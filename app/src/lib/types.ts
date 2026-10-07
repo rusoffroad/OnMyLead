@@ -1,6 +1,8 @@
 import type { BubblePreset, RideRole } from '@/core/bubble';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
+import type { DishModel, PowerSource } from '@/core/power';
+import type { TripCategory } from '@/core/trips';
 
 export type Visibility = 'public' | 'unlisted' | 'private';
 export type RideStatus = 'scheduled' | 'live' | 'ended' | 'cancelled';
@@ -107,4 +109,49 @@ export type VehicleItem = {
   installed_on: string | null;
   notes: string | null;
   created_at: string;
+};
+
+export type Trip = {
+  id: string;
+  owner_id: string;
+  name: string;
+  starts_on: string | null;
+  ends_on: string | null;
+  ride_id: string | null;
+  vehicle_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TripItem = {
+  id: string;
+  trip_id: string;
+  name: string;
+  category: TripCategory;
+  checked: boolean;
+  quantity: number;
+  notes: string | null;
+  position: number;
+  created_at: string;
+};
+
+export type StarlinkSetup = {
+  id: string;
+  owner_id: string;
+  vehicle_id: string | null;
+  plan_name: string | null;
+  monthly_cost_cents: number | null;
+  data_cap_gb: number | null;
+  dish_model: DishModel | null;
+  power_source: PowerSource | null;
+  notes: string | null;
+  dish_watts: number | null;
+  hours_per_day: number | null;
+  battery_wh: number | null;
+  battery_ah: number | null;
+  battery_volts: number | null;
+  usable_percent: number | null;
+  solar_watts: number | null;
+  sun_hours: number | null;
+  updated_at: string;
 };
