@@ -2,6 +2,7 @@ import { Link, router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { LogoBanner } from '@/components/logo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Field, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -31,6 +32,7 @@ export default function Home() {
   if (!isBackendConfigured) {
     return (
       <Screen>
+        <LogoBanner height={110} />
         <ThemedText type="subtitle">Almost ready</ThemedText>
         <ThemedText>Add the backend keys to app/.env (see .env.example), then restart the app.</ThemedText>
       </Screen>
@@ -39,6 +41,7 @@ export default function Home() {
 
   return (
     <Screen>
+      <LogoBanner height={110} />
       {!loading && !session ? (
         <Card>
           <ThemedText type="smallBold">Sign in to create and join rides</ThemedText>
