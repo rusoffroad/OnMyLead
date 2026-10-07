@@ -218,4 +218,138 @@ do $$ begin
 end $$;
 reset role;
 
-select 'ALL PRIVACY AND JOINING TESTS PASSED' as result;
+-- 11. Garage: owners manage their own machines and build lists; nobody else can.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+insert into vehicles (id, owner_id, kind, nickname, make, model, tank_gallons, extra_fuel_gallons, mpg)
+values ('33333333-3333-3333-3333-333333333333', auth.uid(), 'sxs_utv', 'Dusty', 'Polaris', 'RZR', 10, 3.5, 12);
+insert into vehicle_items (id, vehicle_id, area, name, cost_cents)
+values ('44444444-4444-4444-4444-444444444444', '33333333-3333-3333-3333-333333333333', 'lighting', 'Light bar', 45000);
+do $$ begin
+  if (select count(*) from vehicle_items) <> 1 then raise exception 'FAIL: owner cannot see their build list'; end if;
+end $$;
+reset role;
+
+-- A stranger cannot see, change or add to Cara's machine.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from vehicles) <> 0 then raise exception 'FAIL: stranger saw a vehicle'; end if;
+  if (select count(*) from vehicle_items) <> 0 then raise exception 'FAIL: stranger saw build items'; end if;
+  update vehicle_items set cost_cents = 1 where id = '44444444-4444-4444-4444-444444444444';
+  if found then raise exception 'FAIL: stranger edited a build item'; end if;
+  delete from vehicle_items where id = '44444444-4444-4444-4444-444444444444';
+  if found then raise exception 'FAIL: stranger deleted a build item'; end if;
+  update vehicles set nickname = 'mine now' where id = '33333333-3333-3333-3333-333333333333';
+  if found then raise exception 'FAIL: stranger edited a vehicle'; end if;
+  delete from vehicles where id = '33333333-3333-3333-3333-333333333333';
+  if found then raise exception 'FAIL: stranger deleted a vehicle'; end if;
+  begin
+    insert into vehicle_items (vehicle_id, area, name) values ('33333333-3333-3333-3333-333333333333', 'other', 'Spam');
+    raise exception 'FAIL: stranger added an item to someone else''s vehicle';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into vehicles (owner_id, kind, nickname) values ('00000000-0000-0000-0000-00000000000c', 'vehicle', 'Planted');
+    raise exception 'FAIL: stranger created a vehicle in someone else''s garage';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+
+-- The owner cannot hand a vehicle or an item to someone else's garage either.
+insert into vehicles (id, owner_id, kind, nickname)
+values ('55555555-5555-5555-5555-555555555555', '00000000-0000-0000-0000-00000000000d', 'vehicle', 'Dan truck');
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+do $$ begin
+  begin
+    update vehicles set owner_id = '00000000-0000-0000-0000-00000000000d' where id = '33333333-3333-3333-3333-333333333333';
+    raise exception 'FAIL: vehicle moved to another owner';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    update vehicle_items set vehicle_id = '55555555-5555-5555-5555-555555555555' where id = '44444444-4444-4444-4444-444444444444';
+    raise exception 'FAIL: item moved onto another owner''s vehicle';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+-- Cara brings Dusty on the ride.
+select set_my_vehicle('11111111-1111-1111-1111-111111111111', '33333333-3333-3333-3333-333333333333');
+reset role;
+do $$ begin
+  if (select vehicle_id from ride_members where user_id = '00000000-0000-0000-0000-00000000000c') is distinct from '33333333-3333-3333-3333-333333333333' then
+    raise exception 'FAIL: set_my_vehicle did not attach the owner''s vehicle';
+  end if;
+end $$;
+
+-- 12. Ride lineup: a joined rider sees the machine but not its build list; a stranger sees neither.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+do $$ begin
+  if (select count(*) from vehicles where id = '33333333-3333-3333-3333-333333333333') <> 1 then
+    raise exception 'FAIL: ride member cannot see a rider''s vehicle in the lineup';
+  end if;
+  if (select count(*) from vehicle_items) <> 0 then raise exception 'FAIL: ride member saw another rider''s build items'; end if;
+  update vehicles set nickname = 'renamed' where id = '33333333-3333-3333-3333-333333333333';
+  if found then raise exception 'FAIL: ride member edited another rider''s vehicle'; end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from vehicles where id = '33333333-3333-3333-3333-333333333333') <> 0 then
+    raise exception 'FAIL: non-member saw a vehicle on a ride lineup';
+  end if;
+end $$;
+reset role;
+
+-- 13. Nobody can attach someone else's vehicle to a membership to peek at it.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('66666666-6666-6666-6666-666666666666', auth.uid(), 'Dan''s ride', now() + interval '2 days', 38.5, -109.5, 'public');
+do $$ begin
+  -- Dan is the organizer (a ride manager) and tries to point his own membership at Cara's vehicle.
+  begin
+    update ride_members set vehicle_id = '33333333-3333-3333-3333-333333333333'
+    where ride_id = '66666666-6666-6666-6666-666666666666' and user_id = auth.uid();
+    raise exception 'FAIL: manager attached someone else''s vehicle to a membership';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  perform set_my_vehicle('66666666-6666-6666-6666-666666666666', '33333333-3333-3333-3333-333333333333');
+  if (select count(*) from vehicles where id = '33333333-3333-3333-3333-333333333333') <> 0 then
+    raise exception 'FAIL: set_my_vehicle exposed someone else''s vehicle';
+  end if;
+end $$;
+reset role;
+-- Ben joins Dan's ride claiming Cara's vehicle: refused.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  begin
+    perform join_ride('66666666-6666-6666-6666-666666666666', null, '33333333-3333-3333-3333-333333333333');
+    raise exception 'FAIL: joined a ride with someone else''s vehicle';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+end $$;
+reset role;
+do $$ begin
+  if exists (select 1 from ride_members where vehicle_id = '33333333-3333-3333-3333-333333333333' and user_id <> '00000000-0000-0000-0000-00000000000c') then
+    raise exception 'FAIL: a membership points at a vehicle its rider does not own';
+  end if;
+end $$;
+
+-- 14. Deleting a vehicle clears it from memberships and removes its build list.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+delete from vehicles where id = '33333333-3333-3333-3333-333333333333';
+reset role;
+do $$ begin
+  if exists (select 1 from vehicle_items where id = '44444444-4444-4444-4444-444444444444') then raise exception 'FAIL: items survived vehicle delete'; end if;
+  if exists (select 1 from ride_members where vehicle_id is not null) then raise exception 'FAIL: membership kept a deleted vehicle'; end if;
+end $$;
+
+select 'ALL PRIVACY, JOINING AND GARAGE TESTS PASSED' as result;

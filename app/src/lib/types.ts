@@ -1,4 +1,5 @@
 import type { BubblePreset, RideRole } from '@/core/bubble';
+import type { AreaId, VehicleKind } from '@/core/garage';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 
 export type Visibility = 'public' | 'unlisted' | 'private';
@@ -74,3 +75,36 @@ export type RegroupPoint = { id: string; ride_id: string; lat: number; lng: numb
 /** Map a membership role to the Ride Bubble role. */
 export const bubbleRole = (role: MemberRole): RideRole =>
   role === 'leader' ? 'leader' : role === 'sweep' ? 'sweep' : 'rider';
+
+export type Vehicle = {
+  id: string;
+  owner_id: string;
+  kind: VehicleKind;
+  year: number | null;
+  make: string | null;
+  model: string | null;
+  trim: string | null;
+  vin: string | null;
+  nickname: string | null;
+  photo_url: string | null;
+  seats: number | null;
+  engine_hours: number | null;
+  odometer_miles: number | null;
+  tank_gallons: number | null;
+  extra_fuel_gallons: number | null;
+  mpg: number | null;
+  purchase_price_cents: number | null;
+  created_at: string;
+};
+
+export type VehicleItem = {
+  id: string;
+  vehicle_id: string;
+  area: AreaId;
+  name: string;
+  brand: string | null;
+  cost_cents: number | null;
+  installed_on: string | null;
+  notes: string | null;
+  created_at: string;
+};
