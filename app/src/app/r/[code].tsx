@@ -1,6 +1,6 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Platform, Share, View } from 'react-native';
+import { Platform, Pressable, Share, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
@@ -10,6 +10,7 @@ import {
   approveMember, checkIn, getMembers, getPrivateDetails, getRide, joinRide, leaveRide, setMemberRole, setRideStatus, tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
+import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
 import type { Ride, RideMember, RidePrivateDetails } from '@/lib/types';
 
@@ -198,6 +199,14 @@ export default function RidePage() {
       {mine && mine.status !== 'cancelled' && mine.role !== 'organizer' ? (
         <Button title="Leave ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
       ) : null}
+
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel="OnMyLead is presented by RUS Offroad"
+        onPress={() => openStore('ride_page')}
+        style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 12 }}>presented by RUS Offroad</ThemedText>
+      </Pressable>
     </Screen>
   );
 }

@@ -3,6 +3,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { RusGear } from '@/components/rus-gear';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -208,6 +209,8 @@ export default function VehiclePage() {
           ) : null}
         </Card>
       ) : null}
+
+      {mine ? <RusGear vehicle={vehicle} campaign="garage_vehicle" /> : null}
 
       <ThemedText type="smallBold">Export</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>

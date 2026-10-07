@@ -1,5 +1,6 @@
 -- Trip planner (packing checklists) and Starlink setup. Both are private to the rider:
 -- nobody else, including people on the same ride, can see them.
+-- RUS Offroad gear suggestions need no tables: products are read live from the public store.
 
 -- ---------------------------------------------------------------------------
 -- Shared rule: a row's vehicle must be in the same rider's garage.

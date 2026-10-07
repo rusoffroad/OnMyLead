@@ -3,12 +3,13 @@ import { useCallback, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { ProgressBar } from '@/components/progress-bar';
+import { RusGear } from '@/components/rus-gear';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
 import { vehicleTitle } from '@/core/garage';
 import {
-  TRIP_CATEGORIES, TRIP_TEMPLATES, groupByCategory, itemsToAdd, progress, tripDates, type TripCategory,
+  TRIP_CATEGORIES, TRIP_TEMPLATES, categoriesOnList, groupByCategory, itemsToAdd, progress, tripDates, type TripCategory,
 } from '@/core/trips';
 import {
   addTripItems, copyTrip, deleteTrip, deleteTripItem, getRide, getTrip, getVehicle, tripItems, uncheckAll, updateTripItem,
@@ -217,6 +218,8 @@ export default function TripPage() {
           </Card>
         );
       })}
+
+      <RusGear vehicle={vehicle} categories={categoriesOnList(items)} campaign="trip_checklist" />
 
       {items.length ? (
         <View style={{ gap: Spacing.two }}>
