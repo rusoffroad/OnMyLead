@@ -57,6 +57,7 @@ export default function Home() {
         <Button title="My garage" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(session ? '/garage' : '/sign-in')} />
         <Button title="Trip planner" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(session ? '/trips' : '/sign-in')} />
       </View>
+      <Button title="Starlink" kind="secondary" onPress={() => router.push('/starlink')} />
 
       <Card>
         <Field label="Have an invite code?" value={code} onChangeText={setCode} autoCapitalize="characters" placeholder="e.g. 7F3A9C21" />

@@ -72,3 +72,43 @@ create policy trips_owner on trips for all to authenticated
 create policy trip_items_owner on trip_items for all to authenticated
   using (exists (select 1 from trips t where t.id = trip_id and t.owner_id = auth.uid()))
   with check (exists (select 1 from trips t where t.id = trip_id and t.owner_id = auth.uid()));
+
+-- ---------------------------------------------------------------------------
+-- Starlink setup the rider fills in by hand (SpaceX has no public API for plan,
+-- billing or usage) plus their power budget inputs. One general row per rider
+-- (vehicle_id null) and optionally one per vehicle in their garage.
+-- ---------------------------------------------------------------------------
+create table starlink_setups (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references profiles (id) on delete cascade,
+  vehicle_id uuid references vehicles (id) on delete cascade,
+  plan_name text check (plan_name is null or length(plan_name) <= 80),
+  monthly_cost_cents int check (monthly_cost_cents between 0 and 10000000),
+  data_cap_gb numeric check (data_cap_gb >= 0),
+  dish_model text check (dish_model in (
+    'mini', 'standard', 'standard_actuated', 'high_performance', 'flat_high_performance', 'other'
+  )),
+  power_source text check (power_source in (
+    'vehicle_12v', 'aux_battery', 'power_station', 'solar_battery', 'generator', 'shore', 'other'
+  )),
+  notes text check (notes is null or length(notes) <= 1000),
+  dish_watts numeric check (dish_watts between 0 and 1000),
+  hours_per_day numeric check (hours_per_day between 0 and 24),
+  battery_wh numeric check (battery_wh between 0 and 1000000),
+  battery_ah numeric check (battery_ah between 0 and 100000),
+  battery_volts numeric check (battery_volts between 0 and 1000),
+  usable_percent numeric check (usable_percent between 1 and 100),
+  solar_watts numeric check (solar_watts between 0 and 100000),
+  sun_hours numeric check (sun_hours between 0 and 24),
+  updated_at timestamptz not null default now(),
+  unique nulls not distinct (owner_id, vehicle_id)
+);
+
+create trigger starlink_setups_vehicle_owner before insert or update of vehicle_id, owner_id on starlink_setups
+  for each row execute function check_owner_vehicle();
+create trigger starlink_setups_touch before update on starlink_setups
+  for each row execute function touch_updated_at();
+
+alter table starlink_setups enable row level security;
+create policy starlink_setups_owner on starlink_setups for all to authenticated
+  using (owner_id = auth.uid()) with check (owner_id = auth.uid());

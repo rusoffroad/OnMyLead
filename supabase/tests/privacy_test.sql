@@ -452,4 +452,54 @@ do $$ begin
   if exists (select 1 from trip_items where trip_id = '77777777-7777-7777-7777-777777777777') then raise exception 'FAIL: checklist survived trip delete'; end if;
 end $$;
 
+-- 16. Starlink setup: private to the rider, one general row plus one per own vehicle.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+insert into starlink_setups (owner_id, plan_name, monthly_cost_cents, dish_model, power_source, dish_watts, hours_per_day, battery_wh)
+values (auth.uid(), 'Roam Unlimited', 16500, 'mini', 'power_station', 30, 8, 1024);
+insert into starlink_setups (owner_id, vehicle_id, dish_model)
+values (auth.uid(), '55555555-5555-5555-5555-555555555555', 'standard');
+do $$ begin
+  if (select count(*) from starlink_setups) <> 2 then raise exception 'FAIL: owner cannot see their Starlink setups'; end if;
+  begin
+    insert into starlink_setups (owner_id, plan_name) values (auth.uid(), 'Second general row');
+    raise exception 'FAIL: two general Starlink rows for one rider';
+  exception when unique_violation then null;
+  end;
+  begin
+    insert into starlink_setups (owner_id, dish_model) values (auth.uid(), 'dishy_mcflatface');
+    raise exception 'FAIL: unknown dish model accepted';
+  exception when check_violation then null;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+do $$ begin
+  if (select count(*) from starlink_setups) <> 0 then raise exception 'FAIL: saw another rider''s Starlink setup'; end if;
+  update starlink_setups set plan_name = 'hacked';
+  if found then raise exception 'FAIL: edited another rider''s Starlink setup'; end if;
+  delete from starlink_setups;
+  if found then raise exception 'FAIL: deleted another rider''s Starlink setup'; end if;
+  begin
+    insert into starlink_setups (owner_id, plan_name) values ('00000000-0000-0000-0000-00000000000d', 'Planted');
+    raise exception 'FAIL: created a Starlink setup for someone else';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into starlink_setups (owner_id, vehicle_id) values (auth.uid(), '55555555-5555-5555-5555-555555555555');
+    raise exception 'FAIL: Starlink setup linked to someone else''s vehicle';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+end $$;
+reset role;
+-- Deleting the vehicle removes its Starlink row; the general row stays.
+delete from vehicles where id = '55555555-5555-5555-5555-555555555555';
+do $$ begin
+  if (select count(*) from starlink_setups where owner_id = '00000000-0000-0000-0000-00000000000d') <> 1 then
+    raise exception 'FAIL: vehicle delete did not tidy Starlink rows correctly';
+  end if;
+end $$;
+
 select 'ALL PRIVACY, JOINING AND GARAGE TESTS PASSED' as result;

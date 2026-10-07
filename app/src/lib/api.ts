@@ -8,7 +8,7 @@ import { track } from './analytics';
 import { readPhotoBytes, type PickedPhoto } from './photo-bytes';
 import { supabase } from './supabase';
 import type {
-  Position, RegroupPoint, Ride, RideMember, RidePrivateDetails, RiderStatusKind, Trip, TripItem, Vehicle, VehicleItem, Visibility,
+  Position, RegroupPoint, Ride, RideMember, RidePrivateDetails, RiderStatusKind, StarlinkSetup, Trip, TripItem, Vehicle, VehicleItem, Visibility,
 } from './types';
 
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
@@ -528,4 +528,25 @@ export async function copyTrip(trip: Trip, items: TripItem[]): Promise<Trip> {
     { name: `${trip.name} (copy)`.slice(0, 120), starts_on: null, ends_on: null, ride_id: null, vehicle_id: trip.vehicle_id },
     items.map((i) => ({ name: i.name, category: i.category, quantity: i.quantity, notes: i.notes ?? undefined })),
   );
+}
+
+// --- Starlink -----------------------------------------------------------------
+
+export type StarlinkSetupInput = Omit<StarlinkSetup, 'id' | 'owner_id' | 'vehicle_id' | 'updated_at'>;
+
+/** The rider's Starlink setup: the general one (vehicleId null) or the one for a vehicle. */
+export async function getStarlinkSetup(vehicleId: string | null): Promise<StarlinkSetup | null> {
+  const uid = await currentUserId();
+  const q = supabase.from('starlink_setups').select('*').eq('owner_id', uid);
+  return unwrap(await (vehicleId ? q.eq('vehicle_id', vehicleId) : q.is('vehicle_id', null)).maybeSingle());
+}
+
+export async function saveStarlinkSetup(vehicleId: string | null, input: StarlinkSetupInput): Promise<StarlinkSetup> {
+  const owner_id = await currentUserId();
+  const existing = await getStarlinkSetup(vehicleId);
+  const row = existing
+    ? unwrap<StarlinkSetup>(await supabase.from('starlink_setups').update(input).eq('id', existing.id).select().single())
+    : unwrap<StarlinkSetup>(await supabase.from('starlink_setups').insert({ ...input, owner_id, vehicle_id: vehicleId }).select().single());
+  if (!existing) track('starlink_setup_saved', { dish_model: input.dish_model, per_vehicle: !!vehicleId });
+  return row;
 }

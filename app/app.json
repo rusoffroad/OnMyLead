@@ -55,7 +55,8 @@
           "cameraPermission": false,
           "microphonePermission": false
         }
-      ]
+      ],
+      "./plugins/with-starlink-local-network"
     ],
     "experiments": {
       "typedRoutes": true,
