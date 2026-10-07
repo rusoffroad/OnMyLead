@@ -43,10 +43,20 @@ export async function signInWithProvider(provider: SocialProvider) {
 }
 
 /** Phone or email: sends a one-time code. */
+/**
+ * Where the sign-in link in the email lands. Supabase's free email sender can't use a custom
+ * template, so its email carries a link (not the code); on the web the link signs the rider in
+ * through /auth-callback in the same browser.
+ */
+function emailRedirectUrl() {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') return `${window.location.origin}/auth-callback`;
+  return Linking.createURL('/auth-callback');
+}
+
 export async function sendCode(target: string) {
   const isEmail = target.includes('@');
   const { error } = isEmail
-    ? await supabase.auth.signInWithOtp({ email: target })
+    ? await supabase.auth.signInWithOtp({ email: target, options: { emailRedirectTo: emailRedirectUrl() } })
     : await supabase.auth.signInWithOtp({ phone: target });
   if (error) throw error;
 }
