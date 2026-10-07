@@ -1,0 +1,203 @@
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
+import { View } from 'react-native';
+
+import { ThemedText } from '@/components/themed-text';
+import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
+import { Spacing } from '@/constants/theme';
+import type { BubblePreset } from '@/core/bubble';
+import type { JoinPolicy } from '@/core/joining';
+import { parseTime } from '@/core/time';
+import { createRide } from '@/lib/api';
+import { currentPosition } from '@/lib/location';
+import type { Visibility } from '@/lib/types';
+
+const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland rig', 'Snowmobile', 'Car'];
+
+function nextDays(n: number) {
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+}
+
+const at = (day: Date, minutes: number | null) => (minutes == null ? null : new Date(day.getTime() + minutes * 60_000));
+const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : null);
+
+export default function NewRide() {
+  const days = useMemo(() => nextDays(14), []);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [day, setDay] = useState<number>(days[0].getTime());
+  const [meetTime, setMeetTime] = useState('8:00 am');
+  const [departTime, setDepartTime] = useState('');
+  const [finishTime, setFinishTime] = useState('');
+  const [meetLabel, setMeetLabel] = useState('');
+  const [coords, setCoords] = useState('');
+  const [destination, setDestination] = useState('');
+  const [vehicleTypes, setVehicleTypes] = useState<string[]>(['SXS/UTV']);
+  const [difficulty, setDifficulty] = useState<string | null>(null);
+  const [experience, setExperience] = useState<string | null>(null);
+  const [maxVehicles, setMaxVehicles] = useState('');
+  const [maxRiders, setMaxRiders] = useState('');
+  const [routeMiles, setRouteMiles] = useState('');
+  const [whatToBring, setWhatToBring] = useState('');
+  const [requiredEquipment, setRequiredEquipment] = useState('');
+  const [fuelNotes, setFuelNotes] = useState('');
+  const [instructions, setInstructions] = useState('');
+  const [visibility, setVisibility] = useState<Visibility>('unlisted');
+  const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>('open');
+  const [bubble, setBubble] = useState<BubblePreset>('default');
+  const [more, setMore] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const parsedCoords = coords.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+
+  async function useMyLocation() {
+    try {
+      const p = await currentPosition();
+      setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not get your location.');
+    }
+  }
+
+  async function submit() {
+    setError(null);
+    const dayDate = new Date(day);
+    const meetAt = at(dayDate, parseTime(meetTime));
+    if (!name.trim()) return setError('Give the ride a name.');
+    if (!meetAt) return setError('Meeting time looks off. Try "8:00 am".');
+    if (!parsedCoords) return setError('Set the meeting point: use your location or paste coordinates like "38.57, -109.55".');
+    setBusy(true);
+    try {
+      const ride = await createRide({
+        name: name.trim(),
+        description,
+        meetAt,
+        departAt: departTime ? at(dayDate, parseTime(departTime)) : null,
+        expectedFinishAt: finishTime ? at(dayDate, parseTime(finishTime)) : null,
+        meetLat: Number(parsedCoords[1]),
+        meetLng: Number(parsedCoords[2]),
+        meetLabel,
+        destinationLabel: destination,
+        instructions,
+        vehicleTypes,
+        difficulty,
+        experienceLevel: experience,
+        maxVehicles: toInt(maxVehicles),
+        maxRiders: toInt(maxRiders),
+        routeMiles: routeMiles ? Number(routeMiles) : null,
+        whatToBring,
+        requiredEquipment,
+        fuelNotes,
+        visibility,
+        joinPolicy,
+        bubblePreset: bubble,
+      });
+      router.replace(`/r/${ride.invite_code}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not create the ride.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Screen>
+      <Field label="Ride name" value={name} onChangeText={setName} placeholder="Saturday Hell's Revenge run" />
+      <Choice
+        label="Day"
+        value={day}
+        onChange={setDay}
+        options={days.map((d, i) => ({
+          value: d.getTime(),
+          label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }),
+        }))}
+      />
+      <Field label="Meet at" value={meetTime} onChangeText={setMeetTime} placeholder="8:00 am" />
+      <Card>
+        <ThemedText type="smallBold">Meeting point</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          Only joined riders see the exact spot. Public pages show the area within about a mile.
+        </ThemedText>
+        <Button title="Use my current location" kind="secondary" onPress={useMyLocation} />
+        <Field label="Coordinates" value={coords} onChangeText={setCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
+        <Field label="Place name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
+      </Card>
+      <MultiChoice label="Vehicles welcome" options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
+      <Choice
+        label="Who can find it"
+        value={visibility}
+        onChange={setVisibility}
+        options={[
+          { value: 'unlisted', label: 'Anyone with the link' },
+          { value: 'public', label: 'Public' },
+          { value: 'private', label: 'Invite only' },
+        ]}
+      />
+      <Choice
+        label="Joining"
+        value={joinPolicy}
+        onChange={setJoinPolicy}
+        options={[
+          { value: 'open', label: 'Open' },
+          { value: 'approval', label: 'I approve riders' },
+          { value: 'invite_only', label: 'Invite only' },
+        ]}
+      />
+      <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+        <View style={{ flex: 1 }}>
+          <Field label="Max vehicles" value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder="No limit" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Field label="Max riders" value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder="No limit" />
+        </View>
+      </View>
+
+      <Button title={more ? 'Fewer details' : 'More details'} kind="secondary" onPress={() => setMore(!more)} />
+      {more ? (
+        <>
+          <Field label="Description" value={description} onChangeText={setDescription} multiline />
+          <Field label="Departure time" value={departTime} onChangeText={setDepartTime} placeholder="8:30 am" />
+          <Field label="Expected finish" value={finishTime} onChangeText={setFinishTime} placeholder="4:00 pm" />
+          <Field label="Destination" value={destination} onChangeText={setDestination} />
+          <Field label="Route length (miles)" value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint="Used to warn riders whose fuel range is too short." />
+          <Choice
+            label="Difficulty"
+            value={difficulty}
+            onChange={setDifficulty}
+            options={[{ value: 'easy', label: 'Easy' }, { value: 'moderate', label: 'Moderate' }, { value: 'hard', label: 'Hard' }, { value: 'extreme', label: 'Extreme' }]}
+          />
+          <Choice
+            label="Experience"
+            value={experience}
+            onChange={setExperience}
+            options={[{ value: 'beginner', label: 'Beginner' }, { value: 'intermediate', label: 'Intermediate' }, { value: 'advanced', label: 'Advanced' }, { value: 'expert', label: 'Expert' }]}
+          />
+          <Field label="What to bring" value={whatToBring} onChangeText={setWhatToBring} multiline />
+          <Field label="Required equipment" value={requiredEquipment} onChangeText={setRequiredEquipment} multiline placeholder="Whip flag, helmet, spare belt" />
+          <Field label="Fuel" value={fuelNotes} onChangeText={setFuelNotes} placeholder="Full tank, no gas on the trail" />
+          <Field label="Instructions for joined riders" value={instructions} onChangeText={setInstructions} multiline />
+          <Choice
+            label="Ride Bubble"
+            value={bubble}
+            onChange={setBubble}
+            options={[
+              { value: 'default', label: 'Standard' },
+              { value: 'tight_trail', label: 'Tight trail' },
+              { value: 'desert', label: 'Desert' },
+              { value: 'highway', label: 'Highway' },
+            ]}
+          />
+        </>
+      ) : null}
+
+      <ErrorText error={error} />
+      <Button title="Create ride" big loading={busy} onPress={submit} />
+    </Screen>
+  );
+}
