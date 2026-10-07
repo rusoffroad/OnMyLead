@@ -1,6 +1,6 @@
-# Group Ride
+# OnMyLead
 
-A vehicle-agnostic group ride app: plan a ride, invite people with a link, and keep the
+OnMyLead is a vehicle-agnostic group ride app: plan a ride, invite people with a link, and keep the
 group together on the trail. It is a group ride platform that happens to include maps, not
 another navigation app.
 
@@ -31,7 +31,7 @@ Privacy is enforced in the database, not only in the app:
 
 1. **Backend.** Create a Supabase project. Run `supabase/migrations/*.sql` in the SQL editor
    (or `supabase db push` with the Supabase CLI). Under Authentication > Providers, turn on
-   Apple, Google, Facebook, Phone and Email as wanted, and add `groupride://auth-callback`
+   Apple, Google, Facebook, Phone and Email as wanted, and add `onmylead://auth-callback`
    and your web URL to the redirect allow list.
 2. **App config.** `cp app/.env.example app/.env` and fill in the project URL and anon key.
 3. **Run.** In `app/`: `npm install`, then `npx expo start`. Background location and maps

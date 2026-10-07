@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "Group Ride",
-    "slug": "group-ride-app",
+    "name": "OnMyLead",
+    "slug": "onmylead",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "groupride",
+    "scheme": "onmylead",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.rusoffroad.groupride",
+      "bundleIdentifier": "com.rusoffroad.onmylead",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Your location is shared only with riders you choose, only while you are sharing, so your group can stay together.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends."
@@ -23,7 +23,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.rusoffroad.groupride"
+      "package": "com.rusoffroad.onmylead"
     },
     "web": {
       "output": "single",
