@@ -66,6 +66,14 @@ export default function RidePage() {
     }
   }
 
+  if (ride === undefined && error) {
+    return (
+      <Screen>
+        <ErrorText error={error} />
+        <Button title="Try again" onPress={() => { setError(null); load(); }} />
+      </Screen>
+    );
+  }
   if (ride === undefined) return <Screen><ThemedText>Loading…</ThemedText></Screen>;
   if (ride === null) return <Screen><ThemedText>We couldn’t find that ride. Check the link or code.</ThemedText></Screen>;
 
