@@ -11,12 +11,8 @@ How an update reaches the site:
 
 ## One-time setup
 
-**1. GitHub: add the Supabase key** (so GitHub can build the app)
-Repo → **Settings → Secrets and variables → Actions → New repository secret**
-- Name: `SUPABASE_PUBLISHABLE_KEY`
-- Value: the `sb_publishable_…` key from Supabase → Project Settings → API Keys
-
-Then **Actions → Build web → Run workflow** once, and wait for the green check.
+**1. GitHub**
+After merging, **Actions → Build web** runs on its own; wait for the green check.
 
 **2. Cloudflare: a new tunnel for OnMyLead**
 1. If onmylead.com isn't in Cloudflare yet: **Add a domain** → onmylead.com → Free plan, then change the domain's

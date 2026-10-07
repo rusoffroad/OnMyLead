@@ -23,7 +23,9 @@ jobs:
         working-directory: app
     env:
       EXPO_PUBLIC_SUPABASE_URL: https://jeacssxhjzjjmczcorcr.supabase.co
-      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      # The publishable key is meant to be public: it ships inside the website for every visitor,
+      # and the database rules (RLS) decide what it can see.
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_RvOJ7J3hFqBhP4CBJuXYow_OzCJ3zV3
       EXPO_PUBLIC_WEB_URL: https://onmylead.com
       EXPO_OFFLINE: '1'
     steps:
@@ -33,12 +35,6 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: app/package-lock.json
-      - name: Check the publishable key is set
-        run: |
-          if [ -z "$EXPO_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            echo "::error::Add the repository secret SUPABASE_PUBLISHABLE_KEY (Settings → Secrets and variables → Actions)."
-            exit 1
-          fi
       - run: npm ci
       - run: npm test
       - run: npx expo export --platform web --clear
