@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Platform } from 'react-native';
 
+import { LogoBanner } from '@/components/logo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen } from '@/components/ui';
 import { track } from '@/lib/analytics';
@@ -42,6 +43,7 @@ export default function SignIn() {
 
   return (
     <Screen>
+      <LogoBanner />
       <ThemedText type="subtitle">Join the ride</ThemedText>
       {providers.map((p) => (
         <Button key={p.id} title={p.title} kind="secondary" loading={busy === p.id} onPress={() => social(p.id)} />
