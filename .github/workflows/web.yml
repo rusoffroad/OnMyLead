@@ -1,0 +1,49 @@
+# Builds the web version of OnMyLead on every change to main and publishes the finished
+# files to the `web-build` branch. The server only downloads that branch (deploy/deploy.sh),
+# so it never has to run the heavy build itself.
+name: Build web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: web-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: https://jeacssxhjzjjmczcorcr.supabase.co
+      # The publishable key is meant to be public: it ships inside the website for every visitor,
+      # and the database rules (RLS) decide what it can see.
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_RvOJ7J3hFqBhP4CBJuXYow_OzCJ3zV3
+      EXPO_PUBLIC_WEB_URL: https://onmylead.com
+      EXPO_OFFLINE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx expo export --platform web --clear
+      - name: Publish to the web-build branch
+        run: |
+          cd dist
+          git init -q -b web-build
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Web build of ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" web-build

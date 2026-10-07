@@ -1,0 +1,29 @@
+# OnMyLead web: its own Docker project, network and Cloudflare tunnel.
+# It shares nothing with any other app on the server; no port is opened on the host.
+name: onmylead
+
+services:
+  web:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./security-headers.conf:/etc/nginx/security-headers.conf:ro
+      - ./site:/usr/share/nginx/html:ro
+    networks: [onmylead]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/"]
+      interval: 30s
+      retries: 3
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${ONMYLEAD_TUNNEL_TOKEN:?set ONMYLEAD_TUNNEL_TOKEN in deploy/.env}
+    depends_on: [web]
+    networks: [onmylead]
+
+networks:
+  onmylead: {}
