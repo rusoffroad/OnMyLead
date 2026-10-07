@@ -1,6 +1,7 @@
 import type { BubblePreset, RideRole } from '@/core/bubble';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
+import type { TripCategory } from '@/core/trips';
 
 export type Visibility = 'public' | 'unlisted' | 'private';
 export type RideStatus = 'scheduled' | 'live' | 'ended' | 'cancelled';
@@ -106,5 +107,29 @@ export type VehicleItem = {
   cost_cents: number | null;
   installed_on: string | null;
   notes: string | null;
+  created_at: string;
+};
+
+export type Trip = {
+  id: string;
+  owner_id: string;
+  name: string;
+  starts_on: string | null;
+  ends_on: string | null;
+  ride_id: string | null;
+  vehicle_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TripItem = {
+  id: string;
+  trip_id: string;
+  name: string;
+  category: TripCategory;
+  checked: boolean;
+  quantity: number;
+  notes: string | null;
+  position: number;
   created_at: string;
 };

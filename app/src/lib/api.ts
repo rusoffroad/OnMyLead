@@ -3,11 +3,12 @@ import type { BubblePreset } from '@/core/bubble';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import { startShare, type ShareScope } from '@/core/sharing';
+import { itemsFromRideNotes, localDate, templateById, type TemplateItem, type TripCategory } from '@/core/trips';
 import { track } from './analytics';
 import { readPhotoBytes, type PickedPhoto } from './photo-bytes';
 import { supabase } from './supabase';
 import type {
-  Position, RegroupPoint, Ride, RideMember, RidePrivateDetails, RiderStatusKind, Vehicle, VehicleItem, Visibility,
+  Position, RegroupPoint, Ride, RideMember, RidePrivateDetails, RiderStatusKind, Trip, TripItem, Vehicle, VehicleItem, Visibility,
 } from './types';
 
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
@@ -415,4 +416,116 @@ export async function decodeVin(vin: string): Promise<unknown> {
   const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin.trim())}?format=json`);
   if (!res.ok) throw new Error('VIN lookup is not responding. Enter the details by hand.');
   return res.json();
+}
+
+// --- Trip planner -----------------------------------------------------------
+
+export type TripInput = {
+  name: string;
+  starts_on: string | null;
+  ends_on: string | null;
+  ride_id: string | null;
+  vehicle_id: string | null;
+};
+
+export type TripWithCounts = Trip & { packed: number; total: number };
+
+export async function myTrips(): Promise<TripWithCounts[]> {
+  const uid = await currentUserId();
+  type Row = Trip & { trip_items: { checked: boolean }[] | null };
+  const rows = unwrap<Row[]>(
+    await supabase.from('trips').select('*, trip_items(checked)').eq('owner_id', uid).order('created_at', { ascending: false }),
+  );
+  return rows.map(({ trip_items, ...trip }) => ({
+    ...trip,
+    total: trip_items?.length ?? 0,
+    packed: (trip_items ?? []).filter((i) => i.checked).length,
+  }));
+}
+
+export async function getTrip(id: string): Promise<Trip | null> {
+  return unwrap(await supabase.from('trips').select('*').eq('id', id).maybeSingle());
+}
+
+export async function createTrip(input: TripInput, items: TemplateItem[] = []): Promise<Trip> {
+  const owner_id = await currentUserId();
+  const trip = unwrap<Trip>(await supabase.from('trips').insert({ ...input, owner_id }).select().single());
+  if (items.length) await addTripItems(trip.id, items);
+  track('trip_created', { from_ride: !!input.ride_id, items: items.length });
+  return trip;
+}
+
+export async function updateTrip(id: string, input: Partial<TripInput>): Promise<Trip> {
+  return unwrap(await supabase.from('trips').update(input).eq('id', id).select().single());
+}
+
+export async function deleteTrip(id: string) {
+  unwrap(await supabase.from('trips').delete().eq('id', id));
+}
+
+/**
+ * The rider's trip for a ride: opens the existing one or starts a new one named after the
+ * ride, dated to the meet day, with their ride vehicle, the day-ride basics and anything
+ * the organizer listed under Bring or Required.
+ */
+export async function tripForRide(ride: Ride, vehicleId: string | null): Promise<Trip> {
+  const uid = await currentUserId();
+  const existing = unwrap<Trip | null>(
+    await supabase.from('trips').select('*').eq('owner_id', uid).eq('ride_id', ride.id).maybeSingle(),
+  );
+  if (existing) return existing;
+  const fromRide = itemsFromRideNotes(ride.what_to_bring, ride.required_equipment);
+  const basics = templateById('day_ride')!.items;
+  const seen = new Set(fromRide.map((i) => i.name.toLowerCase()));
+  const items = [...fromRide, ...basics.filter((i) => !seen.has(i.name.toLowerCase()))];
+  return createTrip(
+    { name: ride.name.slice(0, 120), starts_on: localDate(ride.meet_at), ends_on: null, ride_id: ride.id, vehicle_id: vehicleId },
+    items,
+  );
+}
+
+export async function tripItems(tripId: string): Promise<TripItem[]> {
+  return unwrap(
+    await supabase.from('trip_items').select('*').eq('trip_id', tripId).order('position').order('created_at'),
+  );
+}
+
+export async function addTripItems(tripId: string, items: TemplateItem[], startAt = 0): Promise<TripItem[]> {
+  if (!items.length) return [];
+  return unwrap(
+    await supabase
+      .from('trip_items')
+      .insert(items.map((i, n) => ({
+        trip_id: tripId,
+        name: i.name,
+        category: i.category,
+        quantity: i.quantity ?? 1,
+        notes: i.notes ?? null,
+        position: startAt + n,
+      })))
+      .select(),
+  );
+}
+
+export type TripItemInput = { name: string; category: TripCategory; quantity: number; notes: string | null };
+
+export async function updateTripItem(id: string, patch: Partial<TripItemInput> & { checked?: boolean }): Promise<TripItem> {
+  return unwrap(await supabase.from('trip_items').update(patch).eq('id', id).select().single());
+}
+
+export async function deleteTripItem(id: string) {
+  unwrap(await supabase.from('trip_items').delete().eq('id', id));
+}
+
+export async function uncheckAll(tripId: string) {
+  unwrap(await supabase.from('trip_items').update({ checked: false }).eq('trip_id', tripId).eq('checked', true));
+  track('trip_unchecked_all', {});
+}
+
+/** Start a fresh trip with the same list, nothing packed, no dates or ride. */
+export async function copyTrip(trip: Trip, items: TripItem[]): Promise<Trip> {
+  return createTrip(
+    { name: `${trip.name} (copy)`.slice(0, 120), starts_on: null, ends_on: null, ride_id: null, vehicle_id: trip.vehicle_id },
+    items.map((i) => ({ name: i.name, category: i.category, quantity: i.quantity, notes: i.notes ?? undefined })),
+  );
 }

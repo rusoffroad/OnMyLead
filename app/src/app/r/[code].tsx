@@ -7,7 +7,7 @@ import { Button, Card, ErrorText, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { counts } from '@/core/joining';
 import {
-  approveMember, checkIn, getMembers, getPrivateDetails, getRide, joinRide, leaveRide, setMemberRole, setRideStatus,
+  approveMember, checkIn, getMembers, getPrivateDetails, getRide, joinRide, leaveRide, setMemberRole, setRideStatus, tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { useSession } from '@/lib/session';
@@ -130,6 +130,19 @@ export default function RidePage() {
           ) : null}
         </View>
       )}
+
+      {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && ride.status !== 'cancelled' ? (
+        <Button
+          title="Plan what to bring"
+          kind="secondary"
+          loading={busy === 'trip'}
+          accessibilityHint="Opens your packing checklist for this ride"
+          onPress={() => act('trip', async () => {
+            const trip = await tripForRide(ride, mine.vehicle_id);
+            router.push(`/trips/${trip.id}`);
+          })}
+        />
+      ) : null}
 
       <Button
         title="Invite riders"

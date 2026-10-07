@@ -18,6 +18,10 @@ export default function RootLayout() {
         <Stack.Screen name="garage/new" options={{ title: 'Add to garage' }} />
         <Stack.Screen name="garage/[id]/index" options={{ title: 'Vehicle' }} />
         <Stack.Screen name="garage/[id]/edit" options={{ title: 'Edit machine' }} />
+        <Stack.Screen name="trips/index" options={{ title: 'Trip planner' }} />
+        <Stack.Screen name="trips/new" options={{ title: 'New trip' }} />
+        <Stack.Screen name="trips/[id]/index" options={{ title: 'Trip' }} />
+        <Stack.Screen name="trips/[id]/edit" options={{ title: 'Edit trip' }} />
         <Stack.Screen name="share" options={{ title: 'Share my location' }} />
         <Stack.Screen name="f/[token]" options={{ title: 'Shared location' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />

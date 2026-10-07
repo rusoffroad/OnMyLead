@@ -352,4 +352,104 @@ do $$ begin
   if exists (select 1 from ride_members where vehicle_id is not null) then raise exception 'FAIL: membership kept a deleted vehicle'; end if;
 end $$;
 
+-- 15. Trip planner: trips and checklists are private to their owner, even on a shared ride.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+insert into trips (id, owner_id, name, ride_id) values
+  ('77777777-7777-7777-7777-777777777777', auth.uid(), 'Moab packing', '11111111-1111-1111-1111-111111111111');
+insert into trip_items (id, trip_id, name, category, quantity) values
+  ('88888888-8888-8888-8888-888888888888', '77777777-7777-7777-7777-777777777777', 'Tow strap', 'recovery', 1),
+  ('88888888-8888-8888-8888-888888888889', '77777777-7777-7777-7777-777777777777', 'Water', 'food_water', 2);
+do $$ begin
+  if (select count(*) from trip_items) <> 2 then raise exception 'FAIL: owner cannot see their checklist'; end if;
+  -- Dan's truck is not in Cara's garage.
+  begin
+    update trips set vehicle_id = '55555555-5555-5555-5555-555555555555' where id = '77777777-7777-7777-7777-777777777777';
+    raise exception 'FAIL: trip linked to someone else''s vehicle';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  -- One trip per ride per rider.
+  begin
+    insert into trips (owner_id, name, ride_id) values (auth.uid(), 'Again', '11111111-1111-1111-1111-111111111111');
+    raise exception 'FAIL: second trip for the same ride';
+  exception when unique_violation then null;
+  end;
+  begin
+    insert into trip_items (trip_id, name, category) values ('77777777-7777-7777-7777-777777777777', 'Junk', 'not_a_category');
+    raise exception 'FAIL: bad checklist category accepted';
+  exception when check_violation then null;
+  end;
+end $$;
+reset role;
+
+-- The ride organizer (same ride) and a stranger see nothing and change nothing.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+do $$ begin
+  if (select count(*) from trips) <> 0 then raise exception 'FAIL: ride organizer saw a rider''s trip'; end if;
+  if (select count(*) from trip_items) <> 0 then raise exception 'FAIL: ride organizer saw a rider''s checklist'; end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+insert into trips (id, owner_id, name) values ('99999999-9999-9999-9999-999999999999', auth.uid(), 'Dan trip');
+do $$ begin
+  if (select count(*) from trips) <> 1 then raise exception 'FAIL: stranger saw someone else''s trip'; end if;
+  if (select count(*) from trip_items) <> 0 then raise exception 'FAIL: stranger saw someone else''s checklist'; end if;
+  update trip_items set checked = true where id = '88888888-8888-8888-8888-888888888888';
+  if found then raise exception 'FAIL: stranger ticked someone else''s item'; end if;
+  delete from trip_items where id = '88888888-8888-8888-8888-888888888888';
+  if found then raise exception 'FAIL: stranger deleted someone else''s item'; end if;
+  update trips set name = 'mine now' where id = '77777777-7777-7777-7777-777777777777';
+  if found then raise exception 'FAIL: stranger renamed someone else''s trip'; end if;
+  delete from trips where id = '77777777-7777-7777-7777-777777777777';
+  if found then raise exception 'FAIL: stranger deleted someone else''s trip'; end if;
+  begin
+    insert into trip_items (trip_id, name) values ('77777777-7777-7777-7777-777777777777', 'Spam');
+    raise exception 'FAIL: stranger added to someone else''s checklist';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into trips (owner_id, name) values ('00000000-0000-0000-0000-00000000000c', 'Planted');
+    raise exception 'FAIL: stranger created a trip for someone else';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+
+-- The owner cannot move an item onto someone else's trip, or hand the trip over.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+do $$ begin
+  begin
+    update trip_items set trip_id = '99999999-9999-9999-9999-999999999999' where id = '88888888-8888-8888-8888-888888888888';
+    raise exception 'FAIL: item moved onto another rider''s trip';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    update trips set owner_id = '00000000-0000-0000-0000-00000000000d' where id = '77777777-7777-7777-7777-777777777777';
+    raise exception 'FAIL: trip handed to another rider';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  begin
+    if (select count(*) from trips) <> 0 then raise exception 'FAIL: signed-out visitor saw trips'; end if;
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+-- Deleting a trip removes its checklist.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+delete from trips where id = '77777777-7777-7777-7777-777777777777';
+reset role;
+do $$ begin
+  if exists (select 1 from trip_items where trip_id = '77777777-7777-7777-7777-777777777777') then raise exception 'FAIL: checklist survived trip delete'; end if;
+end $$;
+
 select 'ALL PRIVACY, JOINING AND GARAGE TESTS PASSED' as result;
