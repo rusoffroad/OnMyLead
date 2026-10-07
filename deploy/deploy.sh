@@ -45,6 +45,9 @@ if ! out=$($SUDO docker compose up -d 2>&1); then
   echo "$out" | tail -20
   fail "the containers didn't start (see above)"
 fi
+# The web container mounts the site folder itself, so after the swap above it still sees the old
+# copy until it restarts.
+$SUDO docker compose restart web >/dev/null 2>&1 || fail "the web server didn't restart"
 
 say "4/4  Checking…"
 ok=""
