@@ -54,6 +54,11 @@ export default function SignIn() {
         <Button title="Send code" loading={busy === 'send'} disabled={!target.trim()} onPress={() => run('send', async () => { await sendCode(target.trim()); setSent(true); })} />
       ) : (
         <>
+          <ThemedText>
+            {target.includes('@')
+              ? 'Check your email and tap the sign-in link on this device. If the email shows a code instead, enter it here.'
+              : 'Enter the code we texted you.'}
+          </ThemedText>
           <Field label="Code" value={code} onChangeText={setCode} keyboardType="number-pad" />
           <Button
             title="Sign in"
