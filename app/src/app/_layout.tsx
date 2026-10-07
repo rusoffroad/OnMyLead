@@ -14,6 +14,10 @@ export default function RootLayout() {
         <Stack.Screen name="ride/new" options={{ title: 'Create a ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: 'Ride' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
+        <Stack.Screen name="garage/index" options={{ title: 'Garage' }} />
+        <Stack.Screen name="garage/new" options={{ title: 'Add to garage' }} />
+        <Stack.Screen name="garage/[id]/index" options={{ title: 'Vehicle' }} />
+        <Stack.Screen name="garage/[id]/edit" options={{ title: 'Edit machine' }} />
         <Stack.Screen name="share" options={{ title: 'Share my location' }} />
         <Stack.Screen name="f/[token]" options={{ title: 'Shared location' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />

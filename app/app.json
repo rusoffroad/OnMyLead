@@ -48,7 +48,15 @@
           "locationAlwaysAndWhenInUsePermission": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose a photo of your machine for your garage. Only the photo you pick is uploaded.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

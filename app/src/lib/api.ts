@@ -1,11 +1,13 @@
 import { fuzzLocation } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
+import type { AreaId, VehicleKind } from '@/core/garage';
 import { startShare, type ShareScope } from '@/core/sharing';
 import { track } from './analytics';
+import { readPhotoBytes, type PickedPhoto } from './photo-bytes';
 import { supabase } from './supabase';
 import type {
-  Position, RegroupPoint, Ride, RideMember, RidePrivateDetails, RiderStatusKind, Visibility,
+  Position, RegroupPoint, Ride, RideMember, RidePrivateDetails, RiderStatusKind, Vehicle, VehicleItem, Visibility,
 } from './types';
 
 function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
@@ -294,4 +296,123 @@ export async function activeRegroup(rideId: string): Promise<RegroupPoint | null
   return unwrap(
     await supabase.from('regroup_points').select('*').eq('ride_id', rideId).is('cleared_at', null).order('created_at', { ascending: false }).limit(1).maybeSingle(),
   );
+}
+
+// --- Garage -----------------------------------------------------------------
+
+export const VEHICLE_PHOTO_BUCKET = 'vehicle-photos';
+
+export type VehicleInput = {
+  kind: VehicleKind;
+  nickname: string | null;
+  year: number | null;
+  make: string | null;
+  model: string | null;
+  trim: string | null;
+  vin: string | null;
+  purchase_price_cents: number | null;
+  engine_hours: number | null;
+  odometer_miles: number | null;
+  tank_gallons: number | null;
+  extra_fuel_gallons: number;
+  mpg: number | null;
+};
+
+export type VehicleWithCost = Vehicle & { build_cost_cents: number; item_count: number };
+
+export async function myVehicles(): Promise<VehicleWithCost[]> {
+  const uid = await currentUserId();
+  type Row = Vehicle & { vehicle_items: { cost_cents: number | null }[] | null };
+  const rows = unwrap<Row[]>(
+    await supabase.from('vehicles').select('*, vehicle_items(cost_cents)').eq('owner_id', uid).order('created_at'),
+  );
+  return rows.map(({ vehicle_items, ...v }) => ({
+    ...v,
+    build_cost_cents: (vehicle_items ?? []).reduce((sum, i) => sum + (i.cost_cents ?? 0), 0),
+    item_count: vehicle_items?.length ?? 0,
+  }));
+}
+
+export async function getVehicle(id: string): Promise<Vehicle | null> {
+  return unwrap(await supabase.from('vehicles').select('*').eq('id', id).maybeSingle());
+}
+
+export async function createVehicle(v: VehicleInput): Promise<Vehicle> {
+  const owner_id = await currentUserId();
+  const row = unwrap<Vehicle>(await supabase.from('vehicles').insert({ ...v, owner_id }).select().single());
+  track('vehicle_added', { kind: v.kind });
+  return row;
+}
+
+export async function updateVehicle(id: string, v: Partial<VehicleInput> & { photo_url?: string | null }): Promise<Vehicle> {
+  return unwrap(await supabase.from('vehicles').update(v).eq('id', id).select().single());
+}
+
+export async function deleteVehicle(v: Pick<Vehicle, 'id' | 'photo_url'>) {
+  unwrap(await supabase.from('vehicles').delete().eq('id', v.id));
+  const path = photoPath(v.photo_url);
+  if (path) await supabase.storage.from(VEHICLE_PHOTO_BUCKET).remove([path]);
+}
+
+/** Storage path inside the bucket for a public photo URL we created, else null. */
+function photoPath(url: string | null): string | null {
+  const marker = `/${VEHICLE_PHOTO_BUCKET}/`;
+  const at = url?.indexOf(marker) ?? -1;
+  return url && at >= 0 ? decodeURIComponent(url.slice(at + marker.length).split('?')[0]) : null;
+}
+
+const PHOTO_EXT: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/heic': 'heic' };
+
+/** Upload a photo into the owner's folder and point the vehicle at it. Replaces any previous photo. */
+export async function setVehiclePhoto(vehicle: Pick<Vehicle, 'id' | 'photo_url'>, photo: PickedPhoto): Promise<Vehicle> {
+  const uid = await currentUserId();
+  const contentType = photo.mimeType && PHOTO_EXT[photo.mimeType] ? photo.mimeType : 'image/jpeg';
+  const path = `${uid}/${vehicle.id}-${Date.now()}.${PHOTO_EXT[contentType]}`;
+  const bucket = supabase.storage.from(VEHICLE_PHOTO_BUCKET);
+  unwrap(await bucket.upload(path, await readPhotoBytes(photo), { contentType, upsert: false }));
+  const { data } = bucket.getPublicUrl(path);
+  const updated = await updateVehicle(vehicle.id, { photo_url: data.publicUrl });
+  const old = photoPath(vehicle.photo_url);
+  if (old && old !== path) await bucket.remove([old]);
+  return updated;
+}
+
+export type VehicleItemInput = {
+  area: AreaId;
+  name: string;
+  brand: string | null;
+  cost_cents: number | null;
+  installed_on: string | null;
+  notes: string | null;
+};
+
+export async function vehicleItems(vehicleId: string): Promise<VehicleItem[]> {
+  return unwrap(
+    await supabase
+      .from('vehicle_items')
+      .select('id, vehicle_id, area, name, brand, cost_cents, installed_on, notes, created_at')
+      .eq('vehicle_id', vehicleId)
+      .order('created_at'),
+  );
+}
+
+export async function addVehicleItem(vehicleId: string, item: VehicleItemInput): Promise<VehicleItem> {
+  const row = unwrap<VehicleItem>(await supabase.from('vehicle_items').insert({ ...item, vehicle_id: vehicleId }).select().single());
+  track('vehicle_item_added', { area: item.area });
+  return row;
+}
+
+export async function updateVehicleItem(id: string, item: VehicleItemInput): Promise<VehicleItem> {
+  return unwrap(await supabase.from('vehicle_items').update(item).eq('id', id).select().single());
+}
+
+export async function deleteVehicleItem(id: string) {
+  unwrap(await supabase.from('vehicle_items').delete().eq('id', id));
+}
+
+/** Free year/make/model lookup from NHTSA vPIC. Returns the raw JSON; parse with core/garage parseVpic. */
+export async function decodeVin(vin: string): Promise<unknown> {
+  const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin.trim())}?format=json`);
+  if (!res.ok) throw new Error('VIN lookup is not responding. Enter the details by hand.');
+  return res.json();
 }
