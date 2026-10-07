@@ -26,14 +26,7 @@ export default function StarlinkPage() {
         See how your dish is doing, keep your plan details handy, and work out how long your batteries will run it.
       </ThemedText>
       <DishStatusCard />
-      {!loading && !session ? (
-        <Card>
-          <ThemedText type="smallBold">Sign in to save your plan and power setup</ThemedText>
-          <Button title="Sign in" onPress={() => router.push('/sign-in')} />
-        </Card>
-      ) : session ? (
-        <SetupForm />
-      ) : null}
+      {loading ? null : <SetupForm signedIn={!!session} />}
     </Screen>
   );
 }
@@ -152,7 +145,7 @@ function DishStatusCard() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ width: '33.33%', gap: 2 }}>
-      <ThemedText type="subtitle">{value}</ThemedText>
+      <ThemedText type="subtitle" style={{ fontSize: 22, lineHeight: 28 }}>{value}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{label}</ThemedText>
     </View>
   );
@@ -160,7 +153,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 // --- Plan and power setup -------------------------------------------------------
 
-function SetupForm() {
+function SetupForm({ signedIn }: { signedIn: boolean }) {
   const [vehicles, setVehicles] = useState<VehicleWithCost[]>([]);
   const [vehicleId, setVehicleId] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -185,11 +178,12 @@ function SetupForm() {
 
   useFocusEffect(
     useCallback(() => {
-      myVehicles().then(setVehicles).catch(() => {});
-    }, []),
+      if (signedIn) myVehicles().then(setVehicles).catch(() => {});
+    }, [signedIn]),
   );
 
   useEffect(() => {
+    if (!signedIn) return;
     let live = true;
     getStarlinkSetup(vehicleId)
       .then((row) => {
@@ -215,7 +209,7 @@ function SetupForm() {
     return () => {
       live = false;
     };
-  }, [vehicleId]);
+  }, [vehicleId, signedIn]);
 
   const num = (s: string) => {
     const r = parseAmount(s);
@@ -292,27 +286,32 @@ function SetupForm() {
         />
       ) : null}
 
-      <Card>
-        <ThemedText type="smallBold">My plan</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Starlink doesn’t share plan or usage details with other apps, so jot them down here. Check usage in the Starlink app.
-        </ThemedText>
-        <Field label="Plan" value={planName} onChangeText={setPlanName} placeholder="e.g. Roam Unlimited" maxLength={80} />
-        <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-          <View style={{ flex: 1 }}>
-            <Field label="Monthly cost ($)" value={cost} onChangeText={setCost} keyboardType="decimal-pad" placeholder="0.00" />
+      {signedIn ? (
+        <Card>
+          <ThemedText type="smallBold">My plan</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            Starlink doesn’t share plan or usage details with other apps, so jot them down here. Check usage in the Starlink app.
+          </ThemedText>
+          <Field label="Plan" value={planName} onChangeText={setPlanName} placeholder="e.g. Roam Unlimited" maxLength={80} />
+          <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+            <View style={{ flex: 1 }}>
+              <Field label="Monthly cost ($)" value={cost} onChangeText={setCost} keyboardType="decimal-pad" placeholder="0.00" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Field label="Data cap (GB)" value={cap} onChangeText={setCap} keyboardType="decimal-pad" placeholder="Unlimited" />
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
-            <Field label="Data cap (GB)" value={cap} onChangeText={setCap} keyboardType="decimal-pad" placeholder="Unlimited" />
-          </View>
-        </View>
-        <Choice label="Dish" options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
-        <Choice label="Powered by" options={POWER_SOURCES.map((p) => ({ value: p.value as PowerSource | null, label: p.label }))} value={source} onChange={setSource} />
-        <Field label="Notes" value={notes} onChangeText={setNotes} multiline placeholder="Mount, cable length, router settings" maxLength={1000} />
-      </Card>
+          <Choice label="Dish" options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
+          <Choice label="Powered by" options={POWER_SOURCES.map((p) => ({ value: p.value as PowerSource | null, label: p.label }))} value={source} onChange={setSource} />
+          <Field label="Notes" value={notes} onChangeText={setNotes} multiline placeholder="Mount, cable length, router settings" maxLength={1000} />
+        </Card>
+      ) : null}
 
       <Card>
         <ThemedText type="smallBold">Power budget</ThemedText>
+        {!signedIn ? (
+          <Choice label="Dish" options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
+        ) : null}
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
             <Field
@@ -359,7 +358,7 @@ function SetupForm() {
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three, paddingTop: Spacing.two }}>
-          <Stat label="Battery runtime" value={budget.usableWh > 0 && dishWatts > 0 ? formatHours(budget.runtimeHours) : '—'} />
+          <Stat label="Battery runtime" value={budget.usableWh > 0 && dishWatts > 0 ? (budget.runtimeHours >= 10 ? `${Math.round(budget.runtimeHours)} h` : formatHours(budget.runtimeHours)) : '—'} />
           <Stat label="Dish uses / day" value={formatWh(budget.dailyUseWh)} />
           <Stat label="Solar adds / day" value={formatWh(budget.dailySolarWh)} />
         </View>
@@ -372,9 +371,19 @@ function SetupForm() {
         </ThemedText>
       </Card>
 
-      <ErrorText error={error} />
-      {saved ? <ThemedText style={{ color: RideColors.green, fontWeight: '700' }}>{saved}</ThemedText> : null}
-      <Button title="Save" big loading={busy} disabled={!loaded} onPress={save} />
+      {!signedIn ? (
+        <Card>
+          <ThemedText type="smallBold">Sign in to save your plan and power setup</ThemedText>
+          <Button title="Sign in" onPress={() => router.push('/sign-in')} />
+        </Card>
+      ) : null}
+      {!signedIn ? null : (
+        <>
+          <ErrorText error={error} />
+          {saved ? <ThemedText style={{ color: RideColors.green, fontWeight: '700' }}>{saved}</ThemedText> : null}
+          <Button title="Save" big loading={busy} disabled={!loaded} onPress={save} />
+        </>
+      )}
     </>
   );
 }
