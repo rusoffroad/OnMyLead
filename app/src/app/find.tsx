@@ -1,10 +1,12 @@
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable } from 'react-native';
+import { View } from 'react-native';
 
+import { RideRow, RowGroup } from '@/components/ride-row';
 import { RidesMap } from '@/components/rides-map';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Card, Choice, ErrorText, Screen } from '@/components/ui';
+import { Button, Card, Choice, ErrorText, Screen, Section, Segmented } from '@/components/ui';
+import { Spacing } from '@/constants/theme';
 import { boundsAround, RADIUS_CHOICES_MI, stateByCode, US_STATES } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
 import { publicRidesInState, publicRidesNear } from '@/lib/api';
@@ -14,9 +16,6 @@ import type { Ride } from '@/lib/types';
 
 type Mode = 'near' | 'state';
 type Found = Ride & { distanceMi?: number };
-
-const when = (iso: string) =>
-  new Date(iso).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
 /**
  * Find public rides: within a distance of where the rider is, or anywhere in a state they pick.
@@ -85,7 +84,7 @@ export default function FindRides() {
 
   return (
     <Screen>
-      <Choice
+      <Segmented<Mode>
         value={mode}
         onChange={setMode}
         options={[
@@ -111,9 +110,9 @@ export default function FindRides() {
         )
       ) : (
         <>
-          <ThemedText type="smallBold">{state ? `Public rides in ${state.name}` : 'Pick a state'}</ThemedText>
+          <ThemedText type="heading">{state ? `Public rides in ${state.name}` : 'Pick a state'}</ThemedText>
           {state && !pickingState ? (
-            <Button title="Change state" kind="secondary" onPress={() => setPickingState(true)} />
+            <Button title="Change state" kind="ghost" onPress={() => setPickingState(true)} />
           ) : (
             <Choice
               value={stateCode}
@@ -141,32 +140,24 @@ export default function FindRides() {
             <Button title="Create a public ride" onPress={() => router.push('/ride/new?type=public')} />
           </Card>
         ) : (
-          <ThemedText type="smallBold">
-            {rides.length} {rides.length === 1 ? 'ride' : 'rides'}
-          </ThemedText>
+          <Section title={`${rides.length} ${rides.length === 1 ? 'ride' : 'rides'}`} />
         )
       ) : null}
-      {rides?.map((r) => (
-        <Link key={r.id} href={`/r/${r.invite_code}`} asChild>
-          <Pressable accessibilityRole="link">
-            <Card>
-              <ThemedText type="smallBold">
-                {r.status === 'live' ? 'LIVE · ' : ''}
-                {r.name}
-              </ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">
-                {when(r.meet_at)}
-                {r.distanceMi != null ? ` · ${r.distanceMi < 1 ? 'under 1' : Math.round(r.distanceMi)} mi away` : ''}
-                {r.meet_area_label ? ` · near ${r.meet_area_label}` : ''}
-                {r.difficulty ? ` · ${r.difficulty}` : ''}
-              </ThemedText>
-              {r.vehicle_types.length ? (
-                <ThemedText type="small" themeColor="textSecondary">{r.vehicle_types.join(', ')}</ThemedText>
-              ) : null}
-            </Card>
-          </Pressable>
-        </Link>
-      ))}
+      {rides?.length ? (
+        <RowGroup>
+          {rides.map((r) => (
+            <RideRow
+              key={r.id}
+              ride={r}
+              note={[
+                r.distanceMi != null ? `${r.distanceMi < 1 ? 'Under 1' : Math.round(r.distanceMi)} mi away` : null,
+                r.vehicle_types.length ? r.vehicle_types.join(', ') : null,
+              ].filter(Boolean).join(', ') || undefined}
+            />
+          ))}
+        </RowGroup>
+      ) : null}
+      <View style={{ height: Spacing.two }} />
     </Screen>
   );
 }

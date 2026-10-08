@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import { Text, View } from 'react-native';
 
+import { Colors, Radius } from '@/constants/theme';
 import type { Bounds } from '@/core/discovery';
 import { regionFor } from '@/core/discovery';
 import type { Ride } from '@/lib/types';
@@ -25,20 +26,20 @@ export function RidesMap({
   }, [bounds]);
 
   return (
-    <View style={{ height, borderRadius: 16, overflow: 'hidden' }}>
+    <View style={{ height, borderRadius: Radius.card, overflow: 'hidden' }}>
       <MapView ref={map} style={{ flex: 1 }} initialRegion={regionFor(bounds)} showsUserLocation mapType="hybrid">
         {rides.map((r) => (
           <Marker
             key={r.id}
             coordinate={{ latitude: r.meet_area_lat, longitude: r.meet_area_lng }}
-            pinColor={r.status === 'live' ? '#E03131' : '#1C7ED6'}>
+            pinColor={r.status === 'live' ? Colors.accent : Colors.sky}>
             <Callout onPress={() => onOpen(r)}>
               <View style={{ maxWidth: 220, padding: 4 }}>
-                <Text style={{ fontWeight: '700' }}>{r.status === 'live' ? 'LIVE · ' : ''}{r.name}</Text>
+                <Text style={{ fontWeight: '700' }}>{r.status === 'live' ? 'Live now: ' : ''}{r.name}</Text>
                 <Text>
                   {new Date(r.meet_at).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                 </Text>
-                <Text style={{ color: '#1C7ED6', marginTop: 2 }}>Tap to open</Text>
+                <Text style={{ color: '#1F6FE0', marginTop: 2 }}>Tap to open</Text>
               </View>
             </Callout>
           </Marker>

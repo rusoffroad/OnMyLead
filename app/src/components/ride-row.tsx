@@ -62,7 +62,7 @@ export function RideRow({ ride, note }: { ride: Ride; note?: string }) {
           {ride.difficulty || note ? (
             <View style={{ flexDirection: 'row', gap: Spacing.two, marginTop: 2 }}>
               {ride.difficulty ? <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>{ride.difficulty}</ThemedText> : null}
-              {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
+              {note ? <ThemedText type="small" themeColor="textSecondary" numberOfLines={1} style={{ flexShrink: 1 }}>{note}</ThemedText> : null}
             </View>
           ) : null}
         </View>

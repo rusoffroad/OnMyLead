@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
 import { Logo } from '@/components/logo';
@@ -32,8 +32,6 @@ export default function Home() {
   const [code, setCode] = useState('');
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const scroll = useRef<ScrollView>(null);
-  const publicY = useRef(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -60,7 +58,7 @@ export default function Home() {
   const openCode = () => code.trim().length >= 4 && router.push(`/r/${code.trim().toUpperCase()}`);
 
   return (
-    <Screen top scrollRef={scroll}>
+    <Screen top>
       <View style={{ paddingTop: Spacing.one }}>
         <Logo height={96} />
       </View>
@@ -104,8 +102,8 @@ export default function Home() {
         <BigAction
           icon="search"
           title="Find a ride"
-          detail="Public rides"
-          onPress={() => scroll.current?.scrollTo({ y: publicY.current - Spacing.three, animated: true })}
+          detail="Near you or by state"
+          onPress={() => router.push('/find')}
         />
       </View>
 
@@ -163,9 +161,7 @@ export default function Home() {
         </>
       ) : null}
 
-      <View onLayout={(e) => (publicY.current = e.nativeEvent.layout.y)}>
-        <Section title="Public rides" />
-      </View>
+      <Section title="Public rides" />
       {others.length === 0 ? (
         <ThemedText themeColor="textSecondary">No public rides coming up. Create one and it shows here for everyone.</ThemedText>
       ) : (
