@@ -502,4 +502,121 @@ do $$ begin
   end if;
 end $$;
 
-select 'ALL PRIVACY, JOINING AND GARAGE TESTS PASSED' as result;
+-- 17. Ride chat: only joined riders read and post; announcements only from organizers.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'Chat ride', now() + interval '1 day', 38.5, -109.5, 'public');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select join_ride('cccccccc-cccc-cccc-cccc-cccccccccccc');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select join_ride('cccccccc-cccc-cccc-cccc-cccccccccccc');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+update ride_members set role = 'co_organizer'
+where ride_id = 'cccccccc-cccc-cccc-cccc-cccccccccccc' and user_id = '00000000-0000-0000-0000-00000000000c';
+insert into ride_messages (ride_id, user_id, kind, body)
+values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'announcement', 'Meet at 8, wheels up 8:30');
+reset role;
+
+-- Ben (rider) chats, but cannot announce or post as someone else.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), '  See you there  ');
+do $$ begin
+  if (select body from ride_messages where user_id = auth.uid()) <> 'See you there' then raise exception 'FAIL: message not trimmed'; end if;
+  if (select count(*) from ride_messages where ride_id = 'cccccccc-cccc-cccc-cccc-cccccccccccc') <> 2 then
+    raise exception 'FAIL: joined rider cannot read the ride chat';
+  end if;
+  begin
+    insert into ride_messages (ride_id, user_id, kind, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'announcement', 'I am the boss now');
+    raise exception 'FAIL: rider posted an announcement';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', '00000000-0000-0000-0000-00000000000a', 'Spoofed');
+    raise exception 'FAIL: rider posted as someone else';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), repeat('x', 501));
+    raise exception 'FAIL: overlong message accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), '   ');
+    raise exception 'FAIL: blank message accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  -- Messages cannot be edited or deleted.
+  update ride_messages set body = 'edited' where user_id = auth.uid();
+  if found then raise exception 'FAIL: rider edited a chat message'; end if;
+  delete from ride_messages where ride_id = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+  if found then raise exception 'FAIL: rider deleted chat messages'; end if;
+end $$;
+reset role;
+
+-- Cara (co-organizer) can announce. Backdating created_at or future sent_at is ignored.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+insert into ride_messages (ride_id, user_id, kind, body, created_at, sent_at)
+values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'announcement', 'Gas in Green River', '2000-01-01', now() + interval '1 day');
+do $$ begin
+  if not exists (select 1 from ride_messages where user_id = auth.uid() and kind = 'announcement'
+                 and created_at > now() - interval '1 minute' and sent_at <= now()) then
+    raise exception 'FAIL: co-organizer announcement missing or timestamps not clamped';
+  end if;
+end $$;
+reset role;
+
+-- Dan (not on the ride) can neither read nor post.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from ride_messages) <> 0 then raise exception 'FAIL: non-member read the ride chat'; end if;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'Hi strangers');
+    raise exception 'FAIL: non-member posted in the ride chat';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  begin
+    if (select count(*) from ride_messages) <> 0 then raise exception 'FAIL: signed-out visitor read the ride chat'; end if;
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+
+-- Rate limit: Ben has 1 message this minute; 9 more are fine, the 11th is refused.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  for i in 1..9 loop
+    insert into ride_messages (ride_id, user_id, kind, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'status', 'All good');
+  end loop;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'one too many');
+    raise exception 'FAIL: rate limit not enforced';
+  exception when raise_exception then
+    if sqlerrm not like 'slow down%' then raise; end if;
+  end;
+end $$;
+-- Leaving the ride removes chat access.
+select leave_ride('cccccccc-cccc-cccc-cccc-cccccccccccc');
+do $$ begin
+  if (select count(*) from ride_messages) <> 0 then raise exception 'FAIL: rider who left can still read the chat'; end if;
+end $$;
+reset role;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT TESTS PASSED' as result;

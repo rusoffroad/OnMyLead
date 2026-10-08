@@ -12,13 +12,15 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Card } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
+import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { formatRemaining, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
+import { useRideChat } from '@/hooks/use-ride-chat';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getRide, latestStatuses, myActiveShares,
   startLocationShare, stopLocationShare, type ActiveShare,
 } from '@/lib/api';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
-import { flushOutbox, sendStatusReliably } from '@/lib/outbox';
+import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
@@ -81,6 +83,24 @@ export default function RideMode() {
   const mine = joined.find((m) => m.user_id === me);
   const canRegroup = mine && ['organizer', 'co_organizer', 'leader'].includes(mine.role);
   const watchesBubble = mine && ['organizer', 'co_organizer', 'leader', 'sweep'].includes(mine.role);
+  const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
+
+  // Announcements: only the latest is shown, and it is read aloud so nobody has to look down.
+  const chat = useRideChat(id, !!mine);
+  const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
+  const [lastReply, setLastReply] = useState<QuickReply | null>(null);
+  const spokenId = useRef<string | null>(null);
+  const firstAnnouncement = useRef(true);
+  useEffect(() => {
+    if (!announcement || spokenId.current === announcement.id) return;
+    spokenId.current = announcement.id;
+    // On entering Ride Mode, only repeat an announcement that is still fresh.
+    const old = firstAnnouncement.current && Date.now() - Date.parse(announcement.created_at) > 10 * 60_000;
+    firstAnnouncement.current = false;
+    if (old || announcement.user_id === me) return;
+    Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body));
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [announcement, me, nameOf]);
 
   const apply = useCallback((d: RideSnapshot) => {
     setRide(d.ride);
@@ -233,6 +253,14 @@ export default function RideMode() {
     if (!sent) Alert.alert('No signal', `"${STATUS_LABEL[kind]}" will send as soon as you're back in service.`);
   }
 
+  async function quickReply(body: QuickReply) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setLastReply(body);
+    const sent = await sendQuickReplyReliably(id, body);
+    if (sent) chat.reload();
+    else Alert.alert('No signal', `"${body}" will send as soon as you're back in service.`);
+  }
+
   async function regroupHere() {
     try {
       const p = await currentPosition();
@@ -273,6 +301,16 @@ export default function RideMode() {
             <Text style={[styles.shareText, { color: '#000' }]}>Regroup point set · Tap to navigate</Text>
           </Pressable>
         ) : null}
+        {announcement ? (
+          <Pressable
+            onPress={() => Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
+            accessibilityRole="button"
+            accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
+            style={styles.announcement}>
+            <Text style={styles.announcementLabel}>ANNOUNCEMENT · {nameOf(announcement.user_id)} · tap to hear</Text>
+            <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
+          </Pressable>
+        ) : null}
       </SafeAreaView>
 
       <SafeAreaView edges={['bottom']} style={styles.bottom}>
@@ -306,6 +344,23 @@ export default function RideMode() {
         </ScrollView>
 
         {canRegroup ? <Button title="Regroup at my location" big onPress={regroupHere} style={{ marginTop: Spacing.two }} /> : null}
+
+        <View style={styles.replies}>
+          {QUICK_REPLIES.map((q) => (
+            <Pressable
+              key={q}
+              onPress={() => quickReply(q)}
+              accessibilityRole="button"
+              accessibilityLabel={`Send to the group: ${q}`}
+              style={({ pressed }) => [
+                styles.replyBtn,
+                { opacity: pressed ? 0.75 : 1 },
+                lastReply === q && { borderColor: '#fff', borderWidth: 3 },
+              ]}>
+              <Text style={styles.replyText}>{q}</Text>
+            </Pressable>
+          ))}
+        </View>
 
         <View style={styles.grid}>
           {STATUSES.map((s) => (
@@ -381,6 +436,12 @@ const styles = StyleSheet.create({
   shareText: { color: '#fff', fontWeight: '700', textAlign: 'center' },
   bottom: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.two, backgroundColor: 'rgba(0,0,0,0.75)' },
   actions: { flexDirection: 'row', gap: Spacing.two },
+  announcement: { borderRadius: 12, padding: Spacing.two, backgroundColor: RideColors.yellow, gap: 2 },
+  announcementLabel: { color: '#000', fontWeight: '800', fontSize: 12, letterSpacing: 0.5 },
+  announcementText: { color: '#000', fontWeight: '800', fontSize: 18 },
+  replies: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.two },
+  replyBtn: { flex: 1, minHeight: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1C7ED6', paddingHorizontal: 4 },
+  replyText: { color: '#fff', fontWeight: '800', fontSize: 15, textAlign: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, marginTop: Spacing.two },
   statusBtn: { width: '31.5%', minHeight: 64, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   statusText: { color: '#fff', fontWeight: '800', fontSize: 16, textAlign: 'center' },

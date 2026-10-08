@@ -1,5 +1,6 @@
 import { fuzzLocation } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
+import type { ChatMessage, MessageKind } from '@/core/chat';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import { startShare, type ShareScope } from '@/core/sharing';
@@ -297,6 +298,33 @@ export async function activeRegroup(rideId: string): Promise<RegroupPoint | null
   return unwrap(
     await supabase.from('regroup_points').select('*').eq('ride_id', rideId).is('cleared_at', null).order('created_at', { ascending: false }).limit(1).maybeSingle(),
   );
+}
+
+// --- Ride chat ----------------------------------------------------------------
+
+/** The newest messages for a ride, oldest first. Only joined riders get rows (enforced by the database). */
+export async function rideMessages(rideId: string, limit = 100): Promise<ChatMessage[]> {
+  const rows = unwrap<ChatMessage[]>(
+    await supabase.from('ride_messages').select('*').eq('ride_id', rideId).order('created_at', { ascending: false }).limit(limit),
+  );
+  return rows.reverse();
+}
+
+/** The pinned announcement for a ride, or null. */
+export async function latestRideAnnouncement(rideId: string): Promise<ChatMessage | null> {
+  return unwrap(
+    await supabase.from('ride_messages').select('*').eq('ride_id', rideId).eq('kind', 'announcement')
+      .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+  );
+}
+
+export async function sendRideMessage(rideId: string, body: string, kind: MessageKind = 'chat', sentAt = new Date()): Promise<ChatMessage> {
+  const user_id = await currentUserId();
+  const row = unwrap<ChatMessage>(
+    await supabase.from('ride_messages').insert({ ride_id: rideId, user_id, kind, body, sent_at: sentAt.toISOString() }).select().single(),
+  );
+  track('ride_message', { kind });
+  return row;
 }
 
 // --- Garage -----------------------------------------------------------------
