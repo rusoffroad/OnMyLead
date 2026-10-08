@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, AppState, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
+import { Button, Card, Choice, ErrorText, Field, Screen, Tag } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
 import { centsToInput, parseAmount, parseDollars, vehicleTitle } from '@/core/garage';
 import {
@@ -124,7 +124,7 @@ function DishStatusCard() {
   if (!dishReadSupported) {
     return (
       <Card>
-        <ThemedText type="smallBold">Your dish</ThemedText>
+        <ThemedText type="heading">Your dish</ThemedText>
         <ThemedText>
           Reading your dish only works in the OnMyLead phone app. Your dish talks to devices on its own Wi-Fi at {DISH_HOST},
           and web browsers block a secure web page from reaching it.
@@ -139,9 +139,9 @@ function DishStatusCard() {
   return (
     <Card>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <ThemedText type="smallBold">Your dish</ThemedText>
+        <ThemedText type="heading">Your dish</ThemedText>
         {live ? (
-          <ThemedText type="small" style={{ color: RideColors.green, fontWeight: '700' }}>● LIVE</ThemedText>
+          <Tag label="Live" color={RideColors.green} solid />
         ) : s && ageS != null ? (
           <ThemedText type="small" themeColor="textSecondary">Last read {formatSeconds(ageS)} ago</ThemedText>
         ) : null}
@@ -181,8 +181,10 @@ function DishStatusCard() {
           </View>
           {s.alerts.length ? (
             <View style={{ gap: Spacing.one }}>
-              <ThemedText type="smallBold">Alerts</ThemedText>
-              {s.alerts.map((a) => <ThemedText key={a.code}>• {a.text}</ThemedText>)}
+              <ThemedText style={{ fontWeight: 700 }}>Alerts</ThemedText>
+              {s.alerts.map((a) => (
+                <ThemedText key={a.code} style={{ color: RideColors.yellow, fontWeight: 600 }}>{a.text}</ThemedText>
+              ))}
             </View>
           ) : (
             <ThemedText type="small" themeColor="textSecondary">No alerts.</ThemedText>
@@ -195,7 +197,7 @@ function DishStatusCard() {
               s.ethSpeedMbps ? `Ethernet ${s.ethSpeedMbps} Mbps` : null,
               s.softwareVersion ? `Software ${s.softwareVersion}` : null,
               s.hardwareVersion ? `Hardware ${s.hardwareVersion}` : null,
-            ].filter(Boolean).join(' · ')}
+            ].filter(Boolean).join('. ')}
           </ThemedText>
         </View>
       ) : null}
@@ -219,10 +221,11 @@ function DishStatusCard() {
 
 /** The last 15 minutes: one bar per minute for download speed, red where the connection dropped. */
 function HistoryView({ h }: { h: DishHistory }) {
+  const theme = useTheme();
   const peak = Math.max(1, ...h.timeline.map((m) => m.avgDownlinkBps ?? 0));
   return (
     <View style={{ gap: Spacing.one }}>
-      <ThemedText type="smallBold">Last {h.minutes || 1} min</ThemedText>
+      <ThemedText style={{ fontWeight: 700 }}>Last {h.minutes || 1} min</ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 48, gap: 3 }}>
         {h.timeline.map((m, i) => (
           <View
@@ -232,7 +235,7 @@ function HistoryView({ h }: { h: DishHistory }) {
               flex: 1,
               height: Math.max(3, Math.round(((m.avgDownlinkBps ?? 0) / peak) * 48)),
               borderRadius: 2,
-              backgroundColor: m.outageSeconds ? RideColors.red : RideColors.leader,
+              backgroundColor: m.outageSeconds ? RideColors.red : theme.sky,
             }}
           />
         ))}
@@ -251,7 +254,7 @@ function HistoryView({ h }: { h: DishHistory }) {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ width: '33.33%', gap: 2 }}>
-      <ThemedText type="subtitle" style={{ fontSize: 22, lineHeight: 28 }}>{value}</ThemedText>
+      <ThemedText type="subtitle" style={{ fontSize: 28, lineHeight: 32 }}>{value}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{label}</ThemedText>
     </View>
   );
@@ -394,7 +397,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
 
       {signedIn ? (
         <Card>
-          <ThemedText type="smallBold">My plan</ThemedText>
+          <ThemedText type="heading">My plan</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             Starlink doesn’t share plan or usage details with other apps, so jot them down here. Check usage in the Starlink app.
           </ThemedText>
@@ -414,7 +417,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
       ) : null}
 
       <Card>
-        <ThemedText type="smallBold">Power budget</ThemedText>
+        <ThemedText type="heading">Power budget</ThemedText>
         {!signedIn ? (
           <Choice label="Dish" options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
         ) : null}
@@ -468,7 +471,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
           <Stat label="Dish uses / day" value={formatWh(budget.dailyUseWh)} />
           <Stat label="Solar adds / day" value={formatWh(budget.dailySolarWh)} />
         </View>
-        <ThemedText type="smallBold" style={{ color: budget.dailyBalanceWh >= 0 ? RideColors.green : RideColors.red }}>
+        <ThemedText type="heading" style={{ color: budget.dailyBalanceWh >= 0 ? RideColors.green : RideColors.red }}>
           Daily balance: {budget.dailyBalanceWh >= 0 ? '+' : '−'}{formatWh(Math.abs(budget.dailyBalanceWh))}
         </ThemedText>
         <ThemedText>{budgetSummary(budget, hoursPerDay)}</ThemedText>
@@ -479,14 +482,14 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
 
       {!signedIn ? (
         <Card>
-          <ThemedText type="smallBold">Sign in to save your plan and power setup</ThemedText>
+          <ThemedText type="heading">Sign in to save your plan and power setup</ThemedText>
           <Button title="Sign in" onPress={() => router.push('/sign-in')} />
         </Card>
       ) : null}
       {!signedIn ? null : (
         <>
           <ErrorText error={error} />
-          {saved ? <ThemedText style={{ color: RideColors.green, fontWeight: '700' }}>{saved}</ThemedText> : null}
+          {saved ? <ThemedText style={{ color: RideColors.green, fontWeight: 700 }}>{saved}</ThemedText> : null}
           <Button title="Save" big loading={busy} disabled={!loaded} onPress={save} />
         </>
       )}

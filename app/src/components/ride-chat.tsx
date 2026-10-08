@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field } from '@/components/ui';
-import { RideColors, Spacing } from '@/constants/theme';
+import { Radius, RideColors, Spacing } from '@/constants/theme';
 import { checkMessage, isLeaderOnly, MAX_MESSAGE_LENGTH, type ChatMessage, type MessageAudience, type MessageKind } from '@/core/chat';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -17,11 +17,11 @@ export function PinnedAnnouncement({ message, senderName }: { message: ChatMessa
     <View
       accessibilityRole="summary"
       accessibilityLabel={`Announcement from ${senderName}: ${message.body}`}
-      style={{ backgroundColor: RideColors.yellow, borderRadius: 14, padding: Spacing.three, gap: Spacing.one }}>
-      <ThemedText type="smallBold" style={{ color: '#000', letterSpacing: 0.5 }}>
-        PINNED ANNOUNCEMENT · {senderName} · {dayAndClock(message.sent_at)}
+      style={{ backgroundColor: RideColors.yellow, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.one }}>
+      <ThemedText type="small" style={{ color: '#3A2600', fontWeight: 700 }}>
+        Announcement from {senderName}, {dayAndClock(message.sent_at)}
       </ThemedText>
-      <ThemedText style={{ color: '#000', fontSize: 18, fontWeight: '700' }}>{message.body}</ThemedText>
+      <ThemedText style={{ color: '#1A1100', fontSize: 19, lineHeight: 25, fontWeight: 700 }}>{message.body}</ThemedText>
     </View>
   );
 }
@@ -74,7 +74,7 @@ export function RideChat({
 
   return (
     <Card>
-      <ThemedText type="smallBold">Ride chat</ThemedText>
+      <ThemedText type="heading">Ride chat</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         Only riders on this ride can see this. Don’t type while driving: Ride Mode has one-tap replies.
       </ThemedText>
@@ -91,7 +91,7 @@ export function RideChat({
             key={m.id}
             style={{
               borderTopWidth: 1,
-              borderTopColor: theme.border,
+              borderTopColor: theme.backgroundSelected,
               paddingTop: Spacing.two,
               gap: 2,
               ...(announcement ? { borderLeftWidth: 5, borderLeftColor: RideColors.yellow, paddingLeft: Spacing.two } : null),
@@ -102,7 +102,7 @@ export function RideChat({
               {mine ? 'You' : nameOf(m.user_id)}
               {leaderOnly ? (mine ? ' → leader only' : ' → you only (leader)') : ''} · {clock(m.sent_at)}
             </ThemedText>
-            <ThemedText style={[m.kind === 'status' && { fontStyle: 'italic' }, announcement && { fontWeight: '700' }]}>{m.body}</ThemedText>
+            <ThemedText style={[m.kind === 'status' && { fontStyle: 'italic' }, announcement && { fontWeight: 700 }]}>{m.body}</ThemedText>
           </View>
         );
       })}

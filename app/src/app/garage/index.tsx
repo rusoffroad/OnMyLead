@@ -5,7 +5,8 @@ import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
-import { Spacing } from '@/constants/theme';
+import { Icon } from '@/components/icon';
+import { Colors, Spacing } from '@/constants/theme';
 import { formatDollars, kindLabel, vehicleTitle } from '@/core/garage';
 import { myVehicles, type VehicleWithCost } from '@/lib/api';
 import { useSession } from '@/lib/session';
@@ -26,7 +27,7 @@ export default function Garage() {
     return (
       <Screen>
         <Card>
-          <ThemedText type="smallBold">Sign in to build your garage</ThemedText>
+          <ThemedText type="heading">Sign in to build your garage</ThemedText>
           <Button title="Sign in" onPress={() => router.push('/sign-in')} />
         </Card>
       </Screen>
@@ -35,7 +36,7 @@ export default function Garage() {
 
   return (
     <Screen>
-      <Button title="Add a machine" onPress={() => router.push('/garage/new')} />
+      <Button title="Add a machine" big onPress={() => router.push('/garage/new')} />
       <ErrorText error={error} />
       {vehicles && vehicles.length === 0 ? (
         <ThemedText themeColor="textSecondary">Your garage is empty. Add your rig or side-by-side to track the build and fuel range.</ThemedText>
@@ -43,20 +44,24 @@ export default function Garage() {
       {vehicles?.map((v) => (
         <Link key={v.id} href={`/garage/${v.id}`} asChild>
           <Pressable accessibilityRole="link">
-            <Card style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.three }}>
+            <Card style={{ padding: 0, gap: 0, overflow: 'hidden' }}>
               {v.photo_url ? (
-                <Image source={{ uri: v.photo_url }} style={{ width: 88, height: 66, borderRadius: 8 }} contentFit="cover" accessibilityIgnoresInvertColors />
+                <Image source={{ uri: v.photo_url }} style={{ width: '100%', aspectRatio: 16 / 9 }} contentFit="cover" accessibilityIgnoresInvertColors />
               ) : (
-                <View style={{ width: 88, height: 66, borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderStyle: 'dashed', borderColor: '#999' }}>
-                  <ThemedText type="small" themeColor="textSecondary">No photo</ThemedText>
+                <View style={{ width: '100%', aspectRatio: 16 / 7, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected, gap: Spacing.one }}>
+                  <Icon name="machine" size={44} color={Colors.textSecondary} strokeWidth={1.5} />
+                  <ThemedText type="small" themeColor="textSecondary">Add a photo from the machine’s page</ThemedText>
                 </View>
               )}
-              <View style={{ flex: 1, gap: 2 }}>
-                <ThemedText type="smallBold">{vehicleTitle(v)}</ThemedText>
-                <ThemedText type="small" themeColor="textSecondary">
-                  {kindLabel(v.kind)} · {v.item_count} item{v.item_count === 1 ? '' : 's'}
-                </ThemedText>
-                <ThemedText type="smallBold">Build {formatDollars(v.build_cost_cents)}</ThemedText>
+              <View style={{ padding: Spacing.three, gap: Spacing.one }}>
+                <ThemedText type="subtitle" style={{ fontSize: 28, lineHeight: 30 }}>{v.nickname?.trim() || vehicleTitle(v)}</ThemedText>
+                {v.nickname?.trim() ? <ThemedText style={{ fontWeight: 600 }}>{vehicleTitle({ ...v, nickname: null })}</ThemedText> : null}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: Spacing.one }}>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {kindLabel(v.kind)}, {v.item_count} item{v.item_count === 1 ? '' : 's'}
+                  </ThemedText>
+                  <ThemedText type="heading" style={{ color: Colors.text }}>{formatDollars(v.build_cost_cents)}</ThemedText>
+                </View>
               </View>
             </Card>
           </Pressable>

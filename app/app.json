@@ -6,12 +6,14 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "onmylead",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0A1626",
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Your location is shared only with riders you choose, only while you are sharing, so your group can stay together.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends.",
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent"
       }
     },
     "android": {

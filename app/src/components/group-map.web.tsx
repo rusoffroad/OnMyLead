@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { RideColors } from '@/constants/theme';
+import { Colors, font, RideColors } from '@/constants/theme';
 import type { MapRider } from './group-map-types';
 
 export type { MapRider } from './group-map-types';
@@ -15,7 +15,7 @@ export function GroupMap({
 }) {
   return (
     <View style={[StyleSheet.absoluteFill, styles.wrap]}>
-      {regroup ? <Text style={styles.regroup}>Regroup at {regroup.lat.toFixed(4)}, {regroup.lng.toFixed(4)}</Text> : null}
+      {regroup ? <Text style={styles.regroup}>Regroup point: {regroup.lat.toFixed(4)}, {regroup.lng.toFixed(4)}</Text> : null}
       {riders.map((r) => (
         <View key={r.id} style={styles.row}>
           <View style={[styles.dot, { backgroundColor: RideColors[r.status] }]} />
@@ -28,10 +28,10 @@ export function GroupMap({
 }
 
 const styles = StyleSheet.create({
-  wrap: { padding: 16, paddingTop: 120, gap: 8, backgroundColor: '#1b1d1f' },
-  regroup: { color: '#F59F00', fontWeight: '800', fontSize: 16 },
+  wrap: { padding: 16, paddingTop: 140, gap: 10, backgroundColor: Colors.background },
+  regroup: { color: RideColors.yellow, fontFamily: font(700), fontSize: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   dot: { width: 14, height: 14, borderRadius: 7 },
-  name: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  detail: { color: '#adb5bd', flex: 1 },
+  name: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
+  detail: { color: Colors.textSecondary, fontFamily: font(500), flex: 1 },
 });

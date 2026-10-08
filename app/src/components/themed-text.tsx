@@ -1,73 +1,42 @@
-import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
+import { StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
 
-import { Fonts, ThemeColor } from '@/constants/theme';
+import { font, Fonts, ThemeColor } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ThemedTextProps = TextProps & {
-  type?: 'default' | 'title' | 'small' | 'smallBold' | 'subtitle' | 'link' | 'linkPrimary' | 'code';
+  type?: 'default' | 'title' | 'subtitle' | 'heading' | 'small' | 'smallBold' | 'link' | 'linkPrimary' | 'code';
   themeColor?: ThemeColor;
 };
 
+const DISPLAY = new Set(['title', 'subtitle', 'heading']);
+
 export function ThemedText({ style, type = 'default', themeColor, ...rest }: ThemedTextProps) {
   const theme = useTheme();
+  const flat = StyleSheet.flatten([{ color: theme[themeColor ?? 'text'] }, styles[type], type === 'linkPrimary' && { color: theme.sky }, style]) as TextStyle;
+  return <Text style={withFont(flat, DISPLAY.has(type) ? 'display' : 'body')} {...rest} />;
+}
 
-  return (
-    <Text
-      style={[
-        { color: theme[themeColor ?? 'text'] },
-        type === 'default' && styles.default,
-        type === 'title' && styles.title,
-        type === 'small' && styles.small,
-        type === 'smallBold' && styles.smallBold,
-        type === 'subtitle' && styles.subtitle,
-        type === 'link' && styles.link,
-        type === 'linkPrimary' && styles.linkPrimary,
-        type === 'code' && styles.code,
-        style,
-      ]}
-      {...rest}
-    />
-  );
+/**
+ * Custom fonts ship one file per weight, so a weight is a family. This swaps fontWeight for the
+ * matching Barlow family, which renders the same on iOS, Android and the web.
+ */
+export function withFont(style: TextStyle, cut: 'body' | 'display' = 'body'): TextStyle {
+  if (style.fontFamily && !style.fontFamily.startsWith('Barlow')) return style;
+  const display = cut === 'display' || style.fontFamily?.startsWith('BarlowCondensed');
+  const { fontWeight, ...rest } = style;
+  return { ...rest, fontFamily: font(fontWeight, display ? 'display' : 'body') };
 }
 
 const styles = StyleSheet.create({
-  small: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: 500,
-  },
-  smallBold: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: 700,
-  },
-  default: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: 500,
-  },
-  title: {
-    fontSize: 48,
-    fontWeight: 600,
-    lineHeight: 52,
-  },
-  subtitle: {
-    fontSize: 32,
-    lineHeight: 44,
-    fontWeight: 600,
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 14,
-  },
-  linkPrimary: {
-    lineHeight: 30,
-    fontSize: 14,
-    color: '#3c87f7',
-  },
-  code: {
-    fontFamily: Fonts.mono,
-    fontWeight: Platform.select({ android: 700 }) ?? 500,
-    fontSize: 12,
-  },
+  default: { fontSize: 16, lineHeight: 23, fontWeight: 500 },
+  small: { fontSize: 14, lineHeight: 20, fontWeight: 500 },
+  smallBold: { fontSize: 14, lineHeight: 20, fontWeight: 700 },
+  /** Screen titles: condensed, tight, signage-like. */
+  title: { fontSize: 44, lineHeight: 44, fontWeight: 800, letterSpacing: -0.5 },
+  subtitle: { fontSize: 32, lineHeight: 34, fontWeight: 700, letterSpacing: -0.2 },
+  /** Section headings inside a screen. */
+  heading: { fontSize: 22, lineHeight: 26, fontWeight: 700 },
+  link: { fontSize: 15, lineHeight: 22, fontWeight: 600 },
+  linkPrimary: { fontSize: 15, lineHeight: 22, fontWeight: 600 },
+  code: { fontFamily: Fonts.mono, fontSize: 12 },
 });

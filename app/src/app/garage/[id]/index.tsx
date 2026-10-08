@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
-import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { RusGear } from '@/components/rus-gear';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
-import { Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 import {
   AREAS, buildCsv, buildSheetText, buildTotals, centsToInput, exportFileBase, formatDollars, kindLabel, parseDollars,
   vehicleRange, vehicleTitle, type AreaId,
@@ -111,24 +111,24 @@ export default function VehiclePage() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: vehicle.nickname || 'Vehicle' }} />
       {vehicle.photo_url ? (
-        <Image source={{ uri: vehicle.photo_url }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 14 }} contentFit="cover" accessibilityLabel={`Photo of ${title}`} />
+        <Image source={{ uri: vehicle.photo_url }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: Radius.card }} contentFit="cover" accessibilityLabel={`Photo of ${title}`} />
       ) : null}
       <View style={{ gap: Spacing.one }}>
-        <ThemedText type="subtitle">{title}</ThemedText>
+        <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{vehicle.nickname?.trim() || title}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {[
+            vehicle.nickname?.trim() ? vehicleTitle({ ...vehicle, nickname: null }) : null,
             kindLabel(vehicle.kind),
             vehicle.vin ? `VIN ${vehicle.vin}` : null,
             vehicle.odometer_miles != null ? `${vehicle.odometer_miles} mi` : null,
             vehicle.engine_hours != null ? `${vehicle.engine_hours} hrs` : null,
-          ].filter(Boolean).join(' · ')}
+          ].filter(Boolean).join(', ')}
         </ThemedText>
       </View>
 
       <Card>
-        <ThemedText type="smallBold">Fuel range</ThemedText>
+        <ThemedText type="heading">Fuel range</ThemedText>
         {range ? (
           <>
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
@@ -146,8 +146,8 @@ export default function VehiclePage() {
       </Card>
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <ThemedText type="smallBold">Build</ThemedText>
-        <ThemedText type="smallBold">{formatDollars(totals.totalCents)}</ThemedText>
+        <ThemedText type="heading">Build</ThemedText>
+        <ThemedText type="heading">{formatDollars(totals.totalCents)}</ThemedText>
       </View>
 
       {mine && editing === 'new' ? (
@@ -163,8 +163,8 @@ export default function VehiclePage() {
       {totals.groups.map((g) => (
         <Card key={g.area}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <ThemedText type="smallBold">{g.label}</ThemedText>
-            <ThemedText type="smallBold">{formatDollars(g.subtotalCents)}</ThemedText>
+            <ThemedText style={{ fontWeight: 700 }}>{g.label}</ThemedText>
+            <ThemedText style={{ fontWeight: 700 }}>{formatDollars(g.subtotalCents)}</ThemedText>
           </View>
           {g.items.map((item) =>
             editing !== 'new' && editing?.id === item.id ? (
@@ -182,7 +182,7 @@ export default function VehiclePage() {
                 accessibilityRole={mine ? 'button' : undefined}
                 accessibilityHint={mine ? 'Edit this item' : undefined}
                 onPress={() => setEditing(item)}
-                style={{ borderTopWidth: 1, borderTopColor: theme.border, paddingTop: Spacing.two, gap: 2 }}>
+                style={{ borderTopWidth: 1, borderTopColor: theme.backgroundSelected, paddingTop: Spacing.two, gap: 2 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: Spacing.two }}>
                   <ThemedText style={{ flex: 1 }}>{item.brand ? `${item.name} · ${item.brand}` : item.name}</ThemedText>
                   <ThemedText>{formatDollars(item.cost_cents, { blank: '—' })}</ThemedText>
@@ -212,7 +212,7 @@ export default function VehiclePage() {
 
       {mine ? <RusGear vehicle={vehicle} campaign="garage_vehicle" /> : null}
 
-      <ThemedText type="smallBold">Export</ThemedText>
+      <ThemedText type="heading">Export</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title="Build sheet" kind="secondary" style={{ flex: 1 }} onPress={exportSheet} />
         <Button title="CSV" kind="secondary" style={{ flex: 1 }} onPress={exportCsv} />
@@ -233,7 +233,7 @@ export default function VehiclePage() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ flex: 1, gap: 2 }}>
-      <ThemedText type="subtitle">{value}</ThemedText>
+      <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{value}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{label}</ThemedText>
     </View>
   );
@@ -289,7 +289,7 @@ function ItemForm({
   }
 
   return (
-    <Card style={{ borderWidth: 1.5, borderColor: theme.accent }}>
+    <Card style={{ borderWidth: 1.5, borderColor: theme.sky }}>
       <Choice label="Area" options={AREAS.map((a) => ({ value: a.id, label: a.label }))} value={area} onChange={setArea} />
       <Field label="Item" value={name} onChangeText={setName} placeholder="Beadlock wheels" />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>

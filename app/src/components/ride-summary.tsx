@@ -75,7 +75,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
   return (
     <View style={{ gap: Spacing.three }}>
       <Card>
-        <ThemedText type="smallBold">Your ride</ThemedText>
+        <ThemedText type="heading">Your ride</ThemedText>
         {points === undefined ? (
           <ThemedText type="small" themeColor="textSecondary">Loading your track…</ThemedText>
         ) : summary ? (
@@ -99,7 +99,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
       </Card>
 
       <Card>
-        <ThemedText type="smallBold">The group</ThemedText>
+        <ThemedText type="heading">The group</ThemedText>
         <ThemedText>
           {finished.length} {finished.length === 1 ? 'rider' : 'riders'} finished:{' '}
           {finished.map((m) => m.profiles?.display_name || 'Rider').join(', ')}
@@ -119,7 +119,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
       </Card>
 
       <Card>
-        <ThemedText type="smallBold">Ride card</ThemedText>
+        <ThemedText type="heading">Ride card</ThemedText>
         <RideCard ref={cardRef} card={card} />
         <Button title="Share ride card" loading={sharing} onPress={share} />
         <ThemedText type="small" themeColor="textSecondary">The card never shows the meeting point or anyone’s route.</ThemedText>
@@ -133,7 +133,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <View style={{ width: '33.3%', gap: 2, paddingRight: Spacing.one }}>
-      <ThemedText style={{ fontSize: 22, lineHeight: 28, fontWeight: '700' }}>{value}</ThemedText>
+      <ThemedText type="subtitle" style={{ fontSize: 26, lineHeight: 30 }}>{value}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{label}</ThemedText>
     </View>
   );

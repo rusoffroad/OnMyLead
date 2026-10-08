@@ -2,9 +2,10 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Platform, Pressable } from 'react-native';
 
-import { LogoBanner } from '@/components/logo';
+import { Logo } from '@/components/logo';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Choice, ErrorText, Field, Screen } from '@/components/ui';
+import { Button, Card, ErrorText, Field, Screen, Segmented } from '@/components/ui';
+import { Colors } from '@/constants/theme';
 import { track } from '@/lib/analytics';
 import {
   sendCode,
@@ -85,11 +86,11 @@ export default function SignIn() {
 
   return (
     <Screen>
-      <LogoBanner />
-      <Choice
+      <Logo height={104} />
+      <Segmented<Mode>
         value={mode}
         onChange={(m) => {
-          setMode(m as Mode);
+          setMode(m);
           setError(null);
           setNotice(null);
         }}
@@ -121,6 +122,7 @@ export default function SignIn() {
       />
       <Button
         title={mode === 'create' ? 'Create account' : 'Sign in'}
+        big
         loading={busy === 'submit'}
         disabled={!emailOk || password.length < (mode === 'create' ? 8 : 1) || (mode === 'create' && !name.trim())}
         onPress={submit}
@@ -130,13 +132,14 @@ export default function SignIn() {
         <Pressable
           accessibilityRole="button"
           disabled={!emailOk}
+          style={{ minHeight: 44, justifyContent: 'center' }}
           onPress={() =>
             run('reset', async () => {
               await sendPasswordReset(cleanEmail);
               setNotice(`We sent a link to ${cleanEmail} to set a new password.`);
             })
           }>
-          <ThemedText themeColor="textSecondary">
+          <ThemedText type="link" style={{ color: emailOk ? Colors.sky : Colors.textSecondary }}>
             {emailOk ? 'Forgot your password? Email me a reset link' : 'Forgot your password? Enter your email above first'}
           </ThemedText>
         </Pressable>
@@ -145,6 +148,7 @@ export default function SignIn() {
       <Pressable
         accessibilityRole="button"
         disabled={!emailOk}
+        style={{ minHeight: 44, justifyContent: 'center' }}
         onPress={() =>
           run('link', async () => {
             await sendCode(cleanEmail);
@@ -152,15 +156,15 @@ export default function SignIn() {
             setNotice(`We sent a sign-in link to ${cleanEmail}. Tap it on this device. No password needed, and it creates your account if you're new.`);
           })
         }>
-        <ThemedText themeColor="textSecondary">
+        <ThemedText type="link" style={{ color: emailOk ? Colors.sky : Colors.textSecondary }}>
           {emailOk ? 'Or email me a sign-in link instead (no password)' : 'Or enter your email to get a sign-in link instead'}
         </ThemedText>
       </Pressable>
 
       {notice ? (
-        <ThemedText type="smallBold" accessibilityLiveRegion="polite">
-          {notice}
-        </ThemedText>
+        <Card style={{ borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
+          <ThemedText accessibilityLiveRegion="polite">{notice}</ThemedText>
+        </Card>
       ) : null}
       <ErrorText error={error} />
 

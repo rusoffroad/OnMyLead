@@ -3,6 +3,7 @@ import type { RefObject } from 'react';
 import type { View } from 'react-native';
 
 import { CARD_COLORS } from '@/components/ride-card';
+import { font as appFont } from '@/constants/theme';
 import { rideCardLines, rideCardText, type RideCardData } from '@/core/summary';
 
 const SIZE = 1080;
@@ -46,7 +47,9 @@ async function drawCard(card: RideCardData, logoSrc: string | null): Promise<Blo
   if (!ctx) return null;
   const pad = 80;
   const { title, date, stats } = rideCardLines(card);
-  const font = (weight: number, px: number) => `${weight} ${px}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+  // The app's own Barlow faces (already loaded by the app), with system fallbacks.
+  const font = (weight: number, px: number, cut: 'body' | 'display' = 'body') =>
+    `${px}px ${appFont(weight, cut)}, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
 
   ctx.fillStyle = CARD_COLORS.background;
   ctx.fillRect(0, 0, SIZE, SIZE);
@@ -58,31 +61,31 @@ async function drawCard(card: RideCardData, logoSrc: string | null): Promise<Blo
     ctx.drawImage(logo, (SIZE - w) / 2, pad, w, h);
   } else {
     ctx.fillStyle = CARD_COLORS.text;
-    ctx.font = font(900, 96);
+    ctx.font = font(800, 96, 'display');
     ctx.fillText('OnMyLead', pad, pad + 120);
   }
 
-  ctx.font = font(900, 104);
+  ctx.font = font(800, 120, 'display');
   const titleLines = wrap(ctx, title, SIZE - pad * 2, 3);
   const statsY = SIZE - pad - 100;
   const firstTitleY = statsY - 130 - (titleLines.length - 1) * 118;
 
   ctx.fillStyle = CARD_COLORS.muted;
-  ctx.font = font(700, 44);
-  ctx.fillText(date.toUpperCase(), pad, firstTitleY - 120);
+  ctx.font = font(600, 44);
+  ctx.fillText(date, pad, firstTitleY - 120);
 
   ctx.fillStyle = CARD_COLORS.text;
-  ctx.font = font(900, 104);
+  ctx.font = font(800, 120, 'display');
   titleLines.forEach((l, i) => ctx.fillText(l, pad, firstTitleY + i * 118));
 
   ctx.fillStyle = CARD_COLORS.accent;
-  ctx.font = font(900, 80);
+  ctx.font = font(700, 88, 'display');
   ctx.fillText(stats.join('   '), pad, statsY);
 
   ctx.fillStyle = CARD_COLORS.muted;
   ctx.font = font(600, 36);
   ctx.textAlign = 'right';
-  ctx.fillText('presented by RUS Offroad', SIZE - pad, SIZE - pad + 20);
+  ctx.fillText('Presented by RUS Offroad', SIZE - pad, SIZE - pad + 20);
 
   return new Promise((resolve) => canvas.toBlob((b) => resolve(b), 'image/png'));
 }
