@@ -50,11 +50,11 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
   if (!vehicles.length && !ride.route_miles) return null;
 
   return (
-    <Card style={advice ? { borderLeftWidth: 6, borderLeftColor: COLOR[advice.check] } : undefined}>
-      <ThemedText type="smallBold">{advice ? LABEL[advice.check] : 'Your machine'}</ThemedText>
+    <Card style={advice ? { borderLeftWidth: 4, borderLeftColor: COLOR[advice.check] } : undefined}>
+      <ThemedText type="heading" style={advice ? { color: COLOR[advice.check] } : undefined}>{advice ? LABEL[advice.check] : 'Your machine'}</ThemedText>
       {advice ? (
         <>
-          <ThemedText style={{ fontSize: 18, fontWeight: '700' }}>{advice.line}</ThemedText>
+          <ThemedText style={{ fontSize: 18, lineHeight: 24, fontWeight: 700 }}>{advice.line}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             {ride.route_miles} mile route · {vehicleTitle(vehicle!)} goes about {Math.round(range!.fullRangeMiles)} miles on{' '}
             {vehicle!.extra_fuel_gallons ? `${range!.totalGallons} gal (${vehicle!.tank_gallons} tank + ${vehicle!.extra_fuel_gallons} extra)` : 'a full tank'}.

@@ -1,4 +1,4 @@
-import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
@@ -7,8 +7,8 @@ import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { RideSummary } from '@/components/ride-summary';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Card, ErrorText, Screen } from '@/components/ui';
-import { Spacing } from '@/constants/theme';
+import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
+import { Colors, RideColors, Spacing } from '@/constants/theme';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { counts } from '@/core/joining';
 import { useRideChat } from '@/hooks/use-ride-chat';
@@ -74,7 +74,7 @@ export default function RidePage() {
     }
   }
 
-  if (ride === undefined) return <Screen><ThemedText>Loading…</ThemedText></Screen>;
+  if (ride === undefined) return <Screen><ThemedText themeColor="textSecondary">Loading…</ThemedText></Screen>;
   if (ride === null) return <Screen><ThemedText>We couldn’t find that ride. Check the link or code.</ThemedText></Screen>;
 
   const mine = members.find((m) => m.user_id === me);
@@ -94,30 +94,41 @@ export default function RidePage() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: ride.name }} />
-      <ThemedText type="subtitle">{ride.name}</ThemedText>
-      {ride.status === 'live' ? <ThemedText style={{ color: '#E03131', fontWeight: '800' }}>RIDE IS LIVE</ThemedText> : null}
-      <ThemedText type="small" themeColor="textSecondary">{ride.visibility === 'private' ? 'Private ride · invite only' : ride.visibility === 'public' ? 'Public ride' : 'Anyone with the link'}</ThemedText>
+      <View style={{ gap: Spacing.two }}>
+        <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+          {ride.status === 'live' ? <Tag label="Live now" color={Colors.accent} solid /> : null}
+          {ride.status === 'ended' ? <Tag label="Ended" color={Colors.textSecondary} /> : null}
+          {ride.status === 'cancelled' ? <Tag label="Cancelled" color={Colors.danger} /> : null}
+          {ride.difficulty ? <Tag label={cap(ride.difficulty)} color={Colors.sky} /> : null}
+          <Tag label={ride.visibility === 'private' ? 'Private, invite only' : ride.visibility === 'public' ? 'Public' : 'Anyone with the link'} color={Colors.textSecondary} />
+        </View>
+        <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{ride.name}</ThemedText>
+        <ThemedText style={{ color: Colors.sky, fontWeight: 700, fontSize: 17 }}>{when(ride.meet_at)}</ThemedText>
+        {ride.description ? <ThemedText themeColor="textSecondary">{ride.description}</ThemedText> : null}
+      </View>
       {justCreated && isManager ? <InviteCard ride={ride} fresh /> : null}
-      <ThemedText>{when(ride.meet_at)}</ThemedText>
-      {ride.description ? <ThemedText>{ride.description}</ThemedText> : null}
       {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
       {ride.status === 'ended' && isJoined ? <RideSummary ride={ride} members={members} /> : null}
 
-      <Card>
-        <Info label="Meet" value={details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'} />
-        {ride.depart_at ? <Info label="Departs" value={time(ride.depart_at)} /> : null}
-        {ride.expected_finish_at ? <Info label="Back by" value={time(ride.expected_finish_at)} /> : null}
-        {ride.destination_label ? <Info label="Destination" value={ride.destination_label} /> : null}
-        {ride.vehicle_types.length ? <Info label="Vehicles" value={ride.vehicle_types.join(', ')} /> : null}
-        {ride.difficulty ? <Info label="Difficulty" value={ride.difficulty} /> : null}
-        {ride.experience_level ? <Info label="Experience" value={ride.experience_level} /> : null}
-        {ride.route_miles ? <Info label="Route" value={`${ride.route_miles} miles`} /> : null}
-        <Info label="Spots" value={ride.max_vehicles ? `${c.vehicles} of ${ride.max_vehicles} vehicles` : ride.max_riders ? `${c.riders} of ${ride.max_riders} riders` : `${joined.length} going`} />
-        {ride.what_to_bring ? <Info label="Bring" value={ride.what_to_bring} /> : null}
-        {ride.required_equipment ? <Info label="Required" value={ride.required_equipment} /> : null}
-        {ride.fuel_notes ? <Info label="Fuel" value={ride.fuel_notes} /> : null}
-        {details?.instructions ? <Info label="Instructions" value={details.instructions} /> : null}
+      <Card style={{ gap: 0, paddingVertical: Spacing.one }}>
+        {(
+          [
+            ['Meet', details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'],
+            ride.depart_at ? ['Departs', time(ride.depart_at)] : null,
+            ride.expected_finish_at ? ['Back by', time(ride.expected_finish_at)] : null,
+            ride.destination_label ? ['Destination', ride.destination_label] : null,
+            ride.vehicle_types.length ? ['Vehicles', ride.vehicle_types.join(', ')] : null,
+            ride.experience_level ? ['Experience', ride.experience_level] : null,
+            ride.route_miles ? ['Route', `${ride.route_miles} miles`] : null,
+            ['Spots', ride.max_vehicles ? `${c.vehicles} of ${ride.max_vehicles} vehicles` : ride.max_riders ? `${c.riders} of ${ride.max_riders} riders` : `${joined.length} going`],
+            ride.what_to_bring ? ['Bring', ride.what_to_bring] : null,
+            ride.required_equipment ? ['Required', ride.required_equipment] : null,
+            ride.fuel_notes ? ['Fuel', ride.fuel_notes] : null,
+            details?.instructions ? ['Instructions', details.instructions] : null,
+          ].filter(Boolean) as [string, string][]
+        ).map(([label, value], i) => (
+          <Info key={label} label={label} value={value} first={i === 0} />
+        ))}
       </Card>
 
       {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && (ride.status === 'scheduled' || ride.status === 'live') ? (
@@ -166,9 +177,9 @@ export default function RidePage() {
 
       {isManager ? (
         <Card>
-          <ThemedText type="smallBold">Organizer</ThemedText>
+          <ThemedText type="heading">You’re organizing</ThemedText>
           {ride.status === 'scheduled' ? (
-            <Button title="Start Ride Mode" loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
+            <Button title="Start Ride Mode" big loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
           ) : null}
           {ride.status === 'live' ? (
             <Button title="End ride for everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
@@ -185,18 +196,22 @@ export default function RidePage() {
 
       {mine?.status === 'joined' ? (
         <Card>
-          <ThemedText type="smallBold">Going ({joined.length})</ThemedText>
+          <ThemedText type="heading">Going ({joined.length})</ThemedText>
           {joined.map((m) => (
-            <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flexWrap: 'wrap' }}>
-              <ThemedText style={{ flex: 1 }}>
-                {m.profiles?.display_name || 'Rider'}
-                {m.role !== 'rider' ? ` · ${m.role.replace('_', '-')}` : ''}
-                {m.checked_in_at ? ' · here' : ''}
-              </ThemedText>
+            <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flexWrap: 'wrap', minHeight: 48 }}>
+              <Avatar name={m.profiles?.display_name || 'Rider'} color={ROLE_COLOR[m.role]} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <ThemedText style={{ fontWeight: 600 }}>{m.profiles?.display_name || 'Rider'}</ThemedText>
+                {m.role !== 'rider' || m.checked_in_at ? (
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {[m.role !== 'rider' ? ROLE_LABEL[m.role] : null, m.checked_in_at ? 'Here' : null].filter(Boolean).join(', ')}
+                  </ThemedText>
+                ) : null}
+              </View>
               {isManager && m.role !== 'organizer' ? (
                 <>
-                  <Button title="Leader" kind={m.role === 'leader' ? 'primary' : 'secondary'} onPress={() => act('role', () => setMemberRole(ride.id, m.user_id, m.role === 'leader' ? 'rider' : 'leader'))} />
-                  <Button title="Sweep" kind={m.role === 'sweep' ? 'primary' : 'secondary'} onPress={() => act('role', () => setMemberRole(ride.id, m.user_id, m.role === 'sweep' ? 'rider' : 'sweep'))} />
+                  <Button title="Leader" kind="secondary" style={m.role === 'leader' && { backgroundColor: RideColors.leader }} onPress={() => act('role', () => setMemberRole(ride.id, m.user_id, m.role === 'leader' ? 'rider' : 'leader'))} />
+                  <Button title="Sweep" kind="secondary" style={m.role === 'sweep' && { backgroundColor: RideColors.sweep }} onPress={() => act('role', () => setMemberRole(ride.id, m.user_id, m.role === 'sweep' ? 'rider' : 'sweep'))} />
                 </>
               ) : null}
             </View>
@@ -226,17 +241,34 @@ export default function RidePage() {
         accessibilityLabel="OnMyLead is presented by RUS Offroad"
         onPress={() => openStore('ride_page')}
         style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 12 }}>presented by RUS Offroad</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13 }}>Presented by RUS Offroad</ThemedText>
       </Pressable>
     </Screen>
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function Info({ label, value, first }: { label: string; value: string; first: boolean }) {
   return (
-    <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-      <ThemedText type="smallBold" style={{ width: 96 }}>{label}</ThemedText>
-      <ThemedText type="small" style={{ flex: 1 }}>{value}</ThemedText>
+    <View style={{ flexDirection: 'row', gap: Spacing.three, paddingVertical: 10, borderTopWidth: first ? 0 : 1, borderTopColor: Colors.backgroundSelected }}>
+      <ThemedText type="small" themeColor="textSecondary" style={{ width: 92 }}>{label}</ThemedText>
+      <ThemedText style={{ flex: 1, fontSize: 15, lineHeight: 21, fontWeight: 600 }}>{value}</ThemedText>
+    </View>
+  );
+}
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const ROLE_LABEL: Record<RideMember['role'], string> = {
+  organizer: 'Organizer', co_organizer: 'Co-organizer', leader: 'Leader', sweep: 'Sweep', rider: 'Rider',
+};
+const ROLE_COLOR: Record<RideMember['role'], string> = {
+  organizer: Colors.accent, co_organizer: Colors.accent, leader: RideColors.leader, sweep: RideColors.sweep, rider: RideColors.rider,
+};
+
+function Avatar({ name, color }: { name: string; color: string }) {
+  return (
+    <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
+      <ThemedText style={{ color: '#fff', fontWeight: 700 }}>{name.trim().charAt(0).toUpperCase()}</ThemedText>
     </View>
   );
 }

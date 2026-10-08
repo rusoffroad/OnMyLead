@@ -177,7 +177,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
       </Row>
 
       <Card>
-        <ThemedText type="smallBold">Fuel and mileage</ThemedText>
+        <ThemedText type="heading">Fuel and mileage</ThemedText>
         <Row>
           <Half>
             <Field label="Tank (gal)" value={tank} onChangeText={setTank} keyboardType="decimal-pad" placeholder="10" />

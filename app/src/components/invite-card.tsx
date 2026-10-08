@@ -2,7 +2,7 @@ import * as Clipboard from 'expo-clipboard';
 import { useState } from 'react';
 import { Linking, Platform, Share, View } from 'react-native';
 
-import { Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { inviteMessage, mailUrl, smsUrl } from '@/core/discovery';
 import { track } from '@/lib/analytics';
 import type { Ride } from '@/lib/types';
@@ -33,8 +33,8 @@ export function InviteCard({ ride, fresh }: { ride: Ride; fresh?: boolean }) {
   };
 
   return (
-    <Card>
-      <ThemedText type={fresh ? 'subtitle' : 'smallBold'}>
+    <Card style={fresh ? { borderWidth: 2, borderColor: Colors.accent } : undefined}>
+      <ThemedText type={fresh ? 'subtitle' : 'heading'}>
         {fresh ? (isPrivate ? 'Your private ride is ready' : 'Your ride is live in search') : 'Invite riders'}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
@@ -42,7 +42,10 @@ export function InviteCard({ ride, fresh }: { ride: Ride; fresh?: boolean }) {
           ? 'Only people you send this to can find it. They can open the link or type the code.'
           : 'Anyone can find it near them or in your state. Send it to friends too.'}
       </ThemedText>
-      <ThemedText type="subtitle" selectable style={{ letterSpacing: 2 }}>{ride.invite_code}</ThemedText>
+      <View style={{ borderRadius: Radius.control, borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border, paddingVertical: 12, alignItems: 'center' }}>
+        <ThemedText type="small" themeColor="textSecondary">Invite code</ThemedText>
+        <ThemedText selectable style={{ fontSize: 40, lineHeight: 44, letterSpacing: 4, fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
+      </View>
       <Button title="Share invite" big onPress={() => send('sheet')} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title="Text" kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />

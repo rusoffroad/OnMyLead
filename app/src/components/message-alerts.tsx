@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { alertTitle, isLeaderOnly, shouldAlert, type ChatMessage } from '@/core/chat';
 import { registerForPush, resetPushRegistration, useNotificationTaps } from '@/lib/push';
 import { useSession } from '@/lib/session';
@@ -39,7 +39,7 @@ async function toAlert(m: ChatMessage): Promise<Alert> {
     title: alertTitle(m, who, ride?.name),
     body: m.body,
     inviteCode: ride?.invite_code ?? null,
-    accent: announcement ? RideColors.yellow : isLeaderOnly(m) ? RideColors.leader : RideColors.red,
+    accent: announcement ? RideColors.yellow : isLeaderOnly(m) ? RideColors.leader : Colors.accent,
     seconds: announcement ? 10 : 6,
   };
 }
@@ -125,18 +125,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: Spacing.two,
-    backgroundColor: '#11161D',
-    borderRadius: 14,
+    backgroundColor: Colors.backgroundSelected,
+    borderRadius: Radius.card,
     borderLeftWidth: 5,
     padding: Spacing.three,
     shadowColor: '#000',
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.5,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },
-  title: { color: '#FFFFFF', fontWeight: '700', fontSize: 15 },
-  body: { color: '#E6E8EB', fontSize: 16 },
-  more: { color: '#9BA1A6', fontSize: 13 },
+  title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
+  body: { color: Colors.text, fontFamily: font(500), fontSize: 16, lineHeight: 22 },
+  more: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   close: { paddingHorizontal: Spacing.one },
-  closeText: { color: '#9BA1A6', fontSize: 16 },
+  closeText: { color: Colors.textSecondary, fontSize: 16 },
 });

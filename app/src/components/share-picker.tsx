@@ -6,7 +6,7 @@ import { ThemedText } from './themed-text';
 import { Button, Field } from './ui';
 
 const label = (min: number | null, openLabel: string) =>
-  min == null ? openLabel : min < 60 ? `${min} min` : `${min / 60} hours`;
+  min == null ? openLabel : min < 60 ? `${min} min` : min === 60 ? '1 hour' : `${min / 60} hours`;
 
 /** Duration choice for a share. Includes a custom length in hours. */
 export function SharePicker({
@@ -21,9 +21,19 @@ export function SharePicker({
   const customMin = Math.round(parseFloat(custom) * 60);
   return (
     <View style={{ gap: Spacing.two }}>
-      {options.map((o) => (
-        <Button key={String(o)} title={label(o, openLabel)} big disabled={busy} onPress={() => onPick(o)} />
-      ))}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two }}>
+        {options.map((o) => (
+          <Button
+            key={String(o)}
+            title={label(o, openLabel)}
+            kind="secondary"
+            big
+            disabled={busy}
+            onPress={() => onPick(o)}
+            style={{ flexGrow: 1, flexBasis: o == null ? '100%' : '40%' }}
+          />
+        ))}
+      </View>
       <ThemedText type="small" themeColor="textSecondary">Or pick your own length</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' }}>
         <View style={{ flex: 1 }}>

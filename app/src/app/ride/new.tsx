@@ -1,10 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
-import { Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
@@ -123,48 +123,53 @@ export default function NewRide() {
 
   return (
     <Screen>
-      <ThemedText type="smallBold">What kind of ride?</ThemedText>
+      <ThemedText type="heading">What kind of ride?</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Public" big kind={kind === 'public' ? 'primary' : 'secondary'} style={{ flex: 1 }} onPress={() => setKind('public')} />
-        <Button title="Private" big kind={kind === 'private' ? 'primary' : 'secondary'} style={{ flex: 1 }} onPress={() => setKind('private')} />
+        <KindCard
+          title="Public"
+          detail="Open to anyone. Found by riders near you or in your state."
+          on={kind === 'public'}
+          onPress={() => setKind('public')}
+        />
+        <KindCard
+          title="Private"
+          detail="Only friends you invite by link, text or email."
+          on={kind === 'private'}
+          onPress={() => setKind('private')}
+        />
       </View>
-      {kind ? (
-        <ThemedText type="small" themeColor="textSecondary">
-          {kind === 'public'
-            ? 'Open to anyone. Riders find it by searching near them or by picking your state on the map.'
-            : 'Only the friends you invite. After you create it, send them the link or code by text, email or any app.'}
-        </ThemedText>
-      ) : null}
+
       <Field label="Ride name" value={name} onChangeText={setName} placeholder="Saturday Hell's Revenge run" />
-      <Choice
-        label="Day"
-        value={day}
-        onChange={setDay}
-        options={days.map((d, i) => ({
-          value: d.getTime(),
-          label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }),
-        }))}
-      />
-      <Field label="Meet at" value={meetTime} onChangeText={setMeetTime} placeholder="8:00 am" />
+
       <Card>
-        <ThemedText type="smallBold">Meeting point</ThemedText>
+        <ThemedText type="heading">When</ThemedText>
+        <Choice
+          value={day}
+          onChange={setDay}
+          options={days.map((d, i) => ({
+            value: d.getTime(),
+            label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }),
+          }))}
+        />
+        <Field label="Meet at" value={meetTime} onChangeText={setMeetTime} placeholder="8:00 am" />
+      </Card>
+
+      <Card>
+        <ThemedText type="heading">Meeting point</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           Only joined riders see the exact spot. Public pages show the area within about a mile.
         </ThemedText>
         <Button title="Use my current location" kind="secondary" onPress={useMyLocation} />
         <Field label="Coordinates" value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
         <Field label="Place name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
-      </Card>
-      <MultiChoice label="Vehicles welcome" options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
-      {kind === 'public' ? (
-        <>
+        {kind === 'public' ? (
           <View style={{ gap: Spacing.one }}>
-            <ThemedText type="smallBold">State</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
+            <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>State</ThemedText>
+            <ThemedText>
               {meetState ? `Listed in ${stateByCode(meetState)?.name}.` : 'Set the meeting point and we fill this in, or pick it.'}
             </ThemedText>
             {meetState && !pickingState ? (
-              <Button title="Change state" kind="secondary" onPress={() => setPickingState(true)} />
+              <Button title="Change state" kind="ghost" onPress={() => setPickingState(true)} />
             ) : (
               <Choice
                 value={meetState}
@@ -176,6 +181,13 @@ export default function NewRide() {
               />
             )}
           </View>
+        ) : null}
+      </Card>
+
+      <Card>
+        <ThemedText type="heading">Who’s riding</ThemedText>
+        <MultiChoice label="Vehicles welcome" options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
+        {kind === 'public' ? (
           <Choice
             label="Joining"
             value={joinPolicy}
@@ -185,20 +197,20 @@ export default function NewRide() {
               { value: 'approval', label: 'I approve riders' },
             ]}
           />
-        </>
-      ) : null}
-      <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <View style={{ flex: 1 }}>
-          <Field label="Max vehicles" value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder="No limit" />
+        ) : null}
+        <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+          <View style={{ flex: 1 }}>
+            <Field label="Max vehicles" value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder="No limit" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Field label="Max riders" value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder="No limit" />
+          </View>
         </View>
-        <View style={{ flex: 1 }}>
-          <Field label="Max riders" value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder="No limit" />
-        </View>
-      </View>
+      </Card>
 
-      <Button title={more ? 'Fewer details' : 'More details'} kind="secondary" onPress={() => setMore(!more)} />
+      <Button title={more ? 'Fewer details' : 'Add route, difficulty and more'} kind="ghost" onPress={() => setMore(!more)} />
       {more ? (
-        <>
+        <Card>
           <Field label="Description" value={description} onChangeText={setDescription} multiline />
           <Field label="Departure time" value={departTime} onChangeText={setDepartTime} placeholder="8:30 am" />
           <Field label="Expected finish" value={finishTime} onChangeText={setFinishTime} placeholder="4:00 pm" />
@@ -231,7 +243,7 @@ export default function NewRide() {
               { value: 'highway', label: 'Highway' },
             ]}
           />
-        </>
+        </Card>
       ) : null}
 
       <ErrorText error={error} />
@@ -242,5 +254,22 @@ export default function NewRide() {
         onPress={submit}
       />
     </Screen>
+  );
+}
+
+/** One of the two ride kinds: a big tappable card, outlined in red when picked. */
+function KindCard({ title, detail, on, onPress }: { title: string; detail: string; on: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ selected: on }}
+      onPress={onPress}
+      style={{
+        flex: 1, gap: Spacing.one, padding: Spacing.three, minHeight: 128, borderRadius: Radius.card, borderWidth: 2,
+        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? '#2A1620' : Colors.backgroundElement,
+      }}>
+      <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText>
+    </Pressable>
   );
 }

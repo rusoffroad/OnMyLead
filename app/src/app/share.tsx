@@ -4,7 +4,8 @@ import { Alert, Pressable, Share, View } from 'react-native';
 
 import { SharePicker } from '@/components/share-picker';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Card, ErrorText, Screen } from '@/components/ui';
+import { Icon } from '@/components/icon';
+import { Button, Card, ErrorText, Screen, Section } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { EXTEND_PROMPT_LEAD_MIN, formatRemaining, PERSONAL_SHARE_OPTIONS_MIN } from '@/core/sharing';
@@ -84,8 +85,8 @@ export default function ShareMyLocation() {
         const left = s.expires_at ? Date.parse(s.expires_at) - now : null;
         const nearEnd = left != null && left <= EXTEND_PROMPT_LEAD_MIN * 60_000;
         return (
-          <Card key={s.id} style={{ borderLeftWidth: 6, borderLeftColor: '#1C7ED6' }}>
-            <ThemedText type="smallBold">Sharing now · {formatRemaining(left)}</ThemedText>
+          <Card key={s.id} style={{ borderLeftWidth: 4, borderLeftColor: theme.sky }}>
+            <ThemedText type="heading" style={{ color: theme.sky }}>Sharing now, {formatRemaining(left)}</ThemedText>
             {s.link_token ? <ThemedText type="small" themeColor="textSecondary">Includes a family link</ThemedText> : null}
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
               <Button title="Stop" kind="danger" style={{ flex: 1 }} onPress={() => stop(s)} />
@@ -95,7 +96,7 @@ export default function ShareMyLocation() {
         );
       })}
 
-      <ThemedText type="smallBold">Who can see you</ThemedText>
+      <Section title="Who can see you" />
       {friends.length === 0 ? (
         <ThemedText themeColor="textSecondary">People you’ve ridden with show up here. You can still share a family link.</ThemedText>
       ) : null}
@@ -108,8 +109,8 @@ export default function ShareMyLocation() {
               accessibilityRole="checkbox"
               accessibilityState={{ checked: on }}
               onPress={() => setPicked(on ? picked.filter((x) => x !== f.id) : [...picked, f.id])}
-              style={{ borderWidth: 1.5, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8, borderColor: on ? theme.accent : theme.border, backgroundColor: on ? theme.accent : 'transparent' }}>
-              <ThemedText style={{ color: on ? theme.onAccent : theme.text }}>{f.name}</ThemedText>
+              style={{ borderRadius: 999, paddingHorizontal: 16, minHeight: 40, justifyContent: 'center', backgroundColor: on ? theme.accent : theme.backgroundSelected }}>
+              <ThemedText style={{ color: on ? theme.onAccent : theme.text, fontWeight: 600 }}>{f.name}</ThemedText>
             </Pressable>
           );
         })}
@@ -119,15 +120,17 @@ export default function ShareMyLocation() {
         accessibilityState={{ checked: familyLink }}
         onPress={() => setFamilyLink(!familyLink)}>
         <Card style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
-          <ThemedText style={{ fontSize: 22 }}>{familyLink ? '☑' : '☐'}</ThemedText>
+          <View style={{ width: 30, height: 30, borderRadius: 9, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center', borderColor: familyLink ? theme.sky : theme.border, backgroundColor: familyLink ? theme.sky : 'transparent' }}>
+            {familyLink ? <Icon name="check" size={20} color="#fff" strokeWidth={3} /> : null}
+          </View>
           <View style={{ flex: 1 }}>
-            <ThemedText type="smallBold">Family link</ThemedText>
+            <ThemedText style={{ fontWeight: 700 }}>Family link</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">A read-only web link for someone without the app. It stops working when sharing ends.</ThemedText>
           </View>
         </Card>
       </Pressable>
 
-      <ThemedText type="smallBold">For how long</ThemedText>
+      <Section title="For how long" />
       <SharePicker options={PERSONAL_SHARE_OPTIONS_MIN} openLabel="Until I turn it off (max 24 hours)" busy={busy} onPick={(m) => {
         if (m == null) {
           Alert.alert('Share until you turn it off?', 'It still stops automatically after 24 hours.', [

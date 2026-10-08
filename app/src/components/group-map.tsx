@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import { RideColors } from '@/constants/theme';
+import { Colors, font, RideColors } from '@/constants/theme';
 import type { MapRider } from './group-map-types';
 
 export type { MapRider } from './group-map-types';
@@ -47,14 +47,14 @@ export function GroupMap({
           </Marker>
         ))}
       {regroup ? (
-        <Marker coordinate={{ latitude: regroup.lat, longitude: regroup.lng }} title={regroup.label ?? 'Regroup here'} pinColor="#F59F00" />
+        <Marker coordinate={{ latitude: regroup.lat, longitude: regroup.lng }} title={regroup.label ?? 'Regroup here'} pinColor={RideColors.yellow} />
       ) : null}
     </MapView>
   );
 }
 
 const styles = StyleSheet.create({
-  ring: { width: 40, height: 40, borderRadius: 20, borderWidth: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
+  ring: { width: 40, height: 40, borderRadius: 20, borderWidth: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
   dot: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  initial: { color: '#fff', fontWeight: '800' },
+  initial: { color: '#fff', fontFamily: font(800) },
 });

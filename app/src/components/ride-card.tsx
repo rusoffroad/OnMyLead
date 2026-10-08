@@ -2,9 +2,10 @@ import { Image } from 'expo-image';
 import { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { font } from '@/constants/theme';
 import { rideCardLines, type RideCardData } from '@/core/summary';
 
-const banner = require('../../assets/images/logo-banner.png');
+const wordmark = require('../../assets/images/logo-wordmark.png');
 
 /**
  * The shareable ride card. What you see is what gets shared: ride name, date, your distance
@@ -15,7 +16,7 @@ export const RideCard = forwardRef<View, { card: RideCardData }>(function RideCa
   const { title, date, stats } = rideCardLines(card);
   return (
     <View ref={ref} collapsable={false} style={styles.card}>
-      <Image source={banner} contentFit="contain" style={styles.logo} accessibilityLabel="OnMyLead" />
+      <Image source={wordmark} contentFit="contain" style={styles.logo} accessibilityLabel="OnMyLead" />
       <View style={styles.body}>
         <Text style={styles.date}>{date}</Text>
         <Text style={styles.title} numberOfLines={3}>{title}</Text>
@@ -25,20 +26,20 @@ export const RideCard = forwardRef<View, { card: RideCardData }>(function RideCa
           ))}
         </View>
       </View>
-      <Text style={styles.mark}>presented by RUS Offroad</Text>
+      <Text style={styles.mark}>Presented by RUS Offroad</Text>
     </View>
   );
 });
 
-export const CARD_COLORS = { background: '#020A14', text: '#ffffff', muted: '#9AA4B2', accent: '#F0313A' };
+export const CARD_COLORS = { background: '#0A1626', text: '#ffffff', muted: '#9AA4B2', accent: '#FF4048' };
 
 const styles = StyleSheet.create({
   card: { width: '100%', aspectRatio: 1, backgroundColor: CARD_COLORS.background, borderRadius: 18, padding: 20, justifyContent: 'space-between' },
   logo: { width: '100%', height: '24%' },
   body: { gap: 6 },
-  date: { color: CARD_COLORS.muted, fontSize: 16, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
-  title: { color: CARD_COLORS.text, fontSize: 30, fontWeight: '900' },
+  date: { color: CARD_COLORS.muted, fontSize: 16, fontFamily: font(600) },
+  title: { color: CARD_COLORS.text, fontSize: 38, lineHeight: 40, fontFamily: font(800, 'display') },
   stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 14, marginTop: 6 },
-  stat: { color: CARD_COLORS.accent, fontSize: 24, fontWeight: '900' },
-  mark: { color: CARD_COLORS.muted, fontSize: 13, fontWeight: '600', textAlign: 'right' },
+  stat: { color: CARD_COLORS.accent, fontSize: 28, fontFamily: font(700, 'display') },
+  mark: { color: CARD_COLORS.muted, fontSize: 13, fontFamily: font(600), textAlign: 'right' },
 });

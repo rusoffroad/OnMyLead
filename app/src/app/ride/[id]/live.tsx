@@ -10,7 +10,7 @@ import { GroupMap, type MapRider } from '@/components/group-map';
 import { SharePicker } from '@/components/share-picker';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card } from '@/components/ui';
-import { RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { formatRemaining, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
@@ -279,7 +279,7 @@ export default function RideMode() {
   const myPos = me ? positions[me] : undefined;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000' }}>
+    <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <GroupMap riders={mapRiders} regroup={regroup} />
 
       <SafeAreaView edges={['top']} style={styles.top}>
@@ -291,16 +291,16 @@ export default function RideMode() {
             {bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Group together'}
           </Text>
         </View>
-        <Pressable onPress={() => (activeShare ? endShare() : setAskShare(true))} style={[styles.shareBanner, { backgroundColor: activeShare ? '#1C7ED6' : '#495057' }]}>
+        <Pressable onPress={() => (activeShare ? endShare() : setAskShare(true))} style={[styles.shareBanner, { backgroundColor: activeShare ? Colors.sky : Colors.backgroundSelected }]}>
           <Text style={styles.shareText}>
             {activeShare
-              ? `Sharing with this ride · ${formatRemaining(activeShare.expires_at ? Date.parse(activeShare.expires_at) - now : null)} · Tap to stop`
-              : 'Not sharing your location · Tap to share'}
+              ? `Sharing with this ride, ${formatRemaining(activeShare.expires_at ? Date.parse(activeShare.expires_at) - now : null)}. Tap to stop`
+              : 'Not sharing your location. Tap to share'}
           </Text>
         </Pressable>
         {regroup ? (
           <Pressable onPress={() => navigateTo(regroup.lat, regroup.lng)} style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}>
-            <Text style={[styles.shareText, { color: '#000' }]}>Regroup point set · Tap to navigate</Text>
+            <Text style={[styles.shareText, { color: '#1A1100' }]}>Regroup point set. Tap to navigate</Text>
           </Pressable>
         ) : null}
         {announcement ? (
@@ -309,7 +309,7 @@ export default function RideMode() {
             accessibilityRole="button"
             accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
             style={styles.announcement}>
-            <Text style={styles.announcementLabel}>ANNOUNCEMENT · {nameOf(announcement.user_id)} · tap to hear</Text>
+            <Text style={styles.announcementLabel}>Announcement from {nameOf(announcement.user_id)}. Tap to hear it again</Text>
             <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
           </Pressable>
         ) : null}
@@ -336,7 +336,7 @@ export default function RideMode() {
           {helpCalls.map(({ m, s }) => (
             <Card key={`s-${m.user_id}`} style={{ borderLeftWidth: 6, borderLeftColor: s.status === 'emergency' || s.status === 'need_help' ? RideColors.red : RideColors.yellow }}>
               <ThemedText type="smallBold">
-                {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]} · {ago(s.tapped_at, now)}
+                {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}, {ago(s.tapped_at, now)}
               </ThemedText>
               {positions[m.user_id] ? (
                 <Button title="Navigate" kind="secondary" onPress={() => navigateTo(positions[m.user_id].lat, positions[m.user_id].lng)} />
@@ -357,7 +357,7 @@ export default function RideMode() {
               style={({ pressed }) => [
                 styles.replyBtn,
                 { opacity: pressed ? 0.75 : 1 },
-                lastReply === q && { borderColor: '#fff', borderWidth: 3 },
+                lastReply === q && { borderColor: Colors.text, borderWidth: 3 },
               ]}>
               <Text style={styles.replyText}>{q}</Text>
             </Pressable>
@@ -373,8 +373,8 @@ export default function RideMode() {
               accessibilityLabel={`Send status ${s.label}`}
               style={({ pressed }) => [
                 styles.statusBtn,
-                { backgroundColor: s.kind === 'emergency' ? RideColors.red : s.urgent ? '#C92A2A' : '#343A40', opacity: pressed ? 0.75 : 1 },
-                statuses[me ?? '']?.status === s.kind && { borderColor: '#fff', borderWidth: 3 },
+                { backgroundColor: s.kind === 'emergency' ? Colors.danger : s.urgent ? Colors.accent : Colors.backgroundSelected, opacity: pressed ? 0.75 : 1 },
+                statuses[me ?? '']?.status === s.kind && { borderColor: Colors.text, borderWidth: 3 },
               ]}>
               <Text style={styles.statusText}>{s.label}</Text>
             </Pressable>
@@ -385,7 +385,7 @@ export default function RideMode() {
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <View style={styles.sheetWrap}>
           <View style={styles.sheet}>
-            <ThemedText type="smallBold" style={styles.sheetTitle}>Share your location with this ride?</ThemedText>
+            <ThemedText type="subtitle" style={styles.sheetTitle}>Share your location with this ride?</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
               Only riders on this ride will see you. Sharing stops automatically when time runs out or the ride ends.
             </ThemedText>
@@ -403,7 +403,7 @@ export default function RideMode() {
               This alerts everyone on the ride with your location. It does not contact emergency services. Call 911 if anyone is hurt.
             </ThemedText>
             {myPos ? (
-              <ThemedText style={[styles.sheetBody, { fontSize: 22, fontWeight: '800' }]}>
+              <ThemedText style={[styles.sheetBody, { fontSize: 24, fontWeight: 800, color: Colors.text }]}>
                 {myPos.lat.toFixed(5)}, {myPos.lng.toFixed(5)}
               </ThemedText>
             ) : null}
@@ -431,24 +431,27 @@ export default function RideMode() {
 }
 
 const styles = StyleSheet.create({
-  top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: Spacing.one },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(0,0,0,0.65)', borderRadius: 12, padding: Spacing.two },
-  topText: { color: '#fff', fontSize: 17, fontWeight: '800' },
-  shareBanner: { borderRadius: 12, padding: Spacing.two },
-  shareText: { color: '#fff', fontWeight: '700', textAlign: 'center' },
-  bottom: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.two, backgroundColor: 'rgba(0,0,0,0.75)' },
+  top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: 6 },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48 },
+  topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
+  shareBanner: { borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center' },
+  shareText: { color: '#fff', fontFamily: font(700), fontSize: 15, textAlign: 'center' },
+  bottom: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.two, paddingTop: 12,
+    backgroundColor: 'rgba(10,22,38,0.96)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
+  },
   actions: { flexDirection: 'row', gap: Spacing.two },
-  announcement: { borderRadius: 12, padding: Spacing.two, backgroundColor: RideColors.yellow, gap: 2 },
-  announcementLabel: { color: '#000', fontWeight: '800', fontSize: 12, letterSpacing: 0.5 },
-  announcementText: { color: '#000', fontWeight: '800', fontSize: 18 },
+  announcement: { borderRadius: Radius.control, padding: 12, backgroundColor: RideColors.yellow, gap: 2 },
+  announcementLabel: { color: '#3A2600', fontFamily: font(700), fontSize: 13 },
+  announcementText: { color: '#1A1100', fontFamily: font(800), fontSize: 19, lineHeight: 24 },
   replies: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.two },
-  replyBtn: { flex: 1, minHeight: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#1C7ED6', paddingHorizontal: 4 },
-  replyText: { color: '#fff', fontWeight: '800', fontSize: 15, textAlign: 'center' },
+  replyBtn: { flex: 1, minHeight: 58, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.sky, paddingHorizontal: 4 },
+  replyText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 18, lineHeight: 20, textAlign: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, marginTop: Spacing.two },
-  statusBtn: { width: '31.5%', minHeight: 64, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  statusText: { color: '#fff', fontWeight: '800', fontSize: 16, textAlign: 'center' },
+  statusBtn: { width: '31.5%', minHeight: 64, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center' },
+  statusText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 20, textAlign: 'center' },
   sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
-  sheet: { backgroundColor: '#1b1d1f', padding: Spacing.three, gap: Spacing.two, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
-  sheetTitle: { color: '#fff' },
-  sheetBody: { color: '#dee2e6' },
+  sheet: { backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
+  sheetTitle: { color: Colors.text },
+  sheetBody: { color: Colors.textSecondary },
 });

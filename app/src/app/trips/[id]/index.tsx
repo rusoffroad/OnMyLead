@@ -1,9 +1,10 @@
-import { Link, router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { ProgressBar } from '@/components/progress-bar';
 import { RusGear } from '@/components/rus-gear';
+import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
@@ -129,23 +130,22 @@ export default function TripPage() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: trip.name }} />
       <View style={{ gap: Spacing.one }}>
-        <ThemedText type="subtitle">{trip.name}</ThemedText>
+        <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{trip.name}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {[dates, vehicle ? `Taking ${vehicle.nickname || vehicleTitle(vehicle)}` : null].filter(Boolean).join(' · ') || 'No dates set'}
+          {[dates, vehicle ? `Taking ${vehicle.nickname || vehicleTitle(vehicle)}` : null].filter(Boolean).join(', ') || 'No dates set'}
         </ThemedText>
         {ride ? (
           <Link href={`/r/${ride.invite_code}`} asChild>
             <Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}>
-              <ThemedText type="smallBold" style={{ color: theme.accent }}>For the ride: {ride.name} ›</ThemedText>
+              <ThemedText type="link" style={{ color: theme.sky }}>For the ride: {ride.name}</ThemedText>
             </Pressable>
           </Link>
         ) : null}
       </View>
 
       <Card>
-        <ThemedText type="subtitle" style={{ color: p.done ? RideColors.green : theme.text }}>
+        <ThemedText type="subtitle" style={{ fontSize: 36, lineHeight: 38, color: p.done ? RideColors.green : theme.text }}>
           {p.done ? `All ${p.total} packed` : p.label}
         </ThemedText>
         <ProgressBar fraction={p.fraction} done={p.done} />
@@ -153,7 +153,7 @@ export default function TripPage() {
 
       {items.length === 0 || showTemplates ? (
         <Card>
-          <ThemedText type="smallBold">Add a starter list</ThemedText>
+          <ThemedText type="heading">Add a starter list</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">One tap adds the items. Add as many as fit the trip; nothing is added twice.</ThemedText>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two }}>
             {TRIP_TEMPLATES.map((tpl) => (
@@ -170,7 +170,7 @@ export default function TripPage() {
           </View>
         </Card>
       ) : (
-        <Button title="Add a starter list" kind="secondary" onPress={() => setShowTemplates(true)} />
+        <Button title="Add a starter list" kind="ghost" onPress={() => setShowTemplates(true)} />
       )}
 
       {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
@@ -195,8 +195,8 @@ export default function TripPage() {
         return (
           <Card key={g.category}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <ThemedText type="smallBold">{g.label}</ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">{gp.packed}/{gp.total}</ThemedText>
+              <ThemedText type="heading">{g.label}</ThemedText>
+              <ThemedText style={{ fontWeight: 700, color: gp.done ? RideColors.green : theme.textSecondary }}>{gp.packed} of {gp.total}</ThemedText>
             </View>
             {g.items.map((item) =>
               editing !== 'new' && editing?.id === item.id ? (
@@ -223,7 +223,7 @@ export default function TripPage() {
 
       {items.length ? (
         <View style={{ gap: Spacing.two }}>
-          <ThemedText type="smallBold">After the trip</ThemedText>
+          <ThemedText type="heading">After the trip</ThemedText>
           <View style={{ flexDirection: 'row', gap: Spacing.two }}>
             <Button title="Uncheck all" kind="secondary" style={{ flex: 1 }} loading={busy === 'uncheck'} disabled={p.packed === 0} onPress={resetChecks} />
             <Button title="Copy to a new trip" kind="secondary" style={{ flex: 1 }} loading={busy === 'copy'} onPress={copy} />
@@ -243,7 +243,7 @@ export default function TripPage() {
 function CheckRow({ item, onToggle, onEdit }: { item: TripItem; onToggle: () => void; onEdit: () => void }) {
   const theme = useTheme();
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'stretch', borderTopWidth: 1, borderTopColor: theme.border }}>
+    <View style={{ flexDirection: 'row', alignItems: 'stretch', borderTopWidth: 1, borderTopColor: theme.backgroundSelected }}>
       <Pressable
         accessibilityRole="checkbox"
         accessibilityState={{ checked: item.checked }}
@@ -252,11 +252,11 @@ function CheckRow({ item, onToggle, onEdit }: { item: TripItem; onToggle: () => 
         style={({ pressed }) => ({ flex: 1, flexDirection: 'row', alignItems: 'center', gap: Spacing.three, minHeight: 60, paddingVertical: Spacing.two, opacity: pressed ? 0.6 : 1 })}>
         <View
           style={{
-            width: 34, height: 34, borderRadius: 8, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center',
-            borderColor: item.checked ? RideColors.green : theme.textSecondary,
+            width: 34, height: 34, borderRadius: 10, borderWidth: 2.5, alignItems: 'center', justifyContent: 'center',
+            borderColor: item.checked ? RideColors.green : theme.border,
             backgroundColor: item.checked ? RideColors.green : 'transparent',
           }}>
-          {item.checked ? <Text style={{ color: '#fff', fontSize: 22, fontWeight: '900', lineHeight: 26 }}>✓</Text> : null}
+          {item.checked ? <Icon name="check" size={22} color="#fff" strokeWidth={3} /> : null}
         </View>
         <View style={{ flex: 1, gap: 2 }}>
           <ThemedText style={item.checked ? { textDecorationLine: 'line-through', color: theme.textSecondary } : undefined}>
@@ -271,7 +271,7 @@ function CheckRow({ item, onToggle, onEdit }: { item: TripItem; onToggle: () => 
         onPress={onEdit}
         hitSlop={8}
         style={{ minWidth: 56, alignItems: 'center', justifyContent: 'center' }}>
-        <ThemedText type="small" themeColor="textSecondary">Edit</ThemedText>
+        <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>Edit</ThemedText>
       </Pressable>
     </View>
   );
@@ -308,7 +308,7 @@ function ItemForm({
   }
 
   return (
-    <Card style={{ borderWidth: 1.5, borderColor: theme.accent }}>
+    <Card style={{ borderWidth: 1.5, borderColor: theme.sky }}>
       <Field label="Item" value={name} onChangeText={setName} placeholder="Tow strap" maxLength={200} />
       <View style={{ flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' }}>
         <View style={{ width: 96 }}>

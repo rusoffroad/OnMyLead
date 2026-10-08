@@ -49,13 +49,13 @@ export function RusGear({
   return (
     <Card>
       <View style={{ gap: 2 }}>
-        <ThemedText type="smallBold">Gear from RUS Offroad</ThemedText>
+        <ThemedText type="heading">Gear from RUS Offroad</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">Suggestions from RUS Offroad, the team behind OnMyLead.</ThemedText>
       </View>
       {suggestions.map(({ product, reason }) => (
-        <View key={product.id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderTopWidth: 1, borderTopColor: theme.border, paddingTop: Spacing.two }}>
+        <View key={product.id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderTopWidth: 1, borderTopColor: theme.backgroundSelected, paddingTop: Spacing.two }}>
           {product.image ? (
-            <Image source={{ uri: product.image }} style={{ width: 64, height: 64, borderRadius: 8, backgroundColor: '#fff' }} contentFit="contain" accessibilityIgnoresInvertColors />
+            <Image source={{ uri: product.image }} style={{ width: 64, height: 64, borderRadius: 12, backgroundColor: '#fff' }} contentFit="contain" accessibilityIgnoresInvertColors />
           ) : null}
           <View style={{ flex: 1, gap: 2 }}>
             <ThemedText type="small" numberOfLines={2}>{product.name}</ThemedText>
@@ -67,7 +67,7 @@ export function RusGear({
         </View>
       ))}
       <Pressable accessibilityRole="link" onPress={() => openStore(campaign)} style={{ minHeight: 44, justifyContent: 'center' }}>
-        <ThemedText type="small" style={{ color: theme.accent, fontWeight: '700' }}>More at rusoffroad.com ›</ThemedText>
+        <ThemedText type="small" style={{ color: theme.sky, fontWeight: 700 }}>Shop more at rusoffroad.com</ThemedText>
       </Pressable>
     </Card>
   );

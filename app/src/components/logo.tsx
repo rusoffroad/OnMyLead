@@ -1,15 +1,15 @@
 import { Image } from 'expo-image';
 
-const banner = require('../../assets/images/logo-banner.png');
+const wordmark = require('../../assets/images/logo-wordmark.png');
 
-// The logo artwork is white, red and blue on dark navy, so it always sits on its own dark tile.
-export function LogoBanner({ height = 140 }: { height?: number }) {
+// The logo artwork cut out of its navy tile, so it sits straight on the app's dark background.
+export function Logo({ height = 120 }: { height?: number }) {
   return (
     <Image
-      source={banner}
-      accessibilityLabel="OnMyLead"
+      source={wordmark}
+      accessibilityLabel="OnMyLead by RUS Offroad"
       contentFit="contain"
-      style={{ height, width: '100%', borderRadius: 16, backgroundColor: '#020A14' }}
+      style={{ height, width: '100%' }}
     />
   );
 }

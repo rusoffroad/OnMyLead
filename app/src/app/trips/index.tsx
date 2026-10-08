@@ -26,7 +26,7 @@ export default function Trips() {
     return (
       <Screen>
         <Card>
-          <ThemedText type="smallBold">Sign in to plan your trips</ThemedText>
+          <ThemedText type="heading">Sign in to plan your trips</ThemedText>
           <Button title="Sign in" onPress={() => router.push('/sign-in')} />
         </Card>
       </Screen>
@@ -50,7 +50,7 @@ export default function Trips() {
             <Pressable accessibilityRole="link">
               <Card>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: Spacing.two }}>
-                  <ThemedText type="smallBold" style={{ flex: 1 }}>{trip.name}</ThemedText>
+                  <ThemedText type="heading" style={{ flex: 1 }}>{trip.name}</ThemedText>
                   {dates ? <ThemedText type="small" themeColor="textSecondary">{dates}</ThemedText> : null}
                 </View>
                 <ProgressBar fraction={p.fraction} done={p.done} />
