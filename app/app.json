@@ -59,6 +59,12 @@
         }
       ],
       "./plugins/with-starlink-local-network",
+      [
+        "./plugins/with-carplay",
+        {
+          "enabled": false
+        }
+      ],
       "./plugins/with-scene-lifecycle",
       [
         "./plugins/with-push-entitlement",

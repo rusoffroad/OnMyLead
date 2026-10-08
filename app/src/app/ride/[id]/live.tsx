@@ -11,6 +11,7 @@ import { SharePicker } from '@/components/share-picker';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { formatRemaining, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
@@ -20,6 +21,7 @@ import {
   activeRegroup, dropRegroup, getMembers, getPositions, getRide, latestStatuses, myActiveShares,
   startLocationShare, stopLocationShare, type ActiveShare,
 } from '@/lib/api';
+import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
@@ -276,6 +278,47 @@ export default function RideMode() {
     }
   }
 
+  async function sendEmergency() {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    let at: { lat: number; lng: number } | null = null;
+    try { at = await currentPosition(); } catch {}
+    await sendStatusReliably(id, 'emergency', at);
+    setStatuses((prev) => ({ ...prev, [me!]: { status: 'emergency', tapped_at: new Date().toISOString() } }));
+  }
+
+  // CarPlay: the car screen mirrors the group's state and sends button presses back here.
+  const car = carPlayState({
+    rideName: ride?.name ?? 'Ride',
+    separated: bubble.alerts.map((a) => ({ riderId: a.riderId, message: a.message ?? 'A rider is separated' })),
+    watchesBubble: !!watchesBubble,
+    canRegroup: !!canRegroup,
+    riders: mapRiders.map((r) => ({
+      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? ' (Sweep)' : ''}`,
+      detail: r.detail,
+    })),
+    helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || 'Rider', status: STATUS_LABEL[s.status] })),
+  });
+  const carKey = JSON.stringify(car);
+  useEffect(() => {
+    if (ride) showRideOnCarPlay(JSON.parse(carKey));
+  }, [carKey, ride]);
+  useEffect(() => () => clearCarPlay(), []);
+  const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency });
+  useEffect(() => {
+    carActions.current = { tapStatus, quickReply, regroupHere, sendEmergency };
+  });
+  useEffect(() => {
+    const sub = onCarPlayAction((buttonId) => {
+      const a = parseCarPlayAction(buttonId);
+      const act = carActions.current;
+      if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
+      else if (a.type === 'reply' && (QUICK_REPLIES as readonly string[]).includes(a.body)) act.quickReply(a.body as QuickReply);
+      else if (a.type === 'regroup') act.regroupHere();
+      else if (a.type === 'emergency') act.sendEmergency();
+    });
+    return () => sub.remove();
+  }, []);
+
   const navigateTo = (lat: number, lng: number) =>
     Linking.openURL(Platform.OS === 'ios' ? `http://maps.apple.com/?daddr=${lat},${lng}` : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
 
@@ -439,10 +482,7 @@ export default function RideMode() {
               kind="danger"
               big
               onLongPress={async () => {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-                let at: { lat: number; lng: number } | null = null;
-                try { at = await currentPosition(); } catch {}
-                await sendStatusReliably(id, 'emergency', at);
+                await sendEmergency();
                 setSosOpen(false);
               }}
               delayLongPress={1500}
