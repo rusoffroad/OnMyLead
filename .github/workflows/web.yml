@@ -38,6 +38,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npx expo export --platform web --clear
+      - run: node scripts/pwa-head.mjs dist/index.html
       - name: Publish to the web-build branch
         run: |
           cd dist
