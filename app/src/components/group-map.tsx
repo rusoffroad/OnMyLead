@@ -52,8 +52,8 @@ export function GroupMap({
             anchor={{ x: 0.5, y: 0.5 }}
             onPress={() => onPressRider?.(r.id)}
             opacity={r.stale ? 0.55 : 1}>
-            <View style={[styles.ring, { borderColor: RideColors[r.status] }]}>
-              <View style={[styles.dot, { backgroundColor: RideColors[r.role], opacity: r.stale ? 0.4 : 1 }]}>
+            <View style={[styles.ring, r.role === 'leader' && styles.leaderRing, { borderColor: RideColors[r.status] }]}>
+              <View style={[styles.dot, r.role === 'leader' && styles.leaderDot, { backgroundColor: RideColors[r.role], opacity: r.stale ? 0.4 : 1 }]}>
                 <Text style={styles.initial}>{r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : r.name.slice(0, 1).toUpperCase()}</Text>
               </View>
             </View>
@@ -69,5 +69,8 @@ export function GroupMap({
 const styles = StyleSheet.create({
   ring: { width: 40, height: 40, borderRadius: 20, borderWidth: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.background },
   dot: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  // The leader is the one everyone follows: bigger, and the only logo-blue pin on the map.
+  leaderRing: { width: 50, height: 50, borderRadius: 25 },
+  leaderDot: { width: 38, height: 38, borderRadius: 19 },
   initial: { color: '#fff', fontFamily: font(800) },
 });

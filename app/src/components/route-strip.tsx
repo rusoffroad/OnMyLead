@@ -53,7 +53,7 @@ export function RouteStrip({
         {order.map((r) => {
           const mine = r.id === meId;
           const color = r.role === 'leader' ? RideColors.leader : r.role === 'sweep' ? RideColors.sweep : mine ? Colors.accent : RideColors.rider;
-          const size = mine ? 30 : r.role === 'rider' ? 18 : 24;
+          const size = mine ? 30 : r.role === 'leader' ? 28 : r.role === 'sweep' ? 24 : 18;
           const letter = mine ? 'You' : r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : nameOf(r.id).slice(0, 1).toUpperCase();
           return (
             <View
