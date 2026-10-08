@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 
@@ -6,11 +6,11 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
+import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { parseTime } from '@/core/time';
 import { createRide } from '@/lib/api';
-import { currentPosition } from '@/lib/location';
-import type { Visibility } from '@/lib/types';
+import { currentPosition, stateAt } from '@/lib/location';
 
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland rig', 'Snowmobile', 'Car'];
 
@@ -26,7 +26,10 @@ function nextDays(n: number) {
 const at = (day: Date, minutes: number | null) => (minutes == null ? null : new Date(day.getTime() + minutes * 60_000));
 const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : null);
 
+type Kind = 'public' | 'private';
+
 export default function NewRide() {
+  const { type } = useLocalSearchParams<{ type?: string }>();
   const days = useMemo(() => nextDays(14), []);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -47,7 +50,9 @@ export default function NewRide() {
   const [requiredEquipment, setRequiredEquipment] = useState('');
   const [fuelNotes, setFuelNotes] = useState('');
   const [instructions, setInstructions] = useState('');
-  const [visibility, setVisibility] = useState<Visibility>('unlisted');
+  const [kind, setKind] = useState<Kind | null>(type === 'public' || type === 'private' ? type : null);
+  const [meetState, setMeetState] = useState<string | null>(null);
+  const [pickingState, setPickingState] = useState(false);
   const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>('open');
   const [bubble, setBubble] = useState<BubblePreset>('default');
   const [more, setMore] = useState(false);
@@ -60,29 +65,38 @@ export default function NewRide() {
     try {
       const p = await currentPosition();
       setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+      setMeetState(await stateAt(p));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not get your location.');
     }
+  }
+
+  async function fillStateFromCoords() {
+    if (parsedCoords) setMeetState(await stateAt({ lat: Number(parsedCoords[1]), lng: Number(parsedCoords[2]) }));
   }
 
   async function submit() {
     setError(null);
     const dayDate = new Date(day);
     const meetAt = at(dayDate, parseTime(meetTime));
+    if (!kind) return setError('Pick Public or Private at the top.');
     if (!name.trim()) return setError('Give the ride a name.');
     if (!meetAt) return setError('Meeting time looks off. Try "8:00 am".');
     if (!parsedCoords) return setError('Set the meeting point: use your location or paste coordinates like "38.57, -109.55".');
     setBusy(true);
     try {
+      const lat = Number(parsedCoords[1]);
+      const lng = Number(parsedCoords[2]);
       const ride = await createRide({
         name: name.trim(),
         description,
         meetAt,
         departAt: departTime ? at(dayDate, parseTime(departTime)) : null,
         expectedFinishAt: finishTime ? at(dayDate, parseTime(finishTime)) : null,
-        meetLat: Number(parsedCoords[1]),
-        meetLng: Number(parsedCoords[2]),
+        meetLat: lat,
+        meetLng: lng,
         meetLabel,
+        meetState: meetState ?? (await stateAt({ lat, lng })),
         destinationLabel: destination,
         instructions,
         vehicleTypes,
@@ -94,11 +108,12 @@ export default function NewRide() {
         whatToBring,
         requiredEquipment,
         fuelNotes,
-        visibility,
-        joinPolicy,
+        visibility: kind,
+        // A private ride's invite code is the invitation, so anyone holding it can join.
+        joinPolicy: kind === 'private' ? 'open' : joinPolicy,
         bubblePreset: bubble,
       });
-      router.replace(`/r/${ride.invite_code}`);
+      router.replace(`/r/${ride.invite_code}?new=1`);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create the ride.');
     } finally {
@@ -108,6 +123,18 @@ export default function NewRide() {
 
   return (
     <Screen>
+      <ThemedText type="smallBold">What kind of ride?</ThemedText>
+      <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+        <Button title="Public" big kind={kind === 'public' ? 'primary' : 'secondary'} style={{ flex: 1 }} onPress={() => setKind('public')} />
+        <Button title="Private" big kind={kind === 'private' ? 'primary' : 'secondary'} style={{ flex: 1 }} onPress={() => setKind('private')} />
+      </View>
+      {kind ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          {kind === 'public'
+            ? 'Open to anyone. Riders find it by searching near them or by picking your state on the map.'
+            : 'Only the friends you invite. After you create it, send them the link or code by text, email or any app.'}
+        </ThemedText>
+      ) : null}
       <Field label="Ride name" value={name} onChangeText={setName} placeholder="Saturday Hell's Revenge run" />
       <Choice
         label="Day"
@@ -125,30 +152,41 @@ export default function NewRide() {
           Only joined riders see the exact spot. Public pages show the area within about a mile.
         </ThemedText>
         <Button title="Use my current location" kind="secondary" onPress={useMyLocation} />
-        <Field label="Coordinates" value={coords} onChangeText={setCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
+        <Field label="Coordinates" value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
         <Field label="Place name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
       </Card>
       <MultiChoice label="Vehicles welcome" options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
-      <Choice
-        label="Who can find it"
-        value={visibility}
-        onChange={setVisibility}
-        options={[
-          { value: 'unlisted', label: 'Anyone with the link' },
-          { value: 'public', label: 'Public' },
-          { value: 'private', label: 'Invite only' },
-        ]}
-      />
-      <Choice
-        label="Joining"
-        value={joinPolicy}
-        onChange={setJoinPolicy}
-        options={[
-          { value: 'open', label: 'Open' },
-          { value: 'approval', label: 'I approve riders' },
-          { value: 'invite_only', label: 'Invite only' },
-        ]}
-      />
+      {kind === 'public' ? (
+        <>
+          <View style={{ gap: Spacing.one }}>
+            <ThemedText type="smallBold">State</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              {meetState ? `Listed in ${stateByCode(meetState)?.name}.` : 'Set the meeting point and we fill this in, or pick it.'}
+            </ThemedText>
+            {meetState && !pickingState ? (
+              <Button title="Change state" kind="secondary" onPress={() => setPickingState(true)} />
+            ) : (
+              <Choice
+                value={meetState}
+                onChange={(c) => {
+                  setMeetState(c);
+                  setPickingState(false);
+                }}
+                options={US_STATES.map((st) => ({ value: st.code, label: st.name }))}
+              />
+            )}
+          </View>
+          <Choice
+            label="Joining"
+            value={joinPolicy}
+            onChange={setJoinPolicy}
+            options={[
+              { value: 'open', label: 'Anyone can join' },
+              { value: 'approval', label: 'I approve riders' },
+            ]}
+          />
+        </>
+      ) : null}
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <View style={{ flex: 1 }}>
           <Field label="Max vehicles" value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder="No limit" />
@@ -197,7 +235,12 @@ export default function NewRide() {
       ) : null}
 
       <ErrorText error={error} />
-      <Button title="Create ride" big loading={busy} onPress={submit} />
+      <Button
+        title={kind === 'public' ? 'Create public ride' : kind === 'private' ? 'Create private ride' : 'Create ride'}
+        big
+        loading={busy}
+        onPress={submit}
+      />
     </Screen>
   );
 }

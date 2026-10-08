@@ -1,8 +1,9 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Platform, Pressable, Share, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { FuelCheck } from '@/components/fuel-check';
+import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { RideSummary } from '@/components/ride-summary';
 import { ThemedText } from '@/components/themed-text';
@@ -19,7 +20,6 @@ import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
 import type { Ride, RideMember, RidePrivateDetails } from '@/lib/types';
 
-const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 const when = (iso: string) =>
   new Date(iso).toLocaleString(undefined, { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const time = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
@@ -29,7 +29,7 @@ const time = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour
  * before creating an account. Exact meeting point and roster only show once joined.
  */
 export default function RidePage() {
-  const { code } = useLocalSearchParams<{ code: string }>();
+  const { code, new: justCreated } = useLocalSearchParams<{ code: string; new?: string }>();
   const { session } = useSession();
   const me = session?.user.id;
   const [ride, setRide] = useState<Ride | null | undefined>(undefined);
@@ -85,7 +85,6 @@ export default function RidePage() {
   const c = counts(members.map((m) => ({ ...m, createdAt: 0, userId: m.user_id })));
   const nameOf = (userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider';
   const pinned = isJoined ? latestAnnouncement(chat.messages) : null;
-  const link = WEB_URL ? `${WEB_URL}/r/${ride.invite_code}` : `Invite code ${ride.invite_code}`;
 
   const join = () =>
     me
@@ -97,6 +96,8 @@ export default function RidePage() {
       <Stack.Screen options={{ title: ride.name }} />
       <ThemedText type="subtitle">{ride.name}</ThemedText>
       {ride.status === 'live' ? <ThemedText style={{ color: '#E03131', fontWeight: '800' }}>RIDE IS LIVE</ThemedText> : null}
+      <ThemedText type="small" themeColor="textSecondary">{ride.visibility === 'private' ? 'Private ride · invite only' : ride.visibility === 'public' ? 'Public ride' : 'Anyone with the link'}</ThemedText>
+      {justCreated && isManager ? <InviteCard ride={ride} fresh /> : null}
       <ThemedText>{when(ride.meet_at)}</ThemedText>
       {ride.description ? <ThemedText>{ride.description}</ThemedText> : null}
       {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
@@ -160,15 +161,7 @@ export default function RidePage() {
         />
       ) : null}
 
-      <Button
-        title="Invite riders"
-        kind="secondary"
-        onPress={async () => {
-          await Share.share({ message: `Join "${ride.name}" ${link}` });
-          track('invite_shared', { platform: Platform.OS });
-        }}
-      />
-      <ThemedText type="small" themeColor="textSecondary">Invite code: {ride.invite_code}</ThemedText>
+      {!(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} /> : null}
 
       {isManager ? (
         <Card>

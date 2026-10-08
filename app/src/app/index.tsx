@@ -54,8 +54,9 @@ export default function Home() {
 
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title="Create a ride" style={{ flex: 1 }} onPress={() => router.push(session ? '/ride/new' : '/sign-in')} />
-        <Button title="Share location" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(session ? '/share' : '/sign-in')} />
+        <Button title="Find a ride" style={{ flex: 1 }} onPress={() => router.push('/find')} />
       </View>
+      <Button title="Share location" kind="secondary" onPress={() => router.push(session ? '/share' : '/sign-in')} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title="My garage" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(session ? '/garage' : '/sign-in')} />
         <Button title="Trip planner" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(session ? '/trips' : '/sign-in')} />
