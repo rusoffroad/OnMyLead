@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkRideRange, fuelRange } from '../fuel';
+import { checkRideRange, fuelRange, rideFuelAdvice } from '../fuel';
 import { decideJoin, Member, promoteFromWaitlist } from '../joining';
 import { distanceM, fuzzLocation, metersToMiles } from '../geo';
 import { parseTime } from '../time';
@@ -17,6 +17,40 @@ describe('fuel range', () => {
     expect(checkRideRange(90, p)).toBe('ok');
     expect(checkRideRange(140, p)).toBe('tight');
     expect(checkRideRange(170, p)).toBe('over');
+  });
+});
+
+describe('ride fuel advice', () => {
+  const p = { tankGallons: 10, extraGallons: 0, mpg: 15 }; // 150 mi range, 100 mi safe trip
+
+  it('says how much is left on a comfortable ride', () => {
+    const a = rideFuelAdvice(90, p);
+    expect(a.check).toBe('ok');
+    expect(a.percentLeft).toBe(40);
+    expect(a.line).toBe('You’ll have about 40% left.');
+  });
+
+  it('warns when the reserve is eaten into', () => {
+    const a = rideFuelAdvice(130, p);
+    expect(a.check).toBe('tight');
+    expect(a.percentLeft).toBe(15);
+    expect(a.line).toMatch(/^Tight: about 15% left at the end\. Bring extra fuel/);
+    expect(rideFuelAdvice(149, p).line).toMatch(/close to empty/);
+  });
+
+  it('tells riders to bring extra fuel when the ride is over range', () => {
+    const a = rideFuelAdvice(180, p);
+    expect(a.check).toBe('over');
+    expect(a.percentLeft).toBe(0);
+    expect(a.line).toBe('About 30 miles more than your range. Bring extra fuel.');
+  });
+
+  it('mentions extra fuel cans when they count', () => {
+    expect(rideFuelAdvice(90, { tankGallons: 8, extraGallons: 2, mpg: 15 }).line).toBe('You’ll have about 40% left (counting your extra fuel).');
+  });
+
+  it('treats a machine with no range as over', () => {
+    expect(rideFuelAdvice(10, { tankGallons: 0, extraGallons: 0, mpg: 20 }).check).toBe('over');
   });
 });
 

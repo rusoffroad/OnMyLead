@@ -18,7 +18,8 @@ const QUEUE_KEY = 'ride.trackQueue.v1';
 const CONTEXT_KEY = 'ride.trackContext.v1';
 
 type TrackContext = { rideId: string | null; lastMovedAt: number | null };
-type QueuedPoint = [lng: number, lat: number, epochSec: number, speedMps: number | null];
+// Altitude was added later; older stored points have four values.
+type QueuedPoint = [lng: number, lat: number, epochSec: number, speedMps: number | null, altitudeM?: number | null];
 
 async function readContext(): Promise<TrackContext> {
   const raw = await AsyncStorage.getItem(CONTEXT_KEY);
@@ -41,7 +42,7 @@ export async function handleLocations(locations: Location.LocationObject[]) {
   if (ctx.rideId) {
     const queue: QueuedPoint[] = JSON.parse((await AsyncStorage.getItem(QUEUE_KEY)) ?? '[]');
     for (const l of locations) {
-      queue.push([l.coords.longitude, l.coords.latitude, Math.round(l.timestamp / 1000), l.coords.speed ?? null]);
+      queue.push([l.coords.longitude, l.coords.latitude, Math.round(l.timestamp / 1000), l.coords.speed ?? null, l.coords.altitude ?? null]);
     }
     await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
   }

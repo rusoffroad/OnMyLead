@@ -1,5 +1,6 @@
 import { fuzzLocation } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
+import type { ChatMessage, MessageKind } from '@/core/chat';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import { startShare, type ShareScope } from '@/core/sharing';
@@ -158,6 +159,12 @@ export const checkIn = async (rideId: string) => {
   track('check_in', { ride_id: rideId });
 };
 
+/** Attach one of your own vehicles to your ride membership (or none). Keeps your rider count. */
+export async function setMyVehicle(rideId: string, vehicleId: string | null, riders: number) {
+  unwrap(await supabase.rpc('set_my_vehicle', { p_ride: rideId, p_vehicle: vehicleId, p_riders: riders }));
+  track('ride_vehicle_set', { has_vehicle: !!vehicleId });
+}
+
 export async function setRideStatus(rideId: string, status: 'live' | 'ended' | 'cancelled') {
   unwrap(await supabase.rpc('set_ride_status', { p_ride: rideId, p_status: status }));
   track(status === 'live' ? 'ride_mode_started' : 'ride_mode_ended', { ride_id: rideId });
@@ -297,6 +304,67 @@ export async function activeRegroup(rideId: string): Promise<RegroupPoint | null
   return unwrap(
     await supabase.from('regroup_points').select('*').eq('ride_id', rideId).is('cleared_at', null).order('created_at', { ascending: false }).limit(1).maybeSingle(),
   );
+}
+
+// --- Ride chat ----------------------------------------------------------------
+
+/** The newest messages for a ride, oldest first. Only joined riders get rows (enforced by the database). */
+export async function rideMessages(rideId: string, limit = 100): Promise<ChatMessage[]> {
+  const rows = unwrap<ChatMessage[]>(
+    await supabase.from('ride_messages').select('*').eq('ride_id', rideId).order('created_at', { ascending: false }).limit(limit),
+  );
+  return rows.reverse();
+}
+
+/** The pinned announcement for a ride, or null. */
+export async function latestRideAnnouncement(rideId: string): Promise<ChatMessage | null> {
+  return unwrap(
+    await supabase.from('ride_messages').select('*').eq('ride_id', rideId).eq('kind', 'announcement')
+      .order('created_at', { ascending: false }).limit(1).maybeSingle(),
+  );
+}
+
+export async function sendRideMessage(rideId: string, body: string, kind: MessageKind = 'chat', sentAt = new Date()): Promise<ChatMessage> {
+  const user_id = await currentUserId();
+  const row = unwrap<ChatMessage>(
+    await supabase.from('ride_messages').insert({ ride_id: rideId, user_id, kind, body, sent_at: sentAt.toISOString() }).select().single(),
+  );
+  track('ride_message', { kind });
+  return row;
+}
+
+// --- Post-ride summary ---------------------------------------------------------
+
+/** The signed-in rider's own track for a ride (raw points; parse with core/summary parseTrack). */
+export async function myTrack(rideId: string): Promise<unknown[] | null> {
+  const uid = await currentUserId();
+  const row = unwrap<{ points: unknown[] } | null>(
+    await supabase.from('ride_tracks').select('points').eq('ride_id', rideId).eq('user_id', uid).maybeSingle(),
+  );
+  return row?.points ?? null;
+}
+
+export type GroupSummary = {
+  riders_tracked: number;
+  total_miles: number | null;
+  average_miles: number | null;
+  longest_miles: number | null;
+  top_speed_mph: number | null;
+};
+
+/** Group totals for an ended ride (no one's points). Null before the ride ends or for non-members. */
+export async function groupSummary(rideId: string): Promise<GroupSummary | null> {
+  const rows = unwrap<GroupSummary[]>(await supabase.rpc('ride_group_summary', { p_ride: rideId }));
+  const row = rows?.[0];
+  if (!row) return null;
+  const n = (v: unknown) => (v == null ? null : Number(v));
+  return {
+    riders_tracked: Number(row.riders_tracked) || 0,
+    total_miles: n(row.total_miles),
+    average_miles: n(row.average_miles),
+    longest_miles: n(row.longest_miles),
+    top_speed_mph: n(row.top_speed_mph),
+  };
 }
 
 // --- Garage -----------------------------------------------------------------

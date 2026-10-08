@@ -35,3 +35,32 @@ export function checkRideRange(rideMiles: number, p: FuelProfile): RangeCheck {
   if (rideMiles > r.safeTripMiles) return 'tight';
   return 'ok';
 }
+
+export type RideFuelAdvice = {
+  check: RangeCheck;
+  /** Rough share of fuel left at the end of the ride, 0-100, rounded to 5. */
+  percentLeft: number;
+  /** One plain-language line for the ride page. */
+  line: string;
+};
+
+/** Fuel check for a planned ride: ok / tight / over with a plain-language line. */
+export function rideFuelAdvice(rideMiles: number, p: FuelProfile): RideFuelAdvice {
+  const r = fuelRange(p);
+  const check = checkRideRange(rideMiles, p);
+  const left = r.fullRangeMiles > 0 ? Math.max(0, 1 - rideMiles / r.fullRangeMiles) : 0;
+  const percentLeft = Math.round((left * 100) / 5) * 5;
+  const extra = p.extraGallons > 0 ? ' (counting your extra fuel)' : '';
+  let line: string;
+  if (check === 'ok') {
+    line = `You’ll have about ${percentLeft}% left${extra}.`;
+  } else if (check === 'tight') {
+    line = percentLeft > 0
+      ? `Tight: about ${percentLeft}% left at the end${extra}. Bring extra fuel or plan a fill-up.`
+      : `Tight: you’ll be close to empty${extra}. Bring extra fuel or plan a fill-up.`;
+  } else {
+    const short = Math.max(1, Math.round(rideMiles - r.fullRangeMiles));
+    line = `About ${short} miles more than your range${extra}. Bring extra fuel.`;
+  }
+  return { check, percentLeft, line };
+}

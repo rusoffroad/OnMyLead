@@ -502,4 +502,212 @@ do $$ begin
   end if;
 end $$;
 
-select 'ALL PRIVACY, JOINING AND GARAGE TESTS PASSED' as result;
+-- 17. Ride chat: only joined riders read and post; announcements only from organizers.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'Chat ride', now() + interval '1 day', 38.5, -109.5, 'public');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select join_ride('cccccccc-cccc-cccc-cccc-cccccccccccc');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select join_ride('cccccccc-cccc-cccc-cccc-cccccccccccc');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+update ride_members set role = 'co_organizer'
+where ride_id = 'cccccccc-cccc-cccc-cccc-cccccccccccc' and user_id = '00000000-0000-0000-0000-00000000000c';
+insert into ride_messages (ride_id, user_id, kind, body)
+values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'announcement', 'Meet at 8, wheels up 8:30');
+reset role;
+
+-- Ben (rider) chats, but cannot announce or post as someone else.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), '  See you there  ');
+do $$ begin
+  if (select body from ride_messages where user_id = auth.uid()) <> 'See you there' then raise exception 'FAIL: message not trimmed'; end if;
+  if (select count(*) from ride_messages where ride_id = 'cccccccc-cccc-cccc-cccc-cccccccccccc') <> 2 then
+    raise exception 'FAIL: joined rider cannot read the ride chat';
+  end if;
+  begin
+    insert into ride_messages (ride_id, user_id, kind, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'announcement', 'I am the boss now');
+    raise exception 'FAIL: rider posted an announcement';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', '00000000-0000-0000-0000-00000000000a', 'Spoofed');
+    raise exception 'FAIL: rider posted as someone else';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), repeat('x', 501));
+    raise exception 'FAIL: overlong message accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), '   ');
+    raise exception 'FAIL: blank message accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  -- Messages cannot be edited or deleted.
+  update ride_messages set body = 'edited' where user_id = auth.uid();
+  if found then raise exception 'FAIL: rider edited a chat message'; end if;
+  delete from ride_messages where ride_id = 'cccccccc-cccc-cccc-cccc-cccccccccccc';
+  if found then raise exception 'FAIL: rider deleted chat messages'; end if;
+end $$;
+reset role;
+
+-- Cara (co-organizer) can announce. Backdating created_at or future sent_at is ignored.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+insert into ride_messages (ride_id, user_id, kind, body, created_at, sent_at)
+values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'announcement', 'Gas in Green River', '2000-01-01', now() + interval '1 day');
+do $$ begin
+  if not exists (select 1 from ride_messages where user_id = auth.uid() and kind = 'announcement'
+                 and created_at > now() - interval '1 minute' and sent_at <= now()) then
+    raise exception 'FAIL: co-organizer announcement missing or timestamps not clamped';
+  end if;
+end $$;
+reset role;
+
+-- Dan (not on the ride) can neither read nor post.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from ride_messages) <> 0 then raise exception 'FAIL: non-member read the ride chat'; end if;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'Hi strangers');
+    raise exception 'FAIL: non-member posted in the ride chat';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  begin
+    if (select count(*) from ride_messages) <> 0 then raise exception 'FAIL: signed-out visitor read the ride chat'; end if;
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+
+-- Rate limit: Ben has 1 message this minute; 9 more are fine, the 11th is refused.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  for i in 1..9 loop
+    insert into ride_messages (ride_id, user_id, kind, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'status', 'All good');
+  end loop;
+  begin
+    insert into ride_messages (ride_id, user_id, body) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', auth.uid(), 'one too many');
+    raise exception 'FAIL: rate limit not enforced';
+  exception when raise_exception then
+    if sqlerrm not like 'slow down%' then raise; end if;
+  end;
+end $$;
+-- Leaving the ride removes chat access.
+select leave_ride('cccccccc-cccc-cccc-cccc-cccccccccccc');
+do $$ begin
+  if (select count(*) from ride_messages) <> 0 then raise exception 'FAIL: rider who left can still read the chat'; end if;
+end $$;
+reset role;
+
+-- 18. Post-ride summary: riders read only their own track; group totals only after the ride ends.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(), 'Track ride', now(), 38.5, -109.5, 'public');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select join_ride('dddddddd-dddd-dddd-dddd-dddddddddddd');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select join_ride('dddddddd-dddd-dddd-dddd-dddddddddddd');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select set_ride_status('dddddddd-dddd-dddd-dddd-dddddddddddd', 'live');
+-- Olivia: 10 segments of about 111 m every 10 s (about 25 mph), so about 0.69 miles.
+insert into ride_tracks (ride_id, user_id, points)
+select 'dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(),
+       jsonb_agg(jsonb_build_array(-109.5, 38.5 + i * 0.001, 1760000000 + i * 10, 11) order by i)
+from generate_series(0, 10) i;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+-- Ben: twice as far, plus one wild GPS spike that must not add miles or top speed.
+insert into ride_tracks (ride_id, user_id, points)
+select 'dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(),
+       jsonb_agg(case when i = 7 then jsonb_build_array(-108.5, 38.5, 1760000000 + i * 10, 300)
+                      else jsonb_build_array(-109.5, 38.5 + i * 0.001, 1760000000 + i * 10, 12) end order by i)
+from generate_series(0, 21) i;
+do $$ begin
+  begin
+    insert into ride_tracks (ride_id, user_id, points) values ('dddddddd-dddd-dddd-dddd-dddddddddddd', '00000000-0000-0000-0000-00000000000c', '[]');
+    raise exception 'FAIL: wrote a track for someone else';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+-- Cara: parked, GPS jitter of about a meter. Adds no distance.
+insert into ride_tracks (ride_id, user_id, points)
+select 'dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(),
+       jsonb_agg(jsonb_build_array(-109.5 + (i % 2) * 0.00001, 38.6, 1760000000 + i * 10, 0) order by i)
+from generate_series(0, 30) i;
+do $$ begin
+  if (select count(*) from ride_tracks where ride_id = 'dddddddd-dddd-dddd-dddd-dddddddddddd') <> 1 then
+    raise exception 'FAIL: rider can read other riders'' tracks';
+  end if;
+  if (select count(*) from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd')) <> 0 then
+    raise exception 'FAIL: group summary available before the ride ended';
+  end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select set_ride_status('dddddddd-dddd-dddd-dddd-dddddddddddd', 'ended');
+do $$
+declare s record;
+begin
+  if (select count(*) from ride_tracks where ride_id = 'dddddddd-dddd-dddd-dddd-dddddddddddd') <> 1 then
+    raise exception 'FAIL: organizer can read riders'' tracks';
+  end if;
+  select * into s from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd');
+  if s.riders_tracked <> 3 then raise exception 'FAIL: expected 3 tracked riders, got %', s.riders_tracked; end if;
+  -- Olivia 0.69 mi + Ben about 1.24 mi (19 good segments; the two around the spike are dropped) + Cara 0.
+  if s.longest_miles not between 1.1 and 1.4 then raise exception 'FAIL: longest distance %', s.longest_miles; end if;
+  if s.total_miles not between 1.8 and 2.1 then raise exception 'FAIL: total distance %', s.total_miles; end if;
+  if s.top_speed_mph <> 27 then raise exception 'FAIL: top speed % (GPS spike leaked?)', s.top_speed_mph; end if;
+end $$;
+reset role;
+-- A stranger and a signed-out visitor get nothing.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from ride_tracks) <> 0 then raise exception 'FAIL: stranger read ride tracks'; end if;
+  if (select count(*) from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd')) <> 0 then
+    raise exception 'FAIL: stranger got the group summary';
+  end if;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  if (select count(*) from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd')) <> 0 then
+    raise exception 'FAIL: signed-out visitor got the group summary';
+  end if;
+end $$;
+reset role;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY TESTS PASSED' as result;

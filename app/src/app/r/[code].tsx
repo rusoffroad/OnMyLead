@@ -2,10 +2,15 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useState } from 'react';
 import { Platform, Pressable, Share, View } from 'react-native';
 
+import { FuelCheck } from '@/components/fuel-check';
+import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
+import { RideSummary } from '@/components/ride-summary';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
+import { latestAnnouncement } from '@/core/chat';
 import { counts } from '@/core/joining';
+import { useRideChat } from '@/hooks/use-ride-chat';
 import {
   approveMember, checkIn, getMembers, getPrivateDetails, getRide, joinRide, leaveRide, setMemberRole, setRideStatus, tripForRide,
 } from '@/lib/api';
@@ -32,6 +37,8 @@ export default function RidePage() {
   const [members, setMembers] = useState<RideMember[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const isJoined = members.some((m) => m.user_id === me && m.status === 'joined');
+  const chat = useRideChat(ride?.id, isJoined);
 
   const load = useCallback(async () => {
     try {
@@ -76,6 +83,8 @@ export default function RidePage() {
   const pending = members.filter((m) => m.status === 'pending');
   const waitlist = members.filter((m) => m.status === 'waitlisted');
   const c = counts(members.map((m) => ({ ...m, createdAt: 0, userId: m.user_id })));
+  const nameOf = (userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider';
+  const pinned = isJoined ? latestAnnouncement(chat.messages) : null;
   const link = WEB_URL ? `${WEB_URL}/r/${ride.invite_code}` : `Invite code ${ride.invite_code}`;
 
   const join = () =>
@@ -90,6 +99,8 @@ export default function RidePage() {
       {ride.status === 'live' ? <ThemedText style={{ color: '#E03131', fontWeight: '800' }}>RIDE IS LIVE</ThemedText> : null}
       <ThemedText>{when(ride.meet_at)}</ThemedText>
       {ride.description ? <ThemedText>{ride.description}</ThemedText> : null}
+      {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
+      {ride.status === 'ended' && isJoined ? <RideSummary ride={ride} members={members} /> : null}
 
       <Card>
         <Info label="Meet" value={details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'} />
@@ -106,6 +117,10 @@ export default function RidePage() {
         {ride.fuel_notes ? <Info label="Fuel" value={ride.fuel_notes} /> : null}
         {details?.instructions ? <Info label="Instructions" value={details.instructions} /> : null}
       </Card>
+
+      {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && (ride.status === 'scheduled' || ride.status === 'live') ? (
+        <FuelCheck ride={ride} mine={mine} onChanged={load} />
+      ) : null}
 
       <ErrorText error={error} />
 
@@ -194,6 +209,10 @@ export default function RidePage() {
           ))}
           {waitlist.length ? <ThemedText type="small" themeColor="textSecondary">{waitlist.length} on the waitlist</ThemedText> : null}
         </Card>
+      ) : null}
+
+      {isJoined ? (
+        <RideChat messages={chat.messages} nameOf={nameOf} me={me} canAnnounce={isManager} error={chat.error} onSend={chat.send} />
       ) : null}
 
       {mine && mine.status !== 'cancelled' && mine.role !== 'organizer' ? (
