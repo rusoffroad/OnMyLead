@@ -14,6 +14,7 @@ import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { formatRemaining, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
+import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getRide, latestStatuses, myActiveShares,
@@ -90,6 +91,8 @@ export default function RideMode() {
 
   // Announcements: only the latest is shown, and it is read aloud so nobody has to look down.
   const chat = useRideChat(id, !!mine);
+  // Riders can fold the reply and status buttons away to see more map. Emergency always stays.
+  const [panelOpen, togglePanel] = useRememberedToggle('ride.modePanelOpen.v1', true);
   const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
   const [lastReply, setLastReply] = useState<QuickReply | null>(null);
   const spokenId = useRef<string | null>(null);
@@ -316,6 +319,16 @@ export default function RideMode() {
       </SafeAreaView>
 
       <SafeAreaView edges={['bottom']} style={styles.bottom}>
+        <Pressable
+          onPress={togglePanel}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: panelOpen }}
+          accessibilityLabel={panelOpen ? 'Hide the message and status buttons' : 'Show the message and status buttons'}
+          hitSlop={8}
+          style={styles.handle}>
+          <View style={styles.handleBar} />
+          <Text style={styles.handleText}>{panelOpen ? 'Hide buttons ▼' : 'Show buttons ▲'}</Text>
+        </Pressable>
         <ScrollView style={{ maxHeight: 180 }} contentContainerStyle={{ gap: Spacing.two }}>
           {watchesBubble
             ? bubble.riders
@@ -345,41 +358,55 @@ export default function RideMode() {
           ))}
         </ScrollView>
 
-        {canRegroup ? <Button title="Regroup at my location" big onPress={regroupHere} style={{ marginTop: Spacing.two }} /> : null}
+        {!panelOpen ? (
+          <Pressable
+            onPress={() => tapStatus('emergency')}
+            accessibilityRole="button"
+            accessibilityLabel="Send status EMERGENCY"
+            style={({ pressed }) => [styles.statusBtn, { width: '100%', marginTop: Spacing.two, backgroundColor: Colors.danger, opacity: pressed ? 0.75 : 1 }]}>
+            <Text style={styles.statusText}>EMERGENCY</Text>
+          </Pressable>
+        ) : null}
 
-        <View style={styles.replies}>
-          {QUICK_REPLIES.map((q) => (
-            <Pressable
-              key={q}
-              onPress={() => quickReply(q)}
-              accessibilityRole="button"
-              accessibilityLabel={`Send to the group: ${q}`}
-              style={({ pressed }) => [
-                styles.replyBtn,
-                { opacity: pressed ? 0.75 : 1 },
-                lastReply === q && { borderColor: Colors.text, borderWidth: 3 },
-              ]}>
-              <Text style={styles.replyText}>{q}</Text>
-            </Pressable>
-          ))}
-        </View>
+        {panelOpen ? (
+          <>
+            {canRegroup ? <Button title="Regroup at my location" big onPress={regroupHere} style={{ marginTop: Spacing.two }} /> : null}
 
-        <View style={styles.grid}>
-          {STATUSES.map((s) => (
-            <Pressable
-              key={s.kind}
-              onPress={() => tapStatus(s.kind)}
-              accessibilityRole="button"
-              accessibilityLabel={`Send status ${s.label}`}
-              style={({ pressed }) => [
-                styles.statusBtn,
-                { backgroundColor: s.kind === 'emergency' ? Colors.danger : s.urgent ? Colors.accent : Colors.backgroundSelected, opacity: pressed ? 0.75 : 1 },
-                statuses[me ?? '']?.status === s.kind && { borderColor: Colors.text, borderWidth: 3 },
-              ]}>
-              <Text style={styles.statusText}>{s.label}</Text>
-            </Pressable>
-          ))}
-        </View>
+            <View style={styles.replies}>
+              {QUICK_REPLIES.map((q) => (
+                <Pressable
+                  key={q}
+                  onPress={() => quickReply(q)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Send to the group: ${q}`}
+                  style={({ pressed }) => [
+                    styles.replyBtn,
+                    { opacity: pressed ? 0.75 : 1 },
+                    lastReply === q && { borderColor: Colors.text, borderWidth: 3 },
+                  ]}>
+                  <Text style={styles.replyText}>{q}</Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <View style={styles.grid}>
+              {STATUSES.map((s) => (
+                <Pressable
+                  key={s.kind}
+                  onPress={() => tapStatus(s.kind)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Send status ${s.label}`}
+                  style={({ pressed }) => [
+                    styles.statusBtn,
+                    { backgroundColor: s.kind === 'emergency' ? Colors.danger : s.urgent ? Colors.accent : Colors.backgroundSelected, opacity: pressed ? 0.75 : 1 },
+                    statuses[me ?? '']?.status === s.kind && { borderColor: Colors.text, borderWidth: 3 },
+                  ]}>
+                  <Text style={styles.statusText}>{s.label}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </>
+        ) : null}
       </SafeAreaView>
 
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
@@ -441,6 +468,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(10,22,38,0.96)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
   actions: { flexDirection: 'row', gap: Spacing.two },
+  handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },
+  handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
+  handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
   announcement: { borderRadius: Radius.control, padding: 12, backgroundColor: RideColors.yellow, gap: 2 },
   announcementLabel: { color: '#3A2600', fontFamily: font(700), fontSize: 13 },
   announcementText: { color: '#1A1100', fontFamily: font(800), fontSize: 19, lineHeight: 24 },
