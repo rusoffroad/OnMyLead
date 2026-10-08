@@ -1,78 +1,187 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 
 import { LogoBanner } from '@/components/logo';
 import { ThemedText } from '@/components/themed-text';
-import { Button, ErrorText, Field, Screen } from '@/components/ui';
+import { Button, Choice, ErrorText, Field, Screen } from '@/components/ui';
 import { track } from '@/lib/analytics';
-import { sendCode, signInWithProvider, verifyCode, type SocialProvider } from '@/lib/session';
+import {
+  sendCode,
+  sendPasswordReset,
+  signInWithPassword,
+  signInWithProvider,
+  signUpWithPassword,
+  type SocialProvider,
+} from '@/lib/session';
+
+type Mode = 'sign_in' | 'create';
+
+// Social buttons only show once each provider is set up in Supabase,
+// e.g. EXPO_PUBLIC_SOCIAL_PROVIDERS=apple,google,facebook
+const ENABLED_SOCIAL = (process.env.EXPO_PUBLIC_SOCIAL_PROVIDERS ?? '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 export default function SignIn() {
-  const [target, setTarget] = useState('');
-  const [code, setCode] = useState('');
-  const [sent, setSent] = useState(false);
+  const params = useLocalSearchParams<{ mode?: string }>();
+  const [mode, setMode] = useState<Mode>(params.mode === 'create' ? 'create' : 'sign_in');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function run(key: string, fn: () => Promise<void>) {
     setBusy(key);
     setError(null);
+    setNotice(null);
     try {
       await fn();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      setError(friendly(e instanceof Error ? e.message : 'Something went wrong.'));
     } finally {
       setBusy(null);
     }
   }
 
+  const done = () => (router.canGoBack() ? router.back() : router.replace('/'));
+  const cleanEmail = email.trim().toLowerCase();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail);
+
+  const submit = () =>
+    run('submit', async () => {
+      if (mode === 'create') {
+        const { needsConfirmation } = await signUpWithPassword(cleanEmail, password, name.trim());
+        track('sign_up', { method: 'password' });
+        if (needsConfirmation) {
+          setNotice(`Almost done. We sent a link to ${cleanEmail}. Tap it on this device to confirm your email, and you'll be signed in.`);
+          return;
+        }
+      } else {
+        await signInWithPassword(cleanEmail, password);
+        track('sign_in', { method: 'password' });
+      }
+      done();
+    });
+
   const social = (p: SocialProvider) =>
     run(p, async () => {
       await signInWithProvider(p);
       track('sign_in', { method: p });
-      if (router.canGoBack()) router.back();
+      done();
     });
 
   // Apple's rules expect Sign in with Apple wherever Google or Facebook sign-in is offered.
-  const providers: { id: SocialProvider; title: string }[] = [
-    ...(Platform.OS !== 'android' ? [{ id: 'apple' as const, title: 'Continue with Apple' }] : []),
-    { id: 'google', title: 'Continue with Google' },
-    { id: 'facebook', title: 'Continue with Facebook' },
-  ];
+  const providers = (
+    [
+      { id: 'apple', title: 'Continue with Apple' },
+      { id: 'google', title: 'Continue with Google' },
+      { id: 'facebook', title: 'Continue with Facebook' },
+    ] as { id: SocialProvider; title: string }[]
+  ).filter((p) => ENABLED_SOCIAL.includes(p.id) && !(p.id === 'apple' && Platform.OS === 'android'));
 
   return (
     <Screen>
       <LogoBanner />
-      <ThemedText type="subtitle">Join the ride</ThemedText>
-      {providers.map((p) => (
-        <Button key={p.id} title={p.title} kind="secondary" loading={busy === p.id} onPress={() => social(p.id)} />
-      ))}
-      <ThemedText themeColor="textSecondary">or use your phone number or email</ThemedText>
-      <Field label="Phone or email" value={target} onChangeText={setTarget} autoCapitalize="none" keyboardType="email-address" placeholder="+1 555 123 4567 or you@example.com" />
-      {!sent ? (
-        <Button title="Send code" loading={busy === 'send'} disabled={!target.trim()} onPress={() => run('send', async () => { await sendCode(target.trim()); setSent(true); })} />
-      ) : (
-        <>
-          <ThemedText>
-            {target.includes('@')
-              ? 'Check your email and tap the sign-in link on this device. If the email shows a code instead, enter it here.'
-              : 'Enter the code we texted you.'}
+      <Choice
+        value={mode}
+        onChange={(m) => {
+          setMode(m as Mode);
+          setError(null);
+          setNotice(null);
+        }}
+        options={[
+          { value: 'sign_in', label: 'Sign in' },
+          { value: 'create', label: 'Create account' },
+        ]}
+      />
+
+      {mode === 'create' ? (
+        <Field label="Your name" value={name} onChangeText={setName} placeholder="What riders will see" autoComplete="name" />
+      ) : null}
+      <Field
+        label="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        autoComplete="email"
+        placeholder="you@example.com"
+      />
+      <Field
+        label="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoComplete={mode === 'create' ? 'new-password' : 'current-password'}
+        placeholder={mode === 'create' ? 'At least 8 characters' : ''}
+      />
+      <Button
+        title={mode === 'create' ? 'Create account' : 'Sign in'}
+        loading={busy === 'submit'}
+        disabled={!emailOk || password.length < (mode === 'create' ? 8 : 1) || (mode === 'create' && !name.trim())}
+        onPress={submit}
+      />
+
+      {mode === 'sign_in' ? (
+        <Pressable
+          accessibilityRole="button"
+          disabled={!emailOk}
+          onPress={() =>
+            run('reset', async () => {
+              await sendPasswordReset(cleanEmail);
+              setNotice(`We sent a link to ${cleanEmail} to set a new password.`);
+            })
+          }>
+          <ThemedText themeColor="textSecondary">
+            {emailOk ? 'Forgot your password? Email me a reset link' : 'Forgot your password? Enter your email above first'}
           </ThemedText>
-          <Field label="Code" value={code} onChangeText={setCode} keyboardType="number-pad" />
-          <Button
-            title="Sign in"
-            loading={busy === 'verify'}
-            disabled={code.length < 6}
-            onPress={() => run('verify', async () => {
-              await verifyCode(target.trim(), code.trim());
-              track('sign_in', { method: target.includes('@') ? 'email' : 'phone' });
-              if (router.canGoBack()) router.back();
-            })}
-          />
-        </>
-      )}
+        </Pressable>
+      ) : null}
+
+      <Pressable
+        accessibilityRole="button"
+        disabled={!emailOk}
+        onPress={() =>
+          run('link', async () => {
+            await sendCode(cleanEmail);
+            track('sign_in_link_sent', {});
+            setNotice(`We sent a sign-in link to ${cleanEmail}. Tap it on this device. No password needed, and it creates your account if you're new.`);
+          })
+        }>
+        <ThemedText themeColor="textSecondary">
+          {emailOk ? 'Or email me a sign-in link instead (no password)' : 'Or enter your email to get a sign-in link instead'}
+        </ThemedText>
+      </Pressable>
+
+      {notice ? (
+        <ThemedText type="smallBold" accessibilityLiveRegion="polite">
+          {notice}
+        </ThemedText>
+      ) : null}
       <ErrorText error={error} />
+
+      {providers.length ? (
+        <>
+          <ThemedText themeColor="textSecondary">or</ThemedText>
+          {providers.map((p) => (
+            <Button key={p.id} title={p.title} kind="secondary" loading={busy === p.id} onPress={() => social(p.id)} />
+          ))}
+        </>
+      ) : null}
     </Screen>
   );
+}
+
+/** Supabase's messages, in plain words. */
+function friendly(message: string) {
+  if (/invalid login credentials/i.test(message)) return 'That email and password don’t match. Try again, or use the reset link.';
+  if (/email not confirmed/i.test(message)) return 'Please confirm your email first. Tap the link we sent you, then sign in.';
+  if (/already registered|already exists/i.test(message)) return 'There’s already an account with that email. Switch to Sign in.';
+  if (/rate limit|too many/i.test(message)) return 'Too many emails sent just now. Wait a few minutes and try again.';
+  if (/password/i.test(message) && /least|short|weak/i.test(message)) return 'Pick a longer password (at least 8 characters).';
+  return message;
 }

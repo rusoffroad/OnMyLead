@@ -44,8 +44,11 @@ export default function Home() {
       <LogoBanner height={110} />
       {!loading && !session ? (
         <Card>
-          <ThemedText type="smallBold">Sign in to create and join rides</ThemedText>
-          <Button title="Sign in" onPress={() => router.push('/sign-in')} />
+          <ThemedText type="smallBold">Create a free account to start and join rides</ThemedText>
+          <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+            <Button title="Create account" style={{ flex: 1 }} onPress={() => router.push('/sign-in?mode=create')} />
+            <Button title="Sign in" kind="secondary" style={{ flex: 1 }} onPress={() => router.push('/sign-in')} />
+          </View>
         </Card>
       ) : null}
 
