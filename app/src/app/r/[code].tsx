@@ -2,6 +2,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useState } from 'react';
 import { Platform, Pressable, Share, View } from 'react-native';
 
+import { FuelCheck } from '@/components/fuel-check';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { RideSummary } from '@/components/ride-summary';
 import { ThemedText } from '@/components/themed-text';
@@ -116,6 +117,10 @@ export default function RidePage() {
         {ride.fuel_notes ? <Info label="Fuel" value={ride.fuel_notes} /> : null}
         {details?.instructions ? <Info label="Instructions" value={details.instructions} /> : null}
       </Card>
+
+      {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && (ride.status === 'scheduled' || ride.status === 'live') ? (
+        <FuelCheck ride={ride} mine={mine} onChanged={load} />
+      ) : null}
 
       <ErrorText error={error} />
 

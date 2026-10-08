@@ -159,6 +159,12 @@ export const checkIn = async (rideId: string) => {
   track('check_in', { ride_id: rideId });
 };
 
+/** Attach one of your own vehicles to your ride membership (or none). Keeps your rider count. */
+export async function setMyVehicle(rideId: string, vehicleId: string | null, riders: number) {
+  unwrap(await supabase.rpc('set_my_vehicle', { p_ride: rideId, p_vehicle: vehicleId, p_riders: riders }));
+  track('ride_vehicle_set', { has_vehicle: !!vehicleId });
+}
+
 export async function setRideStatus(rideId: string, status: 'live' | 'ended' | 'cancelled') {
   unwrap(await supabase.rpc('set_ride_status', { p_ride: rideId, p_status: status }));
   track(status === 'live' ? 'ride_mode_started' : 'ride_mode_ended', { ride_id: rideId });
