@@ -619,4 +619,95 @@ do $$ begin
 end $$;
 reset role;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT TESTS PASSED' as result;
+-- 18. Post-ride summary: riders read only their own track; group totals only after the ride ends.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(), 'Track ride', now(), 38.5, -109.5, 'public');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select join_ride('dddddddd-dddd-dddd-dddd-dddddddddddd');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select join_ride('dddddddd-dddd-dddd-dddd-dddddddddddd');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select set_ride_status('dddddddd-dddd-dddd-dddd-dddddddddddd', 'live');
+-- Olivia: 10 segments of about 111 m every 10 s (about 25 mph), so about 0.69 miles.
+insert into ride_tracks (ride_id, user_id, points)
+select 'dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(),
+       jsonb_agg(jsonb_build_array(-109.5, 38.5 + i * 0.001, 1760000000 + i * 10, 11) order by i)
+from generate_series(0, 10) i;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+-- Ben: twice as far, plus one wild GPS spike that must not add miles or top speed.
+insert into ride_tracks (ride_id, user_id, points)
+select 'dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(),
+       jsonb_agg(case when i = 7 then jsonb_build_array(-108.5, 38.5, 1760000000 + i * 10, 300)
+                      else jsonb_build_array(-109.5, 38.5 + i * 0.001, 1760000000 + i * 10, 12) end order by i)
+from generate_series(0, 21) i;
+do $$ begin
+  begin
+    insert into ride_tracks (ride_id, user_id, points) values ('dddddddd-dddd-dddd-dddd-dddddddddddd', '00000000-0000-0000-0000-00000000000c', '[]');
+    raise exception 'FAIL: wrote a track for someone else';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+-- Cara: parked, GPS jitter of about a meter. Adds no distance.
+insert into ride_tracks (ride_id, user_id, points)
+select 'dddddddd-dddd-dddd-dddd-dddddddddddd', auth.uid(),
+       jsonb_agg(jsonb_build_array(-109.5 + (i % 2) * 0.00001, 38.6, 1760000000 + i * 10, 0) order by i)
+from generate_series(0, 30) i;
+do $$ begin
+  if (select count(*) from ride_tracks where ride_id = 'dddddddd-dddd-dddd-dddd-dddddddddddd') <> 1 then
+    raise exception 'FAIL: rider can read other riders'' tracks';
+  end if;
+  if (select count(*) from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd')) <> 0 then
+    raise exception 'FAIL: group summary available before the ride ended';
+  end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select set_ride_status('dddddddd-dddd-dddd-dddd-dddddddddddd', 'ended');
+do $$
+declare s record;
+begin
+  if (select count(*) from ride_tracks where ride_id = 'dddddddd-dddd-dddd-dddd-dddddddddddd') <> 1 then
+    raise exception 'FAIL: organizer can read riders'' tracks';
+  end if;
+  select * into s from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd');
+  if s.riders_tracked <> 3 then raise exception 'FAIL: expected 3 tracked riders, got %', s.riders_tracked; end if;
+  -- Olivia 0.69 mi + Ben about 1.24 mi (19 good segments; the two around the spike are dropped) + Cara 0.
+  if s.longest_miles not between 1.1 and 1.4 then raise exception 'FAIL: longest distance %', s.longest_miles; end if;
+  if s.total_miles not between 1.8 and 2.1 then raise exception 'FAIL: total distance %', s.total_miles; end if;
+  if s.top_speed_mph <> 27 then raise exception 'FAIL: top speed % (GPS spike leaked?)', s.top_speed_mph; end if;
+end $$;
+reset role;
+-- A stranger and a signed-out visitor get nothing.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from ride_tracks) <> 0 then raise exception 'FAIL: stranger read ride tracks'; end if;
+  if (select count(*) from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd')) <> 0 then
+    raise exception 'FAIL: stranger got the group summary';
+  end if;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  if (select count(*) from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd')) <> 0 then
+    raise exception 'FAIL: signed-out visitor got the group summary';
+  end if;
+end $$;
+reset role;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY TESTS PASSED' as result;

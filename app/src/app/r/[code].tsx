@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { Platform, Pressable, Share, View } from 'react-native';
 
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
+import { RideSummary } from '@/components/ride-summary';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -98,6 +99,7 @@ export default function RidePage() {
       <ThemedText>{when(ride.meet_at)}</ThemedText>
       {ride.description ? <ThemedText>{ride.description}</ThemedText> : null}
       {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
+      {ride.status === 'ended' && isJoined ? <RideSummary ride={ride} members={members} /> : null}
 
       <Card>
         <Info label="Meet" value={details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'} />

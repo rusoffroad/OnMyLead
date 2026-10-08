@@ -327,6 +327,40 @@ export async function sendRideMessage(rideId: string, body: string, kind: Messag
   return row;
 }
 
+// --- Post-ride summary ---------------------------------------------------------
+
+/** The signed-in rider's own track for a ride (raw points; parse with core/summary parseTrack). */
+export async function myTrack(rideId: string): Promise<unknown[] | null> {
+  const uid = await currentUserId();
+  const row = unwrap<{ points: unknown[] } | null>(
+    await supabase.from('ride_tracks').select('points').eq('ride_id', rideId).eq('user_id', uid).maybeSingle(),
+  );
+  return row?.points ?? null;
+}
+
+export type GroupSummary = {
+  riders_tracked: number;
+  total_miles: number | null;
+  average_miles: number | null;
+  longest_miles: number | null;
+  top_speed_mph: number | null;
+};
+
+/** Group totals for an ended ride (no one's points). Null before the ride ends or for non-members. */
+export async function groupSummary(rideId: string): Promise<GroupSummary | null> {
+  const rows = unwrap<GroupSummary[]>(await supabase.rpc('ride_group_summary', { p_ride: rideId }));
+  const row = rows?.[0];
+  if (!row) return null;
+  const n = (v: unknown) => (v == null ? null : Number(v));
+  return {
+    riders_tracked: Number(row.riders_tracked) || 0,
+    total_miles: n(row.total_miles),
+    average_miles: n(row.average_miles),
+    longest_miles: n(row.longest_miles),
+    top_speed_mph: n(row.top_speed_mph),
+  };
+}
+
 // --- Garage -----------------------------------------------------------------
 
 export const VEHICLE_PHOTO_BUCKET = 'vehicle-photos';
