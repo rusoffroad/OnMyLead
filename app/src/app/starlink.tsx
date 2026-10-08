@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, AppState, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
@@ -12,7 +13,8 @@ import {
 import { getStarlinkSetup, myVehicles, saveStarlinkSetup, type VehicleWithCost } from '@/lib/api';
 import { useSession } from '@/lib/session';
 import {
-  DISH_HOST, DishError, dishReadSupported, formatMbps, formatPercent, formatUptime, readDish, type DishReading,
+  compassPoint, DISH_HOST, DishError, dishHeadline, dishReadSupported, formatMbps, formatPercent, formatSeconds, formatUptime,
+  readHistory, readStatus, type DishHistory, type DishStatus,
 } from '@/lib/starlink';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -33,23 +35,91 @@ export default function StarlinkPage() {
 
 // --- Live dish status -----------------------------------------------------------
 
+const STATUS_EVERY_MS = 3_000;
+const HISTORY_EVERY_MS = 60_000;
+const RETRY_EVERY_MS = 10_000;
+// Set once the rider has tapped Connect, so the page reconnects by itself next time. Waiting
+// for that first tap keeps iOS's local network prompt tied to something the rider chose.
+const AUTO_KEY = 'starlink.autoConnect.v1';
+
+/**
+ * Keeps reading the dish while this page is open and the app is in front: status every few
+ * seconds, the 15-minute history every minute. Stops when the rider leaves the page.
+ */
+function useLiveDish() {
+  const [status, setStatus] = useState<DishStatus | null>(null);
+  const [history, setHistory] = useState<DishHistory | null>(null);
+  const [readAt, setReadAt] = useState<number | null>(null);
+  const [failure, setFailure] = useState<DishError | null>(null);
+  const [wanted, setWanted] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [appActive, setAppActive] = useState(AppState.currentState === 'active');
+  const historyAt = useRef(0);
+  const [nudge, setNudge] = useState(0);
+
+  useEffect(() => {
+    AsyncStorage.getItem(AUTO_KEY).then((v) => v === '1' && setWanted(true)).catch(() => {});
+    const sub = AppState.addEventListener('change', (st) => setAppActive(st === 'active'));
+    return () => sub.remove();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      setFocused(true);
+      return () => setFocused(false);
+    }, []),
+  );
+
+  const running = dishReadSupported && wanted && focused && appActive;
+  useEffect(() => {
+    if (!running) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tick = async () => {
+      let next = STATUS_EVERY_MS;
+      try {
+        const s = await readStatus();
+        if (stopped) return;
+        setStatus(s);
+        setReadAt(Date.now());
+        setFailure(null);
+        if (Date.now() - historyAt.current >= HISTORY_EVERY_MS) {
+          historyAt.current = Date.now();
+          readHistory().then((h) => !stopped && h && setHistory(h));
+        }
+      } catch (e) {
+        if (stopped) return;
+        setFailure(e instanceof DishError ? e : new DishError('unreachable', e instanceof Error ? e.message : String(e)));
+        next = RETRY_EVERY_MS;
+      }
+      if (!stopped) timer = setTimeout(tick, next);
+    };
+    tick();
+    return () => {
+      stopped = true;
+      clearTimeout(timer);
+    };
+  }, [running, nudge]);
+
+  const connect = useCallback(() => {
+    AsyncStorage.setItem(AUTO_KEY, '1').catch(() => {});
+    historyAt.current = 0;
+    setFailure(null);
+    setWanted(true);
+    setNudge((n) => n + 1);
+  }, []);
+
+  return { status, history, readAt, failure, connecting: running && !status && !failure, live: running && !failure && !!status, connect };
+}
+
 function DishStatusCard() {
   const theme = useTheme();
-  const [reading, setReading] = useState<DishReading | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [failure, setFailure] = useState<DishError | null>(null);
-
-  async function connect() {
-    setBusy(true);
-    setFailure(null);
-    try {
-      setReading(await readDish());
-    } catch (e) {
-      setFailure(e instanceof DishError ? e : new DishError('unreachable', e instanceof Error ? e.message : String(e)));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const { status: s, history: h, readAt, failure, connecting, live, connect } = useLiveDish();
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   if (!dishReadSupported) {
     return (
@@ -64,13 +134,22 @@ function DishStatusCard() {
     );
   }
 
-  const s = reading?.status;
-  const h = reading?.history;
+  const ageS = readAt ? Math.max(0, Math.round((now - readAt) / 1000)) : null;
+  const facing = s ? compassPoint(s.azimuthDeg) : null;
   return (
     <Card>
-      <ThemedText type="smallBold">Your dish</ThemedText>
-      {!reading && !failure ? (
-        <ThemedText type="small" themeColor="textSecondary">Connect your phone to your Starlink Wi-Fi first, then tap the button.</ThemedText>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <ThemedText type="smallBold">Your dish</ThemedText>
+        {live ? (
+          <ThemedText type="small" style={{ color: RideColors.green, fontWeight: '700' }}>● LIVE</ThemedText>
+        ) : s && ageS != null ? (
+          <ThemedText type="small" themeColor="textSecondary">Last read {formatSeconds(ageS)} ago</ThemedText>
+        ) : null}
+      </View>
+      {!s && !failure && !connecting ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          Join your Starlink Wi-Fi, then tap Connect. This page then stays live while it is open.
+        </ThemedText>
       ) : null}
 
       {failure ? (
@@ -79,7 +158,7 @@ function DishStatusCard() {
           <ThemedText>
             {failure.kind === 'refused' || failure.kind === 'unreadable'
               ? 'Your dish answered but we could not read it. A Starlink software update may have changed things. Try again later.'
-              : 'Join your Starlink Wi-Fi, then tap Retry.'}
+              : 'Join your Starlink Wi-Fi and allow OnMyLead to use your local network (Settings › OnMyLead). We keep trying every 10 seconds.'}
           </ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{failure.message}</ThemedText>
         </View>
@@ -91,15 +170,15 @@ function DishStatusCard() {
             <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: s.online ? RideColors.green : RideColors.red }} />
             <ThemedText type="subtitle">{s.state}</ThemedText>
           </View>
+          <ThemedText>{dishHeadline(s)}</ThemedText>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three }}>
-            <Stat label="Download" value={formatMbps(s.downlinkBps)} />
-            <Stat label="Upload" value={formatMbps(s.uplinkBps)} />
+            <Stat label="Download now" value={formatMbps(s.downlinkBps)} />
+            <Stat label="Upload now" value={formatMbps(s.uplinkBps)} />
             <Stat label="Latency" value={s.latencyMs == null ? '—' : `${Math.round(s.latencyMs)} ms`} />
-            <Stat label="Obstructed" value={formatPercent(s.obstructionFraction)} />
+            <Stat label="Sky blocked" value={formatPercent(s.obstructionFraction)} />
             <Stat label="Dropped pings" value={formatPercent(s.dropRate)} />
             <Stat label="Up for" value={formatUptime(s.uptimeS)} />
           </View>
-          {s.currentlyObstructed ? <ThemedText style={{ color: RideColors.yellow, fontWeight: '700' }}>Something is blocking the sky right now.</ThemedText> : null}
           {s.alerts.length ? (
             <View style={{ gap: Spacing.one }}>
               <ThemedText type="smallBold">Alerts</ThemedText>
@@ -108,37 +187,64 @@ function DishStatusCard() {
           ) : (
             <ThemedText type="small" themeColor="textSecondary">No alerts.</ThemedText>
           )}
-          {h && h.samples > 0 ? (
-            <ThemedText type="small">
-              Last {h.minutes || 1} min: {formatMbps(h.avgDownlinkBps)} down on average (peak {formatMbps(h.peakDownlinkBps)}),
-              {' '}{formatMbps(h.avgUplinkBps)} up{h.avgLatencyMs != null ? `, ${Math.round(h.avgLatencyMs)} ms latency` : ''}, {formatPercent(h.avgDropRate)} dropped.
-            </ThemedText>
-          ) : null}
+          {h && h.samples > 0 ? <HistoryView h={h} /> : null}
           <ThemedText type="small" themeColor="textSecondary">
             {[
-              s.softwareVersion ? `Software ${s.softwareVersion}` : null,
-              s.hardwareVersion ? `Hardware ${s.hardwareVersion}` : null,
+              facing && s.elevationDeg != null ? `Facing ${facing}, ${Math.round(s.elevationDeg)}° up` : null,
               s.gpsSats != null ? `GPS ${s.gpsValid ? 'locked' : 'searching'}, ${s.gpsSats} sats` : null,
               s.ethSpeedMbps ? `Ethernet ${s.ethSpeedMbps} Mbps` : null,
-              s.elevationDeg != null ? `Aimed ${Math.round(s.elevationDeg)}° up` : null,
+              s.softwareVersion ? `Software ${s.softwareVersion}` : null,
+              s.hardwareVersion ? `Hardware ${s.hardwareVersion}` : null,
             ].filter(Boolean).join(' · ')}
           </ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">Read at {new Date(reading!.readAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', second: '2-digit' })}</ThemedText>
         </View>
       ) : null}
 
-      <Button
-        title={busy ? 'Connecting…' : failure ? 'Retry' : reading ? 'Refresh' : 'Connect to my dish'}
-        big
-        disabled={busy}
-        onPress={connect}
-      />
-      {busy ? <ActivityIndicator color={theme.accent} /> : null}
+      {!live ? (
+        <Button
+          title={connecting ? 'Connecting…' : failure ? 'Retry now' : 'Connect to my dish'}
+          big
+          disabled={connecting}
+          onPress={connect}
+        />
+      ) : null}
+      {connecting && !s ? <ActivityIndicator color={theme.accent} /> : null}
       <ThemedText type="small" themeColor="textSecondary">
         This uses your dish’s built-in local connection, which SpaceX doesn’t officially support. A Starlink update can break it;
         everything else on this page keeps working.
       </ThemedText>
     </Card>
+  );
+}
+
+/** The last 15 minutes: one bar per minute for download speed, red where the connection dropped. */
+function HistoryView({ h }: { h: DishHistory }) {
+  const peak = Math.max(1, ...h.timeline.map((m) => m.avgDownlinkBps ?? 0));
+  return (
+    <View style={{ gap: Spacing.one }}>
+      <ThemedText type="smallBold">Last {h.minutes || 1} min</ThemedText>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 48, gap: 3 }}>
+        {h.timeline.map((m, i) => (
+          <View
+            key={i}
+            accessibilityLabel={`${formatMbps(m.avgDownlinkBps)}${m.outageSeconds ? `, ${m.outageSeconds} s offline` : ''}`}
+            style={{
+              flex: 1,
+              height: Math.max(3, Math.round(((m.avgDownlinkBps ?? 0) / peak) * 48)),
+              borderRadius: 2,
+              backgroundColor: m.outageSeconds ? RideColors.red : RideColors.leader,
+            }}
+          />
+        ))}
+      </View>
+      <ThemedText type="small">
+        {formatMbps(h.avgDownlinkBps)} down on average (peak {formatMbps(h.peakDownlinkBps)}), {formatMbps(h.avgUplinkBps)} up
+        {h.avgLatencyMs != null ? `, ${Math.round(h.avgLatencyMs)} ms latency` : ''}.{' '}
+        {h.outages
+          ? `Dropped ${h.outages} ${h.outages === 1 ? 'time' : 'times'} for ${formatSeconds(h.outageSeconds)} in total (longest ${formatSeconds(h.longestOutageS)}).`
+          : 'No dropouts.'}
+      </ThemedText>
+    </View>
   );
 }
 
