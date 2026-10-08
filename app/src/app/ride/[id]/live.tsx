@@ -22,8 +22,11 @@ import {
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
-import { supabase } from '@/lib/supabase';
+import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
+
+// If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
+export { ErrorBoundary } from 'expo-router';
 
 const STATUSES: { kind: RiderStatusKind; label: string; urgent?: boolean }[] = [
   { kind: 'ok', label: 'OK' },
@@ -123,8 +126,7 @@ export default function RideMode() {
 
   // Live updates, with polling as a fallback for flaky connections.
   useEffect(() => {
-    const channel = supabase
-      .channel(`ride-${id}`)
+    const channel = newChannel(`ride-${id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'positions_latest' }, (payload) => {
         const p = payload.new as Position;
         if (p?.user_id) setPositions((prev) => ({ ...prev, [p.user_id]: p }));

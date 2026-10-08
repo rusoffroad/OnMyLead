@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { friendlyChatError, mergeMessages, type ChatMessage, type MessageKind } from '@/core/chat';
 import { rideMessages, sendRideMessage } from '@/lib/api';
-import { supabase } from '@/lib/supabase';
+import { newChannel, supabase } from '@/lib/supabase';
 
 /**
  * Ride chat for a joined rider: loads recent messages and keeps them live with a realtime
@@ -26,8 +26,7 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
   useEffect(() => {
     if (!rideId || !enabled) return;
     reload();
-    const channel = supabase
-      .channel(`ride-chat-${rideId}`)
+    const channel = newChannel(`ride-chat-${rideId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ride_messages', filter: `ride_id=eq.${rideId}` }, (payload) => {
         const m = payload.new as ChatMessage;
         if (!m?.id) return;
