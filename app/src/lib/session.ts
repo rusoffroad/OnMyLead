@@ -42,7 +42,6 @@ export async function signInWithProvider(provider: SocialProvider) {
   if (code) await supabase.auth.exchangeCodeForSession(code);
 }
 
-/** Phone or email: sends a one-time code. */
 /**
  * Where the sign-in link in the email lands. Supabase's free email sender can't use a custom
  * template, so its email carries a link (not the code); on the web the link signs the rider in
@@ -66,6 +65,36 @@ export async function verifyCode(target: string, token: string) {
   const { error } = isEmail
     ? await supabase.auth.verifyOtp({ email: target, token, type: 'email' })
     : await supabase.auth.verifyOtp({ phone: target, token, type: 'sms' });
+  if (error) throw error;
+}
+
+/** Email + password: create an account. Supabase emails a link to confirm the address. */
+export async function signUpWithPassword(email: string, password: string, name: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: emailRedirectUrl(), data: { full_name: name, name } },
+  });
+  if (error) throw error;
+  // With email confirmation on, there is no session until the rider taps the link.
+  return { needsConfirmation: !data.session };
+}
+
+/** Email + password: sign in. */
+export async function signInWithPassword(email: string, password: string) {
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+}
+
+/** Emails a link that opens /reset-password, where the rider picks a new password. */
+export async function sendPasswordReset(email: string) {
+  const redirectTo = emailRedirectUrl().replace(/auth-callback$/, 'reset-password');
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) throw error;
+}
+
+export async function updatePassword(password: string) {
+  const { error } = await supabase.auth.updateUser({ password });
   if (error) throw error;
 }
 

@@ -10,7 +10,8 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerBackButtonDisplayMode: 'minimal' }}>
         <Stack.Screen name="index" options={{ title: 'Rides' }} />
-        <Stack.Screen name="sign-in" options={{ title: 'Sign in', presentation: 'modal' }} />
+        <Stack.Screen name="sign-in" options={{ title: 'Sign in or create account', presentation: 'modal' }} />
+        <Stack.Screen name="reset-password" options={{ title: 'New password' }} />
         <Stack.Screen name="ride/new" options={{ title: 'Create a ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: 'Ride' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
