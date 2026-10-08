@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  checkMessage, friendlyChatError, latestAnnouncement, MAX_MESSAGE_LENGTH, mergeMessages, QUICK_REPLIES, spokenAnnouncement,
+  alertTitle, checkMessage, friendlyChatError, isLeaderOnly, latestAnnouncement, MAX_MESSAGE_LENGTH, mergeMessages, QUICK_REPLIES,
+  rideLeaderIds, shouldAlert, spokenAnnouncement,
   type ChatMessage,
 } from '../chat';
 
@@ -63,5 +64,35 @@ describe('friendlyChatError', () => {
     expect(friendlyChatError('slow down: too many messages')).toMatch(/wait a minute/i);
     expect(friendlyChatError('new row violates row-level security policy for table "ride_messages"')).toMatch(/only riders/i);
     expect(friendlyChatError('something else')).toBe('something else');
+  });
+});
+
+describe('leader-only messages', () => {
+  const m = (user_id: string, role: string, status = 'joined') => ({ user_id, role, status });
+
+  it('uses riders with the Leader role as the leader', () => {
+    expect(rideLeaderIds([m('o', 'organizer'), m('a', 'leader'), m('b', 'rider')], 'o')).toEqual(['a']);
+  });
+
+  it('falls back to the organizer when nobody is Leader, ignoring riders who are not joined', () => {
+    expect(rideLeaderIds([m('o', 'organizer'), m('a', 'leader', 'left'), m('b', 'sweep')], 'o')).toEqual(['o']);
+    expect(rideLeaderIds([], null)).toEqual([]);
+  });
+
+  it('pops up messages from others only', () => {
+    expect(shouldAlert({ user_id: 'a' }, 'b')).toBe(true);
+    expect(shouldAlert({ user_id: 'a' }, 'a')).toBe(false);
+    expect(shouldAlert({ user_id: 'a' }, undefined)).toBe(false);
+  });
+
+  it('titles alerts by sender, audience and ride', () => {
+    expect(alertTitle({ kind: 'chat' }, 'Ben', 'Moab Saturday')).toBe('Ben · Moab Saturday');
+    expect(alertTitle({ kind: 'chat', audience: 'leader' }, 'Ben', null)).toBe('Ben (to you, the leader)');
+    expect(alertTitle({ kind: 'announcement', audience: 'everyone' }, '', 'Moab')).toBe('Announcement from A rider · Moab');
+    expect(isLeaderOnly({})).toBe(false);
+  });
+
+  it('explains a leader-only send before the database update', () => {
+    expect(friendlyChatError("Could not find the 'audience' column of 'ride_messages' in the schema cache")).toMatch(/everyone for now/);
   });
 });

@@ -1,7 +1,7 @@
 import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
 import { fuzzLocation, type LatLng } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
-import type { ChatMessage, MessageKind } from '@/core/chat';
+import type { ChatMessage, MessageAudience, MessageKind } from '@/core/chat';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import { startShare, type ShareScope } from '@/core/sharing';
@@ -351,12 +351,18 @@ export async function latestRideAnnouncement(rideId: string): Promise<ChatMessag
   );
 }
 
-export async function sendRideMessage(rideId: string, body: string, kind: MessageKind = 'chat', sentAt = new Date()): Promise<ChatMessage> {
+export async function sendRideMessage(
+  rideId: string, body: string, kind: MessageKind = 'chat', sentAt = new Date(), audience: MessageAudience = 'everyone',
+): Promise<ChatMessage> {
   const user_id = await currentUserId();
+  // audience is only sent when it isn't the default, so messages to everyone keep working on a
+  // database that hasn't had the leader-only update yet.
   const row = unwrap<ChatMessage>(
-    await supabase.from('ride_messages').insert({ ride_id: rideId, user_id, kind, body, sent_at: sentAt.toISOString() }).select().single(),
+    await supabase.from('ride_messages')
+      .insert({ ride_id: rideId, user_id, kind, body, sent_at: sentAt.toISOString(), ...(audience === 'leader' ? { audience } : null) })
+      .select().single(),
   );
-  track('ride_message', { kind });
+  track('ride_message', { kind, audience });
   return row;
 }
 

@@ -9,7 +9,7 @@ import { RideSummary } from '@/components/ride-summary';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
-import { latestAnnouncement } from '@/core/chat';
+import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { counts } from '@/core/joining';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
@@ -84,6 +84,7 @@ export default function RidePage() {
   const waitlist = members.filter((m) => m.status === 'waitlisted');
   const c = counts(members.map((m) => ({ ...m, createdAt: 0, userId: m.user_id })));
   const nameOf = (userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider';
+  const leaderIds = rideLeaderIds(members, ride.organizer_id);
   const pinned = isJoined ? latestAnnouncement(chat.messages) : null;
 
   const join = () =>
@@ -205,7 +206,15 @@ export default function RidePage() {
       ) : null}
 
       {isJoined ? (
-        <RideChat messages={chat.messages} nameOf={nameOf} me={me} canAnnounce={isManager} error={chat.error} onSend={chat.send} />
+        <RideChat
+          messages={chat.messages}
+          nameOf={nameOf}
+          me={me}
+          canAnnounce={isManager}
+          leaderName={leaderIds.length && !leaderIds.includes(me ?? '') ? leaderIds.map(nameOf).join(', ') : null}
+          error={chat.error}
+          onSend={chat.send}
+        />
       ) : null}
 
       {mine && mine.status !== 'cancelled' && mine.role !== 'organizer' ? (
