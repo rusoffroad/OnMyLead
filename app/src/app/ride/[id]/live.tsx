@@ -1,5 +1,6 @@
 import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
+import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -7,16 +8,18 @@ import { Alert, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Tex
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GroupMap, type MapRider } from '@/components/group-map';
+import { RouteStrip } from '@/components/route-strip';
 import { SharePicker } from '@/components/share-picker';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
+import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
-  activeRegroup, dropRegroup, getMembers, getPositions, getRide, latestStatuses, myActiveShares,
+  activeRegroup, dropRegroup, getMembers, getPositions, getRide, getRideRoute, latestStatuses, myActiveShares,
   startLocationShare, stopLocationShare, type ActiveShare,
 } from '@/lib/api';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
@@ -81,6 +84,12 @@ export default function RideMode() {
   const [sosOpen, setSosOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const announced = useRef(new Set<string>());
+  const [route, setRoute] = useState<{ route: RideRoute | null; offline: boolean }>({ route: null, offline: false });
+  // This phone's own fix, kept on the phone: it places me on the route even when I'm not sharing.
+  const [myFix, setMyFix] = useState<{ lat: number; lng: number } | null>(null);
+  // Each rider's last progress along the route, so loops and out-and-backs don't make them jump.
+  const [tracker] = useState(() => new RouteTracker());
+  const routeMiles = useRef<number | null | undefined>(undefined);
 
   const joined = useMemo(() => members.filter((m) => m.status === 'joined'), [members]);
   const mine = joined.find((m) => m.user_id === me);
@@ -107,6 +116,7 @@ export default function RideMode() {
 
   const apply = useCallback((d: RideSnapshot) => {
     setRide(d.ride);
+    routeMiles.current = d.ride?.route_miles;
     setMembers(d.members);
     setRegroup(d.regroup);
     setStatuses(d.statuses);
@@ -114,15 +124,40 @@ export default function RideMode() {
   }, []);
   const refresh = useCallback(() => loadSnapshot(id).then(apply).catch(() => {}), [id, apply]);
 
+  const loadRoute = useCallback(() => getRideRoute(id).then(setRoute).catch(() => {}), [id]);
+
   // Initial load, then ask to share if this rider has no active ride share.
   useEffect(() => {
     loadSnapshot(id).then(apply).catch(() => {});
+    loadRoute();
     myActiveShares().then((all) => {
       const s = all.find((x) => x.scope === 'ride' && x.ride_id === id) ?? null;
       setShare(s);
       if (!s) setAskShare(true);
     });
-  }, [id, apply]);
+  }, [id, apply, loadRoute]);
+
+  // Follow this phone's position while Ride Mode is open and there is a route to place it on.
+  // Only if location access was already given; this never asks and never uploads.
+  const hasRoute = !!route.route;
+  useEffect(() => {
+    if (!hasRoute) return;
+    let sub: Location.LocationSubscription | null = null;
+    let gone = false;
+    Location.getForegroundPermissionsAsync()
+      .then(async (p) => {
+        if (p.status !== 'granted' || gone) return;
+        sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.High, distanceInterval: 20 }, (l) =>
+          setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude }),
+        );
+        if (gone) sub.remove();
+      })
+      .catch(() => {});
+    return () => {
+      gone = true;
+      sub?.remove();
+    };
+  }, [hasRoute]);
 
   // Live updates, with polling as a fallback for flaky connections.
   useEffect(() => {
@@ -142,7 +177,11 @@ export default function RideMode() {
         });
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rides', filter: `id=eq.${id}` }, (payload) => {
-        setRide(payload.new as Ride);
+        const next = payload.new as Ride;
+        // Saving a route updates the ride's miles; pick up the new route when that happens.
+        if (next.route_miles !== routeMiles.current) loadRoute();
+        routeMiles.current = next.route_miles;
+        setRide(next);
       })
       .subscribe();
     const poll = setInterval(refresh, 15_000);
@@ -152,7 +191,7 @@ export default function RideMode() {
       clearInterval(poll);
       clearInterval(tick);
     };
-  }, [id, refresh]);
+  }, [id, refresh, loadRoute]);
 
   // A share is live only until its timer runs out or the ride ends (the server enforces the same).
   const rideOver = ride?.status === 'ended' || ride?.status === 'cancelled';
@@ -219,6 +258,17 @@ export default function RideMode() {
     };
   });
 
+  const placed = useMemo(() => {
+    if (!route.route) return [];
+    const riders = joined.map((m) => {
+      const p = positions[m.user_id];
+      const at = m.user_id === me && myFix ? myFix : p ? { lat: p.lat, lng: p.lng } : null;
+      return { id: m.user_id, role: bubbleRole(m.role), at };
+    });
+    return tracker.place(route.route, riders);
+  }, [route.route, joined, positions, me, myFix, tracker]);
+  const routeSummary = route.route ? summarizeMe(route.route, placed, me) : null;
+
   const helpCalls = joined
     .map((m) => ({ m, s: statuses[m.user_id] }))
     .filter(({ s, m }) => s && m.user_id !== me && !['ok'].includes(s.status) && now - Date.parse(s.tapped_at) < 30 * 60_000);
@@ -280,7 +330,7 @@ export default function RideMode() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <GroupMap riders={mapRiders} regroup={regroup} />
+      <GroupMap riders={mapRiders} regroup={regroup} route={route.route?.points} />
 
       <SafeAreaView edges={['top']} style={styles.top}>
         <View style={styles.topRow}>
@@ -316,6 +366,16 @@ export default function RideMode() {
       </SafeAreaView>
 
       <SafeAreaView edges={['bottom']} style={styles.bottom}>
+        {route.route ? (
+          <RouteStrip
+            lengthM={route.route.lengthM}
+            riders={placed}
+            meId={me}
+            summary={routeSummary}
+            nameOf={nameOf}
+            offline={route.offline}
+          />
+        ) : null}
         <ScrollView style={{ maxHeight: 180 }} contentContainerStyle={{ gap: Spacing.two }}>
           {watchesBubble
             ? bubble.riders

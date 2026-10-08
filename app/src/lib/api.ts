@@ -1,9 +1,12 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
 import { fuzzLocation, type LatLng } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
 import type { ChatMessage, MessageAudience, MessageKind } from '@/core/chat';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
+import { fromStored, toStored, type RideRoute } from '@/core/route';
 import { startShare, type ShareScope } from '@/core/sharing';
 import { itemsFromRideNotes, localDate, templateById, type TemplateItem, type TripCategory } from '@/core/trips';
 import { track } from './analytics';
@@ -116,6 +119,45 @@ export async function getPrivateDetails(rideId: string): Promise<RidePrivateDeta
   return unwrap(await supabase.from('ride_private_details').select('*').eq('ride_id', rideId).maybeSingle());
 }
 
+// ---------------------------------------------------------------------------
+// The ride's route. It lives with the private details, so only the ride's riders can read it
+// and only its organizers can change it (enforced by the database). Each phone keeps the last
+// route it saw, because trails rarely have signal.
+// ---------------------------------------------------------------------------
+const routeKey = (rideId: string) => `ride.route.v1.${rideId}`;
+
+export async function getRideRoute(rideId: string): Promise<{ route: RideRoute | null; offline: boolean }> {
+  try {
+    const row = unwrap<{ route_geojson: unknown; waypoints: unknown } | null>(
+      await supabase.from('ride_private_details').select('route_geojson, waypoints').eq('ride_id', rideId).maybeSingle(),
+    );
+    const route = row ? fromStored(row.route_geojson, row.waypoints) : null;
+    if (route) await AsyncStorage.setItem(routeKey(rideId), JSON.stringify(row)).catch(() => {});
+    else await forgetRoute(rideId);
+    return { route, offline: false };
+  } catch {
+    const raw = await AsyncStorage.getItem(routeKey(rideId)).catch(() => null);
+    const row = raw ? JSON.parse(raw) : null;
+    return { route: row ? fromStored(row.route_geojson, row.waypoints) : null, offline: true };
+  }
+}
+
+export const forgetRoute = (rideId: string) => AsyncStorage.removeItem(routeKey(rideId)).catch(() => {});
+
+/** Save (or with null, remove) the ride's route. The ride's listed miles follow the route. */
+export async function saveRideRoute(rideId: string, route: RideRoute | null): Promise<void> {
+  const stored = route ? toStored({ ...route, updatedAt: new Date().toISOString() }) : { route_geojson: null, waypoints: [] };
+  const rows = unwrap<unknown[]>(await supabase.from('ride_private_details').update(stored).eq('ride_id', rideId).select('ride_id'));
+  if (!rows.length) throw new Error('Only the ride’s organizer can change the route.');
+  if (route) {
+    await supabase.from('rides').update({ route_miles: Math.round((route.lengthM / 1609.344) * 10) / 10 }).eq('id', rideId);
+    await AsyncStorage.setItem(routeKey(rideId), JSON.stringify(stored)).catch(() => {});
+  } else {
+    await forgetRoute(rideId);
+  }
+  track('ride_route_saved', { source: route?.source ?? 'removed', points: route?.points.length ?? 0 });
+}
+
 export async function getMembers(rideId: string): Promise<RideMember[]> {
   return unwrap(
     await supabase
@@ -180,7 +222,10 @@ export async function joinRide(opts: { rideId?: string; inviteCode?: string; veh
   return status;
 }
 
-export const leaveRide = async (rideId: string) => unwrap(await supabase.rpc('leave_ride', { p_ride: rideId }));
+export const leaveRide = async (rideId: string) => {
+  unwrap(await supabase.rpc('leave_ride', { p_ride: rideId }));
+  await forgetRoute(rideId);
+};
 export const checkIn = async (rideId: string) => {
   unwrap(await supabase.rpc('check_in', { p_ride: rideId }));
   track('check_in', { ride_id: rideId });

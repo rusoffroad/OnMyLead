@@ -893,4 +893,69 @@ do $$ begin
   end if;
 end $$;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT TESTS PASSED' as result;
+-- 20. Ride route: only the ride's joined riders can read it; only its organizers can change it.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility, max_vehicles)
+values ('20000000-0000-0000-0000-000000000001', auth.uid(), 'Route test', now() + interval '1 day', 38.57, -109.55, 'public', 2);
+insert into ride_private_details (ride_id, meet_lat, meet_lng)
+values ('20000000-0000-0000-0000-000000000001', 38.5733, -109.5498);
+do $$ begin
+  update ride_private_details
+     set route_geojson = '{"type":"Feature","geometry":{"type":"LineString","coordinates":[[-109.5498,38.5733],[-109.53,38.60]]},"properties":{"source":"drawn"}}',
+         waypoints = '[[-109.5498,38.5733],[-109.53,38.60]]'
+   where ride_id = '20000000-0000-0000-0000-000000000001';
+  if not found then raise exception 'FAIL: organizer could not save the route'; end if;
+end $$;
+reset role;
+
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  if join_ride('20000000-0000-0000-0000-000000000001') <> 'joined' then raise exception 'FAIL: Ben should join the route ride'; end if;
+  if (select route_geojson from ride_private_details where ride_id = '20000000-0000-0000-0000-000000000001') is null then
+    raise exception 'FAIL: joined rider cannot see the route';
+  end if;
+  update ride_private_details set route_geojson = null where ride_id = '20000000-0000-0000-0000-000000000001';
+  if found then raise exception 'FAIL: a rider changed the route'; end if;
+end $$;
+reset role;
+
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+do $$ begin
+  if join_ride('20000000-0000-0000-0000-000000000001') <> 'waitlisted' then raise exception 'FAIL: Cara should be waitlisted on the route ride'; end if;
+  if exists (select 1 from ride_private_details where ride_id = '20000000-0000-0000-0000-000000000001') then
+    raise exception 'FAIL: waitlisted rider saw the route';
+  end if;
+end $$;
+reset role;
+
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if exists (select 1 from ride_private_details where ride_id = '20000000-0000-0000-0000-000000000001') then
+    raise exception 'FAIL: stranger saw the route';
+  end if;
+  update ride_private_details set route_geojson = null where ride_id = '20000000-0000-0000-0000-000000000001';
+  if found then raise exception 'FAIL: stranger changed the route'; end if;
+end $$;
+reset role;
+
+-- Leaving the ride takes the route away (Cara moves up from the waitlist and gets it).
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select leave_ride('20000000-0000-0000-0000-000000000001');
+do $$ begin
+  if exists (select 1 from ride_private_details where ride_id = '20000000-0000-0000-0000-000000000001') then
+    raise exception 'FAIL: rider who left can still see the route';
+  end if;
+end $$;
+reset role;
+do $$ begin
+  if (select route_geojson from ride_private_details where ride_id = '20000000-0000-0000-0000-000000000001') is null then
+    raise exception 'FAIL: a rider changed the route';
+  end if;
+end $$;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, ROUTE TESTS PASSED' as result;
