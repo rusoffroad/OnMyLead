@@ -9,7 +9,8 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { discoverPublicRides, myRides } from '@/lib/api';
+import { initialOf } from '@/core/profile';
+import { discoverPublicRides, myRideName, myRides } from '@/lib/api';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import type { Ride, RideMember } from '@/lib/types';
@@ -32,12 +33,15 @@ export default function Home() {
   const [code, setCode] = useState('');
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** The rider's ride name; null until loaded (or if it couldn't load), '' when they haven't picked one. */
+  const [rideName, setRideName] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       if (!isBackendConfigured) return;
       discoverPublicRides().then(setNearby).catch((e) => setError(e.message));
       if (session) myRides().then(setMine).catch((e) => setError(e.message));
+      if (session) myRideName().then(setRideName).catch(() => setRideName(null));
     }, [session]),
   );
 
@@ -61,7 +65,31 @@ export default function Home() {
     <Screen top>
       <View style={{ paddingTop: Spacing.one }}>
         <Logo height={96} />
+        {session ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Your profile and ride name"
+            onPress={() => router.push('/profile')}
+            hitSlop={8}
+            style={({ pressed }) => [styles.me, { borderColor: theme.backgroundSelected, opacity: pressed ? 0.7 : 1 }]}>
+            <ThemedText style={styles.meInitial}>{rideName ? initialOf(rideName) : ''}</ThemedText>
+            {!rideName ? <Icon name="person" size={20} color={theme.text} /> : null}
+          </Pressable>
+        ) : null}
       </View>
+
+      {session && rideName === '' ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/profile')}
+          style={[styles.nudge, { backgroundColor: theme.backgroundElement }]}>
+          <View style={{ flex: 1 }}>
+            <ThemedText type="heading">Pick your ride name</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">Other riders see you as Rider until you do. A nickname works.</ThemedText>
+          </View>
+          <Icon name="chevron" color={theme.textSecondary} />
+        </Pressable>
+      ) : null}
 
       {live ? (
         <Pressable
@@ -207,6 +235,12 @@ const styles = StyleSheet.create({
   actionTitle: { color: '#fff', fontSize: 26, lineHeight: 28, fontFamily: font(800, 'display') },
   join: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, borderRadius: Radius.card, borderWidth: 1.5, paddingLeft: Spacing.three, padding: 8 },
   joinInput: { flex: 1, minHeight: 44, fontSize: 17, fontFamily: font(600), letterSpacing: 1 },
+  me: {
+    position: 'absolute', top: Spacing.one, right: 0, width: 44, height: 44, borderRadius: 22, borderWidth: 2,
+    backgroundColor: RideColors.rider, alignItems: 'center', justifyContent: 'center',
+  },
+  meInitial: { color: '#fff', fontSize: 18, lineHeight: 22, fontWeight: 800 },
+  nudge: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, padding: 14, borderLeftWidth: 4, borderLeftColor: Colors.sky },
   tools: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: Spacing.one },
   tool: { width: '24%', alignItems: 'center', gap: 6, minHeight: 72 },
   toolIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },

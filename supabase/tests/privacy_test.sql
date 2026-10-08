@@ -893,4 +893,54 @@ do $$ begin
   end if;
 end $$;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT TESTS PASSED' as result;
+-- Ride names: Ben picks a nickname; everyone sees it, nobody else can change it.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+update profiles set display_name = '   Dusty
+   Ben  ' where id = auth.uid();
+update profiles set display_name = 'Hacked' where id = '00000000-0000-0000-0000-00000000000c';
+insert into profile_private (user_id, emergency_contact_name, emergency_contact_phone)
+values (auth.uid(), 'Mom', '555-0100');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+do $$ begin
+  if (select display_name from profiles where id = '00000000-0000-0000-0000-00000000000b') <> 'Dusty Ben' then
+    raise exception 'FAIL: other riders do not see the tidied nickname';
+  end if;
+  if (select display_name from profiles where id = '00000000-0000-0000-0000-00000000000c') <> 'Cara Rider' then
+    raise exception 'FAIL: a rider changed someone else''s name';
+  end if;
+  if exists (select 1 from profile_private) then
+    raise exception 'FAIL: a rider read someone else''s emergency contact';
+  end if;
+  if exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name like 'emergency%') then
+    raise exception 'FAIL: emergency contact still sits on the readable profile row';
+  end if;
+end $$;
+update profiles set display_name = 'Cara the Extremely Long Named Rider' where id = auth.uid();
+do $$ begin
+  if (select display_name from profiles where id = auth.uid()) <> 'Cara the Extremely Long' then
+    raise exception 'FAIL: ride name longer than 24 characters';
+  end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  if (select emergency_contact_phone from profile_private where user_id = auth.uid()) <> '555-0100' then
+    raise exception 'FAIL: rider cannot read their own emergency contact';
+  end if;
+end $$;
+reset role;
+
+-- A long name from a social sign-in is cut to fit instead of breaking sign-up.
+insert into auth.users (id, raw_user_meta_data) values
+  ('00000000-0000-0000-0000-00000000000e', '{"full_name":"Bartholomew Maximilian Featherstonehaugh"}');
+do $$ begin
+  if (select display_name from profiles where id = '00000000-0000-0000-0000-00000000000e') <> 'Bartholomew Maximilian F' then
+    raise exception 'FAIL: long sign-in name not cut to 24 characters';
+  end if;
+end $$;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME TESTS PASSED' as result;

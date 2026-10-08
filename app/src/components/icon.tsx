@@ -13,6 +13,7 @@ const PATHS = {
   plus: ['M12 5v14', 'M5 12h14'],
   check: ['M5 12.5l4.5 4.5L19 7.5'],
   search: ['M15.5 15.5L20.5 20.5'],
+  person: ['M4.5 20.5c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6'],
   join: ['M10 7l5 5-5 5', 'M15 12H3.5', 'M14 4h4.5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H14'],
 } as const;
 
@@ -26,6 +27,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: 
         <Path key={d} d={d} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       ))}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'search' ? <Circle cx={10.5} cy={10.5} r={6.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'machine' ? (
         <>
