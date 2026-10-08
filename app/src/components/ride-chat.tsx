@@ -94,13 +94,13 @@ export function RideChat({
               borderTopColor: theme.backgroundSelected,
               paddingTop: Spacing.two,
               gap: 2,
-              ...(announcement ? { borderLeftWidth: 5, borderLeftColor: RideColors.yellow, paddingLeft: Spacing.two } : null),
-              ...(leaderOnly ? { borderLeftWidth: 5, borderLeftColor: RideColors.leader, paddingLeft: Spacing.two } : null),
+              ...(announcement ? { borderLeftWidth: 4, borderLeftColor: RideColors.yellow, paddingLeft: Spacing.two } : null),
+              ...(leaderOnly ? { borderLeftWidth: 4, borderLeftColor: RideColors.leader, paddingLeft: Spacing.two } : null),
             }}>
             <ThemedText type="small" themeColor="textSecondary">
-              {announcement ? 'Announcement · ' : ''}
+              {announcement ? 'Announcement from ' : ''}
               {mine ? 'You' : nameOf(m.user_id)}
-              {leaderOnly ? (mine ? ' → leader only' : ' → you only (leader)') : ''} · {clock(m.sent_at)}
+              {leaderOnly ? (mine ? ', to the leader only' : ', to you only as leader') : ''}, {clock(m.sent_at)}
             </ThemedText>
             <ThemedText style={[m.kind === 'status' && { fontStyle: 'italic' }, announcement && { fontWeight: 700 }]}>{m.body}</ThemedText>
           </View>
