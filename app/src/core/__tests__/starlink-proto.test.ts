@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  compassPoint, dishHeadline, formatSeconds, minuteBuckets, outageRuns,
   decodeHistory, decodeMessage, decodeStatus, encodeVarint, formatMbps, formatPercent, formatUptime, getFloats,
   grpcWebFrame, historyRequest, parseGrpcWeb, ringTail, statusRequest,
 } from '../starlink-proto';
@@ -156,11 +157,57 @@ describe('history', () => {
     expect(h.avgDownlinkBps).toBeCloseTo(15e6);
     expect(h.peakDownlinkBps).toBeCloseTo(30e6);
     expect(h.peakUplinkBps).toBeCloseTo(3e6);
+    expect(h.outages).toBe(1);
+    expect(h.outageSeconds).toBe(1);
+    expect(h.timeline).toHaveLength(1);
+    expect(h.timeline[0].outageSeconds).toBe(1);
     expect(getFloats(decodeMessage(new Uint8Array([...float(5, 1.5), ...float(5, 2.5)])), 5)).toEqual([1.5, 2.5]);
   });
 });
 
+describe('history timeline', () => {
+  it('finds outage runs', () => {
+    expect(outageRuns([0, 1, 1, 0, 0.5, 1, 1, 1])).toEqual([2, 3]);
+    expect(outageRuns([])).toEqual([]);
+  });
+
+  it('buckets seconds into minutes ending at the newest sample', () => {
+    // 150 seconds: a partial 30 s minute first, then two full minutes.
+    const drop = Array.from({ length: 150 }, (_, i) => (i >= 140 ? 1 : 0));
+    const down = Array.from({ length: 150 }, (_, i) => (i < 30 ? 10e6 : 20e6));
+    const lat = Array.from({ length: 150 }, () => 30);
+    const b = minuteBuckets(drop, lat, down, down);
+    expect(b).toHaveLength(3);
+    expect(b[0].avgDownlinkBps).toBeCloseTo(10e6);
+    expect(b[1].avgDownlinkBps).toBeCloseTo(20e6);
+    expect(b[2].outageSeconds).toBe(10);
+    expect(b[2].avgLatencyMs).toBeCloseTo(30);
+    expect(b[2].dropRate).toBeCloseTo(10 / 60);
+  });
+
+  it('aligns series of different lengths on their newest sample', () => {
+    const b = minuteBuckets([0, 0], [20, 40], [5e6], []);
+    expect(b).toHaveLength(1);
+    expect(b[0].avgDownlinkBps).toBeCloseTo(5e6);
+    expect(b[0].avgUplinkBps).toBeNull();
+  });
+});
+
 describe('display', () => {
+  it('names the compass direction and writes a headline', () => {
+    expect(compassPoint(-12.5)).toBe('N');
+    expect(compassPoint(135)).toBe('SE');
+    expect(compassPoint(350)).toBe('N');
+    expect(compassPoint(null)).toBeNull();
+    expect(formatSeconds(42)).toBe('42 s');
+    expect(formatSeconds(125)).toBe('2 min 5 s');
+    const s = decodeStatus(unhex(STATUS_FIXTURE_HEX));
+    expect(dishHeadline(s)).toBe('Online with 2 alerts.');
+    expect(dishHeadline({ ...s, alerts: [] })).toBe('Online and working well.');
+    expect(dishHeadline({ ...s, alerts: [], currentlyObstructed: true })).toMatch(/blocking the sky/);
+    expect(dishHeadline({ ...s, online: false, outageCause: 'Obstructed' })).toBe('Offline: obstructed.');
+  });
+
   it('formats speeds, uptime and percents', () => {
     expect(formatMbps(87_500_000)).toBe('88 Mbps');
     expect(formatMbps(2_340_000)).toBe('2.3 Mbps');

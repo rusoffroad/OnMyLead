@@ -341,6 +341,16 @@ export function decodeStatus(responseBytes: Uint8Array): DishStatus {
 
 // --- History -----------------------------------------------------------------
 
+/** One minute of the dish's recent history, oldest first in DishHistory.timeline. */
+export type HistoryMinute = {
+  avgDownlinkBps: number | null;
+  avgUplinkBps: number | null;
+  avgLatencyMs: number | null;
+  dropRate: number | null;
+  /** Seconds in this minute with every ping dropped (no connection). */
+  outageSeconds: number;
+};
+
 export type DishHistory = {
   minutes: number;
   samples: number;
@@ -350,6 +360,12 @@ export type DishHistory = {
   peakDownlinkBps: number | null;
   avgUplinkBps: number | null;
   peakUplinkBps: number | null;
+  /** Separate stretches with no connection (every ping dropped) and their total length. */
+  outages: number;
+  outageSeconds: number;
+  longestOutageS: number;
+  /** Per-minute buckets, oldest first; the newest may be partial. */
+  timeline: HistoryMinute[];
 };
 
 /** The newest `n` entries of a ring buffer whose total write count is `current`. */
@@ -377,6 +393,7 @@ export function decodeHistory(responseBytes: Uint8Array, seconds = 900): DishHis
   // Latency is meaningless for seconds where every ping dropped.
   const okLatency = latency.filter((v, i) => Number.isFinite(v) && v > 0 && (drop[i] ?? 0) < 1);
   const samples = Math.max(drop.length, latency.length, down.length, up.length);
+  const runs = outageRuns(drop);
   return {
     samples,
     minutes: Math.round(samples / 60),
@@ -386,7 +403,51 @@ export function decodeHistory(responseBytes: Uint8Array, seconds = 900): DishHis
     peakDownlinkBps: max(down),
     avgUplinkBps: mean(up),
     peakUplinkBps: max(up),
+    outages: runs.length,
+    outageSeconds: runs.reduce((a, b) => a + b, 0),
+    longestOutageS: max(runs) ?? 0,
+    timeline: minuteBuckets(drop, latency, down, up),
   };
+}
+
+/** Lengths in seconds of each run of fully dropped seconds. */
+export function outageRuns(drop: number[]): number[] {
+  const runs: number[] = [];
+  let run = 0;
+  for (const d of drop) {
+    if (d >= 1) run++;
+    else if (run) {
+      runs.push(run);
+      run = 0;
+    }
+  }
+  if (run) runs.push(run);
+  return runs;
+}
+
+/** Group per-second samples into minutes, aligned so the newest second ends the last bucket. */
+export function minuteBuckets(drop: number[], latency: number[], down: number[], up: number[]): HistoryMinute[] {
+  const n = Math.max(drop.length, latency.length, down.length, up.length);
+  const out: HistoryMinute[] = [];
+  // Series may differ in length; align them all on their newest sample.
+  const at = (xs: number[], i: number) => xs[xs.length - n + i];
+  for (let end = n; end > 0; end -= 60) {
+    const start = Math.max(0, end - 60);
+    const d: number[] = [], l: number[] = [], dn: number[] = [], u: number[] = [];
+    let outageSeconds = 0;
+    for (let i = start; i < end; i++) {
+      const di = at(drop, i), li = at(latency, i), dni = at(down, i), ui = at(up, i);
+      if (Number.isFinite(di)) {
+        d.push(di);
+        if (di >= 1) outageSeconds++;
+      }
+      if (Number.isFinite(li) && li > 0 && !(di >= 1)) l.push(li);
+      if (Number.isFinite(dni)) dn.push(dni);
+      if (Number.isFinite(ui)) u.push(ui);
+    }
+    out.unshift({ avgDownlinkBps: mean(dn), avgUplinkBps: mean(u), avgLatencyMs: mean(l), dropRate: mean(d), outageSeconds });
+  }
+  return out;
 }
 
 // --- Display -----------------------------------------------------------------
@@ -405,6 +466,31 @@ export function formatUptime(s: number | null): string {
   if (d) return `${d} d ${h} h`;
   if (h) return `${h} h ${m} min`;
   return `${m} min`;
+}
+
+const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+/** Which way the dish faces, e.g. -12.5 (degrees from north) -> "N". */
+export function compassPoint(deg: number | null): string | null {
+  if (deg == null || !Number.isFinite(deg)) return null;
+  const d = ((deg % 360) + 360) % 360;
+  return COMPASS[Math.round(d / 45) % 8];
+}
+
+export function formatSeconds(s: number): string {
+  if (s < 60) return `${Math.round(s)} s`;
+  const m = Math.floor(s / 60);
+  const r = Math.round(s % 60);
+  return r ? `${m} min ${r} s` : `${m} min`;
+}
+
+/** One plain sentence on how the dish is doing right now, for the top of the card. */
+export function dishHeadline(s: DishStatus): string {
+  if (!s.online) return s.outageCause ? `Offline: ${s.outageCause.toLowerCase()}.` : 'Offline: searching for satellites.';
+  if (s.currentlyObstructed) return 'Online, but something is blocking the sky right now.';
+  if (s.alerts.length) return `Online with ${s.alerts.length === 1 ? 'an alert' : `${s.alerts.length} alerts`}.`;
+  if ((s.dropRate ?? 0) >= 0.05 || (s.obstructionFraction ?? 0) >= 0.05) return 'Online, but the connection is patchy.';
+  return 'Online and working well.';
 }
 
 export const formatPercent = (f: number | null, digits = 1) =>

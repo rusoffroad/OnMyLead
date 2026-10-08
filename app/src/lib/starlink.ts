@@ -14,7 +14,7 @@ import {
 } from '@/core/starlink-proto';
 
 export type { DishHistory, DishStatus } from '@/core/starlink-proto';
-export { formatMbps, formatPercent, formatUptime } from '@/core/starlink-proto';
+export { compassPoint, dishHeadline, formatMbps, formatPercent, formatSeconds, formatUptime } from '@/core/starlink-proto';
 
 export const DISH_HOST = '192.168.100.1';
 const ENDPOINT = `http://${DISH_HOST}:9201/SpaceX.API.Device.Device/Handle`;
@@ -72,21 +72,30 @@ async function call(frame: Uint8Array, timeoutMs: number): Promise<Uint8Array> {
 
 export type DishReading = { status: DishStatus; history: DishHistory | null; readAt: number };
 
-/** Ask the dish for its status, then (best effort) its recent history. */
-export async function readDish(timeoutMs = 5000): Promise<DishReading> {
+/** Ask the dish for its current status. */
+export async function readStatus(timeoutMs = 5000): Promise<DishStatus> {
   if (!dishReadSupported) throw new DishError('web', 'Reading the dish only works in the phone app.');
-  const statusBytes = await call(statusRequest(), timeoutMs);
-  let status: DishStatus;
+  const bytes = await call(statusRequest(), timeoutMs);
   try {
-    status = decodeStatus(statusBytes);
+    return decodeStatus(bytes);
   } catch (e) {
     throw new DishError('unreadable', e instanceof Error ? e.message : 'Could not read the status.');
   }
-  let history: DishHistory | null = null;
+}
+
+/** The dish's last 15 minutes, or null if it won't share them (some firmware or routers refuse). */
+export async function readHistory(timeoutMs = 8000): Promise<DishHistory | null> {
+  if (!dishReadSupported) return null;
   try {
-    history = decodeHistory(await call(historyRequest(), timeoutMs));
+    return decodeHistory(await call(historyRequest(), timeoutMs));
   } catch {
-    // History is a bonus; some firmware or routers refuse it.
+    return null;
   }
+}
+
+/** Ask the dish for its status, then (best effort) its recent history. */
+export async function readDish(timeoutMs = 5000): Promise<DishReading> {
+  const status = await readStatus(timeoutMs);
+  const history = await readHistory(timeoutMs);
   return { status, history, readAt: Date.now() };
 }
