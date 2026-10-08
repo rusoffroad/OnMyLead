@@ -20,6 +20,8 @@ export type Ride = {
   meet_area_lat: number;
   meet_area_lng: number;
   meet_area_label: string | null;
+  /** Two-letter US state; null on rides saved before the discovery migration. */
+  meet_state?: string | null;
   destination_label: string | null;
   vehicle_types: string[];
   difficulty: string | null;

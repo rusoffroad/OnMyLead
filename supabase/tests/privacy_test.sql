@@ -710,4 +710,69 @@ do $$ begin
 end $$;
 reset role;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY TESTS PASSED' as result;
+-- ---------------------------------------------------------------------------
+-- Discovery by state, and private ride previews by invite code
+-- ---------------------------------------------------------------------------
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, invite_code, name, meet_at, meet_area_lat, meet_area_lng, meet_state, visibility)
+values ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', auth.uid(), 'PRIV1234', 'Friends only', now() + interval '2 days', 39.07, -108.55, 'CO', 'private');
+insert into ride_private_details (ride_id, meet_lat, meet_lng, meet_label)
+values ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 39.0712, -108.5501, 'My driveway');
+do $$ begin
+  begin
+    update rides set meet_state = 'Colorado' where id = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee';
+    raise exception 'FAIL: meet_state accepted a full state name';
+  exception when check_violation then null;
+  end;
+end $$;
+reset role;
+
+-- A stranger cannot list or search private rides, but the invite code opens the preview.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if exists (select 1 from rides where id = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee') then
+    raise exception 'FAIL: stranger can list a private ride';
+  end if;
+  if exists (select 1 from rides where meet_state = 'CO') then
+    raise exception 'FAIL: private ride shows up in state discovery';
+  end if;
+  if (select count(*) from ride_preview(' priv1234 ')) <> 1 then
+    raise exception 'FAIL: invite code does not open the private ride preview';
+  end if;
+  if (select count(*) from ride_preview('NOPE0000')) <> 0 then
+    raise exception 'FAIL: wrong code returned a ride';
+  end if;
+  if exists (select 1 from ride_private_details where ride_id = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee') then
+    raise exception 'FAIL: stranger saw the private ride''s exact meeting point';
+  end if;
+  begin
+    perform join_ride(p_ride => 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee');
+    raise exception 'FAIL: joined a private ride without the code';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  if join_ride(p_invite_code => 'priv1234') <> 'joined' then
+    raise exception 'FAIL: invite code did not join the private ride';
+  end if;
+  if not exists (select 1 from ride_private_details where ride_id = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee') then
+    raise exception 'FAIL: joined rider cannot see the meeting point';
+  end if;
+end $$;
+reset role;
+
+-- Signed out: the code shows the preview, nothing else.
+select as_user(null);
+set role anon;
+do $$ begin
+  if exists (select 1 from rides where id = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee') then
+    raise exception 'FAIL: signed-out visitor can list a private ride';
+  end if;
+  if (select name from ride_preview('PRIV1234')) <> 'Friends only' then
+    raise exception 'FAIL: signed-out preview by code failed';
+  end if;
+end $$;
+reset role;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY TESTS PASSED' as result;

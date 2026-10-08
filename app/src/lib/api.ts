@@ -1,4 +1,5 @@
-import { fuzzLocation } from '@/core/geo';
+import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
+import { fuzzLocation, type LatLng } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
 import type { ChatMessage, MessageKind } from '@/core/chat';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
@@ -32,6 +33,8 @@ export type NewRide = {
   meetLat: number;
   meetLng: number;
   meetLabel?: string;
+  /** Two-letter US state of the meeting area, for "rides in my state". */
+  meetState?: string | null;
   destinationLabel?: string;
   instructions?: string;
   vehicleTypes: string[];
@@ -51,36 +54,38 @@ export type NewRide = {
 export async function createRide(r: NewRide): Promise<Ride> {
   const organizer_id = await currentUserId();
   const area = fuzzLocation({ lat: r.meetLat, lng: r.meetLng });
-  const ride = unwrap<Ride>(
-    await supabase
-      .from('rides')
-      .insert({
-        organizer_id,
-        name: r.name,
-        description: r.description || null,
-        meet_at: r.meetAt.toISOString(),
-        depart_at: r.departAt?.toISOString() ?? null,
-        expected_finish_at: r.expectedFinishAt?.toISOString() ?? null,
-        meet_area_lat: area.lat,
-        meet_area_lng: area.lng,
-        meet_area_label: r.meetLabel ? r.meetLabel.split(',').slice(-2).join(',').trim() : null,
-        destination_label: r.destinationLabel || null,
-        vehicle_types: r.vehicleTypes,
-        difficulty: r.difficulty ?? null,
-        experience_level: r.experienceLevel ?? null,
-        max_riders: r.maxRiders ?? null,
-        max_vehicles: r.maxVehicles ?? null,
-        what_to_bring: r.whatToBring || null,
-        required_equipment: r.requiredEquipment || null,
-        fuel_notes: r.fuelNotes || null,
-        route_miles: r.routeMiles ?? null,
-        visibility: r.visibility,
-        join_policy: r.joinPolicy,
-        bubble_preset: r.bubblePreset,
-      })
-      .select()
-      .single(),
-  );
+  const row = {
+    organizer_id,
+    name: r.name,
+    description: r.description || null,
+    meet_at: r.meetAt.toISOString(),
+    depart_at: r.departAt?.toISOString() ?? null,
+    expected_finish_at: r.expectedFinishAt?.toISOString() ?? null,
+    meet_area_lat: area.lat,
+    meet_area_lng: area.lng,
+    meet_area_label: r.meetLabel ? r.meetLabel.split(',').slice(-2).join(',').trim() : null,
+    destination_label: r.destinationLabel || null,
+    vehicle_types: r.vehicleTypes,
+    difficulty: r.difficulty ?? null,
+    experience_level: r.experienceLevel ?? null,
+    max_riders: r.maxRiders ?? null,
+    max_vehicles: r.maxVehicles ?? null,
+    what_to_bring: r.whatToBring || null,
+    required_equipment: r.requiredEquipment || null,
+    fuel_notes: r.fuelNotes || null,
+    route_miles: r.routeMiles ?? null,
+    visibility: r.visibility,
+    join_policy: r.joinPolicy,
+    bubble_preset: r.bubblePreset,
+    meet_state: r.meetState ?? null,
+  };
+  let res = await supabase.from('rides').insert(row).select().single();
+  if (res.error && /meet_state/.test(res.error.message)) {
+    // The state column arrives with the 20261011 migration; save the ride without it until then.
+    const { meet_state: _skip, ...withoutState } = row;
+    res = await supabase.from('rides').insert(withoutState).select().single();
+  }
+  const ride = unwrap<Ride>(res);
   unwrap(
     await supabase.from('ride_private_details').insert({
       ride_id: ride.id,
@@ -97,8 +102,13 @@ export async function createRide(r: NewRide): Promise<Ride> {
 export async function getRide(idOrCode: string): Promise<Ride | null> {
   const isUuid = /^[0-9a-f-]{36}$/i.test(idOrCode);
   const q = supabase.from('rides').select('*');
-  const res = isUuid ? await q.eq('id', idOrCode).maybeSingle() : await q.eq('invite_code', idOrCode.toUpperCase()).maybeSingle();
-  return unwrap<Ride | null>(res);
+  const res = isUuid ? await q.eq('id', idOrCode).maybeSingle() : await q.eq('invite_code', idOrCode.trim().toUpperCase()).maybeSingle();
+  const ride = unwrap<Ride | null>(res);
+  if (ride || isUuid) return ride;
+  // Private rides are hidden from everyone but their riders; the invite code opens a preview.
+  const preview = await supabase.rpc('ride_preview', { p_code: idOrCode });
+  if (preview.error) return null; // preview function not deployed yet
+  return ((preview.data as Ride[] | null) ?? [])[0] ?? null;
 }
 
 /** Only returns data for joined riders; everyone else gets null (enforced by the database). */
@@ -127,17 +137,34 @@ export async function myRides(): Promise<(RideMember & { rides: Ride })[]> {
   );
 }
 
-export async function discoverPublicRides(): Promise<Ride[]> {
-  return unwrap(
-    await supabase
-      .from('rides')
-      .select('*')
-      .eq('visibility', 'public')
-      .in('status', ['scheduled', 'live'])
-      .gte('meet_at', new Date(Date.now() - 6 * 3600_000).toISOString())
-      .order('meet_at')
-      .limit(100),
-  );
+/** Upcoming and live public rides, optionally only those whose meeting area is inside a box. */
+export async function discoverPublicRides(bounds?: Bounds, limit = 100): Promise<Ride[]> {
+  let q = supabase
+    .from('rides')
+    .select('*')
+    .eq('visibility', 'public')
+    .in('status', ['scheduled', 'live'])
+    .gte('meet_at', new Date(Date.now() - 6 * 3600_000).toISOString());
+  if (bounds) {
+    q = q
+      .gte('meet_area_lat', bounds.minLat)
+      .lte('meet_area_lat', bounds.maxLat)
+      .gte('meet_area_lng', bounds.minLng)
+      .lte('meet_area_lng', bounds.maxLng);
+  }
+  return unwrap(await q.order('meet_at').limit(limit));
+}
+
+/** Public rides within `miles` of a point, nearest first. */
+export async function publicRidesNear(center: LatLng, miles: number) {
+  return withinRadius(await discoverPublicRides(boundsAround(center, miles), 300), center, miles);
+}
+
+/** Public rides in a US state, soonest first. */
+export async function publicRidesInState(code: string): Promise<Ride[]> {
+  const state = stateByCode(code);
+  if (!state) return [];
+  return inState(await discoverPublicRides(state, 300), state.code);
 }
 
 export async function joinRide(opts: { rideId?: string; inviteCode?: string; vehicleId?: string | null; riders?: number }): Promise<MemberStatus> {

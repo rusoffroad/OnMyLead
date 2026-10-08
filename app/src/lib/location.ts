@@ -11,6 +11,7 @@ import * as TaskManager from 'expo-task-manager';
 import { Platform } from 'react-native';
 
 import { MOVING_SPEED_MPS } from '@/core/bubble';
+import { guessState, normalizeState } from '@/core/discovery';
 import { supabase } from './supabase';
 
 export const LOCATION_TASK = 'ride-location-updates';
@@ -148,7 +149,25 @@ function stopWebWatch() {
   webSub = null;
 }
 
-export async function currentPosition() {
-  const l = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+/** One fix, asking for while-using permission first (never background) if it was not granted yet. */
+export async function currentPosition(accuracy = Location.Accuracy.High) {
+  const fg = await Location.requestForegroundPermissionsAsync();
+  if (fg.status !== 'granted') throw new Error('Allow location access in Settings to use your current location.');
+  const l = await Location.getCurrentPositionAsync({ accuracy });
   return { lat: l.coords.latitude, lng: l.coords.longitude };
+}
+
+/** Two-letter US state for a point: the phone's reverse geocoder when it has one, else a box guess. */
+export async function stateAt(p: { lat: number; lng: number }): Promise<string | null> {
+  if (Platform.OS !== 'web') {
+    try {
+      const [place] = await Location.reverseGeocodeAsync({ latitude: p.lat, longitude: p.lng });
+      if (place && place.isoCountryCode && place.isoCountryCode !== 'US') return null;
+      const code = normalizeState(place?.region);
+      if (code) return code;
+    } catch {
+      // offline or no geocoder: fall through to the guess
+    }
+  }
+  return guessState(p);
 }

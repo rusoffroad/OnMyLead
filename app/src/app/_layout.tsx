@@ -14,6 +14,7 @@ export default function RootLayout() {
         <Stack.Screen name="reset-password" options={{ title: 'New password' }} />
         <Stack.Screen name="ride/new" options={{ title: 'Create a ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: 'Ride' }} />
+        <Stack.Screen name="find" options={{ title: 'Find a ride' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
         <Stack.Screen name="garage/index" options={{ title: 'Garage' }} />
         <Stack.Screen name="garage/new" options={{ title: 'Add to garage' }} />
