@@ -4,6 +4,7 @@ import type { BubblePreset } from '@/core/bubble';
 import type { ChatMessage, MessageAudience, MessageKind } from '@/core/chat';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
+import { cleanRideName } from '@/core/profile';
 import { startShare, type ShareScope } from '@/core/sharing';
 import { itemsFromRideNotes, localDate, templateById, type TemplateItem, type TripCategory } from '@/core/trips';
 import { track } from './analytics';
@@ -650,4 +651,20 @@ export async function saveStarlinkSetup(vehicleId: string | null, input: Starlin
     : unwrap<StarlinkSetup>(await supabase.from('starlink_setups').insert({ ...input, owner_id, vehicle_id: vehicleId }).select().single());
   if (!existing) track('starlink_setup_saved', { dish_model: input.dish_model, per_vehicle: !!vehicleId });
   return row;
+}
+
+/** The signed-in rider's own ride name ('' until they pick one). */
+export async function myRideName(): Promise<string> {
+  const id = await currentUserId();
+  const row = unwrap(await supabase.from('profiles').select('display_name').eq('id', id).maybeSingle());
+  return (row as { display_name: string } | null)?.display_name ?? '';
+}
+
+/** Saves the name other riders see on the map, the rider list and in chat. */
+export async function saveRideName(name: string): Promise<string> {
+  const id = await currentUserId();
+  const clean = cleanRideName(name);
+  unwrap(await supabase.from('profiles').update({ display_name: clean }).eq('id', id));
+  track('ride_name_saved');
+  return clean;
 }

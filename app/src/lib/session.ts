@@ -98,8 +98,6 @@ export async function updatePassword(password: string) {
   if (error) throw error;
 }
 
-export async function setDisplayName(name: string) {
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return;
-  await supabase.from('profiles').update({ display_name: name }).eq('id', data.user.id);
+export async function signOut() {
+  await supabase.auth.signOut();
 }
