@@ -775,4 +775,122 @@ do $$ begin
 end $$;
 reset role;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY TESTS PASSED' as result;
+-- 19. Leader-only chat messages: only the sender and the leader can read them.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('12121212-1212-1212-1212-121212121212', auth.uid(), 'Leader ride', now() + interval '1 day', 38.5, -109.5, 'public');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select join_ride('12121212-1212-1212-1212-121212121212');
+select register_push_token('ben-token-0000000000000000', 'ios');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select join_ride('12121212-1212-1212-1212-121212121212');
+select register_push_token('cara-token-000000000000000', 'ios');
+-- No Leader assigned yet, so the organizer (Olivia) leads.
+insert into ride_messages (id, ride_id, user_id, audience, body)
+values ('e0000000-0000-0000-0000-000000000001', '12121212-1212-1212-1212-121212121212', auth.uid(), 'leader', 'Low on fuel, can we stop?');
+insert into ride_messages (id, ride_id, user_id, body)
+values ('e0000000-0000-0000-0000-000000000002', '12121212-1212-1212-1212-121212121212', auth.uid(), 'Hi all');
+do $$ begin
+  if (select count(*) from ride_messages where ride_id = '12121212-1212-1212-1212-121212121212') <> 2 then
+    raise exception 'FAIL: sender cannot read their own leader-only message';
+  end if;
+  begin
+    perform * from ride_message_recipients('e0000000-0000-0000-0000-000000000001');
+    raise exception 'FAIL: a rider called ride_message_recipients';
+  exception when raise_exception or insufficient_privilege then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select register_push_token('olivia-token-0000000000000', 'ios');
+do $$ begin
+  if not exists (select 1 from ride_messages where id = 'e0000000-0000-0000-0000-000000000001') then
+    raise exception 'FAIL: organizer (leading, no Leader assigned) cannot read a leader-only message';
+  end if;
+  begin
+    insert into ride_messages (ride_id, user_id, kind, audience, body)
+    values ('12121212-1212-1212-1212-121212121212', auth.uid(), 'announcement', 'leader', 'Secret announcement');
+    raise exception 'FAIL: leader-only announcement accepted';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  if exists (select 1 from ride_messages where id = 'e0000000-0000-0000-0000-000000000001') then
+    raise exception 'FAIL: another rider read a leader-only message';
+  end if;
+  if not exists (select 1 from ride_messages where id = 'e0000000-0000-0000-0000-000000000002') then
+    raise exception 'FAIL: rider cannot read a message to everyone';
+  end if;
+  if (select count(*) from push_tokens) <> 1 then raise exception 'FAIL: rider sees push tokens that are not theirs'; end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from ride_messages where ride_id = '12121212-1212-1212-1212-121212121212') <> 0 then
+    raise exception 'FAIL: non-member read the leader ride chat';
+  end if;
+  if (select count(*) from push_tokens) <> 0 then raise exception 'FAIL: stranger read push tokens'; end if;
+end $$;
+reset role;
+
+-- Notification recipients (server side): the leader only for leader-only, everyone else otherwise.
+do $$ begin
+  if (select array_agg(token order by token) from ride_message_recipients('e0000000-0000-0000-0000-000000000001'))
+     <> array['olivia-token-0000000000000'] then
+    raise exception 'FAIL: leader-only notification not limited to the leader';
+  end if;
+  if (select array_agg(token order by token) from ride_message_recipients('e0000000-0000-0000-0000-000000000002'))
+     <> array['ben-token-0000000000000000', 'olivia-token-0000000000000'] then
+    raise exception 'FAIL: message to everyone not notified to everyone but the sender';
+  end if;
+end $$;
+
+-- Olivia makes Ben the Leader: now Ben reads the leader-only message and Olivia doesn't.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+update ride_members set role = 'leader'
+where ride_id = '12121212-1212-1212-1212-121212121212' and user_id = '00000000-0000-0000-0000-00000000000b';
+do $$ begin
+  if exists (select 1 from ride_messages where id = 'e0000000-0000-0000-0000-000000000001') then
+    raise exception 'FAIL: organizer still reads leader-only messages after assigning a Leader';
+  end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  if not exists (select 1 from ride_messages where id = 'e0000000-0000-0000-0000-000000000001') then
+    raise exception 'FAIL: assigned Leader cannot read a leader-only message';
+  end if;
+end $$;
+reset role;
+do $$ begin
+  if (select array_agg(token) from ride_message_recipients('e0000000-0000-0000-0000-000000000001'))
+     <> array['ben-token-0000000000000000'] then
+    raise exception 'FAIL: leader-only notification did not follow the new Leader';
+  end if;
+end $$;
+
+-- A phone that signs in as someone else moves its token to them.
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+select register_push_token('ben-token-0000000000000000', 'ios');
+reset role;
+do $$ begin
+  if (select user_id from push_tokens where token = 'ben-token-0000000000000000') <> '00000000-0000-0000-0000-00000000000d' then
+    raise exception 'FAIL: device token did not move to the newly signed-in rider';
+  end if;
+end $$;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT TESTS PASSED' as result;

@@ -1,6 +1,8 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
+import { MessageAlerts } from '@/components/message-alerts';
+
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 
@@ -29,6 +31,7 @@ export default function RootLayout() {
         <Stack.Screen name="f/[token]" options={{ title: 'Shared location' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
       </Stack>
+      <MessageAlerts />
     </ThemeProvider>
   );
 }

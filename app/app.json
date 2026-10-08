@@ -57,7 +57,14 @@
         }
       ],
       "./plugins/with-starlink-local-network",
-      "./plugins/with-scene-lifecycle"
+      "./plugins/with-scene-lifecycle",
+      [
+        "./plugins/with-push-entitlement",
+        {
+          "enabled": false
+        }
+      ],
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,

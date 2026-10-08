@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { friendlyChatError, mergeMessages, type ChatMessage, type MessageKind } from '@/core/chat';
+import { friendlyChatError, mergeMessages, type ChatMessage, type MessageAudience, type MessageKind } from '@/core/chat';
 import { rideMessages, sendRideMessage } from '@/lib/api';
 import { newChannel, supabase } from '@/lib/supabase';
 
@@ -42,11 +42,11 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
   }, [rideId, enabled, reload]);
 
   const send = useCallback(
-    async (body: string, kind: MessageKind = 'chat') => {
+    async (body: string, kind: MessageKind = 'chat', audience: MessageAudience = 'everyone') => {
       if (!rideId) return false;
       setError(null);
       try {
-        const row = await sendRideMessage(rideId, body, kind);
+        const row = await sendRideMessage(rideId, body, kind, new Date(), audience);
         setMessages((prev) => mergeMessages(prev, [row]));
         return true;
       } catch (e) {

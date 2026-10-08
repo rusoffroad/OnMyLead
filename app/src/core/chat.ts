@@ -8,12 +8,19 @@
 
 export type MessageKind = 'chat' | 'announcement' | 'status';
 
+/**
+ * Who a message is for. 'leader' messages are readable only by the sender and the ride's
+ * leader (enforced by the database). Rows from before the leader-only update have no audience.
+ */
+export type MessageAudience = 'everyone' | 'leader';
+
 export type ChatMessage = {
   id: string;
   ride_id: string;
   user_id: string;
   kind: MessageKind;
   body: string;
+  audience?: MessageAudience;
   sent_at: string;
   created_at: string;
 };
@@ -68,10 +75,38 @@ export function spokenAnnouncement(senderName: string | null | undefined, body: 
   return `Announcement from ${who}. ${body}`;
 }
 
+/**
+ * The ride's leader, the same rule the database uses: every joined rider with the Leader
+ * role, or the organizer when nobody has been given it.
+ */
+export function rideLeaderIds(
+  members: { user_id: string; status: string; role: string }[],
+  organizerId: string | null | undefined,
+): string[] {
+  const leaders = members.filter((m) => m.status === 'joined' && m.role === 'leader').map((m) => m.user_id);
+  if (leaders.length) return leaders;
+  return organizerId ? [organizerId] : [];
+}
+
+export const isLeaderOnly = (m: Pick<ChatMessage, 'audience'>) => m.audience === 'leader';
+
+/** Should a new message pop up for this rider? Everything except their own messages. */
+export function shouldAlert(m: Pick<ChatMessage, 'user_id'>, me: string | null | undefined): boolean {
+  return !!me && m.user_id !== me;
+}
+
+/** Headline for the pop-up and the push notification. */
+export function alertTitle(m: Pick<ChatMessage, 'kind' | 'audience'>, senderName: string | null | undefined, rideName?: string | null): string {
+  const who = senderName?.trim() || 'A rider';
+  const what = m.kind === 'announcement' ? `Announcement from ${who}` : isLeaderOnly(m) ? `${who} (to you, the leader)` : who;
+  return rideName?.trim() ? `${what} · ${rideName.trim()}` : what;
+}
+
 /** Turn a database error into something a rider can act on. */
 export function friendlyChatError(message: string): string {
   if (/slow down/i.test(message)) return 'You’re sending a lot. Wait a minute and try again.';
   if (/row-level security|violates row-level/i.test(message)) return 'Only riders on this ride can chat here.';
+  if (/audience/i.test(message)) return 'Leader-only messages aren’t switched on yet. Send it to everyone for now.';
   if (/too long/i.test(message)) return `Keep it under ${MAX_MESSAGE_LENGTH} characters.`;
   return message;
 }

@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
-import { checkMessage, MAX_MESSAGE_LENGTH, type ChatMessage, type MessageKind } from '@/core/chat';
+import { checkMessage, isLeaderOnly, MAX_MESSAGE_LENGTH, type ChatMessage, type MessageAudience, type MessageKind } from '@/core/chat';
 import { useTheme } from '@/hooks/use-theme';
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
@@ -26,23 +26,28 @@ export function PinnedAnnouncement({ message, senderName }: { message: ChatMessa
   );
 }
 
+type SendTo = 'everyone' | 'leader' | 'announcement';
+
 /**
- * Ride chat for joined riders. Organizers and co-organizers can post an announcement instead,
- * which gets pinned and read aloud in Ride Mode.
+ * Ride chat for joined riders. Each message goes to everyone or only to the ride's leader.
+ * Organizers and co-organizers can post an announcement instead, which gets pinned and read
+ * aloud in Ride Mode.
  */
 export function RideChat({
-  messages, nameOf, me, canAnnounce, error, onSend,
+  messages, nameOf, me, canAnnounce, leaderName, error, onSend,
 }: {
   messages: ChatMessage[];
   nameOf: (userId: string) => string;
   me: string | undefined;
   canAnnounce: boolean;
+  /** The leader's name, or null when this rider is the leader (nobody to message privately). */
+  leaderName: string | null;
   error: string | null;
-  onSend: (body: string, kind: MessageKind) => Promise<boolean>;
+  onSend: (body: string, kind: MessageKind, audience: MessageAudience) => Promise<boolean>;
 }) {
   const theme = useTheme();
   const [draft, setDraft] = useState('');
-  const [kind, setKind] = useState<'chat' | 'announcement'>('chat');
+  const [sendTo, setSendTo] = useState<SendTo>('everyone');
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
@@ -54,13 +59,18 @@ export function RideChat({
     if (!check.ok) return setLocalError(check.error);
     setLocalError(null);
     setBusy(true);
-    const ok = await onSend(check.body, kind);
+    const ok = await onSend(check.body, sendTo === 'announcement' ? 'announcement' : 'chat', sendTo === 'leader' ? 'leader' : 'everyone');
     setBusy(false);
     if (ok) {
       setDraft('');
-      setKind('chat');
+      setSendTo('everyone');
     }
   }
+
+  const options: { value: SendTo; label: string }[] = [{ value: 'everyone', label: 'Everyone' }];
+  if (leaderName) options.push({ value: 'leader', label: `Leader only (${leaderName})` });
+  if (canAnnounce) options.push({ value: 'announcement', label: 'Announcement (pinned, read aloud)' });
+  const announcing = sendTo === 'announcement';
 
   return (
     <Card>
@@ -75,6 +85,7 @@ export function RideChat({
       {visible.map((m) => {
         const mine = m.user_id === me;
         const announcement = m.kind === 'announcement';
+        const leaderOnly = isLeaderOnly(m);
         return (
           <View
             key={m.id}
@@ -84,32 +95,32 @@ export function RideChat({
               paddingTop: Spacing.two,
               gap: 2,
               ...(announcement ? { borderLeftWidth: 5, borderLeftColor: RideColors.yellow, paddingLeft: Spacing.two } : null),
+              ...(leaderOnly ? { borderLeftWidth: 5, borderLeftColor: RideColors.leader, paddingLeft: Spacing.two } : null),
             }}>
             <ThemedText type="small" themeColor="textSecondary">
               {announcement ? 'Announcement · ' : ''}
-              {mine ? 'You' : nameOf(m.user_id)} · {clock(m.sent_at)}
+              {mine ? 'You' : nameOf(m.user_id)}
+              {leaderOnly ? (mine ? ' → leader only' : ' → you only (leader)') : ''} · {clock(m.sent_at)}
             </ThemedText>
             <ThemedText style={[m.kind === 'status' && { fontStyle: 'italic' }, announcement && { fontWeight: '700' }]}>{m.body}</ThemedText>
           </View>
         );
       })}
-      {canAnnounce ? (
-        <Choice
-          options={[{ value: 'chat', label: 'Chat' }, { value: 'announcement', label: 'Announcement (pinned, read aloud)' }]}
-          value={kind}
-          onChange={setKind}
-        />
-      ) : null}
+      {options.length > 1 ? <Choice label="Send to" options={options} value={sendTo} onChange={setSendTo} /> : null}
       <Field
-        label={kind === 'announcement' ? 'Announcement' : 'Message'}
+        label={announcing ? 'Announcement' : sendTo === 'leader' ? 'Message to the leader' : 'Message'}
         value={draft}
         onChangeText={setDraft}
-        placeholder={kind === 'announcement' ? 'Fuel stop in Green River at 11' : 'Message the group'}
+        placeholder={announcing ? 'Fuel stop in Green River at 11' : sendTo === 'leader' ? 'Only you and the leader see this' : 'Message the group'}
         maxLength={MAX_MESSAGE_LENGTH}
         multiline
       />
       <ErrorText error={localError ?? error} />
-      <Button title={kind === 'announcement' ? 'Post announcement' : 'Send'} loading={busy} onPress={send} />
+      <Button
+        title={announcing ? 'Post announcement' : sendTo === 'leader' ? 'Send to leader' : 'Send to everyone'}
+        loading={busy}
+        onPress={send}
+      />
     </Card>
   );
 }
