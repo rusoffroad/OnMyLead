@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, type Ref, useState } from 'react';
 import {
   ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
   type PressableProps, type StyleProp, type TextInputProps, type ViewStyle,
@@ -9,13 +9,13 @@ import { font, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { ThemedText } from './themed-text';
 
-export function Screen({ children, scroll = true, top }: { children: ReactNode; scroll?: boolean; top?: boolean }) {
+export function Screen({ children, scroll = true, top, scrollRef }: { children: ReactNode; scroll?: boolean; top?: boolean; scrollRef?: Ref<ScrollView> }) {
   const theme = useTheme();
   const inner = <View style={styles.content}>{children}</View>;
   return (
     <SafeAreaView edges={top ? ['top', 'bottom'] : ['bottom']} style={{ flex: 1, backgroundColor: theme.background }}>
       {scroll ? (
-        <ScrollView keyboardShouldPersistTaps="handled" indicatorStyle="white" contentContainerStyle={{ paddingBottom: Spacing.five }}>
+        <ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" indicatorStyle="white" contentContainerStyle={{ paddingBottom: Spacing.five }}>
           {inner}
         </ScrollView>
       ) : (

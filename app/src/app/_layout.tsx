@@ -18,6 +18,11 @@ import { Colors, font, NavigationColors } from '@/constants/theme';
 import '@/lib/location';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+SplashScreen.setOptions({ duration: 400, fade: true });
+
+// The logo stays up for a moment on every cold start, even when the app is ready sooner.
+const SPLASH_MIN_MS = 1800;
+const launchedAt = Date.now();
 
 const theme: Theme = { ...DarkTheme, dark: true, colors: { ...DarkTheme.colors, ...NavigationColors } };
 
@@ -29,7 +34,9 @@ export default function RootLayout() {
   const ready = loaded || !!error;
 
   useEffect(() => {
-    if (ready) SplashScreen.hideAsync().catch(() => {});
+    if (!ready) return;
+    const t = setTimeout(() => SplashScreen.hideAsync().catch(() => {}), Math.max(0, SPLASH_MIN_MS - (Date.now() - launchedAt)));
+    return () => clearTimeout(t);
   }, [ready]);
 
   if (!ready) return null;
