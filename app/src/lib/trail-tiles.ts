@@ -1,19 +1,20 @@
 import { Directory, File, Paths } from 'expo-file-system';
 
 import type { LatLng } from '@/core/geo';
+import { USGS_IMAGERY, type OfflineLayer } from '@/core/offline-maps';
 import {
-  fillTemplate, identifyUrl, nearestTrail, offlineTilePlan, TRAIL_SOURCE_IDS, TRAIL_SOURCES, trailTileTemplate,
-  USGS_TOPO, type GeoJsonLine, type TrailInfo, type TrailSourceId,
+  identifyUrl, nearestTrail, TRAIL_SOURCE_IDS, TRAIL_SOURCES, trailTileTemplate, USGS_TOPO, type GeoJsonLine,
+  type TrailInfo, type TrailSourceId,
 } from '@/core/trails';
 
 /**
  * Trail tiles live in the documents folder (iOS never clears it), one folder per layer, laid out
  * as {z}/{x}/{y}: the layout react-native-maps reads through tileCachePath. Tiles a rider has
- * looked at are kept automatically; saveRideTiles fills in a ride's whole area ahead of time.
+ * looked at are kept automatically; downloads (lib/offline-maps) fill in whole areas ahead of time.
  */
 const ROOT = new Directory(Paths.document, 'map-tiles');
 
-export type TileLayerId = TrailSourceId | 'topo';
+export type TileLayerId = OfflineLayer;
 
 export function tileCachePath(layer: TileLayerId): string {
   return new Directory(ROOT, layer).uri.replace(/\/+$/, '');
@@ -22,52 +23,15 @@ export function tileCachePath(layer: TileLayerId): string {
 /** Saved tiles refresh in the background after 30 days; a stale tile still shows while it does. */
 export const TILE_MAX_AGE_S = 30 * 24 * 3600;
 
-function templateFor(layer: TileLayerId): string {
+/** The URL each layer's squares come from ({z}/{x}/{y}, or a box for the trail layers). */
+export function templateFor(layer: TileLayerId): string {
+  if (layer === 'imagery') return USGS_IMAGERY;
   return layer === 'topo' ? USGS_TOPO : trailTileTemplate(TRAIL_SOURCES[layer]);
 }
 
-export type SaveProgress = { done: number; total: number; failed: number };
-
-/**
- * Download every tile a ride needs for the given layers. Tiles already on the phone are skipped,
- * so running it again only fetches what is missing. Four downloads at a time keeps the agency
- * servers happy and still finishes a typical ride in a minute or two on LTE.
- */
-export async function saveRideTiles(
-  route: LatLng[],
-  layers: TileLayerId[],
-  onProgress?: (p: SaveProgress) => void,
-  signal?: { cancelled: boolean },
-): Promise<SaveProgress> {
-  const plan = offlineTilePlan(route);
-  const jobs = layers.flatMap((layer) => plan.map((t) => ({ layer, t })));
-  const progress: SaveProgress = { done: 0, total: jobs.length, failed: 0 };
-  onProgress?.({ ...progress });
-
-  let next = 0;
-  const worker = async () => {
-    while (next < jobs.length && !signal?.cancelled) {
-      const { layer, t } = jobs[next++];
-      try {
-        const dir = new Directory(ROOT, layer, String(t.z), String(t.x));
-        const file = new File(dir, String(t.y));
-        if (!file.exists) {
-          if (!dir.exists) dir.create({ intermediates: true, idempotent: true });
-          const res = await fetch(fillTemplate(templateFor(layer), t));
-          const type = res.headers.get('content-type') ?? '';
-          // ArcGIS answers errors with JSON and a 200, so only keep real images.
-          if (!res.ok || !type.startsWith('image/')) throw new Error(`tile ${res.status} ${type}`);
-          file.write(new Uint8Array(await res.arrayBuffer()));
-        }
-      } catch {
-        progress.failed++;
-      }
-      progress.done++;
-      onProgress?.({ ...progress });
-    }
-  };
-  await Promise.all([worker(), worker(), worker(), worker()]);
-  return progress;
+/** Where one square is kept on the phone. */
+export function tileFile(layer: TileLayerId, z: number, x: number, y: number): File {
+  return new File(new Directory(ROOT, layer, String(z), String(x)), String(y));
 }
 
 /** Roughly how much room saved map tiles take, in megabytes. */

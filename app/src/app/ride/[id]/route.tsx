@@ -122,6 +122,7 @@ export default function RouteBuilder() {
           top={insets.top + 66}
           cardTop={insets.top + 118}
           route={route?.points}
+          ride={ride}
           lookupHint={imported ? 'Tap a line to see who can ride it.' : 'Press and hold a line to see who can ride it.'}
         />
       ) : null}

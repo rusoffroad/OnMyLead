@@ -8,8 +8,10 @@ import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } from '@/core/profile';
 import { settingsSummary } from '@/core/notifications';
+import { formatBytes } from '@/core/offline-maps';
 import { myRideName, saveRideName } from '@/lib/api';
 import { useNotificationSettings } from '@/lib/notification-settings';
+import { useOfflineMaps } from '@/lib/offline-maps';
 import { signOut, useSession } from '@/lib/session';
 
 /** Your ride name (nickname) and account. The name is what every other rider sees. */
@@ -21,6 +23,10 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState(false);
   const notifications = useNotificationSettings();
+  const offlineMaps = useOfflineMaps();
+  const offlineSummary = offlineMaps.length
+    ? `${offlineMaps.length === 1 ? '1 map' : `${offlineMaps.length} maps`}, ${formatBytes(offlineMaps.reduce((n, m) => n + m.bytes, 0))}`
+    : 'Download maps for riding with no signal';
 
   useEffect(() => {
     if (!session) return;
@@ -107,6 +113,17 @@ export default function Profile() {
         <View style={{ flex: 1, gap: 2 }}>
           <ThemedText style={{ fontWeight: 600 }}>Notifications</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{settingsSummary(notifications)}</ThemedText>
+        </View>
+        <Icon name="chevron" color={Colors.textSecondary} />
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Offline Maps. ${offlineSummary}`}
+        onPress={() => router.push('/maps')}
+        style={({ pressed }) => [styles.setting, pressed && { backgroundColor: Colors.backgroundSelected }]}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <ThemedText style={{ fontWeight: 600 }}>Offline Maps</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{offlineSummary}</ThemedText>
         </View>
         <Icon name="chevron" color={Colors.textSecondary} />
       </Pressable>

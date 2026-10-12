@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { router } from 'expo-router';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Colors, font, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { TOPO_ATTRIBUTION, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { saveRideTiles, type SaveProgress, type TileLayerId } from '@/lib/trail-tiles';
+import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 
 const SAND = '#ECCD91';
 const ROAD = '#E8ECF2';
@@ -14,11 +16,11 @@ const ROAD = '#E8ECF2';
 /**
  * Everything drawn over a map for the trails feature: the layers button and its panel (with the
  * agencies' credit), and the card for a tapped trail. Place it as a sibling after the MapView.
- * `top`, `cardTop` and `bottom` keep it clear of each screen's own header and panels; `route` adds
- * a button to save the ride's area for use with no signal.
+ * `top`, `cardTop` and `bottom` keep it clear of each screen's own header and panels; `ride` with
+ * its `route` adds a one-tap download of the ride's map for riding with no signal.
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, lookupHint = 'Tap a line to see who can ride it.',
+  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.',
 }: {
   trail: TrailMap;
   /** Where the layers button sits. */
@@ -27,11 +29,12 @@ export function TrailMapOverlay({
   cardTop?: number;
   bottom?: number;
   route?: LatLng[] | null;
+  ride?: { id: string; name: string } | null;
   lookupHint?: string;
 }) {
   const [open, setOpen] = useState(false);
   if (Platform.OS === 'web') return null;
-  const credit = [trail.base === 'topo' ? TOPO_ATTRIBUTION : null, ...(trail.trails ? TRAIL_SOURCE_IDS.map((id) => TRAIL_SOURCES[id].attribution) : [])]
+  const credit = [trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null, ...(trail.trails ? TRAIL_SOURCE_IDS.map((id) => TRAIL_SOURCES[id].attribution) : [])]
     .filter(Boolean)
     .join(', ');
 
@@ -47,7 +50,13 @@ export function TrailMapOverlay({
           style={({ pressed }) => [styles.fab, (open || trail.trails || trail.base === 'topo') && styles.fabOn, pressed && { opacity: 0.8 }]}>
           <LayersIcon color={trail.trails || trail.base === 'topo' ? SAND : Colors.text} />
         </Pressable>
-        {open ? <LayersPanel trail={trail} route={route} lookupHint={lookupHint} credit={credit} /> : null}
+        {trail.offline && !open ? (
+          <View style={styles.offline} accessible accessibilityLabel="No signal. The map is showing what's downloaded on this phone.">
+            <Text style={styles.offlineText}>No Signal</Text>
+            <Text style={styles.offlineSub}>Downloaded Map</Text>
+          </View>
+        ) : null}
+        {open ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} /> : null}
       </View>
 
       {trail.zoomInHint && !open ? (
@@ -72,7 +81,9 @@ export function TrailMapOverlay({
   );
 }
 
-function LayersPanel({ trail, route, lookupHint, credit }: { trail: TrailMap; route?: LatLng[] | null; lookupHint: string; credit: string }) {
+function LayersPanel({
+  trail, route, ride, lookupHint, credit,
+}: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string }) {
   return (
     <View style={styles.panel} accessibilityViewIsModal={false}>
       <Text style={styles.panelTitle}>Map</Text>
@@ -95,7 +106,7 @@ function LayersPanel({ trail, route, lookupHint, credit }: { trail: TrailMap; ro
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.rowTitle}>Public trails and roads</Text>
-          <Text style={styles.rowSub}>Forest Service and BLM. {lookupHint}</Text>
+          <Text style={styles.rowSub}>{`Forest Service and BLM. ${lookupHint}`.trim()}</Text>
         </View>
         <Switch
           value={trail.trails}
@@ -113,50 +124,57 @@ function LayersPanel({ trail, route, lookupHint, credit }: { trail: TrailMap; ro
         </View>
       ) : null}
 
-      {route && route.length > 1 ? <SaveOffline route={route} base={trail.base} trails={trail.trails} /> : null}
+      {ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} /> : null}
+      <Pressable accessibilityRole="link" onPress={() => router.push('/maps')} hitSlop={6} style={styles.link}>
+        <Text style={styles.linkText}>Offline Maps</Text>
+        <Text style={styles.linkText}>›</Text>
+      </Pressable>
       {credit ? <Text style={styles.fine}>Map data: {credit}</Text> : null}
     </View>
   );
 }
 
-function SaveOffline({ route, base, trails }: { route: LatLng[]; base: BaseMap; trails: boolean }) {
-  const [progress, setProgress] = useState<SaveProgress | null>(null);
-  const [state, setState] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const cancel = useRef({ cancelled: false });
-  useEffect(() => () => void (cancel.current.cancelled = true), []);
+const ALL: OfflineChoice[] = OFFLINE_CHOICES.map((c) => c.id);
 
-  const layers: TileLayerId[] = [...(trails ? TRAIL_SOURCE_IDS : []), ...(base === 'topo' ? (['topo'] as const) : [])];
-  if (!layers.length) return <Text style={styles.rowSub}>Turn on trails or topo to save them for riding with no signal.</Text>;
+/** One tap saves satellite, topo and trails around the ride's route; then shows how it is going. */
+function RideMapDownload({ ride, route }: { ride: { id: string; name: string }; route: LatLng[] }) {
+  const maps = useOfflineMaps();
+  const saved = rideDownload(maps, ride.id);
+  const estimate = useMemo(() => (saved ? 0 : planRide(route, ALL).bytes), [route, saved]);
+  const busy = saved?.status === 'downloading';
+  const pct = saved && saved.total ? Math.round(((saved.saved + saved.failed) / saved.total) * 100) : 0;
 
-  const start = async () => {
-    setState('saving');
-    cancel.current = { cancelled: false };
-    const result = await saveRideTiles(route, layers, setProgress, cancel.current);
-    if (!cancel.current.cancelled) {
-      setProgress(result);
-      setState('saved');
-    }
-  };
-
-  const pct = progress && progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
-  return (
-    <View style={{ gap: 6 }}>
+  if (!saved) {
+    return (
       <Pressable
         accessibilityRole="button"
-        disabled={state === 'saving'}
-        onPress={start}
-        style={({ pressed }) => [styles.save, pressed && { opacity: 0.85 }, state === 'saving' && { opacity: 0.7 }]}>
-        <Text style={styles.saveText}>
-          {state === 'saving' ? `Saving this ride's map… ${pct}%` : state === 'saved' ? 'Saved for no signal' : "Save this ride's map for no signal"}
-        </Text>
+        accessibilityHint="Saves satellite, topo and trails around this ride's route for riding with no signal"
+        onPress={() => downloadRide(ride.id, ride.name, route, ALL)}
+        style={({ pressed }) => [styles.save, pressed && { opacity: 0.85 }]}>
+        <Text style={styles.saveText}>Download This Ride’s Map</Text>
+        <Text style={styles.saveSub}>{`Satellite, Topo and Trails, About ${formatBytes(estimate)}`}</Text>
       </Pressable>
-      {state === 'saving' ? (
-        <View style={styles.track}>
-          <View style={[styles.fill, { width: `${pct}%` }]} />
-        </View>
-      ) : null}
-      {state === 'saved' && progress && progress.failed > 0 ? (
-        <Text style={styles.rowSub}>{`${progress.failed} of ${progress.total} pieces didn't download. Tap again with better signal to finish.`}</Text>
+    );
+  }
+  return (
+    <View style={styles.saved}>
+      <View style={{ flex: 1, gap: 4 }}>
+        <Text style={styles.rowTitle}>{busy ? 'Downloading Ride Map' : saved.status === 'ready' ? 'Ride Map Downloaded' : 'Ride Map'}</Text>
+        <Text style={styles.savedSub}>{statusLine(saved)}</Text>
+        {busy || saved.status === 'paused' ? (
+          <View style={styles.track}>
+            <View style={[styles.fill, { width: `${pct}%` }]} />
+          </View>
+        ) : null}
+      </View>
+      {busy ? (
+        <Pressable accessibilityRole="button" onPress={() => pauseDownload(saved.id)} hitSlop={8} style={styles.mini}>
+          <Text style={styles.miniText}>Pause</Text>
+        </Pressable>
+      ) : saved.status !== 'ready' ? (
+        <Pressable accessibilityRole="button" onPress={() => resumeDownload(saved.id)} hitSlop={8} style={styles.mini}>
+          <Text style={styles.miniText}>{saved.status === 'paused' ? 'Resume' : 'Finish'}</Text>
+        </Pressable>
       ) : null}
     </View>
   );
@@ -237,8 +255,18 @@ const styles = StyleSheet.create({
   legend: { flexDirection: 'row', gap: 18 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
-  save: { minHeight: 42, borderRadius: Radius.control, backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
-  saveText: { color: Colors.text, fontFamily: font(600), fontSize: 14 },
+  save: { minHeight: 52, borderRadius: Radius.control, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 8, gap: 1 },
+  saveText: { color: Colors.onAccent, fontFamily: font(700), fontSize: 15 },
+  saveSub: { color: 'rgba(255,255,255,0.8)', fontFamily: font(500), fontSize: 12 },
+  saved: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: Radius.control, borderWidth: 1, borderColor: 'rgba(236,205,145,0.4)' },
+  savedSub: { color: SAND, fontFamily: font(600), fontSize: 13 },
+  mini: { paddingHorizontal: 12, minHeight: 34, borderRadius: Radius.control - 4, backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center' },
+  miniText: { color: Colors.text, fontFamily: font(600), fontSize: 14 },
+  link: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 32 },
+  linkText: { color: Colors.sky, fontFamily: font(600), fontSize: 15 },
+  offline: { alignItems: 'flex-end', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, ...glass, borderColor: SAND },
+  offlineText: { color: SAND, fontFamily: font(700), fontSize: 13 },
+  offlineSub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 11 },
   track: { height: 4, borderRadius: 2, backgroundColor: Colors.backgroundElement, overflow: 'hidden' },
   fill: { height: 4, backgroundColor: SAND },
   bottom: { position: 'absolute', left: 12, right: 12, gap: 6, zIndex: 25 },

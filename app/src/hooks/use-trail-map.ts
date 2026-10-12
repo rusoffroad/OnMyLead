@@ -4,6 +4,7 @@ import { Platform, type LayoutChangeEvent } from 'react-native';
 import type { MapPressEvent, Region } from 'react-native-maps';
 
 import { metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type TrailInfo } from '@/core/trails';
+import { useMapSignal } from '@/lib/map-signal';
 import { identifyTrail } from '@/lib/trail-tiles';
 
 const KEY = 'map.layers.v1';
@@ -13,6 +14,8 @@ export type TrailMap = {
   trails: boolean;
   /** True when trails are on but the map is too far out to draw them. */
   zoomInHint: boolean;
+  /** No signal: the map draws only squares saved on the phone (see lib/offline-maps). */
+  offline: boolean;
   setBase: (b: BaseMap) => void;
   setTrails: (on: boolean) => void;
   info: TrailInfo | null;
@@ -45,6 +48,7 @@ export function useTrailMap(): TrailMap {
   const region = useRef<Region | null>(null);
   const width = useRef(390);
   const lookup = useRef(0);
+  const { offline } = useMapSignal();
 
   useEffect(() => {
     AsyncStorage.getItem(KEY)
@@ -102,6 +106,7 @@ export function useTrailMap(): TrailMap {
     base,
     trails,
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
+    offline,
     setBase,
     setTrails,
     info,
