@@ -1,12 +1,15 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } from '@/core/profile';
+import { settingsSummary } from '@/core/notifications';
 import { myRideName, saveRideName } from '@/lib/api';
+import { useNotificationSettings } from '@/lib/notification-settings';
 import { signOut, useSession } from '@/lib/session';
 
 /** Your ride name (nickname) and account. The name is what every other rider sees. */
@@ -17,6 +20,7 @@ export default function Profile() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState(false);
+  const notifications = useNotificationSettings();
 
   useEffect(() => {
     if (!session) return;
@@ -94,6 +98,19 @@ export default function Profile() {
         onPress={save}
       />
 
+      <Section title="Settings" />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Notifications. ${settingsSummary(notifications)}`}
+        onPress={() => router.push('/notifications')}
+        style={({ pressed }) => [styles.setting, pressed && { backgroundColor: Colors.backgroundSelected }]}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <ThemedText style={{ fontWeight: 600 }}>Notifications</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{settingsSummary(notifications)}</ThemedText>
+        </View>
+        <Icon name="chevron" color={Colors.textSecondary} />
+      </Pressable>
+
       <Section title="Account" />
       <View style={styles.account}>
         <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>Email</ThemedText>
@@ -161,4 +178,8 @@ const styles = StyleSheet.create({
   chatName: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
   chatBody: { color: Colors.text, fontFamily: font(500), fontSize: 15 },
   account: { gap: 4 },
+  setting: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.three, backgroundColor: Colors.backgroundElement,
+    borderRadius: Radius.card, paddingHorizontal: Spacing.three, paddingVertical: 14,
+  },
 });

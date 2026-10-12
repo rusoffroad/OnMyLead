@@ -76,6 +76,7 @@ function RootLayout() {
         <Stack.Screen name="trips/[id]/edit" options={{ title: 'Edit trip' }} />
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
         <Stack.Screen name="profile" options={{ title: 'Your profile' }} />
+        <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
         <Stack.Screen name="share" options={{ title: 'Share my location' }} />
         <Stack.Screen name="f/[token]" options={{ title: 'Shared location' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
