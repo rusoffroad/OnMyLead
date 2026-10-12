@@ -120,7 +120,7 @@ export default function NotificationsScreen() {
             ))}
             {g.title === 'Before the ride' ? (
               <ToggleRow
-                title="Email when a ride is cancelled"
+                title="Email When a Ride Is Cancelled"
                 detail="An email if a ride you joined is cancelled or removed, as well as the notification."
                 value={settings.ride_emails}
                 disabled={!editable}
