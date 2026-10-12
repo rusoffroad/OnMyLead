@@ -1390,4 +1390,44 @@ do $$ begin
   end if;
 end $$;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF, TAIL GUNNER AND NOTIFICATION TESTS PASSED' as result;
+-- Approval-only rides: a new rider asking to join waits for the organizer; an invited rider
+-- and a rider with the invite code go straight in.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility, join_policy, invite_code)
+values ('15151515-1515-1515-1515-151515151515', auth.uid(), 'Ask first ride', now() + interval '3 days', 38.5, -109.5, 'public', 'approval', 'ASKFIRST');
+reset role;
+insert into ride_members (ride_id, user_id, status)
+values ('15151515-1515-1515-1515-151515151515', '00000000-0000-0000-0000-00000000000b', 'invited');
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if join_ride('15151515-1515-1515-1515-151515151515') <> 'pending' then
+    raise exception 'FAIL: approval-only ride let a new rider straight in';
+  end if;
+  if join_ride('15151515-1515-1515-1515-151515151515') <> 'pending' then
+    raise exception 'FAIL: asking again changed a pending request';
+  end if;
+  if (select count(*) from ride_private_details where ride_id = '15151515-1515-1515-1515-151515151515') <> 0 then
+    raise exception 'FAIL: pending rider saw the meeting point';
+  end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  if join_ride('15151515-1515-1515-1515-151515151515') <> 'joined' then
+    raise exception 'FAIL: invited rider not let in on an approval-only ride';
+  end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+do $$ begin
+  if join_ride(p_invite_code => 'askfirst') <> 'joined' then
+    raise exception 'FAIL: invite code not let in on an approval-only ride';
+  end if;
+end $$;
+reset role;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF, TAIL GUNNER, NOTIFICATION AND APPROVAL TESTS PASSED' as result;
