@@ -222,7 +222,7 @@ function BigAction({ icon, title, detail, on, onPress }: { icon: IconName; title
 }
 
 const roleLabel = (role: RideMember['role']) =>
-  ({ organizer: 'You organize', co_organizer: 'Co-organizer', leader: 'You lead', sweep: 'You sweep', rider: 'Going' })[role];
+  ({ organizer: 'You organize', co_organizer: 'Co-organizer', leader: 'You lead', sweep: 'Tail gunner', rider: 'Going' })[role];
 
 const styles = StyleSheet.create({
   live: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, borderWidth: 2, padding: 14 },

@@ -80,9 +80,12 @@ export type RiderStatusKind =
 
 export type RegroupPoint = { id: string; ride_id: string; lat: number; lng: number; label: string | null; created_at: string; cleared_at: string | null };
 
-/** Map a membership role to the Ride Bubble role. */
-export const bubbleRole = (role: MemberRole): RideRole =>
-  role === 'leader' ? 'leader' : role === 'sweep' ? 'sweep' : 'rider';
+/**
+ * Map a membership role to the Ride Bubble role. Pass `leads` from rideLeaderIds so an organizer
+ * who leads (nobody given the Leader role, or right after a hand-off) shows as the leader.
+ */
+export const bubbleRole = (role: MemberRole, leads = false): RideRole =>
+  leads || role === 'leader' ? 'leader' : role === 'sweep' ? 'sweep' : 'rider';
 
 export type Vehicle = {
   id: string;

@@ -19,7 +19,7 @@ import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
-import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
+import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
@@ -100,6 +100,7 @@ export default function RideMode() {
   const routeMiles = useRef<number | null | undefined>(undefined);
 
   const joined = useMemo(() => members.filter((m) => m.status === 'joined'), [members]);
+  const leaderIds = useMemo(() => rideLeaderIds(members, ride?.organizer_id), [members, ride?.organizer_id]);
   const mine = joined.find((m) => m.user_id === me);
   const canRegroup = mine && ['organizer', 'co_organizer', 'leader'].includes(mine.role);
   const watchesBubble = mine && ['organizer', 'co_organizer', 'leader', 'sweep'].includes(mine.role);
@@ -251,16 +252,16 @@ export default function RideMode() {
       return {
         id: m.user_id,
         name: m.profiles?.display_name || 'Rider',
-        role: bubbleRole(m.role),
+        role: bubbleRole(m.role, leaderIds.includes(m.user_id)),
         sharing: !!p, // rows only arrive for riders currently sharing with us
         fix: p ? { lat: p.lat, lng: p.lng, at: Date.parse(p.recorded_at), speedMps: p.speed_mps, headingDeg: p.heading_deg } : null,
         lastMovedAt: p?.last_moved_at ? Date.parse(p.last_moved_at) : null,
       };
     });
     return computeBubble(riders, settings, now);
-  }, [joined, positions, settings, now]);
+  }, [joined, leaderIds, positions, settings, now]);
 
-  // Spoken alert once per rider each time they turn red (Leader and Sweep only).
+  // Spoken alert once per rider each time they turn red (leader and tail gunner only).
   useEffect(() => {
     if (!watchesBubble) return;
     const red = new Set(bubble.alerts.map((a) => a.riderId));
@@ -280,7 +281,7 @@ export default function RideMode() {
     return {
       id: m.user_id,
       name: m.profiles?.display_name || 'Rider',
-      role: bubbleRole(m.role),
+      role: bubbleRole(m.role, leaderIds.includes(m.user_id)),
       status: b?.status ?? 'unknown',
       lat: p?.lat ?? null,
       lng: p?.lng ?? null,
@@ -298,10 +299,10 @@ export default function RideMode() {
     const riders = joined.map((m) => {
       const p = positions[m.user_id];
       const at = m.user_id === me && myFix ? myFix : p ? { lat: p.lat, lng: p.lng } : null;
-      return { id: m.user_id, role: bubbleRole(m.role), at };
+      return { id: m.user_id, role: bubbleRole(m.role, leaderIds.includes(m.user_id)), at };
     });
     return tracker.place(route.route, riders);
-  }, [route.route, joined, positions, me, myFix, tracker]);
+  }, [route.route, joined, leaderIds, positions, me, myFix, tracker]);
   const routeSummary = route.route ? summarizeMe(route.route, placed, me) : null;
 
   // With a route, tell this rider whether their machine's range (from the garage) covers it.
@@ -393,7 +394,7 @@ export default function RideMode() {
     watchesBubble: !!watchesBubble,
     canRegroup: !!canRegroup,
     riders: mapRiders.map((r) => ({
-      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? ' (Sweep)' : ''}`,
+      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? ' (Tail gunner)' : ''}`,
       detail: r.detail,
     })),
     helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || 'Rider', status: STATUS_LABEL[s.status] })),
