@@ -8,7 +8,9 @@ import { RideRow, RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { previewLine, unreadLabel, type GroupChatSummary } from '@/core/group-chat';
 import { NOT_SWITCHED_ON, ridersLabel } from '@/core/groups';
+import { myGroupChats } from '@/lib/group-chat';
 import {
   followedLeadersRides, leadersIFollow, openNewGroup, myFollowerCount, myGroups, NotSwitchedOnError, unfollowLeader, type Followed, type RidingGroup,
 } from '@/lib/groups';
@@ -24,6 +26,7 @@ export default function Groups() {
   const [leaderRides, setLeaderRides] = useState<Ride[]>([]);
   const [off, setOff] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [chats, setChats] = useState<Map<string, GroupChatSummary>>(new Map());
 
   useFocusEffect(
     useCallback(() => {
@@ -34,6 +37,7 @@ export default function Groups() {
       }
       const fail = (e: unknown) => (e instanceof NotSwitchedOnError ? setOff(true) : setError((e as Error).message));
       myGroups().then(setGroups).catch(fail);
+      myGroupChats().then((all) => setChats(new Map(all.map((c) => [c.group_id, c])))).catch(() => {});
       leadersIFollow()
         .then(async (f) => {
           setFollows(f);
@@ -67,10 +71,10 @@ export default function Groups() {
       {groups && !groups.length && !off ? <EmptyCrew /> : null}
 
       {mine.length ? <Section title="Your Groups" /> : null}
-      {mine.map((g) => <GroupCard key={g.id} group={g} />)}
+      {mine.map((g) => <GroupCard key={g.id} group={g} chat={chats.get(g.id)} me={session?.user.id} />)}
 
       {theirs.length ? <Section title="Groups You’re In" /> : null}
-      {theirs.map((g) => <GroupCard key={g.id} group={g} />)}
+      {theirs.map((g) => <GroupCard key={g.id} group={g} chat={chats.get(g.id)} me={session?.user.id} />)}
 
       {follows.length || followers ? <Section title="Leaders You Follow" /> : null}
       {follows.length ? (
@@ -118,7 +122,9 @@ export default function Groups() {
   );
 }
 
-function GroupCard({ group }: { group: RidingGroup }) {
+function GroupCard({ group, chat, me }: { group: RidingGroup; chat?: GroupChatSummary; me?: string }) {
+  const preview = chat ? previewLine(chat, me, (uid) => group.riders.find((r) => r.id === uid)?.name ?? 'Former Rider') : null;
+  const unread = chat ? unreadLabel(chat.unread) : null;
   return (
     <Pressable
       accessibilityRole="button"
@@ -133,6 +139,16 @@ function GroupCard({ group }: { group: RidingGroup }) {
       <ThemedText type="small" themeColor="textSecondary">
         {group.mine ? ridersLabel(group.riders.length) : `${ridersLabel(group.riders.length)}, Run By ${group.ownerName}`}
       </ThemedText>
+      {preview ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Open ${group.name} group chat${unread ? `, ${unread}` : ''}`}
+          onPress={() => router.push(`/groups/${group.id}/chat`)}
+          style={({ pressed }) => [styles.chatLine, pressed && { opacity: 0.7 }]}>
+          <ThemedText type="small" style={{ flex: 1, color: unread ? Colors.text : Colors.textSecondary }} numberOfLines={1}>{preview}</ThemedText>
+          {unread ? <Text style={styles.unread}>{unread}</Text> : null}
+        </Pressable>
+      ) : null}
     </Pressable>
   );
 }
@@ -157,5 +173,13 @@ const styles = StyleSheet.create({
   cardName: { flex: 1, color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 32 },
   list: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, overflow: 'hidden' },
   followRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10 },
+  chatLine: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.two, minHeight: 40, borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: Colors.border, paddingTop: 10,
+  },
+  unread: {
+    color: '#fff', backgroundColor: Colors.accent, fontFamily: font(700), fontSize: 12, overflow: 'hidden',
+    paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill,
+  },
   rule: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
 });

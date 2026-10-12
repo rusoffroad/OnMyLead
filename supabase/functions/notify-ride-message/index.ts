@@ -11,7 +11,8 @@
 // come from push_batch_social instead (migration 20261017430000_riding_groups.sql). The older
 // {"message_id": "..."} body is still accepted. Pro trial reminders ({"type":"trial"}, queued
 // hourly by trial_reminder_batch) come from push_batch_account and email_batch_account
-// (migration 20261018000000_pro_entitlements.sql).
+// (migration 20261018000000_pro_entitlements.sql). Riding group chat messages
+// ({"type":"group_message"}) come from push_batch_group (migration 20261019400000_group_chat.sql).
 //
 // email_batch() does the same for the emails, which go out through Resend.
 //
@@ -31,6 +32,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
 const ACCOUNT_EVENTS = new Set(['trial']);
+const GROUP_EVENTS = new Set(['group_message']);
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -61,7 +63,9 @@ Deno.serve(async (req) => {
 
 // deno-lint-ignore no-explicit-any
 async function sendPushes(event: any): Promise<{ sent: number; removed?: number; note?: string } | { error: string }> {
-  const batch = ACCOUNT_EVENTS.has(event.type) ? 'push_batch_account' : SOCIAL_EVENTS.has(event.type) ? 'push_batch_social' : 'push_batch';
+  const batch = ACCOUNT_EVENTS.has(event.type)
+    ? 'push_batch_account'
+    : SOCIAL_EVENTS.has(event.type) ? 'push_batch_social' : GROUP_EVENTS.has(event.type) ? 'push_batch_group' : 'push_batch';
   const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 

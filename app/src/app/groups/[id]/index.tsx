@@ -13,7 +13,9 @@ import { mailUrl, smsUrl } from '@/core/discovery';
 import {
   groupInviteMessage, groupLink, groupNameProblem, invitedLine, MAX_GROUP_NAME, ridersLabel, type RideMate,
 } from '@/core/groups';
+import { previewLine, unreadLabel, type GroupChatSummary } from '@/core/group-chat';
 import { confirmAsync } from '@/lib/confirm';
+import { myGroupChats } from '@/lib/group-chat';
 import {
   addGroupRiders, deleteGroup, getGroup, inviteGroupToRide, leaveGroup, removeGroupRider, renameGroup, resetGroupLink,
   rideMates, ridesIOrganize, type RidingGroup,
@@ -40,6 +42,8 @@ export default function GroupPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  /** Undefined while loading, null when Group Chat isn't switched on yet. */
+  const [chat, setChat] = useState<GroupChatSummary | null | undefined>(undefined);
 
   const load = useCallback(async () => {
     try {
@@ -54,7 +58,10 @@ export default function GroupPage() {
     useCallback(() => {
       load();
       ridesIOrganize().then(setRides).catch(() => setRides([]));
-    }, [load]),
+      myGroupChats()
+        .then((all) => setChat(all.find((c) => c.group_id === id) ?? { group_id: id, last_body: null, last_user_id: null, last_at: null, unread: 0, muted: false }))
+        .catch(() => setChat(null));
+    }, [load, id]),
   );
 
   async function act(key: string, fn: () => Promise<unknown>) {
@@ -131,6 +138,12 @@ export default function GroupPage() {
         )}
         <Convoy names={group.riders.map((r) => r.name)} size={40} max={7} />
       </View>
+
+      <ChatCard
+        summary={chat}
+        preview={chat ? previewLine(chat, me, (uid) => group.riders.find((r) => r.id === uid)?.name ?? 'Former Rider') : null}
+        onPress={() => router.push(`/groups/${group.id}/chat`)}
+      />
 
       <Button title="Invite to a Ride" big onPress={() => setPicking(picking === 'ride' ? null : 'ride')} />
       {notice ? (
@@ -307,7 +320,46 @@ export default function GroupPage() {
   );
 }
 
+/** The way into the group's chat: the newest message and how many are new. */
+function ChatCard({ summary, preview, onPress }: { summary: GroupChatSummary | null | undefined; preview: string | null; onPress: () => void }) {
+  const unread = summary ? unreadLabel(summary.unread) : null;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Group Chat${unread ? `, ${unread}` : ''}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.chatCard, pressed && { backgroundColor: Colors.backgroundSelected }]}>
+      <View style={styles.chatBubbles}>
+        <View style={[styles.chatBubble, { backgroundColor: Colors.backgroundSelected, alignSelf: 'flex-start' }]} />
+        <View style={[styles.chatBubble, { backgroundColor: Colors.sky, alignSelf: 'flex-end', width: 22 }]} />
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
+          <Text style={styles.chatTitle}>Group Chat</Text>
+          {unread ? <Text style={styles.unread}>{unread}</Text> : null}
+          {summary?.muted ? <ThemedText type="small" themeColor="textSecondary">Muted</ThemedText> : null}
+        </View>
+        <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
+          {summary === null ? 'Not switched on yet' : preview ?? 'Talk about the next ride, or the last one.'}
+        </ThemedText>
+      </View>
+      <Icon name="chevron" color={Colors.textSecondary} />
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
+  chatCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: Colors.backgroundElement, borderRadius: Radius.card,
+    paddingHorizontal: Spacing.three, paddingVertical: 14,
+  },
+  chatBubbles: { width: 34, gap: 4 },
+  chatBubble: { width: 26, height: 12, borderRadius: 6 },
+  chatTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 22, lineHeight: 24 },
+  unread: {
+    color: '#fff', backgroundColor: Colors.accent, fontFamily: font(700), fontSize: 12, overflow: 'hidden',
+    paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill,
+  },
   hero: { gap: Spacing.three, alignItems: 'flex-start' },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 46, letterSpacing: -0.5 },
   notice: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(60,195,107,0.10)', borderRadius: Radius.control, padding: 12 },
