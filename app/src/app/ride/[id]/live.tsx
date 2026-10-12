@@ -13,6 +13,7 @@ import { GroupMap, type MapRider } from '@/components/group-map';
 import { BreakdownBadge } from '@/components/rider-status-badge';
 import { RiderList } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
+import { SendNote, type SendNoteValue } from '@/components/send-note';
 import { SharePicker } from '@/components/share-picker';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { ThemedText } from '@/components/themed-text';
@@ -152,6 +153,22 @@ export default function RideMode() {
   [panelOpen, setPanelOpen, panelDrag]);
   const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
   const [lastReply, setLastReply] = useState<QuickReply | null>(null);
+  // Proof that a status tap or quick reply went out: Sending, then Sent, or Waiting for Signal.
+  const [note, setNote] = useState<SendNoteValue | null>(null);
+  const noteKey = useRef(0);
+  const showNote = useCallback((what: string, state: SendNoteValue['state'], key?: number) => {
+    const k = key ?? ++noteKey.current;
+    // A later tap replaces the note; an old send finishing doesn't overwrite it.
+    setNote((n) => (key != null && n?.key !== key ? n : { key: k, what, state }));
+    return k;
+  }, []);
+  useEffect(() => {
+    if (note?.state !== 'sent') return;
+    const t = setTimeout(() => setNote((n) => (n?.key === note.key ? null : n)), 3500);
+    return () => clearTimeout(t);
+  }, [note]);
+  // Status calls this rider has dismissed on their own screen (they come back if the rider taps again).
+  const [dismissedCalls, setDismissedCalls] = useState<Set<string>>(() => new Set());
   const spokenId = useRef<string | null>(null);
   const firstAnnouncement = useRef(true);
   useEffect(() => {
@@ -398,9 +415,10 @@ export default function RideMode() {
     return { check, text: `${RANGE_LABEL[check]}. ${v.nickname?.trim() || vehicleTitle(v)} goes about ${Math.round(r.fullRangeMiles)} mi.` };
   }, [vehicles, mine?.vehicle_id, route.route]);
 
+  const callKey = (userId: string, s: TappedStatus) => `${userId}:${s.status}:${s.tapped_at}`;
   const helpCalls = joined
     .map((m) => ({ m, s: statuses[m.user_id] }))
-    .filter(({ s, m }) => m.user_id !== me && isActiveCall(s, now));
+    .filter(({ s, m }) => m.user_id !== me && isActiveCall(s, now) && !dismissedCalls.has(callKey(m.user_id, s)));
   const separations = watchesBubble ? bubble.riders.filter((r) => r.status === 'red' || r.status === 'yellow') : [];
   // Folded, only the calls nobody should miss stay on screen; the rest are counted on the handle.
   const isUrgentCall = (k: RiderStatusKind) => k === 'emergency' || k === 'need_help';
@@ -440,17 +458,33 @@ export default function RideMode() {
     try {
       at = await currentPosition();
     } catch {}
+    const what = kind === 'ok' ? 'OK' : `“${STATUS_LABEL[kind]}”`;
+    const key = showNote(what, 'sending');
     const sent = await sendStatusReliably(id, kind, at);
     setStatuses((prev) => ({ ...prev, [me!]: { status: kind, tapped_at: new Date().toISOString() } }));
-    if (!sent) Alert.alert('No Signal', `"${STATUS_LABEL[kind]}" will send as soon as you're back in service.`);
+    showNote(what, sent ? 'sent' : 'queued', key);
+  }
+
+  /** Waiting for Signal: try everything in the outbox again now. */
+  async function retryOutbox() {
+    if (!note) return;
+    const { key, what } = note;
+    showNote(what, 'sending', key);
+    const sent = await flushOutbox().catch(() => 0);
+    showNote(what, sent > 0 ? 'sent' : 'queued', key);
+    if (sent > 0) {
+      chat.reload();
+      refresh();
+    }
   }
 
   async function quickReply(body: QuickReply) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setLastReply(body);
+    const key = showNote(`“${body}”`, 'sending');
     const sent = await sendQuickReplyReliably(id, body);
+    showNote(`“${body}”`, sent ? 'sent' : 'queued', key);
     if (sent) chat.reload();
-    else Alert.alert('No Signal', `"${body}" will send as soon as you're back in service.`);
   }
 
   async function regroupHere() {
@@ -467,7 +501,9 @@ export default function RideMode() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     let at: { lat: number; lng: number } | null = null;
     try { at = await currentPosition(); } catch {}
-    await sendStatusReliably(id, 'emergency', at);
+    const key = showNote('EMERGENCY Alert', 'sending');
+    const sent = await sendStatusReliably(id, 'emergency', at);
+    showNote('EMERGENCY Alert', sent ? 'sent' : 'queued', key);
     setStatuses((prev) => ({ ...prev, [me!]: { status: 'emergency', tapped_at: new Date().toISOString() } }));
   }
 
@@ -613,6 +649,8 @@ export default function RideMode() {
           {panelOpen ? <Text style={styles.handleText}>Hide ▼</Text> : null}
         </Pressable>
 
+        {note ? <SendNote note={note} onRetry={retryOutbox} onDismiss={() => setNote(null)} /> : null}
+
         {shownSeparations.length || shownHelpCalls.length ? (
           <ScrollView style={{ maxHeight: 180 }} contentContainerStyle={{ gap: Spacing.two }}>
             {shownSeparations.map((r) => {
@@ -636,6 +674,14 @@ export default function RideMode() {
                     <ThemedText type="smallBold" style={{ flex: 1 }}>
                       {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}, {ago(s.tapped_at, now)}
                     </ThemedText>
+                    <Pressable
+                      onPress={() => setDismissedCalls((d) => new Set(d).add(callKey(m.user_id, s)))}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Dismiss ${m.profiles?.display_name || 'Rider'}'s ${STATUS_LABEL[s.status]} on my screen`}
+                      hitSlop={12}
+                      style={styles.callDismiss}>
+                      <Text style={styles.callDismissText}>✕</Text>
+                    </Pressable>
                   </View>
                   {spot ? <Button title="Navigate" kind="secondary" onPress={() => navigateTo(spot.lat, spot.lng)} /> : null}
                 </Card>
@@ -648,7 +694,7 @@ export default function RideMode() {
           <View style={styles.myBreakdown}>
             <BreakdownBadge size={28} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.myBreakdownTitle}>{MECHANICAL_LABEL} Sent</Text>
+              <Text style={styles.myBreakdownTitle}>{MECHANICAL_LABEL}</Text>
               <Text style={styles.myBreakdownBody}>Your leader and tail gunner can see where you are.</Text>
             </View>
             <Pressable
@@ -657,6 +703,22 @@ export default function RideMode() {
               accessibilityLabel="Fixed. Send status OK"
               style={({ pressed }) => [styles.myBreakdownOk, { opacity: pressed ? 0.75 : 1 }]}>
               <Text style={styles.myBreakdownOkText}>Fixed, I’m OK</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
+        {myStatus && myStatus.status !== 'ok' && myStatus.status !== 'mechanical' && isActiveCall(myStatus, now) ? (
+          <View style={[styles.myBreakdown, { borderLeftColor: isUrgentCall(myStatus.status) ? RideColors.red : RideColors.yellow }]}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.myBreakdownTitle}>Your Status: {STATUS_LABEL[myStatus.status]}</Text>
+              <Text style={styles.myBreakdownBody}>The group sees it until you mark it resolved.</Text>
+            </View>
+            <Pressable
+              onPress={() => tapStatus('ok')}
+              accessibilityRole="button"
+              accessibilityLabel={`Resolved. Clear ${STATUS_LABEL[myStatus.status]} and send status OK`}
+              style={({ pressed }) => [styles.myBreakdownOk, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.myBreakdownOkText}>Resolved, I’m OK</Text>
             </Pressable>
           </View>
         ) : null}
@@ -836,6 +898,8 @@ const styles = StyleSheet.create({
   myBreakdownOk: { minHeight: 44, paddingHorizontal: 12, borderRadius: Radius.control, justifyContent: 'center', backgroundColor: RideColors.green },
   myBreakdownOkText: { color: '#06210F', fontFamily: font(700, 'display'), fontSize: 17 },
   callRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  callDismiss: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
+  callDismissText: { color: Colors.textSecondary, fontSize: 18 },
   foldedSos: { flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.danger },
   actions: { flexDirection: 'row', gap: Spacing.two },
   handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },

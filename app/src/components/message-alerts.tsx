@@ -5,7 +5,7 @@ import { AppState, Platform, Pressable, StyleSheet, Text, View } from 'react-nat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
-import { alertTitle, isLeaderOnly, shouldAlert, type ChatMessage } from '@/core/chat';
+import { alertTitle, isLeaderOnly, isResolved, shouldAlert, type ChatMessage } from '@/core/chat';
 import type { NotificationSettings } from '@/core/notifications';
 import { currentNotificationSettings, resetNotificationSettings, syncNotificationSettings } from '@/lib/notification-settings';
 import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps, useRideChangeReminders } from '@/lib/push';
@@ -55,7 +55,8 @@ async function toAlert(m: ChatMessage): Promise<Alert> {
 /**
  * On-screen pop-up for new ride chat messages, on every screen, for every ride the rider is
  * on. The database only sends a rider the messages they may read, so leader-only messages pop
- * up only for the leader. Also registers the phone for push notifications after sign-in, and
+ * up only for the leader. Anyone can dismiss a pop-up for themselves; one the sender clears or
+ * marks resolved before it is seen goes away on its own. Also registers the phone for push notifications after sign-in, and
  * keeps the notification settings and this phone's ride reminders up to date.
  */
 export function MessageAlerts() {
@@ -94,6 +95,14 @@ export function MessageAlerts() {
         if (!m?.id || !shouldAlert(m, me) || !wanted(m, currentNotificationSettings())) return;
         toAlert(m).then((a) => setQueue((q) => (q.some((x) => x.id === a.id) ? q : [...q, a].slice(-5))));
       })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ride_messages' }, (payload) => {
+        const m = payload.new as ChatMessage;
+        if (m?.id && isResolved(m)) setQueue((q) => q.filter((x) => x.id !== m.id));
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'ride_messages' }, (payload) => {
+        const id = (payload.old as { id?: string })?.id;
+        if (id) setQueue((q) => q.filter((x) => x.id !== id));
+      })
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
@@ -102,6 +111,7 @@ export function MessageAlerts() {
   }, [me]);
 
   const dismiss = useCallback(() => setQueue((q) => q.slice(1)), []);
+  const dismissAll = useCallback(() => setQueue([]), []);
 
   const shown = useRef<string | null>(null);
   useEffect(() => {
@@ -130,10 +140,18 @@ export function MessageAlerts() {
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.title} numberOfLines={1}>{current.title}</Text>
           <Text style={styles.body} numberOfLines={3}>{current.body}</Text>
-          {queue.length > 1 ? <Text style={styles.more}>+{queue.length - 1} more</Text> : null}
+          {queue.length > 1 ? (
+            <View style={styles.moreRow}>
+              <Text style={styles.more}>+{queue.length - 1} More</Text>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Dismiss all ${queue.length}`} hitSlop={10} onPress={dismissAll}>
+                <Text style={styles.dismissAll}>Dismiss All</Text>
+              </Pressable>
+            </View>
+          ) : null}
         </View>
         <Pressable accessibilityRole="button" accessibilityLabel="Dismiss" hitSlop={12} onPress={dismiss} style={styles.close}>
           <Text style={styles.closeText}>✕</Text>
+          <Text style={styles.closeLabel}>Dismiss</Text>
         </Pressable>
       </Pressable>
     </View>
@@ -159,7 +177,10 @@ const styles = StyleSheet.create({
   },
   title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
   body: { color: Colors.text, fontFamily: font(500), fontSize: 16, lineHeight: 22 },
+  moreRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, marginTop: 2 },
   more: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
-  close: { paddingHorizontal: Spacing.one },
+  dismissAll: { color: Colors.sky, fontFamily: font(700), fontSize: 13 },
+  close: { paddingHorizontal: Spacing.one, alignItems: 'center', gap: 2 },
   closeText: { color: Colors.textSecondary, fontSize: 16 },
+  closeLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 11 },
 });

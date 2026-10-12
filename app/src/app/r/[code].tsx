@@ -341,6 +341,12 @@ export default function RidePage() {
           votes={chat.votes}
           onSendPoll={chat.sendPoll}
           onVote={(messageId, choice) => me && chat.vote(messageId, choice, me)}
+          pending={chat.pending}
+          onRetry={chat.retry}
+          onDiscard={chat.discard}
+          onResolve={chat.resolve}
+          onClear={chat.clear}
+          actionsOn={chat.actionsOn}
         />
       ) : null}
 

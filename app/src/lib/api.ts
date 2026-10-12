@@ -456,6 +456,21 @@ export async function sendRideMessage(
   return row;
 }
 
+/** Marks one of your own messages resolved, or opens it again. Returns the resolved time (null when open). */
+export async function setMessageResolved(messageId: string, resolved: boolean): Promise<string | null> {
+  const res = await supabase.rpc('set_message_resolved', { p_message: messageId, p_resolved: resolved });
+  if (res.error) throw new Error(res.error.message);
+  track('ride_message_resolved', { resolved });
+  return (res.data as string | null) ?? null;
+}
+
+/** Clears (deletes) one of your own messages for everyone on the ride. */
+export async function clearRideMessage(messageId: string): Promise<void> {
+  const res = await supabase.rpc('clear_ride_message', { p_message: messageId });
+  if (res.error) throw new Error(res.error.message);
+  track('ride_message_cleared', {});
+}
+
 /** Posts a quick poll: a chat message to everyone whose body is the question. Leaders only (enforced by the database). */
 export async function sendRidePoll(rideId: string, question: string, choices: string[]): Promise<ChatMessage> {
   const user_id = await currentUserId();
