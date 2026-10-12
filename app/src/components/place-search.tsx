@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
@@ -95,7 +95,7 @@ export function PlaceSearch({
           accessibilityLabel={label}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          style={styles.input}
+          style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
         />
         {busy ? <ActivityIndicator color={Colors.textSecondary} /> : null}
         {query && !busy ? (

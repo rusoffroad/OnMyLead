@@ -152,7 +152,7 @@ export default function FindRides() {
       <PlaceSearch label="Search Near a Place" near={here} onPick={goToPlace} />
       {place ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
-          <ThemedText style={{ flex: 1, fontWeight: 600 }}>Rides near {place.name}</ThemedText>
+          <ThemedText style={{ flex: 1, fontWeight: 600 }}>Rides Near {place.name}</ThemedText>
           <Button title={here ? 'Back to Near Me' : 'Clear'} kind="ghost" onPress={clearPlace} />
         </View>
       ) : null}
