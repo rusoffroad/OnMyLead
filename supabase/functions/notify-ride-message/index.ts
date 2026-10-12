@@ -8,7 +8,7 @@
 // and the shared secret in the x-onmylead-push-secret header. push_batch() in the database
 // decides who gets what, applying each rider's notification settings and quiet hours, and
 // writes the text; this function only delivers it. Ride invites and followed leaders' new rides
-// come from push_batch_social instead (migration 20261017420000_riding_groups.sql). The older
+// come from push_batch_social instead (migration 20261017430000_riding_groups.sql). The older
 // {"message_id": "..."} body is still accepted.
 //
 // email_batch() does the same for the emails, which go out through Resend.

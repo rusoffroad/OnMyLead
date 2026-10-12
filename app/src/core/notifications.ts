@@ -77,7 +77,7 @@ export const TOPIC_GROUPS: TopicGroup[] = [
   },
 ];
 
-/** Topics that arrived with riding groups (migration 20261017420000_riding_groups.sql). */
+/** Topics that arrived with riding groups (migration 20261017430000_riding_groups.sql). */
 export const GROUP_TOPICS: NotificationTopic[] = ['ride_invites', 'followed_leaders'];
 
 export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [

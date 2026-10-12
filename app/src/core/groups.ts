@@ -4,7 +4,7 @@
  * A group is a rider's crew, saved once and invited to a ride in one tap. People are added from
  * riders you have been on a ride with, or join through the group's link. Who is in a group is
  * seen only by its owner and members (enforced by the database, see migration
- * 20261017420000_riding_groups.sql).
+ * 20261017430000_riding_groups.sql).
  */
 import { shownName } from './profile';
 
