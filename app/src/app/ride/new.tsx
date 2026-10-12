@@ -3,12 +3,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { PlaceSearch } from '@/components/place-search';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
 import { rideAllowanceText } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
+import { placeLabel, type Place } from '@/core/places';
 import { parseTime } from '@/core/time';
 import { createRide } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
@@ -86,6 +88,12 @@ export default function NewRide() {
     }
   }
 
+  async function pickPlace(p: Place) {
+    setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+    if (p.kind !== 'Coordinates') setMeetLabel(placeLabel(p));
+    setMeetState(p.state ?? (await stateAt(p)));
+  }
+
   async function fillStateFromCoords() {
     if (parsedCoords) setMeetState(await stateAt({ lat: Number(parsedCoords[1]), lng: Number(parsedCoords[2]) }));
   }
@@ -97,7 +105,7 @@ export default function NewRide() {
     if (!kind) return setError('Pick Public or Private at the top.');
     if (!name.trim()) return setError('Give the ride a name.');
     if (!meetAt) return setError('Meeting time looks off. Try "8:00 am".');
-    if (!parsedCoords) return setError('Set the meeting point: use your location or paste coordinates like "38.57, -109.55".');
+    if (!parsedCoords) return setError('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".');
     if (!routePlan) return setError('Pick Mapped or Freeride under The Route.');
     setBusy(true);
     try {
@@ -190,6 +198,7 @@ export default function NewRide() {
         <ThemedText type="small" themeColor="textSecondary">
           Only joined riders see the exact spot. Public pages show the area within about a mile.
         </ThemedText>
+        <PlaceSearch label="Search a Place" onPick={pickPlace} />
         <Button title="Use My Current Location" kind="secondary" onPress={useMyLocation} />
         <Field label="Coordinates" value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
         <Field label="Place Name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
