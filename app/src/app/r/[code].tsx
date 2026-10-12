@@ -12,6 +12,7 @@ import { RideRoster } from '@/components/ride-roster';
 import { RideSummary } from '@/components/ride-summary';
 import { RouteSketch } from '@/components/route-sketch';
 import { ThemedText } from '@/components/themed-text';
+import { waypointDots } from '@/components/waypoint-blaze';
 import { WaypointRow } from '@/components/waypoint-row';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
@@ -21,7 +22,7 @@ import { rideDirections } from '@/core/directions';
 import { leadersToFollow } from '@/core/groups';
 import { counts } from '@/core/joining';
 import { miles, type RideRoute } from '@/core/route';
-import { WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
+import { canShareWaypoints, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import {
@@ -116,6 +117,9 @@ export default function RidePage() {
   const c = counts(members.map((m) => ({ ...m, createdAt: 0, userId: m.user_id })));
   const nameOf = (userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider';
   const leaderIds = rideLeaderIds(members, ride.organizer_id);
+  const canPlanStops = canShareWaypoints(me, mine, leaderIds);
+  const stops = plannedStops(waypoints.waypoints);
+  const otherWaypoints = waypoints.waypoints.filter((w) => !w.planned_stop);
   const pinned = isJoined ? latestAnnouncement(chat.messages) : null;
 
   const join = () =>
@@ -219,7 +223,7 @@ export default function RidePage() {
             <>
               <RouteSketch
                 points={route.points}
-                dots={waypoints.waypoints.map((w) => ({ id: w.id, lat: w.lat, lng: w.lng, color: w.shared ? Colors.sky : Colors.text, diamond: true }))}
+                dots={waypointDots(waypoints.waypoints)}
               />
               <ThemedText type="small" themeColor="textSecondary">
                 {ride.status === 'live'
@@ -246,21 +250,51 @@ export default function RidePage() {
         </Card>
       ) : null}
 
+      {isJoined && !cancelled && waypoints.switchedOn && (stops.length || (canPlanStops && ride.status !== 'ended')) ? (
+        <Card>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <ThemedText type="heading">Planned Stops</ThemedText>
+            {stops.length ? <ThemedText style={{ color: Colors.accent, fontWeight: 700 }}>{stops.length}</ThemedText> : null}
+          </View>
+          {stops.length ? (
+            <View>
+              {stops.map((w, i) => (
+                <WaypointRow key={w.id} waypoint={w} stop={i + 1} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
+              ))}
+            </View>
+          ) : (
+            <ThemedText themeColor="textSecondary">
+              {waypoints.stopsSwitchedOn
+                ? 'Mark where the group will stop for fuel, lunch or camp. Every rider sees them numbered on the map, in order.'
+                : PLANNED_STOPS_NOT_SWITCHED_ON}
+            </ThemedText>
+          )}
+          {canPlanStops && ride.status !== 'ended' ? (
+            <Button
+              title="Add a Planned Stop"
+              kind={stops.length ? 'secondary' : 'primary'}
+              disabled={!waypoints.stopsSwitchedOn}
+              onPress={() => router.push(`/ride/${ride.id}/waypoints?stop=1`)}
+            />
+          ) : null}
+        </Card>
+      ) : null}
+
       {isJoined && !cancelled ? (
         <Card>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
             <ThemedText type="heading">Waypoints</ThemedText>
-            {waypoints.waypoints.length ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{waypoints.waypoints.length}</ThemedText> : null}
+            {otherWaypoints.length ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{otherWaypoints.length}</ThemedText> : null}
           </View>
           {!waypoints.switchedOn ? (
             <ThemedText themeColor="textSecondary">{WAYPOINTS_NOT_SWITCHED_ON}</ThemedText>
-          ) : waypoints.waypoints.length ? (
+          ) : otherWaypoints.length ? (
             <View>
-              {waypoints.waypoints.slice(0, 3).map((w, i) => (
+              {otherWaypoints.slice(0, 3).map((w, i) => (
                 <WaypointRow key={w.id} waypoint={w} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
               ))}
-              {waypoints.waypoints.length > 3 ? (
-                <ThemedText type="small" themeColor="textSecondary">and {waypoints.waypoints.length - 3} more</ThemedText>
+              {otherWaypoints.length > 3 ? (
+                <ThemedText type="small" themeColor="textSecondary">and {otherWaypoints.length - 3} more</ThemedText>
               ) : null}
             </View>
           ) : (
@@ -271,8 +305,8 @@ export default function RidePage() {
             </ThemedText>
           )}
           <Button
-            title={waypoints.waypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
-            kind={waypoints.waypoints.length ? 'secondary' : 'primary'}
+            title={otherWaypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
+            kind={otherWaypoints.length ? 'secondary' : 'primary'}
             disabled={!waypoints.switchedOn}
             onPress={() => router.push(`/ride/${ride.id}/waypoints`)}
           />

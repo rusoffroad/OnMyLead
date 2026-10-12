@@ -12,6 +12,8 @@ export function useRideWaypoints(rideId: string | null | undefined, enabled: boo
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
   /** False until the server has the waypoints update. */
   const [switchedOn, setSwitchedOn] = useState(true);
+  /** False until the server has the planned stops update. */
+  const [stopsSwitchedOn, setStopsSwitchedOn] = useState(true);
   const [offline, setOffline] = useState(false);
 
   const reload = useCallback(
@@ -20,6 +22,7 @@ export function useRideWaypoints(rideId: string | null | undefined, enabled: boo
         ? rideWaypoints(rideId).then((r) => {
             setWaypoints(r.waypoints);
             setSwitchedOn(!r.switchedOff);
+            setStopsSwitchedOn(!r.stopsSwitchedOff);
             setOffline(r.offline);
           })
         : Promise.resolve(),
@@ -27,9 +30,13 @@ export function useRideWaypoints(rideId: string | null | undefined, enabled: boo
   );
 
   /** Show a save or a removal straight away, before the live update arrives. */
-  const apply = useCallback((change: { saved?: Waypoint; removedId?: string }) => {
+  const apply = useCallback((change: { saved?: Waypoint; removedId?: string; stopOrder?: string[] }) => {
     setWaypoints((prev) => {
       let next = prev;
+      if (change.stopOrder) {
+        const order = change.stopOrder;
+        next = next.map((w) => (order.includes(w.id) ? { ...w, stop_order: order.indexOf(w.id) + 1 } : w));
+      }
       if (change.removedId) next = next.filter((w) => w.id !== change.removedId);
       if (change.saved) next = [...next.filter((w) => w.id !== change.saved!.id), change.saved];
       return sortWaypoints(next);
@@ -55,5 +62,5 @@ export function useRideWaypoints(rideId: string | null | undefined, enabled: boo
     };
   }, [rideId, enabled, reload]);
 
-  return { waypoints, switchedOn, offline, reload, apply };
+  return { waypoints, switchedOn, stopsSwitchedOn, offline, reload, apply };
 }

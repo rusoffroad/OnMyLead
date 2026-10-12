@@ -1,10 +1,10 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { RouteSketch } from './route-sketch';
+import { waypointDots } from './waypoint-blaze';
 
 /** The web build has no native map: draw the route with the waypoints on it as blazes. */
 export function WaypointMap({
@@ -17,7 +17,7 @@ export function WaypointMap({
   onPressWaypoint: (w: Waypoint) => void;
   onLongPressMap?: (p: LatLng) => void;
 }) {
-  const dots = waypoints.map((w) => ({ id: w.id, lat: w.lat, lng: w.lng, name: w.name, color: w.shared ? Colors.sky : Colors.text, diamond: true }));
+  const dots = waypointDots(waypoints, true);
   return (
     <View style={[StyleSheet.absoluteFill, styles.wrap]}>
       {(route?.length ?? 0) > 1 || dots.length ? (

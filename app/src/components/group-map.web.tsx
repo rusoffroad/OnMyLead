@@ -8,6 +8,7 @@ import type { MapRider } from './group-map-types';
 import { BreakdownBadge } from './rider-status-badge';
 import { RiderDot } from './rider-dot';
 import { RouteSketch } from './route-sketch';
+import { waypointDots } from './waypoint-blaze';
 
 export type { MapRider } from './group-map-types';
 
@@ -16,7 +17,7 @@ export type { MapRider } from './group-map-types';
  * show the group as a list so the screen still works.
  */
 export function GroupMap({
-  riders, regroup, route,
+  riders, regroup, route, waypoints,
 }: {
   riders: MapRider[];
   route?: { lat: number; lng: number }[] | null;
@@ -39,9 +40,11 @@ export function GroupMap({
         big: r.role === 'leader',
         name: r.name,
       }));
+    // The planned stops, so the web shows where the group will stop too.
+    const stops = waypointDots((waypoints ?? []).filter((w) => w.planned_stop));
     return (
       <View style={[StyleSheet.absoluteFill, styles.sketchWrap]}>
-        <RouteSketch points={route} dots={dots} width={360} height={300} style={{ borderRadius: 0 }} label="The route with the group on it" />
+        <RouteSketch points={route} dots={[...stops, ...dots]} width={360} height={300} style={{ borderRadius: 0 }} label="The route with the group on it" />
       </View>
     );
   }
