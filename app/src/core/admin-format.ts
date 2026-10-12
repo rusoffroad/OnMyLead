@@ -106,6 +106,10 @@ export function actionLabel(action: string): string {
     'report.dismissed': 'Dismissed Report',
     'report.open': 'Reopened Report',
     'feature_plan.set': 'Changed Feature Access',
+    'trial.extend': 'Extended Trial',
+    'pro.comp_grant': 'Granted Complimentary Pro',
+    'pro.grant_revoke': 'Revoked Complimentary Pro',
+    'setting.update': 'Changed a Setting',
   };
   if (known[action]) return known[action];
   return action

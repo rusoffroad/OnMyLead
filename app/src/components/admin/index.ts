@@ -8,6 +8,8 @@ export { AdminGate } from './gate';
 export { ADMIN_SECTIONS, sectionFor, type AdminSection } from './nav';
 export { AdminPage, Columns, ComingSoon, Empty, ErrorNote, Fields, Loading, Panel } from './page';
 export { AdminShell } from './shell';
+export { TrialSettings } from './trial-settings';
+export { RIDE_STATUS, ROLE, VISIBILITY } from './labels';
 export { planTone, StatGrid, StatTile, StatusBadge } from './stats';
 export { DataTable, Pager, type Column } from './table';
 export { AdminColors, SeriesColors, tabular, toneColor, useLayoutSize, type LayoutSize, type Tone } from './tokens';

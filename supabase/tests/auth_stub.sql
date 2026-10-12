@@ -15,3 +15,8 @@ create function auth.jwt() returns jsonb language sql stable as $$
   select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb
 $$;
 grant execute on function auth.jwt() to anon, authenticated;
+-- Columns the Admin Dashboard reads (account status and sign-in times).
+alter table auth.users add column if not exists created_at timestamptz default now(),
+  add column if not exists email_confirmed_at timestamptz,
+  add column if not exists last_sign_in_at timestamptz,
+  add column if not exists banned_until timestamptz;
