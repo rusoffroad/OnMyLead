@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useState } from 'react';
 import { Platform, Pressable } from 'react-native';
 
@@ -26,7 +26,7 @@ const ENABLED_SOCIAL = (process.env.EXPO_PUBLIC_SOCIAL_PROVIDERS ?? '')
   .filter(Boolean);
 
 export default function SignIn() {
-  const params = useLocalSearchParams<{ mode?: string }>();
+  const params = useLocalSearchParams<{ mode?: string; next?: string }>();
   const [mode, setMode] = useState<Mode>(params.mode === 'create' ? 'create' : 'sign_in');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -48,7 +48,9 @@ export default function SignIn() {
     }
   }
 
-  const done = () => (router.canGoBack() ? router.back() : router.replace('/'));
+  // `next` (a page on this site, like /ride/new) is where the website sends someone after signing in.
+  const next = typeof params.next === 'string' && /^\/(?!\/)[\w\-/?=&.]*$/.test(params.next) ? params.next : null;
+  const done = () => (next ? router.replace(next as Href) : router.canGoBack() ? router.back() : router.replace('/'));
   const cleanEmail = email.trim().toLowerCase();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail);
 

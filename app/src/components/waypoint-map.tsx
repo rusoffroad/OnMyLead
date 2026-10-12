@@ -23,6 +23,8 @@ export function WaypointMap({
   trail: TrailMap;
   onPressWaypoint: (w: Waypoint) => void;
   onLongPressMap?: (p: LatLng) => void;
+  /** Web only: keeps framed routes clear of the panels over the map. */
+  padding?: [number, number, number, number];
 }) {
   const map = useRef<MapView>(null);
   const fitted = useRef(false);

@@ -1,5 +1,3 @@
-import 'leaflet/dist/leaflet.css';
-
 import L from 'leaflet';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
@@ -7,36 +5,10 @@ import { View } from 'react-native';
 import { MapControls, MapOverlay, meetsLabel, pinColor, type RidesMapProps } from '@/components/rides-map-chrome';
 import { Colors, Radius } from '@/constants/theme';
 import { regionMoved, type Bounds } from '@/core/discovery';
+import { esc, satelliteMap } from '@/lib/web-map';
 
 const toLatLngBounds = (b: Bounds) => L.latLngBounds([b.minLat, b.minLng], [b.maxLat, b.maxLng]);
 const fromLatLngBounds = (b: L.LatLngBounds): Bounds => ({ minLat: b.getSouth(), maxLat: b.getNorth(), minLng: b.getWest(), maxLng: b.getEast() });
-const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-
-// Leaflet draws its own popups and controls in HTML; restyle them in the app's dark palette.
-const CSS = `
-.omlmap { background: ${Colors.backgroundElement}; font-family: Barlow_500Medium, system-ui, sans-serif; }
-.omlmap .leaflet-popup-content-wrapper { background: ${Colors.backgroundElement}; color: ${Colors.text}; border: 1px solid ${Colors.border}; border-radius: 14px; box-shadow: 0 6px 20px rgba(0,0,0,.45); }
-.omlmap .leaflet-popup-tip { background: ${Colors.backgroundElement}; border: 1px solid ${Colors.border}; }
-.omlmap .leaflet-popup-content { margin: 12px 14px; width: 200px !important; }
-.omlmap .leaflet-popup-close-button { color: ${Colors.textSecondary} !important; }
-.omlmap .leaflet-control-attribution { background: rgba(10,22,38,.7); color: ${Colors.textSecondary}; font-size: 9px; }
-.omlmap .leaflet-control-attribution a { color: ${Colors.textSecondary}; }
-.oml-pin { position: relative; width: 30px; height: 30px; }
-.oml-pin i { position: absolute; left: 6px; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid ${Colors.background}; }
-.oml-pin b { position: absolute; inset: 0; border-radius: 50%; background: ${Colors.accent}; opacity: .3; }
-.oml-pop .live { color: ${Colors.accent}; font-family: Barlow_700Bold, sans-serif; font-size: 13px; }
-.oml-pop .t { font-family: BarlowCondensed_700Bold, sans-serif; font-size: 19px; line-height: 22px; color: ${Colors.text}; }
-.oml-pop .s { color: ${Colors.textSecondary}; font-size: 14px; margin-top: 2px; }
-.oml-pop button { all: unset; cursor: pointer; color: ${Colors.sky}; font-family: Barlow_700Bold, sans-serif; font-size: 14px; margin-top: 6px; display: inline-block; }
-`;
-
-function injectCss() {
-  if (document.getElementById('omlmap-css')) return;
-  const el = document.createElement('style');
-  el.id = 'omlmap-css';
-  el.textContent = CSS;
-  document.head.appendChild(el);
-}
 
 /** The Find a ride map on the web: satellite imagery with place names, same pins and controls as the phone. */
 export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400 }: RidesMapProps) {
@@ -57,14 +29,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
   };
 
   useEffect(() => {
-    injectCss();
-    const m = L.map(el.current!, { zoomControl: false, attributionControl: true, zoomSnap: 0.25 });
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 18,
-      attribution: 'Esri, Maxar, Earthstar Geographics',
-    }).addTo(m);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }).addTo(m);
-    m.attributionControl.setPrefix(false);
+    const m = satelliteMap(el.current!);
     layer.current = L.layerGroup().addTo(m);
     m.on('moveend', () => {
       const now = fromLatLngBounds(m.getBounds());
