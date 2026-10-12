@@ -943,4 +943,165 @@ do $$ begin
   end if;
 end $$;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME TESTS PASSED' as result;
+-- 20. Hand off the ride, and the tail gunner.
+create function expect_refused(p_sql text, p_fail text) returns void language plpgsql as $$
+begin
+  begin
+    execute p_sql;
+  exception when others then
+    return;
+  end;
+  raise exception 'FAIL: %', p_fail;
+end;
+$$;
+create function role_of(p_ride uuid, p_user uuid) returns member_role language sql security definer as $$
+  select role from ride_members where ride_id = p_ride and user_id = p_user;
+$$;
+
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('13131313-1313-1313-1313-131313131313', auth.uid(), 'Hand-off ride', now() + interval '1 day', 38.5, -109.5, 'public');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select join_ride('13131313-1313-1313-1313-131313131313');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select join_ride('13131313-1313-1313-1313-131313131313');
+-- Cara writes to the leader while Olivia still leads.
+insert into ride_messages (id, ride_id, user_id, audience, body)
+values ('e0000000-0000-0000-0000-000000000013', '13131313-1313-1313-1313-131313131313', auth.uid(), 'leader', 'Need to stop soon');
+reset role;
+
+-- A plain rider can't hand off the ride or pick the tail gunner.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select expect_refused($q$select hand_off_ride('13131313-1313-1313-1313-131313131313', auth.uid())$q$, 'rider took the ride');
+select expect_refused($q$select hand_off_ride('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000c')$q$, 'rider handed off a ride they don''t lead');
+select expect_refused($q$select set_tail_gunner('13131313-1313-1313-1313-131313131313', auth.uid())$q$, 'rider made themself tail gunner');
+reset role;
+do $$ begin
+  if (select organizer_id from rides where id = '13131313-1313-1313-1313-131313131313') <> '00000000-0000-0000-0000-00000000000a' then
+    raise exception 'FAIL: organizer changed after refused hand-offs';
+  end if;
+end $$;
+
+-- Olivia picks a tail gunner; there is only ever one.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select set_tail_gunner('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000c');
+select set_tail_gunner('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000b');
+select expect_refused($q$select set_tail_gunner('13131313-1313-1313-1313-131313131313', auth.uid())$q$, 'organizer made tail gunner');
+select expect_refused($q$select set_tail_gunner('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000d')$q$, 'non-member made tail gunner');
+-- Nobody takes over a ride by editing it directly, not even a co-organizer.
+select expect_refused($q$update rides set organizer_id = '00000000-0000-0000-0000-00000000000b' where id = '13131313-1313-1313-1313-131313131313'$q$, 'organizer changed by a direct edit');
+select expect_refused($q$update ride_members set role = 'organizer' where ride_id = '13131313-1313-1313-1313-131313131313' and user_id = '00000000-0000-0000-0000-00000000000c'$q$, 'organizer role given by a direct edit');
+select expect_refused($q$update ride_members set role = 'rider' where ride_id = '13131313-1313-1313-1313-131313131313' and user_id = auth.uid()$q$, 'organizer role dropped by a direct edit');
+update ride_members set role = 'co_organizer'
+where ride_id = '13131313-1313-1313-1313-131313131313' and user_id = '00000000-0000-0000-0000-00000000000c';
+reset role;
+do $$ begin
+  if (select count(*) from ride_members where ride_id = '13131313-1313-1313-1313-131313131313' and role = 'sweep') <> 1
+     or role_of('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000b') <> 'sweep' then
+    raise exception 'FAIL: tail gunner not moved to the newly picked rider';
+  end if;
+end $$;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select expect_refused($q$update rides set organizer_id = auth.uid() where id = '13131313-1313-1313-1313-131313131313'$q$, 'co-organizer took the ride by a direct edit');
+select expect_refused($q$select hand_off_ride('13131313-1313-1313-1313-131313131313', auth.uid())$q$, 'co-organizer took the ride');
+reset role;
+
+-- Olivia can't hand the ride to someone who hasn't joined, then hands it to Ben.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select expect_refused($q$select hand_off_ride('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000d')$q$, 'ride handed to a non-member');
+select expect_refused($q$select hand_off_ride('13131313-1313-1313-1313-131313131313', auth.uid())$q$, 'ride handed to yourself');
+select hand_off_ride('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000b');
+do $$ begin
+  if exists (select 1 from ride_messages where id = 'e0000000-0000-0000-0000-000000000013') then
+    raise exception 'FAIL: old leader still reads leader-only messages after handing off the ride';
+  end if;
+end $$;
+select expect_refused($q$select set_tail_gunner('13131313-1313-1313-1313-131313131313', null)$q$, 'old organizer still picks the tail gunner');
+reset role;
+do $$
+declare r constant uuid := '13131313-1313-1313-1313-131313131313';
+begin
+  if (select organizer_id from rides where id = r) <> '00000000-0000-0000-0000-00000000000b' then
+    raise exception 'FAIL: hand-off did not move the ride';
+  end if;
+  if role_of(r, '00000000-0000-0000-0000-00000000000b') <> 'organizer' or role_of(r, '00000000-0000-0000-0000-00000000000a') <> 'rider' then
+    raise exception 'FAIL: hand-off roles wrong (new organizer, old one a rider)';
+  end if;
+  if (select status from ride_members where ride_id = r and user_id = '00000000-0000-0000-0000-00000000000a') <> 'joined' then
+    raise exception 'FAIL: old organizer dropped off the ride';
+  end if;
+  if not is_ride_leader(r, '00000000-0000-0000-0000-00000000000b') or is_ride_leader(r, '00000000-0000-0000-0000-00000000000a') then
+    raise exception 'FAIL: leader did not follow the hand-off';
+  end if;
+  if not is_ride_manager(r, '00000000-0000-0000-0000-00000000000b') or is_ride_manager(r, '00000000-0000-0000-0000-00000000000a') then
+    raise exception 'FAIL: organizer rights did not follow the hand-off';
+  end if;
+  if exists (select 1 from ride_members where ride_id = r and role = 'sweep') then
+    raise exception 'FAIL: the new leader is still tail gunner';
+  end if;
+  if (select array_agg(token) from ride_message_recipients('e0000000-0000-0000-0000-000000000013')) is not null then
+    raise exception 'FAIL: leader-only notification went to someone other than the new leader';
+  end if;
+end $$;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  if not exists (select 1 from ride_messages where id = 'e0000000-0000-0000-0000-000000000013') then
+    raise exception 'FAIL: new leader cannot read leader-only messages';
+  end if;
+end $$;
+-- Ben gives Olivia the Leader role; as the leader she hands the lead (not the ride) to Cara.
+update ride_members set role = 'leader'
+where ride_id = '13131313-1313-1313-1313-131313131313' and user_id = '00000000-0000-0000-0000-00000000000a';
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select hand_off_ride('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000c');
+reset role;
+do $$
+declare r constant uuid := '13131313-1313-1313-1313-131313131313';
+begin
+  if (select organizer_id from rides where id = r) <> '00000000-0000-0000-0000-00000000000b' then
+    raise exception 'FAIL: handing off the lead gave away the ride';
+  end if;
+  if role_of(r, '00000000-0000-0000-0000-00000000000c') <> 'leader' or role_of(r, '00000000-0000-0000-0000-00000000000a') <> 'rider' then
+    raise exception 'FAIL: lead hand-off roles wrong';
+  end if;
+  if not is_ride_leader(r, '00000000-0000-0000-0000-00000000000c') or is_ride_leader(r, '00000000-0000-0000-0000-00000000000b') then
+    raise exception 'FAIL: leader did not follow the lead hand-off';
+  end if;
+end $$;
+-- The leader picks the tail gunner, then hands the lead back to the organizer.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select set_tail_gunner('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000a');
+select hand_off_ride('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000b');
+reset role;
+do $$
+declare r constant uuid := '13131313-1313-1313-1313-131313131313';
+begin
+  if role_of(r, '00000000-0000-0000-0000-00000000000a') <> 'sweep' then
+    raise exception 'FAIL: leader could not pick the tail gunner';
+  end if;
+  if role_of(r, '00000000-0000-0000-0000-00000000000b') <> 'organizer' or role_of(r, '00000000-0000-0000-0000-00000000000c') <> 'rider'
+     or not is_ride_leader(r, '00000000-0000-0000-0000-00000000000b') then
+    raise exception 'FAIL: lead not back with the organizer';
+  end if;
+end $$;
+-- A finished ride can't be handed off.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select set_ride_status('13131313-1313-1313-1313-131313131313', 'ended');
+select expect_refused($q$select hand_off_ride('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000c')$q$, 'ended ride handed off');
+reset role;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, HAND-OFF AND TAIL GUNNER TESTS PASSED' as result;

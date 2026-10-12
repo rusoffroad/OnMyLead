@@ -5,15 +5,16 @@ import { Pressable, View } from 'react-native';
 import { FuelCheck } from '@/components/fuel-check';
 import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
+import { RideRoster } from '@/components/ride-roster';
 import { RideSummary } from '@/components/ride-summary';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
-import { Colors, RideColors, Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { counts } from '@/core/joining';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
-  approveMember, checkIn, getMembers, getPrivateDetails, getRide, joinRide, leaveRide, setMemberRole, setRideStatus, tripForRide,
+  approveMember, checkIn, getMembers, getPrivateDetails, getRide, joinRide, leaveRide, setRideStatus, tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { openStore } from '@/lib/rus';
@@ -195,29 +196,7 @@ export default function RidePage() {
       ) : null}
 
       {mine?.status === 'joined' ? (
-        <Card>
-          <ThemedText type="heading">Going ({joined.length})</ThemedText>
-          {joined.map((m) => (
-            <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flexWrap: 'wrap', minHeight: 48 }}>
-              <Avatar name={m.profiles?.display_name || 'Rider'} color={ROLE_COLOR[m.role]} />
-              <View style={{ flex: 1, gap: 2 }}>
-                <ThemedText style={{ fontWeight: 600 }}>{m.profiles?.display_name || 'Rider'}</ThemedText>
-                {m.role !== 'rider' || m.checked_in_at ? (
-                  <ThemedText type="small" themeColor="textSecondary">
-                    {[m.role !== 'rider' ? ROLE_LABEL[m.role] : null, m.checked_in_at ? 'Here' : null].filter(Boolean).join(', ')}
-                  </ThemedText>
-                ) : null}
-              </View>
-              {isManager && m.role !== 'organizer' ? (
-                <>
-                  <Button title="Leader" kind="secondary" style={m.role === 'leader' && { backgroundColor: RideColors.leader }} onPress={() => act('role', () => setMemberRole(ride.id, m.user_id, m.role === 'leader' ? 'rider' : 'leader'))} />
-                  <Button title="Sweep" kind="secondary" style={m.role === 'sweep' && { backgroundColor: RideColors.sweep }} onPress={() => act('role', () => setMemberRole(ride.id, m.user_id, m.role === 'sweep' ? 'rider' : 'sweep'))} />
-                </>
-              ) : null}
-            </View>
-          ))}
-          {waitlist.length ? <ThemedText type="small" themeColor="textSecondary">{waitlist.length} on the waitlist</ThemedText> : null}
-        </Card>
+        <RideRoster ride={ride} members={members} me={me} waitlisted={waitlist.length} onChanged={load} />
       ) : null}
 
       {isJoined ? (
@@ -257,18 +236,3 @@ function Info({ label, value, first }: { label: string; value: string; first: bo
 }
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
-const ROLE_LABEL: Record<RideMember['role'], string> = {
-  organizer: 'Organizer', co_organizer: 'Co-organizer', leader: 'Leader', sweep: 'Sweep', rider: 'Rider',
-};
-const ROLE_COLOR: Record<RideMember['role'], string> = {
-  organizer: Colors.accent, co_organizer: Colors.accent, leader: RideColors.leader, sweep: RideColors.sweep, rider: RideColors.rider,
-};
-
-function Avatar({ name, color }: { name: string; color: string }) {
-  return (
-    <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
-      <ThemedText style={{ color: '#fff', fontWeight: 700 }}>{name.trim().charAt(0).toUpperCase()}</ThemedText>
-    </View>
-  );
-}

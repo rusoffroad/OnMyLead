@@ -198,8 +198,23 @@ export async function setRideStatus(rideId: string, status: 'live' | 'ended' | '
   track(status === 'live' ? 'ride_mode_started' : 'ride_mode_ended', { ride_id: rideId });
 }
 
-export async function setMemberRole(rideId: string, userId: string, role: 'leader' | 'sweep' | 'rider' | 'co_organizer') {
+export async function setMemberRole(rideId: string, userId: string, role: 'leader' | 'rider' | 'co_organizer') {
   unwrap(await supabase.from('ride_members').update({ role }).eq('ride_id', rideId).eq('user_id', userId));
+}
+
+/**
+ * Give the ride (organizer) or the lead (a rider with the Leader role) to another joined rider.
+ * You stay on the ride as a rider; leader-only chat follows the new leader.
+ */
+export async function handOffRide(rideId: string, toUserId: string) {
+  unwrap(await supabase.rpc('hand_off_ride', { p_ride: rideId, p_to: toUserId }));
+  track('ride_handed_off', { ride_id: rideId });
+}
+
+/** Name the one rider at the rear (stored as the 'sweep' role), or clear it with null. */
+export async function setTailGunner(rideId: string, userId: string | null) {
+  unwrap(await supabase.rpc('set_tail_gunner', { p_ride: rideId, p_user: userId }));
+  track('tail_gunner_set', { cleared: !userId });
 }
 
 export async function approveMember(rideId: string, userId: string, approve: boolean) {
