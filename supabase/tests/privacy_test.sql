@@ -1430,4 +1430,100 @@ do $$ begin
 end $$;
 reset role;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF, TAIL GUNNER, NOTIFICATION AND APPROVAL TESTS PASSED' as result;
+-- 25. Cancelling and deleting a ride tells everyone on it, by push and by email.
+update auth.users set email = case id
+  when '00000000-0000-0000-0000-00000000000a' then 'olivia@example.test'
+  when '00000000-0000-0000-0000-00000000000b' then 'ben@example.test'
+  when '00000000-0000-0000-0000-00000000000c' then 'cara@example.test'
+  else 'dan@example.test' end;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('16161616-1616-1616-1616-161616161616', auth.uid(), 'Cancel me', '2030-06-01 15:00+00', 38.5, -109.5, 'public'),
+       ('17171717-1717-1717-1717-171717171717', auth.uid(), 'Delete me', '2030-06-02 15:00+00', 38.5, -109.5, 'public');
+reset role;
+insert into ride_members (ride_id, user_id, status) values
+  ('16161616-1616-1616-1616-161616161616', '00000000-0000-0000-0000-00000000000b', 'joined'),
+  ('16161616-1616-1616-1616-161616161616', '00000000-0000-0000-0000-00000000000c', 'pending'),
+  ('17171717-1717-1717-1717-171717171717', '00000000-0000-0000-0000-00000000000b', 'joined'),
+  ('17171717-1717-1717-1717-171717171717', '00000000-0000-0000-0000-00000000000c', 'joined');
+
+-- Only the organizer can cancel or delete.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select expect_refused($q$select cancel_ride('16161616-1616-1616-1616-161616161616')$q$, 'rider cancelled the ride');
+select expect_refused($q$select delete_ride('16161616-1616-1616-1616-161616161616')$q$, 'rider deleted the ride');
+select expect_refused($q$select * from email_batch('{"type":"ride","change":"cancelled","id":"16161616-1616-1616-1616-161616161616"}')$q$, 'rider called email_batch');
+reset role;
+do $$ begin
+  if (select status from rides where id = '16161616-1616-1616-1616-161616161616') <> 'scheduled' then
+    raise exception 'FAIL: rider changed the ride';
+  end if;
+end $$;
+
+-- Olivia cancels: Cara (pending) gets the push, Ben switched ride changes off; both get the email.
+truncate net.calls;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select cancel_ride('16161616-1616-1616-1616-161616161616');
+select expect_refused($q$select cancel_ride('16161616-1616-1616-1616-161616161616')$q$, 'cancelled the ride twice');
+reset role;
+do $$ begin
+  if (select status from rides where id = '16161616-1616-1616-1616-161616161616') <> 'cancelled' then
+    raise exception 'FAIL: ride not cancelled';
+  end if;
+  if last_push() ->> 'change' <> 'cancelled' or push_tokens_for(last_push()) <> array['cara-token-000000000000000'] then
+    raise exception 'FAIL: cancel push not sent to the riders';
+  end if;
+  if (select array_agg(email order by email) from email_batch(last_push())) <> array['ben@example.test', 'cara@example.test'] then
+    raise exception 'FAIL: cancel email recipients';
+  end if;
+  if (select meet_local from email_batch(last_push()) where email = 'cara@example.test') <> 'Saturday, June 1 at 9:00 AM'
+     or (select organizer_name from email_batch(last_push()) limit 1) <> 'Olivia Organizer'
+     or (select bool_or(deleted) from email_batch(last_push())) then
+    raise exception 'FAIL: cancel email details';
+  end if;
+end $$;
+
+-- Cara turns the emails off.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+update notification_settings set ride_emails = false where user_id = auth.uid();
+reset role;
+
+-- Olivia deletes a ride people joined: they hear it was cancelled, and the ride is gone.
+truncate net.calls;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select delete_ride('17171717-1717-1717-1717-171717171717');
+reset role;
+do $$ begin
+  if exists (select 1 from rides where id = '17171717-1717-1717-1717-171717171717')
+     or exists (select 1 from ride_members where ride_id = '17171717-1717-1717-1717-171717171717') then
+    raise exception 'FAIL: ride not deleted';
+  end if;
+  if last_push() ->> 'type' <> 'ride_deleted' or push_tokens_for(last_push()) <> array['cara-token-000000000000000'] then
+    raise exception 'FAIL: delete push not sent to the riders';
+  end if;
+  if (select title from push_batch(last_push())) <> 'Delete me is cancelled' then
+    raise exception 'FAIL: delete push title';
+  end if;
+  if (select array_agg(email) from email_batch(last_push())) <> array['ben@example.test']
+     or not (select bool_and(deleted) from email_batch(last_push())) then
+    raise exception 'FAIL: delete email recipients or emails setting ignored';
+  end if;
+end $$;
+
+-- Deleting a ride that was already cancelled sends nothing new.
+truncate net.calls;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select delete_ride('16161616-1616-1616-1616-161616161616');
+reset role;
+do $$ begin
+  if (select count(*) from net.calls) <> 0 or exists (select 1 from rides where id = '16161616-1616-1616-1616-161616161616') then
+    raise exception 'FAIL: deleting a cancelled ride notified again or kept the ride';
+  end if;
+end $$;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF, TAIL GUNNER, NOTIFICATION, APPROVAL AND CANCEL/DELETE TESTS PASSED' as result;

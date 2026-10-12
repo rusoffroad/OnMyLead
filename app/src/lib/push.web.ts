@@ -3,6 +3,7 @@ export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unsupporte
 export async function registerForPush(_userId: string): Promise<void> {}
 export function resetPushRegistration() {}
 export function useNotificationTaps() {}
+export function useRideChangeReminders() {}
 export function tapTarget(_data: unknown): string | null {
   return null;
 }

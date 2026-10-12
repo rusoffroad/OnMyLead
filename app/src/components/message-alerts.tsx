@@ -8,7 +8,7 @@ import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { alertTitle, isLeaderOnly, shouldAlert, type ChatMessage } from '@/core/chat';
 import type { NotificationSettings } from '@/core/notifications';
 import { currentNotificationSettings, resetNotificationSettings, syncNotificationSettings } from '@/lib/notification-settings';
-import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps } from '@/lib/push';
+import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps, useRideChangeReminders } from '@/lib/push';
 import { useSession } from '@/lib/session';
 import { newChannel, supabase } from '@/lib/supabase';
 
@@ -66,6 +66,7 @@ export function MessageAlerts() {
   const current = queue[0];
 
   useNotificationTaps();
+  useRideChangeReminders();
 
   useEffect(() => {
     if (!me) {

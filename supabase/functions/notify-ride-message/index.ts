@@ -1,12 +1,15 @@
 // Sends the app's push notifications: ride chat, rider status taps (Need help, EMERGENCY and
-// the rest), ride changes, new riders and roles.
+// the rest), ride changes, new riders and roles. A cancelled or deleted ride also gets an email
+// to everyone who was on it.
 //
-// Called by the database triggers (see migrations 20261012000000_chat_leader_push.sql and
-// 20261015000000_notification_settings.sql) with an event such as {"type":"status","id":"..."}
+// Called by the database triggers (see migrations 20261012000000_chat_leader_push.sql,
+// 20261015000000_notification_settings.sql and 20261017000000_cancel_delete_ride.sql) with an event such as {"type":"status","id":"..."}
 // and the shared secret in the x-onmylead-push-secret header. push_batch() in the database
 // decides who gets what, applying each rider's notification settings and quiet hours, and
 // writes the text; this function only delivers it. The older {"message_id": "..."} body is
 // still accepted.
+//
+// email_batch() does the same for the emails, which go out through Resend.
 //
 // iOS goes straight to Apple (APNs) with a token-based key, so no third-party push service is
 // involved. Android (FCM) is not wired yet; those tokens are skipped.
@@ -17,6 +20,8 @@
 //          APNS_TEAM_ID          Apple Developer Team ID
 //          APNS_PRIVATE_KEY      contents of the .p8 file
 //          APNS_BUNDLE_ID        com.rusoffroad.onmylead.app (default)
+//          RESEND_API_KEY        Resend API key; without it no emails are sent
+//          EMAIL_FROM            OnMyLead <rides@onmylead.com> (default); the domain must be verified in Resend
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -42,13 +47,20 @@ Deno.serve(async (req) => {
   const event = typeof input?.message_id === 'string' ? { type: 'message', id: input.message_id } : input;
   if (typeof event?.type !== 'string') return new Response('event required', { status: 400 });
 
+  const [push, email] = await Promise.all([sendPushes(event), sendEmails(event)]);
+  if ('error' in push) return new Response(push.error, { status: 500 });
+  return Response.json({ ...push, ...email });
+});
+
+// deno-lint-ignore no-explicit-any
+async function sendPushes(event: any): Promise<{ sent: number; removed?: number; note?: string } | { error: string }> {
   const { data: rows, error } = await db.rpc('push_batch', { p_event: event });
-  if (error) return new Response(error.message, { status: 500 });
+  if (error) return { error: error.message };
 
   const ios = ((rows ?? []) as Push[]).filter((r) => r.platform === 'ios');
-  if (!ios.length) return Response.json({ sent: 0 });
+  if (!ios.length) return { sent: 0 };
   const jwt = await apnsJwt();
-  if (!jwt) return Response.json({ sent: 0, note: 'APNs not configured' });
+  if (!jwt) return { sent: 0, note: 'APNs not configured' };
 
   const results = await Promise.all(
     ios.map((r) =>
@@ -65,8 +77,70 @@ Deno.serve(async (req) => {
   );
   const gone = ios.filter((_, i) => results[i] === 'gone').map((r) => r.token);
   if (gone.length) await db.from('push_tokens').delete().in('token', gone);
-  return Response.json({ sent: results.filter((r) => r === 'ok').length, removed: gone.length });
-});
+  return { sent: results.filter((r) => r === 'ok').length, removed: gone.length };
+}
+
+type Email = {
+  email: string;
+  rider_name: string | null;
+  ride_name: string;
+  organizer_name: string;
+  meet_local: string | null;
+  deleted: boolean;
+};
+
+/** Cancelled and deleted rides only. Never fails the request: push matters more. */
+// deno-lint-ignore no-explicit-any
+async function sendEmails(event: any): Promise<{ emailed?: number; email_note?: string }> {
+  const isCancel = event.type === 'ride_deleted' || (event.type === 'ride' && event.change === 'cancelled');
+  if (!isCancel) return {};
+  const key = env('RESEND_API_KEY');
+  if (!key) return { emailed: 0, email_note: 'email not configured' };
+  const { data, error } = await db.rpc('email_batch', { p_event: event });
+  if (error) return { emailed: 0, email_note: error.message };
+  const rows = (data ?? []) as Email[];
+  if (!rows.length) return { emailed: 0 };
+  const from = env('EMAIL_FROM') || 'OnMyLead <rides@onmylead.com>';
+  let emailed = 0;
+  // Resend takes up to 100 emails per batch call.
+  for (let i = 0; i < rows.length; i += 100) {
+    const res = await fetch('https://api.resend.com/emails/batch', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+      body: JSON.stringify(rows.slice(i, i + 100).map((r) => ({ from, to: [r.email], ...cancelEmail(r) }))),
+    }).catch(() => null);
+    if (res?.ok) emailed += Math.min(100, rows.length - i);
+    else return { emailed, email_note: `Resend said ${res?.status ?? 'nothing'}` };
+  }
+  return { emailed };
+}
+
+/** The email itself: plain words, dark like the app. */
+export function cancelEmail(r: Email): { subject: string; text: string; html: string } {
+  const when = r.meet_local ? `, planned for ${r.meet_local}` : '';
+  const lines = [
+    r.rider_name ? `Hi ${r.rider_name},` : 'Hi,',
+    `${r.organizer_name} cancelled ${r.ride_name}${when}.${r.deleted ? ' The ride has been removed from OnMyLead.' : ''}`,
+    'You don’t need to do anything. Your other rides are unchanged.',
+  ];
+  const footer = 'You’re getting this because you were on this ride in OnMyLead. Turn these emails off in the app under Profile, Settings, Notifications.';
+  const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const html = `<!doctype html><html><body style="margin:0;background:#0A1626;padding:32px 16px;font-family:-apple-system,Helvetica,Arial,sans-serif">
+<table role="presentation" width="100%" style="max-width:520px;margin:0 auto;background:#12223A;border-radius:16px;border-top:4px solid #E5262E">
+<tr><td style="padding:28px 24px;color:#F1F4F8;font-size:16px;line-height:24px">
+<p style="margin:0 0 4px;color:#3B86F7;font-weight:700">OnMyLead</p>
+<h1 style="margin:0 0 20px;color:#F1F4F8;font-size:24px;line-height:30px">${esc(r.ride_name)} is cancelled</h1>
+${lines.map((l) => `<p style="margin:0 0 14px">${esc(l)}</p>`).join('\n')}
+<p style="margin:24px 0 0"><a href="https://onmylead.com" style="color:#3B86F7;font-weight:700;text-decoration:none">Open OnMyLead</a></p>
+</td></tr></table>
+<p style="max-width:520px;margin:16px auto 0;color:#97A7BE;font-size:12px;line-height:18px">${esc(footer)}</p>
+</body></html>`;
+  return {
+    subject: `${r.ride_name} is cancelled`,
+    text: `${lines.join('\n\n')}\n\nOpen OnMyLead: https://onmylead.com\n\n${footer}\n`,
+    html,
+  };
+}
 
 const APNS_HOSTS = ['https://api.push.apple.com', 'https://api.sandbox.push.apple.com'];
 

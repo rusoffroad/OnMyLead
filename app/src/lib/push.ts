@@ -17,6 +17,7 @@ import { Linking, Platform } from 'react-native';
 
 import { planReminders } from '@/core/notifications';
 import { myRides } from './api';
+import { currentNotificationSettings } from './notification-settings';
 import { supabase } from './supabase';
 
 // Chat already pops up inside the app, so only the rest gets a banner while the app is open.
@@ -78,6 +79,20 @@ export function useNotificationTaps() {
     const target = tapTarget(last?.notification.request.content.data as TapData | undefined);
     if (target) router.push(target as never);
   }, [last]);
+}
+
+/**
+ * A ride you're on was cancelled, removed or moved while the app is running: reschedule the
+ * reminders so the old one doesn't go off.
+ */
+export function useRideChangeReminders() {
+  useEffect(() => {
+    const sub = Notifications.addNotificationReceivedListener((n) => {
+      const data = n.request.content.data as TapData | undefined;
+      if (data?.type === 'ride' && data.change !== 'live') syncRideReminders(currentNotificationSettings().reminder_minutes);
+    });
+    return () => sub.remove();
+  }, []);
 }
 
 export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unsupported';
