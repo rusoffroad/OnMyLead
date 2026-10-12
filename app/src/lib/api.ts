@@ -774,3 +774,10 @@ export async function saveRideName(name: string): Promise<string> {
   track('ride_name_saved');
   return clean;
 }
+
+/** Ask for this account to be deleted (Apple requires an in-app way). The owner deletes it. */
+export async function requestAccountDeletion(reason?: string) {
+  const { error } = await supabase.rpc('request_account_deletion', { p_reason: reason ?? null });
+  if (error) throw new Error(error.message);
+  track('account_deletion_requested');
+}

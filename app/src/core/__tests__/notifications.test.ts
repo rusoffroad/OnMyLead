@@ -28,7 +28,7 @@ describe('notification settings', () => {
     expect(settingsSummary({ ...DEFAULT_SETTINGS, chat: false, quiet_hours: true })).toBe('1 turned off, quiet 10 PM to 6 AM');
     const allOff = { ...DEFAULT_SETTINGS, chat: false, rider_status: false, announcements: false, leader_messages: false, ride_changes: false, new_riders: false };
     expect(settingsSummary(allOff)).toBe('6 turned off');
-    expect(settingsSummary({ ...allOff, ride_invites: false, followed_leaders: false })).toBe('Help alerts only');
+    expect(settingsSummary({ ...allOff, ride_invites: false, followed_leaders: false, account_push: false })).toBe('Help alerts only');
   });
 
   it('notices a database without the update', () => {

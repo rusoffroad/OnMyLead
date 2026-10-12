@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the migrations, then the privacy tests and the riding group tests, against a throwaway local Postgres database.
+# Runs the migrations, then the privacy, riding group and Pro tests, against a throwaway local Postgres database.
 # Usage: PGHOST=... PGPORT=... PGUSER=postgres ./supabase/tests/run_local.sh
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -9,4 +9,6 @@ trap 'dropdb "$db"' EXIT
 psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   $(for f in "$here"/../migrations/*.sql; do echo -f "$f"; done) \
   -f "$here/privacy_test.sql" \
-  -f "$here/groups_test.sql"
+  -f "$here/groups_test.sql" \
+  -f "$here/pro_test.sql"
+bash "$here/concurrency_test.sh" "$db"
