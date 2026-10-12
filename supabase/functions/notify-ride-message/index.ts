@@ -1,13 +1,15 @@
 // Sends the app's push notifications: ride chat, rider status taps (Need help, EMERGENCY and
-// the rest), ride changes, new riders and roles. A cancelled or deleted ride also gets an email
-// to everyone who was on it.
+// the rest), ride changes, new riders and roles, ride invites from a riding group and new rides
+// from leaders a rider follows. A cancelled or deleted ride also gets an email to everyone who
+// was on it.
 //
 // Called by the database triggers (see migrations 20261012000000_chat_leader_push.sql,
 // 20261015000000_notification_settings.sql and 20261017000000_cancel_delete_ride.sql) with an event such as {"type":"status","id":"..."}
 // and the shared secret in the x-onmylead-push-secret header. push_batch() in the database
 // decides who gets what, applying each rider's notification settings and quiet hours, and
-// writes the text; this function only delivers it. The older {"message_id": "..."} body is
-// still accepted.
+// writes the text; this function only delivers it. Ride invites and followed leaders' new rides
+// come from push_batch_social instead (migration 20261017420000_riding_groups.sql). The older
+// {"message_id": "..."} body is still accepted.
 //
 // email_batch() does the same for the emails, which go out through Resend.
 //
@@ -24,6 +26,8 @@
 //          EMAIL_FROM            OnMyLead <rides@onmylead.com> (default); the domain must be verified in Resend
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+
+const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -54,7 +58,8 @@ Deno.serve(async (req) => {
 
 // deno-lint-ignore no-explicit-any
 async function sendPushes(event: any): Promise<{ sent: number; removed?: number; note?: string } | { error: string }> {
-  const { data: rows, error } = await db.rpc('push_batch', { p_event: event });
+  const batch = SOCIAL_EVENTS.has(event.type) ? 'push_batch_social' : 'push_batch';
+  const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 
   const ios = ((rows ?? []) as Push[]).filter((r) => r.platform === 'ios');

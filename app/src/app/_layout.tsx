@@ -81,6 +81,10 @@ function RootLayout() {
         <Stack.Screen name="maps/area" options={{ title: 'Pick An Area', headerShown: false }} />
         <Stack.Screen name="share" options={{ title: 'Share my location' }} />
         <Stack.Screen name="f/[token]" options={{ title: 'Shared location' }} />
+        <Stack.Screen name="groups/index" options={{ title: 'Riding Groups' }} />
+        <Stack.Screen name="groups/new" options={{ title: 'New Group' }} />
+        <Stack.Screen name="groups/[id]" options={{ title: '' }} />
+        <Stack.Screen name="g/[code]" options={{ title: 'Riding Group' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
       </Stack>
       <MessageAlerts />

@@ -6,6 +6,7 @@ import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { inviteMessage, mailUrl, smsUrl } from '@/core/discovery';
 import { track } from '@/lib/analytics';
 import type { Ride } from '@/lib/types';
+import { GroupInvite } from './group-invite';
 import { ThemedText } from './themed-text';
 import { Button, Card } from './ui';
 
@@ -14,8 +15,9 @@ const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 /**
  * Send a ride to friends: the phone's share sheet (any app), or straight into a text or an
  * email, with the link and the invite code. `fresh` is the version shown right after creating.
+ * The ride's organizers (`manager`) can also invite a whole riding group in one tap.
  */
-export function InviteCard({ ride, fresh }: { ride: Ride; fresh?: boolean }) {
+export function InviteCard({ ride, fresh, manager }: { ride: Ride; fresh?: boolean; manager?: boolean }) {
   const [copied, setCopied] = useState(false);
   const link = WEB_URL ? `${WEB_URL}/r/${ride.invite_code}` : null;
   const message = inviteMessage(ride, link);
@@ -61,6 +63,7 @@ export function InviteCard({ ride, fresh }: { ride: Ride; fresh?: boolean }) {
           }}
         />
       </View>
+      {manager && (ride.status === 'scheduled' || ride.status === 'live') ? <GroupInvite rideId={ride.id} /> : null}
     </Card>
   );
 }

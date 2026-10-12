@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import {
-  DEFAULT_SETTINGS, formatClock, quietLengthHours, quietSegments, REMINDER_OPTIONS, stepClock, TOPIC_GROUPS,
+  DEFAULT_SETTINGS, formatClock, GROUP_TOPICS, quietLengthHours, quietSegments, REMINDER_OPTIONS, stepClock, TOPIC_GROUPS,
   type NotificationSettings,
 } from '@/core/notifications';
 import { loadNotificationSettings, saveNotificationSettings } from '@/lib/notification-settings';
@@ -61,7 +61,8 @@ export default function NotificationsScreen() {
       if ('reminder_minutes' in patch) syncRideReminders(saved.reminder_minutes);
     } catch (e) {
       setSettings(before);
-      setError(`Couldn’t save that. ${(e as Error).message}`);
+      const groupsOff = GROUP_TOPICS.some((k) => k in patch) && /ride_invites|followed_leaders|schema cache/i.test((e as Error).message);
+      setError(groupsOff ? 'Ride Invites and Leaders You Follow are not switched on yet. They start working with the next server update.' : `Couldn’t save that. ${(e as Error).message}`);
     }
   };
 
