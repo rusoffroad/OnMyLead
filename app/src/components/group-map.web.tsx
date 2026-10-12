@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors } from '@/constants/theme';
+import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
 import { RouteSketch } from './route-sketch';
 
@@ -17,6 +18,7 @@ export function GroupMap({
   route?: { lat: number; lng: number }[] | null;
   regroup: { lat: number; lng: number; label: string | null } | null;
   onPressRider?: (id: string) => void;
+  trail?: TrailMap;
 }) {
   if (route && route.length > 1) {
     const dots = riders

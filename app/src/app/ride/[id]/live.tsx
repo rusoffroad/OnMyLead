@@ -7,11 +7,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert, Animated, LayoutAnimation, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GroupMap, type MapRider } from '@/components/group-map';
 import { RouteStrip } from '@/components/route-strip';
 import { SharePicker } from '@/components/share-picker';
+import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
@@ -25,6 +26,7 @@ import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
+import { useTrailMap } from '@/hooks/use-trail-map';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
   startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
@@ -77,6 +79,8 @@ async function loadSnapshot(id: string): Promise<RideSnapshot> {
 
 export default function RideMode() {
   useKeepAwake();
+  const trail = useTrailMap();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useSession();
   const me = session?.user.id;
@@ -428,7 +432,8 @@ export default function RideMode() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <GroupMap riders={mapRiders} meId={me} regroup={regroup} route={route.route?.points} />
+      <GroupMap riders={mapRiders} meId={me} regroup={regroup} route={route.route?.points} trail={trail} />
+      <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route.route?.points} />
 
       <SafeAreaView edges={['top']} style={styles.top}>
         <View style={styles.topRow}>

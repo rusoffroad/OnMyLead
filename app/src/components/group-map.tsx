@@ -4,8 +4,10 @@ import MapView, { Marker } from 'react-native-maps';
 
 import { Colors, font, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
 import { RouteEnds, RouteLine } from './route-overlay';
+import { TrailTiles } from './trail-tiles';
 
 export type { MapRider } from './group-map-types';
 
@@ -14,7 +16,7 @@ export type { MapRider } from './group-map-types';
  * the one bigger blue dot, so a glance finds them. A yellow or red ring means Ride Bubble trouble.
  */
 export function GroupMap({
-  riders, regroup, route, meId, onPressRider,
+  riders, regroup, route, meId, onPressRider, trail,
 }: {
   riders: MapRider[];
   /** This phone's rider: iOS already draws them as the location dot, so no second pin. */
@@ -23,6 +25,8 @@ export function GroupMap({
   route?: LatLng[] | null;
   regroup: { lat: number; lng: number; label: string | null } | null;
   onPressRider?: (id: string) => void;
+  /** Topo and public trails layers (see useTrailMap); tapping a trail shows what it is. */
+  trail?: TrailMap;
 }) {
   const map = useRef<MapView>(null);
   const fitted = useRef<'no' | 'riders' | 'route'>('no');
@@ -39,7 +43,8 @@ export function GroupMap({
   }, [riders, route]);
 
   return (
-    <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text}>
+    <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}>
+      {trail ? <TrailTiles base={trail.base} trails={trail.trails} /> : null}
       {route && route.length > 1 ? (
         <>
           <RouteLine points={route} />
