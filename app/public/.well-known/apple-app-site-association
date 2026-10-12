@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["YJ4KUF2QQV.com.rusoffroad.onmylead.app"],
+        "components": [
+          { "/": "/r/*", "comment": "Ride invite links and ride QR codes" },
+          { "/": "/g/*", "comment": "Riding group invite links" }
+        ]
+      }
+    ]
+  }
+}
