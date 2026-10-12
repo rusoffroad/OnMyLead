@@ -9,7 +9,8 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0A1626",
     "ios": {
-      "bundleIdentifier": "com.rusoffroad.onmylead",
+      "bundleIdentifier": "com.rusoffroad.onmylead.app",
+      "appleTeamId": "YJ4KUF2QQV",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Your location is shared only with riders you choose, only while you are sharing, so your group can stay together.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends.",
@@ -24,7 +25,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.rusoffroad.onmylead"
+      "package": "com.rusoffroad.onmylead.app"
     },
     "web": {
       "output": "single",
