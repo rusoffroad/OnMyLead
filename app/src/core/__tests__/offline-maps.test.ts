@@ -11,8 +11,8 @@ const hugeBox = boxAround([moab], 60)!;
 
 describe('layers', () => {
   it('maps the three choices to the four map services', () => {
-    expect(layersFor(['satellite', 'topo', 'trails'])).toEqual(['imagery', 'topo', 'mvum', 'blm']);
-    expect(layersFor(['trails'])).toEqual(['mvum', 'blm']);
+    expect(layersFor(['satellite', 'topo', 'trails'])).toEqual(['imagery', 'topo', 'mvum', 'blm', 'osm']);
+    expect(layersFor(['trails'])).toEqual(['mvum', 'blm', 'osm']);
     expect(layersFor([])).toEqual([]);
   });
 });
@@ -43,7 +43,7 @@ describe('area downloads', () => {
 
   it('estimates the whole download and names what is too big', () => {
     const plan = planArea(smallBox, ['satellite', 'trails']);
-    expect(plan.layers.map((l) => l.layer)).toEqual(['imagery', 'mvum', 'blm']);
+    expect(plan.layers.map((l) => l.layer)).toEqual(['imagery', 'mvum', 'blm', 'osm']);
     expect(plan.tiles).toBe(plan.layers.reduce((n, l) => n + l.tiles.length, 0));
     expect(plan.bytes).toBeGreaterThan(0);
     expect(plan.tooBig).toEqual([]);
@@ -66,7 +66,7 @@ describe('ride downloads', () => {
 
   it('plans nothing without a route', () => {
     expect(planRide([], ['satellite']).tiles).toBe(0);
-    expect(planRide(route, ['satellite', 'topo', 'trails']).layers).toHaveLength(4);
+    expect(planRide(route, ['satellite', 'topo', 'trails']).layers).toHaveLength(5);
   });
 });
 

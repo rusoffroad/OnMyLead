@@ -52,7 +52,7 @@ export function AreaPickerMap({
       pitchEnabled={false}
       tintColor={Colors.text}
       initialRegion={start ? { latitude: start.lat, longitude: start.lng, latitudeDelta: 0.25, longitudeDelta: 0.25 } : undefined}>
-      <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} />
+      <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} osm={trail.osmLines} />
     </MapView>
   );
 

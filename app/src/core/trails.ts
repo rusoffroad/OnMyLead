@@ -278,7 +278,8 @@ export function distanceToLineM(p: LatLng, geometry: GeoJsonLine['geometry']): n
 export type VehicleAccess = { vehicle: string; dates: string | null };
 
 export type TrailInfo = {
-  source: TrailSourceId;
+  /** osm: OpenStreetMap tracks (core/osm-trails), looked up on the phone. */
+  source: TrailSourceId | 'osm';
   kind: 'trail' | 'road';
   /** "Trail 145" or the route's name. */
   title: string;

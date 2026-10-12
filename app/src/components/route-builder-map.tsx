@@ -55,7 +55,7 @@ export function RouteBuilderMap({
         if (!editable) return trail?.identifyAt(c.latitude, c.longitude);
         onAdd({ lat: c.latitude, lng: c.longitude });
       }}>
-      {trail ? <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} /> : null}
+      {trail ? <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} osm={trail.osmLines} /> : null}
       {points.length > 1 ? <RouteLine points={points} /> : null}
       {points.length > 1 && !waypoints.length ? <RouteEnds points={points} /> : null}
       {waypoints.map((w, i) => (
