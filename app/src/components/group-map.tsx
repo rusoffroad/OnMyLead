@@ -6,6 +6,7 @@ import { Colors, font, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
+import { BreakdownBadge } from './rider-status-badge';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 
@@ -13,7 +14,8 @@ export type { MapRider } from './group-map-types';
 
 /**
  * Live group map. Every rider is the same grey dot with their ride name beside it; the leader is
- * the one bigger blue dot, so a glance finds them. A yellow or red ring means Ride Bubble trouble.
+ * the one bigger blue dot, so a glance finds them. A yellow or red ring means Ride Bubble trouble,
+ * and an amber wrench means a Mechanical Issue.
  */
 export function GroupMap({
   riders, regroup, route, meId, onPressRider, trail,
@@ -61,7 +63,7 @@ export function GroupMap({
             description={r.detail}
             anchor={{ x: 0.5, y: 0.5 }}
             onPress={() => onPressRider?.(r.id)}
-            zIndex={r.role === 'leader' ? 5 : 4}>
+            zIndex={r.breakdown ? 6 : r.role === 'leader' ? 5 : 4}>
             <RiderPin rider={r} />
           </Marker>
         ))}
@@ -92,7 +94,12 @@ function RiderPin({ rider: r }: { rider: MapRider }) {
           leader && styles.leaderDot,
         ]}
       />
-      <View style={[styles.label, { left: PIN_W / 2 + (trouble ? ring : size) / 2 + 4 }, leader && styles.leaderLabel]}>
+      {r.breakdown ? (
+        <View style={[styles.badge, { left: PIN_W / 2 + size / 2 - 8, top: 0 }]}>
+          <BreakdownBadge size={18} />
+        </View>
+      ) : null}
+      <View style={[styles.label, { left: PIN_W / 2 + (trouble ? ring : size) / 2 + (r.breakdown ? 14 : 4) }, leader && styles.leaderLabel]}>
         <Text style={[styles.name, leader && styles.leaderName]} numberOfLines={1}>
           {r.name}
         </Text>
@@ -103,6 +110,7 @@ function RiderPin({ rider: r }: { rider: MapRider }) {
 
 const styles = StyleSheet.create({
   pin: { width: PIN_W, height: 34, alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute' },
   ring: { position: 'absolute', borderWidth: 3, backgroundColor: 'rgba(10,22,38,0.35)' },
   dot: { borderWidth: 2, borderColor: Colors.background },
   // The leader is the one everyone follows: bigger, ringed in white, and the only blue dot.

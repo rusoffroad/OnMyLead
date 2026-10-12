@@ -30,6 +30,7 @@ export const CARPLAY_STATUS_BUTTONS: CarPlayButton[] = [
   { id: 'status:ok', title: 'OK', symbol: 'checkmark.circle.fill' },
   { id: 'status:stopped', title: 'Stopped', symbol: 'pause.circle.fill' },
   { id: 'status:need_fuel', title: 'Need fuel', symbol: 'fuelpump.fill' },
+  { id: 'status:mechanical', title: 'Mechanical Issue', symbol: 'wrench.and.screwdriver.fill' },
   { id: 'status:need_help', title: 'Need help', symbol: 'exclamationmark.triangle.fill' },
 ];
 export const CARPLAY_REPLY_BUTTONS: CarPlayButton[] = [
@@ -51,9 +52,10 @@ export function carPlayState(i: CarPlayInput): CarPlayState {
     GROUP_BUTTON,
     ...CARPLAY_STATUS_BUTTONS,
     ...(i.canRegroup ? [REGROUP_BUTTON] : CARPLAY_REPLY_BUTTONS.slice(0, 1)),
-    CARPLAY_REPLY_BUTTONS[1],
     EMERGENCY_BUTTON,
   ];
+  // Apple's grid holds 8: Group, 5 statuses, Regroup (or Running late) and EMERGENCY.
+  // Mechanical Issue took the "Need a minute" slot; that reply stays on the phone.
   // Newest problem first: help calls beat separation, so a rider asking for help is never hidden.
   const alert = i.helpCalls.length
     ? { id: `help:${i.helpCalls[0].name}:${i.helpCalls[0].status}`, text: `${i.helpCalls[0].name}: ${i.helpCalls[0].status}` }

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Colors, font, RideColors } from '@/constants/theme';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
+import { BreakdownBadge } from './rider-status-badge';
 import { RouteSketch } from './route-sketch';
 
 export type { MapRider } from './group-map-types';
@@ -44,6 +45,7 @@ export function GroupMap({
         <View key={r.id} style={styles.row}>
           <View style={[styles.dot, { backgroundColor: r.role === 'leader' ? RideColors.leader : RideColors.rider }]} />
           <Text style={[styles.name, r.role === 'leader' && { color: RideColors.leader }]}>{r.name}{r.role === 'leader' ? ', leader' : ''}</Text>
+          {r.breakdown ? <BreakdownBadge /> : null}
           <Text style={styles.detail}>{r.detail}</Text>
         </View>
       ))}

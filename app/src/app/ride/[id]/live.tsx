@@ -10,6 +10,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GroupMap, type MapRider } from '@/components/group-map';
+import { BreakdownBadge } from '@/components/rider-status-badge';
 import { RouteStrip } from '@/components/route-strip';
 import { SharePicker } from '@/components/share-picker';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
@@ -17,6 +18,9 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Card } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { carPlayState, parseCarPlayAction } from '@/core/carplay';
+import {
+  breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
+} from '@/core/breakdown';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
@@ -45,7 +49,7 @@ const STATUSES: { kind: RiderStatusKind; label: string; urgent?: boolean }[] = [
   { kind: 'ok', label: 'OK' },
   { kind: 'stopped', label: 'Stopped' },
   { kind: 'need_fuel', label: 'Need fuel' },
-  { kind: 'mechanical', label: 'Mechanical' },
+  { kind: 'mechanical', label: MECHANICAL_LABEL },
   { kind: 'flat_tire', label: 'Flat tire' },
   { kind: 'stuck', label: 'Stuck' },
   { kind: 'lost', label: 'Lost' },
@@ -64,7 +68,7 @@ type RideSnapshot = {
   ride: Ride | null;
   members: RideMember[];
   regroup: RegroupPoint | null;
-  statuses: Record<string, { status: RiderStatusKind; tapped_at: string }>;
+  statuses: Record<string, TappedStatus>;
   positions: Record<string, Position>;
 };
 
@@ -88,7 +92,7 @@ export default function RideMode() {
   const [ride, setRide] = useState<Ride | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
   const [positions, setPositions] = useState<Record<string, Position>>({});
-  const [statuses, setStatuses] = useState<Record<string, { status: RiderStatusKind; tapped_at: string }>>({});
+  const [statuses, setStatuses] = useState<Record<string, TappedStatus>>({});
   const [regroup, setRegroup] = useState<RegroupPoint | null>(null);
   const [share, setShare] = useState<ActiveShare | null>(null);
   const [askShare, setAskShare] = useState(false);
@@ -207,7 +211,7 @@ export default function RideMode() {
         if (p?.user_id) setPositions((prev) => ({ ...prev, [p.user_id]: p }));
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
-        const s = payload.new as { user_id: string; status: RiderStatusKind; tapped_at: string };
+        const s = payload.new as TappedStatus & { user_id: string };
         setStatuses((prev) => ({ ...prev, [s.user_id]: s }));
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'regroup_points', filter: `ride_id=eq.${id}` }, () => {
@@ -278,20 +282,40 @@ export default function RideMode() {
     announced.current = red;
   }, [bubble.alerts, watchesBubble]);
 
+  // Leader and tail gunner hear a Mechanical Issue the moment it's tapped, once per tap.
+  const heardBreakdowns = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    if (!watchesBubble) return;
+    const heard = (heardBreakdowns.current ??= new Set<string>());
+    for (const [userId, s] of Object.entries(statuses)) {
+      if (userId === me || s.status !== 'mechanical') continue;
+      const key = breakdownKey(userId, s);
+      if (heard.has(key)) continue;
+      heard.add(key);
+      // Opening Ride Mode doesn't read out a breakdown from long ago.
+      if (Date.now() - Date.parse(s.tapped_at) > BREAKDOWN_SPEAK_WITHIN_MS) continue;
+      Speech.speak(spokenBreakdown(nameOf(userId)));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+  }, [statuses, watchesBubble, me, nameOf]);
+
   const mapRiders: MapRider[] = joined.map((m) => {
     const p = positions[m.user_id];
     const b = bubble.riders.find((x) => x.riderId === m.user_id);
     const st = statuses[m.user_id];
+    // A broken-down rider who isn't sharing still shows, at the spot they tapped Mechanical Issue.
+    const spot = breakdownSpot(st, p) ?? p;
     return {
       id: m.user_id,
       name: m.profiles?.display_name || 'Rider',
       role: bubbleRole(m.role, leaderIds.includes(m.user_id)),
       status: b?.status ?? 'unknown',
-      lat: p?.lat ?? null,
-      lng: p?.lng ?? null,
+      lat: spot?.lat ?? null,
+      lng: spot?.lng ?? null,
       stale: b?.reason === 'no_update',
+      breakdown: st?.status === 'mechanical',
       detail: [
-        p ? ago(p.recorded_at, now) : 'not sharing',
+        p ? ago(p.recorded_at, now) : st?.status === 'mechanical' && spot ? `location from ${ago(st.tapped_at, now)}` : 'not sharing',
         p?.speed_mps != null ? `${Math.round(p.speed_mps * 2.237)} mph` : null,
         st ? STATUS_LABEL[st.status] : null,
       ].filter(Boolean).join(' · '),
@@ -325,11 +349,16 @@ export default function RideMode() {
 
   const helpCalls = joined
     .map((m) => ({ m, s: statuses[m.user_id] }))
-    .filter(({ s, m }) => s && m.user_id !== me && !['ok'].includes(s.status) && now - Date.parse(s.tapped_at) < 30 * 60_000);
+    .filter(({ s, m }) => m.user_id !== me && isActiveCall(s, now));
   const separations = watchesBubble ? bubble.riders.filter((r) => r.status === 'red' || r.status === 'yellow') : [];
   // Folded, only the calls nobody should miss stay on screen; the rest are counted on the handle.
   const isUrgentCall = (k: RiderStatusKind) => k === 'emergency' || k === 'need_help';
-  const shownHelpCalls = panelOpen ? helpCalls : helpCalls.filter(({ s }) => isUrgentCall(s.status));
+  // A breakdown stays on screen for the leader and tail gunner too: they're the ones who go back.
+  const shownHelpCalls = panelOpen
+    ? helpCalls
+    : helpCalls.filter(({ s }) => isUrgentCall(s.status) || (watchesBubble && s.status === 'mechanical'));
+  const myStatus = me ? statuses[me] : undefined;
+  const callSpot = (userId: string) => breakdownSpot(statuses[userId], positions[userId]) ?? positions[userId];
   const shownSeparations = panelOpen ? separations : [];
   const foldedCount = helpCalls.length - shownHelpCalls.length + separations.length - shownSeparations.length;
 
@@ -532,17 +561,38 @@ export default function RideMode() {
                 </Card>
               );
             })}
-            {shownHelpCalls.map(({ m, s }) => (
-              <Card key={`s-${m.user_id}`} style={{ borderLeftWidth: 6, borderLeftColor: isUrgentCall(s.status) ? RideColors.red : RideColors.yellow }}>
-                <ThemedText type="smallBold">
-                  {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}, {ago(s.tapped_at, now)}
-                </ThemedText>
-                {positions[m.user_id] ? (
-                  <Button title="Navigate" kind="secondary" onPress={() => navigateTo(positions[m.user_id].lat, positions[m.user_id].lng)} />
-                ) : null}
-              </Card>
-            ))}
+            {shownHelpCalls.map(({ m, s }) => {
+              const spot = callSpot(m.user_id);
+              return (
+                <Card key={`s-${m.user_id}`} style={{ borderLeftWidth: 6, borderLeftColor: isUrgentCall(s.status) ? RideColors.red : RideColors.yellow }}>
+                  <View style={styles.callRow}>
+                    {s.status === 'mechanical' ? <BreakdownBadge size={24} /> : null}
+                    <ThemedText type="smallBold" style={{ flex: 1 }}>
+                      {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}, {ago(s.tapped_at, now)}
+                    </ThemedText>
+                  </View>
+                  {spot ? <Button title="Navigate" kind="secondary" onPress={() => navigateTo(spot.lat, spot.lng)} /> : null}
+                </Card>
+              );
+            })}
           </ScrollView>
+        ) : null}
+
+        {myStatus?.status === 'mechanical' ? (
+          <View style={styles.myBreakdown}>
+            <BreakdownBadge size={28} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.myBreakdownTitle}>{MECHANICAL_LABEL} Sent</Text>
+              <Text style={styles.myBreakdownBody}>Your leader and tail gunner can see where you are.</Text>
+            </View>
+            <Pressable
+              onPress={() => tapStatus('ok')}
+              accessibilityRole="button"
+              accessibilityLabel="Fixed. Send status OK"
+              style={({ pressed }) => [styles.myBreakdownOk, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.myBreakdownOkText}>Fixed, I’m OK</Text>
+            </Pressable>
+          </View>
         ) : null}
 
         {!panelOpen ? (
@@ -559,6 +609,15 @@ export default function RideMode() {
                 </View>
               ) : null}
             </Pressable>
+            {myStatus?.status !== 'mechanical' ? (
+              <Pressable
+                onPress={() => tapStatus('mechanical')}
+                accessibilityRole="button"
+                accessibilityLabel={`Send status ${MECHANICAL_LABEL}`}
+                style={({ pressed }) => [styles.foldedMech, { opacity: pressed ? 0.75 : 1 }]}>
+                <Text style={[styles.statusText, styles.mechText]}>{MECHANICAL_LABEL}</Text>
+              </Pressable>
+            ) : null}
             <Pressable
               onPress={() => tapStatus('emergency')}
               accessibilityRole="button"
@@ -599,10 +658,14 @@ export default function RideMode() {
                   accessibilityLabel={`Send status ${s.label}`}
                   style={({ pressed }) => [
                     styles.statusBtn,
-                    { backgroundColor: s.kind === 'emergency' ? Colors.danger : s.urgent ? Colors.accent : Colors.backgroundSelected, opacity: pressed ? 0.75 : 1 },
-                    statuses[me ?? '']?.status === s.kind && { borderColor: Colors.text, borderWidth: 3 },
+                    {
+                      backgroundColor:
+                        s.kind === 'emergency' ? Colors.danger : s.urgent ? Colors.accent : s.kind === 'mechanical' ? RideColors.yellow : Colors.backgroundSelected,
+                      opacity: pressed ? 0.75 : 1,
+                    },
+                    myStatus?.status === s.kind && { borderColor: Colors.text, borderWidth: 3 },
                   ]}>
-                  <Text style={styles.statusText}>{s.label}</Text>
+                  <Text style={[styles.statusText, s.kind === 'mechanical' && styles.mechText]}>{s.label}</Text>
                 </Pressable>
               ))}
             </View>
@@ -686,6 +749,17 @@ const styles = StyleSheet.create({
   foldedShowText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19 },
   foldedBadge: { minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow },
   foldedBadgeText: { color: '#1A1100', fontFamily: font(800), fontSize: 14 },
+  foldedMech: { flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow, paddingHorizontal: 6 },
+  mechText: { color: '#1A1100', fontSize: 18, lineHeight: 20 },
+  myBreakdown: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: Spacing.two, padding: 10, paddingLeft: 12,
+    borderRadius: Radius.control, backgroundColor: Colors.backgroundElement, borderLeftWidth: 6, borderLeftColor: RideColors.yellow,
+  },
+  myBreakdownTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 18 },
+  myBreakdownBody: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14 },
+  myBreakdownOk: { minHeight: 44, paddingHorizontal: 12, borderRadius: Radius.control, justifyContent: 'center', backgroundColor: RideColors.green },
+  myBreakdownOkText: { color: '#06210F', fontFamily: font(700, 'display'), fontSize: 17 },
+  callRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   foldedSos: { flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.danger },
   actions: { flexDirection: 'row', gap: Spacing.two },
   handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },

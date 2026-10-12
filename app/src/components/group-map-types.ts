@@ -9,4 +9,6 @@ export type MapRider = {
   lng: number | null;
   stale: boolean;
   detail: string;
+  /** Tapped Mechanical Issue and hasn't sent another status since. */
+  breakdown?: boolean;
 };
