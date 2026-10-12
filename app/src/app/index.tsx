@@ -2,6 +2,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { AppNotices } from '@/components/app-notices';
 import { Convoy } from '@/components/convoy';
 import { Icon, type IconName } from '@/components/icon';
 import { Logo } from '@/components/logo';
@@ -12,29 +13,33 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { flagOn, type AppFlag } from '@/core/app-settings';
 import { initialOf } from '@/core/profile';
 import { historySplit } from '@/core/pro';
 import { discoverPublicRides, myRideName, myRides } from '@/lib/api';
+import { useAppSettings } from '@/lib/app-settings';
 import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import type { Ride, RideMember } from '@/lib/types';
 
-type Tool = { icon: IconName; title: string; href: '/share' | '/garage' | '/trips' | '/starlink'; color: string; open?: boolean };
+type Tool = { icon: IconName; title: string; href: '/share' | '/garage' | '/trips' | '/starlink'; color: string; open?: boolean; flag?: AppFlag };
 
 // Secondary tools: one compact row under the ride actions.
 const TOOLS: Tool[] = [
   { icon: 'pin', title: 'Share Location', href: '/share', color: Colors.sky },
-  { icon: 'checklist', title: 'Trip Planner', href: '/trips', color: RideColors.green },
+  { icon: 'checklist', title: 'Trip Planner', href: '/trips', color: RideColors.green, flag: 'trip_planner' },
   { icon: 'machine', title: 'Garage', href: '/garage', color: Colors.accent },
-  { icon: 'dish', title: 'Starlink', href: '/starlink', color: RideColors.yellow, open: true },
+  { icon: 'dish', title: 'Starlink', href: '/starlink', color: RideColors.yellow, open: true, flag: 'starlink' },
 ];
 
 export default function Home() {
   const theme = useTheme();
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
+  const { settings } = useAppSettings();
+  const findOn = flagOn(settings, 'find_a_ride');
   const [mine, setMine] = useState<(RideMember & { rides: Ride })[]>([]);
   const [nearby, setNearby] = useState<Ride[]>([]);
   const [code, setCode] = useState('');
@@ -46,10 +51,10 @@ export default function Home() {
   useFocusEffect(
     useCallback(() => {
       if (!isBackendConfigured) return;
-      discoverPublicRides().then(setNearby).catch((e) => setError(e.message));
+      if (findOn) discoverPublicRides().then(setNearby).catch((e) => setError(e.message));
       if (session) myRides().then(setMine).catch((e) => setError(e.message));
       if (session) myRideName().then(setRideName).catch(() => setRideName(null));
-    }, [session]),
+    }, [session, findOn]),
   );
 
   // On onmylead.com, signed-out visitors get the showcase; signed-in riders get the app.
@@ -81,6 +86,7 @@ export default function Home() {
   );
   const mineIds = new Set(mine.map((m) => m.ride_id));
   const others = nearby.filter((r) => !mineIds.has(r.id));
+  const tools = TOOLS.filter((t) => !t.flag || flagOn(settings, t.flag));
   const openCode = () => code.trim().length >= 4 && router.push(`/r/${code.trim().toUpperCase()}`);
 
   return (
@@ -99,6 +105,8 @@ export default function Home() {
           </Pressable>
         ) : null}
       </View>
+
+      <AppNotices />
 
       {session && rideName === '' ? (
         <Pressable
@@ -149,12 +157,14 @@ export default function Home() {
           on={joining}
           onPress={() => setJoining(!joining)}
         />
-        <BigAction
-          icon="search"
-          title="Find a Ride"
-          detail="Near you or by state"
-          onPress={() => router.push('/find')}
-        />
+        {findOn ? (
+          <BigAction
+            icon="search"
+            title="Find a Ride"
+            detail="Near you or by state"
+            onPress={() => router.push('/find')}
+          />
+        ) : null}
       </View>
 
       {joining ? (
@@ -197,8 +207,8 @@ export default function Home() {
         <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
 
-      <View style={styles.tools}>
-        {TOOLS.map((t) => (
+      <View style={[styles.tools, tools.length < TOOLS.length && { justifyContent: 'space-evenly' }]}>
+        {tools.map((t) => (
           <Pressable
             key={t.href}
             accessibilityRole="button"
@@ -255,16 +265,20 @@ export default function Home() {
         </>
       ) : null}
 
-      <Section title="Public Rides" />
-      {others.length === 0 ? (
-        <ThemedText themeColor="textSecondary">No public rides coming up. Create one and it shows here for everyone.</ThemedText>
-      ) : (
-        <RowGroup>
-          {others.map((r) => (
-            <RideRow key={r.id} ride={r} />
-          ))}
-        </RowGroup>
-      )}
+      {findOn ? (
+        <>
+          <Section title="Public Rides" />
+          {others.length === 0 ? (
+            <ThemedText themeColor="textSecondary">No public rides coming up. Create one and it shows here for everyone.</ThemedText>
+          ) : (
+            <RowGroup>
+              {others.map((r) => (
+                <RideRow key={r.id} ride={r} />
+              ))}
+            </RowGroup>
+          )}
+        </>
+      ) : null}
     </Screen>
   );
 }

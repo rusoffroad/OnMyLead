@@ -7,6 +7,7 @@ import {
 } from '@/components/admin';
 import { font } from '@/constants/theme';
 import { fmtDateTime } from '@/core/admin-format';
+import { APP_FLAG_KEYS, APP_FLAGS } from '@/core/app-settings';
 import * as admin from '@/lib/admin';
 
 const FEATURES: Record<string, { label: string; hint: string; allowance?: string }> = {
@@ -59,7 +60,7 @@ export default function Settings() {
                 hint="Warns riders about planned downtime. It doesn't switch anything off." />
             </Panel>
           </Columns>
-          <Text style={styles.small}>The iPhone app doesn&apos;t show announcements or maintenance notices yet; they are saved for when it does.</Text>
+          <Text style={styles.small}>Riders see these at the top of the home screen the next time the app checks (on opening, and every few minutes). Maintenance stays until you clear it or its date passes; riders can close an announcement, and new wording shows again.</Text>
 
           <Panel title="Feature Flags">
             <Flags value={(v('flags') as Record<string, boolean>) ?? {}} onSaved={reload} />
@@ -170,7 +171,7 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
   const [busy, setBusy] = useState(false);
   const toast = useToast();
   const confirm = useConfirm();
-  const keys = Object.keys(flags).sort();
+  const keys = Object.keys(flags).filter((k) => !(k in APP_FLAGS)).sort();
   const changed = JSON.stringify(flags) !== JSON.stringify(value);
   const newKey = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 
@@ -191,8 +192,19 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
 
   return (
     <View style={{ gap: 10 }}>
-      <Text style={styles.small}>On or off switches the app can read. None are in use by the app yet.</Text>
-      {keys.length === 0 ? <Text style={styles.text}>No flags yet.</Text> : null}
+      <Text style={styles.small}>Switch an extra off for everyone without an app update. Everything stays on unless you switch it off here. Safety features (Ride Mode, Help and SOS, Mechanical Issue, sharing, chat and joining) have no switch.</Text>
+      {APP_FLAG_KEYS.map((k) => (
+        <View key={k} style={styles.flag}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={styles.label}>{APP_FLAGS[k].label}</Text>
+            <Text style={styles.small}>{APP_FLAGS[k].hint}</Text>
+          </View>
+          <Text style={[styles.small, { color: flags[k] === false ? AdminColors.danger : AdminColors.dim }]}>{flags[k] === false ? 'Off' : 'On'}</Text>
+          <Switch value={flags[k] !== false} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor={AdminColors.text} {...({ activeThumbColor: AdminColors.text } as object)} accessibilityLabel={APP_FLAGS[k].label} />
+        </View>
+      ))}
+      {keys.length ? <Text style={[styles.label, { paddingTop: 6 }]}>Other Flags</Text> : null}
+      {keys.length ? <Text style={styles.small}>The app doesn&apos;t read these yet.</Text> : null}
       {keys.map((k) => (
         <View key={k} style={styles.flag}>
           <Text style={[styles.label, { flex: 1 }]}>{k}</Text>
@@ -204,9 +216,9 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
           }} />
         </View>
       ))}
-      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center', paddingTop: 6 }}>
         <TextInput value={name} onChangeText={setName} placeholder="new_flag_name" placeholderTextColor={AdminColors.faint} autoCapitalize="none" style={[styles.input, { width: 220 }]} accessibilityLabel="New flag name" />
-        <AdminButton title="Add Flag" small disabled={!newKey || newKey in flags} onPress={() => { setFlags({ ...flags, [newKey]: false }); setName(''); }} />
+        <AdminButton title="Add Flag" small disabled={!newKey || newKey in flags || newKey in APP_FLAGS} onPress={() => { setFlags({ ...flags, [newKey]: false }); setName(''); }} />
         <AdminButton title="Save Flags" kind="primary" small disabled={!changed} loading={busy} onPress={save} />
       </View>
     </View>

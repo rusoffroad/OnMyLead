@@ -24,6 +24,7 @@ import {
   myTrips, tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
+import { useFlag } from '@/lib/app-settings';
 import { confirmAsync } from '@/lib/confirm';
 import { declineRideInvite } from '@/lib/groups';
 import { useEntitlements } from '@/lib/entitlements';
@@ -48,6 +49,7 @@ export default function RidePage() {
   const { can } = useEntitlements();
   const me = session?.user.id;
   const [ride, setRide] = useState<Ride | null | undefined>(undefined);
+  const pollsFlag = useFlag('ride_polls');
   const [details, setDetails] = useState<RidePrivateDetails | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
   const [route, setRoute] = useState<RideRoute | null>(null);
@@ -334,8 +336,9 @@ export default function RidePage() {
           leaderName={leaderIds.length && !leaderIds.includes(me ?? '') ? leaderIds.map(nameOf).join(', ') : null}
           error={chat.error}
           onSend={chat.send}
-          // The one place that decides who can create polls: the ride's leaders, on a plan with polls.
-          canPoll={isManager || leaderIds.includes(me ?? '')}
+          // The one place that decides who can create polls: the ride's leaders, on a plan with polls,
+          // unless the owner switched polls off.
+          canPoll={pollsFlag && (isManager || leaderIds.includes(me ?? ''))}
           pollLocked={!can('create_poll')}
           pollsOn={chat.pollsOn}
           votes={chat.votes}

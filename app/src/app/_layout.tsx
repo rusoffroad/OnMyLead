@@ -17,6 +17,7 @@ import { ProGateHost } from '@/components/pro-gate';
 import { Colors, font, NavigationColors } from '@/constants/theme';
 // Starts crash reporting before anything else can fail (off when no DSN is set).
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
+import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
@@ -43,6 +44,8 @@ function RootLayout() {
   useEffect(() => setCrashScreen(screen), [screen]);
   // The rider's plan (Free, Pro Trial, Pro, Admin), kept fresh for every screen.
   useEffect(() => startEntitlements(), []);
+  // The owner's announcement, maintenance notice and feature flags.
+  useEffect(() => startAppSettings(), []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
   useEffect(() => {

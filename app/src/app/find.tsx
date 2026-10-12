@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 
+import { FlagGate } from '@/components/app-notices';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { PlaceSearch } from '@/components/place-search';
 import { RidesMap } from '@/components/rides-map';
@@ -24,7 +25,15 @@ type Found = Ride & { distanceMi?: number };
  * Both show a map that opens on the rider's state; moving it offers "Search this area".
  * Private rides never show here; they are reached only by their link or invite code.
  */
-export default function FindRides() {
+export default function FindRidesScreen() {
+  return (
+    <FlagGate flag="find_a_ride">
+      <FindRides />
+    </FlagGate>
+  );
+}
+
+function FindRides() {
   const [mode, setMode] = useState<Mode>('near');
   const [radius, setRadius] = useState<number>(50);
   const [here, setHere] = useState<LatLng | null>(null);

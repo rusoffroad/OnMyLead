@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, AppState, View } from 'react-native';
 
+import { FlagGate } from '@/components/app-notices';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen, Tag } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
@@ -20,7 +21,15 @@ import { useTheme } from '@/hooks/use-theme';
 
 const numText = (n: number | null | undefined) => (n == null ? '' : String(n));
 
-export default function StarlinkPage() {
+export default function StarlinkPageScreen() {
+  return (
+    <FlagGate flag="starlink">
+      <StarlinkPage />
+    </FlagGate>
+  );
+}
+
+function StarlinkPage() {
   const { session, loading } = useSession();
   return (
     <Screen>

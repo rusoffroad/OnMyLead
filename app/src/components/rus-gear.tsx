@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 import { Spacing } from '@/constants/theme';
 import type { TripCategory } from '@/core/trips';
 import { useTheme } from '@/hooks/use-theme';
+import { useFlag } from '@/lib/app-settings';
 import {
   formatPrice, matchProducts, openProduct, openStore, rusProducts, type GearSuggestion, type RiderVehicle,
 } from '@/lib/rus';
@@ -25,6 +26,8 @@ export function RusGear({
   limit?: number;
 }) {
   const theme = useTheme();
+  // The owner can switch suggestions off on the Admin Dashboard.
+  const on = useFlag('rus_gear');
   const [suggestions, setSuggestions] = useState<GearSuggestion[]>([]);
   const catKey = (categories ?? []).join(',');
   const make = vehicle?.make ?? null;
@@ -44,7 +47,7 @@ export function RusGear({
     };
   }, [make, model, trim, year, catKey, limit]);
 
-  if (!suggestions.length) return null;
+  if (!on || !suggestions.length) return null;
 
   return (
     <Card>
