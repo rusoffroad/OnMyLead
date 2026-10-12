@@ -18,7 +18,8 @@ import { distanceToLineM, tileFor, type Tile, type TrailInfo } from './trails';
  */
 
 export const OSM_TILEJSON = 'https://tiles.openfreemap.org/planet';
-export const OSM_ATTRIBUTION = 'OpenStreetMap contributors, OpenMapTiles, OpenFreeMap';
+// ODbL asks for "© OpenStreetMap contributors"; OpenFreeMap asks for OpenMapTiles too (its own name is optional).
+export const OSM_ATTRIBUTION = '© OpenStreetMap contributors, © OpenMapTiles, OpenFreeMap';
 /** OpenMapTiles puts dirt tracks in squares from zoom 13; zoom 14 is the closest square made. */
 export const OSM_MIN_Z = 13;
 export const OSM_MAX_Z = 14;
