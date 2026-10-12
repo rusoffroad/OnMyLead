@@ -45,7 +45,7 @@ async function toAlert(m: ChatMessage): Promise<Alert> {
   return {
     id: m.id,
     title: alertTitle(m, who, ride?.name),
-    body: m.body,
+    body: m.poll_options?.length ? `${m.body} Tap to vote.` : m.body,
     inviteCode: ride?.invite_code ?? null,
     accent: announcement ? RideColors.yellow : isLeaderOnly(m) ? RideColors.leader : Colors.accent,
     seconds: announcement ? 10 : 6,

@@ -301,6 +301,11 @@ export default function RidePage() {
           leaderName={leaderIds.length && !leaderIds.includes(me ?? '') ? leaderIds.map(nameOf).join(', ') : null}
           error={chat.error}
           onSend={chat.send}
+          canPoll={isManager || leaderIds.includes(me ?? '')}
+          pollsOn={chat.pollsOn}
+          votes={chat.votes}
+          onSendPoll={chat.sendPoll}
+          onVote={(messageId, choice) => me && chat.vote(messageId, choice, me)}
         />
       ) : null}
 

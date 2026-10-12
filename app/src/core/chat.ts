@@ -21,6 +21,8 @@ export type ChatMessage = {
   kind: MessageKind;
   body: string;
   audience?: MessageAudience;
+  /** Set only on quick polls (see core/polls): the choices, with the body as the question. */
+  poll_options?: string[] | null;
   sent_at: string;
   created_at: string;
 };
@@ -96,14 +98,29 @@ export function shouldAlert(m: Pick<ChatMessage, 'user_id'>, me: string | null |
 }
 
 /** Headline for the pop-up and the push notification. */
-export function alertTitle(m: Pick<ChatMessage, 'kind' | 'audience'>, senderName: string | null | undefined, rideName?: string | null): string {
+export function alertTitle(
+  m: Pick<ChatMessage, 'kind' | 'audience' | 'poll_options'>, senderName: string | null | undefined, rideName?: string | null,
+): string {
   const who = senderName?.trim() || 'A rider';
-  const what = m.kind === 'announcement' ? `Announcement from ${who}` : isLeaderOnly(m) ? `${who} (to you, the leader)` : who;
+  const what = m.kind === 'announcement'
+    ? `Announcement from ${who}`
+    : m.poll_options?.length
+      ? `Poll from ${who}`
+      : isLeaderOnly(m) ? `${who} (to you, the leader)` : who;
   return rideName?.trim() ? `${what} · ${rideName.trim()}` : what;
 }
 
 /** Turn a database error into something a rider can act on. */
 export function friendlyChatError(message: string): string {
+  if (/poll_options|ride_poll_votes|vote_on_poll/i.test(message) && /column|relation|schema cache|does not exist|could not find/i.test(message)) {
+    return 'Polls aren’t switched on yet.';
+  }
+  if (/poll choices repeat/i.test(message)) return 'Each choice needs to be different.';
+  if (/poll choice too long/i.test(message)) return 'Keep each choice under 60 characters.';
+  if (/poll question too long/i.test(message)) return 'Keep the question under 200 characters.';
+  if (/poll choice is empty|poll_size|check constraint/i.test(message)) return 'A poll needs 2 to 6 choices.';
+  if (/not one of the poll choices|poll not found/i.test(message)) return 'That choice isn’t in this poll.';
+  if (/only riders on this ride can vote/i.test(message)) return 'Only riders on this ride can vote.';
   if (/slow down/i.test(message)) return 'You’re sending a lot. Wait a minute and try again.';
   if (/row-level security|violates row-level/i.test(message)) return 'Only riders on this ride can chat here.';
   if (/audience/i.test(message)) return 'Leader-only messages aren’t switched on yet. Send it to everyone for now.';

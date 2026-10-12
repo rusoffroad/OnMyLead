@@ -96,3 +96,15 @@ describe('leader-only messages', () => {
     expect(friendlyChatError("Could not find the 'audience' column of 'ride_messages' in the schema cache")).toMatch(/everyone for now/);
   });
 });
+
+describe('polls in chat', () => {
+  it('titles a poll pop-up as a poll', () => {
+    expect(alertTitle({ kind: 'chat', audience: 'everyone', poll_options: ['Yes', 'No'] }, 'Olivia', 'Moab')).toBe('Poll from Olivia · Moab');
+  });
+
+  it('says polls are not switched on when the database lacks them', () => {
+    expect(friendlyChatError("Could not find the 'poll_options' column of 'ride_messages' in the schema cache")).toBe('Polls aren’t switched on yet.');
+    expect(friendlyChatError('relation "ride_poll_votes" does not exist')).toBe('Polls aren’t switched on yet.');
+    expect(friendlyChatError('poll choices repeat')).toBe('Each choice needs to be different.');
+  });
+});
