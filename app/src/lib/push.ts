@@ -63,12 +63,13 @@ export function resetPushRegistration() {
 
 type TapData = { type?: unknown; change?: unknown; rideId?: unknown; inviteCode?: unknown };
 
-/** Where a tapped notification goes: Ride Mode for a live ride or a rider's status, else the ride page. */
+/** Where a tapped notification goes: Ride Mode for a live ride or a rider's status, else the ride page (its chat for a message). */
 export function tapTarget(data: TapData | undefined): string | null {
   if (!data) return null;
   const rideId = typeof data.rideId === 'string' && data.rideId ? data.rideId : null;
   if (rideId && (data.type === 'status' || (data.type === 'ride' && data.change === 'live'))) return `/ride/${rideId}/live`;
-  if (typeof data.inviteCode === 'string' && data.inviteCode) return `/r/${data.inviteCode}`;
+  // A chat message opens the ride page on its Chat section.
+  if (typeof data.inviteCode === 'string' && data.inviteCode) return `/r/${data.inviteCode}${data.type === 'message' ? '?section=chat' : ''}`;
   return null;
 }
 

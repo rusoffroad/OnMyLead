@@ -3,7 +3,6 @@ import { useCallback, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppNotices } from '@/components/app-notices';
-import { Convoy } from '@/components/convoy';
 import { Icon, type IconName } from '@/components/icon';
 import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
@@ -11,10 +10,9 @@ import { RideRow, RowGroup } from '@/components/ride-row';
 import { Showcase } from '@/components/showcase';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { flagOn, type AppFlag } from '@/core/app-settings';
-import { initialOf } from '@/core/profile';
+import { flagOn } from '@/core/app-settings';
 import { historySplit } from '@/core/pro';
 import { discoverPublicRides, myRideName, myRides } from '@/lib/api';
 import { useAppSettings } from '@/lib/app-settings';
@@ -24,15 +22,8 @@ import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import type { Ride, RideMember } from '@/lib/types';
 
-type Tool = { icon: IconName; title: string; href: '/share' | '/garage' | '/trips' | '/starlink'; color: string; open?: boolean; flag?: AppFlag };
-
-// Secondary tools: one compact row under the ride actions.
-const TOOLS: Tool[] = [
-  { icon: 'pin', title: 'Share Location', href: '/share', color: Colors.sky },
-  { icon: 'checklist', title: 'Trip Planner', href: '/trips', color: RideColors.green, flag: 'trip_planner' },
-  { icon: 'machine', title: 'Garage', href: '/garage', color: Colors.accent },
-  { icon: 'dish', title: 'Starlink', href: '/starlink', color: RideColors.yellow, open: true, flag: 'starlink' },
-];
+/** Public rides listed on Rides; the Find tab has every one of them on the map. */
+const PUBLIC_ON_HOME = 3;
 
 export default function Home() {
   const theme = useTheme();
@@ -72,7 +63,6 @@ export default function Home() {
     );
   }
 
-  const go = (href: Parameters<typeof router.push>[0]) => router.push(session ? href : '/sign-in');
   const live = mine.find((m) => m.rides?.status === 'live' && m.status === 'joined');
   // Invitations (from a riding group) get their own list; the rest are rides you're on.
   const invites = mine.filter((m) => m.status === 'invited' && (m.rides?.status === 'scheduled' || m.rides?.status === 'live'));
@@ -86,24 +76,12 @@ export default function Home() {
   );
   const mineIds = new Set(mine.map((m) => m.ride_id));
   const others = nearby.filter((r) => !mineIds.has(r.id));
-  const tools = TOOLS.filter((t) => !t.flag || flagOn(settings, t.flag));
   const openCode = () => code.trim().length >= 4 && router.push(`/r/${code.trim().toUpperCase()}`);
 
   return (
     <Screen top>
       <View style={{ paddingTop: Spacing.one }}>
         <Logo height={96} />
-        {session ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Your profile and ride name"
-            onPress={() => router.push('/profile')}
-            hitSlop={8}
-            style={({ pressed }) => [styles.me, { borderColor: theme.backgroundSelected, opacity: pressed ? 0.7 : 1 }]}>
-            <ThemedText style={styles.meInitial}>{rideName ? initialOf(rideName) : ''}</ThemedText>
-            {!rideName ? <Icon name="person" size={20} color={theme.text} /> : null}
-          </Pressable>
-        ) : null}
       </View>
 
       <AppNotices />
@@ -111,7 +89,7 @@ export default function Home() {
       {session && rideName === '' ? (
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push('/profile')}
+          onPress={() => router.push('/ride-name')}
           style={[styles.nudge, { backgroundColor: theme.backgroundElement }]}>
           <View style={{ flex: 1 }}>
             <ThemedText type="heading">Pick Your Ride Name</ThemedText>
@@ -188,40 +166,9 @@ export default function Home() {
         </View>
       ) : null}
 
-      {session ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Riding Groups. Save your crew and invite everyone in one tap"
-          onPress={() => router.push('/groups')}
-          style={({ pressed }) => [styles.groups, { backgroundColor: pressed ? theme.backgroundSelected : theme.backgroundElement }]}>
-          <Convoy names={[null, null, null, null]} size={16} />
-          <View style={{ flex: 1 }}>
-            <ThemedText style={styles.groupsTitle}>Riding Groups</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">Save your crew. Invite everyone in one tap.</ThemedText>
-          </View>
-          <Icon name="chevron" color={theme.textSecondary} />
-        </Pressable>
-      ) : null}
-
       {!loading && !session ? (
         <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
-
-      <View style={[styles.tools, tools.length < TOOLS.length && { justifyContent: 'space-evenly' }]}>
-        {tools.map((t) => (
-          <Pressable
-            key={t.href}
-            accessibilityRole="button"
-            accessibilityLabel={t.title}
-            onPress={() => (t.open ? router.push(t.href) : go(t.href))}
-            style={styles.tool}>
-            <View style={[styles.toolIcon, { backgroundColor: theme.backgroundElement }]}>
-              <Icon name={t.icon} color={t.color} size={22} />
-            </View>
-            <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', fontSize: 13, lineHeight: 16 }}>{t.title}</ThemedText>
-          </Pressable>
-        ))}
-      </View>
 
       <ErrorText error={error} />
 
@@ -272,11 +219,12 @@ export default function Home() {
             <ThemedText themeColor="textSecondary">No public rides coming up. Create one and it shows here for everyone.</ThemedText>
           ) : (
             <RowGroup>
-              {others.map((r) => (
+              {others.slice(0, PUBLIC_ON_HOME).map((r) => (
                 <RideRow key={r.id} ride={r} />
               ))}
             </RowGroup>
           )}
+          <Button title={others.length > PUBLIC_ON_HOME ? `See All ${others.length} on the Map` : 'Find Rides on the Map'} kind="secondary" onPress={() => router.push('/find')} />
         </>
       ) : null}
     </Screen>
@@ -315,15 +263,6 @@ const styles = StyleSheet.create({
   actionTitle: { color: '#fff', fontSize: 26, lineHeight: 28, fontFamily: font(800, 'display') },
   join: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, borderRadius: Radius.card, borderWidth: 1.5, paddingLeft: Spacing.three, padding: 8 },
   joinInput: { flex: 1, minHeight: 44, fontSize: 17, fontFamily: font(600), letterSpacing: 1 },
-  me: {
-    position: 'absolute', top: Spacing.one, right: 0, width: 44, height: 44, borderRadius: 22, borderWidth: 2,
-    backgroundColor: RideColors.rider, alignItems: 'center', justifyContent: 'center',
-  },
-  meInitial: { color: '#fff', fontSize: 18, lineHeight: 22, fontWeight: 800 },
+
   nudge: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, padding: 14, borderLeftWidth: 4, borderLeftColor: Colors.sky },
-  groups: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: Radius.card, paddingHorizontal: 16, paddingVertical: 14 },
-  groupsTitle: { fontSize: 22, lineHeight: 26, fontFamily: font(700, 'display') },
-  tools: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: Spacing.one },
-  tool: { width: '24%', alignItems: 'center', gap: 6, minHeight: 72 },
-  toolIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
 });
