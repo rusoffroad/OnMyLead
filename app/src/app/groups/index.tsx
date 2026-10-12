@@ -4,14 +4,16 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Convoy, RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
+import { RideRow, RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { NOT_SWITCHED_ON, ridersLabel } from '@/core/groups';
 import {
-  leadersIFollow, myFollowerCount, myGroups, NotSwitchedOnError, unfollowLeader, type Followed, type RidingGroup,
+  followedLeadersRides, leadersIFollow, openNewGroup, myFollowerCount, myGroups, NotSwitchedOnError, unfollowLeader, type Followed, type RidingGroup,
 } from '@/lib/groups';
 import { useSession } from '@/lib/session';
+import type { Ride } from '@/lib/types';
 
 /** Your riding groups, the groups you're in, and the leaders you follow. */
 export default function Groups() {
@@ -19,6 +21,7 @@ export default function Groups() {
   const [groups, setGroups] = useState<RidingGroup[] | null>(null);
   const [follows, setFollows] = useState<Followed[]>([]);
   const [followers, setFollowers] = useState(0);
+  const [leaderRides, setLeaderRides] = useState<Ride[]>([]);
   const [off, setOff] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +34,12 @@ export default function Groups() {
       }
       const fail = (e: unknown) => (e instanceof NotSwitchedOnError ? setOff(true) : setError((e as Error).message));
       myGroups().then(setGroups).catch(fail);
-      leadersIFollow().then(setFollows).catch(() => {});
+      leadersIFollow()
+        .then(async (f) => {
+          setFollows(f);
+          setLeaderRides(await followedLeadersRides(f.map((x) => x.id)));
+        })
+        .catch(() => {});
       myFollowerCount().then(setFollowers).catch(() => {});
     }, [session, loading]),
   );
@@ -54,7 +62,7 @@ export default function Groups() {
       ) : null}
       <ErrorText error={error} />
 
-      <Button title="New Group" big disabled={off} onPress={() => router.push('/groups/new')} />
+      <Button title="New Group" big disabled={off} onPress={openNewGroup} />
 
       {groups && !groups.length && !off ? <EmptyCrew /> : null}
 
@@ -77,6 +85,7 @@ export default function Groups() {
                 style={{ minHeight: 40 }}
                 onPress={async () => {
                   setFollows((all) => all.filter((x) => x.id !== f.id));
+                  setLeaderRides((all) => all.filter((r) => r.organizer_id !== f.id));
                   await unfollowLeader(f.id).catch((e) => setError((e as Error).message));
                 }}
               />
@@ -89,6 +98,16 @@ export default function Groups() {
           {follows.length ? 'You get a notification when they post a new public ride. ' : ''}
           {followers ? `${followers} ${followers === 1 ? 'rider follows' : 'riders follow'} you.` : ''}
         </ThemedText>
+      ) : null}
+      {leaderRides.length ? (
+        <>
+          <Section title="Their Upcoming Rides" />
+          <RowGroup>
+            {leaderRides.map((r) => (
+              <RideRow key={r.id} ride={r} note={`By ${follows.find((f) => f.id === r.organizer_id)?.name ?? 'a leader you follow'}`} />
+            ))}
+          </RowGroup>
+        </>
       ) : null}
       {!follows.length && !off ? (
         <ThemedText type="small" themeColor="textSecondary">

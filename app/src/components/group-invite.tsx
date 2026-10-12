@@ -1,10 +1,9 @@
-import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { invitedLine, namesLine, ridersLabel } from '@/core/groups';
-import { inviteGroupToRide, myGroups, NotSwitchedOnError, type RidingGroup } from '@/lib/groups';
+import { inviteGroupToRide, myGroups, NotSwitchedOnError, openNewGroup, type RidingGroup } from '@/lib/groups';
 import { Convoy } from './convoy';
 import { Icon } from './icon';
 import { ThemedText } from './themed-text';
@@ -46,7 +45,7 @@ export function GroupInvite({ rideId }: { rideId: string }) {
       {off ? (
         <ThemedText type="small" themeColor="textSecondary">Riding groups are not switched on yet. They start working with the next server update.</ThemedText>
       ) : groups === null ? null : groups.length === 0 ? (
-        <Pressable accessibilityRole="button" onPress={() => router.push('/groups/new')} style={styles.empty}>
+        <Pressable accessibilityRole="button" onPress={openNewGroup} style={styles.empty}>
           <View style={{ flex: 1, gap: 2 }}>
             <ThemedText style={{ fontWeight: 700 }}>Save Your Crew As A Group</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">Then invite everyone to your next ride in one tap.</ThemedText>

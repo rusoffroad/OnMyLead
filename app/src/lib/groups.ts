@@ -3,6 +3,8 @@
  * 20261017420000_riding_groups.sql). Until that migration runs, every call here throws
  * NotSwitchedOnError, and the screens say so.
  */
+import { router } from 'expo-router';
+
 import { cleanGroupName, isGroupsNotSwitchedOn, NOT_SWITCHED_ON, sortRideMates, type RideMate } from '@/core/groups';
 import { shownName } from '@/core/profile';
 import { track } from './analytics';
@@ -90,6 +92,14 @@ export async function getGroup(id: string): Promise<RidingGroup | null> {
   const uid = await me();
   const row = unwrap<GroupRow | null>(await supabase.from('riding_groups').select('*').eq('id', id).maybeSingle());
   return row ? (await withRiders([row], uid))[0] : null;
+}
+
+/**
+ * The only way into making a new group (the Riding Groups screen and the ride page both use it),
+ * so a plan check can sit here in one place.
+ */
+export function openNewGroup() {
+  router.push('/groups/new');
 }
 
 export async function createGroup(name: string, riderIds: string[]): Promise<string> {
@@ -208,6 +218,22 @@ export async function leadersIFollow(): Promise<Followed[]> {
   const rows = unwrap<{ leader_id: string }[]>(await supabase.from('leader_follows').select('leader_id').eq('follower_id', uid).order('created_at'));
   const nameOf = await names(rows.map((r) => r.leader_id));
   return rows.map((r) => ({ id: r.leader_id, name: nameOf.get(r.leader_id) ?? shownName('') }));
+}
+
+/** Upcoming public rides posted by leaders you follow, soonest first. Private rides never show. */
+export async function followedLeadersRides(leaderIds: string[]): Promise<Ride[]> {
+  if (!leaderIds.length) return [];
+  return unwrap<Ride[]>(
+    await supabase
+      .from('rides')
+      .select('*')
+      .in('organizer_id', leaderIds)
+      .eq('visibility', 'public')
+      .eq('status', 'scheduled')
+      .gte('meet_at', new Date().toISOString())
+      .order('meet_at')
+      .limit(20),
+  );
 }
 
 export async function myFollowerCount(): Promise<number> {
