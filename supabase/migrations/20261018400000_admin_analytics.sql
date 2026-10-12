@@ -9,10 +9,12 @@
 -- position, track or meeting point, and never writes Apple's billing state. The only write here is
 -- admin_log_export(), which records each CSV download through log_admin_action().
 --
--- Revenue is an estimate: the customer price of each billing event Apple reported (new
--- subscription or renewal) minus refunds, before Apple's commission and taxes. The price is taken
--- from the event's decoded transaction when it carries one, else from the subscription's last
--- verified price. Sandbox purchases are kept apart from real ones by p_env.
+-- Money comes from Apple's signed notifications as the App Store functions store them
+-- (/mnt/project-files/onmylead/pro/app-store-events.md): each charged transaction (SUBSCRIBED,
+-- DID_RENEW or OFFER_REDEEMED with a price above zero) counts once by its transactionId, at the
+-- customer price in its own currency, before Apple's commission and taxes. REFUND takes that
+-- transaction's price off again and REFUND_REVERSED puts it back. The app's own verify calls
+-- (APP_VERIFY) never count. Sandbox and real purchases are kept apart by p_env.
 
 -- ---------------------------------------------------------------------------
 -- Helpers (not callable by the app)
@@ -28,17 +30,53 @@ returns table (bucket_start timestamptz) language sql immutable set search_path 
     ('1 ' || p_bucket)::interval) g
 $$;
 
--- Price in milli-units of one billing event: the event's own transaction price when present
--- (the shape differs between the decoded notification and the verify call), else the
--- subscription's.
-create or replace function admin_event_price(p_payload jsonb, p_fallback bigint)
-returns bigint language sql immutable set search_path = public as $$
-  select coalesce(
-    (p_payload #>> '{transaction,price}')::bigint,
-    (p_payload #>> '{transactionInfo,price}')::bigint,
-    (p_payload #>> '{data,transactionInfo,price}')::bigint,
-    (p_payload #>> '{signedTransactionInfo,price}')::bigint,
-    p_fallback)
+-- Every charge, refund and refund reversal Apple reported, one row per transaction.
+create or replace function admin_charges(p_env text)
+returns table (transaction_id text, original_transaction_id text, at timestamptz, type text, kind text,
+  price_milli bigint, currency text, offer_type int, offer_id text, user_id uuid)
+-- Security invoker: it only works inside the admin_* functions below, which run as the owner.
+language sql stable set search_path = public as $$
+  with t as (
+    select e.received_at, e.type, e.payload -> 'transaction' as tx, e.original_transaction_id as otid
+    from app_store_events e
+    where e.notification_uuid is not null and e.error is null
+      and e.type in ('SUBSCRIBED', 'DID_RENEW', 'OFFER_REDEEMED', 'REFUND', 'REFUND_REVERSED')
+      and e.payload #>> '{transaction,environment}' = p_env
+      and e.payload #>> '{transaction,transactionId}' is not null
+  ), c as (
+    (select distinct on (tx ->> 'transactionId') tx ->> 'transactionId' as tid, coalesce(tx ->> 'originalTransactionId', otid) as otid,
+       received_at, type, 'charge' as kind, (tx ->> 'price')::bigint as price, coalesce(tx ->> 'currency', 'USD') as cur,
+       (tx ->> 'offerType')::int as ot, tx ->> 'offerIdentifier' as oid
+     from t where type in ('SUBSCRIBED', 'DID_RENEW', 'OFFER_REDEEMED') and coalesce((tx ->> 'price')::bigint, 0) > 0
+     order by tx ->> 'transactionId', received_at)
+    union all
+    (select distinct on (tx ->> 'transactionId', type) tx ->> 'transactionId', coalesce(tx ->> 'originalTransactionId', otid),
+       received_at, type, case type when 'REFUND' then 'refund' else 'refund_reversed' end, coalesce((tx ->> 'price')::bigint, 0),
+       coalesce(tx ->> 'currency', 'USD'), (tx ->> 'offerType')::int, tx ->> 'offerIdentifier'
+     from t where type in ('REFUND', 'REFUND_REVERSED')
+     order by tx ->> 'transactionId', type, received_at)
+  )
+  select c.tid, c.otid, c.received_at, c.type, c.kind, c.price, c.cur, c.ot, c.oid, s.user_id
+  from c left join app_store_subscriptions s on s.original_transaction_id = c.otid
+$$;
+
+-- Each offer-code redemption: the first transaction of a subscription that carried the offer,
+-- free or paid.
+create or replace function admin_offer_redemptions(p_env text)
+returns table (original_transaction_id text, offer_id text, redeemed_at timestamptz, product_id text, user_id uuid)
+language sql stable set search_path = public as $$
+  select distinct on (r.otid, r.oid) r.otid, r.oid, r.received_at, r.product, s.user_id
+  from (
+    select coalesce(e.payload #>> '{transaction,originalTransactionId}', e.original_transaction_id) as otid,
+      e.payload #>> '{transaction,offerIdentifier}' as oid, e.received_at, e.payload #>> '{transaction,productId}' as product
+    from app_store_events e
+    where e.notification_uuid is not null and e.error is null
+      and e.payload #>> '{transaction,environment}' = p_env
+      and e.payload #>> '{transaction,offerType}' = '3'
+      and e.payload #>> '{transaction,offerIdentifier}' is not null
+  ) r
+  left join app_store_subscriptions s on s.original_transaction_id = r.otid
+  order by r.otid, r.oid, r.received_at
 $$;
 
 create or replace function admin_check_bucket(p_bucket text) returns text
@@ -155,7 +193,7 @@ begin
       when 'billing' then s.status in ('grace', 'billing_retry')
       when 'ended' then s.status in ('expired', 'refunded', 'revoked')
       when 'renewing_soon' then s.status = 'active' and s.auto_renew is not false and s.expires_at between now() and now() + interval '7 days'
-      when 'offer_code' then s.offer_type = 3
+      when 'offer_code' then exists (select 1 from admin_offer_redemptions(p_env) o where o.original_transaction_id = s.original_transaction_id)
       else s.status = p_filter end
     and (p_q is null or p_q = ''
       or p.display_name ilike '%' || p_q || '%' or u.email ilike '%' || p_q || '%'
@@ -227,7 +265,7 @@ begin
 end;
 $$;
 
--- Estimated gross revenue per bucket and currency: new subscriptions, renewals and refunds.
+-- Gross sales per bucket and currency: new paid subscriptions, renewals and refunds.
 create or replace function admin_revenue_series(
   p_from timestamptz, p_to timestamptz, p_bucket text default 'day', p_env text default 'Production')
 returns table (bucket_start timestamptz, currency text, gross_milli bigint, refunds_milli bigint,
@@ -238,26 +276,21 @@ begin
   perform admin_check_bucket(p_bucket);
   return query
   with ev as (
-    select date_trunc(p_bucket, e.received_at at time zone 'UTC') at time zone 'UTC' as b,
-      coalesce(e.payload #>> '{transaction,currency}', s.currency, 'USD') as cur,
-      e.type, admin_event_price(e.payload, s.price_milli) as price
-    from app_store_events e
-    join app_store_subscriptions s on s.original_transaction_id = e.original_transaction_id
-    where s.environment = p_env and e.error is null
-      and e.received_at >= p_from and e.received_at < p_to
-      and e.type in ('SUBSCRIBED', 'DID_RENEW', 'REFUND')
+    select date_trunc(p_bucket, c.at at time zone 'UTC') at time zone 'UTC' as b, c.currency as cur, c.type, c.kind, c.price_milli as price
+    from admin_charges(p_env) c
+    where c.at >= p_from and c.at < p_to
   ), currencies as (
-    select distinct cur from ev union select 'USD'
+    select distinct ev.cur from ev union select 'USD'
   )
-  select bk.bucket_start, c.cur,
-    coalesce(sum(ev.price) filter (where ev.type in ('SUBSCRIBED', 'DID_RENEW')), 0)::bigint,
-    coalesce(sum(ev.price) filter (where ev.type = 'REFUND'), 0)::bigint,
-    count(ev.type) filter (where ev.type = 'SUBSCRIBED'),
-    count(ev.type) filter (where ev.type = 'DID_RENEW'),
-    count(ev.type) filter (where ev.type = 'REFUND')
+  select bk.bucket_start, cu.cur,
+    coalesce(sum(ev.price) filter (where ev.kind = 'charge'), 0)::bigint,
+    coalesce(sum(case ev.kind when 'refund' then ev.price when 'refund_reversed' then -ev.price end), 0)::bigint,
+    count(ev.kind) filter (where ev.kind = 'charge' and ev.type = 'SUBSCRIBED'),
+    count(ev.kind) filter (where ev.kind = 'charge' and ev.type = 'DID_RENEW'),
+    count(ev.kind) filter (where ev.kind = 'refund')
   from admin_buckets(p_from, p_to, p_bucket) bk
-  cross join currencies c
-  left join ev on ev.b = bk.bucket_start and ev.cur = c.cur
+  cross join currencies cu
+  left join ev on ev.b = bk.bucket_start and ev.cur = cu.cur
   group by 1, 2 order by 1, 2;
 end;
 $$;
@@ -275,6 +308,8 @@ begin
   perform require_admin();
   with trials as (
     select g.user_id from entitlement_grants g where g.source = 'trial' and g.starts_at >= p_from and g.starts_at < p_to
+  ), charges as (
+    select * from admin_charges('Production') where kind = 'charge'
   )
   select jsonb_build_object(
     'signups', (select count(*) from profiles where created_at >= p_from and created_at < p_to),
@@ -288,10 +323,9 @@ begin
     'ride_joins', (select count(*) from ride_members where status = 'joined' and role <> 'organizer' and created_at >= p_from and created_at < p_to),
     'messages', (select count(*) from ride_messages where created_at >= p_from and created_at < p_to),
     'trials_started', (select count(*) from trials),
-    'trials_converted', (select count(*) from trials t where exists (
-        select 1 from app_store_subscriptions s where s.user_id = t.user_id and s.environment = 'Production')),
-    'paid_starts', (select count(*) from app_store_events e join app_store_subscriptions s using (original_transaction_id)
-        where e.type = 'SUBSCRIBED' and e.error is null and s.environment = 'Production' and e.received_at >= p_from and e.received_at < p_to),
+    -- Of the trials that started in the range, how many have paid at least once since.
+    'trials_converted', (select count(*) from trials t where exists (select 1 from charges c where c.user_id = t.user_id)),
+    'paid_starts', (select count(*) from charges c where c.type = 'SUBSCRIBED' and c.at >= p_from and c.at < p_to),
     'top_features', coalesce((select jsonb_agg(jsonb_build_object('name', name, 'count', n, 'users', u) order by n desc)
         from (select name, count(*) as n, count(distinct user_id) as u from events
               where created_at >= p_from and created_at < p_to group by name order by 2 desc limit 15) f), '[]'::jsonb)
@@ -317,16 +351,14 @@ begin
     union all
     select m.created_at from ride_messages m where p_metric = 'messages' and m.created_at >= p_from and m.created_at < p_to
     union all
-    select e.received_at from app_store_events e join app_store_subscriptions s using (original_transaction_id)
-      where p_metric = 'paid_starts' and e.type = 'SUBSCRIBED' and e.error is null and s.environment = 'Production'
-        and e.received_at >= p_from and e.received_at < p_to
+    select c.at from admin_charges('Production') c
+      where p_metric = 'paid_starts' and c.kind = 'charge' and c.type = 'SUBSCRIBED' and c.at >= p_from and c.at < p_to
     union all
-    -- A trial user's first real subscription, on the day it started.
-    select min(e.received_at) from entitlement_grants g
-      join app_store_subscriptions s on s.user_id = g.user_id and s.environment = 'Production'
-      join app_store_events e on e.original_transaction_id = s.original_transaction_id and e.type = 'SUBSCRIBED' and e.error is null
+    -- A trial rider's first payment, on the day it happened.
+    select min(c.at) from entitlement_grants g
+      join admin_charges('Production') c on c.user_id = g.user_id and c.kind = 'charge'
       where p_metric = 'trial_conversions' and g.source = 'trial'
-      group by g.user_id having min(e.received_at) >= p_from and min(e.received_at) < p_to
+      group by g.user_id having min(c.at) >= p_from and min(c.at) < p_to
     union all
     select ev.created_at from events ev where p_metric like 'feature:%' and ev.name = substr(p_metric, 9)
       and ev.created_at >= p_from and ev.created_at < p_to
@@ -339,7 +371,7 @@ end;
 $$;
 
 -- Trials grouped by the week (or month) they started: how many are still running, ended,
--- and became paying subscribers.
+-- and have paid at least once.
 create or replace function admin_trial_cohorts(p_from timestamptz, p_to timestamptz, p_bucket text default 'week')
 returns table (cohort_start timestamptz, trials bigint, running bigint, ended bigint, converted bigint, revoked bigint)
 language plpgsql stable security definer set search_path = public as $$
@@ -347,11 +379,12 @@ begin
   perform require_admin();
   perform admin_check_bucket(p_bucket);
   return query
+  with payers as (select distinct c.user_id from admin_charges('Production') c where c.kind = 'charge' and c.user_id is not null)
   select date_trunc(p_bucket, g.starts_at at time zone 'UTC') at time zone 'UTC',
     count(*),
     count(*) filter (where g.revoked_at is null and (g.ends_at is null or g.ends_at > now())),
     count(*) filter (where g.revoked_at is null and g.ends_at <= now()),
-    count(*) filter (where exists (select 1 from app_store_subscriptions s where s.user_id = g.user_id and s.environment = 'Production')),
+    count(*) filter (where g.user_id in (select user_id from payers)),
     count(*) filter (where g.revoked_at is not null)
   from entitlement_grants g
   where g.source = 'trial' and g.starts_at >= p_from and g.starts_at < p_to
@@ -363,7 +396,8 @@ $$;
 -- Promo codes (Apple offer codes; campaigns themselves live in App Store Connect)
 -- ---------------------------------------------------------------------------
 
--- How each offer performed, from the verified subscriptions that carry it.
+-- How each offer performed: redemptions, who still subscribes, who went on to pay full price
+-- (a later charge without an offer), and the sales from those subscriptions since redeeming.
 create or replace function admin_promo_performance(p_env text default 'Production')
 returns table (offer_id text, offer_type int, redemptions bigint, paying_now bigint, renewed bigint,
   ended bigint, revenue_milli bigint, first_redeemed_at timestamptz, last_redeemed_at timestamptz)
@@ -371,23 +405,28 @@ language plpgsql stable security definer set search_path = public as $$
 begin
   perform require_admin();
   return query
-  with subs as (
-    select s.*, (select min(e.received_at) from app_store_events e where e.original_transaction_id = s.original_transaction_id) as first_at,
-      (select count(*) from app_store_events e where e.original_transaction_id = s.original_transaction_id and e.type = 'DID_RENEW' and e.error is null) as renewals,
-      (select coalesce(sum(admin_event_price(e.payload, s.price_milli)), 0) from app_store_events e
-        where e.original_transaction_id = s.original_transaction_id and e.error is null and e.type in ('SUBSCRIBED', 'DID_RENEW')) as gross
-    from app_store_subscriptions s where s.environment = p_env and s.offer_id is not null
+  with r as (
+    select * from admin_offer_redemptions(p_env)
+  ), ch as (
+    select * from admin_charges(p_env)
+  ), per as (
+    select r.offer_id, r.original_transaction_id, r.redeemed_at, s.status,
+      exists (select 1 from ch where ch.original_transaction_id = r.original_transaction_id and ch.kind = 'charge'
+              and ch.offer_type is null and ch.at > r.redeemed_at) as full_price,
+      coalesce((select sum(case ch.kind when 'charge' then ch.price_milli when 'refund' then -ch.price_milli else ch.price_milli end)
+                from ch where ch.original_transaction_id = r.original_transaction_id and ch.at >= r.redeemed_at and ch.currency = 'USD'), 0) as usd
+    from r left join app_store_subscriptions s on s.original_transaction_id = r.original_transaction_id
   )
-  select subs.offer_id, max(subs.offer_type)::int, count(*),
-    count(*) filter (where subs.status in ('active', 'grace')),
-    count(*) filter (where subs.renewals > 0),
-    count(*) filter (where subs.status in ('expired', 'refunded', 'revoked')),
-    sum(subs.gross)::bigint, min(subs.first_at), max(subs.first_at)
-  from subs group by subs.offer_id order by 3 desc;
+  select per.offer_id, 3, count(*),
+    count(*) filter (where per.status in ('active', 'grace')),
+    count(*) filter (where per.full_price),
+    count(*) filter (where per.status in ('expired', 'refunded', 'revoked')),
+    sum(per.usd)::bigint, min(per.redeemed_at), max(per.redeemed_at)
+  from per group by per.offer_id order by 3 desc;
 end;
 $$;
 
--- Latest offer redemptions, newest first.
+-- Latest offer-code redemptions, newest first.
 create or replace function admin_promo_redemptions(p_q text default null, p_env text default 'Production', p_limit int default 100)
 returns table (redeemed_at timestamptz, offer_id text, offer_type int, product_id text, status text,
   user_id uuid, display_name text, email text)
@@ -395,14 +434,13 @@ language plpgsql stable security definer set search_path = public as $$
 begin
   perform require_admin();
   return query
-  select coalesce((select min(e.received_at) from app_store_events e where e.original_transaction_id = s.original_transaction_id), s.updated_at),
-    s.offer_id, s.offer_type, s.product_id, s.status, s.user_id, p.display_name, u.email::text
-  from app_store_subscriptions s
-  left join profiles p on p.id = s.user_id
-  left join auth.users u on u.id = s.user_id
-  where s.environment = p_env and s.offer_id is not null
-    and (p_q is null or p_q = '' or s.offer_id ilike '%' || p_q || '%' or p.display_name ilike '%' || p_q || '%' or u.email ilike '%' || p_q || '%')
-  order by 1 desc limit least(greatest(p_limit, 1), 1000);
+  select r.redeemed_at, r.offer_id, 3, coalesce(r.product_id, s.product_id), s.status, r.user_id, p.display_name, u.email::text
+  from admin_offer_redemptions(p_env) r
+  left join app_store_subscriptions s on s.original_transaction_id = r.original_transaction_id
+  left join profiles p on p.id = r.user_id
+  left join auth.users u on u.id = r.user_id
+  where p_q is null or p_q = '' or r.offer_id ilike '%' || p_q || '%' or p.display_name ilike '%' || p_q || '%' or u.email ilike '%' || p_q || '%'
+  order by r.redeemed_at desc limit least(greatest(p_limit, 1), 1000);
 end;
 $$;
 
@@ -491,10 +529,11 @@ $$;
 -- Grants: callable by signed-in users, and each one refuses anyone but an admin with an
 -- authenticator session. Helpers stay private.
 -- ---------------------------------------------------------------------------
-revoke all on function admin_buckets(timestamptz, timestamptz, text) from public;
-revoke all on function admin_event_price(jsonb, bigint) from public;
-revoke all on function admin_check_bucket(text) from public;
-revoke all on function admin_plan_of(text) from public;
+revoke all on function admin_buckets(timestamptz, timestamptz, text) from public, anon, authenticated;
+revoke all on function admin_charges(text) from public, anon, authenticated;
+revoke all on function admin_offer_redemptions(text) from public, anon, authenticated;
+revoke all on function admin_check_bucket(text) from public, anon, authenticated;
+revoke all on function admin_plan_of(text) from public, anon, authenticated;
 revoke all on function admin_analytics_ping() from public, anon;
 revoke all on function admin_subscription_summary(text) from public, anon;
 revoke all on function admin_subscriptions(text, text, text, int, int) from public, anon;

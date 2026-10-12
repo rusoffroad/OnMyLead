@@ -8,7 +8,7 @@ import { ExternalLink, Fact, LoadError, Notice, TextButton } from '@/components/
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { bytesLabel, releaseLabel } from '@/core/admin-analytics';
-import { fmtAgo, fmtDateTime, fmtInt, fmtPct } from '@/core/admin-format';
+import { fmtAgo, fmtDateTime, fmtInt } from '@/core/admin-format';
 import { AdminError, useAdminData } from '@/lib/admin';
 import * as api from '@/lib/admin-analytics';
 
@@ -86,7 +86,7 @@ function Crashes({ configured }: { configured: boolean | null }) {
           <StatGrid>
             <StatTile
               label="Crash-Free Sessions"
-              value={fmtPct(sessions?.crash_free_rate ?? null)}
+              value={sessions?.crash_free_rate == null ? '–' : `${(Math.floor(sessions.crash_free_rate * 10000) / 100).toFixed(2)}%`}
               hint={sessions ? `${fmtInt(sessions.crashed)} crashes in ${fmtInt(sessions.sessions)} sessions` : undefined}
               tone={sessions?.crash_free_rate == null ? 'neutral' : sessions.crash_free_rate >= 0.995 ? 'ok' : sessions.crash_free_rate >= 0.98 ? 'warn' : 'danger'}
             />
@@ -138,7 +138,7 @@ function Server({ h, error }: { h: api.ServerHealth | null; error: AdminError | 
         <>
           <StatGrid>
             <StatTile label="Active Riders, 24 Hours" value={fmtInt(h.activity.active_24h)} hint={`${fmtInt(h.activity.live_rides)} rides live now`} />
-            <StatTile label="Push Deliveries, 24 Hours" value={calls ? fmtInt(calls.total) : '–'} hint={calls ? `${fmtInt(calls.failed)} failed` : 'No delivery log on this server'} tone={calls?.failed ? 'danger' : 'neutral'} />
+            <StatTile label="Push Deliveries, 24 Hours" value={calls ? fmtInt(calls.total) : '–'} hint={calls ? `${fmtInt(calls.failed)} failed` : 'No delivery log on this server'} tone={calls && calls.failed > calls.total * 0.05 ? 'danger' : 'neutral'} />
             <StatTile label="Purchase Check Errors, 7 Days" value={fmtInt(h.subscriptions.errors_7d)} hint={`${fmtInt(h.subscriptions.errors_24h)} in the last day`} tone={h.subscriptions.errors_7d ? 'danger' : 'ok'} />
           </StatGrid>
 
