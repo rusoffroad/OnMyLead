@@ -4,14 +4,16 @@ import MapView, { Marker } from 'react-native-maps';
 
 import { Colors, font } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { TrailMap } from '@/hooks/use-trail-map';
 import { RouteEnds, RouteLine } from './route-overlay';
+import { TrailTiles } from './trail-tiles';
 
 /**
  * Satellite map for building a route: tap to add the next point, drag a point to move it.
  * An imported track is shown as is (no points to drag).
  */
 export function RouteBuilderMap({
-  points, waypoints, center, editable, onAdd, onMove,
+  points, waypoints, center, editable, onAdd, onMove, trail,
 }: {
   points: LatLng[];
   waypoints: LatLng[];
@@ -19,6 +21,8 @@ export function RouteBuilderMap({
   editable: boolean;
   onAdd: (p: LatLng) => void;
   onMove: (index: number, p: LatLng) => void;
+  /** Topo and public trails layers. A tap adds a point here, so pressing and holding looks up a trail. */
+  trail?: TrailMap;
 }) {
   const map = useRef<MapView>(null);
   const fittedTo = useRef<LatLng[] | null>(null);
@@ -37,15 +41,21 @@ export function RouteBuilderMap({
     <MapView
       ref={map}
       style={StyleSheet.absoluteFill}
-      mapType="hybrid"
+      mapType={trail?.mapProps.mapType ?? 'hybrid'}
+      onRegionChangeComplete={trail?.mapProps.onRegionChangeComplete}
+      onLayout={trail?.mapProps.onLayout}
+      onLongPress={(e) => trail?.identifyAt(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)}
       showsUserLocation
       showsCompass
       initialRegion={center ? { latitude: center.lat, longitude: center.lng, latitudeDelta: 0.08, longitudeDelta: 0.08 } : undefined}
       onPress={(e) => {
-        if (!editable || e.nativeEvent.action === 'marker-press') return;
+        if (e.nativeEvent.action === 'marker-press') return;
         const c = e.nativeEvent.coordinate;
+        // An imported track can't be edited, so a plain tap is free to look up the trail.
+        if (!editable) return trail?.identifyAt(c.latitude, c.longitude);
         onAdd({ lat: c.latitude, lng: c.longitude });
       }}>
+      {trail ? <TrailTiles base={trail.base} trails={trail.trails} /> : null}
       {points.length > 1 ? <RouteLine points={points} /> : null}
       {points.length > 1 && !waypoints.length ? <RouteEnds points={points} /> : null}
       {waypoints.map((w, i) => (

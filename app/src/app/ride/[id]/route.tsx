@@ -3,13 +3,15 @@ import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { RouteBuilderMap } from '@/components/route-builder-map';
+import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button, ErrorText } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { miles, routeFromGpx, routeFromWaypoints, type RideRoute } from '@/core/route';
+import { useTrailMap } from '@/hooks/use-trail-map';
 import { getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { confirmAsync } from '@/lib/confirm';
 import { readPickedText } from '@/lib/read-text';
@@ -29,6 +31,8 @@ export default function RouteBuilder() {
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState<'save' | 'gpx' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const trail = useTrailMap();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     Promise.all([getRide(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])
@@ -109,6 +113,16 @@ export default function RouteBuilder() {
           editable={!imported && Platform.OS !== 'web'}
           onAdd={add}
           onMove={(i, p) => setTaps((t) => t.map((x, j) => (j === i ? p : x)))}
+          trail={trail}
+        />
+      ) : null}
+      {loaded ? (
+        <TrailMapOverlay
+          trail={trail}
+          top={insets.top + 66}
+          cardTop={insets.top + 118}
+          route={route?.points}
+          lookupHint={imported ? 'Tap a line to see who can ride it.' : 'Press and hold a line to see who can ride it.'}
         />
       ) : null}
 

@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { TrailMap } from '@/hooks/use-trail-map';
 import { RouteSketch } from './route-sketch';
 
 /** The web build has no native map: show the route as a drawing. Tapping to draw needs the app. */
@@ -14,6 +15,7 @@ export function RouteBuilderMap({
   editable: boolean;
   onAdd: (p: LatLng) => void;
   onMove: (index: number, p: LatLng) => void;
+  trail?: TrailMap;
 }) {
   return (
     <View style={[StyleSheet.absoluteFill, styles.wrap]}>
