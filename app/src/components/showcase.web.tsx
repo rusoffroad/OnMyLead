@@ -75,18 +75,18 @@ export function Showcase() {
           <ol className="steps">
             <Step
               n={1}
-              shot="home"
-              alt="The OnMyLead home screen with the big red Create a Ride button"
+              shot="create"
+              alt="Create a Ride with The Route set to Mapped, next to Freeride, and the vehicles welcome"
               title="Create a Ride"
-              text="Set the meeting point, time, difficulty and which machines are welcome. Draw the route on the map or import a GPX file, and choose public, private or approval-only."
-              points={['Pick a ride name other riders see', 'Route miles checked against every machine’s fuel range', 'Hand the lead to another rider at any point']}
+              text="Set the meeting point, time, difficulty and which machines are welcome, and choose public, private or approval-only. Then pick Mapped and draw the route or import a GPX file, or pick Freeride and everyone follows the leader."
+              points={['Search parks, trailheads, towns or a street address for the meeting spot', 'Route miles checked against every machine’s fuel range', 'Hand the lead to another rider at any point']}
             />
             <Step
               n={2}
               shot="find"
-              alt="Find a Ride with a map of Utah and public rides within 50 miles"
+              alt="Find a Ride with a place search, a map of Utah and public rides within 50 miles"
               title="Bring Your Crew"
-              text="Send the ride by link, text or email. Friends see a preview before they make an account, and riders nearby can find public rides by distance or by state."
+              text="Send the ride by link, text or email. Friends see a preview before they make an account, and riders can find public rides near them, by state, or near a park or trailhead they search for."
               points={['Riding Groups invite your whole crew in one tap', 'Follow This Leader to hear about their next public ride', 'Exact meeting spot only shows to riders who join']}
             />
             <Step
@@ -99,11 +99,19 @@ export function Showcase() {
             />
             <Step
               n={4}
+              shot="waypoints"
+              alt="The ride’s waypoints map: two numbered planned stops, a shared Washout hazard, and a camp spot only you see"
+              title="Mark the Trail"
+              text="Press and hold the map to drop a waypoint: camp, fuel, water, a viewpoint, parking or a hazard, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
+              points={['Shared waypoints show on every rider’s map', 'Never public: only riders on the ride see shared ones', 'Add one at your location with one tap']}
+            />
+            <Step
+              n={5}
               shot="chat"
               alt="Ride chat with two quick polls, Lunch Stop and How’s the Pace"
               title="Talk Without Typing"
               text="Ride chat goes to everyone or just the leader. Announcements are read aloud and pinned, and quick polls settle lunch and the pace with one tap."
-              points={['Pop-ups for new messages while you ride', 'Notification settings with quiet hours', 'Only riders on the ride can read it']}
+              points={['Every message shows Sending, then Sent, or Not Sent with a Retry button', 'Mark your own message Resolved, or Clear it for everyone', 'Pop-ups you can dismiss, and notification settings with quiet hours']}
             />
           </ol>
         </section>
@@ -112,12 +120,13 @@ export function Showcase() {
           <div className="signal-copy">
             <h2 id="signal-title" className="section-title">Made for Where the Signal Ends</h2>
             <p>
-              Trails rarely have service, so OnMyLead plans for it. Every dot says how fresh it is: solid when it’s live,
-              hollow when it only marks where a rider was last seen, so a stale dot never reads as “they’re right here.”
+              Trails rarely have service, so OnMyLead plans for it. Live positions need a signal, so every dot says how
+              fresh it is: solid when it’s live, hollow when it only marks where a rider was last seen, so a stale dot
+              never reads as “they’re right here.”
             </p>
             <ul className="ticks">
-              <li><b>Offline Maps.</b> Save the area before you leave and the map works with no bars.</li>
-              <li><b>Trail and Topo Layers.</b> Public trails and roads over satellite or topo.</li>
+              <li><b>Trails on the Map.</b> Public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls, named when you tap them. Over satellite or topo.</li>
+              <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
               <li><b>A Family Link.</b> People at home follow along on a read-only page, no app needed.</li>
             </ul>
