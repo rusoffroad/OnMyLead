@@ -1,8 +1,9 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
@@ -16,6 +17,7 @@ import { createRide } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
+import { useSession } from '@/lib/session';
 import { handleProError } from '@/lib/pro';
 
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
@@ -37,6 +39,7 @@ type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
   const { type } = useLocalSearchParams<{ type?: string }>();
+  const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
   const days = useMemo(() => nextDays(14), []);
@@ -92,6 +95,11 @@ export default function NewRide() {
     setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
     if (p.kind !== 'Coordinates') setMeetLabel(placeLabel(p));
     setMeetState(p.state ?? (await stateAt(p)));
+  }
+
+  async function pickOnMap(p: { lat: number; lng: number }) {
+    setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+    setMeetState(await stateAt(p));
   }
 
   async function fillStateFromCoords() {
@@ -152,8 +160,16 @@ export default function NewRide() {
     }
   }
 
+  // Someone who opens onmylead.com/ride/new signed out signs in first, then comes straight back here.
+  if (Platform.OS === 'web' && !loading && !session) return <Redirect href="/sign-in?next=/ride/new" />;
+
   return (
     <Screen>
+      {Platform.OS === 'web' ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          Plan it here on the big screen. The ride, its route and its stops show up in the OnMyLead app on your iPhone as soon as you save.
+        </ThemedText>
+      ) : null}
       {allowance ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement }}>
           <ThemedText type="small" style={{ flex: 1, fontWeight: 600 }}>{allowance}</ThemedText>
@@ -199,6 +215,7 @@ export default function NewRide() {
           Only joined riders see the exact spot. Public pages show the area within about a mile.
         </ThemedText>
         <PlaceSearch label="Search a Place or Address" onPick={pickPlace} />
+        <MeetPointMap value={parsedCoords ? { lat: Number(parsedCoords[1]), lng: Number(parsedCoords[2]) } : null} onPick={pickOnMap} />
         <Button title="Use My Current Location" kind="secondary" onPress={useMyLocation} />
         <Field label="Coordinates" value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
         <Field label="Place Name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />

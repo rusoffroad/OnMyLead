@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
@@ -23,7 +23,8 @@ import type { Ride, RideMember } from '@/lib/types';
 
 /**
  * Every waypoint on a ride, on a map and in a list: the leader's shared ones and your own. Press and
- * hold the map to drop one, or add one where you're standing. Only riders on the ride get here.
+ * hold the map to drop one (click it on the website), or add one where you're standing. Only riders
+ * on the ride get here.
  */
 export default function RideWaypoints() {
   // stop=1: the leader came to add a planned stop, so a new one starts as one.
@@ -32,6 +33,9 @@ export default function RideWaypoints() {
   const me = session?.user.id;
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
+  const web = Platform.OS === 'web';
+  const { width } = useWindowDimensions();
+  const wide = web && width >= WIDE;
   const [ride, setRide] = useState<Ride | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
   const [route, setRoute] = useState<RideRoute | null>(null);
@@ -80,6 +84,9 @@ export default function RideWaypoints() {
     }
   }
 
+  // A page opened from a link has nothing to go back to: land on the ride instead.
+  const leave = () => (router.canGoBack() ? router.back() : ride ? router.replace(`/r/${ride.invite_code}`) : router.replace('/'));
+
   const navigateTo = (lat: number, lng: number, title = 'This Waypoint') => openDirections({ title, to: { lat, lng } });
 
   const hint = !mine
@@ -88,13 +95,11 @@ export default function RideWaypoints() {
       ? WAYPOINTS_NOT_SWITCHED_ON
       : addingStop && !wp.stopsSwitchedOn
         ? PLANNED_STOPS_NOT_SWITCHED_ON
-      : Platform.OS === 'web'
-        ? 'Add one where you are, or drop them on the map in the OnMyLead app.'
-        : addingStop
-          ? 'Press and hold the map where the group will stop. Stops are numbered in the order you add them.'
-        : canShare
-          ? 'Press and hold the map to drop a waypoint. You choose whether the whole ride sees it.'
-          : 'Press and hold the map to drop a waypoint. Yours are only for you.';
+      : addingStop
+        ? `${web ? 'Click' : 'Press and hold'} the map where the group will stop. Stops are numbered in the order you add them.`
+      : canShare
+        ? `${web ? 'Click' : 'Press and hold'} the map to drop a waypoint. You choose whether the whole ride sees it.`
+        : `${web ? 'Click' : 'Press and hold'} the map to drop a waypoint. Yours are only for you.`;
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -106,20 +111,21 @@ export default function RideWaypoints() {
           trail={trail}
           onPressWaypoint={(w) => setTarget({ type: 'view', waypoint: w })}
           onLongPressMap={mine ? openNew : undefined}
+          padding={wide ? [90, 70, 40, PANEL_W + 60] : undefined}
         />
       ) : null}
       {loaded ? <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route?.points} ride={ride} /> : null}
 
-      <SafeAreaView edges={['top']} style={styles.top}>
+      <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]}>
         <View style={styles.topRow}>
-          <Pressable onPress={() => router.back()} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={{ flexShrink: 1 }}>
+          <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={{ flexShrink: 1 }}>
             <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
           </Pressable>
           <Text style={[styles.topText, { color: Colors.textSecondary }]}>Waypoints</Text>
         </View>
       </SafeAreaView>
 
-      <SafeAreaView edges={['bottom']} style={styles.panel}>
+      <SafeAreaView edges={['bottom']} style={[styles.panel, wide && styles.panelWide]}>
         <View style={styles.counts}>
           {stops ? <Count n={stops} label={stops === 1 ? 'Stop' : 'Stops'} color={Colors.accent} /> : null}
           <Count n={shared} label="Shared" color={Colors.sky} />
@@ -128,7 +134,7 @@ export default function RideWaypoints() {
         </View>
         <Text style={styles.hint}>{hint}</Text>
         {wp.waypoints.length ? (
-          <ScrollView style={{ maxHeight: 220 }} indicatorStyle="white">
+          <ScrollView style={{ maxHeight: wide ? 420 : 220 }} indicatorStyle="white">
             {wp.waypoints.map((w, i) => (
               <WaypointRow key={w.id} waypoint={w} stop={stopNumber(w, wp.waypoints)} me={me} ownerName={nameOf} first={i === 0} onPress={() => setTarget({ type: 'view', waypoint: w })} />
             ))}
@@ -165,7 +171,13 @@ function Count({ n, label, color }: { n: number; label: string; color: string })
   );
 }
 
+/** At this width and up (a laptop or desktop browser), the panel moves beside the map. */
+const WIDE = 900;
+const PANEL_W = 400;
+
 const styles = StyleSheet.create({
+  topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
+  panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two },
   topRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10,

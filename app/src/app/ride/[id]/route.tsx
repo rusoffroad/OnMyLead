@@ -2,7 +2,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { RouteBuilderMap } from '@/components/route-builder-map';
@@ -21,6 +21,8 @@ import type { Ride } from '@/lib/types';
 /**
  * The organizer's route builder. Tap the map to lay down the route point by point (straight
  * lines between taps; drag a point to move it), or bring in a GPX track from another app.
+ * On the website it's the same builder with a click instead of a tap, and on a wide screen the
+ * panel sits beside the map instead of under it.
  */
 export default function RouteBuilder() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -34,6 +36,9 @@ export default function RouteBuilder() {
   const [error, setError] = useState<string | null>(null);
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
+  const web = Platform.OS === 'web';
+  const { width } = useWindowDimensions();
+  const wide = web && width >= WIDE;
 
   useEffect(() => {
     Promise.all([getRide(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])
@@ -52,6 +57,23 @@ export default function RouteBuilder() {
   // What's on screen right now: an imported track, or the line through the taps.
   const route = useMemo(() => imported ?? (taps.length > 1 ? routeFromWaypoints(taps, saved?.source === 'drawn' ? saved.name : null) : null), [imported, taps, saved]);
   const changed = JSON.stringify(route?.points ?? null) !== JSON.stringify(saved?.points ?? null);
+
+  // A page opened from a link has nothing to go back to: land on the ride instead.
+  const leave = () => (router.canGoBack() ? router.back() : ride ? router.replace(`/r/${ride.invite_code}`) : router.replace('/'));
+
+  // Ctrl or Cmd + Z takes back the last point on the website.
+  useEffect(() => {
+    if (!web || imported) return;
+    const onKey = (e: KeyboardEvent) => {
+      const field = (e.target as HTMLElement | null)?.tagName;
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && field !== 'INPUT' && field !== 'TEXTAREA') {
+        e.preventDefault();
+        setTaps((t) => t.slice(0, -1));
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [web, imported]);
 
   function add(p: LatLng) {
     Haptics.selectionAsync();
@@ -88,7 +110,7 @@ export default function RouteBuilder() {
     try {
       await saveRideRoute(id, route);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.back();
+      leave();
     } catch (e) {
       if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not save the route.');
     } finally {
@@ -98,12 +120,12 @@ export default function RouteBuilder() {
 
   const hint = imported
     ? `Imported${imported.name ? ` “${imported.name}”` : ' from GPX'}. Clear it to draw your own.`
-    : Platform.OS === 'web'
-      ? 'Import a GPX track, or draw the route in the OnMyLead app.'
-      : taps.length === 0
-        ? 'Tap the map where the ride starts.'
-        : taps.length === 1
-          ? 'Now tap the next turn or landmark.'
+    : taps.length === 0
+      ? `${web ? 'Click' : 'Tap'} the map where the ride starts.`
+      : taps.length === 1
+        ? `Now ${web ? 'click' : 'tap'} the next turn or landmark.`
+        : web
+          ? 'Keep clicking along the trail. Drag a point to move it, or press Ctrl+Z to undo.'
           : 'Keep tapping along the trail. Drag a point to move it.';
 
   return (
@@ -113,10 +135,11 @@ export default function RouteBuilder() {
           points={route?.points ?? []}
           waypoints={imported ? [] : taps}
           center={center}
-          editable={!imported && Platform.OS !== 'web'}
+          editable={!imported}
           onAdd={add}
           onMove={(i, p) => setTaps((t) => t.map((x, j) => (j === i ? p : x)))}
           trail={trail}
+          padding={wide ? [90, 70, 40, PANEL_W + 60] : undefined}
         />
       ) : null}
       {loaded ? (
@@ -130,16 +153,16 @@ export default function RouteBuilder() {
         />
       ) : null}
 
-      <SafeAreaView edges={['top']} style={styles.top}>
+      <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]}>
         <View style={styles.topRow}>
-          <Pressable onPress={() => router.back()} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back">
+          <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back">
             <Text style={styles.topText}>‹ {ride?.name ?? 'Ride'}</Text>
           </Pressable>
           <Text style={[styles.topText, { color: Colors.textSecondary }]}>Route</Text>
         </View>
       </SafeAreaView>
 
-      <SafeAreaView edges={['bottom']} style={styles.panel}>
+      <SafeAreaView edges={['bottom']} style={[styles.panel, wide && styles.panelWide]}>
         <View style={styles.readout}>
           <Text style={styles.miles} accessibilityLabel={`${route ? miles(route.lengthM) : 0} miles`}>
             {route ? miles(route.lengthM) : '0.0'}
@@ -164,13 +187,21 @@ export default function RouteBuilder() {
           loading={busy === 'save'}
           onPress={save}
         />
-        <Text style={styles.privacy}>Only riders on this ride can see the route.</Text>
+        <Text style={styles.privacy}>
+          Only riders on this ride can see the route.{web ? ' It’s in the OnMyLead app as soon as you save.' : ''}
+        </Text>
       </SafeAreaView>
     </View>
   );
 }
 
+/** At this width and up (a laptop or desktop browser), the panel moves beside the map. */
+const WIDE = 900;
+const PANEL_W = 400;
+
 const styles = StyleSheet.create({
+  topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
+  panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two },
   topRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',

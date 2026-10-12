@@ -23,6 +23,8 @@ export function RouteBuilderMap({
   onMove: (index: number, p: LatLng) => void;
   /** Topo and public trails layers. A tap adds a point here, so pressing and holding looks up a trail. */
   trail?: TrailMap;
+  /** Web only: keeps framed routes clear of the panels over the map. */
+  padding?: [number, number, number, number];
 }) {
   const map = useRef<MapView>(null);
   const fittedTo = useRef<LatLng[] | null>(null);
