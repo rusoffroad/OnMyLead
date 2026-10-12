@@ -198,7 +198,7 @@ export default function NewRide() {
         <ThemedText type="small" themeColor="textSecondary">
           Only joined riders see the exact spot. Public pages show the area within about a mile.
         </ThemedText>
-        <PlaceSearch label="Search a Place" onPick={pickPlace} />
+        <PlaceSearch label="Search a Place or Address" onPick={pickPlace} />
         <Button title="Use My Current Location" kind="secondary" onPress={useMyLocation} />
         <Field label="Coordinates" value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
         <Field label="Place Name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
@@ -282,7 +282,14 @@ export default function NewRide() {
           <Field label="Description" value={description} onChangeText={setDescription} multiline />
           <Field label="Departure Time" value={departTime} onChangeText={setDepartTime} placeholder="8:30 am" />
           <Field label="Expected Finish" value={finishTime} onChangeText={setFinishTime} placeholder="4:00 pm" />
-          <Field label="Destination" value={destination} onChangeText={setDestination} />
+          <PlaceSearch label="Search a Destination" onPick={(p) => setDestination(placeLabel(p))} />
+          <Field
+            label="Destination"
+            value={destination}
+            onChangeText={setDestination}
+            placeholder="Trailhead, town or street address"
+            hint="Anyone who can see the ride sees this. Riders get directions to it in Apple Maps or Google Maps."
+          />
           <Field label="Route Length (Miles)" value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint="Used to warn riders whose fuel range is too short." />
           <Choice
             label="Difficulty"

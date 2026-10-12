@@ -1,17 +1,19 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
-import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
+import { Button, Choice, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } from '@/core/profile';
+import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directions';
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
 import { myRideName, requestAccountDeletion, saveRideName } from '@/lib/api';
 import { confirmAsync } from '@/lib/confirm';
+import { setMapsPreference, useMapsPreference } from '@/lib/directions';
 import { useEntitlements } from '@/lib/entitlements';
 import { useNotificationSettings } from '@/lib/notification-settings';
 import { useOfflineMaps } from '@/lib/offline-maps';
@@ -26,6 +28,7 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState(false);
   const notifications = useNotificationSettings();
+  const mapsPref = useMapsPreference();
   const { ent } = useEntitlements();
   const subscriptionSummary = ent.switchedOn ? planHeadline(ent) : 'OnMyLead Pro, Restore Purchases and Promo Codes';
   const offlineMaps = useOfflineMaps();
@@ -143,6 +146,21 @@ export default function Profile() {
         </View>
         <Icon name="chevron" color={Colors.textSecondary} />
       </Pressable>
+
+      <View style={[styles.setting, { flexDirection: 'column', alignItems: 'stretch', gap: Spacing.two }]}>
+        <View style={{ gap: 2 }}>
+          <ThemedText style={{ fontWeight: 600 }}>Directions</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">Which app Navigate opens for turn-by-turn on the roads.</ThemedText>
+        </View>
+        <Choice
+          value={mapsPref}
+          onChange={setMapsPreference}
+          options={[
+            { value: 'ask' as MapsPreference, label: 'Ask Each Time' },
+            ...mapsAppsFor(Platform.OS).map((a) => ({ value: a as MapsPreference, label: MAPS_APP_LABEL[a] })),
+          ]}
+        />
+      </View>
 
       <Section title="Account" />
       <View style={styles.account}>

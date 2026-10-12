@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
@@ -16,6 +16,7 @@ import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getMembers, getPrivateDetails, getRide, getRideRoute } from '@/lib/api';
+import { openDirections } from '@/lib/directions';
 import { currentPosition } from '@/lib/location';
 import { useSession } from '@/lib/session';
 import type { Ride, RideMember } from '@/lib/types';
@@ -76,8 +77,7 @@ export default function RideWaypoints() {
     }
   }
 
-  const navigateTo = (lat: number, lng: number) =>
-    Linking.openURL(Platform.OS === 'ios' ? `http://maps.apple.com/?daddr=${lat},${lng}` : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+  const navigateTo = (lat: number, lng: number, title = 'This Waypoint') => openDirections({ title, to: { lat, lng } });
 
   const hint = !mine
     ? 'Join the ride to add and see its waypoints.'

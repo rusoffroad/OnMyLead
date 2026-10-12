@@ -5,11 +5,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert, Animated, AppState, LayoutAnimation, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
+  Alert, Animated, AppState, LayoutAnimation, Linking, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DirectionsSheet } from '@/components/directions';
 import { GroupMap, type MapRider } from '@/components/group-map';
+import { Icon } from '@/components/icon';
 import { BreakdownBadge } from '@/components/rider-status-badge';
 import { RiderList } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
@@ -26,6 +28,7 @@ import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
+import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
@@ -39,10 +42,11 @@ import { useRideChat } from '@/hooks/use-ride-chat';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
-  activeRegroup, dropRegroup, getMembers, getPositions, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
+  activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
   startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
 import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay';
+import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
@@ -92,6 +96,7 @@ export default function RideMode() {
   useKeepAwake();
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
+  const winH = useWindowDimensions().height;
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useSession();
   const me = session?.user.id;
@@ -130,6 +135,9 @@ export default function RideMode() {
   const wp = useRideWaypoints(id, !!mine);
   const canShareWp = canShareWaypoints(me, mine, leaderIds);
   const [wpTarget, setWpTarget] = useState<WaypointSheetTarget>(null);
+  const [directionsOpen, setDirectionsOpen] = useState(false);
+  // The exact meeting point, for directions; only riders on the ride get it back.
+  const [meet, setMeet] = useState<{ lat: number; lng: number; label: string | null } | null>(null);
   const [panelH, setPanelH] = useState(0);
   const openNewWaypoint = useCallback((at: { lat: number; lng: number }) => {
     if (!wp.switchedOn) return Alert.alert('Not Switched On Yet', WAYPOINTS_NOT_SWITCHED_ON);
@@ -231,6 +239,9 @@ export default function RideMode() {
     loadSnapshot(id).then(apply).catch(() => {});
     loadRoute();
     loadShare();
+    getPrivateDetails(id)
+      .then((d) => setMeet(d ? { lat: d.meet_lat, lng: d.meet_lng, label: d.meet_label } : null))
+      .catch(() => {});
   }, [id, apply, loadRoute, loadShare]);
 
   // Back from the background or the lock screen: catch up at once instead of waiting for the poll.
@@ -566,8 +577,14 @@ export default function RideMode() {
     return () => sub.remove();
   }, []);
 
-  const navigateTo = (lat: number, lng: number) =>
-    Linking.openURL(Platform.OS === 'ios' ? `http://maps.apple.com/?daddr=${lat},${lng}` : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
+  const navigateTo = (lat: number, lng: number, title = 'There') => openDirections({ title, to: { lat, lng } });
+  const directionRows = rideDirections({
+    regroup,
+    meet,
+    route: route.route,
+    alongM: placed.find((p) => p.id === me)?.place?.alongM,
+    destination: ride?.destination_label,
+  });
 
   const myPos = me ? positions[me] : undefined;
   const shareLeft = activeShare?.expires_at ? Date.parse(activeShare.expires_at) - now : null;
@@ -641,7 +658,7 @@ export default function RideMode() {
           </View>
         ) : null}
         {regroup ? (
-          <Pressable onPress={() => navigateTo(regroup.lat, regroup.lng)} style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}>
+          <Pressable onPress={() => navigateTo(regroup.lat, regroup.lng, 'the Regroup Point')} style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}>
             <Text style={[styles.shareText, { color: '#1A1100' }]}>Regroup point set. Tap to navigate</Text>
           </Pressable>
         ) : null}
@@ -657,13 +674,24 @@ export default function RideMode() {
         ) : null}
       </SafeAreaView>
 
+      {panelH && directionRows.length && panelH + 70 < winH - insets.top - 140 ? (
+        <Pressable
+          onPress={() => setDirectionsOpen(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Directions in Apple Maps or Google Maps"
+          style={({ pressed }) => [styles.wpFab, styles.directionsFab, { bottom: panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
+          <Icon name="turn" size={24} color={Colors.sky} strokeWidth={2.1} />
+          <Text style={styles.wpFabText}>Directions</Text>
+        </Pressable>
+      ) : null}
+
       {mine && panelH ? (
         <Pressable
           onPress={dropWaypointHere}
           accessibilityRole="button"
           accessibilityLabel="Add a waypoint at your location"
           accessibilityHint="You can also press and hold the map to drop one anywhere"
-          style={({ pressed }) => [styles.wpFab, { bottom: panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
+          style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
           <WaypointBlaze kind="spot" shared={false} size={24} />
           <Text style={styles.wpFabText}>Add Waypoint</Text>
         </Pressable>
@@ -852,6 +880,8 @@ export default function RideMode() {
       </SafeAreaView>
       </Animated.View>
 
+      <DirectionsSheet visible={directionsOpen} rows={directionRows} onClose={() => setDirectionsOpen(false)} />
+
       <RiderList
         visible={ridersOpen}
         riders={mapRiders}
@@ -985,9 +1015,11 @@ const styles = StyleSheet.create({
   statusBtn: { width: '31.5%', minHeight: 64, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center' },
   statusText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 20, textAlign: 'center' },
   wpFab: {
-    position: 'absolute', right: 12, flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingLeft: 10, paddingRight: 14,
+    position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingLeft: 10, paddingRight: 14,
     borderRadius: 22, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
   },
+  directionsFab: { left: 12 },
+  waypointFab: { right: 12 },
   wpFabText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
   sheet: { backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },

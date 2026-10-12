@@ -67,3 +67,31 @@ describe('place search', () => {
     expect(parsePlaces({ features: [{ properties: { name: 'No geometry' } }] })).toEqual([]);
   });
 });
+
+// Trimmed from real Photon answers for "501 Congress Ave Austin TX" and "4800 W Gate Blvd Austin" on 2026-10-12.
+const CONGRESS = {
+  features: [
+    feature({ osm_type: 'N', osm_id: 20, osm_key: 'shop', osm_value: 'shoes', name: 'Allen Edmonds', housenumber: '501', street: 'Congress Avenue', city: 'Austin', state: 'Texas', postcode: '78701' }, [-97.7428, 30.2672]),
+    feature({ osm_type: 'W', osm_id: 21, osm_key: 'building', osm_value: 'yes', housenumber: '501', street: 'Congress Avenue', city: 'Austin', state: 'Texas', postcode: '78701' }, [-97.7429, 30.2673]),
+  ],
+};
+
+describe('street addresses', () => {
+  it('lists a bare house number and street as a street address', () => {
+    const [, addr] = parsePlaces(CONGRESS);
+    expect(addr).toMatchObject({ name: '501 Congress Avenue', kind: 'Address', where: 'Austin, Texas', state: 'TX', address: null });
+    expect(placeDetail(addr)).toBe('Street Address in Austin, Texas');
+    expect(placeLabel(addr)).toBe('501 Congress Avenue, Austin, TX');
+  });
+
+  it('keeps the street address of a named place', () => {
+    const [shop] = parsePlaces(CONGRESS);
+    expect(shop).toMatchObject({ name: 'Allen Edmonds', kind: 'Shoes', address: '501 Congress Avenue' });
+    expect(placeDetail(shop)).toBe('Shoes at 501 Congress Avenue, Austin');
+    expect(placeLabel(shop)).toBe('Allen Edmonds, 501 Congress Avenue, Austin, TX');
+  });
+
+  it('sends an address search as typed', () => {
+    expect(placeSearchUrl('4800 W Gate Blvd, Austin')).toContain('q=4800%20W%20Gate%20Blvd%2C%20Austin');
+  });
+});
