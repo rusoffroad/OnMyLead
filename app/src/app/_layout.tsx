@@ -8,12 +8,14 @@ import { BarlowCondensed_600SemiBold } from '@expo-google-fonts/barlow-condensed
 import { BarlowCondensed_700Bold } from '@expo-google-fonts/barlow-condensed/700Bold';
 import { BarlowCondensed_800ExtraBold } from '@expo-google-fonts/barlow-condensed/800ExtraBold';
 import { useFonts } from 'expo-font';
-import { DarkTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
+import { DarkTheme, Stack, ThemeProvider, useSegments, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
 import { MessageAlerts } from '@/components/message-alerts';
 import { Colors, font, NavigationColors } from '@/constants/theme';
+// Starts crash reporting before anything else can fail (off when no DSN is set).
+import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 
@@ -26,12 +28,16 @@ const launchedAt = Date.now();
 
 const theme: Theme = { ...DarkTheme, dark: true, colors: { ...DarkTheme.colors, ...NavigationColors } };
 
-export default function RootLayout() {
+function RootLayout() {
   const [loaded, error] = useFonts({
     Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, Barlow_700Bold, Barlow_800ExtraBold,
     BarlowCondensed_500Medium, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold, BarlowCondensed_800ExtraBold,
   });
   const ready = loaded || !!error;
+  // The route pattern ("ride/[id]/live"), not the path, so reports group by screen.
+  const screen = '/' + useSegments().join('/');
+
+  useEffect(() => setCrashScreen(screen), [screen]);
 
   useEffect(() => {
     if (!ready) return;
@@ -77,3 +83,5 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+export default withCrashReporting(RootLayout);

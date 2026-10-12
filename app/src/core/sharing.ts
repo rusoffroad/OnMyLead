@@ -83,3 +83,13 @@ export function formatRemaining(ms: number | null): string {
   if (h === 0) return `${m} min left`;
   return m === 0 ? `${h} hr left` : `${h} hr ${m} min left`;
 }
+
+/** The tiny version for the folded sharing pill in Ride Mode: "1h 20m", "45m", or "On" with no timer. */
+export function formatRemainingShort(ms: number | null): string {
+  if (ms == null) return 'On';
+  const totalMin = Math.max(1, Math.ceil(ms / 60_000));
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m}m`;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+}

@@ -3,7 +3,9 @@ import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert, Animated, LayoutAnimation, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GroupMap, type MapRider } from '@/components/group-map';
@@ -14,7 +16,8 @@ import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
-import { formatRemaining, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
+import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
+import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
@@ -93,8 +96,33 @@ export default function RideMode() {
 
   // Announcements: only the latest is shown, and it is read aloud so nobody has to look down.
   const chat = useRideChat(id, !!mine);
-  // Riders can fold the reply and status buttons away to see more map. Emergency always stays.
-  const [panelOpen, togglePanel] = useRememberedToggle('ride.modePanelOpen.v1', true);
+  // Riders can fold the reply and status buttons away (tap the handle or swipe down) to see more map.
+  // Emergency, and calls for help, always stay.
+  const [panelOpen, , setPanelOpenRaw] = useRememberedToggle('ride.modePanelOpen.v1', true);
+  const setPanelOpen = useCallback((open: boolean) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setPanelOpenRaw(open);
+  }, [setPanelOpenRaw]);
+  // The sharing timer folds down to a small pill next to the ride name.
+  const [shareOpen, toggleShareOpen] = useRememberedToggle('ride.shareBannerOpen.v1', false);
+  const [panelDrag] = useState(() => new Animated.Value(0));
+  const panelSwipe = useMemo(() =>
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_e, g) => isVerticalSwipe(g.dx, g.dy),
+      onPanResponderMove: (_e, g) => panelDrag.setValue(panelOpen ? Math.max(0, g.dy) : 0),
+      onPanResponderRelease: (_e, g) => {
+        const result = swipeResult(panelOpen, g.dy, g.vy);
+        if (result) {
+          Haptics.selectionAsync();
+          panelDrag.setValue(0);
+          setPanelOpen(result === 'open');
+        } else {
+          Animated.spring(panelDrag, { toValue: 0, useNativeDriver: true }).start();
+        }
+      },
+      onPanResponderTerminate: () => Animated.spring(panelDrag, { toValue: 0, useNativeDriver: true }).start(),
+    }),
+  [panelOpen, setPanelOpen, panelDrag]);
   const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
   const [lastReply, setLastReply] = useState<QuickReply | null>(null);
   const spokenId = useRef<string | null>(null);
@@ -227,6 +255,12 @@ export default function RideMode() {
   const helpCalls = joined
     .map((m) => ({ m, s: statuses[m.user_id] }))
     .filter(({ s, m }) => s && m.user_id !== me && !['ok'].includes(s.status) && now - Date.parse(s.tapped_at) < 30 * 60_000);
+  const separations = watchesBubble ? bubble.riders.filter((r) => r.status === 'red' || r.status === 'yellow') : [];
+  // Folded, only the calls nobody should miss stay on screen; the rest are counted on the handle.
+  const isUrgentCall = (k: RiderStatusKind) => k === 'emergency' || k === 'need_help';
+  const shownHelpCalls = panelOpen ? helpCalls : helpCalls.filter(({ s }) => isUrgentCall(s.status));
+  const shownSeparations = panelOpen ? separations : [];
+  const foldedCount = helpCalls.length - shownHelpCalls.length + separations.length - shownSeparations.length;
 
   async function beginShare(minutes: number | null) {
     setBusy(true);
@@ -323,6 +357,7 @@ export default function RideMode() {
     Linking.openURL(Platform.OS === 'ios' ? `http://maps.apple.com/?daddr=${lat},${lng}` : `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`);
 
   const myPos = me ? positions[me] : undefined;
+  const shareLeft = activeShare?.expires_at ? Date.parse(activeShare.expires_at) - now : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -330,20 +365,44 @@ export default function RideMode() {
 
       <SafeAreaView edges={['top']} style={styles.top}>
         <View style={styles.topRow}>
-          <Pressable onPress={() => router.back()} hitSlop={16} accessibilityLabel="Back">
-            <Text style={styles.topText}>‹ {ride?.name ?? 'Ride'}</Text>
+          <Pressable onPress={() => router.back()} hitSlop={16} accessibilityLabel="Back" style={{ flexShrink: 1 }}>
+            <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
           </Pressable>
-          <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
-            {bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Group together'}
-          </Text>
+          <View style={styles.topRight}>
+            <Pressable
+              onPress={() => (activeShare ? toggleShareOpen() : setAskShare(true))}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityState={activeShare ? { expanded: shareOpen } : undefined}
+              accessibilityLabel={
+                activeShare
+                  ? `Sharing your location, ${formatRemaining(shareLeft)}. Tap for details`
+                  : 'Not sharing your location. Tap to share'
+              }
+              style={[styles.sharePill, activeShare ? styles.sharePillOn : styles.sharePillOff]}>
+              <View style={[styles.shareDot, { backgroundColor: activeShare ? '#fff' : Colors.textSecondary }]} />
+              <Text style={[styles.sharePillText, !activeShare && { color: Colors.textSecondary }]}>
+                {activeShare ? formatRemainingShort(shareLeft) : 'Off'}
+              </Text>
+            </Pressable>
+            <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
+              {bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}
+            </Text>
+          </View>
         </View>
-        <Pressable onPress={() => (activeShare ? endShare() : setAskShare(true))} style={[styles.shareBanner, { backgroundColor: activeShare ? Colors.sky : Colors.backgroundSelected }]}>
-          <Text style={styles.shareText}>
-            {activeShare
-              ? `Sharing with this ride, ${formatRemaining(activeShare.expires_at ? Date.parse(activeShare.expires_at) - now : null)}. Tap to stop`
-              : 'Not sharing your location. Tap to share'}
-          </Text>
-        </Pressable>
+        {activeShare && shareOpen ? (
+          <View style={styles.shareBanner}>
+            <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
+              Sharing, {formatRemaining(shareLeft)}
+            </Text>
+            <Pressable onPress={endShare} hitSlop={8} accessibilityRole="button" style={styles.shareAction}>
+              <Text style={styles.shareActionText}>Stop</Text>
+            </Pressable>
+            <Pressable onPress={toggleShareOpen} hitSlop={8} accessibilityRole="button" accessibilityLabel="Hide sharing details" style={styles.shareAction}>
+              <Text style={styles.shareActionText}>Hide</Text>
+            </Pressable>
+          </View>
+        ) : null}
         {regroup ? (
           <Pressable onPress={() => navigateTo(regroup.lat, regroup.lng)} style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}>
             <Text style={[styles.shareText, { color: '#1A1100' }]}>Regroup point set. Tap to navigate</Text>
@@ -361,54 +420,69 @@ export default function RideMode() {
         ) : null}
       </SafeAreaView>
 
+      <Animated.View {...panelSwipe.panHandlers} style={[styles.bottomWrap, { transform: [{ translateY: panelDrag }] }]}>
       <SafeAreaView edges={['bottom']} style={styles.bottom}>
         <Pressable
-          onPress={togglePanel}
+          onPress={() => setPanelOpen(!panelOpen)}
           accessibilityRole="button"
           accessibilityState={{ expanded: panelOpen }}
           accessibilityLabel={panelOpen ? 'Hide the message and status buttons' : 'Show the message and status buttons'}
+          accessibilityHint="You can also swipe the panel down to hide it or up to show it"
           hitSlop={8}
           style={styles.handle}>
           <View style={styles.handleBar} />
-          <Text style={styles.handleText}>{panelOpen ? 'Hide buttons ▼' : 'Show buttons ▲'}</Text>
+          {panelOpen ? <Text style={styles.handleText}>Hide ▼</Text> : null}
         </Pressable>
-        <ScrollView style={{ maxHeight: 180 }} contentContainerStyle={{ gap: Spacing.two }}>
-          {watchesBubble
-            ? bubble.riders
-                .filter((r) => r.status === 'red' || r.status === 'yellow')
-                .map((r) => {
-                  const p = positions[r.riderId];
-                  return (
-                    <Card key={r.riderId} style={{ borderLeftWidth: 6, borderLeftColor: RideColors[r.status] }}>
-                      <ThemedText type="smallBold">{r.message}</ThemedText>
-                      <View style={styles.actions}>
-                        {p ? <Button title="Navigate" kind="secondary" onPress={() => navigateTo(p.lat, p.lng)} /> : null}
-                        {canRegroup ? <Button title="Regroup" kind="secondary" onPress={regroupHere} /> : null}
-                      </View>
-                    </Card>
-                  );
-                })
-            : null}
-          {helpCalls.map(({ m, s }) => (
-            <Card key={`s-${m.user_id}`} style={{ borderLeftWidth: 6, borderLeftColor: s.status === 'emergency' || s.status === 'need_help' ? RideColors.red : RideColors.yellow }}>
-              <ThemedText type="smallBold">
-                {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}, {ago(s.tapped_at, now)}
-              </ThemedText>
-              {positions[m.user_id] ? (
-                <Button title="Navigate" kind="secondary" onPress={() => navigateTo(positions[m.user_id].lat, positions[m.user_id].lng)} />
-              ) : null}
-            </Card>
-          ))}
-        </ScrollView>
+
+        {shownSeparations.length || shownHelpCalls.length ? (
+          <ScrollView style={{ maxHeight: 180 }} contentContainerStyle={{ gap: Spacing.two }}>
+            {shownSeparations.map((r) => {
+              const p = positions[r.riderId];
+              return (
+                <Card key={r.riderId} style={{ borderLeftWidth: 6, borderLeftColor: RideColors[r.status] }}>
+                  <ThemedText type="smallBold">{r.message}</ThemedText>
+                  <View style={styles.actions}>
+                    {p ? <Button title="Navigate" kind="secondary" onPress={() => navigateTo(p.lat, p.lng)} /> : null}
+                    {canRegroup ? <Button title="Regroup" kind="secondary" onPress={regroupHere} /> : null}
+                  </View>
+                </Card>
+              );
+            })}
+            {shownHelpCalls.map(({ m, s }) => (
+              <Card key={`s-${m.user_id}`} style={{ borderLeftWidth: 6, borderLeftColor: isUrgentCall(s.status) ? RideColors.red : RideColors.yellow }}>
+                <ThemedText type="smallBold">
+                  {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}, {ago(s.tapped_at, now)}
+                </ThemedText>
+                {positions[m.user_id] ? (
+                  <Button title="Navigate" kind="secondary" onPress={() => navigateTo(positions[m.user_id].lat, positions[m.user_id].lng)} />
+                ) : null}
+              </Card>
+            ))}
+          </ScrollView>
+        ) : null}
 
         {!panelOpen ? (
-          <Pressable
-            onPress={() => tapStatus('emergency')}
-            accessibilityRole="button"
-            accessibilityLabel="Send status EMERGENCY"
-            style={({ pressed }) => [styles.statusBtn, { width: '100%', marginTop: Spacing.two, backgroundColor: Colors.danger, opacity: pressed ? 0.75 : 1 }]}>
-            <Text style={styles.statusText}>EMERGENCY</Text>
-          </Pressable>
+          <View style={styles.foldedRow}>
+            <Pressable
+              onPress={() => setPanelOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel={foldedCount ? `Show buttons and ${foldedCount} more alerts` : 'Show the message and status buttons'}
+              style={({ pressed }) => [styles.foldedShow, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.foldedShowText}>Buttons ▲</Text>
+              {foldedCount ? (
+                <View style={styles.foldedBadge}>
+                  <Text style={styles.foldedBadgeText}>{foldedCount}</Text>
+                </View>
+              ) : null}
+            </Pressable>
+            <Pressable
+              onPress={() => tapStatus('emergency')}
+              accessibilityRole="button"
+              accessibilityLabel="Send status EMERGENCY"
+              style={({ pressed }) => [styles.foldedSos, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.statusText}>EMERGENCY</Text>
+            </Pressable>
+          </View>
         ) : null}
 
         {panelOpen ? (
@@ -451,6 +525,7 @@ export default function RideMode() {
           </>
         ) : null}
       </SafeAreaView>
+      </Animated.View>
 
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <View style={styles.sheetWrap}>
@@ -501,12 +576,33 @@ const styles = StyleSheet.create({
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: 6 },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48 },
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
-  shareBanner: { borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 44, justifyContent: 'center' },
+  topRight: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 10 },
+  sharePill: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 30, paddingHorizontal: 10, borderRadius: 15 },
+  sharePillOn: { backgroundColor: Colors.sky },
+  sharePillOff: { backgroundColor: Colors.backgroundSelected },
+  shareDot: { width: 8, height: 8, borderRadius: 4 },
+  sharePillText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 16 },
+  shareBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: Radius.control, paddingLeft: 14, paddingRight: 6,
+    minHeight: 44, backgroundColor: Colors.sky,
+  },
   shareText: { color: '#fff', fontFamily: font(700), fontSize: 15, textAlign: 'center' },
+  shareAction: { minHeight: 32, paddingHorizontal: 10, borderRadius: 16, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.22)' },
+  shareActionText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
+  bottomWrap: { position: 'absolute', bottom: 0, left: 0, right: 0 },
   bottom: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.two, paddingTop: 12,
+    padding: Spacing.two, paddingTop: 12,
     backgroundColor: 'rgba(10,22,38,0.96)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
+  foldedRow: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.two },
+  foldedShow: {
+    flex: 1, minHeight: 56, borderRadius: Radius.control, flexDirection: 'row', gap: 8,
+    alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected,
+  },
+  foldedShowText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19 },
+  foldedBadge: { minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow },
+  foldedBadgeText: { color: '#1A1100', fontFamily: font(800), fontSize: 14 },
+  foldedSos: { flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.danger },
   actions: { flexDirection: 'row', gap: Spacing.two },
   handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },
   handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
