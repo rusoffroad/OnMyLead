@@ -11,6 +11,8 @@ const PATHS = {
   chevron: ['M9 5.5l6.5 6.5L9 18.5'],
   hash: ['M4.5 9h15', 'M4.5 15h15', 'M10 4l-2 16', 'M16 4l-2 16'],
   plus: ['M12 5v14', 'M5 12h14'],
+  minus: ['M5 12h14'],
+  locate: ['M12 2.5v3.5', 'M12 18v3.5', 'M2.5 12H6', 'M18 12h3.5'],
   check: ['M5 12.5l4.5 4.5L19 7.5'],
   search: ['M15.5 15.5L20.5 20.5'],
   person: ['M4.5 20.5c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6'],
@@ -28,6 +30,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: 
       ))}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'locate' ? <Circle cx={12} cy={12} r={6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'search' ? <Circle cx={10.5} cy={10.5} r={6.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'machine' ? (
         <>

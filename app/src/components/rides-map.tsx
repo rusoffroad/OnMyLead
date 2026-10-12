@@ -1,50 +1,97 @@
-import { useEffect, useRef } from 'react';
-import MapView, { Callout, Marker } from 'react-native-maps';
-import { Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import MapView, { Callout, Circle, Marker, type Region } from 'react-native-maps';
+import { View } from 'react-native';
 
+import { MapControls, MapOverlay, RideBubble, RidePin, type RidesMapProps } from '@/components/rides-map-chrome';
 import { Colors, Radius } from '@/constants/theme';
-import type { Bounds } from '@/core/discovery';
-import { regionFor } from '@/core/discovery';
-import type { Ride } from '@/lib/types';
+import { boundsOfRegion, regionFor, regionMoved, zoomRegion } from '@/core/discovery';
 
 /**
- * Public rides as pins on a map. Pins sit on the rounded meeting area, never the exact spot.
- * The web build uses rides-map.web.tsx (a native map is not available there).
+ * Public rides as pins on a map the rider can pinch, pan and zoom. Opens on the rider's state.
+ * Pins sit on the rounded meeting area, never the exact spot.
+ * The web build uses rides-map.web.tsx.
  */
-export function RidesMap({
-  rides, bounds, onOpen, height = 320,
-}: {
-  rides: Ride[];
-  bounds: Bounds;
-  onOpen: (ride: Ride) => void;
-  height?: number;
-}) {
+export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400 }: RidesMapProps) {
   const map = useRef<MapView>(null);
+  const [initial] = useState(() => regionFor(frame));
+  const region = useRef<Region>(initial);
+  // The region the map settled on after we last moved it, so "Search this area" shows only after the rider moves it.
+  const anchor = useRef(boundsOfRegion(initial));
+  const settling = useRef(true);
+  const [moved, setMoved] = useState(false);
 
-  useEffect(() => {
-    map.current?.animateToRegion(regionFor(bounds), 300);
-  }, [bounds]);
+  const flyTo = (r: Region) => {
+    settling.current = true;
+    map.current?.animateToRegion(r, 350);
+  };
+
+  // Fly only when the frame itself changes (a new state), not on every search.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => flyTo(regionFor(frame)), [frameKey]);
+
+  const zoom = (factor: number) => map.current?.animateToRegion(zoomRegion(region.current, factor), 250);
 
   return (
-    <View style={{ height, borderRadius: Radius.card, overflow: 'hidden' }}>
-      <MapView ref={map} style={{ flex: 1 }} initialRegion={regionFor(bounds)} showsUserLocation mapType="hybrid">
+    <View style={{ height, borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement }}>
+      <MapView
+        ref={map}
+        style={{ flex: 1 }}
+        initialRegion={initial}
+        showsUserLocation
+        showsCompass={false}
+        mapType="hybrid"
+        userInterfaceStyle="dark"
+        onRegionChangeComplete={(r) => {
+          region.current = r;
+          const now = boundsOfRegion(r);
+          if (settling.current) {
+            settling.current = false;
+            anchor.current = now;
+            setMoved(false);
+          } else {
+            setMoved(regionMoved(anchor.current, now));
+          }
+        }}>
+        {circle ? (
+          <Circle
+            center={{ latitude: circle.center.lat, longitude: circle.center.lng }}
+            radius={circle.miles * 1609.344}
+            strokeColor="rgba(59, 134, 247, 0.9)"
+            fillColor="rgba(59, 134, 247, 0.10)"
+            strokeWidth={2}
+          />
+        ) : null}
         {rides.map((r) => (
           <Marker
             key={r.id}
             coordinate={{ latitude: r.meet_area_lat, longitude: r.meet_area_lng }}
-            pinColor={r.status === 'live' ? Colors.accent : Colors.sky}>
-            <Callout onPress={() => onOpen(r)}>
-              <View style={{ maxWidth: 220, padding: 4 }}>
-                <Text style={{ fontWeight: '700' }}>{r.status === 'live' ? 'Live now: ' : ''}{r.name}</Text>
-                <Text>
-                  {new Date(r.meet_at).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
-                </Text>
-                <Text style={{ color: '#1F6FE0', marginTop: 2 }}>Tap to open</Text>
-              </View>
+            anchor={{ x: 0.5, y: 0.5 }}
+            zIndex={r.status === 'live' ? 2 : 1}
+            calloutAnchor={{ x: 0.5, y: 0.1 }}
+            accessibilityLabel={r.name}>
+            <RidePin ride={r} />
+            <Callout tooltip onPress={() => onOpen(r)}>
+              <RideBubble ride={r} />
             </Callout>
           </Marker>
         ))}
       </MapView>
+      <MapOverlay
+        title={title}
+        onPressTitle={onPressTitle}
+        count={rides.length}
+        moved={moved}
+        onSearch={
+          onSearchArea
+            ? () => {
+                anchor.current = boundsOfRegion(region.current);
+                setMoved(false);
+                onSearchArea(anchor.current);
+              }
+            : undefined
+        }
+      />
+      <MapControls onZoomIn={() => zoom(0.5)} onZoomOut={() => zoom(2)} onRecenter={() => flyTo(regionFor(frame))} />
     </View>
   );
 }

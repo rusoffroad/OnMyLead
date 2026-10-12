@@ -126,6 +126,33 @@ export function regionFor(b: Bounds) {
   };
 }
 
+/** Map region in, bounding box out: what a map is showing right now. */
+export function boundsOfRegion(r: { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number }): Bounds {
+  return {
+    minLat: r.latitude - r.latitudeDelta / 2,
+    maxLat: r.latitude + r.latitudeDelta / 2,
+    minLng: r.longitude - r.longitudeDelta / 2,
+    maxLng: r.longitude + r.longitudeDelta / 2,
+  };
+}
+
+/** The same region with its span multiplied by `factor` (under 1 zooms in), kept to the globe. */
+export function zoomRegion<R extends { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number }>(r: R, factor: number): R {
+  return {
+    ...r,
+    latitudeDelta: Math.min(150, Math.max(0.005, r.latitudeDelta * factor)),
+    longitudeDelta: Math.min(300, Math.max(0.005, r.longitudeDelta * factor)),
+  };
+}
+
+/** True when the map has been moved or zoomed far enough that "Search this area" means something new. */
+export function regionMoved(a: Bounds, b: Bounds) {
+  const span = Math.max(a.maxLat - a.minLat, 0.01);
+  const shift = Math.abs((a.minLat + a.maxLat) / 2 - (b.minLat + b.maxLat) / 2) + Math.abs((a.minLng + a.maxLng) / 2 - (b.minLng + b.maxLng) / 2);
+  const zoom = Math.abs(Math.log((b.maxLat - b.minLat || 0.01) / span));
+  return shift > span * 0.15 || zoom > 0.25;
+}
+
 /** "Join my private ride ..." text used for the share sheet, text messages and email. */
 export function inviteMessage(ride: { name: string; invite_code: string; visibility: string }, link: string | null) {
   const what = ride.visibility === 'private' ? 'my private ride' : 'my ride';
