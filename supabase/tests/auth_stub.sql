@@ -4,6 +4,13 @@ do $$ begin
   if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin; end if;
   if not exists (select 1 from pg_roles where rolname = 'authenticated') then create role authenticated nologin; end if;
 end $$;
+-- Like Supabase, pgcrypto lives in the extensions schema, which is on the default search_path.
+create schema extensions;
+create extension pgcrypto with schema extensions;
+select set_config('search_path', current_setting('search_path') || ', extensions', false);
+do $$ begin
+  execute format('alter database %I set search_path = "$user", public, extensions', current_database());
+end $$;
 create schema auth;
 create table auth.users (id uuid primary key, email text, raw_user_meta_data jsonb default '{}');
 create function auth.uid() returns uuid language sql stable as $$
