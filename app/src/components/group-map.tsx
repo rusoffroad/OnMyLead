@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import { Colors, font, RideColors } from '@/constants/theme';
+import { Colors, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
-import { BreakdownBadge } from './rider-status-badge';
+import { RiderPin } from './rider-pin';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 
@@ -15,7 +15,9 @@ export type { MapRider } from './group-map-types';
 /**
  * Live group map. Every rider is the same grey dot with their ride name beside it; the leader is
  * the one bigger blue dot, so a glance finds them. A yellow or red ring means Ride Bubble trouble,
- * and an amber wrench means a Mechanical Issue.
+ * and an amber wrench means a Mechanical Issue. A rider whose last fix is over a minute old is
+ * drawn hollow at where they were last seen, with the age on the tag, so an old position never
+ * passes for a live one.
  */
 export function GroupMap({
   riders, regroup, route, meId, onPressRider, trail,
@@ -73,53 +75,3 @@ export function GroupMap({
     </MapView>
   );
 }
-
-/** Wide enough for a 24-character name; the dot sits dead centre so the anchor stays on it. */
-const PIN_W = 220;
-
-function RiderPin({ rider: r }: { rider: MapRider }) {
-  const leader = r.role === 'leader';
-  const size = leader ? 22 : 14;
-  const trouble = r.status === 'red' || r.status === 'yellow';
-  const ring = size + 10;
-  return (
-    <View style={[styles.pin, { opacity: r.stale ? 0.55 : 1 }]}>
-      {trouble ? (
-        <View style={[styles.ring, { width: ring, height: ring, borderRadius: ring / 2, borderColor: RideColors[r.status] }]} />
-      ) : null}
-      <View
-        style={[
-          styles.dot,
-          { width: size, height: size, borderRadius: size / 2, backgroundColor: leader ? RideColors.leader : RideColors.rider },
-          leader && styles.leaderDot,
-        ]}
-      />
-      {r.breakdown ? (
-        <View style={[styles.badge, { left: PIN_W / 2 + size / 2 - 8, top: 0 }]}>
-          <BreakdownBadge size={18} />
-        </View>
-      ) : null}
-      <View style={[styles.label, { left: PIN_W / 2 + (trouble ? ring : size) / 2 + (r.breakdown ? 14 : 4) }, leader && styles.leaderLabel]}>
-        <Text style={[styles.name, leader && styles.leaderName]} numberOfLines={1}>
-          {r.name}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  pin: { width: PIN_W, height: 34, alignItems: 'center', justifyContent: 'center' },
-  badge: { position: 'absolute' },
-  ring: { position: 'absolute', borderWidth: 3, backgroundColor: 'rgba(10,22,38,0.35)' },
-  dot: { borderWidth: 2, borderColor: Colors.background },
-  // The leader is the one everyone follows: bigger, ringed in white, and the only blue dot.
-  leaderDot: { borderWidth: 3, borderColor: Colors.text },
-  label: {
-    position: 'absolute', maxWidth: PIN_W / 2 - 24, paddingHorizontal: 5, paddingVertical: 1,
-    borderRadius: 6, backgroundColor: 'rgba(10,22,38,0.78)',
-  },
-  leaderLabel: { backgroundColor: RideColors.leader },
-  name: { color: Colors.text, fontFamily: font(600), fontSize: 11, lineHeight: 14 },
-  leaderName: { color: '#fff', fontFamily: font(800), fontSize: 12, lineHeight: 15 },
-});

@@ -12,8 +12,10 @@ const RANGE_COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: R
  * reading a map.
  */
 export function RouteStrip({
-  lengthM, riders, meId, summary, nameOf, offline, range, compact,
+  lengthM, riders, meId, summary, nameOf, offline, range, compact, lastSeenIds,
 }: {
+  /** Riders whose spot is only where they were last seen: drawn hollow and grey, never as live. */
+  lastSeenIds?: string[];
   /** Folded Ride Mode: just the miles and the line, to leave the map as much room as possible. */
   compact?: boolean;
   /** Whether this rider's machine (from the garage) can do the whole route. */
@@ -59,7 +61,8 @@ export function RouteStrip({
         <View style={[styles.cap, styles.finish, { right: 0 }]} />
         {order.map((r) => {
           const mine = r.id === meId;
-          const color = r.role === 'leader' ? RideColors.leader : mine ? Colors.accent : RideColors.rider;
+          const lastSeen = !mine && !!lastSeenIds?.includes(r.id);
+          const color = lastSeen ? Colors.textSecondary : r.role === 'leader' ? RideColors.leader : mine ? Colors.accent : RideColors.rider;
           const size = mine ? 30 : r.role === 'leader' ? 28 : 18;
           const letter = mine ? 'You' : r.role === 'leader' ? 'L' : nameOf(r.id).slice(0, 1).toUpperCase();
           return (
@@ -74,8 +77,9 @@ export function RouteStrip({
                   borderRadius: size / 2,
                   marginLeft: -size / 2,
                   marginTop: -size / 2,
-                  backgroundColor: r.place!.onRoute ? color : Colors.background,
-                  borderColor: r.place!.onRoute ? (mine ? Colors.text : Colors.background) : color,
+                  backgroundColor: r.place!.onRoute && !lastSeen ? color : Colors.background,
+                  borderColor: r.place!.onRoute && !lastSeen ? (mine ? Colors.text : Colors.background) : color,
+                  borderStyle: lastSeen ? 'dashed' : 'solid',
                   zIndex: mine ? 3 : r.role === 'rider' ? 1 : 2,
                 },
               ]}>

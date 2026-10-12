@@ -4,6 +4,7 @@ import { Colors, font, RideColors } from '@/constants/theme';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
 import { BreakdownBadge } from './rider-status-badge';
+import { RiderDot } from './rider-dot';
 import { RouteSketch } from './route-sketch';
 
 export type { MapRider } from './group-map-types';
@@ -28,7 +29,8 @@ export function GroupMap({
         id: r.id,
         lat: r.lat!,
         lng: r.lng!,
-        color: r.role === 'leader' ? RideColors.leader : RideColors.rider,
+        // Only a live fix gets the rider's colour; a last-seen point is greyed out.
+        color: r.freshness?.state !== 'live' ? Colors.backgroundSelected : r.role === 'leader' ? RideColors.leader : RideColors.rider,
         big: r.role === 'leader',
         name: r.name,
       }));
@@ -43,7 +45,7 @@ export function GroupMap({
       {regroup ? <Text style={styles.regroup}>Regroup point: {regroup.lat.toFixed(4)}, {regroup.lng.toFixed(4)}</Text> : null}
       {riders.map((r) => (
         <View key={r.id} style={styles.row}>
-          <View style={[styles.dot, { backgroundColor: r.role === 'leader' ? RideColors.leader : RideColors.rider }]} />
+          <RiderDot role={r.role} freshness={r.freshness?.state ?? null} />
           <Text style={[styles.name, r.role === 'leader' && { color: RideColors.leader }]}>{r.name}{r.role === 'leader' ? ', leader' : ''}</Text>
           {r.breakdown ? <BreakdownBadge /> : null}
           <Text style={styles.detail}>{r.detail}</Text>
@@ -58,7 +60,6 @@ const styles = StyleSheet.create({
   sketchWrap: { paddingTop: 120, backgroundColor: '#0D1C31' },
   regroup: { color: RideColors.yellow, fontFamily: font(700), fontSize: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  dot: { width: 14, height: 14, borderRadius: 7 },
   name: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
   detail: { color: Colors.textSecondary, fontFamily: font(500), flex: 1 },
 });

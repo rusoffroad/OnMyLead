@@ -3,7 +3,7 @@
  *
  * The phone records every fix locally first (so tracks survive dead zones), then tries to
  * upload the latest point. If the upload fails, points stay queued and go up on reconnect;
- * other riders meanwhile see this rider's last-known point and its age.
+ * other riders meanwhile see this rider's last-known point and its age, never a live-looking dot.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
@@ -12,13 +12,16 @@ import { Platform } from 'react-native';
 
 import { MOVING_SPEED_MPS } from '@/core/bubble';
 import { guessState, normalizeState } from '@/core/discovery';
+import { shareStillOn, shouldSendFix } from '@/core/freshness';
+import { distanceM } from '@/core/geo';
 import { supabase } from './supabase';
 
 export const LOCATION_TASK = 'ride-location-updates';
 const QUEUE_KEY = 'ride.trackQueue.v1';
 const CONTEXT_KEY = 'ride.trackContext.v1';
 
-type TrackContext = { rideId: string | null; lastMovedAt: number | null };
+/** `until` is when the share ends (epoch ms, null for open-ended), checked here so sharing stops on time even with no service. */
+type TrackContext = { rideId: string | null; lastMovedAt: number | null; until?: number | null };
 // Altitude was added later; older stored points have four values.
 type QueuedPoint = [lng: number, lat: number, epochSec: number, speedMps: number | null, altitudeM?: number | null];
 
@@ -31,40 +34,61 @@ async function writeContext(ctx: TrackContext) {
   await AsyncStorage.setItem(CONTEXT_KEY, JSON.stringify(ctx));
 }
 
+// The phone reports fixes about once a second; only every 25 m or 15 s goes anywhere, so a parked
+// rider still shows as live to the group (see core/freshness). Kept in memory: a cold start just sends.
+let lastSent: { at: number; lat: number; lng: number } | null = null;
+let movedAt: number | null = null;
+
 export async function handleLocations(locations: Location.LocationObject[]) {
   if (!locations.length) return;
-  const ctx = await readContext();
   const latest = locations[locations.length - 1];
   for (const l of locations) {
-    if ((l.coords.speed ?? 0) >= MOVING_SPEED_MPS) ctx.lastMovedAt = l.timestamp;
+    if ((l.coords.speed ?? 0) >= MOVING_SPEED_MPS) movedAt = Math.max(movedAt ?? 0, l.timestamp);
   }
+  const next = { at: latest.timestamp, lat: latest.coords.latitude, lng: latest.coords.longitude };
+  if (!shouldSendFix(lastSent, next, distanceM)) return;
+  lastSent = next;
+
+  const ctx = await readContext();
+  // The share's own end time stops sending on the phone, even when the server can't be reached to say so.
+  if (!shareStillOn(ctx.until, Date.now())) {
+    await stopSendingLocation();
+    return;
+  }
+  if (movedAt != null && movedAt > (ctx.lastMovedAt ?? 0)) ctx.lastMovedAt = movedAt;
   await writeContext(ctx);
 
+  // Every sent fix goes into the ride track first, so dead zones still show on the after-ride map.
   if (ctx.rideId) {
     const queue: QueuedPoint[] = JSON.parse((await AsyncStorage.getItem(QUEUE_KEY)) ?? '[]');
-    for (const l of locations) {
-      queue.push([l.coords.longitude, l.coords.latitude, Math.round(l.timestamp / 1000), l.coords.speed ?? null, l.coords.altitude ?? null]);
-    }
+    queue.push([next.lng, next.lat, Math.round(next.at / 1000), latest.coords.speed ?? null, latest.coords.altitude ?? null]);
     await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
   }
 
-  const { data } = await supabase.auth.getSession();
-  const userId = data.session?.user.id;
-  if (!userId) return;
+  try {
+    const { data } = await supabase.auth.getSession();
+    const userId = data.session?.user.id;
+    if (!userId) return;
 
-  const speed = latest.coords.speed != null && latest.coords.speed >= 0 ? latest.coords.speed : null;
-  const heading = latest.coords.heading != null && latest.coords.heading >= 0 ? latest.coords.heading : null;
-  const { error } = await supabase.from('positions_latest').upsert({
-    user_id: userId,
-    lat: latest.coords.latitude,
-    lng: latest.coords.longitude,
-    speed_mps: speed,
-    heading_deg: heading,
-    accuracy_m: latest.coords.accuracy ?? null,
-    last_moved_at: ctx.lastMovedAt ? new Date(ctx.lastMovedAt).toISOString() : null,
-    recorded_at: new Date(latest.timestamp).toISOString(),
-  });
-  if (!error) await flushTrack(userId);
+    const speed = latest.coords.speed != null && latest.coords.speed >= 0 ? latest.coords.speed : null;
+    const heading = latest.coords.heading != null && latest.coords.heading >= 0 ? latest.coords.heading : null;
+    // Only the newest fix goes up, stamped with when it was taken, so after a dead zone the
+    // group sees where this rider is now and never an old point passed off as new.
+    const { error } = await supabase.from('positions_latest').upsert({
+      user_id: userId,
+      lat: next.lat,
+      lng: next.lng,
+      speed_mps: speed,
+      heading_deg: heading,
+      accuracy_m: latest.coords.accuracy ?? null,
+      last_moved_at: ctx.lastMovedAt ? new Date(ctx.lastMovedAt).toISOString() : null,
+      recorded_at: new Date(next.at).toISOString(),
+    });
+    // Back in service: send the track points saved while offline.
+    if (!error) await flushTrack(userId);
+  } catch {
+    // No service: the point is queued above and goes up with the next fix that gets through.
+  }
 }
 
 /** Append queued points to this rider's ride track. Safe to call repeatedly. */
@@ -100,18 +124,27 @@ export async function requestLocationPermission(): Promise<'always' | 'while_usi
   return bg.status === 'granted' ? 'always' : 'while_using';
 }
 
-/** Start sending location. Call only after the rider has chosen to share. */
-export async function startSendingLocation(rideId: string | null) {
-  await writeContext({ rideId, lastMovedAt: Date.now() });
+/**
+ * Start sending location. Call only after the rider has chosen to share. Safe to call again for a
+ * share that is already running (Ride Mode does on every open, so sharing resumes after the app
+ * was closed or the phone restarted).
+ * @param until when the share ends, epoch ms, or null for open-ended.
+ */
+export async function startSendingLocation(rideId: string | null, until: number | null = null) {
+  const prev = await readContext();
+  const resuming = prev.rideId === rideId;
+  await writeContext({ rideId, lastMovedAt: resuming ? prev.lastMovedAt ?? Date.now() : Date.now(), until });
+  if (!resuming) lastSent = null;
   if (Platform.OS === 'web') return startWebWatch();
   const permission = await requestLocationPermission();
   if (permission === 'denied') throw new Error('Location permission is needed to share your location.');
   if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) return;
   await Location.startLocationUpdatesAsync(LOCATION_TASK, {
     accuracy: Location.Accuracy.High,
-    // Every ~10 s or ~25 m while moving keeps Ride Bubble fresh without draining the battery.
-    timeInterval: 10_000,
-    distanceInterval: 25,
+    // Every fix is reported (about once a second) and handleLocations sends one each 25 m or 15 s,
+    // so a stopped rider keeps checking in. iOS has no time-based option, only distance.
+    timeInterval: 5_000,
+    distanceInterval: 0,
     pausesUpdatesAutomatically: false,
     activityType: Location.ActivityType.AutomotiveNavigation,
     showsBackgroundLocationIndicator: true,
@@ -131,7 +164,9 @@ export async function stopSendingLocation() {
   }
   const { data } = await supabase.auth.getSession();
   if (data.session) await flushTrack(data.session.user.id);
-  await writeContext({ rideId: null, lastMovedAt: null });
+  await writeContext({ rideId: null, lastMovedAt: null, until: null });
+  lastSent = null;
+  movedAt = null;
 }
 
 let webSub: Location.LocationSubscription | null = null;
@@ -140,7 +175,7 @@ async function startWebWatch() {
   if (permission === 'denied') throw new Error('Location permission is needed to share your location.');
   webSub?.remove();
   webSub = await Location.watchPositionAsync(
-    { accuracy: Location.Accuracy.High, timeInterval: 10_000, distanceInterval: 25 },
+    { accuracy: Location.Accuracy.High, timeInterval: 5_000, distanceInterval: 0 },
     (l) => void handleLocations([l]),
   );
 }
