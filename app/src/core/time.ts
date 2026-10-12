@@ -11,3 +11,9 @@ export function parseTime(s: string): number | null {
   if (h > 23 || min > 59) return null;
   return h * 60 + min;
 }
+
+/** A time of day the way the ride form takes it, e.g. "8:00 am" or "2:30 pm" (parseTime reads it back). */
+export function clockText(d: Date): string {
+  const h = d.getHours();
+  return `${h % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
+}

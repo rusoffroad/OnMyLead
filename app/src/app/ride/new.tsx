@@ -12,8 +12,9 @@ import { rideAllowanceText } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
-import { parseTime } from '@/core/time';
-import { createRide } from '@/lib/api';
+import type { RideRoute } from '@/core/route';
+import { clockText, parseTime } from '@/core/time';
+import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
@@ -38,7 +39,7 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  const { type } = useLocalSearchParams<{ type?: string }>();
+  const { type, copy } = useLocalSearchParams<{ type?: string; copy?: string }>();
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
@@ -73,6 +74,51 @@ export default function NewRide() {
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<RidingGroup[]>([]);
   const [groupNames, setGroupNames] = useState<string[]>([]);
+
+  /** Ride Again: the ride this one copies, and its route, which comes along when the new ride is saved. */
+  const [copiedFrom, setCopiedFrom] = useState<string | null>(null);
+  const [copiedRoute, setCopiedRoute] = useState<RideRoute | null>(null);
+
+  useEffect(() => {
+    if (!copy) return;
+    (async () => {
+      const src = await getRide(copy);
+      if (!src) return;
+      const [details, route] = await Promise.all([getPrivateDetails(src.id), getRideRoute(src.id).then((r) => r.route).catch(() => null)]);
+      const clockOf = (iso: string | null) => (iso ? clockText(new Date(iso)) : '');
+      setName(src.name);
+      // The next one on the same weekday: a Saturday ride stays a Saturday ride.
+      const sameDay = days.find((d, i) => i > 0 && d.getDay() === new Date(src.meet_at).getDay());
+      if (sameDay) setDay(sameDay.getTime());
+      setDescription(src.description ?? '');
+      setMeetTime(clockOf(src.meet_at));
+      setDepartTime(clockOf(src.depart_at));
+      setFinishTime(clockOf(src.expected_finish_at));
+      setDestination(src.destination_label ?? '');
+      setVehicleTypes(src.vehicle_types);
+      setDifficulty(src.difficulty);
+      setExperience(src.experience_level);
+      setMaxVehicles(src.max_vehicles ? String(src.max_vehicles) : '');
+      setMaxRiders(src.max_riders ? String(src.max_riders) : '');
+      setRouteMiles(src.route_miles ? String(src.route_miles) : '');
+      setWhatToBring(src.what_to_bring ?? '');
+      setRequiredEquipment(src.required_equipment ?? '');
+      setFuelNotes(src.fuel_notes ?? '');
+      setKind(src.visibility === 'private' ? 'private' : 'public');
+      setJoinPolicy(src.join_policy);
+      if (src.bubble_preset !== 'custom') setBubble(src.bubble_preset);
+      setMeetState(src.meet_state ?? null);
+      setRoutePlan(route ? 'mapped' : src.freeride ? 'freeride' : null);
+      if (details) {
+        setCoords(`${details.meet_lat.toFixed(5)}, ${details.meet_lng.toFixed(5)}`);
+        setMeetLabel(details.meet_label ?? '');
+        setInstructions(details.instructions ?? '');
+      }
+      setCopiedRoute(route);
+      setCopiedFrom(src.name);
+      setMore(true);
+    })().catch((e) => setError(e instanceof Error ? e.message : 'Could not copy that ride.'));
+  }, [copy, days]);
 
   // Riding groups to invite as soon as the ride exists (none until groups are switched on).
   useEffect(() => {
@@ -150,9 +196,11 @@ export default function NewRide() {
       for (const g of groups.filter((x) => groupNames.includes(x.name))) {
         await inviteGroupToRide(ride.id, g.id).catch(() => {});
       }
+      // Ride Again brings the old route along; if it can't save, the leader lands in the builder instead.
+      const routeCopied = routePlan === 'mapped' && copiedRoute ? await saveRideRoute(ride.id, copiedRoute).then(() => true, () => false) : false;
       router.replace(`/r/${ride.invite_code}?new=1`);
       // A mapped ride goes straight to the route builder; saving it lands back on the new ride.
-      if (routePlan === 'mapped') router.push(`/ride/${ride.id}/route`);
+      if (routePlan === 'mapped' && !routeCopied) router.push(`/ride/${ride.id}/route`);
     } catch (e) {
       if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not create the ride.');
     } finally {
@@ -169,6 +217,16 @@ export default function NewRide() {
         <ThemedText type="small" themeColor="textSecondary">
           Plan it here on the big screen. The ride, its route and its stops show up in the OnMyLead app on your iPhone as soon as you save.
         </ThemedText>
+      ) : null}
+      {copiedFrom ? (
+        <View style={{ gap: 2, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
+          <ThemedText style={{ fontWeight: 700 }}>Riding {copiedFrom} Again</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            {copiedRoute
+              ? 'The details, meeting point and route are filled in. Pick the day, check the times and create it.'
+              : 'The details and meeting point are filled in. Pick the day, check the times and create it.'}
+          </ThemedText>
+        </View>
       ) : null}
       {allowance ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement }}>

@@ -9,6 +9,7 @@ import { GetTheApp } from '@/components/get-the-app';
 import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { ReportSheet } from '@/components/report-sheet';
+import { RideDay } from '@/components/ride-day';
 import { RideRoster } from '@/components/ride-roster';
 import { RideSummary } from '@/components/ride-summary';
 import { RouteSketch } from '@/components/route-sketch';
@@ -22,6 +23,7 @@ import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { rideDirections } from '@/core/directions';
 import { leadersToFollow } from '@/core/groups';
 import { counts } from '@/core/joining';
+import { startsIn } from '@/core/ride-day';
 import { miles, type RideRoute } from '@/core/route';
 import { canShareWaypoints, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useRideChat } from '@/hooks/use-ride-chat';
@@ -36,7 +38,7 @@ import { confirmAsync, showNotice } from '@/lib/confirm';
 import { declineRideInvite } from '@/lib/groups';
 import { useEntitlements } from '@/lib/entitlements';
 import { currentNotificationSettings } from '@/lib/notification-settings';
-import { requireTripSlot } from '@/lib/pro';
+import { requirePro, requireTripSlot } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
 import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
@@ -122,6 +124,7 @@ export default function RidePage() {
   const stops = plannedStops(waypoints.waypoints);
   const otherWaypoints = waypoints.waypoints.filter((w) => !w.planned_stop);
   const pinned = isJoined ? latestAnnouncement(chat.messages) : null;
+  const countdown = ride.status === 'scheduled' ? startsIn(new Date(ride.meet_at), new Date()) : null;
 
   const join = () =>
     me
@@ -166,6 +169,7 @@ export default function RidePage() {
       <View style={{ gap: Spacing.two }}>
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           {ride.status === 'live' ? <Tag label="Live Now" color={Colors.accent} solid /> : null}
+          {countdown ? <Tag label={countdown} color={Colors.accent} /> : null}
           {ride.status === 'ended' ? <Tag label="Ended" color={Colors.textSecondary} /> : null}
           {ride.status === 'cancelled' ? <Tag label="Cancelled" color={Colors.danger} /> : null}
           {ride.difficulty ? <Tag label={cap(ride.difficulty)} color={Colors.sky} /> : null}
@@ -210,6 +214,8 @@ export default function RidePage() {
           <Info key={label} label={label} value={value} first={i === 0} />
         ))}
       </Card>
+
+      {ride.status === 'scheduled' || ride.status === 'live' ? <RideDay ride={ride} /> : null}
 
       {ride.status === 'scheduled' || ride.status === 'live' ? (
         <DirectionsCard
@@ -389,6 +395,14 @@ export default function RidePage() {
           ) : null}
           {ride.status === 'live' ? (
             <Button title="End Ride for Everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
+          ) : null}
+          {isOrganizer ? (
+            <Button
+              title={over ? 'Ride Again' : 'Copy This Ride'}
+              kind={over ? 'primary' : 'secondary'}
+              accessibilityHint="Starts a new ride with this one's details and route. You pick the day."
+              onPress={() => requirePro('create_ride') && router.push(`/ride/new?copy=${ride.id}`)}
+            />
           ) : null}
           {pending.map((m) => (
             <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
