@@ -462,7 +462,7 @@ export default function RideMode() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <GroupMap riders={mapRiders} meId={me} regroup={regroup} route={route.route?.points} trail={trail} />
-      <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route.route?.points} />
+      <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route.route?.points} ride={ride} />
 
       <SafeAreaView edges={['top']} style={styles.top}>
         <View style={styles.topRow}>

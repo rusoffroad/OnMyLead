@@ -46,7 +46,7 @@ export function GroupMap({
 
   return (
     <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}>
-      {trail ? <TrailTiles base={trail.base} trails={trail.trails} /> : null}
+      {trail ? <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} /> : null}
       {route && route.length > 1 ? (
         <>
           <RouteLine points={route} />
