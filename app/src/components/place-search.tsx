@@ -10,15 +10,15 @@ import { searchPlaces } from '@/lib/places';
 
 const WAIT_MS = 350;
 
-const iconFor = (p: Place): IconName => (p.kind === 'Trailhead' || p.kind === 'Trail' ? 'flag' : 'pin');
+const iconFor = (p: Place): IconName => (p.kind === 'Trailhead' || p.kind === 'Trail' ? 'flag' : p.kind === 'Address' ? 'home' : 'pin');
 
 /**
- * A search box for parks, trailheads, towns and landmarks by name. Results drop down under it as
+ * A search box for parks, trailheads, towns, landmarks and street addresses. Results drop down under it as
  * the rider types; tapping one hands the place back and closes the list.
  */
 export function PlaceSearch({
   label,
-  placeholder = 'Park, trailhead or town',
+  placeholder = 'Park, trailhead, town or address',
   near,
   onPick,
 }: {
@@ -30,48 +30,45 @@ export function PlaceSearch({
 }) {
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState<string | null>(null);
-  const [places, setPlaces] = useState<Place[] | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // The latest answer, kept with the words it answers, so a stale one never shows.
+  const [result, setResult] = useState<{ q: string; places: Place[] | null; error: string | null } | null>(null);
   const [focused, setFocused] = useState(false);
   const nearRef = useRef(near);
-  nearRef.current = near;
+  useEffect(() => {
+    nearRef.current = near;
+  });
+
+  const q = query.trim();
+  const searching = q !== picked && q.length >= MIN_QUERY;
+  const answer = searching && result?.q === q ? result : null;
+  const busy = searching && !answer;
+  const places = answer?.places ?? null;
+  const error = answer?.error ?? null;
 
   useEffect(() => {
-    const q = query.trim();
-    if (q === picked || q.length < MIN_QUERY) {
-      setPlaces(null);
-      setBusy(false);
-      setError(null);
-      return;
-    }
+    if (!searching) return;
     const ctl = new AbortController();
-    setBusy(true);
     const t = setTimeout(() => {
       searchPlaces(q, nearRef.current ?? null, ctl.signal)
-        .then((found) => {
-          setPlaces(found);
-          setError(null);
-        })
+        .then((found) => setResult({ q, places: found, error: null }))
         .catch((e) => {
           if (ctl.signal.aborted) return;
-          setPlaces(null);
-          setError(e instanceof Error && e.message.startsWith('Place search') ? e.message : 'No signal for place search. Try again with service.');
-        })
-        .finally(() => {
-          if (!ctl.signal.aborted) setBusy(false);
+          setResult({
+            q,
+            places: null,
+            error: e instanceof Error && e.message.startsWith('Place search') ? e.message : 'No signal for place search. Try again with service.',
+          });
         });
     }, WAIT_MS);
     return () => {
       clearTimeout(t);
       ctl.abort();
     };
-  }, [query, picked]);
+  }, [q, searching]);
 
   const pick = (p: Place) => {
     setPicked(p.name);
     setQuery(p.name);
-    setPlaces(null);
     onPick(p);
   };
 
@@ -111,7 +108,7 @@ export function PlaceSearch({
         <View style={styles.list} accessibilityRole="list">
           {places.length === 0 ? (
             <ThemedText type="small" themeColor="textSecondary" style={{ padding: Spacing.three }}>
-              Nothing called “{query.trim()}”. Try the park’s or trailhead’s full name, or a nearby town.
+              Nothing found for “{q}”. Try the full name, a street address with the town, or a nearby town.
             </ThemedText>
           ) : (
             places.map((p, i) => (

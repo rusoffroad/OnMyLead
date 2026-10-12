@@ -2,8 +2,8 @@ import { normalizeState } from './discovery';
 import { distanceM, type LatLng } from './geo';
 
 /**
- * Finding a place by name ("Hidden Falls Adventure Park", "Hell's Revenge Trailhead") for a
- * meeting point or a ride search. The names come from OpenStreetMap through Photon, a free search
+ * Finding a place by name ("Hidden Falls Adventure Park", "Hell's Revenge Trailhead") or by street
+ * address ("501 Congress Ave, Austin") for a meeting point, a destination or a ride search. The names come from OpenStreetMap through Photon, a free search
  * service with no key and no account. Only the typed words and a rough map centre are sent,
  * never who is asking.
  */
@@ -25,6 +25,8 @@ export type Place = {
   lng: number;
   /** Two-letter US state, when it is in one. */
   state: string | null;
+  /** The street address, when OpenStreetMap has one: "501 Congress Avenue". */
+  address: string | null;
 };
 
 /** "38.5733, -109.5498" typed into the search box is a place too. */
@@ -119,10 +121,13 @@ export function parsePlaces(json: unknown): Place[] {
     const p = f.properties ?? {};
     const c = f.geometry?.coordinates;
     if (!c || c.length < 2) continue;
-    const name = p.name?.trim() || (p.street ? [p.housenumber, p.street].filter(Boolean).join(' ') : '');
+    const address = p.street && p.housenumber ? `${p.housenumber.trim()} ${p.street.trim()}` : null;
+    const named = p.name?.trim();
+    const name = named || address || p.street?.trim() || '';
     if (!name) continue;
     const [lng, lat] = c;
-    const kind = kindOf(p.osm_key, p.osm_value);
+    // A house number with no name of its own is a street address, whatever building it is.
+    const kind = !named && address ? 'Address' : kindOf(p.osm_key, p.osm_value);
     const town = p.city ?? p.district ?? (p.county ? p.county.replace(/ County$/, '') + ' County' : undefined);
     const where = [town && town !== name ? town : null, p.state && p.state !== name ? p.state : null].filter(Boolean).join(', ');
     const place: Place = {
@@ -133,6 +138,7 @@ export function parsePlaces(json: unknown): Place[] {
       lat,
       lng,
       state: normalizeState(p.state),
+      address: named ? address : null,
     };
     // OpenStreetMap often draws one trail or parking lot as several pieces with the same name.
     const twin = out.find((o) => o.name.toLowerCase() === name.toLowerCase() && o.kind === kind && distanceM(o, place) < 8000);
@@ -141,11 +147,15 @@ export function parsePlaces(json: unknown): Place[] {
   return out;
 }
 
-/** One line under the name: "Trailhead in Moab, Utah". */
-export const placeDetail = (p: Place) => (p.where ? `${p.kind} in ${p.where}` : p.kind);
+/** One line under the name: "Trailhead in Moab, Utah", "Restaurant at 501 Congress Avenue, Austin". */
+export function placeDetail(p: Place): string {
+  if (p.address) return [`${p.kind} at ${p.address}`, p.where.split(', ')[0] || null].filter(Boolean).join(', ');
+  if (p.kind === 'Address') return p.where ? `Street Address in ${p.where}` : 'Street Address';
+  return p.where ? `${p.kind} in ${p.where}` : p.kind;
+}
 
 /** The meeting point's place name when a search result is picked: "Hidden Falls Adventure Park, Burnet, TX". */
 export function placeLabel(p: Place): string {
   const town = p.where.split(', ')[0];
-  return [p.name, town && !/County$/.test(town) && town !== p.where ? town : null, p.state].filter(Boolean).join(', ');
+  return [p.name, p.address, town && !/County$/.test(town) && town !== p.where ? town : null, p.state].filter(Boolean).join(', ');
 }

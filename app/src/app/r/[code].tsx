@@ -2,6 +2,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState, type ComponentProps } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { DirectionsCard } from '@/components/directions';
 import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
 import { InviteCard } from '@/components/invite-card';
@@ -16,6 +17,7 @@ import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
+import { rideDirections } from '@/core/directions';
 import { leadersToFollow } from '@/core/groups';
 import { counts } from '@/core/joining';
 import { miles, type RideRoute } from '@/core/route';
@@ -196,6 +198,16 @@ export default function RidePage() {
           <Info key={label} label={label} value={value} first={i === 0} />
         ))}
       </Card>
+
+      {ride.status === 'scheduled' || ride.status === 'live' ? (
+        <DirectionsCard
+          rows={rideDirections({
+            meet: details ? { lat: details.meet_lat, lng: details.meet_lng, label: details.meet_label } : null,
+            route,
+            destination: ride.destination_label,
+          })}
+        />
+      ) : null}
 
       {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
         <Card>

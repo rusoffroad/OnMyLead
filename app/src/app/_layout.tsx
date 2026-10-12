@@ -12,6 +12,7 @@ import { DarkTheme, Stack, ThemeProvider, useSegments, type Theme } from 'expo-r
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
+import { DirectionsHost } from '@/components/directions';
 import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
 import { Colors, font, NavigationColors } from '@/constants/theme';
@@ -108,6 +109,7 @@ function RootLayout() {
       </Stack>
       <MessageAlerts />
       <ProGateHost />
+      <DirectionsHost />
     </ThemeProvider>
   );
 }

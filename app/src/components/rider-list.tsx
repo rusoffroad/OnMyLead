@@ -21,7 +21,7 @@ export function RiderList({
   /** This phone has no service, so every age is "as of when we lost it". */
   offline: boolean;
   onClose: () => void;
-  onNavigate: (lat: number, lng: number) => void;
+  onNavigate: (lat: number, lng: number, title?: string) => void;
   /** Anything else to show beside a rider's name, such as their status badge. */
   extra?: (riderId: string) => ReactNode;
 }) {
@@ -67,7 +67,7 @@ export function RiderList({
                 </View>
                 {at ? (
                   <Pressable
-                    onPress={() => onNavigate(at.lat, at.lng)}
+                    onPress={() => onNavigate(at.lat, at.lng, r.id === meId ? 'Your Last Spot' : r.name)}
                     accessibilityRole="button"
                     accessibilityLabel={f?.state === 'live' ? `Navigate to ${r.name}` : `Navigate to where ${r.name} was last seen`}
                     style={({ pressed }) => [styles.go, { opacity: pressed ? 0.75 : 1 }]}>

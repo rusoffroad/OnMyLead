@@ -31,7 +31,7 @@ export function WaypointSheet({
   me: string | null | undefined;
   canShare: boolean;
   ownerName: (userId: string) => string;
-  onNavigate: (lat: number, lng: number) => void;
+  onNavigate: (lat: number, lng: number, title?: string) => void;
   /** After a save or a removal, with what changed, so the map can update before the next refresh. */
   onChanged: (change: { saved?: Waypoint; removedId?: string }) => void;
   onClose: () => void;
@@ -214,7 +214,7 @@ export function WaypointSheet({
                   {viewing.note ? <ThemedText>{viewing.note}</ThemedText> : null}
                   <Text style={styles.coords}>{viewing.lat.toFixed(5)}, {viewing.lng.toFixed(5)}</Text>
                   <ErrorText error={error} />
-                  <Button title="Navigate" big onPress={() => onNavigate(viewing.lat, viewing.lng)} />
+                  <Button title="Navigate" big onPress={() => onNavigate(viewing.lat, viewing.lng, viewing.name)} />
                   {viewing.user_id === me || canRemoveWaypoint(viewing, me, canShare) ? (
                     <View style={{ flexDirection: 'row', gap: Spacing.two }}>
                       {viewing.user_id === me ? <Button title="Edit" kind="secondary" style={{ flex: 1 }} onPress={() => startEdit(viewing)} /> : null}

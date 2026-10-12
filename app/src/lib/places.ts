@@ -9,7 +9,7 @@ export async function searchPlaces(query: string, near: LatLng | null, signal?: 
   const q = query.trim();
   const typed = parseCoords(q);
   if (typed) {
-    return [{ id: `coords:${typed.lat},${typed.lng}`, name: `${typed.lat.toFixed(5)}, ${typed.lng.toFixed(5)}`, kind: 'Coordinates', where: '', ...typed, state: null }];
+    return [{ id: `coords:${typed.lat},${typed.lng}`, name: `${typed.lat.toFixed(5)}, ${typed.lng.toFixed(5)}`, kind: 'Coordinates', where: '', ...typed, state: null, address: null }];
   }
   if (q.length < MIN_QUERY) return [];
   const res = await fetch(placeSearchUrl(q, near), { signal, headers: { Accept: 'application/json' } });

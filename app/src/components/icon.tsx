@@ -22,6 +22,9 @@ const PATHS = {
   close: ['M6 6l12 12', 'M18 6L6 18'],
   megaphone: ['M3.5 10v4h3l8 4.5v-13l-8 4.5z', 'M6.5 14l1.5 5.5h3L9.5 15', 'M18 9.5a3.5 3.5 0 0 1 0 5'],
   warning: ['M12 3.5l9.5 16.5h-19z', 'M12 10v4.5', 'M12 17.2v.3'],
+  home: ['M3.5 11.5L12 4.5l8.5 7', 'M6 9.5V20h12V9.5', 'M10 20v-5.5h4V20'],
+  // A road sign's turn arrow, for directions in Apple Maps or Google Maps.
+  turn: ['M12 2.8l9.2 9.2-9.2 9.2L2.8 12z', 'M9.2 15.5v-3.2a1.5 1.5 0 0 1 1.5-1.5h4.5', 'M13.2 8.6l2.2 2.2-2.2 2.2'],
   join: ['M10 7l5 5-5 5', 'M15 12H3.5', 'M14 4h4.5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H14'],
 } as const;
 
