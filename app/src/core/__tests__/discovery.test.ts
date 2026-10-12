@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  boundsAround, guessState, inState, inviteMessage, mailUrl, normalizeState, regionFor, smsUrl, stateByCode, US_STATES, withinRadius,
+  boundsAround, boundsOfRegion, guessState, inState, inviteMessage, mailUrl, normalizeState, regionFor, regionMoved, smsUrl, stateByCode, US_STATES, withinRadius, zoomRegion,
 } from '../discovery';
 
 const moab = { lat: 38.5733, lng: -109.5498 };
@@ -85,5 +85,35 @@ describe('sharing a private ride', () => {
     expect(smsUrl('hi there', 'ios')).toBe('sms:&body=hi%20there');
     expect(smsUrl('hi', 'android')).toBe('sms:?body=hi');
     expect(mailUrl('Ride', 'a&b')).toBe('mailto:?subject=Ride&body=a%26b');
+  });
+});
+
+describe('map browsing', () => {
+  const utah = stateByCode('UT')!;
+
+  it('turns a map region back into the box it shows', () => {
+    const b = boundsOfRegion({ latitude: 40, longitude: -110, latitudeDelta: 2, longitudeDelta: 4 });
+    expect(b).toEqual({ minLat: 39, maxLat: 41, minLng: -112, maxLng: -108 });
+  });
+
+  it('zooms by a factor and stays on the globe', () => {
+    const r = { latitude: 40, longitude: -110, latitudeDelta: 2, longitudeDelta: 4 };
+    expect(zoomRegion(r, 0.5)).toMatchObject({ latitude: 40, latitudeDelta: 1, longitudeDelta: 2 });
+    expect(zoomRegion(r, 1000).latitudeDelta).toBe(150);
+    expect(zoomRegion(r, 0.00001).latitudeDelta).toBe(0.005);
+  });
+
+  it('notices a real pan or zoom but not a nudge', () => {
+    const shift = (b: typeof utah, dLat: number) => ({ ...b, minLat: b.minLat + dLat, maxLat: b.maxLat + dLat });
+    expect(regionMoved(utah, utah)).toBe(false);
+    expect(regionMoved(utah, shift(utah, 0.1))).toBe(false);
+    expect(regionMoved(utah, shift(utah, 2))).toBe(true);
+    const zoomed = boundsOfRegion(zoomRegion(regionFor(utah), 0.5));
+    expect(regionMoved(boundsOfRegion(regionFor(utah)), zoomed)).toBe(true);
+  });
+
+  it('finds every ride in an area, nearest first, with an infinite radius', () => {
+    const rides = [ride('far', 40.7, -111.9), ride('near', 38.6, -109.5)];
+    expect(withinRadius(rides, moab, Infinity).map((r) => r.id)).toEqual(['near', 'far']);
   });
 });

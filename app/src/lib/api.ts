@@ -161,6 +161,12 @@ export async function publicRidesNear(center: LatLng, miles: number) {
   return withinRadius(await discoverPublicRides(boundsAround(center, miles), 300), center, miles);
 }
 
+/** Public rides inside a map area. With the rider's location they come nearest first, with distances. */
+export async function publicRidesInArea(area: Bounds, from: LatLng | null): Promise<(Ride & { distanceMi?: number })[]> {
+  const found = await discoverPublicRides(area, 300);
+  return from ? withinRadius(found, from, Infinity) : found;
+}
+
 /** Public rides in a US state, soonest first. */
 export async function publicRidesInState(code: string): Promise<Ride[]> {
   const state = stateByCode(code);
