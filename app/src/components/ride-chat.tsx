@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { PollCard, PollComposer } from '@/components/ride-poll';
 import { Button, Card, Choice, ErrorText, Field } from '@/components/ui';
 import { Radius, RideColors, Spacing } from '@/constants/theme';
 import { checkMessage, isLeaderOnly, MAX_MESSAGE_LENGTH, type ChatMessage, type MessageAudience, type MessageKind } from '@/core/chat';
+import { isPoll, type PollVote } from '@/core/polls';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -27,15 +29,15 @@ export function PinnedAnnouncement({ message, senderName }: { message: ChatMessa
   );
 }
 
-type SendTo = 'everyone' | 'leader' | 'announcement';
+type SendTo = 'everyone' | 'leader' | 'announcement' | 'poll';
 
 /**
  * Ride chat for joined riders. Each message goes to everyone or only to the ride's leader.
  * Organizers and co-organizers can post an announcement instead, which gets pinned and read
- * aloud in Ride Mode.
+ * aloud in Ride Mode. The leader (and organizers) can also ask a quick poll.
  */
 export function RideChat({
-  messages, nameOf, me, canAnnounce, leaderName, error, onSend,
+  messages, nameOf, me, canAnnounce, leaderName, error, onSend, canPoll = false, pollsOn = true, votes = [], onSendPoll, onVote,
 }: {
   messages: ChatMessage[];
   nameOf: (userId: string) => string;
@@ -45,6 +47,13 @@ export function RideChat({
   leaderName: string | null;
   error: string | null;
   onSend: (body: string, kind: MessageKind, audience: MessageAudience) => Promise<boolean>;
+  /** The ride's leader, organizers and co-organizers can post quick polls. */
+  canPoll?: boolean;
+  /** False until the database has the polls update. */
+  pollsOn?: boolean;
+  votes?: PollVote[];
+  onSendPoll?: (question: string, choices: string[]) => Promise<boolean>;
+  onVote?: (messageId: string, choice: number) => void;
 }) {
   const theme = useTheme();
   const [draft, setDraft] = useState('');
@@ -73,7 +82,14 @@ export function RideChat({
   const options: { value: SendTo; label: string }[] = [{ value: 'everyone', label: 'Everyone' }];
   if (leaderName) options.push({ value: 'leader', label: `Leader only (${leaderName})` });
   if (canAnnounce) options.push({ value: 'announcement', label: 'Announcement (pinned, read aloud)' });
+  if (canPoll && onSendPoll) options.push({ value: 'poll', label: 'Quick Poll' });
   const announcing = sendTo === 'announcement';
+
+  async function sendPoll(question: string, choices: string[]) {
+    const ok = await onSendPoll!(question, choices);
+    if (ok) setSendTo('everyone');
+    return ok;
+  }
 
   return (
     <Card>
@@ -90,7 +106,7 @@ export function RideChat({
       {!open ? (
         last ? (
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            {last.user_id === me ? 'You' : nameOf(last.user_id)}: {last.body}
+            {last.user_id === me ? 'You' : nameOf(last.user_id)}: {isPoll(last) ? `Poll: ${last.body}` : last.body}
           </ThemedText>
         ) : null
       ) : (
@@ -106,6 +122,7 @@ export function RideChat({
             const mine = m.user_id === me;
             const announcement = m.kind === 'announcement';
             const leaderOnly = isLeaderOnly(m);
+            const poll = isPoll(m);
             return (
               <View
                 key={m.id}
@@ -116,31 +133,45 @@ export function RideChat({
                   gap: 2,
                   ...(announcement ? { borderLeftWidth: 4, borderLeftColor: RideColors.yellow, paddingLeft: Spacing.two } : null),
                   ...(leaderOnly ? { borderLeftWidth: 4, borderLeftColor: RideColors.leader, paddingLeft: Spacing.two } : null),
+                  ...(poll ? { gap: Spacing.two, paddingBottom: Spacing.one } : null),
                 }}>
                 <ThemedText type="small" themeColor="textSecondary">
-                  {announcement ? 'Announcement from ' : ''}
+                  {announcement ? 'Announcement from ' : poll ? 'Poll from ' : ''}
                   {mine ? 'You' : nameOf(m.user_id)}
                   {leaderOnly ? (mine ? ', to the leader only' : ', to you only as leader') : ''}, {clock(m.sent_at)}
                 </ThemedText>
-                <ThemedText style={[m.kind === 'status' && { fontStyle: 'italic' }, announcement && { fontWeight: 700 }]}>{m.body}</ThemedText>
+                {poll ? (
+                  <PollCard message={m} votes={votes} me={me} onVote={(choice) => onVote?.(m.id, choice)} />
+                ) : (
+                  <ThemedText style={[m.kind === 'status' && { fontStyle: 'italic' }, announcement && { fontWeight: 700 }]}>{m.body}</ThemedText>
+                )}
               </View>
             );
           })}
           {options.length > 1 ? <Choice label="Send to" options={options} value={sendTo} onChange={setSendTo} /> : null}
-          <Field
-            label={announcing ? 'Announcement' : sendTo === 'leader' ? 'Message to the leader' : 'Message'}
-            value={draft}
-            onChangeText={setDraft}
-            placeholder={announcing ? 'Fuel stop in Green River at 11' : sendTo === 'leader' ? 'Only you and the leader see this' : 'Message the group'}
-            maxLength={MAX_MESSAGE_LENGTH}
-            multiline
-          />
-          <ErrorText error={localError ?? error} />
-          <Button
-            title={announcing ? 'Post announcement' : sendTo === 'leader' ? 'Send to leader' : 'Send to everyone'}
-            loading={busy}
-            onPress={send}
-          />
+          {sendTo === 'poll' ? (
+            <>
+              <PollComposer pollsOn={pollsOn} onSend={sendPoll} />
+              <ErrorText error={error} />
+            </>
+          ) : (
+            <>
+              <Field
+                label={announcing ? 'Announcement' : sendTo === 'leader' ? 'Message to the leader' : 'Message'}
+                value={draft}
+                onChangeText={setDraft}
+                placeholder={announcing ? 'Fuel stop in Green River at 11' : sendTo === 'leader' ? 'Only you and the leader see this' : 'Message the group'}
+                maxLength={MAX_MESSAGE_LENGTH}
+                multiline
+              />
+              <ErrorText error={localError ?? error} />
+              <Button
+                title={announcing ? 'Post announcement' : sendTo === 'leader' ? 'Send to leader' : 'Send to everyone'}
+                loading={busy}
+                onPress={send}
+              />
+            </>
+          )}
         </>
       )}
     </Card>

@@ -1526,4 +1526,126 @@ do $$ begin
   end if;
 end $$;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF, TAIL GUNNER, NOTIFICATION, APPROVAL AND CANCEL/DELETE TESTS PASSED' as result;
+-- 26. Quick ride polls: the leader asks, every rider on the ride votes once and can change it.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility)
+values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'Poll ride', now() + interval '2 days', 38.5, -109.5, 'public');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select join_ride('17171717-1717-1717-1717-171717171717');
+do $$ begin
+  begin
+    insert into ride_messages (ride_id, user_id, body, poll_options)
+    values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'Rider poll?', array['Yes', 'No']);
+    raise exception 'FAIL: a rider who is not the leader posted a poll';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into ride_messages (id, ride_id, user_id, body, poll_options)
+values ('f0000000-0000-0000-0000-000000000001', '17171717-1717-1717-1717-171717171717', auth.uid(), ' Lunch stop? ', array[' Yes ', 'No']);
+do $$ begin
+  if (select poll_options from ride_messages where id = 'f0000000-0000-0000-0000-000000000001') <> array['Yes', 'No'] then
+    raise exception 'FAIL: poll choices not trimmed';
+  end if;
+  begin
+    insert into ride_messages (ride_id, user_id, body, poll_options)
+    values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'One choice?', array['Only']);
+    raise exception 'FAIL: one-choice poll accepted';
+  exception when check_violation then null;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body, poll_options)
+    values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'Repeats?', array['Yes', ' yes']);
+    raise exception 'FAIL: repeated poll choices accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, body, poll_options)
+    values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'Blank?', array['Yes', '  ']);
+    raise exception 'FAIL: blank poll choice accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, kind, body, poll_options)
+    values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'announcement', 'Pinned poll?', array['Yes', 'No']);
+    raise exception 'FAIL: poll posted as an announcement';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    insert into ride_messages (ride_id, user_id, audience, body, poll_options)
+    values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'leader', 'Secret poll?', array['Yes', 'No']);
+    raise exception 'FAIL: leader-only poll accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  perform vote_on_poll('f0000000-0000-0000-0000-000000000001', 0);
+  begin
+    insert into ride_poll_votes (message_id, ride_id, user_id, choice)
+    values ('f0000000-0000-0000-0000-000000000001', '17171717-1717-1717-1717-171717171717', '00000000-0000-0000-0000-00000000000b', 1);
+    raise exception 'FAIL: a vote was written for someone else';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  perform vote_on_poll('f0000000-0000-0000-0000-000000000001', 0);
+  perform vote_on_poll('f0000000-0000-0000-0000-000000000001', 1);
+  if (select count(*) from ride_poll_votes where message_id = 'f0000000-0000-0000-0000-000000000001') <> 2 then
+    raise exception 'FAIL: rider cannot see both votes, or a changed vote counted twice';
+  end if;
+  if (select choice from ride_poll_votes where user_id = auth.uid()) <> 1 then
+    raise exception 'FAIL: changed vote not saved';
+  end if;
+  begin
+    perform vote_on_poll('f0000000-0000-0000-0000-000000000001', 2);
+    raise exception 'FAIL: vote for a choice that does not exist accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  begin
+    perform vote_on_poll('e0000000-0000-0000-0000-000000000002', 0);
+    raise exception 'FAIL: vote on an ordinary message accepted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+  update ride_poll_votes set choice = 0 where user_id = auth.uid();
+  if found then raise exception 'FAIL: rider changed a vote without vote_on_poll'; end if;
+  update ride_messages set poll_options = array['Rigged', 'Also rigged'] where id = 'f0000000-0000-0000-0000-000000000001';
+  if found then raise exception 'FAIL: rider changed the poll choices'; end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from ride_poll_votes) <> 0 then raise exception 'FAIL: non-member read poll votes'; end if;
+  begin
+    perform vote_on_poll('f0000000-0000-0000-0000-000000000001', 0);
+    raise exception 'FAIL: non-member voted';
+  exception when raise_exception then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  begin
+    perform vote_on_poll('f0000000-0000-0000-0000-000000000001', 0);
+    raise exception 'FAIL: signed-out visitor voted';
+  exception when raise_exception or insufficient_privilege then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+end $$;
+reset role;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF, TAIL GUNNER, NOTIFICATION, APPROVAL, CANCEL/DELETE AND POLL TESTS PASSED' as result;

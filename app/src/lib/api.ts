@@ -5,6 +5,7 @@ import { fuzzLocation, type LatLng } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
 import { friendlyCancelError } from '@/core/cancel';
 import type { ChatMessage, MessageAudience, MessageKind } from '@/core/chat';
+import type { PollVote } from '@/core/polls';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import { cleanRideName } from '@/core/profile';
@@ -446,6 +447,30 @@ export async function sendRideMessage(
   );
   track('ride_message', { kind, audience });
   return row;
+}
+
+/** Posts a quick poll: a chat message to everyone whose body is the question. Leaders only (enforced by the database). */
+export async function sendRidePoll(rideId: string, question: string, choices: string[]): Promise<ChatMessage> {
+  const user_id = await currentUserId();
+  const row = unwrap<ChatMessage>(
+    await supabase.from('ride_messages')
+      .insert({ ride_id: rideId, user_id, kind: 'chat', body: question, poll_options: choices, sent_at: new Date().toISOString() })
+      .select().single(),
+  );
+  track('ride_poll', { choices: choices.length });
+  return row;
+}
+
+/** Every vote on the ride's polls. Only joined riders get rows (enforced by the database). */
+export async function ridePollVotes(rideId: string): Promise<PollVote[]> {
+  return unwrap<PollVote[]>(await supabase.from('ride_poll_votes').select('*').eq('ride_id', rideId));
+}
+
+/** Casts or changes the signed-in rider's vote (choice is the 0-based position). */
+export async function voteOnPoll(messageId: string, choice: number): Promise<void> {
+  const res = await supabase.rpc('vote_on_poll', { p_message: messageId, p_choice: choice });
+  if (res.error) throw new Error(res.error.message);
+  track('ride_poll_vote', {});
 }
 
 // --- Post-ride summary ---------------------------------------------------------
