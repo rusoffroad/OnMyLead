@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
 import {
@@ -10,7 +10,9 @@ import { mergeVotes, pollsNotSwitchedOn, type PollVote } from '@/core/polls';
 import {
   clearRideMessage, rideMessages, ridePollVotes, sendRideMessage, sendRidePoll, setMessageResolved, voteOnPoll,
 } from '@/lib/api';
+import { useSession } from '@/lib/session';
 import { newChannel, supabase } from '@/lib/supabase';
+import { useAcknowledge } from './use-broadcast';
 
 /**
  * Ride chat for a joined rider: loads recent messages and keeps them live with a realtime
@@ -44,6 +46,14 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
   useEffect(() => {
     votesRef.current = votes;
   }, [votes]);
+
+  // Ride Mode quick replies from other riders reached this phone: their card says Seen by.
+  const { session } = useSession();
+  const quickReplies = useMemo(
+    () => messages.filter((m) => m.kind === 'status').map((m) => ({ id: m.id, user_id: m.user_id, at: m.created_at })),
+    [messages],
+  );
+  useAcknowledge(enabled ? rideId : null, session?.user.id, quickReplies);
 
   const reload = useCallback(
     () =>

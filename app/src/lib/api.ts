@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
 import { fuzzLocation, type LatLng } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
+import { isDuplicateSend, type Receipt } from '@/core/broadcast';
 import { friendlyCancelError } from '@/core/cancel';
 import type { ChatMessage, MessageAudience, MessageKind } from '@/core/chat';
 import type { PollVote } from '@/core/polls';
@@ -396,17 +397,53 @@ export async function getPositions(userIds: string[]): Promise<Position[]> {
   return unwrap(await supabase.from('positions_latest').select('*').in('user_id', userIds));
 }
 
-export async function sendRiderStatus(rideId: string, status: RiderStatusKind, at?: { lat: number; lng: number } | null, tappedAt = new Date()) {
+/**
+ * Pass the id the phone picked for the tap: a retry of a send that actually landed the first
+ * time then counts as sent instead of showing up twice.
+ */
+export async function sendRiderStatus(
+  rideId: string, status: RiderStatusKind, at?: { lat: number; lng: number } | null, tappedAt = new Date(), id?: string,
+) {
   const user_id = await currentUserId();
-  unwrap(
-    await supabase.from('rider_statuses').insert({ ride_id: rideId, user_id, status, lat: at?.lat ?? null, lng: at?.lng ?? null, tapped_at: tappedAt.toISOString() }),
-  );
+  const res = await supabase.from('rider_statuses')
+    .insert({ ...(id ? { id } : null), ride_id: rideId, user_id, status, lat: at?.lat ?? null, lng: at?.lng ?? null, tapped_at: tappedAt.toISOString() });
+  if (res.error && !(id && isDuplicateSend(res.error.message))) throw new Error(res.error.message);
   track('rider_status', { status });
 }
 
+export type StatusRow = {
+  id: string; user_id: string; status: RiderStatusKind; tapped_at: string; lat: number | null; lng: number | null; cancelled_at?: string | null;
+};
+
+/** The ride's recent status taps, newest first, without the ones their riders cancelled. */
 export async function latestStatuses(rideId: string) {
-  return unwrap<{ user_id: string; status: RiderStatusKind; tapped_at: string; lat: number | null; lng: number | null }[]>(
-    await supabase.from('rider_statuses').select('user_id, status, tapped_at, lat, lng').eq('ride_id', rideId).order('created_at', { ascending: false }).limit(200),
+  // '*' rather than a column list so this keeps working before the cancelled_at column exists.
+  const rows = unwrap<StatusRow[]>(
+    await supabase.from('rider_statuses').select('*').eq('ride_id', rideId).order('created_at', { ascending: false }).limit(200),
+  );
+  return rows.filter((r) => !r.cancelled_at);
+}
+
+/** Takes back one of my status taps or quick replies. Says which it was. */
+export async function cancelRideItem(itemId: string): Promise<'status' | 'message'> {
+  const res = await supabase.rpc('cancel_ride_item', { p_item: itemId });
+  if (res.error) throw new Error(res.error.message);
+  track('ride_status_cancelled');
+  return res.data as 'status' | 'message';
+}
+
+/** Tells the senders that these taps reached this phone. */
+export async function ackRideItems(rideId: string, itemIds: string[]): Promise<void> {
+  if (!itemIds.length) return;
+  const res = await supabase.rpc('ack_ride_items', { p_ride: rideId, p_items: itemIds });
+  if (res.error) throw new Error(res.error.message);
+}
+
+/** Who got these taps of mine (the database only shows a sender their own). */
+export async function myReceipts(itemIds: string[]): Promise<Receipt[]> {
+  if (!itemIds.length) return [];
+  return unwrap<Receipt[]>(
+    await supabase.from('ride_receipts').select('item_id, user_id, seen_at, pushed_at').in('item_id', itemIds),
   );
 }
 
@@ -442,16 +479,19 @@ export async function latestRideAnnouncement(rideId: string): Promise<ChatMessag
 }
 
 export async function sendRideMessage(
-  rideId: string, body: string, kind: MessageKind = 'chat', sentAt = new Date(), audience: MessageAudience = 'everyone',
+  rideId: string, body: string, kind: MessageKind = 'chat', sentAt = new Date(), audience: MessageAudience = 'everyone', id?: string,
 ): Promise<ChatMessage> {
   const user_id = await currentUserId();
   // audience is only sent when it isn't the default, so messages to everyone keep working on a
   // database that hasn't had the leader-only update yet.
-  const row = unwrap<ChatMessage>(
-    await supabase.from('ride_messages')
-      .insert({ ride_id: rideId, user_id, kind, body, sent_at: sentAt.toISOString(), ...(audience === 'leader' ? { audience } : null) })
-      .select().single(),
-  );
+  const res = await supabase.from('ride_messages')
+    .insert({ ...(id ? { id } : null), ride_id: rideId, user_id, kind, body, sent_at: sentAt.toISOString(), ...(audience === 'leader' ? { audience } : null) })
+    .select().single();
+  // A retry of a send that landed the first time (the phone picked the id): it's already there.
+  if (res.error && id && isDuplicateSend(res.error.message)) {
+    return unwrap<ChatMessage>(await supabase.from('ride_messages').select('*').eq('id', id).single());
+  }
+  const row = unwrap<ChatMessage>(res);
   track('ride_message', { kind, audience });
   return row;
 }

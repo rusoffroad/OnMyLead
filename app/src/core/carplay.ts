@@ -34,8 +34,8 @@ export const CARPLAY_STATUS_BUTTONS: CarPlayButton[] = [
   { id: 'status:need_help', title: 'Need Help', symbol: 'exclamationmark.triangle.fill' },
 ];
 export const CARPLAY_REPLY_BUTTONS: CarPlayButton[] = [
-  { id: 'reply:Running late', title: 'Running late', symbol: 'clock.fill' },
-  { id: 'reply:Need a minute', title: 'Need a minute', symbol: 'hand.raised.fill' },
+  { id: 'reply:Running Late', title: 'Running Late', symbol: 'clock.fill' },
+  { id: 'reply:Need a Minute', title: 'Need a Minute', symbol: 'hand.raised.fill' },
 ];
 export const GROUP_BUTTON: CarPlayButton = { id: 'group', title: 'Group', symbol: 'person.3.fill' };
 export const REGROUP_BUTTON: CarPlayButton = { id: 'regroup', title: 'Regroup Here', symbol: 'mappin.and.ellipse' };
@@ -54,8 +54,8 @@ export function carPlayState(i: CarPlayInput): CarPlayState {
     ...(i.canRegroup ? [REGROUP_BUTTON] : CARPLAY_REPLY_BUTTONS.slice(0, 1)),
     EMERGENCY_BUTTON,
   ];
-  // Apple's grid holds 8: Group, 5 statuses, Regroup (or Running late) and EMERGENCY.
-  // Mechanical Issue took the "Need a minute" slot; that reply stays on the phone.
+  // Apple's grid holds 8: Group, 5 statuses, Regroup (or Running Late) and EMERGENCY.
+  // Mechanical Issue took the "Need a Minute" slot; that reply stays on the phone.
   // Newest problem first: help calls beat separation, so a rider asking for help is never hidden.
   const alert = i.helpCalls.length
     ? { id: `help:${i.helpCalls[0].name}:${i.helpCalls[0].status}`, text: `${i.helpCalls[0].name}: ${i.helpCalls[0].status}` }

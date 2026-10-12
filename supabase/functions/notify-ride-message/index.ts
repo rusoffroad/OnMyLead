@@ -1,6 +1,7 @@
 // Sends the app's push notifications: ride chat, rider status taps (Need help, EMERGENCY and
-// the rest), ride changes, new riders and roles, ride invites from a riding group and new rides
-// from leaders a rider follows. A cancelled or deleted ride also gets an email to everyone who
+// the rest) and Ride Mode quick replies (plus a follow-up when one is cancelled), ride changes,
+// new riders and roles, ride invites from a riding group and new rides from leaders a rider
+// follows. A cancelled or deleted ride also gets an email to everyone who
 // was on it.
 //
 // Called by the database triggers (see migrations 20261012000000_chat_leader_push.sql,
@@ -84,11 +85,18 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
           body: r.data,
         },
         jwt,
+        typeof r.data?.collapseId === 'string' ? r.data.collapseId : undefined,
       ),
     ),
   );
   const gone = ios.filter((_, i) => results[i] === 'gone').map((r) => r.token);
   if (gone.length) await db.from('push_tokens').delete().in('token', gone);
+  // Status taps and quick replies: tell the sender which riders were notified (migration
+  // 20261019300000_status_broadcast.sql). Never fails the request.
+  if (event.type === 'status' || event.type === 'message') {
+    const reached = [...new Set(ios.filter((_, i) => results[i] === 'ok').map((r) => r.user_id))];
+    if (reached.length) await db.rpc('record_push_reach', { p_item: event.id, p_users: reached }).then(() => {}, () => {});
+  }
   return { sent: results.filter((r) => r === 'ok').length, removed: gone.length };
 }
 
@@ -178,7 +186,7 @@ const APNS_HOSTS = ['https://api.push.apple.com', 'https://api.sandbox.push.appl
  * Production first; builds installed from Xcode use the sandbox, so a token production rejects
  * as BadDeviceToken is retried there. 'gone' means the app was removed from that phone.
  */
-async function sendApns(token: string, payload: unknown, jwt: string): Promise<'ok' | 'gone' | 'failed'> {
+async function sendApns(token: string, payload: unknown, jwt: string, collapseId?: string): Promise<'ok' | 'gone' | 'failed'> {
   for (const host of APNS_HOSTS) {
     const res = await fetch(`${host}/3/device/${token}`, {
       method: 'POST',
@@ -187,6 +195,8 @@ async function sendApns(token: string, payload: unknown, jwt: string): Promise<'
         'apns-topic': env('APNS_BUNDLE_ID') || 'com.rusoffroad.onmylead.app',
         'apns-push-type': 'alert',
         'apns-priority': '10',
+        // A later push with the same id (a cancelled status) replaces this one on the lock screen.
+        ...(collapseId ? { 'apns-collapse-id': collapseId.slice(0, 64) } : null),
       },
       body: JSON.stringify(payload),
     }).catch(() => null);

@@ -35,7 +35,7 @@ export const MAX_MESSAGE_LENGTH = 500;
 export const MESSAGES_PER_MINUTE = 10;
 
 /** One-tap replies for Ride Mode. Sent as kind 'status' so the chat can show them differently. */
-export const QUICK_REPLIES = ['On my way', 'Running late', 'Need a minute', 'All good'] as const;
+export const QUICK_REPLIES = ['On My Way', 'Running Late', 'Need a Minute', 'All Good'] as const;
 export type QuickReply = (typeof QUICK_REPLIES)[number];
 
 export type MessageCheck = { ok: true; body: string } | { ok: false; error: string };
