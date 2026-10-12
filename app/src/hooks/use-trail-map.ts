@@ -23,8 +23,11 @@ export type TrailMap = {
   offline: boolean;
   setBase: (b: BaseMap) => void;
   setTrails: (on: boolean) => void;
-  /** Feed a map's region changes in (mapProps does this; maps with their own handler call it). */
-  onRegion: (r: Region) => void;
+  /**
+   * Feed a map's region changes in (mapProps does this; maps with their own handler call it).
+   * A web map passes its real zoom, since a wide browser window shows far more than a phone.
+   */
+  onRegion: (r: Region, zoom?: number) => void;
   info: TrailInfo | null;
   looking: boolean;
   clearInfo: () => void;
@@ -55,6 +58,7 @@ export function useTrailMap(): TrailMap {
   const [info, setInfo] = useState<TrailInfo | null>(null);
   const [looking, setLooking] = useState(false);
   const region = useRef<Region | null>(null);
+  const zoomNow = useRef<number | null>(null);
   const width = useRef(390);
   const lookup = useRef(0);
   const osmLoad = useRef(0);
@@ -93,7 +97,7 @@ export function useTrailMap(): TrailMap {
       put([]);
       return;
     }
-    loadOsmView(r, zoomOf(r), offlineRef.current)
+    loadOsmView(r, zoomNow.current ?? zoomOf(r), offlineRef.current)
       .then((lines) => {
         if (id === osmLoad.current) put(lines);
       })
@@ -116,9 +120,10 @@ export function useTrailMap(): TrailMap {
   }, [trails, offline, refreshOsm]);
 
   const onRegion = useCallback(
-    (r: Region) => {
+    (r: Region, z?: number) => {
       region.current = r;
-      setZoom(zoomOf(r));
+      zoomNow.current = z ?? null;
+      setZoom(z ?? zoomOf(r));
       refreshOsm();
     },
     [refreshOsm],
@@ -156,7 +161,8 @@ export function useTrailMap(): TrailMap {
     [identifyAt],
   );
 
-  const drawn = useMemo(() => drawableOsm(osm), [osm]);
+  // Leaflet draws lines cheaply and a browser window shows more of the map, so the website draws more.
+  const drawn = useMemo(() => drawableOsm(osm, Platform.OS === 'web' ? 1500 : undefined), [osm]);
 
   return {
     base,
@@ -176,7 +182,7 @@ export function useTrailMap(): TrailMap {
       // Topo replaces Apple's map content; Android has to be told there is no base map under it.
       mapType: base === 'satellite' ? 'hybrid' : Platform.OS === 'android' ? 'none' : 'standard',
       onPress,
-      onRegionChangeComplete: onRegion,
+      onRegionChangeComplete: (r: Region) => onRegion(r),
       onLayout: (e: LayoutChangeEvent) => {
         width.current = e.nativeEvent.layout.width;
       },

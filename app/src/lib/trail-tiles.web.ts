@@ -70,11 +70,14 @@ function decoded<T>(cache: Map<string, T[]>, t: Tile, decode: (d: Uint8Array, t:
   });
 }
 
+/** A browser window shows far more of the map than a phone, so it reads more squares. */
+const WEB_MAX_TILES = 40;
+
 /** OpenStreetMap tracks for a map view; empty when the map is too far out. */
 export async function loadOsmView(r: ViewRegion, zoom: number, _offline: boolean): Promise<OsmTrail[]> {
   const z = osmTileZoom(zoom);
   if (z == null) return [];
-  const parts = await Promise.all(osmTilesForRegion(r, z).map((t) => decoded(trails, t, decodeOsmTrails)));
+  const parts = await Promise.all(osmTilesForRegion(r, z, WEB_MAX_TILES).map((t) => decoded(trails, t, decodeOsmTrails)));
   return parts.flat();
 }
 

@@ -52,7 +52,7 @@ export function RouteBuilderMap({
     const report = () => {
       const b = m.getBounds();
       const c = b.getCenter();
-      cb.current.onRegion?.({ latitude: c.lat, longitude: c.lng, latitudeDelta: b.getNorth() - b.getSouth(), longitudeDelta: b.getEast() - b.getWest() });
+      cb.current.onRegion?.({ latitude: c.lat, longitude: c.lng, latitudeDelta: b.getNorth() - b.getSouth(), longitudeDelta: b.getEast() - b.getWest() }, m.getZoom());
     };
     m.on('moveend', report);
     const start = waypoints.length ? waypoints : points;
