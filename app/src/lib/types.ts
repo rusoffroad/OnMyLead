@@ -46,6 +46,10 @@ export type RidePrivateDetails = {
   meet_lng: number;
   meet_label: string | null;
   instructions: string | null;
+  /** The planned route as a GeoJSON LineString feature (see core/route). */
+  route_geojson?: unknown;
+  /** The leader's tapped points, [lng, lat] pairs. */
+  waypoints?: unknown;
 };
 
 export type RideMember = {

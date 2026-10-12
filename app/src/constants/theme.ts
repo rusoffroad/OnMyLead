@@ -102,5 +102,6 @@ export const RideColors = {
   unknown: '#7A8AA3',
   leader: '#3B86F7',
   sweep: '#B967F0',
-  rider: '#5A6F8F',
+  /** Plain grey, so the leader's logo blue is the only blue dot on the map. */
+  rider: '#6E7681',
 } as const;

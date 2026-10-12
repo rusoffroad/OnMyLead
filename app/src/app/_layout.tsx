@@ -59,6 +59,7 @@ export default function RootLayout() {
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
         <Stack.Screen name="find" options={{ title: 'Find a ride' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
+        <Stack.Screen name="ride/[id]/route" options={{ title: 'Route', headerShown: false }} />
         <Stack.Screen name="garage/index" options={{ title: 'Garage' }} />
         <Stack.Screen name="garage/new" options={{ title: 'Add to garage' }} />
         <Stack.Screen name="garage/[id]/index" options={{ title: '' }} />
