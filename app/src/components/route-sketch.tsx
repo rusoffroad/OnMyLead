@@ -5,7 +5,7 @@ import { Colors, FontFamilies, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { projectRoute } from '@/core/summary';
 
-export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean };
+export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string };
 
 /**
  * The route as a drawing on a navy grid, no map tiles: it works offline and on the web, and is
@@ -61,10 +61,25 @@ export function RouteSketch({
         ) : null}
         {riders.map((p, i) => {
           const d = dots[i];
-          const r = d.mine ? 12 : 10;
+          const r = d.mine ? 12 : d.big ? 8 : d.name ? 5.5 : 10;
           return (
             <G key={d.id}>
-              <Circle cx={p.x} cy={p.y} r={r} fill={d.color} stroke={d.mine ? Colors.text : Colors.background} strokeWidth={2.5} />
+              <Circle cx={p.x} cy={p.y} r={r} fill={d.color} stroke={d.mine || d.big ? Colors.text : Colors.background} strokeWidth={d.big ? 2.5 : 2} />
+              {d.name
+                ? [Colors.background, d.big ? Colors.text : Colors.textSecondary].map((c, k) => (
+                    <SvgText
+                      key={k}
+                      x={p.x + r + 4}
+                      y={p.y + 4}
+                      fill={c}
+                      stroke={k === 0 ? Colors.background : undefined}
+                      strokeWidth={k === 0 ? 3 : 0}
+                      fontSize={d.big ? 12 : 10.5}
+                      fontFamily={FontFamilies.body[d.big ? 800 : 600]}>
+                      {d.name}
+                    </SvgText>
+                  ))
+                : null}
               {d.label ? (
                 <SvgText x={p.x} y={p.y + 3.5} fill="#fff" fontSize={d.mine ? 8 : 10} fontFamily={FontFamilies.body[800]} textAnchor="middle">
                   {d.label}

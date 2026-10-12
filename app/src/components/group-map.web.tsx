@@ -25,8 +25,9 @@ export function GroupMap({
         id: r.id,
         lat: r.lat!,
         lng: r.lng!,
-        color: RideColors[r.role],
-        label: r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : r.name.slice(0, 1).toUpperCase(),
+        color: r.role === 'leader' ? RideColors.leader : RideColors.rider,
+        big: r.role === 'leader',
+        name: r.name,
       }));
     return (
       <View style={[StyleSheet.absoluteFill, styles.sketchWrap]}>
@@ -39,8 +40,8 @@ export function GroupMap({
       {regroup ? <Text style={styles.regroup}>Regroup point: {regroup.lat.toFixed(4)}, {regroup.lng.toFixed(4)}</Text> : null}
       {riders.map((r) => (
         <View key={r.id} style={styles.row}>
-          <View style={[styles.dot, { backgroundColor: RideColors[r.status] }]} />
-          <Text style={styles.name}>{r.name}{r.role !== 'rider' ? ` (${r.role})` : ''}</Text>
+          <View style={[styles.dot, { backgroundColor: r.role === 'leader' ? RideColors.leader : RideColors.rider }]} />
+          <Text style={[styles.name, r.role === 'leader' && { color: RideColors.leader }]}>{r.name}{r.role === 'leader' ? ', leader' : ''}</Text>
           <Text style={styles.detail}>{r.detail}</Text>
         </View>
       ))}

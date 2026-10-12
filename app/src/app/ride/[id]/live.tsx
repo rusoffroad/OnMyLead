@@ -15,14 +15,16 @@ import { Button, Card } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
+import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
+import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
-  activeRegroup, dropRegroup, getMembers, getPositions, getRide, getRideRoute, latestStatuses, myActiveShares,
-  startLocationShare, stopLocationShare, type ActiveShare,
+  activeRegroup, dropRegroup, getMembers, getPositions, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
+  startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
 import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
@@ -274,6 +276,20 @@ export default function RideMode() {
   }, [route.route, joined, positions, me, myFix, tracker]);
   const routeSummary = route.route ? summarizeMe(route.route, placed, me) : null;
 
+  // With a route, tell this rider whether their machine's range (from the garage) covers it.
+  const [vehicles, setVehicles] = useState<VehicleWithCost[]>([]);
+  useEffect(() => {
+    if (hasRoute) myVehicles().then(setVehicles).catch(() => {});
+  }, [hasRoute]);
+  const rangeNote = useMemo(() => {
+    const v = rideVehicle(vehicles, mine?.vehicle_id)?.vehicle;
+    const r = v && vehicleRange(v);
+    if (!route.route || !v || !r) return null;
+    const routeMi = route.route.lengthM / 1609.344;
+    const check = checkRideRange(routeMi, { tankGallons: v.tank_gallons!, extraGallons: v.extra_fuel_gallons ?? 0, mpg: v.mpg! });
+    return { check, text: `${RANGE_LABEL[check]}. ${v.nickname?.trim() || vehicleTitle(v)} goes about ${Math.round(r.fullRangeMiles)} mi.` };
+  }, [vehicles, mine?.vehicle_id, route.route]);
+
   const helpCalls = joined
     .map((m) => ({ m, s: statuses[m.user_id] }))
     .filter(({ s, m }) => s && m.user_id !== me && !['ok'].includes(s.status) && now - Date.parse(s.tapped_at) < 30 * 60_000);
@@ -376,7 +392,7 @@ export default function RideMode() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <GroupMap riders={mapRiders} regroup={regroup} route={route.route?.points} />
+      <GroupMap riders={mapRiders} meId={me} regroup={regroup} route={route.route?.points} />
 
       <SafeAreaView edges={['top']} style={styles.top}>
         <View style={styles.topRow}>
@@ -420,6 +436,7 @@ export default function RideMode() {
             summary={routeSummary}
             nameOf={nameOf}
             offline={route.offline}
+            range={rangeNote}
           />
         ) : null}
         <Pressable

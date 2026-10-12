@@ -143,6 +143,22 @@ export function vehicleRange(v: Pick<GarageVehicle, 'tank_gallons' | 'extra_fuel
   return fuelRange({ tankGallons: v.tank_gallons, extraGallons: v.extra_fuel_gallons ?? 0, mpg: v.mpg });
 }
 
+/**
+ * The machine to check a ride's range against: the one the rider picked for the ride, or, when
+ * they haven't picked, their only machine with a known range.
+ */
+export function rideVehicle<V extends { id: string } & Pick<GarageVehicle, 'tank_gallons' | 'mpg'>>(
+  vehicles: V[],
+  pickedId: string | null | undefined,
+): { vehicle: V; picked: boolean } | null {
+  if (pickedId) {
+    const v = vehicles.find((x) => x.id === pickedId);
+    return v ? { vehicle: v, picked: true } : null;
+  }
+  const withRange = vehicles.filter((v) => v.tank_gallons && v.mpg);
+  return withRange.length === 1 ? { vehicle: withRange[0], picked: false } : null;
+}
+
 const num = (n: number, digits = 1) => (Number.isInteger(n) ? String(n) : n.toFixed(digits));
 
 export function exportFileBase(v: Pick<GarageVehicle, 'nickname' | 'year' | 'make' | 'model' | 'trim'>): string {

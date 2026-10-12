@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors } from '@/constants/theme';
+import type { RangeCheck } from '@/core/fuel';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
+
+const RANGE_COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: RideColors.yellow, over: RideColors.red };
 
 /**
  * The whole route as one straight line, start to finish, with every sharing rider placed by how
@@ -9,8 +12,10 @@ import type { MyRouteSummary, PlacedRider } from '@/core/route';
  * reading a map.
  */
 export function RouteStrip({
-  lengthM, riders, meId, summary, nameOf, offline,
+  lengthM, riders, meId, summary, nameOf, offline, range,
 }: {
+  /** Whether this rider's machine (from the garage) can do the whole route. */
+  range?: { check: RangeCheck; text: string } | null;
   lengthM: number;
   riders: PlacedRider[];
   meId: string | undefined;
@@ -52,9 +57,9 @@ export function RouteStrip({
         <View style={[styles.cap, styles.finish, { right: 0 }]} />
         {order.map((r) => {
           const mine = r.id === meId;
-          const color = r.role === 'leader' ? RideColors.leader : r.role === 'sweep' ? RideColors.sweep : mine ? Colors.accent : RideColors.rider;
-          const size = mine ? 30 : r.role === 'leader' ? 28 : r.role === 'sweep' ? 24 : 18;
-          const letter = mine ? 'You' : r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : nameOf(r.id).slice(0, 1).toUpperCase();
+          const color = r.role === 'leader' ? RideColors.leader : mine ? Colors.accent : RideColors.rider;
+          const size = mine ? 30 : r.role === 'leader' ? 28 : 18;
+          const letter = mine ? 'You' : r.role === 'leader' ? 'L' : nameOf(r.id).slice(0, 1).toUpperCase();
           return (
             <View
               key={r.id}
@@ -86,6 +91,12 @@ export function RouteStrip({
       ) : (
         <Text style={styles.compared}>Share your location to see where you are on the route.</Text>
       )}
+      {range ? (
+        <View style={styles.range}>
+          <View style={[styles.rangeDot, { backgroundColor: RANGE_COLOR[range.check] }]} />
+          <Text style={styles.rangeText} numberOfLines={2}>{range.text}</Text>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -103,5 +114,8 @@ const styles = StyleSheet.create({
   finish: { backgroundColor: Colors.text },
   dot: { position: 'absolute', top: '50%', borderWidth: 2.5, alignItems: 'center', justifyContent: 'center' },
   letter: { color: '#fff', fontFamily: font(800), fontSize: 11 },
+  range: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  rangeDot: { width: 10, height: 10, borderRadius: 5 },
+  rangeText: { flex: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },
   compared: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20 },
 });

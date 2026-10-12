@@ -5,12 +5,11 @@ import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
-import { rideFuelAdvice, type RangeCheck } from '@/core/fuel';
-import { vehicleRange, vehicleTitle } from '@/core/garage';
+import { RANGE_LABEL, rideFuelAdvice, type RangeCheck } from '@/core/fuel';
+import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { myVehicles, setMyVehicle, type VehicleWithCost } from '@/lib/api';
 import type { Ride, RideMember } from '@/lib/types';
 
-const LABEL: Record<RangeCheck, string> = { ok: 'Fuel OK', tight: 'Fuel is tight', over: 'Not enough fuel' };
 const COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: RideColors.yellow, over: RideColors.red };
 
 /**
@@ -27,7 +26,8 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
   }, []);
 
   if (!vehicles) return null;
-  const vehicle = vehicles.find((v) => v.id === mine.vehicle_id) ?? null;
+  // Until a machine is picked for the ride, a rider with one machine in the garage is checked against it.
+  const vehicle = rideVehicle(vehicles, mine.vehicle_id)?.vehicle ?? null;
   const range = vehicle ? vehicleRange(vehicle) : null;
   const advice = ride.route_miles && vehicle && range
     ? rideFuelAdvice(ride.route_miles, { tankGallons: vehicle.tank_gallons!, extraGallons: vehicle.extra_fuel_gallons ?? 0, mpg: vehicle.mpg! })
@@ -51,12 +51,12 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
 
   return (
     <Card style={advice ? { borderLeftWidth: 4, borderLeftColor: COLOR[advice.check] } : undefined}>
-      <ThemedText type="heading" style={advice ? { color: COLOR[advice.check] } : undefined}>{advice ? LABEL[advice.check] : 'Your machine'}</ThemedText>
+      <ThemedText type="heading" style={advice ? { color: COLOR[advice.check] } : undefined}>{advice ? RANGE_LABEL[advice.check] : 'Your machine'}</ThemedText>
       {advice ? (
         <>
           <ThemedText style={{ fontSize: 18, lineHeight: 24, fontWeight: 700 }}>{advice.line}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            {ride.route_miles} mile route · {vehicleTitle(vehicle!)} goes about {Math.round(range!.fullRangeMiles)} miles on{' '}
+            {ride.route_miles} mile route. {vehicleTitle(vehicle!)} goes about {Math.round(range!.fullRangeMiles)} miles on{' '}
             {vehicle!.extra_fuel_gallons ? `${range!.totalGallons} gal (${vehicle!.tank_gallons} tank + ${vehicle!.extra_fuel_gallons} extra)` : 'a full tank'}.
             Trail miles burn more fuel than you think; the thirds rule keeps a reserve.
           </ThemedText>
