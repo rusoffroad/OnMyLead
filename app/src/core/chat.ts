@@ -23,6 +23,8 @@ export type ChatMessage = {
   audience?: MessageAudience;
   /** Set only on quick polls (see core/polls): the choices, with the body as the question. */
   poll_options?: string[] | null;
+  /** When the sender marked it resolved; null or missing while it is open. */
+  resolved_at?: string | null;
   sent_at: string;
   created_at: string;
 };
@@ -51,13 +53,16 @@ export function checkMessage(raw: string): MessageCheck {
 const byTime = (a: ChatMessage, b: ChatMessage) =>
   Date.parse(a.created_at) - Date.parse(b.created_at) || a.id.localeCompare(b.id);
 
-/** The pinned announcement: the most recent one, or null. */
+/**
+ * The pinned announcement: the most recent one, or null. Once its sender marks it resolved
+ * nothing is pinned (an older announcement doesn't come back).
+ */
 export function latestAnnouncement(messages: ChatMessage[]): ChatMessage | null {
   let best: ChatMessage | null = null;
   for (const m of messages) {
     if (m.kind === 'announcement' && (!best || byTime(best, m) < 0)) best = m;
   }
-  return best;
+  return best && !isResolved(best) ? best : null;
 }
 
 /**
@@ -69,6 +74,60 @@ export function mergeMessages(current: ChatMessage[], incoming: ChatMessage[], l
   for (const m of incoming) seen.set(m.id, m);
   const all = [...seen.values()].sort(byTime);
   return all.length > limit ? all.slice(all.length - limit) : all;
+}
+
+/**
+ * Replace the loaded messages with a fresh page from the database (newest `limit`, oldest
+ * first), so messages cleared since the last load disappear. Messages that arrived after the
+ * page was read are kept, and so are older ones when the page was full (they are just off it).
+ */
+export function reconcileMessages(current: ChatMessage[], page: ChatMessage[], limit: number): ChatMessage[] {
+  // An empty page means every message is gone (a stray new one comes back on the next load).
+  if (!page.length) return [];
+  const ids = new Set(page.map((m) => m.id));
+  const times = page.map((m) => Date.parse(m.created_at));
+  const newest = Math.max(...times);
+  const oldest = Math.min(...times);
+  const keep = current.filter((m) => {
+    if (ids.has(m.id)) return false;
+    const t = Date.parse(m.created_at);
+    return t > newest || (page.length >= limit && t < oldest);
+  });
+  return mergeMessages(keep, page);
+}
+
+/** The list without one message (cleared by its sender). */
+export const withoutMessage = (current: ChatMessage[], id: string) => current.filter((m) => m.id !== id);
+
+export const isResolved = (m: Pick<ChatMessage, 'resolved_at'>) => !!m.resolved_at;
+
+/**
+ * A message on its way out. It shows in the chat straight away as Sending, then becomes the
+ * real message (Sent) or stays as Not Sent with Retry and Remove.
+ */
+export type PendingMessage = {
+  localId: string;
+  body: string;
+  kind: MessageKind;
+  audience: MessageAudience;
+  state: 'sending' | 'failed';
+  error?: string;
+  at: string;
+};
+
+/** Sending state for anything a rider sends, in words. */
+export type SendState = 'sending' | 'sent' | 'failed' | 'queued';
+export const SEND_STATE_LABEL: Record<SendState, string> = {
+  sending: 'Sending…',
+  sent: 'Sent',
+  failed: 'Not Sent',
+  queued: 'Waiting for Signal',
+};
+
+/** Clearing and resolving need the database update; true when it hasn't run yet. */
+export function messageActionsNotSwitchedOn(message: string): boolean {
+  return /set_message_resolved|clear_ride_message|resolved_at/i.test(message)
+    && /function|column|schema cache|does not exist|could not find/i.test(message);
 }
 
 /** What Ride Mode says out loud for a new announcement. */
@@ -112,6 +171,10 @@ export function alertTitle(
 
 /** Turn a database error into something a rider can act on. */
 export function friendlyChatError(message: string): string {
+  if (messageActionsNotSwitchedOn(message)) return 'Clear and Mark Resolved aren’t switched on yet.';
+  if (/only the sender can resolve/i.test(message)) return 'Only the person who sent it can mark it resolved.';
+  if (/only the sender can clear/i.test(message)) return 'Only the person who sent it can clear it, or it’s already gone.';
+  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return 'No signal. Check your connection and tap Retry.';
   if (/poll_options|ride_poll_votes|vote_on_poll/i.test(message) && /column|relation|schema cache|does not exist|could not find/i.test(message)) {
     return 'Polls aren’t switched on yet.';
   }

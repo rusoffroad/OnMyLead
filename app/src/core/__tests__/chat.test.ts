@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
-  alertTitle, checkMessage, friendlyChatError, isLeaderOnly, latestAnnouncement, MAX_MESSAGE_LENGTH, mergeMessages, QUICK_REPLIES,
-  rideLeaderIds, shouldAlert, spokenAnnouncement,
+  alertTitle, checkMessage, friendlyChatError, isLeaderOnly, isResolved, latestAnnouncement, MAX_MESSAGE_LENGTH, mergeMessages,
+  messageActionsNotSwitchedOn, QUICK_REPLIES, reconcileMessages, rideLeaderIds, SEND_STATE_LABEL, shouldAlert, spokenAnnouncement,
+  withoutMessage,
   type ChatMessage,
 } from '../chat';
 
@@ -106,5 +107,56 @@ describe('polls in chat', () => {
     expect(friendlyChatError("Could not find the 'poll_options' column of 'ride_messages' in the schema cache")).toBe('Polls aren’t switched on yet.');
     expect(friendlyChatError('relation "ride_poll_votes" does not exist')).toBe('Polls aren’t switched on yet.');
     expect(friendlyChatError('poll choices repeat')).toBe('Each choice needs to be different.');
+  });
+});
+
+describe('clear and resolve', () => {
+  it('drops a cleared message when the chat reloads', () => {
+    const before = [msg('a', 1), msg('b', 2), msg('c', 3)];
+    // b was cleared by its sender: the fresh page no longer has it.
+    expect(reconcileMessages(before, [msg('a', 1), msg('c', 3)], 100).map((m) => m.id)).toEqual(['a', 'c']);
+  });
+
+  it('keeps messages that arrived after the page was read, and older ones off a full page', () => {
+    const before = [msg('old', 0), msg('a', 1), msg('late', 9)];
+    expect(reconcileMessages(before, [msg('a', 1), msg('b', 2)], 2).map((m) => m.id)).toEqual(['old', 'a', 'b', 'late']);
+    // Not a full page: everything older than its newest message is exactly what the database has.
+    expect(reconcileMessages(before, [msg('a', 1), msg('b', 2)], 100).map((m) => m.id)).toEqual(['a', 'b', 'late']);
+    expect(reconcileMessages(before, [], 100).map((m) => m.id)).toEqual([]);
+  });
+
+  it('takes the resolved state from the fresh page', () => {
+    const resolved = { ...msg('a', 1), resolved_at: '2026-10-10T10:00:00Z' };
+    const [a] = reconcileMessages([msg('a', 1)], [resolved], 100);
+    expect(isResolved(a)).toBe(true);
+    expect(isResolved(msg('b', 1))).toBe(false);
+    expect(isResolved({ resolved_at: null })).toBe(false);
+  });
+
+  it('removes one message by id', () => {
+    expect(withoutMessage([msg('a', 1), msg('b', 2)], 'a').map((m) => m.id)).toEqual(['b']);
+  });
+
+  it('stops pinning an announcement once it is resolved, without bringing back an older one', () => {
+    const older = msg('old', 1, 'announcement');
+    const newest = { ...msg('new', 2, 'announcement'), resolved_at: '2026-10-10T10:00:00Z' };
+    expect(latestAnnouncement([older, newest])).toBeNull();
+    expect(latestAnnouncement([older, { ...newest, resolved_at: null }])?.id).toBe('new');
+  });
+
+  it('says when Clear and Mark Resolved are not switched on yet', () => {
+    const missing = 'Could not find the function public.clear_ride_message(p_message) in the schema cache';
+    expect(messageActionsNotSwitchedOn(missing)).toBe(true);
+    expect(friendlyChatError(missing)).toBe('Clear and Mark Resolved aren’t switched on yet.');
+    expect(messageActionsNotSwitchedOn('only the sender can clear this message')).toBe(false);
+    expect(friendlyChatError('only the sender can resolve this message')).toMatch(/Only the person who sent it/);
+  });
+
+  it('turns a dropped connection into a retry hint', () => {
+    expect(friendlyChatError('TypeError: Network request failed')).toMatch(/Retry/);
+  });
+
+  it('names every send state in Title Case', () => {
+    expect(SEND_STATE_LABEL).toEqual({ sending: 'Sending…', sent: 'Sent', failed: 'Not Sent', queued: 'Waiting for Signal' });
   });
 });

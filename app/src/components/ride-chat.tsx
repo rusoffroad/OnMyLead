@@ -1,16 +1,20 @@
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ProLock } from '@/components/pro-gate';
 import { ThemedText } from '@/components/themed-text';
 import { PollCard, PollComposer } from '@/components/ride-poll';
-import { Button, Card, Choice, ErrorText, Field } from '@/components/ui';
-import { Radius, RideColors, Spacing } from '@/constants/theme';
-import { checkMessage, isLeaderOnly, MAX_MESSAGE_LENGTH, type ChatMessage, type MessageAudience, type MessageKind } from '@/core/chat';
+import { Button, Card, Choice, ErrorText, Field, Tag } from '@/components/ui';
+import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import {
+  checkMessage, isLeaderOnly, isResolved, MAX_MESSAGE_LENGTH, SEND_STATE_LABEL,
+  type ChatMessage, type MessageAudience, type MessageKind, type PendingMessage, type SendState,
+} from '@/core/chat';
 import { parseProError } from '@/core/entitlements';
 import { isPoll, type PollVote } from '@/core/polls';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useTheme } from '@/hooks/use-theme';
+import { confirmAsync } from '@/lib/confirm';
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 const dayAndClock = (iso: string) =>
@@ -40,6 +44,7 @@ type SendTo = 'everyone' | 'leader' | 'announcement' | 'poll';
  */
 export function RideChat({
   messages, nameOf, me, canAnnounce, leaderName, error, onSend, canPoll = false, pollLocked = false, pollsOn = true, votes = [], onSendPoll, onVote,
+  pending = [], onRetry, onDiscard, onResolve, onClear, actionsOn = true,
 }: {
   messages: ChatMessage[];
   nameOf: (userId: string) => string;
@@ -58,29 +63,50 @@ export function RideChat({
   votes?: PollVote[];
   onSendPoll?: (question: string, choices: string[]) => Promise<boolean>;
   onVote?: (messageId: string, choice: number) => void;
+  /** This rider's messages still on their way out (Sending) or Not Sent. */
+  pending?: PendingMessage[];
+  onRetry?: (localId: string) => void;
+  onDiscard?: (localId: string) => void;
+  /** The sender marks their own message resolved (true) or open again (false). */
+  onResolve?: (messageId: string, resolved: boolean) => void;
+  /** The sender clears their own message for everyone. */
+  onClear?: (messageId: string) => void;
+  /** False until the database has the Clear and Mark Resolved update. */
+  actionsOn?: boolean;
 }) {
   const theme = useTheme();
   const [draft, setDraft] = useState('');
   const [sendTo, setSendTo] = useState<SendTo>('everyone');
-  const [busy, setBusy] = useState(false);
+  const [menuFor, setMenuFor] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const [open, toggleOpen] = useRememberedToggle('ride.chatOpen.v1', true);
 
   const last = messages[messages.length - 1];
+  const canManage = !!onResolve || !!onClear;
+  // Only my newest message spells out Sent; earlier ones keep just the check.
+  const myLatestId = [...messages].reverse().find((m) => m.user_id === me)?.id;
   const visible = showAll ? messages : messages.slice(-30);
 
   async function send() {
     const check = checkMessage(draft);
     if (!check.ok) return setLocalError(check.error);
     setLocalError(null);
-    setBusy(true);
+    // The message shows in the chat straight away as Sending, so the box clears now. If it
+    // doesn't go through it stays there as Not Sent, with Retry.
+    setDraft('');
     const ok = await onSend(check.body, sendTo === 'announcement' ? 'announcement' : 'chat', sendTo === 'leader' ? 'leader' : 'everyone');
-    setBusy(false);
-    if (ok) {
-      setDraft('');
-      setSendTo('everyone');
-    }
+    if (ok) setSendTo('everyone');
+  }
+
+  async function clear(m: ChatMessage) {
+    setMenuFor(null);
+    const ok = await confirmAsync(
+      'Clear This Message?',
+      'It disappears from the ride chat for everyone. This can’t be undone.',
+      'Clear',
+    );
+    if (ok) onClear?.(m.id);
   }
 
   const options: { value: SendTo; label: string }[] = [{ value: 'everyone', label: 'Everyone' }];
@@ -127,6 +153,8 @@ export function RideChat({
             const announcement = m.kind === 'announcement';
             const leaderOnly = isLeaderOnly(m);
             const poll = isPoll(m);
+            const resolved = isResolved(m);
+            const menuOpen = menuFor === m.id;
             return (
               <View
                 key={m.id}
@@ -137,21 +165,87 @@ export function RideChat({
                   gap: 2,
                   ...(announcement ? { borderLeftWidth: 4, borderLeftColor: RideColors.yellow, paddingLeft: Spacing.two } : null),
                   ...(leaderOnly ? { borderLeftWidth: 4, borderLeftColor: RideColors.leader, paddingLeft: Spacing.two } : null),
+                  ...(resolved ? { borderLeftWidth: 4, borderLeftColor: RideColors.green, paddingLeft: Spacing.two } : null),
                   ...(poll ? { gap: Spacing.two, paddingBottom: Spacing.one } : null),
                 }}>
-                <ThemedText type="small" themeColor="textSecondary">
-                  {announcement ? 'Announcement from ' : poll ? 'Poll from ' : ''}
-                  {mine ? 'You' : nameOf(m.user_id)}
-                  {leaderOnly ? (mine ? ', to the leader only' : ', to you only as leader') : ''}, {clock(m.sent_at)}
-                </ThemedText>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
+                  <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
+                    {announcement ? 'Announcement from ' : poll ? 'Poll from ' : ''}
+                    {mine ? 'You' : nameOf(m.user_id)}
+                    {leaderOnly ? (mine ? ', to the leader only' : ', to you only as leader') : ''}, {clock(m.sent_at)}
+                  </ThemedText>
+                  {resolved ? <Tag label="Resolved" color={RideColors.green} /> : null}
+                  {mine ? <SendBadge state="sent" iconOnly={m.id !== myLatestId || pending.length > 0} /> : null}
+                  {mine && canManage ? (
+                    <Pressable
+                      onPress={() => setMenuFor(menuOpen ? null : m.id)}
+                      accessibilityRole="button"
+                      accessibilityState={{ expanded: menuOpen }}
+                      accessibilityLabel={menuOpen ? 'Close message options' : 'Message options: Mark Resolved or Clear'}
+                      hitSlop={12}
+                      style={({ pressed }) => [chatStyles.more, { opacity: pressed ? 0.6 : 1 }, menuOpen && { backgroundColor: theme.backgroundSelected }]}>
+                      <Text style={chatStyles.moreText}>•••</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
                 {poll ? (
                   <PollCard message={m} votes={votes} me={me} onVote={(choice) => onVote?.(m.id, choice)} />
                 ) : (
-                  <ThemedText style={[m.kind === 'status' && { fontStyle: 'italic' }, announcement && { fontWeight: 700 }]}>{m.body}</ThemedText>
+                  <ThemedText
+                    style={[
+                      m.kind === 'status' && { fontStyle: 'italic' },
+                      announcement && { fontWeight: 700 },
+                      resolved && { color: theme.textSecondary },
+                    ]}>
+                    {m.body}
+                  </ThemedText>
                 )}
+                {menuOpen ? (
+                  actionsOn ? (
+                    <View style={chatStyles.actions}>
+                      {onResolve ? (
+                        <Button
+                          title={resolved ? 'Reopen' : 'Mark Resolved'}
+                          kind="secondary"
+                          onPress={() => {
+                            setMenuFor(null);
+                            onResolve(m.id, !resolved);
+                          }}
+                          style={{ flex: 1 }}
+                        />
+                      ) : null}
+                      {onClear ? <Button title="Clear" kind="ghost" onPress={() => clear(m)} style={{ flex: 1 }} /> : null}
+                    </View>
+                  ) : (
+                    <ThemedText type="small" themeColor="textSecondary">Clear and Mark Resolved aren’t switched on yet.</ThemedText>
+                  )
+                ) : null}
               </View>
             );
           })}
+          {pending.map((p) => (
+            <View
+              key={p.localId}
+              style={{ borderTopWidth: 1, borderTopColor: theme.backgroundSelected, paddingTop: Spacing.two, gap: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
+                <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
+                  {p.kind === 'announcement' ? 'Announcement from You' : 'You'}
+                  {p.audience === 'leader' ? ', to the leader only' : ''}, {clock(p.at)}
+                </ThemedText>
+                <SendBadge state={p.state} />
+              </View>
+              <ThemedText style={{ color: p.state === 'sending' ? theme.textSecondary : theme.text }}>{p.body}</ThemedText>
+              {p.state === 'failed' ? (
+                <>
+                  {p.error ? <ThemedText type="small" style={{ color: Colors.danger }}>{p.error}</ThemedText> : null}
+                  <View style={chatStyles.actions}>
+                    {onRetry ? <Button title="Retry" onPress={() => onRetry(p.localId)} style={{ flex: 1 }} /> : null}
+                    {onDiscard ? <Button title="Remove" kind="ghost" onPress={() => onDiscard(p.localId)} style={{ flex: 1 }} /> : null}
+                  </View>
+                </>
+              ) : null}
+            </View>
+          ))}
           {options.length > 1 ? <Choice label="Send To" options={options} value={sendTo} onChange={setSendTo} /> : null}
           {sendTo === 'poll' && (pollLocked || parseProError(error)?.kind === 'pro_required') ? (
             <ProLock feature="create_poll" title="Create Ride Polls" detail="Part of Pro. Everyone can still vote." />
@@ -173,7 +267,6 @@ export function RideChat({
               <ErrorText error={localError ?? error} />
               <Button
                 title={announcing ? 'Post Announcement' : sendTo === 'leader' ? 'Send to Leader' : 'Send to Everyone'}
-                loading={busy}
                 onPress={send}
               />
             </>
@@ -183,3 +276,34 @@ export function RideChat({
     </Card>
   );
 }
+
+const BADGE_COLOR: Record<SendState, string> = {
+  sending: Colors.textSecondary,
+  sent: RideColors.green,
+  failed: Colors.danger,
+  queued: RideColors.yellow,
+};
+
+/** Sending…, ✓ Sent, ! Not Sent or Waiting for Signal, next to a message. */
+export function SendBadge({ state, iconOnly = false }: { state: SendState; iconOnly?: boolean }) {
+  const color = BADGE_COLOR[state];
+  return (
+    <View
+      accessible
+      accessibilityLabel={SEND_STATE_LABEL[state]}
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+      {state === 'sending' ? <ActivityIndicator size="small" color={color} /> : (
+        <Text style={[chatStyles.badgeIcon, { color }]}>{state === 'sent' ? '✓' : state === 'failed' ? '!' : '…'}</Text>
+      )}
+      {iconOnly ? null : <Text style={[chatStyles.badgeText, { color }]}>{SEND_STATE_LABEL[state]}</Text>}
+    </View>
+  );
+}
+
+const chatStyles = StyleSheet.create({
+  more: { minWidth: 36, minHeight: 28, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center' },
+  moreText: { color: Colors.textSecondary, fontFamily: font(800), fontSize: 14, letterSpacing: 1 },
+  actions: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.one },
+  badgeIcon: { fontFamily: font(800), fontSize: 13 },
+  badgeText: { fontFamily: font(700), fontSize: 13 },
+});
