@@ -5,12 +5,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert, Animated, LayoutAnimation, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
+  Alert, Animated, AppState, LayoutAnimation, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GroupMap, type MapRider } from '@/components/group-map';
 import { BreakdownBadge } from '@/components/rider-status-badge';
+import { RiderList } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
 import { SharePicker } from '@/components/share-picker';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
@@ -22,6 +23,7 @@ import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
+import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
@@ -98,6 +100,11 @@ export default function RideMode() {
   const [askShare, setAskShare] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [sosOpen, setSosOpen] = useState(false);
+  const [ridersOpen, setRidersOpen] = useState(false);
+  // When this phone last heard from the server (a refresh or a live update). Long silence means
+  // we have no service, so other riders' ages say nothing about their own signal.
+  const [lastHeardAt, setLastHeardAt] = useState(() => Date.now());
+  const heard = useCallback(() => setLastHeardAt(Date.now()), []);
   const [busy, setBusy] = useState(false);
   const announced = useRef(new Set<string>());
   const [route, setRoute] = useState<{ route: RideRoute | null; offline: boolean }>({ route: null, offline: false });
@@ -165,21 +172,44 @@ export default function RideMode() {
     setRegroup(d.regroup);
     setStatuses(d.statuses);
     setPositions(d.positions);
+    setLastHeardAt(Date.now());
   }, []);
   const refresh = useCallback(() => loadSnapshot(id).then(apply).catch(() => {}), [id, apply]);
 
   const loadRoute = useCallback(() => getRideRoute(id).then(setRoute).catch(() => {}), [id]);
 
+  // Find this rider's share for the ride. With one, make sure the phone is sending (it resumes a
+  // share after the app was closed or the phone restarted); without one, ask once. With no
+  // service this fails quietly and is tried again, rather than asking someone already sharing.
+  const shareChecked = useRef(false);
+  const loadShare = useCallback(() =>
+    myActiveShares()
+      .then((all) => {
+        const s = all.find((x) => x.scope === 'ride' && x.ride_id === id) ?? null;
+        setShare(s);
+        if (s) startSendingLocation(id, s.expires_at ? Date.parse(s.expires_at) : null).catch(() => {});
+        else if (!shareChecked.current) setAskShare(true);
+        shareChecked.current = true;
+      })
+      .catch(() => {}),
+  [id]);
+
   // Initial load, then ask to share if this rider has no active ride share.
   useEffect(() => {
     loadSnapshot(id).then(apply).catch(() => {});
     loadRoute();
-    myActiveShares().then((all) => {
-      const s = all.find((x) => x.scope === 'ride' && x.ride_id === id) ?? null;
-      setShare(s);
-      if (!s) setAskShare(true);
+    loadShare();
+  }, [id, apply, loadRoute, loadShare]);
+
+  // Back from the background or the lock screen: catch up at once instead of waiting for the poll.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      refresh();
+      loadShare();
     });
-  }, [id, apply, loadRoute]);
+    return () => sub.remove();
+  }, [refresh, loadShare]);
 
   // Follow this phone's position while Ride Mode is open and there is a route to place it on.
   // Only if location access was already given; this never asks and never uploads.
@@ -208,6 +238,7 @@ export default function RideMode() {
     const channel = newChannel(`ride-${id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'positions_latest' }, (payload) => {
         const p = payload.new as Position;
+        heard();
         if (p?.user_id) setPositions((prev) => ({ ...prev, [p.user_id]: p }));
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
@@ -227,15 +258,21 @@ export default function RideMode() {
         routeMiles.current = next.route_miles;
         setRide(next);
       })
-      .subscribe();
-    const poll = setInterval(refresh, 15_000);
+      .subscribe((status) => {
+        // The live connection came back after a drop: fetch what was missed right away.
+        if (status === 'SUBSCRIBED') refresh();
+      });
+    const poll = setInterval(() => {
+      refresh();
+      if (!shareChecked.current) loadShare();
+    }, 15_000);
     const tick = setInterval(() => setNow(Date.now()), 5_000);
     return () => {
       supabase.removeChannel(channel);
       clearInterval(poll);
       clearInterval(tick);
     };
-  }, [id, refresh, loadRoute]);
+  }, [id, refresh, loadRoute, loadShare, heard]);
 
   // A share is live only until its timer runs out or the ride ends (the server enforces the same).
   const rideOver = ride?.status === 'ended' || ride?.status === 'cancelled';
@@ -269,9 +306,11 @@ export default function RideMode() {
     return computeBubble(riders, settings, now);
   }, [joined, leaderIds, positions, settings, now]);
 
-  // Spoken alert once per rider each time they turn red (leader and tail gunner only).
+  // Spoken alert once per rider each time they turn red (leader and tail gunner only). Not while
+  // this phone has no service: everyone goes quiet then, and that is our signal, not theirs.
+  const meOffline = viewerOfflineSince(lastHeardAt, now) != null;
   useEffect(() => {
-    if (!watchesBubble) return;
+    if (!watchesBubble || meOffline) return;
     const red = new Set(bubble.alerts.map((a) => a.riderId));
     for (const a of bubble.alerts) {
       if (!announced.current.has(a.riderId) && a.message) {
@@ -280,7 +319,7 @@ export default function RideMode() {
       }
     }
     announced.current = red;
-  }, [bubble.alerts, watchesBubble]);
+  }, [bubble.alerts, watchesBubble, meOffline]);
 
   // Leader and tail gunner hear a Mechanical Issue the moment it's tapped, once per tap.
   const heardBreakdowns = useRef<Set<string> | null>(null);
@@ -299,12 +338,21 @@ export default function RideMode() {
     }
   }, [statuses, watchesBubble, me, nameOf]);
 
+  const offlineSince = viewerOfflineSince(lastHeardAt, now);
   const mapRiders: MapRider[] = joined.map((m) => {
     const p = positions[m.user_id];
     const b = bubble.riders.find((x) => x.riderId === m.user_id);
     const st = statuses[m.user_id];
     // A broken-down rider who isn't sharing still shows, at the spot they tapped Mechanical Issue.
     const spot = breakdownSpot(st, p) ?? p;
+    // A shared fix is aged by when it was taken. A breakdown spot from a rider who isn't sharing is
+    // aged by the tap and only ever "last seen": with no sharing there is no signal to lose.
+    let freshness = p ? riderFreshness(Date.parse(p.recorded_at), now, offlineSince) : null;
+    if (!p && spot && st) {
+      const f = riderFreshness(Date.parse(st.tapped_at), now, offlineSince);
+      freshness = f.state === 'live' ? f : { ...f, state: 'delayed', label: f.ago };
+    }
+    const live = freshness?.state === 'live';
     return {
       id: m.user_id,
       name: m.profiles?.display_name || 'Rider',
@@ -312,11 +360,12 @@ export default function RideMode() {
       status: b?.status ?? 'unknown',
       lat: spot?.lat ?? null,
       lng: spot?.lng ?? null,
-      stale: b?.reason === 'no_update',
+      freshness,
       breakdown: st?.status === 'mechanical',
       detail: [
-        p ? ago(p.recorded_at, now) : st?.status === 'mechanical' && spot ? `location from ${ago(st.tapped_at, now)}` : 'not sharing',
-        p?.speed_mps != null ? `${Math.round(p.speed_mps * 2.237)} mph` : null,
+        !freshness ? 'Not Sharing' : live ? 'Live' : freshness.state === 'lost' ? freshness.label : `Last Seen ${freshness.ago}`,
+        // A speed is only true while the fix is live.
+        live && p?.speed_mps != null ? `${Math.round(p.speed_mps * 2.237)} mph` : null,
         st ? STATUS_LABEL[st.status] : null,
       ].filter(Boolean).join(' · '),
     };
@@ -331,6 +380,8 @@ export default function RideMode() {
     });
     return tracker.place(route.route, riders);
   }, [route.route, joined, leaderIds, positions, me, myFix, tracker]);
+  // Riders on the route strip whose spot is only where they were last seen.
+  const lastSeenIds = mapRiders.filter((r) => r.id !== me && r.freshness && r.freshness.state !== 'live').map((r) => r.id);
   const routeSummary = route.route ? summarizeMe(route.route, placed, me) : null;
 
   // With a route, tell this rider whether their machine's range (from the garage) covers it.
@@ -486,11 +537,25 @@ export default function RideMode() {
                 {activeShare ? formatRemainingShort(shareLeft) : 'Off'}
               </Text>
             </Pressable>
-            <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
-              {bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}
-            </Text>
+            <Pressable
+              onPress={() => setRidersOpen(true)}
+              hitSlop={10}
+              accessibilityRole="button"
+              accessibilityLabel={`${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}. Tap to see every rider and when they last updated`}>
+              <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
+                {bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'} ›
+              </Text>
+            </Pressable>
           </View>
         </View>
+        {offlineSince != null ? (
+          <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
+            <View style={styles.offlineDot} />
+            <Text style={styles.offlineText}>
+              No Service. Riders Show Where They Were Last Seen{activeShare ? ', and Yours Sends When Service Returns' : ''}.
+            </Text>
+          </View>
+        ) : null}
         {activeShare && shareOpen ? (
           <View style={styles.shareBanner}>
             <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
@@ -531,6 +596,7 @@ export default function RideMode() {
             summary={routeSummary}
             nameOf={nameOf}
             offline={route.offline}
+            lastSeenIds={lastSeenIds}
             range={rangeNote}
             compact={!panelOpen}
           />
@@ -674,6 +740,16 @@ export default function RideMode() {
       </SafeAreaView>
       </Animated.View>
 
+      <RiderList
+        visible={ridersOpen}
+        riders={mapRiders}
+        meId={me}
+        offline={offlineSince != null}
+        onClose={() => setRidersOpen(false)}
+        onNavigate={navigateTo}
+        extra={(riderId) => (statuses[riderId]?.status === 'mechanical' ? <BreakdownBadge size={18} /> : null)}
+      />
+
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <View style={styles.sheetWrap}>
           <View style={styles.sheet}>
@@ -765,6 +841,13 @@ const styles = StyleSheet.create({
   handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },
   handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
   handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
+  offlineBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: Radius.control, paddingHorizontal: 14, paddingVertical: 10,
+    backgroundColor: 'rgba(10,22,38,0.94)', borderWidth: 1.5, borderColor: Colors.textSecondary, borderStyle: 'dashed',
+  },
+  // The same dashed grey as a rider who has lost service: dashed grey always means no signal.
+  offlineDot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2.5, borderColor: Colors.textSecondary, borderStyle: 'dashed' },
+  offlineText: { flex: 1, color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 18 },
   announcement: { borderRadius: Radius.control, padding: 12, backgroundColor: RideColors.yellow, gap: 2 },
   announcementLabel: { color: '#3A2600', fontFamily: font(700), fontSize: 13 },
   announcementText: { color: '#1A1100', fontFamily: font(800), fontSize: 19, lineHeight: 24 },
