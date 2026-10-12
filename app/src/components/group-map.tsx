@@ -4,11 +4,13 @@ import MapView, { Marker } from 'react-native-maps';
 
 import { Colors, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
 import { RiderPin } from './rider-pin';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
+import { WaypointPin } from './waypoint-blaze';
 
 export type { MapRider } from './group-map-types';
 
@@ -20,7 +22,7 @@ export type { MapRider } from './group-map-types';
  * passes for a live one.
  */
 export function GroupMap({
-  riders, regroup, route, meId, onPressRider, trail,
+  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap,
 }: {
   riders: MapRider[];
   /** This phone's rider: iOS already draws them as the location dot, so no second pin. */
@@ -31,6 +33,11 @@ export function GroupMap({
   onPressRider?: (id: string) => void;
   /** Topo and public trails layers (see useTrailMap); tapping a trail shows what it is. */
   trail?: TrailMap;
+  /** Waypoints this rider can see: the leader's shared ones (blue) and their own (white). */
+  waypoints?: Waypoint[];
+  onPressWaypoint?: (w: Waypoint) => void;
+  /** Press and hold the map: drop a waypoint there. */
+  onLongPressMap?: (p: LatLng) => void;
 }) {
   const map = useRef<MapView>(null);
   const fitted = useRef<'no' | 'riders' | 'route'>('no');
@@ -47,7 +54,8 @@ export function GroupMap({
   }, [riders, route]);
 
   return (
-    <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}>
+    <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}
+      onLongPress={onLongPressMap ? (e) => onLongPressMap({ lat: e.nativeEvent.coordinate.latitude, lng: e.nativeEvent.coordinate.longitude }) : undefined}>
       {trail ? <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} /> : null}
       {route && route.length > 1 ? (
         <>
@@ -55,6 +63,21 @@ export function GroupMap({
           <RouteEnds points={route} />
         </>
       ) : null}
+      {waypoints?.map((w) => (
+        <Marker
+          key={`w-${w.id}`}
+          coordinate={{ latitude: w.lat, longitude: w.lng }}
+          anchor={{ x: 0.5, y: 0.5 }}
+          onPress={(e) => {
+            // Keep the tap from also reaching the map (which looks up trails).
+            e.stopPropagation?.();
+            onPressWaypoint?.(w);
+          }}
+          accessibilityLabel={`Waypoint ${w.name}`}
+          zIndex={w.shared ? 3 : 2}>
+          <WaypointPin name={w.name} kind={w.kind} shared={w.shared} />
+        </Marker>
+      ))}
       {riders
         .filter((r) => r.lat != null && r.lng != null && r.id !== meId)
         .map((r) => (

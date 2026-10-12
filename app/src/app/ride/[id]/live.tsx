@@ -16,6 +16,8 @@ import { RouteStrip } from '@/components/route-strip';
 import { SendNote, type SendNoteValue } from '@/components/send-note';
 import { SharePicker } from '@/components/share-picker';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
+import { WaypointBlaze } from '@/components/waypoint-blaze';
+import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
@@ -31,8 +33,10 @@ import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, t
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
+import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
+import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
@@ -121,6 +125,17 @@ export default function RideMode() {
   const canRegroup = mine && ['organizer', 'co_organizer', 'leader'].includes(mine.role);
   const watchesBubble = mine && ['organizer', 'co_organizer', 'leader', 'sweep'].includes(mine.role);
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
+
+  // Waypoints: the leader's shared ones and this rider's own. Press and hold the map to drop one.
+  const wp = useRideWaypoints(id, !!mine);
+  const canShareWp = canShareWaypoints(me, mine, leaderIds);
+  const [wpTarget, setWpTarget] = useState<WaypointSheetTarget>(null);
+  const [panelH, setPanelH] = useState(0);
+  const openNewWaypoint = useCallback((at: { lat: number; lng: number }) => {
+    if (!wp.switchedOn) return Alert.alert('Not Switched On Yet', WAYPOINTS_NOT_SWITCHED_ON);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setWpTarget({ type: 'new', at });
+  }, [wp.switchedOn]);
 
   // Announcements: only the latest is shown, and it is read aloud so nobody has to look down.
   const chat = useRideChat(id, !!mine);
@@ -497,6 +512,17 @@ export default function RideMode() {
     }
   }
 
+  async function dropWaypointHere() {
+    let at: { lat: number; lng: number } | null = null;
+    try {
+      at = await currentPosition();
+    } catch {
+      at = myFix ?? (me && positions[me] ? { lat: positions[me].lat, lng: positions[me].lng } : null);
+    }
+    if (at) openNewWaypoint(at);
+    else Alert.alert('No Location Yet', 'Press and hold the map where you want the waypoint.');
+  }
+
   async function sendEmergency() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     let at: { lat: number; lng: number } | null = null;
@@ -548,7 +574,16 @@ export default function RideMode() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <GroupMap riders={mapRiders} meId={me} regroup={regroup} route={route.route?.points} trail={trail} />
+      <GroupMap
+        riders={mapRiders}
+        meId={me}
+        regroup={regroup}
+        route={route.route?.points}
+        trail={trail}
+        waypoints={wp.waypoints}
+        onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
+        onLongPressMap={mine ? openNewWaypoint : undefined}
+      />
       <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route.route?.points} ride={ride} />
 
       <SafeAreaView edges={['top']} style={styles.top}>
@@ -622,7 +657,22 @@ export default function RideMode() {
         ) : null}
       </SafeAreaView>
 
-      <Animated.View {...panelSwipe.panHandlers} style={[styles.bottomWrap, { transform: [{ translateY: panelDrag }] }]}>
+      {mine && panelH ? (
+        <Pressable
+          onPress={dropWaypointHere}
+          accessibilityRole="button"
+          accessibilityLabel="Add a waypoint at your location"
+          accessibilityHint="You can also press and hold the map to drop one anywhere"
+          style={({ pressed }) => [styles.wpFab, { bottom: panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
+          <WaypointBlaze kind="spot" shared={false} size={24} />
+          <Text style={styles.wpFabText}>Add Waypoint</Text>
+        </Pressable>
+      ) : null}
+
+      <Animated.View
+        {...panelSwipe.panHandlers}
+        onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}
+        style={[styles.bottomWrap, { transform: [{ translateY: panelDrag }] }]}>
       <SafeAreaView edges={['bottom']} style={styles.bottom}>
         {route.route ? (
           <RouteStrip
@@ -812,6 +862,18 @@ export default function RideMode() {
         extra={(riderId) => (statuses[riderId]?.status === 'mechanical' ? <BreakdownBadge size={18} /> : null)}
       />
 
+      <WaypointSheet
+        rideId={id}
+        target={wpTarget}
+        existing={wp.waypoints}
+        me={me}
+        canShare={canShareWp}
+        ownerName={nameOf}
+        onNavigate={navigateTo}
+        onChanged={wp.apply}
+        onClose={() => setWpTarget(null)}
+      />
+
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <View style={styles.sheetWrap}>
           <View style={styles.sheet}>
@@ -922,6 +984,11 @@ const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, marginTop: Spacing.two },
   statusBtn: { width: '31.5%', minHeight: 64, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center' },
   statusText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 20, textAlign: 'center' },
+  wpFab: {
+    position: 'absolute', right: 12, flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingLeft: 10, paddingRight: 14,
+    borderRadius: 22, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
+  },
+  wpFabText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
   sheet: { backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
   sheetTitle: { color: Colors.text },
