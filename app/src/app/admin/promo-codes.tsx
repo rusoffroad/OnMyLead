@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { View } from 'react-native';
 
 import {
-  AdminPage, DataTable, FilterChips, Panel, SearchBox, StatGrid, StatTile, StatusBadge, useConfirm, useToast,
+  AdminButton, AdminPage, DataTable, FilterChips, Panel, SearchBox, StatGrid, StatTile, StatusBadge, useConfirm, useToast,
 } from '@/components/admin';
 import { ExternalLink, Fact, LoadError, Notice, TextButton, Who } from '@/components/admin-insights';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Field } from '@/components/ui';
+import { Field } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
 import { ascEnumLabel, offerTypeLabel, PROMO_MANUAL_STEPS, subscriptionBadge } from '@/core/admin-analytics';
 import { fmtDate, fmtDateTime, fmtInt, fmtMoney, fmtPct } from '@/core/admin-format';
@@ -158,8 +158,8 @@ function Campaign({ c, onChanged }: { c: api.OfferCampaign; onChanged: () => voi
             <View style={{ flexGrow: 1, flexBasis: 160 }}><Field label="Good Until" placeholder="2027-01-31" value={expires} onChangeText={setExpires} /></View>
           </View>
           <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-            <Button title="Generate Codes" onPress={generate} loading={busy} style={{ paddingHorizontal: Spacing.four }} />
-            <Button title="Cancel" kind="ghost" onPress={() => setShowForm(false)} style={{ paddingHorizontal: Spacing.four }} />
+            <AdminButton title="Generate Codes" kind="primary" onPress={generate} loading={busy} />
+            <AdminButton title="Cancel" onPress={() => setShowForm(false)} />
           </View>
         </View>
       ) : (

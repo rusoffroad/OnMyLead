@@ -4,7 +4,7 @@
 //
 // Every call must come from a signed-in admin with an authenticator session: the caller's JWT is
 // passed to admin_analytics_ping(), which runs require_admin() in the database. Changes in App
-// Store Connect and code downloads are written to the audit log through admin_log().
+// Store Connect and code downloads are written to the audit log through admin_log_integration().
 //
 // POST { action, ...args } with the user's Authorization header. Actions:
 //   status                 which integrations are set up, and backend / website reachability
@@ -276,6 +276,11 @@ async function offerCodes() {
   return { app: { id: app.id, name: app.attributes?.name, bundleId: bundle }, subscriptions };
 }
 
+async function audit(db: SupabaseClient, action: string, targetType: string, targetId: string, after: unknown) {
+  const { error } = await db.rpc('admin_log_integration', { p_action: action, p_target_type: targetType, p_target_id: targetId, p_after: after });
+  if (error) throw new Problem('audit_failed', `Could not write the Audit Log: ${error.message}`, 500);
+}
+
 // deno-lint-ignore no-explicit-any
 async function generateCodes(db: SupabaseClient, input: any) {
   const offerCodeId = String(input.offerCodeId ?? '');
@@ -286,6 +291,8 @@ async function generateCodes(db: SupabaseClient, input: any) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(expirationDate) || new Date(`${expirationDate}T00:00:00Z`) <= new Date()) {
     throw new Problem('bad_input', 'expirationDate must be a future date (YYYY-MM-DD)');
   }
+  // Logged before Apple is asked: no audit entry, no codes.
+  await audit(db, 'asc.generate_offer_codes', 'offer_code', offerCodeId, { numberOfCodes, expirationDate });
   const made = await asc('/v1/subscriptionOfferCodeOneTimeUseCodes', {
     method: 'POST',
     body: JSON.stringify({
@@ -296,10 +303,6 @@ async function generateCodes(db: SupabaseClient, input: any) {
       },
     }),
   });
-  await db.rpc('admin_log', {
-    p_action: 'asc_generate_offer_codes', p_target_type: 'offer_code', p_target_id: offerCodeId,
-    p_before: null, p_after: { batch: made.data?.id, numberOfCodes, expirationDate },
-  });
   return { id: made.data?.id, numberOfCodes, expirationDate };
 }
 
@@ -307,9 +310,8 @@ async function generateCodes(db: SupabaseClient, input: any) {
 async function codeValues(db: SupabaseClient, input: any) {
   const id = String(input.oneTimeUseCodesId ?? '');
   if (!/^[\w-]+$/.test(id)) throw new Problem('bad_input', 'oneTimeUseCodesId is required');
+  // Logged before the codes leave the server: no audit entry, no codes.
+  await audit(db, 'asc.download_offer_codes', 'offer_code_batch', id, null);
   const csv = await asc(`/v1/subscriptionOfferCodeOneTimeUseCodes/${id}/values`, { headers: { Accept: 'text/csv' } }, 'text');
-  await db.rpc('admin_log', {
-    p_action: 'asc_download_offer_codes', p_target_type: 'offer_code_batch', p_target_id: id, p_before: null, p_after: null,
-  });
   return { id, csv };
 }

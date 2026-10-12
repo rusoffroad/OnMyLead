@@ -6,8 +6,9 @@
 --   20261018300000_admin_dashboard.sql   admin_log(), admin_timeseries() (signups, rides_created,
 --                                        active_users, trials_started, ride_joins)
 -- Every function starts with require_admin() (admin + authenticator session), never returns a
--- position, track or meeting point, and never writes Apple's billing state. The only write here is
--- admin_log_export(), which records each CSV download through log_admin_action().
+-- position, track or meeting point, and never writes Apple's billing state. The only writes here are
+-- audit log entries: admin_log_export() for each CSV download and admin_log_integration() for
+-- App Store Connect actions, both through log_admin_action().
 --
 -- Money comes from Apple's signed notifications as the App Store functions store them
 -- (/mnt/project-files/onmylead/pro/app-store-events.md): each charged transaction (SUBSCRIBED,
@@ -525,6 +526,19 @@ begin
 end;
 $$;
 
+-- What the admin-integrations edge function changed or handed out in App Store Connect,
+-- recorded with the admin's own session before the result is returned.
+create or replace function admin_log_integration(p_action text, p_target_type text, p_target_id text, p_after jsonb)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  perform require_admin();
+  if p_action not in ('asc.generate_offer_codes', 'asc.download_offer_codes') then
+    raise exception 'unknown action %', p_action;
+  end if;
+  perform log_admin_action(p_action, p_target_type, p_target_id, null, p_after);
+end;
+$$;
+
 -- ---------------------------------------------------------------------------
 -- Grants: callable by signed-in users, and each one refuses anyone but an admin with an
 -- authenticator session. Helpers stay private.
@@ -549,11 +563,12 @@ revoke all on function admin_promo_performance(text) from public, anon;
 revoke all on function admin_promo_redemptions(text, text, int) from public, anon;
 revoke all on function admin_health() from public, anon;
 revoke all on function admin_log_export(text, timestamptz, timestamptz, int) from public, anon;
+revoke all on function admin_log_integration(text, text, text, jsonb) from public, anon;
 grant execute on function admin_analytics_ping(), admin_subscription_summary(text),
   admin_subscriptions(text, text, text, int, int), admin_subscription_history(text),
   admin_subscription_errors(int, int), admin_comp_grants(boolean), admin_find_people(text),
   admin_revenue_series(timestamptz, timestamptz, text, text), admin_analytics_summary(timestamptz, timestamptz),
   admin_analytics_series(text, timestamptz, timestamptz, text), admin_trial_cohorts(timestamptz, timestamptz, text),
   admin_promo_performance(text), admin_promo_redemptions(text, text, int), admin_health(),
-  admin_log_export(text, timestamptz, timestamptz, int)
+  admin_log_export(text, timestamptz, timestamptz, int), admin_log_integration(text, text, text, jsonb)
   to authenticated;

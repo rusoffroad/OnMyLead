@@ -2,12 +2,12 @@ import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 
 import {
-  AdminPage, DataTable, DateRangePicker, FilterChips, Pager, Panel, rangeFor, SearchBox, SeriesColors, StatGrid,
+  AdminButton, AdminPage, DataTable, DateRangePicker, FilterChips, Pager, Panel, rangeFor, SearchBox, SeriesColors, StatGrid,
   StatTile, StatusBadge, TimeSeriesChart, useConfirm, useToast, type Column, type DateRange,
 } from '@/components/admin';
 import { Fact, LoadError, Notice, PlanBar, TextButton, Who } from '@/components/admin-insights';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Choice, Field } from '@/components/ui';
+import { Choice, Field } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
 import { offerTypeLabel, planLabel, revenueByCurrency, subscriptionBadge } from '@/core/admin-analytics';
 import { fmtDate, fmtDateTime, fmtInt, fmtMoney } from '@/core/admin-format';
@@ -292,7 +292,7 @@ function CompPanel() {
         )}
         <Choice label="For" options={COMP_LENGTHS.map((l) => ({ value: l.value, label: l.label }))} value={length} onChange={setLength} />
         <Field label="Note" placeholder="Why, for the Audit Log" value={note} onChangeText={setNote} />
-        <Button title="Grant Pro" onPress={grant} disabled={!person} loading={busy} style={{ alignSelf: 'flex-start', paddingHorizontal: Spacing.four }} />
+        <AdminButton title="Grant Pro" kind="primary" onPress={grant} disabled={!person} loading={busy} style={{ alignSelf: 'flex-start' }} />
       </View>
     </Panel>
   );

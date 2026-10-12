@@ -128,12 +128,13 @@ export const revenueSeries = (from: string, to: string, bucket: Bucket, env: Env
 
 export const analyticsSummary = (from: string, to: string) => adminRpc<AnalyticsSummary>('admin_analytics_summary', { p_from: from, p_to: to });
 
-/** Shell metrics come from admin_timeseries (shell migration); the rest from admin_analytics_series. */
-export function series(metric: ShellMetric | ExtraMetric, from: string, to: string, bucket: Bucket) {
+/** Shell metrics come from admin_timeseries (shell migration, rows {t, v}); the rest from admin_analytics_series. */
+export async function series(metric: ShellMetric | ExtraMetric, from: string, to: string, bucket: Bucket): Promise<SeriesPoint[]> {
   const shell: string[] = ['signups', 'rides_created', 'active_users', 'trials_started', 'ride_joins'];
-  return adminRpc<SeriesPoint[]>(shell.includes(metric) ? 'admin_timeseries' : 'admin_analytics_series', {
-    p_metric: metric, p_from: from, p_to: to, p_bucket: bucket,
-  });
+  const args = { p_metric: metric, p_from: from, p_to: to, p_bucket: bucket };
+  if (!shell.includes(metric)) return adminRpc<SeriesPoint[]>('admin_analytics_series', args);
+  const rows = await adminRpc<{ t: string; v: number }[]>('admin_timeseries', args);
+  return (rows ?? []).map((r) => ({ bucket_start: r.t, value: Number(r.v) || 0 }));
 }
 
 export const trialCohorts = (from: string, to: string, bucket: Bucket = 'week') =>

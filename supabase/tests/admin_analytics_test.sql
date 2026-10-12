@@ -82,6 +82,7 @@ select expect_refused($q$select admin_subscription_summary()$q$, 'a rider read t
 select expect_refused($q$select * from admin_subscriptions()$q$, 'a rider listed subscriptions');
 select expect_refused($q$select admin_health()$q$, 'a rider read app health');
 select expect_refused($q$select admin_log_export('revenue', now() - interval '1 day', now(), 1)$q$, 'a rider logged an export');
+select expect_refused($q$select admin_log_integration('asc.download_offer_codes', 'offer_code_batch', 'b1', null)$q$, 'a rider wrote the audit log');
 do $$ begin
   -- The helpers run as the caller, so a rider who reaches them still sees no one's purchases.
   if (select count(*) from admin_charges('Production')) <> 0 or (select count(*) from admin_offer_redemptions('Production')) <> 0 then
@@ -152,7 +153,9 @@ begin
   if (admin_health()->'push'->>'tokens') is null then raise exception 'FAIL: health'; end if;
 
   perform admin_log_export('revenue', now() - interval '30 days', now(), 30);
+  perform admin_log_integration('asc.download_offer_codes', 'offer_code_batch', 'b1', null);
 end $$;
+select expect_refused($q$select admin_log_integration('user.delete', 'user', 'x', null)$q$, 'the integration log wrote an unrelated action');
 select expect_refused($q$select admin_log_export('everyone_locations', now() - interval '1 day', now(), 1)$q$, 'an unknown export was logged');
 select expect_refused($q$select * from admin_analytics_series('positions', now() - interval '1 day', now())$q$, 'an unknown series was read');
 reset role;
@@ -160,6 +163,9 @@ reset role;
 do $$ begin
   if (select count(*) from admin_audit_log where action = 'export_csv' and target_id = 'revenue') <> 1 then
     raise exception 'FAIL: export not audit-logged';
+  end if;
+  if (select count(*) from admin_audit_log where action = 'asc.download_offer_codes' and actor_id = '00000000-0000-0000-0000-0000000000ad') <> 1 then
+    raise exception 'FAIL: code download not audit-logged';
   end if;
 end $$;
 

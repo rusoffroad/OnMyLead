@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { AdminPage, DateRangePicker, FilterChips, Panel, rangeFor, useToast, type DateRange } from '@/components/admin';
+import { AdminButton, AdminPage, DateRangePicker, FilterChips, Panel, rangeFor, useToast, type DateRange } from '@/components/admin';
 import { ThemedText } from '@/components/themed-text';
-import { Button } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
 import { EXPORTS, type ExportKind } from '@/core/admin-analytics';
 import { fmtDate } from '@/core/admin-format';
@@ -46,7 +45,7 @@ export default function ExportsPage() {
               <ThemedText type="heading">{e.title}</ThemedText>
               <ThemedText type="small" themeColor="textSecondary">{e.description}</ThemedText>
             </View>
-            <Button title="Download CSV" kind="secondary" loading={busy === e.kind} disabled={!!busy && busy !== e.kind} onPress={() => download(e.kind)} />
+            <AdminButton title="Download CSV" loading={busy === e.kind} disabled={!!busy && busy !== e.kind} onPress={() => download(e.kind)} />
           </View>
         ))}
       </View>
