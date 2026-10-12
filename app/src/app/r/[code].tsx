@@ -6,14 +6,16 @@ import { FuelCheck } from '@/components/fuel-check';
 import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { RideSummary } from '@/components/ride-summary';
+import { RouteSketch } from '@/components/route-sketch';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, RideColors, Spacing } from '@/constants/theme';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { counts } from '@/core/joining';
+import { miles, type RideRoute } from '@/core/route';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
-  approveMember, checkIn, getMembers, getPrivateDetails, getRide, joinRide, leaveRide, setMemberRole, setRideStatus, tripForRide,
+  approveMember, checkIn, getMembers, getPrivateDetails, getRide, getRideRoute, joinRide, leaveRide, setMemberRole, setRideStatus, tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { openStore } from '@/lib/rus';
@@ -35,6 +37,7 @@ export default function RidePage() {
   const [ride, setRide] = useState<Ride | null | undefined>(undefined);
   const [details, setDetails] = useState<RidePrivateDetails | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
+  const [route, setRoute] = useState<RideRoute | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const isJoined = members.some((m) => m.user_id === me && m.status === 'joined');
@@ -48,6 +51,8 @@ export default function RidePage() {
         const [d, m] = await Promise.all([getPrivateDetails(r.id), getMembers(r.id)]);
         setDetails(d);
         setMembers(m);
+        // The route is part of the private details, so only riders on the ride get one back.
+        if (d) setRoute((await getRideRoute(r.id)).route);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load the ride.');
@@ -130,6 +135,32 @@ export default function RidePage() {
           <Info key={label} label={label} value={value} first={i === 0} />
         ))}
       </Card>
+
+      {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
+        <Card>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <ThemedText type="heading">{route?.name || 'The route'}</ThemedText>
+            {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{miles(route.lengthM)} mi</ThemedText> : null}
+          </View>
+          {route ? (
+            <>
+              <RouteSketch points={route.points} />
+              <ThemedText type="small" themeColor="textSecondary">
+                {ride.status === 'live'
+                  ? 'Open Ride Mode to see where you and everyone else are on it.'
+                  : 'Saved on your phone once you’ve opened it, so it’s there without signal.'}
+              </ThemedText>
+            </>
+          ) : (
+            <ThemedText themeColor="textSecondary">
+              Draw the trail on the map or import a GPX file. Riders see it in Ride Mode with everyone placed along it.
+            </ThemedText>
+          )}
+          {isManager && ride.status !== 'ended' && ride.status !== 'cancelled' ? (
+            <Button title={route ? 'Edit route' : 'Build the route'} kind={route ? 'secondary' : 'primary'} onPress={() => router.push(`/ride/${ride.id}/route`)} />
+          ) : null}
+        </Card>
+      ) : null}
 
       {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && (ride.status === 'scheduled' || ride.status === 'live') ? (
         <FuelCheck ride={ride} mine={mine} onChanged={load} />

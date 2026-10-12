@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   AREAS, areaLabel, buildCsv, buildSheetText, buildTotals, centsToInput, csvCell, exportFileBase, formatDollars,
-  isPlausibleVin, parseAmount, parseDollars, parseVpic, vehicleRange, vehicleTitle, type GarageItem, type GarageVehicle,
+  isPlausibleVin, parseAmount, parseDollars, parseVpic, rideVehicle, vehicleRange, vehicleTitle, type GarageItem, type GarageVehicle,
 } from '../garage';
 
 const rzr: GarageVehicle = {
@@ -180,5 +180,19 @@ describe('vin decode', () => {
     expect(parseVpic({ Results: [{ ModelYear: '', Make: '', Model: '' }] })).toBeNull();
     expect(parseVpic(null)).toBeNull();
     expect(parseVpic({})).toBeNull();
+  });
+});
+
+describe('which machine a ride checks range against', () => {
+  const v = (id: string, tank: number | null, mpg: number | null) => ({ id, tank_gallons: tank, mpg });
+  it('uses the machine picked for the ride', () => {
+    expect(rideVehicle([v('a', 20, 15), v('b', 10, 30)], 'b')).toEqual({ vehicle: v('b', 10, 30), picked: true });
+  });
+  it('falls back to the only machine with a known range', () => {
+    expect(rideVehicle([v('a', null, 15), v('b', 10, 30)], null)).toEqual({ vehicle: v('b', 10, 30), picked: false });
+  });
+  it('does not guess between two machines', () => {
+    expect(rideVehicle([v('a', 20, 15), v('b', 10, 30)], null)).toBeNull();
+    expect(rideVehicle([], undefined)).toBeNull();
   });
 });
