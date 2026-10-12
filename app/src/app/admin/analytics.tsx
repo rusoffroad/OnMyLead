@@ -38,12 +38,12 @@ export default function AnalyticsPage() {
           <StatTile label="New Riders" value={fmtInt(s.signups)} hint={`${fmtInt(s.users_total)} accounts in all`} />
           <StatTile label="Active Riders" value={fmtInt(s.active_users)} hint="Opened the app or did something" />
           <StatTile label="Rides Created" value={fmtInt(s.rides_created)} hint={`${fmtInt(s.rides_cancelled)} cancelled`} />
-          <StatTile label="Rides Completed" value={fmtInt(s.rides_completed)} hint={`${fmtInt(s.paid_starts)} new paid subscriptions`} />
+          <StatTile label="Rides Completed" value={fmtInt(s.rides_completed)} />
           <StatTile label="Riders Joining Rides" value={fmtInt(s.ride_joins)} hint={`${fmtInt(s.messages)} chat messages`} />
           <StatTile
             label="Trial to Paid"
             value={fmtPct(ratio(s.trials_converted, s.trials_started))}
-            hint={`${fmtInt(s.trials_converted)} of ${fmtInt(s.trials_started)} trials have paid`}
+            hint={`${fmtInt(s.trials_converted)} of ${fmtInt(s.trials_started)} trials; ${fmtInt(s.paid_starts)} new paid`}
             tone="pro"
           />
         </StatGrid>
