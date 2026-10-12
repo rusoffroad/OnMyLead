@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors } from '@/constants/theme';
+import type { LatLng } from '@/core/geo';
+import type { Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
 import { BreakdownBadge } from './rider-status-badge';
@@ -21,6 +23,9 @@ export function GroupMap({
   regroup: { lat: number; lng: number; label: string | null } | null;
   onPressRider?: (id: string) => void;
   trail?: TrailMap;
+  waypoints?: Waypoint[];
+  onPressWaypoint?: (w: Waypoint) => void;
+  onLongPressMap?: (p: LatLng) => void;
 }) {
   if (route && route.length > 1) {
     const dots = riders

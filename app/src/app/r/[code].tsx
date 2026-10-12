@@ -11,6 +11,7 @@ import { RideRoster } from '@/components/ride-roster';
 import { RideSummary } from '@/components/ride-summary';
 import { RouteSketch } from '@/components/route-sketch';
 import { ThemedText } from '@/components/themed-text';
+import { WaypointRow } from '@/components/waypoint-row';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
@@ -18,7 +19,9 @@ import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { leadersToFollow } from '@/core/groups';
 import { counts } from '@/core/joining';
 import { miles, type RideRoute } from '@/core/route';
+import { WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useRideChat } from '@/hooks/use-ride-chat';
+import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import {
   approveMember, cancelRide, checkIn, deleteRide, getMembers, getPrivateDetails, getRide, getRideRoute, joinRide, leaveRide, setRideStatus,
   myTrips, tripForRide,
@@ -58,6 +61,7 @@ export default function RidePage() {
   const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
   const isJoined = members.some((m) => m.user_id === me && m.status === 'joined');
   const chat = useRideChat(ride?.id, isJoined);
+  const waypoints = useRideWaypoints(ride?.id, isJoined);
 
   const load = useCallback(async () => {
     try {
@@ -201,7 +205,10 @@ export default function RidePage() {
           </View>
           {route ? (
             <>
-              <RouteSketch points={route.points} />
+              <RouteSketch
+                points={route.points}
+                dots={waypoints.waypoints.map((w) => ({ id: w.id, lat: w.lat, lng: w.lng, color: w.shared ? Colors.sky : Colors.text, diamond: true }))}
+              />
               <ThemedText type="small" themeColor="textSecondary">
                 {ride.status === 'live'
                   ? 'Open Ride Mode to see where you and everyone else are on it.'
@@ -224,6 +231,39 @@ export default function RidePage() {
               onPress={() => router.push(`/ride/${ride.id}/route`)}
             />
           ) : null}
+        </Card>
+      ) : null}
+
+      {isJoined && !cancelled ? (
+        <Card>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+            <ThemedText type="heading">Waypoints</ThemedText>
+            {waypoints.waypoints.length ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{waypoints.waypoints.length}</ThemedText> : null}
+          </View>
+          {!waypoints.switchedOn ? (
+            <ThemedText themeColor="textSecondary">{WAYPOINTS_NOT_SWITCHED_ON}</ThemedText>
+          ) : waypoints.waypoints.length ? (
+            <View>
+              {waypoints.waypoints.slice(0, 3).map((w, i) => (
+                <WaypointRow key={w.id} waypoint={w} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
+              ))}
+              {waypoints.waypoints.length > 3 ? (
+                <ThemedText type="small" themeColor="textSecondary">and {waypoints.waypoints.length - 3} more</ThemedText>
+              ) : null}
+            </View>
+          ) : (
+            <ThemedText themeColor="textSecondary">
+              {leaderIds.includes(me ?? '') || isManager
+                ? 'Mark camp, fuel, a viewpoint or a hazard. Share each one with the whole ride, or keep it to yourself.'
+                : 'Mark camp, fuel, a viewpoint or a hazard. Your waypoints are only for you; the leader’s shared ones show here too.'}
+            </ThemedText>
+          )}
+          <Button
+            title={waypoints.waypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
+            kind={waypoints.waypoints.length ? 'secondary' : 'primary'}
+            disabled={!waypoints.switchedOn}
+            onPress={() => router.push(`/ride/${ride.id}/waypoints`)}
+          />
         </Card>
       ) : null}
 

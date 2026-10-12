@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the migrations, then the privacy, riding group, Pro, report, admin analytics, admin and clear/resolve tests, against a throwaway local Postgres database.
+# Runs the migrations, then the privacy, riding group, Pro, report, admin analytics, admin, clear/resolve and waypoint tests, against a throwaway local Postgres database.
 # Usage: PGHOST=... PGPORT=... PGUSER=postgres ./supabase/tests/run_local.sh
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -14,5 +14,6 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/reports_test.sql" \
   -f "$here/admin_analytics_test.sql" \
   -f "$here/admin_test.sql" \
-  -f "$here/messages_test.sql"
+  -f "$here/messages_test.sql" \
+  -f "$here/waypoints_test.sql"
 bash "$here/concurrency_test.sh" "$db"
