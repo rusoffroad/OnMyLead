@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { DirectionsCard } from '@/components/directions';
 import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
+import { GetTheApp } from '@/components/get-the-app';
 import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { ReportSheet } from '@/components/report-sheet';
@@ -161,6 +162,7 @@ export default function RidePage() {
 
   return (
     <Screen>
+      <GetTheApp inviteCode={ride.invite_code} />
       <View style={{ gap: Spacing.two }}>
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           {ride.status === 'live' ? <Tag label="Live Now" color={Colors.accent} solid /> : null}

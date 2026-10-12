@@ -56,6 +56,9 @@ for _ in $(seq 1 20); do
   sleep 2
 done
 [ -n "$ok" ] || fail "the web server isn't answering. Send Claude the output of: cd ~/onmylead/deploy && sudo docker compose logs --tail 40"
+# Ride QR codes and links open the iPhone app only while Apple can read this file.
+$SUDO docker compose exec -T web wget -q -O - http://127.0.0.1:8080/.well-known/apple-app-site-association 2>/dev/null | grep -q applinks \
+  || echo "Warning: the app link file isn't being served, so ride links will open the website instead of the app."
 $SUDO docker compose ps --status running --services | grep -qx cloudflared \
   || fail "the tunnel isn't running. Send Claude the output of: cd ~/onmylead/deploy && sudo docker compose logs --tail 40 cloudflared"
 
