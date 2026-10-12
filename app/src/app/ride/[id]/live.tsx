@@ -69,6 +69,16 @@ const STATUSES: { kind: RiderStatusKind; label: string; urgent?: boolean }[] = [
 ];
 const STATUS_LABEL = Object.fromEntries(STATUSES.map((s) => [s.kind, s.label])) as Record<RiderStatusKind, string>;
 
+// Room the open panel needs below the banners to show the full route strip (with and without
+// alert cards); with less, the strip shows just the line so the buttons still fit.
+const FULL_STRIP_ROOM = 640;
+const FULL_STRIP_ROOM_WITH_ALERTS = 720;
+// The alert cards and the top banners scroll rather than shrink below these.
+const ALERTS_MIN = 72;
+const ALERTS_MAX = 180;
+const BANNERS_MIN = 76;
+const WP_FAB_H = 44;
+
 const ago = (iso: string | null | undefined, now: number) => {
   if (!iso) return 'no location yet';
   const s = Math.max(0, Math.round((now - Date.parse(iso)) / 1000));
@@ -96,7 +106,20 @@ export default function RideMode() {
   useKeepAwake();
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
-  const winH = useWindowDimensions().height;
+  const { height: screenH } = useWindowDimensions();
+  // The top banners (no service, sharing, regroup, announcement) and the bottom panel share the
+  // screen and never cover each other. When room is short the route strip goes compact, then the
+  // alert cards scroll, then the banners scroll; the status buttons always stay whole.
+  const [topRowBottom, setTopRowBottom] = useState(0);
+  const [bannersH, setBannersH] = useState(0);
+  const [alertsH, setAlertsH] = useState(0);
+  const [stripH, setStripH] = useState(0);
+  // The compact strip's last measured height, to tell whether it fits again once it is hidden.
+  const [compactStripH, setCompactStripH] = useState(90);
+  // Gone from the panel, the strip takes no room. (A stable ref, so it isn't detached each render.)
+  const stripRef = useCallback((v: View | null) => {
+    if (!v) setStripH(0);
+  }, []);
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useSession();
   const me = session?.user.id;
@@ -457,6 +480,28 @@ export default function RideMode() {
   const shownSeparations = panelOpen ? separations : [];
   const foldedCount = helpCalls.length - shownHelpCalls.length + separations.length - shownSeparations.length;
 
+  const alertsShown = shownSeparations.length + shownHelpCalls.length > 0;
+  const hasBanners = offlineSince != null || !!(activeShare && shareOpen) || !!regroup || !!announcement;
+  // Each value below comes from measurements that don't depend on it, so nothing feeds back.
+  const bannersBottom = topRowBottom + (hasBanners ? 6 + bannersH : 0);
+  const roomBelowBanners = screenH - bannersBottom - Spacing.two;
+  const panelRest = panelH - (alertsShown ? alertsH : 0);
+  const stripCompact = !panelOpen || roomBelowBanners < (alertsShown ? FULL_STRIP_ROOM_WITH_ALERTS : FULL_STRIP_ROOM);
+  // On a short screen with banners up, the open panel drops the strip (it comes back folded) so
+  // the alerts and buttons fit under the banners.
+  const panelSpace = screenH - Spacing.two - topRowBottom - (hasBanners ? 6 + Math.min(bannersH, BANNERS_MIN) : 0);
+  const stripHidden = panelOpen && !!panelH &&
+    panelSpace < panelRest - stripH + (alertsShown ? ALERTS_MIN : 0) + compactStripH;
+  const stripShown = !!route.route && !stripHidden;
+  const alertsMax = panelH ? Math.min(ALERTS_MAX, Math.max(ALERTS_MIN, roomBelowBanners - panelRest)) : ALERTS_MAX;
+  const bannersMax = panelH
+    ? Math.max(BANNERS_MIN, screenH - Spacing.two - panelRest - (alertsShown ? ALERTS_MIN : 0) - topRowBottom - 6)
+    : undefined;
+  const shownBannersBottom = topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
+  // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
+  // and hold the map still drops one).
+  const wpFabFits = screenH - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
+
   async function beginShare(minutes: number | null) {
     setBusy(true);
     try {
@@ -604,7 +649,7 @@ export default function RideMode() {
       <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route.route?.points} ride={ride} />
 
       <SafeAreaView edges={['top']} style={styles.top}>
-        <View style={styles.topRow}>
+        <View style={styles.topRow} onLayout={(e) => setTopRowBottom(Math.round(e.nativeEvent.layout.y + e.nativeEvent.layout.height))}>
           <Pressable onPress={() => router.back()} hitSlop={16} accessibilityLabel="Back" style={{ flexShrink: 1 }}>
             <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
           </Pressable>
@@ -636,45 +681,53 @@ export default function RideMode() {
             </Pressable>
           </View>
         </View>
-        {offlineSince != null ? (
-          <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
-            <View style={styles.offlineDot} />
-            <Text style={styles.offlineText}>
-              No Service. Riders Show Where They Were Last Seen{activeShare ? ', and Yours Sends When Service Returns' : ''}.
-            </Text>
-          </View>
-        ) : null}
-        {activeShare && shareOpen ? (
-          <View style={styles.shareBanner}>
-            <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
-              Sharing, {formatRemaining(shareLeft)}
-            </Text>
-            <Pressable onPress={endShare} hitSlop={8} accessibilityRole="button" style={styles.shareAction}>
-              <Text style={styles.shareActionText}>Stop</Text>
+        {hasBanners ? (
+          <ScrollView
+            style={{ maxHeight: bannersMax }}
+            contentContainerStyle={{ gap: 6 }}
+            onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
+            showsVerticalScrollIndicator={false}>
+          {offlineSince != null ? (
+            <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
+              <View style={styles.offlineDot} />
+              <Text style={styles.offlineText}>
+                No Service. Riders Show Where They Were Last Seen{activeShare ? ', and Yours Sends When Service Returns' : ''}.
+              </Text>
+            </View>
+          ) : null}
+          {activeShare && shareOpen ? (
+            <View style={styles.shareBanner}>
+              <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
+                Sharing, {formatRemaining(shareLeft)}
+              </Text>
+              <Pressable onPress={endShare} hitSlop={8} accessibilityRole="button" style={styles.shareAction}>
+                <Text style={styles.shareActionText}>Stop</Text>
+              </Pressable>
+              <Pressable onPress={toggleShareOpen} hitSlop={8} accessibilityRole="button" accessibilityLabel="Hide sharing details" style={styles.shareAction}>
+                <Text style={styles.shareActionText}>Hide</Text>
+              </Pressable>
+            </View>
+          ) : null}
+          {regroup ? (
+            <Pressable onPress={() => navigateTo(regroup.lat, regroup.lng, 'the Regroup Point')} style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}>
+              <Text style={[styles.shareText, { color: '#1A1100' }]}>Regroup point set. Tap to navigate</Text>
             </Pressable>
-            <Pressable onPress={toggleShareOpen} hitSlop={8} accessibilityRole="button" accessibilityLabel="Hide sharing details" style={styles.shareAction}>
-              <Text style={styles.shareActionText}>Hide</Text>
+          ) : null}
+          {announcement ? (
+            <Pressable
+              onPress={() => Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
+              accessibilityRole="button"
+              accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
+              style={styles.announcement}>
+              <Text style={styles.announcementLabel}>Announcement from {nameOf(announcement.user_id)}. Tap to hear it again</Text>
+              <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
             </Pressable>
-          </View>
-        ) : null}
-        {regroup ? (
-          <Pressable onPress={() => navigateTo(regroup.lat, regroup.lng, 'the Regroup Point')} style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}>
-            <Text style={[styles.shareText, { color: '#1A1100' }]}>Regroup point set. Tap to navigate</Text>
-          </Pressable>
-        ) : null}
-        {announcement ? (
-          <Pressable
-            onPress={() => Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
-            accessibilityRole="button"
-            accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
-            style={styles.announcement}>
-            <Text style={styles.announcementLabel}>Announcement from {nameOf(announcement.user_id)}. Tap to hear it again</Text>
-            <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
-          </Pressable>
+          ) : null}
+          </ScrollView>
         ) : null}
       </SafeAreaView>
 
-      {panelH && directionRows.length && panelH + 70 < winH - insets.top - 140 ? (
+      {panelH && directionRows.length && wpFabFits ? (
         <Pressable
           onPress={() => setDirectionsOpen(true)}
           accessibilityRole="button"
@@ -685,7 +738,7 @@ export default function RideMode() {
         </Pressable>
       ) : null}
 
-      {mine && panelH ? (
+      {mine && panelH && wpFabFits ? (
         <Pressable
           onPress={dropWaypointHere}
           accessibilityRole="button"
@@ -702,7 +755,14 @@ export default function RideMode() {
         onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}
         style={[styles.bottomWrap, { transform: [{ translateY: panelDrag }] }]}>
       <SafeAreaView edges={['bottom']} style={styles.bottom}>
-        {route.route ? (
+        {route.route && stripShown ? (
+          <View
+            ref={stripRef}
+            onLayout={(e) => {
+              const h = Math.round(e.nativeEvent.layout.height);
+              setStripH(h);
+              if (stripCompact) setCompactStripH(h);
+            }}>
           <RouteStrip
             lengthM={route.route.lengthM}
             riders={placed}
@@ -712,8 +772,9 @@ export default function RideMode() {
             offline={route.offline}
             lastSeenIds={lastSeenIds}
             range={rangeNote}
-            compact={!panelOpen}
+            compact={stripCompact}
           />
+          </View>
         ) : null}
         <Pressable
           onPress={() => setPanelOpen(!panelOpen)}
@@ -729,8 +790,11 @@ export default function RideMode() {
 
         {note ? <SendNote note={note} onRetry={retryOutbox} onDismiss={() => setNote(null)} /> : null}
 
-        {shownSeparations.length || shownHelpCalls.length ? (
-          <ScrollView style={{ maxHeight: 180 }} contentContainerStyle={{ gap: Spacing.two }}>
+        {alertsShown ? (
+          <ScrollView
+            style={{ maxHeight: alertsMax }}
+            onLayout={(e) => setAlertsH(Math.round(e.nativeEvent.layout.height))}
+            contentContainerStyle={{ gap: Spacing.two }}>
             {shownSeparations.map((r) => {
               const p = positions[r.riderId];
               return (
