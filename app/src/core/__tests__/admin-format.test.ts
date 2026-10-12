@@ -58,7 +58,8 @@ describe('ranges', () => {
 describe('actionLabel', () => {
   it('names known and unknown actions in Title Case', () => {
     expect(actionLabel('user.suspend')).toBe('Suspended Account');
-    expect(actionLabel('trial.extend')).toBe('Trial Extend');
+    expect(actionLabel('trial.extend')).toBe('Extended Trial');
+    expect(actionLabel('promo.create')).toBe('Promo Create');
     expect(actionLabel('setting.set_trial_days')).toBe('Setting Set Trial Days');
   });
 });
