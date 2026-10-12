@@ -86,7 +86,7 @@ export default function PickArea() {
           <Pressable onPress={() => router.back()} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back">
             <Text style={styles.topText}>‹ Offline Maps</Text>
           </Pressable>
-          <Text style={[styles.topText, { color: Colors.textSecondary }]}>Pick An Area</Text>
+          <Text style={[styles.topText, { color: Colors.textSecondary }]}>Pick an Area</Text>
         </View>
       </SafeAreaView>
 
@@ -113,7 +113,7 @@ export default function PickArea() {
           ) : !choices.length ? (
             <Text style={styles.estimateSub}>Pick at least one map to download.</Text>
           ) : tooBig ? (
-            <Text style={[styles.estimateSub, { color: Colors.danger }]}>Too Big For One Download. Zoom In A Little.</Text>
+            <Text style={[styles.estimateSub, { color: Colors.danger }]}>Too big for one download. Zoom in a little.</Text>
           ) : plan ? (
             <>
               <Text style={styles.estimateBig}>About {formatBytes(plan.bytes)}</Text>

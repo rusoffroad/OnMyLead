@@ -60,7 +60,7 @@ export default function VehiclePage() {
     return (
       <Screen>
         <ThemedText>That machine is not in your garage.</ThemedText>
-        <Button title="Back to garage" kind="secondary" onPress={() => router.replace('/garage')} />
+        <Button title="Back to Garage" kind="secondary" onPress={() => router.replace('/garage')} />
       </Screen>
     );
   }
@@ -128,13 +128,13 @@ export default function VehiclePage() {
       </View>
 
       <Card>
-        <ThemedText type="heading">Fuel range</ThemedText>
+        <ThemedText type="heading">Fuel Range</ThemedText>
         {range ? (
           <>
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-              <Stat label="Full range" value={miles(range.fullRangeMiles)} />
-              <Stat label="Safe turnaround" value={miles(range.safeTurnaroundMiles)} />
-              <Stat label="Safe trip" value={miles(range.safeTripMiles)} />
+              <Stat label="Full Range" value={miles(range.fullRangeMiles)} />
+              <Stat label="Safe Turnaround" value={miles(range.safeTurnaroundMiles)} />
+              <Stat label="Safe Trip" value={miles(range.safeTripMiles)} />
             </View>
             <ThemedText type="small" themeColor="textSecondary">
               {range.totalGallons} gal ({vehicle.tank_gallons} tank + {vehicle.extra_fuel_gallons ?? 0} extra) at {vehicle.mpg} mpg. Thirds rule: a third out, a third back, a third in reserve.
@@ -153,7 +153,7 @@ export default function VehiclePage() {
       {mine && editing === 'new' ? (
         <ItemForm onCancel={() => setEditing(null)} onSave={async (input) => { await addVehicleItem(vehicle.id, input); setEditing(null); await load(); }} />
       ) : mine ? (
-        <Button title="Add a part or extra" kind="secondary" onPress={() => setEditing('new')} />
+        <Button title="Add a Part or Extra" kind="secondary" onPress={() => setEditing('new')} />
       ) : null}
 
       {totals.itemCount === 0 ? (
@@ -200,11 +200,11 @@ export default function VehiclePage() {
 
       {totals.itemCount ? (
         <Card>
-          <Total label="Build total" cents={totals.totalCents} />
+          <Total label="Build Total" cents={totals.totalCents} />
           {vehicle.purchase_price_cents != null ? (
             <>
-              <Total label="Purchase price" cents={vehicle.purchase_price_cents} />
-              <Total label="All in" cents={vehicle.purchase_price_cents + totals.totalCents} bold />
+              <Total label="Purchase Price" cents={vehicle.purchase_price_cents} />
+              <Total label="All In" cents={vehicle.purchase_price_cents + totals.totalCents} bold />
             </>
           ) : null}
         </Card>
@@ -214,7 +214,7 @@ export default function VehiclePage() {
 
       <ThemedText type="heading">Export</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Build sheet" kind="secondary" style={{ flex: 1 }} onPress={exportSheet} />
+        <Button title="Build Sheet" kind="secondary" style={{ flex: 1 }} onPress={exportSheet} />
         <Button title="CSV" kind="secondary" style={{ flex: 1 }} onPress={exportCsv} />
       </View>
       {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
@@ -222,7 +222,7 @@ export default function VehiclePage() {
 
       {mine ? (
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-          <Button title="Edit machine" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(`/garage/${vehicle.id}/edit`)} />
+          <Button title="Edit Machine" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(`/garage/${vehicle.id}/edit`)} />
           <Button title="Delete" kind="danger" style={{ flex: 1 }} onPress={removeVehicle} />
         </View>
       ) : null}
@@ -307,7 +307,7 @@ function ItemForm({
         <Button title="Cancel" kind="secondary" style={{ flex: 1 }} onPress={onCancel} />
         <Button title={item ? 'Save' : 'Add'} style={{ flex: 1 }} loading={busy} onPress={save} />
       </View>
-      {onDelete ? <Button title="Remove item" kind="danger" onPress={onDelete} /> : null}
+      {onDelete ? <Button title="Remove Item" kind="danger" onPress={onDelete} /> : null}
     </Card>
   );
 }

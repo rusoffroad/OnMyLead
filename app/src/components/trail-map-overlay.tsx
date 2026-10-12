@@ -105,7 +105,7 @@ function LayersPanel({
 
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.rowTitle}>Public trails and roads</Text>
+          <Text style={styles.rowTitle}>Public Trails and Roads</Text>
           <Text style={styles.rowSub}>{`Forest Service and BLM. ${lookupHint}`.trim()}</Text>
         </View>
         <Switch
@@ -198,7 +198,7 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
       <Text style={styles.facts}>{facts.join('   ')}</Text>
       {info.allowed.length ? (
         <View style={styles.allowed}>
-          <Text style={styles.allowedLabel}>{info.seasonal ? 'Open to, by season' : 'Open to'}</Text>
+          <Text style={styles.allowedLabel}>{info.seasonal ? 'Open To, by Season' : 'Open To'}</Text>
           {info.allowed.slice(0, 6).map((a) => (
             <View key={a.vehicle} style={styles.allowedRow}>
               <Text style={styles.allowedName}>{a.vehicle}</Text>

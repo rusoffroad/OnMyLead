@@ -71,24 +71,24 @@ export default function NotificationsScreen() {
       <Stack.Screen options={{ title: 'Notifications' }} />
 
       {Platform.OS === 'web' ? (
-        <Note tone="info" title="Notifications come to the iPhone app">
+        <Note tone="info" title="Notifications Come to the iPhone App">
           Your choices here apply on your phone too.
         </Note>
       ) : permission === 'denied' ? (
-        <Note tone="warn" title="Notifications are off for OnMyLead" action={{ title: 'Open iPhone Settings', onPress: openPhoneSettings }}>
+        <Note tone="warn" title="Notifications Are Off for OnMyLead" action={{ title: 'Open iPhone Settings', onPress: openPhoneSettings }}>
           Your phone is blocking them, so nothing below can reach you. Turn on Allow Notifications for OnMyLead.
         </Note>
       ) : permission === 'undetermined' && session ? (
         <Note
           tone="warn"
-          title="Let OnMyLead send notifications"
-          action={{ title: 'Turn on notifications', onPress: () => askPushPermission(session.user.id).then(setPermission) }}>
+          title="Let OnMyLead Send Notifications"
+          action={{ title: 'Turn On Notifications', onPress: () => askPushPermission(session.user.id).then(setPermission) }}>
           So you hear when someone in your group needs help, even with the phone in your pocket.
         </Note>
       ) : null}
 
       {switchedOn === false && !error ? (
-        <Note tone="info" title="Not switched on yet">
+        <Note tone="info" title="Not Switched On Yet">
           These settings start working with the next server update. Until then, ride chat still pops up while the app is open.
         </Note>
       ) : null}
@@ -119,7 +119,7 @@ export default function NotificationsScreen() {
                 onChange={(v) => change({ [t.key]: v })}
               />
             ))}
-            {g.title === 'Before the ride' ? (
+            {g.title === 'Before the Ride' ? (
               <ToggleRow
                 title="Email When a Ride Is Cancelled"
                 detail="An email if a ride you joined is cancelled or removed, as well as the notification."
@@ -128,9 +128,9 @@ export default function NotificationsScreen() {
                 onChange={(v) => change({ ride_emails: v })}
               />
             ) : null}
-            {g.title === 'Ride chat' ? (
+            {g.title === 'Ride Chat' ? (
               <ToggleRow
-                title="Show message text"
+                title="Show Message Text"
                 detail="Off keeps messages off your lock screen. You’ll see who wrote, not what."
                 value={settings.previews}
                 disabled={!editable}
@@ -138,7 +138,7 @@ export default function NotificationsScreen() {
               />
             ) : null}
           </View>
-          {g.title === 'Before the ride' ? (
+          {g.title === 'Before the Ride' ? (
             <View style={[styles.reminder, !editable && styles.dim]} pointerEvents={editable ? 'auto' : 'none'}>
               <Text style={styles.rowTitle}>Ride reminder</Text>
               <Text style={styles.rowDetail}>A heads-up before each ride you’ve joined, with the meeting spot.</Text>
@@ -201,7 +201,7 @@ function QuietHours({
       <View style={[styles.card, { paddingBottom: on ? Spacing.three : 0 }]}>
         <ToggleRow
           first
-          title="Silence overnight"
+          title="Silence Overnight"
           detail={on ? `Silent for ${hours % 1 ? hours.toFixed(1) : hours} hours a day. Help alerts still come through.` : 'Hold everything but help alerts overnight.'}
           value={on}
           disabled={disabled}

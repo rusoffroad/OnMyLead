@@ -27,8 +27,8 @@ export default function Garage() {
     return (
       <Screen>
         <Card>
-          <ThemedText type="heading">Sign in to build your garage</ThemedText>
-          <Button title="Sign in" onPress={() => router.push('/sign-in')} />
+          <ThemedText type="heading">Sign In to Build Your Garage</ThemedText>
+          <Button title="Sign In" onPress={() => router.push('/sign-in')} />
         </Card>
       </Screen>
     );
@@ -36,7 +36,7 @@ export default function Garage() {
 
   return (
     <Screen>
-      <Button title="Add a machine" big onPress={() => router.push('/garage/new')} />
+      <Button title="Add a Machine" big onPress={() => router.push('/garage/new')} />
       <ErrorText error={error} />
       {vehicles && vehicles.length === 0 ? (
         <ThemedText themeColor="textSecondary">Your garage is empty. Add your rig or side-by-side to track the build and fuel range.</ThemedText>

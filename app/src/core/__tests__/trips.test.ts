@@ -7,7 +7,7 @@ import {
 describe('templates', () => {
   it('has the eight starter lists Chris asked for', () => {
     expect(TRIP_TEMPLATES.map((x) => x.label)).toEqual([
-      'Day ride', 'Overnight / camping', 'Desert', 'Mountain / snow', 'Recovery kit', 'First aid', 'Tools & spares', 'Starlink / power',
+      'Day Ride', 'Overnight / Camping', 'Desert', 'Mountain / Snow', 'Recovery Kit', 'First Aid', 'Tools & Spares', 'Starlink / Power',
     ]);
   });
 

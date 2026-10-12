@@ -74,7 +74,7 @@ export default function RouteBuilder() {
   }
 
   async function clear() {
-    if (route && !(await confirmAsync('Clear the route?', 'This removes every point. Nothing is saved until you tap Save route.', 'Clear'))) return;
+    if (route && !(await confirmAsync('Clear the route?', 'This removes every point. Nothing is saved until you tap Save Route.', 'Clear'))) return;
     setImported(null);
     setTaps([]);
   }
@@ -154,7 +154,7 @@ export default function RouteBuilder() {
         </View>
         <ErrorText error={error} />
         <Button
-          title={route ? 'Save route' : saved ? 'Remove route' : 'Save route'}
+          title={route ? 'Save Route' : saved ? 'Remove Route' : 'Save Route'}
           kind={!route && saved ? 'danger' : 'primary'}
           big
           disabled={!changed || (!route && !saved)}

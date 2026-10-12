@@ -32,7 +32,7 @@ const t = (category: TripCategory, ...names: (string | [string, number])[]): Tem
 export const TRIP_TEMPLATES: TripTemplate[] = [
   {
     id: 'day_ride',
-    label: 'Day ride',
+    label: 'Day Ride',
     blurb: 'The basics for a day on the trail',
     items: [
       ...t('food_water', ['Water (1 gal per person)', 1], 'Snacks / lunch'),
@@ -46,7 +46,7 @@ export const TRIP_TEMPLATES: TripTemplate[] = [
   },
   {
     id: 'overnight',
-    label: 'Overnight / camping',
+    label: 'Overnight / Camping',
     blurb: 'Sleep out under the stars',
     items: [
       ...t('camping', 'Tent or rooftop tent', 'Sleeping bag', 'Sleeping pad', 'Camp chairs', 'Headlamp + spare batteries', 'Lantern', 'Trash bags', 'Fire extinguisher'),
@@ -70,7 +70,7 @@ export const TRIP_TEMPLATES: TripTemplate[] = [
   },
   {
     id: 'mountain_snow',
-    label: 'Mountain / snow',
+    label: 'Mountain / Snow',
     blurb: 'Cold, altitude and slick trails',
     items: [
       ...t('clothing', 'Insulated jacket', 'Winter gloves', 'Beanie', 'Waterproof boots', 'Base layers'),
@@ -82,7 +82,7 @@ export const TRIP_TEMPLATES: TripTemplate[] = [
   },
   {
     id: 'recovery_kit',
-    label: 'Recovery kit',
+    label: 'Recovery Kit',
     blurb: 'Get unstuck and help others',
     items: t(
       'recovery',
@@ -101,7 +101,7 @@ export const TRIP_TEMPLATES: TripTemplate[] = [
   },
   {
     id: 'first_aid',
-    label: 'First aid',
+    label: 'First Aid',
     blurb: 'Patch up people on the trail',
     items: t(
       'first_aid',
@@ -119,7 +119,7 @@ export const TRIP_TEMPLATES: TripTemplate[] = [
   },
   {
     id: 'tools_spares',
-    label: 'Tools & spares',
+    label: 'Tools & Spares',
     blurb: 'Fix it and keep going',
     items: [
       ...t('tools_spares', 'Socket + wrench set', 'Screwdrivers + pliers', 'Zip ties', 'Duct tape', 'Electrical tape + spare fuses', 'Spare belt (CVT)', 'Belt change tools', 'Spare tire + lug wrench', 'Tire plug kit', 'Air compressor', 'Jumper pack', 'Baling wire', 'Hose clamps'),
@@ -128,7 +128,7 @@ export const TRIP_TEMPLATES: TripTemplate[] = [
   },
   {
     id: 'starlink_power',
-    label: 'Starlink / power',
+    label: 'Starlink / Power',
     blurb: 'Stay online off grid',
     items: t(
       'power_starlink',

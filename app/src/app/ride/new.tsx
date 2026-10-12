@@ -13,7 +13,7 @@ import { createRide } from '@/lib/api';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
 
-const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland rig', 'Snowmobile', 'Car'];
+const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
 
 function nextDays(n: number) {
   return Array.from({ length: n }, (_, i) => {
@@ -135,7 +135,7 @@ export default function NewRide() {
 
   return (
     <Screen>
-      <ThemedText type="heading">What kind of ride?</ThemedText>
+      <ThemedText type="heading">What Kind of Ride?</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <KindCard
           title="Public"
@@ -151,7 +151,7 @@ export default function NewRide() {
         />
       </View>
 
-      <Field label="Ride name" value={name} onChangeText={setName} placeholder="Saturday Hell's Revenge run" />
+      <Field label="Ride Name" value={name} onChangeText={setName} placeholder="Saturday Hell's Revenge run" />
 
       <Card>
         <ThemedText type="heading">When</ThemedText>
@@ -163,17 +163,17 @@ export default function NewRide() {
             label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }),
           }))}
         />
-        <Field label="Meet at" value={meetTime} onChangeText={setMeetTime} placeholder="8:00 am" />
+        <Field label="Meet At" value={meetTime} onChangeText={setMeetTime} placeholder="8:00 am" />
       </Card>
 
       <Card>
-        <ThemedText type="heading">Meeting point</ThemedText>
+        <ThemedText type="heading">Meeting Point</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           Only joined riders see the exact spot. Public pages show the area within about a mile.
         </ThemedText>
-        <Button title="Use my current location" kind="secondary" onPress={useMyLocation} />
+        <Button title="Use My Current Location" kind="secondary" onPress={useMyLocation} />
         <Field label="Coordinates" value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
-        <Field label="Place name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
+        <Field label="Place Name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
         {kind === 'public' ? (
           <View style={{ gap: Spacing.one }}>
             <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>State</ThemedText>
@@ -181,7 +181,7 @@ export default function NewRide() {
               {meetState ? `Listed in ${stateByCode(meetState)?.name}.` : 'Set the meeting point and we fill this in, or pick it.'}
             </ThemedText>
             {meetState && !pickingState ? (
-              <Button title="Change state" kind="ghost" onPress={() => setPickingState(true)} />
+              <Button title="Change State" kind="ghost" onPress={() => setPickingState(true)} />
             ) : (
               <Choice
                 value={meetState}
@@ -197,32 +197,32 @@ export default function NewRide() {
       </Card>
 
       <Card>
-        <ThemedText type="heading">Who’s riding</ThemedText>
-        <MultiChoice label="Vehicles welcome" options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
+        <ThemedText type="heading">Who’s Riding</ThemedText>
+        <MultiChoice label="Vehicles Welcome" options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
         {kind === 'public' ? (
           <Choice
             label="Joining"
             value={joinPolicy}
             onChange={setJoinPolicy}
             options={[
-              { value: 'open', label: 'Anyone can join' },
-              { value: 'approval', label: 'I approve riders' },
+              { value: 'open', label: 'Anyone Can Join' },
+              { value: 'approval', label: 'I Approve Riders' },
             ]}
           />
         ) : null}
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
-            <Field label="Max vehicles" value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder="No limit" />
+            <Field label="Max Vehicles" value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder="No limit" />
           </View>
           <View style={{ flex: 1 }}>
-            <Field label="Max riders" value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder="No limit" />
+            <Field label="Max Riders" value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder="No limit" />
           </View>
         </View>
       </Card>
 
       {groups.length ? (
         <Card>
-          <ThemedText type="heading">Invite A Group</ThemedText>
+          <ThemedText type="heading">Invite a Group</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             Everyone in the groups you pick gets a notification and sees the ride on their home screen. They join with one tap.
           </ThemedText>
@@ -230,14 +230,14 @@ export default function NewRide() {
         </Card>
       ) : null}
 
-      <Button title={more ? 'Fewer details' : 'Add route, difficulty and more'} kind="ghost" onPress={() => setMore(!more)} />
+      <Button title={more ? 'Fewer Details' : 'Add Route, Difficulty and More'} kind="ghost" onPress={() => setMore(!more)} />
       {more ? (
         <Card>
           <Field label="Description" value={description} onChangeText={setDescription} multiline />
-          <Field label="Departure time" value={departTime} onChangeText={setDepartTime} placeholder="8:30 am" />
-          <Field label="Expected finish" value={finishTime} onChangeText={setFinishTime} placeholder="4:00 pm" />
+          <Field label="Departure Time" value={departTime} onChangeText={setDepartTime} placeholder="8:30 am" />
+          <Field label="Expected Finish" value={finishTime} onChangeText={setFinishTime} placeholder="4:00 pm" />
           <Field label="Destination" value={destination} onChangeText={setDestination} />
-          <Field label="Route length (miles)" value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint="Used to warn riders whose fuel range is too short." />
+          <Field label="Route Length (Miles)" value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint="Used to warn riders whose fuel range is too short." />
           <Choice
             label="Difficulty"
             value={difficulty}
@@ -250,17 +250,17 @@ export default function NewRide() {
             onChange={setExperience}
             options={[{ value: 'beginner', label: 'Beginner' }, { value: 'intermediate', label: 'Intermediate' }, { value: 'advanced', label: 'Advanced' }, { value: 'expert', label: 'Expert' }]}
           />
-          <Field label="What to bring" value={whatToBring} onChangeText={setWhatToBring} multiline />
-          <Field label="Required equipment" value={requiredEquipment} onChangeText={setRequiredEquipment} multiline placeholder="Whip flag, helmet, spare belt" />
+          <Field label="What to Bring" value={whatToBring} onChangeText={setWhatToBring} multiline />
+          <Field label="Required Equipment" value={requiredEquipment} onChangeText={setRequiredEquipment} multiline placeholder="Whip flag, helmet, spare belt" />
           <Field label="Fuel" value={fuelNotes} onChangeText={setFuelNotes} placeholder="Full tank, no gas on the trail" />
-          <Field label="Instructions for joined riders" value={instructions} onChangeText={setInstructions} multiline />
+          <Field label="Instructions for Joined Riders" value={instructions} onChangeText={setInstructions} multiline />
           <Choice
             label="Ride Bubble"
             value={bubble}
             onChange={setBubble}
             options={[
               { value: 'default', label: 'Standard' },
-              { value: 'tight_trail', label: 'Tight trail' },
+              { value: 'tight_trail', label: 'Tight Trail' },
               { value: 'desert', label: 'Desert' },
               { value: 'highway', label: 'Highway' },
             ]}
@@ -270,7 +270,7 @@ export default function NewRide() {
 
       <ErrorText error={error} />
       <Button
-        title={kind === 'public' ? 'Create public ride' : kind === 'private' ? 'Create private ride' : 'Create ride'}
+        title={kind === 'public' ? 'Create Public Ride' : kind === 'private' ? 'Create Private Ride' : 'Create Ride'}
         big
         loading={busy}
         onPress={submit}

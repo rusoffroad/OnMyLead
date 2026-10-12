@@ -140,11 +140,11 @@ export default function RidePage() {
     <Screen>
       <View style={{ gap: Spacing.two }}>
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-          {ride.status === 'live' ? <Tag label="Live now" color={Colors.accent} solid /> : null}
+          {ride.status === 'live' ? <Tag label="Live Now" color={Colors.accent} solid /> : null}
           {ride.status === 'ended' ? <Tag label="Ended" color={Colors.textSecondary} /> : null}
           {ride.status === 'cancelled' ? <Tag label="Cancelled" color={Colors.danger} /> : null}
           {ride.difficulty ? <Tag label={cap(ride.difficulty)} color={Colors.sky} /> : null}
-          <Tag label={ride.visibility === 'private' ? 'Private, invite only' : ride.visibility === 'public' ? 'Public' : 'Anyone with the link'} color={Colors.textSecondary} />
+          <Tag label={ride.visibility === 'private' ? 'Private, Invite Only' : ride.visibility === 'public' ? 'Public' : 'Anyone with the Link'} color={Colors.textSecondary} />
         </View>
         <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{ride.name}</ThemedText>
         <ThemedText style={{ color: Colors.sky, fontWeight: 700, fontSize: 17 }}>{when(ride.meet_at)}</ThemedText>
@@ -170,7 +170,7 @@ export default function RidePage() {
           [
             ['Meet', details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'],
             ride.depart_at ? ['Departs', time(ride.depart_at)] : null,
-            ride.expected_finish_at ? ['Back by', time(ride.expected_finish_at)] : null,
+            ride.expected_finish_at ? ['Back By', time(ride.expected_finish_at)] : null,
             ride.destination_label ? ['Destination', ride.destination_label] : null,
             ride.vehicle_types.length ? ['Vehicles', ride.vehicle_types.join(', ')] : null,
             ride.experience_level ? ['Experience', ride.experience_level] : null,
@@ -189,7 +189,7 @@ export default function RidePage() {
       {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
         <Card>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <ThemedText type="heading">{route?.name || 'The route'}</ThemedText>
+            <ThemedText type="heading">{route?.name || 'The Route'}</ThemedText>
             {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{miles(route.lengthM)} mi</ThemedText> : null}
           </View>
           {route ? (
@@ -207,7 +207,7 @@ export default function RidePage() {
             </ThemedText>
           )}
           {isManager && ride.status !== 'ended' && ride.status !== 'cancelled' ? (
-            <Button title={route ? 'Edit route' : 'Build the route'} kind={route ? 'secondary' : 'primary'} onPress={() => router.push(`/ride/${ride.id}/route`)} />
+            <Button title={route ? 'Edit Route' : 'Build the Route'} kind={route ? 'secondary' : 'primary'} onPress={() => router.push(`/ride/${ride.id}/route`)} />
           ) : null}
         </Card>
       ) : null}
@@ -222,7 +222,7 @@ export default function RidePage() {
         ride.status === 'ended' ? (
           <ThemedText>This ride has ended.</ThemedText>
         ) : (
-          <Button title={me ? (ride.join_policy === 'approval' ? 'Request to join' : 'Join ride') : 'Sign in to join'} big loading={busy === 'join'} onPress={join} />
+          <Button title={me ? (ride.join_policy === 'approval' ? 'Request to Join' : 'Join Ride') : 'Sign In to Join'} big loading={busy === 'join'} onPress={join} />
         )
       ) : mine.status === 'invited' ? (
         ride.status === 'ended' || ride.status === 'cancelled' ? (
@@ -247,7 +247,7 @@ export default function RidePage() {
             <Button title="Enter Ride Mode" big onPress={() => router.push(`/ride/${ride.id}/live`)} />
           ) : null}
           {!mine.checked_in_at && ride.status !== 'ended' ? (
-            <Button title="I'm here and ready" kind="secondary" loading={busy === 'checkin'} onPress={() => act('checkin', () => checkIn(ride.id))} />
+            <Button title="I'm Here and Ready" kind="secondary" loading={busy === 'checkin'} onPress={() => act('checkin', () => checkIn(ride.id))} />
           ) : mine.checked_in_at ? (
             <ThemedText>Checked in at {time(mine.checked_in_at)}</ThemedText>
           ) : null}
@@ -256,7 +256,7 @@ export default function RidePage() {
 
       {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && ride.status !== 'cancelled' ? (
         <Button
-          title="Plan what to bring"
+          title="Plan What to Bring"
           kind="secondary"
           loading={busy === 'trip'}
           accessibilityHint="Opens your packing checklist for this ride"
@@ -271,12 +271,12 @@ export default function RidePage() {
 
       {isManager ? (
         <Card>
-          <ThemedText type="heading">You’re organizing</ThemedText>
+          <ThemedText type="heading">You’re Organizing</ThemedText>
           {ride.status === 'scheduled' ? (
             <Button title="Start Ride Mode" big loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
           ) : null}
           {ride.status === 'live' ? (
-            <Button title="End ride for everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
+            <Button title="End Ride for Everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
           ) : null}
           {pending.map((m) => (
             <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
@@ -328,7 +328,7 @@ export default function RidePage() {
       ) : null}
 
       {mine && mine.status !== 'cancelled' && mine.status !== 'invited' && mine.role !== 'organizer' ? (
-        <Button title="Leave ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
+        <Button title="Leave Ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
       ) : null}
 
       <Pressable

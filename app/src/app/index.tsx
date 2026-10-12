@@ -20,8 +20,8 @@ type Tool = { icon: IconName; title: string; href: '/share' | '/garage' | '/trip
 
 // Secondary tools: one compact row under the ride actions.
 const TOOLS: Tool[] = [
-  { icon: 'pin', title: 'Share location', href: '/share', color: Colors.sky },
-  { icon: 'checklist', title: 'Trip planner', href: '/trips', color: RideColors.green },
+  { icon: 'pin', title: 'Share Location', href: '/share', color: Colors.sky },
+  { icon: 'checklist', title: 'Trip Planner', href: '/trips', color: RideColors.green },
   { icon: 'machine', title: 'Garage', href: '/garage', color: Colors.accent },
   { icon: 'dish', title: 'Starlink', href: '/starlink', color: RideColors.yellow, open: true },
 ];
@@ -50,7 +50,7 @@ export default function Home() {
     return (
       <Screen top>
         <Logo />
-        <ThemedText type="subtitle">Almost ready</ThemedText>
+        <ThemedText type="subtitle">Almost Ready</ThemedText>
         <ThemedText>Add the backend keys to app/.env (see .env.example), then restart the app.</ThemedText>
       </Screen>
     );
@@ -88,7 +88,7 @@ export default function Home() {
           onPress={() => router.push('/profile')}
           style={[styles.nudge, { backgroundColor: theme.backgroundElement }]}>
           <View style={{ flex: 1 }}>
-            <ThemedText type="heading">Pick your ride name</ThemedText>
+            <ThemedText type="heading">Pick Your Ride Name</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">Other riders see you as Rider until you do. A nickname works.</ThemedText>
           </View>
           <Icon name="chevron" color={theme.textSecondary} />
@@ -118,7 +118,7 @@ export default function Home() {
           <Icon name="flag" size={34} color="#fff" strokeWidth={2.4} />
         </View>
         <View style={{ flex: 1 }}>
-          <ThemedText style={styles.createTitle}>Create a ride</ThemedText>
+          <ThemedText style={styles.createTitle}>Create a Ride</ThemedText>
           <ThemedText style={styles.createDetail}>You lead. Public or just your friends.</ThemedText>
         </View>
       </Pressable>
@@ -126,14 +126,14 @@ export default function Home() {
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <BigAction
           icon="join"
-          title="Join a ride"
+          title="Join a Ride"
           detail="Got a code or link"
           on={joining}
           onPress={() => setJoining(!joining)}
         />
         <BigAction
           icon="search"
-          title="Find a ride"
+          title="Find a Ride"
           detail="Near you or by state"
           onPress={() => router.push('/find')}
         />
@@ -176,7 +176,7 @@ export default function Home() {
       ) : null}
 
       {!loading && !session ? (
-        <Button title="Sign in or create a free account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
+        <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
 
       <View style={styles.tools}>
@@ -210,7 +210,7 @@ export default function Home() {
 
       {going.length ? (
         <>
-          <Section title="Your rides" />
+          <Section title="Your Rides" />
           <RowGroup>
             {going.map((m) => (
               <RideRow key={m.ride_id} ride={m.rides} note={m.status === 'joined' ? roleLabel(m.role) : m.status.replace('_', ' ')} />
@@ -219,7 +219,7 @@ export default function Home() {
         </>
       ) : null}
 
-      <Section title="Public rides" />
+      <Section title="Public Rides" />
       {others.length === 0 ? (
         <ThemedText themeColor="textSecondary">No public rides coming up. Create one and it shows here for everyone.</ThemedText>
       ) : (
@@ -252,7 +252,7 @@ function BigAction({ icon, title, detail, on, onPress }: { icon: IconName; title
 }
 
 const roleLabel = (role: RideMember['role']) =>
-  ({ organizer: 'You organize', co_organizer: 'Co-organizer', leader: 'You lead', sweep: 'Tail gunner', rider: 'Going' })[role];
+  ({ organizer: 'You Organize', co_organizer: 'Co-Organizer', leader: 'You Lead', sweep: 'Tail Gunner', rider: 'Going' })[role];
 
 const styles = StyleSheet.create({
   live: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, borderWidth: 2, padding: 14 },

@@ -15,9 +15,9 @@ export function tailGunnerId(members: Member[]): string | null {
 
 export const ROLE_LABEL: Record<RosterRole, string> = {
   organizer: 'Organizer',
-  co_organizer: 'Co-organizer',
+  co_organizer: 'Co-Organizer',
   leader: 'Leader',
-  sweep: 'Tail gunner',
+  sweep: 'Tail Gunner',
   rider: 'Rider',
 };
 
@@ -71,12 +71,12 @@ export function handOffPrompt(kind: Exclude<HandOff, null>, name: string): { tit
     ? {
         title: `Give the ride to ${name}?`,
         message: `${name} becomes the organizer and leader. You stay on the ride as a rider and can't undo this yourself.`,
-        confirm: 'Give ride',
+        confirm: 'Give Ride',
       }
     : {
         title: `Hand the lead to ${name}?`,
         message: `${name} leads from here, and messages to the leader go to them. You stay on the ride as a rider.`,
-        confirm: 'Hand off',
+        confirm: 'Hand Off',
       };
 }
 

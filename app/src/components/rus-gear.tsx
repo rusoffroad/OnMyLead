@@ -49,7 +49,7 @@ export function RusGear({
   return (
     <Card>
       <View style={{ gap: 2 }}>
-        <ThemedText type="heading">Gear from RUS Offroad</ThemedText>
+        <ThemedText type="heading">Gear From RUS Offroad</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">Suggestions from RUS Offroad, the team behind OnMyLead.</ThemedText>
       </View>
       {suggestions.map(({ product, reason }) => (

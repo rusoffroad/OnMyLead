@@ -26,8 +26,8 @@ export default function Trips() {
     return (
       <Screen>
         <Card>
-          <ThemedText type="heading">Sign in to plan your trips</ThemedText>
-          <Button title="Sign in" onPress={() => router.push('/sign-in')} />
+          <ThemedText type="heading">Sign In to Plan Your Trips</ThemedText>
+          <Button title="Sign In" onPress={() => router.push('/sign-in')} />
         </Card>
       </Screen>
     );
@@ -35,7 +35,7 @@ export default function Trips() {
 
   return (
     <Screen>
-      <Button title="Plan a new trip" big onPress={() => router.push('/trips/new')} />
+      <Button title="Plan a New Trip" big onPress={() => router.push('/trips/new')} />
       <ErrorText error={error} />
       {trips && trips.length === 0 ? (
         <ThemedText themeColor="textSecondary">

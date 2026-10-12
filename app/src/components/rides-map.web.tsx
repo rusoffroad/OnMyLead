@@ -108,7 +108,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
       const pop = document.createElement('div');
       pop.className = 'oml-pop';
       const away = r.distanceMi != null ? `, ${r.distanceMi < 1 ? 'under 1' : Math.round(r.distanceMi)} mi away` : '';
-      pop.innerHTML = `${r.status === 'live' ? '<div class="live">Live now</div>' : ''}<div class="t">${esc(r.name)}</div><div class="s">${esc(meetsLabel(r))}${away}</div><button>Open ride</button>`;
+      pop.innerHTML = `${r.status === 'live' ? '<div class="live">Live Now</div>' : ''}<div class="t">${esc(r.name)}</div><div class="s">${esc(meetsLabel(r))}${away}</div><button>Open Ride</button>`;
       pop.querySelector('button')!.addEventListener('click', () => openRef.current(r));
       L.marker([r.meet_area_lat, r.meet_area_lng], { icon, title: r.name, zIndexOffset: r.status === 'live' ? 1000 : 0 }).bindPopup(pop, { closeButton: false, offset: [0, -8] }).addTo(g);
     }

@@ -66,12 +66,12 @@ export default function Profile() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Your profile' }} />
+      <Stack.Screen options={{ title: 'Your Profile' }} />
 
       <NamePreview name={clean} />
 
       <Field
-        label="Ride name"
+        label="Ride Name"
         value={name}
         onChangeText={(t) => {
           setName(t);
@@ -97,7 +97,7 @@ export default function Profile() {
 
       <ErrorText error={error ?? problem} />
       <Button
-        title={justSaved && !changed ? 'Name saved' : 'Save name'}
+        title={justSaved && !changed ? 'Name Saved' : 'Save Name'}
         big
         loading={busy}
         disabled={!changed || !!problem}
@@ -135,7 +135,7 @@ export default function Profile() {
         <ThemedText type="small" themeColor="textSecondary">Only you can see this. Other riders only see your ride name.</ThemedText>
       </View>
       <Button
-        title="Sign out"
+        title="Sign Out"
         kind="ghost"
         onPress={async () => {
           await signOut();

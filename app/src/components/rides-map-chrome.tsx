@@ -44,13 +44,13 @@ export function RidePin({ ride }: { ride: Pick<Ride, 'status'> }) {
 export function RideBubble({ ride }: { ride: Ride & { distanceMi?: number } }) {
   return (
     <View style={styles.bubble}>
-      {ride.status === 'live' ? <Text style={styles.live}>Live now</Text> : null}
+      {ride.status === 'live' ? <Text style={styles.live}>Live Now</Text> : null}
       <Text style={styles.bubbleTitle} numberOfLines={2}>{ride.name}</Text>
       <Text style={styles.bubbleText}>
         {meetsLabel(ride)}
         {ride.distanceMi != null ? `, ${ride.distanceMi < 1 ? 'under 1' : Math.round(ride.distanceMi)} mi away` : ''}
       </Text>
-      <Text style={styles.bubbleLink}>Open ride</Text>
+      <Text style={styles.bubbleLink}>Open Ride</Text>
     </View>
   );
 }
@@ -105,14 +105,14 @@ export function MapOverlay({
         ) : null}
         <View style={[styles.chip, styles.count]}>
           <View style={[styles.countDot, { backgroundColor: Colors.sky }]} />
-          <Text style={styles.chipText}>{count === 0 ? 'No rides here yet' : `${count} ${count === 1 ? 'ride' : 'rides'}`}</Text>
+          <Text style={styles.chipText}>{count === 0 ? 'No rides here yet' : `${count} ${count === 1 ? 'Ride' : 'Rides'}`}</Text>
         </View>
       </View>
       {moved && onSearch ? (
         <View style={styles.bottom} pointerEvents="box-none">
           <Pressable accessibilityRole="button" onPress={onSearch} style={({ pressed }) => [styles.search, pressed && styles.pressed]}>
             <Icon name="search" size={16} color={Colors.onAccent} strokeWidth={2.4} />
-            <Text style={styles.searchText}>Search this area</Text>
+            <Text style={styles.searchText}>Search This Area</Text>
           </Pressable>
         </View>
       ) : null}

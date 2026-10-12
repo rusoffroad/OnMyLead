@@ -48,24 +48,24 @@ export type TopicGroup = { title: string; topics: TopicInfo[] };
 /** The settings screen, grouped by where a rider is when it matters. */
 export const TOPIC_GROUPS: TopicGroup[] = [
   {
-    title: 'On the trail',
+    title: 'On the Trail',
     topics: [
-      { key: 'rider_status', title: 'Rider status', detail: 'Stopped, flat tire, need fuel, stuck, lost, mechanical, and all good again.' },
+      { key: 'rider_status', title: 'Rider Status', detail: 'Stopped, flat tire, need fuel, stuck, lost, mechanical, and all good again.' },
       { key: 'announcements', title: 'Announcements', detail: 'What the organizer tells the whole group.' },
     ],
   },
   {
-    title: 'Ride chat',
+    title: 'Ride Chat',
     topics: [
-      { key: 'chat', title: 'Group chat', detail: 'Messages and quick replies from your group.' },
-      { key: 'leader_messages', title: 'Messages to the leader', detail: 'Leader-only messages, when you’re leading.' },
+      { key: 'chat', title: 'Group Chat', detail: 'Messages and quick replies from your group.' },
+      { key: 'leader_messages', title: 'Messages to the Leader', detail: 'Leader-only messages, when you’re leading.' },
     ],
   },
   {
-    title: 'Before the ride',
+    title: 'Before the Ride',
     topics: [
-      { key: 'ride_changes', title: 'Ride changes', detail: 'A ride starts, is cancelled, or gets a new time or meeting spot. You get a spot or a role.' },
-      { key: 'new_riders', title: 'New riders', detail: 'Someone joins or asks to join a ride you organize.' },
+      { key: 'ride_changes', title: 'Ride Changes', detail: 'A ride starts, is cancelled, or gets a new time or meeting spot. You get a spot or a role.' },
+      { key: 'new_riders', title: 'New Riders', detail: 'Someone joins or asks to join a ride you organize.' },
     ],
   },
   {
@@ -82,10 +82,10 @@ export const GROUP_TOPICS: NotificationTopic[] = ['ride_invites', 'followed_lead
 
 export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [
   { value: null, label: 'Off' },
-  { value: 30, label: '30 min' },
-  { value: 60, label: '1 hour' },
-  { value: 120, label: '2 hours' },
-  { value: 1440, label: 'Day before' },
+  { value: 30, label: '30 Min' },
+  { value: 60, label: '1 Hour' },
+  { value: 120, label: '2 Hours' },
+  { value: 1440, label: 'Day Before' },
 ];
 
 /** Settings from the database, with defaults for anything missing or malformed. */

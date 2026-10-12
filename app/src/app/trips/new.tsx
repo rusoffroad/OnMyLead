@@ -10,7 +10,7 @@ export default function NewTrip() {
     <Screen>
       <ThemedText themeColor="textSecondary">Name it now. You can add a starter list on the next screen.</ThemedText>
       <TripForm
-        saveLabel="Create trip"
+        saveLabel="Create Trip"
         onSave={async (input) => {
           const trip = await createTrip(input);
           router.replace(`/trips/${trip.id}`);

@@ -43,7 +43,7 @@ export async function registerForPush(userId: string): Promise<void> {
     if (status !== 'granted') return;
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('ride-chat', {
-        name: 'Ride chat',
+        name: 'Ride Chat',
         importance: Notifications.AndroidImportance.HIGH,
       });
     }

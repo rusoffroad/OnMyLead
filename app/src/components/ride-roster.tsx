@@ -109,7 +109,7 @@ export function RideRoster({
                   {actions.handOff ? (
                     <Action
                       color={RideColors.leader}
-                      title={actions.handOff === 'ride' ? 'Give them the ride' : 'Hand them the lead'}
+                      title={actions.handOff === 'ride' ? 'Give Them the Ride' : 'Hand Them the Lead'}
                       caption={actions.handOff === 'ride' ? 'They organize and lead. You ride along.' : 'They lead from here. You ride along.'}
                       busy={busy === `handoff-${m.user_id}`}
                       onPress={() => handOff(m, actions.handOff!)}
@@ -119,7 +119,7 @@ export function RideRoster({
                     <Action
                       color={RideColors.leader}
                       on={m.role === 'leader'}
-                      title={m.role === 'leader' ? 'Remove as leader' : 'Make leader'}
+                      title={m.role === 'leader' ? 'Remove as Leader' : 'Make Leader'}
                       caption={m.role === 'leader' ? 'You lead again.' : 'They ride up front. You keep organizing.'}
                       busy={busy === `leader-${m.user_id}`}
                       onPress={() => run(`leader-${m.user_id}`, () => setMemberRole(ride.id, m.user_id, m.role === 'leader' ? 'rider' : 'leader'))}
@@ -129,7 +129,7 @@ export function RideRoster({
                     <Action
                       color={RideColors.sweep}
                       on={m.role === 'sweep'}
-                      title={m.role === 'sweep' ? 'Remove as tail gunner' : 'Make tail gunner'}
+                      title={m.role === 'sweep' ? 'Remove as Tail Gunner' : 'Make Tail Gunner'}
                       caption={m.role === 'sweep' ? 'Nobody rides at the rear.' : tailId ? `Rides at the rear instead of ${nameOf(tailId)}.` : 'Rides at the rear so nobody gets left behind.'}
                       busy={busy === `tail-${m.user_id}`}
                       onPress={() => run(`tail-${m.user_id}`, () => setTailGunner(ride.id, m.role === 'sweep' ? null : m.user_id))}
@@ -173,7 +173,7 @@ function RideLine({ leader, tail, middle }: { leader: string | null; tail: strin
           <ThemedText numberOfLines={1} style={[styles.lineName, { color: RideColors.leader }]}>{leader ?? 'Not set'}</ThemedText>
         </View>
         <View style={{ flex: 1, alignItems: 'flex-end' }}>
-          <ThemedText type="small" themeColor="textSecondary">Tail gunner</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">Tail Gunner</ThemedText>
           <ThemedText numberOfLines={1} style={[styles.lineName, { color: tail ? RideColors.sweep : Colors.textSecondary }]}>{tail ?? 'Not picked yet'}</ThemedText>
         </View>
       </View>

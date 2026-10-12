@@ -18,11 +18,11 @@ export type PowerSource = 'vehicle_12v' | 'aux_battery' | 'power_station' | 'sol
 
 export const POWER_SOURCES: { value: PowerSource; label: string }[] = [
   { value: 'vehicle_12v', label: 'Vehicle 12V' },
-  { value: 'aux_battery', label: 'Aux battery' },
-  { value: 'power_station', label: 'Power station' },
-  { value: 'solar_battery', label: 'Solar + battery' },
+  { value: 'aux_battery', label: 'Aux Battery' },
+  { value: 'power_station', label: 'Power Station' },
+  { value: 'solar_battery', label: 'Solar + Battery' },
   { value: 'generator', label: 'Generator' },
-  { value: 'shore', label: 'Wall / shore' },
+  { value: 'shore', label: 'Wall / Shore' },
   { value: 'other', label: 'Other' },
 ];
 

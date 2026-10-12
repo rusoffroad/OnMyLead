@@ -55,7 +55,7 @@ export function PollCard({
         );
       })}
       <ThemedText type="small" themeColor="textSecondary">
-        {voteCountLabel(tally.total)}. {tally.mine == null ? 'Tap A Choice To Vote.' : 'Tap Another Choice To Change Your Vote.'}
+        {voteCountLabel(tally.total)}. {tally.mine == null ? 'Tap a choice to vote.' : 'Tap another choice to change your vote.'}
       </ThemedText>
     </View>
   );
@@ -116,7 +116,7 @@ export function PollComposer({
           </Pressable>
         ))}
       </View>
-      <Field label="Question" value={question} onChangeText={setQuestion} placeholder="Lunch Stop?" maxLength={MAX_POLL_QUESTION} />
+      <Field label="Question" value={question} onChangeText={setQuestion} placeholder="Lunch stop?" maxLength={MAX_POLL_QUESTION} />
       {choices.map((c, i) => (
         <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>

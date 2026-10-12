@@ -29,7 +29,7 @@ export function fuelRange(p: FuelProfile): FuelRange {
 export type RangeCheck = 'ok' | 'tight' | 'over';
 
 /** The answer to "do I have enough range for this route?", in a few words. */
-export const RANGE_LABEL: Record<RangeCheck, string> = { ok: 'Enough range', tight: 'Range is tight', over: 'Not enough range' };
+export const RANGE_LABEL: Record<RangeCheck, string> = { ok: 'Enough Range', tight: 'Range Is Tight', over: 'Not Enough Range' };
 
 /** Compare a planned ride distance with a machine's range. */
 export function checkRideRange(rideMiles: number, p: FuelProfile): RangeCheck {

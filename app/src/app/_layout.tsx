@@ -60,27 +60,27 @@ function RootLayout() {
         }}>
         <Stack.Screen name="index" options={{ title: 'OnMyLead', headerShown: false }} />
         <Stack.Screen name="sign-in" options={{ title: 'Welcome', presentation: 'modal' }} />
-        <Stack.Screen name="reset-password" options={{ title: 'New password' }} />
-        <Stack.Screen name="ride/new" options={{ title: 'Create a ride' }} />
+        <Stack.Screen name="reset-password" options={{ title: 'New Password' }} />
+        <Stack.Screen name="ride/new" options={{ title: 'Create a Ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
-        <Stack.Screen name="find" options={{ title: 'Find a ride' }} />
+        <Stack.Screen name="find" options={{ title: 'Find a Ride' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
         <Stack.Screen name="ride/[id]/route" options={{ title: 'Route', headerShown: false }} />
         <Stack.Screen name="garage/index" options={{ title: 'Garage' }} />
-        <Stack.Screen name="garage/new" options={{ title: 'Add to garage' }} />
+        <Stack.Screen name="garage/new" options={{ title: 'Add to Garage' }} />
         <Stack.Screen name="garage/[id]/index" options={{ title: '' }} />
-        <Stack.Screen name="garage/[id]/edit" options={{ title: 'Edit machine' }} />
-        <Stack.Screen name="trips/index" options={{ title: 'Trip planner' }} />
-        <Stack.Screen name="trips/new" options={{ title: 'New trip' }} />
+        <Stack.Screen name="garage/[id]/edit" options={{ title: 'Edit Machine' }} />
+        <Stack.Screen name="trips/index" options={{ title: 'Trip Planner' }} />
+        <Stack.Screen name="trips/new" options={{ title: 'New Trip' }} />
         <Stack.Screen name="trips/[id]/index" options={{ title: '' }} />
-        <Stack.Screen name="trips/[id]/edit" options={{ title: 'Edit trip' }} />
+        <Stack.Screen name="trips/[id]/edit" options={{ title: 'Edit Trip' }} />
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
-        <Stack.Screen name="profile" options={{ title: 'Your profile' }} />
+        <Stack.Screen name="profile" options={{ title: 'Your Profile' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
         <Stack.Screen name="maps/index" options={{ title: 'Offline Maps' }} />
-        <Stack.Screen name="maps/area" options={{ title: 'Pick An Area', headerShown: false }} />
-        <Stack.Screen name="share" options={{ title: 'Share my location' }} />
-        <Stack.Screen name="f/[token]" options={{ title: 'Shared location' }} />
+        <Stack.Screen name="maps/area" options={{ title: 'Pick an Area', headerShown: false }} />
+        <Stack.Screen name="share" options={{ title: 'Share My Location' }} />
+        <Stack.Screen name="f/[token]" options={{ title: 'Shared Location' }} />
         <Stack.Screen name="groups/index" options={{ title: 'Riding Groups' }} />
         <Stack.Screen name="groups/new" options={{ title: 'New Group' }} />
         <Stack.Screen name="groups/[id]" options={{ title: '' }} />
