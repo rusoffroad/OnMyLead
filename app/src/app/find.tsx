@@ -3,12 +3,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 
 import { RideRow, RowGroup } from '@/components/ride-row';
+import { PlaceSearch } from '@/components/place-search';
 import { RidesMap } from '@/components/rides-map';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Screen, Section, Segmented } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { boundsAround, RADIUS_CHOICES_MI, stateByCode, US_STATES, type Bounds } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
+import type { Place } from '@/core/places';
 import { publicRidesInArea, publicRidesInState, publicRidesNear } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { currentPosition, stateAt } from '@/lib/location';
@@ -26,6 +28,8 @@ export default function FindRides() {
   const [mode, setMode] = useState<Mode>('near');
   const [radius, setRadius] = useState<number>(50);
   const [here, setHere] = useState<LatLng | null>(null);
+  // A park, trailhead or town the rider searched for: "near me" then means near there.
+  const [place, setPlace] = useState<Place | null>(null);
   const [locating, setLocating] = useState(true);
   const [stateCode, setStateCode] = useState<string | null>(null);
   const [pickingState, setPickingState] = useState(false);
@@ -55,13 +59,15 @@ export default function FindRides() {
   // Ask for the rider's location as soon as the screen opens (locating starts true).
   useEffect(() => void findHere(), []);
 
+  const origin: LatLng | null = place ?? here;
+
   useEffect(() => {
     let live = true;
     const run = async () => {
       const search: (() => Promise<Found[]>) | null = area
         ? () => publicRidesInArea(area, here)
-        : mode === 'near' && here
-          ? () => publicRidesNear(here, radius)
+        : mode === 'near' && origin
+          ? () => publicRidesNear(origin, radius)
           : stateCode
             ? () => publicRidesInState(stateCode)
             : null;
@@ -72,7 +78,7 @@ export default function FindRides() {
         const found = await search();
         if (live) setRides(found);
         track('rides_searched', {
-          mode: area ? 'area' : mode,
+          mode: area ? 'area' : place && mode === 'near' ? 'place' : mode,
           radius: mode === 'near' && !area ? radius : null,
           state: stateCode,
           results: found.length,
@@ -87,16 +93,32 @@ export default function FindRides() {
     return () => {
       live = false;
     };
-  }, [mode, here, radius, stateCode, area]);
+  }, [mode, origin, radius, stateCode, area]);
 
   const state = stateByCode(stateCode);
-  // The map opens on the rider's state; outside the US it falls back to the search radius.
-  const frame = useMemo(() => state ?? (here ? boundsAround(here, radius) : null), [state, here, radius]);
-  const ring = useMemo(() => (mode === 'near' && here && !area ? { center: here, miles: radius } : null), [mode, here, radius, area]);
+  // The map opens on the rider's state (or around a searched place); outside the US it falls back to the search radius.
+  const frame = useMemo(
+    () => (place ? boundsAround(place, radius) : state ?? (here ? boundsAround(here, radius) : null)),
+    [place, state, here, radius],
+  );
+  const ring = useMemo(() => (mode === 'near' && origin && !area ? { center: origin, miles: radius } : null), [mode, origin, radius, area]);
   const open = (r: Ride) => router.push(`/r/${r.invite_code}`);
+
+  const goToPlace = (p: Place) => {
+    setPlace(p);
+    setMode('near');
+    setArea(null);
+    setPickingState(false);
+    if (p.state) setStateCode(p.state);
+  };
+  const clearPlace = () => {
+    setPlace(null);
+    setArea(null);
+  };
 
   const switchMode = (m: Mode) => {
     setMode(m);
+    if (m === 'state') setPlace(null);
     setArea(null);
     setPickingState(false);
   };
@@ -104,7 +126,7 @@ export default function FindRides() {
     setStateCode(code);
     setPickingState(false);
     // On the near-me map a picked state means "show me rides there", not near me.
-    setArea(mode === 'near' && here ? stateByCode(code) ?? null : null);
+    setArea(mode === 'near' && origin ? stateByCode(code) ?? null : null);
   };
 
   const statePicker = (
@@ -113,7 +135,7 @@ export default function FindRides() {
 
   const empty =
     area ? 'No public rides in this map area yet.'
-    : mode === 'near' && here ? `No public rides within ${radius} miles yet.`
+    : mode === 'near' && origin ? `No public rides within ${radius} miles${place ? ` of ${place.name}` : ''} yet.`
     : `No public rides in ${state?.name ?? 'this state'} yet.`;
 
   return (
@@ -127,7 +149,15 @@ export default function FindRides() {
         ]}
       />
 
-      {mode === 'near' && !here ? (
+      <PlaceSearch label="Search Near a Place" near={here} onPick={goToPlace} />
+      {place ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
+          <ThemedText style={{ flex: 1, fontWeight: 600 }}>Rides Near {place.name}</ThemedText>
+          <Button title={here ? 'Back to Near Me' : 'Clear'} kind="ghost" onPress={clearPlace} />
+        </View>
+      ) : null}
+
+      {mode === 'near' && !origin ? (
         <Card>
           <ThemedText>{locating ? 'Finding where you are…' : 'Turn on location to see rides near you, or pick your state below.'}</ThemedText>
           {!locating && locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
@@ -144,16 +174,16 @@ export default function FindRides() {
         <RidesMap
           rides={rides ?? []}
           frame={frame}
-          frameKey={state?.code ?? 'here'}
+          frameKey={place ? `${place.id}:${radius}` : state?.code ?? 'here'}
           circle={ring}
-          title={state?.name ?? null}
+          title={place?.name ?? state?.name ?? null}
           onPressTitle={() => setPickingState((p) => !p)}
           onOpen={open}
           onSearchArea={setArea}
         />
       ) : null}
 
-      {mode === 'near' && here && !area ? (
+      {mode === 'near' && origin && !area ? (
         <Choice
           label="How Far Will You Go?"
           value={radius}
@@ -161,7 +191,7 @@ export default function FindRides() {
           options={RADIUS_CHOICES_MI.map((mi) => ({ value: mi, label: `${mi} Miles` }))}
         />
       ) : null}
-      {area ? <Button title={mode === 'near' && here ? 'Back to Rides Near Me' : `Back to All of ${state?.name ?? 'the State'}`} kind="ghost" onPress={() => setArea(null)} /> : null}
+      {area ? <Button title={mode === 'near' && origin ? (place ? `Back to Rides Near ${place.name}` : 'Back to Rides Near Me') : `Back to All of ${state?.name ?? 'the State'}`} kind="ghost" onPress={() => setArea(null)} /> : null}
 
       {loading ? <ThemedText themeColor="textSecondary">Looking for rides…</ThemedText> : null}
       {rides && !loading ? (
