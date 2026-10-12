@@ -13,7 +13,7 @@
 //          APNS_KEY_ID           10-character Key ID of the APNs auth key (.p8)
 //          APNS_TEAM_ID          Apple Developer Team ID
 //          APNS_PRIVATE_KEY      contents of the .p8 file
-//          APNS_BUNDLE_ID        com.rusoffroad.onmylead (default)
+//          APNS_BUNDLE_ID        com.rusoffroad.onmylead.app (default)
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -75,7 +75,7 @@ async function sendApns(token: string, payload: unknown, jwt: string): Promise<'
       method: 'POST',
       headers: {
         authorization: `bearer ${jwt}`,
-        'apns-topic': env('APNS_BUNDLE_ID') || 'com.rusoffroad.onmylead',
+        'apns-topic': env('APNS_BUNDLE_ID') || 'com.rusoffroad.onmylead.app',
         'apns-push-type': 'alert',
         'apns-priority': '10',
       },
