@@ -49,7 +49,7 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
 
   return (
     <Card>
-      <Field label="Trip name" value={name} onChangeText={setName} placeholder="Moab long weekend" maxLength={120} />
+      <Field label="Trip Name" value={name} onChangeText={setName} placeholder="Moab long weekend" maxLength={120} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <View style={{ flex: 1 }}>
           <Field label="Starts" value={startsOn} onChangeText={setStartsOn} placeholder="YYYY-MM-DD" autoCapitalize="none" maxLength={10} />
@@ -61,18 +61,18 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
       {vehicles.length ? (
         <Choice
           label="Taking"
-          options={[{ value: null, label: 'Not set' }, ...vehicles.map((v) => ({ value: v.id as string | null, label: v.nickname || vehicleTitle(v) }))]}
+          options={[{ value: null, label: 'Not Set' }, ...vehicles.map((v) => ({ value: v.id as string | null, label: v.nickname || vehicleTitle(v) }))]}
           value={vehicleId}
           onChange={setVehicleId}
         />
       ) : null}
       {rideOptions.length || rideId ? (
         <Choice
-          label="For a ride"
+          label="For a Ride"
           options={[
-            { value: null, label: 'No ride' },
+            { value: null, label: 'No Ride' },
             ...rideOptions.map((r) => ({ value: r.id as string | null, label: r.name })),
-            ...(rideId && !rideOptions.some((r) => r.id === rideId) ? [{ value: rideId as string | null, label: 'Linked ride' }] : []),
+            ...(rideId && !rideOptions.some((r) => r.id === rideId) ? [{ value: rideId as string | null, label: 'Linked Ride' }] : []),
           ]}
           value={rideId}
           onChange={setRideId}

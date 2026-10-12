@@ -131,7 +131,7 @@ export default function GroupPage() {
         <Convoy names={group.riders.map((r) => r.name)} size={40} max={7} />
       </View>
 
-      <Button title="Invite To A Ride" big onPress={() => setPicking(picking === 'ride' ? null : 'ride')} />
+      <Button title="Invite to a Ride" big onPress={() => setPicking(picking === 'ride' ? null : 'ride')} />
       {notice ? (
         <View style={styles.notice} accessibilityLiveRegion="polite">
           <Icon name="check" color="#3CC36B" size={20} strokeWidth={2.6} />
@@ -165,7 +165,7 @@ export default function GroupPage() {
           ) : (
             <View style={{ padding: Spacing.three, gap: Spacing.two }}>
               <ThemedText themeColor="textSecondary">You’re not organizing an upcoming ride. Create one and invite the group from there.</ThemedText>
-              <Button title="Create A Ride" kind="secondary" onPress={() => router.push('/ride/new')} />
+              <Button title="Create a Ride" kind="secondary" onPress={() => router.push('/ride/new')} />
             </View>
           )}
         </View>
@@ -240,7 +240,7 @@ export default function GroupPage() {
       ) : null}
 
       <View style={styles.linkCard}>
-        <ThemedText type="heading">Invite By Link</ThemedText>
+        <ThemedText type="heading">Invite by Link</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           For friends who aren’t on OnMyLead yet. They open the link, make a free account and join the group.
         </ThemedText>
@@ -262,7 +262,7 @@ export default function GroupPage() {
           <Pressable
             accessibilityRole="button"
             onPress={async () => {
-              if (!(await confirmAsync('Make A New Link?', 'The old link stops working. Everyone already in the group stays in.', 'New Link'))) return;
+              if (!(await confirmAsync('Make a new link?', 'The old link stops working. Everyone already in the group stays in.', 'New Link'))) return;
               act('reset', async () => {
                 await resetGroupLink(group.id);
                 setCopied(false);
@@ -270,7 +270,7 @@ export default function GroupPage() {
               });
             }}
             style={{ minHeight: 40, justifyContent: 'center' }}>
-            <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Make A New Link</ThemedText>
+            <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Make a New Link</ThemedText>
           </Pressable>
         ) : null}
       </View>

@@ -86,17 +86,17 @@ export default function ShareMyLocation() {
         const nearEnd = left != null && left <= EXTEND_PROMPT_LEAD_MIN * 60_000;
         return (
           <Card key={s.id} style={{ borderLeftWidth: 4, borderLeftColor: theme.sky }}>
-            <ThemedText type="heading" style={{ color: theme.sky }}>Sharing now, {formatRemaining(left)}</ThemedText>
+            <ThemedText type="heading" style={{ color: theme.sky }}>Sharing Now, {formatRemaining(left)}</ThemedText>
             {s.link_token ? <ThemedText type="small" themeColor="textSecondary">Includes a family link</ThemedText> : null}
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
               <Button title="Stop" kind="danger" style={{ flex: 1 }} onPress={() => stop(s)} />
-              <Button title={nearEnd ? 'Ending soon · add 1 hr' : 'Add 1 hour'} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
+              <Button title={nearEnd ? 'Ending Soon · Add 1 Hr' : 'Add 1 Hour'} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
             </View>
           </Card>
         );
       })}
 
-      <Section title="Who can see you" />
+      <Section title="Who Can See You" />
       {friends.length === 0 ? (
         <ThemedText themeColor="textSecondary">People you’ve ridden with show up here. You can still share a family link.</ThemedText>
       ) : null}
@@ -124,14 +124,14 @@ export default function ShareMyLocation() {
             {familyLink ? <Icon name="check" size={20} color="#fff" strokeWidth={3} /> : null}
           </View>
           <View style={{ flex: 1 }}>
-            <ThemedText style={{ fontWeight: 700 }}>Family link</ThemedText>
+            <ThemedText style={{ fontWeight: 700 }}>Family Link</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">A read-only web link for someone without the app. It stops working when sharing ends.</ThemedText>
           </View>
         </Card>
       </Pressable>
 
-      <Section title="For how long" />
-      <SharePicker options={PERSONAL_SHARE_OPTIONS_MIN} openLabel="Until I turn it off (max 24 hours)" busy={busy} onPick={(m) => {
+      <Section title="For How Long" />
+      <SharePicker options={PERSONAL_SHARE_OPTIONS_MIN} openLabel="Until I Turn It Off (Max 24 Hours)" busy={busy} onPick={(m) => {
         if (m == null) {
           Alert.alert('Share until you turn it off?', 'It still stops automatically after 24 hours.', [
             { text: 'Cancel', style: 'cancel' },

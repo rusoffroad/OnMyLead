@@ -51,7 +51,7 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
 
   return (
     <Card style={advice ? { borderLeftWidth: 4, borderLeftColor: COLOR[advice.check] } : undefined}>
-      <ThemedText type="heading" style={advice ? { color: COLOR[advice.check] } : undefined}>{advice ? RANGE_LABEL[advice.check] : 'Your machine'}</ThemedText>
+      <ThemedText type="heading" style={advice ? { color: COLOR[advice.check] } : undefined}>{advice ? RANGE_LABEL[advice.check] : 'Your Machine'}</ThemedText>
       {advice ? (
         <>
           <ThemedText style={{ fontSize: 18, lineHeight: 24, fontWeight: 700 }}>{advice.line}</ThemedText>
@@ -66,7 +66,7 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
           <ThemedText type="small" themeColor="textSecondary">
             Add tank size and mpg to {vehicleTitle(vehicle)} to check your fuel for this ride.
           </ThemedText>
-          <Button title="Edit machine" kind="secondary" onPress={() => router.push(`/garage/${vehicle.id}/edit`)} />
+          <Button title="Edit Machine" kind="secondary" onPress={() => router.push(`/garage/${vehicle.id}/edit`)} />
         </View>
       ) : !vehicle && ride.route_miles ? (
         <ThemedText type="small" themeColor="textSecondary">
@@ -77,13 +77,13 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
       {canChange && vehicles.length ? (
         <Choice
           label="Bringing"
-          options={[...vehicles.map((v) => ({ value: v.id as string | null, label: vehicleTitle(v) })), { value: null, label: 'None / riding along' }]}
+          options={[...vehicles.map((v) => ({ value: v.id as string | null, label: vehicleTitle(v) })), { value: null, label: 'None / Riding Along' }]}
           value={mine.vehicle_id}
           onChange={(v) => (busy || v === mine.vehicle_id ? undefined : pick(v))}
         />
       ) : null}
       {canChange && !vehicles.length ? (
-        <Button title="Add your machine to the garage" kind="secondary" onPress={() => router.push('/garage/new')} />
+        <Button title="Add Your Machine to the Garage" kind="secondary" onPress={() => router.push('/garage/new')} />
       ) : null}
       <ErrorText error={error} />
     </Card>

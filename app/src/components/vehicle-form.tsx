@@ -134,7 +134,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
 
   return (
     <>
-      <Choice label="What are you adding?" options={VEHICLE_KINDS} value={kind} onChange={setKind} />
+      <Choice label="What Are You Adding?" options={VEHICLE_KINDS} value={kind} onChange={setKind} />
 
       <Card>
         {shownPhoto ? (
@@ -142,7 +142,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
         ) : (
           <ThemedText type="small" themeColor="textSecondary">Add a photo of your machine.</ThemedText>
         )}
-        <Button title={shownPhoto ? 'Change photo' : 'Choose photo'} kind="secondary" onPress={pickPhoto} />
+        <Button title={shownPhoto ? 'Change Photo' : 'Choose Photo'} kind="secondary" onPress={pickPhoto} />
       </Card>
 
       <Field label="Nickname" value={nickname} onChangeText={setNickname} placeholder="Dusty" />
@@ -163,30 +163,30 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
         </Half>
       </Row>
       <Field label="VIN" value={vin} onChangeText={setVin} autoCapitalize="characters" autoCorrect={false} maxLength={17} placeholder="Optional" />
-      <Button title="Fill year, make and model from VIN" kind="secondary" loading={vinBusy} disabled={!vin.trim()} onPress={lookUpVin} />
+      <Button title="Fill Year, Make and Model From VIN" kind="secondary" loading={vinBusy} disabled={!vin.trim()} onPress={lookUpVin} />
       {vinNote ? <ThemedText type="small" themeColor="textSecondary">{vinNote}</ThemedText> : null}
 
-      <Field label="Purchase price ($)" value={price} onChangeText={setPrice} keyboardType="decimal-pad" placeholder="Optional" />
+      <Field label="Purchase Price ($)" value={price} onChangeText={setPrice} keyboardType="decimal-pad" placeholder="Optional" />
       <Row>
         <Half>
-          <Field label="Engine hours" value={hours} onChangeText={setHours} keyboardType="decimal-pad" />
+          <Field label="Engine Hours" value={hours} onChangeText={setHours} keyboardType="decimal-pad" />
         </Half>
         <Half>
-          <Field label="Odometer (miles)" value={odometer} onChangeText={setOdometer} keyboardType="decimal-pad" />
+          <Field label="Odometer (Miles)" value={odometer} onChangeText={setOdometer} keyboardType="decimal-pad" />
         </Half>
       </Row>
 
       <Card>
-        <ThemedText type="heading">Fuel and mileage</ThemedText>
+        <ThemedText type="heading">Fuel and Mileage</ThemedText>
         <Row>
           <Half>
             <Field label="Tank (gal)" value={tank} onChangeText={setTank} keyboardType="decimal-pad" placeholder="10" />
           </Half>
           <Half>
-            <Field label="Extra fuel (gal)" value={extra} onChangeText={setExtra} keyboardType="decimal-pad" placeholder="0" />
+            <Field label="Extra Fuel (gal)" value={extra} onChangeText={setExtra} keyboardType="decimal-pad" placeholder="0" />
           </Half>
         </Row>
-        <Field label="Miles per gallon" value={mpg} onChangeText={setMpg} keyboardType="decimal-pad" placeholder="12" hint="Your real-world trail mpg, not the sticker." />
+        <Field label="Miles per Gallon" value={mpg} onChangeText={setMpg} keyboardType="decimal-pad" placeholder="12" hint="Your real-world trail mpg, not the sticker." />
         {range ? (
           <ThemedText type="small" themeColor="textSecondary">
             About {Math.round(range.fullRangeMiles)} miles on {range.totalGallons} gallons. Turn around by {Math.round(range.safeTurnaroundMiles)} miles out.
@@ -195,7 +195,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
       </Card>
 
       <ErrorText error={error} />
-      <Button title={current ? 'Save changes' : 'Add to garage'} big loading={busy} onPress={save} />
+      <Button title={current ? 'Save Changes' : 'Add to Garage'} big loading={busy} onPress={save} />
     </>
   );
 }

@@ -50,12 +50,12 @@ export { ErrorBoundary } from 'expo-router';
 const STATUSES: { kind: RiderStatusKind; label: string; urgent?: boolean }[] = [
   { kind: 'ok', label: 'OK' },
   { kind: 'stopped', label: 'Stopped' },
-  { kind: 'need_fuel', label: 'Need fuel' },
+  { kind: 'need_fuel', label: 'Need Fuel' },
   { kind: 'mechanical', label: MECHANICAL_LABEL },
-  { kind: 'flat_tire', label: 'Flat tire' },
+  { kind: 'flat_tire', label: 'Flat Tire' },
   { kind: 'stuck', label: 'Stuck' },
   { kind: 'lost', label: 'Lost' },
-  { kind: 'need_help', label: 'Need help', urgent: true },
+  { kind: 'need_help', label: 'Need Help', urgent: true },
   { kind: 'emergency', label: 'EMERGENCY', urgent: true },
 ];
 const STATUS_LABEL = Object.fromEntries(STATUSES.map((s) => [s.kind, s.label])) as Record<RiderStatusKind, string>;
@@ -421,7 +421,7 @@ export default function RideMode() {
       setShare(s);
       setAskShare(false);
     } catch (e) {
-      Alert.alert('Could not start sharing', e instanceof Error ? e.message : String(e));
+      Alert.alert('Could Not Start Sharing', e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -442,7 +442,7 @@ export default function RideMode() {
     } catch {}
     const sent = await sendStatusReliably(id, kind, at);
     setStatuses((prev) => ({ ...prev, [me!]: { status: kind, tapped_at: new Date().toISOString() } }));
-    if (!sent) Alert.alert('No signal', `"${STATUS_LABEL[kind]}" will send as soon as you're back in service.`);
+    if (!sent) Alert.alert('No Signal', `"${STATUS_LABEL[kind]}" will send as soon as you're back in service.`);
   }
 
   async function quickReply(body: QuickReply) {
@@ -450,7 +450,7 @@ export default function RideMode() {
     setLastReply(body);
     const sent = await sendQuickReplyReliably(id, body);
     if (sent) chat.reload();
-    else Alert.alert('No signal', `"${body}" will send as soon as you're back in service.`);
+    else Alert.alert('No Signal', `"${body}" will send as soon as you're back in service.`);
   }
 
   async function regroupHere() {
@@ -459,7 +459,7 @@ export default function RideMode() {
       await dropRegroup(id, p.lat, p.lng, 'Regroup here');
       refresh();
     } catch (e) {
-      Alert.alert('Could not set regroup point', e instanceof Error ? e.message : String(e));
+      Alert.alert('Could Not Set Regroup Point', e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -478,7 +478,7 @@ export default function RideMode() {
     watchesBubble: !!watchesBubble,
     canRegroup: !!canRegroup,
     riders: mapRiders.map((r) => ({
-      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? ' (Tail gunner)' : ''}`,
+      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? ' (Tail Gunner)' : ''}`,
       detail: r.detail,
     })),
     helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || 'Rider', status: STATUS_LABEL[s.status] })),
@@ -543,7 +543,7 @@ export default function RideMode() {
               accessibilityRole="button"
               accessibilityLabel={`${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}. Tap to see every rider and when they last updated`}>
               <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
-                {bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'} ›
+                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'} ›
               </Text>
             </Pressable>
           </View>
@@ -696,7 +696,7 @@ export default function RideMode() {
 
         {panelOpen ? (
           <>
-            {canRegroup ? <Button title="Regroup at my location" big onPress={regroupHere} style={{ marginTop: Spacing.two }} /> : null}
+            {canRegroup ? <Button title="Regroup at My Location" big onPress={regroupHere} style={{ marginTop: Spacing.two }} /> : null}
 
             <View style={styles.replies}>
               {QUICK_REPLIES.map((q) => (
@@ -753,12 +753,12 @@ export default function RideMode() {
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <View style={styles.sheetWrap}>
           <View style={styles.sheet}>
-            <ThemedText type="subtitle" style={styles.sheetTitle}>Share your location with this ride?</ThemedText>
+            <ThemedText type="subtitle" style={styles.sheetTitle}>Share Your Location with This Ride?</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
               Only riders on this ride will see you. Sharing stops automatically when time runs out or the ride ends.
             </ThemedText>
-            <SharePicker options={RIDE_SHARE_OPTIONS_MIN} openLabel="Until I leave the ride" onPick={beginShare} busy={busy} />
-            <Button title="Not now" kind="secondary" onPress={() => setAskShare(false)} />
+            <SharePicker options={RIDE_SHARE_OPTIONS_MIN} openLabel="Until I Leave the Ride" onPick={beginShare} busy={busy} />
+            <Button title="Not Now" kind="secondary" onPress={() => setAskShare(false)} />
           </View>
         </View>
       </Modal>
@@ -776,7 +776,7 @@ export default function RideMode() {
               </ThemedText>
             ) : null}
             <Button
-              title="Alert my group"
+              title="Alert My Group"
               kind="danger"
               big
               onLongPress={async () => {

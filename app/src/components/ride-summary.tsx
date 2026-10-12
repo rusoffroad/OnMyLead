@@ -75,18 +75,18 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
   return (
     <View style={{ gap: Spacing.three }}>
       <Card>
-        <ThemedText type="heading">Your ride</ThemedText>
+        <ThemedText type="heading">Your Ride</ThemedText>
         {points === undefined ? (
           <ThemedText type="small" themeColor="textSecondary">Loading your track…</ThemedText>
         ) : summary ? (
           <>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three }}>
               <Stat label="Distance" value={formatMiles(summary.distanceM)} />
-              <Stat label="Moving time" value={formatDuration(summary.movingTimeSec)} />
-              <Stat label="Average speed" value={summary.movingTimeSec ? formatMph(summary.avgMovingSpeedMps) : '—'} />
-              <Stat label="Top speed" value={formatMph(summary.maxSpeedMps)} />
+              <Stat label="Moving Time" value={formatDuration(summary.movingTimeSec)} />
+              <Stat label="Average Speed" value={summary.movingTimeSec ? formatMph(summary.avgMovingSpeedMps) : '—'} />
+              <Stat label="Top Speed" value={formatMph(summary.maxSpeedMps)} />
               {summary.elevationGainM != null ? <Stat label="Climbing" value={formatFeet(summary.elevationGainM)} /> : null}
-              <Stat label="Out for" value={formatDuration(summary.elapsedSec)} />
+              <Stat label="Out For" value={formatDuration(summary.elapsedSec)} />
             </View>
             <RouteMap route={summary.route} />
             <ThemedText type="small" themeColor="textSecondary">Only you can see your route.</ThemedText>
@@ -99,7 +99,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
       </Card>
 
       <Card>
-        <ThemedText type="heading">The group</ThemedText>
+        <ThemedText type="heading">The Group</ThemedText>
         <ThemedText>
           {finished.length} {finished.length === 1 ? 'rider' : 'riders'} finished:{' '}
           {finished.map((m) => m.profiles?.display_name || 'Rider').join(', ')}
@@ -108,7 +108,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three }}>
             {group.longest_miles != null ? <Stat label="Longest" value={`${group.longest_miles} mi`} /> : null}
             {group.average_miles != null ? <Stat label="Average" value={`${group.average_miles} mi`} /> : null}
-            {group.top_speed_mph != null ? <Stat label="Group top speed" value={`${group.top_speed_mph} mph`} /> : null}
+            {group.top_speed_mph != null ? <Stat label="Group Top Speed" value={`${group.top_speed_mph} mph`} /> : null}
           </View>
         ) : null}
         {group && group.riders_tracked > 0 ? (
@@ -119,9 +119,9 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
       </Card>
 
       <Card>
-        <ThemedText type="heading">Ride card</ThemedText>
+        <ThemedText type="heading">Ride Card</ThemedText>
         <RideCard ref={cardRef} card={card} />
-        <Button title="Share ride card" loading={sharing} onPress={share} />
+        <Button title="Share Ride Card" loading={sharing} onPress={share} />
         <ThemedText type="small" themeColor="textSecondary">The card never shows the meeting point or anyone’s route.</ThemedText>
         {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
         <ErrorText error={error} />

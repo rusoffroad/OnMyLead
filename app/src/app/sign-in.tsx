@@ -95,13 +95,13 @@ export default function SignIn() {
           setNotice(null);
         }}
         options={[
-          { value: 'sign_in', label: 'Sign in' },
-          { value: 'create', label: 'Create account' },
+          { value: 'sign_in', label: 'Sign In' },
+          { value: 'create', label: 'Create Account' },
         ]}
       />
 
       {mode === 'create' ? (
-        <Field label="Your name" value={name} onChangeText={setName} placeholder="What riders will see" autoComplete="name" />
+        <Field label="Your Name" value={name} onChangeText={setName} placeholder="What riders will see" autoComplete="name" />
       ) : null}
       <Field
         label="Email"
@@ -121,7 +121,7 @@ export default function SignIn() {
         placeholder={mode === 'create' ? 'At least 8 characters' : ''}
       />
       <Button
-        title={mode === 'create' ? 'Create account' : 'Sign in'}
+        title={mode === 'create' ? 'Create Account' : 'Sign In'}
         big
         loading={busy === 'submit'}
         disabled={!emailOk || password.length < (mode === 'create' ? 8 : 1) || (mode === 'create' && !name.trim())}
@@ -184,7 +184,7 @@ export default function SignIn() {
 function friendly(message: string) {
   if (/invalid login credentials/i.test(message)) return 'That email and password don’t match. Try again, or use the reset link.';
   if (/email not confirmed/i.test(message)) return 'Please confirm your email first. Tap the link we sent you, then sign in.';
-  if (/already registered|already exists/i.test(message)) return 'There’s already an account with that email. Switch to Sign in.';
+  if (/already registered|already exists/i.test(message)) return 'There’s already an account with that email. Switch to Sign In.';
   if (/rate limit|too many/i.test(message)) return 'Too many emails sent just now. Wait a few minutes and try again.';
   if (/password/i.test(message) && /least|short|weak/i.test(message)) return 'Pick a longer password (at least 8 characters).';
   return message;

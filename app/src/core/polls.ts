@@ -17,9 +17,9 @@ export type PollVote = { message_id: string; ride_id: string; user_id: string; c
 /** One-tap starters for the questions organizers ask most. */
 export const POLL_STARTERS: { question: string; choices: string[] }[] = [
   { question: 'Lunch Stop?', choices: ['Yes', 'No'] },
-  { question: 'How’s The Pace?', choices: ['Too Slow', 'Just Right', 'Too Fast'] },
-  { question: 'Saturday Or Sunday?', choices: ['Saturday', 'Sunday'] },
-  { question: 'Morning Or Afternoon?', choices: ['Morning', 'Afternoon'] },
+  { question: 'How’s the Pace?', choices: ['Too Slow', 'Just Right', 'Too Fast'] },
+  { question: 'Saturday or Sunday?', choices: ['Saturday', 'Sunday'] },
+  { question: 'Morning or Afternoon?', choices: ['Morning', 'Afternoon'] },
 ];
 
 export const isPoll = (m: Pick<ChatMessage, 'poll_options'>): boolean =>

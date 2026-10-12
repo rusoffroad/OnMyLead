@@ -37,7 +37,7 @@ export function InviteCard({ ride, fresh, manager }: { ride: Ride; fresh?: boole
   return (
     <Card style={fresh ? { borderWidth: 2, borderColor: Colors.accent } : undefined}>
       <ThemedText type={fresh ? 'subtitle' : 'heading'}>
-        {fresh ? (isPrivate ? 'Your private ride is ready' : 'Your ride is live in search') : 'Invite riders'}
+        {fresh ? (isPrivate ? 'Your Private Ride Is Ready' : 'Your Ride Is Live in Search') : 'Invite Riders'}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         {isPrivate
@@ -45,15 +45,15 @@ export function InviteCard({ ride, fresh, manager }: { ride: Ride; fresh?: boole
           : 'Anyone can find it near them or in your state. Send it to friends too.'}
       </ThemedText>
       <View style={{ borderRadius: Radius.control, borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border, paddingVertical: 12, alignItems: 'center' }}>
-        <ThemedText type="small" themeColor="textSecondary">Invite code</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">Invite Code</ThemedText>
         <ThemedText selectable style={{ fontSize: 40, lineHeight: 44, letterSpacing: 4, fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
       </View>
-      <Button title="Share invite" big onPress={() => send('sheet')} />
+      <Button title="Share Invite" big onPress={() => send('sheet')} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title="Text" kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
         <Button title="Email" kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
         <Button
-          title={copied ? 'Copied' : 'Copy link'}
+          title={copied ? 'Copied' : 'Copy Link'}
           kind="secondary"
           style={{ flex: 1 }}
           onPress={async () => {

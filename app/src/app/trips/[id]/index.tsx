@@ -56,7 +56,7 @@ export default function TripPage() {
     return (
       <Screen>
         <ThemedText>That trip is not in your list.</ThemedText>
-        <Button title="All trips" kind="secondary" onPress={() => router.replace('/trips')} />
+        <Button title="All Trips" kind="secondary" onPress={() => router.replace('/trips')} />
       </Screen>
     );
   }
@@ -102,7 +102,7 @@ export default function TripPage() {
 
   const resetChecks = () =>
     run('uncheck', async () => {
-      if (!(await confirmAsync('Uncheck everything?', 'Every item goes back to not packed. The list stays.', 'Uncheck all'))) return;
+      if (!(await confirmAsync('Uncheck everything?', 'Every item goes back to not packed. The list stays.', 'Uncheck All'))) return;
       await uncheckAll(trip.id);
       await load();
     });
@@ -153,7 +153,7 @@ export default function TripPage() {
 
       {items.length === 0 || showTemplates ? (
         <Card>
-          <ThemedText type="heading">Add a starter list</ThemedText>
+          <ThemedText type="heading">Add a Starter List</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">One tap adds the items. Add as many as fit the trip; nothing is added twice.</ThemedText>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two }}>
             {TRIP_TEMPLATES.map((tpl) => (
@@ -170,7 +170,7 @@ export default function TripPage() {
           </View>
         </Card>
       ) : (
-        <Button title="Add a starter list" kind="ghost" onPress={() => setShowTemplates(true)} />
+        <Button title="Add a Starter List" kind="ghost" onPress={() => setShowTemplates(true)} />
       )}
 
       {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
@@ -187,7 +187,7 @@ export default function TripPage() {
           }}
         />
       ) : (
-        <Button title="Add an item" onPress={() => setEditing('new')} />
+        <Button title="Add an Item" onPress={() => setEditing('new')} />
       )}
 
       {groupByCategory(items).map((g) => {
@@ -223,16 +223,16 @@ export default function TripPage() {
 
       {items.length ? (
         <View style={{ gap: Spacing.two }}>
-          <ThemedText type="heading">After the trip</ThemedText>
+          <ThemedText type="heading">After the Trip</ThemedText>
           <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-            <Button title="Uncheck all" kind="secondary" style={{ flex: 1 }} loading={busy === 'uncheck'} disabled={p.packed === 0} onPress={resetChecks} />
-            <Button title="Copy to a new trip" kind="secondary" style={{ flex: 1 }} loading={busy === 'copy'} onPress={copy} />
+            <Button title="Uncheck All" kind="secondary" style={{ flex: 1 }} loading={busy === 'uncheck'} disabled={p.packed === 0} onPress={resetChecks} />
+            <Button title="Copy to a New Trip" kind="secondary" style={{ flex: 1 }} loading={busy === 'copy'} onPress={copy} />
           </View>
         </View>
       ) : null}
 
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Edit trip" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(`/trips/${trip.id}/edit`)} />
+        <Button title="Edit Trip" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(`/trips/${trip.id}/edit`)} />
         <Button title="Delete" kind="danger" style={{ flex: 1 }} loading={busy === 'delete'} onPress={remove} />
       </View>
     </Screen>
@@ -312,7 +312,7 @@ function ItemForm({
       <Field label="Item" value={name} onChangeText={setName} placeholder="Tow strap" maxLength={200} />
       <View style={{ flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' }}>
         <View style={{ width: 96 }}>
-          <Field label="How many" value={qty} onChangeText={setQty} keyboardType="number-pad" maxLength={3} />
+          <Field label="How Many" value={qty} onChangeText={setQty} keyboardType="number-pad" maxLength={3} />
         </View>
         <View style={{ flexDirection: 'row', gap: Spacing.two, flex: 1 }}>
           <Button title="−" kind="secondary" style={{ flex: 1 }} accessibilityLabel="One less" onPress={() => setQty(String(Math.max(1, (Number(qty) || 1) - 1)))} />
@@ -326,7 +326,7 @@ function ItemForm({
         <Button title="Cancel" kind="secondary" style={{ flex: 1 }} onPress={onCancel} />
         <Button title={item ? 'Save' : 'Add'} style={{ flex: 1 }} loading={busy} onPress={save} />
       </View>
-      {onDelete ? <Button title="Remove item" kind="danger" onPress={onDelete} /> : null}
+      {onDelete ? <Button title="Remove Item" kind="danger" onPress={onDelete} /> : null}
     </Card>
   );
 }

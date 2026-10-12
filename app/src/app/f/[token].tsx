@@ -19,7 +19,7 @@ export default function FamilyLink() {
   }, [token]);
 
   if (data === undefined) return <Screen><ThemedText>Loading…</ThemedText></Screen>;
-  if (!data) return <Screen><ThemedText type="subtitle">No longer shared</ThemedText><ThemedText>This location link has ended.</ThemedText></Screen>;
+  if (!data) return <Screen><ThemedText type="subtitle">No Longer Shared</ThemedText><ThemedText>This location link has ended.</ThemedText></Screen>;
 
   const t = (iso: string | null) => (iso ? new Date(iso).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : '—');
   return (

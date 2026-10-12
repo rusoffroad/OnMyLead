@@ -122,8 +122,8 @@ export default function FindRides() {
         value={mode}
         onChange={switchMode}
         options={[
-          { value: 'near', label: 'Near me' },
-          { value: 'state', label: 'By state' },
+          { value: 'near', label: 'Near Me' },
+          { value: 'state', label: 'By State' },
         ]}
       />
 
@@ -131,11 +131,11 @@ export default function FindRides() {
         <Card>
           <ThemedText>{locating ? 'Finding where you are…' : 'Turn on location to see rides near you, or pick your state below.'}</ThemedText>
           {!locating && locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
-          {!locating ? <Button title="Use my location" onPress={locate} /> : null}
+          {!locating ? <Button title="Use My Location" onPress={locate} /> : null}
         </Card>
       ) : null}
 
-      {mode === 'state' && !state ? <ThemedText type="heading">Pick a state</ThemedText> : null}
+      {mode === 'state' && !state ? <ThemedText type="heading">Pick a State</ThemedText> : null}
       {(!state && !locating) || pickingState ? statePicker : null}
 
       <ErrorText error={error} />
@@ -155,23 +155,23 @@ export default function FindRides() {
 
       {mode === 'near' && here && !area ? (
         <Choice
-          label="How far will you go?"
+          label="How Far Will You Go?"
           value={radius}
           onChange={setRadius}
-          options={RADIUS_CHOICES_MI.map((mi) => ({ value: mi, label: `${mi} miles` }))}
+          options={RADIUS_CHOICES_MI.map((mi) => ({ value: mi, label: `${mi} Miles` }))}
         />
       ) : null}
-      {area ? <Button title={mode === 'near' && here ? 'Back to rides near me' : `Back to all of ${state?.name ?? 'the state'}`} kind="ghost" onPress={() => setArea(null)} /> : null}
+      {area ? <Button title={mode === 'near' && here ? 'Back to Rides Near Me' : `Back to All of ${state?.name ?? 'the State'}`} kind="ghost" onPress={() => setArea(null)} /> : null}
 
       {loading ? <ThemedText themeColor="textSecondary">Looking for rides…</ThemedText> : null}
       {rides && !loading ? (
         rides.length === 0 ? (
           <Card>
             <ThemedText>{empty}</ThemedText>
-            <Button title="Create a public ride" onPress={() => router.push('/ride/new?type=public')} />
+            <Button title="Create a Public Ride" onPress={() => router.push('/ride/new?type=public')} />
           </Card>
         ) : (
-          <Section title={`${rides.length} ${rides.length === 1 ? 'ride' : 'rides'}${area ? ' in this map area' : ''}`} />
+          <Section title={`${rides.length} ${rides.length === 1 ? 'Ride' : 'Rides'}${area ? ' in This Map Area' : ''}`} />
         )
       ) : null}
       {rides?.length ? (

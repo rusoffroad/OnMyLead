@@ -41,7 +41,7 @@ export function RiderList({
           </Pressable>
         </View>
         {offline ? (
-          <Text style={styles.offline}>You Have No Service. Times Are From the Last Update You Got.</Text>
+          <Text style={styles.offline}>You have no service. Times are from the last update you got.</Text>
         ) : null}
         <ScrollView contentContainerStyle={{ gap: Spacing.two, paddingBottom: Spacing.four }}>
           {sorted.map((r) => {

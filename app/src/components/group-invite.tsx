@@ -41,13 +41,13 @@ export function GroupInvite({ rideId }: { rideId: string }) {
 
   return (
     <View style={styles.wrap}>
-      <ThemedText type="heading" style={{ fontSize: 20 }}>Invite A Group</ThemedText>
+      <ThemedText type="heading" style={{ fontSize: 20 }}>Invite a Group</ThemedText>
       {off ? (
         <ThemedText type="small" themeColor="textSecondary">Riding groups are not switched on yet. They start working with the next server update.</ThemedText>
       ) : groups === null ? null : groups.length === 0 ? (
         <Pressable accessibilityRole="button" onPress={openNewGroup} style={styles.empty}>
           <View style={{ flex: 1, gap: 2 }}>
-            <ThemedText style={{ fontWeight: 700 }}>Save Your Crew As A Group</ThemedText>
+            <ThemedText style={{ fontWeight: 700 }}>Save Your Crew as a Group</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">Then invite everyone to your next ride in one tap.</ThemedText>
           </View>
           <Icon name="chevron" color={Colors.textSecondary} />

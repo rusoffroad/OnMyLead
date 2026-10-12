@@ -80,8 +80,8 @@ export function RideChat({
   }
 
   const options: { value: SendTo; label: string }[] = [{ value: 'everyone', label: 'Everyone' }];
-  if (leaderName) options.push({ value: 'leader', label: `Leader only (${leaderName})` });
-  if (canAnnounce) options.push({ value: 'announcement', label: 'Announcement (pinned, read aloud)' });
+  if (leaderName) options.push({ value: 'leader', label: `Leader Only (${leaderName})` });
+  if (canAnnounce) options.push({ value: 'announcement', label: 'Announcement (Pinned, Read Aloud)' });
   if (canPoll && onSendPoll) options.push({ value: 'poll', label: 'Quick Poll' });
   const announcing = sendTo === 'announcement';
 
@@ -100,7 +100,7 @@ export function RideChat({
         accessibilityLabel={open ? 'Hide ride chat' : `Show ride chat, ${messages.length} messages`}
         hitSlop={8}
         style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}>
-        <ThemedText type="heading">Ride chat{!open && messages.length ? ` (${messages.length})` : ''}</ThemedText>
+        <ThemedText type="heading">Ride Chat{!open && messages.length ? ` (${messages.length})` : ''}</ThemedText>
         <ThemedText type="smallBold" style={{ color: theme.sky }}>{open ? 'Hide ▲' : 'Show ▼'}</ThemedText>
       </Pressable>
       {!open ? (
@@ -115,7 +115,7 @@ export function RideChat({
             Only riders on this ride can see this. Don’t type while driving: Ride Mode has one-tap replies.
           </ThemedText>
           {messages.length > visible.length ? (
-            <Button title={`Show ${messages.length - visible.length} earlier`} kind="secondary" onPress={() => setShowAll(true)} />
+            <Button title={`Show ${messages.length - visible.length} Earlier`} kind="secondary" onPress={() => setShowAll(true)} />
           ) : null}
           {messages.length === 0 ? <ThemedText type="small" themeColor="textSecondary">No messages yet. Say hi.</ThemedText> : null}
           {visible.map((m) => {
@@ -148,7 +148,7 @@ export function RideChat({
               </View>
             );
           })}
-          {options.length > 1 ? <Choice label="Send to" options={options} value={sendTo} onChange={setSendTo} /> : null}
+          {options.length > 1 ? <Choice label="Send To" options={options} value={sendTo} onChange={setSendTo} /> : null}
           {sendTo === 'poll' ? (
             <>
               <PollComposer pollsOn={pollsOn} onSend={sendPoll} />
@@ -157,7 +157,7 @@ export function RideChat({
           ) : (
             <>
               <Field
-                label={announcing ? 'Announcement' : sendTo === 'leader' ? 'Message to the leader' : 'Message'}
+                label={announcing ? 'Announcement' : sendTo === 'leader' ? 'Message to the Leader' : 'Message'}
                 value={draft}
                 onChangeText={setDraft}
                 placeholder={announcing ? 'Fuel stop in Green River at 11' : sendTo === 'leader' ? 'Only you and the leader see this' : 'Message the group'}
@@ -166,7 +166,7 @@ export function RideChat({
               />
               <ErrorText error={localError ?? error} />
               <Button
-                title={announcing ? 'Post announcement' : sendTo === 'leader' ? 'Send to leader' : 'Send to everyone'}
+                title={announcing ? 'Post Announcement' : sendTo === 'leader' ? 'Send to Leader' : 'Send to Everyone'}
                 loading={busy}
                 onPress={send}
               />

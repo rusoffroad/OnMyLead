@@ -22,18 +22,18 @@ export default function ResetPassword() {
   if (!session) {
     return (
       <Screen>
-        <ThemedText type="subtitle">This link has expired</ThemedText>
+        <ThemedText type="subtitle">This Link Has Expired</ThemedText>
         <ThemedText>Ask for a new reset link from the sign-in screen, and open it on this device.</ThemedText>
-        <Button title="Back to sign in" onPress={() => router.replace('/sign-in')} />
+        <Button title="Back to Sign In" onPress={() => router.replace('/sign-in')} />
       </Screen>
     );
   }
   return (
     <Screen>
-      <ThemedText type="subtitle">Choose a new password</ThemedText>
-      <Field label="New password" value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder="At least 8 characters" />
+      <ThemedText type="subtitle">Choose a New Password</ThemedText>
+      <Field label="New Password" value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder="At least 8 characters" />
       <Button
-        title="Save password"
+        title="Save Password"
         loading={busy}
         disabled={password.length < 8}
         onPress={async () => {

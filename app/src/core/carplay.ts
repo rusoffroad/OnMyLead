@@ -29,25 +29,25 @@ export type CarPlayInput = {
 export const CARPLAY_STATUS_BUTTONS: CarPlayButton[] = [
   { id: 'status:ok', title: 'OK', symbol: 'checkmark.circle.fill' },
   { id: 'status:stopped', title: 'Stopped', symbol: 'pause.circle.fill' },
-  { id: 'status:need_fuel', title: 'Need fuel', symbol: 'fuelpump.fill' },
+  { id: 'status:need_fuel', title: 'Need Fuel', symbol: 'fuelpump.fill' },
   { id: 'status:mechanical', title: 'Mechanical Issue', symbol: 'wrench.and.screwdriver.fill' },
-  { id: 'status:need_help', title: 'Need help', symbol: 'exclamationmark.triangle.fill' },
+  { id: 'status:need_help', title: 'Need Help', symbol: 'exclamationmark.triangle.fill' },
 ];
 export const CARPLAY_REPLY_BUTTONS: CarPlayButton[] = [
   { id: 'reply:Running late', title: 'Running late', symbol: 'clock.fill' },
   { id: 'reply:Need a minute', title: 'Need a minute', symbol: 'hand.raised.fill' },
 ];
 export const GROUP_BUTTON: CarPlayButton = { id: 'group', title: 'Group', symbol: 'person.3.fill' };
-export const REGROUP_BUTTON: CarPlayButton = { id: 'regroup', title: 'Regroup here', symbol: 'mappin.and.ellipse' };
+export const REGROUP_BUTTON: CarPlayButton = { id: 'regroup', title: 'Regroup Here', symbol: 'mappin.and.ellipse' };
 export const EMERGENCY_BUTTON: CarPlayButton = { id: 'emergency', title: 'EMERGENCY', symbol: 'sos.circle.fill' };
 
 export function carPlayState(i: CarPlayInput): CarPlayState {
   const alerts = i.watchesBubble ? i.separated : [];
   const title = alerts.length
-    ? `${alerts.length} separated`
+    ? `${alerts.length} Separated`
     : i.helpCalls.length
       ? `${i.helpCalls[0].name}: ${i.helpCalls[0].status}`
-      : 'Group together';
+      : 'Group Together';
   const buttons = [
     GROUP_BUTTON,
     ...CARPLAY_STATUS_BUTTONS,

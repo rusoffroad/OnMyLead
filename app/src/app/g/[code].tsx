@@ -73,10 +73,10 @@ export default function GroupLink() {
       {preview.is_member ? (
         <Button title="Open Group" big onPress={() => router.replace(`/groups/${preview.id}`)} />
       ) : (
-        <Button title={session ? 'Join Group' : 'Create A Free Account To Join'} big loading={busy} onPress={join} />
+        <Button title={session ? 'Join Group' : 'Create a Free Account to Join'} big loading={busy} onPress={join} />
       )}
       {!session ? (
-        <Button title="I Already Have An Account" kind="ghost" onPress={() => router.push('/sign-in')} />
+        <Button title="I Already Have an Account" kind="ghost" onPress={() => router.push('/sign-in')} />
       ) : null}
     </Screen>
   );

@@ -25,7 +25,7 @@ describe('CarPlay screen', () => {
     const separated = [{ riderId: 'b', message: 'Ben is 1.2 miles behind' }];
     expect(carPlayState({ ...base, separated }).alert).toBeNull();
     const s = carPlayState({ ...base, separated, watchesBubble: true });
-    expect(s.title).toBe('Moab Saturday · 1 separated');
+    expect(s.title).toBe('Moab Saturday · 1 Separated');
     expect(s.alert).toEqual({ id: 'sep:b', text: 'Ben is 1.2 miles behind' });
   });
 

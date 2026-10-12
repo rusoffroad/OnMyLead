@@ -6,7 +6,7 @@ import { ThemedText } from './themed-text';
 import { Button, Field } from './ui';
 
 const label = (min: number | null, openLabel: string) =>
-  min == null ? openLabel : min < 60 ? `${min} min` : min === 60 ? '1 hour' : `${min / 60} hours`;
+  min == null ? openLabel : min < 60 ? `${min} Min` : min === 60 ? '1 Hour' : `${min / 60} Hours`;
 
 /** Duration choice for a share. Includes a custom length in hours. */
 export function SharePicker({

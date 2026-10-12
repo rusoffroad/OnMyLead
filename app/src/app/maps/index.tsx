@@ -65,7 +65,7 @@ export default function OfflineMaps() {
       <Stack.Screen options={{ title: 'Offline Maps' }} />
 
       <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Maps For No Signal</Text>
+        <Text style={styles.heroTitle}>Maps for No Signal</Text>
         <Text style={styles.heroBody}>
           Download an area or a ride before you leave. Ride Mode switches to it on its own when the signal drops.
         </Text>
@@ -73,12 +73,12 @@ export default function OfflineMaps() {
           <Text style={styles.gaugeBig}>{maps.length ? formatBytes(used) : 'None Yet'}</Text>
           <Text style={styles.gaugeSmall}>
             {maps.length === 1 ? '1 Map Saved' : `${maps.length} Maps Saved`}
-            {free != null ? `   ${formatBytes(free)} Free On This Phone` : ''}
+            {free != null ? `   ${formatBytes(free)} Free on This Phone` : ''}
           </Text>
         </View>
       </View>
 
-      <Button title="Download A Map Area" big onPress={() => router.push('/maps/area')} />
+      <Button title="Download a Map Area" big onPress={() => router.push('/maps/area')} />
 
       {maps.length ? (
         <>
