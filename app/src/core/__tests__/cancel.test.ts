@@ -32,7 +32,7 @@ describe('prompts', () => {
     expect(cancelPrompt('Moab', 0).message).toContain('Nobody else');
     expect(deletePrompt('Moab', 4, false).message).toContain('4 riders');
     expect(deletePrompt('Moab', 4, true).message).not.toContain('riders');
-    expect(deletePrompt('Moab', 0, false).confirm).toBe('Delete ride');
+    expect(deletePrompt('Moab', 0, false).confirm).toBe('Delete Ride');
   });
 });
 

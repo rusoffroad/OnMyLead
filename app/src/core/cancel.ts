@@ -30,7 +30,7 @@ export function cancelPrompt(rideName: string, others: number): Prompt {
     message: others
       ? `${people(others)} on this ride will get a notification and an email saying it’s cancelled. The ride stays in their list as Cancelled. This can’t be undone.`
       : 'Nobody else has joined yet. The ride stays in your list as Cancelled. This can’t be undone.',
-    confirm: 'Cancel ride',
+    confirm: 'Cancel Ride',
   };
 }
 
@@ -41,7 +41,7 @@ export function deletePrompt(rideName: string, others: number, over: boolean): P
       others && !over
         ? `It’s removed for everyone, with its chat and route. ${people(others)} on this ride will get a notification and an email saying it’s cancelled. This can’t be undone.`
         : 'It’s removed for everyone, with its chat and route. This can’t be undone.',
-    confirm: 'Delete ride',
+    confirm: 'Delete Ride',
   };
 }
 

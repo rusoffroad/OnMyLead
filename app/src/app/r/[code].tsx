@@ -111,7 +111,7 @@ export default function RidePage() {
 
   const cancel = async () => {
     const p = cancelPrompt(ride.name, toTell);
-    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep ride'))) return;
+    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
     await act('cancel', async () => {
       await cancelRide(ride.id);
       resyncReminders();
@@ -120,7 +120,7 @@ export default function RidePage() {
 
   const remove = async () => {
     const p = deletePrompt(ride.name, toTell, over);
-    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep ride'))) return;
+    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
     setBusy('delete');
     setError(null);
     try {
@@ -149,7 +149,7 @@ export default function RidePage() {
       </View>
       {cancelled ? (
         <View style={styles.cancelled} accessibilityRole="alert">
-          <ThemedText type="heading">This ride is cancelled</ThemedText>
+          <ThemedText type="heading">This Ride Is Cancelled</ThemedText>
           <ThemedText themeColor="textSecondary">
             {isManager
               ? 'Everyone who had joined was sent a notification and an email.'
@@ -272,10 +272,10 @@ export default function RidePage() {
             <View style={styles.callOff}>
               <View style={{ flexDirection: 'row', gap: Spacing.two }}>
                 {canCancel(ride.status, isManager) ? (
-                  <Button title="Cancel ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
+                  <Button title="Cancel Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
                 ) : null}
                 {isOrganizer ? (
-                  <Button title="Delete ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'delete'} disabled={!!busy} onPress={remove} />
+                  <Button title="Delete Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'delete'} disabled={!!busy} onPress={remove} />
                 ) : null}
               </View>
               <ThemedText type="small" themeColor="textSecondary">
