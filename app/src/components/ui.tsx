@@ -1,4 +1,5 @@
-import { ReactNode, useState } from 'react';
+import { BottomTabBarHeightContext } from 'expo-router/tabs';
+import { ReactNode, useContext, useState } from 'react';
 import {
   ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
   type PressableProps, type StyleProp, type TextInputProps, type ViewStyle,
@@ -12,8 +13,11 @@ import { ThemedText } from './themed-text';
 export function Screen({ children, scroll = true, top }: { children: ReactNode; scroll?: boolean; top?: boolean }) {
   const theme = useTheme();
   const inner = <View style={styles.content}>{children}</View>;
+  // On a tab, the tab bar already sits over the home indicator, so the page doesn't pad for it twice.
+  const inTabs = useContext(BottomTabBarHeightContext) !== undefined;
+  const edges = [...(top ? (['top'] as const) : []), ...(inTabs ? [] : (['bottom'] as const))];
   return (
-    <SafeAreaView edges={top ? ['top', 'bottom'] : ['bottom']} style={{ flex: 1, backgroundColor: theme.background }}>
+    <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: theme.background }}>
       {scroll ? (
         <ScrollView keyboardShouldPersistTaps="handled" indicatorStyle="white" contentContainerStyle={{ paddingBottom: Spacing.five }}>
           {inner}

@@ -1,6 +1,6 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState, type ComponentProps } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { DirectionsCard } from '@/components/directions';
 import { FollowLeaders } from '@/components/follow-leaders';
@@ -17,7 +17,7 @@ import { ThemedText } from '@/components/themed-text';
 import { waypointDots } from '@/components/waypoint-blaze';
 import { WaypointRow } from '@/components/waypoint-row';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { rideDirections } from '@/core/directions';
@@ -53,7 +53,7 @@ const time = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour
  * before creating an account. Exact meeting point and roster only show once joined.
  */
 export default function RidePage() {
-  const { code, new: justCreated } = useLocalSearchParams<{ code: string; new?: string }>();
+  const { code, new: justCreated, section: startOn } = useLocalSearchParams<{ code: string; new?: string; section?: string }>();
   const { session } = useSession();
   const { can } = useEntitlements();
   const me = session?.user.id;
@@ -64,6 +64,7 @@ export default function RidePage() {
   const [route, setRoute] = useState<RideRoute | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [section, setSection] = useState<RideSection>(isRideSection(startOn) ? startOn : 'details');
   const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
   const isJoined = members.some((m) => m.user_id === me && m.status === 'joined');
   const chat = useRideChat(ride?.id, isJoined);
@@ -163,6 +164,35 @@ export default function RidePage() {
     }
   };
 
+  // Riders on the ride get the page in four parts instead of one long scroll; anyone else sees the short version.
+  const sectioned = isJoined && !cancelled;
+  const show = (key: RideSection) => !sectioned || section === key;
+  const chatBlock = isJoined ? (
+    <RideChat
+      messages={chat.messages}
+      nameOf={nameOf}
+      me={me}
+      canAnnounce={isManager}
+      leaderName={leaderIds.length && !leaderIds.includes(me ?? '') ? leaderIds.map(nameOf).join(', ') : null}
+      error={chat.error}
+      onSend={chat.send}
+      // The one place that decides who can create polls: the ride's leaders, on a plan with polls,
+      // unless the owner switched polls off.
+      canPoll={pollsFlag && (isManager || leaderIds.includes(me ?? ''))}
+      pollLocked={!can('create_poll')}
+      pollsOn={chat.pollsOn}
+      votes={chat.votes}
+      onSendPoll={chat.sendPoll}
+      onVote={(messageId, choice) => me && chat.vote(messageId, choice, me)}
+      pending={chat.pending}
+      onRetry={chat.retry}
+      onDiscard={chat.discard}
+      onResolve={chat.resolve}
+      onClear={chat.clear}
+      actionsOn={chat.actionsOn}
+    />
+  ) : null;
+
   return (
     <Screen>
       <GetTheApp inviteCode={ride.invite_code} />
@@ -189,150 +219,14 @@ export default function RidePage() {
           </ThemedText>
         </View>
       ) : null}
-      {me && ride.status !== 'cancelled' ? <FollowLeaders ids={leadersToFollow(ride.organizer_id, leaderIds, me)} organizerId={ride.organizer_id} /> : null}
       {justCreated && isManager ? <InviteCard ride={ride} fresh manager /> : null}
       {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
       {ride.status === 'ended' && isJoined ? <RideSummary ride={ride} members={members} /> : null}
 
-      <Card style={{ gap: 0, paddingVertical: Spacing.one }}>
-        {(
-          [
-            ['Meet', details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'],
-            ride.depart_at ? ['Departs', time(ride.depart_at)] : null,
-            ride.expected_finish_at ? ['Back By', time(ride.expected_finish_at)] : null,
-            ride.destination_label ? ['Destination', ride.destination_label] : null,
-            ride.vehicle_types.length ? ['Vehicles', ride.vehicle_types.join(', ')] : null,
-            ride.experience_level ? ['Experience', ride.experience_level] : null,
-            ride.route_miles ? ['Route', `${ride.route_miles} miles`] : ride.freeride ? ['Route', 'Freeride, no mapped route'] : null,
-            ['Spots', ride.max_vehicles ? `${c.vehicles} of ${ride.max_vehicles} vehicles` : ride.max_riders ? `${c.riders} of ${ride.max_riders} riders` : `${joined.length} going`],
-            ride.what_to_bring ? ['Bring', ride.what_to_bring] : null,
-            ride.required_equipment ? ['Required', ride.required_equipment] : null,
-            ride.fuel_notes ? ['Fuel', ride.fuel_notes] : null,
-            details?.instructions ? ['Instructions', details.instructions] : null,
-          ].filter(Boolean) as [string, string][]
-        ).map(([label, value], i) => (
-          <Info key={label} label={label} value={value} first={i === 0} />
-        ))}
-      </Card>
-
-      {ride.status === 'scheduled' || ride.status === 'live' ? <RideDay ride={ride} /> : null}
-
-      {ride.status === 'scheduled' || ride.status === 'live' ? (
-        <DirectionsCard
-          rows={rideDirections({
-            meet: details ? { lat: details.meet_lat, lng: details.meet_lng, label: details.meet_label } : null,
-            route,
-            destination: ride.destination_label,
-          })}
-        />
+      {/* What to do next sits right under the name: start the ride, join, check in or enter Ride Mode. */}
+      {isManager && ride.status === 'scheduled' ? (
+        <Button title="Start Ride Mode" big loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
       ) : null}
-
-      {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
-        <Card>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <ThemedText type="heading">{route?.name || (ride.freeride ? 'Freeride' : 'The Route')}</ThemedText>
-            {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{miles(route.lengthM)} mi</ThemedText> : null}
-          </View>
-          {route ? (
-            <>
-              <RouteSketch
-                points={route.points}
-                dots={waypointDots(waypoints.waypoints)}
-              />
-              <ThemedText type="small" themeColor="textSecondary">
-                {ride.status === 'live'
-                  ? 'Open Ride Mode to see where you and everyone else are on it.'
-                  : 'Saved on your phone once you’ve opened it, so it’s there without signal.'}
-              </ThemedText>
-            </>
-          ) : ride.freeride ? (
-            <ThemedText themeColor="textSecondary">
-              Freeride: no mapped route. Everyone follows the leader, and Ride Mode shows where each rider is.
-            </ThemedText>
-          ) : (
-            <ThemedText themeColor="textSecondary">
-              Draw the trail on the map or import a GPX file. Riders see it in Ride Mode with everyone placed along it.
-            </ThemedText>
-          )}
-          {isManager && ride.status !== 'ended' && ride.status !== 'cancelled' ? (
-            <Button
-              title={route ? 'Edit Route' : ride.freeride ? 'Map a Route Anyway' : 'Build the Route'}
-              kind={route || ride.freeride ? 'secondary' : 'primary'}
-              onPress={() => router.push(`/ride/${ride.id}/route`)}
-            />
-          ) : null}
-        </Card>
-      ) : null}
-
-      {isJoined && !cancelled && waypoints.switchedOn && (stops.length || (canPlanStops && ride.status !== 'ended')) ? (
-        <Card>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <ThemedText type="heading">Planned Stops</ThemedText>
-            {stops.length ? <ThemedText style={{ color: Colors.accent, fontWeight: 700 }}>{stops.length}</ThemedText> : null}
-          </View>
-          {stops.length ? (
-            <View>
-              {stops.map((w, i) => (
-                <WaypointRow key={w.id} waypoint={w} stop={i + 1} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
-              ))}
-            </View>
-          ) : (
-            <ThemedText themeColor="textSecondary">
-              {waypoints.stopsSwitchedOn
-                ? 'Mark where the group will stop for fuel, lunch or camp. Every rider sees them numbered on the map, in order.'
-                : PLANNED_STOPS_NOT_SWITCHED_ON}
-            </ThemedText>
-          )}
-          {canPlanStops && ride.status !== 'ended' ? (
-            <Button
-              title="Add a Planned Stop"
-              kind={stops.length ? 'secondary' : 'primary'}
-              disabled={!waypoints.stopsSwitchedOn}
-              onPress={() => router.push(`/ride/${ride.id}/waypoints?stop=1`)}
-            />
-          ) : null}
-        </Card>
-      ) : null}
-
-      {isJoined && !cancelled ? (
-        <Card>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <ThemedText type="heading">Waypoints</ThemedText>
-            {otherWaypoints.length ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{otherWaypoints.length}</ThemedText> : null}
-          </View>
-          {!waypoints.switchedOn ? (
-            <ThemedText themeColor="textSecondary">{WAYPOINTS_NOT_SWITCHED_ON}</ThemedText>
-          ) : otherWaypoints.length ? (
-            <View>
-              {otherWaypoints.slice(0, 3).map((w, i) => (
-                <WaypointRow key={w.id} waypoint={w} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
-              ))}
-              {otherWaypoints.length > 3 ? (
-                <ThemedText type="small" themeColor="textSecondary">and {otherWaypoints.length - 3} more</ThemedText>
-              ) : null}
-            </View>
-          ) : (
-            <ThemedText themeColor="textSecondary">
-              {leaderIds.includes(me ?? '') || isManager
-                ? 'Mark camp, fuel, a viewpoint or a hazard. Share each one with the whole ride, or keep it to yourself.'
-                : 'Mark camp, fuel, a viewpoint or a hazard. Your waypoints are only for you; the leader’s shared ones show here too.'}
-            </ThemedText>
-          )}
-          <Button
-            title={otherWaypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
-            kind={otherWaypoints.length ? 'secondary' : 'primary'}
-            disabled={!waypoints.switchedOn}
-            onPress={() => router.push(`/ride/${ride.id}/waypoints`)}
-          />
-        </Card>
-      ) : null}
-
-      {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && (ride.status === 'scheduled' || ride.status === 'live') ? (
-        <FuelCheck ride={ride} mine={mine} onChanged={load} />
-      ) : null}
-
-      <ErrorText error={error} />
-
       {cancelled ? null : !mine || mine.status === 'cancelled' || mine.status === 'declined' ? (
         ride.status === 'ended' ? (
           <ThemedText>This ride has ended.</ThemedText>
@@ -368,31 +262,192 @@ export default function RidePage() {
           ) : null}
         </View>
       )}
+      <ErrorText error={error} />
 
-      {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && ride.status !== 'cancelled' ? (
-        <Button
-          title="Plan What to Bring"
-          kind="secondary"
-          loading={busy === 'trip'}
-          accessibilityHint="Opens your packing checklist for this ride"
-          onPress={() => act('trip', async () => {
-            // An existing trip for this ride always opens; a new one counts toward Free's one active trip.
-            const existing = (await myTrips()).find((t) => t.ride_id === ride.id);
-            if (!existing && !(await requireTripSlot())) return;
-            const trip = existing ?? (await tripForRide(ride, mine.vehicle_id));
-            router.push(`/trips/${trip.id}`);
-          })}
-        />
+      {sectioned ? <SectionTabs value={section} onChange={setSection} counts={{ riders: isManager ? pending.length : null }} /> : null}
+
+      {show('details') ? (
+        <>
+          <Card style={{ gap: 0, paddingVertical: Spacing.one }}>
+            {(
+              [
+                ['Meet', details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'],
+                ride.depart_at ? ['Departs', time(ride.depart_at)] : null,
+                ride.expected_finish_at ? ['Back By', time(ride.expected_finish_at)] : null,
+                ride.destination_label ? ['Destination', ride.destination_label] : null,
+                ride.vehicle_types.length ? ['Vehicles', ride.vehicle_types.join(', ')] : null,
+                ride.experience_level ? ['Experience', ride.experience_level] : null,
+                ride.route_miles ? ['Route', `${ride.route_miles} miles`] : ride.freeride ? ['Route', 'Freeride, no mapped route'] : null,
+                ['Spots', ride.max_vehicles ? `${c.vehicles} of ${ride.max_vehicles} vehicles` : ride.max_riders ? `${c.riders} of ${ride.max_riders} riders` : `${joined.length} going`],
+                ride.what_to_bring ? ['Bring', ride.what_to_bring] : null,
+                ride.required_equipment ? ['Required', ride.required_equipment] : null,
+                ride.fuel_notes ? ['Fuel', ride.fuel_notes] : null,
+                details?.instructions ? ['Instructions', details.instructions] : null,
+              ].filter(Boolean) as [string, string][]
+            ).map(([label, value], i) => (
+              <Info key={label} label={label} value={value} first={i === 0} />
+            ))}
+          </Card>
+          {ride.status === 'scheduled' || ride.status === 'live' ? <RideDay ride={ride} /> : null}
+          {ride.status === 'scheduled' || ride.status === 'live' ? (
+            <DirectionsCard
+              rows={rideDirections({
+                meet: details ? { lat: details.meet_lat, lng: details.meet_lng, label: details.meet_label } : null,
+                route,
+                destination: ride.destination_label,
+              })}
+            />
+          ) : null}
+          {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && (ride.status === 'scheduled' || ride.status === 'live') ? (
+            <FuelCheck ride={ride} mine={mine} onChanged={load} />
+          ) : null}
+          {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && ride.status !== 'cancelled' ? (
+            <Button
+              title="Plan What to Bring"
+              kind="secondary"
+              loading={busy === 'trip'}
+              accessibilityHint="Opens your packing checklist for this ride"
+              onPress={() => act('trip', async () => {
+                // An existing trip for this ride always opens; a new one counts toward Free's one active trip.
+                const existing = (await myTrips()).find((t) => t.ride_id === ride.id);
+                if (!existing && !(await requireTripSlot())) return;
+                const trip = existing ?? (await tripForRide(ride, mine.vehicle_id));
+                router.push(`/trips/${trip.id}`);
+              })}
+            />
+          ) : null}
+        </>
       ) : null}
 
-      {!cancelled && !(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} manager={isManager} /> : null}
+      {show('map') ? (
+        <>
+          {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
+            <Card>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                <ThemedText type="heading">{route?.name || (ride.freeride ? 'Freeride' : 'The Route')}</ThemedText>
+                {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{miles(route.lengthM)} mi</ThemedText> : null}
+              </View>
+              {route ? (
+                <>
+                  <RouteSketch
+                    points={route.points}
+                    dots={waypointDots(waypoints.waypoints)}
+                  />
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {ride.status === 'live'
+                      ? 'Open Ride Mode to see where you and everyone else are on it.'
+                      : 'Saved on your phone once you’ve opened it, so it’s there without signal.'}
+                  </ThemedText>
+                </>
+              ) : ride.freeride ? (
+                <ThemedText themeColor="textSecondary">
+                  Freeride: no mapped route. Everyone follows the leader, and Ride Mode shows where each rider is.
+                </ThemedText>
+              ) : (
+                <ThemedText themeColor="textSecondary">
+                  Draw the trail on the map or import a GPX file. Riders see it in Ride Mode with everyone placed along it.
+                </ThemedText>
+              )}
+              {isManager && ride.status !== 'ended' && ride.status !== 'cancelled' ? (
+                <Button
+                  title={route ? 'Edit Route' : ride.freeride ? 'Map a Route Anyway' : 'Build the Route'}
+                  kind={route || ride.freeride ? 'secondary' : 'primary'}
+                  onPress={() => router.push(`/ride/${ride.id}/route`)}
+                />
+              ) : null}
+            </Card>
+          ) : null}
+          {isJoined && !cancelled && waypoints.switchedOn && (stops.length || (canPlanStops && ride.status !== 'ended')) ? (
+            <Card>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                <ThemedText type="heading">Planned Stops</ThemedText>
+                {stops.length ? <ThemedText style={{ color: Colors.accent, fontWeight: 700 }}>{stops.length}</ThemedText> : null}
+              </View>
+              {stops.length ? (
+                <View>
+                  {stops.map((w, i) => (
+                    <WaypointRow key={w.id} waypoint={w} stop={i + 1} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
+                  ))}
+                </View>
+              ) : (
+                <ThemedText themeColor="textSecondary">
+                  {waypoints.stopsSwitchedOn
+                    ? 'Mark where the group will stop for fuel, lunch or camp. Every rider sees them numbered on the map, in order.'
+                    : PLANNED_STOPS_NOT_SWITCHED_ON}
+                </ThemedText>
+              )}
+              {canPlanStops && ride.status !== 'ended' ? (
+                <Button
+                  title="Add a Planned Stop"
+                  kind={stops.length ? 'secondary' : 'primary'}
+                  disabled={!waypoints.stopsSwitchedOn}
+                  onPress={() => router.push(`/ride/${ride.id}/waypoints?stop=1`)}
+                />
+              ) : null}
+            </Card>
+          ) : null}
+          {isJoined && !cancelled ? (
+            <Card>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                <ThemedText type="heading">Waypoints</ThemedText>
+                {otherWaypoints.length ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{otherWaypoints.length}</ThemedText> : null}
+              </View>
+              {!waypoints.switchedOn ? (
+                <ThemedText themeColor="textSecondary">{WAYPOINTS_NOT_SWITCHED_ON}</ThemedText>
+              ) : otherWaypoints.length ? (
+                <View>
+                  {otherWaypoints.slice(0, 3).map((w, i) => (
+                    <WaypointRow key={w.id} waypoint={w} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
+                  ))}
+                  {otherWaypoints.length > 3 ? (
+                    <ThemedText type="small" themeColor="textSecondary">and {otherWaypoints.length - 3} more</ThemedText>
+                  ) : null}
+                </View>
+              ) : (
+                <ThemedText themeColor="textSecondary">
+                  {leaderIds.includes(me ?? '') || isManager
+                    ? 'Mark camp, fuel, a viewpoint or a hazard. Share each one with the whole ride, or keep it to yourself.'
+                    : 'Mark camp, fuel, a viewpoint or a hazard. Your waypoints are only for you; the leader’s shared ones show here too.'}
+                </ThemedText>
+              )}
+              <Button
+                title={otherWaypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
+                kind={otherWaypoints.length ? 'secondary' : 'primary'}
+                disabled={!waypoints.switchedOn}
+                onPress={() => router.push(`/ride/${ride.id}/waypoints`)}
+              />
+            </Card>
+          ) : null}
+        </>
+      ) : null}
 
-      {isManager ? (
+      {show('riders') ? (
+        <>
+          {isManager && pending.length ? (
+            <Card>
+              <ThemedText type="heading">Waiting for You</ThemedText>
+              {pending.map((m) => (
+                <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
+                  <ThemedText style={{ flex: 1 }}>{m.profiles?.display_name || 'Rider'} wants to join</ThemedText>
+                  <Button title="Approve" onPress={() => act('approve', () => approveMember(ride.id, m.user_id, true))} />
+                  <Button title="Decline" kind="secondary" onPress={() => act('decline', () => approveMember(ride.id, m.user_id, false))} />
+                </View>
+              ))}
+            </Card>
+          ) : null}
+          {me && ride.status !== 'cancelled' ? <FollowLeaders ids={leadersToFollow(ride.organizer_id, leaderIds, me)} organizerId={ride.organizer_id} /> : null}
+          {!cancelled && !(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} manager={isManager} /> : null}
+          {mine?.status === 'joined' ? (
+            <RideRoster ride={ride} members={members} me={me} waitlisted={waitlist.length} onChanged={load} />
+          ) : null}
+        </>
+      ) : null}
+
+      {show('chat') ? chatBlock : null}
+
+      {show('details') && isManager && (ride.status === 'live' || canCancel(ride.status, isManager) || isOrganizer) ? (
         <Card>
           <ThemedText type="heading">You’re Organizing</ThemedText>
-          {ride.status === 'scheduled' ? (
-            <Button title="Start Ride Mode" big loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
-          ) : null}
           {ride.status === 'live' ? (
             <Button title="End Ride for Everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
           ) : null}
@@ -404,15 +459,8 @@ export default function RidePage() {
               onPress={() => requirePro('create_ride') && router.push(`/ride/new?copy=${ride.id}`)}
             />
           ) : null}
-          {pending.map((m) => (
-            <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
-              <ThemedText style={{ flex: 1 }}>{m.profiles?.display_name || 'Rider'} wants to join</ThemedText>
-              <Button title="Approve" onPress={() => act('approve', () => approveMember(ride.id, m.user_id, true))} />
-              <Button title="Decline" kind="secondary" onPress={() => act('decline', () => approveMember(ride.id, m.user_id, false))} />
-            </View>
-          ))}
           {canCancel(ride.status, isManager) || isOrganizer ? (
-            <View style={styles.callOff}>
+            <View style={[styles.callOff, ride.status !== 'live' && !isOrganizer && styles.callOffAlone]}>
               <View style={{ flexDirection: 'row', gap: Spacing.two }}>
                 {canCancel(ride.status, isManager) ? (
                   <Button title="Cancel Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
@@ -431,40 +479,9 @@ export default function RidePage() {
         </Card>
       ) : null}
 
-      {mine?.status === 'joined' ? (
-        <RideRoster ride={ride} members={members} me={me} waitlisted={waitlist.length} onChanged={load} />
-      ) : null}
-
-      {isJoined ? (
-        <RideChat
-          messages={chat.messages}
-          nameOf={nameOf}
-          me={me}
-          canAnnounce={isManager}
-          leaderName={leaderIds.length && !leaderIds.includes(me ?? '') ? leaderIds.map(nameOf).join(', ') : null}
-          error={chat.error}
-          onSend={chat.send}
-          // The one place that decides who can create polls: the ride's leaders, on a plan with polls,
-          // unless the owner switched polls off.
-          canPoll={pollsFlag && (isManager || leaderIds.includes(me ?? ''))}
-          pollLocked={!can('create_poll')}
-          pollsOn={chat.pollsOn}
-          votes={chat.votes}
-          onSendPoll={chat.sendPoll}
-          onVote={(messageId, choice) => me && chat.vote(messageId, choice, me)}
-          pending={chat.pending}
-          onRetry={chat.retry}
-          onDiscard={chat.discard}
-          onResolve={chat.resolve}
-          onClear={chat.clear}
-          actionsOn={chat.actionsOn}
-        />
-      ) : null}
-
-      {mine && mine.status !== 'cancelled' && mine.status !== 'invited' && mine.role !== 'organizer' ? (
+      {show('riders') && mine && mine.status !== 'cancelled' && mine.status !== 'invited' && mine.role !== 'organizer' ? (
         <Button title="Leave Ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
       ) : null}
-
       {me && !isOrganizer ? (
         <Pressable
           accessibilityRole="button"
@@ -487,6 +504,44 @@ export default function RidePage() {
   );
 }
 
+type RideSection = 'details' | 'map' | 'riders' | 'chat';
+const SECTIONS: { key: RideSection; label: string }[] = [
+  { key: 'details', label: 'Details' },
+  { key: 'map', label: 'Map' },
+  { key: 'riders', label: 'Riders' },
+  { key: 'chat', label: 'Chat' },
+];
+const isRideSection = (v: unknown): v is RideSection => SECTIONS.some((s) => s.key === v);
+
+/** The ride page's four parts. The one you're on is underlined in red; a red count means riders are waiting on you. */
+function SectionTabs({ value, onChange, counts }: { value: RideSection; onChange: (v: RideSection) => void; counts: Partial<Record<RideSection, number | null>> }) {
+  return (
+    <View style={styles.tabs} accessibilityRole="tablist">
+      {SECTIONS.map((s) => {
+        const on = s.key === value;
+        const count = counts[s.key];
+        return (
+          <Pressable
+            key={s.key}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: on }}
+            accessibilityLabel={count ? `${s.label}, ${count} waiting` : s.label}
+            onPress={() => onChange(s.key)}
+            style={styles.tab}>
+            <Text style={[styles.tabLabel, { color: on ? Colors.text : Colors.textSecondary }]}>{s.label}</Text>
+            {count ? (
+              <View style={styles.tabCount}>
+                <Text style={styles.tabCountText}>{count}</Text>
+              </View>
+            ) : null}
+            <View style={[styles.tabLine, { backgroundColor: on ? Colors.accent : 'transparent' }]} />
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 function Info({ label, value, first }: { label: string; value: string; first: boolean }) {
   return (
     <View style={{ flexDirection: 'row', gap: Spacing.three, paddingVertical: 10, borderTopWidth: first ? 0 : 1, borderTopColor: Colors.backgroundSelected }}>
@@ -506,6 +561,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundElement,
   },
   callOff: { gap: Spacing.two, marginTop: Spacing.one, paddingTop: Spacing.three, borderTopWidth: 1, borderTopColor: Colors.backgroundSelected },
+  callOffAlone: { marginTop: 0, paddingTop: 0, borderTopWidth: 0 },
+  tabs: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: Colors.backgroundSelected },
+  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 48, flexDirection: 'row', gap: 6 },
+  tabLine: { position: 'absolute', left: 10, right: 10, bottom: -1, height: 3, borderTopLeftRadius: 3, borderTopRightRadius: 3 },
+  tabLabel: { fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
+  tabCount: { minWidth: 20, height: 20, borderRadius: 10, paddingHorizontal: 5, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
+  tabCountText: { color: '#fff', fontFamily: font(700), fontSize: 12, lineHeight: 14 },
 });
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

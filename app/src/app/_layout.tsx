@@ -72,12 +72,11 @@ function RootLayout() {
           headerTitleStyle: { fontFamily: font(700, 'display'), fontSize: 21, color: Colors.text },
           contentStyle: { backgroundColor: Colors.background },
         }}>
-        <Stack.Screen name="index" options={{ title: 'OnMyLead', headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ title: 'OnMyLead', headerShown: false }} />
         <Stack.Screen name="sign-in" options={{ title: 'Welcome', presentation: 'modal' }} />
         <Stack.Screen name="reset-password" options={{ title: 'New Password' }} />
         <Stack.Screen name="ride/new" options={{ title: 'Create a Ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
-        <Stack.Screen name="find" options={{ title: 'Find a Ride' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
         <Stack.Screen name="ride/[id]/route" options={{ title: 'Route', headerShown: false }} />
         <Stack.Screen name="ride/[id]/waypoints" options={{ title: 'Waypoints', headerShown: false }} />
@@ -90,7 +89,7 @@ function RootLayout() {
         <Stack.Screen name="trips/[id]/index" options={{ title: '' }} />
         <Stack.Screen name="trips/[id]/edit" options={{ title: 'Edit Trip' }} />
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
-        <Stack.Screen name="profile" options={{ title: 'Your Profile' }} />
+        <Stack.Screen name="ride-name" options={{ title: 'Your Ride Name' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
         <Stack.Screen name="pro" options={{ title: '' }} />
         <Stack.Screen name="subscription" options={{ title: 'Subscription' }} />
@@ -98,7 +97,6 @@ function RootLayout() {
         <Stack.Screen name="maps/area" options={{ title: 'Pick an Area', headerShown: false }} />
         <Stack.Screen name="share" options={{ title: 'Share My Location' }} />
         <Stack.Screen name="f/[token]" options={{ title: 'Shared Location' }} />
-        <Stack.Screen name="groups/index" options={{ title: 'Riding Groups' }} />
         <Stack.Screen name="groups/new" options={{ title: 'New Group' }} />
         <Stack.Screen name="groups/[id]" options={{ title: '' }} />
         <Stack.Screen name="g/[code]" options={{ title: 'Riding Group' }} />
