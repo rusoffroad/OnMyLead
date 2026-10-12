@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import MapView, { Callout, Circle, Marker, type Region } from 'react-native-maps';
 import { View } from 'react-native';
 
+import { TrailTiles } from '@/components/trail-tiles';
 import { MapControls, MapOverlay, RideBubble, RidePin, type RidesMapProps } from '@/components/rides-map-chrome';
 import { Colors, Radius } from '@/constants/theme';
 import { boundsOfRegion, regionFor, regionMoved, zoomRegion } from '@/core/discovery';
+import { useTrailMap } from '@/hooks/use-trail-map';
 
 /**
  * Public rides as pins on a map the rider can pinch, pan and zoom. Opens on the rider's state.
- * Pins sit on the rounded meeting area, never the exact spot.
+ * Pins sit on the rounded meeting area, never the exact spot. Zoomed in, public trails and
+ * off-road park tracks show too (the rider's Map Layers choice from the ride maps).
  * The web build uses rides-map.web.tsx.
  */
 export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400 }: RidesMapProps) {
@@ -19,6 +22,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
   const anchor = useRef(boundsOfRegion(initial));
   const settling = useRef(true);
   const [moved, setMoved] = useState(false);
+  const trail = useTrailMap();
 
   const flyTo = (r: Region) => {
     settling.current = true;
@@ -43,6 +47,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
         userInterfaceStyle="dark"
         onRegionChangeComplete={(r) => {
           region.current = r;
+          trail.onRegion(r);
           const now = boundsOfRegion(r);
           if (settling.current) {
             settling.current = false;
@@ -52,6 +57,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
             setMoved(regionMoved(anchor.current, now));
           }
         }}>
+        <TrailTiles base="satellite" trails={trail.trails} offline={trail.offline} osm={trail.osmLines} />
         {circle ? (
           <Circle
             center={{ latitude: circle.center.lat, longitude: circle.center.lng }}

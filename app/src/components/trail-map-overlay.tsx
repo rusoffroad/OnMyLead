@@ -6,6 +6,7 @@ import Svg, { Path } from 'react-native-svg';
 import { Colors, font, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type OfflineChoice } from '@/core/offline-maps';
+import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import { TOPO_ATTRIBUTION, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
@@ -35,7 +36,7 @@ export function TrailMapOverlay({
 }) {
   const [open, setOpen] = useState(false);
   if (Platform.OS === 'web') return null;
-  const credit = [trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null, ...(trail.trails ? TRAIL_SOURCE_IDS.map((id) => TRAIL_SOURCES[id].attribution) : [])]
+  const credit = [trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null, ...(trail.trails ? [...TRAIL_SOURCE_IDS.map((id) => TRAIL_SOURCES[id].attribution), OSM_ATTRIBUTION] : [])]
     .filter(Boolean)
     .join(', ');
 
@@ -60,9 +61,9 @@ export function TrailMapOverlay({
         {open ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} /> : null}
       </View>
 
-      {trail.zoomInHint && !open ? (
+      {(trail.zoomInHint || trail.closerForTracks) && !open ? (
         <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
-          <Text style={styles.hintText}>Zoom in to see trails</Text>
+          <Text style={styles.hintText}>{trail.zoomInHint ? 'Zoom In to See Trails' : 'Zoom In for Park and Local Trails'}</Text>
         </View>
       ) : null}
 
@@ -107,7 +108,7 @@ function LayersPanel({
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.rowTitle}>Public Trails and Roads</Text>
-          <Text style={styles.rowSub}>{`Forest Service and BLM. ${lookupHint}`.trim()}</Text>
+          <Text style={styles.rowSub}>{`Forest Service, BLM and OpenStreetMap, including off-road parks. ${lookupHint}`.trim()}</Text>
         </View>
         <Switch
           value={trail.trails}
@@ -182,7 +183,7 @@ function RideMapDownload({ ride, route }: { ride: { id: string; name: string }; 
 }
 
 export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => void }) {
-  const facts = [info.kind === 'trail' ? 'Trail' : 'Road', info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
+  const facts = [info.source === 'osm' ? 'Track' : info.kind === 'trail' ? 'Trail' : 'Road', info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
   return (
     <View style={styles.card} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
@@ -207,6 +208,8 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
             </View>
           ))}
         </View>
+      ) : info.source === 'osm' ? (
+        <Text style={styles.rowSub}>Mapped by riders on OpenStreetMap. Parks and private land need permission or a pass.</Text>
       ) : (
         <Text style={styles.rowSub}>{"The agency data doesn't list which vehicles can use this one."}</Text>
       )}

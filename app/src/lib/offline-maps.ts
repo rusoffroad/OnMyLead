@@ -184,10 +184,11 @@ async function fetchTile(layer: OfflineLayer, t: Tile, file: File) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 20_000);
   try {
-    const res = await fetch(fillTemplate(templateFor(layer), t), { signal: controller.signal });
+    const res = await fetch(fillTemplate(await templateFor(layer), t), { signal: controller.signal });
     const type = res.headers.get('content-type') ?? '';
-    // ArcGIS answers errors with JSON and a 200, so only keep real images.
-    if (!res.ok || !type.startsWith('image/')) throw new Error(`tile ${res.status} ${type}`);
+    // ArcGIS answers errors with JSON and a 200, so only keep real images (or OpenStreetMap's vector squares).
+    const ok = layer === 'osm' ? !type.includes('json') && !type.includes('html') : type.startsWith('image/');
+    if (!res.ok || !ok) throw new Error(`tile ${res.status} ${type}`);
     const data = new Uint8Array(await res.arrayBuffer());
     const dir = file.parentDirectory;
     if (!dir.exists) dir.create({ intermediates: true, idempotent: true });
