@@ -841,8 +841,9 @@ const styles = StyleSheet.create({
   handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },
   handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
   handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
+  // Leaves the map layers button (and its downloaded-map tag) uncovered on the right.
   offlineBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: Radius.control, paddingHorizontal: 14, paddingVertical: 10,
+    marginRight: 60, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: Radius.control, paddingHorizontal: 14, paddingVertical: 10,
     backgroundColor: 'rgba(10,22,38,0.94)', borderWidth: 1.5, borderColor: Colors.textSecondary, borderStyle: 'dashed',
   },
   // The same dashed grey as a rider who has lost service: dashed grey always means no signal.
