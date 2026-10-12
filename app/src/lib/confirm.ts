@@ -10,3 +10,12 @@ export function confirmAsync(title: string, message: string, confirmLabel = 'Del
     ], { cancelable: true, onDismiss: () => resolve(false) });
   });
 }
+
+/** A message with an OK button, shown over whatever is on screen. */
+export function showNotice(title: string, message: string): void {
+  if (Platform.OS === 'web') {
+    globalThis.alert?.(`${title}\n\n${message}`);
+    return;
+  }
+  Alert.alert(title, message);
+}
