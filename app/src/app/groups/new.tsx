@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { cleanGroupName, groupNameProblem, MAX_GROUP_NAME, type RideMate } from '@/core/groups';
 import { createGroup, rideMates } from '@/lib/groups';
+import { handleProError } from '@/lib/pro';
 
 /** Name a group and tick the riders in it. Friends not in the app join later by the group link. */
 export default function NewGroup() {
@@ -29,7 +30,7 @@ export default function NewGroup() {
       const id = await createGroup(name, picked);
       router.replace(`/groups/${id}`);
     } catch (e) {
-      setError((e as Error).message);
+      if (!handleProError(e)) setError((e as Error).message);
       setBusy(false);
     }
   };

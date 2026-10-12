@@ -10,6 +10,7 @@ import type { LatLng } from '@/core/geo';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, type OfflineChoice } from '@/core/offline-maps';
 import { getRideRoute, myRides } from '@/lib/api';
 import { downloadRide, freeSpace, planRide, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
+import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
 
@@ -17,7 +18,10 @@ const ALL: OfflineChoice[] = OFFLINE_CHOICES.map((c) => c.id);
 
 type RideWithRoute = { ride: Ride; route: LatLng[] };
 
-/** Every downloaded map on this phone, the rides you can download in one tap, and a way to pick any area. */
+/**
+ * Every downloaded map on this phone, the rides you can download in one tap, and a way to pick any area.
+ * New downloads are part of Pro; maps already saved always work, on any plan.
+ */
 export default function OfflineMaps() {
   const { session } = useSession();
   const maps = useOfflineMaps();
@@ -78,7 +82,7 @@ export default function OfflineMaps() {
         </View>
       </View>
 
-      <Button title="Download a Map Area" big onPress={() => router.push('/maps/area')} />
+      <Button title="Download a Map Area" big onPress={() => requirePro('offline_maps') && router.push('/maps/area')} />
 
       {maps.length ? (
         <>
@@ -124,6 +128,7 @@ function RideOffer({ ride, route }: RideWithRoute) {
         strong
         disabled={starting}
         onPress={async () => {
+          if (!requirePro('offline_maps')) return;
           setStarting(true);
           await downloadRide(ride.id, ride.name, route, ALL);
         }}

@@ -13,6 +13,7 @@ import { formatBoxMiles, formatBytes, OFFLINE_CHOICES, type OfflineChoice } from
 import type { Box } from '@/core/trails';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { downloadArea, planArea } from '@/lib/offline-maps';
+import { requirePro } from '@/lib/pro';
 
 const SIDE = 18;
 
@@ -42,6 +43,7 @@ export default function PickArea() {
 
   const download = async () => {
     if (!box || !plan || tooBig) return;
+    if (!requirePro('offline_maps')) return;
     setStarting(true);
     const name = await placeName(box);
     await downloadArea(name, box, choices);

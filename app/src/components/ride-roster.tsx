@@ -1,8 +1,9 @@
 import * as Haptics from 'expo-haptics';
-import { useState } from 'react';
+import { useState, type ComponentProps } from 'react';
 import { LayoutAnimation, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { ReportSheet } from '@/components/report-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Card, ErrorText } from '@/components/ui';
 import { Colors, Radius, RideColors, Spacing } from '@/constants/theme';
@@ -18,7 +19,7 @@ const ROLE_COLOR: Record<RideMember['role'], string> = {
 
 /**
  * Who's going, in riding order: the leader up front, the tail gunner at the rear. The leader taps
- * a rider to hand them the ride, make them leader, or put them at the back.
+ * a rider to hand them the ride, make them leader, or put them at the back. Anyone can report a rider.
  */
 export function RideRoster({
   ride, members, me, waitlisted, onChanged,
@@ -32,6 +33,7 @@ export function RideRoster({
   const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
   const joined = members.filter((m) => m.status === 'joined');
   const nameOf = (id: string) => members.find((m) => m.user_id === id)?.profiles?.display_name || 'Rider';
   const leaderIds = rideLeaderIds(members, ride.organizer_id);
@@ -76,7 +78,8 @@ export function RideRoster({
       <View>
         {ordered.map((m, i) => {
           const actions = rosterActions(members, ride.organizer_id, me, m.user_id, rideOver);
-          const can = !!actions.handOff || actions.leader || actions.tailGunner;
+          // Every other rider can be reported; organizers also get the role actions.
+          const can = !!actions.handOff || actions.leader || actions.tailGunner || (!!me && m.user_id !== me);
           const isOpen = open === m.user_id && can;
           const leads = leaderIds.includes(m.user_id);
           const roleLine = [
@@ -90,7 +93,7 @@ export function RideRoster({
                 onPress={() => toggle(m.user_id)}
                 accessibilityRole={can ? 'button' : undefined}
                 accessibilityState={can ? { expanded: isOpen } : undefined}
-                accessibilityHint={can ? 'Shows what you can change for this rider' : undefined}
+                accessibilityHint={can ? 'Shows what you can do for this rider' : undefined}
                 style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
                 <Avatar name={nameOf(m.user_id)} color={leads ? RideColors.leader : ROLE_COLOR[m.role]} />
                 <View style={{ flex: 1, gap: 2 }}>
@@ -135,6 +138,14 @@ export function RideRoster({
                       onPress={() => run(`tail-${m.user_id}`, () => setTailGunner(ride.id, m.role === 'sweep' ? null : m.user_id))}
                     />
                   ) : null}
+                  {me && m.user_id !== me ? (
+                    <Action
+                      color={Colors.textSecondary}
+                      title="Report Rider"
+                      caption="Tell the OnMyLead team about a problem. They aren’t told it was you."
+                      onPress={() => setReporting({ kind: 'rider', userId: m.user_id, rideId: ride.id, name: nameOf(m.user_id) })}
+                    />
+                  ) : null}
                 </View>
               ) : null}
             </View>
@@ -143,6 +154,7 @@ export function RideRoster({
       </View>
 
       <ErrorText error={error} />
+      <ReportSheet target={reporting} onClose={() => setReporting(null)} />
       {waitlisted ? <ThemedText type="small" themeColor="textSecondary">{waitlisted} on the waitlist</ThemedText> : null}
     </Card>
   );

@@ -5,6 +5,7 @@ import { Spacing } from '@/constants/theme';
 import { vehicleTitle } from '@/core/garage';
 import { isIsoDate } from '@/core/trips';
 import { myRides, myVehicles, type TripInput, type VehicleWithCost } from '@/lib/api';
+import { useEntitlements } from '@/lib/entitlements';
 import type { Ride, Trip } from '@/lib/types';
 import { Button, Card, Choice, ErrorText, Field } from './ui';
 
@@ -18,6 +19,7 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
   const [vehicles, setVehicles] = useState<VehicleWithCost[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
   const [busy, setBusy] = useState(false);
+  const { can } = useEntitlements();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -66,7 +68,8 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
           onChange={setVehicleId}
         />
       ) : null}
-      {rideOptions.length || rideId ? (
+      {/* Linking a trip to a ride is part of Advanced Trip Planning; an existing link always shows. */}
+      {(rideOptions.length > 0 && can('advanced_trip_planning')) || !!trip?.ride_id ? (
         <Choice
           label="For a Ride"
           options={[

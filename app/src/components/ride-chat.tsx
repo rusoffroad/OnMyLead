@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { ProLock } from '@/components/pro-gate';
 import { ThemedText } from '@/components/themed-text';
 import { PollCard, PollComposer } from '@/components/ride-poll';
 import { Button, Card, Choice, ErrorText, Field } from '@/components/ui';
 import { Radius, RideColors, Spacing } from '@/constants/theme';
 import { checkMessage, isLeaderOnly, MAX_MESSAGE_LENGTH, type ChatMessage, type MessageAudience, type MessageKind } from '@/core/chat';
+import { parseProError } from '@/core/entitlements';
 import { isPoll, type PollVote } from '@/core/polls';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useTheme } from '@/hooks/use-theme';
@@ -37,7 +39,7 @@ type SendTo = 'everyone' | 'leader' | 'announcement' | 'poll';
  * aloud in Ride Mode. The leader (and organizers) can also ask a quick poll.
  */
 export function RideChat({
-  messages, nameOf, me, canAnnounce, leaderName, error, onSend, canPoll = false, pollsOn = true, votes = [], onSendPoll, onVote,
+  messages, nameOf, me, canAnnounce, leaderName, error, onSend, canPoll = false, pollLocked = false, pollsOn = true, votes = [], onSendPoll, onVote,
 }: {
   messages: ChatMessage[];
   nameOf: (userId: string) => string;
@@ -49,6 +51,8 @@ export function RideChat({
   onSend: (body: string, kind: MessageKind, audience: MessageAudience) => Promise<boolean>;
   /** The ride's leader, organizers and co-organizers can post quick polls. */
   canPoll?: boolean;
+  /** A Free plan: the poll option opens the Pro prompt instead of the composer. Voting stays free. */
+  pollLocked?: boolean;
   /** False until the database has the polls update. */
   pollsOn?: boolean;
   votes?: PollVote[];
@@ -149,7 +153,9 @@ export function RideChat({
             );
           })}
           {options.length > 1 ? <Choice label="Send To" options={options} value={sendTo} onChange={setSendTo} /> : null}
-          {sendTo === 'poll' ? (
+          {sendTo === 'poll' && (pollLocked || parseProError(error)?.kind === 'pro_required') ? (
+            <ProLock feature="create_poll" title="Create Ride Polls" detail="Part of Pro. Everyone can still vote." />
+          ) : sendTo === 'poll' ? (
             <>
               <PollComposer pollsOn={pollsOn} onSend={sendPoll} />
               <ErrorText error={error} />
