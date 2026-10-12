@@ -32,6 +32,8 @@ export type Ride = {
   required_equipment: string | null;
   fuel_notes: string | null;
   route_miles: number | null;
+  /** True when the organizer said there's no mapped route. Missing until the 20261018900000 migration. */
+  freeride?: boolean;
   visibility: Visibility;
   join_policy: JoinPolicy;
   bubble_preset: BubblePreset | 'custom';

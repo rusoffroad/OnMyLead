@@ -179,7 +179,7 @@ export default function RidePage() {
             ride.destination_label ? ['Destination', ride.destination_label] : null,
             ride.vehicle_types.length ? ['Vehicles', ride.vehicle_types.join(', ')] : null,
             ride.experience_level ? ['Experience', ride.experience_level] : null,
-            ride.route_miles ? ['Route', `${ride.route_miles} miles`] : null,
+            ride.route_miles ? ['Route', `${ride.route_miles} miles`] : ride.freeride ? ['Route', 'Freeride, no mapped route'] : null,
             ['Spots', ride.max_vehicles ? `${c.vehicles} of ${ride.max_vehicles} vehicles` : ride.max_riders ? `${c.riders} of ${ride.max_riders} riders` : `${joined.length} going`],
             ride.what_to_bring ? ['Bring', ride.what_to_bring] : null,
             ride.required_equipment ? ['Required', ride.required_equipment] : null,
@@ -194,7 +194,7 @@ export default function RidePage() {
       {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
         <Card>
           <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <ThemedText type="heading">{route?.name || 'The Route'}</ThemedText>
+            <ThemedText type="heading">{route?.name || (ride.freeride ? 'Freeride' : 'The Route')}</ThemedText>
             {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{miles(route.lengthM)} mi</ThemedText> : null}
           </View>
           {route ? (
@@ -206,13 +206,21 @@ export default function RidePage() {
                   : 'Saved on your phone once you’ve opened it, so it’s there without signal.'}
               </ThemedText>
             </>
+          ) : ride.freeride ? (
+            <ThemedText themeColor="textSecondary">
+              Freeride: no mapped route. Everyone follows the leader, and Ride Mode shows where each rider is.
+            </ThemedText>
           ) : (
             <ThemedText themeColor="textSecondary">
               Draw the trail on the map or import a GPX file. Riders see it in Ride Mode with everyone placed along it.
             </ThemedText>
           )}
           {isManager && ride.status !== 'ended' && ride.status !== 'cancelled' ? (
-            <Button title={route ? 'Edit Route' : 'Build the Route'} kind={route ? 'secondary' : 'primary'} onPress={() => router.push(`/ride/${ride.id}/route`)} />
+            <Button
+              title={route ? 'Edit Route' : ride.freeride ? 'Map a Route Anyway' : 'Build the Route'}
+              kind={route || ride.freeride ? 'secondary' : 'primary'}
+              onPress={() => router.push(`/ride/${ride.id}/route`)}
+            />
           ) : null}
         </Card>
       ) : null}

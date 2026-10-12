@@ -55,6 +55,8 @@ export type NewRide = {
   visibility: Visibility;
   joinPolicy: JoinPolicy;
   bubblePreset: BubblePreset;
+  /** No mapped route: everyone follows the leader. */
+  freeride?: boolean;
 };
 
 export async function createRide(r: NewRide): Promise<Ride> {
@@ -84,12 +86,15 @@ export async function createRide(r: NewRide): Promise<Ride> {
     join_policy: r.joinPolicy,
     bubble_preset: r.bubblePreset,
     meet_state: r.meetState ?? null,
+    // Only sent for a freeride, so mapped rides save before the 20261018900000 migration too.
+    ...(r.freeride ? { freeride: true } : {}),
   };
   let res = await supabase.from('rides').insert(row).select().single();
-  if (res.error && /meet_state/.test(res.error.message)) {
-    // The state column arrives with the 20261011 migration; save the ride without it until then.
-    const { meet_state: _skip, ...withoutState } = row;
-    res = await supabase.from('rides').insert(withoutState).select().single();
+  if (res.error && /meet_state|freeride/.test(res.error.message)) {
+    // The state column arrives with the 20261011 migration and freeride with 20261018900000;
+    // save the ride without them until then.
+    const { meet_state: _skip, freeride: _free, ...older } = row as typeof row & { freeride?: boolean };
+    res = await supabase.from('rides').insert(older).select().single();
   }
   const ride = unwrap<Ride>(res);
   unwrap(
@@ -154,6 +159,8 @@ export async function saveRideRoute(rideId: string, route: RideRoute | null): Pr
   if (!rows.length) throw new Error('Only the ride’s organizer can change the route.');
   if (route) {
     await supabase.from('rides').update({ route_miles: Math.round((route.lengthM / 1609.344) * 10) / 10 }).eq('id', rideId);
+    // A freeride that gets a route becomes a mapped ride.
+    await supabase.from('rides').update({ freeride: false }).eq('id', rideId).eq('freeride', true);
     await AsyncStorage.setItem(routeKey(rideId), JSON.stringify(stored)).catch(() => {});
   } else {
     await forgetRoute(rideId);

@@ -31,6 +31,7 @@ const at = (day: Date, minutes: number | null) => (minutes == null ? null : new 
 const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : null);
 
 type Kind = 'public' | 'private';
+type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
   const { type } = useLocalSearchParams<{ type?: string }>();
@@ -57,6 +58,7 @@ export default function NewRide() {
   const [fuelNotes, setFuelNotes] = useState('');
   const [instructions, setInstructions] = useState('');
   const [kind, setKind] = useState<Kind | null>(type === 'public' || type === 'private' ? type : null);
+  const [routePlan, setRoutePlan] = useState<RoutePlan | null>(null);
   const [meetState, setMeetState] = useState<string | null>(null);
   const [pickingState, setPickingState] = useState(false);
   const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>('open');
@@ -96,6 +98,7 @@ export default function NewRide() {
     if (!name.trim()) return setError('Give the ride a name.');
     if (!meetAt) return setError('Meeting time looks off. Try "8:00 am".');
     if (!parsedCoords) return setError('Set the meeting point: use your location or paste coordinates like "38.57, -109.55".');
+    if (!routePlan) return setError('Pick Mapped or Freeride under The Route.');
     setBusy(true);
     try {
       const lat = Number(parsedCoords[1]);
@@ -125,12 +128,15 @@ export default function NewRide() {
         // A private ride's invite code is the invitation, so anyone holding it can join.
         joinPolicy: kind === 'private' ? 'open' : joinPolicy,
         bubblePreset: bubble,
+        freeride: routePlan === 'freeride',
       });
       // A group that fails to invite can be invited again from the ride page.
       for (const g of groups.filter((x) => groupNames.includes(x.name))) {
         await inviteGroupToRide(ride.id, g.id).catch(() => {});
       }
       router.replace(`/r/${ride.invite_code}?new=1`);
+      // A mapped ride goes straight to the route builder; saving it lands back on the new ride.
+      if (routePlan === 'mapped') router.push(`/ride/${ride.id}/route`);
     } catch (e) {
       if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not create the ride.');
     } finally {
@@ -208,6 +214,24 @@ export default function NewRide() {
           </View>
         ) : null}
       </Card>
+
+      <View style={{ gap: Spacing.two }}>
+        <ThemedText type="heading">The Route</ThemedText>
+        <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+          <KindCard
+            title="Mapped"
+            detail="Draw the route or import a GPX next. Riders follow it in Ride Mode."
+            on={routePlan === 'mapped'}
+            onPress={() => setRoutePlan('mapped')}
+          />
+          <KindCard
+            title="Freeride"
+            detail="No set route. Everyone follows the leader."
+            on={routePlan === 'freeride'}
+            onPress={() => setRoutePlan('freeride')}
+          />
+        </View>
+      </View>
 
       <Card>
         <ThemedText type="heading">Who’s Riding</ThemedText>
@@ -292,7 +316,7 @@ export default function NewRide() {
   );
 }
 
-/** One of the two ride kinds: a big tappable card, outlined in red when picked. */
+/** One of two choices (Public or Private, Mapped or Freeride): a big tappable card, outlined in red when picked. */
 function KindCard({ title, detail, on, onPress }: { title: string; detail: string; on: boolean; onPress: () => void }) {
   return (
     <Pressable
