@@ -8,7 +8,7 @@
 
 export type NotificationTopic =
   | 'rider_status' | 'announcements' | 'leader_messages' | 'chat' | 'ride_changes' | 'new_riders'
-  | 'ride_invites' | 'followed_leaders';
+  | 'ride_invites' | 'followed_leaders' | 'account_push';
 
 export type NotificationSettings = Record<NotificationTopic, boolean> & {
   /** Off: notifications say a message arrived, not what it says. */
@@ -22,6 +22,8 @@ export type NotificationSettings = Record<NotificationTopic, boolean> & {
   time_zone: string | null;
   /** Email when a ride you're on is cancelled or removed. */
   ride_emails: boolean;
+  /** Email about your account, such as Pro trial reminders. */
+  account_emails: boolean;
 };
 
 export const DEFAULT_SETTINGS: NotificationSettings = {
@@ -33,6 +35,7 @@ export const DEFAULT_SETTINGS: NotificationSettings = {
   new_riders: true,
   ride_invites: true,
   followed_leaders: true,
+  account_push: true,
   previews: true,
   reminder_minutes: 60,
   quiet_hours: false,
@@ -40,6 +43,7 @@ export const DEFAULT_SETTINGS: NotificationSettings = {
   quiet_end: 6 * 60,
   time_zone: null,
   ride_emails: true,
+  account_emails: true,
 };
 
 export type TopicInfo = { key: NotificationTopic; title: string; detail: string };
@@ -75,7 +79,16 @@ export const TOPIC_GROUPS: TopicGroup[] = [
       { key: 'followed_leaders', title: 'Leaders You Follow', detail: 'A leader you follow posts a new public ride.' },
     ],
   },
+  {
+    title: 'Your Account',
+    topics: [
+      { key: 'account_push', title: 'Pro Trial Reminders', detail: 'A week, 3 days and a day before your Pro Trial ends, and when it does.' },
+    ],
+  },
 ];
+
+/** Settings that arrived with OnMyLead Pro (migration 20261018000000_pro_entitlements.sql). */
+export const ACCOUNT_SETTINGS: (keyof NotificationSettings)[] = ['account_push', 'account_emails'];
 
 /** Topics that arrived with riding groups (migration 20261017430000_riding_groups.sql). */
 export const GROUP_TOPICS: NotificationTopic[] = ['ride_invites', 'followed_leaders'];
@@ -94,7 +107,7 @@ export function settingsFromRow(row: Partial<Record<keyof NotificationSettings, 
   if (!row) return s;
   for (const k of [
     'rider_status', 'announcements', 'leader_messages', 'chat', 'ride_changes', 'new_riders', 'ride_invites', 'followed_leaders',
-    'previews', 'quiet_hours', 'ride_emails',
+    'account_push', 'previews', 'quiet_hours', 'ride_emails', 'account_emails',
   ] as const) {
     if (typeof row[k] === 'boolean') s[k] = row[k] as boolean;
   }

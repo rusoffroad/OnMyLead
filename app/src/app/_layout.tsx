@@ -16,6 +16,7 @@ import { MessageAlerts } from '@/components/message-alerts';
 import { Colors, font, NavigationColors } from '@/constants/theme';
 // Starts crash reporting before anything else can fail (off when no DSN is set).
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
+import { startEntitlements } from '@/lib/entitlements';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 
@@ -38,6 +39,8 @@ function RootLayout() {
   const screen = '/' + useSegments().join('/');
 
   useEffect(() => setCrashScreen(screen), [screen]);
+  // The rider's plan (Free, Pro Trial, Pro, Admin), kept fresh for every screen.
+  useEffect(() => startEntitlements(), []);
 
   useEffect(() => {
     if (!ready) return;

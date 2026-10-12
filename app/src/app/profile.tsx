@@ -9,7 +9,8 @@ import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } from '@/core/profile';
 import { settingsSummary } from '@/core/notifications';
 import { formatBytes } from '@/core/offline-maps';
-import { myRideName, saveRideName } from '@/lib/api';
+import { myRideName, requestAccountDeletion, saveRideName } from '@/lib/api';
+import { confirmAsync } from '@/lib/confirm';
 import { useNotificationSettings } from '@/lib/notification-settings';
 import { useOfflineMaps } from '@/lib/offline-maps';
 import { signOut, useSession } from '@/lib/session';
@@ -142,7 +143,58 @@ export default function Profile() {
           router.replace('/');
         }}
       />
+      <DeleteAccount />
     </Screen>
+  );
+}
+
+/**
+ * Apple requires an in-app way to delete an account. The request goes to the owner, who deletes
+ * the account and everything in it; a Pro subscription is billed by Apple and is cancelled there.
+ */
+function DeleteAccount() {
+  const [state, setState] = useState<'idle' | 'busy' | 'sent' | 'off'>('idle');
+  const [error, setError] = useState<string | null>(null);
+
+  const ask = async () => {
+    const ok = await confirmAsync(
+      'Delete Your Account?',
+      'Your account, rides you organize, Garage, trips and groups will be permanently deleted. Rides you organize are removed for everyone on them. This can’t be undone.',
+      'Delete Account',
+    );
+    if (!ok) return;
+    setState('busy');
+    setError(null);
+    try {
+      await requestAccountDeletion();
+      setState('sent');
+    } catch (e) {
+      const message = (e as Error).message;
+      if (/request_account_deletion|schema cache|does not exist/i.test(message)) setState('off');
+      else {
+        setState('idle');
+        setError(`Couldn’t send that. ${message}`);
+      }
+    }
+  };
+
+  if (state === 'sent' || state === 'off') {
+    return (
+      <View style={styles.deleteNote} accessibilityLiveRegion="polite">
+        <ThemedText style={{ fontWeight: 600 }}>{state === 'sent' ? 'Deletion Requested' : 'Not Switched On Yet'}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {state === 'sent'
+            ? 'Your account and its data will be deleted within 7 days. If you pay for OnMyLead Pro, cancel it in your Apple subscriptions so you aren’t billed again.'
+            : 'Account deletion starts working with the next server update.'}
+        </ThemedText>
+      </View>
+    );
+  }
+  return (
+    <View style={{ gap: Spacing.two }}>
+      <ErrorText error={error} />
+      <Button title="Delete Account" kind="ghost" loading={state === 'busy'} onPress={ask} style={styles.deleteButton} />
+    </View>
   );
 }
 
@@ -195,6 +247,8 @@ const styles = StyleSheet.create({
   chatName: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
   chatBody: { color: Colors.text, fontFamily: font(500), fontSize: 15 },
   account: { gap: 4 },
+  deleteButton: { borderColor: Colors.danger },
+  deleteNote: { gap: 4, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   setting: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, backgroundColor: Colors.backgroundElement,
     borderRadius: Radius.card, paddingHorizontal: Spacing.three, paddingVertical: 14,
