@@ -31,7 +31,7 @@ import {
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { useFlag } from '@/lib/app-settings';
-import { confirmAsync } from '@/lib/confirm';
+import { confirmAsync, showNotice } from '@/lib/confirm';
 import { declineRideInvite } from '@/lib/groups';
 import { useEntitlements } from '@/lib/entitlements';
 import { currentNotificationSettings } from '@/lib/notification-settings';
@@ -129,26 +129,32 @@ export default function RidePage() {
 
   const resyncReminders = () => syncRideReminders(currentNotificationSettings().reminder_minutes);
 
+  // The buttons sit far below the page's error line, so a failure pops up where the organizer is looking.
   const cancel = async () => {
     const p = cancelPrompt(ride.name, toTell);
     if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
-    await act('cancel', async () => {
+    setBusy('cancel');
+    try {
       await cancelRide(ride.id);
       resyncReminders();
-    });
+      await load();
+    } catch (e) {
+      showNotice('Couldn’t Cancel the Ride', e instanceof Error ? e.message : 'Something went wrong.');
+    } finally {
+      setBusy(null);
+    }
   };
 
   const remove = async () => {
     const p = deletePrompt(ride.name, toTell, over);
     if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
     setBusy('delete');
-    setError(null);
     try {
       await deleteRide(ride.id);
       resyncReminders();
       router.replace('/');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice('Couldn’t Delete the Ride', e instanceof Error ? e.message : 'Something went wrong.');
       setBusy(null);
     }
   };
