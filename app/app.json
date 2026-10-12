@@ -71,7 +71,7 @@
       [
         "./plugins/with-push-entitlement",
         {
-          "enabled": false
+          "enabled": true
         }
       ],
       "expo-notifications"

@@ -1,10 +1,8 @@
-// Keeps the iOS push entitlement out of the build until the paid Apple Developer account is
-// ready. expo-notifications adds aps-environment on its own, and a free Apple ID ("Personal
-// Team") cannot sign an app that has it, so the phone build would stop installing.
-//
-// Turn push on for TestFlight and App Store builds by setting "enabled": true on this plugin
-// in app.json (or ONMYLEAD_PUSH=1 for a one-off build). The in-app message pop-up works
-// either way; only notifications while the app is closed need the entitlement.
+// Controls the iOS push entitlement (aps-environment). expo-notifications adds it on its own,
+// and a free Apple ID ("Personal Team") cannot sign an app that has it, so with "enabled":
+// false in app.json this plugin strips it again. Push is on ("enabled": true) since the app is
+// signed with the paid team; set it back to false only for a free-team build. Local ride
+// reminders and the in-app message pop-up work either way.
 //
 // Keep this plugin listed BEFORE expo-notifications in app.json: entitlement mods run in
 // reverse order, so listing it first makes it run after expo-notifications has added the key.

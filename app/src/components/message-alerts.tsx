@@ -1,12 +1,14 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AppState, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { alertTitle, isLeaderOnly, shouldAlert, type ChatMessage } from '@/core/chat';
-import { registerForPush, resetPushRegistration, useNotificationTaps } from '@/lib/push';
+import type { NotificationSettings } from '@/core/notifications';
+import { currentNotificationSettings, resetNotificationSettings, syncNotificationSettings } from '@/lib/notification-settings';
+import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps } from '@/lib/push';
 import { useSession } from '@/lib/session';
 import { newChannel, supabase } from '@/lib/supabase';
 
@@ -31,6 +33,12 @@ async function rideInfo(rideId: string) {
   return rides.get(rideId) ?? null;
 }
 
+/** The pop-up follows the same choices as push: no group chat pop-ups when group chat is off. */
+function wanted(m: ChatMessage, s: NotificationSettings): boolean {
+  if (m.kind === 'announcement') return s.announcements;
+  return isLeaderOnly(m) ? s.leader_messages : s.chat;
+}
+
 async function toAlert(m: ChatMessage): Promise<Alert> {
   const [who, ride] = await Promise.all([senderName(m.user_id).catch(() => 'A rider'), rideInfo(m.ride_id).catch(() => null)]);
   const announcement = m.kind === 'announcement';
@@ -47,7 +55,8 @@ async function toAlert(m: ChatMessage): Promise<Alert> {
 /**
  * On-screen pop-up for new ride chat messages, on every screen, for every ride the rider is
  * on. The database only sends a rider the messages they may read, so leader-only messages pop
- * up only for the leader. Also registers the phone for push notifications after sign-in.
+ * up only for the leader. Also registers the phone for push notifications after sign-in, and
+ * keeps the notification settings and this phone's ride reminders up to date.
  */
 export function MessageAlerts() {
   const { session } = useSession();
@@ -59,8 +68,21 @@ export function MessageAlerts() {
   useNotificationTaps();
 
   useEffect(() => {
-    if (me) registerForPush(me);
-    else resetPushRegistration();
+    if (!me) {
+      resetPushRegistration();
+      resetNotificationSettings();
+      syncRideReminders(null);
+      return;
+    }
+    const sync = () => {
+      registerForPush(me).then(syncNotificationSettings).then((s) => syncRideReminders(s.reminder_minutes));
+    };
+    sync();
+    // Rides joined or moved since: refresh reminders whenever the app comes back to the front.
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') sync();
+    });
+    return () => sub.remove();
   }, [me]);
 
   useEffect(() => {
@@ -68,7 +90,7 @@ export function MessageAlerts() {
     const channel = newChannel('message-alerts')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ride_messages' }, (payload) => {
         const m = payload.new as ChatMessage;
-        if (!m?.id || !shouldAlert(m, me)) return;
+        if (!m?.id || !shouldAlert(m, me) || !wanted(m, currentNotificationSettings())) return;
         toAlert(m).then((a) => setQueue((q) => (q.some((x) => x.id === a.id) ? q : [...q, a].slice(-5))));
       })
       .subscribe();

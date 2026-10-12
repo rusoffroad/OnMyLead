@@ -1170,4 +1170,224 @@ select set_ride_status('13131313-1313-1313-1313-131313131313', 'ended');
 select expect_refused($q$select hand_off_ride('13131313-1313-1313-1313-131313131313', '00000000-0000-0000-0000-00000000000c')$q$, 'ended ride handed off');
 reset role;
 
-select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF AND TAIL GUNNER TESTS PASSED' as result;
+-- 24. Notification settings and the push events behind them.
+-- Test-only stand-ins for pg_net and Vault, so the triggers' events can be read back.
+create schema if not exists net;
+create table net.calls (id serial primary key, url text, body jsonb, headers jsonb);
+create or replace function net.http_post(url text, body jsonb, headers jsonb) returns bigint
+language sql as $$ insert into net.calls (url, body, headers) values (url, body, headers) returning id::bigint $$;
+create schema if not exists vault;
+create table vault.decrypted_secrets (name text primary key, decrypted_secret text);
+insert into vault.decrypted_secrets values ('onmylead_push_url', 'https://example.test/notify'), ('onmylead_push_secret', 's3cret');
+grant usage on schema net to authenticated;
+grant execute on all functions in schema net to authenticated;
+grant insert on net.calls to authenticated;
+grant usage on sequence net.calls_id_seq to authenticated;
+create function last_push() returns jsonb language sql as $$ select body from net.calls order by id desc limit 1 $$;
+create function push_tokens_for(p_event jsonb) returns text[] language sql as $$
+  select coalesce(array_agg(token order by token), '{}') from push_batch(p_event)
+$$;
+
+do $$ begin
+  if not in_quiet_window(1320, 360, 1400) or not in_quiet_window(1320, 360, 30) or in_quiet_window(1320, 360, 720)
+     or not in_quiet_window(60, 120, 90) or in_quiet_window(60, 120, 120) or in_quiet_window(600, 600, 600) then
+    raise exception 'FAIL: quiet hours window math';
+  end if;
+end $$;
+
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select register_push_token('ben-phone-0000000000000000', 'ios');
+reset role;
+
+-- Olivia's approval-only ride. Ben asks to join: the organizer hears about it.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility, join_policy, invite_code)
+values ('14141414-1414-1414-1414-141414141414', auth.uid(), 'Push ride', now() + interval '2 days', 38.5, -109.5, 'public', 'approval', 'PUSHRIDE');
+reset role;
+truncate net.calls;
+-- (Written directly: join_ride's own approval check is not what's under test here.)
+select as_user('00000000-0000-0000-0000-00000000000b');
+insert into ride_members (ride_id, user_id, status) values ('14141414-1414-1414-1414-141414141414', auth.uid(), 'pending');
+do $$ begin
+  if last_push() ->> 'change' <> 'pending' or (select count(*) from net.calls) <> 1 then
+    raise exception 'FAIL: join request not queued for push';
+  end if;
+  if push_tokens_for(last_push()) <> array['olivia-token-0000000000000'] then
+    raise exception 'FAIL: join request not sent to the organizer only';
+  end if;
+  if (select title from push_batch(last_push())) not like '% asks to join Push ride' then
+    raise exception 'FAIL: join request title';
+  end if;
+end $$;
+
+-- Olivia approves Ben: Ben hears he's in.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+update ride_members set status = 'joined'
+where ride_id = '14141414-1414-1414-1414-141414141414' and user_id = '00000000-0000-0000-0000-00000000000b';
+reset role;
+do $$ begin
+  if last_push() ->> 'change' <> 'in' or push_tokens_for(last_push()) <> array['ben-phone-0000000000000000'] then
+    raise exception 'FAIL: approved rider not told they are in';
+  end if;
+end $$;
+
+-- Cara joins with the invite code: the organizer hears about it, Ben doesn't.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+select join_ride(p_invite_code => 'PUSHRIDE');
+reset role;
+do $$ begin
+  if last_push() ->> 'change' <> 'joined' or push_tokens_for(last_push()) <> array['olivia-token-0000000000000'] then
+    raise exception 'FAIL: new rider not announced to the organizer only';
+  end if;
+end $$;
+
+-- Settings are private: each rider reads and writes only their own.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+insert into notification_settings (user_id, rider_status, previews, time_zone)
+values (auth.uid(), false, false, 'America/Denver');
+select expect_refused($q$insert into notification_settings (user_id) values ('00000000-0000-0000-0000-00000000000b')$q$, 'rider wrote someone else''s notification settings');
+select expect_refused($q$update notification_settings set time_zone = 'Mars/Olympus' where user_id = auth.uid()$q$, 'unknown time zone saved');
+select expect_refused($q$select * from push_batch('{"type":"status"}')$q$, 'rider called push_batch');
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+do $$ begin
+  if exists (select 1 from notification_settings where user_id <> auth.uid()) then
+    raise exception 'FAIL: rider read someone else''s notification settings';
+  end if;
+end $$;
+update notification_settings set chat = false where user_id = '00000000-0000-0000-0000-00000000000c';
+reset role;
+do $$ begin
+  if not (select chat from notification_settings where user_id = '00000000-0000-0000-0000-00000000000c') then
+    raise exception 'FAIL: rider changed someone else''s notification settings';
+  end if;
+end $$;
+
+-- Ride status taps. Cara switched rider status off, but help always gets through.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into rider_statuses (ride_id, user_id, status) values ('14141414-1414-1414-1414-141414141414', auth.uid(), 'flat_tire');
+reset role;
+do $$ begin
+  if last_push() ->> 'type' <> 'status' or push_tokens_for(last_push()) <> array['olivia-token-0000000000000'] then
+    raise exception 'FAIL: rider status ignored the setting or went to the sender';
+  end if;
+  if (select title from push_batch(last_push())) not like '% has a flat tire' then raise exception 'FAIL: flat tire title'; end if;
+end $$;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into rider_statuses (ride_id, user_id, status, created_at) values ('14141414-1414-1414-1414-141414141414', auth.uid(), 'emergency', now() + interval '1 second');
+reset role;
+do $$ begin
+  if push_tokens_for(last_push()) <> array['cara-token-000000000000000', 'olivia-token-0000000000000'] then
+    raise exception 'FAIL: EMERGENCY did not reach every rider';
+  end if;
+  if (select title from push_batch(last_push()) limit 1) not like 'EMERGENCY: % needs help now' then raise exception 'FAIL: emergency title'; end if;
+end $$;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into rider_statuses (ride_id, user_id, status, created_at) values ('14141414-1414-1414-1414-141414141414', auth.uid(), 'ok', now() + interval '2 seconds');
+reset role;
+do $$ begin
+  if push_tokens_for(last_push()) <> array['olivia-token-0000000000000'] then
+    raise exception 'FAIL: all good after an emergency not sent';
+  end if;
+end $$;
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into rider_statuses (ride_id, user_id, status, created_at) values ('14141414-1414-1414-1414-141414141414', auth.uid(), 'ok', now() + interval '3 seconds');
+reset role;
+do $$ begin
+  if push_tokens_for(last_push()) <> '{}' then raise exception 'FAIL: repeated all good was sent'; end if;
+end $$;
+
+-- Chat: Cara hides message text, so she gets the notice without the words.
+-- (Ben chatted a lot earlier in this script; age those so the rate limit doesn't trip.)
+update ride_messages set created_at = created_at - interval '2 minutes' where user_id = '00000000-0000-0000-0000-00000000000b';
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into ride_messages (ride_id, user_id, body) values ('14141414-1414-1414-1414-141414141414', auth.uid(), 'Gas station at mile 12');
+reset role;
+do $$ begin
+  if last_push() ->> 'type' <> 'message' then raise exception 'FAIL: chat message not queued through the new path'; end if;
+  if (select body from push_batch(last_push()) where token = 'olivia-token-0000000000000') <> 'Gas station at mile 12'
+     or (select body from push_batch(last_push()) where token = 'cara-token-000000000000000') like '%mile 12%' then
+    raise exception 'FAIL: message previews setting';
+  end if;
+end $$;
+
+-- Quiet hours: Olivia's quiet window covers now, so chat waits but an emergency doesn't.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+insert into notification_settings (user_id, quiet_hours, quiet_start, quiet_end, time_zone)
+select auth.uid(), true, (m + 1430) % 1440, (m + 10) % 1440, 'America/Denver'
+from (select (extract(hour from now() at time zone 'America/Denver') * 60 + extract(minute from now() at time zone 'America/Denver'))::int as m) x;
+reset role;
+do $$ begin
+  if push_tokens_for(jsonb_build_object('type', 'message', 'id', (select id from ride_messages where body = 'Gas station at mile 12')))
+     <> array['cara-token-000000000000000'] then
+    raise exception 'FAIL: chat push sent during quiet hours';
+  end if;
+  if push_tokens_for(jsonb_build_object('type', 'status', 'id', (select id from rider_statuses where status = 'emergency' and ride_id = '14141414-1414-1414-1414-141414141414')))
+     <> array['cara-token-000000000000000', 'olivia-token-0000000000000'] then
+    raise exception 'FAIL: emergency held back by quiet hours';
+  end if;
+end $$;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+update notification_settings set quiet_hours = false where user_id = auth.uid();
+
+-- Olivia moves the meeting time: riders hear it (in their own time zone when known), she doesn't.
+update rides set meet_at = '2030-06-01 15:30:00+00' where id = '14141414-1414-1414-1414-141414141414';
+reset role;
+do $$ begin
+  if last_push() ->> 'change' <> 'time' or push_tokens_for(last_push()) <> array['ben-phone-0000000000000000', 'cara-token-000000000000000'] then
+    raise exception 'FAIL: new ride time not sent to the riders';
+  end if;
+  if (select body from push_batch(last_push()) where token = 'cara-token-000000000000000') <> 'Now meeting Saturday, June 1 at 9:30 AM.'
+     or (select body from push_batch(last_push()) where token = 'ben-phone-0000000000000000') <> 'Tap to see the new time.' then
+    raise exception 'FAIL: new ride time text';
+  end if;
+end $$;
+
+-- Olivia makes Ben the leader: Ben hears it. Starting the ride reaches everyone else.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+update ride_members set role = 'leader'
+where ride_id = '14141414-1414-1414-1414-141414141414' and user_id = '00000000-0000-0000-0000-00000000000b';
+reset role;
+do $$ begin
+  if last_push() ->> 'role' <> 'leader' or push_tokens_for(last_push()) <> array['ben-phone-0000000000000000'] then
+    raise exception 'FAIL: new leader not told';
+  end if;
+end $$;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+select set_ride_status('14141414-1414-1414-1414-141414141414', 'live');
+reset role;
+do $$ begin
+  if last_push() ->> 'change' <> 'live' or push_tokens_for(last_push()) <> array['ben-phone-0000000000000000', 'cara-token-000000000000000'] then
+    raise exception 'FAIL: ride start not sent';
+  end if;
+end $$;
+
+-- Ben switches ride changes off; the next change skips him.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+insert into notification_settings (user_id, ride_changes) values (auth.uid(), false);
+reset role;
+do $$ begin
+  if push_tokens_for(jsonb_build_object('type', 'ride', 'id', '14141414-1414-1414-1414-141414141414', 'change', 'cancelled',
+                                        'actor', '00000000-0000-0000-0000-00000000000a'))
+     <> array['cara-token-000000000000000'] then
+    raise exception 'FAIL: ride changes setting ignored';
+  end if;
+end $$;
+
+select 'ALL PRIVACY, JOINING AND GARAGE, CHAT, SUMMARY, DISCOVERY, LEADER-ONLY CHAT, RIDE NAME, ROUTE, HAND-OFF, TAIL GUNNER AND NOTIFICATION TESTS PASSED' as result;

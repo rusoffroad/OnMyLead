@@ -1,9 +1,12 @@
-// Sends a push notification for each new ride chat message.
+// Sends the app's push notifications: ride chat, rider status taps (Need help, EMERGENCY and
+// the rest), ride changes, new riders and roles.
 //
-// Called by the ride_messages_notify database trigger (see migration
-// 20261012000000_chat_leader_push.sql) with {"message_id": "..."} and the shared secret in
-// the x-onmylead-push-secret header. Recipients come from ride_message_recipients(): everyone
-// joined on the ride except the sender, or only the leader for leader-only messages.
+// Called by the database triggers (see migrations 20261012000000_chat_leader_push.sql and
+// 20261015000000_notification_settings.sql) with an event such as {"type":"status","id":"..."}
+// and the shared secret in the x-onmylead-push-secret header. push_batch() in the database
+// decides who gets what, applying each rider's notification settings and quiet hours, and
+// writes the text; this function only delivers it. The older {"message_id": "..."} body is
+// still accepted.
 //
 // iOS goes straight to Apple (APNs) with a token-based key, so no third-party push service is
 // involved. Android (FCM) is not wired yet; those tokens are skipped.
@@ -20,44 +23,46 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const env = (k: string) => Deno.env.get(k) ?? '';
 const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
 
-type Recipient = { user_id: string; token: string; platform: 'ios' | 'android' };
+type Push = {
+  user_id: string;
+  token: string;
+  platform: 'ios' | 'android';
+  title: string;
+  body: string;
+  thread_id: string;
+  data: Record<string, unknown>;
+};
 
 Deno.serve(async (req) => {
   const secret = env('PUSH_WEBHOOK_SECRET');
   if (!secret || req.headers.get('x-onmylead-push-secret') !== secret) return new Response('forbidden', { status: 403 });
 
-  const { message_id } = await req.json().catch(() => ({}));
-  if (typeof message_id !== 'string') return new Response('message_id required', { status: 400 });
-
-  const { data: msg, error } = await db
-    .from('ride_messages')
-    .select('id, ride_id, user_id, kind, audience, body, rides(name, invite_code), profiles(display_name)')
-    .eq('id', message_id)
-    .maybeSingle();
-  if (error || !msg) return new Response('message not found', { status: 404 });
-
-  const { data: recipients, error: rErr } = await db.rpc('ride_message_recipients', { p_message: message_id });
-  if (rErr) return new Response(rErr.message, { status: 500 });
-
   // deno-lint-ignore no-explicit-any
-  const ride = (msg as any).rides as { name: string; invite_code: string } | null;
-  // deno-lint-ignore no-explicit-any
-  const who = ((msg as any).profiles?.display_name as string | undefined)?.trim() || 'A rider';
-  const what = msg.kind === 'announcement' ? `Announcement from ${who}` : msg.audience === 'leader' ? `${who} (to you, the leader)` : who;
-  const title = ride?.name ? `${what} · ${ride.name}` : what;
+  const input: any = await req.json().catch(() => ({}));
+  const event = typeof input?.message_id === 'string' ? { type: 'message', id: input.message_id } : input;
+  if (typeof event?.type !== 'string') return new Response('event required', { status: 400 });
 
-  const payload = {
-    aps: { alert: { title, body: msg.body }, sound: 'default', 'thread-id': msg.ride_id },
-    // expo-notifications exposes this as notification.request.content.data.
-    body: { rideId: msg.ride_id, inviteCode: ride?.invite_code ?? null, messageId: msg.id },
-  };
+  const { data: rows, error } = await db.rpc('push_batch', { p_event: event });
+  if (error) return new Response(error.message, { status: 500 });
 
-  const ios = ((recipients ?? []) as Recipient[]).filter((r) => r.platform === 'ios');
+  const ios = ((rows ?? []) as Push[]).filter((r) => r.platform === 'ios');
   if (!ios.length) return Response.json({ sent: 0 });
   const jwt = await apnsJwt();
   if (!jwt) return Response.json({ sent: 0, note: 'APNs not configured' });
 
-  const results = await Promise.all(ios.map((r) => sendApns(r.token, payload, jwt)));
+  const results = await Promise.all(
+    ios.map((r) =>
+      sendApns(
+        r.token,
+        {
+          aps: { alert: { title: r.title, body: r.body }, sound: 'default', 'thread-id': r.thread_id },
+          // expo-notifications exposes this as notification.request.content.data.
+          body: r.data,
+        },
+        jwt,
+      ),
+    ),
+  );
   const gone = ios.filter((_, i) => results[i] === 'gone').map((r) => r.token);
   if (gone.length) await db.from('push_tokens').delete().in('token', gone);
   return Response.json({ sent: results.filter((r) => r === 'ok').length, removed: gone.length });
