@@ -318,6 +318,7 @@ export default function RidePage() {
           leaderName={leaderIds.length && !leaderIds.includes(me ?? '') ? leaderIds.map(nameOf).join(', ') : null}
           error={chat.error}
           onSend={chat.send}
+          // The one place that decides who can create polls (gate Pro here).
           canPoll={isManager || leaderIds.includes(me ?? '')}
           pollsOn={chat.pollsOn}
           votes={chat.votes}

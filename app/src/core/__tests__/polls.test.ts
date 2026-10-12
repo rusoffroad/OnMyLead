@@ -10,7 +10,7 @@ describe('checkPoll', () => {
     expect(checkPoll('  Lunch Stop? ', [' Yes ', '', 'No', '  '])).toEqual({ ok: true, question: 'Lunch Stop?', choices: ['Yes', 'No'] });
   });
 
-  it('needs a question and two to six different choices', () => {
+  it('needs a question and two to five different choices', () => {
     expect(checkPoll(' ', ['Yes', 'No']).ok).toBe(false);
     expect(checkPoll('Lunch?', ['Yes', '']).ok).toBe(false);
     expect(checkPoll('Lunch?', ['Yes', 'yes ']).ok).toBe(false);

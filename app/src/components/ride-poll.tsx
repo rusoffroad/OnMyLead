@@ -61,7 +61,7 @@ export function PollCard({
   );
 }
 
-/** The leader's poll composer: a question, two to six choices, or one of the starters. */
+/** The leader's poll composer: a question, two to five choices, or one of the starters. */
 export function PollComposer({
   pollsOn, onSend,
 }: {

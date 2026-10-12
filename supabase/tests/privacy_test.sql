@@ -1586,6 +1586,12 @@ do $$ begin
   exception when raise_exception then
     if sqlerrm like 'FAIL%' then raise; end if;
   end;
+  begin
+    insert into ride_messages (ride_id, user_id, body, poll_options)
+    values ('17171717-1717-1717-1717-171717171717', auth.uid(), 'Six choices?', array['A', 'B', 'C', 'D', 'E', 'F']);
+    raise exception 'FAIL: six-choice poll accepted';
+  exception when check_violation then null;
+  end;
   perform vote_on_poll('f0000000-0000-0000-0000-000000000001', 0);
   begin
     insert into ride_poll_votes (message_id, ride_id, user_id, choice)

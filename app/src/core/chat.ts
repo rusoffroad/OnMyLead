@@ -118,7 +118,7 @@ export function friendlyChatError(message: string): string {
   if (/poll choices repeat/i.test(message)) return 'Each choice needs to be different.';
   if (/poll choice too long/i.test(message)) return 'Keep each choice under 60 characters.';
   if (/poll question too long/i.test(message)) return 'Keep the question under 200 characters.';
-  if (/poll choice is empty|poll_size|check constraint/i.test(message)) return 'A poll needs 2 to 6 choices.';
+  if (/poll choice is empty|poll_size|check constraint/i.test(message)) return 'A poll needs 2 to 5 choices.';
   if (/not one of the poll choices|poll not found/i.test(message)) return 'That choice isn’t in this poll.';
   if (/only riders on this ride can vote/i.test(message)) return 'Only riders on this ride can vote.';
   if (/slow down/i.test(message)) return 'You’re sending a lot. Wait a minute and try again.';
