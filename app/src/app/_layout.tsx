@@ -19,6 +19,7 @@ import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { startEntitlements } from '@/lib/entitlements';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
+import { startPurchaseUpdates } from '@/lib/purchases';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ duration: 400, fade: true });
@@ -41,6 +42,11 @@ function RootLayout() {
   useEffect(() => setCrashScreen(screen), [screen]);
   // The rider's plan (Free, Pro Trial, Pro, Admin), kept fresh for every screen.
   useEffect(() => startEntitlements(), []);
+
+  // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
+  useEffect(() => {
+    if (ready) startPurchaseUpdates();
+  }, [ready]);
 
   useEffect(() => {
     if (!ready) return;
