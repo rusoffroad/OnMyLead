@@ -22,7 +22,7 @@ export default function Privacy() {
           title: 'What We Collect',
           body: [
             'Account: your email address and password (stored securely by our sign-in provider), and the ride name you pick.',
-            'What you add: rides, routes, Garage machines and photos, trip checklists, Starlink setup, riding groups, ride chat messages and poll votes.',
+            'What you add: rides, routes, waypoints, Garage machines and photos, trip checklists, Starlink setup, riding groups, ride chat messages and poll votes. Waypoints you drop are only yours unless the ride’s leader shares them with the riders on that ride.',
             'Device and app: a push notification token and your notification settings, crash reports (through Sentry) and basic usage events, such as a ride being created, so we can fix problems and improve the app. Crash reports never include your location.',
             'Purchases: if you buy Pro, Apple sends us the subscription’s status and transaction details. We never see your card or payment details.',
             'Website: onmylead.com uses Cloudflare Web Analytics, which counts visits without cookies.',
@@ -31,7 +31,7 @@ export default function Privacy() {
         {
           title: 'Who We Share It With',
           body: [
-            'We do not sell your data or use it for advertising. We share it only with the services that run OnMyLead: Supabase (database and sign-in), Apple (push notifications and purchases), Sentry (crash reports), Resend (emails such as ride cancellations) and Cloudflare (the website). If you look up a VIN in your Garage, that VIN is sent to the US government’s free NHTSA lookup.',
+            'We do not sell your data or use it for advertising. We share it only with the services that run OnMyLead: Supabase (database and sign-in), Apple (push notifications and purchases), Sentry (crash reports), Resend (emails such as ride cancellations) and Cloudflare (the website). If you look up a VIN in your Garage, that VIN is sent to the US government’s free NHTSA lookup. When you search for a park, trailhead or town, only the words you type and a rough map area go to Photon, an OpenStreetMap place search; trail maps are loaded from OpenFreeMap. Neither is told who you are. When you tap Navigate or Directions, the destination opens in Apple Maps or Google Maps, and their own privacy policies apply there.',
             'Other riders see what you share with them: your ride name, the rides you join, your messages on those rides and, while you share, your location.',
             'We may disclose information if the law requires it.',
           ],
