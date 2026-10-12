@@ -1,6 +1,6 @@
 /**
  * Riding groups, group invites to rides, and Follow This Leader (see core/groups and migration
- * 20261017420000_riding_groups.sql). Until that migration runs, every call here throws
+ * 20261017430000_riding_groups.sql). Until that migration runs, every call here throws
  * NotSwitchedOnError, and the screens say so.
  */
 import { router } from 'expo-router';
