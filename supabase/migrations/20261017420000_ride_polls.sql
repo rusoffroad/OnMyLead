@@ -11,7 +11,7 @@
 -- ---------------------------------------------------------------------------
 alter table ride_messages add column poll_options text[];
 alter table ride_messages add constraint ride_messages_poll_size
-  check (poll_options is null or cardinality(poll_options) between 2 and 6);
+  check (poll_options is null or cardinality(poll_options) between 2 and 5);
 
 -- Tidies and checks the choices: trimmed, 1 to 60 characters, no repeats. A poll is always a
 -- chat message to everyone (not an announcement, status or leader-only message), and the
@@ -58,7 +58,7 @@ create table ride_poll_votes (
   message_id uuid not null references ride_messages (id) on delete cascade,
   ride_id uuid not null references rides (id) on delete cascade,
   user_id uuid not null references profiles (id) on delete cascade,
-  choice smallint not null check (choice between 0 and 5),
+  choice smallint not null check (choice between 0 and 4),
   voted_at timestamptz not null default now(),
   primary key (message_id, user_id)
 );

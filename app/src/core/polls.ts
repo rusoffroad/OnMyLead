@@ -8,7 +8,7 @@
 import type { ChatMessage } from './chat';
 
 export const MIN_POLL_CHOICES = 2;
-export const MAX_POLL_CHOICES = 6;
+export const MAX_POLL_CHOICES = 5;
 export const MAX_POLL_QUESTION = 200;
 export const MAX_POLL_CHOICE = 60;
 
@@ -19,6 +19,7 @@ export const POLL_STARTERS: { question: string; choices: string[] }[] = [
   { question: 'Lunch Stop?', choices: ['Yes', 'No'] },
   { question: 'How’s The Pace?', choices: ['Too Slow', 'Just Right', 'Too Fast'] },
   { question: 'Saturday Or Sunday?', choices: ['Saturday', 'Sunday'] },
+  { question: 'Morning Or Afternoon?', choices: ['Morning', 'Afternoon'] },
 ];
 
 export const isPoll = (m: Pick<ChatMessage, 'poll_options'>): boolean =>
