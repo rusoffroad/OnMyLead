@@ -1,12 +1,13 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { Convoy } from '@/components/convoy';
 import { Icon, type IconName } from '@/components/icon';
 import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
 import { RideRow, RowGroup } from '@/components/ride-row';
+import { Showcase } from '@/components/showcase';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
@@ -50,6 +51,11 @@ export default function Home() {
       if (session) myRideName().then(setRideName).catch(() => setRideName(null));
     }, [session]),
   );
+
+  // On onmylead.com, signed-out visitors get the showcase; signed-in riders get the app.
+  if (Platform.OS === 'web' && !session) {
+    return loading ? <View style={{ flex: 1, backgroundColor: theme.background }} /> : <Showcase />;
+  }
 
   if (!isBackendConfigured) {
     return (

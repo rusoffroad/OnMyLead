@@ -98,6 +98,8 @@ function RootLayout() {
         <Stack.Screen name="groups/[id]" options={{ title: '' }} />
         <Stack.Screen name="g/[code]" options={{ title: 'Riding Group' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
+        <Stack.Screen name="terms" options={{ title: '' }} />
+        <Stack.Screen name="privacy" options={{ title: '' }} />
         <Stack.Screen name="admin" options={{ title: 'OnMyLead Admin', headerShown: false }} />
       </Stack>
       <MessageAlerts />
