@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Path, Polygon, Rect } from 'react-native-svg';
 
 import { Colors, font } from '@/constants/theme';
-import type { WaypointKind } from '@/core/waypoints';
+import { stopNumber, type Waypoint, type WaypointKind } from '@/core/waypoints';
 
 /** One small line drawing per kind, on a 24 grid. */
 const GLYPHS: Record<WaypointKind, string[]> = {
@@ -71,11 +71,61 @@ export function WaypointPin({ name, kind, shared }: { name: string; kind: Waypoi
 }
 
 const styles = StyleSheet.create({
-  pin: { width: PIN_W, height: 36, alignItems: 'center', justifyContent: 'center' },
+  pin: { width: PIN_W, height: 44, alignItems: 'center', justifyContent: 'center' },
   label: {
     position: 'absolute', left: PIN_W / 2 + 17, maxWidth: PIN_W / 2 - 20, paddingHorizontal: 5, paddingVertical: 1,
     borderRadius: 6, backgroundColor: 'rgba(10,22,38,0.82)', borderWidth: 1, borderColor: 'rgba(241,244,248,0.35)',
   },
   sharedLabel: { borderColor: Colors.sky },
   name: { color: Colors.text, fontFamily: font(700), fontSize: 12 },
+  stopN: { color: '#FFFFFF', fontFamily: font(800, 'display'), textAlign: 'center', includeFontPadding: false },
+  stopLabel: { left: PIN_W / 2 + 22, maxWidth: PIN_W / 2 - 24, borderColor: Colors.accent, paddingVertical: 2 },
+  stopName: { color: Colors.text, fontFamily: font(800), fontSize: 13 },
+  stopTime: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 11, fontVariant: ['tabular-nums'] },
 });
+
+/** The eight corners of a stop sign filling a square of this size. */
+export function octagon(cx: number, cy: number, r: number): string {
+  return Array.from({ length: 8 }, (_, i) => {
+    const a = Math.PI / 8 + (i * Math.PI) / 4;
+    return `${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`;
+  }).join(' ');
+}
+
+/**
+ * A planned stop: a red stop sign with its number, so "we stop here, second" reads from across the
+ * map. Logo red with a white rim, so it stays clear of the red route line it usually sits on.
+ */
+export function StopSign({ n, size = 34 }: { n: number | null; size?: number }) {
+  const c = size / 2;
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={StyleSheet.absoluteFill}>
+        <Polygon points={octagon(c, c, c - 0.5)} fill={Colors.background} />
+        <Polygon points={octagon(c, c, c - 2.5)} fill="#FFFFFF" />
+        <Polygon points={octagon(c, c, c - 4.5)} fill={Colors.accent} />
+      </Svg>
+      <Text style={[styles.stopN, { fontSize: size * 0.5, lineHeight: size * 0.56 }]}>{n ?? ''}</Text>
+    </View>
+  );
+}
+
+/** A planned stop on a live map: the stop sign, with its name and planned time beside it. */
+export function StopPin({ name, n, time }: { name: string; n: number | null; time?: string | null }) {
+  return (
+    <View style={styles.pin}>
+      <StopSign n={n} size={38} />
+      <View style={[styles.label, styles.stopLabel]}>
+        <Text style={styles.stopName} numberOfLines={1}>{name}</Text>
+        {time ? <Text style={styles.stopTime}>{time}</Text> : null}
+      </View>
+    </View>
+  );
+}
+
+/** Waypoints as dots for the drawn route (RouteSketch): stop signs, blue or white blazes. */
+export const waypointDots = (list: Waypoint[], names = false) =>
+  list.map((w) => ({
+    id: w.id, lat: w.lat, lng: w.lng, name: names ? w.name : undefined,
+    color: w.shared ? Colors.sky : Colors.text, diamond: true, stop: stopNumber(w, list) ?? undefined,
+  }));

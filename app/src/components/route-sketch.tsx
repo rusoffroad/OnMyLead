@@ -1,11 +1,12 @@
 import { View, type StyleProp, type ViewStyle } from 'react-native';
-import Svg, { Circle, G, Line, Polyline, Rect, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, G, Line, Polygon, Polyline, Rect, Text as SvgText } from 'react-native-svg';
 
 import { Colors, FontFamilies, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { projectRoute } from '@/core/summary';
+import { octagon } from './waypoint-blaze';
 
-export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string; /** A waypoint: drawn as a trail blaze. */ diamond?: boolean };
+export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string; /** A waypoint: drawn as a trail blaze. */ diamond?: boolean; /** A planned stop: a numbered stop sign. */ stop?: number };
 
 /**
  * The route as a drawing on a navy grid, no map tiles: it works offline and on the web, and is
@@ -61,10 +62,18 @@ export function RouteSketch({
         ) : null}
         {riders.map((p, i) => {
           const d = dots[i];
-          const r = d.mine ? 12 : d.big ? 8 : d.name ? 5.5 : 10;
+          const r = d.stop != null ? 9 : d.mine ? 12 : d.big ? 8 : d.name ? 5.5 : 10;
           return (
             <G key={d.id}>
-              {d.diamond ? (
+              {d.stop != null ? (
+                <>
+                  <Polygon points={octagon(p.x, p.y, 10.5)} fill="#FFFFFF" stroke={Colors.background} strokeWidth={1.5} />
+                  <Polygon points={octagon(p.x, p.y, 8.5)} fill={Colors.accent} />
+                  <SvgText x={p.x} y={p.y + 3.8} fill="#fff" fontSize={11} fontFamily={FontFamilies.body[800]} textAnchor="middle">
+                    {d.stop}
+                  </SvgText>
+                </>
+              ) : d.diamond ? (
                 <Rect x={p.x - 6.5} y={p.y - 6.5} width={13} height={13} rx={1.5} fill={d.color} stroke={Colors.background} strokeWidth={2} transform={`rotate(45 ${p.x} ${p.y})`} />
               ) : (
                 <Circle cx={p.x} cy={p.y} r={r} fill={d.color} stroke={d.mine || d.big ? Colors.text : Colors.background} strokeWidth={d.big ? 2.5 : 2} />

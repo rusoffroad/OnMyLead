@@ -4,13 +4,13 @@ import MapView, { Marker } from 'react-native-maps';
 
 import { Colors, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
-import type { Waypoint } from '@/core/waypoints';
+import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { MapRider } from './group-map-types';
 import { RiderPin } from './rider-pin';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
-import { WaypointPin } from './waypoint-blaze';
+import { StopPin, WaypointPin } from './waypoint-blaze';
 
 export type { MapRider } from './group-map-types';
 
@@ -73,9 +73,13 @@ export function GroupMap({
             e.stopPropagation?.();
             onPressWaypoint?.(w);
           }}
-          accessibilityLabel={`Waypoint ${w.name}`}
-          zIndex={w.shared ? 3 : 2}>
-          <WaypointPin name={w.name} kind={w.kind} shared={w.shared} />
+          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}` : `Waypoint ${w.name}`}
+          zIndex={w.planned_stop ? 4 : w.shared ? 3 : 2}>
+          {w.planned_stop ? (
+            <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} />
+          ) : (
+            <WaypointPin name={w.name} kind={w.kind} shared={w.shared} />
+          )}
         </Marker>
       ))}
       {riders

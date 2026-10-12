@@ -898,6 +898,7 @@ export default function RideMode() {
         existing={wp.waypoints}
         me={me}
         canShare={canShareWp}
+        stopsOn={wp.stopsSwitchedOn}
         ownerName={nameOf}
         onNavigate={navigateTo}
         onChanged={wp.apply}

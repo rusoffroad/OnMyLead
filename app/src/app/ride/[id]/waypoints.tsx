@@ -12,7 +12,7 @@ import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { rideLeaderIds } from '@/core/chat';
 import type { LatLng } from '@/core/geo';
 import type { RideRoute } from '@/core/route';
-import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
+import { canShareWaypoints, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getMembers, getPrivateDetails, getRide, getRideRoute } from '@/lib/api';
@@ -26,7 +26,8 @@ import type { Ride, RideMember } from '@/lib/types';
  * hold the map to drop one, or add one where you're standing. Only riders on the ride get here.
  */
 export default function RideWaypoints() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // stop=1: the leader came to add a planned stop, so a new one starts as one.
+  const { id, stop } = useLocalSearchParams<{ id: string; stop?: string }>();
   const { session } = useSession();
   const me = session?.user.id;
   const trail = useTrailMap();
@@ -57,8 +58,10 @@ export default function RideWaypoints() {
   const canShare = canShareWaypoints(me, mine, leaderIds);
   const wp = useRideWaypoints(id, !!mine);
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
-  const shared = wp.waypoints.filter((w) => w.shared).length;
-  const own = wp.waypoints.length - shared;
+  const stops = wp.waypoints.filter((w) => w.planned_stop).length;
+  const shared = wp.waypoints.filter((w) => w.shared && !w.planned_stop).length;
+  const own = wp.waypoints.length - shared - stops;
+  const addingStop = stop === '1' && canShare;
 
   const openNew = (at: LatLng) => {
     if (!wp.switchedOn) return setError(WAYPOINTS_NOT_SWITCHED_ON);
@@ -83,8 +86,12 @@ export default function RideWaypoints() {
     ? 'Join the ride to add and see its waypoints.'
     : !wp.switchedOn
       ? WAYPOINTS_NOT_SWITCHED_ON
+      : addingStop && !wp.stopsSwitchedOn
+        ? PLANNED_STOPS_NOT_SWITCHED_ON
       : Platform.OS === 'web'
         ? 'Add one where you are, or drop them on the map in the OnMyLead app.'
+        : addingStop
+          ? 'Press and hold the map where the group will stop. Stops are numbered in the order you add them.'
         : canShare
           ? 'Press and hold the map to drop a waypoint. You choose whether the whole ride sees it.'
           : 'Press and hold the map to drop a waypoint. Yours are only for you.';
@@ -114,6 +121,7 @@ export default function RideWaypoints() {
 
       <SafeAreaView edges={['bottom']} style={styles.panel}>
         <View style={styles.counts}>
+          {stops ? <Count n={stops} label={stops === 1 ? 'Stop' : 'Stops'} color={Colors.accent} /> : null}
           <Count n={shared} label="Shared" color={Colors.sky} />
           <Count n={own} label="Only You" color={Colors.text} />
           {wp.offline ? <Text style={styles.offline}>Saved on This Phone</Text> : null}
@@ -122,13 +130,13 @@ export default function RideWaypoints() {
         {wp.waypoints.length ? (
           <ScrollView style={{ maxHeight: 220 }} indicatorStyle="white">
             {wp.waypoints.map((w, i) => (
-              <WaypointRow key={w.id} waypoint={w} me={me} ownerName={nameOf} first={i === 0} onPress={() => setTarget({ type: 'view', waypoint: w })} />
+              <WaypointRow key={w.id} waypoint={w} stop={stopNumber(w, wp.waypoints)} me={me} ownerName={nameOf} first={i === 0} onPress={() => setTarget({ type: 'view', waypoint: w })} />
             ))}
           </ScrollView>
         ) : null}
         <ErrorText error={error} />
         {mine ? <Button title="Add at My Location" big loading={locating} disabled={!wp.switchedOn} onPress={addHere} /> : null}
-        <Text style={styles.privacy}>Waypoints are never public. Shared ones show only to riders on this ride.</Text>
+        <Text style={styles.privacy}>Waypoints are never public. Shared ones and planned stops show only to riders on this ride.</Text>
       </SafeAreaView>
 
       <WaypointSheet
@@ -137,6 +145,8 @@ export default function RideWaypoints() {
         existing={wp.waypoints}
         me={me}
         canShare={canShare}
+        stopsOn={wp.stopsSwitchedOn}
+        startAsStop={addingStop}
         ownerName={nameOf}
         onNavigate={navigateTo}
         onChanged={wp.apply}
