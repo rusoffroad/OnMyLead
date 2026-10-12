@@ -56,7 +56,7 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
           )}
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.headline, card.state === 'cancelled' && styles.struck]} numberOfLines={2}>{headline(card)}</Text>
+          <Text style={[styles.headline, card.state === 'cancelled' && styles.muted]} numberOfLines={2}>{headline(card)}</Text>
           {detail ? <Text style={styles.detail} numberOfLines={2}>{detail}</Text> : null}
         </View>
         {card.state === 'sent' || card.state === 'queued' ? (
@@ -66,25 +66,22 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
         ) : null}
       </View>
 
-      {out && receiptsOn && riders.length ? (
-        <View style={styles.lights} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          {riders.slice(0, MAX_DOTS).map(({ id, s }) => (
-            <View
-              key={id}
-              style={[
-                styles.light,
-                s === 'seen' && { backgroundColor: RideColors.green, borderColor: RideColors.green },
-                s === 'pushed' && { borderColor: Colors.sky },
-              ]}>
-              <Text style={[styles.initial, s === 'seen' && { color: Colors.background }]}>{nameOf(id).trim().charAt(0).toUpperCase() || '?'}</Text>
-            </View>
-          ))}
-          {riders.length > MAX_DOTS ? <Text style={styles.more}>+{riders.length - MAX_DOTS}</Text> : null}
-        </View>
-      ) : null}
-
       {canCancel ? (
-        <View style={styles.actions}>
+        <View style={styles.bottom}>
+          <View style={styles.lights} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {out && receiptsOn ? riders.slice(0, MAX_DOTS).map(({ id, s }) => (
+              <View
+                key={id}
+                style={[
+                  styles.light,
+                  s === 'seen' && { backgroundColor: RideColors.green, borderColor: RideColors.green },
+                  s === 'pushed' && { borderColor: Colors.sky },
+                ]}>
+                <Text style={[styles.initial, s === 'seen' && { color: Colors.background }]}>{nameOf(id).trim().charAt(0).toUpperCase() || '?'}</Text>
+              </View>
+            )) : null}
+            {out && receiptsOn && riders.length > MAX_DOTS ? <Text style={styles.more}>+{riders.length - MAX_DOTS}</Text> : null}
+          </View>
           {card.state === 'queued' ? (
             <Pressable onPress={onRetry} accessibilityRole="button" style={({ pressed }) => [styles.retry, { opacity: pressed ? 0.75 : 1 }]}>
               <Text style={styles.retryText}>Retry Now</Text>
@@ -95,8 +92,9 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
             accessibilityRole="button"
             accessibilityLabel={`Cancel ${card.label}`}
             accessibilityHint="Takes it back and tells the group to ignore it"
+            hitSlop={6}
             style={({ pressed }) => [styles.cancel, { opacity: pressed ? 0.7 : 1 }]}>
-            <Text style={styles.cancelText}>Cancel {card.label}</Text>
+            <Text style={styles.cancelText}>Cancel</Text>
           </Pressable>
         </View>
       ) : null}
@@ -110,31 +108,31 @@ const styles = StyleSheet.create({
     borderRadius: Radius.control,
     borderWidth: 2,
     padding: Spacing.three - 4,
-    gap: 10,
+    gap: 8,
   },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   mark: { width: 36, height: 36, borderRadius: 18, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   markText: { fontFamily: font(800), fontSize: 19, lineHeight: 22 },
   headline: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 21, lineHeight: 24 },
-  struck: { color: Colors.textSecondary, textDecorationLine: 'line-through' },
+  muted: { color: Colors.textSecondary },
   detail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 15, lineHeight: 19, marginTop: 2 },
   close: { alignSelf: 'flex-start', paddingHorizontal: 2 },
   closeText: { color: Colors.textSecondary, fontSize: 18 },
-  lights: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6, paddingLeft: 48 },
+  bottom: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  lights: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 5, paddingLeft: 48 },
   light: {
     width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: Colors.border,
     backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center',
   },
   initial: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 13 },
   more: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 15 },
-  actions: { flexDirection: 'row', gap: Spacing.two },
   retry: {
-    flex: 1, minHeight: 48, borderRadius: Radius.control, backgroundColor: RideColors.yellow, alignItems: 'center', justifyContent: 'center',
+    minHeight: 48, paddingHorizontal: 14, borderRadius: Radius.control, backgroundColor: RideColors.yellow, alignItems: 'center', justifyContent: 'center',
   },
   retryText: { color: '#1A1100', fontFamily: font(700, 'display'), fontSize: 18 },
   cancel: {
-    flex: 1, minHeight: 48, borderRadius: Radius.control, borderWidth: 2, borderColor: Colors.border,
-    backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.two,
+    minHeight: 48, minWidth: 104, borderRadius: Radius.control, borderWidth: 2, borderColor: Colors.text,
+    alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18,
   },
   cancelText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 18 },
 });
