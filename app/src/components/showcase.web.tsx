@@ -103,7 +103,7 @@ export function Showcase() {
               shot="create"
               alt="Create a Ride with The Route set to Mapped, next to Freeride, and the vehicles welcome"
               title="Create a Ride"
-              text="Set the meeting point, time, difficulty and which machines are welcome, and choose public, private or approval-only. Then pick Mapped and draw the route or import a GPX file, or pick Freeride and everyone follows the leader."
+              text="Set the meeting point, time, difficulty and which machines are welcome, and choose public, private or approval-only. Then pick Mapped and tap along the trail, and the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader."
               points={['Search parks, trailheads, towns or a street address for the meeting spot', 'Route miles checked against every machine’s fuel range', 'Hand the lead to another rider at any point']}
             />
             <Step
@@ -161,11 +161,12 @@ export function Showcase() {
             <h2 id="plan-title" className="section-title">Plan It on the Big Screen</h2>
             <p>
               Sign in at onmylead.com to create a ride from your computer. Click the map to drop the meeting point, click
-              along the trail to draw the route, and add numbered planned stops. Everything is in the OnMyLead app on
+              along the trail and the route snaps to it, bends and switchbacks included, then add numbered planned stops. Everything is in the OnMyLead app on
               your iPhone the moment you save.
             </p>
             <ul className="ticks">
-              <li>Satellite map with place and trailhead search</li>
+              <li>Satellite map with trails, place and trailhead search</li>
+              <li>Follow Trails, or Straight Line where nothing is mapped</li>
               <li>Drag a point to move it, or press Ctrl+Z to undo</li>
               <li>Drawing a route is free. Importing a GPX track is Pro.</li>
             </ul>
@@ -174,7 +175,7 @@ export function Showcase() {
           </div>
           <figure className="browser">
             <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>onmylead.com</span></div>
-            <img src="/showcase/web-route.webp" alt="Drawing a 6.3 mile route near Moab on onmylead.com, with numbered points and a Save Route button" loading="lazy" width={1600} height={1000} />
+            <img src="/showcase/web-route.webp" alt="Drawing a 3.8 mile route on Engineer Pass Road on onmylead.com: four clicks, and the route follows every switchback of the trail" loading="lazy" width={1600} height={1000} />
           </figure>
         </section>
 
@@ -225,6 +226,7 @@ export function Showcase() {
             </p>
             <ul className="ticks">
               <li><b>Trails on the Map.</b> Public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls, named when you tap them. Over satellite or topo.</li>
+              <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
               <li><b>A Family Link.</b> People at home follow along on a read-only page, no app needed.</li>

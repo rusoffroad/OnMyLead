@@ -1,8 +1,9 @@
 /**
  * A ride's planned route and where each rider is along it.
  *
- * The leader either taps waypoints on the map (straight lines between them, since trails rarely
- * match a road network) or imports a GPX track. The route is stored with the ride's private
+ * The leader either taps waypoints on the map (each leg following the trails between them, or a
+ * straight line where none is mapped; see core/route-legs and core/trail-router) or imports a
+ * GPX track. The route is stored with the ride's private
  * details, so only the ride's riders can read it, and riders' positions are placed on it by
  * projecting each live fix onto the nearest part of the line. No turn-by-turn: just the line,
  * how far along everyone is, and who is ahead or behind.
@@ -118,7 +119,7 @@ export function makeRoute(opts: { points: LatLng[]; waypoints?: LatLng[]; source
   };
 }
 
-/** A route the leader drew by tapping: straight lines between the taps. */
+/** A route drawn as straight lines between the taps (routes saved before trail snapping). */
 export const routeFromWaypoints = (waypoints: LatLng[], name?: string | null) =>
   makeRoute({ points: waypoints, waypoints, source: 'drawn', name });
 

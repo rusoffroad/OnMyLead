@@ -6,6 +6,7 @@ import { USGS_IMAGERY, type OfflineLayer } from '@/core/offline-maps';
 import {
   decodeOsmTrails, OSM_TILEJSON, osmTilesForRegion, osmTileZoom, templateFromTileJson, type OsmTrail, type ViewRegion,
 } from '@/core/osm-trails';
+import { decodeRoadLines, type RoadLine } from '@/core/trail-router';
 import {
   fillTemplate, identifyUrl, nearestTrail, TRAIL_SOURCE_IDS, TRAIL_SOURCES, trailTileTemplate, USGS_TOPO, type GeoJsonLine,
   type Tile, type TrailInfo, type TrailSourceId,
@@ -91,10 +92,8 @@ function isFresh(file: File): boolean {
   return Date.now() - ms < TILE_MAX_AGE_S * 1000;
 }
 
-async function loadOsmTile(t: Tile, offline: boolean): Promise<OsmTrail[]> {
-  const key = `${t.z}/${t.x}/${t.y}`;
-  const hit = osmMemory.get(key);
-  if (hit) return hit;
+/** One OpenStreetMap square's bytes: saved on the phone when fresh (or offline), else fetched and saved. */
+async function osmTileBytes(t: Tile, offline: boolean): Promise<Uint8Array | null> {
   const file = tileFile('osm', t.z, t.x, t.y);
   const saved = file.exists;
   let data: Uint8Array | null = null;
@@ -119,6 +118,14 @@ async function loadOsmTile(t: Tile, offline: boolean): Promise<OsmTrail[]> {
     }
   }
   if (!data && saved) data = await file.bytes().catch(() => null);
+  return data;
+}
+
+async function loadOsmTile(t: Tile, offline: boolean): Promise<OsmTrail[]> {
+  const key = `${t.z}/${t.x}/${t.y}`;
+  const hit = osmMemory.get(key);
+  if (hit) return hit;
+  const data = await osmTileBytes(t, offline);
   if (!data) return [];
   const trails = decodeOsmTrails(data, t);
   remember(key, trails);
@@ -131,6 +138,32 @@ export async function loadOsmView(region: ViewRegion, mapZoom: number, offline: 
   if (z == null) return [];
   const tiles = osmTilesForRegion(region, z);
   const parts = await Promise.all(tiles.map((t) => loadOsmTile(t, offline).catch(() => [] as OsmTrail[])));
+  return parts.flat();
+}
+
+/** Roads and trails decoded for snapping (core/trail-router), kept apart from the drawn tracks. */
+const roadMemory = new Map<string, RoadLine[]>();
+const ROAD_MEMORY_MAX = 64;
+
+/**
+ * Every road and trail in these squares, for snapping a drawn route to them. Squares a rider
+ * has looked at or downloaded are read from the phone, so snapping works with no signal there.
+ */
+export async function loadRoadLines(tiles: Tile[], offline: boolean): Promise<RoadLine[]> {
+  const parts = await Promise.all(
+    tiles.map(async (t) => {
+      const key = `${t.z}/${t.x}/${t.y}`;
+      const hit = roadMemory.get(key);
+      if (hit) return hit;
+      const data = await osmTileBytes(t, offline).catch(() => null);
+      if (!data) return [];
+      const lines = decodeRoadLines(data, t);
+      roadMemory.delete(key);
+      roadMemory.set(key, lines);
+      while (roadMemory.size > ROAD_MEMORY_MAX) roadMemory.delete(roadMemory.keys().next().value!);
+      return lines;
+    }),
+  );
   return parts.flat();
 }
 
