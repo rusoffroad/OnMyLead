@@ -131,6 +131,7 @@ export function Showcase() {
           <h2 id="more-title" className="section-title">Everything Else in Your Pocket</h2>
           <div className="more-grid">
             <div className="more-list">
+              <Feature title="Planned Stops">The leader marks where the whole ride will stop for fuel, lunch or camp, with a time. Everyone on the ride sees them numbered on the map, in order, and nobody else does.</Feature>
               <Feature title="Directions in Apple Maps or Google Maps">Search a street address, a trailhead or a town for the meeting point. One tap opens turn-by-turn on the roads to the meeting point, the destination, a waypoint or along the route.</Feature>
               <Feature title="Garage and Fuel Range">Add your machines with photos and every part of the build. Your tank, extra fuel and mileage give a full range, a safe turnaround and a safe trip.</Feature>
               <Feature title="Trip Planner">Packing checklists for each trip, linked to the ride and the machine you’re taking.</Feature>
