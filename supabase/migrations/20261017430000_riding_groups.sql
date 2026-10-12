@@ -27,7 +27,7 @@ create table riding_groups (
   owner_id uuid not null references profiles (id) on delete cascade,
   name text not null check (length(btrim(name)) between 1 and 60),
   -- The group's invite link (onmylead.com/g/<code>), for friends not in the app yet.
-  invite_code text not null unique default upper(substr(encode(gen_random_bytes(8), 'hex'), 1, 10)),
+  invite_code text not null unique default upper(substr(encode(extensions.gen_random_bytes(8), 'hex'), 1, 10)),
   created_at timestamptz not null default now()
 );
 create index on riding_groups (owner_id);
@@ -151,7 +151,7 @@ $$;
 create or replace function reset_group_link(p_group uuid)
 returns text language plpgsql security definer set search_path = public as $$
 declare
-  v_code text := upper(substr(encode(gen_random_bytes(8), 'hex'), 1, 10));
+  v_code text := upper(substr(encode(extensions.gen_random_bytes(8), 'hex'), 1, 10));
 begin
   if not is_group_owner(p_group, auth.uid()) then raise exception 'only the group''s owner can do that'; end if;
   update riding_groups set invite_code = v_code where id = p_group;
