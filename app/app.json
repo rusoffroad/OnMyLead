@@ -65,6 +65,7 @@
           "enabled": false
         }
       ],
+      "./plugins/with-sentry",
       "./plugins/with-scene-lifecycle",
       [
         "./plugins/with-push-entitlement",

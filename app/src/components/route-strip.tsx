@@ -12,8 +12,10 @@ const RANGE_COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: R
  * reading a map.
  */
 export function RouteStrip({
-  lengthM, riders, meId, summary, nameOf, offline, range,
+  lengthM, riders, meId, summary, nameOf, offline, range, compact,
 }: {
+  /** Folded Ride Mode: just the miles and the line, to leave the map as much room as possible. */
+  compact?: boolean;
   /** Whether this rider's machine (from the garage) can do the whole route. */
   range?: { check: RangeCheck; text: string } | null;
   lengthM: number;
@@ -83,7 +85,7 @@ export function RouteStrip({
         })}
       </View>
 
-      {summary ? (
+      {compact ? null : summary ? (
         <Text style={styles.compared}>
           {summary.offRoute ? <Text style={{ color: RideColors.yellow }}>{summary.offRoute} </Text> : null}
           {summary.compared}
@@ -91,7 +93,7 @@ export function RouteStrip({
       ) : (
         <Text style={styles.compared}>Share your location to see where you are on the route.</Text>
       )}
-      {range ? (
+      {range && !compact ? (
         <View style={styles.range}>
           <View style={[styles.rangeDot, { backgroundColor: RANGE_COLOR[range.check] }]} />
           <Text style={styles.rangeText} numberOfLines={2}>{range.text}</Text>

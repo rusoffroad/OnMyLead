@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   extendShare,
   formatRemaining,
+  formatRemainingShort,
   isShareActive,
   remainingMs,
   revokeShare,
@@ -63,5 +64,13 @@ describe('location sharing sessions', () => {
     expect(formatRemaining(45 * min)).toBe('45 min left');
     expect(formatRemaining(120 * min)).toBe('2 hr left');
     expect(formatRemaining(150 * min)).toBe('2 hr 30 min left');
+  });
+
+  it('formats the remaining time for the folded pill', () => {
+    expect(formatRemainingShort(null)).toBe('On');
+    expect(formatRemainingShort(10_000)).toBe('1m');
+    expect(formatRemainingShort(45 * min)).toBe('45m');
+    expect(formatRemainingShort(120 * min)).toBe('2h');
+    expect(formatRemainingShort(80 * min)).toBe('1h 20m');
   });
 });
