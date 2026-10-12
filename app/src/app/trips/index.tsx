@@ -8,6 +8,7 @@ import { ProgressBar } from '@/components/progress-bar';
 import { Spacing } from '@/constants/theme';
 import { progress, tripDates } from '@/core/trips';
 import { myTrips, type TripWithCounts } from '@/lib/api';
+import { requireTripSlot } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 
 export default function Trips() {
@@ -35,7 +36,7 @@ export default function Trips() {
 
   return (
     <Screen>
-      <Button title="Plan a New Trip" big onPress={() => router.push('/trips/new')} />
+      <Button title="Plan a New Trip" big onPress={async () => (await requireTripSlot()) && router.push('/trips/new')} />
       <ErrorText error={error} />
       {trips && trips.length === 0 ? (
         <ThemedText themeColor="textSecondary">

@@ -1,11 +1,12 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type ComponentProps } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
 import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
+import { ReportSheet } from '@/components/report-sheet';
 import { RideRoster } from '@/components/ride-roster';
 import { RideSummary } from '@/components/ride-summary';
 import { RouteSketch } from '@/components/route-sketch';
@@ -20,12 +21,14 @@ import { miles, type RideRoute } from '@/core/route';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
   approveMember, cancelRide, checkIn, deleteRide, getMembers, getPrivateDetails, getRide, getRideRoute, joinRide, leaveRide, setRideStatus,
-  tripForRide,
+  myTrips, tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { confirmAsync } from '@/lib/confirm';
 import { declineRideInvite } from '@/lib/groups';
+import { useEntitlements } from '@/lib/entitlements';
 import { currentNotificationSettings } from '@/lib/notification-settings';
+import { requireTripSlot } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
 import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
@@ -42,6 +45,7 @@ const time = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour
 export default function RidePage() {
   const { code, new: justCreated } = useLocalSearchParams<{ code: string; new?: string }>();
   const { session } = useSession();
+  const { can } = useEntitlements();
   const me = session?.user.id;
   const [ride, setRide] = useState<Ride | null | undefined>(undefined);
   const [details, setDetails] = useState<RidePrivateDetails | null>(null);
@@ -49,6 +53,7 @@ export default function RidePage() {
   const [route, setRoute] = useState<RideRoute | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
   const isJoined = members.some((m) => m.user_id === me && m.status === 'joined');
   const chat = useRideChat(ride?.id, isJoined);
 
@@ -261,7 +266,10 @@ export default function RidePage() {
           loading={busy === 'trip'}
           accessibilityHint="Opens your packing checklist for this ride"
           onPress={() => act('trip', async () => {
-            const trip = await tripForRide(ride, mine.vehicle_id);
+            // An existing trip for this ride always opens; a new one counts toward Free's one active trip.
+            const existing = (await myTrips()).find((t) => t.ride_id === ride.id);
+            if (!existing && !(await requireTripSlot())) return;
+            const trip = existing ?? (await tripForRide(ride, mine.vehicle_id));
             router.push(`/trips/${trip.id}`);
           })}
         />
@@ -318,8 +326,9 @@ export default function RidePage() {
           leaderName={leaderIds.length && !leaderIds.includes(me ?? '') ? leaderIds.map(nameOf).join(', ') : null}
           error={chat.error}
           onSend={chat.send}
-          // The one place that decides who can create polls (gate Pro here).
+          // The one place that decides who can create polls: the ride's leaders, on a plan with polls.
           canPoll={isManager || leaderIds.includes(me ?? '')}
+          pollLocked={!can('create_poll')}
           pollsOn={chat.pollsOn}
           votes={chat.votes}
           onSendPoll={chat.sendPoll}
@@ -330,6 +339,17 @@ export default function RidePage() {
       {mine && mine.status !== 'cancelled' && mine.status !== 'invited' && mine.role !== 'organizer' ? (
         <Button title="Leave Ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
       ) : null}
+
+      {me && !isOrganizer ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setReporting({ kind: 'ride', rideId: ride.id, name: ride.name })}
+          hitSlop={6}
+          style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13, textDecorationLine: 'underline' }}>Report Ride</ThemedText>
+        </Pressable>
+      ) : null}
+      <ReportSheet target={reporting} onClose={() => setReporting(null)} />
 
       <Pressable
         accessibilityRole="link"

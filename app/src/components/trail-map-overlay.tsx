@@ -9,6 +9,7 @@ import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type Off
 import { TOPO_ATTRIBUTION, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
+import { requirePro } from '@/lib/pro';
 
 const SAND = '#ECCD91';
 const ROAD = '#E8ECF2';
@@ -149,7 +150,7 @@ function RideMapDownload({ ride, route }: { ride: { id: string; name: string }; 
       <Pressable
         accessibilityRole="button"
         accessibilityHint="Saves satellite, topo and trails around this ride's route for riding with no signal"
-        onPress={() => downloadRide(ride.id, ride.name, route, ALL)}
+        onPress={() => requirePro('offline_maps') && downloadRide(ride.id, ride.name, route, ALL)}
         style={({ pressed }) => [styles.save, pressed && { opacity: 0.85 }]}>
         <Text style={styles.saveText}>Download This Ride’s Map</Text>
         <Text style={styles.saveSub}>{`Satellite, Topo and Trails, About ${formatBytes(estimate)}`}</Text>

@@ -10,6 +10,7 @@ import { shownName } from '@/core/profile';
 import { track } from './analytics';
 import { supabase } from './supabase';
 import type { Ride } from './types';
+import { requirePro } from './pro';
 
 export class NotSwitchedOnError extends Error {
   constructor() {
@@ -96,9 +97,10 @@ export async function getGroup(id: string): Promise<RidingGroup | null> {
 
 /**
  * The only way into making a new group (the Riding Groups screen and the ride page both use it),
- * so a plan check can sit here in one place.
+ * so the plan check sits here in one place. Saved groups are part of Pro.
  */
 export function openNewGroup() {
+  if (!requirePro('saved_groups')) return;
   router.push('/groups/new');
 }
 

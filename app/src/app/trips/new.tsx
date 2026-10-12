@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import { TripForm } from '@/components/trip-form';
 import { Screen } from '@/components/ui';
 import { createTrip } from '@/lib/api';
+import { requireTripSlot } from '@/lib/pro';
 
 export default function NewTrip() {
   return (
@@ -12,6 +13,7 @@ export default function NewTrip() {
       <TripForm
         saveLabel="Create Trip"
         onSave={async (input) => {
+          if (!(await requireTripSlot())) return;
           const trip = await createTrip(input);
           router.replace(`/trips/${trip.id}`);
         }}

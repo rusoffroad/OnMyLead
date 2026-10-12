@@ -18,6 +18,7 @@ import {
   addGroupRiders, deleteGroup, getGroup, inviteGroupToRide, leaveGroup, removeGroupRider, renameGroup, resetGroupLink,
   rideMates, ridesIOrganize, type RidingGroup,
 } from '@/lib/groups';
+import { handleProError, requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
 
@@ -62,7 +63,7 @@ export default function GroupPage() {
     try {
       await fn();
     } catch (e) {
-      setError((e as Error).message);
+      if (!handleProError(e)) setError((e as Error).message);
     } finally {
       setBusy(null);
     }
@@ -188,6 +189,7 @@ export default function GroupPage() {
                 accessibilityLabel={`Remove ${r.name} from the group`}
                 hitSlop={8}
                 onPress={async () => {
+                  if (!requirePro('saved_groups')) return;
                   if (!(await confirmAsync(`Remove ${r.name}?`, 'They stop getting this group’s ride invites. You can add them back later.', 'Remove'))) return;
                   act(`remove:${r.id}`, async () => {
                     await removeGroupRider(group.id, r.id);
@@ -232,6 +234,7 @@ export default function GroupPage() {
             title="Add Riders You’ve Ridden With"
             kind="secondary"
             onPress={() => {
+              if (!requirePro('saved_groups')) return;
               setPicking('riders');
               rideMates().then(setMates).catch((e) => setError((e as Error).message));
             }}

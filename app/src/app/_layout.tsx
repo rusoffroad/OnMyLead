@@ -13,6 +13,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
 import { MessageAlerts } from '@/components/message-alerts';
+import { ProGateHost } from '@/components/pro-gate';
 import { Colors, font, NavigationColors } from '@/constants/theme';
 // Starts crash reporting before anything else can fail (off when no DSN is set).
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
@@ -86,6 +87,8 @@ function RootLayout() {
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
         <Stack.Screen name="profile" options={{ title: 'Your Profile' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
+        <Stack.Screen name="pro" options={{ title: '' }} />
+        <Stack.Screen name="subscription" options={{ title: 'Subscription' }} />
         <Stack.Screen name="maps/index" options={{ title: 'Offline Maps' }} />
         <Stack.Screen name="maps/area" options={{ title: 'Pick an Area', headerShown: false }} />
         <Stack.Screen name="share" options={{ title: 'Share My Location' }} />
@@ -98,6 +101,7 @@ function RootLayout() {
         <Stack.Screen name="admin" options={{ title: 'OnMyLead Admin', headerShown: false }} />
       </Stack>
       <MessageAlerts />
+      <ProGateHost />
     </ThemeProvider>
   );
 }

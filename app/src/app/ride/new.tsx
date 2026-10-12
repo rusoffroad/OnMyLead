@@ -6,12 +6,15 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
+import { rideAllowanceText } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { parseTime } from '@/core/time';
 import { createRide } from '@/lib/api';
+import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
+import { handleProError } from '@/lib/pro';
 
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
 
@@ -31,6 +34,8 @@ type Kind = 'public' | 'private';
 
 export default function NewRide() {
   const { type } = useLocalSearchParams<{ type?: string }>();
+  const { ent } = useEntitlements();
+  const allowance = rideAllowanceText(ent);
   const days = useMemo(() => nextDays(14), []);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -127,7 +132,7 @@ export default function NewRide() {
       }
       router.replace(`/r/${ride.invite_code}?new=1`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not create the ride.');
+      if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not create the ride.');
     } finally {
       setBusy(false);
     }
@@ -135,6 +140,14 @@ export default function NewRide() {
 
   return (
     <Screen>
+      {allowance ? (
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement }}>
+          <ThemedText type="small" style={{ flex: 1, fontWeight: 600 }}>{allowance}</ThemedText>
+          <Pressable accessibilityRole="link" onPress={() => router.push('/pro')} hitSlop={8}>
+            <ThemedText type="linkPrimary">Unlimited With Pro</ThemedText>
+          </Pressable>
+        </View>
+      ) : null}
       <ThemedText type="heading">What Kind of Ride?</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <KindCard

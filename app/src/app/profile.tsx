@@ -8,9 +8,11 @@ import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } from '@/core/profile';
 import { settingsSummary } from '@/core/notifications';
+import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
 import { myRideName, requestAccountDeletion, saveRideName } from '@/lib/api';
 import { confirmAsync } from '@/lib/confirm';
+import { useEntitlements } from '@/lib/entitlements';
 import { useNotificationSettings } from '@/lib/notification-settings';
 import { useOfflineMaps } from '@/lib/offline-maps';
 import { signOut, useSession } from '@/lib/session';
@@ -24,6 +26,8 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState(false);
   const notifications = useNotificationSettings();
+  const { ent } = useEntitlements();
+  const subscriptionSummary = ent.switchedOn ? planHeadline(ent) : 'OnMyLead Pro, Restore Purchases and Promo Codes';
   const offlineMaps = useOfflineMaps();
   const offlineSummary = offlineMaps.length
     ? `${offlineMaps.length === 1 ? '1 map' : `${offlineMaps.length} maps`}, ${formatBytes(offlineMaps.reduce((n, m) => n + m.bytes, 0))}`
@@ -106,6 +110,17 @@ export default function Profile() {
       />
 
       <Section title="Settings" />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Subscription. ${subscriptionSummary}`}
+        onPress={() => router.push('/subscription')}
+        style={({ pressed }) => [styles.setting, pressed && { backgroundColor: Colors.backgroundSelected }]}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <ThemedText style={{ fontWeight: 600 }}>Subscription</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{subscriptionSummary}</ThemedText>
+        </View>
+        <Icon name="chevron" color={Colors.textSecondary} />
+      </Pressable>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`Notifications. ${settingsSummary(notifications)}`}

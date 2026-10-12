@@ -14,6 +14,7 @@ import { miles, routeFromGpx, routeFromWaypoints, type RideRoute } from '@/core/
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { confirmAsync } from '@/lib/confirm';
+import { handleProError, requirePro } from '@/lib/pro';
 import { readPickedText } from '@/lib/read-text';
 import type { Ride } from '@/lib/types';
 
@@ -58,6 +59,8 @@ export default function RouteBuilder() {
   }
 
   async function importGpx() {
+    // Importing is Pro; drawing a route stays free.
+    if (!requirePro('import_gpx')) return;
     setError(null);
     setBusy('gpx');
     try {
@@ -87,7 +90,7 @@ export default function RouteBuilder() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save the route.');
+      if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not save the route.');
     } finally {
       setBusy(null);
     }

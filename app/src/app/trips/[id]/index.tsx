@@ -2,6 +2,7 @@ import { Link, router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { ProLock } from '@/components/pro-gate';
 import { ProgressBar } from '@/components/progress-bar';
 import { RusGear } from '@/components/rus-gear';
 import { Icon } from '@/components/icon';
@@ -18,11 +19,14 @@ import {
 } from '@/lib/api';
 import { confirmAsync } from '@/lib/confirm';
 import { useTheme } from '@/hooks/use-theme';
+import { useEntitlements } from '@/lib/entitlements';
+import { requirePro } from '@/lib/pro';
 import type { Ride, Trip, TripItem, Vehicle } from '@/lib/types';
 
 export default function TripPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theme = useTheme();
+  const { can } = useEntitlements();
   const [trip, setTrip] = useState<Trip | null | undefined>(undefined);
   const [items, setItems] = useState<TripItem[]>([]);
   const [ride, setRide] = useState<Ride | null>(null);
@@ -90,6 +94,7 @@ export default function TripPage() {
 
   const addTemplate = (templateId: string) =>
     run(templateId, async () => {
+      if (!requirePro('advanced_trip_planning')) return;
       const tpl = TRIP_TEMPLATES.find((x) => x.id === templateId)!;
       const add = itemsToAdd(items, tpl.items);
       if (!add.length) return setNote(`Everything from "${tpl.label}" is already on your list.`);
@@ -109,6 +114,7 @@ export default function TripPage() {
 
   const copy = () =>
     run('copy', async () => {
+      if (!requirePro('advanced_trip_planning')) return;
       const next = await copyTrip(trip, items);
       router.push(`/trips/${next.id}`);
     });
@@ -151,7 +157,9 @@ export default function TripPage() {
         <ProgressBar fraction={p.fraction} done={p.done} />
       </Card>
 
-      {items.length === 0 || showTemplates ? (
+      {!can('advanced_trip_planning') && (items.length === 0 || showTemplates) ? (
+        <ProLock feature="advanced_trip_planning" title="Start From a Packing List" detail="Day ride, overnight and more, in one tap" />
+      ) : items.length === 0 || showTemplates ? (
         <Card>
           <ThemedText type="heading">Add a Starter List</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">One tap adds the items. Add as many as fit the trip; nothing is added twice.</ThemedText>

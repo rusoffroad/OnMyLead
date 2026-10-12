@@ -5,13 +5,17 @@ import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Convoy } from '@/components/convoy';
 import { Icon, type IconName } from '@/components/icon';
 import { Logo } from '@/components/logo';
+import { ProLock } from '@/components/pro-gate';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { initialOf } from '@/core/profile';
+import { historySplit } from '@/core/pro';
 import { discoverPublicRides, myRideName, myRides } from '@/lib/api';
+import { useEntitlements } from '@/lib/entitlements';
+import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import type { Ride, RideMember } from '@/lib/types';
@@ -29,6 +33,7 @@ const TOOLS: Tool[] = [
 export default function Home() {
   const theme = useTheme();
   const { session, loading } = useSession();
+  const { ent } = useEntitlements();
   const [mine, setMine] = useState<(RideMember & { rides: Ride })[]>([]);
   const [nearby, setNearby] = useState<Ride[]>([]);
   const [code, setCode] = useState('');
@@ -60,7 +65,14 @@ export default function Home() {
   const live = mine.find((m) => m.rides?.status === 'live' && m.status === 'joined');
   // Invitations (from a riding group) get their own list; the rest are rides you're on.
   const invites = mine.filter((m) => m.status === 'invited' && (m.rides?.status === 'scheduled' || m.rides?.status === 'live'));
-  const going = mine.filter((m) => m.status !== 'invited');
+  const yours = mine.filter((m) => m.status !== 'invited');
+  const isPast = (m: (typeof mine)[number]) => m.rides?.status === 'ended' || m.rides?.status === 'cancelled';
+  const going = yours.filter((m) => !isPast(m));
+  // Past rides, newest first. Free shows the last few; nothing is deleted, and live or upcoming rides are never hidden.
+  const past = historySplit(
+    yours.filter(isPast).sort((a, b) => Date.parse(b.rides.meet_at) - Date.parse(a.rides.meet_at)),
+    ent.historyLimit,
+  );
   const mineIds = new Set(mine.map((m) => m.ride_id));
   const others = nearby.filter((r) => !mineIds.has(r.id));
   const openCode = () => code.trim().length >= 4 && router.push(`/r/${code.trim().toUpperCase()}`);
@@ -112,7 +124,7 @@ export default function Home() {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Create a ride"
-        onPress={() => go('/ride/new')}
+        onPress={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
         style={({ pressed }) => [styles.create, { backgroundColor: theme.accent, transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
         <View style={styles.createIcon}>
           <Icon name="flag" size={34} color="#fff" strokeWidth={2.4} />
@@ -216,6 +228,24 @@ export default function Home() {
               <RideRow key={m.ride_id} ride={m.rides} note={m.status === 'joined' ? roleLabel(m.role) : m.status.replace('_', ' ')} />
             ))}
           </RowGroup>
+        </>
+      ) : null}
+
+      {past.shown.length ? (
+        <>
+          <Section title="Past Rides" />
+          <RowGroup>
+            {past.shown.map((m) => (
+              <RideRow key={m.ride_id} ride={m.rides} note={m.rides.status === 'cancelled' ? 'Cancelled' : 'Ended'} />
+            ))}
+          </RowGroup>
+          {past.hidden ? (
+            <ProLock
+              feature="ride_history"
+              title={`See ${past.hidden} Older ${past.hidden === 1 ? 'Ride' : 'Rides'}`}
+              detail={`Free shows your last ${past.shown.length}. They’re all saved.`}
+            />
+          ) : null}
         </>
       ) : null}
 
