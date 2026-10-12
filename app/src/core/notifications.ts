@@ -55,7 +55,7 @@ export const TOPIC_GROUPS: TopicGroup[] = [
   {
     title: 'On the Trail',
     topics: [
-      { key: 'rider_status', title: 'Rider Status', detail: 'Stopped, flat tire, need fuel, stuck, lost, mechanical, and all good again.' },
+      { key: 'rider_status', title: 'Rider Status', detail: 'Status buttons and quick replies from Ride Mode, like On My Way, Need Fuel and Flat Tire, and when a rider cancels one.' },
       { key: 'announcements', title: 'Announcements', detail: 'What the organizer tells the whole group.' },
     ],
   },

@@ -40,7 +40,7 @@ describe('CarPlay screen', () => {
 
   it('turns button ids back into actions', () => {
     expect(parseCarPlayAction('status:need_fuel')).toEqual({ type: 'status', kind: 'need_fuel' });
-    expect(parseCarPlayAction('reply:Running late')).toEqual({ type: 'reply', body: 'Running late' });
+    expect(parseCarPlayAction('reply:Running Late')).toEqual({ type: 'reply', body: 'Running Late' });
     expect(parseCarPlayAction('emergency_confirmed')).toEqual({ type: 'emergency' });
     // The bare EMERGENCY tap only opens the confirm alert on the car screen.
     expect(parseCarPlayAction('emergency')).toEqual({ type: 'none' });

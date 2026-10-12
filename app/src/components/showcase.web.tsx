@@ -84,7 +84,7 @@ export function Showcase() {
           </div>
           <div className="hero-phone">
             <figure className="phone">
-              <img src="/showcase/live.webp" alt="Ride Mode: the group on the route, a Ride Bubble alert and big status buttons" width={786} height={1704} />
+              <img src="/showcase/live.webp" alt="Ride Mode: the group on the route, an On My Way tap seen by three riders with a Cancel button, and big status buttons" width={786} height={1704} />
             </figure>
           </div>
         </div>
@@ -117,10 +117,10 @@ export function Showcase() {
             <Step
               n={3}
               shot="live"
-              alt="Ride Mode showing the group’s progress on the route, a Ride Bubble alert and big status buttons"
+              alt="Ride Mode showing the group’s progress on the route, an On My Way tap seen by three riders with a Cancel button, and big status buttons"
               title="Ride Together"
               text="Ride Mode puts the group on one screen. The leader, the tail gunner and every rider show on the route, and Ride Bubble warns everyone when someone drops back or stops moving."
-              points={['Glove-sized buttons for Flat Tire, Need Fuel, Mechanical Issue and Regroup', 'SOS sheet and an EMERGENCY button one tap away', 'Keeps sharing with the phone locked on the mount']}
+              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'SOS sheet and an EMERGENCY button one tap away']}
             />
             <Step
               n={4}
@@ -242,6 +242,7 @@ export function Showcase() {
           <div className="more-grid">
             <div className="more-list">
               <Feature title="Nothing Buried">Four tabs along the bottom: Rides, Find, Groups and You. Every ride opens in four parts, Details, Map, Riders and Chat, with what to do next right under its name.</Feature>
+              <Feature title="Status Taps You Can Trust">Tap On My Way or Need Fuel and everyone on the ride gets a notification. A light comes on for each rider who has it, and Cancel takes it back with a follow-up so nobody turns around for nothing.</Feature>
               <Feature title="Ride Day Weather and Daylight">Every upcoming ride shows the meet day’s forecast, with a heads-up for storms, high wind or heat, and a daylight bar that tells you if the group gets back after dark.</Feature>
               <Feature title="Ride Again">Ran a great ride? One tap copies it, meeting point and route included. Pick the new day and send the invite.</Feature>
               <Feature title="Planned Stops">The leader marks where the whole ride will stop for fuel, lunch or camp, with a time. Everyone on the ride sees them numbered on the map, in order, and nobody else does.</Feature>

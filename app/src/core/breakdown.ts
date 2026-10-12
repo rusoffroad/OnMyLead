@@ -8,7 +8,7 @@ import type { LatLng } from './geo';
 export type StatusKind =
   | 'ok' | 'stopped' | 'need_fuel' | 'mechanical' | 'flat_tire' | 'stuck' | 'lost' | 'need_help' | 'emergency';
 
-export type TappedStatus = { status: StatusKind; tapped_at: string; lat?: number | null; lng?: number | null };
+export type TappedStatus = { id?: string; status: StatusKind; tapped_at: string; lat?: number | null; lng?: number | null };
 
 export const MECHANICAL_LABEL = 'Mechanical Issue';
 

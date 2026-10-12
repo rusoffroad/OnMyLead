@@ -15,7 +15,7 @@ import { Icon } from '@/components/icon';
 import { BreakdownBadge } from '@/components/rider-status-badge';
 import { RiderList } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
-import { SendNote, type SendNoteValue } from '@/components/send-note';
+import { BroadcastCard } from '@/components/broadcast-card';
 import { SharePicker } from '@/components/share-picker';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointBlaze } from '@/components/waypoint-blaze';
@@ -27,6 +27,7 @@ import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
+import { tally } from '@/core/broadcast';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
@@ -37,6 +38,7 @@ import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
+import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
@@ -199,20 +201,16 @@ export default function RideMode() {
   [panelOpen, setPanelOpen, panelDrag]);
   const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
   const [lastReply, setLastReply] = useState<QuickReply | null>(null);
-  // Proof that a status tap or quick reply went out: Sending, then Sent, or Waiting for Signal.
-  const [note, setNote] = useState<SendNoteValue | null>(null);
-  const noteKey = useRef(0);
-  const showNote = useCallback((what: string, state: SendNoteValue['state'], key?: number) => {
-    const k = key ?? ++noteKey.current;
-    // A later tap replaces the note; an old send finishing doesn't overwrite it.
-    setNote((n) => (key != null && n?.key !== key ? n : { key: k, what, state }));
-    return k;
-  }, []);
-  useEffect(() => {
-    if (note?.state !== 'sent') return;
-    const t = setTimeout(() => setNote((n) => (n?.key === note.key ? null : n)), 3500);
-    return () => clearTimeout(t);
-  }, [note]);
+  // The last status tap or quick reply: Sending, then Sent with who has it, or Waiting for
+  // Signal; Cancel takes it back. Before the database has Cancel, a status is cancelled by
+  // telling the group "OK" and a quick reply by clearing it from the chat.
+  const broadcast = useBroadcast(id, me, async (b) => {
+    if (b.kind === 'reply') {
+      if (!(await chat.clear(b.id))) throw new Error('Could not take the message back. Try again.');
+    } else {
+      await sendStatusReliably(id, 'ok', null, newTapId());
+    }
+  });
   // Status calls this rider has dismissed on their own screen (they come back if the rider taps again).
   const [dismissedCalls, setDismissedCalls] = useState<Set<string>>(() => new Set());
   const spokenId = useRef<string | null>(null);
@@ -227,6 +225,13 @@ export default function RideMode() {
     Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body));
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, [announcement, me, nameOf]);
+
+  // Other riders' status taps reached this phone: their card says so.
+  const ackItems = useMemo(
+    () => Object.entries(statuses).map(([userId, s]) => ({ id: s.id, user_id: userId, at: s.tapped_at })),
+    [statuses],
+  );
+  useAcknowledge(id, me, ackItems);
 
   const apply = useCallback((d: RideSnapshot) => {
     setRide(d.ride);
@@ -310,6 +315,10 @@ export default function RideMode() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
         const s = payload.new as TappedStatus & { user_id: string };
         setStatuses((prev) => ({ ...prev, [s.user_id]: s }));
+      })
+      // A rider cancelled a tap: their status goes back to what it was before.
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
+        if ((payload.new as { cancelled_at?: string | null })?.cancelled_at) refresh();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'regroup_points', filter: `ride_id=eq.${id}` }, () => {
         activeRegroup(id).then((rg) => {
@@ -522,27 +531,41 @@ export default function RideMode() {
     setShare(null);
   }
 
+  /**
+   * Where this rider is, for a status tap, without holding the tap up: the fix Ride Mode already
+   * has, else the phone's last known one, else a quick fresh fix (waiting for a full GPS fix made
+   * every button feel dead for seconds).
+   */
+  async function spotNow(): Promise<{ lat: number; lng: number } | null> {
+    const known = myFix ?? (me && positions[me] ? { lat: positions[me].lat, lng: positions[me].lng } : null);
+    if (known) return known;
+    try {
+      const l = await Location.getLastKnownPositionAsync({ maxAge: 5 * 60_000 });
+      if (l) return { lat: l.coords.latitude, lng: l.coords.longitude };
+    } catch {}
+    return Promise.race([
+      currentPosition(Location.Accuracy.Balanced).catch(() => null),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
+    ]);
+  }
+
+  /** Marks my own tap on screen at once (the button lights up before anything is sent). */
+  const showMine = (tapId: string, kind: RiderStatusKind) =>
+    me && setStatuses((prev) => ({ ...prev, [me]: { id: tapId, status: kind, tapped_at: new Date().toISOString() } }));
+
   async function tapStatus(kind: RiderStatusKind) {
     if (kind === 'emergency') return setSosOpen(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    let at: { lat: number; lng: number } | null = null;
-    try {
-      at = await currentPosition();
-    } catch {}
-    const what = kind === 'ok' ? 'OK' : `“${STATUS_LABEL[kind]}”`;
-    const key = showNote(what, 'sending');
-    const sent = await sendStatusReliably(id, kind, at);
-    setStatuses((prev) => ({ ...prev, [me!]: { status: kind, tapped_at: new Date().toISOString() } }));
-    showNote(what, sent ? 'sent' : 'queued', key);
+    const tapId = newTapId();
+    showMine(tapId, kind);
+    await broadcast.send(
+      { id: tapId, kind: 'status', label: STATUS_LABEL[kind], urgent: kind === 'need_help' },
+      async (tid) => sendStatusReliably(id, kind, await spotNow(), tid),
+    );
   }
 
   /** Waiting for Signal: try everything in the outbox again now. */
   async function retryOutbox() {
-    if (!note) return;
-    const { key, what } = note;
-    showNote(what, 'sending', key);
-    const sent = await flushOutbox().catch(() => 0);
-    showNote(what, sent > 0 ? 'sent' : 'queued', key);
+    const sent = await broadcast.retry();
     if (sent > 0) {
       chat.reload();
       refresh();
@@ -550,13 +573,40 @@ export default function RideMode() {
   }
 
   async function quickReply(body: QuickReply) {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setLastReply(body);
-    const key = showNote(`“${body}”`, 'sending');
-    const sent = await sendQuickReplyReliably(id, body);
-    showNote(`“${body}”`, sent ? 'sent' : 'queued', key);
+    const sent = await broadcast.send({ id: newTapId(), kind: 'reply', label: body }, (tid) => sendQuickReplyReliably(id, body, tid));
     if (sent) chat.reload();
   }
+
+  /** Takes back the last tap, for everyone. */
+  async function cancelTap() {
+    const b = broadcast.card;
+    if (!b) return;
+    try {
+      await broadcast.cancel();
+    } catch (e) {
+      Alert.alert('Could Not Cancel', e instanceof Error ? e.message : String(e));
+      return;
+    }
+    if (b.kind === 'reply') {
+      setLastReply((r) => (r === b.label ? null : r));
+      chat.reload();
+    } else {
+      setStatuses((prev) => {
+        if (!me || prev[me]?.id !== b.id) return prev;
+        const next = { ...prev };
+        delete next[me];
+        return next;
+      });
+      refresh();
+    }
+  }
+
+  // A tap that was waiting for signal went out with a refresh: its card says Sent.
+  const { checkQueued } = broadcast;
+  useEffect(() => {
+    checkQueued();
+  }, [lastHeardAt, checkQueued]);
 
   async function regroupHere() {
     try {
@@ -581,12 +631,12 @@ export default function RideMode() {
 
   async function sendEmergency() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    let at: { lat: number; lng: number } | null = null;
-    try { at = await currentPosition(); } catch {}
-    const key = showNote('EMERGENCY Alert', 'sending');
-    const sent = await sendStatusReliably(id, 'emergency', at);
-    showNote('EMERGENCY Alert', sent ? 'sent' : 'queued', key);
-    setStatuses((prev) => ({ ...prev, [me!]: { status: 'emergency', tapped_at: new Date().toISOString() } }));
+    const tapId = newTapId();
+    showMine(tapId, 'emergency');
+    await broadcast.send(
+      { id: tapId, kind: 'status', label: 'EMERGENCY Alert', urgent: true },
+      async (tid) => sendStatusReliably(id, 'emergency', await spotNow(), tid),
+    );
   }
 
   // CarPlay: the car screen mirrors the group's state and sends button presses back here.
@@ -788,7 +838,17 @@ export default function RideMode() {
           {panelOpen ? <Text style={styles.handleText}>Hide ▼</Text> : null}
         </Pressable>
 
-        {note ? <SendNote note={note} onRetry={retryOutbox} onDismiss={() => setNote(null)} /> : null}
+        {broadcast.card ? (
+          <BroadcastCard
+            card={broadcast.card}
+            tally={tally(broadcast.card.id, broadcast.receipts, joined.filter((m) => m.user_id !== me).map((m) => m.user_id))}
+            receiptsOn={broadcast.receiptsOn}
+            nameOf={nameOf}
+            onCancel={cancelTap}
+            onRetry={retryOutbox}
+            onDismiss={broadcast.dismiss}
+          />
+        ) : null}
 
         {alertsShown ? (
           <ScrollView

@@ -16,7 +16,7 @@ import { useEffect } from 'react';
 import { Linking, Platform } from 'react-native';
 
 import { planReminders } from '@/core/notifications';
-import { myRides } from './api';
+import { ackRideItems, myRides } from './api';
 import { openGroupChat } from './group-chat';
 import { currentNotificationSettings } from './notification-settings';
 import { supabase } from './supabase';
@@ -64,7 +64,13 @@ export function resetPushRegistration() {
   registeredFor = null;
 }
 
-type TapData = { type?: unknown; change?: unknown; rideId?: unknown; inviteCode?: unknown; groupId?: unknown };
+type TapData = { type?: unknown; change?: unknown; rideId?: unknown; inviteCode?: unknown; groupId?: unknown; itemId?: unknown };
+
+/** A rider's status tap or quick reply reached this phone by push: the sender's card says so. */
+function acknowledge(data: TapData | undefined) {
+  if (data?.type === 'cancelled') return;
+  if (typeof data?.rideId === 'string' && typeof data.itemId === 'string') ackRideItems(data.rideId, [data.itemId]).catch(() => {});
+}
 
 /**
  * Where a tapped notification goes: Ride Mode for a live ride or a rider's status, a riding
@@ -74,7 +80,10 @@ export function tapTarget(data: TapData | undefined): string | null {
   if (!data) return null;
   if (data.type === 'group_message' && typeof data.groupId === 'string' && data.groupId) return `/groups/${data.groupId}/chat`;
   const rideId = typeof data.rideId === 'string' && data.rideId ? data.rideId : null;
-  if (rideId && (data.type === 'status' || (data.type === 'ride' && data.change === 'live'))) return `/ride/${rideId}/live`;
+  // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open
+  // Ride Mode, where the group is.
+  const rideModeTap = data.type === 'status' || data.type === 'cancelled' || (data.type === 'message' && typeof data.itemId === 'string');
+  if (rideId && (rideModeTap || (data.type === 'ride' && data.change === 'live'))) return `/ride/${rideId}/live`;
   // A chat message opens the ride page on its Chat section.
   if (typeof data.inviteCode === 'string' && data.inviteCode) return `/r/${data.inviteCode}${data.type === 'message' ? '?section=chat' : ''}`;
   return null;
@@ -84,7 +93,9 @@ export function tapTarget(data: TapData | undefined): string | null {
 export function useNotificationTaps() {
   const last = Notifications.useLastNotificationResponse();
   useEffect(() => {
-    const target = tapTarget(last?.notification.request.content.data as TapData | undefined);
+    const data = last?.notification.request.content.data as TapData | undefined;
+    acknowledge(data);
+    const target = tapTarget(data);
     if (target) router.push(target as never);
   }, [last]);
 }
@@ -97,6 +108,7 @@ export function useRideChangeReminders() {
   useEffect(() => {
     const sub = Notifications.addNotificationReceivedListener((n) => {
       const data = n.request.content.data as TapData | undefined;
+      acknowledge(data);
       if (data?.type === 'ride' && data.change !== 'live') syncRideReminders(currentNotificationSettings().reminder_minutes);
     });
     return () => sub.remove();
