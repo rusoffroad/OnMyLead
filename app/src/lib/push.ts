@@ -80,7 +80,10 @@ export function tapTarget(data: TapData | undefined): string | null {
   if (!data) return null;
   if (data.type === 'group_message' && typeof data.groupId === 'string' && data.groupId) return `/groups/${data.groupId}/chat`;
   const rideId = typeof data.rideId === 'string' && data.rideId ? data.rideId : null;
-  if (rideId && (data.type === 'status' || (data.type === 'ride' && data.change === 'live'))) return `/ride/${rideId}/live`;
+  // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open
+  // Ride Mode, where the group is.
+  const rideModeTap = data.type === 'status' || data.type === 'cancelled' || (data.type === 'message' && typeof data.itemId === 'string');
+  if (rideId && (rideModeTap || (data.type === 'ride' && data.change === 'live'))) return `/ride/${rideId}/live`;
   // A chat message opens the ride page on its Chat section.
   if (typeof data.inviteCode === 'string' && data.inviteCode) return `/r/${data.inviteCode}${data.type === 'message' ? '?section=chat' : ''}`;
   return null;
