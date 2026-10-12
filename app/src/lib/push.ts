@@ -17,13 +17,16 @@ import { Linking, Platform } from 'react-native';
 
 import { planReminders } from '@/core/notifications';
 import { myRides } from './api';
+import { openGroupChat } from './group-chat';
 import { currentNotificationSettings } from './notification-settings';
 import { supabase } from './supabase';
 
 // Chat already pops up inside the app, so only the rest gets a banner while the app is open.
 Notifications.setNotificationHandler({
   handleNotification: async (n) => {
-    const banner = (n.request.content.data as { type?: unknown } | undefined)?.type !== 'message';
+    const data = n.request.content.data as { type?: unknown; groupId?: unknown } | undefined;
+    // A group chat message for the chat that's already open shows there instead.
+    const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat());
     return { shouldShowBanner: banner, shouldShowList: true, shouldPlaySound: banner, shouldSetBadge: false };
   },
 });
@@ -61,11 +64,15 @@ export function resetPushRegistration() {
   registeredFor = null;
 }
 
-type TapData = { type?: unknown; change?: unknown; rideId?: unknown; inviteCode?: unknown };
+type TapData = { type?: unknown; change?: unknown; rideId?: unknown; inviteCode?: unknown; groupId?: unknown };
 
-/** Where a tapped notification goes: Ride Mode for a live ride or a rider's status, else the ride page (its chat for a message). */
+/**
+ * Where a tapped notification goes: Ride Mode for a live ride or a rider's status, a riding
+ * group's chat for its messages, else the ride page (its chat for a message).
+ */
 export function tapTarget(data: TapData | undefined): string | null {
   if (!data) return null;
+  if (data.type === 'group_message' && typeof data.groupId === 'string' && data.groupId) return `/groups/${data.groupId}/chat`;
   const rideId = typeof data.rideId === 'string' && data.rideId ? data.rideId : null;
   if (rideId && (data.type === 'status' || (data.type === 'ride' && data.change === 'live'))) return `/ride/${rideId}/live`;
   // A chat message opens the ride page on its Chat section.

@@ -112,7 +112,7 @@ export function Showcase() {
               alt="Find a Ride with a place search, a map of Utah and the Rides, Find, Groups and You tabs"
               title="Bring Your Crew"
               text="Send the ride by link, text, email or its QR code. Friends see a preview before they make an account, and riders can find public rides near them, by state, or near a park or trailhead they search for."
-              points={['Riding Groups invite your whole crew in one tap', 'Follow This Leader to hear about their next public ride', 'Exact meeting spot only shows to riders who join']}
+              points={['Riding Groups invite your whole crew in one tap and have their own group chat', 'Follow This Leader to hear about their next public ride', 'Exact meeting spot only shows to riders who join']}
             />
             <Step
               n={3}
@@ -192,6 +192,25 @@ export function Showcase() {
             <p className="qr-small">The code only opens the ride’s invite. No location is ever in it.</p>
             <InviteCode />
           </div>
+        </section>
+
+        <section className="qr crew" aria-labelledby="crew-title">
+          <div className="qr-copy">
+            <h2 id="crew-title" className="section-title">Your Crew’s Group Text</h2>
+            <p>
+              Every riding group has its own chat. Plan Saturday’s ride, find a seat on someone’s trailer, and swap the
+              stories after. Link a message to a ride and it carries a ticket for that ride, so the group can pull up
+              everything said about it in one tap.
+            </p>
+            <ul className="ticks">
+              <li>Only people in the group can read it or post</li>
+              <li>Notifications for the whole group, or mute one chat</li>
+              <li>Every message shows Sending, then Sent, or Retry</li>
+            </ul>
+          </div>
+          <figure className="phone qr-phone">
+            <img src="/showcase/group-chat.webp" alt="A riding group’s chat with messages linked to a ride happening now, an upcoming ride and one that’s over" loading="lazy" width={786} height={1704} />
+          </figure>
         </section>
       </main>
 
@@ -762,6 +781,8 @@ const CSS = `
 .qr { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 72px; align-items: center; padding-top: 140px; }
 .qr-copy { max-width: 36em; }
 .qr-copy > p { margin-top: 20px; color: var(--soft); font-size: 19px; }
+.crew { grid-template-columns: minmax(0, 1fr) 280px; }
+.crew .ticks { margin-top: 20px; }
 .qr-copy > .qr-small { margin-top: 12px; color: var(--dust); font-size: 15px; }
 .invite { margin-top: 36px; max-width: 460px; }
 .invite label { display: block; font-family: ${display7}; font-size: 22px; margin-bottom: 10px; }
@@ -848,6 +869,7 @@ const CSS = `
   .browser { margin: 0; }
   .signal-map { max-height: 420px; }
   .qr { grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
+  .crew { grid-template-columns: minmax(0, 1fr) 240px; }
   .more-grid { grid-template-columns: 1fr; }
   .more-grid .phone { display: none; }
 }
@@ -883,7 +905,7 @@ const CSS = `
   .step-copy > p, .band-copy > p, .plan-copy > p, .qr-copy > p { font-size: 17px; }
   .band { margin-top: 90px; padding: 90px 0; }
   .plan-web, .qr { padding-top: 90px; }
-  .qr { grid-template-columns: 1fr; }
+  .qr, .crew { grid-template-columns: 1fr; }
   .qr-phone { max-width: 240px; margin: 0 auto; order: 2; }
   .convoy { aspect-ratio: 4 / 5; border-radius: 24px; }
   .alert { font-size: 15px; right: 12px; top: 12px; width: calc(100% - 24px); }
