@@ -4,6 +4,7 @@ import L from 'leaflet';
 
 import { Colors, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { OsmTrail } from '@/core/osm-trails';
 
 export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
@@ -85,6 +86,17 @@ export function drawRoute(g: L.LayerGroup, points: LatLng[], ends = true) {
     }).addTo(g);
   end(points[0], RideColors.green, false, 'Start');
   end(points[points.length - 1], Colors.text, true, 'Finish');
+}
+
+/** OpenStreetMap trails: a sand dash over a navy casing, like the phone's trail layer. */
+export function drawOsmTracks(g: L.LayerGroup, lines: OsmTrail[]) {
+  for (const t of lines) {
+    for (const part of t.parts) {
+      const line = part.map(ll);
+      L.polyline(line, { color: 'rgba(10,22,38,0.67)', weight: 4.5, interactive: false }).addTo(g);
+      L.polyline(line, { color: '#ECCD91', weight: 2.2, dashArray: '7 5', interactive: false }).addTo(g);
+    }
+  }
 }
 
 /** Frame these points, or sit at `center` when there are too few to frame. */
