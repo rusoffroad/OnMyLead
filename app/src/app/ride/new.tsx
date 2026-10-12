@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -10,6 +10,7 @@ import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { parseTime } from '@/core/time';
 import { createRide } from '@/lib/api';
+import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
 
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland rig', 'Snowmobile', 'Car'];
@@ -58,6 +59,13 @@ export default function NewRide() {
   const [more, setMore] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [groups, setGroups] = useState<RidingGroup[]>([]);
+  const [groupNames, setGroupNames] = useState<string[]>([]);
+
+  // Riding groups to invite as soon as the ride exists (none until groups are switched on).
+  useEffect(() => {
+    myGroups().then(setGroups).catch(() => setGroups([]));
+  }, []);
 
   const parsedCoords = coords.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
 
@@ -113,6 +121,10 @@ export default function NewRide() {
         joinPolicy: kind === 'private' ? 'open' : joinPolicy,
         bubblePreset: bubble,
       });
+      // A group that fails to invite can be invited again from the ride page.
+      for (const g of groups.filter((x) => groupNames.includes(x.name))) {
+        await inviteGroupToRide(ride.id, g.id).catch(() => {});
+      }
       router.replace(`/r/${ride.invite_code}?new=1`);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not create the ride.');
@@ -207,6 +219,16 @@ export default function NewRide() {
           </View>
         </View>
       </Card>
+
+      {groups.length ? (
+        <Card>
+          <ThemedText type="heading">Invite A Group</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            Everyone in the groups you pick gets a notification and sees the ride on their home screen. They join with one tap.
+          </ThemedText>
+          <MultiChoice label="Your Riding Groups" options={[...new Set(groups.map((g) => g.name))]} value={groupNames} onChange={setGroupNames} />
+        </Card>
+      ) : null}
 
       <Button title={more ? 'Fewer details' : 'Add route, difficulty and more'} kind="ghost" onPress={() => setMore(!more)} />
       {more ? (

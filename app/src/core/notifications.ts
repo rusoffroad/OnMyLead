@@ -6,7 +6,9 @@
  * from your group always come through, quiet hours included, so they are not a setting.
  */
 
-export type NotificationTopic = 'rider_status' | 'announcements' | 'leader_messages' | 'chat' | 'ride_changes' | 'new_riders';
+export type NotificationTopic =
+  | 'rider_status' | 'announcements' | 'leader_messages' | 'chat' | 'ride_changes' | 'new_riders'
+  | 'ride_invites' | 'followed_leaders';
 
 export type NotificationSettings = Record<NotificationTopic, boolean> & {
   /** Off: notifications say a message arrived, not what it says. */
@@ -29,6 +31,8 @@ export const DEFAULT_SETTINGS: NotificationSettings = {
   chat: true,
   ride_changes: true,
   new_riders: true,
+  ride_invites: true,
+  followed_leaders: true,
   previews: true,
   reminder_minutes: 60,
   quiet_hours: false,
@@ -64,7 +68,17 @@ export const TOPIC_GROUPS: TopicGroup[] = [
       { key: 'new_riders', title: 'New riders', detail: 'Someone joins or asks to join a ride you organize.' },
     ],
   },
+  {
+    title: 'Your Riding Groups',
+    topics: [
+      { key: 'ride_invites', title: 'Ride Invites', detail: 'Someone invites you, or a group you’re in, to a ride.' },
+      { key: 'followed_leaders', title: 'Leaders You Follow', detail: 'A leader you follow posts a new public ride.' },
+    ],
+  },
 ];
+
+/** Topics that arrived with riding groups (migration 20261017420000_riding_groups.sql). */
+export const GROUP_TOPICS: NotificationTopic[] = ['ride_invites', 'followed_leaders'];
 
 export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [
   { value: null, label: 'Off' },
@@ -78,7 +92,10 @@ export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [
 export function settingsFromRow(row: Partial<Record<keyof NotificationSettings, unknown>> | null | undefined): NotificationSettings {
   const s = { ...DEFAULT_SETTINGS };
   if (!row) return s;
-  for (const k of ['rider_status', 'announcements', 'leader_messages', 'chat', 'ride_changes', 'new_riders', 'previews', 'quiet_hours', 'ride_emails'] as const) {
+  for (const k of [
+    'rider_status', 'announcements', 'leader_messages', 'chat', 'ride_changes', 'new_riders', 'ride_invites', 'followed_leaders',
+    'previews', 'quiet_hours', 'ride_emails',
+  ] as const) {
     if (typeof row[k] === 'boolean') s[k] = row[k] as boolean;
   }
   if (row.reminder_minutes === null || typeof row.reminder_minutes === 'number') s.reminder_minutes = row.reminder_minutes as number | null;
@@ -129,8 +146,9 @@ export function quietSegments(start: number, end: number): [number, number][] {
 
 /** One line for the profile screen's Notifications row. */
 export function settingsSummary(s: NotificationSettings): string {
-  const off = TOPIC_GROUPS.flatMap((g) => g.topics).filter((t) => !s[t.key]).length;
-  const parts = [off === 0 ? 'Everything on' : off === 6 ? 'Help alerts only' : `${off} turned off`];
+  const topics = TOPIC_GROUPS.flatMap((g) => g.topics);
+  const off = topics.filter((t) => !s[t.key]).length;
+  const parts = [off === 0 ? 'Everything on' : off === topics.length ? 'Help alerts only' : `${off} turned off`];
   if (s.quiet_hours) parts.push(`quiet ${formatClock(s.quiet_start)} to ${formatClock(s.quiet_end)}`);
   return parts.join(', ');
 }

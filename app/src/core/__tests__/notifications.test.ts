@@ -16,11 +16,19 @@ describe('notification settings', () => {
     expect(s.time_zone).toBe('America/Denver');
   });
 
+  it('reads the riding group switches, on until turned off', () => {
+    expect(settingsFromRow({ chat: true }).ride_invites).toBe(true);
+    const s = settingsFromRow({ ride_invites: false, followed_leaders: false });
+    expect(s.ride_invites).toBe(false);
+    expect(s.followed_leaders).toBe(false);
+  });
+
   it('summarizes for the profile row', () => {
     expect(settingsSummary(DEFAULT_SETTINGS)).toBe('Everything on');
     expect(settingsSummary({ ...DEFAULT_SETTINGS, chat: false, quiet_hours: true })).toBe('1 turned off, quiet 10 PM to 6 AM');
     const allOff = { ...DEFAULT_SETTINGS, chat: false, rider_status: false, announcements: false, leader_messages: false, ride_changes: false, new_riders: false };
-    expect(settingsSummary(allOff)).toBe('Help alerts only');
+    expect(settingsSummary(allOff)).toBe('6 turned off');
+    expect(settingsSummary({ ...allOff, ride_invites: false, followed_leaders: false })).toBe('Help alerts only');
   });
 
   it('notices a database without the update', () => {

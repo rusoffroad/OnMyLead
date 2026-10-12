@@ -2,6 +2,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { Convoy } from '@/components/convoy';
 import { Icon, type IconName } from '@/components/icon';
 import { Logo } from '@/components/logo';
 import { RideRow, RowGroup } from '@/components/ride-row';
@@ -57,6 +58,9 @@ export default function Home() {
 
   const go = (href: Parameters<typeof router.push>[0]) => router.push(session ? href : '/sign-in');
   const live = mine.find((m) => m.rides?.status === 'live' && m.status === 'joined');
+  // Invitations (from a riding group) get their own list; the rest are rides you're on.
+  const invites = mine.filter((m) => m.status === 'invited' && (m.rides?.status === 'scheduled' || m.rides?.status === 'live'));
+  const going = mine.filter((m) => m.status !== 'invited');
   const mineIds = new Set(mine.map((m) => m.ride_id));
   const others = nearby.filter((r) => !mineIds.has(r.id));
   const openCode = () => code.trim().length >= 4 && router.push(`/r/${code.trim().toUpperCase()}`);
@@ -156,6 +160,21 @@ export default function Home() {
         </View>
       ) : null}
 
+      {session ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Riding Groups. Save your crew and invite everyone in one tap"
+          onPress={() => router.push('/groups')}
+          style={({ pressed }) => [styles.groups, { backgroundColor: pressed ? theme.backgroundSelected : theme.backgroundElement }]}>
+          <Convoy names={[null, null, null, null]} size={16} />
+          <View style={{ flex: 1 }}>
+            <ThemedText style={styles.groupsTitle}>Riding Groups</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">Save your crew. Invite everyone in one tap.</ThemedText>
+          </View>
+          <Icon name="chevron" color={theme.textSecondary} />
+        </Pressable>
+      ) : null}
+
       {!loading && !session ? (
         <Button title="Sign in or create a free account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
@@ -178,11 +197,22 @@ export default function Home() {
 
       <ErrorText error={error} />
 
-      {mine.length ? (
+      {invites.length ? (
+        <>
+          <Section title="Ride Invites" />
+          <RowGroup>
+            {invites.map((m) => (
+              <RideRow key={m.ride_id} ride={m.rides} note="You’re invited. Tap to join" />
+            ))}
+          </RowGroup>
+        </>
+      ) : null}
+
+      {going.length ? (
         <>
           <Section title="Your rides" />
           <RowGroup>
-            {mine.map((m) => (
+            {going.map((m) => (
               <RideRow key={m.ride_id} ride={m.rides} note={m.status === 'joined' ? roleLabel(m.role) : m.status.replace('_', ' ')} />
             ))}
           </RowGroup>
@@ -241,6 +271,8 @@ const styles = StyleSheet.create({
   },
   meInitial: { color: '#fff', fontSize: 18, lineHeight: 22, fontWeight: 800 },
   nudge: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, padding: 14, borderLeftWidth: 4, borderLeftColor: Colors.sky },
+  groups: { flexDirection: 'row', alignItems: 'center', gap: 14, borderRadius: Radius.card, paddingHorizontal: 16, paddingVertical: 14 },
+  groupsTitle: { fontSize: 22, lineHeight: 26, fontFamily: font(700, 'display') },
   tools: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: Spacing.one },
   tool: { width: '24%', alignItems: 'center', gap: 6, minHeight: 72 },
   toolIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },

@@ -2,6 +2,7 @@ import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
 import { InviteCard } from '@/components/invite-card';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
@@ -13,6 +14,7 @@ import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
+import { leadersToFollow } from '@/core/groups';
 import { counts } from '@/core/joining';
 import { miles, type RideRoute } from '@/core/route';
 import { useRideChat } from '@/hooks/use-ride-chat';
@@ -22,6 +24,7 @@ import {
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { confirmAsync } from '@/lib/confirm';
+import { declineRideInvite } from '@/lib/groups';
 import { currentNotificationSettings } from '@/lib/notification-settings';
 import { syncRideReminders } from '@/lib/push';
 import { openStore } from '@/lib/rus';
@@ -157,7 +160,8 @@ export default function RidePage() {
           </ThemedText>
         </View>
       ) : null}
-      {justCreated && isManager ? <InviteCard ride={ride} fresh /> : null}
+      {me && ride.status !== 'cancelled' ? <FollowLeaders ids={leadersToFollow(ride.organizer_id, leaderIds, me)} organizerId={ride.organizer_id} /> : null}
+      {justCreated && isManager ? <InviteCard ride={ride} fresh manager /> : null}
       {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
       {ride.status === 'ended' && isJoined ? <RideSummary ride={ride} members={members} /> : null}
 
@@ -220,6 +224,19 @@ export default function RidePage() {
         ) : (
           <Button title={me ? (ride.join_policy === 'approval' ? 'Request to join' : 'Join ride') : 'Sign in to join'} big loading={busy === 'join'} onPress={join} />
         )
+      ) : mine.status === 'invited' ? (
+        ride.status === 'ended' || ride.status === 'cancelled' ? (
+          <ThemedText>This ride has {ride.status}.</ThemedText>
+        ) : (
+          <Card style={{ borderWidth: 2, borderColor: Colors.sky }}>
+            <ThemedText type="heading">You’re Invited</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              {ride.join_policy === 'approval' ? 'No waiting for approval: you’re on the list.' : 'Join to see the exact meeting spot and the group.'}
+            </ThemedText>
+            <Button title="Join Ride" big loading={busy === 'join'} onPress={join} />
+            <Button title="No Thanks" kind="secondary" loading={busy === 'decline'} onPress={() => act('decline', () => declineRideInvite(ride.id))} />
+          </Card>
+        )
       ) : mine.status === 'pending' ? (
         <ThemedText>Your request is waiting for the organizer.</ThemedText>
       ) : mine.status === 'waitlisted' ? (
@@ -250,7 +267,7 @@ export default function RidePage() {
         />
       ) : null}
 
-      {!cancelled && !(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} /> : null}
+      {!cancelled && !(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} manager={isManager} /> : null}
 
       {isManager ? (
         <Card>
@@ -304,7 +321,7 @@ export default function RidePage() {
         />
       ) : null}
 
-      {mine && mine.status !== 'cancelled' && mine.role !== 'organizer' ? (
+      {mine && mine.status !== 'cancelled' && mine.status !== 'invited' && mine.role !== 'organizer' ? (
         <Button title="Leave ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
       ) : null}
 
