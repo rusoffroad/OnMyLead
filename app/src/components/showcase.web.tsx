@@ -109,7 +109,7 @@ export function Showcase() {
             <Step
               n={2}
               shot="find"
-              alt="Find a Ride with a place search, a map of Utah and public rides within 50 miles"
+              alt="Find a Ride with a place search, a map of Utah and the Rides, Find, Groups and You tabs"
               title="Bring Your Crew"
               text="Send the ride by link, text, email or its QR code. Friends see a preview before they make an account, and riders can find public rides near them, by state, or near a park or trailhead they search for."
               points={['Riding Groups invite your whole crew in one tap', 'Follow This Leader to hear about their next public ride', 'Exact meeting spot only shows to riders who join']}
@@ -222,6 +222,7 @@ export function Showcase() {
           <h2 id="more-title" className="section-title">Everything Else in Your Pocket</h2>
           <div className="more-grid">
             <div className="more-list">
+              <Feature title="Nothing Buried">Four tabs along the bottom: Rides, Find, Groups and You. Every ride opens in four parts, Details, Map, Riders and Chat, with what to do next right under its name.</Feature>
               <Feature title="Ride Day Weather and Daylight">Every upcoming ride shows the meet day’s forecast, with a heads-up for storms, high wind or heat, and a daylight bar that tells you if the group gets back after dark.</Feature>
               <Feature title="Ride Again">Ran a great ride? One tap copies it, meeting point and route included. Pick the new day and send the invite.</Feature>
               <Feature title="Planned Stops">The leader marks where the whole ride will stop for fuel, lunch or camp, with a time. Everyone on the ride sees them numbered on the map, in order, and nobody else does.</Feature>
