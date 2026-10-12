@@ -48,17 +48,20 @@ function DateBlock({ ride }: { ride: Ride }) {
 
 export function RideRow({ ride, note }: { ride: Ride; note?: string }) {
   const theme = useTheme();
+  const cancelled = ride.status === 'cancelled';
   const meta = [
-    ride.status === 'live' ? 'Riding now' : clock(ride.meet_at),
+    cancelled ? 'Cancelled' : ride.status === 'live' ? 'Riding now' : clock(ride.meet_at),
     ride.meet_area_label ? `near ${ride.meet_area_label}` : null,
   ].filter(Boolean).join(', ');
   return (
     <Link href={`/r/${ride.invite_code}`} asChild>
       <Pressable accessibilityRole="link" style={styles.row}>
-        <DateBlock ride={ride} />
+        <View style={cancelled && { opacity: 0.45 }}>
+          <DateBlock ride={ride} />
+        </View>
         <View style={{ flex: 1, gap: 2 }}>
           <ThemedText style={{ fontSize: 17, lineHeight: 22, fontWeight: 700 }} numberOfLines={2}>{ride.name}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{meta}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1} style={cancelled && { color: theme.danger, fontWeight: 600 }}>{meta}</ThemedText>
           {ride.difficulty || note ? (
             <View style={{ flexDirection: 'row', gap: Spacing.two, marginTop: 2 }}>
               {ride.difficulty ? <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>{ride.difficulty}</ThemedText> : null}

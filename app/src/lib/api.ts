@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
 import { fuzzLocation, type LatLng } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
+import { friendlyCancelError } from '@/core/cancel';
 import type { ChatMessage, MessageAudience, MessageKind } from '@/core/chat';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
@@ -247,6 +248,20 @@ export async function setMyVehicle(rideId: string, vehicleId: string | null, rid
 export async function setRideStatus(rideId: string, status: 'live' | 'ended' | 'cancelled') {
   unwrap(await supabase.rpc('set_ride_status', { p_ride: rideId, p_status: status }));
   track(status === 'live' ? 'ride_mode_started' : 'ride_mode_ended', { ride_id: rideId });
+}
+
+/** Call off a ride that hasn't ended. Everyone on it hears by push and email. */
+export async function cancelRide(rideId: string) {
+  const { error } = await supabase.rpc('cancel_ride', { p_ride: rideId });
+  if (error) throw new Error(friendlyCancelError(error.message));
+  track('ride_cancelled', { ride_id: rideId });
+}
+
+/** Remove a ride for good (organizer only). Anyone still on an upcoming ride hears it was cancelled. */
+export async function deleteRide(rideId: string) {
+  const { error } = await supabase.rpc('delete_ride', { p_ride: rideId });
+  if (error) throw new Error(friendlyCancelError(error.message));
+  track('ride_deleted', { ride_id: rideId });
 }
 
 export async function setMemberRole(rideId: string, userId: string, role: 'leader' | 'rider' | 'co_organizer') {

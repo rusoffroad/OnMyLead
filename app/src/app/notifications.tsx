@@ -118,6 +118,15 @@ export default function NotificationsScreen() {
                 onChange={(v) => change({ [t.key]: v })}
               />
             ))}
+            {g.title === 'Before the ride' ? (
+              <ToggleRow
+                title="Email when a ride is cancelled"
+                detail="An email if a ride you joined is cancelled or removed, as well as the notification."
+                value={settings.ride_emails}
+                disabled={!editable}
+                onChange={(v) => change({ ride_emails: v })}
+              />
+            ) : null}
             {g.title === 'Ride chat' ? (
               <ToggleRow
                 title="Show message text"
