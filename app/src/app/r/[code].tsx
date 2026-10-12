@@ -1,6 +1,6 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { FuelCheck } from '@/components/fuel-check';
 import { InviteCard } from '@/components/invite-card';
@@ -10,15 +10,20 @@ import { RideSummary } from '@/components/ride-summary';
 import { RouteSketch } from '@/components/route-sketch';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
-import { Colors, Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing } from '@/constants/theme';
+import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { counts } from '@/core/joining';
 import { miles, type RideRoute } from '@/core/route';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import {
-  approveMember, checkIn, getMembers, getPrivateDetails, getRide, getRideRoute, joinRide, leaveRide, setRideStatus, tripForRide,
+  approveMember, cancelRide, checkIn, deleteRide, getMembers, getPrivateDetails, getRide, getRideRoute, joinRide, leaveRide, setRideStatus,
+  tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
+import { confirmAsync } from '@/lib/confirm';
+import { currentNotificationSettings } from '@/lib/notification-settings';
+import { syncRideReminders } from '@/lib/push';
 import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
 import type { Ride, RideMember, RidePrivateDetails } from '@/lib/types';
@@ -84,7 +89,11 @@ export default function RidePage() {
   if (ride === null) return <Screen><ThemedText>We couldn’t find that ride. Check the link or code.</ThemedText></Screen>;
 
   const mine = members.find((m) => m.user_id === me);
-  const isManager = ride.organizer_id === me || mine?.role === 'co_organizer';
+  const isOrganizer = ride.organizer_id === me;
+  const isManager = isOrganizer || mine?.role === 'co_organizer';
+  const cancelled = ride.status === 'cancelled';
+  const over = ride.status === 'ended' || cancelled;
+  const toTell = ridersToTell(members, me);
   const joined = members.filter((m) => m.status === 'joined');
   const pending = members.filter((m) => m.status === 'pending');
   const waitlist = members.filter((m) => m.status === 'waitlisted');
@@ -97,6 +106,32 @@ export default function RidePage() {
     me
       ? act('join', () => joinRide({ rideId: ride.id, inviteCode: /^[0-9a-f-]{36}$/i.test(code) ? undefined : ride.invite_code }))
       : router.push('/sign-in');
+
+  const resyncReminders = () => syncRideReminders(currentNotificationSettings().reminder_minutes);
+
+  const cancel = async () => {
+    const p = cancelPrompt(ride.name, toTell);
+    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
+    await act('cancel', async () => {
+      await cancelRide(ride.id);
+      resyncReminders();
+    });
+  };
+
+  const remove = async () => {
+    const p = deletePrompt(ride.name, toTell, over);
+    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
+    setBusy('delete');
+    setError(null);
+    try {
+      await deleteRide(ride.id);
+      resyncReminders();
+      router.replace('/');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      setBusy(null);
+    }
+  };
 
   return (
     <Screen>
@@ -112,6 +147,16 @@ export default function RidePage() {
         <ThemedText style={{ color: Colors.sky, fontWeight: 700, fontSize: 17 }}>{when(ride.meet_at)}</ThemedText>
         {ride.description ? <ThemedText themeColor="textSecondary">{ride.description}</ThemedText> : null}
       </View>
+      {cancelled ? (
+        <View style={styles.cancelled} accessibilityRole="alert">
+          <ThemedText type="heading">This Ride Is Cancelled</ThemedText>
+          <ThemedText themeColor="textSecondary">
+            {isManager
+              ? 'Everyone who had joined was sent a notification and an email.'
+              : `${nameOf(ride.organizer_id)} called it off. You don’t need to do anything.`}
+          </ThemedText>
+        </View>
+      ) : null}
       {justCreated && isManager ? <InviteCard ride={ride} fresh /> : null}
       {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
       {ride.status === 'ended' && isJoined ? <RideSummary ride={ride} members={members} /> : null}
@@ -169,9 +214,9 @@ export default function RidePage() {
 
       <ErrorText error={error} />
 
-      {!mine || mine.status === 'cancelled' || mine.status === 'declined' ? (
-        ride.status === 'ended' || ride.status === 'cancelled' ? (
-          <ThemedText>This ride has {ride.status}.</ThemedText>
+      {cancelled ? null : !mine || mine.status === 'cancelled' || mine.status === 'declined' ? (
+        ride.status === 'ended' ? (
+          <ThemedText>This ride has ended.</ThemedText>
         ) : (
           <Button title={me ? (ride.join_policy === 'approval' ? 'Request to join' : 'Join ride') : 'Sign in to join'} big loading={busy === 'join'} onPress={join} />
         )
@@ -205,7 +250,7 @@ export default function RidePage() {
         />
       ) : null}
 
-      {!(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} /> : null}
+      {!cancelled && !(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} /> : null}
 
       {isManager ? (
         <Card>
@@ -223,6 +268,23 @@ export default function RidePage() {
               <Button title="Decline" kind="secondary" onPress={() => act('decline', () => approveMember(ride.id, m.user_id, false))} />
             </View>
           ))}
+          {canCancel(ride.status, isManager) || isOrganizer ? (
+            <View style={styles.callOff}>
+              <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+                {canCancel(ride.status, isManager) ? (
+                  <Button title="Cancel Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
+                ) : null}
+                {isOrganizer ? (
+                  <Button title="Delete Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'delete'} disabled={!!busy} onPress={remove} />
+                ) : null}
+              </View>
+              <ThemedText type="small" themeColor="textSecondary">
+                {over
+                  ? 'Deleting removes the ride, its chat and its route for everyone.'
+                  : 'Everyone who joined gets a notification and an email either way. Cancel keeps the ride in their list; delete removes it.'}
+              </ThemedText>
+            </View>
+          ) : null}
         </Card>
       ) : null}
 
@@ -265,5 +327,17 @@ function Info({ label, value, first }: { label: string; value: string; first: bo
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  cancelled: {
+    gap: Spacing.one,
+    padding: Spacing.three,
+    borderRadius: Radius.card,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.danger,
+    backgroundColor: Colors.backgroundElement,
+  },
+  callOff: { gap: Spacing.two, marginTop: Spacing.one, paddingTop: Spacing.three, borderTopWidth: 1, borderTopColor: Colors.backgroundSelected },
+});
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

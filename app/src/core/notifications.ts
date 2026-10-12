@@ -18,6 +18,8 @@ export type NotificationSettings = Record<NotificationTopic, boolean> & {
   quiet_start: number;
   quiet_end: number;
   time_zone: string | null;
+  /** Email when a ride you're on is cancelled or removed. */
+  ride_emails: boolean;
 };
 
 export const DEFAULT_SETTINGS: NotificationSettings = {
@@ -33,6 +35,7 @@ export const DEFAULT_SETTINGS: NotificationSettings = {
   quiet_start: 22 * 60,
   quiet_end: 6 * 60,
   time_zone: null,
+  ride_emails: true,
 };
 
 export type TopicInfo = { key: NotificationTopic; title: string; detail: string };
@@ -75,7 +78,7 @@ export const REMINDER_OPTIONS: { value: number | null; label: string }[] = [
 export function settingsFromRow(row: Partial<Record<keyof NotificationSettings, unknown>> | null | undefined): NotificationSettings {
   const s = { ...DEFAULT_SETTINGS };
   if (!row) return s;
-  for (const k of ['rider_status', 'announcements', 'leader_messages', 'chat', 'ride_changes', 'new_riders', 'previews', 'quiet_hours'] as const) {
+  for (const k of ['rider_status', 'announcements', 'leader_messages', 'chat', 'ride_changes', 'new_riders', 'previews', 'quiet_hours', 'ride_emails'] as const) {
     if (typeof row[k] === 'boolean') s[k] = row[k] as boolean;
   }
   if (row.reminder_minutes === null || typeof row.reminder_minutes === 'number') s.reminder_minutes = row.reminder_minutes as number | null;
