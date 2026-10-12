@@ -2,6 +2,7 @@ import { Link, router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
+import { FlagGate } from '@/components/app-notices';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
 import { ProgressBar } from '@/components/progress-bar';
@@ -11,7 +12,15 @@ import { myTrips, type TripWithCounts } from '@/lib/api';
 import { requireTripSlot } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 
-export default function Trips() {
+export default function TripsScreen() {
+  return (
+    <FlagGate flag="trip_planner">
+      <Trips />
+    </FlagGate>
+  );
+}
+
+function Trips() {
   const { session, loading } = useSession();
   const [trips, setTrips] = useState<TripWithCounts[] | null>(null);
   const [error, setError] = useState<string | null>(null);
