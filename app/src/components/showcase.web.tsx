@@ -290,7 +290,7 @@ export function Showcase() {
               </>
             )}
           </div>
-          {signUpWith ? <p className="download-account">Make your account in seconds with {signUpWith}.</p> : null}
+          {signUpWith ? <p className="download-account">Make your account in seconds with {signUpWith}. Using a social account? You choose whether your riding crew sees it.</p> : null}
           <p className="download-sign">
             Already riding with OnMyLead? <a href="/sign-in" onClick={go('/sign-in')}>Sign In</a>
           </p>

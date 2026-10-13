@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { MenuGroup, MenuRow } from '@/components/menu';
 import { ThemedText } from '@/components/themed-text';
@@ -20,6 +20,8 @@ import { useEntitlements } from '@/lib/entitlements';
 import { useNotificationSettings } from '@/lib/notification-settings';
 import { useOfflineMaps } from '@/lib/offline-maps';
 import { signOut, useSession } from '@/lib/session';
+import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
+import { socialSetting, type SocialProfile } from '@/core/social-profile';
 
 /**
  * The You tab: everything that isn't a ride, in one place and in plain groups. Your name up top,
@@ -36,12 +38,30 @@ export default function You() {
   const starlinkOn = useFlag('starlink');
   const offlineMaps = useOfflineMaps();
   const blocks = useBlocks();
+  const [social, setSocial] = useState<SocialProfile | null>(null);
+  const [socialBusy, setSocialBusy] = useState(false);
+  const [socialError, setSocialError] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
-      if (session) myRideName().then(setRideName).catch(() => setRideName(null));
+      if (!session) return;
+      myRideName().then(setRideName).catch(() => setRideName(null));
+      // Keeps the name and photo from their Apple, Google or Facebook sign-in up to date.
+      syncSocialProfile().then(setSocial).catch(() => {});
     }, [session]),
   );
+
+  async function toggleSocial(on: boolean) {
+    setSocialBusy(true);
+    setSocialError(null);
+    try {
+      setSocial(await setSocialProfileShown(on));
+    } catch {
+      setSocialError('That didn’t save. Check your connection and try again.');
+    } finally {
+      setSocialBusy(false);
+    }
+  }
 
   if (loading) return <Screen><View /></Screen>;
 
@@ -118,9 +138,31 @@ export default function You() {
       ) : null}
 
       {session ? (
-        <MenuGroup title="Account">
-          <MenuRow icon="person" title="Email" detail={`${session.user.email ?? 'No email on this account'}. Only you see this.`} />
-        </MenuGroup>
+        <>
+          <MenuGroup title="Account">
+            <MenuRow icon="person" title="Email" detail={`${session.user.email ?? 'No email on this account'}. Only you see this.`} />
+            {social ? (
+              <MenuRow
+                icon="people"
+                color={Colors.sky}
+                title={socialSetting(social).title}
+                detail={socialSetting(social).detail}
+                right={
+                  <Switch
+                    value={social.shown}
+                    disabled={socialBusy}
+                    onValueChange={toggleSocial}
+                    trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+                    thumbColor={Colors.text}
+                    {...({ activeThumbColor: Colors.text } as object)}
+                    accessibilityLabel={socialSetting(social).title}
+                  />
+                }
+              />
+            ) : null}
+          </MenuGroup>
+          <ErrorText error={socialError} />
+        </>
       ) : null}
 
       {session ? (

@@ -6,6 +6,7 @@ import { Linking, Platform, Pressable, Share, StyleSheet, Text, View } from 'rea
 import { Convoy, RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
 import { RiderPicker } from '@/components/rider-picker';
+import { SocialPhoto, SocialTag } from '@/components/social-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
@@ -23,6 +24,7 @@ import {
 } from '@/lib/groups';
 import { handleProError, requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
+import { useSocialProfiles } from '@/lib/social-profile';
 import type { Ride } from '@/lib/types';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
@@ -46,6 +48,8 @@ export default function GroupPage() {
   const [copied, setCopied] = useState(false);
   /** Undefined while loading, null when Group Chat isn't switched on yet. */
   const [chat, setChat] = useState<GroupChatSummary | null | undefined>(undefined);
+  // The Apple, Google or Facebook accounts riders chose to show their group.
+  const social = useSocialProfiles(group ? group.riders.map((r) => r.id) : []);
 
   const load = useCallback(async () => {
     try {
@@ -193,10 +197,11 @@ export default function GroupPage() {
       <View style={styles.list}>
         {group.riders.map((r, i) => (
           <View key={r.id} style={[styles.riderRow, i > 0 && styles.rule]}>
-            <RiderDot name={r.name} lead={r.isOwner} size={36} />
+            <SocialPhoto profile={social.get(r.id)} size={36} fallback={<RiderDot name={r.name} lead={r.isOwner} size={36} />} />
             <View style={{ flex: 1 }}>
               <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{r.id === me ? `${r.name} (You)` : r.name}</ThemedText>
               {r.isOwner ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Runs This Group</ThemedText> : null}
+              {social.get(r.id) ? <SocialTag profile={social.get(r.id)!} /> : null}
             </View>
             {owner && !r.isOwner ? (
               <Pressable
