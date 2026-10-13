@@ -12,8 +12,10 @@ export type LegalSection = { title: string; body: string[] };
  * A plain reading page for the Terms of Use and Privacy Policy. Both are drafts until Chris has
  * reviewed them (and, ideally, a lawyer), so each one carries a visible draft note.
  */
-export function LegalPage({ title, updated, intro, sections, draft = true }: {
+export function LegalPage({ title, updated, intro, sections, draft = true, action }: {
   title: string; updated: string; intro: string; sections: LegalSection[]; draft?: boolean;
+  /** A button under the intro, e.g. Contact Us on the Support page. */
+  action?: { title: string; href: '/contact' };
 }) {
   return (
     <Screen>
@@ -30,6 +32,7 @@ export function LegalPage({ title, updated, intro, sections, draft = true }: {
         <ThemedText type="subtitle" accessibilityRole="header">{title}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">Last updated {updated}</ThemedText>
         <ThemedText style={styles.p}>{intro}</ThemedText>
+        {action ? <Button title={action.title} onPress={() => router.push(action.href)} style={{ alignSelf: 'flex-start', paddingHorizontal: Spacing.four }} /> : null}
         {sections.map((s) => (
           <View key={s.title} style={styles.section}>
             <ThemedText type="heading" accessibilityRole="header">{s.title}</ThemedText>

@@ -6,6 +6,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { key: 'users', title: 'Users', href: '/admin/users', group: 'People' },
   { key: 'trials', title: 'Pro Trials', href: '/admin/trials', group: 'People' },
   { key: 'reports', title: 'Reports', href: '/admin/reports', group: 'People' },
+  { key: 'contact', title: 'Contact Messages', href: '/admin/contact', group: 'People' },
   { key: 'rides', title: 'Rides', href: '/admin/rides', group: 'Rides' },
   { key: 'analytics', title: 'Analytics', href: '/admin/analytics', group: 'Rides' },
   { key: 'subscriptions', title: 'Subscriptions', href: '/admin/subscriptions', group: 'Money' },
