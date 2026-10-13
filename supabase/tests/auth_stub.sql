@@ -27,3 +27,14 @@ alter table auth.users add column if not exists created_at timestamptz default n
   add column if not exists email_confirmed_at timestamptz,
   add column if not exists last_sign_in_at timestamptz,
   add column if not exists banned_until timestamptz;
+-- Sign-in accounts linked to each user (Apple, Google, Facebook, email), as Supabase keeps them.
+create table auth.identities (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  provider text not null,
+  provider_id text not null,
+  identity_data jsonb not null default '{}',
+  last_sign_in_at timestamptz,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);

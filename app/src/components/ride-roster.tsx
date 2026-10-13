@@ -4,6 +4,7 @@ import { LayoutAnimation, Platform, Pressable, StyleSheet, View } from 'react-na
 
 import { Icon } from '@/components/icon';
 import { ReportSheet } from '@/components/report-sheet';
+import { SocialPhoto, SocialTag } from '@/components/social-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Card, ErrorText } from '@/components/ui';
 import { Colors, Radius, RideColors, Spacing } from '@/constants/theme';
@@ -12,6 +13,7 @@ import { friendlyRoleError, handOffPrompt, ROLE_LABEL, rosterActions, tailGunner
 import { handOffRide, setMemberRole, setTailGunner } from '@/lib/api';
 import { confirmAndBlock, unblockRider, useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
+import { useSocialProfiles } from '@/lib/social-profile';
 import type { Ride, RideMember } from '@/lib/types';
 
 const ROLE_COLOR: Record<RideMember['role'], string> = {
@@ -46,6 +48,8 @@ export function RideRoster({
   // Leader first, tail gunner last, everyone else in between.
   const rank = (m: RideMember) => (leaderIds.includes(m.user_id) ? 0 : m.user_id === tailId ? 2 : 1);
   const ordered = [...joined].sort((a, b) => rank(a) - rank(b));
+  // The Apple, Google or Facebook accounts riders chose to show the people they ride with.
+  const social = useSocialProfiles(joined.map((m) => m.user_id));
 
   function toggle(id: string) {
     if (Platform.OS !== 'web') LayoutAnimation.configureNext(LayoutAnimation.create(180, 'easeInEaseOut', 'opacity'));
@@ -106,10 +110,15 @@ export function RideRoster({
                 accessibilityState={can ? { expanded: isOpen } : undefined}
                 accessibilityHint={can ? 'Shows what you can do for this rider' : undefined}
                 style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
-                <Avatar name={nameOf(m.user_id)} color={leads ? RideColors.leader : ROLE_COLOR[m.role]} />
+                <SocialPhoto
+                  profile={social.get(m.user_id)}
+                  size={36}
+                  fallback={<Avatar name={nameOf(m.user_id)} color={leads ? RideColors.leader : ROLE_COLOR[m.role]} />}
+                />
                 <View style={{ flex: 1, gap: 2 }}>
                   <ThemedText style={{ fontWeight: 600 }}>{nameOf(m.user_id)}{m.user_id === me ? ' (you)' : ''}</ThemedText>
                   {roleLine ? <ThemedText type="small" themeColor="textSecondary">{roleLine}</ThemedText> : null}
+                  {social.get(m.user_id) ? <SocialTag profile={social.get(m.user_id)!} /> : null}
                 </View>
                 {can ? (
                   <View style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}>
