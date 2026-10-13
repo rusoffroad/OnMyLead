@@ -61,6 +61,9 @@ describe('money', () => {
     expect(parseAmount('')).toEqual({ ok: true, value: null });
     expect(parseAmount('9.5')).toEqual({ ok: true, value: 9.5 });
     expect(parseAmount('1,200')).toEqual({ ok: true, value: 1200 });
+    expect(parseAmount('12,5')).toEqual({ ok: true, value: 12.5 });
+    expect(parseAmount('9,75')).toEqual({ ok: true, value: 9.75 });
+    expect(parseAmount('12 ')).toEqual({ ok: true, value: 12 });
     expect(parseAmount('-3').ok).toBe(false);
     expect(parseAmount('x').ok).toBe(false);
   });
