@@ -4,16 +4,15 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 
 export type LegalSection = { title: string; body: string[] };
 
 /**
- * A plain reading page for the Terms of Use and Privacy Policy. Both are drafts until Chris has
- * reviewed them (and, ideally, a lawyer), so each one carries a visible draft note.
+ * A plain reading page for the Terms of Use, the Privacy Policy and Help.
  */
-export function LegalPage({ title, updated, intro, sections, draft = true, action }: {
-  title: string; updated: string; intro: string; sections: LegalSection[]; draft?: boolean;
+export function LegalPage({ title, updated, intro, sections, action }: {
+  title: string; updated: string; intro: string; sections: LegalSection[];
   /** A button under the intro, e.g. Contact Us on the Support page. */
   action?: { title: string; href: '/contact' };
 }) {
@@ -23,12 +22,6 @@ export function LegalPage({ title, updated, intro, sections, draft = true, actio
         <title>{`${title} | OnMyLead`}</title>
       </Head>
       <View style={styles.wrap}>
-        {draft ? (
-          <View style={styles.draft} accessibilityRole="alert">
-            <ThemedText type="smallBold">Draft for Review</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">This page is a draft and is not in effect yet.</ThemedText>
-          </View>
-        ) : null}
         <ThemedText type="subtitle" accessibilityRole="header">{title}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">Last updated {updated}</ThemedText>
         <ThemedText style={styles.p}>{intro}</ThemedText>
@@ -54,7 +47,6 @@ export function LegalPage({ title, updated, intro, sections, draft = true, actio
 
 const styles = StyleSheet.create({
   wrap: { width: '100%', maxWidth: 760, alignSelf: 'center', gap: Spacing.two },
-  draft: { borderRadius: Radius.card, borderLeftWidth: 4, borderLeftColor: Colors.accent, backgroundColor: Colors.backgroundElement, padding: 14, marginBottom: Spacing.two },
   section: { gap: Spacing.two, marginTop: Spacing.three },
   p: { lineHeight: 24 },
 });

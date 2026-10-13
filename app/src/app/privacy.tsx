@@ -1,12 +1,11 @@
 import { LegalPage } from '@/components/legal-page';
 import { COMPANY, SUPPORT_EMAIL } from '@/constants/site';
 
-// DRAFT for Chris's review. Not legal advice; have it checked before the App Store launch.
 export default function Privacy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="October 12, 2026"
+      updated="October 13, 2026"
       intro={`OnMyLead is made by ${COMPANY}. This page explains what the app and onmylead.com collect, why, and the choices you have. The short version: your location is never public, you choose who sees it, and sharing always ends.`}
       sections={[
         {
