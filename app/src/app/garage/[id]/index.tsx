@@ -141,7 +141,10 @@ export default function VehiclePage() {
             </ThemedText>
           </>
         ) : (
-          <ThemedText type="small" themeColor="textSecondary">Add tank size and mpg to see how far you can go.</ThemedText>
+          <>
+            <ThemedText type="small" themeColor="textSecondary">Add tank size and mpg to see how far you can go.</ThemedText>
+            {mine ? <Button title="Add Fuel Range" kind="secondary" onPress={() => router.push(`/garage/${vehicle.id}/edit`)} /> : null}
+          </>
         )}
       </Card>
 

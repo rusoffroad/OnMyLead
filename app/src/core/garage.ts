@@ -93,7 +93,8 @@ const centsPlain = (cents: number | null) => (cents == null ? '' : (cents / 100)
 
 /** Parse an optional non-negative decimal (gallons, mpg, hours). */
 export function parseAmount(input: string): { ok: true; value: number | null } | { ok: false } {
-  const s = input.trim().replace(/,/g, '');
+  // A comma before the last one or two digits is a decimal comma (12,5 mpg); any other comma groups thousands.
+  const s = input.trim().replace(/,(?=\d{1,2}$)/, '.').replace(/,/g, '');
   if (!s) return { ok: true, value: null };
   if (!/^\d*\.?\d+$|^\d+\.$/.test(s)) return { ok: false };
   return { ok: true, value: Number(s) };

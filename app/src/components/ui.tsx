@@ -19,7 +19,12 @@ export function Screen({ children, scroll = true, top }: { children: ReactNode; 
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: theme.background }}>
       {scroll ? (
-        <ScrollView keyboardShouldPersistTaps="handled" indicatorStyle="white" contentContainerStyle={{ paddingBottom: Spacing.five }}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          // The number pads have no return key: keep the field being typed in above the keyboard, and let a drag put the keyboard away.
+          automaticallyAdjustKeyboardInsets
+          keyboardDismissMode="interactive"
+          indicatorStyle="white" contentContainerStyle={{ paddingBottom: Spacing.five }}>
           {inner}
         </ScrollView>
       ) : (
