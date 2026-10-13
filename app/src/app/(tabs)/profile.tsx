@@ -11,7 +11,7 @@ import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directi
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
-import { myRideName, requestAccountDeletion } from '@/lib/api';
+import { deleteMyAccount, myRideName } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
 import { confirmAsync } from '@/lib/confirm';
 import { setMapsPreference, useMapsPreference } from '@/lib/directions';
@@ -138,6 +138,9 @@ export default function You() {
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/privacy')}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Privacy</ThemedText>
         </Pressable>
+        <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/support')}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Help</ThemedText>
+        </Pressable>
       </View>
     </Screen>
   );
@@ -169,8 +172,8 @@ function Identity({ name, plan }: { name: string | null; plan: string | null }) 
 }
 
 /**
- * Apple requires an in-app way to delete an account. The request goes to the owner, who deletes
- * the account and everything in it; a Pro subscription is billed by Apple and is cancelled there.
+ * Apple requires an in-app way to delete an account. It is deleted on the spot and the rider is
+ * signed out; a Pro subscription is billed by Apple and is cancelled there.
  */
 function DeleteAccount() {
   const [state, setState] = useState<'idle' | 'busy' | 'sent' | 'off'>('idle');
@@ -179,14 +182,18 @@ function DeleteAccount() {
   const ask = async () => {
     const ok = await confirmAsync(
       'Delete Your Account?',
-      'Your account, rides you organize, Garage, trips and groups will be permanently deleted. Rides you organize are removed for everyone on them. This can’t be undone.',
+      'Your account, rides you organize, Garage, trips and groups will be permanently deleted. Rides you organize are removed for everyone on them. This can’t be undone. If you pay for Pro, cancel it in your Apple subscriptions too.',
       'Delete Account',
     );
     if (!ok) return;
     setState('busy');
     setError(null);
     try {
-      await requestAccountDeletion();
+      if ((await deleteMyAccount()) === 'deleted') {
+        await signOut().catch(() => {});
+        router.replace('/');
+        return;
+      }
       setState('sent');
     } catch (e) {
       const message = (e as Error).message;

@@ -12,7 +12,7 @@ import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/const
  * The photos in /showcase/photos are U.S. Bureau of Land Management pictures from the Imperial
  * Sand Dunes and Johnson Valley, which are in the public domain (sources in showcase/photos/SOURCES.md).
  */
-type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy';
+type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy' | '/support';
 
 export function Showcase() {
   const scroller = useRef<HTMLDivElement>(null);
@@ -297,6 +297,7 @@ export function Showcase() {
         <nav aria-label="Legal and account">
           <a href="/terms" onClick={go('/terms')}>Terms of Use</a>
           <a href="/privacy" onClick={go('/privacy')}>Privacy Policy</a>
+          <a href="/support" onClick={go('/support')}>Help and Support</a>
           <a href="/sign-in" onClick={go('/sign-in')}>Sign In</a>
         </nav>
         <p className="credit">Photos: U.S. Bureau of Land Management, Imperial Sand Dunes and Johnson Valley.</p>

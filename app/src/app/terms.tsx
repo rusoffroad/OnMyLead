@@ -1,5 +1,5 @@
 import { LegalPage } from '@/components/legal-page';
-import { COMPANY, PRO_PRICES, TRIAL_DAYS } from '@/constants/site';
+import { COMPANY, PRO_PRICES, SUPPORT_EMAIL, TRIAL_DAYS } from '@/constants/site';
 
 // DRAFT for Chris's review. Not legal advice; have it checked before the App Store launch.
 export default function Terms() {
@@ -28,7 +28,8 @@ export default function Terms() {
           title: 'Rides and What You Post',
           body: [
             'You own what you post (ride details, routes, messages, photos). You give us permission to store it and show it to the people you choose, so the app can work.',
-            'Do not post anything unlawful, harassing or misleading, or anything that puts other riders at risk. Ride organizers decide who joins their rides. You can report a ride or a rider, and we may remove content or close accounts that break these terms.',
+            'Do not post anything unlawful, harassing, hateful, sexually explicit or misleading, or anything that puts other riders at risk. There is no tolerance for objectionable content or abusive riders. Ride organizers decide who joins their rides.',
+            `You can report a ride or a rider, and block a rider so you no longer see their messages. We review every report within 24 hours, remove content that breaks these terms and close the accounts of riders who post it. You can also email ${SUPPORT_EMAIL}.`,
           ],
         },
         {
@@ -50,7 +51,7 @@ export default function Terms() {
         },
         {
           title: 'Contact',
-          body: [`${COMPANY}. Contact email to be confirmed before launch.`],
+          body: [`${COMPANY}. Questions, problems or reports: ${SUPPORT_EMAIL}.`],
         },
       ]}
     />
