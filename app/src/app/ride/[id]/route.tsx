@@ -158,7 +158,7 @@ export default function RouteBuilder() {
             ? `Now ${click} further along the trail. The route follows it for you.`
             : `Now ${click} the next turn or landmark.`
           : follow
-            ? `Keep ${click}ing along the trail. Drag a point to move it${web ? ', or press Ctrl+Z to undo' : ''}.`
+            ? `Keep ${web ? 'clicking' : 'tapping'} along the trail. Drag a point to move it${web ? ', or press Ctrl+Z to undo' : ''}.`
             : `Straight lines between points. Switch to Follow Trails to snap to the trail.`;
 
   return (
