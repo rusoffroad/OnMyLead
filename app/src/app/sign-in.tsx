@@ -9,6 +9,7 @@ import { Button, Card, ErrorText, Field, Screen, Segmented } from '@/components/
 import { Colors, Spacing } from '@/constants/theme';
 import { track } from '@/lib/analytics';
 import { signInWithApple } from '@/lib/apple-sign-in';
+import { nativeGoogleReady, signInWithGoogleNative } from '@/lib/google-sign-in';
 import {
   sendCode,
   sendPasswordReset,
@@ -71,7 +72,12 @@ export default function SignIn() {
   const social = (p: SocialProvider) =>
     run(p, async () => {
       // The website leaves for the provider's page here and comes back on /auth-callback.
-      const result = p === 'apple' && Platform.OS === 'ios' ? await signInWithApple() : await signInWithProvider(p);
+      const result =
+        p === 'apple' && Platform.OS === 'ios'
+          ? await signInWithApple()
+          : p === 'google' && nativeGoogleReady
+            ? await signInWithGoogleNative()
+            : await signInWithProvider(p);
       if (result !== 'signed_in') return;
       track('sign_in', { method: p });
       done();
