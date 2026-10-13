@@ -5,7 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert, Animated, AppState, LayoutAnimation, Linking, Modal, PanResponder, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View,
+  Alert, Animated, AppState, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -35,10 +35,10 @@ import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
-import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
+import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
@@ -174,31 +174,9 @@ export default function RideMode() {
   const chat = useRideChat(id, !!mine);
   // Riders can fold the reply and status buttons away (tap the handle or swipe down) to see more map.
   // Emergency, and calls for help, always stay.
-  const [panelOpen, , setPanelOpenRaw] = useRememberedToggle('ride.modePanelOpen.v1', true);
-  const setPanelOpen = useCallback((open: boolean) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setPanelOpenRaw(open);
-  }, [setPanelOpenRaw]);
+  const { open: panelOpen, setOpen: setPanelOpen, drag: panelDrag, panHandlers: panelSwipeHandlers } = usePanelFold('ride.modePanelOpen.v1');
   // The sharing timer folds down to a small pill next to the ride name.
   const [shareOpen, toggleShareOpen] = useRememberedToggle('ride.shareBannerOpen.v1', false);
-  const [panelDrag] = useState(() => new Animated.Value(0));
-  const panelSwipe = useMemo(() =>
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_e, g) => isVerticalSwipe(g.dx, g.dy),
-      onPanResponderMove: (_e, g) => panelDrag.setValue(panelOpen ? Math.max(0, g.dy) : 0),
-      onPanResponderRelease: (_e, g) => {
-        const result = swipeResult(panelOpen, g.dy, g.vy);
-        if (result) {
-          Haptics.selectionAsync();
-          panelDrag.setValue(0);
-          setPanelOpen(result === 'open');
-        } else {
-          Animated.spring(panelDrag, { toValue: 0, useNativeDriver: true }).start();
-        }
-      },
-      onPanResponderTerminate: () => Animated.spring(panelDrag, { toValue: 0, useNativeDriver: true }).start(),
-    }),
-  [panelOpen, setPanelOpen, panelDrag]);
   const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
   const [lastReply, setLastReply] = useState<QuickReply | null>(null);
   // The last status tap or quick reply: Sending, then Sent with who has it, or Waiting for
@@ -801,7 +779,7 @@ export default function RideMode() {
       ) : null}
 
       <Animated.View
-        {...panelSwipe.panHandlers}
+        {...panelSwipeHandlers}
         onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}
         style={[styles.bottomWrap, { transform: [{ translateY: panelDrag }] }]}>
       <SafeAreaView edges={['bottom']} style={styles.bottom}>

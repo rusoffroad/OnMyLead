@@ -1,8 +1,9 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button, ErrorText } from '@/components/ui';
 import { WaypointMap } from '@/components/waypoint-map';
@@ -13,6 +14,7 @@ import { rideLeaderIds } from '@/core/chat';
 import type { LatLng } from '@/core/geo';
 import type { RideRoute } from '@/core/route';
 import { canShareWaypoints, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
+import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getMembers, getPrivateDetails, getRide, getRideRoute } from '@/lib/api';
@@ -36,6 +38,8 @@ export default function RideWaypoints() {
   const web = Platform.OS === 'web';
   const { width } = useWindowDimensions();
   const wide = web && width >= WIDE;
+  // Swipe the panel down (or tap its handle) to fold it to the counts and see more map.
+  const fold = usePanelFold('waypoints.panelOpen.v1', !wide);
   const [ride, setRide] = useState<Ride | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
   const [route, setRoute] = useState<RideRoute | null>(null);
@@ -125,25 +129,33 @@ export default function RideWaypoints() {
         </View>
       </SafeAreaView>
 
-      <SafeAreaView edges={['bottom']} style={[styles.panel, wide && styles.panelWide]}>
+      <Animated.View {...fold.panHandlers} style={[styles.panel, wide && styles.panelWide, { transform: [{ translateY: fold.drag }] }]}>
+      <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 4 }]}>
+        <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Waypoints" fromTop={wide} />
         <View style={styles.counts}>
           {stops ? <Count n={stops} label={stops === 1 ? 'Stop' : 'Stops'} color={Colors.accent} /> : null}
           <Count n={shared} label="Shared" color={Colors.sky} />
           <Count n={own} label="Only You" color={Colors.text} />
           {wp.offline ? <Text style={styles.offline}>Saved on This Phone</Text> : null}
         </View>
-        <Text style={styles.hint}>{hint}</Text>
-        {wp.waypoints.length ? (
-          <ScrollView style={{ maxHeight: wide ? 420 : 220 }} indicatorStyle="white">
-            {wp.waypoints.map((w, i) => (
-              <WaypointRow key={w.id} waypoint={w} stop={stopNumber(w, wp.waypoints)} me={me} ownerName={nameOf} first={i === 0} onPress={() => setTarget({ type: 'view', waypoint: w })} />
-            ))}
-          </ScrollView>
+        {fold.open ? (
+          <>
+            <Text style={styles.hint}>{hint}</Text>
+            {wp.waypoints.length ? (
+              <ScrollView style={{ maxHeight: wide ? 420 : 220 }} indicatorStyle="white">
+                {wp.waypoints.map((w, i) => (
+                  <WaypointRow key={w.id} waypoint={w} stop={stopNumber(w, wp.waypoints)} me={me} ownerName={nameOf} first={i === 0} onPress={() => setTarget({ type: 'view', waypoint: w })} />
+                ))}
+              </ScrollView>
+            ) : null}
+            <ErrorText error={error} />
+            {mine ? <Button title="Add at My Location" big loading={locating} disabled={!wp.switchedOn} onPress={addHere} /> : null}
+            <Text style={styles.privacy}>Waypoints are never public. Shared ones and planned stops show only to riders on this ride.</Text>
+          </>
         ) : null}
-        <ErrorText error={error} />
-        {mine ? <Button title="Add at My Location" big loading={locating} disabled={!wp.switchedOn} onPress={addHere} /> : null}
-        <Text style={styles.privacy}>Waypoints are never public. Shared ones and planned stops show only to riders on this ride.</Text>
+        {!fold.open ? <ErrorText error={error} /> : null}
       </SafeAreaView>
+      </Animated.View>
 
       <WaypointSheet
         rideId={id}
@@ -178,16 +190,17 @@ const PANEL_W = 400;
 const styles = StyleSheet.create({
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
   panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
-  top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two },
+  top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, zIndex: 30 },
   topRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10,
     backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48,
   },
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   panel: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.three, gap: 10,
+    position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
+  panelInner: { padding: Spacing.three, paddingTop: 4, gap: 10 },
   counts: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.four },
   count: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
   countN: { fontFamily: font(800, 'display'), fontSize: 40, lineHeight: 42 },

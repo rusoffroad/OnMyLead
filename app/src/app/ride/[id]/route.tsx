@@ -1,12 +1,13 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, LayoutAnimation, PanResponder, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
+import { PanelHandle } from '@/components/panel-handle';
 import { RouteBuilderMap } from '@/components/route-builder-map';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button, ErrorText } from '@/components/ui';
@@ -16,9 +17,9 @@ import type { LatLng } from '@/core/geo';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import type { Place } from '@/core/places';
 import { miles, routeFromGpx, type RideRoute } from '@/core/route';
-import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
 import { routeFromLegs } from '@/core/route-legs';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
+import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
@@ -53,36 +54,15 @@ export default function RouteBuilder() {
   const trail = useTrailMap();
   const [follow, , setFollow] = useRememberedToggle('route.followTrails.v1', true);
   const draft = useRouteDraft(follow, trail.offline);
-  // The tools panel folds down to the miles and Undo (swipe it down, or tap the handle) to see more map.
-  const [open, , setOpenRaw] = useRememberedToggle('route.panelOpen.v1', true);
-  const setOpen = useCallback((on: boolean) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setOpenRaw(on);
-  }, [setOpenRaw]);
-  const [panelDrag] = useState(() => new Animated.Value(0));
-  const panelSwipe = useMemo(() =>
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_e, g) => isVerticalSwipe(g.dx, g.dy),
-      onPanResponderMove: (_e, g) => panelDrag.setValue(open ? Math.max(0, g.dy) : 0),
-      onPanResponderRelease: (_e, g) => {
-        const result = swipeResult(open, g.dy, g.vy);
-        if (result) {
-          Haptics.selectionAsync();
-          panelDrag.setValue(0);
-          setOpen(result === 'open');
-        } else {
-          Animated.spring(panelDrag, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start();
-        }
-      },
-      onPanResponderTerminate: () => Animated.spring(panelDrag, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start(),
-    }),
-  [open, setOpen, panelDrag]);
   const { load: loadDraft, undo: undoDraft } = draft;
   const taps = draft.taps;
   const insets = useSafeAreaInsets();
   const web = Platform.OS === 'web';
   const { width } = useWindowDimensions();
   const wide = web && width >= WIDE;
+  // The tools panel folds down to the miles and Undo (swipe it down, or tap the handle) to see more map.
+  const fold = usePanelFold('route.panelOpen.v1', !wide);
+  const open = fold.open;
 
   useEffect(() => {
     Promise.all([getRide(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])
@@ -231,20 +211,10 @@ export default function RouteBuilder() {
       </SafeAreaView>
 
       <Animated.View
-        {...(wide ? {} : panelSwipe.panHandlers)}
-        style={[styles.panel, wide && styles.panelWide, { transform: [{ translateY: panelDrag }] }]}>
+        {...fold.panHandlers}
+        style={[styles.panel, wide && styles.panelWide, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !open && styles.panelFolded]}>
-        <Pressable
-          onPress={() => setOpen(!open)}
-          accessibilityRole="button"
-          accessibilityState={{ expanded: open }}
-          accessibilityLabel={open ? 'Hide the route tools' : 'Show the route tools'}
-          accessibilityHint={wide ? undefined : 'You can also swipe the panel down to hide it or up to show it'}
-          hitSlop={8}
-          style={styles.handle}>
-          <View style={styles.handleBar} />
-          <Text style={styles.handleText}>{open ? (wide ? 'Hide ▲' : 'Hide ▼') : wide ? 'Show Tools ▼' : 'Show Tools ▲'}</Text>
-        </Pressable>
+        <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Route Tools" fromTop={wide} />
         <View style={styles.readout}>
           <Text style={[styles.miles, !open && styles.milesFolded]} accessibilityLabel={`${route ? miles(route.lengthM) : 0} miles`}>
             {route ? miles(route.lengthM) : '0.0'}
@@ -368,9 +338,6 @@ const styles = StyleSheet.create({
   },
   panelInner: { padding: Spacing.three, paddingTop: 4, gap: 10 },
   panelFolded: { gap: 4 },
-  handle: { alignItems: 'center', gap: 4, minHeight: 40, justifyContent: 'center' },
-  handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
-  handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 13 },
   readoutRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   milesFolded: { fontSize: 36, lineHeight: 40 },
   undoChip: {
