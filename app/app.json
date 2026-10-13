@@ -10,7 +10,7 @@
     "backgroundColor": "#0A1626",
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead.app",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "supportsTablet": false,
       "appleTeamId": "YJ4KUF2QQV",
       "associatedDomains": ["applinks:onmylead.com"],
