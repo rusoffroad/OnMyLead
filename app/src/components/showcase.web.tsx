@@ -168,6 +168,7 @@ export function Showcase() {
               <li>Search a trailhead, park or area to jump the map there</li>
               <li>Follow Trails, or Straight Line where nothing is mapped</li>
               <li>Drag a point to move it, or press Ctrl+Z to undo</li>
+              <li>Fold the route tools away to see more map</li>
               <li>Drawing a route is free. Importing a GPX track is Pro.</li>
             </ul>
             <a className="btn btn-red" href="/ride/new" onClick={go('/ride/new')}>Create a Ride on the Web</a>
