@@ -1,9 +1,10 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
+import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field } from '@/components/ui';
 import { StopSign, WaypointBlaze, WaypointGlyph } from '@/components/waypoint-blaze';
@@ -164,10 +165,10 @@ export function WaypointSheet({
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
       {target ? (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardLift>
           <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
             <View style={styles.grip} />
-            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: Spacing.three }} style={{ maxHeight: 640 }}>
+            <ScrollView {...keyboardScroll} contentContainerStyle={{ gap: Spacing.three }} style={{ maxHeight: 640, flexShrink: 1 }}>
               {form ? (
                 <>
                   <View style={styles.head}>
@@ -319,7 +320,7 @@ export function WaypointSheet({
               ) : null}
             </ScrollView>
           </View>
-        </KeyboardAvoidingView>
+        </KeyboardLift>
       ) : null}
     </Modal>
   );
@@ -359,7 +360,7 @@ function AudienceChoice({
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
   sheet: {
-    backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    flexShrink: 1, backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
   },
   grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, marginBottom: Spacing.one },

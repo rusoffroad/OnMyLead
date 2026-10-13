@@ -1,12 +1,13 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
-  KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
+  KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
+import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
@@ -180,7 +181,7 @@ export default function GroupChat() {
           ref={scroller}
           style={{ flex: 1 }}
           contentContainerStyle={styles.thread}
-          keyboardShouldPersistTaps="handled"
+          {...keyboardScroll}
           indicatorStyle="white"
           onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
           {chat.off ? (
@@ -361,7 +362,7 @@ export default function GroupChat() {
               )}
             </View>
             <View style={styles.inputRow}>
-              <TextInput
+              <TextBox
                 value={draft}
                 onChangeText={(t) => {
                   setDraft(t);

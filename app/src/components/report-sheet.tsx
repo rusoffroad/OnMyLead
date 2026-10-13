@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
+import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Field } from '@/components/ui';
 import { Colors, font, Spacing } from '@/constants/theme';
@@ -63,8 +64,10 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={close} statusBarTranslucent>
       <Pressable style={styles.scrim} onPress={close} accessibilityLabel="Close" accessibilityRole="button" />
       {target ? (
+        <KeyboardLift>
         <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
           <View style={styles.grip} />
+          <ScrollView {...keyboardScroll} style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.three }}>
           {sent ? (
             <>
               <Text style={styles.title} accessibilityRole="header">Report Sent</Text>
@@ -107,7 +110,9 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <Button title="Cancel" kind="ghost" onPress={close} />
             </>
           )}
+          </ScrollView>
         </View>
+        </KeyboardLift>
       ) : null}
     </Modal>
   );
@@ -116,7 +121,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
   sheet: {
-    backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    flexShrink: 1, backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
   },
   grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, marginBottom: Spacing.one },

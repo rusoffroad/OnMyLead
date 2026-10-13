@@ -1,13 +1,14 @@
 import { BottomTabBarHeightContext } from 'expo-router/tabs';
 import { ReactNode, useContext, useState } from 'react';
 import {
-  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
+  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View,
   type PressableProps, type StyleProp, type TextInputProps, type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { font, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { keyboardScroll, TextBox } from './keyboard';
 import { ThemedText } from './themed-text';
 
 export function Screen({ children, scroll = true, top }: { children: ReactNode; scroll?: boolean; top?: boolean }) {
@@ -20,10 +21,9 @@ export function Screen({ children, scroll = true, top }: { children: ReactNode; 
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: theme.background }}>
       {scroll ? (
         <ScrollView
-          keyboardShouldPersistTaps="handled"
-          // The number pads have no return key: keep the field being typed in above the keyboard, and let a drag put the keyboard away.
+          // Keep the field being typed in above the keyboard, and let a drag or a tap on empty space put the keyboard away.
           automaticallyAdjustKeyboardInsets
-          keyboardDismissMode="interactive"
+          {...keyboardScroll}
           indicatorStyle="white" contentContainerStyle={{ paddingBottom: Spacing.five }}>
           {inner}
         </ScrollView>
@@ -74,9 +74,8 @@ export function Field({ label, hint, style, onFocus, onBlur, ...rest }: TextInpu
   return (
     <View style={{ gap: 6 }}>
       <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{label}</ThemedText>
-      <TextInput
+      <TextBox
         placeholderTextColor="#5F7190"
-        keyboardAppearance="dark"
         selectionColor={theme.sky}
         onFocus={(e) => {
           setFocused(true);
