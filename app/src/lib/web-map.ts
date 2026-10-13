@@ -43,6 +43,11 @@ const CSS = `
 .oml-wp.shared span { border-color: ${Colors.sky}; }
 .oml-wp.stop span { border-color: ${Colors.accent}; font-family: Barlow_800ExtraBold, sans-serif; font-size: 13px; }
 .oml-wp.stop span small { display: block; color: ${Colors.textSecondary}; font: 11px Barlow_700Bold, sans-serif; }
+.oml-found { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.oml-found span { white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis; padding: 3px 9px; border-radius: 10px;
+  background: #ECCD91; color: ${Colors.background}; font: 13px Barlow_700Bold, sans-serif; box-shadow: 0 3px 10px rgba(0,0,0,.5); }
+.oml-found::after { content: ''; width: 2px; height: 10px; background: #ECCD91; }
+.oml-found::before { content: ''; order: 3; width: 10px; height: 10px; margin-bottom: -5px; border-radius: 50%; background: #ECCD91; border: 2px solid ${Colors.background}; box-sizing: border-box; }
 .oml-meet { width: 34px; height: 44px; }
 .oml-meet svg { display: block; filter: drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
 `;

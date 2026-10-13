@@ -4,6 +4,7 @@ import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
 import { Colors, font } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
@@ -16,7 +17,7 @@ import { TrailTiles } from './trail-tiles';
  * a trail: about a fingertip at the zoom it was made.
  */
 export function RouteBuilderMap({
-  points, waypoints, center, editable, onAdd, onMove, trail, pending = [],
+  points, waypoints, center, editable, onAdd, onMove, trail, pending = [], found, onCenter,
 }: {
   points: LatLng[];
   waypoints: LatLng[];
@@ -30,6 +31,10 @@ export function RouteBuilderMap({
   trail?: TrailMap;
   /** Web only: keeps framed routes clear of the panels over the map. */
   padding?: [number, number, number, number];
+  /** A place picked in the map search: the map moves there and marks it. Nothing joins the route. */
+  found?: Place | null;
+  /** Where the map is looking after each move, so a search ranks nearby places first. */
+  onCenter?: (c: LatLng) => void;
 }) {
   const map = useRef<MapView>(null);
   const fittedTo = useRef<LatLng[] | null>(null);
@@ -47,6 +52,21 @@ export function RouteBuilderMap({
     });
   }, [points, waypoints.length]);
 
+  // Go to a searched place: the whole area when it has one, else close in on the spot.
+  useEffect(() => {
+    if (!found) return;
+    const b = found.bounds;
+    if (b) {
+      map.current?.fitToCoordinates(
+        [{ latitude: b.north, longitude: b.west }, { latitude: b.south, longitude: b.east }],
+        { edgePadding: { top: 140, right: 40, bottom: 340, left: 40 }, animated: true },
+      );
+    } else {
+      // Nudged north so the spot lands in the open map above the panel.
+      map.current?.animateToRegion({ latitude: found.lat - 0.006, longitude: found.lng, latitudeDelta: 0.03, longitudeDelta: 0.03 }, 700);
+    }
+  }, [found]);
+
   return (
     <MapView
       ref={map}
@@ -54,6 +74,7 @@ export function RouteBuilderMap({
       mapType={trail?.mapProps.mapType ?? 'hybrid'}
       onRegionChangeComplete={(r) => {
         region.current = r;
+        onCenter?.({ lat: r.latitude, lng: r.longitude });
         trail?.mapProps.onRegionChangeComplete(r);
       }}
       onLayout={(e) => {
@@ -84,6 +105,21 @@ export function RouteBuilderMap({
         />
       ))}
       {points.length > 1 && !waypoints.length ? <RouteEnds points={points} /> : null}
+      {found ? (
+        <Marker
+          coordinate={{ latitude: found.lat, longitude: found.lng }}
+          anchor={{ x: 0.5, y: 1 }}
+          tappable={false}
+          tracksViewChanges={false}
+          accessibilityLabel={`Search result: ${found.name}`}
+          zIndex={2}>
+          <View style={styles.found}>
+            <Text style={styles.foundText} numberOfLines={1}>{found.name}</Text>
+            <View style={styles.foundStem} />
+            <View style={styles.foundDot} />
+          </View>
+        </Marker>
+      ) : null}
       {waypoints.map((w, i) => (
         <Marker
           key={i}
@@ -108,5 +144,12 @@ const styles = StyleSheet.create({
   },
   first: { backgroundColor: '#3CC36B', borderColor: Colors.background },
   last: { backgroundColor: Colors.text, borderColor: Colors.background },
+  found: { alignItems: 'center', maxWidth: 220 },
+  foundText: {
+    color: Colors.background, backgroundColor: '#ECCD91', fontFamily: font(700), fontSize: 13,
+    paddingHorizontal: 9, paddingVertical: 4, borderRadius: 10, overflow: 'hidden',
+  },
+  foundStem: { width: 2, height: 10, backgroundColor: '#ECCD91' },
+  foundDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#ECCD91', borderWidth: 2, borderColor: Colors.background },
   num: { color: '#fff', fontFamily: font(800), fontSize: 12 },
 });

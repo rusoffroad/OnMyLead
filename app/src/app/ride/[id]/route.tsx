@@ -1,10 +1,12 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Icon } from '@/components/icon';
+import { MapSearch } from '@/components/map-search';
 import { RouteBuilderMap } from '@/components/route-builder-map';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button, ErrorText } from '@/components/ui';
@@ -12,6 +14,7 @@ import Svg, { Path } from 'react-native-svg';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
+import type { Place } from '@/core/places';
 import { miles, routeFromGpx, type RideRoute } from '@/core/route';
 import { routeFromLegs } from '@/core/route-legs';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
@@ -27,7 +30,8 @@ import type { Ride } from '@/lib/types';
  * The organizer's route builder. Tap the map to lay down the route point by point, or bring in a
  * GPX track from another app. With Follow Trails on, each tap lands on the nearest trail or road
  * and the line between taps runs along it (core/trail-router); Straight Line draws straight
- * across ground nobody has mapped. Drag a point to move it.
+ * across ground nobody has mapped. Drag a point to move it. The search at the top moves the map
+ * to a trailhead, park, forest or town before drawing.
  * On the website it's the same builder with a click instead of a tap, and on a wide screen the
  * panel sits beside the map instead of under it.
  */
@@ -40,6 +44,10 @@ export default function RouteBuilder() {
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState<'save' | 'gpx' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Where the map was looking when the search opened: nearby places rank first.
+  const [searching, setSearching] = useState<LatLng | null | false>(false);
+  const [found, setFound] = useState<Place | null>(null);
+  const looking = useRef<LatLng | null>(null);
   const trail = useTrailMap();
   const [follow, , setFollow] = useRememberedToggle('route.followTrails.v1', true);
   const draft = useRouteDraft(follow, trail.offline);
@@ -159,6 +167,8 @@ export default function RouteBuilder() {
           onMove={draft.move}
           pending={pending}
           trail={trail}
+          found={found}
+          onCenter={(c) => (looking.current = c)}
           padding={wide ? [90, 70, 40, PANEL_W + 60] : undefined}
         />
       ) : null}
@@ -174,12 +184,24 @@ export default function RouteBuilder() {
       ) : null}
 
       <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]}>
-        <View style={styles.topRow}>
-          <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back">
-            <Text style={styles.topText}>‹ {ride?.name ?? 'Ride'}</Text>
-          </Pressable>
-          <Text style={[styles.topText, { color: Colors.textSecondary }]}>Route</Text>
-        </View>
+        {searching !== false ? (
+          <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
+        ) : (
+          <View style={styles.topRow}>
+            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={styles.flex}>
+              <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setSearching(looking.current ?? center)}
+              accessibilityRole="button"
+              accessibilityLabel="Search the Map for a Place"
+              hitSlop={8}
+              style={({ pressed }) => [styles.search, pressed && { opacity: 0.8 }]}>
+              <Icon name="search" size={17} color={Colors.text} />
+              <Text style={styles.searchText}>Search</Text>
+            </Pressable>
+          </View>
+        )}
       </SafeAreaView>
 
       <SafeAreaView edges={['bottom']} style={[styles.panel, wide && styles.panelWide]}>
@@ -265,11 +287,17 @@ const PANEL_W = 400;
 const styles = StyleSheet.create({
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
   panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
-  top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two },
+  // Above the side panel, so the search results drop down over it on a wide screen.
+  top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, zIndex: 30 },
   topRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48,
   },
+  search: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, marginLeft: 10,
+    borderRadius: Radius.pill, backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
+  },
+  searchText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   panel: {
     position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.three, paddingTop: Spacing.three, gap: 10,

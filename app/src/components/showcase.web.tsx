@@ -103,7 +103,7 @@ export function Showcase() {
               shot="create"
               alt="Create a Ride with The Route set to Mapped, next to Freeride, and the vehicles welcome"
               title="Create a Ride"
-              text="Set the meeting point, time, difficulty and which machines are welcome, and choose public, private or approval-only. Then pick Mapped and tap along the trail, and the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader."
+              text="Set the meeting point, time, difficulty and which machines are welcome, and choose public, private or approval-only. Then pick Mapped, search the trailhead or area to jump the map there, and tap along the trail so the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader."
               points={['Search parks, trailheads, towns or a street address for the meeting spot', 'Route miles checked against every machine’s fuel range', 'Hand the lead to another rider at any point']}
             />
             <Step
@@ -165,7 +165,7 @@ export function Showcase() {
               your iPhone the moment you save.
             </p>
             <ul className="ticks">
-              <li>Satellite map with trails, place and trailhead search</li>
+              <li>Search a trailhead, park or area to jump the map there</li>
               <li>Follow Trails, or Straight Line where nothing is mapped</li>
               <li>Drag a point to move it, or press Ctrl+Z to undo</li>
               <li>Drawing a route is free. Importing a GPX track is Pro.</li>
