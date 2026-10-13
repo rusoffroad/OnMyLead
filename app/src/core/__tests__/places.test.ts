@@ -94,4 +94,15 @@ describe('street addresses', () => {
   it('sends an address search as typed', () => {
     expect(placeSearchUrl('4800 W Gate Blvd, Austin')).toContain('q=4800%20W%20Gate%20Blvd%2C%20Austin');
   });
+
+  it('keeps the extent of an area so a map can frame all of it', () => {
+    const [forest, bad] = parsePlaces({
+      features: [
+        feature({ osm_type: 'R', osm_id: 20, osm_key: 'boundary', osm_value: 'protected_area', name: 'Uwharrie National Forest', state: 'North Carolina', extent: [-80.1, 35.5, -79.8, 35.2] }, [-79.95, 35.35]),
+        feature({ osm_type: 'N', osm_id: 21, osm_key: 'highway', osm_value: 'trailhead', name: 'Flat Spot', extent: [-80, 35, -80, 35] }, [-80, 35]),
+      ],
+    });
+    expect(forest.bounds).toEqual({ north: 35.5, south: 35.2, east: -79.8, west: -80.1 });
+    expect(bad.bounds).toBeNull();
+  });
 });

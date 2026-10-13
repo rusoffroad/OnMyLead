@@ -3,9 +3,10 @@ import { useEffect, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import type { LatLng } from '@/core/geo';
+import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { drawOsmTracks, drawRoute, frame, ll, satelliteMap } from '@/lib/web-map';
+import { drawOsmTracks, drawRoute, esc, frame, ll, satelliteMap } from '@/lib/web-map';
 
 /**
  * The route builder's map on the web: satellite imagery, click to add the next point, drag a
@@ -13,7 +14,7 @@ import { drawOsmTracks, drawRoute, frame, ll, satelliteMap } from '@/lib/web-map
  * trails are drawn once the map is in close (zoom 13), the same sand dash as on the phone.
  */
 export function RouteBuilderMap({
-  points, waypoints, center, editable, onAdd, onMove, padding, trail, pending = [],
+  points, waypoints, center, editable, onAdd, onMove, padding, trail, pending = [], found, onCenter,
 }: {
   points: LatLng[];
   waypoints: LatLng[];
@@ -25,16 +26,21 @@ export function RouteBuilderMap({
   trail?: TrailMap;
   /** Keeps framed routes clear of the panels drawn over the map: [top, right, bottom, left]. */
   padding?: [number, number, number, number];
+  /** A place picked in the map search: the map moves there and marks it. Nothing joins the route. */
+  found?: Place | null;
+  /** Where the map is looking after each move, so a search ranks nearby places first. */
+  onCenter?: (c: LatLng) => void;
 }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
   const tracks = useRef<L.LayerGroup | null>(null);
   const fittedTo = useRef<LatLng[] | null>(null);
-  const cb = useRef({ onAdd, onMove, editable, onRegion: trail?.onRegion });
+  const cb = useRef({ onAdd, onMove, editable, onRegion: trail?.onRegion, onCenter });
   useEffect(() => {
-    cb.current = { onAdd, onMove, editable, onRegion: trail?.onRegion };
-  }, [onAdd, onMove, editable, trail?.onRegion]);
+    cb.current = { onAdd, onMove, editable, onRegion: trail?.onRegion, onCenter };
+  }, [onAdd, onMove, editable, trail?.onRegion, onCenter]);
+  const marker = useRef<L.Marker | null>(null);
   // About a fingertip (24 screen pixels) at the map's zoom.
   const snapM = (m: L.Map) => snapRadiusM((156_543.03 * Math.cos((m.getCenter().lat * Math.PI) / 180)) / 2 ** m.getZoom());
   const pad = padding ?? [120, 40, 320, 40];
@@ -52,6 +58,7 @@ export function RouteBuilderMap({
     const report = () => {
       const b = m.getBounds();
       const c = b.getCenter();
+      cb.current.onCenter?.({ lat: c.lat, lng: c.lng });
       cb.current.onRegion?.({ latitude: c.lat, longitude: c.lng, latitudeDelta: b.getNorth() - b.getSouth(), longitudeDelta: b.getEast() - b.getWest() }, m.getZoom());
     };
     m.on('moveend', report);
@@ -79,6 +86,25 @@ export function RouteBuilderMap({
     if (osm?.length) map.current.attributionControl.addAttribution(credit);
     else map.current.attributionControl.removeAttribution(credit);
   }, [osm]);
+
+  // Go to a searched place: the whole area when it has one, else close in on the spot.
+  useEffect(() => {
+    const m = map.current;
+    marker.current?.remove();
+    marker.current = null;
+    if (!m || !found) return;
+    const b = found.bounds;
+    // Framed inside the open map, clear of the panels over it; a lone spot comes in at zoom 15.
+    const area: L.LatLngBoundsExpression = b ? [[b.south, b.west], [b.north, b.east]] : [ll(found), ll(found)];
+    m.flyToBounds(area, { ...fitPadding, maxZoom: b ? 16 : 15, duration: 0.9 });
+    marker.current = L.marker(ll(found), {
+      interactive: false,
+      keyboard: false,
+      zIndexOffset: 200,
+      icon: L.divIcon({ className: '', iconSize: [0, 0], html: `<div class="oml-found"><span>${esc(found.name)}</span></div>` }),
+    }).addTo(m);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [found]);
 
   useEffect(() => {
     el.current?.classList.toggle('oml-draw', editable);
