@@ -29,12 +29,18 @@ describe('Universal Links setup', () => {
   const aasa = JSON.parse(readFileSync(resolve(root, 'public/.well-known/apple-app-site-association'), 'utf8'));
   const app = JSON.parse(readFileSync(resolve(root, 'app.json'), 'utf8')).expo;
 
-  it('the site names this exact app and only the ride and group paths', () => {
+  it('the site names this exact app and only the ride, group and email-link paths', () => {
     const [detail] = aasa.applinks.details;
     expect(aasa.applinks.details).toHaveLength(1);
     expect(detail.appIDs).toEqual([APPLE_APP_ID]);
     expect(detail.components.map((c: { '/': string }) => c['/'])).toEqual([...APP_LINK_PATHS]);
     expect(APPLE_APP_ID).toBe(`${app.ios.appleTeamId}.${app.ios.bundleIdentifier}`);
+  });
+
+  it('opens only our own email links in the app, never a website sign-in coming back with a code', () => {
+    const [detail] = aasa.applinks.details;
+    const callback = detail.components.find((c: { '/': string }) => c['/'] === '/auth-callback');
+    expect(callback['?']).toEqual({ token_hash: '?*' });
   });
 
   it('the app claims the same domain the QR code points at', () => {

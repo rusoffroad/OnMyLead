@@ -1,13 +1,29 @@
-import { router } from 'expo-router';
-import { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen } from '@/components/ui';
-import { updatePassword, useSession } from '@/lib/session';
+import { parseAuthLink } from '@/core/auth-link';
+import { completeAuthLink, updatePassword, useSession } from '@/lib/session';
 
-/** The password-reset email lands here, already signed in for this one step. */
+/**
+ * The password-reset email lands here (Supabase's built-in email), or on /auth-callback first (our
+ * branded one). Either way the link signs the rider in for this one step.
+ */
 export default function ResetPassword() {
-  const { session, loading } = useSession();
+  const params = useLocalSearchParams<Record<string, string>>();
+  const { session, loading: sessionLoading } = useSession();
+  const [linking, setLinking] = useState(() => parseAuthLink(params, { reset: true }).kind !== 'none');
+  useEffect(() => {
+    const link = parseAuthLink(params, { reset: true });
+    if (link.kind === 'none') return;
+    completeAuthLink(link)
+      .catch(() => {})
+      .finally(() => setLinking(false));
+    // Runs once, for the link this screen was opened with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const loading = sessionLoading || linking;
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

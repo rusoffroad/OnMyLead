@@ -1,10 +1,12 @@
 import type { Session } from '@supabase/supabase-js';
 import * as WebBrowser from 'expo-web-browser';
-import * as Linking from 'expo-linking';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
-import { isBackendConfigured, supabase } from './supabase';
+import { APP_AUTH_CALLBACK, APP_RESET_PASSWORD, socialProviders, type AuthLink, type SocialProvider } from '@/core/auth-link';
+import { isBackendConfigured, supabase, supabaseUrl, supabaseKey } from './supabase';
+
+export type { SocialProvider } from '@/core/auth-link';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -25,31 +27,83 @@ export function useSession() {
   return { session, loading };
 }
 
-export type SocialProvider = 'google' | 'apple' | 'facebook';
+/**
+ * The social buttons Supabase has switched on, read from its public settings. Empty until the
+ * answer arrives (or when it can't be reached), so the screen never shows a button that won't work.
+ * The website passes 'ios' to describe what the iPhone app offers.
+ */
+export function useSocialProviders(platform: string = Platform.OS): SocialProvider[] {
+  const [providers, setProviders] = useState<SocialProvider[]>([]);
+  useEffect(() => {
+    if (!isBackendConfigured) return;
+    let live = true;
+    fetch(`${supabaseUrl}/auth/v1/settings`, { headers: { apikey: supabaseKey } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((settings) => {
+        if (live) setProviders(socialProviders(settings, platform, { webApple: process.env.EXPO_PUBLIC_WEB_APPLE_SIGN_IN === '1' }));
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [platform]);
+  return providers;
+}
 
-/** Sign in with Google, Apple or Facebook through Supabase Auth. */
-export async function signInWithProvider(provider: SocialProvider) {
-  const redirectTo = Linking.createURL('/auth-callback');
+/**
+ * Sign in with Google or Facebook (or Apple on the website) through Supabase Auth. In the app this
+ * opens a browser sheet that closes itself on onmylead://auth-callback; on the web the whole page
+ * goes to the provider and comes back to /auth-callback.
+ * Resolves 'cancelled' when the rider closes the sheet.
+ */
+export async function signInWithProvider(provider: SocialProvider): Promise<'signed_in' | 'cancelled' | 'redirected'> {
+  const redirectTo = Platform.OS === 'web' ? webUrl('/auth-callback') : APP_AUTH_CALLBACK;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: { redirectTo, skipBrowserRedirect: Platform.OS !== 'web' },
   });
   if (error) throw error;
-  if (Platform.OS === 'web' || !data.url) return;
+  if (Platform.OS === 'web' || !data.url) return 'redirected';
   const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-  if (result.type !== 'success') return;
-  const code = new URL(result.url).searchParams.get('code');
-  if (code) await supabase.auth.exchangeCodeForSession(code);
+  if (result.type !== 'success') return 'cancelled';
+  const url = new URL(result.url);
+  const failed = url.searchParams.get('error_description');
+  if (failed) throw new Error(failed.replace(/\+/g, ' '));
+  const code = url.searchParams.get('code');
+  if (!code) return 'cancelled';
+  const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+  if (exchangeError) throw exchangeError;
+  return 'signed_in';
+}
+
+function webUrl(path: string) {
+  return typeof window !== 'undefined' ? `${window.location.origin}${path}` : `https://onmylead.com${path}`;
 }
 
 /**
- * Where the sign-in link in the email lands. Supabase's free email sender can't use a custom
- * template, so its email carries a link (not the code); on the web the link signs the rider in
- * through /auth-callback in the same browser.
+ * Where an emailed link sends the rider back to when Supabase's built-in email is used. The app
+ * uses its own scheme, spelled exactly as it is allow-listed in Supabase: anything else (a dev
+ * build's onmylead://192.168.1.5:8081/auth-callback, say) fails the allow-list and Supabase falls
+ * back to the Site URL, which is why the verify button used to open the website.
+ * Our branded templates ignore this and link to https://onmylead.com/auth-callback, which opens
+ * the app through Universal Links when it is installed.
  */
 function emailRedirectUrl() {
-  if (Platform.OS === 'web' && typeof window !== 'undefined') return `${window.location.origin}/auth-callback`;
-  return Linking.createURL('/auth-callback');
+  return Platform.OS === 'web' ? webUrl('/auth-callback') : APP_AUTH_CALLBACK;
+}
+
+/**
+ * Finishes an emailed or OAuth link that landed on /auth-callback or /reset-password. Returns the
+ * kind of link it was so the screen can say what happened.
+ */
+export async function completeAuthLink(link: AuthLink) {
+  if (link.kind === 'token') {
+    const { error } = await supabase.auth.verifyOtp({ token_hash: link.tokenHash, type: link.type });
+    if (error) throw error;
+  } else if (link.kind === 'code') {
+    const { error } = await supabase.auth.exchangeCodeForSession(link.code);
+    if (error) throw error;
+  }
 }
 
 export async function sendCode(target: string) {
@@ -88,7 +142,7 @@ export async function signInWithPassword(email: string, password: string) {
 
 /** Emails a link that opens /reset-password, where the rider picks a new password. */
 export async function sendPasswordReset(email: string) {
-  const redirectTo = emailRedirectUrl().replace(/auth-callback$/, 'reset-password');
+  const redirectTo = Platform.OS === 'web' ? webUrl('/reset-password') : APP_RESET_PASSWORD;
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
   if (error) throw error;
 }

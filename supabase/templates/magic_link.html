@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<title>Your OnMyLead Sign-In Link</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;700;800&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;padding:0;background:#0A1626;-webkit-text-size-adjust:100%;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Tap to sign in. No password needed.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A1626;">
+  <tr>
+    <td align="center" style="padding:40px 16px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
+        <tr>
+          <td align="left" style="padding:0 4px 28px;">
+            <a href="https://onmylead.com" style="text-decoration:none;"><img src="https://onmylead.com/email/logo.png" width="210" height="48" alt="OnMyLead" style="display:block;border:0;width:210px;height:48px;"></a>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#12223A;border-radius:20px;border-top:4px solid #E5262E;padding:36px 32px 32px;">
+            <h1 style="margin:0 0 14px;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:30px;line-height:34px;font-weight:800;color:#F1F4F8;letter-spacing:-0.3px;">Sign In to OnMyLead</h1>
+            <p style="margin:0 0 28px;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:17px;line-height:26px;font-weight:500;color:#F1F4F8;">Tap the button to sign in as {{ .Email }}. No password needed.</p>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="border-radius:14px;background:#E5262E;">
+                  <a href="{{ .SiteURL }}/auth-callback?token_hash={{ .TokenHash }}&type=magiclink" style="display:inline-block;padding:16px 30px;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:18px;line-height:22px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:14px;">Sign In</a>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:28px 0 0;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:14px;line-height:21px;color:#97A7BE;">On your iPhone with OnMyLead installed, the button opens the app. Anywhere else, it opens onmylead.com.</p>
+            <p style="margin:20px 0 0;padding-top:20px;border-top:1px solid #27406A;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:14px;line-height:21px;color:#97A7BE;">The link works once and expires in an hour. If you didn’t ask to sign in, you can ignore this email.</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 4px 0;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:13px;line-height:20px;color:#97A7BE;">
+            OnMyLead by <a href="https://rusoffroad.com" style="color:#97A7BE;">RUS Offroad</a>. Group rides that stay together.<br>
+            <a href="https://onmylead.com/support" style="color:#3B86F7;text-decoration:none;">Help</a>&nbsp;&nbsp;&nbsp;<a href="https://onmylead.com/privacy" style="color:#3B86F7;text-decoration:none;">Privacy</a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

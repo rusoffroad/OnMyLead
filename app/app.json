@@ -178,6 +178,7 @@
         }
       ],
       "expo-secure-store",
+      "expo-apple-authentication",
       "expo-iap",
       [
         "expo-image-picker",

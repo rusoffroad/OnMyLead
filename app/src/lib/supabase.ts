@@ -4,16 +4,20 @@ import { Platform } from 'react-native';
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+export const supabaseUrl = url ?? 'http://localhost:54321';
+export const supabaseKey = anonKey ?? 'missing-anon-key';
 
 /** True once the backend keys are set in .env (see .env.example). */
 export const isBackendConfigured = Boolean(url && anonKey);
 
-export const supabase = createClient(url ?? 'http://localhost:54321', anonKey ?? 'missing-anon-key', {
+export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     storage: Platform.OS === 'web' ? undefined : AsyncStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: Platform.OS === 'web',
+    // /auth-callback and /reset-password finish emailed and OAuth links themselves (completeAuthLink),
+    // on every platform, so a link is never exchanged twice.
+    detectSessionInUrl: false,
     flowType: 'pkce',
   },
 });
