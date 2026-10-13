@@ -263,7 +263,7 @@ export function Showcase() {
               <Feature title="Your Location Is Never Public">Sharing is per ride or per person and always ends. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, or tap a rider, to report or block them. A blocked rider’s messages disappear for you and they are never told.</Feature>
             </div>
-            <figure className="phone phone-tilt">
+            <figure className="phone">
               <img src="/showcase/vehicle.webp" alt="A Garage machine called Red Rocket with its fuel range and build list" loading="lazy" width={786} height={1704} />
             </figure>
           </div>
@@ -817,7 +817,6 @@ const CSS = `
 .feature { border-top: 2px solid var(--ridge); padding-top: 18px; }
 .feature h3 { font-size: 28px; line-height: 1.05; }
 .feature p { margin-top: 10px; color: var(--dust); font-size: 17px; }
-.phone-tilt { transform: rotate(3deg); }
 
 /* Pricing, over the dunes */
 .pricing { position: relative; margin-top: 110px; padding: 130px 0 110px; isolation: isolate; overflow: hidden; }
