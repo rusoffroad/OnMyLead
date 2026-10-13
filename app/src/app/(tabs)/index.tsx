@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { type ReactElement, useCallback, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppNotices } from '@/components/app-notices';
@@ -8,16 +8,22 @@ import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { Showcase } from '@/components/showcase';
+import { SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { flagOn } from '@/core/app-settings';
+import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
+import { rowActionFor } from '@/core/row-swipe';
 import { historySplit } from '@/core/pro';
-import { discoverPublicRides, myRideName, myRides } from '@/lib/api';
+import { deleteRide, discoverPublicRides, getMembers, leaveRide, myRideName, myRides } from '@/lib/api';
 import { useAppSettings } from '@/lib/app-settings';
+import { confirmAsync, showNotice } from '@/lib/confirm';
 import { useEntitlements } from '@/lib/entitlements';
+import { currentNotificationSettings } from '@/lib/notification-settings';
 import { requirePro } from '@/lib/pro';
+import { syncRideReminders } from '@/lib/push';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import type { Ride, RideMember } from '@/lib/types';
@@ -62,6 +68,38 @@ export default function Home() {
       </Screen>
     );
   }
+
+  const uid = session?.user.id;
+
+  /** Swipe left on one of your rides: the organizer deletes it, anyone else leaves (or declines the invite). */
+  const swipeAway = async (m: (typeof mine)[number]): Promise<boolean> => {
+    const ride = m.rides;
+    const action = rowActionFor(m, ride.organizer_id, uid);
+    let p;
+    if (action === 'delete') {
+      const members = await getMembers(ride.id).catch(() => []);
+      p = deletePrompt(ride.name, ridersToTell(members, uid), ride.status === 'ended' || ride.status === 'cancelled');
+    } else {
+      p = leavePrompt(ride.name, ride.status, action === 'decline');
+    }
+    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return false;
+    try {
+      await (action === 'delete' ? deleteRide(ride.id) : leaveRide(ride.id));
+    } catch (e) {
+      const what = action === 'delete' ? 'Delete' : action === 'decline' ? 'Decline' : 'Leave';
+      showNotice(`Couldn’t ${what} the Ride`, e instanceof Error ? e.message : 'Something went wrong.');
+      return false;
+    }
+    setMine((all) => all.filter((x) => x.ride_id !== m.ride_id));
+    syncRideReminders(currentNotificationSettings().reminder_minutes);
+    myRides().then(setMine).catch(() => {});
+    return true;
+  };
+  const swipeRow = (m: (typeof mine)[number], row: ReactElement) => (
+    <SwipeRow key={m.ride_id} action={rowActionFor(m, m.rides.organizer_id, uid)} onAction={() => swipeAway(m)}>
+      {row}
+    </SwipeRow>
+  );
 
   const live = mine.find((m) => m.rides?.status === 'live' && m.status === 'joined');
   // Invitations (from a riding group) get their own list; the rest are rides you're on.
@@ -177,7 +215,7 @@ export default function Home() {
           <Section title="Ride Invites" />
           <RowGroup>
             {invites.map((m) => (
-              <RideRow key={m.ride_id} ride={m.rides} note="You’re invited. Tap to join" />
+              swipeRow(m, <RideRow ride={m.rides} note="You’re invited. Tap to join" />)
             ))}
           </RowGroup>
         </>
@@ -185,10 +223,10 @@ export default function Home() {
 
       {going.length ? (
         <>
-          <Section title="Your Rides" />
+          <Section title="Your Rides" right={<ThemedText type="small" themeColor="textSecondary">Swipe Left to Delete or Leave</ThemedText>} />
           <RowGroup>
             {going.map((m) => (
-              <RideRow key={m.ride_id} ride={m.rides} note={m.status === 'joined' ? roleLabel(m.role) : m.status.replace('_', ' ')} />
+              swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? roleLabel(m.role) : m.status.replace('_', ' ')} />)
             ))}
           </RowGroup>
         </>
@@ -199,7 +237,7 @@ export default function Home() {
           <Section title="Past Rides" />
           <RowGroup>
             {past.shown.map((m) => (
-              <RideRow key={m.ride_id} ride={m.rides} note={m.rides.status === 'cancelled' ? 'Cancelled' : 'Ended'} />
+              swipeRow(m, <RideRow ride={m.rides} note={m.rides.status === 'cancelled' ? 'Cancelled' : 'Ended'} />)
             ))}
           </RowGroup>
           {past.hidden ? (

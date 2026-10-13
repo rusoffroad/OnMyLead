@@ -55,3 +55,24 @@ export function friendlyCancelError(message: string): string {
   if (/ride not found/i.test(message)) return 'This ride is already gone.';
   return message;
 }
+
+/** Leaving a ride from the Rides list (or turning down an invite). */
+export function leavePrompt(rideName: string, rideStatus: Status, invited = false): Prompt {
+  if (invited) {
+    return {
+      title: `Decline ${rideName}?`,
+      message: 'The invite is removed from your list. You can still join later with the ride’s link or code.',
+      confirm: 'Decline',
+    };
+  }
+  const over = rideStatus === 'ended' || rideStatus === 'cancelled';
+  return {
+    title: `Leave ${rideName}?`,
+    message: over
+      ? 'It’s removed from your Past Rides.'
+      : rideStatus === 'live'
+        ? 'You’re taken off the ride and stop sharing your location with the group. You can rejoin with the ride’s link or code.'
+        : 'You’re taken off the ride and your spot opens up. You can rejoin with the ride’s link or code if there’s room.',
+    confirm: 'Leave Ride',
+  };
+}

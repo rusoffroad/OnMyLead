@@ -20,6 +20,10 @@ const PATHS = {
   lock: ['M7.5 10.5V8a4.5 4.5 0 0 1 9 0v2.5', 'M5.5 10.5h13v10h-13z', 'M12 14.5v2'],
   flagged: ['M5 21V4', 'M5 4.5c4-2 6 2 10 0s4 0 4 0v8.5s-1.5-1.5-4 0-6-2-10 0'],
   close: ['M6 6l12 12', 'M18 6L6 18'],
+  // A bin, for swiping a ride away as its organizer.
+  trash: ['M4 6.5h16', 'M9.5 6.5V4.5h5v2', 'M6 6.5l1 13.5h10l1-13.5', 'M10 10.5v6', 'M14 10.5v6'],
+  // A door with an arrow out, for leaving a ride.
+  leave: ['M14 7l5 5-5 5', 'M19 12H8.5', 'M10 4H5.5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2H10'],
   // A no-entry ring, for Blocked Riders.
   block: ['M5.6 5.6l12.8 12.8'],
   megaphone: ['M3.5 10v4h3l8 4.5v-13l-8 4.5z', 'M6.5 14l1.5 5.5h3L9.5 15', 'M18 9.5a3.5 3.5 0 0 1 0 5'],
