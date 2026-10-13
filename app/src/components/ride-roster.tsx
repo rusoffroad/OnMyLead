@@ -10,6 +10,7 @@ import { Colors, Radius, RideColors, Spacing } from '@/constants/theme';
 import { rideLeaderIds } from '@/core/chat';
 import { friendlyRoleError, handOffPrompt, ROLE_LABEL, rosterActions, tailGunnerId } from '@/core/roles';
 import { handOffRide, setMemberRole, setTailGunner } from '@/lib/api';
+import { confirmAndBlock, unblockRider, useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import type { Ride, RideMember } from '@/lib/types';
 
@@ -19,7 +20,8 @@ const ROLE_COLOR: Record<RideMember['role'], string> = {
 
 /**
  * Who's going, in riding order: the leader up front, the tail gunner at the rear. The leader taps
- * a rider to hand them the ride, make them leader, or put them at the back. Anyone can report a rider.
+ * a rider to hand them the ride, make them leader, or put them at the back. Anyone can report or
+ * block a rider.
  */
 export function RideRoster({
   ride, members, me, waitlisted, onChanged,
@@ -34,6 +36,7 @@ export function RideRoster({
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
+  const blocks = useBlocks();
   const joined = members.filter((m) => m.status === 'joined');
   const nameOf = (id: string) => members.find((m) => m.user_id === id)?.profiles?.display_name || 'Rider';
   const leaderIds = rideLeaderIds(members, ride.organizer_id);
@@ -62,6 +65,14 @@ export function RideRoster({
       setError(friendlyRoleError(e instanceof Error ? e.message : 'Something went wrong.'));
     } finally {
       setBusy(null);
+    }
+  }
+
+  async function toggleBlock(m: RideMember) {
+    if (blocks.ids.has(m.user_id)) {
+      run(`block-${m.user_id}`, () => unblockRider(m.user_id));
+    } else if (await confirmAndBlock(m.user_id, nameOf(m.user_id))) {
+      setOpen(null);
     }
   }
 
@@ -144,6 +155,16 @@ export function RideRoster({
                       title="Report Rider"
                       caption="Tell the OnMyLead team about a problem. They aren’t told it was you."
                       onPress={() => setReporting({ kind: 'rider', userId: m.user_id, rideId: ride.id, name: nameOf(m.user_id) })}
+                    />
+                  ) : null}
+                  {me && m.user_id !== me && !blocks.off ? (
+                    <Action
+                      color={Colors.textSecondary}
+                      on={blocks.ids.has(m.user_id)}
+                      title={blocks.ids.has(m.user_id) ? 'Unblock Rider' : 'Block Rider'}
+                      caption={blocks.ids.has(m.user_id) ? 'You don’t see their chat messages. Unblock to see them again.' : 'Hide their chat messages from you. They aren’t told.'}
+                      busy={busy === `block-${m.user_id}`}
+                      onPress={() => toggleBlock(m)}
                     />
                   ) : null}
                 </View>

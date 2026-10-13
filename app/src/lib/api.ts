@@ -837,7 +837,32 @@ export async function saveRideName(name: string): Promise<string> {
   return clean;
 }
 
-/** Ask for this account to be deleted (Apple requires an in-app way). The owner deletes it. */
+/**
+ * Deletes this account right away (Apple requires it in the app). Until the delete-account
+ * function is deployed, it falls back to a deletion request the owner handles.
+ */
+export async function deleteMyAccount(): Promise<'deleted' | 'requested'> {
+  const { error } = await supabase.functions.invoke('delete-account', { body: {} });
+  if (!error) {
+    track('account_deleted');
+    return 'deleted';
+  }
+  const status = (error as { context?: Response }).context?.status;
+  if (status !== 404) {
+    let message = error.message;
+    try {
+      const j = await (error as { context?: Response }).context?.json();
+      if (j?.error) message = j.error;
+    } catch {
+      // keep the generic message
+    }
+    throw new Error(message);
+  }
+  await requestAccountDeletion();
+  return 'requested';
+}
+
+/** Ask for this account to be deleted. The owner deletes it. */
 export async function requestAccountDeletion(reason?: string) {
   const { error } = await supabase.rpc('request_account_deletion', { p_reason: reason ?? null });
   if (error) throw new Error(error.message);

@@ -91,6 +91,7 @@ function RootLayout() {
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
         <Stack.Screen name="ride-name" options={{ title: 'Your Ride Name' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
+        <Stack.Screen name="blocked" options={{ title: 'Blocked Riders' }} />
         <Stack.Screen name="pro" options={{ title: '' }} />
         <Stack.Screen name="subscription" options={{ title: 'Subscription' }} />
         <Stack.Screen name="maps/index" options={{ title: 'Offline Maps' }} />
@@ -104,6 +105,7 @@ function RootLayout() {
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
         <Stack.Screen name="terms" options={{ title: '' }} />
         <Stack.Screen name="privacy" options={{ title: '' }} />
+        <Stack.Screen name="support" options={{ title: '' }} />
         <Stack.Screen name="admin" options={{ title: 'OnMyLead Admin', headerShown: false }} />
       </Stack>
       <MessageAlerts />

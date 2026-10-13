@@ -5,8 +5,10 @@ import { AppState, Platform, Pressable, StyleSheet, Text, View } from 'react-nat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { hiddenByBlock } from '@/core/blocks';
 import { alertTitle, isLeaderOnly, isResolved, shouldAlert, type ChatMessage } from '@/core/chat';
 import type { NotificationSettings } from '@/core/notifications';
+import { blockedIds, useBlocks } from '@/lib/blocks';
 import { currentNotificationSettings, resetNotificationSettings, syncNotificationSettings } from '@/lib/notification-settings';
 import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps, useRideChangeReminders } from '@/lib/push';
 import { useSession } from '@/lib/session';
@@ -68,6 +70,8 @@ export function MessageAlerts() {
 
   useNotificationTaps();
   useRideChangeReminders();
+  // Loads who this rider blocked, so no pop-up shows their messages.
+  useBlocks();
 
   useEffect(() => {
     if (!me) {
@@ -92,7 +96,7 @@ export function MessageAlerts() {
     const channel = newChannel('message-alerts')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ride_messages' }, (payload) => {
         const m = payload.new as ChatMessage;
-        if (!m?.id || !shouldAlert(m, me) || !wanted(m, currentNotificationSettings())) return;
+        if (!m?.id || !shouldAlert(m, me) || !wanted(m, currentNotificationSettings()) || hiddenByBlock(m, blockedIds(), me)) return;
         toAlert(m).then((a) => setQueue((q) => (q.some((x) => x.id === a.id) ? q : [...q, a].slice(-5))));
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ride_messages' }, (payload) => {

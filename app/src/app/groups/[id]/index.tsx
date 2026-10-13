@@ -14,6 +14,7 @@ import {
   groupInviteMessage, groupLink, groupNameProblem, invitedLine, MAX_GROUP_NAME, ridersLabel, type RideMate,
 } from '@/core/groups';
 import { previewLine, unreadLabel, type GroupChatSummary } from '@/core/group-chat';
+import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { myGroupChats } from '@/lib/group-chat';
 import {
@@ -32,6 +33,7 @@ export default function GroupPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useSession();
   const me = session?.user.id;
+  const blocks = useBlocks();
   const [group, setGroup] = useState<RidingGroup | null | undefined>(undefined);
   const [rides, setRides] = useState<Ride[]>([]);
   const [picking, setPicking] = useState<'ride' | 'riders' | null>(null);
@@ -141,7 +143,7 @@ export default function GroupPage() {
 
       <ChatCard
         summary={chat}
-        preview={chat ? previewLine(chat, me, (uid) => group.riders.find((r) => r.id === uid)?.name ?? 'Former Rider') : null}
+        preview={chat ? previewLine(chat, me, (uid) => group.riders.find((r) => r.id === uid)?.name ?? 'Former Rider', blocks.ids) : null}
         onPress={() => router.push(`/groups/${group.id}/chat`)}
       />
 

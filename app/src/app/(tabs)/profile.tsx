@@ -11,8 +11,9 @@ import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directi
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
-import { myRideName, requestAccountDeletion } from '@/lib/api';
+import { deleteMyAccount, myRideName } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
+import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { setMapsPreference, useMapsPreference } from '@/lib/directions';
 import { useEntitlements } from '@/lib/entitlements';
@@ -34,6 +35,7 @@ export default function You() {
   const tripsOn = useFlag('trip_planner');
   const starlinkOn = useFlag('starlink');
   const offlineMaps = useOfflineMaps();
+  const blocks = useBlocks();
 
   useFocusEffect(
     useCallback(() => {
@@ -47,6 +49,9 @@ export default function You() {
     ? `${offlineMaps.length === 1 ? '1 map' : `${offlineMaps.length} maps`}, ${formatBytes(offlineMaps.reduce((n, m) => n + m.bytes, 0))}`
     : 'For riding with no signal';
   const subscriptionSummary = ent.switchedOn ? planHeadline(ent) : 'Pro, Restore Purchases and Promo Codes';
+  const blockedSummary = blocks.list.length
+    ? `${blocks.list.length === 1 ? '1 rider' : `${blocks.list.length} riders`}. They aren’t told.`
+    : 'Riders whose messages you don’t see';
   const directionsSummary = mapsPref === 'ask' ? 'Ask each time' : MAPS_APP_LABEL[mapsPref];
   const needsAccount = (href: Parameters<typeof router.push>[0]) => () => router.push(session ? href : '/sign-in');
 
@@ -99,6 +104,7 @@ export default function You() {
             ) : null}
           </MenuRow>
           <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
+          <MenuRow icon="block" color={Colors.danger} title="Blocked Riders" detail={blockedSummary} onPress={() => router.push('/blocked')} />
           {ent.accountType === 'admin' ? (
             <MenuRow
               icon="lock"
@@ -138,6 +144,9 @@ export default function You() {
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/privacy')}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Privacy</ThemedText>
         </Pressable>
+        <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/support')}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Help</ThemedText>
+        </Pressable>
       </View>
     </Screen>
   );
@@ -169,8 +178,8 @@ function Identity({ name, plan }: { name: string | null; plan: string | null }) 
 }
 
 /**
- * Apple requires an in-app way to delete an account. The request goes to the owner, who deletes
- * the account and everything in it; a Pro subscription is billed by Apple and is cancelled there.
+ * Apple requires an in-app way to delete an account. It is deleted on the spot and the rider is
+ * signed out; a Pro subscription is billed by Apple and is cancelled there.
  */
 function DeleteAccount() {
   const [state, setState] = useState<'idle' | 'busy' | 'sent' | 'off'>('idle');
@@ -179,14 +188,18 @@ function DeleteAccount() {
   const ask = async () => {
     const ok = await confirmAsync(
       'Delete Your Account?',
-      'Your account, rides you organize, Garage, trips and groups will be permanently deleted. Rides you organize are removed for everyone on them. This can’t be undone.',
+      'Your account, rides you organize, Garage, trips and groups will be permanently deleted. Rides you organize are removed for everyone on them. This can’t be undone. If you pay for Pro, cancel it in your Apple subscriptions too.',
       'Delete Account',
     );
     if (!ok) return;
     setState('busy');
     setError(null);
     try {
-      await requestAccountDeletion();
+      if ((await deleteMyAccount()) === 'deleted') {
+        await signOut().catch(() => {});
+        router.replace('/');
+        return;
+      }
       setState('sent');
     } catch (e) {
       const message = (e as Error).message;

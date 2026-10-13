@@ -25,3 +25,6 @@ export const TRIAL_DAYS = 30;
 
 export const COMPANY = 'RUS Offroad LLC';
 export const RUS_URL = 'https://rusoffroad.com';
+
+/** Where riders and Apple reach us. Shown on the Support, Terms and Privacy pages. */
+export const SUPPORT_EMAIL = 'support@rusoffroad.com';

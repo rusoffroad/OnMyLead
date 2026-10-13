@@ -1,5 +1,5 @@
 import { LegalPage } from '@/components/legal-page';
-import { COMPANY } from '@/constants/site';
+import { COMPANY, SUPPORT_EMAIL } from '@/constants/site';
 
 // DRAFT for Chris's review. Not legal advice; have it checked before the App Store launch.
 export default function Privacy() {
@@ -40,8 +40,8 @@ export default function Privacy() {
           title: 'Your Choices',
           body: [
             'You can stop sharing your location at any time, change notification settings in Profile, and turn off location or notifications in your phone’s settings.',
-            'You can delete your account from Profile. Your account, the rides you organize, your Garage, trips and groups are then permanently deleted.',
-            'Email us to ask for a copy of your data or to ask any privacy question.',
+            'You can delete your account from You > Delete Account. Your account, the rides you organize, your Garage, trips, groups and location history are deleted right away.',
+            `Email ${SUPPORT_EMAIL} to ask for a copy of your data or to ask any privacy question.`,
           ],
         },
         {
@@ -52,7 +52,7 @@ export default function Privacy() {
           title: 'Changes and Contact',
           body: [
             'We will post any change here and tell you in the app if it matters.',
-            `${COMPANY}. Contact email to be confirmed before launch.`,
+            `${COMPANY}. Questions about your data, or a request to see or delete it: ${SUPPORT_EMAIL}.`,
           ],
         },
       ]}

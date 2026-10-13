@@ -12,7 +12,7 @@ import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/const
  * The photos in /showcase/photos are U.S. Bureau of Land Management pictures from the Imperial
  * Sand Dunes and Johnson Valley, which are in the public domain (sources in showcase/photos/SOURCES.md).
  */
-type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy';
+type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy' | '/support';
 
 export function Showcase() {
   const scroller = useRef<HTMLDivElement>(null);
@@ -255,6 +255,7 @@ export function Showcase() {
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Sharing is per ride or per person and always ends. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
+              <Feature title="Report or Block Any Rider">Press and hold a message, or tap a rider, to report or block them. A blocked rider’s messages disappear for you and they are never told.</Feature>
             </div>
             <figure className="phone phone-tilt">
               <img src="/showcase/vehicle.webp" alt="A Garage machine called Red Rocket with its fuel range and build list" loading="lazy" width={786} height={1704} />
@@ -297,6 +298,7 @@ export function Showcase() {
         <nav aria-label="Legal and account">
           <a href="/terms" onClick={go('/terms')}>Terms of Use</a>
           <a href="/privacy" onClick={go('/privacy')}>Privacy Policy</a>
+          <a href="/support" onClick={go('/support')}>Help and Support</a>
           <a href="/sign-in" onClick={go('/sign-in')}>Sign In</a>
         </nav>
         <p className="credit">Photos: U.S. Bureau of Land Management, Imperial Sand Dunes and Johnson Valley.</p>
