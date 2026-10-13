@@ -1,12 +1,11 @@
 import { LegalPage } from '@/components/legal-page';
 import { COMPANY, PRO_PRICES, SUPPORT_EMAIL, TRIAL_DAYS } from '@/constants/site';
 
-// DRAFT for Chris's review. Not legal advice; have it checked before the App Store launch.
 export default function Terms() {
   return (
     <LegalPage
       title="Terms of Use"
-      updated="October 12, 2026"
+      updated="October 13, 2026"
       intro={`These terms cover your use of the OnMyLead app and onmylead.com, made by ${COMPANY} ("we"). By making an account or using the app, you agree to them.`}
       sections={[
         {

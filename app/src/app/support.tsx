@@ -7,7 +7,6 @@ export default function Support() {
     <LegalPage
       title="Help and Support"
       updated="October 13, 2026"
-      draft={false}
       intro={`Something not working, or a question about OnMyLead? Send us a message with the Contact Us form below, or email ${SUPPORT_EMAIL}, and a real person at ${COMPANY} will answer, usually within a day.`}
       action={{ title: 'Contact Us', href: '/contact' }}
       sections={[
