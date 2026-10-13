@@ -1,8 +1,8 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, LayoutAnimation, PanResponder, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -16,6 +16,7 @@ import type { LatLng } from '@/core/geo';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import type { Place } from '@/core/places';
 import { miles, routeFromGpx, type RideRoute } from '@/core/route';
+import { isVerticalSwipe, swipeResult } from '@/core/panel-swipe';
 import { routeFromLegs } from '@/core/route-legs';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRouteDraft } from '@/hooks/use-route-draft';
@@ -31,7 +32,8 @@ import type { Ride } from '@/lib/types';
  * GPX track from another app. With Follow Trails on, each tap lands on the nearest trail or road
  * and the line between taps runs along it (core/trail-router); Straight Line draws straight
  * across ground nobody has mapped. Drag a point to move it. The search at the top moves the map
- * to a trailhead, park, forest or town before drawing.
+ * to a trailhead, park, forest or town before drawing. Swipe the panel down (or tap its handle)
+ * to fold it to the miles and Undo and see more map.
  * On the website it's the same builder with a click instead of a tap, and on a wide screen the
  * panel sits beside the map instead of under it.
  */
@@ -51,6 +53,30 @@ export default function RouteBuilder() {
   const trail = useTrailMap();
   const [follow, , setFollow] = useRememberedToggle('route.followTrails.v1', true);
   const draft = useRouteDraft(follow, trail.offline);
+  // The tools panel folds down to the miles and Undo (swipe it down, or tap the handle) to see more map.
+  const [open, , setOpenRaw] = useRememberedToggle('route.panelOpen.v1', true);
+  const setOpen = useCallback((on: boolean) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setOpenRaw(on);
+  }, [setOpenRaw]);
+  const [panelDrag] = useState(() => new Animated.Value(0));
+  const panelSwipe = useMemo(() =>
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_e, g) => isVerticalSwipe(g.dx, g.dy),
+      onPanResponderMove: (_e, g) => panelDrag.setValue(open ? Math.max(0, g.dy) : 0),
+      onPanResponderRelease: (_e, g) => {
+        const result = swipeResult(open, g.dy, g.vy);
+        if (result) {
+          Haptics.selectionAsync();
+          panelDrag.setValue(0);
+          setOpen(result === 'open');
+        } else {
+          Animated.spring(panelDrag, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start();
+        }
+      },
+      onPanResponderTerminate: () => Animated.spring(panelDrag, { toValue: 0, useNativeDriver: Platform.OS !== 'web' }).start(),
+    }),
+  [open, setOpen, panelDrag]);
   const { load: loadDraft, undo: undoDraft } = draft;
   const taps = draft.taps;
   const insets = useSafeAreaInsets();
@@ -204,42 +230,79 @@ export default function RouteBuilder() {
         )}
       </SafeAreaView>
 
-      <SafeAreaView edges={['bottom']} style={[styles.panel, wide && styles.panelWide]}>
+      <Animated.View
+        {...(wide ? {} : panelSwipe.panHandlers)}
+        style={[styles.panel, wide && styles.panelWide, { transform: [{ translateY: panelDrag }] }]}>
+      <SafeAreaView edges={['bottom']} style={[styles.panelInner, !open && styles.panelFolded]}>
+        <Pressable
+          onPress={() => setOpen(!open)}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: open }}
+          accessibilityLabel={open ? 'Hide the route tools' : 'Show the route tools'}
+          accessibilityHint={wide ? undefined : 'You can also swipe the panel down to hide it or up to show it'}
+          hitSlop={8}
+          style={styles.handle}>
+          <View style={styles.handleBar} />
+          <Text style={styles.handleText}>{open ? (wide ? 'Hide ▲' : 'Hide ▼') : wide ? 'Show Tools ▼' : 'Show Tools ▲'}</Text>
+        </Pressable>
         <View style={styles.readout}>
-          <Text style={styles.miles} accessibilityLabel={`${route ? miles(route.lengthM) : 0} miles`}>
+          <Text style={[styles.miles, !open && styles.milesFolded]} accessibilityLabel={`${route ? miles(route.lengthM) : 0} miles`}>
             {route ? miles(route.lengthM) : '0.0'}
-            <Text style={styles.unit}> mi</Text>
+            <Text style={[styles.unit, !open && { fontSize: 18 }]}> mi</Text>
           </Text>
-          <Text style={styles.count}>
-            {imported ? `${imported.points.length} track points` : `${taps.length} ${taps.length === 1 ? 'point' : 'points'}`}
-          </Text>
+          <View style={styles.readoutRight}>
+            {!open && draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
+            <Text style={styles.count}>
+              {imported ? `${imported.points.length} track points` : `${taps.length} ${taps.length === 1 ? 'point' : 'points'}`}
+            </Text>
+            {!open && !imported ? (
+              <Pressable
+                onPress={draft.undo}
+                disabled={!taps.length}
+                accessibilityRole="button"
+                accessibilityLabel="Undo the last point"
+                hitSlop={8}
+                style={({ pressed }) => [styles.undoChip, !taps.length && { opacity: 0.4 }, pressed && { opacity: 0.75 }]}>
+                <Text style={styles.undoText}>Undo</Text>
+              </Pressable>
+            ) : null}
+          </View>
         </View>
-        {!imported ? <ModeSwitch follow={follow} onChange={setFollow} /> : null}
-        <View style={styles.hintRow}>
-          {draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
-          <Text style={[styles.hint, { flex: 1 }]} accessibilityLiveRegion="polite">
-            {draft.finding ? 'Finding the trail…' : hint}
-          </Text>
-        </View>
-        <View style={styles.row}>
-          <Button title="Undo" kind="secondary" style={styles.flex} disabled={!!imported || !taps.length} onPress={draft.undo} />
-          <Button title="Clear" kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />
-          <Button title="Import GPX" kind="secondary" style={[styles.flex, { flexGrow: 1.6 }]} loading={busy === 'gpx'} onPress={importGpx} />
-        </View>
+        {open ? (
+          <>
+            {!imported ? <ModeSwitch follow={follow} onChange={setFollow} /> : null}
+            <View style={styles.hintRow}>
+              {draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
+              <Text style={[styles.hint, { flex: 1 }]} accessibilityLiveRegion="polite">
+                {draft.finding ? 'Finding the trail…' : hint}
+              </Text>
+            </View>
+            <View style={styles.row}>
+              <Button title="Undo" kind="secondary" style={styles.flex} disabled={!!imported || !taps.length} onPress={draft.undo} />
+              <Button title="Clear" kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />
+              <Button title="Import GPX" kind="secondary" style={[styles.flex, { flexGrow: 1.6 }]} loading={busy === 'gpx'} onPress={importGpx} />
+            </View>
+          </>
+        ) : null}
         <ErrorText error={error} />
-        <Button
-          title={route ? 'Save Route' : saved ? 'Remove Route' : 'Save Route'}
-          kind={!route && saved ? 'danger' : 'primary'}
-          big
-          disabled={!changed || (!route && !saved) || draft.finding}
-          loading={busy === 'save'}
-          onPress={save}
-        />
-        <Text style={styles.privacy}>
-          Only riders on this ride can see the route.{web ? ' It’s in the OnMyLead app as soon as you save.' : ''}
-        </Text>
+        {open ? (
+          <>
+            <Button
+              title={route ? 'Save Route' : saved ? 'Remove Route' : 'Save Route'}
+              kind={!route && saved ? 'danger' : 'primary'}
+              big
+              disabled={!changed || (!route && !saved) || draft.finding}
+              loading={busy === 'save'}
+              onPress={save}
+            />
+            <Text style={styles.privacy}>
+              Only riders on this ride can see the route.{web ? ' It’s in the OnMyLead app as soon as you save.' : ''}
+            </Text>
+          </>
+        ) : null}
         {follow && !imported ? <Text style={styles.credit}>Trails: {OSM_ATTRIBUTION}</Text> : null}
       </SafeAreaView>
+      </Animated.View>
     </View>
   );
 }
@@ -300,9 +363,21 @@ const styles = StyleSheet.create({
   searchText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   panel: {
-    position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.three, paddingTop: Spacing.three, gap: 10,
+    position: 'absolute', bottom: 0, left: 0, right: 0,
     backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
+  panelInner: { padding: Spacing.three, paddingTop: 4, gap: 10 },
+  panelFolded: { gap: 4 },
+  handle: { alignItems: 'center', gap: 4, minHeight: 40, justifyContent: 'center' },
+  handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
+  handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 13 },
+  readoutRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  milesFolded: { fontSize: 36, lineHeight: 40 },
+  undoChip: {
+    height: 36, paddingHorizontal: 14, borderRadius: Radius.pill, justifyContent: 'center',
+    backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
+  },
+  undoText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   readout: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   miles: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 52, lineHeight: 54 },
   unit: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 24 },
