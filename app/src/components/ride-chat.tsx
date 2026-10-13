@@ -40,11 +40,13 @@ type SendTo = 'everyone' | 'leader' | 'announcement' | 'poll';
 /**
  * Ride chat for joined riders. Each message goes to everyone or only to the ride's leader.
  * Organizers and co-organizers can post an announcement instead, which gets pinned and read
- * aloud in Ride Mode. The leader (and organizers) can also ask a quick poll.
+ * aloud in Ride Mode. The leader (and organizers) can also ask a quick poll. A long press on
+ * someone else's message offers Report Rider and Block Rider; pass messages with blocked riders
+ * already taken out (core/blocks).
  */
 export function RideChat({
   messages, nameOf, me, canAnnounce, leaderName, error, onSend, canPoll = false, pollLocked = false, pollsOn = true, votes = [], onSendPoll, onVote,
-  pending = [], onRetry, onDiscard, onResolve, onClear, actionsOn = true,
+  pending = [], onRetry, onDiscard, onResolve, onClear, actionsOn = true, onReport, onBlock,
 }: {
   messages: ChatMessage[];
   nameOf: (userId: string) => string;
@@ -73,6 +75,9 @@ export function RideChat({
   onClear?: (messageId: string) => void;
   /** False until the database has the Clear and Mark Resolved update. */
   actionsOn?: boolean;
+  /** Long press on someone else's message: report them, or block them. */
+  onReport?: (userId: string) => void;
+  onBlock?: (userId: string) => void;
 }) {
   const theme = useTheme();
   const [draft, setDraft] = useState('');
@@ -84,6 +89,7 @@ export function RideChat({
 
   const last = messages[messages.length - 1];
   const canManage = !!onResolve || !!onClear;
+  const canFlag = !!onReport || !!onBlock;
   // Only my newest message spells out Sent; earlier ones keep just the check.
   const myLatestId = [...messages].reverse().find((m) => m.user_id === me)?.id;
   const visible = showAll ? messages : messages.slice(-30);
@@ -155,9 +161,14 @@ export function RideChat({
             const poll = isPoll(m);
             const resolved = isResolved(m);
             const menuOpen = menuFor === m.id;
+            const flaggable = !mine && canFlag;
             return (
-              <View
+              <Pressable
                 key={m.id}
+                disabled={!flaggable}
+                onLongPress={flaggable ? () => setMenuFor(menuOpen ? null : m.id) : undefined}
+                delayLongPress={350}
+                accessibilityHint={flaggable ? 'Long press to report or block this rider' : undefined}
                 style={{
                   borderTopWidth: 1,
                   borderTopColor: theme.backgroundSelected,
@@ -200,7 +211,32 @@ export function RideChat({
                     {m.body}
                   </ThemedText>
                 )}
-                {menuOpen ? (
+                {menuOpen && !mine ? (
+                  <View style={chatStyles.actions}>
+                    {onReport ? (
+                      <Button
+                        title="Report Rider"
+                        kind="secondary"
+                        onPress={() => {
+                          setMenuFor(null);
+                          onReport(m.user_id);
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                    ) : null}
+                    {onBlock ? (
+                      <Button
+                        title="Block Rider"
+                        kind="ghost"
+                        onPress={() => {
+                          setMenuFor(null);
+                          onBlock(m.user_id);
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                    ) : null}
+                  </View>
+                ) : menuOpen ? (
                   actionsOn ? (
                     <View style={chatStyles.actions}>
                       {onResolve ? (
@@ -220,7 +256,7 @@ export function RideChat({
                     <ThemedText type="small" themeColor="textSecondary">Clear and Mark Resolved aren’t switched on yet.</ThemedText>
                   )
                 ) : null}
-              </View>
+              </Pressable>
             );
           })}
           {pending.map((p) => (

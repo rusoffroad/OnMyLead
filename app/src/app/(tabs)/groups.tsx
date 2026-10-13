@@ -10,6 +10,7 @@ import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { previewLine, unreadLabel, type GroupChatSummary } from '@/core/group-chat';
 import { NOT_SWITCHED_ON, ridersLabel } from '@/core/groups';
+import { useBlocks } from '@/lib/blocks';
 import { myGroupChats } from '@/lib/group-chat';
 import {
   followedLeadersRides, leadersIFollow, openNewGroup, myFollowerCount, myGroups, NotSwitchedOnError, unfollowLeader, type Followed, type RidingGroup,
@@ -123,7 +124,8 @@ export default function Groups() {
 }
 
 function GroupCard({ group, chat, me }: { group: RidingGroup; chat?: GroupChatSummary; me?: string }) {
-  const preview = chat ? previewLine(chat, me, (uid) => group.riders.find((r) => r.id === uid)?.name ?? 'Former Rider') : null;
+  const blocks = useBlocks();
+  const preview = chat ? previewLine(chat, me, (uid) => group.riders.find((r) => r.id === uid)?.name ?? 'Former Rider', blocks.ids) : null;
   const unread = chat ? unreadLabel(chat.unread) : null;
   return (
     <Pressable

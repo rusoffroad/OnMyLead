@@ -20,6 +20,8 @@ const PATHS = {
   lock: ['M7.5 10.5V8a4.5 4.5 0 0 1 9 0v2.5', 'M5.5 10.5h13v10h-13z', 'M12 14.5v2'],
   flagged: ['M5 21V4', 'M5 4.5c4-2 6 2 10 0s4 0 4 0v8.5s-1.5-1.5-4 0-6-2-10 0'],
   close: ['M6 6l12 12', 'M18 6L6 18'],
+  // A no-entry ring, for Blocked Riders.
+  block: ['M5.6 5.6l12.8 12.8'],
   megaphone: ['M3.5 10v4h3l8 4.5v-13l-8 4.5z', 'M6.5 14l1.5 5.5h3L9.5 15', 'M18 9.5a3.5 3.5 0 0 1 0 5'],
   warning: ['M12 3.5l9.5 16.5h-19z', 'M12 10v4.5', 'M12 17.2v.3'],
   home: ['M3.5 11.5L12 4.5l8.5 7', 'M6 9.5V20h12V9.5', 'M10 20v-5.5h4V20'],
@@ -50,6 +52,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: 
           <Circle cx={16.2} cy={9.2} r={2.7} stroke={color} strokeWidth={strokeWidth} />
         </>
       ) : null}
+      {name === 'block' ? <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'search' ? <Circle cx={10.5} cy={10.5} r={6.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'machine' ? (
         <>

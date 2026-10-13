@@ -14,6 +14,8 @@
 // hourly by trial_reminder_batch) come from push_batch_account and email_batch_account
 // (migration 20261018000000_pro_entitlements.sql). Riding group chat messages
 // ({"type":"group_message"}) come from push_batch_group (migration 20261019400000_group_chat.sql).
+// Chat pushes skip riders who blocked the sender (blockersOf, migration
+// 20261020000000_blocked_riders.sql); status taps such as Need Help and EMERGENCY never do.
 //
 // email_batch() does the same for the emails, which go out through Resend.
 //
@@ -70,7 +72,10 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
   const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 
-  const ios = ((rows ?? []) as Push[]).filter((r) => r.platform === 'ios');
+  let ios = ((rows ?? []) as Push[]).filter((r) => r.platform === 'ios');
+  if (!ios.length) return { sent: 0 };
+  const blockers = await blockersOf(event);
+  if (blockers.size) ios = ios.filter((r) => !blockers.has(r.user_id));
   if (!ios.length) return { sent: 0 };
   const jwt = await apnsJwt();
   if (!jwt) return { sent: 0, note: 'APNs not configured' };
@@ -98,6 +103,33 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
     if (reached.length) await db.rpc('record_push_reach', { p_item: event.id, p_users: reached }).then(() => {}, () => {});
   }
   return { sent: results.filter((r) => r === 'ok').length, removed: gone.length };
+}
+
+/**
+ * Riders who blocked the sender of a chat message: ride chat (kind 'chat', which includes polls and
+ * leader-only messages) and group chat only. Never status taps, quick replies or announcements,
+ * so Need Help and EMERGENCY always go out. Fails open: on any error (say the blocked_riders
+ * table isn't there yet) nobody is skipped.
+ */
+// deno-lint-ignore no-explicit-any
+async function blockersOf(event: any): Promise<Set<string>> {
+  try {
+    if (typeof event.id !== 'string') return new Set();
+    let sender: string | undefined;
+    if (event.type === 'group_message') {
+      const { data } = await db.from('group_messages').select('user_id').eq('id', event.id).maybeSingle();
+      sender = data?.user_id;
+    } else if (event.type === 'message') {
+      const { data } = await db.from('ride_messages').select('user_id, kind').eq('id', event.id).maybeSingle();
+      if (data?.kind === 'chat') sender = data.user_id;
+    }
+    if (!sender) return new Set();
+    const { data, error } = await db.from('blocked_riders').select('blocker_id').eq('blocked_id', sender);
+    if (error || !data) return new Set();
+    return new Set((data as { blocker_id: string }[]).map((r) => r.blocker_id));
+  } catch {
+    return new Set();
+  }
 }
 
 type Email = {

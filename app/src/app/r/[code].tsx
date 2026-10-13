@@ -18,6 +18,7 @@ import { waypointDots } from '@/components/waypoint-blaze';
 import { WaypointRow } from '@/components/waypoint-row';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { withoutBlocked } from '@/core/blocks';
 import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { rideDirections } from '@/core/directions';
@@ -34,6 +35,7 @@ import {
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { useFlag } from '@/lib/app-settings';
+import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { confirmAsync, showNotice } from '@/lib/confirm';
 import { declineRideInvite } from '@/lib/groups';
 import { useEntitlements } from '@/lib/entitlements';
@@ -68,6 +70,7 @@ export default function RidePage() {
   const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
   const isJoined = members.some((m) => m.user_id === me && m.status === 'joined');
   const chat = useRideChat(ride?.id, isJoined);
+  const blocks = useBlocks();
   const waypoints = useRideWaypoints(ride?.id, isJoined);
 
   const load = useCallback(async () => {
@@ -169,7 +172,8 @@ export default function RidePage() {
   const show = (key: RideSection) => !sectioned || section === key;
   const chatBlock = isJoined ? (
     <RideChat
-      messages={chat.messages}
+      // Chat and polls from riders this rider blocked are left out (announcements stay).
+      messages={withoutBlocked(chat.messages, blocks.ids, me)}
       nameOf={nameOf}
       me={me}
       canAnnounce={isManager}
@@ -190,6 +194,8 @@ export default function RidePage() {
       onResolve={chat.resolve}
       onClear={chat.clear}
       actionsOn={chat.actionsOn}
+      onReport={(userId) => setReporting({ kind: 'rider', userId, rideId: ride.id, name: nameOf(userId) })}
+      onBlock={blocks.off ? undefined : (userId) => confirmAndBlock(userId, nameOf(userId))}
     />
   ) : null;
 

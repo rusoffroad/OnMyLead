@@ -7,13 +7,15 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Field } from '@/components/ui';
 import { Colors, font, Spacing } from '@/constants/theme';
 import { REPORT_REASONS } from '@/core/pro';
+import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { sendReport } from '@/lib/pro';
 
 type Target = { kind: 'ride'; rideId: string; name: string } | { kind: 'rider'; userId: string; rideId?: string | null; name: string };
 
 /**
  * Report Ride / Report Rider: a reason, an optional note, and it goes to the OnMyLead owner.
- * The person reported is never told who reported them.
+ * The person reported is never told who reported them. A rider can also be blocked from here,
+ * instead of or after reporting them.
  */
 export function ReportSheet({ target, onClose }: { target: Target | null; onClose: () => void }) {
   const insets = useSafeAreaInsets();
@@ -22,6 +24,11 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const blocks = useBlocks();
+  const rider = target?.kind === 'rider' ? target : null;
+  const blocked = !!rider && blocks.ids.has(rider.userId);
+  // Hidden until the server has blocking, and once they're blocked the sheet says so instead.
+  const canBlock = !!rider && !blocks.off;
 
   const close = () => {
     setReason(null);
@@ -64,6 +71,13 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <ThemedText>
                 Thanks. OnMyLead looks at every report. {target.name} isn’t told who sent it. If anyone is in danger, call 911.
               </ThemedText>
+              {canBlock ? (
+                blocked ? (
+                  <ThemedText type="small" themeColor="textSecondary">Blocked. You won’t see their messages.</ThemedText>
+                ) : (
+                  <Button title="Also Block This Rider" kind="secondary" onPress={() => confirmAndBlock(rider!.userId, rider!.name)} />
+                )
+              ) : null}
               <Button title="Done" big onPress={close} />
             </>
           ) : (
@@ -81,6 +95,15 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <Field label="Anything Else (Optional)" value={details} onChangeText={setDetails} multiline maxLength={1000} placeholder="What happened, and when" />
               <ErrorText error={error} />
               <Button title="Send Report" big loading={busy} disabled={!reason} onPress={send} style={{ backgroundColor: Colors.danger }} />
+              {canBlock ? (
+                <Button
+                  title={blocked ? 'Blocked' : 'Block This Rider'}
+                  kind="secondary"
+                  disabled={blocked}
+                  accessibilityHint="Hides their messages from you. They aren’t told."
+                  onPress={() => confirmAndBlock(rider!.userId, rider!.name)}
+                />
+              ) : null}
               <Button title="Cancel" kind="ghost" onPress={close} />
             </>
           )}
