@@ -27,7 +27,11 @@ export type Place = {
   state: string | null;
   /** The street address, when OpenStreetMap has one: "501 Congress Avenue". */
   address: string | null;
+  /** How far a park, forest or town reaches, when OpenStreetMap knows: frames the whole area on a map. */
+  bounds?: Bounds | null;
 };
+
+export type Bounds = { north: number; south: number; east: number; west: number };
 
 /** "38.5733, -109.5498" typed into the search box is a place too. */
 export function parseCoords(q: string): LatLng | null {
@@ -110,8 +114,17 @@ type PhotonFeature = {
     county?: string;
     state?: string;
     countrycode?: string;
+    /** [west, north, east, south] for places that are an area, not a point. */
+    extent?: [number, number, number, number];
   };
 };
+
+/** Photon's extent as map bounds; anything malformed or flat is ignored. */
+function boundsOf(e: unknown): Bounds | null {
+  if (!Array.isArray(e) || e.length !== 4 || !e.every((n) => typeof n === 'number' && Number.isFinite(n))) return null;
+  const [west, north, east, south] = e as number[];
+  return north > south && east > west ? { north, south, east, west } : null;
+}
 
 /** A Photon answer as places: named ones only, the same place listed once. */
 export function parsePlaces(json: unknown): Place[] {
@@ -139,6 +152,7 @@ export function parsePlaces(json: unknown): Place[] {
       lng,
       state: normalizeState(p.state),
       address: named ? address : null,
+      bounds: boundsOf(p.extent),
     };
     // OpenStreetMap often draws one trail or parking lot as several pieces with the same name.
     const twin = out.find((o) => o.name.toLowerCase() === name.toLowerCase() && o.kind === kind && distanceM(o, place) < 8000);

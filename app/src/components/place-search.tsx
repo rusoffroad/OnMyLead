@@ -1,16 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
-import { MIN_QUERY, placeDetail, PLACES_CREDIT, type Place } from '@/core/places';
-import { searchPlaces } from '@/lib/places';
+import { placeDetail, PLACES_CREDIT, type Place } from '@/core/places';
+import { usePlaceSearch } from '@/hooks/use-place-search';
 
-const WAIT_MS = 350;
-
-const iconFor = (p: Place): IconName => (p.kind === 'Trailhead' || p.kind === 'Trail' ? 'flag' : p.kind === 'Address' ? 'home' : 'pin');
+export const iconFor = (p: Place): IconName => (p.kind === 'Trailhead' || p.kind === 'Trail' ? 'flag' : p.kind === 'Address' ? 'home' : 'pin');
 
 /**
  * A search box for parks, trailheads, towns, landmarks and street addresses. Results drop down under it as
@@ -30,41 +28,8 @@ export function PlaceSearch({
 }) {
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState<string | null>(null);
-  // The latest answer, kept with the words it answers, so a stale one never shows.
-  const [result, setResult] = useState<{ q: string; places: Place[] | null; error: string | null } | null>(null);
   const [focused, setFocused] = useState(false);
-  const nearRef = useRef(near);
-  useEffect(() => {
-    nearRef.current = near;
-  });
-
-  const q = query.trim();
-  const searching = q !== picked && q.length >= MIN_QUERY;
-  const answer = searching && result?.q === q ? result : null;
-  const busy = searching && !answer;
-  const places = answer?.places ?? null;
-  const error = answer?.error ?? null;
-
-  useEffect(() => {
-    if (!searching) return;
-    const ctl = new AbortController();
-    const t = setTimeout(() => {
-      searchPlaces(q, nearRef.current ?? null, ctl.signal)
-        .then((found) => setResult({ q, places: found, error: null }))
-        .catch((e) => {
-          if (ctl.signal.aborted) return;
-          setResult({
-            q,
-            places: null,
-            error: e instanceof Error && e.message.startsWith('Place search') ? e.message : 'No signal for place search. Try again with service.',
-          });
-        });
-    }, WAIT_MS);
-    return () => {
-      clearTimeout(t);
-      ctl.abort();
-    };
-  }, [q, searching]);
+  const { q, busy, places, error } = usePlaceSearch(query, near, query.trim() !== picked);
 
   const pick = (p: Place) => {
     setPicked(p.name);
