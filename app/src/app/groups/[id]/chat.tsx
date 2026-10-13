@@ -1,5 +1,5 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
 } from 'react-native';
@@ -7,14 +7,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
+import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { withoutBlocked } from '@/core/blocks';
 import { checkMessage, MAX_MESSAGE_LENGTH } from '@/core/chat';
 import {
   NOT_SWITCHED_ON, ridePhase, ridesTalkedAbout, rideWhen, talkableRides, threadRows, type ChatRide, type GroupMessage, type RidePhase,
 } from '@/core/group-chat';
 import { useGroupChat } from '@/hooks/use-group-chat';
+import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { myGroupChats, myJoinedRides, setGroupChatMuted, setOpenGroupChat } from '@/lib/group-chat';
 import { getGroup, type RidingGroup } from '@/lib/groups';
@@ -31,7 +34,8 @@ const STARTERS = ['Who’s in this weekend?', 'Anyone need a spot on a trailer?'
 /**
  * A riding group's chat: a group text for everyone in the group. A message can be about one of
  * your rides (riding now, coming up, or just done), and the strip at the top narrows the chat to
- * the talk about one ride.
+ * the talk about one ride. A long press on someone else's message offers Report Rider and Block
+ * Rider (and Clear, for whoever runs the group); messages from blocked riders aren't shown.
  */
 export default function GroupChat() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -45,7 +49,11 @@ export default function GroupChat() {
   const [picking, setPicking] = useState(false);
   const [draft, setDraft] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
   const chat = useGroupChat(id);
+  const blocks = useBlocks();
+  const messages = useMemo(() => withoutBlocked(chat.messages, blocks.ids, me), [chat.messages, blocks.ids, me]);
   const scroller = useRef<ScrollView>(null);
 
   useFocusEffect(
@@ -66,8 +74,8 @@ export default function GroupChat() {
 
   // Every ride a ticket can show: the ones the chat links to, plus my own for the composer.
   const rideById = useMemo(() => new Map([...mine, ...chat.rides].map((r) => [r.id, r])), [mine, chat.rides]);
-  const talkedAbout = useMemo(() => ridesTalkedAbout(chat.messages, [...rideById.values()]), [chat.messages, rideById]);
-  const shown = focusRide ? chat.messages.filter((m) => m.ride_id === focusRide) : chat.messages;
+  const talkedAbout = useMemo(() => ridesTalkedAbout(messages, [...rideById.values()]), [messages, rideById]);
+  const shown = focusRide ? messages.filter((m) => m.ride_id === focusRide) : messages;
   const rows = threadRows(shown);
   const myLatestId = [...chat.messages].reverse().find((m) => m.user_id === me)?.id;
   const about = aboutRide ? rideById.get(aboutRide) ?? null : null;
@@ -88,6 +96,7 @@ export default function GroupChat() {
   }
 
   async function clear(m: GroupMessage) {
+    setMenuFor(null);
     const theirs = m.user_id !== me;
     const ok = await confirmAsync(
       'Clear This Message?',
@@ -181,7 +190,7 @@ export default function GroupChat() {
             </View>
           ) : null}
 
-          {chat.loaded && !chat.off && !chat.messages.length && !chat.pending.length ? (
+          {chat.loaded && !chat.off && !messages.length && !chat.pending.length ? (
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>Start the Conversation</Text>
               <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 300 }}>
@@ -207,6 +216,7 @@ export default function GroupChat() {
             const self = m.user_id === me;
             const ride = m.ride_id ? rideById.get(m.ride_id) : null;
             const canClear = self || ownerId === me;
+            const menuOpen = menuFor === m.id;
             return (
               <View key={m.id}>
                 {day ? <Text style={styles.day}>{day}</Text> : null}
@@ -222,9 +232,9 @@ export default function GroupChat() {
                       <RideTicket ride={ride} compact onPress={() => focusOn(ride.id)} accessibilityRole="button" />
                     ) : null}
                     <Pressable
-                      onLongPress={canClear ? () => clear(m) : undefined}
+                      onLongPress={self ? () => clear(m) : () => setMenuFor(menuOpen ? null : m.id)}
                       delayLongPress={350}
-                      accessibilityHint={canClear ? 'Long press to clear it' : undefined}
+                      accessibilityHint={self ? 'Long press to clear it' : 'Long press to report or block this rider'}
                       style={[
                         styles.bubble,
                         self ? styles.bubbleMine : styles.bubbleTheirs,
@@ -232,6 +242,35 @@ export default function GroupChat() {
                       ]}>
                       <Text style={[styles.body, self && { color: '#fff' }]}>{m.body}</Text>
                     </Pressable>
+                    {menuOpen ? (
+                      <View style={styles.menu}>
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={() => {
+                            setMenuFor(null);
+                            setReporting({ kind: 'rider', userId: m.user_id, rideId: m.ride_id, name: nameOf(m.user_id) });
+                          }}
+                          style={styles.smallBtn}>
+                          <Text style={styles.smallBtnText}>Report Rider</Text>
+                        </Pressable>
+                        {!blocks.off ? (
+                          <Pressable
+                            accessibilityRole="button"
+                            onPress={() => {
+                              setMenuFor(null);
+                              confirmAndBlock(m.user_id, nameOf(m.user_id));
+                            }}
+                            style={styles.smallBtn}>
+                            <Text style={styles.smallBtnText}>Block Rider</Text>
+                          </Pressable>
+                        ) : null}
+                        {canClear ? (
+                          <Pressable accessibilityRole="button" onPress={() => clear(m)} style={styles.smallBtn}>
+                            <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>Clear</Text>
+                          </Pressable>
+                        ) : null}
+                      </View>
+                    ) : null}
                     {lastInRun ? (
                       <View style={styles.meta}>
                         <Text style={styles.time}>{clock(m.sent_at)}</Text>
@@ -350,6 +389,7 @@ export default function GroupChat() {
           </View>
         ) : null}
       </KeyboardAvoidingView>
+      <ReportSheet target={reporting} onClose={() => setReporting(null)} />
     </SafeAreaView>
   );
 }
@@ -436,6 +476,7 @@ const styles = StyleSheet.create({
   failText: { color: Colors.danger, fontFamily: font(600), fontSize: 13 },
   smallBtn: { minHeight: 36, paddingHorizontal: 14, borderRadius: Radius.pill, backgroundColor: Colors.backgroundSelected, justifyContent: 'center' },
   smallBtnText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
+  menu: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   note: {
     backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky,
     padding: Spacing.three, gap: 4, marginTop: Spacing.three,

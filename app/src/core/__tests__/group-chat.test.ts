@@ -84,6 +84,8 @@ describe('group chat', () => {
     expect(previewLine({ last_body: 'Hi', last_user_id: 'me' }, 'me', () => 'X')).toBe('You: Hi');
     expect(previewLine({ last_body: 'Hi', last_user_id: 'u' }, 'me', () => 'Dusty')).toBe('Dusty: Hi');
     expect(previewLine({ last_body: null, last_user_id: null }, 'me', () => 'X')).toBeNull();
+    expect(previewLine({ last_body: 'Hi', last_user_id: 'u' }, 'me', () => 'Dusty', new Set(['u']))).toBeNull();
+    expect(previewLine({ last_body: 'Hi', last_user_id: 'me' }, 'me', () => 'X', new Set(['me']))).toBe('You: Hi');
   });
 
   it('knows when the server update is missing', () => {

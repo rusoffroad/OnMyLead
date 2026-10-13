@@ -204,8 +204,15 @@ export function unreadLabel(n: number): string | null {
   return n > 99 ? '99+ New' : `${n} New`;
 }
 
-/** The preview line under a group: "You: See you there" or "Dusty: Count me in". */
-export function previewLine(s: Pick<GroupChatSummary, 'last_body' | 'last_user_id'>, me: string | null | undefined, nameOf: (id: string) => string): string | null {
+/**
+ * The preview line under a group: "You: See you there" or "Dusty: Count me in". Nothing when the
+ * newest message is from a rider I blocked.
+ */
+export function previewLine(
+  s: Pick<GroupChatSummary, 'last_body' | 'last_user_id'>, me: string | null | undefined, nameOf: (id: string) => string,
+  blocked?: ReadonlySet<string>,
+): string | null {
   if (!s.last_body || !s.last_user_id) return null;
+  if (s.last_user_id !== me && blocked?.has(s.last_user_id)) return null;
   return `${s.last_user_id === me ? 'You' : nameOf(s.last_user_id)}: ${s.last_body}`;
 }

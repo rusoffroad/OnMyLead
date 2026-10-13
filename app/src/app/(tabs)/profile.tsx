@@ -13,6 +13,7 @@ import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
 import { myRideName, requestAccountDeletion } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
+import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { setMapsPreference, useMapsPreference } from '@/lib/directions';
 import { useEntitlements } from '@/lib/entitlements';
@@ -34,6 +35,7 @@ export default function You() {
   const tripsOn = useFlag('trip_planner');
   const starlinkOn = useFlag('starlink');
   const offlineMaps = useOfflineMaps();
+  const blocks = useBlocks();
 
   useFocusEffect(
     useCallback(() => {
@@ -47,6 +49,9 @@ export default function You() {
     ? `${offlineMaps.length === 1 ? '1 map' : `${offlineMaps.length} maps`}, ${formatBytes(offlineMaps.reduce((n, m) => n + m.bytes, 0))}`
     : 'For riding with no signal';
   const subscriptionSummary = ent.switchedOn ? planHeadline(ent) : 'Pro, Restore Purchases and Promo Codes';
+  const blockedSummary = blocks.list.length
+    ? `${blocks.list.length === 1 ? '1 rider' : `${blocks.list.length} riders`}. They aren’t told.`
+    : 'Riders whose messages you don’t see';
   const directionsSummary = mapsPref === 'ask' ? 'Ask each time' : MAPS_APP_LABEL[mapsPref];
   const needsAccount = (href: Parameters<typeof router.push>[0]) => () => router.push(session ? href : '/sign-in');
 
@@ -99,6 +104,7 @@ export default function You() {
             ) : null}
           </MenuRow>
           <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
+          <MenuRow icon="block" color={Colors.danger} title="Blocked Riders" detail={blockedSummary} onPress={() => router.push('/blocked')} />
           {ent.accountType === 'admin' ? (
             <MenuRow
               icon="lock"
