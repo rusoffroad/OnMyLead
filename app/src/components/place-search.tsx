@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
+import { TextBox } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
@@ -42,7 +43,7 @@ export function PlaceSearch({
       <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{label}</ThemedText>
       <View style={[styles.box, { borderColor: focused ? Colors.sky : 'transparent' }]}>
         <Icon name="search" size={20} color={Colors.textSecondary} />
-        <TextInput
+        <TextBox
           value={query}
           onChangeText={(t) => {
             setQuery(t);
@@ -50,7 +51,6 @@ export function PlaceSearch({
           }}
           placeholder={placeholder}
           placeholderTextColor="#5F7190"
-          keyboardAppearance="dark"
           selectionColor={Colors.sky}
           returnKeyType="search"
           autoCorrect={false}

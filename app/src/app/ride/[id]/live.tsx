@@ -12,6 +12,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DirectionsSheet } from '@/components/directions';
 import { GroupMap, type MapRider } from '@/components/group-map';
 import { Icon } from '@/components/icon';
+import { KeyboardLift } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
 import { RiderList } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
@@ -1009,6 +1010,7 @@ export default function RideMode() {
 
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <View style={styles.sheetWrap}>
+          <KeyboardLift>
           <View style={styles.sheet}>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Share Your Location with This Ride?</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
@@ -1017,6 +1019,7 @@ export default function RideMode() {
             <SharePicker options={RIDE_SHARE_OPTIONS_MIN} openLabel="Until I Leave the Ride" onPick={beginShare} busy={busy} />
             <Button title="Not Now" kind="secondary" onPress={() => setAskShare(false)} />
           </View>
+          </KeyboardLift>
         </View>
       </Modal>
 

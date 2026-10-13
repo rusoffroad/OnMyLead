@@ -1,9 +1,10 @@
 import { router, useFocusEffect } from 'expo-router';
 import { type ReactElement, useCallback, useState } from 'react';
-import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppNotices } from '@/components/app-notices';
 import { Icon, type IconName } from '@/components/icon';
+import { TextBox } from '@/components/keyboard';
 import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
 import { RideRow, RowGroup } from '@/components/ride-row';
@@ -185,7 +186,7 @@ export default function Home() {
 
       {joining ? (
         <View style={[styles.join, { backgroundColor: theme.backgroundElement, borderColor: theme.sky }]}>
-          <TextInput
+          <TextBox
             value={code}
             onChangeText={setCode}
             onSubmitEditing={openCode}
@@ -193,7 +194,6 @@ export default function Home() {
             autoCapitalize="characters"
             autoCorrect={false}
             returnKeyType="go"
-            keyboardAppearance="dark"
             placeholder="Invite code, e.g. 7F3A9C21"
             placeholderTextColor={theme.textSecondary}
             selectionColor={theme.sky}

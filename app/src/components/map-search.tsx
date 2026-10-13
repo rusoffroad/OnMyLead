@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ActivityIndicator, Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Keyboard, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { iconFor } from '@/components/place-search';
 import { Colors, font, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
@@ -27,13 +28,12 @@ export function MapSearch({ near, onPick, onClose }: { near?: LatLng | null; onP
     <View>
       <View style={styles.row}>
         <Icon name="search" size={20} color={Colors.textSecondary} />
-        <TextInput
+        <TextBox
           value={query}
           onChangeText={setQuery}
           autoFocus
           placeholder="Trailhead, park, area or town"
           placeholderTextColor="#5F7190"
-          keyboardAppearance="dark"
           selectionColor={Colors.sky}
           returnKeyType="search"
           autoCorrect={false}
@@ -60,7 +60,7 @@ export function MapSearch({ near, onPick, onClose }: { near?: LatLng | null; onP
             <Text style={styles.note}>Nothing found for “{q}”. Try the full name or a nearby town.</Text>
           ) : null}
           {places?.length ? (
-            <ScrollView style={{ maxHeight: 300 }} keyboardShouldPersistTaps="handled" accessibilityRole="list">
+            <ScrollView style={{ maxHeight: 300 }} {...keyboardScroll} accessibilityRole="list">
               {places.map((p, i) => {
                 const trail = iconFor(p) === 'flag';
                 return (
