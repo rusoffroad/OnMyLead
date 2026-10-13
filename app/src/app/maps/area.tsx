@@ -1,16 +1,18 @@
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AreaPickerMap } from '@/components/area-picker-map';
 import { SAND } from '@/components/offline-map-ui';
+import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button } from '@/components/ui';
 import { Colors, font, Radius } from '@/constants/theme';
 import { formatBoxMiles, formatBytes, OFFLINE_CHOICES, type OfflineChoice } from '@/core/offline-maps';
 import type { Box } from '@/core/trails';
+import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { downloadArea, planArea } from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
@@ -26,6 +28,8 @@ export default function PickArea() {
   const [choices, setChoices] = useState<OfflineChoice[]>(OFFLINE_CHOICES.map((c) => c.id));
   const [panelH, setPanelH] = useState(300);
   const [starting, setStarting] = useState(false);
+  // Swipe the panel down (or tap its handle) to fold the choices away: the frame grows into the room.
+  const fold = usePanelFold('mapArea.panelOpen.v1');
 
   // Start where the rider is: the last known fix is instant and good enough to frame a map.
   useEffect(() => {
@@ -92,23 +96,30 @@ export default function PickArea() {
         </View>
       </SafeAreaView>
 
-      <SafeAreaView edges={['bottom']} style={styles.panel} onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}>
-        <Text style={styles.hint}>Move and zoom the map until the frame holds the area you’ll ride.</Text>
-        <View style={styles.chips} accessibilityRole="none">
-          {OFFLINE_CHOICES.map((c) => {
-            const on = choices.includes(c.id);
-            return (
-              <Pressable
-                key={c.id}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: on }}
-                onPress={() => toggle(c.id)}
-                style={[styles.chip, on && styles.chipOn]}>
-                <Text style={[styles.chipText, on && { color: Colors.background }]}>{on ? `✓ ${c.label}` : c.label}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+      <Animated.View
+        {...fold.panHandlers}
+        style={[styles.panel, { transform: [{ translateY: fold.drag }] }]}
+        onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}>
+      <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 8 }]}>
+        <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Map Choices" />
+        {fold.open ? <Text style={styles.hint}>Move and zoom the map until the frame holds the area you’ll ride.</Text> : null}
+        {fold.open ? (
+          <View style={styles.chips} accessibilityRole="none">
+            {OFFLINE_CHOICES.map((c) => {
+              const on = choices.includes(c.id);
+              return (
+                <Pressable
+                  key={c.id}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: on }}
+                  onPress={() => toggle(c.id)}
+                  style={[styles.chip, on && styles.chipOn]}>
+                  <Text style={[styles.chipText, on && { color: Colors.background }]}>{on ? `✓ ${c.label}` : c.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : null}
         <View style={styles.estimate}>
           {!box ? (
             <ActivityIndicator color={SAND} />
@@ -125,6 +136,7 @@ export default function PickArea() {
         </View>
         <Button title="Download This Area" big loading={starting} disabled={!plan || tooBig || !choices.length} onPress={download} />
       </SafeAreaView>
+      </Animated.View>
     </View>
   );
 }
@@ -169,10 +181,11 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12 },
   topText: { color: Colors.text, fontFamily: font(700), fontSize: 17 },
   panel: {
-    position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 16, paddingTop: 16, gap: 12,
+    position: 'absolute', left: 0, right: 0, bottom: 0,
     backgroundColor: Colors.background, borderTopLeftRadius: Radius.card, borderTopRightRadius: Radius.card,
     borderTopWidth: 1, borderColor: Colors.border,
   },
+  panelInner: { paddingHorizontal: 16, paddingTop: 2, gap: 12 },
   hint: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14, lineHeight: 19 },
   chips: { flexDirection: 'row', gap: 8 },
   chip: {
