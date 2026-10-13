@@ -106,6 +106,7 @@ function RootLayout() {
         <Stack.Screen name="terms" options={{ title: '' }} />
         <Stack.Screen name="privacy" options={{ title: '' }} />
         <Stack.Screen name="support" options={{ title: '' }} />
+        <Stack.Screen name="contact" options={{ title: '' }} />
         <Stack.Screen name="admin" options={{ title: 'OnMyLead Admin', headerShown: false }} />
       </Stack>
       <MessageAlerts />

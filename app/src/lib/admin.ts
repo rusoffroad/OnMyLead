@@ -197,6 +197,18 @@ export const reports = (status: 'open' | 'resolved' | 'dismissed' | 'all', page:
 export const resolveReport = (id: string, status: ReportStatus, note?: string) =>
   adminRpc<void>('admin_resolve_report', { p_id: id, p_status: status, p_note: note ?? null });
 
+export type ContactStatus = 'new' | 'replied' | 'closed';
+export type ContactRow = {
+  id: string; created_at: string; source: 'website' | 'app'; topic: string; name: string | null; email: string; message: string;
+  user_id: string | null; user_name: string | null; platform: string | null; app_version: string | null;
+  status: ContactStatus; emailed_at: string | null; email_note: string | null; handled_at: string | null;
+};
+// Shapes match supabase/migrations/20261023000000_contact_messages.sql.
+export const contactMessages = (status: ContactStatus | 'all', page: number, pageSize = 50) =>
+  adminRpc<Page<ContactRow> & { new: number }>('admin_contact_messages', { p_status: status, p_page: page, p_page_size: pageSize });
+export const setContactStatus = (id: string, status: ContactStatus) =>
+  adminRpc<void>('admin_set_contact_status', { p_id: id, p_status: status });
+
 export type FeaturePlan = { feature: string; min_plan: 'free' | 'pro'; free_monthly_allowance: number | null };
 export type SettingsData = { settings: Record<string, { value: unknown; updated_at: string }>; feature_plans: FeaturePlan[] };
 export const settings = () => adminRpc<SettingsData>('admin_settings');

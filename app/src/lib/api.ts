@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
 import { fuzzLocation, type LatLng } from '@/core/geo';
@@ -6,6 +8,8 @@ import type { BubblePreset } from '@/core/bubble';
 import { isDuplicateSend, type Receipt } from '@/core/broadcast';
 import { friendlyCancelError } from '@/core/cancel';
 import type { ChatMessage, MessageAudience, MessageKind } from '@/core/chat';
+import type { ContactTopic } from '@/core/contact';
+import { SUPPORT_EMAIL } from '@/constants/site';
 import type { PollVote } from '@/core/polls';
 import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
@@ -867,4 +871,36 @@ export async function requestAccountDeletion(reason?: string) {
   const { error } = await supabase.rpc('request_account_deletion', { p_reason: reason ?? null });
   if (error) throw new Error(error.message);
   track('account_deletion_requested');
+}
+
+/**
+ * Sends a contact form message (onmylead.com/contact, You > Contact Us). It is saved for the owner
+ * even when email is off. Works signed out on the website; a signed-in rider's account is linked.
+ */
+export async function sendContactMessage(m: {
+  topic: ContactTopic; name: string; email: string; message: string; elapsedMs: number; website?: string;
+}): Promise<void> {
+  const app = Platform.OS !== 'web';
+  const { error } = await supabase.functions.invoke('contact-form', {
+    body: {
+      source: app ? 'app' : 'website',
+      topic: m.topic, name: m.name, email: m.email, message: m.message,
+      platform: app ? `${Platform.OS === 'ios' ? 'iOS' : 'Android'} ${String(Platform.Version)}` : null,
+      app_version: app ? (Constants.expoConfig?.version ?? null) : null,
+      elapsed_ms: m.elapsedMs, website: m.website ?? '',
+    },
+  });
+  if (error) {
+    const ctx = (error as { context?: Response }).context;
+    if (ctx?.status === 404) throw new Error('Messages can’t be sent from here yet. Email ' + SUPPORT_EMAIL + ' instead.');
+    let message = 'We couldn’t send that. Check your connection and try again.';
+    try {
+      const j = await ctx?.json();
+      if (j?.error) message = j.error;
+    } catch {
+      // keep the generic message
+    }
+    throw new Error(message);
+  }
+  track('contact_sent', { topic: m.topic });
 }
