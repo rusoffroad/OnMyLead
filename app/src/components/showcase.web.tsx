@@ -3,6 +3,8 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
+import type { SocialProvider } from '@/core/auth-link';
+import { useSocialProviders } from '@/lib/session';
 
 /**
  * onmylead.com for signed-out visitors: what the iPhone app does, how a group ride works, and what
@@ -15,6 +17,8 @@ import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/const
 type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy' | '/support';
 
 export function Showcase() {
+  // Only the sign-in choices that are switched on, so the page never promises one that isn't.
+  const signUpWith = signUpChoices(useSocialProviders('ios'));
   const scroller = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -286,6 +290,7 @@ export function Showcase() {
               </>
             )}
           </div>
+          {signUpWith ? <p className="download-account">Make your account in seconds with {signUpWith}.</p> : null}
           <p className="download-sign">
             Already riding with OnMyLead? <a href="/sign-in" onClick={go('/sign-in')}>Sign In</a>
           </p>
@@ -852,6 +857,8 @@ const CSS = `
 .download-actions { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 14px; margin-top: 36px; }
 .soon { display: inline-flex; align-items: center; min-height: 64px; padding: 0 28px; border-radius: 16px; border: 2px dashed rgba(241, 244, 248, 0.5);
   background: rgba(10, 22, 38, 0.5); color: var(--text); font-family: ${display}; font-size: 24px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.download-account { margin-top: 26px !important; color: #DCE3EC; font-size: 17px; }
+.download-account + .download-sign { margin-top: 8px !important; }
 .download-sign { margin-top: 26px !important; color: #DCE3EC; font-size: 17px; }
 .download-sign a { color: #fff; font-family: ${body7}; }
 
@@ -939,3 +946,11 @@ const CSS = `
   .oml * { transition: none !important; animation: none !important; }
 }
 `;
+
+const PROVIDER_NAMES: Record<SocialProvider, string> = { apple: 'Apple', google: 'Google', facebook: 'Facebook' };
+
+/** "Apple, Google, Facebook or your email", or null before any social sign-in is switched on. */
+function signUpChoices(providers: SocialProvider[]): string | null {
+  if (!providers.length) return null;
+  return `${providers.map((p) => PROVIDER_NAMES[p]).join(', ')} or your email`;
+}

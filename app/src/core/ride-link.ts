@@ -11,8 +11,11 @@ export const SITE_URL = 'https://onmylead.com';
 /** Team ID + bundle ID, as Apple checks it against the site's association file. */
 export const APPLE_APP_ID = 'YJ4KUF2QQV.com.rusoffroad.onmylead.app';
 
-/** Paths on the site that open in the app when it is installed: rides and riding groups. */
-export const APP_LINK_PATHS = ['/r/*', '/g/*'] as const;
+/**
+ * Paths on the site that open in the app when it is installed: rides, riding groups, and the links
+ * in our own sign-in emails (only those carrying a token_hash; see core/auth-link.ts).
+ */
+export const APP_LINK_PATHS = ['/r/*', '/g/*', '/auth-callback'] as const;
 
 /** https://onmylead.com/r/CODE (or the configured web address). */
 export function rideLink(inviteCode: string, webUrl?: string | null): string {

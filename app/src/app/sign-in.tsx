@@ -1,29 +1,25 @@
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 
 import { Logo } from '@/components/logo';
+import { SocialButton } from '@/components/social-button';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Field, Screen, Segmented } from '@/components/ui';
-import { Colors } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { track } from '@/lib/analytics';
+import { signInWithApple } from '@/lib/apple-sign-in';
 import {
   sendCode,
   sendPasswordReset,
   signInWithPassword,
   signInWithProvider,
   signUpWithPassword,
+  useSocialProviders,
   type SocialProvider,
 } from '@/lib/session';
 
 type Mode = 'sign_in' | 'create';
-
-// Social buttons only show once each provider is set up in Supabase,
-// e.g. EXPO_PUBLIC_SOCIAL_PROVIDERS=apple,google,facebook
-const ENABLED_SOCIAL = (process.env.EXPO_PUBLIC_SOCIAL_PROVIDERS ?? '')
-  .split(',')
-  .map((s) => s.trim())
-  .filter(Boolean);
 
 export default function SignIn() {
   const params = useLocalSearchParams<{ mode?: string; next?: string }>();
@@ -70,21 +66,16 @@ export default function SignIn() {
       done();
     });
 
+  // Only the providers switched on in Supabase show (Apple first, as Apple's guideline 4.8 expects).
+  const providers = useSocialProviders();
   const social = (p: SocialProvider) =>
     run(p, async () => {
-      await signInWithProvider(p);
+      // The website leaves for the provider's page here and comes back on /auth-callback.
+      const result = p === 'apple' && Platform.OS === 'ios' ? await signInWithApple() : await signInWithProvider(p);
+      if (result !== 'signed_in') return;
       track('sign_in', { method: p });
       done();
     });
-
-  // Apple's rules expect Sign in with Apple wherever Google or Facebook sign-in is offered.
-  const providers = (
-    [
-      { id: 'apple', title: 'Continue with Apple' },
-      { id: 'google', title: 'Continue with Google' },
-      { id: 'facebook', title: 'Continue with Facebook' },
-    ] as { id: SocialProvider; title: string }[]
-  ).filter((p) => ENABLED_SOCIAL.includes(p.id) && !(p.id === 'apple' && Platform.OS === 'android'));
 
   return (
     <Screen>
@@ -101,6 +92,21 @@ export default function SignIn() {
           { value: 'create', label: 'Create Account' },
         ]}
       />
+
+      {providers.length ? (
+        <>
+          <View style={{ gap: Spacing.two }}>
+            {providers.map((p) => (
+              <SocialButton key={p} provider={p} loading={busy === p} disabled={!!busy && busy !== p} onPress={() => social(p)} />
+            ))}
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }} accessibilityRole="text">
+            <View style={{ flex: 1, height: 1, backgroundColor: Colors.border }} />
+            <ThemedText type="small" themeColor="textSecondary">{mode === 'create' ? 'Or Create One With Your Email' : 'Or Use Your Email'}</ThemedText>
+            <View style={{ flex: 1, height: 1, backgroundColor: Colors.border }} />
+          </View>
+        </>
+      ) : null}
 
       {mode === 'create' ? (
         <Field label="Your Name" value={name} onChangeText={setName} placeholder="What riders will see" autoComplete="name" />
@@ -170,14 +176,6 @@ export default function SignIn() {
       ) : null}
       <ErrorText error={error} />
 
-      {providers.length ? (
-        <>
-          <ThemedText themeColor="textSecondary">or</ThemedText>
-          {providers.map((p) => (
-            <Button key={p.id} title={p.title} kind="secondary" loading={busy === p.id} onPress={() => social(p.id)} />
-          ))}
-        </>
-      ) : null}
     </Screen>
   );
 }
