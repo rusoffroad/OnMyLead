@@ -44,12 +44,7 @@ export async function registerForPush(userId: string): Promise<void> {
     let { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') ({ status } = await Notifications.requestPermissionsAsync());
     if (status !== 'granted') return;
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('ride-chat', {
-        name: 'Ride Chat',
-        importance: Notifications.AndroidImportance.HIGH,
-      });
-    }
+    if (Platform.OS === 'android') await createAndroidChannels();
     const { data: token } = await Notifications.getDevicePushTokenAsync();
     if (typeof token !== 'string' || !token) return;
     // Fails harmlessly until the database has the push update.
@@ -57,6 +52,28 @@ export async function registerForPush(userId: string): Promise<void> {
   } catch {
     // No push entitlement (free Apple ID build), no network, or no backend support yet.
   }
+}
+
+/**
+ * Android groups notifications into channels the rider can tune in the phone's settings. The
+ * server picks one per push (supabase/functions/_shared/fcm.ts channelFor); keep the ids in step.
+ */
+async function createAndroidChannels() {
+  const high = Notifications.AndroidImportance.HIGH;
+  await Promise.all([
+    Notifications.setNotificationChannelAsync('ride-alerts', {
+      name: 'Rider Alerts',
+      description: 'Need Help, EMERGENCY and other status taps from your group.',
+      importance: Notifications.AndroidImportance.MAX,
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    }),
+    Notifications.setNotificationChannelAsync('ride-chat', { name: 'Ride Chat', description: 'Messages in ride and group chats.', importance: high }),
+    Notifications.setNotificationChannelAsync('ride-updates', {
+      name: 'Ride Updates',
+      description: 'Ride changes, new riders, invites, reminders and account notices.',
+      importance: Notifications.AndroidImportance.DEFAULT,
+    }),
+  ]);
 }
 
 /** Forget the registration so the next sign-in registers again. */
@@ -117,7 +134,7 @@ export function useRideChangeReminders() {
 
 export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unsupported';
 
-/** Whether iOS lets OnMyLead show notifications at all. */
+/** Whether the phone lets OnMyLead show notifications at all. */
 export async function pushPermission(): Promise<PushPermission> {
   try {
     const p = await Notifications.getPermissionsAsync();
@@ -128,7 +145,7 @@ export async function pushPermission(): Promise<PushPermission> {
   }
 }
 
-/** Ask iOS for permission, then register this phone. */
+/** Ask the phone for permission, then register it. */
 export async function askPushPermission(userId: string): Promise<PushPermission> {
   try {
     await Notifications.requestPermissionsAsync();
@@ -164,7 +181,7 @@ export async function syncRideReminders(minutesBefore: number | null): Promise<v
       await Notifications.scheduleNotificationAsync({
         identifier: REMINDER_PREFIX + r.rideId,
         content: { title: r.title, body: r.body, sound: 'default', data: { type: 'reminder', rideId: r.rideId, inviteCode: byId.get(r.rideId)?.invite_code ?? null } },
-        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: r.at },
+        trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: r.at, channelId: 'ride-updates' },
       });
     }
   } catch {

@@ -91,7 +91,7 @@ You don't need to do anything. The app checks for a connection while a map is op
 
 - A **No Signal** tag with **Downloaded Map** appears under the layers button.
 - The map shows what's saved on your phone. Zoomed in past what you saved, it stretches the closest saved detail.
-- The satellite view switches to USGS aerial photos from your download, since Apple's satellite view can't be saved ahead of time.
+- The satellite view switches to USGS aerial photos from your download, since the live satellite view can't be saved ahead of time.
 
 The ride's route and waypoints are saved on your phone once you've opened the ride, so they're still on the map too.
 

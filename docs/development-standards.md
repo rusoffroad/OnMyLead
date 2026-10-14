@@ -73,8 +73,8 @@ Keep screens shared. When a device needs different native behavior, put it behin
 | Push | APNs direct (`notify-ride-message`) | FCM HTTP v1 from the same function |
 | Sign in with Apple | Native sheet | Web OAuth (Supabase) |
 | Google sign-in | Native iOS client | Android OAuth client (needs the app signing SHA-1) |
-| Background location | "Always" permission + background mode, blue pill | Foreground service with a visible notification; background permission asked separately in Settings (Android 11+) |
-| Maps | Apple Maps (react-native-maps) | Google Maps SDK (react-native-maps, needs a Maps API key) |
+| Background location | "Always" permission + background mode, blue pill | Foreground service (type location) with the visible Sharing Your Location notification, started by the rider; While Using permission is enough, so the app never requests `ACCESS_BACKGROUND_LOCATION` |
+| Maps | Apple Maps (react-native-maps) | Google Maps SDK (react-native-maps; key from `GOOGLE_MAPS_ANDROID_API_KEY` at prebuild, see `docs/android-build.md`) |
 | CarPlay / Android Auto | CarPlay behind `ONMYLEAD_CARPLAY=1` | Not built (exception) |
 | Starlink local status | Local network permission | Cleartext network security config for the dish |
 
@@ -92,10 +92,13 @@ Live rider tracking is the most important feature. On every device:
   know a dot is stale. Never imply live tracking works without a connection.
 - Stop automatically when the timer ends, the rider leaves, or the organizer ends the ride, on
   every platform, including after the app was killed.
-- **Android:** the foreground service notification is required while sharing; ask for background
-  location as a second step with an explanation screen (Android 11+ sends the rider to Settings);
-  handle battery optimization (Doze) by keeping the foreground service; Google Play requires a
-  background-location declaration and demo video.
+- **Android:** sharing runs in a foreground service the rider starts from the app, with the
+  Sharing Your Location notification showing the whole time. Android lets such a service use
+  While Using permission with the screen off, so the app asks only for While Using, never sends
+  riders to Settings for "Allow all the time", and blocks `ACCESS_BACKGROUND_LOCATION` in
+  `app.json`. That also means no Play background-location declaration. Keep it that way: start
+  sharing only from a foreground screen (`startLocationUpdatesAsync` with `foregroundService`
+  refuses otherwise). The foreground service also keeps Doze from stopping updates.
 - **iOS / iPadOS:** "Always" permission with the blue indicator; `pausesUpdatesAutomatically`
   stays off during a ride.
 - **Tablets may have no GPS.** Wi-Fi-only iPads and Android tablets get coarse, Wi-Fi-based

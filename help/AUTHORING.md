@@ -80,6 +80,10 @@ The website only shows what riders can actually use in the App Store version tha
 
 - Features that exist in code but are switched off or unreleased (CarPlay) are listed in
   `help/release.json` under `unreleased`. Never describe them as available.
+- Android steps that differ from iPhone go in a `:::release android` block. Android isn't on
+  Google Play yet, so these blocks never publish; the pull request that ships the first Android
+  release teaches the Help Center to show them. Words listed under `unreleased` (Android, Google
+  Play) are allowed inside release blocks, since those stay hidden until their release is live.
 
 ## Writing rules
 

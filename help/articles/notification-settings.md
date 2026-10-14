@@ -74,6 +74,10 @@ During quiet hours everything is held except help alerts. Until you change them,
 ## If Notifications Aren't Arriving
 
 - If you see **Notifications Are Off for OnMyLead**, your iPhone is blocking them. Tap **Open iPhone Settings** and turn on **Allow Notifications**.
+
+:::release android
+On Android, the button is **Open Settings**. Android also sorts OnMyLead's notifications into three categories you can tune in **Settings > Apps > OnMyLead > Notifications**: **Rider Alerts** (Need Help, EMERGENCY and other status taps, shown at the highest priority), **Ride Chat** (ride and group chat) and **Ride Updates** (ride changes, new riders, invites, reminders and account notices).
+:::
 - If you see **Let OnMyLead Send Notifications**, tap **Turn On Notifications** and allow them.
 - While OnMyLead is open, new ride chat messages pop up inside the app instead of as a banner.
 

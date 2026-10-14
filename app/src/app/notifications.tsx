@@ -82,7 +82,7 @@ export default function NotificationsScreen() {
           Your choices here apply on your phone too.
         </Note>
       ) : permission === 'denied' ? (
-        <Note tone="warn" title="Notifications Are Off for OnMyLead" action={{ title: 'Open iPhone Settings', onPress: openPhoneSettings }}>
+        <Note tone="warn" title="Notifications Are Off for OnMyLead" action={{ title: Platform.OS === 'android' ? 'Open Settings' : 'Open iPhone Settings', onPress: openPhoneSettings }}>
           Your phone is blocking them, so nothing below can reach you. Turn on Allow Notifications for OnMyLead.
         </Note>
       ) : permission === 'undetermined' && session ? (

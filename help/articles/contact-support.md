@@ -58,3 +58,7 @@ You can also email support@rusoffroad.com.
 ## Help and Support Page
 
 Under **Help** on the **You** tab, **Help and Support** has short answers to common questions about joining rides, location and battery, Pro, blocking and deleting your account.
+
+:::release android
+In the Android app, those answers give the Android steps where they differ, such as allowing location **While Using the App**.
+:::

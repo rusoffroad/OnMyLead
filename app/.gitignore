@@ -44,3 +44,7 @@ example
 
 # backend keys
 .env
+
+# Firebase config and service account keys stay on the Mac (docs/android-build.md)
+google-services.json
+*-service-account*.json

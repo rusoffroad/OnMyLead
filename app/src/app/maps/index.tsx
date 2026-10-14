@@ -106,7 +106,7 @@ export default function OfflineMaps() {
 
       <ThemedText type="small" themeColor="textSecondary">
         Maps come from free public sources: {IMAGERY_ATTRIBUTION}, USGS topo, USDA Forest Service MVUM and the Bureau of Land
-        Management. Satellite with no signal uses the USGS aerial photos, since Apple’s satellite view can’t be saved ahead of time.
+        Management. Satellite with no signal uses the USGS aerial photos, since the live satellite view can’t be saved ahead of time.
       </ThemedText>
     </Screen>
   );

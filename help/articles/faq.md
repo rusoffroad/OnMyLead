@@ -80,6 +80,10 @@ No. Positions only update when a phone has a connection. [Offline maps](/help/of
 
 Not yet. OnMyLead is an iPhone app. You can plan a ride on the website at onmylead.com, see [Create a Ride on the Website](/help/create-a-ride-on-the-website).
 
+:::release android
+OnMyLead is on Google Play for Android phones and tablets. iPhone and Android riders can join the same ride, see each other on the map and chat together.
+:::
+
 ## How Many Waypoints Can I Add?
 
 Each rider can add up to 100 waypoints to a ride. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).

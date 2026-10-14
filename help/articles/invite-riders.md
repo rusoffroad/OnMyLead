@@ -38,6 +38,10 @@ On the invite card, tap:
 
 The message includes the ride name, the link and the invite code. When your friend taps the link, the ride opens in OnMyLead if they have it, or on onmylead.com with a button to get the app.
 
+:::release android
+On Android, ride and riding group links open straight in the OnMyLead app once it's installed.
+:::
+
 ## Share the Code
 
 The **Invite Code** is shown in big letters on the card. Friends can type it on the **Rides** tab under **Join a Ride**. See [Join a Ride](/help/join-a-ride).

@@ -43,12 +43,12 @@ Android cell is at best 🟡.
 | F11 | Organizer controls: approvals, hand-off, leaders, tail gunner | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ organizer-controls | iOS 1.0 | Approval fix needs migration 20261025000000 applied |
 | F12 | Ride page, Ride Day weather, fuel check | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ✅ | ✅ ride-day-and-weather | iOS 1.0 | Tablet: details beside map |
 | F13 | Join: code, link, QR, waitlist, check-in | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ join-a-ride | iOS 1.0 | |
-| F14 | Universal / App Links (onmylead.com/r, /g) | ✅ | 🟡 | ⬜ | ⬜ | ➖ | ➖ | ✅ invite-riders | iOS 1.0 | Android: intent filters + assetlinks.json |
+| F14 | Universal / App Links (onmylead.com/r, /g) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ invite-riders | iOS 1.0 | Android: intent filters + `assetlinks.json` in PR #99; needs the signing SHA-256 fingerprints added to `app/public/.well-known/assetlinks.json` and a device check (`docs/android-build.md`). Email links (`/auth-callback`) stay in the browser on Android |
 | F15 | Invite card: share, text, email, QR | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ invite-riders | iOS 1.0 | |
 | F16 | Find a Ride (flag) | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ✅ | ✅ find-a-ride | iOS 1.0 | Android: map needs API key (F27) |
 | F17 | Ride Mode live map | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ➖ | ✅ ride-mode | iOS 1.0 | Tablet: sidebar riders + details over full map |
 | F18 | Live location sharing (foreground) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Cross-platform sync test not run yet |
-| F19 | Background location during a ride | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Android: 2-step background permission, Play declaration |
+| F19 | Background location during a ride | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Android (PR #99): foreground service with While Using permission, no `ACCESS_BACKGROUND_LOCATION` and so no Play background-location declaration. Needs a real-device check with the screen off |
 | F20 | Wi-Fi-only tablets (no GPS) | ➖ | ⬜ | ➖ | ⬜ | ✅ | ➖ | ⬜ | | Show approximate accuracy; follow without sharing |
 | F21 | Personal sharing, family link | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ family-link | iOS 1.0 | |
 | F22 | Freshness, Ride Bubble, convoy | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ ride-bubble | iOS 1.0 | |
@@ -56,7 +56,7 @@ Android cell is at best 🟡.
 | F24 | Ride chat (everyone / leader) | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ✅ | ✅ ride-chat | iOS 1.0 | Tablet: chat beside map |
 | F25 | Ride polls (flag) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-polls | iOS 1.0 | |
 | F26 | Route builder, trail snapping | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ➖ | ✅ route-builder | iOS 1.0 | Web has a wide layout to reuse |
-| F27 | Maps (satellite, topo, trails layers) | ✅ | 🟡 | ⬜ | ⬜ | ➖ | ➖ | ✅ map-layers | iOS 1.0 | Android: Google Maps API key missing |
+| F27 | Maps (satellite, topo, trails layers) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ map-layers | iOS 1.0 | Android: Google Maps SDK via react-native-maps, key from `GOOGLE_MAPS_ANDROID_API_KEY` at prebuild (PR #99, D05); blank until the key exists |
 | F28 | GPX import | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ import-gpx | iOS 1.0 | No GPX export anywhere |
 | F29 | Waypoints, planned stops | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ waypoints-and-planned-stops | iOS 1.0 | |
 | F30 | Directions hand-off | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ directions | iOS 1.0 | Android: Google Maps only |
@@ -69,7 +69,7 @@ Android cell is at best 🟡.
 | F37 | Starlink (flag) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ starlink | iOS 1.0 | Android network config exists, untested |
 | F38 | RUS gear (flag) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ rus-gear | iOS 1.0 | |
 | F39 | Ride summary, share card, ride again | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ ride-summary-and-ride-again | iOS 1.0 | |
-| F40 | Push notifications | ✅ | 🟡 | ⬜ | ⬜ | ⬜ | ✅ | ✅ notification-settings | iOS 1.0 | Backend sends APNs only; FCM sender + Firebase project needed |
+| F40 | Push notifications | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ notification-settings | iOS 1.0 | Android (PR #99): FCM v1 sender in `notify-ride-message` + three Android channels; needs Firebase (D06), `FCM_SERVICE_ACCOUNT` secret and a function deploy |
 | F41 | Notification settings, quiet hours | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ notification-settings | iOS 1.0 | Copy says "Open iPhone Settings" |
 | F42 | Pro subscription purchase | ✅ | 🟡 | ⬜ | ⬜ | ⬜ | ⬜ | ✅ subscribe-to-pro | iOS 1.0 | Apple only; Play Billing + play-verify + RTDN needed |
 | F43 | Restore, manage subscription | ✅ | 🟡 | ⬜ | ⬜ | ⬜ | ➖ | ✅ restore-purchases | iOS 1.0 | |
@@ -78,7 +78,7 @@ Android cell is at best 🟡.
 | F46 | Pro shared across devices | ✅ | 🟡 | 🟡 | 🟡 | ⬜ | ⬜ | ⬜ | | Apple Pro already works on any signed-in device; needs store-neutral entitlements + duplicate guard |
 | F47 | Contact form, support | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ contact-support | iOS 1.0 | |
 | F48 | CarPlay / Android Auto | ⬜ | ➖ | ⬜ | ➖ | ➖ | ➖ | ➖ | | Exception E01 |
-| F49 | Keyboard Done bar / dismiss | ✅ | 🟡 | ⬜ | ⬜ | ➖ | ➖ | ➖ | iOS 1.0 | Done bar is iOS-only; Android dismiss needs a check |
+| F49 | Keyboard Done bar / dismiss | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ➖ | iOS 1.0 | Done bar is iOS-only; Android closes with Back, a drag on lists or a tap outside. Sheets now lift above the keyboard on Android too (PR #99); device check |
 | F50 | Help Center, website, showcase | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | web | Device-specific steps added as each device ships |
 
 ## Device Foundations
@@ -88,11 +88,11 @@ Android cell is at best 🟡.
 | D01 | iPad: `supportsTablet`, rotation, multitasking | ⬜ | Needs a new Apple build after 1.0 is approved |
 | D02 | Shared breakpoint hook (Compact / Medium / Expanded) | ⬜ | `docs/development-standards.md` section 2 |
 | D03 | Tablet layouts: Ride Mode sidebar, ride page split, list + detail | ⬜ | |
-| D04 | Android build pipeline (Mac Gradle or EAS) and release keystore | ⬜ | Play App Signing |
-| D05 | Google Maps API key (Android) | ⬜ | Google Cloud project; free tier for mobile maps SDK, billing account required |
-| D06 | Firebase project + FCM | ⬜ | |
+| D04 | Android build pipeline (Mac Gradle or EAS) and release keystore | 🔨 | Gradle on the Mac, upload-key signing from `~/.gradle/gradle.properties`, Play App Signing: `docs/android-build.md` (PR #99). Keystore is Chris's |
+| D05 | Google Maps API key (Android) | 🔨 | Plugin reads `GOOGLE_MAPS_ANDROID_API_KEY` from `app/.env` (PR #99). Maps SDK for Android has no usage charge; needs a Google Cloud billing account. Key is Chris's |
+| D06 | Firebase project + FCM | 🔨 | Code done (PR #99); Chris creates the Firebase project, `app/google-services.json` and the `FCM_SERVICE_ACCOUNT` secret |
 | D07 | Google Play Developer account | ⬜ | Chris: `docs/google-play-account.md` |
-| D08 | Platform-neutral copy (no "iPhone" in shared screens) | ⬜ | ~37 strings |
+| D08 | Platform-neutral copy (no "iPhone" in shared screens) | 🔨 | PR #99 fixed the Android app's support answers, notification settings button and directions labels; website, legal and billing copy remain |
 | D09 | CI: typecheck, lint, unit tests, database tests on pull requests | ⬜ | Today only the Help check runs on PRs |
 | D10 | CI: Android build check, tablet screenshot check, parity check | ⬜ | |
 | D11 | Play listing, phone + tablet screenshots, data safety form | 🔨 | `store/google-play/`: listing, data safety, declarations, phone screenshots and Play Console checklist done; tablet screenshots wait for D03 |
