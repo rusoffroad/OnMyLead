@@ -52,3 +52,7 @@ Free accounts create one ride each month, whether on the website or in the app. 
 :::tip
 When someone opens a ride link on a computer, the page shows the ride's QR code. They can scan it with their iPhone camera to open the ride on their phone.
 :::
+
+:::note
+Stuck while planning? Click **Help** at the top of onmylead.com to open these guides.
+:::
