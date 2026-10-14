@@ -43,7 +43,7 @@ Android cell is at best 🟡.
 | F11 | Organizer controls: approvals, hand-off, leaders, tail gunner | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ organizer-controls | iOS 1.0 | Approval fix needs migration 20261025000000 applied |
 | F12 | Ride page, Ride Day weather, fuel check | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ✅ | ✅ ride-day-and-weather | iOS 1.0 | Tablet: details beside map |
 | F13 | Join: code, link, QR, waitlist, check-in | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ join-a-ride | iOS 1.0 | |
-| F14 | Universal / App Links (onmylead.com/r, /g) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ invite-riders | iOS 1.0 | Android: intent filters + `assetlinks.json` in PR #99; needs the signing SHA-256 fingerprints added to `app/public/.well-known/assetlinks.json` and a device check (`docs/android-build.md`). Email links (`/auth-callback`) stay in the browser on Android |
+| F14 | Universal / App Links (onmylead.com/r, /g) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ invite-riders | iOS 1.0 | Android: intent filters + `assetlinks.json` in PR #99; upload key fingerprint added (Play App Signing key's still to add once the Play Console app exists, `docs/android-build.md`); needs a website deploy and a device check (`docs/android-build.md`). Email links (`/auth-callback`) stay in the browser on Android |
 | F15 | Invite card: share, text, email, QR | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ invite-riders | iOS 1.0 | |
 | F16 | Find a Ride (flag) | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ✅ | ✅ find-a-ride | iOS 1.0 | Android: map needs API key (F27) |
 | F17 | Ride Mode live map | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ➖ | ✅ ride-mode | iOS 1.0 | Tablet: sidebar riders + details over full map |
