@@ -109,8 +109,8 @@ pass the conditions above).
 | App icon | 512 × 512 PNG, 32-bit, no transparency needed | Export from `app/assets/images/icon.png` (1024) at 512 |
 | Feature graphic | 1024 × 500 PNG or JPEG | `store/google-play/feature-graphic.png` |
 | Phone screenshots | 2 to 8, 9:16, at least 1080 px wide | `store/google-play/screenshots/phone/` 01 to 08, 1080 × 1920 |
-| 7-inch tablet screenshots | up to 8, 9:16 or 16:9 | Wait for the tablet layouts (see `ipad-and-next-apple-release.md`) |
-| 10-inch tablet screenshots | up to 8, 9:16 or 16:9 | Same |
+| 7-inch tablet screenshots | up to 8, 9:16 or 16:9 | `store/google-play/screenshots/tablet-7/` 01 to 08, 1920 × 1200 |
+| 10-inch tablet screenshots | up to 8, 9:16 or 16:9 | `store/google-play/screenshots/tablet-10/` 01 to 08, 2560 × 1600 |
 | Promo video | YouTube URL, optional | Chris's promo film if he puts it on YouTube; otherwise leave blank |
 
 Upload the phone screenshots in file order. Each shows the real app screen, rendered from the

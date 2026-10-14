@@ -41,7 +41,7 @@ Free can't be changed to paid later, which is fine: Pro is a subscription.
 | ⬜ | Privacy policy URL: https://onmylead.com/privacy (after it names Google services, see `listing.md` top) | Android thread updates the page |
 | ⬜ | App category: Maps & Navigation; contact details (support@rusoffroad.com, https://onmylead.com) | `listing.md` |
 | ⬜ | Main store listing: name, short and full description, icon 512, feature graphic, phone screenshots | `listing.md`, `feature-graphic.png`, `screenshots/phone/` |
-| ⬜ | Tablet screenshots (7-inch and 10-inch) | After the tablet layouts merge |
+| ⬜ | Tablet screenshots (7-inch and 10-inch) | `screenshots/tablet-7/`, `screenshots/tablet-10/` |
 
 ## 3. App Signing and Internal Testing
 
