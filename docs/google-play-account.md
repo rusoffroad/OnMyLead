@@ -47,9 +47,10 @@ repository or chat.
 
 - **Create app**: Claude fills in the form; you press the final confirm (it accepts Google's
   Developer Program Policies).
-- **Background location declaration**: Google reviews why OnMyLead uses location in the background
-  (sharing with your ride while the phone is locked). Claude writes the text and records the short
-  demo video Google asks for; you approve before it is sent.
+- **Location foreground service declaration**: Google asks why OnMyLead keeps sharing location
+  while the phone is locked (a notification shows the whole time). Claude writes the text and
+  records the short demo video if Google asks for one; you approve before it is sent. OnMyLead
+  doesn't ask for background location on Android, so there is no background location review.
 - **Closed or open testing / production release**: never happens without your typed OK.
 
 That's all. Nothing on Google Play costs anything beyond the $25 fee; Google takes 15% of

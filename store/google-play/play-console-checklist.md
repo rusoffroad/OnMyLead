@@ -16,8 +16,7 @@ Status marks: ⬜ not done, ✅ done. Update this file as steps are done.
 | ⬜ | Upload key: generate `onmylead-upload.keystore` on the Mac, keep it and its passwords in `~/Developer/OnMyLead-private/` and the Mac keychain, never in the repo or chat | Mac, with Chris's OK |
 | ⬜ | Google Maps API key restricted to the package name and the upload + Play signing SHA-1s (D05) | Android thread; Chris accepts Google Cloud terms if asked |
 | ⬜ | Firebase project for FCM; `google-services.json` stays out of the repo (D06) | Android thread |
-| ⬜ | Merged manifest check: no `AD_ID`, no `READ_MEDIA_*`, only the `location` foreground service type (`listing.md` "Sensitive Permission Declarations") | Android thread |
-| ⬜ | Background location disclosure screen in the app (`listing.md`) | Android thread |
+| ⬜ | Merged manifest check: no `AD_ID`, no `READ_MEDIA_*`, no `ACCESS_BACKGROUND_LOCATION`, only the `location` foreground service type (`listing.md` "Sensitive Permission Declarations") | Android thread |
 
 ## 1. Create the App
 
@@ -70,8 +69,8 @@ Free can't be changed to paid later, which is fine: Pro is a subscription.
 
 | | Step | Who |
 |---|---|---|
-| ⬜ | Every Android column in `docs/feature-parity.md` that the release claims is ✅ on a real Android phone (GPS, background location, push, purchases) | Android thread |
-| ⬜ | Background location and foreground service declarations with the demo video (`listing.md`) | Claude records; Chris approves the video |
+| ⬜ | Every Android column in `docs/feature-parity.md` that the release claims is ✅ on a real Android phone (GPS, sharing with the phone locked, push, purchases) | Android thread |
+| ⬜ | Foreground service (location) declaration, with the demo video if Play asks (`listing.md`) | Claude records; Chris approves the video |
 | ⬜ | Help Center: Android steps published behind the Android release gate (`help/release.json`) | Android thread |
 | ⬜ | Countries: United States only, matching the App Store | Claude |
 | ⬜ | **Send for review / roll out** to production | **Chris's typed OK only** |

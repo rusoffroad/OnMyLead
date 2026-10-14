@@ -16,10 +16,45 @@ SRC = ROOT / 'store/app-store/screenshots'
 OUT = ROOT / 'store/google-play/screenshots/phone'
 FONT = ROOT / 'app/node_modules/@expo-google-fonts/barlow/600SemiBold/Barlow_600SemiBold.ttf'
 
-# Which App Store screenshots go to Google Play, in order. 07-offline-maps is left out until the
-# Android build exists: its footnote talks about Apple's satellite view (docs/feature-parity.md D08).
+# Which App Store screenshots go to Google Play, in order.
 SHOTS = ['01-live-map', '02-regroup', '03-create-a-ride', '04-invite-riders', '05-route-builder',
-         '06-group-chat', '08-ride-day']
+         '06-group-chat', '07-offline-maps', '08-ride-day']
+
+# The App Store offline-maps shot predates the platform-neutral copy (PR #99). Its footnote is
+# re-set with the current text from app/src/app/maps/index.tsx, in the same font, size and place.
+FOOTNOTES = {
+    '07-offline-maps': {
+        'box': (181, 2390, 1139, 2640),
+        'origin': (218, 2423),     # baseline of the first line
+        'pitch': 44,
+        'size': 30.45,
+        'width': 860,
+        'color': (174, 191, 215),
+        'text': 'Maps come from free public sources: USGS The National Map: Orthoimagery, USGS topo, '
+                'USDA Forest Service MVUM and the Bureau of Land Management. Satellite with no signal '
+                'uses the USGS aerial photos, since the live satellite view can’t be saved ahead of time.',
+    },
+}
+REGULAR = ROOT / 'app/node_modules/@expo-google-fonts/barlow/400Regular/Barlow_400Regular.ttf'
+
+
+def reset_footnote(src, spec):
+    d = ImageDraw.Draw(src)
+    x0, y0, x1, y1 = spec['box']
+    d.rectangle((x0, y0, x1, y1), fill=src.getpixel((x0 + 20, y0)))
+    f = ImageFont.truetype(str(REGULAR), spec['size'])
+    lines, line = [], ''
+    for word in spec['text'].split():
+        trial = f'{line} {word}'.strip()
+        if f.getlength(trial) > spec['width'] and line:
+            lines.append(line)
+            line = word
+        else:
+            line = trial
+    lines.append(line)
+    x, y = spec['origin']
+    for i, l in enumerate(lines):
+        d.text((x, y + i * spec['pitch']), l, font=f, fill=spec['color'], anchor='ls')
 
 W, H = 1080, 1920
 BG = (10, 22, 38)
@@ -38,6 +73,8 @@ def rounded_mask(size, r):
 
 def frame(name):
     src = Image.open(SRC / f'{name}.png').convert('RGB')
+    if name in FOOTNOTES:
+        reset_footnote(src, FOOTNOTES[name])
     out = Image.new('RGB', (W, H), BG)
 
     # Caption band, scaled to the Play width.

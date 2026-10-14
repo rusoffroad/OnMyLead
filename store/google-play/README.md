@@ -8,7 +8,7 @@ package `com.rusoffroad.onmylead.app`).
 | `listing.md` | Store listing text, data safety, content rating, target audience, permission declarations and subscription products, ready to paste |
 | `play-console-checklist.md` | What happens in Play Console after the developer account exists, in order, and who does each step |
 | `feature-graphic.png` | 1024 × 500 feature graphic (`tools/feature_graphic.py`) |
-| `screenshots/phone/` | 1080 × 1920 phone screenshots, upload in file order (`tools/frame_android.py`) |
+| `screenshots/phone/` | 8 phone screenshots, 1080 × 1920, upload in file order (`tools/frame_android.py`) |
 
 The phone screenshots reuse the App Store screens (`store/app-store/screenshots/`) in an Android
 frame, so both stores show the same app. When the App Store set changes, run

@@ -76,7 +76,7 @@ ONE RIDE, EVERY PHONE
 
 YOUR PRIVACY
 • Your location is shared only with the ride you join, only while you are sharing, and sharing always ends
-• While a ride is live, a notification shows whenever OnMyLead is sharing your location
+• A notification shows whenever OnMyLead is sharing your location
 • Public rides show a rounded meeting area, never your exact spot
 • Report or block any rider
 
@@ -212,9 +212,10 @@ apps, search history (place searches go to Photon without who the rider is and a
 advertising ID.
 
 Notes:
-- Location is collected in the background only during a live ride the rider is sharing with
-  (see the background location declaration below). Play's data safety form doesn't ask for
-  foreground versus background separately; the declaration covers it.
+- Location is collected only while the rider is sharing with a ride (or a family link they made),
+  including with the phone locked through the location foreground service and its notification.
+  The app never asks for background location ("Allow all the time"), so there is no background
+  location declaration.
 - Social sign-in: only the email, name and profile photo the rider allows reach OnMyLead, covered
   by the rows above (profile photo falls under Photos only if Play asks; it's shown only when Show
   My Profile is on).
@@ -234,34 +235,13 @@ Does the app use the advertising ID? **No.** Make sure the Android build doesn't
 
 ## Sensitive Permission Declarations
 
-### Location permissions (background location)
-
-Play Console asks for this when the uploaded build declares `ACCESS_BACKGROUND_LOCATION`
-(`expo-location` with `isAndroidBackgroundLocationEnabled: true` in `app/app.json`).
-
-- **Main purpose of the app that needs background location:** Share the rider's live position with
-  the people on their group ride while the phone is locked on a handlebar or dash mount.
-- **Feature that uses background location (paste):**
-
-> OnMyLead is a group ride app for off-road riders. During a ride the rider turns on location
-> sharing for that one ride and puts the phone in a handlebar or dash mount. Riders cannot look at
-> or unlock the phone while driving, so OnMyLead keeps sending the rider's position to the other
-> riders on that ride while the phone is locked or another app (such as navigation) is open. The
-> group map shows where everyone is, the leader is warned when a rider falls behind, and an
-> EMERGENCY or Need Help message carries the rider's last position. Sharing only runs after the
-> rider turns it on for a ride, always has an end time, shows a persistent notification while it
-> runs, and stops when the timer ends, the rider leaves, or the ride ends. Location is never shown
-> publicly or used for ads.
-
-- **Prominent disclosure (in-app, before the system prompt):** the Android thread adds an
-  explanation screen before asking for "Allow all the time" (`docs/development-standards.md`
-  section 4). Its text must say: OnMyLead collects location data to share your position with the
-  riders on your ride, even when the app is closed or not in use, only while you are sharing for
-  that ride. Play rejects the declaration without it.
-- **Video (30 seconds or less, YouTube unlisted link):** recorded on an Android phone from the
-  internal test build: open a ride, tap Start Ride, show the disclosure screen, grant "Allow all
-  the time", show the sharing notification, lock the phone, and show the rider's dot still moving
-  on a second phone. Claude scripts it; Chris approves before it is sent.
+### Location permissions
+No background location declaration is needed: the Android build blocks
+`ACCESS_BACKGROUND_LOCATION` (`app/app.json` `android.blockedPermissions`, PR #99) and asks only
+for location "While using the app". Live sharing keeps running with the phone locked through the
+location foreground service below, which Android counts as foreground use because the rider
+starts it from the app. If a later build ever adds background location back, this section needs
+Google's background location declaration, an in-app disclosure screen and a demo video first.
 
 ### Foreground service (location)
 
@@ -272,12 +252,15 @@ declares.
   `isAndroidForegroundServiceEnabled: true`.
 - **Task (paste):** Keeps sharing the rider's live position with their group ride while the phone
   is locked or the rider switches apps. Starts when the rider turns on sharing for a ride, shows a
-  persistent "Sharing your location with <ride>" notification, and stops when the sharing timer
+  persistent "Sharing Your Location" notification (tap it to see who can see you or stop), and stops when the sharing timer
   ends, the rider stops sharing, leaves, or the ride ends.
 - **User impact if deferred or interrupted:** The group would lose sight of the rider mid-ride; the
   leader couldn't tell a rider fell behind and an emergency message wouldn't carry a current
   position.
-- **Video:** the same video as the background location declaration.
+- **Video (YouTube unlisted link, if Play Console asks):** recorded on an Android phone from the
+  internal test build: open a ride, tap Start Ride, turn on sharing, show the "Sharing Your
+  Location" notification, lock the phone, and show the rider's dot still moving on a second phone.
+  Claude scripts it; Chris approves before it is sent.
 - If the build declares any other type (for example `remoteMessaging` from a push library), the
   Android thread removes it or this file adds its declaration.
 
