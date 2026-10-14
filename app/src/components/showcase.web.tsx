@@ -97,6 +97,8 @@ export function Showcase() {
         </p>
       </section>
 
+      <PromoVideo />
+
       <main>
         <section id="how" className="how" aria-labelledby="how-title">
           <h2 id="how-title" className="section-title">How a Group Ride Works</h2>
@@ -341,6 +343,94 @@ function AppleMark() {
         d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.47.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.75 2.27-1.6 2.78-.41 6.89 1.15 9.14.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.38 0 1.78.74 2.99.72 1.24-.02 2.02-1.12 2.77-2.23.87-1.28 1.23-2.52 1.25-2.58-.03-.01-2.39-.92-2.41-3.66zM14.1 5.86c.63-.77 1.06-1.83.94-2.89-.91.04-2.02.61-2.67 1.37-.58.67-1.1 1.76-.96 2.8 1.02.08 2.06-.52 2.69-1.28z"
       />
     </svg>
+  );
+}
+
+// The promo film plays muted and inline once it scrolls into view, and pauses when it leaves.
+// Sound only comes on when the visitor asks for it; with reduced motion it waits for a tap.
+function PromoVideo() {
+  const video = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const userPaused = useRef(false);
+
+  useEffect(() => {
+    const el = video.current;
+    if (!el || prefersReducedMotion() || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          if (!userPaused.current) el.play().catch(() => {});
+        } else if (!el.paused) {
+          el.pause();
+        }
+      },
+      { threshold: [0, 0.5] },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const toggle = () => {
+    const el = video.current;
+    if (!el) return;
+    if (el.paused) {
+      userPaused.current = false;
+      el.play().catch(() => {});
+    } else {
+      userPaused.current = true;
+      el.pause();
+    }
+  };
+  const toggleSound = () => {
+    const el = video.current;
+    if (!el) return;
+    el.muted = !el.muted;
+    setMuted(el.muted);
+    if (!el.muted && el.paused) {
+      userPaused.current = false;
+      el.play().catch(() => {});
+    }
+  };
+
+  return (
+    <section id="watch" className="watch" aria-labelledby="watch-title">
+      <div className="watch-inner">
+        <div className="watch-copy">
+          <h2 id="watch-title" className="section-title">See It on the Trail</h2>
+          <p>
+            The crew rolls out, Ride Mode keeps everyone on one screen, one tap tells the group you are on your way, and
+            a quick poll settles lunch. Then everyone rides home together.
+          </p>
+        </div>
+        <figure className="film">
+          <video
+            ref={video}
+            src="/showcase/promo.mp4"
+            poster="/showcase/promo-poster.webp"
+            width={720}
+            height={1280}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
+            onClick={toggle}
+            aria-label="OnMyLead promo film: a group of side-by-sides at sunset, Ride Mode and ride chat on a phone mounted in the cab, and the OnMyLead logo"
+          />
+          <button type="button" className={playing ? 'film-play hide' : 'film-play'} onClick={toggle} aria-label={playing ? 'Pause the film' : 'Play the film'}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
+          </button>
+          <div className="film-bar">
+            {playing ? <button type="button" className="film-btn" onClick={toggle}>Pause</button> : <span />}
+            <button type="button" className="film-btn" onClick={toggleSound} aria-pressed={!muted}>
+              {muted ? 'Sound On' : 'Sound Off'}
+            </button>
+          </div>
+        </figure>
+      </div>
+    </section>
   );
 }
 
@@ -715,6 +805,25 @@ const CSS = `
 .section-title { font-size: clamp(42px, 5.2vw, 68px); line-height: 0.96; }
 .section-lede { margin-top: 14px; color: var(--soft); font-size: 20px; }
 
+/* Promo film: vertical, muted until asked, right under the hero. */
+.watch { padding: 110px 0 0; }
+.watch-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 72px; align-items: center; }
+.watch-copy > p { margin-top: 20px; color: var(--soft); font-size: 20px; max-width: 30em; }
+.film { position: relative; margin: 0; aspect-ratio: 9 / 16; border-radius: 28px; overflow: hidden; background: #050D18;
+  border: 1px solid rgba(59, 134, 247, 0.28); box-shadow: 0 50px 90px -30px rgba(0, 0, 0, 0.9), 0 0 80px -20px rgba(229, 38, 46, 0.35); }
+.film video { display: block; width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+.film-play { position: absolute; left: 50%; top: 50%; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 50%; border: 0;
+  background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 14px 34px -10px rgba(229, 38, 46, 0.85); transition: opacity 0.2s, transform 0.12s; }
+.film-play svg { width: 38px; height: 38px; margin-left: 4px; }
+.film-play:active { transform: scale(0.96); }
+.film-play.hide { opacity: 0; pointer-events: none; }
+.film-bar { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; justify-content: space-between; gap: 8px; }
+.film-btn { min-height: 40px; padding: 0 16px; border-radius: 12px; border: 1.5px solid rgba(241, 244, 248, 0.3); cursor: pointer;
+  background: rgba(10, 22, 38, 0.6); color: #fff; font-family: ${display7}; font-size: 17px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.film-btn:hover { background: rgba(10, 22, 38, 0.82); border-color: rgba(241, 244, 248, 0.55); }
+.film-btn[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); }
+
 /* How it works */
 .how { padding: 150px 0 40px; }
 .steps { list-style: none; margin: 64px 0 0; padding: 0; display: grid; gap: 96px; }
@@ -880,6 +989,7 @@ const CSS = `
   .step, .step:nth-child(even) { grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
   .step:nth-child(even) .phone { order: 0; }
   .bubble-grid, .signal, .plan-web { grid-template-columns: 1fr; gap: 40px; }
+  .watch-inner { grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; }
   .browser { margin: 0; }
   .signal-map { max-height: 420px; }
   .qr { grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
@@ -912,6 +1022,10 @@ const CSS = `
   .hero-actions .btn { flex: 1 1 100%; }
   .hero-note { font-size: 15px; }
   .machines { font-size: 17px; padding-bottom: 20px; }
+  .watch { padding-top: 64px; }
+  .watch-inner { grid-template-columns: 1fr; gap: 28px; }
+  .watch-copy > p { font-size: 17px; }
+  .film { width: 100%; max-width: 300px; margin: 0 auto; }
   .how { padding-top: 80px; }
   .section-lede { font-size: 18px; }
   .steps { gap: 64px; margin-top: 40px; }
