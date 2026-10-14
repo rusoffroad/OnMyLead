@@ -153,6 +153,12 @@ function Server({ h, error }: { h: api.ServerHealth | null; error: AdminError | 
             <Panel title="Subscriptions and Server" style={{ flexGrow: 1, flexBasis: 320 }}>
               <Fact label="Last Notice from Apple" value={h.subscriptions.last_event_at ? fmtAgo(h.subscriptions.last_event_at) : 'None Yet'} />
               <Fact label="Apple Notices, 24 Hours" value={fmtInt(h.subscriptions.events_24h)} />
+              {h.google_play ? (
+                <>
+                  <Fact label="Last Notice from Google Play" value={h.google_play.last_event_at ? fmtAgo(h.google_play.last_event_at) : 'None Yet'} />
+                  <Fact label="Google Play Errors, 7 Days" value={fmtInt(h.google_play.errors_7d)} tone={h.google_play.errors_7d ? 'danger' : 'ok'} />
+                </>
+              ) : null}
               <Fact label="App Events, 24 Hours" value={fmtInt(h.activity.events_24h)} />
               <Fact label="Database Size" value={bytesLabel(h.database.size_bytes)} />
             </Panel>

@@ -40,7 +40,7 @@ export default function Settings() {
               <TrialSettings key={`${v('trial_days')}-${v('auto_trial')}`} days={v('trial_days') as number} auto={v('auto_trial') as boolean} onSaved={reload} />
             </Panel>
             <Panel title="Promotional Campaigns">
-              <Text style={styles.text}>Promo codes are Apple offer codes, so campaigns are set up and tracked on the Promo Codes page.</Text>
+              <Text style={styles.text}>Promo codes are Apple offer codes on iPhone and iPad and Google Play promo codes on Android; campaigns are tracked on the Promo Codes page.</Text>
               <AdminButton title="Open Promo Codes" small onPress={() => router.push('/admin/promo-codes')} style={{ alignSelf: 'flex-start' }} />
             </Panel>
           </Columns>

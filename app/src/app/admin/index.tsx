@@ -15,7 +15,7 @@ const RECENT_LABEL: Record<admin.Overview['recent'][number]['kind'], string> = {
   ride: 'Ride Created',
   report: 'Report',
   admin: 'Admin Action',
-  store_error: 'App Store Error',
+  store_error: 'Store Error',
 };
 
 export default function Overview() {
@@ -50,7 +50,10 @@ export default function Overview() {
             <StatGrid>
               <StatTile label="Free Users" value={fmtInt(o.free)} tone="free" />
               <StatTile label="Pro Trial Users" value={fmtInt(o.trial)} tone="trial" hint={`${fmtInt(o.trials_started)} trials started in this period`} onPress={() => router.push('/admin/trials')} />
-              <StatTile label="Paid Pro Subscribers" value={fmtInt(o.paid)} tone="pro" hint={o.comp ? `Plus ${fmtInt(o.comp)} complimentary` : undefined} onPress={() => router.push('/admin/subscriptions')} />
+              <StatTile label="Paid Pro Subscribers" value={fmtInt(o.paid)} tone="pro" hint={[
+                  o.paid_google != null ? `${fmtInt(o.paid_apple ?? 0)} App Store, ${fmtInt(o.paid_google)} Google Play` : null,
+                  o.comp ? `plus ${fmtInt(o.comp)} complimentary` : null,
+                ].filter(Boolean).join('; ') || undefined} onPress={() => router.push('/admin/subscriptions')} />
               <StatTile label="Trial-to-Paid" value={fmtPct(o.trial_conversion.rate)} tone="pro" hint={`${fmtInt(o.trial_conversion.paid)} of ${fmtInt(o.trial_conversion.ended)} trials that ended in this period`} />
             </StatGrid>
           </Panel>
@@ -60,7 +63,7 @@ export default function Overview() {
               <StatTile label="Monthly Recurring Revenue" value={fmtMoney(o.mrr_milli)} tone="pro" hint="Live paid plans, annual counted as 1/12" />
               <StatTile label="New Subscriptions" value={fmtInt(o.subs_new)} tone="ok" hint="In this period" />
               <StatTile label="Cancellations" value={fmtInt(o.subs_cancelled)} tone={o.subs_cancelled ? 'warn' : 'neutral'} hint="Renewal turned off, expired, refunded or revoked" />
-              <StatTile label="Promo Code Redemptions" value={fmtInt(o.promo_redemptions)} hint="Apple offer codes, in this period" onPress={() => router.push('/admin/promo-codes')} />
+              <StatTile label="Promo Code Redemptions" value={fmtInt(o.promo_redemptions)} hint="Apple offer codes and Google Play promo codes, in this period" onPress={() => router.push('/admin/promo-codes')} />
             </StatGrid>
           </Panel>
 
@@ -76,7 +79,7 @@ export default function Overview() {
             <Panel title="Needs You">
               <AttentionRow label="Open Reports" value={o.reports_open} href="/admin/reports" />
               <AttentionRow label="Account Deletion Requests" value={o.deletions_pending} href="/admin/users?filter=deletion" />
-              <AttentionRow label="App Store Errors" value={o.store_errors} href="/admin/app-health" />
+              <AttentionRow label="Store Errors" value={o.store_errors} href="/admin/app-health" />
               <Text style={styles.note}>Crash reports from Sentry are on App Health.</Text>
             </Panel>
           </Columns>

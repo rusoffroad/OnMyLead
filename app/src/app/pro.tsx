@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ProShield } from '@/components/pro-gate';
@@ -9,6 +9,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { annualPerMonth, annualSavingsPercent, COMPARISON, PRICES } from '@/core/pro';
+import { deviceStore, manageTarget, otherStoreBlock, restoreMessage } from '@/core/purchases';
 import { track } from '@/lib/analytics';
 import { useEntitlements } from '@/lib/entitlements';
 import { buy, loadProducts, manageSubscription, PRODUCTS, redeemOfferCode, restore } from '@/lib/purchases';
@@ -33,14 +34,18 @@ export default function ProScreen() {
 
   const priceOf = (p: Period) =>
     products.find((x) => x.id === PRODUCTS[p])?.displayPrice ?? `$${p === 'annual' ? PRICES.annual : PRICES.monthly}`;
-  const paid = ent.proSource === 'apple';
-  const onIphone = Platform.OS === 'ios';
-  // No products means App Store subscriptions aren't live yet (or this isn't the iPhone app).
-  const purchasesReady = onIphone && products.length > 0;
+  const paid = ent.proSource === 'apple' || ent.proSource === 'google';
+  // The App Store on iPhone and iPad, Google Play on Android, nothing on the website.
+  const store = deviceStore(Platform.OS);
+  // No products means this store's subscriptions aren't live yet (or this is the website).
+  const purchasesReady = !!store && products.length > 0;
   const admin = ent.accountType === 'admin';
-  const notYet = !onIphone
-    ? 'Subscriptions are in the OnMyLead iPhone app. Pro you buy there works here too.'
+  // Pro running (or stuck on a payment) on the other store: don't sell it twice.
+  const blocked = store ? otherStoreBlock(ent, store) : null;
+  const notYet = !store
+    ? 'Subscriptions are in the OnMyLead app for iPhone, iPad and Android. Pro you buy there works here too.'
     : 'Subscriptions open in an upcoming update. Until then your plan stays as it is and nothing is charged.';
+  const storeName = store === 'google' ? 'Google Play' : 'Apple';
 
   async function run(key: string, fn: () => Promise<string | null>) {
     setBusy(key);
@@ -56,13 +61,23 @@ export default function ProScreen() {
 
   const subscribe = () =>
     run('buy', async () => {
+      if (blocked) return blocked.message;
       if (!purchasesReady) return notYet;
       const r = await buy(PRODUCTS[period]);
       if (r.ok) {
         await refresh();
         return 'You’re on OnMyLead Pro. Thanks for riding with us.';
       }
-      return r.reason === 'cancelled' ? null : r.reason === 'pending' ? 'Waiting on Apple to approve the purchase.' : r.reason === 'ios_only' ? notYet : 'The purchase didn’t go through. You weren’t charged.';
+      return r.reason === 'cancelled' ? null : r.reason === 'pending' ? `Waiting on ${storeName} to approve the purchase.` : r.reason === 'ios_only' ? notYet : 'The purchase didn’t go through. You weren’t charged.';
+    });
+
+  // The store's own screen when this device's store bills it, else the other store's page.
+  const manage = () =>
+    run('manage', async () => {
+      const target = manageTarget(ent, store);
+      if (target.kind === 'store') return store ? (await manageSubscription(ent.store?.productId), null) : notYet;
+      Linking.openURL(target.url).catch(() => {});
+      return target.message;
     });
 
   return (
@@ -83,7 +98,11 @@ export default function ProScreen() {
       {ent.switchedOn ? <PlanStatus ent={ent} /> : null}
 
       {admin ? null : paid ? (
-        <Button title="Manage Subscription" kind="secondary" loading={busy === 'manage'} onPress={() => run('manage', async () => (onIphone ? (await manageSubscription(), null) : notYet))} />
+        <Button title="Manage Subscription" kind="secondary" loading={busy === 'manage'} onPress={manage} />
+      ) : blocked ? (
+        <View style={styles.blocked} accessibilityLiveRegion="polite">
+          <ThemedText type="small" style={{ color: Colors.text }}>{blocked.message}</ThemedText>
+        </View>
       ) : (
         <>
           <View style={{ gap: Spacing.two }} accessibilityRole="radiogroup">
@@ -112,18 +131,21 @@ export default function ProScreen() {
 
       <View style={styles.links}>
         <LinkButton title="Restore Purchases" busy={busy === 'restore'} onPress={() => run('restore', async () => {
-          if (!onIphone) return notYet;
+          if (!store) return notYet;
           const r = await restore();
           await refresh();
-          return r.restored ? 'Your Pro subscription is restored.' : 'No OnMyLead Pro purchase found for this Apple ID.';
+          return restoreMessage(store, r.restored);
         })} />
-        <LinkButton title="Redeem Promo Code" busy={busy === 'redeem'} onPress={() => run('redeem', async () => (onIphone ? (await redeemOfferCode(), null) : notYet))} />
-        {admin || paid ? null : (
-          <LinkButton title="Manage Subscription" busy={busy === 'manage'} onPress={() => run('manage', async () => (onIphone ? (await manageSubscription(), null) : notYet))} />
-        )}
+        <LinkButton title="Redeem Promo Code" busy={busy === 'redeem'} onPress={() => run('redeem', async () => {
+          if (!store) return notYet;
+          if (blocked) return blocked.message;
+          await redeemOfferCode();
+          return store === 'google' ? 'After you redeem the code in Google Play, come back here and Pro turns on.' : null;
+        })} />
+        {admin || paid ? null : <LinkButton title="Manage Subscription" busy={busy === 'manage'} onPress={manage} />}
       </View>
 
-      <Disclosures />
+      <Disclosures store={store} />
     </Screen>
   );
 }
@@ -225,4 +247,5 @@ const styles = StyleSheet.create({
   links: { borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, overflow: 'hidden' },
   link: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 52, paddingHorizontal: Spacing.three, borderBottomWidth: 1, borderBottomColor: Colors.backgroundSelected },
   linkText: { color: Colors.sky, fontFamily: font(600), fontSize: 16 },
+  blocked: { padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky },
 });

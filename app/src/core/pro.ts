@@ -130,6 +130,24 @@ export const REPORT_REASONS = {
   rider: ['Harassment', 'Unsafe Riding', 'Spam or Scam', 'Fake Account', 'Something Else'],
 } as const;
 
-/** Apple's standard licence agreement serves as the Terms of Use for subscriptions. */
+/** Apple's standard licence agreement serves as the Terms of Use for App Store subscriptions. */
 export const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+/** OnMyLead's own Terms of Use, for Google Play subscriptions (Google has no standard one). */
+export const SITE_TERMS_URL = 'https://onmylead.com/terms';
+
+/**
+ * The subscription terms each store requires next to the Subscribe button: price, auto-renewal,
+ * where it is charged and cancelled, and that the free trial never charges.
+ */
+export function disclosureText(store: 'apple' | 'google' | null | undefined): string {
+  const price = `OnMyLead Pro is $${PRICES.monthly} a month or $${PRICES.annual} a year (US prices; other countries are shown in local currency).`;
+  const trial = 'The free Pro Trial for new accounts needs no payment and never turns into a paid subscription on its own.';
+  if (store === 'google') {
+    return `${price} Payment is charged to your Google Play account when you confirm. The subscription renews automatically at the end of each period until you cancel. Cancel anytime in the Play Store app under Profile > Payments & Subscriptions > Subscriptions; Pro stays on until the end of the period you paid for. ${trial}`;
+  }
+  if (!store) {
+    return `${price} Pro is bought in the OnMyLead app for iPhone, iPad and Android, through the App Store or Google Play, and renews automatically until you cancel it in that store. ${trial}`;
+  }
+  return `${price} Payment is charged to your Apple ID when you confirm. The subscription renews automatically unless you turn it off at least 24 hours before the end of the current period, and renewal is charged within the 24 hours before the period ends. Manage or cancel anytime in your App Store account settings. ${trial}`;
+}
 export const PRIVACY_URL = 'https://onmylead.com/privacy';

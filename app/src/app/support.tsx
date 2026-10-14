@@ -38,9 +38,9 @@ export default function Support() {
         {
           title: 'Pro and Your Subscription',
           body: [
-            'Manage or cancel Pro in You > Subscription > Manage Subscription, or in your iPhone’s Settings > Apple Account > Subscriptions.',
-            'New phone or reinstalled the app? Sign in, then tap Restore Purchases in You > Subscription.',
-            'Refunds are handled by Apple at reportaproblem.apple.com.',
+            'Manage or cancel Pro in You > Subscription > Manage Subscription. On iPhone and iPad that’s also in Settings > Apple Account > Subscriptions; on Android, in the Play Store app under Profile > Payments & Subscriptions.',
+            'Pro bought on one device works on all of them when you sign in with the same OnMyLead account. New phone or reinstalled the app? Sign in, then tap Restore Purchases in You > Subscription.',
+            'Refunds are handled by the store you paid: Apple at reportaproblem.apple.com, Google Play at play.google.com/store/account/orderhistory.',
           ],
         },
         {
