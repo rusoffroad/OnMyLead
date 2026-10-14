@@ -10,6 +10,7 @@ sources:
   - app/src/core/notifications.ts
   - app/src/lib/notification-settings.ts
   - app/src/lib/push.ts
+  - app/src/core/push-tap.ts
   - app/src/lib/push.web.ts
   - app/src/components/message-alerts.tsx
   - app/src/app/(tabs)/profile.tsx
@@ -59,6 +60,17 @@ Everything below starts on.
 
 - **Pro Trial Reminders**: a week, 3 days and a day before your Pro Trial ends, and when it does.
 - **Email Me Too**: the same Pro Trial reminders by email.
+
+:::release 1.1.0
+## Tapping a Notification
+
+Tapping a notification takes you straight to what it's about, whether OnMyLead was open, in the background or closed:
+
+- A status tap like **Need Help**, a quick reply, or a ride going live opens **Ride Mode** for that ride.
+- A ride chat message opens the ride's **Chat**.
+- A riding group message opens that group's chat.
+- Ride changes, new riders, invites and reminders open the ride.
+:::
 
 ## Ride Reminder
 

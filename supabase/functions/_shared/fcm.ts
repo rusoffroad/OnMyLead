@@ -6,10 +6,15 @@
 //                         private key). Its project_id picks the Firebase project. Never commit it.
 // Without it Android tokens are skipped, as before.
 //
-// Messages are data-only with high priority, the format expo-notifications reads on Android:
-// title, message, body (the app's tap data as JSON), channelId and tag (a later push with the same
-// tag replaces this one, like apns-collapse-id). The app shows them itself, so a tap reaches the
-// same handler as on iPhone.
+// Messages are FCM notification messages in the format Expo's own push service sends, which is
+// what expo-notifications (SDK 57) is built around on Android:
+// - android.notification: title, text, channel and tag (a later push with the same tag replaces
+//   this one, like apns-collapse-id). With the app in the background or closed, Android shows it
+//   and a tap opens the app with the data attached, so the app opens the ride.
+// - data: title, message and body (the app's tap data as JSON), the same data the iPhone gets.
+//   With the app open, the app's notification handler decides whether to show a banner.
+// Data-only messages (sent until 2026-10-14) lost the ride on a tap from the background: Android
+// opened the app on Home.
 
 export type ServiceAccount = { client_email: string; private_key: string; project_id: string };
 
@@ -37,8 +42,18 @@ export function fcmMessage(p: FcmPush) {
     body: JSON.stringify(p.data ?? {}),
     channelId: p.channelId,
   };
-  if (p.tag) data.tag = p.tag.slice(0, 64);
-  return { message: { token: p.token, data, android: { priority: 'HIGH' } } };
+  const tag = p.tag ? p.tag.slice(0, 64) : undefined;
+  if (tag) data.tag = tag;
+  const notification: Record<string, string> = {
+    title: p.title,
+    body: p.body,
+    channel_id: p.channelId,
+    sound: 'default',
+  };
+  // Help, EMERGENCY and other status taps show on the lock screen in full, like their channel.
+  if (p.channelId === 'ride-alerts') notification.visibility = 'PUBLIC';
+  if (tag) notification.tag = tag;
+  return { message: { token: p.token, data, android: { priority: 'HIGH', notification } } };
 }
 
 /** Parses FCM_SERVICE_ACCOUNT. Null when it is missing or incomplete. */

@@ -11,11 +11,12 @@
  * riders still get the in-app pop-up.
  */
 import * as Notifications from 'expo-notifications';
-import { router } from 'expo-router';
-import { useEffect } from 'react';
+import { router, useRootNavigationState } from 'expo-router';
+import { useEffect, useRef } from 'react';
 import { Linking, Platform } from 'react-native';
 
 import { planReminders } from '@/core/notifications';
+import { tapData, tapTarget, type TapData } from '@/core/push-tap';
 import { ackRideItems, myRides } from './api';
 import { openGroupChat } from './group-chat';
 import { currentNotificationSettings } from './notification-settings';
@@ -24,7 +25,7 @@ import { supabase } from './supabase';
 // Chat already pops up inside the app, so only the rest gets a banner while the app is open.
 Notifications.setNotificationHandler({
   handleNotification: async (n) => {
-    const data = n.request.content.data as { type?: unknown; groupId?: unknown } | undefined;
+    const data = tapData(n.request.content.data);
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat());
     return { shouldShowBanner: banner, shouldShowList: true, shouldPlaySound: banner, shouldSetBadge: false };
@@ -81,8 +82,6 @@ export function resetPushRegistration() {
   registeredFor = null;
 }
 
-type TapData = { type?: unknown; change?: unknown; rideId?: unknown; inviteCode?: unknown; groupId?: unknown; itemId?: unknown };
-
 /** A rider's status tap or quick reply reached this phone by push: the sender's card says so. */
 function acknowledge(data: TapData | undefined) {
   if (data?.type === 'cancelled') return;
@@ -90,31 +89,30 @@ function acknowledge(data: TapData | undefined) {
 }
 
 /**
- * Where a tapped notification goes: Ride Mode for a live ride or a rider's status, a riding
- * group's chat for its messages, else the ride page (its chat for a message).
+ * Open the ride when a notification is tapped: with the app open, in the background, or after
+ * the tap launched it. On a cold start the tap is known before the screens have mounted, and a
+ * navigation then would be dropped (the app stayed on Home), so it waits for the navigator.
+ * Each tap is handled once, then cleared so a remount doesn't open it again.
  */
-export function tapTarget(data: TapData | undefined): string | null {
-  if (!data) return null;
-  if (data.type === 'group_message' && typeof data.groupId === 'string' && data.groupId) return `/groups/${data.groupId}/chat`;
-  const rideId = typeof data.rideId === 'string' && data.rideId ? data.rideId : null;
-  // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open
-  // Ride Mode, where the group is.
-  const rideModeTap = data.type === 'status' || data.type === 'cancelled' || (data.type === 'message' && typeof data.itemId === 'string');
-  if (rideId && (rideModeTap || (data.type === 'ride' && data.change === 'live'))) return `/ride/${rideId}/live`;
-  // A chat message opens the ride page on its Chat section.
-  if (typeof data.inviteCode === 'string' && data.inviteCode) return `/r/${data.inviteCode}${data.type === 'message' ? '?section=chat' : ''}`;
-  return null;
-}
-
-/** Open the ride when a notification is tapped, including one that launched the app. */
 export function useNotificationTaps() {
   const last = Notifications.useLastNotificationResponse();
+  const navReady = !!useRootNavigationState()?.key;
+  const handled = useRef<string | null>(null);
   useEffect(() => {
-    const data = last?.notification.request.content.data as TapData | undefined;
+    if (!last || !navReady) return;
+    const key = `${last.notification.request.identifier}:${last.actionIdentifier}:${last.notification.date}`;
+    if (handled.current === key) return;
+    handled.current = key;
+    const data = tapData(last.notification.request.content.data);
     acknowledge(data);
     const target = tapTarget(data);
+    try {
+      Notifications.clearLastNotificationResponse();
+    } catch {
+      // Older native builds: the key check above still keeps it to one navigation.
+    }
     if (target) router.push(target as never);
-  }, [last]);
+  }, [last, navReady]);
 }
 
 /**
@@ -124,7 +122,7 @@ export function useNotificationTaps() {
 export function useRideChangeReminders() {
   useEffect(() => {
     const sub = Notifications.addNotificationReceivedListener((n) => {
-      const data = n.request.content.data as TapData | undefined;
+      const data = tapData(n.request.content.data);
       acknowledge(data);
       if (data?.type === 'ride' && data.change !== 'live') syncRideReminders(currentNotificationSettings().reminder_minutes);
     });
