@@ -80,7 +80,7 @@ Android build has been made yet, so every Android cell is at best 🟡.
 | F47 | Contact form, support | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ contact-support | iOS 1.0 | |
 | F48 | CarPlay / Android Auto | ⬜ | ➖ | ⬜ | ➖ | ➖ | ➖ | ➖ | | Exception E01 |
 | F49 | Keyboard Done bar / dismiss | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ➖ | iOS 1.0 | Done bar is iOS-only; Android closes with Back, a drag on lists or a tap outside. Sheets now lift above the keyboard on Android too (PR #99); device check |
-| F50 | Help Center, website, showcase | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | web | Device-specific steps added as each device ships |
+| F50 | Help Center, website, showcase | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | web | Device-specific steps added as each device ships. Privacy Policy names Google services for Android (FCM, Google Play, Google Maps) since PR #107 |
 
 ## Device Foundations
 
