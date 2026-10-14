@@ -1,0 +1,217 @@
+# Checks every pull request (and every change to main) on all the ways OnMyLead ships: iPhone, iPad,
+# Android phones, Android tablets and the website (CLAUDE.md Rule 6). Free: GitHub Actions only, no
+# secrets, no paid services. The repository is public, so these minutes cost nothing.
+#
+#   App                 TypeScript, ESLint, the shared-rule unit tests (app/src/core), the native
+#                       setup rules from CLAUDE.md, and the tests of these CI scripts.
+#   Database            every migration plus the privacy, ride-limit and feature tests in
+#                       supabase/tests, on a throwaway Postgres (the same run_local.sh as locally).
+#   Native config       Expo prebuild for iOS and Android (validates app.json and every config
+#                       plugin for both platforms) plus an expo-doctor report.
+#   Android build       prebuild + Gradle debug build of the one Android app (phones and tablets);
+#                       the APK is kept as a download for 7 days. Skipped when no app code changed.
+#   Website             the web export (as deployed) and screenshots at the phone and tablet sizes
+#                       in docs/development-standards.md. Skipped when no app code changed.
+#
+# The iOS compile (Xcode) runs on Chris's Mac before each build; GitHub's macOS runners cost
+# minutes this repo doesn't buy. The feature-parity tracker check is parity.yml; the Help Center
+# check is help.yml.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  EXPO_OFFLINE: '1'
+  # Placeholders: CI never talks to the live project. The website screenshots render signed out.
+  EXPO_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+  EXPO_PUBLIC_WEB_URL: https://onmylead.com
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      native: ${{ steps.diff.outputs.native }}
+      web: ${{ steps.diff.outputs.web }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        name: Which builds this change needs
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "native=true" >> "$GITHUB_OUTPUT"; echo "web=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          echo "$files"
+          # Native: app code and config that end up in the Android or iOS app (not web-only files).
+          native=$(echo "$files" | grep -E '^(app/|scripts/ci/|\.github/workflows/ci\.yml)' \
+            | grep -vE '\.web\.tsx?$|^app/(public|scripts)/' || true)
+          web=$(echo "$files" | grep -E '^(app/|help/|scripts/ci/|\.github/workflows/ci\.yml)' || true)
+          echo "native=$([ -n "$native" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "web=$([ -n "$web" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  app:
+    name: App (types, lint, unit tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - name: TypeScript
+        run: npx tsc --noEmit
+      - name: ESLint
+        run: npx eslint src
+      - name: Unit tests (shared rules for every device)
+        run: npm test
+      - name: Native setup rules (CLAUDE.md)
+        run: node ../scripts/ci/check-config.mjs
+      - name: Tests of the CI scripts
+        working-directory: .
+        run: node --test 'scripts/**/*.test.mjs'
+
+  database:
+    name: Database (migrations, privacy and feature tests)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run supabase/tests/run_local.sh
+        run: bash supabase/tests/run_local.sh > "$RUNNER_TEMP/db.log" 2>&1 || { tail -80 "$RUNNER_TEMP/db.log"; exit 1; }
+      - if: success()
+        run: tail -3 "$RUNNER_TEMP/db.log"
+
+  native-config:
+    name: Native config (iOS and Android prebuild)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - name: Prebuild iOS (iPhone and iPad)
+        run: npx expo prebuild --platform ios --no-install --clean
+      - name: Prebuild Android (phones and tablets)
+        run: npx expo prebuild --platform android --no-install --clean
+      # Report only: it also flags patch releases Expo published after our lockfile, which a pull
+      # request shouldn't be blocked on. Problems show as a warning on the run.
+      - name: expo-doctor (report)
+        env:
+          EXPO_OFFLINE: '0'
+        run: |
+          if ! npx -y expo-doctor > "$RUNNER_TEMP/doctor.txt" 2>&1; then
+            echo "::warning::expo-doctor found something to look at (see this step's log)."
+          fi
+          cat "$RUNNER_TEMP/doctor.txt"
+          { echo '### expo-doctor'; echo '```'; cat "$RUNNER_TEMP/doctor.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+  android:
+    name: Android build (debug APK)
+    needs: changes
+    if: needs.changes.outputs.native == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - name: Free disk space for Gradle
+        working-directory: /
+        run: sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost && df -h /
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - run: npm ci
+      - run: npx expo prebuild --platform android --no-install --clean
+      # One CPU architecture (the emulator's) keeps the build inside the free runner's time.
+      - name: Gradle assembleDebug
+        working-directory: app/android
+        run: ./gradlew assembleDebug --no-daemon -PreactNativeArchitectures=x86_64 -PopeniapStore=play
+      - uses: actions/upload-artifact@v4
+        with:
+          name: onmylead-android-debug
+          path: app/android/app/build/outputs/apk/debug/*.apk
+          retention-days: 7
+
+  web:
+    name: Website (export and phone/tablet screenshots)
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npx expo export --platform web --clear
+      - run: node scripts/pwa-head.mjs dist/index.html
+      - run: node --no-warnings scripts/help/build.mjs dist
+        env:
+          HELP_OFFLINE: '1'
+      - name: Install Playwright (CI only, not an app dependency)
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir -p pw && cd pw && npm init -y > /dev/null
+          npm install --no-audit --no-fund playwright@1.64.1
+          npx playwright install --with-deps chromium
+      - name: Screenshots at phone and tablet sizes
+        run: node ../scripts/ci/screenshots.mjs dist "$RUNNER_TEMP/screenshots"
+        env:
+          PLAYWRIGHT_DIR: ${{ runner.temp }}/pw
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-screenshots
+          path: ${{ runner.temp }}/screenshots
+          retention-days: 14

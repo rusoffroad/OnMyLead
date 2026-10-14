@@ -137,6 +137,13 @@ Live rider tracking is the most important feature. On every device:
 | Android build (prebuild + Gradle) | Chris's Mac or CI | Before an install or Play upload |
 | Real device: GPS, background location, navigation, purchases, push | iPhone (+ iPad, Android when available) | Before each store release |
 
+CI runs on every pull request: `.github/workflows/ci.yml` (typecheck, lint, unit tests, native
+setup rules, database tests, iOS and Android prebuild, Android debug build, web export and
+screenshots at the five sizes above, downloadable from the run), `parity.yml` (this tracker:
+feature code changed without a tracker row fails; a pull request with no feature change says
+"Parity: no feature change (reason)" in its description) and `help.yml`. The nightly parity gap
+report is on the `parity-report` branch. The iOS compile stays on Chris's Mac.
+
 Simulators and emulators cover layouts; real devices cover GPS, background location and billing.
 Cross-platform sync test before each release: one ride with an iPhone, an iPad, an Android phone
 and an Android tablet (or emulators with mock locations), every rider seeing every other rider.
