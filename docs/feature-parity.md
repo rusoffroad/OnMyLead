@@ -70,7 +70,7 @@ Android build has been made yet, so every Android cell is at best 🟡.
 | F37 | Starlink (flag) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ starlink | iOS 1.0 | Android network config exists, untested |
 | F38 | RUS gear (flag) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ rus-gear | iOS 1.0 | |
 | F39 | Ride summary, share card, ride again | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ ride-summary-and-ride-again | iOS 1.0 | |
-| F40 | Push notifications | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ notification-settings | iOS 1.0 | Android (PR #99): FCM v1 sender in `notify-ride-message` + three Android channels; needs Firebase (D06), `FCM_SERVICE_ACCOUNT` secret and a function deploy |
+| F40 | Push notifications | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ notification-settings | iOS 1.0 | Android (PR #99): FCM v1 sender in `notify-ride-message` + three Android channels; needs Firebase (D06), `FCM_SERVICE_ACCOUNT` secret and a function deploy. Tap routing (core/push-tap.ts, unit tested): FCM now sends notification messages so a tap from the background opens the ride, and cold-start taps wait for navigation on every device; needs a notify-ride-message redeploy and an Android + iPhone device check |
 | F41 | Notification settings, quiet hours | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ notification-settings | iOS 1.0 | Copy says "Open iPhone Settings" |
 | F42 | Pro subscription purchase | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ subscribe-to-pro | iOS 1.0 | Google Play Billing, play-verify and play-notifications written and DB-tested in the Play Billing PR; not deployed, no Play products yet, no device test (#102) |
 | F43 | Restore, manage subscription | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | ➖ | ✅ restore-purchases, manage-subscription | iOS 1.0 | Android restore and Google Play manage link written, not device-tested (#102) |

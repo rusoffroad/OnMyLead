@@ -12,7 +12,7 @@ const test: (name: string, fn: () => void | Promise<void>) => void = g.Deno?.tes
   console.log('ok', name);
 });
 
-test('data-only message in the format expo-notifications reads', () => {
+test('notification message in the format expo-notifications reads', () => {
   const m = fcmMessage({ token: 'tok', title: 'Ride', body: 'Hi', data: { type: 'message', rideId: 'r1' }, channelId: 'ride-chat', tag: 'x'.repeat(80) });
   assert.equal(m.message.token, 'tok');
   assert.equal(m.message.android.priority, 'HIGH');
@@ -22,7 +22,18 @@ test('data-only message in the format expo-notifications reads', () => {
   assert.equal(m.message.data.channelId, 'ride-chat');
   assert.equal(m.message.data.tag.length, 64);
   assert.ok(Object.values(m.message.data).every((v) => typeof v === 'string'));
-  assert.equal('tag' in fcmMessage({ token: 't', title: '', body: '', data: {}, channelId: 'c' }).message.data, false);
+  // Android shows it itself when the app is in the background, so a tap opens the ride.
+  const n = m.message.android.notification;
+  assert.equal(n.title, 'Ride');
+  assert.equal(n.body, 'Hi');
+  assert.equal(n.channel_id, 'ride-chat');
+  assert.equal(n.tag, m.message.data.tag);
+  assert.equal(n.sound, 'default');
+  assert.equal('visibility' in n, false);
+  const bare = fcmMessage({ token: 't', title: '', body: '', data: {}, channelId: 'c' }).message;
+  assert.equal('tag' in bare.data, false);
+  assert.equal('tag' in bare.android.notification, false);
+  assert.equal(fcmMessage({ token: 't', title: 'Help', body: '', data: { type: 'status' }, channelId: 'ride-alerts' }).message.android.notification.visibility, 'PUBLIC');
 });
 
 test('channels follow the push type', () => {

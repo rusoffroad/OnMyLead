@@ -94,7 +94,7 @@ Everything that isn't a ride:
 
 ### Notifications
 
-After you sign in, your iPhone asks if OnMyLead can send notifications. Say yes so you hear when someone in your group taps **Need Help** or **EMERGENCY**, even with the phone in your pocket. You choose everything else in [Notification Settings](/help/notification-settings).
+After you sign in, your iPhone asks if OnMyLead can send notifications. Say yes so you hear when someone in your group taps **Need Help** or **EMERGENCY**, even with the phone in your pocket. Tapping a notification opens the ride it is about. You choose everything else in [Notification Settings](/help/notification-settings).
 
 ### Location
 

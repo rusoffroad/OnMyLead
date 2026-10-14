@@ -2,6 +2,17 @@
   {
     "date": "2026-10-14",
     "slugs": [
+      "notification-settings",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "android-push-tap",
+    "why": "Tapping a notification now always opens the ride, chat or group it is about, including when the tap starts the app. Android was opening Home instead. Notification Settings now says where each kind of notification takes you (from version 1.1.0); Get Started mentions it too."
+  },
+  {
+    "date": "2026-10-14",
+    "slugs": [
       "privacy"
     ],
     "kind": "update",
