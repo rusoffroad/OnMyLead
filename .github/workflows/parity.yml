@@ -1,0 +1,69 @@
+# Keeps the feature-parity tracker (docs/feature-parity.md, CLAUDE.md Rule 8) honest. Free: GitHub
+# Actions only.
+#
+# Pull requests: fails when the change edits feature code (screens, components, shared rules,
+#   native modules, config plugins, app.json, migrations, edge functions) without editing a row of
+#   the tracker, or when the tracker is malformed. A pull request with no feature change says so
+#   with a line "Parity: no feature change (reason)" in its description or a commit message (the
+#   check re-runs when the description is edited). The run summary lists what is still incomplete
+#   on each device.
+# Every change to main, every night, and on demand: publishes the gap report (report.md,
+#   report.json: per-device gaps, unfinished foundations, feature commits since the tracker was last
+#   edited) to the `parity-report` branch.
+name: Feature parity
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '27 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: parity-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the tracker against this change
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/parity/check.mjs --base "origin/${{ github.base_ref }}"
+
+  report:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Gap report
+        run: |
+          node scripts/parity/check.mjs --report "$RUNNER_TEMP/out"
+          cat "$RUNNER_TEMP/out/report.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish the report to the parity-report branch
+        run: |
+          cd "$RUNNER_TEMP/out"
+          git init -q -b parity-report
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Parity report of ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" parity-report
