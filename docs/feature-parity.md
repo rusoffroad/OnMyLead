@@ -96,8 +96,8 @@ Android build has been made yet, so every Android cell is at best 🟡.
 | D08 | Platform-neutral copy (no "iPhone" in shared screens) | 🔨 | PR #99 fixed the Android app's support answers, notification settings button and directions labels; website, legal and billing copy remain |
 | D09 | CI: typecheck, lint, unit tests, database tests on pull requests | ✅ | `.github/workflows/ci.yml`, PR #98 |
 | D10 | CI: Android build check, tablet screenshot check, parity check | ✅ | PR #98: `ci.yml` (Android debug APK, website screenshots at phone and tablet sizes), `parity.yml` (tracker check, nightly gap report on the `parity-report` branch) |
-| D11 | Play listing, phone + tablet screenshots, data safety form | 🔨 | `store/google-play/`: listing, data safety, declarations, phone screenshots and Play Console checklist done; tablet screenshots wait for D03 |
-| D12 | iPad screenshots for the App Store | ⬜ | Plan in `store/app-store/ipad-and-next-apple-release.md`; rendered after D03 |
+| D11 | Play listing, phone + tablet screenshots, data safety form | ✅ | `store/google-play/`: listing, data safety, declarations, phone and 7/10-inch tablet screenshots, Play Console checklist. Ready to paste once the Play account exists (D07) |
+| D12 | iPad screenshots for the App Store | ✅ | `store/app-store/screenshots/ipad/` (2732 × 2048); upload with the first iPad build |
 
 ## Exceptions
 
