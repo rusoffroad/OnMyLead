@@ -155,7 +155,7 @@ Review notes (paste as is):
 
 ## Screenshots
 
-6.9-inch iPhone set (1320 x 2868): `store/app-store/screenshots/` in this repo, uploaded in file order 01 to 08. Apple scales these down for every smaller iPhone, so no other sizes are needed. The iPad set (2732 x 2048) is in `store/app-store/screenshots/ipad/`; upload it with the first build that turns on iPad (`ipad-and-next-apple-release.md`).
+6.9-inch iPhone set (1320 x 2868): `store/app-store/screenshots/` in this repo, uploaded in file order 01 to 08. Apple scales these down for every smaller iPhone, so no other sizes are needed. iPad is off, so no iPad screenshots.
 
 ## Export compliance
 
