@@ -62,7 +62,7 @@ export function Showcase() {
           <a href="#features" onClick={jump('features')}>Features</a>
           <a href="#pricing" onClick={jump('pricing')}>Pricing</a>
           {/* A full page load: the Help Center is static pages, not a screen of the app. */}
-          <a href="/help">Help</a>
+          <a className="nav-help" href="/help">Help</a>
         </nav>
         <div className="bar-actions">
           <a className="btn btn-line btn-small" href="/sign-in" onClick={go('/sign-in')}>Sign In</a>
@@ -984,7 +984,9 @@ const CSS = `
 
 /* Tablet */
 @media (max-width: 1080px) {
-  .bar nav { display: none; }
+  /* Narrow screens keep only Help in the bar; the sections are a scroll away. */
+  .bar nav { margin-left: 4px; }
+  .bar nav a:not(.nav-help) { display: none; }
   .hero-inner { grid-template-columns: minmax(0, 1fr) 260px; }
   .hero-phone { width: 250px; }
 }
