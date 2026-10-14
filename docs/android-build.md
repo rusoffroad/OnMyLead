@@ -16,7 +16,7 @@ Each of these is a login or a secret only Chris can create. None of them goes in
 | 3 | Firebase project (it can be the same Google Cloud project), Android app `com.rusoffroad.onmylead.app` added, `google-services.json` downloaded | `app/google-services.json` on the Mac (git ignores it) | Push token on Android |
 | 4 | Firebase service account key: Firebase console > Project settings > Service accounts > Generate new private key | `supabase secrets set FCM_SERVICE_ACCOUNT="$(cat key.json)"` from the Mac thread, then delete the file | Server sends Android pushes |
 | 5 | Upload keystore (`keytool -genkeypair -v -storetype PKCS12 -keystore ~/keys/onmylead-upload.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000`), kept outside the repo and backed up | `~/.gradle/gradle.properties` (below) | Signed release bundles for Play |
-| 6 | The SHA-256 fingerprints of the upload key and of the Play App Signing key (Play Console > Setup > App signing). They are public values | `app/public/.well-known/assetlinks.json` in a pull request, then a website deploy | Ride and group links open the app |
+| 6 | The SHA-256 fingerprints of the upload key (done) and of the Play App Signing key (Play Console > Setup > App signing, once the app exists). They are public values | `app/public/.well-known/assetlinks.json` in a pull request, then a website deploy (see App Link fingerprints below) | Ride and group links open the app |
 
 `~/.gradle/gradle.properties` on the Mac:
 
@@ -29,6 +29,19 @@ ONMYLEAD_UPLOAD_KEY_PASSWORD=...
 
 Without these properties release builds are signed with the debug key, which is fine for testing
 on a phone but can't be uploaded to Play.
+
+## App Link fingerprints
+
+`app/public/.well-known/assetlinks.json` lists every key whose signed app may open
+onmylead.com links, in `sha256_cert_fingerprints`:
+
+| Key | SHA-256 | State |
+|---|---|---|
+| Upload key (`onmylead-upload.jks` on the Mac): signs builds installed straight from the Mac | `1F:5A:24:CF:30:69:B9:41:66:B8:9D:D6:E8:BF:47:D2:82:FD:A2:2B:CD:3F:23:3A:32:3D:34:07:38:0B:9C:A0` | In the file since 2026-10-14 |
+| Play App Signing key: signs every copy installed from Google Play | Play Console > Test and release > Setup > App signing | **To add** as a second entry in the same list once the Play Console app exists |
+
+JSON has no comments, so this table is the record. After changing the file, deploy the website;
+Android rechecks the links when the app is installed or updated.
 
 ## Build
 
