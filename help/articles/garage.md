@@ -37,6 +37,10 @@ You need to be signed in.
 1. Tap **Add a Machine**.
 2. Under **What Are You Adding?**, pick **Vehicle** or **SXS/UTV**.
 3. Tap **Choose Photo** to add a photo from your library (optional).
+
+:::release android
+On Android, the system photo picker opens, and OnMyLead only gets the photo you pick.
+:::
 4. Fill in a **Nickname**, or the **Year**, **Make** and **Model**. You need a nickname or a make and model. **Trim** is optional.
 5. Add the rest if you like: **VIN**, **Purchase Price ($)**, **Engine Hours** and **Odometer (Miles)**.
 6. Under **Fuel and Mileage**, enter **Tank (gal)**, any **Extra Fuel (gal)** you carry and **Miles per Gallon**. Use your real-world trail mileage, not the sticker.

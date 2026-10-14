@@ -7,6 +7,7 @@
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import { Platform } from 'react-native';
 
@@ -116,12 +117,34 @@ if (Platform.OS !== 'web') {
   });
 }
 
+/**
+ * Ask for location. On iPhone and iPad this asks for Always as a second step, so sharing keeps
+ * going with the phone locked. Android doesn't need that: sharing runs in a foreground service
+ * the rider started, which Android lets use While Using the App permission with the screen off,
+ * shown by the Sharing Your Location notification. So the app never asks Android riders for
+ * "Allow all the time" or sends them to Settings for it (and the app doesn't request
+ * ACCESS_BACKGROUND_LOCATION at all, see app.json).
+ */
 export async function requestLocationPermission(): Promise<'always' | 'while_using' | 'denied'> {
   const fg = await Location.requestForegroundPermissionsAsync();
   if (fg.status !== 'granted') return 'denied';
-  if (Platform.OS === 'web') return 'while_using';
+  if (Platform.OS !== 'ios') return 'while_using';
   const bg = await Location.requestBackgroundPermissionsAsync();
   return bg.status === 'granted' ? 'always' : 'while_using';
+}
+
+/**
+ * Android 13 and later hide the sharing notification unless the app may post notifications.
+ * Sharing works either way; asking keeps the rider able to see and stop it from the shade.
+ */
+async function askToShowSharingNotice() {
+  if (Platform.OS !== 'android') return;
+  try {
+    const p = await Notifications.getPermissionsAsync();
+    if (p.status !== 'granted' && p.canAskAgain !== false) await Notifications.requestPermissionsAsync();
+  } catch {
+    // Not fatal: sharing still runs.
+  }
 }
 
 /**
@@ -139,6 +162,7 @@ export async function startSendingLocation(rideId: string | null, until: number 
   const permission = await requestLocationPermission();
   if (permission === 'denied') throw new Error('Location permission is needed to share your location.');
   if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) return;
+  await askToShowSharingNotice();
   await Location.startLocationUpdatesAsync(LOCATION_TASK, {
     accuracy: Location.Accuracy.High,
     // Every fix is reported (about once a second) and handleLocations sends one each 25 m or 15 s,
@@ -150,8 +174,9 @@ export async function startSendingLocation(rideId: string | null, until: number 
     showsBackgroundLocationIndicator: true,
     // Android requires a visible notification while sharing, which matches our privacy rule.
     foregroundService: {
-      notificationTitle: 'Sharing your location',
+      notificationTitle: 'Sharing Your Location',
       notificationBody: 'Tap to see who can see you or stop sharing.',
+      notificationColor: '#E5262E',
       killServiceOnDestroy: false,
     },
   });

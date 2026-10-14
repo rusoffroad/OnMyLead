@@ -98,6 +98,10 @@ OnMyLead asks for your location when you first use it, for example to find rides
 
 When you share on a ride, your iPhone may also ask to allow location **Always**. Allow it so your group keeps seeing you while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends. See [Location Sharing](/help/location-sharing).
 
+:::release android
+On Android, allow location **While Using the App**. OnMyLead never asks for **Allow All the Time**: while you share, Android shows a **Sharing Your Location** notification, and that keeps your group updated with the phone locked. On Android 13 and later, allow notifications too, so you can see that notification and hear **Need Help** and **EMERGENCY** alerts.
+:::
+
 ### Photos
 
 If you add a photo of your machine to your Garage, the app asks to use your photos. Only the photo you pick is uploaded.

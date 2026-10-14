@@ -160,7 +160,35 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.rusoffroad.onmylead.app"
+      "package": "com.rusoffroad.onmylead.app",
+      "versionCode": 1,
+      "blockedPermissions": [
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "onmylead.com",
+              "pathPrefix": "/r/"
+            },
+            {
+              "scheme": "https",
+              "host": "onmylead.com",
+              "pathPrefix": "/g/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "output": "single",
@@ -180,9 +208,10 @@
         "expo-location",
         {
           "isIosBackgroundLocationEnabled": true,
-          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": false,
           "isAndroidForegroundServiceEnabled": true,
-          "locationAlwaysAndWhenInUsePermission": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends."
+          "locationAlwaysAndWhenInUsePermission": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends.",
+          "androidForegroundServiceIcon": "./assets/images/android-icon-monochrome.png"
         }
       ],
       "expo-secure-store",
@@ -204,6 +233,7 @@
         }
       ],
       "./plugins/with-sentry",
+      "./plugins/with-android-setup",
       "./plugins/with-scene-lifecycle",
       [
         "./plugins/with-push-entitlement",
@@ -211,7 +241,14 @@
           "enabled": true
         }
       ],
-      "expo-notifications"
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#E5262E",
+          "defaultChannel": "ride-updates"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

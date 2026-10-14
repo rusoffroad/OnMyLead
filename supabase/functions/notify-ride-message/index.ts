@@ -19,8 +19,9 @@
 //
 // email_batch() does the same for the emails, which go out through Resend.
 //
-// iOS goes straight to Apple (APNs) with a token-based key, so no third-party push service is
-// involved. Android (FCM) is not wired yet; those tokens are skipped.
+// iOS goes straight to Apple (APNs) with a token-based key. Android goes through Firebase Cloud
+// Messaging (_shared/fcm.ts), Google's own push service, which every Android push has to use.
+// Either side is skipped when its secret isn't set.
 //
 // Deploy:  supabase functions deploy notify-ride-message --no-verify-jwt
 // Secrets: PUSH_WEBHOOK_SECRET   random string, same value as the onmylead_push_secret Vault secret
@@ -28,10 +29,13 @@
 //          APNS_TEAM_ID          Apple Developer Team ID
 //          APNS_PRIVATE_KEY      contents of the .p8 file
 //          APNS_BUNDLE_ID        com.rusoffroad.onmylead.app (default)
+//          FCM_SERVICE_ACCOUNT   Firebase service account JSON key for Android pushes (_shared/fcm.ts)
 //          RESEND_API_KEY        Resend API key; without it no emails are sent
 //          EMAIL_FROM            OnMyLead <rides@onmylead.com> (default); the domain must be verified in Resend
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+
+import { channelFor, fcmAccessToken, readServiceAccount, sendFcm } from '../_shared/fcm.ts';
 
 const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
 const ACCOUNT_EVENTS = new Set(['trial']);
@@ -72,16 +76,38 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
   const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 
-  let ios = ((rows ?? []) as Push[]).filter((r) => r.platform === 'ios');
-  if (!ios.length) return { sent: 0 };
+  let all = (rows ?? []) as Push[];
+  if (!all.length) return { sent: 0 };
   const blockers = await blockersOf(event);
-  if (blockers.size) ios = ios.filter((r) => !blockers.has(r.user_id));
-  if (!ios.length) return { sent: 0 };
-  const jwt = await apnsJwt();
-  if (!jwt) return { sent: 0, note: 'APNs not configured' };
+  if (blockers.size) all = all.filter((r) => !blockers.has(r.user_id));
+  if (!all.length) return { sent: 0 };
 
-  const results = await Promise.all(
-    ios.map((r) =>
+  const [ios, android] = await Promise.all([
+    sendIos(all.filter((r) => r.platform === 'ios')),
+    sendAndroid(all.filter((r) => r.platform === 'android')),
+  ]);
+  const results = [...ios.results, ...android.results];
+  const gone = results.filter((r) => r.outcome === 'gone').map((r) => r.row.token);
+  if (gone.length) await db.from('push_tokens').delete().in('token', gone);
+  // Status taps and quick replies: tell the sender which riders were notified (migration
+  // 20261019300000_status_broadcast.sql). Never fails the request.
+  if (event.type === 'status' || event.type === 'message') {
+    const reached = [...new Set(results.filter((r) => r.outcome === 'ok').map((r) => r.row.user_id))];
+    if (reached.length) await db.rpc('record_push_reach', { p_item: event.id, p_users: reached }).then(() => {}, () => {});
+  }
+  const notes = [ios.note, android.note].filter(Boolean).join('; ');
+  return { sent: results.filter((r) => r.outcome === 'ok').length, removed: gone.length, ...(notes ? { note: notes } : null) };
+}
+
+type Sent = { results: { row: Push; outcome: 'ok' | 'gone' | 'failed' }[]; note?: string };
+
+/** iPhone and iPad, straight to Apple. */
+async function sendIos(rows: Push[]): Promise<Sent> {
+  if (!rows.length) return { results: [] };
+  const jwt = await apnsJwt();
+  if (!jwt) return { results: [], note: 'APNs not configured' };
+  const outcomes = await Promise.all(
+    rows.map((r) =>
       sendApns(
         r.token,
         {
@@ -94,15 +120,29 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
       ),
     ),
   );
-  const gone = ios.filter((_, i) => results[i] === 'gone').map((r) => r.token);
-  if (gone.length) await db.from('push_tokens').delete().in('token', gone);
-  // Status taps and quick replies: tell the sender which riders were notified (migration
-  // 20261019300000_status_broadcast.sql). Never fails the request.
-  if (event.type === 'status' || event.type === 'message') {
-    const reached = [...new Set(ios.filter((_, i) => results[i] === 'ok').map((r) => r.user_id))];
-    if (reached.length) await db.rpc('record_push_reach', { p_item: event.id, p_users: reached }).then(() => {}, () => {});
-  }
-  return { sent: results.filter((r) => r === 'ok').length, removed: gone.length };
+  return { results: rows.map((row, i) => ({ row, outcome: outcomes[i] })) };
+}
+
+/** Android phones and tablets, through Firebase Cloud Messaging (_shared/fcm.ts). */
+async function sendAndroid(rows: Push[]): Promise<Sent> {
+  if (!rows.length) return { results: [] };
+  const sa = readServiceAccount(env('FCM_SERVICE_ACCOUNT'));
+  if (!sa) return { results: [], note: 'FCM not configured' };
+  const access = await fcmAccessToken(sa);
+  if (!access) return { results: [], note: 'FCM sign-in failed' };
+  const outcomes = await Promise.all(
+    rows.map((r) =>
+      sendFcm(sa, access, {
+        token: r.token,
+        title: r.title,
+        body: r.body,
+        data: r.data,
+        channelId: channelFor(r.data?.type),
+        tag: typeof r.data?.collapseId === 'string' ? r.data.collapseId : undefined,
+      }),
+    ),
+  );
+  return { results: rows.map((row, i) => ({ row, outcome: outcomes[i] })) };
 }
 
 /**

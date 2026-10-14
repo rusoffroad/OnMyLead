@@ -10,6 +10,9 @@ import { MAPS_APP_LABEL, mapsAppsFor, mapsUrl, pickedApp, type DirectionsTarget,
  * everywhere: the meeting point, waypoints, riders, the regroup point, the destination, the route.
  */
 
+/** The maps apps this device can hand directions to, for labels: Android phones have no Apple Maps. */
+export const MAPS_APPS_TEXT = mapsAppsFor(Platform.OS).map((a) => MAPS_APP_LABEL[a]).join(' or ');
+
 const KEY = 'directions.app.v1';
 let pref: MapsPreference = 'ask';
 let loaded: Promise<void> | null = null;

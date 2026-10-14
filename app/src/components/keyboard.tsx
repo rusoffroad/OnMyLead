@@ -42,7 +42,7 @@ export const TextBox = forwardRef<TextInput, TextInputProps>(function TextBox(pr
 export function KeyboardLift({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
   const insets = useSafeAreaInsets();
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[{ flexShrink: 1, marginTop: insets.top }, style]}>
+    <KeyboardAvoidingView behavior="padding" style={[{ flexShrink: 1, marginTop: insets.top }, style]}>
       {children}
     </KeyboardAvoidingView>
   );

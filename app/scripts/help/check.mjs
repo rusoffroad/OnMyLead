@@ -93,7 +93,8 @@ for (const a of help.articles) {
   // Unreleased features must not read as available.
   for (const u of unreleased) {
     for (const w of u.words ?? []) {
-      for (const sentence of a.body.split(/(?<=[.!?])\s+|\n/)) {
+      // Release blocks stay hidden until their release is live, so they may describe it already.
+      for (const sentence of engine.filterRelease(a.body, null).split(/(?<=[.!?])\s+|\n/)) {
         if (new RegExp(`\\b${w}\\b`, 'i').test(sentence) && !sentence.trim().endsWith('?') && !/\b(not|isn't|aren't|doesn't|don't|no|can't|cannot|only)\b/i.test(sentence))
           add('error', s, 'unreleased', `Mentions ${u.feature} as if it's available ("${sentence.trim().slice(0, 90)}"). ${u.why}`);
       }

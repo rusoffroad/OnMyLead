@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
 import { Colors, font, Spacing } from '@/constants/theme';
 import { MAPS_APP_LABEL, mapsAppsFor, pickedApp, type DirectionsRow, type DirectionsTarget } from '@/core/directions';
-import { openDirections, openIn, useMapsPreference, useWebDirectionsPrompt } from '@/lib/directions';
+import { MAPS_APPS_TEXT, openDirections, openIn, useMapsPreference, useWebDirectionsPrompt } from '@/lib/directions';
 
 /**
  * Places to get turn-by-turn directions to, one row each. A tap opens the rider's maps app, or asks
@@ -45,7 +45,7 @@ export function DirectionsCard({ rows }: { rows: DirectionsRow[] }) {
     <View style={{ gap: Spacing.two }}>
       <View style={{ gap: 2 }}>
         <ThemedText type="heading">Directions</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">Turn-by-turn on the roads, in Apple Maps or Google Maps.</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{`Turn-by-turn on the roads, in ${MAPS_APPS_TEXT}.`}</ThemedText>
       </View>
       <DirectionsList rows={rows} />
     </View>
