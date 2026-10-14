@@ -52,3 +52,11 @@ PGHOST=localhost PGUSER=postgres ./supabase/tests/run_local.sh
 
 Garage with build costs, Trip Planner, fuel range card, Starlink page, RUS Offroad product
 links, post-ride summary and ride card, then the AI assistant (Rider Pro) and subscriptions.
+
+## Cross-Platform Docs
+
+- `CLAUDE.md`: permanent rules for every change (one product on iPhone, iPad, Android phones and tablets).
+- `docs/feature-inventory.md`: what the app does today, by area.
+- `docs/feature-parity.md`: where each feature stands on each device.
+- `docs/development-standards.md`: layouts, platform differences, location, testing, releases.
+- `docs/google-play-account.md`: the Google Play account steps only Chris can do.
