@@ -8,7 +8,7 @@ import { requireTripSlot } from '@/lib/pro';
 
 export default function NewTrip() {
   return (
-    <Screen>
+    <Screen width="readable">
       <ThemedText themeColor="textSecondary">Name it now. You can add a starter list on the next screen.</ThemedText>
       <TripForm
         saveLabel="Create Trip"

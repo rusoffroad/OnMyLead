@@ -7,15 +7,24 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { font, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
+import { READABLE_WIDTH } from '@/core/layout';
 import { useTheme } from '@/hooks/use-theme';
 import { keyboardScroll, TextBox } from './keyboard';
 import { ThemedText } from './themed-text';
 
-export function Screen({ children, scroll = true, top }: { children: ReactNode; scroll?: boolean; top?: boolean }) {
+/**
+ * A page. `width` caps how wide its content gets on a tablet or a wide window: 'page' (the default,
+ * 800), 'readable' (640, for forms and reading) or 'wide' (1200, for screens that lay out their own
+ * columns).
+ */
+export function Screen({
+  children, scroll = true, top, width = 'page',
+}: { children: ReactNode; scroll?: boolean; top?: boolean; width?: 'page' | 'readable' | 'wide' }) {
   const theme = useTheme();
-  const inner = <View style={styles.content}>{children}</View>;
-  // On a tab, the tab bar already sits over the home indicator, so the page doesn't pad for it twice.
-  const inTabs = useContext(BottomTabBarHeightContext) !== undefined;
+  const inner = <View style={[styles.content, { maxWidth: SCREEN_WIDTHS[width] }]}>{children}</View>;
+  // On a tab, the bottom tab bar already sits over the home indicator, so the page doesn't pad for
+  // it twice. The tablet rail sits at the side (no height), so there the page pads for itself.
+  const inTabs = !!useContext(BottomTabBarHeightContext);
   const edges = [...(top ? (['top'] as const) : []), ...(inTabs ? [] : (['bottom'] as const))];
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: theme.background }}>
@@ -33,6 +42,8 @@ export function Screen({ children, scroll = true, top }: { children: ReactNode; 
     </SafeAreaView>
   );
 }
+
+const SCREEN_WIDTHS = { page: MaxContentWidth, readable: READABLE_WIDTH, wide: 1200 } as const;
 
 type ButtonProps = PressableProps & {
   title: string;

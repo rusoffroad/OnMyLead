@@ -13,6 +13,7 @@ import { SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { useLayout } from '@/hooks/use-layout';
 import { useTheme } from '@/hooks/use-theme';
 import { flagOn } from '@/core/app-settings';
 import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
@@ -34,6 +35,7 @@ const PUBLIC_ON_HOME = 3;
 
 export default function Home() {
   const theme = useTheme();
+  const layout = useLayout();
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const { settings } = useAppSettings();
@@ -117,8 +119,8 @@ export default function Home() {
   const others = nearby.filter((r) => !mineIds.has(r.id));
   const openCode = () => code.trim().length >= 4 && router.push(`/r/${code.trim().toUpperCase()}`);
 
-  return (
-    <Screen top>
+  const actions = (
+    <>
       <View style={{ paddingTop: Spacing.one }}>
         <Logo height={96} />
       </View>
@@ -209,7 +211,10 @@ export default function Home() {
       ) : null}
 
       <ErrorText error={error} />
-
+    </>
+  );
+  const lists = (
+    <>
       {invites.length ? (
         <>
           <Section title="Ride Invites" />
@@ -265,6 +270,24 @@ export default function Home() {
           <Button title={others.length > PUBLIC_ON_HOME ? `See All ${others.length} on the Map` : 'Find Rides on the Map'} kind="secondary" onPress={() => router.push('/find')} />
         </>
       ) : null}
+    </>
+  );
+
+  // On a tablet in landscape (or a wide window) the ride actions stay on the left and the ride
+  // lists sit beside them, instead of one long column.
+  return (
+    <Screen top width={layout.expanded ? 'wide' : 'page'}>
+      {layout.expanded ? (
+        <View style={styles.columns}>
+          <View style={styles.column}>{actions}</View>
+          <View style={styles.column}>{lists}</View>
+        </View>
+      ) : (
+        <>
+          {actions}
+          {lists}
+        </>
+      )}
     </Screen>
   );
 }
@@ -291,6 +314,8 @@ const roleLabel = (role: RideMember['role']) =>
   ({ organizer: 'You Organize', co_organizer: 'Co-Organizer', leader: 'You Lead', sweep: 'Tail Gunner', rider: 'Going' })[role];
 
 const styles = StyleSheet.create({
+  columns: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.four },
+  column: { flex: 1, minWidth: 0, gap: Spacing.three },
   live: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, borderWidth: 2, padding: 14 },
   liveDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.accent },
   create: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderRadius: 24, paddingHorizontal: 20, minHeight: 116 },

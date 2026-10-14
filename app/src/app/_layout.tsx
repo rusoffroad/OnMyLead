@@ -20,6 +20,7 @@ import { Colors, font, NavigationColors } from '@/constants/theme';
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
+import { startOrientationRule } from '@/lib/orientation';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
@@ -47,6 +48,8 @@ function RootLayout() {
   useEffect(() => startEntitlements(), []);
   // The owner's announcement, maintenance notice and feature flags.
   useEffect(() => startAppSettings(), []);
+  // Phones stay upright, tablets turn (Android; the Apple app does this in its Info.plist).
+  useEffect(() => startOrientationRule(), []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
   useEffect(() => {

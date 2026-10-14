@@ -16,6 +16,7 @@ import { RouteSketch } from '@/components/route-sketch';
 import { ThemedText } from '@/components/themed-text';
 import { waypointDots } from '@/components/waypoint-blaze';
 import { WaypointRow } from '@/components/waypoint-row';
+import { TwoPane } from '@/components/two-pane';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { withoutBlocked } from '@/core/blocks';
@@ -24,9 +25,11 @@ import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { rideDirections } from '@/core/directions';
 import { leadersToFollow } from '@/core/groups';
 import { counts } from '@/core/joining';
+import { sideColumnWidth } from '@/core/layout';
 import { startsIn } from '@/core/ride-day';
 import { miles, type RideRoute } from '@/core/route';
 import { canShareWaypoints, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
+import { useLayout } from '@/hooks/use-layout';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import {
@@ -72,6 +75,7 @@ export default function RidePage() {
   const chat = useRideChat(ride?.id, isJoined);
   const blocks = useBlocks();
   const waypoints = useRideWaypoints(ride?.id, isJoined);
+  const layout = useLayout();
 
   const load = useCallback(async () => {
     try {
@@ -169,7 +173,6 @@ export default function RidePage() {
 
   // Riders on the ride get the page in four parts instead of one long scroll; anyone else sees the short version.
   const sectioned = isJoined && !cancelled;
-  const show = (key: RideSection) => !sectioned || section === key;
   const chatBlock = isJoined ? (
     <RideChat
       // Chat and polls from riders this rider blocked are left out (announcements stay).
@@ -199,8 +202,15 @@ export default function RidePage() {
     />
   ) : null;
 
-  return (
-    <Screen>
+  // On a tablet or a wide window, a rider on the ride gets two panes: the ride and its details
+  // stay on the left, and the map, riders or chat open beside them, so nobody loses the details
+  // while checking the route or the chat.
+  const split = layout.wide && sectioned;
+  const mainSection: RideSection = split && section === 'details' ? 'map' : section;
+  const show = (key: RideSection) => !sectioned || (split ? key === 'details' || key === mainSection : section === key);
+
+  const top = (
+    <>
       <GetTheApp inviteCode={ride.invite_code} />
       <View style={{ gap: Spacing.two }}>
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
@@ -270,8 +280,18 @@ export default function RidePage() {
       )}
       <ErrorText error={error} />
 
-      {sectioned ? <SectionTabs value={section} onChange={setSection} counts={{ riders: isManager ? pending.length : null }} /> : null}
-
+    </>
+  );
+  const tabs = sectioned ? (
+    <SectionTabs
+      value={mainSection}
+      onChange={setSection}
+      counts={{ riders: isManager ? pending.length : null }}
+      sections={split ? SECTIONS.filter((x) => x.key !== 'details') : SECTIONS}
+    />
+  ) : null;
+  const detailsBlock = (
+    <>
       {show('details') ? (
         <>
           <Card style={{ gap: 0, paddingVertical: Spacing.one }}>
@@ -325,6 +345,44 @@ export default function RidePage() {
         </>
       ) : null}
 
+      {show('details') && isManager && (ride.status === 'live' || canCancel(ride.status, isManager) || isOrganizer) ? (
+        <Card>
+          <ThemedText type="heading">You’re Organizing</ThemedText>
+          {ride.status === 'live' ? (
+            <Button title="End Ride for Everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
+          ) : null}
+          {isOrganizer ? (
+            <Button
+              title={over ? 'Ride Again' : 'Copy This Ride'}
+              kind={over ? 'primary' : 'secondary'}
+              accessibilityHint="Starts a new ride with this one's details and route. You pick the day."
+              onPress={() => requirePro('create_ride') && router.push(`/ride/new?copy=${ride.id}`)}
+            />
+          ) : null}
+          {canCancel(ride.status, isManager) || isOrganizer ? (
+            <View style={[styles.callOff, ride.status !== 'live' && !isOrganizer && styles.callOffAlone]}>
+              <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+                {canCancel(ride.status, isManager) ? (
+                  <Button title="Cancel Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
+                ) : null}
+                {isOrganizer ? (
+                  <Button title="Delete Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'delete'} disabled={!!busy} onPress={remove} />
+                ) : null}
+              </View>
+              <ThemedText type="small" themeColor="textSecondary">
+                {over
+                  ? 'Deleting removes the ride, its chat and its route for everyone.'
+                  : 'Everyone who joined gets a notification and an email either way. Cancel keeps the ride in their list; delete removes it.'}
+              </ThemedText>
+            </View>
+          ) : null}
+        </Card>
+      ) : null}
+
+    </>
+  );
+  const sectionBlocks = (
+    <>
       {show('map') ? (
         <>
           {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
@@ -450,44 +508,13 @@ export default function RidePage() {
       ) : null}
 
       {show('chat') ? chatBlock : null}
-
-      {show('details') && isManager && (ride.status === 'live' || canCancel(ride.status, isManager) || isOrganizer) ? (
-        <Card>
-          <ThemedText type="heading">You’re Organizing</ThemedText>
-          {ride.status === 'live' ? (
-            <Button title="End Ride for Everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
-          ) : null}
-          {isOrganizer ? (
-            <Button
-              title={over ? 'Ride Again' : 'Copy This Ride'}
-              kind={over ? 'primary' : 'secondary'}
-              accessibilityHint="Starts a new ride with this one's details and route. You pick the day."
-              onPress={() => requirePro('create_ride') && router.push(`/ride/new?copy=${ride.id}`)}
-            />
-          ) : null}
-          {canCancel(ride.status, isManager) || isOrganizer ? (
-            <View style={[styles.callOff, ride.status !== 'live' && !isOrganizer && styles.callOffAlone]}>
-              <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-                {canCancel(ride.status, isManager) ? (
-                  <Button title="Cancel Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
-                ) : null}
-                {isOrganizer ? (
-                  <Button title="Delete Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'delete'} disabled={!!busy} onPress={remove} />
-                ) : null}
-              </View>
-              <ThemedText type="small" themeColor="textSecondary">
-                {over
-                  ? 'Deleting removes the ride, its chat and its route for everyone.'
-                  : 'Everyone who joined gets a notification and an email either way. Cancel keeps the ride in their list; delete removes it.'}
-              </ThemedText>
-            </View>
-          ) : null}
-        </Card>
-      ) : null}
-
       {show('riders') && mine && mine.status !== 'cancelled' && mine.status !== 'invited' && mine.role !== 'organizer' ? (
         <Button title="Leave Ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
       ) : null}
+    </>
+  );
+  const bottom = (
+    <>
       {me && !isOrganizer ? (
         <Pressable
           accessibilityRole="button"
@@ -506,6 +533,26 @@ export default function RidePage() {
         style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
         <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13 }}>Presented by RUS Offroad</ThemedText>
       </Pressable>
+    </>
+  );
+
+  if (split) {
+    return (
+      <TwoPane
+        sideWidth={sideColumnWidth(layout.width)}
+        side={<>{top}{detailsBlock}{bottom}</>}
+        main={<>{tabs}{sectionBlocks}</>}
+      />
+    );
+  }
+
+  return (
+    <Screen width={sectioned ? 'page' : 'readable'}>
+      {top}
+      {tabs}
+      {detailsBlock}
+      {sectionBlocks}
+      {bottom}
     </Screen>
   );
 }
@@ -520,10 +567,18 @@ const SECTIONS: { key: RideSection; label: string }[] = [
 const isRideSection = (v: unknown): v is RideSection => SECTIONS.some((s) => s.key === v);
 
 /** The ride page's four parts. The one you're on is underlined in red; a red count means riders are waiting on you. */
-function SectionTabs({ value, onChange, counts }: { value: RideSection; onChange: (v: RideSection) => void; counts: Partial<Record<RideSection, number | null>> }) {
+function SectionTabs({
+  value, onChange, counts, sections = SECTIONS,
+}: {
+  value: RideSection;
+  onChange: (v: RideSection) => void;
+  counts: Partial<Record<RideSection, number | null>>;
+  /** On a tablet the details stay on the left, so the tabs beside them are just Map, Riders and Chat. */
+  sections?: typeof SECTIONS;
+}) {
   return (
     <View style={styles.tabs} accessibilityRole="tablist">
-      {SECTIONS.map((s) => {
+      {sections.map((s) => {
         const on = s.key === value;
         const count = counts[s.key];
         return (

@@ -21,7 +21,8 @@ export type RidesMapProps = {
   onOpen: (ride: Ride) => void;
   /** Shown as "Search this area" once the rider has moved or zoomed the map. */
   onSearchArea?: (visible: Bounds) => void;
-  height?: number;
+  /** Pixels, or '100%' to fill a pane (Find a Ride beside its list on a tablet). */
+  height?: number | '100%';
 };
 
 export const pinColor = (r: Pick<Ride, 'status'>) => (r.status === 'live' ? Colors.accent : Colors.sky);

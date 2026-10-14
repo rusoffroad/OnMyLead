@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { PanelHandle } from '@/components/panel-handle';
@@ -14,6 +14,7 @@ import { rideLeaderIds } from '@/core/chat';
 import type { LatLng } from '@/core/geo';
 import type { RideRoute } from '@/core/route';
 import { canShareWaypoints, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
+import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
@@ -36,10 +37,13 @@ export default function RideWaypoints() {
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
   const web = Platform.OS === 'web';
-  const { width } = useWindowDimensions();
-  const wide = web && width >= WIDE;
+  // Expanded windows (a tablet in landscape, a big iPad, a laptop browser) get the panel beside the
+  // map, hanging from the top; Medium ones (a tablet in portrait) a floating card in the corner.
+  const layout = useLayout();
+  const wide = layout.expanded;
+  const floating = layout.wide && !wide;
   // Swipe the panel down (or tap its handle) to fold it to the counts and see more map.
-  const fold = usePanelFold('waypoints.panelOpen.v1', !wide);
+  const fold = usePanelFold('waypoints.panelOpen.v1', true, wide ? 'up' : 'down');
   const [ride, setRide] = useState<Ride | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
   const [route, setRoute] = useState<RideRoute | null>(null);
@@ -129,7 +133,7 @@ export default function RideWaypoints() {
         </View>
       </SafeAreaView>
 
-      <Animated.View {...fold.panHandlers} style={[styles.panel, wide && styles.panelWide, { transform: [{ translateY: fold.drag }] }]}>
+      <Animated.View {...fold.panHandlers} style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 4 }]}>
         <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Waypoints" fromTop={wide} />
         <View style={styles.counts}>
@@ -183,12 +187,11 @@ function Count({ n, label, color }: { n: number; label: string; color: string })
   );
 }
 
-/** At this width and up (a laptop or desktop browser), the panel moves beside the map. */
-const WIDE = 900;
 const PANEL_W = 400;
 
 const styles = StyleSheet.create({
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
+  panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1, borderColor: Colors.border },
   panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, zIndex: 30 },
   topRow: {

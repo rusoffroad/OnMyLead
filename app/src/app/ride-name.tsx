@@ -55,7 +55,7 @@ export default function RideNameScreen() {
   };
 
   return (
-    <Screen>
+    <Screen width="readable">
       <NamePreview name={clean} />
 
       <Field

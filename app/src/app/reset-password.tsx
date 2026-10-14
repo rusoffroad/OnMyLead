@@ -30,14 +30,14 @@ export default function ResetPassword() {
 
   if (loading) {
     return (
-      <Screen>
+      <Screen width="readable">
         <ThemedText>Opening your reset link…</ThemedText>
       </Screen>
     );
   }
   if (!session) {
     return (
-      <Screen>
+      <Screen width="readable">
         <ThemedText type="subtitle">This Link Has Expired</ThemedText>
         <ThemedText>Ask for a new reset link from the sign-in screen, and open it on this device.</ThemedText>
         <Button title="Back to Sign In" onPress={() => router.replace('/sign-in')} />
@@ -45,7 +45,7 @@ export default function ResetPassword() {
     );
   }
   return (
-    <Screen>
+    <Screen width="readable">
       <ThemedText type="subtitle">Choose a New Password</ThemedText>
       <Field label="New Password" value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder="At least 8 characters" />
       <Button

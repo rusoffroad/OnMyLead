@@ -84,7 +84,7 @@ export default function SignIn() {
     });
 
   return (
-    <Screen>
+    <Screen width="readable">
       <Logo height={104} />
       <Segmented<Mode>
         value={mode}

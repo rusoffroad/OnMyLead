@@ -3,7 +3,7 @@
     "name": "OnMyLead",
     "slug": "onmylead",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "onmylead",
     "userInterfaceStyle": "dark",
@@ -11,13 +11,24 @@
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead.app",
       "buildNumber": "2",
-      "supportsTablet": false,
+      "supportsTablet": true,
+      "requireFullScreen": false,
       "appleTeamId": "YJ4KUF2QQV",
       "associatedDomains": ["applinks:onmylead.com"],
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Your location is shared only with riders you choose, only while you are sharing, so your group can stay together.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends.",
         "UIStatusBarStyle": "UIStatusBarStyleLightContent",
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown"
+        ],
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationPortrait",
+          "UIInterfaceOrientationPortraitUpsideDown",
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ],
         "ITSAppUsesNonExemptEncryption": false
       },
       "privacyManifests": {
