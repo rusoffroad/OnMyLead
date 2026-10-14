@@ -11,6 +11,7 @@ sources:
   - app/src/lib/purchases.ts
   - app/src/core/purchases.ts
   - supabase/functions/appstore-verify/index.ts
+  - supabase/functions/play-verify/index.ts
 related: [subscribe-to-pro, manage-subscription, promo-codes, sign-in]
 keywords: [restore, restore purchase, new phone, reinstall, lost pro, pro missing, subscription not showing]
 ---
@@ -35,6 +36,14 @@ The app says **No OnMyLead Pro purchase found for this Apple ID.** when the Appl
 - You're signed in to the same Apple Account you used to subscribe.
 - The subscription is still active. Look in iPhone **Settings** > your name > **Subscriptions**.
 - You have signal.
+
+:::release android
+## Restore on Android
+
+On Android, **Restore Purchases** looks for OnMyLead Pro on the Google account signed in to the Play Store. If it finds none, the app says **No OnMyLead Pro purchase found for this Google account.** Check that the Play Store is signed in to the Google account you used to subscribe, and that the subscription is still active in the **Play Store** app under **Payments & Subscriptions** > **Subscriptions**.
+
+You don't need to restore on a different kind of device. Pro bought on an iPhone shows on your Android phone or tablet as soon as you sign in to the same OnMyLead account, and the other way round.
+:::
 
 ## One Subscription, One Account
 

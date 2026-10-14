@@ -15,11 +15,12 @@ import {
   type PlaySubscription,
 } from '../../../../supabase/functions/_shared/play-status';
 import { parseEntitlements } from '../entitlements';
-import { disclosureText, PRICES } from '../pro';
+import { PRICES } from '../pro';
 import {
   ANDROID_PACKAGE,
   androidOfferToken,
   deviceStore,
+  disclosureText,
   manageTarget,
   otherStoreBlock,
   PRODUCT_IDS,
@@ -247,7 +248,7 @@ describe('two stores, one Pro', () => {
     expect(fromAndroid.kind === 'web' && fromAndroid.message).toMatch(/Settings > Apple Account > Subscriptions/);
     expect(manageTarget(ent({ account_type: 'free', pro_source: null }), 'google')).toEqual({ kind: 'store' });
     const web = manageTarget(ent({ account_type: 'free', pro_source: null }), null);
-    expect(web.kind === 'web' && web.message).toMatch(/iPhone, iPad and Android/);
+    expect(web.kind === 'web' && web.message).toMatch(/in the OnMyLead app/);
   });
 
   it('says which account Restore looked in', () => {
@@ -274,7 +275,7 @@ describe('subscription terms', () => {
     expect(disclosureText('apple')).toMatch(/24 hours before/);
     expect(disclosureText('google')).toMatch(/charged to your Google Play account/);
     expect(disclosureText('google')).toMatch(/Payments & Subscriptions/);
-    expect(disclosureText(null)).toMatch(/App Store or Google Play/);
+    expect(disclosureText(null)).toMatch(/app store on your phone/);
     for (const s of ['apple', 'google', null] as const) {
       expect(disclosureText(s)).toContain(`$${PRICES.monthly} a month or $${PRICES.annual} a year`);
       expect(disclosureText(s)).toMatch(/never turns into a paid subscription/);

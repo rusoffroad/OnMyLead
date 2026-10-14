@@ -31,5 +31,7 @@ describe('contact form', () => {
     expect(topicHint(null)).toBeTruthy();
     for (const t of CONTACT_TOPICS) expect(topicHint(t.value)).toBeTruthy();
     expect(topicHint('safety')).toMatch(/911/);
+    expect(topicHint('billing')).toMatch(/Apple/);
+    expect(topicHint('billing', 'android')).toMatch(/Google Play/);
   });
 });

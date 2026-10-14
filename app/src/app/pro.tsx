@@ -43,7 +43,7 @@ export default function ProScreen() {
   // Pro running (or stuck on a payment) on the other store: don't sell it twice.
   const blocked = store ? otherStoreBlock(ent, store) : null;
   const notYet = !store
-    ? 'Subscriptions are in the OnMyLead app for iPhone, iPad and Android. Pro you buy there works here too.'
+    ? 'Subscriptions are in the OnMyLead app. Pro you buy there works here too.'
     : 'Subscriptions open in an upcoming update. Until then your plan stays as it is and nothing is charged.';
   const storeName = store === 'google' ? 'Google Play' : 'Apple';
 

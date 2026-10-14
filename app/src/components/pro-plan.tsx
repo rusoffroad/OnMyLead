@@ -3,8 +3,8 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { rideAllowanceText, type Entitlements } from '@/core/entitlements';
-import { disclosureText, planHeadline, PRIVACY_URL, shortDate, SITE_TERMS_URL, TERMS_URL } from '@/core/pro';
-import type { Store } from '@/core/purchases';
+import { planHeadline, PRIVACY_URL, shortDate, TERMS_URL } from '@/core/pro';
+import { disclosureText, SITE_TERMS_URL, type Store } from '@/core/purchases';
 
 /** Where you stand: plan, trial days on a trail of mileposts, or this month's rides. */
 export function PlanStatus({ ent }: { ent: Entitlements }) {

@@ -29,7 +29,7 @@ export default function SubscriptionScreen() {
 
   // The App Store on iPhone and iPad, Google Play on Android, nothing on the website.
   const store = deviceStore(Platform.OS);
-  const notYet = 'Subscriptions are managed in the OnMyLead app for iPhone, iPad and Android.';
+  const notYet = 'Subscriptions are managed in the OnMyLead app.';
   const google = store === 'google';
 
   async function run(key: string, fn: () => Promise<string | null>) {
