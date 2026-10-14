@@ -88,7 +88,7 @@ export function Showcase() {
           </div>
           <div className="hero-phone">
             <figure className="phone">
-              <img src="/showcase/live.webp" alt="Ride Mode: the group on the route, an On My Way tap seen by three riders with a Cancel button, and big status buttons" width={786} height={1704} />
+              <img src="/showcase/group-map.webp" alt="Ride Mode’s live group map: every rider’s dot along the trail on satellite imagery, the leader’s bigger blue dot out front, and the group’s progress along the route" width={786} height={1704} />
             </figure>
           </div>
         </div>
@@ -889,7 +889,8 @@ const CSS = `
 }
 @media (max-width: 820px) {
   .hero-inner { grid-template-columns: 1fr; padding-top: 120px; }
-  .hero-phone { display: none; }
+  /* The live group map is the app's main feature, so phones see it too, under the copy. */
+  .hero-phone { justify-self: center; width: 240px; margin: 12px 0 36px; }
   .hero-photo { background-position: 64% 50%; }
   .hero-photo::after { background:
     linear-gradient(180deg, rgba(8, 17, 30, 0.55) 0%, rgba(8, 17, 30, 0.2) 30%, rgba(8, 17, 30, 0.75) 62%, var(--night) 100%); }
