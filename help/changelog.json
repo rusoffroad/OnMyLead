@@ -2,6 +2,17 @@
   {
     "date": "2026-10-14",
     "slugs": [
+      "ride-mode",
+      "promo-codes"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "push-tap-back",
+    "why": "Back from a screen opened by a notification now returns to Home instead of leaving the app (issue #109). Ride Mode says so from 1.1.0; Promo Codes lists the app's root layout as a source, and nothing about it changes for riders."
+  },
+  {
+    "date": "2026-10-14",
+    "slugs": [
       "notification-settings",
       "getting-started"
     ],

@@ -11,6 +11,7 @@ import { useFonts } from 'expo-font';
 import { DarkTheme, Stack, ThemeProvider, useSegments, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
 import { DirectionsHost } from '@/components/directions';
 import { MessageAlerts } from '@/components/message-alerts';
@@ -31,6 +32,10 @@ SplashScreen.setOptions({ duration: 400, fade: true });
 // The logo stays up for a moment on every cold start, even when the app is ready sooner.
 const SPLASH_MIN_MS = 1800;
 const launchedAt = Date.now();
+
+// On the phone apps, Home sits under any screen opened straight from a notification or a link, so
+// Back returns to it instead of leaving the app. The website keeps its own history.
+export const unstable_settings = Platform.OS === 'web' ? {} : { initialRouteName: '(tabs)' };
 
 const theme: Theme = { ...DarkTheme, dark: true, colors: { ...DarkTheme.colors, ...NavigationColors } };
 
