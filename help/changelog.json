@@ -3,6 +3,17 @@
     "date": "2026-10-14",
     "slugs": [
       "approvals-and-waitlist",
+      "join-a-ride"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "rider-approval-fix",
+    "why": "Fixed two bugs: on I Approve Riders rides, the ride's link or invite code let riders skip approval, and Approve could put a ride over Max Riders or Max Vehicles. The guide is published again and says what now happens."
+  },
+  {
+    "date": "2026-10-14",
+    "slugs": [
+      "approvals-and-waitlist",
       "check-in",
       "contact-support",
       "create-a-ride",

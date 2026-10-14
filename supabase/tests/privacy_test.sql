@@ -1234,16 +1234,22 @@ do $$ begin
   end if;
 end $$;
 
--- Cara joins with the invite code: the organizer hears about it, Ben doesn't.
+-- Cara asks to join with the invite code: the organizer hears about it, Ben doesn't.
 select as_user('00000000-0000-0000-0000-00000000000c');
 set role authenticated;
 select join_ride(p_invite_code => 'PUSHRIDE');
 reset role;
 do $$ begin
-  if last_push() ->> 'change' <> 'joined' or push_tokens_for(last_push()) <> array['olivia-token-0000000000000'] then
-    raise exception 'FAIL: new rider not announced to the organizer only';
+  if last_push() ->> 'change' <> 'pending' or push_tokens_for(last_push()) <> array['olivia-token-0000000000000'] then
+    raise exception 'FAIL: new request not announced to the organizer only';
   end if;
 end $$;
+-- Olivia approves Cara too.
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+update ride_members set status = 'joined'
+where ride_id = '14141414-1414-1414-1414-141414141414' and user_id = '00000000-0000-0000-0000-00000000000c';
+reset role;
 
 -- Settings are private: each rider reads and writes only their own.
 select as_user('00000000-0000-0000-0000-00000000000c');
@@ -1390,8 +1396,8 @@ do $$ begin
   end if;
 end $$;
 
--- Approval-only rides: a new rider asking to join waits for the organizer; an invited rider
--- and a rider with the invite code go straight in.
+-- Approval-only rides: a new rider asking to join waits for the organizer, even with the invite
+-- code (anyone who can see the ride has it); an invited rider goes straight in.
 select as_user('00000000-0000-0000-0000-00000000000a');
 set role authenticated;
 insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, visibility, join_policy, invite_code)
@@ -1424,8 +1430,8 @@ reset role;
 select as_user('00000000-0000-0000-0000-00000000000c');
 set role authenticated;
 do $$ begin
-  if join_ride(p_invite_code => 'askfirst') <> 'joined' then
-    raise exception 'FAIL: invite code not let in on an approval-only ride';
+  if join_ride(p_invite_code => 'askfirst') <> 'pending' then
+    raise exception 'FAIL: invite code skipped approval on an approval-only ride';
   end if;
 end $$;
 reset role;
