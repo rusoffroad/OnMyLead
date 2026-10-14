@@ -754,7 +754,7 @@ export default function RideMode() {
         </View>
         {hasBanners ? (
           <ScrollView
-            style={{ maxHeight: bannersMax }}
+            style={{ maxHeight: bannersMax, flexGrow: 0 }}
             contentContainerStyle={{ gap: 6 }}
             onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
             showsVerticalScrollIndicator={false}>
