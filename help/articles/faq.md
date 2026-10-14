@@ -48,6 +48,10 @@ No. Subscribing, **Restore Purchases** and promo codes work only in the iPhone a
 
 No. Apple bills Pro, so also cancel it in your Apple subscriptions so you aren't billed again. See [Manage Your Subscription](/help/manage-subscription).
 
+:::release android
+If you bought Pro on Android, Google Play bills it: cancel it in Google Play too.
+:::
+
 ## Can I Change My Ride's Time or Meeting Point?
 
 Not after it's created. Tap **Copy This Ride** to make a new ride with the same details and route, pick the new day, then cancel the old ride. See [Edit, Cancel or Delete a Ride](/help/edit-cancel-or-delete-a-ride).

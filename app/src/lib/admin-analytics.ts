@@ -1,13 +1,14 @@
 /**
  * Data for the Admin Dashboard's Subscriptions, Promo Codes, Analytics, App Health and CSV
- * Exports pages: the admin_* functions in migration 20261018400000_admin_analytics.sql and the
+ * Exports pages: the admin_* functions in migrations 20261018400000_admin_analytics.sql and
+ * 20261027000000_play_billing.sql (both stores), and the
  * admin-integrations edge function (Sentry, App Store Connect). Every call is refused by the
  * server unless the caller is an admin with an authenticator session.
  */
 import { Platform } from 'react-native';
 
 import {
-  cumulative, exportFileName, joinSeries, milliToMoney, toCsv, type ExportKind, type RevenueRow, type SeriesPoint,
+  cumulative, exportFileName, joinSeries, milliToMoney, toCsv, type ExportKind, type RevenueRow, type SeriesPoint, type StoreKey,
 } from '@/core/admin-analytics';
 import { adminFn, adminRpc } from './admin';
 
@@ -22,6 +23,9 @@ export type SubscriptionSummary = {
   };
   mrr: { currency: string; mrr_milli: number; subscriptions: number }[];
   errors_7d: number; last_event_at: string | null;
+  /** Per store; missing until the Google Play update is on the server. */
+  by_store?: Partial<Record<StoreKey, { paying: number; billing: number; ended: number; mrr: { currency: string; mrr_milli: number; subscriptions: number }[] }>>;
+  last_google_event_at?: string | null;
 };
 
 export type SubscriptionRow = {
@@ -29,6 +33,8 @@ export type SubscriptionRow = {
   product_id: string; plan: string; status: string; auto_renew: boolean | null; expires_at: string | null;
   grace_until: string | null; offer_type: number | null; offer_id: string | null; price_milli: number | null;
   currency: string | null; environment: Env; updated_at: string; first_seen_at: string | null; total: number;
+  /** 'apple' or 'google' (for Google Play, original_transaction_id is the purchase token). Missing on older servers: Apple. */
+  store?: StoreKey;
 };
 
 export type SubscriptionFilter = 'all' | 'paying' | 'cancelled' | 'billing' | 'ended' | 'renewing_soon' | 'offer_code';
@@ -71,6 +77,7 @@ export type ServerHealth = {
     calls_24h: { total: number; ok: number; failed: number; last_at: string | null; last_error: string | null } | null;
   };
   subscriptions: { last_event_at: string | null; events_24h: number; errors_24h: number; errors_7d: number };
+  google_play?: { last_event_at: string | null; events_24h: number; errors_24h: number; errors_7d: number };
   activity: { active_24h: number; events_24h: number; live_rides: number };
   jobs: { job: string; schedule: string; active: boolean; last_run: string | null; failed_24h: number; last_status: string | null }[] | null;
 };
@@ -106,8 +113,11 @@ export type OfferCodes = {
 // ---------------------------------------------------------------------------
 export const subscriptionSummary = (env: Env) => adminRpc<SubscriptionSummary>('admin_subscription_summary', { p_env: env });
 
-export const subscriptions = (filter: SubscriptionFilter, q: string, env: Env, page: number, pageSize = 50) =>
-  adminRpc<SubscriptionRow[]>('admin_subscriptions', { p_filter: filter, p_q: q || null, p_env: env, p_page: page, p_page_size: pageSize });
+/** store null is both stores (and the only call a server before the Google Play update understands). */
+export const subscriptions = (filter: SubscriptionFilter, q: string, env: Env, page: number, pageSize = 50, store: StoreKey | null = null) =>
+  adminRpc<SubscriptionRow[]>('admin_subscriptions', {
+    p_filter: filter, p_q: q || null, p_env: env, p_page: page, p_page_size: pageSize, ...(store ? { p_store: store } : {}),
+  });
 
 export const subscriptionHistory = (originalTransactionId: string) =>
   adminRpc<HistoryRow[]>('admin_subscription_history', { p_original_transaction_id: originalTransactionId });

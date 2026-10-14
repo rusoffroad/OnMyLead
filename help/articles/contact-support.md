@@ -52,6 +52,10 @@ You can also email support@rusoffroad.com.
 
 - **Something Isn't Working**: tell us what you tapped, what happened and what you expected. The ride name helps if it's about a ride.
 - **Billing and Pro**: purchases are billed by Apple, and refunds go through reportaproblem.apple.com. We're still glad to help.
+
+:::release android
+On Android, the hint says purchases are billed by Google Play, with refunds through your Google Play order history.
+:::
 - **Account and Sign-In**: if you sign in with a different email than the one on the form, tell us which.
 - **Safety or a Rider**: to report a rider, you can also press and hold their message in a ride. See [Report or Block a Rider](/help/report-and-block).
 

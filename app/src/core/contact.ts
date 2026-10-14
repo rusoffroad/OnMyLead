@@ -18,12 +18,14 @@ export const CONTACT_TOPICS: { value: ContactTopic; label: string }[] = [
 export const MAX_CONTACT_MESSAGE = 5000;
 export const MAX_CONTACT_NAME = 80;
 
-/** A hint under the message box that fits the topic picked. */
-export function topicHint(topic: ContactTopic | null): string {
+/** A hint under the message box that fits the topic picked; billing names the store this device buys through. */
+export function topicHint(topic: ContactTopic | null, os: string = 'ios'): string {
   switch (topic) {
     case 'problem': return 'What you tapped, what happened, and what you expected. The ride name helps if it’s about a ride.';
     case 'feature': return 'What would make your rides better? Tell us how you’d use it.';
-    case 'billing': return 'Purchases are billed by Apple. Refunds go through reportaproblem.apple.com, but we’re glad to help.';
+    case 'billing': return os === 'android'
+      ? 'Purchases are billed by Google Play. Refunds go through play.google.com/store/account/orderhistory, but we’re glad to help.'
+      : 'Purchases are billed by Apple. Refunds go through reportaproblem.apple.com, but we’re glad to help.';
     case 'account': return 'Tell us the email you sign in with if it’s different from the one above.';
     case 'safety': return 'In an emergency, call 911 first. To report a rider, you can also press and hold their message in a ride.';
     default: return 'A real person at RUS Offroad reads every message.';

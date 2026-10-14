@@ -9,7 +9,7 @@ import { Fact, LoadError, Notice, PlanBar, TextButton, Who } from '@/components/
 import { ThemedText } from '@/components/themed-text';
 import { Choice, Field } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
-import { offerTypeLabel, planLabel, revenueByCurrency, subscriptionBadge } from '@/core/admin-analytics';
+import { offerTypeLabel, planLabel, revenueByCurrency, storeLabel, subscriptionBadge, type StoreKey } from '@/core/admin-analytics';
 import { fmtDate, fmtDateTime, fmtInt, fmtMoney } from '@/core/admin-format';
 import { useAdminData } from '@/lib/admin';
 import * as api from '@/lib/admin-analytics';
@@ -36,7 +36,7 @@ export default function SubscriptionsPage() {
   return (
     <AdminPage
       title="Subscriptions"
-      subtitle="Who has Pro, what Apple is billing, and what it earns. Apple's billing records are read only here."
+      subtitle="Who has Pro, what the App Store and Google Play are billing, and what it earns. Store billing records are read only here."
       actions={<FilterChips options={[{ value: 'Production', label: 'Real Purchases' }, { value: 'Sandbox', label: 'Sandbox Tests' }]} value={env} onChange={setEnv} />}>
       <LoadError error={summary.error} what="Subscriptions" />
 
@@ -53,7 +53,7 @@ export default function SubscriptionsPage() {
               ]}
             />
             <ThemedText type="small" themeColor="textSecondary">
-              {fmtInt(s.trials_ended)} trials have ended so far. Paid Pro counts anyone Apple is billing, including Sandbox testers.
+              {fmtInt(s.trials_ended)} trials have ended so far. Paid Pro counts anyone the App Store or Google Play is billing, including Sandbox testers.
             </ThemedText>
           </Panel>
 
@@ -61,7 +61,7 @@ export default function SubscriptionsPage() {
             <StatTile
               label="Monthly Recurring Revenue"
               value={fmtMoney(usd?.mrr_milli ?? 0, 'USD')}
-              hint={otherMrr.length ? `Plus ${otherMrr.map((m) => fmtMoney(m.mrr_milli, m.currency)).join(', ')}. Before Apple's commission.` : "Annual plans spread over 12 months. Before Apple's commission."}
+              hint={otherMrr.length ? `Plus ${otherMrr.map((m) => fmtMoney(m.mrr_milli, m.currency)).join(', ')}. Before store commission.` : 'Annual plans spread over 12 months. Before store commission.'}
               tone="pro"
             />
             <StatTile label="Paying Subscribers" value={fmtInt(s.subscriptions.monthly + s.subscriptions.annual)} hint={`${fmtInt(s.subscriptions.monthly)} monthly, ${fmtInt(s.subscriptions.annual)} annual`} />
@@ -69,6 +69,19 @@ export default function SubscriptionsPage() {
             <StatTile label="Billing Problems" value={fmtInt(s.subscriptions.grace + s.subscriptions.billing_retry)} hint={`${fmtInt(s.subscriptions.grace)} in grace, ${fmtInt(s.subscriptions.billing_retry)} in billing retry`} tone={s.subscriptions.grace + s.subscriptions.billing_retry ? 'danger' : 'neutral'} />
             <StatTile label="Ended" value={fmtInt(s.subscriptions.expired + s.subscriptions.refunded + s.subscriptions.revoked)} hint={`${fmtInt(s.subscriptions.expired)} expired, ${fmtInt(s.subscriptions.refunded)} refunded, ${fmtInt(s.subscriptions.revoked)} revoked`} tone="muted" />
             <StatTile label="Renewing This Week" value={fmtInt(s.subscriptions.renewing_7d)} />
+            {(['apple', 'google'] as const).map((k) => {
+              const b = s.by_store?.[k];
+              if (!b) return null;
+              const mrr = b.mrr.find((m) => m.currency === 'USD');
+              return (
+                <StatTile
+                  key={k}
+                  label={`Paying on ${storeLabel(k)}`}
+                  value={fmtInt(b.paying)}
+                  hint={`${fmtMoney(mrr?.mrr_milli ?? 0, 'USD')} a month${b.billing ? `, ${fmtInt(b.billing)} with billing problems` : ''}`}
+                />
+              );
+            })}
           </StatGrid>
         </>
       ) : summary.loading ? <ThemedText themeColor="textSecondary">Loading…</ThemedText> : null}
@@ -76,7 +89,7 @@ export default function SubscriptionsPage() {
       <RevenuePanel env={env} />
       <SubscriptionList env={env} />
       <CompPanel />
-      <ErrorsPanel lastEventAt={s?.last_event_at ?? null} />
+      <ErrorsPanel lastEventAt={s?.last_event_at ?? null} lastGoogleEventAt={s?.last_google_event_at ?? null} />
     </AdminPage>
   );
 }
@@ -112,10 +125,10 @@ function RevenuePanel({ env }: { env: api.Env }) {
               format={(v) => (v >= 1000 ? `${Math.round(v / 100) / 10}k` : String(Math.round(v)))}
             />
           ) : (
-            <Notice text="No sales in this period yet. Sales show here once Apple reports a purchase or renewal." />
+            <Notice text="No sales in this period yet. Sales show here once the App Store or Google Play reports a purchase or renewal." />
           )}
           <ThemedText type="small" themeColor="textSecondary">
-            Estimated from Apple&apos;s purchase and renewal notices at the customer price, minus refunds. Apple keeps its commission and taxes before paying out; App Store Connect Sales and Trends has the final figures.
+            Estimated from the stores&apos; purchase and renewal notices at the customer price, minus refunds. Apple and Google keep their commission and taxes before paying out; App Store Connect Sales and Trends and the Play Console financial reports have the final figures.
           </ThemedText>
         </>
       ) : null}
@@ -125,10 +138,11 @@ function RevenuePanel({ env }: { env: api.Env }) {
 
 function SubscriptionList({ env }: { env: api.Env }) {
   const [filter, setFilter] = useState<api.SubscriptionFilter>('all');
+  const [store, setStore] = useState<StoreKey | 'all'>('all');
   const [q, setQ] = useState('');
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState<api.SubscriptionRow | null>(null);
-  const list = useAdminData(() => api.subscriptions(filter, q, env, page, PAGE), [filter, q, env, page]);
+  const list = useAdminData(() => api.subscriptions(filter, q, env, page, PAGE, store === 'all' ? null : store), [filter, q, env, page, store]);
   const rows = list.data ?? [];
   const onSearch = useCallback((v: string) => {
     setQ(v);
@@ -138,24 +152,30 @@ function SubscriptionList({ env }: { env: api.Env }) {
   const columns: Column<api.SubscriptionRow>[] = [
     { key: 'who', title: 'Rider', flex: 2, render: (r) => <Who name={r.display_name} email={r.email} /> },
     { key: 'plan', title: 'Plan', render: (r) => planLabel(r.plan) },
-    { key: 'status', title: 'Status', render: (r) => { const b = subscriptionBadge(r.status, r.auto_renew); return <StatusBadge label={b.label} tone={b.tone} />; } },
+    { key: 'store', title: 'Store', hideOnPhone: true, render: (r) => storeLabel(r.store) },
+    { key: 'status', title: 'Status', render: (r) => { const b = subscriptionBadge(r.status, r.auto_renew, r.store); return <StatusBadge label={b.label} tone={b.tone} />; } },
     { key: 'renews', title: 'Renews or Ends', render: (r) => `${r.auto_renew === false || r.status !== 'active' ? 'Ends' : 'Renews'} ${fmtDate(r.grace_until ?? r.expires_at)}` },
     { key: 'price', title: 'Price', align: 'right', hideOnPhone: true, render: (r) => (r.price_milli != null ? fmtMoney(r.price_milli, r.currency ?? 'USD') : '–') },
-    { key: 'offer', title: 'Offer', hideOnPhone: true, render: (r) => (r.offer_id ? `${r.offer_id} (${offerTypeLabel(r.offer_type)})` : '–') },
+    { key: 'offer', title: 'Offer', hideOnPhone: true, render: (r) => (r.offer_id ? `${r.offer_id} (${offerTypeLabel(r.offer_type, r.store)})` : '–') },
     { key: 'since', title: 'Since', hideOnPhone: true, render: (r) => fmtDate(r.first_seen_at) },
   ];
 
   return (
-    <Panel title="Apple Subscriptions" right={<SearchBox value={q} onChange={onSearch} placeholder="Search by name or email" />}>
+    <Panel title="Store Subscriptions" right={<SearchBox value={q} onChange={onSearch} placeholder="Search by name or email" />}>
+      <FilterChips
+        options={[{ value: 'all', label: 'Both Stores' }, { value: 'apple', label: 'App Store' }, { value: 'google', label: 'Google Play' }] as { value: StoreKey | 'all'; label: string }[]}
+        value={store}
+        onChange={(v) => { setStore(v); setPage(0); }}
+      />
       <FilterChips options={FILTERS} value={filter} onChange={(f) => { setFilter(f); setPage(0); }} />
       <LoadError error={list.error} what="Subscriptions" />
       <DataTable
         columns={columns}
         rows={rows}
-        rowKey={(r) => r.original_transaction_id}
+        rowKey={(r) => `${r.store ?? 'apple'}-${r.original_transaction_id}`}
         onRowPress={(r) => setOpen(open?.original_transaction_id === r.original_transaction_id ? null : r)}
         loading={list.loading}
-        empty={q || filter !== 'all' ? 'No subscriptions match.' : 'No one has subscribed yet. Purchases show here once Apple confirms them.'}
+        empty={q || filter !== 'all' || store !== 'all' ? 'No subscriptions match.' : 'No one has subscribed yet. Purchases show here once the App Store or Google Play confirms them.'}
       />
       <Pager page={page} pageSize={PAGE} total={rows[0]?.total ?? (page === 0 ? 0 : null)} count={rows.length} onPage={setPage} />
       {open ? <History row={open} onClose={() => setOpen(null)} /> : null}
@@ -172,7 +192,8 @@ function History({ row, onClose }: { row: api.SubscriptionRow; onClose: () => vo
         <TextButton label="Close" onPress={onClose} />
       </View>
       <Fact label="Product" value={row.product_id} />
-      <Fact label="Apple Transaction" value={row.original_transaction_id} />
+      <Fact label="Store" value={storeLabel(row.store)} />
+      <Fact label={row.store === 'google' ? 'Google Play Purchase Token' : 'Apple Transaction'} value={row.original_transaction_id} />
       <Fact label="Auto-Renew" value={row.auto_renew == null ? 'Unknown' : row.auto_renew ? 'On' : 'Off'} />
       {row.grace_until ? <Fact label="Grace Period Until" value={fmtDateTime(row.grace_until)} /> : null}
       <ThemedText type="smallBold" style={{ marginTop: Spacing.two }}>History</ThemedText>
@@ -180,13 +201,13 @@ function History({ row, onClose }: { row: api.SubscriptionRow; onClose: () => vo
       <DataTable
         columns={[
           { key: 'when', title: 'When', render: (e: api.HistoryRow) => fmtDateTime(e.received_at) },
-          { key: 'what', title: 'What Apple Said', flex: 2, render: (e) => [e.type, e.subtype].filter(Boolean).join(' / ') || '–' },
+          { key: 'what', title: `What ${row.store === 'google' ? 'Google Play' : 'Apple'} Said`, flex: 2, render: (e) => [e.type, e.subtype].filter(Boolean).join(' / ') || '–' },
           { key: 'err', title: 'Problem', flex: 2, render: (e) => (e.error ? <ThemedText type="small" style={{ color: Colors.danger }}>{e.error}</ThemedText> : '–') },
         ]}
         rows={h.data ?? []}
         rowKey={(e) => `${e.received_at}-${e.type}`}
         loading={h.loading}
-        empty="No notices from Apple for this subscription yet."
+        empty={`No notices from ${row.store === 'google' ? 'Google Play' : 'Apple'} for this subscription yet.`}
       />
     </View>
   );
@@ -216,7 +237,7 @@ function CompPanel() {
     const who = person.display_name || person.email || 'this rider';
     const { ok } = await confirm({
       title: 'Grant Complimentary Pro',
-      message: `${who} gets every Pro feature for ${label.toLowerCase()} at no charge. Apple billing is not touched.`,
+      message: `${who} gets every Pro feature for ${label.toLowerCase()} at no charge. App Store and Google Play billing are not touched.`,
       confirmLabel: 'Grant Pro',
     });
     if (!ok) return;
@@ -256,7 +277,7 @@ function CompPanel() {
 
   return (
     <Panel title="Complimentary Pro">
-      <ThemedText type="small" themeColor="textSecondary">Free Pro for friends, testers and partners. Kept apart from Apple billing; every grant and revoke goes in the Audit Log.</ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">Free Pro for friends, testers and partners. Kept apart from App Store and Google Play billing; every grant and revoke goes in the Audit Log.</ThemedText>
       <LoadError error={grants.error} what="Complimentary grants" />
       <DataTable
         columns={[
@@ -298,22 +319,28 @@ function CompPanel() {
   );
 }
 
-function ErrorsPanel({ lastEventAt }: { lastEventAt: string | null }) {
+function ErrorsPanel({ lastEventAt, lastGoogleEventAt }: { lastEventAt: string | null; lastGoogleEventAt: string | null }) {
   const errs = useAdminData(() => api.subscriptionErrors(30), []);
   return (
-    <Panel title="Subscription Errors" right={<ThemedText type="small" themeColor="textSecondary">Last notice from Apple: {lastEventAt ? fmtDateTime(lastEventAt) : 'none yet'}</ThemedText>}>
+    <Panel
+      title="Subscription Errors"
+      right={
+        <ThemedText type="small" themeColor="textSecondary">
+          Last notice from Apple: {lastEventAt ? fmtDateTime(lastEventAt) : 'none yet'}. From Google Play: {lastGoogleEventAt ? fmtDateTime(lastGoogleEventAt) : 'none yet'}.
+        </ThemedText>
+      }>
       <LoadError error={errs.error} what="Subscription errors" />
       <DataTable
         columns={[
           { key: 'when', title: 'When', render: (e: api.ErrorRow) => fmtDateTime(e.received_at) },
           { key: 'type', title: 'Notice', render: (e) => [e.type, e.subtype].filter(Boolean).join(' / ') || 'Purchase Check' },
-          { key: 'tx', title: 'Apple Transaction', hideOnPhone: true, render: (e) => e.original_transaction_id ?? '–' },
+          { key: 'tx', title: 'Transaction or Token', hideOnPhone: true, render: (e) => (e.original_transaction_id ? e.original_transaction_id.slice(0, 40) : '–') },
           { key: 'err', title: 'Problem', flex: 2, render: (e) => <ThemedText type="small" style={{ color: Colors.danger }}>{e.error}</ThemedText> },
         ]}
         rows={errs.data ?? []}
         rowKey={(e) => `${e.received_at}-${e.original_transaction_id}-${e.error}`}
         loading={errs.loading}
-        empty="No failed purchase checks or Apple notices in the last 30 days."
+        empty="No failed purchase checks or store notices in the last 30 days."
       />
     </Panel>
   );

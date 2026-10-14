@@ -92,7 +92,7 @@ export default function UserDetail() {
   const grant = async () => {
     const r = await confirm({
       title: 'Grant Complimentary Pro',
-      message: 'Gives Pro without any payment. It is separate from Apple billing and you can revoke it at any time. Leave the days empty for no end date.',
+      message: 'Gives Pro without any payment. It is separate from App Store and Google Play billing and you can revoke it at any time. Leave the days empty for no end date.',
       confirmLabel: 'Grant Pro', reasonLabel: 'Days (empty = until revoked)', reasonNumeric: true,
     });
     if (!r.ok) return;
@@ -103,7 +103,7 @@ export default function UserDetail() {
   const revoke = async (g: admin.Grant) => {
     const r = await confirm({
       title: 'Revoke Complimentary Pro?',
-      message: `${name} goes back to whatever else they have (a trial, an Apple subscription, or Free). Nothing they made is removed.`,
+      message: `${name} goes back to whatever else they have (a trial, an App Store or Google Play subscription, or Free). Nothing they made is removed.`,
       confirmLabel: 'Revoke', tone: 'danger',
     });
     if (r.ok) run(`revoke-${g.id}`, () => admin.revokeGrant(g.id), 'Complimentary Pro revoked.');
@@ -158,7 +158,7 @@ export default function UserDetail() {
             ['Plan', s.label],
             ['Pro Until', s.pro_source === 'admin' ? 'Always (Admin)' : s.pro_until ? fmtDate(s.pro_until) : s.label === 'Free' ? '—' : 'Until revoked'],
             ['Trial', s.trial_state === 'none' ? 'Never had one' : s.trial_state === 'active' ? `Active, ${daysLeft(s.trial_ends_at)} days left (ends ${fmtDate(s.trial_ends_at)})` : s.trial_state === 'expired' ? `Ended ${fmtDate(s.trial_ends_at)}` : 'Revoked'],
-            ['Apple Subscription', s.apple_status ? `${s.apple_product?.endsWith('annual') ? 'Annual' : 'Monthly'}, ${s.apple_status}${s.apple_expires_at ? `, renews or ends ${fmtDate(s.apple_expires_at)}` : ''}` : 'None'],
+            ['Store Subscription', s.apple_status ? `${s.paid_store === 'google' ? 'Google Play' : 'App Store'}, ${s.apple_product?.endsWith('annual') ? 'Annual' : 'Monthly'}, ${s.apple_status}${s.apple_expires_at ? `, renews or ends ${fmtDate(s.apple_expires_at)}` : ''}` : 'None'],
             ['Auto-Renew', s.apple_auto_renew == null ? '—' : s.apple_auto_renew ? 'On' : 'Off'],
           ]} />
           {!isAdmin ? (
@@ -173,7 +173,7 @@ export default function UserDetail() {
               <AdminButton title="Revoke" kind="danger" small onPress={() => revoke(g)} loading={busy === `revoke-${g.id}`} />
             </View>
           ))}
-          <Text style={styles.note}>Apple billing is shown as Apple reports it and can&apos;t be changed here.</Text>
+          <Text style={styles.note}>App Store and Google Play billing is shown as the store reports it and can&apos;t be changed here.</Text>
         </Panel>
       </Columns>
 

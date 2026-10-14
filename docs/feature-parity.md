@@ -35,7 +35,7 @@ Android cell is at best 🟡.
 | F03 | Sign in with Google | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ sign-in | iOS 1.0 | Android: browser fallback works in theory; native client needs SHA-1 |
 | F04 | Sign in with Facebook | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ sign-in | iOS 1.0 | |
 | F05 | Ride name, social profile | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-name-and-profile | iOS 1.0 | |
-| F06 | Delete account | ✅ | 🟡 | 🟡 | ⬜ | ✅ | ✅ | ✅ delete-account | iOS 1.0 | Copy mentions Apple subscriptions only |
+| F06 | Delete account | ✅ | 🟡 | 🟡 | ⬜ | ✅ | ✅ | ✅ delete-account | iOS 1.0 | Copy mentions Apple subscriptions only; Pro screen and Help now name Google Play on Android |
 | F07 | Create a ride (app and website) | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ✅ | ✅ create-a-ride | iOS 1.0 | Tablet: two-column form |
 | F08 | Free ride limit (1 a month) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ free-vs-pro | iOS 1.0 | Enforced in the database |
 | F09 | Edit ride name, time, meeting point | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ➖ | ⬜ | | Not built anywhere (noted, not started) |
@@ -71,11 +71,11 @@ Android cell is at best 🟡.
 | F39 | Ride summary, share card, ride again | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ ride-summary-and-ride-again | iOS 1.0 | |
 | F40 | Push notifications | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ notification-settings | iOS 1.0 | Android (PR #99): FCM v1 sender in `notify-ride-message` + three Android channels; needs Firebase (D06), `FCM_SERVICE_ACCOUNT` secret and a function deploy |
 | F41 | Notification settings, quiet hours | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ notification-settings | iOS 1.0 | Copy says "Open iPhone Settings" |
-| F42 | Pro subscription purchase | ✅ | 🟡 | ⬜ | ⬜ | ⬜ | ⬜ | ✅ subscribe-to-pro | iOS 1.0 | Apple only; Play Billing + play-verify + RTDN needed |
-| F43 | Restore, manage subscription | ✅ | 🟡 | ⬜ | ⬜ | ⬜ | ➖ | ✅ restore-purchases | iOS 1.0 | |
+| F42 | Pro subscription purchase | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ subscribe-to-pro | iOS 1.0 | Google Play Billing, play-verify and play-notifications written and DB-tested in the Play Billing PR; not deployed, no Play products yet, no device test (#102) |
+| F43 | Restore, manage subscription | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | ➖ | ✅ restore-purchases, manage-subscription | iOS 1.0 | Android restore and Google Play manage link written, not device-tested (#102) |
 | F44 | 30-day Pro trial | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ pro-trial | iOS 1.0 | Server-granted, store-neutral |
-| F45 | Promo codes | ✅ | 🟡 | ⬜ | ⬜ | ⬜ | ⬜ | ✅ promo-codes | iOS 1.0 | Apple offer codes; Play promo codes needed |
-| F46 | Pro shared across devices | ✅ | 🟡 | 🟡 | 🟡 | ⬜ | ⬜ | ⬜ | | Apple Pro already works on any signed-in device; needs store-neutral entitlements + duplicate guard |
+| F45 | Promo codes | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ promo-codes | iOS 1.0 | Apple offer codes plus Play promo codes (made in Play Console; Admin shows both); not device-tested (#102) |
+| F46 | Pro shared across devices | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ manage-subscription | | store_subscriptions view + my_entitlements store fields + duplicate-purchase guard, DB-tested; not deployed (#102) |
 | F47 | Contact form, support | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ contact-support | iOS 1.0 | |
 | F48 | CarPlay / Android Auto | ⬜ | ➖ | ⬜ | ➖ | ➖ | ➖ | ➖ | | Exception E01 |
 | F49 | Keyboard Done bar / dismiss | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ➖ | iOS 1.0 | Done bar is iOS-only; Android closes with Back, a drag on lists or a tap outside. Sheets now lift above the keyboard on Android too (PR #99); device check |

@@ -181,10 +181,10 @@ export default function ContactScreen() {
             multiline
             maxLength={MAX_CONTACT_MESSAGE}
             style={{ minHeight: 180 }}
-            accessibilityHint={topicHint(topic)}
+            accessibilityHint={topicHint(topic, Platform.OS)}
           />
           <View style={styles.meta}>
-            <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>{topicHint(topic)}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>{topicHint(topic, Platform.OS)}</ThemedText>
             {length > MAX_CONTACT_MESSAGE * 0.8 ? (
               <ThemedText type="small" themeColor="textSecondary">{length.toLocaleString('en-US')}/{MAX_CONTACT_MESSAGE.toLocaleString('en-US')}</ThemedText>
             ) : null}

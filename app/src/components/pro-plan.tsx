@@ -3,7 +3,8 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { rideAllowanceText, type Entitlements } from '@/core/entitlements';
-import { planHeadline, PRICES, PRIVACY_URL, shortDate, TERMS_URL } from '@/core/pro';
+import { planHeadline, PRIVACY_URL, shortDate, TERMS_URL } from '@/core/pro';
+import { disclosureText, SITE_TERMS_URL, type Store } from '@/core/purchases';
 
 /** Where you stand: plan, trial days on a trail of mileposts, or this month's rides. */
 export function PlanStatus({ ent }: { ent: Entitlements }) {
@@ -27,7 +28,7 @@ export function PlanStatus({ ent }: { ent: Entitlements }) {
         <ThemedText type="small" themeColor="textSecondary">
           {ent.proSource === 'comp'
             ? ent.proUntil ? `Complimentary Pro until ${shortDate(ent.proUntil)}.` : 'Complimentary Pro from OnMyLead.'
-            : ent.proUntil ? `Renews or ends ${shortDate(ent.proUntil)}. Change it in Manage Subscription.` : 'Every Pro feature is on.'}
+            : ent.proUntil ? `Renews or ends ${shortDate(ent.proUntil)}.${ent.store ? ` Billed by ${ent.store.store === 'google' ? 'Google Play' : 'the App Store'}.` : ''} Change it in Manage Subscription.` : 'Every Pro feature is on.'}
         </ThemedText>
       ) : rides ? (
         <ThemedText type="small" themeColor="textSecondary">{rides}. Joining rides and every safety feature stay free.</ThemedText>
@@ -48,15 +49,13 @@ function TrialTrail({ daysLeft, total = 30 }: { daysLeft: number; total?: number
   );
 }
 
-/** Apple's required subscription terms, with the Terms of Use and Privacy Policy. */
-export function Disclosures() {
+/** The store's required subscription terms (Apple's, or Google Play's on Android), with the Terms of Use and Privacy Policy. */
+export function Disclosures({ store = 'apple' }: { store?: Store | null }) {
   return (
     <View style={{ gap: Spacing.two }}>
-      <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13, lineHeight: 18 }}>
-        {`OnMyLead Pro is $${PRICES.monthly} a month or $${PRICES.annual} a year (US prices; other countries are shown in local currency). Payment is charged to your Apple ID when you confirm. The subscription renews automatically unless you turn it off at least 24 hours before the end of the current period, and renewal is charged within the 24 hours before the period ends. Manage or cancel anytime in your App Store account settings. The free Pro Trial for new accounts needs no payment and never turns into a paid subscription on its own.`}
-      </ThemedText>
+      <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13, lineHeight: 18 }}>{disclosureText(store)}</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.four }}>
-        <Pressable accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} hitSlop={8}>
+        <Pressable accessibilityRole="link" onPress={() => Linking.openURL(store === 'google' ? SITE_TERMS_URL : TERMS_URL)} hitSlop={8}>
           <ThemedText type="linkPrimary">Terms of Use</ThemedText>
         </Pressable>
         <Pressable accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} hitSlop={8}>
