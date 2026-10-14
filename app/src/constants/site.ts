@@ -10,6 +10,12 @@
  */
 export const APP_STORE_URL: string | null = null;
 
+/**
+ * True once an iPad or Android tablet build is in a store. Until then the showcase keeps its
+ * tablet section hidden, so the site never offers a device riders can't get yet.
+ */
+export const TABLETS_LIVE = false;
+
 /** Pro prices in US dollars, as set up in App Store Connect (see /pro/plan.md). */
 export const PRO_PRICES = {
   monthly: '$4.99',

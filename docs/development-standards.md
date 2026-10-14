@@ -39,6 +39,14 @@ Layout follows the **window** size, not the device model.
 These are the Android window size classes; iPad uses the same breakpoints so the two tablets
 behave alike. Put the breakpoint helper in one shared hook and use it everywhere.
 
+The shared pieces: `useLayout()` (`app/src/hooks/use-layout.ts`, breakpoints and panel widths in
+`app/src/core/layout.ts`) says `wide` (Medium and up) and `expanded`; `TwoPane`
+(`app/src/components/two-pane.tsx`) puts a side column beside a main pane; `Screen width="readable"`
+caps forms at 640; `usePanelFold(key, swipe, direction)` folds a map panel down (phone sheet), up
+(panel hanging beside the map) or left (sidebar); the tab bar becomes a rail on the left when
+`wide`. Rotation: iPhone portrait only and iPad all four ways in `app/app.json`; Android phones
+are locked upright at runtime by `app/src/lib/orientation.ts`.
+
 Tablet rules:
 
 - **Maps fill the screen.** On Medium and Expanded, the riders list, ride details and controls sit

@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TABLETS_LIVE, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { useSocialProviders } from '@/lib/session';
 
@@ -187,6 +187,27 @@ export function Showcase() {
             <img src="/showcase/web-route.webp" alt="Drawing a 3.8 mile route on Engineer Pass Road on onmylead.com: four clicks, and the route follows every switchback of the trail" loading="lazy" width={1600} height={1000} />
           </figure>
         </section>
+
+        {TABLETS_LIVE ? (
+          <section id="tablet" className="tablet-band" aria-labelledby="tablet-title">
+            <figure className="tablet-frame">
+              <img src="/showcase/tablet-ride-mode.webp" alt="Ride Mode on a tablet held sideways: the riders down the left, the live map and route in the middle, and the status buttons on the right" loading="lazy" width={1600} height={1200} />
+            </figure>
+            <div className="plan-copy">
+              <h2 id="tablet-title" className="section-title">The Whole Ride on One Screen</h2>
+              <p>
+                On an iPad or an Android tablet the map fills the screen. Every rider sits in a list down the side with how fresh their
+                spot is, and your buttons stay on the other side, so the leader sees the group, the route and the controls at once.
+              </p>
+              <ul className="ticks">
+                <li>Hold it upright or sideways; the layout follows</li>
+                <li>Swipe the riders list or the buttons away to see more map</li>
+                <li>The ride page keeps the details beside the map, riders and chat</li>
+                <li>Same account, same rides and the same Pro on your phone and tablet</li>
+              </ul>
+            </div>
+          </section>
+        ) : null}
 
         <section className="qr" aria-labelledby="qr-title">
           <figure className="phone qr-phone">
@@ -893,6 +914,9 @@ const CSS = `
 
 /* Plan on the web */
 .plan-web { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; padding-top: 140px; }
+.tablet-band { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 64px; align-items: center; padding-top: 140px; }
+.tablet-frame { margin: 0; padding: 14px; border-radius: 34px; background: #05101E; border: 1px solid rgba(151, 167, 190, 0.25); box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.8); }
+.tablet-frame img { display: block; width: 100%; height: auto; border-radius: 22px; }
 .plan-copy > p { margin-top: 20px; color: var(--soft); font-size: 19px; }
 .plan-copy .btn { margin-top: 30px; }
 .plan-small { margin-top: 14px !important; color: var(--dust) !important; font-size: 15px !important; }
@@ -993,7 +1017,7 @@ const CSS = `
 @media (max-width: 980px) {
   .step, .step:nth-child(even) { grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
   .step:nth-child(even) .phone { order: 0; }
-  .bubble-grid, .signal, .plan-web { grid-template-columns: 1fr; gap: 40px; }
+  .bubble-grid, .signal, .plan-web, .tablet-band { grid-template-columns: 1fr; gap: 40px; }
   .watch-inner { grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; }
   .browser { margin: 0; }
   .signal-map { max-height: 420px; }
@@ -1038,7 +1062,7 @@ const CSS = `
   .step .phone { max-width: 260px; margin: 0 auto; order: 2 !important; }
   .step-copy > p, .band-copy > p, .plan-copy > p, .qr-copy > p { font-size: 17px; }
   .band { margin-top: 90px; padding: 90px 0; }
-  .plan-web, .qr { padding-top: 90px; }
+  .plan-web, .tablet-band, .qr { padding-top: 90px; }
   .qr, .crew { grid-template-columns: 1fr; }
   .qr-phone { max-width: 240px; margin: 0 auto; order: 2; }
   .convoy { aspect-ratio: 4 / 5; border-radius: 24px; }
