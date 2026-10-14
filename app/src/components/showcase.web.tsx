@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TABLETS_LIVE, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { useSocialProviders } from '@/lib/session';
 
@@ -14,6 +14,12 @@ import { useSocialProviders } from '@/lib/session';
  * The photos in /showcase/photos are U.S. Bureau of Land Management pictures from the Imperial
  * Sand Dunes and Johnson Valley, which are in the public domain (sources in showcase/photos/SOURCES.md).
  */
+/**
+ * True once an iPad or Android tablet build is in a store. Until then the tablet section stays
+ * hidden, so the site never offers a device riders can't get yet.
+ */
+const TABLETS_LIVE = false;
+
 type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy' | '/support' | '/contact';
 
 export function Showcase() {
