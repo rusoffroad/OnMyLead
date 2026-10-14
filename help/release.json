@@ -27,8 +27,8 @@
     },
     {
       "feature": "iPad",
-      "why": "Planned (docs/feature-parity.md). iPhone layout only until an iPad build ships (supportsTablet is false).",
-      "sources": ["app/app.json"],
+      "why": "Tablet layouts are built (docs/feature-parity.md), but no iPad build is in the App Store yet. Tablet steps wait in :::release tablet blocks, and the tablet guide is a draft, until one ships.",
+      "sources": ["app/app.json", "app/src/core/layout.ts"],
       "words": ["iPad"]
     },
     {
