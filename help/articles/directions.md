@@ -14,7 +14,7 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - app/src/components/rider-list.tsx
 related: [ride-mode, ride-day-and-weather, waypoints-and-planned-stops, privacy]
-keywords: [navigate, navigation, turn by turn, apple maps, google maps, meeting point, driving directions, how to get there]
+keywords: [navigate, navigation, turn by turn, apple maps, google maps, meeting point, driving directions, how to get there, tablet]
 ---
 
 OnMyLead hands you over to Apple Maps or Google Maps for turn-by-turn directions on the road. Off road, follow the leader and the route on the OnMyLead map.

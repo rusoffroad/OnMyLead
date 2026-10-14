@@ -5,7 +5,7 @@ import { VehicleForm } from '@/components/vehicle-form';
 
 export default function NewVehicle() {
   return (
-    <Screen>
+    <Screen width="readable">
       <VehicleForm onSaved={(v) => router.replace(`/garage/${v.id}`)} />
     </Screen>
   );

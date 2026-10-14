@@ -14,6 +14,8 @@ import { StopPin, WaypointPin } from './waypoint-blaze';
 
 export type { MapRider } from './group-map-types';
 
+const FIT_PADDING = { top: 80, right: 60, bottom: 80, left: 60 };
+
 /**
  * Live group map. Every rider is the same grey dot with their ride name beside it; the leader is
  * the one bigger blue dot, so a glance finds them. A yellow or red ring means Ride Bubble trouble,
@@ -22,7 +24,7 @@ export type { MapRider } from './group-map-types';
  * passes for a live one.
  */
 export function GroupMap({
-  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap,
+  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding = FIT_PADDING,
 }: {
   riders: MapRider[];
   /** This phone's rider: iOS already draws them as the location dot, so no second pin. */
@@ -38,6 +40,8 @@ export function GroupMap({
   onPressWaypoint?: (w: Waypoint) => void;
   /** Press and hold the map: drop a waypoint there. */
   onLongPressMap?: (p: LatLng) => void;
+  /** Room the first framing of the group leaves around it, for panels that sit over the map (tablets). */
+  edgePadding?: { top: number; right: number; bottom: number; left: number };
 }) {
   const map = useRef<MapView>(null);
   const fitted = useRef<'no' | 'riders' | 'route'>('no');
@@ -48,10 +52,10 @@ export function GroupMap({
     if (route?.length) for (const p of route) pts.push({ latitude: p.lat, longitude: p.lng });
     const want = route?.length ? 'route' : 'riders';
     if (fitted.current !== want && fitted.current !== 'route' && pts.length) {
-      map.current?.fitToCoordinates(pts, { edgePadding: { top: 80, right: 60, bottom: 80, left: 60 }, animated: false });
+      map.current?.fitToCoordinates(pts, { edgePadding, animated: false });
       fitted.current = want;
     }
-  }, [riders, route]);
+  }, [riders, route, edgePadding]);
 
   return (
     <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}

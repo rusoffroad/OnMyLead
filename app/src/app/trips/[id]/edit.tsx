@@ -17,7 +17,7 @@ export default function EditTrip() {
   }, [id]);
 
   return (
-    <Screen>
+    <Screen width="readable">
       <ErrorText error={error} />
       {trip === null ? <ThemedText>That trip is not in your list.</ThemedText> : null}
       {trip ? (

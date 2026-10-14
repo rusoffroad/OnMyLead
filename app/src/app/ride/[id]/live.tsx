@@ -5,7 +5,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert, Animated, AppState, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View,
+  Alert, Animated, AppState, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -14,7 +14,7 @@ import { GroupMap, type MapRider } from '@/components/group-map';
 import { Icon } from '@/components/icon';
 import { KeyboardLift } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
-import { RiderList } from '@/components/rider-list';
+import { RiderList, RiderRows } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
 import { SharePicker } from '@/components/share-picker';
@@ -33,12 +33,14 @@ import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, typ
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
+import { mapPanelWidth, sidebarWidth } from '@/core/layout';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
+import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
@@ -81,6 +83,10 @@ const ALERTS_MIN = 72;
 const ALERTS_MAX = 180;
 const BANNERS_MIN = 76;
 const WP_FAB_H = 44;
+// On a tablet the panels float this far from the screen's edges.
+const EDGE = 12;
+// On a tablet the controls panel starts below the map layers button (and its downloaded-map tag).
+const TABLET_PANEL_TOP = 112;
 
 const ago = (iso: string | null | undefined, now: number) => {
   if (!iso) return 'no location yet';
@@ -109,7 +115,15 @@ export default function RideMode() {
   useKeepAwake();
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
-  const { height: screenH } = useWindowDimensions();
+  const layout = useLayout();
+  const screenH = layout.height;
+  // On a tablet (or any window Medium width and up) the map fills the screen: the ride, its banners
+  // and the riders sit in a sidebar on the left, and the message and status buttons in a panel on
+  // the right, so the leader sees the map, every rider and the controls at once.
+  const tablet = layout.wide;
+  const panelW = mapPanelWidth(layout.width);
+  const sideW = sidebarWidth(layout.width);
+  const panelBottom = tablet ? Math.max(insets.bottom, EDGE) : 0;
   // The top banners (no service, sharing, regroup, announcement) and the bottom panel share the
   // screen and never cover each other. When room is short the route strip goes compact, then the
   // alert cards scroll, then the banners scroll; the status buttons always stay whole.
@@ -178,6 +192,8 @@ export default function RideMode() {
   const { open: panelOpen, setOpen: setPanelOpen, drag: panelDrag, panHandlers: panelSwipeHandlers } = usePanelFold('ride.modePanelOpen.v1');
   // The sharing timer folds down to a small pill next to the ride name.
   const [shareOpen, toggleShareOpen] = useRememberedToggle('ride.shareBannerOpen.v1', false);
+  // Tablets: the riders sidebar folds away to the left (swipe it left, or tap Hide) to see more map.
+  const sidebar = usePanelFold('ride.ridersSidebarOpen.v1', true, 'left', layout.expanded);
   const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
   const [lastReply, setLastReply] = useState<QuickReply | null>(null);
   // The last status tap or quick reply: Sending, then Sent with who has it, or Waiting for
@@ -471,24 +487,37 @@ export default function RideMode() {
   const alertsShown = shownSeparations.length + shownHelpCalls.length > 0;
   const hasBanners = offlineSince != null || !!(activeShare && shareOpen) || !!regroup || !!announcement;
   // Each value below comes from measurements that don't depend on it, so nothing feeds back.
-  const bannersBottom = topRowBottom + (hasBanners ? 6 + bannersH : 0);
-  const roomBelowBanners = screenH - bannersBottom - Spacing.two;
+  // On a tablet the banners sit in the sidebar, beside the panel rather than above it.
+  const panelTop = tablet ? insets.top + TABLET_PANEL_TOP : topRowBottom;
+  const bannersOverPanel = hasBanners && !tablet;
+  const bannersBottom = panelTop + (bannersOverPanel ? 6 + bannersH : 0);
+  const roomBelowBanners = screenH - panelBottom - bannersBottom - Spacing.two;
   const panelRest = panelH - (alertsShown ? alertsH : 0);
   const stripCompact = !panelOpen || roomBelowBanners < (alertsShown ? FULL_STRIP_ROOM_WITH_ALERTS : FULL_STRIP_ROOM);
   // On a short screen with banners up, the open panel drops the strip (it comes back folded) so
   // the alerts and buttons fit under the banners.
-  const panelSpace = screenH - Spacing.two - topRowBottom - (hasBanners ? 6 + Math.min(bannersH, BANNERS_MIN) : 0);
+  const panelSpace = screenH - panelBottom - Spacing.two - panelTop - (bannersOverPanel ? 6 + Math.min(bannersH, BANNERS_MIN) : 0);
   const stripHidden = panelOpen && !!panelH &&
     panelSpace < panelRest - stripH + (alertsShown ? ALERTS_MIN : 0) + compactStripH;
   const stripShown = !!route.route && !stripHidden;
   const alertsMax = panelH ? Math.min(ALERTS_MAX, Math.max(ALERTS_MIN, roomBelowBanners - panelRest)) : ALERTS_MAX;
-  const bannersMax = panelH
-    ? Math.max(BANNERS_MIN, screenH - Spacing.two - panelRest - (alertsShown ? ALERTS_MIN : 0) - topRowBottom - 6)
-    : undefined;
-  const shownBannersBottom = topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
+  const bannersMax = tablet
+    ? Math.max(BANNERS_MIN, Math.round(screenH * 0.35))
+    : panelH
+      ? Math.max(BANNERS_MIN, screenH - Spacing.two - panelRest - (alertsShown ? ALERTS_MIN : 0) - topRowBottom - 6)
+      : undefined;
+  const shownBannersBottom = tablet ? panelTop : topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
   // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
   // and hold the map still drops one).
-  const wpFabFits = screenH - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
+  const wpFabFits = screenH - panelBottom - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
+  // The first framing of the group keeps it clear of the panels over the map.
+  const sidebarOpen = sidebar.open;
+  const fitPadding = useMemo(
+    () => (tablet
+      ? { top: insets.top + 60, right: panelW + EDGE + 40, bottom: 60, left: sidebarOpen ? sideW + EDGE + 40 : 60 }
+      : undefined),
+    [tablet, insets.top, panelW, sideW, sidebarOpen],
+  );
 
   async function beginShare(minutes: number | null) {
     setBusy(true);
@@ -674,10 +703,21 @@ export default function RideMode() {
         waypoints={wp.waypoints}
         onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
         onLongPressMap={mine ? openNewWaypoint : undefined}
+        edgePadding={fitPadding}
       />
-      <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route.route?.points} ride={ride} />
+      <TrailMapOverlay
+        trail={trail}
+        top={tablet ? insets.top + EDGE : insets.top + 66}
+        cardTop={tablet ? insets.top + 64 : insets.top + 118}
+        cardWidth={tablet ? Math.min(360, layout.width - sideW - 3 * EDGE) : undefined}
+        route={route.route?.points}
+        ride={ride}
+      />
 
-      <SafeAreaView edges={['top']} style={styles.top}>
+      <SafeAreaView
+        edges={['top']}
+        pointerEvents="box-none"
+        style={[styles.top, tablet && [styles.topTablet, { width: sideW + 2 * Spacing.two, bottom: panelBottom - Spacing.two }]]}>
         <View style={styles.topRow} onLayout={(e) => setTopRowBottom(Math.round(e.nativeEvent.layout.y + e.nativeEvent.layout.height))}>
           <Pressable onPress={() => router.back()} hitSlop={16} accessibilityLabel="Back" style={{ flexShrink: 1 }}>
             <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
@@ -699,20 +739,22 @@ export default function RideMode() {
                 {activeShare ? formatRemainingShort(shareLeft) : 'Off'}
               </Text>
             </Pressable>
-            <Pressable
-              onPress={() => setRidersOpen(true)}
-              hitSlop={10}
-              accessibilityRole="button"
-              accessibilityLabel={`${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}. Tap to see every rider and when they last updated`}>
-              <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
-                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'} ›
-              </Text>
-            </Pressable>
+            {tablet ? null : (
+              <Pressable
+                onPress={() => setRidersOpen(true)}
+                hitSlop={10}
+                accessibilityRole="button"
+                accessibilityLabel={`${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}. Tap to see every rider and when they last updated`}>
+                <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
+                  {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'} ›
+                </Text>
+              </Pressable>
+            )}
           </View>
         </View>
         {hasBanners ? (
           <ScrollView
-            style={{ maxHeight: bannersMax }}
+            style={{ maxHeight: bannersMax, flexGrow: 0 }}
             contentContainerStyle={{ gap: 6 }}
             onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
             showsVerticalScrollIndicator={false}>
@@ -754,6 +796,55 @@ export default function RideMode() {
           ) : null}
           </ScrollView>
         ) : null}
+        {tablet ? (
+          sidebar.open ? (
+            <Animated.View {...sidebar.panHandlers} style={[styles.sidebar, { transform: [{ translateX: sidebar.drag }] }]}>
+              <View style={styles.sidebarHead}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.sidebarTitle}>Riders</Text>
+                  <Text style={[styles.sidebarState, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
+                    {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'}, {joined.length} on the Ride
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={() => sidebar.setOpen(false)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: true }}
+                  accessibilityLabel="Hide the riders"
+                  accessibilityHint="You can also swipe the list left to hide it"
+                  hitSlop={8}
+                  style={styles.sidebarFold}>
+                  <Text style={styles.sidebarFoldText}>◀ Hide</Text>
+                </Pressable>
+              </View>
+              {offlineSince != null ? (
+                <Text style={styles.sidebarNote}>You have no service. Times are from the last update you got.</Text>
+              ) : null}
+              <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle="white">
+                <RiderRows
+                  riders={mapRiders}
+                  meId={me}
+                  onNavigate={navigateTo}
+                  narrow
+                  extra={(riderId) => (statuses[riderId]?.status === 'mechanical' ? <BreakdownBadge size={18} /> : null)}
+                />
+              </ScrollView>
+            </Animated.View>
+          ) : (
+            <Pressable
+              onPress={() => sidebar.setOpen(true)}
+              accessibilityRole="button"
+              accessibilityState={{ expanded: false }}
+              accessibilityLabel={`Show the riders. ${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}`}
+              style={({ pressed }) => [styles.sidebarShow, { opacity: pressed ? 0.8 : 1 }]}>
+              <View style={[styles.shareDot, { backgroundColor: bubble.alerts.length ? RideColors.red : RideColors.green }]} />
+              <Text style={styles.sidebarShowText}>
+                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'}
+              </Text>
+              <Text style={styles.sidebarShowText}>Show Riders ▶</Text>
+            </Pressable>
+          )
+        ) : null}
       </SafeAreaView>
 
       {panelH && directionRows.length && wpFabFits ? (
@@ -761,7 +852,10 @@ export default function RideMode() {
           onPress={() => setDirectionsOpen(true)}
           accessibilityRole="button"
           accessibilityLabel="Directions in Apple Maps or Google Maps"
-          style={({ pressed }) => [styles.wpFab, styles.directionsFab, { bottom: panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
+          style={({ pressed }) => [
+            styles.wpFab, styles.directionsFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 },
+            tablet && { left: layout.width - EDGE - panelW },
+          ]}>
           <Icon name="turn" size={24} color={Colors.sky} strokeWidth={2.1} />
           <Text style={styles.wpFabText}>Directions</Text>
         </Pressable>
@@ -773,7 +867,7 @@ export default function RideMode() {
           accessibilityRole="button"
           accessibilityLabel="Add a waypoint at your location"
           accessibilityHint="You can also press and hold the map to drop one anywhere"
-          style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
+          style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
           <WaypointBlaze kind="spot" shared={false} size={24} />
           <Text style={styles.wpFabText}>Add Waypoint</Text>
         </Pressable>
@@ -782,8 +876,12 @@ export default function RideMode() {
       <Animated.View
         {...panelSwipeHandlers}
         onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}
-        style={[styles.bottomWrap, { transform: [{ translateY: panelDrag }] }]}>
-      <SafeAreaView edges={['bottom']} style={styles.bottom}>
+        style={[
+          styles.bottomWrap,
+          tablet && { left: 'auto', right: EDGE, bottom: panelBottom, width: panelW },
+          { transform: [{ translateY: panelDrag }] },
+        ]}>
+      <SafeAreaView edges={tablet ? [] : ['bottom']} style={[styles.bottom, tablet && styles.bottomTablet]}>
         {route.route && stripShown ? (
           <View
             ref={stripRef}
@@ -986,7 +1084,7 @@ export default function RideMode() {
       <DirectionsSheet visible={directionsOpen} rows={directionRows} onClose={() => setDirectionsOpen(false)} />
 
       <RiderList
-        visible={ridersOpen}
+        visible={ridersOpen && !tablet}
         riders={mapRiders}
         meId={me}
         offline={offlineSince != null}
@@ -1009,9 +1107,9 @@ export default function RideMode() {
       />
 
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
-        <View style={styles.sheetWrap}>
+        <View style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <KeyboardLift>
-          <View style={styles.sheet}>
+          <View style={[styles.sheet, tablet && styles.sheetTablet]}>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Share Your Location with This Ride?</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
               Only riders on this ride will see you. Sharing stops automatically when time runs out or the ride ends.
@@ -1024,8 +1122,8 @@ export default function RideMode() {
       </Modal>
 
       <Modal visible={sosOpen} animationType="fade" transparent onRequestClose={() => setSosOpen(false)}>
-        <View style={styles.sheetWrap}>
-          <View style={[styles.sheet, { borderTopColor: RideColors.red, borderTopWidth: 6 }]}>
+        <View style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
+          <View style={[styles.sheet, tablet && styles.sheetTablet, { borderTopColor: RideColors.red, borderTopWidth: 6 }]}>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Emergency</ThemedText>
             <ThemedText style={styles.sheetBody}>
               This alerts everyone on the ride with your location. It does not contact emergency services. Call 911 if anyone is hurt.
@@ -1072,7 +1170,25 @@ const styles = StyleSheet.create({
   shareText: { color: '#fff', fontFamily: font(700), fontSize: 15, textAlign: 'center' },
   shareAction: { minHeight: 32, paddingHorizontal: 10, borderRadius: 16, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.22)' },
   shareActionText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
+  // Tablets: the top bar, banners and riders become a column on the left, as tall as the screen.
+  topTablet: { right: 'auto' },
+  sidebar: {
+    flexShrink: 1, gap: Spacing.two, padding: 10, paddingTop: 12, borderRadius: 20,
+    backgroundColor: 'rgba(10,22,38,0.94)', borderWidth: 1, borderColor: Colors.border,
+  },
+  sidebarHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingHorizontal: 4 },
+  sidebarTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 26, lineHeight: 28 },
+  sidebarState: { fontFamily: font(700), fontSize: 14 },
+  sidebarFold: { minHeight: 36, paddingHorizontal: 12, borderRadius: 18, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
+  sidebarFoldText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
+  sidebarNote: { color: Colors.text, fontFamily: font(700), fontSize: 13, paddingHorizontal: 4 },
+  sidebarShow: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', minHeight: 44, paddingHorizontal: 14,
+    borderRadius: 22, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
+  },
+  sidebarShowText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   bottomWrap: { position: 'absolute', bottom: 0, left: 0, right: 0 },
+  bottomTablet: { borderRadius: 24, borderWidth: 1, borderColor: Colors.border, paddingBottom: 12 },
   bottom: {
     padding: Spacing.two, paddingTop: 12,
     backgroundColor: 'rgba(10,22,38,0.96)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
@@ -1128,6 +1244,9 @@ const styles = StyleSheet.create({
   waypointFab: { right: 12 },
   wpFabText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
+  // On a tablet a sheet is a card in the middle of the screen, not a strip across the bottom.
+  sheetWrapTablet: { justifyContent: 'center', alignItems: 'center', padding: Spacing.four },
+  sheetTablet: { width: '100%', maxWidth: 520, borderRadius: 28 },
   sheet: { backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
   sheetTitle: { color: Colors.text },
   sheetBody: { color: Colors.textSecondary },

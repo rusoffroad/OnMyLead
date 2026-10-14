@@ -8,9 +8,12 @@ import { PlaceSearch } from '@/components/place-search';
 import { RidesMap } from '@/components/rides-map';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Screen, Section, Segmented } from '@/components/ui';
+import { TwoPane } from '@/components/two-pane';
 import { Spacing } from '@/constants/theme';
 import { boundsAround, RADIUS_CHOICES_MI, stateByCode, US_STATES, type Bounds } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
+import { sideColumnWidth } from '@/core/layout';
+import { useLayout } from '@/hooks/use-layout';
 import type { Place } from '@/core/places';
 import { publicRidesInArea, publicRidesInState, publicRidesNear } from '@/lib/api';
 import { track } from '@/lib/analytics';
@@ -34,6 +37,7 @@ export default function FindRidesScreen() {
 }
 
 function FindRides() {
+  const layout = useLayout();
   const [mode, setMode] = useState<Mode>('near');
   const [radius, setRadius] = useState<number>(50);
   const [here, setHere] = useState<LatLng | null>(null);
@@ -147,8 +151,21 @@ function FindRides() {
     : mode === 'near' && origin ? `No public rides within ${radius} miles${place ? ` of ${place.name}` : ''} yet.`
     : `No public rides in ${state?.name ?? 'this state'} yet.`;
 
-  return (
-    <Screen>
+  const map = frame ? (
+        <RidesMap
+          rides={rides ?? []}
+          frame={frame}
+          frameKey={place ? `${place.id}:${radius}` : state?.code ?? 'here'}
+          circle={ring}
+          title={place?.name ?? state?.name ?? null}
+          onPressTitle={() => setPickingState((p) => !p)}
+          onOpen={open}
+          onSearchArea={setArea}
+          height={layout.wide ? '100%' : undefined}
+        />
+  ) : null;
+  const search = (
+    <>
       <Segmented<Mode>
         value={mode}
         onChange={switchMode}
@@ -179,18 +196,10 @@ function FindRides() {
 
       <ErrorText error={error} />
 
-      {frame ? (
-        <RidesMap
-          rides={rides ?? []}
-          frame={frame}
-          frameKey={place ? `${place.id}:${radius}` : state?.code ?? 'here'}
-          circle={ring}
-          title={place?.name ?? state?.name ?? null}
-          onPressTitle={() => setPickingState((p) => !p)}
-          onOpen={open}
-          onSearchArea={setArea}
-        />
-      ) : null}
+    </>
+  );
+  const results = (
+    <>
 
       {mode === 'near' && origin && !area ? (
         <Choice
@@ -228,6 +237,30 @@ function FindRides() {
         </RowGroup>
       ) : null}
       <View style={{ height: Spacing.two }} />
+    </>
+  );
+
+  // On a tablet (or a wide window) the search and the list sit beside a map as tall as the screen.
+  if (layout.wide) {
+    return (
+      <TwoPane
+        sideWidth={sideColumnWidth(layout.width)}
+        side={<>{search}{results}</>}
+        mainScroll={false}
+        main={map ?? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <ThemedText themeColor="textSecondary">The map opens on your location or the state you pick.</ThemedText>
+          </View>
+        )}
+      />
+    );
+  }
+
+  return (
+    <Screen>
+      {search}
+      {map}
+      {results}
     </Screen>
   );
 }

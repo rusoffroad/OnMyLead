@@ -17,7 +17,7 @@ sources:
   - supabase/migrations/20261019300000_status_broadcast.sql
   - supabase/migrations/20261015000000_notification_settings.sql
 related: [ride-mode, emergency-and-safety, ride-chat, notification-settings, leader-sweep-and-tail-gunner]
-keywords: [status, quick reply, need help, mechanical issue, flat tire, stuck, lost, need fuel, regroup, seen, receipts, cancel, on my way, running late]
+keywords: [status, quick reply, need help, mechanical issue, flat tire, stuck, lost, need fuel, regroup, seen, receipts, cancel, on my way, running late, tablet]
 screenshots:
   - file: live.webp
     shows: app/src/app/ride/[id]/live.tsx

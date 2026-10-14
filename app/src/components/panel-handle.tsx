@@ -5,7 +5,8 @@ import { Colors, font } from '@/constants/theme';
 /**
  * The grab bar at the top of a foldable map panel (see usePanelFold): tap it to fold or open, and
  * it says which. `what` names what comes back ("Tools", "Waypoints"). `fromTop` is a panel hanging
- * from the top of the screen (beside the map on a wide website), so the arrows point the other way.
+ * from the top of the screen (beside the map on a tablet or a wide website), so the arrows and the
+ * swipe point the other way.
  */
 export function PanelHandle({ open, onToggle, what, fromTop = false }: { open: boolean; onToggle: () => void; what: string; fromTop?: boolean }) {
   const down = open !== fromTop;
@@ -15,7 +16,7 @@ export function PanelHandle({ open, onToggle, what, fromTop = false }: { open: b
       accessibilityRole="button"
       accessibilityState={{ expanded: open }}
       accessibilityLabel={open ? `Hide the ${what.toLowerCase()}` : `Show the ${what.toLowerCase()}`}
-      accessibilityHint={fromTop ? undefined : 'You can also swipe the panel down to hide it or up to show it'}
+      accessibilityHint={fromTop ? 'You can also swipe the panel up to hide it or down to show it' : 'You can also swipe the panel down to hide it or up to show it'}
       hitSlop={8}
       style={styles.handle}>
       <View style={styles.bar} />

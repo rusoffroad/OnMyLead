@@ -17,7 +17,7 @@ export default function EditVehicle() {
   }, [id]);
 
   return (
-    <Screen>
+    <Screen width="readable">
       <ErrorText error={error} />
       {vehicle === null ? <ThemedText>That machine is not in your garage.</ThemedText> : null}
       {vehicle ? <VehicleForm vehicle={vehicle} onSaved={() => (router.canGoBack() ? router.back() : router.replace(`/garage/${id}`))} /> : null}

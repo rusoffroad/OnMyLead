@@ -19,7 +19,7 @@ sources:
   - app/src/core/google-oauth.ts
   - app/src/app/(tabs)/profile.tsx
 related: [getting-started, ride-name-and-profile, delete-account, troubleshooting]
-keywords: [log in, login, sign up, register, password, forgot password, reset, magic link, email link, apple, google, facebook, sign out, log out]
+keywords: [log in, login, sign up, register, password, forgot password, reset, magic link, email link, apple, google, facebook, sign out, log out, tablet]
 ---
 
 You need an account to create rides, keep a Garage and save riding groups. You can sign in with a social account, with your email and a password, or with a link we email you.

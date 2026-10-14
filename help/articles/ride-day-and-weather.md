@@ -11,7 +11,7 @@ sources:
   - app/src/lib/forecast.ts
   - app/src/app/r/[code].tsx
 related: [create-a-ride, directions, fuel-range, emergency-and-safety]
-keywords: [weather, forecast, rain, wind, temperature, sunset, sunrise, daylight, dark, countdown, storm]
+keywords: [weather, forecast, rain, wind, temperature, sunset, sunrise, daylight, dark, countdown, storm, tablet]
 ---
 
 The **Ride Day** card on the ride page shows the weather for the meeting area and how your ride lines up with daylight, so nobody gets surprised by a storm or the last miles in the dark.

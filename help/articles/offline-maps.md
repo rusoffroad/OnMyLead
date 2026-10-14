@@ -23,7 +23,7 @@ sources:
   - app/src/core/pro.ts
   - app/src/lib/pro.ts
 related: [map-layers, free-vs-pro, ride-mode, route-builder, troubleshooting]
-keywords: [offline, no signal, no service, download map, save map, dead zone, backcountry, storage, delete map, topo offline, satellite offline]
+keywords: [offline, no signal, no service, download map, save map, dead zone, backcountry, storage, delete map, topo offline, satellite offline, tablet]
 ---
 
 Out on the trail the signal often drops. Download a map before you leave and the map keeps working with no signal: satellite photos, topo and trail lines for the area you saved.

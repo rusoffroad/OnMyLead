@@ -12,7 +12,7 @@ sources:
   - app/src/app/_layout.tsx
   - supabase/functions/play-notifications/index.ts
 related: [subscribe-to-pro, manage-subscription, restore-purchases]
-keywords: [promo code, offer code, coupon, discount, redeem, gift, free months]
+keywords: [promo code, offer code, coupon, discount, redeem, gift, free months, tablet]
 ---
 
 OnMyLead promo codes are Apple offer codes for OnMyLead Pro. You redeem them through Apple, right from the app.

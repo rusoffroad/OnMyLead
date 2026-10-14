@@ -27,6 +27,7 @@ export function GroupMap({
   waypoints?: Waypoint[];
   onPressWaypoint?: (w: Waypoint) => void;
   onLongPressMap?: (p: LatLng) => void;
+  edgePadding?: { top: number; right: number; bottom: number; left: number };
 }) {
   if (route && route.length > 1) {
     const dots = riders

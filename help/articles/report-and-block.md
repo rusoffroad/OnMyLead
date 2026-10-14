@@ -19,7 +19,7 @@ sources:
   - supabase/migrations/20261018200000_reports.sql
   - supabase/migrations/20261020000000_blocked_riders.sql
 related: [privacy, ride-chat, group-chat, emergency-and-safety, contact-support]
-keywords: [report, block, unblock, harassment, spam, scam, fake account, unsafe, abuse, mute]
+keywords: [report, block, unblock, harassment, spam, scam, fake account, unsafe, abuse, mute, tablet]
 ---
 
 If a rider or a ride isn't right, report it to the OnMyLead team. If you'd rather not hear from a rider, block them. Neither one tells the other person it was you.

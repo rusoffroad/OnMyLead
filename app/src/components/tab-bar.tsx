@@ -17,14 +17,21 @@ export const TABS: TabSpec[] = [
 ];
 
 /**
- * The bottom bar. The tab you're on gets the red lead line above it, the way the leader's line runs
- * ahead of the group on the map; the rest stay quiet. Tabs that need an account send a signed-out
- * rider to sign in instead.
+ * The bottom bar on a phone, and a rail down the left edge on a tablet (`rail`). The tab you're on
+ * gets the red lead line (above it on the bar, beside it on the rail), the way the leader's line
+ * runs ahead of the group on the map; the rest stay quiet. Tabs that need an account send a
+ * signed-out rider to sign in instead.
  */
-export function TabBar({ state, navigation, insets, hidden, signedIn }: BottomTabBarProps & { hidden: string[]; signedIn: boolean }) {
+export function TabBar({
+  state, navigation, insets, hidden, signedIn, rail = false,
+}: BottomTabBarProps & { hidden: string[]; signedIn: boolean; rail?: boolean }) {
   const shown = state.routes.filter((r) => !hidden.includes(r.name));
   return (
-    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]} accessibilityRole="tablist">
+    <View
+      style={rail
+        ? [styles.rail, { paddingTop: Math.max(insets.top, 12) + 8, paddingBottom: Math.max(insets.bottom, 12), paddingLeft: insets.left }]
+        : [styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}
+      accessibilityRole="tablist">
       {shown.map((route) => {
         const spec = TABS.find((t) => t.name === route.name);
         if (!spec) return null;
@@ -44,8 +51,8 @@ export function TabBar({ state, navigation, insets, hidden, signedIn }: BottomTa
             accessibilityLabel={spec.title}
             onPress={onPress}
             onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
-            style={styles.item}>
-            <View style={[styles.lead, focused && styles.leadOn]} />
+            style={rail ? styles.railItem : styles.item}>
+            <View style={[rail ? styles.railLead : styles.lead, focused && styles.leadOn]} />
             <Icon name={spec.icon} size={25} color={color} strokeWidth={focused ? 2.4 : 2} />
             <Text style={[styles.label, { color }]} numberOfLines={1}>{spec.title}</Text>
           </Pressable>
@@ -63,5 +70,15 @@ const styles = StyleSheet.create({
   item: { flex: 1, alignItems: 'center', gap: 3, paddingTop: 0, paddingBottom: 2, minHeight: 56 },
   lead: { width: 30, height: 3, borderBottomLeftRadius: 3, borderBottomRightRadius: 3, marginBottom: 7, backgroundColor: 'transparent' },
   leadOn: { backgroundColor: Colors.accent },
+  // A tablet's rail: the same four places, stacked at the top of the left edge, glove-sized.
+  rail: {
+    width: 92, backgroundColor: Colors.background, borderRightWidth: 1, borderRightColor: Colors.backgroundElement,
+    alignItems: 'stretch', gap: 6,
+  },
+  railItem: { alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 76 },
+  railLead: {
+    position: 'absolute', left: 0, top: 14, bottom: 14, width: 4,
+    borderTopRightRadius: 4, borderBottomRightRadius: 4, backgroundColor: 'transparent',
+  },
   label: { fontFamily: font(700, 'display'), fontSize: 14, lineHeight: 16, letterSpacing: 0.3 },
 });

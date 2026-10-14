@@ -212,7 +212,7 @@ export default function NewRide() {
   if (Platform.OS === 'web' && !loading && !session) return <Redirect href="/sign-in?next=/ride/new" />;
 
   return (
-    <Screen>
+    <Screen width="readable">
       {Platform.OS === 'web' ? (
         <ThemedText type="small" themeColor="textSecondary">
           Plan it here on the big screen. The ride, its route and its stops show up in the OnMyLead app on your iPhone as soon as you save.

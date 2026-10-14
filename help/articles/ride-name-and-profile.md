@@ -18,7 +18,7 @@ sources:
   - supabase/migrations/20261013500000_rider_names.sql
   - supabase/migrations/20261022000000_social_profiles.sql
 related: [sign-in, getting-started, privacy, report-and-block]
-keywords: [nickname, display name, username, change name, profile photo, social profile, google profile, facebook profile, apple profile]
+keywords: [nickname, display name, username, change name, profile photo, social profile, google profile, facebook profile, apple profile, tablet]
 ---
 
 Your ride name is how the group knows you. It shows on the group map, the rider list and in ride chat. A nickname works fine.

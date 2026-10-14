@@ -13,3 +13,21 @@ export function swipeResult(open: boolean, dy: number, vy: number): 'fold' | 'op
   if (!open && (dy < -SWIPE_DISTANCE || vy < -SWIPE_VELOCITY)) return 'open';
   return null;
 }
+
+/** True once a touch has moved enough, mostly left or right, to count as a swipe on a side panel. */
+export function isHorizontalSwipe(dx: number, dy: number): boolean {
+  return Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.5;
+}
+
+/**
+ * Which way a panel folds: down (a sheet at the bottom of the screen), up (a panel hanging from
+ * the top, beside the map on a tablet) or left (a sidebar on the left edge).
+ */
+export type FoldDirection = 'down' | 'up' | 'left';
+
+/** swipeResult for a panel that folds in `direction`: the drag is measured along the way it folds. */
+export function swipeResultToward(direction: FoldDirection, open: boolean, dx: number, dy: number, vx: number, vy: number) {
+  if (direction === 'left') return swipeResult(open, -dx, -vx);
+  if (direction === 'up') return swipeResult(open, -dy, -vy);
+  return swipeResult(open, dy, vy);
+}

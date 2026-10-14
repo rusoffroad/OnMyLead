@@ -16,7 +16,7 @@ sources:
   - supabase/migrations/20261015000000_notification_settings.sql
   - supabase/migrations/20261019300000_status_broadcast.sql
 related: [status-buttons, ride-mode, location-sharing, family-link, notification-settings, offline-maps]
-keywords: [emergency, sos, 911, help, need help, accident, injury, hurt, crash, safety, rescue]
+keywords: [emergency, sos, 911, help, need help, accident, injury, hurt, crash, safety, rescue, tablet]
 ---
 
 :::warning

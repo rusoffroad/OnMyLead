@@ -22,9 +22,10 @@ database, RPCs and edge functions support it for every store and device. **Admin
 Dashboard shows or manages it where relevant. **Docs** = Help Center article(s) cover it.
 **Release** = the store version that carries it.
 
-Today's device-wide state: iPad runs only the iPhone layout in compatibility mode
-(`supportsTablet: false`, portrait lock), and no Android build has been made yet, so every
-Android cell is at best 🟡.
+Today's device-wide state: iPad support and tablet layouts are in the code (`supportsTablet: true`,
+tablets rotate, phones stay upright) but no iPad build has shipped; the version in the App Store
+review is iPhone only. Tablet cells are 🟡 until a tablet build is checked on a device, and no
+Android build has been made yet, so every Android cell is at best 🟡.
 
 ## Features
 
@@ -36,36 +37,36 @@ Android cell is at best 🟡.
 | F04 | Sign in with Facebook | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ sign-in | iOS 1.0 | |
 | F05 | Ride name, social profile | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-name-and-profile | iOS 1.0 | |
 | F06 | Delete account | ✅ | 🟡 | 🟡 | ⬜ | ✅ | ✅ | ✅ delete-account | iOS 1.0 | Copy mentions Apple subscriptions only; Pro screen and Help now name Google Play on Android |
-| F07 | Create a ride (app and website) | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ✅ | ✅ create-a-ride | iOS 1.0 | Tablet: two-column form |
+| F07 | Create a ride (app and website) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ create-a-ride | iOS 1.0 | Tablet: form capped at 640 wide; two-column form not built (issue #101) |
 | F08 | Free ride limit (1 a month) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ free-vs-pro | iOS 1.0 | Enforced in the database |
 | F09 | Edit ride name, time, meeting point | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ➖ | ⬜ | | Not built anywhere (noted, not started) |
 | F10 | Cancel, delete, end ride | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ edit-cancel-or-delete-a-ride | iOS 1.0 | |
 | F11 | Organizer controls: approvals, hand-off, leaders, tail gunner | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ organizer-controls | iOS 1.0 | Approval fix needs migration 20261025000000 applied |
-| F12 | Ride page, Ride Day weather, fuel check | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ✅ | ✅ ride-day-and-weather | iOS 1.0 | Tablet: details beside map |
+| F12 | Ride page, Ride Day weather, fuel check | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-day-and-weather | iOS 1.0 | Tablet: ride and details on the left, Map / Riders / Chat beside them; web-checked, no device check yet |
 | F13 | Join: code, link, QR, waitlist, check-in | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ join-a-ride | iOS 1.0 | |
 | F14 | Universal / App Links (onmylead.com/r, /g) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ invite-riders | iOS 1.0 | Android: intent filters + `assetlinks.json` in PR #99; upload key fingerprint added (Play App Signing key's still to add once the Play Console app exists, `docs/android-build.md`); needs a website deploy and a device check (`docs/android-build.md`). Email links (`/auth-callback`) stay in the browser on Android |
 | F15 | Invite card: share, text, email, QR | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ invite-riders | iOS 1.0 | |
-| F16 | Find a Ride (flag) | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ✅ | ✅ find-a-ride | iOS 1.0 | Android: map needs API key (F27) |
-| F17 | Ride Mode live map | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ➖ | ✅ ride-mode | iOS 1.0 | Tablet: sidebar riders + details over full map |
+| F16 | Find a Ride (flag) | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ✅ | ✅ find-a-ride | iOS 1.0 | Android: map needs API key (F27). Tablet: search and list beside a full-height map; web-checked |
+| F17 | Ride Mode live map | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ ride-mode | iOS 1.0 | Tablet: full-screen map, riders sidebar (swipe left to fold), controls panel on the right; web-checked, no device check yet |
 | F18 | Live location sharing (foreground) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Cross-platform sync test not run yet |
 | F19 | Background location during a ride | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Android (PR #99): foreground service with While Using permission, no `ACCESS_BACKGROUND_LOCATION` and so no Play background-location declaration. Needs a real-device check with the screen off |
-| F20 | Wi-Fi-only tablets (no GPS) | ➖ | ⬜ | ➖ | ⬜ | ✅ | ➖ | ⬜ | | Show approximate accuracy; follow without sharing |
+| F20 | Wi-Fi-only tablets (no GPS) | ➖ | ⬜ | ➖ | ⬜ | ✅ | ➖ | ⬜ | | Show approximate accuracy; follow without sharing. Tracked in issue #101 |
 | F21 | Personal sharing, family link | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ family-link | iOS 1.0 | |
 | F22 | Freshness, Ride Bubble, convoy | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ ride-bubble | iOS 1.0 | |
 | F23 | Status buttons, broadcast receipts, regroup, Mechanical Issue, SOS | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ status-buttons | iOS 1.0 | |
-| F24 | Ride chat (everyone / leader) | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ✅ | ✅ ride-chat | iOS 1.0 | Tablet: chat beside map |
+| F24 | Ride chat (everyone / leader) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-chat | iOS 1.0 | Tablet: chat beside the ride details |
 | F25 | Ride polls (flag) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-polls | iOS 1.0 | |
-| F26 | Route builder, trail snapping | ✅ | ⬜ | ⬜ | ⬜ | ✅ | ➖ | ✅ route-builder | iOS 1.0 | Web has a wide layout to reuse |
+| F26 | Route builder, trail snapping | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ route-builder | iOS 1.0 | Tablet: tools panel beside the map (Expanded) or floating card (Medium); web-checked |
 | F27 | Maps (satellite, topo, trails layers) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ map-layers | iOS 1.0 | Android: Google Maps SDK via react-native-maps, key from `GOOGLE_MAPS_ANDROID_API_KEY` at prebuild (PR #99, D05); blank until the key exists |
 | F28 | GPX import | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ import-gpx | iOS 1.0 | No GPX export anywhere |
-| F29 | Waypoints, planned stops | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ waypoints-and-planned-stops | iOS 1.0 | |
+| F29 | Waypoints, planned stops | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ waypoints-and-planned-stops | iOS 1.0 | Tablet: waypoint panel beside the map; web-checked |
 | F30 | Directions hand-off | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ directions | iOS 1.0 | Android: Google Maps only |
 | F31 | Offline maps | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ offline-maps | iOS 1.0 | |
 | F32 | Place search | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ place-search | iOS 1.0 | |
-| F33 | Riding groups, group chat, follow leaders | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ riding-groups | iOS 1.0 | Tablet: list + chat side by side |
+| F33 | Riding groups, group chat, follow leaders | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ riding-groups | iOS 1.0 | Tablet: list + chat side by side not built yet (issue #101) |
 | F34 | Report and block | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ report-and-block | iOS 1.0 | |
-| F35 | Garage, fuel range | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ garage | iOS 1.0 | |
-| F36 | Trip planner (flag) | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ trip-planner | iOS 1.0 | |
+| F35 | Garage, fuel range | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ garage | iOS 1.0 | Tablet: forms capped at 640 wide; list + detail not built (issue #101) |
+| F36 | Trip planner (flag) | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ trip-planner | iOS 1.0 | Tablet: forms capped at 640 wide; list + detail not built (issue #101) |
 | F37 | Starlink (flag) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ starlink | iOS 1.0 | Android network config exists, untested |
 | F38 | RUS gear (flag) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ rus-gear | iOS 1.0 | |
 | F39 | Ride summary, share card, ride again | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ ride-summary-and-ride-again | iOS 1.0 | |
@@ -85,9 +86,9 @@ Android cell is at best 🟡.
 
 | ID | Item | State | Notes |
 |---|---|---|---|
-| D01 | iPad: `supportsTablet`, rotation, multitasking | ⬜ | Needs a new Apple build after 1.0 is approved |
-| D02 | Shared breakpoint hook (Compact / Medium / Expanded) | ⬜ | `docs/development-standards.md` section 2 |
-| D03 | Tablet layouts: Ride Mode sidebar, ride page split, list + detail | ⬜ | |
+| D01 | iPad: `supportsTablet`, rotation, multitasking | 🔨 | In `app/app.json`: iPhone portrait only, iPad all four orientations and Split View / Slide Over; Android rotation via `src/lib/orientation.ts` (phones locked upright). Needs a new Apple build after 1.0 is approved |
+| D02 | Shared breakpoint hook (Compact / Medium / Expanded) | ✅ | `src/core/layout.ts` (unit tested) + `src/hooks/use-layout.ts`; `TwoPane` and the tab rail use it |
+| D03 | Tablet layouts: Ride Mode sidebar, ride page split, list + detail | 🔨 | Ride Mode, ride page, Find, route builder, waypoints, Rides home and tab rail done; groups / garage / trips list + detail and keyboard shortcuts in issue #101 |
 | D04 | Android build pipeline (Mac Gradle or EAS) and release keystore | 🔨 | Gradle on the Mac, upload-key signing from `~/.gradle/gradle.properties`, Play App Signing: `docs/android-build.md` (PR #99). Keystore is Chris's |
 | D05 | Google Maps API key (Android) | 🔨 | Plugin reads `GOOGLE_MAPS_ANDROID_API_KEY` from `app/.env` (PR #99). Maps SDK for Android has no usage charge; needs a Google Cloud billing account. Key is Chris's |
 | D06 | Firebase project + FCM | 🔨 | Code done (PR #99); Chris creates the Firebase project, `app/google-services.json` and the `FCM_SERVICE_ACCOUNT` secret |

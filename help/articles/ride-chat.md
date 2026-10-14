@@ -16,7 +16,7 @@ sources:
   - supabase/migrations/20261012000000_chat_leader_push.sql
   - supabase/migrations/20261018600000_message_clear_resolve.sql
 related: [ride-polls, status-buttons, notification-settings, report-and-block, organizer-controls]
-keywords: [chat, message, messages, leader only, announcement, pinned, clear message, delete message, resolved, pop-up, notifications]
+keywords: [chat, message, messages, leader only, announcement, pinned, clear message, delete message, resolved, pop-up, notifications, tablet]
 screenshots:
   - file: chat.webp
     shows: app/src/components/ride-chat.tsx

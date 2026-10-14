@@ -16,7 +16,7 @@ sources:
   - app/src/core/entitlements.ts
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [route-builder, free-vs-pro, map-layers, offline-maps]
-keywords: [gpx, import, track, gaia, onx, file, upload route, gpx file]
+keywords: [gpx, import, track, gaia, onx, file, upload route, gpx file, tablet]
 ---
 
 Already have the trail you want to ride as a track in another app? Export it as a GPX file and import it as your ride's route. Riders see it in Ride Mode just like a route drawn in OnMyLead.

@@ -12,7 +12,7 @@ sources:
   - app/src/components/rider-pin.tsx
   - app/src/components/group-map.tsx
 related: [ride-mode, leader-sweep-and-tail-gunner, status-buttons, create-a-ride, location-sharing]
-keywords: [bubble, separated, together, left behind, gap, distance alert, stopped rider, tight trail, desert, highway]
+keywords: [bubble, separated, together, left behind, gap, distance alert, stopped rider, tight trail, desert, highway, tablet]
 ---
 
 Ride Bubble keeps an eye on the gaps in the group while Ride Mode is open. When a rider gets too far from everyone else, stops while the group keeps moving, or goes quiet, Ride Bubble flags them. It's free on every plan.

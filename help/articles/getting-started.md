@@ -55,6 +55,10 @@ New accounts start with a free Pro Trial. See [The Pro Trial](/help/pro-trial).
 
 Four tabs run along the bottom of the screen.
 
+:::release tablet
+On a tablet they run down the left edge instead. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+:::
+
 ### Rides
 
 Your home screen.
@@ -114,6 +118,7 @@ Some things also work at onmylead.com in a web browser:
 - Create a ride from your computer and draw its route on a big map. See [Create a Ride on the Website](/help/create-a-ride-on-the-website).
 - Open a ride with its invite code.
 - Send us a message with **Contact Us**.
+- On a computer, once you're signed in, **Rides**, **Find**, **Groups** and **You** run down the left side of the page.
 - Read these guides: click **Help** at the top of the home page, on a computer or a phone.
 
 Ride Mode and live tracking stay in the iPhone app.

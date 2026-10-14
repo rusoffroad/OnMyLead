@@ -14,7 +14,7 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - app/src/components/app-notices.tsx
 related: [garage, free-vs-pro, rus-gear, create-a-ride]
-keywords: [trip, packing list, checklist, gear list, what to bring, camping, overnight, template, starter list]
+keywords: [trip, packing list, checklist, gear list, what to bring, camping, overnight, template, starter list, tablet]
 ---
 
 The Trip Planner keeps a packing list for each trip. Tick items off as they go in the rig, and reuse the list next time.

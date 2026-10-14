@@ -16,7 +16,7 @@ sources:
   - app/src/lib/api.ts
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [create-a-ride-on-the-website, invite-riders, route-builder, approvals-and-waitlist, edit-cancel-or-delete-a-ride, free-vs-pro]
-keywords: [new ride, plan a ride, start a ride, organize, host, meeting point, meet up, public ride, private ride, freeride]
+keywords: [new ride, plan a ride, start a ride, organize, host, meeting point, meet up, public ride, private ride, freeride, tablet]
 screenshots:
   - file: create.webp
     shows: app/src/app/ride/new.tsx

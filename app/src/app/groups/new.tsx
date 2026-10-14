@@ -38,7 +38,7 @@ export default function NewGroup() {
   const pickedNames = (mates ?? []).filter((m) => picked.includes(m.id)).map((m) => m.name);
 
   return (
-    <Screen>
+    <Screen width="readable">
       <Stack.Screen options={{ title: 'New Group' }} />
       <Field
         label="Group Name"

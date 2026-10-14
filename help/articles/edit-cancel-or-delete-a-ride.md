@@ -15,7 +15,7 @@ sources:
   - supabase/migrations/20261017000000_cancel_delete_ride.sql
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [organizer-controls, route-builder, waypoints-and-planned-stops, ride-summary-and-ride-again, create-a-ride]
-keywords: [change ride, edit ride, cancel ride, call off, delete ride, remove ride, reschedule, change time, change date, weather cancel]
+keywords: [change ride, edit ride, cancel ride, call off, delete ride, remove ride, reschedule, change time, change date, weather cancel, tablet]
 ---
 
 Plans change. As the organizer you can update the route and stops, cancel the ride so everyone knows it's off, or delete it entirely.

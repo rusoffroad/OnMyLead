@@ -16,7 +16,7 @@ sources:
   - app/src/app/groups/[id]/index.tsx
   - supabase/migrations/20261017430000_riding_groups.sql
 related: [join-a-ride, qr-codes, riding-groups, create-a-ride, approvals-and-waitlist]
-keywords: [invite, share, send, text, sms, email, link, copy link, invite code, invite group, crew, friends]
+keywords: [invite, share, send, text, sms, email, link, copy link, invite code, invite group, crew, friends, tablet]
 ---
 
 Every ride has a link, an invite code and a QR code. Send any of them and your friends can open the ride and join.

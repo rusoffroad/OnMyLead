@@ -20,7 +20,7 @@ sources:
   - app/src/components/route-builder-map.tsx
   - app/src/components/route-builder-map.web.tsx
 related: [offline-maps, route-builder, ride-mode, find-a-ride, waypoints-and-planned-stops]
-keywords: [layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type]
+keywords: [layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
 screenshots:
   - file: map.webp
     shows: app/src/components/trail-tiles.tsx

@@ -18,7 +18,7 @@ sources:
   - supabase/migrations/20261011000000_ride_discovery.sql
   - supabase/migrations/20261017430000_riding_groups.sql
 related: [find-a-ride, qr-codes, approvals-and-waitlist, check-in, invite-riders, sign-in]
-keywords: [join, invite code, ride code, link, accept invite, sign up for ride, rsvp, leave ride, private ride, public ride]
+keywords: [join, invite code, ride code, link, accept invite, sign up for ride, rsvp, leave ride, private ride, public ride, tablet]
 ---
 
 Joining a ride is free, with no limit on how many rides you join. You need a free OnMyLead account.

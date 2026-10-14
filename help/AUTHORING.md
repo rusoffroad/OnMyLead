@@ -84,6 +84,11 @@ The website only shows what riders can actually use in the App Store version tha
   Google Play yet, so these blocks never publish; the pull request that ships the first Android
   release teaches the Help Center to show them. Words listed under `unreleased` (Android, Google
   Play) are allowed inside release blocks, since those stay hidden until their release is live.
+- Tablet steps that differ from phones (iPad and Android tablets share the same layouts) go in a
+  `:::release tablet` block; a whole tablet-only article is kept as `draft: true`. They stay
+  hidden until the first tablet build is in a store; that release's pull request teaches the
+  Help Center to show the blocks and takes the article out of draft. Say "on a tablet" rather than naming one device, unless the steps
+  really differ between iPad and Android.
 
 ## Writing rules
 

@@ -18,7 +18,7 @@ sources:
   - supabase/migrations/20261017430000_riding_groups.sql
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [group-chat, follow-leaders, invite-riders, free-vs-pro]
-keywords: [crew, group, club, friends, group link, invite group, invite all, members, leave group, delete group]
+keywords: [crew, group, club, friends, group link, invite group, invite all, members, leave group, delete group, tablet]
 ---
 
 A riding group is your regular crew, saved once. When you create a ride, you can invite everyone in the group in one tap instead of sending the invite to each rider. Each group also has its own [Group Chat](/help/group-chat).

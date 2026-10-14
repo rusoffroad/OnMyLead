@@ -22,7 +22,7 @@ const ROAD = '#E8ECF2';
  * its `route` adds a one-tap download of the ride's map for riding with no signal.
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.',
+  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth,
 }: {
   trail: TrailMap;
   /** Where the layers button sits. */
@@ -33,6 +33,8 @@ export function TrailMapOverlay({
   route?: LatLng[] | null;
   ride?: { id: string; name: string } | null;
   lookupHint?: string;
+  /** On a tablet the trail card sits on the right at this width, clear of the panels on the left. */
+  cardWidth?: number;
 }) {
   const [open, setOpen] = useState(false);
   if (Platform.OS === 'web') return null;
@@ -68,7 +70,7 @@ export function TrailMapOverlay({
       ) : null}
 
       {!open ? (
-        <View pointerEvents="box-none" style={[styles.bottom, cardTop != null ? { top: cardTop } : { bottom }]}>
+        <View pointerEvents="box-none" style={[styles.bottom, cardTop != null ? { top: cardTop } : { bottom }, cardWidth ? { left: 'auto', width: cardWidth } : null]}>
           {trail.looking ? (
             <View style={styles.looking}>
               <ActivityIndicator color={SAND} size="small" />

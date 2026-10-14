@@ -21,7 +21,7 @@ sources:
   - app/src/core/waypoints.ts
   - app/app.json
 related: [troubleshooting, free-vs-pro, privacy, location-sharing, contact-support]
-keywords: [questions, faq, how many rides, cost, price, free, iphone, website]
+keywords: [questions, faq, how many rides, cost, price, free, iphone, website, tablet]
 ---
 
 ## Is OnMyLead Free?

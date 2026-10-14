@@ -2,7 +2,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -19,6 +19,7 @@ import type { Place } from '@/core/places';
 import { miles, routeFromGpx, type RideRoute } from '@/core/route';
 import { routeFromLegs } from '@/core/route-legs';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
+import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTrailMap } from '@/hooks/use-trail-map';
@@ -58,10 +59,13 @@ export default function RouteBuilder() {
   const taps = draft.taps;
   const insets = useSafeAreaInsets();
   const web = Platform.OS === 'web';
-  const { width } = useWindowDimensions();
-  const wide = web && width >= WIDE;
+  // Expanded windows (a tablet in landscape, a big iPad, a laptop browser) get the panel beside the
+  // map, hanging from the top; Medium ones (a tablet in portrait) a floating card in the corner.
+  const layout = useLayout();
+  const wide = layout.expanded;
+  const floating = layout.wide && !wide;
   // The tools panel folds down to the miles and Undo (swipe it down, or tap the handle) to see more map.
-  const fold = usePanelFold('route.panelOpen.v1', !wide);
+  const fold = usePanelFold('route.panelOpen.v1', true, wide ? 'up' : 'down');
   const open = fold.open;
 
   useEffect(() => {
@@ -212,7 +216,7 @@ export default function RouteBuilder() {
 
       <Animated.View
         {...fold.panHandlers}
-        style={[styles.panel, wide && styles.panelWide, { transform: [{ translateY: fold.drag }] }]}>
+        style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !open && styles.panelFolded]}>
         <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Route Tools" fromTop={wide} />
         <View style={styles.readout}>
@@ -313,12 +317,11 @@ function ModeSwitch({ follow, onChange }: { follow: boolean; onChange: (on: bool
   );
 }
 
-/** At this width and up (a laptop or desktop browser), the panel moves beside the map. */
-const WIDE = 900;
 const PANEL_W = 400;
 
 const styles = StyleSheet.create({
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
+  panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1, borderColor: Colors.border },
   panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
   // Above the side panel, so the search results drop down over it on a wide screen.
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, zIndex: 30 },
