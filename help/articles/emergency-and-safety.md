@@ -25,6 +25,8 @@ OnMyLead is not an emergency service. It does not contact 911, search and rescue
 
 OnMyLead helps your group keep track of each other. Phones lose signal, batteries die, and positions can be late or wrong, so use it alongside your own plan, not instead of one.
 
+Everything on this page is free on every plan. None of it needs Pro.
+
 ## What EMERGENCY Does
 
 The **EMERGENCY** button in Ride Mode alerts everyone on your ride at once.

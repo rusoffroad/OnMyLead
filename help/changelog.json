@@ -52,6 +52,27 @@
   {
     "date": "2026-10-14",
     "slugs": [
+      "subscribe-to-pro",
+      "manage-subscription",
+      "restore-purchases",
+      "promo-codes",
+      "free-vs-pro",
+      "pro-trial",
+      "faq",
+      "contact-support",
+      "create-a-ride",
+      "import-gpx",
+      "ride-summary-and-ride-again",
+      "emergency-and-safety"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "google-play-billing",
+    "why": "Groundwork for Pro on Android: subscribing, cancelling, restoring and promo codes through Google Play, and one Pro for every device whichever store it came from (the other store's Pro screen won't sell it twice). The Android steps sit in Android release blocks, so nothing shows on the website until the Android app is on Google Play. The safety guide now says plainly that nothing on it needs Pro. Nothing changes for iPhone riders."
+  },
+  {
+    "date": "2026-10-14",
+    "slugs": [
       "location-sharing",
       "troubleshooting",
       "notification-settings",

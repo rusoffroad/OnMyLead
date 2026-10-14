@@ -1,20 +1,28 @@
 /**
  * Pure helpers for the Admin Dashboard's money, analytics, health and export pages: labels for
- * Apple's subscription states, revenue series by currency, CSV files, and the promo code steps
+ * App Store and Google Play subscription states, revenue series by currency, CSV files, and the promo code steps
  * that can only be done by hand in App Store Connect.
  */
 
 export type BadgeTone = 'neutral' | 'pro' | 'trial' | 'free' | 'admin' | 'ok' | 'warn' | 'danger' | 'muted';
 
-export type SubscriptionStatus = 'active' | 'grace' | 'billing_retry' | 'expired' | 'revoked' | 'refunded';
+export type SubscriptionStatus = 'active' | 'grace' | 'billing_retry' | 'paused' | 'pending' | 'expired' | 'revoked' | 'refunded';
 
-/** How an Apple subscription reads in the dashboard. A paying subscription with auto-renew off is "Cancelled": it still runs to its end date. */
-export function subscriptionBadge(status: string, autoRenew: boolean | null): { label: string; tone: BadgeTone } {
+export type StoreKey = 'apple' | 'google';
+
+/** The store's name as the dashboard shows it. */
+export const storeLabel = (store: string | null | undefined) => (store === 'google' ? 'Google Play' : 'App Store');
+
+/** How a subscription on either store reads in the dashboard. A paying subscription with auto-renew off is "Cancelled": it still runs to its end date. */
+export function subscriptionBadge(status: string, autoRenew: boolean | null, store?: string | null): { label: string; tone: BadgeTone } {
   if ((status === 'active' || status === 'grace') && autoRenew === false) return { label: 'Cancelled', tone: 'warn' };
   switch (status) {
     case 'active': return { label: 'Active', tone: 'ok' };
     case 'grace': return { label: 'Grace Period', tone: 'warn' };
-    case 'billing_retry': return { label: 'Billing Retry', tone: 'danger' };
+    // Google Play calls it "on hold": no Pro until the payment is fixed.
+    case 'billing_retry': return { label: store === 'google' ? 'On Hold' : 'Billing Retry', tone: 'danger' };
+    case 'paused': return { label: 'Paused', tone: 'muted' };
+    case 'pending': return { label: 'Payment Pending', tone: 'warn' };
     case 'expired': return { label: 'Expired', tone: 'muted' };
     case 'refunded': return { label: 'Refunded', tone: 'danger' };
     case 'revoked': return { label: 'Revoked', tone: 'danger' };
@@ -24,8 +32,9 @@ export function subscriptionBadge(status: string, autoRenew: boolean | null): { 
 
 export const planLabel = (plan: string) => ({ monthly: 'Monthly', annual: 'Annual' } as Record<string, string>)[plan] ?? 'Other';
 
-/** Apple's offerType on a transaction. */
-export function offerTypeLabel(t: number | null | undefined) {
+/** Apple's offerType on a transaction; on Google Play, 3 is a promo code and 1 any other offer. */
+export function offerTypeLabel(t: number | null | undefined, store?: string | null) {
+  if (store === 'google') return t === 3 ? 'Google Play Promo Code' : 'Google Play Offer';
   return ({ 1: 'Introductory Offer', 2: 'Promotional Offer', 3: 'Offer Code', 4: 'Win-Back Offer' } as Record<number, string>)[t ?? 0] ?? 'Offer';
 }
 
@@ -155,6 +164,17 @@ export const PROMO_MANUAL_STEPS: { title: string; detail: string }[] = [
   { title: 'Deactivate a Campaign', detail: 'To stop a campaign early, open the offer in App Store Connect and deactivate its codes. Codes already redeemed keep their discount.' },
   { title: 'Share the Codes', detail: 'Riders redeem codes in the app (Profile > Settings > Subscription > Redeem Promo Code) or through the App Store link Apple gives for the offer. Apple shows its own sheet; OnMyLead never sees card details.' },
   { title: 'Wait for Results', detail: 'A redemption shows in Redemption Activity once Apple tells OnMyLead about the purchase. Codes generated in App Store Connect can take up to an hour to appear.' },
+];
+
+/**
+ * Google Play promo codes: made in Play Console, never from the dashboard (Google has no API for
+ * them). They sit alongside Apple offer codes; a code works only in its own store.
+ */
+export const PLAY_PROMO_STEPS: { title: string; detail: string }[] = [
+  { title: 'Create the Promotion', detail: 'Play Console > OnMyLead > Monetize with Play > Products > Promo codes (Google sometimes names it Promotions) > Create promotion. Pick the Monthly or Annual subscription and the free period riders get. Google’s screens change; follow what Play Console shows.' },
+  { title: 'Custom or One-Time Codes', detail: 'A custom code is one word many riders can type, such as RUSRIDE, with a redemption limit. One-time codes are random, each good once, and download as a CSV. Google limits how many codes an app can make each quarter.' },
+  { title: 'Share the Codes', detail: 'Android riders redeem them in the app (You > Subscription > Redeem Promo Code opens Google Play’s Redeem Code page) or in the Play Store app. A Google Play code doesn’t work in the App Store, and an Apple offer code doesn’t work on Google Play.' },
+  { title: 'Wait for Results', detail: 'A redemption shows in Redemption Activity, marked as a Google Play promo code, once Google tells OnMyLead about the subscription.' },
 ];
 
 /** An analytics event name such as ride_poll_vote as a label, e.g. "Ride Poll Vote". */

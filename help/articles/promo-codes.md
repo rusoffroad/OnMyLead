@@ -10,6 +10,7 @@ sources:
   - app/src/app/pro.tsx
   - app/src/lib/purchases.ts
   - app/src/app/_layout.tsx
+  - supabase/functions/play-notifications/index.ts
 related: [subscribe-to-pro, manage-subscription, restore-purchases]
 keywords: [promo code, offer code, coupon, discount, redeem, gift, free months, tablet]
 ---
@@ -25,6 +26,19 @@ OnMyLead promo codes are Apple offer codes for OnMyLead Pro. You redeem them thr
 Apple shows what the code gives you before you confirm. Once Apple accepts the code, OnMyLead checks it and your plan changes to **Pro**. This can take a moment.
 
 You can also tap **Redeem Promo Code** at the bottom of the Pro screen.
+
+:::release android
+## Redeem a Code on Android
+
+On Android, OnMyLead promo codes are Google Play promo codes.
+
+1. On the **You** tab, under **Settings**, tap **Subscription**.
+2. Tap **Redeem Promo Code**. Google Play's **Redeem Code** page opens.
+3. Enter your code and follow the steps to confirm.
+4. Come back to OnMyLead. Once Google Play has the code, your plan changes to **Pro**.
+
+You can also redeem a code in the **Play Store** app: tap your profile picture, then **Payments & Subscriptions** > **Redeem Code**. A Google Play code works only on Google Play, and an Apple offer code works only in the App Store.
+:::
 
 ## Redeemed It in the App Store Instead?
 

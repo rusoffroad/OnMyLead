@@ -40,16 +40,23 @@ export const FEATURE_NAMES: Record<FeatureKey, string> = {
 };
 
 export type AccountType = 'free' | 'pro' | 'admin';
-export type ProSource = 'trial' | 'apple' | 'comp' | 'admin' | null;
+export type ProSource = 'trial' | 'apple' | 'google' | 'comp' | 'admin' | null;
+/** Where a paid subscription was bought. */
+export type Store = 'apple' | 'google';
 export type PlanLabel = 'Free' | 'Pro Trial' | 'Pro' | 'Admin';
+
+export type SubscriptionStatus = 'active' | 'grace' | 'billing_retry' | 'paused' | 'pending' | 'expired' | 'revoked' | 'refunded';
 
 export type AppleSubscription = {
   productId: string;
-  status: 'active' | 'grace' | 'billing_retry' | 'expired' | 'revoked' | 'refunded';
+  status: SubscriptionStatus;
   expiresAt: string | null;
   autoRenew: boolean | null;
   environment: string;
 };
+
+/** A subscription on either store. */
+export type StoreSubscription = AppleSubscription & { store: Store };
 
 export type Entitlements = {
   /** False until the server has the Pro update, or while signed out: gate nothing. */
@@ -57,7 +64,7 @@ export type Entitlements = {
   accountType: AccountType;
   proSource: ProSource;
   label: PlanLabel;
-  /** When the current Pro access ends (trial, complimentary or Apple), if it does. */
+  /** When the current Pro access ends (trial, complimentary or a store subscription), if it does. */
   proUntil: string | null;
   trialEndsAt: string | null;
   /** Whole days left in an active trial (1 on the last day), else null. */
@@ -65,6 +72,11 @@ export type Entitlements = {
   /** This account has had its one trial, active or not. */
   trialUsed: boolean;
   apple: AppleSubscription | null;
+  google: AppleSubscription | null;
+  /** The paid subscription Pro comes from right now, on either store. */
+  store: StoreSubscription | null;
+  /** Every subscription that hasn't ended, on either store (a payment problem or pause included). */
+  openSubscriptions: StoreSubscription[];
   ridesCreatedThisMonth: number;
   /** Rides a Free account may create this UTC month; null is unlimited. */
   rideAllowance: number | null;
@@ -88,6 +100,9 @@ export const NOT_SWITCHED_ON: Entitlements = {
   trialDaysLeft: null,
   trialUsed: false,
   apple: null,
+  google: null,
+  store: null,
+  openSubscriptions: [],
   ridesCreatedThisMonth: 0,
   rideAllowance: null,
   historyLimit: null,
@@ -115,7 +130,9 @@ export function parseEntitlements(raw: unknown, now = Date.now()): Entitlements 
   const r = raw as Record<string, unknown>;
   const accountType: AccountType = r.account_type === 'admin' || r.account_type === 'pro' ? r.account_type : 'free';
   const proSource: ProSource =
-    r.pro_source === 'trial' || r.pro_source === 'apple' || r.pro_source === 'comp' || r.pro_source === 'admin' ? r.pro_source : null;
+    r.pro_source === 'trial' || r.pro_source === 'apple' || r.pro_source === 'google' || r.pro_source === 'comp' || r.pro_source === 'admin'
+      ? r.pro_source
+      : null;
   const isPro = accountType !== 'free';
   const trialEndsAt = str(r.trial_ends_at);
   const rawFeatures = (r.features && typeof r.features === 'object' ? r.features : {}) as Record<string, unknown>;
@@ -123,16 +140,22 @@ export function parseEntitlements(raw: unknown, now = Date.now()): Entitlements 
   const features = Object.fromEntries(
     FEATURE_KEYS.map((k) => [k, typeof rawFeatures[k] === 'boolean' ? (rawFeatures[k] as boolean) : true]),
   ) as Record<FeatureKey, boolean>;
-  const a = r.apple && typeof r.apple === 'object' ? (r.apple as Record<string, unknown>) : null;
-  const apple: AppleSubscription | null = a && typeof a.product_id === 'string'
-    ? {
-        productId: a.product_id,
-        status: (['active', 'grace', 'billing_retry', 'expired', 'revoked', 'refunded'] as const).find((s) => s === a.status) ?? 'expired',
-        expiresAt: str(a.expires_at),
-        autoRenew: typeof a.auto_renew === 'boolean' ? a.auto_renew : null,
-        environment: typeof a.environment === 'string' ? a.environment : 'Production',
-      }
-    : null;
+  const apple = parseSubscription(r.apple);
+  const google = parseSubscription(r.google);
+  const paidStore = parseStore((r.store_subscription as Record<string, unknown> | null)?.store);
+  const paid = parseSubscription(r.store_subscription);
+  // Servers before Google Play only send 'apple'.
+  const store: StoreSubscription | null =
+    paid && paidStore ? { ...paid, store: paidStore } : apple ? { ...apple, store: 'apple' } : google ? { ...google, store: 'google' } : null;
+  const openSubscriptions: StoreSubscription[] = Array.isArray(r.open_subscriptions)
+    ? r.open_subscriptions.flatMap((o) => {
+        const sub = parseSubscription(o);
+        const st = parseStore((o as Record<string, unknown> | null)?.store);
+        return sub && st ? [{ ...sub, store: st }] : [];
+      })
+    : store
+      ? [store]
+      : [];
   return {
     switchedOn: true,
     accountType,
@@ -143,11 +166,30 @@ export function parseEntitlements(raw: unknown, now = Date.now()): Entitlements 
     trialDaysLeft: proSource === 'trial' ? daysLeft(trialEndsAt, now) : null,
     trialUsed: r.trial_used === true,
     apple,
+    google,
+    store,
+    openSubscriptions,
     ridesCreatedThisMonth: num(r.rides_created_this_month, 0),
     rideAllowance: isPro ? null : numOrNull(r.ride_allowance),
     historyLimit: isPro ? null : numOrNull(r.history_limit),
     features: isPro ? ALL_ON : features,
     fetchedAt: now,
+  };
+}
+
+const STATUSES: SubscriptionStatus[] = ['active', 'grace', 'billing_retry', 'paused', 'pending', 'expired', 'revoked', 'refunded'];
+
+const parseStore = (v: unknown): Store | null => (v === 'apple' || v === 'google' ? v : null);
+
+function parseSubscription(raw: unknown): AppleSubscription | null {
+  const a = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : null;
+  if (!a || typeof a.product_id !== 'string') return null;
+  return {
+    productId: a.product_id,
+    status: STATUSES.find((s) => s === a.status) ?? 'expired',
+    expiresAt: str(a.expires_at),
+    autoRenew: typeof a.auto_renew === 'boolean' ? a.auto_renew : null,
+    environment: typeof a.environment === 'string' ? a.environment : 'Production',
   };
 }
 
@@ -159,7 +201,7 @@ export function planLabel(accountType: AccountType, proSource: ProSource): PlanL
 
 /**
  * Re-check a cached answer against the clock: a trial or complimentary grant that has ended
- * since the answer was fetched turns Free, the same as the server would say. Apple
+ * since the answer was fetched turns Free, the same as the server would say. Store
  * subscriptions are left to the server (renewals happen without the app).
  */
 export function applyClock(e: Entitlements, now = Date.now()): Entitlements {

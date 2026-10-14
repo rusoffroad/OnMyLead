@@ -97,6 +97,8 @@ export const adminSession = () => adminRpc<AdminSession>('admin_session');
 export type Overview = {
   users_total: number; users_new: number; dau: number; mau: number;
   free: number; trial: number; paid: number; comp: number; admins: number;
+  /** Paid Pro per store; missing on servers before Google Play. */
+  paid_apple?: number; paid_google?: number;
   trials_active: number; trials_started: number;
   rides_live: number; rides_upcoming: number; rides_completed: number; rides_created: number; ride_joins: number;
   mrr_milli: number; subs_new: number; subs_cancelled: number; promo_redemptions: number; store_errors: number;
@@ -142,10 +144,12 @@ export type UserDetail = {
   state: Pick<UserRow, 'label' | 'pro_source' | 'pro_until' | 'trial_state' | 'trial_ends_at' | 'is_admin' | 'suspended' | 'deletion_requested'> & {
     trial_id: string | null; trial_starts_at: string | null; comp_id: string | null; comp_until: string | null;
     apple_status: string | null; apple_product: string | null; apple_expires_at: string | null; apple_auto_renew: boolean | null;
+    /** Which store the apple_* fields came from ('apple' or 'google'); missing on servers before Google Play. */
+    paid_store?: 'apple' | 'google' | null;
   };
   admin: { granted_at: string; note: string | null } | null;
   grants: Grant[];
-  subscriptions: { product_id: string; status: string; expires_at: string | null; auto_renew: boolean | null; environment: string; offer_id: string | null; updated_at: string }[];
+  subscriptions: { store?: 'apple' | 'google'; product_id: string; status: string; expires_at: string | null; auto_renew: boolean | null; environment: string; offer_id: string | null; updated_at: string }[];
   rides_created_this_month: number;
   ride_counts: { organized: number; joined: number; leader: number; sweep: number; completed: number };
   rides: { id: string; name: string; meet_at: string; status: string; visibility: string; role: string; meet_area_label: string | null; meet_state: string | null }[];

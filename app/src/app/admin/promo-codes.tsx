@@ -8,12 +8,13 @@ import { ExternalLink, Fact, LoadError, Notice, TextButton, Who } from '@/compon
 import { ThemedText } from '@/components/themed-text';
 import { Field } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
-import { ascEnumLabel, offerTypeLabel, PROMO_MANUAL_STEPS, subscriptionBadge } from '@/core/admin-analytics';
+import { ascEnumLabel, offerTypeLabel, PLAY_PROMO_STEPS, PROMO_MANUAL_STEPS, subscriptionBadge } from '@/core/admin-analytics';
 import { fmtDate, fmtDateTime, fmtInt, fmtMoney, fmtPct } from '@/core/admin-format';
 import { AdminError, useAdminData } from '@/lib/admin';
 import * as api from '@/lib/admin-analytics';
 
 const ASC_OFFERS_URL = 'https://appstoreconnect.apple.com/apps';
+const PLAY_CONSOLE_URL = 'https://play.google.com/console';
 
 export default function PromoCodesPage() {
   const [env, setEnv] = useState<api.Env>('Production');
@@ -24,7 +25,7 @@ export default function PromoCodesPage() {
   return (
     <AdminPage
       title="Promo Codes"
-      subtitle="Apple offer codes for OnMyLead Pro: campaigns, codes, and what riders did with them."
+      subtitle="Apple offer codes and Google Play promo codes for OnMyLead Pro: campaigns, codes, and what riders did with them."
       actions={<FilterChips options={[{ value: 'Production', label: 'Real Purchases' }, { value: 'Sandbox', label: 'Sandbox Tests' }]} value={env} onChange={setEnv} />}>
       <StatGrid>
         <StatTile label="Codes Redeemed" value={fmtInt(total.red)} />
@@ -56,6 +57,7 @@ export default function PromoCodesPage() {
 
       <Redemptions env={env} />
       <ManualSteps />
+      <PlaySteps />
     </AdminPage>
   );
 }
@@ -192,11 +194,30 @@ function Redemptions({ env }: { env: api.Env }) {
   );
 }
 
+function PlaySteps() {
+  return (
+    <Panel title="Google Play Promo Codes" right={<ExternalLink href={PLAY_CONSOLE_URL} label="Open Play Console" />}>
+      <ThemedText type="small" themeColor="textSecondary">
+        Android riders use Google Play promo codes, made in Play Console. Their redemptions and results show in the tables above next to Apple&apos;s.
+      </ThemedText>
+      {PLAY_PROMO_STEPS.map((s, i) => (
+        <View key={s.title} style={{ flexDirection: 'row', gap: Spacing.three, paddingVertical: Spacing.one }}>
+          <ThemedText type="heading" style={{ color: Colors.accent, width: 22 }}>{i + 1}</ThemedText>
+          <View style={{ flex: 1, gap: 2 }}>
+            <ThemedText type="smallBold">{s.title}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{s.detail}</ThemedText>
+          </View>
+        </View>
+      ))}
+    </Panel>
+  );
+}
+
 function ManualSteps() {
   return (
     <Panel title="Done by Hand in App Store Connect" right={<ExternalLink href={ASC_OFFERS_URL} label="Open App Store Connect" />}>
       <ThemedText type="small" themeColor="textSecondary">
-        Apple only lets these be done in App Store Connect. Promo codes are always Apple offer codes, so riders redeem them through Apple and are never charged by OnMyLead directly.
+        Apple only lets these be done in App Store Connect. On iPhone and iPad, promo codes are Apple offer codes, so riders redeem them through Apple and are never charged by OnMyLead directly.
       </ThemedText>
       {PROMO_MANUAL_STEPS.map((s, i) => (
         <View key={s.title} style={{ flexDirection: 'row', gap: Spacing.three, paddingVertical: Spacing.one }}>

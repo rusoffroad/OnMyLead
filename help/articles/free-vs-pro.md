@@ -17,6 +17,7 @@ sources:
   - app/src/app/ride/new.tsx
   - app/src/app/(tabs)/index.tsx
   - supabase/migrations/20261018000000_pro_entitlements.sql
+  - supabase/migrations/20261027000000_play_billing.sql
 related: [pro-trial, subscribe-to-pro, manage-subscription, emergency-and-safety]
 keywords: [free, pro, premium, upgrade, price, cost, limits, ride limit, one ride a month, what's included, features, tablet]
 ---
@@ -83,4 +84,8 @@ Your plan is saved on your phone, so the app knows it even with no signal.
 
 :::note
 Pro is bought in the iPhone app. Pro you buy there also works when you use OnMyLead on the website.
+:::
+
+:::release android
+On Android, Pro is bought through Google Play. Pro belongs to your OnMyLead account, so it works on iPhone, iPad, Android and the website, whichever store you bought it from.
 :::

@@ -1,6 +1,6 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
@@ -10,8 +10,9 @@ import { useEntitlements } from '@/lib/entitlements';
 import { manageSubscription, redeemOfferCode, restore } from '@/lib/purchases';
 import { useSession } from '@/lib/session';
 import { PlanStatus } from '@/components/pro-plan';
+import { deviceStore, manageTarget, otherStoreBlock, restoreMessage } from '@/core/purchases';
 
-/** Profile > Settings > Subscription: your plan, this month's rides, and the Apple subscription controls. */
+/** Profile > Settings > Subscription: your plan, this month's rides, and the store's subscription controls. */
 export default function SubscriptionScreen() {
   const { session, loading } = useSession();
   const { ent, refresh } = useEntitlements();
@@ -26,8 +27,10 @@ export default function SubscriptionScreen() {
     refresh();
   }, [refresh]);
 
-  const onIphone = Platform.OS === 'ios';
-  const notYet = 'Subscriptions are managed in the OnMyLead iPhone app.';
+  // The App Store on iPhone and iPad, Google Play on Android, nothing on the website.
+  const store = deviceStore(Platform.OS);
+  const notYet = 'Subscriptions are managed in the OnMyLead app.';
+  const google = store === 'google';
 
   async function run(key: string, fn: () => Promise<string | null>) {
     setBusy(key);
@@ -41,7 +44,8 @@ export default function SubscriptionScreen() {
     }
   }
 
-  const upgrade = ent.switchedOn && ent.accountType !== 'admin' && ent.proSource !== 'apple' && ent.proSource !== 'comp';
+  const upgrade = ent.switchedOn && ent.accountType !== 'admin' && ent.proSource !== 'apple' && ent.proSource !== 'google' && ent.proSource !== 'comp'
+    && !(store && otherStoreBlock(ent, store));
 
   return (
     <Screen>
@@ -67,27 +71,38 @@ export default function SubscriptionScreen() {
       <View style={styles.list}>
         <Row
           title="Manage Subscription"
-          detail="Change plans or cancel in your App Store account"
+          detail={ent.store?.store === 'google' || (!ent.store && google) ? 'Change plans or cancel in Google Play' : 'Change plans or cancel in your App Store account'}
           busy={busy === 'manage'}
-          onPress={() => run('manage', async () => (onIphone ? (await manageSubscription(), null) : notYet))}
+          onPress={() => run('manage', async () => {
+            const target = manageTarget(ent, store);
+            if (target.kind === 'store') return store ? (await manageSubscription(ent.store?.productId), null) : notYet;
+            Linking.openURL(target.url).catch(() => {});
+            return target.message;
+          })}
         />
         <Row
           title="Restore Purchases"
-          detail="Bought Pro on another iPhone? Bring it here"
+          detail={google ? 'Bought Pro on another Android device? Bring it here' : 'Bought Pro on another iPhone or iPad? Bring it here'}
           busy={busy === 'restore'}
           onPress={() => run('restore', async () => {
-            if (!onIphone) return notYet;
+            if (!store) return notYet;
             const r = await restore();
             await refresh();
-            return r.restored ? 'Your Pro subscription is restored.' : 'No OnMyLead Pro purchase found for this Apple ID.';
+            return restoreMessage(store, r.restored);
           })}
         />
         <Row
           title="Redeem Promo Code"
-          detail="Enter an OnMyLead offer code from Apple"
+          detail={google ? 'Enter an OnMyLead promo code in Google Play' : 'Enter an OnMyLead offer code from Apple'}
           busy={busy === 'redeem'}
           last
-          onPress={() => run('redeem', async () => (onIphone ? (await redeemOfferCode(), null) : notYet))}
+          onPress={() => run('redeem', async () => {
+            if (!store) return notYet;
+            const blocked = otherStoreBlock(ent, store);
+            if (blocked) return blocked.message;
+            await redeemOfferCode();
+            return google ? 'After you redeem the code in Google Play, come back here and Pro turns on.' : null;
+          })}
         />
       </View>
       {note ? <ThemedText type="small" style={{ color: Colors.text }} accessibilityLiveRegion="polite">{note}</ThemedText> : null}

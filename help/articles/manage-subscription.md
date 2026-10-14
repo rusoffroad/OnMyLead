@@ -15,6 +15,8 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - supabase/migrations/20261018000000_pro_entitlements.sql
   - store/app-store/listing.md
+  - supabase/migrations/20261027000000_play_billing.sql
+  - app/src/core/purchases.ts
 related: [subscribe-to-pro, free-vs-pro, restore-purchases, delete-account]
 keywords: [cancel, cancel subscription, change plan, switch to annual, downgrade, renew, renewal, refund, stop paying]
 ---
@@ -28,6 +30,14 @@ OnMyLead Pro is billed by Apple, so you change or cancel it in your Apple Accoun
 3. Apple's subscription screen opens. Choose a different plan, or cancel your subscription.
 
 If you pay for Pro, the Pro screen also has a **Manage Subscription** button where the plans usually are.
+
+:::release android
+## Cancel or Change It on Android
+
+On Android, Pro is billed by Google Play. **Manage Subscription** opens Google Play's subscription page for OnMyLead, where you can change plans or cancel. You can also do it in the **Play Store** app: tap your profile picture, then **Payments & Subscriptions** > **Subscriptions** > **OnMyLead**.
+
+If you bought Pro on a different kind of device (on an iPhone while you're on Android, or the other way round), **Manage Subscription** tells you which store bills it and opens that store's subscription page. Cancel it there.
+:::
 
 ## Cancel or Change It in iPhone Settings
 
@@ -62,4 +72,9 @@ See [Free and Pro](/help/free-vs-pro) for the full comparison.
 
 - Deleting your OnMyLead account does not cancel the Apple subscription. Cancel it in your Apple subscriptions too, so you aren't billed again. See [Delete Your Account](/help/delete-account).
 - If your plan says **Complimentary Pro**, it was given to you by OnMyLead and isn't billed by Apple, so there's nothing to cancel.
+
+:::release android
+- Deleting your OnMyLead account doesn't cancel a Google Play subscription either. Cancel it in Google Play too.
+- On Android, **Your Plan** also says which store bills your Pro.
+:::
 - Subscriptions can only be managed on iPhone. On the website, the Subscription screen says so.

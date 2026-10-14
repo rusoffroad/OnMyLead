@@ -64,6 +64,10 @@ On a ride that hasn't ended yet, the same button is called **Copy This Ride**.
 Ride Again creates a new ride, so it counts toward your monthly rides on Free. See [Create a Ride](/help/create-a-ride).
 :::
 
+:::release android
+Advanced Ride Statistics, Premium Ride Cards and full ride history work with Pro from either store: the App Store on iPhone and iPad, or Google Play on Android.
+:::
+
 ## Past Rides
 
 Ended and cancelled rides move to **Past Rides** on the **Rides** tab. Free shows your last 5. Full ride history is a Pro feature. Nothing is deleted, so older rides show again with Pro. See [Free and Pro](/help/free-vs-pro).
