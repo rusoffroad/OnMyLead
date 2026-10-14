@@ -1,0 +1,12 @@
+{
+  "_about": "Rider-facing screens that must each be described by at least one help article (listed in its sources). A new screen added to the app fails the Help check until an article covers it, or it is ignored here with the reason.",
+  "screens": ["app/src/app/**/*.tsx"],
+  "ignore": [
+    { "path": "app/src/app/**/_layout.tsx", "why": "Navigation frames, not screens." },
+    { "path": "app/src/app/admin/**", "why": "The owner's Admin Dashboard, not for riders." },
+    { "path": "app/src/app/auth-callback.tsx", "why": "Finishes sign-in from an email link; covered by sign-in through auth-link.ts." },
+    { "path": "app/src/app/terms.tsx", "why": "Legal page, linked from the help footer." },
+    { "path": "app/src/app/privacy.tsx", "why": "Legal page, linked from the help footer." },
+    { "path": "app/src/app/support.tsx", "why": "The in-app Help and Support page, which points here." }
+  ]
+}

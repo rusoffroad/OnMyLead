@@ -1,0 +1,47 @@
+{
+  "_about": "Which OnMyLead version riders can actually get. The Help Center only publishes articles (and :::release blocks) for versions that are live. The build asks Apple which version is live (the free App Store lookup for the bundle ID) and falls back to `live` below when Apple can't be reached. See help/README.md.",
+  "bundleId": "com.rusoffroad.onmylead.app",
+  "appleId": "6822352321",
+  "country": "us",
+  "live": null,
+  "prelaunch": {
+    "version": "1.0",
+    "notice": "OnMyLead 1.0 is with Apple for App Store review. These guides describe that first release."
+  },
+  "versions": [
+    {
+      "version": "1.0",
+      "build": "2",
+      "commit": "ad388f4",
+      "status": "in_review",
+      "submitted": "2026-10-13",
+      "notes": "First release: everything through PR #88."
+    }
+  ],
+  "unreleased": [
+    {
+      "feature": "CarPlay",
+      "why": "Built, but switched off until Apple grants the CarPlay entitlement (ONMYLEAD_CARPLAY=1 builds only).",
+      "sources": ["app/modules/onmylead-carplay/**", "app/plugins/with-carplay.js", "app/src/lib/carplay.ts", "app/src/core/carplay.ts"],
+      "words": ["CarPlay"]
+    },
+    {
+      "feature": "iPad",
+      "why": "iPhone only for now (supportsTablet is false).",
+      "sources": ["app/app.json"],
+      "words": ["iPad"]
+    },
+    {
+      "feature": "Instagram and TikTok sign-in",
+      "why": "Not supported.",
+      "sources": [],
+      "words": ["Instagram", "TikTok"]
+    },
+    {
+      "feature": "Android",
+      "why": "No Google Play release planned for now.",
+      "sources": [],
+      "words": ["Android", "Google Play"]
+    }
+  ]
+}

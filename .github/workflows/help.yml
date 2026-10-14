@@ -1,0 +1,73 @@
+# Keeps the Help Center (onmylead.com/help) in step with the app. Free: GitHub Actions only.
+#
+# Pull requests: fails when the change edits app code that a help article describes (the
+#   article's `sources:`) without updating that article and help/changelog.json in the same
+#   pull request, adds a screen no article covers, breaks a help link, or describes an
+#   unreleased feature as available. See help/README.md.
+# Every change to main, every night, and on demand: runs the full audit (what changed since each
+#   article was written, screenshots older than their screens, the live App Store version,
+#   dashboard edits) and publishes the report to the `help-audit` branch, which the Admin
+#   Dashboard's Help page and the scheduled Claude routine read.
+name: Help Center
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: help-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the help articles against this change
+        working-directory: app
+        run: node --no-warnings scripts/help/check.mjs --base "origin/${{ github.base_ref }}"
+
+  audit:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: https://jeacssxhjzjjmczcorcr.supabase.co
+      # Public by design (it ships in the website); only reads the live Help Center edits.
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_RvOJ7J3hFqBhP4CBJuXYow_OzCJ3zV3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the change that was just merged
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        working-directory: app
+        run: node --no-warnings scripts/help/check.mjs --base "${{ github.event.before }}" || echo "::warning::This change to main skipped its help updates. The audit below lists what to fix."
+      - name: Full audit
+        working-directory: app
+        run: node --no-warnings scripts/help/check.mjs --audit "$RUNNER_TEMP/report.json"
+      - name: Publish the report to the help-audit branch
+        run: |
+          mkdir -p "$RUNNER_TEMP/out" && cd "$RUNNER_TEMP/out"
+          cp "$RUNNER_TEMP/report.json" report.json
+          git init -q -b help-audit
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Help audit of ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" help-audit

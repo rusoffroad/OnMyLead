@@ -6,14 +6,18 @@ export default function Support() {
   return (
     <LegalPage
       title="Help and Support"
-      updated="October 13, 2026"
+      updated="October 14, 2026"
       intro={`Something not working, or a question about OnMyLead? Send us a message with the Contact Us form below, or email ${SUPPORT_EMAIL}, and a real person at ${COMPANY} will answer, usually within a day.`}
       action={{ title: 'Contact Us', href: '/contact' }}
       sections={[
         {
+          title: 'Step-by-Step Guides',
+          body: ['Every part of OnMyLead is explained step by step in the Help Center at onmylead.com/help, from creating your first ride to offline maps and Pro.'],
+        },
+        {
           title: 'Joining a Ride',
           body: [
-            'Ask the organizer for the ride code or link, or scan their QR code with your iPhone camera. Then tap Join a Ride on the Home tab.',
+            'Ask the organizer for the ride code or link, or scan their QR code with your iPhone camera. Then tap Join a Ride on the Rides tab.',
             'Your location is only shared with the ride while you are sharing, and sharing always stops when the ride ends or your timer runs out.',
           ],
         },

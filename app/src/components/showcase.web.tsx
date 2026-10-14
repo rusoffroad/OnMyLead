@@ -61,6 +61,8 @@ export function Showcase() {
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
           <a href="#features" onClick={jump('features')}>Features</a>
           <a href="#pricing" onClick={jump('pricing')}>Pricing</a>
+          {/* A full page load: the Help Center is static pages, not a screen of the app. */}
+          <a href="/help">Help</a>
         </nav>
         <div className="bar-actions">
           <a className="btn btn-line btn-small" href="/sign-in" onClick={go('/sign-in')}>Sign In</a>
@@ -307,6 +309,7 @@ export function Showcase() {
         <nav aria-label="Legal and account">
           <a href="/terms" onClick={go('/terms')}>Terms of Use</a>
           <a href="/privacy" onClick={go('/privacy')}>Privacy Policy</a>
+          <a href="/help">Help Center</a>
           <a href="/support" onClick={go('/support')}>Help and Support</a>
           <a href="/contact" onClick={go('/contact')}>Contact Us</a>
           <a href="/sign-in" onClick={go('/sign-in')}>Sign In</a>

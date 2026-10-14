@@ -1,0 +1,12 @@
+[
+  { "key": "getting-started", "title": "Getting Started", "summary": "Install the app, make your account and learn your way around.", "icon": "flag" },
+  { "key": "rides", "title": "Creating and Managing Rides", "summary": "Plan a ride, run it as the organizer and wrap it up.", "icon": "calendar" },
+  { "key": "joining", "title": "Joining and Inviting", "summary": "Find rides, join with a code, link or QR, and bring your crew.", "icon": "users" },
+  { "key": "ride-mode", "title": "Ride Mode and Live Map", "summary": "The live group map, status buttons, chat and polls on the trail.", "icon": "map" },
+  { "key": "safety-privacy", "title": "Location Sharing, Privacy and Safety", "summary": "Who sees your location, for how long, and how to stay safe.", "icon": "shield" },
+  { "key": "routes-maps", "title": "Routes and Maps", "summary": "Draw or import a route, add stops, and save maps for offline use.", "icon": "route" },
+  { "key": "groups", "title": "Riding Groups", "summary": "Keep your regular crew together with a group and group chat.", "icon": "group" },
+  { "key": "pro", "title": "Free, Pro and Billing", "summary": "What's free, what Pro adds, the 30-day trial and your subscription.", "icon": "star" },
+  { "key": "account", "title": "Account and Settings", "summary": "Sign-in, your ride name, notifications, garage and extras.", "icon": "user" },
+  { "key": "troubleshooting", "title": "Troubleshooting and FAQ", "summary": "Fixes for common problems and answers to common questions.", "icon": "help" }
+]
