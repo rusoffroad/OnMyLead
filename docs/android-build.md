@@ -38,7 +38,12 @@ onmylead.com links, in `sha256_cert_fingerprints`:
 | Key | SHA-256 | State |
 |---|---|---|
 | Upload key (`onmylead-upload.jks` on the Mac): signs builds installed straight from the Mac | `1F:5A:24:CF:30:69:B9:41:66:B8:9D:D6:E8:BF:47:D2:82:FD:A2:2B:CD:3F:23:3A:32:3D:34:07:38:0B:9C:A0` | In the file since 2026-10-14 |
-| Play App Signing key: signs every copy installed from Google Play | Play Console > Test and release > Setup > App signing | **To add** as a second entry in the same list once the Play Console app exists |
+| Play App Signing key: signs every copy installed from Google Play (Play Console > Test and release > Setup > App signing) | `6D:79:C8:3A:FB:B7:95:7C:67:28:A3:B8:3B:F5:88:7C:E8:C2:CC:29:7A:07:4C:D4:99:5B:A6:50:0A:77:BD:37` | In the file since 2026-10-14 |
+
+The Maps API key "OnMyLead Android Maps" (Google Cloud project `onmylead-fddeb`) is restricted to
+package `com.rusoffroad.onmylead.app` with these SHA-1s: upload
+`F4:D7:74:99:45:41:B7:07:7D:17:A9:12:93:E6:FC:F0:23:3F:C8:B7` and Play App Signing
+`A0:67:15:7E:A8:00:0A:BE:12:49:06:0E:C2:27:CB:47:FB:30:09:5D`.
 
 JSON has no comments, so this table is the record. After changing the file, deploy the website;
 Android rechecks the links when the app is installed or updated.

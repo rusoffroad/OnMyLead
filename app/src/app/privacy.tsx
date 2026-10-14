@@ -5,7 +5,7 @@ export default function Privacy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="October 13, 2026"
+      updated="October 14, 2026"
       intro={`OnMyLead is made by ${COMPANY}. This page explains what the app and onmylead.com collect, why, and the choices you have. The short version: your location is never public, you choose who sees it, and sharing always ends.`}
       sections={[
         {
@@ -30,7 +30,7 @@ export default function Privacy() {
         {
           title: 'Who We Share It With',
           body: [
-            'We do not sell your data or use it for advertising. We share it only with the services that run OnMyLead: Supabase (database and sign-in), Apple (push notifications and purchases), Sentry (crash reports), Resend (emails such as ride cancellations) and Cloudflare (the website). If you look up a VIN in your Garage, that VIN is sent to the US government’s free NHTSA lookup. When you search for a park, trailhead or town, only the words you type and a rough map area go to Photon, an OpenStreetMap place search; trail maps are loaded from OpenFreeMap. Neither is told who you are. When you tap Navigate or Directions, the destination opens in Apple Maps or Google Maps, and their own privacy policies apply there.',
+            'We do not sell your data or use it for advertising. We share it only with the services that run OnMyLead: Supabase (database and sign-in), Apple (push notifications and purchases on iPhone and iPad), Google (push notifications through Firebase Cloud Messaging and purchases through Google Play on Android), Sentry (crash reports), Resend (emails such as ride cancellations) and Cloudflare (the website). If you look up a VIN in your Garage, that VIN is sent to the US government’s free NHTSA lookup. When you search for a park, trailhead or town, only the words you type and a rough map area go to Photon, an OpenStreetMap place search; trail maps are loaded from OpenFreeMap. Neither is told who you are. When you tap Navigate or Directions, the destination opens in Apple Maps or Google Maps, and their own privacy policies apply there. On Android the map itself is drawn by Google Maps, which Google’s privacy policy covers.',
             'Other riders see what you share with them: your ride name, the rides you join, your messages on those rides and, while you share, your location. If you turn on Show My Google (or Apple or Facebook) Profile, riders you share a ride or riding group with also see that account’s name and photo. It’s off until you turn it on, and you can turn it off any time on the You tab.',
             'We may disclose information if the law requires it.',
           ],
