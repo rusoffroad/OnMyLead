@@ -14,6 +14,7 @@ sources:
   - app/src/core/cancel.ts
   - app/src/lib/api.ts
   - supabase/migrations/20261016000000_join_ride_approval_fix.sql
+  - supabase/migrations/20261025000000_rider_approval_fix.sql
   - supabase/migrations/20261011000000_ride_discovery.sql
   - supabase/migrations/20261017430000_riding_groups.sql
 related: [find-a-ride, qr-codes, approvals-and-waitlist, check-in, invite-riders, sign-in]
@@ -52,7 +53,7 @@ When someone invites your riding group, you get a notification and the ride show
 1. Tap the ride.
 2. In the **You're Invited** card, tap **Join Ride**, or **No Thanks** to turn it down.
 
-You don't wait for approval when you're invited. If you say no thanks, you can still join later with the ride's link or code.
+You don't wait for approval when you're invited. If you say no thanks, you can still join later with the ride's link or code. On a ride where the organizer approves riders, you then ask to join like anyone else.
 
 ## Public and Private Rides
 

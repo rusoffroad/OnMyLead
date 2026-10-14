@@ -5,7 +5,6 @@ category: joining
 order: 50
 release: "1.0"
 updated: 2026-10-14
-review: "Approval looks bypassed in the app. Every ride page is opened by its invite code (Find, Rides list, links), and the ride page sends that code when a rider taps Request to Join. join_ride treats any invite code as an invitation, so riders on an I Approve Riders ride are let straight in instead of landing in Waiting for You. Confirm the intended behavior (and fix the app or the server) before publishing. Also: Approve doesn't check Max Riders or Max Vehicles, so an approved rider can go over the limit."
 sources:
   - app/src/app/r/[code].tsx
   - app/src/app/ride/new.tsx
@@ -13,6 +12,7 @@ sources:
   - app/src/lib/api.ts
   - app/src/components/ride-roster.tsx
   - supabase/migrations/20261016000000_join_ride_approval_fix.sql
+  - supabase/migrations/20261025000000_rider_approval_fix.sql
   - supabase/migrations/20261007000000_init.sql
   - supabase/migrations/20261015000000_notification_settings.sql
 related: [join-a-ride, create-a-ride, organizer-controls, invite-riders, notification-settings]
@@ -32,7 +32,7 @@ When creating a public ride, the organizer picks **I Approve Riders** under **Jo
 
 The page shows "Your request is waiting for the organizer." You get a notification when you're approved. Until then you don't see the exact meeting point or the group.
 
-Riders invited through a riding group don't need approval. See [Invite Riders](/help/invite-riders).
+This is the same whether you found the ride on **Find** or opened it with its link, QR code or invite code. Only riders the organizer invited through a riding group skip approval. See [Invite Riders](/help/invite-riders).
 
 ### If You're the Organizer
 
@@ -42,9 +42,11 @@ You get a notification when someone asks to join. Then:
 2. Tap **Riders**.
 3. Under **Waiting for You**, tap **Approve** or **Decline** next to each rider.
 
+If you set **Max Riders** or **Max Vehicles** and the ride is already full, a rider you approve goes on the waitlist instead. They move up automatically when a spot opens.
+
 ## The Waitlist
 
-If the organizer set **Max Riders** or **Max Vehicles** and the ride is full, new riders go on the waitlist. The page shows "You're on the waitlist. You'll move up automatically if a spot opens."
+If the organizer set **Max Riders** or **Max Vehicles** and the ride is full, new riders go on the waitlist. That includes riders the organizer approves and riders invited through a riding group. The page shows "You're on the waitlist. You'll move up automatically if a spot opens."
 
 When a rider leaves, riders on the waitlist move up in the order they joined, as long as they fit. You get a notification when you have a spot.
 
