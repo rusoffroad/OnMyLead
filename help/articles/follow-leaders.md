@@ -14,7 +14,7 @@ sources:
   - app/src/core/notifications.ts
   - supabase/migrations/20261017430000_riding_groups.sql
 related: [find-a-ride, join-a-ride, riding-groups, notification-settings]
-keywords: [follow, follower, unfollow, leader, organizer, new rides, notifications]
+keywords: [follow, follower, unfollow, leader, organizer, new rides, notifications, tablet]
 ---
 
 Liked a ride? Follow the rider who organized or led it, and you'll hear when they post their next public ride. Following is free.

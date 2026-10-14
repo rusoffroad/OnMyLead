@@ -16,7 +16,7 @@ sources:
   - supabase/migrations/20261007000000_init.sql
   - supabase/migrations/20261015000000_notification_settings.sql
 related: [join-a-ride, create-a-ride, organizer-controls, invite-riders, notification-settings]
-keywords: [approve, approval, request to join, pending, waiting, decline, waitlist, wait list, full ride, max riders, max vehicles, spots]
+keywords: [approve, approval, request to join, pending, waiting, decline, waitlist, wait list, full ride, max riders, max vehicles, spots, tablet]
 ---
 
 Organizers can choose to approve each rider on a public ride, and can cap how many riders or vehicles come along. Here's what happens on both sides.

@@ -17,7 +17,7 @@ sources:
   - supabase/migrations/20261012000000_chat_leader_push.sql
   - supabase/migrations/20261020000000_blocked_riders.sql
 related: [location-sharing, family-link, report-and-block, ride-name-and-profile, delete-account]
-keywords: [privacy, private, who can see me, meeting point, exact location, rounded, public ride, data, safe, stranger]
+keywords: [privacy, private, who can see me, meeting point, exact location, rounded, public ride, data, safe, stranger, tablet]
 ---
 
 OnMyLead is built so your location is never public. You choose who sees it and for how long, and sharing always ends. These rules are enforced by OnMyLead's server, not just hidden in the app.

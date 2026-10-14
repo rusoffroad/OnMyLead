@@ -11,7 +11,7 @@ sources:
   - app/src/lib/api.ts
   - supabase/migrations/20261007000000_init.sql
 related: [join-a-ride, ride-mode, directions, organizer-controls]
-keywords: [check in, checkin, arrived, here, ready, attendance, roll call, meeting spot]
+keywords: [check in, checkin, arrived, here, ready, attendance, roll call, meeting spot, tablet]
 ---
 
 Checking in tells the organizer and the rest of the group that you're at the meeting spot and ready to ride.

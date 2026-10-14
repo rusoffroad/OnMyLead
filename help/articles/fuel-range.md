@@ -17,7 +17,7 @@ sources:
   - app/src/components/route-strip.tsx
   - app/src/lib/api.ts
 related: [garage, route-builder, trip-planner, ride-mode, status-buttons]
-keywords: [fuel, gas, range, tank, mpg, miles per gallon, extra fuel, jerry can, thirds rule, enough fuel, fuel check]
+keywords: [fuel, gas, range, tank, mpg, miles per gallon, extra fuel, jerry can, thirds rule, enough fuel, fuel check, tablet]
 screenshots:
   - file: vehicle.webp
     shows: app/src/app/garage/[id]/index.tsx

@@ -13,7 +13,7 @@ sources:
   - app/src/components/route-builder-map.web.tsx
   - app/src/components/get-the-app.web.tsx
 related: [create-a-ride, route-builder, waypoints-and-planned-stops, invite-riders, sign-in]
-keywords: [website, web, computer, desktop, laptop, browser, onmylead.com, plan on the web, big screen]
+keywords: [website, web, computer, desktop, laptop, browser, onmylead.com, plan on the web, big screen, tablet]
 screenshots:
   - file: web-route.webp
     shows: app/src/components/route-builder-map.web.tsx

@@ -15,7 +15,7 @@ sources:
   - app/src/lib/api.ts
   - supabase/migrations/20261007000000_init.sql
 related: [ride-mode, family-link, privacy, ride-summary-and-ride-again, troubleshooting]
-keywords: [share location, location, gps, tracking, stop sharing, background location, always allow, timer, battery, who can see me]
+keywords: [share location, location, gps, tracking, stop sharing, background location, always allow, timer, battery, who can see me, tablet]
 ---
 
 OnMyLead only shares your location when you turn it on, only with the people you choose, and only for as long as you pick. Every share ends on its own. These rules are enforced by OnMyLead's server, not just the app.

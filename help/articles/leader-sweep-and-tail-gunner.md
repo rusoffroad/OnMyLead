@@ -14,7 +14,7 @@ sources:
   - supabase/migrations/20261014000000_ride_handoff_tail_gunner.sql
   - supabase/migrations/20261015000000_notification_settings.sql
 related: [organizer-controls, ride-mode, ride-bubble, ride-chat, follow-leaders]
-keywords: [leader, lead, sweep, tail gunner, tail, rear, back of the pack, hand off, give ride, transfer, co-leader, roles]
+keywords: [leader, lead, sweep, tail gunner, tail, rear, back of the pack, hand off, give ride, transfer, co-leader, roles, tablet]
 ---
 
 Every group ride needs someone up front and someone at the back. OnMyLead shows the riding order on the roster: the leader first, the tail gunner last, everyone else in between.

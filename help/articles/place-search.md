@@ -17,7 +17,7 @@ sources:
   - app/src/components/meet-point-map.tsx
   - app/src/components/meet-point-map.web.tsx
 related: [create-a-ride, find-a-ride, route-builder, create-a-ride-on-the-website]
-keywords: [search, place, address, trailhead, park, town, coordinates, gps coordinates, lat long, find location, meeting point]
+keywords: [search, place, address, trailhead, park, town, coordinates, gps coordinates, lat long, find location, meeting point, tablet]
 ---
 
 Wherever OnMyLead asks for a place, you can type its name instead of hunting on a map: a trailhead, an off-road park, a campground, a town or a street address.

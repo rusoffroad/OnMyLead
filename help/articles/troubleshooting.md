@@ -23,7 +23,7 @@ sources:
   - app/src/lib/starlink.ts
   - app/src/components/fuel-check.tsx
 related: [faq, ride-mode, location-sharing, offline-maps, notification-settings, contact-support]
-keywords: [not working, problem, broken, bug, help, no signal, no service, alerts, download, password]
+keywords: [not working, problem, broken, bug, help, no signal, no service, alerts, download, password, tablet]
 ---
 
 Start here when something doesn't work the way you expect. If your problem isn't listed, [contact us](/help/contact-support).

@@ -14,7 +14,7 @@ sources:
   - app/src/hooks/use-ride-chat.ts
   - supabase/migrations/20261017420000_ride_polls.sql
 related: [ride-chat, free-vs-pro, organizer-controls]
-keywords: [poll, vote, voting, question, lunch stop, pace, survey]
+keywords: [poll, vote, voting, question, lunch stop, pace, survey, tablet]
 screenshots:
   - file: chat.webp
     shows: app/src/components/ride-poll.tsx

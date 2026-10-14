@@ -16,7 +16,7 @@ sources:
   - supabase/migrations/20261007000000_init.sql
   - supabase/migrations/20261015000000_notification_settings.sql
 related: [leader-sweep-and-tail-gunner, approvals-and-waitlist, edit-cancel-or-delete-a-ride, ride-mode, invite-riders, ride-chat]
-keywords: [organizer, host, run a ride, start ride, end ride, manage riders, approve, announcement, admin of ride]
+keywords: [organizer, host, run a ride, start ride, end ride, manage riders, approve, announcement, admin of ride, tablet]
 ---
 
 When you create a ride, you're its organizer. You're also its leader until you hand that job to someone else. Here's what you can do from your ride page.

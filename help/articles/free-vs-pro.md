@@ -18,7 +18,7 @@ sources:
   - app/src/app/(tabs)/index.tsx
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [pro-trial, subscribe-to-pro, manage-subscription, emergency-and-safety]
-keywords: [free, pro, premium, upgrade, price, cost, limits, ride limit, one ride a month, what's included, features]
+keywords: [free, pro, premium, upgrade, price, cost, limits, ride limit, one ride a month, what's included, features, tablet]
 ---
 
 OnMyLead is free to download and use. Free accounts can join as many rides as they like, and every safety feature is free on every plan. OnMyLead Pro is for riders who lead a lot of rides and want extras like offline maps and GPX import.

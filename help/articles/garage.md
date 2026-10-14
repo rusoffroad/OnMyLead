@@ -15,7 +15,7 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - app/app.json
 related: [fuel-range, trip-planner, starlink, rus-gear]
-keywords: [garage, vehicle, machine, rig, truck, jeep, sxs, utv, side by side, vin, build sheet, mods, parts, csv, fuel range, mpg]
+keywords: [garage, vehicle, machine, rig, truck, jeep, sxs, utv, side by side, vin, build sheet, mods, parts, csv, fuel range, mpg, tablet]
 screenshots:
   - file: vehicle.webp
     shows: app/src/app/garage/[id]/index.tsx

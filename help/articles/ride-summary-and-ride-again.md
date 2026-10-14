@@ -15,7 +15,7 @@ sources:
   - app/src/core/pro.ts
   - app/src/core/entitlements.ts
 related: [organizer-controls, create-a-ride, location-sharing, free-vs-pro, ride-mode]
-keywords: [summary, stats, statistics, distance, track, ride card, share, recap, ride again, repeat ride, copy ride, history, past rides]
+keywords: [summary, stats, statistics, distance, track, ride card, share, recap, ride again, repeat ride, copy ride, history, past rides, tablet]
 ---
 
 When the organizer ends a ride, everyone who was on it gets a summary on the ride page. Organizers can also start the same ride again with one tap.
