@@ -120,3 +120,7 @@ Status taps and quick replies you make with no service wait on your phone and se
 ## Leave Ride Mode
 
 Tap **‹ Ride name** at the top to go back to the ride page. Leaving the screen doesn't stop sharing: your location keeps going to the group until your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
+
+:::release 1.1.0
+Opened Ride Mode by tapping a notification? Tap **‹ Ride name** (or Android's Back) to go to **Home**.
+:::
