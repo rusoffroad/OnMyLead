@@ -2,6 +2,17 @@
   {
     "date": "2026-10-14",
     "slugs": [
+      "getting-started",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "help-top-bar",
+    "why": "The website's top bar now shows Help on phones and tablets too, so the guides say where to find it."
+  },
+  {
+    "date": "2026-10-14",
+    "slugs": [
       "approvals-and-waitlist",
       "join-a-ride"
     ],

@@ -110,6 +110,7 @@ Some things also work at onmylead.com in a web browser:
 - Create a ride from your computer and draw its route on a big map. See [Create a Ride on the Website](/help/create-a-ride-on-the-website).
 - Open a ride with its invite code.
 - Send us a message with **Contact Us**.
+- Read these guides: click **Help** at the top of the home page, on a computer or a phone.
 
 Ride Mode and live tracking stay in the iPhone app.
 
