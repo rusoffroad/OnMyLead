@@ -2,6 +2,16 @@
   {
     "date": "2026-10-14",
     "slugs": [
+      "privacy"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "privacy-google-services",
+    "why": "The Privacy Policy now names Google as a service for Android (Firebase notifications, Google Play purchases, Google Maps). The guide says Apple is used on iPhone; the Android line stays hidden until the Android app is on Google Play."
+  },
+  {
+    "date": "2026-10-14",
+    "slugs": [
       "use-onmylead-on-a-tablet",
       "ride-mode",
       "route-builder",
