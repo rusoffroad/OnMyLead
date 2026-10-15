@@ -98,7 +98,9 @@ async function status() {
   const anon = env('SUPABASE_ANON_KEY');
   const [authApi, restApi, website] = await Promise.all([
     timed(`${base}/auth/v1/health`, { headers: { apikey: anon } }),
-    timed(`${base}/rest/v1/`, { headers: { apikey: anon } }),
+    // A real read: the API root (/rest/v1/) answers 401 to the anon key now that Supabase hides
+    // the schema listing, which showed a working API as an error. Public rides are readable by anyone.
+    timed(`${base}/rest/v1/rides?select=id&limit=1`, { headers: { apikey: anon } }),
     timed('https://onmylead.com/'),
   ]);
   return {
