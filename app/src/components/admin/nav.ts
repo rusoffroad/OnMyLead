@@ -3,6 +3,7 @@ export type AdminSection = { key: string; title: string; href: string; group: 'P
 
 export const ADMIN_SECTIONS: AdminSection[] = [
   { key: 'overview', title: 'Overview', href: '/admin', group: 'People' },
+  { key: 'growth', title: 'Signups and Downloads', href: '/admin/growth', group: 'People' },
   { key: 'users', title: 'Users', href: '/admin/users', group: 'People' },
   { key: 'trials', title: 'Pro Trials', href: '/admin/trials', group: 'People' },
   { key: 'reports', title: 'Reports', href: '/admin/reports', group: 'People' },

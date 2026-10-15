@@ -100,6 +100,8 @@ export function actionLabel(action: string): string {
     'user.reactivate': 'Reactivated Account',
     'user.delete': 'Deleted Account',
     'user.delete_failed': 'Account Deletion Failed',
+    'user.mark_test': 'Marked as Test Account',
+    'user.unmark_test': 'Counted as a Rider Again',
     'ride.remove': 'Removed Ride',
     'report.reviewing': 'Started Reviewing Report',
     'report.resolved': 'Resolved Report',
