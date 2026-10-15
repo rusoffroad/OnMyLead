@@ -4,7 +4,7 @@ summary: Everything you can do as a ride's organizer, from starting Ride Mode an
 category: rides
 order: 40
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/r/[code].tsx
   - app/src/components/ride-roster.tsx
