@@ -1,10 +1,11 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
+import { RideDatePicker } from '@/components/ride-date-picker';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
@@ -13,6 +14,7 @@ import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
+import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
 import { clockText, parseTime } from '@/core/time';
 import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
@@ -23,16 +25,6 @@ import { handleProError } from '@/lib/pro';
 
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
 
-function nextDays(n: number) {
-  return Array.from({ length: n }, (_, i) => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
-}
-
-const at = (day: Date, minutes: number | null) => (minutes == null ? null : new Date(day.getTime() + minutes * 60_000));
 const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : null);
 
 type Kind = 'public' | 'private';
@@ -43,10 +35,9 @@ export default function NewRide() {
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
-  const days = useMemo(() => nextDays(14), []);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [day, setDay] = useState<number>(days[0].getTime());
+  const [day, setDay] = useState<number>(() => startOfDay(new Date()).getTime());
   const [meetTime, setMeetTime] = useState('8:00 am');
   const [departTime, setDepartTime] = useState('');
   const [finishTime, setFinishTime] = useState('');
@@ -88,8 +79,7 @@ export default function NewRide() {
       const clockOf = (iso: string | null) => (iso ? clockText(new Date(iso)) : '');
       setName(src.name);
       // The next one on the same weekday: a Saturday ride stays a Saturday ride.
-      const sameDay = days.find((d, i) => i > 0 && d.getDay() === new Date(src.meet_at).getDay());
-      if (sameDay) setDay(sameDay.getTime());
+      setDay(nextWeekday(new Date(), new Date(src.meet_at).getDay()).getTime());
       setDescription(src.description ?? '');
       setMeetTime(clockOf(src.meet_at));
       setDepartTime(clockOf(src.depart_at));
@@ -118,7 +108,7 @@ export default function NewRide() {
       setCopiedFrom(src.name);
       setMore(true);
     })().catch((e) => setError(e instanceof Error ? e.message : 'Could not copy that ride.'));
-  }, [copy, days]);
+  }, [copy]);
 
   // Riding groups to invite as soon as the ride exists (none until groups are switched on).
   useEffect(() => {
@@ -159,6 +149,7 @@ export default function NewRide() {
     if (!kind) return setError('Pick Public or Private at the top.');
     if (!name.trim()) return setError('Give the ride a name.');
     if (!meetAt) return setError('Meeting time looks off. Try "8:00 am".');
+    if (!canRideOn(dayDate, new Date())) return setError('Pick a day from today up to a year out.');
     if (!parsedCoords) return setError('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".');
     if (!routePlan) return setError('Pick Mapped or Freeride under The Route.');
     setBusy(true);
@@ -256,14 +247,7 @@ export default function NewRide() {
 
       <Card>
         <ThemedText type="heading">When</ThemedText>
-        <Choice
-          value={day}
-          onChange={setDay}
-          options={days.map((d, i) => ({
-            value: d.getTime(),
-            label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }),
-          }))}
-        />
+        <RideDatePicker value={day} onChange={setDay} />
         <Field label="Meet At" value={meetTime} onChangeText={setMeetTime} placeholder="8:00 am" />
       </Card>
 

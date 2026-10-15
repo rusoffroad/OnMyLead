@@ -2,6 +2,17 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "create-a-ride",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-calendar-picker",
+    "why": "Create a Ride's day used to be limited to the next two weeks. 1.0.1 and the website add a Calendar button to pick any day from today up to a year out, plus Sat and Sun quick picks for the coming weekend."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "location-sharing",
       "troubleshooting"
     ],

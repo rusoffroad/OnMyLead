@@ -12,6 +12,7 @@ sources:
   - app/src/app/sign-in.tsx
   - app/src/components/route-builder-map.web.tsx
   - app/src/components/get-the-app.web.tsx
+  - app/src/components/ride-date-picker.tsx
 related: [create-a-ride, route-builder, waypoints-and-planned-stops, invite-riders, sign-in]
 keywords: [website, web, computer, desktop, laptop, browser, onmylead.com, plan on the web, big screen, tablet]
 screenshots:
@@ -28,7 +29,7 @@ You can plan a ride on the big screen at onmylead.com. It's the same ride as one
 1. Go to onmylead.com and click **Create a Ride on the Web**.
 2. Sign in with your OnMyLead account if you aren't already. You go straight to Create a Ride after signing in.
 3. Pick **Public** or **Private** under **What Kind of Ride?**
-4. Fill in the **Ride Name**, the day under **When**, and the **Meet At** time.
+4. Fill in the **Ride Name**, the day under **When**, and the **Meet At** time. Click **Calendar** to pick any day from today up to a year out.
 5. Set the **Meeting Point**: click the satellite map to drop the pin, then drag the pin to fine-tune it. You can also search a place, use your location, or type coordinates, and the pin moves there.
 6. Under **The Route**, pick **Mapped** or **Freeride**.
 7. Fill in anything else you want, then click **Create Public Ride** or **Create Private Ride**.
