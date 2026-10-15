@@ -43,7 +43,7 @@ function safeJson(a: unknown): string {
 export function startAppLog() {
   if (started) return;
   started = true;
-  logEvent('app', `Started on ${Platform.OS} ${String(Platform.Version ?? '')}`.trim());
+  logEvent('app', Platform.OS === 'web' ? 'Opened the website' : `Started on ${Platform.OS} ${String(Platform.Version ?? '')}`.trim());
 
   for (const level of ['error', 'warn'] as const) {
     const original = console[level];
