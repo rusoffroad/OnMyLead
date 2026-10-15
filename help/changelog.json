@@ -2,6 +2,19 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "android-version-code-3",
+    "why": "Android build number goes to 3 for the next Google Play upload. These articles list the app config as a source; nothing in them changes for riders."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "contact-support",
       "create-a-ride",
       "delete-account",
