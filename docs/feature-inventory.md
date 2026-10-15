@@ -52,7 +52,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   (admins).
 
 ### Rides: Create, Manage, Organize
-- Create a Ride (`/ride/new`, also on the website): Public / Private, name, day (14 days) and time,
+- Create a Ride (`/ride/new`, also on the website): Public / Private, name, day (quick picks plus a month calendar, today up to a year out, 1.0.1) and time,
   meeting point (place search, current location, map), state, Mapped or Freeride route, vehicles
   welcome, Anyone Can Join / I Approve Riders, max vehicles, max riders, invite riding groups,
   optional description, departure, finish, destination, route length, difficulty, experience,

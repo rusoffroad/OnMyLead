@@ -13,6 +13,8 @@ sources:
   - app/src/core/pro.ts
   - app/src/components/pro-gate.tsx
   - app/src/core/time.ts
+  - app/src/core/calendar.ts
+  - app/src/components/ride-date-picker.tsx
   - app/src/lib/api.ts
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [create-a-ride-on-the-website, invite-riders, route-builder, approvals-and-waitlist, edit-cancel-or-delete-a-ride, free-vs-pro]
@@ -31,7 +33,7 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 1. On the **Rides** tab, tap **Create a Ride**.
 2. Under **What Kind of Ride?**, tap **Public** (open to anyone, found by riders near you or in your state) or **Private** (only friends you invite by link, text or email).
 3. Type a **Ride Name**.
-4. Under **When**, pick the day. You can pick **Today**, **Tomorrow** or any day in the next two weeks.
+4. Under **When**, pick the day (see [Pick the Day](#pick-the-day) below).
 5. Type the time in **Meet At**, for example "8:00 am" or "2:30 pm".
 6. Set the **Meeting Point**. You can search in **Search a Place or Address**, tap **Use My Current Location**, or paste **Coordinates** like "38.57, -109.55".
 7. Add a **Place Name** if you like, such as "Gas station on Main St".
@@ -43,6 +45,18 @@ If you picked **Mapped**, the route builder opens right away so you can draw the
 
 :::tip
 Only riders who have joined see the exact meeting spot. Public pages show the general area, within about a mile.
+:::
+
+## Pick the Day
+
+:::until 1.0.1
+Under **When**, tap **Today**, **Tomorrow** or any day in the next two weeks.
+:::
+
+:::release 1.0.1
+Under **When**, tap **Today**, **Tomorrow**, **Sat** or **Sun** for the coming weekend. For any other day, tap **Calendar** and pick it from the month calendar. Use the arrows to go to another month. You can schedule a ride for any day from today up to a year out. The day you picked shows under **When**, with how far away it is, such as "In 8 Weeks".
+
+On a tablet, the calendar sits in the same form, with bigger day buttons.
 :::
 
 ## Public Ride Options
