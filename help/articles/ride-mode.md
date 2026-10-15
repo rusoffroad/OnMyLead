@@ -51,6 +51,11 @@ Your screen stays on while Ride Mode is open, so the map is ready when you glanc
 
 - **‹ Ride name:** tap it to go back to the ride page.
 - **The sharing pill:** shows how long you have left sharing, such as **1h 20m**, or **On** when there's no timer. It says **Off** when you aren't sharing; tap it to start. While you share, tap it to show **Sharing, 1 hr 20 min left** with **Stop** and **Hide**.
+
+:::release 1.0.1
+If you've turned on [Battery Saver](/help/battery-saver), that banner also names the setting, such as **Sharing, 1 hr 20 min left · Balanced**.
+:::
+
 - **Together** or **2 Separated:** green when the group is together, red with a count when [Ride Bubble](/help/ride-bubble) sees riders who have dropped away. Tap it to open the **Riders** list.
 
 ### The Map

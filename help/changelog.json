@@ -2,12 +2,46 @@
   {
     "date": "2026-10-15",
     "slugs": [
-      "battery-saver"
+      "battery-saver",
+      "location-sharing",
+      "ride-mode",
+      "troubleshooting"
     ],
     "kind": "add",
     "by": "pr",
     "ref": "battery-saver",
-    "why": "New in 1.0.1: Battery Saver lets riders choose how often their phone sends its location while sharing (Best Accuracy, Balanced, Max Battery Saver), starting on Best Accuracy and warning before switching away from it."
+    "why": "New in 1.0.1: Battery Saver lets riders choose how often their phone sends its location while sharing (Best Accuracy, Balanced, Max Battery Saver), starting on Best Accuracy and warning before switching away from it. Share Your Location, Ride Mode and Troubleshooting point to it in 1.0.1 blocks."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
+      "contact-support",
+      "delete-account",
+      "directions",
+      "emergency-and-safety",
+      "family-link",
+      "faq",
+      "fuel-range",
+      "garage",
+      "getting-started",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "promo-codes",
+      "ride-bubble",
+      "ride-chat",
+      "ride-name-and-profile",
+      "sign-in",
+      "starlink",
+      "status-buttons",
+      "trip-planner",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "battery-saver",
+    "why": "Reviewed for Battery Saver (new You tab row, a Change link on Share My Location, and Ride Mode's sharing banner naming the setting). The steps in these articles don't change."
   },
   {
     "date": "2026-10-15",

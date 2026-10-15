@@ -39,7 +39,7 @@ export default function BatteryScreen() {
     <Screen width={sideBySide ? 'page' : 'readable'}>
       <Stack.Screen options={{ title: 'Battery Saver' }} />
       <ThemedText themeColor="textSecondary">
-        How often this phone tells your group where you are while you share your location. Fewer updates use less battery.
+        How often this device tells your group where you are while you share your location. Fewer updates use less battery.
       </ThemedText>
 
       {mode !== DEFAULT_BATTERY_MODE ? (
@@ -60,7 +60,7 @@ export default function BatteryScreen() {
       <ErrorText error={error} />
 
       <ThemedText type="small" themeColor="textSecondary">
-        This setting is for this phone only. Need Help, EMERGENCY and your other taps still send right away on every setting. Other riders aren’t told which one you picked.
+        This setting is for this device only. Need Help, EMERGENCY and your other taps still send right away on every setting. Other riders aren’t told which one you picked.
       </ThemedText>
     </Screen>
   );
@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
     padding: Spacing.three, gap: Spacing.two,
   },
   optionOn: { borderColor: Colors.sky },
-  optionHead: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  optionHead: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: Spacing.two },
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: Colors.sky },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.sky },
-  optionTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 24, flexShrink: 1 },
+  optionTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 24 },
   recommended: {
-    color: RideColors.green, fontFamily: font(700), fontSize: 12, overflow: 'hidden',
+    color: RideColors.green, fontFamily: font(700), fontSize: 12, overflow: 'hidden', flexShrink: 0,
     backgroundColor: `${RideColors.green}1F`, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2,
   },
   trail: { height: HALO, marginHorizontal: HALO / 2, justifyContent: 'center', marginVertical: 2 },

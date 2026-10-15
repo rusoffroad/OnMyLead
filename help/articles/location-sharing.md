@@ -81,6 +81,10 @@ If you turn off location for OnMyLead while you're sharing with a ride, Ride Mod
 
 Your phone sends a new position each time you move about 25 meters (80 feet), and at least every 15 seconds while you're stopped, so the group can tell you're still there.
 
+:::release 1.0.1
+To make your battery last longer, you can have your phone send less often with [Battery Saver](/help/battery-saver). It starts on **Best Accuracy**, the rate above.
+:::
+
 ## With No Service
 
 Live tracking needs a connection. When your phone has no service:
