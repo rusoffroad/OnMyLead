@@ -34,6 +34,17 @@ async function runLink(link: AuthLink): Promise<Next> {
   return { step: 'go', to };
 }
 
+/**
+ * Goes on from the link. A sign-in link is usually tapped while the sign-in sheet is still open,
+ * and this screen opens on top of it, so close everything over Home first; otherwise Home ends up
+ * drawn inside the sheet (a floating card on iPad).
+ */
+function leave(to: '/' | '/reset-password') {
+  if (!router.canDismiss()) return router.replace(to);
+  router.dismissAll();
+  if (to !== '/') router.push(to);
+}
+
 type State =
   | { step: 'working' }
   | { step: 'choose' }
@@ -71,7 +82,7 @@ export default function AuthCallback() {
   const finish = () => {
     if (started.current) return;
     started.current = true;
-    runLink(link).then((next) => (next.step === 'go' ? router.replace(next.to) : setState(next)));
+    runLink(link).then((next) => (next.step === 'go' ? leave(next.to) : setState(next)));
   };
 
   useEffect(() => {
@@ -84,7 +95,7 @@ export default function AuthCallback() {
   // "Email Confirmed" stays up just long enough to read, then the app carries on.
   useEffect(() => {
     if (state.step !== 'done') return;
-    const t = setTimeout(() => router.replace(state.to), 1800);
+    const t = setTimeout(() => leave(state.to), 1800);
     return () => clearTimeout(t);
   }, [state]);
 
@@ -120,7 +131,7 @@ export default function AuthCallback() {
         <Card style={{ gap: Spacing.two, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
           <ThemedText type="subtitle" accessibilityLiveRegion="polite">{state.title}</ThemedText>
           <ThemedText themeColor="textSecondary">{state.body}</ThemedText>
-          <Button title="Let’s Ride" onPress={() => router.replace(state.to)} />
+          <Button title="Let’s Ride" onPress={() => leave(state.to)} />
         </Card>
       ) : null}
 
