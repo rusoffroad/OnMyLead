@@ -4,7 +4,7 @@ summary: Find a trailhead, off-road park, town, street address or coordinates fo
 category: routes-maps
 order: 70
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/place-search.tsx
   - app/src/components/map-search.tsx

@@ -12,6 +12,35 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "create-a-ride",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-calendar-picker",
+    "why": "Create a Ride's day used to be limited to the next two weeks. 1.0.1 and the website add a Calendar button to pick any day from today up to a year out, plus Sat and Sun quick picks for the coming weekend."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
+      "approvals-and-waitlist",
+      "edit-cancel-or-delete-a-ride",
+      "free-vs-pro",
+      "fuel-range",
+      "invite-riders",
+      "place-search",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "ride-calendar-picker",
+    "why": "Reviewed for the Create a Ride calendar. The steps in these articles don't change; Ride Again still sets the next day on the same weekday."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "location-sharing",
       "troubleshooting"
     ],
