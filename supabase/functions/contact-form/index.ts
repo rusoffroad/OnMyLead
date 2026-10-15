@@ -47,7 +47,7 @@ function cors(origin: string | null): Record<string, string> {
   return {
     'Access-Control-Allow-Origin': origin && ORIGINS.has(origin) ? origin : 'https://onmylead.com',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     Vary: 'Origin',
   };
 }
@@ -58,6 +58,8 @@ Deno.serve(async (req) => {
   const headers = cors(req.headers.get('origin'));
   const reply = (body: unknown, status = 200) => Response.json(body, { status, headers });
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
+  // The form asks first, so it only offers screenshots once this version is deployed (older ones say 405).
+  if (req.method === 'GET') return reply({ ok: true, bug_reports: true });
   if (req.method !== 'POST') return reply({ error: 'POST only' }, 405);
 
   // deno-lint-ignore no-explicit-any

@@ -14,7 +14,7 @@ import {
   CONTACT_TOPICS, contactProblem, MAX_CONTACT_MESSAGE, MAX_CONTACT_NAME, screenBeforeContact, screenshotHint, screenshotProblem, topicHint,
   type ContactTopic,
 } from '@/core/contact';
-import { myRideName, sendContactMessage } from '@/lib/api';
+import { canSendBugReports, myRideName, sendContactMessage } from '@/lib/api';
 import { appLogText, screenTrail } from '@/lib/app-log';
 import { deviceSummary, isTablet } from '@/lib/device-info';
 import { useSession } from '@/lib/session';
@@ -39,6 +39,11 @@ export default function ContactScreen() {
   const params = useLocalSearchParams<{ topic?: string }>();
   const [topic, setTopic] = useState<ContactTopic | null>(() => CONTACT_TOPICS.find((t) => t.value === params.topic)?.value ?? null);
   const [shot, setShot] = useState<{ uri: string; base64: string; type: string } | null>(null);
+  // Screenshots and the log go only to a server that keeps them (see canSendBugReports).
+  const [reportsReady, setReportsReady] = useState(false);
+  useEffect(() => {
+    canSendBugReports().then(setReportsReady);
+  }, []);
   // Where the rider was before they opened this screen, for a bug report.
   const [cameFrom] = useState(() => screenBeforeContact(screenTrail()));
   const [name, setName] = useState('');
@@ -68,7 +73,7 @@ export default function ContactScreen() {
     setBusy(true);
     setError(null);
     try {
-      const report = topic === 'problem'
+      const report = topic === 'problem' && reportsReady
         ? { device: deviceSummary(), screen: cameFrom, log: appLogText(), screenshot: shot ? { base64: shot.base64, type: shot.type } : null }
         : undefined;
       await sendContactMessage({ topic, name, email: email.trim(), message, elapsedMs: Date.now() - openedAt.current, website: trap, report });
@@ -223,7 +228,7 @@ export default function ContactScreen() {
           </View>
         </View>
 
-        {topic === 'problem' ? (
+        {topic === 'problem' && reportsReady ? (
           <View style={styles.report}>
             <ThemedText type="smallBold">Add a Screenshot</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">{screenshotHint(Platform.OS, Platform.OS !== 'web' && isTablet())}</ThemedText>

@@ -873,6 +873,23 @@ export async function requestAccountDeletion(reason?: string) {
   track('account_deletion_requested');
 }
 
+let bugReportsReady: Promise<boolean> | null = null;
+/**
+ * Whether the server takes bug report extras (screenshot, device, log): the contact-form function
+ * from migration 20261031000000 on answers a GET, older ones refuse it. Asked once per launch.
+ */
+export function canSendBugReports(): Promise<boolean> {
+  bugReportsReady ??= supabase.functions
+    .invoke('contact-form', { method: 'GET' })
+    .then(({ data, error }) => !error && (data as { bug_reports?: boolean } | null)?.bug_reports === true)
+    .catch(() => false)
+    .then((ok) => {
+      if (!ok) bugReportsReady = null; // ask again next time the form opens
+      return ok;
+    });
+  return bugReportsReady;
+}
+
 export type BugReport = {
   device: string;
   screen: string | null;
