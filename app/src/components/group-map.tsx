@@ -16,6 +16,21 @@ export type { MapRider } from './group-map-types';
 
 const FIT_PADDING = { top: 80, right: 60, bottom: 80, left: 60 };
 
+/** Whether every point is within about 300 m, too close together to frame by fitting. */
+function isTight(pts: { latitude: number; longitude: number }[]) {
+  const lats = pts.map((p) => p.latitude);
+  const lngs = pts.map((p) => p.longitude);
+  return Math.max(...lats) - Math.min(...lats) < 0.003 && Math.max(...lngs) - Math.min(...lngs) < 0.003;
+}
+
+/** Two corners about 800 m either side of a point, the closest the map frames on its own. */
+function around(p: { latitude: number; longitude: number }) {
+  return [
+    { latitude: p.latitude - 0.007, longitude: p.longitude - 0.007 },
+    { latitude: p.latitude + 0.007, longitude: p.longitude + 0.007 },
+  ];
+}
+
 /**
  * Live group map. Every rider is the same grey dot with their ride name beside it; the leader is
  * the one bigger blue dot, so a glance finds them. A yellow or red ring means Ride Bubble trouble,
@@ -52,7 +67,9 @@ export function GroupMap({
     if (route?.length) for (const p of route) pts.push({ latitude: p.lat, longitude: p.lng });
     const want = route?.length ? 'route' : 'riders';
     if (fitted.current !== want && fitted.current !== 'route' && pts.length) {
-      map.current?.fitToCoordinates(pts, { edgePadding, animated: false });
+      // One rider, or the whole group at the meeting spot, would zoom all the way in, past where
+      // satellite and topo tiles exist, so the map showed blank or blurred: frame about a mile.
+      map.current?.fitToCoordinates(isTight(pts) ? around(pts[0]) : pts, { edgePadding, animated: false });
       fitted.current = want;
     }
   }, [riders, route, edgePadding]);
