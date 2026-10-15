@@ -82,7 +82,7 @@ web build and the Android emulator.
 | F48 | CarPlay / Android Auto | ⬜ | ➖ | ⬜ | ➖ | ➖ | ➖ | ➖ | | Exception E01 |
 | F49 | Keyboard Done bar / dismiss | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ➖ | iOS 1.0 | Done bar is iOS-only; Android closes with Back, a drag on lists or a tap outside. Sheets now lift above the keyboard on Android too (PR #99); device check |
 | F50 | Help Center, website, showcase | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | web | Device-specific steps added as each device ships. Privacy Policy names Google services for Android (FCM, Google Play, Google Maps) since PR #107 |
-| F51 | Admin: signups and downloads | ➖ | ➖ | ➖ | ➖ | 🟡 | 🟡 | ➖ | web | Owner-only page onmylead.com/admin/growth (Exception E02): real riders without test/admin accounts, over time, by sign-in method; App Store and Google Play downloads from the stores' daily reports. Migration 20261030000000 DB-tested, store-downloads function written; not deployed, store report keys not set (#PR) |
+| F51 | Admin: signups and downloads | ➖ | ➖ | ➖ | ➖ | 🟡 | 🟡 | ➖ | web | Owner-only page onmylead.com/admin/growth (Exception E02): real riders without test/admin accounts, over time, by sign-in method; App Store and Google Play downloads from the stores' daily reports. Migration 20261030000000 DB-tested, store-downloads function written; not deployed, store report keys not set (PR #126) |
 
 ## Device Foundations
 
