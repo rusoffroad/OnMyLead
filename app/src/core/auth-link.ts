@@ -13,6 +13,7 @@
  * Supabase reports a bad or expired link with ?error_code=...&error_description=... instead.
  */
 
+import { ANDROID_PACKAGE } from './purchases';
 import { SITE_URL } from './ride-link';
 
 /** Where the app asks Supabase to send email and OAuth links back to. Exactly as allow-listed. */
@@ -73,6 +74,51 @@ export function appAuthLink(link: AuthLink): string {
     return `${APP_AUTH_CALLBACK}?token_hash=${encodeURIComponent(link.tokenHash)}&type=${link.type}`;
   }
   return 'onmylead://sign-in';
+}
+
+/**
+ * Android hand-off for emailed links. The iPhone opens /auth-callback?token_hash=... in the app
+ * through the site association file, but Android's App Links can't filter on the query string, so
+ * claiming /auth-callback would also pull the website's Google and Facebook returns (?code=...)
+ * into the app. Instead the website page sends Android browsers on to the app with an intent URL;
+ * Chrome opens the app when it is installed and otherwise loads browser_fallback_url, which is the
+ * same page with web=1 so it signs the browser in rather than bouncing again.
+ */
+export const WEB_ONLY_PARAM = 'web';
+
+export function isAndroidBrowser(userAgent: string | null | undefined): boolean {
+  return !!userAgent && /Android/i.test(userAgent);
+}
+
+/** The intent URL to send this page to, or null when the page should finish the link itself. */
+export function androidAuthHandoff(href: string, userAgent: string | null | undefined): string | null {
+  if (!isAndroidBrowser(userAgent)) return null;
+  let url: URL;
+  try {
+    url = new URL(href);
+  } catch {
+    return null;
+  }
+  if (url.searchParams.get(WEB_ONLY_PARAM) === '1') return null;
+  const link = parseAuthLink(Object.fromEntries(url.searchParams));
+  if (link.kind !== 'token') return null;
+  return androidIntentUrl(link, webOnlyUrl(href));
+}
+
+/** The same page, marked so it finishes the link in the browser instead of handing it off. */
+export function webOnlyUrl(href: string): string {
+  const url = new URL(href);
+  url.searchParams.set(WEB_ONLY_PARAM, '1');
+  return url.toString();
+}
+
+/** Chrome's intent URL for onmylead://auth-callback?token_hash=...&type=..., with a fallback page. */
+export function androidIntentUrl(link: Extract<AuthLink, { kind: 'token' }>, fallbackUrl: string): string {
+  const query = `token_hash=${encodeURIComponent(link.tokenHash)}&type=${encodeURIComponent(link.type)}`;
+  return (
+    `intent://auth-callback?${query}#Intent;scheme=onmylead;package=${ANDROID_PACKAGE};` +
+    `S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end`
+  );
 }
 
 /** What each emailed link says once it has worked, for the screen it lands on. */

@@ -6,7 +6,7 @@ import { Logo } from '@/components/logo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Screen } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
-import { afterAuthLink, appAuthLink, authLinkDone, authLinkError, parseAuthLink, type AuthLink } from '@/core/auth-link';
+import { afterAuthLink, androidAuthHandoff, appAuthLink, authLinkDone, authLinkError, parseAuthLink, type AuthLink } from '@/core/auth-link';
 import { isAppleMobile } from '@/core/ride-link';
 import { track } from '@/lib/analytics';
 import { completeAuthLink } from '@/lib/session';
@@ -45,14 +45,27 @@ type State =
  * Every emailed link (confirm your email, sign-in link, reset password, new email) and every
  * Google or Facebook sign-in lands here, in the app or on the website (see core/auth-link.ts).
  * On an iPhone browser a branded link first offers the app, since the token can only be used once.
+ * An Android browser is sent straight on to the app with an intent URL (see androidAuthHandoff),
+ * which falls back to this page with web=1 when the app isn't installed; the same choice stays on
+ * screen in case the browser holds the hand-off back.
  */
 export default function AuthCallback() {
   const params = useLocalSearchParams<Record<string, string>>();
   const [link] = useState<AuthLink>(() => parseAuthLink(params));
   const [iphoneWeb] = useState(() => Platform.OS === 'web' && isAppleMobile(typeof navigator === 'undefined' ? null : navigator.userAgent));
-  const [state, setState] = useState<State>(() =>
-    link.kind === 'error' ? { step: 'failed', message: link.message } : link.kind === 'token' && iphoneWeb ? { step: 'choose' } : { step: 'working' },
+  const [androidIntent] = useState(() =>
+    Platform.OS === 'web' && typeof window !== 'undefined' && typeof navigator !== 'undefined'
+      ? androidAuthHandoff(window.location.href, navigator.userAgent)
+      : null,
   );
+  const [state, setState] = useState<State>(() =>
+    link.kind === 'error'
+      ? { step: 'failed', message: link.message }
+      : link.kind === 'token' && (iphoneWeb || androidIntent)
+        ? { step: 'choose' }
+        : { step: 'working' },
+  );
+  const openApp = () => (androidIntent ? window.location.assign(androidIntent) : Linking.openURL(appAuthLink(link)));
   const started = useRef(false);
 
   const finish = () => {
@@ -62,6 +75,7 @@ export default function AuthCallback() {
   };
 
   useEffect(() => {
+    if (androidIntent) window.location.replace(androidIntent);
     if (state.step === 'working') finish();
     // Runs once, for the link this screen was opened with.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,7 +104,7 @@ export default function AuthCallback() {
         <Card style={{ gap: Spacing.three, borderLeftWidth: 4, borderLeftColor: Colors.accent }}>
           <ThemedText type="subtitle">Open OnMyLead</ThemedText>
           <ThemedText themeColor="textSecondary">Finish signing in inside the app, or carry on here in the browser.</ThemedText>
-          <Button title="Open in the App" big onPress={() => Linking.openURL(appAuthLink(link))} />
+          <Button title="Open in the App" big onPress={openApp} />
           <Button
             title="Continue on the Website"
             kind="secondary"

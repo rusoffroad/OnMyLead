@@ -4,7 +4,7 @@ summary: Sign in with Apple, Google or Facebook, an email and password, or an em
 category: account
 order: 10
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/sign-in.tsx
   - app/src/app/reset-password.tsx
@@ -82,6 +82,10 @@ If you see **This Link Has Expired**, tap **Back to Sign In** and ask for a new 
 ## Opening an Email Link on Another Device
 
 If you tap a link from us in a browser on an iPhone, you may see **Open OnMyLead**. Tap **Open in the App** to finish in the app, or **Continue on the Website** to stay in the browser.
+
+:::release android
+On an Android phone or tablet, a link from us opens Chrome for a moment and then OnMyLead, which finishes signing you in. If OnMyLead isn't installed, the website signs you in instead. If you see **Open OnMyLead** in the browser, tap **Open in the App**.
+:::
 
 If you see **Your Email Is Confirmed** and a request to sign in again, the link opened somewhere other than where you signed up. Your email is confirmed. Tap **Sign In** and sign in once more with your email and password.
 
