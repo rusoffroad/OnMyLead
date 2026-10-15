@@ -2,6 +2,16 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "ride-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-mode-live-riders",
+    "why": "Ride Mode now adds a rider who joins while you're on the map within a few seconds (it used to wait for the 15 second refresh), and drops riders whose share ends. The article says so."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "location-sharing",
       "ride-mode",
       "troubleshooting",
