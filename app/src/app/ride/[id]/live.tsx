@@ -52,6 +52,7 @@ import {
   startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
 import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay';
+import { showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
@@ -252,12 +253,21 @@ export default function RideMode() {
   // share after the app was closed or the phone restarted); without one, ask once. With no
   // service this fails quietly and is tried again, rather than asking someone already sharing.
   const shareChecked = useRef(false);
+  const warnedLocationOff = useRef(false);
   const loadShare = useCallback(() =>
     myActiveShares()
       .then((all) => {
         const s = all.find((x) => x.scope === 'ride' && x.ride_id === id) ?? null;
         setShare(s);
-        if (s) startSendingLocation(id, s.expires_at ? Date.parse(s.expires_at) : null).catch(() => {});
+        if (s) {
+          startSendingLocation(id, s.expires_at ? Date.parse(s.expires_at) : null).catch(() => {
+            // Location was turned off for the app mid-share: the ride still lists this rider as
+            // sharing, so say once that nothing is being sent instead of failing quietly.
+            if (warnedLocationOff.current) return;
+            warnedLocationOff.current = true;
+            showNotice('Location Is Off', 'OnMyLead can’t see your location, so your group won’t see you move. Turn on location for OnMyLead in Settings to keep sharing.');
+          });
+        }
         else if (!shareChecked.current) setAskShare(true);
         shareChecked.current = true;
       })

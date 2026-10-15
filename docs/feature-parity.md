@@ -49,7 +49,7 @@ web build and the Android emulator.
 | F15 | Invite card: share, text, email, QR | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ invite-riders | iOS 1.0 | |
 | F16 | Find a Ride (flag) | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ✅ | ✅ find-a-ride | iOS 1.0 | Android: map needs API key (F27). Tablet: search and list beside a full-height map; web-checked |
 | F17 | Ride Mode live map | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ ride-mode | iOS 1.0 | Tablet: full-screen map, riders sidebar (swipe left to fold), controls panel on the right; web-checked, no device check yet. Riders who join mid-ride appear live (ride_members + positions realtime, core/live-roster.ts) |
-| F18 | Live location sharing (foreground) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Cross-platform sync test not run yet |
+| F18 | Live location sharing (foreground) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Cross-platform sync test not run yet. 1.0.1: one-time Location Is Off notice when location is turned off mid-share (reproduced on Android emulator; fix not device-checked yet) |
 | F19 | Background location during a ride | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ location-sharing | iOS 1.0 | Android (PR #99): foreground service with While Using permission, no `ACCESS_BACKGROUND_LOCATION` and so no Play background-location declaration. Needs a real-device check with the screen off |
 | F20 | Wi-Fi-only tablets (no GPS) | ➖ | ⬜ | ➖ | ⬜ | ✅ | ➖ | ⬜ | | Show approximate accuracy; follow without sharing. Tracked in issue #101 |
 | F21 | Personal sharing, family link | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ family-link | iOS 1.0 | |

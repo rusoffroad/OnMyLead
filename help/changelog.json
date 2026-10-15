@@ -2,6 +2,16 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "location-sharing"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "location-off-notice",
+    "why": "Bug fix for 1.0.1: if you turned off location for OnMyLead mid-share, Ride Mode kept saying you were sharing while nothing was sent. It now shows a one-time Location Is Off notice, and the article says so."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "sign-in"
     ],
     "kind": "update",

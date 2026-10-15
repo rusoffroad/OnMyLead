@@ -75,6 +75,10 @@ To keep your group updated while your phone is locked or in your pocket, OnMyLea
 
 On Android, allow location **While Using the App**. OnMyLead doesn't need **Allow All the Time**. While you share, Android shows a **Sharing Your Location** notification, and that is what keeps your group updated with the phone locked. Tap it to see who can see you or to stop sharing. On Android 13 and later, also allow notifications when asked, or that notification stays hidden.
 
+:::release 1.0.1
+If you turn off location for OnMyLead while you're sharing with a ride, Ride Mode shows a **Location Is Off** notice once, because your group can't see you move. Turn location back on for OnMyLead in your phone's **Settings** to keep sharing.
+:::
+
 Your phone sends a new position each time you move about 25 meters (80 feet), and at least every 15 seconds while you're stopped, so the group can tell you're still there.
 
 ## With No Service
