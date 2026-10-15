@@ -4,7 +4,7 @@ summary: Show your ride's QR code so riders can scan it at the trailhead, share 
 category: joining
 order: 40
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/ride-qr-sheet.tsx
   - app/src/components/ride-qr.tsx
@@ -41,13 +41,13 @@ It sends a picture of the QR code card along with the ride link. You can print i
 
 ## Scan a QR Code to Join
 
-1. Open your iPhone's Camera and point it at the QR code.
+1. Open your phone's Camera and point it at the QR code.
 2. Tap the link that appears.
 3. If you have OnMyLead, you go straight to the ride. If not, the ride's page opens on onmylead.com with a button to get the app.
 4. Tap **Join Ride**. See [Join a Ride](/help/join-a-ride).
 
 :::tip
-Opened a ride link on your computer? The ride's web page shows its QR code. Scan it with your iPhone to open the ride on your phone.
+Opened a ride link on your computer? The ride's web page shows its QR code. Scan it with your phone to open the ride there.
 :::
 
 :::note

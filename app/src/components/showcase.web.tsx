@@ -2,12 +2,12 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { useSocialProviders } from '@/lib/session';
 
 /**
- * onmylead.com for signed-out visitors: what the iPhone app does, how a group ride works, and what
+ * onmylead.com for signed-out visitors: what the app does on iPhone, iPad and Android, how a group ride works, and what
  * Free and Pro include. Plain HTML and CSS (this file only builds for the web), so the page can
  * use real headings, links and media queries. Signed-in riders on the web get the app instead.
  *
@@ -18,7 +18,7 @@ import { useSocialProviders } from '@/lib/session';
  * True once an iPad or Android tablet build is in a store. Until then the tablet section stays
  * hidden, so the site never offers a device riders can't get yet.
  */
-const TABLETS_LIVE = false;
+const TABLETS_LIVE = true;
 
 type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy' | '/support' | '/contact';
 
@@ -50,10 +50,10 @@ export function Showcase() {
   return (
     <div className="oml" ref={scroller}>
       <Head>
-        <title>OnMyLead: the Group Ride App for iPhone</title>
+        <title>OnMyLead: the Group Ride App for iPhone, iPad and Android</title>
         <meta
           name="description"
-          content="Create a ride, bring your crew and keep everyone together on the trail. Live group map, Ride Bubble alerts, ride chat and more. Free on iPhone, with Pro for the riders who lead."
+          content="Create a ride, bring your crew and keep everyone together on the trail. Live group map, Ride Bubble alerts, ride chat and more. Free on iPhone, iPad and Android, with Pro for the riders who lead."
         />
       </Head>
       <style>{CSS}</style>
@@ -87,6 +87,7 @@ export function Showcase() {
             </p>
             <div className="hero-actions">
               <StoreButton onSoon={jump('download')} />
+              <PlayButton />
               <a className="btn btn-glass" href="/ride/new" onClick={go('/ride/new')}>Create a Ride on the Web</a>
             </div>
             <p className="hero-note">
@@ -176,7 +177,7 @@ export function Showcase() {
             <p>
               Sign in at onmylead.com to create a ride from your computer. Click the map to drop the meeting point, click
               along the trail and the route snaps to it, bends and switchbacks included, then add numbered planned stops. Everything is in the OnMyLead app on
-              your iPhone the moment you save.
+              your phone or tablet the moment you save.
             </p>
             <ul className="ticks">
               <li>Search a trailhead, park or area to jump the map there</li>
@@ -186,7 +187,7 @@ export function Showcase() {
               <li>Drawing a route is free. Importing a GPX track is Pro.</li>
             </ul>
             <a className="btn btn-red" href="/ride/new" onClick={go('/ride/new')}>Create a Ride on the Web</a>
-            <p className="plan-small">You’ll sign in first, then go straight to Create a Ride. Ride Mode and live tracking stay in the iPhone app.</p>
+            <p className="plan-small">You’ll sign in first, then go straight to Create a Ride. Ride Mode and live tracking stay in the app on your phone or tablet.</p>
           </div>
           <figure className="browser">
             <div className="browser-bar" aria-hidden="true"><i /><i /><i /><span>onmylead.com</span></div>
@@ -305,15 +306,23 @@ export function Showcase() {
 
       <section id="download" className="download" aria-labelledby="download-title">
         <div className="download-inner">
-          <h2 id="download-title">{APP_STORE_URL ? 'Get OnMyLead for iPhone' : 'Coming Soon to iPhone'}</h2>
+          <h2 id="download-title">{APP_STORE_URL || PLAY_STORE_URL ? 'Get OnMyLead' : 'Coming Soon to iPhone'}</h2>
           <p>
-            {APP_STORE_URL
-              ? `Download it free, make your account, and your first ${TRIAL_DAYS} days of Pro start on their own.`
+            {APP_STORE_URL || PLAY_STORE_URL
+              ? `Free on iPhone, iPad, Android phones and Android tablets. Download it, make your account, and your first ${TRIAL_DAYS} days of Pro start on their own.`
               : 'OnMyLead is in testing on the trail now and heads to the App Store next. Plan your first ride on the web today.'}
           </p>
           <div className="download-actions">
-            {APP_STORE_URL ? (
-              <a className="btn btn-red btn-big" href={APP_STORE_URL}>Download on the App Store</a>
+            {APP_STORE_URL || PLAY_STORE_URL ? (
+              <>
+                {APP_STORE_URL ? (
+                  <a className="btn btn-store btn-big" href={APP_STORE_URL}>
+                    <AppleMark />
+                    <span><small>Download on the</small>App Store</span>
+                  </a>
+                ) : null}
+                <PlayButton big />
+              </>
             ) : (
               <>
                 <span className="soon" role="note">Coming Soon to the App Store</span>
@@ -362,6 +371,25 @@ function StoreButton({ onSoon }: { onSoon: (e: MouseEvent) => void }) {
       <AppleMark />
       <span><small>Free on iPhone</small>Coming Soon</span>
     </a>
+  );
+}
+
+/** Google Play, beside the App Store button, once the Android app is listed. */
+function PlayButton({ big }: { big?: boolean }) {
+  if (!PLAY_STORE_URL) return null;
+  return (
+    <a className={big ? 'btn btn-store btn-play btn-big' : 'btn btn-store btn-play'} href={PLAY_STORE_URL}>
+      <PlayMark />
+      <span><small>Get It on</small>Google Play</span>
+    </a>
+  );
+}
+
+function PlayMark() {
+  return (
+    <svg viewBox="0 0 24 24" width={24} height={24} aria-hidden="true">
+      <path fill="currentColor" d="M4.2 2.4c-.25.26-.4.67-.4 1.2v16.8c0 .53.15.94.4 1.2l.07.06L13.7 12.2v-.22L4.27 2.33l-.07.07zm12.64 12.97-3.14-3.15v-.22l3.14-3.15.07.04 3.72 2.12c1.06.6 1.06 1.59 0 2.2l-3.72 2.11-.07.05zm-.07.04L13.7 12.1l-9.5 9.5c.35.37.93.42 1.58.05l10.99-6.24M16.77 8.8 5.78 2.55c-.65-.37-1.23-.32-1.58.05l9.5 9.5 3.07-3.3z" />
+    </svg>
   );
 }
 
@@ -562,9 +590,9 @@ function Pricing() {
         </div>
 
         <p className="fine">
-          Prices in US dollars. Pro is bought in the iPhone app and paid through your Apple Account. It renews
-          automatically until you cancel, which you can do any time in your Apple Account settings at least 24 hours
-          before the period ends. The free trial is separate and never charges. See the{' '}
+          Prices in US dollars. Pro is bought in the app and paid through your Apple Account on iPhone and iPad, or your
+          Google Play account on Android. It renews automatically until you cancel, which you can do any time in your
+          Apple Account settings or in Google Play at least 24 hours before the period ends. The free trial is separate and never charges. See the{' '}
           <a href="/terms" onClick={(e) => { e.preventDefault(); router.push('/terms'); }}>Terms of Use</a> and{' '}
           <a href="/privacy" onClick={(e) => { e.preventDefault(); router.push('/privacy'); }}>Privacy Policy</a>.
         </p>
@@ -799,6 +827,8 @@ const CSS = `
 .btn-big { min-height: 64px; font-size: 26px; padding: 0 34px; }
 .btn-store { background: var(--red); color: #fff; padding: 0 26px 0 20px; text-align: left; box-shadow: 0 14px 30px -14px rgba(229, 38, 46, 0.8); }
 .btn-store:hover { background: #F2353D; }
+.btn-play { background: rgba(10, 22, 38, 0.72); border: 1.5px solid rgba(241, 244, 248, 0.55); box-shadow: none; }
+.btn-play:hover { background: rgba(18, 34, 58, 0.92); border-color: #fff; }
 .btn-store span { display: flex; flex-direction: column; line-height: 1; font-size: 24px; }
 .btn-store small { font-family: ${body7}; font-size: 12px; letter-spacing: 0.02em; opacity: 0.9; margin-bottom: 3px; }
 

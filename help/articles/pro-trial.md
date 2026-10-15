@@ -4,7 +4,7 @@ summary: Every new account gets 30 days of OnMyLead Pro with no payment, and it 
 category: pro
 order: 20
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/pro-plan.tsx
   - app/src/app/subscription.tsx
@@ -28,9 +28,7 @@ You're never charged when the trial ends. It does not turn into a paid subscript
 
 On the **You** tab, under **Settings**, tap **Subscription**. **Your Plan** shows **Pro Trial** with the days remaining, the date it ends, and a row of 30 marks that fills in as the days go by.
 
-:::release android
 The trial is the same on Android. It belongs to your account, not your phone, so it shows the same days left on every device you sign in to.
-:::
 
 ## Trial Reminders
 

@@ -4,7 +4,7 @@ summary: Bring in a track from Gaia, onX or any GPX file and use it as your ride
 category: routes-maps
 order: 20
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/core/route.ts
@@ -56,9 +56,7 @@ An imported track is shown as it is, so you can't drag or add points to it.
 
 Tapping a line on an imported route's map shows that trail's name and who can ride it. See [Map Layers and Trails](/help/map-layers).
 
-:::release android
 GPX import works with Pro from either store: the App Store on iPhone and iPad, or Google Play on Android.
-:::
 
 ## If Your Pro Plan Ends
 

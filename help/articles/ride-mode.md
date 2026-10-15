@@ -67,9 +67,7 @@ The panel at the bottom holds the route strip, alert cards, the quick replies an
 
 Above the panel are two buttons: **Directions** (on the left) for Apple Maps or Google Maps, and **Add Waypoint** (on the right) to mark your spot. You can also press and hold anywhere on the map to drop a waypoint there. See [Get Directions](/help/directions) and [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
 
-:::release android
 On Android, **Directions** opens Google Maps, and while you share, a **Sharing Your Location** notification stays in the notification shade. Tap it to come back to OnMyLead. If your phone restarted or the app was updated while you were sharing, opening Ride Mode starts that notification and your sharing again.
-:::
 
 ## Read the Rider Dots
 
@@ -106,9 +104,7 @@ While the panel is folded:
 - Need Help and EMERGENCY calls from other riders stay on screen. The leader, tail gunner and organizers also keep Mechanical Issue calls.
 - Other alerts are counted in a badge on **Buttons ▲**.
 
-:::release tablet
 On a tablet the map fills the screen. The **Riders** list sits on the left (tap **Hide** or swipe it left to fold it, **Show Riders** to bring it back) and the buttons panel on the right. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
-:::
 
 ## When You Lose Service
 
@@ -124,6 +120,4 @@ Status taps and quick replies you make with no service wait on your phone and se
 
 Tap **‹ Ride name** at the top to go back to the ride page. Leaving the screen doesn't stop sharing: your location keeps going to the group until your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
 
-:::release 1.1.0
 Opened Ride Mode by tapping a notification? Tap **‹ Ride name** (or Android's Back) to go to **Home**.
-:::

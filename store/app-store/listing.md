@@ -19,7 +19,7 @@ Written 2026-10-13 by the "App Store launch" thread. Everything below is ready t
 | Marketing URL | https://onmylead.com |
 | Copyright | 2026 RUS Offroad LLC |
 | License agreement | Apple's standard EULA (the Terms of Use link in the app points to it) |
-| Devices | iPhone only |
+| Devices | iPhone and iPad |
 | Price | Free, with in-app subscriptions |
 
 ## Promotional Text (170)

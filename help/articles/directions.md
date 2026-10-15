@@ -19,9 +19,7 @@ keywords: [navigate, navigation, turn by turn, apple maps, google maps, meeting 
 
 OnMyLead hands you over to Apple Maps or Google Maps for turn-by-turn directions on the road. Off road, follow the leader and the route on the OnMyLead map.
 
-:::release android
 On Android, directions open in Google Maps, since Android phones and tablets don't have Apple Maps.
-:::
 
 Only the place you want to go is sent to the maps app, nothing about you.
 

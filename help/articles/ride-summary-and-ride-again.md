@@ -64,9 +64,7 @@ On a ride that hasn't ended yet, the same button is called **Copy This Ride**.
 Ride Again creates a new ride, so it counts toward your monthly rides on Free. See [Create a Ride](/help/create-a-ride).
 :::
 
-:::release android
 Advanced Ride Statistics, Premium Ride Cards and full ride history work with Pro from either store: the App Store on iPhone and iPad, or Google Play on Android.
-:::
 
 ## Past Rides
 

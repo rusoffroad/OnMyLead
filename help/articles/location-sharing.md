@@ -73,9 +73,7 @@ While you share, **Share My Location** shows a card for each share with **Sharin
 
 To keep your group updated while your phone is locked or in your pocket, OnMyLead needs location access set to **Always**. You can change it any time in your iPhone's **Settings > OnMyLead > Location**. While OnMyLead is using your location in the background, iPhone shows its location indicator.
 
-:::release android
 On Android, allow location **While Using the App**. OnMyLead doesn't need **Allow All the Time**. While you share, Android shows a **Sharing Your Location** notification, and that is what keeps your group updated with the phone locked. Tap it to see who can see you or to stop sharing. On Android 13 and later, also allow notifications when asked, or that notification stays hidden.
-:::
 
 Your phone sends a new position each time you move about 25 meters (80 feet), and at least every 15 seconds while you're stopped, so the group can tell you're still there.
 

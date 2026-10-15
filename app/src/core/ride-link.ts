@@ -33,3 +33,9 @@ export function isAppleMobile(userAgent: string | null | undefined): boolean {
   if (!userAgent) return false;
   return /iPhone|iPad|iPod/i.test(userAgent);
 }
+
+/** Android phone and tablet browsers, where the web page offers Google Play. */
+export function isAndroid(userAgent: string | null | undefined): boolean {
+  if (!userAgent) return false;
+  return /Android/i.test(userAgent);
+}
