@@ -28,6 +28,17 @@ export default function Groups() {
   const [off, setOff] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [chats, setChats] = useState<Map<string, GroupChatSummary>>(new Map());
+  // A different account (or none) must not see the last rider's groups.
+  const uid = session?.user.id;
+  const [shownFor, setShownFor] = useState(uid);
+  if (shownFor !== uid) {
+    setShownFor(uid);
+    setGroups(null);
+    setFollows([]);
+    setFollowers(0);
+    setLeaderRides([]);
+    setChats(new Map());
+  }
 
   useFocusEffect(
     useCallback(() => {

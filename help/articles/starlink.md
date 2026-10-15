@@ -4,7 +4,7 @@ summary: See your Starlink dish's live status on its Wi-Fi, keep your plan detai
 category: account
 order: 60
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/starlink.tsx
   - app/src/lib/starlink.ts
