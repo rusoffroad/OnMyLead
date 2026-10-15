@@ -1,4 +1,6 @@
-import { router } from 'expo-router';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
+import { router, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import { createElement, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -8,8 +10,13 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen } from '@/components/ui';
 import { COMPANY } from '@/constants/site';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
-import { CONTACT_TOPICS, contactProblem, MAX_CONTACT_MESSAGE, MAX_CONTACT_NAME, topicHint, type ContactTopic } from '@/core/contact';
+import {
+  CONTACT_TOPICS, contactProblem, MAX_CONTACT_MESSAGE, MAX_CONTACT_NAME, screenBeforeContact, screenshotHint, screenshotProblem, topicHint,
+  type ContactTopic,
+} from '@/core/contact';
 import { myRideName, sendContactMessage } from '@/lib/api';
+import { appLogText, screenTrail } from '@/lib/app-log';
+import { deviceSummary, isTablet } from '@/lib/device-info';
 import { useSession } from '@/lib/session';
 
 const TOPIC_ICON: Record<ContactTopic, IconName> = {
@@ -28,7 +35,12 @@ const TOPIC_ICON: Record<ContactTopic, IconName> = {
  */
 export default function ContactScreen() {
   const { session } = useSession();
-  const [topic, setTopic] = useState<ContactTopic | null>(null);
+  // You > Report a Bug opens this with ?topic=problem.
+  const params = useLocalSearchParams<{ topic?: string }>();
+  const [topic, setTopic] = useState<ContactTopic | null>(() => CONTACT_TOPICS.find((t) => t.value === params.topic)?.value ?? null);
+  const [shot, setShot] = useState<{ uri: string; base64: string; type: string } | null>(null);
+  // Where the rider was before they opened this screen, for a bug report.
+  const [cameFrom] = useState(() => screenBeforeContact(screenTrail()));
   const [name, setName] = useState('');
   // Signed in: the sign-in email until something else is typed.
   const [typedEmail, setEmail] = useState<string | null>(null);
@@ -56,12 +68,31 @@ export default function ContactScreen() {
     setBusy(true);
     setError(null);
     try {
-      await sendContactMessage({ topic, name, email: email.trim(), message, elapsedMs: Date.now() - openedAt.current, website: trap });
+      const report = topic === 'problem'
+        ? { device: deviceSummary(), screen: cameFrom, log: appLogText(), screenshot: shot ? { base64: shot.base64, type: shot.type } : null }
+        : undefined;
+      await sendContactMessage({ topic, name, email: email.trim(), message, elapsedMs: Date.now() - openedAt.current, website: trap, report });
       setSentTo(email.trim());
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
+    }
+  };
+
+  const pickShot = async () => {
+    setError(null);
+    try {
+      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.6, base64: true });
+      const a = res.canceled ? null : res.assets[0];
+      if (!a) return;
+      // The website hands back a data URL; the apps hand back base64 beside a file.
+      const base64 = a.base64 ?? (a.uri.startsWith('data:') ? a.uri.split(',')[1] : null);
+      const why = screenshotProblem(base64);
+      if (why || !base64) return setError(why);
+      setShot({ uri: a.uri, base64, type: a.mimeType ?? 'image/jpeg' });
+    } catch {
+      setError('Your pictures couldn’t be opened. Allow OnMyLead to see your photos in Settings, or send the message without one.');
     }
   };
 
@@ -87,6 +118,7 @@ export default function ContactScreen() {
               setSentTo(null);
               setMessage('');
               setTopic(null);
+              setShot(null);
               openedAt.current = Date.now();
             }}
           />
@@ -191,6 +223,29 @@ export default function ContactScreen() {
           </View>
         </View>
 
+        {topic === 'problem' ? (
+          <View style={styles.report}>
+            <ThemedText type="smallBold">Add a Screenshot</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{screenshotHint(Platform.OS, Platform.OS !== 'web' && isTablet())}</ThemedText>
+            {shot ? (
+              <View style={styles.shotRow}>
+                <Image source={{ uri: shot.uri }} style={styles.shot} contentFit="cover" accessibilityLabel="Your screenshot" />
+                <View style={{ flex: 1, gap: Spacing.two }}>
+                  <Button title="Change Screenshot" kind="secondary" onPress={pickShot} />
+                  <Button title="Remove" kind="ghost" onPress={() => setShot(null)} />
+                </View>
+              </View>
+            ) : (
+              <Button title="Add a Screenshot" kind="secondary" onPress={pickShot} />
+            )}
+            <ThemedText type="small" themeColor="textSecondary">
+              {Platform.OS === 'web'
+                ? 'Your browser and a short log of what the page just did go with your message, to help us fix it. Never your location or anything you typed.'
+                : 'Your phone model, app version and a short log of what the app just did go with your message, to help us fix it. Never your location or anything you typed.'}
+            </ThemedText>
+          </View>
+        ) : null}
+
         {/* A box people never see. Bots fill it in, and the server drops what they send. */}
         {Platform.OS === 'web'
           ? createElement('input', {
@@ -224,6 +279,9 @@ const styles = StyleSheet.create({
   pair: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.three },
   half: { flexGrow: 1, flexBasis: 240 },
   meta: { flexDirection: 'row', gap: Spacing.two },
+  report: { gap: Spacing.two, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
+  shotRow: { flexDirection: 'row', gap: Spacing.three, alignItems: 'center' },
+  shot: { width: 96, height: 160, borderRadius: Radius.control, backgroundColor: Colors.backgroundSelected },
   sent: { alignItems: 'center', gap: Spacing.two, paddingVertical: Spacing.five },
   sentMark: { width: 72, height: 72, borderRadius: 36, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.two },
 });

@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 
+import { loggedFetch } from '@/lib/app-log';
+
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 export const supabaseUrl = url ?? 'http://localhost:54321';
@@ -20,6 +22,8 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     detectSessionInUrl: false,
     flowType: 'pkce',
   },
+  // Failed requests go in the activity log a bug report carries (lib/app-log.ts).
+  global: { fetch: loggedFetch },
 });
 
 let channelSeq = 0;

@@ -19,12 +19,16 @@ import { ProGateHost } from '@/components/pro-gate';
 import { Colors, font, NavigationColors } from '@/constants/theme';
 // Starts crash reporting before anything else can fail (off when no DSN is set).
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
+import { logScreen, startAppLog } from '@/lib/app-log';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
 import { startOrientationRule } from '@/lib/orientation';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
+
+// The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
+startAppLog();
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ duration: 400, fade: true });
@@ -48,7 +52,10 @@ function RootLayout() {
   // The route pattern ("ride/[id]/live"), not the path, so reports group by screen.
   const screen = '/' + useSegments().join('/');
 
-  useEffect(() => setCrashScreen(screen), [screen]);
+  useEffect(() => {
+    setCrashScreen(screen);
+    logScreen(screen);
+  }, [screen]);
   // The rider's plan (Free, Pro Trial, Pro, Admin), kept fresh for every screen.
   useEffect(() => startEntitlements(), []);
   // The owner's announcement, maintenance notice and feature flags.

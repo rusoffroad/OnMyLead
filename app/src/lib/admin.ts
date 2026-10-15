@@ -206,10 +206,18 @@ export type ContactRow = {
   id: string; created_at: string; source: 'website' | 'app'; topic: string; name: string | null; email: string; message: string;
   user_id: string | null; user_name: string | null; platform: string | null; app_version: string | null;
   status: ContactStatus; emailed_at: string | null; email_note: string | null; handled_at: string | null;
+  /** Bug reports (20261031000000); absent before that migration. */
+  device?: string | null; screen?: string | null; app_log?: string | null; screenshot_path?: string | null;
 };
-// Shapes match supabase/migrations/20261023000000_contact_messages.sql.
+// Shapes match supabase/migrations/20261023000000_contact_messages.sql and 20261031000000_contact_bug_reports.sql.
 export const contactMessages = (status: ContactStatus | 'all', page: number, pageSize = 50) =>
   adminRpc<Page<ContactRow> & { new: number }>('admin_contact_messages', { p_status: status, p_page: page, p_page_size: pageSize });
+/** A short-lived link to a bug report's screenshot (private bucket, admins only). */
+export async function contactScreenshotUrl(path: string): Promise<string> {
+  const { data, error } = await supabase.storage.from('contact-screenshots').createSignedUrl(path, 600);
+  if (error || !data) throw new Error('The screenshot couldn’t be opened.');
+  return data.signedUrl;
+}
 export const setContactStatus = (id: string, status: ContactStatus) =>
   adminRpc<void>('admin_set_contact_status', { p_id: id, p_status: status });
 

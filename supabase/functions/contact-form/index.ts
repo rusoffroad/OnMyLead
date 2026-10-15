@@ -13,6 +13,11 @@
 //
 // Body: {"source":"website"|"app","topic":"problem",...,"name":"...","email":"...","message":"...",
 //        "platform":"iOS 27.0","app_version":"1.0.0","elapsed_ms":12345,"website":""}
+// Bug reports (1.0.1 and the website) add: "device":"iPhone 16 Pro, iOS 27.0, OnMyLead 1.0.1 (4)",
+//        "screen":"/ride/[id]/live","app_log":"...","screenshot":{"data":"<base64>","type":"image/jpeg"}
+// They are saved with contact_attach_details() (migration 20261031000000); the screenshot goes to the
+// private contact-screenshots bucket and, with the log, is attached to the email. Older builds send
+// none of these and work as before.
 //
 // Deploy:  supabase functions deploy contact-form --no-verify-jwt
 // Secrets: CONTACT_TO        where messages are emailed (kept out of the public repo)
@@ -100,10 +105,42 @@ Deno.serve(async (req) => {
     return reply({ error: 'We couldn’t send that. Try again in a minute.' }, 500);
   }
 
-  const sent = await sendEmail({ id, source, topic, name, email, message, userId, platform, appVersion });
+  const details = await saveDetails(id, input);
+  const sent = await sendEmail({ id, source, topic, name, email, message, userId, platform, appVersion, ...details });
   await service.rpc('contact_mark_emailed', { p_id: id, p_ok: sent.ok, p_note: sent.note ?? null });
   return reply({ ok: true });
 });
+
+const SHOT_TYPES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+const MAX_SHOT_BASE64 = 6_000_000;
+
+type Details = { device: string | null; screen: string | null; appLog: string | null; shot: { data: string; type: string; ext: string } | null };
+
+/** A bug report's extras: saved beside the message, never blocking it. */
+// deno-lint-ignore no-explicit-any
+async function saveDetails(id: string, input: any): Promise<Details> {
+  const device = clip(input?.device, 120) || null;
+  const screen = clip(input?.screen, 200) || null;
+  const appLog = typeof input?.app_log === 'string' ? input.app_log.slice(0, 40000) : null;
+  const raw = input?.screenshot;
+  const type = String(raw?.type ?? '').toLowerCase().replace('image/jpg', 'image/jpeg');
+  const data = typeof raw?.data === 'string' ? raw.data.replace(/^data:[^,]*,/, '').replace(/\s+/g, '') : '';
+  const shot = SHOT_TYPES[type] && data && data.length <= MAX_SHOT_BASE64 && /^[A-Za-z0-9+/]+=*$/.test(data)
+    ? { data, type, ext: SHOT_TYPES[type] }
+    : null;
+  if (!device && !screen && !appLog && !shot) return { device, screen, appLog, shot: null };
+
+  let path: string | null = null;
+  if (shot) {
+    const bytes = Uint8Array.from(atob(shot.data), (c) => c.charCodeAt(0));
+    const name = `${id}.${shot.ext}`;
+    const { error } = await service.storage.from('contact-screenshots').upload(name, bytes, { contentType: shot.type, upsert: true });
+    if (!error) path = name;
+  }
+  // Before migration 20261031000000 this function doesn't exist yet; the message itself is already saved.
+  await service.rpc('contact_attach_details', { p_id: id, p_device: device, p_screen: screen, p_app_log: appLog, p_screenshot_path: path });
+  return { device, screen, appLog, shot };
+}
 
 /** The IP address is never stored: only an HMAC of it, keyed with the service role key. */
 async function keyedHash(ip: string): Promise<string> {
@@ -112,7 +149,24 @@ async function keyedHash(ip: string): Promise<string> {
   return Array.from(new Uint8Array(sig).slice(0, 16), (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-type Msg = { id: string; source: string; topic: string; name: string; email: string; message: string; userId: string | null; platform: string | null; appVersion: string | null };
+type Msg = {
+  id: string; source: string; topic: string; name: string; email: string; message: string; userId: string | null; platform: string | null; appVersion: string | null;
+  device?: string | null; screen?: string | null; appLog?: string | null; shot?: { data: string; type: string; ext: string } | null;
+};
+
+function base64Text(text: string): string {
+  let bin = '';
+  for (const b of new TextEncoder().encode(text)) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+/** The screenshot and activity log go with the email as files, so the report reads on a phone. */
+function attachments(m: Msg): { filename: string; content: string }[] {
+  const out: { filename: string; content: string }[] = [];
+  if (m.shot) out.push({ filename: `screenshot.${m.shot.ext}`, content: m.shot.data });
+  if (m.appLog) out.push({ filename: 'app-log.txt', content: base64Text(m.appLog) });
+  return out;
+}
 
 async function sendEmail(m: Msg): Promise<{ ok: boolean; note?: string }> {
   const key = env('RESEND_API_KEY');
@@ -126,6 +180,7 @@ async function sendEmail(m: Msg): Promise<{ ok: boolean; note?: string }> {
       to: to.split(',').map((s) => s.trim()).filter(Boolean),
       reply_to: m.email,
       ...contactEmail(m),
+      ...(attachments(m).length ? { attachments: attachments(m) } : {}),
     }),
   }).catch(() => null);
   return res?.ok ? { ok: true } : { ok: false, note: `Resend said ${res?.status ?? 'nothing'}` };
@@ -139,6 +194,9 @@ export function contactEmail(m: Msg): { subject: string; text: string; html: str
     ['Name', m.name || 'Not given'],
     ['Email', m.email],
     ['Account', m.userId ? `Signed in (user ${m.userId})` : 'Not signed in'],
+    ...(m.device ? [['Device', m.device] as [string, string]] : []),
+    ...(m.screen ? [['Screen Before', m.screen] as [string, string]] : []),
+    ...(m.shot || m.appLog ? [['Attached', [m.shot ? 'Screenshot' : '', m.appLog ? 'App activity log' : ''].filter(Boolean).join(', ')] as [string, string]] : []),
   ];
   const text = `${facts.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\n${m.message}\n\nReply to this email to answer ${m.name || m.email}. It is also on the Admin Dashboard: https://onmylead.com/admin/contact`;
   const html = `<!doctype html><html><body style="margin:0;padding:24px 16px;font-family:-apple-system,Helvetica,Arial,sans-serif;color:#0A1626">

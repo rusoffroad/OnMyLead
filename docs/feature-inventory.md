@@ -48,7 +48,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   leader messages, ride changes, new riders, reminders, ride invites, group chat, leaders you
   follow, trial reminders), cancellation emails, message preview, quiet hours.
 - Directions app choice (Ask Each Time / Apple Maps / Google Maps; Google only on Android).
-- Subscription, Blocked Riders, Contact Us, Help and Support, Terms, Privacy, Admin Dashboard link
+- Subscription, Blocked Riders, Report a Bug (1.0.1: screenshot + app activity log), Contact Us, Help and Support, Terms, Privacy, Admin Dashboard link
   (admins).
 
 ### Rides: Create, Manage, Organize
