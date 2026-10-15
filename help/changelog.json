@@ -2,6 +2,16 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "sign-in"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "auth-callback-dismiss-sheet",
+    "why": "Bug fix: tapping an emailed sign-in link while the sign-in screen was still open showed Home inside that screen (a floating card on iPad). The app now closes the sign-in screen first, so the link opens Home normally. The article says the link opens Home."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "sign-in",
       "troubleshooting"
     ],

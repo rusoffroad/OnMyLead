@@ -66,7 +66,7 @@ On the website, **Continue with Apple** may not be there. Use Apple in the iPhon
 2. Tap **Or email me a sign-in link instead (no password)**.
 3. Open the email on the same iPhone and tap the link.
 
-The link signs you in. If you don't have an account yet, it creates one.
+The link signs you in and opens Home, even if the sign-in screen was still open. If you don't have an account yet, it creates one.
 
 ## Reset a Forgotten Password
 
