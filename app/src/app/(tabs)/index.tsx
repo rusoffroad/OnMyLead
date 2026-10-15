@@ -47,6 +47,14 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   /** The rider's ride name; null until loaded (or if it couldn't load), '' when they haven't picked one. */
   const [rideName, setRideName] = useState<string | null>(null);
+  // Signing out (or into another account) must not leave the last rider's rides on screen.
+  const uid = session?.user.id;
+  const [shownFor, setShownFor] = useState(uid);
+  if (shownFor !== uid) {
+    setShownFor(uid);
+    setMine([]);
+    setRideName(null);
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -71,8 +79,6 @@ export default function Home() {
       </Screen>
     );
   }
-
-  const uid = session?.user.id;
 
   /** Swipe left on one of your rides: the organizer deletes it, anyone else leaves (or declines the invite). */
   const swipeAway = async (m: (typeof mine)[number]): Promise<boolean> => {

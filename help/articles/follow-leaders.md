@@ -4,7 +4,7 @@ summary: Follow the riders who organize and lead your favorite rides and get a n
 category: groups
 order: 30
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/follow-leaders.tsx
   - app/src/app/r/[code].tsx
