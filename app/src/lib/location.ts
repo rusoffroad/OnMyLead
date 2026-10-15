@@ -15,6 +15,7 @@ import { MOVING_SPEED_MPS } from '@/core/bubble';
 import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
 import { distanceM } from '@/core/geo';
+import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
 import { supabase } from './supabase';
 
 export const LOCATION_TASK = 'ride-location-updates';
@@ -126,11 +127,23 @@ if (Platform.OS !== 'web') {
  * ACCESS_BACKGROUND_LOCATION at all, see app.json).
  */
 export async function requestLocationPermission(): Promise<'always' | 'while_using' | 'denied'> {
-  const fg = await Location.requestForegroundPermissionsAsync();
+  const fg = await foregroundPermission();
   if (fg.status !== 'granted') return 'denied';
   if (Platform.OS !== 'ios') return 'while_using';
   const bg = await Location.requestBackgroundPermissionsAsync();
   return bg.status === 'granted' ? 'always' : 'while_using';
+}
+
+/**
+ * While-using location permission, asking only when it isn't granted yet. On Android, asking always
+ * opens the system's (invisible) permission screen even when access was given, which pauses the app;
+ * Ride Mode resumes sharing every time the app comes back, so asking every time looped forever.
+ */
+function foregroundPermission() {
+  return askOnlyIfNeeded({
+    get: () => Location.getForegroundPermissionsAsync(),
+    request: () => Location.requestForegroundPermissionsAsync(),
+  });
 }
 
 /**
@@ -222,7 +235,7 @@ function stopWebWatch() {
 
 /** One fix, asking for while-using permission first (never background) if it was not granted yet. */
 export async function currentPosition(accuracy = Location.Accuracy.High) {
-  const fg = await Location.requestForegroundPermissionsAsync();
+  const fg = await foregroundPermission();
   if (fg.status !== 'granted') throw new Error('Allow location access in Settings to use your current location.');
   const l = await Location.getCurrentPositionAsync({ accuracy });
   return { lat: l.coords.latitude, lng: l.coords.longitude };
