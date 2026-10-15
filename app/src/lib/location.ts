@@ -161,7 +161,13 @@ export async function startSendingLocation(rideId: string | null, until: number 
   if (Platform.OS === 'web') return startWebWatch();
   const permission = await requestLocationPermission();
   if (permission === 'denied') throw new Error('Location permission is needed to share your location.');
-  if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) return;
+  if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) {
+    // The task stays registered after the app is updated, force-stopped or the phone restarts,
+    // but Android's sharing service is gone then. Restart it once per app launch so a resumed
+    // share really sends; later calls in the same launch leave the running service alone.
+    if (startedThisLaunch || Platform.OS !== 'android') return;
+    await Location.stopLocationUpdatesAsync(LOCATION_TASK).catch(() => {});
+  }
   await askToShowSharingNotice();
   await Location.startLocationUpdatesAsync(LOCATION_TASK, {
     accuracy: Location.Accuracy.High,
@@ -180,13 +186,18 @@ export async function startSendingLocation(rideId: string | null, until: number 
       killServiceOnDestroy: false,
     },
   });
+  startedThisLaunch = true;
 }
+
+/** Whether this app launch has started (or restarted) the location task itself. */
+let startedThisLaunch = false;
 
 export async function stopSendingLocation() {
   if (Platform.OS === 'web') return stopWebWatch();
   if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) {
     await Location.stopLocationUpdatesAsync(LOCATION_TASK);
   }
+  startedThisLaunch = false;
   const { data } = await supabase.auth.getSession();
   if (data.session) await flushTrack(data.session.user.id);
   await writeContext({ rideId: null, lastMovedAt: null, until: null });

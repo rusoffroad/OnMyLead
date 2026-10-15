@@ -133,7 +133,10 @@ if (base) {
     const logged = new Set(help.changelog.slice(0, Math.max(0, help.changelog.length - before.length)).flatMap((e) => e.slugs ?? []));
     for (const a of help.articles) {
       const code = changed.filter((f) => !f.startsWith('help/') && matchesAny(f, a.sources));
-      if (code.length && !touched.has(a.path))
+      // An article already dated today (another change bumped it) can't be bumped again, so a
+      // changelog entry naming it is enough to say it was reviewed for this change.
+      const reviewedToday = logged.has(a.slug) && a.updated >= new Date().toISOString().slice(0, 10);
+      if (code.length && !touched.has(a.path) && !reviewedToday)
         add('error', a.slug, 'drift', `This change edits ${code.slice(0, 3).join(', ')}${code.length > 3 ? ` and ${code.length - 3} more` : ''}, which "${a.title}" describes. Update the article (or, if riders see no difference, just bump its updated: date and log why in help/changelog.json).`);
       if (touched.has(a.path) && !logged.has(a.slug))
         add('error', a.slug, 'changelog', `Article changed without a help/changelog.json entry naming "${a.slug}".`);
