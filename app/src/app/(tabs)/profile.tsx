@@ -8,11 +8,13 @@ import { Button, Choice, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { initialOf } from '@/core/profile';
 import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directions';
+import { BATTERY_PLANS } from '@/core/battery';
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
 import { deleteMyAccount, myRideName } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
+import { useBatteryMode } from '@/lib/battery';
 import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { setMapsPreference, useMapsPreference } from '@/lib/directions';
@@ -33,6 +35,7 @@ export default function You() {
   const [directionsOpen, setDirectionsOpen] = useState(false);
   const notifications = useNotificationSettings();
   const mapsPref = useMapsPreference();
+  const batteryMode = useBatteryMode();
   const { ent } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
   const starlinkOn = useFlag('starlink');
@@ -105,6 +108,13 @@ export default function You() {
 
       <MenuGroup title="On the Trail">
         <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail="With chosen riders or family, for a set time" onPress={needsAccount('/share')} />
+        <MenuRow
+          icon="battery"
+          color={batteryMode === 'best' ? RideColors.green : RideColors.yellow}
+          title="Battery Saver"
+          detail={`${BATTERY_PLANS[batteryMode].label}. ${BATTERY_PLANS[batteryMode].short}`}
+          onPress={() => router.push('/battery')}
+        />
         {starlinkOn ? (
           <MenuRow icon="dish" color={RideColors.yellow} title="Starlink" detail="Your dish, your plan and battery run time" onPress={() => router.push('/starlink')} />
         ) : null}

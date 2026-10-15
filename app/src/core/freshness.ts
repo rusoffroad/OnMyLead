@@ -75,16 +75,18 @@ export function viewerOfflineSince(lastHeardAt: number, now: number): number | n
 
 /**
  * Should this phone send the newest fix? Sends on the first fix, after moving `minMoveM`, or once
- * HEARTBEAT_SEC has passed, so a parked rider still shows as live rather than lost.
+ * `heartbeatSec` has passed, so a parked rider still shows as live rather than lost. Battery Saver
+ * (core/battery.ts) passes larger values, always under LIVE_SEC.
  */
 export function shouldSendFix(
   last: { at: number; lat: number; lng: number } | null,
   next: { at: number; lat: number; lng: number },
   distanceM: (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => number,
   minMoveM = 25,
+  heartbeatSec = HEARTBEAT_SEC,
 ): boolean {
   if (!last) return true;
-  if (next.at - last.at >= HEARTBEAT_SEC * 1000) return true;
+  if (next.at - last.at >= heartbeatSec * 1000) return true;
   return distanceM(last, next) >= minMoveM;
 }
 

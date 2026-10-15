@@ -40,6 +40,8 @@ const PATHS = {
   // A wall calendar, for picking a ride's date.
   calendar: ['M4 6h16v14H4z', 'M4 10.5h16', 'M8.5 3.5v4.5', 'M15.5 3.5v4.5'],
   star: ['M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z'],
+  // A battery on its side with a charge bolt, for Battery Saver.
+  battery: ['M3 7.5h15v9H3z', 'M20.5 10.5v3', 'M11.5 9l-2.5 3.2h3L9.5 15'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
