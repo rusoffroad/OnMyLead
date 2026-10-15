@@ -95,9 +95,7 @@ Tap a waypoint on the map or in the list to open it. You'll see its type, who it
 
 The waypoints map works on onmylead.com too. Click the map to drop a waypoint, and click a waypoint to open it.
 
-:::release tablet
 On a tablet held sideways, the waypoint list sits beside the map; swipe it up or tap **Hide** to fold it.
-:::
 
 ## No Signal
 

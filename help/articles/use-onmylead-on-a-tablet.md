@@ -4,7 +4,6 @@ summary: On an iPad or Android tablet the map fills the screen, with the riders,
 category: getting-started
 order: 40
 release: "1.0"
-draft: true
 updated: 2026-10-15
 sources:
   - app/src/core/layout.ts
@@ -24,7 +23,6 @@ related: [ride-mode, route-builder, find-a-ride, getting-started]
 keywords: [ipad, android tablet, tablet, landscape, split view, sidebar, big screen, rotate, multitasking]
 ---
 
-:::release tablet
 OnMyLead works the same on a tablet as on a phone, with the same account, rides and Pro plan. A tablet just gets layouts made for the bigger screen: the map fills it, and the riders, the ride details and your buttons sit beside the map instead of on top of it.
 
 ## Turn It Either Way
@@ -62,5 +60,4 @@ Search and the list of rides sit on the left, with the map filling the rest of t
 
 :::note
 Many tablets have no GPS. A Wi-Fi-only tablet can usually only tell roughly where it is, so share your location from your phone on the trail and use the tablet to follow the group.
-:::
 :::

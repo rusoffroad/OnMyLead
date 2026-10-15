@@ -4,7 +4,7 @@ summary: What every OnMyLead account gets for free, what OnMyLead Pro adds, and 
 category: pro
 order: 10
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/core/pro.ts
   - app/src/core/entitlements.ts
@@ -83,9 +83,7 @@ On the **You** tab, under **Settings**, tap **Subscription**. **Your Plan** show
 Your plan is saved on your phone, so the app knows it even with no signal.
 
 :::note
-Pro is bought in the iPhone app. Pro you buy there also works when you use OnMyLead on the website.
+Pro is bought in the app on iPhone or iPad through the App Store. Pro you buy there also works when you use OnMyLead on the website.
 :::
 
-:::release android
 On Android, Pro is bought through Google Play. Pro belongs to your OnMyLead account, so it works on iPhone, iPad, Android and the website, whichever store you bought it from.
-:::

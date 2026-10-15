@@ -42,9 +42,7 @@ See [Share Your Location](/help/location-sharing).
 2. Choose **Always**.
 3. Open Ride Mode again. If your share is still running, it picks back up.
 
-:::release android
 On Android, check that the **Sharing Your Location** notification is showing while you share. If it isn't, open Ride Mode again to restart it. If your phone has a battery saver that closes apps, set OnMyLead's battery use to **Unrestricted** in **Settings > Apps > OnMyLead > Battery**.
-:::
 
 Closing Ride Mode or locking your phone doesn't stop sharing. Sharing ends when your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
 
@@ -57,9 +55,7 @@ It waits on your phone as **Waiting for Signal** and sends by itself as soon as 
 1. Check that notifications are allowed for OnMyLead in your iPhone's **Settings > Notifications > OnMyLead**.
 2. In the app, open **You** and check your [notification settings](/help/notification-settings), including quiet hours.
 
-:::release android
 On Android, check **Settings > Apps > OnMyLead > Notifications**, including the **Rider Alerts**, **Ride Chat** and **Ride Updates** categories.
-:::
 
 **Need Help** and **EMERGENCY** alerts from your group always come through, even in quiet hours, as long as iPhone notifications are allowed for OnMyLead.
 
@@ -69,7 +65,7 @@ The route builder follows mapped trails. It draws a straight line when no mapped
 
 ## I Turned On Trails but See No Lines
 
-Zoom in. Forest Service and BLM lines appear from about zoom level 9 (**Zoom In to See Trails**), and smaller park and local tracks need you to zoom in further (**Zoom In for Park and Local Trails**). The website shows fewer trail layers than the iPhone app. See [Map Layers](/help/map-layers).
+Zoom in. Forest Service and BLM lines appear from about zoom level 9 (**Zoom In to See Trails**), and smaller park and local tracks need you to zoom in further (**Zoom In for Park and Local Trails**). The website shows fewer trail layers than the app. See [Map Layers](/help/map-layers).
 
 ## My Offline Map Download Stopped
 

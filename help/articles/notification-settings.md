@@ -4,7 +4,7 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/notifications.tsx
   - app/src/core/notifications.ts
@@ -61,7 +61,6 @@ Everything below starts on.
 - **Pro Trial Reminders**: a week, 3 days and a day before your Pro Trial ends, and when it does.
 - **Email Me Too**: the same Pro Trial reminders by email.
 
-:::release 1.1.0
 ## Tapping a Notification
 
 Tapping a notification takes you straight to what it's about, whether OnMyLead was open, in the background or closed:
@@ -70,7 +69,6 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 - A ride chat message opens the ride's **Chat**.
 - A riding group message opens that group's chat.
 - Ride changes, new riders, invites and reminders open the ride.
-:::
 
 ## Ride Reminder
 
@@ -87,12 +85,10 @@ During quiet hours everything is held except help alerts. Until you change them,
 
 - If you see **Notifications Are Off for OnMyLead**, your iPhone is blocking them. Tap **Open iPhone Settings** and turn on **Allow Notifications**.
 
-:::release android
 On Android, the button is **Open Settings**. Android also sorts OnMyLead's notifications into three categories you can tune in **Settings > Apps > OnMyLead > Notifications**: **Rider Alerts** (Need Help, EMERGENCY and other status taps, shown at the highest priority), **Ride Chat** (ride and group chat) and **Ride Updates** (ride changes, new riders, invites, reminders and account notices).
-:::
 - If you see **Let OnMyLead Send Notifications**, tap **Turn On Notifications** and allow them.
 - While OnMyLead is open, new ride chat messages pop up inside the app instead of as a banner.
 
 ## On the Website
 
-You can change these settings at onmylead.com too. Notifications themselves come to the iPhone app.
+You can change these settings at onmylead.com too. Notifications themselves come to the app on your phone or tablet.

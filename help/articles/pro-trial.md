@@ -28,9 +28,7 @@ You're never charged when the trial ends. It does not turn into a paid subscript
 
 On the **You** tab, under **Settings**, tap **Subscription**. **Your Plan** shows **Pro Trial** with the days remaining, the date it ends, and a row of 30 marks that fills in as the days go by.
 
-:::release android
 The trial is the same on Android. It belongs to your account, not your phone, so it shows the same days left on every device you sign in to.
-:::
 
 ## Trial Reminders
 

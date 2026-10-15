@@ -1,6 +1,6 @@
 ---
 title: Get Started With OnMyLead
-summary: What OnMyLead is, how to get the iPhone app, make your account, and find your way around the Rides, Find, Groups and You tabs.
+summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make your account, and find your way around the Rides, Find, Groups and You tabs.
 category: getting-started
 order: 10
 release: "1.0"
@@ -30,11 +30,7 @@ OnMyLead is a group ride app for off-road riders. The leader creates a ride, the
 
 ## Get the App
 
-OnMyLead is an iPhone app. Download **OnMyLead** from the App Store on your iPhone, then open it.
-
-:::note
-OnMyLead is made for iPhone. There is no iPad version.
-:::
+OnMyLead runs on iPhone, iPad, Android phones and Android tablets. Download **OnMyLead** free from the App Store on an iPhone or iPad, or from Google Play on an Android phone or tablet, then open it. It's the same account, rides and Pro plan on every device, and iPhone and Android riders ride together on the same map.
 
 ## Make Your Account
 
@@ -55,9 +51,7 @@ New accounts start with a free Pro Trial. See [The Pro Trial](/help/pro-trial).
 
 Four tabs run along the bottom of the screen.
 
-:::release tablet
 On a tablet they run down the left edge instead. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
-:::
 
 ### Rides
 
@@ -102,9 +96,7 @@ OnMyLead asks for your location when you first use it, for example to find rides
 
 When you share on a ride, your iPhone may also ask to allow location **Always**. Allow it so your group keeps seeing you while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends. See [Location Sharing](/help/location-sharing).
 
-:::release android
 On Android, allow location **While Using the App**. OnMyLead never asks for **Allow All the Time**: while you share, Android shows a **Sharing Your Location** notification, and that keeps your group updated with the phone locked. On Android 13 and later, allow notifications too, so you can see that notification and hear **Need Help** and **EMERGENCY** alerts.
-:::
 
 ### Photos
 
@@ -121,7 +113,7 @@ Some things also work at onmylead.com in a web browser:
 - On a computer, once you're signed in, **Rides**, **Find**, **Groups** and **You** run down the left side of the page.
 - Read these guides: click **Help** at the top of the home page, on a computer or a phone.
 
-Ride Mode and live tracking stay in the iPhone app.
+Ride Mode and live tracking stay in the app on your phone or tablet.
 
 ## Notices From the Team
 

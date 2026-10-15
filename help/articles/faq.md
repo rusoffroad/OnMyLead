@@ -1,6 +1,6 @@
 ---
 title: Frequently Asked Questions
-summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, iPhone support and the website.
+summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, iPhone, iPad and Android, and the website.
 category: troubleshooting
 order: 20
 release: "1.0"
@@ -42,15 +42,13 @@ Rides you created during the trial count toward that month's one free ride.
 
 ## Can I Buy Pro or Use a Promo Code on the Website?
 
-No. Subscribing, **Restore Purchases** and promo codes work only in the iPhone app. Pro bought in the app also works when you sign in on the website.
+No. Subscribing, **Restore Purchases** and promo codes work only in the app on your phone or tablet. Pro bought in the app also works when you sign in on the website.
 
 ## Does Deleting My Account Cancel My Pro Subscription?
 
 No. Apple bills Pro, so also cancel it in your Apple subscriptions so you aren't billed again. See [Manage Your Subscription](/help/manage-subscription).
 
-:::release android
 If you bought Pro on Android, Google Play bills it: cancel it in Google Play too.
-:::
 
 ## Can I Change My Ride's Time or Meeting Point?
 
@@ -82,11 +80,9 @@ No. Positions only update when a phone has a connection. [Offline maps](/help/of
 
 ## Can I Use OnMyLead on an iPad or Android Phone?
 
-Not yet. OnMyLead is an iPhone app. You can plan a ride on the website at onmylead.com, see [Create a Ride on the Website](/help/create-a-ride-on-the-website).
+Yes. OnMyLead is in the App Store for iPhone and iPad, and on Google Play for Android phones and tablets. On a tablet the map fills the screen, see [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet). You can also plan a ride on the website at onmylead.com, see [Create a Ride on the Website](/help/create-a-ride-on-the-website).
 
-:::release android
-OnMyLead is on Google Play for Android phones and tablets. iPhone and Android riders can join the same ride, see each other on the map and chat together.
-:::
+ iPhone and Android riders can join the same ride, see each other on the map and chat together.
 
 ## How Many Waypoints Can I Add?
 

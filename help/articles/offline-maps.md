@@ -4,7 +4,7 @@ summary: Download a ride's map or any area before you leave, so the map and rout
 category: routes-maps
 order: 60
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/maps/index.tsx
   - app/src/app/maps/area.tsx
@@ -34,7 +34,7 @@ This is a Pro feature. See [Free and Pro](/help/free-vs-pro). Maps already on yo
 Offline maps keep the map, not the tracking. With no signal, your phone can't send or receive positions. Riders show where they were last seen, and positions update again when phones get a connection.
 :::
 
-Offline maps are in the iPhone app only.
+Offline maps are in the app on your phone or tablet only, not on the website.
 
 ## Open Offline Maps
 

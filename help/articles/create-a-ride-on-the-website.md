@@ -1,10 +1,10 @@
 ---
 title: Create a Ride on the Website
-summary: Plan a ride on onmylead.com from your computer, drop the meeting point on a map, and find it in the iPhone app as soon as you save.
+summary: Plan a ride on onmylead.com from your computer, drop the meeting point on a map, and find it in the app on your phone as soon as you save.
 category: rides
 order: 20
 release: web
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/ride/new.tsx
   - app/src/components/meet-point-map.web.tsx
@@ -19,7 +19,7 @@ screenshots:
     shows: app/src/components/route-builder-map.web.tsx
 ---
 
-You can plan a ride on the big screen at onmylead.com. It's the same ride as one made in the app: the ride, its route and its stops show up in the OnMyLead app on your iPhone as soon as you save. Ride Mode and live tracking stay in the iPhone app.
+You can plan a ride on the big screen at onmylead.com. It's the same ride as one made in the app: the ride, its route and its stops show up in the OnMyLead app on your phone or tablet as soon as you save. Ride Mode and live tracking stay in the app.
 
 ![Drawing a route on onmylead.com](/help/img/web-route.webp)
 
@@ -50,7 +50,7 @@ Free accounts create one ride each month, whether on the website or in the app. 
 :::
 
 :::tip
-When someone opens a ride link on a computer, the page shows the ride's QR code. They can scan it with their iPhone camera to open the ride on their phone.
+When someone opens a ride link on a computer, the page shows the ride's QR code. They can scan it with their phone's camera to open the ride on their phone.
 :::
 
 :::note

@@ -4,7 +4,7 @@ summary: Got an OnMyLead promo code? Redeem it in the app through Apple to get O
 category: pro
 order: 50
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/subscription.tsx
   - app/src/app/pro.tsx
@@ -27,7 +27,6 @@ Apple shows what the code gives you before you confirm. Once Apple accepts the c
 
 You can also tap **Redeem Promo Code** at the bottom of the Pro screen.
 
-:::release android
 ## Redeem a Code on Android
 
 On Android, OnMyLead promo codes are Google Play promo codes.
@@ -38,7 +37,6 @@ On Android, OnMyLead promo codes are Google Play promo codes.
 4. Come back to OnMyLead. Once Google Play has the code, your plan changes to **Pro**.
 
 You can also redeem a code in the **Play Store** app: tap your profile picture, then **Payments & Subscriptions** > **Redeem Code**. A Google Play code works only on Google Play, and an Apple offer code works only in the App Store.
-:::
 
 ## Redeemed It in the App Store Instead?
 
@@ -47,5 +45,5 @@ That works too. Open OnMyLead afterwards, signed in to your account, with signal
 ## Good to Know
 
 - A promo code becomes an OnMyLead Pro subscription with your Apple Account. Manage or cancel it like any subscription. See [Manage or Cancel Your Subscription](/help/manage-subscription).
-- Promo codes can only be redeemed in the iPhone app, not on the website.
+- Promo codes can only be redeemed in the app on your phone or tablet, not on the website.
 - If your plan doesn't change to Pro, make sure you have signal and are signed in to the right OnMyLead account, then tap **Restore Purchases**. See [Restore Purchases](/help/restore-purchases).
