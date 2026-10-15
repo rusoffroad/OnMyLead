@@ -9,6 +9,7 @@ import {
 import { font } from '@/constants/theme';
 import { bucketFor, fmtAgo, fmtInt, fmtMoney, fmtPct } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
+import { growthSummary } from '@/lib/admin-growth';
 
 const RECENT_LABEL: Record<admin.Overview['recent'][number]['kind'], string> = {
   signup: 'New Rider',
@@ -22,6 +23,9 @@ export default function Overview() {
   const [range, setRange] = useState<DateRange>(() => rangeFor('30d'));
   const bucket = bucketFor(range);
   const { data, error, loading, reload } = useOverview(range);
+  // Real riders without test and admin accounts; missing until that server update is on.
+  const growth = admin.useAdminData(() => growthSummary(range.from, range.to), [range.from, range.to]);
+  const g = growth.data;
   const charts = admin.useAdminData(async () => {
     const [signups, active, created, joins] = await Promise.all([
       admin.timeseries('signups', range.from, range.to, bucket),
@@ -40,7 +44,11 @@ export default function Overview() {
       {o ? (
         <>
           <StatGrid>
-            <StatTile label="Registered Users" value={fmtInt(o.users_total)} hint={`${fmtInt(o.users_new)} new in this period`} onPress={() => router.push('/admin/users')} />
+            {g ? (
+              <StatTile label="Registered Riders" value={fmtInt(g.riders_total)} hint={`${fmtInt(g.riders_new)} new in this period; ${fmtInt(g.test_accounts)} test accounts left out`} onPress={() => router.push('/admin/growth')} />
+            ) : (
+              <StatTile label="Registered Users" value={fmtInt(o.users_total)} hint={`${fmtInt(o.users_new)} new in this period`} onPress={() => router.push('/admin/users')} />
+            )}
             <StatTile label="Daily Active Users" value={fmtInt(o.dau)} hint="Opened the app in the last 24 hours" />
             <StatTile label="Monthly Active Users" value={fmtInt(o.mau)} hint="Opened the app in the last 30 days" />
             <StatTile label="Riding Now" value={fmtInt(o.rides_live)} tone="admin" hint={`${fmtInt(o.rides_upcoming)} upcoming`} onPress={() => router.push('/admin/rides')} />

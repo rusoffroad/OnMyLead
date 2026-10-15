@@ -34,7 +34,7 @@ export async function adminRpc<T>(fn: string, args?: Record<string, unknown>): P
 }
 
 /** Calls an admin edge function with the session's token. */
-export async function adminFn<T>(fn: 'admin-api' | 'admin-integrations', action: string, body: Record<string, unknown> = {}): Promise<T> {
+export async function adminFn<T>(fn: 'admin-api' | 'admin-integrations' | 'store-downloads', action: string, body: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.functions.invoke(fn, { body: { action, ...body } });
   if (error) {
     // FunctionsHttpError carries the response; our functions answer { error: "..." }.

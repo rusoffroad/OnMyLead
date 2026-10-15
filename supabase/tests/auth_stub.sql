@@ -26,7 +26,8 @@ grant execute on function auth.jwt() to anon, authenticated;
 alter table auth.users add column if not exists created_at timestamptz default now(),
   add column if not exists email_confirmed_at timestamptz,
   add column if not exists last_sign_in_at timestamptz,
-  add column if not exists banned_until timestamptz;
+  add column if not exists banned_until timestamptz,
+  add column if not exists raw_app_meta_data jsonb default '{}';
 -- Sign-in accounts linked to each user (Apple, Google, Facebook, email), as Supabase keeps them.
 create table auth.identities (
   id uuid primary key default gen_random_uuid(),

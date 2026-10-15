@@ -13,7 +13,7 @@ Per-device status for each feature: `docs/feature-parity.md`.
 | Platform code | 20 `*.web.ts(x)` files; no `*.ios` / `*.android` files; ~77 `Platform.OS` branches (mostly web vs native) | `app/src/lib/`, `app/src/components/` |
 | Native extras | CarPlay Expo module (Swift, Apple only, off); config plugins: Starlink local network (iOS + Android), CarPlay, Sentry, scene lifecycle, push entitlement | `app/modules/`, `app/plugins/` |
 | Backend | One Supabase project: 29 migrations, RLS on every table, realtime, pg_net, pg_cron, Vault | `supabase/migrations/` |
-| Edge functions | notify-ride-message, appstore-verify, appstore-notifications, admin-api, admin-integrations, contact-form, delete-account | `supabase/functions/` |
+| Edge functions | notify-ride-message, appstore-verify, appstore-notifications, admin-api, admin-integrations, store-downloads, contact-form, delete-account | `supabase/functions/` |
 | Database tests | 18 SQL test files + a concurrency test on real Postgres | `supabase/tests/` |
 | Admin Dashboard | Web-only routes at onmylead.com/admin, Admin + authenticator code (aal2) | `app/src/app/admin/` |
 | Website | Showcase home, ride/group link previews, web ride creation, /contact /support /terms /privacy, Help Center | `app/src/components/showcase.web.tsx`, `help/` |
@@ -154,7 +154,8 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Contact form, Support, Terms, Privacy; Help Center at /help.
 
 ### Admin Dashboard (onmylead.com/admin)
-- Overview, Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
+- Overview, Signups and Downloads (real riders without test and admin accounts, marking test
+  accounts, App Store and Google Play downloads), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
   Subscriptions, Promo Codes (App Store Connect offer codes), Reports, Analytics, App Health
   (Sentry, push tokens by iPhone / Android, server checks), Exports, Settings (trial days, feature
   plans, flags, banners), Audit log, Contact messages, Help Center editor.

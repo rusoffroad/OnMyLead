@@ -9,6 +9,7 @@ import {
 import { font } from '@/constants/theme';
 import { actionLabel, daysLeft, fmtAgo, fmtDate, fmtDateTime, fmtInt } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
+import * as growthApi from '@/lib/admin-growth';
 
 const STATUS: Record<string, string> = { scheduled: 'Upcoming', live: 'Riding Now', ended: 'Completed', cancelled: 'Cancelled' };
 
@@ -18,6 +19,8 @@ export default function UserDetail() {
   const confirm = useConfirm();
   const toast = useToast();
   const [busy, setBusy] = useState<string | null>(null);
+  // Test accounts are left out of rider counts (Signups and Downloads). Hidden until that server update is on.
+  const growth = admin.useAdminData(() => growthApi.growthSummary(null, null), [id]);
 
   const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
     setBusy(key);
@@ -56,6 +59,16 @@ export default function UserDetail() {
   const reactivate = async () => {
     const r = await confirm({ title: `Reactivate ${name}?`, message: 'They can sign in again straight away.', confirmLabel: 'Reactivate Account' });
     if (r.ok) run('reactivate', () => admin.reactivateUser(p.id), 'Account reactivated.');
+  };
+  const isTest = !!growth.data?.test_list.some((t) => t.user_id === p.id);
+  const toggleTest = async () => {
+    const r = await confirm(isTest
+      ? { title: `Count ${name} as a Rider?`, message: 'The account is counted in Registered Riders again.', confirmLabel: 'Count as Rider' }
+      : { title: `Mark ${name} as a Test Account?`, message: 'The account stays as it is; it is only left out of rider counts on Signups and Downloads.', confirmLabel: 'Mark as Test Account', reasonLabel: 'Note (optional)' });
+    if (r.ok) {
+      run('test', () => growthApi.setTestAccount(p.id, !isTest, r.reason ?? undefined), isTest ? 'Counted as a rider again.' : 'Marked as a test account.')
+        .then(growth.reload);
+    }
   };
   const del = async () => {
     const r = await confirm({
@@ -231,7 +244,13 @@ export default function UserDetail() {
       {!isAdmin ? (
         <Panel title="Account">
           <Text style={styles.note}>Suspending signs the rider out and blocks sign-in. Deleting is permanent.</Text>
+          {growth.data ? (
+            <Text style={styles.note}>{isTest ? 'Test account: left out of rider counts.' : 'Counted as a real rider on Signups and Downloads.'}</Text>
+          ) : null}
           <View style={styles.actions}>
+            {growth.data ? (
+              <AdminButton title={isTest ? 'Count as Rider' : 'Mark as Test Account'} onPress={toggleTest} loading={busy === 'test'} />
+            ) : null}
             {s.suspended
               ? <AdminButton title="Reactivate Account" kind="primary" onPress={reactivate} loading={busy === 'reactivate'} />
               : <AdminButton title="Suspend Account" kind="danger" onPress={suspend} loading={busy === 'suspend'} />}
