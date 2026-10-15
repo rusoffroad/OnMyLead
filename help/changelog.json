@@ -2,6 +2,35 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "sign-in"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "sign-out-local-scope",
+    "why": "Bug fix: signing out on one device (for example an iPad) also signed you out on your other devices, so your phone showed \"Please sign in first.\" and stopped sharing your location. Sign Out now affects only the device you tap it on, and the article says so."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "getting-started",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "sign-out-local-scope",
+    "why": "Reviewed for the sign-out fix: Home now clears an old error message when you sign in to a different account. The steps in these articles don't change."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "contact-support",
       "create-a-ride",
       "create-a-ride-on-the-website",

@@ -152,6 +152,10 @@ export async function updatePassword(password: string) {
   if (error) throw error;
 }
 
+/**
+ * Signs out on this device only. Supabase's default signs the account out everywhere, which would
+ * drop a rider's phone (and its location sharing) when they sign out on an iPad or the website.
+ */
 export async function signOut() {
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: 'local' });
 }

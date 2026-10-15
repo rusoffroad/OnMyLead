@@ -94,6 +94,8 @@ If you see **Your Email Is Confirmed** and a request to sign in again, the link 
 1. Go to the **You** tab.
 2. Scroll down and tap **Sign Out**.
 
+This signs you out on this device only. If you're also signed in on another device or the website, you stay signed in there, and any location you're sharing from that device keeps going.
+
 ## If Something Goes Wrong
 
 - **That email and password don't match**: check for typos, or use the reset link above.
