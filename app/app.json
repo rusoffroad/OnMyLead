@@ -10,7 +10,7 @@
     "backgroundColor": "#0A1626",
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead.app",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "supportsTablet": true,
       "requireFullScreen": false,
       "appleTeamId": "YJ4KUF2QQV",
@@ -212,7 +212,10 @@
         {
           "backgroundColor": "#0A1626",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 280
+          "imageWidth": 280,
+          "android": {
+            "imageWidth": 200
+          }
         }
       ],
       [

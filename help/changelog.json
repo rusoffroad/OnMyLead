@@ -2,6 +2,19 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "android-launch-logo",
+    "why": "Android now shows the whole logo on the launch screen and keeps the app icon inside every launcher shape. These articles list the app config as a source; nothing in them changes for riders."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "ride-mode",
       "ride-bubble"
     ],

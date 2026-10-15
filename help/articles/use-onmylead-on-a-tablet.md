@@ -5,7 +5,7 @@ category: getting-started
 order: 40
 release: "1.0"
 draft: true
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/core/layout.ts
   - app/src/hooks/use-layout.ts
