@@ -4,7 +4,7 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/privacy.tsx
   - app/src/app/r/[code].tsx
@@ -72,8 +72,6 @@ When you block a rider, nothing tells them, and they can't see who has blocked t
 
 OnMyLead doesn't sell your data or use it for advertising. It shares data only with the services that run the app, such as Apple for notifications and purchases on iPhone. For the full list, read the Privacy Policy at onmylead.com/privacy.
 
-:::release android
 On Android, Google delivers notifications (Firebase Cloud Messaging), handles purchases (Google Play) and draws the map (Google Maps).
-:::
 
 You can delete your account and its data at any time. See [Delete Your Account](/help/delete-account).

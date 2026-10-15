@@ -1,28 +1,33 @@
 import { useState } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 
-import { APP_STORE_URL } from '@/constants/site';
+import { APP_STORE_URL, PLAY_STORE_URL } from '@/constants/site';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
-import { appRideUrl, isAppleMobile, rideLink } from '@/core/ride-link';
+import { appRideUrl, isAndroid, isAppleMobile, rideLink } from '@/core/ride-link';
 import { track } from '@/lib/analytics';
 import { QrCode } from './ride-qr';
 import { Button } from './ui';
 
 /**
  * Top of a ride's web page (where a scanned QR code lands when OnMyLead isn't installed): get the
- * app, or open this ride in it. On an iPhone that's two buttons; on a computer it's the ride's QR
+ * app, or open this ride in it. On an iPhone or iPad that's two buttons and the App Store, on Android
+ * it's Google Play (an installed app opens ride links itself), and on a computer it's the ride's QR
  * code, so the rider can pick it up on their phone.
  */
 export function GetTheApp({ inviteCode }: { inviteCode: string }) {
   // The web build is a single-page app with no server render, so the browser is known up front.
-  const [iphone] = useState(() => isAppleMobile(typeof navigator === 'undefined' ? null : navigator.userAgent));
+  const [agent] = useState(() => (typeof navigator === 'undefined' ? null : navigator.userAgent));
+  const iphone = isAppleMobile(agent);
+  const android = isAndroid(agent);
+  // The store for this device; a computer gets the App Store, or Google Play if that's all there is.
+  const store = android ? PLAY_STORE_URL : APP_STORE_URL ?? PLAY_STORE_URL;
 
-  const download = APP_STORE_URL ? (
+  const download = store ? (
     <Button
       title="Get the App, Free"
       onPress={() => {
         track('web_get_app', { from: 'ride_page' });
-        Linking.openURL(APP_STORE_URL!);
+        Linking.openURL(store);
       }}
     />
   ) : (
@@ -39,10 +44,12 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
           <Text style={styles.body}>
             {iphone
               ? 'Already have it? Open the ride right where you left off. New here? Get the app, then scan or open the link again.'
-              : 'Scan this with your iPhone camera to open the ride on your phone. Your group shares one live map and chat, and the leader’s route.'}
+              : android
+                ? 'Get the app, then open the link again and the ride opens right in OnMyLead.'
+                : 'Scan this with your phone’s camera to open the ride on your phone. Your group shares one live map and chat, and the leader’s route.'}
           </Text>
         </View>
-        {iphone ? null : <QrCode value={rideLink(inviteCode)} size={112} />}
+        {iphone || android ? null : <QrCode value={rideLink(inviteCode)} size={112} />}
       </View>
       <View style={styles.actions}>
         {iphone ? (

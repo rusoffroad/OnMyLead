@@ -22,10 +22,11 @@ database, RPCs and edge functions support it for every store and device. **Admin
 Dashboard shows or manages it where relevant. **Docs** = Help Center article(s) cover it.
 **Release** = the store version that carries it.
 
-Today's device-wide state: iPad support and tablet layouts are in the code (`supportsTablet: true`,
-tablets rotate, phones stay upright) but no iPad build has shipped; the version in the App Store
-review is iPhone only. Tablet cells are 🟡 until a tablet build is checked on a device, and no
-Android build has been made yet, so every Android cell is at best 🟡.
+Today's device-wide state (2026-10-15): OnMyLead 1.0 build 3 (from `22c7a3f`) is submitted to the
+App Store for iPhone and iPad, and the same code is submitted to Google Play for Android phones and
+tablets. The Help Center and onmylead.com treat iPad and Android as released. Cells stay 🟡 until a
+feature is checked on that device: iPhone is device-tested, tablets and Android mostly only on the
+web build and the Android emulator.
 
 ## Features
 
@@ -86,14 +87,14 @@ Android build has been made yet, so every Android cell is at best 🟡.
 
 | ID | Item | State | Notes |
 |---|---|---|---|
-| D01 | iPad: `supportsTablet`, rotation, multitasking | 🔨 | In `app/app.json`: iPhone portrait only, iPad all four orientations and Split View / Slide Over; Android rotation via `src/lib/orientation.ts` (phones locked upright). Needs a new Apple build after 1.0 is approved |
+| D01 | iPad: `supportsTablet`, rotation, multitasking | ✅ | In `app/app.json`: iPhone portrait only, iPad all four orientations and Split View / Slide Over; Android rotation via `src/lib/orientation.ts` (phones locked upright). Ships in 1.0 build 3 (submitted 2026-10-15) |
 | D02 | Shared breakpoint hook (Compact / Medium / Expanded) | ✅ | `src/core/layout.ts` (unit tested) + `src/hooks/use-layout.ts`; `TwoPane` and the tab rail use it |
 | D03 | Tablet layouts: Ride Mode sidebar, ride page split, list + detail | 🔨 | Ride Mode, ride page, Find, route builder, waypoints, Rides home and tab rail done; groups / garage / trips list + detail and keyboard shortcuts in issue #101 |
-| D04 | Android build pipeline (Mac Gradle or EAS) and release keystore | 🔨 | Gradle on the Mac, upload-key signing from `~/.gradle/gradle.properties`, Play App Signing: `docs/android-build.md` (PR #99). Keystore is Chris's |
-| D05 | Google Maps API key (Android) | 🔨 | Plugin reads `GOOGLE_MAPS_ANDROID_API_KEY` from `app/.env` (PR #99). Maps SDK for Android has no usage charge; needs a Google Cloud billing account. Key is Chris's |
-| D06 | Firebase project + FCM | 🔨 | Code done (PR #99); Chris creates the Firebase project, `app/google-services.json` and the `FCM_SERVICE_ACCOUNT` secret |
-| D07 | Google Play Developer account | ⬜ | Chris: `docs/google-play-account.md` |
-| D08 | Platform-neutral copy (no "iPhone" in shared screens) | 🔨 | PR #99 fixed the Android app's support answers, notification settings button and directions labels; website, legal and billing copy remain |
+| D04 | Android build pipeline (Mac Gradle or EAS) and release keystore | ✅ | Gradle on the Mac, upload-key signing from `~/.gradle/gradle.properties`, Play App Signing: `docs/android-build.md` (PR #99). AABs built and uploaded to Play Console |
+| D05 | Google Maps API key (Android) | ✅ | Plugin reads `GOOGLE_MAPS_ANDROID_API_KEY` from `app/.env` (PR #99); key restricted to the upload and Play-signing certificates |
+| D06 | Firebase project + FCM | ✅ | Firebase project, `app/google-services.json` on the Mac and the `FCM_SERVICE_ACCOUNT` secret are set; pushes verified on the emulator |
+| D07 | Google Play Developer account | ✅ | RUS Offroad LLC organization account; app listing, data safety and subscriptions set up (`docs/google-play-account.md`) |
+| D08 | Platform-neutral copy (no "iPhone" in shared screens) | 🔨 | PR #99 fixed the Android app's support answers, notification settings button and directions labels; the website showcase and Help Center now say iPhone, iPad and Android (iPad and Android release PR); legal and some billing copy remain |
 | D09 | CI: typecheck, lint, unit tests, database tests on pull requests | ✅ | `.github/workflows/ci.yml`, PR #98 |
 | D10 | CI: Android build check, tablet screenshot check, parity check | ✅ | PR #98: `ci.yml` (Android debug APK, website screenshots at phone and tablet sizes), `parity.yml` (tracker check, nightly gap report on the `parity-report` branch) |
 | D11 | Play listing, phone + tablet screenshots, data safety form | ✅ | `store/google-play/`: listing, data safety, declarations, phone and 7/10-inch tablet screenshots, Play Console checklist. Ready to paste once the Play account exists (D07) |

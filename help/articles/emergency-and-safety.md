@@ -67,8 +67,6 @@ When things are sorted, tap **Resolved, I'm OK** so the group knows.
 - **Allow notifications** so you hear when someone needs help. See [Notification Settings](/help/notification-settings).
 - **Allow location Always**, so your group can see you with your phone locked.
 
-:::release android
 On Android, allow location **While Using the App**: the **Sharing Your Location** notification keeps your group seeing you with the phone locked. **Need Help** and **EMERGENCY** arrive in the **Rider Alerts** notification category, which Android shows at the highest priority.
-:::
 - **Never type or read the screen while driving or riding.** Pull over first. Ride Mode is built for one-tap use when you're stopped.
 - **Carry what you need to get yourself home**, and ride within your skill and your machine's limits.

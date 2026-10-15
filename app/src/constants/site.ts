@@ -4,13 +4,13 @@
  */
 
 /**
- * The App Store listing. Leave it null until the app is live: the site then says "Coming Soon to
- * iPhone". Once set (e.g. 'https://apps.apple.com/us/app/onmylead/id0000000000'), every download
- * button on the site links straight to it.
+ * The store listings. Every download button on the site links straight to them. Set one back to
+ * null to take its buttons off the site (with both null the site says "Coming Soon").
  */
-export const APP_STORE_URL: string | null = null;
+export const APP_STORE_URL: string | null = 'https://apps.apple.com/us/app/onmylead/id6822352321';
+export const PLAY_STORE_URL: string | null = 'https://play.google.com/store/apps/details?id=com.rusoffroad.onmylead.app';
 
-/** Pro prices in US dollars, as set up in App Store Connect (see /pro/plan.md). */
+/** Pro prices in US dollars, the same in App Store Connect and Google Play Console (see /pro/plan.md). */
 export const PRO_PRICES = {
   monthly: '$4.99',
   annual: '$29.99',

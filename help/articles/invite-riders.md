@@ -4,7 +4,7 @@ summary: Send your ride by text, email or any app, copy its link, show a QR code
 category: joining
 order: 30
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/invite-card.tsx
   - app/src/components/group-invite.tsx
@@ -38,9 +38,7 @@ On the invite card, tap:
 
 The message includes the ride name, the link and the invite code. When your friend taps the link, the ride opens in OnMyLead if they have it, or on onmylead.com with a button to get the app.
 
-:::release android
 On Android, ride and riding group links open straight in the OnMyLead app once it's installed.
-:::
 
 ## Share the Code
 

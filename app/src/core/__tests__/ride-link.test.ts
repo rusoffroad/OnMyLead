@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { qrModules, qrPath } from '../qr';
-import { APP_LINK_PATHS, APPLE_APP_ID, appRideUrl, isAppleMobile, rideLink, SITE_URL } from '../ride-link';
+import { APP_LINK_PATHS, APPLE_APP_ID, appRideUrl, isAndroid, isAppleMobile, rideLink, SITE_URL } from '../ride-link';
 
 const root = resolve(__dirname, '../../..');
 
@@ -22,6 +22,9 @@ describe('ride links', () => {
     expect(isAppleMobile('Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X)')).toBe(true);
     expect(isAppleMobile('Mozilla/5.0 (Macintosh; Intel Mac OS X 15_0)')).toBe(false);
     expect(isAppleMobile(undefined)).toBe(false);
+    expect(isAndroid('Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36')).toBe(true);
+    expect(isAndroid('Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X)')).toBe(false);
+    expect(isAndroid(null)).toBe(false);
   });
 });
 

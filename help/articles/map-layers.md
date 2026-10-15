@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, show public trails and roads, and ta
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/trail-map-overlay.tsx
   - app/src/components/trail-tiles.tsx
@@ -93,7 +93,7 @@ When your phone loses signal, a **No Signal** tag with **Downloaded Map** appear
 
 ## On the Website
 
-The website's maps show satellite imagery only. The layers button, the topo map, the Forest Service and BLM lines and the trail lookup are in the iPhone app. When you build a route on the website, OpenStreetMap trail lines appear once you zoom in close.
+The website's maps show satellite imagery only. The layers button, the topo map, the Forest Service and BLM lines and the trail lookup are in the app. When you build a route on the website, OpenStreetMap trail lines appear once you zoom in close.
 
 ## Map Data and Credits
 

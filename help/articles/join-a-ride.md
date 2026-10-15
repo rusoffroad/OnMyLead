@@ -26,7 +26,7 @@ Joining a ride is free, with no limit on how many rides you join. You need a fre
 ## Join With a Link
 
 1. Tap the ride link someone sent you.
-2. If you have OnMyLead on your iPhone, the ride opens in the app. If not, it opens the ride's page on onmylead.com, with a button to get the app.
+2. If you have OnMyLead on your phone or tablet, the ride opens in the app. If not, it opens the ride's page on onmylead.com, with a button to get the app from the App Store or Google Play.
 3. Tap **Join Ride**.
 
 If you aren't signed in, the button says **Sign In to Join**. See [Sign In](/help/sign-in).
@@ -40,7 +40,7 @@ If you aren't signed in, the button says **Sign In to Join**. See [Sign In](/hel
 
 ## Join With a QR Code
 
-Point your iPhone camera at the ride's QR code and tap the link that appears. See [QR Codes](/help/qr-codes).
+Point your phone's camera at the ride's QR code and tap the link that appears. See [QR Codes](/help/qr-codes).
 
 ## Join From Find
 

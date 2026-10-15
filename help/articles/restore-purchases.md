@@ -4,7 +4,7 @@ summary: Bring your OnMyLead Pro subscription back after getting a new iPhone, r
 category: pro
 order: 60
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/subscription.tsx
   - app/src/app/pro.tsx
@@ -37,18 +37,16 @@ The app says **No OnMyLead Pro purchase found for this Apple ID.** when the Appl
 - The subscription is still active. Look in iPhone **Settings** > your name > **Subscriptions**.
 - You have signal.
 
-:::release android
 ## Restore on Android
 
 On Android, **Restore Purchases** looks for OnMyLead Pro on the Google account signed in to the Play Store. If it finds none, the app says **No OnMyLead Pro purchase found for this Google account.** Check that the Play Store is signed in to the Google account you used to subscribe, and that the subscription is still active in the **Play Store** app under **Payments & Subscriptions** > **Subscriptions**.
 
 You don't need to restore on a different kind of device. Pro bought on an iPhone shows on your Android phone or tablet as soon as you sign in to the same OnMyLead account, and the other way round.
-:::
 
 ## One Subscription, One Account
 
 An Apple subscription gives Pro to one OnMyLead account at a time. If you restore it while signed in to a different OnMyLead account, Pro moves to that account. Make sure you're signed in to the account you want Pro on before you tap **Restore Purchases**.
 
 :::note
-Restore Purchases works in the iPhone app only. Once Pro is on your account, it also works when you use OnMyLead on the website.
+Restore Purchases works in the app only, on iPhone, iPad or Android. Once Pro is on your account, it also works when you use OnMyLead on the website.
 :::
