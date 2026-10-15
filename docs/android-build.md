@@ -102,6 +102,16 @@ The cloud can't compile Kotlin, so these were set up but not yet built:
 - **Location:** a foreground service with While Using permission (`app/src/lib/location.ts`); see
   `docs/development-standards.md` section 5.
 - **App Links:** `android.intentFilters` in `app/app.json` plus
-  `app/public/.well-known/assetlinks.json`, served as JSON by `deploy/nginx.conf`. Email links
-  (`/auth-callback`) stay in the browser on Android: Android's link filters can't tell our email
-  links from the website's Google and Facebook sign-in returns, which must stay in the browser.
+  `app/public/.well-known/assetlinks.json`, served as JSON by `deploy/nginx.conf`. There is no
+  App Link for `/auth-callback`: Android's link filters can't tell our email links (`?token_hash=`)
+  from the website's Google and Facebook sign-in returns (`?code=`), which must stay in the browser.
+- **Email links (sign-in, confirm email, reset password):** they open
+  `https://onmylead.com/auth-callback?token_hash=...` in Chrome. On an Android browser that page
+  redirects at once to
+  `intent://auth-callback?token_hash=...&type=...#Intent;scheme=onmylead;package=com.rusoffroad.onmylead.app;S.browser_fallback_url=...;end`,
+  so the app opens and signs itself in (`androidAuthHandoff` in `app/src/core/auth-link.ts`). With
+  no app installed, Chrome loads the fallback, the same page with `&web=1`, which signs the browser
+  in instead. If the browser holds the redirect back, the page shows Open in the App / Continue on
+  the Website. This is a website change, so it ships with a website deploy, not an app build.
+  Check on a device or emulator: `adb shell am start -a android.intent.action.VIEW -d
+  '<emailed link>' com.android.chrome` should land in the app, signed in.
