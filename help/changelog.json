@@ -1,5 +1,16 @@
 [
   {
+    "date": "2026-10-15",
+    "slugs": [
+      "ride-mode",
+      "ride-bubble"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-fit-single-rider",
+    "why": "With one rider, or the whole group at the meeting spot, the Ride Mode map now frames about a mile around them instead of zooming past where map tiles exist (it showed blank or blurry). Nothing the articles describe changes, so only the dates moved."
+  },
+  {
     "date": "2026-10-14",
     "slugs": [
       "ride-mode",
