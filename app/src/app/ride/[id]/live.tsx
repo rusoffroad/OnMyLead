@@ -28,6 +28,7 @@ import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
+import { BATTERY_PLANS, batteryBannerTag } from '@/core/battery';
 import { tally } from '@/core/broadcast';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { rideDirections } from '@/core/directions';
@@ -51,6 +52,7 @@ import {
   activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
   startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
+import { useBatteryMode } from '@/lib/battery';
 import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay';
 import { showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
@@ -297,6 +299,9 @@ export default function RideMode() {
   // Follow this phone's position while Ride Mode is open and there is a route to place it on.
   // Only if location access was already given; this never asks and never uploads.
   const hasRoute = !!route.route;
+  // Battery Saver also slows this screen's own work: the blue dot and the backup check for riders.
+  const batteryMode = useBatteryMode();
+  const { followEveryM, refreshSec } = BATTERY_PLANS[batteryMode];
   useEffect(() => {
     if (!hasRoute) return;
     let sub: Location.LocationSubscription | null = null;
@@ -304,7 +309,7 @@ export default function RideMode() {
     Location.getForegroundPermissionsAsync()
       .then(async (p) => {
         if (p.status !== 'granted' || gone) return;
-        sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.High, distanceInterval: 20 }, (l) =>
+        sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.High, distanceInterval: followEveryM }, (l) =>
           setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude }),
         );
         if (gone) sub.remove();
@@ -314,7 +319,7 @@ export default function RideMode() {
       gone = true;
       sub?.remove();
     };
-  }, [hasRoute]);
+  }, [hasRoute, followEveryM]);
 
   // Live updates, with polling as a fallback for flaky connections.
   useEffect(() => {
@@ -357,14 +362,14 @@ export default function RideMode() {
     const poll = setInterval(() => {
       refresh();
       if (!shareChecked.current) loadShare();
-    }, 15_000);
+    }, refreshSec * 1000);
     const tick = setInterval(() => setNow(Date.now()), 5_000);
     return () => {
       supabase.removeChannel(channel);
       clearInterval(poll);
       clearInterval(tick);
     };
-  }, [id, refresh, loadRoute, loadShare, heard]);
+  }, [id, refresh, loadRoute, loadShare, heard, refreshSec]);
 
   // A share is live only until its timer runs out or the ride ends (the server enforces the same).
   const rideOver = ride?.status === 'ended' || ride?.status === 'cancelled';
@@ -791,7 +796,7 @@ export default function RideMode() {
           {activeShare && shareOpen ? (
             <View style={styles.shareBanner}>
               <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
-                Sharing, {formatRemaining(shareLeft)}
+                Sharing, {formatRemaining(shareLeft)}{batteryBannerTag(batteryMode)}
               </Text>
               <Pressable onPress={endShare} hitSlop={8} accessibilityRole="button" style={styles.shareAction}>
                 <Text style={styles.shareActionText}>Stop</Text>

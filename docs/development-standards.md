@@ -95,7 +95,9 @@ Live rider tracking is the most important feature. On every device:
 - Sharing is per ride, temporary, revocable and enforced by database policies. Never widen who can
   read a location without a privacy test proving the rule.
 - Send efficiently: the current rule (one point each 25 m or 15 s, `app/src/lib/location.ts`) is
-  shared by all platforms; change it in one place.
+  shared by all platforms; change it in one place. Battery Saver (`app/src/core/battery.ts`)
+  widens it per device; every choice must keep its heartbeat well under freshness `LIVE_SEC` so a
+  parked rider never looks lost, and on iOS `distanceInterval` stays 0 for the same reason.
 - Queue points while offline and flush when back online; show freshness ("last seen") so riders
   know a dot is stale. Never imply live tracking works without a connection.
 - Stop automatically when the timer ends, the rider leaves, or the organizer ends the ride, on
