@@ -54,6 +54,7 @@ export default function Home() {
     setShownFor(uid);
     setMine([]);
     setRideName(null);
+    setError(null);
   }
 
   useFocusEffect(

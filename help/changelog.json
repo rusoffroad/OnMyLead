@@ -2,6 +2,16 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "sign-in"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "sign-out-local-scope",
+    "why": "Bug fix: signing out on one device (for example an iPad) also signed you out on your other devices, so your phone showed \"Please sign in first.\" and stopped sharing your location. Sign Out now affects only the device you tap it on, and the article says so."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "contact-support",
       "create-a-ride",
       "delete-account",
