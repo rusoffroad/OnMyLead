@@ -29,6 +29,23 @@ set role authenticated;
 select register_push_token('sid-phone-0000000000000000', 'ios');
 reset role;
 
+-- C0. The app posts with insert ... returning, so the sender reads back their own message (the
+-- same check that once broke making a group). Rolled back so the counts below stay the same.
+select as_user('00000000-0000-0000-0000-0000000000c2');
+set role authenticated;
+do $$
+declare v_id uuid;
+begin
+  begin
+    insert into group_messages (group_id, user_id, body)
+    values ('41414141-4141-4141-4141-414141414141', auth.uid(), 'read me back') returning id into v_id;
+    if v_id is null then raise exception 'FAIL: member could not read back their own group message'; end if;
+    raise exception using errcode = 'P0099', message = 'rollback';
+  exception when sqlstate 'P0099' then null;
+  end;
+end $$;
+reset role;
+
 -- C1. Members post, and can link a ride they are on. The message is trimmed and gets server time.
 truncate net.calls;
 select as_user('00000000-0000-0000-0000-0000000000c1');

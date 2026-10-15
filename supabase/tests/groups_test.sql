@@ -26,6 +26,15 @@ select as_user('00000000-0000-0000-0000-0000000000e1');
 set role authenticated;
 insert into riding_groups (id, owner_id, name, invite_code)
 values ('31313131-3131-3131-3131-313131313131', auth.uid(), 'Saturday Crew', 'CREWLINK01');
+-- The app creates a group with insert ... returning (supabase-js .insert().select().single()),
+-- so the owner must be able to read back the row in the same statement.
+do $$
+declare v_id uuid;
+begin
+  insert into riding_groups (owner_id, name) values (auth.uid(), 'Returning Crew') returning id into v_id;
+  if v_id is null then raise exception 'FAIL: owner could not read back the group they just made'; end if;
+  delete from riding_groups where id = v_id;
+end $$;
 do $$ begin
   if add_group_members('31313131-3131-3131-3131-313131313131', array['00000000-0000-0000-0000-0000000000f1'::uuid]) <> 1 then
     raise exception 'FAIL: owner could not add a riding friend';
