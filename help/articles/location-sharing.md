@@ -4,7 +4,7 @@ summary: Choose who sees your location and for how long. Sharing always ends on 
 category: safety-privacy
 order: 10
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/share.tsx

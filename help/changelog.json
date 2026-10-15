@@ -2,6 +2,22 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "location-sharing",
+      "ride-mode",
+      "troubleshooting",
+      "getting-started",
+      "faq",
+      "garage",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "android-share-resume",
+    "why": "Bug fix: on Android, a location share resumed after an app update, force-stop or phone restart now really sends again when Ride Mode opens, as these articles already describe. app.json only bumps the Android build number. No wording changes for riders."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "faq",
       "garage",
       "getting-started",
