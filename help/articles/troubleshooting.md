@@ -44,6 +44,10 @@ See [Share Your Location](/help/location-sharing).
 
 On Android, check that the **Sharing Your Location** notification is showing while you share. If it isn't, open Ride Mode again to restart it. If your phone has a battery saver that closes apps, set OnMyLead's battery use to **Unrestricted** in **Settings > Apps > OnMyLead > Battery**.
 
+:::release 1.0.1
+If Ride Mode shows **Location Is Off**, location is turned off for OnMyLead, so your group can't see you move. Turn it back on in your phone's **Settings**, then open Ride Mode again.
+:::
+
 Closing Ride Mode or locking your phone doesn't stop sharing. Sharing ends when your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
 
 ## I Tapped a Status Button With No Signal
