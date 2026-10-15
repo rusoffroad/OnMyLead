@@ -4,7 +4,7 @@ summary: Every new account gets 30 days of OnMyLead Pro with no payment, and it 
 category: pro
 order: 20
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/pro-plan.tsx
   - app/src/app/subscription.tsx

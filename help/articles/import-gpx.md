@@ -4,7 +4,7 @@ summary: Bring in a track from Gaia, onX or any GPX file and use it as your ride
 category: routes-maps
 order: 20
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/core/route.ts
