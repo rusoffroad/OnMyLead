@@ -184,7 +184,8 @@ export default function You() {
       ) : null}
 
       <MenuGroup title="Help">
-        <MenuRow icon="mail" color={Colors.sky} title="Contact Us" detail="A problem, an idea or a billing question" onPress={() => router.push('/contact')} />
+        <MenuRow icon="wrench" color={Colors.accent} title="Report a Bug" detail="Something not working? Send it with a screenshot" onPress={() => router.push('/contact?topic=problem')} />
+        <MenuRow icon="mail" color={Colors.sky} title="Contact Us" detail="An idea, a billing question or anything else" onPress={() => router.push('/contact')} />
         <MenuRow icon="checklist" color={Colors.textSecondary} title="Help and Support" detail="Answers to common questions" onPress={() => router.push('/support')} />
       </MenuGroup>
 

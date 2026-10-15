@@ -873,12 +873,38 @@ export async function requestAccountDeletion(reason?: string) {
   track('account_deletion_requested');
 }
 
+let bugReportsReady: Promise<boolean> | null = null;
+/**
+ * Whether the server takes bug report extras (screenshot, device, log): the contact-form function
+ * from migration 20261031000000 on answers a GET, older ones refuse it. Asked once per launch.
+ */
+export function canSendBugReports(): Promise<boolean> {
+  bugReportsReady ??= supabase.functions
+    .invoke('contact-form', { method: 'GET' })
+    .then(({ data, error }) => !error && (data as { bug_reports?: boolean } | null)?.bug_reports === true)
+    .catch(() => false)
+    .then((ok) => {
+      if (!ok) bugReportsReady = null; // ask again next time the form opens
+      return ok;
+    });
+  return bugReportsReady;
+}
+
+export type BugReport = {
+  device: string;
+  screen: string | null;
+  log: string;
+  screenshot: { base64: string; type: string } | null;
+};
+
 /**
  * Sends a contact form message (onmylead.com/contact, You > Contact Us). It is saved for the owner
  * even when email is off. Works signed out on the website; a signed-in rider's account is linked.
  */
 export async function sendContactMessage(m: {
   topic: ContactTopic; name: string; email: string; message: string; elapsedMs: number; website?: string;
+  /** Bug reports ("Something Isn't Working"): device details, the screen before, the activity log, a screenshot. */
+  report?: BugReport;
 }): Promise<void> {
   const app = Platform.OS !== 'web';
   const { error } = await supabase.functions.invoke('contact-form', {
@@ -888,6 +914,14 @@ export async function sendContactMessage(m: {
       platform: app ? `${Platform.OS === 'ios' ? 'iOS' : 'Android'} ${String(Platform.Version)}` : null,
       app_version: app ? (Constants.expoConfig?.version ?? null) : null,
       elapsed_ms: m.elapsedMs, website: m.website ?? '',
+      ...(m.report
+        ? {
+          device: m.report.device || null,
+          screen: m.report.screen,
+          app_log: m.report.log || null,
+          screenshot: m.report.screenshot ? { data: m.report.screenshot.base64, type: m.report.screenshot.type } : null,
+        }
+        : {}),
     },
   });
   if (error) {

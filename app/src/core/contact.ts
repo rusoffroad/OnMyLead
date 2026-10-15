@@ -44,3 +44,46 @@ export function contactProblem(f: { topic: ContactTopic | null; email: string; m
   if (f.message.length > MAX_CONTACT_MESSAGE) return `Keep it under ${MAX_CONTACT_MESSAGE.toLocaleString('en-US')} characters.`;
   return null;
 }
+
+/** The largest screenshot the form sends (the photo as base64 text). The server checks it too. */
+export const MAX_SCREENSHOT_BASE64 = 6_000_000;
+
+/** How to take a screenshot on this device, shown above Add a Screenshot. */
+export function screenshotHint(os: string, tablet = false): string {
+  if (os === 'ios') {
+    return tablet
+      ? 'Go to the screen with the problem and press the top button and a volume button together. Then come back and add it here.'
+      : 'Go to the screen with the problem and press the side button and volume up together. Then come back and add it here.';
+  }
+  if (os === 'android') return 'Go to the screen with the problem and press the power and volume down buttons together. Then come back and add it here.';
+  return 'Add a picture of the problem, such as a screenshot.';
+}
+
+/** Why a picked screenshot can't be sent, or null when it can. */
+export function screenshotProblem(base64: string | null | undefined): string | null {
+  if (!base64) return 'That picture couldn’t be read. Try another one.';
+  if (base64.length > MAX_SCREENSHOT_BASE64) return 'That picture is too big. Try a screenshot instead of a photo.';
+  return null;
+}
+
+/** "iPhone 16 Pro, iOS 27.0, OnMyLead 1.0.1 (4)": what the team needs to reproduce a problem. */
+export function deviceLine(d: { model?: string | null; os?: string | null; osVersion?: string | null; version?: string | null; build?: string | null }): string {
+  const os = [d.os, d.osVersion].filter(Boolean).join(' ');
+  const app = d.version ? `OnMyLead ${d.version}${d.build ? ` (${d.build})` : ''}` : '';
+  return [d.model, os, app].filter(Boolean).join(', ').slice(0, 120);
+}
+
+/**
+ * The screens a rider visited, newest last, so a bug report can say where they were before they
+ * opened Contact Us. Route patterns only ("/ride/[id]/live"), never ride codes or ids.
+ */
+export function rememberScreen(trail: readonly string[], screen: string, keep = 5): string[] {
+  if (trail[trail.length - 1] === screen) return [...trail];
+  return [...trail, screen].slice(-keep);
+}
+
+/** The last screen before Contact Us, or null when the rider opened it first thing. */
+export function screenBeforeContact(trail: readonly string[]): string | null {
+  for (let i = trail.length - 1; i >= 0; i--) if (!trail[i].startsWith('/contact')) return trail[i];
+  return null;
+}

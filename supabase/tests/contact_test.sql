@@ -92,6 +92,45 @@ set role authenticated;
 select expect_refused($q$select admin_contact_messages()$q$, 'admin without two-factor listed contact messages');
 reset role;
 
+-- C6b. Bug report details (20261031000000): only the function adds them, and the admin list shows them.
+select as_user('00000000-0000-0000-0000-00000000000b');
+set role authenticated;
+select expect_refused($q$select contact_attach_details(gen_random_uuid(), 'iPhone', '/ride/[id]', 'log', 'x.jpg')$q$, 'rider called contact_attach_details');
+reset role;
+set role anon;
+select expect_refused($q$select contact_attach_details(gen_random_uuid(), 'iPhone')$q$, 'visitor called contact_attach_details');
+reset role;
+do $$
+declare v uuid;
+begin
+  v := contact_submit('app', 'problem', null, 'bug@example.com', 'The map went blank', null, 'iOS 27.0', '1.0.1', 'ip-bug');
+  perform contact_attach_details(v, ' iPhone 16 Pro, iOS 27.0, OnMyLead 1.0.1 (4) ', '/ride/[id]/live',
+                                 '20:14:03.120  error    Map failed', v::text || '.jpg');
+  if not exists (select 1 from contact_messages where id = v and device = 'iPhone 16 Pro, iOS 27.0, OnMyLead 1.0.1 (4)'
+                 and screen = '/ride/[id]/live' and app_log like '%Map failed' and screenshot_path = v::text || '.jpg') then
+    raise exception 'FAIL: bug report details not saved';
+  end if;
+  -- An empty report leaves the columns empty, not blank strings.
+  perform contact_attach_details(v, '  ', null, '', null);
+  if exists (select 1 from contact_messages where id = v and (device is not null or app_log is not null)) then
+    raise exception 'FAIL: blank bug report details saved as text';
+  end if;
+  perform contact_attach_details(v, 'iPhone', '/ride/[id]/live', repeat('x', 50000), v::text || '.jpg');
+  if (select char_length(app_log) from contact_messages where id = v) <> 40000 then raise exception 'FAIL: long log not trimmed'; end if;
+end $$;
+select as_admin_session('00000000-0000-0000-0000-00000000ad01', 'aal2');
+set role authenticated;
+do $$
+declare r jsonb;
+begin
+  r := (select x from jsonb_array_elements(admin_contact_messages('all', 0, 200) -> 'rows') x where x ->> 'email' = 'bug@example.com');
+  if r ->> 'device' <> 'iPhone' or r ->> 'screen' <> '/ride/[id]/live' or r ->> 'screenshot_path' is null or r ->> 'app_log' is null then
+    raise exception 'FAIL: admin list missing bug report details: %', r;
+  end if;
+end $$;
+reset role;
+delete from contact_messages where email = 'bug@example.com';
+
 -- C7. Deleting the sender's account keeps the message but drops the link to the account.
 delete from contact_messages where user_id is distinct from '00000000-0000-0000-0000-00000000000b';
 delete from auth.users where id = '00000000-0000-0000-0000-00000000000b';

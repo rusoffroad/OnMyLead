@@ -12,6 +12,9 @@ sources:
   - app/src/constants/site.ts
   - app/src/app/(tabs)/profile.tsx
   - supabase/functions/contact-form/index.ts
+  - app/src/core/app-log.ts
+  - app/src/lib/app-log.ts
+  - app/src/lib/device-info.ts
 related: [troubleshooting, faq, report-and-block, emergency-and-safety, manage-subscription, delete-account]
 keywords: [contact, support, help, email, bug, problem, feedback, feature request, billing question, refund, customer service]
 ---
@@ -39,6 +42,24 @@ OnMyLead is not an emergency service. In an emergency, call 911 or your local em
 6. Tap **Send Message**.
 
 You'll see **Message Sent**. We reply to the email you gave, usually within a day.
+
+:::release 1.0.1
+## Report a Bug
+
+If something in the app isn't working, tell us with a screenshot so we can fix it fast.
+
+1. Take a screenshot of the problem:
+   - **iPhone**: press the side button and volume up together.
+   - **iPad**: press the top button and a volume button together.
+   - **Android phone or tablet**: press the power and volume down buttons together.
+2. Go to the **You** tab. Under **Help**, tap **Report a Bug**. The form opens with **Something Isn't Working** already picked.
+3. Tap **Add a Screenshot** and pick your screenshot. Tap **Change Screenshot** or **Remove** if you picked the wrong one.
+4. Write what you tapped, what happened and what you expected, then tap **Send Message**.
+
+Your report also includes your phone model, your OnMyLead version, the screen you were on before you opened the form, and a short log of what the app just did (the screens you opened, errors and requests that failed). The log never includes your location, your messages or anything you typed, and it's kept only in memory: it's gone when you close the app.
+
+On onmylead.com/contact, pick **Something Isn't Working** to add a screenshot the same way. Your browser goes with the report instead of a phone model.
+:::
 
 ## Send a Message From the Website
 

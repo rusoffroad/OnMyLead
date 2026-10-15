@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
@@ -80,6 +81,7 @@ export default function ContactMessages() {
             </View>
           </View>
           <Text style={styles.message} selectable>{m.message}</Text>
+          {m.device || m.screen || m.app_log || m.screenshot_path ? <BugDetails m={m} /> : null}
           <View style={styles.row}>
             {m.user_id ? <AdminButton small title={`Rider: ${m.user_name || 'Open'}`} onPress={() => router.push(`/admin/users/${m.user_id}`)} /> : null}
             <Text style={styles.sub}>
@@ -93,7 +95,39 @@ export default function ContactMessages() {
   );
 }
 
+/** A bug report's extras: the device, the screen before, the screenshot and the app's activity log. */
+function BugDetails({ m }: { m: admin.ContactRow }) {
+  const [shot, setShot] = useState<string | null>(null);
+  const [shotError, setShotError] = useState<string | null>(null);
+  const [showLog, setShowLog] = useState(false);
+  const openShot = async () => {
+    try {
+      setShot(await admin.contactScreenshotUrl(m.screenshot_path!));
+    } catch (e) {
+      setShotError((e as Error).message);
+    }
+  };
+  return (
+    <View style={{ gap: 8 }}>
+      {m.device ? <Text style={styles.sub}>Device: <Text style={styles.fact}>{m.device}</Text></Text> : null}
+      {m.screen ? <Text style={styles.sub}>Screen before: <Text style={styles.fact}>{m.screen}</Text></Text> : null}
+      <View style={styles.row}>
+        {m.screenshot_path && !shot ? <AdminButton small title="Show Screenshot" onPress={openShot} /> : null}
+        {m.app_log ? <AdminButton small title={showLog ? 'Hide App Log' : 'Show App Log'} onPress={() => setShowLog((v) => !v)} /> : null}
+        {shotError ? <Text style={styles.sub}>{shotError}</Text> : null}
+      </View>
+      {shot ? (
+        <Image source={{ uri: shot }} style={styles.shot} contentFit="contain" accessibilityLabel="The rider’s screenshot" />
+      ) : null}
+      {showLog && m.app_log ? <Text style={styles.log} selectable>{m.app_log}</Text> : null}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  fact: { fontFamily: font(600), color: AdminColors.text },
+  shot: { width: '100%', maxWidth: 360, height: 640, borderRadius: 10, backgroundColor: AdminColors.page },
+  log: { fontFamily: 'monospace', fontSize: 12, lineHeight: 17, color: AdminColors.text, backgroundColor: AdminColors.page, borderRadius: 10, padding: 12 },
   head: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' },
   row: { flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
   topic: { fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24, color: AdminColors.text },

@@ -78,7 +78,7 @@ web build and the Android emulator.
 | F44 | 30-day Pro trial | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ pro-trial | iOS 1.0 | Server-granted, store-neutral |
 | F45 | Promo codes | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ promo-codes | iOS 1.0 | Apple offer codes plus Play promo codes (made in Play Console; Admin shows both); not device-tested (#102) |
 | F46 | Pro shared across devices | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ manage-subscription | | store_subscriptions view + my_entitlements store fields + duplicate-purchase guard, DB-tested; not deployed (#102) |
-| F47 | Contact form, support | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ contact-support | iOS 1.0 | |
+| F47 | Contact form, support, Report a Bug | ✅ | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ contact-support | iOS 1.0 | 1.0.1: You > Report a Bug adds a screenshot, device line, screen before and the in-memory app activity log (core/app-log.ts, unit tested; no locations or typed text). Migration 20261031000000 (DB-tested) + contact-form redeploy needed before reports carry details; admin Contact page shows device, screenshot and log. Web-checked at phone and tablet sizes, no device check yet |
 | F48 | CarPlay / Android Auto | ⬜ | ➖ | ⬜ | ➖ | ➖ | ➖ | ➖ | | Exception E01 |
 | F49 | Keyboard Done bar / dismiss | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ➖ | iOS 1.0 | Done bar is iOS-only; Android closes with Back, a drag on lists or a tap outside. Sheets now lift above the keyboard on Android too (PR #99); device check |
 | F50 | Help Center, website, showcase | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | web | Device-specific steps added as each device ships. Privacy Policy names Google services for Android (FCM, Google Play, Google Maps) since PR #107 |

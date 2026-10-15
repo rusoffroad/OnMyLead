@@ -2,6 +2,52 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "contact-support"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "report-a-bug",
+    "why": "1.0.1 adds Report a Bug on the You tab: a screenshot, the phone model and app version, and a short app activity log go with the message so problems testers find can be fixed fast."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride",
+      "delete-account",
+      "directions",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "faq",
+      "find-a-ride",
+      "fuel-range",
+      "garage",
+      "getting-started",
+      "import-gpx",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "organizer-controls",
+      "privacy",
+      "promo-codes",
+      "ride-name-and-profile",
+      "route-builder",
+      "sign-in",
+      "starlink",
+      "trip-planner"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "report-a-bug",
+    "why": "Reviewed for Report a Bug, which logs failed requests from the shared server connection. Nothing riders do in these articles changes."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "battery-saver",
       "location-sharing",
       "ride-mode",
