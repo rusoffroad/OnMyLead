@@ -113,7 +113,9 @@ async function loadSnapshot(id: string): Promise<RideSnapshot> {
 }
 
 export default function RideMode() {
-  useKeepAwake();
+  // Leaving Ride Mode while Android is tearing the screen down rejects the keep-awake release
+  // ("current activity is no longer available"); the screen is going away anyway, so catch it.
+  useKeepAwake(undefined, { suppressDeactivateWarnings: true });
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
   const layout = useLayout();
