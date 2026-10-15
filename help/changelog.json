@@ -2,6 +2,39 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "contact-support",
+      "create-a-ride",
+      "delete-account",
+      "directions",
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "find-a-ride",
+      "follow-leaders",
+      "free-vs-pro",
+      "garage",
+      "getting-started",
+      "group-chat",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "riding-groups",
+      "sign-in",
+      "starlink",
+      "trip-planner",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "clear-tabs-on-sign-out",
+    "why": "Bug fix: after signing out, or signing in to another account, Home, Groups and the You tab kept showing the previous account's rides, groups and ride name until they reloaded. They now clear as soon as the account changes. The steps in these articles don't change, so only their dates were bumped."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "sign-in"
     ],
     "kind": "update",

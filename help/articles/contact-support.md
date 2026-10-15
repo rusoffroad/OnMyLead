@@ -4,7 +4,7 @@ summary: Send the OnMyLead team a message from the app or the website about a pr
 category: troubleshooting
 order: 30
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/contact.tsx
   - app/src/core/contact.ts

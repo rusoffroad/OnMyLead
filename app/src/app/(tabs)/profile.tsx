@@ -41,6 +41,14 @@ export default function You() {
   const [social, setSocial] = useState<SocialProfile | null>(null);
   const [socialBusy, setSocialBusy] = useState(false);
   const [socialError, setSocialError] = useState<string | null>(null);
+  // A different account (or none) must not see the last rider's name.
+  const uid = session?.user.id;
+  const [shownFor, setShownFor] = useState(uid);
+  if (shownFor !== uid) {
+    setShownFor(uid);
+    setRideName(null);
+    setSocial(null);
+  }
 
   useFocusEffect(
     useCallback(() => {
