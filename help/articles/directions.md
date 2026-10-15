@@ -4,7 +4,7 @@ summary: Hand off to Apple Maps or Google Maps for turn-by-turn directions to th
 category: routes-maps
 order: 70
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/directions.tsx
   - app/src/core/directions.ts

@@ -4,7 +4,7 @@ summary: Mark camp, fuel, water or a hazard on a ride's map, and let the leader 
 category: routes-maps
 order: 30
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/ride/[id]/waypoints.tsx
   - app/src/app/r/[code].tsx
