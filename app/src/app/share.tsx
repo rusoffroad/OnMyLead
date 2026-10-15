@@ -1,4 +1,4 @@
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, Share, View } from 'react-native';
 
@@ -12,6 +12,8 @@ import { EXTEND_PROMPT_LEAD_MIN, formatRemaining, PERSONAL_SHARE_OPTIONS_MIN } f
 import {
   extendLocationShare, myActiveShares, ridingFriends, startLocationShare, stopLocationShare, type ActiveShare,
 } from '@/lib/api';
+import { BATTERY_PLANS } from '@/core/battery';
+import { useBatteryMode } from '@/lib/battery';
 import { startSendingLocation, stopSendingLocation } from '@/lib/location';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
@@ -29,6 +31,7 @@ export default function ShareMyLocation() {
   const [now, setNow] = useState(() => Date.now());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const batteryMode = useBatteryMode();
 
   const load = useCallback(async () => {
     const [f, s] = await Promise.all([ridingFriends(), myActiveShares()]);
@@ -140,6 +143,11 @@ export default function ShareMyLocation() {
         } else start(m);
       }} />
       <ErrorText error={error} />
+      <Pressable accessibilityRole="link" onPress={() => router.push('/battery')} hitSlop={6}>
+        <ThemedText type="small" themeColor="textSecondary">
+          Battery Saver: {BATTERY_PLANS[batteryMode].label}. <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>Change</ThemedText>
+        </ThemedText>
+      </Pressable>
     </Screen>
   );
 }

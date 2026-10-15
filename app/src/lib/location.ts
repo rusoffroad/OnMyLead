@@ -16,6 +16,8 @@ import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
 import { distanceM } from '@/core/geo';
 import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
+import type { BatteryPlan } from '@/core/battery';
+import { batteryPlan } from './battery';
 import { supabase } from './supabase';
 
 export const LOCATION_TASK = 'ride-location-updates';
@@ -36,8 +38,9 @@ async function writeContext(ctx: TrackContext) {
   await AsyncStorage.setItem(CONTEXT_KEY, JSON.stringify(ctx));
 }
 
-// The phone reports fixes about once a second; only every 25 m or 15 s goes anywhere, so a parked
-// rider still shows as live to the group (see core/freshness). Kept in memory: a cold start just sends.
+// The phone reports fixes about once a second; only every 25 m or 15 s goes anywhere (wider on
+// Battery Saver, see core/battery), so a parked rider still shows as live to the group (see
+// core/freshness). Kept in memory: a cold start just sends.
 let lastSent: { at: number; lat: number; lng: number } | null = null;
 let movedAt: number | null = null;
 
@@ -48,7 +51,8 @@ export async function handleLocations(locations: Location.LocationObject[]) {
     if ((l.coords.speed ?? 0) >= MOVING_SPEED_MPS) movedAt = Math.max(movedAt ?? 0, l.timestamp);
   }
   const next = { at: latest.timestamp, lat: latest.coords.latitude, lng: latest.coords.longitude };
-  if (!shouldSendFix(lastSent, next, distanceM)) return;
+  const plan = await batteryPlan();
+  if (!shouldSendFix(lastSent, next, distanceM, plan.sendEveryM, plan.heartbeatSec)) return;
   lastSent = next;
 
   const ctx = await readContext();
@@ -182,11 +186,19 @@ export async function startSendingLocation(rideId: string | null, until: number 
     await Location.stopLocationUpdatesAsync(LOCATION_TASK).catch(() => {});
   }
   await askToShowSharingNotice();
-  await Location.startLocationUpdatesAsync(LOCATION_TASK, {
-    accuracy: Location.Accuracy.High,
-    // Every fix is reported (about once a second) and handleLocations sends one each 25 m or 15 s,
-    // so a stopped rider keeps checking in. iOS has no time-based option, only distance.
-    timeInterval: 5_000,
+  await startTask(await batteryPlan());
+  startedThisLaunch = true;
+}
+
+const accuracyFor = (plan: BatteryPlan) => (plan.accuracy === 'high' ? Location.Accuracy.High : Location.Accuracy.Balanced);
+
+function startTask(plan: BatteryPlan) {
+  return Location.startLocationUpdatesAsync(LOCATION_TASK, {
+    accuracy: accuracyFor(plan),
+    // Every fix is reported and handleLocations sends one each 25 m or 15 s (Battery Saver widens
+    // both), so a stopped rider keeps checking in. iOS has no time-based option, only distance, and
+    // a distance filter would silence a parked rider, so it stays 0 there on every mode.
+    timeInterval: plan.fixEveryMs,
     distanceInterval: 0,
     pausesUpdatesAutomatically: false,
     activityType: Location.ActivityType.AutomotiveNavigation,
@@ -199,6 +211,21 @@ export async function startSendingLocation(rideId: string | null, until: number 
       killServiceOnDestroy: false,
     },
   });
+}
+
+/**
+ * Battery Saver changed: a share that is running picks up the new rate now rather than at the next
+ * share. Called from the settings screen, so Android's foreground service restarts from the foreground.
+ */
+export async function applyBatteryPlan() {
+  lastSent = null;
+  if (Platform.OS === 'web') {
+    if (webSub) await startWebWatch();
+    return;
+  }
+  if (!(await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK))) return;
+  await Location.stopLocationUpdatesAsync(LOCATION_TASK).catch(() => {});
+  await startTask(await batteryPlan());
   startedThisLaunch = true;
 }
 
@@ -222,9 +249,10 @@ let webSub: Location.LocationSubscription | null = null;
 async function startWebWatch() {
   const permission = await requestLocationPermission();
   if (permission === 'denied') throw new Error('Location permission is needed to share your location.');
+  const plan = await batteryPlan();
   webSub?.remove();
   webSub = await Location.watchPositionAsync(
-    { accuracy: Location.Accuracy.High, timeInterval: 5_000, distanceInterval: 0 },
+    { accuracy: accuracyFor(plan), timeInterval: plan.fixEveryMs, distanceInterval: 0 },
     (l) => void handleLocations([l]),
   );
 }

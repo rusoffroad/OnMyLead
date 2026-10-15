@@ -2,6 +2,16 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "battery-saver"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "battery-saver",
+    "why": "New in 1.0.1: Battery Saver lets riders choose how often their phone sends its location while sharing (Best Accuracy, Balanced, Max Battery Saver), starting on Best Accuracy and warning before switching away from it."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "location-sharing",
       "troubleshooting"
     ],
