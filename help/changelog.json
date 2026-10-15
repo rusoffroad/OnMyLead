@@ -2,6 +2,16 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "sign-in"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "android-auth-link-handoff",
+    "why": "On Android, sign-in, confirm-email and password-reset links used to sign in the browser instead of the app. The website now hands them to the Android app. The article says so in an Android-only block, hidden until the Android app is released."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "ride-mode",
       "directions",
       "emergency-and-safety",
