@@ -13,6 +13,27 @@
   {
     "date": "2026-10-15",
     "slugs": [
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "getting-started",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "android-permission-loop",
+    "why": "Bug fix: on Android, Ride Mode with location sharing on asked for location permission over and over and could bounce the app to the home screen. The app now asks only when access isn't given yet. Riders still see the same first-time question, so no article wording changes; these articles list Ride Mode or the location code as a source."
+  },
+  {
+    "date": "2026-10-15",
+    "slugs": [
       "ride-mode",
       "directions",
       "emergency-and-safety",
