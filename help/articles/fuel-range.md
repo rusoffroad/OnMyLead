@@ -4,7 +4,7 @@ summary: See if your machine's tank covers the ride's miles, using the thirds ru
 category: routes-maps
 order: 40
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/components/fuel-check.tsx
   - app/src/core/fuel.ts

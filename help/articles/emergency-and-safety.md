@@ -4,7 +4,7 @@ summary: What the EMERGENCY button does and doesn't do, how Need Help works, and
 category: safety-privacy
 order: 50
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-10-15
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/core/breakdown.ts

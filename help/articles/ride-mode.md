@@ -17,6 +17,7 @@ sources:
   - app/src/hooks/use-panel-fold.ts
   - app/src/core/panel-swipe.ts
   - app/src/core/freshness.ts
+  - app/src/core/live-roster.ts
   - app/src/core/route.ts
   - app/src/core/sharing.ts
   - app/src/lib/location.ts
@@ -55,6 +56,8 @@ Your screen stays on while Ride Mode is open, so the map is ready when you glanc
 ### The Map
 
 The map shows the ride's route, waypoints, planned stops and any regroup point. Every rider who is sharing shows as a dot with their ride name beside it. The leader is the one bigger blue dot, so you can find them at a glance. Tap a rider's dot to see their name, whether they're live, and their latest status.
+
+You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
 
 To switch map layers or download the ride's map for riding with no signal, use the layers button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
 

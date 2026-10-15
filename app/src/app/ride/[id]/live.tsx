@@ -32,6 +32,7 @@ import { tally } from '@/core/broadcast';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
+import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { mapPanelWidth, sidebarWidth } from '@/core/layout';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
@@ -228,9 +229,13 @@ export default function RideMode() {
   );
   useAcknowledge(id, me, ackItems);
 
+  // Who is on the ride right now, for the live position handler (a rider not in it joined since).
+  const memberIds = useRef<Set<string>>(new Set());
+  const rosterGate = useRef(new RosterGate());
   const apply = useCallback((d: RideSnapshot) => {
     setRide(d.ride);
     routeMiles.current = d.ride?.route_miles;
+    memberIds.current = new Set(d.members.filter((m) => m.status === 'joined').map((m) => m.user_id));
     setMembers(d.members);
     setRegroup(d.regroup);
     setStatuses(d.statuses);
@@ -303,10 +308,15 @@ export default function RideMode() {
   useEffect(() => {
     const channel = newChannel(`ride-${id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'positions_latest' }, (payload) => {
-        const p = payload.new as Position;
         heard();
-        if (p?.user_id) setPositions((prev) => ({ ...prev, [p.user_id]: p }));
+        setPositions((prev) => applyPositionChange(prev, payload as unknown as PositionChange<Position>));
+        // A position from someone not on the list yet: they joined after it loaded, so reload it
+        // now and their dot appears, instead of waiting for the poll.
+        const userId = (payload.new as Partial<Position> | null)?.user_id;
+        if (userId && rosterGate.current.shouldReload(userId, memberIds.current.has(userId), Date.now())) refresh();
       })
+      // A rider joined, left or was removed: reload the list (and everyone's positions) at once.
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ride_members', filter: `ride_id=eq.${id}` }, () => refresh())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
         const s = payload.new as TappedStatus & { user_id: string };
         setStatuses((prev) => ({ ...prev, [s.user_id]: s }));
