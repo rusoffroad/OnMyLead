@@ -1,5 +1,17 @@
 [
   {
+    "date": "2026-10-18",
+    "slugs": [
+      "waypoints-and-planned-stops",
+      "place-search",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "web-place-search",
+    "why": "Chris couldn't find a way to search for a location while building a ride on the website. The waypoints map now has the same Search as the route builder (parks, trailheads, towns, addresses), and the website guide points to the search boxes."
+  },
+  {
     "date": "2026-10-15",
     "slugs": [
       "contact-support"
