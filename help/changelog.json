@@ -10,7 +10,8 @@
       "ride-bubble",
       "ride-mode",
       "troubleshooting",
-      "waypoints-and-planned-stops"
+      "waypoints-and-planned-stops",
+      "getting-started"
     ],
     "kind": "update",
     "by": "pr",
