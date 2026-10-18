@@ -4,7 +4,7 @@ summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make y
 category: getting-started
 order: 10
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/(tabs)/_layout.tsx
   - app/src/components/tab-bar.tsx
@@ -61,7 +61,7 @@ Your home screen.
 - **Join a Ride**: type an invite code and tap **Open**. See [Join a Ride](/help/join-a-ride).
 - **Find a Ride**: opens the Find tab.
 - When one of your rides is live, a card at the top says **Your ride is live. Tap to open Ride Mode**.
-- **Ride Invites**, **Your Rides** and **Past Rides** list the rides you're on. Swipe a ride left to delete it (if you organize it) or leave it. The app always asks first.
+- **Ride Invites**, **Your Rides** and **Past Rides** list the rides you're on. Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com, click **Delete** or **Leave** at the end of the row instead. The app always asks first.
 - **Public Rides** shows a few upcoming public rides near the bottom.
 
 ### Find
