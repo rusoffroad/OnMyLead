@@ -4,7 +4,7 @@ summary: Download a ride's map or any area before you leave, so the map and rout
 category: routes-maps
 order: 60
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/maps/index.tsx
   - app/src/app/maps/area.tsx
@@ -104,6 +104,10 @@ Download before you leave, while you have good signal. Then open the ride once s
 - **Satellite**: USGS aerial photos.
 - **Topo**: the USGS topo map.
 - **Trails**: Forest Service and BLM lines, plus OpenStreetMap tracks (map data © OpenStreetMap contributors).
+
+:::release 1.0.1
+The Forest Service's closed roads are saved too, so closed lines still show red with no signal. Seasonal closures need a signal to load.
+:::
 
 Trail and topo areas you've already looked at with signal are also kept on your phone for a while, but only a download makes sure the whole area is there.
 

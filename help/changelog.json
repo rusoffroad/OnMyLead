@@ -2,6 +2,24 @@
   {
     "date": "2026-10-18",
     "slugs": [
+      "map-layers",
+      "route-builder",
+      "offline-maps",
+      "create-a-ride-on-the-website",
+      "find-a-ride",
+      "ride-bubble",
+      "ride-mode",
+      "troubleshooting",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "trail-visibility",
+    "why": "Chris asked for trails that are easier to see, trail and road names on the maps, and closed trails made visible on every device and the website. Trail lines are bolder, OpenStreetMap trails get name tags, Forest Service lines show names and numbers, and closed roads and trails (Forest Service, BLM, OpenStreetMap, plus today's seasonal closures) are red with a Closed note on the trail card. The app part ships in 1.0.1; the website gets the layers panel, topo and these layers at its next deploy. The route builder and offline maps guides mention the website layers and saved closed roads; the other guides only had their date bumped (their maps share the trail layer, nothing else changed for them)."
+  },
+  {
+    "date": "2026-10-18",
+    "slugs": [
       "waypoints-and-planned-stops",
       "place-search",
       "create-a-ride-on-the-website",

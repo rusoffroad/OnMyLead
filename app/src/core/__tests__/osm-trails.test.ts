@@ -145,6 +145,8 @@ describe('decoding a square', () => {
     const gated = trails.find((x) => x.name === 'Gated Ranch Road')!.parts[0];
     expect(labels[1].at.lng).toBeCloseTo((gated[0].lng + gated[1].lng) / 2, 6);
     expect(trailLabels(trails, 1)).toHaveLength(1);
+    // A gap as big as the square keeps only the first tag.
+    expect(trailLabels(trails, 10, { lat: 1, lng: 1 })).toHaveLength(1);
   });
 
   it('survives a broken square', () => {

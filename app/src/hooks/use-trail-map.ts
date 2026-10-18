@@ -178,7 +178,13 @@ export function useTrailMap(): TrailMap {
   // Leaflet draws lines cheaply and a browser window shows more of the map, so the website draws more.
   const drawn = useMemo(() => drawableOsm(osm, Platform.OS === 'web' ? 1500 : undefined), [osm]);
   // Each phone tag is a small native view, so the phone keeps fewer than the website.
-  const labels = useMemo(() => trailLabels(osm, Platform.OS === 'web' ? 60 : 24), [osm]);
+  // A tag is about 120 by 24 points; degrees per point at this zoom keep tags from overlapping.
+  const labels = useMemo(() => {
+    // The phone's zoom estimate runs a little low, which only spaces its tags a little wider.
+    const perPt = 360 / (256 * 2 ** Math.max(1, zoom));
+    const lat = osm[0]?.parts[0]?.[0]?.lat ?? 0;
+    return trailLabels(osm, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
+  }, [osm, zoom]);
 
   return {
     base,

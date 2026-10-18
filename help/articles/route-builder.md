@@ -112,12 +112,12 @@ You can build the route at onmylead.com too, using the same steps:
 
 - Click the map instead of tapping, and drag a point to move it.
 - Press Ctrl+Z (Cmd+Z on a Mac) to undo the last point.
-- Trail lines appear once you zoom in close, and **Follow Trails** snaps to them the same way.
+- Trail lines and their names appear once you zoom in close, and **Follow Trails** snaps to them the same way.
 - On a wide screen, the tools panel sits beside the map.
 
 On a tablet held sideways, the tools panel sits beside the map; swipe it up or tap **Hide** to fold it. Held upright, it floats in the bottom corner of the map.
 
-The website's map doesn't have the layers button, the topo map or the trail lookup. Those are in the app. A route you save on the website is in the app as soon as you save it.
+The website's map has the same layers button: switch to **Topo**, turn trail lines on or off, and see trail names and closed trails in red. A click adds a point while you draw, so to see a trail's card, click its line on a route you aren't editing (an imported GPX route). See [Map Layers and Trails](/help/map-layers). A route you save on the website is in the app as soon as you save it.
 
 ## No Signal
 

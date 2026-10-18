@@ -167,8 +167,9 @@ export type TrailLabel = { key: string; name: string; at: LatLng; closed: boolea
 /**
  * One name tag per named track in view, at the middle of its longest stretch. Squares come middle
  * first, so a trail crossing several squares is tagged in the one nearest the middle of the map.
+ * `gap` (degrees) is about one tag's size on screen, so tags don't pile on each other.
  */
-export function trailLabels(trails: OsmTrail[], limit: number): TrailLabel[] {
+export function trailLabels(trails: OsmTrail[], limit: number, gap?: { lat: number; lng: number }): TrailLabel[] {
   const closedLines = trails.filter((t) => t.closed);
   const seen = new Set<string>();
   const out: TrailLabel[] = [];
@@ -183,8 +184,10 @@ export function trailLabels(trails: OsmTrail[], limit: number): TrailLabel[] {
       if (m > longestM) [longest, longestM] = [part, m];
     }
     if (longest.length < 2) continue;
-    seen.add(t.name);
     const at = midpoint(longest);
+    // Tags that would sit on top of one already placed are skipped (the nearer-the-middle one stays).
+    if (gap && out.some((o) => Math.abs(o.at.lat - at.lat) < gap.lat && Math.abs(o.at.lng - at.lng) < gap.lng)) continue;
+    seen.add(t.name);
     // Names live on separate copies of the lines; a closed drawn line under the tag marks it closed.
     const closed = closedLines.some((c) => c.parts.some((part) => distanceToLineM(at, { type: 'LineString', coordinates: part.map((q) => [q.lng, q.lat]) }) < 12));
     out.push({ key: `${t.key}-label`, name: t.name, at, closed });
