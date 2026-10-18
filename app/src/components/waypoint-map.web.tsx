@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { Place } from '@/core/places';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { drawRoute, esc, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
@@ -24,7 +25,7 @@ const stopSign = (n: number | null) =>
  * new one; click a blaze to open it.
  */
 export function WaypointMap({
-  waypoints, route, center, trail, onPressWaypoint, onLongPressMap, padding,
+  waypoints, route, center, trail, onPressWaypoint, onLongPressMap, padding, found, onCenter,
 }: {
   waypoints: Waypoint[];
   route?: LatLng[] | null;
@@ -34,16 +35,21 @@ export function WaypointMap({
   onLongPressMap?: (p: LatLng) => void;
   /** Keeps the framed route clear of the panels drawn over the map: [top, right, bottom, left]. */
   padding?: [number, number, number, number];
+  /** A place picked in the map search: the map moves there and marks it. Nothing is added. */
+  found?: Place | null;
+  /** Where the map is looking after each move, so a search ranks nearby places first. */
+  onCenter?: (c: LatLng) => void;
 }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
   const tracks = useRef<ReturnType<typeof trailLayers> | null>(null);
   const fitted = useRef(false);
-  const cb = useRef({ onPressWaypoint, onLongPressMap, onRegion: trail.onRegion });
+  const marker = useRef<L.Marker | null>(null);
+  const cb = useRef({ onPressWaypoint, onLongPressMap, onCenter, onRegion: trail.onRegion });
   useEffect(() => {
-    cb.current = { onPressWaypoint, onLongPressMap, onRegion: trail.onRegion };
-  }, [onPressWaypoint, onLongPressMap, trail.onRegion]);
+    cb.current = { onPressWaypoint, onLongPressMap, onCenter, onRegion: trail.onRegion };
+  }, [onPressWaypoint, onLongPressMap, onCenter, trail.onRegion]);
   const pad = padding ?? [80, 40, 380, 40];
 
   useEffect(() => {
@@ -52,13 +58,18 @@ export function WaypointMap({
     tracks.current = trailLayers(m);
     layer.current = L.layerGroup().addTo(m);
     m.on('click', (e: L.LeafletMouseEvent) => cb.current.onLongPressMap?.({ lat: e.latlng.lat, lng: e.latlng.lng }));
-    m.on('moveend', () => reportRegion(m, cb.current.onRegion));
+    m.on('moveend', () => {
+      const c = m.getCenter();
+      cb.current.onCenter?.({ lat: c.lat, lng: c.lng });
+      reportRegion(m, cb.current.onRegion);
+    });
     m.setView(center ? ll(center) : [39.5, -98.35], center ? 13 : 4);
     map.current = m;
     reportRegion(m, cb.current.onRegion);
     return () => {
       m.remove();
       map.current = null;
+      marker.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -67,6 +78,24 @@ export function WaypointMap({
   useEffect(() => {
     tracks.current?.update({ base, trails, osmLines, closedLines, labels });
   }, [base, trails, osmLines, closedLines, labels]);
+
+  // Go to a searched place: the whole area when it has one, else close in on the spot.
+  useEffect(() => {
+    const m = map.current;
+    marker.current?.remove();
+    marker.current = null;
+    if (!m || !found) return;
+    const b = found.bounds;
+    const area: L.LatLngBoundsExpression = b ? [[b.south, b.west], [b.north, b.east]] : [ll(found), ll(found)];
+    m.flyToBounds(area, { paddingTopLeft: [pad[3], pad[0]], paddingBottomRight: [pad[1], pad[2]], maxZoom: b ? 16 : 15, duration: 0.9 });
+    marker.current = L.marker(ll(found), {
+      interactive: false,
+      keyboard: false,
+      zIndexOffset: 200,
+      icon: L.divIcon({ className: '', iconSize: [0, 0], html: `<div class="oml-found"><span>${esc(found.name)}</span></div>` }),
+    }).addTo(m);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [found]);
 
   useEffect(() => {
     el.current?.classList.toggle('oml-draw', !!onLongPressMap);
