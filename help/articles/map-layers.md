@@ -1,10 +1,10 @@
 ---
 title: Map Layers and Trails
-summary: Switch between satellite and topo, show public trails and roads, and tap a trail to see which vehicles can ride it.
+summary: Switch between satellite and topo, show public trails and roads with their names and closures, and tap a trail to see which vehicles can ride it.
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/components/trail-map-overlay.tsx
   - app/src/components/trail-tiles.tsx
@@ -14,13 +14,16 @@ sources:
   - app/src/core/osm-trails.ts
   - app/src/lib/trail-tiles.ts
   - app/src/lib/trail-tiles.web.ts
+  - app/src/lib/trail-lookup.ts
   - app/src/lib/map-signal.ts
   - app/src/lib/web-map.ts
   - app/src/components/rides-map.tsx
   - app/src/components/route-builder-map.tsx
   - app/src/components/route-builder-map.web.tsx
+  - app/src/components/rides-map.web.tsx
+  - app/src/components/waypoint-map.web.tsx
 related: [offline-maps, route-builder, ride-mode, find-a-ride, waypoints-and-planned-stops]
-keywords: [layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
+keywords: [closed, closure, closed trail, seasonal closure, trail names, road names, labels, layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
 screenshots:
   - file: map.webp
     shows: app/src/components/trail-tiles.tsx
@@ -54,8 +57,26 @@ At the top of the panel, pick:
 
 Turn **Public Trails and Roads** on to draw trail and road lines on the map. It's on unless you turn it off.
 
+:::until 1.0.1
 - **Trail**: a dashed sand-colored line.
 - **Road**: a solid pale line.
+:::
+
+:::release 1.0.1
+- **Trail**: a bold dashed amber line.
+- **Road**: a solid white line.
+- **Closed**: red dashes on a dark outline. See [Closed Trails and Roads](#closed-trails-and-roads).
+
+Every line has a dark outline, so it stands out on forest, desert and snow.
+
+### Trail and Road Names
+
+Zoomed in, the map shows names:
+
+- OpenStreetMap trails get a name tag in the middle of the trail, like **Hell's Revenge 4x4 Trail**. A tag with a red border and **Closed** marks a trail mapped as closed or private.
+- Forest Service roads and trails show their name and number along the line, like **Jenny Lind 414.1**.
+- Road names come from the satellite map's own labels, and the topo map has its own road names.
+:::
 
 The lines come from:
 
@@ -75,10 +96,30 @@ The map on the **Find a Ride** tab shows trail lines too when you zoom in, follo
 
 Under **Open To**, the card lists the vehicles the agency allows. If access changes by season, it says **Open To, by Season** with the open dates. If the agency data doesn't say, the card tells you.
 
+:::release 1.0.1
+If the trail or road is closed today, a red box at the top of the card says so, for example **Closed for the Season** with the date it opens again, **Closed to Motor Vehicles** or **No Public Access**. On a seasonal trail, a vehicle whose season is over shows **Closed Now** next to its dates.
+:::
+
 For an OpenStreetMap track, the card says it was mapped by riders on OpenStreetMap, and that parks and private land need permission or a pass.
 
 :::warning
 Map data can be out of date. Always check posted signs and closures before you ride.
+:::
+
+:::release 1.0.1
+## Closed Trails and Roads
+
+Closed trails and roads are drawn as red dashes on a dark outline, and the panel's legend shows **Trail**, **Road** and **Closed**. A line is marked closed when:
+
+- **Forest Service**: the road is listed as closed to motor vehicles (red, labeled **CLOSED** along the line), or a seasonal road or trail is outside its open dates for every vehicle today (red, over the trail's normal line).
+- **BLM**: the route's travel plan closes it to off-highway vehicles.
+- **OpenStreetMap**: the track is mapped as closed or private.
+
+Seasonal closures show once you zoom in to about a county's width, and need a signal to load. The other closures are part of the trail lines, so they're saved with a downloaded map.
+
+:::warning
+Closures come from the agencies' published travel plans and seasons and from OpenStreetMap. They are not live gate reports: a trail can also be closed for fire, snow, repairs or a local order that isn't in this data, and coverage outside Forest Service and BLM land depends on what riders have mapped. Always check posted signs and local orders before you ride.
+:::
 :::
 
 ## Download a Ride's Map
@@ -93,11 +134,13 @@ When your phone loses signal, a **No Signal** tag with **Downloaded Map** appear
 
 ## On the Website
 
-The website's maps show satellite imagery only. The layers button, the topo map, the Forest Service and BLM lines and the trail lookup are in the app. When you build a route on the website, OpenStreetMap trail lines appear once you zoom in close.
+The website's route builder and waypoints map have the same layers button and **Map** panel: **Satellite** or **Topo**, **Public Trails and Roads**, the trail and road names, and closed trails in red. The satellite map shows road names too. Zoomed in, the **Find a Ride** map shows the trail lines and names as well.
+
+On the website, click a trail line to see its card when you're not adding points: on a route imported from a GPX file, for example. On the waypoints map a click adds a waypoint, so read the names on the map there. Downloading maps for no signal is only in the app.
 
 ## Map Data and Credits
 
-- Trails and roads: USDA Forest Service MVUM, Bureau of Land Management, and map data © OpenStreetMap contributors, © OpenMapTiles, served by OpenFreeMap.
+- Trails and roads: USDA Forest Service MVUM and Forest Service roads, Bureau of Land Management, and map data © OpenStreetMap contributors, © OpenMapTiles, served by OpenFreeMap.
 - Topo: USGS The National Map.
 - Satellite with no signal: USGS The National Map: Orthoimagery.
 

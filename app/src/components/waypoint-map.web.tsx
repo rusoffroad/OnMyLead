@@ -7,7 +7,7 @@ import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { drawRoute, esc, ll, satelliteMap } from '@/lib/web-map';
+import { drawRoute, esc, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { octagon } from './waypoint-blaze';
 
 const blaze = (shared: boolean) => {
@@ -21,10 +21,11 @@ const stopSign = (n: number | null) =>
 
 /**
  * The ride's waypoints on the web: satellite imagery, the route under them, the leader's planned
- * stops as numbered stop signs. Click anywhere to drop a new one; click a blaze to open it.
+ * stops as numbered stop signs, over the same trail layers as the phone. Click anywhere to drop a
+ * new one; click a blaze to open it.
  */
 export function WaypointMap({
-  waypoints, route, center, onPressWaypoint, onLongPressMap, padding, found, onCenter,
+  waypoints, route, center, trail, onPressWaypoint, onLongPressMap, padding, found, onCenter,
 }: {
   waypoints: Waypoint[];
   route?: LatLng[] | null;
@@ -42,25 +43,29 @@ export function WaypointMap({
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
+  const tracks = useRef<ReturnType<typeof trailLayers> | null>(null);
   const fitted = useRef(false);
   const marker = useRef<L.Marker | null>(null);
-  const cb = useRef({ onPressWaypoint, onLongPressMap, onCenter });
+  const cb = useRef({ onPressWaypoint, onLongPressMap, onCenter, onRegion: trail.onRegion });
   useEffect(() => {
-    cb.current = { onPressWaypoint, onLongPressMap, onCenter };
-  }, [onPressWaypoint, onLongPressMap, onCenter]);
+    cb.current = { onPressWaypoint, onLongPressMap, onCenter, onRegion: trail.onRegion };
+  }, [onPressWaypoint, onLongPressMap, onCenter, trail.onRegion]);
   const pad = padding ?? [80, 40, 380, 40];
 
   useEffect(() => {
     const m = satelliteMap(el.current!, { doubleClickZoom: false });
     L.control.zoom({ position: 'topright' }).addTo(m);
+    tracks.current = trailLayers(m);
     layer.current = L.layerGroup().addTo(m);
     m.on('click', (e: L.LeafletMouseEvent) => cb.current.onLongPressMap?.({ lat: e.latlng.lat, lng: e.latlng.lng }));
     m.on('moveend', () => {
       const c = m.getCenter();
       cb.current.onCenter?.({ lat: c.lat, lng: c.lng });
+      reportRegion(m, cb.current.onRegion);
     });
     m.setView(center ? ll(center) : [39.5, -98.35], center ? 13 : 4);
     map.current = m;
+    reportRegion(m, cb.current.onRegion);
     return () => {
       m.remove();
       map.current = null;
@@ -68,6 +73,11 @@ export function WaypointMap({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const { base, trails, osmLines, closedLines, labels } = trail;
+  useEffect(() => {
+    tracks.current?.update({ base, trails, osmLines, closedLines, labels });
+  }, [base, trails, osmLines, closedLines, labels]);
 
   // Go to a searched place: the whole area when it has one, else close in on the spot.
   useEffect(() => {

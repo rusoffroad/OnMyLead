@@ -59,6 +59,7 @@ web build and the Android emulator.
 | F25 | Ride polls (flag) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-polls | iOS 1.0 | |
 | F26 | Route builder, trail snapping | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ route-builder | iOS 1.0 | Tablet: tools panel beside the map (Expanded) or floating card (Medium); web-checked |
 | F27 | Maps (satellite, topo, trails layers) | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ map-layers | iOS 1.0 | Android: Google Maps SDK via react-native-maps, key from `GOOGLE_MAPS_ANDROID_API_KEY` at prebuild (PR #99, D05); blank until the key exists |
+| F27a | Trail visibility, trail and road names, closures | 🟡 | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ map-layers | 1.0.1 | Added 2026-10-18: bolder amber/white lines with navy casing, OSM trail name tags, Forest Service names and numbers in its tiles, closed lines in red dashes (FS roads closed to motor vehicles, BLM OHV-closed routes, OSM access=no, today's MVUM seasonal closures). Website: route builder, waypoints and Find maps now get the layers panel, topo and these layers (Leaflet), plus Esri road names. Web-checked at phone, tablet and desktop sizes; iPhone/iPad/Android checks due with the 1.0.1 build. Closure data is published designations, not live gate reports |
 | F28 | GPX import | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ import-gpx | iOS 1.0 | No GPX export anywhere |
 | F29 | Waypoints, planned stops | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ waypoints-and-planned-stops | iOS 1.0 | Tablet: waypoint panel beside the map; web-checked |
 | F30 | Directions hand-off | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ directions | iOS 1.0 | Android: Google Maps only |

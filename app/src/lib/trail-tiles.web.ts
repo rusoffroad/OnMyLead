@@ -1,15 +1,14 @@
-import type { LatLng } from '@/core/geo';
 import {
   decodeOsmTrails, OSM_TILEJSON, osmTilesForRegion, osmTileZoom, templateFromTileJson, type OsmTrail, type ViewRegion,
 } from '@/core/osm-trails';
 import { decodeRoadLines, type RoadLine } from '@/core/trail-router';
-import { fillTemplate, type Tile, type TrailInfo, type TrailSourceId } from '@/core/trails';
+import { fillTemplate, type Tile, type TrailSourceId } from '@/core/trails';
 
 /**
- * The website's side of the trail layer. The agency and topo layers are phone-only, but the
- * OpenStreetMap squares are fetched here too (the browser keeps them in its own cache), so the
- * website's route builder can draw trails and snap a route to them. tiles.openfreemap.org is
- * allowed in deploy/security-headers.conf.
+ * The website's side of the trail layer. The browser keeps every square in its own cache, so
+ * nothing is saved here; the agency and topo squares are drawn by Leaflet (lib/web-map.ts), and the
+ * OpenStreetMap squares are fetched and decoded here so the website can draw trails, name them and
+ * snap a route to them. The hosts are allowed in deploy/security-headers.conf.
  */
 export type TileLayerId = 'imagery' | 'topo' | 'osm' | TrailSourceId;
 
@@ -17,9 +16,7 @@ export const TILE_MAX_AGE_S = 30 * 24 * 3600;
 export const tileCachePath = (_layer: TileLayerId) => '';
 export const savedTilesMb = () => 0;
 export function clearSavedTiles() {}
-export async function identifyTrail(_p: LatLng, _sources: TrailSourceId[], _radiusM: number): Promise<TrailInfo | null> {
-  return null;
-}
+export { identifyTrail, loadSeasonalClosures } from './trail-lookup';
 
 let template: Promise<string | null> | null = null;
 function osmTemplate(): Promise<string | null> {

@@ -71,7 +71,7 @@ export function WaypointMap({
       }}
       initialRegion={center ? { latitude: center.lat, longitude: center.lng, latitudeDelta: 0.08, longitudeDelta: 0.08 } : undefined}
       onLongPress={onLongPressMap ? (e) => onLongPressMap({ lat: e.nativeEvent.coordinate.latitude, lng: e.nativeEvent.coordinate.longitude }) : undefined}>
-      <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} osm={trail.osmLines} />
+      <TrailTiles trail={trail} />
       {route && route.length > 1 ? (
         <>
           <RouteLine points={route} />

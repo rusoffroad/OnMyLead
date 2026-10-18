@@ -262,7 +262,7 @@ export function Showcase() {
               never reads as “they’re right here.”
             </p>
             <ul className="ticks">
-              <li><b>Trails on the Map.</b> Public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls, named when you tap them. Over satellite or topo.</li>
+              <li><b>Trails on the Map.</b> Bold trail lines with their names on the map: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
               <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>

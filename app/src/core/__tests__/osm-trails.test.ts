@@ -2,14 +2,14 @@ import Pbf from 'pbf';
 import { describe, expect, it } from 'vitest';
 
 import {
-  decodeOsmTrails, drawableOsm, nearestOsmTrail, OSM_MAX_TILES, osmTilesForRegion, osmTileZoom, templateFromTileJson,
+  decodeOsmTrails, drawableOsm, nearestOsmTrail, OSM_MAX_TILES, osmTilesForRegion, osmTileZoom, templateFromTileJson, trailLabels,
 } from '../osm-trails';
 import { tileFor } from '../trails';
 
 // Hidden Falls Adventure Park, Marble Falls, Texas: named tracks in OpenStreetMap, none in federal data.
 const hiddenFalls = { lat: 30.6079, lng: -98.1582 };
 
-type Feat = { cls: string; name?: string; surface?: string; line: [number, number][] };
+type Feat = { cls: string; name?: string; surface?: string; access?: string; line: [number, number][] };
 
 /** A tiny Mapbox Vector Tile, written the way OpenMapTiles lays out its road layers. */
 function mvt(layers: Record<string, Feat[]>, extent = 4096): Uint8Array {
@@ -24,7 +24,7 @@ function mvt(layers: Record<string, Feat[]>, extent = 4096): Uint8Array {
       const idx = (arr: string[], v: string) => (arr.includes(v) ? arr.indexOf(v) : arr.push(v) - 1);
       const encoded = feats.map((f) => {
         const tags: number[] = [];
-        for (const [k, v] of Object.entries({ class: f.cls, name: f.name, surface: f.surface })) {
+        for (const [k, v] of Object.entries({ class: f.cls, name: f.name, surface: f.surface, access: f.access })) {
           if (v) tags.push(idx(keys, k), idx(values, v));
         }
         const geom: number[] = [1 | (1 << 3)];
@@ -85,19 +85,20 @@ describe('decoding a square', () => {
   const data = mvt({
     transportation: [
       { cls: 'track', surface: 'unpaved', line: [[100, 100], [2000, 2000], [4000, 2100]] },
-      { cls: 'track', line: [[0, 3000], [4096, 3000]] },
+      { cls: 'track', access: 'no', line: [[0, 3000], [4096, 3000]] },
       { cls: 'secondary', line: [[0, 0], [4096, 4096]] },
     ],
     transportation_name: [
       { cls: 'track', name: 'Carnage Canyon (lvl 5)', line: [[100, 100], [2000, 2000], [4000, 2100]] },
+      { cls: 'track', name: 'Gated Ranch Road', line: [[0, 3000], [4096, 3000]] },
       { cls: 'service', name: 'Park Road 1', line: [[0, 500], [4096, 500]] },
     ],
   });
 
   it('keeps dirt tracks only, with names from the name layer', () => {
     const trails = decodeOsmTrails(data, t);
-    expect(trails).toHaveLength(3);
-    expect(trails.filter((x) => x.name).map((x) => x.name)).toEqual(['Carnage Canyon (lvl 5)']);
+    expect(trails).toHaveLength(4);
+    expect(trails.filter((x) => x.name).map((x) => x.name)).toEqual(['Carnage Canyon (lvl 5)', 'Gated Ranch Road']);
     expect(trails[0].surface).toBe('unpaved');
     // The first point sits inside this square.
     const p = trails[0].parts[0][0];
@@ -109,7 +110,7 @@ describe('decoding a square', () => {
     expect(drawn).toHaveLength(2);
     expect(drawn.every((x) => x.name === null)).toBe(true);
     expect(drawableOsm(decodeOsmTrails(data, t), 1)).toHaveLength(1);
-    const many = { key: '14/1/1/l0', name: null, surface: null, parts: Array.from({ length: 10 }, () => [hiddenFalls, hiddenFalls]) };
+    const many = { key: '14/1/1/l0', name: null, surface: null, closed: false, parts: Array.from({ length: 10 }, () => [hiddenFalls, hiddenFalls]) };
     const capped = drawableOsm([many, { ...many, key: '14/1/1/l1' }], 4);
     expect(capped).toHaveLength(1);
     expect(capped[0].parts).toHaveLength(4);
@@ -123,8 +124,29 @@ describe('decoding a square', () => {
     expect(info.source).toBe('osm');
     expect(info.attribution).toMatch(/OpenStreetMap/);
     expect(nearestOsmTrail({ lat: on.lat + 0.01, lng: on.lng }, trails, 20)).toBeNull();
-    const unnamed = trails[1].parts[0][0];
-    expect(nearestOsmTrail(unnamed, trails, 20)!.title).toBe('Unnamed Track');
+    expect(info.closure).toBeNull();
+  });
+
+  it('marks tracks mapped with no public access as closed, by name too', () => {
+    const trails = decodeOsmTrails(data, t);
+    expect(trails.filter((x) => x.closed)).toHaveLength(1);
+    const gated = trails.find((x) => x.closed)!.parts[0][1];
+    const info = nearestOsmTrail(gated, trails, 20)!;
+    expect(info.title).toBe('Gated Ranch Road');
+    expect(info.closure?.label).toBe('No Public Access');
+  });
+
+  it('tags each named track once, at the middle of its line', () => {
+    const trails = decodeOsmTrails(data, t);
+    const labels = trailLabels([...trails, ...trails], 10);
+    expect(labels.map((l) => l.name)).toEqual(['Carnage Canyon (lvl 5)', 'Gated Ranch Road']);
+    expect(labels.map((l) => l.closed)).toEqual([false, true]);
+    // Halfway along the gated road's straight line is the middle of the square.
+    const gated = trails.find((x) => x.name === 'Gated Ranch Road')!.parts[0];
+    expect(labels[1].at.lng).toBeCloseTo((gated[0].lng + gated[1].lng) / 2, 6);
+    expect(trailLabels(trails, 1)).toHaveLength(1);
+    // A gap as big as the square keeps only the first tag.
+    expect(trailLabels(trails, 10, { lat: 1, lng: 1 })).toHaveLength(1);
   });
 
   it('survives a broken square', () => {

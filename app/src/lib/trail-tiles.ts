@@ -1,16 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Directory, File, Paths } from 'expo-file-system';
 
-import type { LatLng } from '@/core/geo';
 import { USGS_IMAGERY, type OfflineLayer } from '@/core/offline-maps';
 import {
   decodeOsmTrails, OSM_TILEJSON, osmTilesForRegion, osmTileZoom, templateFromTileJson, type OsmTrail, type ViewRegion,
 } from '@/core/osm-trails';
 import { decodeRoadLines, type RoadLine } from '@/core/trail-router';
-import {
-  fillTemplate, identifyUrl, nearestTrail, TRAIL_SOURCE_IDS, TRAIL_SOURCES, trailTileTemplate, USGS_TOPO, type GeoJsonLine,
-  type Tile, type TrailInfo, type TrailSourceId,
-} from '@/core/trails';
+import { fillTemplate, TRAIL_SOURCE_IDS, TRAIL_SOURCES, trailTileTemplate, USGS_TOPO, type Tile } from '@/core/trails';
 
 /**
  * Trail tiles live in the documents folder (iOS never clears it), one folder per layer, laid out
@@ -189,24 +185,5 @@ export function clearSavedTiles() {
   }
 }
 
-/** Ask the agencies what line is under a tap. Returns null when nothing is close or the phone is offline. */
-export async function identifyTrail(p: LatLng, sources: TrailSourceId[], radiusM: number): Promise<TrailInfo | null> {
-  const queries = sources.flatMap((id) => TRAIL_SOURCES[id].identifyLayers.map((layerId) => ({ id, layerId })));
-  const results = await Promise.all(
-    queries.map(async ({ id, layerId }) => {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 8000);
-        const res = await fetch(identifyUrl(TRAIL_SOURCES[id], layerId, p, radiusM), { signal: controller.signal });
-        clearTimeout(timer);
-        const json = (await res.json()) as { features?: GeoJsonLine[] };
-        return { source: id, layerId, features: json.features ?? [] };
-      } catch {
-        return { source: id, layerId, features: [] };
-      }
-    }),
-  );
-  return nearestTrail(p, results, radiusM);
-}
-
+export { identifyTrail, loadSeasonalClosures } from './trail-lookup';
 export { TRAIL_SOURCE_IDS };

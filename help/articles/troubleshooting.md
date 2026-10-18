@@ -4,7 +4,7 @@ summary: What to check when riders don't show on the map, alerts don't arrive, a
 category: troubleshooting
 order: 10
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/core/freshness.ts
   - app/src/components/rider-dot.tsx

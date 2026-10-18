@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
-  boxAround, densify, distanceToLineM, fillTemplate, identifyUrl, metersPerPoint, nearestTrail, offlineTilePlan,
-  parseBlm, parseMvum, tileBoundsMercator, tileFor, tilesInBox, TRAIL_SOURCES, trailTileTemplate,
+  boxAround, closedSeasonalLines, densify, distanceToLineM, fillTemplate, identifyUrl, metersPerPoint, mvumSeason, nextOpening,
+  nearestTrail, offlineTilePlan, openOnDay, parseBlm, parseDateRanges, parseFsClosed, parseMvum, seasonalQueryUrl, tileBoundsLatLng,
+  tileBoundsMercator, tileFor, tilesInBox, TRAIL_SOURCE_IDS, TRAIL_SOURCES, trailTileTemplate,
 } from '../trails';
 
 const fishlake = { lat: 38.45, lng: -111.55 };
@@ -100,8 +101,10 @@ describe('tapping a line', () => {
         other_ohv_gt50inches: null, fourwd_gt50inches: 'open', fourwd_gt50_datesopen: '04/16-12/31', gis_miles: 1.341,
       },
       'trail',
+      new Date(2026, 9, 18),
     );
     expect(info.title).toBe('Trail 145');
+    expect(info.closure).toBeNull();
     expect(info.where).toBe('Fishlake National Forest, Fremont River Ranger District');
     expect(info.allowed.map((a) => a.vehicle)).toEqual(['ATVs (50" or less)', 'Dirt bikes', '4x4s']);
     expect(info.allowed[0].dates).toBe('04/16-12/31');
@@ -132,5 +135,86 @@ describe('tapping a line', () => {
     ], 60);
     expect(info?.title).toBe('Trail 1');
     expect(nearestTrail(fishlake, [{ source: 'blm', layerId: 0, features: [far] }], 60)).toBeNull();
+  });
+});
+
+describe('closures', () => {
+  const oct18 = new Date(2026, 9, 18);
+  const jan5 = new Date(2027, 0, 5);
+
+  it('reads MVUM date ranges, loose typing included', () => {
+    expect(parseDateRanges('05/01-11/30')).toEqual([{ from: 501, to: 1130 }]);
+    expect(parseDateRanges('01/01-03/31,05/16-09/30,11/01-12/31')).toHaveLength(3);
+    expect(parseDateRanges('07/01-10/11   10/22-11/30')).toEqual([{ from: 701, to: 1011 }, { from: 1022, to: 1130 }]);
+    expect(parseDateRanges('7/01-10/11')).toEqual([{ from: 701, to: 1011 }]);
+    expect(parseDateRanges(' ')).toEqual([]);
+    expect(parseDateRanges(null)).toEqual([]);
+    expect(parseDateRanges('13/01-14/01')).toEqual([]);
+  });
+
+  it('knows which days are open, across the new year too', () => {
+    expect(openOnDay(parseDateRanges('05/01-10/15'), oct18)).toBe(false);
+    expect(openOnDay(parseDateRanges('05/01-10/18'), oct18)).toBe(true);
+    expect(openOnDay(parseDateRanges('12/01-03/14'), jan5)).toBe(true);
+    expect(openOnDay(parseDateRanges('12/01-03/14'), oct18)).toBe(false);
+    expect(openOnDay([], oct18)).toBe(true);
+    expect(nextOpening(parseDateRanges('05/01-10/15'), oct18)).toBe('May 1');
+    expect(nextOpening(parseDateRanges('12/01-03/14,05/25-06/30'), oct18)).toBe('Dec 1');
+  });
+
+  it('closes a seasonal route only when every vehicle is out of season', () => {
+    const props = {
+      seasonal: 'seasonal', atv: 'open', atv_datesopen: '05/01-10/15', motorcycle: 'open', motorcycle_datesopen: '05/01-10/15',
+    };
+    const closed = mvumSeason(props, oct18);
+    expect(closed.closure?.label).toBe('Closed for the Season');
+    expect(closed.closure?.detail).toContain('May 1');
+    expect(closed.allowed.every((a) => a.closedNow)).toBe(true);
+    const mixed = mvumSeason({ ...props, motorcycle_datesopen: '05/01-11/30' }, oct18);
+    expect(mixed.closure).toBeNull();
+    expect(mixed.allowed.map((a) => a.closedNow)).toEqual([true, false]);
+    // Yearlong routes are never "closed for the season", whatever their date columns say.
+    expect(mvumSeason({ ...props, seasonal: 'yearlong' }, oct18).closure).toBeNull();
+  });
+
+  it('reads closed Forest Service roads and closed BLM routes', () => {
+    const fs = parseFsClosed({ id: '414.1', name: 'JENNY LIND', gis_miles: 2.04 });
+    expect(fs.title).toBe('Jenny Lind (Road 414.1)');
+    expect(fs.closure?.label).toBe('Closed to Motor Vehicles');
+    expect(parseBlm({ ROUTE_PRMRY_NM: 'X', PLAN_OHV_ROUTE_DSGNTN: 'Closed' }).closure?.label).toBe('Closed to Off-Highway Vehicles');
+    expect(parseBlm({ ROUTE_PRMRY_NM: 'X', PLAN_OHV_ROUTE_DSGNTN: 'Open' }).closure).toBeNull();
+    const line = { type: 'Feature' as const, properties: { id: '414.1' }, geometry: { type: 'LineString' as const, coordinates: [[-111.551, 38.45], [-111.549, 38.45]] } };
+    expect(nearestTrail(fishlake, [{ source: 'fsclosed', layerId: 1, features: [line] }], 60)?.closure).not.toBeNull();
+  });
+
+  it('draws closed roads below the open layers, and labels them', () => {
+    expect(TRAIL_SOURCE_IDS[0]).toBe('fsclosed');
+    const t = trailTileTemplate(TRAIL_SOURCES.fsclosed);
+    expect(t).toContain('EDW_RoadBasic_01');
+    expect(decodeURIComponent(t)).toContain('\\"CLOSED\\"');
+    const blm = JSON.parse(decodeURIComponent(trailTileTemplate(TRAIL_SOURCES.blm).split('dynamicLayers=')[1].split('&')[0]));
+    expect(blm[0].drawingInfo.renderer.uniqueValueInfos[0].value).toBe('Closed');
+  });
+
+  it('asks for seasonal routes in a square and keeps the ones closed today', () => {
+    const sq = tileFor(fishlake, 11);
+    const b = tileBoundsLatLng(sq);
+    expect(fishlake.lat).toBeGreaterThan(b.minLat);
+    expect(fishlake.lat).toBeLessThan(b.maxLat);
+    expect(fishlake.lng).toBeGreaterThan(b.minLng);
+    expect(fishlake.lng).toBeLessThan(b.maxLng);
+    const url = seasonalQueryUrl(2, sq);
+    expect(url).toContain('/2/query?');
+    expect(url).toContain(encodeURIComponent("seasonal='seasonal'"));
+    expect(url).toContain('atv_datesopen');
+    const feature = (objectid: number, dates: string) => ({
+      type: 'Feature' as const,
+      properties: { objectid, id: String(objectid), seasonal: 'seasonal', atv: 'open', atv_datesopen: dates },
+      geometry: { type: 'LineString' as const, coordinates: [[-111.551, 38.45], [-111.549, 38.45]] },
+    });
+    const lines = closedSeasonalLines([feature(1, '05/01-10/15'), feature(2, '05/01-11/30')], 2, oct18);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ key: 'mvum2-1', title: 'Trail 1', opens: 'May 1' });
+    expect(lines[0].parts[0][0]).toEqual({ lat: 38.45, lng: -111.551 });
   });
 });
