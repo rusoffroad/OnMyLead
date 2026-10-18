@@ -57,7 +57,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
             setMoved(regionMoved(anchor.current, now));
           }
         }}>
-        <TrailTiles base="satellite" trails={trail.trails} offline={trail.offline} osm={trail.osmLines} />
+        <TrailTiles trail={trail} base="satellite" />
         {circle ? (
           <Circle
             center={{ latitude: circle.center.lat, longitude: circle.center.lng }}

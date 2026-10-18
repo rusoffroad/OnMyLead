@@ -77,7 +77,7 @@ export function GroupMap({
   return (
     <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}
       onLongPress={onLongPressMap ? (e) => onLongPressMap({ lat: e.nativeEvent.coordinate.latitude, lng: e.nativeEvent.coordinate.longitude }) : undefined}>
-      {trail ? <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} osm={trail.osmLines} /> : null}
+      {trail ? <TrailTiles trail={trail} /> : null}
       {route && route.length > 1 ? (
         <>
           <RouteLine points={route} />

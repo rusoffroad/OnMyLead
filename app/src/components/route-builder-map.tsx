@@ -92,7 +92,7 @@ export function RouteBuilderMap({
         if (!editable) return trail?.identifyAt(c.latitude, c.longitude);
         onAdd({ lat: c.latitude, lng: c.longitude }, snapM());
       }}>
-      {trail ? <TrailTiles base={trail.base} trails={trail.trails} offline={trail.offline} osm={trail.osmLines} /> : null}
+      {trail ? <TrailTiles trail={trail} /> : null}
       {points.length > 1 ? <RouteLine points={points} /> : null}
       {pending.map((leg, i) => (
         <Polyline

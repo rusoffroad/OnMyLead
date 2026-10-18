@@ -3,10 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, type LayoutChangeEvent } from 'react-native';
 import type { MapPressEvent, Region } from 'react-native-maps';
 
-import { drawableOsm, nearestOsmTrail, OSM_MIN_Z, type OsmTrail } from '@/core/osm-trails';
-import { metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type TrailInfo } from '@/core/trails';
+import { drawableOsm, nearestOsmTrail, OSM_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
+import { metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
-import { identifyTrail, loadOsmView } from '@/lib/trail-tiles';
+import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
 
 const KEY = 'map.layers.v1';
 
@@ -17,6 +17,10 @@ export type TrailMap = {
   zoomInHint: boolean;
   /** OpenStreetMap tracks to draw (TrailTiles), once the map is in to zoom 13. */
   osmLines: OsmTrail[];
+  /** Name tags for the named OpenStreetMap tracks on screen (agency names are drawn into their tiles). */
+  labels: TrailLabel[];
+  /** Forest Service routes closed for the season today, drawn over the trail layer in the closed style. */
+  closedLines: ClosedLine[];
   /** True when trails are on and agency lines show, but OpenStreetMap tracks need a closer zoom. */
   closerForTracks: boolean;
   /** No signal: the map draws only squares saved on the phone (see lib/offline-maps). */
@@ -54,6 +58,7 @@ export function useTrailMap(): TrailMap {
   // On unless the rider turned it off: trails are the reason most riders open the map.
   const [trails, setTrailsState] = useState(true);
   const [osm, setOsm] = useState<OsmTrail[]>([]);
+  const [closed, setClosed] = useState<ClosedLine[]>([]);
   const [zoom, setZoom] = useState(12);
   const [info, setInfo] = useState<TrailInfo | null>(null);
   const [looking, setLooking] = useState(false);
@@ -62,6 +67,7 @@ export function useTrailMap(): TrailMap {
   const width = useRef(390);
   const lookup = useRef(0);
   const osmLoad = useRef(0);
+  const closedLoad = useRef(0);
   const { offline } = useMapSignal();
   // Read by the loaders below, which outlive a render.
   const trailsRef = useRef(trails);
@@ -93,13 +99,21 @@ export function useTrailMap(): TrailMap {
       osmRef.current = lines;
       setOsm(lines);
     };
+    const closedId = ++closedLoad.current;
     if (!trailsRef.current || !r) {
       put([]);
+      setClosed([]);
       return;
     }
-    loadOsmView(r, zoomNow.current ?? zoomOf(r), offlineRef.current)
+    const z = zoomNow.current ?? zoomOf(r);
+    loadOsmView(r, z, offlineRef.current)
       .then((lines) => {
         if (id === osmLoad.current) put(lines);
+      })
+      .catch(() => {});
+    loadSeasonalClosures(r, z, offlineRef.current)
+      .then((lines) => {
+        if (closedId === closedLoad.current) setClosed(lines);
       })
       .catch(() => {});
   }, []);
@@ -163,12 +177,16 @@ export function useTrailMap(): TrailMap {
 
   // Leaflet draws lines cheaply and a browser window shows more of the map, so the website draws more.
   const drawn = useMemo(() => drawableOsm(osm, Platform.OS === 'web' ? 1500 : undefined), [osm]);
+  // Each phone tag is a small native view, so the phone keeps fewer than the website.
+  const labels = useMemo(() => trailLabels(osm, Platform.OS === 'web' ? 60 : 24), [osm]);
 
   return {
     base,
     trails,
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
     osmLines: trails ? drawn : [],
+    labels: trails ? labels : [],
+    closedLines: trails ? closed : [],
     closerForTracks: trails && zoom >= TRAILS_MIN_Z && zoom < OSM_MIN_Z - 0.25,
     offline,
     setBase,

@@ -5,12 +5,16 @@ import { View } from 'react-native';
 import { MapControls, MapOverlay, meetsLabel, pinColor, type RidesMapProps } from '@/components/rides-map-chrome';
 import { Colors, Radius } from '@/constants/theme';
 import { regionMoved, type Bounds } from '@/core/discovery';
-import { esc, satelliteMap } from '@/lib/web-map';
+import { useTrailMap } from '@/hooks/use-trail-map';
+import { esc, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 
 const toLatLngBounds = (b: Bounds) => L.latLngBounds([b.minLat, b.minLng], [b.maxLat, b.maxLng]);
 const fromLatLngBounds = (b: L.LatLngBounds): Bounds => ({ minLat: b.getSouth(), maxLat: b.getNorth(), minLng: b.getWest(), maxLng: b.getEast() });
 
-/** The Find a ride map on the web: satellite imagery with place names, same pins and controls as the phone. */
+/**
+ * The Find a ride map on the web: satellite imagery with road and place names, same pins and
+ * controls as the phone. Zoomed in, the trail layers show too, as they do on the phone.
+ */
 export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400 }: RidesMapProps) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
@@ -22,6 +26,12 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
     openRef.current = onOpen;
   }, [onOpen]);
   const [moved, setMoved] = useState(false);
+  const trail = useTrailMap();
+  const tracks = useRef<ReturnType<typeof trailLayers> | null>(null);
+  const onRegion = useRef(trail.onRegion);
+  useEffect(() => {
+    onRegion.current = trail.onRegion;
+  }, [trail.onRegion]);
 
   const flyTo = (b: Bounds) => {
     settling.current = true;
@@ -30,8 +40,10 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
 
   useEffect(() => {
     const m = satelliteMap(el.current!);
+    tracks.current = trailLayers(m);
     layer.current = L.layerGroup().addTo(m);
     m.on('moveend', () => {
+      reportRegion(m, onRegion.current);
       const now = fromLatLngBounds(m.getBounds());
       if (settling.current) {
         settling.current = false;
@@ -53,6 +65,12 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => flyTo(frame), [frameKey]);
+
+  // Always satellite here, as on the phone; trails follow the rider's Map Layers choice.
+  const { trails, osmLines, closedLines, labels } = trail;
+  useEffect(() => {
+    tracks.current?.update({ base: 'satellite', trails, osmLines, closedLines, labels });
+  }, [trails, osmLines, closedLines, labels]);
 
   useEffect(() => {
     const g = layer.current;

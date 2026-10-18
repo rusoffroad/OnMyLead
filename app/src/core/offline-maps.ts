@@ -10,7 +10,8 @@ import { boxAround, offlineTilePlan, tileFor, tilesInBox, TOPO_MAX_NATIVE_Z, TRA
 
 /** imagery is the USGS aerial photo, used as the satellite map when there is no signal. */
 /** osm is OpenStreetMap dirt tracks, saved as vector squares (see core/osm-trails). */
-export type OfflineLayer = 'imagery' | 'topo' | 'mvum' | 'blm' | 'osm';
+/** fsclosed is the Forest Service's closed roads, drawn in the closed style. */
+export type OfflineLayer = 'imagery' | 'topo' | 'mvum' | 'blm' | 'fsclosed' | 'osm';
 
 export const USGS_IMAGERY = 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}';
 export const IMAGERY_ATTRIBUTION = 'USGS The National Map: Orthoimagery';
@@ -22,7 +23,7 @@ export type OfflineChoice = 'satellite' | 'topo' | 'trails';
 export const OFFLINE_CHOICES: { id: OfflineChoice; label: string; layers: OfflineLayer[] }[] = [
   { id: 'satellite', label: 'Satellite', layers: ['imagery'] },
   { id: 'topo', label: 'Topo', layers: ['topo'] },
-  { id: 'trails', label: 'Trails', layers: ['mvum', 'blm', 'osm'] },
+  { id: 'trails', label: 'Trails', layers: ['mvum', 'blm', 'fsclosed', 'osm'] },
 ];
 
 export function layersFor(choices: OfflineChoice[]): OfflineLayer[] {
@@ -43,6 +44,7 @@ export const LAYER_ZOOMS: Record<OfflineLayer, { min: number; boxMax: number; ma
   topo: { min: 8, boxMax: 12, max: TOPO_MAX_NATIVE_Z },
   mvum: { min: TRAILS_MIN_Z, boxMax: 12, max: 15 },
   blm: { min: TRAILS_MIN_Z, boxMax: 12, max: 15 },
+  fsclosed: { min: TRAILS_MIN_Z, boxMax: 12, max: 15 },
   // Track squares only exist at 13 and 14, and the map draws the 14 lines at any closer zoom.
   osm: { min: OSM_MIN_Z, boxMax: OSM_MIN_Z, max: OSM_MAX_Z },
 };
@@ -54,10 +56,10 @@ export const LAYER_ZOOMS: Record<OfflineLayer, { min: number; boxMax: number; ma
 export const MAX_TILES_PER_LAYER = 4000;
 
 /** Below this the photo and topo get too blurry to ride by, so a bigger area is refused instead. */
-const AREA_MIN_DETAIL: Record<OfflineLayer, number> = { imagery: 14, topo: 14, mvum: 13, blm: 13, osm: OSM_MIN_Z };
+const AREA_MIN_DETAIL: Record<OfflineLayer, number> = { imagery: 14, topo: 14, mvum: 13, blm: 13, fsclosed: 13, osm: OSM_MIN_Z };
 
 /** Average size of one saved square, measured on western public land. Used for estimates only. */
-export const AVG_TILE_BYTES: Record<OfflineLayer, number> = { imagery: 25_000, topo: 20_000, mvum: 10_000, blm: 3_000, osm: 12_000 };
+export const AVG_TILE_BYTES: Record<OfflineLayer, number> = { imagery: 25_000, topo: 20_000, mvum: 10_000, blm: 3_000, fsclosed: 3_000, osm: 12_000 };
 
 export type LayerPlan = { layer: OfflineLayer; tiles: Tile[]; maxZ: number };
 

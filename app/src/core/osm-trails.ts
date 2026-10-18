@@ -33,6 +33,11 @@ export type OsmTrail = {
   name: string | null;
   /** Unpaved or paved, when the mapper said. */
   surface: string | null;
+  /**
+   * Mapped with no public access (OpenMapTiles folds OSM's access=no and access=private into
+   * "no"): gated, closed or private. Only the drawn copies carry it; the named copies don't.
+   */
+  closed: boolean;
   parts: LatLng[][];
 };
 
@@ -99,7 +104,13 @@ export function decodeOsmTrails(data: Uint8Array, t: Tile): OsmTrail[] {
         .map((ring) => ring.map((p) => toLatLng(t, layer.extent, p.x, p.y)))
         .filter((part) => part.length > 1);
       if (!parts.length) continue;
-      out.push({ key: `${t.z}/${t.x}/${t.y}/${layerName === 'transportation' ? 'l' : 'n'}${i}`, name, surface: str(f.properties.surface), parts });
+      out.push({
+        key: `${t.z}/${t.x}/${t.y}/${layerName === 'transportation' ? 'l' : 'n'}${i}`,
+        name,
+        surface: str(f.properties.surface),
+        closed: f.properties.access === 'no',
+        parts,
+      });
     }
   }
   return out;
@@ -125,13 +136,18 @@ export function drawableOsm(trails: OsmTrail[], limit = OSM_MAX_LINES): OsmTrail
 /** The track under a tap, from what is already on screen. Named copies win a near tie. */
 export function nearestOsmTrail(p: LatLng, trails: OsmTrail[], maxM: number): TrailInfo | null {
   let best: { d: number; t: OsmTrail } | null = null;
+  // The drawn copy under the tap says whether it's closed; the named copy only carries the name.
+  let line: { d: number; t: OsmTrail } | null = null;
   for (const t of trails) {
     for (const part of t.parts) {
-      const d = distanceToLineM(p, { type: 'LineString', coordinates: part.map((q) => [q.lng, q.lat]) }) - (t.name ? 3 : 0);
+      const raw = distanceToLineM(p, { type: 'LineString', coordinates: part.map((q) => [q.lng, q.lat]) });
+      const d = raw - (t.name ? 3 : 0);
       if (d <= maxM && (!best || d < best.d)) best = { d, t };
+      if (t.key.includes('/l') && raw <= maxM && (!line || raw < line.d)) line = { d: raw, t };
     }
   }
   if (!best) return null;
+  const closed = best.t.closed || !!line?.t.closed;
   return {
     source: 'osm',
     kind: 'trail',
@@ -142,5 +158,53 @@ export function nearestOsmTrail(p: LatLng, trails: OsmTrail[], maxM: number): Tr
     miles: null,
     surface: best.t.surface ? best.t.surface.charAt(0).toUpperCase() + best.t.surface.slice(1) : null,
     attribution: OSM_ATTRIBUTION,
+    closure: closed ? { label: 'No Public Access', detail: 'OpenStreetMap marks this track closed or private.' } : null,
   };
+}
+
+export type TrailLabel = { key: string; name: string; at: LatLng; closed: boolean };
+
+/**
+ * One name tag per named track in view, at the middle of its longest stretch. Squares come middle
+ * first, so a trail crossing several squares is tagged in the one nearest the middle of the map.
+ */
+export function trailLabels(trails: OsmTrail[], limit: number): TrailLabel[] {
+  const closedLines = trails.filter((t) => t.closed);
+  const seen = new Set<string>();
+  const out: TrailLabel[] = [];
+  for (const t of trails) {
+    if (out.length >= limit) break;
+    if (!t.name || seen.has(t.name)) continue;
+    let longest: LatLng[] = [];
+    let longestM = 0;
+    for (const part of t.parts) {
+      let m = 0;
+      for (let i = 1; i < part.length; i++) m += Math.hypot(part[i].lat - part[i - 1].lat, (part[i].lng - part[i - 1].lng) * Math.cos((part[i].lat * Math.PI) / 180));
+      if (m > longestM) [longest, longestM] = [part, m];
+    }
+    if (longest.length < 2) continue;
+    seen.add(t.name);
+    const at = midpoint(longest);
+    // Names live on separate copies of the lines; a closed drawn line under the tag marks it closed.
+    const closed = closedLines.some((c) => c.parts.some((part) => distanceToLineM(at, { type: 'LineString', coordinates: part.map((q) => [q.lng, q.lat]) }) < 12));
+    out.push({ key: `${t.key}-label`, name: t.name, at, closed });
+  }
+  return out;
+}
+
+/** The point halfway along a line. */
+function midpoint(line: LatLng[]): LatLng {
+  const seg = (i: number) => Math.hypot(line[i].lat - line[i - 1].lat, (line[i].lng - line[i - 1].lng) * Math.cos((line[i].lat * Math.PI) / 180));
+  let total = 0;
+  for (let i = 1; i < line.length; i++) total += seg(i);
+  let left = total / 2;
+  for (let i = 1; i < line.length; i++) {
+    const s = seg(i);
+    if (s >= left && s > 0) {
+      const f = left / s;
+      return { lat: line[i - 1].lat + (line[i].lat - line[i - 1].lat) * f, lng: line[i - 1].lng + (line[i].lng - line[i - 1].lng) * f };
+    }
+    left -= s;
+  }
+  return line[Math.floor(line.length / 2)];
 }

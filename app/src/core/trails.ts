@@ -8,11 +8,13 @@ import { distanceM } from './geo';
  * nothing about a rider is ever sent: only the map square being looked at.
  */
 
-export type TrailSourceId = 'mvum' | 'blm';
+export type TrailSourceId = 'mvum' | 'blm' | 'fsclosed';
 export type BaseMap = 'satellite' | 'topo';
 
 export const FS_MVUM = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_MVUM_02/MapServer';
 export const BLM_ROUTES = 'https://gis.blm.gov/arcgis/rest/services/transportation/BLM_Natl_GTLF/MapServer';
+/** Forest Service roads; layer 1 is every system road the agency lists as closed to motor vehicles. */
+export const FS_ROADS = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_RoadBasic_01/MapServer';
 export const USGS_TOPO = 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}';
 
 /** USGS caches its topo to zoom 16; closer than that the phone scales the zoom 16 tile up. */
@@ -20,13 +22,28 @@ export const TOPO_MAX_NATIVE_Z = 16;
 /** Below zoom 9 a whole state of trails is a grey smear, so the overlay waits until you zoom in. */
 export const TRAILS_MIN_Z = 9;
 
-/** Line colors in RGBA. Neutral "map ink" so the group's colors and the ride route stay the loud things. */
+/**
+ * Line colors in RGBA, shared with the app's own trail lines (TRAIL_INK) so every source reads as
+ * one map. Trails are a bright amber that stands out on forest, desert and snow imagery alike;
+ * roads are near white; both sit on a wide navy casing. Closed lines are red dashes on that navy,
+ * a barricade look that can't be mistaken for the ride's solid red route.
+ */
 const INK = {
-  trail: [236, 205, 145, 255], // sand, dashed: dirt trails
-  road: [232, 236, 242, 255], // pale grey, solid: forest and BLM roads
-  casing: [10, 22, 38, 170], // the app's navy, so lines read on bright desert imagery
+  trail: [255, 196, 61, 255],
+  road: [246, 248, 251, 255],
+  closed: [255, 69, 58, 255],
+  casing: [10, 22, 38, 215],
   label: [255, 255, 255, 255],
+  closedLabel: [255, 138, 128, 255],
 };
+
+/** The same colors for lines the app draws itself (OpenStreetMap tracks, seasonal closures, the website). */
+export const TRAIL_INK = {
+  trail: '#FFC43D',
+  road: '#F6F8FB',
+  closed: '#FF453A',
+  casing: 'rgba(10,22,38,0.84)',
+} as const;
 
 type Renderer = { type: 'simple'; symbol: { type: 'esriSLS'; style: string; color: number[]; width: number } };
 const line = (color: number[], width: number, style = 'esriSLSSolid'): Renderer => ({
@@ -34,44 +51,61 @@ const line = (color: number[], width: number, style = 'esriSLSSolid'): Renderer 
   symbol: { type: 'esriSLS', style, color, width },
 });
 
-const label = (field: string) => [
+const label = (expression: string, color = INK.label) => [
   {
-    labelExpression: `[${field}]`,
+    labelExpression: expression,
     labelPlacement: 'esriServerLinePlacementCenterAlong',
     symbol: {
       type: 'esriTS',
-      color: INK.label,
+      color,
       haloColor: [10, 22, 38, 255],
-      haloSize: 1.5,
-      font: { family: 'Arial', size: 8, weight: 'bold' },
+      haloSize: 2,
+      font: { family: 'Arial', size: 10, weight: 'bold' },
     },
-    // Route numbers only once you are close enough to read the trail you are on (about zoom 12+).
+    // Names and numbers once you are close enough to read the trail you are on (about zoom 12+).
     minScale: 150000,
   },
 ];
 
+type UniqueRenderer = {
+  type: 'uniqueValue';
+  field1: string;
+  defaultSymbol: Renderer['symbol'];
+  uniqueValueInfos: { value: string; symbol: Renderer['symbol'] }[];
+};
+
 type DynamicLayer = {
   id: number;
   source: { type: 'mapLayer'; mapLayerId: number };
-  drawingInfo: { renderer: Renderer; showLabels?: boolean; labelingInfo?: ReturnType<typeof label> };
+  drawingInfo: { renderer: Renderer | UniqueRenderer; showLabels?: boolean; labelingInfo?: ReturnType<typeof label> };
 };
 
-/** A cased line: the casing is listed after the line because ArcGIS draws the first layer on top. */
-function cased(baseId: number, mapLayerId: number, color: number[], width: number, style?: string, labelField?: string): DynamicLayer[] {
-  const top: DynamicLayer = {
+/**
+ * A cased line: the casing is listed after the line because ArcGIS draws the first layer on top.
+ * `top` replaces the plain line renderer (BLM colors its closed routes from the same layer).
+ */
+function cased(
+  baseId: number, mapLayerId: number, color: number[], width: number,
+  { style, labelExpression, labelColor, top }: { style?: string; labelExpression?: string; labelColor?: number[]; top?: UniqueRenderer } = {},
+): DynamicLayer[] {
+  const line1: DynamicLayer = {
     id: baseId,
     source: { type: 'mapLayer', mapLayerId },
-    drawingInfo: { renderer: line(color, width, style) },
+    drawingInfo: { renderer: top ?? line(color, width, style) },
   };
-  if (labelField) {
-    top.drawingInfo.showLabels = true;
-    top.drawingInfo.labelingInfo = label(labelField);
+  if (labelExpression) {
+    line1.drawingInfo.showLabels = true;
+    line1.drawingInfo.labelingInfo = label(labelExpression, labelColor);
   }
   return [
-    top,
-    { id: baseId + 1, source: { type: 'mapLayer', mapLayerId }, drawingInfo: { renderer: line(INK.casing, width + 1.8) } },
+    line1,
+    { id: baseId + 1, source: { type: 'mapLayer', mapLayerId }, drawingInfo: { renderer: line(INK.casing, width + 2.6) } },
   ];
 }
+
+const TRAIL_W = 2.6;
+const ROAD_W = 2.2;
+const CLOSED_W = 2.2;
 
 export type TrailSource = {
   id: TrailSourceId;
@@ -91,8 +125,11 @@ export const TRAIL_SOURCES: Record<TrailSourceId, TrailSource> = {
     attribution: 'USDA Forest Service MVUM',
     service: FS_MVUM,
     identifyLayers: [2, 1],
-    // Layer 2 is MVUM trails, layer 1 MVUM roads. Trails sit above roads.
-    dynamicLayers: [...cased(201, 2, INK.trail, 1.8, 'esriSLSDash', 'id'), ...cased(101, 1, INK.road, 1.6, undefined, 'id')],
+    // Layer 2 is MVUM trails, layer 1 MVUM roads. Trails sit above roads. Labels read "Name 123".
+    dynamicLayers: [
+      ...cased(201, 2, INK.trail, TRAIL_W, { style: 'esriSLSDash', labelExpression: '[name] CONCAT " " CONCAT [id]' }),
+      ...cased(101, 1, INK.road, ROAD_W, { labelExpression: '[name] CONCAT " " CONCAT [id]' }),
+    ],
   },
   blm: {
     id: 'blm',
@@ -100,11 +137,29 @@ export const TRAIL_SOURCES: Record<TrailSourceId, TrailSource> = {
     attribution: 'Bureau of Land Management',
     service: BLM_ROUTES,
     identifyLayers: [0],
-    dynamicLayers: cased(301, 0, INK.road, 1.6, undefined, 'ROUTE_PRMRY_NM'),
+    // Routes BLM's travel plan closes to off-highway vehicles get the closed style.
+    dynamicLayers: cased(301, 0, INK.road, ROAD_W, {
+      labelExpression: '[ROUTE_PRMRY_NM]',
+      top: {
+        type: 'uniqueValue',
+        field1: 'PLAN_OHV_ROUTE_DSGNTN',
+        defaultSymbol: line(INK.road, ROAD_W).symbol,
+        uniqueValueInfos: [{ value: 'Closed', symbol: line(INK.closed, CLOSED_W, 'esriSLSDash').symbol }],
+      },
+    }),
+  },
+  fsclosed: {
+    id: 'fsclosed',
+    name: 'Closed Forest Service roads',
+    attribution: 'USDA Forest Service roads',
+    service: FS_ROADS,
+    identifyLayers: [1],
+    dynamicLayers: cased(401, 1, INK.closed, CLOSED_W, { style: 'esriSLSDash', labelExpression: '"CLOSED"', labelColor: INK.closedLabel }),
   },
 };
 
-export const TRAIL_SOURCE_IDS: TrailSourceId[] = ['mvum', 'blm'];
+/** Closed roads first, so an open trail drawn over the same line wins. */
+export const TRAIL_SOURCE_IDS: TrailSourceId[] = ['fsclosed', 'mvum', 'blm'];
 export const TOPO_ATTRIBUTION = 'USGS The National Map';
 
 /**
@@ -275,7 +330,20 @@ export function distanceToLineM(p: LatLng, geometry: GeoJsonLine['geometry']): n
   return best;
 }
 
-export type VehicleAccess = { vehicle: string; dates: string | null };
+export type VehicleAccess = {
+  vehicle: string;
+  dates: string | null;
+  /** Its season is over (or not started) on the day looked up. */
+  closedNow?: boolean;
+};
+
+/** A closure the agency or the map's mappers recorded. Shown in red on the trail card. */
+export type Closure = {
+  /** "Closed for the Season", "Closed to Motor Vehicles". */
+  label: string;
+  /** One plain sentence: who says so, and when it opens if the data says. */
+  detail: string;
+};
 
 export type TrailInfo = {
   /** osm: OpenStreetMap tracks (core/osm-trails), looked up on the phone. */
@@ -291,6 +359,8 @@ export type TrailInfo = {
   miles: number | null;
   surface: string | null;
   attribution: string;
+  /** Closed today, per the source. Null when the source shows it open or doesn't say. */
+  closure: Closure | null;
 };
 
 /** MVUM vehicle columns in the order riders think about them, with plain names. */
@@ -330,11 +400,79 @@ function titleCase(s: string): string {
     .join(' ');
 }
 
-export function parseMvum(props: Record<string, unknown>, kind: 'trail' | 'road'): TrailInfo {
-  const allowed: VehicleAccess[] = [];
-  for (const v of MVUM_VEHICLES) {
-    if (str(props[v.field])?.toLowerCase() === 'open') allowed.push({ vehicle: v.label, dates: str(props[v.dates]) });
+
+// ---------------------------------------------------------------------------------------------
+// Seasonal closures. MVUM lists open dates per vehicle as "MM/DD-MM/DD", sometimes several ranges
+// ("01/01-03/31,05/16-12/31"), sometimes wrapping the new year ("12/01-03/14") and sometimes
+// typed loosely ("7/01-10/11", spaces for commas). These are the agency's published designations,
+// not live gate reports: a trail can still be closed for fire, snow or repairs.
+
+type DayRange = { from: number; to: number };
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Month and day as one comparable number, 101 to 1231. */
+const dayKey = (month: number, day: number) => month * 100 + day;
+
+export function parseDateRanges(text: string | null | undefined): DayRange[] {
+  if (!text) return [];
+  const out: DayRange[] = [];
+  for (const m of text.matchAll(/(\d{1,2})\/(\d{1,2})\s*-\s*(\d{1,2})\/(\d{1,2})/g)) {
+    const [fm, fd, tm, td] = m.slice(1, 5).map(Number);
+    if (fm < 1 || fm > 12 || tm < 1 || tm > 12 || fd < 1 || fd > 31 || td < 1 || td > 31) continue;
+    out.push({ from: dayKey(fm, fd), to: dayKey(tm, td) });
   }
+  return out;
+}
+
+const inRange = (k: number, r: DayRange) => (r.from <= r.to ? k >= r.from && k <= r.to : k >= r.from || k <= r.to);
+
+/** True when `on` falls inside one of the ranges. No readable ranges means open all year. */
+export function openOnDay(ranges: DayRange[], on: Date): boolean {
+  if (!ranges.length) return true;
+  const k = dayKey(on.getMonth() + 1, on.getDate());
+  return ranges.some((r) => inRange(k, r));
+}
+
+/** The next day one of the ranges starts, as "May 1". */
+export function nextOpening(ranges: DayRange[], on: Date): string | null {
+  if (!ranges.length) return null;
+  const k = dayKey(on.getMonth() + 1, on.getDate());
+  const starts = ranges.map((r) => r.from).sort((a, b) => a - b);
+  const next = starts.find((s) => s > k) ?? starts[0];
+  return `${MONTHS[Math.floor(next / 100) - 1]} ${next % 100}`;
+}
+
+/**
+ * Whether a seasonal MVUM route is closed on `on`: closed when every vehicle the agency opens it to
+ * is outside its dates. Each vehicle's row is marked closedNow too, for the card.
+ */
+export function mvumSeason(props: Record<string, unknown>, on: Date): { allowed: VehicleAccess[]; closure: Closure | null } {
+  const allowed: VehicleAccess[] = [];
+  const seasonal = str(props.seasonal)?.toLowerCase() === 'seasonal';
+  let openToday = false;
+  const all: DayRange[] = [];
+  for (const v of MVUM_VEHICLES) {
+    if (str(props[v.field])?.toLowerCase() !== 'open') continue;
+    const dates = str(props[v.dates]);
+    const ranges = seasonal ? parseDateRanges(dates) : [];
+    const open = openOnDay(ranges, on);
+    openToday ||= open;
+    all.push(...ranges);
+    allowed.push({ vehicle: v.label, dates, closedNow: seasonal && !open });
+  }
+  if (!seasonal || !allowed.length || openToday) return { allowed, closure: null };
+  const opens = nextOpening(all, on);
+  return {
+    allowed,
+    closure: {
+      label: 'Closed for the Season',
+      detail: `The Forest Service travel map closes it to every vehicle on this date${opens ? `. It opens again ${opens}` : ''}.`,
+    },
+  };
+}
+
+export function parseMvum(props: Record<string, unknown>, kind: 'trail' | 'road', on = new Date()): TrailInfo {
+  const { allowed, closure } = mvumSeason(props, on);
   const rawName = str(props.name);
   const name = rawName ? titleCase(rawName) : null;
   const id = str(props.id);
@@ -353,6 +491,27 @@ export function parseMvum(props: Record<string, unknown>, kind: 'trail' | 'road'
     miles: Number.isFinite(miles) && miles > 0 ? Math.round(miles * 10) / 10 : null,
     surface: tidy(props.surfacetype),
     attribution: TRAIL_SOURCES.mvum.attribution,
+    closure,
+  };
+}
+
+/** A Forest Service system road the agency lists as closed to motor vehicles (maintenance level 1 and similar). */
+export function parseFsClosed(props: Record<string, unknown>): TrailInfo {
+  const rawName = str(props.name);
+  const name = rawName ? titleCase(rawName) : null;
+  const id = str(props.id);
+  const miles = Number(props.gis_miles ?? props.seg_length);
+  return {
+    source: 'fsclosed',
+    kind: 'road',
+    title: name && id && !name.includes(id) ? `${name} (Road ${id})` : name ?? (id ? `Road ${id}` : 'Forest Service road'),
+    where: null,
+    allowed: [],
+    seasonal: false,
+    miles: Number.isFinite(miles) && miles > 0 ? Math.round(miles * 10) / 10 : null,
+    surface: tidy(props.surface_type),
+    attribution: TRAIL_SOURCES.fsclosed.attribution,
+    closure: { label: 'Closed to Motor Vehicles', detail: 'The Forest Service lists this road as closed to motorized use.' },
   };
 }
 
@@ -371,6 +530,7 @@ export function parseBlm(props: Record<string, unknown>): TrailInfo {
     miles: Number.isFinite(miles) && miles > 0 ? Math.round(miles * 10) / 10 : null,
     surface: tidy(props.OBSRVE_SRFCE_TYPE),
     attribution: ohv ? `${TRAIL_SOURCES.blm.attribution} (OHV: ${ohv})` : TRAIL_SOURCES.blm.attribution,
+    closure: ohv?.toLowerCase() === 'closed' ? { label: 'Closed to Off-Highway Vehicles', detail: "BLM's travel plan closes this route to off-highway vehicles." } : null,
   };
 }
 
@@ -386,9 +546,65 @@ export function nearestTrail(
       const d = distanceToLineM(p, f.geometry);
       if (d > maxM || (best && d >= best.d)) continue;
       const props = f.properties ?? {};
-      const info = r.source === 'mvum' ? parseMvum(props, r.layerId === 2 ? 'trail' : 'road') : parseBlm(props);
+      const info =
+        r.source === 'mvum' ? parseMvum(props, r.layerId === 2 ? 'trail' : 'road') : r.source === 'fsclosed' ? parseFsClosed(props) : parseBlm(props);
       best = { d, info };
     }
   }
   return best?.info ?? null;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Seasonal closures drawn on the map. The agency's tiles can't know today's date, so seasonal
+// routes in view are fetched as lines (simplified to about 5 m) and the ones closed today are
+// drawn over the trail layer in the closed style. Needs a signal; the trail card still says
+// "Closed for the Season" from the same dates whenever a lookup works.
+
+/** Closures show from about a county's width in; wider than this the lines are too small to tell apart. */
+export const SEASONAL_MIN_Z = 11;
+/** Fetched one zoom-11 square at a time (about 12 miles across), so panning reuses what's loaded. */
+export const SEASONAL_TILE_Z = 11;
+export const SEASONAL_MAX_TILES = 6;
+
+const SEASON_FIELDS = ['objectid', 'id', 'name', 'seasonal', ...MVUM_VEHICLES.flatMap((v) => [v.field, v.dates])];
+
+export function tileBoundsLatLng(t: Tile): Box {
+  const n = 2 ** t.z;
+  const lat = (y: number) => (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / n))) * 180) / Math.PI;
+  return { minLat: lat(t.y + 1), maxLat: lat(t.y), minLng: (t.x / n) * 360 - 180, maxLng: ((t.x + 1) / n) * 360 - 180 };
+}
+
+/** Seasonal MVUM roads (layer 1) or trails (layer 2) inside one square, as simplified GeoJSON. */
+export function seasonalQueryUrl(layerId: number, t: Tile): string {
+  const b = tileBoundsLatLng(t);
+  const env = [b.minLng, b.minLat, b.maxLng, b.maxLat].map((n) => n.toFixed(6)).join(',');
+  return (
+    `${FS_MVUM}/${layerId}/query?where=${encodeURIComponent("seasonal='seasonal'")}&geometry=${env}` +
+    `&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=${SEASON_FIELDS.join(',')}` +
+    `&returnGeometry=true&outSR=4326&maxAllowableOffset=0.00005&geometryPrecision=5&resultRecordCount=500&f=geojson`
+  );
+}
+
+export type ClosedLine = {
+  key: string;
+  title: string;
+  /** "May 1", when the dates say. */
+  opens: string | null;
+  parts: LatLng[][];
+};
+
+/** The seasonal routes in an answer that are closed on `on`. */
+export function closedSeasonalLines(features: GeoJsonLine[], layerId: number, on: Date): ClosedLine[] {
+  const out: ClosedLine[] = [];
+  for (const f of features) {
+    const props = f.properties ?? {};
+    if (!f.geometry || !mvumSeason(props, on).closure) continue;
+    const info = parseMvum(props, layerId === 2 ? 'trail' : 'road', on);
+    const lines = f.geometry.type === 'LineString' ? [f.geometry.coordinates] : f.geometry.coordinates;
+    const parts = lines.map((l) => l.map(([lng, lat]) => ({ lat, lng }))).filter((p) => p.length > 1);
+    if (!parts.length) continue;
+    const ranges = MVUM_VEHICLES.flatMap((v) => (str(props[v.field])?.toLowerCase() === 'open' ? parseDateRanges(str(props[v.dates])) : []));
+    out.push({ key: `mvum${layerId}-${str(props.objectid) ?? str(props.id) ?? out.length}`, title: info.title, opens: nextOpening(ranges, on), parts });
+  }
+  return out;
 }

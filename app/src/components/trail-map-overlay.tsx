@@ -7,19 +7,20 @@ import { Colors, font, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
-import { TOPO_ATTRIBUTION, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
+import { TOPO_ATTRIBUTION, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
 
 const SAND = '#ECCD91';
-const ROAD = '#E8ECF2';
+const WEB = Platform.OS === 'web';
 
 /**
  * Everything drawn over a map for the trails feature: the layers button and its panel (with the
  * agencies' credit), and the card for a tapped trail. Place it as a sibling after the MapView.
  * `top`, `cardTop` and `bottom` keep it clear of each screen's own header and panels; `ride` with
- * its `route` adds a one-tap download of the ride's map for riding with no signal.
+ * its `route` adds a one-tap download of the ride's map for riding with no signal (apps only: the
+ * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
   trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth,
@@ -37,7 +38,6 @@ export function TrailMapOverlay({
   cardWidth?: number;
 }) {
   const [open, setOpen] = useState(false);
-  if (Platform.OS === 'web') return null;
   const credit = [trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null, ...(trail.trails ? [...TRAIL_SOURCE_IDS.map((id) => TRAIL_SOURCES[id].attribution), OSM_ATTRIBUTION] : [])]
     .filter(Boolean)
     .join(', ');
@@ -110,7 +110,7 @@ function LayersPanel({
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.rowTitle}>Public Trails and Roads</Text>
-          <Text style={styles.rowSub}>{`Forest Service, BLM and OpenStreetMap, including off-road parks. ${lookupHint}`.trim()}</Text>
+          <Text style={styles.rowSub}>{`Forest Service, BLM and OpenStreetMap, including off-road parks, with names and closures. ${lookupHint}`.trim()}</Text>
         </View>
         <Switch
           value={trail.trails}
@@ -122,17 +122,25 @@ function LayersPanel({
       </Pressable>
 
       {trail.trails ? (
-        <View style={styles.legend}>
-          <LegendLine dashed color={SAND} label="Trail" />
-          <LegendLine color={ROAD} label="Road" />
+        <View style={{ gap: 6 }}>
+          <View style={styles.legend}>
+            <LegendLine dashed color={TRAIL_INK.trail} label="Trail" />
+            <LegendLine color={TRAIL_INK.road} label="Road" />
+            <LegendLine dashed closed color={TRAIL_INK.closed} label="Closed" />
+          </View>
+          <Text style={styles.fine}>
+            Closed means the Forest Service, BLM or OpenStreetMap lists it closed or private today, from their published travel plans and seasons. It is not a live gate report, so check posted signs and local orders.
+          </Text>
         </View>
       ) : null}
 
-      {ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} /> : null}
-      <Pressable accessibilityRole="link" onPress={() => router.push('/maps')} hitSlop={6} style={styles.link}>
-        <Text style={styles.linkText}>Offline Maps</Text>
-        <Text style={styles.linkText}>›</Text>
-      </Pressable>
+      {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} /> : null}
+      {!WEB ? (
+        <Pressable accessibilityRole="link" onPress={() => router.push('/maps')} hitSlop={6} style={styles.link}>
+          <Text style={styles.linkText}>Offline Maps</Text>
+          <Text style={styles.linkText}>›</Text>
+        </Pressable>
+      ) : null}
       {credit ? <Text style={styles.fine}>Map data: {credit}</Text> : null}
     </View>
   );
@@ -199,6 +207,12 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
           </Svg>
         </Pressable>
       </View>
+      {info.closure ? (
+        <View style={styles.closure} accessibilityRole="alert">
+          <Text style={styles.closureLabel}>{info.closure.label}</Text>
+          <Text style={styles.closureText}>{info.closure.detail}</Text>
+        </View>
+      ) : null}
       <Text style={styles.facts}>{facts.join('   ')}</Text>
       {info.allowed.length ? (
         <View style={styles.allowed}>
@@ -206,7 +220,9 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
           {info.allowed.slice(0, 6).map((a) => (
             <View key={a.vehicle} style={styles.allowedRow}>
               <Text style={styles.allowedName}>{a.vehicle}</Text>
-              {a.dates ? <Text style={styles.allowedDates}>{a.dates}</Text> : null}
+              <Text style={[styles.allowedDates, a.closedNow && styles.closedNow]}>
+                {[a.closedNow ? 'Closed Now' : null, a.dates].filter(Boolean).join('  ')}
+              </Text>
             </View>
           ))}
         </View>
@@ -220,12 +236,12 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
   );
 }
 
-function LegendLine({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) {
+function LegendLine({ color, label, dashed, closed }: { color: string; label: string; dashed?: boolean; closed?: boolean }) {
   return (
     <View style={styles.legendItem}>
-      <Svg width={28} height={8}>
-        <Path d="M2 4H26" stroke={Colors.background} strokeWidth={6} strokeLinecap="round" />
-        <Path d="M2 4H26" stroke={color} strokeWidth={3} strokeDasharray={dashed ? '5 4' : undefined} />
+      <Svg width={28} height={10}>
+        <Path d="M2 5H26" stroke={Colors.background} strokeWidth={7} strokeLinecap="round" />
+        <Path d="M2 5H26" stroke={color} strokeWidth={3.2} strokeDasharray={closed ? '3.5 3.5' : dashed ? '6 3.5' : undefined} />
       </Svg>
       <Text style={styles.legendText}>{label}</Text>
     </View>
@@ -258,7 +274,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowTitle: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   rowSub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
-  legend: { flexDirection: 'row', gap: 18 },
+  legend: { flexDirection: 'row', gap: 16 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   save: { minHeight: 52, borderRadius: Radius.control, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 8, gap: 1 },
@@ -279,6 +295,10 @@ const styles = StyleSheet.create({
   looking: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 8, borderRadius: Radius.pill, ...glass },
   lookingText: { color: Colors.text, fontFamily: font(600), fontSize: 13 },
   card: { borderRadius: Radius.card, padding: 14, gap: 8, ...glass, borderColor: 'rgba(236,205,145,0.45)' },
+  closure: { borderRadius: Radius.control, padding: 10, gap: 2, backgroundColor: 'rgba(255,69,58,0.14)', borderWidth: 1, borderColor: TRAIL_INK.closed },
+  closureLabel: { color: TRAIL_INK.closed, fontFamily: font(800), fontSize: 15 },
+  closureText: { color: Colors.text, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
+  closedNow: { color: TRAIL_INK.closed, fontFamily: font(700) },
   cardHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   cardTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24 },
   close: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundElement },

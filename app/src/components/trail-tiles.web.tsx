@@ -1,7 +1,7 @@
-import type { OsmTrail } from '@/core/osm-trails';
 import type { BaseMap } from '@/core/trails';
+import type { TrailMap } from '@/hooks/use-trail-map';
 
-/** The web build has no native map, so there are no tiles to draw. */
-export function TrailTiles(_props: { base: BaseMap; trails: boolean; offline?: boolean; osm?: OsmTrail[] }) {
+/** The web build has no native map; Leaflet draws the same layers (lib/web-map.ts trailLayers). */
+export function TrailTiles(_props: { trail: TrailMap; base?: BaseMap }) {
   return null;
 }

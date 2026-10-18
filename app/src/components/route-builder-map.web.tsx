@@ -6,12 +6,13 @@ import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { drawOsmTracks, drawRoute, esc, frame, ll, satelliteMap } from '@/lib/web-map';
+import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 
 /**
  * The route builder's map on the web: satellite imagery, click to add the next point, drag a
- * numbered point to move it. An imported track is shown as is (no points to drag). OpenStreetMap
- * trails are drawn once the map is in close (zoom 13), the same sand dash as on the phone.
+ * numbered point to move it. An imported track is shown as is (no points to drag). The trail layers
+ * (lib/web-map.ts trailLayers) are the phone's: agency lines from zoom 9, OpenStreetMap tracks and
+ * their names from zoom 13, closures in red. While not drawing, a click shows the trail under it.
  */
 export function RouteBuilderMap({
   points, waypoints, center, editable, onAdd, onMove, padding, trail, pending = [], found, onCenter,
@@ -34,12 +35,12 @@ export function RouteBuilderMap({
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
-  const tracks = useRef<L.LayerGroup | null>(null);
+  const tracks = useRef<ReturnType<typeof trailLayers> | null>(null);
   const fittedTo = useRef<LatLng[] | null>(null);
-  const cb = useRef({ onAdd, onMove, editable, onRegion: trail?.onRegion, onCenter });
+  const cb = useRef({ onAdd, onMove, editable, onRegion: trail?.onRegion, onCenter, identifyAt: trail?.identifyAt });
   useEffect(() => {
-    cb.current = { onAdd, onMove, editable, onRegion: trail?.onRegion, onCenter };
-  }, [onAdd, onMove, editable, trail?.onRegion, onCenter]);
+    cb.current = { onAdd, onMove, editable, onRegion: trail?.onRegion, onCenter, identifyAt: trail?.identifyAt };
+  }, [onAdd, onMove, editable, trail?.onRegion, onCenter, trail?.identifyAt]);
   const marker = useRef<L.Marker | null>(null);
   // About a fingertip (24 screen pixels) at the map's zoom.
   const snapM = (m: L.Map) => snapRadiusM((156_543.03 * Math.cos((m.getCenter().lat * Math.PI) / 180)) / 2 ** m.getZoom());
@@ -49,17 +50,17 @@ export function RouteBuilderMap({
   useEffect(() => {
     const m = satelliteMap(el.current!, { doubleClickZoom: false });
     L.control.zoom({ position: 'topright' }).addTo(m);
-    tracks.current = L.layerGroup().addTo(m);
+    tracks.current = trailLayers(m);
     layer.current = L.layerGroup().addTo(m);
     m.on('click', (e: L.LeafletMouseEvent) => {
       if (cb.current.editable) cb.current.onAdd({ lat: e.latlng.lat, lng: e.latlng.lng }, snapM(m));
+      else cb.current.identifyAt?.(e.latlng.lat, e.latlng.lng);
     });
     // Tell the trail layer what's on screen, so it fetches the squares to draw.
     const report = () => {
-      const b = m.getBounds();
-      const c = b.getCenter();
+      const c = m.getCenter();
       cb.current.onCenter?.({ lat: c.lat, lng: c.lng });
-      cb.current.onRegion?.({ latitude: c.lat, longitude: c.lng, latitudeDelta: b.getNorth() - b.getSouth(), longitudeDelta: b.getEast() - b.getWest() }, m.getZoom());
+      reportRegion(m, cb.current.onRegion);
     };
     m.on('moveend', report);
     const start = waypoints.length ? waypoints : points;
@@ -76,16 +77,10 @@ export function RouteBuilderMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const osm = trail?.osmLines;
+  const { base, trails, osmLines, closedLines, labels } = trail ?? { base: 'satellite' as const, trails: false, osmLines: [], closedLines: [], labels: [] };
   useEffect(() => {
-    const g = tracks.current;
-    if (!g || !map.current) return;
-    g.clearLayers();
-    if (osm?.length) drawOsmTracks(g, osm);
-    const credit = 'Trails © OpenStreetMap contributors, © OpenMapTiles';
-    if (osm?.length) map.current.attributionControl.addAttribution(credit);
-    else map.current.attributionControl.removeAttribution(credit);
-  }, [osm]);
+    tracks.current?.update({ base, trails, osmLines, closedLines, labels });
+  }, [base, trails, osmLines, closedLines, labels]);
 
   // Go to a searched place: the whole area when it has one, else close in on the spot.
   useEffect(() => {
