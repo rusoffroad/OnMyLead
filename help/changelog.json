@@ -4,12 +4,16 @@
     "slugs": [
       "waypoints-and-planned-stops",
       "place-search",
-      "create-a-ride-on-the-website"
+      "create-a-ride-on-the-website",
+      "route-builder",
+      "import-gpx",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
     ],
     "kind": "update",
     "by": "pr",
     "ref": "web-place-search",
-    "why": "Chris couldn't find a way to search for a location while building a ride on the website. The waypoints map now has the same Search as the route builder (parks, trailheads, towns, addresses), and the website guide points to the search boxes."
+    "why": "Chris couldn't find a way to search for a location while building a ride on the website. The waypoints map now has the same Search as the route builder (parks, trailheads, towns, addresses), and the website guide points to the search boxes. The route builder's first hint now mentions Search; the other guides only had their date bumped (no visible change for them)."
   },
   {
     "date": "2026-10-15",
