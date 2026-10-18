@@ -4,7 +4,7 @@ summary: Pick public or private, set the day, time and meeting point, choose a m
 category: rides
 order: 10
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/ride/new.tsx
   - app/src/app/(tabs)/index.tsx

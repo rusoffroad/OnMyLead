@@ -41,7 +41,7 @@ web build and the Android emulator.
 | F07 | Create a ride (app and website) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ create-a-ride | iOS 1.0 | Tablet: form capped at 640 wide; two-column form not built (issue #101). 1.0.1: ride day from a month calendar, today up to a year out (core/calendar.ts, unit tested; `ride-date-picker.tsx`, pure JS, same on every device); web-checked at phone and tablet sizes, no device check yet. Website gets it on its next deploy |
 | F08 | Free ride limit (1 a month) | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ free-vs-pro | iOS 1.0 | Enforced in the database |
 | F09 | Edit ride name, time, meeting point | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ➖ | ⬜ | | Not built anywhere (noted, not started) |
-| F10 | Cancel, delete, end ride | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ edit-cancel-or-delete-a-ride | iOS 1.0 | |
+| F10 | Cancel, delete, end ride | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ edit-cancel-or-delete-a-ride | iOS 1.0 | Website: Rides rows have a Delete / Leave / Decline button instead of swipe (`swipe-row.web.tsx`), web-checked at phone and desktop widths |
 | F11 | Organizer controls: approvals, hand-off, leaders, tail gunner | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ organizer-controls | iOS 1.0 | Approval fix needs migration 20261025000000 applied |
 | F12 | Ride page, Ride Day weather, fuel check | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-day-and-weather | iOS 1.0 | Tablet: ride and details on the left, Map / Riders / Chat beside them; web-checked, no device check yet |
 | F13 | Join: code, link, QR, waitlist, check-in | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ join-a-ride | iOS 1.0 | |

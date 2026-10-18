@@ -2,6 +2,25 @@
   {
     "date": "2026-10-18",
     "slugs": [
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "getting-started",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "web-delete-ride",
+    "why": "On onmylead.com the Rides list relied on swiping, which doesn't work with a mouse. Each ride row on the website now has a Delete, Leave or Decline button, and the article says where it is. Articles that describe the Rides tab were checked; on phones and tablets nothing changed."
+  },
+  {
+    "date": "2026-10-18",
+    "slugs": [
       "waypoints-and-planned-stops",
       "place-search",
       "create-a-ride-on-the-website",
