@@ -9,7 +9,7 @@ import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { Showcase } from '@/components/showcase';
-import { SwipeRow } from '@/components/swipe-row';
+import { ROW_ACTION_HINT, SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
@@ -235,7 +235,7 @@ export default function Home() {
 
       {going.length ? (
         <>
-          <Section title="Your Rides" right={<ThemedText type="small" themeColor="textSecondary">Swipe Left to Delete or Leave</ThemedText>} />
+          <Section title="Your Rides" right={ROW_ACTION_HINT ? <ThemedText type="small" themeColor="textSecondary">{ROW_ACTION_HINT}</ThemedText> : undefined} />
           <RowGroup>
             {going.map((m) => (
               swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? roleLabel(m.role) : m.status.replace('_', ' ')} />)

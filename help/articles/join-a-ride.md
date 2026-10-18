@@ -4,7 +4,7 @@ summary: Join with an invite link, a QR code or a code, or from Find. Learn what
 category: joining
 order: 20
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/r/[code].tsx
   - app/src/app/(tabs)/index.tsx
@@ -82,7 +82,7 @@ If the ride is full, you go on the waitlist. If the organizer approves riders, y
 1. Open the ride page and tap **Riders**.
 2. Tap **Leave Ride**.
 
-Or, on the **Rides** tab, swipe left on the ride and tap **Leave**. Your spot opens up for someone else. You can rejoin with the ride's link or code if there's room. If the ride is live, leaving also stops sharing your location with the group.
+Or, on the **Rides** tab, swipe left on the ride and tap **Leave** (on onmylead.com, click **Leave** at the end of the ride's row). Your spot opens up for someone else. You can rejoin with the ride's link or code if there's room. If the ride is live, leaving also stops sharing your location with the group.
 
 :::note
 You can't join a ride that has ended or been cancelled.
