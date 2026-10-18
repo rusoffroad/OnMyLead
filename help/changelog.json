@@ -1,5 +1,15 @@
 [
   {
+    "date": "2026-10-18",
+    "slugs": [
+      "edit-cancel-or-delete-a-ride"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "web-delete-ride",
+    "why": "On onmylead.com the Rides list relied on swiping, which doesn't work with a mouse. Each ride row on the website now has a Delete, Leave or Decline button, and the article says where it is."
+  },
+  {
     "date": "2026-10-15",
     "slugs": [
       "contact-support"

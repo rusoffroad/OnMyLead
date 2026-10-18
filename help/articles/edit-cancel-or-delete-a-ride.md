@@ -4,18 +4,20 @@ summary: Change your ride's route and stops, call a ride off so riders hear abou
 category: rides
 order: 30
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/r/[code].tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/core/cancel.ts
   - app/src/core/row-swipe.ts
+  - app/src/components/swipe-row.tsx
+  - app/src/components/swipe-row.web.tsx
   - app/src/lib/api.ts
   - app/src/app/ride/new.tsx
   - supabase/migrations/20261017000000_cancel_delete_ride.sql
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [organizer-controls, route-builder, waypoints-and-planned-stops, ride-summary-and-ride-again, create-a-ride]
-keywords: [change ride, edit ride, cancel ride, call off, delete ride, remove ride, reschedule, change time, change date, weather cancel, tablet]
+keywords: [change ride, edit ride, website, onmylead.com, cancel ride, call off, delete ride, remove ride, reschedule, change time, change date, weather cancel, tablet]
 ---
 
 Plans change. As the organizer you can update the route and stops, cancel the ride so everyone knows it's off, or delete it entirely.
@@ -57,6 +59,8 @@ If the ride hadn't ended yet, everyone on it gets a notification and an email sa
 
 :::tip
 You can also delete a ride from the **Rides** tab. Swipe left on the ride under **Your Rides** or **Past Rides** and tap **Delete**.
+
+On onmylead.com there's nothing to swipe: each ride on the **Rides** page has its own button at the end of the row. Click the trash can (**Delete**) on a ride you organize, then confirm. On a ride someone else organizes the button is **Leave** (or **Decline** for an invite).
 :::
 
 ## Cancel or Delete: Which One?

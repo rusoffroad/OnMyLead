@@ -7,6 +7,9 @@ import { ACTION_WIDTH, isHorizontalSwipe, ROW_ACTION_LABEL, rowSwipeResult, type
 import { useTheme } from '@/hooks/use-theme';
 import { Icon } from './icon';
 
+/** The line over a list of swipe rows saying what a swipe does. */
+export const ROW_ACTION_HINT: string | null = 'Swipe Left to Delete or Leave';
+
 /**
  * A list row you can swipe left to show one action behind it: Delete (red) for your own ride,
  * Leave or Decline (blue) for anyone else's. A long swipe runs it straight away. Either way
