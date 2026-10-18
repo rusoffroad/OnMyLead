@@ -154,7 +154,7 @@ export default function RouteBuilder() {
   const hint = imported
     ? `Imported${imported.name ? ` “${imported.name}”` : ' from GPX'}. Clear it to draw your own.`
     : taps.length === 0
-      ? `${web ? 'Click' : 'Tap'} the map where the ride starts.`
+      ? `${web ? 'Click' : 'Tap'} the map where the ride starts, or Search for the trailhead.`
       : draft.lastNoTrail
         ? 'No mapped trail joins those points, so that part is a straight line. Add a point on the trail or zoom in.'
         : taps.length === 1

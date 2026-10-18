@@ -180,7 +180,7 @@ export function Showcase() {
               your phone or tablet the moment you save.
             </p>
             <ul className="ticks">
-              <li>Search a trailhead, park or area to jump the map there</li>
+              <li>Search a park, trailhead or town by name to jump the map there, for the route or the stops</li>
               <li>Follow Trails, or Straight Line where nothing is mapped</li>
               <li>Drag a point to move it, or press Ctrl+Z to undo</li>
               <li>Fold the route tools away to see more map</li>

@@ -63,7 +63,7 @@ web build and the Android emulator.
 | F29 | Waypoints, planned stops | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ waypoints-and-planned-stops | iOS 1.0 | Tablet: waypoint panel beside the map; web-checked |
 | F30 | Directions hand-off | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ directions | iOS 1.0 | Android: Google Maps only |
 | F31 | Offline maps | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ offline-maps | iOS 1.0 | |
-| F32 | Place search | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ place-search | iOS 1.0 | |
+| F32 | Place search | ✅ | 🟡 | 🟡 | 🟡 | ➖ | ➖ | ✅ place-search | iOS 1.0 | Create a Ride, Find, route builder in 1.0. Waypoints map Search added for 1.0.1 (2026-10-18): web-checked at phone, tablet and desktop sizes; iPhone check due with the 1.0.1 build |
 | F33 | Riding groups, group chat, follow leaders | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ riding-groups | iOS 1.0 | Tablet: list + chat side by side not built yet (issue #101) |
 | F34 | Report and block | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ report-and-block | iOS 1.0 | |
 | F35 | Garage, fuel range | ✅ | ⬜ | 🟡 | ⬜ | ✅ | ➖ | ✅ garage | iOS 1.0 | Tablet: forms capped at 640 wide; list + detail not built (issue #101) |
