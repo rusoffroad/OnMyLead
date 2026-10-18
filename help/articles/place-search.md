@@ -4,10 +4,11 @@ summary: Find a trailhead, off-road park, town, street address or coordinates fo
 category: routes-maps
 order: 70
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/components/place-search.tsx
   - app/src/components/map-search.tsx
+  - app/src/app/ride/[id]/waypoints.tsx
   - app/src/hooks/use-place-search.ts
   - app/src/core/places.ts
   - app/src/lib/places.ts
@@ -28,6 +29,10 @@ Wherever OnMyLead asks for a place, you can type its name instead of hunting on 
 - **Find a Ride**: **Search Near a Place** shows rides near the place you pick instead of near you. Tap **Back to Near Me** (or **Clear**) to go back. See [Find a Ride](/help/find-a-ride).
 - **Route builder**: **Search** moves the map to a place before you draw. See [Draw a Route](/help/route-builder).
 
+:::release 1.0.1
+- **Waypoints map**: **Search** moves the map to a place so you can drop a waypoint or planned stop there. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
+:::
+
 ## Search
 
 1. Tap the search box and type at least three letters.
@@ -38,6 +43,10 @@ What happens next depends on where you searched:
 
 - For a meeting point, the coordinates and place name fill in for you. You can still edit the **Place Name**.
 - In the route builder, the map moves to the place and marks it. Nothing is added to your route.
+
+:::release 1.0.1
+- On the waypoints map, the map moves to the place and marks it. Press and hold (or click) the map there to drop a waypoint.
+:::
 
 If nothing turns up, try the full name, a street address with the town, or a nearby town.
 

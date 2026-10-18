@@ -4,7 +4,7 @@ summary: Tap the map to lay down your ride's route. It snaps to trails for you, 
 category: routes-maps
 order: 10
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/app/r/[code].tsx
@@ -52,7 +52,7 @@ A Freeride that gets a saved route becomes a mapped ride.
 
 The map opens at the ride's meeting point.
 
-1. Tap the map where the ride starts. That's point 1, shown in green.
+1. Tap the map where the ride starts. That's point 1, shown in green. To get there fast, tap **Search** at the top and type a trailhead, park or town.
 2. Tap further along the trail. The route follows the trail between your two taps.
 3. Keep tapping along the way. Each new point is numbered, and the last one is shown in white.
 4. Watch the miles add up at the top of the panel at the bottom of the screen.

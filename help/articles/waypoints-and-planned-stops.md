@@ -4,7 +4,7 @@ summary: Mark camp, fuel, water or a hazard on a ride's map, and let the leader 
 category: routes-maps
 order: 30
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/ride/[id]/waypoints.tsx
   - app/src/app/r/[code].tsx
@@ -13,13 +13,14 @@ sources:
   - app/src/components/waypoint-row.tsx
   - app/src/components/waypoint-map.tsx
   - app/src/components/waypoint-map.web.tsx
+  - app/src/components/map-search.tsx
   - app/src/hooks/use-ride-waypoints.ts
   - app/src/core/waypoints.ts
   - app/src/lib/waypoints.ts
   - supabase/migrations/20261018500000_ride_waypoints.sql
   - supabase/migrations/20261019200000_planned_stops.sql
 related: [route-builder, leader-sweep-and-tail-gunner, ride-mode, directions, privacy]
-keywords: [waypoint, pin, marker, camp, fuel stop, lunch stop, hazard, viewpoint, parking, planned stop, stops]
+keywords: [search, find a place, waypoint, pin, marker, camp, fuel stop, lunch stop, hazard, viewpoint, parking, planned stop, stops]
 screenshots:
   - file: waypoints.webp
     shows: app/src/app/ride/[id]/waypoints.tsx
@@ -45,11 +46,15 @@ You need to have joined the ride to add or see its waypoints.
 
 1. Open the ride and tap the **Map** tab.
 2. Under **Waypoints**, tap **Add a Waypoint** (or **Open Waypoints Map** if there are some already).
-3. Press and hold the map where you want it. To mark where you're standing, tap **Add at My Location** instead.
+3. Press and hold the map where you want it (click it on onmylead.com). To mark where you're standing, tap **Add at My Location** instead.
 4. Pick what it is: **Spot**, **Camp**, **Fuel**, **Water**, **Viewpoint**, **Hazard** or **Parking**. The name fills in for you.
 5. Change the **Name** if you like, and add a **Note (Optional)**.
 6. If you're the leader or an organizer, choose who it's for under **What It Is** (see below).
 7. Tap **Save Waypoint**.
+
+:::release 1.0.1
+To find a spot by name, tap **Search** at the top of the waypoints map and type a park, trailhead, town or address, such as "Hidden Falls Adventure Park". Pick a result and the map moves there and labels it. Then press and hold (or click) the map at that spot to drop the waypoint. Search only moves the map; nothing is added until you drop it. See [Search for a Place](/help/place-search).
+:::
 
 In Ride Mode, tap **Add Waypoint** to drop one where you are, or press and hold the map. See [Ride Mode](/help/ride-mode).
 

@@ -1,8 +1,10 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Icon } from '@/components/icon';
+import { MapSearch } from '@/components/map-search';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button, ErrorText } from '@/components/ui';
@@ -12,6 +14,7 @@ import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-s
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { rideLeaderIds } from '@/core/chat';
 import type { LatLng } from '@/core/geo';
+import type { Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
 import { canShareWaypoints, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useLayout } from '@/hooks/use-layout';
@@ -52,6 +55,10 @@ export default function RideWaypoints() {
   const [target, setTarget] = useState<WaypointSheetTarget>(null);
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Where the map was looking when the search opened: nearby places rank first.
+  const [searching, setSearching] = useState<LatLng | null | false>(false);
+  const [found, setFound] = useState<Place | null>(null);
+  const looking = useRef<LatLng | null>(null);
 
   useEffect(() => {
     Promise.all([getRide(id), getMembers(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])
@@ -97,17 +104,20 @@ export default function RideWaypoints() {
 
   const navigateTo = (lat: number, lng: number, title = 'This Waypoint') => openDirections({ title, to: { lat, lng } });
 
+  const drop = web ? 'Click' : 'Press and hold';
   const hint = !mine
     ? 'Join the ride to add and see its waypoints.'
     : !wp.switchedOn
       ? WAYPOINTS_NOT_SWITCHED_ON
       : addingStop && !wp.stopsSwitchedOn
         ? PLANNED_STOPS_NOT_SWITCHED_ON
+      : found
+        ? `${drop} the map at ${found.name} to drop ${addingStop ? 'the stop' : 'a waypoint'} there.`
       : addingStop
-        ? `${web ? 'Click' : 'Press and hold'} the map where the group will stop. Stops are numbered in the order you add them.`
+        ? `${drop} the map where the group will stop, or Search for the place. Stops are numbered in the order you add them.`
       : canShare
-        ? `${web ? 'Click' : 'Press and hold'} the map to drop a waypoint. You choose whether the whole ride sees it.`
-        : `${web ? 'Click' : 'Press and hold'} the map to drop a waypoint. Yours are only for you.`;
+        ? `${drop} the map to drop a waypoint, or Search for a place. You choose whether the whole ride sees it.`
+        : `${drop} the map to drop a waypoint, or Search for a place. Yours are only for you.`;
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -119,18 +129,32 @@ export default function RideWaypoints() {
           trail={trail}
           onPressWaypoint={(w) => setTarget({ type: 'view', waypoint: w })}
           onLongPressMap={mine ? openNew : undefined}
+          found={found}
+          onCenter={(c) => (looking.current = c)}
           padding={wide ? [90, 70, 40, PANEL_W + 60] : undefined}
         />
       ) : null}
       {loaded ? <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route?.points} ride={ride} /> : null}
 
       <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]}>
-        <View style={styles.topRow}>
-          <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={{ flexShrink: 1 }}>
-            <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
-          </Pressable>
-          <Text style={[styles.topText, { color: Colors.textSecondary }]}>Waypoints</Text>
-        </View>
+        {searching !== false ? (
+          <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
+        ) : (
+          <View style={styles.topRow}>
+            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={{ flexShrink: 1 }}>
+              <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setSearching(looking.current ?? center)}
+              accessibilityRole="button"
+              accessibilityLabel="Search the Map for a Place"
+              hitSlop={8}
+              style={({ pressed }) => [styles.search, pressed && { opacity: 0.8 }]}>
+              <Icon name="search" size={17} color={Colors.text} />
+              <Text style={styles.searchText}>Search</Text>
+            </Pressable>
+          </View>
+        )}
       </SafeAreaView>
 
       <Animated.View {...fold.panHandlers} style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
@@ -171,7 +195,10 @@ export default function RideWaypoints() {
         startAsStop={addingStop}
         ownerName={nameOf}
         onNavigate={navigateTo}
-        onChanged={wp.apply}
+        onChanged={(w) => {
+          wp.apply(w);
+          if (w.saved) setFound(null);
+        }}
         onClose={() => setTarget(null)}
       />
     </View>
@@ -198,6 +225,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10,
     backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48,
   },
+  search: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12,
+    borderRadius: Radius.pill, backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
+  },
+  searchText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   panel: {
     position: 'absolute', bottom: 0, left: 0, right: 0,

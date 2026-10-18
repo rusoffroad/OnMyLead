@@ -4,7 +4,7 @@ summary: Plan a ride on onmylead.com from your computer, drop the meeting point 
 category: rides
 order: 20
 release: web
-updated: 2026-10-15
+updated: 2026-10-18
 sources:
   - app/src/app/ride/new.tsx
   - app/src/components/meet-point-map.web.tsx
@@ -30,7 +30,7 @@ You can plan a ride on the big screen at onmylead.com. It's the same ride as one
 2. Sign in with your OnMyLead account if you aren't already. You go straight to Create a Ride after signing in.
 3. Pick **Public** or **Private** under **What Kind of Ride?**
 4. Fill in the **Ride Name**, the day under **When**, and the **Meet At** time. Click **Calendar** to pick any day from today up to a year out.
-5. Set the **Meeting Point**: click the satellite map to drop the pin, then drag the pin to fine-tune it. You can also search a place, use your location, or type coordinates, and the pin moves there.
+5. Set the **Meeting Point**: type a park, trailhead, town or address in **Search a Place or Address** (just above the map) and pick it, or click the satellite map to drop the pin, then drag the pin to fine-tune it. You can also use your location or type coordinates, and the pin moves there.
 6. Under **The Route**, pick **Mapped** or **Freeride**.
 7. Fill in anything else you want, then click **Create Public Ride** or **Create Private Ride**.
 
@@ -40,7 +40,13 @@ The rest of the form works the same as in the app. See [Create a Ride](/help/cre
 
 If you picked **Mapped**, the route builder opens after you create the ride. Click along the trail and the route follows it. Drawing a route is free. Importing a GPX file is a Pro feature. See [Build a Route](/help/route-builder) and [Free and Pro](/help/free-vs-pro).
 
+To find a trailhead or park by name while you draw, click **Search** at the top of the map and pick a result. The map jumps there.
+
 You can also add numbered planned stops for fuel, lunch or camp. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
+
+:::release 1.0.1
+The waypoints map has the same **Search**, so you can jump to a place before you click to drop a stop.
+:::
 
 ## Share It
 
