@@ -1,5 +1,18 @@
 [
   {
+    "date": "2026-10-20",
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "version-1-0-1",
+    "why": "App version goes to 1.0.1 (iPhone and iPad build 4, Android versionCode 4) to match the 1.0.1 beta builds. These articles list the app config as a source; nothing in them changes for riders."
+  },
+  {
     "date": "2026-10-18",
     "slugs": [
       "map-layers",
