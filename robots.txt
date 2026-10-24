@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /admin
+Disallow: /f/
+Disallow: /auth-callback
+Disallow: /reset-password
+Disallow: /help/search
+
+Sitemap: https://onmylead.com/sitemap.xml
