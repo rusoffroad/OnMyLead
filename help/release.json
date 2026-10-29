@@ -3,7 +3,7 @@
   "bundleId": "com.rusoffroad.onmylead.app",
   "appleId": "6822352321",
   "country": "us",
-  "live": null,
+  "live": "1.0",
   "prelaunch": {
     "version": "1.0",
     "notice": "OnMyLead 1.0 for iPhone, iPad and Android is with Apple and Google for store review. These guides describe that first release."
@@ -13,9 +13,10 @@
       "version": "1.0",
       "build": "3",
       "commit": "22c7a3f",
-      "status": "in_review",
+      "status": "live",
       "submitted": "2026-10-15",
-      "notes": "First release, now for iPhone and iPad: everything through PR #116. Replaced build 2 (ad388f4, submitted 2026-10-13) in review. The same code goes to Google Play for Android phones and tablets."
+      "notes": "First release, now for iPhone and iPad: everything through PR #116. Replaced build 2 (ad388f4, submitted 2026-10-13) in review. The same code goes to Google Play for Android phones and tablets.",
+      "released": "2026-10-28"
     }
   ],
   "unreleased": [

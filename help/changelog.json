@@ -1,5 +1,13 @@
 [
   {
+    "date": "2026-10-28",
+    "slugs": [],
+    "kind": "release",
+    "by": "audit",
+    "ref": "help-audit-2026-10-28",
+    "why": "Apple released OnMyLead 1.0 in the US App Store on 2026-10-28. release.json now marks 1.0 live, so the guides drop the 'waiting for review' notice."
+  },
+  {
     "date": "2026-10-20",
     "slugs": [
       "faq",
