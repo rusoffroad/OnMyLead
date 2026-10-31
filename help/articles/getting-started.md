@@ -4,7 +4,7 @@ summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make y
 category: getting-started
 order: 10
 release: "1.0"
-updated: 2026-10-20
+updated: 2026-10-31
 sources:
   - app/src/app/(tabs)/_layout.tsx
   - app/src/components/tab-bar.tsx

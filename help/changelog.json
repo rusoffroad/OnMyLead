@@ -2,6 +2,17 @@
   {
     "date": "2026-10-31",
     "slugs": [
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "release-notes-page",
+    "why": "These guides list the website home page as a source. Its footer only gains a Release Notes link; nothing they describe changes."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
       "faq"
     ],
     "kind": "add",
