@@ -4,7 +4,7 @@ summary: Send a read-only web link so family at home can see where you are, with
 category: safety-privacy
 order: 20
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-31
 sources:
   - app/src/app/share.tsx
   - app/src/app/f/[token].tsx
@@ -22,8 +22,15 @@ A family link is a web link you can text to someone at home. They open it in any
 1. Tap the **You** tab.
 2. Under **On the Trail**, tap **Share My Location**.
 3. Turn on **Family Link**.
+:::until 1.0.2
 4. Under **For How Long**, pick how long to share. If you pick **Until I Turn It Off (Max 24 Hours)**, tap **Share** to confirm.
 5. Your iPhone's share sheet opens with a message like "Follow my location until 5:30 PM" and the link. Pick Messages, or any app, and send it.
+:::
+
+:::release 1.0.2
+4. Under **For How Long**, pick how long to share, or tap **Pick an End Date** to choose a day and time. If you pick **Until I Turn It Off**, tap **Share** to confirm.
+5. Your phone's share sheet opens with a message like "Follow my location until 5:30 PM" (or just "Follow my location" when you picked **Until I Turn It Off**) and the link. Pick Messages, or any app, and send it.
+:::
 
 You can pick riders under **Who Can See You** at the same time, or send just the family link.
 
@@ -33,7 +40,11 @@ The link opens a simple page with:
 
 - Your ride name.
 - **Last update:** when your phone last sent its location.
-- **Sharing ends:** when the link stops working.
+- **Sharing ends:** when the link stops working, with the date for a share that runs past today.
+
+:::release 1.0.2
+- For a share set to **Until I Turn It Off**, **Sharing ends** says **When they turn it off**.
+:::
 - **Open in Maps:** opens your last location in Google Maps.
 
 The page checks for a new location every 30 seconds. If your phone hasn't sent a location yet, it says **No location received yet.**
@@ -48,7 +59,13 @@ The family link lasts exactly as long as the share it belongs to.
 
 1. Tap the **You** tab, then **Share My Location**.
 2. Find the card that says **Includes a family link**.
+:::until 1.0.2
 3. Tap **Add 1 Hour** to keep it going, or **Stop** to end it now.
+:::
+
+:::release 1.0.2
+3. Tap **Add 1 Hour** to keep it going, or **Stop Sharing** to end it now.
+:::
 
 Once the share ends, the link shows **No Longer Shared** and **This location link has ended.** Your location can't be seen from it again.
 

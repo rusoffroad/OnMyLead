@@ -292,7 +292,7 @@ export function Showcase() {
               <Feature title="Ride Summary and Ride Card">After the ride, see the miles and the group’s totals, then share a ride card.</Feature>
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
-              <Feature title="Your Location Is Never Public">Sharing is per ride or per person and always ends. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
+              <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for as long as you choose, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, or tap a rider, to report or block them. A blocked rider’s messages disappear for you and they are never told.</Feature>
             </div>
             <figure className="phone">

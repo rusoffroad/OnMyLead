@@ -4,7 +4,7 @@ summary: Send your ride by text, email or any app, copy its link, show a QR code
 category: joining
 order: 30
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-31
 sources:
   - app/src/components/invite-card.tsx
   - app/src/components/group-invite.tsx

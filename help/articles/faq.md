@@ -72,7 +72,13 @@ You haven't picked a ride name yet. Tap **Pick Your Ride Name** on the Rides tab
 
 ## Does "Until I Turn It Off" Sharing Ever End?
 
+:::until 1.0.2
 Yes. Personal shares stop by themselves after 24 hours. A ride share set to **Until I Leave the Ride** ends when the ride ends or you leave it. See [Share Your Location](/help/location-sharing).
+:::
+
+:::release 1.0.2
+Only when you stop it. Sharing with chosen riders or a family link set to **Until I Turn It Off** has no time limit: tap the **You** tab, then **Share My Location**, then **Stop Sharing**. A ride share set to **Until I Turn It Off** also ends when the ride ends or you leave it. If you'd rather it end on its own, tap **Pick an End Date** instead. See [Share Your Location](/help/location-sharing).
+:::
 
 ## Does Live Tracking Work With No Cell Service?
 

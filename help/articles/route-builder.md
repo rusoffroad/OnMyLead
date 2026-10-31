@@ -4,7 +4,7 @@ summary: Tap the map to lay down your ride's route. It snaps to trails for you, 
 category: routes-maps
 order: 10
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-10-31
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/app/r/[code].tsx
