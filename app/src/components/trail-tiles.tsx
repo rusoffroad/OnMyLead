@@ -1,4 +1,4 @@
-import { Fragment, memo, useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Marker, Polyline, UrlTile, WMSTile } from 'react-native-maps';
 
@@ -70,9 +70,16 @@ export function TrailTiles({ trail, base = trail.base }: { trail: TrailMap; base
 type Part = OsmTrail['parts'][number];
 const coords = (part: Part) => part.map((p) => ({ latitude: p.lat, longitude: p.lng }));
 
-/** Navy casing, then the line: closed lines are red dashes, which read as red and navy barricade tape. */
-function Cased({ part, closed }: { part: Part; closed: boolean }) {
-  const c = coords(part);
+const OPEN_DASH = [9, 5];
+const CLOSED_DASH = [5, 5];
+
+/**
+ * Navy casing, then the line: closed lines are red dashes, which read as red and navy barricade tape.
+ * Memoized on the line itself: Apple Maps takes a line off the map and puts it back on every prop
+ * change, so redrawing unchanged lines on each pan or zoom made every trail flash.
+ */
+const Cased = memo(function Cased({ part, closed }: { part: Part; closed: boolean }) {
+  const c = useMemo(() => coords(part), [part]);
   return (
     <>
       <Polyline coordinates={c} strokeColor={TRAIL_INK.casing} strokeWidth={6.5} zIndex={0} tappable={false} />
@@ -80,28 +87,23 @@ function Cased({ part, closed }: { part: Part; closed: boolean }) {
         coordinates={c}
         strokeColor={closed ? TRAIL_INK.closed : TRAIL_INK.trail}
         strokeWidth={3.2}
-        lineDashPattern={closed ? [5, 5] : [9, 5]}
+        lineDashPattern={closed ? CLOSED_DASH : OPEN_DASH}
         zIndex={closed ? 1 : 0}
         tappable={false}
       />
     </>
   );
-}
+});
 
 /**
  * OpenStreetMap dirt tracks (core/osm-trails) drawn in the same amber dash as the agency trails,
- * so a rider sees one kind of line for "dirt you can follow" whatever the source.
+ * so a rider sees one kind of line for "dirt you can follow" whatever the source. drawableOsm
+ * hands out one piece per item, in a steady order, so lines that stay in view are left alone.
  */
 const OsmLines = memo(function OsmLines({ lines }: { lines: OsmTrail[] }) {
   return (
     <>
-      {lines.map((t) =>
-        t.parts.map((part, i) => (
-          <Fragment key={`${t.key}-${i}`}>
-            <Cased part={part} closed={t.closed} />
-          </Fragment>
-        )),
-      )}
+      {lines.map((t) => t.parts.map((part, i) => <Cased key={`${t.key}-${i}`} part={part} closed={t.closed} />))}
     </>
   );
 });
@@ -111,11 +113,7 @@ const ClosedLines = memo(function ClosedLines({ lines }: { lines: ClosedLine[] }
   return (
     <>
       {lines.map((l) =>
-        l.parts.map((part, i) => (
-          <Fragment key={`${l.key}-${i}`}>
-            <Cased part={part} closed />
-          </Fragment>
-        )),
+        l.parts.map((part, i) => <Cased key={`${l.key}-${i}`} part={part} closed />),
       )}
     </>
   );
@@ -134,28 +132,32 @@ const Labels = memo(function Labels({ labels }: { labels: TrailLabel[] }) {
 /**
  * A trail's name on the map, flat so it reads at any angle. Native maps snapshot a marker's view;
  * Android needs it to keep redrawing until the text has laid out, then it's frozen for speed.
+ * A tag that hasn't moved isn't redrawn when the map does.
  */
-function NameTag({ label }: { label: TrailLabel }) {
-  const [track, setTrack] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setTrack(false), 600);
-    return () => clearTimeout(t);
-  }, []);
-  return (
-    <Marker
-      coordinate={{ latitude: label.at.lat, longitude: label.at.lng }}
-      anchor={{ x: 0.5, y: 0.5 }}
-      tracksViewChanges={track}
-      tappable={false}
-      zIndex={2}
-      accessibilityLabel={label.closed ? `${label.name}, closed` : label.name}>
-      <View style={[styles.tag, label.closed && styles.tagClosed]}>
-        <Text style={styles.tagText} numberOfLines={1}>{label.name}</Text>
-        {label.closed ? <Text style={styles.tagClosedText}>Closed</Text> : null}
-      </View>
-    </Marker>
-  );
-}
+const NameTag = memo(
+  function NameTag({ label }: { label: TrailLabel }) {
+    const [track, setTrack] = useState(true);
+    useEffect(() => {
+      const t = setTimeout(() => setTrack(false), 600);
+      return () => clearTimeout(t);
+    }, []);
+    return (
+      <Marker
+        coordinate={{ latitude: label.at.lat, longitude: label.at.lng }}
+        anchor={{ x: 0.5, y: 0.5 }}
+        tracksViewChanges={track}
+        tappable={false}
+        zIndex={2}
+        accessibilityLabel={label.closed ? `${label.name}, closed` : label.name}>
+        <View style={[styles.tag, label.closed && styles.tagClosed]}>
+          <Text style={styles.tagText} numberOfLines={1}>{label.name}</Text>
+          {label.closed ? <Text style={styles.tagClosedText}>Closed</Text> : null}
+        </View>
+      </Marker>
+    );
+  },
+  (a, b) => a.label.key === b.label.key && a.label.name === b.label.name && a.label.closed === b.label.closed && a.label.at.lat === b.label.at.lat && a.label.at.lng === b.label.at.lng,
+);
 
 const styles = StyleSheet.create({
   tag: {

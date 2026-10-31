@@ -73,7 +73,13 @@ The route builder follows mapped trails. It draws a straight line when no mapped
 
 ## I Turned On Trails but See No Lines
 
+:::until 1.0.2
 Zoom in. Forest Service and BLM lines appear from about zoom level 9 (**Zoom In to See Trails**), and smaller park and local tracks need you to zoom in further (**Zoom In for Park and Local Trails**). The website shows fewer trail layers than the app. See [Map Layers](/help/map-layers).
+:::
+
+:::release 1.0.2
+Zoom in. Forest Service and BLM lines appear when the map is about 60 miles across a phone screen (**Zoom In to See Trails**), and park and local tracks from OpenStreetMap when it's about 15 miles across (**Zoom In for Park and Local Trails**). The website shows fewer trail layers than the app. See [Map Layers](/help/map-layers).
+:::
 
 ## My Offline Map Download Stopped
 

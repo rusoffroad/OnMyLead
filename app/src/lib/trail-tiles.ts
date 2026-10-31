@@ -3,7 +3,7 @@ import { Directory, File, Paths } from 'expo-file-system';
 
 import { USGS_IMAGERY, type OfflineLayer } from '@/core/offline-maps';
 import {
-  decodeOsmTrails, OSM_TILEJSON, osmTilesForRegion, osmTileZoom, templateFromTileJson, type OsmTrail, type ViewRegion,
+  decodeOsmTrails, OSM_MAX_TILES, OSM_TILEJSON, osmTilesForRegion, osmTileZoom, templateFromTileJson, type OsmTrail, type ViewRegion,
 } from '@/core/osm-trails';
 import { decodeRoadLines, type RoadLine } from '@/core/trail-router';
 import { fillTemplate, TRAIL_SOURCE_IDS, TRAIL_SOURCES, trailTileTemplate, USGS_TOPO, type Tile } from '@/core/trails';
@@ -71,9 +71,13 @@ export function osmTemplate(): Promise<string | null> {
   return osmTemplateNow;
 }
 
-/** Decoded squares in memory, newest last, so panning back and forth doesn't re-read files. */
+/**
+ * Decoded squares in memory, newest last, so panning back and forth doesn't re-read files. Room
+ * for more than one far-out view (OSM_MAX_TILES): a square read again would come back as new
+ * lines, and the map would redraw (flash) every track in it.
+ */
 const osmMemory = new Map<string, OsmTrail[]>();
-const OSM_MEMORY_MAX = 48;
+const OSM_MEMORY_MAX = 2 * OSM_MAX_TILES;
 
 function remember(key: string, trails: OsmTrail[]) {
   osmMemory.delete(key);

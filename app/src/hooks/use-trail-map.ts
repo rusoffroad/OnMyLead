@@ -3,8 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, type LayoutChangeEvent } from 'react-native';
 import type { MapPressEvent, Region } from 'react-native-maps';
 
-import { drawableOsm, nearestOsmTrail, OSM_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
-import { metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
+import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
+import { mapZoom, metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
 
@@ -15,7 +15,7 @@ export type TrailMap = {
   trails: boolean;
   /** True when trails are on but the map is too far out to draw them. */
   zoomInHint: boolean;
-  /** OpenStreetMap tracks to draw (TrailTiles), once the map is in to zoom 13. */
+  /** OpenStreetMap tracks to draw (TrailTiles), once the map is in to OSM_VIEW_MIN_Z (about 15 miles across). */
   osmLines: OsmTrail[];
   /** Name tags for the named OpenStreetMap tracks on screen (agency names are drawn into their tiles). */
   labels: TrailLabel[];
@@ -46,7 +46,9 @@ export type TrailMap = {
   };
 };
 
-const zoomOf = (r: Region) => Math.log2(360 / Math.max(1e-6, r.longitudeDelta));
+/** True when both lists hold the same lines in the same order (the squares came from memory). */
+const sameLines = <T>(a: T[], b: T[]) => a.length === b.length && a.every((t, i) => t === b[i]);
+const byKey = <T extends { key: string }>(a: T, b: T) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
 
 /**
  * Map layer choices (satellite or topo, public trails on or off), remembered on the phone and
@@ -96,6 +98,8 @@ export function useTrailMap(): TrailMap {
     const r = region.current;
     const id = ++osmLoad.current;
     const put = (lines: OsmTrail[]) => {
+      // Panning within the same squares changes nothing on the map; skipping it keeps lines still.
+      if (sameLines(osmRef.current, lines)) return;
       osmRef.current = lines;
       setOsm(lines);
     };
@@ -105,7 +109,7 @@ export function useTrailMap(): TrailMap {
       setClosed([]);
       return;
     }
-    const z = zoomNow.current ?? zoomOf(r);
+    const z = zoomNow.current ?? mapZoom(r, width.current);
     loadOsmView(r, z, offlineRef.current)
       .then((lines) => {
         if (id === osmLoad.current) put(lines);
@@ -113,7 +117,8 @@ export function useTrailMap(): TrailMap {
       .catch(() => {});
     loadSeasonalClosures(r, z, offlineRef.current)
       .then((lines) => {
-        if (closedId === closedLoad.current) setClosed(lines);
+        // In a steady order, and unchanged when nothing changed, so closed lines don't flash either.
+        if (closedId === closedLoad.current) setClosed((prev) => (sameLines(prev, lines.sort(byKey)) ? prev : lines));
       })
       .catch(() => {});
   }, []);
@@ -137,7 +142,7 @@ export function useTrailMap(): TrailMap {
     (r: Region, z?: number) => {
       region.current = r;
       zoomNow.current = z ?? null;
-      setZoom(z ?? zoomOf(r));
+      setZoom(z ?? mapZoom(r, width.current));
       refreshOsm();
     },
     [refreshOsm],
@@ -145,7 +150,7 @@ export function useTrailMap(): TrailMap {
 
   const identifyAt = useCallback(
     (lat: number, lng: number) => {
-      if (!trails || !region.current || zoomOf(region.current) < TRAILS_MIN_Z) {
+      if (!trails || !region.current || (zoomNow.current ?? mapZoom(region.current, width.current)) < TRAILS_MIN_Z) {
         setInfo(null);
         return;
       }
@@ -180,7 +185,6 @@ export function useTrailMap(): TrailMap {
   // Each phone tag is a small native view, so the phone keeps fewer than the website.
   // A tag is about 120 by 24 points; degrees per point at this zoom keep tags from overlapping.
   const labels = useMemo(() => {
-    // The phone's zoom estimate runs a little low, which only spaces its tags a little wider.
     const perPt = 360 / (256 * 2 ** Math.max(1, zoom));
     const lat = osm[0]?.parts[0]?.[0]?.lat ?? 0;
     return trailLabels(osm, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
@@ -193,7 +197,7 @@ export function useTrailMap(): TrailMap {
     osmLines: trails ? drawn : [],
     labels: trails ? labels : [],
     closedLines: trails ? closed : [],
-    closerForTracks: trails && zoom >= TRAILS_MIN_Z && zoom < OSM_MIN_Z - 0.25,
+    closerForTracks: trails && zoom >= TRAILS_MIN_Z && zoom < OSM_VIEW_MIN_Z,
     offline,
     setBase,
     setTrails,

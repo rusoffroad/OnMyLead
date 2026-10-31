@@ -2,9 +2,9 @@ import Pbf from 'pbf';
 import { describe, expect, it } from 'vitest';
 
 import {
-  decodeOsmTrails, drawableOsm, nearestOsmTrail, OSM_MAX_TILES, osmTilesForRegion, osmTileZoom, templateFromTileJson, trailLabels,
+  decodeOsmTrails, drawableOsm, nearestOsmTrail, OSM_MAX_TILES, OSM_VIEW_MIN_Z, osmTilesForRegion, osmTileZoom, templateFromTileJson, trailLabels,
 } from '../osm-trails';
-import { tileFor } from '../trails';
+import { mapZoom, tileFor } from '../trails';
 
 // Hidden Falls Adventure Park, Marble Falls, Texas: named tracks in OpenStreetMap, none in federal data.
 const hiddenFalls = { lat: 30.6079, lng: -98.1582 };
@@ -52,13 +52,25 @@ function mvt(layers: Record<string, Feat[]>, extent = 4096): Uint8Array {
 }
 
 describe('which squares to read', () => {
-  it('waits for zoom 13 and never asks past 14', () => {
-    expect(osmTileZoom(11)).toBeNull();
-    expect(osmTileZoom(12.5)).toBeNull();
-    expect(osmTileZoom(12.8)).toBe(13);
-    expect(osmTileZoom(13.4)).toBe(13);
+  it('draws tracks from about 15 miles across, from zoom 13 squares, and never asks past 14', () => {
+    expect(osmTileZoom(9)).toBeNull();
+    expect(osmTileZoom(10.9)).toBeNull();
+    expect(osmTileZoom(NaN)).toBeNull();
+    expect(osmTileZoom(OSM_VIEW_MIN_Z)).toBe(13);
+    expect(osmTileZoom(12.5)).toBe(13);
+    expect(osmTileZoom(13.9)).toBe(13);
     expect(osmTileZoom(14)).toBe(14);
     expect(osmTileZoom(18)).toBe(14);
+  });
+
+  it('reads a far-out phone view in one go', () => {
+    // A phone (390 by about 700 points) at zoom 11 shows about 6 by 11 zoom 13 squares.
+    const lngDelta = (390 / (256 * 2 ** 11)) * 360;
+    const region = { latitude: hiddenFalls.lat, longitude: hiddenFalls.lng, latitudeDelta: lngDelta * 1.6, longitudeDelta: lngDelta };
+    expect(mapZoom(region, 390)).toBeCloseTo(11, 5);
+    const tiles = osmTilesForRegion(region, osmTileZoom(mapZoom(region, 390))!);
+    expect(tiles.length).toBeGreaterThan(40);
+    expect(tiles.length).toBeLessThanOrEqual(OSM_MAX_TILES);
   });
 
   it('covers the view, middle first, capped', () => {
@@ -105,15 +117,34 @@ describe('decoding a square', () => {
     expect(tileFor(p, 14)).toEqual(t);
   });
 
-  it('draws each track once', () => {
-    const drawn = drawableOsm(decodeOsmTrails(data, t));
+  it('draws each track once, one piece per item', () => {
+    const trails = decodeOsmTrails(data, t);
+    const drawn = drawableOsm(trails);
     expect(drawn).toHaveLength(2);
-    expect(drawn.every((x) => x.name === null)).toBe(true);
-    expect(drawableOsm(decodeOsmTrails(data, t), 1)).toHaveLength(1);
+    expect(drawn.every((x) => x.name === null && x.parts.length === 1)).toBe(true);
+    expect(drawableOsm(trails, 1)).toHaveLength(1);
     const many = { key: '14/1/1/l0', name: null, surface: null, closed: false, parts: Array.from({ length: 10 }, () => [hiddenFalls, hiddenFalls]) };
     const capped = drawableOsm([many, { ...many, key: '14/1/1/l1' }], 4);
-    expect(capped).toHaveLength(1);
-    expect(capped[0].parts).toHaveLength(4);
+    expect(capped).toHaveLength(4);
+    expect(capped.every((x) => x.key.startsWith('14/1/1/l0#'))).toBe(true);
+  });
+
+  it('keeps the longest pieces when there are too many', () => {
+    const step = (n: number) => [hiddenFalls, { lat: hiddenFalls.lat + n / 1000, lng: hiddenFalls.lng }];
+    const track = { key: '13/1/1/l0', name: null, surface: null, closed: false, parts: [step(1), step(5), step(2), step(9)] };
+    const kept = drawableOsm([track], 2);
+    expect(kept.map((x) => x.key)).toEqual(['13/1/1/l0#1', '13/1/1/l0#3']);
+  });
+
+  it('hands back the same pieces in the same order however the squares arrive', () => {
+    const trails = decodeOsmTrails(data, t);
+    const other = { key: '13/9/9/l0', name: null, surface: null, closed: false, parts: [[hiddenFalls, hiddenFalls]] };
+    const a = drawableOsm([...trails, other]);
+    const b = drawableOsm([other, ...trails]);
+    expect(b.map((x) => x.key)).toEqual(a.map((x) => x.key));
+    // The very same objects, so the map leaves those lines alone instead of redrawing them.
+    b.forEach((x, i) => expect(x).toBe(a[i]));
+    expect(b[0].parts[0]).toBe(a[0].parts[0]);
   });
 
   it('names the track under a tap and ignores taps far away', () => {

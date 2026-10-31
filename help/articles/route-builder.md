@@ -112,7 +112,7 @@ You can build the route at onmylead.com too, using the same steps:
 
 - Click the map instead of tapping, and drag a point to move it.
 - Press Ctrl+Z (Cmd+Z on a Mac) to undo the last point.
-- Trail lines and their names appear once you zoom in close, and **Follow Trails** snaps to them the same way.
+- Trail lines and their names appear once you zoom in to about a county's width, and **Follow Trails** snaps to them the same way.
 - On a wide screen, the tools panel sits beside the map.
 
 On a tablet held sideways, the tools panel sits beside the map; swipe it up or tap **Hide** to fold it. Held upright, it floats in the bottom corner of the map.
