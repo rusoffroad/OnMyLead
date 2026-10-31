@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["YJ4KUF2QQV.com.rusoffroad.onmylead.app"],
+        "components": [
+          { "/": "/r/*", "comment": "Ride invite links and ride QR codes" },
+          { "/": "/g/*", "comment": "Riding group invite links" },
+          { "/": "/auth-callback", "?": { "token_hash": "?*" }, "comment": "Links in OnMyLead's own emails (confirm, sign in, reset password). Only these: Google and Facebook sign-in on the website also return to /auth-callback, with a code, and must stay in the browser." }
+        ]
+      }
+    ]
+  }
+}
