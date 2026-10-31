@@ -1,14 +1,6 @@
 [
   {
     "date": "2026-10-31",
-    "slugs": ["contact-support"],
-    "kind": "update",
-    "by": "pr",
-    "ref": "fix-expo-head-alert",
-    "why": "iPhone and iPad: opening Help and Support, Contact Us, Terms or Privacy no longer shows an 'Expo Head: Add the handoff origin' alert. Page titles are now set only on the website. No article text changes; the pages work the same."
-  },
-  {
-    "date": "2026-10-31",
     "slugs": [
       "map-layers",
       "troubleshooting",
@@ -19,6 +11,16 @@
     "by": "pr",
     "ref": "trails-zoomed-out",
     "why": "Chris found that Ride Mode only showed roads and trails when zoomed way in, and that they flashed when zooming out. OpenStreetMap tracks now show from about 15 miles across (the same zoom on iPad and Android tablets as on a phone), the longest trails are drawn first when zoomed far out, and lines on screen stay put while the map moves. The app text ships with 1.0.2; the website change goes live with the next website deploy. Offline Maps only lists these files as sources: downloads save the same squares as before, so nothing changes there for riders."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
+      "contact-support"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "fix-expo-head-alert",
+    "why": "iPhone and iPad: opening Help and Support, Contact Us, Terms or Privacy no longer shows an 'Expo Head: Add the handoff origin' alert. Page titles are now set only on the website. No article text changes; the pages work the same."
   },
   {
     "date": "2026-10-31",
