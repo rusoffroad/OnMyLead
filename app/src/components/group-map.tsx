@@ -1,18 +1,19 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
 import { Colors, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { cameraCenterFor, openMapCenter } from '@/core/map-center';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import type { MapRider } from './group-map-types';
+import type { GroupMapHandle, MapRider } from './group-map-types';
 import { RiderPin } from './rider-pin';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
-export type { MapRider } from './group-map-types';
+export type { GroupMapHandle, MapRider } from './group-map-types';
 
 const FIT_PADDING = { top: 80, right: 60, bottom: 80, left: 60 };
 
@@ -39,7 +40,7 @@ function around(p: { latitude: number; longitude: number }) {
  * passes for a live one.
  */
 export function GroupMap({
-  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding = FIT_PADDING,
+  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding = FIT_PADDING, ref,
 }: {
   riders: MapRider[];
   /** This phone's rider: iOS already draws them as the location dot, so no second pin. */
@@ -57,9 +58,38 @@ export function GroupMap({
   onLongPressMap?: (p: LatLng) => void;
   /** Room the first framing of the group leaves around it, for panels that sit over the map (tablets). */
   edgePadding?: { top: number; right: number; bottom: number; left: number };
+  /** Lets Ride Mode's center-on-me button move the map. */
+  ref?: Ref<GroupMapHandle>;
 }) {
   const map = useRef<MapView>(null);
   const fitted = useRef<'no' | 'riders' | 'route'>('no');
+  const size = useRef({ width: 0, height: 0 });
+
+  useImperativeHandle(ref, () => ({
+    async centerOn(p, inset) {
+      const m = map.current;
+      if (!m) return;
+      const { width, height } = size.current;
+      const target = { latitude: p.lat, longitude: p.lng };
+      try {
+        const open = openMapCenter(size.current, inset);
+        // Both points are on screen now, so reading them is exact even on a turned map.
+        const [here, there] = await Promise.all([
+          m.coordinateForPoint({ x: width / 2, y: height / 2 }),
+          m.coordinateForPoint(open),
+        ]);
+        const c = cameraCenterFor(
+          p,
+          { lat: here.latitude, lng: here.longitude },
+          { lat: there.latitude, lng: there.longitude },
+        );
+        m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: 450 });
+      } catch {
+        // No reading from the map (not laid out yet): centre on the whole map instead.
+        m.animateCamera({ center: target }, { duration: 450 });
+      }
+    },
+  }), []);
 
   useEffect(() => {
     const pts = riders.filter((r) => r.lat != null).map((r) => ({ latitude: r.lat!, longitude: r.lng! }));
@@ -75,7 +105,9 @@ export function GroupMap({
   }, [riders, route, edgePadding]);
 
   return (
-    <MapView ref={map} style={StyleSheet.absoluteFill} showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}
+    <MapView ref={map} style={StyleSheet.absoluteFill}
+      onLayout={(e) => { size.current = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }; }}
+      showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}
       onLongPress={onLongPressMap ? (e) => onLongPressMap({ lat: e.nativeEvent.coordinate.latitude, lng: e.nativeEvent.coordinate.longitude }) : undefined}>
       {trail ? <TrailTiles trail={trail} /> : null}
       {route && route.length > 1 ? (
