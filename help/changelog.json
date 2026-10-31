@@ -1,5 +1,34 @@
 [
   {
+    "date": "2026-10-31",
+    "slugs": [
+      "ride-mode",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-mode-center-on-me",
+    "why": "Ride Mode gets a Center on Me button (iPhone, iPad, Android phones and tablets) that moves the map to your location in the open part of the map, keeping the zoom. Ships with 1.0.2, so the text is in a release block."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "troubleshooting",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-mode-center-on-me",
+    "why": "These guides list Ride Mode's screen as a source. Adding the Center on Me button changes nothing they describe; the button is covered in Use Ride Mode. The live.webp screenshot is unchanged because the website's Ride Mode has no live map and no button."
+  },
+  {
     "date": "2026-10-28",
     "slugs": [],
     "kind": "release",
