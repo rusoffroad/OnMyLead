@@ -1,4 +1,4 @@
-import Head from 'expo-router/head';
+import Head from '@/components/page-head';
 import { Redirect, Slot } from 'expo-router';
 import { Platform } from 'react-native';
 
