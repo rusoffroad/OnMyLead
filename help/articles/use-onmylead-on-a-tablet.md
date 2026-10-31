@@ -4,7 +4,7 @@ summary: On an iPad or Android tablet the map fills the screen, with the riders,
 category: getting-started
 order: 40
 release: "1.0"
-updated: 2026-10-20
+updated: 2026-10-31
 sources:
   - app/src/core/layout.ts
   - app/src/hooks/use-layout.ts
@@ -45,6 +45,10 @@ The live map fills the screen.
 - **Your buttons** (the route strip, quick replies and status buttons) sit in a panel on the right. Swipe it down or tap **Hide** to fold it, just like on a phone. **Mechanical Issue** and **EMERGENCY** always stay on screen.
 - **Directions** and **Add Waypoint** sit just above the buttons panel.
 - The ride name, your sharing timer and any announcement stay at the top of the left side.
+
+:::release 1.0.2
+The round target button at the bottom of the map, just left of the buttons panel, centers the map on you. See [Use Ride Mode](/help/ride-mode).
+:::
 
 ## The Ride Page
 
