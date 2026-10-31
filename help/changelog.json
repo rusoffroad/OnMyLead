@@ -2,6 +2,50 @@
   {
     "date": "2026-10-31",
     "slugs": [
+      "location-sharing",
+      "family-link",
+      "faq",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "share-until-turned-off",
+    "why": "Chris asked for a way to share location forever, until the rider turns it off, plus a calendar to pick when sharing ends. From 1.0.2, Until I Turn It Off has no 24-hour cap on personal shares, ride shares get the same option (still ending with the ride), both share screens get Pick an End Date (a calendar plus a time, up to a year out), the You tab shows an active personal share, and the family link page says When they turn it off. Old text stays for 1.0 and 1.0.1 in until blocks."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "garage",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "privacy",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "ride-name-and-profile",
+      "sign-in",
+      "starlink",
+      "status-buttons",
+      "trip-planner",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "share-until-turned-off",
+    "why": "These guides list Ride Mode's screen or the You tab as a source. The change there is the location sharing sheet (Until I Turn It Off, Pick an End Date) and the Share My Location row on the You tab saying when an active share ends; both are covered in Share Your Location. Nothing these guides describe changes."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
       "create-a-ride",
       "create-a-ride-on-the-website"
     ],
@@ -30,7 +74,9 @@
   },
   {
     "date": "2026-10-31",
-    "slugs": ["contact-support"],
+    "slugs": [
+      "contact-support"
+    ],
     "kind": "update",
     "by": "pr",
     "ref": "fix-expo-head-alert",

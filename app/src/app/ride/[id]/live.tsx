@@ -12,7 +12,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DirectionsSheet } from '@/components/directions';
 import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group-map';
 import { Icon } from '@/components/icon';
-import { KeyboardLift } from '@/components/keyboard';
+import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
 import { RiderList, RiderRows } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
@@ -1209,9 +1209,17 @@ export default function RideMode() {
           <View style={[styles.sheet, tablet && styles.sheetTablet]}>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Share Your Location with This Ride?</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
-              Only riders on this ride will see you. Sharing stops automatically when time runs out or the ride ends.
+              Only riders on this ride will see you. Sharing always stops when the ride ends or you leave it.
             </ThemedText>
-            <SharePicker options={RIDE_SHARE_OPTIONS_MIN} openLabel="Until I Leave the Ride" onPick={beginShare} busy={busy} />
+            <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} {...keyboardScroll}>
+              <SharePicker
+                options={RIDE_SHARE_OPTIONS_MIN}
+                openLabel="Until I Turn It Off"
+                openHint="No time limit. Stops when you tap Stop, leave, or the ride ends."
+                onPick={beginShare}
+                busy={busy}
+              />
+            </ScrollView>
             <Button title="Not Now" kind="secondary" onPress={() => setAskShare(false)} />
           </View>
           </KeyboardLift>
@@ -1349,7 +1357,7 @@ const styles = StyleSheet.create({
   // On a tablet a sheet is a card in the middle of the screen, not a strip across the bottom.
   sheetWrapTablet: { justifyContent: 'center', alignItems: 'center', padding: Spacing.four },
   sheetTablet: { width: '100%', maxWidth: 520, borderRadius: 28 },
-  sheet: { backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
+  sheet: { flexShrink: 1, backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
   sheetTitle: { color: Colors.text },
   sheetBody: { color: Colors.textSecondary },
 });

@@ -190,6 +190,63 @@ do $$ begin
 end $$;
 reset role;
 
+-- 8b. "Until I turn it off" (app 1.0.2): a personal share stored with a far-off end. It is live for its
+-- recipient and family link, invisible to anyone else, and one revoke ends it. A personal share with
+-- no end at all is still refused, so app 1.0 and 1.0.1 keep their guarantees.
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+insert into location_shares (id, user_id, scope, expires_at, link_token)
+values ('22222222-2222-2222-2222-2222222222f0', auth.uid(), 'personal', '9999-12-31T00:00:00Z', 'family-token-forever');
+insert into location_share_recipients values ('22222222-2222-2222-2222-2222222222f0', '00000000-0000-0000-0000-00000000000d');
+do $$ begin
+  begin
+    insert into location_shares (user_id, scope, expires_at) values (auth.uid(), 'personal', null);
+    raise exception 'FAIL: personal share with no end was accepted';
+  exception when check_violation then null;
+  end;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if (select count(*) from positions_latest where user_id = '00000000-0000-0000-0000-00000000000c') <> 1 then
+    raise exception 'FAIL: until-turned-off share recipient cannot see location';
+  end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000a');
+set role authenticated;
+do $$ begin
+  if exists (select 1 from positions_latest where user_id = '00000000-0000-0000-0000-00000000000c') then
+    raise exception 'FAIL: until-turned-off share visible to someone who was not picked';
+  end if;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  if (select count(*) from get_shared_location('family-token-forever')) <> 1 then raise exception 'FAIL: until-turned-off family link not working'; end if;
+end $$;
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000c');
+set role authenticated;
+update location_shares set revoked_at = now() where id = '22222222-2222-2222-2222-2222222222f0';
+reset role;
+select as_user('00000000-0000-0000-0000-00000000000d');
+set role authenticated;
+do $$ begin
+  if exists (select 1 from positions_latest where user_id = '00000000-0000-0000-0000-00000000000c') then
+    raise exception 'FAIL: stopped until-turned-off share still visible';
+  end if;
+end $$;
+reset role;
+select as_user(null);
+set role anon;
+do $$ begin
+  if (select count(*) from get_shared_location('family-token-forever')) <> 0 then raise exception 'FAIL: stopped until-turned-off family link still works'; end if;
+end $$;
+reset role;
+
 -- 9. Ending the ride revokes every ride share.
 select as_user('00000000-0000-0000-0000-00000000000c');
 set role authenticated;
