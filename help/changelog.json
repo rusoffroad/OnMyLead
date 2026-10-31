@@ -1,5 +1,16 @@
 [
   {
+    "date": "2026-10-31",
+    "slugs": [
+      "create-a-ride",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-dates-calendar",
+    "why": "Create a Ride: rides can now be set up to three years out (2027 and later work), and the calendar lets riders type a date or jump to any month and year. App text is in a 1.0.2 block; the website gets it on its next deploy."
+  },
+  {
     "date": "2026-10-28",
     "slugs": [],
     "kind": "release",
