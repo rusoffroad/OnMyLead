@@ -4,7 +4,7 @@ summary: Add your rig or side-by-side with a photo, fill details from the VIN, t
 category: account
 order: 40
 release: "1.0"
-updated: 2026-10-20
+updated: 2026-10-31
 sources:
   - app/src/app/garage/**
   - app/src/components/vehicle-form.tsx

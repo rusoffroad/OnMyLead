@@ -1,6 +1,6 @@
 ---
 title: Share Your Location
-summary: Choose who sees your location and for how long. Sharing always ends on its own, and you can stop it any time.
+summary: Choose who sees your location and for how long, from a few hours to until you turn it off. You can stop it any time.
 category: safety-privacy
 order: 10
 release: "1.0"
@@ -9,16 +9,22 @@ sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/share.tsx
   - app/src/components/share-picker.tsx
+  - app/src/components/date-calendar.tsx
+  - app/src/app/(tabs)/profile.tsx
   - app/src/core/sharing.ts
   - app/src/core/freshness.ts
   - app/src/lib/location.ts
   - app/src/lib/api.ts
   - supabase/migrations/20261007000000_init.sql
 related: [ride-mode, family-link, privacy, ride-summary-and-ride-again, troubleshooting]
-keywords: [share location, location, gps, tracking, stop sharing, background location, always allow, timer, battery, who can see me, tablet]
+keywords: [share location, location, gps, tracking, stop sharing, background location, always allow, timer, battery, who can see me, tablet, until I turn it off, forever, end date, calendar]
 ---
 
-OnMyLead only shares your location when you turn it on, only with the people you choose, and only for as long as you pick. Every share ends on its own. These rules are enforced by OnMyLead's server, not just the app.
+OnMyLead only shares your location when you turn it on, only with the people you choose, and only for as long as you pick. These rules are enforced by OnMyLead's server, not just the app.
+
+:::until 1.0.2
+Every share ends on its own.
+:::
 
 There are two ways to share:
 
@@ -30,15 +36,31 @@ There are two ways to share:
 When you open Ride Mode on a live ride and aren't sharing yet, the app asks **Share Your Location with This Ride?**
 
 1. Open Ride Mode. See [Use Ride Mode](/help/ride-mode).
+:::until 1.0.2
 2. Pick how long to share: **2 Hours**, **4 Hours**, **8 Hours** or **Until I Leave the Ride**.
 3. Or type your own length in **Hours** and tap **Share**. The longest you can pick is 24 hours.
+:::
+
+:::release 1.0.2
+2. Pick how long to share: **2 Hours**, **4 Hours**, **8 Hours** or **Until I Turn It Off**.
+3. Or tap **Pick an End Date**, pick the day on the calendar (or type it), set **Stop Sharing At**, and tap the **Share Until** button. See [Pick an End Date](#pick-an-end-date).
+:::
+
 4. If your iPhone asks for location access, allow it. Choose **Always** so the group keeps seeing you with the phone locked.
 
 Only riders on this ride see you. Tap **Not Now** to skip. You can start sharing later by tapping the **Off** pill at the top of Ride Mode.
 
 ### Check or Stop Ride Sharing
 
-The pill at the top of Ride Mode shows the time left, such as **1h 20m**, or **On** when you picked **Until I Leave the Ride**.
+The pill at the top of Ride Mode shows the time left, such as **1h 20m**, or **On** when you picked
+
+:::until 1.0.2
+**Until I Leave the Ride**.
+:::
+
+:::release 1.0.2
+**Until I Turn It Off**. A share that runs for more than a day shows days, such as **3d**.
+:::
 
 1. Tap the pill. A banner shows **Sharing** and the time left.
 2. Tap **Stop** to stop sharing now, or **Hide** to fold the banner back into the pill.
@@ -47,10 +69,14 @@ The pill at the top of Ride Mode shows the time left, such as **1h 20m**, or **O
 
 Sharing with a ride stops on its own at the first of these:
 
-- Your timer runs out.
+- Your timer runs out, or the end date you picked arrives.
 - The organizer ends or cancels the ride.
 - You leave the ride.
 - You tap **Stop**.
+
+:::release 1.0.2
+Even **Until I Turn It Off** stops when the ride ends or you leave it. Sharing with a ride never carries on after the ride.
+:::
 
 Closing Ride Mode, or locking your phone, doesn't stop sharing. If the app was closed or your phone restarted, opening Ride Mode picks your share back up.
 
@@ -60,6 +86,7 @@ Closing Ride Mode, or locking your phone, doesn't stop sharing. If the app was c
 2. Under **On the Trail**, tap **Share My Location**.
 3. Under **Who Can See You**, tap the riders you want. Only people you've been on a ride with are listed.
 4. To share with someone who doesn't have the app, turn on **Family Link**. See [Share a Family Link](/help/family-link).
+:::until 1.0.2
 5. Under **For How Long**, pick **15 Min**, **1 Hour**, **4 Hours**, **8 Hours** or **Until I Turn It Off (Max 24 Hours)**, or type your own length in **Hours** and tap **Share**.
 
 **Until I Turn It Off** still stops by itself after 24 hours, so a forgotten share always ends.
@@ -68,6 +95,29 @@ While you share, **Share My Location** shows a card for each share with **Sharin
 
 - Tap **Add 1 Hour** to keep going longer. In the last 10 minutes, the button says **Ending Soon · Add 1 Hr**.
 - Tap **Stop** to end it now.
+:::
+
+:::release 1.0.2
+5. Under **For How Long**, pick **15 Min**, **1 Hour**, **4 Hours** or **8 Hours**, tap **Until I Turn It Off**, or tap **Pick an End Date** to choose a day and time on a calendar.
+
+**Until I Turn It Off** has no time limit. It keeps sharing, even for days, until you tap **Stop Sharing**. The app asks you to confirm before it starts.
+
+While you share, **Share My Location** shows a card for each share with **Sharing Now** and when it ends: the time left, the end date (such as **until Sat, Nov 14, 6:00 PM**), or **until you turn it off**. On the **You** tab, the **Share My Location** row also says you're sharing and until when, so a long share is never forgotten.
+
+- Tap **Add 1 Hour** to keep going longer. In the last 10 minutes, the button says **Ending Soon · Add 1 Hr**. A share set to **Until I Turn It Off** doesn't need it, so it isn't shown.
+- Tap **Stop Sharing** to end it now.
+
+## Pick an End Date
+
+Both the ride sharing sheet and **Share My Location** let you pick exactly when sharing stops, up to a year out.
+
+1. Tap **Pick an End Date**. A calendar opens.
+2. Tap a day, or type the date in the box above the calendar. Use the arrows to change months.
+3. Check **Stop Sharing At**. It starts at 6:00 pm (or about an hour from now, later today). Type a different time, such as "9:30 am".
+4. Tap the button, such as **Share Until Sat, Nov 14, 6:00 PM**.
+
+A share with an end date still stops early if you tap **Stop Sharing**, and a ride share still stops when the ride ends.
+:::
 
 ## Location in the Background
 
@@ -100,5 +150,11 @@ Offline maps keep the map on your screen without service, but positions only upd
 - **Ride sharing:** riders who have joined that ride.
 - **Chosen riders:** only the riders you picked are allowed to see your position.
 - **Family link:** anyone who has the link, until the share ends.
+
+:::release 1.0.2
+## Stopping a Long Share
+
+A share set to **Until I Turn It Off** or a far-off end date keeps your phone's location on in the background, which uses more battery. To stop it, tap the **You** tab, tap **Share My Location**, and tap **Stop Sharing**. On Android you can also tap the **Sharing Your Location** notification to get there. [Battery Saver](/help/battery-saver) makes a long share easier on the battery.
+:::
 
 Your exact location is never shown publicly. See [Privacy](/help/privacy).
