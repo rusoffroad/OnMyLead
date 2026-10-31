@@ -39,6 +39,19 @@
   {
     "date": "2026-10-31",
     "slugs": [
+      "location-sharing",
+      "family-link",
+      "faq",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "share-until-turned-off",
+    "why": "Chris asked for a way to share location forever, until the rider turns it off, plus a calendar to pick when sharing ends. From 1.0.2, Until I Turn It Off has no 24-hour cap on personal shares, ride shares get the same option (still ending with the ride), both share screens get Pick an End Date (a calendar plus a time, up to a year out), the You tab shows an active personal share, and the family link page says When they turn it off. Old text stays for 1.0 and 1.0.1 in until blocks."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
       "ride-mode",
       "use-onmylead-on-a-tablet"
     ],

@@ -12,7 +12,8 @@ import { BATTERY_PLANS } from '@/core/battery';
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
-import { deleteMyAccount, myRideName } from '@/lib/api';
+import { shareEndText } from '@/core/sharing';
+import { deleteMyAccount, myActiveShares, myRideName } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
 import { useBatteryMode } from '@/lib/battery';
 import { useBlocks } from '@/lib/blocks';
@@ -32,6 +33,8 @@ import { socialSetting, type SocialProfile } from '@/core/social-profile';
 export default function You() {
   const { session, loading } = useSession();
   const [rideName, setRideName] = useState<string | null>(null);
+  /** When the rider's personal share ends (epoch ms; far off for "until I turn it off"), or null when not sharing. */
+  const [sharingUntil, setSharingUntil] = useState<number | null>(null);
   const [directionsOpen, setDirectionsOpen] = useState(false);
   const notifications = useNotificationSettings();
   const mapsPref = useMapsPreference();
@@ -51,12 +54,20 @@ export default function You() {
     setShownFor(uid);
     setRideName(null);
     setSocial(null);
+    setSharingUntil(null);
   }
 
   useFocusEffect(
     useCallback(() => {
       if (!session) return;
       myRideName().then(setRideName).catch(() => setRideName(null));
+      // A personal share can run for days, so the row below says so every time the tab shows.
+      myActiveShares()
+        .then((all) => {
+          const ends = all.filter((x) => x.scope === 'personal').map((x) => Date.parse(x.expires_at!));
+          setSharingUntil(ends.length ? Math.max(...ends) : null);
+        })
+        .catch(() => setSharingUntil(null));
       // Keeps the name and photo from their Apple, Google or Facebook sign-in up to date.
       syncSocialProfile().then(setSocial).catch(() => {});
     }, [session]),
@@ -107,7 +118,7 @@ export default function You() {
       </MenuGroup>
 
       <MenuGroup title="On the Trail">
-        <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail="With chosen riders or family, for a set time" onPress={needsAccount('/share')} />
+        <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail={sharingUntil != null ? `Sharing now, ${shareEndText(sharingUntil, Date.now())}. Tap to stop` : 'With chosen riders or family, for as long as you pick'} onPress={needsAccount('/share')} />
         <MenuRow
           icon="battery"
           color={batteryMode === 'best' ? RideColors.green : RideColors.yellow}

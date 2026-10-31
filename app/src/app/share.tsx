@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable, Share, View } from 'react-native';
+import { Pressable, Share, View } from 'react-native';
 
 import { SharePicker } from '@/components/share-picker';
 import { ThemedText } from '@/components/themed-text';
@@ -8,19 +8,22 @@ import { Icon } from '@/components/icon';
 import { Button, Card, ErrorText, Screen, Section } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { EXTEND_PROMPT_LEAD_MIN, formatRemaining, PERSONAL_SHARE_OPTIONS_MIN } from '@/core/sharing';
+import {
+  EXTEND_PROMPT_LEAD_MIN, formatRemaining, isUntilTurnedOff, PERSONAL_SHARE_OPTIONS_MIN, shareEndText,
+} from '@/core/sharing';
 import {
   extendLocationShare, myActiveShares, ridingFriends, startLocationShare, stopLocationShare, type ActiveShare,
 } from '@/lib/api';
 import { BATTERY_PLANS } from '@/core/battery';
 import { useBatteryMode } from '@/lib/battery';
+import { confirmAsync } from '@/lib/confirm';
 import { startSendingLocation, stopSendingLocation } from '@/lib/location';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
 /**
- * Personal location sharing: share with chosen people, any time, for as long as you pick.
- * Always ends on its own; "until I turn it off" is capped at 24 hours.
+ * Personal location sharing: share with chosen people, any time, for as long as you pick: a few
+ * hours, until a day and time on the calendar, or until you turn it off. Stop is always one tap.
  */
 export default function ShareMyLocation() {
   const theme = useTheme();
@@ -57,10 +60,12 @@ export default function ShareMyLocation() {
     setError(null);
     try {
       const s = await startLocationShare({ scope: 'personal', durationMin: minutes, recipientIds: picked, withFamilyLink: familyLink });
-      await startSendingLocation(null);
+      const endAt = s.expires_at ? Date.parse(s.expires_at) : null;
+      await startSendingLocation(null, isUntilTurnedOff(endAt) ? null : endAt);
       if (s.link_token) {
         const url = WEB_URL ? `${WEB_URL}/f/${s.link_token}` : s.link_token;
-        await Share.share({ message: `Follow my location until ${new Date(s.expires_at!).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}: ${url}` });
+        const when = isUntilTurnedOff(endAt) ? 'Follow my location' : `Follow my location ${shareEndText(endAt, Date.now())}`;
+        await Share.share({ message: `${when}: ${url}` });
       }
       setPicked([]);
       setFamilyLink(false);
@@ -85,15 +90,25 @@ export default function ShareMyLocation() {
   return (
     <Screen>
       {shares.map((s) => {
-        const left = s.expires_at ? Date.parse(s.expires_at) - now : null;
+        const endAt = s.expires_at ? Date.parse(s.expires_at) : null;
+        const untilOff = isUntilTurnedOff(endAt);
+        const left = endAt == null ? null : endAt - now;
         const nearEnd = left != null && left <= EXTEND_PROMPT_LEAD_MIN * 60_000;
+        const multiDay = left != null && !untilOff && left >= 24 * 3_600_000;
         return (
           <Card key={s.id} style={{ borderLeftWidth: 4, borderLeftColor: theme.sky }}>
-            <ThemedText type="heading" style={{ color: theme.sky }}>Sharing Now, {formatRemaining(left)}</ThemedText>
+            <ThemedText type="heading" style={{ color: theme.sky }}>
+              Sharing Now, {untilOff || multiDay ? shareEndText(endAt, now) : formatRemaining(left)}
+            </ThemedText>
+            {untilOff ? (
+              <ThemedText type="small" themeColor="textSecondary">This keeps going, even for days, until you tap Stop.</ThemedText>
+            ) : null}
             {s.link_token ? <ThemedText type="small" themeColor="textSecondary">Includes a family link</ThemedText> : null}
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-              <Button title="Stop" kind="danger" style={{ flex: 1 }} onPress={() => stop(s)} />
-              <Button title={nearEnd ? 'Ending Soon · Add 1 Hr' : 'Add 1 Hour'} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
+              <Button title="Stop Sharing" kind="danger" style={{ flex: 1 }} onPress={() => stop(s)} />
+              {untilOff ? null : (
+                <Button title={nearEnd ? 'Ending Soon · Add 1 Hr' : 'Add 1 Hour'} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
+              )}
             </View>
           </Card>
         );
@@ -134,14 +149,22 @@ export default function ShareMyLocation() {
       </Pressable>
 
       <Section title="For How Long" />
-      <SharePicker options={PERSONAL_SHARE_OPTIONS_MIN} openLabel="Until I Turn It Off (Max 24 Hours)" busy={busy} onPick={(m) => {
-        if (m == null) {
-          Alert.alert('Share until you turn it off?', 'It still stops automatically after 24 hours.', [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Share', onPress: () => start(null) },
-          ]);
-        } else start(m);
-      }} />
+      <SharePicker
+        options={PERSONAL_SHARE_OPTIONS_MIN}
+        openLabel="Until I Turn It Off"
+        openHint="No time limit. Keeps sharing until you tap Stop Sharing here."
+        busy={busy}
+        onPick={async (m) => {
+          if (m == null) {
+            const ok = await confirmAsync(
+              'Share Until You Turn It Off?',
+              'There is no time limit. Your location keeps sharing, even for days, until you come back here and tap Stop Sharing.',
+              'Share',
+            );
+            if (ok) start(null);
+          } else start(m);
+        }}
+      />
       <ErrorText error={error} />
       <Pressable accessibilityRole="link" onPress={() => router.push('/battery')} hitSlop={6}>
         <ThemedText type="small" themeColor="textSecondary">
