@@ -4,7 +4,7 @@ summary: What every OnMyLead account gets for free, what OnMyLead Pro adds, and 
 category: pro
 order: 10
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-10-31
 sources:
   - app/src/core/pro.ts
   - app/src/core/entitlements.ts

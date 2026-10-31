@@ -4,7 +4,7 @@ summary: Pick public or private, set the day, time and meeting point, choose a m
 category: rides
 order: 10
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-10-31
 sources:
   - app/src/app/ride/new.tsx
   - app/src/app/(tabs)/index.tsx
@@ -15,6 +15,7 @@ sources:
   - app/src/core/time.ts
   - app/src/core/calendar.ts
   - app/src/components/ride-date-picker.tsx
+  - app/src/components/date-calendar.tsx
   - app/src/lib/api.ts
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [create-a-ride-on-the-website, invite-riders, route-builder, approvals-and-waitlist, edit-cancel-or-delete-a-ride, free-vs-pro]
@@ -54,7 +55,22 @@ Under **When**, tap **Today**, **Tomorrow** or any day in the next two weeks.
 :::
 
 :::release 1.0.1
-Under **When**, tap **Today**, **Tomorrow**, **Sat** or **Sun** for the coming weekend. For any other day, tap **Calendar** and pick it from the month calendar. Use the arrows to go to another month. You can schedule a ride for any day from today up to a year out. The day you picked shows under **When**, with how far away it is, such as "In 8 Weeks".
+Under **When**, tap **Today**, **Tomorrow**, **Sat** or **Sun** for the coming weekend. For any other day, tap **Calendar**.
+
+:::until 1.0.2
+Pick the day from the month calendar. Use the arrows to go to another month. You can schedule a ride for any day from today up to a year out.
+:::
+
+:::release 1.0.2
+Then either type the date or pick it on the calendar:
+
+- **Type a Date:** tap the box and type the month, day and year, such as 06/12/2027. The number pad is enough; the slashes go in for you. The calendar jumps to that day.
+- **Tap a day:** use the arrows to go to another month, or tap the month's name (such as "November 2026") to choose a year and month, then tap the day.
+
+You can schedule a ride for any day from today up to three years out, so rides next year and the year after are fine. Past days and days further out are greyed out.
+:::
+
+The day you picked shows under **When**, with how far away it is, such as "In 8 Weeks". Tap **Done** to fold the calendar away.
 
 On a tablet, the calendar sits in the same form, with bigger day buttons.
 :::

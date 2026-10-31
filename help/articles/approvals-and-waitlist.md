@@ -4,7 +4,7 @@ summary: How join requests work on rides where the organizer approves riders, an
 category: joining
 order: 50
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-31
 sources:
   - app/src/app/r/[code].tsx
   - app/src/app/ride/new.tsx
