@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, show public trails and roads with th
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-10-31
 sources:
   - app/src/components/trail-map-overlay.tsx
   - app/src/components/trail-tiles.tsx
@@ -84,7 +84,18 @@ The lines come from:
 - **Bureau of Land Management**: BLM routes.
 - **OpenStreetMap**: tracks mapped by riders, including off-road parks, state land and county roads.
 
+:::until 1.0.2
 Trail lines show once you zoom in. If you see **Zoom In to See Trails**, zoom in a little. If you see **Zoom In for Park and Local Trails**, the Forest Service and BLM lines are showing, and the OpenStreetMap tracks appear when you zoom in closer.
+:::
+
+:::release 1.0.2
+Trail lines show from pretty far out. Forest Service and BLM lines appear when the map is about 60 miles across a phone screen, and OpenStreetMap tracks when it's about 15 miles across. iPad and Android tablets show them at the same zoom as a phone, over their bigger map.
+
+- If you see **Zoom In to See Trails**, zoom in a little.
+- If you see **Zoom In for Park and Local Trails**, the Forest Service and BLM lines are showing, and the OpenStreetMap tracks appear when you zoom in a bit more.
+- Zoomed far out, the map draws the longest trails first and fills in short spurs as you zoom in.
+- Lines already on screen stay put while you pan and zoom.
+:::
 
 The map on the **Find a Ride** tab shows trail lines too when you zoom in, following the choice you made here.
 

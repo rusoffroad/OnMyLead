@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Marker, Polyline } from 'react-native-maps';
 
@@ -11,7 +12,9 @@ const coords = (points: LatLng[]) => points.map((p) => ({ latitude: p.lat, longi
  * imagery, desert sand and snow alike.
  */
 export function RouteLine({ points }: { points: LatLng[] }) {
-  const c = coords(points);
+  // Kept the same while the route is: Apple Maps takes a line off the map and puts it back on any
+  // change, so a fresh copy on every rider update made the route flash.
+  const c = useMemo(() => coords(points), [points]);
   return (
     <>
       <Polyline coordinates={c} strokeColor={Colors.background} strokeWidth={9} lineCap="round" lineJoin="round" zIndex={1} />

@@ -4,7 +4,7 @@ summary: Tap the map to lay down your ride's route. It snaps to trails for you, 
 category: routes-maps
 order: 10
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-10-31
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/app/r/[code].tsx
@@ -112,7 +112,7 @@ You can build the route at onmylead.com too, using the same steps:
 
 - Click the map instead of tapping, and drag a point to move it.
 - Press Ctrl+Z (Cmd+Z on a Mac) to undo the last point.
-- Trail lines and their names appear once you zoom in close, and **Follow Trails** snaps to them the same way.
+- Trail lines and their names appear once you zoom in to about a county's width, and **Follow Trails** snaps to them the same way.
 - On a wide screen, the tools panel sits beside the map.
 
 On a tablet held sideways, the tools panel sits beside the map; swipe it up or tap **Hide** to fold it. Held upright, it floats in the bottom corner of the map.

@@ -47,7 +47,7 @@ function tileBytes(t: Tile): Promise<Uint8Array | null> {
       if (!b) bytes.delete(key);
     });
     bytes.set(key, hit);
-    while (bytes.size > 96) bytes.delete(bytes.keys().next().value!);
+    while (bytes.size > 256) bytes.delete(bytes.keys().next().value!);
   }
   return hit;
 }
@@ -62,13 +62,13 @@ function decoded<T>(cache: Map<string, T[]>, t: Tile, decode: (d: Uint8Array, t:
     if (!d) return [];
     const out = decode(d, t);
     cache.set(key, out);
-    while (cache.size > 64) cache.delete(cache.keys().next().value!);
+    while (cache.size > 256) cache.delete(cache.keys().next().value!);
     return out;
   });
 }
 
-/** A browser window shows far more of the map than a phone, so it reads more squares. */
-const WEB_MAX_TILES = 40;
+/** A browser window shows far more of the map than a phone, so it reads more squares (middle first). */
+const WEB_MAX_TILES = 128;
 
 /** OpenStreetMap tracks for a map view; empty when the map is too far out. */
 export async function loadOsmView(r: ViewRegion, zoom: number, _offline: boolean): Promise<OsmTrail[]> {
