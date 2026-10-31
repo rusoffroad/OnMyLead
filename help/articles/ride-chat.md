@@ -4,7 +4,7 @@ summary: Message everyone on the ride or just the leader, post announcements, an
 category: ride-mode
 order: 40
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-10-31
 sources:
   - app/src/components/ride-chat.tsx
   - app/src/components/message-alerts.tsx
