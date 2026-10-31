@@ -2,6 +2,19 @@
   {
     "date": "2026-10-31",
     "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "version-1-0-2",
+    "why": "App version goes to 1.0.2 (iPhone and iPad build 5, Android versionCode 5) for the store update with the trails, Center on Me, 2027 dates and calendar, share until turned off and iOS contact page fixes. These articles list the app config as a source; nothing in them changes for riders."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
       "create-a-ride-on-the-website",
       "getting-started"
     ],
