@@ -108,4 +108,7 @@ something works):
 7. Run the check again; it must pass. The pull request check runs the same thing.
 
 When a new App Store version is submitted, add it to `help/release.json` `versions`.
+Every app version has rider-facing release notes in `help/release-notes.json` (shown at
+onmylead.com/help/release-notes; its `whatsNew` is the store "What's New" text): add them in the
+pull request that bumps the version, and add each rider-visible change to the next version's notes.
 How the automation works: `help/README.md`.

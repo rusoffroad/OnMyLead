@@ -1,0 +1,118 @@
+[
+  {
+    "version": "1.0.2",
+    "title": "Better Maps on the Trail",
+    "intro": "Roads and trails show from farther out, a new button brings the map back to you, and rides can be planned for 2027 and beyond.",
+    "whatsNew": "What's new in 1.0.2:\n\n• Roads and trails now show when you're zoomed out (about 15 miles across) and no longer flash while you zoom.\n• New Center on Me button in Ride Mode brings the map back to your location.\n• Plan rides in 2027 and later: type a date or jump to any month and year on the calendar.\n• Until I Turn It Off sharing now stays on until you turn it off.\n• iPhone and iPad: Help and Support and Contact Us open without an error alert.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Ride Mode has a Center on Me button. Tap it to bring the map back to your location without changing the zoom."
+      },
+      {
+        "kind": "improved",
+        "text": "Roads and dirt trails show on the Ride Mode map from about 15 miles across, so you no longer have to zoom way in to see them. When you're zoomed far out, the longest trails are drawn first."
+      },
+      {
+        "kind": "improved",
+        "text": "Create a Ride takes dates in 2027 and later, up to three years out. On the calendar you can type a date or jump straight to any month and year."
+      },
+      {
+        "kind": "fixed",
+        "text": "Trail and road lines no longer flash or disappear while you move or zoom the map."
+      },
+      {
+        "kind": "fixed",
+        "text": "Tablets show trails at the same zoom as phones. They used to appear only when zoomed in much closer."
+      },
+      {
+        "kind": "fixed",
+        "text": "Sharing set to Until I Turn It Off now keeps going until you turn it off. It used to stop by itself after 24 hours."
+      },
+      {
+        "kind": "fixed",
+        "text": "Opening Help and Support, Contact Us, Terms or Privacy no longer shows an \"Expo Head\" alert.",
+        "devices": "iphone-ipad"
+      }
+    ]
+  },
+  {
+    "version": "1.0.1",
+    "title": "Android, Battery Saver and Trail Names",
+    "intro": "OnMyLead arrives on Android phones and tablets. This update also adds Battery Saver, a ride calendar, Report a Bug, and trails that are easier to read.",
+    "whatsNew": "What's new in 1.0.1:\n\n• Battery Saver: choose how often your phone sends its location while you share.\n• Create a Ride has a calendar: pick any day up to a year out.\n• Trails are bolder, show their names, and closed trails are marked in red.\n• Search for a place on the waypoints map.\n• Report a Bug from the You tab, with a screenshot.\n• Ride Mode tells you when location is turned off for OnMyLead.",
+    "apple": null,
+    "google": "2026-10-20",
+    "notes": [
+      {
+        "kind": "new",
+        "text": "OnMyLead is on Google Play for Android phones and tablets, with the same rides, live map, chat and Pro plan as on iPhone and iPad.",
+        "devices": "android"
+      },
+      {
+        "kind": "new",
+        "text": "Battery Saver on the You tab lets you choose how often your phone sends its location while you share: Best Accuracy, Balanced or Max Battery Saver."
+      },
+      {
+        "kind": "new",
+        "text": "Create a Ride has a Calendar button to pick any day from today up to a year out, plus Sat and Sun quick picks for the coming weekend."
+      },
+      {
+        "kind": "new",
+        "text": "Report a Bug on the You tab sends us your message with a screenshot, your phone model and app version, so problems get fixed faster."
+      },
+      {
+        "kind": "improved",
+        "text": "Trails are bolder and easier to see, with trail and road names on the map. Closed roads and trails, including today's seasonal closures, show in red with a Closed note."
+      },
+      {
+        "kind": "improved",
+        "text": "Search for a park, trailhead, town or address on the waypoints map, the same way as in the route builder."
+      },
+      {
+        "kind": "fixed",
+        "text": "If you turn off location for OnMyLead while sharing, Ride Mode now tells you with a Location Is Off notice instead of saying you're still sharing."
+      }
+    ]
+  },
+  {
+    "version": "1.0",
+    "title": "First Release",
+    "intro": "The first OnMyLead: plan a ride, bring your crew, and keep everyone together on one live map.",
+    "whatsNew": "Welcome to OnMyLead, the group ride app.\n\n• Create a ride with a meeting point, time and route.\n• Invite riders with a link, code or QR code.\n• See your group on one live map in Ride Mode.\n• Share your location only for the ride, and stop anytime.\n• Ride chat, status buttons, polls and Ride Bubble alerts.\n• Draw routes; with Pro, import GPX and save offline maps.\n• Find rides near you and follow leaders.\n• Works on iPhone and iPad.",
+    "apple": "2026-10-28",
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Create a ride with a meeting point, time, route and who can join, then share it with a link, code or QR code."
+      },
+      {
+        "kind": "new",
+        "text": "Ride Mode puts the whole group on one live map, with status buttons, ride chat, polls and Ride Bubble alerts when someone falls behind."
+      },
+      {
+        "kind": "new",
+        "text": "Location sharing is per ride and temporary. Your exact location is never public, and you can stop sharing anytime."
+      },
+      {
+        "kind": "new",
+        "text": "Draw a route and add waypoints and planned stops. With Pro, import GPX files and save maps for offline use."
+      },
+      {
+        "kind": "new",
+        "text": "Find a ride near you and follow leaders you ride with. With Pro, keep your regular crew together in a riding group with its own chat."
+      },
+      {
+        "kind": "new",
+        "text": "Free lets you create one ride a month and join as many as you like, with every safety feature included. Pro adds unlimited rides, offline maps, GPX import and riding groups, with a 30-day free trial."
+      },
+      {
+        "kind": "new",
+        "text": "iPad gets its own layouts: the live map with a riders sidebar, and split views for rides and routes."
+      }
+    ]
+  }
+]

@@ -11,6 +11,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { checkReleaseNotes } from '../../src/core/release-notes.ts';
 import { HELP, ROOT, engine, filesFor, git, loadHelp, loadLiveEdits, matchesAny, readJson, repoFiles, resolveRelease, withEdit } from './lib.mjs';
 
 const args = process.argv.slice(2);
@@ -75,7 +76,7 @@ for (const a of help.articles) {
   const r = engine.renderMarkdown(a.body.replace(/^:::(release|until)\s+\S+\s*$/gm, '').replace(/^:::\s*$/gm, ''));
   for (const href of r.links) {
     const m = /^\/help\/([a-z0-9-]+)(#.*)?$/.exec(href);
-    if (m && !slugs.has(m[1]) && m[1] !== 'category' && m[1] !== 'search') add('error', s, 'links', `Link to /help/${m[1]}, which doesn't exist.`);
+    if (m && !slugs.has(m[1]) && m[1] !== 'category' && m[1] !== 'search' && m[1] !== 'release-notes') add('error', s, 'links', `Link to /help/${m[1]}, which doesn't exist.`);
     if (/^\/help\/category\/([a-z-]+)/.test(href) && !catKeys.has(href.split('/')[3])) add('error', s, 'links', `Link to unknown category ${href}.`);
     if (/^(?!\/|#|https?:|mailto:)/.test(href)) add('error', s, 'links', `Link "${href}" must start with /, https:// or mailto:.`);
   }
@@ -102,6 +103,19 @@ for (const a of help.articles) {
   }
   if (a.review) add('warning', s, 'review', `Waiting for Chris's review, so not published: ${a.review}`);
 }
+/* ---------------------------------------------------------------------------------------------
+ * 1b. Release notes (help/release-notes.json): well formed, and the app's version has notes
+ * ------------------------------------------------------------------------------------------- */
+const appVersion = readJson(join(ROOT, 'app/app.json')).expo?.version ?? null;
+for (const e of checkReleaseNotes(help.releaseNotes, appVersion)) add('error', 'release-notes', 'release-notes', e);
+if (slugs.has('release-notes')) add('error', 'release-notes', 'format', 'The slug release-notes is the Release Notes page; pick another name for this article.');
+for (const r of Array.isArray(help.releaseNotes) ? help.releaseNotes : []) {
+  const text = [r.title, r.intro, r.whatsNew, ...(r.notes ?? []).map((n) => n.text)].join('\n');
+  for (const u of unreleased)
+    for (const w of u.words ?? [])
+      if (new RegExp(`\\b${w}\\b`, 'i').test(text)) add('error', 'release-notes', 'unreleased', `Release notes ${r.version} mention ${u.feature}. ${u.why}`);
+}
+
 if (!help.articles.some((a) => a.slug === 'faq')) add('warning', null, 'coverage', 'There is no faq article.');
 
 /* ---------------------------------------------------------------------------------------------

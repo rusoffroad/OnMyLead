@@ -8,7 +8,8 @@ import { stripTypeScriptTypes } from 'node:module';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { HELP, ROOT, SITE, engine, git, loadHelp, loadLiveEdits, resolveRelease, withEdit } from './lib.mjs';
+import * as notesRules from '../../src/core/release-notes.ts';
+import { HELP, ROOT, SITE, engine, git, loadHelp, loadLiveEdits, lookupPlay, readJson, resolveRelease, withEdit } from './lib.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = resolve(process.argv[2] ?? 'dist');
@@ -25,6 +26,14 @@ const release = await resolveRelease(help.release, { offline });
 const { edits, error: editsError } = await loadLiveEdits({ offline });
 if (editsError) console.log(`Help: no dashboard edits (${editsError})`);
 const editFor = new Map(edits.map((e) => [e.slug, e]));
+const appConfig = readJson(join(ROOT, 'app/app.json')).expo;
+const play = await lookupPlay(appConfig.android?.package ?? help.release.bundleId, { offline });
+if (play.error && !offline) console.log(`Help: no Google Play version (${play.error})`);
+const stores = {
+  apple: { version: release.apple.checked ? release.apple.version : release.live, releasedAt: release.apple.releasedAt },
+  google: { version: play.version },
+};
+const releaseNotes = notesRules.publishedReleases(help.releaseNotes, stores);
 
 const cats = help.categories;
 const catByKey = new Map(cats.map((c) => [c.key, c]));
@@ -116,7 +125,8 @@ ${jsonLd.map((j) => `<script type="application/ld+json">${JSON.stringify(j).repl
   <a class="brand" href="/" aria-label="OnMyLead home"><img src="/showcase/logo-lockup.png" alt="OnMyLead" width="158" height="36"></a>
   <nav aria-label="Site">
     <a href="/">Home</a>
-    <a href="/help" aria-current="${path.startsWith('/help') ? 'page' : 'false'}">Help Center</a>
+    <a href="/help" aria-current="${path.startsWith('/help') && path !== '/help/release-notes' ? 'page' : 'false'}">Help Center</a>
+    <a class="nav-notes" href="/help/release-notes" aria-current="${path === '/help/release-notes' ? 'page' : 'false'}">Release Notes</a>
     <a href="/contact">Contact Us</a>
   </nav>
   <a class="btn btn-line btn-small" href="/sign-in">Sign In</a>
@@ -130,6 +140,7 @@ ${body}
   <p>Made by <a href="https://rusoffroad.com">RUS Offroad</a>. © ${new Date().getFullYear()} RUS Offroad LLC.</p>
   <nav aria-label="Legal and account">
     <a href="/help">Help Center</a>
+    <a href="/help/release-notes">Release Notes</a>
     <a href="/support">Help and Support</a>
     <a href="/contact">Contact Us</a>
     <a href="/terms">Terms of Use</a>
@@ -191,6 +202,11 @@ const pages = []; // [path, lastmod] for the sitemap
         .join('')}
     </ul>
   </section>
+  ${releaseNotes.length ? `<section aria-labelledby="whats-new" class="whats-new">
+    <h2 id="whats-new">What's New in ${esc(releaseNotes[0].version)}</h2>
+    <p>${esc(releaseNotes[0].intro)}</p>
+    <a class="btn btn-line btn-small" href="/help/release-notes">See All Release Notes</a>
+  </section>` : ''}
   <section aria-labelledby="recent" class="recent">
     <h2 id="recent">Recently Updated</h2>
     <ul class="list">${latest.map(articleLink).join('')}</ul>
@@ -261,7 +277,7 @@ for (const a of published) {
   const r = engine.renderMarkdown(md);
   // A link to an article that isn't public yet (upcoming or waiting for review) becomes plain text.
   r.html = r.html.replace(/<a href="\/help\/([a-z0-9-]+)(#[^"]*)?">([\s\S]*?)<\/a>/g, (m, slug, _hash, label) =>
-    bySlug.has(slug) || slug === 'search' || slug === 'category' ? m : label);
+    bySlug.has(slug) || slug === 'search' || slug === 'category' || slug === 'release-notes' ? m : label);
   const c = catByKey.get(a.category);
   const items = [['Help Center', '/help'], [c?.title ?? 'Help', `/help/category/${a.category}`], [a.title, null]];
   const related = a.related.map((s) => bySlug.get(s)).filter(Boolean);
@@ -327,7 +343,85 @@ for (const a of published) {
   });
 }
 
+/* ---------- release notes ---------- */
+// Every version a store has released, newest first, drawn as stops along a trail
+// (help/release-notes.json; rules in app/src/core/release-notes.ts).
+{
+  const anchor = (v) => `v${v.replace(/\./g, '-')}`;
+  const storeLine = (r, store) => {
+    const s = notesRules.storeState(r, store, help.releaseNotes, stores);
+    const name = store === 'apple' ? 'App Store' : 'Google Play';
+    const devices = store === 'apple' ? 'iPhone and iPad' : 'Android';
+    if (s.state === 'released')
+      return `<li class="store on"><b>${devices}</b><span>${name}${s.date ? `, <time datetime="${s.date}">${engine.formatHelpDate(s.date)}</time>` : ''}</span></li>`;
+    if (s.state === 'later') return `<li class="store"><b>${devices}</b><span>Included in <a href="#${anchor(s.version)}">${esc(s.version)}</a></span></li>`;
+    return `<li class="store"><b>${devices}</b><span>Coming to the ${name}</span></li>`;
+  };
+  const stops = releaseNotes
+    .map(
+      (r, i) => `<li class="stop${i === 0 ? ' latest' : ''}" id="${anchor(r.version)}">
+      <span class="pin" aria-hidden="true"></span>
+      <header class="stop-head">
+        <h2><span class="ver">${esc(r.version)}</span><span class="stop-title">${esc(r.title)}</span></h2>
+        ${i === 0 ? '<span class="tag tag-latest">Latest</span>' : ''}
+      </header>
+      <ul class="stores" aria-label="Where to get ${esc(r.version)}">${storeLine(r, 'apple')}${storeLine(r, 'google')}</ul>
+      <p class="stop-intro">${esc(r.intro)}</p>
+      ${notesRules
+        .groupNotes(r)
+        .map(
+          (g) => `<section class="kind kind-${g.kind}" aria-label="${g.title} in ${esc(r.version)}"><h3>${g.title}</h3><ul>${g.notes
+            .map((n) => `<li>${esc(n.text)}${n.devices ? ` <span class="tag">${notesRules.DEVICE_LABELS[n.devices]}</span>` : ''}</li>`)
+            .join('')}</ul></section>`,
+        )
+        .join('')}
+    </li>`,
+    )
+    .join('');
+  const items = [['Help Center', '/help'], ['Release Notes', null]];
+  const body = `<div class="wrap notes-page">
+  ${crumb(items)}
+  <header class="notes-head">
+    <h1>Release Notes</h1>
+    <p class="lede">What changed in each version of OnMyLead for iPhone, iPad and Android, newest first. Update the app from the App Store or Google Play to get the latest.</p>
+  </header>
+  ${stops ? `<ol class="trail">${stops}</ol>` : '<p class="empty">The first version\'s notes appear here once it is in the App Store or on Google Play.</p>'}
+  <p class="trail-end">Found a problem in the latest version? <a href="/contact">Tell us about it</a>.</p>
+</div>`;
+  const newest = releaseNotes[0];
+  writeFileSync(
+    join(out, 'release-notes.html'),
+    page({
+      path: '/help/release-notes',
+      title: 'Release Notes | OnMyLead Help',
+      description: newest
+        ? `What's new in every OnMyLead update. Latest: ${newest.version}, ${newest.title}.`
+        : "What's new in every OnMyLead update for iPhone, iPad and Android.",
+      body,
+      bodyClass: 'notes',
+      jsonLd: [crumbLd(items)],
+    }),
+  );
+  const lastDate = releaseNotes
+    .flatMap((r) => ['apple', 'google'].map((s) => notesRules.storeState(r, s, help.releaseNotes, stores)))
+    .map((s) => (s.state === 'released' ? s.date : null))
+    .filter(Boolean)
+    .sort()
+    .pop();
+  pages.push(['/help/release-notes', lastDate ?? null]);
+}
+
 /* ---------- search, 404, redirects ---------- */
+if (releaseNotes.length)
+  searchDocs.push({
+    slug: 'release-notes',
+    title: 'Release Notes',
+    summary: `What's new in every OnMyLead update. Latest: ${releaseNotes[0].version}.`,
+    category: 'Help Center',
+    keywords: ['release notes', "what's new", 'changelog', 'update', 'version', ...releaseNotes.map((r) => r.version)],
+    headings: releaseNotes.map((r) => `${r.version} ${r.title}`),
+    text: releaseNotes.flatMap((r) => [r.intro, ...r.notes.map((n) => n.text)]).join(' ').slice(0, 4000),
+  });
 writeFileSync(join(out, 'search-index.json'), JSON.stringify(searchDocs));
 writeFileSync(
   join(out, 'search.html'),
@@ -370,6 +464,8 @@ writeFileSync(
       appleChecked: release.apple.checked,
       appleError: release.apple.error,
       published: published.map((a) => ({ slug: a.slug, updated: a.updated, edit: a.edited?.id ?? null })),
+      googlePlay: play.version,
+      releaseNotes: releaseNotes.map((r) => r.version),
       editsError,
     },
     null,

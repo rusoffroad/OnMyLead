@@ -39,6 +39,7 @@ export function loadHelp() {
     release: readJson(join(HELP, 'release.json')),
     changelog: readJson(join(HELP, 'changelog.json')),
     redirects: readJson(join(HELP, 'redirects.json')),
+    releaseNotes: readJson(join(HELP, 'release-notes.json')),
   };
 }
 
@@ -119,6 +120,27 @@ export async function resolveRelease(release, { offline = false } = {}) {
     publicVersion: live ?? release.prelaunch?.version ?? null,
     notice: prelaunch ? release.prelaunch?.notice ?? null : null,
   };
+}
+
+/**
+ * Which version Google Play shows for the app, read from the public store page (Google has no free
+ * lookup like Apple's). Best effort: if the page can't be read or its layout changed, the answer is
+ * null and the release notes fall back to the dates in help/release-notes.json.
+ */
+export async function lookupPlay(packageName, { offline = false } = {}) {
+  if (offline) return { version: null, error: 'offline' };
+  try {
+    const res = await fetch(`https://play.google.com/store/apps/details?id=${encodeURIComponent(packageName)}&hl=en_US&gl=US`, {
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`Google Play answered ${res.status}`);
+    const html = await res.text();
+    // The version sits next to the minimum Android version: [[["1.0.1"]],[[[36]],[[[24,"7.0"]]]]]
+    const m = /\[\[\["(\d+(?:\.\d+){0,2})"\]\],\[\[\[\d+\]\],\[\[\[\d+,"[\d.]+"\]\]\]\]\]/.exec(html);
+    return m ? { version: m[1], error: null } : { version: null, error: 'version not found on the Google Play page' };
+  } catch (e) {
+    return { version: null, error: String(e.message ?? e) };
+  }
 }
 
 /**
