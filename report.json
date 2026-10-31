@@ -1,0 +1,1011 @@
+{
+  "generated": "2026-10-31T16:46:22.813Z",
+  "commit": "48f08362b6f738be9764cf32b82c0fd01fe6599d",
+  "features": 57,
+  "columns": {
+    "iPhone": {
+      "counts": {
+        "✅": 47,
+        "🟡": 5,
+        "🔨": 0,
+        "⬜": 2,
+        "➖": 3
+      },
+      "open": [
+        {
+          "id": "F09",
+          "feature": "Edit ride name, time, meeting point",
+          "mark": "⬜"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F48",
+          "feature": "CarPlay / Android Auto",
+          "mark": "⬜"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "iPad": {
+      "counts": {
+        "✅": 1,
+        "🟡": 48,
+        "🔨": 0,
+        "⬜": 5,
+        "➖": 3
+      },
+      "open": [
+        {
+          "id": "F01",
+          "feature": "Email sign-up, sign-in, reset, email link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F02",
+          "feature": "Sign in with Apple",
+          "mark": "🟡"
+        },
+        {
+          "id": "F03",
+          "feature": "Sign in with Google",
+          "mark": "🟡"
+        },
+        {
+          "id": "F04",
+          "feature": "Sign in with Facebook",
+          "mark": "🟡"
+        },
+        {
+          "id": "F05",
+          "feature": "Ride name, social profile",
+          "mark": "🟡"
+        },
+        {
+          "id": "F06",
+          "feature": "Delete account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F07",
+          "feature": "Create a ride (app and website)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F08",
+          "feature": "Free ride limit (1 a month)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F09",
+          "feature": "Edit ride name, time, meeting point",
+          "mark": "⬜"
+        },
+        {
+          "id": "F10",
+          "feature": "Cancel, delete, end ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F11",
+          "feature": "Organizer controls: approvals, hand-off, leaders, tail gunner",
+          "mark": "🟡"
+        },
+        {
+          "id": "F12",
+          "feature": "Ride page, Ride Day weather, fuel check",
+          "mark": "🟡"
+        },
+        {
+          "id": "F13",
+          "feature": "Join: code, link, QR, waitlist, check-in",
+          "mark": "🟡"
+        },
+        {
+          "id": "F14",
+          "feature": "Universal / App Links (onmylead.com/r, /g)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F15",
+          "feature": "Invite card: share, text, email, QR",
+          "mark": "🟡"
+        },
+        {
+          "id": "F16",
+          "feature": "Find a Ride (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F17",
+          "feature": "Ride Mode live map",
+          "mark": "🟡"
+        },
+        {
+          "id": "F18",
+          "feature": "Live location sharing (foreground)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F19",
+          "feature": "Background location during a ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F20",
+          "feature": "Wi-Fi-only tablets (no GPS)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F21",
+          "feature": "Personal sharing, family link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F22",
+          "feature": "Freshness, Ride Bubble, convoy",
+          "mark": "🟡"
+        },
+        {
+          "id": "F23",
+          "feature": "Status buttons, broadcast receipts, regroup, Mechanical Issue, SOS",
+          "mark": "🟡"
+        },
+        {
+          "id": "F24",
+          "feature": "Ride chat (everyone / leader)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F25",
+          "feature": "Ride polls (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F26",
+          "feature": "Route builder, trail snapping",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27",
+          "feature": "Maps (satellite, topo, trails layers)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F28",
+          "feature": "GPX import",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29",
+          "feature": "Waypoints, planned stops",
+          "mark": "🟡"
+        },
+        {
+          "id": "F30",
+          "feature": "Directions hand-off",
+          "mark": "🟡"
+        },
+        {
+          "id": "F31",
+          "feature": "Offline maps",
+          "mark": "🟡"
+        },
+        {
+          "id": "F32",
+          "feature": "Place search",
+          "mark": "🟡"
+        },
+        {
+          "id": "F33",
+          "feature": "Riding groups, group chat, follow leaders",
+          "mark": "⬜"
+        },
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F35",
+          "feature": "Garage, fuel range",
+          "mark": "⬜"
+        },
+        {
+          "id": "F36",
+          "feature": "Trip planner (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F37",
+          "feature": "Starlink (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38",
+          "feature": "RUS gear (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F39",
+          "feature": "Ride summary, share card, ride again",
+          "mark": "🟡"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F41",
+          "feature": "Notification settings, quiet hours",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F44",
+          "feature": "30-day Pro trial",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F49",
+          "feature": "Keyboard Done bar / dismiss",
+          "mark": "🟡"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Android Phone": {
+      "counts": {
+        "✅": 1,
+        "🟡": 46,
+        "🔨": 0,
+        "⬜": 7,
+        "➖": 3
+      },
+      "open": [
+        {
+          "id": "F01",
+          "feature": "Email sign-up, sign-in, reset, email link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F02",
+          "feature": "Sign in with Apple",
+          "mark": "⬜"
+        },
+        {
+          "id": "F03",
+          "feature": "Sign in with Google",
+          "mark": "⬜"
+        },
+        {
+          "id": "F04",
+          "feature": "Sign in with Facebook",
+          "mark": "🟡"
+        },
+        {
+          "id": "F05",
+          "feature": "Ride name, social profile",
+          "mark": "🟡"
+        },
+        {
+          "id": "F06",
+          "feature": "Delete account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F07",
+          "feature": "Create a ride (app and website)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F08",
+          "feature": "Free ride limit (1 a month)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F09",
+          "feature": "Edit ride name, time, meeting point",
+          "mark": "⬜"
+        },
+        {
+          "id": "F10",
+          "feature": "Cancel, delete, end ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F11",
+          "feature": "Organizer controls: approvals, hand-off, leaders, tail gunner",
+          "mark": "🟡"
+        },
+        {
+          "id": "F12",
+          "feature": "Ride page, Ride Day weather, fuel check",
+          "mark": "🟡"
+        },
+        {
+          "id": "F13",
+          "feature": "Join: code, link, QR, waitlist, check-in",
+          "mark": "🟡"
+        },
+        {
+          "id": "F14",
+          "feature": "Universal / App Links (onmylead.com/r, /g)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F15",
+          "feature": "Invite card: share, text, email, QR",
+          "mark": "🟡"
+        },
+        {
+          "id": "F16",
+          "feature": "Find a Ride (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F17",
+          "feature": "Ride Mode live map",
+          "mark": "⬜"
+        },
+        {
+          "id": "F18",
+          "feature": "Live location sharing (foreground)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F19",
+          "feature": "Background location during a ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21",
+          "feature": "Personal sharing, family link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F22",
+          "feature": "Freshness, Ride Bubble, convoy",
+          "mark": "🟡"
+        },
+        {
+          "id": "F23",
+          "feature": "Status buttons, broadcast receipts, regroup, Mechanical Issue, SOS",
+          "mark": "🟡"
+        },
+        {
+          "id": "F24",
+          "feature": "Ride chat (everyone / leader)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F25",
+          "feature": "Ride polls (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F26",
+          "feature": "Route builder, trail snapping",
+          "mark": "⬜"
+        },
+        {
+          "id": "F27",
+          "feature": "Maps (satellite, topo, trails layers)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F28",
+          "feature": "GPX import",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29",
+          "feature": "Waypoints, planned stops",
+          "mark": "🟡"
+        },
+        {
+          "id": "F30",
+          "feature": "Directions hand-off",
+          "mark": "🟡"
+        },
+        {
+          "id": "F31",
+          "feature": "Offline maps",
+          "mark": "🟡"
+        },
+        {
+          "id": "F32",
+          "feature": "Place search",
+          "mark": "🟡"
+        },
+        {
+          "id": "F33",
+          "feature": "Riding groups, group chat, follow leaders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F35",
+          "feature": "Garage, fuel range",
+          "mark": "🟡"
+        },
+        {
+          "id": "F36",
+          "feature": "Trip planner (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F37",
+          "feature": "Starlink (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38",
+          "feature": "RUS gear (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F39",
+          "feature": "Ride summary, share card, ride again",
+          "mark": "🟡"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F41",
+          "feature": "Notification settings, quiet hours",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F44",
+          "feature": "30-day Pro trial",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F48",
+          "feature": "CarPlay / Android Auto",
+          "mark": "⬜"
+        },
+        {
+          "id": "F49",
+          "feature": "Keyboard Done bar / dismiss",
+          "mark": "🟡"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Android Tablet": {
+      "counts": {
+        "✅": 1,
+        "🟡": 42,
+        "🔨": 0,
+        "⬜": 11,
+        "➖": 3
+      },
+      "open": [
+        {
+          "id": "F01",
+          "feature": "Email sign-up, sign-in, reset, email link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F02",
+          "feature": "Sign in with Apple",
+          "mark": "⬜"
+        },
+        {
+          "id": "F03",
+          "feature": "Sign in with Google",
+          "mark": "⬜"
+        },
+        {
+          "id": "F04",
+          "feature": "Sign in with Facebook",
+          "mark": "🟡"
+        },
+        {
+          "id": "F05",
+          "feature": "Ride name, social profile",
+          "mark": "🟡"
+        },
+        {
+          "id": "F06",
+          "feature": "Delete account",
+          "mark": "⬜"
+        },
+        {
+          "id": "F07",
+          "feature": "Create a ride (app and website)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F08",
+          "feature": "Free ride limit (1 a month)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F09",
+          "feature": "Edit ride name, time, meeting point",
+          "mark": "⬜"
+        },
+        {
+          "id": "F10",
+          "feature": "Cancel, delete, end ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F11",
+          "feature": "Organizer controls: approvals, hand-off, leaders, tail gunner",
+          "mark": "🟡"
+        },
+        {
+          "id": "F12",
+          "feature": "Ride page, Ride Day weather, fuel check",
+          "mark": "🟡"
+        },
+        {
+          "id": "F13",
+          "feature": "Join: code, link, QR, waitlist, check-in",
+          "mark": "🟡"
+        },
+        {
+          "id": "F14",
+          "feature": "Universal / App Links (onmylead.com/r, /g)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F15",
+          "feature": "Invite card: share, text, email, QR",
+          "mark": "🟡"
+        },
+        {
+          "id": "F16",
+          "feature": "Find a Ride (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F17",
+          "feature": "Ride Mode live map",
+          "mark": "⬜"
+        },
+        {
+          "id": "F18",
+          "feature": "Live location sharing (foreground)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F19",
+          "feature": "Background location during a ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F20",
+          "feature": "Wi-Fi-only tablets (no GPS)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F21",
+          "feature": "Personal sharing, family link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F22",
+          "feature": "Freshness, Ride Bubble, convoy",
+          "mark": "🟡"
+        },
+        {
+          "id": "F23",
+          "feature": "Status buttons, broadcast receipts, regroup, Mechanical Issue, SOS",
+          "mark": "🟡"
+        },
+        {
+          "id": "F24",
+          "feature": "Ride chat (everyone / leader)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F25",
+          "feature": "Ride polls (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F26",
+          "feature": "Route builder, trail snapping",
+          "mark": "⬜"
+        },
+        {
+          "id": "F27",
+          "feature": "Maps (satellite, topo, trails layers)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F28",
+          "feature": "GPX import",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29",
+          "feature": "Waypoints, planned stops",
+          "mark": "🟡"
+        },
+        {
+          "id": "F30",
+          "feature": "Directions hand-off",
+          "mark": "🟡"
+        },
+        {
+          "id": "F31",
+          "feature": "Offline maps",
+          "mark": "🟡"
+        },
+        {
+          "id": "F32",
+          "feature": "Place search",
+          "mark": "🟡"
+        },
+        {
+          "id": "F33",
+          "feature": "Riding groups, group chat, follow leaders",
+          "mark": "⬜"
+        },
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F35",
+          "feature": "Garage, fuel range",
+          "mark": "⬜"
+        },
+        {
+          "id": "F36",
+          "feature": "Trip planner (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F37",
+          "feature": "Starlink (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38",
+          "feature": "RUS gear (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F39",
+          "feature": "Ride summary, share card, ride again",
+          "mark": "🟡"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F41",
+          "feature": "Notification settings, quiet hours",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F44",
+          "feature": "30-day Pro trial",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F49",
+          "feature": "Keyboard Done bar / dismiss",
+          "mark": "🟡"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Backend": {
+      "counts": {
+        "✅": 36,
+        "🟡": 7,
+        "🔨": 0,
+        "⬜": 1,
+        "➖": 13
+      },
+      "open": [
+        {
+          "id": "F09",
+          "feature": "Edit ride name, time, meeting point",
+          "mark": "⬜"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F51",
+          "feature": "Admin: signups and downloads",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Admin": {
+      "counts": {
+        "✅": 14,
+        "🟡": 5,
+        "🔨": 0,
+        "⬜": 0,
+        "➖": 38
+      },
+      "open": [
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F51",
+          "feature": "Admin: signups and downloads",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Docs": {
+      "counts": {
+        "✅": 52,
+        "🟡": 0,
+        "🔨": 0,
+        "⬜": 2,
+        "➖": 3
+      },
+      "open": [
+        {
+          "id": "F09",
+          "feature": "Edit ride name, time, meeting point",
+          "mark": "⬜"
+        },
+        {
+          "id": "F20",
+          "feature": "Wi-Fi-only tablets (no GPS)",
+          "mark": "⬜"
+        }
+      ]
+    }
+  },
+  "foundations": [
+    {
+      "id": "D03",
+      "item": "Tablet layouts: Ride Mode sidebar, ride page split, list + detail",
+      "mark": "🔨",
+      "notes": "Ride Mode, ride page, Find, route builder, waypoints, Rides home and tab rail done; groups / garage / trips list + detail and keyboard shortcuts in issue #101"
+    },
+    {
+      "id": "D08",
+      "item": "Platform-neutral copy (no \"iPhone\" in shared screens)",
+      "mark": "🔨",
+      "notes": "PR #99 fixed the Android app's support answers, notification settings button and directions labels; the website showcase and Help Center now say iPhone, iPad and Android (iPad and Android release PR); legal and some billing copy remain"
+    }
+  ],
+  "drift": [
+    {
+      "sha": "fca55a1",
+      "date": "2026-10-31",
+      "subject": "Version 1.0.2: iOS build 5, Android versionCode 5"
+    }
+  ],
+  "errors": []
+}
