@@ -346,6 +346,7 @@ export function Showcase() {
           <a href="/terms" onClick={go('/terms')}>Terms of Use</a>
           <a href="/privacy" onClick={go('/privacy')}>Privacy Policy</a>
           <a href="/help">Help Center</a>
+          <a href="/help/release-notes">Release Notes</a>
           <a href="/support" onClick={go('/support')}>Help and Support</a>
           <a href="/contact" onClick={go('/contact')}>Contact Us</a>
           <a href="/sign-in" onClick={go('/sign-in')}>Sign In</a>

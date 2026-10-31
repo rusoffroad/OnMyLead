@@ -1,6 +1,6 @@
 ---
 title: Frequently Asked Questions
-summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, iPhone, iPad and Android, and the website.
+summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, iPhone, iPad and Android, updates, and the website.
 category: troubleshooting
 order: 20
 release: "1.0"
@@ -21,7 +21,7 @@ sources:
   - app/src/core/waypoints.ts
   - app/app.json
 related: [troubleshooting, free-vs-pro, privacy, location-sharing, contact-support]
-keywords: [questions, faq, how many rides, cost, price, free, iphone, website, tablet]
+keywords: [questions, faq, release notes, what's new, update, version, how many rides, cost, price, free, iphone, website, tablet]
 ---
 
 ## Is OnMyLead Free?
@@ -89,6 +89,10 @@ No. Positions only update when a phone has a connection. [Offline maps](/help/of
 Yes. OnMyLead is in the App Store for iPhone and iPad, and on Google Play for Android phones and tablets. On a tablet the map fills the screen, see [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet). You can also plan a ride on the website at onmylead.com, see [Create a Ride on the Website](/help/create-a-ride-on-the-website).
 
  iPhone and Android riders can join the same ride, see each other on the map and chat together.
+
+## How Do I See What Changed in an Update?
+
+Every version's changes are listed in the [Release Notes](/help/release-notes), newest first, with when it reached the App Store and Google Play. To get the latest version, update OnMyLead from the App Store or Google Play.
 
 ## How Many Waypoints Can I Add?
 

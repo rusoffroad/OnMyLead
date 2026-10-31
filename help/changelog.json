@@ -2,6 +2,27 @@
   {
     "date": "2026-10-31",
     "slugs": [
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "release-notes-page",
+    "why": "These guides list the website home page as a source. Its footer only gains a Release Notes link; nothing they describe changes."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
+      "faq"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "release-notes-page",
+    "why": "Chris asked for a page on the website with the changelog and release notes for every app version. onmylead.com/help/release-notes is built from help/release-notes.json and shows each version once the App Store or Google Play has it (1.0 and 1.0.1 today; 1.0.2 is written and appears when a store releases it). It is linked from the Help Center menu, home page and footer and the website footer. The FAQ gets a question pointing to it."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
       "map-layers",
       "troubleshooting",
       "route-builder",

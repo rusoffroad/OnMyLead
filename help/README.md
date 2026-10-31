@@ -41,6 +41,24 @@ nightly as well as on every change; the server picks it up at the next website d
 When a new version is submitted, add it to `versions` in `release.json` in the same pull request
 that bumps the build number.
 
+## Release notes
+
+`help/release-notes.json` holds the release notes for every app version, newest first, and the
+build turns it into **onmylead.com/help/release-notes** (linked from the Help Center menu, its home
+page and both footers). Each version has a Title Case `title`, an `intro`, `notes` (each `new`,
+`improved` or `fixed`, with optional `devices`: `iphone-ipad`, `android`, `phones`, `tablets`), the
+store text `whatsNew` (at most 500 characters, Google Play's limit; paste it into both stores), and
+the store release days `apple` and `google` (or null).
+
+A version shows on the page only once a store has it: the build asks Apple's lookup and reads the
+version on the public Google Play page, so a version appears by itself on the first website build
+after a store releases it. Fill in `apple` / `google` with the release day once known; a version
+skipped on one store says "Included in" the next version that store got. Rules and tests:
+`app/src/core/release-notes.ts`.
+
+The check fails when the file is malformed, mentions an unreleased feature, or has no notes for
+the version in `app/app.json`, so the pull request that bumps the version writes its notes.
+
 ## Manual edits (Admin Dashboard)
 
 The dashboard's Help page can edit any article, restore any earlier version (from git history or
@@ -79,6 +97,7 @@ HELP_OFFLINE=1 node scripts/help/build.mjs dist     # after expo export; preview
 | `help/img/` | Screenshots used by articles |
 | `help/categories.json` | Topics, in order |
 | `help/release.json` | App Store versions, statuses and unreleased features |
+| `help/release-notes.json` | Rider-facing release notes for every app version (onmylead.com/help/release-notes) and the store "What's New" text |
 | `help/changelog.json` | Every change to the articles and why, newest first |
 | `help/coverage.json` | Which screens must be documented |
 | `help/redirects.json` | Old slug to new slug, for removed articles |
