@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-10-31
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/r/[code].tsx
@@ -18,11 +18,12 @@ sources:
   - app/src/core/panel-swipe.ts
   - app/src/core/freshness.ts
   - app/src/core/live-roster.ts
+  - app/src/core/map-center.ts
   - app/src/core/route.ts
   - app/src/core/sharing.ts
   - app/src/lib/location.ts
 related: [location-sharing, status-buttons, ride-bubble, ride-chat, directions, offline-maps]
-keywords: [live map, group map, tracking, live tracking, rider dots, last seen, no signal, follow the group, screen stays on]
+keywords: [center on me, my location, recenter, live map, group map, tracking, live tracking, rider dots, last seen, no signal, follow the group, screen stays on]
 screenshots:
   - file: live.webp
     shows: app/src/app/ride/[id]/live.tsx
@@ -65,6 +66,15 @@ The map shows the ride's route, waypoints, planned stops and any regroup point. 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
 
 To switch map layers or download the ride's map for riding with no signal, use the layers button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
+
+:::release 1.0.2
+### Center the Map on You
+
+Tap the round target button to move the map so you're in the middle of it. The map keeps how far you've zoomed in or out, and puts you in the middle of the part you can see, clear of the panel. If the app doesn't have your location yet, the button spins for a moment while your phone finds you. If location is off for OnMyLead, it offers **Open Settings** so you can turn it on.
+
+- **iPhone and Android phones:** the button sits on the right, just above the bottom panel (above **Add Waypoint**). When the panel is open and fills the screen, fold it to see the button.
+- **iPad and Android tablets:** the button sits at the bottom of the map, just left of the buttons panel.
+:::
 
 ### The Bottom Panel
 

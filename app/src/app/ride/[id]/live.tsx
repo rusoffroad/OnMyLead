@@ -5,12 +5,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert, Animated, AppState, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View,
+  ActivityIndicator, Alert, Animated, AppState, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
-import { GroupMap, type MapRider } from '@/components/group-map';
+import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group-map';
 import { Icon } from '@/components/icon';
 import { KeyboardLift } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
@@ -87,6 +87,8 @@ const ALERTS_MIN = 72;
 const ALERTS_MAX = 180;
 const BANNERS_MIN = 76;
 const WP_FAB_H = 44;
+/** The round Center on Me button. */
+const LOCATE_SIZE = 48;
 // On a tablet the panels float this far from the screen's edges.
 const EDGE = 12;
 // On a tablet the controls panel starts below the map layers button (and its downloaded-map tag).
@@ -537,6 +539,13 @@ export default function RideMode() {
   // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
   // and hold the map still drops one).
   const wpFabFits = screenH - panelBottom - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
+  // Center on Me. On a phone it sits on the right just above the panel, over Add Waypoint when
+  // that is there, and shows when there is room (folding the panel always makes room). On a
+  // tablet it sits in the open map's bottom corner, just left of the panel, so it is always there.
+  // The web has no live map to move, so it has no button.
+  const locateBottom = tablet ? panelBottom : panelBottom + panelH + 12 + (mine && wpFabFits ? WP_FAB_H + 8 : 0);
+  const locateFits = Platform.OS !== 'web' && !!panelH &&
+    (tablet || screenH - locateBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
   // The first framing of the group keeps it clear of the panels over the map.
   const sidebarOpen = sidebar.open;
   const fitPadding = useMemo(
@@ -653,6 +662,50 @@ export default function RideMode() {
     }
   }
 
+  /**
+   * Center on Me: move the map so this rider's spot is in the middle of the open map (between
+   * the banners and the panel on a phone, between the riders list and the panel on a tablet),
+   * keeping the zoom. Uses the fix Ride Mode already has, else the phone's recent one, else a
+   * fresh one, asking for while-using access only if it was never given.
+   */
+  const groupMap = useRef<GroupMapHandle>(null);
+  const [locating, setLocating] = useState(false);
+  async function centerOnMe() {
+    Haptics.selectionAsync().catch(() => {});
+    let at = myFix;
+    if (!at) {
+      try {
+        const l = await Location.getLastKnownPositionAsync({ maxAge: 60_000 });
+        if (l) at = { lat: l.coords.latitude, lng: l.coords.longitude };
+      } catch {}
+    }
+    if (!at) {
+      setLocating(true);
+      try {
+        at = await Promise.race([
+          currentPosition(Location.Accuracy.Balanced),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+        ]);
+      } catch {
+        setLocating(false);
+        Alert.alert('Location Is Off', 'Allow OnMyLead to use your location in Settings to center the map on you.', [
+          { text: 'Not Now', style: 'cancel' },
+          { text: 'Open Settings', onPress: () => Linking.openSettings().catch(() => {}) },
+        ]);
+        return;
+      }
+      setLocating(false);
+    }
+    if (!at) {
+      Alert.alert('No Location Yet', "Your phone hasn't found where you are yet. Try again in a moment.");
+      return;
+    }
+    const inset = tablet
+      ? { top: insets.top + EDGE, right: panelW + 2 * EDGE, bottom: panelBottom, left: sidebar.open ? sideW + 2 * EDGE : 0 }
+      : { top: shownBannersBottom, right: 0, bottom: panelBottom + panelH, left: 0 };
+    await groupMap.current?.centerOn(at, inset);
+  }
+
   async function dropWaypointHere() {
     let at: { lat: number; lng: number } | null = null;
     try {
@@ -722,6 +775,7 @@ export default function RideMode() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <GroupMap
+        ref={groupMap}
         riders={mapRiders}
         meId={me}
         regroup={regroup}
@@ -897,6 +951,22 @@ export default function RideMode() {
           style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
           <WaypointBlaze kind="spot" shared={false} size={24} />
           <Text style={styles.wpFabText}>Add Waypoint</Text>
+        </Pressable>
+      ) : null}
+
+      {locateFits ? (
+        <Pressable
+          onPress={centerOnMe}
+          disabled={locating}
+          accessibilityRole="button"
+          accessibilityLabel="Center the map on you"
+          accessibilityState={{ busy: locating }}
+          hitSlop={6}
+          style={({ pressed }) => [
+            styles.locateFab, { bottom: locateBottom, opacity: pressed ? 0.8 : 1 },
+            tablet && { right: panelW + 2 * EDGE },
+          ]}>
+          {locating ? <ActivityIndicator color={Colors.sky} /> : <Icon name="locate" size={26} color={Colors.sky} strokeWidth={2.2} />}
         </Pressable>
       ) : null}
 
@@ -1268,6 +1338,11 @@ const styles = StyleSheet.create({
     borderRadius: 22, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
   },
   directionsFab: { left: 12 },
+  locateFab: {
+    position: 'absolute', right: 12, width: LOCATE_SIZE, height: LOCATE_SIZE, borderRadius: LOCATE_SIZE / 2,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
+  },
   waypointFab: { right: 12 },
   wpFabText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },

@@ -1,16 +1,17 @@
+import type { Ref } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import type { MapRider } from './group-map-types';
+import type { GroupMapHandle, MapRider } from './group-map-types';
 import { BreakdownBadge } from './rider-status-badge';
 import { RiderDot } from './rider-dot';
 import { RouteSketch } from './route-sketch';
 import { waypointDots } from './waypoint-blaze';
 
-export type { MapRider } from './group-map-types';
+export type { GroupMapHandle, MapRider } from './group-map-types';
 
 /**
  * The web build has no native map. With a route, draw it with the riders on it; without one,
@@ -28,6 +29,8 @@ export function GroupMap({
   onPressWaypoint?: (w: Waypoint) => void;
   onLongPressMap?: (p: LatLng) => void;
   edgePadding?: { top: number; right: number; bottom: number; left: number };
+  /** No live map on the web, so Ride Mode shows no center-on-me button there. */
+  ref?: Ref<GroupMapHandle>;
 }) {
   if (route && route.length > 1) {
     const dots = riders
