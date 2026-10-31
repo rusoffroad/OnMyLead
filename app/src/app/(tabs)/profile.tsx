@@ -35,6 +35,7 @@ export default function You() {
   const [rideName, setRideName] = useState<string | null>(null);
   /** When the rider's personal share ends (epoch ms; far off for "until I turn it off"), or null when not sharing. */
   const [sharingUntil, setSharingUntil] = useState<number | null>(null);
+  const [sharingCheckedAt, setSharingCheckedAt] = useState(0);
   const [directionsOpen, setDirectionsOpen] = useState(false);
   const notifications = useNotificationSettings();
   const mapsPref = useMapsPreference();
@@ -66,6 +67,7 @@ export default function You() {
         .then((all) => {
           const ends = all.filter((x) => x.scope === 'personal').map((x) => Date.parse(x.expires_at!));
           setSharingUntil(ends.length ? Math.max(...ends) : null);
+          setSharingCheckedAt(Date.now());
         })
         .catch(() => setSharingUntil(null));
       // Keeps the name and photo from their Apple, Google or Facebook sign-in up to date.
@@ -118,7 +120,7 @@ export default function You() {
       </MenuGroup>
 
       <MenuGroup title="On the Trail">
-        <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail={sharingUntil != null ? `Sharing now, ${shareEndText(sharingUntil, Date.now())}. Tap to stop` : 'With chosen riders or family, for as long as you pick'} onPress={needsAccount('/share')} />
+        <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail={sharingUntil != null ? `Sharing now, ${shareEndText(sharingUntil, sharingCheckedAt)}. Tap to stop` : 'With chosen riders or family, for as long as you pick'} onPress={needsAccount('/share')} />
         <MenuRow
           icon="battery"
           color={batteryMode === 'best' ? RideColors.green : RideColors.yellow}

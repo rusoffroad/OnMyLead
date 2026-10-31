@@ -101,7 +101,7 @@ export default function ShareMyLocation() {
               Sharing Now, {untilOff || multiDay ? shareEndText(endAt, now) : formatRemaining(left)}
             </ThemedText>
             {untilOff ? (
-              <ThemedText type="small" themeColor="textSecondary">This keeps going, even for days, until you tap Stop.</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">This keeps going, even for days, until you tap Stop Sharing.</ThemedText>
             ) : null}
             {s.link_token ? <ThemedText type="small" themeColor="textSecondary">Includes a family link</ThemedText> : null}
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>

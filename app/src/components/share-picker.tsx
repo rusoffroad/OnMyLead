@@ -57,7 +57,7 @@ export function SharePicker({
 
   function shareUntil() {
     if (problem || endAt == null) return setError(minutes == null && day ? 'Time looks off. Try "6:00 pm".' : problem);
-    onPick(minutesUntil(endAt, Date.now()));
+    onPick(minutesUntil(endAt, new Date().getTime()));
   }
 
   return (
