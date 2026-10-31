@@ -1,6 +1,35 @@
 [
   {
     "date": "2026-10-31",
+    "slugs": [
+      "create-a-ride",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-dates-calendar",
+    "why": "Create a Ride: rides can now be set up to three years out (2027 and later work), and the calendar lets riders type a date or jump to any month and year. App text is in a 1.0.2 block; the website gets it on its next deploy."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
+      "approvals-and-waitlist",
+      "edit-cancel-or-delete-a-ride",
+      "free-vs-pro",
+      "fuel-range",
+      "invite-riders",
+      "place-search",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-dates-calendar",
+    "why": "These articles list the Create a Ride screen as a source. Only its ride-day picker and the out-of-range message changed; nothing in these articles changes for riders."
+  },
+  {
+    "date": "2026-10-31",
     "slugs": ["contact-support"],
     "kind": "update",
     "by": "pr",

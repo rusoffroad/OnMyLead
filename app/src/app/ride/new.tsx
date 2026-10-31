@@ -149,7 +149,7 @@ export default function NewRide() {
     if (!kind) return setError('Pick Public or Private at the top.');
     if (!name.trim()) return setError('Give the ride a name.');
     if (!meetAt) return setError('Meeting time looks off. Try "8:00 am".');
-    if (!canRideOn(dayDate, new Date())) return setError('Pick a day from today up to a year out.');
+    if (!canRideOn(dayDate, new Date())) return setError('Pick a day from today up to three years out.');
     if (!parsedCoords) return setError('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".');
     if (!routePlan) return setError('Pick Mapped or Freeride under The Route.');
     setBusy(true);

@@ -4,7 +4,7 @@ summary: Plan a ride on onmylead.com from your computer, drop the meeting point 
 category: rides
 order: 20
 release: web
-updated: 2026-10-18
+updated: 2026-10-31
 sources:
   - app/src/app/ride/new.tsx
   - app/src/components/meet-point-map.web.tsx
@@ -13,6 +13,7 @@ sources:
   - app/src/components/route-builder-map.web.tsx
   - app/src/components/get-the-app.web.tsx
   - app/src/components/ride-date-picker.tsx
+  - app/src/components/date-calendar.tsx
 related: [create-a-ride, route-builder, waypoints-and-planned-stops, invite-riders, sign-in]
 keywords: [website, web, computer, desktop, laptop, browser, onmylead.com, plan on the web, big screen, tablet]
 screenshots:
@@ -29,7 +30,7 @@ You can plan a ride on the big screen at onmylead.com. It's the same ride as one
 1. Go to onmylead.com and click **Create a Ride on the Web**.
 2. Sign in with your OnMyLead account if you aren't already. You go straight to Create a Ride after signing in.
 3. Pick **Public** or **Private** under **What Kind of Ride?**
-4. Fill in the **Ride Name**, the day under **When**, and the **Meet At** time. Click **Calendar** to pick any day from today up to a year out.
+4. Fill in the **Ride Name**, the day under **When**, and the **Meet At** time. Click **Calendar**, then type the date (such as 06/12/2027) in **Type a Date** or click it on the calendar. Click the month's name to jump to another year and month. Any day from today up to three years out works.
 5. Set the **Meeting Point**: type a park, trailhead, town or address in **Search a Place or Address** (just above the map) and pick it, or click the satellite map to drop the pin, then drag the pin to fine-tune it. You can also use your location or type coordinates, and the pin moves there.
 6. Under **The Route**, pick **Mapped** or **Freeride**.
 7. Fill in anything else you want, then click **Create Public Ride** or **Create Private Ride**.
