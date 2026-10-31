@@ -23,6 +23,19 @@
   {
     "date": "2026-10-31",
     "slugs": [
+      "map-layers",
+      "troubleshooting",
+      "route-builder",
+      "offline-maps"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "trails-zoomed-out",
+    "why": "Chris found that Ride Mode only showed roads and trails when zoomed way in, and that they flashed when zooming out. OpenStreetMap tracks now show from about 15 miles across (the same zoom on iPad and Android tablets as on a phone), the longest trails are drawn first when zoomed far out, and lines on screen stay put while the map moves. The app text ships with 1.0.2; the website change goes live with the next website deploy. Offline Maps only lists these files as sources: downloads save the same squares as before, so nothing changes there for riders."
+  },
+  {
+    "date": "2026-10-31",
+    "slugs": [
       "location-sharing",
       "family-link",
       "faq",

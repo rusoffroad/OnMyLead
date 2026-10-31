@@ -23,8 +23,15 @@ export const OSM_ATTRIBUTION = '© OpenStreetMap contributors, © OpenMapTiles, 
 /** OpenMapTiles puts dirt tracks in squares from zoom 13; zoom 14 is the closest square made. */
 export const OSM_MIN_Z = 13;
 export const OSM_MAX_Z = 14;
-/** The most squares fetched for one view, and the most lines drawn, so a dense area stays smooth. */
-export const OSM_MAX_TILES = 16;
+/**
+ * The farthest out (real map zoom) tracks are drawn: about 15 miles across a phone. Wider than the
+ * squares that carry them, so a view this far out reads many zoom 13 squares, which are small
+ * (about 10 KB) and kept on the phone once seen.
+ */
+export const OSM_VIEW_MIN_Z = 11;
+/** The most squares read for one view (middle first), so a tablet zoomed far out stays quick. */
+export const OSM_MAX_TILES = 96;
+/** The most line pieces drawn: the longest win, so a wide view still shows the main trails everywhere. */
 export const OSM_MAX_LINES = 500;
 
 export type OsmTrail = {
@@ -41,10 +48,13 @@ export type OsmTrail = {
   parts: LatLng[][];
 };
 
-/** Which square zoom to read for a map zoom, or null when the map is too far out for tracks. */
+/**
+ * Which square zoom to read for a (real) map zoom, or null when the map is too far out for tracks.
+ * Zoom 13 squares serve every view out to OSM_VIEW_MIN_Z; zoom 14 adds the finest detail up close.
+ */
 export function osmTileZoom(mapZoom: number): number | null {
-  if (mapZoom < OSM_MIN_Z - 0.25) return null;
-  return Math.max(OSM_MIN_Z, Math.min(OSM_MAX_Z, Math.round(mapZoom)));
+  if (!(mapZoom >= OSM_VIEW_MIN_Z)) return null;
+  return mapZoom >= OSM_MAX_Z ? OSM_MAX_Z : OSM_MIN_Z;
 }
 
 export type ViewRegion = { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number };
@@ -117,20 +127,37 @@ export function decodeOsmTrails(data: Uint8Array, t: Tile): OsmTrail[] {
 }
 
 /**
- * Lines worth drawing, at most `limit` line pieces in all (squares come middle first, so the cut
- * falls at the edges). The named copies are only for tap lookups, so they aren't drawn twice.
+ * Lines worth drawing, one item per line piece (key "<track key>#<piece>", so a piece keeps its
+ * key while it stays in view). The named copies are only for tap lookups, so they aren't drawn
+ * twice. Past `limit` pieces the longest are kept, so a wide view shows the main trails everywhere
+ * rather than every short spur in the middle. The result is sorted by key: map lines that stay put
+ * are never re-created as the view moves, which is what made the lines flash when zooming.
  */
 export function drawableOsm(trails: OsmTrail[], limit = OSM_MAX_LINES): OsmTrail[] {
-  const out: OsmTrail[] = [];
-  let left = limit;
+  const pieces: { t: OsmTrail; i: number; len: number }[] = [];
   for (const t of trails) {
-    if (left <= 0) break;
     if (!t.key.includes('/l')) continue;
-    const parts = t.parts.slice(0, left);
-    left -= parts.length;
-    out.push(parts.length === t.parts.length ? t : { ...t, parts });
+    t.parts.forEach((part, i) => pieces.push({ t, i, len: pieceLength(part) }));
   }
-  return out;
+  const kept = pieces.length > limit ? pieces.map((p, n) => ({ ...p, n })).sort((a, b) => b.len - a.len || a.n - b.n).slice(0, Math.max(0, limit)) : pieces;
+  const out = kept.map(({ t, i }) => drawnPiece(t, i));
+  return out.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+}
+
+/** Pieces handed out by drawableOsm, reused so an unchanged piece is the same object on every call. */
+const pieceCache = new WeakMap<OsmTrail, OsmTrail[]>();
+
+function drawnPiece(t: OsmTrail, i: number): OsmTrail {
+  let list = pieceCache.get(t);
+  if (!list) pieceCache.set(t, (list = []));
+  return (list[i] ??= { ...t, key: `${t.key}#${i}`, parts: [t.parts[i]] });
+}
+
+/** Length in degrees (longitude scaled for latitude), only for ranking pieces against each other. */
+function pieceLength(part: LatLng[]): number {
+  let m = 0;
+  for (let i = 1; i < part.length; i++) m += Math.hypot(part[i].lat - part[i - 1].lat, (part[i].lng - part[i - 1].lng) * Math.cos((part[i].lat * Math.PI) / 180));
+  return m;
 }
 
 /** The track under a tap, from what is already on screen. Named copies win a near tie. */
@@ -192,7 +219,8 @@ export function trailLabels(trails: OsmTrail[], limit: number, gap?: { lat: numb
     const closed = closedLines.some((c) => c.parts.some((part) => distanceToLineM(at, { type: 'LineString', coordinates: part.map((q) => [q.lng, q.lat]) }) < 12));
     out.push({ key: `${t.key}-label`, name: t.name, at, closed });
   }
-  return out;
+  // A steady order, so tags that stay in view aren't redrawn when the view moves.
+  return out.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
 }
 
 /** The point halfway along a line. */

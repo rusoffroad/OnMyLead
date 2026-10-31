@@ -281,6 +281,15 @@ export function densify(route: LatLng[], stepM: number): LatLng[] {
 // ---------------------------------------------------------------------------------------------
 // Tap a line to see what it is.
 
+/**
+ * A map's real zoom from what it shows and how wide it is: a tile is 256 points, so a 390 point
+ * phone sees about 1.5 tiles across and an iPad far more. (Leaving the width out read an iPad two
+ * zoom levels too far out, so its trails waited until it was zoomed way in.)
+ */
+export function mapZoom(region: { longitudeDelta: number }, mapWidthPts = 390): number {
+  return Math.log2((360 / Math.max(1e-6, region.longitudeDelta)) * (Math.max(1, mapWidthPts) / 256));
+}
+
 /** About how many meters one screen point covers at this map width (from the visible region). */
 export function metersPerPoint(region: { latitude: number; longitudeDelta: number }, mapWidthPts: number): number {
   return (region.longitudeDelta * 111_320 * Math.cos((region.latitude * Math.PI) / 180)) / Math.max(1, mapWidthPts);
