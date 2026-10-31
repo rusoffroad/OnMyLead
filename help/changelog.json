@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-10-31",
+    "slugs": ["contact-support"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "fix-expo-head-alert",
+    "why": "iPhone and iPad: opening Help and Support, Contact Us, Terms or Privacy no longer shows an 'Expo Head: Add the handoff origin' alert. Page titles are now set only on the website. No article text changes; the pages work the same."
+  },
+  {
+    "date": "2026-10-31",
     "slugs": [
       "map-layers",
       "troubleshooting",
