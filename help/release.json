@@ -17,6 +17,14 @@
       "submitted": "2026-10-15",
       "notes": "First release, now for iPhone and iPad: everything through PR #116. Replaced build 2 (ad388f4, submitted 2026-10-13) in review. The same code goes to Google Play for Android phones and tablets.",
       "released": "2026-10-28"
+    },
+    {
+      "version": "1.0.3",
+      "build": "7",
+      "commit": "8c98600",
+      "status": "submitted",
+      "submitted": "2026-11-01",
+      "notes": "Includes the unreleased 1.0.2. Android versionCode 7."
     }
   ],
   "unreleased": [
