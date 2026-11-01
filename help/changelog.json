@@ -31,6 +31,83 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "out-riding",
+      "notification-settings",
+      "report-and-block",
+      "privacy",
+      "riding-groups",
+      "getting-started"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "out-riding",
+    "why": "New in 1.0.3: Out Riding. Switch it on to see which riders are out near you (riders you know by default, or everyone nearby who chose the same), roughly how far away in whole miles, never where, and message them. Adds direct messages with mute, report, block and delete, and a Direct Messages notification switch."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "follow-leaders",
+      "group-chat",
+      "pro-trial",
+      "promo-codes",
+      "ride-chat",
+      "troubleshooting",
+      "emergency-and-safety",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "out-riding",
+    "why": "Out Riding touched shared files these articles list (the Groups tab, notification topics, the app layout, message pop-ups and the website showcase). Nothing in them changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "badges-and-ranks",
+      "leader-sweep-and-tail-gunner",
+      "notification-settings",
+      "pro-trial",
+      "ride-mode",
+      "ride-name-and-profile"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "rider-badges",
+    "why": "New in 1.0.3: riders earn Bronze, Silver and Gold badges (Trail Boss, Tail Gunner, Crew Rider, Mile Eater, Trailblazer, Mapmaker, Trail Scout) and a rank from Rookie to Legend, shown on the You tab, on a new Badges screen and beside rider names. The account notification switch is now Badges and Pro Trial, and a badge notification opens Badges."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-leaders",
+      "garage",
+      "getting-started",
+      "group-chat",
+      "location-sharing",
+      "manage-subscription",
+      "offline-maps",
+      "organizer-controls",
+      "promo-codes",
+      "report-and-block",
+      "sign-in",
+      "starlink",
+      "trip-planner",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "rider-badges",
+    "why": "The badges change touched screens these articles list as sources (the You tab, the Going list, the Riders list, notification settings and the app's screen list, and the onmylead.com features list, which gains a Badges and Ranks card). Nothing these articles describe changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "faq",
       "garage",
       "getting-started",

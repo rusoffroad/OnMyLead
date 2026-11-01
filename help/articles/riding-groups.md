@@ -4,7 +4,7 @@ summary: Save the people you ride with as a group, invite friends with a link, a
 category: groups
 order: 10
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-11-01
 sources:
   - app/src/app/(tabs)/groups.tsx
   - app/src/app/groups/new.tsx
@@ -17,6 +17,7 @@ sources:
   - app/src/app/r/[code].tsx
   - supabase/migrations/20261017430000_riding_groups.sql
   - supabase/migrations/20261018000000_pro_entitlements.sql
+  - app/src/components/out-riding-card.tsx
 related: [group-chat, follow-leaders, invite-riders, free-vs-pro]
 keywords: [crew, group, club, friends, group link, invite group, invite all, members, leave group, delete group, tablet]
 ---
@@ -24,6 +25,10 @@ keywords: [crew, group, club, friends, group link, invite group, invite all, mem
 A riding group is your regular crew, saved once. When you create a ride, you can invite everyone in the group in one tap instead of sending the invite to each rider. Each group also has its own [Group Chat](/help/group-chat).
 
 Your groups live on the **Groups** tab, on the **Riding Groups** screen. It shows **Your Groups** (the ones you run) and **Groups You’re In** (the ones someone else runs).
+
+:::release 1.0.3
+The top of the Groups tab also has **Out Riding**, to see who's out riding near you, and **Messages**, your direct messages. See [See Who's Out Riding Nearby](/help/out-riding).
+:::
 
 :::note
 This is a Pro feature. You need Pro to create a group and to add or remove riders. See [Free and Pro](/help/free-vs-pro). Joining a group with its link, the group chat, inviting a group to your rides and getting the group's ride invites are free for everyone.

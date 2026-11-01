@@ -120,6 +120,10 @@ A dot only looks live when the phone behind it is actually checking in. A sharin
 
 Tap **Together** (or **Separated**) at the top to open the **Riders** list. It shows everyone on the ride, the leader first, with **Live**, **Last Seen** and an age, **No Signal**, or **Not Sharing**. The leader and tail gunner are labeled.
 
+:::release 1.0.3
+A small patch beside a rider's name is their top badge. See [Earn Badges and Ranks](/help/badges-and-ranks).
+:::
+
 Tap **Navigate** next to a live rider, or **Go to Last Seen** for a rider whose spot is old, to get directions to them in your maps app.
 
 ## See Where You Are on the Route

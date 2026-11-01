@@ -17,6 +17,8 @@ export type TapData = {
   inviteCode?: unknown;
   groupId?: unknown;
   itemId?: unknown;
+  threadId?: unknown;
+  userId?: unknown;
 };
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -37,7 +39,7 @@ export function tapData(raw: unknown): TapData | undefined {
   if (fromString) return fromString;
   if (!isObject(raw)) return undefined;
   // The app's own fields are already there (iPhone, and Android in Expo's format).
-  if (typeof raw.type === 'string' || typeof raw.rideId === 'string' || typeof raw.groupId === 'string') return raw;
+  if (typeof raw.type === 'string' || typeof raw.rideId === 'string' || typeof raw.groupId === 'string' || typeof raw.userId === 'string') return raw;
   // Raw FCM data: the object is a JSON string under "body" (or "dataString").
   return parseObject(raw.body) ?? parseObject(raw.dataString) ?? raw;
 }
@@ -46,13 +48,18 @@ const id = (v: unknown) => (typeof v === 'string' && v ? v : null);
 
 /**
  * The screen a tapped notification opens: Ride Mode for a live ride or a rider's status, a
- * riding group's chat for its messages, else the ride page (its chat for a message). Null when
+ * riding group's chat for its messages, Badges for a new badge, else the ride page (its chat for a message). Null when
  * the notification isn't about a ride or group (the app then just opens).
  */
 export function tapTarget(data: TapData | undefined): string | null {
   if (!data) return null;
+  // A new badge opens Badges.
+  if (data.type === 'badge') return '/badges';
   const groupId = id(data.groupId);
   if (data.type === 'group_message' && groupId) return `/groups/${groupId}/chat`;
+  // A direct message opens the conversation with whoever sent it.
+  const userId = id(data.userId);
+  if (data.type === 'direct_message' && userId) return `/messages/${userId}`;
   const rideId = id(data.rideId);
   // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open
   // Ride Mode, where the group is.

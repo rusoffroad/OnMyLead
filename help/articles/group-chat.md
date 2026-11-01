@@ -4,7 +4,7 @@ summary: Talk with your whole riding group between rides, link a message to a ri
 category: groups
 order: 20
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-11-01
 sources:
   - app/src/app/groups/[id]/chat.tsx
   - app/src/app/groups/[id]/index.tsx

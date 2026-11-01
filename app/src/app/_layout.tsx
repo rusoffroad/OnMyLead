@@ -107,6 +107,7 @@ function RootLayout() {
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
         <Stack.Screen name="ride-name" options={{ title: 'Your Ride Name' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
+        <Stack.Screen name="badges" options={{ title: 'Badges' }} />
         <Stack.Screen name="blocked" options={{ title: 'Blocked Riders' }} />
         <Stack.Screen name="battery" options={{ title: 'Battery Saver' }} />
         <Stack.Screen name="pro" options={{ title: '' }} />
@@ -118,6 +119,9 @@ function RootLayout() {
         <Stack.Screen name="groups/new" options={{ title: 'New Group' }} />
         <Stack.Screen name="groups/[id]/index" options={{ title: '' }} />
         <Stack.Screen name="groups/[id]/chat" options={{ title: 'Group Chat', headerShown: false }} />
+        <Stack.Screen name="out-riding" options={{ title: 'Out Riding' }} />
+        <Stack.Screen name="messages/index" options={{ title: 'Messages' }} />
+        <Stack.Screen name="messages/[id]" options={{ title: 'Message', headerShown: false }} />
         <Stack.Screen name="g/[code]" options={{ title: 'Riding Group' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
         <Stack.Screen name="terms" options={{ title: '' }} />

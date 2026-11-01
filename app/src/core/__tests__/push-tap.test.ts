@@ -36,6 +36,7 @@ describe('push tap target', () => {
 
   it('opens the ride chat for a chat message and the ride page for other ride news', () => {
     expect(tapTarget(chat)).toBe('/r/ABC123?section=chat');
+    expect(tapTarget(tapData({ type: 'badge', url: '/badges' }))).toBe('/badges');
     expect(tapTarget({ type: 'ride', change: 'moved', rideId: 'ride-1', inviteCode: 'ABC123' })).toBe('/r/ABC123');
     expect(tapTarget({ type: 'member', change: 'joined', rideId: 'ride-1', inviteCode: 'ABC123' })).toBe('/r/ABC123');
     expect(tapTarget({ type: 'reminder', rideId: 'ride-1', inviteCode: 'ABC123' })).toBe('/r/ABC123');
@@ -43,6 +44,8 @@ describe('push tap target', () => {
 
   it('opens a riding group chat for group messages', () => {
     expect(tapTarget({ type: 'group_message', groupId: 'g1' })).toBe('/groups/g1/chat');
+    expect(tapTarget({ type: 'direct_message', threadId: 't1', userId: 'u1' })).toBe('/messages/u1');
+    expect(tapTarget({ type: 'direct_message', threadId: 't1' })).toBeNull();
   });
 
   it('routes the same from every delivery shape', () => {

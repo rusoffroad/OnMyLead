@@ -4,7 +4,7 @@ summary: Who rides up front, who rides at the rear, and how to make someone lead
 category: rides
 order: 50
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-11-01
 sources:
   - app/src/components/ride-roster.tsx
   - app/src/core/roles.ts
@@ -73,3 +73,7 @@ Roles can only go to riders who have joined the ride, and they can't change afte
 :::
 
 The rider gets a notification when they're made leader, made tail gunner or given the ride.
+
+:::release 1.0.3
+Leading a ride earns toward the **Trail Boss** badge, and riding at the rear as tail gunner earns toward **Tail Gunner**. See [Earn Badges and Ranks](/help/badges-and-ranks).
+:::

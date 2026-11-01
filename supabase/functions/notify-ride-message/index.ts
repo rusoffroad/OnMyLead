@@ -12,8 +12,11 @@
 // come from push_batch_social instead (migration 20261017430000_riding_groups.sql). The older
 // {"message_id": "..."} body is still accepted. Pro trial reminders ({"type":"trial"}, queued
 // hourly by trial_reminder_batch) come from push_batch_account and email_batch_account
-// (migration 20261018000000_pro_entitlements.sql). Riding group chat messages
+// (migration 20261018000000_pro_entitlements.sql); new rider badges ({"type":"badge"}) come from
+// push_batch_account too (migration 20261101500000_rider_badges.sql). Riding group chat messages
 // ({"type":"group_message"}) come from push_batch_group (migration 20261019400000_group_chat.sql).
+// Direct messages ({"type":"direct_message"}) come from push_batch_dm (migration
+// 20261101700000_out_riding.sql), which itself skips riders who blocked the sender.
 // Chat pushes skip riders who blocked the sender (blockersOf, migration
 // 20261020000000_blocked_riders.sql); status taps such as Need Help and EMERGENCY never do.
 //
@@ -38,8 +41,9 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { channelFor, fcmAccessToken, readServiceAccount, sendFcm } from '../_shared/fcm.ts';
 
 const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
-const ACCOUNT_EVENTS = new Set(['trial']);
+const ACCOUNT_EVENTS = new Set(['trial', 'badge']);
 const GROUP_EVENTS = new Set(['group_message']);
+const DM_EVENTS = new Set(['direct_message']);
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -72,7 +76,9 @@ Deno.serve(async (req) => {
 async function sendPushes(event: any): Promise<{ sent: number; removed?: number; note?: string } | { error: string }> {
   const batch = ACCOUNT_EVENTS.has(event.type)
     ? 'push_batch_account'
-    : SOCIAL_EVENTS.has(event.type) ? 'push_batch_social' : GROUP_EVENTS.has(event.type) ? 'push_batch_group' : 'push_batch';
+    : SOCIAL_EVENTS.has(event.type)
+      ? 'push_batch_social'
+      : GROUP_EVENTS.has(event.type) ? 'push_batch_group' : DM_EVENTS.has(event.type) ? 'push_batch_dm' : 'push_batch';
   const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 

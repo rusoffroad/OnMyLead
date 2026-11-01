@@ -72,6 +72,10 @@ Public rides on a map. Choose **Near Me** or **By State**, or use **Search Near 
 
 Your riding groups, the groups you're in, and **Leaders You Follow**. Tap **New Group** to save your crew. You need an account for this tab; if you're signed out, it takes you to sign in. See [Riding Groups](/help/riding-groups).
 
+:::release 1.0.3
+At the top: **Out Riding**, to see which riders are out near you and message them, and your **Messages**. See [See Who's Out Riding Nearby](/help/out-riding).
+:::
+
 ### You
 
 Everything that isn't a ride:

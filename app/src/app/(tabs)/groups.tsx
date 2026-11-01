@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Convoy, RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
+import { OutRidingCard } from '@/components/out-riding-card';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
@@ -18,7 +19,7 @@ import {
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
 
-/** Your riding groups, the groups you're in, and the leaders you follow. */
+/** Out Riding and your messages, your riding groups, the groups you're in, and the leaders you follow. */
 export default function Groups() {
   const { session, loading } = useSession();
   const [groups, setGroups] = useState<RidingGroup[] | null>(null);
@@ -66,6 +67,7 @@ export default function Groups() {
   return (
     <Screen>
       <Stack.Screen options={{ title: 'Riding Groups' }} />
+      <OutRidingCard />
       <ThemedText themeColor="textSecondary">
         Save the people you ride with. When you create a ride, invite the whole group in one tap.
       </ThemedText>

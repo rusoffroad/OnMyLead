@@ -12,7 +12,10 @@ import { REPORT_REASONS } from '@/core/pro';
 import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { sendReport } from '@/lib/pro';
 
-type Target = { kind: 'ride'; rideId: string; name: string } | { kind: 'rider'; userId: string; rideId?: string | null; name: string };
+type Target =
+  | { kind: 'ride'; rideId: string; name: string }
+  // context: added to the report for the owner, such as the direct message being reported.
+  | { kind: 'rider'; userId: string; rideId?: string | null; name: string; context?: string };
 
 /**
  * Report Ride / Report Rider: a reason, an optional note, and it goes to the OnMyLead owner.
@@ -50,7 +53,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
         rideId: target.rideId ?? null,
         userId: target.kind === 'rider' ? target.userId : null,
         reason,
-        details,
+        details: [details.trim(), target.kind === 'rider' ? target.context?.trim() : ''].filter(Boolean).join('\n\n'),
       });
       setSent(true);
     } catch (e) {
