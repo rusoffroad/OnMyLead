@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.0.3",
+    "title": "Easier Ride Times",
+    "intro": "Pick a ride's time with a few taps instead of typing it.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "improved",
+        "text": "Pick times by tapping instead of typing: tap AM or PM, the hour and the minute. Works for Meet At, Departure Time, Expected Finish, a planned stop's time and Stop Sharing At."
+      }
+    ]
+  },
+  {
     "version": "1.0.2",
     "title": "Better Maps on the Trail",
     "intro": "Roads and trails show from farther out, a new button brings the map back to you, sharing can stay on until you turn it off, and rides can be planned for 2027 and beyond.",
