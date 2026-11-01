@@ -15,6 +15,8 @@ export type MapRider = {
   detail: string;
   /** Tapped Mechanical Issue and hasn't sent another status since. */
   breakdown?: boolean;
+  /** Compass direction they're moving in (see core/heading riderHeading); null or missing: no arrow. */
+  headingDeg?: number | null;
 };
 
 /** What a screen can ask of the live map. */
