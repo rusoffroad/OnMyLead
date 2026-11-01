@@ -70,7 +70,7 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
         <View style={{ flex: 1, gap: Spacing.one }}>
           <View style={{ borderRadius: Radius.control, borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border, paddingVertical: 8, alignItems: 'center' }}>
             <ThemedText type="small" themeColor="textSecondary">Invite Code</ThemedText>
-            <ThemedText selectable numberOfLines={1} adjustsFontSizeToFit style={{ ...codeTextSize(ride.invite_code, 28), fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
+            <ThemedText selectable numberOfLines={1} style={{ ...codeTextSize(ride.invite_code, 28), fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
           </View>
           <Button title="Show QR Code" kind="secondary" style={{ minHeight: 44 }} onPress={() => { setShowQr(true); track('invite_qr_shown', { platform: Platform.OS }); }} />
         </View>

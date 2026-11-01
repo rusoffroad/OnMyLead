@@ -2,6 +2,22 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "create-a-ride",
+      "custom-codes",
+      "friends",
+      "invite-riders",
+      "organizer-controls",
+      "qr-codes",
+      "riding-groups"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "share-code-size-fix",
+    "why": "Fix before 1.0.3 ships: the friend code (and, on long codes, the ride invite code) showed tiny on iPhone after custom codes arrived. Codes now show at full size again. Nothing in these articles changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "custom-codes",
       "invite-riders",
       "create-a-ride",
