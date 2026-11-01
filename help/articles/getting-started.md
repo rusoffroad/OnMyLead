@@ -84,6 +84,10 @@ Everything that isn't a ride:
 - **Help**: **Contact Us** and **Help and Support**.
 - **Sign Out** and **Delete Account** at the bottom.
 
+:::release 1.0.3
+Any sheet that slides up from the bottom of the screen, such as a new waypoint, a report or the Pro prompt, closes when you swipe it down. That works on iPhone, iPad, Android phones and tablets. On onmylead.com you can drag it down with the mouse, or click **Cancel** or **Close**.
+:::
+
 ## Permissions the App Asks For
 
 ### Notifications

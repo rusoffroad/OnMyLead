@@ -1,6 +1,7 @@
 import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SheetRoot, SwipeSheet } from '@/components/swipe-sheet';
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
@@ -62,8 +63,9 @@ export function DirectionsSheet({ visible, rows, onClose }: { visible: boolean; 
   };
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+      <SheetRoot>
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
-      <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
+      <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
         <View style={styles.grip} />
         <Text style={styles.title} accessibilityRole="header">Directions</Text>
         <ThemedText type="small" themeColor="textSecondary">For the road. Off road, follow the leader and the route on this map.</ThemedText>
@@ -73,7 +75,8 @@ export function DirectionsSheet({ visible, rows, onClose }: { visible: boolean; 
           <ThemedText themeColor="textSecondary">Nothing to get directions to yet. Tap a waypoint or a rider to navigate to them.</ThemedText>
         )}
         <Button title="Close" kind="ghost" onPress={onClose} />
-      </View>
+      </SwipeSheet>
+      </SheetRoot>
     </Modal>
   );
 }
@@ -84,9 +87,10 @@ export function DirectionsHost() {
   if (Platform.OS !== 'web') return null;
   return (
     <Modal visible={!!target} transparent animationType="fade" onRequestClose={close}>
+      <SheetRoot>
       <Pressable style={styles.scrim} onPress={close} accessibilityLabel="Close" accessibilityRole="button" />
       {target ? (
-        <View style={[styles.sheet, styles.webSheet]} accessibilityViewIsModal>
+        <SwipeSheet onClose={close} style={[styles.sheet, styles.webSheet]} accessibilityViewIsModal>
           <Text style={styles.title} accessibilityRole="header">Directions to {target.title}</Text>
           {target.via?.length ? (
             <ThemedText type="small" themeColor="textSecondary">Maps keeps to roads between the route’s stops, so off-road parts may differ.</ThemedText>
@@ -103,8 +107,9 @@ export function DirectionsHost() {
             />
           ))}
           <Button title="Cancel" kind="ghost" onPress={close} />
-        </View>
+        </SwipeSheet>
       ) : null}
+      </SheetRoot>
     </Modal>
   );
 }

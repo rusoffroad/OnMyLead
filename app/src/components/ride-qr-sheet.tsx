@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Modal, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Spacing } from '@/constants/theme';
@@ -7,11 +7,13 @@ import { track } from '@/lib/analytics';
 import { shareQrCode } from '@/lib/share-qr';
 import { Logo } from './logo';
 import { QrCode } from './ride-qr';
+import { SheetRoot, SheetScroll, SwipeSheet } from './swipe-sheet';
 import { Button } from './ui';
 
 /**
  * The ride's QR code, full screen, for a rider to scan off your phone at the trailhead. The card
- * in the middle (logo, ride name, code) is also the picture "Share QR Code" sends.
+ * in the middle (logo, ride name, code) is also the picture "Share QR Code" sends. Swipe it down,
+ * or tap Done, to close it.
  */
 export function RideQrSheet({
   visible, onClose, rideName, inviteCode, link, message,
@@ -33,9 +35,12 @@ export function RideQrSheet({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" onRequestClose={onClose} statusBarTranslucent>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: Colors.background }}
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose} statusBarTranslucent>
+      <SheetRoot>
+      <SwipeSheet onClose={onClose} style={{ flex: 1, backgroundColor: Colors.background }} accessibilityViewIsModal>
+      <View style={[styles.grip, { top: insets.top + Spacing.two }]} />
+      <SheetScroll
+        style={{ flex: 1 }}
         contentContainerStyle={[styles.page, { paddingTop: insets.top + Spacing.four, paddingBottom: insets.bottom + Spacing.four }]}>
         <View ref={card} collapsable={false} style={styles.card}>
           <Logo height={56} />
@@ -52,12 +57,15 @@ export function RideQrSheet({
         </Text>
         <Button title="Share QR Code" big loading={busy} onPress={share} accessibilityHint="Sends this QR code and the ride link by text, email or any app" />
         <Button title="Done" kind="secondary" onPress={onClose} />
-      </ScrollView>
+      </SheetScroll>
+      </SwipeSheet>
+      </SheetRoot>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  grip: { position: 'absolute', alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, zIndex: 1 },
   page: { flexGrow: 1, justifyContent: 'center', gap: Spacing.three, paddingHorizontal: Spacing.four, width: '100%', maxWidth: 480, alignSelf: 'center' },
   card: {
     gap: Spacing.three, padding: Spacing.four, borderRadius: 28, backgroundColor: Colors.backgroundElement,
