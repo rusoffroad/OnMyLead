@@ -2,6 +2,19 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "profile-picture",
+      "ride-name-and-profile",
+      "report-and-block",
+      "privacy"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "profile-photos",
+    "why": "Coming in 1.0.4: Profile Pictures. Riders can take a photo or choose one from their library (cropped square and shrunk to 512 pixels), change it or remove it from Your Name and Picture. It shows in place of their initial in ride rider lists, riding groups, ride and group chat, Messages, Friends, Out Riding and the You tab, to signed-in riders only like the ride name. Report a rider now has Inappropriate Photo, and the OnMyLead team can remove a picture."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "custom-codes",
       "invite-riders",
       "create-a-ride",

@@ -105,7 +105,7 @@ function RootLayout() {
         <Stack.Screen name="trips/[id]/index" options={{ title: '' }} />
         <Stack.Screen name="trips/[id]/edit" options={{ title: 'Edit Trip' }} />
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
-        <Stack.Screen name="ride-name" options={{ title: 'Your Ride Name' }} />
+        <Stack.Screen name="ride-name" options={{ title: 'Your Name and Picture' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
         <Stack.Screen name="badges" options={{ title: 'Badges' }} />
         <Stack.Screen name="blocked" options={{ title: 'Blocked Riders' }} />

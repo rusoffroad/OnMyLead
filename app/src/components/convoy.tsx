@@ -2,12 +2,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors } from '@/constants/theme';
 import { initialOf } from '@/core/profile';
+import { RiderPhoto } from './rider-photo';
 
 /**
  * A group drawn the way it rides: dots strung along a trail, the person who runs it in the logo
  * blue up front and everyone else in rider grey, as on the ride map.
  */
-export function Convoy({ names, size = 34, max = 8 }: { names: (string | null)[]; size?: number; max?: number }) {
+export function Convoy({ names, ids, size = 34, max = 8 }: { names: (string | null)[]; ids?: (string | null)[]; size?: number; max?: number }) {
   const shown = names.length > max ? names.slice(0, max - 1) : names;
   const more = names.length - shown.length;
   const ring = Math.max(2, Math.round(size / 14));
@@ -15,7 +16,7 @@ export function Convoy({ names, size = 34, max = 8 }: { names: (string | null)[]
     <View style={[styles.row, { height: size + ring * 2 }]} accessible accessibilityLabel={`${names.length} riders`}>
       <View style={[styles.trail, { top: (size + ring * 2) / 2 - 1 }]} />
       {shown.map((n, i) => (
-        <RiderDot key={i} name={n} lead={i === 0} size={size} ring={ring} />
+        <RiderDot key={i} userId={ids?.[i]} name={n} lead={i === 0} size={size} ring={ring} />
       ))}
       {more > 0 ? (
         <View style={[styles.more, { height: size, borderRadius: size / 2, borderWidth: ring }]}>
@@ -26,8 +27,17 @@ export function Convoy({ names, size = 34, max = 8 }: { names: (string | null)[]
   );
 }
 
-/** One rider as a map dot with their initial (none for a null name). `lead` is the blue one. */
-export function RiderDot({ name, lead, size = 34, ring = 0 }: { name: string | null; lead?: boolean; size?: number; ring?: number }) {
+/**
+ * One rider as a map dot with their initial (none for a null name). `lead` is the blue one.
+ * With `userId`, their profile picture shows instead when they have one.
+ */
+export function RiderDot({ userId, name, lead, size = 34, ring = 0 }: { userId?: string | null; name: string | null; lead?: boolean; size?: number; ring?: number }) {
+  const dot = <InitialDot name={name} lead={lead} size={size} ring={ring} />;
+  if (!userId) return dot;
+  return <RiderPhoto userId={userId} size={size} ring={ring} fallback={dot} />;
+}
+
+function InitialDot({ name, lead, size, ring }: { name: string | null; lead?: boolean; size: number; ring: number }) {
   return (
     <View
       style={{

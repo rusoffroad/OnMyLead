@@ -2,6 +2,8 @@ import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { AvatarEditor } from '@/components/avatar-editor';
+import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
@@ -9,7 +11,10 @@ import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } f
 import { myRideName, saveRideName } from '@/lib/api';
 import { useSession } from '@/lib/session';
 
-/** Your ride name (nickname): what every other rider sees on the map, the rider list and in chat. */
+/**
+ * Your ride name (nickname) and profile picture: what every other rider sees on the map, the
+ * rider list and in chat.
+ */
 export default function RideNameScreen() {
   const { session, loading } = useSession();
   const [saved, setSaved] = useState<string | null>(null);
@@ -56,7 +61,9 @@ export default function RideNameScreen() {
 
   return (
     <Screen width="readable">
-      <NamePreview name={clean} />
+      <NamePreview userId={session?.user.id} name={clean} />
+
+      {session ? <AvatarEditor userId={session.user.id} name={clean || saved || ''} /> : null}
 
       <Field
         label="Ride Name"
@@ -91,12 +98,13 @@ export default function RideNameScreen() {
         disabled={!changed || !!problem}
         onPress={save}
       />
+
     </Screen>
   );
 }
 
 /** How other riders see you: your pin on the map and a line in ride chat, live as you type. */
-function NamePreview({ name }: { name: string }) {
+function NamePreview({ userId, name }: { userId: string | undefined; name: string }) {
   const shown = shownName(name);
   return (
     <View style={styles.preview} accessible accessibilityLabel={`Other riders see you as ${shown}`}>
@@ -107,9 +115,15 @@ function NamePreview({ name }: { name: string }) {
       </View>
       <View style={styles.pinRow}>
         <View style={styles.ring}>
-          <View style={styles.dot}>
-            <Text style={styles.initial}>{initialOf(name)}</Text>
-          </View>
+          <RiderPhoto
+            userId={userId}
+            size={38}
+            fallback={
+              <View style={styles.dot}>
+                <Text style={styles.initial}>{initialOf(name)}</Text>
+              </View>
+            }
+          />
         </View>
         <View style={styles.label}>
           <Text style={styles.labelText} numberOfLines={1}>{shown}</Text>

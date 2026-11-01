@@ -82,7 +82,7 @@ export default function Messages() {
                 accessibilityLabel={`${t.other_name}${unread ? `, ${unread}` : ''}${t.muted ? ', muted' : ''}`}
                 onPress={() => router.push(`/messages/${t.other_id}`)}
                 style={({ pressed }) => [styles.row, i > 0 && styles.rule, pressed && { backgroundColor: Colors.backgroundSelected }]}>
-                <RiderDot name={t.other_name} size={42} />
+                <RiderDot userId={t.other_id} name={t.other_name} size={42} />
                 <View style={{ flex: 1, gap: 2 }}>
                   <View style={styles.top}>
                     <Text style={styles.name} numberOfLines={1}>{t.other_name}</Text>

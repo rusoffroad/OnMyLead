@@ -38,6 +38,11 @@ The exact meeting point and the route are stored separately from the public ride
 Once you've joined a ride, the other riders on it can see:
 
 - Your ride name. If you turned on **Show My Google (or Apple or Facebook) Profile**, they also see that account's name and photo. See [Your Ride Name and Profile](/help/ride-name-and-profile).
+
+:::release 1.0.4
+- Your profile picture, if you added one. Like your ride name, any signed-in rider can see it, never people who aren't signed in. See [Add a Profile Picture](/help/profile-picture).
+:::
+
 - That you're on the ride, your role, and whether you've checked in.
 - Your messages in the ride chat, except leader-only messages, which only you and the leader can read.
 - Your status taps and quick replies from Ride Mode. A status tap carries your phone's location at the moment you tapped it.

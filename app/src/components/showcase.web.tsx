@@ -314,6 +314,7 @@ export function Showcase() {
               <Feature title="Badges and Ranks">Earn Bronze, Silver and Gold badges for leading rides, riding tail gunner, riding with your crew and racking up miles, plus the trails you share and rate. Your levels add up to a rank from Rookie to Legend, and they’re earned from real GPS tracks, so nobody can fake one.</Feature>
               <Feature title="Out Riding">At a park for the weekend? Switch on Out Riding to see which riders you know are out near you, or anyone nearby who chose the same, and message them. Riders see roughly how far away you are, never where, and it turns itself off.</Feature>
               <Feature title="Friends">Add the riders you ride with as friends, or share your friend link. Friends see each other when they’re out riding nearby and can message any time, without ever sharing where they are.</Feature>
+              <Feature title="Profile Pictures" next>Take a photo or pick one from your library, cropped square. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
               <Feature title="Pick Your Own Code">Give your ride, riding group or friend link a code that’s easy to say at the trailhead, like MOAB-2026. OnMyLead checks as you type that nobody else has it.</Feature>
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
@@ -536,10 +537,11 @@ function Step({ n, shot, alt, title, text, points }: { n: number; shot: string; 
   );
 }
 
-function Feature({ title, children }: { title: string; children: ReactNode }) {
+/** `next`: built for the next app update and not in the stores yet; the version bump PR drops it. */
+function Feature({ title, next, children }: { title: string; next?: boolean; children: ReactNode }) {
   return (
     <div className="feature">
-      <h3>{title}</h3>
+      <h3>{title}{next ? <span className="next-tag">Next Update</span> : null}</h3>
       <p>{children}</p>
     </div>
   );
@@ -1019,6 +1021,8 @@ const CSS = `
 .feature { border-top: 2px solid var(--ridge); padding-top: 18px; }
 .feature h3 { font-size: 28px; line-height: 1.05; }
 .feature p { margin-top: 10px; color: var(--dust); font-size: 17px; }
+.next-tag { display: inline-block; margin-left: 10px; padding: 3px 10px; border-radius: 999px; border: 1.5px dashed rgba(241, 244, 248, 0.5);
+  font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: middle; color: var(--dust); }
 
 /* Pricing, over the dunes */
 .pricing { position: relative; margin-top: 110px; padding: 130px 0 110px; isolation: isolate; overflow: hidden; }

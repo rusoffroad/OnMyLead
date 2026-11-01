@@ -5,6 +5,7 @@ import { LayoutAnimation, Platform, Pressable, StyleSheet, View } from 'react-na
 
 import { Icon } from '@/components/icon';
 import { ReportSheet } from '@/components/report-sheet';
+import { RiderPhoto } from '@/components/rider-photo';
 import { SocialPhoto, SocialTag } from '@/components/social-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Card, ErrorText } from '@/components/ui';
@@ -142,10 +143,16 @@ export function RideRoster({
                 accessibilityState={can ? { expanded: isOpen } : undefined}
                 accessibilityHint={can ? 'Shows what you can do for this rider' : undefined}
                 style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
-                <SocialPhoto
-                  profile={social.get(m.user_id)}
+                <RiderPhoto
+                  userId={m.user_id}
                   size={36}
-                  fallback={<Avatar name={nameOf(m.user_id)} color={leads ? RideColors.leader : ROLE_COLOR[m.role]} />}
+                  fallback={
+                    <SocialPhoto
+                      profile={social.get(m.user_id)}
+                      size={36}
+                      fallback={<Avatar name={nameOf(m.user_id)} color={leads ? RideColors.leader : ROLE_COLOR[m.role]} />}
+                    />
+                  }
                 />
                 <View style={{ flex: 1, gap: 2 }}>
                   <View style={styles.nameRow}>

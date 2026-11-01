@@ -20,7 +20,7 @@ export function RiderPicker({ mates, picked, onChange }: { mates: RideMate[]; pi
             accessibilityLabel={`${m.name}, ${togetherLabel(m.ridesTogether)}`}
             onPress={() => onChange(on ? picked.filter((id) => id !== m.id) : [...picked, m.id])}
             style={({ pressed }) => [styles.row, i > 0 && styles.rule, pressed && { backgroundColor: Colors.backgroundSelected }]}>
-            <RiderDot name={m.name} size={36} />
+            <RiderDot userId={m.id} name={m.name} size={36} />
             <View style={{ flex: 1 }}>
               <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{m.name}</ThemedText>
               <ThemedText type="small" themeColor="textSecondary">{togetherLabel(m.ridesTogether)}</ThemedText>

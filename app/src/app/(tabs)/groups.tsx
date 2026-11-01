@@ -150,7 +150,7 @@ function GroupCard({ group, chat, me }: { group: RidingGroup; chat?: GroupChatSu
         <Text style={styles.cardName} numberOfLines={2}>{group.name}</Text>
         <Icon name="chevron" color={Colors.textSecondary} />
       </View>
-      <Convoy names={group.riders.map((r) => r.name)} max={7} />
+      <Convoy names={group.riders.map((r) => r.name)} ids={group.riders.map((r) => r.id)} max={7} />
       <ThemedText type="small" themeColor="textSecondary">
         {group.mine ? ridersLabel(group.riders.length) : `${ridersLabel(group.riders.length)}, Run By ${group.ownerName}`}
       </ThemedText>

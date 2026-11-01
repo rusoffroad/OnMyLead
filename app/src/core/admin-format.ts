@@ -103,6 +103,7 @@ export function actionLabel(action: string): string {
     'user.mark_test': 'Marked as Test Account',
     'user.unmark_test': 'Counted as a Rider Again',
     'ride.remove': 'Removed Ride',
+    'profile_photo.remove': 'Removed Profile Picture',
     'ride.reset_code': 'Reset Ride Invite Code',
     'report.reviewing': 'Started Reviewing Report',
     'report.resolved': 'Resolved Report',

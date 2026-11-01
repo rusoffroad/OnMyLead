@@ -4,6 +4,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddFriendButton } from '@/components/add-friend-button';
+import { RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
 import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
@@ -109,6 +110,7 @@ export default function Conversation() {
               <Icon name="chevron" color={Colors.text} size={26} />
             </View>
           </Pressable>
+          <RiderDot userId={id} name={who} size={40} />
           <View style={{ flex: 1 }}>
             <Text style={styles.title} numberOfLines={1}>{who}</Text>
             <Text style={styles.sub} numberOfLines={1}>{blocked ? 'Blocked' : muted ? 'Muted' : 'Direct Message'}</Text>
