@@ -12,6 +12,25 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-mode-opens-on-you",
+    "why": "Ride Mode's map now opens centered on the rider (see Use Ride Mode). These articles list Ride Mode as a source; nothing in them changes for riders. The live.webp screenshot still matches: only where the map starts changed."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "faq",
       "garage",
       "getting-started",
