@@ -3,7 +3,7 @@
     "version": "1.0.3",
     "title": "Easier Ride Times",
     "intro": "Pick a ride's time with a few taps instead of typing it.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".\n• Swipe down to close any sheet, like a new waypoint or the riders list.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".\n• Swipe down to close any sheet, like a new waypoint or the riders list.\n• The app now tells you when an update is waiting or when your version has a known problem.",
     "apple": null,
     "google": null,
     "notes": [
@@ -14,6 +14,10 @@
       {
         "kind": "improved",
         "text": "Swipe down to close any sheet: a new waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride's QR code. In a long sheet the first swipe scrolls back to the top, and if the keyboard is up it puts the keyboard away first."
+      },
+      {
+        "kind": "new",
+        "text": "If an update ever has a problem, the app can tell you: an About This Version card on the home screen explains what's wrong, Update Available lets you know a fix is out, and Please Update OnMyLead asks you to update (with Not Now, so you're never locked out on the trail)."
       }
     ]
   },
