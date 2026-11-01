@@ -1,12 +1,24 @@
 [
   {
     "version": "1.0.3",
-    "title": "Easier Ride Times",
-    "intro": "Pick a ride's time with a few taps instead of typing it, and the Emergency screen now shows you exactly when your alert is going out.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".\n• Swipe down to close any sheet, like a new waypoint or the riders list.\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out.\n• The app now tells you when an update is waiting or when your version has a known problem.",
+    "title": "Exact Rider Dots and Easier Ride Times",
+    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Pick a ride's time with a few taps, swipe down to close any sheet, and the Emergency screen shows you exactly when your alert is going out.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots stay on each rider's exact position as you zoom, are easier to see, and show an arrow for which way each rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute.\n• Swipe down to close any sheet.\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out.\n• The app now tells you when an update is waiting or when your version has a known problem.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "fixed",
+        "text": "Rider dots in Ride Mode now sit on each rider's exact position and stay there as you zoom in and out. Before, every dot was drawn a little to the right of the rider, so riders who were together looked spread out. Waypoints, planned stops and search pins are placed exactly too."
+      },
+      {
+        "kind": "improved",
+        "text": "Rider dots are easier to see on satellite, topo and the dark map: each rider is a bold white ring with a dark name tag, and the leader is a bigger solid blue dot with a blue name tag."
+      },
+      {
+        "kind": "new",
+        "text": "A small arrow on each moving rider's dot shows which way they're heading, and it stays true when you turn the map. Stopped riders show a plain dot."
+      },
       {
         "kind": "improved",
         "text": "Pick times by tapping instead of typing: tap AM or PM, the hour and the minute. Works for Meet At, Departure Time, Expected Finish, a planned stop's time and Stop Sharing At."

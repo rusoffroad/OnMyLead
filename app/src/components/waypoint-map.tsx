@@ -7,6 +7,7 @@ import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { MarkerBody } from './marker-body';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { StopPin, WaypointPin } from './waypoint-blaze';
@@ -86,11 +87,11 @@ export function WaypointMap({
           tracksViewChanges={false}
           accessibilityLabel={`Search result: ${found.name}`}
           zIndex={2}>
-          <View style={styles.found}>
+          <MarkerBody style={styles.found}>
             <Text style={styles.foundText} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundStem} />
             <View style={styles.foundDot} />
-          </View>
+          </MarkerBody>
         </Marker>
       ) : null}
       {waypoints.map((w) => (

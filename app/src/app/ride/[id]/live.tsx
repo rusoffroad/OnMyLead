@@ -35,6 +35,7 @@ import { tally } from '@/core/broadcast';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
+import { riderHeading } from '@/core/heading';
 import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { mapPanelWidth, sidebarWidth } from '@/core/layout';
@@ -463,6 +464,8 @@ export default function RideMode() {
       lng: spot?.lng ?? null,
       freshness,
       breakdown: st?.status === 'mechanical',
+      // The arrow only follows this rider's own shared fix, never a breakdown spot.
+      headingDeg: spot === p ? riderHeading(p ? { speedMps: p.speed_mps, headingDeg: p.heading_deg } : null, live) : null,
       detail: [
         !freshness ? 'Not Sharing' : live ? 'Live' : freshness.state === 'lost' ? freshness.label : `Last Seen ${freshness.ago}`,
         // A speed is only true while the fix is live.

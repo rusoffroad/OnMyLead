@@ -13,7 +13,7 @@ Per-device status for each feature: `docs/feature-parity.md`.
 | Platform code | 20 `*.web.ts(x)` files; no `*.ios` / `*.android` files; ~77 `Platform.OS` branches (mostly web vs native) | `app/src/lib/`, `app/src/components/` |
 | Native extras | CarPlay Expo module (Swift, Apple only, off); config plugins: Starlink local network (iOS + Android), CarPlay, Sentry, scene lifecycle, push entitlement | `app/modules/`, `app/plugins/` |
 | Backend | One Supabase project: 29 migrations, RLS on every table, realtime, pg_net, pg_cron, Vault | `supabase/migrations/` |
-| Edge functions | notify-ride-message, appstore-verify, appstore-notifications, admin-api, admin-integrations, store-downloads, store-releases, contact-form, delete-account | `supabase/functions/` |
+| Edge functions | notify-ride-message, appstore-verify, appstore-notifications, admin-api, admin-integrations, store-downloads, store-reviews, store-releases, contact-form, delete-account | `supabase/functions/` |
 | Database tests | 18 SQL test files + a concurrency test on real Postgres | `supabase/tests/` |
 | Admin Dashboard | Web-only routes at onmylead.com/admin, Admin + authenticator code (aal2) | `app/src/app/admin/` |
 | Website | Showcase home, ride/group link previews, web ride creation, /contact /support /terms /privacy, Help Center | `app/src/components/showcase.web.tsx`, `help/` |
@@ -77,7 +77,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Universal Links for onmylead.com/r/*, /g/* **[iOS-only]**; **[Android gap]** no App Links.
 
 ### Ride Mode and Live Tracking
-- Full-screen live group map (satellite hybrid), every rider a dot, leader colored, rider names.
+- Full-screen live group map (satellite hybrid), every rider a white-ringed dot on their exact position, leader a bigger blue dot, rider names in dark pills.
 - Location sharing per ride with a duration picker or Until I Leave the Ride; background updates
   through a location task (`lib/location.ts`): one point each 25 m or 15 s, offline queue,
   Android foreground-service notification already configured.
@@ -158,7 +158,8 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 
 ### Admin Dashboard (onmylead.com/admin)
 - Overview, Signups and Downloads (real riders without test and admin accounts, marking test
-  accounts, App Store and Google Play downloads), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
+  accounts, App Store and Google Play downloads), Store Reviews (both stores' ratings and reviews,
+  replies posted to the store), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
   Subscriptions, Promo Codes (App Store Connect offer codes), Reports, Analytics, App Health
   (Sentry, push tokens by iPhone / Android, server checks), Exports, Settings (trial days, feature
   plans, flags, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
