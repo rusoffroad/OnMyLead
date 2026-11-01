@@ -17,6 +17,8 @@ sources:
   - app/src/components/route-strip.tsx
   - app/src/hooks/use-panel-fold.ts
   - app/src/core/panel-swipe.ts
+  - app/src/components/swipe-sheet.tsx
+  - app/src/core/sheet-swipe.ts
   - app/src/core/freshness.ts
   - app/src/core/live-roster.ts
   - app/src/core/map-center.ts
@@ -130,6 +132,10 @@ While the panel is folded:
 - **Mechanical Issue** and **EMERGENCY** stay on screen.
 - Need Help and EMERGENCY calls from other riders stay on screen. The leader, tail gunner and organizers also keep Mechanical Issue calls.
 - Other alerts are counted in a badge on **Buttons ▲**.
+
+:::release 1.0.3
+Sheets that slide up over the map (**Riders**, **Directions**, a waypoint, Share Your Location and **EMERGENCY**) close when you swipe them down, the same as tapping **Cancel**, **Close** or **Done**. In a long sheet, the first swipe scrolls back to the top. If the keyboard is up, the first swipe puts the keyboard away.
+:::
 
 On a tablet the map fills the screen. The **Riders** list sits on the left (tap **Hide** or swipe it left to fold it, **Show Riders** to bring it back) and the buttons panel on the right. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 

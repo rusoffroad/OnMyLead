@@ -2,8 +2,8 @@
   {
     "version": "1.0.3",
     "title": "Exact Rider Dots and Easier Ride Times",
-    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading, and you pick a ride's time with a few taps instead of typing it.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots in Ride Mode stay on each rider's exact position when you zoom in and out.\n• Easier-to-see rider dots, with an arrow showing which way each moving rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".",
+    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Pick a ride's time with a few taps, and swipe down to close any sheet.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots in Ride Mode stay on each rider's exact position when you zoom in and out.\n• Easier-to-see rider dots, with an arrow showing which way each moving rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute.\n• Swipe down to close any sheet, like a new waypoint or the riders list.",
     "apple": null,
     "google": null,
     "notes": [
@@ -22,6 +22,10 @@
       {
         "kind": "improved",
         "text": "Pick times by tapping instead of typing: tap AM or PM, the hour and the minute. Works for Meet At, Departure Time, Expected Finish, a planned stop's time and Stop Sharing At."
+      },
+      {
+        "kind": "improved",
+        "text": "Swipe down to close any sheet: a new waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride's QR code. In a long sheet the first swipe scrolls back to the top, and if the keyboard is up it puts the keyboard away first."
       }
     ]
   },

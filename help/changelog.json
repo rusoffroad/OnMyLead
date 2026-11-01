@@ -29,6 +29,43 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "getting-started",
+      "qr-codes",
+      "report-and-block",
+      "ride-mode",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "swipe-sheets",
+    "why": "Every sheet that slides up (a new or open waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride QR code) now closes when you swipe it down, on iPhone, iPad and Android. A rider couldn't swipe away the New Waypoint sheet and had to tap Cancel. In the app from 1.0.3."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "create-a-ride",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "free-vs-pro",
+      "fuel-range",
+      "invite-riders",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "subscribe-to-pro",
+      "troubleshooting"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "swipe-sheets",
+    "why": "These guides list Ride Mode, Directions, the Pro prompt or the QR code as a source. Only the way their sheets close changed (swipe down, covered in Use Ride Mode and Getting Started); nothing these guides describe changes."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "approvals-and-waitlist",
       "edit-cancel-or-delete-a-ride",
       "free-vs-pro",

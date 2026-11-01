@@ -4,7 +4,7 @@ summary: Report a rider or a ride to the OnMyLead team, and block a rider to hid
 category: safety-privacy
 order: 40
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-11-01
 sources:
   - app/src/components/report-sheet.tsx
   - app/src/components/ride-roster.tsx
@@ -36,6 +36,10 @@ If anyone is in danger, call 911 first.
 4. Under **What's Wrong**, pick **Harassment**, **Unsafe Riding**, **Spam or Scam**, **Fake Account** or **Something Else**.
 5. Add details under **Anything Else (Optional)** if you like.
 6. Tap **Send Report**.
+
+:::release 1.0.3
+To close the report without sending it, swipe it down or tap **Cancel**.
+:::
 
 You can also press and hold one of the rider's messages in ride chat or group chat, then tap **Report Rider**.
 
