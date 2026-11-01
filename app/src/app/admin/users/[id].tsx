@@ -10,6 +10,8 @@ import { font } from '@/constants/theme';
 import { actionLabel, daysLeft, fmtAgo, fmtDate, fmtDateTime, fmtInt } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
 import * as growthApi from '@/lib/admin-growth';
+import { adminRemoveAvatar, useAvatar } from '@/lib/avatars';
+import { RiderPhoto } from '@/components/rider-photo';
 
 const STATUS: Record<string, string> = { scheduled: 'Upcoming', live: 'Riding Now', ended: 'Completed', cancelled: 'Cancelled' };
 
@@ -21,6 +23,7 @@ export default function UserDetail() {
   const [busy, setBusy] = useState<string | null>(null);
   // Test accounts are left out of rider counts (Signups and Downloads). Hidden until that server update is on.
   const growth = admin.useAdminData(() => growthApi.growthSummary(null, null), [id]);
+  const photo = useAvatar(id);
 
   const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
     setBusy(key);
@@ -113,6 +116,14 @@ export default function UserDetail() {
     const endsAt = days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null;
     run('grant', () => admin.grantComp(p.id, endsAt, 'Granted from the Admin Dashboard'), 'Complimentary Pro granted.');
   };
+  const removePhoto = async () => {
+    const r = await confirm({
+      title: `Remove ${name}'s Profile Picture?`,
+      message: 'The picture is deleted and they show as their initial again. They can upload a new one. Their account and everything else stay as they are.',
+      confirmLabel: 'Remove Picture', tone: 'danger', reasonLabel: 'Reason (kept in the audit log)', reasonRequired: true,
+    });
+    if (r.ok) run('photo', () => adminRemoveAvatar(p.id, r.reason ?? ''), 'Profile picture removed.');
+  };
   const revoke = async (g: admin.Grant) => {
     const r = await confirm({
       title: 'Revoke Complimentary Pro?',
@@ -164,6 +175,17 @@ export default function UserDetail() {
             ['Role', isAdmin ? `Admin since ${fmtDate(data.admin?.granted_at)}` : 'Rider'],
           ]} />
           {isAdmin ? <Text style={styles.note}>Admin access is granted or removed only in the database, never from the dashboard.</Text> : null}
+          <View style={styles.photoRow}>
+            <RiderPhoto userId={p.id} size={64} fallback={<View style={styles.noPhoto}><Text style={styles.note}>None</Text></View>} />
+            <View style={{ flex: 1, gap: 6 }}>
+              <Text style={styles.photoLabel}>Profile Picture</Text>
+              {photo ? (
+                <AdminButton title="Remove Picture" kind="danger" small onPress={removePhoto} loading={busy === 'photo'} />
+              ) : (
+                <Text style={styles.note}>No picture uploaded. Riders see their initial.</Text>
+              )}
+            </View>
+          </View>
         </Panel>
 
         <Panel title="Pro and Billing">
@@ -268,6 +290,9 @@ const styles = StyleSheet.create({
   bannerText: { fontFamily: font(500), fontSize: 14.5, color: AdminColors.dim },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   note: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.faint },
+  photoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12 },
+  noPhoto: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, borderColor: AdminColors.faint, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
+  photoLabel: { fontFamily: font(700), fontSize: 14, color: AdminColors.text },
   grant: { flexDirection: 'row', alignItems: 'center', gap: 12, justifyContent: 'space-between', backgroundColor: AdminColors.page, borderRadius: 10, padding: 10 },
   grantText: { flex: 1, fontFamily: font(600), fontSize: 14, color: AdminColors.text },
   vehicle: { paddingVertical: 8, borderTopWidth: 1, borderTopColor: AdminColors.line, gap: 2 },

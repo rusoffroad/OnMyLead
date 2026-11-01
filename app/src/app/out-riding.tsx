@@ -305,7 +305,7 @@ export default function OutRiding() {
             <View key={r.user_id} style={styles.riderCard}>
               <View style={styles.riderTop}>
                 <View>
-                  <RiderDot name={r.display_name} size={40} />
+                  <RiderDot userId={r.user_id} name={r.display_name} size={40} />
                   <View style={[styles.badge, { backgroundColor: r.known ? RideColors.green : RideColors.rider }]} />
                 </View>
                 <View style={{ flex: 1, gap: 1 }}>

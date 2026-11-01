@@ -17,7 +17,7 @@ sources:
   - app/src/app/groups/[id]/index.tsx
   - supabase/migrations/20261013500000_rider_names.sql
   - supabase/migrations/20261022000000_social_profiles.sql
-related: [sign-in, getting-started, privacy, report-and-block, badges-and-ranks]
+related: [profile-picture, sign-in, getting-started, privacy, report-and-block, badges-and-ranks]
 keywords: [nickname, display name, username, change name, profile photo, social profile, google profile, facebook profile, apple profile, tablet]
 ---
 
@@ -25,6 +25,10 @@ Your ride name is how the group knows you. It shows on the group map, the rider 
 
 :::release 1.0.3
 Under your name on the **You** tab you also see your rank and badges. See [Earn Badges and Ranks](/help/badges-and-ranks).
+:::
+
+:::release 1.0.3
+The same screen also has your **Profile Picture**. See [Add a Profile Picture](/help/profile-picture). The screen is called **Your Name and Picture**.
 :::
 
 ## Pick or Change Your Ride Name

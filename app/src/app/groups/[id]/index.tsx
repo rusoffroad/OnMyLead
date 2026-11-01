@@ -8,6 +8,7 @@ import { Icon } from '@/components/icon';
 import { RiderPicker } from '@/components/rider-picker';
 import { ShareCodeEditor } from '@/components/share-code-editor';
 import { SocialPhoto, SocialTag } from '@/components/social-tag';
+import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
@@ -144,7 +145,7 @@ export default function GroupPage() {
             </ThemedText>
           </Pressable>
         )}
-        <Convoy names={group.riders.map((r) => r.name)} size={40} max={7} />
+        <Convoy names={group.riders.map((r) => r.name)} ids={group.riders.map((r) => r.id)} size={40} max={7} />
       </View>
 
       <ChatCard
@@ -199,7 +200,7 @@ export default function GroupPage() {
       <View style={styles.list}>
         {group.riders.map((r, i) => (
           <View key={r.id} style={[styles.riderRow, i > 0 && styles.rule]}>
-            <SocialPhoto profile={social.get(r.id)} size={36} fallback={<RiderDot name={r.name} lead={r.isOwner} size={36} />} />
+            <RiderPhoto userId={r.id} size={36} fallback={<SocialPhoto profile={social.get(r.id)} size={36} fallback={<RiderDot name={r.name} lead={r.isOwner} size={36} />} />} />
             <View style={{ flex: 1 }}>
               <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{r.id === me ? `${r.name} (You)` : r.name}</ThemedText>
               {r.isOwner ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Runs This Group</ThemedText> : null}

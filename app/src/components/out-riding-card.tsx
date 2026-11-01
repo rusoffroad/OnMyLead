@@ -60,7 +60,7 @@ export function OutRidingCard() {
         </View>
         {on && me.status ? (
           <>
-            {shown.length ? <Convoy names={shown.map((r) => r.display_name)} max={7} size={30} /> : null}
+            {shown.length ? <Convoy names={shown.map((r) => r.display_name)} ids={shown.map((r) => r.user_id)} max={7} size={30} /> : null}
             <Text style={styles.line}>{countLine(shown, DEFAULT_RADIUS)}</Text>
             <Text style={styles.sub}>{endsLabel(me.status.expires_at)}</Text>
           </>

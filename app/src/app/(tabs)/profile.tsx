@@ -4,6 +4,7 @@ import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 're
 
 import { BadgePatch } from '@/components/badge-patch';
 import { MenuGroup, MenuRow } from '@/components/menu';
+import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
@@ -120,7 +121,7 @@ export default function You() {
     <Screen>
       {session ? (
         <>
-          <Identity name={rideName} plan={ent.switchedOn ? planHeadline(ent) : null} />
+          <Identity userId={uid} name={rideName} plan={ent.switchedOn ? planHeadline(ent) : null} />
           {badges ? <BadgeStrip mine={badges} /> : null}
         </>
       ) : (
@@ -271,23 +272,29 @@ export default function You() {
 }
 
 /** Who you are to the group: your pin as it shows on the map, your ride name and your plan. Tap to change the name. */
-function Identity({ name, plan }: { name: string | null; plan: string | null }) {
+function Identity({ userId, name, plan }: { userId: string | undefined; name: string | null; plan: string | null }) {
   const picked = !!name;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={picked ? `Your ride name is ${name}. Change it` : 'Pick your ride name'}
+      accessibilityLabel={picked ? `Your ride name is ${name}. Change it or your profile picture` : 'Pick your ride name and profile picture'}
       onPress={() => router.push('/ride-name')}
       style={({ pressed }) => [styles.identity, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.ring}>
-        <View style={styles.dot}>
-          <Text style={styles.initial}>{name ? initialOf(name) : '?'}</Text>
-        </View>
+        <RiderPhoto
+          userId={userId}
+          size={44}
+          fallback={
+            <View style={styles.dot}>
+              <Text style={styles.initial}>{name ? initialOf(name) : '?'}</Text>
+            </View>
+          }
+        />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
         <Text style={styles.name} numberOfLines={1}>{picked ? name : name === '' ? 'Pick Your Ride Name' : ' '}</Text>
         <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-          {picked ? 'How the group sees you. Tap to change' : 'Other riders see you as Rider until you do'}
+          {picked ? 'Your name and picture. Tap to change' : 'Other riders see you as Rider until you do'}
         </ThemedText>
         {plan ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 700 }}>{plan}</ThemedText> : null}
       </View>

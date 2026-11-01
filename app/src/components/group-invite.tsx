@@ -58,7 +58,7 @@ export function GroupInvite({ rideId }: { rideId: string }) {
             <View style={styles.groupTop}>
               <View style={{ flex: 1, gap: 6 }}>
                 <ThemedText style={styles.name} numberOfLines={1}>{g.name}</ThemedText>
-                <Convoy names={g.riders.map((r) => r.name)} size={22} max={5} />
+                <Convoy names={g.riders.map((r) => r.name)} ids={g.riders.map((r) => r.id)} size={22} max={5} />
               </View>
               {done[g.id] ? (
                 <View style={styles.sent} accessibilityLabel="Invited">

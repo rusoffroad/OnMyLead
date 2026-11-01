@@ -211,7 +211,7 @@ export default function Friends() {
     <View key={f.user_id} style={styles.row}>
       <Pressable accessibilityRole={onPress ? 'button' : undefined} disabled={!onPress} onPress={onPress} style={styles.rowMain}>
         <View>
-          <RiderDot name={f.display_name} size={42} />
+          <RiderDot userId={f.user_id} name={f.display_name} size={42} />
           {'out_now' in f && f.out_now ? <View style={styles.outBadge} /> : null}
         </View>
         <View style={{ flex: 1, gap: 1 }}>

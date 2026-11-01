@@ -8,6 +8,7 @@
 // Deploy:  supabase functions deploy delete-account   (JWT verification stays on)
 // SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { removeRiderFiles } from '../_shared/rider-files.ts';
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const service = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -45,5 +46,6 @@ Deno.serve(async (req) => {
     });
     return reply({ error: error.message }, 500);
   }
+  await removeRiderFiles(service, userId);
   return reply({ ok: true });
 });

@@ -239,8 +239,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Choose a photo of your machine for your garage. Only the photo you pick is uploaded.",
-          "cameraPermission": false,
+          "photosPermission": "Choose a profile picture or a photo of your machine for your garage. Only the photo you pick is uploaded.",
+          "cameraPermission": "Take a profile picture or a photo of your machine. Only the photo you take is uploaded.",
           "microphonePermission": false
         }
       ],
