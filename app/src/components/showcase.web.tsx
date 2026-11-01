@@ -132,10 +132,10 @@ export function Showcase() {
             <Step
               n={3}
               shot="live"
-              alt="Ride Mode showing the group’s progress on the route, an On My Way tap seen by three riders with a Cancel button, and big status buttons"
+              alt="Ride Mode showing every rider in running order on the route line, a Full Map button, a separated rider alert and big status buttons"
               title="Ride Together"
-              text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear, and Ride Bubble warns everyone when someone drops back or stops moving."
-              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Full Map hides everything but the route line, with EMERGENCY one tap away']}
+              text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear. On the map, a small arrow on each moving rider’s dot shows which way they’re heading, and Ride Bubble warns everyone when someone drops back or stops moving."
+              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Full Map hides everything but the route line, with EMERGENCY one tap away', 'Ride Mode opens on you, and Center on Me brings you back after you look around']}
             />
             <Step
               n={4}
@@ -283,7 +283,7 @@ export function Showcase() {
               never reads as “they’re right here.”
             </p>
             <ul className="ticks">
-              <li><b>Trails on the Map.</b> Bold trail lines with their names on the map: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
+              <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
               <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
@@ -301,7 +301,7 @@ export function Showcase() {
           <h2 id="more-title" className="section-title">Everything Else in Your Pocket</h2>
           <div className="more-grid">
             <div className="more-list">
-              <Feature title="Nothing Buried">Four tabs along the bottom: Rides, Find, Groups and You. Every ride opens in four parts, Details, Map, Riders and Chat, with what to do next right under its name.</Feature>
+              <Feature title="Nothing Buried">Four tabs along the bottom: Rides, Find, Groups and You. Every ride opens in four parts, Details, Map, Riders and Chat, with what to do next right under its name. Any sheet swipes down to close, and times take a few taps, no typing.</Feature>
               <Feature title="Status Taps You Can Trust">Tap On My Way or Need Fuel and everyone on the ride gets a notification. A light comes on for each rider who has it, and Cancel takes it back with a follow-up so nobody turns around for nothing.</Feature>
               <Feature title="Ride Day Weather and Daylight">Every upcoming ride shows the meet day’s forecast, with a heads-up for storms, high wind or heat, and a daylight bar that tells you if the group gets back after dark.</Feature>
               <Feature title="Swipe Left to Delete or Leave">Swipe a ride left in your list. Your own ride is deleted and everyone on it is told; anyone else’s, you leave. It always asks first.</Feature>
@@ -318,7 +318,9 @@ export function Showcase() {
               <Feature title="Pick Your Own Code">Give your ride, riding group or friend link a code that’s easy to say at the trailhead, like MOAB-2026. OnMyLead checks as you type that nobody else has it.</Feature>
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
-              <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for as long as you choose, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
+              <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for 15 minutes to 8 hours, until an end date up to a year out, or until you turn it off, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
+              <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
+              <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, or tap a rider, to report or block them. A blocked rider’s messages disappear for you and they are never told.</Feature>
             </div>
             <figure className="phone">
