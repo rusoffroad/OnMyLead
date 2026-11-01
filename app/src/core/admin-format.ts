@@ -112,6 +112,8 @@ export function actionLabel(action: string): string {
     'pro.comp_grant': 'Granted Complimentary Pro',
     'pro.grant_revoke': 'Revoked Complimentary Pro',
     'setting.update': 'Changed a Setting',
+    'review.reply': 'Replied to a Store Review',
+    'review.reply_edit': 'Changed a Store Review Reply',
   };
   if (known[action]) return known[action];
   return action

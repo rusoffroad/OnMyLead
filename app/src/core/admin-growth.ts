@@ -25,7 +25,7 @@ export type StoreState = { label: string; tone: 'ok' | 'warn' | 'danger' | 'mute
  * A store is connected once it has been read without an error. Keys not set on the server and
  * never read: "Not Connected Yet". The last read failed: "Problem", with the numbers kept.
  */
-export function storeState(info: StoreDownloads | null | undefined, configured: boolean | null): StoreState {
+export function storeState(info: Pick<StoreDownloads, 'checked_at' | 'ok_at' | 'error'> | null | undefined, configured: boolean | null): StoreState {
   const failed = !!info?.error && (!info.ok_at || (info.checked_at ?? '') > info.ok_at);
   if (failed) return { label: 'Problem', tone: 'danger', connected: !!info?.ok_at };
   if (info?.ok_at) return { label: 'Connected', tone: 'ok', connected: true };
