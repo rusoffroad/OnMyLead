@@ -10,6 +10,25 @@
     "why": "Chris tapped EMERGENCY in Ride Mode and nothing seemed to happen: Alert My Group needed a 1.5 second hold with no sign it was working, and the screen stayed up while the alert sent. From 1.0.3 the button fills a bar and says Keep Holding, a quick tap says Not sent, and the screen closes as soon as the alert goes out."
   },
   {
+    "date": "2026-11-01",
+    "slugs": [
+      "directions",
+      "fuel-range",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "emergency-hold-feedback",
+    "why": "These guides list the Ride Mode screen as a source. Only the Emergency sheet's Alert My Group button changes (covered in Emergencies and Staying Safe); nothing they describe changes."
+  },
+  {
     "date": "2026-10-31",
     "slugs": [
       "faq",
