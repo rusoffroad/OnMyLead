@@ -18,6 +18,9 @@ sources:
   - app/src/lib/blocks.ts
   - supabase/migrations/20261018200000_reports.sql
   - supabase/migrations/20261020000000_blocked_riders.sql
+  - app/src/app/out-riding.tsx
+  - app/src/app/messages/[id].tsx
+  - supabase/migrations/20261101700000_out_riding.sql
 related: [privacy, ride-chat, group-chat, emergency-and-safety, contact-support]
 keywords: [report, block, unblock, harassment, spam, scam, fake account, unsafe, abuse, mute, tablet]
 ---
@@ -42,6 +45,10 @@ To close the report without sending it, swipe it down or tap **Cancel**.
 :::
 
 You can also press and hold one of the rider's messages in ride chat or group chat, then tap **Report Rider**.
+
+:::release 1.0.3
+From a direct message, tap **•••** then **Report Rider**, or press and hold one of their messages. The message goes with your report. In Out Riding, tap **•••** next to a rider. See [See Who's Out Riding Nearby](/help/out-riding).
+:::
 
 ## Report a Ride
 
@@ -71,6 +78,10 @@ You can also block from:
 - You don't see their messages or polls in ride chat or group chat.
 - You don't get chat notifications or pop-ups from them.
 - They aren't told, and they can't see that you blocked them.
+
+:::release 1.0.3
+- Neither of you sees the other in Out Riding, their direct messages are hidden from you, and they can't message you.
+:::
 
 ### What Blocking Doesn't Do
 

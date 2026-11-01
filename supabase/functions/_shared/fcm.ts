@@ -30,7 +30,7 @@ export type FcmPush = {
 /** The Android notification channel for a push type. The app creates these channels (lib/push.ts). */
 export function channelFor(type: unknown): string {
   if (type === 'status' || type === 'cancelled') return 'ride-alerts';
-  if (type === 'message' || type === 'group_message') return 'ride-chat';
+  if (type === 'message' || type === 'group_message' || type === 'direct_message') return 'ride-chat';
   return 'ride-updates';
 }
 

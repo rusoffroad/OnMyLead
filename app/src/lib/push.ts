@@ -19,6 +19,7 @@ import { planReminders } from '@/core/notifications';
 import { tapData, tapTarget, type TapData } from '@/core/push-tap';
 import { ackRideItems, myRides } from './api';
 import { openGroupChat } from './group-chat';
+import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
 import { supabase } from './supabase';
 
@@ -27,7 +28,8 @@ Notifications.setNotificationHandler({
   handleNotification: async (n) => {
     const data = tapData(n.request.content.data);
     // A group chat message for the chat that's already open shows there instead.
-    const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat());
+    const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
+      && !(data?.type === 'direct_message' && data.userId === openDmWith());
     return { shouldShowBanner: banner, shouldShowList: true, shouldPlaySound: banner, shouldSetBadge: false };
   },
 });

@@ -15,6 +15,7 @@ sources:
   - app/src/components/message-alerts.tsx
   - app/src/app/(tabs)/profile.tsx
   - supabase/migrations/20261101500000_rider_badges.sql
+  - supabase/migrations/20261101700000_out_riding.sql
 related: [getting-started, status-buttons, ride-chat, group-chat, follow-leaders, emergency-and-safety, pro-trial, troubleshooting]
 keywords: [notifications, push, alerts, mute, quiet hours, do not disturb, reminder, lock screen, preview, emails, sound]
 ---
@@ -56,6 +57,10 @@ Everything below starts on.
 - **Ride Invites**: someone invites you, or a group you're in, to a ride.
 - **Riding Group Chat**: new messages in your riding groups' chats. To mute just one group, do it from that group's chat. See [Group Chat](/help/group-chat).
 - **Leaders You Follow**: a leader you follow posts a new public ride.
+
+:::release 1.0.3
+- **Direct Messages**: a rider messages you, say after seeing you Out Riding. To mute one conversation, do it from inside it. See [See Who's Out Riding Nearby](/help/out-riding).
+:::
 
 ### Your Account
 

@@ -2,6 +2,37 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "out-riding",
+      "notification-settings",
+      "report-and-block",
+      "privacy",
+      "riding-groups",
+      "getting-started"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "out-riding",
+    "why": "New in 1.0.3: Out Riding. Switch it on to see which riders are out near you (riders you know by default, or everyone nearby who chose the same), roughly how far away in whole miles, never where, and message them. Adds direct messages with mute, report, block and delete, and a Direct Messages notification switch."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "follow-leaders",
+      "group-chat",
+      "pro-trial",
+      "promo-codes",
+      "ride-chat",
+      "troubleshooting",
+      "emergency-and-safety"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "out-riding",
+    "why": "Out Riding touched shared files these articles list (the Groups tab, notification topics, the app layout and message pop-ups). Nothing in them changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "badges-and-ranks",
       "leader-sweep-and-tail-gunner",
       "notification-settings",
