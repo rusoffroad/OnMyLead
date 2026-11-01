@@ -4,9 +4,11 @@ summary: What the EMERGENCY button does and doesn't do, how Need Help works, and
 category: safety-privacy
 order: 50
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/ride/[id]/live.tsx
+  - app/src/components/hold-button.tsx
+  - app/src/core/hold-to-send.ts
   - app/src/core/breakdown.ts
   - app/src/core/blocks.ts
   - app/src/lib/outbox.ts
@@ -33,7 +35,13 @@ The **EMERGENCY** button in Ride Mode alerts everyone on your ride at once.
 
 1. In Ride Mode, tap **EMERGENCY**. It stays on screen even when the bottom panel is folded.
 2. Read the **Emergency** screen. If you're sharing your location, it shows your coordinates in large type, so you can read them out on a call.
+:::until 1.0.3
 3. Press and hold **Alert My Group** until it sends. A quick tap won't send it.
+:::
+
+:::release 1.0.3
+3. Press and hold **Alert My Group** for 1.5 seconds. A bar fills across the button and it says **Keep Holding**. When the bar is full, your phone buzzes, the screen closes and the alert goes out. If you let go early, it says **Not sent** and nothing goes to the group. With VoiceOver or TalkBack, double tap and hold, or use the **Send** action.
+:::
 4. If anyone is hurt, tap **Call 911** to open your phone's dialer.
 
 Tap **Cancel** to close the screen without sending anything.

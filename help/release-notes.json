@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.0.3",
+    "title": "Emergency Alerts You Can Count On",
+    "intro": "The Emergency screen now shows you exactly when your alert is going out.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out so you see who has it.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "fixed",
+        "text": "Emergency in Ride Mode: Alert My Group now fills a bar while you hold it and says Keep Holding, so it no longer looks like nothing happens. A quick tap tells you the alert was not sent, and the screen closes as soon as the alert goes out so you can see who has it."
+      }
+    ]
+  },
+  {
     "version": "1.0.2",
     "title": "Better Maps on the Trail",
     "intro": "Roads and trails show from farther out, a new button brings the map back to you, sharing can stay on until you turn it off, and rides can be planned for 2027 and beyond.",

@@ -10,6 +10,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
+import { HoldButton } from '@/components/hold-button';
 import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group-map';
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
@@ -1238,17 +1239,16 @@ export default function RideMode() {
                 {myPos.lat.toFixed(5)}, {myPos.lng.toFixed(5)}
               </ThemedText>
             ) : null}
-            <Button
+            <HoldButton
               title="Alert My Group"
-              kind="danger"
-              big
-              onLongPress={async () => {
-                await sendEmergency();
+              accessibilityLabel="Alert my group: send EMERGENCY to everyone on this ride"
+              onHold={() => {
+                // Close the sheet first so the Sending card shows at once; the send keeps going
+                // (and retries from the outbox) after the sheet is gone.
                 setSosOpen(false);
+                sendEmergency();
               }}
-              delayLongPress={1500}
             />
-            <ThemedText type="small" style={styles.sheetBody}>Press and hold to send.</ThemedText>
             <Button title="Call 911" kind="danger" onPress={() => Linking.openURL('tel:911')} />
             <Button title="Cancel" kind="secondary" onPress={() => setSosOpen(false)} />
           </View>
