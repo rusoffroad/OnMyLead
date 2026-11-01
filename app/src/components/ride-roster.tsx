@@ -13,6 +13,9 @@ import { friendlyRoleError, handOffPrompt, ROLE_LABEL, rosterActions, tailGunner
 import { handOffRide, setMemberRole, setTailGunner } from '@/lib/api';
 import { confirmAndBlock, unblockRider, useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
+import { badgeTitle } from '@/core/badges';
+import { useRiderBadges } from '@/lib/badges';
+import { BadgePatch } from './badge-patch';
 import { useSocialProfiles } from '@/lib/social-profile';
 import type { Ride, RideMember } from '@/lib/types';
 
@@ -50,6 +53,8 @@ export function RideRoster({
   const ordered = [...joined].sort((a, b) => rank(a) - rank(b));
   // The Apple, Google or Facebook accounts riders chose to show the people they ride with.
   const social = useSocialProfiles(joined.map((m) => m.user_id));
+  // Each rider's top badge, small beside their name.
+  const badges = useRiderBadges(joined.map((m) => m.user_id));
 
   function toggle(id: string) {
     if (Platform.OS !== 'web') LayoutAnimation.configureNext(LayoutAnimation.create(180, 'easeInEaseOut', 'opacity'));
@@ -116,7 +121,14 @@ export function RideRoster({
                   fallback={<Avatar name={nameOf(m.user_id)} color={leads ? RideColors.leader : ROLE_COLOR[m.role]} />}
                 />
                 <View style={{ flex: 1, gap: 2 }}>
-                  <ThemedText style={{ fontWeight: 600 }}>{nameOf(m.user_id)}{m.user_id === me ? ' (you)' : ''}</ThemedText>
+                  <View style={styles.nameRow}>
+                    <ThemedText style={{ fontWeight: 600, flexShrink: 1 }} numberOfLines={1}>{nameOf(m.user_id)}{m.user_id === me ? ' (you)' : ''}</ThemedText>
+                    {badges.get(m.user_id) ? (
+                      <View accessible accessibilityLabel={badgeTitle(badges.get(m.user_id)!)}>
+                        <BadgePatch badge={badges.get(m.user_id)!.badge} level={badges.get(m.user_id)!.level} size={18} />
+                      </View>
+                    ) : null}
+                  </View>
                   {roleLine ? <ThemedText type="small" themeColor="textSecondary">{roleLine}</ThemedText> : null}
                   {social.get(m.user_id) ? <SocialTag profile={social.get(m.user_id)!} /> : null}
                 </View>
@@ -264,5 +276,6 @@ const styles = StyleSheet.create({
   emptyDot: { borderWidth: 2, borderColor: Colors.border, borderStyle: 'dashed' },
   midDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: RideColors.rider },
   lineLabels: { flexDirection: 'row', gap: Spacing.three },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   lineName: { fontWeight: 700, fontSize: 17 },
 });

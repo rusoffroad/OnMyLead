@@ -2,6 +2,9 @@ import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { badgeTitle } from '@/core/badges';
+import { useRiderBadges } from '@/lib/badges';
+import { BadgePatch } from './badge-patch';
 import { SheetRoot, SheetScroll, SwipeSheet } from './swipe-sheet';
 import type { MapRider } from './group-map-types';
 import { Icon } from './icon';
@@ -69,6 +72,8 @@ export function RiderRows({
   const rank = (r: MapRider) =>
     (r.id === meId ? 100 : 0) + (r.role === 'leader' ? -10 : 0) + (r.freshness ? ORDER[r.freshness.state] : 3);
   const sorted = [...riders].sort((a, b) => rank(a) - rank(b));
+  // Each rider's top badge, small beside their name.
+  const badges = useRiderBadges(riders.map((r) => r.id));
 
   return (
     <>
@@ -78,8 +83,9 @@ export function RiderRows({
         const when = !f ? 'Not Sharing' : f.state === 'live' ? 'Live' : f.state === 'lost' ? f.label : `Last Seen ${f.ago}`;
         const whenColor = !f ? Colors.textSecondary : f.state === 'live' ? RideColors.green : f.state === 'lost' ? Colors.text : Colors.textSecondary;
         const at = r.lat != null && r.lng != null && r.id !== meId ? { lat: r.lat, lng: r.lng } : null;
+        const badge = badges.get(r.id);
         return (
-          <View key={r.id} style={styles.row} accessible accessibilityLabel={`${r.name}${role ? `, ${role}` : ''}. ${when}`}>
+          <View key={r.id} style={styles.row} accessible accessibilityLabel={`${r.name}${role ? `, ${role}` : ''}${badge ? `, ${badgeTitle(badge)}` : ''}. ${when}`}>
             <View style={styles.dotBox}>
               <RiderDot role={r.role} freshness={f?.state ?? null} />
             </View>
@@ -89,6 +95,7 @@ export function RiderRows({
                   {r.id === meId ? `${r.name} (You)` : r.name}
                   {role ? <Text style={[styles.role, r.role === 'leader' && { color: RideColors.leader }]}>  {role}</Text> : null}
                 </Text>
+                {badge ? <BadgePatch badge={badge.badge} level={badge.level} size={18} /> : null}
                 {extra?.(r.id)}
               </View>
               <Text style={[styles.when, { color: whenColor }, f?.state === 'lost' && styles.lostWhen]} numberOfLines={1}>{when}</Text>

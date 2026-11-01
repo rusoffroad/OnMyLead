@@ -12,7 +12,8 @@
 // come from push_batch_social instead (migration 20261017430000_riding_groups.sql). The older
 // {"message_id": "..."} body is still accepted. Pro trial reminders ({"type":"trial"}, queued
 // hourly by trial_reminder_batch) come from push_batch_account and email_batch_account
-// (migration 20261018000000_pro_entitlements.sql). Riding group chat messages
+// (migration 20261018000000_pro_entitlements.sql); new rider badges ({"type":"badge"}) come from
+// push_batch_account too (migration 20261101500000_rider_badges.sql). Riding group chat messages
 // ({"type":"group_message"}) come from push_batch_group (migration 20261019400000_group_chat.sql).
 // Chat pushes skip riders who blocked the sender (blockersOf, migration
 // 20261020000000_blocked_riders.sql); status taps such as Need Help and EMERGENCY never do.
@@ -38,7 +39,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { channelFor, fcmAccessToken, readServiceAccount, sendFcm } from '../_shared/fcm.ts';
 
 const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
-const ACCOUNT_EVENTS = new Set(['trial']);
+const ACCOUNT_EVENTS = new Set(['trial', 'badge']);
 const GROUP_EVENTS = new Set(['group_message']);
 
 const env = (k: string) => Deno.env.get(k) ?? '';

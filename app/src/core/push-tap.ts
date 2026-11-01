@@ -46,11 +46,13 @@ const id = (v: unknown) => (typeof v === 'string' && v ? v : null);
 
 /**
  * The screen a tapped notification opens: Ride Mode for a live ride or a rider's status, a
- * riding group's chat for its messages, else the ride page (its chat for a message). Null when
+ * riding group's chat for its messages, Badges for a new badge, else the ride page (its chat for a message). Null when
  * the notification isn't about a ride or group (the app then just opens).
  */
 export function tapTarget(data: TapData | undefined): string | null {
   if (!data) return null;
+  // A new badge opens Badges.
+  if (data.type === 'badge') return '/badges';
   const groupId = id(data.groupId);
   if (data.type === 'group_message' && groupId) return `/groups/${groupId}/chat`;
   const rideId = id(data.rideId);

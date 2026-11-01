@@ -4,7 +4,7 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/notifications.tsx
   - app/src/core/notifications.ts
@@ -14,6 +14,7 @@ sources:
   - app/src/lib/push.web.ts
   - app/src/components/message-alerts.tsx
   - app/src/app/(tabs)/profile.tsx
+  - supabase/migrations/20261101500000_rider_badges.sql
 related: [getting-started, status-buttons, ride-chat, group-chat, follow-leaders, emergency-and-safety, pro-trial, troubleshooting]
 keywords: [notifications, push, alerts, mute, quiet hours, do not disturb, reminder, lock screen, preview, emails, sound]
 ---
@@ -58,7 +59,12 @@ Everything below starts on.
 
 ### Your Account
 
+:::until 1.0.3
 - **Pro Trial Reminders**: a week, 3 days and a day before your Pro Trial ends, and when it does.
+:::
+:::release 1.0.3
+- **Badges and Pro Trial**: when you earn a badge (see [Earn Badges and Ranks](/help/badges-and-ranks)), and a week, 3 days and a day before your Pro Trial ends.
+:::
 - **Email Me Too**: the same Pro Trial reminders by email.
 
 ## Tapping a Notification
@@ -69,6 +75,9 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 - A ride chat message opens the ride's **Chat**.
 - A riding group message opens that group's chat.
 - Ride changes, new riders, invites and reminders open the ride.
+:::release 1.0.3
+- A new badge opens **Badges**.
+:::
 
 ## Ride Reminder
 

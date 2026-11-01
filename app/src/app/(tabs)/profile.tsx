@@ -2,11 +2,13 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
+import { BadgePatch } from '@/components/badge-patch';
 import { MenuGroup, MenuRow } from '@/components/menu';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { initialOf } from '@/core/profile';
+import { BADGES, bestLevels, rankFor, unseen, type MyBadges } from '@/core/badges';
 import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directions';
 import { BATTERY_PLANS } from '@/core/battery';
 import { settingsSummary } from '@/core/notifications';
@@ -15,6 +17,7 @@ import { formatBytes } from '@/core/offline-maps';
 import { shareEndText } from '@/core/sharing';
 import { deleteMyAccount, myActiveShares, myRideName } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
+import { fetchMyBadges } from '@/lib/badges';
 import { useBatteryMode } from '@/lib/battery';
 import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
@@ -48,6 +51,7 @@ export default function You() {
   const [social, setSocial] = useState<SocialProfile | null>(null);
   const [socialBusy, setSocialBusy] = useState(false);
   const [socialError, setSocialError] = useState<string | null>(null);
+  const [badges, setBadges] = useState<MyBadges | null>(null);
   // A different account (or none) must not see the last rider's name.
   const uid = session?.user.id;
   const [shownFor, setShownFor] = useState(uid);
@@ -56,6 +60,7 @@ export default function You() {
     setRideName(null);
     setSocial(null);
     setSharingUntil(null);
+    setBadges(null);
   }
 
   useFocusEffect(
@@ -72,6 +77,8 @@ export default function You() {
         .catch(() => setSharingUntil(null));
       // Keeps the name and photo from their Apple, Google or Facebook sign-in up to date.
       syncSocialProfile().then(setSocial).catch(() => {});
+      // Your rank and badges, brought up to date by the server each time the tab shows.
+      fetchMyBadges().then(setBadges).catch(() => {});
     }, [session]),
   );
 
@@ -102,7 +109,10 @@ export default function You() {
   return (
     <Screen>
       {session ? (
-        <Identity name={rideName} plan={ent.switchedOn ? planHeadline(ent) : null} />
+        <>
+          <Identity name={rideName} plan={ent.switchedOn ? planHeadline(ent) : null} />
+          {badges ? <BadgeStrip mine={badges} /> : null}
+        </>
       ) : (
         <View style={styles.signedOut}>
           <ThemedText type="subtitle">Ride with Your Crew</ThemedText>
@@ -257,6 +267,36 @@ function Identity({ name, plan }: { name: string | null; plan: string | null }) 
 }
 
 /**
+ * Your rank and all seven badges as a row of patches: earned ones in their Bronze, Silver or Gold
+ * cloth, the rest as empty outlines. New ones are called out. Tap for Badges.
+ */
+function BadgeStrip({ mine }: { mine: MyBadges }) {
+  const rank = rankFor(mine.badges);
+  const best = bestLevels(mine.badges);
+  const fresh = unseen(mine).length;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Badges. Your rank is ${rank.name}, ${rank.levels} levels earned.${fresh ? ` ${fresh} new.` : ''}`}
+      onPress={() => router.push('/badges')}
+      style={({ pressed }) => [styles.badges, pressed && { backgroundColor: Colors.backgroundSelected }]}>
+      <View style={styles.badgesHead}>
+        <Text style={styles.rankName}>{rank.name}</Text>
+        <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }} numberOfLines={1}>
+          {rank.next ? `${rank.next.min - rank.levels} more ${rank.next.min - rank.levels === 1 ? 'level' : 'levels'} for ${rank.next.name}` : 'The top rank'}
+        </ThemedText>
+        {fresh ? <Text style={styles.newPill}>{fresh === 1 ? 'New Badge' : `${fresh} New`}</Text> : null}
+      </View>
+      <View style={styles.patches}>
+        {BADGES.map((b) => (
+          <BadgePatch key={b.key} badge={b.key} level={best[b.key] ?? 0} size={36} />
+        ))}
+      </View>
+    </Pressable>
+  );
+}
+
+/**
  * Apple requires an in-app way to delete an account. It is deleted on the spot and the rider is
  * signed out; a Pro subscription is billed by Apple and is cancelled there.
  */
@@ -319,6 +359,14 @@ const styles = StyleSheet.create({
   dot: { width: 44, height: 44, borderRadius: 22, backgroundColor: RideColors.rider, alignItems: 'center', justifyContent: 'center' },
   initial: { color: '#fff', fontFamily: font(800), fontSize: 20 },
   name: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 32, lineHeight: 36 },
+  badges: { gap: Spacing.two, borderRadius: Radius.card, padding: Spacing.three, backgroundColor: Colors.backgroundElement },
+  badgesHead: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
+  rankName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 24, lineHeight: 28 },
+  newPill: {
+    color: Colors.background, backgroundColor: '#F2C14E', fontFamily: font(700), fontSize: 12, alignSelf: 'center',
+    paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill, overflow: 'hidden',
+  },
+  patches: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   signedOut: { gap: Spacing.two, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   legal: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.four },
   legalLink: { fontSize: 13, textDecorationLine: 'underline' },
