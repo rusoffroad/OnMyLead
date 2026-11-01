@@ -3,6 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Text as SvgText } from 'react-native-svg';
 
+import { SheetRoot, SwipeSheet } from '@/components/swipe-sheet';
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
@@ -57,9 +58,10 @@ export function ProGateHost() {
   const copy = block ? promptCopy(block) : null;
   return (
     <Modal visible={!!block} transparent animationType="slide" onRequestClose={closeProGate} statusBarTranslucent>
+      <SheetRoot>
       <Pressable style={styles.scrim} onPress={closeProGate} accessibilityLabel="Close" accessibilityRole="button" />
       {copy ? (
-        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
+        <SwipeSheet onClose={closeProGate} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
           <View style={styles.grip} />
           <View style={styles.head}>
             <ProShield size={52} />
@@ -78,8 +80,9 @@ export function ProGateHost() {
             }}
           />
           <Button title="Not Now" kind="ghost" onPress={closeProGate} />
-        </View>
+        </SwipeSheet>
       ) : null}
+      </SheetRoot>
     </Modal>
   );
 }

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
@@ -62,12 +63,13 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
   const reasons = target ? REPORT_REASONS[target.kind] : [];
   return (
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={close} statusBarTranslucent>
+      <SheetRoot>
       <Pressable style={styles.scrim} onPress={close} accessibilityLabel="Close" accessibilityRole="button" />
       {target ? (
         <KeyboardLift>
-        <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
+        <SwipeSheet onClose={close} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
           <View style={styles.grip} />
-          <ScrollView {...keyboardScroll} style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.three }}>
+          <SheetScroll {...keyboardScroll} style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.three }}>
           {sent ? (
             <>
               <Text style={styles.title} accessibilityRole="header">Report Sent</Text>
@@ -110,10 +112,11 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <Button title="Cancel" kind="ghost" onPress={close} />
             </>
           )}
-          </ScrollView>
-        </View>
+          </SheetScroll>
+        </SwipeSheet>
         </KeyboardLift>
       ) : null}
+      </SheetRoot>
     </Modal>
   );
 }
