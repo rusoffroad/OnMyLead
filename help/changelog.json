@@ -2,6 +2,17 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "website-1.0.3",
+    "why": "The onmylead.com homepage now also shows the rest of 1.0.3 (heading arrows, Center on Me, trails from farther out, sharing until you turn it off, swipe-down sheets, hold-to-send Emergency, update heads-ups) and a new Ride Mode picture. These guides list the homepage as a source; nothing in them changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "profile-picture",
       "ride-name-and-profile",
       "report-and-block",
