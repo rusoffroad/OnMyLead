@@ -3,9 +3,9 @@
 -- the files that set up as_session (run_local.sh). Each block raises an exception if a rule is broken.
 
 insert into auth.users (id, email) values
-  ('00000000-0000-0000-0000-000000000fa1', 'owner-r@example.test'),
-  ('00000000-0000-0000-0000-000000000fa2', 'rider-r@example.test');
-insert into admin_users (user_id) values ('00000000-0000-0000-0000-000000000fa1');
+  ('00000000-0000-0000-0000-000000000fc1', 'owner-r@example.test'),
+  ('00000000-0000-0000-0000-000000000fc2', 'rider-r@example.test');
+insert into admin_users (user_id) values ('00000000-0000-0000-0000-000000000fc1');
 
 -- Anyone (signed out too) reads the controls, empty until the owner sets them.
 set role anon;
@@ -16,7 +16,7 @@ end $$;
 reset role;
 
 -- A rider can't change them, and neither can an admin without the authenticator code.
-select as_session('00000000-0000-0000-0000-000000000fa2', 'aal2');
+select as_session('00000000-0000-0000-0000-000000000fc2', 'aal2');
 set role authenticated;
 do $$ begin
   begin
@@ -31,7 +31,7 @@ do $$ begin
   end;
 end $$;
 reset role;
-select as_session('00000000-0000-0000-0000-000000000fa1', 'aal1');
+select as_session('00000000-0000-0000-0000-000000000fc1', 'aal1');
 set role authenticated;
 do $$ begin
   begin
@@ -43,7 +43,7 @@ end $$;
 reset role;
 
 -- The owner sets them; bad values are refused in plain words.
-select as_session('00000000-0000-0000-0000-000000000fa1', 'aal2');
+select as_session('00000000-0000-0000-0000-000000000fc1', 'aal2');
 set role authenticated;
 do $$
 declare
