@@ -10,6 +10,7 @@ sources:
   - app/src/app/share.tsx
   - app/src/components/share-picker.tsx
   - app/src/components/date-calendar.tsx
+  - app/src/components/time-picker.tsx
   - app/src/app/(tabs)/profile.tsx
   - app/src/core/sharing.ts
   - app/src/core/freshness.ts
@@ -113,7 +114,12 @@ Both the ride sharing sheet and **Share My Location** let you pick exactly when 
 
 1. Tap **Pick an End Date**. A calendar opens.
 2. Tap a day, or type the date in the box above the calendar. Use the arrows to change months.
+:::until 1.0.3
 3. Check **Stop Sharing At**. It starts at 6:00 pm (or about an hour from now, later today). Type a different time, such as "9:30 am".
+:::
+:::release 1.0.3
+3. Check **Stop Sharing At**. It starts at 6:00 PM (or about an hour from now, later today). To change it, tap the time, then tap **AM** or **PM**, the hour and the minute.
+:::
 4. Tap the button, such as **Share Until Sat, Nov 14, 6:00 PM**.
 
 A share with an end date still stops early if you tap **Stop Sharing**, and a ride share still stops when the ride ends.

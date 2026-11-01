@@ -1,9 +1,9 @@
 [
   {
     "version": "1.0.3",
-    "title": "See the Whole Group",
-    "intro": "Ride Mode's route line shows every rider in running order, and a new Full Map view gives you the map with nothing in the way.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Every rider's dot on the Ride Mode route line, in running order from rear to front. Tap a dot to see who it is.\n• New Full Map view: hide everything but the route line and EMERGENCY, then tap Menus to bring it all back.",
+    "title": "See the Whole Group, Easier Ride Times",
+    "intro": "Ride Mode's route line shows every rider in running order, a new Full Map view gives you the map with nothing in the way, and ride times take a few taps instead of typing.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".\n• Every rider's dot on the Ride Mode route line, in running order. Tap a dot to see who it is.\n• Full Map: hide everything but the route line and EMERGENCY, then tap Menus to bring it all back.",
     "apple": null,
     "google": null,
     "notes": [
@@ -14,6 +14,10 @@
       {
         "kind": "improved",
         "text": "The route line in Ride Mode shows every sharing rider's dot in running order, rear to front, and riders bunched together line up side by side instead of hiding each other. The leader is blue, the tail gunner purple, and you red. Tap a dot for the rider's name and place."
+      },
+      {
+        "kind": "improved",
+        "text": "Pick times by tapping instead of typing: tap AM or PM, the hour and the minute. Works for Meet At, Departure Time, Expected Finish, a planned stop's time and Stop Sharing At."
       }
     ]
   },

@@ -4,7 +4,7 @@ summary: Pick public or private, set the day, time and meeting point, choose a m
 category: rides
 order: 10
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/ride/new.tsx
   - app/src/app/(tabs)/index.tsx
@@ -16,6 +16,7 @@ sources:
   - app/src/core/calendar.ts
   - app/src/components/ride-date-picker.tsx
   - app/src/components/date-calendar.tsx
+  - app/src/components/time-picker.tsx
   - app/src/lib/api.ts
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [create-a-ride-on-the-website, invite-riders, route-builder, approvals-and-waitlist, edit-cancel-or-delete-a-ride, free-vs-pro]
@@ -35,7 +36,7 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 2. Under **What Kind of Ride?**, tap **Public** (open to anyone, found by riders near you or in your state) or **Private** (only friends you invite by link, text or email).
 3. Type a **Ride Name**.
 4. Under **When**, pick the day (see [Pick the Day](#pick-the-day) below).
-5. Type the time in **Meet At**, for example "8:00 am" or "2:30 pm".
+5. Set the time in **Meet At** (see [Pick the Time](#pick-the-time) below).
 6. Set the **Meeting Point**. You can search in **Search a Place or Address**, tap **Use My Current Location**, or paste **Coordinates** like "38.57, -109.55".
 7. Add a **Place Name** if you like, such as "Gas station on Main St".
 8. Under **The Route**, tap **Mapped** (you draw the route or import a GPX file next) or **Freeride** (no set route, everyone follows the leader).
@@ -73,6 +74,26 @@ You can schedule a ride for any day from today up to three years out, so rides n
 The day you picked shows under **When**, with how far away it is, such as "In 8 Weeks". Tap **Done** to fold the calendar away.
 
 On a tablet, the calendar sits in the same form, with bigger day buttons.
+
+## Pick the Time
+
+:::until 1.0.3
+Type the time in **Meet At**, for example "8:00 am" or "2:30 pm".
+:::
+
+:::release 1.0.3
+No typing needed. **Meet At** starts at 8:00 AM. To change it, tap the time, then:
+
+1. Tap **AM** or **PM**.
+2. Tap the hour, **1** to **12**.
+3. Tap the minute, from **:00** to **:55** in 5-minute steps.
+
+The time shows in big letters as you tap. Tap **Done** to fold the picker away.
+
+**Departure Time** and **Expected Finish** (under **Add Route, Difficulty and More**) work the same way. They start as **Not Set**: tap **Add** and the app suggests a time (30 minutes after you meet for departure, 8 hours after for the finish), then tap to adjust. Tap **Clear** to leave one empty.
+
+On a tablet or a computer, all 12 hours and all 12 minutes fit in one row each.
+:::
 :::
 
 ## Public Ride Options
