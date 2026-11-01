@@ -50,7 +50,7 @@ export function RideQrSheet({
           <Text style={styles.scan}>Scan with Your Phone Camera to Join</Text>
           <View style={styles.codeRow}>
             <Text style={styles.codeLabel}>Or Enter Code</Text>
-            <Text selectable numberOfLines={1} adjustsFontSizeToFit style={[styles.code, codeTextSize(inviteCode, 32)]}>{inviteCode}</Text>
+            <Text selectable numberOfLines={1} style={[styles.code, codeTextSize(inviteCode, 32)]}>{inviteCode}</Text>
           </View>
         </View>
         <Text style={styles.help}>
