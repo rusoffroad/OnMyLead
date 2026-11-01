@@ -4,7 +4,7 @@ summary: Show your ride's QR code so riders can scan it at the trailhead, share 
 category: joining
 order: 40
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-11-01
 sources:
   - app/src/components/ride-qr-sheet.tsx
   - app/src/components/ride-qr.tsx
@@ -30,6 +30,10 @@ Every ride has its own QR code. It's the quickest way to get riders on your ride
 2. Tap **Show QR Code**, or tap the small QR code on the card.
 
 The QR code opens full screen with the ride name and the invite code under it (**Or Enter Code**), so riders can type the code if their camera won't scan. Tap **Done** to close it.
+
+:::release 1.0.3
+You can also swipe it down to close it.
+:::
 
 ## Share the QR Code as a Picture
 

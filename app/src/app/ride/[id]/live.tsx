@@ -19,6 +19,7 @@ import { RiderList, RiderRows } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
 import { SharePicker } from '@/components/share-picker';
+import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
@@ -1205,14 +1206,14 @@ export default function RideMode() {
       />
 
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
-        <View style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
+        <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <KeyboardLift>
-          <View style={[styles.sheet, tablet && styles.sheetTablet]}>
+          <SwipeSheet onClose={() => setAskShare(false)} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Share Your Location with This Ride?</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
               Only riders on this ride will see you. Sharing always stops when the ride ends or you leave it.
             </ThemedText>
-            <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} {...keyboardScroll}>
+            <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} {...keyboardScroll}>
               <SharePicker
                 options={RIDE_SHARE_OPTIONS_MIN}
                 openLabel="Until I Turn It Off"
@@ -1220,16 +1221,19 @@ export default function RideMode() {
                 onPick={beginShare}
                 busy={busy}
               />
-            </ScrollView>
+            </SheetScroll>
             <Button title="Not Now" kind="secondary" onPress={() => setAskShare(false)} />
-          </View>
+          </SwipeSheet>
           </KeyboardLift>
-        </View>
+        </SheetRoot>
       </Modal>
 
       <Modal visible={sosOpen} animationType="fade" transparent onRequestClose={() => setSosOpen(false)}>
-        <View style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
-          <View style={[styles.sheet, tablet && styles.sheetTablet, { borderTopColor: RideColors.red, borderTopWidth: 6 }]}>
+        <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
+          <SwipeSheet
+            onClose={() => setSosOpen(false)}
+            style={[styles.sheet, tablet && styles.sheetTablet, { borderTopColor: RideColors.red, borderTopWidth: 6 }]}
+            accessibilityViewIsModal>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Emergency</ThemedText>
             <ThemedText style={styles.sheetBody}>
               This alerts everyone on the ride with your location. It does not contact emergency services. Call 911 if anyone is hurt.
@@ -1251,8 +1255,8 @@ export default function RideMode() {
             />
             <Button title="Call 911" kind="danger" onPress={() => Linking.openURL('tel:911')} />
             <Button title="Cancel" kind="secondary" onPress={() => setSosOpen(false)} />
-          </View>
-        </View>
+          </SwipeSheet>
+        </SheetRoot>
       </Modal>
     </View>
   );
