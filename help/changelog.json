@@ -20,6 +20,7 @@
       "approvals-and-waitlist",
       "check-in",
       "contact-support",
+      "create-a-ride-on-the-website",
       "delete-account",
       "directions",
       "faq",
@@ -41,7 +42,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "rider-badges",
-    "why": "The badges change touched screens these articles list as sources (the You tab, the Going list, the Riders list, notification settings and the app's screen list). Nothing these articles describe changes for riders."
+    "why": "The badges change touched screens these articles list as sources (the You tab, the Going list, the Riders list, notification settings and the app's screen list, and the onmylead.com features list, which gains a Badges and Ranks card). Nothing these articles describe changes for riders."
   },
   {
     "date": "2026-11-01",
