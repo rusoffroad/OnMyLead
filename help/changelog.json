@@ -11,6 +11,22 @@
     "why": "Version 1.0.3 fixes rider dots in Ride Mode drifting off the rider's real position as the map zooms, and restyles them: a white ring for each rider and a bigger solid blue dot for the leader, with dark name tags. The new look is described in 1.0.3 release blocks."
   },
   {
+    "date": "2026-11-01",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "find-a-ride",
+      "getting-started",
+      "map-layers",
+      "ride-bubble",
+      "route-builder",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "rider-dots-exact-position",
+    "why": "These guides list map pin or website files as sources. Their pins (waypoints, planned stops, search results, Find ride pins) are now placed exactly on their spot, and the website's sample rider dots match the new look; nothing they describe changes."
+  },
+  {
     "date": "2026-10-31",
     "slugs": [
       "faq",
