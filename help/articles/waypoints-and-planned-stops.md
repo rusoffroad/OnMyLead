@@ -53,6 +53,10 @@ You need to have joined the ride to add or see its waypoints.
 6. If you're the leader or an organizer, choose who it's for under **What It Is** (see below).
 7. Tap **Save Waypoint**.
 
+:::release 1.0.3
+Changed your mind? Swipe the sheet down, or tap **Cancel**, to close it without saving.
+:::
+
 :::release 1.0.1
 To find a spot by name, tap **Search** at the top of the waypoints map and type a park, trailhead, town or address, such as "Hidden Falls Adventure Park". Pick a result and the map moves there and labels it. Then press and hold (or click) the map at that spot to drop the waypoint. Search only moves the map; nothing is added until you drop it. See [Search for a Place](/help/place-search).
 :::
