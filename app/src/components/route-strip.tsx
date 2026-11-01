@@ -1,15 +1,27 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors } from '@/constants/theme';
 import type { RangeCheck } from '@/core/fuel';
+import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
+import { describeRank, groupSpread, layoutDots, rankRiders } from '@/core/route-order';
 
 const RANGE_COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: RideColors.yellow, over: RideColors.red };
 
+/** Dot sizes on the line, before a big group shrinks them to fit. */
+const SIZE = { me: 30, leader: 28, sweep: 24, rider: 22 } as const;
+/** How long a tapped rider's name stays up. */
+const LABEL_MS = 4000;
+const LABEL_W = 190;
+
 /**
- * The whole route as one straight line, start to finish, with every sharing rider placed by how
- * far along they are. One glance answers "where am I compared with everyone else?" without
- * reading a map.
+ * The whole route as one straight line, start to finish, with every sharing rider's dot strung
+ * along it in running order: the rear on the left, the front on the right. Each dot sits as near
+ * its real spot as it can without hiding a neighbor, so a bunched-up group reads as a string of
+ * dots rather than one blob, and the leader sees everyone between the front and the rear. Tap a
+ * dot for the rider's name and place. One glance answers "where am I compared with everyone
+ * else?" without reading a map.
  */
 export function RouteStrip({
   lengthM, riders, meId, summary, nameOf, offline, range, compact, lastSeenIds,
@@ -28,33 +40,51 @@ export function RouteStrip({
   offline?: boolean;
 }) {
   const pct = (m: number) => `${Math.max(0, Math.min(100, (m / Math.max(1, lengthM)) * 100))}%` as const;
-  const placed = riders.filter((r) => r.place);
-  const me = placed.find((r) => r.id === meId);
-  // Draw me last so my dot sits on top of anyone at the same spot.
-  const order = [...placed.filter((r) => r.id !== meId), ...(me ? [me] : [])];
+  const ranked = rankRiders(riders);
+  const me = ranked.find((r) => r.id === meId);
+  const [width, setWidth] = useState(0);
+  const sizeOf = (r: PlacedRider) => (r.id === meId ? SIZE.me : SIZE[r.role]);
+  const spots = new Map(
+    layoutDots(ranked.map((r) => ({ id: r.id, alongM: r.place!.alongM, size: sizeOf(r) })), lengthM, width).map((d) => [d.id, d]),
+  );
+  // Draw me last so my dot sits on top, then the leader and sweep over the riders.
+  const order = [...ranked].sort((a, b) => layer(a) - layer(b));
+  function layer(r: PlacedRider) {
+    return r.id === meId ? 3 : r.role === 'rider' ? 1 : 2;
+  }
+
+  // A tapped dot shows the rider's name and place for a few seconds.
+  const [picked, setPicked] = useState<string | null>(null);
+  useEffect(() => {
+    if (!picked) return;
+    const t = setTimeout(() => setPicked(null), LABEL_MS);
+    return () => clearTimeout(t);
+  }, [picked]);
+  const pickedRider = picked ? ranked.find((r) => r.id === picked) : undefined;
+  const pickedSpot = pickedRider ? spots.get(pickedRider.id) : undefined;
+  const spread = groupSpread(ranked);
 
   return (
-    <View
-      style={styles.wrap}
-      accessible
-      accessibilityLabel={
-        summary
-          ? `Mile ${summary.doneMi} of ${summary.totalMi}. ${summary.compared} ${summary.offRoute ?? ''}`
-          : `Route, ${placed.length} riders on it`
-      }>
-      <View style={styles.head}>
+    <View style={styles.wrap}>
+      <View
+        style={styles.head}
+        accessible
+        accessibilityLabel={[
+          summary ? `Mile ${summary.doneMi} of ${summary.totalMi}. ${summary.compared} ${summary.offRoute ?? ''}` : `Route, ${ranked.length} riders on it`,
+          spread ? `${spread}, front to rear.` : '',
+        ].join(' ')}>
         {summary ? (
           <Text style={styles.big}>
             {summary.doneMi}
             <Text style={styles.of}> of {summary.totalMi} mi</Text>
           </Text>
         ) : (
-          <Text style={styles.of}>Route · {placed.length ? `${placed.length} on the line` : 'nobody placed yet'}</Text>
+          <Text style={styles.of}>Route · {ranked.length ? `${ranked.length} on the line` : 'nobody placed yet'}</Text>
         )}
         <Text style={styles.toGo}>{summary ? summary.toGo : offline ? 'Saved route, no signal' : ''}</Text>
       </View>
 
-      <View style={styles.track}>
+      <View style={styles.track} onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}>
         <View style={styles.rail} />
         {me?.place ? <View style={[styles.done, { width: pct(me.place.alongM) }]} /> : null}
         <View style={[styles.cap, { left: 0, backgroundColor: RideColors.green }]} />
@@ -62,31 +92,52 @@ export function RouteStrip({
         {order.map((r) => {
           const mine = r.id === meId;
           const lastSeen = !mine && !!lastSeenIds?.includes(r.id);
-          const color = lastSeen ? Colors.textSecondary : r.role === 'leader' ? RideColors.leader : mine ? Colors.accent : RideColors.rider;
-          const size = mine ? 30 : r.role === 'leader' ? 28 : 18;
-          const letter = mine ? 'You' : r.role === 'leader' ? 'L' : nameOf(r.id).slice(0, 1).toUpperCase();
+          const color = lastSeen
+            ? Colors.textSecondary
+            : r.role === 'leader' ? RideColors.leader : mine ? Colors.accent : r.role === 'sweep' ? RideColors.sweep : RideColors.rider;
+          const spot = spots.get(r.id);
+          const size = spot?.size ?? sizeOf(r);
+          const letter = mine ? 'You' : r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : initialOf(nameOf(r.id));
+          const filled = r.place!.onRoute && !lastSeen;
           return (
-            <View
+            <Pressable
               key={r.id}
+              onPress={() => setPicked((p) => (p === r.id ? null : r.id))}
+              hitSlop={4}
+              accessibilityRole="button"
+              accessibilityLabel={`${describeRank(r, ranked, nameOf(r.id), meId)}${lastSeen ? ', last seen here' : ''}`}
               style={[
                 styles.dot,
                 {
-                  left: pct(r.place!.alongM),
+                  left: spot ? spot.x : pct(r.place!.alongM),
                   width: size,
                   height: size,
                   borderRadius: size / 2,
                   marginLeft: -size / 2,
                   marginTop: -size / 2,
-                  backgroundColor: r.place!.onRoute && !lastSeen ? color : Colors.background,
-                  borderColor: r.place!.onRoute && !lastSeen ? (mine ? Colors.text : Colors.background) : color,
+                  backgroundColor: filled ? color : Colors.background,
+                  borderColor: filled ? (mine || picked === r.id ? Colors.text : Colors.background) : color,
                   borderStyle: lastSeen ? 'dashed' : 'solid',
-                  zIndex: mine ? 3 : r.role === 'rider' ? 1 : 2,
+                  zIndex: picked === r.id ? 4 : layer(r),
                 },
               ]}>
-              {size > 18 ? <Text style={[styles.letter, mine && { fontSize: 10 }]}>{letter}</Text> : null}
-            </View>
+              {size >= 18 ? (
+                <Text style={[styles.letter, { fontSize: mine ? 10 : size >= 24 ? 11 : 9, color: filled ? '#fff' : color }]} numberOfLines={1}>
+                  {letter}
+                </Text>
+              ) : null}
+            </Pressable>
           );
         })}
+        {pickedRider && pickedSpot && width ? (
+          <View
+            pointerEvents="none"
+            style={[styles.label, { left: Math.max(0, Math.min(width - LABEL_W, pickedSpot.x - LABEL_W / 2)) }]}>
+            <Text style={styles.labelText} numberOfLines={2}>
+              {describeRank(pickedRider, ranked, nameOf(pickedRider.id), meId)}
+            </Text>
+          </View>
+        ) : null}
       </View>
 
       {compact ? null : summary ? (
@@ -118,8 +169,13 @@ const styles = StyleSheet.create({
   done: { position: 'absolute', left: 0, height: 6, borderRadius: 3, backgroundColor: Colors.accent },
   cap: { position: 'absolute', width: 12, height: 12, borderRadius: 6, marginLeft: -6, marginRight: -6, borderWidth: 2, borderColor: Colors.background },
   finish: { backgroundColor: Colors.text },
-  dot: { position: 'absolute', top: '50%', borderWidth: 2.5, alignItems: 'center', justifyContent: 'center' },
+  dot: { position: 'absolute', top: '50%', borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   letter: { color: '#fff', fontFamily: font(800), fontSize: 11 },
+  label: {
+    position: 'absolute', bottom: 34, width: LABEL_W, paddingHorizontal: 10, paddingVertical: 6, zIndex: 5,
+    borderRadius: 10, backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
+  },
+  labelText: { color: Colors.text, fontFamily: font(700), fontSize: 13, lineHeight: 17, textAlign: 'center' },
   range: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rangeDot: { width: 10, height: 10, borderRadius: 5 },
   rangeText: { flex: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },

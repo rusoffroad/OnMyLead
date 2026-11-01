@@ -46,6 +46,10 @@ The **EMERGENCY** button in Ride Mode alerts everyone on your ride at once.
 
 Tap **Cancel** to close the screen without sending anything.
 
+:::release 1.0.3
+In [Full Map](/help/ride-mode), **EMERGENCY** stays in the slim bar at the bottom of the screen, so it's still one tap away.
+:::
+
 When the alert goes out:
 
 - Every rider on the ride gets a notification, "EMERGENCY: your name needs help now", with "Tap to see where they are."

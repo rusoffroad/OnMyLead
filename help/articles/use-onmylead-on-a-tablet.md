@@ -54,6 +54,10 @@ On a tablet, Ride Mode's pop-up cards (Share Your Location, **EMERGENCY**) and s
 The round target button at the bottom of the map, just left of the buttons panel, centers the map on you. See [Use Ride Mode](/help/ride-mode).
 :::
 
+:::release 1.0.3
+Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, the ride name and the buttons. A slim bar stays at the bottom right with the route line, **EMERGENCY** and **Menus ▲**, which brings everything back. See [Use Ride Mode](/help/ride-mode).
+:::
+
 ## The Ride Page
 
 Once you've joined a ride, the ride and its details stay on the left, and **Map**, **Riders** and **Chat** open on the right. You can read the chat or check the route without losing the meeting time and place.

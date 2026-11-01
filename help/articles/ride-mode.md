@@ -23,10 +23,11 @@ sources:
   - app/src/core/live-roster.ts
   - app/src/core/map-center.ts
   - app/src/core/route.ts
+  - app/src/core/route-order.ts
   - app/src/core/sharing.ts
   - app/src/lib/location.ts
 related: [location-sharing, status-buttons, ride-bubble, ride-chat, directions, offline-maps]
-keywords: [center on me, my location, recenter, live map, group map, tracking, live tracking, rider dots, last seen, no signal, follow the group, screen stays on]
+keywords: [full map, full screen, hide menus, rider order, running order, front and rear, center on me, my location, recenter, live map, group map, tracking, live tracking, rider dots, last seen, no signal, follow the group, screen stays on]
 screenshots:
   - file: live.webp
     shows: app/src/app/ride/[id]/live.tsx
@@ -123,6 +124,18 @@ When the ride has a route, the route strip at the bottom shows the whole route a
 
 If you've added your machine in the [Garage](/help/garage) with its fuel details, the strip also says whether your range covers the route. See [Fuel Range](/help/fuel-range).
 
+:::release 1.0.3
+### See the Whole Group in Order
+
+Every rider who is sharing has a dot on the route line, strung out in running order: the rear on the left, the front on the right. Each dot sits as close to the rider's real spot as it can, and riders bunched together line up side by side instead of hiding each other, so the leader can see everyone between the front and the rear at a glance.
+
+- **L** in blue is the leader, **S** in purple is the tail gunner, and the red **You** dot is you. Other riders show their initial.
+- A hollow dot is a rider off the route. A grey dashed dot is where a rider was last seen.
+- Tap a dot to see who it is and their place, such as "Mia · 3rd of 6 · 0.4 mi behind the leader".
+- Riders who aren't sharing their location aren't on the line.
+- With a big group, the dots get smaller to fit the line.
+:::
+
 ## Fold the Panel to See More Map
 
 Swipe the bottom panel down, or tap **Hide ▼** on its handle, to fold it away. Swipe up or tap **Buttons ▲** to bring it back. The app remembers your choice.
@@ -138,6 +151,19 @@ Sheets that slide up over the map (**Riders**, **Directions**, a waypoint, Share
 :::
 
 On a tablet the map fills the screen. The **Riders** list sits on the left (tap **Hide** or swipe it left to fold it, **Show Riders** to bring it back) and the buttons panel on the right. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+
+:::release 1.0.3
+## Full Map
+
+Want the map and nothing else? Tap **⤢ Full Map** at the top of the bottom panel. The ride name, banners, map buttons and the riders list tuck away, and a slim bar at the bottom keeps:
+
+- the route line with every rider's dot (when the ride has a route);
+- **EMERGENCY**, always one tap away;
+- Need Help and EMERGENCY calls from other riders;
+- **Menus ▲**, with a badge counting any other alerts.
+
+Tap **Menus ▲** to bring back the status buttons, quick replies and everything else. Full Map works the same on iPhone, iPad, Android phones and Android tablets.
+:::
 
 ## When You Lose Service
 
