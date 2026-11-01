@@ -2,6 +2,16 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "ride-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-mode-opens-on-you",
+    "why": "Ride Mode's map now opens centered on the rider at riding zoom (it could open over a random spot or the whole world), and Center on Me zooms in when the map is zoomed far out. Ships in 1.0.3."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "faq",
       "garage",
       "getting-started",

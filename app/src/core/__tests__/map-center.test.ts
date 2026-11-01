@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { cameraCenterFor, MIN_OPEN_MAP, openMapCenter } from '../map-center';
+import {
+  cameraCenterFor, fitInset, isFarOut, MIN_OPEN_MAP, openMapCenter, RIDE_VIEW_M, rideViewCorners, shouldCenterOnOpen,
+} from '../map-center';
 
 describe('openMapCenter', () => {
   const size = { width: 400, height: 800 };
@@ -54,5 +56,73 @@ describe('cameraCenterFor', () => {
   it('wraps across the date line', () => {
     const c = cameraCenterFor({ lat: 0, lng: 179.99 }, { lat: 0, lng: 0 }, { lat: 0, lng: -0.05 });
     expect(c.lng).toBeCloseTo(-179.96, 6);
+  });
+});
+
+describe('rideViewCorners', () => {
+  it('puts the rider in the middle of a box about RIDE_VIEW_M tall', () => {
+    const p = { lat: 38.57, lng: -109.55 }; // Moab
+    const [a, b] = rideViewCorners(p);
+    expect((a.lat + b.lat) / 2).toBeCloseTo(p.lat, 6);
+    expect((a.lng + b.lng) / 2).toBeCloseTo(p.lng, 6);
+    expect((b.lat - a.lat) * 111_320).toBeCloseTo(RIDE_VIEW_M, 0);
+    // East-west degrees are wider at this latitude, so the box is still about square on the ground.
+    expect((b.lng - a.lng) * 111_320 * Math.cos((p.lat * Math.PI) / 180)).toBeCloseTo(RIDE_VIEW_M, -1);
+  });
+
+  it('stays on the map near the date line and the poles', () => {
+    const [a, b] = rideViewCorners({ lat: 89, lng: 179.99 });
+    expect(b.lat).toBeLessThanOrEqual(85);
+    expect(a.lng).toBeGreaterThanOrEqual(-180);
+    expect(b.lng).toBeLessThanOrEqual(180);
+  });
+});
+
+describe('isFarOut', () => {
+  it('is far out before the map has reported where it is (a new map shows the world)', () => {
+    expect(isFarOut(null, 390)).toBe(true);
+  });
+
+  it('is far out over a continent and not at riding zoom', () => {
+    expect(isFarOut({ longitudeDelta: 60 }, 390)).toBe(true);
+    expect(isFarOut({ longitudeDelta: 0.2 }, 390)).toBe(false);
+  });
+
+  it('accounts for a wider tablet map showing more', () => {
+    // About 0.6 degrees across is past the line on a phone but not on a wide tablet map.
+    expect(isFarOut({ longitudeDelta: 0.6 }, 390)).toBe(true);
+    expect(isFarOut({ longitudeDelta: 0.6 }, 1100)).toBe(false);
+  });
+});
+
+describe('fitInset', () => {
+  const size = { width: 400, height: 800 };
+
+  it('keeps the panels as padding when there is open map between them', () => {
+    expect(fitInset(size, { top: 100, right: 0, bottom: 300.4, left: 0 })).toEqual({ top: 100, right: 0, bottom: 300, left: 0 });
+  });
+
+  it('drops the padding on an axis the panels nearly cover', () => {
+    expect(fitInset(size, { top: 300, right: 0, bottom: 450, left: 0 })).toEqual({ top: 0, right: 0, bottom: 0, left: 0 });
+    expect(fitInset(size, { top: 10, right: 200, bottom: 10, left: 150 })).toEqual({ top: 10, right: 0, bottom: 10, left: 0 });
+  });
+});
+
+describe('shouldCenterOnOpen', () => {
+  const at = { lat: 38.57, lng: -109.55 };
+  const base = { done: false, userMoved: false, mapReady: true, at };
+
+  it('centers once the map is ready and a spot is known', () => {
+    expect(shouldCenterOnOpen(base)).toBe(true);
+  });
+
+  it('waits for a first fix and for the map', () => {
+    expect(shouldCenterOnOpen({ ...base, at: null })).toBe(false);
+    expect(shouldCenterOnOpen({ ...base, mapReady: false })).toBe(false);
+  });
+
+  it('never fights a rider who moved the map first, and only happens once', () => {
+    expect(shouldCenterOnOpen({ ...base, userMoved: true })).toBe(false);
+    expect(shouldCenterOnOpen({ ...base, done: true })).toBe(false);
   });
 });

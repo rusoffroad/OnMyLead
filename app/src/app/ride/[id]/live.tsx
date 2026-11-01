@@ -39,6 +39,7 @@ import { riderHeading } from '@/core/heading';
 import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { mapPanelWidth, sidebarWidth } from '@/core/layout';
+import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
@@ -684,6 +685,11 @@ export default function RideMode() {
    */
   const groupMap = useRef<GroupMapHandle>(null);
   const [locating, setLocating] = useState(false);
+  // The open map between the panels: on a phone between the banners and the panel, on a tablet
+  // between the riders list and the panel.
+  const openMapInset = tablet
+    ? { top: insets.top + EDGE, right: panelW + 2 * EDGE, bottom: panelBottom, left: sidebar.open ? sideW + 2 * EDGE : 0 }
+    : { top: shownBannersBottom, right: 0, bottom: panelBottom + panelH, left: 0 };
   async function centerOnMe() {
     Haptics.selectionAsync().catch(() => {});
     let at = myFix;
@@ -714,11 +720,51 @@ export default function RideMode() {
       Alert.alert('No Location Yet', "Your phone hasn't found where you are yet. Try again in a moment.");
       return;
     }
-    const inset = tablet
-      ? { top: insets.top + EDGE, right: panelW + 2 * EDGE, bottom: panelBottom, left: sidebar.open ? sideW + 2 * EDGE : 0 }
-      : { top: shownBannersBottom, right: 0, bottom: panelBottom + panelH, left: 0 };
-    await groupMap.current?.centerOn(at, inset);
+    opening.current = 'done';
+    await groupMap.current?.centerOn(at, openMapInset);
   }
+
+  /**
+   * When Ride Mode opens, the map centers on this rider at riding zoom: from the phone's recent
+   * fix at once, else the first fix that comes in. Never asks for location (Center on Me and
+   * sharing do), and never moves the map once the rider has moved it themselves.
+   */
+  const opening = useRef<'waiting' | 'done'>('waiting');
+  const [mapReady, setMapReady] = useState(false);
+  // The rider dragged or pinched the map before their spot was known: leave the map where they put it.
+  const [mapMoved, setMapMoved] = useState(false);
+  const [openFix, setOpenFix] = useState<{ lat: number; lng: number } | null>(null);
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    let gone = false;
+    (async () => {
+      const p = await Location.getForegroundPermissionsAsync().catch(() => null);
+      if (p?.status !== 'granted' || gone) return;
+      try {
+        const l = await Location.getLastKnownPositionAsync({ maxAge: 2 * 60_000 });
+        if (l) {
+          if (!gone) setOpenFix({ lat: l.coords.latitude, lng: l.coords.longitude });
+          return;
+        }
+      } catch {}
+      try {
+        const l = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        if (!gone) setOpenFix({ lat: l.coords.latitude, lng: l.coords.longitude });
+      } catch {}
+    })();
+    return () => {
+      gone = true;
+    };
+  }, []);
+  const openAt = openFix ?? myFix;
+  // On a phone, wait until the panel is measured so the rider lands above it, not under it.
+  const openLaidOut = mapReady && (tablet || panelH > 0);
+  const openInsetKey = JSON.stringify(openMapInset);
+  useEffect(() => {
+    if (!shouldCenterOnOpen({ done: opening.current === 'done', userMoved: mapMoved, mapReady: openLaidOut, at: openAt })) return;
+    opening.current = 'done';
+    groupMap.current?.centerOn(openAt!, JSON.parse(openInsetKey), { animated: false });
+  }, [openLaidOut, openAt, openInsetKey, mapMoved]);
 
   async function dropWaypointHere() {
     let at: { lat: number; lng: number } | null = null;
@@ -799,6 +845,9 @@ export default function RideMode() {
         onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
         onLongPressMap={mine ? openNewWaypoint : undefined}
         edgePadding={fitPadding}
+        fallback={meet}
+        onReady={() => setMapReady(true)}
+        onUserMove={() => setMapMoved(true)}
       />
       {fullMap ? null : (
       <TrailMapOverlay

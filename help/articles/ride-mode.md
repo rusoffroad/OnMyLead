@@ -44,6 +44,10 @@ Ride Mode opens once the organizer starts the ride.
 - **Organizers:** on the ride page, tap **Start Ride Mode**. The ride goes live for everyone and Ride Mode opens.
 - **Riders:** once the ride is live, open the ride page and tap **Enter Ride Mode**. Riders on the ride also get a notification when the ride starts.
 
+:::release 1.0.3
+The map opens centered on you, zoomed in to about 10 miles across so nearby trails show, and clear of the panels over the map. If your phone hasn't found you yet, the map centers on you as soon as it does, unless you've already moved the map yourself. If OnMyLead can't use your location, the map opens on the group, the route or the meeting point instead.
+:::
+
 The first time you open Ride Mode on a ride, it asks **Share Your Location with This Ride?** Pick how long to share, or tap **Not Now**. You can see the group without sharing, but the group can't see you. See [Share Your Location](/help/location-sharing).
 
 :::tip
@@ -84,7 +88,7 @@ To switch map layers or download the ride's map for riding with no signal, use t
 :::release 1.0.2
 ### Center the Map on You
 
-Tap the round target button to move the map so you're in the middle of it. The map keeps how far you've zoomed in or out, and puts you in the middle of the part you can see, clear of the panel. If the app doesn't have your location yet, the button spins for a moment while your phone finds you. If location is off for OnMyLead, it offers **Open Settings** so you can turn it on.
+Tap the round target button to move the map so you're in the middle of it. The map keeps how far you've zoomed in or out (if you're zoomed far out, over a whole state or more, it zooms in to about 10 miles across), and puts you in the middle of the part you can see, clear of the panel. If the app doesn't have your location yet, the button spins for a moment while your phone finds you. If location is off for OnMyLead, it offers **Open Settings** so you can turn it on.
 
 - **iPhone and Android phones:** the button sits on the right, just above the bottom panel (above **Add Waypoint**). When the panel is open and fills the screen, fold it to see the button.
 - **iPad and Android tablets:** the button sits at the bottom of the map, just left of the buttons panel.
