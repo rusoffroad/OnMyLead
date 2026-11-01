@@ -89,14 +89,14 @@ export default function BadgesScreen() {
         {rows.map((row) => (
           <View key={row[0].def.key} style={[styles.gridRow, columns === 1 && { flexDirection: 'column' }]}>
             {row.map((p) => (
-              <BadgeCard key={p.def.key} p={p} fresh={fresh.has(p.def.key)} />
+              <BadgeCard key={p.def.key} p={p} fresh={fresh.has(p.def.key)} grid={columns > 1} />
             ))}
-            {Array.from({ length: columns - row.length }, (_, i) => <View key={`pad-${i}`} style={{ flex: 1 }} />)}
+            {Array.from({ length: columns - row.length }, (_, i) => <View key={`pad-${i}`} style={[styles.gridCell, styles.pad]} />)}
           </View>
         ))}
       </View>
 
-      <ThemedText type="small" themeColor="textSecondary">
+      <ThemedText type="small" themeColor="textSecondary" style={{ maxWidth: 640 }}>
         A ride counts once it ends, for riders whose own location track covers at least half a mile. Leading, tail gunning and
         group rides need at least two riders with a track. Badges are earned on the server from what you really ride, so they
         can’t be added by hand.
@@ -132,13 +132,13 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
   );
 }
 
-function BadgeCard({ p, fresh }: { p: BadgeProgress; fresh: boolean }) {
+function BadgeCard({ p, fresh, grid }: { p: BadgeProgress; fresh: boolean; grid: boolean }) {
   const earned = p.level > 0;
   const levelName = earned ? LEVEL_NAME[p.level as BadgeLevel] : 'Not Earned Yet';
   const barColor = earned && p.goal == null ? PATCH_COLORS[3].cloth : earned ? PATCH_COLORS[p.level as BadgeLevel].cloth : Colors.textSecondary;
   return (
     <View
-      style={[styles.card, fresh && styles.cardFresh]}
+      style={[styles.card, grid && styles.gridCell, fresh && styles.cardFresh]}
       accessible
       accessibilityLabel={`${p.def.name}, ${levelName}${fresh ? ', new' : ''}. ${p.def.what}. ${p.line}.`}>
       <BadgePatch badge={p.def.key} level={p.level} size={64} />
@@ -166,8 +166,12 @@ const styles = StyleSheet.create({
   rungBar: { height: 6, borderRadius: 3, backgroundColor: Colors.backgroundSelected },
   rungName: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12 },
   gridRow: { flexDirection: 'row', gap: Spacing.three },
+  // Side by side, every card in a row gets the same width.
+  gridCell: { flex: 1, flexBasis: 0, minWidth: 0 },
+  // An empty slot sized like a card (same padding and border), so a short last row lines up.
+  pad: { padding: Spacing.three, borderWidth: 1, borderColor: 'transparent' },
   card: {
-    flex: 1, flexDirection: 'row', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card,
+    flexDirection: 'row', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card,
     backgroundColor: Colors.backgroundElement, borderWidth: 1, borderColor: 'transparent',
   },
   cardFresh: { borderColor: PATCH_COLORS[3].cloth },

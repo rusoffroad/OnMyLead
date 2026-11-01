@@ -25,8 +25,8 @@ const MARKS: Record<BadgeKey, string[]> = {
   tail_gunner: ['M7.5 7.5l4.5 4 4.5-4', 'M7.5 12.5l4.5 4 4.5-4'],
   // Three machines in a line.
   crew_rider: ['M6.5 12h.01', 'M12 12h.01', 'M17.5 12h.01'],
-  // A road running away to the horizon.
-  mile_eater: ['M8.5 18.5L11 6', 'M15.5 18.5L13 6', 'M12 16.5v-1.8', 'M12 11.8v-1.3'],
+  // A speedometer.
+  mile_eater: ['M5 16.5a7 7 0 0 1 14 0', 'M12 16.5l3.5-4.5', 'M7.2 11.2l.9.7', 'M12 9.2v1'],
   // A painted trail blaze.
   trailblazer: ['M12 5.5l5.5 6.5-5.5 6.5-5.5-6.5z'],
   // A folded map.
@@ -58,7 +58,7 @@ export function BadgePatch({
         {!tiny ? (
           <Path d={STITCH} fill="none" stroke={c ? c.edge : Colors.border} strokeWidth={1.2} strokeDasharray="2.2 2" strokeLinejoin="round" />
         ) : null}
-        <G transform={`translate(12 ${tiny ? 10 : 8.5})`}>
+        <G transform={tiny ? 'translate(9.6 7.6) scale(1.2)' : 'translate(10.8 6.6) scale(1.1)'}>
           {MARKS[badge].map((d) => (
             <Path
               key={d}
