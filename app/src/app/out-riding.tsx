@@ -2,6 +2,7 @@ import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState, type ComponentProps } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { AddFriendButton } from '@/components/add-friend-button';
 import { RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
 import { RangeRings } from '@/components/range-rings';
@@ -10,6 +11,7 @@ import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
 import { Button, ErrorText, Field, Screen, Section, Segmented } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { friendIds, splitFriends } from '@/core/friends';
 import { sideColumnWidth } from '@/core/layout';
 import {
   AUDIENCE_CHOICES, countLine, DEFAULT_HOURS, DEFAULT_RADIUS, distanceLabel, DURATION_OPTIONS, endsLabel, IDLE_HOURS, isOut,
@@ -17,6 +19,7 @@ import {
 } from '@/core/out-riding';
 import { useLayout } from '@/hooks/use-layout';
 import { confirmAndBlock, useBlocks } from '@/lib/blocks';
+import { useFriends } from '@/lib/friends';
 import { goOutRiding, nearbyRiders, OutRidingOffError, refreshOutRiding, stopOutRiding, updateOutRiding, useMyOutRiding } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
 
@@ -26,7 +29,7 @@ const LIST_EVERY_MS = 60_000;
 /**
  * Out Riding: switch it on when you're out on the trail, and see which other riders are out near
  * you right now, with roughly how far away they are (never where). Message any of them. By
- * default only riders you know see you and show here; Everyone Nearby opens it up to any rider
+ * default only your friends and riders you know see you and show here; Everyone Nearby opens it up to any rider
  * at the same park who chose the same. Phones: one column. Tablets and wide windows: your status
  * on the left, the rings and the list on the right.
  */
@@ -34,6 +37,7 @@ export default function OutRiding() {
   const { session, loading } = useSession();
   const me = useMyOutRiding();
   const blocks = useBlocks();
+  const friends = useFriends();
   const { wide, width } = useLayout();
   const on = isOut(me.status);
 
@@ -101,7 +105,12 @@ export default function OutRiding() {
     return () => clearTimeout(t);
   }, [loadList]);
 
-  const visible = (riders ?? []).filter((r) => !blocks.ids.has(r.user_id));
+  // Friends first, then the rest of the riders you know, then nearest.
+  const myFriends = friendIds(friends.list);
+  const visible = (riders ?? [])
+    .filter((r) => !blocks.ids.has(r.user_id))
+    .sort((a, b) => Number(myFriends.has(b.user_id)) - Number(myFriends.has(a.user_id)));
+  const friendRequests = splitFriends(friends.list).received.length;
 
   async function switchOn() {
     setBusy(true);
@@ -160,7 +169,7 @@ export default function OutRiding() {
             <Text style={styles.statusTitle}>You’re Out Riding</Text>
           </View>
           <ThemedText type="small" themeColor="textSecondary">
-            {endsLabel(me.status.expires_at, now)}. {me.status.audience === 'everyone' ? 'Everyone nearby who chose Everyone Nearby' : 'Riders you know'} can see your name and roughly how far away you are.
+            {endsLabel(me.status.expires_at, now)}. {me.status.audience === 'everyone' ? 'Everyone nearby who chose Everyone Nearby' : 'Your friends and riders you know'} can see your name and roughly how far away you are.
           </ThemedText>
           {me.status.spot ? <Text style={styles.spotLine}>At {me.status.spot}</Text> : null}
           <View style={styles.btnRow}>
@@ -241,6 +250,14 @@ export default function OutRiding() {
         <Text style={styles.linkText}>Messages</Text>
         <Icon name="chevron" color={Colors.textSecondary} />
       </Pressable>
+      {friends.loaded && !friends.off ? (
+        <Pressable accessibilityRole="button" onPress={() => router.push('/friends')} style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}>
+          <Icon name="addFriend" color={RideColors.green} />
+          <Text style={styles.linkText}>Friends</Text>
+          {friendRequests ? <Text style={styles.reqBadge}>{friendRequests}</Text> : null}
+          <Icon name="chevron" color={Colors.textSecondary} />
+        </Pressable>
+      ) : null}
     </>
   );
 
@@ -276,7 +293,7 @@ export default function OutRiding() {
       {riders && !visible.length ? (
         <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
           {shownScope === 'riders'
-            ? 'Riders you know show up here when they switch on Out Riding too.'
+            ? 'Your friends and riders you know show up here when they switch on Out Riding too.'
             : 'Anyone at the same park shows up here once they switch on Out Riding with Everyone Nearby.'}
         </ThemedText>
       ) : null}
@@ -296,7 +313,9 @@ export default function OutRiding() {
                   <Text style={styles.riderMeta} numberOfLines={1}>
                     {distanceLabel(r.miles)}{r.spot ? `, at ${r.spot}` : ''}
                   </Text>
-                  <Text style={styles.riderSub} numberOfLines={1}>{r.known ? 'Ridden With You' : 'New Rider'}, {outSince(r.since, now)}</Text>
+                  <Text style={styles.riderSub} numberOfLines={1}>
+                    {myFriends.has(r.user_id) ? 'Friend' : r.known ? 'Ridden With You' : 'New Rider'}, {outSince(r.since, now)}
+                  </Text>
                 </View>
                 <Pressable
                   accessibilityRole="button"
@@ -317,6 +336,7 @@ export default function OutRiding() {
               </View>
               {open ? (
                 <View style={styles.menu}>
+                  <AddFriendButton userId={r.user_id} name={r.display_name} style={styles.menuBtn} onDone={() => setMenuFor(null)} />
                   <Button
                     title="Report Rider"
                     kind="secondary"
@@ -393,6 +413,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundElement, borderRadius: Radius.control,
   },
   linkText: { flex: 1, color: Colors.text, fontFamily: font(700), fontSize: 17 },
+  reqBadge: {
+    color: '#fff', backgroundColor: Colors.accent, fontFamily: font(700), fontSize: 12, overflow: 'hidden',
+    paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill,
+  },
   radiusRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flexWrap: 'wrap' },
   radiusLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 15 },
   radiusChip: { minHeight: 40, paddingHorizontal: 16, borderRadius: Radius.pill, borderWidth: 1, borderColor: Colors.border, justifyContent: 'center' },

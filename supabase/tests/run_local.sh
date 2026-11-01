@@ -29,5 +29,6 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/store_reviews_test.sql" \
   -f "$here/release_controls_test.sql" \
   -f "$here/badges_test.sql" \
-  -f "$here/out_riding_test.sql"
+  -f "$here/out_riding_test.sql" \
+  -f "$here/friends_test.sql"
 bash "$here/concurrency_test.sh" "$db"

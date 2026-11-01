@@ -60,6 +60,8 @@ export function tapTarget(data: TapData | undefined): string | null {
   // A direct message opens the conversation with whoever sent it.
   const userId = id(data.userId);
   if (data.type === 'direct_message' && userId) return `/messages/${userId}`;
+  // A friend request, or a request that was accepted, opens Friends.
+  if (data.type === 'friend_request' || data.type === 'friend_accept') return '/friends';
   const rideId = id(data.rideId);
   // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open
   // Ride Mode, where the group is.

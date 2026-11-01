@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import {
-  ACCOUNT_SETTINGS, DEFAULT_SETTINGS, DM_TOPICS, formatClock, GROUP_CHAT_TOPICS, GROUP_TOPICS, quietLengthHours, quietSegments, REMINDER_OPTIONS, stepClock, TOPIC_GROUPS,
+  ACCOUNT_SETTINGS, DEFAULT_SETTINGS, DM_TOPICS, formatClock, FRIEND_TOPICS, GROUP_CHAT_TOPICS, GROUP_TOPICS, quietLengthHours, quietSegments, REMINDER_OPTIONS, stepClock, TOPIC_GROUPS,
   type NotificationSettings,
 } from '@/core/notifications';
 import { loadNotificationSettings, saveNotificationSettings } from '@/lib/notification-settings';
@@ -64,9 +64,11 @@ export default function NotificationsScreen() {
       const groupsOff = GROUP_TOPICS.some((k) => k in patch) && /ride_invites|followed_leaders|schema cache/i.test((e as Error).message);
       const chatOff = GROUP_CHAT_TOPICS.some((k) => k in patch) && /group_chat|schema cache/i.test((e as Error).message);
       const dmOff = DM_TOPICS.some((k) => k in patch) && /direct_messages|schema cache/i.test((e as Error).message);
+      const friendsOff = FRIEND_TOPICS.some((k) => k in patch) && /friend_requests|schema cache/i.test((e as Error).message);
       const accountOff = ACCOUNT_SETTINGS.some((k) => k in patch) && /account_push|account_emails|schema cache/i.test((e as Error).message);
       setError(
-        dmOff ? 'Direct Message notifications are not switched on yet. They start working with the next server update.'
+        friendsOff ? 'Friend Request notifications are not switched on yet. They start working with the next server update.'
+        : dmOff ? 'Direct Message notifications are not switched on yet. They start working with the next server update.'
         : chatOff ? 'Riding Group Chat notifications are not switched on yet. They start working with the next server update.'
         : groupsOff ? 'Ride Invites and Leaders You Follow are not switched on yet. They start working with the next server update.'
         : accountOff ? 'Account notifications are not switched on yet. They start working with the next server update.'

@@ -292,6 +292,7 @@ export function Showcase() {
               <Feature title="Ride Summary and Ride Card">After the ride, see the miles and the group’s totals, then share a ride card.</Feature>
               <Feature title="Badges and Ranks">Earn Bronze, Silver and Gold badges for leading rides, riding tail gunner, riding with your crew and racking up miles, plus the trails you share and rate. Your levels add up to a rank from Rookie to Legend, and they’re earned from real GPS tracks, so nobody can fake one.</Feature>
               <Feature title="Out Riding">At a park for the weekend? Switch on Out Riding to see which riders you know are out near you, or anyone nearby who chose the same, and message them. Riders see roughly how far away you are, never where, and it turns itself off.</Feature>
+              <Feature title="Friends">Add the riders you ride with as friends, or share your friend link. Friends see each other when they’re out riding nearby and can message any time, without ever sharing where they are.</Feature>
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for as long as you choose, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>

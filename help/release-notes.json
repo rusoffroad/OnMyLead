@@ -2,8 +2,8 @@
   {
     "version": "1.0.3",
     "title": "Exact Rider Dots and Better Maps on the Trail",
-    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, and Out Riding shows which riders are out near you so you can message them.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Badges and ranks for leading, riding and miles.\n• Out Riding: see who's out near you and message them.\n• Rider dots stay put as you zoom and show heading.\n• Full Map, and every rider in order on the route line.\n• Ride Mode opens on you; Center on Me.\n• Trails show from farther out.\n• Faster ride time picker; plan rides in 2027+.\n• Share your location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
+    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, and you can add riders as friends.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Badges and ranks for leading, riding and miles.\n• Out Riding + Friends: see who's out and message them.\n• Rider dots stay put as you zoom and show heading.\n• Full Map, and every rider in order on the route line.\n• Ride Mode opens on you; Center on Me.\n• Trails show from farther out.\n• Faster ride time picker; plan rides in 2027+.\n• Share your location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
     "apple": null,
     "google": null,
     "notes": [
@@ -14,6 +14,10 @@
       {
         "kind": "new",
         "text": "Out Riding. Heading out, or at a park for the weekend? Switch on Out Riding from the Groups tab to see which riders are out near you right now and roughly how far away they are (never where), then send them a message. By default only riders you've ridden with can see you; pick Everyone Nearby to meet anyone at the same park who chose the same. It's off until you switch it on and turns itself off."
+      },
+      {
+        "kind": "new",
+        "text": "Friends. Add the riders you ride with as friends from Friends on the Groups tab, from a ride's Going list, from Out Riding or from a conversation, or share your friend link with anyone. Friends see each other in Out Riding and can message any time. There's no search by name, and being friends never shares where you are."
       },
       {
         "kind": "new",
