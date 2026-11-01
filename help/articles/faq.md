@@ -20,8 +20,11 @@ sources:
   - app/src/core/sharing.ts
   - app/src/core/waypoints.ts
   - app/app.json
+  - app/src/core/app-versions.ts
+  - app/src/components/update-required.tsx
+  - app/src/components/app-notices.tsx
 related: [troubleshooting, free-vs-pro, privacy, location-sharing, contact-support]
-keywords: [questions, faq, release notes, what's new, update, version, how many rides, cost, price, free, iphone, website, tablet]
+keywords: [questions, faq, release notes, what's new, update, update required, update available, version, how many rides, cost, price, free, iphone, website, tablet]
 ---
 
 ## Is OnMyLead Free?
@@ -93,6 +96,19 @@ Yes. OnMyLead is in the App Store for iPhone and iPad, and on Google Play for An
 ## How Do I See What Changed in an Update?
 
 Every version's changes are listed in the [Release Notes](/help/release-notes), newest first, with when it reached the App Store and Google Play. To get the latest version, update OnMyLead from the App Store or Google Play.
+
+:::release 1.0.3
+## The App Says "Please Update OnMyLead". What Do I Do?
+
+We show this when your version has a problem that's fixed in a newer one. Tap **Update Now** to open the App Store (iPhone and iPad) or Google Play (Android), then update OnMyLead. Your rides, groups and settings stay as they are.
+
+On a ride with no signal? Tap **Not Now**. Ride Mode, Help and SOS and everything else keep working, and the app asks again the next time you open it.
+
+You might also see:
+
+- **Update Available** at the top of the home screen when a newer version is out. Tap **Update**, or close the card with the X.
+- **About This Version**, an amber card at the top of the home screen, when we know about a problem in your version. It says what's wrong and what to do until the fix arrives.
+:::
 
 ## How Many Waypoints Can I Add?
 

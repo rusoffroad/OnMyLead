@@ -2,6 +2,30 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "faq"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-controls",
+    "why": "1.0.3 adds Update Required, Update Available and About This Version notices that the owner sets from the new Admin Releases page; the FAQ explains what riders see and that Not Now always works."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "getting-started",
+      "promo-codes",
+      "rus-gear",
+      "starlink",
+      "trip-planner"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "release-controls",
+    "why": "These guides list the home screen notices, app settings or the root layout as sources. The change adds release controls (Update Required, Update Available, About This Version), covered in the FAQ; the feature switches, notices and screens these guides describe work as before."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "ride-mode",
       "troubleshooting"
     ],

@@ -2,22 +2,27 @@
  * What the owner sets on the Admin Dashboard's Settings page and every rider's app reads
  * (public_app_settings() in migration 20261018000000_pro_entitlements.sql):
  *   * an announcement and a maintenance notice, each null or {"text": 1-500 chars, "until": ISO?};
- *   * feature flags, an object of booleans.
+ *   * feature flags, an object of booleans;
+ *   * release controls (`app_versions`: minimum and latest version per store, and a notice for
+ *     chosen versions), read by core/app-versions.ts. Builds before 1.0.3 ignore them.
  *
  * Flags are kill switches for extras, never for safety: a flag the owner hasn't set, or an app that
  * can't reach the server, leaves the feature on. Ride Mode, Help and SOS, Mechanical Issue,
  * location sharing, chat and joining have no flag.
  */
 
-export type Notice = { text: string; until?: string };
+import { NO_VERSIONS, parseAppVersions, type AppVersions, type Notice } from './app-versions';
+
+export type { Notice };
 
 export type AppSettings = {
   announcement: Notice | null;
   maintenance: Notice | null;
   flags: Record<string, boolean>;
+  versions: AppVersions;
 };
 
-export const NO_SETTINGS: AppSettings = { announcement: null, maintenance: null, flags: {} };
+export const NO_SETTINGS: AppSettings = { announcement: null, maintenance: null, flags: {}, versions: NO_VERSIONS };
 
 /** The flags the app reads, with the names and notes the Settings page shows (Title Case). */
 export const APP_FLAGS = {
@@ -48,7 +53,7 @@ export function parseAppSettings(v: unknown): AppSettings {
   if (o.flags && typeof o.flags === 'object' && !Array.isArray(o.flags)) {
     for (const [k, b] of Object.entries(o.flags as Record<string, unknown>)) if (typeof b === 'boolean') flags[k] = b;
   }
-  return { announcement: parseNotice(o.announcement), maintenance: parseNotice(o.maintenance), flags };
+  return { announcement: parseNotice(o.announcement), maintenance: parseNotice(o.maintenance), flags, versions: parseAppVersions(o.app_versions) };
 }
 
 /** The notice if it is still showing: none once its "until" time has passed. */

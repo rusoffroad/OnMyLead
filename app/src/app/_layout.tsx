@@ -16,6 +16,7 @@ import { Platform } from 'react-native';
 import { DirectionsHost } from '@/components/directions';
 import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
+import { UpdateRequired } from '@/components/update-required';
 import { Colors, font, NavigationColors } from '@/constants/theme';
 // Starts crash reporting before anything else can fail (off when no DSN is set).
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
@@ -58,7 +59,7 @@ function RootLayout() {
   }, [screen]);
   // The rider's plan (Free, Pro Trial, Pro, Admin), kept fresh for every screen.
   useEffect(() => startEntitlements(), []);
-  // The owner's announcement, maintenance notice and feature flags.
+  // The owner's announcement, maintenance notice, feature flags and release controls.
   useEffect(() => startAppSettings(), []);
   // Phones stay upright, tablets turn (Android; the Apple app does this in its Info.plist).
   useEffect(() => startOrientationRule(), []);
@@ -128,6 +129,8 @@ function RootLayout() {
       <MessageAlerts />
       <ProGateHost />
       <DirectionsHost />
+      {/* The owner's minimum version (Admin Dashboard > Releases), over everything, with Not Now. */}
+      <UpdateRequired />
     </ThemeProvider>
   );
 }

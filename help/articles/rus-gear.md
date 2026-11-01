@@ -4,7 +4,7 @@ summary: Why you may see product suggestions from RUS Offroad on your machine's 
 category: account
 order: 70
 release: "1.0"
-updated: 2026-10-14
+updated: 2026-11-01
 sources:
   - app/src/components/rus-gear.tsx
   - app/src/lib/rus.ts
