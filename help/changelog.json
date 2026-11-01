@@ -4,12 +4,31 @@
     "slugs": [
       "ride-mode",
       "emergency-and-safety",
-      "use-onmylead-on-a-tablet"
+      "use-onmylead-on-a-tablet",
+      "status-buttons"
     ],
     "kind": "update",
     "by": "pr",
     "ref": "rider-order-full-map",
     "why": "Ride Mode's route line now shows every sharing rider's dot in running order without dots hiding each other (tap one for the rider's name and place), and a new Full Map view hides everything but that line, EMERGENCY and a Menus button. Ships in 1.0.3."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "directions",
+      "fuel-range",
+      "getting-started",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "troubleshooting",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "rider-order-full-map",
+    "why": "These guides list Ride Mode, the route strip or the website home page as a source. Ride Mode gains the rider order line and Full Map (covered in Use Ride Mode); the website's Ride Together step mentions them. Nothing these guides describe changes."
   },
   {
     "date": "2026-10-31",

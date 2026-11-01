@@ -4,7 +4,7 @@ summary: Tell the whole group what's happening with one tap, see who got it, and
 category: ride-mode
 order: 20
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/broadcast-card.tsx
@@ -55,6 +55,10 @@ The grid below sets your status for the group:
 - **EMERGENCY**
 
 **Need Help** sends right away and shows in red for the group. **EMERGENCY** asks you to confirm first. See [Emergencies and Safety](/help/emergency-and-safety).
+
+:::release 1.0.3
+In [Full Map](/help/ride-mode), the quick replies and status buttons are tucked away and only **EMERGENCY** stays on screen. Tap **Menus ▲** to bring the rest back.
+:::
 
 ## Send a Status
 
