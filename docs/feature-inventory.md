@@ -117,6 +117,17 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   app only.
 - Place search (search a place or address) on create, find and route builder.
 
+### Navigation Mode (Navigate)
+- Offroad map for solo riding, `app/src/app/nav/` **[flag nav_mode]**: Explore (speed, elevation,
+  follow a trail with distance left), Record (foreground GPS with keep-awake, pause, crash-safe
+  in-progress store; apps only), Measure (distance finder along trails or straight, save as a trail).
+- My Trails on the device (`lib/nav-trails.ts`, photos in `lib/trail-photo-files.ts`); trail details
+  (difficulty, vehicles, surface, season, width, one way, notes, up to 6 photos).
+- Share with Everyone (`shared_trails`, trail-photos bucket, ends trimmed 200 m), rider trails as mint
+  dotted lines on every map (switch in layers and on the You tab), ratings (quality, line accuracy),
+  auto-hide with a push to the mapper, Admin > Rider Trails. Migration 20261101600000_nav_trails.sql.
+- Plan a Group Ride on This Trail and Use One of My Trails (route source `trail`, free).
+
 ### Riding Groups and Social
 - Groups tab: New Group, your groups, groups you're in, group chat with unread counts and ride
   "tickets", group links (`/g/[code]`), invite a group to a ride, leave / delete **[Pro]** to

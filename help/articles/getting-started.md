@@ -63,6 +63,9 @@ Your home screen.
 - When one of your rides is live, a card at the top says **Your ride is live. Tap to open Ride Mode**.
 - **Ride Invites**, **Your Rides** and **Past Rides** list the rides you're on. Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com, click **Delete** or **Leave** at the end of the row instead. The app always asks first.
 - **Public Rides** shows a few upcoming public rides near the bottom.
+:::release 1.0.3
+- **Navigate**: your offroad map when you're not on a group ride. Record, share and rate trails, and measure distances. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
+:::
 
 ### Find
 
@@ -83,6 +86,9 @@ Everything that isn't a ride:
 - Your ride name and plan at the top.
 - **Your Gear**: [Garage](/help/garage), [Trip Planner](/help/trip-planner) and [Offline Maps](/help/offline-maps).
 - **On the Trail**: **Share My Location** and [Starlink](/help/starlink).
+:::release 1.0.3
+- **On the Trail** also has **Navigate** and **Rider Trails on Maps**, which shows or hides trails other riders shared.
+:::
 - **Settings**: [Notifications](/help/notification-settings), **Directions** (which maps app **Navigate** opens), **Subscription** and **Blocked Riders**.
 - **Account**: the email you sign in with.
 - **Help**: **Contact Us** and **Help and Support**.

@@ -18,7 +18,7 @@ sources:
   - app/src/app/(tabs)/index.tsx
   - supabase/migrations/20261018000000_pro_entitlements.sql
   - supabase/migrations/20261027000000_play_billing.sql
-related: [pro-trial, subscribe-to-pro, manage-subscription, emergency-and-safety]
+related: [navigation-mode, pro-trial, subscribe-to-pro, manage-subscription, emergency-and-safety]
 keywords: [free, pro, premium, upgrade, price, cost, limits, ride limit, one ride a month, what's included, features, tablet]
 ---
 
@@ -37,6 +37,9 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Live Tracking, SOS and Ride Bubble | Yes | Yes |
 | Ride Chat and Voting | Yes | Yes |
 | Draw Routes and Follow Leaders | Yes | Yes |
+| Navigate: Offroad Map, Measure, Rate Trails | Yes | Yes |
+| Record and Share Your Trails | No | Yes |
+| Group Rides on Your Trails | No | Yes |
 | Import GPX Routes | No | Yes |
 | Offline Maps | No | Yes |
 | Saved Riding Groups | No | Yes |
@@ -68,6 +71,10 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 - **Import GPX Routes:** bring in a track from Gaia, onX or any GPX file. See [Import a GPX Route](/help/import-gpx). Drawing a route on the map stays free, and a route you already imported stays editable.
 - **Offline Maps:** download satellite, topo and trail maps so the map keeps working with no signal. See [Offline Maps](/help/offline-maps). Maps already on your phone keep working on Free.
 - **Saved Riding Groups:** save your crew, add riders and invite everyone in one tap. See [Riding Groups](/help/riding-groups). Joining a group, its chat and its ride invites stay free.
+:::release 1.0.3
+- **Record and Share Your Trails:** record a trail in Navigate, and share your trails on the public map. The offroad map, following a trail, measuring and rating other riders' trails stay free, and a trail you already shared stays editable. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
+- **Group Rides on Your Trails:** turn one of your trails into a group ride's route. Drawing a route on the map stays free.
+:::
 - **Create Ride Polls:** ask the group a quick question in ride chat. Everyone can still vote on polls for free. See [Ride Polls](/help/ride-polls).
 - **Full Ride History:** Free shows your last 5 past rides. Pro shows every ride you've been on. Nothing is ever deleted, so older rides come back if you upgrade.
 - **Advanced Trip Planning:** plan several trips at once, start from packing lists, copy trips and link them to rides. One active trip and the fuel check stay free. See [Trip Planner](/help/trip-planner).

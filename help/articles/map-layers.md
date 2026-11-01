@@ -23,7 +23,7 @@ sources:
   - app/src/components/rides-map.web.tsx
   - app/src/components/waypoint-map.web.tsx
 related: [offline-maps, route-builder, ride-mode, find-a-ride, waypoints-and-planned-stops]
-keywords: [closed, closure, closed trail, seasonal closure, trail names, road names, labels, layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
+keywords: [rider trails, user submitted trails, closed, closure, closed trail, seasonal closure, trail names, road names, labels, layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
 screenshots:
   - file: map.webp
     shows: app/src/components/trail-tiles.tsx
@@ -95,6 +95,14 @@ Trail lines show from pretty far out. Forest Service and BLM lines appear when t
 - If you see **Zoom In for Park and Local Trails**, the Forest Service and BLM lines are showing, and the OpenStreetMap tracks appear when you zoom in a bit more.
 - Zoomed far out, the map draws the longest trails first and fills in short spurs as you zoom in.
 - Lines already on screen stay put while you pan and zoom.
+:::
+
+:::release 1.0.3
+## Rider Trails
+
+Trails other riders mapped and shared in [Navigate](/help/navigation-mode) are drawn as **mint dotted lines**, so you can tell them apart from agency and OpenStreetMap trails. They show once you zoom in to about a county's width, when you're signed in. Tap one to see its card: it says **User Submitted Trail**, who mapped it, its difficulty, its **Quality** and **Line Accuracy** stars, and has **Rate Trail**, **Navigate** and **Details**.
+
+Turn **Rider Trails** off in the panel to hide them. The same choice is on the **You** tab as **Rider Trails on Maps**. They're on unless you turn them off.
 :::
 
 The map on the **Find a Ride** tab shows trail lines too when you zoom in, following the choice you made here.

@@ -3,12 +3,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, type LayoutChangeEvent } from 'react-native';
 import type { MapPressEvent, Region } from 'react-native-maps';
 
+import { boxInside, nearestRiderTrail, paddedBox, RIDER_TRAILS_MIN_Z, type PublicTrail } from '@/core/nav-trails';
 import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
 import { mapZoom, metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
+import { publicTrailsIn, type Box } from '@/lib/nav-trails';
+import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
 
 const KEY = 'map.layers.v1';
+/** Show trails other riders mapped and shared (Navigation Mode). On unless the rider hid them. */
+export const RIDER_TRAILS_KEY = 'map.riderTrails.v1';
 
 export type TrailMap = {
   base: BaseMap;
@@ -27,6 +32,15 @@ export type TrailMap = {
   offline: boolean;
   setBase: (b: BaseMap) => void;
   setTrails: (on: boolean) => void;
+  /** Trails riders mapped and shared, drawn mint and dotted (see core/nav-trails). */
+  riderTrailsOn: boolean;
+  setRiderTrails: (on: boolean) => void;
+  riderTrails: PublicTrail[];
+  /** The rider trail the rider tapped: its card says it's user submitted and offers ratings. */
+  picked: PublicTrail | null;
+  pick: (t: PublicTrail | null) => void;
+  /** Load the rider trails on screen again (after sharing or rating one). */
+  reloadRiderTrails: () => void;
   /**
    * Feed a map's region changes in (mapProps does this; maps with their own handler call it).
    * A web map passes its real zoom, since a wide browser window shows far more than a phone.
@@ -75,6 +89,13 @@ export function useTrailMap(): TrailMap {
   const trailsRef = useRef(trails);
   const offlineRef = useRef(offline);
   const osmRef = useRef<OsmTrail[]>([]);
+  const [riderOn, setRiderOn] = useState(true);
+  const riderOnRef = useRef(true);
+  const [riderTrails, setRiderTrailsList] = useState<PublicTrail[]>([]);
+  const riderRef = useRef<PublicTrail[]>([]);
+  const riderBox = useRef<Box | null>(null);
+  const riderLoad = useRef(0);
+  const [picked, setPicked] = useState<PublicTrail | null>(null);
 
   useEffect(() => {
     AsyncStorage.getItem(KEY)
@@ -86,7 +107,45 @@ export function useTrailMap(): TrailMap {
         if (typeof saved.trailsOn === 'boolean') setTrailsState(saved.trailsOn);
       })
       .catch(() => {});
+    AsyncStorage.getItem(RIDER_TRAILS_KEY)
+      .then((v) => {
+        if (v === '0') {
+          riderOnRef.current = false;
+          setRiderOn(false);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  /** Rider trails for the region on screen; skips the call while the map stays inside the last box. */
+  const refreshRiders = useCallback((force = false) => {
+    const r = region.current;
+    if (!r || !riderOnRef.current || offlineRef.current) return;
+    const z = zoomNow.current ?? mapZoom(r, width.current);
+    if (z < RIDER_TRAILS_MIN_Z) return;
+    const view = { minLat: r.latitude - r.latitudeDelta / 2, maxLat: r.latitude + r.latitudeDelta / 2, minLng: r.longitude - r.longitudeDelta / 2, maxLng: r.longitude + r.longitudeDelta / 2 };
+    if (!force && riderBox.current && boxInside(view, riderBox.current)) return;
+    const box = paddedBox(r);
+    const id = ++riderLoad.current;
+    supabase.auth
+      .getSession()
+      .then(({ data }) => (data.session ? publicTrailsIn(box) : []))
+      .then((list) => {
+        if (id !== riderLoad.current) return;
+        riderBox.current = box;
+        riderRef.current = list;
+        setRiderTrailsList(list);
+      })
+      .catch(() => {});
+  }, []);
+
+  const setRiderTrails = (on: boolean) => {
+    riderOnRef.current = on;
+    setRiderOn(on);
+    if (!on) setPicked(null);
+    else refreshRiders(true);
+    AsyncStorage.setItem(RIDER_TRAILS_KEY, on ? '1' : '0').catch(() => {});
+  };
 
   const save = (next: { base: BaseMap; trailsOn: boolean }) => AsyncStorage.setItem(KEY, JSON.stringify(next)).catch(() => {});
   const setBase = (b: BaseMap) => {
@@ -144,12 +203,26 @@ export function useTrailMap(): TrailMap {
       zoomNow.current = z ?? null;
       setZoom(z ?? mapZoom(r, width.current));
       refreshOsm();
+      refreshRiders();
     },
-    [refreshOsm],
+    [refreshOsm, refreshRiders],
   );
 
   const identifyAt = useCallback(
     (lat: number, lng: number) => {
+      // A rider trail under the tap comes first: its card is the one with ratings.
+      if (riderOnRef.current && region.current && riderRef.current.length) {
+        const radius = Math.min(400, Math.max(15, metersPerPoint(region.current, width.current) * 22));
+        const hit = nearestRiderTrail({ lat, lng }, riderRef.current, radius);
+        if (hit) {
+          ++lookup.current;
+          setLooking(false);
+          setInfo(null);
+          setPicked(hit);
+          return;
+        }
+      }
+      setPicked(null);
       if (!trails || !region.current || (zoomNow.current ?? mapZoom(region.current, width.current)) < TRAILS_MIN_Z) {
         setInfo(null);
         return;
@@ -201,6 +274,12 @@ export function useTrailMap(): TrailMap {
     offline,
     setBase,
     setTrails,
+    riderTrailsOn: riderOn,
+    setRiderTrails,
+    riderTrails: riderOn ? riderTrails : [],
+    picked: riderOn ? picked : null,
+    pick: setPicked,
+    reloadRiderTrails: () => refreshRiders(true),
     onRegion,
     info,
     looking,

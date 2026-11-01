@@ -4,7 +4,7 @@ summary: Join with an invite link, a QR code or a code, or from Find. Learn what
 category: joining
 order: 20
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-11-01
 sources:
   - app/src/app/r/[code].tsx
   - app/src/app/(tabs)/index.tsx
