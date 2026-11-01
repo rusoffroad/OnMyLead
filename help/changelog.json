@@ -13,6 +13,20 @@
     "date": "2026-11-01",
     "slugs": [
       "getting-started",
+      "promo-codes",
+      "rus-gear",
+      "starlink",
+      "trip-planner"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "release-controls",
+    "why": "These guides list the home screen notices, app settings or the root layout as sources. The change adds release controls (Update Required, Update Available, About This Version), covered in the FAQ; the feature switches, notices and screens these guides describe work as before."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "getting-started",
       "qr-codes",
       "report-and-block",
       "ride-mode",
