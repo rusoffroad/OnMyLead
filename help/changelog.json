@@ -17,6 +17,14 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "create-a-ride",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "free-vs-pro",
+      "fuel-range",
+      "invite-riders",
+      "location-sharing",
       "ride-bubble",
       "ride-chat",
       "status-buttons",
@@ -26,7 +34,7 @@
     "kind": "review",
     "by": "pr",
     "ref": "swipe-sheets",
-    "why": "These guides list Ride Mode or the Pro prompt as a source. Only the way their sheets close changed (swipe down, covered in Use Ride Mode and Getting Started); nothing these guides describe changes."
+    "why": "These guides list Ride Mode, Directions, the Pro prompt or the QR code as a source. Only the way their sheets close changed (swipe down, covered in Use Ride Mode and Getting Started); nothing these guides describe changes."
   },
   {
     "date": "2026-11-01",
