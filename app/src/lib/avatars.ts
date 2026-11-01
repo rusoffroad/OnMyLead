@@ -1,3 +1,4 @@
+import * as Crypto from 'expo-crypto';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useSyncExternalStore } from 'react';
@@ -139,7 +140,7 @@ export async function saveAvatar(asset: ImagePicker.ImagePickerAsset): Promise<v
   const uid = await signedInId();
   const old = await myAvatarPath(uid);
   const uri = await squareJpeg(asset);
-  const path = avatarPath(uid);
+  const path = avatarPath(uid, Crypto.randomUUID());
   const bucket = supabase.storage.from(AVATAR_BUCKET);
   const { error: upErr } = await bucket.upload(path, await readPhotoBytes({ uri, mimeType: 'image/jpeg' }), {
     contentType: 'image/jpeg', upsert: false, cacheControl: '31536000',

@@ -58,7 +58,7 @@ Riders see your initial again.
 
 ## Who Can See It
 
-Your picture follows the same rule as your ride name: riders who are signed in to OnMyLead can see it next to your name. People who aren't signed in never see it. It never shows where you are.
+Your picture follows the same rule as your ride name: riders who are signed in to OnMyLead see it next to your name. OnMyLead never shows it to people who aren't signed in, and its web address is a long random one that only signed-in riders are given. Like any photo, someone who has that address could still pass it on. It never shows where you are.
 
 Your Apple, Google or Facebook photo is separate. It only shows if you turn on **Show My Google Profile** (or Apple or Facebook), and your uploaded picture comes first when you have both. See [Your Ride Name and Profile](/help/ride-name-and-profile).
 

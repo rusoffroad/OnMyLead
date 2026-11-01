@@ -3,8 +3,9 @@
 --
 -- Privacy: the photo follows the existing profile visibility. profiles rows are readable by
 -- signed-in riders only (profiles_read), exactly like the ride name, so nothing here reaches
--- signed-out visitors through the API. The image itself sits in a public bucket at an
--- unguessable path, like vehicle and trail photos.
+-- signed-out visitors through the API. The image itself sits in a public-read bucket (so it
+-- caches and loads on weak signal without signed URLs) at an unguessable path: the app names
+-- each file <user id>/<random 128-bit token>-<time>.jpg, and the bucket allows no listing.
 --
 -- Backward compatible: a new nullable column and a new bucket. The old profiles.photo_url (filled
 -- from social sign-in metadata at sign-up and never shown) is left alone, so a Google picture is

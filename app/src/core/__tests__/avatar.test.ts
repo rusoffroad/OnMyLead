@@ -22,11 +22,13 @@ describe('squareCrop', () => {
 });
 
 describe('avatar paths', () => {
-  it('puts a new picture in the rider’s own folder with a fresh name', () => {
-    const p = avatarPath(ME, 1730505600000);
-    expect(p).toBe(`${ME}/avatar-1730505600000.jpg`);
+  it('puts a new picture in the rider\u2019s own folder under a random, unguessable name', () => {
+    const token = '3F2A9C1E-7B44-4D0A-9E21-55C0FFEE1234';
+    const p = avatarPath(ME, token, 1730505600000);
+    expect(p).toBe(`${ME}/3f2a9c1e7b444d0a9e2155c0ffee1234-1730505600000.jpg`);
     expect(isOwnAvatarPath(ME, p)).toBe(true);
-    expect(avatarPath(ME, 1)).not.toBe(avatarPath(ME, 2));
+    expect(avatarPath(ME, token, 1)).not.toBe(avatarPath(ME, token, 2));
+    expect(() => avatarPath(ME, 'short')).toThrow();
   });
   it('matches the database rule: own folder, one plain file name', () => {
     expect(isOwnAvatarPath(ME, `${YOU}/avatar-1.jpg`)).toBe(false);

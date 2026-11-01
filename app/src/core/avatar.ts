@@ -30,9 +30,15 @@ export function squareCrop(width: number, height: number): Rect {
   return { originX: Math.floor((w - side) / 2), originY: Math.floor((h - side) / 2), width: side, height: side };
 }
 
-/** A new file path for a rider's picture: their folder plus a time-stamped name, so caches refresh. */
-export function avatarPath(userId: string, now: number = Date.now()): string {
-  return `${userId}/avatar-${now}.jpg`;
+/**
+ * A new file path for a rider's picture: their folder plus a random token and the time. The
+ * bucket is public-read, so the random token is what keeps a picture's address unguessable;
+ * the address itself is only handed to signed-in riders (profiles are not readable signed out).
+ */
+export function avatarPath(userId: string, token: string, now: number = Date.now()): string {
+  const clean = token.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 32);
+  if (clean.length < 16) throw new Error('avatar token too short');
+  return `${userId}/${clean}-${now}.jpg`;
 }
 
 const FILE = /^[A-Za-z0-9._-]{1,80}$/;
