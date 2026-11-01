@@ -1,9 +1,9 @@
 [
   {
     "version": "1.0.3",
-    "title": "Exact Rider Dots and Easier Ride Times",
-    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Pick a ride's time with a few taps, swipe down to close any sheet, and the Emergency screen shows you exactly when your alert is going out. Ride Mode's route line shows every rider in running order, and Full Map gives you the map with nothing in the way.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots stay on the exact spot as you zoom, are easier to see, and point the way each rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute.\n• Swipe down to close any sheet.\n• Full Map, and every rider in order on the route line.\n• Emergency: Alert My Group fills a bar while you hold it and closes once your alert is sent.\n• The app now tells you when an update is waiting or when your version has a known problem.",
+    "title": "Exact Rider Dots and Better Maps on the Trail",
+    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots stay put as you zoom, are easier to see and show each rider's heading.\n• Full Map, and every rider in order on the route line.\n• Center on Me brings the map back to you.\n• Trails show from farther out and no longer flash.\n• Pick ride times with a few taps, and plan rides in 2027 and later.\n• Share your location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group and a bar fills.\n• The app tells you when an update is waiting.",
     "apple": null,
     "google": null,
     "notes": [
@@ -12,47 +12,13 @@
         "text": "Full Map in Ride Mode. Tap Full Map to hide the ride name, banners, buttons and riders list. A slim bar keeps the route line, EMERGENCY and Menus, which brings everything back."
       },
       {
-        "kind": "improved",
-        "text": "The route line in Ride Mode shows every sharing rider's dot in running order, rear to front, and riders bunched together line up side by side instead of hiding each other. The leader is blue, the tail gunner purple, and you red. Tap a dot for the rider's name and place."
-      },
-      {
-        "kind": "fixed",
-        "text": "Rider dots in Ride Mode now sit on each rider's exact position and stay there as you zoom in and out. Before, every dot was drawn a little to the right of the rider, so riders who were together looked spread out. Waypoints, planned stops and search pins are placed exactly too."
-      },
-      {
-        "kind": "improved",
-        "text": "Rider dots are easier to see on satellite, topo and the dark map: each rider is a bold white ring with a dark name tag, and the leader is a bigger solid blue dot with a blue name tag."
-      },
-      {
         "kind": "new",
         "text": "A small arrow on each moving rider's dot shows which way they're heading, and it stays true when you turn the map. Stopped riders show a plain dot."
       },
       {
-        "kind": "improved",
-        "text": "Pick times by tapping instead of typing: tap AM or PM, the hour and the minute. Works for Meet At, Departure Time, Expected Finish, a planned stop's time and Stop Sharing At."
-      },
-      {
-        "kind": "improved",
-        "text": "Swipe down to close any sheet: a new waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride's QR code. In a long sheet the first swipe scrolls back to the top, and if the keyboard is up it puts the keyboard away first."
-      },
-      {
-        "kind": "fixed",
-        "text": "Emergency in Ride Mode: Alert My Group now fills a bar while you hold it and says Keep Holding, so it no longer looks like nothing happens. A quick tap tells you the alert was not sent, and the screen closes as soon as the alert goes out so you can see who has it."
-      },
-      {
         "kind": "new",
         "text": "If an update ever has a problem, the app can tell you: an About This Version card on the home screen explains what's wrong, Update Available lets you know a fix is out, and Please Update OnMyLead asks you to update (with Not Now, so you're never locked out on the trail)."
-      }
-    ]
-  },
-  {
-    "version": "1.0.2",
-    "title": "Better Maps on the Trail",
-    "intro": "Roads and trails show from farther out, a new button brings the map back to you, sharing can stay on until you turn it off, and rides can be planned for 2027 and beyond.",
-    "whatsNew": "What's new in 1.0.2:\n\n• Share your location until you turn it off, or pick an end date.\n• New Center on Me button in Ride Mode brings the map back to you.\n• Roads and trails now show when you're zoomed out and no longer flash while you zoom.\n• Plan rides in 2027 and later: type a date or jump to any month and year on the calendar.\n• iPhone and iPad: Help and Support and Contact Us open without an error alert.",
-    "apple": null,
-    "google": null,
-    "notes": [
+      },
       {
         "kind": "new",
         "text": "Ride Mode has a Center on Me button. Tap it to bring the map back to your location without changing the zoom."
@@ -67,6 +33,22 @@
       },
       {
         "kind": "improved",
+        "text": "The route line in Ride Mode shows every sharing rider's dot in running order, rear to front, and riders bunched together line up side by side instead of hiding each other. The leader is blue, the tail gunner purple, and you red. Tap a dot for the rider's name and place."
+      },
+      {
+        "kind": "improved",
+        "text": "Rider dots are easier to see on satellite, topo and the dark map: each rider is a bold white ring with a dark name tag, and the leader is a bigger solid blue dot with a blue name tag."
+      },
+      {
+        "kind": "improved",
+        "text": "Pick times by tapping instead of typing: tap AM or PM, the hour and the minute. Works for Meet At, Departure Time, Expected Finish, a planned stop's time and Stop Sharing At."
+      },
+      {
+        "kind": "improved",
+        "text": "Swipe down to close any sheet: a new waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride's QR code. In a long sheet the first swipe scrolls back to the top, and if the keyboard is up it puts the keyboard away first."
+      },
+      {
+        "kind": "improved",
         "text": "Roads and dirt trails show on the Ride Mode map from about 15 miles across, so you no longer have to zoom way in to see them. When you're zoomed far out, the longest trails are drawn first."
       },
       {
@@ -76,6 +58,14 @@
       {
         "kind": "improved",
         "text": "The You tab shows your active location share and when it ends."
+      },
+      {
+        "kind": "fixed",
+        "text": "Rider dots in Ride Mode now sit on each rider's exact position and stay there as you zoom in and out. Before, every dot was drawn a little to the right of the rider, so riders who were together looked spread out. Waypoints, planned stops and search pins are placed exactly too."
+      },
+      {
+        "kind": "fixed",
+        "text": "Emergency in Ride Mode: Alert My Group now fills a bar while you hold it and says Keep Holding, so it no longer looks like nothing happens. A quick tap tells you the alert was not sent, and the screen closes as soon as the alert goes out so you can see who has it."
       },
       {
         "kind": "fixed",

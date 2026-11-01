@@ -2,6 +2,19 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "version-1-0-3",
+    "why": "App version goes to 1.0.3 (iPhone and iPad build 6, Android versionCode 6). 1.0.2 was never released, so 1.0.3 carries its changes too. These articles list the app config as a source; nothing in them changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "emergency-and-safety",
       "ride-mode",
       "status-buttons",
