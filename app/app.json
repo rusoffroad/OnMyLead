@@ -2,7 +2,7 @@
   "expo": {
     "name": "OnMyLead",
     "slug": "onmylead",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "onmylead",
@@ -10,7 +10,7 @@
     "backgroundColor": "#0A1626",
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead.app",
-      "buildNumber": "5",
+      "buildNumber": "6",
       "supportsTablet": true,
       "requireFullScreen": false,
       "appleTeamId": "YJ4KUF2QQV",
@@ -172,7 +172,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.rusoffroad.onmylead.app",
-      "versionCode": 5,
+      "versionCode": 6,
       "blockedPermissions": [
         "android.permission.ACCESS_BACKGROUND_LOCATION",
         "android.permission.RECORD_AUDIO",
