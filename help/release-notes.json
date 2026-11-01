@@ -1,5 +1,23 @@
 [
   {
+    "version": "1.0.3",
+    "title": "See the Whole Group",
+    "intro": "Ride Mode's route line shows every rider in running order, and a new Full Map view gives you the map with nothing in the way.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Every rider's dot on the Ride Mode route line, in running order from rear to front. Tap a dot to see who it is.\n• New Full Map view: hide everything but the route line and EMERGENCY, then tap Menus to bring it all back.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Full Map in Ride Mode. Tap Full Map to hide the ride name, banners, buttons and riders list. A slim bar keeps the route line, EMERGENCY and Menus, which brings everything back."
+      },
+      {
+        "kind": "improved",
+        "text": "The route line in Ride Mode shows every sharing rider's dot in running order, rear to front, and riders bunched together line up side by side instead of hiding each other. The leader is blue, the tail gunner purple, and you red. Tap a dot for the rider's name and place."
+      }
+    ]
+  },
+  {
     "version": "1.0.2",
     "title": "Better Maps on the Trail",
     "intro": "Roads and trails show from farther out, a new button brings the map back to you, sharing can stay on until you turn it off, and rides can be planned for 2027 and beyond.",

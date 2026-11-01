@@ -197,7 +197,16 @@ export default function RideMode() {
   const chat = useRideChat(id, !!mine);
   // Riders can fold the reply and status buttons away (tap the handle or swipe down) to see more map.
   // Emergency, and calls for help, always stay.
-  const { open: panelOpen, setOpen: setPanelOpen, drag: panelDrag, panHandlers: panelSwipeHandlers } = usePanelFold('ride.modePanelOpen.v1');
+  const { open: panelFoldOpen, setOpen: setPanelOpen, drag: panelDrag, panHandlers: panelSwipeHandlers } = usePanelFold('ride.modePanelOpen.v1');
+  // Full Map: everything over the map tucks away except a slim bar at the bottom with the route
+  // line (every rider's dot in running order), Menus to bring it all back, and Emergency, which
+  // is always one tap away. Calls for help from other riders still show in the bar.
+  const [fullMap, setFullMap] = useState(false);
+  const panelOpen = panelFoldOpen && !fullMap;
+  const showMenus = useCallback(() => {
+    setFullMap(false);
+    setPanelOpen(true);
+  }, [setPanelOpen]);
   // The sharing timer folds down to a small pill next to the ride name.
   const [shareOpen, toggleShareOpen] = useRememberedToggle('ride.shareBannerOpen.v1', false);
   // Tablets: the riders sidebar folds away to the left (swipe it left, or tap Hide) to see more map.
@@ -538,7 +547,7 @@ export default function RideMode() {
   const shownBannersBottom = tablet ? panelTop : topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
   // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
   // and hold the map still drops one).
-  const wpFabFits = screenH - panelBottom - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
+  const wpFabFits = !fullMap && screenH - panelBottom - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
   // Center on Me. On a phone it sits on the right just above the panel, over Add Waypoint when
   // that is there, and shows when there is room (folding the panel always makes room). On a
   // tablet it sits in the open map's bottom corner, just left of the panel, so it is always there.
@@ -786,6 +795,7 @@ export default function RideMode() {
         onLongPressMap={mine ? openNewWaypoint : undefined}
         edgePadding={fitPadding}
       />
+      {fullMap ? null : (
       <TrailMapOverlay
         trail={trail}
         top={tablet ? insets.top + EDGE : insets.top + 66}
@@ -794,7 +804,9 @@ export default function RideMode() {
         route={route.route?.points}
         ride={ride}
       />
+      )}
 
+      {fullMap ? null : (
       <SafeAreaView
         edges={['top']}
         pointerEvents="box-none"
@@ -927,6 +939,7 @@ export default function RideMode() {
           )
         ) : null}
       </SafeAreaView>
+      )}
 
       {panelH && directionRows.length && wpFabFits ? (
         <Pressable
@@ -971,12 +984,12 @@ export default function RideMode() {
       ) : null}
 
       <Animated.View
-        {...panelSwipeHandlers}
+        {...(fullMap ? {} : panelSwipeHandlers)}
         onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}
         style={[
           styles.bottomWrap,
           tablet && { left: 'auto', right: EDGE, bottom: panelBottom, width: panelW },
-          { transform: [{ translateY: panelDrag }] },
+          { transform: [{ translateY: fullMap ? 0 : panelDrag }] },
         ]}>
       <SafeAreaView edges={tablet ? [] : ['bottom']} style={[styles.bottom, tablet && styles.bottomTablet]}>
         {route.route && stripShown ? (
@@ -1000,19 +1013,32 @@ export default function RideMode() {
           />
           </View>
         ) : null}
-        <Pressable
-          onPress={() => setPanelOpen(!panelOpen)}
-          accessibilityRole="button"
-          accessibilityState={{ expanded: panelOpen }}
-          accessibilityLabel={panelOpen ? 'Hide the message and status buttons' : 'Show the message and status buttons'}
-          accessibilityHint="You can also swipe the panel down to hide it or up to show it"
-          hitSlop={8}
-          style={styles.handle}>
-          <View style={styles.handleBar} />
-          {panelOpen ? <Text style={styles.handleText}>Hide ▼</Text> : null}
-        </Pressable>
+        {fullMap ? null : (
+          <View>
+            <Pressable
+              onPress={() => setPanelOpen(!panelOpen)}
+              accessibilityRole="button"
+              accessibilityState={{ expanded: panelOpen }}
+              accessibilityLabel={panelOpen ? 'Hide the message and status buttons' : 'Show the message and status buttons'}
+              accessibilityHint="You can also swipe the panel down to hide it or up to show it"
+              hitSlop={8}
+              style={styles.handle}>
+              <View style={styles.handleBar} />
+              {panelOpen ? <Text style={styles.handleText}>Hide ▼</Text> : null}
+            </Pressable>
+            <Pressable
+              onPress={() => setFullMap(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Full Map"
+              accessibilityHint="Hides everything but the route line and Emergency. Tap Menus to bring it all back"
+              hitSlop={8}
+              style={({ pressed }) => [styles.fullMapBtn, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.fullMapText}>⤢ Full Map</Text>
+            </Pressable>
+          </View>
+        )}
 
-        {broadcast.card ? (
+        {broadcast.card && !fullMap ? (
           <BroadcastCard
             card={broadcast.card}
             tally={tally(broadcast.card.id, broadcast.receipts, joined.filter((m) => m.user_id !== me).map((m) => m.user_id))}
@@ -1099,7 +1125,29 @@ export default function RideMode() {
           </View>
         ) : null}
 
-        {!panelOpen ? (
+        {fullMap ? (
+          <View style={[styles.foldedRow, !stripShown && { marginTop: 0 }]}>
+            <Pressable
+              onPress={showMenus}
+              accessibilityRole="button"
+              accessibilityLabel={foldedCount ? `Show the menus and ${foldedCount} more alerts` : 'Show the menus: messages, status buttons and the ride'}
+              style={({ pressed }) => [styles.foldedShow, styles.fullMapBarBtn, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.foldedShowText}>Menus ▲</Text>
+              {foldedCount ? (
+                <View style={styles.foldedBadge}>
+                  <Text style={styles.foldedBadgeText}>{foldedCount}</Text>
+                </View>
+              ) : null}
+            </Pressable>
+            <Pressable
+              onPress={() => tapStatus('emergency')}
+              accessibilityRole="button"
+              accessibilityLabel="Send status EMERGENCY"
+              style={({ pressed }) => [styles.foldedSos, styles.fullMapBarBtn, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.statusText}>EMERGENCY</Text>
+            </Pressable>
+          </View>
+        ) : !panelOpen ? (
           <View style={styles.foldedRow}>
             <Pressable
               onPress={() => setPanelOpen(true)}
@@ -1324,6 +1372,12 @@ const styles = StyleSheet.create({
   handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },
   handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
   handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
+  fullMapBtn: {
+    position: 'absolute', right: 0, top: -4, minHeight: 34, paddingHorizontal: 12, borderRadius: 17,
+    justifyContent: 'center', backgroundColor: Colors.backgroundSelected,
+  },
+  fullMapText: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
+  fullMapBarBtn: { minHeight: 48 },
   // Leaves the map layers button (and its downloaded-map tag) uncovered on the right.
   offlineBanner: {
     marginRight: 60, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: Radius.control, paddingHorizontal: 14, paddingVertical: 10,

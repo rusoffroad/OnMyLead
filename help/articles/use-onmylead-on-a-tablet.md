@@ -4,7 +4,7 @@ summary: On an iPad or Android tablet the map fills the screen, with the riders,
 category: getting-started
 order: 40
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/core/layout.ts
   - app/src/hooks/use-layout.ts
@@ -48,6 +48,10 @@ The live map fills the screen.
 
 :::release 1.0.2
 The round target button at the bottom of the map, just left of the buttons panel, centers the map on you. See [Use Ride Mode](/help/ride-mode).
+:::
+
+:::release 1.0.3
+Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, the ride name and the buttons. A slim bar stays at the bottom right with the route line, **EMERGENCY** and **Menus ▲**, which brings everything back. See [Use Ride Mode](/help/ride-mode).
 :::
 
 ## The Ride Page

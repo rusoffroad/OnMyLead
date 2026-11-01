@@ -1,5 +1,17 @@
 [
   {
+    "date": "2026-11-01",
+    "slugs": [
+      "ride-mode",
+      "emergency-and-safety",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "rider-order-full-map",
+    "why": "Ride Mode's route line now shows every sharing rider's dot in running order without dots hiding each other (tap one for the rider's name and place), and a new Full Map view hides everything but that line, EMERGENCY and a Menus button. Ships in 1.0.3."
+  },
+  {
     "date": "2026-10-31",
     "slugs": [
       "faq",

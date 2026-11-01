@@ -4,7 +4,7 @@ summary: What the EMERGENCY button does and doesn't do, how Need Help works, and
 category: safety-privacy
 order: 50
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/core/breakdown.ts
@@ -37,6 +37,10 @@ The **EMERGENCY** button in Ride Mode alerts everyone on your ride at once.
 4. If anyone is hurt, tap **Call 911** to open your phone's dialer.
 
 Tap **Cancel** to close the screen without sending anything.
+
+:::release 1.0.3
+In [Full Map](/help/ride-mode), **EMERGENCY** stays in the slim bar at the bottom of the screen, so it's still one tap away.
+:::
 
 When the alert goes out:
 

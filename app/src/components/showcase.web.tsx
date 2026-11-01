@@ -134,8 +134,8 @@ export function Showcase() {
               shot="live"
               alt="Ride Mode showing the group’s progress on the route, an On My Way tap seen by three riders with a Cancel button, and big status buttons"
               title="Ride Together"
-              text="Ride Mode puts the group on one screen. The leader, the tail gunner and every rider show on the route, and Ride Bubble warns everyone when someone drops back or stops moving."
-              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'SOS sheet and an EMERGENCY button one tap away']}
+              text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear, and Ride Bubble warns everyone when someone drops back or stops moving."
+              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Full Map hides everything but the route line, with EMERGENCY one tap away']}
             />
             <Step
               n={4}
