@@ -2,11 +2,19 @@
   {
     "version": "1.0.3",
     "title": "Exact Rider Dots and Easier Ride Times",
-    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Pick a ride's time with a few taps, swipe down to close any sheet, and the Emergency screen shows you exactly when your alert is going out.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots stay on each rider's exact position as you zoom, are easier to see, and show an arrow for which way each rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute.\n• Swipe down to close any sheet.\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out.\n• The app now tells you when an update is waiting or when your version has a known problem.",
+    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Pick a ride's time with a few taps, swipe down to close any sheet, and the Emergency screen shows you exactly when your alert is going out. Ride Mode's route line shows every rider in running order, and Full Map gives you the map with nothing in the way.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots stay on the exact spot as you zoom, are easier to see, and point the way each rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute.\n• Swipe down to close any sheet.\n• Full Map, and every rider in order on the route line.\n• Emergency: Alert My Group fills a bar while you hold it and closes once your alert is sent.\n• The app now tells you when an update is waiting or when your version has a known problem.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Full Map in Ride Mode. Tap Full Map to hide the ride name, banners, buttons and riders list. A slim bar keeps the route line, EMERGENCY and Menus, which brings everything back."
+      },
+      {
+        "kind": "improved",
+        "text": "The route line in Ride Mode shows every sharing rider's dot in running order, rear to front, and riders bunched together line up side by side instead of hiding each other. The leader is blue, the tail gunner purple, and you red. Tap a dot for the rider's name and place."
+      },
       {
         "kind": "fixed",
         "text": "Rider dots in Ride Mode now sit on each rider's exact position and stay there as you zoom in and out. Before, every dot was drawn a little to the right of the rider, so riders who were together looked spread out. Waypoints, planned stops and search pins are placed exactly too."
