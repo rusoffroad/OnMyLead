@@ -46,6 +46,25 @@ export default function RideDetail() {
     }
   };
 
+  const resetCode = async () => {
+    const res = await confirm({
+      title: `Reset the invite code ${r.invite_code}?`,
+      message: 'The ride gets a new made-up code. Its old link, QR code and code stop working; riders already on it stay on it. Use this for a code that breaks the rules.',
+      confirmLabel: 'Reset Code', tone: 'danger', reasonLabel: 'Policy Reason', reasonRequired: true,
+    });
+    if (!res.ok) return;
+    setBusy(true);
+    try {
+      const code = await admin.resetRideCode(r.id, res.reason ?? '');
+      toast(`New invite code: ${code}`);
+      reload();
+    } catch (e) {
+      toast((e as Error).message, 'danger');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <AdminPage
       title={r.name}
@@ -99,6 +118,7 @@ export default function RideDetail() {
           <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
             <AdminButton title="Open Reports Queue" small onPress={() => router.push('/admin/reports')} />
             <AdminButton title="Organizer's Account" small onPress={() => router.push(`/admin/users/${r.organizer_id}`)} />
+            <AdminButton title="Reset Invite Code" small disabled={busy} onPress={resetCode} />
           </View>
         </Panel>
       </Columns>

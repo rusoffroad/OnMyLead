@@ -3,6 +3,7 @@ import { Modal, Platform, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Spacing } from '@/constants/theme';
+import { codeTextSize } from '@/core/share-code';
 import { track } from '@/lib/analytics';
 import { shareQrCode } from '@/lib/share-qr';
 import { Logo } from './logo';
@@ -49,7 +50,7 @@ export function RideQrSheet({
           <Text style={styles.scan}>Scan with Your Phone Camera to Join</Text>
           <View style={styles.codeRow}>
             <Text style={styles.codeLabel}>Or Enter Code</Text>
-            <Text selectable style={styles.code}>{inviteCode}</Text>
+            <Text selectable numberOfLines={1} adjustsFontSizeToFit style={[styles.code, codeTextSize(inviteCode, 32)]}>{inviteCode}</Text>
           </View>
         </View>
         <Text style={styles.help}>

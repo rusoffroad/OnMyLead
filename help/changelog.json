@@ -2,6 +2,72 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "custom-codes",
+      "invite-riders",
+      "create-a-ride",
+      "riding-groups",
+      "join-a-ride",
+      "friends"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "custom-share-codes",
+    "why": "New in 1.0.3: Choose Your Own Code. Organizers can type their own ride invite code (when creating the ride or later from the invite card), group owners their group code, and every rider their friend link code, like MOAB-2026. The app checks live that no one else uses it; the old link stops working when a code changes."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "find-a-ride",
+      "follow-leaders",
+      "free-vs-pro",
+      "fuel-range",
+      "group-chat",
+      "import-gpx",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "organizer-controls",
+      "place-search",
+      "privacy",
+      "qr-codes",
+      "report-and-block",
+      "ride-bubble",
+      "ride-chat",
+      "ride-day-and-weather",
+      "ride-mode",
+      "ride-name-and-profile",
+      "ride-polls",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "custom-share-codes",
+    "why": "These articles list ride page, ride creation or app files that changed for custom share codes (the invite card's Choose Your Own Code, long codes shrinking to fit). Nothing in them changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "custom-share-codes",
+    "why": "1.0.3 moves to iPhone and iPad build 7 and Android versionCode 7 (build 6 was uploaded but not submitted). These articles list the app config as a source; nothing in them changes for riders."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",

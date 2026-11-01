@@ -5,9 +5,12 @@ import { Linking, Platform, Pressable, Share, View } from 'react-native';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { inviteMessage, mailUrl, smsUrl } from '@/core/discovery';
 import { rideLink } from '@/core/ride-link';
+import { codeTextSize } from '@/core/share-code';
 import { track } from '@/lib/analytics';
+import { setRideCode } from '@/lib/share-codes';
 import type { Ride } from '@/lib/types';
 import { GroupInvite } from './group-invite';
+import { ShareCodeEditor } from './share-code-editor';
 import { QrCode } from './ride-qr';
 import { RideQrSheet } from './ride-qr-sheet';
 import { ThemedText } from './themed-text';
@@ -19,11 +22,18 @@ const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
  * Send a ride to friends: a QR code to scan off your screen (or share as a picture), the phone's
  * share sheet (any app), or straight into a text or an email, with the link and the invite code.
  * Every rider who can see the card can share it, whatever their role. `fresh` is the version
- * shown right after creating. The ride's organizers (`manager`) can also invite a whole riding group in one tap.
+ * shown right after creating. The ride's organizers (`manager`) can also invite a whole riding group in one tap,
+ * and change the invite code to one they type (`onCodeChanged` gets the new code).
  */
-export function InviteCard({ ride, fresh, manager }: { ride: Ride; fresh?: boolean; manager?: boolean }) {
+export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
+  ride: Ride;
+  fresh?: boolean;
+  manager?: boolean;
+  onCodeChanged?: (code: string) => void;
+}) {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
+  const canChange = !!manager && !!onCodeChanged && (ride.status === 'scheduled' || ride.status === 'live');
   const link = rideLink(ride.invite_code, WEB_URL);
   const message = inviteMessage(ride, link);
   const isPrivate = ride.visibility === 'private';
@@ -60,11 +70,21 @@ export function InviteCard({ ride, fresh, manager }: { ride: Ride; fresh?: boole
         <View style={{ flex: 1, gap: Spacing.one }}>
           <View style={{ borderRadius: Radius.control, borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border, paddingVertical: 8, alignItems: 'center' }}>
             <ThemedText type="small" themeColor="textSecondary">Invite Code</ThemedText>
-            <ThemedText selectable style={{ fontSize: 28, lineHeight: 32, letterSpacing: 3, fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
+            <ThemedText selectable numberOfLines={1} adjustsFontSizeToFit style={{ ...codeTextSize(ride.invite_code, 28), fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
           </View>
           <Button title="Show QR Code" kind="secondary" style={{ minHeight: 44 }} onPress={() => { setShowQr(true); track('invite_qr_shown', { platform: Platform.OS }); }} />
         </View>
       </View>
+      {canChange ? (
+        <ShareCodeEditor
+          kind="ride"
+          id={ride.id}
+          current={ride.invite_code}
+          note={`The old link, QR code and code stop working. Riders already on the ride stay on it.${isPrivate ? ' Anyone with the code can join, so pick one that’s hard to guess.' : ''}`}
+          save={(c) => setRideCode(ride.id, c)}
+          onSaved={(c) => onCodeChanged?.(c)}
+        />
+      ) : null}
       <Button title="Share Invite" big onPress={() => send('sheet')} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title="Text" kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />

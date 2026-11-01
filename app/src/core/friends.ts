@@ -9,6 +9,8 @@
  * same as before) and can message each other any time. This file holds the words the screens use.
  */
 
+import { SHARE_CODE_MAX, SHARE_CODE_MIN } from './share-code';
+
 /** 'friends', 'sent' (I asked them) or 'received' (they asked me). */
 export type FriendStatus = 'friends' | 'sent' | 'received';
 
@@ -112,14 +114,18 @@ export function friendInviteMessage(code: string, link: string | null): string {
 
 /**
  * A friend code from whatever was typed or pasted: the code itself, or a whole friend link.
- * Codes are 10 letters and numbers (0-9, A-F). Null when it isn't one.
+ * Made-up codes are 10 of 0-9 and A-F (spaces and dashes typed inside one are ignored); riders
+ * can also choose their own, like MOAB-RIDER (core/share-code.ts). Null when it can't be one.
  */
 export function readFriendCode(raw: string | null | undefined): string | null {
   const s = (raw ?? '').trim();
   if (!s) return null;
-  const fromLink = s.match(/\/friend\/([0-9a-f]{10})\b/i);
-  const code = (fromLink ? fromLink[1] : s.replace(/[\s-]/g, '')).toUpperCase();
-  return /^[0-9A-F]{10}$/.test(code) ? code : null;
+  const fromLink = s.match(/\/friend\/([0-9a-z-]{4,20})(?![0-9a-z-])/i);
+  if (fromLink) return fromLink[1].toUpperCase();
+  const made = s.replace(/[\s-]/g, '').toUpperCase();
+  if (/^[0-9A-F]{10}$/.test(made)) return made;
+  const typed = s.replace(/\s+/g, '').toUpperCase();
+  return typed.length >= SHARE_CODE_MIN && typed.length <= SHARE_CODE_MAX && /^[A-Z0-9]+(-[A-Z0-9]+)*$/.test(typed) ? typed : null;
 }
 
 export const FRIENDS_NOT_SWITCHED_ON = 'Friends isn’t switched on yet. It starts working with the next server update.';

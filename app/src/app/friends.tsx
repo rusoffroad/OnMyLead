@@ -4,6 +4,7 @@ import { useCallback, useState, type ReactNode } from 'react';
 import { Linking, Platform, Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
 import { RiderDot } from '@/components/convoy';
+import { ShareCodeEditor } from '@/components/share-code-editor';
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
@@ -15,6 +16,7 @@ import {
   type Friend, type FriendSuggestion,
 } from '@/core/friends';
 import { sideColumnWidth } from '@/core/layout';
+import { codeTextSize, isMadeCode } from '@/core/share-code';
 import { distanceLabel } from '@/core/out-riding';
 import { useLayout } from '@/hooks/use-layout';
 import { useBlocks } from '@/lib/blocks';
@@ -24,6 +26,7 @@ import {
   useFriends,
 } from '@/lib/friends';
 import { useSession } from '@/lib/session';
+import { setFriendCode } from '@/lib/share-codes';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
@@ -33,7 +36,8 @@ function shortDate(iso: string): string {
 }
 
 /** The code split in two so it reads aloud: "A1B2C 3D4E5". */
-const spaced = (code: string) => `${code.slice(0, 5)} ${code.slice(5)}`;
+/** Made-up 10-character codes read easier in two halves; a code the rider typed shows as typed. */
+const spaced = (code: string) => (isMadeCode(code) && code.length === 10 ? `${code.slice(0, 5)} ${code.slice(5)}` : code);
 
 /**
  * Friends: requests to answer, your friends (the ones Out Riding near you first, with roughly how
@@ -132,7 +136,7 @@ export default function Friends() {
           Send it to a riding buddy. They open it, and you’re friends once you accept.
         </ThemedText>
         {code ? (
-          <Text style={styles.code} accessibilityLabel={`Friend code ${code.split('').join(' ')}`} selectable>{spaced(code)}</Text>
+          <Text style={[styles.code, codeTextSize(code, 34)]} numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={`Friend code ${code.split('').join(' ')}`} selectable>{spaced(code)}</Text>
         ) : null}
         <Button title="Share Friend Link" disabled={!code} onPress={() => share('sheet')} style={{ backgroundColor: Colors.sky }} />
         <View style={styles.btnRow}>
@@ -149,6 +153,18 @@ export default function Friends() {
             }}
           />
         </View>
+        {code ? (
+          <ShareCodeEditor
+            kind="friend"
+            current={code}
+            note="Your old link and code stop working. Your friends stay friends."
+            save={setFriendCode}
+            onSaved={(c) => {
+              setCode(c);
+              setCopied(false);
+            }}
+          />
+        ) : null}
         <Pressable
           accessibilityRole="button"
           onPress={async () => {
@@ -166,7 +182,7 @@ export default function Friends() {
       <View style={styles.linkCard}>
         <Field
           label="Got a Friend Code?"
-          hint="Paste their friend link or type their 10-character code."
+          hint="Paste their friend link or type their code."
           value={typed}
           onChangeText={setTyped}
           autoCapitalize="characters"

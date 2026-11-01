@@ -7,6 +7,7 @@ import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
 import { RideDatePicker } from '@/components/ride-date-picker';
 import { TimePicker } from '@/components/time-picker';
+import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-code-field';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
@@ -20,6 +21,7 @@ import { metersToMiles } from '@/core/geo';
 import { getLocalTrail, loadTrails, trailLine } from '@/lib/nav-trails';
 import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
 import { clockText, parseTime, shiftClock } from '@/core/time';
+import { cleanShareCode, friendlyShareCodeError } from '@/core/share-code';
 import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
@@ -65,6 +67,8 @@ export default function NewRide() {
   const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>('open');
   const [bubble, setBubble] = useState<BubblePreset>('default');
   const [more, setMore] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
+  const [codeCheck, setCodeCheck] = useState<CodeCheck>('empty');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [groups, setGroups] = useState<RidingGroup[]>([]);
@@ -174,6 +178,7 @@ export default function NewRide() {
     if (!canRideOn(dayDate, new Date())) return setError('Pick a day from today up to three years out.');
     if (!parsedCoords) return setError('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".');
     if (!routePlan) return setError('Pick Mapped or Freeride under The Route.');
+    if (!codeCheckOk(codeCheck)) return setError(codeCheck === 'checking' ? 'Checking your invite code. Try again in a second.' : 'Pick a different invite code, or clear it to get one made for you.');
     setBusy(true);
     try {
       const lat = Number(parsedCoords[1]);
@@ -204,6 +209,7 @@ export default function NewRide() {
         joinPolicy: kind === 'private' ? 'open' : joinPolicy,
         bubblePreset: bubble,
         freeride: routePlan === 'freeride',
+        inviteCode: cleanShareCode(inviteCode) || null,
       });
       // A group that fails to invite can be invited again from the ride page.
       for (const g of groups.filter((x) => groupNames.includes(x.name))) {
@@ -215,7 +221,7 @@ export default function NewRide() {
       // A mapped ride goes straight to the route builder; saving it lands back on the new ride.
       if (routePlan === 'mapped' && !routeCopied) router.push(`/ride/${ride.id}/route`);
     } catch (e) {
-      if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not create the ride.');
+      if (!handleProError(e)) setError(e instanceof Error ? friendlyShareCodeError(e.message, 'ride') : 'Could not create the ride.');
     } finally {
       setBusy(false);
     }
@@ -353,6 +359,15 @@ export default function NewRide() {
             <Field label="Max Riders" value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder="No limit" />
           </View>
         </View>
+      </Card>
+
+      <Card>
+        <ThemedText type="heading">Invite Code</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          Riders open the ride with its link, QR code or this code. Leave it empty and OnMyLead makes one, or type your own so it’s easy to say out loud.
+          {kind === 'private' ? ' Anyone with the code can join, so pick one that’s hard to guess.' : ''}
+        </ThemedText>
+        <ShareCodeField kind="ride" label="Your Own Code (Optional)" value={inviteCode} onChange={setInviteCode} onCheck={setCodeCheck} />
       </Card>
 
       {groups.length ? (

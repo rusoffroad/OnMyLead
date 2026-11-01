@@ -14,6 +14,7 @@ sources:
   - app/src/core/friends.ts
   - app/src/lib/friends.ts
   - supabase/migrations/20261101800000_friends.sql
+  - app/src/components/share-code-editor.tsx
 related: [out-riding, report-and-block, privacy, notification-settings, riding-groups]
 keywords: [friends, add friend, friend request, friend link, friend code, buddy, riding buddy, who's riding, message a friend, dm, remove friend, tablet]
 ---
@@ -40,7 +41,7 @@ They get a notification and see your request at the top of their Friends screen.
 
 ## Share Your Friend Link
 
-1. On the Friends screen, find **Your Friend Link**. It shows your 10-character friend code.
+1. On the Friends screen, find **Your Friend Link**. It shows your friend code. Want one that's easy to say, like MOAB-RIDER? Tap **Choose Your Own Code**. See [Choose Your Own Code](/help/custom-codes).
 2. Tap **Share Friend Link**, or **Text**, **Email** or **Copy**.
 3. When your buddy opens the link (or types your code under **Got a Friend Code?** and taps **Look Up**), they see your name and tap **Add Friend**. They need to be signed in to OnMyLead.
 4. Accept their request on your Friends screen.

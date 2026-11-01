@@ -195,6 +195,8 @@ export type RideDetail = {
 };
 export const ride = (id: string) => adminRpc<RideDetail>('admin_ride', { p_id: id });
 export const removeRide = (id: string, reason: string) => adminRpc<void>('admin_remove_ride', { p_id: id, p_reason: reason });
+/** A fresh made-up invite code for a ride whose own code breaks the rules (20261101900000). The old link stops working. */
+export const resetRideCode = (id: string, reason: string) => adminRpc<string>('admin_reset_ride_code', { p_id: id, p_reason: reason });
 
 export const reports = (status: 'open' | 'resolved' | 'dismissed' | 'all', page: number, pageSize = 50) =>
   adminRpc<Page<ReportRow>>('admin_reports', { p_status: status, p_page: page, p_page_size: pageSize });

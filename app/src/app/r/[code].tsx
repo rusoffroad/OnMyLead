@@ -235,7 +235,7 @@ export default function RidePage() {
           </ThemedText>
         </View>
       ) : null}
-      {justCreated && isManager ? <InviteCard ride={ride} fresh manager /> : null}
+      {justCreated && isManager ? <InviteCard ride={ride} fresh manager onCodeChanged={(c) => router.setParams({ code: c })} /> : null}
       {pinned ? <PinnedAnnouncement message={pinned} senderName={nameOf(pinned.user_id)} /> : null}
       {ride.status === 'ended' && isJoined ? <RideSummary ride={ride} members={members} /> : null}
 
@@ -500,7 +500,7 @@ export default function RidePage() {
             </Card>
           ) : null}
           {me && ride.status !== 'cancelled' ? <FollowLeaders ids={leadersToFollow(ride.organizer_id, leaderIds, me)} organizerId={ride.organizer_id} /> : null}
-          {!cancelled && !(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} manager={isManager} /> : null}
+          {!cancelled && !(justCreated && isManager) && (ride.visibility !== 'private' || mine?.status === 'joined') ? <InviteCard ride={ride} manager={isManager} onCodeChanged={(c) => router.setParams({ code: c })} /> : null}
           {mine?.status === 'joined' ? (
             <RideRoster ride={ride} members={members} me={me} waitlisted={waitlist.length} onChanged={load} />
           ) : null}
