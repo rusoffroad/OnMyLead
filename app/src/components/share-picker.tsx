@@ -3,12 +3,13 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DateCalendar } from '@/components/date-calendar';
 import { Icon } from '@/components/icon';
+import { TimePicker } from '@/components/time-picker';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { atMinutes, sameDateMonthsLater, startOfDay } from '@/core/calendar';
 import { minutesUntil, shareEndProblem, shareEndText } from '@/core/sharing';
 import { clockText, parseTime } from '@/core/time';
 import { ThemedText } from './themed-text';
-import { Button, ErrorText, Field } from './ui';
+import { Button, ErrorText } from './ui';
 
 const label = (min: number) => (min < 60 ? `${min} Min` : min === 60 ? '1 Hour' : `${min / 60} Hours`);
 
@@ -56,7 +57,7 @@ export function SharePicker({
   }
 
   function shareUntil() {
-    if (problem || endAt == null) return setError(minutes == null && day ? 'Time looks off. Try "6:00 pm".' : problem);
+    if (problem || endAt == null) return setError(minutes == null && day ? 'Pick a time.' : problem);
     onPick(minutesUntil(endAt, new Date().getTime()));
   }
 
@@ -114,7 +115,7 @@ export function SharePicker({
           />
           {day ? (
             <>
-              <Field label="Stop Sharing At" value={time} onChangeText={(t) => { setTime(t); setError(null); }} placeholder="6:00 pm" />
+              <TimePicker label="Stop Sharing At" value={time} onChange={(t) => { setTime(t); setError(null); }} />
               <Button
                 title={problem ? 'Share Until Then' : `Share ${capitalize(shareEndText(endAt, now.getTime()))}`}
                 big

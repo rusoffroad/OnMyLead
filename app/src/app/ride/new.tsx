@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
 import { RideDatePicker } from '@/components/ride-date-picker';
+import { TimePicker } from '@/components/time-picker';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
@@ -15,7 +16,7 @@ import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
 import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
-import { clockText, parseTime } from '@/core/time';
+import { clockText, parseTime, shiftClock } from '@/core/time';
 import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
@@ -148,7 +149,7 @@ export default function NewRide() {
     const meetAt = at(dayDate, parseTime(meetTime));
     if (!kind) return setError('Pick Public or Private at the top.');
     if (!name.trim()) return setError('Give the ride a name.');
-    if (!meetAt) return setError('Meeting time looks off. Try "8:00 am".');
+    if (!meetAt) return setError('Pick a meeting time.');
     if (!canRideOn(dayDate, new Date())) return setError('Pick a day from today up to three years out.');
     if (!parsedCoords) return setError('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".');
     if (!routePlan) return setError('Pick Mapped or Freeride under The Route.');
@@ -248,7 +249,7 @@ export default function NewRide() {
       <Card>
         <ThemedText type="heading">When</ThemedText>
         <RideDatePicker value={day} onChange={setDay} />
-        <Field label="Meet At" value={meetTime} onChangeText={setMeetTime} placeholder="8:00 am" />
+        <TimePicker label="Meet At" value={meetTime} onChange={setMeetTime} />
       </Card>
 
       <Card>
@@ -339,8 +340,20 @@ export default function NewRide() {
       {more ? (
         <Card>
           <Field label="Description" value={description} onChangeText={setDescription} multiline />
-          <Field label="Departure Time" value={departTime} onChangeText={setDepartTime} placeholder="8:30 am" />
-          <Field label="Expected Finish" value={finishTime} onChangeText={setFinishTime} placeholder="4:00 pm" />
+          <TimePicker
+            label="Departure Time (Optional)"
+            value={departTime}
+            onChange={setDepartTime}
+            optional
+            suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 30)}
+          />
+          <TimePicker
+            label="Expected Finish (Optional)"
+            value={finishTime}
+            onChange={setFinishTime}
+            optional
+            suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 8 * 60)}
+          />
           <PlaceSearch label="Search a Destination" onPick={(p) => setDestination(placeLabel(p))} />
           <Field
             label="Destination"
