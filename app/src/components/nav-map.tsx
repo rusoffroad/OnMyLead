@@ -3,7 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
 import { Colors, font } from '@/constants/theme';
+import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
+import { cameraCenterFor, openMapCenter } from '@/core/map-center';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
@@ -31,7 +33,7 @@ const toCoords = (pts: LatLng[]) => pts.map((p) => ({ latitude: p.lat, longitude
  * while measuring; otherwise it looks up the trail under the finger.
  */
 export function NavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -46,17 +48,25 @@ export function NavMap({
   onCenter?: (c: LatLng) => void;
   /** Room the panels take over the map: [top, right, bottom, left]. */
   padding?: [number, number, number, number];
+  /** Follow-me camera: while set, the map keeps this spot (the rider) in the open map. */
+  followMe?: LatLng | null;
+  /** The rider dragged, pinched or turned the map by hand. */
+  onUserMove?: () => void;
   ref?: Ref<NavMapHandle>;
 }) {
   const map = useRef<MapView>(null);
   const region = useRef<Region | null>(null);
   const width = useRef(390);
+  const size = useRef({ width: 390, height: 800 });
+  const followed = useRef<LatLng | null>(null);
   const centered = useRef(false);
   const pad = padding ?? [120, 50, 320, 50];
   const edge = { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] };
 
   useImperativeHandle(ref, () => ({
     centerOn(p) {
+      // The follow-me camera takes over from this spot once the rider moves.
+      followed.current = p;
       const d = region.current ? Math.min(region.current.latitudeDelta, 0.05) : 0.03;
       map.current?.animateToRegion({ latitude: p.lat, longitude: p.lng, latitudeDelta: d, longitudeDelta: d }, 450);
     },
@@ -72,6 +82,30 @@ export function NavMap({
     centered.current = true;
     map.current?.animateToRegion({ latitude: center.lat, longitude: center.lng, latitudeDelta: 0.04, longitudeDelta: 0.04 }, 1);
   }, [center]);
+
+  // Follow-me camera: slide the map (same zoom and heading) so the rider stays in the open part of
+  // the map between the panels. Moves under a couple of meters are GPS jitter and skipped.
+  useEffect(() => {
+    if (!followMe) {
+      followed.current = null;
+      return;
+    }
+    if (!followCamShouldMove(followed.current, followMe)) return;
+    followed.current = followMe;
+    const m = map.current;
+    if (!m) return;
+    const target = { latitude: followMe.lat, longitude: followMe.lng };
+    const { width: w, height: h } = size.current;
+    const open = openMapCenter(size.current, { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] });
+    Promise.all([m.coordinateForPoint({ x: w / 2, y: h / 2 }), m.coordinateForPoint(open)])
+      .then(([here, there]) => {
+        const c = cameraCenterFor(followMe, { lat: here.latitude, lng: here.longitude }, { lat: there.latitude, lng: there.longitude });
+        m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: 600 });
+      })
+      .catch(() => m.animateCamera({ center: target }, { duration: 600 }));
+    // Only when the followed spot moves; the panels' padding is read as it is then.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [followMe]);
 
   useEffect(() => {
     if (!found) return;
@@ -98,9 +132,12 @@ export function NavMap({
       initialRegion={center ? { latitude: center.lat, longitude: center.lng, latitudeDelta: 0.04, longitudeDelta: 0.04 } : { latitude: 39.5, longitude: -105.8, latitudeDelta: 6, longitudeDelta: 6 }}
       onLayout={(e) => {
         width.current = e.nativeEvent.layout.width;
+        size.current = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height };
         trail.mapProps.onLayout(e);
       }}
-      onRegionChangeComplete={(r) => {
+      onPanDrag={() => onUserMove?.()}
+      onRegionChangeComplete={(r, details) => {
+        if (details?.isGesture) onUserMove?.();
         region.current = r;
         onCenter?.({ lat: r.latitude, lng: r.longitude });
         trail.mapProps.onRegionChangeComplete(r);

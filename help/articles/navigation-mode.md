@@ -36,7 +36,13 @@ On a tablet, the panel sits beside the map in landscape, and floats over the cor
 
 ## Explore
 
-**Explore** shows your speed and elevation, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round button to center on you again. Tap any line to see what it is.
+**Explore** shows your speed and elevation, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
+
+### The Map Follows You
+
+While you record a trail, or follow a trail you're on or near, the map moves with you so your dot stays in view. Tapping **Center on Me** also makes the map follow you. The button turns white while the map is following.
+
+To look around, drag or pinch the map. It stops following until you tap **Center on Me** again. The map also holds still while the **Measure** tab is open, and when you jump to a place with search.
 
 The screen stays on while Navigate is open.
 

@@ -3,6 +3,7 @@ import { useEffect, useImperativeHandle, useMemo, useRef, type Ref } from 'react
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
+import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
@@ -13,6 +14,7 @@ export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng
 
 export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
+const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;height:18px;border-radius:9px;background:#2F80FF;border:3px solid #FFFFFF;box-sizing:border-box;box-shadow:0 0 0 6px rgba(47,128,255,.25),0 2px 4px rgba(0,0,0,.5)"></div>';
 
 /**
  * Navigation Mode's map on the website: the phone's layers on Leaflet (satellite or topo, agency,
@@ -20,7 +22,7 @@ const MEASURE_INK = '#ECCD91';
  * finder. A click measures while measuring; otherwise it shows the trail under it.
  */
 export function NavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -33,6 +35,10 @@ export function NavMap({
   found?: Place | null;
   onCenter?: (c: LatLng) => void;
   padding?: [number, number, number, number];
+  /** Follow-me camera: while set, the map keeps this spot in the open map between the panels. */
+  followMe?: LatLng | null;
+  /** The rider dragged the map by hand. */
+  onUserMove?: () => void;
   ref?: Ref<NavMapHandle>;
 }) {
   const el = useRef<HTMLDivElement>(null);
@@ -40,16 +46,19 @@ export function NavMap({
   const layer = useRef<L.LayerGroup | null>(null);
   const tracks = useRef<ReturnType<typeof trailLayers> | null>(null);
   const centered = useRef(false);
-  const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter });
+  const followed = useRef<LatLng | null>(null);
+  const meDot = useRef<L.Marker | null>(null);
+  const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove });
   useEffect(() => {
-    cb.current = { measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter };
-  }, [measuring, onMeasure, trail.identifyAt, trail.onRegion, onCenter]);
+    cb.current = { measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove };
+  }, [measuring, onMeasure, trail.identifyAt, trail.onRegion, onCenter, onUserMove]);
   const pad = padding ?? [120, 40, 320, 40];
   const fitPadding = { paddingTopLeft: [pad[3], pad[0]] as L.PointTuple, paddingBottomRight: [pad[1], pad[2]] as L.PointTuple };
   const snapM = (m: L.Map) => snapRadiusM((156_543.03 * Math.cos((m.getCenter().lat * Math.PI) / 180)) / 2 ** m.getZoom());
 
   useImperativeHandle(ref, () => ({
     centerOn(p) {
+      followed.current = p;
       map.current?.setView(ll(p), Math.max(map.current.getZoom(), 14), { animate: true });
     },
     fit(points) {
@@ -72,6 +81,7 @@ export function NavMap({
       reportRegion(m, cb.current.onRegion);
     };
     m.on('moveend', report);
+    m.on('dragstart', () => cb.current.onUserMove?.());
     frame(m, [], center);
     map.current = m;
     report();
@@ -88,6 +98,42 @@ export function NavMap({
     centered.current = true;
     map.current.setView(ll(center), 13);
   }, [center]);
+
+  // The rider's own spot (the phone maps draw it themselves).
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    if (!center) {
+      meDot.current?.remove();
+      meDot.current = null;
+      return;
+    }
+    if (meDot.current) meDot.current.setLatLng(ll(center));
+    else {
+      meDot.current = L.marker(ll(center), {
+        interactive: false,
+        keyboard: false,
+        zIndexOffset: 1000,
+        icon: L.divIcon({ className: '', iconSize: [18, 18], iconAnchor: [9, 9], html: ME_DOT }),
+      }).addTo(m);
+    }
+  }, [center]);
+
+  // Follow-me camera: pan (same zoom) so the spot sits in the open map between the panels.
+  useEffect(() => {
+    const m = map.current;
+    if (!followMe) {
+      followed.current = null;
+      return;
+    }
+    if (!m || !followCamShouldMove(followed.current, followMe)) return;
+    followed.current = followMe;
+    const z = m.getZoom();
+    const p = m.project(ll(followMe), z).add([(pad[1] - pad[3]) / 2, (pad[2] - pad[0]) / 2]);
+    m.panTo(m.unproject(p, z), { animate: true, duration: 0.6 });
+    // Only when the followed spot moves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [followMe]);
 
   useEffect(() => {
     el.current?.classList.toggle('oml-draw', measuring);

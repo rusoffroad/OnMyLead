@@ -2,7 +2,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
@@ -13,6 +13,7 @@ import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { FOLLOW_CAM_START, followCamActive, followCamReducer, nearFollowedTrail } from '@/core/follow-camera';
 import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
 import {
@@ -119,6 +120,8 @@ export default function NavMode() {
 
   // --- Following a trail ----------------------------------------------------------
   const [followed, setFollowed] = useState<Followed | null>(null);
+  // Follow-me camera: keeps the rider on screen while recording or following (core/follow-camera).
+  const [cam, camEvent] = useReducer(followCamReducer, FOLLOW_CAM_START);
   const followTrack = useRef<LatLng[]>([]);
   const [followCovered, setFollowCovered] = useState(0);
   const hint = useRef<number | null>(null);
@@ -129,6 +132,7 @@ export default function NavMode() {
     hint.current = null;
     setFollowCovered(0);
     setFollowed(f);
+    camEvent('follow');
     setMode('explore');
     trail.pick(null);
     setTimeout(() => map.current?.fit(f.points), 50);
@@ -196,6 +200,7 @@ export default function NavMode() {
     const r: Recording = { startedAt: Date.now(), points: [], paused: false };
     setRecording(r);
     writeRecording(r);
+    camEvent('record');
     setNow(Date.now());
   }
 
@@ -205,6 +210,7 @@ export default function NavMode() {
     const r = { ...rec, paused };
     setRecording(r);
     writeRecording(r);
+    if (!paused) camEvent('record');
   }
 
   async function finishRecording() {
@@ -272,6 +278,8 @@ export default function NavMode() {
 
   const progress = followed && me ? followProgress(followed.points, cum, me, hint.current) : null;
   if (progress?.alongM != null) hint.current = progress.alongM;
+  // Measuring taps the map, so the camera holds still while the Measure tab is open.
+  const camOn = mode !== 'measure' && followCamActive(cam, { recording: !!rec && !rec.paused, following: !!followed, nearTrail: nearFollowedTrail(progress) });
   const rateable = !!followed?.publicTrail && !followed.publicTrail.mine && canRate(lineLengthM(followed.points), followCovered);
 
   const leave = () => (router.canGoBack() ? router.back() : router.replace('/'));
@@ -295,6 +303,8 @@ export default function NavMode() {
         found={found}
         onCenter={(c) => (looking.current = c)}
         padding={panelPad}
+        followMe={camOn ? me : null}
+        onUserMove={() => camEvent('pan')}
       />
       <TrailMapOverlay
         trail={trail}
@@ -309,7 +319,15 @@ export default function NavMode() {
 
       <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]} pointerEvents="box-none">
         {searching !== false ? (
-          <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
+          <MapSearch
+            near={searching}
+            onPick={(p) => {
+              // Looking at a place: stop following so the map stays on it.
+              camEvent('pan');
+              setFound(p);
+            }}
+            onClose={() => setSearching(false)}
+          />
         ) : (
           <View style={styles.topRow}>
             <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={styles.flex}>
@@ -349,9 +367,14 @@ export default function NavMode() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Center on me"
-          onPress={() => map.current?.centerOn(me)}
-          style={({ pressed }) => [styles.locate, wide ? { right: 12, bottom: 24 } : { right: 12, bottom: (open ? 340 : 180) + insets.bottom * 0 }, pressed && { opacity: 0.8 }]}>
-          <Icon name="locate" size={22} color={Colors.text} />
+          accessibilityHint={camOn ? 'The map is following you' : 'Centers the map on you and follows you'}
+          accessibilityState={{ selected: camOn }}
+          onPress={() => {
+            camEvent('center');
+            map.current?.centerOn(me);
+          }}
+          style={({ pressed }) => [styles.locate, camOn && styles.locateOn, wide ? { right: 12, bottom: 24 } : { right: 12, bottom: (open ? 340 : 180) + insets.bottom * 0 }, pressed && { opacity: 0.8 }]}>
+          <Icon name="locate" size={22} color={camOn ? Colors.background : Colors.text} />
         </Pressable>
       ) : null}
 
@@ -654,6 +677,7 @@ const styles = StyleSheet.create({
   noticeText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
   noticeOk: { paddingHorizontal: 14, height: 36, borderRadius: Radius.pill, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   locate: { position: 'absolute', width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', zIndex: 15, ...glass },
+  locateOn: { backgroundColor: Colors.text, borderColor: Colors.text },
   panel: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24, zIndex: 20 },
   panelWide: { bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
   panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1, borderColor: Colors.border },
