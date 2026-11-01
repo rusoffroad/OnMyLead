@@ -19,12 +19,19 @@
       "map-layers",
       "ride-bubble",
       "route-builder",
-      "waypoints-and-planned-stops"
+      "waypoints-and-planned-stops",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "location-sharing",
+      "ride-chat",
+      "status-buttons",
+      "use-onmylead-on-a-tablet"
     ],
     "kind": "review",
     "by": "pr",
     "ref": "rider-dots-exact-position",
-    "why": "These guides list map pin or website files as sources. Their pins (waypoints, planned stops, search results, Find ride pins) are now placed exactly on their spot, and the website's sample rider dots match the new look; nothing they describe changes."
+    "why": "These guides list map pin or website files as sources. Their pins (waypoints, planned stops, search results, Find ride pins) are now placed exactly on their spot, and the website's sample rider dots match the new look; nothing they describe changes. Ride Mode's screen file also changed only to pass each rider's heading to the map, so the Ride Mode guides that list it describe nothing new."
   },
   {
     "date": "2026-11-01",
