@@ -4,7 +4,7 @@ summary: Pick the ride name other riders see on the map, the rider list and in c
 category: account
 order: 20
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/ride-name.tsx
   - app/src/core/profile.ts
@@ -17,11 +17,15 @@ sources:
   - app/src/app/groups/[id]/index.tsx
   - supabase/migrations/20261013500000_rider_names.sql
   - supabase/migrations/20261022000000_social_profiles.sql
-related: [sign-in, getting-started, privacy, report-and-block]
+related: [sign-in, getting-started, privacy, report-and-block, badges-and-ranks]
 keywords: [nickname, display name, username, change name, profile photo, social profile, google profile, facebook profile, apple profile, tablet]
 ---
 
 Your ride name is how the group knows you. It shows on the group map, the rider list and in ride chat. A nickname works fine.
+
+:::release 1.0.3
+Under your name on the **You** tab you also see your rank and badges. See [Earn Badges and Ranks](/help/badges-and-ranks).
+:::
 
 ## Pick or Change Your Ride Name
 

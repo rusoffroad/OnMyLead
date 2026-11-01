@@ -107,6 +107,7 @@ function RootLayout() {
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
         <Stack.Screen name="ride-name" options={{ title: 'Your Ride Name' }} />
         <Stack.Screen name="notifications" options={{ title: 'Notifications' }} />
+        <Stack.Screen name="badges" options={{ title: 'Badges' }} />
         <Stack.Screen name="blocked" options={{ title: 'Blocked Riders' }} />
         <Stack.Screen name="battery" options={{ title: 'Battery Saver' }} />
         <Stack.Screen name="pro" options={{ title: '' }} />

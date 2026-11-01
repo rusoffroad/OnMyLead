@@ -84,7 +84,7 @@ export const TOPIC_GROUPS: TopicGroup[] = [
   {
     title: 'Your Account',
     topics: [
-      { key: 'account_push', title: 'Pro Trial Reminders', detail: 'A week, 3 days and a day before your Pro Trial ends, and when it does.' },
+      { key: 'account_push', title: 'Badges and Pro Trial', detail: 'When you earn a badge, and a week, 3 days and a day before your Pro Trial ends.' },
     ],
   },
 ];

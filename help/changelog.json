@@ -2,6 +2,19 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "badges-and-ranks",
+      "notification-settings",
+      "pro-trial",
+      "ride-name-and-profile"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "rider-badges",
+    "why": "New in 1.0.3: riders earn Bronze, Silver and Gold badges (Trail Boss, Tail Gunner, Crew Rider, Mile Eater, Trailblazer, Mapmaker, Trail Scout) and a rank from Rookie to Legend, shown on the You tab, on a new Badges screen and beside rider names. The account notification switch is now Badges and Pro Trial, and a badge notification opens Badges."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "faq",
       "garage",
       "getting-started",

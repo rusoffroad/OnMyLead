@@ -4,7 +4,7 @@ summary: Every new account gets 30 days of OnMyLead Pro with no payment, and it 
 category: pro
 order: 20
 release: "1.0"
-updated: 2026-10-15
+updated: 2026-11-01
 sources:
   - app/src/components/pro-plan.tsx
   - app/src/app/subscription.tsx
@@ -34,7 +34,12 @@ The trial is the same on Android. It belongs to your account, not your phone, so
 
 OnMyLead reminds you a week, 3 days and a day before your trial ends, and again when it ends.
 
+:::until 1.0.3
 - To turn off the notifications, switch off **Pro Trial Reminders** in [Notification Settings](/help/notification-settings).
+:::
+:::release 1.0.3
+- To turn off the notifications, switch off **Badges and Pro Trial** in [Notification Settings](/help/notification-settings). That also stops badge notifications.
+:::
 - The same reminders come by email too. Switch off **Email Me Too** to stop the emails.
 
 ## When the Trial Ends

@@ -36,6 +36,7 @@ describe('push tap target', () => {
 
   it('opens the ride chat for a chat message and the ride page for other ride news', () => {
     expect(tapTarget(chat)).toBe('/r/ABC123?section=chat');
+    expect(tapTarget(tapData({ type: 'badge', url: '/badges' }))).toBe('/badges');
     expect(tapTarget({ type: 'ride', change: 'moved', rideId: 'ride-1', inviteCode: 'ABC123' })).toBe('/r/ABC123');
     expect(tapTarget({ type: 'member', change: 'joined', rideId: 'ride-1', inviteCode: 'ABC123' })).toBe('/r/ABC123');
     expect(tapTarget({ type: 'reminder', rideId: 'ride-1', inviteCode: 'ABC123' })).toBe('/r/ABC123');
