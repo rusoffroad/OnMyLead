@@ -44,6 +44,8 @@ describe('push tap target', () => {
 
   it('opens a riding group chat for group messages', () => {
     expect(tapTarget({ type: 'group_message', groupId: 'g1' })).toBe('/groups/g1/chat');
+    expect(tapTarget({ type: 'direct_message', threadId: 't1', userId: 'u1' })).toBe('/messages/u1');
+    expect(tapTarget({ type: 'direct_message', threadId: 't1' })).toBeNull();
   });
 
   it('routes the same from every delivery shape', () => {

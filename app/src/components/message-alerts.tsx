@@ -10,6 +10,7 @@ import { alertTitle, isLeaderOnly, isResolved, shouldAlert, type ChatMessage } f
 import type { NotificationSettings } from '@/core/notifications';
 import { blockedIds, useBlocks } from '@/lib/blocks';
 import { currentNotificationSettings, resetNotificationSettings, syncNotificationSettings } from '@/lib/notification-settings';
+import { useOutRidingKeeper } from '@/lib/out-riding';
 import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps, useRideChangeReminders } from '@/lib/push';
 import { useSession } from '@/lib/session';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -72,6 +73,8 @@ export function MessageAlerts() {
   useRideChangeReminders();
   // Loads who this rider blocked, so no pop-up shows their messages.
   useBlocks();
+  // Out Riding: keeps the rough area fresh each time the app opens while it's on.
+  useOutRidingKeeper();
 
   useEffect(() => {
     if (!me) {

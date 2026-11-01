@@ -8,7 +8,7 @@
 
 export type NotificationTopic =
   | 'rider_status' | 'announcements' | 'leader_messages' | 'chat' | 'ride_changes' | 'new_riders'
-  | 'ride_invites' | 'followed_leaders' | 'group_chat' | 'account_push';
+  | 'ride_invites' | 'followed_leaders' | 'group_chat' | 'direct_messages' | 'account_push';
 
 export type NotificationSettings = Record<NotificationTopic, boolean> & {
   /** Off: notifications say a message arrived, not what it says. */
@@ -36,6 +36,7 @@ export const DEFAULT_SETTINGS: NotificationSettings = {
   ride_invites: true,
   followed_leaders: true,
   group_chat: true,
+  direct_messages: true,
   account_push: true,
   previews: true,
   reminder_minutes: 60,
@@ -79,6 +80,7 @@ export const TOPIC_GROUPS: TopicGroup[] = [
       { key: 'ride_invites', title: 'Ride Invites', detail: 'Someone invites you, or a group you’re in, to a ride.' },
       { key: 'group_chat', title: 'Riding Group Chat', detail: 'New messages in your riding groups’ chats. Mute one group from its chat.' },
       { key: 'followed_leaders', title: 'Leaders You Follow', detail: 'A leader you follow posts a new public ride.' },
+      { key: 'direct_messages', title: 'Direct Messages', detail: 'A rider messages you, say after seeing you Out Riding. Mute one conversation from inside it.' },
     ],
   },
   {
@@ -91,6 +93,9 @@ export const TOPIC_GROUPS: TopicGroup[] = [
 
 /** The topic that arrived with Group Chat (migration 20261019400000_group_chat.sql). */
 export const GROUP_CHAT_TOPICS: NotificationTopic[] = ['group_chat'];
+
+/** The topic that arrived with Out Riding and direct messages (migration 20261101700000_out_riding.sql). */
+export const DM_TOPICS: NotificationTopic[] = ['direct_messages'];
 
 /** Settings that arrived with OnMyLead Pro (migration 20261018000000_pro_entitlements.sql). */
 export const ACCOUNT_SETTINGS: (keyof NotificationSettings)[] = ['account_push', 'account_emails'];
@@ -112,7 +117,7 @@ export function settingsFromRow(row: Partial<Record<keyof NotificationSettings, 
   if (!row) return s;
   for (const k of [
     'rider_status', 'announcements', 'leader_messages', 'chat', 'ride_changes', 'new_riders', 'ride_invites', 'followed_leaders',
-    'group_chat', 'account_push', 'previews', 'quiet_hours', 'ride_emails', 'account_emails',
+    'group_chat', 'direct_messages', 'account_push', 'previews', 'quiet_hours', 'ride_emails', 'account_emails',
   ] as const) {
     if (typeof row[k] === 'boolean') s[k] = row[k] as boolean;
   }
