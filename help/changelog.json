@@ -2,6 +2,16 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "nav-follow-camera",
+    "why": "Navigate's map now follows you while you record a trail or follow one you're near, and after you tap Center on Me (the button turns white while following). Dragging or pinching the map pauses following until you tap Center on Me again. Found while testing 1.0.3 on Android, where the dot could leave the screen while recording."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "friends",
       "out-riding",
       "notification-settings",
