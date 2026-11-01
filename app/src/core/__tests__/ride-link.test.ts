@@ -32,7 +32,7 @@ describe('Universal Links setup', () => {
   const aasa = JSON.parse(readFileSync(resolve(root, 'public/.well-known/apple-app-site-association'), 'utf8'));
   const app = JSON.parse(readFileSync(resolve(root, 'app.json'), 'utf8')).expo;
 
-  it('the site names this exact app and only the ride, group and email-link paths', () => {
+  it('the site names this exact app and only the ride, group, friend and email-link paths', () => {
     const [detail] = aasa.applinks.details;
     expect(aasa.applinks.details).toHaveLength(1);
     expect(detail.appIDs).toEqual([APPLE_APP_ID]);

@@ -192,6 +192,11 @@
               "scheme": "https",
               "host": "onmylead.com",
               "pathPrefix": "/g/"
+            },
+            {
+              "scheme": "https",
+              "host": "onmylead.com",
+              "pathPrefix": "/friend/"
             }
           ],
           "category": [

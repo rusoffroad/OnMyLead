@@ -81,6 +81,7 @@ You can also block from:
 
 :::release 1.0.3
 - Neither of you sees the other in Out Riding, their direct messages are hidden from you, and they can't message you.
+- If you were friends, you aren't anymore, and any friend request between you is removed. Neither of you can send a new one.
 :::
 
 ### What Blocking Doesn't Do

@@ -69,7 +69,11 @@ Anyone with your family link can see your last location until that share ends. S
 :::release 1.0.3
 ## Out Riding
 
-[Out Riding](/help/out-riding) is off until you switch it on. While it's on, riders who can see you get your ride name, where you said you're riding (if you typed it) and roughly how far away you are in whole miles, never your location. OnMyLead keeps only an area of about a mile, and deletes it when you turn Out Riding off. It turns itself off at the time you picked, or after 6 hours without opening the app. By default only riders you've ridden with or share a group with can see you.
+[Out Riding](/help/out-riding) is off until you switch it on. While it's on, riders who can see you get your ride name, where you said you're riding (if you typed it) and roughly how far away you are in whole miles, never your location. OnMyLead keeps only an area of about a mile, and deletes it when you turn Out Riding off. It turns itself off at the time you picked, or after 6 hours without opening the app. By default only your friends, and riders you've ridden with or share a group with, can see you.
+
+## Friends
+
+Only you and the other rider can see that you're friends, or that one of you sent a request. Nobody can search for riders by name: a rider can only send you a request if they've ridden with you, share a riding group with you, can see you in Out Riding, have messaged with you, or have your friend link. Being friends never shares your location. See [Add Friends](/help/friends).
 :::
 
 ## Blocked Riders

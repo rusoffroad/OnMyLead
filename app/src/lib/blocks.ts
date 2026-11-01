@@ -3,6 +3,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { blockPrompt, blocksNotSwitchedOn, BLOCKS_NOT_SWITCHED_ON, sortBlocked, type BlockedRider } from '@/core/blocks';
 import { track } from './analytics';
 import { confirmAsync, showNotice } from './confirm';
+import { refreshFriends } from './friends';
 import { useSession } from './session';
 import { supabase } from './supabase';
 
@@ -98,6 +99,8 @@ export async function blockRider(userId: string, name: string) {
     set({ list: sortBlocked([...current.list, { userId, name: name.trim() || 'Rider', blockedAt: new Date().toISOString() }]) });
   }
   track('rider_blocked');
+  // Blocking ends a friendship (the database removes it); show that straight away.
+  refreshFriends();
 }
 
 export async function unblockRider(userId: string) {

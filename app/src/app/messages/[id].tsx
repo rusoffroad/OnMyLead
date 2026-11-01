@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'rea
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AddFriendButton } from '@/components/add-friend-button';
 import { Icon } from '@/components/icon';
 import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
@@ -24,7 +25,7 @@ const STARTERS = ['Where are you parked?', 'Which trail are you on?', 'Want to r
 
 /**
  * A direct message conversation with one rider. Opened from Out Riding, the Messages list, or a
- * push. Report Rider, Block Rider and Delete Conversation sit behind the ••• button; a long press
+ * push. Add Friend, Report Rider, Block Rider and Delete Conversation sit behind the ••• button; a long press
  * on one of their messages reports that message. Until they reply, you can send 3.
  */
 export default function Conversation() {
@@ -134,6 +135,9 @@ export default function Conversation() {
 
         {menu ? (
           <View style={styles.menu}>
+            {id && !blocked ? (
+              <AddFriendButton userId={id} name={who} style={styles.friendBtn} onDone={() => setMenu(false)} />
+            ) : null}
             <Pressable
               accessibilityRole="button"
               style={styles.smallBtn}
@@ -320,6 +324,7 @@ const styles = StyleSheet.create({
   time: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12 },
   failText: { color: Colors.danger, fontFamily: font(600), fontSize: 13 },
   smallBtn: { minHeight: 36, paddingHorizontal: 14, borderRadius: Radius.pill, backgroundColor: Colors.backgroundSelected, justifyContent: 'center' },
+  friendBtn: { minHeight: 36, paddingHorizontal: 14, paddingVertical: 0, borderRadius: Radius.pill },
   smallBtnText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
   note: {
     backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky,

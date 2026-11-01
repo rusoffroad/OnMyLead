@@ -27,7 +27,7 @@ A riding group is your regular crew, saved once. When you create a ride, you can
 Your groups live on the **Groups** tab, on the **Riding Groups** screen. It shows **Your Groups** (the ones you run) and **Groups You’re In** (the ones someone else runs).
 
 :::release 1.0.3
-The top of the Groups tab also has **Out Riding**, to see who's out riding near you, and **Messages**, your direct messages. See [See Who's Out Riding Nearby](/help/out-riding).
+The top of the Groups tab also has **Out Riding**, to see who's out riding near you, **Messages**, your direct messages, and **Friends**. See [See Who's Out Riding Nearby](/help/out-riding) and [Add Friends](/help/friends).
 :::
 
 :::note

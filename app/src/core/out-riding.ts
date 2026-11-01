@@ -29,7 +29,7 @@ export type NearbyRider = {
   /** Whole miles; 0 means under a mile. Rounded to 5 past 10 miles. */
   miles: number;
   spot: string | null;
-  /** Ridden together, or in a riding group together. */
+  /** A friend, ridden together, or in a riding group together. */
   known: boolean;
   since: string;
   riding_types: string[] | null;
@@ -82,7 +82,7 @@ export const AUDIENCE_CHOICES: { value: Audience; title: string; detail: string 
   {
     value: 'riders',
     title: 'Riders I Know',
-    detail: 'Only riders you’ve been on a ride with or share a riding group with can see you.',
+    detail: 'Only your friends, and riders you’ve been on a ride with or share a riding group with, can see you.',
   },
   {
     value: 'everyone',
@@ -175,7 +175,7 @@ export function friendlyOutRidingError(message: string): string {
   if (/dm_daily_limit/i.test(message)) return 'You’ve hit today’s message limit. Try again tomorrow.';
   if (/dm_wait_for_reply/i.test(message)) return 'Wait for them to reply before sending more.';
   if (/dm_you_blocked/i.test(message)) return 'You blocked this rider. Unblock them from You, Blocked Riders to message them.';
-  if (/dm_not_allowed/i.test(message)) return 'You can message riders you see Out Riding near you, or riders you’ve ridden with.';
+  if (/dm_not_allowed/i.test(message)) return 'You can message your friends, riders you see Out Riding near you, or riders you’ve ridden with.';
   if (/too long/i.test(message)) return 'Keep it under 500 characters.';
   if (/conversation not found/i.test(message)) return 'This conversation isn’t available.';
   return message;

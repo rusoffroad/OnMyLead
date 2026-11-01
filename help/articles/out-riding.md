@@ -27,7 +27,7 @@ Out Riding is off until you switch it on, and other riders never see where you a
 
 1. Go to the **Groups** tab and tap **Out Riding** at the top.
 2. Under **Who Can See Me**, pick one:
-   - **Riders I Know**: only riders you've been on a ride with, or share a riding group with. This is the default.
+   - **Riders I Know**: only your [friends](/help/friends), and riders you've been on a ride with or share a riding group with. This is the default.
    - **Everyone Nearby**: also any other OnMyLead rider who is Out Riding near you and picked **Everyone Nearby** too.
 3. Under **Turn Off After**, pick **4 Hours**, **Today** or **This Weekend**.
 4. If you like, type where you're riding under **Where You're Riding (Optional)**, like the park's name. Riders who can see you see it.
@@ -41,7 +41,7 @@ OnMyLead only uses your location while the app is open to work out your rough ar
 
 ## See Who's Out Near You
 
-While you're Out Riding, the **Out Near You** list shows each rider with roughly how far away they are (like **Under a Mile** or **About 6 Miles**), where they said they're riding, and whether you've ridden with them.
+While you're Out Riding, the **Out Near You** list shows each rider with roughly how far away they are (like **Under a Mile** or **About 6 Miles**), where they said they're riding, and whether they're your friend or you've ridden with them. Friends are listed first.
 
 - Tap **10 Mi**, **25 Mi** or **50 Mi** to look farther.
 - If you picked **Everyone Nearby**, switch between **Riders I Know** and **Everyone Nearby** to see only your riders or everyone.
@@ -54,17 +54,21 @@ You only see other riders while you're Out Riding yourself, and you only see rid
 1. In the list, tap the blue message button next to a rider (or tap their dot on the rings).
 2. Type your message and tap send.
 
-Only the two of you see the conversation. You can start one with a rider you see Out Riding near you, or with a rider you've ridden with. Until they reply, you can send up to 3 messages.
+Only the two of you see the conversation. You can start one with a friend, a rider you see Out Riding near you, or a rider you've ridden with. Until they reply, you can send up to 3 messages.
 
 Find all your conversations under **Messages** on the Groups tab or the Out Riding screen. In a conversation:
 
 - **Mute** stops notifications for that conversation.
-- **•••** opens **Report Rider**, **Block Rider** and **Delete Conversation**. Deleting removes it from your Messages only; the other rider keeps their copy.
+- **•••** opens **Add Friend**, **Report Rider**, **Block Rider** and **Delete Conversation**. Deleting removes it from your Messages only; the other rider keeps their copy.
 - Long press one of their messages to report it. The message goes with your report.
 
 :::tip
 Meeting up with someone new? Meet at a trailhead or staging area.
 :::
+
+## Add a Rider as a Friend
+
+In the list, tap **•••** next to a rider, then **Add Friend**. Once they accept, they see you whenever you're both Out Riding with **Riders I Know**, and you can message each other any time. See [Add Friends](/help/friends).
 
 ## Change or Turn It Off
 

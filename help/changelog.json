@@ -2,6 +2,50 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "friends",
+      "out-riding",
+      "notification-settings",
+      "report-and-block",
+      "privacy",
+      "riding-groups"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "friends",
+    "why": "New in 1.0.3: Friends. Add riders you've ridden with, riders you see Out Riding or message with, or anyone with your friend link (no search by name). Friends see each other in Out Riding and can message any time. Blocking ends a friendship. Adds a Friend Requests notification switch, and Add Friend and Message on a ride's Going list."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "approvals-and-waitlist",
+      "badges-and-ranks",
+      "check-in",
+      "emergency-and-safety",
+      "faq",
+      "follow-leaders",
+      "garage",
+      "getting-started",
+      "group-chat",
+      "invite-riders",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "organizer-controls",
+      "pro-trial",
+      "promo-codes",
+      "qr-codes",
+      "ride-name-and-profile",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "friends",
+    "why": "Friends touched shared files these articles list (the ride's Going list, notification topics, the app layout, app links in app.json and ride-link.ts, and the website showcase). Nothing they describe changes for riders, apart from the new Add Friend and Message buttons on the Going list, which Add Friends covers."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",

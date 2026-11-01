@@ -1,4 +1,5 @@
 import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import { useState, type ComponentProps } from 'react';
 import { LayoutAnimation, Platform, Pressable, StyleSheet, View } from 'react-native';
 
@@ -13,6 +14,8 @@ import { friendlyRoleError, handOffPrompt, ROLE_LABEL, rosterActions, tailGunner
 import { handOffRide, setMemberRole, setTailGunner } from '@/lib/api';
 import { confirmAndBlock, unblockRider, useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
+import { relationTo, requestResultLine } from '@/core/friends';
+import { removeFriend, respondFriendRequest, sendFriendRequest, useFriends } from '@/lib/friends';
 import { badgeTitle } from '@/core/badges';
 import { useRiderBadges } from '@/lib/badges';
 import { BadgePatch } from './badge-patch';
@@ -42,6 +45,8 @@ export function RideRoster({
   const [error, setError] = useState<string | null>(null);
   const [reporting, setReporting] = useState<ComponentProps<typeof ReportSheet>['target']>(null);
   const blocks = useBlocks();
+  const friends = useFriends();
+  const [friendNote, setFriendNote] = useState<string | null>(null);
   const joined = members.filter((m) => m.status === 'joined');
   const nameOf = (id: string) => members.find((m) => m.user_id === id)?.profiles?.display_name || 'Rider';
   const leaderIds = rideLeaderIds(members, ride.organizer_id);
@@ -56,10 +61,32 @@ export function RideRoster({
   // Each rider's top badge, small beside their name.
   const badges = useRiderBadges(joined.map((m) => m.user_id));
 
+  // Add Friend from a rider's row: riders on the same ride can always ask each other.
+  async function friendPress(m: RideMember) {
+    const name = nameOf(m.user_id);
+    const rel = relationTo(friends.list, m.user_id, me);
+    if (rel === 'friends' && !(await confirmAsync(`Remove ${name}?`, 'You’ll stop being friends. They aren’t told.', 'Remove'))) return;
+    setBusy(`friend-${m.user_id}`);
+    setError(null);
+    setFriendNote(null);
+    try {
+      if (rel === 'none') setFriendNote(requestResultLine(await sendFriendRequest(m.user_id), name));
+      else if (rel === 'received') {
+        await respondFriendRequest(m.user_id, true);
+        setFriendNote(`You and ${name} are friends now.`);
+      } else await removeFriend(m.user_id);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.');
+    } finally {
+      setBusy(null);
+    }
+  }
+
   function toggle(id: string) {
     if (Platform.OS !== 'web') LayoutAnimation.configureNext(LayoutAnimation.create(180, 'easeInEaseOut', 'opacity'));
     setOpen((o) => (o === id ? null : id));
     setError(null);
+    setFriendNote(null);
   }
 
   async function run(key: string, fn: () => Promise<unknown>) {
@@ -170,6 +197,33 @@ export function RideRoster({
                       onPress={() => run(`tail-${m.user_id}`, () => setTailGunner(ride.id, m.role === 'sweep' ? null : m.user_id))}
                     />
                   ) : null}
+                  {me && m.user_id !== me && friends.loaded && !friends.off && !blocks.ids.has(m.user_id) ? (() => {
+                    const rel = relationTo(friends.list, m.user_id, me);
+                    return (
+                      <>
+                        <Action
+                          color={RideColors.green}
+                          on={rel === 'friends'}
+                          title={{ none: 'Add Friend', sent: 'Cancel Friend Request', received: 'Accept Friend Request', friends: 'Remove Friend', self: '' }[rel]}
+                          caption={
+                            rel === 'friends' ? 'You see each other in Out Riding and can message any time.'
+                            : rel === 'sent' ? 'Waiting for them to accept.'
+                            : rel === 'received' ? 'They asked to be your friend.'
+                            : 'See each other in Out Riding and message any time.'
+                          }
+                          busy={busy === `friend-${m.user_id}`}
+                          onPress={() => friendPress(m)}
+                        />
+                        <Action
+                          color={Colors.sky}
+                          title="Message"
+                          caption="Only the two of you see it."
+                          onPress={() => router.push(`/messages/${m.user_id}`)}
+                        />
+                      </>
+                    );
+                  })() : null}
+                  {friendNote && open === m.user_id ? <ThemedText type="small" themeColor="textSecondary">{friendNote}</ThemedText> : null}
                   {me && m.user_id !== me ? (
                     <Action
                       color={Colors.textSecondary}

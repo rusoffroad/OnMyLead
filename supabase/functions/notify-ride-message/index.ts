@@ -17,7 +17,9 @@
 // hidden" ({"type":"trail_hidden"}, migration 20261101600000_nav_trails.sql). Riding group chat messages
 // ({"type":"group_message"}) come from push_batch_group (migration 20261019400000_group_chat.sql).
 // Direct messages ({"type":"direct_message"}) come from push_batch_dm (migration
-// 20261101700000_out_riding.sql), which itself skips riders who blocked the sender.
+// 20261101700000_out_riding.sql), which itself skips riders who blocked the sender. Friend requests
+// and accepted requests ({"type":"friend_request"} / {"type":"friend_accept"}) come from
+// push_batch_friends (migration 20261101800000_friends.sql).
 // Chat pushes skip riders who blocked the sender (blockersOf, migration
 // 20261020000000_blocked_riders.sql); status taps such as Need Help and EMERGENCY never do.
 //
@@ -45,6 +47,7 @@ const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
 const ACCOUNT_EVENTS = new Set(['trial', 'badge', 'trail_hidden']);
 const GROUP_EVENTS = new Set(['group_message']);
 const DM_EVENTS = new Set(['direct_message']);
+const FRIEND_EVENTS = new Set(['friend_request', 'friend_accept']);
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -79,7 +82,9 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
     ? 'push_batch_account'
     : SOCIAL_EVENTS.has(event.type)
       ? 'push_batch_social'
-      : GROUP_EVENTS.has(event.type) ? 'push_batch_group' : DM_EVENTS.has(event.type) ? 'push_batch_dm' : 'push_batch';
+      : GROUP_EVENTS.has(event.type)
+        ? 'push_batch_group'
+        : DM_EVENTS.has(event.type) ? 'push_batch_dm' : FRIEND_EVENTS.has(event.type) ? 'push_batch_friends' : 'push_batch';
   const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 

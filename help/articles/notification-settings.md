@@ -60,6 +60,7 @@ Everything below starts on.
 
 :::release 1.0.3
 - **Direct Messages**: a rider messages you, say after seeing you Out Riding. To mute one conversation, do it from inside it. See [See Who's Out Riding Nearby](/help/out-riding).
+- **Friend Requests**: a rider asks to be your friend, or accepts your request. See [Add Friends](/help/friends).
 :::
 
 ### Your Account
@@ -82,6 +83,8 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 - Ride changes, new riders, invites and reminders open the ride.
 :::release 1.0.3
 - A new badge opens **Badges**.
+- A direct message opens the conversation.
+- A friend request, or a request someone accepted, opens **Friends**.
 - A trail of yours being hidden opens **My Trails**.
 :::
 
