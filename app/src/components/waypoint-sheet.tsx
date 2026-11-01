@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { TimePicker } from '@/components/time-picker';
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
@@ -209,14 +210,7 @@ export function WaypointSheet({
                     returnKeyType="done"
                   />
                   {stopForm ? (
-                    <Field
-                      label="Planned Time (Optional)"
-                      value={stopTime}
-                      onChangeText={setStopTime}
-                      placeholder="12:30 pm"
-                      autoCapitalize="none"
-                      returnKeyType="done"
-                    />
+                    <TimePicker label="Planned Time (Optional)" value={stopTime} onChange={setStopTime} optional suggest={12 * 60} />
                   ) : null}
                   <Field
                     label="Note (Optional)"

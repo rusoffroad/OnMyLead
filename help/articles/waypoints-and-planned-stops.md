@@ -4,12 +4,13 @@ summary: Mark camp, fuel, water or a hazard on a ride's map, and let the leader 
 category: routes-maps
 order: 30
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/ride/[id]/waypoints.tsx
   - app/src/app/r/[code].tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/waypoint-sheet.tsx
+  - app/src/components/time-picker.tsx
   - app/src/components/waypoint-row.tsx
   - app/src/components/waypoint-map.tsx
   - app/src/components/waypoint-map.web.tsx
@@ -78,7 +79,12 @@ Planned stops tell everyone where the group will stop for fuel, lunch or camp, a
 2. Under **Planned Stops**, tap **Add a Planned Stop**.
 3. Press and hold the map where the group will stop.
 4. Pick what it is and give it a name.
+:::until 1.0.3
 5. Add a **Planned Time (Optional)**, like "12:30 pm".
+:::
+:::release 1.0.3
+5. To add a **Planned Time (Optional)**, tap **Add**, then tap **AM** or **PM**, the hour and the minute. It starts at 12:00 PM. Tap **Clear** to remove it.
+:::
 6. Tap **Save Planned Stop**.
 
 Stops are numbered in the order you add them. To change the order:
