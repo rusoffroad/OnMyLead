@@ -10,6 +10,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
+import { HoldButton } from '@/components/hold-button';
 import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group-map';
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
@@ -18,6 +19,7 @@ import { RiderList, RiderRows } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
 import { SharePicker } from '@/components/share-picker';
+import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
@@ -1252,14 +1254,14 @@ export default function RideMode() {
       />
 
       <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
-        <View style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
+        <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <KeyboardLift>
-          <View style={[styles.sheet, tablet && styles.sheetTablet]}>
+          <SwipeSheet onClose={() => setAskShare(false)} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Share Your Location with This Ride?</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
               Only riders on this ride will see you. Sharing always stops when the ride ends or you leave it.
             </ThemedText>
-            <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} {...keyboardScroll}>
+            <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} {...keyboardScroll}>
               <SharePicker
                 options={RIDE_SHARE_OPTIONS_MIN}
                 openLabel="Until I Turn It Off"
@@ -1267,16 +1269,19 @@ export default function RideMode() {
                 onPick={beginShare}
                 busy={busy}
               />
-            </ScrollView>
+            </SheetScroll>
             <Button title="Not Now" kind="secondary" onPress={() => setAskShare(false)} />
-          </View>
+          </SwipeSheet>
           </KeyboardLift>
-        </View>
+        </SheetRoot>
       </Modal>
 
       <Modal visible={sosOpen} animationType="fade" transparent onRequestClose={() => setSosOpen(false)}>
-        <View style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
-          <View style={[styles.sheet, tablet && styles.sheetTablet, { borderTopColor: RideColors.red, borderTopWidth: 6 }]}>
+        <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
+          <SwipeSheet
+            onClose={() => setSosOpen(false)}
+            style={[styles.sheet, tablet && styles.sheetTablet, { borderTopColor: RideColors.red, borderTopWidth: 6 }]}
+            accessibilityViewIsModal>
             <ThemedText type="subtitle" style={styles.sheetTitle}>Emergency</ThemedText>
             <ThemedText style={styles.sheetBody}>
               This alerts everyone on the ride with your location. It does not contact emergency services. Call 911 if anyone is hurt.
@@ -1286,21 +1291,20 @@ export default function RideMode() {
                 {myPos.lat.toFixed(5)}, {myPos.lng.toFixed(5)}
               </ThemedText>
             ) : null}
-            <Button
+            <HoldButton
               title="Alert My Group"
-              kind="danger"
-              big
-              onLongPress={async () => {
-                await sendEmergency();
+              accessibilityLabel="Alert my group: send EMERGENCY to everyone on this ride"
+              onHold={() => {
+                // Close the sheet first so the Sending card shows at once; the send keeps going
+                // (and retries from the outbox) after the sheet is gone.
                 setSosOpen(false);
+                sendEmergency();
               }}
-              delayLongPress={1500}
             />
-            <ThemedText type="small" style={styles.sheetBody}>Press and hold to send.</ThemedText>
             <Button title="Call 911" kind="danger" onPress={() => Linking.openURL('tel:911')} />
             <Button title="Cancel" kind="secondary" onPress={() => setSosOpen(false)} />
-          </View>
-        </View>
+          </SwipeSheet>
+        </SheetRoot>
       </Modal>
     </View>
   );

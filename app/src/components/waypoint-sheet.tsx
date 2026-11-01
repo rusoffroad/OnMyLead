@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TimePicker } from '@/components/time-picker';
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
+import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field } from '@/components/ui';
 import { StopSign, WaypointBlaze, WaypointGlyph } from '@/components/waypoint-blaze';
@@ -164,12 +165,13 @@ export function WaypointSheet({
   const noun = stopForm ? 'Planned Stop' : 'Waypoint';
   return (
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+      <SheetRoot>
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
       {target ? (
         <KeyboardLift>
-          <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
+          <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
             <View style={styles.grip} />
-            <ScrollView {...keyboardScroll} contentContainerStyle={{ gap: Spacing.three }} style={{ maxHeight: 640, flexShrink: 1 }}>
+            <SheetScroll {...keyboardScroll} contentContainerStyle={{ gap: Spacing.three }} style={{ maxHeight: 640, flexShrink: 1 }}>
               {form ? (
                 <>
                   <View style={styles.head}>
@@ -312,10 +314,11 @@ export function WaypointSheet({
                   <Button title="Close" kind="ghost" onPress={onClose} />
                 </>
               ) : null}
-            </ScrollView>
-          </View>
+            </SheetScroll>
+          </SwipeSheet>
         </KeyboardLift>
       ) : null}
+      </SheetRoot>
     </Modal>
   );
 }

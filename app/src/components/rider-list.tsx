@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { SheetRoot, SheetScroll, SwipeSheet } from './swipe-sheet';
 import type { MapRider } from './group-map-types';
 import { Icon } from './icon';
 import { RiderDot } from './rider-dot';
@@ -28,8 +29,10 @@ export function RiderList({
 }) {
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <SheetRoot>
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close Riders" />
-      <View style={styles.sheet}>
+      <SwipeSheet onClose={onClose} style={styles.sheet} accessibilityViewIsModal>
+        <View style={styles.grip} />
         <View style={styles.head}>
           <Text style={styles.title}>Riders</Text>
           <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" style={styles.close}>
@@ -39,10 +42,11 @@ export function RiderList({
         {offline ? (
           <Text style={styles.offline}>You have no service. Times are from the last update you got.</Text>
         ) : null}
-        <ScrollView contentContainerStyle={{ gap: Spacing.two, paddingBottom: Spacing.four }}>
+        <SheetScroll contentContainerStyle={{ gap: Spacing.two, paddingBottom: Spacing.four }}>
           <RiderRows riders={riders} meId={meId} onNavigate={onNavigate} extra={extra} />
-        </ScrollView>
-      </View>
+        </SheetScroll>
+      </SwipeSheet>
+      </SheetRoot>
     </Modal>
   );
 }
@@ -113,9 +117,10 @@ export function RiderRows({
 const styles = StyleSheet.create({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },
   sheet: {
-    maxHeight: '70%', backgroundColor: Colors.backgroundElement, paddingHorizontal: Spacing.three, paddingTop: Spacing.three,
+    maxHeight: '70%', backgroundColor: Colors.backgroundElement, paddingHorizontal: Spacing.three, paddingTop: Spacing.two,
     borderTopLeftRadius: 28, borderTopRightRadius: 28, gap: Spacing.two,
   },
+  grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 28 },
   close: { minHeight: 36, paddingHorizontal: 14, borderRadius: 18, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },

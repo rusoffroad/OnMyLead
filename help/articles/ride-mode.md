@@ -16,6 +16,8 @@ sources:
   - app/src/components/route-strip.tsx
   - app/src/hooks/use-panel-fold.ts
   - app/src/core/panel-swipe.ts
+  - app/src/components/swipe-sheet.tsx
+  - app/src/core/sheet-swipe.ts
   - app/src/core/freshness.ts
   - app/src/core/live-roster.ts
   - app/src/core/map-center.ts
@@ -133,6 +135,12 @@ While the panel is folded:
 - Other alerts are counted in a badge on **Buttons ▲**.
 
 :::release 1.0.3
+Sheets that slide up over the map (**Riders**, **Directions**, a waypoint, Share Your Location and **EMERGENCY**) close when you swipe them down, the same as tapping **Cancel**, **Close** or **Done**. In a long sheet, the first swipe scrolls back to the top. If the keyboard is up, the first swipe puts the keyboard away.
+:::
+
+On a tablet the map fills the screen. The **Riders** list sits on the left (tap **Hide** or swipe it left to fold it, **Show Riders** to bring it back) and the buttons panel on the right. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+
+:::release 1.0.3
 ## Full Map
 
 Want the map and nothing else? Tap **⤢ Full Map** at the top of the bottom panel. The ride name, banners, map buttons and the riders list tuck away, and a slim bar at the bottom keeps:
@@ -144,8 +152,6 @@ Want the map and nothing else? Tap **⤢ Full Map** at the top of the bottom pan
 
 Tap **Menus ▲** to bring back the status buttons, quick replies and everything else. Full Map works the same on iPhone, iPad, Android phones and Android tablets.
 :::
-
-On a tablet the map fills the screen. The **Riders** list sits on the left (tap **Hide** or swipe it left to fold it, **Show Riders** to bring it back) and the buttons panel on the right. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 
 ## When You Lose Service
 

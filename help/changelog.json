@@ -2,10 +2,10 @@
   {
     "date": "2026-11-01",
     "slugs": [
-      "ride-mode",
       "emergency-and-safety",
-      "use-onmylead-on-a-tablet",
-      "status-buttons"
+      "ride-mode",
+      "status-buttons",
+      "use-onmylead-on-a-tablet"
     ],
     "kind": "update",
     "by": "pr",
@@ -29,6 +29,72 @@
     "by": "pr",
     "ref": "rider-order-full-map",
     "why": "These guides list Ride Mode, the route strip or the website home page as a source. Ride Mode gains the rider order line and Full Map (covered in Use Ride Mode); the website's Ride Together step mentions them. Nothing these guides describe changes."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "emergency-and-safety"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "emergency-hold-feedback",
+    "why": "Chris tapped EMERGENCY in Ride Mode and nothing seemed to happen: Alert My Group needed a 1.5 second hold with no sign it was working, and the screen stayed up while the alert sent. From 1.0.3 the button fills a bar and says Keep Holding, a quick tap says Not sent, and the screen closes as soon as the alert goes out."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "directions",
+      "fuel-range",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "emergency-hold-feedback",
+    "why": "These guides list the Ride Mode screen as a source. Only the Emergency sheet's Alert My Group button changes (covered in Emergencies and Staying Safe); nothing they describe changes."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "getting-started",
+      "qr-codes",
+      "report-and-block",
+      "ride-mode",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "swipe-sheets",
+    "why": "Every sheet that slides up (a new or open waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride QR code) now closes when you swipe it down, on iPhone, iPad and Android. A rider couldn't swipe away the New Waypoint sheet and had to tap Cancel. In the app from 1.0.3."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "create-a-ride",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "free-vs-pro",
+      "fuel-range",
+      "invite-riders",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "subscribe-to-pro",
+      "troubleshooting"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "swipe-sheets",
+    "why": "These guides list Ride Mode, Directions, the Pro prompt or the QR code as a source. Only the way their sheets close changed (swipe down, covered in Use Ride Mode and Getting Started); nothing these guides describe changes."
   },
   {
     "date": "2026-11-01",
