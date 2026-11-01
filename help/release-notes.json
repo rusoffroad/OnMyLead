@@ -2,8 +2,8 @@
   {
     "version": "1.0.3",
     "title": "Easier Ride Times",
-    "intro": "Pick a ride's time with a few taps instead of typing it.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".\n• Swipe down to close any sheet, like a new waypoint or the riders list.\n• The app now tells you when an update is waiting or when your version has a known problem.",
+    "intro": "Pick a ride's time with a few taps instead of typing it, and the Emergency screen now shows you exactly when your alert is going out.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".\n• Swipe down to close any sheet, like a new waypoint or the riders list.\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out.\n• The app now tells you when an update is waiting or when your version has a known problem.",
     "apple": null,
     "google": null,
     "notes": [
@@ -14,6 +14,10 @@
       {
         "kind": "improved",
         "text": "Swipe down to close any sheet: a new waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride's QR code. In a long sheet the first swipe scrolls back to the top, and if the keyboard is up it puts the keyboard away first."
+      },
+      {
+        "kind": "fixed",
+        "text": "Emergency in Ride Mode: Alert My Group now fills a bar while you hold it and says Keep Holding, so it no longer looks like nothing happens. A quick tap tells you the alert was not sent, and the screen closes as soon as the alert goes out so you can see who has it."
       },
       {
         "kind": "new",
