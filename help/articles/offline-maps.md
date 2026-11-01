@@ -4,7 +4,7 @@ summary: Download a ride's map or any area before you leave, so the map and rout
 category: routes-maps
 order: 60
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/maps/index.tsx
   - app/src/app/maps/area.tsx
