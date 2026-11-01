@@ -77,7 +77,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Universal Links for onmylead.com/r/*, /g/* **[iOS-only]**; **[Android gap]** no App Links.
 
 ### Ride Mode and Live Tracking
-- Full-screen live group map (satellite hybrid), every rider a dot, leader colored, rider names.
+- Full-screen live group map (satellite hybrid), every rider a white-ringed dot on their exact position, leader a bigger blue dot, rider names in dark pills.
 - Location sharing per ride with a duration picker or Until I Leave the Ride; background updates
   through a location task (`lib/location.ts`): one point each 25 m or 15 s, offline queue,
   Android foreground-service notification already configured.

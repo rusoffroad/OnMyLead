@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/r/[code].tsx
@@ -61,7 +61,15 @@ If you've turned on [Battery Saver](/help/battery-saver), that banner also names
 
 ### The Map
 
-The map shows the ride's route, waypoints, planned stops and any regroup point. Every rider who is sharing shows as a dot with their ride name beside it. The leader is the one bigger blue dot, so you can find them at a glance. Tap a rider's dot to see their name, whether they're live, and their latest status.
+The map shows the ride's route, waypoints, planned stops and any regroup point. Every rider who is sharing shows as a dot with their ride name beside it. Tap a rider's dot to see their name, whether they're live, and their latest status.
+
+:::until 1.0.3
+The leader is the one bigger blue dot, so you can find them at a glance.
+:::
+
+:::release 1.0.3
+Each rider is a white ring with a dark center and a dark name tag, easy to spot on satellite, topo and the dark map. The leader is the bigger solid blue dot with a blue name tag, so you can find them at a glance. Every dot sits on the rider's exact position and stays there as you zoom in and out.
+:::
 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
 
@@ -90,8 +98,8 @@ A dot only looks live when the phone behind it is actually checking in. A sharin
 
 | What you see | What it means |
 |---|---|
-| Solid dot | Live. The position is less than a minute old. |
-| Hollow dot with **Last Seen 2 Min Ago** | Where the rider was last seen, a minute or more ago. |
+| Solid dot (from version 1.0.3: a white ring, or solid blue for the leader) | Live. The position is less than a minute old. |
+| Hollow dot (from version 1.0.3: a thin grey ring) with **Last Seen 2 Min Ago** | Where the rider was last seen, a minute or more ago. |
 | Dashed grey ring with **No Signal, 8 Min Ago** | Nothing for three minutes or more. Their phone has likely lost service or stopped sending. |
 | Faint ring, **Not Sharing** | The rider is on the ride but isn't sharing their location. |
 | Yellow or red ring around a dot | Ride Bubble thinks the rider is separating from the group. |

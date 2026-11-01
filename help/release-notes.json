@@ -1,5 +1,23 @@
 [
   {
+    "version": "1.0.3",
+    "title": "Rider Dots You Can Trust",
+    "intro": "Rider dots now sit on each rider's exact position at every zoom, and they're easier to see on any map.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots in Ride Mode stay on each rider's exact position when you zoom in and out.\n• Easier-to-see rider dots: a white ring for each rider and a bigger solid blue dot for the leader.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "fixed",
+        "text": "Rider dots in Ride Mode now sit on each rider's exact position and stay there as you zoom in and out. Before, every dot was drawn a little to the right of the rider, so riders who were together looked spread out. Waypoints, planned stops and search pins are placed exactly too."
+      },
+      {
+        "kind": "improved",
+        "text": "Rider dots are easier to see on satellite, topo and the dark map: each rider is a bold white ring with a dark name tag, and the leader is a bigger solid blue dot with a blue name tag."
+      }
+    ]
+  },
+  {
     "version": "1.0.2",
     "title": "Better Maps on the Trail",
     "intro": "Roads and trails show from farther out, a new button brings the map back to you, sharing can stay on until you turn it off, and rides can be planned for 2027 and beyond.",

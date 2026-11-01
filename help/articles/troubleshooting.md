@@ -4,7 +4,7 @@ summary: What to check when riders don't show on the map, alerts don't arrive, a
 category: troubleshooting
 order: 10
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/core/freshness.ts
   - app/src/components/rider-dot.tsx
@@ -31,6 +31,10 @@ Start here when something doesn't work the way you expect. If your problem isn't
 ## A Rider Shows as a Hollow Dot or "Last Seen"
 
 A rider's dot turns hollow when their last position is more than a minute old, and shows **No Signal** with a dashed grey ring after about 3 minutes. A sharing phone checks in at least every 15 seconds while it has service, so this usually means that rider lost service.
+
+:::release 1.0.3
+A live rider's dot has a bold white ring (the leader's is solid blue). A last-seen rider's dot is a thin grey ring instead.
+:::
 
 If **everyone** suddenly shows as last seen, it's probably your phone. After about 35 seconds without hearing from the server, Ride Mode shows **No Service. Riders Show Where They Were Last Seen**. It doesn't mark the others as lost because of your own dropout.
 

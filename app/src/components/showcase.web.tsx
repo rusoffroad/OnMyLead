@@ -258,7 +258,7 @@ export function Showcase() {
             <h2 id="signal-title" className="section-title">Made for Where the Signal Ends</h2>
             <p>
               Trails rarely have service, so OnMyLead plans for it. Live positions need a signal, so every dot says how
-              fresh it is: solid when it’s live, hollow when it only marks where a rider was last seen, so a stale dot
+              fresh it is: a bold white ring when it’s live, a thin grey ring when it only marks where a rider was last seen, so a stale dot
               never reads as “they’re right here.”
             </p>
             <ul className="ticks">
@@ -935,7 +935,8 @@ const CSS = `
 .dot-leader text { font-size: 24px; }
 .dot-you circle { fill: var(--red); stroke: var(--text); stroke-width: 3.5; }
 .dot-you text { font-size: 15px; }
-.dot-rider { fill: var(--rider); stroke: var(--night); stroke-width: 3; }
+/* Riders as the app draws them: a bold white ring around a dark centre. */
+.dot-rider { fill: var(--night); stroke: #fff; stroke-width: 4; }
 .dot-sweep { fill: var(--sweep); stroke: var(--night); stroke-width: 3; }
 .straggler circle { fill: var(--rider); stroke: var(--night); stroke-width: 3; transition: fill 0.3s, stroke 0.3s; }
 .straggler.lost circle { fill: rgba(10, 22, 38, 0.85); stroke: var(--dust); stroke-width: 4; }

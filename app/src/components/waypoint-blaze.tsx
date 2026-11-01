@@ -3,6 +3,7 @@ import Svg, { Circle, Path, Polygon, Rect } from 'react-native-svg';
 
 import { Colors, font } from '@/constants/theme';
 import { stopNumber, type Waypoint, type WaypointKind } from '@/core/waypoints';
+import { MarkerBody } from './marker-body';
 
 /** One small line drawing per kind, on a 24 grid. */
 const GLYPHS: Record<WaypointKind, string[]> = {
@@ -61,12 +62,12 @@ const PIN_W = 260;
 /** A waypoint on a live map: the blaze with its name beside it. */
 export function WaypointPin({ name, kind, shared }: { name: string; kind: WaypointKind; shared: boolean }) {
   return (
-    <View style={styles.pin}>
+    <MarkerBody style={styles.pin}>
       <WaypointBlaze kind={kind} shared={shared} size={30} />
       <View style={[styles.label, shared && styles.sharedLabel]}>
         <Text style={styles.name} numberOfLines={1}>{name}</Text>
       </View>
-    </View>
+    </MarkerBody>
   );
 }
 
@@ -113,13 +114,13 @@ export function StopSign({ n, size = 34 }: { n: number | null; size?: number }) 
 /** A planned stop on a live map: the stop sign, with its name and planned time beside it. */
 export function StopPin({ name, n, time }: { name: string; n: number | null; time?: string | null }) {
   return (
-    <View style={styles.pin}>
+    <MarkerBody style={styles.pin}>
       <StopSign n={n} size={38} />
       <View style={[styles.label, styles.stopLabel]}>
         <Text style={styles.stopName} numberOfLines={1}>{name}</Text>
         {time ? <Text style={styles.stopTime}>{time}</Text> : null}
       </View>
-    </View>
+    </MarkerBody>
   );
 }
 

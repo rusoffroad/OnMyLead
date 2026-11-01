@@ -39,8 +39,10 @@ export function GroupMap({
         id: r.id,
         lat: r.lat!,
         lng: r.lng!,
-        // Only a live fix gets the rider's colour; a last-seen point is greyed out.
-        color: r.freshness?.state !== 'live' ? Colors.backgroundSelected : r.role === 'leader' ? RideColors.leader : RideColors.rider,
+        // As in the app: a live rider is a white ring on a dark centre, the leader solid blue; a
+        // last-seen point is greyed out.
+        color: r.freshness?.state !== 'live' ? Colors.backgroundSelected : r.role === 'leader' ? RideColors.leader : Colors.background,
+        ring: r.freshness?.state === 'live' ? '#FFFFFF' : undefined,
         big: r.role === 'leader',
         name: r.name,
       }));
