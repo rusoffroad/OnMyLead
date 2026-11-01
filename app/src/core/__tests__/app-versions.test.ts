@@ -1,0 +1,104 @@
+import { describe, expect, it } from 'vitest';
+
+import { NO_SETTINGS, parseAppSettings } from '../app-settings';
+import {
+  compareVersions, isVersion, NO_VERSIONS, noticeForVersion, parseAppVersions, updateState, versionsProblem, versionsValue,
+  type AppVersions,
+} from '../app-versions';
+
+const v = (o: Partial<AppVersions>): AppVersions => ({ ...NO_VERSIONS, ...o });
+
+describe('compareVersions', () => {
+  it('compares number by number', () => {
+    expect(compareVersions('1.0.10', '1.0.9')).toBe(1);
+    expect(compareVersions('1.0.2', '1.0.3')).toBe(-1);
+    expect(compareVersions('1.0', '1.0.0')).toBe(0);
+    expect(compareVersions('2', '1.9.9')).toBe(1);
+    expect(compareVersions(' 1.1 ', '1.1.0')).toBe(0);
+  });
+
+  it('knows a version when it sees one', () => {
+    expect(isVersion('1.0.3')).toBe(true);
+    expect(isVersion('1')).toBe(true);
+    expect(isVersion('1.0.3.4')).toBe(false);
+    expect(isVersion('v1.0')).toBe(false);
+    expect(isVersion('')).toBe(false);
+    expect(isVersion(3)).toBe(false);
+  });
+});
+
+describe('parseAppVersions', () => {
+  it('reads both stores and the version notice', () => {
+    expect(parseAppVersions({
+      ios: { minimum: '1.0.2', latest: '1.0.4' },
+      android: { latest: '1.0.4' },
+      notice: { versions: ['1.0.3', 'bad'], text: ' Chat is broken in 1.0.3 ', until: '2026-11-10T00:00:00Z' },
+    })).toEqual({
+      ios: { minimum: '1.0.2', latest: '1.0.4' },
+      android: { minimum: null, latest: '1.0.4' },
+      notice: { versions: ['1.0.3'], text: 'Chat is broken in 1.0.3', until: '2026-11-10T00:00:00Z' },
+    });
+  });
+
+  it('drops anything malformed instead of failing', () => {
+    expect(parseAppVersions(null)).toEqual(NO_VERSIONS);
+    expect(parseAppVersions([])).toEqual(NO_VERSIONS);
+    expect(parseAppVersions({ ios: { minimum: 'soon' }, notice: { versions: [], text: 'x' } })).toEqual(NO_VERSIONS);
+    expect(parseAppVersions({ notice: { versions: ['1.0.3'], text: '' } }).notice).toBeNull();
+  });
+
+  it('comes with the other app settings, and older servers send none', () => {
+    expect(parseAppSettings({ flags: {} }).versions).toEqual(NO_VERSIONS);
+    expect(NO_SETTINGS.versions).toEqual(NO_VERSIONS);
+    expect(parseAppSettings({ app_versions: { android: { minimum: '1.0.1' } } }).versions.android.minimum).toBe('1.0.1');
+  });
+});
+
+describe('updateState', () => {
+  const controls = v({ ios: { minimum: '1.0.2', latest: '1.0.4' }, android: { minimum: null, latest: '1.0.4' } });
+
+  it('asks riders below the minimum to update', () => {
+    expect(updateState(controls, 'ios', '1.0.1')).toEqual({ kind: 'required', minimum: '1.0.2' });
+  });
+
+  it('tells riders when a newer version is waiting', () => {
+    expect(updateState(controls, 'ios', '1.0.3')).toEqual({ kind: 'available', latest: '1.0.4' });
+    expect(updateState(controls, 'android', '1.0.1')).toEqual({ kind: 'available', latest: '1.0.4' });
+  });
+
+  it('shows nothing when up to date, on the website, or without a version', () => {
+    expect(updateState(controls, 'ios', '1.0.4')).toEqual({ kind: 'none' });
+    expect(updateState(controls, 'ios', '1.1')).toEqual({ kind: 'none' });
+    expect(updateState(controls, 'web', '1.0.0')).toEqual({ kind: 'none' });
+    expect(updateState(controls, 'android', null)).toEqual({ kind: 'none' });
+    expect(updateState(NO_VERSIONS, 'ios', '1.0.0')).toEqual({ kind: 'none' });
+  });
+});
+
+describe('noticeForVersion', () => {
+  const now = Date.parse('2026-11-05T12:00:00Z');
+  const controls = v({ notice: { versions: ['1.0.3'], text: 'Fix coming', until: '2026-11-06T00:00:00Z' } });
+
+  it('shows only on the listed versions', () => {
+    expect(noticeForVersion(controls, 'ios', '1.0.3', now)?.text).toBe('Fix coming');
+    expect(noticeForVersion(controls, 'android', '1.0.3', now)?.text).toBe('Fix coming');
+    expect(noticeForVersion(controls, 'ios', '1.0.4', now)).toBeNull();
+    expect(noticeForVersion(controls, 'web', '1.0.3', now)).toBeNull();
+  });
+
+  it('hides once its time is up', () => {
+    expect(noticeForVersion(controls, 'ios', '1.0.3', Date.parse('2026-11-06T00:00:01Z'))).toBeNull();
+  });
+});
+
+describe('versionsProblem and versionsValue', () => {
+  it('refuses a minimum newer than the latest', () => {
+    expect(versionsProblem(v({ ios: { minimum: '1.0.5', latest: '1.0.4' } }))).toMatch(/iPhone and iPad/);
+    expect(versionsProblem(v({ android: { minimum: '1.0.4', latest: '1.0.4' } }))).toBeNull();
+  });
+
+  it('saves only what is set', () => {
+    expect(versionsValue(NO_VERSIONS)).toEqual({});
+    expect(versionsValue(v({ android: { minimum: '1.0.2', latest: null } }))).toEqual({ android: { minimum: '1.0.2' } });
+  });
+});

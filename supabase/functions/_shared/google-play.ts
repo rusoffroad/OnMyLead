@@ -58,8 +58,8 @@ async function signingKey(pem: string): Promise<CryptoKey> {
 
 let cached: { token: string; until: number } | null = null;
 
-/** An OAuth access token for the Android Publisher API, kept until a minute before it ends. */
-async function accessToken(): Promise<string> {
+/** An OAuth access token for the Android Publisher API, kept until a minute before it ends (also used by store-releases). */
+export async function accessToken(): Promise<string> {
   if (cached && cached.until > Date.now()) return cached.token;
   const sa = serviceAccount();
   if (!sa) throw new Error('PLAY_SERVICE_ACCOUNT_JSON is not set');

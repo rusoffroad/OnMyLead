@@ -158,5 +158,9 @@ and an Android tablet (or emulators with mock locations), every rider seeing eve
 - **Google Play:** one app for phones and tablets, package `com.rusoffroad.onmylead.app`, Play App
   Signing, Android App Bundle, internal testing track first. Chris's account steps:
   `docs/google-play-account.md`.
+- **Small releases first:** Google Play production releases go out as a staged rollout (10% first)
+  and App Store versions with phased release on, so a broken update reaches few riders and can be
+  halted or paused from Admin > Releases. The version's `help/release.json` entry records the exact
+  commit built. A broken release: `docs/release-rollback.md`.
 - Nothing is submitted, released or deployed to production without Chris's typed OK.
 - Store listings and screenshots live in `store/` (`store/app-store/`, `store/google-play/`).

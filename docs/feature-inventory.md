@@ -13,7 +13,7 @@ Per-device status for each feature: `docs/feature-parity.md`.
 | Platform code | 20 `*.web.ts(x)` files; no `*.ios` / `*.android` files; ~77 `Platform.OS` branches (mostly web vs native) | `app/src/lib/`, `app/src/components/` |
 | Native extras | CarPlay Expo module (Swift, Apple only, off); config plugins: Starlink local network (iOS + Android), CarPlay, Sentry, scene lifecycle, push entitlement | `app/modules/`, `app/plugins/` |
 | Backend | One Supabase project: 29 migrations, RLS on every table, realtime, pg_net, pg_cron, Vault | `supabase/migrations/` |
-| Edge functions | notify-ride-message, appstore-verify, appstore-notifications, admin-api, admin-integrations, store-downloads, store-reviews, contact-form, delete-account | `supabase/functions/` |
+| Edge functions | notify-ride-message, appstore-verify, appstore-notifications, admin-api, admin-integrations, store-downloads, store-reviews, store-releases, contact-form, delete-account | `supabase/functions/` |
 | Database tests | 18 SQL test files + a concurrency test on real Postgres | `supabase/tests/` |
 | Admin Dashboard | Web-only routes at onmylead.com/admin, Admin + authenticator code (aal2) | `app/src/app/admin/` |
 | Website | Showcase home, ride/group link previews, web ride creation, /contact /support /terms /privacy, Help Center | `app/src/components/showcase.web.tsx`, `help/` |
@@ -162,7 +162,9 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   replies posted to the store), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
   Subscriptions, Promo Codes (App Store Connect offer codes), Reports, Analytics, App Health
   (Sentry, push tokens by iPhone / Android, server checks), Exports, Settings (trial days, feature
-  plans, flags, banners), Audit log, Contact messages, Help Center editor.
+  plans, flags, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
+  the App Store phased release, minimum and latest app version, a notice for chosen versions;
+  `docs/release-rollback.md`), Audit log, Contact messages, Help Center editor.
 - Store data is Apple-only today (`app_store_subscriptions`, `app_store_events`, revenue, promo
   codes).
 
