@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useRef, type Ref } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
@@ -64,6 +64,11 @@ export function GroupMap({
   const map = useRef<MapView>(null);
   const fitted = useRef<'no' | 'riders' | 'route'>('no');
   const size = useRef({ width: 0, height: 0 });
+  // How far the map is turned from north, so heading arrows stay true on a rotated map.
+  const [mapHeading, setMapHeading] = useState(0);
+  const readHeading = () => {
+    map.current?.getCamera().then((c) => setMapHeading(Math.round(c.heading ?? 0))).catch(() => {});
+  };
 
   useImperativeHandle(ref, () => ({
     async centerOn(p, inset) {
@@ -108,6 +113,10 @@ export function GroupMap({
     <MapView ref={map} style={StyleSheet.absoluteFill}
       onLayout={(e) => { size.current = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height }; }}
       showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}
+      onRegionChangeComplete={(region) => {
+        trail?.mapProps.onRegionChangeComplete(region);
+        readHeading();
+      }}
       onLongPress={onLongPressMap ? (e) => onLongPressMap({ lat: e.nativeEvent.coordinate.latitude, lng: e.nativeEvent.coordinate.longitude }) : undefined}>
       {trail ? <TrailTiles trail={trail} /> : null}
       {route && route.length > 1 ? (
@@ -146,7 +155,7 @@ export function GroupMap({
             anchor={{ x: 0.5, y: 0.5 }}
             onPress={() => onPressRider?.(r.id)}
             zIndex={r.breakdown ? 6 : r.role === 'leader' ? 5 : 4}>
-            <RiderPin rider={r} />
+            <RiderPin rider={r} mapHeading={mapHeading} />
           </Marker>
         ))}
       {regroup ? (

@@ -10,6 +10,7 @@ sources:
   - app/src/app/r/[code].tsx
   - app/src/components/group-map.tsx
   - app/src/components/group-map-types.ts
+  - app/src/core/heading.ts
   - app/src/components/rider-dot.tsx
   - app/src/components/rider-pin.tsx
   - app/src/components/rider-list.tsx
@@ -69,6 +70,8 @@ The leader is the one bigger blue dot, so you can find them at a glance.
 
 :::release 1.0.3
 Each rider is a white ring with a dark center and a dark name tag, easy to spot on satellite, topo and the dark map. The leader is the bigger solid blue dot with a blue name tag, so you can find them at a glance. Every dot sits on the rider's exact position and stays there as you zoom in and out.
+
+When a rider is moving, a small white arrow on the edge of their dot points the way they're heading, even when you turn the map. A rider who is stopped, or whose position is only last seen, has no arrow, because a phone can only tell direction while it moves.
 :::
 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
@@ -104,6 +107,7 @@ A dot only looks live when the phone behind it is actually checking in. A sharin
 | Faint ring, **Not Sharing** | The rider is on the ride but isn't sharing their location. |
 | Yellow or red ring around a dot | Ride Bubble thinks the rider is separating from the group. |
 | Amber wrench on a dot | The rider tapped **Mechanical Issue**. |
+| White arrow on a dot (version 1.0.3 and later) | The rider is moving; the arrow points the way they're heading. |
 
 ## See Every Rider
 

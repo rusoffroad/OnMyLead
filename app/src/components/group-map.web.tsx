@@ -43,6 +43,7 @@ export function GroupMap({
         // last-seen point is greyed out.
         color: r.freshness?.state !== 'live' ? Colors.backgroundSelected : r.role === 'leader' ? RideColors.leader : Colors.background,
         ring: r.freshness?.state === 'live' ? '#FFFFFF' : undefined,
+        heading: r.headingDeg ?? null,
         big: r.role === 'leader',
         name: r.name,
       }));

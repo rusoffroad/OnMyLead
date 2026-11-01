@@ -2,8 +2,8 @@
   {
     "version": "1.0.3",
     "title": "Exact Rider Dots and Easier Ride Times",
-    "intro": "Rider dots sit on each rider's exact position at every zoom and are easier to see, and you pick a ride's time with a few taps instead of typing it.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots in Ride Mode stay on each rider's exact position when you zoom in and out.\n• Easier-to-see rider dots: a white ring for each rider and a bigger solid blue dot for the leader.\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".",
+    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading, and you pick a ride's time with a few taps instead of typing it.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots in Ride Mode stay on each rider's exact position when you zoom in and out.\n• Easier-to-see rider dots, with an arrow showing which way each moving rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".",
     "apple": null,
     "google": null,
     "notes": [
@@ -14,6 +14,10 @@
       {
         "kind": "improved",
         "text": "Rider dots are easier to see on satellite, topo and the dark map: each rider is a bold white ring with a dark name tag, and the leader is a bigger solid blue dot with a blue name tag."
+      },
+      {
+        "kind": "new",
+        "text": "A small arrow on each moving rider's dot shows which way they're heading, and it stays true when you turn the map. Stopped riders show a plain dot."
       },
       {
         "kind": "improved",

@@ -6,7 +6,7 @@ import type { LatLng } from '@/core/geo';
 import { projectRoute } from '@/core/summary';
 import { octagon } from './waypoint-blaze';
 
-export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string; /** A waypoint: drawn as a trail blaze. */ diamond?: boolean; /** A planned stop: a numbered stop sign. */ stop?: number; /** Outline colour, for a live rider's white ring. */ ring?: string };
+export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string; /** A waypoint: drawn as a trail blaze. */ diamond?: boolean; /** A planned stop: a numbered stop sign. */ stop?: number; /** Outline colour, for a live rider's white ring. */ ring?: string; /** Compass direction a moving rider is heading: a small arrow beside the dot. */ heading?: number | null };
 
 /**
  * The route as a drawing on a navy grid, no map tiles: it works offline and on the web, and is
@@ -76,7 +76,17 @@ export function RouteSketch({
               ) : d.diamond ? (
                 <Rect x={p.x - 6.5} y={p.y - 6.5} width={13} height={13} rx={1.5} fill={d.color} stroke={Colors.background} strokeWidth={2} transform={`rotate(45 ${p.x} ${p.y})`} />
               ) : (
+                <>
+                {d.heading != null ? (
+                  // North is up on the sketch, so the compass heading turns the wedge directly.
+                  <Polygon
+                    points={`${p.x - 4.5},${p.y - r - 1} ${p.x},${p.y - r - 7} ${p.x + 4.5},${p.y - r - 1}`}
+                    fill="#FFFFFF" stroke={Colors.background} strokeWidth={1.5} strokeLinejoin="round"
+                    transform={`rotate(${Math.round(d.heading)} ${p.x} ${p.y})`}
+                  />
+                ) : null}
                 <Circle cx={p.x} cy={p.y} r={r} fill={d.color} stroke={d.ring ?? (d.mine || d.big ? Colors.text : Colors.background)} strokeWidth={d.big || d.ring ? 2.5 : 2} />
+                </>
               )}
               {d.name
                 ? [Colors.background, d.big ? Colors.text : Colors.textSecondary].map((c, k) => (
