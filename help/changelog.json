@@ -2,6 +2,40 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "ride-mode",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "rider-dots-exact-position",
+    "why": "Version 1.0.3 fixes rider dots in Ride Mode drifting off the rider's real position as the map zooms, and restyles them: a white ring for each rider and a bigger solid blue dot for the leader, with dark name tags. The new look is described in 1.0.3 release blocks. Moving riders' dots also get a heading arrow (from the GPS course they already share), described in the same 1.0.3 block."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "find-a-ride",
+      "getting-started",
+      "map-layers",
+      "ride-bubble",
+      "route-builder",
+      "waypoints-and-planned-stops",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "location-sharing",
+      "ride-chat",
+      "status-buttons",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "rider-dots-exact-position",
+    "why": "These guides list map pin or website files as sources. Their pins (waypoints, planned stops, search results, Find ride pins) are now placed exactly on their spot, and the website's sample rider dots match the new look; nothing they describe changes. Ride Mode's screen file also changed only to pass each rider's heading to the map, so the Ride Mode guides that list it describe nothing new."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "emergency-and-safety"
     ],
     "kind": "update",

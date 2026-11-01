@@ -5,6 +5,7 @@ import { Colors, font, Radius } from '@/constants/theme';
 import type { Bounds } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
 import type { Ride } from '@/lib/types';
+import { MarkerBody } from './marker-body';
 
 /** What the Find a ride map needs, shared by the native map and the web one. */
 export type RidesMapProps = {
@@ -34,10 +35,10 @@ export const meetsLabel = (r: Pick<Ride, 'meet_at'>) =>
 export function RidePin({ ride }: { ride: Pick<Ride, 'status'> }) {
   const live = ride.status === 'live';
   return (
-    <View style={styles.pinWrap}>
+    <MarkerBody style={styles.pinWrap}>
       {live ? <View style={[styles.halo, { backgroundColor: Colors.accent }]} /> : null}
       <View style={[styles.pin, { backgroundColor: pinColor(ride) }]} />
-    </View>
+    </MarkerBody>
   );
 }
 
