@@ -23,12 +23,13 @@
       "promo-codes",
       "ride-chat",
       "troubleshooting",
-      "emergency-and-safety"
+      "emergency-and-safety",
+      "create-a-ride-on-the-website"
     ],
     "kind": "update",
     "by": "pr",
     "ref": "out-riding",
-    "why": "Out Riding touched shared files these articles list (the Groups tab, notification topics, the app layout and message pop-ups). Nothing in them changes for riders."
+    "why": "Out Riding touched shared files these articles list (the Groups tab, notification topics, the app layout, message pop-ups and the website showcase). Nothing in them changes for riders."
   },
   {
     "date": "2026-11-01",
