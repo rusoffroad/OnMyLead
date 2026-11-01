@@ -29,6 +29,9 @@ export function GroupMap({
   onPressWaypoint?: (w: Waypoint) => void;
   onLongPressMap?: (p: LatLng) => void;
   edgePadding?: { top: number; right: number; bottom: number; left: number };
+  fallback?: LatLng | null;
+  onReady?: () => void;
+  onUserMove?: () => void;
   /** No live map on the web, so Ride Mode shows no center-on-me button there. */
   ref?: Ref<GroupMapHandle>;
 }) {

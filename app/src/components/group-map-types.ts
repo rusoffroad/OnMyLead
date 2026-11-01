@@ -21,6 +21,10 @@ export type MapRider = {
 
 /** What a screen can ask of the live map. */
 export type GroupMapHandle = {
-  /** Move the map (keeping its zoom) so `p` sits in the middle of the map left open by `inset`. */
-  centerOn: (p: LatLng, inset: Inset) => Promise<void>;
+  /**
+   * Move the map so `p` sits in the middle of the map left open by `inset`, keeping the zoom, or
+   * zooming in to riding distance when the map is zoomed far out (see core/map-center isFarOut).
+   * `animated: false` jumps there (used when Ride Mode opens).
+   */
+  centerOn: (p: LatLng, inset: Inset, opts?: { animated?: boolean }) => Promise<void>;
 };

@@ -43,3 +43,59 @@ function mercatorStretch(lat: number) {
 function wrapLng(lng: number) {
   return ((((lng + 180) % 360) + 360) % 360) - 180;
 }
+
+/** How wide (m) the map opens around a rider: about 10 miles, close enough that trails show. */
+export const RIDE_VIEW_M = 16_000;
+
+/**
+ * Wider than this (map zoom, see core/trails mapZoom) is "zoomed far out": about 30 miles across
+ * a phone. Centering on a rider from there also zooms in to RIDE_VIEW_M, since a dot over a whole
+ * state or continent tells them nothing.
+ */
+export const FAR_OUT_ZOOM = 10;
+
+/** Two corners RIDE_VIEW_M apart with `p` in the middle, for fitting the map to. */
+export function rideViewCorners(p: LatLng, spanM = RIDE_VIEW_M): [LatLng, LatLng] {
+  const dLat = spanM / 2 / 111_320;
+  const lat = Math.max(-85, Math.min(85, p.lat));
+  const dLng = dLat / Math.max(0.05, Math.cos((lat * Math.PI) / 180));
+  return [
+    { lat: Math.max(-85, lat - dLat), lng: wrapLng(p.lng - dLng) },
+    { lat: Math.min(85, lat + dLat), lng: wrapLng(p.lng + dLng) },
+  ];
+}
+
+/**
+ * Whether the map is too far out to just slide over to a rider. `region` is the map's last
+ * reported region, or null before it has reported one (a fresh map opens over the whole world).
+ */
+export function isFarOut(region: { longitudeDelta: number } | null, mapWidthPts: number): boolean {
+  if (!region) return true;
+  const zoom = Math.log2((360 / Math.max(1e-6, region.longitudeDelta)) * (Math.max(1, mapWidthPts) / 256));
+  return zoom < FAR_OUT_ZOOM;
+}
+
+/**
+ * The padding to fit the map with so the fitted spot lands in the open map between the panels.
+ * An axis the panels leave too little of is not padded at all (the map's own middle is used, as
+ * in openMapCenter); padding past the map's size makes Android's map refuse to move.
+ */
+export function fitInset(size: { width: number; height: number }, inset: Inset): Inset {
+  const clamp = (n: number) => Math.max(0, Math.round(n));
+  const w = size.width - inset.left - inset.right;
+  const h = size.height - inset.top - inset.bottom;
+  return {
+    top: h >= MIN_OPEN_MAP ? clamp(inset.top) : 0,
+    bottom: h >= MIN_OPEN_MAP ? clamp(inset.bottom) : 0,
+    left: w >= MIN_OPEN_MAP ? clamp(inset.left) : 0,
+    right: w >= MIN_OPEN_MAP ? clamp(inset.right) : 0,
+  };
+}
+
+/**
+ * What Ride Mode's map does when it opens, once per visit: center on the rider's own spot as soon
+ * as one is known and the map is ready, unless the rider has already moved the map themselves.
+ */
+export function shouldCenterOnOpen(s: { done: boolean; userMoved: boolean; mapReady: boolean; at: LatLng | null }): boolean {
+  return !s.done && !s.userMoved && s.mapReady && s.at != null;
+}

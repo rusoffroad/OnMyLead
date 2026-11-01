@@ -3,7 +3,7 @@
     "version": "1.0.3",
     "title": "Exact Rider Dots and Better Maps on the Trail",
     "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, and Out Riding shows which riders are out near you so you can message them.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Badges and ranks for leading, riding and miles.\n• Out Riding: see who's out near you and message them.\n• Rider dots stay put as you zoom and show heading.\n• Full Map, and every rider in order on the route line.\n• Center on Me.\n• Trails show from farther out.\n• Faster ride time picker; plan rides in 2027+.\n• Share your location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Badges and ranks for leading, riding and miles.\n• Out Riding: see who's out near you and message them.\n• Rider dots stay put as you zoom and show heading.\n• Full Map, and every rider in order on the route line.\n• Ride Mode opens on you; Center on Me.\n• Trails show from farther out.\n• Faster ride time picker; plan rides in 2027+.\n• Share your location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
     "apple": null,
     "google": null,
     "notes": [
@@ -29,7 +29,7 @@
       },
       {
         "kind": "new",
-        "text": "Ride Mode has a Center on Me button. Tap it to bring the map back to your location without changing the zoom."
+        "text": "Ride Mode has a Center on Me button. Tap it to bring the map back to your location. It keeps your zoom, and zooms in to riding distance if you were zoomed far out."
       },
       {
         "kind": "new",
@@ -87,6 +87,10 @@
         "kind": "fixed",
         "text": "Opening Help and Support, Contact Us, Terms or Privacy no longer shows an \"Expo Head\" alert.",
         "devices": "iphone-ipad"
+      },
+      {
+        "kind": "fixed",
+        "text": "Ride Mode's map opens centered on you, zoomed in close enough to see nearby trails, instead of over a random spot. If your phone is still finding you, the map centers as soon as it does, unless you've already moved it."
       }
     ]
   },
