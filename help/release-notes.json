@@ -2,8 +2,8 @@
   {
     "version": "1.0.3",
     "title": "Exact Rider Dots and Easier Ride Times",
-    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Pick a ride's time with a few taps, and swipe down to close any sheet.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots in Ride Mode stay on each rider's exact position when you zoom in and out.\n• Easier-to-see rider dots, with an arrow showing which way each moving rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute.\n• Swipe down to close any sheet, like a new waypoint or the riders list.",
+    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Pick a ride's time with a few taps, swipe down to close any sheet, and the Emergency screen shows you exactly when your alert is going out.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Rider dots stay on each rider's exact position as you zoom, are easier to see, and show an arrow for which way each rider is heading.\n• Pick ride times with a few taps: AM or PM, the hour and the minute.\n• Swipe down to close any sheet.\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out.",
     "apple": null,
     "google": null,
     "notes": [
@@ -26,6 +26,10 @@
       {
         "kind": "improved",
         "text": "Swipe down to close any sheet: a new waypoint, Riders, Directions, Share Your Location, Emergency, a report, the Pro prompt and the ride's QR code. In a long sheet the first swipe scrolls back to the top, and if the keyboard is up it puts the keyboard away first."
+      },
+      {
+        "kind": "fixed",
+        "text": "Emergency in Ride Mode: Alert My Group now fills a bar while you hold it and says Keep Holding, so it no longer looks like nothing happens. A quick tap tells you the alert was not sent, and the screen closes as soon as the alert goes out so you can see who has it."
       }
     ]
   },
