@@ -50,6 +50,10 @@ describe('push tap target', () => {
     expect(tapTarget({ type: 'friend_accept', userId: 'u1' })).toBe('/friends');
   });
 
+  it('opens My Trails when a shared trail was hidden', () => {
+    expect(tapTarget({ type: 'trail_hidden', trailId: 't1' } as never)).toBe('/nav/trails');
+  });
+
   it('routes the same from every delivery shape', () => {
     const android = { title: 'Ride Chat', message: 'Hi', body: JSON.stringify(chat) };
     expect(tapTarget(tapData(android))).toBe(tapTarget(tapData(chat)));

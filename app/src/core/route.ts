@@ -10,7 +10,8 @@
  */
 import { distanceM, formatDistance, metersToMiles, type LatLng } from './geo';
 
-export type RouteSource = 'drawn' | 'gpx';
+/** 'trail': one of the rider's own Navigation Mode trails (free; only 'gpx' imports need Pro). Older builds read it as 'drawn'. */
+export type RouteSource = 'drawn' | 'gpx' | 'trail';
 
 export type RideRoute = {
   /** The full line riders follow. */
@@ -184,7 +185,7 @@ export function fromStored(geojson: unknown, waypoints: unknown): RideRoute | nu
   return {
     points,
     waypoints: pairs(waypoints),
-    source: props.source === 'gpx' ? 'gpx' : 'drawn',
+    source: props.source === 'gpx' || props.source === 'trail' ? props.source : 'drawn',
     name: typeof props.name === 'string' ? props.name : null,
     lengthM: lineLengthM(points),
     updatedAt: typeof props.updated_at === 'string' ? props.updated_at : null,

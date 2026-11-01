@@ -4,7 +4,7 @@ summary: Bring in a track from Gaia, onX or any GPX file and use it as your ride
 category: routes-maps
 order: 20
 release: "1.0"
-updated: 2026-10-18
+updated: 2026-11-01
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/core/route.ts
@@ -34,6 +34,10 @@ You need to be the ride's organizer or a co-organizer.
 5. Tap **Save Route**.
 
 If you're on the Free plan, tapping **Import GPX** shows what Pro includes instead of opening the file picker.
+
+:::release 1.0.3
+A trail you recorded or saved in [Navigate](/help/navigation-mode) doesn't need a GPX file: tap **Use One of My Trails** instead. That's also a Pro feature.
+:::
 
 ## What Gets Imported
 

@@ -5,12 +5,15 @@ import Svg, { Path } from 'react-native-svg';
 
 import { Colors, font, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_INK, vehicleLabel, type PublicTrail } from '@/core/nav-trails';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import { TOPO_ATTRIBUTION, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
+import { RateTrailSheet } from './rate-trail-sheet';
+import { StarScore } from './stars';
 
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
@@ -23,7 +26,7 @@ const WEB = Platform.OS === 'web';
  * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth,
+  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden,
 }: {
   trail: TrailMap;
   /** Where the layers button sits. */
@@ -36,8 +39,13 @@ export function TrailMapOverlay({
   lookupHint?: string;
   /** On a tablet the trail card sits on the right at this width, clear of the panels on the left. */
   cardWidth?: number;
+  /** Navigation Mode follows a tapped rider trail itself; elsewhere Navigate opens Navigation Mode on it. */
+  onFollow?: (t: PublicTrail) => void;
+  /** Meters of a rider trail covered in Navigation Mode (for the rating sheet). */
+  ridden?: (t: PublicTrail) => number | null;
 }) {
   const [open, setOpen] = useState(false);
+  const [rating, setRating] = useState<PublicTrail | null>(null);
   const credit = [trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null, ...(trail.trails ? [...TRAIL_SOURCE_IDS.map((id) => TRAIL_SOURCES[id].attribution), OSM_ATTRIBUTION] : [])]
     .filter(Boolean)
     .join(', ');
@@ -76,11 +84,27 @@ export function TrailMapOverlay({
               <ActivityIndicator color={SAND} size="small" />
               <Text style={styles.lookingText}>Checking that trail</Text>
             </View>
+          ) : trail.picked ? (
+            <RiderTrailCard
+              t={trail.picked}
+              onClose={() => trail.pick(null)}
+              onRate={() => setRating(trail.picked)}
+              onFollow={() => (onFollow ? onFollow(trail.picked!) : router.push(`/nav?follow=${trail.picked!.id}`))}
+            />
           ) : trail.info ? (
             <TrailCard info={trail.info} onClose={trail.clearInfo} />
           ) : null}
         </View>
       ) : null}
+      <RateTrailSheet
+        trail={rating}
+        ridden={rating ? ridden?.(rating) : null}
+        onClose={() => setRating(null)}
+        onRated={(status) => {
+          trail.reloadRiderTrails();
+          if (status === 'hidden') trail.pick(null);
+        }}
+      />
     </>
   );
 }
@@ -133,6 +157,23 @@ function LayersPanel({
           </Text>
         </View>
       ) : null}
+
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.riderTrailsOn }} onPress={() => trail.setRiderTrails(!trail.riderTrailsOn)} style={styles.row}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <View style={styles.legendItem}>
+            <Text style={styles.rowTitle}>Rider Trails</Text>
+            <LegendLine color={RIDER_TRAIL_INK} label="" dotted />
+          </View>
+          <Text style={styles.rowSub}>Trails OnMyLead riders mapped and shared. User submitted, so check them against signs.</Text>
+        </View>
+        <Switch
+          value={trail.riderTrailsOn}
+          onValueChange={trail.setRiderTrails}
+          trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }}
+          thumbColor={Colors.text}
+          ios_backgroundColor={Colors.backgroundSelected}
+        />
+      </Pressable>
 
       {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} /> : null}
       {!WEB ? (
@@ -236,14 +277,71 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
   );
 }
 
-function LegendLine({ color, label, dashed, closed }: { color: string; label: string; dashed?: boolean; closed?: boolean }) {
+function LegendLine({ color, label, dashed, closed, dotted }: { color: string; label: string; dashed?: boolean; closed?: boolean; dotted?: boolean }) {
   return (
     <View style={styles.legendItem}>
       <Svg width={28} height={10}>
         <Path d="M2 5H26" stroke={Colors.background} strokeWidth={7} strokeLinecap="round" />
-        <Path d="M2 5H26" stroke={color} strokeWidth={3.2} strokeDasharray={closed ? '3.5 3.5' : dashed ? '6 3.5' : undefined} />
+        <Path d="M3 5H25" stroke={color} strokeWidth={dotted ? 3.6 : 3.2} strokeLinecap={dotted ? 'round' : 'butt'} strokeDasharray={dotted ? '0.1 6' : closed ? '3.5 3.5' : dashed ? '6 3.5' : undefined} />
       </Svg>
-      <Text style={styles.legendText}>{label}</Text>
+      {label ? <Text style={styles.legendText}>{label}</Text> : null}
+    </View>
+  );
+}
+
+/**
+ * A trail another rider mapped and shared. It says plainly that it's user submitted (mint, like its
+ * dotted line), who mapped it and when, its ratings, and offers Rate, Navigate and Details.
+ */
+export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrail; onClose: () => void; onRate: () => void; onFollow: () => void }) {
+  const facts = [feetOrMiles(t.lengthM), t.vehicles.map(vehicleLabel).join(', ')].filter(Boolean).join('   ');
+  return (
+    <View style={[styles.card, styles.riderCard]} accessibilityLiveRegion="polite">
+      <View style={styles.cardHead}>
+        <View style={{ flex: 1, gap: 3 }}>
+          <View style={styles.userRow}>
+            <Svg width={22} height={8}><Path d="M3 4H19" stroke={RIDER_TRAIL_INK} strokeWidth={3.6} strokeLinecap="round" strokeDasharray="0.1 5.5" /></Svg>
+            <Text style={styles.userText}>User Submitted Trail</Text>
+          </View>
+          <Text style={styles.cardTitle} numberOfLines={2}>{t.name}</Text>
+          <Text style={styles.rowSub} numberOfLines={1}>{mappedBy(t)}</Text>
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={10} onPress={onClose} style={styles.close}>
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <Path d="M6 6l12 12M18 6L6 18" stroke={Colors.textSecondary} strokeWidth={2.5} strokeLinecap="round" />
+          </Svg>
+        </Pressable>
+      </View>
+      <View style={styles.userRow}>
+        <View style={[styles.diff, { borderColor: difficultyColor(t.difficulty) }]}>
+          <View style={[styles.diffDot, { backgroundColor: difficultyColor(t.difficulty) }]} />
+          <Text style={styles.diffText}>{difficultyLabel(t.difficulty)}</Text>
+        </View>
+        <Text style={[styles.facts, { flex: 1 }]} numberOfLines={2}>{facts}</Text>
+      </View>
+      <View style={styles.scores}>
+        <View style={styles.scoreCol}>
+          <Text style={styles.scoreLabel}>Quality</Text>
+          <StarScore average={t.quality} count={t.qualityCount} color="#F5C451" empty="Not Rated" />
+        </View>
+        <View style={styles.scoreCol}>
+          <Text style={styles.scoreLabel}>Line Accuracy</Text>
+          <StarScore average={t.average} count={t.ratingCount} color={RIDER_TRAIL_INK} empty="Not Rated" />
+        </View>
+      </View>
+      <View style={styles.actions}>
+        {!t.mine ? (
+          <Pressable accessibilityRole="button" onPress={onRate} style={({ pressed }) => [styles.action, styles.actionMain, pressed && { opacity: 0.85 }]}>
+            <Text style={[styles.actionText, { color: Colors.background }]}>{t.myScore != null || t.myQuality != null ? 'Change Rating' : 'Rate Trail'}</Text>
+          </Pressable>
+        ) : null}
+        <Pressable accessibilityRole="button" onPress={onFollow} style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}>
+          <Text style={styles.actionText}>Navigate</Text>
+        </Pressable>
+        <Pressable accessibilityRole="button" onPress={() => router.push(`/nav/public/${t.id}`)} style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}>
+          <Text style={styles.actionText}>Details</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -309,4 +407,17 @@ const styles = StyleSheet.create({
   allowedName: { color: Colors.text, fontFamily: font(600), fontSize: 15, flexShrink: 1 },
   allowedDates: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14 },
   fine: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12, lineHeight: 16 },
+  riderCard: { borderColor: 'rgba(87,227,195,0.55)', gap: 10 },
+  userRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  userText: { color: RIDER_TRAIL_INK, fontFamily: font(700), fontSize: 13 },
+  diff: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderRadius: Radius.pill, paddingHorizontal: 10, paddingVertical: 3 },
+  diffDot: { width: 8, height: 8, borderRadius: 4 },
+  diffText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
+  scores: { flexDirection: 'row', gap: 16 },
+  scoreCol: { gap: 2 },
+  scoreLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12 },
+  actions: { flexDirection: 'row', gap: 8 },
+  action: { flex: 1, minHeight: 44, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border },
+  actionMain: { backgroundColor: RIDER_TRAIL_INK, borderColor: RIDER_TRAIL_INK },
+  actionText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
 });

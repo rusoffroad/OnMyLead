@@ -1,12 +1,16 @@
 [
   {
     "version": "1.0.3",
-    "title": "Exact Rider Dots and Better Maps on the Trail",
-    "intro": "Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, and you can add riders as friends.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Badges and ranks for leading, riding and miles.\n• Out Riding + Friends: see who's out and message them.\n• Rider dots stay put as you zoom and show heading.\n• Full Map, and every rider in order on the route line.\n• Ride Mode opens on you; Center on Me.\n• Trails show from farther out.\n• Faster ride time picker; plan rides in 2027+.\n• Share your location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
+    "title": "Navigate Offroad, Exact Rider Dots and Better Maps",
+    "intro": "Navigate is a new offroad map for riding on your own: record and share your own trails, rate trails other riders mapped, and measure distances. Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, and you can add riders as friends.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Nav Mode: offroad map and your own trails.\n• Badges and ranks for leading, riding and miles.\n• Out Riding + Friends: see who's out and message them.\n• Rider dots stay put and show heading.\n• Full Map; riders in order on the route line.\n• Ride Mode opens on you; Center on Me.\n• Trails show from farther out.\n• Faster time picker; plan rides in 2027+.\n• Share location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Navigate, an offroad map for when you're not on a group ride. See every trail and road with your speed and elevation, draw trails with the distance finder or record them, add photos, and keep them on your phone or share them with every rider with a name, difficulty and the vehicles that fit. Trails other riders shared show as mint dotted lines on every map (turn them off in Settings). Tap one to rate its quality and how accurate the line is; trails rated inaccurate are hidden and the mapper is told. With Pro, record and share your trails and turn any trail into a group ride's route; the map, measuring and ratings are free."
+      },
       {
         "kind": "new",
         "text": "Badges and ranks. Earn Bronze, Silver and Gold badges for leading rides (Trail Boss), riding at the rear (Tail Gunner), riding with a group (Crew Rider), your miles (Mile Eater) and the trails you share and rate (Trailblazer, Mapmaker, Trail Scout). Your levels add up to a rank from Rookie to Legend. See them on the You tab, get a notification when you earn one, and spot each rider's top badge beside their name."

@@ -48,7 +48,7 @@ const id = (v: unknown) => (typeof v === 'string' && v ? v : null);
 
 /**
  * The screen a tapped notification opens: Ride Mode for a live ride or a rider's status, a
- * riding group's chat for its messages, Badges for a new badge, else the ride page (its chat for a message). Null when
+ * riding group's chat for its messages, Badges for a new badge, My Trails for a hidden trail, else the ride page (its chat for a message). Null when
  * the notification isn't about a ride or group (the app then just opens).
  */
 export function tapTarget(data: TapData | undefined): string | null {
@@ -62,6 +62,8 @@ export function tapTarget(data: TapData | undefined): string | null {
   if (data.type === 'direct_message' && userId) return `/messages/${userId}`;
   // A friend request, or a request that was accepted, opens Friends.
   if (data.type === 'friend_request' || data.type === 'friend_accept') return '/friends';
+  // "Your shared trail is hidden": the rider's trails in Navigation Mode.
+  if (data.type === 'trail_hidden') return '/nav/trails';
   const rideId = id(data.rideId);
   // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open
   // Ride Mode, where the group is.

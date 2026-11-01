@@ -86,6 +86,8 @@ describe('entitlements', () => {
   it('reads the server refusals', () => {
     expect(parseProError('ride_limit:1/1')).toEqual({ kind: 'ride_limit', used: 1, allowance: 1 });
     expect(parseProError('pro_required:create_poll')).toEqual({ kind: 'pro_required', feature: 'create_poll' });
+    expect(parseProError('pro_required:share_trails')).toEqual({ kind: 'pro_required', feature: 'share_trails' });
+    expect(parseProError('pro_required:trail_rides')).toEqual({ kind: 'pro_required', feature: 'trail_rides' });
     expect(parseProError('pro_required:something_new')).toEqual({ kind: 'pro_required', feature: null });
     expect(parseProError('ride not found')).toBeNull();
   });

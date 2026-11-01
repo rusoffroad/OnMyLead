@@ -13,7 +13,8 @@
 // {"message_id": "..."} body is still accepted. Pro trial reminders ({"type":"trial"}, queued
 // hourly by trial_reminder_batch) come from push_batch_account and email_batch_account
 // (migration 20261018000000_pro_entitlements.sql); new rider badges ({"type":"badge"}) come from
-// push_batch_account too (migration 20261101500000_rider_badges.sql). Riding group chat messages
+// push_batch_account too (migration 20261101500000_rider_badges.sql), and so does "your shared trail is
+// hidden" ({"type":"trail_hidden"}, migration 20261101600000_nav_trails.sql). Riding group chat messages
 // ({"type":"group_message"}) come from push_batch_group (migration 20261019400000_group_chat.sql).
 // Direct messages ({"type":"direct_message"}) come from push_batch_dm (migration
 // 20261101700000_out_riding.sql), which itself skips riders who blocked the sender. Friend requests
@@ -43,7 +44,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { channelFor, fcmAccessToken, readServiceAccount, sendFcm } from '../_shared/fcm.ts';
 
 const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
-const ACCOUNT_EVENTS = new Set(['trial', 'badge']);
+const ACCOUNT_EVENTS = new Set(['trial', 'badge', 'trail_hidden']);
 const GROUP_EVENTS = new Set(['group_message']);
 const DM_EVENTS = new Set(['direct_message']);
 const FRIEND_EVENTS = new Set(['friend_request', 'friend_accept']);

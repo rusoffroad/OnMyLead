@@ -46,6 +46,92 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "navigation-mode",
+    "why": "Mappers can delete their own trails: Delete Trail in My Trails (also takes a shared trail, its photos and ratings off the public map) and Delete Your Trail on a shared trail's page. Past rides keep their route."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "navigation-mode",
+      "free-vs-pro",
+      "route-builder",
+      "import-gpx",
+      "create-a-ride",
+      "report-and-block",
+      "ride-polls",
+      "subscribe-to-pro"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "navigation-mode",
+    "why": "Recording trails, sharing trails and group rides on your own trails are now Pro. The Navigate map, measuring, following and rating trails stay free. Report or Block, Ride Polls and Subscribe to Pro read the same Pro list and need no wording change."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "navigation-mode",
+      "map-layers",
+      "route-builder",
+      "import-gpx",
+      "create-a-ride",
+      "getting-started",
+      "notification-settings",
+      "pro-trial"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "navigation-mode",
+    "why": "New in 1.0.3: Navigate, an offroad map for riding on your own. Record or draw trails, keep them on your phone or share them with a name, difficulty and vehicles, add photos, rate other riders' trails for quality and line accuracy (trails rated inaccurate are hidden and the mapper is told), measure distances, and use a trail as a group ride's route. Rider trails show as mint dotted lines on every map, with a switch to hide them."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "approvals-and-waitlist",
+      "badges-and-ranks",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "find-a-ride",
+      "follow-leaders",
+      "free-vs-pro",
+      "fuel-range",
+      "garage",
+      "group-chat",
+      "invite-riders",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "manage-subscription",
+      "offline-maps",
+      "place-search",
+      "promo-codes",
+      "ride-bubble",
+      "ride-mode",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "trip-planner",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "navigation-mode",
+    "why": "Checked against the Navigation Mode change, which touches shared screens (Home, the You tab, the ride form, the route builder and the maps). Nothing these articles describe looks or works differently."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "ride-mode"
     ],
     "kind": "update",

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { milesToMeters } from '../geo';
 import {
-  cumulativeM, fromStored, locateOnRoute, OFF_ROUTE_M, parseGpx, placeRiders, routeFromGpx, routeFromWaypoints, RouteTracker, simplifyLine,
+  cumulativeM, fromStored, locateOnRoute, makeRoute, OFF_ROUTE_M, parseGpx, placeRiders, routeFromGpx, routeFromWaypoints, RouteTracker, simplifyLine,
   summarizeMe, toStored,
 } from '../route';
 
@@ -145,5 +145,21 @@ describe('RouteTracker', () => {
     t.place(outBack, [{ id: 'a', role: 'rider', at: north(1.8, 0.004) }]);
     const [a] = t.place(outBack, [{ id: 'a', role: 'rider', at: north(2, 0.005) }]);
     expect(a.place!.alongM / milesToMeters(1)).toBeCloseTo(2, 0);
+  });
+});
+
+describe('trail routes (Navigation Mode)', () => {
+  it('keeps the trail source through storage, so it stays free and followed as recorded', () => {
+    const r = makeRoute({ points: [north(0), north(1), north(2)], source: 'trail', name: 'Poison Spider' });
+    const stored = toStored(r);
+    const back = fromStored(stored.route_geojson, stored.waypoints);
+    expect(back?.source).toBe('trail');
+    expect(back?.name).toBe('Poison Spider');
+  });
+  it('reads an unknown source as drawn, like older builds do', () => {
+    const r = makeRoute({ points: [north(0), north(1)], source: 'drawn' });
+    const stored = toStored(r);
+    (stored.route_geojson.properties as { source: string }).source = 'something_new';
+    expect(fromStored(stored.route_geojson, stored.waypoints)?.source).toBe('drawn');
   });
 });

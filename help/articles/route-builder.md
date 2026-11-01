@@ -23,13 +23,17 @@ sources:
   - app/src/lib/api.ts
   - app/src/lib/trail-tiles.ts
   - app/src/lib/trail-tiles.web.ts
-related: [import-gpx, waypoints-and-planned-stops, map-layers, create-a-ride, ride-mode, place-search]
+related: [navigation-mode, import-gpx, waypoints-and-planned-stops, map-layers, create-a-ride, ride-mode, place-search]
 keywords: [route builder, draw route, map a route, trail snapping, follow trails, straight line, undo, route miles, mapped ride, edit route]
 ---
 
 A route is the line your group will follow. Once it's saved, every rider on the ride sees it on the ride page and in Ride Mode, with everyone placed along it. You draw it by tapping points on a satellite map, and OnMyLead follows the trails between your taps for you.
 
 Drawing a route is free. Bringing one in from a GPX file is covered in [Import a GPX Route](/help/import-gpx).
+
+:::release 1.0.3
+To ride one of your own trails from [Navigate](/help/navigation-mode), tap **Use One of My Trails** in the route builder and pick it. The trail is used as the route just as you recorded or drew it. This is a Pro feature, like GPX import. Clear it to draw your own.
+:::
 
 ## Who Can Draw the Route
 

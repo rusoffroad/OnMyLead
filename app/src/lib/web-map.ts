@@ -4,6 +4,7 @@ import L from 'leaflet';
 
 import { Colors, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { OSM_ATTRIBUTION, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
 import {
   fillTemplate, TOPO_ATTRIBUTION, TOPO_MAX_NATIVE_Z, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate, USGS_TOPO,
@@ -154,7 +155,18 @@ export type TrailLayerState = {
   osmLines: OsmTrail[];
   closedLines: ClosedLine[];
   labels: TrailLabel[];
+  /** Trails riders mapped and shared (Navigation Mode), drawn mint and dotted; their own toggle. */
+  riderLines?: LatLng[][];
 };
+
+/** Rider trails: navy casing, then mint dots, so they never pass for an agency trail. */
+export function drawRiderTrails(g: L.LayerGroup, lines: LatLng[][]) {
+  for (const part of lines) {
+    const line = part.map(ll);
+    L.polyline(line, { color: TRAIL_INK.casing, weight: 7, interactive: false }).addTo(g);
+    L.polyline(line, { color: RIDER_TRAIL_INK, weight: 4, dashArray: '1 8', lineCap: 'round', interactive: false }).addTo(g);
+  }
+}
 
 /**
  * The phone's trail layers on a Leaflet map: the USGS topo base, the Forest Service and BLM lines
@@ -170,6 +182,7 @@ export function trailLayers(m: L.Map) {
   const agency = TRAIL_SOURCE_IDS.map(
     (id) => new BoxTiles(trailTileTemplate(TRAIL_SOURCES[id]), { pane: 'oml-agency', minZoom: TRAILS_MIN_Z, maxZoom: 19, attribution: TRAIL_SOURCES[id].attribution }),
   );
+  const riders = L.layerGroup().addTo(m);
   const lines = L.layerGroup().addTo(m);
   const tags = L.layerGroup().addTo(m);
   const show = (layer: L.Layer, on: boolean) => {
@@ -182,6 +195,8 @@ export function trailLayers(m: L.Map) {
       for (const a of agency) show(a, t.trails);
       lines.clearLayers();
       tags.clearLayers();
+      riders.clearLayers();
+      drawRiderTrails(riders, t.riderLines ?? []);
       if (!t.trails) {
         m.attributionControl.removeAttribution(OSM_ATTRIBUTION);
         return;
