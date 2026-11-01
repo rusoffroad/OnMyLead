@@ -1,12 +1,16 @@
 [
   {
     "version": "1.0.3",
-    "title": "Emergency Alerts You Can Count On",
-    "intro": "The Emergency screen now shows you exactly when your alert is going out.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out so you see who has it.",
+    "title": "Easier Ride Times and Clearer Emergency Alerts",
+    "intro": "Pick a ride's time with a few taps instead of typing it, and the Emergency screen now shows you exactly when your alert is going out.",
+    "whatsNew": "What's new in 1.0.3:\n\n• Pick ride times with a few taps: AM or PM, the hour and the minute. No more typing \"8:00 am\".\n• Emergency: Alert My Group fills a bar while you hold it, tells you if you let go too early, and closes the moment your alert goes out.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "improved",
+        "text": "Pick times by tapping instead of typing: tap AM or PM, the hour and the minute. Works for Meet At, Departure Time, Expected Finish, a planned stop's time and Stop Sharing At."
+      },
       {
         "kind": "fixed",
         "text": "Emergency in Ride Mode: Alert My Group now fills a bar while you hold it and says Keep Holding, so it no longer looks like nothing happens. A quick tap tells you the alert was not sent, and the screen closes as soon as the alert goes out so you can see who has it."
