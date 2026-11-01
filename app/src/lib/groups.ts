@@ -104,9 +104,11 @@ export function openNewGroup() {
   router.push('/groups/new');
 }
 
-export async function createGroup(name: string, riderIds: string[]): Promise<string> {
+/** `code`: the owner's own group code (core/share-code.ts); left out, the database makes one. */
+export async function createGroup(name: string, riderIds: string[], code?: string | null): Promise<string> {
   const uid = await me();
-  const group = unwrap<GroupRow>(await supabase.from('riding_groups').insert({ owner_id: uid, name: cleanGroupName(name) }).select().single());
+  const row = { owner_id: uid, name: cleanGroupName(name), ...(code ? { invite_code: code } : {}) };
+  const group = unwrap<GroupRow>(await supabase.from('riding_groups').insert(row).select().single());
   if (riderIds.length) unwrap(await supabase.rpc('add_group_members', { p_group: group.id, p_users: riderIds }));
   track('riding_group_created', { riders: riderIds.length });
   return group.id;

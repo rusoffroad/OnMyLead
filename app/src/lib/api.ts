@@ -62,6 +62,8 @@ export type NewRide = {
   bubblePreset: BubblePreset;
   /** No mapped route: everyone follows the leader. */
   freeride?: boolean;
+  /** The rider's own invite code (core/share-code.ts). Left out, the database makes one. */
+  inviteCode?: string | null;
 };
 
 export async function createRide(r: NewRide): Promise<Ride> {
@@ -93,6 +95,8 @@ export async function createRide(r: NewRide): Promise<Ride> {
     meet_state: r.meetState ?? null,
     // Only sent for a freeride, so mapped rides save before the 20261018900000 migration too.
     ...(r.freeride ? { freeride: true } : {}),
+    // Only sent when the rider typed one, so older databases and the made-up default are untouched.
+    ...(r.inviteCode ? { invite_code: r.inviteCode } : {}),
   };
   let res = await supabase.from('rides').insert(row).select().single();
   if (res.error && /meet_state|freeride/.test(res.error.message)) {

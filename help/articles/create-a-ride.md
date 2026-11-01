@@ -117,6 +117,10 @@ See [Approvals and the Waitlist](/help/approvals-and-waitlist) for how requests 
 
 Under **Who's Riding**, set **Max Vehicles**, **Max Riders** or both. Leave them empty for no limit. When the ride is full, new riders go on a waitlist. See [Approvals and the Waitlist](/help/approvals-and-waitlist).
 
+:::release 1.0.3
+**Pick your own invite code.** Under **Invite Code**, leave **Your Own Code (Optional)** empty and OnMyLead makes a code for you. Or type your own, like MOAB-2026: 6 to 20 letters and numbers, with dashes between words. A green **Available** means no other ride uses it. See [Choose Your Own Code](/help/custom-codes).
+:::
+
 ## Invite a Riding Group
 
 If you're in a riding group, an **Invite a Group** section shows up. Pick one or more groups under **Your Riding Groups**. Everyone in them gets a notification and sees the ride on their Rides tab, and they join with one tap. See [Riding Groups](/help/riding-groups).

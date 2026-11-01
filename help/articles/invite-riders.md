@@ -44,6 +44,10 @@ On Android, ride and riding group links open straight in the OnMyLead app once i
 
 The **Invite Code** is shown in big letters on the card. Friends can type it on the **Rides** tab under **Join a Ride**. See [Join a Ride](/help/join-a-ride).
 
+:::release 1.0.3
+Want a code that's easy to say out loud, like MOAB-2026? The ride's organizers can tap **Choose Your Own Code** under the QR code, type a new one and tap **Save Code**. OnMyLead checks right away that no other ride uses it. The old link, QR code and code stop working; riders already on the ride stay on it. See [Choose Your Own Code](/help/custom-codes).
+:::
+
 ## Show a QR Code
 
 Tap **Show QR Code** (or the small QR code) to show it full screen, so riders at the trailhead can scan it off your phone. See [QR Codes](/help/qr-codes).

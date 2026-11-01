@@ -4,7 +4,7 @@ summary: Send a read-only web link so family at home can see where you are, with
 category: safety-privacy
 order: 20
 release: "1.0"
-updated: 2026-10-31
+updated: 2026-11-01
 sources:
   - app/src/app/share.tsx
   - app/src/app/f/[token].tsx

@@ -6,6 +6,7 @@ import { Linking, Platform, Pressable, Share, StyleSheet, Text, View } from 'rea
 import { Convoy, RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
 import { RiderPicker } from '@/components/rider-picker';
+import { ShareCodeEditor } from '@/components/share-code-editor';
 import { SocialPhoto, SocialTag } from '@/components/social-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
@@ -22,6 +23,7 @@ import {
   addGroupRiders, deleteGroup, getGroup, inviteGroupToRide, leaveGroup, removeGroupRider, renameGroup, resetGroupLink,
   rideMates, ridesIOrganize, type RidingGroup,
 } from '@/lib/groups';
+import { setGroupCode } from '@/lib/share-codes';
 import { handleProError, requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { useSocialProfiles } from '@/lib/social-profile';
@@ -281,6 +283,20 @@ export default function GroupPage() {
             }}
           />
         </View>
+        <ThemedText type="small" themeColor="textSecondary" selectable>Group Code: {group.inviteCode}</ThemedText>
+        {owner ? (
+          <ShareCodeEditor
+            kind="group"
+            id={group.id}
+            current={group.inviteCode}
+            note="The old link stops working. Everyone already in the group stays in."
+            save={(c) => setGroupCode(group.id, c)}
+            onSaved={() => {
+              setCopied(false);
+              load();
+            }}
+          />
+        ) : null}
         {owner ? (
           <Pressable
             accessibilityRole="button"

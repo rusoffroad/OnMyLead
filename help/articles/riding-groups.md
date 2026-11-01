@@ -56,6 +56,10 @@ The group link is for friends who aren't on OnMyLead yet, or anyone you haven't 
 
 When your friend opens the link, they see the group's name, who runs it and how many riders are in it. They don't see who the riders are until they join. They tap **Join Group**, or **Create a Free Account to Join** if they don't have an account yet.
 
+:::release 1.0.3
+The card also shows the **Group Code**, the end of the group's link. The rider who runs the group can tap **Choose Your Own Code** to make it something like SATURDAY-CREW, or type one under **Group Code (Optional)** when creating the group. See [Choose Your Own Code](/help/custom-codes).
+:::
+
 :::tip
 If a link got shared somewhere it shouldn't, the rider who runs the group can tap **Make a New Link**. The old link stops working, and everyone already in the group stays in.
 :::

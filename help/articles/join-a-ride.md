@@ -38,6 +38,10 @@ If you aren't signed in, the button says **Sign In to Join**. See [Sign In](/hel
 3. Tap **Open**.
 4. On the ride page, tap **Join Ride**.
 
+:::release 1.0.3
+Some organizers pick their own code, like MOAB-2026. Type it with the dashes. Capital or small letters both work.
+:::
+
 ## Join With a QR Code
 
 Point your phone's camera at the ride's QR code and tap the link that appears. See [QR Codes](/help/qr-codes).

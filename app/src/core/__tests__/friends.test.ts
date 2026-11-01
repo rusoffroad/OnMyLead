@@ -70,7 +70,11 @@ describe('friend links and codes', () => {
     expect(readFriendCode('A1B2C-3D4E5')).toBe('A1B2C3D4E5');
     expect(readFriendCode('Add me https://onmylead.com/friend/a1b2c3d4e5 thanks')).toBe('A1B2C3D4E5');
     expect(readFriendCode('hello')).toBeNull();
-    expect(readFriendCode('A1B2C3D4E5F')).toBeNull();
+    expect(readFriendCode('A1B2C3D4E5F')).toBe('A1B2C3D4E5F');
+    expect(readFriendCode('moab-rider')).toBe('MOAB-RIDER');
+    expect(readFriendCode('Add me: https://onmylead.com/friend/Moab-Rider')).toBe('MOAB-RIDER');
+    expect(readFriendCode('moab--rider')).toBeNull();
+    expect(readFriendCode('A1B2C3D4E5F6G7H8I9J0K')).toBeNull();
     expect(readFriendCode('')).toBeNull();
   });
 });

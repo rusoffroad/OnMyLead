@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 
 import { Convoy } from '@/components/convoy';
 import { RiderPicker } from '@/components/rider-picker';
+import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-code-field';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Field, Screen, Section } from '@/components/ui';
 import { cleanGroupName, groupNameProblem, MAX_GROUP_NAME, type RideMate } from '@/core/groups';
+import { cleanShareCode, friendlyShareCodeError } from '@/core/share-code';
 import { createGroup, rideMates } from '@/lib/groups';
 import { handleProError } from '@/lib/pro';
 
@@ -16,6 +18,8 @@ export default function NewGroup() {
   const [picked, setPicked] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [code, setCode] = useState('');
+  const [codeCheck, setCodeCheck] = useState<CodeCheck>('empty');
 
   useEffect(() => {
     rideMates().then(setMates).catch(() => setMates([]));
@@ -24,13 +28,14 @@ export default function NewGroup() {
   const save = async () => {
     const why = groupNameProblem(name);
     if (why) return setError(why);
+    if (!codeCheckOk(codeCheck)) return setError('Pick a different group code, or clear it to get one made for you.');
     setBusy(true);
     setError(null);
     try {
-      const id = await createGroup(name, picked);
+      const id = await createGroup(name, picked, cleanShareCode(code) || null);
       router.replace(`/groups/${id}`);
     } catch (e) {
-      if (!handleProError(e)) setError((e as Error).message);
+      if (!handleProError(e)) setError(friendlyShareCodeError((e as Error).message, 'group'));
       setBusy(false);
     }
   };
@@ -70,6 +75,15 @@ export default function NewGroup() {
       <ThemedText type="small" themeColor="textSecondary">
         Friends who aren’t on OnMyLead yet: save the group, then send them its link.
       </ThemedText>
+      <ShareCodeField
+        kind="group"
+        label="Group Code (Optional)"
+        hint="It’s the end of the group’s link. Leave it empty and OnMyLead makes one."
+        placeholder="SATURDAY-CREW"
+        value={code}
+        onChange={setCode}
+        onCheck={setCodeCheck}
+      />
 
       <ErrorText error={error} />
       <Button title="Save Group" big loading={busy} onPress={save} />
