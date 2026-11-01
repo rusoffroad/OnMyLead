@@ -31,6 +31,7 @@ export const APP_FLAGS = {
   starlink: { label: 'Starlink', hint: 'The Starlink page on the home screen.' },
   rus_gear: { label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },
   ride_polls: { label: 'Ride Polls', hint: 'Creating new polls in ride chat. Polls already sent can still be voted on.' },
+  nav_mode: { label: 'Navigate', hint: 'The Navigate button on the home screen (offroad navigation, recording and sharing trails). Trails on riders’ phones are kept; rider trails on maps still show.' },
 } as const satisfies Record<string, { label: string; hint: string }>;
 
 export type AppFlag = keyof typeof APP_FLAGS;

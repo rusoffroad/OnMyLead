@@ -38,7 +38,7 @@ OnMyLead reminds you a week, 3 days and a day before your trial ends, and again 
 - To turn off the notifications, switch off **Pro Trial Reminders** in [Notification Settings](/help/notification-settings).
 :::
 :::release 1.0.3
-- To turn off the notifications, switch off **Badges and Pro Trial** in [Notification Settings](/help/notification-settings). That also stops badge notifications.
+- To turn off the notifications, switch off **Badges and Pro Trial** in [Notification Settings](/help/notification-settings). That also stops badge notifications and the notice when a trail you shared is hidden.
 :::
 - The same reminders come by email too. Switch off **Email Me Too** to stop the emails.
 

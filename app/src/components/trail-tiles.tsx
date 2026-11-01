@@ -4,6 +4,7 @@ import { Marker, Polyline, UrlTile, WMSTile } from 'react-native-maps';
 
 import { IMAGERY_MAX_NATIVE_Z, USGS_IMAGERY } from '@/core/offline-maps';
 import { font } from '@/constants/theme';
+import { RIDER_TRAIL_INK, type PublicTrail } from '@/core/nav-trails';
 import type { OsmTrail, TrailLabel } from '@/core/osm-trails';
 import {
   TOPO_MAX_NATIVE_Z, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate, USGS_TOPO, type BaseMap, type ClosedLine,
@@ -63,6 +64,7 @@ export function TrailTiles({ trail, base = trail.base }: { trail: TrailMap; base
       {trails && trail.osmLines.length ? <OsmLines lines={trail.osmLines} /> : null}
       {trails && trail.closedLines.length ? <ClosedLines lines={trail.closedLines} /> : null}
       {trails && trail.labels.length ? <Labels labels={trail.labels} /> : null}
+      {trail.riderTrails.length ? <RiderLines trails={trail.riderTrails} /> : null}
     </>
   );
 }
@@ -115,6 +117,30 @@ const ClosedLines = memo(function ClosedLines({ lines }: { lines: ClosedLine[] }
       {lines.map((l) =>
         l.parts.map((part, i) => <Cased key={`${l.key}-${i}`} part={part} closed />),
       )}
+    </>
+  );
+});
+
+const RIDER_DOTS = [1, 8];
+
+/** One rider-mapped trail: navy casing and mint dots, unlike any agency or OpenStreetMap line. */
+const RiderLine = memo(function RiderLine({ trail }: { trail: PublicTrail }) {
+  const c = useMemo(() => coords(trail.points), [trail.points]);
+  return (
+    <>
+      <Polyline coordinates={c} strokeColor={TRAIL_INK.casing} strokeWidth={7} zIndex={1} tappable={false} />
+      <Polyline coordinates={c} strokeColor={RIDER_TRAIL_INK} strokeWidth={4} lineDashPattern={RIDER_DOTS} lineCap="round" zIndex={1} tappable={false} />
+    </>
+  );
+});
+
+/** Trails riders mapped and shared in Navigation Mode (hidden with Rider Trails off in Map layers). */
+const RiderLines = memo(function RiderLines({ trails }: { trails: PublicTrail[] }) {
+  return (
+    <>
+      {trails.map((t) => (
+        <RiderLine key={t.id} trail={t} />
+      ))}
     </>
   );
 });

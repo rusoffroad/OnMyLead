@@ -6,6 +6,8 @@ import { AppNotices } from '@/components/app-notices';
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
 import { Logo } from '@/components/logo';
+import { NavGlyph } from '@/components/nav-glyph';
+import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { ProLock } from '@/components/pro-gate';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { Showcase } from '@/components/showcase';
@@ -40,6 +42,7 @@ export default function Home() {
   const { ent } = useEntitlements();
   const { settings } = useAppSettings();
   const findOn = flagOn(settings, 'find_a_ride');
+  const navOn = flagOn(settings, 'nav_mode');
   const [mine, setMine] = useState<(RideMember & { rides: Ride })[]>([]);
   const [nearby, setNearby] = useState<Ride[]>([]);
   const [code, setCode] = useState('');
@@ -193,6 +196,21 @@ export default function Home() {
         ) : null}
       </View>
 
+      {navOn ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Navigate. Your offroad map when you're not group riding"
+          onPress={() => router.push('/nav')}
+          style={({ pressed }) => [styles.nav, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+          <NavGlyph size={30} color={RIDER_TRAIL_INK} />
+          <View style={{ flex: 1 }}>
+            <ThemedText style={styles.navTitle}>Navigate</ThemedText>
+            <ThemedText type="small" style={{ color: '#B9C8DD' }}>Riding solo today? Trails, record, measure.</ThemedText>
+          </View>
+          <Icon name="chevron" color="#B9C8DD" />
+        </Pressable>
+      ) : null}
+
       {joining ? (
         <View style={[styles.join, { backgroundColor: theme.backgroundElement, borderColor: theme.sky }]}>
           <TextBox
@@ -329,6 +347,11 @@ const styles = StyleSheet.create({
   createIcon: { width: 60, height: 60, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
   createTitle: { color: '#fff', fontSize: 38, lineHeight: 40, fontFamily: font(800, 'display') },
   createDetail: { color: '#FFD9DA', fontSize: 15, lineHeight: 20, fontFamily: font(600) },
+  nav: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderRadius: 22, paddingHorizontal: Spacing.three, minHeight: 76,
+    backgroundColor: '#0F2A3A', borderWidth: 1.5, borderColor: 'rgba(87,227,195,0.45)',
+  },
+  navTitle: { color: '#fff', fontSize: 26, lineHeight: 28, fontFamily: font(800, 'display') },
   action: { flex: 1, borderRadius: 22, padding: Spacing.three, minHeight: 116, justifyContent: 'space-between', gap: Spacing.two },
   actionTitle: { color: '#fff', fontSize: 26, lineHeight: 28, fontFamily: font(800, 'display') },
   join: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, borderRadius: Radius.card, borderWidth: 1.5, paddingLeft: Spacing.three, padding: 8 },

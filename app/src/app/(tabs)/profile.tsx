@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { BadgePatch } from '@/components/badge-patch';
@@ -25,6 +25,10 @@ import { setMapsPreference, useMapsPreference } from '@/lib/directions';
 import { useEntitlements } from '@/lib/entitlements';
 import { useNotificationSettings } from '@/lib/notification-settings';
 import { useOfflineMaps } from '@/lib/offline-maps';
+import { loadTrails, useLocalTrails } from '@/lib/nav-trails';
+import { RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
+import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
+import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { signOut, useSession } from '@/lib/session';
 import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
 import { socialSetting, type SocialProfile } from '@/core/social-profile';
@@ -47,6 +51,12 @@ export default function You() {
   const tripsOn = useFlag('trip_planner');
   const starlinkOn = useFlag('starlink');
   const offlineMaps = useOfflineMaps();
+  const navOn = useFlag('nav_mode');
+  const { trails: myTrails } = useLocalTrails();
+  const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
+  useEffect(() => {
+    loadTrails();
+  }, []);
   const blocks = useBlocks();
   const [social, setSocial] = useState<SocialProfile | null>(null);
   const [socialBusy, setSocialBusy] = useState(false);
@@ -130,6 +140,25 @@ export default function You() {
       </MenuGroup>
 
       <MenuGroup title="On the Trail">
+        {navOn ? (
+          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Navigate" detail={myTrails.length ? `Your offroad map. ${myTrails.length} ${myTrails.length === 1 ? 'trail' : 'trails'} on this phone` : 'Your offroad map: trails, record, measure'} onPress={() => router.push('/nav')} />
+        ) : null}
+        <MenuRow
+          icon="map"
+          color={RIDER_TRAIL_INK}
+          title="Rider Trails on Maps"
+          detail={riderTrails ? 'Showing trails riders mapped and shared, as mint dotted lines' : 'Hidden. Only agency and OpenStreetMap trails show'}
+          right={
+            <Switch
+              value={riderTrails}
+              onValueChange={setRiderTrails}
+              trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+              thumbColor={Colors.text}
+              {...({ activeThumbColor: Colors.text } as object)}
+              accessibilityLabel="Rider Trails on Maps"
+            />
+          }
+        />
         <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail={sharingUntil != null ? `Sharing now, ${shareEndText(sharingUntil, sharingCheckedAt)}. Tap to stop` : 'With chosen riders or family, for as long as you pick'} onPress={needsAccount('/share')} />
         <MenuRow
           icon="battery"

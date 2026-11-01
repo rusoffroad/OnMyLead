@@ -250,6 +250,27 @@ export function Showcase() {
             <img src="/showcase/group-chat.webp" alt="A riding group’s chat with messages linked to a ride happening now, an upcoming ride and one that’s over" loading="lazy" width={786} height={1704} />
           </figure>
         </section>
+
+        <section className="qr" aria-labelledby="nav-title">
+          <figure className="phone qr-phone">
+            <img src="/showcase/navigate.webp" alt="Navigate on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Measure tabs, and speed and elevation" loading="lazy" width={786} height={1704} />
+          </figure>
+          <div className="qr-copy">
+            <h2 id="nav-title" className="section-title">Navigate When It’s Just You</h2>
+            <p>
+              Not every ride is a group ride. Navigate is your offroad map for the rest: every trail and road with your speed
+              and elevation, a recorder that draws your line as you ride, and a distance finder that measures along the trails.
+              Keep your trails on your phone, or share them with every rider.
+            </p>
+            <ul className="ticks">
+              <li>Shared trails carry a name, a difficulty, the vehicles that fit and photos</li>
+              <li>Rider trails show as mint dots, so you always know who mapped what</li>
+              <li>Riders rate each trail’s quality and accuracy, and bad lines drop off the map</li>
+              <li>Turn any trail into a group ride’s route in one tap</li>
+            </ul>
+            <p className="qr-small">The map, measuring and rating are free; recording, sharing and group rides on your trails are Pro. Shared trails leave off their first and last 200 meters, so your start stays private.</p>
+          </div>
+        </section>
       </main>
 
       <section id="features" className="band band-night" aria-labelledby="signal-title">
@@ -530,11 +551,14 @@ const FREE = [
   'Mechanical Issue and Family Tracking Links',
   'Ride Chat and Poll Voting',
   'Draw Routes and Follow Leaders',
+  'Navigate: Offroad Map, Measure, Rate Trails',
   'Ride History: Last 5 Rides',
 ];
 const PRO = [
   'Unlimited Rides',
   'Import GPX Routes',
+  'Record and Share Your Trails',
+  'Group Rides on Your Trails',
   'Offline Maps',
   'Saved Riding Groups',
   'Create Ride Polls',

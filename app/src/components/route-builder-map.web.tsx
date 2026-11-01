@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import type { LatLng } from '@/core/geo';
@@ -77,10 +77,11 @@ export function RouteBuilderMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const riderLines = useMemo(() => (trail?.riderTrails ?? []).map((t) => t.points), [trail?.riderTrails]);
   const { base, trails, osmLines, closedLines, labels } = trail ?? { base: 'satellite' as const, trails: false, osmLines: [], closedLines: [], labels: [] };
   useEffect(() => {
-    tracks.current?.update({ base, trails, osmLines, closedLines, labels });
-  }, [base, trails, osmLines, closedLines, labels]);
+    tracks.current?.update({ base, trails, osmLines, closedLines, labels, riderLines });
+  }, [base, trails, osmLines, closedLines, labels, riderLines]);
 
   // Go to a searched place: the whole area when it has one, else close in on the spot.
   useEffect(() => {

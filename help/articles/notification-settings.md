@@ -68,7 +68,7 @@ Everything below starts on.
 - **Pro Trial Reminders**: a week, 3 days and a day before your Pro Trial ends, and when it does.
 :::
 :::release 1.0.3
-- **Badges and Pro Trial**: when you earn a badge (see [Earn Badges and Ranks](/help/badges-and-ranks)), and a week, 3 days and a day before your Pro Trial ends.
+- **Badges and Pro Trial**: when you earn a badge (see [Earn Badges and Ranks](/help/badges-and-ranks)), and a week, 3 days and a day before your Pro Trial ends. It also tells you when a trail you shared is hidden from the public map (see [Navigate Offroad and Map Your Own Trails](/help/navigation-mode)).
 :::
 - **Email Me Too**: the same Pro Trial reminders by email.
 
@@ -82,6 +82,7 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 - Ride changes, new riders, invites and reminders open the ride.
 :::release 1.0.3
 - A new badge opens **Badges**.
+- A trail of yours being hidden opens **My Trails**.
 :::
 
 ## Ride Reminder

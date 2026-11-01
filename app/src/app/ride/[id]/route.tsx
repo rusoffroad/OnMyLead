@@ -10,6 +10,7 @@ import { MapSearch } from '@/components/map-search';
 import { PanelHandle } from '@/components/panel-handle';
 import { RouteBuilderMap } from '@/components/route-builder-map';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
+import { TrailPickerSheet } from '@/components/trail-picker-sheet';
 import { Button, ErrorText } from '@/components/ui';
 import Svg, { Path } from 'react-native-svg';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
@@ -18,6 +19,8 @@ import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import type { Place } from '@/core/places';
 import { miles, routeFromGpx, type RideRoute } from '@/core/route';
 import { routeFromLegs } from '@/core/route-legs';
+import { trailAsRoute } from '@/core/nav-trails';
+import { loadTrails, trailLine } from '@/lib/nav-trails';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
@@ -47,6 +50,7 @@ export default function RouteBuilder() {
   const [imported, setImported] = useState<RideRoute | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState<'save' | 'gpx' | null>(null);
+  const [picking, setPicking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Where the map was looking when the search opened: nearby places rank first.
   const [searching, setSearching] = useState<LatLng | null | false>(false);
@@ -75,7 +79,7 @@ export default function RouteBuilder() {
         if (d) setCenter({ lat: d.meet_lat, lng: d.meet_lng });
         else if (r) setCenter({ lat: r.meet_area_lat, lng: r.meet_area_lng });
         setSaved(route);
-        if (route?.source === 'gpx') setImported(route);
+        if (route?.source === 'gpx' || route?.source === 'trail') setImported(route);
         else if (route) loadDraft(route);
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Could not load the ride.'))
@@ -152,7 +156,9 @@ export default function RouteBuilder() {
 
   const click = web ? 'click' : 'tap';
   const hint = imported
-    ? `Imported${imported.name ? ` “${imported.name}”` : ' from GPX'}. Clear it to draw your own.`
+    ? imported.source === 'trail'
+      ? `Your trail${imported.name ? ` “${imported.name}”` : ''}. Clear it to draw your own.`
+      : `Imported${imported.name ? ` “${imported.name}”` : ' from GPX'}. Clear it to draw your own.`
     : taps.length === 0
       ? `${web ? 'Click' : 'Tap'} the map where the ride starts, or Search for the trailhead.`
       : draft.lastNoTrail
@@ -256,6 +262,15 @@ export default function RouteBuilder() {
               <Button title="Clear" kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />
               <Button title="Import GPX" kind="secondary" style={[styles.flex, { flexGrow: 1.6 }]} loading={busy === 'gpx'} onPress={importGpx} />
             </View>
+            <Button
+              title="Use One of My Trails"
+              kind="secondary"
+              onPress={() => {
+                if (!requirePro('trail_rides')) return;
+                loadTrails();
+                setPicking(true);
+              }}
+            />
           </>
         ) : null}
         <ErrorText error={error} />
@@ -277,6 +292,16 @@ export default function RouteBuilder() {
         {follow && !imported ? <Text style={styles.credit}>Trails: {OSM_ATTRIBUTION}</Text> : null}
       </SafeAreaView>
       </Animated.View>
+      <TrailPickerSheet
+        visible={picking}
+        onClose={() => setPicking(false)}
+        onPick={(t) => {
+          setPicking(false);
+          // A trail from Navigation Mode comes in like an imported track: followed as recorded.
+          setImported(trailAsRoute(trailLine(t), t.details.name || null));
+          draft.clear();
+        }}
+      />
     </View>
   );
 }

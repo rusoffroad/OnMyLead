@@ -63,6 +63,18 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
     title: 'Premium Ride Cards',
     body: 'Share your ride with the Full Stats and Big Number layouts. The standard card stays free.',
   },
+  record_trails: {
+    title: 'Record Your Trails',
+    body: 'Ride and Navigate draws your line, with distance, climb and time. The offroad map, following trails, measuring and rating trails stay free.',
+  },
+  share_trails: {
+    title: 'Share Your Trails',
+    body: 'Submit your trails to the public map with photos, difficulty and vehicles. Seeing, following and rating other riders’ trails stays free.',
+  },
+  trail_rides: {
+    title: 'Group Rides on Your Trails',
+    body: 'Turn a trail into a group ride’s route in one tap. Drawing a route on the map stays free.',
+  },
 };
 
 /** The comparison on the Pro screen. true = included, false = not, a string = the amount. */
@@ -72,6 +84,9 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Live Tracking, SOS and Ride Bubble', free: true, pro: true },
   { label: 'Ride Chat and Voting', free: true, pro: true },
   { label: 'Draw Routes and Follow Leaders', free: true, pro: true },
+  { label: 'Navigate: Offroad Map, Measure, Rate Trails', free: true, pro: true },
+  { label: 'Record and Share Your Trails', free: false, pro: true },
+  { label: 'Group Rides on Your Trails', free: false, pro: true },
   { label: 'Import GPX Routes', free: false, pro: true },
   { label: 'Offline Maps', free: false, pro: true },
   { label: 'Saved Riding Groups', free: false, pro: true },

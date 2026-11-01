@@ -45,6 +45,12 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 
 If you picked **Mapped**, the route builder opens right away so you can draw the trail. See [Build a Route](/help/route-builder). Once the ride is saved you land on its page, ready to invite riders.
 
+:::release 1.0.3
+### Ride One of Your Trails
+
+This is a Pro feature. Open a trail in [Navigate](/help/navigation-mode) and tap **Plan a Group Ride on This Trail**. The new ride starts with the trail's name, the trail as its route and its start as the meeting point, under a **Riding** banner. Pick the day, change anything you like and create it.
+:::
+
 :::tip
 Only riders who have joined see the exact meeting spot. Public pages show the general area, within about a mile.
 :::

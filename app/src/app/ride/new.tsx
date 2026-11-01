@@ -15,6 +15,9 @@ import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
+import { trailAsRoute } from '@/core/nav-trails';
+import { metersToMiles } from '@/core/geo';
+import { getLocalTrail, loadTrails, trailLine } from '@/lib/nav-trails';
 import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
 import { clockText, parseTime, shiftClock } from '@/core/time';
 import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
@@ -32,7 +35,7 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  const { type, copy } = useLocalSearchParams<{ type?: string; copy?: string }>();
+  const { type, copy, trail } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string }>();
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
@@ -110,6 +113,24 @@ export default function NewRide() {
       setMore(true);
     })().catch((e) => setError(e instanceof Error ? e.message : 'Could not copy that ride.'));
   }, [copy]);
+
+  // Plan a Group Ride on This Trail (Navigation Mode): the trail becomes the route, its start the meeting point.
+  const [fromTrail, setFromTrail] = useState<string | null>(null);
+  useEffect(() => {
+    if (!trail) return;
+    loadTrails().then(() => {
+      const t = getLocalTrail(trail);
+      if (!t) return;
+      const route = trailAsRoute(trailLine(t), t.details.name || null);
+      const start = route.points[0];
+      setName((n) => n || t.details.name);
+      setRoutePlan('mapped');
+      setCopiedRoute(route);
+      setRouteMiles((m) => m || String(Math.round(metersToMiles(route.lengthM) * 10) / 10));
+      if (start) setCoords((c) => c || `${start.lat.toFixed(5)}, ${start.lng.toFixed(5)}`);
+      setFromTrail(t.details.name || 'Your Trail');
+    });
+  }, [trail]);
 
   // Riding groups to invite as soon as the ride exists (none until groups are switched on).
   useEffect(() => {
@@ -217,6 +238,14 @@ export default function NewRide() {
             {copiedRoute
               ? 'The details, meeting point and route are filled in. Pick the day, check the times and create it.'
               : 'The details and meeting point are filled in. Pick the day, check the times and create it.'}
+          </ThemedText>
+        </View>
+      ) : null}
+      {fromTrail ? (
+        <View style={{ gap: 2, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
+          <ThemedText style={{ fontWeight: 700 }}>Riding {fromTrail}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            The trail is the route, and its start is the meeting point. Change anything, pick the day and create it.
           </ThemedText>
         </View>
       ) : null}
