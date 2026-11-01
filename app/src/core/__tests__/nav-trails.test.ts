@@ -223,3 +223,14 @@ describe('rider trails on the map', () => {
     expect(boxInside(paddedBox({ latitude: 39, longitude: -109, latitudeDelta: 0.1, longitudeDelta: 0.1 }), box)).toBe(false);
   });
 });
+
+describe('photoPaths', () => {
+  it('finds the bucket path of uploaded photos and skips phone files', async () => {
+    const { photoPaths } = await import('../nav-trails');
+    expect(photoPaths([
+      'https://x.supabase.co/storage/v1/object/public/trail-photos/u1/t1/a%20b.jpg?v=2',
+      'file:///phone/trail-photos/u1/x.jpg',
+      'https://example.com/other.jpg',
+    ])).toEqual(['u1/t1/a b.jpg']);
+  });
+});

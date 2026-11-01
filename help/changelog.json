@@ -2,6 +2,16 @@
   {
     "date": "2026-11-01",
     "slugs": [
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "navigation-mode",
+    "why": "Mappers can delete their own trails: Delete Trail in My Trails (also takes a shared trail, its photos and ratings off the public map) and Delete Your Trail on a shared trail's page. Past rides keep their route."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
       "navigation-mode",
       "free-vs-pro",
       "route-builder",

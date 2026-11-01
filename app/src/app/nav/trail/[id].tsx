@@ -34,7 +34,7 @@ export default function TrailDetail() {
   const layout = useLayout();
   const saved = trails.find((t) => t.id === id) ?? null;
   const [details, setDetails] = useState<TrailDetails | null>(null);
-  const [busy, setBusy] = useState<'save' | 'share' | 'stop' | 'photo' | null>(null);
+  const [busy, setBusy] = useState<'save' | 'share' | 'stop' | 'photo' | 'delete' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [problems, setProblems] = useState<string[]>([]);
 
@@ -130,8 +130,15 @@ export default function TrailDetail() {
   async function remove() {
     const msg = saved!.shared ? 'It’s deleted from this phone and taken off the public map.' : 'It’s deleted from this phone.';
     if (!(await confirmAsync('Delete This Trail?', msg, 'Delete', 'Keep It'))) return;
-    await deleteLocalTrail(saved!.id).catch((e) => setError(e instanceof Error ? e.message : 'Couldn’t delete.'));
-    router.back();
+    setBusy('delete');
+    try {
+      await deleteLocalTrail(saved!.id);
+      router.back();
+    } catch (e) {
+      setError(e instanceof Error ? `Couldn’t take it off the public map, so it wasn’t deleted. ${e.message}` : 'Couldn’t delete.');
+    } finally {
+      setBusy(null);
+    }
   }
 
   const facts = [
@@ -256,7 +263,7 @@ export default function TrailDetail() {
       ) : null}
       <Button title="Follow in Navigate" kind="secondary" onPress={() => router.push(`/nav?trail=${saved.id}`)} />
       <Button title="Plan a Group Ride on This Trail" kind="secondary" onPress={() => requirePro('trail_rides') && router.push(`/ride/new?trail=${saved.id}`)} />
-      <Button title="Delete Trail" kind="ghost" onPress={remove} />
+      <Button title="Delete Trail" kind="ghost" loading={busy === 'delete'} onPress={remove} />
     </>
   );
 

@@ -568,3 +568,16 @@ export function paddedBox(r: { latitude: number; longitude: number; latitudeDelt
 /** True when `inner` is entirely inside `outer`. */
 export const boxInside = (inner: { minLat: number; minLng: number; maxLat: number; maxLng: number }, outer: typeof inner) =>
   inner.minLat >= outer.minLat && inner.maxLat <= outer.maxLat && inner.minLng >= outer.minLng && inner.maxLng <= outer.maxLng;
+
+// --- Photos on the server ----------------------------------------------------
+
+export const TRAIL_PHOTO_BUCKET = 'trail-photos';
+
+/** The bucket paths of uploaded trail photos (https URLs ending in /trail-photos/<path>). */
+export function photoPaths(urls: string[]): string[] {
+  const mark = `/${TRAIL_PHOTO_BUCKET}/`;
+  return urls.flatMap((u) => {
+    const i = u.indexOf(mark);
+    return u.startsWith('https://') && i >= 0 ? [decodeURIComponent(u.slice(i + mark.length).split('?')[0])] : [];
+  });
+}

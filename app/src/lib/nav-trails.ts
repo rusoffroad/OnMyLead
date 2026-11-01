@@ -11,7 +11,7 @@ import { useSyncExternalStore } from 'react';
 
 import type { LatLng } from '@/core/geo';
 import {
-  lineForSharing, parsePublicTrail, parsePublicTrails, shareStateOf, syncShareStates, toLineString, toLatLngs, trackStats,
+  lineForSharing, parsePublicTrail, photoPaths, TRAIL_PHOTO_BUCKET, parsePublicTrails, shareStateOf, syncShareStates, toLineString, toLatLngs, trackStats,
   type LocalTrail, type PublicTrail, type TrackPoint,
 } from '@/core/nav-trails';
 import { lineLengthM } from '@/core/route';
@@ -23,7 +23,6 @@ import { supabase } from './supabase';
 const KEY = 'nav.trails.v1';
 /** A recording in progress, saved as it grows so a crash or a dead battery keeps the trail. */
 const RECORDING_KEY = 'nav.recording.v1';
-export const TRAIL_PHOTO_BUCKET = 'trail-photos';
 
 let trails: LocalTrail[] = [];
 let loaded = false;
@@ -183,11 +182,21 @@ export async function shareTrail(t: LocalTrail): Promise<LocalTrail> {
 }
 
 /** Take the public copy down. The trail stays on the phone. */
+/**
+ * Take a shared trail off the server: the row (only its mapper may, by row-level security; its
+ * ratings go with it) and its uploaded photos. Rides that used the trail keep their own copy of
+ * the route, so they're untouched.
+ */
+export async function deleteSharedTrail(id: string, photos: string[]): Promise<void> {
+  const { error } = await supabase.from('shared_trails').delete().eq('id', id);
+  if (error) throw new Error(error.message);
+  const paths = photoPaths(photos);
+  // Best effort: a photo left behind is unlisted and only reachable by its random link.
+  if (paths.length) await supabase.storage.from(TRAIL_PHOTO_BUCKET).remove(paths).catch(() => {});
+}
+
 export async function stopSharing(t: LocalTrail): Promise<LocalTrail> {
-  if (t.shared) {
-    const { error } = await supabase.from('shared_trails').delete().eq('id', t.shared.id);
-    if (error) throw new Error(error.message);
-  }
+  if (t.shared) await deleteSharedTrail(t.shared.id, t.photos.filter((p) => p.startsWith('https://')));
   const next = { ...t, shared: null };
   if (getLocalTrail(t.id)) return saveLocalTrail(next);
   return next;

@@ -96,6 +96,19 @@ To take it back, tap **Stop Sharing**. The trail comes off the public map and it
 
 You need to be signed in to share. Sharing trails also counts toward the **Trailblazer** badge. See [Earn Badges and Ranks](/help/badges-and-ranks).
 
+## Delete a Trail
+
+Only the rider who mapped a trail can delete it.
+
+1. Open the trail in **My Trails**.
+2. Tap **Delete Trail**, then **Delete**.
+
+The trail is deleted from your phone. If you shared it, it also comes off the public map with its photos and ratings. If that can't happen (with no signal, for example), the app says so and keeps the trail, so try again with a signal.
+
+On a trail you shared, the trail's page also has **Delete Your Trail**. It takes the trail off the public map and keeps the copy on this phone in My Trails.
+
+Group rides that already used the trail as their route keep their route.
+
 ## Rider Trails on the Map
 
 Trails other riders shared are called rider trails. They're drawn as **mint dotted lines**, so they stand out from the agency and OpenStreetMap trails. They show on Navigate and on the other maps with trail lines once you zoom in, when you're signed in.

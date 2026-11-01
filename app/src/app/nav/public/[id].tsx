@@ -14,7 +14,8 @@ import {
   difficultyColor, difficultyLabel, feet, feetOrMiles, mappedBy, RIDER_TRAIL_INK, seasonLabel, surfaceLabel, vehicleLabel, type PublicTrail,
 } from '@/core/nav-trails';
 import { useLayout } from '@/hooks/use-layout';
-import { getPublicTrail, savePublicTrail, useLocalTrails } from '@/lib/nav-trails';
+import { confirmAsync } from '@/lib/confirm';
+import { deleteSharedTrail, getPublicTrail, savePublicTrail, stopSharing, useLocalTrails } from '@/lib/nav-trails';
 import { requirePro } from '@/lib/pro';
 
 /**
@@ -28,6 +29,7 @@ export default function PublicTrailPage() {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const { trails } = useLocalTrails();
   const savedCopy = t ? trails.find((x) => x.savedFrom?.id === t.id || (t.mine && x.id === t.clientId)) : null;
 
@@ -46,6 +48,25 @@ export default function PublicTrailPage() {
         <ErrorText error={error} />
       </Screen>
     );
+  }
+
+  // The mapper deletes their shared trail: off the public map with its photos and ratings. A copy
+  // on this phone stays in My Trails (delete it there too if they want it gone).
+  async function removeMine() {
+    const msg = savedCopy
+      ? 'It comes off the public map with its photos and ratings. Your copy stays in My Trails on this phone. Rides that used it keep their route.'
+      : 'It comes off the public map with its photos and ratings. Rides that used it keep their route.';
+    if (!(await confirmAsync('Delete Your Trail?', msg, 'Delete', 'Keep It'))) return;
+    setDeleting(true);
+    try {
+      if (savedCopy?.shared?.id === t!.id) await stopSharing(savedCopy);
+      else await deleteSharedTrail(t!.id, t!.photos);
+      router.back();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Couldn’t delete it.');
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function save() {
@@ -143,7 +164,10 @@ export default function PublicTrailPage() {
         />
       ) : null}
       {t.mine ? (
-        savedCopy ? <Button title="Edit Your Trail" kind="secondary" onPress={() => router.push(`/nav/trail/${savedCopy.id}`)} /> : null
+        <>
+          {savedCopy ? <Button title="Edit Your Trail" kind="secondary" onPress={() => router.push(`/nav/trail/${savedCopy.id}`)} /> : null}
+          <Button title="Delete Your Trail" kind="ghost" loading={deleting} onPress={removeMine} />
+        </>
       ) : (
         <Button title={savedCopy ? 'Saved to My Trails' : 'Save to My Trails'} kind="secondary" disabled={!!savedCopy} onPress={save} />
       )}
