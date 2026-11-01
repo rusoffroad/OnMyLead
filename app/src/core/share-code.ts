@@ -144,6 +144,7 @@ export function friendlyShareCodeError(message: string, kind: ShareCodeKind): st
 /**
  * Type size for showing a code big (the invite card, the full-screen QR code). Made-up codes are
  * 8 or 10 characters; a typed one can be 20, so longer codes get smaller to stay on one line.
+ * Sized here rather than with adjustsFontSizeToFit, which shrank codes to a few points on iOS.
  */
 export function codeTextSize(code: string, base: number): { fontSize: number; lineHeight: number; letterSpacing: number } {
   const n = code.length;

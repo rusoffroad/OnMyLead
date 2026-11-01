@@ -3,7 +3,7 @@ title: Add a Profile Picture
 summary: Take or choose a photo so riders know who's who. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding.
 category: account
 order: 21
-release: "1.0.4"
+release: "1.0.3"
 updated: 2026-11-01
 sources:
   - app/src/components/avatar-editor.tsx

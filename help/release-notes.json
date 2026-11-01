@@ -52,6 +52,10 @@
         "text": "Pick your own code. Give your ride, riding group or friend link a code that's easy to say at the trailhead, like MOAB-2026, when you create it or later with Choose Your Own Code. The app checks as you type that nobody else uses it."
       },
       {
+        "kind": "new",
+        "text": "Profile pictures. Take a photo or choose one from your library on the You tab (tap your name). It's cropped square and shows next to your name in rider lists, chat, Messages, Friends and Out Riding, for signed-in riders only. No picture? You keep your initial."
+      },
+      {
         "kind": "improved",
         "text": "The route line in Ride Mode shows every sharing rider's dot in running order, rear to front, and riders bunched together line up side by side instead of hiding each other. The leader is blue, the tail gunner purple, and you red. Tap a dot for the rider's name and place."
       },

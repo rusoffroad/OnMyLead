@@ -39,7 +39,7 @@ Once you've joined a ride, the other riders on it can see:
 
 - Your ride name. If you turned on **Show My Google (or Apple or Facebook) Profile**, they also see that account's name and photo. See [Your Ride Name and Profile](/help/ride-name-and-profile).
 
-:::release 1.0.4
+:::release 1.0.3
 - Your profile picture, if you added one. Like your ride name, any signed-in rider can see it, never people who aren't signed in. See [Add a Profile Picture](/help/profile-picture).
 :::
 

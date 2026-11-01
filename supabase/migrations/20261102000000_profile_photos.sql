@@ -1,4 +1,4 @@
--- Profile pictures (1.0.4): a rider can upload, change or remove a photo that shows in place of
+-- Profile pictures (1.0.3): a rider can upload, change or remove a photo that shows in place of
 -- their initial wherever other riders see them (Going lists, chat, Messages, Friends, Out Riding).
 --
 -- Privacy: the photo follows the existing profile visibility. profiles rows are readable by

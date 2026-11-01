@@ -36,10 +36,10 @@ If anyone is in danger, call 911 first.
 1. Open the ride and tap **Riders**.
 2. In the **Going** list, tap the rider.
 3. Tap **Report Rider**.
-:::until 1.0.4
+:::until 1.0.3
 4. Under **What's Wrong**, pick **Harassment**, **Unsafe Riding**, **Spam or Scam**, **Fake Account** or **Something Else**.
 :::
-:::release 1.0.4
+:::release 1.0.3
 4. Under **What's Wrong**, pick **Harassment**, **Unsafe Riding**, **Spam or Scam**, **Fake Account**, **Inappropriate Photo** or **Something Else**.
 :::
 5. Add details under **Anything Else (Optional)** if you like.

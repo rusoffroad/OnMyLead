@@ -10,7 +10,7 @@
     "kind": "add",
     "by": "pr",
     "ref": "profile-photos",
-    "why": "Coming in 1.0.4: Profile Pictures. Riders can take a photo or choose one from their library (cropped square and shrunk to 512 pixels), change it or remove it from Your Name and Picture. It shows in place of their initial in ride rider lists, riding groups, ride and group chat, Messages, Friends, Out Riding and the You tab, to signed-in riders only like the ride name. Report a rider now has Inappropriate Photo, and the OnMyLead team can remove a picture."
+    "why": "New in 1.0.3: Profile Pictures. Riders can take a photo or choose one from their library (cropped square and shrunk to 512 pixels), change it or remove it from Your Name and Picture. It shows in place of their initial in ride rider lists, riding groups, ride and group chat, Messages, Friends, Out Riding and the You tab, to signed-in riders only like the ride name. Report a rider now has Inappropriate Photo, and the OnMyLead team can remove a picture."
   },
   {
     "date": "2026-11-01",
@@ -56,7 +56,23 @@
     "kind": "review",
     "by": "pr",
     "ref": "profile-photos",
-    "why": "Reviewed for profile pictures (1.0.4). These articles share code that changed: rider dots in lists and chat now show a rider's picture when they have one, the report sheet gained Inappropriate Photo, the You tab name row says Your name and picture, and the camera permission is now asked for profile pictures. The steps in these articles are unchanged; the new behavior is described in Add a Profile Picture."
+    "why": "Reviewed for profile pictures (1.0.3). These articles share code that changed: rider dots in lists and chat now show a rider's picture when they have one, the report sheet gained Inappropriate Photo, the You tab name row says Your name and picture, and the camera permission is now asked for profile pictures. The steps in these articles are unchanged; the new behavior is described in Add a Profile Picture."
+  },
+  {
+    "date": "2026-11-01",
+    "slugs": [
+      "create-a-ride",
+      "custom-codes",
+      "friends",
+      "invite-riders",
+      "organizer-controls",
+      "qr-codes",
+      "riding-groups"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "share-code-size-fix",
+    "why": "Fix before 1.0.3 ships: the friend code (and, on long codes, the ride invite code) showed tiny on iPhone after custom codes arrived. Codes now show at full size again. Nothing in these articles changes for riders."
   },
   {
     "date": "2026-11-01",

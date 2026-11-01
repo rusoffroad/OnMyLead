@@ -27,7 +27,7 @@ Your ride name is how the group knows you. It shows on the group map, the rider 
 Under your name on the **You** tab you also see your rank and badges. See [Earn Badges and Ranks](/help/badges-and-ranks).
 :::
 
-:::release 1.0.4
+:::release 1.0.3
 The same screen also has your **Profile Picture**. See [Add a Profile Picture](/help/profile-picture). The screen is called **Your Name and Picture**.
 :::
 

@@ -136,7 +136,9 @@ export default function Friends() {
           Send it to a riding buddy. They open it, and you’re friends once you accept.
         </ThemedText>
         {code ? (
-          <Text style={[styles.code, codeTextSize(code, 34)]} numberOfLines={1} adjustsFontSizeToFit accessibilityLabel={`Friend code ${code.split('').join(' ')}`} selectable>{spaced(code)}</Text>
+          <View style={styles.codeBox}>
+            <Text style={[styles.code, codeTextSize(spaced(code), 34)]} numberOfLines={1} accessibilityLabel={`Friend code ${code.split('').join(' ')}`} selectable>{spaced(code)}</Text>
+          </View>
         ) : null}
         <Button title="Share Friend Link" disabled={!code} onPress={() => share('sheet')} style={{ backgroundColor: Colors.sky }} />
         <View style={styles.btnRow}>
@@ -325,10 +327,9 @@ const styles = StyleSheet.create({
   hero: { gap: 6, paddingTop: Spacing.two },
   heroTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 40, lineHeight: 42, letterSpacing: -0.4 },
   linkCard: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.two },
-  code: {
-    color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, letterSpacing: 3, textAlign: 'center',
-    paddingVertical: 10, borderRadius: Radius.control, borderWidth: 2, borderStyle: 'dashed', borderColor: Colors.border,
-  },
+  // The dashed box is a View around the code: iOS mis-sizes text that carries its own border and padding.
+  codeBox: { paddingVertical: 10, paddingHorizontal: 8, borderRadius: Radius.control, borderWidth: 2, borderStyle: 'dashed', borderColor: Colors.border, alignItems: 'center' },
+  code: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, letterSpacing: 3, textAlign: 'center' },
   btnRow: { flexDirection: 'row', gap: Spacing.two },
   done: { color: RideColors.green, fontFamily: font(700), fontSize: 16 },
   row: {
