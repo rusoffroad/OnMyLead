@@ -1,13 +1,15 @@
-import { useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 
 import { Colors, RideColors } from '@/constants/theme';
+import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { cameraCenterFor, fitInset, isFarOut, openMapCenter, rideViewCorners } from '@/core/map-center';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
+import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RiderPin } from './rider-pin';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
@@ -41,7 +43,7 @@ function around(p: { latitude: number; longitude: number }) {
  */
 export function GroupMap({
   riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding = FIT_PADDING, fallback,
-  onReady, onUserMove, ref,
+  onReady, onUserMove, follow, locationEveryMs = 1000, ref,
 }: {
   riders: MapRider[];
   /** This phone's rider: iOS already draws them as the location dot, so no second pin. */
@@ -65,6 +67,13 @@ export function GroupMap({
   onReady?: () => void;
   /** The rider dragged, pinched or turned the map themselves. */
   onUserMove?: () => void;
+  /**
+   * Follow Me: while set, the map keeps the rider's own dot in the open map (between the panels
+   * given by `inset`) as they move. Null or missing: the map stays where it is.
+   */
+  follow?: { inset: { top: number; right: number; bottom: number; left: number } } | null;
+  /** How often Android reports the phone's own dot (iPhone and iPad report it as it moves). */
+  locationEveryMs?: number;
   /** Lets Ride Mode center the map on the rider (when it opens, and the center-on-me button). */
   ref?: Ref<GroupMapHandle>;
 }) {
@@ -84,40 +93,74 @@ export function GroupMap({
     map.current?.getCamera().then((c) => setMapHeading(Math.round(c.heading ?? 0))).catch(() => {});
   };
 
+  // Center the map on a point in the open map; far out over a state or the world, zoom in too.
+  const centerMap = useCallback(async (
+    p: LatLng,
+    inset: { top: number; right: number; bottom: number; left: number },
+    opts?: { animated?: boolean; duration?: number },
+  ) => {
+    const m = map.current;
+    if (!m) return;
+    // From here on the rider's own spot is the framing; a later group framing must not undo it.
+    fitted.current = 'route';
+    const { width, height } = size.current;
+    const target = { latitude: p.lat, longitude: p.lng };
+    if (isFarOut(region.current, width || 390)) {
+      // Zoomed out over a state or the world (a fresh map opens over the world): zoom in to
+      // riding distance too, with the rider in the middle of the open map.
+      const corners = rideViewCorners(p).map((c) => ({ latitude: c.lat, longitude: c.lng }));
+      m.fitToCoordinates(corners, { edgePadding: fitInset(size.current, inset), animated: opts?.animated ?? true });
+      return;
+    }
+    try {
+      const open = openMapCenter(size.current, inset);
+      // Both points are on screen now, so reading them is exact even on a turned map.
+      const [here, there] = await Promise.all([
+        m.coordinateForPoint({ x: width / 2, y: height / 2 }),
+        m.coordinateForPoint(open),
+      ]);
+      const c = cameraCenterFor(
+        p,
+        { lat: here.latitude, lng: here.longitude },
+        { lat: there.latitude, lng: there.longitude },
+      );
+      m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: opts?.duration ?? 450 });
+    } catch {
+      // No reading from the map (not laid out yet): centre on the whole map instead.
+      m.animateCamera({ center: target }, { duration: opts?.duration ?? 450 });
+    }
+  }, []);
+
+  // Follow Me: each time the phone's own dot moves a real step, slide the map (same zoom and
+  // turn) so the dot stays in the open map. Moves under a couple of meters are GPS jitter.
+  const followRef = useRef(follow);
+  useEffect(() => {
+    followRef.current = follow;
+  }, [follow]);
+  const followed = useRef<LatLng | null>(null);
+  const own = useOwnLocation(useCallback((f: LatLng) => {
+    const fl = followRef.current;
+    if (!fl || !followCamShouldMove(followed.current, f)) return;
+    followed.current = { lat: f.lat, lng: f.lng };
+    centerMap(f, fl.inset, { duration: 600 });
+  }, [centerMap]));
+  // Follow Me just came on (or back on): go to the rider at once rather than at their next step.
+  const followOn = !!follow;
+  useEffect(() => {
+    if (!followOn) {
+      followed.current = null;
+      return;
+    }
+    const f = own.last.current;
+    if (f && followRef.current) {
+      followed.current = { lat: f.lat, lng: f.lng };
+      centerMap(f, followRef.current.inset);
+    }
+  }, [followOn, own, centerMap]);
+
   useImperativeHandle(ref, () => ({
-    async centerOn(p, inset, opts) {
-      const m = map.current;
-      if (!m) return;
-      // From here on the rider's own spot is the framing; a later group framing must not undo it.
-      fitted.current = 'route';
-      const { width, height } = size.current;
-      const target = { latitude: p.lat, longitude: p.lng };
-      if (isFarOut(region.current, width || 390)) {
-        // Zoomed out over a state or the world (a fresh map opens over the world): zoom in to
-        // riding distance too, with the rider in the middle of the open map.
-        const corners = rideViewCorners(p).map((c) => ({ latitude: c.lat, longitude: c.lng }));
-        m.fitToCoordinates(corners, { edgePadding: fitInset(size.current, inset), animated: opts?.animated ?? true });
-        return;
-      }
-      try {
-        const open = openMapCenter(size.current, inset);
-        // Both points are on screen now, so reading them is exact even on a turned map.
-        const [here, there] = await Promise.all([
-          m.coordinateForPoint({ x: width / 2, y: height / 2 }),
-          m.coordinateForPoint(open),
-        ]);
-        const c = cameraCenterFor(
-          p,
-          { lat: here.latitude, lng: here.longitude },
-          { lat: there.latitude, lng: there.longitude },
-        );
-        m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: 450 });
-      } catch {
-        // No reading from the map (not laid out yet): centre on the whole map instead.
-        m.animateCamera({ center: target }, { duration: 450 });
-      }
-    },
-  }), []);
+    centerOn: (p, inset, opts) => centerMap(p, inset, opts),
+  }), [centerMap]);
 
   useEffect(() => {
     const pts = riders.filter((r) => r.lat != null).map((r) => ({ latitude: r.lat!, longitude: r.lng! }));
@@ -139,6 +182,9 @@ export function GroupMap({
   return (
     <MapView ref={map} style={StyleSheet.absoluteFill}
       showsUserLocation showsCompass mapType="hybrid" tintColor={Colors.text} {...trail?.mapProps}
+      onUserLocationChange={own.onUserLocationChange}
+      userLocationUpdateInterval={locationEveryMs}
+      userLocationFastestInterval={Math.min(locationEveryMs, 1000)}
       onLayout={(e) => {
         // After the trail props, which have their own onLayout that used to replace this one, so
         // the map's size was never known and centering fell back to the whole map's middle.
@@ -194,6 +240,7 @@ export function GroupMap({
             <RiderPin rider={r} mapHeading={mapHeading} />
           </Marker>
         ))}
+      <OwnHeadingMarker own={own} mapHeading={mapHeading} />
       {regroup ? (
         <Marker coordinate={{ latitude: regroup.lat, longitude: regroup.lng }} title={regroup.label ?? 'Regroup here'} pinColor={RideColors.yellow} />
       ) : null}

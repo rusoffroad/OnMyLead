@@ -12,12 +12,14 @@ sources:
   - app/src/app/nav/public/[id].tsx
   - app/src/components/nav-map.tsx
   - app/src/components/nav-map.web.tsx
+  - app/src/core/follow-camera.ts
+  - app/src/components/follow-me-button.tsx
   - app/src/components/rate-trail-sheet.tsx
   - app/src/components/trail-picker-sheet.tsx
   - app/src/core/nav-trails.ts
   - app/src/lib/nav-trails.ts
   - supabase/migrations/20261101600000_nav_trails.sql
-related: [map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
+related: [follow-me, map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
 keywords: [navigate, navigation, nav mode, navigation mode, offroad map, gps, record a trail, track, my trails, share a trail, rider trails, user submitted trails, rate a trail, trail rating, accuracy, distance finder, measure, ruler, how far, trail photos, difficulty]
 ---
 
@@ -44,9 +46,17 @@ On a tablet, the panel sits beside the map in landscape, and floats over the cor
 
 ### The Map Follows You
 
+:::until 1.0.4
 While you record a trail, or follow a trail you're on or near, the map moves with you so your dot stays in view. Tapping **Center on Me** also makes the map follow you. The button turns white while the map is following.
 
 To look around, drag or pinch the map. It stops following until you tap **Center on Me** again. The map also holds still while the **Measure** tab is open, and when you jump to a place with search.
+:::
+
+:::release 1.0.4
+With **Follow Me** on (it is unless you turn it off), the map moves with you so your dot stays in view, and while you're moving your dot has a white arrow pointing the way you're heading. The **Follow Me** button sits just left of **Center on Me** and shows **Following**.
+
+To look around, drag or pinch the map. It pauses (the button shows **Paused**) until you tap it or **Center on Me** again. The map also holds still while the **Measure** tab is open, and when you jump to a place with search. Tap **Following** to turn Follow Me off; the map then stays where you put it, even while you record. See [Follow Me on the Map](/help/follow-me).
+:::
 
 The screen stays on while Navigate is open.
 

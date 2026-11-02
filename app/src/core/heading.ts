@@ -24,3 +24,19 @@ export function screenAngle(headingDeg: number, mapHeadingDeg: number | null | u
   const a = headingDeg - (mapHeadingDeg ?? 0);
   return ((a % 360) + 360) % 360;
 }
+
+/** This phone's own spot and arrow, from the map's location dot (or the phone's location watch). */
+export type OwnFix = { lat: number; lng: number; headingDeg: number | null };
+
+/**
+ * The phone's own fix as the map's blue dot reports it (react-native-maps onUserLocationChange:
+ * iPhone and iPad send the GPS course, Android the bearing). iOS and Android draw that dot
+ * themselves without any arrow, so OnMyLead adds its own arrow on top, by the same rule as every
+ * other rider: only while moving faster than a walk.
+ */
+export function ownFix(
+  c: { latitude?: number | null; longitude?: number | null; speed?: number | null; heading?: number | null } | null | undefined,
+): OwnFix | null {
+  if (!c || c.latitude == null || c.longitude == null || !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return null;
+  return { lat: c.latitude, lng: c.longitude, headingDeg: riderHeading({ speedMps: c.speed, headingDeg: c.heading }, true) };
+}

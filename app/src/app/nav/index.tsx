@@ -2,7 +2,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
@@ -14,7 +14,10 @@ import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
-import { FOLLOW_CAM_START, followCamActive, followCamReducer, nearFollowedTrail } from '@/core/follow-camera';
+import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
+import { riderHeading } from '@/core/heading';
+import { useFollowMe } from '@/hooks/use-follow-me';
+import { FollowMeButton } from '@/components/follow-me-button';
 import { FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
 import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
@@ -75,6 +78,8 @@ export default function NavMode() {
   // --- Where the rider is -------------------------------------------------------
   const [me, setMe] = useState<LatLng | null>(null);
   const [speed, setSpeed] = useState<number | null>(null);
+  // Which way the rider is moving, for the arrow on their own dot on the website's map.
+  const [meHeading, setMeHeading] = useState<number | null>(null);
   const [altitude, setAltitude] = useState<number | null>(null);
   const [noLocation, setNoLocation] = useState(false);
   const fixListener = useRef<(l: Location.LocationObject) => void>(() => {});
@@ -91,6 +96,7 @@ export default function NavMode() {
           sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.BestForNavigation, distanceInterval: 3, timeInterval: 1000 }, (l) => {
             setMe({ lat: l.coords.latitude, lng: l.coords.longitude });
             setSpeed(l.coords.speed != null && l.coords.speed >= 0 ? l.coords.speed : null);
+            setMeHeading(riderHeading({ speedMps: l.coords.speed, headingDeg: l.coords.heading }, true));
             setAltitude(l.coords.altitude ?? null);
             fixListener.current(l);
           });
@@ -127,8 +133,10 @@ export default function NavMode() {
 
   // --- Following a trail ----------------------------------------------------------
   const [followed, setFollowed] = useState<Followed | null>(null);
-  // Follow-me camera: keeps the rider on screen while recording or following (core/follow-camera).
-  const [cam, camEvent] = useReducer(followCamReducer, FOLLOW_CAM_START);
+  // Follow Me (core/follow-camera): the map keeps the rider on screen as they move. The switch is
+  // shared with Ride Mode and remembered; dragging the map pauses it until Center on Me.
+  const followMe = useFollowMe();
+  const { cam, camEvent } = followMe;
   const followTrack = useRef<LatLng[]>([]);
   const [followCovered, setFollowCovered] = useState(0);
   const hint = useRef<number | null>(null);
@@ -286,10 +294,22 @@ export default function NavMode() {
   const progress = followed && me ? followProgress(followed.points, cum, me, hint.current) : null;
   if (progress?.alongM != null) hint.current = progress.alongM;
   // Measuring taps the map, so the camera holds still while the Measure tab is open.
-  const camOn = mode !== 'measure' && followCamActive(cam, { recording: !!rec && !rec.paused, following: !!followed, nearTrail: nearFollowedTrail(progress) });
+  const camOn = mode !== 'measure' && followCamActive(cam, { recording: !!rec && !rec.paused, following: !!followed, nearTrail: nearFollowedTrail(progress), followMe: followMe.on });
+  const followStatus = followMeStatus(followMe.on, cam);
+  function tapFollowMe() {
+    const act = followMeTap(followStatus);
+    if (act === 'turn-off') return followMe.setOn(false);
+    if (act === 'turn-on') followMe.setOn(true);
+    camEvent('center');
+    if (me) map.current?.centerOn(me);
+  }
   const rateable = !!followed?.publicTrail && !followed.publicTrail.mine && canRate(lineLengthM(followed.points), followCovered);
 
   const leave = () => (router.canGoBack() ? router.back() : router.replace('/'));
+  // Center on Me's corner, with Follow Me just left of it.
+  const locatePos = full
+    ? { right: 12, bottom: Math.max(insets.bottom, 12) + (wide || floating ? 0 : FULL_MAP_BAR_H + 12) }
+    : wide ? { right: 12, bottom: 24 } : { right: 12, bottom: open ? 340 : 180 };
   const panelPad: [number, number, number, number] = full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : [120, 60, open ? 360 : 200, 60];
   // The one number the Full Map bar keeps.
   const barValue = ((): [string, string] => {
@@ -323,6 +343,7 @@ export default function NavMode() {
         onCenter={(c) => (looking.current = c)}
         padding={panelPad}
         followMe={camOn ? me : null}
+        meHeading={meHeading}
         onUserMove={() => camEvent('pan')}
       />
       <TrailMapOverlay
@@ -398,18 +419,20 @@ export default function NavMode() {
       </SafeAreaView>
       )}
 
+      {me && mode !== 'measure' ? (
+        <FollowMeButton status={followStatus} onPress={tapFollowMe} compact={full} style={[locatePos, { right: locatePos.right + 56 }]} />
+      ) : null}
       {me ? (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Center on me"
-          accessibilityHint={camOn ? 'The map is following you' : 'Centers the map on you and follows you'}
-          accessibilityState={{ selected: camOn }}
+          accessibilityHint={followMe.on ? 'Centers the map on you and follows you again' : 'Centers the map on you'}
           onPress={() => {
             camEvent('center');
             map.current?.centerOn(me);
           }}
-          style={({ pressed }) => [styles.locate, camOn && styles.locateOn, full ? { right: 12, bottom: Math.max(insets.bottom, 12) + (wide || floating ? 0 : FULL_MAP_BAR_H + 12) } : wide ? { right: 12, bottom: 24 } : { right: 12, bottom: (open ? 340 : 180) + insets.bottom * 0 }, pressed && { opacity: 0.8 }]}>
-          <Icon name="locate" size={22} color={camOn ? Colors.background : Colors.text} />
+          style={({ pressed }) => [styles.locate, locatePos, pressed && { opacity: 0.8 }]}>
+          <Icon name="locate" size={22} color={Colors.text} />
         </Pressable>
       ) : null}
 
@@ -714,7 +737,6 @@ const styles = StyleSheet.create({
   noticeText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
   noticeOk: { paddingHorizontal: 14, height: 36, borderRadius: Radius.pill, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   locate: { position: 'absolute', width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', zIndex: 15, ...glass },
-  locateOn: { backgroundColor: Colors.text, borderColor: Colors.text },
   panel: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24, zIndex: 20 },
   panelWide: { bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
   panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1, borderColor: Colors.border },

@@ -29,6 +29,7 @@ import { useOfflineMaps } from '@/lib/offline-maps';
 import { loadTrails, useLocalTrails } from '@/lib/nav-trails';
 import { RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
+import { useFollowMePref } from '@/hooks/use-follow-me';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { signOut, useSession } from '@/lib/session';
 import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
@@ -55,6 +56,7 @@ export default function You() {
   const navOn = useFlag('nav_mode');
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
+  const [followMe, setFollowMe] = useFollowMePref();
   useEffect(() => {
     loadTrails();
   }, []);
@@ -157,6 +159,22 @@ export default function You() {
               thumbColor={Colors.text}
               {...({ activeThumbColor: Colors.text } as object)}
               accessibilityLabel="Rider Trails on Maps"
+            />
+          }
+        />
+        <MenuRow
+          icon="follow"
+          color={Colors.sky}
+          title="Follow Me on Maps"
+          detail={followMe ? 'The map keeps your dot in view in Ride Mode and Navigate' : 'Off. The map stays where you put it'}
+          right={
+            <Switch
+              value={followMe}
+              onValueChange={setFollowMe}
+              trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+              thumbColor={Colors.text}
+              {...({ activeThumbColor: Colors.text } as object)}
+              accessibilityLabel="Follow Me on Maps"
             />
           }
         />

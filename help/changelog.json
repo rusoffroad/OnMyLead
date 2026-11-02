@@ -2,6 +2,20 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "follow-me",
+      "ride-mode",
+      "navigation-mode",
+      "full-map",
+      "getting-started"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "follow-me",
+    "why": "Coming in 1.0.4: Follow Me keeps the map in Ride Mode and Navigate moving with the rider (drag pauses it, Paused or Center on Me resumes, Following turns it off, remembered and also in the You tab), and the rider's own dot gets the same heading arrow as everyone else's (iPhone, iPad and Android draw their own dot with no direction). New Follow Me article; Ride Mode, Navigate, Full Map and Getting Started updated in 1.0.4 release blocks."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "faq"
     ],
     "kind": "update",

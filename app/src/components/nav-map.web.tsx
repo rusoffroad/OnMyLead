@@ -14,6 +14,11 @@ export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng
 
 export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
+/** The rider's dot with the white wedge every moving rider gets, turned to their heading. */
+const meDotHtml = (heading: number | null | undefined) =>
+  heading == null
+    ? ME_DOT
+    : `<div style="position:relative;width:18px;height:18px">${ME_DOT}<div aria-hidden="true" style="position:absolute;left:-13px;top:-13px;width:44px;height:44px;transform:rotate(${Math.round(heading)}deg);pointer-events:none"><div style="position:absolute;left:12px;top:0;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:14px solid rgba(10,22,38,.85)"></div><div style="position:absolute;left:14.5px;top:3px;width:0;height:0;border-left:7.5px solid transparent;border-right:7.5px solid transparent;border-bottom:10.5px solid #fff"></div></div></div>`;
 const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;height:18px;border-radius:9px;background:#2F80FF;border:3px solid #FFFFFF;box-sizing:border-box;box-shadow:0 0 0 6px rgba(47,128,255,.25),0 2px 4px rgba(0,0,0,.5)"></div>';
 
 /**
@@ -22,7 +27,7 @@ const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;heig
  * finder. A click measures while measuring; otherwise it shows the trail under it.
  */
 export function NavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -39,6 +44,8 @@ export function NavMap({
   followMe?: LatLng | null;
   /** The rider dragged the map by hand. */
   onUserMove?: () => void;
+  /** Which way the rider is moving (core/heading riderHeading), for the arrow on their dot. */
+  meHeading?: number | null;
   ref?: Ref<NavMapHandle>;
 }) {
   const el = useRef<HTMLDivElement>(null);
@@ -108,16 +115,14 @@ export function NavMap({
       meDot.current = null;
       return;
     }
-    if (meDot.current) meDot.current.setLatLng(ll(center));
-    else {
-      meDot.current = L.marker(ll(center), {
-        interactive: false,
-        keyboard: false,
-        zIndexOffset: 1000,
-        icon: L.divIcon({ className: '', iconSize: [18, 18], iconAnchor: [9, 9], html: ME_DOT }),
-      }).addTo(m);
+    const icon = L.divIcon({ className: '', iconSize: [18, 18], iconAnchor: [9, 9], html: meDotHtml(meHeading) });
+    if (meDot.current) {
+      meDot.current.setLatLng(ll(center));
+      meDot.current.setIcon(icon);
+    } else {
+      meDot.current = L.marker(ll(center), { interactive: false, keyboard: false, zIndexOffset: 1000, icon }).addTo(m);
     }
-  }, [center]);
+  }, [center, meHeading]);
 
   // Follow-me camera: pan (same zoom) so the spot sits in the open map between the panels.
   useEffect(() => {
