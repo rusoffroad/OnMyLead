@@ -69,7 +69,7 @@ the server, and ship the last good code again as a new, higher version.
 | Part | Where |
 |---|---|
 | Rider-side rules (minimum, latest, version notice) | `app/src/core/app-versions.ts` (unit tested) |
-| Update Required screen, Update Available and About This Version cards | `app/src/components/update-required.tsx`, `app/src/components/app-notices.tsx`, `app/src/lib/app-update.ts` |
+| Update Required screen, Update Available and About This Version cards (from 1.0.4 Update Available also comes from the store's own version) | `app/src/components/update-required.tsx`, `app/src/components/app-notices.tsx`, `app/src/lib/app-update.ts` |
 | Server setting `app_versions`, its checks and the Audit Log function | `supabase/migrations/20261101300000_release_controls.sql` (tested in `supabase/tests/release_controls_test.sql`) |
 | Store buttons | `supabase/functions/store-releases` (Play Developer API edits, App Store Connect phased releases); rules in `supabase/functions/_shared/store-releases.ts` (tested) |
 | Admin page | `app/src/app/admin/releases.tsx` |
