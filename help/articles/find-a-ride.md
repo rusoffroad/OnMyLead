@@ -55,6 +55,10 @@ Rides in that state show soonest first. To switch states, tap the state's name i
 - Tap a dot to see the ride's name, time and distance, then tap **Open Ride**.
 - Move or zoom the map, then tap **Search This Area** to see rides there. To return, tap the button under the map that starts with **Back to**, such as **Back to Rides Near Me**.
 - Use the **+** and **-** buttons to zoom, and the location button to recenter the map.
+
+:::release 1.0.4
+- Tap the **Full Map** button above the zoom buttons to make the map fill the screen (on a tablet or a wide screen, the list tucks away). Tap it again (**Exit Full Map**) to bring the list back. See [Full Map](/help/full-map).
+:::
 - On a wide screen, such as the website on a computer, the search and the list of rides sit on the left and the map fills the rest of the screen.
 
 :::note

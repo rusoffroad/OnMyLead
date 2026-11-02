@@ -2,8 +2,8 @@ import L from 'leaflet';
 import { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 
-import { MapControls, MapOverlay, meetsLabel, pinColor, type RidesMapProps } from '@/components/rides-map-chrome';
-import { Colors, Radius } from '@/constants/theme';
+import { mapFrameStyle, MapControls, MapOverlay, meetsLabel, pinColor, type RidesMapProps } from '@/components/rides-map-chrome';
+import { Colors } from '@/constants/theme';
 import { regionMoved, type Bounds } from '@/core/discovery';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { esc, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
@@ -15,7 +15,7 @@ const fromLatLngBounds = (b: L.LatLngBounds): Bounds => ({ minLat: b.getSouth(),
  * The Find a ride map on the web: satellite imagery with road and place names, same pins and
  * controls as the phone. Zoomed in, the trail layers show too, as they do on the phone.
  */
-export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400 }: RidesMapProps) {
+export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull }: RidesMapProps) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
@@ -98,7 +98,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
   }, [rides, circle]);
 
   return (
-    <View style={{ height, borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement }}>
+    <View style={mapFrameStyle(height, full)}>
       <div ref={el} className="omlmap" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
       <MapOverlay
         title={title}
@@ -116,7 +116,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
             : undefined
         }
       />
-      <MapControls onZoomIn={() => map.current?.zoomIn()} onZoomOut={() => map.current?.zoomOut()} onRecenter={() => flyTo(frame)} />
+      <MapControls onZoomIn={() => map.current?.zoomIn()} onZoomOut={() => map.current?.zoomOut()} onRecenter={() => flyTo(frame)} full={full} onToggleFull={onToggleFull} />
     </View>
   );
 }

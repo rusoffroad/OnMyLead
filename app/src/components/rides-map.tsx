@@ -3,8 +3,7 @@ import MapView, { Callout, Circle, Marker, type Region } from 'react-native-maps
 import { View } from 'react-native';
 
 import { TrailTiles } from '@/components/trail-tiles';
-import { MapControls, MapOverlay, RideBubble, RidePin, type RidesMapProps } from '@/components/rides-map-chrome';
-import { Colors, Radius } from '@/constants/theme';
+import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, type RidesMapProps } from '@/components/rides-map-chrome';
 import { boundsOfRegion, regionFor, regionMoved, zoomRegion } from '@/core/discovery';
 import { useTrailMap } from '@/hooks/use-trail-map';
 
@@ -14,7 +13,7 @@ import { useTrailMap } from '@/hooks/use-trail-map';
  * off-road park tracks show too (the rider's Map Layers choice from the ride maps).
  * The web build uses rides-map.web.tsx.
  */
-export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400 }: RidesMapProps) {
+export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull }: RidesMapProps) {
   const map = useRef<MapView>(null);
   const [initial] = useState(() => regionFor(frame));
   const region = useRef<Region>(initial);
@@ -36,7 +35,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
   const zoom = (factor: number) => map.current?.animateToRegion(zoomRegion(region.current, factor), 250);
 
   return (
-    <View style={{ height, borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement }}>
+    <View style={mapFrameStyle(height, full)}>
       <MapView
         ref={map}
         style={{ flex: 1 }}
@@ -97,7 +96,7 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
             : undefined
         }
       />
-      <MapControls onZoomIn={() => zoom(0.5)} onZoomOut={() => zoom(2)} onRecenter={() => flyTo(regionFor(frame))} />
+      <MapControls onZoomIn={() => zoom(0.5)} onZoomOut={() => zoom(2)} onRecenter={() => flyTo(regionFor(frame))} full={full} onToggleFull={onToggleFull} />
     </View>
   );
 }

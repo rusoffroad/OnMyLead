@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FlagGate } from '@/components/app-notices';
 import { RideRow, RowGroup } from '@/components/ride-row';
@@ -9,10 +10,11 @@ import { RidesMap } from '@/components/rides-map';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Screen, Section, Segmented } from '@/components/ui';
 import { TwoPane } from '@/components/two-pane';
-import { Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { boundsAround, RADIUS_CHOICES_MI, stateByCode, US_STATES, type Bounds } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
 import { sideColumnWidth } from '@/core/layout';
+import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import type { Place } from '@/core/places';
 import { publicRidesInArea, publicRidesInState, publicRidesNear } from '@/lib/api';
@@ -38,6 +40,10 @@ export default function FindRidesScreen() {
 
 function FindRides() {
   const layout = useLayout();
+  const insets = useSafeAreaInsets();
+  // Full Map: the map fills the screen (on a tablet, the list beside it tucks away). Starts off
+  // each visit, since Find is mostly a list.
+  const fullMap = useFullMap(null);
   const [mode, setMode] = useState<Mode>('near');
   const [radius, setRadius] = useState<number>(50);
   const [here, setHere] = useState<LatLng | null>(null);
@@ -158,10 +164,18 @@ function FindRides() {
           frameKey={place ? `${place.id}:${radius}` : state?.code ?? 'here'}
           circle={ring}
           title={place?.name ?? state?.name ?? null}
-          onPressTitle={() => setPickingState((p) => !p)}
+          onPressTitle={() => {
+            // The state list is beside or under the map, so picking a state leaves Full Map.
+            if (fullMap.full) {
+              fullMap.exit();
+              setPickingState(true);
+            } else setPickingState((p) => !p);
+          }}
           onOpen={open}
           onSearchArea={setArea}
-          height={layout.wide ? '100%' : undefined}
+          height={layout.wide || fullMap.full ? '100%' : undefined}
+          full={fullMap.full}
+          onToggleFull={fullMap.full ? fullMap.exit : fullMap.enter}
         />
   ) : null;
   const search = (
@@ -239,6 +253,10 @@ function FindRides() {
       <View style={{ height: Spacing.two }} />
     </>
   );
+
+  if (fullMap.full && map) {
+    return <View style={{ flex: 1, paddingTop: insets.top, backgroundColor: Colors.background }}>{map}</View>;
+  }
 
   // On a tablet (or a wide window) the search and the list sit beside a map as tall as the screen.
   if (layout.wide) {

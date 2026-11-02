@@ -7,6 +7,7 @@ import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, Vie
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
+import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
 import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
@@ -14,6 +15,7 @@ import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { FOLLOW_CAM_START, followCamActive, followCamReducer, nearFollowedTrail } from '@/core/follow-camera';
+import { FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
 import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
 import {
@@ -22,6 +24,7 @@ import {
 } from '@/core/nav-trails';
 import type { Place } from '@/core/places';
 import { cumulativeM, lineLengthM } from '@/core/route';
+import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
@@ -62,6 +65,10 @@ export default function NavMode() {
   const map = useRef<NavMapHandle>(null);
   const fold = usePanelFold('nav.panelOpen.v1', true, wide ? 'up' : 'down');
   const open = fold.open;
+  // Full Map: the top bar, layers and panel tuck away; one slim bar keeps the number that matters
+  // (speed, miles left on the trail, or the measured length) and Center on Me stays.
+  const fullMap = useFullMap('nav.fullMap.v1');
+  const full = fullMap.full;
   const [mode, setMode] = useState<Mode>('explore');
   const { trails: local } = useLocalTrails();
 
@@ -283,7 +290,19 @@ export default function NavMode() {
   const rateable = !!followed?.publicTrail && !followed.publicTrail.mine && canRate(lineLengthM(followed.points), followCovered);
 
   const leave = () => (router.canGoBack() ? router.back() : router.replace('/'));
-  const panelPad: [number, number, number, number] = wide ? [90, 70, 40, PANEL_W + 60] : [120, 60, open ? 360 : 200, 60];
+  const panelPad: [number, number, number, number] = full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : [120, 60, open ? 360 : 200, 60];
+  // The one number the Full Map bar keeps.
+  const barValue = ((): [string, string] => {
+    if (mode === 'measure') {
+      const [v, u] = feetOrMiles(measureLen).split(' ');
+      return [v, u];
+    }
+    if (followed && progress) {
+      const [v, u] = feetOrMiles(progress.onTrail ? progress.remainingM ?? 0 : progress.toStartM).split(' ');
+      return [v, progress.onTrail ? `${u} Left` : `${u} to Start`];
+    }
+    return [speed != null ? String(Math.round(speed * MPS_TO_MPH)) : '–', 'mph'];
+  })();
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -308,8 +327,9 @@ export default function NavMode() {
       />
       <TrailMapOverlay
         trail={trail}
-        top={insets.top + 66}
-        cardTop={wide ? insets.top + 118 : undefined}
+        bare={full}
+        top={full ? insets.top + 12 : insets.top + 66}
+        cardTop={full ? insets.top + 64 : wide ? insets.top + 118 : undefined}
         bottom={wide ? 12 : open ? 330 : 170}
         cardWidth={wide || floating ? 380 : undefined}
         lookupHint="Tap a line to see what it is."
@@ -317,6 +337,20 @@ export default function NavMode() {
         ridden={(t) => (followed?.publicTrail?.id === t.id ? followCovered : null)}
       />
 
+      {full ? (
+        <FullMapBar onRestore={fullMap.exit} wide={wide || floating}>
+          {rec && !rec.paused ? (
+            <View style={styles.barRec} accessible accessibilityLabel="Recording">
+              <View style={styles.recDot} />
+              <Text style={styles.barRecText}>Rec</Text>
+            </View>
+          ) : null}
+          <BarReadout value={barValue[0]} unit={barValue[1]} />
+          {mode === 'measure' ? <BarChip title="Undo" label="Undo the last point" disabled={!draft.taps.length} onPress={draft.undo} /> : null}
+        </FullMapBar>
+      ) : null}
+
+      {full ? null : (
       <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]} pointerEvents="box-none">
         {searching !== false ? (
           <MapSearch
@@ -362,6 +396,7 @@ export default function NavMode() {
           </View>
         ) : null}
       </SafeAreaView>
+      )}
 
       {me ? (
         <Pressable
@@ -373,16 +408,17 @@ export default function NavMode() {
             camEvent('center');
             map.current?.centerOn(me);
           }}
-          style={({ pressed }) => [styles.locate, camOn && styles.locateOn, wide ? { right: 12, bottom: 24 } : { right: 12, bottom: (open ? 340 : 180) + insets.bottom * 0 }, pressed && { opacity: 0.8 }]}>
+          style={({ pressed }) => [styles.locate, camOn && styles.locateOn, full ? { right: 12, bottom: Math.max(insets.bottom, 12) + (wide || floating ? 0 : FULL_MAP_BAR_H + 12) } : wide ? { right: 12, bottom: 24 } : { right: 12, bottom: (open ? 340 : 180) + insets.bottom * 0 }, pressed && { opacity: 0.8 }]}>
           <Icon name="locate" size={22} color={camOn ? Colors.background : Colors.text} />
         </Pressable>
       ) : null}
 
+      {full ? null : (
       <Animated.View
         {...fold.panHandlers}
         style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
         <SafeAreaView edges={wide || floating ? [] : ['bottom']} style={[styles.panelInner, !open && { gap: 6 }]}>
-          <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Navigation Tools" fromTop={wide} />
+          <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Navigation Tools" fromTop={wide} onFullMap={fullMap.enter} />
           <ModeTabs mode={mode} onChange={setMode} recording={!!rec} />
 
           {mode === 'explore' ? (
@@ -426,6 +462,7 @@ export default function NavMode() {
           )}
         </SafeAreaView>
       </Animated.View>
+      )}
     </View>
   );
 }
@@ -705,6 +742,8 @@ const styles = StyleSheet.create({
   recBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, minHeight: 68, borderRadius: 18, backgroundColor: Colors.accent },
   recText: { color: '#fff', fontFamily: font(800, 'display'), fontSize: 26 },
   recHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  barRec: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  barRecText: { color: RideColors.red, fontFamily: font(800), fontSize: 14 },
   recDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: RideColors.red },
   recState: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   row: { flexDirection: 'row', gap: Spacing.two },

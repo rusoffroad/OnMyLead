@@ -59,7 +59,15 @@ The round target button at the bottom of the map, just left of the buttons panel
 :::
 
 :::release 1.0.3
-Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, the ride name and the buttons. A slim bar stays at the bottom right with the route line, **EMERGENCY** and **Menus ▲**, which brings everything back. See [Use Ride Mode](/help/ride-mode).
+Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, the ride name and the buttons. A slim bar stays at the bottom right with the route line and **EMERGENCY**. See [Use Ride Mode](/help/ride-mode).
+:::
+
+:::until 1.0.4
+**Menus ▲** in that bar brings everything back.
+:::
+
+:::release 1.0.4
+**Controls** in that bar brings everything back (or swipe the bar up). Navigate, Draw a Route, Waypoints and Find a Ride have **Full Map** too; on a tablet their bar sits in the bottom-left corner. See [Full Map](/help/full-map).
 :::
 
 ## The Ride Page

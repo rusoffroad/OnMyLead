@@ -26,7 +26,7 @@ const WEB = Platform.OS === 'web';
  * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden,
+  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false,
 }: {
   trail: TrailMap;
   /** Where the layers button sits. */
@@ -43,6 +43,8 @@ export function TrailMapOverlay({
   onFollow?: (t: PublicTrail) => void;
   /** Meters of a rider trail covered in Navigation Mode (for the rating sheet). */
   ridden?: (t: PublicTrail) => number | null;
+  /** Full Map: no layers button or zoom hint, just the No Signal tag and a tapped trail's card. */
+  bare?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState<PublicTrail | null>(null);
@@ -53,6 +55,7 @@ export function TrailMapOverlay({
   return (
     <>
       <View pointerEvents="box-none" style={[styles.corner, { top }]}>
+        {bare ? null : (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Map layers"
@@ -62,22 +65,23 @@ export function TrailMapOverlay({
           style={({ pressed }) => [styles.fab, (open || trail.trails || trail.base === 'topo') && styles.fabOn, pressed && { opacity: 0.8 }]}>
           <LayersIcon color={trail.trails || trail.base === 'topo' ? SAND : Colors.text} />
         </Pressable>
-        {trail.offline && !open ? (
+        )}
+        {trail.offline && (!open || bare) ? (
           <View style={styles.offline} accessible accessibilityLabel="No signal. The map is showing what's downloaded on this phone.">
             <Text style={styles.offlineText}>No Signal</Text>
             <Text style={styles.offlineSub}>Downloaded Map</Text>
           </View>
         ) : null}
-        {open ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} /> : null}
+        {open && !bare ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} /> : null}
       </View>
 
-      {(trail.zoomInHint || trail.closerForTracks) && !open ? (
+      {(trail.zoomInHint || trail.closerForTracks) && !open && !bare ? (
         <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
           <Text style={styles.hintText}>{trail.zoomInHint ? 'Zoom In to See Trails' : 'Zoom In for Park and Local Trails'}</Text>
         </View>
       ) : null}
 
-      {!open ? (
+      {!open || bare ? (
         <View pointerEvents="box-none" style={[styles.bottom, cardTop != null ? { top: cardTop } : { bottom }, cardWidth ? { left: 'auto', width: cardWidth } : null]}>
           {trail.looking ? (
             <View style={styles.looking}>
