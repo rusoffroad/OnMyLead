@@ -10,6 +10,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
+import { FollowMeButton } from '@/components/follow-me-button';
 import { FullMapButton } from '@/components/full-map';
 import { HoldButton } from '@/components/hold-button';
 import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group-map';
@@ -38,6 +39,7 @@ import { tally } from '@/core/broadcast';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
+import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
 import { RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
 import { isVerticalSwipe } from '@/core/panel-swipe';
 import { riderHeading } from '@/core/heading';
@@ -53,6 +55,7 @@ import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
+import { useFollowMe } from '@/hooks/use-follow-me';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { useLeaderTrail } from '@/hooks/use-leader-trail';
@@ -746,8 +749,20 @@ export default function RideMode() {
   const openMapInset = tablet
     ? { top: insets.top + EDGE, right: panelW + 2 * EDGE, bottom: panelBottom, left: sidebar.open ? sideW + 2 * EDGE : 0 }
     : { top: shownBannersBottom, right: 0, bottom: panelBottom + panelH, left: 0 };
+  // Follow Me (core/follow-camera): the map keeps this rider's dot in the open map as they ride.
+  // Dragging the map pauses it; Center on Me or the Follow Me button picks it back up.
+  const follow = useFollowMe();
+  const following = followCamActive(follow.cam, { recording: false, following: false, nearTrail: false, followMe: follow.on });
+  const followStatus = followMeStatus(follow.on, follow.cam);
+  function tapFollowMe() {
+    const act = followMeTap(followStatus);
+    if (act === 'turn-off') return follow.setOn(false);
+    if (act === 'turn-on') follow.setOn(true);
+    follow.camEvent('center');
+  }
   async function centerOnMe() {
     Haptics.selectionAsync().catch(() => {});
+    follow.camEvent('center');
     let at = myFix;
     if (!at) {
       try {
@@ -918,7 +933,12 @@ export default function RideMode() {
         edgePadding={fitPadding}
         fallback={meet}
         onReady={() => setMapReady(true)}
-        onUserMove={() => setMapMoved(true)}
+        onUserMove={() => {
+          setMapMoved(true);
+          follow.camEvent('pan');
+        }}
+        follow={following ? { inset: openMapInset } : null}
+        locationEveryMs={batteryMode === 'best' ? 1000 : BATTERY_PLANS[batteryMode].fixEveryMs}
       />
       {/* In Full Map only No Signal and a tapped trail's card stay; the layers button tucks away. */}
       <TrailMapOverlay
@@ -1104,6 +1124,14 @@ export default function RideMode() {
         </Pressable>
       ) : null}
 
+      {locateFits ? (
+        <FollowMeButton
+          status={followStatus}
+          onPress={tapFollowMe}
+          compact={fullMap}
+          style={{ bottom: locateBottom, right: (tablet ? panelW + 2 * EDGE : 12) + LOCATE_SIZE + 8 }}
+        />
+      ) : null}
       {locateFits ? (
         <Pressable
           onPress={centerOnMe}

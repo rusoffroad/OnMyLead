@@ -1,4 +1,4 @@
-import { useEffect, useImperativeHandle, useMemo, useRef, type Ref } from 'react';
+import { useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
@@ -11,6 +11,7 @@ import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MarkerBody } from './marker-body';
+import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 
@@ -52,6 +53,8 @@ export function NavMap({
   followMe?: LatLng | null;
   /** The rider dragged, pinched or turned the map by hand. */
   onUserMove?: () => void;
+  /** The website draws the rider's arrow from this; the phones read their own map dot. */
+  meHeading?: number | null;
   ref?: Ref<NavMapHandle>;
 }) {
   const map = useRef<MapView>(null);
@@ -60,6 +63,9 @@ export function NavMap({
   const size = useRef({ width: 390, height: 800 });
   const followed = useRef<LatLng | null>(null);
   const centered = useRef(false);
+  // The arrow on the rider's own dot (the phone draws the dot itself, never with a direction).
+  const own = useOwnLocation();
+  const [mapHeading, setMapHeading] = useState(0);
   const pad = padding ?? [120, 50, 320, 50];
   const edge = { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] };
 
@@ -126,6 +132,9 @@ export function NavMap({
       style={StyleSheet.absoluteFill}
       mapType={trail.mapProps.mapType}
       showsUserLocation
+      onUserLocationChange={own.onUserLocationChange}
+      userLocationUpdateInterval={1000}
+      userLocationFastestInterval={1000}
       showsCompass
       showsScale
       tintColor={Colors.text}
@@ -141,6 +150,7 @@ export function NavMap({
         region.current = r;
         onCenter?.({ lat: r.latitude, lng: r.longitude });
         trail.mapProps.onRegionChangeComplete(r);
+        map.current?.getCamera().then((c) => setMapHeading(Math.round(c.heading ?? 0))).catch(() => {});
       }}
       onPress={(e) => {
         if (e.nativeEvent.action === 'marker-press') return;
@@ -150,6 +160,7 @@ export function NavMap({
       }}
       onLongPress={(e) => trail.identifyAt(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)}>
       <TrailTiles trail={trail} />
+      <OwnHeadingMarker own={own} mapHeading={mapHeading} />
       {following && following.length > 1 ? (
         <>
           <RouteLine points={following} />

@@ -2,8 +2,8 @@
   {
     "version": "1.0.4",
     "title": "Accurate Locations, a Notifications Inbox and Easier Leaving",
-    "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone. And every map can go Full Map, with one tap on Controls to bring the buttons back. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own message and save your own quick replies.\n• Ride Mode tells you when your location is rough and helps fix it.\n• Android asks for precise location.\n• Rough locations are labeled Approximate.\n• New bell on the Rides tab: see and clear your notifications.\n• Easier Leave Ride; organizers can hand off the ride and leave.\n• Full Map on every map.\n• Freeride rides get the rider line.\n• Update Available when a new version is out.\n• Fixed: ride miles.",
+    "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone. And every map can go Full Map, with one tap on Controls to bring the buttons back. Follow Me keeps Ride Mode and Navigate moving with you as you ride, and your own dot now has the arrow showing which way you're heading. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own messages and quick replies.\n• Ride Mode flags a rough location and helps fix it.\n• Android asks for precise location.\n• Rough locations say Approximate.\n• New bell on the Rides tab for your notifications.\n• Easier Leave Ride; organizers can hand off and leave.\n• Full Map on every map.\n• Follow Me keeps the map on you; your dot shows your heading.\n• Freeride rides get the rider line.\n• Update Available for new versions.\n• Fixed: ride miles.",
     "apple": null,
     "google": null,
     "notes": [
@@ -18,6 +18,14 @@
       {
         "kind": "new",
         "text": "Notifications: tap the bell at the top right of the Rides tab to see what OnMyLead sent you in the last 30 days, with a red number for new ones. Tap one to open it, Mark All Read, swipe one left to clear it, or Clear All, which also clears them from your phone's own notification list and resets the app icon badge. Also on onmylead.com."
+      },
+      {
+        "kind": "new",
+        "text": "Follow Me: in Ride Mode and Navigate the map now moves with you as you ride, so your dot stays in view without dragging the map. Drag or pinch the map to look around and it pauses; tap Paused or Center on Me to follow you again, or tap Following to turn it off. Your phone remembers the choice, and Follow Me on Maps in the You tab switches it too."
+      },
+      {
+        "kind": "fixed",
+        "text": "Your own dot had no direction arrow. Other riders' dots showed which way they were heading, but your own blue dot never did, because iPhone, iPad and Android draw that dot without a direction. Now your dot gets the same white arrow while you're moving."
       },
       {
         "kind": "fixed",
