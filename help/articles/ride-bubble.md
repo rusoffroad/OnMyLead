@@ -4,9 +4,10 @@ summary: Ride Bubble watches for riders who drop back, run ahead or stop moving,
 category: ride-mode
 order: 30
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/core/bubble.ts
+  - app/src/core/precise-location.ts
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/ride/new.tsx
   - app/src/components/rider-pin.tsx
@@ -28,6 +29,10 @@ A rider turns yellow or red when:
 - **Their phone has gone quiet.** No update for 5 minutes turns a rider red, with a message like "No update from Sam for 6 minutes. Showing last known location."
 
 Only riders who are sharing their location are part of Ride Bubble. A rider who isn't sharing can't be measured.
+
+:::release 1.0.4
+A rider whose phone shares only an approximate location (Precise Location turned off) can show up a mile or more from where they are. Ride Bubble leaves out the distance their rough location could be off by, so a rider beside you isn't called separated. See [Make Your Location Accurate](/help/accurate-location).
+:::
 
 ## Ride Bubble Settings
 
