@@ -4,7 +4,7 @@ summary: Choose who sees your location and for how long, from a few hours to unt
 category: safety-privacy
 order: 10
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/share.tsx
@@ -30,6 +30,11 @@ Every share ends on its own.
 There are two ways to share:
 
 - **With a ride:** everyone on the ride sees you on the Ride Mode map.
+
+:::release 1.0.4
+On a Freeride, if you're the leader, each rider's phone keeps the path you've ridden while they're in Ride Mode, built from the same live location they already see, to measure how far behind you everyone is. It stays on their phone, isn't uploaded, and is cleared after 18 hours or when they open another Freeride.
+:::
+
 - **With chosen people:** riders you pick, a family link, or both, from **Share My Location**.
 
 ## Share with Your Ride

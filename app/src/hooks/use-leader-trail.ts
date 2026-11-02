@@ -1,11 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useRef, useState } from 'react';
 
-import { extendTrail, parseStoredTrail, type LeaderTrail } from '@/core/freeride';
+import { extendTrail, parseStoredTrail, TRAIL_MAX_AGE_MS, type LeaderTrail } from '@/core/freeride';
 import type { LatLng } from '@/core/geo';
 
 /** One slot on the phone: only the latest Freeride's trail is kept, so old rides never pile up. */
 const KEY = 'ride.leaderTrail.v1';
+function isStale(raw: string): boolean {
+  try {
+    const at = (JSON.parse(raw) as { updatedAt?: unknown }).updatedAt;
+    return typeof at !== 'number' || Date.now() - at > TRAIL_MAX_AGE_MS;
+  } catch {
+    return true;
+  }
+}
+
 /** Save at most this often while the trail grows. */
 const SAVE_EVERY_MS = 20_000;
 
@@ -28,6 +37,8 @@ export function useLeaderTrail(rideId: string | undefined, leaderId: string | nu
         if (gone) return;
         loaded.current = rideId;
         const stored = parseStoredTrail(raw, rideId);
+        // A trail older than the limit (for any ride) is deleted, not just skipped.
+        if (raw && !stored && isStale(raw)) AsyncStorage.removeItem(KEY).catch(() => {});
         // A spot that arrived while reading wins over nothing, but a kept trail carries on from it.
         if (stored) setTrail((t) => (t && t.leaderId === stored.leaderId ? t.points.reduce((acc, p) => extendTrail(acc, rideId, stored.leaderId, p), stored) : t ?? stored));
       })

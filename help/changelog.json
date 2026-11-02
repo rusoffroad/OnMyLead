@@ -10,6 +10,36 @@
     "why": "Coming in 1.0.4: on a Freeride (no mapped route), Ride Mode's line shows every sharing rider in order behind the leader, measured along the path the leader has ridden (kept on each phone, never uploaded), with the group's spread and how far the leader is ahead. Written in a 1.0.4 release block so it shows once 1.0.4 is out."
   },
   {
+    "date": "2026-11-02",
+    "slugs": [
+      "location-sharing"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "freeride-rider-line",
+    "why": "Coming in 1.0.4: says that on a Freeride each rider's phone keeps the leader's path (from the live location riders already see) to measure the group's spread, that it stays on the phone, and that it is cleared after 18 hours or on the next Freeride."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "getting-started",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "freeride-rider-line",
+    "why": "Ride Mode's screen code changed to show the rider line on Freeride rides (see Use Ride Mode). These guides list Ride Mode as a source; nothing in them changes for riders."
+  },
+  {
     "date": "2026-11-01",
     "slugs": [
       "create-a-ride-on-the-website",
