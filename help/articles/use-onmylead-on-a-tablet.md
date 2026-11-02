@@ -56,6 +56,10 @@ On a tablet, Ride Mode's pop-up cards (Share Your Location, **EMERGENCY**) and s
 
 :::release 1.0.2
 The round target button at the bottom of the map, just left of the buttons panel, centers the map on you. See [Use Ride Mode](/help/ride-mode).
+
+:::release 1.0.4
+**Follow Me** sits just left of that button and keeps the map moving with you as you ride. Drag the map to look around and it pauses; tap **Paused** to follow you again. See [Follow Me on the Map](/help/follow-me).
+:::
 :::
 
 :::release 1.0.3
