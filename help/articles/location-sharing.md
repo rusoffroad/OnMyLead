@@ -30,6 +30,11 @@ Every share ends on its own.
 There are two ways to share:
 
 - **With a ride:** everyone on the ride sees you on the Ride Mode map.
+
+:::release 1.0.4
+On a Freeride, if you're the leader, each rider's phone keeps the path you've ridden while they're in Ride Mode, built from the same live location they already see, to measure how far behind you everyone is. It stays on their phone, isn't uploaded, and is cleared after 18 hours or when they open another Freeride.
+:::
+
 - **With chosen people:** riders you pick, a family link, or both, from **Share My Location**.
 
 ## Share with Your Ride

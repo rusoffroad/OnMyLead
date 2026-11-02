@@ -48,12 +48,14 @@ import { isApproximateFix, LOCATION_PROBLEM_BANNER } from '@/core/precise-locati
 import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
+import { FreerideTracker, summarizeFreeride } from '@/core/freeride';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
+import { useLeaderTrail } from '@/hooks/use-leader-trail';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { usePreciseLocation } from '@/hooks/use-precise-location';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
@@ -178,7 +180,7 @@ export default function RideMode() {
   const heard = useCallback(() => setLastHeardAt(Date.now()), []);
   const [busy, setBusy] = useState(false);
   const announced = useRef(new Set<string>());
-  const [route, setRoute] = useState<{ route: RideRoute | null; offline: boolean }>({ route: null, offline: false });
+  const [route, setRoute] = useState<{ route: RideRoute | null; offline: boolean; loaded?: boolean }>({ route: null, offline: false });
   // This phone's own fix, kept on the phone: it places me on the route even when I'm not sharing.
   const [myFix, setMyFix] = useState<{ lat: number; lng: number } | null>(null);
   // Each rider's last progress along the route, so loops and out-and-backs don't make them jump.
@@ -287,7 +289,7 @@ export default function RideMode() {
   }, []);
   const refresh = useCallback(() => loadSnapshot(id).then(apply).catch(() => {}), [id, apply]);
 
-  const loadRoute = useCallback(() => getRideRoute(id).then(setRoute).catch(() => {}), [id]);
+  const loadRoute = useCallback(() => getRideRoute(id).then((r) => setRoute({ ...r, loaded: true })).catch(() => {}), [id]);
 
   // Find this rider's share for the ride. With one, make sure the phone is sending (it resumes a
   // share after the app was closed or the phone restarted); without one, ask once. With no
@@ -334,16 +336,19 @@ export default function RideMode() {
     return () => sub.remove();
   }, [refresh, loadShare]);
 
-  // Follow this phone's position while Ride Mode is open and there is a route to place it on.
-  // Only if location access was already given; this never asks and never uploads.
+  // Follow this phone's position while Ride Mode is open and there is a line to place it on: the
+  // route, or on a Freeride the group behind the leader. Only if location access was already
+  // given; this never asks and never uploads.
   const hasRoute = !!route.route;
+  const freeride = !!route.loaded && !route.route;
+  const placesMe = hasRoute || freeride;
   // Battery Saver also slows this screen's own work: the blue dot and the backup check for riders.
   const batteryMode = useBatteryMode();
   // Approximate Location (Android) or Precise off (iPhone, iPad) puts this rider miles from where they are.
   const precise = usePreciseLocation(me ? positions[me]?.accuracy_m : null);
   const { followEveryM, refreshSec } = BATTERY_PLANS[batteryMode];
   useEffect(() => {
-    if (!hasRoute) return;
+    if (!placesMe) return;
     let sub: Location.LocationSubscription | null = null;
     let gone = false;
     Location.getForegroundPermissionsAsync()
@@ -359,7 +364,7 @@ export default function RideMode() {
       gone = true;
       sub?.remove();
     };
-  }, [hasRoute, followEveryM]);
+  }, [placesMe, followEveryM]);
 
   // Live updates, with polling as a fallback for flaky connections.
   useEffect(() => {
@@ -525,6 +530,23 @@ export default function RideMode() {
   const lastSeenIds = mapRiders.filter((r) => r.id !== me && r.freshness && r.freshness.state !== 'live').map((r) => r.id);
   const routeSummary = route.route ? summarizeMe(route.route, placed, me) : null;
 
+  // Freeride: no route, so the line shows the group behind the leader, measured along the trail
+  // the leader has ridden (kept on this phone from the leader's live spots; never uploaded).
+  const spotOf = useCallback(
+    (userId: string) => (userId === me && myFix ? myFix : positions[userId] ? { lat: positions[userId].lat, lng: positions[userId].lng } : null),
+    [me, myFix, positions],
+  );
+  const trailLeaderId = freeride ? leaderIds.find((l) => joined.some((m) => m.user_id === l) && spotOf(l)) ?? null : null;
+  const trailLeaderAt = trailLeaderId ? spotOf(trailLeaderId) : null;
+  const leaderTrail = useLeaderTrail(id, trailLeaderId, trailLeaderAt, freeride);
+  const [freerideTracker] = useState(() => new FreerideTracker());
+  const freerideLine = useMemo(() => {
+    if (!freeride) return null;
+    const riders = joined.map((m) => ({ id: m.user_id, role: bubbleRole(m.role, leaderIds.includes(m.user_id)), at: spotOf(m.user_id) }));
+    return freerideTracker.place(leaderTrail, trailLeaderId, riders);
+  }, [freeride, joined, leaderIds, spotOf, leaderTrail, trailLeaderId, freerideTracker]);
+  const freerideStrip = freerideLine ? { summary: summarizeFreeride(freerideLine, me), waiting: !freerideLine.leaderId } : null;
+
   // With a route, tell this rider whether their machine's range (from the garage) covers it.
   const [vehicles, setVehicles] = useState<VehicleWithCost[]>([]);
   useEffect(() => {
@@ -570,7 +592,7 @@ export default function RideMode() {
   const panelSpace = screenH - panelBottom - Spacing.two - panelTop - (bannersOverPanel ? 6 + Math.min(bannersH, BANNERS_MIN) : 0);
   const stripHidden = panelOpen && !!panelH &&
     panelSpace < panelRest - stripH + (alertsShown ? ALERTS_MIN : 0) + compactStripH;
-  const stripShown = !!route.route && !stripHidden;
+  const stripShown = (!!route.route || freeride) && !stripHidden;
   const alertsMax = panelH ? Math.min(ALERTS_MAX, Math.max(ALERTS_MIN, roomBelowBanners - panelRest)) : ALERTS_MAX;
   const bannersMax = tablet
     ? Math.max(BANNERS_MIN, Math.round(screenH * 0.35))
@@ -1107,7 +1129,7 @@ export default function RideMode() {
           { transform: [{ translateY: fullMap ? 0 : panelDrag }] },
         ]}>
       <SafeAreaView edges={tablet ? [] : ['bottom']} style={[styles.bottom, tablet && styles.bottomTablet]}>
-        {route.route && stripShown ? (
+        {stripShown ? (
           <View
             ref={stripRef}
             onLayout={(e) => {
@@ -1116,15 +1138,16 @@ export default function RideMode() {
               if (stripCompact) setCompactStripH(h);
             }}>
           <RouteStrip
-            lengthM={route.route.lengthM}
-            riders={placed}
+            lengthM={route.route?.lengthM ?? freerideLine?.lengthM ?? 0}
+            riders={route.route ? placed : freerideLine?.placed ?? []}
             meId={me}
             summary={routeSummary}
             nameOf={nameOf}
             offline={route.offline}
             lastSeenIds={lastSeenIds}
-            range={rangeNote}
+            range={route.route ? rangeNote : null}
             compact={stripCompact}
+            freeride={route.route ? null : freerideStrip}
           />
           </View>
         ) : null}

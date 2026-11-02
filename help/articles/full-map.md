@@ -6,6 +6,7 @@ order: 12
 release: "1.0.4"
 updated: 2026-11-02
 sources:
+  - app/src/core/freeride.ts
   - app/src/components/full-map.tsx
   - app/src/hooks/use-full-map.ts
   - app/src/core/full-map.ts
@@ -46,7 +47,7 @@ The bar keeps only what you shouldn't have to dig for:
 
 | Map | In the bar or on the map |
 | --- | --- |
-| Ride Mode | The route line with every rider, **EMERGENCY**, calls for help from other riders, **Center on Me** |
+| Ride Mode | The rider line with every rider (on a Freeride, the group behind the leader), **EMERGENCY**, calls for help from other riders, **Center on Me** |
 | Navigate | Your speed, the miles left on a trail you're following, or the length you're measuring, a red **Rec** while recording, **Undo** while measuring, **Center on Me** |
 | Draw a Route | The route's miles and **Undo**. Tapping the map still adds points |
 | Waypoints | How many waypoints the ride has. Press and hold the map to drop one |
