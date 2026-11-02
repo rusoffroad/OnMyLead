@@ -191,10 +191,17 @@ Want the map and nothing else? Tap **⤢ Full Map** at the top of the bottom pan
 
 - the route line with every rider's dot (when the ride has a route);
 - **EMERGENCY**, always one tap away;
-- Need Help and EMERGENCY calls from other riders;
-- **Menus ▲**, with a badge counting any other alerts.
+- Need Help and EMERGENCY calls from other riders.
 
-Tap **Menus ▲** to bring back the status buttons, quick replies and everything else. Full Map works the same on iPhone, iPad, Android phones and Android tablets.
+Full Map works the same on iPhone, iPad, Android phones and Android tablets.
+:::
+
+:::until 1.0.4
+The bar also has **Menus ▲**, with a badge counting any other alerts. Tap it to bring back the status buttons, quick replies and everything else.
+:::
+
+:::release 1.0.4
+The bar also has **Controls**, with a badge counting any other alerts. Tap it, or swipe the bar up, to bring back the status buttons, quick replies and everything else. **Center on Me** and the **No Signal** tag stay on the map, and tapping a trail line still shows its card. Your phone remembers Full Map, so Ride Mode opens the same way next time. Every other map works the same way: see [Full Map](/help/full-map).
 :::
 
 :::release 1.0.4

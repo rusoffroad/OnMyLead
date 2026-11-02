@@ -4,7 +4,7 @@ summary: Use Navigate as your offroad map, record or draw your own trails, share
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/app/nav/index.tsx
   - app/src/app/nav/trails.tsx
@@ -29,6 +29,10 @@ keywords: [navigate, navigation, nav mode, navigation mode, offroad map, gps, re
 - Or on the **You** tab, tap **Navigate** under **On the Trail**.
 
 At the top of the map are three tabs: **Explore**, **Record** and **Measure**. Swipe the panel down to see more of the map, and up to bring it back.
+
+:::release 1.0.4
+For the whole screen, tap **Full Map** on the panel's grab bar. A slim bar keeps your speed (or the miles left on a trail you're following, or the length you're measuring, with **Undo**), a red **Rec** while you record, and **Center on Me** stays. Tap **Controls**, or swipe the bar up, to bring everything back. See [Full Map](/help/full-map).
+:::
 
 :::tip
 On a tablet, the panel sits beside the map in landscape, and floats over the corner of the map in portrait.

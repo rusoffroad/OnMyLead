@@ -112,6 +112,10 @@ The waypoints map works on onmylead.com too. Click the map to drop a waypoint, a
 
 On a tablet held sideways, the waypoint list sits beside the map; swipe it up or tap **Hide** to fold it.
 
+:::release 1.0.4
+For the whole screen, tap **Full Map** on the panel's grab bar. Press and hold the map to drop waypoints as usual, and tap **Controls** (or swipe the bar up) to bring the list back. See [Full Map](/help/full-map).
+:::
+
 ## No Signal
 
 The waypoints you can see are saved on your phone, so they stay on the map without signal. The panel shows **Saved on This Phone** when that's what you're seeing.

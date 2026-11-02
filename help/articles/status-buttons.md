@@ -84,7 +84,15 @@ The grid below sets your status for the group:
 **Need Help** sends right away and shows in red for the group. **EMERGENCY** asks you to confirm first. See [Emergencies and Safety](/help/emergency-and-safety).
 
 :::release 1.0.3
-In [Full Map](/help/ride-mode), the quick replies and status buttons are tucked away and only **EMERGENCY** stays on screen. Tap **Menus ▲** to bring the rest back.
+In [Full Map](/help/ride-mode), the quick replies and status buttons are tucked away and only **EMERGENCY** stays on screen.
+:::
+
+:::until 1.0.4
+Tap **Menus ▲** to bring the rest back.
+:::
+
+:::release 1.0.4
+Tap **Controls**, or swipe the bar up, to bring the rest back.
 :::
 
 ## Send a Status

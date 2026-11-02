@@ -24,7 +24,14 @@ export type RidesMapProps = {
   onSearchArea?: (visible: Bounds) => void;
   /** Pixels, or '100%' to fill a pane (Find a Ride beside its list on a tablet). */
   height?: number | '100%';
+  /** Full Map: the map fills the screen. `onToggleFull` adds the button that switches it. */
+  full?: boolean;
+  onToggleFull?: () => void;
 };
+
+/** The map's frame: a rounded card in the page, or square corners when it fills the screen. */
+export const mapFrameStyle = (height: number | '100%', full?: boolean) =>
+  ({ height, borderRadius: full ? 0 : Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement }) as const;
 
 export const pinColor = (r: Pick<Ride, 'status'>) => (r.status === 'live' ? Colors.accent : Colors.sky);
 
@@ -65,10 +72,17 @@ function RoundButton({ icon, label, onPress }: { icon: IconName; label: string; 
   );
 }
 
-/** Zoom and back-to-my-state buttons, stacked on the map's right edge. */
-export function MapControls({ onZoomIn, onZoomOut, onRecenter }: { onZoomIn: () => void; onZoomOut: () => void; onRecenter: () => void }) {
+/** Full Map, zoom and back-to-my-state buttons, stacked on the map's right edge. */
+export function MapControls({
+  onZoomIn, onZoomOut, onRecenter, full, onToggleFull,
+}: { onZoomIn: () => void; onZoomOut: () => void; onRecenter: () => void; full?: boolean; onToggleFull?: () => void }) {
   return (
     <View style={styles.controls} pointerEvents="box-none">
+      {onToggleFull ? (
+        <View style={styles.zoomStack}>
+          <RoundButton icon={full ? 'collapse' : 'expand'} label={full ? 'Exit Full Map' : 'Full Map'} onPress={onToggleFull} />
+        </View>
+      ) : null}
       <View style={styles.zoomStack}>
         <RoundButton icon="plus" label="Zoom in" onPress={onZoomIn} />
         <View style={styles.rule} />

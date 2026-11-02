@@ -42,6 +42,55 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "full-map"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "full-map",
+    "why": "Coming in 1.0.4: Full Map on every map (Ride Mode, Navigate, Draw a Route, Waypoints, Find a Ride). Chris asked for as much map as possible in every mode, with the buttons easy to bring back."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "ride-mode",
+      "status-buttons",
+      "use-onmylead-on-a-tablet",
+      "route-builder",
+      "navigation-mode",
+      "waypoints-and-planned-stops",
+      "find-a-ride"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "full-map",
+    "why": "Coming in 1.0.4: where Full Map is on each map and what stays on screen. Ride Mode's Menus button is now Controls (same name on every map), the bar also swipes up, Center on Me and No Signal stay, and the phone remembers Full Map."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "getting-started",
+      "import-gpx",
+      "location-sharing",
+      "map-layers",
+      "offline-maps",
+      "place-search",
+      "ride-bubble",
+      "ride-chat",
+      "troubleshooting",
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "fuel-range"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "full-map",
+    "why": "Checked against the Full Map change, which touched screens these guides describe (Ride Mode, the route builder, waypoints, Find a Ride, the map layers button). Nothing they say changed; Full Map has its own guide."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "status-buttons",
       "ride-chat",
       "ride-mode",

@@ -5,11 +5,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ActivityIndicator, Alert, Animated, AppState, Linking, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View,
+  ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
+import { FullMapButton } from '@/components/full-map';
 import { HoldButton } from '@/components/hold-button';
 import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group-map';
 import { Icon } from '@/components/icon';
@@ -37,6 +38,8 @@ import { tally } from '@/core/broadcast';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
+import { RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
+import { isVerticalSwipe } from '@/core/panel-swipe';
 import { riderHeading } from '@/core/heading';
 import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
@@ -50,6 +53,7 @@ import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
+import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { useLeaderTrail } from '@/hooks/use-leader-trail';
 import { usePanelFold } from '@/hooks/use-panel-fold';
@@ -210,14 +214,24 @@ export default function RideMode() {
   // Emergency, and calls for help, always stay.
   const { open: panelFoldOpen, setOpen: setPanelOpen, drag: panelDrag, panHandlers: panelSwipeHandlers } = usePanelFold('ride.modePanelOpen.v1');
   // Full Map: everything over the map tucks away except a slim bar at the bottom with the route
-  // line (every rider's dot in running order), Menus to bring it all back, and Emergency, which
-  // is always one tap away. Calls for help from other riders still show in the bar.
-  const [fullMap, setFullMap] = useState(false);
+  // line (every rider's dot in running order), Controls to bring it all back (tap, or swipe the
+  // bar up), Center on Me, and Emergency, which is always one tap away. Calls for help from other
+  // riders still show in the bar. The phone remembers it, like Full Map on every other map.
+  const { full: fullMap, enter: enterFullMap, exit: exitFullMap } = useFullMap('ride.fullMap.v1');
   const panelOpen = panelFoldOpen && !fullMap;
   const showMenus = useCallback(() => {
-    setFullMap(false);
+    exitFullMap();
     setPanelOpen(true);
-  }, [setPanelOpen]);
+  }, [exitFullMap, setPanelOpen]);
+  const fullMapSwipe = useMemo(
+    () => PanResponder.create({
+      onMoveShouldSetPanResponder: (_e, g) => isVerticalSwipe(g.dx, g.dy),
+      onPanResponderRelease: (_e, g) => {
+        if (swipeRestores(g.dy, g.vy)) showMenus();
+      },
+    }),
+    [showMenus],
+  );
   // The sharing timer folds down to a small pill next to the ride name.
   const [shareOpen, toggleShareOpen] = useRememberedToggle('ride.shareBannerOpen.v1', false);
   // Tablets: the riders sidebar folds away to the left (swipe it left, or tap Hide) to see more map.
@@ -585,7 +599,7 @@ export default function RideMode() {
     : panelH
       ? Math.max(BANNERS_MIN, screenH - Spacing.two - panelRest - (alertsShown ? ALERTS_MIN : 0) - topRowBottom - 6)
       : undefined;
-  const shownBannersBottom = tablet ? panelTop : topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
+  const shownBannersBottom = fullMap ? insets.top : tablet ? panelTop : topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
   // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
   // and hold the map still drops one).
   const wpFabFits = !fullMap && screenH - panelBottom - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
@@ -906,16 +920,16 @@ export default function RideMode() {
         onReady={() => setMapReady(true)}
         onUserMove={() => setMapMoved(true)}
       />
-      {fullMap ? null : (
+      {/* In Full Map only No Signal and a tapped trail's card stay; the layers button tucks away. */}
       <TrailMapOverlay
         trail={trail}
-        top={tablet ? insets.top + EDGE : insets.top + 66}
-        cardTop={tablet ? insets.top + 64 : insets.top + 118}
+        bare={fullMap}
+        top={tablet || fullMap ? insets.top + EDGE : insets.top + 66}
+        cardTop={tablet || fullMap ? insets.top + 64 : insets.top + 118}
         cardWidth={tablet ? Math.min(360, layout.width - sideW - 3 * EDGE) : undefined}
         route={route.route?.points}
         ride={ride}
       />
-      )}
 
       {fullMap ? null : (
       <SafeAreaView
@@ -1107,7 +1121,7 @@ export default function RideMode() {
       ) : null}
 
       <Animated.View
-        {...(fullMap ? {} : panelSwipeHandlers)}
+        {...(fullMap ? fullMapSwipe.panHandlers : panelSwipeHandlers)}
         onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}
         style={[
           styles.bottomWrap,
@@ -1150,15 +1164,7 @@ export default function RideMode() {
               <View style={styles.handleBar} />
               {panelOpen ? <Text style={styles.handleText}>Hide ▼</Text> : null}
             </Pressable>
-            <Pressable
-              onPress={() => setFullMap(true)}
-              accessibilityRole="button"
-              accessibilityLabel="Full Map"
-              accessibilityHint="Hides everything but the rider line and Emergency. Tap Menus to bring it all back"
-              hitSlop={8}
-              style={({ pressed }) => [styles.fullMapBtn, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.fullMapText}>⤢ Full Map</Text>
-            </Pressable>
+            <FullMapButton onPress={enterFullMap} style={styles.fullMapBtn} />
             <Pressable
               onPress={() => setMessageOpen(true)}
               accessibilityRole="button"
@@ -1263,9 +1269,11 @@ export default function RideMode() {
             <Pressable
               onPress={showMenus}
               accessibilityRole="button"
-              accessibilityLabel={foldedCount ? `Show the menus and ${foldedCount} more alerts` : 'Show the menus: messages, status buttons and the ride'}
+              accessibilityLabel={restoreA11yLabel(foldedCount)}
+              accessibilityHint="Brings back messages, status buttons and the ride. You can also swipe the bar up"
               style={({ pressed }) => [styles.foldedShow, styles.fullMapBarBtn, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.foldedShowText}>Menus ▲</Text>
+              <Icon name="collapse" size={20} color={Colors.text} strokeWidth={2.4} />
+              <Text style={styles.foldedShowText}>{RESTORE_LABEL}</Text>
               {foldedCount ? (
                 <View style={styles.foldedBadge}>
                   <Text style={styles.foldedBadgeText}>{foldedCount}</Text>
@@ -1517,11 +1525,7 @@ const styles = StyleSheet.create({
   handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },
   handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
   handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
-  fullMapBtn: {
-    position: 'absolute', right: 0, top: -4, minHeight: 34, paddingHorizontal: 12, borderRadius: 17,
-    justifyContent: 'center', backgroundColor: Colors.backgroundSelected,
-  },
-  fullMapText: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
+  fullMapBtn: { position: 'absolute', right: 0, top: -4 },
   // Mirrors Full Map on the left of the handle: Type a Message.
   typeBtn: {
     position: 'absolute', left: 0, top: -4, minHeight: 34, paddingHorizontal: 12, borderRadius: 17,

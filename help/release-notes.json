@@ -2,8 +2,8 @@
   {
     "version": "1.0.4",
     "title": "Accurate Locations, a Notifications Inbox and Easier Leaving",
-    "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own message to the group and save your own quick replies.\n• Ride Mode tells you when your location is rough and helps fix it.\n• Android asks for a precise location when you share.\n• Rough locations are labeled Approximate Location, and Ride Bubble no longer calls them separated.\n• New bell on the Rides tab: see and clear your notifications.\n• Easier Leave Ride; organizers can hand off the ride and leave.\n• Freeride rides get the rider line.",
+    "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone. And every map can go Full Map, with one tap on Controls to bring the buttons back. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own message and save your own quick replies.\n• Ride Mode tells you when your location is rough and helps fix it.\n• Android asks for a precise location when you share.\n• Rough locations are labeled Approximate Location; Ride Bubble won't call them separated.\n• New bell on the Rides tab: see and clear your notifications.\n• Easier Leave Ride; organizers can hand off the ride and leave.\n• Full Map on every map.\n• Freeride rides get the rider line.",
     "apple": null,
     "google": null,
     "notes": [
@@ -34,6 +34,10 @@
       {
         "kind": "new",
         "text": "Organizers can leave their own ride. Tap Leave Ride, pick who takes over from the riders who joined, and they become the organizer and leader. Nobody else on it yet? Leave Ride offers to cancel the ride instead."
+      },
+      {
+        "kind": "new",
+        "text": "Full Map on every map: Ride Mode, Navigate, Draw a Route, Waypoints and Find a Ride. Tap Full Map and the bars and panels tuck away so the map fills your screen. One slim bar keeps what matters (EMERGENCY and the route line in Ride Mode, your speed in Navigate, the miles and Undo while drawing a route), and Controls brings everything back. Swipe the bar up to do the same. Your phone remembers it for next time."
       }
     ]
   },

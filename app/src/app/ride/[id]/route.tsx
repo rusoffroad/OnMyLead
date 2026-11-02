@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
 import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { PanelHandle } from '@/components/panel-handle';
@@ -14,6 +15,7 @@ import { TrailPickerSheet } from '@/components/trail-picker-sheet';
 import { Button, ErrorText } from '@/components/ui';
 import Svg, { Path } from 'react-native-svg';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { fullMapPadding } from '@/core/full-map';
 import type { LatLng } from '@/core/geo';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import type { Place } from '@/core/places';
@@ -22,6 +24,7 @@ import { routeFromLegs } from '@/core/route-legs';
 import { trailAsRoute } from '@/core/nav-trails';
 import { loadTrails, trailLine } from '@/lib/nav-trails';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
+import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRouteDraft } from '@/hooks/use-route-draft';
@@ -71,6 +74,9 @@ export default function RouteBuilder() {
   // The tools panel folds down to the miles and Undo (swipe it down, or tap the handle) to see more map.
   const fold = usePanelFold('route.panelOpen.v1', true, wide ? 'up' : 'down');
   const open = fold.open;
+  // Full Map: the top bar, layers and tools tuck away; the miles and Undo stay in a slim bar.
+  const fullMap = useFullMap('route.fullMap.v1');
+  const full = fullMap.full;
 
   useEffect(() => {
     Promise.all([getRide(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])
@@ -185,13 +191,14 @@ export default function RouteBuilder() {
           trail={trail}
           found={found}
           onCenter={(c) => (looking.current = c)}
-          padding={wide ? [90, 70, 40, PANEL_W + 60] : undefined}
+          padding={full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : undefined}
         />
       ) : null}
       {loaded ? (
         <TrailMapOverlay
           trail={trail}
-          top={insets.top + 66}
+          bare={full}
+          top={full ? insets.top + 12 : insets.top + 66}
           cardTop={insets.top + 118}
           route={route?.points}
           ride={ride}
@@ -199,6 +206,15 @@ export default function RouteBuilder() {
         />
       ) : null}
 
+      {full ? (
+        <FullMapBar onRestore={fullMap.exit} wide={wide || floating} credit={follow && !imported ? `Trails: ${OSM_ATTRIBUTION}` : null}>
+          {draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
+          <BarReadout value={route ? miles(route.lengthM) : '0.0'} unit="mi" label={`${route ? miles(route.lengthM) : 0} miles`} />
+          {!imported ? <BarChip title="Undo" label="Undo the last point" disabled={!taps.length} onPress={draft.undo} /> : null}
+        </FullMapBar>
+      ) : null}
+
+      {full ? null : (
       <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]}>
         {searching !== false ? (
           <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
@@ -219,12 +235,14 @@ export default function RouteBuilder() {
           </View>
         )}
       </SafeAreaView>
+      )}
 
+      {full ? null : (
       <Animated.View
         {...fold.panHandlers}
         style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !open && styles.panelFolded]}>
-        <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Route Tools" fromTop={wide} />
+        <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Route Tools" fromTop={wide} onFullMap={fullMap.enter} />
         <View style={styles.readout}>
           <Text style={[styles.miles, !open && styles.milesFolded]} accessibilityLabel={`${route ? miles(route.lengthM) : 0} miles`}>
             {route ? miles(route.lengthM) : '0.0'}
@@ -292,6 +310,7 @@ export default function RouteBuilder() {
         {follow && !imported ? <Text style={styles.credit}>Trails: {OSM_ATTRIBUTION}</Text> : null}
       </SafeAreaView>
       </Animated.View>
+      )}
       <TrailPickerSheet
         visible={picking}
         onClose={() => setPicking(false)}
