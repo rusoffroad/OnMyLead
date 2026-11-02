@@ -1,5 +1,23 @@
 [
   {
+    "version": "1.0.4",
+    "title": "Easier Leaving",
+    "intro": "Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Leave Ride is one tap away on every ride page and in Ride Mode.\n• Organizers can hand the ride to another rider and leave.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "improved",
+        "text": "Leave Ride is now at the bottom of the ride page whichever section you're on, and under the Riders list in Ride Mode (the Riders sidebar on a tablet). It always asks first, says what happens, and stops your phone sharing your location for that ride. Asked to join or on the waitlist? The same button says Withdraw."
+      },
+      {
+        "kind": "new",
+        "text": "Organizers can leave their own ride. Tap Leave Ride, pick who takes over from the riders who joined, and they become the organizer and leader. Nobody else on it yet? Leave Ride offers to cancel the ride instead."
+      }
+    ]
+  },
+  {
     "version": "1.0.3",
     "title": "Navigate Offroad, Exact Rider Dots and Better Maps",
     "intro": "Navigate is a new offroad map for riding on your own: record and share your own trails, rate trails other riders mapped, and measure distances. Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, you can add riders as friends, and you can pick your own easy-to-say code for a ride, group or friend link.",

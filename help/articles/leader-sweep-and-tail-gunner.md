@@ -4,8 +4,10 @@ summary: Who rides up front, who rides at the rear, and how to make someone lead
 category: rides
 order: 50
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
+  - app/src/core/leaving.ts
+  - app/src/components/leave-ride.tsx
   - app/src/components/ride-roster.tsx
   - app/src/core/roles.ts
   - app/src/core/chat.ts
@@ -67,6 +69,22 @@ The organizer can hand the entire ride to another rider, for example if you can'
 3. Tap **Give Them the Ride**, then **Give Ride**.
 
 They become the organizer and the leader. You stay on the ride as a rider and can't undo this yourself.
+
+:::release 1.0.4
+## Leave a Ride You Organize
+
+Can't make it? You don't have to cancel the ride on everyone.
+
+1. Tap **Leave Ride** at the bottom of the ride page (or under **Riders** in Ride Mode).
+2. **Who Takes Over?** lists everyone who has joined, leaders and co-organizers first. Tap who should run it.
+3. Tap **Give Ride and Leave**.
+
+They become the organizer and the leader, and you're off the ride. Your location sharing for the ride stops. You can rejoin later as a rider with the ride's link or code.
+
+Rather call it off? Tap **Cancel the Ride Instead**. If nobody else has joined yet, **Leave Ride** offers to cancel the ride, since there's nobody to hand it to. See [Edit, Cancel or Delete a Ride](/help/edit-cancel-or-delete-a-ride).
+
+If you were made leader (but aren't the organizer) and you leave, the lead goes back to the organizer.
+:::
 
 :::note
 Roles can only go to riders who have joined the ride, and they can't change after the ride has ended or been cancelled.

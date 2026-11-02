@@ -245,6 +245,15 @@ export async function stopSendingLocation() {
   movedAt = null;
 }
 
+/**
+ * Stop sending location if this phone is sending it for `rideId` (the rider left that ride).
+ * Sharing for another ride, or Out Riding, keeps going.
+ */
+export async function stopSendingLocationFor(rideId: string) {
+  const ctx = await readContext().catch(() => null);
+  if (ctx?.rideId === rideId) await stopSendingLocation();
+}
+
 let webSub: Location.LocationSubscription | null = null;
 async function startWebWatch() {
   const permission = await requestLocationPermission();

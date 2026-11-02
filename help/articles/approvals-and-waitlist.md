@@ -4,8 +4,10 @@ summary: How join requests work on rides where the organizer approves riders, an
 category: joining
 order: 50
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
+  - app/src/core/leaving.ts
+  - app/src/components/leave-ride.tsx
   - app/src/app/r/[code].tsx
   - app/src/app/ride/new.tsx
   - app/src/core/joining.ts
@@ -54,7 +56,13 @@ The **Spots** line on the ride page shows how full the ride is, like "8 of 10 ve
 
 ## Leaving the Waitlist or a Request
 
+:::until 1.0.4
 Open the ride page and tap **Leave Ride**, or swipe left on the ride on the **Rides** tab and tap **Leave**.
+:::
+
+:::release 1.0.4
+Open the ride page and tap **Withdraw** at the bottom, then confirm. Or swipe left on the ride on the **Rides** tab and tap **Leave**. You can ask again later with the ride's link or code.
+:::
 
 :::note
 If the ride is cancelled, riders who asked to join or are on the waitlist get a notification and an email too.
