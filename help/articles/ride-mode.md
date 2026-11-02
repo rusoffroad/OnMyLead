@@ -6,6 +6,7 @@ order: 10
 release: "1.0"
 updated: 2026-11-02
 sources:
+  - app/src/components/music-controls.tsx
   - app/src/components/leave-ride.tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/r/[code].tsx
@@ -216,6 +217,12 @@ The bar also has **Controls**, with a badge counting any other alerts. Tap it, o
 :::
 
 :::release 1.0.4
+:::release 1.0.4
+## Control Your Music
+
+Tap the round **Music** button above **Center on Me** to pause, skip or change the volume of the music on your phone without leaving Ride Mode. See [Control Your Music While You Ride](/help/music-controls).
+:::
+
 ## When Your Location Isn't Sharp
 
 If your phone's location is rough, a yellow banner says why: **Precise Location Is Off**, **Google Location Accuracy Is Off** (Android) or **Your Phone Has a Rough Location Right Now**. Tap it to fix it. On Android the phone asks to change to a precise location or to turn on Google Location Accuracy; on iPhone and iPad Settings opens; for a rough location you get steps, such as calibrating in Google Maps. The banner goes away once it's fixed. See [Make Your Location Accurate](/help/accurate-location).

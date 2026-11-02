@@ -91,4 +91,8 @@ OnMyLead doesn't sell your data or use it for advertising. It shares data only w
 
 On Android, Google delivers notifications (Firebase Cloud Messaging), handles purchases (Google Play) and draws the map (Google Maps).
 
+:::release 1.0.4
+[Music Controls](/help/music-controls) read what's playing only on your phone. On Android, the optional Notification Access is used only to see the song and the app playing it; OnMyLead never reads or keeps your notifications.
+:::
+
 You can delete your account and its data at any time. See [Delete Your Account](/help/delete-account).

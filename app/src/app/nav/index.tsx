@@ -39,6 +39,8 @@ import {
   type Recording,
 } from '@/lib/nav-trails';
 import { requirePro } from '@/lib/pro';
+import { MusicButton, MusicSheet } from '@/components/music-controls';
+import { useMusicControls } from '@/hooks/use-music-controls';
 
 type Mode = 'explore' | 'record' | 'measure';
 type Followed = { name: string; points: LatLng[]; publicTrail: PublicTrail | null };
@@ -68,6 +70,8 @@ export default function NavMode() {
   const map = useRef<NavMapHandle>(null);
   const fold = usePanelFold('nav.panelOpen.v1', true, wide ? 'up' : 'down');
   const open = fold.open;
+  const [musicOpen, setMusicOpen] = useState(false);
+  const musicOn = useMusicControls();
   // Full Map: the top bar, layers and panel tuck away; one slim bar keeps the number that matters
   // (speed, miles left on the trail, or the measured length) and Center on Me stays.
   const fullMap = useFullMap('nav.fullMap.v1');
@@ -422,6 +426,11 @@ export default function NavMode() {
       {me && mode !== 'measure' ? (
         <FollowMeButton status={followStatus} onPress={tapFollowMe} compact={full} style={[locatePos, { right: locatePos.right + 56 }]} />
       ) : null}
+      {musicOn ? (
+        <MusicButton onPress={() => setMusicOpen(true)} style={[styles.music, { bottom: locatePos.bottom + (me ? 58 : 0) }]} />
+      ) : null}
+      {musicOn ? <MusicSheet visible={musicOpen} tablet={wide} onClose={() => setMusicOpen(false)} /> : null}
+
       {me ? (
         <Pressable
           accessibilityRole="button"
@@ -736,6 +745,7 @@ const styles = StyleSheet.create({
   noticeTitle: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   noticeText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
   noticeOk: { paddingHorizontal: 14, height: 36, borderRadius: Radius.pill, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
+  music: { position: 'absolute', right: 12, zIndex: 15 },
   locate: { position: 'absolute', width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', zIndex: 15, ...glass },
   panel: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24, zIndex: 20 },
   panelWide: { bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },

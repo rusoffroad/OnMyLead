@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!--
+      Android shares what is playing (song, app, playing or paused) only with apps the rider allows
+      in Settings > Notification Access. This service exists only for that permission: it ignores
+      every notification. Music Controls work without it, just without song names.
+    -->
+    <service
+      android:name="com.rusoffroad.onmylead.music.MusicListenerService"
+      android:label="OnMyLead Music Controls"
+      android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.service.notification.NotificationListenerService" />
+      </intent-filter>
+    </service>
+  </application>
+</manifest>

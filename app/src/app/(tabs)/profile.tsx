@@ -34,6 +34,8 @@ import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { signOut, useSession } from '@/lib/session';
 import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
 import { socialSetting, type SocialProfile } from '@/core/social-profile';
+import { useMusicControlsSetting } from '@/hooks/use-music-controls';
+import { musicAvailable } from '@/lib/music';
 
 /**
  * The You tab: everything that isn't a ride, in one place and in plain groups. Your name up top,
@@ -54,6 +56,8 @@ export default function You() {
   const starlinkOn = useFlag('starlink');
   const offlineMaps = useOfflineMaps();
   const navOn = useFlag('nav_mode');
+  const musicFlag = useFlag('music_controls');
+  const [musicMine, setMusicMine] = useMusicControlsSetting();
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [followMe, setFollowMe] = useFollowMePref();
@@ -186,6 +190,24 @@ export default function You() {
           detail={`${BATTERY_PLANS[batteryMode].label}. ${BATTERY_PLANS[batteryMode].short}`}
           onPress={() => router.push('/battery')}
         />
+        {musicAvailable && musicFlag ? (
+          <MenuRow
+            icon="music"
+            color={Colors.sky}
+            title="Music Controls"
+            detail={musicMine ? 'A Music button in Ride Mode and Navigate: play, pause, skip and volume' : 'Hidden. Turn it on for a Music button in Ride Mode and Navigate'}
+            right={
+              <Switch
+                value={musicMine}
+                onValueChange={setMusicMine}
+                trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+                thumbColor={Colors.text}
+                {...({ activeThumbColor: Colors.text } as object)}
+                accessibilityLabel="Music Controls"
+              />
+            }
+          />
+        ) : null}
         {starlinkOn ? (
           <MenuRow icon="dish" color={RideColors.yellow} title="Starlink" detail="Your dish, your plan and battery run time" onPress={() => router.push('/starlink')} />
         ) : null}
