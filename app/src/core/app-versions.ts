@@ -12,7 +12,8 @@
  * Neither store lets an app go back to an older version, so a bad release is handled by:
  *   * `notice`, a message shown only on the listed versions ("We know Ride Chat is broken in
  *     1.0.3; a fix is on the way");
- *   * `latest`, which tells riders on an older version that an update is waiting;
+ *   * `latest`, which tells riders on an older version that an update is waiting (the app also
+ *     checks the App Store or Google Play itself, see parseAppStoreLookup, so this is optional);
  *   * `minimum`, which asks riders below it to update before they carry on, once the fixed
  *     version is in the store.
  *
@@ -88,12 +89,49 @@ export type UpdateState =
  * What this phone should show. `current` is the app's own version (app.json `version`); null on
  * the website or when it can't be read, which shows nothing.
  */
-export function updateState(versions: AppVersions, platform: string, current: string | null | undefined): UpdateState {
+export function updateState(
+  versions: AppVersions,
+  platform: string,
+  current: string | null | undefined,
+  storeVersion: string | null = null,
+): UpdateState {
   if ((platform !== 'ios' && platform !== 'android') || !isVersion(current)) return { kind: 'none' };
   const p = versions[platform];
   if (p.minimum && compareVersions(current, p.minimum) < 0) return { kind: 'required', minimum: p.minimum };
-  if (p.latest && compareVersions(current, p.latest) < 0) return { kind: 'available', latest: p.latest };
+  const latest = newestVersion(p.latest, storeVersion);
+  if (latest && compareVersions(current, latest) < 0) return { kind: 'available', latest };
   return { kind: 'none' };
+}
+
+/** The newer of two versions, ignoring anything missing or malformed. */
+export function newestVersion(a: string | null | undefined, b: string | null | undefined): string | null {
+  const x = isVersion(a) ? a.trim() : null;
+  const y = isVersion(b) ? b.trim() : null;
+  if (!x || !y) return x ?? y;
+  return compareVersions(x, y) >= 0 ? x : y;
+}
+
+/*
+ * The store's own answer, so "Update Available" shows by itself the day a new version goes live,
+ * with nothing to set on the Releases page (its Latest Version still works and wins when newer).
+ * Both readers return null on anything unexpected, which shows nothing.
+ */
+
+/** The version in the App Store, from Apple's public lookup (itunes.apple.com/lookup?bundleId=). */
+export function parseAppStoreLookup(json: unknown): string | null {
+  if (!json || typeof json !== 'object') return null;
+  const results = (json as { results?: unknown }).results;
+  const r = Array.isArray(results) ? (results[0] as { version?: unknown } | undefined) : undefined;
+  return isVersion(r?.version) ? r.version.trim() : null;
+}
+
+/**
+ * The version on OnMyLead's public Google Play page. It sits next to the minimum Android version:
+ * [[["1.0.3"]],[[[36]],[[[24,"7.0"]]]]] (the same reader the Help Center build uses).
+ */
+export function parsePlayPage(html: string): string | null {
+  const m = /\[\[\["(\d+(?:\.\d+){0,2})"\]\],\[\[\[\d+\]\],\[\[\[\d+,"[\d.]+"\]\]\]\]\]/.exec(html);
+  return m ? m[1] : null;
 }
 
 /** The owner's message for this exact version, while it is still showing. */

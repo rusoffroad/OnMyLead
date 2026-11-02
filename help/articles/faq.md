@@ -23,6 +23,7 @@ sources:
   - app/src/core/app-versions.ts
   - app/src/components/update-required.tsx
   - app/src/components/app-notices.tsx
+  - app/src/lib/app-update.ts
 related: [troubleshooting, free-vs-pro, privacy, location-sharing, contact-support]
 keywords: [questions, faq, release notes, what's new, update, update required, update available, version, how many rides, cost, price, free, iphone, website, tablet]
 ---
@@ -108,6 +109,12 @@ You might also see:
 
 - **Update Available** at the top of the home screen when a newer version is out. Tap **Update**, or close the card with the X.
 - **About This Version**, an amber card at the top of the home screen, when we know about a problem in your version. It says what's wrong and what to do until the fix arrives.
+:::
+
+:::release 1.0.4
+## How Do I Know When There's a New Version?
+
+OnMyLead checks the App Store (iPhone and iPad) or Google Play (Android) for you. When a newer version is out, an **Update Available** card shows at the top of the home screen. Tap **Update** to go straight to OnMyLead in the store, or close the card with the X and it won't show again for that version. The check needs a signal and runs at most twice a day, so the card can take a few hours to appear after an update comes out.
 :::
 
 ## How Many Waypoints Can I Add?

@@ -2,6 +2,16 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "faq"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "store-update-check",
+    "why": "Coming in 1.0.4: the app checks the App Store or Google Play itself and shows Update Available on the home screen when a newer version is out, so the FAQ explains how riders find out about a new version. Written in a 1.0.4 release block."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "full-map"
     ],
     "kind": "update",

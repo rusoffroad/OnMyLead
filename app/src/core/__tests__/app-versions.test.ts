@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { NO_SETTINGS, parseAppSettings } from '../app-settings';
 import {
-  compareVersions, isVersion, NO_VERSIONS, noticeForVersion, parseAppVersions, updateState, versionsProblem, versionsValue,
+  compareVersions, isVersion, newestVersion, NO_VERSIONS, noticeForVersion, parseAppStoreLookup, parseAppVersions, parsePlayPage,
+  updateState, versionsProblem, versionsValue,
   type AppVersions,
 } from '../app-versions';
 
@@ -100,5 +101,37 @@ describe('versionsProblem and versionsValue', () => {
   it('saves only what is set', () => {
     expect(versionsValue(NO_VERSIONS)).toEqual({});
     expect(versionsValue(v({ android: { minimum: '1.0.2', latest: null } }))).toEqual({ android: { minimum: '1.0.2' } });
+  });
+});
+
+describe('store version (automatic Update Available)', () => {
+  it('reads the App Store lookup and the Google Play page', () => {
+    expect(parseAppStoreLookup({ resultCount: 1, results: [{ version: '1.0.4', trackName: 'OnMyLead' }] })).toBe('1.0.4');
+    expect(parseAppStoreLookup({ resultCount: 0, results: [] })).toBeNull();
+    expect(parseAppStoreLookup({ results: [{ version: 'beta' }] })).toBeNull();
+    expect(parseAppStoreLookup(null)).toBeNull();
+    expect(parseAppStoreLookup('nope')).toBeNull();
+    expect(parsePlayPage('x,[[["1.0.3"]],[[[36]],[[[24,"7.0"]]]]],y')).toBe('1.0.3');
+    expect(parsePlayPage('<html>Varies with device</html>')).toBeNull();
+  });
+
+  it('shows Update Available from the store with nothing set on the Releases page', () => {
+    expect(updateState(NO_VERSIONS, 'ios', '1.0.3', '1.0.4')).toEqual({ kind: 'available', latest: '1.0.4' });
+    expect(updateState(NO_VERSIONS, 'android', '1.0.3', '1.0.4')).toEqual({ kind: 'available', latest: '1.0.4' });
+    // Same or older in the store (a build waiting for review, or a test build): nothing.
+    expect(updateState(NO_VERSIONS, 'ios', '1.0.4', '1.0.4')).toEqual({ kind: 'none' });
+    expect(updateState(NO_VERSIONS, 'ios', '1.0.4', '1.0')).toEqual({ kind: 'none' });
+    expect(updateState(NO_VERSIONS, 'ios', '1.0.3', null)).toEqual({ kind: 'none' });
+    expect(updateState(NO_VERSIONS, 'web', '1.0.3', '1.0.4')).toEqual({ kind: 'none' });
+  });
+
+  it('uses the newer of the store and the Releases page, and minimum still wins', () => {
+    const set = parseAppVersions({ ios: { minimum: '1.0.2', latest: '1.0.5' } });
+    expect(updateState(set, 'ios', '1.0.3', '1.0.4')).toEqual({ kind: 'available', latest: '1.0.5' });
+    expect(updateState(parseAppVersions({ ios: { latest: '1.0.4' } }), 'ios', '1.0.3', '1.0.6')).toEqual({ kind: 'available', latest: '1.0.6' });
+    expect(updateState(set, 'ios', '1.0.1', '1.0.4')).toEqual({ kind: 'required', minimum: '1.0.2' });
+    expect(newestVersion('1.0.10', '1.0.9')).toBe('1.0.10');
+    expect(newestVersion(null, 'x')).toBeNull();
+    expect(newestVersion(undefined, '1.1')).toBe('1.1');
   });
 });

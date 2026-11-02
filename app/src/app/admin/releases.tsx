@@ -381,7 +381,7 @@ function VersionControls({ value, updatedAt, switchedOn, onSaved }: { value: App
           <View style={styles.row}>{input('androidMin', 'Minimum Version')}{input('androidLatest', 'Latest Version')}</View>
         </View>
       </View>
-      <Text style={styles.small}>Latest Version: riders on anything older see a closable Update Available card on the home screen. Minimum Version: riders below it see Update Required over the app, with Update Now and Not Now. Set it only once the fixed version is live in that store.</Text>
+      <Text style={styles.small}>Latest Version: optional. From 1.0.4 the app checks the App Store and Google Play itself and shows a closable Update Available card on the home screen when a newer version is live; set Latest Version only to announce a version sooner (1.0.3 apps need it set). Minimum Version: riders below it see Update Required over the app, with Update Now and Not Now. Set it only once the fixed version is live in that store.</Text>
 
       <View style={{ gap: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: AdminColors.line }}>
         <Text style={styles.label}>Version Notice</Text>
