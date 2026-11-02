@@ -36,7 +36,12 @@
       "place-search",
       "ride-bubble",
       "ride-chat",
-      "troubleshooting"
+      "troubleshooting",
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "fuel-range"
     ],
     "kind": "review",
     "by": "pr",
