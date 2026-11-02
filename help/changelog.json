@@ -2,6 +2,65 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "join-a-ride",
+      "approvals-and-waitlist",
+      "leader-sweep-and-tail-gunner",
+      "ride-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "leave-ride",
+    "why": "Coming in 1.0.4: an easier way to leave a ride. Leave Ride moved from the bottom of the Riders section to the bottom of every ride page and into Ride Mode's Riders sheet and tablet sidebar, always confirms, and stops location sharing for the ride. Pending and waitlisted riders see Withdraw. Organizers can now leave by picking who takes the ride over (or cancel when nobody else has joined)."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "use-onmylead-on-a-tablet",
+      "organizer-controls"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "leave-ride",
+    "why": "Coming in 1.0.4: where Leave Ride is on a tablet (bottom of the ride page's left side and of the Riders list in Ride Mode), and that an organizer can leave by handing the ride to another rider."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "badges-and-ranks",
+      "battery-saver",
+      "check-in",
+      "create-a-ride-on-the-website",
+      "directions",
+      "edit-cancel-or-delete-a-ride",
+      "emergency-and-safety",
+      "faq",
+      "follow-leaders",
+      "fuel-range",
+      "getting-started",
+      "invite-riders",
+      "location-sharing",
+      "privacy",
+      "report-and-block",
+      "ride-bubble",
+      "ride-chat",
+      "ride-day-and-weather",
+      "ride-polls",
+      "ride-summary-and-ride-again",
+      "riding-groups",
+      "route-builder",
+      "status-buttons",
+      "troubleshooting",
+      "waypoints-and-planned-stops",
+      "accurate-location"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "leave-ride",
+    "why": "These guides list the ride page, Ride Mode or location sharing as a source, which the 1.0.4 Leave Ride change touched (a Leave Ride button at the bottom of the ride page and under Riders in Ride Mode). Nothing they describe changes for riders."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "notifications-inbox",
       "notification-settings",
       "getting-started"

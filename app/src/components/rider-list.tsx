@@ -18,7 +18,7 @@ const ORDER = { live: 0, delayed: 1, lost: 2 } as const;
  * "No Signal". Opened from the group state in Ride Mode's top bar.
  */
 export function RiderList({
-  visible, riders, meId, offline, onClose, onNavigate, extra,
+  visible, riders, meId, offline, onClose, onNavigate, extra, footer,
 }: {
   visible: boolean;
   riders: MapRider[];
@@ -29,6 +29,8 @@ export function RiderList({
   onNavigate: (lat: number, lng: number, title?: string) => void;
   /** Anything else to show beside a rider's name, such as their status badge. */
   extra?: (riderId: string) => ReactNode;
+  /** Shown under the riders, such as Ride Mode's Leave Ride button. */
+  footer?: ReactNode;
 }) {
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
@@ -47,6 +49,7 @@ export function RiderList({
         ) : null}
         <SheetScroll contentContainerStyle={{ gap: Spacing.two, paddingBottom: Spacing.four }}>
           <RiderRows riders={riders} meId={meId} onNavigate={onNavigate} extra={extra} />
+          {footer ? <View style={{ marginTop: Spacing.three }}>{footer}</View> : null}
         </SheetScroll>
       </SwipeSheet>
       </SheetRoot>

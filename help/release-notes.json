@@ -1,9 +1,9 @@
 [
   {
     "version": "1.0.4",
-    "title": "Accurate Rider Locations and a Notifications Inbox",
-    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.\n• New bell on the Rides tab: see your notifications from the last 30 days and clear one or all.",
+    "title": "Accurate Locations, a Notifications Inbox and Easier Leaving",
+    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.\n• New bell on the Rides tab: see your notifications from the last 30 days and clear one or all.\n• Easier Leave Ride; organizers can hand off the ride and leave.",
     "apple": null,
     "google": null,
     "notes": [
@@ -18,6 +18,14 @@
       {
         "kind": "improved",
         "text": "Riders sharing a rough location show Approximate Location in the riders list, and Ride Bubble leaves out the distance their location could be off by, so a rider beside you isn't called separated."
+      },
+      {
+        "kind": "improved",
+        "text": "Leave Ride is now at the bottom of the ride page whichever section you're on, and under the Riders list in Ride Mode (the Riders sidebar on a tablet). It always asks first, says what happens, and stops your phone sharing your location for that ride. Asked to join or on the waitlist? The same button says Withdraw."
+      },
+      {
+        "kind": "new",
+        "text": "Organizers can leave their own ride. Tap Leave Ride, pick who takes over from the riders who joined, and they become the organizer and leader. Nobody else on it yet? Leave Ride offers to cancel the ride instead."
       }
     ]
   },

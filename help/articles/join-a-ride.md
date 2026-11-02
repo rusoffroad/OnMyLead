@@ -6,6 +6,8 @@ order: 20
 release: "1.0"
 updated: 2026-11-02
 sources:
+  - app/src/core/leaving.ts
+  - app/src/components/leave-ride.tsx
   - app/src/app/r/[code].tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/get-the-app.web.tsx
@@ -83,8 +85,21 @@ If the ride is full, you go on the waitlist. If the organizer approves riders, y
 
 ## Leave a Ride
 
+:::until 1.0.4
 1. Open the ride page and tap **Riders**.
 2. Tap **Leave Ride**.
+:::
+
+:::release 1.0.4
+1. Open the ride page. **Leave Ride** is the red-outlined button at the bottom, whichever section you're on (on a tablet, it's at the bottom of the left column).
+2. Tap **Leave Ride**. A box tells you what happens; tap **Leave Ride** again to confirm, or **Stay**.
+
+In Ride Mode, tap **Together** (or **Separated**) at the top to open **Riders**, and **Leave Ride** is under the list. On a tablet it's at the bottom of the **Riders** sidebar. You go back to the **Rides** tab when you've left.
+
+Leaving always stops your phone sharing your location for that ride, whether or not the ride has started.
+
+Organized the ride? See [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
+:::
 
 Or, on the **Rides** tab, swipe left on the ride and tap **Leave** (on onmylead.com, click **Leave** at the end of the ride's row). Your spot opens up for someone else. You can rejoin with the ride's link or code if there's room. If the ride is live, leaving also stops sharing your location with the group.
 

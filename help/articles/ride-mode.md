@@ -6,6 +6,7 @@ order: 10
 release: "1.0"
 updated: 2026-11-02
 sources:
+  - app/src/components/leave-ride.tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/r/[code].tsx
   - app/src/components/group-map.tsx
@@ -196,5 +197,11 @@ Status taps and quick replies you make with no service wait on your phone and se
 ## Leave Ride Mode
 
 Tap **‹ Ride name** at the top to go back to the ride page. Leaving the screen doesn't stop sharing: your location keeps going to the group until your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
+
+:::release 1.0.4
+## Leave the Ride
+
+Heading home early? Tap **Together** (or **Separated**) at the top to open **Riders**, then tap **Leave Ride** under the list and confirm. On a tablet, **Leave Ride** is at the bottom of the **Riders** sidebar. Your location stops going to the group and you're taken back to the **Rides** tab. The organizer first picks who takes the ride over; see [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
+:::
 
 Opened Ride Mode by tapping a notification? Tap **‹ Ride name** (or Android's Back) to go to **Home**.

@@ -7,6 +7,7 @@ import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
 import { GetTheApp } from '@/components/get-the-app';
 import { InviteCard } from '@/components/invite-card';
+import { LeaveRide } from '@/components/leave-ride';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { ReportSheet } from '@/components/report-sheet';
 import { RideDay } from '@/components/ride-day';
@@ -33,7 +34,7 @@ import { useLayout } from '@/hooks/use-layout';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import {
-  approveMember, cancelRide, checkIn, deleteRide, getMembers, getPrivateDetails, getRide, getRideRoute, joinRide, leaveRide, setRideStatus,
+  approveMember, cancelRide, checkIn, deleteRide, getMembers, getPrivateDetails, getRide, getRideRoute, joinRide, setRideStatus,
   myTrips, tripForRide,
 } from '@/lib/api';
 import { track } from '@/lib/analytics';
@@ -508,13 +509,22 @@ export default function RidePage() {
       ) : null}
 
       {show('chat') ? chatBlock : null}
-      {show('riders') && mine && mine.status !== 'cancelled' && mine.status !== 'invited' && mine.role !== 'organizer' ? (
-        <Button title="Leave Ride" kind="secondary" onPress={() => act('leave', () => leaveRide(ride.id))} />
-      ) : null}
     </>
   );
   const bottom = (
     <>
+      {/* Leaving is always one tap away, whichever section is open: riders confirm, the organizer picks who takes over. */}
+      <LeaveRide
+        ride={ride}
+        members={members}
+        me={me}
+        skip={['decline']}
+        onLeft={(what) => {
+          track(what === 'left' ? 'ride_left' : 'ride_cancelled_on_leave', { ride_id: ride.id });
+          router.replace('/');
+        }}
+        style={{ marginTop: Spacing.two }}
+      />
       {me && !isOrganizer ? (
         <Pressable
           accessibilityRole="button"
