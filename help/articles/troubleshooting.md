@@ -4,13 +4,15 @@ summary: What to check when riders don't show on the map, alerts don't arrive, a
 category: troubleshooting
 order: 10
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/core/freshness.ts
   - app/src/components/rider-dot.tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/lib/outbox.ts
   - app/src/lib/location.ts
+  - app/src/core/precise-location.ts
+  - app/src/hooks/use-precise-location.ts
   - app/src/core/notifications.ts
   - app/src/app/notifications.tsx
   - app/src/lib/offline-maps.ts
@@ -22,8 +24,8 @@ sources:
   - app/src/core/auth-link.ts
   - app/src/lib/starlink.ts
   - app/src/components/fuel-check.tsx
-related: [faq, ride-mode, location-sharing, offline-maps, notification-settings, contact-support]
-keywords: [not working, problem, broken, bug, help, no signal, no service, alerts, download, password, tablet]
+related: [accurate-location, faq, ride-mode, location-sharing, offline-maps, notification-settings, contact-support]
+keywords: [not working, problem, broken, bug, help, no signal, no service, alerts, download, password, tablet, wrong location, miles away, approximate, precise location]
 ---
 
 Start here when something doesn't work the way you expect. If your problem isn't listed, [contact us](/help/contact-support).
@@ -39,6 +41,10 @@ A live rider's dot has a bold white ring (the leader's is solid blue). A last-se
 If **everyone** suddenly shows as last seen, it's probably your phone. After about 35 seconds without hearing from the server, Ride Mode shows **No Service. Riders Show Where They Were Last Seen**. It doesn't mark the others as lost because of your own dropout.
 
 See [Share Your Location](/help/location-sharing).
+
+## A Rider Shows Miles From Where They Are
+
+If a rider right beside you shows up a mile or two away, their phone is giving every app a rough location (Google Maps or Apple Maps on that phone shows the same wrong spot). On that phone, turn on **Precise Location** for OnMyLead and, on Android, **Google Location Accuracy**, then calibrate. Step by step: [Make Your Location Accurate](/help/accurate-location).
 
 ## My Group Can't See Me With My Phone Locked
 

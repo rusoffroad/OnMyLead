@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/r/[code].tsx
@@ -124,6 +124,10 @@ Tap **Together** (or **Separated**) at the top to open the **Riders** list. It s
 A small patch beside a rider's name is their top badge. See [Earn Badges and Ranks](/help/badges-and-ranks).
 :::
 
+:::release 1.0.4
+A rider whose phone shares only a rough spot shows **Approximate Location**. Their dot can be a mile or more from where they are. See [Fix Common Problems](/help/troubleshooting).
+:::
+
 Tap **Navigate** next to a live rider, or **Go to Last Seen** for a rider whose spot is old, to get directions to them in your maps app.
 
 ## See Where You Are on the Route
@@ -171,6 +175,12 @@ Want the map and nothing else? Tap **⤢ Full Map** at the top of the bottom pan
 - **Menus ▲**, with a badge counting any other alerts.
 
 Tap **Menus ▲** to bring back the status buttons, quick replies and everything else. Full Map works the same on iPhone, iPad, Android phones and Android tablets.
+:::
+
+:::release 1.0.4
+## When Your Location Isn't Sharp
+
+If your phone's location is rough, a yellow banner says why: **Precise Location Is Off**, **Google Location Accuracy Is Off** (Android) or **Your Phone Has a Rough Location Right Now**. Tap it to fix it. On Android the phone asks to change to a precise location or to turn on Google Location Accuracy; on iPhone and iPad Settings opens; for a rough location you get steps, such as calibrating in Google Maps. The banner goes away once it's fixed. See [Make Your Location Accurate](/help/accurate-location).
 :::
 
 ## When You Lose Service
