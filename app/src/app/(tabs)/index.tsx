@@ -3,6 +3,7 @@ import { type ReactElement, useCallback, useState } from 'react';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppNotices } from '@/components/app-notices';
+import { InboxBell } from '@/components/inbox-bell';
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
 import { Logo } from '@/components/logo';
@@ -131,8 +132,9 @@ export default function Home() {
 
   const actions = (
     <>
-      <View style={{ paddingTop: Spacing.one }}>
+      <View style={{ paddingTop: Spacing.one, justifyContent: 'center' }}>
         <Logo height={96} />
+        {session ? <InboxBell /> : null}
       </View>
 
       <AppNotices />

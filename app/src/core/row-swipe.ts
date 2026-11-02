@@ -27,7 +27,8 @@ export function rowSwipeResult(dx: number, vx: number, open: boolean, rowWidth: 
   return 'close';
 }
 
-export type RowAction = 'delete' | 'leave' | 'decline';
+/** Delete, Leave and Decline are for ride rows; Clear is for a row in the Notifications inbox. */
+export type RowAction = 'delete' | 'leave' | 'decline' | 'clear';
 
 type Member = { status: string; role: string; user_id?: string };
 
@@ -38,4 +39,4 @@ export function rowActionFor(member: Member, organizerId: string, me: string | n
   return 'leave';
 }
 
-export const ROW_ACTION_LABEL: Record<RowAction, string> = { delete: 'Delete', leave: 'Leave', decline: 'Decline' };
+export const ROW_ACTION_LABEL: Record<RowAction, string> = { delete: 'Delete', leave: 'Leave', decline: 'Decline', clear: 'Clear' };

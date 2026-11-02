@@ -1,12 +1,16 @@
 [
   {
     "version": "1.0.4",
-    "title": "Accurate Rider Locations",
-    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.",
+    "title": "Accurate Rider Locations and a Notifications Inbox",
+    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.\n• New bell on the Rides tab: see your notifications from the last 30 days and clear one or all.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Notifications: tap the bell at the top right of the Rides tab to see what OnMyLead sent you in the last 30 days, with a red number for new ones. Tap one to open it, Mark All Read, swipe one left to clear it, or Clear All, which also clears them from your phone's own notification list and resets the app icon badge. Also on onmylead.com."
+      },
       {
         "kind": "fixed",
         "text": "A rider whose phone shares only a rough location could show up a mile or two from where they really were. Ride Mode now shows a banner when Precise Location is off, when Google Location Accuracy is off (Android), or when your phone's location is rough, and tapping it fixes it or shows how (including calibrating in Google Maps). On Android, OnMyLead also asks for both once when you start sharing."

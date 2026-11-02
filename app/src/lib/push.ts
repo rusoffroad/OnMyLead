@@ -19,6 +19,7 @@ import { planReminders } from '@/core/notifications';
 import { tapData, tapTarget, type TapData } from '@/core/push-tap';
 import { ackRideItems, myRides } from './api';
 import { openGroupChat } from './group-chat';
+import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
 import { supabase } from './supabase';
@@ -107,6 +108,8 @@ export function useNotificationTaps() {
     handled.current = key;
     const data = tapData(last.notification.request.content.data);
     acknowledge(data);
+    // Its row in the Notifications inbox counts as read.
+    markReadForPush(last.notification.request.content.data);
     const target = tapTarget(data);
     try {
       Notifications.clearLastNotificationResponse();
@@ -126,6 +129,8 @@ export function useRideChangeReminders() {
     const sub = Notifications.addNotificationReceivedListener((n) => {
       const data = tapData(n.request.content.data);
       acknowledge(data);
+      // The bell on the Rides tab picks it up straight away.
+      refreshInbox();
       if (data?.type === 'ride' && data.change !== 'live') syncRideReminders(currentNotificationSettings().reminder_minutes);
     });
     return () => sub.remove();
