@@ -4,7 +4,7 @@ summary: On an iPad or Android tablet the map fills the screen, with the riders,
 category: getting-started
 order: 40
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/core/layout.ts
   - app/src/hooks/use-layout.ts
@@ -61,6 +61,10 @@ Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, th
 ## The Ride Page
 
 Once you've joined a ride, the ride and its details stay on the left, and **Map**, **Riders** and **Chat** open on the right. You can read the chat or check the route without losing the meeting time and place.
+
+:::release 1.0.4
+**Leave Ride** is at the bottom of the left side of the ride page, and at the bottom of the **Riders** list in Ride Mode. See [Join a Ride](/help/join-a-ride).
+:::
 
 ## Draw a Route and Add Waypoints
 
