@@ -140,6 +140,12 @@ On Android, allow location **While Using the App**. OnMyLead doesn't need **Allo
 If you turn off location for OnMyLead while you're sharing with a ride, Ride Mode shows a **Location Is Off** notice once, because your group can't see you move. Turn location back on for OnMyLead in your phone's **Settings** to keep sharing.
 :::
 
+Keep **Precise Location** on for OnMyLead (on Android, **Use precise location**). With only an approximate location, your group sees you up to a few miles from where you are. See [Make Your Location Accurate](/help/accurate-location).
+
+:::release 1.0.4
+On Android, when you start sharing, OnMyLead asks once to change to a precise location if you allowed only an approximate one, and to turn on Google Location Accuracy if it's off.
+:::
+
 Your phone sends a new position each time you move about 25 meters (80 feet), and at least every 15 seconds while you're stopped, so the group can tell you're still there.
 
 :::release 1.0.1

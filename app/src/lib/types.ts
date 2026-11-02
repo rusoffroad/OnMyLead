@@ -73,6 +73,8 @@ export type Position = {
   lng: number;
   speed_mps: number | null;
   heading_deg: number | null;
+  /** How far off the sharing phone says the fix may be, meters; a mile or more on Approximate Location. */
+  accuracy_m?: number | null;
   last_moved_at: string | null;
   recorded_at: string;
 };
