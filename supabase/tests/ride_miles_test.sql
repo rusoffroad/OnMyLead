@@ -49,4 +49,20 @@ begin
   end if;
 end $$;
 
+-- The migration's quiet recount, run again over the badge test's rides: miles stay right and
+-- nothing breaks (Dee rode about 103 miles; Ed's spikes count for nothing).
+do $$
+declare r record;
+begin
+  for r in select distinct c.ride_id from rider_ride_credits c join rides x on x.id = c.ride_id where x.status = 'ended' loop
+    perform credit_ride(r.ride_id, true);
+  end loop;
+  if (select miles from rider_ride_credits where user_id = '00000000-0000-0000-0000-0000000007d1') not between 100 and 106 then
+    raise exception 'FAIL: recount changed Dee''s miles';
+  end if;
+  if (select miles from rider_ride_credits where user_id = '00000000-0000-0000-0000-0000000007e1') > 0 then
+    raise exception 'FAIL: recount counted spikes';
+  end if;
+end $$;
+
 drop function test_drive(int, double precision, double precision);

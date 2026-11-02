@@ -13,7 +13,8 @@
 -- Spike and moving thresholds are unchanged (2 to 60 m/s).
 --
 -- Backward compatible: same function names, arguments and results; old builds' tracks (no
--- accuracy) are read as before, minus the gap and bounce rules. Nothing stored is changed here.
+-- accuracy) are read as before, minus the gap and bounce rules. Stored ride credits are recounted
+-- quietly at the end (miles only go down; earned badges stay).
 
 -- Great-circle meters (null when either point is missing).
 create or replace function track_geo_m(lat1 double precision, lng1 double precision, lat2 double precision, lng2 double precision)
@@ -114,3 +115,14 @@ begin
   from per_rider;
 end;
 $$;
+
+-- Recount stored ride miles with the fixed math (Chris's OK, 2026-11-02: "Yes, recount quietly").
+-- credit_ride recomputes every joined rider's credit for each ended ride; quiet, so no badge
+-- pushes go out. Badges already earned stay earned (award_rider_badges never removes one).
+do $$
+declare r record;
+begin
+  for r in select distinct c.ride_id from rider_ride_credits c join rides x on x.id = c.ride_id where x.status = 'ended' loop
+    perform credit_ride(r.ride_id, true);
+  end loop;
+end $$;
