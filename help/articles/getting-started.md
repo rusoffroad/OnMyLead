@@ -91,6 +91,10 @@ Everything that isn't a ride:
 - **On the Trail**: **Share My Location** and [Starlink](/help/starlink).
 :::release 1.0.3
 - **On the Trail** also has **Navigate** and **Rider Trails on Maps**, which shows or hides trails other riders shared.
+
+:::release 1.0.4
+- **Follow Me on Maps**, also under **On the Trail**, turns off (or back on) the map moving with you in Ride Mode and Navigate. See [Follow Me on the Map](/help/follow-me).
+:::
 :::
 - **Settings**: [Notifications](/help/notification-settings), **Directions** (which maps app **Navigate** opens), **Subscription** and **Blocked Riders**.
 - **Account**: the email you sign in with.

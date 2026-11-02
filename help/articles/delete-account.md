@@ -4,7 +4,7 @@ summary: Permanently delete your OnMyLead account and its data from the You tab,
 category: account
 order: 80
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/app/(tabs)/profile.tsx
   - app/src/lib/api.ts

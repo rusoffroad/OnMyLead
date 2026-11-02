@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { riderHeading, screenAngle } from '../heading';
+import { ownFix, riderHeading, screenAngle } from '../heading';
 
 describe('riderHeading', () => {
   it('uses the GPS course while a live rider is moving', () => {
@@ -35,5 +35,19 @@ describe('screenAngle', () => {
     expect(screenAngle(90, 90)).toBe(0);
     expect(screenAngle(10, 300)).toBe(70);
     expect(screenAngle(350, 20)).toBe(330);
+  });
+});
+
+describe('ownFix', () => {
+  it("adds the arrow to this phone's own dot while moving", () => {
+    expect(ownFix({ latitude: 38.5, longitude: -109.5, speed: 9, heading: 270 })).toEqual({ lat: 38.5, lng: -109.5, headingDeg: 270 });
+  });
+  it('no arrow standing still or without a course (iPhone -1, Android 0 at rest)', () => {
+    expect(ownFix({ latitude: 38.5, longitude: -109.5, speed: 0, heading: 0 })?.headingDeg).toBeNull();
+    expect(ownFix({ latitude: 38.5, longitude: -109.5, speed: -1, heading: -1 })?.headingDeg).toBeNull();
+  });
+  it('ignores a dot with no position', () => {
+    expect(ownFix(null)).toBeNull();
+    expect(ownFix({ latitude: null, longitude: -109.5 })).toBeNull();
   });
 });

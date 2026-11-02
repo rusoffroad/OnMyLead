@@ -32,6 +32,9 @@ export function GroupMap({
   fallback?: LatLng | null;
   onReady?: () => void;
   onUserMove?: () => void;
+  /** Follow Me needs the phone's live map; the web draws the route instead. */
+  follow?: { inset: { top: number; right: number; bottom: number; left: number } } | null;
+  locationEveryMs?: number;
   /** No live map on the web, so Ride Mode shows no center-on-me button there. */
   ref?: Ref<GroupMapHandle>;
 }) {

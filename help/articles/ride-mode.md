@@ -12,6 +12,9 @@ sources:
   - app/src/components/group-map.tsx
   - app/src/components/group-map-types.ts
   - app/src/core/heading.ts
+  - app/src/components/own-heading.tsx
+  - app/src/components/follow-me-button.tsx
+  - app/src/hooks/use-follow-me.ts
   - app/src/components/rider-dot.tsx
   - app/src/components/rider-pin.tsx
   - app/src/components/rider-list.tsx
@@ -29,8 +32,8 @@ sources:
   - app/src/core/route-order.ts
   - app/src/core/sharing.ts
   - app/src/lib/location.ts
-related: [location-sharing, status-buttons, ride-bubble, ride-chat, directions, offline-maps]
-keywords: [full map, full screen, hide menus, rider order, running order, front and rear, center on me, my location, recenter, live map, group map, tracking, live tracking, rider dots, last seen, no signal, follow the group, screen stays on]
+related: [location-sharing, status-buttons, ride-bubble, ride-chat, directions, offline-maps, follow-me]
+keywords: [follow me, map follows me, my arrow, full map, full screen, hide menus, rider order, running order, front and rear, center on me, my location, recenter, live map, group map, tracking, live tracking, rider dots, last seen, no signal, follow the group, screen stays on]
 screenshots:
   - file: live.webp
     shows: app/src/app/ride/[id]/live.tsx
@@ -95,6 +98,14 @@ Tap the round target button to move the map so you're in the middle of it. The m
 
 - **iPhone and Android phones:** the button sits on the right, just above the bottom panel (above **Add Waypoint**). When the panel is open and fills the screen, fold it to see the button.
 - **iPad and Android tablets:** the button sits at the bottom of the map, just left of the buttons panel.
+:::
+
+:::release 1.0.4
+### Follow Me
+
+With **Follow Me** on (it is unless you turn it off), the map moves with you as you ride, so your dot stays in view. Drag or pinch the map to look around and it pauses; tap **Paused** or **Center on Me** to follow you again. Tap **Following** to turn it off. The button sits just left of **Center on Me**. See [Follow Me on the Map](/help/follow-me).
+
+While you're moving, your own dot has the same white arrow as everyone else's, pointing the way you're heading.
 :::
 
 ### The Bottom Panel
@@ -201,7 +212,7 @@ The bar also has **Menus ▲**, with a badge counting any other alerts. Tap it t
 :::
 
 :::release 1.0.4
-The bar also has **Controls**, with a badge counting any other alerts. Tap it, or swipe the bar up, to bring back the status buttons, quick replies and everything else. **Center on Me** and the **No Signal** tag stay on the map, and tapping a trail line still shows its card. Your phone remembers Full Map, so Ride Mode opens the same way next time. Every other map works the same way: see [Full Map](/help/full-map).
+The bar also has **Controls**, with a badge counting any other alerts. Tap it, or swipe the bar up, to bring back the status buttons, quick replies and everything else. **Center on Me** and the **No Signal** tag stay on the map (from 1.0.4, **Follow Me** too), and tapping a trail line still shows its card. Your phone remembers Full Map, so Ride Mode opens the same way next time. Every other map works the same way: see [Full Map](/help/full-map).
 :::
 
 :::release 1.0.4

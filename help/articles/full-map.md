@@ -18,7 +18,8 @@ sources:
   - app/src/app/ride/[id]/waypoints.tsx
   - app/src/app/nav/index.tsx
   - app/src/app/(tabs)/find.tsx
-related: [ride-mode, navigation-mode, route-builder, waypoints-and-planned-stops, find-a-ride, map-layers]
+  - app/src/components/follow-me-button.tsx
+related: [follow-me, ride-mode, navigation-mode, route-builder, waypoints-and-planned-stops, find-a-ride, map-layers]
 keywords: [full map, full screen, bigger map, more map, hide buttons, hide controls, show controls, map only]
 ---
 
@@ -47,8 +48,8 @@ The bar keeps only what you shouldn't have to dig for:
 
 | Map | In the bar or on the map |
 | --- | --- |
-| Ride Mode | The rider line with every rider (on a Freeride, the group behind the leader), **EMERGENCY**, calls for help from other riders, **Center on Me** |
-| Navigate | Your speed, the miles left on a trail you're following, or the length you're measuring, a red **Rec** while recording, **Undo** while measuring, **Center on Me** |
+| Ride Mode | The rider line with every rider (on a Freeride, the group behind the leader), **EMERGENCY**, calls for help from other riders, **Center on Me** and **Follow Me** |
+| Navigate | Your speed, the miles left on a trail you're following, or the length you're measuring, a red **Rec** while recording, **Undo** while measuring, **Center on Me** and **Follow Me** (not while measuring) |
 | Draw a Route | The route's miles and **Undo**. Tapping the map still adds points |
 | Waypoints | How many waypoints the ride has. Press and hold the map to drop one |
 

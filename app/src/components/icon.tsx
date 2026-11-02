@@ -13,6 +13,8 @@ const PATHS = {
   plus: ['M12 5v14', 'M5 12h14'],
   minus: ['M5 12h14'],
   locate: ['M12 2.5v3.5', 'M12 18v3.5', 'M2.5 12H6', 'M18 12h3.5'],
+  // A navigation arrowhead, for Follow Me (the map keeps moving with you).
+  follow: ['M12 3.5l7.5 17-7.5-4.2-7.5 4.2z'],
   check: ['M5 12.5l4.5 4.5L19 7.5'],
   search: ['M15.5 15.5L20.5 20.5'],
   person: ['M4.5 20.5c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6'],
