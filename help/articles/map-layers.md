@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, show public trails and roads with th
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/components/trail-map-overlay.tsx
   - app/src/components/trail-tiles.tsx

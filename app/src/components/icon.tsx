@@ -47,6 +47,8 @@ const PATHS = {
   clock: ['M12 3.5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 1 1 0-17z', 'M12 7.5V12l3 2'],
   star: ['M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z'],
   // A battery on its side with a charge bolt, for Battery Saver.
+  expand: ['M14 4h6v6', 'M20 4l-6.5 6.5', 'M10 20H4v-6', 'M4 20l6.5-6.5'],
+  collapse: ['M20 10h-6V4', 'M14 10l6.5-6.5', 'M4 14h6v6', 'M10 14l-6.5 6.5'],
   battery: ['M3 7.5h15v9H3z', 'M20.5 10.5v3', 'M11.5 9l-2.5 3.2h3L9.5 15'],
 } as const;
 

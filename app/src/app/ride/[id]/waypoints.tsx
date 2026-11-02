@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BarReadout, FullMapBar } from '@/components/full-map';
 import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { PanelHandle } from '@/components/panel-handle';
@@ -13,10 +14,12 @@ import { WaypointRow } from '@/components/waypoint-row';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { rideLeaderIds } from '@/core/chat';
+import { fullMapPadding } from '@/core/full-map';
 import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
 import { canShareWaypoints, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
+import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
@@ -47,6 +50,9 @@ export default function RideWaypoints() {
   const floating = layout.wide && !wide;
   // Swipe the panel down (or tap its handle) to fold it to the counts and see more map.
   const fold = usePanelFold('waypoints.panelOpen.v1', true, wide ? 'up' : 'down');
+  // Full Map: the top bar, layers and panel tuck away. Press and hold still drops a waypoint.
+  const fullMap = useFullMap('waypoints.fullMap.v1');
+  const full = fullMap.full;
   const [ride, setRide] = useState<Ride | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
   const [route, setRoute] = useState<RideRoute | null>(null);
@@ -131,11 +137,18 @@ export default function RideWaypoints() {
           onLongPressMap={mine ? openNew : undefined}
           found={found}
           onCenter={(c) => (looking.current = c)}
-          padding={wide ? [90, 70, 40, PANEL_W + 60] : undefined}
+          padding={full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : undefined}
         />
       ) : null}
-      {loaded ? <TrailMapOverlay trail={trail} top={insets.top + 66} cardTop={insets.top + 118} route={route?.points} ride={ride} /> : null}
+      {loaded ? <TrailMapOverlay trail={trail} bare={full} top={full ? insets.top + 12 : insets.top + 66} cardTop={full ? insets.top + 64 : insets.top + 118} route={route?.points} ride={ride} /> : null}
 
+      {full ? (
+        <FullMapBar onRestore={fullMap.exit} wide={wide || floating}>
+          <BarReadout value={String(wp.waypoints.length)} unit={wp.waypoints.length === 1 ? 'Waypoint' : 'Waypoints'} />
+        </FullMapBar>
+      ) : null}
+
+      {full ? null : (
       <SafeAreaView edges={['top']} style={[styles.top, wide && styles.topWide]}>
         {searching !== false ? (
           <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
@@ -156,10 +169,12 @@ export default function RideWaypoints() {
           </View>
         )}
       </SafeAreaView>
+      )}
 
+      {full ? null : (
       <Animated.View {...fold.panHandlers} style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 4 }]}>
-        <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Waypoints" fromTop={wide} />
+        <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Waypoints" fromTop={wide} onFullMap={fullMap.enter} />
         <View style={styles.counts}>
           {stops ? <Count n={stops} label={stops === 1 ? 'Stop' : 'Stops'} color={Colors.accent} /> : null}
           <Count n={shared} label="Shared" color={Colors.sky} />
@@ -184,6 +199,7 @@ export default function RideWaypoints() {
         {!fold.open ? <ErrorText error={error} /> : null}
       </SafeAreaView>
       </Animated.View>
+      )}
 
       <WaypointSheet
         rideId={id}
