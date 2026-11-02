@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.0.4",
+    "title": "The Rider Line on Freeride Rides",
+    "intro": "Ride Mode's rider line now works on Freeride rides too, showing the whole group in order behind the leader and how spread out it is.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Freeride rides get the rider line: everyone in order behind the leader, and how spread out the group is.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "The rider line on Freeride rides. With no mapped route, Ride Mode's line shows the leader on the right and every sharing rider in order behind them, measured along the path the leader has ridden, so bends and switchbacks count. It shows how spread out the group is, from the leader to the tail gunner, and tells you how far ahead the leader is. The leader's path stays on your phone and isn't uploaded."
+      }
+    ]
+  },
+  {
     "version": "1.0.3",
     "title": "Navigate Offroad, Exact Rider Dots and Better Maps",
     "intro": "Navigate is a new offroad map for riding on your own: record and share your own trails, rate trails other riders mapped, and measure distances. Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, you can add riders as friends, and you can pick your own easy-to-say code for a ride, group or friend link.",

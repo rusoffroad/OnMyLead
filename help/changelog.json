@@ -1,5 +1,15 @@
 [
   {
+    "date": "2026-11-02",
+    "slugs": [
+      "ride-mode"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "freeride-rider-line",
+    "why": "Coming in 1.0.4: on a Freeride (no mapped route), Ride Mode's line shows every sharing rider in order behind the leader, measured along the path the leader has ridden (kept on each phone, never uploaded), with the group's spread and how far the leader is ahead. Written in a 1.0.4 release block so it shows once 1.0.4 is out."
+  },
+  {
     "date": "2026-11-01",
     "slugs": [
       "create-a-ride-on-the-website",

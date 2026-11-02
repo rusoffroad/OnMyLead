@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors } from '@/constants/theme';
+import type { FreerideSummary } from '@/core/freeride';
 import type { RangeCheck } from '@/core/fuel';
 import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
@@ -22,10 +23,16 @@ const LABEL_W = 190;
  * dots rather than one blob, and the leader sees everyone between the front and the rear. Tap a
  * dot for the rider's name and place. One glance answers "where am I compared with everyone
  * else?" without reading a map.
+ *
+ * On a Freeride (no mapped route) the same line shows the group behind the leader instead: the
+ * leader on the right, the rear on the left, measured along the leader's own path (core/freeride),
+ * with the group's spread in place of the miles done.
  */
 export function RouteStrip({
-  lengthM, riders, meId, summary, nameOf, offline, range, compact, lastSeenIds,
+  lengthM, riders, meId, summary, nameOf, offline, range, compact, lastSeenIds, freeride,
 }: {
+  /** A Freeride: no route, so the line is the group behind the leader. */
+  freeride?: { summary: FreerideSummary; waiting: boolean } | null;
   /** Riders whose spot is only where they were last seen: drawn hollow and grey, never as live. */
   lastSeenIds?: string[];
   /** Folded Ride Mode: just the miles and the line, to leave the map as much room as possible. */
@@ -63,17 +70,35 @@ export function RouteStrip({
   const pickedRider = picked ? ranked.find((r) => r.id === picked) : undefined;
   const pickedSpot = pickedRider ? spots.get(pickedRider.id) : undefined;
   const spread = groupSpread(ranked);
+  const offWord = freeride ? "off the leader's path" : 'off the route';
+  const describe = (r: (typeof ranked)[number]) => describeRank(r, ranked, nameOf(r.id), meId, offWord);
+  const fs = freeride?.summary;
+  const [spreadNum, ...spreadUnit] = fs?.spread?.split(' ') ?? [];
 
   return (
     <View style={styles.wrap}>
       <View
         style={styles.head}
         accessible
-        accessibilityLabel={[
+        accessibilityLabel={freeride ? [
+          freeride.waiting ? 'Freeride. Waiting for the leader to share their location.' : fs?.spread ? `Freeride. The group is spread over ${fs.spread}, ${fs.ends}.` : `Freeride. ${fs?.ends}.`,
+          fs?.compared ?? '',
+        ].join(' ') : [
           summary ? `Mile ${summary.doneMi} of ${summary.totalMi}. ${summary.compared} ${summary.offRoute ?? ''}` : `Route, ${ranked.length} riders on it`,
           spread ? `${spread}, front to rear.` : '',
         ].join(' ')}>
-        {summary ? (
+        {freeride ? (
+          freeride.waiting ? (
+            <Text style={styles.of}>Waiting for the Leader</Text>
+          ) : fs?.spread ? (
+            <Text style={styles.big}>
+              {spreadNum}
+              <Text style={styles.of}> {spreadUnit.join(' ')} spread</Text>
+            </Text>
+          ) : (
+            <Text style={styles.of}>{fs?.ends}</Text>
+          )
+        ) : summary ? (
           <Text style={styles.big}>
             {summary.doneMi}
             <Text style={styles.of}> of {summary.totalMi} mi</Text>
@@ -81,14 +106,18 @@ export function RouteStrip({
         ) : (
           <Text style={styles.of}>Route · {ranked.length ? `${ranked.length} on the line` : 'nobody placed yet'}</Text>
         )}
-        <Text style={styles.toGo}>{summary ? summary.toGo : offline ? 'Saved route, no signal' : ''}</Text>
+        <Text style={styles.toGo}>{freeride ? (freeride.waiting || !fs?.spread ? 'Freeride' : fs.ends) : summary ? summary.toGo : offline ? 'Saved route, no signal' : ''}</Text>
       </View>
 
       <View style={styles.track} onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}>
         <View style={styles.rail} />
-        {me?.place ? <View style={[styles.done, { width: pct(me.place.alongM) }]} /> : null}
-        <View style={[styles.cap, { left: 0, backgroundColor: RideColors.green }]} />
-        <View style={[styles.cap, styles.finish, { right: 0 }]} />
+        {freeride ? null : (
+          <>
+            {me?.place ? <View style={[styles.done, { width: pct(me.place.alongM) }]} /> : null}
+            <View style={[styles.cap, { left: 0, backgroundColor: RideColors.green }]} />
+            <View style={[styles.cap, styles.finish, { right: 0 }]} />
+          </>
+        )}
         {order.map((r) => {
           const mine = r.id === meId;
           const lastSeen = !mine && !!lastSeenIds?.includes(r.id);
@@ -105,7 +134,7 @@ export function RouteStrip({
               onPress={() => setPicked((p) => (p === r.id ? null : r.id))}
               hitSlop={4}
               accessibilityRole="button"
-              accessibilityLabel={`${describeRank(r, ranked, nameOf(r.id), meId)}${lastSeen ? ', last seen here' : ''}`}
+              accessibilityLabel={`${describe(r)}${lastSeen ? ', last seen here' : ''}`}
               style={[
                 styles.dot,
                 {
@@ -134,13 +163,19 @@ export function RouteStrip({
             pointerEvents="none"
             style={[styles.label, { left: Math.max(0, Math.min(width - LABEL_W, pickedSpot.x - LABEL_W / 2)) }]}>
             <Text style={styles.labelText} numberOfLines={2}>
-              {describeRank(pickedRider, ranked, nameOf(pickedRider.id), meId)}
+              {describe(pickedRider)}
             </Text>
           </View>
         ) : null}
       </View>
 
-      {compact ? null : summary ? (
+      {compact ? null : freeride ? (
+        <Text style={styles.compared}>
+          {freeride.waiting
+            ? 'The line fills in once the leader shares their location.'
+            : fs?.compared ?? 'Share your location to see how far you are behind the leader.'}
+        </Text>
+      ) : summary ? (
         <Text style={styles.compared}>
           {summary.offRoute ? <Text style={{ color: RideColors.yellow }}>{summary.offRoute} </Text> : null}
           {summary.compared}

@@ -83,7 +83,7 @@ const ordinal = (n: number) => {
 const short = (m: number) => (metersToMiles(m) < 0.1 ? formatDistance(m) : `${miles(m)} mi`);
 
 /** One line about a rider on the order line, e.g. "Mia · 3rd of 6 · 0.4 mi behind the leader". */
-export function describeRank(r: RankedRider, ranked: RankedRider[], name: string, meId?: string): string {
+export function describeRank(r: RankedRider, ranked: RankedRider[], name: string, meId?: string, offWord = 'off the route'): string {
   const who = r.id === meId ? 'You' : name;
   const parts = [who, ranked.length === 1 ? 'only one on the line' : r.rank === 1 ? 'out front' : r.rank === ranked.length ? `last of ${ranked.length}` : `${ordinal(r.rank)} of ${ranked.length}`];
   const leader = ranked.find((x) => x.role === 'leader');
@@ -94,7 +94,7 @@ export function describeRank(r: RankedRider, ranked: RankedRider[], name: string
   } else if (!leader && r.rank > 1) {
     parts.push(`${short(r.backM)} back from the front`);
   }
-  if (!r.place!.onRoute) parts.push('off the route');
+  if (!r.place!.onRoute) parts.push(offWord);
   return parts.join(' · ');
 }
 
