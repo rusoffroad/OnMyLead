@@ -2,6 +2,16 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "full-map"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "freeride-rider-line",
+    "why": "Full Map's Ride Mode bar keeps the rider line, which on a Freeride (new in 1.0.4) shows the group behind the leader."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "ride-mode"
     ],
     "kind": "add",
