@@ -51,6 +51,8 @@ const PATHS = {
   // A battery on its side with a charge bolt, for Battery Saver.
   expand: ['M14 4h6v6', 'M20 4l-6.5 6.5', 'M10 20H4v-6', 'M4 20l6.5-6.5'],
   collapse: ['M20 10h-6V4', 'M14 10l6.5-6.5', 'M4 14h6v6', 'M10 14l-6.5 6.5'],
+  // A music note, for Music Controls.
+  music: ['M9 17.5V5.8l10.5-2.3v11.7', 'M9 9l10.5-2.3', 'M9 17.5a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z', 'M19.5 15.2a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z'],
   battery: ['M3 7.5h15v9H3z', 'M20.5 10.5v3', 'M11.5 9l-2.5 3.2h3L9.5 15'],
 } as const;
 

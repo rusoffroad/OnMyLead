@@ -6,6 +6,7 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-02
 sources:
+  - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
   - app/src/app/nav/trails.tsx
   - app/src/app/nav/trail/[id].tsx
@@ -164,6 +165,12 @@ This is a Pro feature. See [Free and Pro](/help/free-vs-pro).
 - On a ride's route, tap **Use One of My Trails** and pick a trail.
 
 See [Create a Ride](/help/create-a-ride) and [Draw a Route](/help/route-builder).
+
+:::release 1.0.4
+## Control Your Music
+
+The round **Music** button above **Center on Me** pauses, skips and changes the volume of the music on your phone. See [Control Your Music While You Ride](/help/music-controls).
+:::
 
 ## On the Website
 

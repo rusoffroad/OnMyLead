@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["OnMyLeadMusicModule"]
+  },
+  "android": {
+    "modules": ["com.rusoffroad.onmylead.music.OnMyLeadMusicModule"]
+  }
+}

@@ -29,6 +29,8 @@
           "UIInterfaceOrientationLandscapeLeft",
           "UIInterfaceOrientationLandscapeRight"
         ],
+        "NSAppleMusicUsageDescription": "Shows the name of the Apple Music song in Music Controls. It stays on your phone.",
+        "LSApplicationQueriesSchemes": ["spotify"],
         "ITSAppUsesNonExemptEncryption": false
       },
       "privacyManifests": {
