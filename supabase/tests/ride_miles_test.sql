@@ -57,10 +57,10 @@ begin
   for r in select distinct c.ride_id from rider_ride_credits c join rides x on x.id = c.ride_id where x.status = 'ended' loop
     perform credit_ride(r.ride_id, true);
   end loop;
-  if (select miles from rider_ride_credits where user_id = '00000000-0000-0000-0000-0000000007d1') not between 100 and 106 then
+  if (select miles from rider_ride_credits where user_id = '00000000-0000-0000-0000-0000000007d1' and ride_id = '22222222-2222-2222-2222-2222222227d1') not between 100 and 106 then
     raise exception 'FAIL: recount changed Dee''s miles';
   end if;
-  if (select miles from rider_ride_credits where user_id = '00000000-0000-0000-0000-0000000007e1') > 0 then
+  if (select miles from rider_ride_credits where user_id = '00000000-0000-0000-0000-0000000007e1' and ride_id = '22222222-2222-2222-2222-2222222227e1') > 0 then
     raise exception 'FAIL: recount counted spikes';
   end if;
 end $$;
