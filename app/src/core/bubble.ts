@@ -6,6 +6,7 @@
  * rather than the whole pack.
  */
 import { distanceM, formatDistance, LatLng, milesToMeters } from './geo';
+import { certainGapM } from './precise-location';
 
 export type RideRole = 'leader' | 'sweep' | 'rider';
 export type BubbleStatus = 'green' | 'yellow' | 'red' | 'unknown';
@@ -15,6 +16,8 @@ export type RiderFix = LatLng & {
   at: number; // epoch ms of the fix
   speedMps?: number | null;
   headingDeg?: number | null;
+  /** How far off the phone says this fix may be, meters. Approximate Location fixes are a mile or more. */
+  accuracyM?: number | null;
 };
 
 export type BubbleRider = {
@@ -107,6 +110,11 @@ export function computeBubble(
     const nearestM = others.length
       ? Math.min(...others.map((o) => distanceM(r.fix!, o.fix!)))
       : null;
+    // Separation counts only distance beyond what an Approximate Location dot may be off by, so a
+    // rider sharing a rough location from right beside the group isn't called a mile behind.
+    const gapM = others.length
+      ? Math.min(...others.map((o) => certainGapM(distanceM(r.fix!, o.fix!), r.fix!.accuracyM, o.fix!.accuracyM)))
+      : null;
 
     let status: BubbleStatus = 'green';
     let reason: BubbleReason = 'ok';
@@ -115,9 +123,9 @@ export function computeBubble(
       status = worse(status, s);
     };
 
-    if (nearestM != null) {
-      if (nearestM > settings.redDistanceM) bump('red', 'distance');
-      else if (nearestM > settings.yellowDistanceM) bump('yellow', 'distance');
+    if (gapM != null) {
+      if (gapM > settings.redDistanceM) bump('red', 'distance');
+      else if (gapM > settings.yellowDistanceM) bump('yellow', 'distance');
     }
     // Stopping only matters while the rest of the group keeps moving.
     if (groupMoving && (r.fix.speedMps ?? 0) < MOVING_SPEED_MPS) {

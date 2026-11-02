@@ -50,12 +50,58 @@
       "route-builder",
       "status-buttons",
       "troubleshooting",
-      "waypoints-and-planned-stops"
+      "waypoints-and-planned-stops",
+      "accurate-location"
     ],
     "kind": "review",
     "by": "pr",
     "ref": "leave-ride",
     "why": "These guides list the ride page, Ride Mode or location sharing as a source, which the 1.0.4 Leave Ride change touched (a Leave Ride button at the bottom of the ride page and under Riders in Ride Mode). Nothing they describe changes for riders."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "accurate-location",
+      "troubleshooting",
+      "ride-mode",
+      "location-sharing",
+      "ride-bubble"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "approximate-location",
+    "why": "New guide Make Your Location Accurate, after an Android rider beside Chris showed 1.5 miles away (Google Maps on that phone was off by the same amount; the fix was Precise Location plus Google Location Accuracy and a calibration). The phone steps are true today. For 1.0.4: Android asks for Google Location Accuracy when sharing starts, and Ride Mode's banner also covers Google Location Accuracy off and a rough fix (with calibration steps)."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "troubleshooting",
+      "ride-bubble",
+      "ride-mode",
+      "location-sharing"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "approximate-location",
+    "why": "A rider who joined from Android showed about 1.5 miles away while sitting next to the organizer: their phone had Approximate location. Fix Common Problems now explains how to turn on Precise Location on Android, iPhone and iPad (true today). For 1.0.4: Ride Mode shows a Precise Location Is Off banner that asks for precise location (Android) or opens Settings (iPhone, iPad), the riders list labels Approximate Location, and Ride Bubble no longer calls such a rider separated for a gap their rough location could explain."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "battery-saver",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "getting-started",
+      "ride-chat",
+      "status-buttons",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "approximate-location",
+    "why": "Ride Mode and location sharing changed for riders on Approximate Location (a new banner and an Approximate Location label, written up in Use Ride Mode, Share Your Location and Fix Common Problems). Nothing in these guides changes; on a tablet the banner sits with the others in the sidebar."
   },
   {
     "date": "2026-11-01",

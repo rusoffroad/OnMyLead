@@ -40,6 +40,7 @@ import { riderHeading } from '@/core/heading';
 import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { mapPanelWidth, sidebarWidth } from '@/core/layout';
+import { isApproximateFix, LOCATION_PROBLEM_BANNER } from '@/core/precise-location';
 import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
@@ -49,6 +50,7 @@ import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
 import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
+import { usePreciseLocation } from '@/hooks/use-precise-location';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
@@ -317,6 +319,8 @@ export default function RideMode() {
   const hasRoute = !!route.route;
   // Battery Saver also slows this screen's own work: the blue dot and the backup check for riders.
   const batteryMode = useBatteryMode();
+  // Approximate Location (Android) or Precise off (iPhone, iPad) puts this rider miles from where they are.
+  const precise = usePreciseLocation(me ? positions[me]?.accuracy_m : null);
   const { followEveryM, refreshSec } = BATTERY_PLANS[batteryMode];
   useEffect(() => {
     if (!hasRoute) return;
@@ -412,7 +416,7 @@ export default function RideMode() {
         name: m.profiles?.display_name || 'Rider',
         role: bubbleRole(m.role, leaderIds.includes(m.user_id)),
         sharing: !!p, // rows only arrive for riders currently sharing with us
-        fix: p ? { lat: p.lat, lng: p.lng, at: Date.parse(p.recorded_at), speedMps: p.speed_mps, headingDeg: p.heading_deg } : null,
+        fix: p ? { lat: p.lat, lng: p.lng, at: Date.parse(p.recorded_at), speedMps: p.speed_mps, headingDeg: p.heading_deg, accuracyM: p.accuracy_m } : null,
         lastMovedAt: p?.last_moved_at ? Date.parse(p.last_moved_at) : null,
       };
     });
@@ -481,6 +485,8 @@ export default function RideMode() {
         !freshness ? 'Not Sharing' : live ? 'Live' : freshness.state === 'lost' ? freshness.label : `Last Seen ${freshness.ago}`,
         // A speed is only true while the fix is live.
         live && p?.speed_mps != null ? `${Math.round(p.speed_mps * 2.237)} mph` : null,
+        // Their phone only shares a rough spot (Approximate Location): the dot can be a mile or more off.
+        spot === p && isApproximateFix(p?.accuracy_m) ? 'Approximate Location' : null,
         st ? STATUS_LABEL[st.status] : null,
       ].filter(Boolean).join(' · '),
     };
@@ -530,7 +536,7 @@ export default function RideMode() {
   const foldedCount = helpCalls.length - shownHelpCalls.length + separations.length - shownSeparations.length;
 
   const alertsShown = shownSeparations.length + shownHelpCalls.length > 0;
-  const hasBanners = offlineSince != null || !!(activeShare && shareOpen) || !!regroup || !!announcement;
+  const hasBanners = !!precise.problem || offlineSince != null || !!(activeShare && shareOpen) || !!regroup || !!announcement;
   // Each value below comes from measurements that don't depend on it, so nothing feeds back.
   // On a tablet the banners sit in the sidebar, beside the panel rather than above it.
   const panelTop = tablet ? insets.top + TABLET_PANEL_TOP : topRowBottom;
@@ -921,6 +927,17 @@ export default function RideMode() {
             contentContainerStyle={{ gap: 6 }}
             onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
             showsVerticalScrollIndicator={false}>
+          {precise.problem ? (
+            <Pressable
+              onPress={() => void precise.fix()}
+              style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}
+              accessibilityRole="button"
+              accessibilityLabel={LOCATION_PROBLEM_BANNER[precise.problem]}>
+              <Text style={[styles.shareText, { color: '#1A1100', flex: 1, textAlign: 'left' }]}>
+                {LOCATION_PROBLEM_BANNER[precise.problem]}
+              </Text>
+            </Pressable>
+          ) : null}
           {offlineSince != null ? (
             <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
               <View style={styles.offlineDot} />
