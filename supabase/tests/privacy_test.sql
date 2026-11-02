@@ -742,9 +742,10 @@ begin
   end if;
   select * into s from ride_group_summary('dddddddd-dddd-dddd-dddd-dddddddddddd');
   if s.riders_tracked <> 3 then raise exception 'FAIL: expected 3 tracked riders, got %', s.riders_tracked; end if;
-  -- Olivia 0.69 mi + Ben about 1.24 mi (19 good segments; the two around the spike are dropped) + Cara 0.
-  if s.longest_miles not between 1.1 and 1.4 then raise exception 'FAIL: longest distance %', s.longest_miles; end if;
-  if s.total_miles not between 1.8 and 2.1 then raise exception 'FAIL: total distance %', s.total_miles; end if;
+  -- Olivia 0.69 mi + Ben about 1.45 mi (the spike fix is dropped and the fixes either side of it
+  -- are joined, 21 segments, since 20261102200000) + Cara 0.
+  if s.longest_miles not between 1.3 and 1.6 then raise exception 'FAIL: longest distance %', s.longest_miles; end if;
+  if s.total_miles not between 2.0 and 2.3 then raise exception 'FAIL: total distance %', s.total_miles; end if;
   if s.top_speed_mph <> 27 then raise exception 'FAIL: top speed % (GPS spike leaked?)', s.top_speed_mph; end if;
 end $$;
 reset role;

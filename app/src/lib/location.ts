@@ -22,13 +22,35 @@ import { batteryPlan } from './battery';
 import { supabase } from './supabase';
 
 export const LOCATION_TASK = 'ride-location-updates';
-const QUEUE_KEY = 'ride.trackQueue.v1';
+/**
+ * Track points not yet uploaded, kept per ride. Version 1 was one list for whatever ride was
+ * active when it was flushed, so points left over from an earlier ride (no service when it
+ * ended) were added to the next ride's track and its summary counted the jump between them.
+ */
+const QUEUE_KEY = 'ride.trackQueue.v2';
+const OLD_QUEUE_KEY = 'ride.trackQueue.v1';
 const CONTEXT_KEY = 'ride.trackContext.v1';
 
 /** `until` is when the share ends (epoch ms, null for open-ended), checked here so sharing stops on time even with no service. */
 type TrackContext = { rideId: string | null; lastMovedAt: number | null; until?: number | null };
 // Altitude was added later; older stored points have four values.
-type QueuedPoint = [lng: number, lat: number, epochSec: number, speedMps: number | null, altitudeM?: number | null];
+// Accuracy was added in 1.0.4 so the summary can skip rough fixes; older points have five values or fewer.
+type QueuedPoint = [lng: number, lat: number, epochSec: number, speedMps: number | null, altitudeM?: number | null, accuracyM?: number | null];
+type TrackQueue = Record<string, QueuedPoint[]>;
+
+async function readQueue(): Promise<TrackQueue> {
+  try {
+    const raw = JSON.parse((await AsyncStorage.getItem(QUEUE_KEY)) ?? '{}');
+    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  } catch {
+    return {};
+  }
+}
+
+const writeQueue = (q: TrackQueue) => AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(q));
+
+/** A fix rougher than this is never added to the ride track (it still updates the rider's dot). */
+const MAX_TRACK_FIX_ACCURACY_M = 100;
 
 async function readContext(): Promise<TrackContext> {
   const raw = await AsyncStorage.getItem(CONTEXT_KEY);
@@ -66,10 +88,14 @@ export async function handleLocations(locations: Location.LocationObject[]) {
   await writeContext(ctx);
 
   // Every sent fix goes into the ride track first, so dead zones still show on the after-ride map.
-  if (ctx.rideId) {
-    const queue: QueuedPoint[] = JSON.parse((await AsyncStorage.getItem(QUEUE_KEY)) ?? '[]');
-    queue.push([next.lng, next.lat, Math.round(next.at / 1000), latest.coords.speed ?? null, latest.coords.altitude ?? null]);
-    await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+  const accuracy = latest.coords.accuracy ?? null;
+  if (ctx.rideId && (accuracy == null || accuracy <= MAX_TRACK_FIX_ACCURACY_M)) {
+    const queue = await readQueue();
+    (queue[ctx.rideId] ??= []).push([
+      next.lng, next.lat, Math.round(next.at / 1000), latest.coords.speed ?? null, latest.coords.altitude ?? null,
+      accuracy != null ? Math.round(accuracy) : null,
+    ]);
+    await writeQueue(queue);
   }
 
   try {
@@ -98,22 +124,36 @@ export async function handleLocations(locations: Location.LocationObject[]) {
   }
 }
 
-/** Append queued points to this rider's ride track. Safe to call repeatedly. */
+/** Append queued points to each ride's own track. Safe to call repeatedly. */
 export async function flushTrack(userId: string) {
-  const ctx = await readContext();
-  const queue: QueuedPoint[] = JSON.parse((await AsyncStorage.getItem(QUEUE_KEY)) ?? '[]');
-  if (!ctx.rideId || !queue.length) return;
-  const { data: existing } = await supabase
-    .from('ride_tracks')
-    .select('points')
-    .eq('ride_id', ctx.rideId)
-    .eq('user_id', userId)
-    .maybeSingle();
-  const points = [...((existing?.points as QueuedPoint[] | undefined) ?? []), ...queue];
-  const { error } = await supabase
-    .from('ride_tracks')
-    .upsert({ ride_id: ctx.rideId, user_id: userId, points, updated_at: new Date().toISOString() });
-  if (!error) await AsyncStorage.setItem(QUEUE_KEY, '[]');
+  // The old single list can't say which ride its points belong to, so it is dropped rather than
+  // risk adding them to the wrong ride.
+  await AsyncStorage.removeItem(OLD_QUEUE_KEY).catch(() => {});
+  const queue = await readQueue();
+  for (const [rideId, pending] of Object.entries(queue)) {
+    if (!pending?.length) {
+      delete queue[rideId];
+      continue;
+    }
+    const { data: existing, error: readError } = await supabase
+      .from('ride_tracks')
+      .select('points')
+      .eq('ride_id', rideId)
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (readError) continue;
+    const points = [...((existing?.points as QueuedPoint[] | undefined) ?? []), ...pending];
+    const { error } = await supabase
+      .from('ride_tracks')
+      .upsert({ ride_id: rideId, user_id: userId, points, updated_at: new Date().toISOString() });
+    if (error) continue;
+    // Points queued while this upload ran stay for the next flush.
+    const now = await readQueue();
+    const rest = (now[rideId] ?? []).slice(pending.length);
+    if (rest.length) now[rideId] = rest;
+    else delete now[rideId];
+    await writeQueue(now);
+  }
 }
 
 if (Platform.OS !== 'web') {

@@ -2,6 +2,17 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "ride-summary-and-ride-again",
+      "badges-and-ranks"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-miles-fix",
+    "why": "Fixed: a 4 mile test ride showed about 60 miles on the ride summary. Distance now leaves out rough locations, GPS bounces, jumps while the phone says it is standing still, and gaps with location off, and points from an earlier ride no longer join the next one. The articles say what counts; written in 1.0.4 release blocks."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "faq"
     ],
     "kind": "update",

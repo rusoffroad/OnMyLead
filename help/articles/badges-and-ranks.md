@@ -6,6 +6,7 @@ order: 25
 release: "1.0.3"
 updated: 2026-11-02
 sources:
+  - supabase/migrations/20261102200000_ride_miles_cleanup.sql
   - app/src/app/badges.tsx
   - app/src/core/badges.ts
   - app/src/lib/badges.ts
@@ -40,6 +41,10 @@ Leading counts when you are the ride's leader as it ends: the organizer, or the 
 - It counts for you when your own location track on that ride covers at least half a mile, so share your location in **Ride Mode** while you ride.
 - **Trail Boss**, **Tail Gunner** and **Crew Rider** also need at least two riders with a track, so a ride you end on your own doesn't count toward them. Your miles on it still do.
 - Miles come from your own track, with GPS jumps and time stopped left out, the same way as the ride summary.
+
+:::release 1.0.4
+Rough locations, GPS bounces and time with your location off are left out of your miles too, the same as the ride summary.
+:::
 - No signal on the trail? Your track uploads when your phone gets service again, and the ride counts then.
 
 Badges are worked out by OnMyLead's server from what you really ride, so nobody can add one by hand. Once you earn a badge, you keep it.

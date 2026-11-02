@@ -3,7 +3,7 @@
     "version": "1.0.4",
     "title": "Accurate Locations, a Notifications Inbox and Easier Leaving",
     "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone. And every map can go Full Map, with one tap on Controls to bring the buttons back. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own message and save your own quick replies.\n• Ride Mode tells you when your location is rough and helps fix it.\n• Android asks for a precise location when you share.\n• Rough locations are labeled Approximate.\n• New bell on the Rides tab: see and clear your notifications.\n• Easier Leave Ride; organizers can hand off the ride and leave.\n• Full Map on every map.\n• Freeride rides get the rider line.\n• Update Available when a new version is out.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own message and save your own quick replies.\n• Ride Mode tells you when your location is rough and helps fix it.\n• Android asks for precise location.\n• Rough locations are labeled Approximate.\n• New bell on the Rides tab: see and clear your notifications.\n• Easier Leave Ride; organizers can hand off the ride and leave.\n• Full Map on every map.\n• Freeride rides get the rider line.\n• Update Available when a new version is out.\n• Fixed: ride miles.",
     "apple": null,
     "google": null,
     "notes": [
@@ -42,6 +42,10 @@
       {
         "kind": "improved",
         "text": "OnMyLead now tells you when there's a newer version. An Update Available card shows at the top of the home screen once the update is in the App Store or Google Play. Tap Update to go straight to it, or close the card."
+      },
+      {
+        "kind": "fixed",
+        "text": "Your ride summary, ride card and Mile Eater badge now count only the miles you actually rode. A phone with a rough location, GPS jumps, points left over from an earlier ride, or time with location off could add miles that weren't ridden: one short test ride showed about 60 miles. Those are now left out."
       }
     ]
   },
