@@ -8,7 +8,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SEND_TIMEOUT_MS } from '@/core/broadcast';
-import type { QuickReply } from '@/core/chat';
 import { sendRideMessage, sendRiderStatus } from './api';
 import type { RiderStatusKind } from './types';
 
@@ -16,7 +15,7 @@ const KEY = 'ride.outbox.v1';
 
 type Item =
   | { kind: 'status'; id?: string; rideId: string; status: RiderStatusKind; lat: number | null; lng: number | null; tappedAt: string }
-  | { kind: 'reply'; id?: string; rideId: string; body: QuickReply; tappedAt: string };
+  | { kind: 'reply'; id?: string; rideId: string; body: string; tappedAt: string };
 
 async function read(): Promise<Item[]> {
   return JSON.parse((await AsyncStorage.getItem(KEY)) ?? '[]');
@@ -46,8 +45,8 @@ export function sendStatusReliably(
   return sendOrQueue({ kind: 'status', id, rideId, status, lat: at?.lat ?? null, lng: at?.lng ?? null, tappedAt: new Date().toISOString() });
 }
 
-/** Ride Mode quick reply: send now or queue it, like a status tap. */
-export function sendQuickReplyReliably(rideId: string, body: QuickReply, id?: string): Promise<boolean> {
+/** Ride Mode quick reply, or a message the rider typed there: send now or queue it, like a status tap. */
+export function sendQuickReplyReliably(rideId: string, body: string, id?: string): Promise<boolean> {
   return sendOrQueue({ kind: 'reply', id, rideId, body, tappedAt: new Date().toISOString() });
 }
 

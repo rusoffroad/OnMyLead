@@ -45,7 +45,7 @@ Once you've joined a ride, the other riders on it can see:
 
 - That you're on the ride, your role, and whether you've checked in.
 - Your messages in the ride chat, except leader-only messages, which only you and the leader can read.
-- Your status taps and quick replies from Ride Mode. A status tap carries your phone's location at the moment you tapped it.
+- Your status taps and quick replies from Ride Mode (and, from 1.0.4, messages you type there). A status tap carries your phone's location at the moment you tapped it.
 - Your live location, but only while you're sharing with the ride.
 
 ## Your Live Location
