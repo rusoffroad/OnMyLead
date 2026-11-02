@@ -4,7 +4,7 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/app/notifications.tsx
   - app/src/core/notifications.ts
@@ -16,7 +16,7 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - supabase/migrations/20261101500000_rider_badges.sql
   - supabase/migrations/20261101700000_out_riding.sql
-related: [getting-started, status-buttons, ride-chat, group-chat, follow-leaders, emergency-and-safety, pro-trial, troubleshooting]
+related: [notifications-inbox, getting-started, status-buttons, ride-chat, group-chat, follow-leaders, emergency-and-safety, pro-trial, troubleshooting]
 keywords: [notifications, push, alerts, mute, quiet hours, do not disturb, reminder, lock screen, preview, emails, sound]
 ---
 
@@ -26,6 +26,10 @@ You decide what OnMyLead tells you about. Every change saves as soon as you make
 
 1. Go to the **You** tab.
 2. Under **Settings**, tap **Notifications**. The line under it sums up your settings, like **Everything on** or **2 turned off**.
+
+:::release 1.0.4
+You can also tap the bell at the top of the **Rides** tab, then **Notification Settings** at the bottom of the list.
+:::
 
 ## Always On: Help and EMERGENCY
 
@@ -86,6 +90,10 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 - A direct message opens the conversation.
 - A friend request, or a request someone accepted, opens **Friends**.
 - A trail of yours being hidden opens **My Trails**.
+:::
+
+:::release 1.0.4
+Notifications you've missed or swiped away are kept under the bell on the **Rides** tab for 30 days. See [See and Clear Your Notifications](/help/notifications-inbox).
 :::
 
 ## Ride Reminder

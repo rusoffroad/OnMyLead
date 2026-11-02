@@ -12,7 +12,7 @@ export const ROW_ACTION_HINT: string | null = 'Swipe Left to Delete or Leave';
 
 /**
  * A list row you can swipe left to show one action behind it: Delete (red) for your own ride,
- * Leave or Decline (blue) for anyone else's. A long swipe runs it straight away. Either way
+ * Leave or Decline (blue) for anyone else's, Clear (grey) for a notification. A long swipe runs it straight away. Either way
  * `onAction` asks first and resolves true only when the ride is gone from the list.
  * The row's own tap still opens it; while the action is showing, a tap just closes it.
  */
@@ -22,7 +22,7 @@ export function SwipeRow({ action, onAction, children }: { action: RowAction; on
   const [width, setWidth] = useState(360);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const color = action === 'delete' ? theme.accent : theme.sky;
+  const color = action === 'delete' ? theme.accent : action === 'clear' ? theme.backgroundSelected : theme.sky;
   const label = ROW_ACTION_LABEL[action];
 
   const settle = useCallback(
@@ -86,7 +86,7 @@ export function SwipeRow({ action, onAction, children }: { action: RowAction; on
           { backgroundColor: color, opacity: x.interpolate({ inputRange: [-12, 0], outputRange: [1, 0], extrapolate: 'clamp' }) },
         ]}>
         <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={() => { settle(-ACTION_WIDTH); run(); }} style={styles.action}>
-          {busy ? <ActivityIndicator color="#fff" /> : <Icon name={action === 'delete' ? 'trash' : 'leave'} size={24} color="#fff" strokeWidth={2.3} />}
+          {busy ? <ActivityIndicator color="#fff" /> : <Icon name={action === 'delete' ? 'trash' : action === 'clear' ? 'close' : 'leave'} size={24} color="#fff" strokeWidth={2.3} />}
           <Text style={styles.label}>{label}</Text>
         </Pressable>
       </Animated.View>

@@ -9,6 +9,7 @@ import { hiddenByBlock } from '@/core/blocks';
 import { alertTitle, isLeaderOnly, isResolved, shouldAlert, type ChatMessage } from '@/core/chat';
 import type { NotificationSettings } from '@/core/notifications';
 import { blockedIds, useBlocks } from '@/lib/blocks';
+import { useInboxSync } from '@/lib/inbox';
 import { currentNotificationSettings, resetNotificationSettings, syncNotificationSettings } from '@/lib/notification-settings';
 import { useOutRidingKeeper } from '@/lib/out-riding';
 import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps, useRideChangeReminders } from '@/lib/push';
@@ -75,6 +76,8 @@ export function MessageAlerts() {
   useBlocks();
   // Out Riding: keeps the rough area fresh each time the app opens while it's on.
   useOutRidingKeeper();
+  // The Notifications inbox (the bell on the Rides tab) stays current.
+  useInboxSync();
 
   useEffect(() => {
     if (!me) {
