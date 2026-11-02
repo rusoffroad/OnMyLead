@@ -44,6 +44,10 @@ Everything below starts on.
 - **Rider Status**: status buttons and quick replies from Ride Mode, like **On My Way**, **Need Fuel** and **Flat Tire**, and when a rider cancels one.
 - **Announcements**: what the organizer tells the whole group.
 
+:::release 1.0.4
+Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status** setting too.
+:::
+
 ### Ride Chat
 
 - **Group Chat**: messages and quick replies from your group.

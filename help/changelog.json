@@ -2,6 +2,37 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "status-buttons",
+      "ride-chat",
+      "ride-mode",
+      "use-onmylead-on-a-tablet",
+      "notification-settings",
+      "privacy"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-mode-message",
+    "why": "Coming in 1.0.4: Ride Mode has a ✎ Message button to type a short message of your own to the group (sent like a quick reply, with Seen by and Cancel) and to keep up to 6 of your own quick replies on the device."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "directions",
+      "emergency-and-safety",
+      "fuel-range",
+      "location-sharing",
+      "ride-bubble",
+      "troubleshooting",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "ride-mode-message",
+    "why": "Checked against the Ride Mode message change: only a new ✎ Message button and sheet were added, so nothing in these articles changed."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "join-a-ride",
       "approvals-and-waitlist",
       "leader-sweep-and-tail-gunner",

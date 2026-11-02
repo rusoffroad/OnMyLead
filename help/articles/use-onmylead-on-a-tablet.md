@@ -46,6 +46,10 @@ The live map fills the screen.
 - **Directions** and **Add Waypoint** sit just above the buttons panel.
 - The ride name, your sharing timer and any announcement stay at the top of the left side.
 
+:::release 1.0.4
+Tap **✎ Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
+:::
+
 :::release 1.0.3
 On a tablet, Ride Mode's pop-up cards (Share Your Location, **EMERGENCY**) and sheets close when you swipe them down, just like on a phone.
 :::

@@ -2,11 +2,15 @@
   {
     "version": "1.0.4",
     "title": "Accurate Locations, a Notifications Inbox and Easier Leaving",
-    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.\n• New bell on the Rides tab: see your notifications from the last 30 days and clear one or all.\n• Easier Leave Ride; organizers can hand off the ride and leave.",
+    "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own message to the group and save your own quick replies.\n• Ride Mode tells you when your location is rough and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Rough locations are labeled Approximate Location, and Ride Bubble no longer calls them separated.\n• New bell on the Rides tab: see and clear your notifications.\n• Easier Leave Ride; organizers can hand off the ride and leave.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Type your own message in Ride Mode: tap ✎ Message, write a short line like \"Gas stop at the next town\" and tap Send to Everyone. It goes out like a quick reply, with the same Seen by lights and Cancel, and waits for signal if you have none. Check Save as One of My Quick Replies to send it again in one tap next time."
+      },
       {
         "kind": "new",
         "text": "Notifications: tap the bell at the top right of the Rides tab to see what OnMyLead sent you in the last 30 days, with a red number for new ones. Tap one to open it, Mark All Read, swipe one left to clear it, or Clear All, which also clears them from your phone's own notification list and resets the app icon badge. Also on onmylead.com."

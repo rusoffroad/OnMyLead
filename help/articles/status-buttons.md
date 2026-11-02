@@ -14,13 +14,18 @@ sources:
   - app/src/core/breakdown.ts
   - app/src/core/chat.ts
   - app/src/lib/outbox.ts
+  - app/src/components/ride-message-sheet.tsx
+  - app/src/core/ride-message.ts
+  - app/src/hooks/use-saved-replies.ts
   - supabase/migrations/20261019300000_status_broadcast.sql
   - supabase/migrations/20261015000000_notification_settings.sql
 related: [ride-mode, emergency-and-safety, ride-chat, notification-settings, leader-sweep-and-tail-gunner]
-keywords: [status, quick reply, need help, mechanical issue, flat tire, stuck, lost, need fuel, regroup, seen, receipts, cancel, on my way, running late, tablet]
+keywords: [status, quick reply, need help, mechanical issue, flat tire, stuck, lost, need fuel, regroup, seen, receipts, cancel, on my way, running late, tablet, custom message, type a message, my quick replies]
 screenshots:
   - file: live.webp
     shows: app/src/app/ride/[id]/live.tsx
+  - file: ride-message.webp
+    shows: app/src/components/ride-message-sheet.tsx
 ---
 
 Ride Mode has big buttons so you can tell the group what's going on without typing. Every rider on the ride sees your tap, and you can see whose phone has it.
@@ -39,6 +44,28 @@ The four blue buttons send a short message to the group. They also show in the r
 - **Running Late**
 - **Need a Minute**
 - **All Good**
+
+:::release 1.0.4
+## Type Your Own Message
+
+Need to say something the buttons don't cover, like "Gas stop at the next town"? Pull over first, then:
+
+1. Tap **✎ Message** at the top left of the bottom panel (across from **⤢ Full Map**).
+2. Type your message. It's one line of up to 120 characters, and the counter shows how many are left.
+3. Tap **Send to Everyone**, or the send key on your keyboard.
+
+![Message the Group in Ride Mode, with two saved quick replies above the message box](/help/img/ride-message.webp)
+
+It goes out just like a quick reply: the same **Sending** and **Sent to the Group** card with a light for each rider, **Cancel** to take it back, and it waits for signal if you have none. Riders get a notification titled with your name and the message, and it shows in the ride chat in italics.
+
+To put the keyboard away without sending, tap **Done** above it on iPhone and iPad, use the back key on Android, or swipe the sheet down.
+
+### My Quick Replies
+
+Check **Save as One of My Quick Replies** before you send, and the message is kept on this phone or tablet. Next time, tap **✎ Message** and tap it under **My Quick Replies** to send it in one tap. You can keep up to 6; saving a seventh drops the oldest. Tap **Edit**, then a reply, to remove it. Saved replies stay on the device you saved them on.
+
+On a tablet the message sheet opens as a card in the middle of the screen.
+:::
 
 ## Status Buttons
 

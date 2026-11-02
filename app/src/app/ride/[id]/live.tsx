@@ -1142,7 +1142,7 @@ export default function RideMode() {
               accessibilityLabel="Type a Message"
               accessibilityHint="Write your own message to everyone on this ride, or send one of your saved quick replies"
               hitSlop={8}
-              style={({ pressed }) => [styles.fullMapBtn, styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
+              style={({ pressed }) => [styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
               <Text style={styles.typeText}>✎ Message</Text>
             </Pressable>
           </View>
@@ -1500,7 +1500,10 @@ const styles = StyleSheet.create({
   },
   fullMapText: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
   // Mirrors Full Map on the left of the handle: Type a Message.
-  typeBtn: { right: undefined, left: 0, backgroundColor: Colors.sky },
+  typeBtn: {
+    position: 'absolute', left: 0, top: -4, minHeight: 34, paddingHorizontal: 12, borderRadius: 17,
+    justifyContent: 'center', backgroundColor: Colors.sky,
+  },
   typeText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
   fullMapBarBtn: { minHeight: 48 },
   // Leaves the map layers button (and its downloaded-map tag) uncovered on the right.
