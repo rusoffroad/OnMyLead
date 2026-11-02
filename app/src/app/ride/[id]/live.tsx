@@ -15,6 +15,7 @@ import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
+import { LeaveRide } from '@/components/leave-ride';
 import { RiderList, RiderRows } from '@/components/rider-list';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
@@ -859,6 +860,21 @@ export default function RideMode() {
 
   const myPos = me ? positions[me] : undefined;
   const shareLeft = activeShare?.expires_at ? Date.parse(activeShare.expires_at) - now : null;
+  // Leave Ride sits under the riders (the Riders sheet on phones, the sidebar on tablets).
+  const leaveButton = ride && mine ? (
+    <LeaveRide
+      ride={ride}
+      members={members}
+      me={me}
+      sharing={!!activeShare}
+      look="dark"
+      onLeft={() => {
+        setShare(null);
+        setRidersOpen(false);
+        router.replace('/');
+      }}
+    />
+  ) : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -1014,6 +1030,7 @@ export default function RideMode() {
                   narrow
                   extra={(riderId) => (statuses[riderId]?.status === 'mechanical' ? <BreakdownBadge size={18} /> : null)}
                 />
+                {leaveButton ? <View style={{ marginTop: Spacing.two }}>{leaveButton}</View> : null}
               </ScrollView>
             </Animated.View>
           ) : (
@@ -1330,6 +1347,7 @@ export default function RideMode() {
         onClose={() => setRidersOpen(false)}
         onNavigate={navigateTo}
         extra={(riderId) => (statuses[riderId]?.status === 'mechanical' ? <BreakdownBadge size={18} /> : null)}
+        footer={leaveButton}
       />
 
       <WaypointSheet

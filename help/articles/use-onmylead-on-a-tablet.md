@@ -62,6 +62,10 @@ Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, th
 
 Once you've joined a ride, the ride and its details stay on the left, and **Map**, **Riders** and **Chat** open on the right. You can read the chat or check the route without losing the meeting time and place.
 
+:::release 1.0.4
+**Leave Ride** is at the bottom of the left side of the ride page, and at the bottom of the **Riders** list in Ride Mode. See [Join a Ride](/help/join-a-ride).
+:::
+
 ## Draw a Route and Add Waypoints
 
 With the tablet sideways, the route tools and the waypoint list sit in a panel beside the map. Swipe the panel up or tap **Hide** to fold it. With the tablet upright, the panel floats in the bottom corner of the map; swipe it down to fold it.

@@ -4,7 +4,7 @@ summary: Everything you can do as a ride's organizer, from starting Ride Mode an
 category: rides
 order: 40
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/app/r/[code].tsx
   - app/src/components/ride-roster.tsx
@@ -54,6 +54,10 @@ A live ride doesn't end by itself. Remember to tap **End Ride for Everyone** whe
 ## Hand Off the Whole Ride
 
 If you can't make it, give the ride to another rider who has joined. Open **Riders**, tap their name and tap **Give Them the Ride**. They become the organizer and leader, and you stay on the ride as a rider. You can't undo this yourself. See [Leader, Sweep and Tail Gunner](/help/leader-sweep-and-tail-gunner).
+
+:::release 1.0.4
+Or tap **Leave Ride** at the bottom of the ride page: pick who takes over under **Who Takes Over?** and tap **Give Ride and Leave**. They run the ride and you're off it.
+:::
 
 ## Call It Off
 

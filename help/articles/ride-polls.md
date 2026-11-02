@@ -4,7 +4,7 @@ summary: Leaders post a quick question in ride chat, like a lunch stop or the pa
 category: ride-mode
 order: 50
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/components/ride-poll.tsx
   - app/src/components/ride-chat.tsx

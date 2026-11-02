@@ -4,7 +4,7 @@ summary: Earn Bronze, Silver and Gold badges for leading, riding, miles and trai
 category: account
 order: 25
 release: "1.0.3"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/app/badges.tsx
   - app/src/core/badges.ts
