@@ -16,6 +16,52 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "music-controls",
+    "why": "The You tab's On the Trail section gets a Music Controls switch in 1.0.4, which shows or hides the new Music button."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "badges-and-ranks",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "garage",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "profile-picture",
+      "ride-bubble",
+      "ride-chat",
+      "ride-name-and-profile",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "status-buttons",
+      "subscribe-to-pro",
+      "trip-planner",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "music-controls",
+    "why": "Checked against the Music Controls change: it adds a Music button to Ride Mode and Navigate, a Music Controls switch to the You tab, an Apple Music permission text and a Spotify link check in the app config, a website feature card, a Music Controls flag on the Admin Settings page, and store privacy notes. Nothing these articles describe changed, so only their review dates move."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "follow-me",
       "ride-mode",
       "navigation-mode",
