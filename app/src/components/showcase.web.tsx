@@ -135,7 +135,7 @@ export function Showcase() {
               alt="Ride Mode showing every rider in running order on the route line, a Full Map button, a separated rider alert and big status buttons"
               title="Ride Together"
               text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear. On a Freeride with no mapped route, the line shows the group behind the leader and how spread out it is. On the map, a small arrow on each moving rider’s dot shows which way they’re heading, and Ride Bubble warns everyone when someone drops back or stops moving."
-              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Full Map hides everything but the route line, with EMERGENCY one tap away', 'Ride Mode opens on you, and Center on Me brings you back after you look around']}
+              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Type your own message to the group when the buttons don’t cover it, and save the ones you send often', 'Full Map hides everything but the route line, with EMERGENCY one tap away', 'Ride Mode opens on you, and Center on Me brings you back after you look around']}
             />
             <Step
               n={4}

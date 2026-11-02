@@ -89,7 +89,8 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Freshness: Live / Last Seen / lost, no-service banner; Ride Bubble (Together / N Separated) with
   presets; convoy view.
 - Status buttons (OK, Stopped, Need Fuel, Mechanical, Flat Tire, Stuck, Lost, Need Help,
-  EMERGENCY), quick replies, broadcast receipts with offline queue and cancel, pinned
+  EMERGENCY), quick replies, ✎ Message (type your own one-line message to the group, sent like a
+  quick reply; up to 6 saved My Quick Replies per device, 1.0.4), broadcast receipts with offline queue and cancel, pinned
   announcement read aloud, Regroup Here, Navigate to a rider, Mechanical Issue spoken to leaders.
 - Emergency sheet: Alert My Group (hold), Call 911.
 - Keep-awake, speech, haptics, route progress strip, directions sheet, add waypoint.

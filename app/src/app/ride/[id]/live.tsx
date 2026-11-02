@@ -17,6 +17,7 @@ import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
 import { LeaveRide } from '@/components/leave-ride';
 import { RiderList, RiderRows } from '@/components/rider-list';
+import { RideMessageSheet } from '@/components/ride-message-sheet';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
 import { SharePicker } from '@/components/share-picker';
@@ -55,6 +56,7 @@ import { usePanelFold } from '@/hooks/use-panel-fold';
 import { usePreciseLocation } from '@/hooks/use-precise-location';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
+import { useSavedReplies } from '@/hooks/use-saved-replies';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
@@ -221,7 +223,11 @@ export default function RideMode() {
   // Tablets: the riders sidebar folds away to the left (swipe it left, or tap Hide) to see more map.
   const sidebar = usePanelFold('ride.ridersSidebarOpen.v1', true, 'left', layout.expanded);
   const announcement = useMemo(() => latestAnnouncement(chat.messages), [chat.messages]);
-  const [lastReply, setLastReply] = useState<QuickReply | null>(null);
+  const [lastReply, setLastReply] = useState<string | null>(null);
+  // Type a Message: the rider's own words to the group, sent like a quick reply. Messages they
+  // send often can be kept as their own quick replies on this device.
+  const [messageOpen, setMessageOpen] = useState(false);
+  const savedReplies = useSavedReplies();
   // The last status tap or quick reply: Sending, then Sent with who has it, or Waiting for
   // Signal; Cancel takes it back. Before the database has Cancel, a status is cancelled by
   // telling the group "OK" and a quick reply by clearing it from the chat.
@@ -660,10 +666,17 @@ export default function RideMode() {
     }
   }
 
-  async function quickReply(body: QuickReply) {
+  async function quickReply(body: string) {
     setLastReply(body);
     const sent = await broadcast.send({ id: newTapId(), kind: 'reply', label: body }, (tid) => sendQuickReplyReliably(id, body, tid));
     if (sent) chat.reload();
+  }
+
+  /** From the Message the Group sheet: close it first so the Sending card shows at once. */
+  function sendTyped(body: string, save: boolean) {
+    setMessageOpen(false);
+    if (save) savedReplies.save(body);
+    quickReply(body);
   }
 
   /** Takes back the last tap, for everyone. */
@@ -1146,6 +1159,15 @@ export default function RideMode() {
               style={({ pressed }) => [styles.fullMapBtn, { opacity: pressed ? 0.75 : 1 }]}>
               <Text style={styles.fullMapText}>⤢ Full Map</Text>
             </Pressable>
+            <Pressable
+              onPress={() => setMessageOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Type a Message"
+              accessibilityHint="Write your own message to everyone on this ride, or send one of your saved quick replies"
+              hitSlop={8}
+              style={({ pressed }) => [styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
+              <Text style={styles.typeText}>✎ Message</Text>
+            </Pressable>
           </View>
         )}
 
@@ -1337,6 +1359,15 @@ export default function RideMode() {
       </SafeAreaView>
       </Animated.View>
 
+      <RideMessageSheet
+        visible={messageOpen}
+        tablet={tablet}
+        saved={savedReplies.saved}
+        onSend={sendTyped}
+        onRemove={savedReplies.remove}
+        onClose={() => setMessageOpen(false)}
+      />
+
       <DirectionsSheet visible={directionsOpen} rows={directionRows} onClose={() => setDirectionsOpen(false)} />
 
       <RiderList
@@ -1491,6 +1522,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center', backgroundColor: Colors.backgroundSelected,
   },
   fullMapText: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
+  // Mirrors Full Map on the left of the handle: Type a Message.
+  typeBtn: {
+    position: 'absolute', left: 0, top: -4, minHeight: 34, paddingHorizontal: 12, borderRadius: 17,
+    justifyContent: 'center', backgroundColor: Colors.sky,
+  },
+  typeText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
   fullMapBarBtn: { minHeight: 48 },
   // Leaves the map layers button (and its downloaded-map tag) uncovered on the right.
   offlineBanner: {

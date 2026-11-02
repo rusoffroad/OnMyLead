@@ -101,6 +101,10 @@ Tap the round target button to move the map so you're in the middle of it. The m
 
 The panel at the bottom holds the route strip, alert cards, the quick replies and the status buttons. See [Status Buttons and Quick Replies](/help/status-buttons).
 
+:::release 1.0.4
+Tap **✎ Message** at the top left of the panel to type your own message to the group or send one of your saved quick replies. See [Type Your Own Message](/help/status-buttons).
+:::
+
 Above the panel are two buttons: **Directions** (on the left) for Apple Maps or Google Maps, and **Add Waypoint** (on the right) to mark your spot. You can also press and hold anywhere on the map to drop a waypoint there. See [Get Directions](/help/directions) and [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
 
 On Android, **Directions** opens Google Maps, and while you share, a **Sharing Your Location** notification stays in the notification shade. Tap it to come back to OnMyLead. If your phone restarted or the app was updated while you were sharing, opening Ride Mode starts that notification and your sharing again.
