@@ -24,7 +24,7 @@ sources:
   - app/src/core/auth-link.ts
   - app/src/lib/starlink.ts
   - app/src/components/fuel-check.tsx
-related: [faq, ride-mode, location-sharing, offline-maps, notification-settings, contact-support]
+related: [accurate-location, faq, ride-mode, location-sharing, offline-maps, notification-settings, contact-support]
 keywords: [not working, problem, broken, bug, help, no signal, no service, alerts, download, password, tablet, wrong location, miles away, approximate, precise location]
 ---
 
@@ -44,16 +44,7 @@ See [Share Your Location](/help/location-sharing).
 
 ## A Rider Shows Miles From Where They Are
 
-If a rider right beside you shows up a mile or two away, their phone is probably giving OnMyLead only an approximate location. The phone then shares a rough spot that can be off by a few miles, so the group sees them in the wrong place. That rider fixes it on their own phone:
-
-- **Android:** open **Settings > Apps > OnMyLead > Permissions > Location** and turn on **Use precise location**.
-- **iPhone and iPad:** open **Settings > OnMyLead > Location** and turn on **Precise Location**.
-
-Then open Ride Mode again. Their dot moves to where they really are with the next update.
-
-:::release 1.0.4
-Ride Mode tells you when your own phone only shares an approximate location: a yellow banner says **Precise Location Is Off**. Tap it to turn it on. On Android the phone asks you to change to a precise location; on iPhone and iPad it opens Settings. Riders whose phone shares a rough spot show **Approximate Location** in the riders list, and [Ride Bubble](/help/ride-bubble) doesn't call them separated for a gap their rough location could explain.
-:::
+If a rider right beside you shows up a mile or two away, their phone is giving every app a rough location (Google Maps or Apple Maps on that phone shows the same wrong spot). On that phone, turn on **Precise Location** for OnMyLead and, on Android, **Google Location Accuracy**, then calibrate. Step by step: [Make Your Location Accurate](/help/accurate-location).
 
 ## My Group Can't See Me With My Phone Locked
 

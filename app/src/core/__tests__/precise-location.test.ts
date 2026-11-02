@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { BUBBLE_PRESETS, BubbleRider, computeBubble } from '../bubble';
-import { APPROXIMATE_M, certainGapM, isApproximateFix, isApproximatePermission, shouldAskForPrecise } from '../precise-location';
+import {
+  APPROXIMATE_M, certainGapM, isApproximateFix, isApproximatePermission, LOCATION_PROBLEM_BANNER, locationProblem, ROUGH_FIX_M,
+  roughFixTips, shouldAskForGoogleAccuracy, shouldAskForPrecise,
+} from '../precise-location';
 
 const granted = { status: 'granted', canAskAgain: true };
 
@@ -73,5 +76,35 @@ describe('Ride Bubble with an Approximate Location rider', () => {
   it('keeps flagging precise riders by plain distance', () => {
     const r = computeBubble([rider('Lead', 0, 5), rider('Far', -1.7, 10)], BUBBLE_PRESETS.default, now);
     expect(r.riders.find((s) => s.riderId === 'Far')?.status).toBe('red');
+  });
+});
+
+describe('Google Location Accuracy and rough fixes', () => {
+  it('asks Android once per launch only when the network provider is off', () => {
+    expect(shouldAskForGoogleAccuracy(false, 'android', false)).toBe(true);
+    expect(shouldAskForGoogleAccuracy(false, 'android', true)).toBe(false);
+    expect(shouldAskForGoogleAccuracy(true, 'android', false)).toBe(false);
+    expect(shouldAskForGoogleAccuracy(null, 'android', false)).toBe(false);
+    expect(shouldAskForGoogleAccuracy(false, 'ios', false)).toBe(false);
+  });
+
+  it('names the worst problem first', () => {
+    expect(locationProblem({ approximate: true, networkAvailable: false, ownAccuracyM: 3000 })).toBe('approximate');
+    expect(locationProblem({ approximate: false, networkAvailable: false, ownAccuracyM: 3000 })).toBe('google_accuracy_off');
+    expect(locationProblem({ approximate: false, networkAvailable: true, ownAccuracyM: 2400 })).toBe('rough_fix');
+    expect(locationProblem({ approximate: false, networkAvailable: null, ownAccuracyM: ROUGH_FIX_M })).toBe('rough_fix');
+  });
+
+  it('stays quiet for a good fix or when not sharing', () => {
+    expect(locationProblem({ approximate: false, networkAvailable: true, ownAccuracyM: 12 })).toBeNull();
+    expect(locationProblem({ approximate: false, networkAvailable: null, ownAccuracyM: null })).toBeNull();
+    expect(locationProblem({ approximate: false, networkAvailable: null, ownAccuracyM: undefined })).toBeNull();
+  });
+
+  it('has a Title Case banner and device-specific tips', () => {
+    for (const b of Object.values(LOCATION_PROBLEM_BANNER)) expect(b).not.toMatch(/[—–]/);
+    expect(roughFixTips('android')).toMatch(/Calibrate/);
+    expect(roughFixTips('android')).toMatch(/Google Location Accuracy/);
+    expect(roughFixTips('ios')).toMatch(/Precise Location/);
   });
 });

@@ -178,9 +178,9 @@ Tap **Menus ▲** to bring back the status buttons, quick replies and everything
 :::
 
 :::release 1.0.4
-## When Precise Location Is Off
+## When Your Location Isn't Sharp
 
-If your phone gives OnMyLead only an approximate location, a yellow banner says **Precise Location Is Off. Riders See You Up to a Few Miles Away**. Tap it to turn it on: on Android the phone asks to change to a precise location, and on iPhone and iPad Settings opens, where you turn on **Precise Location**. The banner goes away once it's on.
+If your phone's location is rough, a yellow banner says why: **Precise Location Is Off**, **Google Location Accuracy Is Off** (Android) or **Your Phone Has a Rough Location Right Now**. Tap it to fix it. On Android the phone asks to change to a precise location or to turn on Google Location Accuracy; on iPhone and iPad Settings opens; for a rough location you get steps, such as calibrating in Google Maps. The banner goes away once it's fixed. See [Make Your Location Accurate](/help/accurate-location).
 :::
 
 ## When You Lose Service

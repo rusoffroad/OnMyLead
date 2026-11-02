@@ -47,3 +47,50 @@ export const fixUncertaintyM = (accuracyM: number | null | undefined): number =>
 export function certainGapM(distanceM: number, accuracyAM?: number | null, accuracyBM?: number | null): number {
   return Math.max(0, distanceM - fixUncertaintyM(accuracyAM) - fixUncertaintyM(accuracyBM));
 }
+
+/**
+ * Whether to ask Android to turn on Google Location Accuracy (Android's "improve accuracy" dialog).
+ * With it off the phone has no network provider, and a fix indoors or under trees can be miles off.
+ * Once per app launch, for the same reason as `shouldAskForPrecise`.
+ */
+export function shouldAskForGoogleAccuracy(networkAvailable: boolean | null | undefined, os: string, askedThisLaunch: boolean): boolean {
+  return os === 'android' && !askedThisLaunch && networkAvailable === false;
+}
+
+/** A fix of this own phone this uncertain (meters) gets the calibration tip; a good fix is under 50 m. */
+export const ROUGH_FIX_M = 300;
+
+export type LocationProblem = 'approximate' | 'google_accuracy_off' | 'rough_fix';
+
+/**
+ * What, if anything, keeps this phone's shared dot from being where the rider is, worst first:
+ * the app only allowed an approximate location; Android's Google Location Accuracy is off; or the
+ * phone reports its latest fix is rough (needs a clear sky or, on Android, a compass calibration).
+ */
+export function locationProblem(s: {
+  approximate: boolean;
+  /** Android's network provider (Google Location Accuracy); null where unknown or not Android. */
+  networkAvailable: boolean | null;
+  /** Accuracy of this phone's latest shared fix, meters, or null when not sharing. */
+  ownAccuracyM: number | null | undefined;
+}): LocationProblem | null {
+  if (s.approximate) return 'approximate';
+  if (s.networkAvailable === false) return 'google_accuracy_off';
+  if (s.ownAccuracyM != null && Number.isFinite(s.ownAccuracyM) && s.ownAccuracyM >= ROUGH_FIX_M) return 'rough_fix';
+  return null;
+}
+
+/** The Ride Mode banner for each problem, Title Case. */
+export const LOCATION_PROBLEM_BANNER: Record<LocationProblem, string> = {
+  approximate: 'Precise Location Is Off. Riders See You Up to a Few Miles Away. Tap to Turn It On',
+  google_accuracy_off: 'Google Location Accuracy Is Off, So Your Dot Can Be Miles Off. Tap to Turn It On',
+  rough_fix: 'Your Phone Has a Rough Location Right Now. Tap for How to Fix It',
+};
+
+/** Steps for a rough fix, shown when the rider taps that banner. */
+export function roughFixTips(os: string): string {
+  const common = 'Go outside or near a window with a clear view of the sky for a minute, and make sure Location is on.';
+  if (os === 'android')
+    return `${common} In Settings > Location > Location Services, turn on Google Location Accuracy. Then calibrate: open Google Maps, tap your blue dot and choose Calibrate, and follow the steps.`;
+  return `${common} In Settings > Privacy & Security > Location Services > OnMyLead, keep Precise Location on. If the dot still wanders, open Settings > Privacy & Security > Location Services > System Services and turn on Compass Calibration.`;
+}

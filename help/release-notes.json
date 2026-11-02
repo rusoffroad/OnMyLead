@@ -1,15 +1,15 @@
 [
   {
     "version": "1.0.4",
-    "title": "Precise Rider Locations",
-    "intro": "Riders whose phone only shares an approximate location no longer show up miles from the group without anyone knowing why.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode warns when Precise Location is off and helps you turn it on.\n• Riders sharing a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls a rider separated just because their location is approximate.",
+    "title": "Accurate Rider Locations",
+    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "fixed",
-        "text": "A rider whose phone gives OnMyLead only an approximate location could show up a mile or two from where they really were. Ride Mode now shows a Precise Location Is Off banner; tap it and Android asks to change to a precise location, while iPhone and iPad open Settings. Android also asks once when you start sharing."
+        "text": "A rider whose phone shares only a rough location could show up a mile or two from where they really were. Ride Mode now shows a banner when Precise Location is off, when Google Location Accuracy is off (Android), or when your phone's location is rough, and tapping it fixes it or shows how (including calibrating in Google Maps). On Android, OnMyLead also asks for both once when you start sharing."
       },
       {
         "kind": "improved",

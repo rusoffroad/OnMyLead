@@ -1,18 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
-import { askForPreciseLocation, hasApproximateLocation } from '@/lib/location';
+import { locationProblem, roughFixTips, type LocationProblem } from '@/core/precise-location';
+import { showNotice } from '@/lib/confirm';
+import { askForGoogleAccuracy, askForPreciseLocation, googleAccuracyOn, hasApproximateLocation } from '@/lib/location';
 
 /**
- * Whether this phone only lets the app have an approximate location, checked when the screen
- * opens and each time the app comes back (from Settings, or from Android's precise prompt).
- * `fix` asks for Precise Location (Android) or opens Settings (iPhone and iPad).
+ * What keeps this phone's dot from being where the rider is (see core/precise-location), checked
+ * when the screen opens and each time the app comes back (from Settings or a system prompt).
+ * `fix` runs the remedy: Android's precise or Google Location Accuracy prompt, Settings, or tips.
+ * @param ownAccuracyM accuracy of this phone's latest shared fix, meters.
  */
-export function usePreciseLocation() {
+export function usePreciseLocation(ownAccuracyM: number | null | undefined) {
   const [approximate, setApproximate] = useState(false);
+  const [networkAvailable, setNetworkAvailable] = useState<boolean | null>(null);
 
   const check = useCallback(() => {
     hasApproximateLocation().then(setApproximate, () => {});
+    googleAccuracyOn().then(setNetworkAvailable, () => {});
   }, []);
 
   useEffect(() => {
@@ -23,10 +28,19 @@ export function usePreciseLocation() {
     return () => sub.remove();
   }, [check]);
 
-  const fix = useCallback(async () => {
-    await askForPreciseLocation();
-    check();
-  }, [check]);
+  // A browser's fix is often rough on a computer and has no fix to offer, so the web shows no tip.
+  const problem: LocationProblem | null = locationProblem({
+    approximate,
+    networkAvailable,
+    ownAccuracyM: Platform.OS === 'web' ? null : ownAccuracyM,
+  });
 
-  return { approximate, fix };
+  const fix = useCallback(async () => {
+    if (problem === 'approximate') await askForPreciseLocation();
+    else if (problem === 'google_accuracy_off') await askForGoogleAccuracy();
+    else if (problem === 'rough_fix') showNotice('Get a Sharper Location', roughFixTips(Platform.OS));
+    check();
+  }, [problem, check]);
+
+  return { problem, fix };
 }

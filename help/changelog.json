@@ -2,6 +2,20 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "accurate-location",
+      "troubleshooting",
+      "ride-mode",
+      "location-sharing",
+      "ride-bubble"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "approximate-location",
+    "why": "New guide Make Your Location Accurate, after an Android rider beside Chris showed 1.5 miles away (Google Maps on that phone was off by the same amount; the fix was Precise Location plus Google Location Accuracy and a calibration). The phone steps are true today. For 1.0.4: Android asks for Google Location Accuracy when sharing starts, and Ride Mode's banner also covers Google Location Accuracy off and a rough fix (with calibration steps)."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "troubleshooting",
       "ride-bubble",
       "ride-mode",

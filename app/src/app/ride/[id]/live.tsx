@@ -39,7 +39,7 @@ import { riderHeading } from '@/core/heading';
 import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { mapPanelWidth, sidebarWidth } from '@/core/layout';
-import { isApproximateFix } from '@/core/precise-location';
+import { isApproximateFix, LOCATION_PROBLEM_BANNER } from '@/core/precise-location';
 import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
@@ -319,7 +319,7 @@ export default function RideMode() {
   // Battery Saver also slows this screen's own work: the blue dot and the backup check for riders.
   const batteryMode = useBatteryMode();
   // Approximate Location (Android) or Precise off (iPhone, iPad) puts this rider miles from where they are.
-  const precise = usePreciseLocation();
+  const precise = usePreciseLocation(me ? positions[me]?.accuracy_m : null);
   const { followEveryM, refreshSec } = BATTERY_PLANS[batteryMode];
   useEffect(() => {
     if (!hasRoute) return;
@@ -535,7 +535,7 @@ export default function RideMode() {
   const foldedCount = helpCalls.length - shownHelpCalls.length + separations.length - shownSeparations.length;
 
   const alertsShown = shownSeparations.length + shownHelpCalls.length > 0;
-  const hasBanners = precise.approximate || offlineSince != null || !!(activeShare && shareOpen) || !!regroup || !!announcement;
+  const hasBanners = !!precise.problem || offlineSince != null || !!(activeShare && shareOpen) || !!regroup || !!announcement;
   // Each value below comes from measurements that don't depend on it, so nothing feeds back.
   // On a tablet the banners sit in the sidebar, beside the panel rather than above it.
   const panelTop = tablet ? insets.top + TABLET_PANEL_TOP : topRowBottom;
@@ -911,14 +911,14 @@ export default function RideMode() {
             contentContainerStyle={{ gap: 6 }}
             onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
             showsVerticalScrollIndicator={false}>
-          {precise.approximate ? (
+          {precise.problem ? (
             <Pressable
               onPress={() => void precise.fix()}
               style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}
               accessibilityRole="button"
-              accessibilityLabel="Precise Location is off, so riders see you up to a few miles from where you are. Tap to turn it on">
+              accessibilityLabel={LOCATION_PROBLEM_BANNER[precise.problem]}>
               <Text style={[styles.shareText, { color: '#1A1100', flex: 1, textAlign: 'left' }]}>
-                Precise Location Is Off. Riders See You Up to a Few Miles Away. Tap to Turn It On
+                {LOCATION_PROBLEM_BANNER[precise.problem]}
               </Text>
             </Pressable>
           ) : null}

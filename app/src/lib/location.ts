@@ -16,7 +16,7 @@ import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
 import { distanceM } from '@/core/geo';
 import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
-import { isApproximatePermission, shouldAskForPrecise } from '@/core/precise-location';
+import { isApproximatePermission, shouldAskForGoogleAccuracy, shouldAskForPrecise } from '@/core/precise-location';
 import type { BatteryPlan } from '@/core/battery';
 import { batteryPlan } from './battery';
 import { supabase } from './supabase';
@@ -135,6 +135,7 @@ export async function requestLocationPermission(): Promise<'always' | 'while_usi
   const fg = await foregroundPermission();
   if (fg.status !== 'granted') return 'denied';
   await askForPreciseOnce(fg);
+  await askForGoogleAccuracyOnce();
   if (Platform.OS !== 'ios') return 'while_using';
   const bg = await Location.requestBackgroundPermissionsAsync();
   return bg.status === 'granted' ? 'always' : 'while_using';
@@ -162,6 +163,39 @@ async function askForPreciseOnce(fg: Location.LocationPermissionResponse) {
   if (!shouldAskForPrecise(fg, Platform.OS, askedForPreciseThisLaunch)) return;
   askedForPreciseThisLaunch = true;
   await Location.requestForegroundPermissionsAsync().catch(() => null);
+}
+
+let askedForGoogleAccuracyThisLaunch = false;
+
+/**
+ * Android with Google Location Accuracy off has no network provider, and its fixes can be miles
+ * off (Google Maps shows the same wrong spot). Shows Android's own "turn on" dialog, once per launch.
+ */
+async function askForGoogleAccuracyOnce() {
+  if (!shouldAskForGoogleAccuracy(await googleAccuracyOn(), Platform.OS, askedForGoogleAccuracyThisLaunch)) return;
+  askedForGoogleAccuracyThisLaunch = true;
+  await Location.enableNetworkProviderAsync().catch(() => {});
+}
+
+/** Android's Google Location Accuracy (the network provider): false when off, null off Android or unknown. */
+export async function googleAccuracyOn(): Promise<boolean | null> {
+  if (Platform.OS !== 'android') return null;
+  try {
+    const s = await Location.getProviderStatusAsync();
+    if (!s.locationServicesEnabled) return null; // Location itself is off: Ride Mode says so already.
+    return s.networkAvailable ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** The rider tapped the Google Location Accuracy banner: Android's dialog, else Location settings. */
+export async function askForGoogleAccuracy(): Promise<void> {
+  try {
+    await Location.enableNetworkProviderAsync();
+  } catch {
+    await Linking.sendIntent('android.settings.LOCATION_SOURCE_SETTINGS').catch(() => Linking.openSettings().catch(() => {}));
+  }
 }
 
 /** Whether this phone gives the app only an approximate location (Android Approximate, iOS Precise off). */
