@@ -216,6 +216,12 @@ Notes:
   including with the phone locked through the location foreground service and its notification.
   The app never asks for background location ("Allow all the time"), so there is no background
   location declaration.
+- Music Controls (1.0.4): reading what is playing (song, artist, app) and changing the media
+  volume happen only on the phone and nothing is sent anywhere, so it is not "collected" and the
+  answers above don't change. The optional Notification Access (a `NotificationListenerService`
+  that ignores every notification) is used only to read media sessions; Play has no declaration
+  form for it. If review asks: "Used only for in-app music controls (MediaSessionManager); no
+  notification content is read, stored or transmitted."
 - Social sign-in: only the email, name and profile photo the rider allows reach OnMyLead, covered
   by the rows above (profile photo falls under Photos only if Play asks; it's shown only when Show
   My Profile is on).

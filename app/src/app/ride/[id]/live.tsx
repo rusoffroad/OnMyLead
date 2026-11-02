@@ -77,6 +77,8 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
+import { MusicButton, MusicSheet } from '@/components/music-controls';
+import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
 
@@ -244,6 +246,8 @@ export default function RideMode() {
   // Type a Message: the rider's own words to the group, sent like a quick reply. Messages they
   // send often can be kept as their own quick replies on this device.
   const [messageOpen, setMessageOpen] = useState(false);
+  const [musicOpen, setMusicOpen] = useState(false);
+  const musicOn = useMusicControls();
   const savedReplies = useSavedReplies();
   // The last status tap or quick reply: Sending, then Sent with who has it, or Waiting for
   // Signal; Cancel takes it back. Before the database has Cancel, a status is cancelled by
@@ -613,6 +617,11 @@ export default function RideMode() {
   const locateBottom = tablet ? panelBottom : panelBottom + panelH + 12 + (mine && wpFabFits ? WP_FAB_H + 8 : 0);
   const locateFits = Platform.OS !== 'web' && !!panelH &&
     (tablet || screenH - locateBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
+  // Music (when the rider has it on) sits right above Center on Me, and only when there is room.
+  // In Full Map it moves into the slim bar instead.
+  const musicBottom = locateBottom + LOCATE_SIZE + 10;
+  const musicFits = musicOn && locateFits && !fullMap &&
+    (tablet || screenH - musicBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
   // The first framing of the group keeps it clear of the panels over the map.
   const sidebarOpen = sidebar.open;
   const fitPadding = useMemo(
@@ -1148,6 +1157,14 @@ export default function RideMode() {
         </Pressable>
       ) : null}
 
+      {musicFits ? (
+        <MusicButton
+          onPress={() => setMusicOpen(true)}
+          size={LOCATE_SIZE}
+          style={[styles.musicFab, { bottom: musicBottom }, tablet && { right: panelW + 2 * EDGE }]}
+        />
+      ) : null}
+
       <Animated.View
         {...(fullMap ? fullMapSwipe.panHandlers : panelSwipeHandlers)}
         onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}
@@ -1308,6 +1325,7 @@ export default function RideMode() {
                 </View>
               ) : null}
             </Pressable>
+            {musicOn ? <MusicButton onPress={() => setMusicOpen(true)} size={56} style={styles.fullMapMusic} /> : null}
             <Pressable
               onPress={() => tapStatus('emergency')}
               accessibilityRole="button"
@@ -1403,6 +1421,8 @@ export default function RideMode() {
         onRemove={savedReplies.remove}
         onClose={() => setMessageOpen(false)}
       />
+
+      {musicOn ? <MusicSheet visible={musicOpen} tablet={tablet} onClose={() => setMusicOpen(false)} /> : null}
 
       <DirectionsSheet visible={directionsOpen} rows={directionRows} onClose={() => setDirectionsOpen(false)} />
 
@@ -1589,6 +1609,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
   },
   waypointFab: { right: 12 },
+  musicFab: { position: 'absolute', right: 12 },
+  // Square-cornered like its neighbours in the Full Map bar, and as tall.
+  fullMapMusic: { borderRadius: Radius.control },
   wpFabText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
   // On a tablet a sheet is a card in the middle of the screen, not a strip across the bottom.

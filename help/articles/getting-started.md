@@ -94,6 +94,7 @@ Everything that isn't a ride:
 
 :::release 1.0.4
 - **Follow Me on Maps**, also under **On the Trail**, turns off (or back on) the map moving with you in Ride Mode and Navigate. See [Follow Me on the Map](/help/follow-me).
+- **Music Controls**, also under **On the Trail**, shows or hides the Music button in Ride Mode and Navigate. See [Control Your Music While You Ride](/help/music-controls).
 :::
 :::
 - **Settings**: [Notifications](/help/notification-settings), **Directions** (which maps app **Navigate** opens), **Subscription** and **Blocked Riders**.

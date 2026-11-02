@@ -5,7 +5,7 @@ export default function Privacy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="October 14, 2026"
+      updated="November 2, 2026"
       intro={`OnMyLead is made by ${COMPANY}. This page explains what the app and onmylead.com collect, why, and the choices you have. The short version: your location is never public, you choose who sees it, and sharing always ends.`}
       sections={[
         {
@@ -25,6 +25,7 @@ export default function Privacy() {
             'Device and app: a push notification token and your notification settings, crash reports (through Sentry) and basic usage events, such as a ride being created, so we can fix problems and improve the app. Crash reports never include your location.',
             'Purchases: if you buy Pro, Apple sends us the subscription’s status and transaction details. We never see your card or payment details.',
             'Website: onmylead.com uses Cloudflare Web Analytics, which counts visits without cookies.',
+            'Music Controls: to show what’s playing and let you pause, skip and change the volume, the app reads the current song, artist and music app on your phone. It never leaves your phone. On Android, the optional Notification Access you can allow for this is used only to see what’s playing; the app never reads or keeps your notifications.',
           ],
         },
         {

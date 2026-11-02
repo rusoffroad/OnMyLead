@@ -118,6 +118,8 @@ Social sign-in only passes the name, email and profile photo the rider allows, c
 
 Not collected: phone number, physical address, payment info, contacts, health, fitness, browsing or search history, sensitive info, audio, advertising data. The app's privacy manifest (app.json, `ios.privacyManifests`) matches this table.
 
+Music Controls (1.0.4) read the Apple Music song and set the volume on the phone only; nothing is sent, so the answers don't change. New Info.plist keys: `NSAppleMusicUsageDescription` (asked only when the rider taps Show Song Names) and `LSApplicationQueriesSchemes` `spotify` (to show Open Spotify).
+
 ## In-App Purchases (submit with version 1.0)
 
 Subscription group "OnMyLead Pro", both at level 1:
