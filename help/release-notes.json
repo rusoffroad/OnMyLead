@@ -1,5 +1,23 @@
 [
   {
+    "version": "1.0.4",
+    "title": "Precise Rider Locations",
+    "intro": "Riders whose phone only shares an approximate location no longer show up miles from the group without anyone knowing why.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode warns when Precise Location is off and helps you turn it on.\n• Riders sharing a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls a rider separated just because their location is approximate.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "fixed",
+        "text": "A rider whose phone gives OnMyLead only an approximate location could show up a mile or two from where they really were. Ride Mode now shows a Precise Location Is Off banner; tap it and Android asks to change to a precise location, while iPhone and iPad open Settings. Android also asks once when you start sharing."
+      },
+      {
+        "kind": "improved",
+        "text": "Riders sharing a rough location show Approximate Location in the riders list, and Ride Bubble leaves out the distance their location could be off by, so a rider beside you isn't called separated."
+      }
+    ]
+  },
+  {
     "version": "1.0.3",
     "title": "Navigate Offroad, Exact Rider Dots and Better Maps",
     "intro": "Navigate is a new offroad map for riding on your own: record and share your own trails, rate trails other riders mapped, and measure distances. Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, you can add riders as friends, and you can pick your own easy-to-say code for a ride, group or friend link.",

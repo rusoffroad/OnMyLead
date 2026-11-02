@@ -9,13 +9,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 
 import { MOVING_SPEED_MPS } from '@/core/bubble';
 import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
 import { distanceM } from '@/core/geo';
 import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
+import { isApproximatePermission, shouldAskForPrecise } from '@/core/precise-location';
 import type { BatteryPlan } from '@/core/battery';
 import { batteryPlan } from './battery';
 import { supabase } from './supabase';
@@ -133,6 +134,7 @@ if (Platform.OS !== 'web') {
 export async function requestLocationPermission(): Promise<'always' | 'while_using' | 'denied'> {
   const fg = await foregroundPermission();
   if (fg.status !== 'granted') return 'denied';
+  await askForPreciseOnce(fg);
   if (Platform.OS !== 'ios') return 'while_using';
   const bg = await Location.requestBackgroundPermissionsAsync();
   return bg.status === 'granted' ? 'always' : 'while_using';
@@ -148,6 +150,45 @@ function foregroundPermission() {
     get: () => Location.getForegroundPermissionsAsync(),
     request: () => Location.requestForegroundPermissionsAsync(),
   });
+}
+
+let askedForPreciseThisLaunch = false;
+
+/**
+ * Approximate Location puts this rider a mile or more from where they are. On Android, asking
+ * again shows "Change to precise location"; done once per launch so declining it doesn't loop.
+ */
+async function askForPreciseOnce(fg: Location.LocationPermissionResponse) {
+  if (!shouldAskForPrecise(fg, Platform.OS, askedForPreciseThisLaunch)) return;
+  askedForPreciseThisLaunch = true;
+  await Location.requestForegroundPermissionsAsync().catch(() => null);
+}
+
+/** Whether this phone gives the app only an approximate location (Android Approximate, iOS Precise off). */
+export async function hasApproximateLocation(): Promise<boolean> {
+  if (Platform.OS === 'web') return false;
+  try {
+    return isApproximatePermission(await Location.getForegroundPermissionsAsync());
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The rider tapped Turn On Precise Location. Android asks in the app while it still can; otherwise
+ * (and always on iPhone and iPad, where Precise is a switch in Settings) Settings opens.
+ * Resolves true when the app opened Settings.
+ */
+export async function askForPreciseLocation(): Promise<boolean> {
+  if (Platform.OS === 'android') {
+    const now = await Location.getForegroundPermissionsAsync().catch(() => null);
+    if (now?.canAskAgain) {
+      await Location.requestForegroundPermissionsAsync().catch(() => null);
+      return false;
+    }
+  }
+  await Linking.openSettings().catch(() => {});
+  return true;
 }
 
 /**

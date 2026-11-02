@@ -1,5 +1,16 @@
 [
   {
+    "date": "2026-11-02",
+    "slugs": [
+      "troubleshooting",
+      "ride-bubble"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "approximate-location",
+    "why": "A rider who joined from Android showed about 1.5 miles away while sitting next to the organizer: their phone had Approximate location. Fix Common Problems now explains how to turn on Precise Location on Android, iPhone and iPad (true today). For 1.0.4: Ride Mode shows a Precise Location Is Off banner that asks for precise location (Android) or opens Settings (iPhone, iPad), the riders list labels Approximate Location, and Ride Bubble no longer calls such a rider separated for a gap their rough location could explain."
+  },
+  {
     "date": "2026-11-01",
     "slugs": [
       "create-a-ride-on-the-website",
