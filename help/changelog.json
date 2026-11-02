@@ -42,6 +42,40 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "notifications-inbox",
+      "notification-settings",
+      "getting-started"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "notification-inbox",
+    "why": "New in 1.0.4: a bell on the Rides tab opens Notifications, the notifications OnMyLead sent you in the last 30 days. Open one, Mark All Read, swipe one away to clear it (X on the website), or Clear All, which also clears the phone's own notification list and the app icon badge. Notification Settings links from the bottom of the list."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "create-a-ride",
+      "create-a-ride-on-the-website",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "promo-codes",
+      "report-and-block",
+      "ride-chat",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "notification-inbox",
+    "why": "The Rides tab now has a notifications bell at the top right, and the app keeps its saved notifications current in the background. These guides list the Rides tab, the app's screen list or the message pop-ups as sources; nothing in them changes for riders."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "accurate-location",
       "troubleshooting",
       "ride-mode",

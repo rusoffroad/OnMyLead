@@ -303,6 +303,7 @@ export function Showcase() {
             <div className="more-list">
               <Feature title="Nothing Buried">Four tabs along the bottom: Rides, Find, Groups and You. Every ride opens in four parts, Details, Map, Riders and Chat, with what to do next right under its name. Any sheet swipes down to close, and times take a few taps, no typing.</Feature>
               <Feature title="Status Taps You Can Trust">Tap On My Way or Need Fuel and everyone on the ride gets a notification. A light comes on for each rider who has it, and Cancel takes it back with a follow-up so nobody turns around for nothing.</Feature>
+              <Feature title="Every Notification in One Place">Missed a ping or swiped it away? Tap the bell on the Rides tab to see the last 30 days, with rider alerts in red so they stand out. Open one, swipe it away, or Clear All, and your phone’s own list clears too.</Feature>
               <Feature title="Ride Day Weather and Daylight">Every upcoming ride shows the meet day’s forecast, with a heads-up for storms, high wind or heat, and a daylight bar that tells you if the group gets back after dark.</Feature>
               <Feature title="Swipe Left to Delete or Leave">Swipe a ride left in your list. Your own ride is deleted and everyone on it is told; anyone else’s, you leave. It always asks first.</Feature>
               <Feature title="Ride Again">Ran a great ride? One tap copies it, meeting point and route included. Pick the new day and send the invite.</Feature>

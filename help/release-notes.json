@@ -1,12 +1,16 @@
 [
   {
     "version": "1.0.4",
-    "title": "Accurate Rider Locations and the Freeride Rider Line",
-    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.\n• Freeride rides get the rider line: the group in order behind the leader.",
+    "title": "Accurate Locations, a Notifications Inbox and the Freeride Rider Line",
+    "intro": "Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode tells you when your location is rough (Precise Location or Google Location Accuracy off) and helps fix it.\n• Android asks for a precise location when you start sharing.\n• Riders with a rough location are labeled Approximate Location.\n• Ride Bubble no longer calls them separated by mistake.\n• New bell on the Rides tab: see your notifications from the last 30 days and clear one or all.\n• Freeride rides get the rider line: the group in order behind the leader.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Notifications: tap the bell at the top right of the Rides tab to see what OnMyLead sent you in the last 30 days, with a red number for new ones. Tap one to open it, Mark All Read, swipe one left to clear it, or Clear All, which also clears them from your phone's own notification list and resets the app icon badge. Also on onmylead.com."
+      },
       {
         "kind": "new",
         "text": "The rider line on Freeride rides. With no mapped route, Ride Mode's line shows the leader on the right and every sharing rider in order behind them, measured along the path the leader has ridden, so bends and switchbacks count. It shows how spread out the group is, from the leader to the tail gunner, and tells you how far ahead the leader is. The leader's path stays on your phone and isn't uploaded."

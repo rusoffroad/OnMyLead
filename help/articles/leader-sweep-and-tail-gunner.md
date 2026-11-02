@@ -4,7 +4,7 @@ summary: Who rides up front, who rides at the rear, and how to make someone lead
 category: rides
 order: 50
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-02
 sources:
   - app/src/components/ride-roster.tsx
   - app/src/core/roles.ts
