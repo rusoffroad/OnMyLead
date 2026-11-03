@@ -60,6 +60,8 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'voice.choice.v1': 'The voice for spoken alerts (a device without it uses its best installed voice)',
   'tilt.limits': 'Roll and pitch warning angles',
   'tilt.voice': 'Spoken tilt warnings on or off',
+  'tilt.show': 'Show the Tilt tile in Map Mode and Ride Mode',
+  'tilt.warn': 'Tilt warnings on or off',
   'crash.alert': 'Crash Alert on or off and its sensitivity',
   // Settings from the other 2.1 threads register here as they land (waypoint symbols, units).
 };
@@ -231,7 +233,7 @@ export function syncSummary(s: { lastSyncedAt: number | null; syncing: boolean; 
   if (s.syncing) return 'Syncing now…';
   const when = s.lastSyncedAt == null ? null : agoText(now - s.lastSyncedAt);
   if (s.failed) return when ? `Waiting for signal. Last synced ${when}` : 'Waiting for signal to sync';
-  return when ? `Settings and Map Mode trails on every device you sign in on. Synced ${when}` : 'Settings and Map Mode trails on every device you sign in on';
+  return when ? `Settings and trails on all your devices. Synced ${when}` : 'Settings and trails on all your devices';
 }
 
 export function agoText(ms: number): string {

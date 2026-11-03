@@ -260,7 +260,7 @@ export function Showcase() {
             <p>
               Not every ride is a group ride. Map Mode is your offroad map for the rest: every trail and road with your speed,
               elevation, heading, trip miles and moving time, a recorder that draws your line as you ride, and Map a Custom Trail to draw one that isn’t marked
-              anywhere. Track Line shows exactly where you’ve been, a new colour each day. Keep your trails on your phone, or share
+              anywhere. Track Line shows exactly where you’ve been, a new colour each day. Keep your trails private, or share
               them with every rider.
             </p>
             <ul className="ticks">
@@ -268,6 +268,7 @@ export function Showcase() {
               <li>Rider trails show as mint dots, so you always know who mapped what</li>
               <li>Riders rate each trail’s quality and accuracy, and bad lines drop off the map</li>
               <li>Turn any trail into a group ride’s route in one tap</li>
+              <li>Sign in on your iPhone, iPad, Android phone or tablet and your trails and settings are there, backed up privately to your account</li>
             </ul>
             <p className="qr-small">The map, drawing, Track Line and rating are free; recording, sharing and group rides on your trails are Pro. Shared trails show in full, and Hide My Start leaves off the first and last 200 meters of a recording that starts at home.</p>
           </div>
