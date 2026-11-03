@@ -2,6 +2,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "home-screen"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "home-cards-fix",
+    "why": "In 2.0 the Create a Ride card is now dark like Find a Ride (red flag icon instead of a red background), and both cards fill and line up evenly. The guide now names the card by its look."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "events",
       "privacy"
     ],

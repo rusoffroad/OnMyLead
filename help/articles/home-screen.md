@@ -32,7 +32,7 @@ The **Rides** tab is your home screen. It puts the three things riders do most a
 ## Join, Create and Find
 
 - **Join a Ride**, the big red card: type the invite code from the ride leader and tap **Join**. You can also open a ride's link or scan its QR code with your phone's camera. Joining is **Unlimited** on every plan. See [Join a Ride](/help/join-a-ride).
-- **Create a Ride**: the label says how many rides you have left this month on Free (**1 Left This Month**, or **None Left This Month**), or **Unlimited** on Pro and during the trial. Tap the label on Free to see what Pro adds. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
+- **Create a Ride**, the dark card with the red flag under Join: the label says how many rides you have left this month on Free (**1 Left This Month**, or **None Left This Month**), or **Unlimited** on Pro and during the trial. Tap the label on Free to see what Pro adds. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
 - **Find a Ride**: opens the map of public rides. The label shows how many are coming up near you, like **12 Within 500 mi**. See [Find a Ride](/help/find-a-ride).
 
 When one of your rides is live, a card says **Your ride is live. Tap to open Ride Mode**.
