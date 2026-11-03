@@ -54,16 +54,16 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'home.publicRadius.v1': 'Find a Ride and Events search radius',
   'starlink.autoConnect.v1': 'Starlink page connects by itself',
   'onmylead.dismissedNotices': 'Announcements the rider closed',
-  // Appearance (2.1 themes thread; lib/appearance applies a change from another device)
+  // Appearance (themes thread; lib/appearance applies a change from another device)
   'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
-  // Ride Mode alerts (2.1 threads; each writes its key with setSyncedItem once both branches are in)
+  // Ride Mode alerts (their threads; each writes its key with setSyncedItem once both branches are in)
   'voice.choice.v1': 'The voice for spoken alerts (a device without it uses its best installed voice)',
   'tilt.limits': 'Roll and pitch warning angles',
   'tilt.voice': 'Spoken tilt warnings on or off',
   'tilt.show': 'Show the Tilt tile in Map Mode and Ride Mode',
   'tilt.warn': 'Tilt warnings on or off',
   'crash.alert': 'Crash Alert on or off and its sensitivity',
-  // Settings from the other 2.1 threads register here as they land (waypoint symbols, units).
+  // Settings from other threads register here as they land (waypoint symbols, units).
 };
 
 /**

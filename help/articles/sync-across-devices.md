@@ -3,7 +3,7 @@ title: Use OnMyLead on More Than One Device
 summary: Sign in with the same account on your iPhone, iPad, Android phone, tablet or the website, and your settings and Map Mode trails follow you.
 category: account
 order: 25
-release: "2.1"
+release: "2.0"
 updated: 2026-11-03
 sources:
   - app/src/core/synced-settings.ts

@@ -1,4 +1,4 @@
--- Sync across devices (2.1). Chris 2026-11-03: "sync everything with cloud somehow so its cross
+-- Sync across devices (2.0 rebuild). Chris 2026-11-03: "sync everything with cloud somehow so its cross
 -- device with the same account signed in".
 --
 --   * rider_settings: one private row per account holding the settings that follow the rider

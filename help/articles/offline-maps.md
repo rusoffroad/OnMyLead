@@ -47,7 +47,7 @@ Offline maps are in the app on your phone or tablet only, not on the website.
 
 The screen shows how much space your maps use, how much is free on your phone, your downloads under **On This Phone**, and your upcoming rides under **Your Rides**.
 
-:::release 2.1
+:::release 2.0
 Areas you downloaded on your other devices (signed in with the same account) show under **On Your Other Devices**. Tap **Download** to save the same area here, or **Hide** to stop seeing it. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
 :::
 

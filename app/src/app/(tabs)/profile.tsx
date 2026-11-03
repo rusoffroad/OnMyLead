@@ -39,7 +39,7 @@ import { useMusicControlsSetting } from '@/hooks/use-music-controls';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 import { musicAvailable } from '@/lib/music';
-import { syncSettingsNow, useSyncSummary } from '@/lib/settings-sync';
+import { syncSettingsNow, useSyncStatus, useSyncSummary } from '@/lib/settings-sync';
 import { backupTrailsNow } from '@/lib/trail-backup';
 
 /**
@@ -57,6 +57,7 @@ export default function You() {
   const mapsPref = useMapsPreference();
   const batteryMode = useBatteryMode();
   const syncLine = useSyncSummary();
+  const syncAvailable = useSyncStatus().available;
   const { ent } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
   const starlinkOn = useFlag('starlink');
@@ -240,17 +241,19 @@ export default function You() {
               />
             ) : null}
           </MenuRow>
-          <MenuRow
-            icon="sync"
-            color={Colors.sky}
-            title="Sync Across Devices"
-            detail={syncLine}
-            onPress={() => {
-              syncSettingsNow();
-              backupTrailsNow();
-            }}
-            right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Sync Now</ThemedText>}
-          />
+          {syncAvailable ? (
+            <MenuRow
+              icon="sync"
+              color={Colors.sky}
+              title="Sync Across Devices"
+              detail={syncLine}
+              onPress={() => {
+                syncSettingsNow();
+                backupTrailsNow();
+              }}
+              right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Sync Now</ThemedText>}
+            />
+          ) : null}
           <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
           <MenuRow icon="block" color={Colors.danger} title="Blocked Riders" detail={blockedSummary} onPress={() => router.push('/blocked')} />
           {ent.accountType === 'admin' ? (

@@ -28,8 +28,14 @@ let loading: Promise<void> | null = null;
 const keyListeners = new Map<string, Set<(v: string | null) => void>>();
 const prefixListeners = new Map<string, Set<() => void>>();
 
-export type SyncStatus = { lastSyncedAt: number | null; syncing: boolean; failed: boolean };
-let status: SyncStatus = { lastSyncedAt: null, syncing: false, failed: false };
+export type SyncStatus = {
+  lastSyncedAt: number | null;
+  syncing: boolean;
+  failed: boolean;
+  /** False when the server doesn't have sync yet (before its update): the You tab hides the row. */
+  available: boolean;
+};
+let status: SyncStatus = { lastSyncedAt: null, syncing: false, failed: false, available: true };
 const statusListeners = new Set<() => void>();
 const setStatus = (s: Partial<SyncStatus>) => {
   status = { ...status, ...s };
@@ -157,7 +163,14 @@ async function run() {
     }
 
     const { data, error } = await supabase.rpc('sync_rider_settings', { p_changes: stamps });
-    if (error) throw new Error(error.message);
+    if (error) {
+      // The server update hasn't run yet: stay quiet, keep everything on the device, try next time.
+      if (isMissingFunction(error)) {
+        setStatus({ syncing: false, failed: false, available: false });
+        return;
+      }
+      throw new Error(error.message);
+    }
     const remote = parseSyncedMap(data);
     const { merged, apply } = mergeSynced(stamps, remote);
     for (const [k, e] of Object.entries(apply)) {
@@ -179,12 +192,15 @@ async function run() {
     if (!sameAccount) prefixListeners.forEach((set) => set.forEach((l) => l()));
     const now = Date.now();
     AsyncStorage.multiSet([[ACCOUNT_KEY, me], [LAST_KEY, String(now)]]).catch(() => {});
-    setStatus({ syncing: false, failed: false, lastSyncedAt: now });
+    setStatus({ syncing: false, failed: false, available: true, lastSyncedAt: now });
   } catch {
     // Offline or the server doesn't have sync yet: changes wait on the device.
     setStatus({ syncing: false, failed: true });
   }
 }
+
+const isMissingFunction = (e: { code?: string; message?: string }) =>
+  e.code === 'PGRST202' || e.code === '42883' || /could not find the function|schema cache/i.test(e.message ?? '');
 
 /** For You > Sync: when this device last synced with the account. */
 export function useSyncStatus(): SyncStatus {

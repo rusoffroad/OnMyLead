@@ -182,11 +182,11 @@ On a trail you can:
 - See its **Named Spots**. Tap one to rename it, change its kind or **Remove** it, then tap **Save Changes** (or **Save on This Phone**).
 :::
 
-:::until 2.1
+:::until 2.0
 Trails stay on your phone until you share them. Deleting the app deletes them too.
 :::
 
-:::release 2.1
+:::release 2.0
 Your trails are backed up privately to your account, so they're in My Trails on every device you sign in on, and deleting the app doesn't lose them. Nobody else sees them until you share them. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
 :::
 
@@ -223,7 +223,7 @@ Only the rider who mapped a trail can delete it.
 
 The trail is deleted from your phone. If you shared it, it also comes off the public map with its photos and ratings. If that can't happen (with no signal, for example), the app says so and keeps the trail, so try again with a signal.
 
-:::release 2.1
+:::release 2.0
 It's deleted from your backup and your other devices too, the next time each one syncs.
 :::
 
