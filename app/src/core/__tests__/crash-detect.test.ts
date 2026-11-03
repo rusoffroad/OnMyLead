@@ -7,6 +7,7 @@ import {
   crashMessage,
   crashStep,
   parseCrashSettings,
+  properG,
   quietAfterAlarm,
   secondsLeft,
   type CrashSample,
@@ -148,5 +149,85 @@ describe('countdown and settings', () => {
     expect(parseCrashSettings('{"enabled":false,"sensitivity":"high"}')).toEqual({ enabled: false, sensitivity: 'high' });
     expect(parseCrashSettings('{"sensitivity":"wild"}')).toEqual({ enabled: true, sensitivity: 'normal' });
     expect(parseCrashSettings('not json')).toEqual({ enabled: true, sensitivity: 'normal' });
+  });
+});
+
+describe('dropped phone', () => {
+  // 20 samples a second, like the motion feed.
+  const every = (from: number, to: number, o: Partial<CrashSample>) => {
+    const out: CrashSample[] = [];
+    for (let t = from; t <= to; t += 50) out.push(s(t, o));
+    return out;
+  };
+
+  it('ignores the landing hit after a free fall, even right after riding', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 8, feltG: 1 }),
+      ...every(1050, 1350, { speedMps: 3, feltG: 0.05 }), // falling ~300 ms
+      s(1400, { speedMps: 1, feltG: 7, userAccel: { x: 7 * G, y: 0, z: 0 } }), // hits the floor
+      ...every(1450, 9000, { speedMps: 0, feltG: 1, roll: 85, pitch: 10 }), // lies on its side
+    ]);
+    expect(alarms).toEqual([]);
+  });
+
+  it('a very short dip under 1 g (a bump) does not count as a drop', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 12, feltG: 1 }),
+      s(1050, { speedMps: 12, feltG: 0.1 }),
+      s(1100, { speedMps: 12, feltG: 1, userAccel: { x: 5 * G, y: 0, z: 0 } }),
+      ...every(1150, 6000, { speedMps: 0, feltG: 1 }),
+    ]);
+    expect(alarms).toEqual(['impact']);
+  });
+
+  it('counts hits again once the drop is a few seconds old', () => {
+    const { alarms } = run([
+      ...every(0, 500, { speedMps: 10, feltG: 1 }),
+      ...every(550, 800, { speedMps: 10, feltG: 0.1 }),
+      ...every(850, 5000, { speedMps: 10, feltG: 1 }),
+      s(5050, { speedMps: 10, feltG: 6, userAccel: { x: 6 * G, y: 0, z: 0 } }),
+      ...every(5100, 10_000, { speedMps: 0, feltG: 1 }),
+    ]);
+    expect(alarms).toEqual(['impact']);
+  });
+
+  it('no rollover until the dropped phone is back in its mount, then it counts again', () => {
+    const before = run([
+      ...every(0, 500, { speedMps: 10, feltG: 1 }),
+      ...every(550, 800, { speedMps: 10, feltG: 0.1 }),
+      ...every(850, 6000, { speedMps: 10, feltG: 1, roll: 70 }),
+    ]);
+    expect(before.alarms).toEqual([]);
+    expect(before.state.displaced).toBe(true);
+    const after = run(
+      [
+        ...every(6050, 8500, { speedMps: 10, feltG: 1, roll: 2 }), // back in the mount
+        ...every(8550, 15_000, { speedMps: 0, feltG: 1, roll: 80 }), // a real rollover
+      ],
+      'normal',
+      before.state,
+    );
+    expect(after.alarms).toEqual(['rollover']);
+  });
+
+  it('a crash that throws the phone out of the mount still alarms', () => {
+    const { alarms } = run([
+      ...every(0, 500, { speedMps: 12, feltG: 1 }),
+      s(550, { speedMps: 12, feltG: 6, userAccel: { x: 6 * G, y: 0, z: 0 } }),
+      ...every(600, 900, { speedMps: 2, feltG: 0.1 }),
+      ...every(950, 6000, { speedMps: 0, feltG: 1, roll: 90 }),
+    ]);
+    expect(alarms).toEqual(['impact']);
+  });
+});
+
+describe('properG', () => {
+  const down = { x: 0, y: 0, z: -G };
+  it('is about 1 g at rest and 0 in free fall, whichever way the platform signs acceleration', () => {
+    expect(properG(down, { x: 0, y: 0, z: 0 })).toBeCloseTo(1);
+    // Falling: acceleration cancels gravity one way (iOS) or doubles it the other (Android); either reads ~0.
+    expect(properG(down, { x: 0, y: 0, z: G })).toBeCloseTo(0);
+    expect(properG(down, { x: 0, y: 0, z: -G })).toBeCloseTo(0);
+    expect(properG(null, null)).toBeNull();
   });
 });

@@ -81,6 +81,11 @@ function TiltMeter() {
         </View>
       ) : null}
 
+      <CrashToggle
+        on={crash.enabled}
+        onChange={(enabled) => setCrashSettings({ ...crash, enabled })}
+      />
+
       <View style={[styles.dials, sideBySide && styles.dialsRow]}>
         <TiltDial axis="roll" angle={t?.roll ?? null} limit={limits.roll} max={[reading.max.rollLeft, reading.max.rollRight]} width={dialW} zeroed={reading.zeroed} />
         <TiltDial axis="pitch" angle={t?.pitch ?? null} limit={limits.pitch} max={[reading.max.pitchDown, reading.max.pitchUp]} width={dialW} zeroed={reading.zeroed} />
@@ -117,12 +122,9 @@ function TiltMeter() {
             <Icon name="warning" size={20} color={RideColors.red} />
             <Text style={styles.cardTitle}>Crash Alert</Text>
           </View>
-          <Row
-            title="Detect Crashes"
-            detail="In Ride Mode, a hard hit or a rollover followed by a stop starts a 30 second countdown. If you don’t tap I’m OK, your group gets an EMERGENCY alert with your location."
-            value={crash.enabled}
-            onChange={(enabled) => setCrashSettings({ ...crash, enabled })}
-          />
+          <ThemedText type="small" themeColor="textSecondary">
+            In Ride Mode, a hard hit or a rollover followed by a stop starts a 30 second countdown. If you don’t tap I’m OK, your group gets an EMERGENCY alert with your location. A dropped phone doesn’t set it off.
+          </ThemedText>
           <View accessibilityRole="radiogroup" style={{ gap: Spacing.one, opacity: crash.enabled ? 1 : 0.5 }}>
             <Text style={styles.rowTitle}>Sensitivity</Text>
             {CRASH_SENSITIVITIES.map((o) => (
@@ -135,6 +137,37 @@ function TiltMeter() {
         </View>
       </View>
     </Screen>
+  );
+}
+
+/** The big Crash Alert switch at the top of the screen: one tap on or off, synced to your other devices. */
+function CrashToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <Pressable
+      onPress={() => onChange(!on)}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: on }}
+      accessibilityLabel="Crash Alert"
+      accessibilityHint={on ? 'Turns Crash Alert off' : 'Turns Crash Alert on'}
+      style={({ pressed }) => [styles.toggle, on ? styles.toggleOn : styles.toggleOff, pressed && { opacity: 0.85 }]}>
+      <View style={[styles.toggleIcon, { backgroundColor: on ? RideColors.red : Colors.backgroundSelected }]}>
+        <Icon name="warning" size={22} color={on ? '#FFFFFF' : Colors.textSecondary} strokeWidth={2.3} />
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.toggleTitle}>Crash Alert {on ? 'On' : 'Off'}</Text>
+        <Text style={styles.rowDetail}>
+          {on ? 'Watching for a crash while Ride Mode is open.' : 'Your group won’t be told automatically if you crash.'}
+        </Text>
+      </View>
+      <Switch
+        value={on}
+        onValueChange={onChange}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        trackColor={{ true: RideColors.red, false: Colors.backgroundSelected }}
+        thumbColor="#FFFFFF"
+      />
+    </Pressable>
   );
 }
 
@@ -200,6 +233,11 @@ function Sensitivity({ value, label, detail, on, disabled, onPress }: { value: C
 
 const styles = themedStyles(() => ({
   notice: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: RideColors.yellow, padding: Spacing.three, gap: 4 },
+  toggle: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card, borderWidth: 2, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  toggleOn: { backgroundColor: Colors.backgroundElement, borderColor: RideColors.red },
+  toggleOff: { backgroundColor: Colors.backgroundElement, borderColor: Colors.border },
+  toggleIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  toggleTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 24 },
   dials: { alignItems: 'center', gap: Spacing.four, paddingTop: Spacing.two },
   dialsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-start' },
   actions: { flexDirection: 'row', gap: Spacing.two, width: '100%', maxWidth: 520, alignSelf: 'center' },

@@ -82,7 +82,7 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
-import { useTiltSettings } from '@/lib/tilt';
+import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -1223,7 +1223,12 @@ export default function RideMode() {
         />
       ) : null}
       {crash.alarm ? (
-        <CrashCountdown cause={crash.alarm.cause} startedAt={crash.alarm.startedAt} onOk={crash.dismiss} onSend={() => sendCrashAlert(crash.alarm!.cause)} />
+        <CrashCountdown cause={crash.alarm.cause} startedAt={crash.alarm.startedAt} onOk={crash.dismiss} onSend={() => sendCrashAlert(crash.alarm!.cause)}
+          onTurnOff={() => {
+            crash.dismiss();
+            setCrashSettings({ ...tiltSettings.crash, enabled: false });
+          }}
+        />
       ) : null}
 
       {musicFits ? (

@@ -2,6 +2,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "tilt-and-crash-alert"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "crash-toggle-drop",
+    "why": "Chris asked for an easy on/off switch for Crash Alert and for a dropped phone not to set it off. The article now names the Crash Alert switch at the top of the Tilt screen, the new I'm OK, Turn Off Crash Alert button on the countdown, and how a drop is ignored."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "tilt-and-crash-alert",
       "ride-mode",
       "navigation-mode"
