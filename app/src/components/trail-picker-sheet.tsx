@@ -33,7 +33,7 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
               ))
             ) : (
               <ThemedText themeColor="textSecondary">
-                No trails on this phone yet. Record or draw one in Map Mode, or save a rider trail, and it shows here.
+                No trails yet. Record or draw one in Map Mode, or save a rider trail, and it shows here.
               </ThemedText>
             )}
           </SheetScroll>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ActionSheetIOS, Linking, Platform } from 'react-native';
 
 import { MAPS_APP_LABEL, mapsAppsFor, mapsUrl, pickedApp, type DirectionsTarget, type MapsApp, type MapsPreference } from '@/core/directions';
+import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 /**
  * The one way OnMyLead hands a rider over to Apple Maps or Google Maps (see core/directions.ts).
@@ -18,6 +19,14 @@ let pref: MapsPreference = 'ask';
 let loaded: Promise<void> | null = null;
 const listeners = new Set<(p: MapsPreference) => void>();
 
+// Changed on another device (lib/settings-sync). Apple Maps picked on an iPhone falls back to
+// asking on an Android phone, which has no Apple Maps (core/directions pickedApp).
+onSyncedChange(KEY, (v) => {
+  pref = v === 'apple' || v === 'google' ? v : 'ask';
+  loaded = Promise.resolve();
+  listeners.forEach((l) => l(pref));
+});
+
 function load() {
   loaded ??= AsyncStorage.getItem(KEY)
     .then((v) => {
@@ -31,7 +40,7 @@ function load() {
 export function setMapsPreference(next: MapsPreference) {
   pref = next;
   listeners.forEach((l) => l(pref));
-  AsyncStorage.setItem(KEY, next).catch(() => {});
+  setSyncedItem(KEY, next).catch(() => {});
 }
 
 /** The app Profile shows as picked, kept in step with every screen. */

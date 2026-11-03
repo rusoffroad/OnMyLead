@@ -29,6 +29,8 @@ import { startOrientationRule } from '@/lib/orientation';
 import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
 import { startRiderAgreement } from '@/lib/rider-agreement';
+import { startSettingsSync } from '@/lib/settings-sync';
+import { backupTrailsNow } from '@/lib/trail-backup';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
 startAppLog();
@@ -67,6 +69,8 @@ function RootLayout() {
   useEffect(() => startOrientationRule(), []);
   // Who has agreed to the Rider Safety and Liability Agreement, and sending each record to the server.
   useEffect(() => startRiderAgreement(), []);
+  // Settings and Map Mode trails follow the account to the rider's other devices.
+  useEffect(() => startSettingsSync(backupTrailsNow), []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
   useEffect(() => {

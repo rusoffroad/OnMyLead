@@ -22,3 +22,11 @@ export function dropPhoto(uri: string) {
     // Already gone.
   }
 }
+
+/** Save a photo from the rider's private trail backup (a short-lived signed link) next to the trail. */
+export async function restorePhoto(url: string, trailId: string, png: boolean): Promise<string> {
+  if (!DIR.exists) DIR.create({ intermediates: true, idempotent: true });
+  const dest = new File(DIR, `${trailId}-${Date.now()}-${Math.floor(Math.random() * 1e6)}.${png ? 'png' : 'jpg'}`);
+  const got = await File.downloadFileAsync(url, dest);
+  return got.uri;
+}

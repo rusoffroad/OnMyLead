@@ -1,7 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/** An open/closed switch the phone remembers between visits (for panels riders collapse). */
+import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
+
+/**
+ * An open/closed switch remembered between visits (for panels riders collapse). Keys listed in
+ * core/synced-settings follow the account to the rider's other devices.
+ */
 export function useRememberedToggle(key: string, initial: boolean): [boolean, () => void, (on: boolean) => void] {
   const [on, setOn] = useState(initial);
   // Once the rider has toggled, a slow storage read must not flip the panel back.
@@ -13,13 +18,16 @@ export function useRememberedToggle(key: string, initial: boolean): [boolean, ()
         if (!touched.current && (v === '1' || v === '0')) setOn(v === '1');
       })
       .catch(() => {});
+    return onSyncedChange(key, (v) => setOn(v == null ? initial : v === '1'));
+    // initial is the screen's default; a change to it alone needn't re-read storage.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   const set = useCallback(
     (next: boolean) => {
       touched.current = true;
       setOn(next);
-      AsyncStorage.setItem(key, next ? '1' : '0').catch(() => {});
+      setSyncedItem(key, next ? '1' : '0').catch(() => {});
     },
     [key],
   );
@@ -27,7 +35,7 @@ export function useRememberedToggle(key: string, initial: boolean): [boolean, ()
   const toggle = useCallback(() => {
     touched.current = true;
     setOn((prev) => {
-      AsyncStorage.setItem(key, prev ? '0' : '1').catch(() => {});
+      setSyncedItem(key, prev ? '0' : '1').catch(() => {});
       return !prev;
     });
   }, [key]);

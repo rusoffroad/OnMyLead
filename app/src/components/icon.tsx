@@ -16,6 +16,8 @@ const PATHS = {
   // A navigation arrowhead, for Follow Me (the map keeps moving with you).
   follow: ['M12 3.5l7.5 17-7.5-4.2-7.5 4.2z'],
   check: ['M5 12.5l4.5 4.5L19 7.5'],
+  // Two arrows chasing each other, for Sync Across Devices.
+  sync: ['M19.5 10a7.8 7.8 0 0 0-14-3.2L4 8.5', 'M4 4v4.5h4.5', 'M4.5 14a7.8 7.8 0 0 0 14 3.2l1.5-1.7', 'M20 20v-4.5h-4.5'],
   search: ['M15.5 15.5L20.5 20.5'],
   person: ['M4.5 20.5c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6'],
   wrench: ['M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z'],

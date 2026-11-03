@@ -54,7 +54,7 @@ export default function PublicTrailPage() {
   // on this phone stays in My Trails (delete it there too if they want it gone).
   async function removeMine() {
     const msg = savedCopy
-      ? 'It comes off the public map with its photos and ratings. Your copy stays in My Trails on this phone. Rides that used it keep their route.'
+      ? 'It comes off the public map with its photos and ratings. Your copy stays in My Trails. Rides that used it keep their route.'
       : 'It comes off the public map with its photos and ratings. Rides that used it keep their route.';
     if (!(await confirmAsync('Delete Your Trail?', msg, 'Delete', 'Keep It'))) return;
     setDeleting(true);

@@ -13,6 +13,7 @@ import {
   DISH_MODELS, POWER_SOURCES, budgetSummary, formatHours, formatWh, powerBudget, typicalWatts, type DishModel, type PowerSource,
 } from '@/core/power';
 import { getStarlinkSetup, myVehicles, saveStarlinkSetup, type VehicleWithCost } from '@/lib/api';
+import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
 import {
   compassPoint, DISH_HOST, DishError, dishHeadline, dishReadSupported, formatMbps, formatPercent, formatSeconds, formatUptime,
@@ -113,7 +114,7 @@ function useLiveDish() {
   }, [running, nudge]);
 
   const connect = useCallback(() => {
-    AsyncStorage.setItem(AUTO_KEY, '1').catch(() => {});
+    setSyncedItem(AUTO_KEY, '1').catch(() => {});
     historyAt.current = 0;
     setFailure(null);
     setWanted(true);
