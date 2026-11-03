@@ -95,6 +95,12 @@ Zoom in. Forest Service and BLM lines appear when the map is about 60 miles acro
 
 Closing the app pauses a running download. Open **You > Offline Maps** and tap **Resume**, or **Finish** if some pieces are missing. If the area says **Too big for one download**, zoom in so the frame covers less. See [Offline Maps](/help/offline-maps).
 
+:::release 2.1
+## The 3D Map Went Flat
+
+With no signal, Ride Mode and Map Mode show 3D Terrain only over an area you saved with **3D Terrain** ticked in Offline Maps. Anywhere else they show the flat downloaded map, so you still have a map. The 3D view comes back with signal. See [3D Terrain](/help/3d-terrain).
+:::
+
 ## I Don't See a Fuel Check on My Ride
 
 The fuel check needs miles to check against (a saved route or **Route Length (Miles)**) and a machine in your Garage with **Tank (gal)** and **Miles per Gallon** filled in. If you have more than one machine, pick yours under **Bringing** on the ride. See [Fuel Range](/help/fuel-range).
