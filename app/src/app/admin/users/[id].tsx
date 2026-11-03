@@ -13,6 +13,8 @@ import * as admin from '@/lib/admin';
 import * as growthApi from '@/lib/admin-growth';
 import { adminRemoveAvatar, useAvatar } from '@/lib/avatars';
 import { RiderPhoto } from '@/components/rider-photo';
+import { BadgePatch } from '@/components/badge-patch';
+import { badgeTitle, isBadgeKey, type BadgeLevel } from '@/core/badges';
 import { adminRiderSocial } from '@/lib/social';
 
 const STATUS: Record<string, string> = { scheduled: 'Upcoming', live: 'Riding Now', ended: 'Completed', cancelled: 'Cancelled' };
@@ -29,6 +31,8 @@ export default function UserDetail() {
   const agreements = admin.useAdminData(() => admin.riderAgreements('', 0, 20, id), [id]);
   const social = admin.useAdminData(() => adminRiderSocial(id), [id]);
   const photo = useAvatar(id);
+  // Their badges (empty until the Brand Ambassador server update is on).
+  const badges = admin.useAdminData(() => admin.userBadges(id), [id]);
 
   const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
     setBusy(key);
@@ -108,6 +112,16 @@ export default function UserDetail() {
     const days = Number(r.reason || 0);
     const endsAt = days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null;
     run('grant', () => admin.grantComp(p.id, endsAt, 'Granted from the Admin Dashboard'), 'Complimentary Pro granted.');
+  };
+  const isAmbassador = !!badges.data?.some((b) => b.badge === 'ambassador');
+  const toggleAmbassador = async () => {
+    const r = await confirm(isAmbassador
+      ? { title: `Take Back ${name}'s Brand Ambassador Badge?`, message: 'The badge comes off their profile, the Feed and beside their name. Their Pro and everything else stay as they are.', confirmLabel: 'Take Back Badge', tone: 'danger' }
+      : { title: `Make ${name} a Brand Ambassador?`, message: 'They get the Brand Ambassador badge beside their name and on their profile, and a notification about it. It doesn’t change their plan; give Complimentary Pro separately.', confirmLabel: 'Give Badge' });
+    if (r.ok) {
+      run('ambassador', () => (isAmbassador ? admin.revokeBadge(p.id, 'ambassador') : admin.grantBadge(p.id, 'ambassador')),
+        isAmbassador ? 'Brand Ambassador badge taken back.' : 'Brand Ambassador badge given.').then(badges.reload);
+    }
   };
   const removePhoto = async () => {
     const r = await confirm({
@@ -204,6 +218,28 @@ export default function UserDetail() {
           <Text style={styles.note}>App Store and Google Play billing is shown as the store reports it and can&apos;t be changed here.</Text>
         </Panel>
       </Columns>
+
+      <Panel title="Badges">
+        {badges.error ? <Text style={styles.note}>Badges aren&apos;t available here until the Brand Ambassador server update is on.</Text> : null}
+        {badges.data ? (
+          <>
+            <View style={styles.badgeRow}>
+              {badges.data.filter((b) => isBadgeKey(b.badge)).length === 0 ? <Empty text="No badges yet." /> : null}
+              {badges.data.map((b) => (isBadgeKey(b.badge) ? (
+                <View key={`${b.badge}${b.level}`} style={styles.badgeChip}>
+                  <BadgePatch badge={b.badge} level={b.level as BadgeLevel} size={28} />
+                  <Text style={styles.grantText}>{badgeTitle({ badge: b.badge, level: b.level as BadgeLevel })}</Text>
+                </View>
+              ) : null))}
+            </View>
+            <View style={styles.actions}>
+              <AdminButton title={isAmbassador ? 'Take Back Brand Ambassador' : 'Make Brand Ambassador'} kind={isAmbassador ? 'danger' : undefined}
+                small onPress={toggleAmbassador} loading={busy === 'ambassador'} />
+            </View>
+            <Text style={styles.note}>Brand Ambassador is the only badge you give. Every other badge is earned by riding and can&apos;t be changed here.</Text>
+          </>
+        ) : null}
+      </Panel>
 
       <Panel title="Rides">
         <DataTable
@@ -327,6 +363,8 @@ const styles = StyleSheet.create({
   photoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12 },
   noPhoto: { width: 64, height: 64, borderRadius: 32, borderWidth: 1, borderColor: AdminColors.faint, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
   photoLabel: { fontFamily: font(700), fontSize: 14, color: AdminColors.text },
+  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  badgeChip: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: AdminColors.page, borderRadius: 10, paddingVertical: 6, paddingHorizontal: 10 },
   grant: { flexDirection: 'row', alignItems: 'center', gap: 12, justifyContent: 'space-between', backgroundColor: AdminColors.page, borderRadius: 10, padding: 10 },
   grantText: { flex: 1, fontFamily: font(600), fontSize: 14, color: AdminColors.text },
   vehicle: { paddingVertical: 8, borderTopWidth: 1, borderTopColor: AdminColors.line, gap: 2 },
