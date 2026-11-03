@@ -82,8 +82,8 @@ function TiltMeter() {
       ) : null}
 
       <View style={[styles.dials, sideBySide && styles.dialsRow]}>
-        <TiltDial axis="roll" angle={t?.roll ?? null} limit={limits.roll} max={[reading.max.rollLeft, reading.max.rollRight]} width={dialW} />
-        <TiltDial axis="pitch" angle={t?.pitch ?? null} limit={limits.pitch} max={[reading.max.pitchDown, reading.max.pitchUp]} width={dialW} />
+        <TiltDial axis="roll" angle={t?.roll ?? null} limit={limits.roll} max={[reading.max.rollLeft, reading.max.rollRight]} width={dialW} zeroed={reading.zeroed} />
+        <TiltDial axis="pitch" angle={t?.pitch ?? null} limit={limits.pitch} max={[reading.max.pitchDown, reading.max.pitchUp]} width={dialW} zeroed={reading.zeroed} />
       </View>
 
       <View style={styles.actions}>
@@ -93,7 +93,7 @@ function TiltMeter() {
       <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
         {settings.calibration
           ? 'Zeroed for your mount. Zero again if you move the phone.'
-          : 'Not zeroed yet: level is the phone lying flat. Mount it, park on level ground and tap Zero.'}
+          : 'Not zeroed yet, so the reading is only rough and warnings and the rollover check are off. Mount the phone, park on level ground and tap Zero.'}
         {settings.calibration ? (
           <Text onPress={clearZero} style={styles.link} accessibilityRole="button"> Clear Zero</Text>
         ) : null}

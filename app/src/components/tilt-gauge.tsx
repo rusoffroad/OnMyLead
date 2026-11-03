@@ -84,7 +84,7 @@ function SideChassis({ ink }: { ink: string }) {
  * and the frame seen from the side.
  */
 export const TiltDial = memo(function TiltDial({
-  axis, angle, limit, max, width,
+  axis, angle, limit, max, width, zeroed = true,
 }: {
   axis: 'roll' | 'pitch';
   angle: number | null;
@@ -92,10 +92,12 @@ export const TiltDial = memo(function TiltDial({
   /** Biggest lean each way this ride: [left/down, right/up]. */
   max: [number, number];
   width: number;
+  /** False before the rider taps Zero: the reading is only roughly level, so it stays blue, never amber or red. */
+  zeroed?: boolean;
 }) {
   const a = angle ?? 0;
-  const level = angle == null ? 'ok' : tiltLevel(a, limit);
-  const ink = angle == null ? Colors.textSecondary : LEVEL_INK[level];
+  const level = angle == null || !zeroed ? 'ok' : tiltLevel(a, limit);
+  const ink = angle == null ? Colors.textSecondary : zeroed ? LEVEL_INK[level] : Colors.sky;
   // Roll right (positive) turns the rear view clockwise; nose up turns the side view counterclockwise.
   const turn = axis === 'roll' ? a : -a;
   const shown = Math.max(-SCALE, Math.min(SCALE, turn));

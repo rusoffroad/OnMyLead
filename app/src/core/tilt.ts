@@ -65,6 +65,25 @@ const PHONE_TOP: Vec3 = { x: 0, y: 1, z: 0 };
  */
 export const FLAT_CALIBRATION: TiltCalibration = calibrate({ x: 0, y: 0, z: -1 })!;
 
+const AXES: Vec3[] = [
+  { x: 0, y: 0, z: -1 }, { x: 0, y: 0, z: 1 },
+  { x: 0, y: -1, z: 0 }, { x: 0, y: 1, z: 0 },
+  { x: -1, y: 0, z: 0 }, { x: 1, y: 0, z: 0 },
+];
+
+/**
+ * Level until the rider taps Zero: the phone's nearest plain position (flat, standing upright in
+ * portrait, or on its side in landscape). A phone standing in a dash mount then reads close to
+ * level instead of 90° nose up. Null when the reading is unusable.
+ */
+export function defaultCalibration(gravity: Vec3): TiltCalibration | null {
+  const g = unit(gravity);
+  if (!g) return null;
+  let best = AXES[0];
+  for (const a of AXES) if (dot(g, a) > dot(g, best)) best = a;
+  return calibrate(best);
+}
+
 /**
  * The vehicle's level, from the phone's "down" (gravity) at the moment the rider taps Zero on level
  * ground. Null when the reading is unusable (no sensor data).

@@ -71,6 +71,15 @@ describe('crashStep', () => {
     expect(alarms).toEqual(['rollover']);
   });
 
+  it('never calls a rollover without a tilt reading (not zeroed yet)', () => {
+    const { alarms } = run([
+      s(0, { speedMps: 4, roll: null, pitch: null }),
+      s(2000, { speedMps: 0, roll: null, pitch: null }),
+      s(6000, { speedMps: 0, roll: null, pitch: null }),
+    ]);
+    expect(alarms).toEqual([]);
+  });
+
   it('ignores a steep lean that comes back', () => {
     const { alarms } = run([
       s(0, { speedMps: 3 }),
