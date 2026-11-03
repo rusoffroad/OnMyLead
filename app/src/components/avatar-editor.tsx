@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { initialOf } from '@/core/profile';
 import { canUseCamera, pickAvatar, removeAvatar, saveAvatar, useAvatar, type AvatarSource } from '@/lib/avatars';
 import { confirmAsync } from '@/lib/confirm';
@@ -113,7 +113,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: {
     backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.three,
   },
@@ -127,4 +127,4 @@ const styles = StyleSheet.create({
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 22, lineHeight: 26 },
   buttons: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   button: { flexGrow: 1, flexBasis: 140 },
-});
+}));

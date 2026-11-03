@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { BadgePatch } from '@/components/badge-patch';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { BADGES, bestLevels, honorsHeld, rankFor, unseen, type MyBadges } from '@/core/badges';
 
 /**
@@ -41,7 +41,7 @@ export function BadgeStrip({ mine }: { mine: MyBadges }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   badges: { gap: Spacing.two, borderRadius: Radius.card, padding: Spacing.three, backgroundColor: Colors.backgroundElement },
   badgesHead: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
   rankName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 24, lineHeight: 28 },
@@ -50,4 +50,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill, overflow: 'hidden',
   },
   patches: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
-});
+}));

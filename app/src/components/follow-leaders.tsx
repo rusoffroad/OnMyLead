@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { followLeader, followStates, NotSwitchedOnError, unfollowLeader } from '@/lib/groups';
 import { RiderDot } from './convoy';
 import { ThemedText } from './themed-text';
@@ -75,10 +75,10 @@ export function FollowLeaders({ ids, organizerId }: { ids: string[]; organizerId
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, paddingVertical: 10, paddingHorizontal: 14 },
   button: { minHeight: 40, minWidth: 104, paddingHorizontal: 16, borderRadius: Radius.pill, alignItems: 'center', justifyContent: 'center' },
   offBtn: { backgroundColor: Colors.sky },
   on: { borderWidth: 1.5, borderColor: Colors.sky, backgroundColor: 'transparent' },
   buttonText: { fontFamily: font(700), fontSize: 15 },
-});
+}));

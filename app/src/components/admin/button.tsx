@@ -1,6 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, Text, type StyleProp, type ViewStyle } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { AdminColors } from './tokens';
 
 /** Dashboard button. Red does something, quiet is everything else, danger removes things. */
@@ -34,8 +34,8 @@ export function AdminButton({ title, onPress, kind = 'quiet', loading, disabled,
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   btn: { minHeight: 42, borderRadius: 11, paddingHorizontal: 16, alignItems: 'center', justifyContent: 'center' },
   small: { minHeight: 34, paddingHorizontal: 12, borderRadius: 9 },
   text: { fontFamily: font(700), fontSize: 14.5 },
-});
+}));

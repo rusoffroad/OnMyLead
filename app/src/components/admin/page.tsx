@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import type { AdminError } from '@/lib/admin';
 import { AdminColors, useLayoutSize } from './tokens';
 
@@ -102,7 +102,7 @@ export function ComingSoon({ title }: { title: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   page: { padding: 32, gap: 20, width: '100%', maxWidth: 1360, alignSelf: 'center' },
   pagePhone: { padding: 16, gap: 16 },
   head: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 4 },
@@ -122,4 +122,4 @@ const styles = StyleSheet.create({
   errorText: { fontFamily: font(600), fontSize: 15, lineHeight: 21, color: AdminColors.danger },
   retry: { backgroundColor: AdminColors.raised, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 },
   retryText: { fontFamily: font(600), fontSize: 14, color: AdminColors.text },
-});
+}));

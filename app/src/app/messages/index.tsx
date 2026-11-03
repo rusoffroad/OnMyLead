@@ -6,7 +6,7 @@ import { RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { dayLabel, unreadLabel } from '@/core/group-chat';
 import { dmPreview, NOT_SWITCHED_ON, type DmThread } from '@/core/out-riding';
 import { myDmThreads, OutRidingOffError } from '@/lib/out-riding';
@@ -102,7 +102,7 @@ export default function Messages() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky, padding: Spacing.three, gap: 4 },
   empty: { alignItems: 'center', gap: Spacing.two, paddingVertical: Spacing.five },
   emptyTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30 },
@@ -117,4 +117,4 @@ const styles = StyleSheet.create({
     color: '#fff', backgroundColor: Colors.accent, fontFamily: font(700), fontSize: 12, overflow: 'hidden',
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill,
   },
-});
+}));

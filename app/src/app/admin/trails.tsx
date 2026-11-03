@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, Text, TextInput, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Empty, ErrorNote, FilterChips, Loading, Pager, Panel, SearchBox, StatusBadge, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDateTime } from '@/core/admin-format';
 import { difficultyLabel, feetOrMiles, vehicleLabel, type Difficulty, type TrailVehicle } from '@/core/nav-trails';
 import { useAdminData } from '@/lib/admin';
@@ -189,7 +189,7 @@ function HideRule({ rules, onSaved }: { rules: api.TrailRulesRow; onSaved: () =>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' },
   titleRow: { flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
   name: { fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24, color: AdminColors.text },
@@ -204,4 +204,4 @@ const styles = StyleSheet.create({
   ruleRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   ruleText: { fontFamily: font(600), fontSize: 15, color: AdminColors.text },
   input: { width: 64, textAlign: 'center', fontFamily: font(800, 'display'), fontSize: 20, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingVertical: 4 },
-});
+}));

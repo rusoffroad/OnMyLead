@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, Switch, Text, View } from 'react-native';
 
 import { BadgeStrip } from '@/components/badge-strip';
 import { Icon } from '@/components/icon';
@@ -8,10 +8,11 @@ import { MenuGroup, MenuRow } from '@/components/menu';
 import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { initialOf } from '@/core/profile';
 import { type MyBadges } from '@/core/badges';
 import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directions';
+import { describeAppearance } from '@/core/appearance';
 import { BATTERY_PLANS } from '@/core/battery';
 import { AUTO_VOICE } from '@/core/voice';
 import { settingsSummary } from '@/core/notifications';
@@ -21,6 +22,7 @@ import { shareEndText } from '@/core/sharing';
 import { deleteMyAccount, myActiveShares, myRideName } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
 import { fetchMyBadges } from '@/lib/badges';
+import { useAppearance } from '@/lib/appearance';
 import { useBatteryMode } from '@/lib/battery';
 import { useVoiceChoice } from '@/lib/voice';
 import { useBlocks } from '@/lib/blocks';
@@ -56,6 +58,7 @@ export default function You() {
   const notifications = useNotificationSettings();
   const mapsPref = useMapsPreference();
   const batteryMode = useBatteryMode();
+  const { appearance } = useAppearance();
   const voiceChoice = useVoiceChoice();
   const { ent } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
@@ -166,8 +169,8 @@ export default function You() {
               value={riderTrails}
               onValueChange={setRiderTrails}
               trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-              thumbColor={Colors.text}
-              {...({ activeThumbColor: Colors.text } as object)}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
               accessibilityLabel="Rider Trails on Maps"
             />
           }
@@ -182,8 +185,8 @@ export default function You() {
               value={followMe}
               onValueChange={setFollowMe}
               trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-              thumbColor={Colors.text}
-              {...({ activeThumbColor: Colors.text } as object)}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
               accessibilityLabel="Follow Me on Maps"
             />
           }
@@ -196,6 +199,16 @@ export default function You() {
           detail={`${BATTERY_PLANS[batteryMode].label}. ${BATTERY_PLANS[batteryMode].short}`}
           onPress={() => router.push('/battery')}
         />
+        <MenuRow icon="theme" color={Colors.sky} title="Appearance" detail={describeAppearance(appearance)} onPress={() => router.push('/appearance')} />
+        {Platform.OS !== 'web' ? (
+          <MenuRow
+            icon="tilt"
+            color={RideColors.green}
+            title="Tilt and Crash Alert"
+            detail="Roll and pitch meter, tilt warnings, and an alert to your group after a crash"
+            onPress={() => router.push('/tilt')}
+          />
+        ) : null}
         <MenuRow
           icon="voice"
           color={Colors.sky}
@@ -214,8 +227,8 @@ export default function You() {
                 value={musicMine}
                 onValueChange={setMusicMine}
                 trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                thumbColor={Colors.text}
-                {...({ activeThumbColor: Colors.text } as object)}
+                thumbColor="#FFFFFF"
+                {...({ activeThumbColor: '#FFFFFF' } as object)}
                 accessibilityLabel="Music Controls"
               />
             }
@@ -277,8 +290,8 @@ export default function You() {
                     disabled={socialBusy}
                     onValueChange={toggleSocial}
                     trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                    thumbColor={Colors.text}
-                    {...({ activeThumbColor: Colors.text } as object)}
+                    thumbColor="#FFFFFF"
+                    {...({ activeThumbColor: '#FFFFFF' } as object)}
                     accessibilityLabel={socialSetting(social).title}
                   />
                 }
@@ -423,7 +436,7 @@ function DeleteAccount() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   identity: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderRadius: Radius.card, padding: Spacing.three,
     backgroundColor: Colors.backgroundElement,
@@ -437,4 +450,4 @@ const styles = StyleSheet.create({
   legalLink: { fontSize: 13, textDecorationLine: 'underline' },
   deleteButton: { borderColor: Colors.danger },
   deleteNote: { gap: 4, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
-});
+}));

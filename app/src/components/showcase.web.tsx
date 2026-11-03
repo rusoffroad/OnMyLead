@@ -258,7 +258,7 @@ export function Showcase() {
           <div className="qr-copy">
             <h2 id="nav-title" className="section-title">Map Mode When It’s Just You</h2>
             <p>
-              Not every ride is a group ride. Map Mode is your offroad map for the rest: every trail and road with your speed,
+              Not every ride is a group ride. Map Mode is your offroad map for the rest, one tap from any screen: every trail and road with your speed,
               elevation, heading, trip miles and moving time, a recorder that draws your line as you ride, and Map a Custom Trail to draw one that isn’t marked
               anywhere. Track Line shows exactly where you’ve been, a new colour each day. Keep your trails on your phone, or share
               them with every rider.
@@ -304,6 +304,7 @@ export function Showcase() {
           <div className="more-grid">
             <div className="more-list">
               <Feature title="Nothing Buried">Four tabs along the bottom: Rides, Find, Groups and You. Every ride opens in four parts, Details, Map, Riders and Chat, with what to do next right under its name. Any sheet swipes down to close, and times take a few taps, no typing.</Feature>
+              <Feature title="Dark, Light or Your Own Theme">Ride in the dark Night Navy look, switch to Light for bright sun, or let it match your phone. Pick Night Navy, Carbon true black, Desert or Forest. Color Blind Mode swaps rider status, trail and Track Line colors for ones color blind riders can tell apart, with a symbol on every rider who needs a look.</Feature>
               <Feature title="Status Taps You Can Trust">Tap On My Way or Need Fuel and everyone on the ride gets a notification. A light comes on for each rider who has it, and Cancel takes it back with a follow-up so nobody turns around for nothing.</Feature>
               <Feature title="Every Notification in One Place">Missed a ping or swiped it away? Tap the bell on the Rides tab to see the last 30 days, with rider alerts in red so they stand out. Open one, swipe it away, or Clear All, and your phone’s own list clears too.</Feature>
               <Feature title="Ride Day Weather and Daylight">Every upcoming ride shows the meet day’s forecast, with a heads-up for storms, high wind or heat, and a daylight bar that tells you if the group gets back after dark.</Feature>
@@ -325,6 +326,7 @@ export function Showcase() {
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for 15 minutes to 8 hours, until an end date up to a year out, or until you turn it off, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
+              <Feature title="Tilt Meter and Crash Alert">See your roll and pitch over the map, with a full tilt meter whose axle and wheels lean as you do. Zero it for your mount, set your own limits and get a buzz before a steep side hill. In Ride Mode, a hard hit or a rollover starts a 30 second I’m OK countdown, and if you don’t answer, your group gets an EMERGENCY alert with your location. It works with no signal and sends once you reconnect. It never calls 911.</Feature>
               <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>

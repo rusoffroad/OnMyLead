@@ -1,7 +1,7 @@
 import { Children, Fragment, isValidElement, type ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { Icon, type IconName } from './icon';
 import { ThemedText } from './themed-text';
 
@@ -71,7 +71,7 @@ export function MenuRow({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: { fontWeight: 600, paddingHorizontal: Spacing.one },
   group: { borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement },
   divider: { height: 1, marginLeft: 66, backgroundColor: Colors.backgroundSelected },
@@ -79,4 +79,4 @@ const styles = StyleSheet.create({
   tile: { width: 38, height: 38, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
   rowTitle: { fontSize: 17, lineHeight: 22, fontWeight: 600 },
   below: { paddingLeft: 66, paddingRight: 14, paddingBottom: 14 },
-});
+}));

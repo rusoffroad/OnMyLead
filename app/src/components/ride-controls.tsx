@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Glass, Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { QUICK_REPLIES, type QuickReply } from '@/core/chat';
 import type { RiderStatusKind } from '@/lib/types';
 import { Icon, type IconName } from './icon';
@@ -22,6 +22,7 @@ const REPLY_ICON: Record<QuickReply, IconName> = {
   'Running Late': 'clock',
   'Need a Minute': 'clock',
   'All Good': 'check',
+  'Beverage Break': 'cup',
 };
 
 /** Statuses in the More sheet, grouped so the trouble ones are easy to find. */
@@ -200,7 +201,7 @@ export function QuickRow({ lastReply, onReply, onMore }: { lastReply: string | n
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', gap: 8 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   quarter: { flex: 1 },
@@ -229,4 +230,4 @@ const styles = StyleSheet.create({
   title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 24 },
   done: { color: Colors.sky, fontFamily: font(700), fontSize: 16 },
   section: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 12, letterSpacing: 1, textTransform: 'uppercase' },
-});
+}));

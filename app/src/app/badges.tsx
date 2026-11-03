@@ -1,11 +1,11 @@
 import { Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Text, useWindowDimensions, View } from 'react-native';
 
 import { AMBASSADOR_COLORS, BadgePatch, PATCH_COLORS } from '@/components/badge-patch';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { allProgress, honorsHeld, LEVEL_NAME, RANKS, rankFor, type BadgeLevel, type BadgeProgress, type HonorDef, type MyBadges } from '@/core/badges';
 import { widthClass } from '@/core/layout';
 import { fetchMyBadges, forgetRiderBadge, markBadgesSeen } from '@/lib/badges';
@@ -179,7 +179,7 @@ function BadgeCard({ p, fresh, grid }: { p: BadgeProgress; fresh: boolean; grid:
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   honor: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card,
     backgroundColor: Colors.backgroundElement, borderWidth: 1, borderColor: AMBASSADOR_COLORS.cloth,
@@ -210,4 +210,4 @@ const styles = StyleSheet.create({
   level: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
   track: { height: 6, borderRadius: 3, backgroundColor: Colors.backgroundSelected, overflow: 'hidden', marginTop: 4 },
   fill: { height: '100%', borderRadius: 3 },
-});
+}));

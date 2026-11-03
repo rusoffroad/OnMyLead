@@ -1,7 +1,7 @@
 import { Children, ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { AdminColors, tabular, toneColor, useLayoutSize, type Tone } from './tokens';
 
 /**
@@ -53,7 +53,7 @@ export function planTone(label: string): Tone {
   return label === 'Admin' ? 'admin' : label === 'Pro' ? 'pro' : label === 'Pro Trial' ? 'trial' : 'free';
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   grid: { flexDirection: 'row', flexWrap: 'wrap', margin: -6 },
   tile: {
     backgroundColor: AdminColors.panel, borderRadius: 14, borderWidth: 1, borderColor: AdminColors.line,
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
   hint: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.faint },
   badge: { alignSelf: 'flex-start', borderRadius: 999, borderWidth: 1, paddingHorizontal: 9, paddingVertical: 2 },
   badgeText: { fontFamily: font(700), fontSize: 12.5 },
-});
+}));

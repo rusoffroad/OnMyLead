@@ -1,9 +1,9 @@
 import type { Session } from '@supabase/supabase-js';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TextInput, View } from 'react-native';
 
 import { Logo } from '@/components/logo';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { signInWithPassword, signOut } from '@/lib/session';
 import { isBackendConfigured, supabase } from '@/lib/supabase';
 import { AdminButton } from './button';
@@ -204,7 +204,7 @@ function Input({ label, value, onChange, secure, onSubmit, autoComplete }: { lab
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   page: { flex: 1, minHeight: '100%' as unknown as number, backgroundColor: AdminColors.rail, alignItems: 'center', justifyContent: 'center', padding: 16, gap: 16 },
   card: { width: '100%', maxWidth: 420, backgroundColor: AdminColors.panel, borderRadius: 20, borderWidth: 1, borderColor: AdminColors.line, padding: 24, gap: 8 },
   kicker: { fontFamily: font(700, 'display'), fontSize: 18, color: AdminColors.red, textAlign: 'center', marginBottom: 8 },
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   code: { outlineStyle: 'none' as never, fontFamily: font(800, 'display'), fontSize: 36, letterSpacing: 10, textAlign: 'center', color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 12, paddingVertical: 10 },
   error: { fontFamily: font(600), fontSize: 14.5, color: AdminColors.danger },
   foot: { fontFamily: font(500), fontSize: 13, color: AdminColors.faint },
-});
+}));
 
 async function nextStep(session: Session | null, loading: boolean): Promise<Step> {
   if (!isBackendConfigured) return { kind: 'not_switched_on' };

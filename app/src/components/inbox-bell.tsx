@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { badgeText } from '@/core/inbox';
 import { useInbox } from '@/lib/inbox';
 import { Icon } from './icon';
@@ -30,7 +30,7 @@ export function InboxBell({ compact }: { compact?: boolean } = {}) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   bell: {
     position: 'absolute', right: 0, width: 52, height: 52, borderRadius: 26,
     alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundElement,
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: Colors.background,
   },
   count: { color: '#fff', fontSize: 12, lineHeight: 14, fontFamily: font(800) },
-});
+}));

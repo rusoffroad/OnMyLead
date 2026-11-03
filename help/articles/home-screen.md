@@ -21,7 +21,7 @@ related: [join-a-ride, create-a-ride, find-a-ride, navigation-mode, riding-group
 keywords: [home, home screen, rides tab, main screen, feed, activity, customize feed, who sees my activity, toolkit, public rides near me, distance, radius, 500 miles, rides left, unlimited, your group]
 ---
 
-The **Rides** tab is your home screen. It puts the three things riders do most at the top (join, create and find a ride), then events, Map Mode, your rides, your crew and what your friends have been up to.
+The **Rides** tab is your home screen. It puts the three things riders do most at the top (join, create and find a ride), then Map Mode, events, your rides, your crew and what your friends have been up to.
 
 ## At the Top
 
@@ -43,9 +43,9 @@ Right under Join, Create and Find, the **Events** card opens the Events area: ra
 
 ## Map Mode
 
-Your offroad map for when you're not on a group ride. The card shows a small map with your Track Line, and how many rider trails are near you when location is allowed.
+Your offroad map for when you're not on a group ride. It's the blue card right under **Create a Ride** and **Find a Ride**, and shows how many rider trails are near you when location is allowed.
 
-- **Open Map** opens Map Mode.
+- **Open Map Mode** opens Map Mode. The blue **Map Mode** button in the tab bar opens it too, from any tab.
 - **Map a Custom Trail** opens Map Mode ready to draw a trail that isn't marked on any map.
 - **Track Line** draws where you've been, a new colour each day: today red, yesterday blue, older days gold.
 
@@ -120,7 +120,7 @@ Opens Help and Support. At the top, **Help Center: How-To Guides** opens these s
 
 ## On a Tablet
 
-In landscape, and on a big window, Home has two columns: join, create, find, events, Map Mode, your toolkit and help on the left; your rides, group, public rides, feed and badges on the right. In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+In landscape, and on a big window, Home has two columns: join, create, find, Map Mode, events, your toolkit and help on the left; your rides, group, public rides, feed and badges on the right. In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 
 ## On the Website
 

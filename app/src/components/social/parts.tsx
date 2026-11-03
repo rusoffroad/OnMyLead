@@ -1,16 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { Colors, font, Glass, themedStyles } from '@/constants/theme';
 
 /** The Social area's own shades, matching the 2.0 home cards. */
 export const Social = {
-  panel: '#101E33',
-  panel2: '#16273F',
-  line: 'rgba(151,167,190,0.16)',
-  muted: '#8C9CB3',
-  gold: '#E6C27A',
+  get panel() { return Colors.backgroundElement; },
+  get panel2() { return Colors.backgroundSelected; },
+  get line() { return Glass.edge; },
+  get muted() { return Colors.textSecondary; },
+  get gold() { return Colors.gold; },
   heart: '#FF4D57',
-} as const;
+};
 
 /**
  * The Pro tag next to a rider's name: a small gold plate, the same gold as the Pro screen, so
@@ -28,7 +28,7 @@ export function ProTag({ size = 'small' }: { size?: 'small' | 'large' }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   tag: {
     borderRadius: 5, borderWidth: 1, borderColor: 'rgba(230,194,122,0.6)', backgroundColor: 'rgba(230,194,122,0.14)',
     paddingHorizontal: 5, paddingVertical: 1, alignSelf: 'center',
@@ -36,4 +36,4 @@ const styles = StyleSheet.create({
   tagBig: { borderRadius: 7, paddingHorizontal: 9, paddingVertical: 3 },
   text: { color: Social.gold, fontFamily: font(800, 'display'), fontSize: 11, lineHeight: 13, letterSpacing: 0.8 },
   textBig: { fontSize: 15, lineHeight: 18, letterSpacing: 1.2 },
-});
+}));

@@ -8,7 +8,7 @@ import { OutRidingCard } from '@/components/out-riding-card';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { previewLine, unreadLabel, type GroupChatSummary } from '@/core/group-chat';
 import { NOT_SWITCHED_ON, ridersLabel } from '@/core/groups';
 import { useBlocks } from '@/lib/blocks';
@@ -181,7 +181,7 @@ function EmptyCrew() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky, padding: Spacing.three, gap: 4 },
   card: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: 10 },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
@@ -197,4 +197,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill,
   },
   rule: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
-});
+}));

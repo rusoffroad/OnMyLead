@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { Colors, font, RideColors } from '@/constants/theme';
+import { Colors, font, RideColors, themedStyles } from '@/constants/theme';
 import type { FreerideSummary } from '@/core/freeride';
 import type { RangeCheck } from '@/core/fuel';
 import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
 import { describeRank, groupSpread, layoutDots, rankRiders } from '@/core/route-order';
 
-const RANGE_COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: RideColors.yellow, over: RideColors.red };
+const RANGE_COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
 
 /** Dot sizes on the line, before a big group shrinks them to fit. */
 const SIZE = { me: 30, leader: 28, sweep: 24, rider: 22 } as const;
@@ -193,7 +193,7 @@ export function RouteStrip({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { gap: 8, paddingHorizontal: 4, paddingBottom: 4 },
   head: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   big: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 36 },
@@ -215,4 +215,4 @@ const styles = StyleSheet.create({
   rangeDot: { width: 10, height: 10, borderRadius: 5 },
   rangeText: { flex: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },
   compared: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20 },
-});
+}));

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Colors, Radius } from '@/constants/theme';
+import { Colors, Radius, themedStyles } from '@/constants/theme';
 import { togetherLabel, type RideMate } from '@/core/groups';
 import { RiderDot } from './convoy';
 import { Icon } from './icon';
@@ -35,10 +35,10 @@ export function RiderPicker({ mates, picked, onChange }: { mates: RideMate[]; pi
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   list: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10, minHeight: 60 },
   rule: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
   box: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
   boxOn: { backgroundColor: Colors.accent, borderColor: Colors.accent },
-});
+}));

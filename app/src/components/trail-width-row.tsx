@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ActivityIndicator, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import { inches, parseWidth, rigFit, shownWidth, NO_RIDER_WIDTHS, type FitVehicle } from '@/core/trail-width';
 import type { TrailInfo } from '@/core/trails';
 import { useGarageWidths, useRiderWidths } from '@/lib/trail-width';
@@ -128,7 +128,7 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { gap: 6 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   value: { color: SAND, fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
@@ -150,4 +150,4 @@ const styles = StyleSheet.create({
   saveText: { color: Colors.background, fontFamily: font(700), fontSize: 15 },
   links: { flexDirection: 'row', gap: 18 },
   link: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, textDecorationLine: 'underline' },
-});
+}));

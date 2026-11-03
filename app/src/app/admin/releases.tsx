@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, ErrorNote, Loading, Panel, StatusBadge, useConfirm, useToast, type Tone,
 } from '@/components/admin';
 import { TextButton } from '@/components/admin-insights';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDateTime } from '@/core/admin-format';
 import {
   isVersion, NO_VERSIONS, parseAppVersions, versionsProblem, versionsValue, type AppVersions,
@@ -403,7 +403,7 @@ function VersionControls({ value, updatedAt, switchedOn, onSaved }: { value: App
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   text: { fontFamily: font(500), fontSize: 14.5, lineHeight: 21, color: AdminColors.dim },
   small: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.faint },
   label: { fontFamily: font(700), fontSize: 15, color: AdminColors.text },
@@ -417,4 +417,4 @@ const styles = StyleSheet.create({
   platform: { gap: 6, flexGrow: 1, flexBasis: 260 },
   row: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' },
   input: { fontFamily: font(500), fontSize: 15, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9 },
-});
+}));

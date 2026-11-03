@@ -1,13 +1,13 @@
 import { router } from 'expo-router';
 import { Fragment, useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, Switch, Text, View } from 'react-native';
 
 import { BadgePatch } from '@/components/badge-patch';
 import { BottomSheet } from '@/components/bottom-sheet';
 import { Icon } from '@/components/icon';
 import { RiderPhoto } from '@/components/rider-photo';
 import { Button, ErrorText } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   feedHref, feedLine, feedStat, KIND_CHOICES, SHARE_WITH_CHOICES, SHOW_FROM_CHOICES, timeAgo, toggleKind, type FeedSettings,
 } from '@/core/feed';
@@ -179,7 +179,7 @@ function Radio({ label, detail, on, onPress }: { label: string; detail: string; 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   empty: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
   item: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
   divider: { height: 1, backgroundColor: Home.line },
@@ -193,4 +193,4 @@ const styles = StyleSheet.create({
   dotIn: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.accent },
   optLabel: { color: Colors.text, fontFamily: font(600), fontSize: 15 },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 44 },
-});
+}));

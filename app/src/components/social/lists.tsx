@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { RiderPhoto } from '@/components/rider-photo';
 import { Button } from '@/components/ui';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { splitFriends, type Friend } from '@/core/friends';
 import { profileHref, type SocialItem } from '@/core/social';
 import { requirePro } from '@/lib/pro';
@@ -113,7 +113,7 @@ function FriendRow({ friend, first }: { friend: Friend; first: boolean }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   empty: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 22, backgroundColor: Social.panel, borderWidth: 1, borderColor: Social.line },
   emptyText: { flex: 1, color: Social.muted, fontFamily: font(500), fontSize: 14, lineHeight: 20 },
   compose: {
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
   rowLine: { borderTopWidth: 1, borderTopColor: Social.line },
   rowName: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   rowSub: { color: Social.muted, fontFamily: font(500), fontSize: 12 },
-});
+}));

@@ -6,6 +6,7 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-03
 sources:
+  - app/src/components/tilt-tile.tsx
   - app/src/components/trail-width-row.tsx
   - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
@@ -52,7 +53,8 @@ At the top of the map are three tabs: **Explore**, **Record** and **Measure**. S
 
 ## Open Map Mode
 
-- On Home, tap **Open Map** (or the little map) on the **Map Mode** card.
+- From any tab, tap the blue **Map Mode** button in the middle of the bar at the bottom of the screen. On a tablet, and on onmylead.com on a computer, it's in the menu down the left edge, under **Find**.
+- On Home, tap **Open Map Mode** (or the little map) on the **Map Mode** card.
 - To map a trail that isn't marked anywhere, tap **Map a Custom Trail** on the same card. Map Mode opens on the **Draw** tab.
 - Or on the **You** tab, tap **Map Mode** under **On the Trail**.
 
@@ -84,6 +86,10 @@ Next to your speed are four readings:
 - **Moving**, how long you've been moving on this trip (minutes, then hours and minutes).
 
 To start a new trip, press and hold **Trip**. Trip and Moving only count while Map Mode is open, and they're kept on your phone only. When you follow a trail, the big number shows the miles left, and **Speed** moves into the readings in place of **Moving**.
+:::
+
+:::release 2.0
+Under the readings, the **Tilt** tile shows your **Roll** and **Pitch**, turning amber, then red, near your limits. Tap it for the full tilt meter. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
 :::
 
 ### The Map Follows You

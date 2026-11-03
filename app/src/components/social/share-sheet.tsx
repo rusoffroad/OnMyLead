@@ -7,7 +7,7 @@ import { BadgePatch } from '@/components/badge-patch';
 import { BottomSheet } from '@/components/bottom-sheet';
 import { RiderPhoto } from '@/components/rider-photo';
 import { Button, ErrorText } from '@/components/ui';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { shareHeadline, shareSubline, shareText, type SocialItem } from '@/core/social';
 import { shareActivity, shareActivityText } from '@/lib/share-activity';
 import { Home, Initial, faceColor } from '../home/parts';
@@ -103,18 +103,18 @@ export function ShareSheet({ item, onClose }: { item: SocialItem | null; onClose
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   cardWrap: { alignSelf: 'center', width: 288, height: 360, borderRadius: 18, overflow: 'hidden' },
   card: { flex: 1, backgroundColor: '#0D1E38', padding: 22, justifyContent: 'space-between' },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  name: { color: '#C9D3E1', fontFamily: font(600), fontSize: 16, flexShrink: 1 },
+  name: { color: Colors.textSoft, fontFamily: font(600), fontSize: 16, flexShrink: 1 },
   middle: { gap: 6 },
   headline: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 52, lineHeight: 52 },
-  sub: { color: '#C9D3E1', fontFamily: font(500), fontSize: 16, lineHeight: 21 },
+  sub: { color: Colors.textSoft, fontFamily: font(500), fontSize: 16, lineHeight: 21 },
   bottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   url: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
   logo: { width: 92, height: 30 },
   caption: { color: Colors.text, fontFamily: font(500), fontSize: 14, lineHeight: 20, backgroundColor: Home.panel2, borderRadius: 12, padding: 12 },
   hint: { color: Home.muted, fontFamily: font(500), fontSize: 12, lineHeight: 17 },
   note: { color: '#3CC36B', fontFamily: font(700), fontSize: 13 },
-});
+}));

@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useState, type ComponentProps } from 'react';
-import { LayoutAnimation, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { LayoutAnimation, Platform, Pressable, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ReportSheet } from '@/components/report-sheet';
@@ -9,7 +9,7 @@ import { RiderPhoto } from '@/components/rider-photo';
 import { SocialPhoto, SocialTag } from '@/components/social-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Card, ErrorText } from '@/components/ui';
-import { Colors, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { rideLeaderIds } from '@/core/chat';
 import { friendlyRoleError, handOffPrompt, ROLE_LABEL, rosterActions, tailGunnerId } from '@/core/roles';
 import { handOffRide, setMemberRole, setTailGunner } from '@/lib/api';
@@ -24,7 +24,11 @@ import { useSocialProfiles } from '@/lib/social-profile';
 import type { Ride, RideMember } from '@/lib/types';
 
 const ROLE_COLOR: Record<RideMember['role'], string> = {
-  organizer: Colors.accent, co_organizer: Colors.accent, leader: RideColors.leader, sweep: RideColors.sweep, rider: RideColors.rider,
+  get organizer() { return Colors.accent; },
+  get co_organizer() { return Colors.accent; },
+  get leader() { return RideColors.leader; },
+  get sweep() { return RideColors.sweep; },
+  get rider() { return RideColors.rider; },
 };
 
 /**
@@ -321,7 +325,7 @@ function Avatar({ name, color }: { name: string; color: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, minHeight: 56, paddingVertical: Spacing.two },
   divider: { borderTopWidth: 1, borderTopColor: Colors.backgroundSelected },
   avatar: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
@@ -340,4 +344,4 @@ const styles = StyleSheet.create({
   lineLabels: { flexDirection: 'row', gap: Spacing.three },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   lineName: { fontWeight: 700, fontSize: 17 },
-});
+}));

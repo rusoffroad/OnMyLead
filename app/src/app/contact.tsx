@@ -3,13 +3,14 @@ import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import Head from '@/components/page-head';
 import { createElement, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen } from '@/components/ui';
 import { COMPANY } from '@/constants/site';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import {
   CONTACT_TOPICS, contactProblem, MAX_CONTACT_MESSAGE, MAX_CONTACT_NAME, screenBeforeContact, screenshotHint, screenshotProblem, topicHint,
   type ContactTopic,
@@ -270,7 +271,7 @@ export default function ContactScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { width: '100%', maxWidth: 640, alignSelf: 'center', gap: Spacing.four },
   topics: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   topic: {
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 10, borderRadius: Radius.control,
     backgroundColor: Colors.backgroundElement, borderWidth: 1.5, borderColor: Colors.backgroundSelected,
   },
-  topicOn: { borderColor: Colors.accent, backgroundColor: '#2A1A26' },
+  topicOn: { borderColor: Colors.accent, backgroundColor: withAlpha(Colors.accent, 0.14) },
   topicIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   topicText: { flex: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 15, lineHeight: 19 },
   pair: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.three },
@@ -289,4 +290,4 @@ const styles = StyleSheet.create({
   shot: { width: 96, height: 160, borderRadius: Radius.control, backgroundColor: Colors.backgroundSelected },
   sent: { alignItems: 'center', gap: Spacing.two, paddingVertical: Spacing.five },
   sentMark: { width: 72, height: 72, borderRadius: 36, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.two },
-});
+}));

@@ -1,10 +1,10 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { DateStub } from '@/components/events/parts';
 import { Icon } from '@/components/icon';
-import { Colors } from '@/constants/theme';
+import { Colors, themedStyles } from '@/constants/theme';
 import { eventDates, sortCards, type EventCard } from '@/core/events';
 import { myEvents, upcomingEvents } from '@/lib/events';
 import { positionIfAllowed } from '@/lib/location';
@@ -66,11 +66,11 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: {
     flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 14, paddingVertical: 12,
     borderRadius: 22, backgroundColor: Home.panel, borderWidth: 1, borderColor: Home.line,
   },
   icon: { width: 46, height: 46, borderRadius: 12, backgroundColor: Home.panel2, alignItems: 'center', justifyContent: 'center' },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-});
+}));

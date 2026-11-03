@@ -2,18 +2,18 @@ import { type ReactNode, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
 
 /** The 2.0 home screen's own shades: a deeper card and a hairline, from the approved mock. */
 export const Home = {
-  panel: '#101E33',
-  panel2: '#16273F',
-  line: 'rgba(151,167,190,0.16)',
-  muted: '#8C9CB3',
-  gold: Colors.gold,
+  get panel() { return Colors.backgroundElement; },
+  get panel2() { return Colors.backgroundSelected; },
+  get line() { return Glass.edge; },
+  get muted() { return Colors.textSecondary; },
+  get gold() { return Colors.gold; },
   mint: '#57E3C3',
-  ink: '#070F1C',
-} as const;
+  get ink() { return Colors.background; },
+};
 
 /**
  * A soft vertical (or angled) gradient behind a card. react-native-svg works the same on iPhone,
@@ -80,10 +80,10 @@ export function Pill({ text, tone = 'plain', style }: { text: string; tone?: 'pl
 }
 
 const PILL = {
-  plain: { bg: 'rgba(255,255,255,0.06)', border: Home.line, fg: Colors.text },
-  gold: { bg: 'rgba(230,194,122,0.14)', border: 'rgba(230,194,122,0.45)', fg: Home.gold },
+  get plain() { return { bg: Glass.tile, border: Home.line, fg: Colors.text }; },
+  get gold() { return { bg: 'rgba(230,194,122,0.14)', border: 'rgba(230,194,122,0.45)', fg: Home.gold }; },
   onRed: { bg: 'rgba(0,0,0,0.22)', border: 'rgba(255,255,255,0.28)', fg: '#fff' },
-  dark: { bg: 'rgba(7,15,28,0.78)', border: 'transparent', fg: Colors.text },
+  get dark() { return { bg: 'rgba(7,15,28,0.78)', border: 'transparent', fg: Colors.text }; },
   out: { bg: 'rgba(240,62,62,0.14)', border: 'rgba(240,62,62,0.45)', fg: '#FF8A8E' },
 } as const;
 
@@ -109,16 +109,16 @@ export function faceColor(id: string): string {
   return FACE_COLORS[Math.abs(h) % FACE_COLORS.length];
 }
 
-export const homeStyles = StyleSheet.create({
+export const homeStyles = themedStyles(() => ({
   muted: { color: Home.muted, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
   cardTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 21, lineHeight: 23 },
-});
+}));
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.three },
   headTitle: { color: Colors.text, fontFamily: font(600, 'display'), fontSize: 24, lineHeight: 28, flexShrink: 1 },
   link: { color: Colors.sky, fontFamily: font(600), fontSize: 14 },
   pill: { alignSelf: 'flex-start', borderRadius: Radius.pill, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 3 },
   pillText: { fontFamily: font(700), fontSize: 12, lineHeight: 16 },
   card: { borderRadius: 22, backgroundColor: Home.panel, borderWidth: 1, borderColor: Home.line, overflow: 'hidden' },
-});
+}));

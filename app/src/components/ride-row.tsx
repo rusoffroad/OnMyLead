@@ -1,8 +1,8 @@
 import { Link } from 'expo-router';
 import { Fragment, ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { font, Radius, Spacing } from '@/constants/theme';
+import { font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { Ride } from '@/lib/types';
 import { Icon } from './icon';
@@ -75,7 +75,7 @@ export function RideRow({ ride, note }: { ride: Ride; note?: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   group: { borderRadius: Radius.card, overflow: 'hidden' },
   divider: { height: 1, marginLeft: 84 },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: 14 },
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
   dateSmall: { fontSize: 12, lineHeight: 14, fontFamily: font(600) },
   dateDay: { fontSize: 26, lineHeight: 28, fontFamily: font(700, 'display') },
   liveDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#fff', marginBottom: 4 },
-});
+}));

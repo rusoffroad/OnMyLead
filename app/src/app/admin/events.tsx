@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Empty, ErrorNote, FilterChips, Loading, Pager, Panel, StatusBadge, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDateTime } from '@/core/admin-format';
 import { eventDates, type EventDetail } from '@/core/events';
 import { useAdminData } from '@/lib/admin';
@@ -144,11 +144,11 @@ export default function AdminEvents() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' },
   titleRow: { flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
   name: { fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24, color: AdminColors.text },
   sub: { fontFamily: font(500), fontSize: 13.5, color: AdminColors.dim },
   photo: { width: 160, height: 110, borderRadius: 10, backgroundColor: AdminColors.page },
   actions: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-});
+}));
