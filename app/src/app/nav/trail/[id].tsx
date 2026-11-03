@@ -56,7 +56,7 @@ export default function TrailDetail() {
   if (!saved || !details || !extra) {
     return (
       <Screen width="readable">
-        <ThemedText themeColor="textSecondary">{loaded ? 'That trail isn’t on this phone.' : 'Loading…'}</ThemedText>
+        <ThemedText themeColor="textSecondary">{loaded ? 'That trail isn’t on this device.' : 'Loading…'}</ThemedText>
       </Screen>
     );
   }
@@ -120,7 +120,7 @@ export default function TrailDetail() {
   }
 
   async function unshare() {
-    if (!(await confirmAsync('Stop Sharing?', 'The trail comes off the public map and its ratings are removed. It stays on this phone.', 'Stop Sharing', 'Keep Sharing'))) return;
+    if (!(await confirmAsync('Stop Sharing?', 'The trail comes off the public map and its ratings are removed. It stays in My Trails.', 'Stop Sharing', 'Keep Sharing'))) return;
     setBusy('stop');
     try {
       await stopSharing(saved!);

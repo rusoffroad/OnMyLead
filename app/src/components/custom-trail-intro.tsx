@@ -11,7 +11,7 @@ export const CUSTOM_TRAIL_INTRO_KEY = 'nav.customTrailIntro.v1';
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
   { icon: 'draw', title: 'Draw It', body: 'Tap along the trail. Follow Trails snaps to lines on the map; Straight Line is for trails that aren’t marked anywhere. Name spots like ledges and crossings as you go.' },
-  { icon: 'lock', title: 'It Stays Private', body: 'Your trail is saved on this phone only. Nobody sees it unless you share it.' },
+  { icon: 'lock', title: 'It Stays Private', body: 'Your trail is saved privately to your account. Nobody sees it unless you share it.' },
   { icon: 'people', title: 'Share With Riders (Pro)', body: 'Shared trails show in full on every rider’s map, mint dotted, with your ride name as the mapper.' },
   { icon: 'star', title: 'Riders Rate It', body: 'Riders who ride a quarter of it (or a full kilometer) rate how accurate the line is, 1 to 5 stars.' },
 ];

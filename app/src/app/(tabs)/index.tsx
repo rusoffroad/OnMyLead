@@ -50,6 +50,7 @@ import { publicTrailsIn } from '@/lib/nav-trails';
 import { currentNotificationSettings } from '@/lib/notification-settings';
 import { requirePro } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
+import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import { setTrackLineOn } from '@/lib/track-line';
@@ -249,7 +250,7 @@ export default function HomeScreen() {
 
   const pickRadius = (mi: number) => {
     setRadius(mi);
-    AsyncStorage.setItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
+    setSyncedItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
   };
   const switchTrack = (on: boolean) => {
     setTrackSwitch(on);

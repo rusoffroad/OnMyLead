@@ -115,6 +115,8 @@ export type LocalTrail = {
   obstacles?: Obstacle[];
   /** Recorded trails only: leave off the first and last SHARE_TRIM_M when sharing (off by default). */
   hideStart?: boolean;
+  /** The account this trail is backed up to (core/trail-backup). Unset until its first backup. */
+  owner?: string;
 };
 
 export const MAX_PHOTOS = 6;

@@ -31,7 +31,7 @@ export default function MyTrails() {
         <View style={styles.empty}>
           <ThemedText type="heading">No Trails Yet</ThemedText>
           <ThemedText themeColor="textSecondary">
-            In Map Mode, tap Record and ride, or Draw to map a custom trail. Trails stay on this phone until you share them. A rider trail you save shows here too.
+            In Map Mode, tap Record and ride, or Draw to map a custom trail. Your trails are private until you share them, and they show on every device you sign in on. A rider trail you save shows here too.
           </ThemedText>
         </View>
       ) : null}

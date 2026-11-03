@@ -9,7 +9,10 @@ import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, type OfflineChoice } from '@/core/offline-maps';
 import { getRideRoute, myRides } from '@/lib/api';
-import { downloadRide, freeSpace, planRide, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
+import type { SyncedOfflineArea } from '@/core/synced-settings';
+import {
+  downloadFromOtherDevice, downloadRide, forgetOtherDeviceArea, freeSpace, planArea, planRide, rideDownload, useOfflineMaps, useOtherDeviceAreas,
+} from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
@@ -25,6 +28,7 @@ type RideWithRoute = { ride: Ride; route: LatLng[] };
 export default function OfflineMaps() {
   const { session } = useSession();
   const maps = useOfflineMaps();
+  const elsewhere = useOtherDeviceAreas();
   const [rides, setRides] = useState<RideWithRoute[] | null>(null);
 
   useEffect(() => {
@@ -93,6 +97,15 @@ export default function OfflineMaps() {
         </>
       ) : null}
 
+      {session && elsewhere.length ? (
+        <>
+          <Section title="On Your Other Devices" />
+          {elsewhere.map((a) => (
+            <OtherDeviceOffer key={a.id} area={a} />
+          ))}
+        </>
+      ) : null}
+
       {session && rides == null ? (
         <ActivityIndicator color={SAND} style={{ marginTop: 8 }} />
       ) : notDownloaded.length ? (
@@ -109,6 +122,33 @@ export default function OfflineMaps() {
         Management. Satellite with no signal uses the USGS aerial photos, since the live satellite view can’t be saved ahead of time.
       </ThemedText>
     </Screen>
+  );
+}
+
+/** An area the rider saved on another device: download the same squares here in one tap. */
+function OtherDeviceOffer({ area }: { area: SyncedOfflineArea }) {
+  const plan = useMemo(() => planArea(area.box, ALL), [area.box]);
+  const [starting, setStarting] = useState(false);
+  return (
+    <View style={styles.offer}>
+      <MapSheet ride={area.kind === 'ride'} dim />
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text style={styles.offerName} numberOfLines={1}>{area.name}</Text>
+        <Text style={styles.offerSub}>{`About ${formatBytes(plan.bytes)}`}</Text>
+      </View>
+      <SmallButton title="Hide" onPress={() => forgetOtherDeviceArea(area.id)} />
+      <SmallButton
+        title="Download"
+        pro="offline_maps"
+        strong
+        disabled={starting}
+        onPress={async () => {
+          if (!requirePro('offline_maps')) return;
+          setStarting(true);
+          await downloadFromOtherDevice(area);
+        }}
+      />
+    </View>
   );
 }
 

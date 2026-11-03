@@ -11,8 +11,9 @@ sources:
   - app/src/core/color.ts
   - app/src/core/ink.ts
   - app/src/lib/appearance.ts
+  - app/src/lib/appearance-sync.ts
   - app/src/constants/theme.ts
-related: [ride-bubble, navigation-mode, battery-saver]
+related: [sync-across-devices, ride-bubble, navigation-mode, battery-saver]
 keywords: [appearance, theme, themes, skin, light mode, dark mode, match phone, color blind, colour blind, colorblind, accessibility, carbon, desert, forest, night navy, black]
 ---
 
@@ -49,6 +50,10 @@ The Appearance screen shows a preview of these colors as you switch.
 :::tip
 Changing the look only changes how OnMyLead looks on your screen. Other riders don't see your choice.
 :::
+
+## On Your Other Devices
+
+Your choice follows your account to every device you sign in on. A change from another device shows the next time you open the app (or right away if you just opened it), so the screen never changes in the middle of a ride. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
 
 ## On a Tablet
 

@@ -10,6 +10,7 @@ import { useMapSignal } from '@/lib/map-signal';
 import { publicTrailsIn, type Box } from '@/lib/nav-trails';
 import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
+import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 const KEY = 'map.layers.v1';
 /** Show trails other riders mapped and shared (Navigation Mode). On unless the rider hid them. */
@@ -98,23 +99,32 @@ export function useTrailMap(): TrailMap {
   const [picked, setPicked] = useState<PublicTrail | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY)
-      .then((v) => {
-        if (!v) return;
+    const applyLayers = (v: string | null) => {
+      if (!v) return;
+      try {
         // `trails` from the first version defaulted to off, so only the newer `trailsOn` choice counts.
         const saved = JSON.parse(v) as { base?: BaseMap; trailsOn?: boolean };
         if (saved.base === 'topo' || saved.base === 'satellite') setBaseState(saved.base);
         if (typeof saved.trailsOn === 'boolean') setTrailsState(saved.trailsOn);
-      })
-      .catch(() => {});
+      } catch {
+        // Not a saved choice.
+      }
+    };
+    const applyRiders = (v: string | null) => {
+      riderOnRef.current = v !== '0';
+      setRiderOn(v !== '0');
+    };
+    AsyncStorage.getItem(KEY).then(applyLayers).catch(() => {});
     AsyncStorage.getItem(RIDER_TRAILS_KEY)
-      .then((v) => {
-        if (v === '0') {
-          riderOnRef.current = false;
-          setRiderOn(false);
-        }
-      })
+      .then((v) => v === '0' && applyRiders(v))
       .catch(() => {});
+    // Picked on another device (lib/settings-sync).
+    const offLayers = onSyncedChange(KEY, applyLayers);
+    const offRiders = onSyncedChange(RIDER_TRAILS_KEY, applyRiders);
+    return () => {
+      offLayers();
+      offRiders();
+    };
   }, []);
 
   /** Rider trails for the region on screen; skips the call while the map stays inside the last box. */
@@ -144,10 +154,10 @@ export function useTrailMap(): TrailMap {
     setRiderOn(on);
     if (!on) setPicked(null);
     else refreshRiders(true);
-    AsyncStorage.setItem(RIDER_TRAILS_KEY, on ? '1' : '0').catch(() => {});
+    setSyncedItem(RIDER_TRAILS_KEY, on ? '1' : '0').catch(() => {});
   };
 
-  const save = (next: { base: BaseMap; trailsOn: boolean }) => AsyncStorage.setItem(KEY, JSON.stringify(next)).catch(() => {});
+  const save = (next: { base: BaseMap; trailsOn: boolean }) => setSyncedItem(KEY, JSON.stringify(next)).catch(() => {});
   const setBase = (b: BaseMap) => {
     setBaseState(b);
     save({ base: b, trailsOn: trails });

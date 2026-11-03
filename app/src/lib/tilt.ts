@@ -14,6 +14,7 @@ import {
   type TiltLimits,
   type Vec3,
 } from '@/core/tilt';
+import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 /**
  * Tilt meter and Crash Alert settings. Warning angles, voice and Crash Alert follow the rider's
@@ -44,6 +45,14 @@ function emit() {
   listeners.forEach((l) => l(settings));
 }
 
+// Changed on another device (lib/settings-sync): read the settings again.
+for (const key of [TILT_LIMITS_KEY, TILT_VOICE_KEY, TILT_SHOW_KEY, TILT_WARN_KEY, CRASH_KEY]) {
+  onSyncedChange(key, () => {
+    loaded = null;
+    loadTiltSettings();
+  });
+}
+
 export function loadTiltSettings(): Promise<TiltSettings> {
   loaded ??= AsyncStorage.multiGet([TILT_LIMITS_KEY, TILT_VOICE_KEY, TILT_SHOW_KEY, TILT_WARN_KEY, TILT_CALIBRATION_KEY, CRASH_KEY])
     .then((rows) => {
@@ -67,7 +76,8 @@ function save(patch: Partial<TiltSettings>, key: string, value: string | null) {
   settings = { ...settings, ...patch };
   loaded = Promise.resolve(settings);
   emit();
-  (value == null ? AsyncStorage.removeItem(key) : AsyncStorage.setItem(key, value)).catch(() => {});
+  // Synced keys go to the account too (lib/settings-sync); the Zero is only written here.
+  setSyncedItem(key, value).catch(() => {});
 }
 
 export function setTiltLimits(limits: TiltLimits) {

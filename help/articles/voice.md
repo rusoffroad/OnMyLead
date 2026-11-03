@@ -9,7 +9,7 @@ sources:
   - app/src/app/voice.tsx
   - app/src/core/voice.ts
   - app/src/lib/voice.ts
-related: [ride-mode, ride-bubble, status-buttons, music-controls]
+related: [ride-mode, ride-bubble, status-buttons, music-controls, sync-across-devices]
 keywords: [voice, speech, spoken alerts, text to speech, robot, robotic, read aloud, out loud, siri, premium voice, enhanced voice, helmet, headset]
 ---
 
@@ -26,7 +26,7 @@ Every voice OnMyLead uses is stored on your phone, so spoken alerts keep working
 
 Voices marked **Premium** sound the most natural, then **Enhanced**, then **Standard**. If you delete the voice you picked, OnMyLead goes back to Automatic.
 
-The setting is for this phone or tablet only.
+Your choice follows your account to every device you sign in on. A phone or tablet that doesn't have that voice uses its best one. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
 
 ## Get a More Natural Voice
 

@@ -3,6 +3,7 @@ import * as Speech from 'expo-speech';
 import { useEffect, useState } from 'react';
 
 import { parseVoiceChoice, resolveVoice, type PhoneVoice } from '@/core/voice';
+import { onSyncedChange, setSyncedItem } from './settings-sync';
 
 /**
  * Spoken alerts in the most natural voice on this device (core/voice.ts picks it). The choice is
@@ -43,6 +44,14 @@ export function installedVoices(refresh = false): Promise<PhoneVoice[]> {
   return voices;
 }
 
+// Picked on another device (lib/settings-sync). A voice this device doesn't have falls back to
+// its best installed voice (core/voice resolveVoice).
+onSyncedChange(KEY, (v) => {
+  choice = parseVoiceChoice(v);
+  loaded = Promise.resolve(choice);
+  listeners.forEach((l) => l(choice));
+});
+
 export function loadVoiceChoice(): Promise<string> {
   loaded ??= AsyncStorage.getItem(KEY)
     .then((v) => {
@@ -58,7 +67,7 @@ export function setVoiceChoice(next: string) {
   choice = parseVoiceChoice(next);
   loaded = Promise.resolve(choice);
   listeners.forEach((l) => l(choice));
-  AsyncStorage.setItem(KEY, choice).catch(() => {});
+  setSyncedItem(KEY, choice).catch(() => {});
 }
 
 export function useVoiceChoice(): string {

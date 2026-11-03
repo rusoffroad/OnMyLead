@@ -17,6 +17,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { myEvents, upcomingEvents } from '@/lib/events';
 import { positionIfAllowed } from '@/lib/location';
 import { requirePro } from '@/lib/pro';
+import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
 
 type Tab = 'upcoming' | 'mine';
@@ -61,7 +62,7 @@ export default function EventsScreen() {
 
   const pickRadius = (mi: number) => {
     setRadius(mi);
-    AsyncStorage.setItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
+    setSyncedItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
   };
 
   const create = () => {

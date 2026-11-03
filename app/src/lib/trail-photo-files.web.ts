@@ -16,3 +16,14 @@ export async function keepPhoto(picked: { uri: string; mimeType?: string | null;
 export function dropPhoto(_uri: string) {
   // Nothing to delete: the data URL goes with the trail.
 }
+
+/** Save a photo from the rider's private trail backup as a data URL, like the website's own photos. */
+export async function restorePhoto(url: string, _trailId: string, _png: boolean): Promise<string> {
+  const blob = await (await fetch(url)).blob();
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result));
+    r.onerror = () => reject(new Error('Could not read that photo.'));
+    r.readAsDataURL(blob);
+  });
+}

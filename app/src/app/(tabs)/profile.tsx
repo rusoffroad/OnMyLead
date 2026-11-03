@@ -44,6 +44,8 @@ import { useMusicControlsSetting } from '@/hooks/use-music-controls';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 import { musicAvailable } from '@/lib/music';
+import { syncSettingsNow, useSyncStatus, useSyncSummary } from '@/lib/settings-sync';
+import { backupTrailsNow } from '@/lib/trail-backup';
 
 /**
  * The You tab: everything that isn't a ride, in one place and in plain groups. Your name up top,
@@ -59,6 +61,8 @@ export default function You() {
   const notifications = useNotificationSettings();
   const mapsPref = useMapsPreference();
   const batteryMode = useBatteryMode();
+  const syncLine = useSyncSummary();
+  const syncAvailable = useSyncStatus().available;
   const { appearance } = useAppearance();
   const voiceChoice = useVoiceChoice();
   const { ent } = useEntitlements();
@@ -159,7 +163,7 @@ export default function You() {
 
       <MenuGroup title="On the Trail">
         {navOn ? (
-          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Map Mode" detail={myTrails.length ? `Your offroad map. ${myTrails.length} ${myTrails.length === 1 ? 'trail' : 'trails'} on this phone` : 'Your offroad map: trails, record, draw'} onPress={() => router.push('/nav')} />
+          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Map Mode" detail={myTrails.length ? `Your offroad map. ${myTrails.length} ${myTrails.length === 1 ? 'trail' : 'trails'}` : 'Your offroad map: trails, record, draw'} onPress={() => router.push('/nav')} />
         ) : null}
         <MenuRow
           icon="map"
@@ -262,6 +266,19 @@ export default function You() {
               />
             ) : null}
           </MenuRow>
+          {syncAvailable ? (
+            <MenuRow
+              icon="sync"
+              color={Colors.sky}
+              title="Sync Across Devices"
+              detail={syncLine}
+              onPress={() => {
+                syncSettingsNow();
+                backupTrailsNow();
+              }}
+              right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Sync Now</ThemedText>}
+            />
+          ) : null}
           <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
           {referralsOn ? (
             <MenuRow icon="addFriend" color={Colors.accent} title="Invite Friends" detail="You both get 50% off Pro Annual when they finish a ride" onPress={() => router.push('/invite-friends')} />

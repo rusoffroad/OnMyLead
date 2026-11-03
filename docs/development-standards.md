@@ -132,6 +132,10 @@ Live rider tracking is the most important feature. On every device:
   One person has one Pro state no matter which store they paid in; a second store purchase while
   one is active must be blocked or flagged, never stacked.
 - Schema-qualify extension calls (`extensions.gen_random_bytes`).
+- Settings a rider would expect on every device follow the account: add the storage key to
+  `SYNCED_SETTINGS` in `app/src/core/synced-settings.ts`, write it with `setSyncedItem` and listen
+  with `onSyncedChange` (`app/src/lib/settings-sync.ts`). Something about one device (calibration,
+  battery, downloaded files, location history) goes in `DEVICE_ONLY` with the reason instead.
 - Edge functions can't be type-checked in the cloud; keep them small and tested where possible.
 
 ## 6. Testing Matrix

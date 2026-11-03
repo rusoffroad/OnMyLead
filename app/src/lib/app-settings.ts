@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import { AppState } from 'react-native';
 
 import { flagOn, NO_SETTINGS, parseAppSettings, type AppFlag, type AppSettings } from '@/core/app-settings';
+import { onSyncedChange, setSyncedItem } from './settings-sync';
 import { isBackendConfigured, supabase } from './supabase';
 
 // The owner's announcement, maintenance notice and feature flags, shared by every screen.
@@ -18,6 +19,17 @@ const listeners = new Set<() => void>();
 function publish() {
   listeners.forEach((l) => l());
 }
+
+// Closed on another device (lib/settings-sync): hide it here too.
+onSyncedChange(DISMISSED_KEY, (v) => {
+  try {
+    const list = v ? (JSON.parse(v) as unknown[]) : [];
+    dismissed = Array.isArray(list) ? list.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    dismissed = [];
+  }
+  publish();
+});
 
 function subscribe(l: () => void) {
   listeners.add(l);
@@ -74,7 +86,7 @@ export function dismissNotice(key: string) {
   if (dismissed.includes(key)) return;
   dismissed = [...dismissed, key].slice(-20);
   publish();
-  AsyncStorage.setItem(DISMISSED_KEY, JSON.stringify(dismissed)).catch(() => {});
+  setSyncedItem(DISMISSED_KEY, JSON.stringify(dismissed)).catch(() => {});
 }
 
 type Snapshot = { settings: AppSettings; dismissed: string[] };

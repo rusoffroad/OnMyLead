@@ -51,6 +51,7 @@ import { requirePro } from '@/lib/pro';
 import { useTiltSettings } from '@/lib/tilt';
 import { TiltTile } from '@/components/tilt-tile';
 import { clearTrackLine, flushTrackLine, recordTrackFixes, setTrackLineOn, useTrackDays } from '@/lib/track-line';
+import { setSyncedItem } from '@/lib/settings-sync';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { ProTag } from '@/components/pro-tag';
@@ -677,7 +678,7 @@ export default function NavMode() {
         onClose={() => setIntro(false)}
         onStart={(skip) => {
           setIntro(false);
-          if (skip) AsyncStorage.setItem(CUSTOM_TRAIL_INTRO_KEY, '1').catch(() => {});
+          if (skip) setSyncedItem(CUSTOM_TRAIL_INTRO_KEY, '1').catch(() => {});
         }}
       />
       <ObstacleSheet

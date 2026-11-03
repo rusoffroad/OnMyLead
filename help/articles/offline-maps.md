@@ -22,7 +22,7 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - app/src/core/pro.ts
   - app/src/lib/pro.ts
-related: [map-layers, free-vs-pro, ride-mode, route-builder, troubleshooting]
+related: [sync-across-devices, map-layers, free-vs-pro, ride-mode, route-builder, troubleshooting]
 keywords: [offline, no signal, no service, download map, save map, dead zone, backcountry, storage, delete map, topo offline, satellite offline, tablet]
 ---
 
@@ -46,6 +46,10 @@ Offline maps are in the app on your phone or tablet only, not on the website.
 - Or, on any map with the layers button, open the layers panel and tap **Offline Maps**.
 
 The screen shows how much space your maps use, how much is free on your phone, your downloads under **On This Phone**, and your upcoming rides under **Your Rides**.
+
+:::release 2.0
+Areas you downloaded on your other devices (signed in with the same account) show under **On Your Other Devices**. Tap **Download** to save the same area here, or **Hide** to stop seeing it. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
+:::
 
 ## Download a Ride's Map
 

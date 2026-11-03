@@ -32,6 +32,9 @@ import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
 import { startReferrals } from '@/lib/referrals';
 import { startRiderAgreement } from '@/lib/rider-agreement';
+import { startSettingsSync } from '@/lib/settings-sync';
+import { startAppearanceSync } from '@/lib/appearance-sync';
+import { backupTrailsNow } from '@/lib/trail-backup';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
 startAppLog();
@@ -91,6 +94,11 @@ function RootLayout() {
   useEffect(() => startRiderAgreement(), []);
   // A friend link opened before signing up counts as an invite once the new account signs in.
   useEffect(() => startReferrals(), []);
+  // Settings and Map Mode trails follow the account to the rider's other devices.
+  useEffect(() => {
+    startAppearanceSync();
+    startSettingsSync(backupTrailsNow);
+  }, []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
   useEffect(() => {
