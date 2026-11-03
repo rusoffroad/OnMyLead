@@ -107,7 +107,7 @@ Your rank and all seven badge patches. Tap **See All** (or the patches) for your
 
 ## Your Toolkit
 
-Shortcuts to the tools that live on the **You** tab: **Who's Riding**, **Friends**, **Garage**, **Trip Planner**, **Offline Maps**, **Starlink**, **Battery Saver** and **Share Location**.
+Shortcuts to the tools that live on the **You** tab: **Who's Riding**, **Friends & Social** (your friends, their activity and your posts; see [Like, Comment and Post in Social](/help/social)), **Garage**, **Trip Planner**, **Offline Maps**, **Starlink**, **Battery Saver** and **Share Location**.
 
 ## Help & Support
 
