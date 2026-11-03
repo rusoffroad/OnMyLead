@@ -12,6 +12,18 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "home-screen",
+      "social",
+      "profile-picture"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "founder-badge",
+    "why": "Checked against the OnMyLead Founder badge: the Feed and share caption now have their own wording for Founder (\"is the OnMyLead Founder\", \"founded OnMyLead\") and the Admin user page gives both special badges. Described in Earn Badges and Ranks; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "badges-and-ranks"
     ],
     "kind": "update",
