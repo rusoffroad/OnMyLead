@@ -5,12 +5,13 @@
       "sync-across-devices",
       "navigation-mode",
       "offline-maps",
-      "privacy"
+      "privacy",
+      "voice"
     ],
     "kind": "new",
     "by": "pr",
     "ref": "sync-across-devices",
-    "why": "New in 2.0 (added to the 2.0 rebuild, Chris 2026-11-03): settings and Map Mode trails follow the rider's account to every device (Chris: \"sync everything with cloud somehow so its cross device with the same account signed in\"). New article on what syncs and what stays on each device; Map Mode, Offline Maps and Privacy get 2.0 blocks for the private trail backup and areas from other devices."
+    "why": "New in 2.0 (added to the 2.0 rebuild, Chris 2026-11-03): settings and Map Mode trails follow the rider's account to every device (Chris: \"sync everything with cloud somehow so its cross device with the same account signed in\"). New article on what syncs and what stays on each device; Map Mode, Offline Maps and Privacy get 2.0 blocks for the private trail backup and areas from other devices. Voice: the chosen voice now follows the account (was this device only)."
   },
   {
     "date": "2026-11-03",
