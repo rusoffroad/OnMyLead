@@ -52,7 +52,8 @@ At the top of the map are three tabs: **Explore**, **Record** and **Measure**. S
 
 ## Open Map Mode
 
-- On Home, tap **Open Map** (or the little map) on the **Map Mode** card.
+- From any tab, tap the blue **Map Mode** button in the middle of the bar at the bottom of the screen. On a tablet, and on onmylead.com on a computer, it's in the menu down the left edge, under **Find**.
+- On Home, tap **Open Map Mode** (or the little map) on the **Map Mode** card.
 - To map a trail that isn't marked anywhere, tap **Map a Custom Trail** on the same card. Map Mode opens on the **Draw** tab.
 - Or on the **You** tab, tap **Map Mode** under **On the Trail**.
 

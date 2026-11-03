@@ -2,6 +2,62 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "status-buttons",
+      "home-screen",
+      "ride-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Chris asked for a Beverage Break quick reply in Ride Mode (under More, with the other quick replies), and for the Map Mode card to look like the Join, Create and Find buttons in a colour that pops: it's now a blue card right under Create and Find. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "group-chat",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "privacy",
+      "ride-chat",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Checked against the Map Mode card move and the Beverage Break quick reply: only the Map Mode card's colour and place on Home changed, and quick replies gained Beverage Break (a short message like the others). Joining, creating and finding rides, chat, notifications, privacy and the rest work the same; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "navigation-mode",
+      "getting-started",
+      "home-screen",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Chris asked to make Map Mode more visible. A blue Map Mode button now sits in the middle of the tab bar (under Find on tablets and the website menu), so the offroad map is one tap from any tab, and the Home card's button reads Open Map Mode. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Checked against the Map Mode button change: the showcase only gained a few words in Map Mode's text. Creating a ride on the website works the same; no change to this article."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "approvals-and-waitlist",
       "check-in",
       "create-a-ride",
