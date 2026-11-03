@@ -39,6 +39,8 @@ export function RouteStrip({
   compact?: boolean;
   /** Whether this rider's machine (from the garage) can do the whole route. */
   range?: { check: RangeCheck; text: string } | null;
+  /** No longer used: the line is the group, leader to tail gunner, not the route. Kept so callers needn't change. */
+  lengthM?: number;
   riders: PlacedRider[];
   meId: string | undefined;
   summary: MyRouteSummary | null;
