@@ -6,6 +6,7 @@ order: 30
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - supabase/migrations/20261102950000_events.sql
   - supabase/migrations/20261102800000_abuse_reports.sql
   - app/src/app/privacy.tsx
   - app/src/app/r/[code].tsx
@@ -113,3 +114,9 @@ When you agree to the Rider Safety and Liability Agreement, a record of it is sa
 :::
 
 You can delete your account and its data at any time. See [Delete Your Account](/help/delete-account).
+
+:::release 2.0
+## Events
+
+An event's place is picked by its host and is shown to everyone who sees the event, so hosts are asked to pick a public spot. It's stored to about 100 m. Events never show any rider's location. Anyone with an event's link can see it, but the names of its hosts, Ride Managers and riders going only show to signed-in riders.
+:::

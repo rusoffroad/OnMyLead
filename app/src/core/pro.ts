@@ -79,6 +79,10 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
     title: 'Post, Comment and Share',
     body: 'Post to your profile, comment on friends’ rides and share your activity to Facebook, Instagram and X. Seeing the Feed, reading comments and liking stay free.',
   },
+  create_events: {
+    title: 'Create Events',
+    body: 'Post rallies, poker runs and ride weekends with photos, an agenda and their group rides. Seeing events, saying you’re going and co-hosting stay free.',
+  },
 };
 
 /** The comparison on the Pro screen. true = included, false = not, a string = the amount. */
@@ -101,6 +105,7 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Advanced Trip Planning', free: false, pro: true },
   { label: 'Advanced Ride Statistics', free: false, pro: true },
   { label: 'Premium Ride Cards', free: false, pro: true },
+  { label: 'Create Events', free: false, pro: true },
 ];
 
 export const PRICES = { monthly: 4.99, annual: 29.99 } as const;
@@ -149,6 +154,7 @@ export function localToday(now: Date = new Date()): string {
 export const REPORT_REASONS = {
   ride: ['Unsafe Plan', 'Spam or Scam', 'Offensive Content', 'Something Else'],
   rider: ['Harassment', 'Threats', 'Unsafe Riding', 'Spam or Scam', 'Fake Account', 'Inappropriate Photo', 'Something Else'],
+  event: ['Spam or Scam', 'Fake Event', 'Offensive Content', 'Inappropriate Photo', 'Unsafe Plan', 'Something Else'],
 } as const;
 
 /** Apple's standard licence agreement serves as the Terms of Use for subscriptions. */

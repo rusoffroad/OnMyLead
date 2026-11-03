@@ -4,7 +4,7 @@ summary: Show your ride's QR code so riders can scan it at the trailhead, share 
 category: joining
 order: 40
 release: "1.0"
-updated: 2026-11-01
+updated: 2026-11-03
 sources:
   - app/src/components/ride-qr-sheet.tsx
   - app/src/components/ride-qr.tsx
