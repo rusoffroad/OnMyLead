@@ -1,18 +1,23 @@
 import { router } from 'expo-router';
 import Head from '@/components/page-head';
+import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { GuideLink } from '@/components/help-center-card';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 
-export type LegalSection = { title: string; body: string[] };
+/** `guide`: a Help Center article slug, linked under the section as "Read the Guide". */
+export type LegalSection = { title: string; body: string[]; guide?: string };
 
 /**
  * A plain reading page for the Terms of Use, the Privacy Policy and Help.
  */
-export function LegalPage({ title, updated, intro, sections, action }: {
+export function LegalPage({ title, updated, intro, sections, action, lead }: {
   title: string; updated: string; intro: string; sections: LegalSection[];
+  /** Shown first, above the intro (e.g. the Help Center link on the Support page). */
+  lead?: ReactNode;
   /** A button under the intro, e.g. Contact Us on the Support page. */
   action?: { title: string; href: '/contact' };
 }) {
@@ -24,6 +29,7 @@ export function LegalPage({ title, updated, intro, sections, action }: {
       <View style={styles.wrap}>
         <ThemedText type="subtitle" accessibilityRole="header">{title}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">Last updated {updated}</ThemedText>
+        {lead ? <View style={styles.lead}>{lead}</View> : null}
         <ThemedText style={styles.p}>{intro}</ThemedText>
         {action ? <Button title={action.title} onPress={() => router.push(action.href)} style={{ alignSelf: 'flex-start', paddingHorizontal: Spacing.four }} /> : null}
         {sections.map((s) => (
@@ -32,6 +38,7 @@ export function LegalPage({ title, updated, intro, sections, action }: {
             {s.body.map((p, i) => (
               <ThemedText key={i} style={styles.p} themeColor="textSecondary">{p}</ThemedText>
             ))}
+            {s.guide ? <GuideLink slug={s.guide} /> : null}
           </View>
         ))}
         <Button
@@ -49,4 +56,5 @@ const styles = StyleSheet.create({
   wrap: { width: '100%', maxWidth: 760, alignSelf: 'center', gap: Spacing.two },
   section: { gap: Spacing.two, marginTop: Spacing.three },
   p: { lineHeight: 24 },
+  lead: { marginVertical: Spacing.two },
 });

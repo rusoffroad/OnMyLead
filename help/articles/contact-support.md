@@ -80,6 +80,21 @@ On Android, the hint says purchases are billed by Google Play, with refunds thro
 
 ## Help and Support Page
 
+:::until 2.0
 Under **Help** on the **You** tab, **Help and Support** has short answers to common questions about joining rides, location and battery, Pro, blocking and deleting your account.
+:::
+
+:::release 2.0
+Under **Help** on the **You** tab, **Help and Support** has short answers to common questions about joining rides, location and battery, Pro, blocking and deleting your account. Under each answer, **Read the Guide** opens the full guide for that topic.
+
+## Open These Guides From the App
+
+The step-by-step guides you're reading now (onmylead.com/help) are one tap away in the app:
+
+- On the **You** tab, under **Help**, tap **Help Center: How-To Guides**.
+- Or tap **Help & Support** on the **Home** tab, or **Help and Support** on the **You** tab, then tap **Help Center: How-To Guides** at the top.
+
+The guides open inside OnMyLead. Tap **Done** (iPhone and iPad) or the close button at the top (Android phones and tablets) to go back to the app. On onmylead.com, the link opens the Help Center in the same tab.
+:::
 
 In the Android app, those answers give the Android steps where they differ, such as allowing location **While Using the App**.

@@ -71,6 +71,10 @@ const PATHS = {
   heart: ['M12 20s-7.6-4.6-9.1-9.4C1.9 7.4 4.1 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.8 1.1-1.7 2.7-2.8 4.7-2.8 3.2 0 5.4 2.9 4.4 6.1C19.6 15.4 12 20 12 20z'],
   share: ['M12 3.5v11', 'M8 7.2l4-3.7 4 3.7', 'M7 10.5H5v10h14v-10h-2'],
   image: ['M3.5 5h17v14h-17z', 'M3.5 16.5l5-5 4 4 2.5-2.5 5.5 5.5'],
+  // An open book: the Help Center's how-to guides.
+  book: ['M12 6.8C10 5.2 7 4.6 3.5 5.1v13c3.5-.5 6.5.1 8.5 1.7', 'M12 6.8c2-1.6 5-2.2 8.5-1.7v13c-3.5-.5-6.5.1-8.5 1.7', 'M12 6.8v13'],
+  // Opens a page outside the app (the website).
+  external: ['M14 4.5h5.5V10', 'M19.5 4.5L11.5 12.5', 'M17.5 13.5v6h-13v-13h6'],
 } as const;
 
 export type IconName = keyof typeof PATHS;

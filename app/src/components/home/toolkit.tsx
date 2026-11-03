@@ -35,10 +35,10 @@ export function Toolkit({ tools, columns }: { tools: typeof TOOLKIT; columns: nu
   );
 }
 
-/** Help & Support: guides, contact, and reporting a problem, one tap from home. */
+/** Help & Support: the Help Center's how-to guides, contact, and reporting a problem, one tap from home. */
 export function HelpRow() {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel="Help and Support. Guides, contact us, report a problem" onPress={() => router.push('/support')}>
+    <Pressable accessibilityRole="button" accessibilityLabel="Help and Support. How-to guides, contact us, report a problem" onPress={() => router.push('/support')}>
       {({ pressed }) => (
         <HomeCard style={[styles.help, pressed && { backgroundColor: Home.panel2 }]}>
           <View style={styles.helpIcon}>
@@ -46,7 +46,7 @@ export function HelpRow() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={homeStyles.cardTitle}>Help & Support</Text>
-            <Text style={homeStyles.muted}>Guides, contact us, report a problem</Text>
+            <Text style={homeStyles.muted}>How-to guides, contact us, report a problem</Text>
           </View>
           <Icon name="chevron" color={Home.muted} />
         </HomeCard>
