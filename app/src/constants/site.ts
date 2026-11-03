@@ -30,9 +30,10 @@ export const RUS_URL = 'https://rusoffroad.com';
 export const SUPPORT_EMAIL = 'support@rusoffroad.com';
 
 /**
- * Mapbox's public token for the 3D Terrain map (Ride Mode and Map Mode, apps and website). A pk.
- * token is meant to ship inside apps and web pages; it can only show maps on our account, never
- * change it. Empty: 3D Terrain isn't offered and every map stays as it was.
+ * Mapbox's public token for the 3D Terrain map (Ride Mode and Map Mode, apps and website). Kept
+ * out of this public repo: builds read EXPO_PUBLIC_MAPBOX_TOKEN (app/.env on the Mac, the
+ * MAPBOX_PUBLIC_TOKEN Actions variable for the website). Empty: 3D Terrain isn't offered and every
+ * map stays as it was.
  */
 export const MAPBOX_PUBLIC_TOKEN = '';
 

@@ -103,7 +103,8 @@ export function TerrainMap({
         attributionControl: true,
       });
       made = m;
-      m.addControl(new gl.NavigationControl({ visualizePitch: true }), 'top-right');
+      // Bottom left: the top right holds the app's own layers button.
+      m.addControl(new gl.NavigationControl({ visualizePitch: true }), 'bottom-left');
       m.on('style.load', () => {
         addLayers(m);
         setStyled(true);
@@ -220,7 +221,9 @@ export function TerrainMap({
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      <div ref={el} style={{ position: 'absolute', inset: 0, zIndex: 0, background: Colors.background }} />
+      {/* Mapbox's zoom, compass and tilt buttons sit above Full Map's bar in the bottom-left corner. */}
+      <style>{'.oml-terrain .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-group{margin-bottom:96px}'}</style>
+      <div ref={el} className="oml-terrain" style={{ position: 'absolute', inset: 0, zIndex: 0, background: Colors.background }} />
       <MapCtx.Provider value={map}>{children}</MapCtx.Provider>
     </View>
   );

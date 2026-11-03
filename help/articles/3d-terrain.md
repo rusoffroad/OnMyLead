@@ -37,7 +37,7 @@ To go back, tap **Satellite** or **Topo**.
 - **Turn**: twist with two fingers. The compass in the corner shows north; tap it to face north again.
 - **Zoom and pan**: pinch and drag, as on any map.
 
-On the website, right-drag or hold Ctrl and drag to tilt and turn, or use the buttons in the top-right corner.
+On the website, right-drag or hold Ctrl and drag to tilt and turn, or use the zoom, compass and tilt buttons in the bottom-left corner.
 
 ## What's on the Map
 

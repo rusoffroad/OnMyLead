@@ -2,9 +2,8 @@ import { MAPBOX_PUBLIC_TOKEN } from '@/constants/site';
 import { useFlag } from './app-settings';
 
 /**
- * The Mapbox public token (pk.) the 3D Terrain map uses. It is a public, client-side key by
- * Mapbox's design (every app and web page that shows a Mapbox map carries it), so it can live in
- * the code: constants/site.ts, or EXPO_PUBLIC_MAPBOX_TOKEN for a build that overrides it.
+ * The Mapbox public token (pk.) the 3D Terrain map uses, from the build's EXPO_PUBLIC_MAPBOX_TOKEN
+ * (app/.env for phone builds, the MAPBOX_PUBLIC_TOKEN Actions variable for the website).
  */
 export const MAPBOX_TOKEN: string = (process.env.EXPO_PUBLIC_MAPBOX_TOKEN || MAPBOX_PUBLIC_TOKEN || '').trim();
 
