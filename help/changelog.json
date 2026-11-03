@@ -50,7 +50,8 @@
       "status-buttons",
       "trip-planner",
       "troubleshooting",
-      "use-onmylead-on-a-tablet"
+      "use-onmylead-on-a-tablet",
+      "create-a-ride-on-the-website"
     ],
     "kind": "update",
     "by": "pr",
