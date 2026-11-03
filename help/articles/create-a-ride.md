@@ -152,3 +152,7 @@ A ride counts toward the month you create it, even if you later cancel or delete
 :::
 
 Pro bought on Android through Google Play lifts the monthly limit the same way, on every device you sign in to.
+
+:::release 2.0
+On Home, the **Create a Ride** card shows where you stand: **1 Left This Month** or **None Left This Month** on Free, and **Unlimited** on Pro or the trial. On Free, tap the label to see what Pro adds.
+:::

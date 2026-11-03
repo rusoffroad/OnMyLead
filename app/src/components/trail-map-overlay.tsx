@@ -40,9 +40,9 @@ export function TrailMapOverlay({
   lookupHint?: string;
   /** On a tablet the trail card sits on the right at this width, clear of the panels on the left. */
   cardWidth?: number;
-  /** Navigation Mode follows a tapped rider trail itself; elsewhere Navigate opens Navigation Mode on it. */
+  /** Map Mode follows a tapped rider trail itself; elsewhere Navigate opens Map Mode on it. */
   onFollow?: (t: PublicTrail) => void;
-  /** Meters of a rider trail covered in Navigation Mode (for the rating sheet). */
+  /** Meters of a rider trail covered in Map Mode (for the rating sheet). */
   ridden?: (t: PublicTrail) => number | null;
   /** Full Map: no layers button or zoom hint, just the No Signal tag and a tapped trail's card. */
   bare?: boolean;

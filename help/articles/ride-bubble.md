@@ -4,7 +4,7 @@ summary: Ride Bubble watches for riders who drop back, run ahead or stop moving,
 category: ride-mode
 order: 30
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/core/bubble.ts
   - app/src/core/precise-location.ts

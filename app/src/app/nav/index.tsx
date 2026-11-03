@@ -1,13 +1,16 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
+import { CUSTOM_TRAIL_INTRO_KEY, CustomTrailIntro } from '@/components/custom-trail-intro';
 import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
+import { ObstacleSheet } from '@/components/obstacle-sheet';
 import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
@@ -23,8 +26,10 @@ import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
 import {
   acceptFix, canRate, clock, coveredM, EMPTY_DETAILS, feet, feetOrMiles, followProgress, newTrailId, RIDER_TRAIL_INK, toLatLngs, toTrackPoint,
-  trackStats, unseenHidden, type LocalTrail, type PublicTrail,
+  DEFAULT_TRAIL_RULES, trackStats, unseenHidden, type LocalTrail, type PublicTrail, type TrailRules,
 } from '@/core/nav-trails';
+import { newObstacleId, nextName, type Obstacle, type ObstacleKind } from '@/core/obstacles';
+import { dayLines, TRACK_DAY_COLORS, TRACK_LINE_SWITCH_KEY } from '@/core/track-line';
 import type { Place } from '@/core/places';
 import { cumulativeM, lineLengthM } from '@/core/route';
 import { useFullMap } from '@/hooks/use-full-map';
@@ -35,16 +40,19 @@ import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { confirmAsync } from '@/lib/confirm';
 import {
-  getLocalTrail, getPublicTrail, loadTrails, markHiddenSeen, readRecording, saveLocalTrail, syncMyTrails, trailLine, useLocalTrails, writeRecording,
+  fetchTrailRules, getLocalTrail, getPublicTrail, loadTrails, markHiddenSeen, readRecording, saveLocalTrail, syncMyTrails, trailLine, useLocalTrails, writeRecording,
   type Recording,
 } from '@/lib/nav-trails';
 import { requirePro } from '@/lib/pro';
+import { clearTrackLine, flushTrackLine, recordTrackFixes, setTrackLineOn, useTrackDays } from '@/lib/track-line';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { ProTag } from '@/components/pro-tag';
 
 type Mode = 'explore' | 'record' | 'measure';
-type Followed = { name: string; points: LatLng[]; publicTrail: PublicTrail | null };
+type Followed = { name: string; points: LatLng[]; publicTrail: PublicTrail | null; obstacles?: Obstacle[] };
+/** A spot being named: where it goes (the drawn line or the recording) and, when editing, which one. */
+type Pending = { lat: number; lng: number; where: 'draw' | 'rec'; id?: string; name: string; kind: ObstacleKind };
 
 const WEB = Platform.OS === 'web';
 const PANEL_W = 400;
@@ -52,17 +60,19 @@ const SAND = '#ECCD91';
 const MPS_TO_MPH = 2.23694;
 
 /**
- * Navigation Mode: OnMyLead as a rider's everyday off-road map when they aren't on a group ride.
+ * Map Mode: OnMyLead as a rider's everyday off-road map when they aren't on a group ride.
  * The same map as Ride Mode (satellite or topo, Forest Service, BLM, OpenStreetMap and rider trails)
- * with three tools in the panel:
+ * with three tools in the panel, plus Track Line (where you've been, a colour per day):
  *  - Explore: where you are, speed and elevation, and a trail to follow (yours or a rider's) with
  *    the distance to its start or what's left of it;
  *  - Record: lays down your own trail as you ride, kept on this phone until you choose to share it;
- *  - Measure: the distance finder, tap points (along the trails or straight) for the miles between.
+ *  - Draw: map a custom trail or measure, tap points (along the trails or straight) for the miles
+ *    between, name spots on it, and save it as a trail. Opened with ?draw=1 (home screen's Map a
+ *    Custom Trail), it first explains how custom trails are shared, rated and taken down.
  * The screen stays on while recording or following. Trails saved here work as group ride routes.
  */
 export default function NavMode() {
-  const params = useLocalSearchParams<{ follow?: string; trail?: string }>();
+  const params = useLocalSearchParams<{ follow?: string; trail?: string; draw?: string }>();
   const insets = useSafeAreaInsets();
   const layout = useLayout();
   const wide = layout.expanded;
@@ -113,6 +123,7 @@ export default function NavMode() {
       return () => {
         gone = true;
         sub?.remove();
+        flushTrackLine();
       };
     }, []),
   );
@@ -164,12 +175,12 @@ export default function NavMode() {
   useEffect(() => {
     if (params.follow) {
       getPublicTrail(params.follow)
-        .then((t) => t && follow({ name: t.name, points: t.points, publicTrail: t }))
+        .then((t) => t && follow({ name: t.name, points: t.points, publicTrail: t, obstacles: t.obstacles }))
         .catch(() => {});
     } else if (params.trail) {
       loadTrails().then(() => {
         const t = getLocalTrail(params.trail!);
-        if (t) follow({ name: t.details.name || 'Your Trail', points: trailLine(t), publicTrail: null });
+        if (t) follow({ name: t.details.name || 'Your Trail', points: trailLine(t), publicTrail: null, obstacles: t.obstacles });
       });
     }
   }, [params.follow, params.trail, follow]);
@@ -177,6 +188,7 @@ export default function NavMode() {
   // Every fix: add it to the recording, and note how much of a followed trail has been ridden.
   useEffect(() => {
     fixListener.current = (l) => {
+      void recordTrackFixes([{ lat: l.coords.latitude, lng: l.coords.longitude, accuracy: l.coords.accuracy ?? null, timestamp: l.timestamp }]);
       const r = recRef.current;
       if (r && !r.paused) {
         const fix = { lat: l.coords.latitude, lng: l.coords.longitude, altitude: l.coords.altitude ?? null, accuracy: l.coords.accuracy ?? null, timestamp: l.timestamp };
@@ -245,6 +257,7 @@ export default function NavMode() {
       details: { ...EMPTY_DETAILS, name: `Trail ${new Date(rec.startedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` },
       points: rec.points,
       source: 'recorded',
+      obstacles: rec.obstacles ?? [],
       photos: [],
       createdAt: nowIso,
       updatedAt: nowIso,
@@ -272,14 +285,89 @@ export default function NavMode() {
   const measureLen = useMemo(() => lineLengthM(draft.points), [draft.points]);
   const lastTap = draft.taps[draft.taps.length - 1];
 
+  // --- Map a Custom Trail: the how-it-works sheet, then Draw ------------------------
+  const [intro, setIntro] = useState(false);
+  const [rules, setRules] = useState<TrailRules>(DEFAULT_TRAIL_RULES);
+  const introDone = useRef<boolean | null>(null);
+  const showIntroIfNew = useCallback(() => {
+    AsyncStorage.getItem(CUSTOM_TRAIL_INTRO_KEY)
+      .catch(() => null)
+      .then((v) => {
+        if (v === '1' || introDone.current) return;
+        introDone.current = true;
+        fetchTrailRules().then(setRules).catch(() => {});
+        setIntro(true);
+      });
+  }, []);
+  useEffect(() => {
+    if (params.draw !== '1') return;
+    // From the home screen's Map a Custom Trail: open on Draw.
+    Promise.resolve().then(() => setMode('measure'));
+    showIntroIfNew();
+  }, [params.draw, showIntroIfNew]);
+  const changeMode = (m: Mode) => {
+    setMode(m);
+    if (m === 'measure') showIntroIfNew();
+  };
+
+  // --- Named spots (obstacles) on a drawn line or a recording ------------------------
+  const [drawObs, setDrawObs] = useState<Obstacle[]>([]);
+  const [marking, setMarking] = useState(false);
+  const [pending, setPending] = useState<Pending | null>(null);
+  const markAt = (p: LatLng, where: 'draw' | 'rec') => {
+    const list = where === 'draw' ? drawObs : rec?.obstacles ?? [];
+    setPending({ ...p, where, name: nextName(list), kind: 'obstacle' });
+  };
+  const editSpot = (o: Obstacle) => {
+    const where = drawObs.some((x) => x.id === o.id) ? 'draw' : rec?.obstacles?.some((x) => x.id === o.id) ? 'rec' : null;
+    if (where) setPending({ lat: o.lat, lng: o.lng, where, id: o.id, name: o.name, kind: o.kind });
+  };
+  const putSpots = (where: 'draw' | 'rec', change: (list: Obstacle[]) => Obstacle[]) => {
+    if (where === 'draw') setDrawObs(change);
+    else if (recRef.current) {
+      const r = { ...recRef.current, obstacles: change(recRef.current.obstacles ?? []) };
+      setRecording(r);
+      writeRecording(r);
+    }
+  };
+  const saveSpot = (name: string, kind: ObstacleKind) => {
+    if (!pending) return;
+    const p = pending;
+    putSpots(p.where, (list) => (p.id
+      ? list.map((o) => (o.id === p.id ? { ...o, name, kind } : o))
+      : [...list, { id: newObstacleId(), lat: p.lat, lng: p.lng, name, kind }]));
+    Haptics.selectionAsync();
+    setPending(null);
+  };
+  const removeSpot = () => {
+    if (!pending?.id) return;
+    const id = pending.id;
+    putSpots(pending.where, (list) => list.filter((o) => o.id !== id));
+    setPending(null);
+  };
+
+  // --- Track Line ---------------------------------------------------------------------
+  const [trackOn, , setTrackSwitch] = useRememberedToggle(TRACK_LINE_SWITCH_KEY, false);
+  const trackDays = useTrackDays();
+  const trackLines = useMemo(() => (trackOn ? dayLines(trackDays, now) : []), [trackOn, trackDays, now]);
+  const switchTrack = (on: boolean) => {
+    setTrackSwitch(on);
+    setTrackLineOn(on);
+    Haptics.selectionAsync();
+  };
+  async function clearTrack() {
+    if (await confirmAsync('Clear Track Line?', 'Every day of your Track Line is deleted from this phone.', 'Clear', 'Keep It')) clearTrackLine();
+  }
+
   async function saveMeasure() {
     if (draft.points.length < 2) return;
     const nowIso = new Date().toISOString();
     const t: LocalTrail = {
       id: newTrailId(),
-      details: { ...EMPTY_DETAILS, name: 'Planned Trail' },
+      details: { ...EMPTY_DETAILS, name: 'Custom Trail' },
       points: draft.points.map((p, i) => [p.lat, p.lng, null, i]),
       source: 'drawn',
+      obstacles: drawObs,
       photos: [],
       createdAt: nowIso,
       updatedAt: nowIso,
@@ -287,6 +375,7 @@ export default function NavMode() {
     };
     await saveLocalTrail(t);
     draft.clear();
+    setDrawObs([]);
     router.push(`/nav/trail/${t.id}?fresh=1`);
   }
 
@@ -341,8 +430,14 @@ export default function NavMode() {
         measuring={mode === 'measure'}
         onMeasure={(p, snap) => {
           Haptics.selectionAsync();
-          draft.add(p, snap);
+          if (marking) {
+            setMarking(false);
+            markAt(p, 'draw');
+          } else draft.add(p, snap);
         }}
+        trackLines={trackLines}
+        obstacles={mode === 'measure' ? drawObs : rec ? rec.obstacles ?? [] : followed?.obstacles ?? []}
+        onObstacle={editSpot}
         center={me}
         found={found}
         onCenter={(c) => (looking.current = c)}
@@ -359,7 +454,7 @@ export default function NavMode() {
         bottom={wide ? 12 : open ? 330 : 170}
         cardWidth={wide || floating ? 380 : undefined}
         lookupHint="Tap a line to see what it is."
-        onFollow={(t) => follow({ name: t.name, points: t.points, publicTrail: t })}
+        onFollow={(t) => follow({ name: t.name, points: t.points, publicTrail: t, obstacles: t.obstacles })}
         ridden={(t) => (followed?.publicTrail?.id === t.id ? followCovered : null)}
       />
 
@@ -391,7 +486,7 @@ export default function NavMode() {
         ) : (
           <View style={styles.topRow}>
             <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={styles.flex}>
-              <Text style={styles.topText} numberOfLines={1}>‹ Navigate</Text>
+              <Text style={styles.topText} numberOfLines={1}>‹ Map Mode</Text>
             </Pressable>
             <Pressable onPress={() => router.push('/nav/trails')} accessibilityRole="button" hitSlop={8} style={({ pressed }) => [styles.chip, pressed && { opacity: 0.8 }]}>
               <Text style={styles.chipText}>My Trails{local.length ? ` ${local.length}` : ''}</Text>
@@ -452,7 +547,7 @@ export default function NavMode() {
         style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
         <SafeAreaView edges={wide || floating ? [] : ['bottom']} style={[styles.panelInner, !open && { gap: 6 }]}>
           <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Navigation Tools" fromTop={wide} onFullMap={fullMap.enter} />
-          <ModeTabs mode={mode} onChange={setMode} recording={!!rec} />
+          <ModeTabs mode={mode} onChange={changeMode} recording={!!rec} />
 
           {mode === 'explore' ? (
             <ExplorePanel
@@ -466,6 +561,10 @@ export default function NavMode() {
               onRate={() => followed?.publicTrail && trail.pick(followed.publicTrail)}
               onStop={() => setFollowed(null)}
               onMyTrails={() => router.push('/nav/trails')}
+              trackOn={trackOn}
+              onTrack={switchTrack}
+              onClearTrack={clearTrack}
+              hasTrack={Object.keys(trackDays).length > 0}
             />
           ) : mode === 'record' ? (
             <RecordPanel
@@ -478,6 +577,8 @@ export default function NavMode() {
               onPause={pauseRecording}
               onFinish={finishRecording}
               onDiscard={discard}
+              spots={rec?.obstacles?.length ?? 0}
+              onMark={me ? () => markAt(me, 'rec') : null}
             />
           ) : (
             <MeasurePanel
@@ -489,13 +590,37 @@ export default function NavMode() {
               follows={follows}
               onFollows={setFollows}
               onUndo={draft.undo}
-              onClear={draft.clear}
+              onClear={() => {
+                draft.clear();
+                setDrawObs([]);
+              }}
               onSave={saveMeasure}
+              spots={drawObs.length}
+              marking={marking}
+              onMark={() => setMarking(!marking)}
             />
           )}
         </SafeAreaView>
       </Animated.View>
       )}
+
+      <CustomTrailIntro
+        visible={intro}
+        rules={rules}
+        onClose={() => setIntro(false)}
+        onStart={(skip) => {
+          setIntro(false);
+          if (skip) AsyncStorage.setItem(CUSTOM_TRAIL_INTRO_KEY, '1').catch(() => {});
+        }}
+      />
+      <ObstacleSheet
+        visible={!!pending}
+        initial={{ name: pending?.name ?? '', kind: pending?.kind ?? 'obstacle' }}
+        editing={!!pending?.id}
+        onSave={saveSpot}
+        onRemove={removeSpot}
+        onClose={() => setPending(null)}
+      />
     </View>
   );
 }
@@ -504,7 +629,7 @@ function ModeTabs({ mode, onChange, recording }: { mode: Mode; onChange: (m: Mod
   const tabs: { value: Mode; label: string }[] = [
     { value: 'explore', label: 'Explore' },
     { value: 'record', label: 'Record' },
-    { value: 'measure', label: 'Measure' },
+    { value: 'measure', label: 'Draw' },
   ];
   return (
     <View style={styles.tabs} accessibilityRole="tablist">
@@ -543,7 +668,7 @@ function Gauge({ value, unit, label, big }: { value: string; unit?: string; labe
 }
 
 function ExplorePanel({
-  open, followed, progress, speed, altitude, noLocation, rateable, onRate, onStop, onMyTrails,
+  open, followed, progress, speed, altitude, noLocation, rateable, onRate, onStop, onMyTrails, trackOn, onTrack, onClearTrack, hasTrack,
 }: {
   open: boolean;
   followed: Followed | null;
@@ -555,6 +680,10 @@ function ExplorePanel({
   onRate: () => void;
   onStop: () => void;
   onMyTrails: () => void;
+  trackOn: boolean;
+  onTrack: (on: boolean) => void;
+  onClearTrack: () => void;
+  hasTrack: boolean;
 }) {
   const mph = speed != null ? String(Math.round(speed * MPS_TO_MPH)) : '–';
   const elev = altitude != null ? feet(altitude)!.replace(' ft', '') : '–';
@@ -603,12 +732,40 @@ function ExplorePanel({
           </View>
         ) : null
       ) : null}
+      {open ? (
+        <View style={styles.track}>
+          <Icon name="trackLine" size={22} color={trackOn ? TRACK_DAY_COLORS[0] : Colors.textSecondary} />
+          <View style={{ flex: 1, gap: 3 }}>
+            <Text style={styles.wideBtnText}>Track Line</Text>
+            <View style={styles.days}>
+              {(['Today', 'Yesterday', 'Older'] as const).map((label, i) => (
+                <View key={label} style={styles.day}>
+                  <View style={[styles.dayLine, { backgroundColor: TRACK_DAY_COLORS[i] }]} />
+                  <Text style={styles.dayText}>{label}</Text>
+                </View>
+              ))}
+              {hasTrack ? (
+                <Pressable accessibilityRole="button" accessibilityLabel="Clear Track Line" hitSlop={8} onPress={onClearTrack}>
+                  <Text style={[styles.dayText, { color: Colors.sky }]}>Clear</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          </View>
+          <Switch
+            value={trackOn}
+            onValueChange={onTrack}
+            accessibilityLabel="Track Line. Draws where you've been, a new colour each day. Kept on this phone only"
+            trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+            thumbColor="#fff"
+          />
+        </View>
+      ) : null}
     </>
   );
 }
 
 function RecordPanel({
-  open, rec, stats, elapsed, noLocation, onStart, onPause, onFinish, onDiscard,
+  open, rec, stats, elapsed, noLocation, onStart, onPause, onFinish, onDiscard, spots, onMark,
 }: {
   open: boolean;
   rec: Recording | null;
@@ -619,6 +776,9 @@ function RecordPanel({
   onPause: (paused: boolean) => void;
   onFinish: () => void;
   onDiscard: () => void;
+  spots: number;
+  /** Name the spot where the rider is now; null without a fix. */
+  onMark: (() => void) | null;
 }) {
   if (!rec) {
     return (
@@ -642,7 +802,7 @@ function RecordPanel({
               ? 'Recording works in the OnMyLead app on your phone or tablet. Here you can measure, plan and look at trails.'
               : noLocation
                 ? 'Turn on location for OnMyLead in Settings to record.'
-                : 'Ride and OnMyLead draws your line. It stays on this phone unless you share it. Keep Navigate open: the screen stays on while recording.'}
+                : 'Ride and OnMyLead draws your line. It stays on this phone unless you share it. Keep Map Mode open: the screen stays on while recording.'}
           </Text>
         ) : null}
       </>
@@ -669,6 +829,15 @@ function RecordPanel({
           <Text style={[styles.ctlText, { color: Colors.background }]}>Finish and Save</Text>
         </Pressable>
       </View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Mark a spot here, like a ledge or water crossing"
+        disabled={!onMark}
+        onPress={() => onMark?.()}
+        style={({ pressed }) => [styles.wideBtn, !onMark && { opacity: 0.45 }, pressed && { opacity: 0.85 }]}>
+        <Text style={styles.wideBtnText}>Mark a Spot Here</Text>
+        <Text style={styles.dayText}>{spots ? `${spots} marked` : 'Ledges, crossings, views'}</Text>
+      </Pressable>
       {open ? (
         <Pressable accessibilityRole="button" onPress={onDiscard} hitSlop={6} style={{ alignSelf: 'center', padding: 4 }}>
           <Text style={styles.discard}>Discard Recording</Text>
@@ -679,7 +848,7 @@ function RecordPanel({
 }
 
 function MeasurePanel({
-  open, lengthM, taps, fromMeM, finding, follows, onFollows, onUndo, onClear, onSave,
+  open, lengthM, taps, fromMeM, finding, follows, onFollows, onUndo, onClear, onSave, spots, marking, onMark,
 }: {
   open: boolean;
   lengthM: number;
@@ -691,6 +860,9 @@ function MeasurePanel({
   onUndo: () => void;
   onClear: () => void;
   onSave: () => void;
+  spots: number;
+  marking: boolean;
+  onMark: () => void;
 }) {
   const len = feetOrMiles(lengthM).split(' ');
   return (
@@ -711,11 +883,20 @@ function MeasurePanel({
           <View style={styles.hintRow}>
             {finding ? <ActivityIndicator size="small" color={SAND} /> : null}
             <Text style={[styles.hint, { flex: 1 }]}>
-              {finding ? 'Finding the trail…' : taps === 0 ? `${WEB ? 'Click' : 'Tap'} the map where you want to measure from.` : taps === 1 ? `Now ${WEB ? 'click' : 'tap'} where you want to measure to.` : 'Add more points, or save the line as a trail to follow.'}
+              {marking ? `${WEB ? 'Click' : 'Tap'} the map where the spot is.` : finding ? 'Finding the trail…' : taps === 0 ? `${WEB ? 'Click' : 'Tap'} the map where you want to measure from.` : taps === 1 ? `Now ${WEB ? 'click' : 'tap'} where you want to measure to.` : 'Add more points, mark spots, or save it as a custom trail.'}
             </Text>
           </View>
         </>
       ) : null}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ selected: marking }}
+        accessibilityLabel={marking ? 'Cancel marking a spot' : 'Mark a spot on the trail, like a ledge or water crossing'}
+        onPress={onMark}
+        style={({ pressed }) => [styles.wideBtn, marking && { borderWidth: 1.5, borderColor: SAND }, pressed && { opacity: 0.85 }]}>
+        <Text style={styles.wideBtnText}>{marking ? 'Cancel Marking' : 'Mark a Spot'}</Text>
+        <Text style={styles.dayText}>{spots ? `${spots} marked` : 'Ledges, crossings, views'}</Text>
+      </Pressable>
       <View style={styles.row}>
         <Pressable accessibilityRole="button" disabled={!taps} onPress={onUndo} style={({ pressed }) => [styles.ctl, !taps && { opacity: 0.4 }, pressed && { opacity: 0.85 }]}>
           <Text style={styles.ctlText}>Undo</Text>
@@ -725,7 +906,7 @@ function MeasurePanel({
         </Pressable>
         {open ? (
           <Pressable accessibilityRole="button" disabled={taps < 2 || finding} onPress={onSave} style={({ pressed }) => [styles.ctl, { flexGrow: 1.5 }, (taps < 2 || finding) && { opacity: 0.4 }, pressed && { opacity: 0.85 }]}>
-            <Text style={styles.ctlText}>Save as Trail</Text>
+            <Text style={styles.ctlText}>Save Trail</Text>
           </Pressable>
         ) : null}
       </View>
@@ -785,4 +966,9 @@ const styles = StyleSheet.create({
   ctlMain: { flexGrow: 1.6, backgroundColor: RECORD_INK, borderColor: RECORD_INK },
   ctlText: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
   discard: { color: Colors.danger, fontFamily: font(600), fontSize: 14 },
+  track: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 10, borderTopWidth: 1, borderTopColor: Colors.border },
+  days: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12 },
+  day: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  dayLine: { width: 14, height: 3, borderRadius: 2 },
+  dayText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12 },
 });

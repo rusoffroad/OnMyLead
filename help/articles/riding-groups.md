@@ -91,6 +91,10 @@ From the ride:
 1. Open the ride and go to **Riders**.
 2. Under **Invite a Group**, tap **Invite All** next to the group.
 
+:::release 2.0
+Or plan a new ride for the group: on Home, tap **Plan a Group Ride** on the **Your Group** card. The new ride has that group ticked under **Your Riding Groups**, so everyone is invited when you create it.
+:::
+
 Everyone in the group gets a notification and sees the ride under **Ride Invites** on their home screen. They can tap **Join Ride**, with no waiting for approval, or **No Thanks**. Riders who are already on the ride, waiting, or who said no thanks are left alone.
 
 To get these invites, keep **Ride Invites** on in [Notification Settings](/help/notification-settings).

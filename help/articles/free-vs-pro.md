@@ -38,7 +38,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Live Tracking, SOS and Ride Bubble | Yes | Yes |
 | Ride Chat and Voting | Yes | Yes |
 | Draw Routes and Follow Leaders | Yes | Yes |
-| Navigate: Offroad Map, Measure, Rate Trails | Yes | Yes |
+| Navigate (Map Mode From 2.0): Offroad Map, Draw and Measure, Rate Trails | Yes | Yes |
 | Record and Share Your Trails | No | Yes |
 | Group Rides on Your Trails | No | Yes |
 | Import GPX Routes | No | Yes |
@@ -85,7 +85,7 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 When you tap something that needs Pro, a short prompt explains it. Tap **See OnMyLead Pro** to see the plans, or **Not Now** to close it.
 
 :::release 2.0
-On a Free account, a small gold **Pro** tag sits beside each button that needs Pro, so you know before you tap. You'll see it on **Import GPX** and **Use One of My Trails** when you draw a route, **Record a Trail** in Navigate, **Share with Everyone** and **Plan a Group Ride on This Trail** on a trail, the offline map **Download** buttons, **New Group** and **Add Riders You've Ridden With** in Riding Groups, and **Copy to a New Trip** in the Trip Planner. Tapping one opens the same prompt. During your Pro Trial and on Pro the tags are gone. Create a Ride doesn't carry a tag, because Free includes a ride a month; it shows how many you have left instead.
+On a Free account, a small gold **Pro** tag sits beside each button that needs Pro, so you know before you tap. You'll see it on **Import GPX** and **Use One of My Trails** when you draw a route, **Record a Trail** in Map Mode, **Share with Everyone** and **Plan a Group Ride on This Trail** on a trail, the offline map **Download** buttons, **New Group** and **Add Riders You've Ridden With** in Riding Groups, and **Copy to a New Trip** in the Trip Planner. Tapping one opens the same prompt. During your Pro Trial and on Pro the tags are gone. Create a Ride doesn't carry a tag, because Free includes a ride a month; it shows how many you have left instead.
 :::
 
 ## See Your Plan
