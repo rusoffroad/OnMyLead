@@ -211,6 +211,10 @@ describe('featured products', () => {
     expect(isRusUrl(STARLINK_MOUNT.url)).toBe(true);
   });
 
+  it('has a $249 fallback price', () => {
+    expect(formatPrice(STARLINK_MOUNT.priceCents)).toBe('$249');
+  });
+
   it('never says preorder in its own wording', () => {
     expect(JSON.stringify(STARLINK_MOUNT)).not.toMatch(/pre-?order/i);
   });
