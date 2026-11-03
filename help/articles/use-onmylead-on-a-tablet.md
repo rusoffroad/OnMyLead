@@ -36,7 +36,7 @@ You can also run OnMyLead next to another app (Split View or Slide Over on an iP
 
 On a tablet, **Rides**, **Find**, **Groups** and **You** run down the left edge of the screen instead of along the bottom.
 :::release 2.0
-The white **Map Mode** button sits under **Find** and opens your offroad map full screen.
+The blue **Map Mode** button sits under **Find** and opens your offroad map full screen.
 :::
 
 :::until 2.0
@@ -44,7 +44,7 @@ On **Rides**, with the tablet sideways, **Create a Ride**, **Join a Ride** and *
 :::
 
 :::release 2.0
-On **Rides**, with the tablet sideways, **Join a Ride**, **Create a Ride**, **Find a Ride**, **Events**, **Map Mode**, your toolkit and help stay on the left, and your rides, group, public rides, feed and badges are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
+On **Rides**, with the tablet sideways, **Join a Ride**, **Create a Ride**, **Find a Ride**, **Map Mode**, **Events**, your toolkit and help stay on the left, and your rides, group, public rides, feed and badges are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
 :::
 
 ## Ride Mode on a Tablet

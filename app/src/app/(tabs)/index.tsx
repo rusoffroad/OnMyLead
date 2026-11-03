@@ -52,7 +52,7 @@ import { requirePro } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
-import { setTrackLineOn, useTrackDays } from '@/lib/track-line';
+import { setTrackLineOn } from '@/lib/track-line';
 import type { Ride, RideMember } from '@/lib/types';
 
 /** Feed posts shown before Show More: enough to feel alive, not enough to scroll past everything else. */
@@ -96,7 +96,6 @@ export default function HomeScreen() {
   const [feedAll, setFeedAll] = useState(false);
   const [moreRides, setMoreRides] = useState(false);
   const [trailsNear, setTrailsNear] = useState<number | null>(trailCount?.n ?? null);
-  const trackDays = useTrackDays();
   const [trackOn, , setTrackSwitch] = useRememberedToggle(TRACK_LINE_SWITCH_KEY, false);
 
   // Signing out (or into another account) must not leave the last rider's things on screen.
@@ -326,8 +325,8 @@ export default function HomeScreen() {
         onCreate={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
         onFind={() => router.push('/find')}
       />
+      {navOn ? <MapModeCard trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       <EventsCard signedIn={!!session} radius={radius} />
-      {navOn ? <MapModeCard days={trackDays} trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       {!loading && !session ? (
         <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}

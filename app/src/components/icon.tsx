@@ -37,6 +37,7 @@ const PATHS = {
   // A rider with a plus, for Friends and Add Friend.
   addFriend: ['M3.5 20.5c.8-3.8 3.6-6 7-6 2.6 0 4.8 1.3 6 3.5', 'M19 7.5v6', 'M16 10.5h6'],
   people: ['M2.5 19.5c.6-3 3-4.8 6-4.8s5.4 1.8 6 4.8', 'M15.8 14.9c2.5.3 4.4 1.9 5 4.6'],
+  cup: ['M5 8.5h11v5.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z', 'M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16', 'M8.5 3.5v2.5', 'M12.5 3.5v2.5'],
   map: ['M3.5 6.5L9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5-5.5 2.5z', 'M9 4v13.5', 'M15 6.5V20'],
   // A speech bubble, for chat in the Notifications inbox.
   chat: ['M4 5h16v11H10l-4.5 3.5V16H4z'],

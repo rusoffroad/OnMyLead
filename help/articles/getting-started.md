@@ -62,7 +62,7 @@ On a tablet they run down the left edge instead. See [Use OnMyLead on a Tablet](
 :::
 
 :::release 2.0
-Four tabs run along the bottom of the screen: **Rides**, **Find**, **Groups** and **You**. In the middle, the white **Map Mode** button opens your offroad map from any tab. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
+Four tabs run along the bottom of the screen: **Rides**, **Find**, **Groups** and **You**. In the middle, the blue **Map Mode** button opens your offroad map from any tab. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
 
 On a tablet they run down the left edge instead, with **Map Mode** under **Find**. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 :::

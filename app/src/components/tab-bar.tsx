@@ -16,12 +16,15 @@ export const TABS: TabSpec[] = [
   { name: 'profile', title: 'You', icon: 'person' },
 ];
 
+/** Map Mode's colour, shared with its card on Home (components/home/map-mode-card.tsx). */
+const MAP_BLUE = '#2F6FE0';
+
 /** Map Mode's key sits right after this tab: the middle of the bar, under the thumb. */
 export const MAP_KEY_AFTER = 'find';
 
 /**
  * Map Mode's key in the bar: not a tab but a way out to the full-screen map, so it looks like a
- * key (a white map tile, the same white as Open Map on the home card) instead of a quiet tab.
+ * key (a blue map tile, the same logo blue as the Map Mode card on Home) instead of a quiet tab.
  * Signed-out riders can use it too; Map Mode needs no account.
  */
 function MapKey({ rail }: { rail: boolean }) {
@@ -36,7 +39,7 @@ function MapKey({ rail }: { rail: boolean }) {
       style={({ pressed }) => [rail ? styles.railItem : styles.item, pressed && { opacity: 0.8 }]}>
       {rail ? null : <View style={styles.lead} />}
       <View style={styles.mapTile}>
-        <Icon name="map" size={22} color={Colors.background} strokeWidth={2.4} />
+        <Icon name="map" size={22} color="#fff" strokeWidth={2.4} />
       </View>
       <Text style={[styles.label, styles.mapLabel]} numberOfLines={1}>Map Mode</Text>
     </Pressable>
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
   },
   // Icon-height plus a little, so the key's label lines up with the tabs' labels.
   mapTile: {
-    width: 46, height: 30, borderRadius: 10, backgroundColor: Colors.text, alignItems: 'center', justifyContent: 'center',
+    width: 46, height: 30, borderRadius: 10, backgroundColor: MAP_BLUE, alignItems: 'center', justifyContent: 'center',
     marginTop: -3, marginBottom: -2,
   },
   mapLabel: { color: Colors.text },
