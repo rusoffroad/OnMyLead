@@ -1,4 +1,4 @@
-import { forwardRef, useId, type ReactNode } from 'react';
+import { forwardRef, useCallback, useId, useRef, useState, type ReactNode } from 'react';
 import {
   InputAccessoryView, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View,
   type StyleProp, type TextInputProps, type ViewStyle,
@@ -45,6 +45,35 @@ export function KeyboardLift({ children, style }: { children: ReactNode; style?:
     <KeyboardAvoidingView behavior="padding" style={[{ flexShrink: 1, marginTop: insets.top }, style]}>
       {children}
     </KeyboardAvoidingView>
+  );
+}
+
+/**
+ * The body of a full screen whose text box is pinned to the bottom (a chat, a comment box). It keeps that box
+ * above the keyboard on iPhone, iPad and Android.
+ *
+ * React Native's KeyboardAvoidingView measures itself against its parent, not the screen, so inside a safe-area
+ * page under a header it lifts the box too little and the keyboard hides it (2.0 build 8, Social comments). This
+ * measures where it sits on the screen and passes that as the offset, so the lift is right wherever it is placed.
+ * On Android the app draws edge to edge and the window no longer shrinks for the keyboard, so it pads there too;
+ * if a device does shrink the window the measured overlap is 0 and nothing is added twice. The website has no
+ * on-screen keyboard, so it is a plain view there.
+ */
+export function KeyboardScreen({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const box = useRef<View>(null);
+  const [top, setTop] = useState(0);
+  const measure = useCallback(() => {
+    box.current?.measureInWindow((_x, y) => {
+      if (Number.isFinite(y)) setTop((old) => (Math.abs(old - y) < 0.5 ? old : y));
+    });
+  }, []);
+  if (Platform.OS === 'web') return <View style={[{ flex: 1 }, style]}>{children}</View>;
+  return (
+    <View ref={box} collapsable={false} onLayout={measure} style={[{ flex: 1 }, style]}>
+      <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={top} style={{ flex: 1 }}>
+        {children}
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 

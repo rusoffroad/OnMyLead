@@ -1,10 +1,10 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
-import { keyboardScroll, TextBox } from '@/components/keyboard';
+import { KeyboardScreen, keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { RiderPhoto } from '@/components/rider-photo';
 import { faceColor, Initial } from '@/components/home/parts';
@@ -122,7 +122,7 @@ export default function SocialItemScreen() {
           </Pressable>
         </View>
 
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardScreen>
           <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={styles.body} {...keyboardScroll} indicatorStyle={scrollIndicator()}>
             {off ? <Text style={styles.muted}>{SOCIAL_NOT_SWITCHED_ON}</Text> : null}
             {item === null && !off ? (
@@ -214,7 +214,7 @@ export default function SocialItemScreen() {
               </Pressable>
             )
           ) : null}
-        </KeyboardAvoidingView>
+        </KeyboardScreen>
       </View>
       <ReportSheet
         target={reporting ? { kind: 'rider', userId: reporting.authorId, name: reporting.authorName, source: 'comment', commentId: reporting.id } : null}
