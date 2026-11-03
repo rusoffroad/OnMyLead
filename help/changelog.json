@@ -15,6 +15,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Checked against the Map Mode button change: the showcase only gained a few words in Map Mode's text. Creating a ride on the website works the same; no change to this article."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",
