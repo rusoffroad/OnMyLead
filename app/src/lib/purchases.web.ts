@@ -7,7 +7,7 @@ export type { BuyResult, ProProduct };
 export const onPurchaseVerified = (_listener: (result: unknown) => void): (() => void) => () => {};
 export const startPurchaseUpdates = async (): Promise<void> => {};
 export const loadProducts = async (): Promise<ProProduct[]> => [];
-export const buy = async (_id: string): Promise<BuyResult> => ({ ok: false, reason: 'ios_only' });
+export const buy = async (_id: string, _offerId?: string | null): Promise<BuyResult> => ({ ok: false, reason: 'ios_only' });
 export const restore = async (): Promise<{ ok: boolean; restored: number }> => ({ ok: false, restored: 0 });
 export const redeemOfferCode = async (): Promise<void> => {};
 export const manageSubscription = async (_productId?: string | null): Promise<void> => {};
