@@ -4,10 +4,11 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, DataTable, Empty, ErrorNote, Fields, Loading, Panel, planTone, StatGrid,
-  ROLE, StatTile, StatusBadge, useConfirm, useToast,
+  ROLE, StatTile, StatusBadge, SuspendPanel, useConfirm, useToast,
 } from '@/components/admin';
 import { font } from '@/constants/theme';
 import { actionLabel, daysLeft, fmtAgo, fmtDate, fmtDateTime, fmtInt } from '@/core/admin-format';
+import { suspensionLabel } from '@/core/moderation';
 import * as admin from '@/lib/admin';
 import * as growthApi from '@/lib/admin-growth';
 import { adminRemoveAvatar, useAvatar } from '@/lib/avatars';
@@ -53,18 +54,6 @@ export default function UserDetail() {
   const isAdmin = s.is_admin;
   const comps = data.grants.filter((g) => g.source === 'comp' && !g.revoked_at && (!g.ends_at || new Date(g.ends_at) > new Date()));
 
-  const suspend = async () => {
-    const r = await confirm({
-      title: `Suspend ${name}?`,
-      message: 'They are signed out and can\'t sign in until you reactivate the account. Their rides, groups and data stay as they are.',
-      confirmLabel: 'Suspend Account', tone: 'danger', reasonLabel: 'Reason (kept in the audit log)', reasonRequired: true,
-    });
-    if (r.ok) run('suspend', () => admin.suspendUser(p.id, r.reason ?? ''), 'Account suspended.');
-  };
-  const reactivate = async () => {
-    const r = await confirm({ title: `Reactivate ${name}?`, message: 'They can sign in again straight away.', confirmLabel: 'Reactivate Account' });
-    if (r.ok) run('reactivate', () => admin.reactivateUser(p.id), 'Account reactivated.');
-  };
   const isTest = !!growth.data?.test_list.some((t) => t.user_id === p.id);
   const toggleTest = async () => {
     const r = await confirm(isTest
@@ -142,7 +131,7 @@ export default function UserDetail() {
       actions={
         <>
           <StatusBadge label={s.pro_source === 'comp' ? 'Pro (Complimentary)' : s.label} tone={planTone(s.label)} />
-          {s.suspended ? <StatusBadge label="Suspended" tone="danger" /> : null}
+          {s.suspended ? <StatusBadge label={suspensionLabel(p.banned_until) ?? 'Suspended'} tone="danger" /> : null}
           {s.deletion_requested ? <StatusBadge label="Deletion Requested" tone="warn" /> : null}
         </>
       }>
@@ -282,7 +271,7 @@ export default function UserDetail() {
 
       {!isAdmin ? (
         <Panel title="Account">
-          <Text style={styles.note}>Suspending signs the rider out and blocks sign-in. Deleting is permanent.</Text>
+          <Text style={styles.note}>Suspending signs the rider out and blocks sign-in for a set time. A ban and deleting are permanent.</Text>
           {growth.data ? (
             <Text style={styles.note}>{isTest ? 'Test account: left out of rider counts.' : 'Counted as a real rider on Signups and Downloads.'}</Text>
           ) : null}
@@ -290,11 +279,9 @@ export default function UserDetail() {
             {growth.data ? (
               <AdminButton title={isTest ? 'Count as Rider' : 'Mark as Test Account'} onPress={toggleTest} loading={busy === 'test'} />
             ) : null}
-            {s.suspended
-              ? <AdminButton title="Reactivate Account" kind="primary" onPress={reactivate} loading={busy === 'reactivate'} />
-              : <AdminButton title="Suspend Account" kind="danger" onPress={suspend} loading={busy === 'suspend'} />}
             <AdminButton title="Delete Account" kind="danger" onPress={del} loading={busy === 'delete'} />
           </View>
+          <SuspendPanel userId={p.id} name={name} bannedUntil={s.suspended ? p.banned_until : null} onDone={reload} />
         </Panel>
       ) : null}
     </AdminPage>

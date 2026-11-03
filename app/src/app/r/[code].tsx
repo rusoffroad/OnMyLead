@@ -198,7 +198,7 @@ export default function RidePage() {
       onResolve={chat.resolve}
       onClear={chat.clear}
       actionsOn={chat.actionsOn}
-      onReport={(userId) => setReporting({ kind: 'rider', userId, rideId: ride.id, name: nameOf(userId) })}
+      onReport={(userId) => setReporting({ kind: 'rider', userId, rideId: ride.id, name: nameOf(userId), source: 'ride_chat' })}
       onBlock={blocks.off ? undefined : (userId) => confirmAndBlock(userId, nameOf(userId))}
     />
   ) : null;
@@ -528,7 +528,7 @@ export default function RidePage() {
       {me && !isOrganizer ? (
         <Pressable
           accessibilityRole="button"
-          onPress={() => setReporting({ kind: 'ride', rideId: ride.id, name: ride.name })}
+          onPress={() => setReporting({ kind: 'ride', rideId: ride.id, name: ride.name, source: 'ride' })}
           hitSlop={6}
           style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
           <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13, textDecorationLine: 'underline' }}>Report Ride</ThemedText>

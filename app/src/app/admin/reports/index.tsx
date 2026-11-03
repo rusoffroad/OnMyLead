@@ -7,6 +7,7 @@ import {
 } from '@/components/admin';
 import { font } from '@/constants/theme';
 import { fmtAgo, fmtDateTime } from '@/core/admin-format';
+import { reportSourceLabel, suspensionLabel } from '@/core/moderation';
 import * as admin from '@/lib/admin';
 
 const PAGE = 30;
@@ -44,7 +45,7 @@ export default function Reports() {
   };
 
   return (
-    <AdminPage title="Reports" subtitle="What riders reported about rides and other riders. Newest first.">
+    <AdminPage title="Reports" subtitle="What riders reported about rides and other riders. Newest first. Open a report to read the saved conversation and suspend or ban the rider.">
       <FilterChips
         options={[
           { value: 'open', label: 'Needs Review' },
@@ -68,13 +69,19 @@ export default function Reports() {
               </View>
               <Text style={styles.sub}>
                 {r.kind === 'ride' ? 'Ride report' : 'Rider report'} from {r.reporter_name || 'a rider'}, {fmtAgo(r.created_at)}
+                {reportSourceLabel(r.source) ? `, from ${reportSourceLabel(r.source)}` : ''}
+                {r.messages_copied ? `. ${r.messages_copied} messages saved` : ''}
               </Text>
+              {suspensionLabel(r.reported_banned_until) ? (
+                <View style={{ flexDirection: 'row' }}><StatusBadge label={`${r.reported_name || 'Rider'}: ${suspensionLabel(r.reported_banned_until)}`} tone="danger" /></View>
+              ) : null}
             </View>
             <View style={styles.actions}>
+              <AdminButton title="Open Report" kind={r.status === 'open' ? 'primary' : 'quiet'} small onPress={() => router.push(`/admin/reports/${r.id}`)} />
               {r.status === 'open' ? <AdminButton title="Start Reviewing" small onPress={() => act(r, 'reviewing')} loading={busy === r.id} /> : null}
               {r.status === 'open' || r.status === 'reviewing' ? (
                 <>
-                  <AdminButton title="Resolve" kind="primary" small onPress={() => act(r, 'resolved')} disabled={busy === r.id} />
+                  <AdminButton title="Resolve" small onPress={() => act(r, 'resolved')} disabled={busy === r.id} />
                   <AdminButton title="Dismiss" small onPress={() => act(r, 'dismissed')} disabled={busy === r.id} />
                 </>
               ) : <AdminButton title="Reopen" small onPress={() => act(r, 'open')} loading={busy === r.id} />}

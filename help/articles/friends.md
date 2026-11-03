@@ -4,7 +4,7 @@ summary: Add riders as friends so you see each other when you're out riding near
 category: groups
 order: 26
 release: "1.0.3"
-updated: 2026-11-01
+updated: 2026-11-03
 sources:
   - app/src/app/friends.tsx
   - app/src/app/friend/[code].tsx
