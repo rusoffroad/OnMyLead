@@ -140,10 +140,10 @@ export function Showcase() {
             <Step
               n={4}
               shot="waypoints"
-              alt="The ride’s waypoints map: two numbered planned stops, a shared Washout hazard, and a camp spot only you see"
+              alt="The ride’s waypoints map: numbered planned stops tagged fuel and food, a shared Washout hazard triangle, a gate, a water crossing and a camp only you see"
               title="Mark the Trail"
-              text="Press and hold the map to drop a waypoint: camp, fuel, water, a viewpoint, parking or a hazard, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
-              points={['Shared waypoints show on every rider’s map', 'Never public: only riders on the ride see shared ones', 'Add one at your location with one tap']}
+              text="Press and hold the map to drop a waypoint with one of 15 symbols: camp, fuel, water, food, a gate, a trailhead, a water crossing, a hazard and more, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
+              points={['Shared waypoints show on every rider’s map', 'Every symbol has its own drawing, easy to read for color-blind riders, and hazards stand out as triangles', 'Planned stops show what they’re for right on the stop sign', 'Never public: only riders on the ride see shared ones']}
             />
             <Step
               n={5}

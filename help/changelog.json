@@ -96,6 +96,89 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "waypoint-symbols",
+    "why": "Chris asked for waypoint symbols. Waypoints now have 15 symbols (8 new: Gate, Trailhead, Water Crossing, Food, Restroom, First Aid, Repair, Photo Spot), drawn so color-blind riders can tell them apart, and planned stops show theirs on the stop sign. Comes with the 2.0 update; the old list of seven stays until then."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "location-sharing",
+      "map-layers",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "waypoint-symbols",
+    "why": "Checked against the waypoint symbols change: Ride Mode and the other maps now draw each waypoint with its symbol, and the showcase text names the new symbols, but these articles don't list waypoint types, so nothing in them changes. The symbols are described in Waypoints and Planned Stops."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "voice",
+      "ride-bubble",
+      "ride-mode",
+      "troubleshooting"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "natural-voice",
+    "why": "Chris asked for spoken alerts that don't sound like a robot. Ride Mode now reads alerts in the most natural voice on the phone (Premium or Enhanced, never a voice that needs service), and You > Voice lets riders hear and pick one. New article; Ride Bubble links to it. Ride Mode and Fix Common Problems got a Spoken Alerts section (release 2.0)."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "badges-and-ranks",
+      "contact-support",
+      "delete-account",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "getting-started",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "profile-picture",
+      "promo-codes",
+      "report-and-block",
+      "ride-chat",
+      "ride-name-and-profile",
+      "sign-in",
+      "starlink",
+      "status-buttons",
+      "trip-planner",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "natural-voice",
+    "why": "Reviewed for the new You > Voice row and Ride Mode speaking in a better voice: these articles describe the You tab, the app layout or Ride Mode, and nothing they say changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",

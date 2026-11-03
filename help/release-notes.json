@@ -110,6 +110,10 @@
       {
         "kind": "new",
         "text": "The Starlink page now features the RUS Starlink Mini Mount V2 (Morelock Series), made by RUS Offroad, the team behind OnMyLead. Tap Shop the Mount to see it in the store."
+      },
+      {
+        "kind": "new",
+        "text": "Waypoint symbols: pick from 15, including the new Gate, Trailhead, Water Crossing, Food, Restroom, First Aid, Repair and Photo Spot. Each has its own drawing and hazards sit on a triangle, so they're easy to tell apart for color-blind riders too. Planned stops show their symbol on the stop sign."
       }
     ]
   },

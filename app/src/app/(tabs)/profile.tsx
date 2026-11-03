@@ -14,6 +14,7 @@ import { type MyBadges } from '@/core/badges';
 import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directions';
 import { describeAppearance } from '@/core/appearance';
 import { BATTERY_PLANS } from '@/core/battery';
+import { AUTO_VOICE } from '@/core/voice';
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
@@ -23,6 +24,7 @@ import { useFlag } from '@/lib/app-settings';
 import { fetchMyBadges } from '@/lib/badges';
 import { useAppearance } from '@/lib/appearance';
 import { useBatteryMode } from '@/lib/battery';
+import { useVoiceChoice } from '@/lib/voice';
 import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { setMapsPreference, useMapsPreference } from '@/lib/directions';
@@ -57,6 +59,7 @@ export default function You() {
   const mapsPref = useMapsPreference();
   const batteryMode = useBatteryMode();
   const { appearance } = useAppearance();
+  const voiceChoice = useVoiceChoice();
   const { ent } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
   const starlinkOn = useFlag('starlink');
@@ -197,6 +200,13 @@ export default function You() {
           onPress={() => router.push('/battery')}
         />
         <MenuRow icon="theme" color={Colors.sky} title="Appearance" detail={describeAppearance(appearance)} onPress={() => router.push('/appearance')} />
+        <MenuRow
+          icon="voice"
+          color={Colors.sky}
+          title="Voice"
+          detail={voiceChoice === AUTO_VOICE ? 'Automatic. The most natural voice on this device reads Ride Mode alerts' : 'Your pick reads Ride Mode alerts'}
+          onPress={() => router.push('/voice')}
+        />
         {musicAvailable && musicFlag ? (
           <MenuRow
             icon="music"

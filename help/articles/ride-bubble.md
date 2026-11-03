@@ -70,6 +70,10 @@ The alert cards hide when the bottom panel is folded. Tap **Buttons ▲** to ope
 Spoken alerts pause while your own phone has no service. When you lose signal everyone looks quiet, and that's your signal dropping, not theirs.
 :::
 
+:::release 2.0
+Spoken alerts use the most natural voice on your phone. To hear and pick another, see [Choose the Voice for Spoken Alerts](/help/voice).
+:::
+
 ## Tips
 
 - Ask everyone to share their location for the whole ride so Ride Bubble can see them. See [Share Your Location](/help/location-sharing).
