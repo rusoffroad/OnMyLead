@@ -40,6 +40,7 @@ import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRouteDraft } from '@/hooks/use-route-draft';
+import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { confirmAsync } from '@/lib/confirm';
 import {
@@ -47,6 +48,8 @@ import {
   type Recording,
 } from '@/lib/nav-trails';
 import { requirePro } from '@/lib/pro';
+import { useTiltSettings } from '@/lib/tilt';
+import { TiltTile } from '@/components/tilt-tile';
 import { clearTrackLine, flushTrackLine, recordTrackFixes, setTrackLineOn, useTrackDays } from '@/lib/track-line';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
@@ -758,6 +761,10 @@ function ExplorePanel({
   const [tripV, tripU] = feetOrMiles(trip.distanceM).split(' ');
   const [movV, movU] = movingReadout(trip.movingS);
   const following = !!(followed && progress);
+  // The Tilt tile under the dash (phones and tablets; the website has no motion sensors).
+  const tiltSettings = useTiltSettings();
+  const tiltOn = Platform.OS !== 'web' && tiltSettings.show;
+  const tilt = useTilt(tiltSettings, tiltOn);
   return (
     <>
       {followed ? (
@@ -799,6 +806,7 @@ function ExplorePanel({
           {following ? <Gauge small value={hdg} unit={deg} label="Heading" /> : <Gauge small value={movV} unit={movU} label="Moving" />}
         </View>
       </View>
+      {tiltOn ? <TiltTile bar reading={tilt} limits={tiltSettings.limits} /> : null}
       {open ? (
         noLocation ? (
           <Text style={styles.hint}>Location is off for OnMyLead, so the map can’t show where you are. Turn it on in Settings to record and follow trails.</Text>

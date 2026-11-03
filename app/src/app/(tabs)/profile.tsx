@@ -196,6 +196,15 @@ export default function You() {
           detail={`${BATTERY_PLANS[batteryMode].label}. ${BATTERY_PLANS[batteryMode].short}`}
           onPress={() => router.push('/battery')}
         />
+        {Platform.OS !== 'web' ? (
+          <MenuRow
+            icon="tilt"
+            color={RideColors.green}
+            title="Tilt and Crash Alert"
+            detail="Roll and pitch meter, tilt warnings, and an alert to your group after a crash"
+            onPress={() => router.push('/tilt')}
+          />
+        ) : null}
         <MenuRow
           icon="voice"
           color={Colors.sky}

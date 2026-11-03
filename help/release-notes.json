@@ -130,6 +130,10 @@
       {
         "kind": "fixed",
         "text": "Share My Location with a family link showed an error (\"Property 'crypto' doesn't exist\") on iPhone, iPad and Android, and no link was made. Family links work again."
+      },
+      {
+        "kind": "new",
+        "text": "Tilt meter and Crash Alert. A Tilt tile in Map Mode and Ride Mode shows your vehicle's roll and pitch, turning amber, then red, near your limits; tap it for a full tilt meter. Zero it for your phone mount, set your own warning angles and get a buzz (or a spoken angle) before a steep lean. In Ride Mode, Crash Alert watches for a hard hit or a rollover: a 30 second I'm OK countdown starts, and if you don't answer, your group gets an EMERGENCY alert with your location. It never calls 911. Find it all under You, Tilt and Crash Alert."
       }
     ]
   },

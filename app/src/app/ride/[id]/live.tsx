@@ -22,6 +22,8 @@ import { PanelActions, QuickRow, StatusSheet, tapFeel } from '@/components/ride-
 import { RideMessageSheet } from '@/components/ride-message-sheet';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
+import { CrashCountdown } from '@/components/crash-countdown';
+import { TILT_TILE_H, TiltTile } from '@/components/tilt-tile';
 import { SharePicker } from '@/components/share-picker';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
@@ -37,6 +39,7 @@ import {
 import { BATTERY_PLANS, batteryBannerTag } from '@/core/battery';
 import { tally } from '@/core/broadcast';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
+import { crashMessage, type CrashCause } from '@/core/crash-detect';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
@@ -56,6 +59,7 @@ import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
+import { useCrashAlert } from '@/hooks/use-crash-alert';
 import { useFollowMe } from '@/hooks/use-follow-me';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
@@ -66,6 +70,7 @@ import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useSavedReplies } from '@/hooks/use-saved-replies';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
+import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
@@ -78,6 +83,7 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
+import { useTiltSettings } from '@/lib/tilt';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -358,6 +364,10 @@ export default function RideMode() {
   const placesMe = hasRoute || freeride;
   // Battery Saver also slows this screen's own work: the blue dot and the backup check for riders.
   const batteryMode = useBatteryMode();
+  // Tilt meter tile and Crash Alert (phones and tablets; the website has no motion sensors).
+  const tiltSettings = useTiltSettings();
+  const tiltShown = Platform.OS !== 'web' && tiltSettings.show;
+  const tiltReading = useTilt(tiltSettings, tiltShown);
   // Approximate Location (Android) or Precise off (iPhone, iPad) puts this rider miles from where they are.
   const precise = usePreciseLocation(me ? positions[me]?.accuracy_m : null);
   const { followEveryM, refreshSec } = BATTERY_PLANS[batteryMode];
@@ -642,6 +652,10 @@ export default function RideMode() {
   const musicBottom = locateBottom + LOCATE_SIZE + 10;
   const musicFits = musicOn && locateFits && !fullMap &&
     (tablet || screenH - musicBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
+  // The Tilt tile: on a phone on the left, level with Music (above Center on Me's row); on a tablet
+  // in the open map's bottom-left corner. Only when there is room; Full Map hides it.
+  const tiltFits = tiltShown && locateFits && !fullMap &&
+    (tablet || screenH - musicBottom - TILT_TILE_H >= shownBannersBottom + Spacing.two);
   // The first framing of the group keeps it clear of the panels over the map.
   const sidebarOpen = sidebar.open;
   const fitPadding = useMemo(
@@ -885,6 +899,16 @@ export default function RideMode() {
       { id: tapId, kind: 'status', label: 'EMERGENCY Alert', urgent: true },
       async (tid) => sendStatusReliably(id, 'emergency', await spotNow(), tid),
     );
+  }
+
+  // Crash Alert: a crash while riding starts the I'm OK countdown; at zero the group gets the
+  // EMERGENCY alert plus a chat line saying why, both through the outbox (so they go out on reconnect).
+  const crash = useCrashAlert(tiltSettings.crash, !!mine);
+  function sendCrashAlert(cause: CrashCause) {
+    crash.dismiss();
+    void sendEmergency();
+    const body = crashMessage(cause);
+    void broadcast.send({ id: newTapId(), kind: 'reply', label: body }, (tid) => sendQuickReplyReliably(id, body, tid));
   }
 
   // CarPlay: the car screen mirrors the group's state and sends button presses back here.
@@ -1190,6 +1214,17 @@ export default function RideMode() {
           ]}>
           {locating ? <ActivityIndicator color={Colors.sky} /> : <Icon name="locate" size={26} color={Colors.sky} strokeWidth={2.2} />}
         </Pressable>
+      ) : null}
+
+      {tiltFits ? (
+        <TiltTile
+          reading={tiltReading}
+          limits={tiltSettings.limits}
+          style={tablet ? { bottom: panelBottom, left: (sidebar.open ? sideW + EDGE : 0) + EDGE } : { bottom: musicBottom, left: 12 }}
+        />
+      ) : null}
+      {crash.alarm ? (
+        <CrashCountdown cause={crash.alarm.cause} startedAt={crash.alarm.startedAt} onOk={crash.dismiss} onSend={() => sendCrashAlert(crash.alarm!.cause)} />
       ) : null}
 
       {musicFits ? (
