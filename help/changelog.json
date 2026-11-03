@@ -49,6 +49,41 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "waypoint-symbols",
+    "why": "Chris asked for waypoint symbols. Waypoints now have 15 symbols (8 new: Gate, Trailhead, Water Crossing, Food, Restroom, First Aid, Repair, Photo Spot), drawn so color-blind riders can tell them apart, and planned stops show theirs on the stop sign. Comes with the 2.0 update; the old list of seven stays until then."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "location-sharing",
+      "map-layers",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "waypoint-symbols",
+    "why": "Checked against the waypoint symbols change: Ride Mode and the other maps now draw each waypoint with its symbol, and the showcase text names the new symbols, but these articles don't list waypoint types, so nothing in them changes. The symbols are described in Waypoints and Planned Stops."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "voice",
       "ride-bubble",
       "ride-mode",

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the migrations, then the privacy, approval and ride limit, riding group, group chat, Pro, report, admin analytics, admin, clear/resolve, waypoint, planned stop, status button, block, social profile, contact form, Help Center, Google Play Billing, admin growth, store reviews, release controls, badge, Out Riding, Navigation Mode trail, custom share code, profile photo, notification inbox, ride miles, home feed, rider agreement, abuse report, social, event and trail width tests, against a throwaway local Postgres database.
+# Runs the migrations, then the privacy, approval and ride limit, riding group, group chat, Pro, report, admin analytics, admin, clear/resolve, waypoint, planned stop, waypoint symbol, status button, block, social profile, contact form, Help Center, Google Play Billing, admin growth, store reviews, release controls, badge, Out Riding, Navigation Mode trail, custom share code, profile photo, notification inbox, ride miles, home feed, rider agreement, abuse report, social, event and trail width tests, against a throwaway local Postgres database.
 # Usage: PGHOST=... PGPORT=... PGUSER=postgres ./supabase/tests/run_local.sh
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -19,6 +19,7 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/messages_test.sql" \
   -f "$here/waypoints_test.sql" \
   -f "$here/planned_stops_test.sql" \
+  -f "$here/waypoint_symbols_test.sql" \
   -f "$here/status_broadcast_test.sql" \
   -f "$here/blocks_test.sql" \
   -f "$here/social_profiles_test.sql" \
