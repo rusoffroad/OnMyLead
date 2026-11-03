@@ -52,7 +52,7 @@ They get a notification and see your request at the top of their Friends screen.
 
 To stop an old link working, tap **Make a New Link**. Your friends stay friends.
 
-:::release 2.1
+:::release 2.0
 If your buddy is new to OnMyLead and creates their account with your link, it also counts as an invite: when they finish their first ride, you both get 50% off Pro Annual. See [Invite Friends and Get 50% Off Pro](/help/refer-a-friend).
 :::
 

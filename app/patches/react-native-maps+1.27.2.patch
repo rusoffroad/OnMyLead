@@ -1,0 +1,96 @@
+diff --git a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapTileProvider.java b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapTileProvider.java
+index a974311..8424610 100644
+--- a/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapTileProvider.java
++++ b/node_modules/react-native-maps/android/src/main/java/com/rnmaps/maps/MapTileProvider.java
+@@ -122,6 +122,9 @@ public class MapTileProvider implements TileProvider {
+ 
+ 	@Override
+ 	public Tile getTile(int x, int y, int zoom) {
++		// OnMyLead patch: below the layer's minimum zoom there is no tile (getTileUrl is null there,
++		// which threw a NullPointerException on every tile request).
++		if (this.minimumZ > 0 && zoom < this.minimumZ) return NO_TILE;
+ 		if (!this.customMode) return this.tileProvider.getTile(x, y, zoom);
+ 
+ 		byte[] image = null;
+@@ -175,44 +178,10 @@ public class MapTileProvider implements TileProvider {
+ 		}
+ 
+ 		if (image == null && !this.offlineMode && this.tileCachePath != null) {
+-			String fileName = getTileFilename(x, y, zoom);
+-			Constraints constraints = new Constraints.Builder()
+-				.setRequiredNetworkType(NetworkType.CONNECTED)
+-				.build();
+-			OneTimeWorkRequest tileRefreshWorkRequest = new OneTimeWorkRequest.Builder(MapTileWorker.class)
+-				.setConstraints(constraints)
+-				.addTag(fileName)
+-				.setInputData(
+-					new Data.Builder()
+-						.putString("url", getTileUrl(x, y, zoom).toString())
+-						.putString("filename", fileName)
+-						.putInt("maxAge", -1)
+-						.build()
+-					)
+-				.build();
+-			WorkManager workManager = WorkManager.getInstance(this.context.getApplicationContext());
+-			Operation fetchOperation = workManager
+-				.enqueueUniqueWork(fileName, ExistingWorkPolicy.KEEP, tileRefreshWorkRequest);
+-			Future<Operation.State.SUCCESS> operationFuture = fetchOperation.getResult();
+-			try {
+-				operationFuture.get(1L, TimeUnit.SECONDS);
+-				Thread.sleep(500);
+-				Future<List<WorkInfo>> fetchFuture = workManager.getWorkInfosByTag(fileName);
+-				List<WorkInfo> workInfo = fetchFuture.get(1L, TimeUnit.SECONDS);
+-				Log.d("urlTile: ", workInfo.get(0).toString());
+-				if (this.tileCachePath != null) {
+-					image = readTileImage(x, y, zoom);
+-					if (image != null) {
+-						Log.d("urlTile","tile cache fetch HIT for " + zoom +
+-							"/" + x + "/" + y);
+-					} else {
+-							Log.d("urlTile","tile cache fetch MISS for " + zoom +
+-								"/" + x + "/" + y);
+-					}
+-				}
+-			} catch (Exception e) {
+-			  e.printStackTrace();
+-			}
++			// OnMyLead patch: fetch on this tile thread and save it, instead of queueing a WorkManager
++			// job and sleeping 1.5 s per tile, which made a fresh map take many seconds to draw.
++			image = fetchTile(x, y, zoom);
++			if (image != null) writeTileImage(image, x, y, zoom);
+ 		} else if (image == null && !this.offlineMode) {
+ 			Log.d("urlTile", "Normal fetch");
+ 			image = fetchTile(x, y, zoom);
+@@ -323,6 +292,8 @@ public class MapTileProvider implements TileProvider {
+ 		long lastModified = file.lastModified();
+ 		long now = System.currentTimeMillis();
+ 
++		URL refreshUrl = getTileUrl(x, y, zoom);
++		if (refreshUrl == null) return;
+ 		if ((now - lastModified) / 1000 > this.tileCacheMaxAge) {
+       Log.d("urlTile", "Refreshing");
+ 			Constraints constraints = new Constraints.Builder()
+@@ -333,7 +304,7 @@ public class MapTileProvider implements TileProvider {
+ 				.addTag(fileName)
+ 				.setInputData(
+ 					new Data.Builder()
+-						.putString("url", getTileUrl(x, y, zoom).toString())
++						.putString("url", refreshUrl.toString())
+ 						.putString("filename", fileName)
+ 						.putInt("maxAge", this.tileCacheMaxAge)
+ 						.build()
+@@ -346,11 +317,14 @@ public class MapTileProvider implements TileProvider {
+ 
+ 	byte[] fetchTile(int x, int y, int zoom) {
+ 		URL url = getTileUrl(x, y, zoom);
++		if (url == null) return null;
+ 		ByteArrayOutputStream buffer = null;
+ 		InputStream in = null;
+ 
+ 		try {
+ 			URLConnection conn = url.openConnection();
++			conn.setConnectTimeout(10000);
++			conn.setReadTimeout(15000);
+ 			in = conn.getInputStream();
+ 			buffer = new ByteArrayOutputStream();
+ 

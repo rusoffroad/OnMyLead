@@ -107,6 +107,9 @@ export function needsAgreement(opts: {
 }): boolean {
   const current = opts.current ?? RIDER_AGREEMENT.version;
   if (opts.serverVersion != null && opts.serverVersion >= current) return false;
+  // Signed out: anyone who agreed on this device covers it (a rider who signs out isn't asked
+  // again). Whoever signs in next is checked for their own account.
+  if (!opts.userId) return !Object.values(opts.local).some((a) => a.version >= current);
   const mine = opts.local[accountKey(opts.userId)];
   if (mine && mine.version >= current) return false;
   // Agreed on this device before signing in: that acceptance carries over to the account.

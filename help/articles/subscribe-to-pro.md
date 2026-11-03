@@ -35,7 +35,7 @@ Outside the US, the app shows the price in your local currency.
 
 ## Subscribe
 
-:::release 2.1
+:::release 2.0
 Invited by a friend, or invited one? When the new rider finishes their first ride, you both get Pro Annual at 50% off for the first year. See [Invite Friends and Get 50% Off Pro](/help/refer-a-friend).
 :::
 

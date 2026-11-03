@@ -3,7 +3,7 @@ title: Invite Friends and Get 50% Off Pro
 summary: Invite a riding buddy who's new to OnMyLead. When they finish their first ride, you both get Pro Annual at half price for the first year.
 category: pro
 order: 45
-release: "2.1"
+release: "2.0"
 updated: 2026-11-03
 sources:
   - app/src/app/invite-friends.tsx

@@ -5,19 +5,31 @@ import { StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
+import { symbolInfo, symbolLabel, symbolSvgMarkup, warningTriangle, waypointSymbol, type WaypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { drawRoute, esc, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { octagon } from './waypoint-blaze';
 
-const blaze = (shared: boolean) => {
+/** The same blaze as the app (WaypointBlaze): a diamond, or a warning triangle for hazards, with the symbol on it. */
+const blaze = (shared: boolean, symbol: WaypointSymbol) => {
   const fill = shared ? Colors.sky : Colors.text;
   const ink = shared ? '#FFFFFF' : Colors.background;
-  return `<svg width="30" height="30" viewBox="0 0 30 30"><rect x="4.4" y="4.4" width="21.2" height="21.2" rx="2.7" fill="${fill}" stroke="${Colors.background}" stroke-width="2.5" transform="rotate(45 15 15)"/><circle cx="15" cy="15" r="3.4" fill="${ink}"/></svg>`;
+  const triangle = symbolInfo(symbol).shape === 'triangle';
+  const shape = triangle
+    ? `<polygon points="${warningTriangle(30)}" fill="${fill}" stroke="${Colors.background}" stroke-width="2.5" stroke-linejoin="round"/>`
+    : `<rect x="4.4" y="4.4" width="21.2" height="21.2" rx="2.7" fill="${fill}" stroke="${Colors.background}" stroke-width="2.5" transform="rotate(45 15 15)"/>`;
+  const g = triangle ? 13.5 : 14;
+  return `<svg width="30" height="30" viewBox="0 0 30 30">${shape}<g transform="translate(${(30 - g) / 2} ${triangle ? 11.5 : 8})">${symbolSvgMarkup(symbol, ink, g)}</g></svg>`;
 };
 
-const stopSign = (n: number | null) =>
-  `<svg width="34" height="34" viewBox="0 0 34 34"><polygon points="${octagon(17, 17, 16.5)}" fill="${Colors.background}"/><polygon points="${octagon(17, 17, 14.5)}" fill="#FFFFFF"/><polygon points="${octagon(17, 17, 12.5)}" fill="${Colors.accent}"/><text x="17" y="22.5" text-anchor="middle" fill="#FFFFFF" font-family="BarlowCondensed_800ExtraBold, sans-serif" font-size="17">${n ?? ''}</text></svg>`;
+/** A planned stop's sign, with what it's for (fuel, food) on a small white tag at its corner. */
+const stopSign = (n: number | null, symbol: WaypointSymbol) =>
+  `<svg width="34" height="34" viewBox="0 0 34 34" overflow="visible"><polygon points="${octagon(17, 17, 16.5)}" fill="${Colors.background}"/><polygon points="${octagon(17, 17, 14.5)}" fill="#FFFFFF"/><polygon points="${octagon(17, 17, 12.5)}" fill="${Colors.accent}"/><text x="17" y="22.5" text-anchor="middle" fill="#FFFFFF" font-family="BarlowCondensed_800ExtraBold, sans-serif" font-size="17">${n ?? ''}</text>${
+    symbol === 'spot'
+      ? ''
+      : `<circle cx="31" cy="3" r="8.5" fill="#FFFFFF" stroke="${Colors.background}" stroke-width="1.5"/><g transform="translate(25.4 -2.6)">${symbolSvgMarkup(symbol, Colors.background, 11.2, true)}</g>`
+  }</svg>`;
 
 /**
  * The ride's waypoints on the web: satellite imagery, the route under them, the leader's planned
@@ -118,6 +130,7 @@ export function WaypointMap({
     if (route) drawRoute(g, route);
     for (const w of waypoints) {
       const n = w.planned_stop ? stopNumber(w, waypoints) : null;
+      const symbol = waypointSymbol(w);
       const time = w.planned_stop ? stopTimeLabel(w.stop_time) : null;
       const cls = w.planned_stop ? 'stop' : w.shared ? 'shared' : '';
       const size = w.planned_stop ? 34 : 30;
@@ -125,11 +138,11 @@ export function WaypointMap({
         className: '',
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
-        html: `<div class="oml-wp ${cls}" style="width:${size}px;height:${size}px">${w.planned_stop ? stopSign(n) : blaze(w.shared)}<span>${esc(w.name)}${time ? `<small>${esc(time)}</small>` : ''}</span></div>`,
+        html: `<div class="oml-wp ${cls}" style="width:${size}px;height:${size}px">${w.planned_stop ? stopSign(n, symbol) : blaze(w.shared, symbol)}<span>${esc(w.name)}${time ? `<small>${esc(time)}</small>` : ''}</span></div>`,
       });
       L.marker(ll(w), {
         icon,
-        title: w.planned_stop ? `Planned stop ${n ?? ''}, ${w.name}` : `Waypoint ${w.name}`,
+        title: w.planned_stop ? `Planned stop ${n ?? ''}, ${w.name}, ${symbolLabel(symbol)}` : `${symbolLabel(symbol)} waypoint, ${w.name}`,
         zIndexOffset: w.planned_stop ? 500 : w.shared ? 400 : 300,
       })
         .on('click', () => cb.current.onPressWaypoint(w))

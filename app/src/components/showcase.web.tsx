@@ -144,10 +144,10 @@ export function Showcase() {
             <Step
               n={4}
               shot="waypoints"
-              alt="The ride’s waypoints map: two numbered planned stops, a shared Washout hazard, and a camp spot only you see"
+              alt="The ride’s waypoints map: numbered planned stops tagged fuel and food, a shared Washout hazard triangle, a gate, a water crossing and a camp only you see"
               title="Mark the Trail"
-              text="Press and hold the map to drop a waypoint: camp, fuel, water, a viewpoint, parking or a hazard, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
-              points={['Shared waypoints show on every rider’s map', 'Never public: only riders on the ride see shared ones', 'Add one at your location with one tap']}
+              text="Press and hold the map to drop a waypoint with one of 15 symbols: camp, fuel, water, food, a gate, a trailhead, a water crossing, a hazard and more, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
+              points={['Shared waypoints show on every rider’s map', 'Every symbol has its own drawing, easy to read for color-blind riders, and hazards stand out as triangles', 'Planned stops show what they’re for right on the stop sign', 'Never public: only riders on the ride see shared ones']}
             />
             <Step
               n={5}
@@ -257,13 +257,13 @@ export function Showcase() {
 
         <section className="qr" aria-labelledby="nav-title">
           <figure className="phone qr-phone">
-            <img src="/showcase/navigate.webp" alt="Map Mode on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Measure tabs, and speed and elevation" loading="lazy" width={786} height={1704} />
+            <img src="/showcase/navigate.webp" alt="Map Mode on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Draw tabs, and speed with elevation, heading, trip miles and moving time" loading="lazy" width={786} height={1704} />
           </figure>
           <div className="qr-copy">
             <h2 id="nav-title" className="section-title">Map Mode When It’s Just You</h2>
             <p>
-              Not every ride is a group ride. Map Mode is your offroad map for the rest: every trail and road with your speed
-              and elevation, a recorder that draws your line as you ride, and Map a Custom Trail to draw one that isn’t marked
+              Not every ride is a group ride. Map Mode is your offroad map for the rest: every trail and road with your speed,
+              elevation, heading, trip miles and moving time, a recorder that draws your line as you ride, and Map a Custom Trail to draw one that isn’t marked
               anywhere. Track Line shows exactly where you’ve been, a new colour each day. Keep your trails on your phone, or share
               them with every rider.
             </p>

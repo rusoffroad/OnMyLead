@@ -36,7 +36,7 @@ The full text is at [onmylead.com/rider-agreement](/rider-agreement). It's part 
 2. Tick the box that says **I have read and agree to the Rider Safety and Liability Agreement, and I accept the risks of riding**.
 3. Tap **I Agree**. The button stays grey until the box is ticked.
 
-You're asked once. You won't see it again on that phone, tablet or browser unless the agreement changes, in which case everyone is asked to agree to the new version. If you agree before you sign in, that answer counts for the account you sign in with next on that device. If you use a new phone or reinstall the app, it checks your account and doesn't ask again.
+You're asked once, the first time you open the app. You won't see it again on that phone, tablet or browser, even after signing out, unless the agreement changes, in which case everyone is asked to agree to the new version. If you agree before you sign in, that answer counts for the account you sign in with next on that device. If you use a new phone or reinstall the app, it checks your account and doesn't ask again.
 
 No signal? Tapping **I Agree** works offline, so you can still use Ride Mode and Help and SOS. The app sends the record as soon as it's back online.
 
