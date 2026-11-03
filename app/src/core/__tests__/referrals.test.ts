@@ -133,6 +133,7 @@ describe('Apple offer code files', () => {
   it('reads the App Store Connect download or a plain list', () => {
     expect(parseOfferCodes('Offer Codes\nAB12CD34EF\nab12cd34ef\n"XY98ZW76"\n')).toEqual(['AB12CD34EF', 'XY98ZW76']);
     expect(parseOfferCodes('Code,Expiration\nQQ11WW22,2027-05-01\nnot a code\nSHORT1')).toEqual(['QQ11WW22', 'SHORT1']);
-    expect(parseOfferCodes('EXPIRATION\nONLYLETTERS')).toEqual([]);
+    expect(parseOfferCodes('Code,Expiration Date\nONLYLETTERS,2027-05-03\nabcdefgh')).toEqual(['ONLYLETTERS', 'ABCDEFGH']);
+    expect(parseOfferCodes('Offer Code\nEXPIRATION\nCODES')).toEqual([]);
   });
 });
