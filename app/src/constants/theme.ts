@@ -22,6 +22,8 @@ export const Colors = {
   /** Logo blue: links, sharing, information. */
   sky: '#3B86F7',
   danger: '#F03E3E',
+  /** Pro gold: the Pro tag and what Pro unlocks. Never an action colour. */
+  gold: '#E6C27A',
 } as const;
 
 export type ThemeColor = keyof typeof Colors;
@@ -93,6 +95,27 @@ export const Radius = {
 } as const;
 
 export const MaxContentWidth = 800;
+
+/**
+ * Panels and buttons that float over a live map (Ride Mode, Map Mode): dark glass with a hairline
+ * edge, so the map shows through at the edges and every control reads as one family. Red stays for
+ * Regroup and Emergency only.
+ */
+export const Glass = {
+  panel: 'rgba(16,30,51,0.95)',
+  /** A button or tile inside a glass panel. */
+  tile: 'rgba(255,255,255,0.06)',
+  edge: 'rgba(151,167,190,0.18)',
+  /** Thin trouble tints for alert rows (red) and announcements (amber). */
+  redTint: 'rgba(229,38,46,0.10)',
+  redEdge: 'rgba(229,38,46,0.42)',
+  amberTint: 'rgba(242,178,51,0.16)',
+  amber: '#F2B233',
+  softRed: '#FF6B70',
+} as const;
+
+/** The surface of a floating glass control. */
+export const GlassSurface = { backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge } as const;
 
 /** Ride Bubble and role colors, tuned to read on the navy. Riders learn them once. */
 export const RideColors = {

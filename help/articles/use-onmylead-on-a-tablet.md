@@ -6,6 +6,7 @@ order: 40
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - app/src/app/e/[code].tsx
   - app/src/core/layout.ts
   - app/src/hooks/use-layout.ts
   - app/src/components/tab-bar.tsx
@@ -53,7 +54,7 @@ The live map fills the screen.
 - The ride name, your sharing timer and any announcement stay at the top of the left side.
 
 :::release 2.0
-Tap **✎ Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
+Tap **Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
 :::
 
 :::release 1.0.3
@@ -98,4 +99,10 @@ Search and the list of rides sit on the left, with the map filling the rest of t
 
 :::note
 Many tablets have no GPS. A Wi-Fi-only tablet can usually only tell roughly where it is, so share your location from your phone on the trail and use the tablet to follow the group.
+:::
+
+:::release 2.0
+## Events on a Tablet
+
+Events shows two events per row on a tablet in portrait and three in landscape. An event's page keeps its photo, details and hosts on the left, and the agenda, group rides and who's going on the right. See [Events](/help/events).
 :::

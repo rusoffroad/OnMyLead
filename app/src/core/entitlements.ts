@@ -22,11 +22,15 @@ export type FeatureKey =
   | 'premium_ride_cards'
   | 'record_trails'
   | 'share_trails'
-  | 'trail_rides';
+  | 'trail_rides'
+  | 'social_posts'
+  | 'create_events';
 
 export const FEATURE_KEYS: FeatureKey[] = [
   'create_ride', 'import_gpx', 'offline_maps', 'saved_groups', 'create_poll', 'ride_history',
   'advanced_trip_planning', 'advanced_stats', 'premium_ride_cards', 'record_trails', 'share_trails', 'trail_rides',
+  'social_posts',
+  'create_events',
 ];
 
 /** Names for prompts and the comparison table (Title Case). */
@@ -43,6 +47,8 @@ export const FEATURE_NAMES: Record<FeatureKey, string> = {
   record_trails: 'Record Your Trails',
   share_trails: 'Share Your Trails',
   trail_rides: 'Group Rides on Your Trails',
+  social_posts: 'Post, Comment and Share',
+  create_events: 'Create Events',
 };
 
 export type AccountType = 'free' | 'pro' | 'admin';
@@ -231,7 +237,7 @@ export function applyClock(e: Entitlements, now = Date.now()): Entitlements {
     rideAllowance: 1,
     historyLimit: 5,
     features: { ...ALL_ON, import_gpx: false, offline_maps: false, saved_groups: false, create_poll: false,
-      advanced_trip_planning: false, advanced_stats: false, premium_ride_cards: false },
+      advanced_trip_planning: false, advanced_stats: false, premium_ride_cards: false, social_posts: false },
   };
 }
 
@@ -240,6 +246,17 @@ export function can(e: Entitlements, feature: FeatureKey): boolean {
   if (!e.switchedOn) return true;
   if (feature === 'create_ride') return e.rideAllowance === null || e.ridesCreatedThisMonth < e.rideAllowance;
   return e.features[feature] !== false;
+}
+
+/**
+ * Whether a button for this feature carries the small Pro tag: only for a Free account on a
+ * server that gates it, and only for features that are Pro-only. Creating rides isn't one (Free
+ * gets a ride a month; Create a Ride shows what's left instead), and Pro, Pro Trial and Admin
+ * accounts never see a tag.
+ */
+export function showsProTag(e: Entitlements, feature: FeatureKey): boolean {
+  if (feature === 'create_ride') return false;
+  return !can(e, feature);
 }
 
 /** "Rides Created This Month: 0 of 1", or null when unlimited. */

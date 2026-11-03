@@ -4,7 +4,7 @@ summary: Save the people you ride with as a group, invite friends with a link, a
 category: groups
 order: 10
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/(tabs)/groups.tsx
   - app/src/app/groups/new.tsx
@@ -32,6 +32,10 @@ The top of the Groups tab also has **Out Riding**, to see who's out riding near 
 
 :::note
 This is a Pro feature. You need Pro to create a group and to add or remove riders. See [Free and Pro](/help/free-vs-pro). Joining a group with its link, the group chat, inviting a group to your rides and getting the group's ride invites are free for everyone.
+
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
 :::
 
 ## Create a Group

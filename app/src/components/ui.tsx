@@ -9,7 +9,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { font, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { READABLE_WIDTH } from '@/core/layout';
 import { useTheme } from '@/hooks/use-theme';
+import type { FeatureKey } from '@/core/entitlements';
 import { keyboardScroll, TextBox } from './keyboard';
+import { ProTag } from './pro-tag';
 import { ThemedText } from './themed-text';
 
 /**
@@ -51,9 +53,11 @@ type ButtonProps = PressableProps & {
   big?: boolean;
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** A Pro-only action: shows the Pro tag beside the title for Free riders. The press handler still calls requirePro(). */
+  pro?: FeatureKey;
 };
 
-export function Button({ title, kind = 'primary', big, loading, disabled, style, ...rest }: ButtonProps) {
+export function Button({ title, kind = 'primary', big, loading, disabled, style, pro, ...rest }: ButtonProps) {
   const theme = useTheme();
   const bg = { primary: theme.accent, danger: theme.danger, secondary: theme.backgroundSelected, ghost: 'transparent' }[kind];
   const fg = kind === 'secondary' || kind === 'ghost' ? theme.text : theme.onAccent;
@@ -72,6 +76,11 @@ export function Button({ title, kind = 'primary', big, loading, disabled, style,
       {...rest}>
       {loading ? (
         <ActivityIndicator color={fg} />
+      ) : pro ? (
+        <View style={styles.buttonRow}>
+          <Text style={[styles.buttonText, big && styles.buttonTextBig, { color: fg, flexShrink: 1 }]}>{title}</Text>
+          <ProTag feature={pro} />
+        </View>
       ) : (
         <Text style={[styles.buttonText, big && styles.buttonTextBig, { color: fg }]}>{title}</Text>
       )}
@@ -215,6 +224,7 @@ const styles = StyleSheet.create({
   content: { padding: Spacing.three, gap: Spacing.three, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
   button: { minHeight: 52, borderRadius: Radius.control, paddingHorizontal: Spacing.three, alignItems: 'center', justifyContent: 'center' },
   buttonBig: { minHeight: 68, borderRadius: 18 },
+  buttonRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   buttonText: { fontSize: 17, fontFamily: font(600), textAlign: 'center' },
   buttonTextBig: { fontSize: 21, fontFamily: font(700, 'display'), letterSpacing: 0.2 },
   input: { minHeight: 52, borderWidth: 1.5, borderRadius: Radius.control, paddingHorizontal: 14, fontSize: 17, fontFamily: font(500) },

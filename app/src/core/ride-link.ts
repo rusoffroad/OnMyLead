@@ -16,6 +16,9 @@ export const APPLE_APP_ID = 'YJ4KUF2QQV.com.rusoffroad.onmylead.app';
  * in our own sign-in emails (only those carrying a token_hash; see core/auth-link.ts).
  */
 export const APP_LINK_PATHS = ['/r/*', '/g/*', '/friend/*', '/auth-callback'] as const;
+// Event links (/e/*) open in the Android app from 2.0 (app.json intent filter, built into each
+// version). On iPhone they join this list and the site's association file only once 2.0 is the
+// App Store version: the file applies to every installed build, and 1.0.3 has no event screen.
 
 /** https://onmylead.com/r/CODE (or the configured web address). */
 export function rideLink(inviteCode: string, webUrl?: string | null): string {

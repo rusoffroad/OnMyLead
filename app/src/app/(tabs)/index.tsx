@@ -7,6 +7,7 @@ import { AppNotices } from '@/components/app-notices';
 import { BadgeStrip } from '@/components/badge-strip';
 import { FeedList, FeedSheet } from '@/components/home/feed';
 import { GroupCard, NoGroupCard } from '@/components/home/group-card';
+import { EventsCard } from '@/components/home/events-card';
 import { MapModeCard } from '@/components/home/map-mode-card';
 import { HeadLink, Home, homeStyles, Initial, SectionHead } from '@/components/home/parts';
 import { PublicRidesRail, RadiusChip, RadiusSheet } from '@/components/home/public-rides';
@@ -26,7 +27,8 @@ import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import { flagOn } from '@/core/app-settings';
 import type { MyBadges } from '@/core/badges';
 import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
-import { DEFAULT_FEED_SETTINGS, FEED_NOT_SWITCHED_ON, type FeedItem, type FeedSettings } from '@/core/feed';
+import { DEFAULT_FEED_SETTINGS, FEED_NOT_SWITCHED_ON, type FeedSettings } from '@/core/feed';
+import type { SocialItem } from '@/core/social';
 import type { GroupChatSummary } from '@/core/group-chat';
 import { createQuota, findCount, firstName, greeting, parseRadius, RADIUS_STORAGE_KEY, toolkitFor } from '@/core/home';
 import { historySplit } from '@/core/pro';
@@ -87,7 +89,7 @@ export default function HomeScreen() {
   const [groups, setGroups] = useState<RidingGroup[] | null>(null);
   const [chats, setChats] = useState<GroupChatSummary[]>([]);
   const [badges, setBadges] = useState<MyBadges | null>(null);
-  const [feed, setFeed] = useState<FeedItem[] | null>(null);
+  const [feed, setFeed] = useState<SocialItem[] | null>(null);
   const [feedOff, setFeedOff] = useState(false);
   const [feedSettings, setFeedSettings] = useState<FeedSettings>(DEFAULT_FEED_SETTINGS);
   const [feedOpen, setFeedOpen] = useState(false);
@@ -265,7 +267,7 @@ export default function HomeScreen() {
           <InboxBell compact />
           <Pressable accessibilityRole="button" accessibilityLabel="You: profile and settings" hitSlop={4} onPress={() => router.push('/profile')}>
             <View style={styles.avatar}>
-              <RiderPhoto userId={uid} size={40} fallback={<Initial name={name || 'R'} size={40} />} ring={0} />
+              <RiderPhoto userId={uid} size={40} zoom={false} fallback={<Initial name={name || 'R'} size={40} />} ring={0} />
             </View>
           </Pressable>
         </View>
@@ -325,6 +327,7 @@ export default function HomeScreen() {
         onFind={() => router.push('/find')}
       />
       {navOn ? <MapModeCard days={trackDays} trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
+      <EventsCard signedIn={!!session} radius={radius} />
       {!loading && !session ? (
         <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
@@ -378,13 +381,21 @@ export default function HomeScreen() {
   ) : null;
 
   const feedBlock = session && feedOn ? (
-    <Block title="Feed" right={feedOff ? undefined : <HeadLink title="Customize" onPress={() => setFeedOpen(true)} label="Customize your feed" />}>
+    <Block
+      title="Feed"
+      right={feedOff ? undefined : (
+        <View style={{ flexDirection: 'row', gap: 18 }}>
+          <HeadLink title="Customize" onPress={() => setFeedOpen(true)} label="Customize your feed" />
+          <HeadLink title="Open Social" onPress={() => router.push('/social')} label="Open Social: all your friends, activity and comments" />
+        </View>
+      )}>
       {feed == null ? null : feedOff ? (
         <Text style={homeStyles.muted}>{FEED_NOT_SWITCHED_ON}</Text>
       ) : (
         <>
           <FeedList
             items={feedAll ? feed : feed.slice(0, FEED_SHOWN)}
+            onChange={(i, next) => setFeed((list) => (list ? list.map((x, j) => (j === i ? next : x)) : list))}
             emptyText={feedSettings.kinds.length
               ? 'Nothing new yet. When friends ride, earn badges or share trails, it shows here.'
               : 'Everything is switched off in Customize.'}

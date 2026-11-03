@@ -3,6 +3,7 @@ import { useCallback, useState, type ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { DirectionsCard } from '@/components/directions';
+import { PartOfEvent } from '@/components/events/part-of-event';
 import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
 import { GetTheApp } from '@/components/get-the-app';
@@ -198,7 +199,7 @@ export default function RidePage() {
       onResolve={chat.resolve}
       onClear={chat.clear}
       actionsOn={chat.actionsOn}
-      onReport={(userId) => setReporting({ kind: 'rider', userId, rideId: ride.id, name: nameOf(userId) })}
+      onReport={(userId) => setReporting({ kind: 'rider', userId, rideId: ride.id, name: nameOf(userId), source: 'ride_chat' })}
       onBlock={blocks.off ? undefined : (userId) => confirmAndBlock(userId, nameOf(userId))}
     />
   ) : null;
@@ -214,6 +215,7 @@ export default function RidePage() {
     <>
       <GetTheApp inviteCode={ride.invite_code} />
       <View style={{ gap: Spacing.two }}>
+        <PartOfEvent rideId={ride.id} />
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           {ride.status === 'live' ? <Tag label="Live Now" color={Colors.accent} solid /> : null}
           {countdown ? <Tag label={countdown} color={Colors.accent} /> : null}
@@ -528,7 +530,7 @@ export default function RidePage() {
       {me && !isOrganizer ? (
         <Pressable
           accessibilityRole="button"
-          onPress={() => setReporting({ kind: 'ride', rideId: ride.id, name: ride.name })}
+          onPress={() => setReporting({ kind: 'ride', rideId: ride.id, name: ride.name, source: 'ride' })}
           hitSlop={6}
           style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
           <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13, textDecorationLine: 'underline' }}>Report Ride</ThemedText>

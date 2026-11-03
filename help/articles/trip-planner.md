@@ -68,6 +68,10 @@ Under **After the Trip**:
 - **Uncheck All** puts every item back to not packed. The list stays.
 - **Copy to a New Trip** starts a new trip with the same list. This is a Pro feature. See [Free and Pro](/help/free-vs-pro).
 
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
+
 ## Link a Trip to a Ride
 
 When you create or edit a trip, you can pick a ride you've joined under **For a Ride**. The trip then shows a link to that ride.

@@ -16,7 +16,7 @@ import { MapSearch } from '@/components/map-search';
 import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing } from '@/constants/theme';
 import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
 import { riderHeading } from '@/core/heading';
 import { useFollowMe } from '@/hooks/use-follow-me';
@@ -47,6 +47,7 @@ import { requirePro } from '@/lib/pro';
 import { clearTrackLine, flushTrackLine, recordTrackFixes, setTrackLineOn, useTrackDays } from '@/lib/track-line';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
+import { ProTag } from '@/components/pro-tag';
 
 type Mode = 'explore' | 'record' | 'measure';
 type Followed = { name: string; points: LatLng[]; publicTrail: PublicTrail | null; obstacles?: Obstacle[] };
@@ -793,6 +794,7 @@ function RecordPanel({
             <Circle cx={15} cy={15} r={7} fill="#fff" />
           </Svg>
           <Text style={styles.recText}>Record a Trail</Text>
+          <ProTag feature="record_trails" />
         </Pressable>
         {open ? (
           <Text style={styles.hint}>
@@ -912,29 +914,29 @@ function MeasurePanel({
   );
 }
 
-const glass = { backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1, borderColor: Colors.border } as const;
+const glass = GlassSurface;
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: Spacing.two, zIndex: 30 },
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
-  topRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48 },
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: 8, ...GlassSurface, borderRadius: 20, paddingHorizontal: 14, minHeight: 50 },
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: Radius.pill, backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: Radius.pill, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   chipText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   notice: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: Radius.card, ...glass, borderColor: RIDER_TRAIL_INK },
   noticeTitle: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   noticeText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
-  noticeOk: { paddingHorizontal: 14, height: 36, borderRadius: Radius.pill, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
+  noticeOk: { paddingHorizontal: 14, height: 36, borderRadius: Radius.pill, justifyContent: 'center', backgroundColor: Glass.tile },
   music: { position: 'absolute', right: 12, zIndex: 15 },
   locate: { position: 'absolute', width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', zIndex: 15, ...glass },
-  panel: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24, zIndex: 20 },
+  panel: { position: 'absolute', bottom: 0, left: 0, right: 0, ...GlassSurface, borderBottomWidth: 0, borderTopLeftRadius: 26, borderTopRightRadius: 26, zIndex: 20 },
   panelWide: { bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
-  panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1, borderColor: Colors.border },
+  panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1 },
   panelInner: { padding: Spacing.three, paddingTop: 4, gap: 12 },
-  tabs: { flexDirection: 'row', gap: 6, padding: 4, borderRadius: Radius.control, backgroundColor: Colors.backgroundElement },
+  tabs: { flexDirection: 'row', gap: 6, padding: 4, borderRadius: Radius.control, backgroundColor: 'rgba(0,0,0,0.22)' },
   tab: { flex: 1, flexDirection: 'row', gap: 6, minHeight: 42, borderRadius: Radius.control - 4, alignItems: 'center', justifyContent: 'center' },
-  tabOn: { backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border },
+  tabOn: { backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   tabText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 15 },
   gauges: { flexDirection: 'row', alignItems: 'flex-end', gap: 18 },
   gauge: { flexShrink: 1, gap: 0 },
@@ -945,10 +947,10 @@ const styles = StyleSheet.create({
   follow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 12, borderLeftWidth: 3, borderLeftColor: Colors.accent },
   followLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   followName: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22 },
-  smallBtn: { paddingHorizontal: 14, height: 36, borderRadius: Radius.pill, justifyContent: 'center', backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border },
+  smallBtn: { paddingHorizontal: 14, height: 36, borderRadius: Radius.pill, justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   hint: { color: Colors.text, fontFamily: font(500), fontSize: 15, lineHeight: 21 },
   hintRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  wideBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, paddingHorizontal: 14, borderRadius: Radius.control, backgroundColor: Colors.backgroundSelected },
+  wideBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48, paddingHorizontal: 14, borderRadius: Radius.control, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   wideBtnText: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
   rateCta: { minHeight: 50, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: RIDER_TRAIL_INK },
   rateText: { color: Colors.background, fontFamily: font(700), fontSize: 16 },
@@ -960,7 +962,7 @@ const styles = StyleSheet.create({
   recDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: RideColors.red },
   recState: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   row: { flexDirection: 'row', gap: Spacing.two },
-  ctl: { flex: 1, minHeight: 50, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border },
+  ctl: { flex: 1, minHeight: 50, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   ctlMain: { flexGrow: 1.6, backgroundColor: RECORD_INK, borderColor: RECORD_INK },
   ctlText: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
   discard: { color: Colors.danger, fontFamily: font(600), fontSize: 14 },

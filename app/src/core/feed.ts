@@ -6,7 +6,7 @@
 import { BADGE_BY_KEY, isBadgeKey, LEVEL_NAME, type BadgeKey, type BadgeLevel } from './badges';
 import { METERS_PER_MILE } from './geo';
 
-export type FeedKind = 'out' | 'ride' | 'badge' | 'trail' | 'group';
+export type FeedKind = 'out' | 'ride' | 'badge' | 'trail' | 'group' | 'post';
 export type ShowFrom = 'friends' | 'follows' | 'groups';
 export type ShareWith = 'friends' | 'followers' | 'nobody';
 
@@ -33,7 +33,7 @@ export type FeedItem = {
 
 export type FeedSettings = { showFrom: ShowFrom; kinds: FeedKind[]; shareWith: ShareWith };
 
-export const ALL_KINDS: FeedKind[] = ['out', 'ride', 'badge', 'trail', 'group'];
+export const ALL_KINDS: FeedKind[] = ['post', 'out', 'ride', 'badge', 'trail', 'group'];
 export const DEFAULT_FEED_SETTINGS: FeedSettings = { showFrom: 'groups', kinds: ALL_KINDS, shareWith: 'friends' };
 
 /** The Customize sheet, in the order it shows. */
@@ -43,6 +43,7 @@ export const SHOW_FROM_CHOICES: { value: ShowFrom; label: string; detail: string
   { value: 'groups', label: 'Friends, Follows and My Groups', detail: 'Adds rides posted to your riding groups' },
 ];
 export const KIND_CHOICES: { value: FeedKind; label: string }[] = [
+  { value: 'post', label: 'Posts' },
   { value: 'out', label: 'Friends Out Riding' },
   { value: 'ride', label: 'Finished Rides' },
   { value: 'badge', label: 'Badges Earned' },
@@ -127,6 +128,8 @@ export function feedLine(item: FeedItem): string {
       return item.badge ? `earned ${BADGE_BY_KEY[item.badge.badge].name} ${LEVEL_NAME[item.badge.level]}` : 'earned a badge';
     case 'trail':
       return item.title ? `shared a trail, ${item.title}` : 'shared a trail';
+    case 'post':
+      return 'posted';
     case 'group':
       return item.groupName ? `posted a ride to ${item.groupName}${item.title ? `, ${item.title}` : ''}` : `posted a group ride${item.title ? `, ${item.title}` : ''}`;
   }
@@ -155,7 +158,7 @@ export function timeAgo(iso: string, now: Date = new Date()): string {
 }
 
 /** Out riding posts always come first (they're happening now), then newest first. */
-export function sortFeed(items: FeedItem[]): FeedItem[] {
+export function sortFeed<T extends FeedItem>(items: T[]): T[] {
   return [...items].sort((a, b) => (a.kind === 'out') !== (b.kind === 'out') ? (a.kind === 'out' ? -1 : 1) : Date.parse(b.at) - Date.parse(a.at));
 }
 

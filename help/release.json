@@ -50,10 +50,12 @@
     },
     {
       "feature": "Instagram and TikTok sign-in",
-      "why": "Not supported.",
+      "why": "Not supported. Sharing a post to Instagram (2.0) is fine; signing in with Instagram is not.",
       "sources": [],
       "words": [
-        "Instagram",
+        "sign in with Instagram",
+        "Instagram sign-in",
+        "Instagram account",
         "TikTok"
       ]
     }

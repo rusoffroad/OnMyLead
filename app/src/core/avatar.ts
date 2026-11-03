@@ -2,7 +2,7 @@
  * Profile pictures: the shared rules for cropping, naming and showing a rider's photo.
  *
  * The app crops every photo to a centered square and saves a 512 x 512 JPEG before upload, so a
- * picture is small (about 50-150 KB), loads fast on weak signal and looks the same on every
+ * picture is small (about 40-90 KB, never over AVATAR_MAX_BYTES; the bucket refuses anything over 512 KB), loads fast on weak signal and looks the same on every
  * device. The database keeps only the file's path inside the rider's own folder of the
  * rider-avatars bucket (migration 20261102000000_profile_photos.sql); it refuses any other path.
  */
@@ -13,8 +13,11 @@ export const AVATAR_BUCKET = 'rider-avatars';
 /** Width and height of the saved picture, in pixels. */
 export const AVATAR_SIZE = 512;
 
-/** JPEG quality for the saved picture (0-1). */
-export const AVATAR_QUALITY = 0.8;
+/** JPEG quality for the saved picture (0-1). Lowered step by step if the file is still too big. */
+export const AVATAR_QUALITY = 0.72;
+
+/** The most a saved picture may weigh. A very detailed photo is saved again at lower quality until it fits. */
+export const AVATAR_MAX_BYTES = 200 * 1024;
 
 export type Rect = { originX: number; originY: number; width: number; height: number };
 

@@ -97,6 +97,9 @@ function RootLayout() {
         <Stack.Screen name="reset-password" options={{ title: 'New Password' }} />
         <Stack.Screen name="ride/new" options={{ title: 'Create a Ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
+        <Stack.Screen name="events/index" options={{ title: 'Events' }} />
+        <Stack.Screen name="events/new" options={{ title: 'Create an Event' }} />
+        <Stack.Screen name="e/[code]" options={{ title: '' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
         <Stack.Screen name="ride/[id]/route" options={{ title: 'Route', headerShown: false }} />
         <Stack.Screen name="ride/[id]/waypoints" options={{ title: 'Waypoints', headerShown: false }} />
@@ -114,6 +117,7 @@ function RootLayout() {
         <Stack.Screen name="notifications" options={{ title: 'Notification Settings' }} />
         <Stack.Screen name="badges" options={{ title: 'Badges' }} />
         <Stack.Screen name="blocked" options={{ title: 'Blocked Riders' }} />
+        <Stack.Screen name="report-rider" options={{ title: 'Report a Rider' }} />
         <Stack.Screen name="battery" options={{ title: 'Battery Saver' }} />
         <Stack.Screen name="pro" options={{ title: '' }} />
         <Stack.Screen name="subscription" options={{ title: 'Subscription' }} />
@@ -134,6 +138,10 @@ function RootLayout() {
         <Stack.Screen name="g/[code]" options={{ title: 'Riding Group' }} />
         <Stack.Screen name="friends" options={{ title: 'Friends' }} />
         <Stack.Screen name="friend/[code]" options={{ title: 'Add Friend' }} />
+        <Stack.Screen name="social/index" options={{ title: 'Social' }} />
+        <Stack.Screen name="social/item" options={{ title: 'Post', headerShown: false }} />
+        <Stack.Screen name="social/new" options={{ title: 'New Post', presentation: 'modal' }} />
+        <Stack.Screen name="social/rider/[id]" options={{ title: '' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
         <Stack.Screen name="terms" options={{ title: '' }} />
         <Stack.Screen name="privacy" options={{ title: '' }} />

@@ -6,6 +6,7 @@ order: 15
 release: "2.0"
 updated: 2026-11-03
 sources:
+  - app/src/components/home/events-card.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/home/**
   - app/src/components/inbox-bell.tsx
@@ -46,6 +47,10 @@ Your offroad map for when you're not on a group ride. The card shows a small map
 
 See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
 
+## Events
+
+Under Map Mode, the **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
+
 ## Your Rides
 
 - **Ride Invites**: rides your riding groups invited you to.
@@ -84,6 +89,10 @@ What your friends, riders you follow and your riding groups have been up to in t
 
 Tap a post about a group ride or a trail to open it. The feed shows a few posts; tap **Show More** for the rest.
 
+:::release 2.0
+Riders' own posts show in the feed too. Tap the **heart** on any post to like it, or tap the post to open it in **Social** with every comment. **Open Social**, next to **Customize**, shows all your friends' activity, your friends and your posts. See [Like, Comment and Post in Social](/help/social).
+:::
+
 A ride is named only if it was public or you were on it. Your location is never in anyone's feed: an Out Riding post says only the spot words the rider chose, and only to riders who could already see them on Who's Riding.
 
 ### Customize Your Feed
@@ -91,7 +100,7 @@ A ride is named only if it was public or you were on it. Your location is never 
 Tap **Customize**.
 
 1. Under **Show Posts From**, pick **Friends**, **Friends and Riders I Follow**, or **Friends, Follows and My Groups**.
-2. Under **What Shows**, turn off any kind of post you don't want: **Friends Out Riding**, **Finished Rides**, **Badges Earned**, **Trails Shared** or **Group Rides Posted**.
+2. Under **What Shows**, turn off any kind of post you don't want: **Friends Out Riding**, **Finished Rides**, **Badges Earned**, **Trails Shared** or **Group Rides Posted**. From 2.0 there's also **Posts**.
 3. Under **Who Sees Your Activity**, pick **Friends Only** (the default), **Friends and Followers** (riders who follow you as a leader) or **Nobody**.
 4. Tap **Save**.
 
@@ -103,7 +112,7 @@ Your rank and all seven badge patches. Tap **See All** (or the patches) for your
 
 ## Your Toolkit
 
-Shortcuts to the tools that live on the **You** tab: **Who's Riding**, **Friends**, **Garage**, **Trip Planner**, **Offline Maps**, **Starlink**, **Battery Saver** and **Share Location**.
+Shortcuts to the tools that live on the **You** tab: **Who's Riding**, **Friends & Social** (your friends, their activity and your posts; see [Like, Comment and Post in Social](/help/social)), **Garage**, **Trip Planner**, **Offline Maps**, **Starlink**, **Battery Saver** and **Share Location**.
 
 ## Help & Support
 

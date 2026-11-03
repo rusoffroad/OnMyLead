@@ -110,7 +110,7 @@ export default function Conversation() {
               <Icon name="chevron" color={Colors.text} size={26} />
             </View>
           </Pressable>
-          <RiderDot userId={id} name={who} size={40} />
+          <RiderDot userId={id} name={who} size={40} zoom />
           <View style={{ flex: 1 }}>
             <Text style={styles.title} numberOfLines={1}>{who}</Text>
             <Text style={styles.sub} numberOfLines={1}>{blocked ? 'Blocked' : muted ? 'Muted' : 'Direct Message'}</Text>
@@ -146,7 +146,7 @@ export default function Conversation() {
               onPress={() => {
                 setMenu(false);
                 const theirs = [...chat.messages].reverse().find((m) => m.sender_id !== me);
-                if (id) setReporting({ kind: 'rider', userId: id, name: who, context: dmReportDetails(theirs?.body) });
+                if (id) setReporting({ kind: 'rider', userId: id, name: who, context: dmReportDetails(theirs?.body), source: 'dm' });
               }}>
               <Text style={styles.smallBtnText}>Report Rider</Text>
             </Pressable>
@@ -208,7 +208,7 @@ export default function Conversation() {
                   <View style={[styles.row, self && styles.rowMine]}>
                     <View style={[styles.col, self && { alignItems: 'flex-end' }]}>
                       <Pressable
-                        onLongPress={self || !id ? undefined : () => setReporting({ kind: 'rider', userId: id, name: who, context: dmReportDetails(m.body) })}
+                        onLongPress={self || !id ? undefined : () => setReporting({ kind: 'rider', userId: id, name: who, context: dmReportDetails(m.body), source: 'dm' })}
                         delayLongPress={350}
                         accessibilityHint={self ? undefined : 'Long press to report this message'}
                         style={[styles.bubble, self ? styles.bubbleMine : styles.bubbleTheirs]}>

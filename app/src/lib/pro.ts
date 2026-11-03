@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { can, parseProError, type FeatureKey } from '@/core/entitlements';
+import type { ReportSource } from '@/core/moderation';
 import { canStartTrip, localToday, type ProBlock } from '@/core/pro';
 import { myTrips } from './api';
 import { track } from './analytics';
@@ -79,14 +80,29 @@ export async function requireTripSlot(): Promise<boolean> {
 // ---- Reports ----
 
 /** File a report for the owner to look at. Reporters never see reports again (insert only). */
-export async function sendReport(r: { kind: 'ride' | 'rider'; rideId?: string | null; userId?: string | null; reason: string; details?: string }) {
-  const { error } = await supabase.from('reports').insert({
-    kind: r.kind,
+export async function sendReport(r: {
+  kind: 'ride' | 'rider' | 'event'; rideId?: string | null; userId?: string | null; reason: string; details?: string;
+  source?: ReportSource | null; groupId?: string | null; eventId?: string | null;
+}) {
+  // An event is reported as its owner (the server fills that in from event_id and sets the source).
+  const row = {
+    kind: r.kind === 'ride' ? 'ride' : 'rider',
     ride_id: r.rideId ?? null,
-    reported_user_id: r.kind === 'rider' ? r.userId : null,
+    reported_user_id: r.kind === 'ride' ? null : r.userId,
     reason: r.reason,
     details: r.details?.trim() ? r.details.trim().slice(0, 1000) : null,
-  });
+  };
+  // source and group_id arrive with the 2.0 server update (20261102800000), event_id with
+  // 20261102950000; until then the report is sent without them, as before.
+  const extra = {
+    ...(r.source ? { source: r.source } : {}), ...(r.groupId ? { group_id: r.groupId } : {}), ...(r.eventId ? { event_id: r.eventId } : {}),
+  };
+  let { error } = await supabase.from('reports').insert({ ...row, ...extra });
+  if (error && Object.keys(extra).length && (error.code === 'PGRST204' || error.code === '42703' || /source|group_id|event_id/.test(error.message))) {
+    // An older server has no event_id: say which event in the note instead.
+    const note = r.eventId ? `Event ${r.eventId}${row.details ? `\n${row.details}` : ''}`.slice(0, 1000) : row.details;
+    ({ error } = await supabase.from('reports').insert({ ...row, details: note }));
+  }
   if (error) {
     if (/report_limit/.test(error.message)) throw new Error('You’ve sent a lot of reports in the last hour. Try again later.');
     if (error.code === '42P01' || error.code === 'PGRST205' || /schema cache|does not exist/.test(error.message)) throw new Error('Reports are not switched on yet. They start working with the next server update.');

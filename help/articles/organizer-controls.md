@@ -6,6 +6,7 @@ order: 40
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - app/src/app/e/[code].tsx
   - app/src/app/r/[code].tsx
   - app/src/components/ride-roster.tsx
   - app/src/components/invite-card.tsx
@@ -69,4 +70,10 @@ Tap **Copy This Ride** (or **Ride Again** after it ends) to start a new ride wit
 
 :::note
 As the organizer you can't leave your own ride. Hand it to another rider first if you need to step away.
+:::
+
+:::release 2.0
+## Ride Managers for Event Rides
+
+When a ride is one of an event's group rides, an event host who organizes the ride can pick a **Ride Manager** on the event's page. The Ride Manager becomes a **Co-Organizer** of the ride (after joining it, if they weren't on it). See [Events](/help/events).
 :::

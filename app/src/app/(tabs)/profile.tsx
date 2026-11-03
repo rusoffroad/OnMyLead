@@ -277,6 +277,9 @@ export default function You() {
       ) : null}
 
       <MenuGroup title="Help">
+        {session ? (
+          <MenuRow icon="flagged" color={Colors.danger} title="Report a Rider" detail="Harassment, threats or abuse. Goes to the OnMyLead team" onPress={() => router.push('/report-rider')} />
+        ) : null}
         <MenuRow icon="wrench" color={Colors.accent} title="Report a Bug" detail="Something not working? Send it with a screenshot" onPress={() => router.push('/contact?topic=problem')} />
         <MenuRow icon="mail" color={Colors.sky} title="Contact Us" detail="An idea, a billing question or anything else" onPress={() => router.push('/contact')} />
         <MenuRow icon="checklist" color={Colors.textSecondary} title="Help and Support" detail="Answers to common questions" onPress={() => router.push('/support')} />

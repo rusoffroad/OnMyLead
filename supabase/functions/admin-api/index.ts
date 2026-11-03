@@ -7,7 +7,8 @@
 // same rule as every admin_* RPC applies. Admin accounts and the caller's own account can't be
 // suspended or deleted from here. Every action is written to admin_audit_log.
 //
-// Body: {"action":"suspend","user_id":"...","reason":"..."}
+// Body: {"action":"suspend","user_id":"...","reason":"...","days":7}   (days 1-365: a timed
+//       suspension that ends by itself; no days: a permanent ban, as before 2.0)
 //       {"action":"reactivate","user_id":"..."}
 //       {"action":"delete_user","user_id":"...","reason":"..."}
 //
@@ -64,6 +65,10 @@ Deno.serve(async (req) => {
   const { data: isAdmin } = await service.from('admin_users').select('user_id').eq('user_id', userId).maybeSingle();
   if (isAdmin && action !== 'reactivate') return reply({ error: 'Admin accounts must be changed in the database, not from the dashboard.' }, 400);
   if ((action === 'suspend' || action === 'delete_user') && (!reason || reason.length < 3)) return reply({ error: 'a reason is required' }, 400);
+  // Timed suspension in whole days; none (older dashboards) is a permanent ban.
+  const days = input?.days == null ? null : Number(input.days);
+  if (days !== null && !(Number.isInteger(days) && days >= 1 && days <= 365)) return reply({ error: 'days must be 1 to 365' }, 400);
+  const reportId = typeof input?.report_id === 'string' && UUID.test(input.report_id) ? input.report_id : null;
 
   const { data: profile } = await service.from('profiles').select('display_name, created_at').eq('id', userId).maybeSingle();
   const before = {
@@ -75,9 +80,13 @@ Deno.serve(async (req) => {
 
   let after: Record<string, unknown>;
   if (action === 'suspend' || action === 'reactivate') {
-    const { data, error } = await service.auth.admin.updateUserById(userId, { ban_duration: action === 'suspend' ? BAN : 'none' });
+    const ban = action === 'suspend' ? (days ? `${days * 24}h` : BAN) : 'none';
+    const { data, error } = await service.auth.admin.updateUserById(userId, { ban_duration: ban });
     if (error) return reply({ error: error.message }, 500);
-    after = { banned_until: (data.user as { banned_until?: string } | null)?.banned_until ?? null, reason };
+    after = {
+      banned_until: (data.user as { banned_until?: string } | null)?.banned_until ?? null, reason,
+      ...(action === 'suspend' ? { days, permanent: !days } : {}), ...(reportId ? { report_id: reportId } : {}),
+    };
   } else {
     const { data: request } = await service.from('account_deletion_requests').select('requested_at, reason').eq('user_id', userId).maybeSingle();
     // Log first: the profile, its rides and the deletion request go with the account.
@@ -92,7 +101,7 @@ Deno.serve(async (req) => {
     return reply({ ok: true });
   }
 
-  const logged = await log(actorId, action === 'suspend' ? 'user.suspend' : 'user.reactivate', userId, before, after);
+  const logged = await log(actorId, action === 'suspend' ? (days ? 'user.suspend' : 'user.ban') : 'user.reactivate', userId, before, after);
   if (logged) return reply({ error: logged }, 500);
   return reply({ ok: true, ...after });
 });

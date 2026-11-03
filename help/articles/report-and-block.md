@@ -6,6 +6,7 @@ order: 40
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - app/src/app/e/[code].tsx
   - app/src/components/report-sheet.tsx
   - app/src/components/ride-roster.tsx
   - app/src/components/ride-chat.tsx
@@ -21,14 +22,30 @@ sources:
   - app/src/app/out-riding.tsx
   - app/src/app/messages/[id].tsx
   - supabase/migrations/20261101700000_out_riding.sql
+  - app/src/app/report-rider.tsx
+  - app/src/app/(tabs)/profile.tsx
+  - app/src/core/moderation.ts
+  - app/src/app/sign-in.tsx
+  - supabase/migrations/20261102800000_abuse_reports.sql
 related: [privacy, ride-chat, group-chat, emergency-and-safety, contact-support]
-keywords: [report, block, unblock, harassment, spam, scam, fake account, unsafe, abuse, mute, tablet]
+keywords: [report, block, unblock, harassment, threats, spam, scam, fake account, unsafe, abuse, mute, tablet, suspended, banned]
 ---
 
 If a rider or a ride isn't right, report it to the OnMyLead team. If you'd rather not hear from a rider, block them. Neither one tells the other person it was you.
 
 :::warning
 If anyone is in danger, call 911 first.
+:::
+
+:::release 2.0
+## Report a Rider From the You Tab
+
+1. Tap the **You** tab.
+2. Under **Help**, tap **Report a Rider**.
+3. Tap the rider. The list shows riders you've messaged, added as friends, ridden with or share a group with, and riders you blocked. Type in **Search** to find one by name.
+4. Pick what's wrong, add details if you like, and tap **Send Report**.
+
+Riders you've never ridden with or messaged aren't listed, so nobody can look riders up by name.
 :::
 
 ## Report a Rider
@@ -40,7 +57,12 @@ If anyone is in danger, call 911 first.
 4. Under **What's Wrong**, pick **Harassment**, **Unsafe Riding**, **Spam or Scam**, **Fake Account** or **Something Else**.
 :::
 :::release 1.0.3
+:::until 2.0
 4. Under **What's Wrong**, pick **Harassment**, **Unsafe Riding**, **Spam or Scam**, **Fake Account**, **Inappropriate Photo** or **Something Else**.
+:::
+:::
+:::release 2.0
+4. Under **What's Wrong**, pick **Harassment**, **Threats**, **Unsafe Riding**, **Spam or Scam**, **Fake Account**, **Inappropriate Photo** or **Something Else**.
 :::
 5. Add details under **Anything Else (Optional)** if you like.
 6. Tap **Send Report**.
@@ -55,6 +77,12 @@ You can also press and hold one of the rider's messages in ride chat or group ch
 From a direct message, tap **•••** then **Report Rider**, or press and hold one of their messages. The message goes with your report. In Out Riding, tap **•••** next to a rider. See [See Who's Out Riding Nearby](/help/out-riding).
 :::
 
+:::release 2.0
+## Report a Post or Comment
+
+In Social, tap **⋯** on a post and tap **Report This Post**, or tap **Report** under a comment. Pick what's wrong, add details if you like, and tap **Send Report**. You can also report a rider from their profile. When three different riders report the same post or comment, it's hidden until the OnMyLead team looks at it. See [Like, Comment and Post in Social](/help/social).
+:::
+
 ## Report a Ride
 
 1. Open the ride's page.
@@ -63,6 +91,23 @@ From a direct message, tap **•••** then **Report Rider**, or press and hol
 4. Add details if you like, then tap **Send Report**.
 
 Reports go to the OnMyLead team, not to the rider or the organizer. OnMyLead looks at every report, and the person reported isn't told who sent it.
+
+:::release 2.0
+## What Happens After You Report a Rider
+
+- The OnMyLead team is emailed about every report straight away.
+- Your messages with the rider are saved with the report: your direct messages, and what either of you wrote in the last 30 days in a group chat or ride chat you share. Only the OnMyLead team can read them, and only to look into your report. Deleting a message or leaving a group afterwards doesn't remove the copy.
+- If the rider broke the rules, OnMyLead can suspend their account for 1, 7, 30 or 90 days, or ban it for good. They're signed out within the hour and can't sign in until the suspension ends.
+- You aren't told what action was taken, and they aren't told who reported them.
+
+If you see **This account is suspended** when you sign in, your account was suspended for breaking the rider rules. If you think it's a mistake, [contact us](/help/contact-support).
+:::
+
+:::release 2.0
+## Report an Event
+
+On an event's page, scroll down and tap **Report This Event** (you need to be signed in, and it isn't shown to the event's hosts). Pick what's wrong (**Spam or Scam**, **Fake Event**, **Offensive Content**, **Inappropriate Photo**, **Unsafe Plan** or **Something Else**), add a note if you like, and tap **Send Report**. It goes to the OnMyLead team as a report about the event's host, with the event attached. The host isn't told who sent it. The team can hide the event or take down a photo.
+:::
 
 ## Block a Rider
 

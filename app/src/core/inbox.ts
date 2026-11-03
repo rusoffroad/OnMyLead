@@ -78,7 +78,7 @@ export function whenText(iso: string, now: Date = new Date()): string {
 }
 
 export type InboxTone = 'alert' | 'status' | 'chat' | 'ride' | 'social' | 'account' | 'quiet';
-export type InboxIcon = 'warning' | 'flagged' | 'chat' | 'flag' | 'clock' | 'pin' | 'close' | 'people' | 'mail' | 'addFriend' | 'star' | 'map' | 'check' | 'bell';
+export type InboxIcon = 'warning' | 'flagged' | 'chat' | 'flag' | 'clock' | 'pin' | 'close' | 'people' | 'mail' | 'addFriend' | 'star' | 'map' | 'check' | 'bell' | 'heart';
 
 /** The icon and color family for a row, from its type. */
 export function inboxLook(item: Pick<InboxItem, 'kind' | 'data'>): { icon: InboxIcon; tone: InboxTone } {
@@ -107,6 +107,10 @@ export function inboxLook(item: Pick<InboxItem, 'kind' | 'data'>): { icon: Inbox
     case 'friend_request':
     case 'friend_accept':
       return { icon: 'addFriend', tone: 'social' };
+    case 'feed_like':
+      return { icon: 'heart', tone: 'social' };
+    case 'feed_comment':
+      return { icon: 'chat', tone: 'social' };
     case 'badge':
     case 'trial':
       return { icon: 'star', tone: 'account' };
@@ -131,6 +135,7 @@ export function notificationKey(raw: unknown): string | null {
   if (d.type === 'message') return `chat:${str(d.rideId)}`;
   if (d.type === 'group_message') return `group:${str(d.groupId)}`;
   if (d.type === 'direct_message') return `dm:${str(d.userId)}`;
+  if (d.type === 'feed_like' || d.type === 'feed_comment') return `${d.type}:${str(d.key)}`;
   const extra = d as Record<string, unknown>;
   return [d.type, str(d.rideId), str(d.change), str(extra.trailId), str(extra.stage)].join(':');
 }

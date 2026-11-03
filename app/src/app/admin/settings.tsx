@@ -20,6 +20,7 @@ const FEATURES: Record<string, { label: string; hint: string; allowance?: string
   advanced_trip_planning: { label: 'Advanced Trip Planning', hint: 'Templates, copying and more than one trip.' },
   advanced_stats: { label: 'Advanced Ride Statistics', hint: 'Speed, elevation and the group breakdown.' },
   premium_ride_cards: { label: 'Premium Ride Cards', hint: 'The standard card stays free.' },
+  create_events: { label: 'Create Events', hint: 'Seeing events, saying you’re going and co-hosting stay free.' },
 };
 
 type Notice = { text: string; until?: string } | null;

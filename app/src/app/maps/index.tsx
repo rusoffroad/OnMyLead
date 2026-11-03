@@ -82,7 +82,7 @@ export default function OfflineMaps() {
         </View>
       </View>
 
-      <Button title="Download a Map Area" big onPress={() => requirePro('offline_maps') && router.push('/maps/area')} />
+      <Button title="Download a Map Area" pro="offline_maps" big onPress={() => requirePro('offline_maps') && router.push('/maps/area')} />
 
       {maps.length ? (
         <>
@@ -125,6 +125,7 @@ function RideOffer({ ride, route }: RideWithRoute) {
       </View>
       <SmallButton
         title="Download"
+        pro="offline_maps"
         strong
         disabled={starting}
         onPress={async () => {

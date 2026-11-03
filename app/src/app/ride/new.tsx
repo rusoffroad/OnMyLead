@@ -23,6 +23,7 @@ import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/cale
 import { clockText, parseTime, shiftClock } from '@/core/time';
 import { cleanShareCode, friendlyShareCodeError } from '@/core/share-code';
 import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
+import { linkRide } from '@/lib/events';
 import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
@@ -37,7 +38,7 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  const { type, copy, trail, group } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string }>();
+  const { type, copy, trail, group, event } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string }>();
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
@@ -222,6 +223,8 @@ export default function NewRide() {
       for (const g of groups.filter((x) => groupNames.includes(x.name))) {
         await inviteGroupToRide(ride.id, g.id).catch(() => {});
       }
+      // Create a Ride from an event's Group Rides: the new ride joins that event (it can be added later if this fails).
+      if (event) await linkRide(event, ride.id).catch(() => {});
       // Ride Again brings the old route along; if it can't save, the leader lands in the builder instead.
       const routeCopied = routePlan === 'mapped' && copiedRoute ? await saveRideRoute(ride.id, copiedRoute).then(() => true, () => false) : false;
       router.replace(`/r/${ride.invite_code}?new=1`);
@@ -259,6 +262,14 @@ export default function NewRide() {
           <ThemedText style={{ fontWeight: 700 }}>Riding {fromTrail}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             The trail is the route, and its start is the meeting point. Change anything, pick the day and create it.
+          </ThemedText>
+        </View>
+      ) : null}
+      {event ? (
+        <View style={{ gap: 2, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.accent }}>
+          <ThemedText style={{ fontWeight: 700 }}>For Your Event</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            Once it’s created, this ride shows under the event’s Group Rides.
           </ThemedText>
         </View>
       ) : null}

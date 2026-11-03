@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  applyClock, can, daysLeft, isEntitlementsMissing, NOT_SWITCHED_ON, parseEntitlements, parseProError,
-  rideAllowanceText, trialBadgeText,
+  applyClock, can, daysLeft, FEATURE_KEYS, isEntitlementsMissing, NOT_SWITCHED_ON, parseEntitlements, parseProError,
+  rideAllowanceText, showsProTag, trialBadgeText,
 } from '../entitlements';
 
 const NOW = Date.parse('2026-10-12T12:00:00Z');
@@ -95,5 +95,39 @@ describe('entitlements', () => {
   it('spots a server without the Pro update', () => {
     expect(isEntitlementsMissing({ code: 'PGRST202', message: 'Could not find the function public.my_entitlements' })).toBe(true);
     expect(isEntitlementsMissing({ code: '08006', message: 'network' })).toBe(false);
+  });
+});
+
+describe('showsProTag', () => {
+  const freeServer = parseEntitlements({
+    account_type: 'free', ride_allowance: 1, rides_created_this_month: 1,
+    features: { create_ride: true, import_gpx: false, offline_maps: false, saved_groups: false, record_trails: false, share_trails: false, trail_rides: false },
+  });
+
+  it('tags every Pro-only feature for a Free rider', () => {
+    for (const f of ['import_gpx', 'offline_maps', 'saved_groups', 'record_trails', 'share_trails', 'trail_rides'] as const) {
+      expect(showsProTag(freeServer, f)).toBe(true);
+    }
+  });
+
+  it('never tags Create a Ride, even with the month used up', () => {
+    expect(can(freeServer, 'create_ride')).toBe(false);
+    expect(showsProTag(freeServer, 'create_ride')).toBe(false);
+  });
+
+  it('shows no tag to Pro, Pro Trial or Admin', () => {
+    for (const raw of [
+      { account_type: 'pro', pro_source: 'apple' },
+      { account_type: 'pro', pro_source: 'trial', trial_ends_at: '2099-01-01T00:00:00Z' },
+      { account_type: 'admin', pro_source: 'admin' },
+    ]) {
+      const e = parseEntitlements({ ...raw, features: { import_gpx: false, offline_maps: false } });
+      for (const f of FEATURE_KEYS) expect(showsProTag(e, f)).toBe(false);
+    }
+  });
+
+  it('shows no tag before the server gates anything, or when a feature is free on this server', () => {
+    for (const f of FEATURE_KEYS) expect(showsProTag(NOT_SWITCHED_ON, f)).toBe(false);
+    expect(showsProTag(parseEntitlements({ account_type: 'free', features: {} }), 'import_gpx')).toBe(false);
   });
 });

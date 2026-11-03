@@ -8,6 +8,7 @@ import { Convoy } from './convoy';
 import { Icon } from './icon';
 import { ThemedText } from './themed-text';
 import { Button } from './ui';
+import { ProTag } from './pro-tag';
 
 /**
  * Invite a whole riding group to this ride in one tap. Shown to the ride's organizers inside the
@@ -47,7 +48,10 @@ export function GroupInvite({ rideId }: { rideId: string }) {
       ) : groups === null ? null : groups.length === 0 ? (
         <Pressable accessibilityRole="button" onPress={openNewGroup} style={styles.empty}>
           <View style={{ flex: 1, gap: 2 }}>
-            <ThemedText style={{ fontWeight: 700 }}>Save Your Crew as a Group</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <ThemedText style={{ fontWeight: 700, flexShrink: 1 }}>Save Your Crew as a Group</ThemedText>
+              <ProTag feature="saved_groups" />
+            </View>
             <ThemedText type="small" themeColor="textSecondary">Then invite everyone to your next ride in one tap.</ThemedText>
           </View>
           <Icon name="chevron" color={Colors.textSecondary} />

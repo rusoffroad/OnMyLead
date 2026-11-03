@@ -7,6 +7,7 @@ import { SocialButton } from '@/components/social-button';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Field, Screen, Segmented } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
+import { BANNED_MESSAGE, isBannedError } from '@/core/moderation';
 import { track } from '@/lib/analytics';
 import { signInWithApple } from '@/lib/apple-sign-in';
 import { nativeGoogleReady, signInWithGoogleNative } from '@/lib/google-sign-in';
@@ -188,6 +189,7 @@ export default function SignIn() {
 
 /** Supabase's messages, in plain words. */
 function friendly(message: string) {
+  if (isBannedError(message)) return BANNED_MESSAGE;
   if (/invalid login credentials/i.test(message)) return 'That email and password don’t match. Try again, or use the reset link.';
   if (/email not confirmed/i.test(message)) return 'Please confirm your email first. Tap the link we sent you, then sign in.';
   if (/already registered|already exists/i.test(message)) return 'There’s already an account with that email. Switch to Sign In.';

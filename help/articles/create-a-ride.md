@@ -156,3 +156,9 @@ Pro bought on Android through Google Play lifts the monthly limit the same way, 
 :::release 2.0
 On Home, the **Create a Ride** card shows where you stand: **1 Left This Month** or **None Left This Month** on Free, and **Unlimited** on Pro or the trial. On Free, tap the label to see what Pro adds.
 :::
+
+:::release 2.0
+## Create a Ride for an Event
+
+On an event you host, **Group Rides > Add > Create a New Ride for This Event** opens Create a Ride with a **For Your Event** note at the top. Once you create the ride, it shows under the event's Group Rides. See [Events](/help/events).
+:::

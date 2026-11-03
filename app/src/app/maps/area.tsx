@@ -134,7 +134,7 @@ export default function PickArea() {
             </>
           ) : null}
         </View>
-        <Button title="Download This Area" big loading={starting} disabled={!plan || tooBig || !choices.length} onPress={download} />
+        <Button title="Download This Area" pro="offline_maps" big loading={starting} disabled={!plan || tooBig || !choices.length} onPress={download} />
       </SafeAreaView>
       </Animated.View>
     </View>

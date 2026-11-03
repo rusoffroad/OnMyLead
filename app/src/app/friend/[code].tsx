@@ -91,7 +91,7 @@ export default function FriendLink() {
     <Screen width="readable">
       <Stack.Screen options={{ title: 'Add Friend' }} />
       <View style={styles.top}>
-        <RiderDot userId={preview.user_id} name={preview.display_name} size={72} />
+        <RiderDot userId={preview.user_id} name={preview.display_name} size={72} zoom />
         <Text style={styles.title}>{headline}</Text>
         <ThemedText themeColor="textSecondary">
           {preview.relation === 'self'

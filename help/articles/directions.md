@@ -47,7 +47,7 @@ The **Directions** card shows while the ride is scheduled or live. **Meeting Poi
 
 You can also get directions from other places in Ride Mode:
 
-- Tap the yellow **Regroup point set. Tap to navigate** banner.
+- Tap the **Regroup point set. Tap to navigate** banner.
 - Tap **Navigate** on a rider's alert card.
 - Open the **Riders** list and tap **Navigate**, or **Go to Last Seen** for a rider whose position is old.
 - Tap a waypoint on the map. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).

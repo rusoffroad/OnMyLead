@@ -224,7 +224,7 @@ export default function GroupChat() {
                 <View style={[styles.row, self ? styles.rowMine : null, { marginTop: firstInRun ? Spacing.three : 3 }]}>
                   {!self ? (
                     <View style={styles.avatarSlot}>
-                      {lastInRun ? <RiderDot userId={m.user_id} name={nameOf(m.user_id)} lead={m.user_id === ownerId} size={28} /> : null}
+                      {lastInRun ? <RiderDot userId={m.user_id} name={nameOf(m.user_id)} lead={m.user_id === ownerId} size={28} zoom /> : null}
                     </View>
                   ) : null}
                   <View style={[styles.col, self && { alignItems: 'flex-end' }]}>
@@ -249,7 +249,7 @@ export default function GroupChat() {
                           accessibilityRole="button"
                           onPress={() => {
                             setMenuFor(null);
-                            setReporting({ kind: 'rider', userId: m.user_id, rideId: m.ride_id, name: nameOf(m.user_id) });
+                            setReporting({ kind: 'rider', userId: m.user_id, rideId: m.ride_id, name: nameOf(m.user_id), source: 'group_chat', groupId: id });
                           }}
                           style={styles.smallBtn}>
                           <Text style={styles.smallBtnText}>Report Rider</Text>

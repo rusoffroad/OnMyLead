@@ -4,7 +4,7 @@ summary: Add riders as friends so you see each other when you're out riding near
 category: groups
 order: 26
 release: "1.0.3"
-updated: 2026-11-01
+updated: 2026-11-03
 sources:
   - app/src/app/friends.tsx
   - app/src/app/friend/[code].tsx
@@ -26,6 +26,10 @@ Being friends never shares where you are. In Out Riding, friends see your ride n
 ## Open Friends
 
 Go to the **Groups** tab and tap **Friends** near the top. The row shows how many friends you have, how many are out riding, and any friend requests waiting for you.
+
+:::release 2.0
+Tap a friend's picture to see it full size, or their name in **Social** to see their profile, rides, badges and posts. See [Like, Comment and Post in Social](/help/social).
+:::
 
 ## Add a Friend
 

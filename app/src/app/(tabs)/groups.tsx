@@ -80,7 +80,7 @@ export default function Groups() {
       ) : null}
       <ErrorText error={error} />
 
-      <Button title="New Group" big disabled={off} onPress={openNewGroup} />
+      <Button title="New Group" pro="saved_groups" big disabled={off} onPress={openNewGroup} />
 
       {groups && !groups.length && !off ? <EmptyCrew /> : null}
 

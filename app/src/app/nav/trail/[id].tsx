@@ -304,11 +304,11 @@ export default function TrailDetail() {
         saved.shared ? (
           <Button title="Stop Sharing" kind="secondary" loading={busy === 'stop'} onPress={unshare} />
         ) : (
-          <Button title="Share with Everyone" big loading={busy === 'share'} onPress={share} />
+          <Button title="Share with Everyone" pro="share_trails" big loading={busy === 'share'} onPress={share} />
         )
       ) : null}
       <Button title="Follow in Map Mode" kind="secondary" onPress={() => router.push(`/nav?trail=${saved.id}`)} />
-      <Button title="Plan a Group Ride on This Trail" kind="secondary" onPress={() => requirePro('trail_rides') && router.push(`/ride/new?trail=${saved.id}`)} />
+      <Button title="Plan a Group Ride on This Trail" pro="trail_rides" kind="secondary" onPress={() => requirePro('trail_rides') && router.push(`/ride/new?trail=${saved.id}`)} />
       <Button title="Delete Trail" kind="ghost" loading={busy === 'delete'} onPress={remove} />
     </>
   );

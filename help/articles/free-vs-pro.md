@@ -13,6 +13,7 @@ sources:
   - app/src/app/pro.tsx
   - app/src/app/subscription.tsx
   - app/src/components/pro-gate.tsx
+  - app/src/components/pro-tag.tsx
   - app/src/components/pro-plan.tsx
   - app/src/app/ride/new.tsx
   - app/src/app/(tabs)/index.tsx
@@ -49,6 +50,14 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Advanced Ride Statistics | No | Yes |
 | Premium Ride Cards | No | Yes |
 
+:::release 2.0
+| | Free | Pro |
+|---|---|---|
+| Social Feed: See, Like and Read Comments | Yes | Yes |
+| Post, Comment and Share to Social Media | No | Yes |
+| Create Events | No | Yes |
+:::
+
 ## Always Free
 
 Safety never depends on your plan. On every plan you get Ride Mode, live tracking, Need Help, EMERGENCY, Mechanical Issue alerts, Ride Bubble, location sharing, family links, ride chat and joining rides.
@@ -80,8 +89,16 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 - **Advanced Trip Planning:** plan several trips at once, start from packing lists, copy trips and link them to rides. One active trip and the fuel check stay free. See [Trip Planner](/help/trip-planner).
 - **Advanced Ride Statistics:** moving time, average and top speed, climbing and the group's totals after every ride. Distance and time out stay free.
 - **Premium Ride Cards:** share your ride with the Full Stats and Big Number layouts. The standard card stays free.
+:::release 2.0
+- **Post, Comment and Share:** post ride reports with a photo on your profile, comment on your friends' rides, badges, trails and posts, and share your rides, badges and posts to Facebook, Instagram or X. Seeing Social, reading comments and liking stay free. Pro riders show a gold **PRO** tag next to their name. See [Like, Comment and Post in Social](/help/social).
+- **Create Events:** post a rally, poker run or ride weekend with photos, an agenda and its group rides. Seeing events, saying you're going and being a co-host or Ride Manager stay free. See [Events](/help/events).
+:::
 
 When you tap something that needs Pro, a short prompt explains it. Tap **See OnMyLead Pro** to see the plans, or **Not Now** to close it.
+
+:::release 2.0
+On a Free account, a small gold **Pro** tag sits beside each button that needs Pro, so you know before you tap. You'll see it on **Import GPX** and **Use One of My Trails** when you draw a route, **Record a Trail** in Map Mode, **Share with Everyone** and **Plan a Group Ride on This Trail** on a trail, the offline map **Download** buttons, **New Group** and **Add Riders You've Ridden With** in Riding Groups, **Copy to a New Trip** in the Trip Planner, and **Create an Event** in Events. Tapping one opens the same prompt. During your Pro Trial and on Pro the tags are gone. Create a Ride doesn't carry a tag, because Free includes a ride a month; it shows how many you have left instead.
+:::
 
 ## See Your Plan
 

@@ -140,12 +140,24 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   Feed with Customize (`home_feed`, `rider_feed_settings`) **[flag home_feed]**, Your Badges, Your
   Toolkit, Help & Support. Two columns at Expanded width.
 
+### Social (2.0)
+- `app/social/index.tsx` (Activity / Friends / My Posts; TwoPane on tablets), `social/item.tsx` (one
+  item with likers and every comment), `social/rider/[id].tsx` (profile, PRO tag, stats, timeline),
+  `social/new.tsx` (post with one photo). Likes free; comment, post and share **[Pro: social_posts]**.
+  Share to other apps via a generated card (`lib/share-activity*.ts`). Tap any profile picture for
+  full size (`components/photo-viewer.tsx`). Migration 20261102900000_social_hub.sql.
+
 ### Riding Groups and Social
 - Groups tab: New Group, your groups, groups you're in, group chat with unread counts and ride
   "tickets", group links (`/g/[code]`), invite a group to a ride, leave / delete **[Pro]** to
   create.
 - Follow leaders and see their upcoming rides.
-- Blocked riders list; report rider or ride.
+- Blocked riders list; report rider or ride; You > Report a Rider (2.0) for anyone you messaged, friended, rode with or blocked.
+
+### Events (2.0)
+- Events card on Home opens Events: public events coming up near you and Yours (hosting, co-hosting, going or interested).
+- Event page (onmylead.com/e/CODE, works signed out): dates, public place with Directions, photos, details, website, Going / Interested, Share, an Agenda by day (group rides, poker runs, concerts, raffles, shows, contests, food, vendors, meetups), and the event's Group Rides with labels and a Ride Manager each.
+- Pro creates events (Public or Link Only); the owner adds up to 10 co-hosts; hosts add photos, agenda items and the rides they organize; a Ride Manager becomes the ride's Co-Organizer. Cancel or delete; Report This Event; Admin > Events hides events and takes down photos.
 
 ### Garage, Trips and Extras
 - Garage: machines with photo, VIN decode, specs, fuel range (full, safe turnaround, safe trip),
@@ -184,7 +196,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Overview, Signups and Downloads (real riders without test and admin accounts, marking test
   accounts, App Store and Google Play downloads), Store Reviews (both stores' ratings and reviews,
   replies posted to the store), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
-  Subscriptions, Promo Codes (App Store Connect offer codes), Reports, Analytics, App Health
+  Subscriptions, Promo Codes (App Store Connect offer codes), Reports (2.0: report page with the saved conversation, suspend 1/7/30/90 days or ban), Analytics, App Health
   (Sentry, push tokens by iPhone / Android, server checks), Exports, Settings (trial days, feature
   plans, flags, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
   the App Store phased release, minimum and latest app version, a notice for chosen versions;
