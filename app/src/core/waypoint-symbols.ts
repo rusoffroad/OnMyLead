@@ -2,8 +2,8 @@
  * Waypoint symbols: the picture a rider gives a waypoint (camp, fuel, a gate, a water crossing).
  *
  * The first seven are the original waypoint kinds (ride_waypoints.kind). The others came later
- * (2.1) and live in ride_waypoints.symbol, while kind keeps the nearest original one, so app builds
- * from before 2.1 still draw them (a Gate shows there as a plain Spot, a Water Crossing as a Hazard).
+ * (2.0) and live in ride_waypoints.symbol, while kind keeps the nearest original one, so app builds
+ * from before 2.0 still draw them (a Gate shows there as a plain Spot, a Water Crossing as a Hazard).
  * The server sets kind from symbol, and clears symbol when an older build changes kind.
  *
  * Every symbol is told apart by its line drawing, never by colour alone, so riders with any kind

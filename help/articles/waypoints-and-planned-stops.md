@@ -51,10 +51,10 @@ You need to have joined the ride to add or see its waypoints.
 1. Open the ride and tap the **Map** tab.
 2. Under **Waypoints**, tap **Add a Waypoint** (or **Open Waypoints Map** if there are some already).
 3. Press and hold the map where you want it (click it on onmylead.com). To mark where you're standing, tap **Add at My Location** instead.
-:::until 2.1
+:::until 2.0
 4. Pick what it is: **Spot**, **Camp**, **Fuel**, **Water**, **Viewpoint**, **Hazard** or **Parking**. The name fills in for you.
 :::
-:::release 2.1
+:::release 2.0
 4. Pick its symbol. The name fills in for you. See [Waypoint Symbols](#waypoint-symbols) below.
 :::
 5. Change the **Name** if you like, and add a **Note (Optional)**.
@@ -73,7 +73,7 @@ In Ride Mode, tap **Add Waypoint** to drop one where you are, or press and hold 
 
 Names can be up to 60 characters and notes up to 280.
 
-:::release 2.1
+:::release 2.0
 ## Waypoint Symbols
 
 Every waypoint has a symbol, so you can tell what it is at a glance on the map. There are 15:

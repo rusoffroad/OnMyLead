@@ -1,4 +1,4 @@
--- Waypoint symbols (2.1): riders give a waypoint one of 15 symbols. The first seven are the
+-- Waypoint symbols (2.0): riders give a waypoint one of 15 symbols. The first seven are the
 -- original kinds; the eight new ones (gate, trailhead, water crossing, food, restroom, first aid,
 -- repair, photo spot) go in a new symbol column.
 --
@@ -16,7 +16,7 @@ alter table ride_waypoints add column symbol text
   ));
 
 comment on column ride_waypoints.symbol is
-  'The picture the rider picked (2.1+). null = show kind. kind always holds the nearest original value for older app builds.';
+  'The picture the rider picked (2.0+). null = show kind. kind always holds the nearest original value for older app builds.';
 
 -- The original kind an older build should show for a symbol.
 create function waypoint_symbol_kind(p_symbol text) returns text language sql immutable set search_path = public as $$

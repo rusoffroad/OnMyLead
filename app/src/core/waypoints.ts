@@ -16,7 +16,7 @@ export type Waypoint = {
   name: string;
   /** The original kind; older app builds draw this one. */
   kind: WaypointKind;
-  /** Its symbol (2.1 and later): missing until that server update, null when it's just the kind. Show waypointSymbol(w). */
+  /** Its symbol (2.0 and later): missing until that server update, null when it's just the kind. Show waypointSymbol(w). */
   symbol?: WaypointSymbol | null;
   note: string | null;
   lat: number;
@@ -138,7 +138,7 @@ export function moveStop(ids: string[], id: string, by: -1 | 1): string[] | null
   return next;
 }
 
-/** Did a request fail because the server doesn't have waypoint symbols yet (the 2.1 update)? Then save the kind alone. */
+/** Did a request fail because the server doesn't have waypoint symbols yet (the 2.0 server update)? Then save the kind alone. */
 export function isSymbolsNotSwitchedOn(message: string | null | undefined, code?: string | null): boolean {
   return !!message && /\bsymbol\b/i.test(message) && (/does not exist|could not find|schema cache/i.test(message) || code === '42703' || code === 'PGRST204');
 }
