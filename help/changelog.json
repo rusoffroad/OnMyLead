@@ -67,6 +67,44 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "ride-mode",
+      "status-buttons",
+      "ride-chat",
+      "map-layers",
+      "use-onmylead-on-a-tablet",
+      "directions"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-mode-2.0-polish",
+    "why": "2.0 redesigns Ride Mode and the map panels: a back button and sharing line under the ride name, glass panels, three quick replies plus More (a Tell the Group sheet with every status), Regroup Here beside EMERGENCY, amber-edged announcement and regroup banners, Map Style pictures for Satellite and Topo, and riders that glide instead of jumping. New text is in 2.0 release blocks; the old steps stay until 2.0 is live."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "emergency-and-safety",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "location-sharing",
+      "music-controls",
+      "navigation-mode",
+      "offline-maps",
+      "ride-bubble",
+      "route-builder",
+      "troubleshooting",
+      "waypoints-and-planned-stops",
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "ride-mode-2.0-polish",
+    "why": "Checked against the 2.0 Ride Mode and map redesign: these screens changed color and spacing only (glass panels and buttons, smoother rider dots and Follow Me), so the steps and labels in these articles are unchanged. The onmylead.com home page gained one sentence about the smoother Ride Mode; nothing in the website or getting-started steps changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "home-screen"
     ],
     "kind": "add",

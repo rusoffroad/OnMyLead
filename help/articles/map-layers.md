@@ -42,13 +42,23 @@ The layers button is the round button with a stacked layers icon in the top-righ
 - The route builder
 - The area picker for offline maps
 
+:::until 2.0
 Tap it to open the **Map** panel. Tap it again to close the panel.
+:::
+
+:::release 2.0
+Tap it to open the **Map Style** panel. Tap it again to close the panel.
+:::
 
 Your choices are remembered on your phone and used on every map in the app.
 
 ## Satellite or Topo
 
 At the top of the panel, pick:
+
+:::release 2.0
+Each style has a small picture of how it looks; the one you're using has a blue outline.
+:::
 
 - **Satellite**: aerial imagery with road and place labels. This is the default.
 - **Topo**: the USGS topographic map, with contour lines.
@@ -153,7 +163,7 @@ When your phone loses signal, a **No Signal** tag with **Downloaded Map** appear
 
 ## On the Website
 
-The website's route builder and waypoints map have the same layers button and **Map** panel: **Satellite** or **Topo**, **Public Trails and Roads**, the trail and road names, and closed trails in red. The satellite map shows road names too. Zoomed in, the **Find a Ride** map shows the trail lines and names as well.
+The website's route builder and waypoints map have the same layers button and map panel: **Satellite** or **Topo**, **Public Trails and Roads**, the trail and road names, and closed trails in red. The satellite map shows road names too. Zoomed in, the **Find a Ride** map shows the trail lines and names as well.
 
 On the website, click a trail line to see its card when you're not adding points: on a route imported from a GPX file, for example. On the waypoints map a click adds a waypoint, so read the names on the map there. Downloading maps for no signal is only in the app.
 
@@ -163,4 +173,4 @@ On the website, click a trail line to see its card when you're not adding points
 - Topo: USGS The National Map.
 - Satellite with no signal: USGS The National Map: Orthoimagery.
 
-The credits for what's showing are listed at the bottom of the **Map** panel. Loading map squares only sends the area being looked at, never anything about you.
+The credits for what's showing are listed at the bottom of the layers panel. Loading map squares only sends the area being looked at, never anything about you.
