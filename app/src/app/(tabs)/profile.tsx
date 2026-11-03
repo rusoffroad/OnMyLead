@@ -200,6 +200,15 @@ export default function You() {
           onPress={() => router.push('/battery')}
         />
         <MenuRow icon="theme" color={Colors.sky} title="Appearance" detail={describeAppearance(appearance)} onPress={() => router.push('/appearance')} />
+        {Platform.OS !== 'web' ? (
+          <MenuRow
+            icon="tilt"
+            color={RideColors.green}
+            title="Tilt and Crash Alert"
+            detail="Roll and pitch meter, tilt warnings, and an alert to your group after a crash"
+            onPress={() => router.push('/tilt')}
+          />
+        ) : null}
         <MenuRow
           icon="voice"
           color={Colors.sky}

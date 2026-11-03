@@ -6,6 +6,8 @@ order: 10
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - app/src/components/tilt-tile.tsx
+  - app/src/hooks/use-crash-alert.ts
   - app/src/components/ride-controls.tsx
   - app/src/components/rider-marker.tsx
   - app/src/core/glide.ts
@@ -134,7 +136,7 @@ The panel at the bottom holds, from the top:
 
 - the route strip, with how far along the route you are;
 - an alert row for each rider who has dropped away or called for help, with **Navigate** (and **Regroup** for leaders);
-- three quick replies, **On My Way**, **Need a Minute** and **All Good**, and **More**, which opens every quick reply and status;
+- three quick replies, **On My Way**, **Need a Minute** and **All Good**, and **More**, which opens every quick reply (like **Running Late** and **Beverage Break**) and status;
 - **Regroup Here** (for organizers and leaders) and **EMERGENCY**.
 
 See [Send a Status or Quick Reply](/help/status-buttons).
@@ -256,6 +258,10 @@ The bar also has **Controls**, with a badge counting any other alerts. Tap it, o
 ## Control Your Music
 
 Tap the round **Music** button above **Center on Me** to pause, skip or change the volume of the music on your phone without leaving Ride Mode. See [Control Your Music While You Ride](/help/music-controls).
+
+:::release 2.0
+The **Tilt** tile on the left of the map shows your vehicle's roll and pitch; tap it for the full tilt meter. **Crash Alert** also runs while Ride Mode is open: after a hard hit or a rollover it counts down 30 seconds, and if you don't tap **I'm OK**, your group gets an EMERGENCY alert. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
+:::
 :::
 
 :::release 2.0

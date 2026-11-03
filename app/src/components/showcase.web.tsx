@@ -258,7 +258,7 @@ export function Showcase() {
           <div className="qr-copy">
             <h2 id="nav-title" className="section-title">Map Mode When It’s Just You</h2>
             <p>
-              Not every ride is a group ride. Map Mode is your offroad map for the rest: every trail and road with your speed,
+              Not every ride is a group ride. Map Mode is your offroad map for the rest, one tap from any screen: every trail and road with your speed,
               elevation, heading, trip miles and moving time, a recorder that draws your line as you ride, and Map a Custom Trail to draw one that isn’t marked
               anywhere. Track Line shows exactly where you’ve been, a new colour each day. Keep your trails on your phone, or share
               them with every rider.
@@ -285,6 +285,7 @@ export function Showcase() {
             </p>
             <ul className="ticks">
               <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
+              <li><b>Will It Fit?</b> Tap a trail to see its width limit: 50 inch Forest Service trails, and widths riders add to any public trail. Add your machine’s width in the Garage and the card tells you if it fits.</li>
               <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
@@ -325,6 +326,7 @@ export function Showcase() {
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for 15 minutes to 8 hours, until an end date up to a year out, or until you turn it off, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
+              <Feature title="Tilt Meter and Crash Alert">See your roll and pitch over the map, with a full tilt meter whose axle and wheels lean as you do. Zero it for your mount, set your own limits and get a buzz before a steep side hill. In Ride Mode, a hard hit or a rollover starts a 30 second I’m OK countdown, and if you don’t answer, your group gets an EMERGENCY alert with your location. It works with no signal and sends once you reconnect. It never calls 911.</Feature>
               <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>

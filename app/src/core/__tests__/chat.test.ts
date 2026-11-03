@@ -30,7 +30,7 @@ describe('checkMessage', () => {
   });
 
   it('keeps every quick reply short and valid', () => {
-    expect(QUICK_REPLIES).toEqual(['On My Way', 'Running Late', 'Need a Minute', 'All Good']);
+    expect(QUICK_REPLIES).toEqual(['On My Way', 'Running Late', 'Need a Minute', 'All Good', 'Beverage Break']);
     for (const q of QUICK_REPLIES) expect(checkMessage(q).ok).toBe(true);
   });
 });

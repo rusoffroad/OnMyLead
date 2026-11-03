@@ -7,6 +7,7 @@ import Svg, { Path } from 'react-native-svg';
 import { RateTrailSheet } from '@/components/rate-trail-sheet';
 import { RouteMap } from '@/components/route-map';
 import { StarScore } from '@/components/stars';
+import { RigFitLine } from '@/components/trail-width-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
@@ -17,6 +18,7 @@ import { useLayout } from '@/hooks/use-layout';
 import { confirmAsync } from '@/lib/confirm';
 import { deleteSharedTrail, getPublicTrail, savePublicTrail, stopSharing, useLocalTrails } from '@/lib/nav-trails';
 import { requirePro } from '@/lib/pro';
+import { useGarageWidths } from '@/lib/trail-width';
 
 /**
  * A trail another rider mapped and shared. It says it's user submitted up front, who mapped it and
@@ -30,6 +32,7 @@ export default function PublicTrailPage() {
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const garage = useGarageWidths();
   const { trails } = useLocalTrails();
   const savedCopy = t ? trails.find((x) => x.savedFrom?.id === t.id || (t.mine && x.id === t.clientId)) : null;
 
@@ -112,6 +115,7 @@ export default function PublicTrailPage() {
           </View>
         ))}
       </View>
+      <RigFitLine limitIn={t.maxWidthIn} garage={garage} />
       <View style={{ gap: 4 }}>
         <Text style={styles.label}>Vehicles That Fit</Text>
         <ThemedText>{t.vehicles.map(vehicleLabel).join(', ')}</ThemedText>

@@ -22,6 +22,7 @@ const REPLY_ICON: Record<QuickReply, IconName> = {
   'Running Late': 'clock',
   'Need a Minute': 'clock',
   'All Good': 'check',
+  'Beverage Break': 'cup',
 };
 
 /** Statuses in the More sheet, grouped so the trouble ones are easy to find. */
