@@ -12,12 +12,14 @@ import { speak, stopSpeaking } from '@/lib/voice';
  * and a rider who isn't gets help without doing anything. At zero it calls `onSend` once.
  */
 export function CrashCountdown({
-  cause, startedAt, onOk, onSend,
+  cause, startedAt, onOk, onSend, onTurnOff,
 }: {
   cause: CrashCause;
   startedAt: number;
   onOk: () => void;
   onSend: () => void;
+  /** I'm OK, and stop watching for crashes (until turned back on in Tilt). */
+  onTurnOff?: () => void;
 }) {
   const [now, setNow] = useState(() => Date.now());
   const sent = useRef(false);
@@ -78,6 +80,17 @@ export function CrashCountdown({
             style={({ pressed }) => [styles.now, pressed && { opacity: 0.85 }]}>
             <Text style={styles.nowText}>Alert My Group Now</Text>
           </Pressable>
+          {onTurnOff ? (
+            <Pressable
+              onPress={onTurnOff}
+              accessibilityRole="button"
+              accessibilityLabel="I’m OK, Turn Off Crash Alert"
+              accessibilityHint="Cancels this alert and stops watching for crashes. Turn it back on in Tilt."
+              hitSlop={8}
+              style={({ pressed }) => [styles.off, pressed && { opacity: 0.7 }]}>
+              <Text style={styles.offText}>I’m OK, Turn Off Crash Alert</Text>
+            </Pressable>
+          ) : null}
           <Text style={styles.note}>This tells your group only. It doesn’t call 911.</Text>
         </View>
       </SafeAreaView>
@@ -98,5 +111,7 @@ const styles = themedStyles(() => ({
   okText: { color: Colors.background, fontFamily: font(800, 'display'), fontSize: 40 },
   now: { borderRadius: Radius.card, minHeight: 56, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FF8A8F' },
   nowText: { color: '#FFFFFF', fontFamily: font(700, 'display'), fontSize: 20 },
+  off: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  offText: { color: '#FFFFFF', fontFamily: font(700), fontSize: 17, textDecorationLine: 'underline' },
   note: { color: '#FFD9DB', fontFamily: font(500), fontSize: 14, textAlign: 'center' },
 }));

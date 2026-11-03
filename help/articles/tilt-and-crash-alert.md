@@ -41,7 +41,9 @@ Your phone probably doesn't sit flat in its mount, so zero the meter once you've
 2. Put the phone in its mount the way you ride.
 3. Open **Tilt** and tap **Zero**, then **Zero** again to confirm.
 
-That reading becomes level. Zero again whenever you move the phone or switch vehicles. The Zero is kept on this phone only, since each phone sits differently. Tap **Clear Zero** to go back to the phone lying flat as level.
+That reading becomes level. Zero again whenever you move the phone or switch vehicles. The Zero is kept on this phone only, since each phone sits differently. Tap **Clear Zero** to remove it.
+
+Until you zero it, the meter treats the phone's nearest plain position (lying flat, standing upright or on its side) as level, so a phone standing in a dash mount reads close to level. That reading is only rough, so the numbers stay blue instead of turning amber or red, tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers. Zero it to turn those on.
 
 ## Tilt Warnings
 
@@ -55,13 +57,14 @@ On a motorcycle, turn **Warn Me** off, since leaning into turns is normal. To hi
 
 ## Crash Alert
 
-Crash Alert is on unless you turn it off. While Ride Mode is open, it watches for a hard hit or a rollover while you're riding, followed by your vehicle stopping. When it sees one:
+Crash Alert is on unless you turn it off. To turn it on or off, open the Tilt screen and tap the **Crash Alert On** / **Crash Alert Off** switch at the top. The switch follows your account to your other devices. While Ride Mode is open, it watches for a hard hit or (once you've zeroed the tilt meter) a rollover while you're riding, followed by your vehicle stopping. When it sees one:
 
 1. A full-screen countdown starts at 30 seconds, with vibration and a spoken warning.
 2. Tap **I'm OK** to cancel. Nothing is sent.
 3. If nobody taps **I'm OK**, your group gets the same **EMERGENCY** alert as the Emergency button, with your location, plus a chat message saying your phone detected a possible crash. Tap **Alert My Group Now** to send it straight away.
+4. To cancel and stop Crash Alert for now, tap **I'm OK, Turn Off Crash Alert** under the buttons. Turn it back on from the top of the Tilt screen.
 
-Choose how easily it goes off under **Sensitivity** on the Tilt screen: **Low** (only very hard hits and full rollovers, fewer false alarms on rough trails), **Normal** (recommended) or **High** (also smaller hits and steep tips). A hard bump you keep riding through doesn't count, and neither does knocking the phone while parked. Dropping your phone can still start the countdown, which is why it waits for you.
+Choose how easily it goes off under **Sensitivity** on the Tilt screen: **Low** (only very hard hits and full rollovers, fewer false alarms on rough trails), **Normal** (recommended) or **High** (also smaller hits and steep tips). A hard bump you keep riding through doesn't count, and neither does knocking the phone while parked. Dropping your phone doesn't count either: Crash Alert notices the moment of falling and ignores the landing, and a dropped phone lying at an angle doesn't count as a rollover until it's back in its mount. If something still sets it off by mistake, tap **I'm OK**.
 
 :::warning
 Crash Alert tells your group only. It doesn't call 911 or emergency services. It only works while Ride Mode is open and you've joined the ride. With no service the alert waits on your phone and sends as soon as it reconnects, and riders need service to receive it. See [Emergencies and Staying Safe](/help/emergency-and-safety).

@@ -15,6 +15,40 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "tilt-and-crash-alert",
+      "directions",
+      "emergency-and-safety",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "crash-toggle-drop",
+    "why": "Chris asked for an easy on/off switch for Crash Alert and for a dropped phone not to set it off. The article now names the Crash Alert switch at the top of the Tilt screen, the new I'm OK, Turn Off Crash Alert button on the countdown, and how a drop is ignored. Ride Mode only gained the Turn Off button on the countdown; the other Ride Mode articles are unchanged (reviewed)."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "tilt-and-crash-alert",
+      "ride-mode",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "tilt-zero-fix",
+    "why": "An upright phone that hadn't been zeroed read 85° nose up in red. Before Zero the meter now uses the phone's nearest plain position as level, stays blue, and doesn't warn or check for rollovers until the rider zeros it. Ride Mode and Map Mode text is unchanged."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",
