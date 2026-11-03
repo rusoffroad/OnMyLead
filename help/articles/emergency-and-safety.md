@@ -63,7 +63,7 @@ When the alert goes out:
 
 You see a card showing whose phones have the alert. If you sent it by mistake, tap **Cancel** on the card and the group is told to ignore it. See [Send a Status or Quick Reply](/help/status-buttons).
 
-:::release 2.1
+:::release 2.0
 **Crash Alert** can also send it for you: if your phone detects a hard hit or a rollover in Ride Mode and you don't tap **I'm OK** within 30 seconds, your group gets the EMERGENCY alert with your location. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
 :::
 

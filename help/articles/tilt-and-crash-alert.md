@@ -3,7 +3,7 @@ title: Use the Tilt Meter and Crash Alert
 summary: See your vehicle's roll and pitch, get warned before a steep lean, and have OnMyLead alert your group if it detects a crash.
 category: safety-privacy
 order: 52
-release: "2.1"
+release: "2.0"
 updated: 2026-11-03
 sources:
   - app/src/app/tilt.tsx
