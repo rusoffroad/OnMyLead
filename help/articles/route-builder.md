@@ -4,7 +4,7 @@ summary: Tap the map to lay down your ride's route. It snaps to trails for you, 
 category: routes-maps
 order: 10
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/app/r/[code].tsx
@@ -33,6 +33,10 @@ Drawing a route is free. Bringing one in from a GPX file is covered in [Import a
 
 :::release 1.0.3
 To ride one of your own trails from [Navigate](/help/navigation-mode), tap **Use One of My Trails** in the route builder and pick it. The trail is used as the route just as you recorded or drew it. This is a Pro feature, like GPX import. Clear it to draw your own.
+
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
 :::
 
 ## Who Can Draw the Route

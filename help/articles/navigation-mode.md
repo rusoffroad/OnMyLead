@@ -4,7 +4,7 @@ summary: Use Navigate as your offroad map, record or draw your own trails, share
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
@@ -25,6 +25,10 @@ keywords: [navigate, navigation, nav mode, navigation mode, offroad map, gps, re
 ---
 
 **Navigate** is OnMyLead's offroad map for when you're not on a group ride. It has the same trails and roads as the rest of the app, shows where you are, and lets you record your own trails, keep them on your phone or share them with every rider. The map, following trails, measuring and rating trails are free. Recording, sharing your trails and planning group rides on them are part of [OnMyLead Pro](/help/free-vs-pro).
+
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
 
 ## Open Navigate
 

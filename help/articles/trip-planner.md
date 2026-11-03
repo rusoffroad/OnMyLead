@@ -4,7 +4,7 @@ summary: Make a packing checklist for a trip, tick things off as they go in the 
 category: account
 order: 50
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/trips/**
   - app/src/components/trip-form.tsx
@@ -67,6 +67,10 @@ Under **After the Trip**:
 
 - **Uncheck All** puts every item back to not packed. The list stays.
 - **Copy to a New Trip** starts a new trip with the same list. This is a Pro feature. See [Free and Pro](/help/free-vs-pro).
+
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
 
 ## Link a Trip to a Ride
 

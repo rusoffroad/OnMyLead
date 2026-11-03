@@ -4,7 +4,7 @@ summary: Bring in a track from Gaia, onX or any GPX file and use it as your ride
 category: routes-maps
 order: 20
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/core/route.ts
@@ -22,6 +22,10 @@ keywords: [gpx, import, track, gaia, onx, file, upload route, gpx file, tablet]
 Already have the trail you want to ride as a track in another app? Export it as a GPX file and import it as your ride's route. Riders see it in Ride Mode just like a route drawn in OnMyLead.
 
 This is a Pro feature. See [Free and Pro](/help/free-vs-pro). Drawing a route on the map stays free: see [Draw a Route](/help/route-builder).
+
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
 
 ## Import a File
 

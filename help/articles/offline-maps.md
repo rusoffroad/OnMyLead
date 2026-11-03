@@ -4,7 +4,7 @@ summary: Download a ride's map or any area before you leave, so the map and rout
 category: routes-maps
 order: 60
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/maps/index.tsx
   - app/src/app/maps/area.tsx
@@ -29,6 +29,10 @@ keywords: [offline, no signal, no service, download map, save map, dead zone, ba
 Out on the trail the signal often drops. Download a map before you leave and the map keeps working with no signal: satellite photos, topo and trail lines for the area you saved.
 
 This is a Pro feature. See [Free and Pro](/help/free-vs-pro). Maps already on your phone keep working on the Free plan.
+
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
 
 :::warning
 Offline maps keep the map, not the tracking. With no signal, your phone can't send or receive positions. Riders show where they were last seen, and positions update again when phones get a connection.
