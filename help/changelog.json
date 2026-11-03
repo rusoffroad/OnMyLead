@@ -12,6 +12,28 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "place-search",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "waypoint-counts",
+    "why": "Checked against the Waypoints screen without its counts: Search and the tablet side panel work the same, so these articles are unchanged."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "full-map",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "waypoint-counts",
+    "why": "2.0 drops the big waypoint counts (Stops, Shared, Only You) from the Waypoints panel and the waypoint number from its Full Map bar; Chris found them confusing. Full Map's table now says the Waypoints bar shows just the map. Planned stops keep their numbers, since those give the order the group stops in."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "contact-support",
       "getting-started",
       "home-screen"

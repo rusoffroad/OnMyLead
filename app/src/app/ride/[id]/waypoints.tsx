@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BarReadout, FullMapBar } from '@/components/full-map';
+import { FullMapBar } from '@/components/full-map';
 import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { PanelHandle } from '@/components/panel-handle';
@@ -48,7 +48,7 @@ export default function RideWaypoints() {
   const layout = useLayout();
   const wide = layout.expanded;
   const floating = layout.wide && !wide;
-  // Swipe the panel down (or tap its handle) to fold it to the counts and see more map.
+  // Swipe the panel down (or tap its handle) to fold it to its handle and see more map.
   const fold = usePanelFold('waypoints.panelOpen.v1', true, wide ? 'up' : 'down');
   // Full Map: the top bar, layers and panel tuck away. Press and hold still drops a waypoint.
   const fullMap = useFullMap('waypoints.fullMap.v1');
@@ -83,9 +83,6 @@ export default function RideWaypoints() {
   const canShare = canShareWaypoints(me, mine, leaderIds);
   const wp = useRideWaypoints(id, !!mine);
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
-  const stops = wp.waypoints.filter((w) => w.planned_stop).length;
-  const shared = wp.waypoints.filter((w) => w.shared && !w.planned_stop).length;
-  const own = wp.waypoints.length - shared - stops;
   const addingStop = stop === '1' && canShare;
 
   const openNew = (at: LatLng) => {
@@ -143,9 +140,7 @@ export default function RideWaypoints() {
       {loaded ? <TrailMapOverlay trail={trail} bare={full} top={full ? insets.top + 12 : insets.top + 66} cardTop={full ? insets.top + 64 : insets.top + 118} route={route?.points} ride={ride} /> : null}
 
       {full ? (
-        <FullMapBar onRestore={fullMap.exit} wide={wide || floating}>
-          <BarReadout value={String(wp.waypoints.length)} unit={wp.waypoints.length === 1 ? 'Waypoint' : 'Waypoints'} />
-        </FullMapBar>
+        <FullMapBar onRestore={fullMap.exit} wide={wide || floating} />
       ) : null}
 
       {full ? null : (
@@ -175,12 +170,7 @@ export default function RideWaypoints() {
       <Animated.View {...fold.panHandlers} style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 4 }]}>
         <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Waypoints" fromTop={wide} onFullMap={fullMap.enter} />
-        <View style={styles.counts}>
-          {stops ? <Count n={stops} label={stops === 1 ? 'Stop' : 'Stops'} color={Colors.accent} /> : null}
-          <Count n={shared} label="Shared" color={Colors.sky} />
-          <Count n={own} label="Only You" color={Colors.text} />
-          {wp.offline ? <Text style={styles.offline}>Saved on This Phone</Text> : null}
-        </View>
+        {wp.offline ? <Text style={styles.offline}>Saved on This Phone</Text> : null}
         {fold.open ? (
           <>
             <Text style={styles.hint}>{hint}</Text>
@@ -221,15 +211,6 @@ export default function RideWaypoints() {
   );
 }
 
-function Count({ n, label, color }: { n: number; label: string; color: string }) {
-  return (
-    <View style={styles.count}>
-      <Text style={[styles.countN, { color }]}>{n}</Text>
-      <Text style={styles.countLabel}>{label}</Text>
-    </View>
-  );
-}
-
 const PANEL_W = 400;
 
 const styles = StyleSheet.create({
@@ -252,11 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
   panelInner: { padding: Spacing.three, paddingTop: 4, gap: 10 },
-  counts: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.four },
-  count: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
-  countN: { fontFamily: font(800, 'display'), fontSize: 40, lineHeight: 42 },
-  countLabel: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 15 },
-  offline: { marginLeft: 'auto', color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
+  offline: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   hint: { color: Colors.text, fontFamily: font(600), fontSize: 16, lineHeight: 22 },
   privacy: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, textAlign: 'center' },
 });
