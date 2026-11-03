@@ -91,7 +91,7 @@ To start a new trip, press and hold **Trip**. Trip and Moving only count while M
 :::
 
 :::release 2.0
-Under the readings, the **Tilt** tile shows your **Roll** and **Pitch**, turning amber, then red, near your limits. Tap it for the full tilt meter. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
+Under the readings, the **Tilt** tile shows your **Roll** and **Pitch**, turning amber, then red, near your limits. Until you calibrate the tilt meter it says **Calibrate Tilt**. Tap it for the full tilt meter. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
 :::
 
 ### The Map Follows You

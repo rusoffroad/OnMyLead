@@ -52,8 +52,12 @@
         "text": "Type your own message in Ride Mode: tap Message, write a short line like \"Gas stop at the next town\" and tap Send to Everyone. It goes out like a quick reply, with the same Seen by lights and Cancel, and waits for signal if you have none. Check Save as One of My Quick Replies to send it again in one tap next time."
       },
       {
+        "kind": "improved",
+        "text": "The leader line in Ride Mode now always has the leader at the far left and the tail gunner at the far right, with everyone else in order between them by how far back they are, on routes and Freerides. Your miles done and to go still show above the line."
+      },
+      {
         "kind": "new",
-        "text": "The rider line on Freeride rides. With no mapped route, Ride Mode's line shows the leader on the right and every sharing rider in order behind them, measured along the path the leader has ridden, so bends and switchbacks count. It shows how spread out the group is, from the leader to the tail gunner, and tells you how far ahead the leader is. The leader's path stays on your phone and isn't uploaded."
+        "text": "The rider line on Freeride rides. With no mapped route, Ride Mode's line shows the leader at the far left, the tail gunner at the far right and every sharing rider in order between them, measured along the path the leader has ridden, so bends and switchbacks count. It shows how spread out the group is, from the leader to the tail gunner, and tells you how far ahead the leader is. The leader's path stays on your phone and isn't uploaded."
       },
       {
         "kind": "new",
