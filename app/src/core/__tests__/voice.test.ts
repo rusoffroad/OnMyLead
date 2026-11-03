@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  AUTO_VOICE, bestVoice, languageMatch, parseVoiceChoice, resolveVoice, suggestDownload, voiceChoices, voiceLabel, voiceTier,
+  AUTO_VOICE, bestVoice, isEngineName, languageMatch, languageName, parseVoiceChoice, resolveVoice, suggestDownload, voiceChoices, voiceLabel, voiceTier,
   type PhoneVoice,
 } from '../voice';
 
@@ -104,5 +104,43 @@ describe('labels and saved choice', () => {
     expect(parseVoiceChoice(null)).toBe(AUTO_VOICE);
     expect(parseVoiceChoice('  ')).toBe(AUTO_VOICE);
     expect(parseVoiceChoice(zoePremium.identifier)).toBe(zoePremium.identifier);
+  });
+});
+
+describe('Android engine voices', () => {
+  const iol = v('en-us-x-iol-local', 'en-us-x-iol-local', 'en-US', 'Enhanced');
+  const tpf = v('en-us-x-tpf-local', 'en-us-x-tpf-local', 'en-US', 'Enhanced');
+  const lang = v('en-US-language', 'en-US-language', 'en-US', 'Enhanced');
+  const gb = v('en-gb-x-gba-local', 'en-gb-x-gba-local', 'en-GB', 'Enhanced');
+  const ph = v('en-ph-x-a-local', 'en-ph-x-a-local', 'en-PH');
+
+  it('spots engine codes, not real names', () => {
+    expect(isEngineName('en-us-x-iob-local')).toBe(true);
+    expect(isEngineName('en-US-language')).toBe(true);
+    expect(isEngineName('en_US')).toBe(true);
+    expect(isEngineName('Zoe')).toBe(false);
+    expect(isEngineName('Google US English')).toBe(false);
+  });
+
+  it('names languages the way riders say them', () => {
+    expect(languageName('en-US')).toBe('US English');
+    expect(languageName('en_gb')).toBe('UK English');
+    expect(languageName('en-PH')).toBe('English (PH)');
+    expect(languageName('xx')).toBe('XX');
+  });
+
+  it('labels engine voices with a stable number per language, no raw codes', () => {
+    const list = voiceChoices([tpf, gb, iobLocal, iol, ph], 'en-US');
+    const labels = list.map((x) => voiceLabel(x, list));
+    expect(labels).toEqual(['US English Voice 1', 'US English Voice 2', 'US English Voice 3', 'UK English Voice 1', 'English (PH) Voice 1']);
+    // The number follows the voice, not its place in the list.
+    expect(voiceLabel(tpf, [tpf, iobLocal, iol])).toBe('US English Voice 3');
+    expect(labels.join(' ')).not.toMatch(/-x-|local|language|Enhanced/);
+  });
+
+  it('drops the duplicate "-language" default when a named voice exists for that language', () => {
+    expect(voiceChoices([lang, iobLocal], 'en-US')).toEqual([iobLocal]);
+    expect(voiceChoices([lang], 'en-US')).toEqual([lang]);
+    expect(voiceLabel(lang, [lang])).toBe('US English Voice 1');
   });
 });
