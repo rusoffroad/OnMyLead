@@ -4,7 +4,7 @@ summary: Play, pause, skip songs and change the volume of the music on your phon
 category: ride-mode
 order: 45
 release: "2.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/components/music-controls.tsx
   - app/src/core/music.ts

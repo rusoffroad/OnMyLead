@@ -4,7 +4,7 @@ summary: If a rider shows up a mile or more from where they really are, turn on 
 category: troubleshooting
 order: 15
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/core/precise-location.ts
   - app/src/hooks/use-precise-location.ts
