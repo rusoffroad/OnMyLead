@@ -3,11 +3,11 @@ import { PanResponder, Platform, Pressable, StyleSheet, Text, View, type StylePr
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, Radius, RideColors } from '@/constants/theme';
+import { Colors, font, GlassSurface, Radius, RideColors } from '@/constants/theme';
 import { FULL_MAP_BAR_H, RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
 import { isVerticalSwipe } from '@/core/panel-swipe';
 
-const glass = { backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1, borderColor: Colors.border } as const;
+const glass = GlassSurface;
 
 /**
  * The small "Full Map" button that tucks a screen's bars and panels away (see useFullMap). It sits

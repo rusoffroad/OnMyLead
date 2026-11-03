@@ -4,6 +4,7 @@ import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
 import { Colors, font } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
+import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
 import { cameraCenterFor, openMapCenter } from '@/core/map-center';
 import type { Place } from '@/core/places';
@@ -25,6 +26,8 @@ export type NavMapHandle = {
 export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
 
+/** Map Mode's own dot reports every second; the follow camera glides for about that long. */
+const FOLLOW_MS = followCamDurationMs(1000);
 const toCoords = (pts: LatLng[]) => pts.map((p) => ({ latitude: p.lat, longitude: p.lng }));
 
 /**
@@ -106,9 +109,9 @@ export function NavMap({
     Promise.all([m.coordinateForPoint({ x: w / 2, y: h / 2 }), m.coordinateForPoint(open)])
       .then(([here, there]) => {
         const c = cameraCenterFor(followMe, { lat: here.latitude, lng: here.longitude }, { lat: there.latitude, lng: there.longitude });
-        m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: 600 });
+        m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: FOLLOW_MS });
       })
-      .catch(() => m.animateCamera({ center: target }, { duration: 600 }));
+      .catch(() => m.animateCamera({ center: target }, { duration: FOLLOW_MS }));
     // Only when the followed spot moves; the panels' padding is read as it is then.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [followMe]);
@@ -150,7 +153,7 @@ export function NavMap({
         region.current = r;
         onCenter?.({ lat: r.latitude, lng: r.longitude });
         trail.mapProps.onRegionChangeComplete(r);
-        map.current?.getCamera().then((c) => setMapHeading(Math.round(c.heading ?? 0))).catch(() => {});
+        map.current?.getCamera().then((c) => setMapHeading(Math.round((c.heading ?? 0) / 5) * 5 % 360)).catch(() => {});
       }}
       onPress={(e) => {
         if (e.nativeEvent.action === 'marker-press') return;

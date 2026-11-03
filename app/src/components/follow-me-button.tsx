@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import { Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, GlassSurface } from '@/constants/theme';
 import { FOLLOW_ME_LABEL, type FollowMeStatus } from '@/core/follow-camera';
 import { Icon } from './icon';
 
@@ -60,7 +60,7 @@ export function FollowMeButton({
 const styles = StyleSheet.create({
   btn: {
     position: 'absolute', zIndex: 15, height: FOLLOW_ME_H, borderRadius: FOLLOW_ME_H / 2, flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'center', gap: 7, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
+    justifyContent: 'center', gap: 7, ...GlassSurface,
   },
   pill: { paddingLeft: 13, paddingRight: 16 },
   round: { width: FOLLOW_ME_H },

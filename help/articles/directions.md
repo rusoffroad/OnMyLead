@@ -4,7 +4,7 @@ summary: Hand off to Apple Maps or Google Maps for turn-by-turn directions to th
 category: routes-maps
 order: 70
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/components/directions.tsx
   - app/src/core/directions.ts
@@ -47,7 +47,7 @@ The **Directions** card shows while the ride is scheduled or live. **Meeting Poi
 
 You can also get directions from other places in Ride Mode:
 
-- Tap the yellow **Regroup point set. Tap to navigate** banner.
+- Tap the **Regroup point set. Tap to navigate** banner.
 - Tap **Navigate** on a rider's alert card.
 - Open the **Riders** list and tap **Navigate**, or **Go to Last Seen** for a rider whose position is old.
 - Tap a waypoint on the map. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).

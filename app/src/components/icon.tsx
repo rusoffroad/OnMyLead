@@ -54,6 +54,11 @@ const PATHS = {
   // A music note, for Music Controls.
   music: ['M9 17.5V5.8l10.5-2.3v11.7', 'M9 9l10.5-2.3', 'M9 17.5a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z', 'M19.5 15.2a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z'],
   battery: ['M3 7.5h15v9H3z', 'M20.5 10.5v3', 'M11.5 9l-2.5 3.2h3L9.5 15'],
+  go: ['M5 12h13', 'M13 6l6 6-6 6'],
+  more: ['M5 12h.01', 'M12 12h.01', 'M19 12h.01'],
+  regroup: ['M12 2.5v3', 'M12 18.5v3', 'M2.5 12h3', 'M18.5 12h3'],
+  layers: ['M12 3.5l9 5-9 5-9-5z', 'M3 13l9 5 9-5'],
+  back: ['M15 5l-7 7 7 7'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
@@ -68,6 +73,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: 
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'addFriend' ? <Circle cx={10.5} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'regroup' ? <Circle cx={12} cy={12} r={3.5} fill={color} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'locate' ? <Circle cx={12} cy={12} r={6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'people' ? (
         <>

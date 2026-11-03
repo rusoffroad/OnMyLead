@@ -4,7 +4,7 @@ summary: Use Navigate as your offroad map, record or draw your own trails, share
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
