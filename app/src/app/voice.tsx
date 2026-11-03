@@ -60,7 +60,7 @@ export default function VoiceScreen() {
         <View style={styles.list} accessibilityRole="radiogroup">
           <VoiceRow
             title="Automatic"
-            detail={auto ? `Best voice on this device: ${voiceLabel(auto)}` : 'This device’s standard voice'}
+            detail={auto ? `Best voice on this device: ${voiceLabel(auto, choices)}` : 'This device’s standard voice'}
             on={autoOn}
             recommended
             playing={playing === AUTO_VOICE}
@@ -70,7 +70,7 @@ export default function VoiceScreen() {
           {choices.map((v) => (
             <VoiceRow
               key={v.identifier}
-              title={voiceLabel(v)}
+              title={voiceLabel(v, choices)}
               detail={tierDetail(v)}
               on={!autoOn && inUse?.identifier === v.identifier}
               playing={playing === v.identifier}
