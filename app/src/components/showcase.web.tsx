@@ -338,7 +338,7 @@ export function Showcase() {
               {referralsOn ? (
                 <Feature title="Invite Friends, Both Save">Send your link to a riding buddy who’s new to OnMyLead. When they finish their first ride, you both get your first year of Pro Annual for ${REFERRAL_PRICE.discounted} instead of ${REFERRAL_PRICE.annual}, through the App Store or Google Play.</Feature>
               ) : null}
-              <Feature title="Events">Rallies, poker runs and ride weekends on one shareable page: dates, place, photos, an agenda of concerts, raffles and runs, and the group rides to join. Pro riders post them, add co-hosts and pick a Ride Manager for each ride. Anyone can see them and say they’re going.</Feature>
+              <Feature title="Events">Rallies, poker runs and ride weekends on one shareable page: dates, place, photos, an agenda of concerts, raffles and runs, and the group rides to join. Pro riders post them, add co-hosts and pick a Ride Manager for each ride. Anyone can see them and say they’re going, and the app explains when you want an event and when a public ride will do.</Feature>
             </div>
             <figure className="phone">
               <img src="/showcase/vehicle.webp" alt="A Garage machine called Red Rocket with its fuel range and build list" loading="lazy" width={786} height={1704} />

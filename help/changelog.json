@@ -2,6 +2,19 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "events",
+      "find-a-ride",
+      "create-a-ride",
+      "home-screen"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "events",
+    "why": "Chris 2026-11-03 asked for an explainer of events vs public rides, and for Events to stand out more. New Event or Public Ride? section in Events, short notes in Find a Ride and Create a Ride, and the Home screen's Events card is now gold."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "refer-a-friend"
     ],
     "kind": "review",
