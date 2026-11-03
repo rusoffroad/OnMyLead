@@ -2,6 +2,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "refer-a-friend"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "Reviewed, no change for riders: Admin > Referrals now keeps Apple offer codes that are all letters and shows code expiry dates on the right day."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "social",
       "out-riding",
       "group-chat",
