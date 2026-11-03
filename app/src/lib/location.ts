@@ -15,6 +15,7 @@ import { MOVING_SPEED_MPS } from '@/core/bubble';
 import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
 import { distanceM } from '@/core/geo';
+import { shouldFlushTrack } from '@/core/live-costs';
 import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
 import { isApproximatePermission, shouldAskForGoogleAccuracy, shouldAskForPrecise } from '@/core/precise-location';
 import type { BatteryPlan } from '@/core/battery';
@@ -66,6 +67,8 @@ async function writeContext(ctx: TrackContext) {
 // Battery Saver, see core/battery), so a parked rider still shows as live to the group (see
 // core/freshness). Kept in memory: a cold start just sends.
 let lastSent: { at: number; lat: number; lng: number } | null = null;
+/** When queued track points last went up (this process); null sends the first batch at once. */
+let lastTrackFlushAt: number | null = null;
 let movedAt: number | null = null;
 
 export async function handleLocations(locations: Location.LocationObject[]) {
@@ -120,8 +123,12 @@ export async function handleLocations(locations: Location.LocationObject[]) {
       last_moved_at: ctx.lastMovedAt ? new Date(ctx.lastMovedAt).toISOString() : null,
       recorded_at: new Date(next.at).toISOString(),
     });
-    // Back in service: send the track points saved while offline.
-    if (!error) await flushTrack(userId);
+    // The track goes up in batches (each upload carries the whole track, so per-fix uploads
+    // multiplied server traffic); stopping the share sends whatever is left.
+    if (!error) {
+      const pending = Object.values(await readQueue()).reduce((n, pts) => n + (pts?.length ?? 0), 0);
+      if (shouldFlushTrack(lastTrackFlushAt, Date.now(), pending)) await flushTrack(userId);
+    }
   } catch {
     // No service: the point is queued above and goes up with the next fix that gets through.
   }
@@ -129,6 +136,7 @@ export async function handleLocations(locations: Location.LocationObject[]) {
 
 /** Append queued points to each ride's own track. Safe to call repeatedly. */
 export async function flushTrack(userId: string) {
+  lastTrackFlushAt = Date.now();
   // The old single list can't say which ride its points belong to, so it is dropped rather than
   // risk adding them to the wrong ride.
   await AsyncStorage.removeItem(OLD_QUEUE_KEY).catch(() => {});
