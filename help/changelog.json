@@ -2,6 +2,17 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "events",
+      "privacy"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "events-migration-fix",
+    "why": "Fixed the Events database update so it installs on the live server (it called a random-code function by the wrong name). Events work the same; nothing riders see changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "starlink",
       "rus-gear"
     ],
