@@ -4,7 +4,7 @@ summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make y
 category: getting-started
 order: 10
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/(tabs)/_layout.tsx
   - app/src/components/tab-bar.tsx
@@ -31,6 +31,12 @@ OnMyLead is a group ride app for off-road riders. The leader creates a ride, the
 ## Get the App
 
 OnMyLead runs on iPhone, iPad, Android phones and Android tablets. Download **OnMyLead** free from the App Store on an iPhone or iPad, or from Google Play on an Android phone or tablet, then open it. It's the same account, rides and Pro plan on every device, and iPhone and Android riders ride together on the same map.
+
+:::release 2.0
+## Agree Before You Ride
+
+The first time you open the app, the **Before You Ride** screen shows the Rider Safety and Liability Agreement. Read it, tick the box and tap **I Agree**. On onmylead.com it shows after you sign in. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement).
+:::
 
 ## Make Your Account
 

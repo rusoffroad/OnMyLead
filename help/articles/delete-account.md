@@ -4,7 +4,7 @@ summary: Permanently delete your OnMyLead account and its data from the You tab,
 category: account
 order: 80
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/(tabs)/profile.tsx
   - app/src/lib/api.ts
@@ -37,6 +37,10 @@ You're signed out and taken back to the start.
 - Your messages and location history.
 
 This can't be undone. To ride with OnMyLead again later, you'd make a new account.
+
+:::release 2.0
+One thing is kept: the record that you agreed to the Rider Safety and Liability Agreement, because it's a legal record. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement#what-gets-saved).
+:::
 
 ## If You See Deletion Requested
 
