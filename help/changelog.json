@@ -2,6 +2,28 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "badges-and-ranks"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "founder-badge",
+    "why": "New OnMyLead Founder badge (Chris), given the same way as Brand Ambassador. The special badges section now covers both and says what each looks like. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "home-screen",
+      "social",
+      "profile-picture"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "founder-badge",
+    "why": "Checked against the OnMyLead Founder badge: the Feed and share caption now have their own wording for Founder (\"is the OnMyLead Founder\", \"founded OnMyLead\") and the Admin user page gives both special badges. Described in Earn Badges and Ranks; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "refer-a-friend",
       "friends",
       "subscribe-to-pro",
@@ -44,28 +66,6 @@
     "by": "pr",
     "ref": "refer-a-friend",
     "why": "Checked against the refer-a-friend change: the You tab gains an Invite Friends row only while the program is switched on, the Pro screen gains the reward card, the inbox has a reward notification and the Settings flag list has Refer a Friend. Nothing these guides describe changed."
-  },
-  {
-    "date": "2026-11-03",
-    "slugs": [
-      "badges-and-ranks"
-    ],
-    "kind": "update",
-    "by": "pr",
-    "ref": "founder-badge",
-    "why": "New OnMyLead Founder badge (Chris), given the same way as Brand Ambassador. The special badges section now covers both and says what each looks like. Comes with the 2.0 update."
-  },
-  {
-    "date": "2026-11-03",
-    "slugs": [
-      "home-screen",
-      "social",
-      "profile-picture"
-    ],
-    "kind": "review",
-    "by": "pr",
-    "ref": "founder-badge",
-    "why": "Checked against the OnMyLead Founder badge: the Feed and share caption now have their own wording for Founder (\"is the OnMyLead Founder\", \"founded OnMyLead\") and the Admin user page gives both special badges. Described in Earn Badges and Ranks; no change to these articles."
   },
   {
     "date": "2026-11-03",
