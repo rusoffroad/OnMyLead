@@ -47,12 +47,13 @@
       "rus-gear",
       "subscribe-to-pro",
       "troubleshooting",
-      "use-onmylead-on-a-tablet"
+      "use-onmylead-on-a-tablet",
+      "home-screen"
     ],
     "kind": "review",
     "by": "pr",
     "ref": "pro-tags",
-    "why": "Checked after the Pro tags change touched shared screens and components (Button, groups, route builder, trips, offline map buttons, entitlements, showcase). The only change riders see is the Pro tag, covered in Free and Pro and each Pro feature's article; these articles need no text change, so only their review dates moved."
+    "why": "Checked after the Pro tags change touched shared screens and components (Button, groups, route builder, trips, offline map buttons, entitlements, showcase). The only change riders see is the Pro tag, covered in Free and Pro and each Pro feature's article; these articles need no text change, so only their review dates moved. Home's gold now reads the shared Colors.gold (same colour), so Your Home Screen looks the same."
   },
   {
     "date": "2026-11-03",
