@@ -95,8 +95,12 @@ function compare(wanted: string) {
  */
 export function voiceChoices(voices: readonly PhoneVoice[], wanted: string): PhoneVoice[] {
   const seen = new Set<string>();
-  return voices
-    .filter((v) => TIER_RANK[voiceTier(v)] > 0 && languageMatch(v.language, wanted) > 0)
+  const usable = voices.filter((v) => TIER_RANK[voiceTier(v)] > 0 && languageMatch(v.language, wanted) > 0);
+  // Android lists its default voice for a language twice: as "en-US-language" and as the voice it
+  // points at ("en-us-x-iob-local"). Keep the named one.
+  const hasNamed = new Set(usable.filter((v) => /-x-/i.test(v.identifier)).map((v) => langKey(v.language)));
+  return usable
+    .filter((v) => !(/-language$/i.test(v.identifier) && hasNamed.has(langKey(v.language))))
     .sort(compare(wanted))
     .filter((v) => (seen.has(v.identifier) ? false : (seen.add(v.identifier), true)));
 }
@@ -118,8 +122,59 @@ export function resolveVoice(voices: readonly PhoneVoice[], wanted: string, save
   return bestVoice(voices, wanted);
 }
 
-/** "Zoe (Premium)", "Samantha (Enhanced)", "Samantha". */
-export function voiceLabel(v: PhoneVoice): string {
+/** "en-US", "en_us", "en-us-x-iob" all key as "en-us". */
+function langKey(tag: string): string {
+  const { lang, region } = splitLang(tag);
+  return region ? `${lang}-${region}` : lang;
+}
+
+/**
+ * Android names its voices by engine code ("en-us-x-iob-local", "en-US-language"), which mean
+ * nothing to a rider. Apple and browser voices have real names ("Zoe", "Google US English").
+ */
+export function isEngineName(name: string): boolean {
+  return !/\s/.test(name.trim()) && /^[a-z]{2,3}[-_][a-z]{2,3}([-_]|$)/i.test(name.trim());
+}
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian', pt: 'Portuguese', nl: 'Dutch',
+  sv: 'Swedish', da: 'Danish', nb: 'Norwegian', no: 'Norwegian', fi: 'Finnish', pl: 'Polish', ja: 'Japanese',
+  ko: 'Korean', zh: 'Chinese', ru: 'Russian', tr: 'Turkish', ar: 'Arabic', hi: 'Hindi',
+};
+
+/** Short region words riders say: "US English", "UK English", "Mexican Spanish". */
+const REGION_NAMES: Record<string, string> = {
+  'en-us': 'US English', 'en-gb': 'UK English', 'en-au': 'Australian English', 'en-ca': 'Canadian English',
+  'en-in': 'Indian English', 'en-ie': 'Irish English', 'en-nz': 'New Zealand English', 'en-za': 'South African English',
+  'en-ng': 'Nigerian English', 'es-es': 'Spain Spanish', 'es-mx': 'Mexican Spanish', 'es-us': 'US Spanish',
+  'fr-fr': 'France French', 'fr-ca': 'Canadian French', 'pt-br': 'Brazilian Portuguese', 'pt-pt': 'Portugal Portuguese',
+};
+
+/** "US English", or "English (PH)" for a region without a short name. */
+export function languageName(tag: string): string {
+  const key = langKey(tag);
+  if (REGION_NAMES[key]) return REGION_NAMES[key];
+  const { lang, region } = splitLang(tag);
+  const name = LANGUAGE_NAMES[lang] ?? lang.toUpperCase();
+  return region ? `${name} (${region.toUpperCase()})` : name;
+}
+
+/**
+ * What the Voice screen calls a voice: "Zoe (Premium)", "Samantha (Enhanced)", "Samantha", or for
+ * an Android engine code "US English Voice 2". Engine voices are numbered within their language by
+ * identifier, so a voice keeps its number while the list's order changes; pass the listed voices
+ * as `all` for that numbering.
+ */
+export function voiceLabel(v: PhoneVoice, all: readonly PhoneVoice[] = [v]): string {
+  if (isEngineName(v.name)) {
+    const key = langKey(v.language || v.name);
+    const same = all
+      .filter((o) => isEngineName(o.name) && langKey(o.language || o.name) === key)
+      .map((o) => o.identifier)
+      .sort();
+    const n = Math.max(0, same.indexOf(v.identifier)) + 1;
+    return `${languageName(v.language || v.name)} Voice ${n}`;
+  }
   const tier = voiceTier(v);
   const name = baseName(v.name) || v.name;
   if (tier === 'premium') return `${name} (Premium)`;

@@ -24,7 +24,7 @@ Every voice OnMyLead uses is stored on your phone, so spoken alerts keep working
 3. Tap **Play** next to any voice to hear it say "Regroup point set. Sam is falling behind."
 4. Tap a voice to use it for spoken alerts. Tap **Automatic** to go back.
 
-Voices marked **Premium** sound the most natural, then **Enhanced**, then **Standard**. If you delete the voice you picked, OnMyLead goes back to Automatic.
+Voices marked **Premium** sound the most natural, then **Enhanced**, then **Standard**. On Android, voices don't have names, so they're listed by language, such as **US English Voice 1**, with **Natural** or **Standard** under each. If you delete the voice you picked, OnMyLead goes back to Automatic.
 
 Your choice follows your account to every device you sign in on. A phone or tablet that doesn't have that voice uses its best one. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
 
