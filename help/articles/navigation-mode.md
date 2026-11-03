@@ -8,6 +8,7 @@ updated: 2026-11-03
 sources:
   - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
+  - app/src/core/trip-meter.ts
   - app/src/components/custom-trail-intro.tsx
   - app/src/components/obstacle-sheet.tsx
   - app/src/core/obstacles.ts
@@ -67,7 +68,22 @@ On a tablet, the panel sits beside the map in landscape, and floats over the cor
 
 ## Explore
 
+:::until 2.0
 **Explore** shows your speed and elevation, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
+:::
+
+:::release 2.0
+**Explore** shows your speed big on the left, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
+
+Next to your speed are four readings:
+
+- **Elevation**, in feet.
+- **Heading**, the way you're facing, such as **NE 62°**. While you're moving it comes from GPS. When you stop, it comes from your phone's compass. The website shows it only while you're moving.
+- **Trip**, the miles you've covered since you last reset it, like the trip meter on a dash.
+- **Moving**, how long you've been moving on this trip (minutes, then hours and minutes).
+
+To start a new trip, press and hold **Trip**. Trip and Moving only count while Map Mode is open, and they're kept on your phone only. When you follow a trail, the big number shows the miles left, and **Speed** moves into the readings in place of **Moving**.
+:::
 
 ### The Map Follows You
 
