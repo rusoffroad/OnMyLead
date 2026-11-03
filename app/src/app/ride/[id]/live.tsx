@@ -19,6 +19,7 @@ import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
 import { LeaveRide } from '@/components/leave-ride';
 import { RiderList, RiderRows } from '@/components/rider-list';
+import { PanelActions, QuickRow, StatusSheet, tapFeel } from '@/components/ride-controls';
 import { RideMessageSheet } from '@/components/ride-message-sheet';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
@@ -28,8 +29,8 @@ import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Card } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Button } from '@/components/ui';
+import { Colors, font, Glass, Radius, RideColors, Spacing } from '@/constants/theme';
 import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
@@ -247,6 +248,8 @@ export default function RideMode() {
   // send often can be kept as their own quick replies on this device.
   const [messageOpen, setMessageOpen] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
+  // More on the panel: every status and quick reply, grouped.
+  const [statusesOpen, setStatusesOpen] = useState(false);
   const musicOn = useMusicControls();
   const savedReplies = useSavedReplies();
   // The last status tap or quick reply: Sending, then Sent with who has it, or Waiting for
@@ -966,52 +969,58 @@ export default function RideMode() {
         pointerEvents="box-none"
         style={[styles.top, tablet && [styles.topTablet, { width: sideW + 2 * Spacing.two, bottom: panelBottom - Spacing.two }]]}>
         <View style={styles.topRow} onLayout={(e) => setTopRowBottom(Math.round(e.nativeEvent.layout.y + e.nativeEvent.layout.height))}>
-          <Pressable onPress={() => router.back()} hitSlop={16} accessibilityLabel="Back" style={{ flexShrink: 1 }}>
-            <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
+          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Back" style={styles.backBtn}>
+            <Icon name="back" size={18} color={Colors.text} strokeWidth={2.6} />
           </Pressable>
-          <View style={styles.topRight}>
+          <Pressable
+            onPress={() => (activeShare ? toggleShareOpen() : setAskShare(true))}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityState={activeShare ? { expanded: shareOpen } : undefined}
+            accessibilityLabel={
+              activeShare
+                ? `${ride?.name ?? 'Ride'}. Sharing your location, ${formatRemaining(shareLeft)}. Tap for details`
+                : `${ride?.name ?? 'Ride'}. Not sharing your location. Tap to share`
+            }
+            style={styles.topTitleWrap}>
+            <Text style={styles.topText} numberOfLines={1}>{ride?.name ?? 'Ride'}</Text>
+            <View style={styles.topSubRow}>
+              <View style={[styles.shareDot, { backgroundColor: activeShare ? RideColors.green : Colors.textSecondary }]} />
+              <Text style={styles.topSub} numberOfLines={1}>
+                {activeShare
+                  ? formatRemainingShort(shareLeft) === 'On' ? 'Sharing' : `Sharing · ${formatRemainingShort(shareLeft)} Left`
+                  : 'Not Sharing · Tap to Share'}
+              </Text>
+            </View>
+          </Pressable>
+          {tablet ? null : (
             <Pressable
-              onPress={() => (activeShare ? toggleShareOpen() : setAskShare(true))}
+              onPress={() => setRidersOpen(true)}
               hitSlop={10}
               accessibilityRole="button"
-              accessibilityState={activeShare ? { expanded: shareOpen } : undefined}
-              accessibilityLabel={
-                activeShare
-                  ? `Sharing your location, ${formatRemaining(shareLeft)}. Tap for details`
-                  : 'Not sharing your location. Tap to share'
-              }
-              style={[styles.sharePill, activeShare ? styles.sharePillOn : styles.sharePillOff]}>
-              <View style={[styles.shareDot, { backgroundColor: activeShare ? '#fff' : Colors.textSecondary }]} />
-              <Text style={[styles.sharePillText, !activeShare && { color: Colors.textSecondary }]}>
-                {activeShare ? formatRemainingShort(shareLeft) : 'Off'}
+              accessibilityLabel={`${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}. Tap to see every rider and when they last updated`}
+              style={({ pressed }) => [styles.groupChip, bubble.alerts.length ? styles.groupChipRed : styles.groupChipGreen, pressed && { opacity: 0.75 }]}>
+              <Text style={[styles.groupChipText, { color: bubble.alerts.length ? Glass.softRed : RideColors.green }]}>
+                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'}
               </Text>
             </Pressable>
-            {tablet ? null : (
-              <Pressable
-                onPress={() => setRidersOpen(true)}
-                hitSlop={10}
-                accessibilityRole="button"
-                accessibilityLabel={`${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}. Tap to see every rider and when they last updated`}>
-                <Text style={[styles.topText, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
-                  {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'} ›
-                </Text>
-              </Pressable>
-            )}
-          </View>
+          )}
         </View>
         {hasBanners ? (
           <ScrollView
             style={{ maxHeight: bannersMax, flexGrow: 0 }}
-            contentContainerStyle={{ gap: 6 }}
+            // On a phone the map layers button sits at the right of the first banner: leave it room.
+            contentContainerStyle={{ gap: 6, paddingRight: tablet ? 0 : 58 }}
             onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
             showsVerticalScrollIndicator={false}>
           {precise.problem ? (
             <Pressable
               onPress={() => void precise.fix()}
-              style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}
+              style={[styles.shareBanner, styles.amberBanner]}
               accessibilityRole="button"
               accessibilityLabel={LOCATION_PROBLEM_BANNER[precise.problem]}>
-              <Text style={[styles.shareText, { color: '#1A1100', flex: 1, textAlign: 'left' }]}>
+              <Icon name="warning" size={18} color={Glass.amber} strokeWidth={2.2} />
+              <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
                 {LOCATION_PROBLEM_BANNER[precise.problem]}
               </Text>
             </Pressable>
@@ -1038,8 +1047,12 @@ export default function RideMode() {
             </View>
           ) : null}
           {regroup ? (
-            <Pressable onPress={() => navigateTo(regroup.lat, regroup.lng, 'the Regroup Point')} style={[styles.shareBanner, { backgroundColor: RideColors.yellow }]}>
-              <Text style={[styles.shareText, { color: '#1A1100' }]}>Regroup point set. Tap to navigate</Text>
+            <Pressable
+              onPress={() => navigateTo(regroup.lat, regroup.lng, 'the Regroup Point')}
+              accessibilityRole="button"
+              style={[styles.shareBanner, styles.amberBanner]}>
+              <Icon name="regroup" size={18} color={Glass.amber} strokeWidth={2.2} />
+              <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>Regroup point set. Tap to navigate</Text>
             </Pressable>
           ) : null}
           {announcement ? (
@@ -1048,8 +1061,13 @@ export default function RideMode() {
               accessibilityRole="button"
               accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
               style={styles.announcement}>
-              <Text style={styles.announcementLabel}>Announcement from {nameOf(announcement.user_id)}. Tap to hear it again</Text>
-              <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
+              <View style={styles.announcementIcon}>
+                <Icon name="megaphone" size={18} color={Glass.amber} strokeWidth={2.1} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.announcementLabel} numberOfLines={1}>{nameOf(announcement.user_id)} · Tap to Hear Again</Text>
+                <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
+              </View>
             </Pressable>
           ) : null}
           </ScrollView>
@@ -1207,7 +1225,6 @@ export default function RideMode() {
               hitSlop={8}
               style={styles.handle}>
               <View style={styles.handleBar} />
-              {panelOpen ? <Text style={styles.handleText}>Hide ▼</Text> : null}
             </Pressable>
             <FullMapButton onPress={enterFullMap} style={styles.fullMapBtn} />
             <Pressable
@@ -1217,7 +1234,8 @@ export default function RideMode() {
               accessibilityHint="Write your own message to everyone on this ride, or send one of your saved quick replies"
               hitSlop={8}
               style={({ pressed }) => [styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.typeText}>✎ Message</Text>
+              <Icon name="chat" size={16} color={Colors.text} strokeWidth={2.2} />
+              <Text style={styles.typeText}>Message</Text>
             </Pressable>
           </View>
         )}
@@ -1242,35 +1260,38 @@ export default function RideMode() {
             {shownSeparations.map((r) => {
               const p = positions[r.riderId];
               return (
-                <Card key={r.riderId} style={{ borderLeftWidth: 6, borderLeftColor: RideColors[r.status] }}>
-                  <ThemedText type="smallBold">{r.message}</ThemedText>
-                  <View style={styles.actions}>
-                    {p ? <Button title="Navigate" kind="secondary" onPress={() => navigateTo(p.lat, p.lng)} /> : null}
-                    {canRegroup ? <Button title="Regroup" kind="secondary" onPress={regroupHere} /> : null}
+                <View key={r.riderId} style={[styles.alertRow, r.status === 'yellow' && styles.alertRowAmber]}>
+                  <Icon name="warning" size={18} color={r.status === 'yellow' ? Glass.amber : Glass.softRed} strokeWidth={2.2} />
+                  <Text style={styles.alertText}>{r.message}</Text>
+                  <View style={styles.alertActions}>
+                    {p ? <AlertChip label="Navigate" onPress={() => navigateTo(p.lat, p.lng)} /> : null}
+                    {canRegroup ? <AlertChip label="Regroup" onPress={regroupHere} /> : null}
                   </View>
-                </Card>
+                </View>
               );
             })}
             {shownHelpCalls.map(({ m, s }) => {
               const spot = callSpot(m.user_id);
               return (
-                <Card key={`s-${m.user_id}`} style={{ borderLeftWidth: 6, borderLeftColor: isUrgentCall(s.status) ? RideColors.red : RideColors.yellow }}>
-                  <View style={styles.callRow}>
-                    {s.status === 'mechanical' ? <BreakdownBadge size={24} /> : null}
-                    <ThemedText type="smallBold" style={{ flex: 1 }}>
-                      {m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}, {ago(s.tapped_at, now)}
-                    </ThemedText>
+                <View key={`s-${m.user_id}`} style={[styles.alertRow, !isUrgentCall(s.status) && styles.alertRowAmber]}>
+                  {s.status === 'mechanical' ? <BreakdownBadge size={22} /> : (
+                    <Icon name="warning" size={18} color={isUrgentCall(s.status) ? Glass.softRed : Glass.amber} strokeWidth={2.2} />
+                  )}
+                  <Text style={styles.alertText}>
+                    <Text style={{ fontFamily: font(700) }}>{m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}</Text>, {ago(s.tapped_at, now)}
+                  </Text>
+                  <View style={styles.alertActions}>
+                    {spot ? <AlertChip label="Navigate" onPress={() => navigateTo(spot.lat, spot.lng)} /> : null}
                     <Pressable
                       onPress={() => setDismissedCalls((d) => new Set(d).add(callKey(m.user_id, s)))}
                       accessibilityRole="button"
                       accessibilityLabel={`Dismiss ${m.profiles?.display_name || 'Rider'}'s ${STATUS_LABEL[s.status]} on my screen`}
                       hitSlop={12}
                       style={styles.callDismiss}>
-                      <Text style={styles.callDismissText}>✕</Text>
+                      <Icon name="close" size={16} color={Colors.textSecondary} strokeWidth={2.4} />
                     </Pressable>
                   </View>
-                  {spot ? <Button title="Navigate" kind="secondary" onPress={() => navigateTo(spot.lat, spot.lng)} /> : null}
-                </Card>
+                </View>
               );
             })}
           </ScrollView>
@@ -1331,7 +1352,7 @@ export default function RideMode() {
               accessibilityRole="button"
               accessibilityLabel="Send status EMERGENCY"
               style={({ pressed }) => [styles.foldedSos, styles.fullMapBarBtn, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.statusText}>EMERGENCY</Text>
+              <Text style={[styles.statusText, styles.sosText]}>EMERGENCY</Text>
             </Pressable>
           </View>
         ) : !panelOpen ? (
@@ -1362,56 +1383,34 @@ export default function RideMode() {
               accessibilityRole="button"
               accessibilityLabel="Send status EMERGENCY"
               style={({ pressed }) => [styles.foldedSos, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.statusText}>EMERGENCY</Text>
+              <Text style={[styles.statusText, styles.sosText]}>EMERGENCY</Text>
             </Pressable>
           </View>
         ) : null}
 
         {panelOpen ? (
           <>
-            {canRegroup ? <Button title="Regroup at My Location" big onPress={regroupHere} style={{ marginTop: Spacing.two }} /> : null}
-
-            <View style={styles.replies}>
-              {QUICK_REPLIES.map((q) => (
-                <Pressable
-                  key={q}
-                  onPress={() => quickReply(q)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Send to the group: ${q}`}
-                  style={({ pressed }) => [
-                    styles.replyBtn,
-                    { opacity: pressed ? 0.75 : 1 },
-                    lastReply === q && { borderColor: Colors.text, borderWidth: 3 },
-                  ]}>
-                  <Text style={styles.replyText}>{q}</Text>
-                </Pressable>
-              ))}
-            </View>
-
-            <View style={styles.grid}>
-              {STATUSES.map((s) => (
-                <Pressable
-                  key={s.kind}
-                  onPress={() => tapStatus(s.kind)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Send status ${s.label}`}
-                  style={({ pressed }) => [
-                    styles.statusBtn,
-                    {
-                      backgroundColor:
-                        s.kind === 'emergency' ? Colors.danger : s.urgent ? Colors.accent : s.kind === 'mechanical' ? RideColors.yellow : Colors.backgroundSelected,
-                      opacity: pressed ? 0.75 : 1,
-                    },
-                    myStatus?.status === s.kind && { borderColor: Colors.text, borderWidth: 3 },
-                  ]}>
-                  <Text style={[styles.statusText, s.kind === 'mechanical' && styles.mechText]}>{s.label}</Text>
-                </Pressable>
-              ))}
+            <View style={{ gap: Spacing.two, marginTop: Spacing.two }}>
+              <QuickRow lastReply={lastReply} onReply={quickReply} onMore={() => setStatusesOpen(true)} />
+              <PanelActions onRegroup={canRegroup ? regroupHere : undefined} onEmergency={() => tapStatus('emergency')} />
             </View>
           </>
         ) : null}
       </SafeAreaView>
       </Animated.View>
+
+      <StatusSheet
+        visible={statusesOpen}
+        tablet={tablet}
+        labels={STATUS_LABEL}
+        myStatus={myStatus?.status}
+        lastReply={lastReply}
+        onReply={quickReply}
+        onStatus={tapStatus}
+        onRegroup={canRegroup ? regroupHere : undefined}
+        onEmergency={() => tapStatus('emergency')}
+        onClose={() => setStatusesOpen(false)}
+      />
 
       <RideMessageSheet
         visible={messageOpen}
@@ -1507,28 +1506,51 @@ export default function RideMode() {
   );
 }
 
+/** A small action inside an alert row (Navigate, Regroup). */
+function AlertChip({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={() => {
+        tapFeel();
+        onPress();
+      }}
+      accessibilityRole="button"
+      hitSlop={6}
+      style={({ pressed }) => [styles.alertChip, pressed && { opacity: 0.7 }]}>
+      <Text style={styles.alertChipText}>{label}</Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: 6 },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48 },
-  topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
-  topRight: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 10 },
-  sharePill: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 30, paddingHorizontal: 10, borderRadius: 15 },
-  sharePillOn: { backgroundColor: Colors.sky },
-  sharePillOff: { backgroundColor: Colors.backgroundSelected },
-  shareDot: { width: 8, height: 8, borderRadius: 4 },
-  sharePillText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 16 },
-  shareBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: Radius.control, paddingLeft: 14, paddingRight: 6,
-    minHeight: 44, backgroundColor: Colors.sky,
+  topRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 20, paddingLeft: 8, paddingRight: 10, paddingVertical: 7,
+    minHeight: 54, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
-  shareText: { color: '#fff', fontFamily: font(700), fontSize: 15, textAlign: 'center' },
-  shareAction: { minHeight: 32, paddingHorizontal: 10, borderRadius: 16, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.22)' },
-  shareActionText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
+  backBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile },
+  topTitleWrap: { flex: 1, minWidth: 0 },
+  topText: { color: Colors.text, fontSize: 20, lineHeight: 22, fontFamily: font(700, 'display') },
+  topSubRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 1 },
+  topSub: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12, flexShrink: 1 },
+  groupChip: { paddingHorizontal: 10, minHeight: 30, borderRadius: 15, justifyContent: 'center', borderWidth: 1 },
+  groupChipRed: { backgroundColor: Glass.redTint, borderColor: Glass.redEdge },
+  groupChipGreen: { backgroundColor: 'rgba(60,195,107,0.10)', borderColor: 'rgba(60,195,107,0.4)' },
+  groupChipText: { fontFamily: font(700), fontSize: 13 },
+  shareDot: { width: 7, height: 7, borderRadius: 4 },
+  shareBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingLeft: 12, paddingRight: 6,
+    minHeight: 44, backgroundColor: Glass.panel, borderWidth: 1, borderColor: 'rgba(59,134,247,0.45)',
+  },
+  amberBanner: { borderColor: 'rgba(242,178,51,0.45)', paddingRight: 12, paddingVertical: 8 },
+  shareText: { color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 18, textAlign: 'center' },
+  shareAction: { minHeight: 32, paddingHorizontal: 12, borderRadius: 12, justifyContent: 'center', backgroundColor: Glass.tile },
+  shareActionText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
   // Tablets: the top bar, banners and riders become a column on the left, as tall as the screen.
   topTablet: { right: 'auto' },
   sidebar: {
     flexShrink: 1, gap: Spacing.two, padding: 10, paddingTop: 12, borderRadius: 20,
-    backgroundColor: 'rgba(10,22,38,0.94)', borderWidth: 1, borderColor: Colors.border,
+    backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
   sidebarHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingHorizontal: 4 },
   sidebarTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 26, lineHeight: 28 },
@@ -1538,75 +1560,86 @@ const styles = StyleSheet.create({
   sidebarNote: { color: Colors.text, fontFamily: font(700), fontSize: 13, paddingHorizontal: 4 },
   sidebarShow: {
     flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', minHeight: 44, paddingHorizontal: 14,
-    borderRadius: 22, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
+    borderRadius: 22, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
   sidebarShowText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   bottomWrap: { position: 'absolute', bottom: 0, left: 0, right: 0 },
-  bottomTablet: { borderRadius: 24, borderWidth: 1, borderColor: Colors.border, paddingBottom: 12 },
+  bottomTablet: { borderRadius: 24, borderWidth: 1, paddingBottom: 12 },
   bottom: {
-    padding: Spacing.two, paddingTop: 12,
-    backgroundColor: 'rgba(10,22,38,0.96)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    paddingHorizontal: 12, paddingBottom: Spacing.two, paddingTop: 10,
+    backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge, borderBottomWidth: 0, borderTopLeftRadius: 26, borderTopRightRadius: 26,
   },
   foldedRow: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.two },
   foldedShow: {
     flex: 1, minHeight: 56, borderRadius: Radius.control, flexDirection: 'row', gap: 8,
-    alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected,
+    alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge,
   },
   foldedShowText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19 },
   foldedBadge: { minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow },
   foldedBadgeText: { color: '#1A1100', fontFamily: font(800), fontSize: 14 },
-  foldedMech: { flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow, paddingHorizontal: 6 },
-  mechText: { color: '#1A1100', fontSize: 18, lineHeight: 20 },
+  foldedMech: {
+    flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6,
+    backgroundColor: Glass.amberTint, borderWidth: 1.5, borderColor: 'rgba(242,178,51,0.6)',
+  },
+  mechText: { color: Glass.amber, fontSize: 18, lineHeight: 20 },
   myBreakdown: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: Spacing.two, padding: 10, paddingLeft: 12,
-    borderRadius: Radius.control, backgroundColor: Colors.backgroundElement, borderLeftWidth: 6, borderLeftColor: RideColors.yellow,
+    borderRadius: 16, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge, borderLeftWidth: 4, borderLeftColor: RideColors.yellow,
   },
   myBreakdownTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 18 },
   myBreakdownBody: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14 },
   myBreakdownOk: { minHeight: 44, paddingHorizontal: 12, borderRadius: Radius.control, justifyContent: 'center', backgroundColor: RideColors.green },
   myBreakdownOkText: { color: '#06210F', fontFamily: font(700, 'display'), fontSize: 17 },
-  callRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  alertRow: {
+    flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10, paddingHorizontal: 12, paddingVertical: 10,
+    borderRadius: 16, backgroundColor: Glass.redTint, borderWidth: 1, borderColor: Glass.redEdge,
+  },
+  alertRowAmber: { backgroundColor: 'rgba(242,178,51,0.08)', borderColor: 'rgba(242,178,51,0.4)' },
+  alertText: { flex: 1, minWidth: 150, color: Colors.text, fontFamily: font(500), fontSize: 14, lineHeight: 18 },
+  alertActions: { flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 'auto' },
+  alertChip: { minHeight: 34, paddingHorizontal: 12, borderRadius: 11, justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)' },
+  alertChipText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
   callDismiss: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
-  callDismissText: { color: Colors.textSecondary, fontSize: 18 },
-  foldedSos: { flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.danger },
+  foldedSos: {
+    flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Glass.redTint, borderWidth: 1.5, borderColor: 'rgba(229,38,46,0.75)',
+  },
+  sosText: { color: Glass.softRed },
   actions: { flexDirection: 'row', gap: Spacing.two },
-  handle: { alignItems: 'center', gap: 4, minHeight: 44, justifyContent: 'center', marginTop: -6 },
-  handleBar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
-  handleText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
+  handle: { alignItems: 'center', minHeight: 40, justifyContent: 'center', marginTop: -6 },
+  handleBar: { width: 38, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.22)' },
   fullMapBtn: { position: 'absolute', right: 0, top: -4 },
   // Mirrors Full Map on the left of the handle: Type a Message.
   typeBtn: {
-    position: 'absolute', left: 0, top: -4, minHeight: 34, paddingHorizontal: 12, borderRadius: 17,
-    justifyContent: 'center', backgroundColor: Colors.sky,
+    position: 'absolute', left: 0, top: 0, minHeight: 32, paddingHorizontal: 12, borderRadius: 16, flexDirection: 'row', gap: 6,
+    alignItems: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge,
   },
-  typeText: { color: '#fff', fontFamily: font(700), fontSize: 14 },
+  typeText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
   fullMapBarBtn: { minHeight: 48 },
-  // Leaves the map layers button (and its downloaded-map tag) uncovered on the right.
   offlineBanner: {
-    marginRight: 60, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: Radius.control, paddingHorizontal: 14, paddingVertical: 10,
-    backgroundColor: 'rgba(10,22,38,0.94)', borderWidth: 1.5, borderColor: Colors.textSecondary, borderStyle: 'dashed',
+    flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10,
+    backgroundColor: Glass.panel, borderWidth: 1.5, borderColor: Colors.textSecondary, borderStyle: 'dashed',
   },
   // The same dashed grey as a rider who has lost service: dashed grey always means no signal.
   offlineDot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2.5, borderColor: Colors.textSecondary, borderStyle: 'dashed' },
   offlineText: { flex: 1, color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 18 },
-  announcement: { borderRadius: Radius.control, padding: 12, backgroundColor: RideColors.yellow, gap: 2 },
-  announcementLabel: { color: '#3A2600', fontFamily: font(700), fontSize: 13 },
-  announcementText: { color: '#1A1100', fontFamily: font(800), fontSize: 19, lineHeight: 24 },
-  replies: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.two },
-  replyBtn: { flex: 1, minHeight: 58, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.sky, paddingHorizontal: 4 },
-  replyText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 18, lineHeight: 20, textAlign: 'center' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, marginTop: Spacing.two },
-  statusBtn: { width: '31.5%', minHeight: 64, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center' },
+  announcement: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, padding: 10, paddingRight: 12,
+    backgroundColor: Glass.panel, borderWidth: 1, borderColor: 'rgba(242,178,51,0.45)',
+  },
+  announcementIcon: { width: 34, height: 34, borderRadius: 11, alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.amberTint },
+  announcementLabel: { color: Glass.amber, fontFamily: font(700), fontSize: 12, letterSpacing: 0.3 },
+  announcementText: { color: Colors.text, fontFamily: font(700), fontSize: 16, lineHeight: 21 },
   statusText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 20, textAlign: 'center' },
   wpFab: {
     position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingLeft: 10, paddingRight: 14,
-    borderRadius: 22, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
+    borderRadius: 22, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
   directionsFab: { left: 12 },
   locateFab: {
     position: 'absolute', right: 12, width: LOCATE_SIZE, height: LOCATE_SIZE, borderRadius: LOCATE_SIZE / 2,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border,
+    backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
   waypointFab: { right: 12 },
   musicFab: { position: 'absolute', right: 12 },
