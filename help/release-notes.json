@@ -126,6 +126,10 @@
       {
         "kind": "improved",
         "text": "Planning a group ride on a trail with a width limit shows the limit on the Riding banner and adds it to the ride's instructions for everyone who joins."
+      },
+      {
+        "kind": "fixed",
+        "text": "Share My Location with a family link showed an error (\"Property 'crypto' doesn't exist\") on iPhone, iPad and Android, and no link was made. Family links work again."
       }
     ]
   },

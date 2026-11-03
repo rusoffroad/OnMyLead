@@ -2,6 +2,32 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride",
+      "delete-account",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "faq",
+      "find-a-ride",
+      "fuel-range",
+      "import-gpx",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "organizer-controls",
+      "privacy",
+      "ride-mode",
+      "route-builder"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "family-link-crypto",
+    "why": "Fixed Share My Location's family link on iPhone, iPad and Android: it showed \"Property 'crypto' doesn't exist\" and made no link. The steps riders follow are unchanged, so these articles were checked and only their dates bumped. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "map-layers",
       "garage",
       "create-a-ride",
