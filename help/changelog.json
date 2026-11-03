@@ -15,6 +15,30 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "approvals-and-waitlist",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "free-vs-pro",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "invite-riders",
+      "place-search",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "events",
+    "why": "Reviewed, no change to these steps: Find a Ride and Create a Ride gained the Event or Public Ride? explainer (covered in Events, Find a Ride and Create a Ride), and the website's Events feature line mentions it."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "refer-a-friend"
     ],
     "kind": "review",
