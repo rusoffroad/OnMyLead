@@ -260,13 +260,16 @@ export function referralsSwitchedOn(flags: Record<string, boolean>): boolean {
  * downloads, or one code per line. Header lines and anything that can't be a code are skipped;
  * duplicates are dropped. Codes are upper-cased, like the server stores them.
  */
+const HEADER_WORD = /^(offer[ _]?)?codes?$|expir|^date$|redeem|^url$|^status$|^reference/i;
+
 export function parseOfferCodes(text: string): string[] {
   const out = new Set<string>();
   for (const line of text.split(/\r?\n/)) {
-    for (const field of line.split(/[,;\t]/)) {
-      const f = field.trim().replace(/^"|"$/g, '').trim();
-      if (/^[A-Za-z0-9]{6,64}$/.test(f) && /\d/.test(f)) out.add(f.toUpperCase());
-    }
+    const fields = line.split(/[,;\t]/).map((field) => field.trim().replace(/^"|"$/g, '').trim());
+    // A header row (Code, Expiration Date, ...) is skipped whole. Codes themselves can be all
+    // letters, so a code is any 6 to 64 letters and digits.
+    if (fields.some((f) => HEADER_WORD.test(f))) continue;
+    for (const f of fields) if (/^[A-Za-z0-9]{6,64}$/.test(f)) out.add(f.toUpperCase());
   }
   return [...out];
 }

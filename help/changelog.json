@@ -2,6 +2,7 @@
   {
     "date": "2026-11-03",
     "slugs": [
+<<<<<<< HEAD
       "ride-mode",
       "full-map",
       "fuel-range"
@@ -10,6 +11,27 @@
     "by": "pr",
     "ref": "leader-line-ends",
     "why": "Chris asked for the leader to sit all the way to the left of the leader line and the tail gunner all the way to the right. In 2.0 the line pins the leader to the left end and the tail gunner to the right end, with everyone else between them by how far behind the leader they are, on routes and Freerides; the route's start, finish and miles-done fill are no longer drawn on it. Ride Mode's route and Freeride sections now say so (the old rear-left, front-right text stays until 2.0 is live). Full Map and Fuel Range describe the line without its direction, so they are unchanged (reviewed)."
+=======
+      "refer-a-friend"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "Reviewed, no change for riders: Admin > Referrals now keeps Apple offer codes that are all letters and shows code expiry dates on the right day."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "social",
+      "out-riding",
+      "group-chat",
+      "report-and-block"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "social",
+    "why": "Bug fix (Chris 2026-11-03, 2.0 build 8: the keyboard hid the comment box on a Social post). The comment box, direct messages and group chat now stay above the keyboard on iPhone, iPad and Android. The steps and labels are the same, so the articles only get a new updated: date."
+>>>>>>> origin/main
   },
   {
     "date": "2026-11-03",

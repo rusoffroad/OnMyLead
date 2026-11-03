@@ -65,6 +65,10 @@
       },
       {
         "kind": "fixed",
+        "text": "The keyboard could cover the box you were typing in when you commented on a post or wrote a direct message, so you couldn't see your words. The box now stays just above the keyboard on iPhone, iPad and Android, in comments, direct messages and group chat."
+      },
+      {
+        "kind": "fixed",
         "text": "Your own dot had no direction arrow. Other riders' dots showed which way they were heading, but your own blue dot never did, because iPhone, iPad and Android draw that dot without a direction. Now your dot gets the same white arrow while you're moving."
       },
       {
