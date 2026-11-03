@@ -116,7 +116,7 @@ Shortcuts to the tools that live on the **You** tab: **Who's Riding**, **Friends
 
 ## Help & Support
 
-Opens Help and Support: these guides, **Contact Us**, and how to report a problem.
+Opens Help and Support. At the top, **Help Center: How-To Guides** opens these step-by-step guides; below it are **Contact Us** and quick answers to common questions, each with a **Read the Guide** link.
 
 ## On a Tablet
 
