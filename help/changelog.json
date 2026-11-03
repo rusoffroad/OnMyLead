@@ -2,6 +2,30 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "badges-and-ranks"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "brand-ambassador",
+    "why": "New Brand Ambassador badge that OnMyLead gives to the riders in its Ambassador program (Chris). The article explains what it looks like, where it shows and that it doesn't count toward a rank. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "home-screen",
+      "social",
+      "getting-started",
+      "create-a-ride-on-the-website",
+      "profile-picture"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "brand-ambassador",
+    "why": "Checked against the Brand Ambassador badge: the Feed and share card now say a rider became an OnMyLead Brand Ambassador, the You tab badge row shows it first, the website's Badges and Ranks blurb mentions it and the Admin user page gained a Badges panel. All of it is described in Earn Badges and Ranks; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "appearance"
     ],
     "kind": "new",

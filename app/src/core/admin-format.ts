@@ -115,6 +115,8 @@ export function actionLabel(action: string): string {
     'trial.extend': 'Extended Trial',
     'pro.comp_grant': 'Granted Complimentary Pro',
     'pro.grant_revoke': 'Revoked Complimentary Pro',
+    'badge.grant': 'Gave Brand Ambassador Badge',
+    'badge.revoke': 'Took Back Brand Ambassador Badge',
     'setting.update': 'Changed a Setting',
     'review.reply': 'Replied to a Store Review',
     'review.reply_edit': 'Changed a Store Review Reply',

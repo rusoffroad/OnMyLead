@@ -9,12 +9,15 @@ import { font } from '@/constants/theme';
 import { fmtAgo, fmtDate, fmtInt } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
 
-const FILTERS: { value: admin.UserFilter; label: string }[] = [
+// 'ambassador' is listed from the badge itself, not from admin_users.
+type Filter = admin.UserFilter | 'ambassador';
+const FILTERS: { value: Filter; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'free', label: 'Free' },
   { value: 'trial', label: 'Pro Trial' },
   { value: 'paid', label: 'Paid Pro' },
   { value: 'comp', label: 'Complimentary' },
+  { value: 'ambassador', label: 'Brand Ambassadors' },
   { value: 'admin', label: 'Admins' },
   { value: 'suspended', label: 'Suspended' },
   { value: 'deletion', label: 'Deletion Requests' },
@@ -25,9 +28,25 @@ const PAGE = 50;
 export default function Users() {
   const params = useLocalSearchParams<{ filter?: string }>();
   const [q, setQ] = useState('');
-  const [filter, setFilter] = useState<admin.UserFilter>(FILTERS.some((f) => f.value === params.filter) ? (params.filter as admin.UserFilter) : 'all');
+  const [filter, setFilter] = useState<Filter>(FILTERS.some((f) => f.value === params.filter) ? (params.filter as Filter) : 'all');
   const [page, setPage] = useState(0);
-  const { data, error, loading, reload } = admin.useAdminData(() => admin.users(q, filter, page, PAGE), [q, filter, page]);
+  const ambassadors = filter === 'ambassador';
+  const { data, error, loading, reload } = admin.useAdminData(
+    () => (ambassadors ? Promise.resolve(null) : admin.users(q, filter as admin.UserFilter, page, PAGE)), [q, filter, page]);
+  const holders = admin.useAdminData(() => (ambassadors ? admin.badgeHolders('ambassador') : Promise.resolve(null)), [ambassadors]);
+  const needle = q.trim().toLowerCase();
+  const holderRows = (holders.data ?? []).filter((h) => !needle || `${h.display_name ?? ''} ${h.email ?? ''}`.toLowerCase().includes(needle));
+  const holderColumns: Column<admin.BadgeHolder>[] = [
+    {
+      key: 'name', title: 'Rider', flex: 2.2, render: (u) => (
+        <View style={{ gap: 1 }}>
+          <Text style={{ fontFamily: font(700), fontSize: 15, color: AdminColors.text }} numberOfLines={1}>{u.display_name || 'No Name Yet'}</Text>
+          <Text style={{ fontFamily: font(500), fontSize: 13, color: AdminColors.dim }} numberOfLines={1}>{u.email ?? ''}</Text>
+        </View>
+      ),
+    },
+    { key: 'since', title: 'Ambassador Since', width: 150, render: (u) => fmtDate(u.granted_at) },
+  ];
 
   const columns: Column<admin.UserRow>[] = [
     {
@@ -60,11 +79,22 @@ export default function Users() {
           <SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} placeholder="Search Name or Email" />
           <FilterChips options={FILTERS} value={filter} onChange={(f) => { setFilter(f); setPage(0); }} />
         </View>
-        {error ? <ErrorNote error={error} onRetry={reload} /> : null}
-        <DataTable columns={columns} rows={data?.rows ?? []} rowKey={(u) => u.id} loading={loading}
-          onRowPress={(u) => router.push(`/admin/users/${u.id}`)}
-          empty={q ? 'No one matches that search.' : 'No accounts in this list.'} />
-        {data ? <Pager page={page} pageSize={PAGE} total={data.total} count={data.rows.length} onPage={setPage} /> : null}
+        {ambassadors ? (
+          <>
+            {holders.error ? <ErrorNote error={holders.error} onRetry={holders.reload} /> : null}
+            <DataTable columns={holderColumns} rows={holderRows} rowKey={(u) => u.user_id} loading={holders.loading}
+              onRowPress={(u) => router.push(`/admin/users/${u.user_id}`)}
+              empty={q ? 'No one matches that search.' : 'No Brand Ambassadors yet. Open a rider and choose Make Brand Ambassador.'} />
+          </>
+        ) : (
+          <>
+            {error ? <ErrorNote error={error} onRetry={reload} /> : null}
+            <DataTable columns={columns} rows={data?.rows ?? []} rowKey={(u) => u.id} loading={loading}
+              onRowPress={(u) => router.push(`/admin/users/${u.id}`)}
+              empty={q ? 'No one matches that search.' : 'No accounts in this list.'} />
+            {data ? <Pager page={page} pageSize={PAGE} total={data.total} count={data.rows.length} onPage={setPage} /> : null}
+          </>
+        )}
       </Panel>
     </AdminPage>
   );
