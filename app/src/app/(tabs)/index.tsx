@@ -516,7 +516,7 @@ const roleLabel = (role: RideMember['role']) =>
 
 const styles = themedStyles(() => ({
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Spacing.one },
-  logo: { width: 66, height: 52 },
+  logo: { width: 150, height: 52 },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(230,194,122,0.5)', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   hello: { color: Colors.text, fontFamily: font(600), fontSize: 28, lineHeight: 33 },
