@@ -62,7 +62,7 @@ export function tapTarget(data: TapData | undefined): string | null {
   if (data.type === 'direct_message' && userId) return `/messages/${userId}`;
   // A friend request, or a request that was accepted, opens Friends.
   if (data.type === 'friend_request' || data.type === 'friend_accept') return '/friends';
-  // "Your shared trail is hidden": the rider's trails in Navigation Mode.
+  // "Your shared trail is hidden": the rider's trails in Map Mode.
   if (data.type === 'trail_hidden') return '/nav/trails';
   const rideId = id(data.rideId);
   // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open

@@ -4,7 +4,7 @@ summary: Browse public rides near you, near a place you search, or anywhere in a
 category: joining
 order: 10
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/(tabs)/find.tsx
   - app/src/app/(tabs)/index.tsx
@@ -32,6 +32,12 @@ Looking for people to ride with? The **Find** tab shows public rides near you or
 4. Under **How Far Will You Go?**, pick **25 Miles**, **50 Miles**, **100 Miles** or **250 Miles**.
 
 Rides show on the map and in a list under it, nearest first, with how far away each one is.
+
+:::release 2.0
+### Public Rides Near You on Home
+
+Home also shows **Public Rides Near You** as cards you swipe sideways, nearest first. Tap the distance chip (**Within 500 mi** at first) to pick **50 mi**, **100 mi**, **250 mi**, **500 mi**, **1,000 mi** or **Anywhere**. Home never asks for your location: if you haven't allowed it, it shows every upcoming public ride. The **Find a Ride** card shows how many there are. See [Your Home Screen](/help/home-screen).
+:::
 
 ## Find Rides Near a Place
 

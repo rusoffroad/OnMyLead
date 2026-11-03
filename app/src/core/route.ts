@@ -10,7 +10,7 @@
  */
 import { distanceM, formatDistance, metersToMiles, type LatLng } from './geo';
 
-/** 'trail': one of the rider's own Navigation Mode trails (free; only 'gpx' imports need Pro). Older builds read it as 'drawn'. */
+/** 'trail': one of the rider's own Map Mode trails (free; only 'gpx' imports need Pro). Older builds read it as 'drawn'. */
 export type RouteSource = 'drawn' | 'gpx' | 'trail';
 
 export type RideRoute = {

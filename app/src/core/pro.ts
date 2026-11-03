@@ -65,7 +65,7 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
   },
   record_trails: {
     title: 'Record Your Trails',
-    body: 'Ride and Navigate draws your line, with distance, climb and time. The offroad map, following trails, measuring and rating trails stay free.',
+    body: 'Ride and Map Mode draws your line, with distance, climb and time. The offroad map, following trails, measuring and rating trails stay free.',
   },
   share_trails: {
     title: 'Share Your Trails',
@@ -84,7 +84,7 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Live Tracking, SOS and Ride Bubble', free: true, pro: true },
   { label: 'Ride Chat and Voting', free: true, pro: true },
   { label: 'Draw Routes and Follow Leaders', free: true, pro: true },
-  { label: 'Navigate: Offroad Map, Measure, Rate Trails', free: true, pro: true },
+  { label: 'Map Mode: Offroad Map, Custom Trails, Rate Trails', free: true, pro: true },
   { label: 'Record and Share Your Trails', free: false, pro: true },
   { label: 'Group Rides on Your Trails', free: false, pro: true },
   { label: 'Import GPX Routes', free: false, pro: true },

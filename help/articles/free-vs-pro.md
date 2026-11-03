@@ -37,7 +37,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Live Tracking, SOS and Ride Bubble | Yes | Yes |
 | Ride Chat and Voting | Yes | Yes |
 | Draw Routes and Follow Leaders | Yes | Yes |
-| Navigate: Offroad Map, Measure, Rate Trails | Yes | Yes |
+| Navigate (Map Mode From 2.0): Offroad Map, Draw and Measure, Rate Trails | Yes | Yes |
 | Record and Share Your Trails | No | Yes |
 | Group Rides on Your Trails | No | Yes |
 | Import GPX Routes | No | Yes |

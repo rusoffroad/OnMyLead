@@ -20,7 +20,7 @@ const GOLD = '#F5C451';
  */
 export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
   trail: PublicTrail | null;
-  /** Meters of this trail the rider covered in Navigation Mode, when known. */
+  /** Meters of this trail the rider covered in Map Mode, when known. */
   ridden?: number | null;
   onClose: () => void;
   onRated?: (status: string) => void;
@@ -86,7 +86,7 @@ export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
                       <Text style={styles.q}>Rode It? How Accurate Is the Line?</Text>
                       <ThemedText type="small" themeColor="textSecondary">
                         {ridden && ridden > 0
-                          ? `You followed ${feetOrMiles(ridden)} of it in Navigate.`
+                          ? `You followed ${feetOrMiles(ridden)} of it in Map Mode.`
                           : 'Only rate this if you rode it. Does the line on the map match the trail on the ground?'}
                       </ThemedText>
                       <StarInput label="Line accuracy" value={accuracy} onChange={setAccuracy} words={ACCURACY_WORDS} color={RIDER_TRAIL_INK} />

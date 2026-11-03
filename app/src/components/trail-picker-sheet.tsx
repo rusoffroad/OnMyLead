@@ -9,7 +9,7 @@ import { Colors, font, Spacing } from '@/constants/theme';
 import { feetOrMiles, RIDER_TRAIL_INK, trackStats, type LocalTrail } from '@/core/nav-trails';
 import { trailLine, useLocalTrails } from '@/lib/nav-trails';
 
-/** Pick one of My Trails (Navigation Mode) to use as a ride's route. */
+/** Pick one of My Trails (Map Mode) to use as a ride's route. */
 export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolean; onPick: (t: LocalTrail) => void; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const { trails } = useLocalTrails();
@@ -33,7 +33,7 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
               ))
             ) : (
               <ThemedText themeColor="textSecondary">
-                No trails on this phone yet. Record or draw one in Navigate, or save a rider trail, and it shows here.
+                No trails on this phone yet. Record or draw one in Map Mode, or save a rider trail, and it shows here.
               </ThemedText>
             )}
           </SheetScroll>

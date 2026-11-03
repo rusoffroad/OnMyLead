@@ -86,6 +86,10 @@ Only you and the other rider can see that you're friends, or that one of you sen
 ## Reports
 
 The OnMyLead team can't read your direct messages or chats. The one exception is a report: when a rider reports another rider, their messages with that rider (direct messages, and what either of them wrote in the last 30 days in a group or ride chat they share) are saved with the report so the team can look into it. Only the OnMyLead team can read them, and every time they're opened it's logged. See [Report or Block a Rider](/help/report-and-block).
+
+## Your Feed
+
+Home's **Feed** shows your finished rides, badges, shared trails and group rides to **Friends Only** unless you change it. Under **Customize**, **Who Sees Your Activity** can be **Friends and Followers** or **Nobody**. A ride is named only to riders who were on it, or if it was public. Your location is never in a feed. Blocked riders never see your posts. See [Your Home Screen](/help/home-screen).
 :::
 
 ## Blocked Riders

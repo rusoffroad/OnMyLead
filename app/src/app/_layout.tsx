@@ -120,7 +120,7 @@ function RootLayout() {
         <Stack.Screen name="subscription" options={{ title: 'Subscription' }} />
         <Stack.Screen name="maps/index" options={{ title: 'Offline Maps' }} />
         <Stack.Screen name="maps/area" options={{ title: 'Pick an Area', headerShown: false }} />
-        <Stack.Screen name="nav/index" options={{ title: 'Navigate', headerShown: false }} />
+        <Stack.Screen name="nav/index" options={{ title: 'Map Mode', headerShown: false }} />
         <Stack.Screen name="nav/trails" options={{ title: 'My Trails' }} />
         <Stack.Screen name="nav/trail/[id]" options={{ title: 'Trail' }} />
         <Stack.Screen name="nav/public/[id]" options={{ title: 'Rider Trail' }} />
