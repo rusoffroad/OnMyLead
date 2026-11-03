@@ -37,12 +37,51 @@
       "starlink",
       "trip-planner",
       "badges-and-ranks",
-      "contact-support"
+      "contact-support",
+      "create-a-ride-on-the-website"
     ],
     "kind": "review",
     "by": "pr",
     "ref": "refer-a-friend",
     "why": "Checked against the refer-a-friend change: the You tab gains an Invite Friends row only while the program is switched on, the Pro screen gains the reward card, the inbox has a reward notification and the Settings flag list has Refer a Friend. Nothing these guides describe changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "contact-support",
+      "getting-started",
+      "home-screen"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "help-center-link",
+    "why": "2.0: the app now links straight to these guides. You > Help has a new first row, Help Center: How-To Guides, and the Help and Support page opens with a Help Center card and a Read the Guide link under each answer. The guides open in an in-app browser on iPhone, iPad and Android, and in the same tab on the website."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "badges-and-ranks",
+      "delete-account",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "follow-me",
+      "garage",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "profile-picture",
+      "report-and-block",
+      "ride-name-and-profile",
+      "sign-in",
+      "starlink",
+      "trip-planner"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "help-center-link",
+    "why": "The You tab's Help menu gained a Help Center link. Nothing these guides describe changed, so only the updated date moved."
   },
   {
     "date": "2026-11-03",

@@ -117,7 +117,12 @@ Everything that isn't a ride:
 :::
 - **Settings**: [Notifications](/help/notification-settings), **Directions** (which maps app **Navigate** opens), **Subscription** and **Blocked Riders**.
 - **Account**: the email you sign in with.
+:::until 2.0
 - **Help**: **Contact Us** and **Help and Support**.
+:::
+:::release 2.0
+- **Help**: **Help Center: How-To Guides** (these step-by-step guides), **Report a Bug**, **Contact Us** and **Help and Support**. When you're signed in, **Report a Rider** is there too.
+:::
 - **Sign Out** and **Delete Account** at the bottom.
 
 :::release 1.0.3

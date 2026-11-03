@@ -1,26 +1,27 @@
 import { Platform } from 'react-native';
 
+import { HelpCenterCard } from '@/components/help-center-card';
 import { LegalPage } from '@/components/legal-page';
 import { COMPANY, SUPPORT_EMAIL } from '@/constants/site';
+import { SUPPORT_GUIDES } from '@/core/help-link';
 
 // The App Store's Support URL points here, so it answers the questions riders actually ask. The
-// website shows the iPhone answers; the Android app shows its own where they differ.
+// website shows the iPhone answers; the Android app shows its own where they differ. The Help Center
+// (onmylead.com/help) comes first: it has the step-by-step guides, and each topic links its guide.
 const ANDROID = Platform.OS === 'android';
 
 export default function Support() {
   return (
     <LegalPage
       title="Help and Support"
-      updated="October 14, 2026"
+      updated="November 3, 2026"
+      lead={<HelpCenterCard />}
       intro={`Something not working, or a question about OnMyLead? Send us a message with the Contact Us form below, or email ${SUPPORT_EMAIL}, and a real person at ${COMPANY} will answer, usually within a day.`}
       action={{ title: 'Contact Us', href: '/contact' }}
       sections={[
         {
-          title: 'Step-by-Step Guides',
-          body: ['Every part of OnMyLead is explained step by step in the Help Center at onmylead.com/help, from creating your first ride to offline maps and Pro.'],
-        },
-        {
           title: 'Joining a Ride',
+          guide: SUPPORT_GUIDES.joining,
           body: [
             `Ask the organizer for the ride code or link, or scan their QR code with your ${ANDROID ? 'phone’s' : 'iPhone'} camera. Then tap Join a Ride on the Rides tab.`,
             'Your location is only shared with the ride while you are sharing, and sharing always stops when the ride ends or your timer runs out.',
@@ -28,6 +29,7 @@ export default function Support() {
         },
         {
           title: 'Location and Battery',
+          guide: SUPPORT_GUIDES.location,
           body: [
             ANDROID
               ? 'Allow location While Using the App when the app asks. While you share, OnMyLead shows a Sharing Your Location notification, and that keeps your group updated with the phone locked. You can change this anytime in Settings > Apps > OnMyLead > Permissions.'
@@ -37,6 +39,7 @@ export default function Support() {
         },
         {
           title: 'Pro and Your Subscription',
+          guide: SUPPORT_GUIDES.pro,
           body: [
             ANDROID
               ? 'Manage or cancel Pro in You > Subscription > Manage Subscription, or in the Play Store app under Profile > Payments & Subscriptions > Subscriptions.'
@@ -49,6 +52,7 @@ export default function Support() {
         },
         {
           title: 'Reporting and Blocking',
+          guide: SUPPORT_GUIDES.reporting,
           body: [
             'Tap a rider in a ride’s Riders list, or press and hold one of their messages, to report or block them. Blocked riders’ messages are hidden from you, and they are not told.',
             `We review every report within 24 hours. For anything urgent, email ${SUPPORT_EMAIL}.`,
@@ -56,12 +60,14 @@ export default function Support() {
         },
         {
           title: 'Deleting Your Account',
+          guide: SUPPORT_GUIDES.deleting,
           body: [
             'Go to You, scroll to the bottom and tap Delete Account. Your account, rides you organized, messages and location history are deleted. Cancel any Pro subscription with Apple first, because Apple bills it, not us.',
           ],
         },
         {
           title: 'In an Emergency',
+          guide: SUPPORT_GUIDES.emergency,
           body: ['OnMyLead is not an emergency service. Call 911 or your local emergency number first, then use the EMERGENCY button to alert your group.'],
         },
       ]}
