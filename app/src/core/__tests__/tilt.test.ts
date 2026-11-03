@@ -9,6 +9,7 @@ import {
   WARN_REPEAT_MS,
   calibrate,
   clampLimit,
+  defaultCalibration,
   describeTilt,
   overallLevel,
   parseCalibration,
@@ -183,5 +184,27 @@ describe('saved tilt settings', () => {
     expect(cal.forward.z).toBeCloseTo(-1);
     expect(parseCalibration('{"gravity":{"x":"a"}}')).toBeNull();
     expect(parseCalibration(null)).toBeNull();
+  });
+});
+
+describe('level before Zero', () => {
+  it('reads a phone standing in a dash mount as level, not 90° nose up', () => {
+    const upright = { x: 0, y: -9.81, z: 0 };
+    const t = tiltFrom(upright, defaultCalibration(upright)!)!;
+    expect(Math.abs(t.roll)).toBeLessThan(1e-9);
+    expect(Math.abs(t.pitch)).toBeLessThan(1e-9);
+    // Leaned back 10° in the mount reads about 10°, not 80°.
+    const leaned = { x: 0, y: -Math.cos((10 * Math.PI) / 180), z: -Math.sin((10 * Math.PI) / 180) };
+    const l = tiltFrom(leaned, defaultCalibration(leaned)!)!;
+    expect(Math.abs(l.pitch)).toBeCloseTo(10);
+  });
+  it('uses flat for a flat phone and the side for landscape', () => {
+    const flat = { x: 0.5, y: 0.3, z: -9.7 };
+    expect(defaultCalibration(flat)!.down.z).toBeCloseTo(-1);
+    const side = { x: -9.7, y: 0.4, z: 0.2 };
+    const t = tiltFrom(side, defaultCalibration(side)!)!;
+    expect(Math.abs(t.roll)).toBeLessThan(5);
+    expect(Math.abs(t.pitch)).toBeLessThan(5);
+    expect(defaultCalibration({ x: 0, y: 0, z: 0 })).toBeNull();
   });
 });

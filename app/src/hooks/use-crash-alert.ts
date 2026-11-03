@@ -2,7 +2,7 @@ import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
-import { crashStep, INITIAL_CRASH, quietAfterAlarm, type CrashCause, type CrashSettings, type CrashState } from '@/core/crash-detect';
+import { crashStep, INITIAL_CRASH, properG, quietAfterAlarm, type CrashCause, type CrashSettings, type CrashState } from '@/core/crash-detect';
 import { subscribeTiltSamples } from '@/hooks/use-tilt';
 
 /** A GPS speed older than this counts as unknown (phones go quiet when parked). */
@@ -45,11 +45,13 @@ export function useCrashAlert(settings: CrashSettings, active: boolean): { alarm
 
   useEffect(() => {
     if (!on) return;
-    return subscribeTiltSamples((s, tilt) => {
+    return subscribeTiltSamples((s, tilt, zeroed) => {
+      // The rollover check needs the rider's Zero: without it a phone standing in a mount could
+      // look tipped. Hard hits still count.
       const fresh = s.t - speed.current.at <= SPEED_STALE_MS;
       const step = crashStep(
         state.current,
-        { t: s.t, userAccel: s.userAccel, roll: tilt?.roll ?? null, pitch: tilt?.pitch ?? null, speedMps: fresh ? speed.current.mps : null },
+        { t: s.t, userAccel: s.userAccel, roll: zeroed ? (tilt?.roll ?? null) : null, pitch: zeroed ? (tilt?.pitch ?? null) : null, speedMps: fresh ? speed.current.mps : null, feltG: properG(s.gravity, s.userAccel) },
         sensitivity,
       );
       state.current = step.state;

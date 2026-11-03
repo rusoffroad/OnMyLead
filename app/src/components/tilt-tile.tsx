@@ -17,14 +17,16 @@ export const TILT_TILE_H = 48;
  */
 export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading; limits: TiltLimits; bar?: boolean; style?: StyleProp<ViewStyle> }) {
   const t = reading.tilt;
-  const level = t ? overallLevel(t, limits) : 'ok';
-  const ink = t ? LEVEL_INK[level] : Colors.textSecondary;
+  // Colours only once zeroed: before that the reading is only roughly level.
+  const on = !!t && reading.zeroed;
+  const level = on ? overallLevel(t!, limits) : 'ok';
+  const ink = on ? LEVEL_INK[level] : Colors.textSecondary;
   const short = (side: string) => (side === 'Left' ? 'L' : side === 'Right' ? 'R' : side);
   return (
     <Pressable
       onPress={() => router.push('/tilt')}
       accessibilityRole="button"
-      accessibilityLabel={t ? `Tilt. ${describeTilt(t)}` : 'Tilt'}
+      accessibilityLabel={t ? `Tilt. ${describeTilt(t)}${reading.zeroed ? '' : '. Not zeroed yet'}` : 'Tilt'}
       accessibilityHint="Opens the tilt meter"
       hitSlop={6}
       style={({ pressed }) => [
@@ -38,7 +40,7 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
         label="Roll"
         value={t ? `${degrees(t.roll)}°` : '–'}
         side={t ? (bar ? rollSide(t.roll) : short(rollSide(t.roll))) : ''}
-        ink={t && tiltLevel(t.roll, limits.roll) !== 'ok' ? LEVEL_INK[tiltLevel(t.roll, limits.roll)] : Colors.text}
+        ink={on && tiltLevel(t!.roll, limits.roll) !== 'ok' ? LEVEL_INK[tiltLevel(t.roll, limits.roll)] : Colors.text}
         bar={bar}
       />
       <View style={styles.rule} />
@@ -46,7 +48,7 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
         label="Pitch"
         value={t ? `${degrees(t.pitch)}°` : '–'}
         side={t ? pitchSide(t.pitch) : ''}
-        ink={t && tiltLevel(t.pitch, limits.pitch) !== 'ok' ? LEVEL_INK[tiltLevel(t.pitch, limits.pitch)] : Colors.text}
+        ink={on && tiltLevel(t!.pitch, limits.pitch) !== 'ok' ? LEVEL_INK[tiltLevel(t.pitch, limits.pitch)] : Colors.text}
         bar={bar}
       />
       {bar ? <Icon name="chevron" size={18} color={Colors.textSecondary} /> : null}
