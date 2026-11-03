@@ -1,8 +1,9 @@
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Linking, Platform, Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { ReferralRewardCard } from '@/components/referral-reward';
 import { ProShield } from '@/components/pro-gate';
 import { Disclosures, PlanStatus } from '@/components/pro-plan';
 import { ThemedText } from '@/components/themed-text';
@@ -11,9 +12,13 @@ import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/const
 import { withAlpha } from '@/core/color';
 import { annualPerMonth, annualSavingsPercent, COMPARISON, PRICES } from '@/core/pro';
 import { deviceStore, manageTarget, otherStoreBlock, restoreMessage } from '@/core/purchases';
+import { referralsSwitchedOn, rewardState } from '@/core/referrals';
+import { useAppSettings } from '@/lib/app-settings';
 import { track } from '@/lib/analytics';
 import { useEntitlements } from '@/lib/entitlements';
 import { buy, loadProducts, manageSubscription, PRODUCTS, redeemOfferCode, restore } from '@/lib/purchases';
+import { useMyReferrals } from '@/lib/referrals';
+import { useSession } from '@/lib/session';
 
 type Product = Awaited<ReturnType<typeof loadProducts>>[number];
 
@@ -26,6 +31,12 @@ export default function ProScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const { session } = useSession();
+  const referrals = useMyReferrals(!!session);
+  const referralsOn = referralsSwitchedOn(useAppSettings().settings.flags);
+  // A discount earned by inviting (or being invited by) a friend, while it can still be used.
+  const reward = referrals.data?.reward ?? null;
+  const rewardLive = !!reward && !['none', 'expired', 'used'].includes(rewardState(reward).state);
 
   useEffect(() => {
     track('pro_screen_viewed', { plan: ent.label });
@@ -98,6 +109,8 @@ export default function ProScreen() {
 
       {ent.switchedOn ? <PlanStatus ent={ent} /> : null}
 
+      {rewardLive && reward ? <ReferralRewardCard reward={reward} onChanged={() => { referrals.reload(); refresh(); }} /> : null}
+
       {admin ? null : paid ? (
         <Button title="Manage Subscription" kind="secondary" loading={busy === 'manage'} onPress={manage} />
       ) : blocked ? (
@@ -144,6 +157,7 @@ export default function ProScreen() {
           return store === 'google' ? 'After you redeem the code in Google Play, come back here and Pro turns on.' : null;
         })} />
         {admin || paid ? null : <LinkButton title="Manage Subscription" busy={busy === 'manage'} onPress={manage} />}
+        {session && referralsOn ? <LinkButton title="Invite Friends, Both Get 50% Off" onPress={() => router.push('/invite-friends')} /> : null}
       </View>
 
       <Disclosures store={store} />

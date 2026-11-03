@@ -2,6 +2,52 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "refer-a-friend",
+      "friends",
+      "subscribe-to-pro",
+      "promo-codes",
+      "free-vs-pro"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "New in 2.0: Invite Friends. When a new rider joins with your friend link and finishes their first ride, you both get Pro Annual at 50% off for the first year (an App Store offer code on iPhone and iPad, a Google Play offer on Android, or the next Google Play bill moved back 6 months for riders already paying there). Chris asked for a referral promo on 2026-11-03. The Add Friends guide says a friend link also counts as an invite. Subscribe to Pro, Redeem a Promo Code and Free and Pro link to the new guide."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-me",
+      "garage",
+      "getting-started",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "notifications-inbox",
+      "offline-maps",
+      "pro-trial",
+      "profile-picture",
+      "report-and-block",
+      "restore-purchases",
+      "ride-name-and-profile",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "trip-planner",
+      "badges-and-ranks",
+      "contact-support",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "Checked against the refer-a-friend change: the You tab gains an Invite Friends row only while the program is switched on, the Pro screen gains the reward card, the inbox has a reward notification and the Settings flag list has Refer a Friend. Nothing these guides describe changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "badges-and-ranks"
     ],
     "kind": "update",

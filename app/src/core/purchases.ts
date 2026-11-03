@@ -3,6 +3,7 @@
 
 import type { Entitlements, Store, StoreSubscription } from './entitlements';
 import { PRICES } from './pro';
+import { RESERVED_PLAY_OFFERS } from './referrals';
 
 export const PRODUCTS = {
   monthly: 'com.rusoffroad.onmylead.pro.monthly',
@@ -133,13 +134,20 @@ export function restoreMessage(here: Store, restored: number): string {
 
 /**
  * The Google Play offer to buy for a product: its base plan (no offer id), or the first offer
- * when Google only sent offers. OnMyLead has no introductory offers; promo codes are redeemed
- * in Google Play itself.
+ * when Google only sent offers. Asked for a specific offer (the refer-a-friend 50% off, which the
+ * server says this rider earned), that offer only, or null when Google didn't send it. The
+ * referral offer is never picked on its own for a regular purchase. Promo codes are redeemed in
+ * Google Play itself.
  */
-export function androidOfferToken(offers: { id?: string | null; basePlanIdAndroid?: string | null; offerTokenAndroid?: string | null }[] | null | undefined): string | null {
+export function androidOfferToken(
+  offers: { id?: string | null; basePlanIdAndroid?: string | null; offerTokenAndroid?: string | null }[] | null | undefined,
+  offerId?: string | null,
+): string | null {
   const usable = (offers ?? []).filter((o) => !!o.offerTokenAndroid);
-  const base = usable.find((o) => !o.id || o.id === o.basePlanIdAndroid);
-  return (base ?? usable[0])?.offerTokenAndroid ?? null;
+  if (offerId) return usable.find((o) => o.id === offerId)?.offerTokenAndroid ?? null;
+  const regular = usable.filter((o) => !o.id || !RESERVED_PLAY_OFFERS.includes(o.id));
+  const base = regular.find((o) => !o.id || o.id === o.basePlanIdAndroid);
+  return (base ?? regular[0])?.offerTokenAndroid ?? null;
 }
 
 // ---- Subscription terms ----

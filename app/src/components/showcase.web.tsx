@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 're
 
 import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
+import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
+import { useAppSettings } from '@/lib/app-settings';
 import { useSocialProviders } from '@/lib/session';
 
 /**
@@ -25,6 +27,8 @@ type Route = '/sign-in' | '/ride/new' | '/terms' | '/rider-agreement' | '/privac
 export function Showcase() {
   // Only the sign-in choices that are switched on, so the page never promises one that isn't.
   const signUpWith = signUpChoices(useSocialProviders('ios'));
+  // Refer a Friend shows only while the owner has it switched on (Admin > Settings).
+  const referralsOn = referralsSwitchedOn(useAppSettings().settings.flags);
   const scroller = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -330,6 +334,9 @@ export function Showcase() {
               <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>
+              {referralsOn ? (
+                <Feature title="Invite Friends, Both Save">Send your link to a riding buddy who’s new to OnMyLead. When they finish their first ride, you both get your first year of Pro Annual for ${REFERRAL_PRICE.discounted} instead of ${REFERRAL_PRICE.annual}, through the App Store or Google Play.</Feature>
+              ) : null}
               <Feature title="Events">Rallies, poker runs and ride weekends on one shareable page: dates, place, photos, an agenda of concerts, raffles and runs, and the group rides to join. Pro riders post them, add co-hosts and pick a Ride Manager for each ride. Anyone can see them and say they’re going.</Feature>
             </div>
             <figure className="phone">
