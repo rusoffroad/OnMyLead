@@ -1163,7 +1163,7 @@ export default function RideMode() {
           accessibilityLabel="Add a waypoint at your location"
           accessibilityHint="You can also press and hold the map to drop one anywhere"
           style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
-          <WaypointBlaze kind="spot" shared={false} size={24} />
+          <WaypointBlaze symbol="spot" shared={false} size={24} />
           <Text style={styles.wpFabText}>Add Waypoint</Text>
         </Pressable>
       ) : null}

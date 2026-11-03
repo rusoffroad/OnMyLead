@@ -106,7 +106,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Route builder (`/ride/[id]/route`): tap points, Follow Trails (snaps to OSM trails and roads) or
   Straight Line, drag, search, undo, clear, save / remove; web wide layout ≥ 900 px.
 - Import GPX **[Pro]**. No GPX export.
-- Waypoints (shared or only you, press and hold, at my location) and numbered Planned Stops.
+- Waypoints (shared or only you, press and hold, at my location) and numbered Planned Stops. 15 waypoint symbols, color-blind friendly, shown on planned stops too (2.1).
 - Directions to the meeting point, a rider or a waypoint in Apple Maps or Google Maps.
 - Fuel range on the ride (route length vs each rider's machine range).
 
