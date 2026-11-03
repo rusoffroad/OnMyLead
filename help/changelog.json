@@ -1,5 +1,45 @@
 [
   {
+    "date": "2026-11-03",
+    "slugs": [
+      "rider-safety-agreement",
+      "getting-started",
+      "emergency-and-safety",
+      "faq",
+      "privacy",
+      "delete-account"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "rider-agreement",
+    "why": "Coming in 2.0: every rider agrees to the Rider Safety and Liability Agreement on a Before You Ride screen at first launch (and on onmylead.com after signing in), and again when it changes. New article explains what it says, how to agree, where to read it again (You tab > Safety Agreement, onmylead.com/rider-agreement) and the permanent record that's saved; the related guides point to it. Written in 2.0 release blocks."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "badges-and-ranks",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "directions",
+      "follow-me",
+      "garage",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "profile-picture",
+      "promo-codes",
+      "ride-name-and-profile",
+      "sign-in",
+      "starlink",
+      "trip-planner"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "rider-agreement",
+    "why": "Checked after the rider agreement change touched the You tab (a Safety Agreement link next to Terms and Privacy), the app's root layout, the website footer (a Rider Safety Agreement link) and the admin rider page. Nothing these guides describe changed for riders; the agreement itself is in its own article."
+  },
+  {
     "date": "2026-11-02",
     "slugs": [
       "ride-summary-and-ride-again",
