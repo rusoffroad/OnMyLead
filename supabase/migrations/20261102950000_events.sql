@@ -38,7 +38,7 @@ on conflict (feature) do nothing;
 create table if not exists rider_events (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references profiles (id) on delete cascade,
-  share_code text not null unique default upper(substr(encode(gen_random_bytes(6), 'hex'), 1, 8)),
+  share_code text not null unique default upper(substr(encode(extensions.gen_random_bytes(6), 'hex'), 1, 8)),
   title text not null check (char_length(btrim(title)) between 2 and 100),
   details text check (details is null or char_length(details) <= 5000),
   starts_at timestamptz not null,
