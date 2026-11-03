@@ -32,6 +32,10 @@ The top of the Groups tab also has **Out Riding**, to see who's out riding near 
 
 :::note
 This is a Pro feature. You need Pro to create a group and to add or remove riders. See [Free and Pro](/help/free-vs-pro). Joining a group with its link, the group chat, inviting a group to your rides and getting the group's ride invites are free for everyone.
+
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
 :::
 
 ## Create a Group

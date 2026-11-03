@@ -47,6 +47,7 @@ import { requirePro } from '@/lib/pro';
 import { clearTrackLine, flushTrackLine, recordTrackFixes, setTrackLineOn, useTrackDays } from '@/lib/track-line';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
+import { ProTag } from '@/components/pro-tag';
 
 type Mode = 'explore' | 'record' | 'measure';
 type Followed = { name: string; points: LatLng[]; publicTrail: PublicTrail | null; obstacles?: Obstacle[] };
@@ -793,6 +794,7 @@ function RecordPanel({
             <Circle cx={15} cy={15} r={7} fill="#fff" />
           </Svg>
           <Text style={styles.recText}>Record a Trail</Text>
+          <ProTag feature="record_trails" />
         </Pressable>
         {open ? (
           <Text style={styles.hint}>

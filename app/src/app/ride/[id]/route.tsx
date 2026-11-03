@@ -31,7 +31,7 @@ import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { confirmAsync } from '@/lib/confirm';
-import { handleProError, requirePro } from '@/lib/pro';
+import { handleProError, requirePro, useEntitlements } from '@/lib/pro';
 import { readPickedText } from '@/lib/read-text';
 import type { Ride } from '@/lib/types';
 
@@ -62,6 +62,8 @@ export default function RouteBuilder() {
   const trail = useTrailMap();
   const [follow, , setFollow] = useRememberedToggle('route.followTrails.v1', true);
   const draft = useRouteDraft(follow, trail.offline);
+  // A Free rider's Import GPX carries the Pro tag, so it gets more of the row.
+  const canGpx = useEntitlements().can('import_gpx');
   const { load: loadDraft, undo: undoDraft } = draft;
   const taps = draft.taps;
   const insets = useSafeAreaInsets();
@@ -278,10 +280,11 @@ export default function RouteBuilder() {
             <View style={styles.row}>
               <Button title="Undo" kind="secondary" style={styles.flex} disabled={!!imported || !taps.length} onPress={draft.undo} />
               <Button title="Clear" kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />
-              <Button title="Import GPX" kind="secondary" style={[styles.flex, { flexGrow: 1.6 }]} loading={busy === 'gpx'} onPress={importGpx} />
+              <Button title="Import GPX" pro="import_gpx" kind="secondary" style={[styles.flex, { flexGrow: canGpx ? 1.6 : 2.6 }]} loading={busy === 'gpx'} onPress={importGpx} />
             </View>
             <Button
               title="Use One of My Trails"
+              pro="trail_rides"
               kind="secondary"
               onPress={() => {
                 if (!requirePro('trail_rides')) return;

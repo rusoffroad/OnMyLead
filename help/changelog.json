@@ -29,6 +29,73 @@
     "date": "2026-11-03",
     "slugs": [
       "events",
+      "free-vs-pro"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "pro-tags",
+    "why": "Create an Event (Pro since the Events change) now carries the gold Pro tag on Free too; Events and Free and Pro say so."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "free-vs-pro"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "pro-tags",
+    "why": "Free riders now see a small gold Pro tag on every button that needs Pro (Chris: show a little Pro mark next to Pro features to encourage upgrading). The article lists where the tags appear, says tapping one opens the same Pro prompt, and that Pro Trial and Pro accounts never see them. Written in a 2.0 release block."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "import-gpx",
+      "offline-maps",
+      "riding-groups",
+      "route-builder",
+      "trip-planner",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "pro-tags",
+    "why": "Each Pro feature's article now says the buttons that need Pro carry a small gold Pro tag on the Free plan and none during the Pro Trial or on Pro. Written in 2.0 release blocks."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "create-a-ride",
+      "custom-codes",
+      "faq",
+      "follow-leaders",
+      "follow-me",
+      "full-map",
+      "getting-started",
+      "group-chat",
+      "invite-riders",
+      "manage-subscription",
+      "map-layers",
+      "organizer-controls",
+      "place-search",
+      "pro-trial",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "rus-gear",
+      "subscribe-to-pro",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "home-screen"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "pro-tags",
+    "why": "Checked after the Pro tags change touched shared screens and components (Button, groups, route builder, trips, offline map buttons, entitlements, showcase). The only change riders see is the Pro tag, covered in Free and Pro and each Pro feature's article; these articles need no text change, so only their review dates moved. Home's gold now reads the shared Colors.gold (same colour), so Your Home Screen looks the same."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "events",
       "home-screen",
       "free-vs-pro",
       "report-and-block",

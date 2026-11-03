@@ -10,7 +10,7 @@ export const Home = {
   panel2: '#16273F',
   line: 'rgba(151,167,190,0.16)',
   muted: '#8C9CB3',
-  gold: '#E6C27A',
+  gold: Colors.gold,
   mint: '#57E3C3',
   ink: '#070F1C',
 } as const;

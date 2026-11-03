@@ -173,6 +173,7 @@ export default function PublicTrailPage() {
       )}
       <Button
         title="Plan a Group Ride on This Trail"
+        pro="trail_rides"
         kind="secondary"
         onPress={async () => {
           if (!requirePro('trail_rides')) return;

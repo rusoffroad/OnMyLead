@@ -23,6 +23,10 @@ Already have the trail you want to ride as a track in another app? Export it as 
 
 This is a Pro feature. See [Free and Pro](/help/free-vs-pro). Drawing a route on the map stays free: see [Draw a Route](/help/route-builder).
 
+:::release 2.0
+On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so you know before you tap. Tapping one shows what Pro includes. During your Pro Trial and on Pro there are no tags.
+:::
+
 ## Import a File
 
 You need to be the ride's organizer or a co-organizer.

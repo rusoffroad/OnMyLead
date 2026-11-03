@@ -14,6 +14,7 @@ import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, us
 import { requirePro } from '@/lib/pro';
 import { RateTrailSheet } from './rate-trail-sheet';
 import { StarScore } from './stars';
+import { ProTag } from '@/components/pro-tag';
 
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
@@ -237,7 +238,10 @@ function RideMapDownload({ ride, route }: { ride: { id: string; name: string }; 
         accessibilityHint="Saves satellite, topo and trails around this ride's route for riding with no signal"
         onPress={() => requirePro('offline_maps') && downloadRide(ride.id, ride.name, route, ALL)}
         style={({ pressed }) => [styles.save, pressed && { opacity: 0.85 }]}>
-        <Text style={styles.saveText}>Download This Ride’s Map</Text>
+        <View style={styles.saveRow}>
+          <Text style={styles.saveText}>Download This Ride’s Map</Text>
+          <ProTag feature="offline_maps" />
+        </View>
         <Text style={styles.saveSub}>{`Satellite, Topo and Trails, About ${formatBytes(estimate)}`}</Text>
       </Pressable>
     );
@@ -410,6 +414,7 @@ const styles = StyleSheet.create({
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   legendText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   save: { minHeight: 52, borderRadius: Radius.control, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12, paddingVertical: 8, gap: 1 },
+  saveRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   saveText: { color: Colors.onAccent, fontFamily: font(700), fontSize: 15 },
   saveSub: { color: 'rgba(255,255,255,0.8)', fontFamily: font(500), fontSize: 12 },
   saved: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 10, borderRadius: Radius.control, borderWidth: 1, borderColor: 'rgba(236,205,145,0.4)' },
