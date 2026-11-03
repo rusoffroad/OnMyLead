@@ -109,6 +109,10 @@
       },
       {
         "kind": "new",
+        "text": "Waypoint symbols: pick from 15, including the new Gate, Trailhead, Water Crossing, Food, Restroom, First Aid, Repair and Photo Spot. Each has its own drawing and hazards sit on a triangle, so they're easy to tell apart for color-blind riders too. Planned stops show their symbol on the stop sign."
+      },
+      {
+        "kind": "new",
         "text": "Tilt meter and Crash Alert. A Tilt tile in Map Mode and Ride Mode shows your vehicle's roll and pitch, turning amber, then red, near your limits; tap it for a full tilt meter. Zero it for your phone mount, set your own warning angles and get a buzz (or a spoken angle) before a steep lean. In Ride Mode, Crash Alert watches for a hard hit or a rollover: a 30 second I'm OK countdown starts, and if you don't answer, your group gets an EMERGENCY alert with your location. It never calls 911. Find it all under You, Tilt and Crash Alert."
       }
     ]
