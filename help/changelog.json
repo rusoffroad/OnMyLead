@@ -2,6 +2,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-dash",
+    "why": "Map Mode's Explore panel had empty space next to speed and elevation (Chris). It now also shows Heading, Trip miles and Moving time; press and hold Trip to reset it. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "events",
       "privacy"
     ],
