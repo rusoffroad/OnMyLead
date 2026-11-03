@@ -256,19 +256,20 @@ export function Showcase() {
             <img src="/showcase/navigate.webp" alt="Navigate on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Measure tabs, and speed and elevation" loading="lazy" width={786} height={1704} />
           </figure>
           <div className="qr-copy">
-            <h2 id="nav-title" className="section-title">Navigate When It’s Just You</h2>
+            <h2 id="nav-title" className="section-title">Map Mode When It’s Just You</h2>
             <p>
-              Not every ride is a group ride. Navigate is your offroad map for the rest: every trail and road with your speed
-              and elevation, a recorder that draws your line as you ride, and a distance finder that measures along the trails.
-              Keep your trails on your phone, or share them with every rider.
+              Not every ride is a group ride. Map Mode is your offroad map for the rest: every trail and road with your speed
+              and elevation, a recorder that draws your line as you ride, and Map a Custom Trail to draw one that isn’t marked
+              anywhere. Track Line shows exactly where you’ve been, a new colour each day. Keep your trails on your phone, or share
+              them with every rider.
             </p>
             <ul className="ticks">
-              <li>Shared trails carry a name, a difficulty, the vehicles that fit and photos</li>
+              <li>Shared trails carry a name, a difficulty, the vehicles that fit, photos and named spots like ledges and crossings</li>
               <li>Rider trails show as mint dots, so you always know who mapped what</li>
               <li>Riders rate each trail’s quality and accuracy, and bad lines drop off the map</li>
               <li>Turn any trail into a group ride’s route in one tap</li>
             </ul>
-            <p className="qr-small">The map, measuring and rating are free; recording, sharing and group rides on your trails are Pro. Shared trails leave off their first and last 200 meters, so your start stays private.</p>
+            <p className="qr-small">The map, drawing, Track Line and rating are free; recording, sharing and group rides on your trails are Pro. Shared trails show in full, and Hide My Start leaves off the first and last 200 meters of a recording that starts at home.</p>
           </div>
         </section>
       </main>
@@ -315,6 +316,7 @@ export function Showcase() {
               <Feature title="Ride Summary and Ride Card">After the ride, see the miles and the group’s totals, then share a ride card.</Feature>
               <Feature title="Badges and Ranks">Earn Bronze, Silver and Gold badges for leading rides, riding tail gunner, riding with your crew and racking up miles, plus the trails you share and rate. Your levels add up to a rank from Rookie to Legend, and they’re earned from real GPS tracks, so nobody can fake one.</Feature>
               <Feature title="Out Riding">At a park for the weekend? Switch on Out Riding to see which riders you know are out near you, or anyone nearby who chose the same, and message them. Riders see roughly how far away you are, never where, and it turns itself off.</Feature>
+              <Feature title="Your Feed">See what your friends, the leaders you follow and your riding groups have been riding, the badges they earned and the trails they shared, right on Home. Pick whose posts you see and who sees yours, from friends only to nobody.</Feature>
               <Feature title="Friends">Add the riders you ride with as friends, or share your friend link. Friends see each other when they’re out riding nearby and can message any time, without ever sharing where they are.</Feature>
               <Feature title="Profile Pictures">Take a photo or pick one from your library, cropped square. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
               <Feature title="Pick Your Own Code">Give your ride, riding group or friend link a code that’s easy to say at the trailhead, like MOAB-2026. OnMyLead checks as you type that nobody else has it.</Feature>
@@ -558,7 +560,7 @@ const FREE = [
   'Mechanical Issue and Family Tracking Links',
   'Ride Chat and Poll Voting',
   'Draw Routes and Follow Leaders',
-  'Navigate: Offroad Map, Measure, Rate Trails',
+  'Map Mode: Offroad Map, Custom Trails, Rate Trails',
   'Ride History: Last 5 Rides',
 ];
 const PRO = [

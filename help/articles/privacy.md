@@ -4,7 +4,7 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/privacy.tsx
   - app/src/app/r/[code].tsx
@@ -79,6 +79,12 @@ Anyone with your family link can see your last location until that share ends. S
 ## Friends
 
 Only you and the other rider can see that you're friends, or that one of you sent a request. Nobody can search for riders by name: a rider can only send you a request if they've ridden with you, share a riding group with you, can see you in Out Riding, have messaged with you, or have your friend link. Being friends never shares your location. See [Add Friends](/help/friends).
+:::
+
+:::release 2.0
+## Your Feed
+
+Home's **Feed** shows your finished rides, badges, shared trails and group rides to **Friends Only** unless you change it. Under **Customize**, **Who Sees Your Activity** can be **Friends and Followers** or **Nobody**. A ride is named only to riders who were on it, or if it was public. Your location is never in a feed. Blocked riders never see your posts. See [Your Home Screen](/help/home-screen).
 :::
 
 ## Blocked Riders

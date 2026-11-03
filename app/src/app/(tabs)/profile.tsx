@@ -148,7 +148,7 @@ export default function You() {
 
       <MenuGroup title="On the Trail">
         {navOn ? (
-          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Map Mode" detail={myTrails.length ? `Your offroad map. ${myTrails.length} ${myTrails.length === 1 ? 'trail' : 'trails'} on this phone` : 'Your offroad map: trails, record, measure'} onPress={() => router.push('/nav')} />
+          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Map Mode" detail={myTrails.length ? `Your offroad map. ${myTrails.length} ${myTrails.length === 1 ? 'trail' : 'trails'} on this phone` : 'Your offroad map: trails, record, draw'} onPress={() => router.push('/nav')} />
         ) : null}
         <MenuRow
           icon="map"
