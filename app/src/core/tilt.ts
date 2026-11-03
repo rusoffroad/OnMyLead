@@ -208,3 +208,35 @@ export function stepWarning(state: WarnState, t: Tilt, limits: TiltLimits, now: 
       : `Pitch ${degrees(t.pitch)} ${pitchSide(t.pitch).toLowerCase()}`;
   return { state: { since, lastAt: now, armed: false }, announce: { axis, text: text.trim() } };
 }
+
+/** Storage keys. Limits and voice follow the account; the Zero stays on this device (each phone sits differently). */
+export const TILT_LIMITS_KEY = 'tilt.limits';
+export const TILT_VOICE_KEY = 'tilt.voice';
+export const TILT_CALIBRATION_KEY = 'tilt.calibration';
+
+export function parseLimits(raw: string | null): TiltLimits {
+  if (!raw) return DEFAULT_TILT_LIMITS;
+  try {
+    const v = JSON.parse(raw) as Partial<TiltLimits>;
+    return {
+      roll: clampLimit(Number(v.roll), DEFAULT_TILT_LIMITS.roll),
+      pitch: clampLimit(Number(v.pitch), DEFAULT_TILT_LIMITS.pitch),
+    };
+  } catch {
+    return DEFAULT_TILT_LIMITS;
+  }
+}
+
+const isVec = (v: unknown): v is Vec3 =>
+  !!v && typeof v === 'object' && ['x', 'y', 'z'].every((k) => Number.isFinite((v as Record<string, unknown>)[k]));
+
+/** The saved Zero (the gravity reading at Zero), rebuilt into a calibration, or null for none. */
+export function parseCalibration(raw: string | null): TiltCalibration | null {
+  if (!raw) return null;
+  try {
+    const v = JSON.parse(raw) as { gravity?: unknown };
+    return isVec(v.gravity) ? calibrate(v.gravity) : null;
+  } catch {
+    return null;
+  }
+}

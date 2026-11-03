@@ -11,6 +11,8 @@ import {
   clampLimit,
   describeTilt,
   overallLevel,
+  parseCalibration,
+  parseLimits,
   smoothTilt,
   stepWarning,
   tiltFrom,
@@ -167,5 +169,19 @@ describe('stepWarning', () => {
     s = stepWarning(s.state, { roll: 0, pitch: 34 }, limits, 2100);
     s = stepWarning(s.state, { roll: 0, pitch: 34 }, limits, 2100 + WARN_HOLD_MS);
     expect(s.announce?.text).toBe('Pitch 34 up');
+  });
+});
+
+describe('saved tilt settings', () => {
+  it('reads limits safely', () => {
+    expect(parseLimits(null)).toEqual(DEFAULT_TILT_LIMITS);
+    expect(parseLimits('{"roll":30,"pitch":99}')).toEqual({ roll: 30, pitch: 45 });
+    expect(parseLimits('oops')).toEqual(DEFAULT_TILT_LIMITS);
+  });
+  it('rebuilds a saved Zero', () => {
+    const cal = parseCalibration(JSON.stringify({ gravity: { x: 0, y: -9.8, z: 0 } }))!;
+    expect(cal.forward.z).toBeCloseTo(-1);
+    expect(parseCalibration('{"gravity":{"x":"a"}}')).toBeNull();
+    expect(parseCalibration(null)).toBeNull();
   });
 });

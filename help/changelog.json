@@ -2,6 +2,19 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "tilt-and-crash-alert",
+      "emergency-and-safety",
+      "ride-mode",
+      "navigation-mode"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "tilt-meter",
+    "why": "Chris asked for a roll and pitch meter and an automatic emergency alert after a crash. New article for the tilt meter, Zero, tilt warnings and Crash Alert, plus 2.1 notes in Ride Mode, Map Mode and Emergencies. Comes with the 2.1 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",

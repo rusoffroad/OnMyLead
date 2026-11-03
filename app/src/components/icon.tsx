@@ -75,6 +75,8 @@ const PATHS = {
   book: ['M12 6.8C10 5.2 7 4.6 3.5 5.1v13c3.5-.5 6.5.1 8.5 1.7', 'M12 6.8c2-1.6 5-2.2 8.5-1.7v13c-3.5-.5-6.5.1-8.5 1.7', 'M12 6.8v13'],
   // Opens a page outside the app (the website).
   external: ['M14 4.5h5.5V10', 'M19.5 4.5L11.5 12.5', 'M17.5 13.5v6h-13v-13h6'],
+  // Tilt meter: a level base and a leaning arm over its scale.
+  tilt: ['M3.5 18.5h17', 'M4.5 18.5a7.5 7.5 0 0 1 15 0', 'M12 18.5l4.6-6.2'],
 } as const;
 
 export type IconName = keyof typeof PATHS;

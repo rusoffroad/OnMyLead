@@ -6,6 +6,7 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-03
 sources:
+  - app/src/components/tilt-tile.tsx
   - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
   - app/src/core/trip-meter.ts
@@ -83,6 +84,10 @@ Next to your speed are four readings:
 - **Moving**, how long you've been moving on this trip (minutes, then hours and minutes).
 
 To start a new trip, press and hold **Trip**. Trip and Moving only count while Map Mode is open, and they're kept on your phone only. When you follow a trail, the big number shows the miles left, and **Speed** moves into the readings in place of **Moving**.
+:::
+
+:::release 2.1
+Under the readings, the **Tilt** tile shows your **Roll** and **Pitch**, turning amber, then red, near your limits. Tap it for the full tilt meter. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
 :::
 
 ### The Map Follows You

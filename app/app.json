@@ -251,6 +251,12 @@
           "microphonePermission": false
         }
       ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "OnMyLead uses motion sensors for the tilt meter and to detect a possible crash in Ride Mode so it can alert your group."
+        }
+      ],
       "./plugins/with-starlink-local-network",
       [
         "./plugins/with-carplay",
