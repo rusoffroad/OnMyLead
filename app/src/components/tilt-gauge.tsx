@@ -25,40 +25,52 @@ function arc(from: number, to: number, r: number) {
   return `M${a.x.toFixed(2)} ${a.y.toFixed(2)} A${r} ${r} 0 0 1 ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
 }
 
-/** The back of a truck, as seen from behind: leans with roll. */
-function RearTruck({ ink }: { ink: string }) {
+const TIRE = '#05101E';
+
+/** An axle seen from behind (two tires, the axle tube and the frame above it): leans with roll. */
+function RearAxle({ ink }: { ink: string }) {
   return (
     <G>
-      <Rect x={62} y={84} width={18} height={22} rx={4} fill="#05101E" stroke={ink} strokeWidth={2} />
-      <Rect x={120} y={84} width={18} height={22} rx={4} fill="#05101E" stroke={ink} strokeWidth={2} />
-      <Path d="M70 54 L76 34 H124 L130 54 Z" fill={Colors.backgroundSelected} stroke={ink} strokeWidth={2.5} strokeLinejoin="round" />
-      <Path d="M80 39 H120 L124 51 H76 Z" fill="#05101E" />
-      <Rect x={56} y={54} width={88} height={34} rx={6} fill={Colors.backgroundSelected} stroke={ink} strokeWidth={2.5} />
-      <Rect x={62} y={60} width={12} height={8} rx={2} fill={RideColors.red} />
-      <Rect x={126} y={60} width={12} height={8} rx={2} fill={RideColors.red} />
-      <Rect x={86} y={74} width={28} height={8} rx={2} fill="#05101E" />
+      <Rect x={62} y={46} width={76} height={8} rx={4} fill={Colors.backgroundSelected} stroke={ink} strokeWidth={2} />
+      <Line x1={84} y1={54} x2={89} y2={80} stroke={ink} strokeWidth={3} strokeLinecap="round" />
+      <Line x1={116} y1={54} x2={111} y2={80} stroke={ink} strokeWidth={3} strokeLinecap="round" />
+      <Rect x={74} y={81} width={52} height={8} rx={4} fill={Colors.backgroundSelected} stroke={ink} strokeWidth={2} />
+      <Circle cx={100} cy={85} r={11} fill={Colors.backgroundSelected} stroke={ink} strokeWidth={2.5} />
+      {[52, 126].map((x) => (
+        <G key={x}>
+          <Rect x={x} y={62} width={22} height={45} rx={7} fill={TIRE} stroke={ink} strokeWidth={2.5} />
+          {[71, 79, 87, 95].map((y) => (
+            <Line key={y} x1={x + 5} y1={y} x2={x + 17} y2={y} stroke={ink} strokeOpacity={0.45} strokeWidth={2} strokeLinecap="round" />
+          ))}
+        </G>
+      ))}
     </G>
   );
 }
 
-/** A truck from the side, nose to the right: tips with pitch. */
-function SideTruck({ ink }: { ink: string }) {
+/** Two wheels and the frame rail from the side, front to the right: tips with pitch. */
+function SideChassis({ ink }: { ink: string }) {
   return (
     <G>
-      <Path d="M42 88 V68 L60 64 L76 40 H120 L134 64 L158 68 V88 Z" fill={Colors.backgroundSelected} stroke={ink} strokeWidth={2.5} strokeLinejoin="round" />
-      <Path d="M80 45 H98 V62 H67 Z" fill="#05101E" />
-      <Path d="M103 45 H117 L128 62 H103 Z" fill="#05101E" />
-      <Circle cx={68} cy={90} r={14} fill="#05101E" stroke={ink} strokeWidth={2.5} />
-      <Circle cx={132} cy={90} r={14} fill="#05101E" stroke={ink} strokeWidth={2.5} />
-      <Circle cx={68} cy={90} r={5} fill={ink} />
-      <Circle cx={132} cy={90} r={5} fill={ink} />
+      <Line x1={60} y1={86} x2={78} y2={64} stroke={ink} strokeWidth={3} strokeLinecap="round" />
+      <Line x1={140} y1={86} x2={122} y2={64} stroke={ink} strokeWidth={3} strokeLinecap="round" />
+      <Rect x={44} y={58} width={112} height={8} rx={4} fill={Colors.backgroundSelected} stroke={ink} strokeWidth={2} />
+      <Path d="M164 54 L174 62 L164 70" stroke={ink} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      {[60, 140].map((x) => (
+        <G key={x}>
+          <Circle cx={x} cy={86} r={21} fill={TIRE} stroke={ink} strokeWidth={2.5} />
+          <Circle cx={x} cy={86} r={13} fill="none" stroke={ink} strokeOpacity={0.45} strokeWidth={2} />
+          <Circle cx={x} cy={86} r={5} fill={ink} />
+        </G>
+      ))}
     </G>
   );
 }
 
 /**
  * One dial: the scale arc with its amber and red zones at the rider's limit, the vehicle leaning on
- * it, and the big reading under it. Roll leans the rear view; pitch tips the side view.
+ * it, and the big reading under it. Roll leans an axle seen from behind; pitch tips two wheels
+ * and the frame seen from the side.
  */
 export const TiltDial = memo(function TiltDial({
   axis, angle, limit, max, width,
@@ -107,8 +119,8 @@ export const TiltDial = memo(function TiltDial({
         {/* Level ground stays put; the vehicle turns over it. */}
         <Line x1={18} y1={CY + 4} x2={182} y2={CY + 4} stroke={Glass.edge} strokeWidth={1.5} strokeDasharray="4 5" />
         <G transform={`rotate(${turn.toFixed(1)} ${CX} ${CY})`}>
-          <Line x1={CX} y1={CY + 4} x2={CX} y2={CY - R + 14} stroke={ink} strokeWidth={1.5} strokeOpacity={0.5} />
-          {axis === 'roll' ? <RearTruck ink={ink} /> : <SideTruck ink={ink} />}
+          <Line x1={CX} y1={CY + 4} x2={CX} y2={CY - R + 14} stroke={ink} strokeWidth={1.5} strokeOpacity={0.35} strokeDasharray="3 4" />
+          {axis === 'roll' ? <RearAxle ink={ink} /> : <SideChassis ink={ink} />}
         </G>
         <Circle cx={needle.x} cy={needle.y} r={6} fill={ink} stroke={Colors.background} strokeWidth={2} />
       </Svg>
