@@ -10,6 +10,17 @@
     "why": "Chris asked for an ad for the RUS Starlink Mini Mount V2 (Morelock Series) on the Starlink page. The Starlink guide says where it shows and what Shop the Mount does, in a 2.0 release block."
   },
   {
+    "date": "2026-11-03",
+    "slugs": [
+      "getting-started",
+      "rus-gear"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "starlink-mount-ad",
+    "why": "Checked after the Starlink mount ad added an Admin switch (app-settings.ts) and product-lookup helpers (rus-match.ts, lib/rus.ts). Getting started and Gear From RUS Offroad work the same for riders, so no text changed."
+  },
+  {
     "date": "2026-11-02",
     "slugs": [
       "ride-summary-and-ride-again",
