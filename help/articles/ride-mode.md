@@ -134,7 +134,7 @@ The panel at the bottom holds, from the top:
 
 - the route strip, with how far along the route you are;
 - an alert row for each rider who has dropped away or called for help, with **Navigate** (and **Regroup** for leaders);
-- three quick replies, **On My Way**, **Need a Minute** and **All Good**, and **More**, which opens every quick reply and status;
+- three quick replies, **On My Way**, **Need a Minute** and **All Good**, and **More**, which opens every quick reply (like **Running Late** and **Beverage Break**) and status;
 - **Regroup Here** (for organizers and leaders) and **EMERGENCY**.
 
 See [Send a Status or Quick Reply](/help/status-buttons).
