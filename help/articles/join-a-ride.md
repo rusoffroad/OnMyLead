@@ -35,10 +35,18 @@ If you aren't signed in, the button says **Sign In to Join**. See [Sign In](/hel
 
 ## Join With a Code
 
+:::until 2.0
 1. On the **Rides** tab, tap **Join a Ride**.
 2. Type the invite code, for example 7F3A9C21.
 3. Tap **Open**.
 4. On the ride page, tap **Join Ride**.
+:::
+
+:::release 2.0
+1. On the **Rides** tab, type the invite code in the **Join a Ride** card at the top, for example 7F3A9C21.
+2. Tap **Join**.
+3. On the ride page, tap **Join Ride**.
+:::
 
 :::release 1.0.3
 Some organizers pick their own code, like MOAB-2026. Type it with the dashes. Capital or small letters both work.

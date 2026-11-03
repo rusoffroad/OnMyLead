@@ -48,7 +48,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   leader messages, ride changes, new riders, reminders, ride invites, group chat, leaders you
   follow, trial reminders), cancellation emails, message preview, quiet hours.
 - Directions app choice (Ask Each Time / Apple Maps / Google Maps; Google only on Android).
-- Subscription, Blocked Riders, Report a Bug (1.0.1: screenshot + app activity log), Contact Us, Help and Support, Terms, Privacy, Admin Dashboard link
+- Subscription, Blocked Riders, Report a Bug (1.0.1: screenshot + app activity log), Contact Us, Help and Support, Terms, Safety Agreement (2.0), Privacy, Admin Dashboard link
   (admins).
 
 ### Rides: Create, Manage, Organize
@@ -128,6 +128,17 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   dotted lines on every map (switch in layers and on the You tab), ratings (quality, line accuracy),
   auto-hide with a push to the mapper, Admin > Rider Trails. Migration 20261101600000_nav_trails.sql.
 - Plan a Group Ride on This Trail and Use One of My Trails (route source `trail`, free).
+- 2.0: renamed **Map Mode**; Measure is the **Draw** tab (Map a Custom Trail, `?draw=1`, with the How
+  Custom Trails Work sheet); **Track Line** (`core/track-line.ts`, `lib/track-line.ts`: per-day
+  colours, 7 days, phone only); named spots (`core/obstacles.ts`, `shared_trails.obstacles`); shared
+  trails full length, **Hide My Start** trims 200 m on recordings. Migration 20261102300000_home_feed.sql.
+
+### Home Screen (Rides Tab, 2.0)
+- `app/(tabs)/index.tsx` + `components/home/*`: Join a Ride hero with the code box, Create a Ride
+  with rides left this month, Find a Ride with the count near you, Map Mode card, Your Next Ride,
+  Ride Invites, Your Group, Public Rides Near You (remembered radius, never prompts for location),
+  Feed with Customize (`home_feed`, `rider_feed_settings`) **[flag home_feed]**, Your Badges, Your
+  Toolkit, Help & Support. Two columns at Expanded width.
 
 ### Riding Groups and Social
 - Groups tab: New Group, your groups, groups you're in, group chat with unread counts and ride
@@ -166,7 +177,8 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 ### Website (onmylead.com)
 - Showcase home (live group-map hero, features, Free vs Pro, promo film), Get the App.
 - Ride and group link previews, family link, web ride creation and route setup, sign-in.
-- Contact form, Support, Terms, Privacy; Help Center at /help.
+- Contact form, Support, Terms, Rider Safety Agreement (/rider-agreement, asked after sign-in from 2.0), Privacy; Help Center at /help.
+- Before You Ride (2.0): every rider agrees to the Rider Safety and Liability Agreement on first launch (all devices) and again when it changes; Admin > Rider Agreements lists and exports the permanent records.
 
 ### Admin Dashboard (onmylead.com/admin)
 - Overview, Signups and Downloads (real riders without test and admin accounts, marking test

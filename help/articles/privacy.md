@@ -81,6 +81,12 @@ Anyone with your family link can see your last location until that share ends. S
 Only you and the other rider can see that you're friends, or that one of you sent a request. Nobody can search for riders by name: a rider can only send you a request if they've ridden with you, share a riding group with you, can see you in Out Riding, have messaged with you, or have your friend link. Being friends never shares your location. See [Add Friends](/help/friends).
 :::
 
+:::release 2.0
+## Your Feed
+
+Home's **Feed** shows your finished rides, badges, shared trails and group rides to **Friends Only** unless you change it. Under **Customize**, **Who Sees Your Activity** can be **Friends and Followers** or **Nobody**. A ride is named only to riders who were on it, or if it was public. Your location is never in a feed. Blocked riders never see your posts. See [Your Home Screen](/help/home-screen).
+:::
+
 ## Blocked Riders
 
 When you block a rider, nothing tells them, and they can't see who has blocked them. See [Report or Block a Rider](/help/report-and-block).
@@ -93,6 +99,10 @@ On Android, Google delivers notifications (Firebase Cloud Messaging), handles pu
 
 :::release 2.0
 [Music Controls](/help/music-controls) read what's playing only on your phone. On Android, the optional Notification Access is used only to see the song and the app playing it; OnMyLead never reads or keeps your notifications.
+:::
+
+:::release 2.0
+When you agree to the Rider Safety and Liability Agreement, a record of it is saved (your account, the version, the time, the device and app version, and your IP address). Other riders never see it, and it's kept as a legal record if you delete your account. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement#what-gets-saved).
 :::
 
 You can delete your account and its data at any time. See [Delete Your Account](/help/delete-account).
