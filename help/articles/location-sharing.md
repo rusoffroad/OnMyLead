@@ -162,6 +162,10 @@ Live tracking needs a connection. When your phone has no service:
 
 Offline maps keep the map on your screen without service, but positions only update when phones have a connection. See [Offline Maps](/help/offline-maps).
 
+:::release 2.1
+The exception is riders close by on the same ride: phones within Bluetooth range (about 30 to 100 meters) pass spots to each other with no service, encrypted for the ride only. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::
+
 ## Who Sees What
 
 - **Ride sharing:** riders who have joined that ride.

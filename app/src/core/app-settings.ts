@@ -34,6 +34,7 @@ export const APP_FLAGS = {
   ride_polls: { label: 'Ride Polls', hint: 'Creating new polls in ride chat. Polls already sent can still be voted on.' },
   music_controls: { label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
   nav_mode: { label: 'Map Mode', hint: 'The Map Mode card on the home screen (offroad map, recording, custom trails and sharing). Trails on riders’ phones are kept; rider trails on maps still show.' },
+  bluetooth_sharing: { label: 'Bluetooth Sharing', hint: 'Ride Mode passing spots and alerts between nearby riders over Bluetooth when there is no service (app 2.1). Off stops the Bluetooth radio; sharing and alerts over the internet are not affected.' },
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
 } as const satisfies Record<string, { label: string; hint: string }>;
 

@@ -2,6 +2,19 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "bluetooth-sharing",
+      "ride-mode",
+      "location-sharing",
+      "emergency-and-safety"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "bluetooth-sharing",
+    "why": "New for 2.1: Bluetooth Sharing. Chris asked for a way for riders to keep updating each other with no cell service. Ride Mode now passes spots, status taps (including EMERGENCY) and quick replies between nearby riders on the same ride over Bluetooth, relayed up to three phones, and uploads them when any phone gets signal. New article; Ride Mode, Location Sharing and Emergency articles say what changes with no service, in 2.1 release blocks."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",

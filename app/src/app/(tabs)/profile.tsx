@@ -36,6 +36,7 @@ import { signOut, useSession } from '@/lib/session';
 import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
 import { socialSetting, type SocialProfile } from '@/core/social-profile';
 import { useMusicControlsSetting } from '@/hooks/use-music-controls';
+import { nearbyAvailable, useBluetoothSharingSetting } from '@/lib/nearby';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 import { musicAvailable } from '@/lib/music';
@@ -61,6 +62,8 @@ export default function You() {
   const navOn = useFlag('nav_mode');
   const musicFlag = useFlag('music_controls');
   const [musicMine, setMusicMine] = useMusicControlsSetting();
+  const bluetoothFlag = useFlag('bluetooth_sharing');
+  const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [followMe, setFollowMe] = useFollowMePref();
@@ -207,6 +210,26 @@ export default function You() {
                 thumbColor={Colors.text}
                 {...({ activeThumbColor: Colors.text } as object)}
                 accessibilityLabel="Music Controls"
+              />
+            }
+          />
+        ) : null}
+        {nearbyAvailable && bluetoothFlag ? (
+          <MenuRow
+            icon="bluetooth"
+            color={Colors.sky}
+            title="Bluetooth Sharing"
+            detail={bluetoothMine
+              ? 'With no service, Ride Mode passes spots and alerts to nearby riders on your ride'
+              : 'Off. Turn it on to keep sharing with nearby riders when there is no service'}
+            right={
+              <Switch
+                value={bluetoothMine}
+                onValueChange={setBluetoothMine}
+                trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+                thumbColor={Colors.text}
+                {...({ activeThumbColor: Colors.text } as object)}
+                accessibilityLabel="Bluetooth Sharing"
               />
             }
           />
