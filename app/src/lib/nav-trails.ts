@@ -1,5 +1,5 @@
 /**
- * Navigation Mode trails: the rider's own trails kept on this phone, the trails other riders
+ * Map Mode trails: the rider's own trails kept on this phone, the trails other riders
  * shared, and the calls that share, rate and update them (migration 20261101600000_nav_trails.sql).
  *
  * Phone trails are in AsyncStorage (one key, a few hundred KB for a busy season), so they work with
@@ -11,9 +11,10 @@ import { useSyncExternalStore } from 'react';
 
 import type { LatLng } from '@/core/geo';
 import {
-  lineForSharing, parsePublicTrail, photoPaths, TRAIL_PHOTO_BUCKET, parsePublicTrails, shareStateOf, syncShareStates, toLineString, toLatLngs, trackStats,
-  type LocalTrail, type PublicTrail, type TrackPoint,
+  DEFAULT_TRAIL_RULES, lineForSharing, parseTrailRules, parsePublicTrail, shareTrimFor, photoPaths, TRAIL_PHOTO_BUCKET, parsePublicTrails, shareStateOf, syncShareStates, toLineString, toLatLngs, trackStats,
+  type LocalTrail, type TrailRules, type PublicTrail, type TrackPoint,
 } from '@/core/nav-trails';
+import { obstaclesForSharing, type Obstacle } from '@/core/obstacles';
 import { lineLengthM } from '@/core/route';
 import { track } from './analytics';
 import { keepPhoto, dropPhoto } from './trail-photo-files';
@@ -103,7 +104,7 @@ export async function removeLocalPhoto(t: LocalTrail, uri: string): Promise<Loca
 
 // --- Recording in progress ------------------------------------------------------
 
-export type Recording = { startedAt: number; points: TrackPoint[]; paused: boolean };
+export type Recording = { startedAt: number; points: TrackPoint[]; paused: boolean; obstacles?: Obstacle[] };
 
 export async function readRecording(): Promise<Recording | null> {
   try {
@@ -148,12 +149,13 @@ async function uploadPhotos(me: string, t: LocalTrail): Promise<string[]> {
 }
 
 /**
- * Share a phone trail with everyone (or update its public copy). The line that goes up has its
- * ends trimmed (core/nav-trails lineForSharing). The phone copy keeps the full line and its photos.
+ * Share a phone trail with everyone (or update its public copy). Drawn trails go up end to end;
+ * a recorded one loses its ends only with Hide My Start on (core/nav-trails shareTrimFor). Its
+ * obstacles go too, the ones near the shared line. The phone copy keeps the full line and photos.
  */
 export async function shareTrail(t: LocalTrail): Promise<LocalTrail> {
   const me = await uid();
-  const line = lineForSharing(t.points);
+  const line = lineForSharing(t.points, shareTrimFor(t));
   if (!line.length) throw new Error('This trail is too short to share.');
   const stats = trackStats(t.points);
   const photos = await uploadPhotos(me, t);
@@ -174,7 +176,13 @@ export async function shareTrail(t: LocalTrail): Promise<LocalTrail> {
     high_point_m: stats.highM,
     photos,
   };
-  const { data, error } = await supabase.from('shared_trails').upsert(row, { onConflict: 'owner_id,client_id' }).select('id').single();
+  const obstacles = obstaclesForSharing(t.obstacles ?? [], line);
+  // A server before 2.0 has no obstacles column: share the trail without them rather than fail.
+  let res = await supabase.from('shared_trails').upsert({ ...row, obstacles }, { onConflict: 'owner_id,client_id' }).select('id').single();
+  if (res.error && /obstacles/.test(res.error.message) && /column|schema cache/i.test(res.error.message)) {
+    res = await supabase.from('shared_trails').upsert(row, { onConflict: 'owner_id,client_id' }).select('id').single();
+  }
+  const { data, error } = res;
   if (error) throw new Error(error.message);
   const detail = await getPublicTrail((data as { id: string }).id);
   track(t.shared ? 'trail_share_updated' : 'trail_shared', { difficulty: t.details.difficulty, vehicles: t.details.vehicles.length });
@@ -270,3 +278,9 @@ export async function savePublicTrail(t: PublicTrail): Promise<LocalTrail> {
 
 /** Points of any phone trail as plain coordinates. */
 export const trailLine = (t: LocalTrail): LatLng[] => toLatLngs(t.points);
+
+/** When a shared trail comes down (the Admin Dashboard's rule). Defaults until the 2.0 server update. */
+export async function fetchTrailRules(): Promise<TrailRules> {
+  const { data, error } = await supabase.rpc('trail_rules_public');
+  return error ? DEFAULT_TRAIL_RULES : parseTrailRules(data);
+}

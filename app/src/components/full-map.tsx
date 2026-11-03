@@ -31,7 +31,7 @@ export function FullMapButton({ onPress, style }: { onPress: () => void; style?:
 /**
  * What stays on screen in Full Map: one slim bar at the bottom with Controls (tap it, or swipe the
  * bar up, to bring everything back) and whatever that screen must never hide, passed as children
- * (the miles and Undo while drawing a route, speed in Navigate). `waiting` counts alerts tucked
+ * (the miles and Undo while drawing a route, speed in Map Mode). `waiting` counts alerts tucked
  * away. `wide` floats it in the bottom-left corner on a tablet or a wide website instead of across
  * the bottom.
  */

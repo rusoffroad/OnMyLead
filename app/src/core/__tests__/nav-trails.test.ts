@@ -96,7 +96,8 @@ describe('sharing keeps the start private', () => {
   it('refuses a trail too short to share once trimmed', () => {
     expect(trimEnds([north(0), north(300)])).toEqual([]);
     expect(lineForSharing(track(550))).toEqual([]);
-    expect(shareProblems(trail({ points: track(550) }))).toEqual([expect.stringContaining('too short')]);
+    expect(shareProblems({ ...trail({ points: track(550) }), source: 'recorded', hideStart: true })).toEqual([expect.stringContaining('too short')]);
+    expect(shareProblems(trail({ points: track(150) }))).toEqual([expect.stringContaining('too short')]);
   });
 
   it('needs a name, difficulty and a vehicle type', () => {

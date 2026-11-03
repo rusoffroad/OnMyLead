@@ -2,6 +2,93 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "home-screen"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "home-2.0",
+    "why": "Coming in 2.0: the redesigned home screen. Join a Ride first with the code box, Create a Ride with rides left this month, Find a Ride, the Map Mode card, Your Group, Public Rides Near You with a distance you pick, a Feed you can customize (whose posts, which kinds, who sees yours), badges, a toolkit and Help & Support."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "getting-started",
+      "join-a-ride",
+      "find-a-ride",
+      "create-a-ride",
+      "riding-groups",
+      "use-onmylead-on-a-tablet",
+      "privacy"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "home-2.0",
+    "why": "Coming in 2.0: these articles point to the new home screen (Join card with Join button, rides-left label on Create, Public Rides Near You and its distance, Plan a Group Ride from the group card, the two-column tablet layout, and who sees your Feed). Old steps stay in until-2.0 blocks."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "navigation-mode",
+      "free-vs-pro"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "home-2.0",
+    "why": "Coming in 2.0: Navigate is renamed Map Mode. Measure becomes Draw with Map a Custom Trail and a How Custom Trails Work sheet (the take-down rule from the Admin Dashboard), Track Line draws where you've been in a colour per day, Mark a Spot names obstacles on drawn and recorded trails, and shared trails now show in full with an optional Hide My Start on recordings."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "accurate-location",
+      "approvals-and-waitlist",
+      "badges-and-ranks",
+      "battery-saver",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "delete-account",
+      "directions",
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "import-gpx",
+      "invite-riders",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "manage-subscription",
+      "map-layers",
+      "notification-settings",
+      "notifications-inbox",
+      "offline-maps",
+      "place-search",
+      "pro-trial",
+      "profile-picture",
+      "promo-codes",
+      "report-and-block",
+      "ride-bubble",
+      "ride-mode",
+      "ride-name-and-profile",
+      "ride-polls",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "subscribe-to-pro",
+      "trip-planner",
+      "troubleshooting"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "home-2.0",
+    "why": "Checked after the 2.0 home screen change: their code changed only in code comments (Navigation Mode renamed Map Mode), the shared bottom sheet, the You tab's Map Mode label, or a Track Line hook in the location code that riders don't see unless they turn Track Line on. The steps in these articles are unchanged."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "rider-safety-agreement",
       "getting-started",
       "emergency-and-safety",

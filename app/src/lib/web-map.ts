@@ -155,7 +155,7 @@ export type TrailLayerState = {
   osmLines: OsmTrail[];
   closedLines: ClosedLine[];
   labels: TrailLabel[];
-  /** Trails riders mapped and shared (Navigation Mode), drawn mint and dotted; their own toggle. */
+  /** Trails riders mapped and shared (Map Mode), drawn mint and dotted; their own toggle. */
   riderLines?: LatLng[][];
 };
 

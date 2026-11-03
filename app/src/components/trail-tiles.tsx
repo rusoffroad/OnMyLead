@@ -134,7 +134,7 @@ const RiderLine = memo(function RiderLine({ trail }: { trail: PublicTrail }) {
   );
 });
 
-/** Trails riders mapped and shared in Navigation Mode (hidden with Rider Trails off in Map layers). */
+/** Trails riders mapped and shared in Map Mode (hidden with Rider Trails off in Map layers). */
 const RiderLines = memo(function RiderLines({ trails }: { trails: PublicTrail[] }) {
   return (
     <>

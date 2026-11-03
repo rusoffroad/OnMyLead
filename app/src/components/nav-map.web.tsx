@@ -5,6 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
+import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
+import type { DayLine } from '@/core/track-line';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
@@ -22,12 +24,12 @@ const meDotHtml = (heading: number | null | undefined) =>
 const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;height:18px;border-radius:9px;background:#2F80FF;border:3px solid #FFFFFF;box-sizing:border-box;box-shadow:0 0 0 6px rgba(47,128,255,.25),0 2px 4px rgba(0,0,0,.5)"></div>';
 
 /**
- * Navigation Mode's map on the website: the phone's layers on Leaflet (satellite or topo, agency,
+ * Map Mode's map on the website: the phone's layers on Leaflet (satellite or topo, agency,
  * OpenStreetMap and rider trails), a followed trail in route red, a recorded line, and the distance
  * finder. A click measures while measuring; otherwise it shows the trail under it.
  */
 export function NavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, trackLines, obstacles, onObstacle, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -46,6 +48,11 @@ export function NavMap({
   onUserMove?: () => void;
   /** Which way the rider is moving (core/heading riderHeading), for the arrow on their dot. */
   meHeading?: number | null;
+  /** Track Line: where the rider has been, one colour per day, oldest first. */
+  trackLines?: DayLine[];
+  /** Named spots on the trail being drawn, recorded or followed. */
+  obstacles?: Obstacle[];
+  onObstacle?: (o: Obstacle) => void;
   ref?: Ref<NavMapHandle>;
 }) {
   const el = useRef<HTMLDivElement>(null);
@@ -55,10 +62,10 @@ export function NavMap({
   const centered = useRef(false);
   const followed = useRef<LatLng | null>(null);
   const meDot = useRef<L.Marker | null>(null);
-  const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove });
+  const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle });
   useEffect(() => {
-    cb.current = { measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove };
-  }, [measuring, onMeasure, trail.identifyAt, trail.onRegion, onCenter, onUserMove]);
+    cb.current = { measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle };
+  }, [measuring, onMeasure, trail.identifyAt, trail.onRegion, onCenter, onUserMove, onObstacle]);
   const pad = padding ?? [120, 40, 320, 40];
   const fitPadding = { paddingTopLeft: [pad[3], pad[0]] as L.PointTuple, paddingBottomRight: [pad[1], pad[2]] as L.PointTuple };
   const snapM = (m: L.Map) => snapRadiusM((156_543.03 * Math.cos((m.getCenter().lat * Math.PI) / 180)) / 2 ** m.getZoom());
@@ -154,6 +161,9 @@ export function NavMap({
     const g = layer.current;
     if (!g) return;
     g.clearLayers();
+    for (const d of trackLines ?? []) {
+      for (const piece of d.pieces) L.polyline(piece.map(ll), { color: d.color, weight: 4, opacity: 0.95, interactive: false }).addTo(g);
+    }
     if (following && following.length > 1) drawRoute(g, following, true);
     if (recorded.length > 1) {
       L.polyline(recorded.map(ll), { color: Colors.background, weight: 8, interactive: false }).addTo(g);
@@ -169,13 +179,25 @@ export function NavMap({
         icon: L.divIcon({ className: '', iconSize: [24, 24], iconAnchor: [12, 12], html: `<div class="oml-tap">${i + 1}</div>` }),
       }).addTo(g);
     });
+    for (const o of obstacles ?? []) {
+      const pin = L.marker(ll(o), {
+        keyboard: true,
+        title: o.name,
+        icon: L.divIcon({
+          className: '',
+          iconSize: [0, 0],
+          html: `<div class="oml-found" style="pointer-events:auto;cursor:pointer"><span style="background:rgba(10,22,38,.92);color:#F1F4F8;border:1.5px solid ${OBSTACLE_INK[o.kind]}">${esc(o.name)}</span></div>`,
+        }),
+      }).addTo(g);
+      pin.on('click', () => cb.current.onObstacle?.(o));
+    }
     if (found) {
       L.marker(ll(found), {
         interactive: false,
         icon: L.divIcon({ className: '', iconSize: [0, 0], html: `<div class="oml-found"><span>${esc(found.name)}</span></div>` }),
       }).addTo(g);
     }
-  }, [following, recorded, measure, measureTaps, found]);
+  }, [following, recorded, measure, measureTaps, found, trackLines, obstacles]);
 
   useEffect(() => {
     if (!found || !map.current) return;
