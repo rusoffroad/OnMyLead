@@ -32,10 +32,10 @@ export default function Referrals() {
 
   const reward = (w: admin.ReferralRewardRow) => {
     if (!w) return <Text style={styles.dim}>Not Yet</Text>;
-    if (w.redeemed_at) return <StatusBadge label={w.claim_kind === 'google_defer' ? 'Bill Deferred' : 'Used'} tone="ok" />;
-    if (w.claim_kind === 'apple_code') return <StatusBadge label="Apple Code Given" tone="pro" />;
-    if (w.claim_kind === 'google_offer') return <StatusBadge label="Play Offer Shown" tone="pro" />;
-    if (w.claim_kind === 'google_defer') return <StatusBadge label="Deferral Pending" tone="warn" />;
+    if (w.redeemed_at) return <StatusBadge label={w.claim_kind === 'google_defer' ? 'Deferred' : 'Used'} tone="ok" />;
+    if (w.claim_kind === 'apple_code') return <StatusBadge label="Code Given" tone="pro" />;
+    if (w.claim_kind === 'google_offer') return <StatusBadge label="Offer Shown" tone="pro" />;
+    if (w.claim_kind === 'google_defer') return <StatusBadge label="Pending" tone="warn" />;
     return <StatusBadge label="Earned" tone="trial" />;
   };
 
@@ -51,8 +51,8 @@ export default function Referrals() {
     },
     { key: 'friend', title: 'Friend', flex: 2, render: (r) => <Text style={styles.link} onPress={() => router.push(`/admin/users/${r.friend_id}`)} numberOfLines={1}>{r.friend}</Text> },
     { key: 'rode', title: 'First Ride', render: (r) => (r.qualified_at ? fmtDate(r.qualified_at) : <Text style={styles.dim}>Not Yet</Text>) },
-    { key: 'rr', title: 'Inviter Reward', hideOnPhone: true, render: (r) => reward(r.referrer_reward) },
-    { key: 'fr', title: 'Friend Reward', hideOnPhone: true, render: (r) => reward(r.friend_reward) },
+    { key: 'rr', title: 'Inviter Reward', flex: 1.4, hideOnPhone: true, render: (r) => reward(r.referrer_reward) },
+    { key: 'fr', title: 'Friend Reward', flex: 1.4, hideOnPhone: true, render: (r) => reward(r.friend_reward) },
   ];
 
   return (
@@ -76,7 +76,7 @@ export default function Referrals() {
             <StatTile label="Apple Codes Left" value={fmtInt(d.codes.left)} hint={d.codes.expiring_soon ? `${fmtInt(d.codes.expiring_soon)} expire within 30 days` : `${fmtInt(d.codes.given)} given out`} tone={d.codes.left < 20 ? 'warn' : 'neutral'} />
           </StatGrid>
 
-          <Columns ratio={[3, 2]}>
+          <Columns ratio={[2, 1]}>
             <Panel title="Recent Invites">
               <DataTable columns={columns} rows={d.recent} rowKey={(r) => r.id} empty="No one has joined with a friend link yet." />
             </Panel>

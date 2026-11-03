@@ -27,6 +27,10 @@ Apple shows what the code gives you before you confirm. Once Apple accepts the c
 
 You can also tap **Redeem Promo Code** at the bottom of the Pro screen.
 
+:::release 2.1
+A 50% off code you earned by inviting a friend opens from **Invite Friends** with the code already filled in. See [Invite Friends and Get 50% Off Pro](/help/refer-a-friend).
+:::
+
 ## Redeem a Code on Android
 
 On Android, OnMyLead promo codes are Google Play promo codes.

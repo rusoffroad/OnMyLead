@@ -197,7 +197,7 @@ const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 
 export function rewardLines(reward: ReferralReward, now: number = Date.now()): { title: string; body: string; note: string | null } {
   const s = rewardState(reward, now);
   const thanks = reward.role === 'referrer' ? `${reward.from} finished their first ride.` : `Thanks for riding with ${reward.from}.`;
-  const price = `$${REFERRAL_PRICE.discounted} your first year of Pro Annual, then $${REFERRAL_PRICE.annual} a year.`;
+  const price = `Your first year of Pro Annual is half price, then it renews at $${REFERRAL_PRICE.annual} a year.`;
   switch (s.state) {
     case 'expired':
       return { title: 'Your 50% Off Has Expired', body: `${thanks} The discount could be claimed until ${fmt(reward.expiresAt)}.`, note: null };

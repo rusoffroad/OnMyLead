@@ -96,7 +96,7 @@ describe('the reward card', () => {
   });
 
   it('words it for each rider', () => {
-    expect(rewardLines(reward(), now).body).toMatch(/^Jake R\. finished their first ride\. \$14\.99 your first year/);
+    expect(rewardLines(reward(), now).body).toMatch(/^Jake R\. finished their first ride\. Your first year of Pro Annual is half price, then it renews at \$29\.99/);
     expect(rewardLines(reward({ role: 'friend' }), now).body).toMatch(/^Thanks for riding with Jake R\./);
     expect(rewardLines(reward({ claimKind: 'google_defer' }), now).title).toBe('You Earned 6 Months');
     expect(claimErrorLine({ kind: 'error', error: 'no_codes' })).toMatch(/your reward is saved/);

@@ -182,6 +182,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Pro $4.99 a month or $29.99 a year through StoreKit 2 (`expo-iap`), verified by
   `appstore-verify`, kept current by App Store Server Notifications **[iOS-only]**.
 - Restore Purchases, Redeem Promo Code (Apple offer codes), Manage Subscription **[iOS-only]**.
+- Refer a friend (2.1): Invite Friends; a new rider who joins with your friend link and finishes a first ride earns you both Pro Annual at 50% off year one (Apple offer code, Google Play offer, or a 6-month Play bill deferral). Admin > Referrals.
 - Android shows "Subscriptions are managed in the OnMyLead iPhone app" **[Android gap]**: no
   Google Play Billing, no Play verification, no Play promo codes. A Pro entitlement bought on
   iPhone already applies on any device (server side, `my_entitlements`).
