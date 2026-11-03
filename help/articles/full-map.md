@@ -3,7 +3,7 @@ title: Full Map
 summary: Hide the bars and panels on any map so the map fills your screen, and bring them back with one tap.
 category: routes-maps
 order: 12
-release: "1.0.4"
+release: "2.0"
 updated: 2026-11-03
 sources:
   - app/src/core/freeride.ts

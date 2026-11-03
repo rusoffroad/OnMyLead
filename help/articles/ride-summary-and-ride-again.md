@@ -35,7 +35,7 @@ Your **Distance** and how long you were **Out For**, plus a map of your route. O
 
 Your stats come from sharing your location in Ride Mode. If you didn't share, there's no track for you on that ride. See [Location Sharing](/help/location-sharing).
 
-:::release 1.0.4
+:::release 2.0
 Your distance counts only the miles you actually rode. OnMyLead leaves out:
 
 - spots where your phone said its location was rough (off by more than about 100 m, or 330 ft), such as indoors or with Approximate Location on;

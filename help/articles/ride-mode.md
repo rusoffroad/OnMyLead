@@ -115,7 +115,7 @@ Tap the round target button to move the map so you're in the middle of it. The m
 - **iPad and Android tablets:** the button sits at the bottom of the map, just left of the buttons panel.
 :::
 
-:::release 1.0.4
+:::release 2.0
 ### Follow Me
 
 With **Follow Me** on (it is unless you turn it off), the map moves with you as you ride, so your dot stays in view. Drag or pinch the map to look around and it pauses; tap **Paused** or **Center on Me** to follow you again. Tap **Following** to turn it off. The button sits just left of **Center on Me**. See [Follow Me on the Map](/help/follow-me).
@@ -140,7 +140,7 @@ The panel at the bottom holds, from the top:
 See [Send a Status or Quick Reply](/help/status-buttons).
 :::
 
-:::release 1.0.4
+:::release 2.0
 Tap **Message** at the top left of the panel to type your own message to the group or send one of your saved quick replies. See [Type Your Own Message](/help/status-buttons).
 :::
 
@@ -170,7 +170,7 @@ Tap **Together** (or **Separated**) at the top to open the **Riders** list. It s
 A small patch beside a rider's name is their top badge. See [Earn Badges and Ranks](/help/badges-and-ranks).
 :::
 
-:::release 1.0.4
+:::release 2.0
 A rider whose phone shares only a rough spot shows **Approximate Location**. Their dot can be a mile or more from where they are. See [Fix Common Problems](/help/troubleshooting).
 :::
 
@@ -194,7 +194,7 @@ Every rider who is sharing has a dot on the route line, strung out in running or
 - With a big group, the dots get smaller to fit the line.
 :::
 
-:::release 1.0.4
+:::release 2.0
 ### See the Group Behind the Leader on a Freeride
 
 A Freeride has no route, so the line at the bottom of Ride Mode shows the group behind the leader instead. The leader is on the right, the rider furthest back is on the left, and everyone else is in order between them.
@@ -243,16 +243,16 @@ Want the map and nothing else? Tap **⤢ Full Map** at the top of the bottom pan
 Full Map works the same on iPhone, iPad, Android phones and Android tablets.
 :::
 
-:::until 1.0.4
+:::until 2.0
 The bar also has **Menus ▲**, with a badge counting any other alerts. Tap it to bring back the status buttons, quick replies and everything else.
 :::
 
-:::release 1.0.4
-The bar also has **Controls**, with a badge counting any other alerts. Tap it, or swipe the bar up, to bring back the status buttons, quick replies and everything else. **Center on Me** and the **No Signal** tag stay on the map (from 1.0.4, **Follow Me** too), and tapping a trail line still shows its card. Your phone remembers Full Map, so Ride Mode opens the same way next time. Every other map works the same way: see [Full Map](/help/full-map).
+:::release 2.0
+The bar also has **Controls**, with a badge counting any other alerts. Tap it, or swipe the bar up, to bring back the status buttons, quick replies and everything else. **Center on Me** and the **No Signal** tag stay on the map (from 2.0, **Follow Me** too), and tapping a trail line still shows its card. Your phone remembers Full Map, so Ride Mode opens the same way next time. Every other map works the same way: see [Full Map](/help/full-map).
 :::
 
-:::release 1.0.4
-:::release 1.0.4
+:::release 2.0
+:::release 2.0
 ## Control Your Music
 
 Tap the round **Music** button above **Center on Me** to pause, skip or change the volume of the music on your phone without leaving Ride Mode. See [Control Your Music While You Ride](/help/music-controls).
@@ -285,7 +285,7 @@ Tap **‹** at the top left to go back to the ride page.
 
 Leaving the screen doesn't stop sharing: your location keeps going to the group until your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
 
-:::release 1.0.4
+:::release 2.0
 ## Leave the Ride
 
 Heading home early? Tap **Together** (or **Separated**) at the top to open **Riders**, then tap **Leave Ride** under the list and confirm. On a tablet, **Leave Ride** is at the bottom of the **Riders** sidebar. Your location stops going to the group and you're taken back to the **Rides** tab. The organizer first picks who takes the ride over; see [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).

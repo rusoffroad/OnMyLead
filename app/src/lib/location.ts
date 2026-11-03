@@ -36,7 +36,7 @@ const CONTEXT_KEY = 'ride.trackContext.v1';
 /** `until` is when the share ends (epoch ms, null for open-ended), checked here so sharing stops on time even with no service. */
 type TrackContext = { rideId: string | null; lastMovedAt: number | null; until?: number | null };
 // Altitude was added later; older stored points have four values.
-// Accuracy was added in 1.0.4 so the summary can skip rough fixes; older points have five values or fewer.
+// Accuracy was added in 2.0 so the summary can skip rough fixes; older points have five values or fewer.
 type QueuedPoint = [lng: number, lat: number, epochSec: number, speedMps: number | null, altitudeM?: number | null, accuracyM?: number | null];
 type TrackQueue = Record<string, QueuedPoint[]>;
 

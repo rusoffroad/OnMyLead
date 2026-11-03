@@ -3,7 +3,7 @@ title: See and Clear Your Notifications
 summary: The bell on the Rides tab lists the notifications OnMyLead sent you in the last 30 days. Open them, mark them read, or clear one or all.
 category: account
 order: 25
-release: "1.0.4"
+release: "2.0"
 updated: 2026-11-03
 sources:
   - app/src/app/inbox.tsx

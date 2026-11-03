@@ -33,7 +33,7 @@ Menu names differ a little between phone makers. Search Settings for "precise" o
 
 Go outside or near a window with a clear view of the sky for a minute. Then open Ride Mode again: the dot moves to where the rider really is with the next update.
 
-:::release 1.0.4
+:::release 2.0
 ## What OnMyLead Does for You
 
 - **When you start sharing on Android**, OnMyLead asks once to change to a precise location if you allowed only an approximate one, and shows Android's prompt to turn on Google Location Accuracy if it's off.

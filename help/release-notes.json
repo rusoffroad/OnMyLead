@@ -1,12 +1,32 @@
 [
   {
-    "version": "1.0.4",
-    "title": "Accurate Locations, a Notifications Inbox and Easier Leaving",
-    "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone. And every map can go Full Map, with one tap on Controls to bring the buttons back. Follow Me keeps Ride Mode and Navigate moving with you as you ride, and your own dot now has the arrow showing which way you're heading. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is. A new Music button lets you pause, skip and change the volume of your music without leaving Ride Mode or Navigate.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own messages and quick replies.\n• Ride Mode flags rough locations.\n• Android asks for precise location.\n• Rough locations say Approximate.\n• Notifications bell on the Rides tab.\n• Easier Leave Ride; organizers can hand off.\n• Cleaner Ride Mode; Full Map.\n• Music Controls: pause, skip, volume.\n• Smoother maps; Follow Me; your heading.\n• Freeride rides get the rider line.\n• Update Available for new versions.\n• Ride miles fixed.",
+    "version": "2.0",
+    "title": "A New Home, Social, Events and Map Mode",
+    "intro": "OnMyLead 2.0 is the biggest update yet. A new Home screen puts Join a Ride, Create a Ride and Find a Ride up front, with public rides near you, your group, your badges and a Feed of what your friends have been riding. Social lets you like and comment on your friends' rides, badges and trails, post ride reports with a photo and see any rider's profile. Events brings rallies, poker runs and ride weekends to one page with their agenda and group rides. Navigate is now Map Mode, with custom trails, a Track Line of where you've been and named spots like water crossings. Ride Mode is cleaner and smoother, with your own typed messages, Follow Me, Full Map and Music Controls. And there's a notifications inbox, easier Leave Ride, better handling of rough locations, Report a Rider, a Rider Safety Agreement, gold Pro tags and ride miles that match the ride.",
+    "whatsNew": "What's new in 2.0:\n\n• New Home screen with a Feed of your friends' rides.\n• Social: like, comment and post.\n• Events: rallies and ride weekends.\n• Map Mode (was Navigate): custom trails, Track Line.\n• Cleaner, smoother Ride Mode; type your own messages.\n• Notifications bell on the Rides tab.\n• Leave Ride; organizers can hand off.\n• Full Map, Follow Me, Music Controls.\n• Freeride rider line; rough locations flagged.\n• Report a Rider.\n• Gold Pro tags show what Pro adds.\n• Ride miles fixed.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "A new Home screen. Join a Ride sits at the top with a box for the invite code, next to Create a Ride (with the rides you have left this month) and Find a Ride (with how many are near you). Below them: your next ride, your riding group with its latest message, Public Rides Near You (choose 50 to 1,000 miles or Anywhere, 500 to start), your Feed, your badges and Your Toolkit with Garage, Starlink, Battery Saver and the rest. On a tablet it uses two columns."
+      },
+      {
+        "kind": "new",
+        "text": "Your Feed on Home shows what your friends, the leaders you follow and your riding groups have been up to in the last 30 days: rides they finished, badges they earned, trails they shared and group rides they posted. Tap Customize to choose whose posts and which kinds you see. Nobody's location is ever shown."
+      },
+      {
+        "kind": "new",
+        "text": "Social: like and comment on your friends' rides, badges, trails and posts, post a ride report with a photo on your profile, open any rider's profile and see their picture full size, and share to Facebook, Instagram or X. Seeing the Feed, reading comments and liking are free; posting, commenting and sharing are part of Pro."
+      },
+      {
+        "kind": "new",
+        "text": "Events: rallies, poker runs and ride weekends on one page you can share, with dates, the place, photos, details and an agenda. Say you're Going or Interested, and join the event's group rides. Pro riders create events and can add co-hosts and Ride Managers who run each group ride."
+      },
+      {
+        "kind": "new",
+        "text": "Navigate is now Map Mode. Map a Custom Trail from the Draw tab, turn on Track Line to see where you've been (one colour per day, kept 7 days on your phone only), and mark named spots like obstacles, hazards, water crossings and viewpoints that travel with the trail. Shared trails are now full length, with an optional Hide My Start for recordings."
+      },
       {
         "kind": "improved",
         "text": "A cleaner, calmer Ride Mode. The map gets the room: the ride name, sharing and the group's state sit in one slim bar, and the buttons sit in one dark panel with three quick replies, More for every status, and Regroup Here beside EMERGENCY. Announcements and alerts are easier to read, and every button gives a light tap you can feel."
@@ -29,7 +49,7 @@
       },
       {
         "kind": "new",
-        "text": "Follow Me: in Ride Mode and Navigate the map now moves with you as you ride, so your dot stays in view without dragging the map. Drag or pinch the map to look around and it pauses; tap Paused or Center on Me to follow you again, or tap Following to turn it off. Your phone remembers the choice, and Follow Me on Maps in the You tab switches it too."
+        "text": "Follow Me: in Ride Mode and Map Mode the map now moves with you as you ride, so your dot stays in view without dragging the map. Drag or pinch the map to look around and it pauses; tap Paused or Center on Me to follow you again, or tap Following to turn it off. Your phone remembers the choice, and Follow Me on Maps in the You tab switches it too."
       },
       {
         "kind": "fixed",
@@ -53,7 +73,7 @@
       },
       {
         "kind": "new",
-        "text": "Full Map on every map: Ride Mode, Navigate, Draw a Route, Waypoints and Find a Ride. Tap Full Map and the bars and panels tuck away so the map fills your screen. One slim bar keeps what matters (EMERGENCY and the route line in Ride Mode, your speed in Navigate, the miles and Undo while drawing a route), and Controls brings everything back. Swipe the bar up to do the same. Your phone remembers it for next time."
+        "text": "Full Map on every map: Ride Mode, Map Mode, Draw a Route, Waypoints and Find a Ride. Tap Full Map and the bars and panels tuck away so the map fills your screen. One slim bar keeps what matters (EMERGENCY and the route line in Ride Mode, your speed in Navigate, the miles and Undo while drawing a route), and Controls brings everything back. Swipe the bar up to do the same. Your phone remembers it for next time."
       },
       {
         "kind": "improved",
@@ -61,7 +81,7 @@
       },
       {
         "kind": "new",
-        "text": "Music Controls: tap the Music button in Ride Mode or Navigate to pause, skip songs and change the volume without leaving OnMyLead. On Android it controls Spotify, YouTube Music, Apple Music, Pandora and other music apps. On iPhone and iPad it controls Apple Music, and the volume of any app (Apple doesn't let apps skip Spotify songs). Don't want it? Tap Hide Music Button, or switch off Music Controls on the You tab."
+        "text": "Music Controls: tap the Music button in Ride Mode or Map Mode to pause, skip songs and change the volume without leaving OnMyLead. On Android it controls Spotify, YouTube Music, Apple Music, Pandora and other music apps. On iPhone and iPad it controls Apple Music, and the volume of any app (Apple doesn't let apps skip Spotify songs). Don't want it? Tap Hide Music Button, or switch off Music Controls on the You tab."
       },
       {
         "kind": "fixed",
@@ -74,10 +94,14 @@
       {
         "kind": "improved",
         "text": "On a Free account, a small gold Pro tag now marks every button that needs Pro, like Import GPX, Record a Trail, offline map downloads and New Group, so you know before you tap. Tap one to see what Pro adds. Pro Trial and Pro riders don't see the tags."
-        },
-        {
+      },
+      {
         "kind": "new",
         "text": "Report a Rider from the You tab. Pick anyone you've messaged, ridden with, added as a friend or blocked, and report them for harassment, threats or anything else. Your messages with them are saved with the report so the OnMyLead team can read what was said, and riders who break the rules can be suspended or banned. They're never told who reported them."
+      },
+      {
+        "kind": "new",
+        "text": "The Starlink page now features the RUS Starlink Mini Mount V2 (Morelock Series), made by RUS Offroad, the team behind OnMyLead. Tap Shop the Mount to see it in the store."
       }
     ]
   },

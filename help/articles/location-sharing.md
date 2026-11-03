@@ -31,7 +31,7 @@ There are two ways to share:
 
 - **With a ride:** everyone on the ride sees you on the Ride Mode map.
 
-:::release 1.0.4
+:::release 2.0
 On a Freeride, if you're the leader, each rider's phone keeps the path you've ridden while they're in Ride Mode, built from the same live location they already see, to measure how far behind you everyone is. It stays on their phone, isn't uploaded, and is cleared after 18 hours or when they open another Freeride.
 :::
 
@@ -142,7 +142,7 @@ If you turn off location for OnMyLead while you're sharing with a ride, Ride Mod
 
 Keep **Precise Location** on for OnMyLead (on Android, **Use precise location**). With only an approximate location, your group sees you up to a few miles from where you are. See [Make Your Location Accurate](/help/accurate-location).
 
-:::release 1.0.4
+:::release 2.0
 On Android, when you start sharing, OnMyLead asks once to change to a precise location if you allowed only an approximate one, and to turn on Google Location Accuracy if it's off.
 :::
 

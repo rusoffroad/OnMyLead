@@ -91,7 +91,7 @@ Trails come from OpenStreetMap, so snapping works best where riders have mapped 
 
 To see more of the map, swipe the panel down or tap its handle. It folds down to the miles and an **Undo** button.
 
-:::release 1.0.4
+:::release 2.0
 For the whole screen, tap **Full Map** on the panel's grab bar. The top bar, layers button and panel tuck away, and a slim bar keeps the miles and **Undo**. Keep tapping the map to add points, and tap **Controls** (or swipe the bar up) to bring everything back. See [Full Map](/help/full-map).
 :::
 
