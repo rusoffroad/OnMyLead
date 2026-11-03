@@ -109,6 +109,10 @@
       },
       {
         "kind": "new",
+        "text": "Waypoint symbols: pick from 15, including the new Gate, Trailhead, Water Crossing, Food, Restroom, First Aid, Repair and Photo Spot. Each has its own drawing and hazards sit on a triangle, so they're easy to tell apart for color-blind riders too. Planned stops show their symbol on the stop sign."
+      },
+      {
+        "kind": "new",
         "text": "Brand Ambassador: a new blue badge OnMyLead gives to the riders who represent the app. Ambassadors see it at the top of Badges, and everyone sees it beside their name, on the Feed and on their profile."
       }
     ]

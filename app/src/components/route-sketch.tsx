@@ -6,7 +6,7 @@ import type { LatLng } from '@/core/geo';
 import { projectRoute } from '@/core/summary';
 import { octagon } from './waypoint-blaze';
 
-export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string; /** A waypoint: drawn as a trail blaze. */ diamond?: boolean; /** A planned stop: a numbered stop sign. */ stop?: number; /** Outline colour, for a live rider's white ring. */ ring?: string; /** Compass direction a moving rider is heading: a small arrow beside the dot. */ heading?: number | null };
+export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string; /** A waypoint: drawn as a trail blaze. */ diamond?: boolean; /** A hazard waypoint: a warning triangle instead of the diamond. */ triangle?: boolean; /** A planned stop: a numbered stop sign. */ stop?: number; /** Outline colour, for a live rider's white ring. */ ring?: string; /** Compass direction a moving rider is heading: a small arrow beside the dot. */ heading?: number | null };
 
 /**
  * The route as a drawing on a navy grid, no map tiles: it works offline and on the web, and is
@@ -73,6 +73,11 @@ export function RouteSketch({
                     {d.stop}
                   </SvgText>
                 </>
+              ) : d.diamond && d.triangle ? (
+                <Polygon
+                  points={`${p.x},${(p.y - 9).toFixed(1)} ${(p.x + 8.5).toFixed(1)},${(p.y + 6).toFixed(1)} ${(p.x - 8.5).toFixed(1)},${(p.y + 6).toFixed(1)}`}
+                  fill={d.color} stroke={Colors.background} strokeWidth={2} strokeLinejoin="round"
+                />
               ) : d.diamond ? (
                 <Rect x={p.x - 6.5} y={p.y - 6.5} width={13} height={13} rx={1.5} fill={d.color} stroke={Colors.background} strokeWidth={2} transform={`rotate(45 ${p.x} ${p.y})`} />
               ) : (
