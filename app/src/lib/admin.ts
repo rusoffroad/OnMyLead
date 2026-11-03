@@ -258,3 +258,20 @@ export const suspendUser = (userId: string, reason: string, days: number | null 
   adminFn<{ ok: boolean; banned_until?: string | null }>('admin-api', 'suspend', { user_id: userId, reason, days, report_id: reportId });
 export const reactivateUser = (userId: string) => adminFn<{ ok: boolean }>('admin-api', 'reactivate', { user_id: userId });
 export const deleteUser = (userId: string, reason: string) => adminFn<{ ok: boolean }>('admin-api', 'delete_user', { user_id: userId, reason });
+
+/** One saved acceptance of the Rider Safety and Liability Agreement (migration 20261102700000). */
+export type AgreementRow = {
+  id: string; user_id: string; email: string | null; display_name: string | null; agreement_version: number;
+  text_sha256: string; text_matches: boolean; accepted_at: string; device_accepted_at: string | null; before_sign_in: boolean;
+  platform: string | null; app_version: string | null; app_build: string | null; device: string | null; os_version: string | null;
+  locale: string | null; ip_address: string | null; user_agent: string | null; account_deleted: boolean;
+};
+export type AgreementVersion = { version: number; title: string; effective_on: string; body_sha256: string; body: string };
+export type AgreementsData = Page<AgreementRow> & {
+  current_version: number; riders: number; riders_on_current: number; versions: AgreementVersion[];
+};
+export const riderAgreements = (search: string, page: number, pageSize = 50, userId: string | null = null) =>
+  adminRpc<AgreementsData>('admin_rider_agreements', { p_search: search || null, p_user: userId, p_page: page, p_page_size: pageSize });
+/** Every record accepted in [from, to), for a CSV file. The download is written to the Audit Log. */
+export const riderAgreementExport = (from: string, to: string) =>
+  adminRpc<AgreementRow[]>('admin_rider_agreement_export', { p_from: from, p_to: to });

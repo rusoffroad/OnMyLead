@@ -61,6 +61,10 @@
       },
       {
         "kind": "new",
+        "text": "A Before You Ride screen on first launch: read the Rider Safety and Liability Agreement, tick the box and tap I Agree. You're asked once, and again only if it changes. Read it any time on the You tab under Safety Agreement."
+      },
+      {
+        "kind": "new",
         "text": "Report a Rider from the You tab. Pick anyone you've messaged, ridden with, added as a friend or blocked, and report them for harassment, threats or anything else. Your messages with them are saved with the report so the OnMyLead team can read what was said, and riders who break the rules can be suspended or banned. They're never told who reported them."
       }
     ]

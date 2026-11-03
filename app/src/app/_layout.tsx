@@ -16,6 +16,7 @@ import { Platform } from 'react-native';
 import { DirectionsHost } from '@/components/directions';
 import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
+import { RiderAgreementGate } from '@/components/rider-agreement';
 import { UpdateRequired } from '@/components/update-required';
 import { Colors, font, NavigationColors } from '@/constants/theme';
 // Starts crash reporting before anything else can fail (off when no DSN is set).
@@ -27,6 +28,7 @@ import { startOrientationRule } from '@/lib/orientation';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
+import { startRiderAgreement } from '@/lib/rider-agreement';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
 startAppLog();
@@ -63,6 +65,8 @@ function RootLayout() {
   useEffect(() => startAppSettings(), []);
   // Phones stay upright, tablets turn (Android; the Apple app does this in its Info.plist).
   useEffect(() => startOrientationRule(), []);
+  // Who has agreed to the Rider Safety and Liability Agreement, and sending each record to the server.
+  useEffect(() => startRiderAgreement(), []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
   useEffect(() => {
@@ -134,6 +138,7 @@ function RootLayout() {
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
         <Stack.Screen name="terms" options={{ title: '' }} />
         <Stack.Screen name="privacy" options={{ title: '' }} />
+        <Stack.Screen name="rider-agreement" options={{ title: '' }} />
         <Stack.Screen name="support" options={{ title: '' }} />
         <Stack.Screen name="contact" options={{ title: '' }} />
         <Stack.Screen name="admin" options={{ title: 'OnMyLead Admin', headerShown: false }} />
@@ -141,6 +146,8 @@ function RootLayout() {
       <MessageAlerts />
       <ProGateHost />
       <DirectionsHost />
+      {/* Before You Ride: the safety and liability agreement, until the rider agrees. */}
+      <RiderAgreementGate />
       {/* The owner's minimum version (Admin Dashboard > Releases), over everything, with Not Now. */}
       <UpdateRequired />
     </ThemeProvider>

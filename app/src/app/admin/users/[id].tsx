@@ -24,6 +24,8 @@ export default function UserDetail() {
   const [busy, setBusy] = useState<string | null>(null);
   // Test accounts are left out of rider counts (Signups and Downloads). Hidden until that server update is on.
   const growth = admin.useAdminData(() => growthApi.growthSummary(null, null), [id]);
+  // Their Rider Safety and Liability Agreement records (empty until the migration is live).
+  const agreements = admin.useAdminData(() => admin.riderAgreements('', 0, 20, id), [id]);
   const photo = useAvatar(id);
 
   const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
@@ -241,6 +243,21 @@ export default function UserDetail() {
           ))}
         </Panel>
       </Columns>
+
+      <Panel title="Safety Agreement" right={<AdminButton title="All Agreements" small onPress={() => router.push('/admin/agreements')} />}>
+        {agreements.error ? <Text style={styles.note}>Agreement records aren&apos;t available yet.</Text> : null}
+        {agreements.data && agreements.data.rows.length === 0 ? (
+          <Empty text={`Hasn’t agreed to version ${agreements.data.current_version} yet. They’re asked the next time they open the app or the website.`} />
+        ) : null}
+        {agreements.data?.rows.map((a) => (
+          <View key={a.id} style={styles.audit}>
+            <Text style={styles.auditAction}>
+              Agreed to version {a.agreement_version}{a.text_matches ? '' : ' (different text shown)'}, {[a.platform, a.device, a.app_version].filter(Boolean).join(', ')}{a.ip_address ? `, IP ${a.ip_address}` : ''}
+            </Text>
+            <Text style={styles.auditAt}>{fmtDateTime(a.accepted_at)}</Text>
+          </View>
+        ))}
+      </Panel>
 
       <Panel title="Admin History">
         {data.audit.length === 0 ? <Empty text="No admin actions on this account." /> : null}

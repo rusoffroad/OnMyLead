@@ -38,6 +38,10 @@ You're signed out and taken back to the start.
 
 This can't be undone. To ride with OnMyLead again later, you'd make a new account.
 
+:::release 2.0
+One thing is kept: the record that you agreed to the Rider Safety and Liability Agreement, because it's a legal record. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement#what-gets-saved).
+:::
+
 ## If You See Deletion Requested
 
 Sometimes the app shows **Deletion Requested** instead of signing you out. That means your request was sent and your account and its data will be deleted within 7 days. If you pay for Pro, cancel it in your Apple subscriptions so you aren't billed again.

@@ -4,7 +4,7 @@ summary: What the EMERGENCY button does and doesn't do, how Need Help works, and
 category: safety-privacy
 order: 50
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/hold-button.tsx
@@ -26,6 +26,10 @@ OnMyLead is not an emergency service. It does not contact 911, search and rescue
 :::
 
 OnMyLead helps your group keep track of each other. Phones lose signal, batteries die, and positions can be late or wrong, so use it alongside your own plan, not instead of one.
+
+:::release 2.0
+Every rider agrees to the Rider Safety and Liability Agreement before using the app: you ride at your own risk, never use the phone while moving, and only ride where it's allowed. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement).
+:::
 
 Everything on this page is free on every plan. None of it needs Pro.
 
