@@ -77,6 +77,12 @@ On Android, check **Settings > Apps > OnMyLead > Notifications**, including the 
 
 **Need Help** and **EMERGENCY** alerts from your group always come through, even in quiet hours, as long as iPhone notifications are allowed for OnMyLead.
 
+:::release 2.0.1
+## The Spoken Alerts Sound Robotic
+
+Your phone may only have its small standard voice. Open **You** > **Voice** to hear the voices on your phone, and follow the steps there to download a free Premium or Enhanced voice. See [Choose the Voice for Spoken Alerts](/help/voice).
+:::
+
 ## Part of My Route Is a Straight Line
 
 The route builder follows mapped trails. It draws a straight line when no mapped trail joins two points, when the points are very far apart, or when you had no signal and that trail data wasn't saved on your phone. Add a point on the trail or zoom in, or use **Straight Line** for unmapped ground. See [Draw a Route](/help/route-builder).
