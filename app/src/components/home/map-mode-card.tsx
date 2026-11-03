@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, Switch, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { TRACK_DAY_COLORS } from '@/core/track-line';
 import { Gradient, Pill } from './parts';
 
@@ -92,7 +92,7 @@ export function MapModeCard({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: { borderRadius: 28, padding: 22, overflow: 'hidden', gap: Spacing.three },
   art: { position: 'absolute', right: -10, top: -8 },
   top: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
@@ -112,4 +112,4 @@ const styles = StyleSheet.create({
   day: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   dayLine: { width: 16, height: 5, borderRadius: 3, borderWidth: 1, borderColor: 'rgba(255,255,255,0.75)' },
   dayText: { color: 'rgba(255,255,255,0.8)', fontFamily: font(500), fontSize: 12 },
-});
+}));

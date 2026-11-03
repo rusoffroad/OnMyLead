@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { RateTrailSheet } from '@/components/rate-trail-sheet';
@@ -10,7 +10,7 @@ import { StarScore } from '@/components/stars';
 import { RigFitLine } from '@/components/trail-width-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   difficultyColor, difficultyLabel, feet, feetOrMiles, mappedBy, RIDER_TRAIL_INK, seasonLabel, surfaceLabel, vehicleLabel, type PublicTrail,
 } from '@/core/nav-trails';
@@ -208,7 +208,7 @@ export default function PublicTrailPage() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   columns: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.four },
   column: { flex: 1, minWidth: 0, gap: Spacing.three },
   userRow: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
@@ -224,4 +224,4 @@ const styles = StyleSheet.create({
   label: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
   scores: { flexDirection: 'row', gap: 28 },
   photo: { width: 220, height: 150, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
-});
+}));

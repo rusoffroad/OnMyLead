@@ -1,11 +1,11 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, View } from 'react-native';
 
 import { DownloadRow, MapSheet, SAND, SmallButton } from '@/components/offline-map-ui';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, type OfflineChoice } from '@/core/offline-maps';
 import { getRideRoute, myRides } from '@/lib/api';
@@ -138,7 +138,7 @@ function RideOffer({ ride, route }: RideWithRoute) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   hero: { gap: 10, paddingVertical: 4 },
   heroTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 36 },
   heroBody: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 16, lineHeight: 22 },
@@ -151,4 +151,4 @@ const styles = StyleSheet.create({
   offer: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   offerName: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 22 },
   offerSub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
-});
+}));

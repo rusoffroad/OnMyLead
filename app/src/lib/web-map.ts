@@ -2,7 +2,7 @@ import 'leaflet/dist/leaflet.css';
 
 import L from 'leaflet';
 
-import { Colors, RideColors } from '@/constants/theme';
+import { Colors, Glass, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { OSM_ATTRIBUTION, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
@@ -13,20 +13,20 @@ import {
 
 export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
-// Leaflet draws its own popups, controls and pins in HTML; restyle them in the app's dark palette.
-const CSS = `
+// Leaflet draws its own popups, controls and pins in HTML; restyle them in the rider's theme.
+const css = () => `
 .omlmap { background: ${Colors.backgroundElement}; font-family: Barlow_500Medium, system-ui, sans-serif; }
 .omlmap.oml-draw { cursor: crosshair; }
 .omlmap .leaflet-popup-content-wrapper { background: ${Colors.backgroundElement}; color: ${Colors.text}; border: 1px solid ${Colors.border}; border-radius: 14px; box-shadow: 0 6px 20px rgba(0,0,0,.45); }
 .omlmap .leaflet-popup-tip { background: ${Colors.backgroundElement}; border: 1px solid ${Colors.border}; }
 .omlmap .leaflet-popup-content { margin: 12px 14px; width: 200px !important; }
 .omlmap .leaflet-popup-close-button { color: ${Colors.textSecondary} !important; }
-.omlmap .leaflet-control-attribution { background: rgba(10,22,38,.7); color: ${Colors.textSecondary}; font-size: 9px; }
+.omlmap .leaflet-control-attribution { background: ${Glass.panel}; color: ${Colors.textSecondary}; font-size: 9px; }
 .omlmap .leaflet-control-attribution a { color: ${Colors.textSecondary}; }
 .omlmap .leaflet-bar { border: 1px solid ${Colors.border}; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,.45); }
-.omlmap .leaflet-bar a { width: 40px; height: 40px; line-height: 38px; font-size: 22px; background: rgba(10,22,38,.92); color: ${Colors.text}; border-bottom-color: ${Colors.border}; }
+.omlmap .leaflet-bar a { width: 40px; height: 40px; line-height: 38px; font-size: 22px; background: ${Glass.panel}; color: ${Colors.text}; border-bottom-color: ${Colors.border}; }
 .omlmap .leaflet-bar a:hover { background: ${Colors.backgroundElement}; color: ${Colors.text}; }
-.omlmap .leaflet-bar a.leaflet-disabled { background: rgba(10,22,38,.92); color: ${Colors.textSecondary}; opacity: .5; }
+.omlmap .leaflet-bar a.leaflet-disabled { background: ${Glass.panel}; color: ${Colors.textSecondary}; opacity: .5; }
 @media (max-width: 899px) { .omlmap.oml-full .leaflet-top { margin-top: 70px; } }
 /* Full-screen maps carry the Map Layers button top right; the zoom buttons sit under it. */
 .omlmap.oml-full .leaflet-top.leaflet-right { margin-top: 118px; }
@@ -46,7 +46,7 @@ const CSS = `
 .oml-wp { position: relative; width: 30px; height: 30px; }
 .oml-wp svg { display: block; filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
 .oml-wp span { position: absolute; left: 34px; top: 4px; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis;
-  padding: 1px 6px; border-radius: 6px; background: rgba(10,22,38,.82); border: 1px solid rgba(241,244,248,.35); color: ${Colors.text}; font: 12px Barlow_700Bold, sans-serif; }
+  padding: 1px 6px; border-radius: 6px; background: rgba(10,22,38,.82); border: 1px solid rgba(241,244,248,.35); color: #F1F4F8; font: 12px Barlow_700Bold, sans-serif; }
 .oml-wp.shared span { border-color: ${Colors.sky}; }
 .oml-wp.stop span { border-color: ${Colors.accent}; font-family: Barlow_800ExtraBold, sans-serif; font-size: 13px; }
 .oml-wp.stop span small { display: block; color: ${Colors.textSecondary}; font: 11px Barlow_700Bold, sans-serif; }
@@ -65,10 +65,16 @@ const CSS = `
 `;
 
 export function injectMapCss() {
-  if (document.getElementById('omlmap-css')) return;
+  // Rebuilt after a theme change, so popups and controls follow the new colours.
+  const text = css();
+  const old = document.getElementById('omlmap-css');
+  if (old) {
+    if (old.textContent !== text) old.textContent = text;
+    return;
+  }
   const el = document.createElement('style');
   el.id = 'omlmap-css';
-  el.textContent = CSS;
+  el.textContent = text;
   document.head.appendChild(el);
 }
 

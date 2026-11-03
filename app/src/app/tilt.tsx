@@ -1,13 +1,13 @@
 import { useKeepAwake } from 'expo-keep-awake';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Switch, Text, useWindowDimensions, View } from 'react-native';
+import { Platform, Pressable, Switch, Text, useWindowDimensions, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { TiltDial } from '@/components/tilt-gauge';
 import { Button, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { CRASH_SENSITIVITIES, type CrashSensitivity } from '@/core/crash-detect';
 import { EXPANDED_MIN } from '@/core/layout';
 import { clampLimit, TILT_LIMIT_MAX, TILT_LIMIT_MIN } from '@/core/tilt';
@@ -198,7 +198,7 @@ function Sensitivity({ value, label, detail, on, disabled, onPress }: { value: C
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   notice: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: RideColors.yellow, padding: Spacing.three, gap: 4 },
   dials: { alignItems: 'center', gap: Spacing.four, paddingTop: Spacing.two },
   dialsRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-start' },
@@ -219,4 +219,4 @@ const styles = StyleSheet.create({
   radio: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: Colors.sky },
   radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.sky },
-});
+}));

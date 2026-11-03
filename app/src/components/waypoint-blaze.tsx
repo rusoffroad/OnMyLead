@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path, Polygon, Rect } from 'react-native-svg';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, MapLabelText, themedStyles } from '@/constants/theme';
 import { symbolDrawing, symbolInfo, waypointSymbol, warningTriangle, type WaypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, type Waypoint } from '@/core/waypoints';
 import { MarkerBody } from './marker-body';
@@ -72,14 +72,14 @@ export function WaypointPin({ name, symbol, shared }: { name: string; symbol: Wa
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pin: { width: PIN_W, height: 44, alignItems: 'center', justifyContent: 'center' },
   label: {
     position: 'absolute', left: PIN_W / 2 + 17, maxWidth: PIN_W / 2 - 20, paddingHorizontal: 5, paddingVertical: 1,
     borderRadius: 6, backgroundColor: 'rgba(10,22,38,0.82)', borderWidth: 1, borderColor: 'rgba(241,244,248,0.35)',
   },
   sharedLabel: { borderColor: Colors.sky },
-  name: { color: Colors.text, fontFamily: font(700), fontSize: 12 },
+  name: { color: MapLabelText, fontFamily: font(700), fontSize: 12 },
   stopN: { color: '#FFFFFF', fontFamily: font(800, 'display'), textAlign: 'center', includeFontPadding: false },
   stopLabel: { left: PIN_W / 2 + 22, maxWidth: PIN_W / 2 - 24, borderColor: Colors.accent, paddingVertical: 2 },
   stopName: { color: Colors.text, fontFamily: font(800), fontSize: 13 },
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: Colors.background,
   },
   stopTime: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 11, fontVariant: ['tabular-nums'] },
-});
+}));
 
 /** The eight corners of a stop sign filling a square of this size. */
 export function octagon(cx: number, cy: number, r: number): string {

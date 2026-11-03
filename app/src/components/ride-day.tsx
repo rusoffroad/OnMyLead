@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui';
-import { Colors, font, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { daylightBar, daylightCheck, FORECAST_DAYS, spanText, sunTimes, weatherWarnings } from '@/core/ride-day';
 import { useRideForecast } from '@/lib/forecast';
 import type { Ride } from '@/lib/types';
@@ -134,7 +134,7 @@ function DaylightLine({ kind, minutes, finish, sunset }: { kind: string; minutes
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   weather: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   temp: { color: Colors.text, fontSize: 56, lineHeight: 58, fontFamily: font(800, 'display') },
@@ -148,4 +148,4 @@ const styles = StyleSheet.create({
   rideDark: { backgroundColor: Colors.accent, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 },
   sunLabels: { flexDirection: 'row', justifyContent: 'space-between' },
   verdict: { fontWeight: 700, fontSize: 15, lineHeight: 20 },
-});
+}));

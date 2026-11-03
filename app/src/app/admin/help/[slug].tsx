@@ -1,11 +1,11 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Linking, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, Text, TextInput, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, Empty, ErrorNote, Fields, Loading, Panel, StatusBadge, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtDate, fmtDateTime } from '@/core/admin-format';
 import { filterRelease, renderMarkdown } from '@/core/help';
 import { useAdminData } from '@/lib/admin';
@@ -244,13 +244,13 @@ function Preview({ md, version }: { md: string; version: string | null }) {
   const html = useMemo(() => renderMarkdown(filterRelease(md, version)).html, [md, version]);
   return (
     <>
-      <style>{PREVIEW_CSS}</style>
+      <style>{previewCss()}</style>
       <div className="help-preview" dangerouslySetInnerHTML={{ __html: html }} />
     </>
   );
 }
 
-const PREVIEW_CSS = `
+const previewCss = () => `
 .help-preview { font-family: 'Barlow_500Medium', system-ui, sans-serif; font-size: 15px; line-height: 1.55; color: ${AdminColors.text}; min-width: 0; }
 .help-preview > * + * { margin-top: 12px; }
 .help-preview h2, .help-preview h3 { font-family: 'BarlowCondensed_700Bold', sans-serif; margin: 22px 0 0; }
@@ -268,7 +268,7 @@ const PREVIEW_CSS = `
 .help-preview code { background: ${AdminColors.raised}; padding: 1px 5px; border-radius: 5px; }
 `;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: { fontFamily: font(600), fontSize: 14, color: AdminColors.text },
   body: { flex: 1, fontFamily: font(500), fontSize: 14, lineHeight: 20, color: AdminColors.text },
   note: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.dim },
@@ -278,4 +278,4 @@ const styles = StyleSheet.create({
   version: { flexDirection: 'row', gap: 10, alignItems: 'center', paddingVertical: 6, borderTopWidth: 1, borderTopColor: AdminColors.line },
   input: { fontFamily: font(500), fontSize: 15, color: AdminColors.text, backgroundColor: AdminColors.page, borderRadius: 10, borderWidth: 1, borderColor: AdminColors.line, paddingHorizontal: 12, paddingVertical: 10 },
   editor: { minHeight: 520, fontFamily: 'monospace', fontSize: 13.5, lineHeight: 20 },
-});
+}));

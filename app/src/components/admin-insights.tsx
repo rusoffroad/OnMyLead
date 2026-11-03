@@ -3,11 +3,11 @@
  * tables, tiles and charts come from the shell's components in components/admin.
  */
 import { ReactNode } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, Text, View } from 'react-native';
 
 import { StatusBadge, type Tone } from '@/components/admin';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { AdminError } from '@/lib/admin';
 
 /**
@@ -101,7 +101,7 @@ export function Who({ name, email }: { name: string | null; email: string | null
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   bar: { height: 18, borderRadius: Radius.pill, overflow: 'hidden', flexDirection: 'row', gap: 2 },
   legend: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.four },
   legendItem: { minWidth: 96, gap: 0 },
@@ -109,4 +109,4 @@ const styles = StyleSheet.create({
   count: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 30, lineHeight: 34 },
   notice: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, borderWidth: 1, borderRadius: Radius.control, padding: Spacing.three },
   fact: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: Spacing.two, paddingVertical: 4 },
-});
+}));

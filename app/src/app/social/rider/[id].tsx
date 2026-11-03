@@ -1,6 +1,6 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { AddFriendButton } from '@/components/add-friend-button';
 import { faceColor, Initial } from '@/components/home/parts';
@@ -10,7 +10,7 @@ import { ComposePrompt, ItemList, useItems } from '@/components/social/lists';
 import { ProTag, Social } from '@/components/social/parts';
 import { TwoPane } from '@/components/two-pane';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { can } from '@/core/entitlements';
 import { sideColumnWidth } from '@/core/layout';
 import { sinceLine, SOCIAL_NOT_SWITCHED_ON, statLine, type RiderProfile } from '@/core/social';
@@ -150,7 +150,7 @@ export default function RiderProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { alignItems: 'center', gap: 10, paddingTop: 8 },
   ring: { padding: 5, borderRadius: 70, borderWidth: 2, borderColor: 'rgba(229,38,46,0.7)' },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap', justifyContent: 'center' },
@@ -163,4 +163,4 @@ const styles = StyleSheet.create({
   buttons: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignSelf: 'stretch', marginTop: 6 },
   button: { flexGrow: 1, flexBasis: 140 },
   muted: { color: Social.muted, fontFamily: font(500), fontSize: 15, lineHeight: 21, textAlign: 'center' },
-});
+}));

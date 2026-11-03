@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { clockParts, fromClockParts, minutesLabel, minutesText, parseTime } from '@/core/time';
 
 const HOURS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -150,7 +150,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   picked: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, paddingVertical: 12, paddingHorizontal: Spacing.three,
     borderRadius: Radius.control, borderWidth: 1.5, backgroundColor: Colors.background,
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   on: { backgroundColor: Colors.accent },
   onMinute: { backgroundColor: Colors.sky },
   clear: { alignSelf: 'flex-end', paddingVertical: 4 },
-});
+}));

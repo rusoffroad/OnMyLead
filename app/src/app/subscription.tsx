@@ -1,11 +1,11 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { useEntitlements } from '@/lib/entitlements';
 import { manageSubscription, redeemOfferCode, restore } from '@/lib/purchases';
 import { useSession } from '@/lib/session';
@@ -131,10 +131,10 @@ function Row({ title, detail, onPress, busy, last }: { title: string; detail: st
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   off: { gap: Spacing.one, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky },
   offTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22 },
   list: { borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, paddingHorizontal: Spacing.three, paddingVertical: 14 },
   rule: { borderBottomWidth: 1, borderBottomColor: Colors.backgroundSelected },
-});
+}));

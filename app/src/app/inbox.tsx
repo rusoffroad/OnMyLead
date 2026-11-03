@@ -1,13 +1,13 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { RowGroup } from '@/components/ride-row';
 import { SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { groupInbox, inboxLook, INBOX_NOT_SWITCHED_ON, moreText, whenText, type InboxItem, type InboxTone } from '@/core/inbox';
 import { tapTarget } from '@/core/push-tap';
 import { useLayout } from '@/hooks/use-layout';
@@ -17,13 +17,13 @@ import { useSession } from '@/lib/session';
 
 /** Each kind of notification keeps one color, so a glance down the list finds the rider alerts. */
 const TONE: Record<InboxTone, string> = {
-  alert: RideColors.red,
-  status: RideColors.yellow,
-  chat: Colors.sky,
+  get alert() { return RideColors.red; },
+  get status() { return RideColors.yellow; },
+  get chat() { return Colors.sky; },
   ride: '#57E3C3',
-  social: RideColors.green,
-  account: RideColors.sweep,
-  quiet: RideColors.unknown,
+  get social() { return RideColors.green; },
+  get account() { return RideColors.sweep; },
+  get quiet() { return RideColors.unknown; },
 };
 
 const SWIPE = Platform.OS !== 'web';
@@ -187,7 +187,7 @@ function Empty({ title, detail }: { title: string; detail: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   bar: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flexWrap: 'wrap' },
   chip: { minHeight: 40, paddingHorizontal: 14, borderRadius: 20, backgroundColor: Colors.backgroundSelected, justifyContent: 'center' },
   chipText: { fontSize: 15, lineHeight: 18, fontFamily: font(700) },
@@ -202,4 +202,4 @@ const styles = StyleSheet.create({
   empty: { alignItems: 'center', gap: Spacing.two, paddingVertical: Spacing.five, paddingHorizontal: Spacing.three },
   emptyBell: { width: 76, height: 76, borderRadius: 38, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(59,134,247,0.14)', marginBottom: Spacing.one },
   settings: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'center', minHeight: 44, paddingHorizontal: Spacing.two, marginTop: Spacing.three, borderRadius: Radius.card },
-});
+}));

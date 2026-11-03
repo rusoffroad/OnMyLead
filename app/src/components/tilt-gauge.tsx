@@ -1,12 +1,23 @@
 import { memo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Rect } from 'react-native-svg';
 
-import { Colors, font, Glass, RideColors } from '@/constants/theme';
+import { Colors, font, Glass, RideColors, themedStyles } from '@/constants/theme';
 import { CAUTION_SHARE, degrees, pitchSide, rollSide, tiltLevel, type TiltLevel } from '@/core/tilt';
 
 /** Level colors: the same green, amber and red the Ride Bubble uses, so riders already know them. */
-export const LEVEL_INK: Record<TiltLevel, string> = { ok: RideColors.green, caution: RideColors.yellow, warn: RideColors.red };
+// Getters, so the colours follow the theme and Color Blind Mode.
+export const LEVEL_INK: Record<TiltLevel, string> = {
+  get ok() {
+    return RideColors.green;
+  },
+  get caution() {
+    return RideColors.yellow;
+  },
+  get warn() {
+    return RideColors.red;
+  },
+};
 
 /** The dial shows this far each way; past it the vehicle still turns but the scale stops. */
 const SCALE = 60;
@@ -140,7 +151,7 @@ export const TiltDial = memo(function TiltDial({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   dial: { alignItems: 'center' },
   readout: { alignItems: 'center', marginTop: -6 },
   axis: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 18, letterSpacing: 0.4 },
@@ -149,4 +160,4 @@ const styles = StyleSheet.create({
   side: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, marginTop: -2 },
   maxRow: { flexDirection: 'row', gap: 18, marginTop: 8 },
   max: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, fontVariant: ['tabular-nums'] },
-});
+}));

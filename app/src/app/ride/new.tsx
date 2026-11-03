@@ -10,6 +10,7 @@ import { TimePicker } from '@/components/time-picker';
 import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-code-field';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import type { BubblePreset } from '@/core/bubble';
 import { rideAllowanceText } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
@@ -494,7 +495,7 @@ function KindCard({ title, detail, on, onPress }: { title: string; detail: strin
       onPress={onPress}
       style={{
         flex: 1, gap: Spacing.one, padding: Spacing.three, minHeight: 128, borderRadius: Radius.card, borderWidth: 2,
-        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? '#2A1620' : Colors.backgroundElement,
+        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? withAlpha(Colors.accent, 0.14) : Colors.backgroundElement,
       }}>
       <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText>

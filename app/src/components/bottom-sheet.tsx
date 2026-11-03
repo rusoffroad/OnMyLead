@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { useLayout } from '@/hooks/use-layout';
 
 /**
@@ -25,7 +25,7 @@ export function BottomSheet({
   const layout = useLayout();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
-      <SheetRoot style={[{ backgroundColor: 'rgba(3,9,18,0.72)' }, layout.wide && { alignItems: 'center' }]}>
+      <SheetRoot style={[{ backgroundColor: Colors.scrim }, layout.wide && { alignItems: 'center' }]}>
         <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
         <SwipeSheet
           onClose={onClose}
@@ -43,7 +43,7 @@ export function BottomSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   // No focus ring around the dimmed area on the website (the sheet takes focus when it opens).
   scrim: { flex: 1, alignSelf: 'stretch', outlineWidth: 0 },
   sheet: {
@@ -53,4 +53,4 @@ const styles = StyleSheet.create({
   sheetWide: { width: 560, maxWidth: '100%', alignSelf: 'center' },
   grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, marginBottom: Spacing.one },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 28, lineHeight: 30 },
-});
+}));

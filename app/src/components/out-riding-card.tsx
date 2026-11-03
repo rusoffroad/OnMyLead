@@ -1,10 +1,10 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Convoy } from '@/components/convoy';
 import { Icon } from '@/components/icon';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { unreadLabel } from '@/core/group-chat';
 import { countLine, DEFAULT_RADIUS, endsLabel, isOut, totalUnread, type NearbyRider } from '@/core/out-riding';
 import { friendsLine, splitFriends } from '@/core/friends';
@@ -99,7 +99,7 @@ export function OutRidingCard() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: 10, borderWidth: 2, borderColor: 'transparent' },
   cardOn: { borderColor: RideColors.green },
   top: { flexDirection: 'row', alignItems: 'center', gap: 10 },
@@ -118,4 +118,4 @@ const styles = StyleSheet.create({
     color: '#fff', backgroundColor: Colors.accent, fontFamily: font(700), fontSize: 12, overflow: 'hidden',
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill,
   },
-});
+}));

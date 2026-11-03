@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { Colors, font, RideColors } from '@/constants/theme';
+import { colorBlindOn, Colors, font, MapLabelText, RideColors, themedStyles } from '@/constants/theme';
+import { statusSymbol } from '@/core/appearance';
 import { screenAngle } from '@/core/heading';
 import type { MapRider } from './group-map-types';
 import { MarkerBody } from './marker-body';
@@ -46,6 +47,8 @@ export function RiderPin({ rider: r, mapHeading }: { rider: MapRider; /** How fa
           !live && styles.staleLabel,
         ]}>
         <Text style={[styles.name, leader && styles.leaderName, !live && styles.staleName]} numberOfLines={1}>
+          {/* Color Blind Mode: the ring's colour also shows as a symbol, so trouble never rests on colour alone. */}
+          {trouble && colorBlindOn() ? <Text style={{ color: RideColors[r.status] }}>{statusSymbol(r.status)} </Text> : null}
           {r.name}
         </Text>
         {f && !live ? (
@@ -74,7 +77,7 @@ function HeadingArrow({ box, angle }: { box: number; angle: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pin: { width: PIN_W, height: PIN_H, alignItems: 'center', justifyContent: 'center' },
   badge: { position: 'absolute' },
   arrowBox: { position: 'absolute', alignItems: 'center' },
@@ -97,9 +100,9 @@ const styles = StyleSheet.create({
   leaderLabel: { backgroundColor: RideColors.leader },
   // A last-seen tag is outlined, not filled, so it never reads like a live one.
   staleLabel: { backgroundColor: 'rgba(10,22,38,0.9)', borderWidth: 1, borderColor: Colors.border },
-  name: { color: Colors.text, fontFamily: font(700), fontSize: 12, lineHeight: 15 },
+  name: { color: MapLabelText, fontFamily: font(700), fontSize: 12, lineHeight: 15 },
   leaderName: { color: '#fff', fontFamily: font(800), fontSize: 13, lineHeight: 16 },
-  staleName: { color: Colors.textSecondary },
-  age: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 10, lineHeight: 13 },
-  lostAge: { color: Colors.text, fontFamily: font(800) },
-});
+  staleName: { color: '#97A7BE' },
+  age: { color: '#97A7BE', fontFamily: font(700), fontSize: 10, lineHeight: 13 },
+  lostAge: { color: MapLabelText, fontFamily: font(800) },
+}));

@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { StopSign, WaypointBlaze } from '@/components/waypoint-blaze';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { stopTimeLabel, waypointAudience, type Waypoint } from '@/core/waypoints';
 
@@ -41,11 +41,11 @@ export function WaypointRow({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, paddingVertical: 8 },
   divider: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
   name: { color: Colors.text, fontFamily: font(700), fontSize: 17 },
   meta: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   stopMeta: { color: Colors.text, fontVariant: ['tabular-nums'] },
   note: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 17, marginTop: 2 },
-});
+}));

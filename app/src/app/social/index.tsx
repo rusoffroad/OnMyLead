@@ -1,12 +1,12 @@
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { ComposePrompt, FriendRows, ItemList, useItems } from '@/components/social/lists';
 import { Social } from '@/components/social/parts';
 import { TwoPane } from '@/components/two-pane';
 import { Button, ErrorText, Screen, Segmented } from '@/components/ui';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { can } from '@/core/entitlements';
 import { profileHref, SOCIAL_NOT_SWITCHED_ON, type SocialTab } from '@/core/social';
 import { sideColumnWidth } from '@/core/layout';
@@ -156,8 +156,8 @@ export default function SocialScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: { color: Colors.text, fontFamily: font(600, 'display'), fontSize: 24 },
   muted: { color: Social.muted, fontFamily: font(500), fontSize: 14, lineHeight: 20 },
   free: { color: Social.muted, fontFamily: font(500), fontSize: 13, lineHeight: 18, textAlign: 'center' },
-});
+}));

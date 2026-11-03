@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { Colors, font, Glass, GlassSurface } from '@/constants/theme';
+import { Colors, font, Glass, GlassSurface, themedStyles } from '@/constants/theme';
 import { degrees, describeTilt, overallLevel, pitchSide, rollSide, tiltLevel, type TiltLimits } from '@/core/tilt';
 import type { TiltReading } from '@/hooks/use-tilt';
 import { Icon } from './icon';
@@ -66,7 +66,7 @@ function Axis({ label, value, side, ink, bar }: { label: string; value: string; 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pill: {
     position: 'absolute', zIndex: 15, height: TILT_TILE_H, borderRadius: TILT_TILE_H / 2, flexDirection: 'row', alignItems: 'center',
     gap: 8, paddingLeft: 12, paddingRight: 16, ...GlassSurface,
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
   valueBar: { fontSize: 22, lineHeight: 25 },
   side: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 15 },
   rule: { width: 1, alignSelf: 'stretch', marginVertical: 6, backgroundColor: Glass.edge },
-});
+}));

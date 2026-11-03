@@ -1,12 +1,12 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState, type ComponentProps } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ReportSheet } from '@/components/report-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { ErrorText, Field, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import type { DmThread } from '@/core/out-riding';
 import type { FriendSuggestion } from '@/core/friends';
 import { reportablePeople } from '@/core/moderation';
@@ -106,11 +106,11 @@ export default function ReportRider() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { gap: 4, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   list: { borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, minHeight: 64, paddingHorizontal: 14, paddingVertical: 10 },
   divider: { borderTopWidth: 1, borderTopColor: Colors.backgroundSelected },
   dot: { width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center' },
   initial: { color: Colors.textSecondary, fontFamily: font(800), fontSize: 16 },
-});
+}));

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { type ReactElement, type ReactNode, useCallback, useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
 import { AppNotices } from '@/components/app-notices';
 import { BadgeStrip } from '@/components/badge-strip';
@@ -23,7 +23,7 @@ import { Showcase } from '@/components/showcase';
 import { ROW_ACTION_HINT, SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { flagOn } from '@/core/app-settings';
 import type { MyBadges } from '@/core/badges';
 import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
@@ -513,7 +513,7 @@ function Block({ title, right, children }: { title: string; right?: ReactNode; c
 const roleLabel = (role: RideMember['role']) =>
   ({ organizer: 'You Organize', co_organizer: 'Co-Organizer', leader: 'You Lead', sweep: 'Tail Gunner', rider: 'Going' })[role];
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Spacing.one },
   logo: { width: 66, height: 52 },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
@@ -529,4 +529,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, padding: 14, borderLeftWidth: 4, borderLeftColor: Colors.sky,
     backgroundColor: Home.panel,
   },
-});
+}));

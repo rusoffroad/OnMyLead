@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { RiderDot } from '@/components/convoy';
 import { ProLock } from '@/components/pro-gate';
 import { ThemedText } from '@/components/themed-text';
 import { PollCard, PollComposer } from '@/components/ride-poll';
 import { Button, Card, Choice, ErrorText, Field, Tag } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import {
   checkMessage, isLeaderOnly, isResolved, MAX_MESSAGE_LENGTH, SEND_STATE_LABEL,
   type ChatMessage, type MessageAudience, type MessageKind, type PendingMessage, type SendState,
@@ -316,10 +316,10 @@ export function RideChat({
 }
 
 const BADGE_COLOR: Record<SendState, string> = {
-  sending: Colors.textSecondary,
-  sent: RideColors.green,
-  failed: Colors.danger,
-  queued: RideColors.yellow,
+  get sending() { return Colors.textSecondary; },
+  get sent() { return RideColors.green; },
+  get failed() { return Colors.danger; },
+  get queued() { return RideColors.yellow; },
 };
 
 /** Sending…, ✓ Sent, ! Not Sent or Waiting for Signal, next to a message. */
@@ -338,10 +338,10 @@ export function SendBadge({ state, iconOnly = false }: { state: SendState; iconO
   );
 }
 
-const chatStyles = StyleSheet.create({
+const chatStyles = themedStyles(() => ({
   more: { minWidth: 36, minHeight: 28, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center' },
   moreText: { color: Colors.textSecondary, fontFamily: font(800), fontSize: 14, letterSpacing: 1 },
   actions: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.one },
   badgeIcon: { fontFamily: font(800), fontSize: 13 },
   badgeText: { fontFamily: font(700), fontSize: 13 },
-});
+}));

@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { AdminColors, toneColor, type Tone } from './tokens';
 
 export type ConfirmOptions = {
@@ -136,7 +136,7 @@ function ConfirmDialog({ options: o, onClose }: { options: ConfirmOptions; onClo
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   scrim: { position: 'fixed' as 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(3,8,16,0.78)', alignItems: 'center', justifyContent: 'center', padding: 16, zIndex: 50 },
   dialog: { width: '100%', maxWidth: 460, backgroundColor: AdminColors.panel, borderRadius: 18, borderWidth: 1, borderColor: AdminColors.line, padding: 22, gap: 14 },
   title: { fontFamily: font(800, 'display'), fontSize: 28, lineHeight: 30, color: AdminColors.text },
@@ -151,4 +151,4 @@ const styles = StyleSheet.create({
   toasts: { position: 'fixed' as 'absolute', bottom: 20, left: 0, right: 0, alignItems: 'center', gap: 8, zIndex: 60 },
   toast: { backgroundColor: AdminColors.raised, borderRadius: 12, borderLeftWidth: 4, paddingHorizontal: 16, paddingVertical: 12, maxWidth: 480, marginHorizontal: 16 },
   toastText: { fontFamily: font(600), fontSize: 14.5, color: AdminColors.text },
-});
+}));

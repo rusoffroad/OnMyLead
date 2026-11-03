@@ -4,7 +4,7 @@ import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
@@ -16,7 +16,7 @@ import { MapSearch } from '@/components/map-search';
 import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
-import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
 import { riderHeading } from '@/core/heading';
 import { useFollowMe } from '@/hooks/use-follow-me';
@@ -1010,7 +1010,7 @@ function MeasurePanel({
 
 const glass = GlassSurface;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   flex: { flex: 1 },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: Spacing.two, zIndex: 30 },
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
@@ -1069,4 +1069,4 @@ const styles = StyleSheet.create({
   day: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   dayLine: { width: 14, height: 3, borderRadius: 2 },
   dayText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12 },
-});
+}));

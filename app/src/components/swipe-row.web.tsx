@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, useWindowDimensions, View } from 'react-native';
 
-import { font, Spacing } from '@/constants/theme';
+import { font, Spacing, themedStyles } from '@/constants/theme';
 import { ROW_ACTION_LABEL, type RowAction } from '@/core/row-swipe';
 import { useTheme } from '@/hooks/use-theme';
 import { Icon } from './icon';
@@ -60,7 +60,7 @@ export function SwipeRow({ action, onAction, children }: { action: RowAction; on
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', alignItems: 'center', paddingRight: Spacing.three },
   action: {
     minWidth: 44,
@@ -75,4 +75,4 @@ const styles = StyleSheet.create({
     cursor: 'pointer',
   } as object,
   label: { fontSize: 14, lineHeight: 18, fontFamily: font(600) },
-});
+}));

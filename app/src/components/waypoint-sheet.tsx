@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TimePicker } from '@/components/time-picker';
@@ -10,7 +10,7 @@ import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field } from '@/components/ui';
 import { StopSign, WaypointBlaze, WaypointGlyph } from '@/components/waypoint-blaze';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import {
   canEditWaypoint, canRemoveWaypoint, moveStop, parseStopTime, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber,
@@ -355,8 +355,8 @@ function AudienceChoice({
   );
 }
 
-const styles = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+const styles = themedStyles(() => ({
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     flexShrink: 1, backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
@@ -385,4 +385,4 @@ const styles = StyleSheet.create({
   privateNote: { flexDirection: 'row', gap: 10, alignItems: 'center', padding: 12, borderRadius: Radius.control, backgroundColor: Colors.backgroundSelected },
   privateText: { flex: 1, color: Colors.textSecondary, fontFamily: font(500), fontSize: 14, lineHeight: 19 },
   tip: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, textAlign: 'center' },
-});
+}));

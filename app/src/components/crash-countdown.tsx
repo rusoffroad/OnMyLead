@@ -1,9 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import { useEffect, useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { COUNTDOWN_S, secondsLeft, type CrashCause } from '@/core/crash-detect';
 import { speak, stopSpeaking } from '@/lib/voice';
 
@@ -85,7 +85,7 @@ export function CrashCountdown({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   page: { flex: 1, backgroundColor: '#3A0A0E', padding: Spacing.four, justifyContent: 'space-between' },
   top: { alignItems: 'center', gap: Spacing.two, paddingTop: Spacing.five },
   title: { color: '#FFFFFF', fontFamily: font(800, 'display'), fontSize: 40, lineHeight: 44, textAlign: 'center' },
@@ -99,4 +99,4 @@ const styles = StyleSheet.create({
   now: { borderRadius: Radius.card, minHeight: 56, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FF8A8F' },
   nowText: { color: '#FFFFFF', fontFamily: font(700, 'display'), fontSize: 20 },
   note: { color: '#FFD9DB', fontFamily: font(500), fontSize: 14, textAlign: 'center' },
-});
+}));
