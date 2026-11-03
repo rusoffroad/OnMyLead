@@ -41,7 +41,7 @@ On **Rides**, with the tablet sideways, **Create a Ride**, **Join a Ride** and *
 :::
 
 :::release 2.0
-On **Rides**, with the tablet sideways, **Join a Ride**, **Create a Ride**, **Find a Ride**, **Map Mode**, your toolkit and help stay on the left, and your rides, group, public rides, feed and badges are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
+On **Rides**, with the tablet sideways, **Join a Ride**, **Create a Ride**, **Find a Ride**, **Events**, **Map Mode**, your toolkit and help stay on the left, and your rides, group, public rides, feed and badges are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
 :::
 
 ## Ride Mode on a Tablet

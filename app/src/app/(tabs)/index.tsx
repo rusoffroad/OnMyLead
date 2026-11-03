@@ -326,8 +326,8 @@ export default function HomeScreen() {
         onCreate={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
         onFind={() => router.push('/find')}
       />
-      {navOn ? <MapModeCard days={trackDays} trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       <EventsCard signedIn={!!session} radius={radius} />
+      {navOn ? <MapModeCard days={trackDays} trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       {!loading && !session ? (
         <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}

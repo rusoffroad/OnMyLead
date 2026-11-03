@@ -80,7 +80,7 @@ export function ActionTiles({
   return (
     <View style={styles.pair}>
       <Tile
-        primary
+        accent
         icon="flag"
         title="Create a Ride"
         detail="You lead. Public or friends only."
@@ -92,7 +92,7 @@ export function ActionTiles({
             disabled={!quota.upgrade}
             hitSlop={8}
             onPress={() => router.push('/pro')}>
-            <Pill text={quota.text} tone={quota.tone === 'pro' ? 'gold' : quota.tone === 'out' ? 'out' : 'onRed'} />
+            <Pill text={quota.text} tone={quota.tone === 'pro' ? 'gold' : quota.tone === 'out' ? 'out' : 'plain'} />
           </Pressable>
         ) : null}
       />
@@ -103,28 +103,31 @@ export function ActionTiles({
   );
 }
 
+/**
+ * One half of the Create / Find pair. Both are the same dark card (Join a Ride above is the one
+ * red card); Create gets red only as an accent: its icon chip and a thin red edge along the top.
+ * Icon, title and detail line up across the pair, and the pill always sits on the card's bottom
+ * edge, so the two cards read as one even row whatever the text wraps to.
+ */
 function Tile({
-  icon, title, detail, onPress, pill, primary,
-}: { icon: IconName; title: string; detail: string; onPress: () => void; pill: React.ReactNode; primary?: boolean }) {
+  icon, title, detail, onPress, pill, accent,
+}: { icon: IconName; title: string; detail: string; onPress: () => void; pill: React.ReactNode; accent?: boolean }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${title}. ${detail}`}
       onPress={onPress}
-      style={({ pressed }) => [styles.tile, !primary && styles.tileDark, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-      {primary ? <Gradient colors={['#F0323A', '#B3161D']} angle="diagonal" radius={22} /> : <Gradient colors={[Home.panel2, Home.panel]} radius={22} />}
-      <View style={styles.tileTop}>
-        <View style={[styles.tileIcon, primary && { backgroundColor: 'rgba(255,255,255,0.16)' }]}>
-          <Icon name={icon} size={22} color="#fff" strokeWidth={2.4} />
-        </View>
+      style={({ pressed }) => [styles.tile, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+      <Gradient colors={[Home.panel2, Home.panel]} radius={22} />
+      {accent ? <View style={styles.accentEdge} /> : null}
+      <View style={[styles.tileIcon, accent && styles.tileIconRed]}>
+        <Icon name={icon} size={22} color={accent ? Colors.accent : '#fff'} strokeWidth={2.4} />
       </View>
-      <View style={{ gap: 6 }}>
-        <View>
-          <Text style={styles.tileTitle}>{title}</Text>
-          <Text style={[styles.tileDetail, primary && { color: 'rgba(255,255,255,0.82)' }]} numberOfLines={2}>{detail}</Text>
-        </View>
-        {pill}
+      <View style={styles.tileBody}>
+        <Text style={styles.tileTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
+        <Text style={styles.tileDetail} numberOfLines={2}>{detail}</Text>
       </View>
+      {pill ? <View style={styles.tilePill}>{pill}</View> : null}
     </Pressable>
   );
 }
@@ -142,11 +145,16 @@ const styles = StyleSheet.create({
   codeGo: { backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 18, minHeight: 44, justifyContent: 'center' },
   codeGoText: { color: '#B3161D', fontFamily: font(700, 'display'), fontSize: 19 },
   scan: { color: 'rgba(255,255,255,0.75)', fontFamily: font(500), fontSize: 13, marginTop: -6 },
-  pair: { flexDirection: 'row', gap: 12 },
-  tile: { flex: 1, minHeight: 150, borderRadius: 22, padding: 16, overflow: 'hidden', justifyContent: 'space-between', gap: Spacing.three },
-  tileDark: { borderWidth: 1, borderColor: Home.line },
-  tileTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  pair: { flexDirection: 'row', alignItems: 'stretch', gap: 12 },
+  tile: {
+    flex: 1, minHeight: 168, borderRadius: 22, padding: 16, overflow: 'hidden', gap: 14,
+    borderWidth: 1, borderColor: Home.line, backgroundColor: Home.panel,
+  },
+  accentEdge: { position: 'absolute', left: 0, right: 0, top: 0, height: 3, backgroundColor: Colors.accent },
   tileIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)' },
-  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 27 },
-  tileDetail: { color: Home.muted, fontFamily: font(500), fontSize: 13, lineHeight: 17, marginTop: 3 },
+  tileIconRed: { backgroundColor: 'rgba(229,38,46,0.14)', borderWidth: 1, borderColor: 'rgba(229,38,46,0.38)' },
+  tileBody: { gap: 4 },
+  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 28 },
+  tileDetail: { color: Home.muted, fontFamily: font(500), fontSize: 13, lineHeight: 17, minHeight: 34 },
+  tilePill: { marginTop: 'auto', flexDirection: 'row' },
 });
