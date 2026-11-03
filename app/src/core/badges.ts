@@ -4,7 +4,8 @@
  * the thresholds in badge_levels() for the progress bars, and works out the rank. The unit test
  * checks the thresholds against that migration so the two can't drift.
  *
- * Honors (Brand Ambassador, migration 20261103700000_brand_ambassador.sql) are the exception: one
+ * Honors (OnMyLead Founder and Brand Ambassador, migrations 20261103700000_brand_ambassador.sql and
+ * 20261103900000_founder_badge.sql) are the exception: one
  * level, never earned by riding, given and taken back only from the Admin Dashboard. They don't
  * count toward a rank, and a rider who holds one shows it beside their name.
  */
@@ -12,7 +13,7 @@
 /** Badges earned by riding, each with Bronze, Silver and Gold. */
 export type EarnedBadgeKey = 'trail_boss' | 'tail_gunner' | 'crew_rider' | 'mile_eater' | 'trailblazer' | 'mapmaker' | 'trail_scout';
 /** Badges OnMyLead gives (one level, stored as level 1). */
-export type HonorKey = 'ambassador';
+export type HonorKey = 'founder' | 'ambassador';
 export type BadgeKey = EarnedBadgeKey | HonorKey;
 export type BadgeLevel = 1 | 2 | 3;
 
@@ -43,10 +44,22 @@ export type HonorDef = {
   name: string;
   /** What it means, in a few words. */
   what: string;
+  /** The Feed line after the rider's name, e.g. "became an OnMyLead Brand Ambassador". */
+  feed: string;
+  /** The share caption after "I" / the rider's name, without the full stop. */
+  share: [mine: string, theirs: string];
 };
 
+/** In display order: the first one a rider holds is the one beside their name. */
 export const HONORS: HonorDef[] = [
-  { key: 'ambassador', name: 'Brand Ambassador', what: 'Given by OnMyLead to the riders who represent it' },
+  {
+    key: 'founder', name: 'OnMyLead Founder', what: 'The rider who started OnMyLead',
+    feed: 'is the OnMyLead Founder', share: ['founded OnMyLead', 'founded OnMyLead'],
+  },
+  {
+    key: 'ambassador', name: 'Brand Ambassador', what: 'Given by OnMyLead to the riders who represent it',
+    feed: 'became an OnMyLead Brand Ambassador', share: ['am an OnMyLead Brand Ambassador', 'is an OnMyLead Brand Ambassador'],
+  },
 ];
 
 export const BADGE_BY_KEY = Object.fromEntries(BADGES.map((b) => [b.key, b])) as Record<EarnedBadgeKey, BadgeDef>;

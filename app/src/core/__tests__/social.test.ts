@@ -110,6 +110,9 @@ describe('sharing to other apps', () => {
     expect(shareSubline(amb)).toBe('Given by OnMyLead');
     expect(shareText(amb, 'L')).toBe('I am an OnMyLead Brand Ambassador.\n\nRide with me on OnMyLead: L');
     expect(shareText({ ...amb, mine: false, actorName: 'Tony' }, 'L')).toMatch(/^Tony is an OnMyLead Brand Ambassador\./);
+    const founder = { ...badge, badge: { badge: 'founder' as const, level: 1 as const } };
+    expect(shareHeadline(founder)).toBe('OnMyLead Founder');
+    expect(shareText(founder, 'L')).toMatch(/^I founded OnMyLead\./);
     expect(shareText({ ...base, mine: true }, 'L')).toBe('Great day\n\nRide with me on OnMyLead: L');
   });
 });

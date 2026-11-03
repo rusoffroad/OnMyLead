@@ -14,7 +14,7 @@ import * as growthApi from '@/lib/admin-growth';
 import { adminRemoveAvatar, useAvatar } from '@/lib/avatars';
 import { RiderPhoto } from '@/components/rider-photo';
 import { BadgePatch } from '@/components/badge-patch';
-import { badgeTitle, isBadgeKey, type BadgeLevel } from '@/core/badges';
+import { badgeTitle, HONORS, isBadgeKey, type BadgeLevel, type HonorDef } from '@/core/badges';
 import { adminRiderSocial } from '@/lib/social';
 
 const STATUS: Record<string, string> = { scheduled: 'Upcoming', live: 'Riding Now', ended: 'Completed', cancelled: 'Cancelled' };
@@ -113,14 +113,15 @@ export default function UserDetail() {
     const endsAt = days > 0 ? new Date(Date.now() + days * 86_400_000).toISOString() : null;
     run('grant', () => admin.grantComp(p.id, endsAt, 'Granted from the Admin Dashboard'), 'Complimentary Pro granted.');
   };
-  const isAmbassador = !!badges.data?.some((b) => b.badge === 'ambassador');
-  const toggleAmbassador = async () => {
-    const r = await confirm(isAmbassador
-      ? { title: `Take Back ${name}'s Brand Ambassador Badge?`, message: 'The badge comes off their profile, the Feed and beside their name. Their Pro and everything else stay as they are.', confirmLabel: 'Take Back Badge', tone: 'danger' }
-      : { title: `Make ${name} a Brand Ambassador?`, message: 'They get the Brand Ambassador badge beside their name and on their profile, and a notification about it. It doesn’t change their plan; give Complimentary Pro separately.', confirmLabel: 'Give Badge' });
+  // Badges OnMyLead gives (Founder, Brand Ambassador): give or take back from here.
+  const toggleHonor = async (h: HonorDef) => {
+    const has = !!badges.data?.some((b) => b.badge === h.key);
+    const r = await confirm(has
+      ? { title: `Take Back ${name}'s ${h.name} Badge?`, message: 'The badge comes off their profile, the Feed and beside their name. Their Pro and everything else stay as they are.', confirmLabel: 'Take Back Badge', tone: 'danger' }
+      : { title: `Give ${name} the ${h.name} Badge?`, message: 'They get the badge beside their name and on their profile, and a notification about it. It doesn’t change their plan; give Complimentary Pro separately.', confirmLabel: 'Give Badge' });
     if (r.ok) {
-      run('ambassador', () => (isAmbassador ? admin.revokeBadge(p.id, 'ambassador') : admin.grantBadge(p.id, 'ambassador')),
-        isAmbassador ? 'Brand Ambassador badge taken back.' : 'Brand Ambassador badge given.').then(badges.reload);
+      run(h.key, () => (has ? admin.revokeBadge(p.id, h.key) : admin.grantBadge(p.id, h.key)),
+        has ? `${h.name} badge taken back.` : `${h.name} badge given.`).then(badges.reload);
     }
   };
   const removePhoto = async () => {
@@ -220,7 +221,7 @@ export default function UserDetail() {
       </Columns>
 
       <Panel title="Badges">
-        {badges.error ? <Text style={styles.note}>Badges aren&apos;t available here until the Brand Ambassador server update is on.</Text> : null}
+        {badges.error ? <Text style={styles.note}>Badges aren&apos;t available here until the badge server update is on.</Text> : null}
         {badges.data ? (
           <>
             <View style={styles.badgeRow}>
@@ -233,10 +234,15 @@ export default function UserDetail() {
               ) : null))}
             </View>
             <View style={styles.actions}>
-              <AdminButton title={isAmbassador ? 'Take Back Brand Ambassador' : 'Make Brand Ambassador'} kind={isAmbassador ? 'danger' : undefined}
-                small onPress={toggleAmbassador} loading={busy === 'ambassador'} />
+              {HONORS.map((h) => {
+                const has = badges.data!.some((b) => b.badge === h.key);
+                return (
+                  <AdminButton key={h.key} title={has ? `Take Back ${h.name}` : `Give ${h.name}`} kind={has ? 'danger' : undefined}
+                    small onPress={() => toggleHonor(h)} loading={busy === h.key} />
+                );
+              })}
             </View>
-            <Text style={styles.note}>Brand Ambassador is the only badge you give. Every other badge is earned by riding and can&apos;t be changed here.</Text>
+            <Text style={styles.note}>OnMyLead Founder and Brand Ambassador are the badges you give. Every other badge is earned by riding and can&apos;t be changed here.</Text>
           </>
         ) : null}
       </Panel>

@@ -6,6 +6,16 @@
     ],
     "kind": "update",
     "by": "pr",
+    "ref": "founder-badge",
+    "why": "New OnMyLead Founder badge (Chris), given the same way as Brand Ambassador. The special badges section now covers both and says what each looks like. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "badges-and-ranks"
+    ],
+    "kind": "update",
+    "by": "pr",
     "ref": "brand-ambassador",
     "why": "New Brand Ambassador badge that OnMyLead gives to the riders in its Ambassador program (Chris). The article explains what it looks like, where it shows and that it doesn't count toward a rank. Comes with the 2.0 update."
   },

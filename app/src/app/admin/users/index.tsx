@@ -9,8 +9,8 @@ import { font } from '@/constants/theme';
 import { fmtAgo, fmtDate, fmtInt } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
 
-// 'ambassador' is listed from the badge itself, not from admin_users.
-type Filter = admin.UserFilter | 'ambassador';
+// Badge holders ('ambassador', 'founder') are listed from the badge itself, not from admin_users.
+type Filter = admin.UserFilter | admin.HonorKey;
 const FILTERS: { value: Filter; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'free', label: 'Free' },
@@ -18,6 +18,7 @@ const FILTERS: { value: Filter; label: string }[] = [
   { value: 'paid', label: 'Paid Pro' },
   { value: 'comp', label: 'Complimentary' },
   { value: 'ambassador', label: 'Brand Ambassadors' },
+  { value: 'founder', label: 'Founders' },
   { value: 'admin', label: 'Admins' },
   { value: 'suspended', label: 'Suspended' },
   { value: 'deletion', label: 'Deletion Requests' },
@@ -30,10 +31,11 @@ export default function Users() {
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<Filter>(FILTERS.some((f) => f.value === params.filter) ? (params.filter as Filter) : 'all');
   const [page, setPage] = useState(0);
-  const ambassadors = filter === 'ambassador';
+  const honor = filter === 'ambassador' || filter === 'founder' ? filter : null;
+  const ambassadors = !!honor;
   const { data, error, loading, reload } = admin.useAdminData(
     () => (ambassadors ? Promise.resolve(null) : admin.users(q, filter as admin.UserFilter, page, PAGE)), [q, filter, page]);
-  const holders = admin.useAdminData(() => (ambassadors ? admin.badgeHolders('ambassador') : Promise.resolve(null)), [ambassadors]);
+  const holders = admin.useAdminData(() => (ambassadors ? admin.badgeHolders(honor!) : Promise.resolve(null)), [honor]);
   const needle = q.trim().toLowerCase();
   const holderRows = (holders.data ?? []).filter((h) => !needle || `${h.display_name ?? ''} ${h.email ?? ''}`.toLowerCase().includes(needle));
   const holderColumns: Column<admin.BadgeHolder>[] = [
@@ -45,7 +47,7 @@ export default function Users() {
         </View>
       ),
     },
-    { key: 'since', title: 'Ambassador Since', width: 150, render: (u) => fmtDate(u.granted_at) },
+    { key: 'since', title: 'Given', width: 150, render: (u) => fmtDate(u.granted_at) },
   ];
 
   const columns: Column<admin.UserRow>[] = [
@@ -84,7 +86,7 @@ export default function Users() {
             {holders.error ? <ErrorNote error={holders.error} onRetry={holders.reload} /> : null}
             <DataTable columns={holderColumns} rows={holderRows} rowKey={(u) => u.user_id} loading={holders.loading}
               onRowPress={(u) => router.push(`/admin/users/${u.user_id}`)}
-              empty={q ? 'No one matches that search.' : 'No Brand Ambassadors yet. Open a rider and choose Make Brand Ambassador.'} />
+              empty={q ? 'No one matches that search.' : `No one has this badge yet. Open a rider and choose Give ${honor === 'founder' ? 'OnMyLead Founder' : 'Brand Ambassador'}.`} />
           </>
         ) : (
           <>

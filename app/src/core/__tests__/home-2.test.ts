@@ -77,6 +77,8 @@ describe('feed', () => {
     expect(feedLine(ride)).toBe('rode Black Bear Pass with 6 riders');
     expect(feedLine(priv)).toBe('finished a ride');
     expect(feedLine(badge)).toBe('earned Trail Boss Gold');
+    expect(feedLine({ ...badge, badge: { badge: 'founder', level: 1 } })).toBe('is the OnMyLead Founder');
+    expect(feedLine({ ...badge, badge: { badge: 'ambassador', level: 1 } })).toBe('became an OnMyLead Brand Ambassador');
     expect(feedLine(out)).toBe('is out riding right now');
     expect(feedLine(outSpot)).toBe('is out riding at Windrock Park');
     expect(feedLine(trail)).toBe('shared a trail, Paint Rock Ridge');
