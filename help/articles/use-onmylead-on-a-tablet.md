@@ -53,7 +53,7 @@ The live map fills the screen.
 - The ride name, your sharing timer and any announcement stay at the top of the left side.
 
 :::release 1.0.4
-Tap **✎ Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
+Tap **Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
 :::
 
 :::release 1.0.3

@@ -3,13 +3,21 @@
     "version": "1.0.4",
     "title": "Accurate Locations, a Notifications Inbox and Easier Leaving",
     "intro": "In Ride Mode you can now type your own message to the group and keep the ones you send often as your own quick replies. Riders whose phone shares a rough location no longer show up miles from the group without anyone knowing why, and OnMyLead helps them fix it. A new bell on the Rides tab keeps the notifications you missed or swiped away, and clears them on your phone too. Leaving a ride takes one tap from anywhere on it. Leave Ride sits at the bottom of every ride page and under Riders in Ride Mode, tells you exactly what happens before you confirm, and stops your location sharing for that ride. Organizers can leave too: pick who takes the ride over and go, instead of cancelling it on everyone. And every map can go Full Map, with one tap on Controls to bring the buttons back. Follow Me keeps Ride Mode and Navigate moving with you as you ride, and your own dot now has the arrow showing which way you're heading. Freeride rides now get Ride Mode's rider line too, with the whole group in order behind the leader and how spread out it is. A new Music button lets you pause, skip and change the volume of your music without leaving Ride Mode or Navigate.",
-    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own messages and quick replies.\n• Ride Mode flags rough locations.\n• Android asks for precise location.\n• Rough locations say Approximate.\n• Notifications bell on the Rides tab.\n• Easier Leave Ride; organizers can hand off.\n• Full Map on every map.\n• Music Controls: pause, skip, volume.\n• Follow Me keeps the map on you; your dot shows your heading.\n• Freeride rides get the rider line.\n• Update Available for new versions.\n• Ride miles fixed.",
+    "whatsNew": "What's new in 1.0.4:\n\n• Ride Mode: type your own messages and quick replies.\n• Ride Mode flags rough locations.\n• Android asks for precise location.\n• Rough locations say Approximate.\n• Notifications bell on the Rides tab.\n• Easier Leave Ride; organizers can hand off.\n• Cleaner Ride Mode; Full Map.\n• Music Controls: pause, skip, volume.\n• Smoother maps; Follow Me; your heading.\n• Freeride rides get the rider line.\n• Update Available for new versions.\n• Ride miles fixed.",
     "apple": null,
     "google": null,
     "notes": [
       {
+        "kind": "improved",
+        "text": "A cleaner, calmer Ride Mode. The map gets the room: the ride name, sharing and the group's state sit in one slim bar, and the buttons sit in one dark panel with three quick replies, More for every status, and Regroup Here beside EMERGENCY. Announcements and alerts are easier to read, and every button gives a light tap you can feel."
+      },
+      {
+        "kind": "improved",
+        "text": "Smoother live map. Rider dots glide to each new position instead of jumping, pins no longer flicker, and Follow Me moves the map in one steady motion. The map layers panel is now Map Style, with a picture of Satellite and Topo."
+      },
+      {
         "kind": "new",
-        "text": "Type your own message in Ride Mode: tap ✎ Message, write a short line like \"Gas stop at the next town\" and tap Send to Everyone. It goes out like a quick reply, with the same Seen by lights and Cancel, and waits for signal if you have none. Check Save as One of My Quick Replies to send it again in one tap next time."
+        "text": "Type your own message in Ride Mode: tap Message, write a short line like \"Gas stop at the next town\" and tap Send to Everyone. It goes out like a quick reply, with the same Seen by lights and Cancel, and waits for signal if you have none. Check Save as One of My Quick Replies to send it again in one tap next time."
       },
       {
         "kind": "new",
@@ -66,6 +74,10 @@
       {
         "kind": "improved",
         "text": "On a Free account, a small gold Pro tag now marks every button that needs Pro, like Import GPX, Record a Trail, offline map downloads and New Group, so you know before you tap. Tap one to see what Pro adds. Pro Trial and Pro riders don't see the tags."
+        },
+        {
+        "kind": "new",
+        "text": "Report a Rider from the You tab. Pick anyone you've messaged, ridden with, added as a friend or blocked, and report them for harassment, threats or anything else. Your messages with them are saved with the report so the OnMyLead team can read what was said, and riders who break the rules can be suspended or banned. They're never told who reported them."
       }
     ]
   },

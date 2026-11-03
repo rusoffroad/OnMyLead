@@ -63,7 +63,8 @@ export function findCount(count: number, radiusMi: number): string | null {
 export type ToolKey = 'out_riding' | 'friends' | 'garage' | 'trips' | 'maps' | 'starlink' | 'battery' | 'share';
 export const TOOLKIT: { key: ToolKey; label: string; href: string }[] = [
   { key: 'out_riding', label: 'Who’s Riding', href: '/out-riding' },
-  { key: 'friends', label: 'Friends', href: '/friends' },
+  // Social (2.0): friends, everyone's activity and comments, and your posts. Friends is its own tab there.
+  { key: 'friends', label: 'Friends & Social', href: '/social' },
   { key: 'garage', label: 'Garage', href: '/garage' },
   { key: 'trips', label: 'Trip Planner', href: '/trips' },
   { key: 'maps', label: 'Offline Maps', href: '/maps' },

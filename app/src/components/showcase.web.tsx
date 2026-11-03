@@ -134,7 +134,7 @@ export function Showcase() {
               shot="live"
               alt="Ride Mode showing every rider in running order on the route line, a Full Map button, a separated rider alert and big status buttons"
               title="Ride Together"
-              text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear. On a Freeride with no mapped route, the line shows the group behind the leader and how spread out it is. On the map, a small arrow on each moving rider’s dot, yours included, shows which way they’re heading, and Ride Bubble warns everyone when someone drops back or stops moving."
+              text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear. On a Freeride with no mapped route, the line shows the group behind the leader and how spread out it is. On the map, a small arrow on each moving rider’s dot, yours included, shows which way they’re heading, and Ride Bubble warns everyone when someone drops back or stops moving. Riders glide smoothly between updates, and the controls sit in one clean panel: three quick replies, More for every status, and EMERGENCY always one tap away."
               points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Type your own message to the group when the buttons don’t cover it, and save the ones you send often', 'Full Map on every map gives you the whole screen, with EMERGENCY one tap away and Controls to bring the buttons back', 'Follow Me keeps the map moving with you as you ride: drag to look around, one tap to follow again']}
             />
             <Step
@@ -317,15 +317,16 @@ export function Showcase() {
               <Feature title="Badges and Ranks">Earn Bronze, Silver and Gold badges for leading rides, riding tail gunner, riding with your crew and racking up miles, plus the trails you share and rate. Your levels add up to a rank from Rookie to Legend, and they’re earned from real GPS tracks, so nobody can fake one.</Feature>
               <Feature title="Out Riding">At a park for the weekend? Switch on Out Riding to see which riders you know are out near you, or anyone nearby who chose the same, and message them. Riders see roughly how far away you are, never where, and it turns itself off.</Feature>
               <Feature title="Your Feed">See what your friends, the leaders you follow and your riding groups have been riding, the badges they earned and the trails they shared, right on Home. Pick whose posts you see and who sees yours, from friends only to nobody.</Feature>
+              <Feature title="Social: Like, Comment and Post">Like any ride, badge, trail or post in your Feed, and open Social to see all your friends’ activity and every comment. Pro riders post ride reports and photos to their profile, comment, and share their rides and badges to Facebook, Instagram or X with one tap. Tap anyone’s picture to see it full size. Your location never goes in a post or a share.</Feature>
               <Feature title="Friends">Add the riders you ride with as friends, or share your friend link. Friends see each other when they’re out riding nearby and can message any time, without ever sharing where they are.</Feature>
-              <Feature title="Profile Pictures">Take a photo or pick one from your library, cropped square. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
+              <Feature title="Profile Pictures">Take a photo or pick one from your library, cropped square and shrunk to a small file. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
               <Feature title="Pick Your Own Code">Give your ride, riding group or friend link a code that’s easy to say at the trailhead, like MOAB-2026. OnMyLead checks as you type that nobody else has it.</Feature>
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for 15 minutes to 8 hours, until an end date up to a year out, or until you turn it off, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
               <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
-              <Feature title="Report or Block Any Rider">Press and hold a message, or tap a rider, to report or block them. A blocked rider’s messages disappear for you and they are never told.</Feature>
+              <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>
             </div>
             <figure className="phone">
               <img src="/showcase/vehicle.webp" alt="A Garage machine called Red Rocket with its fuel range and build list" loading="lazy" width={786} height={1704} />
@@ -562,11 +563,13 @@ const FREE = [
   'Ride Chat and Poll Voting',
   'Draw Routes and Follow Leaders',
   'Map Mode: Offroad Map, Custom Trails, Rate Trails',
+  'Social Feed: See, Like and Read Comments',
   'Ride History: Last 5 Rides',
 ];
 const PRO = [
   'Unlimited Rides',
   'Import GPX Routes',
+  'Post, Comment and Share to Social Media',
   'Record and Share Your Trails',
   'Group Rides on Your Trails',
   'Offline Maps',

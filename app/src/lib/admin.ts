@@ -3,6 +3,8 @@
 // code (aal2) themselves, so nothing here is trusted for access control.
 import { useCallback, useEffect, useState } from 'react';
 
+import type { ReportSource } from '@/core/moderation';
+
 import { supabase } from './supabase';
 
 export type AdminErrorCode = 'not_admin' | 'mfa_required' | 'not_switched_on' | 'failed';
@@ -131,6 +133,23 @@ export type ReportRow = {
   ride_id: string | null; ride_name: string | null; ride_status?: string | null;
   reported_user_id: string | null; reported_name?: string | null;
   reporter_id?: string | null; reporter_name: string | null; reports_on_user?: number;
+  // 2.0 (migration 20261102800000): where it was sent from, the copied conversation and the
+  // reported rider's suspension. Missing until that migration runs.
+  source?: ReportSource | null; group_id?: string | null; group_name?: string | null;
+  messages_copied?: number; reported_banned_until?: string | null;
+  // 2.0 Social (migration 20261102900000): a reported post or comment and its text when reported.
+  post_id?: string | null; comment_id?: string | null; reported_text?: string | null;
+};
+export type ReportMessage = {
+  source: 'dm' | 'group_chat' | 'ride_chat'; source_id: string | null; source_name: string | null;
+  sender_id: string | null; sender_name: string | null; body: string; sent_at: string;
+};
+type ReportedContent = { id: string; body: string | null; created_at: string; hidden_at: string | null; hidden_reason: string | null; hidden_by: string | null; reporters: number };
+export type ReportDetail = ReportRow & {
+  reporters_on_user?: number; messages: ReportMessage[];
+  reported_photo?: string | null;
+  post?: (ReportedContent & { photo_path: string | null }) | null;
+  comment?: (ReportedContent & { item_key: string; owner_name: string }) | null;
 };
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed';
 export type AuditRow = { id: number; actor_id?: string; actor_name?: string | null; action: string; target_type?: string | null; target_id?: string | null; before?: unknown; after?: unknown; created_at: string };
@@ -200,6 +219,8 @@ export const resetRideCode = (id: string, reason: string) => adminRpc<string>('a
 
 export const reports = (status: 'open' | 'resolved' | 'dismissed' | 'all', page: number, pageSize = 50) =>
   adminRpc<Page<ReportRow>>('admin_reports', { p_status: status, p_page: page, p_page_size: pageSize });
+/** One report with its copied conversation. Opening it is written to the audit log. */
+export const report = (id: string) => adminRpc<ReportDetail>('admin_report', { p_id: id });
 export const resolveReport = (id: string, status: ReportStatus, note?: string) =>
   adminRpc<void>('admin_resolve_report', { p_id: id, p_status: status, p_note: note ?? null });
 
@@ -240,7 +261,9 @@ export const revokeGrant = (grantId: string) => adminRpc<void>('admin_revoke_gra
 export const extendTrial = (userId: string, days: number) => adminRpc<void>('admin_extend_trial', { p_user: userId, p_days: days });
 
 // Account actions through the admin-api edge function.
-export const suspendUser = (userId: string, reason: string) => adminFn<{ ok: boolean }>('admin-api', 'suspend', { user_id: userId, reason });
+// days: a timed suspension (1-365) that ends by itself; null bans the account permanently.
+export const suspendUser = (userId: string, reason: string, days: number | null = null, reportId?: string) =>
+  adminFn<{ ok: boolean; banned_until?: string | null }>('admin-api', 'suspend', { user_id: userId, reason, days, report_id: reportId });
 export const reactivateUser = (userId: string) => adminFn<{ ok: boolean }>('admin-api', 'reactivate', { user_id: userId });
 export const deleteUser = (userId: string, reason: string) => adminFn<{ ok: boolean }>('admin-api', 'delete_user', { user_id: userId, reason });
 

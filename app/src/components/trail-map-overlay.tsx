@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Ellipse, Path, Rect } from 'react-native-svg';
 
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Glass, GlassSurface, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_INK, vehicleLabel, type PublicTrail } from '@/core/nav-trails';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type OfflineChoice } from '@/core/offline-maps';
@@ -119,8 +119,8 @@ function LayersPanel({
 }: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string }) {
   return (
     <View style={styles.panel} accessibilityViewIsModal={false}>
-      <Text style={styles.panelTitle}>Map</Text>
-      <View style={styles.bases} accessibilityRole="radiogroup">
+      <Text style={styles.panelTitle}>Map Style</Text>
+      <View style={styles.bases} accessibilityRole="radiogroup" accessibilityLabel="Map style">
         {(['satellite', 'topo'] as BaseMap[]).map((b) => {
           const on = trail.base === b;
           return (
@@ -128,8 +128,12 @@ function LayersPanel({
               key={b}
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
+              accessibilityLabel={b === 'satellite' ? 'Satellite' : 'Topo'}
               onPress={() => trail.setBase(b)}
-              style={[styles.base, on && styles.baseOn]}>
+              style={({ pressed }) => [styles.base, pressed && { opacity: 0.8 }]}>
+              <View style={[styles.baseThumb, on && styles.baseThumbOn]}>
+                <StyleThumb base={b} />
+              </View>
               <Text style={[styles.baseText, on && { color: Colors.text }]}>{b === 'satellite' ? 'Satellite' : 'Topo'}</Text>
             </Pressable>
           );
@@ -144,8 +148,9 @@ function LayersPanel({
         <Switch
           value={trail.trails}
           onValueChange={trail.setTrails}
-          trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }}
+          trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
           thumbColor={Colors.text}
+          {...({ activeThumbColor: Colors.text } as object)}
           ios_backgroundColor={Colors.backgroundSelected}
         />
       </Pressable>
@@ -174,8 +179,9 @@ function LayersPanel({
         <Switch
           value={trail.riderTrailsOn}
           onValueChange={trail.setRiderTrails}
-          trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }}
+          trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
           thumbColor={Colors.text}
+          {...({ activeThumbColor: Colors.text } as object)}
           ios_backgroundColor={Colors.backgroundSelected}
         />
       </Pressable>
@@ -189,6 +195,29 @@ function LayersPanel({
       ) : null}
       {credit ? <Text style={styles.fine}>Map data: {credit}</Text> : null}
     </View>
+  );
+}
+
+/** A small picture of each map style, so the choice is seen rather than read. */
+function StyleThumb({ base }: { base: BaseMap }) {
+  if (base === 'topo') {
+    return (
+      <Svg width="100%" height="100%" viewBox="0 0 100 64" preserveAspectRatio="xMidYMid slice">
+        <Rect width={100} height={64} fill="#E9E3D2" />
+        {[30, 21, 12].map((r) => (
+          <Ellipse key={r} cx={58} cy={30} rx={r * 1.5} ry={r} stroke="#B08D5A" strokeOpacity={0.7} strokeWidth={1.2} fill="none" />
+        ))}
+        <Path d="M8 60 C26 44 44 48 52 30" stroke={TRAIL_INK.closed} strokeWidth={2.4} strokeDasharray="5 3" fill="none" />
+      </Svg>
+    );
+  }
+  return (
+    <Svg width="100%" height="100%" viewBox="0 0 100 64" preserveAspectRatio="xMidYMid slice">
+      <Rect width={100} height={64} fill="#26301F" />
+      <Ellipse cx={30} cy={22} rx={34} ry={20} fill="#3D4A30" />
+      <Ellipse cx={78} cy={50} rx={30} ry={18} fill="#1A2216" />
+      <Path d="M8 60 C26 44 44 48 52 30 S76 12 94 8" stroke={Colors.sky} strokeWidth={3.5} strokeLinecap="round" fill="none" />
+    </Svg>
   );
 }
 
@@ -363,7 +392,7 @@ function LayersIcon({ color }: { color: string }) {
   );
 }
 
-const glass = { backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1, borderColor: Colors.border } as const;
+const glass = GlassSurface;
 
 const styles = StyleSheet.create({
   corner: { position: 'absolute', right: 12, alignItems: 'flex-end', gap: 8, zIndex: 20 },
@@ -373,10 +402,11 @@ const styles = StyleSheet.create({
   hintText: { color: Colors.text, fontFamily: font(600), fontSize: 13 },
   panel: { width: 288, borderRadius: Radius.card, padding: 14, gap: 12, ...glass },
   panelTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20 },
-  bases: { flexDirection: 'row', backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, padding: 3 },
-  base: { flex: 1, minHeight: 36, borderRadius: Radius.control - 3, alignItems: 'center', justifyContent: 'center' },
-  baseOn: { backgroundColor: Colors.backgroundSelected },
-  baseText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 15 },
+  bases: { flexDirection: 'row', gap: 10 },
+  base: { flex: 1, gap: 6, alignItems: 'center' },
+  baseThumb: { width: '100%', height: 64, borderRadius: Radius.control, overflow: 'hidden', borderWidth: 2, borderColor: Glass.edge },
+  baseThumbOn: { borderColor: Colors.sky },
+  baseText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   rowTitle: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   rowSub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },

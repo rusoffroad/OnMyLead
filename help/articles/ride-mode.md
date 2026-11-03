@@ -6,6 +6,9 @@ order: 10
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - app/src/components/ride-controls.tsx
+  - app/src/components/rider-marker.tsx
+  - app/src/core/glide.ts
   - app/src/components/music-controls.tsx
   - app/src/components/leave-ride.tsx
   - app/src/app/ride/[id]/live.tsx
@@ -65,14 +68,21 @@ Your screen stays on while Ride Mode is open, so the map is ready when you glanc
 
 ### The Top Bar
 
+:::until 2.0
 - **‹ Ride name:** tap it to go back to the ride page.
 - **The sharing pill:** shows how long you have left sharing, such as **1h 20m**, or **On** when there's no timer. It says **Off** when you aren't sharing; tap it to start. While you share, tap it to show **Sharing, 1 hr 20 min left** with **Stop** and **Hide**.
+:::
+
+:::release 2.0
+- **‹ (back):** the round button on the left goes back to the ride page.
+- **Ride name and sharing:** under the ride's name a green dot and **Sharing · 1h 20m Left** (or just **Sharing** when there's no timer) show you're sharing. When you aren't, it says **Not Sharing · Tap to Share**; tap it to start. While you share, tap the name to show **Sharing, 1 hr 20 min left** with **Stop** and **Hide**.
+:::
 
 :::release 1.0.1
 If you've turned on [Battery Saver](/help/battery-saver), that banner also names the setting, such as **Sharing, 1 hr 20 min left · Balanced**.
 :::
 
-- **Together** or **2 Separated:** green when the group is together, red with a count when [Ride Bubble](/help/ride-bubble) sees riders who have dropped away. Tap it to open the **Riders** list.
+- **Together** or **2 Separated** (on the right): green when the group is together, red with a count when [Ride Bubble](/help/ride-bubble) sees riders who have dropped away. Tap it to open the **Riders** list.
 
 ### The Map
 
@@ -86,6 +96,10 @@ The leader is the one bigger blue dot, so you can find them at a glance.
 Each rider is a white ring with a dark center and a dark name tag, easy to spot on satellite, topo and the dark map. The leader is the bigger solid blue dot with a blue name tag, so you can find them at a glance. Every dot sits on the rider's exact position and stays there as you zoom in and out.
 
 When a rider is moving, a small white arrow on the edge of their dot points the way they're heading, even when you turn the map. A rider who is stopped, or whose position is only last seen, has no arrow, because a phone can only tell direction while it moves.
+:::
+
+:::release 2.0
+Riders glide smoothly to each new position instead of jumping, and with [Follow Me](/help/follow-me) on, the map moves with you in one steady motion.
 :::
 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
@@ -111,10 +125,23 @@ While you're moving, your own dot has the same white arrow as everyone else's, p
 
 ### The Bottom Panel
 
+:::until 2.0
 The panel at the bottom holds the route strip, alert cards, the quick replies and the status buttons. See [Status Buttons and Quick Replies](/help/status-buttons).
+:::
+
+:::release 2.0
+The panel at the bottom holds, from the top:
+
+- the route strip, with how far along the route you are;
+- an alert row for each rider who has dropped away or called for help, with **Navigate** (and **Regroup** for leaders);
+- three quick replies, **On My Way**, **Need a Minute** and **All Good**, and **More**, which opens every quick reply and status;
+- **Regroup Here** (for organizers and leaders) and **EMERGENCY**.
+
+See [Send a Status or Quick Reply](/help/status-buttons).
+:::
 
 :::release 1.0.4
-Tap **✎ Message** at the top left of the panel to type your own message to the group or send one of your saved quick replies. See [Type Your Own Message](/help/status-buttons).
+Tap **Message** at the top left of the panel to type your own message to the group or send one of your saved quick replies. See [Type Your Own Message](/help/status-buttons).
 :::
 
 Above the panel are two buttons: **Directions** (on the left) for Apple Maps or Google Maps, and **Add Waypoint** (on the right) to mark your spot. You can also press and hold anywhere on the map to drop a waypoint there. See [Get Directions](/help/directions) and [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
@@ -182,7 +209,15 @@ A Freeride has no route, so the line at the bottom of Ride Mode shows the group 
 
 ## Fold the Panel to See More Map
 
-Swipe the bottom panel down, or tap **Hide ▼** on its handle, to fold it away. Swipe up or tap **Buttons ▲** to bring it back. The app remembers your choice.
+:::until 2.0
+Swipe the bottom panel down, or tap **Hide ▼** on its handle, to fold it away.
+:::
+
+:::release 2.0
+Swipe the bottom panel down, or tap the grab bar at its top, to fold it away.
+:::
+
+Swipe up or tap **Buttons ▲** to bring it back. The app remembers your choice.
 
 While the panel is folded:
 
@@ -240,7 +275,15 @@ Status taps and quick replies you make with no service wait on your phone and se
 
 ## Leave Ride Mode
 
-Tap **‹ Ride name** at the top to go back to the ride page. Leaving the screen doesn't stop sharing: your location keeps going to the group until your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
+:::until 2.0
+Tap **‹ Ride name** at the top to go back to the ride page.
+:::
+
+:::release 2.0
+Tap **‹** at the top left to go back to the ride page.
+:::
+
+Leaving the screen doesn't stop sharing: your location keeps going to the group until your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
 
 :::release 1.0.4
 ## Leave the Ride
@@ -248,4 +291,10 @@ Tap **‹ Ride name** at the top to go back to the ride page. Leaving the screen
 Heading home early? Tap **Together** (or **Separated**) at the top to open **Riders**, then tap **Leave Ride** under the list and confirm. On a tablet, **Leave Ride** is at the bottom of the **Riders** sidebar. Your location stops going to the group and you're taken back to the **Rides** tab. The organizer first picks who takes the ride over; see [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
 :::
 
+:::until 2.0
 Opened Ride Mode by tapping a notification? Tap **‹ Ride name** (or Android's Back) to go to **Home**.
+:::
+
+:::release 2.0
+Opened Ride Mode by tapping a notification? Tap **‹** at the top left (or Android's Back) to go to **Home**.
+:::

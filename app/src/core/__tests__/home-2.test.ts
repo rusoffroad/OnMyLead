@@ -107,7 +107,7 @@ describe('feed', () => {
     expect(parseFeedSettings(null)).toEqual(DEFAULT_FEED_SETTINGS);
     expect(parseFeedSettings([{ show_from: 'friends', kinds: ['badge', 'ride', 'bogus'], share_with: 'nobody' }])).toEqual({ showFrom: 'friends', kinds: ['ride', 'badge'], shareWith: 'nobody' });
     expect(parseFeedSettings({ show_from: 'everyone', kinds: 'x', share_with: 'public' })).toEqual(DEFAULT_FEED_SETTINGS);
-    expect(toggleKind(ALL_KINDS, 'badge')).toEqual(['out', 'ride', 'trail', 'group']);
+    expect(toggleKind(ALL_KINDS, 'badge')).toEqual(['post', 'out', 'ride', 'trail', 'group']);
     expect(toggleKind(['group', 'out'], 'ride')).toEqual(['out', 'ride', 'group']);
   });
   it('knows when the server has no feed yet', () => {

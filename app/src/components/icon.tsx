@@ -54,6 +54,11 @@ const PATHS = {
   // A music note, for Music Controls.
   music: ['M9 17.5V5.8l10.5-2.3v11.7', 'M9 9l10.5-2.3', 'M9 17.5a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z', 'M19.5 15.2a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z'],
   battery: ['M3 7.5h15v9H3z', 'M20.5 10.5v3', 'M11.5 9l-2.5 3.2h3L9.5 15'],
+  go: ['M5 12h13', 'M13 6l6 6-6 6'],
+  more: ['M5 12h.01', 'M12 12h.01', 'M19 12h.01'],
+  regroup: ['M12 2.5v3', 'M12 18.5v3', 'M2.5 12h3', 'M18.5 12h3'],
+  layers: ['M12 3.5l9 5-9 5-9-5z', 'M3 13l9 5 9-5'],
+  back: ['M15 5l-7 7 7 7'],
   // Radio waves: riders out riding right now.
   signal: ['M8.5 8.5a5 5 0 0 0 0 7', 'M15.5 8.5a5 5 0 0 1 0 7', 'M5.6 5.6a9 9 0 0 0 0 12.8', 'M18.4 5.6a9 9 0 0 1 0 12.8'],
   help: ['M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9', 'M12 17.2v.3'],
@@ -62,20 +67,25 @@ const PATHS = {
   draw: ['M7 17.5c3.5-.8 3-5.5 6-7.5s3.5-2.6 4.2-3.2'],
   download: ['M3.5 6.5L9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5-5.5 2.5z', 'M12 9.5v6', 'M9.5 13.2L12 15.7l2.5-2.5'],
   trackLine: ['M3.5 18c2.5-4 5-1 7.5-5s4-6 9.5-7'],
+  // Social (2.0): like, share, a photo.
+  heart: ['M12 20s-7.6-4.6-9.1-9.4C1.9 7.4 4.1 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.8 1.1-1.7 2.7-2.8 4.7-2.8 3.2 0 5.4 2.9 4.4 6.1C19.6 15.4 12 20 12 20z'],
+  share: ['M12 3.5v11', 'M8 7.2l4-3.7 4 3.7', 'M7 10.5H5v10h14v-10h-2'],
+  image: ['M3.5 5h17v14h-17z', 'M3.5 16.5l5-5 4 4 2.5-2.5 5.5 5.5'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
 
 /** A small line icon set drawn for OnMyLead, so it renders the same on iOS, Android and the web. */
-export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
+export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fill }: { name: IconName; size?: number; color?: string; strokeWidth?: number; fill?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {PATHS[name].map((d) => (
-        <Path key={d} d={d} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+        <Path key={d} d={d} stroke={color} fill={fill ?? 'none'} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       ))}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'addFriend' ? <Circle cx={10.5} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'regroup' ? <Circle cx={12} cy={12} r={3.5} fill={color} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'locate' ? <Circle cx={12} cy={12} r={6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'people' ? (
         <>
@@ -99,6 +109,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: 
           <Circle cx={19} cy={5.5} r={2} stroke={color} strokeWidth={strokeWidth} />
         </>
       ) : null}
+      {name === 'image' ? <Circle cx={15.5} cy={9} r={1.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'search' ? <Circle cx={10.5} cy={10.5} r={6.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'machine' ? (
         <>

@@ -145,6 +145,7 @@ export function RideRoster({
                 style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
                 <RiderPhoto
                   userId={m.user_id}
+                  name={nameOf(m.user_id)}
                   size={36}
                   fallback={
                     <SocialPhoto
@@ -236,7 +237,7 @@ export function RideRoster({
                       color={Colors.textSecondary}
                       title="Report Rider"
                       caption="Tell the OnMyLead team about a problem. They aren’t told it was you."
-                      onPress={() => setReporting({ kind: 'rider', userId: m.user_id, rideId: ride.id, name: nameOf(m.user_id) })}
+                      onPress={() => setReporting({ kind: 'rider', userId: m.user_id, rideId: ride.id, name: nameOf(m.user_id), source: 'roster' })}
                     />
                   ) : null}
                   {me && m.user_id !== me && !blocks.off ? (

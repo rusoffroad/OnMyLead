@@ -156,7 +156,7 @@ function HandOffSheet({
                   accessibilityRole="button"
                   accessibilityLabel={`Give the ride to ${name} and leave`}
                   style={({ pressed }) => [styles.rider, { opacity: busy ? 0.5 : pressed ? 0.75 : 1 }]}>
-                  <RiderPhoto userId={m.user_id} size={40} fallback={<Initial name={name} lead={m.role === 'leader'} />} />
+                  <RiderPhoto userId={m.user_id} size={40} zoom={false} fallback={<Initial name={name} lead={m.role === 'leader'} />} />
                   <View style={{ flex: 1, gap: 2 }}>
                     <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{name}</ThemedText>
                     {m.role !== 'rider' ? (

@@ -4,8 +4,9 @@ summary: Tell the whole group what's happening with one tap, see who got it, and
 category: ride-mode
 order: 20
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
+  - app/src/components/ride-controls.tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/broadcast-card.tsx
   - app/src/components/rider-status-badge.tsx
@@ -38,7 +39,13 @@ Don't use your phone while you're moving. Pull over first, then tap.
 
 ## Quick Replies
 
+:::until 2.0
 The four blue buttons send a short message to the group. They also show in the ride chat.
+:::
+
+:::release 2.0
+Quick replies send a short message to the group. They also show in the ride chat. **On My Way**, **Need a Minute** and **All Good** sit on the bottom panel. Tap **More** for **Running Late** and every status.
+:::
 
 - **On My Way**
 - **Running Late**
@@ -50,7 +57,7 @@ The four blue buttons send a short message to the group. They also show in the r
 
 Need to say something the buttons don't cover, like "Gas stop at the next town"? Pull over first, then:
 
-1. Tap **✎ Message** at the top left of the bottom panel (across from **⤢ Full Map**).
+1. Tap **Message** at the top left of the bottom panel (across from **Full Map**).
 2. Type your message. It's one line of up to 120 characters, and the counter shows how many are left.
 3. Tap **Send to Everyone**, or the send key on your keyboard.
 
@@ -62,14 +69,22 @@ To put the keyboard away without sending, tap **Done** above it on iPhone and iP
 
 ### My Quick Replies
 
-Check **Save as One of My Quick Replies** before you send, and the message is kept on this phone or tablet. Next time, tap **✎ Message** and tap it under **My Quick Replies** to send it in one tap. You can keep up to 6; saving a seventh drops the oldest. Tap **Edit**, then a reply, to remove it. Saved replies stay on the device you saved them on.
+Check **Save as One of My Quick Replies** before you send, and the message is kept on this phone or tablet. Next time, tap **Message** and tap it under **My Quick Replies** to send it in one tap. You can keep up to 6; saving a seventh drops the oldest. Tap **Edit**, then a reply, to remove it. Saved replies stay on the device you saved them on.
 
 On a tablet the message sheet opens as a card in the middle of the screen.
 :::
 
 ## Status Buttons
 
+:::until 2.0
 The grid below sets your status for the group:
+:::
+
+:::release 2.0
+Tap **More** on the bottom panel to open **Tell the Group**. It has every quick reply, then your status, in two groups: **On the Move** (**OK** and **Stopped**) and **Trouble** (**Need Fuel**, **Mechanical Issue**, **Flat Tire**, **Stuck**, **Lost** and **Need Help**). **Regroup Here** (for organizers and leaders) and **EMERGENCY** are at the bottom. Tap one to send it; the sheet closes so you see the **Sending** card. Swipe the sheet down or tap **Done** to close it without sending.
+
+The statuses:
+:::
 
 - **OK**
 - **Stopped**
@@ -136,9 +151,17 @@ While your status is anything other than OK, a card on your screen says **Your S
 
 ## Regroup at My Location
 
+:::until 2.0
 Organizers, co-organizers and leaders see a **Regroup at My Location** button above the quick replies. Tap it to set a regroup point where you are.
 
 - Everyone on the ride sees a yellow pin on the map and a yellow banner, **Regroup point set. Tap to navigate**, and hears "Regroup point set."
+:::
+
+:::release 2.0
+Organizers, co-organizers and leaders see a white **Regroup Here** button at the bottom of the panel, next to **EMERGENCY** (it's also in **More**). Tap it to set a regroup point where you are.
+
+- Everyone on the ride sees a yellow pin on the map and an amber-edged banner, **Regroup point set. Tap to navigate**, and hears "Regroup point set."
+:::
 - Tapping the banner opens directions to the regroup point.
 - Setting a new regroup point replaces the old one.
 

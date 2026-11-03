@@ -19,11 +19,17 @@
 // Direct messages ({"type":"direct_message"}) come from push_batch_dm (migration
 // 20261101700000_out_riding.sql), which itself skips riders who blocked the sender. Friend requests
 // and accepted requests ({"type":"friend_request"} / {"type":"friend_accept"}) come from
-// push_batch_friends (migration 20261101800000_friends.sql).
+// push_batch_friends (migration 20261101800000_friends.sql). Likes and comments on the Feed
+// ({"type":"feed_like"} / {"type":"feed_comment"}) come from push_batch_feed (migration
+// 20261102900000_social_hub.sql), which skips riders who blocked the other rider.
 // Chat pushes skip riders who blocked the sender (blockersOf, migration
 // 20261020000000_blocked_riders.sql); status taps such as Need Help and EMERGENCY never do.
 //
 // email_batch() does the same for the emails, which go out through Resend.
+//
+// A new report about a rider or a ride ({"type":"report","id":"..."}, migration
+// 20261102800000_abuse_reports.sql) sends no push: it emails the owner at REPORTS_TO (or CONTACT_TO)
+// with report_email(). The email never holds the reported messages, only a link to the dashboard.
 //
 // iOS goes straight to Apple (APNs) with a token-based key. Android goes through Firebase Cloud
 // Messaging (_shared/fcm.ts), Google's own push service, which every Android push has to use.
@@ -38,6 +44,7 @@
 //          FCM_SERVICE_ACCOUNT   Firebase service account JSON key for Android pushes (_shared/fcm.ts)
 //          RESEND_API_KEY        Resend API key; without it no emails are sent
 //          EMAIL_FROM            OnMyLead <rides@onmylead.com> (default); the domain must be verified in Resend
+//          REPORTS_TO            optional, where report emails go; CONTACT_TO (the contact form's) otherwise
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -48,6 +55,7 @@ const ACCOUNT_EVENTS = new Set(['trial', 'badge', 'trail_hidden']);
 const GROUP_EVENTS = new Set(['group_message']);
 const DM_EVENTS = new Set(['direct_message']);
 const FRIEND_EVENTS = new Set(['friend_request', 'friend_accept']);
+const FEED_EVENTS = new Set(['feed_like', 'feed_comment']);
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -70,6 +78,7 @@ Deno.serve(async (req) => {
   const input: any = await req.json().catch(() => ({}));
   const event = typeof input?.message_id === 'string' ? { type: 'message', id: input.message_id } : input;
   if (typeof event?.type !== 'string') return new Response('event required', { status: 400 });
+  if (event.type === 'report') return Response.json(await sendReportEmail(event));
 
   const [push, email] = await Promise.all([sendPushes(event), sendEmails(event)]);
   if ('error' in push) return new Response(push.error, { status: 500 });
@@ -84,7 +93,11 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
       ? 'push_batch_social'
       : GROUP_EVENTS.has(event.type)
         ? 'push_batch_group'
-        : DM_EVENTS.has(event.type) ? 'push_batch_dm' : FRIEND_EVENTS.has(event.type) ? 'push_batch_friends' : 'push_batch';
+        : DM_EVENTS.has(event.type)
+          ? 'push_batch_dm'
+          : FRIEND_EVENTS.has(event.type)
+            ? 'push_batch_friends'
+            : FEED_EVENTS.has(event.type) ? 'push_batch_feed' : 'push_batch';
   const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 
@@ -223,6 +236,55 @@ async function sendEmails(event: any): Promise<{ emailed?: number; email_note?: 
   return { emailed };
 }
 
+type ReportEmail = {
+  id: string; kind: 'ride' | 'rider'; reason: string; details: string | null; source: string | null; created_at: string;
+  reporter_name: string | null; reported_name: string | null; ride_name: string | null; group_name: string | null;
+  reports_on_user: number; reporters_on_user: number; messages_copied: number;
+};
+
+/** A new report: one email to the owner. Never fails loudly; the report is already saved. */
+// deno-lint-ignore no-explicit-any
+async function sendReportEmail(event: any): Promise<{ emailed: number; email_note?: string }> {
+  const key = env('RESEND_API_KEY');
+  const to = (env('REPORTS_TO') || env('CONTACT_TO')).split(',').map((s) => s.trim()).filter(Boolean);
+  if (!key || !to.length) return { emailed: 0, email_note: 'email not configured' };
+  if (typeof event.id !== 'string') return { emailed: 0, email_note: 'id required' };
+  const { data, error } = await db.rpc('report_email', { p_id: event.id });
+  if (error || !data) return { emailed: 0, email_note: error?.message ?? 'report not found' };
+  const from = env('EMAIL_FROM') || 'OnMyLead <rides@onmylead.com>';
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+    body: JSON.stringify({ from, to, ...reportEmail(data as ReportEmail) }),
+  }).catch(() => null);
+  return res?.ok ? { emailed: 1 } : { emailed: 0, email_note: `Resend said ${res?.status ?? 'nothing'}` };
+}
+
+const REPORT_SOURCES: Record<string, string> = {
+  dm: 'Direct Messages', group_chat: 'Riding group chat', ride_chat: 'Ride chat', ride: 'Ride page',
+  roster: 'Ride’s Going list', out_riding: 'Out Riding', you: 'You > Report a Rider',
+};
+
+export function reportEmail(r: ReportEmail): { subject: string; text: string; html: string } {
+  const who = r.kind === 'rider' ? r.reported_name || 'a rider' : r.ride_name || 'a ride';
+  const where = [r.source ? REPORT_SOURCES[r.source] ?? r.source : null, r.group_name, r.kind === 'rider' ? r.ride_name : null]
+    .filter(Boolean).join(', ');
+  const lines = [
+    `${r.reporter_name || 'A rider'} reported ${who} for ${r.reason}.`,
+    ...(where ? [`Where: ${where}.`] : []),
+    ...(r.kind === 'rider' && r.reports_on_user > 1
+      ? [`${r.reported_name || 'This rider'} has ${r.reports_on_user} reports from ${r.reporters_on_user} ${r.reporters_on_user === 1 ? 'rider' : 'different riders'}.`]
+      : []),
+    ...(r.details ? [`Their note: “${r.details.slice(0, 600)}”`] : []),
+    r.messages_copied > 0
+      ? `${r.messages_copied} messages between them were saved with the report. Read them in the Admin Dashboard; they are not in this email.`
+      : 'Review it in the Admin Dashboard.',
+  ];
+  const footer = 'You’re getting this because you are the OnMyLead admin. Every report also shows on the Admin Dashboard’s Reports page.';
+  return darkEmail(`New report: ${r.reason} (${who})`, `${r.kind === 'rider' ? 'A rider' : 'A ride'} was reported for ${r.reason}`, lines, footer,
+    { label: 'Review in Admin', url: `https://onmylead.com/admin/reports/${r.id}` });
+}
+
 /** The email itself: plain words, dark like the app. */
 export function cancelEmail(r: Email): { subject: string; text: string; html: string } {
   const when = r.meet_local ? `, planned for ${r.meet_local}` : '';
@@ -245,7 +307,10 @@ export function accountEmail(r: AccountEmail): { subject: string; text: string; 
   return darkEmail(r.subject, r.subject, lines, footer);
 }
 
-function darkEmail(subject: string, heading: string, lines: string[], footer: string): { subject: string; text: string; html: string } {
+function darkEmail(
+  subject: string, heading: string, lines: string[], footer: string,
+  link: { label: string; url: string } = { label: 'Open OnMyLead', url: 'https://onmylead.com' },
+): { subject: string; text: string; html: string } {
   const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const html = `<!doctype html><html><body style="margin:0;background:#0A1626;padding:32px 16px;font-family:-apple-system,Helvetica,Arial,sans-serif">
 <table role="presentation" width="100%" style="max-width:520px;margin:0 auto;background:#12223A;border-radius:16px;border-top:4px solid #E5262E">
@@ -253,13 +318,13 @@ function darkEmail(subject: string, heading: string, lines: string[], footer: st
 <p style="margin:0 0 4px;color:#3B86F7;font-weight:700">OnMyLead</p>
 <h1 style="margin:0 0 20px;color:#F1F4F8;font-size:24px;line-height:30px">${esc(heading)}</h1>
 ${lines.map((l) => `<p style="margin:0 0 14px">${esc(l)}</p>`).join('\n')}
-<p style="margin:24px 0 0"><a href="https://onmylead.com" style="color:#3B86F7;font-weight:700;text-decoration:none">Open OnMyLead</a></p>
+<p style="margin:24px 0 0"><a href="${esc(link.url)}" style="color:#3B86F7;font-weight:700;text-decoration:none">${esc(link.label)}</a></p>
 </td></tr></table>
 <p style="max-width:520px;margin:16px auto 0;color:#97A7BE;font-size:12px;line-height:18px">${esc(footer)}</p>
 </body></html>`;
   return {
     subject,
-    text: `${lines.join('\n\n')}\n\nOpen OnMyLead: https://onmylead.com\n\n${footer}\n`,
+    text: `${lines.join('\n\n')}\n\n${link.label}: ${link.url}\n\n${footer}\n`,
     html,
   };
 }

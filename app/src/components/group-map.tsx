@@ -4,13 +4,14 @@ import MapView, { Marker, type Region } from 'react-native-maps';
 
 import { Colors, RideColors } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
+import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
 import { cameraCenterFor, fitInset, isFarOut, openMapCenter, rideViewCorners } from '@/core/map-center';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
-import { RiderPin } from './rider-pin';
+import { RiderMarker } from './rider-marker';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { StopPin, WaypointPin } from './waypoint-blaze';
@@ -90,7 +91,8 @@ export function GroupMap({
   // How far the map is turned from north, so heading arrows stay true on a rotated map.
   const [mapHeading, setMapHeading] = useState(0);
   const readHeading = () => {
-    map.current?.getCamera().then((c) => setMapHeading(Math.round(c.heading ?? 0))).catch(() => {});
+    // In 5-degree steps: a turn smaller than that doesn't change the arrows, so the pins stay put.
+    map.current?.getCamera().then((c) => setMapHeading(Math.round((c.heading ?? 0) / 5) * 5 % 360)).catch(() => {});
   };
 
   // Center the map on a point in the open map; far out over a state or the world, zoom in too.
@@ -138,11 +140,22 @@ export function GroupMap({
     followRef.current = follow;
   }, [follow]);
   const followed = useRef<LatLng | null>(null);
+  const everyMs = useRef(locationEveryMs);
+  useEffect(() => {
+    everyMs.current = locationEveryMs;
+  }, [locationEveryMs]);
+  // One press handler for every rider pin, so a new handler each render doesn't redraw them all.
+  const pressRider = useRef(onPressRider);
+  useEffect(() => {
+    pressRider.current = onPressRider;
+  }, [onPressRider]);
+  const onRiderPress = useCallback((id: string) => pressRider.current?.(id), []);
   const own = useOwnLocation(useCallback((f: LatLng) => {
     const fl = followRef.current;
     if (!fl || !followCamShouldMove(followed.current, f)) return;
     followed.current = { lat: f.lat, lng: f.lng };
-    centerMap(f, fl.inset, { duration: 600 });
+    // As long as the phone takes to report the next spot, so the map moves in one steady glide.
+    centerMap(f, fl.inset, { duration: followCamDurationMs(everyMs.current) });
   }, [centerMap]));
   // Follow Me just came on (or back on): go to the rider at once rather than at their next step.
   const followOn = !!follow;
@@ -229,16 +242,7 @@ export function GroupMap({
       {riders
         .filter((r) => r.lat != null && r.lng != null && r.id !== meId)
         .map((r) => (
-          <Marker
-            key={r.id}
-            coordinate={{ latitude: r.lat!, longitude: r.lng! }}
-            title={r.name}
-            description={r.detail}
-            anchor={{ x: 0.5, y: 0.5 }}
-            onPress={() => onPressRider?.(r.id)}
-            zIndex={r.breakdown ? 6 : r.role === 'leader' ? 5 : 4}>
-            <RiderPin rider={r} mapHeading={mapHeading} />
-          </Marker>
+          <RiderMarker key={r.id} rider={r} mapHeading={mapHeading} onPress={onRiderPress} />
         ))}
       <OwnHeadingMarker own={own} mapHeading={mapHeading} />
       {regroup ? (

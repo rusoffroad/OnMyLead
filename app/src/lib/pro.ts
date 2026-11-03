@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
 import { can, parseProError, type FeatureKey } from '@/core/entitlements';
+import type { ReportSource } from '@/core/moderation';
 import { canStartTrip, localToday, type ProBlock } from '@/core/pro';
 import { myTrips } from './api';
 import { track } from './analytics';
@@ -79,14 +80,24 @@ export async function requireTripSlot(): Promise<boolean> {
 // ---- Reports ----
 
 /** File a report for the owner to look at. Reporters never see reports again (insert only). */
-export async function sendReport(r: { kind: 'ride' | 'rider'; rideId?: string | null; userId?: string | null; reason: string; details?: string }) {
-  const { error } = await supabase.from('reports').insert({
+export async function sendReport(r: {
+  kind: 'ride' | 'rider'; rideId?: string | null; userId?: string | null; reason: string; details?: string;
+  source?: ReportSource | null; groupId?: string | null;
+}) {
+  const row = {
     kind: r.kind,
     ride_id: r.rideId ?? null,
     reported_user_id: r.kind === 'rider' ? r.userId : null,
     reason: r.reason,
     details: r.details?.trim() ? r.details.trim().slice(0, 1000) : null,
-  });
+  };
+  // source and group_id arrive with the 2.0 server update (20261102800000); until then the report
+  // is sent without them, as before.
+  const extra = { ...(r.source ? { source: r.source } : {}), ...(r.groupId ? { group_id: r.groupId } : {}) };
+  let { error } = await supabase.from('reports').insert({ ...row, ...extra });
+  if (error && Object.keys(extra).length && (error.code === 'PGRST204' || error.code === '42703' || /source|group_id/.test(error.message))) {
+    ({ error } = await supabase.from('reports').insert(row));
+  }
   if (error) {
     if (/report_limit/.test(error.message)) throw new Error('You’ve sent a lot of reports in the last hour. Try again later.');
     if (error.code === '42P01' || error.code === 'PGRST205' || /schema cache|does not exist/.test(error.message)) throw new Error('Reports are not switched on yet. They start working with the next server update.');
