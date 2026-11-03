@@ -6,6 +6,7 @@ order: 15
 release: "2.0"
 updated: 2026-11-03
 sources:
+  - app/src/app/leaderboard.tsx
   - app/src/components/home/events-card.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/home/**
@@ -109,6 +110,10 @@ Your choices are saved to your account, so they're the same on every phone, tabl
 ## Your Badges
 
 Your rank and all seven badge patches. Tap **See All** (or the patches) for your progress. See [Earn Badges and Ranks](/help/badges-and-ranks).
+
+:::release 2.1
+Tap **Leaderboard** beside **Your Badges** to see where you rank against other riders, everywhere or in your country and state. See [See the Badge Leaderboard](/help/badge-leaderboard).
+:::
 
 ## Your Toolkit
 
