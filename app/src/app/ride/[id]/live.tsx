@@ -44,6 +44,7 @@ import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-came
 import { RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
 import { isVerticalSwipe } from '@/core/panel-swipe';
 import { riderHeading } from '@/core/heading';
+import { positionsFilter, rosterKey } from '@/core/live-costs';
 import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
 import { mapPanelWidth, sidebarWidth } from '@/core/layout';
@@ -287,10 +288,13 @@ export default function RideMode() {
   // Who is on the ride right now, for the live position handler (a rider not in it joined since).
   const memberIds = useRef<Set<string>>(new Set());
   const rosterGate = useRef(new RosterGate());
+  // The same riders as a stable key: the live position listener restarts only when it changes.
+  const [memberKey, setMemberKey] = useState('');
   const apply = useCallback((d: RideSnapshot) => {
     setRide(d.ride);
     routeMiles.current = d.ride?.route_miles;
     memberIds.current = new Set(d.members.filter((m) => m.status === 'joined').map((m) => m.user_id));
+    setMemberKey(rosterKey(memberIds.current));
     setMembers(d.members);
     setRegroup(d.regroup);
     setStatuses(d.statuses);
@@ -379,14 +383,6 @@ export default function RideMode() {
   // Live updates, with polling as a fallback for flaky connections.
   useEffect(() => {
     const channel = newChannel(`ride-${id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'positions_latest' }, (payload) => {
-        heard();
-        setPositions((prev) => applyPositionChange(prev, payload as unknown as PositionChange<Position>));
-        // A position from someone not on the list yet: they joined after it loaded, so reload it
-        // now and their dot appears, instead of waiting for the poll.
-        const userId = (payload.new as Partial<Position> | null)?.user_id;
-        if (userId && rosterGate.current.shouldReload(userId, memberIds.current.has(userId), Date.now())) refresh();
-      })
       // A rider joined, left or was removed: reload the list (and everyone's positions) at once.
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ride_members', filter: `ride_id=eq.${id}` }, () => refresh())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
@@ -425,6 +421,27 @@ export default function RideMode() {
       clearInterval(tick);
     };
   }, [id, refresh, loadRoute, loadShare, heard, refreshSec]);
+
+  // Live positions of this ride's riders only. Listening to the whole table made the server check
+  // every rider's update against every open map (core/live-costs). The listener restarts when the
+  // roster changes; a new rider's first dot also arrives with the roster reload.
+  useEffect(() => {
+    const opts = positionsFilter(memberKey ? memberKey.split(',') : []);
+    if (!opts) return;
+    const channel = newChannel(`ride-positions-${id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'positions_latest', ...opts }, (payload) => {
+        heard();
+        setPositions((prev) => applyPositionChange(prev, payload as unknown as PositionChange<Position>));
+        // Only reached without a filter (a ride over Realtime's limit): a position from someone not
+        // on the list yet means they joined after it loaded, so reload it now.
+        const userId = (payload.new as Partial<Position> | null)?.user_id;
+        if (userId && rosterGate.current.shouldReload(userId, memberIds.current.has(userId), Date.now())) refresh();
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, memberKey, heard, refresh]);
 
   // A share is live only until its timer runs out or the ride ends (the server enforces the same).
   const rideOver = ride?.status === 'ended' || ride?.status === 'cancelled';
