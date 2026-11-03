@@ -186,6 +186,9 @@ export function nearestOsmTrail(p: LatLng, trails: OsmTrail[], maxM: number): Tr
     surface: best.t.surface ? best.t.surface.charAt(0).toUpperCase() + best.t.surface.slice(1) : null,
     attribution: OSM_ATTRIBUTION,
     closure: closed ? { label: 'No Public Access', detail: 'OpenStreetMap marks this track closed or private.' } : null,
+    widthLimitIn: null,
+    lineKey: null,
+    at: p,
   };
 }
 
