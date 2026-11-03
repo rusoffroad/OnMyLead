@@ -300,6 +300,9 @@ export default function You() {
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/terms')}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Terms</ThemedText>
         </Pressable>
+        <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/rider-agreement')}>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Safety Agreement</ThemedText>
+        </Pressable>
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/privacy')}>
           <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Privacy</ThemedText>
         </Pressable>
@@ -406,7 +409,7 @@ const styles = StyleSheet.create({
   initial: { color: '#fff', fontFamily: font(800), fontSize: 20 },
   name: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 32, lineHeight: 36 },
   signedOut: { gap: Spacing.two, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
-  legal: { flexDirection: 'row', justifyContent: 'center', gap: Spacing.four },
+  legal: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: Spacing.four, rowGap: Spacing.two },
   legalLink: { fontSize: 13, textDecorationLine: 'underline' },
   deleteButton: { borderColor: Colors.danger },
   deleteNote: { gap: 4, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },

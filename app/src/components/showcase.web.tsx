@@ -20,7 +20,7 @@ import { useSocialProviders } from '@/lib/session';
  */
 const TABLETS_LIVE = true;
 
-type Route = '/sign-in' | '/ride/new' | '/terms' | '/privacy' | '/support' | '/contact';
+type Route = '/sign-in' | '/ride/new' | '/terms' | '/rider-agreement' | '/privacy' | '/support' | '/contact';
 
 export function Showcase() {
   // Only the sign-in choices that are switched on, so the page never promises one that isn't.
@@ -376,6 +376,7 @@ export function Showcase() {
         </p>
         <nav aria-label="Legal and account">
           <a href="/terms" onClick={go('/terms')}>Terms of Use</a>
+          <a href="/rider-agreement" onClick={go('/rider-agreement')}>Rider Safety Agreement</a>
           <a href="/privacy" onClick={go('/privacy')}>Privacy Policy</a>
           <a href="/help">Help Center</a>
           <a href="/help/release-notes">Release Notes</a>

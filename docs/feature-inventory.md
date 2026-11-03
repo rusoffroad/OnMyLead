@@ -48,7 +48,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   leader messages, ride changes, new riders, reminders, ride invites, group chat, leaders you
   follow, trial reminders), cancellation emails, message preview, quiet hours.
 - Directions app choice (Ask Each Time / Apple Maps / Google Maps; Google only on Android).
-- Subscription, Blocked Riders, Report a Bug (1.0.1: screenshot + app activity log), Contact Us, Help and Support, Terms, Privacy, Admin Dashboard link
+- Subscription, Blocked Riders, Report a Bug (1.0.1: screenshot + app activity log), Contact Us, Help and Support, Terms, Safety Agreement (2.0), Privacy, Admin Dashboard link
   (admins).
 
 ### Rides: Create, Manage, Organize
@@ -177,7 +177,8 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 ### Website (onmylead.com)
 - Showcase home (live group-map hero, features, Free vs Pro, promo film), Get the App.
 - Ride and group link previews, family link, web ride creation and route setup, sign-in.
-- Contact form, Support, Terms, Privacy; Help Center at /help.
+- Contact form, Support, Terms, Rider Safety Agreement (/rider-agreement, asked after sign-in from 2.0), Privacy; Help Center at /help.
+- Before You Ride (2.0): every rider agrees to the Rider Safety and Liability Agreement on first launch (all devices) and again when it changes; Admin > Rider Agreements lists and exports the permanent records.
 
 ### Admin Dashboard (onmylead.com/admin)
 - Overview, Signups and Downloads (real riders without test and admin accounts, marking test

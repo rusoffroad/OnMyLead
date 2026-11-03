@@ -88,6 +88,12 @@ Only when you stop it. Sharing with chosen riders or a family link set to **Unti
 
 No. Positions only update when a phone has a connection. [Offline maps](/help/offline-maps) keep the map and route on your screen, and riders without service show where they were last seen.
 
+:::release 2.0
+## Why Does the App Ask Me to Agree to a Safety Agreement?
+
+Riding is risky, and OnMyLead can't keep you safe on its own. Before you use the app, you agree that you ride at your own risk, won't use your phone while moving, and only ride where it's allowed. You're asked once, and again only if the agreement changes. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement).
+:::
+
 ## Can I Use OnMyLead on an iPad or Android Phone?
 
 Yes. OnMyLead is in the App Store for iPhone and iPad, and on Google Play for Android phones and tablets. On a tablet the map fills the screen, see [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet). You can also plan a ride on the website at onmylead.com, see [Create a Ride on the Website](/help/create-a-ride-on-the-website).

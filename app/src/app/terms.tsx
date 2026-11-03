@@ -5,7 +5,7 @@ export default function Terms() {
   return (
     <LegalPage
       title="Terms of Use"
-      updated="October 13, 2026"
+      updated="November 3, 2026"
       intro={`These terms cover your use of the OnMyLead app and onmylead.com, made by ${COMPANY} ("we"). By making an account or using the app, you agree to them.`}
       sections={[
         {
@@ -14,6 +14,7 @@ export default function Terms() {
             'OnMyLead helps a group keep track of each other. It is not an emergency service, a navigation system you can rely on, or a substitute for your own judgment. Phones lose signal, batteries die and positions can be late or wrong.',
             'Ride within your skill and your machine’s limits, follow the law and land-use rules where you ride, and carry what you need to get yourself home. In an emergency, contact emergency services directly.',
             'Never type or read the screen while driving or riding. Ride Mode is built for one-tap use when you are stopped.',
+            'Before you use OnMyLead, you agree to the Rider Safety and Liability Agreement (on the You tab under Safety Agreement, and at onmylead.com/rider-agreement). It is part of these terms: you ride at your own risk, you are responsible for what you do while using the app, and you release us from liability as it describes.',
           ],
         },
         {
