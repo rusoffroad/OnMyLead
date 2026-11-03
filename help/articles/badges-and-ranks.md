@@ -42,7 +42,7 @@ Leading counts when you are the ride's leader as it ends: the organizer, or the 
 - **Trail Boss**, **Tail Gunner** and **Crew Rider** also need at least two riders with a track, so a ride you end on your own doesn't count toward them. Your miles on it still do.
 - Miles come from your own track, with GPS jumps and time stopped left out, the same way as the ride summary.
 
-:::release 1.0.4
+:::release 2.0
 Rough locations, GPS bounces and time with your location off are left out of your miles too, the same as the ride summary.
 :::
 - No signal on the trail? Your track uploads when your phone gets service again, and the ride counts then.

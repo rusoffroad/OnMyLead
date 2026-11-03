@@ -23,7 +23,7 @@ export type TrackPoint = LatLng & {
   t: number;
   speedMps: number | null;
   altitudeM: number | null;
-  /** Horizontal accuracy the phone reported, meters. Null on points stored before 1.0.4. */
+  /** Horizontal accuracy the phone reported, meters. Null on points stored before 2.0. */
   accuracyM?: number | null;
 };
 

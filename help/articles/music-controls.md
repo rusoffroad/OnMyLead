@@ -3,7 +3,7 @@ title: Control Your Music While You Ride
 summary: Play, pause, skip songs and change the volume of the music on your phone from Ride Mode and Navigate, without leaving OnMyLead.
 category: ride-mode
 order: 45
-release: "1.0.4"
+release: "2.0"
 updated: 2026-11-03
 sources:
   - app/src/components/music-controls.tsx

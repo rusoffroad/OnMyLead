@@ -253,7 +253,7 @@ export function Showcase() {
 
         <section className="qr" aria-labelledby="nav-title">
           <figure className="phone qr-phone">
-            <img src="/showcase/navigate.webp" alt="Navigate on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Measure tabs, and speed and elevation" loading="lazy" width={786} height={1704} />
+            <img src="/showcase/navigate.webp" alt="Map Mode on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Measure tabs, and speed and elevation" loading="lazy" width={786} height={1704} />
           </figure>
           <div className="qr-copy">
             <h2 id="nav-title" className="section-title">Map Mode When It’s Just You</h2>

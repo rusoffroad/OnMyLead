@@ -56,7 +56,7 @@ A live ride doesn't end by itself. Remember to tap **End Ride for Everyone** whe
 
 If you can't make it, give the ride to another rider who has joined. Open **Riders**, tap their name and tap **Give Them the Ride**. They become the organizer and leader, and you stay on the ride as a rider. You can't undo this yourself. See [Leader, Sweep and Tail Gunner](/help/leader-sweep-and-tail-gunner).
 
-:::release 1.0.4
+:::release 2.0
 Or tap **Leave Ride** at the bottom of the ride page: pick who takes over under **Who Takes Over?** and tap **Give Ride and Leave**. They run the ride and you're off it.
 :::
 

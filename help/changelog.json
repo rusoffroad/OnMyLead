@@ -2,6 +2,63 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-2.0",
+    "why": "The website showcase's Map Mode picture now says Map Mode in its description (it said Navigate). Nothing riders do on the website changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "accurate-location",
+      "approvals-and-waitlist",
+      "badges-and-ranks",
+      "battery-saver",
+      "find-a-ride",
+      "follow-me",
+      "full-map",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "music-controls",
+      "navigation-mode",
+      "notification-settings",
+      "notifications-inbox",
+      "organizer-controls",
+      "privacy",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "status-buttons",
+      "troubleshooting",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-2.0",
+    "why": "Chris named the next release 2.0 instead of 1.0.4. Guides written for it now say 2.0 and publish when the stores release 2.0. Battery Saver and Fix Common Problems cite lib/location.ts, where only a code comment changed; riders see no difference."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "profile-picture",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-1.0.4",
+    "why": "Version bump to 1.0.4 (iOS build 8, Android versionCode 8). These guides cite app/app.json; nothing riders do changed, so the text stays. 1.0.4's new guides publish once the stores release it."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "starlink"
     ],
     "kind": "update",

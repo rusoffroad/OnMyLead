@@ -57,7 +57,7 @@ At the top of the map are three tabs: **Explore**, **Record** and **Measure**. S
 At the bottom of the map are three tabs: **Explore**, **Record** and **Draw**. Swipe the panel down to see more of the map, and up to bring it back.
 :::
 
-:::release 1.0.4
+:::release 2.0
 For the whole screen, tap **Full Map** on the panel's grab bar. A slim bar keeps your speed (or the miles left on a trail you're following, or the length you're measuring, with **Undo**), a red **Rec** while you record, and **Center on Me** stays. Tap **Controls**, or swipe the bar up, to bring everything back. See [Full Map](/help/full-map).
 :::
 
@@ -71,13 +71,13 @@ On a tablet, the panel sits beside the map in landscape, and floats over the cor
 
 ### The Map Follows You
 
-:::until 1.0.4
+:::until 2.0
 While you record a trail, or follow a trail you're on or near, the map moves with you so your dot stays in view. Tapping **Center on Me** also makes the map follow you. The button turns white while the map is following.
 
 To look around, drag or pinch the map. It stops following until you tap **Center on Me** again. The map also holds still while the **Measure** tab is open, and when you jump to a place with search.
 :::
 
-:::release 1.0.4
+:::release 2.0
 With **Follow Me** on (it is unless you turn it off), the map moves with you so your dot stays in view, and while you're moving your dot has a white arrow pointing the way you're heading. The **Follow Me** button sits just left of **Center on Me** and shows **Following**.
 
 To look around, drag or pinch the map. It pauses (the button shows **Paused**) until you tap it or **Center on Me** again. The map also holds still while the **Measure** tab is open, and when you jump to a place with search. Tap **Following** to turn Follow Me off; the map then stays where you put it, even while you record. See [Follow Me on the Map](/help/follow-me).
@@ -245,7 +245,7 @@ This is a Pro feature. See [Free and Pro](/help/free-vs-pro).
 
 See [Create a Ride](/help/create-a-ride) and [Draw a Route](/help/route-builder).
 
-:::release 1.0.4
+:::release 2.0
 ## Control Your Music
 
 The round **Music** button above **Center on Me** pauses, skips and changes the volume of the music on your phone. See [Control Your Music While You Ride](/help/music-controls).
