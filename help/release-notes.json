@@ -154,6 +154,10 @@
       {
         "kind": "improved",
         "text": "A new look for the OnMyLead logo, with RUS Offroad bigger and to the right of OnMyLead."
+      },
+      {
+        "kind": "fixed",
+        "text": "Map Mode could open zoomed out over the whole state, with Zoom In to See Trails, when your phone didn't have your location yet (most often on Android right after starting the phone). It now moves to you as soon as your location comes in, unless you've already moved the map yourself."
       }
     ]
   },
