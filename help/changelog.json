@@ -52,6 +52,135 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "status-buttons",
+      "home-screen",
+      "ride-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Chris asked for a Beverage Break quick reply in Ride Mode (under More, with the other quick replies), and for the Map Mode card to look like the Join, Create and Find buttons in a colour that pops: it's now a blue card right under Create and Find. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "group-chat",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "privacy",
+      "ride-chat",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Checked against the Map Mode card move and the Beverage Break quick reply: only the Map Mode card's colour and place on Home changed, and quick replies gained Beverage Break (a short message like the others). Joining, creating and finding rides, chat, notifications, privacy and the rest work the same; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "navigation-mode",
+      "getting-started",
+      "home-screen",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Chris asked to make Map Mode more visible. A blue Map Mode button now sits in the middle of the tab bar (under Find on tablets and the website menu), so the offroad map is one tap from any tab, and the Home card's button reads Open Map Mode. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Checked against the Map Mode button change: the showcase only gained a few words in Map Mode's text. Creating a ride on the website works the same; no change to this article."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride",
+      "delete-account",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "faq",
+      "find-a-ride",
+      "fuel-range",
+      "import-gpx",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "organizer-controls",
+      "privacy",
+      "ride-mode",
+      "route-builder"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "family-link-crypto",
+    "why": "Fixed Share My Location's family link on iPhone, iPad and Android: it showed \"Property 'crypto' doesn't exist\" and made no link. The steps riders follow are unchanged, so these articles were checked and only their dates bumped. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "map-layers",
+      "garage",
+      "create-a-ride",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "trail-widths",
+    "why": "Trails now show width limits (Chris): Forest Service trails open only to 50\" machines show 50\" Width Limit, riders can add a width to any public trail, Garage machines take a width so cards say whether they fit, and planning a ride on a trail carries the limit into the ride's instructions. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "delete-account",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "faq",
+      "find-a-ride",
+      "free-vs-pro",
+      "fuel-range",
+      "full-map",
+      "import-gpx",
+      "invite-riders",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "offline-maps",
+      "organizer-controls",
+      "place-search",
+      "privacy",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "getting-started"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "trail-widths",
+    "why": "Checked against the trail width change: these articles share code with it (the trail card, the onmylead.com showcase, Create a Ride, the Garage vehicle save in lib/api.ts) but riders see nothing different in them. Width limits are described in Map Layers and Trails, Garage, Map Mode and Create a Ride. No change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "waypoints-and-planned-stops"
     ],
     "kind": "update",

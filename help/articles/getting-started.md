@@ -55,9 +55,17 @@ New accounts start with a free Pro Trial. See [The Pro Trial](/help/pro-trial).
 
 ## Find Your Way Around
 
+:::until 2.0
 Four tabs run along the bottom of the screen.
 
 On a tablet they run down the left edge instead. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+:::
+
+:::release 2.0
+Four tabs run along the bottom of the screen: **Rides**, **Find**, **Groups** and **You**. In the middle, the blue **Map Mode** button opens your offroad map from any tab. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
+
+On a tablet they run down the left edge instead, with **Map Mode** under **Find**. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+:::
 
 ### Rides
 
@@ -81,7 +89,7 @@ Your home screen.
 :::release 2.0
 - **Join a Ride** is the big red card at the top: type the invite code and tap **Join**. Joining is always free and unlimited.
 - **Create a Ride** shows how many rides you have left this month on Free, or **Unlimited** on Pro. **Find a Ride** shows how many public rides are near you.
-- **Map Mode**: your offroad map, **Map a Custom Trail** and the **Track Line** switch.
+- **Map Mode**: **Open Map Mode**, **Map a Custom Trail** and the **Track Line** switch.
 - **Your Next Ride**, **Ride Invites** and **Past Rides**; **Your Group**; **Public Rides Near You**; your **Feed**; **Your Badges**; **Your Toolkit**; and **Help & Support**.
 - **The bell** and your picture at the top right open your notifications and the **You** tab.
 
@@ -156,6 +164,9 @@ Some things also work at onmylead.com in a web browser:
 - Open a ride with its invite code.
 - Send us a message with **Contact Us**.
 - On a computer, once you're signed in, **Rides**, **Find**, **Groups** and **You** run down the left side of the page.
+:::release 2.0
+- **Map Mode** sits in the same menu, under **Find**.
+:::
 - Read these guides: click **Help** at the top of the home page, on a computer or a phone.
 
 Ride Mode and live tracking stay in the app on your phone or tablet.

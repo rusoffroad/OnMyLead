@@ -44,13 +44,16 @@ The four blue buttons send a short message to the group. They also show in the r
 :::
 
 :::release 2.0
-Quick replies send a short message to the group. They also show in the ride chat. **On My Way**, **Need a Minute** and **All Good** sit on the bottom panel. Tap **More** for **Running Late** and every status.
+Quick replies send a short message to the group. They also show in the ride chat. **On My Way**, **Need a Minute** and **All Good** sit on the bottom panel. Tap **More** for **Running Late**, **Beverage Break** and every status.
 :::
 
 - **On My Way**
 - **Running Late**
 - **Need a Minute**
 - **All Good**
+:::release 2.0
+- **Beverage Break**
+:::
 
 :::release 2.0
 ## Type Your Own Message

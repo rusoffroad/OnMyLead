@@ -13,6 +13,9 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
 import { RateTrailSheet } from './rate-trail-sheet';
+import { RigFitLine, TrailWidthRow } from './trail-width-row';
+import { inches } from '@/core/trail-width';
+import { useGarageWidths } from '@/lib/trail-width';
 import { StarScore } from './stars';
 import { ProTag } from '@/components/pro-tag';
 
@@ -292,6 +295,7 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
         </View>
       ) : null}
       <Text style={styles.facts}>{facts.join('   ')}</Text>
+      <TrailWidthRow key={`${info.source}|${info.lineKey ?? info.title}|${info.at?.lat}|${info.at?.lng}`} info={info} />
       {info.allowed.length ? (
         <View style={styles.allowed}>
           <Text style={styles.allowedLabel}>{info.seasonal ? 'Open To, by Season' : 'Open To'}</Text>
@@ -331,7 +335,10 @@ function LegendLine({ color, label, dashed, closed, dotted }: { color: string; l
  * dotted line), who mapped it and when, its ratings, and offers Rate, Navigate and Details.
  */
 export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrail; onClose: () => void; onRate: () => void; onFollow: () => void }) {
-  const facts = [feetOrMiles(t.lengthM), t.vehicles.map(vehicleLabel).join(', ')].filter(Boolean).join('   ');
+  const facts = [feetOrMiles(t.lengthM), t.maxWidthIn != null ? `${inches(t.maxWidthIn)} Width Limit` : null, t.vehicles.map(vehicleLabel).join(', ')]
+    .filter(Boolean)
+    .join('   ');
+  const garage = useGarageWidths();
   return (
     <View style={[styles.card, styles.riderCard]} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
@@ -356,6 +363,7 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
         </View>
         <Text style={[styles.facts, { flex: 1 }]} numberOfLines={2}>{facts}</Text>
       </View>
+      <RigFitLine limitIn={t.maxWidthIn} garage={garage} />
       <View style={styles.scores}>
         <View style={styles.scoreCol}>
           <Text style={styles.scoreLabel}>Quality</Text>
