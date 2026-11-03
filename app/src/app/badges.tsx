@@ -2,7 +2,7 @@ import { Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Text, useWindowDimensions, View } from 'react-native';
 
-import { AMBASSADOR_COLORS, BadgePatch, PATCH_COLORS } from '@/components/badge-patch';
+import { AMBASSADOR_COLORS, BadgePatch, FOUNDER_COLORS, PATCH_COLORS } from '@/components/badge-patch';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
@@ -103,8 +103,8 @@ export default function BadgesScreen() {
       <ThemedText type="small" themeColor="textSecondary" style={{ maxWidth: 640 }}>
         A ride counts once it ends, for riders whose own location track covers at least half a mile. Leading, tail gunning and
         group rides need at least two riders with a track. Badges are earned on the server from what you really ride, so they
-        can’t be added by hand. Brand Ambassador is the one exception: OnMyLead gives it to riders who represent the app, and it
-        doesn’t count toward your rank.
+        can’t be added by hand. OnMyLead Founder and Brand Ambassador are the exceptions: OnMyLead gives them, and they
+        don’t count toward your rank.
       </ThemedText>
     </Screen>
   );
@@ -140,7 +140,7 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
 /** An honor OnMyLead gave you (Brand Ambassador): the big blue patch, above your rank. */
 function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
   return (
-    <View style={[styles.honor, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${h.name}${fresh ? ', new' : ''}. ${h.what}.`}>
+    <View style={[styles.honor, { borderColor: h.key === 'founder' ? FOUNDER_COLORS.cloth : AMBASSADOR_COLORS.cloth }, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${h.name}${fresh ? ', new' : ''}. ${h.what}.`}>
       <BadgePatch badge={h.key} level={1} size={88} />
       <View style={{ flex: 1, gap: 4 }}>
         <View style={[styles.titleRow, { alignItems: 'flex-start' }]}>

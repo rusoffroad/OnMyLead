@@ -7,6 +7,7 @@ release: "1.0.3"
 updated: 2026-11-03
 sources:
   - supabase/migrations/20261103700000_brand_ambassador.sql
+  - supabase/migrations/20261103900000_founder_badge.sql
   - app/src/components/badge-strip.tsx
   - supabase/migrations/20261102200000_ride_miles_cleanup.sql
   - app/src/app/badges.tsx
@@ -18,7 +19,7 @@ sources:
   - app/src/components/ride-roster.tsx
   - supabase/migrations/20261101500000_rider_badges.sql
 related: [ride-name-and-profile, leader-sweep-and-tail-gunner, ride-summary-and-ride-again, notification-settings]
-keywords: [badges, brand ambassador, ambassador, rank, ranking, achievements, levels, trail boss, tail gunner, crew rider, mile eater, trailblazer, mapmaker, trail scout, expert leader, legend]
+keywords: [badges, brand ambassador, ambassador, founder, rank, ranking, achievements, levels, trail boss, tail gunner, crew rider, mile eater, trailblazer, mapmaker, trail scout, expert leader, legend]
 ---
 
 Badges show what you have done on OnMyLead. Each badge has three levels, **Bronze**, **Silver** and **Gold**, and the levels you earn add up to your rank.
@@ -52,13 +53,18 @@ Rough locations, GPS bounces and time with your location off are left out of you
 Badges are worked out by OnMyLead's server from what you really ride, so nobody can add one by hand. Once you earn a badge, you keep it.
 
 :::release 2.0
-## Brand Ambassador
+## Brand Ambassador and OnMyLead Founder
 
-**Brand Ambassador** is a special badge that OnMyLead gives to the riders who represent the app. It's a blue patch with the OnMyLead mountains and red arrow, and it has no Bronze, Silver or Gold. You can't earn it by riding, and it doesn't count toward your rank.
+OnMyLead gives two special badges. They have no Bronze, Silver or Gold, you can't earn them by riding, and they don't count toward your rank.
 
-If you're a Brand Ambassador:
+| Badge | Who has it | Looks like |
+|---|---|---|
+| **OnMyLead Founder** | The rider who started OnMyLead | A red patch with a flag planted on a summit |
+| **Brand Ambassador** | Riders who represent OnMyLead | A blue patch with the OnMyLead mountains and red arrow |
 
-- You get a notification, **You're an OnMyLead Brand Ambassador**.
+If OnMyLead gives you one:
+
+- You get a notification, for example **You're an OnMyLead Brand Ambassador**.
 - It shows at the top of **Badges** and first in the badge row on the **You** tab.
 - It shows beside your name instead of your top riding badge, and on the Feed and your profile.
 :::

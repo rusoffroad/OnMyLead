@@ -1,4 +1,4 @@
--- Brand Ambassador (migration 20261103700000_brand_ambassador.sql): only an admin with the
+-- Brand Ambassador and OnMyLead Founder (migrations 20261103700000 and 20261103900000): only an admin with the
 -- authenticator code can give or take it back, riders can't add it themselves, riding never earns
 -- it, and the push text for earned badges is unchanged. Runs after admin_test.sql and
 -- badges_test.sql (run_local.sh), which set up as_user, expect_refused, as_admin_session and the riders.
@@ -94,4 +94,27 @@ do $$ begin
   if exists (select 1 from rider_badges where user_id = '00000000-0000-0000-0000-0000000007a1' and badge = 'ambassador') then raise exception 'FAIL: still held'; end if;
   if not exists (select 1 from admin_audit_log where action = 'badge.revoke') then raise exception 'FAIL: revoke not audited'; end if;
 end $$;
+select set_config('request.jwt.claims', '', false), set_config('request.jwt.claim.sub', '', false);
+
+-- OnMyLead Founder (migration 20261103900000_founder_badge.sql): the same rules as Brand Ambassador.
+do $$ begin
+  perform as_admin_session('00000000-0000-0000-0000-00000000ad01', 'aal2');
+  if not admin_grant_badge('00000000-0000-0000-0000-00000000ad01', 'founder') then raise exception 'FAIL: founder grant'; end if;
+  if admin_grant_badge('00000000-0000-0000-0000-00000000ad01', 'founder') then raise exception 'FAIL: founder second grant'; end if;
+  if not admin_user_badges('00000000-0000-0000-0000-00000000ad01') @> '[{"badge":"founder","level":1}]' then raise exception 'FAIL: founder user badges'; end if;
+  if jsonb_array_length(admin_badge_holders('founder')) <> 1 then raise exception 'FAIL: founder holders'; end if;
+  begin
+    insert into rider_badges (user_id, badge, level) values ('00000000-0000-0000-0000-0000000007b1', 'founder', 3);
+    raise exception 'FAIL: founder level 3';
+  exception when check_violation then null;
+  end;
+  if (select title from badge_push_text('founder', 1, 1)) <> 'You''re the OnMyLead Founder' then raise exception 'FAIL: founder push title'; end if;
+  if (select title from badge_push_text('ambassador', 1, 1)) <> 'You''re an OnMyLead Brand Ambassador' then raise exception 'FAIL: ambassador push title after founder'; end if;
+  if (select title from badge_push_text('mile_eater', 3, 1)) <> 'New Badge: Mile Eater Gold' then raise exception 'FAIL: earned push title after founder'; end if;
+  if not admin_revoke_badge('00000000-0000-0000-0000-00000000ad01', 'founder') then raise exception 'FAIL: founder revoke'; end if;
+end $$;
+select as_user('00000000-0000-0000-0000-0000000007a1');
+set role authenticated;
+select expect_refused($q$insert into rider_badges (user_id, badge, level) values (auth.uid(), 'founder', 1)$q$, 'typed in Founder');
+reset role;
 select set_config('request.jwt.claims', '', false), set_config('request.jwt.claim.sub', '', false);

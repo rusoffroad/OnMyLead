@@ -3,7 +3,7 @@
  * Social area, rider profiles and sharing to other apps. This file turns the server's rows into
  * what the screens say and holds the limits, so they're tested without a phone.
  */
-import { badgeTitle, isHonor } from './badges';
+import { badgeTitle, HONOR_BY_KEY, isHonor } from './badges';
 import { feedLine, feedStat, parseFeed, type FeedItem } from './feed';
 import { METERS_PER_MILE } from './geo';
 
@@ -297,7 +297,7 @@ export function shareText(item: FeedItem & { body?: string | null; mine: boolean
     }
     case 'badge':
       text = item.badge && isHonor(item.badge.badge)
-        ? `${who} ${item.mine ? 'am' : 'is'} an OnMyLead ${shareHeadline(item)}.`
+        ? `${who} ${HONOR_BY_KEY[item.badge.badge].share[item.mine ? 0 : 1]}.`
         : `${who} earned the ${shareHeadline(item)} badge.`;
       break;
     case 'trail':
