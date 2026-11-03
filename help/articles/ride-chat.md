@@ -30,7 +30,7 @@ Every ride has its own chat for the riders on it. Use it to plan before the ride
 Don't type while driving or riding. In Ride Mode, use the one-tap quick replies instead. See [Send a Status or Quick Reply](/help/status-buttons).
 :::
 
-:::release 1.0.4
+:::release 2.0
 In Ride Mode you can also tap **✎ Message** to send the group a short message of your own, or one of your saved quick replies, once you've pulled over. See [Type Your Own Message](/help/status-buttons).
 :::
 
@@ -80,7 +80,7 @@ Only the person who sent a message can clear it or mark it resolved.
 
 Quick replies sent from Ride Mode, like **On My Way**, also show in the ride chat in italics.
 
-:::release 1.0.4
+:::release 2.0
 So do messages typed in Ride Mode with **✎ Message**.
 :::
 

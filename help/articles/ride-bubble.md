@@ -30,7 +30,7 @@ A rider turns yellow or red when:
 
 Only riders who are sharing their location are part of Ride Bubble. A rider who isn't sharing can't be measured.
 
-:::release 1.0.4
+:::release 2.0
 A rider whose phone shares only an approximate location (Precise Location turned off) can show up a mile or more from where they are. Ride Bubble leaves out the distance their rough location could be off by, so a rider beside you isn't called separated. See [Make Your Location Accurate](/help/accurate-location).
 :::
 

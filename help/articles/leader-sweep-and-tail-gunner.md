@@ -70,7 +70,7 @@ The organizer can hand the entire ride to another rider, for example if you can'
 
 They become the organizer and the leader. You stay on the ride as a rider and can't undo this yourself.
 
-:::release 1.0.4
+:::release 2.0
 ## Leave a Ride You Organize
 
 Can't make it? You don't have to cancel the ride on everyone.

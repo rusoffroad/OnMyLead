@@ -28,10 +28,10 @@
       "released": "2026-11-02"
     },
     {
-      "version": "1.0.4",
+      "version": "2.0",
       "build": "8",
       "status": "building",
-      "notes": "Everything through PR #171 (notifications inbox, accurate location, Leave Ride hand-off, Full Map, Follow Me, Freeride rider line, Ride Mode messages, Update Available, Music Controls, ride miles fix). Android versionCode 8. Commit recorded when the Mac submits."
+      "notes": "Everything through PR #171 (notifications inbox, accurate location, Leave Ride hand-off, Full Map, Follow Me, Freeride rider line, Ride Mode messages, Update Available, Music Controls, ride miles fix). Android versionCode 8. Named 2.0 by Chris (was planned as 1.0.4). Commit recorded when the Mac submits."
     }
   ],
   "unreleased": [

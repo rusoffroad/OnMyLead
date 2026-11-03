@@ -45,7 +45,7 @@ The four blue buttons send a short message to the group. They also show in the r
 - **Need a Minute**
 - **All Good**
 
-:::release 1.0.4
+:::release 2.0
 ## Type Your Own Message
 
 Need to say something the buttons don't cover, like "Gas stop at the next town"? Pull over first, then:
@@ -87,11 +87,11 @@ The grid below sets your status for the group:
 In [Full Map](/help/ride-mode), the quick replies and status buttons are tucked away and only **EMERGENCY** stays on screen.
 :::
 
-:::until 1.0.4
+:::until 2.0
 Tap **Menus ▲** to bring the rest back.
 :::
 
-:::release 1.0.4
+:::release 2.0
 Tap **Controls**, or swipe the bar up, to bring the rest back.
 :::
 

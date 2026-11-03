@@ -45,7 +45,7 @@ Once you've joined a ride, the other riders on it can see:
 
 - That you're on the ride, your role, and whether you've checked in.
 - Your messages in the ride chat, except leader-only messages, which only you and the leader can read.
-- Your status taps and quick replies from Ride Mode (and, from 1.0.4, messages you type there). A status tap carries your phone's location at the moment you tapped it.
+- Your status taps and quick replies from Ride Mode (and, from 2.0, messages you type there). A status tap carries your phone's location at the moment you tapped it.
 - Your live location, but only while you're sharing with the ride.
 
 ## Your Live Location
@@ -91,7 +91,7 @@ OnMyLead doesn't sell your data or use it for advertising. It shares data only w
 
 On Android, Google delivers notifications (Firebase Cloud Messaging), handles purchases (Google Play) and draws the map (Google Maps).
 
-:::release 1.0.4
+:::release 2.0
 [Music Controls](/help/music-controls) read what's playing only on your phone. On Android, the optional Notification Access is used only to see the song and the app playing it; OnMyLead never reads or keeps your notifications.
 :::
 

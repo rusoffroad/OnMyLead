@@ -27,7 +27,7 @@ You decide what OnMyLead tells you about. Every change saves as soon as you make
 1. Go to the **You** tab.
 2. Under **Settings**, tap **Notifications**. The line under it sums up your settings, like **Everything on** or **2 turned off**.
 
-:::release 1.0.4
+:::release 2.0
 You can also tap the bell at the top of the **Rides** tab, then **Notification Settings** at the bottom of the list.
 :::
 
@@ -44,7 +44,7 @@ Everything below starts on.
 - **Rider Status**: status buttons and quick replies from Ride Mode, like **On My Way**, **Need Fuel** and **Flat Tire**, and when a rider cancels one.
 - **Announcements**: what the organizer tells the whole group.
 
-:::release 1.0.4
+:::release 2.0
 Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status** setting too.
 :::
 
@@ -96,7 +96,7 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 - A trail of yours being hidden opens **My Trails**.
 :::
 
-:::release 1.0.4
+:::release 2.0
 Notifications you've missed or swiped away are kept under the bell on the **Rides** tab for 30 days. See [See and Clear Your Notifications](/help/notifications-inbox).
 :::
 

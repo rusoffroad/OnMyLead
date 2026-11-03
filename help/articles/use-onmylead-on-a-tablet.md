@@ -46,7 +46,7 @@ The live map fills the screen.
 - **Directions** and **Add Waypoint** sit just above the buttons panel.
 - The ride name, your sharing timer and any announcement stay at the top of the left side.
 
-:::release 1.0.4
+:::release 2.0
 Tap **✎ Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
 :::
 
@@ -57,7 +57,7 @@ On a tablet, Ride Mode's pop-up cards (Share Your Location, **EMERGENCY**) and s
 :::release 1.0.2
 The round target button at the bottom of the map, just left of the buttons panel, centers the map on you. See [Use Ride Mode](/help/ride-mode).
 
-:::release 1.0.4
+:::release 2.0
 **Follow Me** sits just left of that button and keeps the map moving with you as you ride. Drag the map to look around and it pauses; tap **Paused** to follow you again. See [Follow Me on the Map](/help/follow-me).
 :::
 :::
@@ -66,11 +66,11 @@ The round target button at the bottom of the map, just left of the buttons panel
 Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, the ride name and the buttons. A slim bar stays at the bottom right with the route line and **EMERGENCY**. See [Use Ride Mode](/help/ride-mode).
 :::
 
-:::until 1.0.4
+:::until 2.0
 **Menus ▲** in that bar brings everything back.
 :::
 
-:::release 1.0.4
+:::release 2.0
 **Controls** in that bar brings everything back (or swipe the bar up). Navigate, Draw a Route, Waypoints and Find a Ride have **Full Map** too; on a tablet their bar sits in the bottom-left corner. See [Full Map](/help/full-map).
 :::
 
@@ -78,7 +78,7 @@ Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, th
 
 Once you've joined a ride, the ride and its details stay on the left, and **Map**, **Riders** and **Chat** open on the right. You can read the chat or check the route without losing the meeting time and place.
 
-:::release 1.0.4
+:::release 2.0
 **Leave Ride** is at the bottom of the left side of the ride page, and at the bottom of the **Riders** list in Ride Mode. See [Join a Ride](/help/join-a-ride).
 :::
 

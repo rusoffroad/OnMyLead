@@ -63,7 +63,7 @@ Your home screen.
 - When one of your rides is live, a card at the top says **Your ride is live. Tap to open Ride Mode**.
 - **Ride Invites**, **Your Rides** and **Past Rides** list the rides you're on. Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com, click **Delete** or **Leave** at the end of the row instead. The app always asks first.
 - **Public Rides** shows a few upcoming public rides near the bottom.
-:::release 1.0.4
+:::release 2.0
 - **The bell** at the top right: your notifications from the last 30 days, with a red number for new ones. See [See and Clear Your Notifications](/help/notifications-inbox).
 :::
 :::release 1.0.3
@@ -92,7 +92,7 @@ Everything that isn't a ride:
 :::release 1.0.3
 - **On the Trail** also has **Navigate** and **Rider Trails on Maps**, which shows or hides trails other riders shared.
 
-:::release 1.0.4
+:::release 2.0
 - **Follow Me on Maps**, also under **On the Trail**, turns off (or back on) the map moving with you in Ride Mode and Navigate. See [Follow Me on the Map](/help/follow-me).
 - **Music Controls**, also under **On the Trail**, shows or hides the Music button in Ride Mode and Navigate. See [Control Your Music While You Ride](/help/music-controls).
 :::

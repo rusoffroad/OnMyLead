@@ -3,7 +3,7 @@ title: Follow Me on the Map
 summary: Keep the map moving with your dot as you ride, see which way you're heading, and turn Follow Me on or off.
 category: ride-mode
 order: 13
-release: "1.0.4"
+release: "2.0"
 updated: 2026-11-02
 sources:
   - app/src/core/follow-camera.ts
