@@ -12,6 +12,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { key: 'reviews', title: 'Store Reviews', href: '/admin/reviews', group: 'People' },
   { key: 'rides', title: 'Rides', href: '/admin/rides', group: 'Rides' },
   { key: 'trails', title: 'Rider Trails', href: '/admin/trails', group: 'Rides' },
+  { key: 'trail-widths', title: 'Trail Widths', href: '/admin/trail-widths', group: 'Rides' },
   { key: 'events', title: 'Events', href: '/admin/events', group: 'Rides' },
   { key: 'analytics', title: 'Analytics', href: '/admin/analytics', group: 'Rides' },
   { key: 'subscriptions', title: 'Subscriptions', href: '/admin/subscriptions', group: 'Money' },

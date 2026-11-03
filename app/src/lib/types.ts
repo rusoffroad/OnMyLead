@@ -109,6 +109,8 @@ export type Vehicle = {
   extra_fuel_gallons: number | null;
   mpg: number | null;
   purchase_price_cents: number | null;
+  /** Widest point in inches, for trail width limits (migration 20261103200000). Older rows lack it. */
+  width_in?: number | null;
   created_at: string;
 };
 

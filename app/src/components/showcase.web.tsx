@@ -289,6 +289,7 @@ export function Showcase() {
             </p>
             <ul className="ticks">
               <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
+              <li><b>Will It Fit?</b> Tap a trail to see its width limit: 50 inch Forest Service trails, and widths riders add to any public trail. Add your machine’s width in the Garage and the card tells you if it fits.</li>
               <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
