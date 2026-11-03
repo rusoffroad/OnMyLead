@@ -13,6 +13,7 @@ import { initialOf } from '@/core/profile';
 import { type MyBadges } from '@/core/badges';
 import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directions';
 import { BATTERY_PLANS } from '@/core/battery';
+import { AUTO_VOICE } from '@/core/voice';
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
@@ -21,6 +22,7 @@ import { deleteMyAccount, myActiveShares, myRideName } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
 import { fetchMyBadges } from '@/lib/badges';
 import { useBatteryMode } from '@/lib/battery';
+import { useVoiceChoice } from '@/lib/voice';
 import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { setMapsPreference, useMapsPreference } from '@/lib/directions';
@@ -58,6 +60,7 @@ export default function You() {
   const batteryMode = useBatteryMode();
   const syncLine = useSyncSummary();
   const syncAvailable = useSyncStatus().available;
+  const voiceChoice = useVoiceChoice();
   const { ent } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
   const starlinkOn = useFlag('starlink');
@@ -196,6 +199,13 @@ export default function You() {
           title="Battery Saver"
           detail={`${BATTERY_PLANS[batteryMode].label}. ${BATTERY_PLANS[batteryMode].short}`}
           onPress={() => router.push('/battery')}
+        />
+        <MenuRow
+          icon="voice"
+          color={Colors.sky}
+          title="Voice"
+          detail={voiceChoice === AUTO_VOICE ? 'Automatic. The most natural voice on this device reads Ride Mode alerts' : 'Your pick reads Ride Mode alerts'}
+          onPress={() => router.push('/voice')}
         />
         {musicAvailable && musicFlag ? (
           <MenuRow

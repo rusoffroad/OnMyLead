@@ -55,6 +55,8 @@ const PATHS = {
   collapse: ['M20 10h-6V4', 'M14 10l6.5-6.5', 'M4 14h6v6', 'M10 14l-6.5 6.5'],
   // A music note, for Music Controls.
   music: ['M9 17.5V5.8l10.5-2.3v11.7', 'M9 9l10.5-2.3', 'M9 17.5a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z', 'M19.5 15.2a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z'],
+  // A speaker with sound waves, for Voice.
+  voice: ['M4 9.5h3.5L12 5.5v13l-4.5-4H4z', 'M15.5 9a4 4 0 0 1 0 6', 'M18.3 6.3a8 8 0 0 1 0 11.4'],
   battery: ['M3 7.5h15v9H3z', 'M20.5 10.5v3', 'M11.5 9l-2.5 3.2h3L9.5 15'],
   go: ['M5 12h13', 'M13 6l6 6-6 6'],
   more: ['M5 12h.01', 'M12 12h.01', 'M19 12h.01'],

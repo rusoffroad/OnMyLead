@@ -2,7 +2,6 @@ import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
@@ -83,6 +82,7 @@ import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
+import { speak } from '@/lib/voice';
 
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
@@ -274,7 +274,7 @@ export default function RideMode() {
     const old = firstAnnouncement.current && Date.now() - Date.parse(announcement.created_at) > 10 * 60_000;
     firstAnnouncement.current = false;
     if (old || announcement.user_id === me) return;
-    Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body));
+    speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body));
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, [announcement, me, nameOf]);
 
@@ -396,7 +396,7 @@ export default function RideMode() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'regroup_points', filter: `ride_id=eq.${id}` }, () => {
         activeRegroup(id).then((rg) => {
           setRegroup(rg);
-          if (rg) Speech.speak('Regroup point set.');
+          if (rg) speak('Regroup point set.');
         });
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rides', filter: `id=eq.${id}` }, (payload) => {
@@ -483,7 +483,7 @@ export default function RideMode() {
     const red = new Set(bubble.alerts.map((a) => a.riderId));
     for (const a of bubble.alerts) {
       if (!announced.current.has(a.riderId) && a.message) {
-        Speech.speak(a.message);
+        speak(a.message);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
     }
@@ -502,7 +502,7 @@ export default function RideMode() {
       heard.add(key);
       // Opening Ride Mode doesn't read out a breakdown from long ago.
       if (Date.now() - Date.parse(s.tapped_at) > BREAKDOWN_SPEAK_WITHIN_MS) continue;
-      Speech.speak(spokenBreakdown(nameOf(userId)));
+      speak(spokenBreakdown(nameOf(userId)));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
   }, [statuses, watchesBubble, me, nameOf]);
@@ -1074,7 +1074,7 @@ export default function RideMode() {
           ) : null}
           {announcement ? (
             <Pressable
-              onPress={() => Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
+              onPress={() => speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
               accessibilityRole="button"
               accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
               style={styles.announcement}>

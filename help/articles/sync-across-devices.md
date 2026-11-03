@@ -13,6 +13,7 @@ sources:
   - app/src/lib/offline-maps.ts
   - app/src/app/maps/index.tsx
   - app/src/app/(tabs)/profile.tsx
+  - app/src/lib/voice.ts
   - supabase/migrations/20261103300000_account_sync.sql
 related: [navigation-mode, offline-maps, privacy, use-onmylead-on-a-tablet, sign-in]
 keywords: [sync, cloud, backup, two phones, ipad and iphone, new phone, same account, settings, devices, restore trails]
@@ -31,6 +32,7 @@ Your rides, chats, friends, groups, Garage, trips, Starlink setup, notification 
 - The **Track Line** switch (the line itself stays on each device, see below)
 - **Directions**: which maps app Navigate opens. If you picked Apple Maps, an Android phone asks each time, since it doesn't have Apple Maps.
 - **Music Controls**
+- **Voice**: the voice that speaks your alerts. A device that doesn't have that voice uses its best one.
 - Your saved quick replies for ride chat
 - Which panels you keep open or folded in Ride Mode, Map Mode, Route Builder and Waypoints
 - The search distance in Find a Ride and Events
