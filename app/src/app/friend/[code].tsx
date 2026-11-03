@@ -7,13 +7,19 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, RideColors, Spacing } from '@/constants/theme';
 import { FRIENDS_NOT_SWITCHED_ON, requestResultLine, type FriendPreview } from '@/core/friends';
+import { linkResultLine, type LinkResult } from '@/core/referrals';
+import { useAppSettings } from '@/lib/app-settings';
 import { FriendsOffError, friendPreview, respondFriendRequest, sendFriendRequestByCode } from '@/lib/friends';
+import { linkReferral, rememberInviteCode } from '@/lib/referrals';
 import { useSession } from '@/lib/session';
 
 /**
  * A rider's friend link (onmylead.com/friend/<code>). Signed in: shows whose link it is and adds
  * them as a friend in one tap (they still have to accept). Signed out: asks you to sign in first,
  * because only signed-in riders can see whose link it is.
+ *
+ * It is also the refer-a-friend invite (core/referrals): a brand-new account that opens it, or
+ * signs up right after opening it, is recorded as this rider's invite.
  */
 export default function FriendLink() {
   const { code } = useLocalSearchParams<{ code: string }>();
@@ -22,6 +28,19 @@ export default function FriendLink() {
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [invite, setInvite] = useState<LinkResult | null>(null);
+  // Strictly on: the offer is only mentioned once the owner switched the program on.
+  const referralsOn = useAppSettings().settings.flags.referrals === true;
+
+  // Signed out: remember the link, so the account made next counts as this rider's invite.
+  useEffect(() => {
+    if (!loading && !session && code) rememberInviteCode(code);
+  }, [code, loading, session]);
+
+  useEffect(() => {
+    if (!preview || preview.relation === 'self' || !code) return;
+    linkReferral(code).then(setInvite).catch(() => {});
+  }, [code, preview]);
 
   useEffect(() => {
     if (loading || !session) return;
@@ -44,6 +63,9 @@ export default function FriendLink() {
           <ThemedText themeColor="textSecondary">
             Friends on OnMyLead see each other when they’re out riding nearby and can message any time. Sign in to see who sent this link.
           </ThemedText>
+          {referralsOn ? (
+            <Text style={styles.offer}>New to OnMyLead? Create your account with this link. When you finish your first ride, you and your friend both get 50% off Pro Annual.</Text>
+          ) : null}
         </View>
         <Button title="Create a Free Account" big onPress={() => router.push('/sign-in?mode=create')} />
         <Button title="I Already Have an Account" kind="ghost" onPress={() => router.push('/sign-in')} />
@@ -99,6 +121,7 @@ export default function FriendLink() {
             : 'Friends see each other when they’re out riding nearby and can message any time. Nobody sees where you are, just roughly how far.'}
         </ThemedText>
       </View>
+      {linkResultLine(invite, preview.display_name) ? <Text style={styles.offer}>{linkResultLine(invite, preview.display_name)}</Text> : null}
       {done ? <Text style={styles.done}>{done}</Text> : null}
       <ErrorText error={error} />
       {done || preview.relation === 'friends' || preview.relation === 'self' || preview.relation === 'sent' ? (
@@ -120,4 +143,8 @@ const styles = StyleSheet.create({
   top: { gap: Spacing.three, paddingTop: Spacing.three },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 40, lineHeight: 43, letterSpacing: -0.4 },
   done: { color: RideColors.green, fontFamily: font(700), fontSize: 17 },
+  offer: {
+    color: Colors.text, fontFamily: font(600), fontSize: 16, lineHeight: 22, padding: Spacing.three,
+    borderRadius: 12, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.accent, overflow: 'hidden',
+  },
 });

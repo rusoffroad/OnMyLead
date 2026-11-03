@@ -17,7 +17,8 @@ import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
 import { shareEndText } from '@/core/sharing';
 import { deleteMyAccount, myActiveShares, myRideName } from '@/lib/api';
-import { useFlag } from '@/lib/app-settings';
+import { useAppSettings, useFlag } from '@/lib/app-settings';
+import { referralsSwitchedOn } from '@/core/referrals';
 import { fetchMyBadges } from '@/lib/badges';
 import { useBatteryMode } from '@/lib/battery';
 import { useBlocks } from '@/lib/blocks';
@@ -53,6 +54,7 @@ export default function You() {
   const batteryMode = useBatteryMode();
   const { ent } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
+  const referralsOn = referralsSwitchedOn(useAppSettings().settings.flags);
   const starlinkOn = useFlag('starlink');
   const offlineMaps = useOfflineMaps();
   const navOn = useFlag('nav_mode');
@@ -235,6 +237,9 @@ export default function You() {
             ) : null}
           </MenuRow>
           <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
+          {referralsOn ? (
+            <MenuRow icon="addFriend" color={Colors.accent} title="Invite Friends" detail="You both get 50% off Pro Annual when they finish a ride" onPress={() => router.push('/invite-friends')} />
+          ) : null}
           <MenuRow icon="block" color={Colors.danger} title="Blocked Riders" detail={blockedSummary} onPress={() => router.push('/blocked')} />
           {ent.accountType === 'admin' ? (
             <MenuRow

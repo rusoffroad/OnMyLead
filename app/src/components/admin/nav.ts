@@ -16,6 +16,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { key: 'analytics', title: 'Analytics', href: '/admin/analytics', group: 'Rides' },
   { key: 'subscriptions', title: 'Subscriptions', href: '/admin/subscriptions', group: 'Money' },
   { key: 'promo-codes', title: 'Promo Codes', href: '/admin/promo-codes', group: 'Money' },
+  { key: 'referrals', title: 'Referrals', href: '/admin/referrals', group: 'Money' },
   { key: 'exports', title: 'CSV Exports', href: '/admin/exports', group: 'Money' },
   { key: 'help', title: 'Help Center', href: '/admin/help', group: 'System' },
   { key: 'app-health', title: 'App Health', href: '/admin/app-health', group: 'System' },

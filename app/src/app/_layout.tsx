@@ -28,6 +28,7 @@ import { startOrientationRule } from '@/lib/orientation';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
+import { startReferrals } from '@/lib/referrals';
 import { startRiderAgreement } from '@/lib/rider-agreement';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
@@ -67,6 +68,8 @@ function RootLayout() {
   useEffect(() => startOrientationRule(), []);
   // Who has agreed to the Rider Safety and Liability Agreement, and sending each record to the server.
   useEffect(() => startRiderAgreement(), []);
+  // A friend link opened before signing up counts as an invite once the new account signs in.
+  useEffect(() => startReferrals(), []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
   useEffect(() => {
@@ -97,6 +100,7 @@ function RootLayout() {
         <Stack.Screen name="reset-password" options={{ title: 'New Password' }} />
         <Stack.Screen name="ride/new" options={{ title: 'Create a Ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
+        <Stack.Screen name="invite-friends" options={{ title: 'Invite Friends' }} />
         <Stack.Screen name="events/index" options={{ title: 'Events' }} />
         <Stack.Screen name="events/new" options={{ title: 'Create an Event' }} />
         <Stack.Screen name="e/[code]" options={{ title: '' }} />

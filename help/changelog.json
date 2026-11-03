@@ -2,6 +2,17 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "refer-a-friend",
+      "friends"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "New in 2.1: Invite Friends. When a new rider joins with your friend link and finishes their first ride, you both get Pro Annual at 50% off for the first year (an App Store offer code on iPhone and iPad, a Google Play offer on Android, or the next Google Play bill moved back 6 months for riders already paying there). Chris asked for a referral promo on 2026-11-03. The Add Friends guide says a friend link also counts as an invite."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "home-screen",
       "events",
       "create-a-ride",
