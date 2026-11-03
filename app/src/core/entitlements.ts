@@ -23,12 +23,14 @@ export type FeatureKey =
   | 'record_trails'
   | 'share_trails'
   | 'trail_rides'
-  | 'social_posts';
+  | 'social_posts'
+  | 'create_events';
 
 export const FEATURE_KEYS: FeatureKey[] = [
   'create_ride', 'import_gpx', 'offline_maps', 'saved_groups', 'create_poll', 'ride_history',
   'advanced_trip_planning', 'advanced_stats', 'premium_ride_cards', 'record_trails', 'share_trails', 'trail_rides',
   'social_posts',
+  'create_events',
 ];
 
 /** Names for prompts and the comparison table (Title Case). */
@@ -46,6 +48,7 @@ export const FEATURE_NAMES: Record<FeatureKey, string> = {
   share_trails: 'Share Your Trails',
   trail_rides: 'Group Rides on Your Trails',
   social_posts: 'Post, Comment and Share',
+  create_events: 'Create Events',
 };
 
 export type AccountType = 'free' | 'pro' | 'admin';

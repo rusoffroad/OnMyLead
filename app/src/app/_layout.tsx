@@ -97,6 +97,9 @@ function RootLayout() {
         <Stack.Screen name="reset-password" options={{ title: 'New Password' }} />
         <Stack.Screen name="ride/new" options={{ title: 'Create a Ride' }} />
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
+        <Stack.Screen name="events/index" options={{ title: 'Events' }} />
+        <Stack.Screen name="events/new" options={{ title: 'Create an Event' }} />
+        <Stack.Screen name="e/[code]" options={{ title: '' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: 'Ride Mode', headerShown: false }} />
         <Stack.Screen name="ride/[id]/route" options={{ title: 'Route', headerShown: false }} />
         <Stack.Screen name="ride/[id]/waypoints" options={{ title: 'Waypoints', headerShown: false }} />

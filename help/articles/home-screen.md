@@ -6,6 +6,7 @@ order: 15
 release: "2.0"
 updated: 2026-11-03
 sources:
+  - app/src/components/home/events-card.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/home/**
   - app/src/components/inbox-bell.tsx
@@ -45,6 +46,10 @@ Your offroad map for when you're not on a group ride. The card shows a small map
 - **Track Line** draws where you've been, a new colour each day: today red, yesterday blue, older days gold.
 
 See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
+
+## Events
+
+Under Map Mode, the **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
 
 ## Your Rides
 
