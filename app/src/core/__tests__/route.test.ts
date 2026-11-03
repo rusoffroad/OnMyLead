@@ -148,7 +148,7 @@ describe('RouteTracker', () => {
   });
 });
 
-describe('trail routes (Navigation Mode)', () => {
+describe('trail routes (Map Mode)', () => {
   it('keeps the trail source through storage, so it stays free and followed as recorded', () => {
     const r = makeRoute({ points: [north(0), north(1), north(2)], source: 'trail', name: 'Poison Spider' });
     const stored = toStored(r);

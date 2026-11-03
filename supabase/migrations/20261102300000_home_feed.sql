@@ -1,7 +1,7 @@
 -- Home feed (2.0 home screen): what friends, riders you follow and your riding groups have been
 -- up to, and who gets to see your own activity.
 --
--- Adds only: one settings table, four functions, and trail obstacles (a new shared_trails column,
+-- Adds only: one settings table, five functions (one hands out the trail rule numbers), and trail obstacles (a new shared_trails column,
 -- its check, and trail_json returning it). Nothing older changes, so 1.0.x builds keep
 -- working, and the 2.0 app shows "Feed starts with the next server update" until this runs.
 --
@@ -161,7 +161,7 @@ begin
     union all
     -- Upcoming rides a riding group member invited my group to (I'm on the invite list).
     select 'group', rd.organizer_id, m.created_at, rd.name,
-           jsonb_build_object('ride_id', rd.id, 'meet_at', rd.meet_at),
+           jsonb_build_object('ride_id', rd.id, 'meet_at', rd.meet_at, 'code', rd.invite_code),
            g.id, g.name
     from ride_members m
     join rides rd on rd.id = m.ride_id
@@ -247,3 +247,14 @@ returns jsonb language sql stable security definer set search_path = public as $
   from (select 1) one left join profiles p on p.id = t.owner_id
 $$;
 revoke execute on function trail_json(shared_trails, uuid) from public, anon, authenticated;
+
+-- The rule for when a shared trail comes down, for the "How Custom Trails Work" sheet in Map Mode.
+-- trail_rules itself stays closed; this hands out only the two numbers riders are told anyway.
+create or replace function trail_rules_public()
+returns jsonb language sql stable security definer set search_path = public as $$
+  select coalesce(
+    (select jsonb_build_object('min_bad', min_bad, 'bad_share', bad_share) from trail_rules where id),
+    jsonb_build_object('min_bad', 3, 'bad_share', 0.5))
+$$;
+revoke execute on function trail_rules_public() from public, anon;
+grant execute on function trail_rules_public() to authenticated;

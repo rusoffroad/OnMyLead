@@ -23,6 +23,8 @@ export type FeedItem = {
   badge: { badge: BadgeKey; level: BadgeLevel } | null;
   lengthM: number | null;
   rideId: string | null;
+  /** Invite code of a group ride post, to open it. */
+  rideCode: string | null;
   trailId: string | null;
   meetAt: string | null;
   groupId: string | null;
@@ -82,6 +84,7 @@ export function parseFeed(rows: unknown): FeedItem[] {
       badge,
       lengthM: num(d.length_m),
       rideId: str(d.ride_id),
+      rideCode: str(d.code),
       trailId: str(d.trail_id),
       meetAt: str(d.meet_at),
       groupId: str(o.group_id),
@@ -161,4 +164,12 @@ export const FEED_NOT_SWITCHED_ON = 'Your feed starts with the next server updat
 /** True when the database doesn't have the feed update yet. */
 export function feedNotSwitchedOn(message: string | null | undefined, code?: string | null): boolean {
   return code === 'PGRST202' || code === '42883' || code === '42P01' || /home_feed|my_feed_settings|set_feed_settings|rider_feed_settings/.test(message ?? '') && /does not exist|could not find|schema cache/i.test(message ?? '');
+}
+
+/** Where tapping a post goes, or null when it has nowhere to go. */
+export function feedHref(item: FeedItem): string | null {
+  if (item.kind === 'group' && item.rideCode) return `/r/${item.rideCode}`;
+  if (item.kind === 'trail' && item.trailId) return `/nav/public/${item.trailId}`;
+  if (item.kind === 'out') return '/out-riding';
+  return null;
 }

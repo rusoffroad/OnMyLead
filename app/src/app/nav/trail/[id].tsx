@@ -4,6 +4,7 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
+import { ObstacleSheet } from '@/components/obstacle-sheet';
 import { RouteMap } from '@/components/route-map';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Field, Screen, Section } from '@/components/ui';
@@ -12,6 +13,7 @@ import {
   clock, DIFFICULTIES, feet, feetOrMiles, MAX_PHOTOS, RIDER_TRAIL_INK, SEASONS, shareProblems, SHARE_TRIM_M, SURFACES, trackStats, TRAIL_VEHICLES,
   type Difficulty, type LocalTrail, type Season, type Surface, type TrailDetails, type TrailVehicle,
 } from '@/core/nav-trails';
+import { kindLabel, OBSTACLE_INK, type Obstacle, type ObstacleKind } from '@/core/obstacles';
 import { useLayout } from '@/hooks/use-layout';
 import { confirmAsync, showNotice } from '@/lib/confirm';
 import {
@@ -23,9 +25,10 @@ import { shareBadge } from '@/components/trail-badge';
 
 /**
  * One of your trails: its line and numbers, the details riders need (name, difficulty, vehicles,
- * surface, season, width, notes) and photos. Save on This Phone keeps it private; Share with
- * Everyone puts it on the public map for every rider, with the first and last stretch left off.
- * From here it can be followed in Navigate or used as the route of a group ride.
+ * surface, season, width, notes), named spots and photos. Save on This Phone keeps it private;
+ * Share with Everyone puts the whole line on the public map for every rider (a recorded trail can
+ * leave off its first and last stretch with Hide My Start). From here it can be followed in Map
+ * Mode or used as the route of a group ride.
  */
 export default function TrailDetail() {
   const { id, fresh } = useLocalSearchParams<{ id: string; fresh?: string }>();
@@ -37,17 +40,20 @@ export default function TrailDetail() {
   const [busy, setBusy] = useState<'save' | 'share' | 'stop' | 'photo' | 'delete' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [problems, setProblems] = useState<string[]>([]);
+  const [extra, setExtra] = useState<{ hideStart: boolean; obstacles: Obstacle[] } | null>(null);
+  const [editing, setEditing] = useState<Obstacle | null>(null);
 
   useEffect(() => {
     loadTrails();
   }, []);
   // Start editing from what's saved, once it has loaded.
   if (saved && !details) setDetails(saved.details);
+  if (saved && !extra) setExtra({ hideStart: !!saved.hideStart, obstacles: saved.obstacles ?? [] });
 
   const stats = useMemo(() => (saved ? trackStats(saved.points) : null), [saved]);
   const line = useMemo(() => (saved ? trailLine(saved) : []), [saved]);
 
-  if (!saved || !details) {
+  if (!saved || !details || !extra) {
     return (
       <Screen width="readable">
         <ThemedText themeColor="textSecondary">{loaded ? 'That trail isn’t on this phone.' : 'Loading…'}</ThemedText>
@@ -56,8 +62,21 @@ export default function TrailDetail() {
   }
 
   const set = <K extends keyof TrailDetails>(k: K, v: TrailDetails[K]) => setDetails({ ...details, [k]: v });
-  const draft: LocalTrail = { ...saved, details };
-  const changed = JSON.stringify(details) !== JSON.stringify(saved.details);
+  const draft: LocalTrail = { ...saved, details, hideStart: extra.hideStart, obstacles: extra.obstacles };
+  const changed = JSON.stringify(details) !== JSON.stringify(saved.details)
+    || extra.hideStart !== !!saved.hideStart
+    || JSON.stringify(extra.obstacles) !== JSON.stringify(saved.obstacles ?? []);
+  const trimmed = saved.source === 'recorded' && extra.hideStart;
+  const saveSpot = (name: string, kind: ObstacleKind) => {
+    if (!editing) return;
+    setExtra({ ...extra, obstacles: extra.obstacles.map((o) => (o.id === editing.id ? { ...o, name, kind } : o)) });
+    setEditing(null);
+  };
+  const removeSpot = () => {
+    if (!editing) return;
+    setExtra({ ...extra, obstacles: extra.obstacles.filter((o) => o.id !== editing.id) });
+    setEditing(null);
+  };
   const canShare = !saved.savedFrom;
   const badge = shareBadge(saved);
 
@@ -84,7 +103,7 @@ export default function TrailDetail() {
     if (!session) return router.push('/sign-in');
     if (!saved!.shared && !(await confirmAsync(
       'Share with Everyone?',
-      `Every OnMyLead rider will see this trail, its photos and your ride name. The first and last ${feetOrMiles(SHARE_TRIM_M)} are left off so your start stays private. Riders can rate it; if several say it’s inaccurate it’s hidden from them, but it stays on your phone.`,
+      `Every OnMyLead rider will see ${trimmed ? `this trail (minus the first and last ${feetOrMiles(SHARE_TRIM_M)}, with Hide My Start on)` : 'the whole trail'}, its named spots, photos and your ride name. Riders can rate it; if several say it’s inaccurate it’s hidden from them, but it stays on your phone.`,
       'Share',
       'Not Now',
     ))) return;
@@ -200,6 +219,17 @@ export default function TrailDetail() {
         </View>
         <Switch value={details.oneWay} onValueChange={(v) => set('oneWay', v)} trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }} thumbColor={Colors.text} />
       </Pressable>
+      {saved.source === 'recorded' && canShare ? (
+        <Pressable accessibilityRole="switch" accessibilityState={{ checked: extra.hideStart }} onPress={() => setExtra({ ...extra, hideStart: !extra.hideStart })} style={styles.switchRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.switchTitle}>Hide My Start</Text>
+            <ThemedText type="small" themeColor="textSecondary">
+              When shared, leave off the first and last {feetOrMiles(SHARE_TRIM_M)}, for a trail that starts at your house or camp. Off shares the whole trail.
+            </ThemedText>
+          </View>
+          <Switch value={extra.hideStart} onValueChange={(v) => setExtra({ ...extra, hideStart: v })} trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }} thumbColor={Colors.text} />
+        </Pressable>
+      ) : null}
       <Field label="Notes (Optional)" value={details.description} onChangeText={(v) => set('description', v)} multiline maxLength={1000} placeholder="Water crossing after the second gate. Great view at the top." />
     </>
   );
@@ -226,6 +256,22 @@ export default function TrailDetail() {
             : 'Several riders rated this line inaccurate, so other riders can’t see it. It’s still yours here. Record it again and share the new one.'}
         </ThemedText>
       ) : null}
+      <Section title="Named Spots" right={<Text style={styles.count}>{extra.obstacles.length}</Text>} />
+      {extra.obstacles.length ? (
+        <View style={styles.spots}>
+          {extra.obstacles.map((o) => (
+            <Pressable key={o.id} accessibilityRole="button" accessibilityLabel={`${o.name}, ${kindLabel(o.kind)}. Edit`} onPress={() => setEditing(o)} style={styles.spot}>
+              <View style={[styles.spotDot, { backgroundColor: OBSTACLE_INK[o.kind] }]} />
+              <Text style={styles.spotName} numberOfLines={1}>{o.name}</Text>
+              <Text style={styles.count}>{kindLabel(o.kind)}</Text>
+            </Pressable>
+          ))}
+        </View>
+      ) : (
+        <ThemedText type="small" themeColor="textSecondary">
+          Name ledges, crossings and viewpoints with Mark a Spot while drawing or recording in Map Mode. Tap one here to rename or remove it.
+        </ThemedText>
+      )}
       <Section title="Photos" right={<Text style={styles.count}>{saved.photos.length} of {MAX_PHOTOS}</Text>} />
       <View style={styles.photos}>
         {saved.photos.map((p) => (
@@ -261,7 +307,7 @@ export default function TrailDetail() {
           <Button title="Share with Everyone" big loading={busy === 'share'} onPress={share} />
         )
       ) : null}
-      <Button title="Follow in Navigate" kind="secondary" onPress={() => router.push(`/nav?trail=${saved.id}`)} />
+      <Button title="Follow in Map Mode" kind="secondary" onPress={() => router.push(`/nav?trail=${saved.id}`)} />
       <Button title="Plan a Group Ride on This Trail" kind="secondary" onPress={() => requirePro('trail_rides') && router.push(`/ride/new?trail=${saved.id}`)} />
       <Button title="Delete Trail" kind="ghost" loading={busy === 'delete'} onPress={remove} />
     </>
@@ -282,6 +328,14 @@ export default function TrailDetail() {
           {actions}
         </>
       )}
+      <ObstacleSheet
+        visible={!!editing}
+        editing
+        initial={{ name: editing?.name ?? '', kind: editing?.kind ?? 'obstacle' }}
+        onSave={saveSpot}
+        onRemove={removeSpot}
+        onClose={() => setEditing(null)}
+      />
     </Screen>
   );
 }
@@ -309,6 +363,10 @@ const styles = StyleSheet.create({
   photo: { width: 96, height: 96, borderRadius: 14, overflow: 'hidden', backgroundColor: Colors.backgroundElement },
   addPhoto: { alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border },
   addText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
+  spots: { borderRadius: Radius.control, backgroundColor: Colors.backgroundElement, overflow: 'hidden' },
+  spot: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48, paddingHorizontal: 14, borderBottomWidth: 1, borderBottomColor: Colors.backgroundSelected },
+  spotDot: { width: 10, height: 10, borderRadius: 5 },
+  spotName: { flex: 1, color: Colors.text, fontFamily: font(600), fontSize: 15 },
   problems: { gap: 4, padding: 12, borderRadius: Radius.control, backgroundColor: 'rgba(255,176,32,0.12)', borderWidth: 1, borderColor: '#FFB020' },
   problem: { color: Colors.text, fontFamily: font(600), fontSize: 15 },
 });

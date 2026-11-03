@@ -1,5 +1,5 @@
 /**
- * Navigation Mode trails: the rider's own trails kept on this phone, the trails other riders
+ * Map Mode trails: the rider's own trails kept on this phone, the trails other riders
  * shared, and the calls that share, rate and update them (migration 20261101600000_nav_trails.sql).
  *
  * Phone trails are in AsyncStorage (one key, a few hundred KB for a busy season), so they work with
@@ -11,8 +11,8 @@ import { useSyncExternalStore } from 'react';
 
 import type { LatLng } from '@/core/geo';
 import {
-  lineForSharing, parsePublicTrail, shareTrimFor, photoPaths, TRAIL_PHOTO_BUCKET, parsePublicTrails, shareStateOf, syncShareStates, toLineString, toLatLngs, trackStats,
-  type LocalTrail, type PublicTrail, type TrackPoint,
+  DEFAULT_TRAIL_RULES, lineForSharing, parseTrailRules, parsePublicTrail, shareTrimFor, photoPaths, TRAIL_PHOTO_BUCKET, parsePublicTrails, shareStateOf, syncShareStates, toLineString, toLatLngs, trackStats,
+  type LocalTrail, type TrailRules, type PublicTrail, type TrackPoint,
 } from '@/core/nav-trails';
 import { obstaclesForSharing, type Obstacle } from '@/core/obstacles';
 import { lineLengthM } from '@/core/route';
@@ -278,3 +278,9 @@ export async function savePublicTrail(t: PublicTrail): Promise<LocalTrail> {
 
 /** Points of any phone trail as plain coordinates. */
 export const trailLine = (t: LocalTrail): LatLng[] => toLatLngs(t.points);
+
+/** When a shared trail comes down (the Admin Dashboard's rule). Defaults until the 2.0 server update. */
+export async function fetchTrailRules(): Promise<TrailRules> {
+  const { data, error } = await supabase.rpc('trail_rules_public');
+  return error ? DEFAULT_TRAIL_RULES : parseTrailRules(data);
+}

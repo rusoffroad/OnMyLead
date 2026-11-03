@@ -148,4 +148,13 @@ do $$ begin
   end if;
 end $$;
 
+
+-- H9. The trail rule numbers are readable by any signed-in rider (Map Mode's custom trail sheet).
+do $$ declare v jsonb; begin
+  v := trail_rules_public();
+  if (v->>'min_bad')::int is null or (v->>'bad_share')::numeric is null then
+    raise exception 'FAIL: trail_rules_public returned %', v;
+  end if;
+end $$;
+
 select 'ALL HOME FEED TESTS PASSED' as result;

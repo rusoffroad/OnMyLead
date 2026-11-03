@@ -1,5 +1,5 @@
 /**
- * Navigation Mode: trails a rider records or draws for themselves, the trails other riders shared,
+ * Map Mode: trails a rider records or draws for themselves, the trails other riders shared,
  * and the rules that decide what leaves the phone.
  *
  * A recorded trail lives on the phone (lib/nav-trails). Sharing it with everyone sends a copy to
@@ -383,6 +383,23 @@ export const DEFAULT_TRAIL_RULES: TrailRules = { minBad: 3, badShare: 0.5 };
 export function hidesTrail(scores: number[], rules: TrailRules = DEFAULT_TRAIL_RULES): boolean {
   const bad = scores.filter((s) => s <= 2).length;
   return bad >= rules.minBad && bad >= Math.ceil(rules.badShare * scores.length);
+}
+
+/** The server's trail_rules_public() numbers, or the defaults when they're missing or odd. */
+export function parseTrailRules(raw: unknown): TrailRules {
+  const o = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const minBad = Number(o.min_bad);
+  const badShare = Number(o.bad_share);
+  return {
+    minBad: Number.isInteger(minBad) && minBad >= 2 && minBad <= 50 ? minBad : DEFAULT_TRAIL_RULES.minBad,
+    badShare: Number.isFinite(badShare) && badShare >= 0.2 && badShare <= 1 ? badShare : DEFAULT_TRAIL_RULES.badShare,
+  };
+}
+
+/** The rule in words: "3 or more riders rate it 1 or 2 stars for accuracy, and they're at least half of all ratings". */
+export function trailRuleWords(r: TrailRules): string {
+  const share = r.badShare === 0.5 ? 'half' : r.badShare === 1 ? 'all' : `${Math.round(r.badShare * 100)}%`;
+  return `${r.minBad} or more riders rate it 1 or 2 stars for accuracy, and they’re at least ${share} of all its ratings`;
 }
 
 export const ACCURACY_WORDS = ['', 'Way Off', 'Mostly Off', 'Close', 'Accurate', 'Spot On'];

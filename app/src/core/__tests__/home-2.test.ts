@@ -213,3 +213,24 @@ describe('sharing the whole trail', () => {
     expect(shareProblems({ ...t, source: 'recorded', hideStart: true })[0]).toMatch(/Hide My Start/);
   });
 });
+
+describe('custom trail rules and feed links', () => {
+  it('reads the admin trail rule, falling back to the defaults', async () => {
+    const { parseTrailRules, trailRuleWords, DEFAULT_TRAIL_RULES } = await import('../nav-trails');
+    expect(parseTrailRules({ min_bad: 4, bad_share: '0.6' })).toEqual({ minBad: 4, badShare: 0.6 });
+    expect(parseTrailRules({ min_bad: 1, bad_share: 5 })).toEqual(DEFAULT_TRAIL_RULES);
+    expect(parseTrailRules(null)).toEqual(DEFAULT_TRAIL_RULES);
+    expect(trailRuleWords(DEFAULT_TRAIL_RULES)).toBe('3 or more riders rate it 1 or 2 stars for accuracy, and they’re at least half of all its ratings');
+    expect(trailRuleWords({ minBad: 5, badShare: 0.4 })).toContain('at least 40% of all');
+  });
+  it('links group rides, trails and out riding posts', async () => {
+    const { feedHref } = await import('../feed');
+    const base = parseFeed([{ kind: 'group', actor_id: 'u1', at: '2026-11-01T00:00:00Z', title: 'Moab', detail: { ride_id: 'r1', code: 'AB12CD34' }, group_name: 'Crew' }])[0];
+    expect(base.rideCode).toBe('AB12CD34');
+    expect(feedHref(base)).toBe('/r/AB12CD34');
+    expect(feedHref({ ...base, kind: 'trail', trailId: 't9' })).toBe('/nav/public/t9');
+    expect(feedHref({ ...base, kind: 'out' })).toBe('/out-riding');
+    expect(feedHref({ ...base, kind: 'ride' })).toBeNull();
+    expect(feedHref({ ...base, kind: 'group', rideCode: null })).toBeNull();
+  });
+});

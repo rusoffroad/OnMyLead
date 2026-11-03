@@ -21,6 +21,9 @@ export const OBSTACLE_KINDS: { value: ObstacleKind; label: string }[] = [
   { value: 'view', label: 'Viewpoint' },
 ];
 
+/** Pin colours on the map, one per kind. */
+export const OBSTACLE_INK: Record<ObstacleKind, string> = { obstacle: '#FF9F43', hazard: '#FF4545', water: '#3B86F7', view: '#57E3C3' };
+
 export const kindLabel = (k: ObstacleKind) => OBSTACLE_KINDS.find((o) => o.value === k)?.label ?? 'Obstacle';
 
 const isKind = (v: unknown): v is ObstacleKind => OBSTACLE_KINDS.some((o) => o.value === v);

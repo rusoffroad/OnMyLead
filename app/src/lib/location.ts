@@ -20,6 +20,7 @@ import { isApproximatePermission, shouldAskForGoogleAccuracy, shouldAskForPrecis
 import type { BatteryPlan } from '@/core/battery';
 import { batteryPlan } from './battery';
 import { supabase } from './supabase';
+import { recordTrackFixes } from './track-line';
 
 export const LOCATION_TASK = 'ride-location-updates';
 /**
@@ -70,6 +71,8 @@ let movedAt: number | null = null;
 export async function handleLocations(locations: Location.LocationObject[]) {
   if (!locations.length) return;
   const latest = locations[locations.length - 1];
+  // Track Line (Map Mode's breadcrumb) gets every fix while a ride shares location, if it's on.
+  void recordTrackFixes(locations.map((l) => ({ lat: l.coords.latitude, lng: l.coords.longitude, accuracy: l.coords.accuracy ?? null, timestamp: l.timestamp })));
   for (const l of locations) {
     if ((l.coords.speed ?? 0) >= MOVING_SPEED_MPS) movedAt = Math.max(movedAt ?? 0, l.timestamp);
   }
@@ -406,4 +409,24 @@ export async function stateAt(p: { lat: number; lng: number }): Promise<string |
     }
   }
   return guessState(p);
+}
+
+/**
+ * A rough fix only if the rider already allowed location: never asks. The home screen uses it to
+ * sort public rides by distance without a permission prompt on launch. Null when not allowed or
+ * no fix comes.
+ */
+export async function positionIfAllowed(): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const perm = await Location.getForegroundPermissionsAsync();
+    if (perm.status !== 'granted') return null;
+    if (Platform.OS !== 'web') {
+      const last = await Location.getLastKnownPositionAsync({ maxAge: 30 * 60_000 }).catch(() => null);
+      if (last) return { lat: last.coords.latitude, lng: last.coords.longitude };
+    }
+    const l = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+    return { lat: l.coords.latitude, lng: l.coords.longitude };
+  } catch {
+    return null;
+  }
 }
