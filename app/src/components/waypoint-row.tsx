@@ -3,9 +3,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from '@/components/icon';
 import { StopSign, WaypointBlaze } from '@/components/waypoint-blaze';
 import { Colors, font } from '@/constants/theme';
-import { kindLabel, stopTimeLabel, waypointAudience, type Waypoint } from '@/core/waypoints';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
+import { stopTimeLabel, waypointAudience, type Waypoint } from '@/core/waypoints';
 
-/** One waypoint in a list: its blaze, name, kind and who sees it. A planned stop shows its number and time. */
+/** One waypoint in a list: its blaze, name, symbol and who sees it. A planned stop shows its number and time. */
 export function WaypointRow({
   waypoint: w, me, ownerName, onPress, first, stop,
 }: {
@@ -19,15 +20,15 @@ export function WaypointRow({
 }) {
   const time = stopTimeLabel(w.stop_time);
   const audience = w.planned_stop
-    ? [`Stop ${stop ?? ''}`.trim(), time, kindLabel(w.kind)].filter(Boolean).join(', ')
-    : `${kindLabel(w.kind)}, ${waypointAudience(w, me, ownerName(w.user_id))}`;
+    ? [`Stop ${stop ?? ''}`.trim(), time, symbolLabel(waypointSymbol(w))].filter(Boolean).join(', ')
+    : `${symbolLabel(waypointSymbol(w))}, ${waypointAudience(w, me, ownerName(w.user_id))}`;
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${w.name}, ${audience}`}
       style={({ pressed }) => [styles.row, !first && styles.divider, pressed && { opacity: 0.7 }]}>
-      {w.planned_stop ? <StopSign n={stop ?? null} size={32} /> : <WaypointBlaze kind={w.kind} shared={w.shared} size={30} />}
+      {w.planned_stop ? <StopSign n={stop ?? null} size={32} symbol={waypointSymbol(w)} /> : <WaypointBlaze symbol={waypointSymbol(w)} shared={w.shared} size={30} />}
       <View style={{ flex: 1 }}>
         <Text style={styles.name} numberOfLines={1}>{w.name}</Text>
         <Text style={[styles.meta, w.shared && { color: Colors.sky }, w.planned_stop && styles.stopMeta]} numberOfLines={1}>
