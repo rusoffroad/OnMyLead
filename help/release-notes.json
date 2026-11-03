@@ -106,6 +106,10 @@
       {
         "kind": "new",
         "text": "The Starlink page now features the RUS Starlink Mini Mount V2 (Morelock Series), made by RUS Offroad, the team behind OnMyLead. Tap Shop the Mount to see it in the store."
+      },
+      {
+        "kind": "fixed",
+        "text": "Share My Location with a family link showed an error (\"Property 'crypto' doesn't exist\") on iPhone, iPad and Android, and no link was made. Family links work again."
       }
     ]
   },
