@@ -10,8 +10,7 @@ import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
-import { withAlpha } from '@/core/color';
+import { Colors, currentScheme, font, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { checkMessage, MAX_MESSAGE_LENGTH } from '@/core/chat';
 import { dayLabel } from '@/core/group-chat';
 import { dmReportDetails, leftBeforeReply, NOT_SWITCHED_ON } from '@/core/out-riding';
@@ -284,7 +283,7 @@ export default function Conversation() {
                     onPress={() => send()}
                     style={({ pressed }) => [styles.send, (!draft.trim() || left === 0) && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>
                     <View style={{ transform: [{ rotate: '-90deg' }] }}>
-                      <Icon name="chevron" color="#fff" size={24} strokeWidth={2.8} />
+                      <Icon name="chevron" color={(!draft.trim() || left === 0) ? Colors.textSecondary : '#fff'} size={24} strokeWidth={2.8} />
                     </View>
                   </Pressable>
                 </View>
@@ -321,7 +320,7 @@ const styles = themedStyles(() => ({
   bubble: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 18 },
   bubbleMine: { backgroundColor: Colors.sky, borderBottomRightRadius: 6 },
   bubbleTheirs: { backgroundColor: Colors.backgroundElement, borderBottomLeftRadius: 6 },
-  bubbleFailed: { backgroundColor: withAlpha(Colors.danger, 0.35) },
+  bubbleFailed: { backgroundColor: currentScheme() === 'light' ? Colors.danger : '#5A2230' },
   body: { color: Colors.text, fontFamily: font(500), fontSize: 17, lineHeight: 23 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 4 },
   time: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12 },

@@ -80,7 +80,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
                         accessibilityLabel={editing ? `Remove quick reply: ${s}` : `Send to the group: ${s}`}
                         style={({ pressed }) => [styles.chip, editing && styles.chipEditing, { opacity: pressed ? 0.75 : 1 }]}>
                         {editing ? <Icon name="close" size={16} color={Colors.text} /> : null}
-                        <Text style={styles.chipText} numberOfLines={2}>{s}</Text>
+                        <Text style={[styles.chipText, editing && { color: Colors.text }]} numberOfLines={2}>{s}</Text>
                       </Pressable>
                     ))}
                   </View>

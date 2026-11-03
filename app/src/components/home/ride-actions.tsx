@@ -121,7 +121,7 @@ function Tile({
       <Gradient colors={[Home.panel2, Home.panel]} radius={22} />
       {accent ? <View style={styles.accentEdge} /> : null}
       <View style={[styles.tileIcon, accent && styles.tileIconRed]}>
-        <Icon name={icon} size={22} color={accent ? Colors.accent : '#fff'} strokeWidth={2.4} />
+        <Icon name={icon} size={22} color={accent ? Colors.accent : Colors.text} strokeWidth={2.4} />
       </View>
       <View style={styles.tileBody}>
         <Text style={styles.tileTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>

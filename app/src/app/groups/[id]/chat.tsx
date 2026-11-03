@@ -11,8 +11,7 @@ import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
-import { withAlpha } from '@/core/color';
+import { Colors, currentScheme, font, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { withoutBlocked } from '@/core/blocks';
 import { checkMessage, MAX_MESSAGE_LENGTH } from '@/core/chat';
 import {
@@ -383,7 +382,7 @@ export default function GroupChat() {
                 onPress={() => send()}
                 style={({ pressed }) => [styles.send, !draft.trim() && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>
                 <View style={{ transform: [{ rotate: '-90deg' }] }}>
-                  <Icon name="chevron" color="#fff" size={24} strokeWidth={2.8} />
+                  <Icon name="chevron" color={(!draft.trim()) ? Colors.textSecondary : '#fff'} size={24} strokeWidth={2.8} />
                 </View>
               </Pressable>
             </View>
@@ -471,7 +470,7 @@ const styles = themedStyles(() => ({
   bubble: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 18 },
   bubbleMine: { backgroundColor: Colors.sky },
   bubbleTheirs: { backgroundColor: Colors.backgroundElement },
-  bubbleFailed: { backgroundColor: withAlpha(Colors.danger, 0.35) },
+  bubbleFailed: { backgroundColor: currentScheme() === 'light' ? Colors.danger : '#5A2230' },
   body: { color: Colors.text, fontFamily: font(500), fontSize: 17, lineHeight: 23 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 4 },
   time: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12 },

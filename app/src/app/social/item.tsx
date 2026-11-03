@@ -200,7 +200,7 @@ export default function SocialItemScreen() {
                     onPress={send}
                     style={({ pressed }) => [styles.send, (!draft.trim() || sending) && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>
                     <View style={{ transform: [{ rotate: '-90deg' }] }}>
-                      <Icon name="chevron" color="#fff" size={24} strokeWidth={2.8} />
+                      <Icon name="chevron" color={(!draft.trim() || sending) ? Colors.textSecondary : '#fff'} size={24} strokeWidth={2.8} />
                     </View>
                   </Pressable>
                 </View>
