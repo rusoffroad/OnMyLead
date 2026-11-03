@@ -2,6 +2,32 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "accurate-location",
+      "battery-saver",
+      "directions",
+      "emergency-and-safety",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "location-sharing",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "ride-summary-and-ride-again",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "running-costs",
+    "why": "Server-cost work, no rider-visible change: Ride Mode now listens only to its own riders' live positions, and the ride track uploads every 2 minutes instead of on every fix (the live dot still updates on every fix; stopping sharing sends the rest). Articles checked against the code; nothing they say changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "report-and-block",
       "privacy"
     ],
