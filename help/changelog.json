@@ -2,6 +2,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-2.0",
+    "why": "The website showcase's Map Mode picture now says Map Mode in its description (it said Navigate). Nothing riders do on the website changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "accurate-location",
       "approvals-and-waitlist",
       "badges-and-ranks",
