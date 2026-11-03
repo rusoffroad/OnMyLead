@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { BadgeStrip } from '@/components/badge-strip';
+import { Icon } from '@/components/icon';
 import { MenuGroup, MenuRow } from '@/components/menu';
 import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
@@ -35,6 +36,8 @@ import { signOut, useSession } from '@/lib/session';
 import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
 import { socialSetting, type SocialProfile } from '@/core/social-profile';
 import { useMusicControlsSetting } from '@/hooks/use-music-controls';
+import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
+import { openHelpCenter } from '@/lib/help-center';
 import { musicAvailable } from '@/lib/music';
 
 /**
@@ -277,12 +280,20 @@ export default function You() {
       ) : null}
 
       <MenuGroup title="Help">
+        <MenuRow
+          icon="book"
+          color={Colors.sky}
+          title={HELP_CENTER_TITLE}
+          detail={`Step-by-step instructions for every feature, at ${HELP_CENTER_DISPLAY}`}
+          onPress={() => openHelpCenter()}
+          right={<Icon name="external" size={18} color={Colors.sky} />}
+        />
         {session ? (
           <MenuRow icon="flagged" color={Colors.danger} title="Report a Rider" detail="Harassment, threats or abuse. Goes to the OnMyLead team" onPress={() => router.push('/report-rider')} />
         ) : null}
         <MenuRow icon="wrench" color={Colors.accent} title="Report a Bug" detail="Something not working? Send it with a screenshot" onPress={() => router.push('/contact?topic=problem')} />
         <MenuRow icon="mail" color={Colors.sky} title="Contact Us" detail="An idea, a billing question or anything else" onPress={() => router.push('/contact')} />
-        <MenuRow icon="checklist" color={Colors.textSecondary} title="Help and Support" detail="Answers to common questions" onPress={() => router.push('/support')} />
+        <MenuRow icon="checklist" color={Colors.textSecondary} title="Help and Support" detail="Quick answers to common questions" onPress={() => router.push('/support')} />
       </MenuGroup>
 
       {session ? (

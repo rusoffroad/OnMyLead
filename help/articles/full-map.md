@@ -51,7 +51,7 @@ The bar keeps only what you shouldn't have to dig for:
 | Ride Mode | The rider line with every rider (on a Freeride, the group behind the leader), **EMERGENCY**, calls for help from other riders, **Center on Me**, **Follow Me**, and **Music** if you use [Music Controls](/help/music-controls) |
 | Navigate | Your speed, the miles left on a trail you're following, or the length you're measuring, a red **Rec** while recording, **Undo** while measuring, **Center on Me** and **Follow Me** (not while measuring) |
 | Draw a Route | The route's miles and **Undo**. Tapping the map still adds points |
-| Waypoints | How many waypoints the ride has. Press and hold the map to drop one |
+| Waypoints | Just the map and its pins. Press and hold the map to drop a waypoint |
 
 On every map, the **No Signal** tag stays when you have no service, and tapping a trail line still shows its card.
 

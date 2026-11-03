@@ -44,6 +44,10 @@ describe('needsAgreement', () => {
     expect(needsAgreement({ userId: 'u1', local: { u1: { version: 1, acceptedAt: at, uploaded: true } }, serverVersion: null })).toBe(false);
     expect(needsAgreement({ userId: 'u1', local: {}, serverVersion: 1 })).toBe(false);
   });
+  it('does not ask again after the rider signs out (the before-sign-in copy was uploaded and removed)', () => {
+    expect(needsAgreement({ userId: null, local: { u1: { version: 1, acceptedAt: at, uploaded: true } }, serverVersion: null })).toBe(false);
+    expect(needsAgreement({ userId: null, local: { u1: { version: 1, acceptedAt: at, uploaded: true } }, serverVersion: null, current: 2 })).toBe(true);
+  });
   it('carries an acceptance made before signing in over to the account', () => {
     expect(needsAgreement({ userId: 'u1', local: { '': { version: 1, acceptedAt: at, uploaded: false } }, serverVersion: 0 })).toBe(false);
   });
