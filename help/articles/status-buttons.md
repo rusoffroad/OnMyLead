@@ -129,6 +129,10 @@ Tapped the wrong button? Tap **Cancel** on the card. The status or quick reply i
 
 If your tap can't go out within a few seconds, the card says **Is Waiting for Signal**. Your tap is saved on your phone and sends by itself when you get service, stamped with the time you tapped it. Tap **Retry Now** to try again right away, or **Cancel** to drop it.
 
+:::release 2.1
+While it waits, riders close by on the same ride still get it over Bluetooth, and if one of their phones gets signal first, it sends it for you. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::
+
 ## Clear Your Status
 
 While your status is anything other than OK, a card on your screen says **Your Status** and what you sent, with a reminder that the group sees it until you mark it resolved. Tap **Resolved, I'm OK** when you're sorted. This sends **OK** to the group.

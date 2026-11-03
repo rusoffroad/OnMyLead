@@ -2,6 +2,54 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "status-buttons",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "bluetooth-sharing",
+    "why": "2.1 release blocks: a status tap waiting for signal still reaches nearby riders over Bluetooth, and a troubleshooting entry for nearby riders not showing up over Bluetooth."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "accurate-location",
+      "badges-and-ranks",
+      "battery-saver",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "getting-started",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "profile-picture",
+      "report-and-block",
+      "ride-bubble",
+      "ride-chat",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "trip-planner",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "bluetooth-sharing",
+    "why": "Checked against the Bluetooth Sharing change (2.1): it adds a Bluetooth Sharing switch on the You tab, an admin flag, Ride Mode's no-service banner and Bluetooth hooks in sending; nothing these articles describe works differently."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "bluetooth-sharing",
       "ride-mode",
       "location-sharing",
