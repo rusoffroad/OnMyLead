@@ -15,6 +15,39 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "delete-account",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "faq",
+      "find-a-ride",
+      "free-vs-pro",
+      "fuel-range",
+      "full-map",
+      "import-gpx",
+      "invite-riders",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "offline-maps",
+      "organizer-controls",
+      "place-search",
+      "privacy",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "trail-widths",
+    "why": "Checked against the trail width change: these articles share code with it (the trail card, Create a Ride, the Garage vehicle save in lib/api.ts) but riders see nothing different in them. Width limits are described in Map Layers and Trails, Garage, Map Mode and Create a Ride. No change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",
