@@ -107,6 +107,10 @@ On Android, Google delivers notifications (Firebase Cloud Messaging), handles pu
 
 :::release 2.0
 [Music Controls](/help/music-controls) read what's playing only on your phone. On Android, the optional Notification Access is used only to see the song and the app playing it; OnMyLead never reads or keeps your notifications.
+
+:::release 2.1
+Your app settings and your own Map Mode trails (with their photos) are backed up to your account so they show on every device you sign in on. Only you can read that backup; a trail becomes public only when you tap **Share with Everyone**. Track Line and your live location are never part of it. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
+:::
 :::
 
 :::release 2.0

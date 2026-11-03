@@ -26,7 +26,7 @@ sources:
   - app/src/core/nav-trails.ts
   - app/src/lib/nav-trails.ts
   - supabase/migrations/20261101600000_nav_trails.sql
-related: [home-screen, follow-me, map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
+related: [sync-across-devices, home-screen, follow-me, map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
 keywords: [map mode, custom trail, map a custom trail, draw a trail, track line, breadcrumb, where i have been, obstacle, named spot, hide my start, navigate, navigation, nav mode, navigation mode, offroad map, gps, record a trail, track, my trails, share a trail, rider trails, user submitted trails, rate a trail, trail rating, accuracy, distance finder, measure, ruler, how far, trail photos, difficulty]
 ---
 
@@ -166,7 +166,13 @@ On a trail you can:
 - See its **Named Spots**. Tap one to rename it, change its kind or **Remove** it, then tap **Save Changes** (or **Save on This Phone**).
 :::
 
+:::until 2.1
 Trails stay on your phone until you share them. Deleting the app deletes them too.
+:::
+
+:::release 2.1
+Your trails are backed up privately to your account, so they're in My Trails on every device you sign in on, and deleting the app doesn't lose them. Nobody else sees them until you share them. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
+:::
 
 ## Share a Trail With Every Rider
 
@@ -200,6 +206,10 @@ Only the rider who mapped a trail can delete it.
 2. Tap **Delete Trail**, then **Delete**.
 
 The trail is deleted from your phone. If you shared it, it also comes off the public map with its photos and ratings. If that can't happen (with no signal, for example), the app says so and keeps the trail, so try again with a signal.
+
+:::release 2.1
+It's deleted from your backup and your other devices too, the next time each one syncs.
+:::
 
 On a trail you shared, the trail's page also has **Delete Your Trail**. It takes the trail off the public map and keeps the copy on this phone in My Trails.
 

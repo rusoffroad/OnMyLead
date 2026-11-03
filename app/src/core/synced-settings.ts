@@ -54,8 +54,14 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'home.publicRadius.v1': 'Find a Ride and Events search radius',
   'starlink.autoConnect.v1': 'Starlink page connects by itself',
   'onmylead.dismissedNotices': 'Announcements the rider closed',
-  // Settings from the 2.1 threads register here as they land: theme, light or dark, color blind
-  // mode, waypoint symbols, voice, units and the tilt warning angles.
+  // Appearance (2.1 themes thread; lib/appearance applies a change from another device)
+  'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
+  // Ride Mode alerts (2.1 threads; each writes its key with setSyncedItem once both branches are in)
+  'voice.choice.v1': 'The voice for spoken alerts (a device without it uses its best installed voice)',
+  'tilt.limits': 'Roll and pitch warning angles',
+  'tilt.voice': 'Spoken tilt warnings on or off',
+  'crash.alert': 'Crash Alert on or off and its sensitivity',
+  // Settings from the other 2.1 threads register here as they land (waypoint symbols, units).
 };
 
 /**
@@ -80,7 +86,7 @@ export const DEVICE_ONLY: Record<string, string> = {
   'onmylead.appSettings': 'A cache of the server’s announcements',
   'onmylead.storeVersion': 'A cache of the store’s latest version',
   'osm-template.v1': 'A cache of the trail map address',
-  'tilt.calibration': 'Tilt calibration: each device sits differently in each mount',
+  'tilt.calibration': 'Tilt calibration (the Zero reading): each device sits differently in its mount',
 };
 
 /** Keys from newer app builds are kept and passed along, never dropped. These are the limits. */
