@@ -84,6 +84,10 @@ What your friends, riders you follow and your riding groups have been up to in t
 
 Tap a post about a group ride or a trail to open it. The feed shows a few posts; tap **Show More** for the rest.
 
+:::release 2.0
+Riders' own posts show in the feed too. Tap the **heart** on any post to like it, or tap the post to open it in **Social** with every comment. **Open Social**, next to **Customize**, shows all your friends' activity, your friends and your posts. See [Like, Comment and Post in Social](/help/social).
+:::
+
 A ride is named only if it was public or you were on it. Your location is never in anyone's feed: an Out Riding post says only the spot words the rider chose, and only to riders who could already see them on Who's Riding.
 
 ### Customize Your Feed
@@ -91,7 +95,7 @@ A ride is named only if it was public or you were on it. Your location is never 
 Tap **Customize**.
 
 1. Under **Show Posts From**, pick **Friends**, **Friends and Riders I Follow**, or **Friends, Follows and My Groups**.
-2. Under **What Shows**, turn off any kind of post you don't want: **Friends Out Riding**, **Finished Rides**, **Badges Earned**, **Trails Shared** or **Group Rides Posted**.
+2. Under **What Shows**, turn off any kind of post you don't want: **Friends Out Riding**, **Finished Rides**, **Badges Earned**, **Trails Shared** or **Group Rides Posted**. From 2.0 there's also **Posts**.
 3. Under **Who Sees Your Activity**, pick **Friends Only** (the default), **Friends and Followers** (riders who follow you as a leader) or **Nobody**.
 4. Tap **Save**.
 

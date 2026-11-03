@@ -19,6 +19,7 @@ export type TapData = {
   itemId?: unknown;
   threadId?: unknown;
   userId?: unknown;
+  key?: unknown;
 };
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -62,6 +63,10 @@ export function tapTarget(data: TapData | undefined): string | null {
   if (data.type === 'direct_message' && userId) return `/messages/${userId}`;
   // A friend request, or a request that was accepted, opens Friends.
   if (data.type === 'friend_request' || data.type === 'friend_accept') return '/friends';
+  // A like or comment on the Feed (2.0 Social) opens that item with its comments.
+  if ((data.type === 'feed_like' || data.type === 'feed_comment') && typeof data.key === 'string' && data.key) {
+    return `/social/item?key=${encodeURIComponent(data.key)}`;
+  }
   // "Your shared trail is hidden": the rider's trails in Map Mode.
   if (data.type === 'trail_hidden') return '/nav/trails';
   const rideId = id(data.rideId);

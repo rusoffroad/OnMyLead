@@ -181,7 +181,7 @@ export function RideChat({
                   ...(poll ? { gap: Spacing.two, paddingBottom: Spacing.one } : null),
                 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
-                  {!mine ? <RiderDot userId={m.user_id} name={nameOf(m.user_id)} size={20} /> : null}
+                  {!mine ? <RiderDot userId={m.user_id} name={nameOf(m.user_id)} size={20} zoom /> : null}
                   <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
                     {announcement ? 'Announcement from ' : poll ? 'Poll from ' : ''}
                     {mine ? 'You' : nameOf(m.user_id)}

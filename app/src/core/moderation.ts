@@ -2,7 +2,7 @@
 // Pure TypeScript: no React Native, so it is unit tested in core/__tests__.
 
 /** Where a report was sent from (reports.source, migration 20261102800000_abuse_reports.sql). */
-export type ReportSource = 'dm' | 'group_chat' | 'ride_chat' | 'ride' | 'roster' | 'out_riding' | 'you';
+export type ReportSource = 'dm' | 'group_chat' | 'ride_chat' | 'ride' | 'roster' | 'out_riding' | 'you' | 'post' | 'comment' | 'profile';
 
 export const REPORT_SOURCE_LABELS: Record<ReportSource, string> = {
   dm: 'Direct Messages',
@@ -12,6 +12,9 @@ export const REPORT_SOURCE_LABELS: Record<ReportSource, string> = {
   roster: 'Ride’s Going List',
   out_riding: 'Out Riding',
   you: 'You > Report a Rider',
+  post: 'A Post on the Feed',
+  comment: 'A Comment on the Feed',
+  profile: 'Rider Profile',
 };
 
 export function reportSourceLabel(source: string | null | undefined): string | null {

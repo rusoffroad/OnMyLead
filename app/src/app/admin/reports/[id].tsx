@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import {
-  AdminButton, AdminColors, AdminPage, Columns, Empty, ErrorNote, FilterChips, Loading, Panel, StatusBadge, SuspendPanel,
+  AdminButton, AdminColors, AdminPage, Columns, Empty, ErrorNote, FilterChips, Loading, Panel, SocialContentCard, StatusBadge, SuspendPanel,
   useConfirm, useToast,
 } from '@/components/admin';
 import { font } from '@/constants/theme';
@@ -77,6 +77,32 @@ export default function ReportDetail() {
         r.kind === 'rider' && (r.reports_on_user ?? 0) > 1 ? ` ${reported} has ${r.reports_on_user} reports from ${r.reporters_on_user ?? '?'} riders.` : ''}`}
       actions={<StatusBadge label={r.status === 'open' ? 'New' : cap(r.status)} tone={r.status === 'open' ? 'admin' : r.status === 'reviewing' ? 'warn' : 'muted'} />}>
       <AdminButton small title="All Reports" onPress={() => (router.canGoBack() ? router.back() : router.replace('/admin/reports'))} style={{ alignSelf: 'flex-start' }} />
+      {r.post_id || r.comment_id ? (
+        <Panel title={r.post_id ? 'Reported Post' : 'Reported Comment'} right={<Text style={styles.dim}>As it read when reported</Text>}>
+          {r.reported_text ? <Text style={styles.body}>{r.reported_text}</Text> : null}
+          {r.post ? (
+            <SocialContentCard
+              onDone={reload}
+              c={{
+                kind: 'post', id: r.post.id, authorId: r.reported_user_id ?? '', body: r.post.body, photoPath: r.post.photo_path,
+                createdAt: r.post.created_at, hiddenAt: r.post.hidden_at, hiddenReason: r.post.hidden_reason, hiddenBy: r.post.hidden_by,
+                note: `Now. Reported by ${r.post.reporters} ${r.post.reporters === 1 ? 'rider' : 'riders'}`,
+              }}
+            />
+          ) : r.comment ? (
+            <SocialContentCard
+              onDone={reload}
+              c={{
+                kind: 'comment', id: r.comment.id, authorId: r.reported_user_id ?? '', body: r.comment.body,
+                createdAt: r.comment.created_at, hiddenAt: r.comment.hidden_at, hiddenReason: r.comment.hidden_reason, hiddenBy: r.comment.hidden_by,
+                note: `On ${r.comment.owner_name}’s ${r.comment.item_key.split(':')[0]}. Reported by ${r.comment.reporters} ${r.comment.reporters === 1 ? 'rider' : 'riders'}`,
+              }}
+            />
+          ) : (
+            <Text style={styles.dim}>The rider has since deleted it. The text above is what was reported.</Text>
+          )}
+        </Panel>
+      ) : null}
       <Columns ratio={[1.4, 1]}>
         <Panel title="Conversation" right={<Text style={styles.dim}>Saved when the report was sent</Text>}>
           {conversations.length > 1 ? (
