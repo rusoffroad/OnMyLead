@@ -59,6 +59,14 @@ const PATHS = {
   regroup: ['M12 2.5v3', 'M12 18.5v3', 'M2.5 12h3', 'M18.5 12h3'],
   layers: ['M12 3.5l9 5-9 5-9-5z', 'M3 13l9 5 9-5'],
   back: ['M15 5l-7 7 7 7'],
+  // Radio waves: riders out riding right now.
+  signal: ['M8.5 8.5a5 5 0 0 0 0 7', 'M15.5 8.5a5 5 0 0 1 0 7', 'M5.6 5.6a9 9 0 0 0 0 12.8', 'M18.4 5.6a9 9 0 0 1 0 12.8'],
+  help: ['M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9', 'M12 17.2v.3'],
+  sliders: ['M4 6.5h9', 'M17 6.5h3', 'M4 12h3', 'M11 12h9', 'M4 17.5h11', 'M19 17.5h1'],
+  // A line drawn between two points: a custom trail.
+  draw: ['M7 17.5c3.5-.8 3-5.5 6-7.5s3.5-2.6 4.2-3.2'],
+  download: ['M3.5 6.5L9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5-5.5 2.5z', 'M12 9.5v6', 'M9.5 13.2L12 15.7l2.5-2.5'],
+  trackLine: ['M3.5 18c2.5-4 5-1 7.5-5s4-6 9.5-7'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
@@ -82,6 +90,21 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: 
         </>
       ) : null}
       {name === 'block' ? <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'help' ? <Circle cx={12} cy={12} r={9.5} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'signal' ? <Circle cx={12} cy={12} r={1.8} fill={color} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'sliders' ? (
+        <>
+          <Circle cx={15} cy={6.5} r={2} stroke={color} strokeWidth={strokeWidth} />
+          <Circle cx={9} cy={12} r={2} stroke={color} strokeWidth={strokeWidth} />
+          <Circle cx={17} cy={17.5} r={2} stroke={color} strokeWidth={strokeWidth} />
+        </>
+      ) : null}
+      {name === 'draw' ? (
+        <>
+          <Circle cx={5} cy={18} r={2} stroke={color} strokeWidth={strokeWidth} />
+          <Circle cx={19} cy={5.5} r={2} stroke={color} strokeWidth={strokeWidth} />
+        </>
+      ) : null}
       {name === 'search' ? <Circle cx={10.5} cy={10.5} r={6.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'machine' ? (
         <>

@@ -37,7 +37,7 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  const { type, copy, trail } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string }>();
+  const { type, copy, trail, group } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string }>();
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
@@ -118,7 +118,7 @@ export default function NewRide() {
     })().catch((e) => setError(e instanceof Error ? e.message : 'Could not copy that ride.'));
   }, [copy]);
 
-  // Plan a Group Ride on This Trail (Navigation Mode): the trail becomes the route, its start the meeting point.
+  // Plan a Group Ride on This Trail (Map Mode): the trail becomes the route, its start the meeting point.
   const [fromTrail, setFromTrail] = useState<string | null>(null);
   useEffect(() => {
     if (!trail) return;
@@ -138,8 +138,15 @@ export default function NewRide() {
 
   // Riding groups to invite as soon as the ride exists (none until groups are switched on).
   useEffect(() => {
-    myGroups().then(setGroups).catch(() => setGroups([]));
-  }, []);
+    myGroups()
+      .then((all) => {
+        setGroups(all);
+        // Plan a Group Ride on the home screen's group card: that group comes ticked.
+        const picked = group ? all.find((g) => g.id === group) : undefined;
+        if (picked) setGroupNames((names) => (names.includes(picked.name) ? names : [...names, picked.name]));
+      })
+      .catch(() => setGroups([]));
+  }, [group]);
 
   const parsedCoords = coords.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
 

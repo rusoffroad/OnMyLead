@@ -17,7 +17,7 @@ const STATUS_LABEL: Record<api.TrailStatus, string> = { public: 'Public', hidden
 const STATUS_TONE = { public: 'ok', hidden: 'warn', removed: 'muted' } as const;
 
 /**
- * Rider Trails: every trail riders shared from Navigation Mode. Hidden trails are the ones riders
+ * Rider Trails: every trail riders shared from Map Mode. Hidden trails are the ones riders
  * rated as inaccurate (or that an admin took down). Put a trail back, hide it, or remove it, and
  * change how many bad ratings hide a trail.
  */
@@ -51,7 +51,7 @@ export default function RiderTrails() {
   };
 
   return (
-    <AdminPage title="Rider Trails" subtitle="Trails riders mapped in Navigate and shared with everyone. Newest first.">
+    <AdminPage title="Rider Trails" subtitle="Trails riders mapped in Map Mode and shared with everyone. Newest first.">
       {data?.rules ? <HideRule rules={data.rules} onSaved={reload} /> : null}
       <FilterChips
         options={[
