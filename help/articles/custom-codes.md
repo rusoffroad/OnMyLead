@@ -21,6 +21,10 @@ keywords: [custom code, own code, invite code, ride code, group code, friend cod
 
 Every ride, riding group and friend link has a code: it's the end of the link (onmylead.com/r/MOAB-2026) and what riders type to open it. OnMyLead makes one for you, like 7F3A9C21. You can type your own instead, so it's easy to say out loud at the trailhead.
 
+:::release 2.0
+Choosing your own code is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, every ride, group and friend link still gets its own code that works, and the code box shows a **Pro** tag.
+:::
+
 ## What a Code Can Be
 
 - 6 to 20 letters and numbers

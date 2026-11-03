@@ -7,6 +7,9 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { AUTO_VOICE, resolveVoice, suggestDownload, VOICE_SAMPLE, voiceChoices, voiceLabel, voiceTier, type PhoneVoice } from '@/core/voice';
+import { showsProTag } from '@/core/entitlements';
+import { ProTag } from '@/components/pro-tag';
+import { requirePro, useEntitlements } from '@/lib/pro';
 import { deviceLanguage, installedVoices, setVoiceChoice, speakWith, stopSpeaking, useVoiceChoice } from '@/lib/voice';
 
 /** Where a rider gets a better free voice, per device. Steps are the same on iPhone and iPad. */
@@ -22,6 +25,7 @@ const DOWNLOAD_STEPS: Record<string, string> = {
  * pick another and hear each one first. Device-local, offline (core/voice.ts).
  */
 export default function VoiceScreen() {
+  const { ent } = useEntitlements();
   const saved = useVoiceChoice();
   const [voices, setVoices] = useState<PhoneVoice[] | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
@@ -58,6 +62,12 @@ export default function VoiceScreen() {
         <ActivityIndicator color={Colors.textSecondary} style={{ marginVertical: Spacing.four }} />
       ) : (
         <View style={styles.list} accessibilityRole="radiogroup">
+          {showsProTag(ent, 'natural_voices') ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <ProTag feature="natural_voices" />
+              <ThemedText type="small" themeColor="textSecondary">Automatic is free. Pick your own voice with Pro.</ThemedText>
+            </View>
+          ) : null}
           <VoiceRow
             title="Automatic"
             detail={auto ? `Best voice on this device: ${voiceLabel(auto, choices)}` : 'This device’s standard voice'}
@@ -74,7 +84,8 @@ export default function VoiceScreen() {
               detail={tierDetail(v)}
               on={!autoOn && inUse?.identifier === v.identifier}
               playing={playing === v.identifier}
-              onPick={() => setVoiceChoice(v.identifier)}
+              // Automatic stays free; picking a voice of your own is part of Pro.
+              onPick={() => requirePro('natural_voices') && setVoiceChoice(v.identifier)}
               onPlay={() => play(v.identifier, v)}
             />
           ))}

@@ -19,6 +19,10 @@ keywords: [appearance, theme, themes, skin, light mode, dark mode, match phone, 
 
 OnMyLead starts in the dark Night Navy look. Go to **You** > **Appearance** to change it. The app redraws as soon as you tap, and it opens the same way next time.
 
+:::release 2.0
+Light mode, Match Phone and the themes are Pro features. See [Free and Pro](/help/free-vs-pro). Dark mode, the Navy theme and Color Blind Mode stay free. If you picked a look before version 2.0, the app keeps it.
+:::
+
 ## Mode
 
 | Mode | What it does |

@@ -23,6 +23,10 @@ On Android, directions open in Google Maps, since Android phones and tablets don
 
 Only the place you want to go is sent to the maps app, nothing about you.
 
+:::release 2.0
+Directions are a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Directions** buttons carry a **Pro** tag. Directions to a rider who taps Need Help, EMERGENCY or Mechanical Issue, or who falls behind the group, always stay free.
+:::
+
 ## Get Directions to the Meeting Point
 
 1. Open the ride from the **Rides** tab.

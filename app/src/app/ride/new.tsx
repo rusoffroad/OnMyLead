@@ -12,7 +12,7 @@ import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/c
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { withAlpha } from '@/core/color';
 import type { BubblePreset } from '@/core/bubble';
-import { rideAllowanceText } from '@/core/entitlements';
+import { rideAllowanceText, type FeatureKey } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
@@ -32,7 +32,8 @@ import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
 import { useSession } from '@/lib/session';
-import { handleProError } from '@/lib/pro';
+import { handleProError, requirePro } from '@/lib/pro';
+import { ProTag } from '@/components/pro-tag';
 
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
 
@@ -364,7 +365,8 @@ export default function NewRide() {
             title="Mapped"
             detail="Draw the route or import a GPX next. Riders follow it in Ride Mode."
             on={routePlan === 'mapped'}
-            onPress={() => setRoutePlan('mapped')}
+            onPress={() => requirePro('route_builder') && setRoutePlan('mapped')}
+            pro="route_builder"
           />
           <KindCard
             title="Freeride"
@@ -487,7 +489,7 @@ export default function NewRide() {
 }
 
 /** One of two choices (Public or Private, Mapped or Freeride): a big tappable card, outlined in red when picked. */
-function KindCard({ title, detail, on, onPress }: { title: string; detail: string; on: boolean; onPress: () => void }) {
+function KindCard({ title, detail, on, onPress, pro }: { title: string; detail: string; on: boolean; onPress: () => void; pro?: FeatureKey }) {
   return (
     <Pressable
       accessibilityRole="radio"
@@ -497,7 +499,10 @@ function KindCard({ title, detail, on, onPress }: { title: string; detail: strin
         flex: 1, gap: Spacing.one, padding: Spacing.three, minHeight: 128, borderRadius: Radius.card, borderWidth: 2,
         borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? withAlpha(Colors.accent, 0.14) : Colors.backgroundElement,
       }}>
-      <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
+        {pro ? <ProTag feature={pro} /> : null}
+      </View>
       <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText>
     </Pressable>
   );

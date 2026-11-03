@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ActionSheetIOS, Linking, Platform } from 'react-native';
 
 import { MAPS_APP_LABEL, mapsAppsFor, mapsUrl, pickedApp, type DirectionsTarget, type MapsApp, type MapsPreference } from '@/core/directions';
+import { requirePro } from '@/lib/pro';
 import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 /**
@@ -74,7 +75,9 @@ export function useWebDirectionsPrompt(): [DirectionsTarget | null, () => void] 
 }
 
 /** Turn-by-turn directions: straight into the rider's maps app, or ask which one first. */
-export async function openDirections(t: DirectionsTarget) {
+export async function openDirections(t: DirectionsTarget, opts?: { safety?: boolean }) {
+  // Directions are Pro, except to a rider who asked for help (Need Help, EMERGENCY, a crash).
+  if (!opts?.safety && !requirePro('directions')) return;
   await load();
   const app = pickedApp(pref, Platform.OS);
   if (app) return openIn(app, t);

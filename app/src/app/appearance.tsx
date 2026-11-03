@@ -5,12 +5,14 @@ import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Screen, Segmented } from '@/components/ui';
 import { colorBlindOn, Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
-import { MODES, SKINS, statusSymbol, type Skin } from '@/core/appearance';
+import { DEFAULT_APPEARANCE, MODES, SKINS, statusSymbol, type Skin } from '@/core/appearance';
 import { withAlpha } from '@/core/color';
 import { MEDIUM_MIN } from '@/core/layout';
 import { DIFFICULTIES } from '@/core/nav-trails';
 import { TRACK_DAY_COLORS } from '@/core/track-line';
 import { setAppearance, useAppearance } from '@/lib/appearance';
+import { ProTag } from '@/components/pro-tag';
+import { requirePro } from '@/lib/pro';
 
 const HERE = '/appearance';
 
@@ -29,19 +31,30 @@ export default function AppearanceScreen() {
       <Stack.Screen options={{ title: 'Appearance' }} />
 
       <View style={styles.group}>
-        <ThemedText type="subtitle">Mode</ThemedText>
+        <View style={styles.titleRow}>
+          <ThemedText type="subtitle">Mode</ThemedText>
+          <ProTag feature="themes" />
+        </View>
         <ThemedText type="small" themeColor="textSecondary">
           Light is easier to read in bright sun. Match Phone follows your device’s own Dark Mode setting.
         </ThemedText>
-        <Segmented options={MODES} value={appearance.mode} onChange={(mode) => setAppearance({ mode }, HERE)} />
+        <Segmented
+          options={MODES}
+          value={appearance.mode}
+          // Dark is free; Light and Match Phone are part of Pro (themes).
+          onChange={(mode) => (mode === DEFAULT_APPEARANCE.mode || requirePro('themes')) && setAppearance({ mode }, HERE)}
+        />
       </View>
 
       <View style={styles.group}>
-        <ThemedText type="subtitle">Theme</ThemedText>
+        <View style={styles.titleRow}>
+          <ThemedText type="subtitle">Theme</ThemedText>
+          <ProTag feature="themes" />
+        </View>
         <ThemedText type="small" themeColor="textSecondary">Each theme has a dark and a light version.</ThemedText>
         <View style={styles.skins} accessibilityRole="radiogroup">
           {SKINS.map((s) => (
-            <SkinCard key={s.id} skin={s} on={s.id === appearance.skin} columns={columns} onPress={() => setAppearance({ skin: s.id }, HERE)} />
+            <SkinCard key={s.id} skin={s} on={s.id === appearance.skin} columns={columns} onPress={() => (s.id === DEFAULT_APPEARANCE.skin || requirePro('themes')) && setAppearance({ skin: s.id }, HERE)} />
           ))}
         </View>
       </View>
@@ -157,6 +170,7 @@ function Preview() {
 
 const styles = themedStyles(() => ({
   group: { gap: Spacing.two, marginTop: Spacing.three },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   skins: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: Spacing.two, marginTop: Spacing.one },
   skin: {
     gap: 6, padding: 10, borderRadius: Radius.card, borderWidth: 2, borderColor: Colors.border, backgroundColor: Colors.backgroundElement,

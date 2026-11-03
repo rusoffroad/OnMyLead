@@ -419,7 +419,8 @@ export default function RidePage() {
                 <Button
                   title={route ? 'Edit Route' : ride.freeride ? 'Map a Route Anyway' : 'Build the Route'}
                   kind={route || ride.freeride ? 'secondary' : 'primary'}
-                  onPress={() => router.push(`/ride/${ride.id}/route`)}
+                  pro="route_builder"
+                  onPress={() => requirePro('route_builder') && router.push(`/ride/${ride.id}/route`)}
                 />
               ) : null}
             </Card>
@@ -448,7 +449,8 @@ export default function RidePage() {
                   title="Add a Planned Stop"
                   kind={stops.length ? 'secondary' : 'primary'}
                   disabled={!waypoints.stopsSwitchedOn}
-                  onPress={() => router.push(`/ride/${ride.id}/waypoints?stop=1`)}
+                  pro="waypoints"
+                  onPress={() => requirePro('waypoints') && router.push(`/ride/${ride.id}/waypoints?stop=1`)}
                 />
               ) : null}
             </Card>
@@ -481,7 +483,8 @@ export default function RidePage() {
                 title={otherWaypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
                 kind={otherWaypoints.length ? 'secondary' : 'primary'}
                 disabled={!waypoints.switchedOn}
-                onPress={() => router.push(`/ride/${ride.id}/waypoints`)}
+                pro={otherWaypoints.length ? undefined : 'waypoints'}
+                onPress={() => (otherWaypoints.length || requirePro('waypoints')) && router.push(`/ride/${ride.id}/waypoints`)}
               />
             </Card>
           ) : null}

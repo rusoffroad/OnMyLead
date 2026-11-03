@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 're
 
 import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
+import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
 import { useAppSettings } from '@/lib/app-settings';
 import { useSocialProviders } from '@/lib/session';
@@ -57,7 +58,7 @@ export function Showcase() {
         <title>OnMyLead: the Group Ride App for iPhone, iPad and Android</title>
         <meta
           name="description"
-          content="Create a ride, bring your crew and keep everyone together on the trail. Live group map, Ride Bubble alerts, ride chat and more. Free on iPhone, iPad and Android, with Pro for the riders who lead."
+          content="Create a ride, bring your crew and keep everyone together on the trail. Live group map, Ride Bubble alerts, ride chat and more. Free on iPhone and Android phones, with Pro for the riders who lead and for iPad, Android tablets and the website."
         />
       </Head>
       <style>{CSS}</style>
@@ -188,7 +189,7 @@ export function Showcase() {
               <li>Follow Trails, or Straight Line where nothing is mapped</li>
               <li>Drag a point to move it, or press Ctrl+Z to undo</li>
               <li>Fold the route tools away to see more map</li>
-              <li>Drawing a route is free. Importing a GPX track is Pro.</li>
+              <li>Drawing a route, waypoints and importing a GPX track are Pro. Freeride rides are free.</li>
             </ul>
             <a className="btn btn-red" href="/ride/new" onClick={go('/ride/new')}>Create a Ride on the Web</a>
             <p className="plan-small">You’ll sign in first, then go straight to Create a Ride. Ride Mode and live tracking stay in the app on your phone or tablet.</p>
@@ -209,6 +210,7 @@ export function Showcase() {
               <p>
                 On an iPad or an Android tablet the map fills the screen. Every rider sits in a list down the side with how fresh their
                 spot is, and your buttons stay on the other side, so the leader sees the group, the route and the controls at once.
+                Tablets are part of Pro; joining a ride and Ride Mode work free on any device.
               </p>
               <ul className="ticks">
                 <li>Hold it upright or sideways; the layout follows</li>
@@ -274,7 +276,7 @@ export function Showcase() {
               <li>Turn any trail into a group ride’s route in one tap</li>
               <li>Sign in on your iPhone, iPad, Android phone or tablet and your trails and settings are there, backed up privately to your account</li>
             </ul>
-            <p className="qr-small">The map, drawing, Track Line and rating are free; recording, sharing and group rides on your trails are Pro. Shared trails show in full, and Hide My Start leaves off the first and last 200 meters of a recording that starts at home.</p>
+            <p className="qr-small">Map Mode is free for 8 hours a month (never counted on a group ride) and unlimited with Pro. Drawing, recording, saving, rating, Track Line, named spots, sharing and group rides on your trails are Pro. Shared trails show in full, and Hide My Start leaves off the first and last 200 meters of a recording that starts at home.</p>
           </div>
         </section>
       </main>
@@ -354,7 +356,7 @@ export function Showcase() {
           <h2 id="download-title">{APP_STORE_URL || PLAY_STORE_URL ? 'Get OnMyLead' : 'Coming Soon to iPhone'}</h2>
           <p>
             {APP_STORE_URL || PLAY_STORE_URL
-              ? `Free on iPhone, iPad, Android phones and Android tablets. Download it, make your account, and your first ${TRIAL_DAYS} days of Pro start on their own.`
+              ? `Free on iPhone and Android phones; iPad, Android tablets and the website come with Pro. Download it, make your account, and your first ${TRIAL_DAYS} days of Pro start on their own.`
               : 'OnMyLead is in testing on the trail now and heads to the App Store next. Plan your first ride on the web today.'}
           </p>
           <div className="download-actions">
@@ -569,29 +571,35 @@ function Feature({ title, children }: { title: string; children: ReactNode }) {
 // Plan names match the app's Pro screen (core/pro.ts COMPARISON).
 const FREE = [
   'Create 1 Ride a Month',
-  'Join Unlimited Rides',
-  'Live Tracking, SOS and Ride Bubble',
+  'Join Unlimited Rides and Follow the Leader',
+  'Live Tracking, SOS, Crash Alert and Ride Bubble',
   'Mechanical Issue and Family Tracking Links',
-  'Ride Chat and Poll Voting',
-  'Draw Routes and Follow Leaders',
-  'Map Mode: Offroad Map, Custom Trails, Rate Trails',
+  'Ride Chat',
+  `Map Mode: ${FREE_MAP_HOURS} Hours a Month`,
   'Social Feed: See, Like and Read Comments',
+  'Badges, Events and Friends',
   'Ride History: Last 5 Rides',
 ];
 const PRO = [
-  'Unlimited Rides',
-  'Import GPX Routes',
-  'Post, Comment and Share to Social Media',
-  'Record and Share Your Trails',
+  'Unlimited Rides and Unlimited Map Mode',
+  'iPad, Android Tablets and the Website',
+  'Draw Routes, Waypoints and Directions',
+  'Satellite, Topo and Trail Map Layers',
+  'Draw, Record, Save, Rate and Share Trails',
+  'Track Line and Named Spots',
   'Group Rides on Your Trails',
+  'Import GPX Routes',
   'Offline Maps',
-  'Saved Riding Groups',
-  'Create Ride Polls',
-  'Full Ride History',
-  'Advanced Trip Planning',
-  'Advanced Ride Statistics',
-  'Premium Ride Cards',
+  'Post, Comment and Share to Social Media',
   'Create Events',
+  'Saved Riding Groups and Custom Codes',
+  'Create and Vote on Ride Polls',
+  'Your Own Messages and Music Controls',
+  'Full Ride History',
+  'Advanced Ride Statistics and Premium Cards',
+  'Advanced Trip Planning and Garage Build Sheet',
+  'Themes, Light Mode and Natural Voices',
+  'Sync Across Devices',
 ];
 
 function Pricing() {
