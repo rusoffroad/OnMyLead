@@ -12,6 +12,19 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "full-map",
+      "follow-me",
+      "getting-started",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-dash",
+    "why": "Checked against the Map Mode dash change: Full Map's slim bar still keeps speed, Follow Me works the same (Android now opens Map Mode zoomed in on you, as iPhone already did), and the website showcase only gained the new readings in Map Mode's text and screenshot. No change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "events",
       "privacy"
     ],
