@@ -24,7 +24,7 @@ Events are the big days: a rally, a poker run, a club weekend or a meetup. An ev
 
 ## Find an Event
 
-1. On the **Rides** tab, tap the **Events** card (under Map Mode).
+1. On the **Rides** tab, tap the **Events** card (right under Create a Ride and Find a Ride).
 2. **Coming Up** lists public events, soonest first. With location allowed, it shows the ones within your distance (the same distance as Public Rides Near You); tap the distance chip to change it.
 3. Tap an event to open it.
 
