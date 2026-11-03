@@ -21,7 +21,7 @@ related: [join-a-ride, create-a-ride, find-a-ride, navigation-mode, riding-group
 keywords: [home, home screen, rides tab, main screen, feed, activity, customize feed, who sees my activity, toolkit, public rides near me, distance, radius, 500 miles, rides left, unlimited, your group]
 ---
 
-The **Rides** tab is your home screen. It puts the three things riders do most at the top (join, create and find a ride), then Map Mode, your rides, your crew and what your friends have been up to.
+The **Rides** tab is your home screen. It puts the three things riders do most at the top (join, create and find a ride), then events, Map Mode, your rides, your crew and what your friends have been up to.
 
 ## At the Top
 
@@ -32,10 +32,14 @@ The **Rides** tab is your home screen. It puts the three things riders do most a
 ## Join, Create and Find
 
 - **Join a Ride**, the big red card: type the invite code from the ride leader and tap **Join**. You can also open a ride's link or scan its QR code with your phone's camera. Joining is **Unlimited** on every plan. See [Join a Ride](/help/join-a-ride).
-- **Create a Ride**: the label says how many rides you have left this month on Free (**1 Left This Month**, or **None Left This Month**), or **Unlimited** on Pro and during the trial. Tap the label on Free to see what Pro adds. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
+- **Create a Ride**, the dark card with the red flag under Join: the label says how many rides you have left this month on Free (**1 Left This Month**, or **None Left This Month**), or **Unlimited** on Pro and during the trial. Tap the label on Free to see what Pro adds. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
 - **Find a Ride**: opens the map of public rides. The label shows how many are coming up near you, like **12 Within 500 mi**. See [Find a Ride](/help/find-a-ride).
 
 When one of your rides is live, a card says **Your ride is live. Tap to open Ride Mode**.
+
+## Events
+
+Right under Join, Create and Find, the **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
 
 ## Map Mode
 
@@ -46,10 +50,6 @@ Your offroad map for when you're not on a group ride. The card shows a small map
 - **Track Line** draws where you've been, a new colour each day: today red, yesterday blue, older days gold.
 
 See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
-
-## Events
-
-Under Map Mode, the **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
 
 ## Your Rides
 
@@ -116,11 +116,11 @@ Shortcuts to the tools that live on the **You** tab: **Who's Riding**, **Friends
 
 ## Help & Support
 
-Opens Help and Support: these guides, **Contact Us**, and how to report a problem.
+Opens Help and Support. At the top, **Help Center: How-To Guides** opens these step-by-step guides; below it are **Contact Us** and quick answers to common questions, each with a **Read the Guide** link.
 
 ## On a Tablet
 
-In landscape, and on a big window, Home has two columns: join, create, find, Map Mode, your toolkit and help on the left; your rides, group, public rides, feed and badges on the right. In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+In landscape, and on a big window, Home has two columns: join, create, find, events, Map Mode, your toolkit and help on the left; your rides, group, public rides, feed and badges on the right. In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 
 ## On the Website
 
