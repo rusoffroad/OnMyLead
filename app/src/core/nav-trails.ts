@@ -9,6 +9,7 @@
  * accuracy ratings hide it from everyone but its mapper (the database decides; hidesTrail mirrors
  * the rule for the app's wording).
  */
+import { parseObstacles, type Obstacle } from './obstacles';
 import { distanceM, METERS_PER_MILE, type LatLng } from './geo';
 import { cumulativeM, lineLengthM, locateOnRoute, makeRoute, simplifyLine, type RideRoute } from './route';
 
@@ -110,6 +111,10 @@ export type LocalTrail = {
   shared: ShareState | null;
   /** A public trail saved from someone else: its id there (never shared again by this rider). */
   savedFrom?: { id: string; mapper: string } | null;
+  /** Named spots along the trail (core/obstacles), shared with it. */
+  obstacles?: Obstacle[];
+  /** Recorded trails only: leave off the first and last SHARE_TRIM_M when sharing (off by default). */
+  hideStart?: boolean;
 };
 
 export const MAX_PHOTOS = 6;
@@ -210,8 +215,15 @@ export function trackStats(points: TrackPoint[]): TrackStats {
 
 // --- Sharing -----------------------------------------------------------------
 
-/** Cut off each end before sharing, so a trail recorded from home never shows home. */
+/**
+ * Hide My Start: cut this much off each end before sharing, so a trail recorded from home never
+ * shows home. Since 2.0 it's the rider's choice on recorded trails (off by default) and never
+ * applies to drawn trails, which share end to end.
+ */
 export const SHARE_TRIM_M = 200;
+
+/** How much each end loses when this trail is shared. */
+export const shareTrimFor = (t: Pick<LocalTrail, 'source' | 'hideStart'>) => (t.source === 'recorded' && t.hideStart ? SHARE_TRIM_M : 0);
 /** What must be left after the trim for the trail to be worth sharing. */
 export const MIN_SHARED_M = 200;
 /** Shared lines are thinned to this many points (the database takes up to 3000). */
@@ -220,6 +232,7 @@ export const MAX_SHARED_POINTS = 2500;
 /** Remove `trimM` from the start and the end of a line, cutting mid-segment where needed. */
 export function trimEnds(points: LatLng[], trimM = SHARE_TRIM_M): LatLng[] {
   if (points.length < 2) return [];
+  if (trimM <= 0) return points;
   const cum = cumulativeM(points);
   const total = cum[cum.length - 1];
   if (total <= trimM * 2) return [];
@@ -262,7 +275,7 @@ export function fromLineString(g: unknown): LatLng[] {
 }
 
 /** What stops a trail from being shared, in the words the form shows. Empty when it can go. */
-export function shareProblems(t: Pick<LocalTrail, 'details' | 'points'>): string[] {
+export function shareProblems(t: Pick<LocalTrail, 'details' | 'points'> & Partial<Pick<LocalTrail, 'source' | 'hideStart'>>): string[] {
   const out: string[] = [];
   const name = t.details.name.trim();
   if (name.length < 2) out.push('Give the trail a name.');
@@ -271,8 +284,11 @@ export function shareProblems(t: Pick<LocalTrail, 'details' | 'points'>): string
   if (!t.details.vehicles.length) out.push('Pick at least one vehicle type.');
   if (t.details.description.length > 1000) out.push('Keep the notes under 1,000 characters.');
   if (t.details.maxWidthIn != null && (t.details.maxWidthIn < 30 || t.details.maxWidthIn > 120)) out.push('Width limit is 30 to 120 inches.');
-  if (!lineForSharing(t.points).length) {
-    out.push(`The trail is too short to share. Shared trails leave off the first and last ${feetOrMiles(SHARE_TRIM_M)} to keep your start private.`);
+  const trim = shareTrimFor({ source: t.source ?? 'recorded', hideStart: t.hideStart });
+  if (!lineForSharing(t.points, trim).length) {
+    out.push(trim
+      ? `The trail is too short to share with Hide My Start on. It leaves off the first and last ${feetOrMiles(SHARE_TRIM_M)}.`
+      : `The trail is too short to share. Shared trails need at least ${feetOrMiles(MIN_SHARED_M)}.`);
   }
   return out;
 }
@@ -419,6 +435,8 @@ export type PublicTrail = {
   elevationGainM: number | null;
   highPointM: number | null;
   photos: string[];
+  /** Named spots along the trail; [] from servers before 2.0. */
+  obstacles: Obstacle[];
   status: 'public' | 'hidden' | 'removed';
   hiddenReason: 'ratings' | 'admin' | null;
   hiddenSeen: boolean;
@@ -463,6 +481,7 @@ export function parsePublicTrail(v: unknown): PublicTrail | null {
     elevationGainM: num(o.elevation_gain_m),
     highPointM: num(o.high_point_m),
     photos: (Array.isArray(o.photos) ? o.photos : []).filter((x): x is string => typeof x === 'string' && x.startsWith('https://')),
+    obstacles: parseObstacles(o.obstacles),
     status,
     hiddenReason: o.hidden_reason === 'ratings' || o.hidden_reason === 'admin' ? o.hidden_reason : null,
     hiddenSeen: o.hidden_seen === true,

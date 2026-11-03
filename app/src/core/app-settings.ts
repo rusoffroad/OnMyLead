@@ -27,12 +27,13 @@ export const NO_SETTINGS: AppSettings = { announcement: null, maintenance: null,
 /** The flags the app reads, with the names and notes the Settings page shows (Title Case). */
 export const APP_FLAGS = {
   find_a_ride: { label: 'Find a Ride', hint: 'The Find a Ride button and map, and Public Rides on the home screen. Invite codes and links still work.' },
-  trip_planner: { label: 'Trip Planner', hint: 'The Trip Planner on the home screen. Saved trips are kept.' },
-  starlink: { label: 'Starlink', hint: 'The Starlink page on the home screen.' },
+  trip_planner: { label: 'Trip Planner', hint: 'The Trip Planner in the home screen toolkit. Saved trips are kept.' },
+  starlink: { label: 'Starlink', hint: 'The Starlink page in the home screen toolkit.' },
   rus_gear: { label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },
   ride_polls: { label: 'Ride Polls', hint: 'Creating new polls in ride chat. Polls already sent can still be voted on.' },
-  music_controls: { label: 'Music Controls', hint: 'The Music button in Ride Mode and Navigate (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
-  nav_mode: { label: 'Navigate', hint: 'The Navigate button on the home screen (offroad navigation, recording and sharing trails). Trails on riders’ phones are kept; rider trails on maps still show.' },
+  music_controls: { label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
+  nav_mode: { label: 'Map Mode', hint: 'The Map Mode card on the home screen (offroad map, recording, custom trails and sharing). Trails on riders’ phones are kept; rider trails on maps still show.' },
+  home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
 } as const satisfies Record<string, { label: string; hint: string }>;
 
 export type AppFlag = keyof typeof APP_FLAGS;
