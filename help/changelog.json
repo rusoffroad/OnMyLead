@@ -2,6 +2,28 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "home-screen",
+      "events",
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "getting-started",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "home-cards-fix",
+    "why": "In 2.0 the Create a Ride card is now dark like Find a Ride (red flag icon instead of a red background), and both cards fill and line up evenly. The guide now names the card by its look. Events now sits right under Join, Create and Find, above Map Mode (Chris asked to move it up). Other guides that describe the home screen were checked; only the tablet guide's list changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "events",
       "privacy"
     ],
