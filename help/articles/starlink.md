@@ -4,7 +4,7 @@ summary: See your Starlink dish's live status on its Wi-Fi, keep your plan detai
 category: account
 order: 60
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/starlink.tsx
   - app/src/lib/starlink.ts
@@ -12,6 +12,7 @@ sources:
   - app/src/core/power.ts
   - app/src/app/(tabs)/profile.tsx
   - app/src/components/app-notices.tsx
+  - app/src/components/starlink-mount-ad.tsx
 related: [garage, trip-planner, troubleshooting]
 keywords: [starlink, dish, satellite internet, mini, roam, battery, power station, solar, watts, runtime, obstruction, latency]
 ---
@@ -54,6 +55,12 @@ If you see **Can't Reach Your Dish**:
 The page keeps trying every 10 seconds. Tap **Retry Now** to try straight away. If it says your dish answered but couldn't be read, a Starlink software update may have changed things. Try again later.
 
 Reading the dish only works in the iPhone app, not on the website.
+
+:::release 2.0
+## RUS Starlink Mini Mount V2
+
+Below **Your Dish**, the Starlink page shows an ad for the RUS Offroad Starlink Mini Mount V2 (Morelock Series), made by the team behind OnMyLead. Tap **Shop the Mount** to open its page at rusoffroad.com. The photo and price come from the RUS Offroad store when it can be reached.
+:::
 
 ## Save Your Plan
 
