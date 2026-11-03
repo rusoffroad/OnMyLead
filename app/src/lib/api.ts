@@ -596,6 +596,8 @@ export type VehicleInput = {
   tank_gallons: number | null;
   extra_fuel_gallons: number;
   mpg: number | null;
+  /** Left out until the rider enters one, so saving works before the server has the column. */
+  width_in?: number | null;
 };
 
 export type VehicleWithCost = Vehicle & { build_cost_cents: number; item_count: number };
