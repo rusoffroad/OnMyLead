@@ -38,12 +38,13 @@
       "privacy",
       "ride-bubble",
       "ride-summary-and-ride-again",
-      "route-builder"
+      "route-builder",
+      "getting-started"
     ],
     "kind": "review",
     "by": "pr",
     "ref": "trail-widths",
-    "why": "Checked against the trail width change: these articles share code with it (the trail card, Create a Ride, the Garage vehicle save in lib/api.ts) but riders see nothing different in them. Width limits are described in Map Layers and Trails, Garage, Map Mode and Create a Ride. No change to these articles."
+    "why": "Checked against the trail width change: these articles share code with it (the trail card, the onmylead.com showcase, Create a Ride, the Garage vehicle save in lib/api.ts) but riders see nothing different in them. Width limits are described in Map Layers and Trails, Garage, Map Mode and Create a Ride. No change to these articles."
   },
   {
     "date": "2026-11-03",
