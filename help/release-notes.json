@@ -66,8 +66,8 @@
     "title": "Navigate Offroad, Exact Rider Dots and Better Maps",
     "intro": "Navigate is a new offroad map for riding on your own: record and share your own trails, rate trails other riders mapped, and measure distances. Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, you can add riders as friends, and you can pick your own easy-to-say code for a ride, group or friend link.",
     "whatsNew": "What's new in 1.0.3:\n\n• Nav Mode: offroad map and your own trails.\n• Badges and ranks for leading, riding and miles.\n• Out Riding + Friends: see who's out and message them.\n• Rider dots stay put and show heading.\n• Full Map; riders in order on the route line.\n• Ride Mode opens on you; Center on Me.\n• Trails show from farther out.\n• Faster time picker; plan rides in 2027+.\n• Share location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
-    "apple": null,
-    "google": null,
+    "apple": "2026-11-02",
+    "google": "2026-11-02",
     "notes": [
       {
         "kind": "new",

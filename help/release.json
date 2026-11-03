@@ -3,7 +3,7 @@
   "bundleId": "com.rusoffroad.onmylead.app",
   "appleId": "6822352321",
   "country": "us",
-  "live": "1.0",
+  "live": "1.0.3",
   "prelaunch": {
     "version": "1.0",
     "notice": "OnMyLead 1.0 for iPhone, iPad and Android is with Apple and Google for store review. These guides describe that first release."
@@ -22,9 +22,16 @@
       "version": "1.0.3",
       "build": "7",
       "commit": "8c98600",
-      "status": "submitted",
+      "status": "live",
       "submitted": "2026-11-01",
-      "notes": "Includes the unreleased 1.0.2. Android versionCode 7."
+      "notes": "Includes the unreleased 1.0.2. Android versionCode 7. Live on the App Store and Google Play 2026-11-02.",
+      "released": "2026-11-02"
+    },
+    {
+      "version": "1.0.4",
+      "build": "8",
+      "status": "building",
+      "notes": "Everything through PR #171 (notifications inbox, accurate location, Leave Ride hand-off, Full Map, Follow Me, Freeride rider line, Ride Mode messages, Update Available, Music Controls, ride miles fix). Android versionCode 8. Commit recorded when the Mac submits."
     }
   ],
   "unreleased": [

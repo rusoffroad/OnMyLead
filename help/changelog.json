@@ -1,5 +1,18 @@
 [
   {
+    "date": "2026-11-03",
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-1.0.4",
+    "why": "Version bump to 1.0.4 (iOS build 8, Android versionCode 8). These guides cite app/app.json; nothing riders do changed, so the text stays. 1.0.4's new guides publish once the stores release it."
+  },
+  {
     "date": "2026-11-02",
     "slugs": [
       "ride-summary-and-ride-again",
