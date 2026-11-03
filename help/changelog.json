@@ -2,6 +2,18 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "tilt-and-crash-alert",
+      "ride-mode",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "tilt-zero-fix",
+    "why": "An upright phone that hadn't been zeroed read 85° nose up in red. Before Zero the meter now uses the phone's nearest plain position as level, stays blue, and doesn't warn or check for rollovers until the rider zeros it. Ride Mode and Map Mode text is unchanged."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "create-a-ride",
       "edit-cancel-or-delete-a-ride",
       "find-a-ride",

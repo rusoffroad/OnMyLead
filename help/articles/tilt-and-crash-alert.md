@@ -41,7 +41,9 @@ Your phone probably doesn't sit flat in its mount, so zero the meter once you've
 2. Put the phone in its mount the way you ride.
 3. Open **Tilt** and tap **Zero**, then **Zero** again to confirm.
 
-That reading becomes level. Zero again whenever you move the phone or switch vehicles. The Zero is kept on this phone only, since each phone sits differently. Tap **Clear Zero** to go back to the phone lying flat as level.
+That reading becomes level. Zero again whenever you move the phone or switch vehicles. The Zero is kept on this phone only, since each phone sits differently. Tap **Clear Zero** to remove it.
+
+Until you zero it, the meter treats the phone's nearest plain position (lying flat, standing upright or on its side) as level, so a phone standing in a dash mount reads close to level. That reading is only rough, so the numbers stay blue instead of turning amber or red, tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers. Zero it to turn those on.
 
 ## Tilt Warnings
 
@@ -55,7 +57,7 @@ On a motorcycle, turn **Warn Me** off, since leaning into turns is normal. To hi
 
 ## Crash Alert
 
-Crash Alert is on unless you turn it off. While Ride Mode is open, it watches for a hard hit or a rollover while you're riding, followed by your vehicle stopping. When it sees one:
+Crash Alert is on unless you turn it off. While Ride Mode is open, it watches for a hard hit or (once you've zeroed the tilt meter) a rollover while you're riding, followed by your vehicle stopping. When it sees one:
 
 1. A full-screen countdown starts at 30 seconds, with vibration and a spoken warning.
 2. Tap **I'm OK** to cancel. Nothing is sent.
