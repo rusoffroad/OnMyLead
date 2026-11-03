@@ -2,6 +2,27 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-opening",
+    "why": "Map Mode could open zoomed out over the whole state when the phone didn't have a location yet (Android cold start). It now moves to the rider when the first location comes in, unless they moved the map. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "follow-me",
+      "ride-mode"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-opening",
+    "why": "Checked against the Map Mode opening-camera fix: Follow Me and Ride Mode work the same for riders (Ride Mode's code didn't change; the shared map-center file only gained Map Mode's opening rules)."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "create-a-ride",
       "edit-cancel-or-delete-a-ride",
       "find-a-ride",

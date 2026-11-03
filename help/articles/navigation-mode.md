@@ -59,6 +59,8 @@ At the top of the map are three tabs: **Explore**, **Record** and **Measure**. S
 - Or on the **You** tab, tap **Map Mode** under **On the Trail**.
 
 At the bottom of the map are three tabs: **Explore**, **Record** and **Draw**. Swipe the panel down to see more of the map, and up to bring it back.
+
+Map Mode opens on where you are, close enough to see the trails. If your phone is still finding your location (say, right after you turn it on), the map moves to you as soon as it does, unless you've already moved the map yourself.
 :::
 
 :::release 2.0
