@@ -1,5 +1,4 @@
 import * as Haptics from 'expo-haptics';
-import * as Speech from 'expo-speech';
 import { useEffect, useState } from 'react';
 
 import {
@@ -18,6 +17,7 @@ import {
 } from '@/core/tilt';
 import { subscribeMotion, type MotionSample } from '@/lib/motion';
 import { loadTiltSettings, type TiltSettings } from '@/lib/tilt';
+import { speak } from '@/lib/voice';
 
 /**
  * The live tilt reading, shared by the Map Mode and Ride Mode tiles and the Tilt screen: one
@@ -49,7 +49,7 @@ function onMotion(s: MotionSample) {
   warn = step.state;
   if (step.announce && settings.warn) {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
-    if (settings.voice) Speech.speak(step.announce.text);
+    if (settings.voice) speak(step.announce.text);
   }
   if (s.t - lastEmit < EMIT_MS && max === shown.max) return;
   lastEmit = s.t;

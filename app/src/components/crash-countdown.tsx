@@ -1,11 +1,11 @@
 import * as Haptics from 'expo-haptics';
-import * as Speech from 'expo-speech';
 import { useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
 import { COUNTDOWN_S, secondsLeft, type CrashCause } from '@/core/crash-detect';
+import { speak, stopSpeaking } from '@/lib/voice';
 
 /**
  * The Crash Alert countdown: full screen and loud, so a rider who is fine can stop it with one tap
@@ -24,19 +24,19 @@ export function CrashCountdown({
   const left = secondsLeft(startedAt, now);
 
   useEffect(() => {
-    Speech.speak('Crash detected. Tap I’m OK, or your group gets an emergency alert.');
+    speak('Crash detected. Tap I’m OK, or your group gets an emergency alert.');
     const tick = setInterval(() => {
       setNow(Date.now());
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
     }, 1000);
     const say = setInterval(() => {
-      Speech.stop();
-      Speech.speak('Crash detected. Tap I’m OK.');
+      stopSpeaking();
+      speak('Crash detected. Tap I’m OK.');
     }, 8000);
     return () => {
       clearInterval(tick);
       clearInterval(say);
-      Speech.stop();
+      stopSpeaking();
     };
   }, []);
 

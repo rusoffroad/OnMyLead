@@ -264,6 +264,12 @@ The **Tilt** tile on the left of the map shows your vehicle's roll and pitch; ta
 :::
 :::
 
+:::release 2.0
+## Spoken Alerts
+
+Ride Mode reads announcements, regroup points, a rider falling behind and Mechanical Issue out loud in the most natural voice on your phone. To hear and pick another voice, go to **You** > **Voice**. See [Choose the Voice for Spoken Alerts](/help/voice).
+:::
+
 ## When Your Location Isn't Sharp
 
 If your phone's location is rough, a yellow banner says why: **Precise Location Is Off**, **Google Location Accuracy Is Off** (Android) or **Your Phone Has a Rough Location Right Now**. Tap it to fix it. On Android the phone asks to change to a precise location or to turn on Google Location Accuracy; on iPhone and iPad Settings opens; for a rough location you get steps, such as calibrating in Google Maps. The banner goes away once it's fixed. See [Make Your Location Accurate](/help/accurate-location).
