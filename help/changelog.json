@@ -10,7 +10,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "trail-widths",
-    "why": "Trails now show width limits (Chris): Forest Service trails open only to 50\" machines show 50\" Width Limit, riders can add a width to any public trail, Garage machines take a width so cards say whether they fit, and planning a ride on a trail carries the limit into the ride's instructions. Comes with the update after 2.0 (2.1)."
+    "why": "Trails now show width limits (Chris): Forest Service trails open only to 50\" machines show 50\" Width Limit, riders can add a width to any public trail, Garage machines take a width so cards say whether they fit, and planning a ride on a trail carries the limit into the ride's instructions. Comes with the 2.0 update."
   },
   {
     "date": "2026-11-03",

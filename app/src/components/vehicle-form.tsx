@@ -120,7 +120,17 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
     };
     setBusy(true);
     try {
-      let saved = current ? await updateVehicle(current.id, input) : await createVehicle(input);
+      const write = (v: VehicleInput) => (current ? updateVehicle(current.id, v) : createVehicle(v));
+      let saved: Vehicle;
+      try {
+        saved = await write(input);
+      } catch (e) {
+        // Before the server update that adds widths (migration 20261103200000), save the rest;
+        // the width box keeps what was typed for the next save.
+        if (!('width_in' in input) || !String(e instanceof Error ? e.message : e).includes('width_in')) throw e;
+        const { width_in: _w, ...rest } = input;
+        saved = await write(rest);
+      }
       if (!vehicle) setCreated(saved);
       if (photo) {
         try {

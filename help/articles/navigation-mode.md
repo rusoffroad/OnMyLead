@@ -228,7 +228,7 @@ Trails other riders shared are called rider trails. They're drawn as **mint dott
 
 Tap one to see its card. It says **User Submitted Trail**, who mapped it, the difficulty, distance, its **Quality** and **Line Accuracy** stars, and buttons to rate it, navigate it or see the details. The details page adds the vehicles, notes, photos and **Save to My Trails**.
 
-:::release 2.1
+:::release 2.0
 If the mapper entered a width limit, the card and details page show it (**Width Limit**). With widths on your machines in the [Garage](/help/garage), they also say whether your machine fits or is too wide.
 :::
 

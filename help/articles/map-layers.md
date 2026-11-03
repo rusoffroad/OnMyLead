@@ -134,7 +134,7 @@ If the trail or road is closed today, a red box at the top of the card says so, 
 
 For an OpenStreetMap track, the card says it was mapped by riders on OpenStreetMap, and that parks and private land need permission or a pass.
 
-:::release 2.1
+:::release 2.0
 ## Trail Width Limits
 
 Some trails only fit narrow machines. When the card knows a trail's width limit, it shows it under the trail's name, for example **50" Width Limit**:

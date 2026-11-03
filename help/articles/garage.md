@@ -44,7 +44,7 @@ On Android, the system photo picker opens, and OnMyLead only gets the photo you 
 5. Add the rest if you like: **VIN**, **Purchase Price ($)**, **Engine Hours** and **Odometer (Miles)**.
 6. Under **Fuel and Mileage**, enter **Tank (gal)**, any **Extra Fuel (gal)** you carry and **Miles per Gallon**. Use your real-world trail mileage, not the sticker.
 
-:::release 2.1
+:::release 2.0
 Under **Trail Fit**, enter the machine's **Width (Inches)** at its widest point, tire to tire. Trails with a width limit then tell you whether it fits, on the trail card, a trail's page and when you plan a ride on a trail. See [Map Layers and Trails](/help/map-layers).
 :::
 7. Tap **Add to Garage**.

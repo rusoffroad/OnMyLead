@@ -50,7 +50,7 @@ If you picked **Mapped**, the route builder opens right away so you can draw the
 
 This is a Pro feature. Open a trail in [Navigate](/help/navigation-mode) and tap **Plan a Group Ride on This Trail**. The new ride starts with the trail's name, the trail as its route and its start as the meeting point, under a **Riding** banner. Pick the day, change anything you like and create it.
 
-:::release 2.1
+:::release 2.0
 If the trail has a width limit, the **Riding** banner shows it (and whether your Garage machines fit), and the ride's **Instructions for Joined Riders** start with a line like "Trail width limit: 50". Wider machines won't fit." so everyone who joins sees it. Edit or delete that line like any other.
 :::
 :::
