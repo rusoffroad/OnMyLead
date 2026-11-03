@@ -9,8 +9,10 @@ import { Spacing } from '@/constants/theme';
 import {
   centsToInput, isPlausibleVin, parseAmount, parseDollars, parseVpic, vehicleRange, VEHICLE_KINDS, type VehicleKind,
 } from '@/core/garage';
+import { inches, parseWidth, VEHICLE_WIDTH_MIN_IN, WIDTH_MAX_IN } from '@/core/trail-width';
 import { createVehicle, decodeVin, setVehiclePhoto, updateVehicle, type VehicleInput } from '@/lib/api';
 import type { PickedPhoto } from '@/lib/photo-bytes';
+import { forgetGarageWidths } from '@/lib/trail-width';
 import type { Vehicle } from '@/lib/types';
 
 const str = (n: number | null | undefined) => (n == null ? '' : String(n));
@@ -38,6 +40,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
   const [tank, setTank] = useState(str(vehicle?.tank_gallons));
   const [extra, setExtra] = useState(vehicle?.extra_fuel_gallons ? String(vehicle.extra_fuel_gallons) : '');
   const [mpg, setMpg] = useState(str(vehicle?.mpg));
+  const [width, setWidth] = useState(str(vehicle?.width_in));
   const [photo, setPhoto] = useState<PickedPhoto | null>(null);
   const [busy, setBusy] = useState(false);
   const [vinBusy, setVinBusy] = useState(false);
@@ -95,6 +98,8 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
     if (bad) return setError(`Check the ${bad[0] === 'extra' ? 'extra fuel' : bad[0]} number.`);
     const val = (p: ReturnType<typeof parseAmount>) => (p.ok ? p.value : null);
     if (!text(nickname) && !text(make) && !text(model)) return setError('Give it a nickname or a make and model.');
+    const widthP = parseWidth(width, VEHICLE_WIDTH_MIN_IN, WIDTH_MAX_IN);
+    if (!widthP.ok) return setError(`Width: ${widthP.error}`);
 
     const input: VehicleInput = {
       kind,
@@ -110,6 +115,8 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
       tank_gallons: val(nums.tank),
       extra_fuel_gallons: val(nums.extra) ?? 0,
       mpg: val(nums.mpg),
+      // Only sent once there's a width, so saving works on a server without the column yet.
+      ...(widthP.value != null || current?.width_in != null ? { width_in: widthP.value } : {}),
     };
     setBusy(true);
     try {
@@ -122,6 +129,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
           return setError(`Saved, but the photo did not upload (${e instanceof Error ? e.message : String(e)}). Tap save to try again.`);
         }
       }
+      forgetGarageWidths();
       onSaved(saved);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save.');
@@ -192,6 +200,26 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
             About {Math.round(range.fullRangeMiles)} miles on {range.totalGallons} gallons. Turn around by {Math.round(range.safeTurnaroundMiles)} miles out.
           </ThemedText>
         ) : null}
+      </Card>
+
+      <Card>
+        <ThemedText type="heading">Trail Fit</ThemedText>
+        <Field
+          label="Width (Inches)"
+          value={width}
+          onChangeText={setWidth}
+          keyboardType="number-pad"
+          placeholder={kind === 'sxs_utv' ? '64' : '80'}
+          hint="Widest point, tire to tire. Trails with a width limit show whether it fits."
+        />
+        {(() => {
+          const p = parseWidth(width, VEHICLE_WIDTH_MIN_IN, WIDTH_MAX_IN);
+          return p.ok && p.value != null ? (
+            <ThemedText type="small" themeColor="textSecondary">
+              {p.value <= 50 ? `${inches(p.value)} fits 50" trails.` : `${inches(p.value)} is too wide for 50" trails.`}
+            </ThemedText>
+          ) : null;
+        })()}
       </Card>
 
       <ErrorText error={error} />
