@@ -30,6 +30,7 @@ export const APP_FLAGS = {
   trip_planner: { label: 'Trip Planner', hint: 'The Trip Planner in the home screen toolkit. Saved trips are kept.' },
   starlink: { label: 'Starlink', hint: 'The Starlink page in the home screen toolkit.' },
   rus_gear: { label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },
+  starlink_mount_ad: { label: 'Starlink Mount Ad', hint: 'The RUS Starlink Mini Mount V2 ad on the Starlink page.' },
   ride_polls: { label: 'Ride Polls', hint: 'Creating new polls in ride chat. Polls already sent can still be voted on.' },
   music_controls: { label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
   nav_mode: { label: 'Map Mode', hint: 'The Map Mode card on the home screen (offroad map, recording, custom trails and sharing). Trails on riders’ phones are kept; rider trails on maps still show.' },

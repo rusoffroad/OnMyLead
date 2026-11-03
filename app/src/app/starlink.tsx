@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, AppState, View } from 'react-native';
 
 import { FlagGate } from '@/components/app-notices';
+import { StarlinkMountAd } from '@/components/starlink-mount-ad';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen, Tag } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
@@ -37,6 +38,7 @@ function StarlinkPage() {
         See how your dish is doing, keep your plan details handy, and work out how long your batteries will run it.
       </ThemedText>
       <DishStatusCard />
+      <StarlinkMountAd />
       {loading ? null : <SetupForm signedIn={!!session} />}
     </Screen>
   );

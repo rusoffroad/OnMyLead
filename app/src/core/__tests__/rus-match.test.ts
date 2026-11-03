@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buyUrl, categoryHits, categoryVehicle, decodeEntities, fitment, formatPrice, isRusUrl, matchProducts, parseStoreProducts,
-  storeUrl, vehicleMatches, withParams,
+  featuredUrl, findBySlug, productSlug, STARLINK_MOUNT, storeUrl, vehicleMatches, withParams,
 } from '../rus-match';
 
 // Shaped like the real https://rusoffroad.com/wp-json/wc/store/v1/products response (Oct 2026).
@@ -177,5 +177,41 @@ describe('links', () => {
     expect(formatPrice(25950)).toBe('$259.50');
     expect(formatPrice(123400)).toBe('$1,234');
     expect(formatPrice(null)).toBeNull();
+  });
+});
+
+describe('featured products', () => {
+  const mount = parseStoreProducts([
+    {
+      id: 40001, name: 'Starlink Mini Mount V2 (Morelock Series)', type: 'variable',
+      permalink: 'https://rusoffroad.com/product/starlink-mini-mount-v2-morelock-series/',
+      prices: { price: '18900', currency_minor_unit: 2 },
+      images: [{ src: 'https://rusoffroad.com/wp-content/uploads/mount.webp' }],
+      categories: [], tags: [], is_purchasable: true, is_in_stock: true, has_options: true,
+    },
+    ...API,
+  ]);
+
+  it('reads the slug from a product permalink', () => {
+    expect(productSlug('https://rusoffroad.com/product/starlink-mini-mount-v2-morelock-series/')).toBe('starlink-mini-mount-v2-morelock-series');
+    expect(productSlug('https://rusoffroad.com/product/Foo-Bar?x=1')).toBe('foo-bar');
+    expect(productSlug('https://rusoffroad.com/shop/')).toBeNull();
+  });
+
+  it('finds the Starlink mount by slug, and nothing for an unknown slug', () => {
+    expect(findBySlug(mount, STARLINK_MOUNT.slug)?.id).toBe(40001);
+    expect(findBySlug(mount, 'nope')).toBeNull();
+    expect(findBySlug([], STARLINK_MOUNT.slug)).toBeNull();
+  });
+
+  it('links to the product page with attribution, never straight to the cart', () => {
+    const live = featuredUrl(findBySlug(mount, STARLINK_MOUNT.slug), STARLINK_MOUNT.url, 'starlink page');
+    expect(live).toBe('https://rusoffroad.com/product/starlink-mini-mount-v2-morelock-series/?utm_source=onmylead&utm_medium=app&utm_campaign=starlink_page');
+    expect(featuredUrl(null, STARLINK_MOUNT.url, 'starlink page')).toBe(live);
+    expect(isRusUrl(STARLINK_MOUNT.url)).toBe(true);
+  });
+
+  it('never says preorder in its own wording', () => {
+    expect(JSON.stringify(STARLINK_MOUNT)).not.toMatch(/pre-?order/i);
   });
 });
