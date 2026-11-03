@@ -66,6 +66,10 @@
       {
         "kind": "fixed",
         "text": "Your ride summary, ride card and Mile Eater badge now count only the miles you actually rode. A phone with a rough location, GPS jumps, points left over from an earlier ride, or time with location off could add miles that weren't ridden: one short test ride showed about 60 miles. Those are now left out."
+      },
+      {
+        "kind": "new",
+        "text": "A Before You Ride screen on first launch: read the Rider Safety and Liability Agreement, tick the box and tap I Agree. You're asked once, and again only if it changes. Read it any time on the You tab under Safety Agreement."
       }
     ]
   },

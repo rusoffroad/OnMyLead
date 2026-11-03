@@ -4,7 +4,7 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/privacy.tsx
   - app/src/app/r/[code].tsx
@@ -93,6 +93,10 @@ On Android, Google delivers notifications (Firebase Cloud Messaging), handles pu
 
 :::release 1.0.4
 [Music Controls](/help/music-controls) read what's playing only on your phone. On Android, the optional Notification Access is used only to see the song and the app playing it; OnMyLead never reads or keeps your notifications.
+:::
+
+:::release 2.0
+When you agree to the Rider Safety and Liability Agreement, a record of it is saved (your account, the version, the time, the device and app version, and your IP address). Other riders never see it, and it's kept as a legal record if you delete your account. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement#what-gets-saved).
 :::
 
 You can delete your account and its data at any time. See [Delete Your Account](/help/delete-account).
