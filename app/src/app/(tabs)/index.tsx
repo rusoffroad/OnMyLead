@@ -7,6 +7,7 @@ import { AppNotices } from '@/components/app-notices';
 import { BadgeStrip } from '@/components/badge-strip';
 import { FeedList, FeedSheet } from '@/components/home/feed';
 import { GroupCard, NoGroupCard } from '@/components/home/group-card';
+import { EventsCard } from '@/components/home/events-card';
 import { MapModeCard } from '@/components/home/map-mode-card';
 import { HeadLink, Home, homeStyles, Initial, SectionHead } from '@/components/home/parts';
 import { PublicRidesRail, RadiusChip, RadiusSheet } from '@/components/home/public-rides';
@@ -325,6 +326,7 @@ export default function HomeScreen() {
         onFind={() => router.push('/find')}
       />
       {navOn ? <MapModeCard days={trackDays} trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
+      <EventsCard signedIn={!!session} radius={radius} />
       {!loading && !session ? (
         <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}

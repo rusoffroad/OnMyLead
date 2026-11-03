@@ -3,6 +3,7 @@ import { useCallback, useState, type ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { DirectionsCard } from '@/components/directions';
+import { PartOfEvent } from '@/components/events/part-of-event';
 import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
 import { GetTheApp } from '@/components/get-the-app';
@@ -214,6 +215,7 @@ export default function RidePage() {
     <>
       <GetTheApp inviteCode={ride.invite_code} />
       <View style={{ gap: Spacing.two }}>
+        <PartOfEvent rideId={ride.id} />
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           {ride.status === 'live' ? <Tag label="Live Now" color={Colors.accent} solid /> : null}
           {countdown ? <Tag label={countdown} color={Colors.accent} /> : null}

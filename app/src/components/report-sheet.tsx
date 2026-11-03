@@ -18,7 +18,9 @@ type Target =
   | { kind: 'ride'; rideId: string; name: string; source?: ReportSource }
   // context: added to the report for the owner, such as the direct message being reported.
   // groupId: the riding group chat it was sent from, so that chat is saved with the report first.
-  | { kind: 'rider'; userId: string; rideId?: string | null; name: string; context?: string; source?: ReportSource; groupId?: string | null };
+  | { kind: 'rider'; userId: string; rideId?: string | null; name: string; context?: string; source?: ReportSource; groupId?: string | null }
+  // An event goes to the team as a report of its owner (ownerId), with the event attached.
+  | { kind: 'event'; eventId: string; ownerId: string; name: string };
 
 /**
  * Report Ride / Report Rider: a reason, an optional note, and it goes to the OnMyLead owner,
@@ -55,10 +57,11 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
     try {
       await sendReport({
         kind: target.kind,
-        rideId: target.rideId ?? null,
-        userId: target.kind === 'rider' ? target.userId : null,
+        rideId: target.kind === 'event' ? null : target.rideId ?? null,
+        userId: target.kind === 'rider' ? target.userId : target.kind === 'event' ? target.ownerId : null,
+        eventId: target.kind === 'event' ? target.eventId : null,
         groupId: target.kind === 'rider' ? target.groupId ?? null : null,
-        source: target.source ?? null,
+        source: target.kind === 'event' ? 'event' : target.source ?? null,
         reason,
         details: [details.trim(), target.kind === 'rider' ? target.context?.trim() : ''].filter(Boolean).join('\n\n'),
       });
@@ -84,7 +87,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
             <>
               <Text style={styles.title} accessibilityRole="header">Report Sent</Text>
               <ThemedText>
-                Thanks. OnMyLead looks at every report. {target.name} isn’t told who sent it. If anyone is in danger, call 911.
+                Thanks. OnMyLead looks at every report. {target.kind === 'event' ? 'The host' : target.name} isn’t told who sent it. If anyone is in danger, call 911.
               </ThemedText>
               {canBlock ? (
                 blocked ? (
@@ -100,11 +103,11 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
                 <Icon name="flagged" size={22} color={Colors.danger} />
                 <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>
-                  {target.kind === 'ride' ? 'Report This Ride' : `Report ${target.name}`}
+                  {target.kind === 'ride' ? 'Report This Ride' : target.kind === 'event' ? 'Report This Event' : `Report ${target.name}`}
                 </Text>
               </View>
               <ThemedText type="small" themeColor="textSecondary">
-                Goes to the OnMyLead team, not to the {target.kind === 'ride' ? 'organizer' : 'rider'}. If anyone is in danger, call 911.
+                Goes to the OnMyLead team, not to the {target.kind === 'ride' ? 'organizer' : target.kind === 'event' ? 'host' : 'rider'}. If anyone is in danger, call 911.
               </ThemedText>
               <Choice label="What’s Wrong" options={reasons.map((r) => ({ value: r as string | null, label: r }))} value={reason} onChange={setReason} />
               <Field label="Anything Else (Optional)" value={details} onChangeText={setDetails} multiline maxLength={1000} placeholder="What happened, and when" />
