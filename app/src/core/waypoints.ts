@@ -5,15 +5,19 @@
  */
 
 import { parseTime } from './time';
+import { symbolLabel, type WaypointKind, type WaypointSymbol } from './waypoint-symbols';
 
-export type WaypointKind = 'spot' | 'camp' | 'fuel' | 'water' | 'view' | 'hazard' | 'parking';
+export type { WaypointKind, WaypointSymbol } from './waypoint-symbols';
 
 export type Waypoint = {
   id: string;
   ride_id: string;
   user_id: string;
   name: string;
+  /** The original kind; older app builds draw this one. */
   kind: WaypointKind;
+  /** Its symbol (2.0 and later): missing until that server update, null when it's just the kind. Show waypointSymbol(w). */
+  symbol?: WaypointSymbol | null;
   note: string | null;
   lat: number;
   lng: number;
@@ -28,18 +32,6 @@ export type Waypoint = {
   updated_at: string;
 };
 
-/** In the order the picker shows them. */
-export const WAYPOINT_KINDS: { kind: WaypointKind; label: string }[] = [
-  { kind: 'spot', label: 'Spot' },
-  { kind: 'camp', label: 'Camp' },
-  { kind: 'fuel', label: 'Fuel' },
-  { kind: 'water', label: 'Water' },
-  { kind: 'view', label: 'Viewpoint' },
-  { kind: 'hazard', label: 'Hazard' },
-  { kind: 'parking', label: 'Parking' },
-];
-
-export const kindLabel = (kind: WaypointKind) => WAYPOINT_KINDS.find((k) => k.kind === kind)?.label ?? 'Spot';
 
 export const WAYPOINT_NAME_MAX = 60;
 export const WAYPOINT_NOTE_MAX = 280;
@@ -56,8 +48,8 @@ export function waypointNameProblem(name: string): string | null {
 }
 
 /** A name to start from, so dropping a pin is one tap: "Camp", "Camp 2", "Camp 3". */
-export function suggestWaypointName(kind: WaypointKind, existing: Pick<Waypoint, 'name'>[]): string {
-  const base = kindLabel(kind);
+export function suggestWaypointName(symbol: WaypointSymbol, existing: Pick<Waypoint, 'name'>[]): string {
+  const base = symbolLabel(symbol);
   const taken = new Set(existing.map((w) => w.name.toLowerCase()));
   if (!taken.has(base.toLowerCase())) return base;
   for (let i = 2; ; i++) if (!taken.has(`${base} ${i}`.toLowerCase())) return `${base} ${i}`;
@@ -144,6 +136,11 @@ export function moveStop(ids: string[], id: string, by: -1 | 1): string[] | null
   const next = [...ids];
   [next[i], next[j]] = [next[j], next[i]];
   return next;
+}
+
+/** Did a request fail because the server doesn't have waypoint symbols yet (the 2.0 server update)? Then save the kind alone. */
+export function isSymbolsNotSwitchedOn(message: string | null | undefined, code?: string | null): boolean {
+  return !!message && /\bsymbol\b/i.test(message) && (/does not exist|could not find|schema cache/i.test(message) || code === '42703' || code === 'PGRST204');
 }
 
 /** Did a request fail because the server doesn't have planned stops yet (the waypoints are there)? */
