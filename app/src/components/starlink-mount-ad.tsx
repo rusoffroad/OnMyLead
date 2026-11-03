@@ -55,7 +55,7 @@ export function StarlinkMountAd() {
           <ThemedText type="subtitle">{STARLINK_MOUNT.title}</ThemedText>
           <ThemedText style={{ color: theme.accent, fontWeight: 700 }}>{STARLINK_MOUNT.series}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            Ride with your Starlink Mini mounted on your rig. Made by RUS Offroad, the team behind OnMyLead.
+            A Starlink Mini mount that installs on a Milwaukee Packout. Also works with magnets.
           </ThemedText>
           {price ? <ThemedText style={{ fontWeight: 700 }}>{price}</ThemedText> : null}
         </View>

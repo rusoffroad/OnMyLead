@@ -7,7 +7,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "starlink-mount-ad-photo",
-    "why": "Chris supplied the product photo for the Starlink Mini Mount V2 ad; the app now always shows it, so only the price comes from the store."
+    "why": "Chris supplied the product photo for the Starlink Mini Mount V2 ad; the app now always shows it, so only the price comes from the store. The ad's description now says it installs on a Milwaukee Packout and also works with magnets (Chris's wording)."
   },
   {
     "date": "2026-11-03",
