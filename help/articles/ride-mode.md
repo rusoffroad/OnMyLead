@@ -273,7 +273,7 @@ The bar also has **Controls**, with a badge counting any other alerts. Tap it, o
 Tap the round **Music** button above **Center on Me** to pause, skip or change the volume of the music on your phone without leaving Ride Mode. See [Control Your Music While You Ride](/help/music-controls).
 
 :::release 2.0
-The **Tilt** tile on the left of the map shows your vehicle's roll and pitch; tap it for the full tilt meter. **Crash Alert** also runs while Ride Mode is open: after a hard hit or a rollover it counts down 30 seconds, and if you don't tap **I'm OK**, your group gets an EMERGENCY alert. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
+The **Tilt** tile on the left of the map shows your vehicle's roll and pitch (until you calibrate the tilt meter it says **Calibrate Tilt**); tap it for the full tilt meter. **Crash Alert** also runs while Ride Mode is open: after a hard hit or a rollover it counts down 30 seconds, and if you don't tap **I'm OK**, your group gets an EMERGENCY alert. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
 :::
 :::
 
