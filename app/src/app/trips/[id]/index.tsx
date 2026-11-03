@@ -234,7 +234,7 @@ export default function TripPage() {
           <ThemedText type="heading">After the Trip</ThemedText>
           <View style={{ flexDirection: 'row', gap: Spacing.two }}>
             <Button title="Uncheck All" kind="secondary" style={{ flex: 1 }} loading={busy === 'uncheck'} disabled={p.packed === 0} onPress={resetChecks} />
-            <Button title="Copy to a New Trip" kind="secondary" style={{ flex: 1 }} loading={busy === 'copy'} onPress={copy} />
+            <Button title="Copy to a New Trip" pro="advanced_trip_planning" kind="secondary" style={{ flex: 1 }} loading={busy === 'copy'} onPress={copy} />
           </View>
         </View>
       ) : null}

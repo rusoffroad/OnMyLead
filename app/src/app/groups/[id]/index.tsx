@@ -255,6 +255,7 @@ export default function GroupPage() {
         ) : (
           <Button
             title="Add Riders You’ve Ridden With"
+            pro="saved_groups"
             kind="secondary"
             onPress={() => {
               if (!requirePro('saved_groups')) return;

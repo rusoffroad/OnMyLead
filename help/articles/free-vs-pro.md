@@ -4,7 +4,7 @@ summary: What every OnMyLead account gets for free, what OnMyLead Pro adds, and 
 category: pro
 order: 10
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/core/pro.ts
   - app/src/core/entitlements.ts
@@ -13,6 +13,7 @@ sources:
   - app/src/app/pro.tsx
   - app/src/app/subscription.tsx
   - app/src/components/pro-gate.tsx
+  - app/src/components/pro-tag.tsx
   - app/src/components/pro-plan.tsx
   - app/src/app/ride/new.tsx
   - app/src/app/(tabs)/index.tsx
@@ -82,6 +83,10 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 - **Premium Ride Cards:** share your ride with the Full Stats and Big Number layouts. The standard card stays free.
 
 When you tap something that needs Pro, a short prompt explains it. Tap **See OnMyLead Pro** to see the plans, or **Not Now** to close it.
+
+:::release 2.0
+On a Free account, a small gold **Pro** tag sits beside each button that needs Pro, so you know before you tap. You'll see it on **Import GPX** and **Use One of My Trails** when you draw a route, **Record a Trail** in Navigate, **Share with Everyone** and **Plan a Group Ride on This Trail** on a trail, the offline map **Download** buttons, **New Group** and **Add Riders You've Ridden With** in Riding Groups, and **Copy to a New Trip** in the Trip Planner. Tapping one opens the same prompt. During your Pro Trial and on Pro the tags are gone. Create a Ride doesn't carry a tag, because Free includes a ride a month; it shows how many you have left instead.
+:::
 
 ## See Your Plan
 

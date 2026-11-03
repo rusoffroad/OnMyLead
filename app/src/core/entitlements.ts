@@ -242,6 +242,17 @@ export function can(e: Entitlements, feature: FeatureKey): boolean {
   return e.features[feature] !== false;
 }
 
+/**
+ * Whether a button for this feature carries the small Pro tag: only for a Free account on a
+ * server that gates it, and only for features that are Pro-only. Creating rides isn't one (Free
+ * gets a ride a month; Create a Ride shows what's left instead), and Pro, Pro Trial and Admin
+ * accounts never see a tag.
+ */
+export function showsProTag(e: Entitlements, feature: FeatureKey): boolean {
+  if (feature === 'create_ride') return false;
+  return !can(e, feature);
+}
+
 /** "Rides Created This Month: 0 of 1", or null when unlimited. */
 export function rideAllowanceText(e: Entitlements): string | null {
   if (!e.switchedOn || e.rideAllowance === null) return null;

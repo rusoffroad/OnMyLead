@@ -1,5 +1,15 @@
 [
   {
+    "date": "2026-11-03",
+    "slugs": [
+      "free-vs-pro"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "pro-tags",
+    "why": "Free riders now see a small gold Pro tag on every button that needs Pro (Chris: show a little Pro mark next to Pro features to encourage upgrading). The article lists where the tags appear, says tapping one opens the same Pro prompt, and that Pro Trial and Pro accounts never see them. Written in a 2.0 release block."
+  },
+  {
     "date": "2026-11-02",
     "slugs": [
       "ride-summary-and-ride-again",

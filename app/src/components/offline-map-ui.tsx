@@ -4,6 +4,8 @@ import Svg, { Path } from 'react-native-svg';
 import { Colors, font, Radius } from '@/constants/theme';
 import { choicesLabel, statusLine, type OfflineMap } from '@/core/offline-maps';
 import { deleteOfflineMap, pauseDownload, resumeDownload } from '@/lib/offline-maps';
+import type { FeatureKey } from '@/core/entitlements';
+import { ProTag } from './pro-tag';
 
 /** Downloaded maps wear the same sand as the trails layer: sand means "map on your phone". */
 export const SAND = '#ECCD91';
@@ -72,7 +74,7 @@ export function DownloadRow({ map }: { map: OfflineMap }) {
   );
 }
 
-export function SmallButton({ title, onPress, strong, disabled }: { title: string; onPress: () => void; strong?: boolean; disabled?: boolean }) {
+export function SmallButton({ title, onPress, strong, disabled, pro }: { title: string; onPress: () => void; strong?: boolean; disabled?: boolean; pro?: FeatureKey }) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -81,6 +83,7 @@ export function SmallButton({ title, onPress, strong, disabled }: { title: strin
       onPress={onPress}
       style={({ pressed }) => [styles.small, strong && styles.smallStrong, (pressed || disabled) && { opacity: 0.6 }]}>
       <Text style={[styles.smallText, strong && { color: Colors.onAccent }]}>{title}</Text>
+      {pro ? <ProTag feature={pro} style={{ height: 18 }} /> : null}
     </Pressable>
   );
 }
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
   track: { height: 4, borderRadius: 2, backgroundColor: Colors.backgroundSelected, overflow: 'hidden', marginTop: 2 },
   fill: { height: 4, backgroundColor: SAND },
   actions: { gap: 6, alignItems: 'stretch' },
-  small: { minHeight: 34, minWidth: 76, paddingHorizontal: 12, borderRadius: Radius.control - 4, backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center' },
+  small: { flexDirection: 'row', gap: 6, minHeight: 34, minWidth: 76, paddingHorizontal: 12, borderRadius: Radius.control - 4, backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center' },
   smallStrong: { backgroundColor: Colors.accent },
   smallText: { color: Colors.text, fontFamily: font(600), fontSize: 14 },
 });

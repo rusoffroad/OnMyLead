@@ -22,6 +22,8 @@ export const Colors = {
   /** Logo blue: links, sharing, information. */
   sky: '#3B86F7',
   danger: '#F03E3E',
+  /** Pro gold: the Pro tag and what Pro unlocks. Never an action colour. */
+  gold: '#E6C27A',
 } as const;
 
 export type ThemeColor = keyof typeof Colors;

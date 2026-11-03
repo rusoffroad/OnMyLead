@@ -5,6 +5,7 @@ import Svg, { Path, Text as SvgText } from 'react-native-svg';
 
 import { SheetRoot, SwipeSheet } from '@/components/swipe-sheet';
 import { Icon } from '@/components/icon';
+import { ProChip } from '@/components/pro-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
@@ -106,9 +107,7 @@ export function ProLock({ feature, title, detail }: { feature: FeatureKey; title
         <ThemedText style={{ fontWeight: 700 }}>{title ?? info.title}</ThemedText>
         {detail ? <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText> : null}
       </View>
-      <View style={styles.proTag}>
-        <Text style={styles.proTagText}>Pro</Text>
-      </View>
+      <ProChip />
     </Pressable>
   );
 }
@@ -129,6 +128,4 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.border, borderStyle: 'dashed',
   },
   lockIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: 'rgba(229,38,46,0.14)', alignItems: 'center', justifyContent: 'center' },
-  proTag: { backgroundColor: Colors.accent, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
-  proTagText: { color: '#fff', fontFamily: font(800, 'display'), fontSize: 14, letterSpacing: 0.5 },
 });

@@ -620,7 +620,8 @@ function Pricing() {
 
         <div className="trial">
           <b>Every new account gets {TRIAL_DAYS} days of Pro, automatically.</b> No card, nothing to cancel, and it never
-          turns into a charge. When it ends you keep everything you made and carry on with Free.
+          turns into a charge. When it ends you keep everything you made and carry on with Free, and a small{' '}
+          <span className="pro-chip" aria-label="Pro">Pro</span> tag marks the extras, so you know what’s Pro before you tap.
         </div>
 
         <p className="fine">
@@ -1045,6 +1046,8 @@ const CSS = `
 .price { margin-top: 18px; display: flex; align-items: baseline; gap: 10px; }
 .amount { font-family: ${display}; font-size: 76px; line-height: 1; }
 .per { color: var(--dust); font-size: 18px; }
+.pro-chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px 0 6px; height: 20px; border-radius: 6px; vertical-align: 2px; background: rgba(6, 14, 26, 0.82); border: 1px solid rgba(230, 194, 122, 0.6); color: #E6C27A; font-family: ${display}; font-size: 13px; line-height: 1; letter-spacing: 0.6px; }
+.pro-chip::before { content: ''; width: 8px; height: 9px; background: #E6C27A; clip-path: path('M4 0.3c1.1 0.7 2.4 0.7 3.4 0.2 0.3 1.5 0.3 3.3-0.2 4.7-0.6 1.6-1.8 2.6-3.2 3.3-1.4-0.7-2.6-1.7-3.2-3.3C0.3 3.8 0.3 2 0.6 0.5 1.6 1 2.9 1 4 0.3z'); }
 .plan-note { margin-top: 10px; color: var(--dust); font-size: 16px; min-height: 1.5em; }
 .plan-includes { margin-top: 24px; font-family: ${body7}; font-size: 16px; }
 .plan-includes + .ticks { margin-top: 12px; }
