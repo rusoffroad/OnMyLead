@@ -11,6 +11,7 @@ import { MEDIUM_MIN } from '@/core/layout';
 import { DIFFICULTIES } from '@/core/nav-trails';
 import { TRACK_DAY_COLORS } from '@/core/track-line';
 import { setAppearance, useAppearance } from '@/lib/appearance';
+import { t } from '@/lib/i18n';
 
 const HERE = '/appearance';
 
@@ -26,7 +27,7 @@ export default function AppearanceScreen() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Appearance' }} />
+      <Stack.Screen options={{ title: t('Appearance') }} />
 
       <View style={styles.group}>
         <ThemedText type="subtitle">Mode</ThemedText>
@@ -51,8 +52,8 @@ export default function AppearanceScreen() {
         <Pressable
           accessibilityRole="switch"
           accessibilityState={{ checked: appearance.colorBlind }}
-          accessibilityLabel="Color Blind Mode"
-          accessibilityHint="Uses colors that red-green and blue-yellow color blind riders can tell apart"
+          accessibilityLabel={t('Color Blind Mode')}
+          accessibilityHint={t('Uses colors that red-green and blue-yellow color blind riders can tell apart')}
           onPress={() => setAppearance({ colorBlind: !appearance.colorBlind }, HERE)}
           style={({ pressed }) => [styles.switchRow, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <View style={{ flex: 1, gap: 2 }}>
@@ -87,7 +88,7 @@ function SkinCard({ skin, on, columns, onPress }: { skin: Skin; on: boolean; col
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ checked: on }}
-      accessibilityLabel={`${skin.name}. ${skin.blurb}`}
+      accessibilityLabel={`${t(skin.name)}. ${t(skin.blurb)}`}
       onPress={onPress}
       style={({ pressed }) => [
         styles.skin,
@@ -104,7 +105,7 @@ function SkinCard({ skin, on, columns, onPress }: { skin: Skin; on: boolean; col
       </View>
       <View style={styles.skinHead}>
         <Text style={styles.skinName} numberOfLines={1}>
-          {skin.name}
+          {t(skin.name)}
         </Text>
         {on ? <Icon name="check" size={18} color={Colors.sky} strokeWidth={2.6} /> : null}
       </View>
@@ -124,14 +125,14 @@ function Preview() {
     { tone: 'red' as const, label: 'Separated' },
   ];
   return (
-    <View style={styles.preview} accessibilityLabel="Preview of rider status, trail rating and Track Line colors">
+    <View style={styles.preview} accessibilityLabel={t('Preview of rider status, trail rating and Track Line colors')}>
       <View style={styles.previewRow}>
         {statuses.map((s) => (
           <View key={s.tone} style={[styles.chip, { borderColor: withAlpha(RideColors[s.tone], 0.6), backgroundColor: withAlpha(RideColors[s.tone], 0.12) }]}>
             <View style={[styles.dot, { backgroundColor: RideColors[s.tone] }]}>
               {cb ? <Text style={styles.dotSymbol}>{statusSymbol(s.tone)}</Text> : null}
             </View>
-            <Text style={styles.chipText}>{s.label}</Text>
+            <Text style={styles.chipText}>{t(s.label)}</Text>
           </View>
         ))}
       </View>
@@ -139,7 +140,7 @@ function Preview() {
         {DIFFICULTIES.map((d) => (
           <View key={d.value} style={styles.legend}>
             <View style={[styles.line, { backgroundColor: d.color }, d.value === 'hard' && styles.lineEdge]} />
-            <Text style={styles.legendText}>{d.label}</Text>
+            <Text style={styles.legendText}>{t(d.label)}</Text>
           </View>
         ))}
       </View>
@@ -147,7 +148,7 @@ function Preview() {
         {['Today', 'Yesterday', '2 Days Ago'].map((label, i) => (
           <View key={label} style={styles.legend}>
             <View style={[styles.line, { backgroundColor: TRACK_DAY_COLORS[i] }]} />
-            <Text style={styles.legendText}>Track {label}</Text>
+            <Text style={styles.legendText}>{t(`Track ${label}`)}</Text>
           </View>
         ))}
       </View>

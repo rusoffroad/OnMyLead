@@ -1,7 +1,10 @@
 import { Alert, Platform } from 'react-native';
+import { tx } from './i18n';
 
 /** Yes/no confirmation that works on phones and on the web. */
 export function confirmAsync(title: string, message: string, confirmLabel = 'Delete', dismissLabel = 'Cancel'): Promise<boolean> {
+  // In the rider's language when the line is translated (lib/i18n), else as written.
+  [title, message, confirmLabel, dismissLabel] = [tx(title), tx(message), tx(confirmLabel), tx(dismissLabel)];
   if (Platform.OS === 'web') return Promise.resolve(globalThis.confirm?.(`${title}\n\n${message}`) ?? false);
   return new Promise((resolve) => {
     Alert.alert(title, message, [
@@ -13,6 +16,7 @@ export function confirmAsync(title: string, message: string, confirmLabel = 'Del
 
 /** A message with an OK button, shown over whatever is on screen. */
 export function showNotice(title: string, message: string): void {
+  [title, message] = [tx(title), tx(message)];
   if (Platform.OS === 'web') {
     globalThis.alert?.(`${title}\n\n${message}`);
     return;

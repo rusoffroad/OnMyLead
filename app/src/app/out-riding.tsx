@@ -22,6 +22,7 @@ import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { useFriends } from '@/lib/friends';
 import { goOutRiding, nearbyRiders, OutRidingOffError, refreshOutRiding, stopOutRiding, updateOutRiding, useMyOutRiding } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /** How often the list refreshes while the screen is open. */
 const LIST_EVERY_MS = 60_000;
@@ -375,7 +376,7 @@ export default function OutRiding() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Out Riding' }} />
+      <Stack.Screen options={{ title: t('Out Riding') }} />
       {wide ? (
         <TwoPane side={status} main={list} sideWidth={sideColumnWidth(width)} />
       ) : (

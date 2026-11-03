@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } fro
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { tx } from '@/lib/i18n';
 
 /** The 2.0 home screen's own shades: a deeper card and a hairline, from the approved mock. */
 export const Home = {
@@ -54,7 +55,7 @@ export function Gradient({ colors, angle = 'down', radius = 0 }: { colors: strin
 export function SectionHead({ title, right }: { title: string; right?: ReactNode }) {
   return (
     <View style={styles.head}>
-      <Text style={styles.headTitle} accessibilityRole="header">{title}</Text>
+      <Text style={styles.headTitle} accessibilityRole="header">{tx(title)}</Text>
       {right}
     </View>
   );
@@ -63,8 +64,8 @@ export function SectionHead({ title, right }: { title: string; right?: ReactNode
 /** A blue text link at the right of a section title. */
 export function HeadLink({ title, onPress, label }: { title: string; onPress: () => void; label?: string }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label ?? title} hitSlop={10} onPress={onPress}>
-      {({ pressed }) => <Text style={[styles.link, pressed && { opacity: 0.6 }]}>{title}</Text>}
+    <Pressable accessibilityRole="button" accessibilityLabel={tx(label ?? title)} hitSlop={10} onPress={onPress}>
+      {({ pressed }) => <Text style={[styles.link, pressed && { opacity: 0.6 }]}>{tx(title)}</Text>}
     </Pressable>
   );
 }
@@ -74,7 +75,7 @@ export function Pill({ text, tone = 'plain', style }: { text: string; tone?: 'pl
   const t = PILL[tone];
   return (
     <View style={[styles.pill, { backgroundColor: t.bg, borderColor: t.border }, style]}>
-      <Text style={[styles.pillText, { color: t.fg }]} numberOfLines={1}>{text}</Text>
+      <Text style={[styles.pillText, { color: t.fg }]} numberOfLines={1}>{tx(text)}</Text>
     </View>
   );
 }

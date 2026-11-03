@@ -12,6 +12,7 @@ import { useAppSettings } from '@/lib/app-settings';
 import { FriendsOffError, friendPreview, respondFriendRequest, sendFriendRequestByCode } from '@/lib/friends';
 import { linkReferral, rememberInviteCode } from '@/lib/referrals';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /**
  * A rider's friend link (onmylead.com/friend/<code>). Signed in: shows whose link it is and adds
@@ -57,7 +58,7 @@ export default function FriendLink() {
   if (!session) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Add Friend' }} />
+        <Stack.Screen options={{ title: t('Add Friend') }} />
         <View style={styles.top}>
           <Text style={styles.title}>A Rider Wants to Be Friends</Text>
           <ThemedText themeColor="textSecondary">
@@ -77,7 +78,7 @@ export default function FriendLink() {
   if (preview === null) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Add Friend' }} />
+        <Stack.Screen options={{ title: t('Add Friend') }} />
         <ThemedText>{error ?? 'This friend link doesn’t work anymore. Ask for a new one.'}</ThemedText>
         <Button title="Go to Friends" kind="secondary" onPress={() => router.replace('/friends')} />
       </Screen>
@@ -111,7 +112,7 @@ export default function FriendLink() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Add Friend' }} />
+      <Stack.Screen options={{ title: t('Add Friend') }} />
       <View style={styles.top}>
         <RiderDot userId={preview.user_id} name={preview.display_name} size={72} zoom />
         <Text style={styles.title}>{headline}</Text>

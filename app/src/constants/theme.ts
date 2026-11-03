@@ -60,7 +60,9 @@ export type FontWeightKey = keyof typeof FontFamilies.body;
 export function font(weight: number | string | undefined, cut: 'body' | 'display' = 'body') {
   const w = weight === 'bold' ? 700 : weight === 'normal' || weight == null ? (cut === 'display' ? 700 : 500) : Number(weight);
   const key = (w >= 800 ? 800 : w >= 700 ? 700 : w >= 600 ? 600 : w >= 500 ? 500 : 400) as FontWeightKey;
-  return FontFamilies[cut][key];
+  // On the website, letters Barlow doesn't have (Cyrillic, Chinese, Japanese, Korean, Hindi) fall
+  // back to the system sans-serif instead of the browser's default serif. The phones do this alone.
+  return Platform.OS === 'web' ? `${FontFamilies[cut][key]}, system-ui, sans-serif` : FontFamilies[cut][key];
 }
 
 export const Fonts = Platform.select({

@@ -2,6 +2,18 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "language",
+      "home-screen",
+      "sync-across-devices"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "language",
+    "why": "New in 2.0 (Chris 2026-11-03: \"add an option to change the language of the app\"). OnMyLead follows the phone's language in 12 languages, English otherwise, with a flag switcher on Home and You > Language; the choice syncs across devices. New article; Home and Sync Across Devices mention it."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "refer-a-friend"
     ],
     "kind": "review",

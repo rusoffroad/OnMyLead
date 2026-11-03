@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 import { Colors, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { Icon, type IconName } from './icon';
 import { ThemedText } from './themed-text';
+import { tx } from '@/lib/i18n';
 
 /**
  * One block of a menu: an optional heading over rows that share a surface, divided by hairlines.
@@ -16,7 +17,7 @@ export function MenuGroup({ title, children }: { title?: string; children: React
     <View style={{ gap: Spacing.two }}>
       {title ? (
         <ThemedText type="small" themeColor="textSecondary" accessibilityRole="header" style={styles.title}>
-          {title}
+          {tx(title)}
         </ThemedText>
       ) : null}
       <View style={styles.group}>
@@ -63,7 +64,7 @@ export function MenuRow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={detail ? `${title}. ${detail}` : title}
+      accessibilityLabel={detail ? `${tx(title)}. ${tx(detail)}` : tx(title)}
       onPress={onPress}
       style={({ pressed }) => pressed && { backgroundColor: Colors.backgroundSelected }}>
       {body}

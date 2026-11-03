@@ -17,6 +17,7 @@ import { getEvent, saveEvent } from '@/lib/events';
 import { stateAt } from '@/lib/location';
 import { handleProError } from '@/lib/pro';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /**
  * Create an Event (Pro) or Edit Event (any host, with ?id=). Photos, the agenda, co-hosts and the
@@ -108,7 +109,7 @@ export default function EventForm() {
   if (!loaded) {
     return (
       <Screen width="readable">
-        <Stack.Screen options={{ title: 'Edit Event' }} />
+        <Stack.Screen options={{ title: t('Edit Event') }} />
         <ThemedText themeColor="textSecondary">Loading…</ThemedText>
         <ErrorText error={error} />
       </Screen>
@@ -117,7 +118,7 @@ export default function EventForm() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: id ? 'Edit Event' : 'Create an Event' }} />
+      <Stack.Screen options={{ title: id ? t('Edit Event') : t('Create an Event') }} />
       <View style={{ gap: Spacing.three }}>
         <Card>
           <Field label="Event Name" value={title} onChangeText={setTitle} maxLength={100} placeholder="Moab Spring Rally" />

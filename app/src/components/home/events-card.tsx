@@ -9,6 +9,7 @@ import { eventDates, sortCards, type EventCard } from '@/core/events';
 import { myEvents, upcomingEvents } from '@/lib/events';
 import { positionIfAllowed } from '@/lib/location';
 import { Home, homeStyles, Pill } from './parts';
+import { t } from '@/lib/i18n';
 
 /**
  * Events on the home screen: one quiet row under the ride actions. It shows your next event (one
@@ -41,8 +42,8 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
   );
 
   const label = next
-    ? `${next.yours ? 'Your next event' : 'Next event'}: ${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}. Open Events`
-    : 'Events: rallies, poker runs and ride weekends. Open Events';
+    ? t(next.yours ? 'Your next event: {event}. Open Events' : 'Next event: {event}. Open Events', { event: `${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}` })
+    : t('Events: rallies, poker runs and ride weekends. Open Events');
 
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={() => router.push('/events')}
@@ -54,11 +55,11 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
       )}
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <View style={styles.titleRow}>
-          <Text style={homeStyles.cardTitle}>Events</Text>
-          {count ? <Pill text={`${count} Coming Up`} /> : null}
+          <Text style={homeStyles.cardTitle}>{t('Events')}</Text>
+          {count ? <Pill text={t('{n} Coming Up', { n: count })} /> : null}
         </View>
         <Text style={homeStyles.muted} numberOfLines={1}>
-          {next ? `${next.yours ? 'Yours: ' : ''}${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}` : 'Rallies, poker runs and ride weekends'}
+          {next ? `${next.yours ? `${t('Yours')}: ` : ''}${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}` : t('Rallies, poker runs and ride weekends')}
         </Text>
       </View>
       <Icon name="chevron" size={18} color={Home.muted} />

@@ -10,6 +10,7 @@ import { EXPANDED_MIN } from '@/core/layout';
 import { setBatteryMode, useBatteryMode } from '@/lib/battery';
 import { confirmAsync } from '@/lib/confirm';
 import { applyBatteryPlan } from '@/lib/location';
+import { t } from '@/lib/i18n';
 
 /** The stretch of riding each trail shows, so the dots compare across the three choices. */
 const TRAIL_SEC = 90;
@@ -37,7 +38,7 @@ export default function BatteryScreen() {
 
   return (
     <Screen width={sideBySide ? 'page' : 'readable'}>
-      <Stack.Screen options={{ title: 'Battery Saver' }} />
+      <Stack.Screen options={{ title: t('Battery Saver') }} />
       <ThemedText themeColor="textSecondary">
         How often this device tells your group where you are while you share your location. Fewer updates use less battery.
       </ThemedText>

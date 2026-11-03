@@ -18,6 +18,7 @@ import {
 } from '@/lib/groups';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
+import { t } from '@/lib/i18n';
 
 /** Out Riding and your messages, your riding groups, the groups you're in, and the leaders you follow. */
 export default function Groups() {
@@ -66,7 +67,7 @@ export default function Groups() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Riding Groups' }} />
+      <Stack.Screen options={{ title: t('Riding Groups') }} />
       <OutRidingCard />
       <ThemedText themeColor="textSecondary">
         Save the people you ride with. When you create a ride, invite the whole group in one tap.

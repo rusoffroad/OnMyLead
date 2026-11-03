@@ -10,6 +10,7 @@ import { cleanGroupName, groupNameProblem, MAX_GROUP_NAME, type RideMate } from 
 import { cleanShareCode, friendlyShareCodeError } from '@/core/share-code';
 import { createGroup, rideMates } from '@/lib/groups';
 import { handleProError } from '@/lib/pro';
+import { t } from '@/lib/i18n';
 
 /** Name a group and tick the riders in it. Friends not in the app join later by the group link. */
 export default function NewGroup() {
@@ -44,7 +45,7 @@ export default function NewGroup() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'New Group' }} />
+      <Stack.Screen options={{ title: t('New Group') }} />
       <Field
         label="Group Name"
         value={name}

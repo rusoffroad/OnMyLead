@@ -19,6 +19,7 @@ import { positionIfAllowed } from '@/lib/location';
 import { requirePro } from '@/lib/pro';
 import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 type Tab = 'upcoming' | 'mine';
 
@@ -76,7 +77,7 @@ export default function EventsScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Events' }} />
+      <Stack.Screen options={{ title: t('Events') }} />
       <PageHead><title>Events | OnMyLead</title></PageHead>
       <Screen width="wide">
         <View style={{ gap: Spacing.four }}>
