@@ -6,6 +6,7 @@ order: 20
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - app/src/components/events/part-of-event.tsx
   - app/src/core/leaving.ts
   - app/src/components/leave-ride.tsx
   - app/src/app/r/[code].tsx
@@ -113,4 +114,10 @@ Or, on the **Rides** tab, swipe left on the ride and tap **Leave** (on onmylead.
 
 :::note
 You can't join a ride that has ended or been cancelled.
+:::
+
+:::release 2.0
+## Rides That Are Part of an Event
+
+A ride that belongs to an event shows **Part of** and the event's name at the top of its page; tap it to see the event's agenda and its other rides. You can also join a ride from the event's **Group Rides** with **See Ride and Join**. See [Events](/help/events).
 :::

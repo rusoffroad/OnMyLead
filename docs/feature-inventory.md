@@ -147,6 +147,11 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Follow leaders and see their upcoming rides.
 - Blocked riders list; report rider or ride; You > Report a Rider (2.0) for anyone you messaged, friended, rode with or blocked.
 
+### Events (2.0)
+- Events card on Home opens Events: public events coming up near you and Yours (hosting, co-hosting, going or interested).
+- Event page (onmylead.com/e/CODE, works signed out): dates, public place with Directions, photos, details, website, Going / Interested, Share, an Agenda by day (group rides, poker runs, concerts, raffles, shows, contests, food, vendors, meetups), and the event's Group Rides with labels and a Ride Manager each.
+- Pro creates events (Public or Link Only); the owner adds up to 10 co-hosts; hosts add photos, agenda items and the rides they organize; a Ride Manager becomes the ride's Co-Organizer. Cancel or delete; Report This Event; Admin > Events hides events and takes down photos.
+
 ### Garage, Trips and Extras
 - Garage: machines with photo, VIN decode, specs, fuel range (full, safe turnaround, safe trip),
   parts and extras with costs, build totals, Build Sheet and CSV export.

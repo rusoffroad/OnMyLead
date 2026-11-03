@@ -326,6 +326,7 @@ export function Showcase() {
               <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>
+              <Feature title="Events">Rallies, poker runs and ride weekends on one shareable page: dates, place, photos, an agenda of concerts, raffles and runs, and the group rides to join. Pro riders post them, add co-hosts and pick a Ride Manager for each ride. Anyone can see them and say they’re going.</Feature>
             </div>
             <figure className="phone">
               <img src="/showcase/vehicle.webp" alt="A Garage machine called Red Rocket with its fuel range and build list" loading="lazy" width={786} height={1704} />
@@ -576,6 +577,7 @@ const PRO = [
   'Advanced Trip Planning',
   'Advanced Ride Statistics',
   'Premium Ride Cards',
+  'Create Events',
 ];
 
 function Pricing() {

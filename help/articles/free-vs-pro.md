@@ -49,6 +49,10 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Advanced Ride Statistics | No | Yes |
 | Premium Ride Cards | No | Yes |
 
+:::release 2.0
+From version 2.0 the table also has **Create Events**: No on Free, Yes on Pro.
+:::
+
 ## Always Free
 
 Safety never depends on your plan. On every plan you get Ride Mode, live tracking, Need Help, EMERGENCY, Mechanical Issue alerts, Ride Bubble, location sharing, family links, ride chat and joining rides.
@@ -80,6 +84,9 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 - **Advanced Trip Planning:** plan several trips at once, start from packing lists, copy trips and link them to rides. One active trip and the fuel check stay free. See [Trip Planner](/help/trip-planner).
 - **Advanced Ride Statistics:** moving time, average and top speed, climbing and the group's totals after every ride. Distance and time out stay free.
 - **Premium Ride Cards:** share your ride with the Full Stats and Big Number layouts. The standard card stays free.
+:::release 2.0
+- **Create Events:** post a rally, poker run or ride weekend with photos, an agenda and its group rides. Seeing events, saying you're going and being a co-host or Ride Manager stay free. See [Events](/help/events).
+:::
 
 When you tap something that needs Pro, a short prompt explains it. Tap **See OnMyLead Pro** to see the plans, or **Not Now** to close it.
 

@@ -6,6 +6,7 @@ order: 40
 release: "1.0"
 updated: 2026-11-03
 sources:
+  - app/src/app/e/[code].tsx
   - app/src/components/report-sheet.tsx
   - app/src/components/ride-roster.tsx
   - app/src/components/ride-chat.tsx
@@ -94,6 +95,12 @@ Reports go to the OnMyLead team, not to the rider or the organizer. OnMyLead loo
 - You aren't told what action was taken, and they aren't told who reported them.
 
 If you see **This account is suspended** when you sign in, your account was suspended for breaking the rider rules. If you think it's a mistake, [contact us](/help/contact-support).
+:::
+
+:::release 2.0
+## Report an Event
+
+On an event's page, scroll down and tap **Report This Event** (you need to be signed in, and it isn't shown to the event's hosts). Pick what's wrong (**Spam or Scam**, **Fake Event**, **Offensive Content**, **Inappropriate Photo**, **Unsafe Plan** or **Something Else**), add a note if you like, and tap **Send Report**. It goes to the OnMyLead team as a report about the event's host, with the event attached. The host isn't told who sent it. The team can hide the event or take down a photo.
 :::
 
 ## Block a Rider
