@@ -70,6 +70,9 @@ Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status
 - **Direct Messages**: a rider messages you, say after seeing you Out Riding. To mute one conversation, do it from inside it. See [See Who's Out Riding Nearby](/help/out-riding).
 - **Friend Requests**: a rider asks to be your friend, or accepts your request. See [Add Friends](/help/friends).
 :::
+:::release 2.0
+- **Likes and Comments**: a rider likes or comments on your post, ride, badge or trail, or replies after you comment. Likes on one post come at most once every 15 minutes. See [Like, Comment and Post in Social](/help/social).
+:::
 
 ### Your Account
 
@@ -94,6 +97,9 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 - A direct message opens the conversation.
 - A friend request, or a request someone accepted, opens **Friends**.
 - A trail of yours being hidden opens **My Trails**.
+:::
+:::release 2.0
+- A like or a comment opens that post with all its comments.
 :::
 
 :::release 1.0.4

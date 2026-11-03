@@ -76,6 +76,12 @@ You can also press and hold one of the rider's messages in ride chat or group ch
 From a direct message, tap **•••** then **Report Rider**, or press and hold one of their messages. The message goes with your report. In Out Riding, tap **•••** next to a rider. See [See Who's Out Riding Nearby](/help/out-riding).
 :::
 
+:::release 2.0
+## Report a Post or Comment
+
+In Social, tap **⋯** on a post and tap **Report This Post**, or tap **Report** under a comment. Pick what's wrong, add details if you like, and tap **Send Report**. You can also report a rider from their profile. When three different riders report the same post or comment, it's hidden until the OnMyLead team looks at it. See [Like, Comment and Post in Social](/help/social).
+:::
+
 ## Report a Ride
 
 1. Open the ride's page.

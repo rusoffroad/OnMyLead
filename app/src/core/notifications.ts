@@ -8,7 +8,7 @@
 
 export type NotificationTopic =
   | 'rider_status' | 'announcements' | 'leader_messages' | 'chat' | 'ride_changes' | 'new_riders'
-  | 'ride_invites' | 'followed_leaders' | 'group_chat' | 'direct_messages' | 'friend_requests' | 'account_push';
+  | 'ride_invites' | 'followed_leaders' | 'group_chat' | 'direct_messages' | 'friend_requests' | 'feed_activity' | 'account_push';
 
 export type NotificationSettings = Record<NotificationTopic, boolean> & {
   /** Off: notifications say a message arrived, not what it says. */
@@ -38,6 +38,7 @@ export const DEFAULT_SETTINGS: NotificationSettings = {
   group_chat: true,
   direct_messages: true,
   friend_requests: true,
+  feed_activity: true,
   account_push: true,
   previews: true,
   reminder_minutes: 60,
@@ -83,6 +84,7 @@ export const TOPIC_GROUPS: TopicGroup[] = [
       { key: 'followed_leaders', title: 'Leaders You Follow', detail: 'A leader you follow posts a new public ride.' },
       { key: 'direct_messages', title: 'Direct Messages', detail: 'A rider messages you, say after seeing you Out Riding. Mute one conversation from inside it.' },
       { key: 'friend_requests', title: 'Friend Requests', detail: 'A rider asks to be your friend, or accepts your request.' },
+      { key: 'feed_activity', title: 'Likes and Comments', detail: 'A rider likes or comments on your post, ride, badge or trail, or replies after you comment.' },
     ],
   },
   {
@@ -101,6 +103,9 @@ export const DM_TOPICS: NotificationTopic[] = ['direct_messages'];
 
 /** The topic that arrived with Friends (migration 20261101800000_friends.sql). */
 export const FRIEND_TOPICS: NotificationTopic[] = ['friend_requests'];
+
+/** The topic that arrived with Social (migration 20261102900000_social_hub.sql). */
+export const FEED_TOPICS: NotificationTopic[] = ['feed_activity'];
 
 /** Settings that arrived with OnMyLead Pro (migration 20261018000000_pro_entitlements.sql). */
 export const ACCOUNT_SETTINGS: (keyof NotificationSettings)[] = ['account_push', 'account_emails'];
@@ -122,7 +127,7 @@ export function settingsFromRow(row: Partial<Record<keyof NotificationSettings, 
   if (!row) return s;
   for (const k of [
     'rider_status', 'announcements', 'leader_messages', 'chat', 'ride_changes', 'new_riders', 'ride_invites', 'followed_leaders',
-    'group_chat', 'direct_messages', 'friend_requests', 'account_push', 'previews', 'quiet_hours', 'ride_emails', 'account_emails',
+    'group_chat', 'direct_messages', 'friend_requests', 'feed_activity', 'account_push', 'previews', 'quiet_hours', 'ride_emails', 'account_emails',
   ] as const) {
     if (typeof row[k] === 'boolean') s[k] = row[k] as boolean;
   }

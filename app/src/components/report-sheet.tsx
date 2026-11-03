@@ -12,13 +12,16 @@ import type { ReportSource } from '@/core/moderation';
 import { REPORT_REASONS } from '@/core/pro';
 import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { sendReport } from '@/lib/pro';
+import { reportContent } from '@/lib/social';
 
 // source: where the report was sent from, so the Admin Dashboard can say (2.0).
 type Target =
   | { kind: 'ride'; rideId: string; name: string; source?: ReportSource }
   // context: added to the report for the owner, such as the direct message being reported.
   // groupId: the riding group chat it was sent from, so that chat is saved with the report first.
-  | { kind: 'rider'; userId: string; rideId?: string | null; name: string; context?: string; source?: ReportSource; groupId?: string | null };
+  | { kind: 'rider'; userId: string; rideId?: string | null; name: string; context?: string; source?: ReportSource; groupId?: string | null;
+      // A post or comment on the Feed (2.0 Social): its text is saved with the report on the server.
+      postId?: string; commentId?: string };
 
 /**
  * Report Ride / Report Rider: a reason, an optional note, and it goes to the OnMyLead owner,
@@ -53,6 +56,11 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
     setBusy(true);
     setError(null);
     try {
+      if (target.kind === 'rider' && (target.postId || target.commentId)) {
+        await reportContent({ postId: target.postId, commentId: target.commentId, userId: target.userId }, reason, details);
+        setSent(true);
+        return;
+      }
       await sendReport({
         kind: target.kind,
         rideId: target.rideId ?? null,
@@ -100,7 +108,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
                 <Icon name="flagged" size={22} color={Colors.danger} />
                 <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>
-                  {target.kind === 'ride' ? 'Report This Ride' : `Report ${target.name}`}
+                  {target.kind === 'ride' ? 'Report This Ride' : target.postId ? 'Report This Post' : target.commentId ? 'Report This Comment' : `Report ${target.name}`}
                 </Text>
               </View>
               <ThemedText type="small" themeColor="textSecondary">
