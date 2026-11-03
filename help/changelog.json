@@ -2,6 +2,29 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "refer-a-friend"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "Reviewed, no change for riders: Admin > Referrals now keeps Apple offer codes that are all letters and shows code expiry dates on the right day."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "social",
+      "out-riding",
+      "group-chat",
+      "report-and-block"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "social",
+    "why": "Bug fix (Chris 2026-11-03, 2.0 build 8: the keyboard hid the comment box on a Social post). The comment box, direct messages and group chat now stay above the keyboard on iPhone, iPad and Android. The steps and labels are the same, so the articles only get a new updated: date."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "tilt-and-crash-alert",
       "ride-mode",
       "navigation-mode"

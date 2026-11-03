@@ -1,13 +1,13 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
-  KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View,
+  Pressable, ScrollView, StyleSheet, Text, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
-import { keyboardScroll, TextBox } from '@/components/keyboard';
+import { KeyboardScreen, keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
@@ -176,7 +176,7 @@ export default function GroupChat() {
         </View>
       ) : null}
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardScreen>
         <ScrollView
           ref={scroller}
           style={{ flex: 1 }}
@@ -389,7 +389,7 @@ export default function GroupChat() {
             {localError ? <Text style={styles.failText}>{localError}</Text> : null}
           </View>
         ) : null}
-      </KeyboardAvoidingView>
+      </KeyboardScreen>
       <ReportSheet target={reporting} onClose={() => setReporting(null)} />
     </SafeAreaView>
   );
