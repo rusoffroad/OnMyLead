@@ -75,6 +75,10 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
     title: 'Group Rides on Your Trails',
     body: 'Turn a trail into a group ride’s route in one tap. Drawing a route on the map stays free.',
   },
+  social_posts: {
+    title: 'Post, Comment and Share',
+    body: 'Post to your profile, comment on friends’ rides and share your activity to Facebook, Instagram and X. Seeing the Feed, reading comments and liking stay free.',
+  },
   create_events: {
     title: 'Create Events',
     body: 'Post rallies, poker runs and ride weekends with photos, an agenda and their group rides. Seeing events, saying you’re going and co-hosting stay free.',
@@ -89,6 +93,8 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Ride Chat and Voting', free: true, pro: true },
   { label: 'Draw Routes and Follow Leaders', free: true, pro: true },
   { label: 'Map Mode: Offroad Map, Custom Trails, Rate Trails', free: true, pro: true },
+  { label: 'Social Feed: See, Like and Read Comments', free: true, pro: true },
+  { label: 'Post, Comment and Share to Social Media', free: false, pro: true },
   { label: 'Record and Share Your Trails', free: false, pro: true },
   { label: 'Group Rides on Your Trails', free: false, pro: true },
   { label: 'Import GPX Routes', free: false, pro: true },

@@ -138,6 +138,10 @@ function RootLayout() {
         <Stack.Screen name="g/[code]" options={{ title: 'Riding Group' }} />
         <Stack.Screen name="friends" options={{ title: 'Friends' }} />
         <Stack.Screen name="friend/[code]" options={{ title: 'Add Friend' }} />
+        <Stack.Screen name="social/index" options={{ title: 'Social' }} />
+        <Stack.Screen name="social/item" options={{ title: 'Post', headerShown: false }} />
+        <Stack.Screen name="social/new" options={{ title: 'New Post', presentation: 'modal' }} />
+        <Stack.Screen name="social/rider/[id]" options={{ title: '' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
         <Stack.Screen name="terms" options={{ title: '' }} />
         <Stack.Screen name="privacy" options={{ title: '' }} />

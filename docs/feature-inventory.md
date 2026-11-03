@@ -140,6 +140,13 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   Feed with Customize (`home_feed`, `rider_feed_settings`) **[flag home_feed]**, Your Badges, Your
   Toolkit, Help & Support. Two columns at Expanded width.
 
+### Social (2.0)
+- `app/social/index.tsx` (Activity / Friends / My Posts; TwoPane on tablets), `social/item.tsx` (one
+  item with likers and every comment), `social/rider/[id].tsx` (profile, PRO tag, stats, timeline),
+  `social/new.tsx` (post with one photo). Likes free; comment, post and share **[Pro: social_posts]**.
+  Share to other apps via a generated card (`lib/share-activity*.ts`). Tap any profile picture for
+  full size (`components/photo-viewer.tsx`). Migration 20261102900000_social_hub.sql.
+
 ### Riding Groups and Social
 - Groups tab: New Group, your groups, groups you're in, group chat with unread counts and ride
   "tickets", group links (`/g/[code]`), invite a group to a ride, leave / delete **[Pro]** to

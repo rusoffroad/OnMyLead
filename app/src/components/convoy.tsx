@@ -31,10 +31,11 @@ export function Convoy({ names, ids, size = 34, max = 8 }: { names: (string | nu
  * One rider as a map dot with their initial (none for a null name). `lead` is the blue one.
  * With `userId`, their profile picture shows instead when they have one.
  */
-export function RiderDot({ userId, name, lead, size = 34, ring = 0 }: { userId?: string | null; name: string | null; lead?: boolean; size?: number; ring?: number }) {
+export function RiderDot({ userId, name, lead, size = 34, ring = 0, zoom = false }: { userId?: string | null; name: string | null; lead?: boolean; size?: number; ring?: number; zoom?: boolean }) {
   const dot = <InitialDot name={name} lead={lead} size={size} ring={ring} />;
   if (!userId) return dot;
-  return <RiderPhoto userId={userId} size={size} ring={ring} fallback={dot} />;
+  // zoom: tapping the picture opens it full size (rider lists, chat, Friends). Off on maps.
+  return <RiderPhoto userId={userId} size={size} ring={ring} fallback={dot} zoom={zoom} name={name} />;
 }
 
 function InitialDot({ name, lead, size, ring }: { name: string | null; lead?: boolean; size: number; ring: number }) {

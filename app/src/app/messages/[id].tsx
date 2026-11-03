@@ -110,7 +110,7 @@ export default function Conversation() {
               <Icon name="chevron" color={Colors.text} size={26} />
             </View>
           </Pressable>
-          <RiderDot userId={id} name={who} size={40} />
+          <RiderDot userId={id} name={who} size={40} zoom />
           <View style={{ flex: 1 }}>
             <Text style={styles.title} numberOfLines={1}>{who}</Text>
             <Text style={styles.sub} numberOfLines={1}>{blocked ? 'Blocked' : muted ? 'Muted' : 'Direct Message'}</Text>

@@ -91,6 +91,8 @@ The OnMyLead team can't read your direct messages or chats. The one exception is
 ## Your Feed
 
 Home's **Feed** shows your finished rides, badges, shared trails and group rides to **Friends Only** unless you change it. Under **Customize**, **Who Sees Your Activity** can be **Friends and Followers** or **Nobody**. A ride is named only to riders who were on it, or if it was public. Your location is never in a feed. Blocked riders never see your posts. See [Your Home Screen](/help/home-screen).
+
+The same setting decides who can see your posts, likes and comments in Social and your activity on your profile. Photos you post are made smaller and have no location added. Anyone who can see a post can see its photo, and like any photo, someone with its address could pass it on. Sharing to Facebook, Instagram or X only happens when you tap **Share**, and a share never includes your location. See [Like, Comment and Post in Social](/help/social).
 :::
 
 ## Blocked Riders

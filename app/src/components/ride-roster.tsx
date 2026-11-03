@@ -145,6 +145,7 @@ export function RideRoster({
                 style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
                 <RiderPhoto
                   userId={m.user_id}
+                  name={nameOf(m.user_id)}
                   size={36}
                   fallback={
                     <SocialPhoto

@@ -50,7 +50,11 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Premium Ride Cards | No | Yes |
 
 :::release 2.0
-From version 2.0 the table also has **Create Events**: No on Free, Yes on Pro.
+| | Free | Pro |
+|---|---|---|
+| Social Feed: See, Like and Read Comments | Yes | Yes |
+| Post, Comment and Share to Social Media | No | Yes |
+| Create Events | No | Yes |
 :::
 
 ## Always Free
@@ -85,6 +89,7 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 - **Advanced Ride Statistics:** moving time, average and top speed, climbing and the group's totals after every ride. Distance and time out stay free.
 - **Premium Ride Cards:** share your ride with the Full Stats and Big Number layouts. The standard card stays free.
 :::release 2.0
+- **Post, Comment and Share:** post ride reports with a photo on your profile, comment on your friends' rides, badges, trails and posts, and share your rides, badges and posts to Facebook, Instagram or X. Seeing Social, reading comments and liking stay free. Pro riders show a gold **PRO** tag next to their name. See [Like, Comment and Post in Social](/help/social).
 - **Create Events:** post a rally, poker run or ride weekend with photos, an agenda and its group rides. Seeing events, saying you're going and being a co-host or Ride Manager stay free. See [Events](/help/events).
 :::
 

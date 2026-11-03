@@ -5,8 +5,9 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { Platform } from 'react-native';
 
 import {
-  AVATAR_BUCKET, AVATAR_QUALITY, AVATAR_SIZE, avatarPath, avatarUrl, chunk, idsToFetch, isOwnAvatarPath, squareCrop,
+  AVATAR_BUCKET, AVATAR_MAX_BYTES, AVATAR_QUALITY, AVATAR_SIZE, avatarPath, avatarUrl, chunk, idsToFetch, isOwnAvatarPath, squareCrop,
 } from '@/core/avatar';
+import { nextQuality } from '@/core/social';
 import { track } from './analytics';
 import { readPhotoBytes } from './photo-bytes';
 import { supabase, supabaseUrl } from './supabase';
@@ -112,14 +113,24 @@ export async function pickAvatar(source: AvatarSource): Promise<ImagePicker.Imag
   return res.canceled ? null : (res.assets[0] ?? null);
 }
 
-/** Squares and shrinks a picked photo to a 512 x 512 JPEG. */
-async function squareJpeg(asset: ImagePicker.ImagePickerAsset): Promise<string> {
-  const ctx = ImageManipulator.ImageManipulator.manipulate(asset.uri);
-  if (asset.width && asset.height && asset.width !== asset.height) ctx.crop(squareCrop(asset.width, asset.height));
-  ctx.resize({ width: AVATAR_SIZE, height: AVATAR_SIZE });
-  const image = await ctx.renderAsync();
-  const saved = await image.saveAsync({ compress: AVATAR_QUALITY, format: ImageManipulator.SaveFormat.JPEG });
-  return saved.uri;
+/**
+ * Squares (auto-crops to the centre) and shrinks a picked photo to a 512 x 512 JPEG, saving it
+ * again at lower quality while it's over AVATAR_MAX_BYTES, so every picture stays small in storage.
+ */
+async function squareJpeg(asset: ImagePicker.ImagePickerAsset): Promise<{ uri: string; bytes: ArrayBuffer | Blob }> {
+  let quality: number | null = AVATAR_QUALITY;
+  while (quality != null) {
+    const ctx = ImageManipulator.ImageManipulator.manipulate(asset.uri);
+    if (asset.width && asset.height && asset.width !== asset.height) ctx.crop(squareCrop(asset.width, asset.height));
+    ctx.resize({ width: AVATAR_SIZE, height: AVATAR_SIZE });
+    const image = await ctx.renderAsync();
+    const saved = await image.saveAsync({ compress: quality, format: ImageManipulator.SaveFormat.JPEG });
+    const bytes = await readPhotoBytes({ uri: saved.uri, mimeType: 'image/jpeg' });
+    const next = nextQuality(quality, bytes instanceof Blob ? bytes.size : bytes.byteLength, AVATAR_MAX_BYTES);
+    if (next === quality) return { uri: saved.uri, bytes };
+    quality = next;
+  }
+  throw new Error('That photo is too big. Try another one.');
 }
 
 async function signedInId(): Promise<string> {
@@ -139,10 +150,10 @@ async function myAvatarPath(userId: string): Promise<string | null> {
 export async function saveAvatar(asset: ImagePicker.ImagePickerAsset): Promise<void> {
   const uid = await signedInId();
   const old = await myAvatarPath(uid);
-  const uri = await squareJpeg(asset);
+  const { bytes } = await squareJpeg(asset);
   const path = avatarPath(uid, Crypto.randomUUID());
   const bucket = supabase.storage.from(AVATAR_BUCKET);
-  const { error: upErr } = await bucket.upload(path, await readPhotoBytes({ uri, mimeType: 'image/jpeg' }), {
+  const { error: upErr } = await bucket.upload(path, bytes, {
     contentType: 'image/jpeg', upsert: false, cacheControl: '31536000',
   });
   if (upErr) throw new Error(upErr.message);
