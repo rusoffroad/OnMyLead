@@ -1,7 +1,7 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import type { SocialProvider } from '@/core/auth-link';
 
 /**
@@ -76,7 +76,7 @@ export function ProviderMark({ provider, size = 20, light }: { provider: SocialP
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   button: {
     minHeight: 52, borderRadius: Radius.control, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: Spacing.two, paddingHorizontal: Spacing.three,
@@ -85,4 +85,4 @@ const styles = StyleSheet.create({
   dark: { backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border },
   mark: { width: 22, alignItems: 'center' },
   text: { fontFamily: font(600), fontSize: 17 },
-});
+}));

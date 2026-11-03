@@ -1,11 +1,11 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { Convoy } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { NOT_SWITCHED_ON, ridersLabel } from '@/core/groups';
 import { groupPreview, joinGroup, NotSwitchedOnError, type GroupPreview } from '@/lib/groups';
 import { useSession } from '@/lib/session';
@@ -82,6 +82,6 @@ export default function GroupLink() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 48, lineHeight: 50, letterSpacing: -0.5 },
-});
+}));

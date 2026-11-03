@@ -1,5 +1,6 @@
 import type { LatLng } from './geo';
 import { distanceM } from './geo';
+import { mvumWidthLimitIn, trailLineKey } from './trail-width';
 
 /**
  * Public trail and road data for the ride maps. Everything here is free U.S. government data
@@ -370,6 +371,12 @@ export type TrailInfo = {
   attribution: string;
   /** Closed today, per the source. Null when the source shows it open or doesn't say. */
   closure: Closure | null;
+  /** The agency's width limit in inches (core/trail-width), null when its data doesn't set one. */
+  widthLimitIn: number | null;
+  /** Matches riders' width entries to this line (core/trail-width trailLineKey). */
+  lineKey: string | null;
+  /** Where the rider tapped, for matching width entries on lines with no lasting id. */
+  at?: LatLng;
 };
 
 /** MVUM vehicle columns in the order riders think about them, with plain names. */
@@ -501,6 +508,8 @@ export function parseMvum(props: Record<string, unknown>, kind: 'trail' | 'road'
     surface: tidy(props.surfacetype),
     attribution: TRAIL_SOURCES.mvum.attribution,
     closure,
+    widthLimitIn: mvumWidthLimitIn(props),
+    lineKey: trailLineKey('mvum', props),
   };
 }
 
@@ -521,6 +530,8 @@ export function parseFsClosed(props: Record<string, unknown>): TrailInfo {
     surface: tidy(props.surface_type),
     attribution: TRAIL_SOURCES.fsclosed.attribution,
     closure: { label: 'Closed to Motor Vehicles', detail: 'The Forest Service lists this road as closed to motorized use.' },
+    widthLimitIn: null,
+    lineKey: trailLineKey('fsclosed', props),
   };
 }
 
@@ -540,6 +551,8 @@ export function parseBlm(props: Record<string, unknown>): TrailInfo {
     surface: tidy(props.OBSRVE_SRFCE_TYPE),
     attribution: ohv ? `${TRAIL_SOURCES.blm.attribution} (OHV: ${ohv})` : TRAIL_SOURCES.blm.attribution,
     closure: ohv?.toLowerCase() === 'closed' ? { label: 'Closed to Off-Highway Vehicles', detail: "BLM's travel plan closes this route to off-highway vehicles." } : null,
+    widthLimitIn: null,
+    lineKey: trailLineKey('blm', props),
   };
 }
 
@@ -560,7 +573,7 @@ export function nearestTrail(
       best = { d, info };
     }
   }
-  return best?.info ?? null;
+  return best ? { ...best.info, at: p } : null;
 }
 
 // ---------------------------------------------------------------------------------------------

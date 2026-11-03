@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Modal, Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -8,7 +8,7 @@ import { RiderPhoto } from '@/components/rider-photo';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { ridersToTell } from '@/core/cancel';
 import {
   friendlyLeaveError, handOffAndLeavePrompt, handOffCandidates, LEAVE_LABEL, leadsRide, leaveAloneCancelPrompt,
@@ -184,14 +184,14 @@ function Initial({ name, lead }: { name: string; lead: boolean }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   bar: {
     minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.two,
     borderRadius: Radius.control, borderWidth: 1.5, borderColor: 'rgba(240,62,62,0.55)', paddingHorizontal: Spacing.three,
   },
   barDark: { backgroundColor: 'rgba(240,62,62,0.10)' },
   barText: { color: Colors.danger, fontFamily: font(700), fontSize: 17 },
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     flexShrink: 1, maxHeight: '85%', backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
@@ -204,4 +204,4 @@ const styles = StyleSheet.create({
   },
   initial: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   initialText: { color: Colors.text, fontFamily: font(800), fontSize: 18 },
-});
+}));

@@ -126,16 +126,16 @@ export async function startPurchaseUpdates(): Promise<void> {
   }
 }
 
-/** Google Play's offer token for each product, needed to buy it. */
-const offerTokens = new Map<string, string>();
+type PlayOffers = Parameters<typeof androidOfferToken>[0];
+/** Google Play's offers for each product; buying needs one of their tokens. */
+const playOffers = new Map<string, PlayOffers>();
 
 export async function loadProducts(): Promise<ProProduct[]> {
   if (!(await connect())) return [];
   try {
     const items = await fetchProducts({ skus: PRODUCT_IDS, type: 'subs' });
-    for (const item of (items ?? []) as { id: string; subscriptionOffers?: Parameters<typeof androidOfferToken>[0] }[]) {
-      const token = androidOfferToken(item.subscriptionOffers);
-      if (token) offerTokens.set(item.id, token);
+    for (const item of (items ?? []) as { id: string; subscriptionOffers?: PlayOffers }[]) {
+      if (item.subscriptionOffers?.length) playOffers.set(item.id, item.subscriptionOffers);
     }
     return proProducts((items ?? []) as { id: string; displayPrice: string }[]);
   } catch (e) {
@@ -144,14 +144,18 @@ export async function loadProducts(): Promise<ProProduct[]> {
   }
 }
 
-export async function buy(id: string): Promise<BuyResult> {
+/**
+ * Buys Pro. offerId is a Google Play offer the server said this rider may have (the
+ * refer-a-friend 50% off); without it the regular price.
+ */
+export async function buy(id: string, offerId?: string | null): Promise<BuyResult> {
   if (!PRODUCT_IDS.includes(id)) return { ok: false, reason: 'failed' };
   const { data } = await supabase.auth.getSession();
   const userId = data.session?.user.id;
   if (!userId || !(await connect())) return { ok: false, reason: 'failed' };
   await startPurchaseUpdates();
-  if (android && !offerTokens.has(id)) await loadProducts();
-  const offerToken = offerTokens.get(id);
+  if (android && !playOffers.has(id)) await loadProducts();
+  const offerToken = android ? androidOfferToken(playOffers.get(id), offerId) : null;
   if (android && !offerToken) return { ok: false, reason: 'failed' };
   let result: Purchase | Purchase[] | null;
   try {

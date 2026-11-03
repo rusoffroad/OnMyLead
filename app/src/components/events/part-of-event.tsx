@@ -1,9 +1,9 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import { eventForRide } from '@/lib/events';
 
 /** "Part of Moab Spring Rally": on a ride's page when the ride is one of an event's group rides. */
@@ -34,11 +34,11 @@ export function PartOfEvent({ rideId }: { rideId: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: {
     flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', maxWidth: '100%',
     paddingHorizontal: 12, paddingVertical: 8, borderRadius: Radius.pill, backgroundColor: 'rgba(229,38,46,0.1)',
     borderWidth: 1, borderColor: 'rgba(229,38,46,0.35)',
   },
   text: { color: Colors.text, fontFamily: font(600), fontSize: 14 },
-});
+}));

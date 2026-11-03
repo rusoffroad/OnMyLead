@@ -39,6 +39,7 @@ const PATHS = {
   // A rider with a plus, for Friends and Add Friend.
   addFriend: ['M3.5 20.5c.8-3.8 3.6-6 7-6 2.6 0 4.8 1.3 6 3.5', 'M19 7.5v6', 'M16 10.5h6'],
   people: ['M2.5 19.5c.6-3 3-4.8 6-4.8s5.4 1.8 6 4.8', 'M15.8 14.9c2.5.3 4.4 1.9 5 4.6'],
+  cup: ['M5 8.5h11v5.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z', 'M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16', 'M8.5 3.5v2.5', 'M12.5 3.5v2.5'],
   map: ['M3.5 6.5L9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5-5.5 2.5z', 'M9 4v13.5', 'M15 6.5V20'],
   // A speech bubble, for chat in the Notifications inbox.
   chat: ['M4 5h16v11H10l-4.5 3.5V16H4z'],
@@ -79,6 +80,10 @@ const PATHS = {
   book: ['M12 6.8C10 5.2 7 4.6 3.5 5.1v13c3.5-.5 6.5.1 8.5 1.7', 'M12 6.8c2-1.6 5-2.2 8.5-1.7v13c-3.5-.5-6.5.1-8.5 1.7', 'M12 6.8v13'],
   // Opens a page outside the app (the website).
   external: ['M14 4.5h5.5V10', 'M19.5 4.5L11.5 12.5', 'M17.5 13.5v6h-13v-13h6'],
+  // A half-filled circle: Appearance (Dark, Light and themes).
+  theme: ['M12 3.5a8.5 8.5 0 0 1 0 17z'],
+  // Tilt meter: a level base and a leaning arm over its scale.
+  tilt: ['M3.5 18.5h17', 'M4.5 18.5a7.5 7.5 0 0 1 15 0', 'M12 18.5l4.6-6.2'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
@@ -88,7 +93,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {PATHS[name].map((d) => (
-        <Path key={d} d={d} stroke={color} fill={fill ?? 'none'} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+        <Path key={d} d={d} stroke={color} fill={fill ?? (name === 'theme' ? color : 'none')} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       ))}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
@@ -102,6 +107,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
         </>
       ) : null}
       {name === 'block' ? <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'theme' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'help' ? <Circle cx={12} cy={12} r={9.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'signal' ? <Circle cx={12} cy={12} r={1.8} fill={color} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'sliders' ? (

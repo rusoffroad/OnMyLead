@@ -106,7 +106,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Route builder (`/ride/[id]/route`): tap points, Follow Trails (snaps to OSM trails and roads) or
   Straight Line, drag, search, undo, clear, save / remove; web wide layout ≥ 900 px.
 - Import GPX **[Pro]**. No GPX export.
-- Waypoints (shared or only you, press and hold, at my location) and numbered Planned Stops.
+- Waypoints (shared or only you, press and hold, at my location) and numbered Planned Stops. 15 waypoint symbols, color-blind friendly, shown on planned stops too (2.0).
 - Directions to the meeting point, a rider or a waypoint in Apple Maps or Google Maps.
 - Fuel range on the ride (route length vs each rider's machine range).
 
@@ -182,6 +182,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Pro $4.99 a month or $29.99 a year through StoreKit 2 (`expo-iap`), verified by
   `appstore-verify`, kept current by App Store Server Notifications **[iOS-only]**.
 - Restore Purchases, Redeem Promo Code (Apple offer codes), Manage Subscription **[iOS-only]**.
+- Refer a friend (2.1): Invite Friends; a new rider who joins with your friend link and finishes a first ride earns you both Pro Annual at 50% off year one (Apple offer code, Google Play offer, or a 6-month Play bill deferral). Admin > Referrals.
 - Android shows "Subscriptions are managed in the OnMyLead iPhone app" **[Android gap]**: no
   Google Play Billing, no Play verification, no Play promo codes. A Pro entitlement bought on
   iPhone already applies on any device (server side, `my_entitlements`).

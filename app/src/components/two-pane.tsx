@@ -1,9 +1,9 @@
 import { useContext, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { BottomTabBarHeightContext } from 'expo-router/tabs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors, Spacing } from '@/constants/theme';
+import { Colors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { keyboardScroll } from './keyboard';
 
 /**
@@ -25,7 +25,7 @@ export function TwoPane({
         contentContainerStyle={styles.pad}
         automaticallyAdjustKeyboardInsets
         {...keyboardScroll}
-        indicatorStyle="white">
+        indicatorStyle={scrollIndicator()}>
         {side}
       </ScrollView>
       {mainScroll ? (
@@ -34,7 +34,7 @@ export function TwoPane({
           contentContainerStyle={[styles.pad, styles.mainPad]}
           automaticallyAdjustKeyboardInsets
           {...keyboardScroll}
-          indicatorStyle="white">
+          indicatorStyle={scrollIndicator()}>
           {main}
         </ScrollView>
       ) : (
@@ -44,7 +44,7 @@ export function TwoPane({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flex: 1, flexDirection: 'row', backgroundColor: Colors.background },
   side: { flexGrow: 0, flexShrink: 0, borderRightWidth: 1, borderRightColor: Colors.backgroundElement },
   main: { flex: 1 },
@@ -52,4 +52,4 @@ const styles = StyleSheet.create({
   // The main pane's content keeps a readable width on the biggest screens.
   mainPad: { width: '100%', maxWidth: 760, alignSelf: 'center' },
   mainFill: { padding: Spacing.three, paddingLeft: Spacing.three },
-});
+}));

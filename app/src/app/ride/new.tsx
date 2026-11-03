@@ -10,6 +10,7 @@ import { TimePicker } from '@/components/time-picker';
 import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-code-field';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import type { BubblePreset } from '@/core/bubble';
 import { rideAllowanceText } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
@@ -17,6 +18,9 @@ import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
 import { trailAsRoute } from '@/core/nav-trails';
+import { inches } from '@/core/trail-width';
+import { RigFitLine, WidthIcon } from '@/components/trail-width-row';
+import { useGarageWidths } from '@/lib/trail-width';
 import { metersToMiles } from '@/core/geo';
 import { getLocalTrail, loadTrails, trailLine } from '@/lib/nav-trails';
 import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
@@ -121,6 +125,8 @@ export default function NewRide() {
 
   // Plan a Group Ride on This Trail (Map Mode): the trail becomes the route, its start the meeting point.
   const [fromTrail, setFromTrail] = useState<string | null>(null);
+  const [trailWidth, setTrailWidth] = useState<number | null>(null);
+  const garage = useGarageWidths();
   useEffect(() => {
     if (!trail) return;
     loadTrails().then(() => {
@@ -134,6 +140,13 @@ export default function NewRide() {
       setRouteMiles((m) => m || String(Math.round(metersToMiles(route.lengthM) * 10) / 10));
       if (start) setCoords((c) => c || `${start.lat.toFixed(5)}, ${start.lng.toFixed(5)}`);
       setFromTrail(t.details.name || 'Your Trail');
+      setTrailWidth(t.details.maxWidthIn);
+      // Riders who join see the limit in the ride's instructions.
+      if (t.details.maxWidthIn != null) {
+        const note = `Trail width limit: ${inches(t.details.maxWidthIn)}. Wider machines won't fit.`;
+        setInstructions((v) => (v.includes('width limit') ? v : v ? `${v}\n${note}` : note));
+        setMore(true);
+      }
     });
   }, [trail]);
 
@@ -263,6 +276,13 @@ export default function NewRide() {
           <ThemedText type="small" themeColor="textSecondary">
             The trail is the route, and its start is the meeting point. Change anything, pick the day and create it.
           </ThemedText>
+          {trailWidth != null ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
+              <WidthIcon />
+              <ThemedText style={{ fontWeight: 700 }}>{inches(trailWidth)} Width Limit</ThemedText>
+            </View>
+          ) : null}
+          <RigFitLine limitIn={trailWidth} garage={garage} />
         </View>
       ) : null}
       {event ? (
@@ -475,7 +495,7 @@ function KindCard({ title, detail, on, onPress }: { title: string; detail: strin
       onPress={onPress}
       style={{
         flex: 1, gap: Spacing.one, padding: Spacing.three, minHeight: 128, borderRadius: Radius.card, borderWidth: 2,
-        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? '#2A1620' : Colors.backgroundElement,
+        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? withAlpha(Colors.accent, 0.14) : Colors.backgroundElement,
       }}>
       <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText>

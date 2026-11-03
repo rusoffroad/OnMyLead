@@ -1,13 +1,13 @@
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { TrailThumb } from '@/components/trail-thumb';
 import { Button, Screen, Section } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { shareBadge } from '@/components/trail-badge';
 import { difficultyLabel, feetOrMiles, RIDER_TRAIL_INK, trackStats } from '@/core/nav-trails';
 import { loadTrails, syncMyTrails, trailLine, useLocalTrails } from '@/lib/nav-trails';
@@ -69,10 +69,10 @@ export default function MyTrails() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   empty: { gap: Spacing.two, paddingVertical: Spacing.three },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, minHeight: 80 },
   name: { color: Colors.text, fontFamily: font(700), fontSize: 17 },
   sub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14 },
   badge: { fontFamily: font(700), fontSize: 13 },
-});
+}));

@@ -102,6 +102,11 @@ On a Free account, a small gold **Pro** tag sits beside each button that needs P
 
 ## See Your Plan
 
+:::release 2.0
+Pro Annual is half price for the first year when you invite a new rider who finishes their first ride, or when a friend invites you. See [Invite Friends and Get 50% Off Pro](/help/refer-a-friend).
+:::
+
+
 On the **You** tab, under **Settings**, tap **Subscription**. **Your Plan** shows Free, Pro Trial or Pro. On Free it also shows how many rides you've created this month.
 
 Your plan is saved on your phone, so the app knows it even with no signal.

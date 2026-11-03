@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, Text, View } from 'react-native';
 
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/constants/site';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { appRideUrl, isAndroid, isAppleMobile, rideLink } from '@/core/ride-link';
 import { track } from '@/lib/analytics';
 import { QrCode } from './ride-qr';
@@ -61,7 +61,7 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: {
     gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement,
     borderWidth: 1, borderColor: Colors.border, borderLeftWidth: 4, borderLeftColor: Colors.accent,
@@ -72,4 +72,4 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   soon: { minHeight: 48, borderRadius: Radius.control, borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.three },
   soonText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
-});
+}));

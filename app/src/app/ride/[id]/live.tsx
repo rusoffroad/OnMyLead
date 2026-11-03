@@ -3,9 +3,7 @@ import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
@@ -22,6 +20,8 @@ import { PanelActions, QuickRow, StatusSheet, tapFeel } from '@/components/ride-
 import { RideMessageSheet } from '@/components/ride-message-sheet';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
+import { CrashCountdown } from '@/components/crash-countdown';
+import { TILT_TILE_H, TiltTile } from '@/components/tilt-tile';
 import { SharePicker } from '@/components/share-picker';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
@@ -29,14 +29,16 @@ import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Glass, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
 import { BATTERY_PLANS, batteryBannerTag } from '@/core/battery';
 import { tally } from '@/core/broadcast';
+import { withAlpha } from '@/core/color';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
+import { crashMessage, type CrashCause } from '@/core/crash-detect';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
@@ -56,6 +58,7 @@ import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
+import { useCrashAlert } from '@/hooks/use-crash-alert';
 import { useFollowMe } from '@/hooks/use-follow-me';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
@@ -66,6 +69,7 @@ import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useSavedReplies } from '@/hooks/use-saved-replies';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
+import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
@@ -78,6 +82,7 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
+import { useTiltSettings } from '@/lib/tilt';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -358,6 +363,10 @@ export default function RideMode() {
   const placesMe = hasRoute || freeride;
   // Battery Saver also slows this screen's own work: the blue dot and the backup check for riders.
   const batteryMode = useBatteryMode();
+  // Tilt meter tile and Crash Alert (phones and tablets; the website has no motion sensors).
+  const tiltSettings = useTiltSettings();
+  const tiltShown = Platform.OS !== 'web' && tiltSettings.show;
+  const tiltReading = useTilt(tiltSettings, tiltShown);
   // Approximate Location (Android) or Precise off (iPhone, iPad) puts this rider miles from where they are.
   const precise = usePreciseLocation(me ? positions[me]?.accuracy_m : null);
   const { followEveryM, refreshSec } = BATTERY_PLANS[batteryMode];
@@ -642,6 +651,10 @@ export default function RideMode() {
   const musicBottom = locateBottom + LOCATE_SIZE + 10;
   const musicFits = musicOn && locateFits && !fullMap &&
     (tablet || screenH - musicBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
+  // The Tilt tile: on a phone on the left, level with Music (above Center on Me's row); on a tablet
+  // in the open map's bottom-left corner. Only when there is room; Full Map hides it.
+  const tiltFits = tiltShown && locateFits && !fullMap &&
+    (tablet || screenH - musicBottom - TILT_TILE_H >= shownBannersBottom + Spacing.two);
   // The first framing of the group keeps it clear of the panels over the map.
   const sidebarOpen = sidebar.open;
   const fitPadding = useMemo(
@@ -887,6 +900,16 @@ export default function RideMode() {
     );
   }
 
+  // Crash Alert: a crash while riding starts the I'm OK countdown; at zero the group gets the
+  // EMERGENCY alert plus a chat line saying why, both through the outbox (so they go out on reconnect).
+  const crash = useCrashAlert(tiltSettings.crash, !!mine);
+  function sendCrashAlert(cause: CrashCause) {
+    crash.dismiss();
+    void sendEmergency();
+    const body = crashMessage(cause);
+    void broadcast.send({ id: newTapId(), kind: 'reply', label: body }, (tid) => sendQuickReplyReliably(id, body, tid));
+  }
+
   // CarPlay: the car screen mirrors the group's state and sends button presses back here.
   const car = carPlayState({
     rideName: ride?.name ?? 'Ride',
@@ -1113,7 +1136,7 @@ export default function RideMode() {
               {offlineSince != null ? (
                 <Text style={styles.sidebarNote}>You have no service. Times are from the last update you got.</Text>
               ) : null}
-              <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle="white">
+              <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle={scrollIndicator()}>
                 <RiderRows
                   riders={mapRiders}
                   meId={me}
@@ -1163,7 +1186,7 @@ export default function RideMode() {
           accessibilityLabel="Add a waypoint at your location"
           accessibilityHint="You can also press and hold the map to drop one anywhere"
           style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
-          <WaypointBlaze kind="spot" shared={false} size={24} />
+          <WaypointBlaze symbol="spot" shared={false} size={24} />
           <Text style={styles.wpFabText}>Add Waypoint</Text>
         </Pressable>
       ) : null}
@@ -1190,6 +1213,17 @@ export default function RideMode() {
           ]}>
           {locating ? <ActivityIndicator color={Colors.sky} /> : <Icon name="locate" size={26} color={Colors.sky} strokeWidth={2.2} />}
         </Pressable>
+      ) : null}
+
+      {tiltFits ? (
+        <TiltTile
+          reading={tiltReading}
+          limits={tiltSettings.limits}
+          style={tablet ? { bottom: panelBottom, left: (sidebar.open ? sideW + EDGE : 0) + EDGE } : { bottom: musicBottom, left: 12 }}
+        />
+      ) : null}
+      {crash.alarm ? (
+        <CrashCountdown cause={crash.alarm.cause} startedAt={crash.alarm.startedAt} onOk={crash.dismiss} onSend={() => sendCrashAlert(crash.alarm!.cause)} />
       ) : null}
 
       {musicFits ? (
@@ -1539,7 +1573,7 @@ function AlertChip({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: 6 },
   topRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 20, paddingLeft: 8, paddingRight: 10, paddingVertical: 7,
@@ -1552,7 +1586,7 @@ const styles = StyleSheet.create({
   topSub: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12, flexShrink: 1 },
   groupChip: { paddingHorizontal: 10, minHeight: 30, borderRadius: 15, justifyContent: 'center', borderWidth: 1 },
   groupChipRed: { backgroundColor: Glass.redTint, borderColor: Glass.redEdge },
-  groupChipGreen: { backgroundColor: 'rgba(60,195,107,0.10)', borderColor: 'rgba(60,195,107,0.4)' },
+  groupChipGreen: { backgroundColor: withAlpha(RideColors.green, 0.1), borderColor: withAlpha(RideColors.green, 0.4) },
   groupChipText: { fontFamily: font(700), fontSize: 13 },
   shareDot: { width: 7, height: 7, borderRadius: 4 },
   shareBanner: {
@@ -1670,4 +1704,4 @@ const styles = StyleSheet.create({
   sheet: { flexShrink: 1, backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
   sheetTitle: { color: Colors.text },
   sheetBody: { color: Colors.textSecondary },
-});
+}));

@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import type { TOOLKIT, ToolKey } from '@/core/home';
 import { Gradient, Home, homeStyles, HomeCard } from './parts';
 
@@ -55,7 +55,7 @@ export function HelpRow() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 16, marginHorizontal: -4 },
   tool: { alignItems: 'center', gap: 8, paddingHorizontal: 4 },
   icon: {
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
   label: { color: Colors.text, fontFamily: font(600), fontSize: 12, lineHeight: 15, textAlign: 'center' },
   help: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
   helpIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(59,134,247,0.12)', alignItems: 'center', justifyContent: 'center' },
-});
+}));

@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
-import { Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { Colors, font, GlassSurface } from '@/constants/theme';
+import { Colors, font, GlassSurface, themedStyles } from '@/constants/theme';
 import { FOLLOW_ME_LABEL, type FollowMeStatus } from '@/core/follow-camera';
 import { Icon } from './icon';
 
@@ -57,7 +57,7 @@ export function FollowMeButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   btn: {
     position: 'absolute', zIndex: 15, height: FOLLOW_ME_H, borderRadius: FOLLOW_ME_H / 2, flexDirection: 'row', alignItems: 'center',
     justifyContent: 'center', gap: 7, ...GlassSurface,
@@ -69,4 +69,4 @@ const styles = StyleSheet.create({
   // Turned off: the arrow tips over a little, so it reads as resting rather than on the move.
   offIcon: { transform: [{ rotate: '-35deg' }] },
   label: { fontFamily: font(700, 'display'), fontSize: 16 },
-});
+}));

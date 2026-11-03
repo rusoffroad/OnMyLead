@@ -62,6 +62,408 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "badges-and-ranks"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "founder-badge",
+    "why": "New OnMyLead Founder badge (Chris), given the same way as Brand Ambassador. The special badges section now covers both and says what each looks like. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "home-screen",
+      "social",
+      "profile-picture"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "founder-badge",
+    "why": "Checked against the OnMyLead Founder badge: the Feed and share caption now have their own wording for Founder (\"is the OnMyLead Founder\", \"founded OnMyLead\") and the Admin user page gives both special badges. Described in Earn Badges and Ranks; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "refer-a-friend",
+      "friends",
+      "subscribe-to-pro",
+      "promo-codes",
+      "free-vs-pro"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "New in 2.0: Invite Friends. When a new rider joins with your friend link and finishes their first ride, you both get Pro Annual at 50% off for the first year (an App Store offer code on iPhone and iPad, a Google Play offer on Android, or the next Google Play bill moved back 6 months for riders already paying there). Chris asked for a referral promo on 2026-11-03. The Add Friends guide says a friend link also counts as an invite. Subscribe to Pro, Redeem a Promo Code and Free and Pro link to the new guide."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-me",
+      "garage",
+      "getting-started",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "notifications-inbox",
+      "offline-maps",
+      "pro-trial",
+      "profile-picture",
+      "report-and-block",
+      "restore-purchases",
+      "ride-name-and-profile",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "trip-planner",
+      "badges-and-ranks",
+      "contact-support",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "refer-a-friend",
+    "why": "Checked against the refer-a-friend change: the You tab gains an Invite Friends row only while the program is switched on, the Pro screen gains the reward card, the inbox has a reward notification and the Settings flag list has Refer a Friend. Nothing these guides describe changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "badges-and-ranks"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "brand-ambassador",
+    "why": "New Brand Ambassador badge that OnMyLead gives to the riders in its Ambassador program (Chris). The article explains what it looks like, where it shows and that it doesn't count toward a rank. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "home-screen",
+      "social",
+      "getting-started",
+      "create-a-ride-on-the-website",
+      "profile-picture"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "brand-ambassador",
+    "why": "Checked against the Brand Ambassador badge: the Feed and share card now say a rider became an OnMyLead Brand Ambassador, the You tab badge row shows it first, the website's Badges and Ranks blurb mentions it and the Admin user page gained a Badges panel. All of it is described in Earn Badges and Ranks; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "appearance"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "themes",
+    "why": "New in 2.0 (Chris): Light mode and Match Phone next to the dark look, four themes (Night Navy, Carbon, Desert, Forest) and Color Blind Mode, under You > Appearance."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "ride-bubble"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "themes",
+    "why": "Added how separated riders look with Color Blind Mode on (2.0)."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "approvals-and-waitlist",
+      "badges-and-ranks",
+      "battery-saver",
+      "check-in",
+      "contact-support",
+      "create-a-ride",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "delete-account",
+      "directions",
+      "edit-cancel-or-delete-a-ride",
+      "emergency-and-safety",
+      "events",
+      "faq",
+      "find-a-ride",
+      "follow-leaders",
+      "follow-me",
+      "free-vs-pro",
+      "friends",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "getting-started",
+      "group-chat",
+      "home-screen",
+      "import-gpx",
+      "invite-riders",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "manage-subscription",
+      "map-layers",
+      "music-controls",
+      "navigation-mode",
+      "notification-settings",
+      "notifications-inbox",
+      "offline-maps",
+      "organizer-controls",
+      "out-riding",
+      "place-search",
+      "privacy",
+      "pro-trial",
+      "profile-picture",
+      "promo-codes",
+      "qr-codes",
+      "report-and-block",
+      "restore-purchases",
+      "ride-chat",
+      "ride-day-and-weather",
+      "ride-mode",
+      "ride-name-and-profile",
+      "ride-polls",
+      "ride-summary-and-ride-again",
+      "rider-safety-agreement",
+      "riding-groups",
+      "route-builder",
+      "sign-in",
+      "social",
+      "starlink",
+      "status-buttons",
+      "subscribe-to-pro",
+      "tilt-and-crash-alert",
+      "trip-planner",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "voice",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "themes",
+    "why": "Checked against the themes change: these screens now take their colors from the rider's theme (Dark Night Navy is unchanged and still the default), so the steps, labels and buttons in these articles are the same."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "tilt-and-crash-alert",
+      "emergency-and-safety",
+      "ride-mode",
+      "navigation-mode"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "tilt-meter",
+    "why": "Chris asked for a roll and pitch meter and an automatic emergency alert after a crash. New article for the tilt meter, Zero, tilt warnings and Crash Alert, plus 2.0 notes in Ride Mode, Map Mode and Emergencies. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "badges-and-ranks",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "getting-started",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "profile-picture",
+      "promo-codes",
+      "report-and-block",
+      "ride-bubble",
+      "ride-chat",
+      "ride-name-and-profile",
+      "sign-in",
+      "starlink",
+      "status-buttons",
+      "trip-planner",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "tilt-meter",
+    "why": "Reviewed for the tilt meter change: the You tab gains a Tilt and Crash Alert row, Ride Mode and Map Mode gain the Tilt tile, the showcase lists the feature and the app asks for motion access on iPhone and iPad. Nothing these articles describe changed."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "status-buttons",
+      "home-screen",
+      "ride-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Chris asked for a Beverage Break quick reply in Ride Mode (under More, with the other quick replies), and for the Map Mode card to look like the Join, Create and Find buttons in a colour that pops: it's now a blue card right under Create and Find. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "group-chat",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "privacy",
+      "ride-chat",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Checked against the Map Mode card move and the Beverage Break quick reply: only the Map Mode card's colour and place on Home changed, and quick replies gained Beverage Break (a short message like the others). Joining, creating and finding rides, chat, notifications, privacy and the rest work the same; no change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "navigation-mode",
+      "getting-started",
+      "home-screen",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Chris asked to make Map Mode more visible. A blue Map Mode button now sits in the middle of the tab bar (under Find on tablets and the website menu), so the offroad map is one tap from any tab, and the Home card's button reads Open Map Mode. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Checked against the Map Mode button change: the showcase only gained a few words in Map Mode's text. Creating a ride on the website works the same; no change to this article."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride",
+      "delete-account",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "faq",
+      "find-a-ride",
+      "fuel-range",
+      "import-gpx",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "organizer-controls",
+      "privacy",
+      "ride-mode",
+      "route-builder"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "family-link-crypto",
+    "why": "Fixed Share My Location's family link on iPhone, iPad and Android: it showed \"Property 'crypto' doesn't exist\" and made no link. The steps riders follow are unchanged, so these articles were checked and only their dates bumped. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "map-layers",
+      "garage",
+      "create-a-ride",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "trail-widths",
+    "why": "Trails now show width limits (Chris): Forest Service trails open only to 50\" machines show 50\" Width Limit, riders can add a width to any public trail, Garage machines take a width so cards say whether they fit, and planning a ride on a trail carries the limit into the ride's instructions. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "delete-account",
+      "edit-cancel-or-delete-a-ride",
+      "family-link",
+      "faq",
+      "find-a-ride",
+      "free-vs-pro",
+      "fuel-range",
+      "full-map",
+      "import-gpx",
+      "invite-riders",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "offline-maps",
+      "organizer-controls",
+      "place-search",
+      "privacy",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "getting-started"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "trail-widths",
+    "why": "Checked against the trail width change: these articles share code with it (the trail card, the onmylead.com showcase, Create a Ride, the Garage vehicle save in lib/api.ts) but riders see nothing different in them. Width limits are described in Map Layers and Trails, Garage, Map Mode and Create a Ride. No change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "waypoint-symbols",
+    "why": "Chris asked for waypoint symbols. Waypoints now have 15 symbols (8 new: Gate, Trailhead, Water Crossing, Food, Restroom, First Aid, Repair, Photo Spot), drawn so color-blind riders can tell them apart, and planned stops show theirs on the stop sign. Comes with the 2.0 update; the old list of seven stays until then."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "location-sharing",
+      "map-layers",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "waypoint-symbols",
+    "why": "Checked against the waypoint symbols change: Ride Mode and the other maps now draw each waypoint with its symbol, and the showcase text names the new symbols, but these articles don't list waypoint types, so nothing in them changes. The symbols are described in Waypoints and Planned Stops."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "voice",
       "ride-bubble",
       "ride-mode",

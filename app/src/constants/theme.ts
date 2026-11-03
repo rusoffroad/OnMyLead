@@ -1,30 +1,24 @@
 import '@/global.css';
 
-import { Platform } from 'react-native';
+import { Appearance as SystemAppearance, Platform, StyleSheet } from 'react-native';
 
-/**
- * OnMyLead is always dark: the night navy of the logo, with its red and blue as the accents.
- * One palette for every screen, so nothing flashes white and the app reads the same at dawn or at noon.
+import { buildPalette, parseAppearance, type Appearance, type Palette, type Scheme } from '@/core/appearance';
+import { applyMapInk } from '@/core/ink';
+import { readAppearanceSync } from '@/lib/appearance-storage';
+
+/*
+ * OnMyLead's colours come from the rider's appearance (core/appearance.ts): Dark, Light or Match
+ * Phone, a theme, and Color Blind Mode. Dark Night Navy, the night navy of the logo with its red
+ * and blue as accents, is the default. The objects below keep their names so every screen reads
+ * colours the same way; applyAppearance() refills them and the root layout redraws the app.
+ * Styles that use them are made with themedStyles() (below), never a bare StyleSheet.create.
  */
-export const Colors = {
-  /** Page background, the logo's navy lifted a touch so cards can sit on it. */
-  background: '#0A1626',
-  /** Cards and grouped rows. */
-  backgroundElement: '#12223A',
-  /** Inputs, selected rows, secondary buttons. */
-  backgroundSelected: '#1B2F4C',
-  border: '#27406A',
-  text: '#F1F4F8',
-  textSecondary: '#97A7BE',
-  /** Logo red: the one colour that means "do this". */
-  accent: '#E5262E',
-  onAccent: '#FFFFFF',
-  /** Logo blue: links, sharing, information. */
-  sky: '#3B86F7',
-  danger: '#F03E3E',
-  /** Pro gold: the Pro tag and what Pro unlocks. Never an action colour. */
-  gold: '#E6C27A',
-} as const;
+
+let appearance: Appearance = parseAppearance(readAppearanceSync());
+let palette: Palette = buildPalette(appearance, SystemAppearance.getColorScheme());
+let version = 0;
+
+export const Colors: Palette['colors'] = { ...palette.colors };
 
 export type ThemeColor = keyof typeof Colors;
 
@@ -97,34 +91,85 @@ export const Radius = {
 export const MaxContentWidth = 800;
 
 /**
- * Panels and buttons that float over a live map (Ride Mode, Map Mode): dark glass with a hairline
- * edge, so the map shows through at the edges and every control reads as one family. Red stays for
+ * Panels and buttons that float over a live map (Ride Mode, Map Mode): glass in the theme's card
+ * colour with a hairline edge, so the map shows through at the edges and every control reads as one family. Red stays for
  * Regroup and Emergency only.
  */
-export const Glass = {
-  panel: 'rgba(16,30,51,0.95)',
-  /** A button or tile inside a glass panel. */
-  tile: 'rgba(255,255,255,0.06)',
-  edge: 'rgba(151,167,190,0.18)',
-  /** Thin trouble tints for alert rows (red) and announcements (amber). */
-  redTint: 'rgba(229,38,46,0.10)',
-  redEdge: 'rgba(229,38,46,0.42)',
-  amberTint: 'rgba(242,178,51,0.16)',
-  amber: '#F2B233',
-  softRed: '#FF6B70',
-} as const;
+export const Glass: Palette['glass'] = { ...palette.glass };
+
+/** Text on the dark name tags drawn on the map itself (rider names, waypoints): the map is the same in every theme. */
+export const MapLabelText = '#F1F4F8';
 
 /** The surface of a floating glass control. */
-export const GlassSurface = { backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge } as const;
+export const GlassSurface = { backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge };
 
-/** Ride Bubble and role colors, tuned to read on the navy. Riders learn them once. */
-export const RideColors = {
-  green: '#3CC36B',
-  yellow: '#FFB020',
-  red: '#FF4545',
-  unknown: '#7A8AA3',
-  leader: '#3B86F7',
-  sweep: '#B967F0',
-  /** Plain grey, so the leader's logo blue is the only blue dot on the map. */
-  rider: '#6E7681',
-} as const;
+/**
+ * Ride Bubble and role colors, tuned to read on the map. Riders learn them once. Color Blind Mode
+ * swaps them for the Okabe-Ito set (core/appearance.ts RIDE_INK_CB). `rider` stays plain grey, so
+ * the leader's logo blue is the only blue dot on the map.
+ */
+export const RideColors: Palette['ride'] = { ...palette.ride };
+
+applyMapInk(palette.map, palette.scheme);
+
+/** The rider's current choice and the scheme being drawn. */
+export const currentAppearance = () => appearance;
+export const currentScheme = (): Scheme => palette.scheme;
+/** Scroll bars that show on the current scheme. */
+export const scrollIndicator = () => (palette.scheme === 'light' ? 'black' : 'white');
+/** Color Blind Mode: statuses also show a symbol (core/appearance.ts statusSymbol). */
+export const colorBlindOn = () => appearance.colorBlind;
+/** Goes up by one on every change; the root layout keys the app on it to redraw everything. */
+export const themeVersion = () => version;
+
+/** Refills every colour object from a new choice. Returns true when anything visible changed. */
+export function applyAppearance(next: Appearance, system: string | null | undefined): boolean {
+  const p = buildPalette(next, system);
+  appearance = next;
+  if (JSON.stringify(p) === JSON.stringify(palette)) return false;
+  palette = p;
+  Object.assign(Colors, p.colors);
+  Object.assign(NavigationColors, {
+    primary: Colors.accent,
+    background: Colors.background,
+    card: Colors.background,
+    text: Colors.text,
+    border: Colors.backgroundElement,
+    notification: Colors.accent,
+  });
+  Object.assign(Glass, p.glass);
+  Object.assign(GlassSurface, { backgroundColor: Glass.panel, borderColor: Glass.edge });
+  Object.assign(RideColors, p.ride);
+  applyMapInk(p.map, p.scheme);
+  version += 1;
+  return true;
+}
+
+/**
+ * StyleSheet.create for styles that use theme colours. Write it exactly like StyleSheet.create,
+ * with the object inside a function: `const styles = themedStyles(() => ({ card: {...} }))`.
+ * The styles are built on first use and rebuilt after the theme changes; `styles.card` reads the
+ * same as before everywhere else.
+ */
+export function themedStyles<T extends StyleSheet.NamedStyles<T> | StyleSheet.NamedStyles<any>>(
+  make: () => T & StyleSheet.NamedStyles<T>,
+): T {
+  let built: T | null = null;
+  let at = -1;
+  const get = (): T => {
+    if (!built || at !== version) {
+      built = StyleSheet.create(make());
+      at = version;
+    }
+    return built;
+  };
+  return new Proxy({} as T, {
+    get: (_t, key) => (get() as Record<string | symbol, unknown>)[key],
+    has: (_t, key) => key in get(),
+    ownKeys: () => Reflect.ownKeys(get()),
+    getOwnPropertyDescriptor: (_t, key) => {
+      const d = Reflect.getOwnPropertyDescriptor(get(), key);
+      return d ? { ...d, configurable: true } : undefined;
+    },
+  });
+}

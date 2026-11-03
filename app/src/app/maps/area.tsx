@@ -9,7 +9,7 @@ import { SAND } from '@/components/offline-map-ui';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import { formatBoxMiles, formatBytes, OFFLINE_CHOICES, type OfflineChoice } from '@/core/offline-maps';
 import type { Box } from '@/core/trails';
 import { usePanelFold } from '@/hooks/use-panel-fold';
@@ -164,7 +164,7 @@ async function placeName(box: Box): Promise<string> {
   return `Map Area, ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   root: { flex: 1, backgroundColor: Colors.background },
   note: { color: Colors.text, fontFamily: font(600), fontSize: 17 },
   shade: { position: 'absolute', backgroundColor: 'rgba(10,22,38,0.55)' },
@@ -197,4 +197,4 @@ const styles = StyleSheet.create({
   estimate: { minHeight: 46, justifyContent: 'center', alignItems: 'center', gap: 1 },
   estimateBig: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 26, lineHeight: 28 },
   estimateSub: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, textAlign: 'center' },
-});
+}));

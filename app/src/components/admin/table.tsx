@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtInt } from '@/core/admin-format';
 import { Empty, Loading } from './page';
 import { AdminColors, tabular, useLayoutSize } from './tokens';
@@ -118,7 +118,7 @@ function PagerButton({ label, disabled, onPress }: { label: string; disabled: bo
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 11, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: AdminColors.line, borderRadius: 0 },
   headRow: { borderTopWidth: 0, paddingVertical: 8 },
   headText: { fontFamily: font(600), fontSize: 13, color: AdminColors.faint },
@@ -130,4 +130,4 @@ const styles = StyleSheet.create({
   pagerText: { fontFamily: font(500), fontSize: 13.5, color: AdminColors.dim },
   pagerBtn: { backgroundColor: AdminColors.raised, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 },
   pagerBtnText: { fontFamily: font(600), fontSize: 14, color: AdminColors.text },
-});
+}));

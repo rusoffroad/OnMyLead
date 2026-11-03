@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { DateCalendar } from '@/components/date-calendar';
 import { Icon } from '@/components/icon';
 import { TimePicker } from '@/components/time-picker';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { atMinutes, sameDateMonthsLater, startOfDay } from '@/core/calendar';
 import { minutesUntil, shareEndProblem, shareEndText } from '@/core/sharing';
 import { clockText, parseTime } from '@/core/time';
@@ -133,7 +133,7 @@ export function SharePicker({
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   open: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: Spacing.three, minHeight: 64,
     borderRadius: Radius.control, borderWidth: 1.5, borderColor: Colors.sky, backgroundColor: 'rgba(59, 134, 247, 0.10)',
@@ -145,4 +145,4 @@ const styles = StyleSheet.create({
     borderRadius: Radius.control, borderWidth: 1.5, backgroundColor: Colors.background,
   },
   endRowText: { fontSize: 16, fontFamily: font(600) },
-});
+}));

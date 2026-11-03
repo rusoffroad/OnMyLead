@@ -6,6 +6,8 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-03
 sources:
+  - app/src/components/tilt-tile.tsx
+  - app/src/components/trail-width-row.tsx
   - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
   - app/src/core/trip-meter.ts
@@ -51,7 +53,8 @@ At the top of the map are three tabs: **Explore**, **Record** and **Measure**. S
 
 ## Open Map Mode
 
-- On Home, tap **Open Map** (or the little map) on the **Map Mode** card.
+- From any tab, tap the blue **Map Mode** button in the middle of the bar at the bottom of the screen. On a tablet, and on onmylead.com on a computer, it's in the menu down the left edge, under **Find**.
+- On Home, tap **Open Map Mode** (or the little map) on the **Map Mode** card.
 - To map a trail that isn't marked anywhere, tap **Map a Custom Trail** on the same card. Map Mode opens on the **Draw** tab.
 - Or on the **You** tab, tap **Map Mode** under **On the Trail**.
 
@@ -83,6 +86,10 @@ Next to your speed are four readings:
 - **Moving**, how long you've been moving on this trip (minutes, then hours and minutes).
 
 To start a new trip, press and hold **Trip**. Trip and Moving only count while Map Mode is open, and they're kept on your phone only. When you follow a trail, the big number shows the miles left, and **Speed** moves into the readings in place of **Moving**.
+:::
+
+:::release 2.0
+Under the readings, the **Tilt** tile shows your **Roll** and **Pitch**, turning amber, then red, near your limits. Tap it for the full tilt meter. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
 :::
 
 ### The Map Follows You
@@ -173,7 +180,7 @@ Tap **My Trails** in Explore (or the trail chip on the map) to see every trail o
 
 On a trail you can:
 
-- Name it and add details: **Difficulty** (Easy, Moderate, Hard or Extreme), **Vehicles That Fit**, **Surface**, **Season**, a width limit, **One Way** and notes.
+- Name it and add details: **Difficulty** (Easy, Moderate, Hard or Extreme), **Vehicles That Fit**, **Surface**, **Season**, **Width Limit (Inches, Optional)** for the narrowest gate or gap, **One Way** and notes.
 - Add up to 6 photos. Press and hold a photo to remove it.
 - See its distance, climb, high point and, for a recording, moving time.
 - **Follow in Navigate**, **Plan a Group Ride on This Trail** or **Delete Trail**.
@@ -236,6 +243,10 @@ Group rides that already used the trail as their route keep their route.
 Trails other riders shared are called rider trails. They're drawn as **mint dotted lines**, so they stand out from the agency and OpenStreetMap trails. They show in Navigate (Map Mode from 2.0) and on the other maps with trail lines once you zoom in, when you're signed in.
 
 Tap one to see its card. It says **User Submitted Trail**, who mapped it, the difficulty, distance, its **Quality** and **Line Accuracy** stars, and buttons to rate it, navigate it or see the details. The details page adds the vehicles, notes, photos and **Save to My Trails**.
+
+:::release 2.0
+If the mapper entered a width limit, the card and details page show it (**Width Limit**). With widths on your machines in the [Garage](/help/garage), they also say whether your machine fits or is too wide.
+:::
 
 :::release 2.0
 When you follow a rider trail, the spots its mapper named show on the map with their names.

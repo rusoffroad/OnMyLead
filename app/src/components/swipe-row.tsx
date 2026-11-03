@@ -2,7 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Animated, PanResponder, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { ACTION_WIDTH, isHorizontalSwipe, ROW_ACTION_LABEL, rowSwipeResult, type RowAction } from '@/core/row-swipe';
 import { useTheme } from '@/hooks/use-theme';
 import { Icon } from './icon';
@@ -98,8 +98,8 @@ export function SwipeRow({ action, onAction, children }: { action: RowAction; on
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   behind: { alignItems: 'flex-end', justifyContent: 'center' },
   action: { width: ACTION_WIDTH, height: '100%', alignItems: 'center', justifyContent: 'center', gap: 4 },
   label: { color: '#fff', fontSize: 14, lineHeight: 16, fontFamily: font(700) },
-});
+}));

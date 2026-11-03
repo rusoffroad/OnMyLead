@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, Switch, Text, View } from 'react-native';
 import Svg, { Ellipse, Path, Rect } from 'react-native-svg';
 
-import { Colors, font, Glass, GlassSurface, Radius } from '@/constants/theme';
+import { Colors, font, Glass, GlassSurface, Radius, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_INK, vehicleLabel, type PublicTrail } from '@/core/nav-trails';
 import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type OfflineChoice } from '@/core/offline-maps';
@@ -13,6 +13,9 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
 import { RateTrailSheet } from './rate-trail-sheet';
+import { RigFitLine, TrailWidthRow } from './trail-width-row';
+import { inches } from '@/core/trail-width';
+import { useGarageWidths } from '@/lib/trail-width';
 import { StarScore } from './stars';
 import { ProTag } from '@/components/pro-tag';
 
@@ -149,8 +152,8 @@ function LayersPanel({
           value={trail.trails}
           onValueChange={trail.setTrails}
           trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-          thumbColor={Colors.text}
-          {...({ activeThumbColor: Colors.text } as object)}
+          thumbColor="#FFFFFF"
+          {...({ activeThumbColor: '#FFFFFF' } as object)}
           ios_backgroundColor={Colors.backgroundSelected}
         />
       </Pressable>
@@ -180,8 +183,8 @@ function LayersPanel({
           value={trail.riderTrailsOn}
           onValueChange={trail.setRiderTrails}
           trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-          thumbColor={Colors.text}
-          {...({ activeThumbColor: Colors.text } as object)}
+          thumbColor="#FFFFFF"
+          {...({ activeThumbColor: '#FFFFFF' } as object)}
           ios_backgroundColor={Colors.backgroundSelected}
         />
       </Pressable>
@@ -292,6 +295,7 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
         </View>
       ) : null}
       <Text style={styles.facts}>{facts.join('   ')}</Text>
+      <TrailWidthRow key={`${info.source}|${info.lineKey ?? info.title}|${info.at?.lat}|${info.at?.lng}`} info={info} />
       {info.allowed.length ? (
         <View style={styles.allowed}>
           <Text style={styles.allowedLabel}>{info.seasonal ? 'Open To, by Season' : 'Open To'}</Text>
@@ -331,7 +335,10 @@ function LegendLine({ color, label, dashed, closed, dotted }: { color: string; l
  * dotted line), who mapped it and when, its ratings, and offers Rate, Navigate and Details.
  */
 export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrail; onClose: () => void; onRate: () => void; onFollow: () => void }) {
-  const facts = [feetOrMiles(t.lengthM), t.vehicles.map(vehicleLabel).join(', ')].filter(Boolean).join('   ');
+  const facts = [feetOrMiles(t.lengthM), t.maxWidthIn != null ? `${inches(t.maxWidthIn)} Width Limit` : null, t.vehicles.map(vehicleLabel).join(', ')]
+    .filter(Boolean)
+    .join('   ');
+  const garage = useGarageWidths();
   return (
     <View style={[styles.card, styles.riderCard]} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
@@ -356,6 +363,7 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
         </View>
         <Text style={[styles.facts, { flex: 1 }]} numberOfLines={2}>{facts}</Text>
       </View>
+      <RigFitLine limitIn={t.maxWidthIn} garage={garage} />
       <View style={styles.scores}>
         <View style={styles.scoreCol}>
           <Text style={styles.scoreLabel}>Quality</Text>
@@ -394,7 +402,7 @@ function LayersIcon({ color }: { color: string }) {
 
 const glass = GlassSurface;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   corner: { position: 'absolute', right: 12, alignItems: 'flex-end', gap: 8, zIndex: 20 },
   fab: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', ...glass },
   fabOn: { borderColor: SAND },
@@ -459,4 +467,4 @@ const styles = StyleSheet.create({
   action: { flex: 1, minHeight: 44, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border },
   actionMain: { backgroundColor: RIDER_TRAIL_INK, borderColor: RIDER_TRAIL_INK },
   actionText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
-});
+}));

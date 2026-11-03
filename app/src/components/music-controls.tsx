@@ -3,7 +3,8 @@ import { Modal, Platform, Pressable, StyleSheet, Text, View, type StyleProp, typ
 import Svg, { Path, Rect } from 'react-native-svg';
 
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
-import { Colors, font, GlassSurface, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import { musicButtonLabel, nowPlaying, stepVolume, VOLUME_STEPS, volumePercent, type MusicCommand, type MusicView } from '@/core/music';
 import { setMusicControls } from '@/hooks/use-music-controls';
 import { askMusicAccess, canOpenSpotify, musicCommand, openSpotify, readMusic, setMusicVolume, SystemVolumeSlider } from '@/lib/music';
@@ -272,7 +273,7 @@ function VolumeRow({ volume, onChange }: { volume: number | null; onChange: (v: 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   fab: { alignItems: 'center', justifyContent: 'center', ...glass },
   wrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
   wrapTablet: { justifyContent: 'center', alignItems: 'center', padding: Spacing.four },
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
   sheetTablet: { width: '100%', maxWidth: 520, borderRadius: 28, paddingBottom: Spacing.four },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   source: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1, minHeight: 32, paddingHorizontal: 12, borderRadius: 16, backgroundColor: Colors.backgroundSelected },
-  sourceOn: { backgroundColor: 'rgba(60,195,107,0.16)' },
+  sourceOn: { backgroundColor: withAlpha(RideColors.green, 0.16) },
   dot: { width: 8, height: 8, borderRadius: 4 },
   sourceText: { color: Colors.text, fontFamily: font(700), fontSize: 15, flexShrink: 1 },
   close: { minHeight: 36, paddingHorizontal: 14, borderRadius: 18, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
@@ -303,4 +304,4 @@ const styles = StyleSheet.create({
   wideSub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14, lineHeight: 18 },
   hide: { alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
   hideText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 15, textDecorationLine: 'underline' },
-});
+}));

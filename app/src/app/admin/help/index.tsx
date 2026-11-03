@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, DataTable, Empty, ErrorNote, Fields, FilterChips, Loading, Panel,
   SearchBox, StatGrid, StatTile, StatusBadge, useToast, type Column, type Tone,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDate, fmtDateTime } from '@/core/admin-format';
 import { useAdminData } from '@/lib/admin';
 import * as help from '@/lib/help-admin';
@@ -271,7 +271,7 @@ function History({ report, edits }: { report: help.HelpReport; edits: help.HelpE
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: { fontFamily: font(600), fontSize: 15, color: AdminColors.text },
   dim: { fontFamily: font(500), fontSize: 13, color: AdminColors.dim },
   body: { flex: 1, fontFamily: font(500), fontSize: 14, lineHeight: 20, color: AdminColors.text },
@@ -279,4 +279,4 @@ const styles = StyleSheet.create({
   link: { color: AdminColors.blue, fontFamily: font(600) },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   finding: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
-});
+}));

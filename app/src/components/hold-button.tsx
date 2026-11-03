@@ -1,8 +1,8 @@
 import * as Haptics from 'expo-haptics';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Platform, Pressable, Text, View } from 'react-native';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { HOLD_TO_SEND_MS, holdHint, holdOutcome, type HoldPhase } from '@/core/hold-to-send';
 
 /**
@@ -103,7 +103,7 @@ export function HoldButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { gap: 8 },
   button: { minHeight: 76, borderRadius: 18, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', paddingHorizontal: 16 },
   track: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' },
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
   text: { color: '#fff', fontSize: 22, fontFamily: font(700, 'display'), letterSpacing: 0.2, textAlign: 'center' },
   hint: { color: Colors.textSecondary, fontSize: 16, textAlign: 'center' },
   hintWarn: { color: Colors.text, fontFamily: font(700) },
-});
+}));

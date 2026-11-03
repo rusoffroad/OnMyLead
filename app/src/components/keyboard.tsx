@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 
 /**
  * Every text box in the app. On iPhone it carries a Done bar above the keyboard, so the keyboard can always be
@@ -54,7 +54,7 @@ export const keyboardScroll = {
   keyboardDismissMode: Platform.OS === 'ios' ? 'interactive' : 'on-drag',
 } as const;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   bar: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -65,4 +65,4 @@ const styles = StyleSheet.create({
   },
   done: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 },
   doneText: { color: Colors.sky, fontSize: 17, fontFamily: font(700) },
-});
+}));

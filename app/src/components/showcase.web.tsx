@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 're
 
 import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
+import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
+import { useAppSettings } from '@/lib/app-settings';
 import { useSocialProviders } from '@/lib/session';
 
 /**
@@ -25,6 +27,8 @@ type Route = '/sign-in' | '/ride/new' | '/terms' | '/rider-agreement' | '/privac
 export function Showcase() {
   // Only the sign-in choices that are switched on, so the page never promises one that isn't.
   const signUpWith = signUpChoices(useSocialProviders('ios'));
+  // Refer a Friend shows only while the owner has it switched on (Admin > Settings).
+  const referralsOn = referralsSwitchedOn(useAppSettings().settings.flags);
   const scroller = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
@@ -140,10 +144,10 @@ export function Showcase() {
             <Step
               n={4}
               shot="waypoints"
-              alt="The ride’s waypoints map: two numbered planned stops, a shared Washout hazard, and a camp spot only you see"
+              alt="The ride’s waypoints map: numbered planned stops tagged fuel and food, a shared Washout hazard triangle, a gate, a water crossing and a camp only you see"
               title="Mark the Trail"
-              text="Press and hold the map to drop a waypoint: camp, fuel, water, a viewpoint, parking or a hazard, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
-              points={['Shared waypoints show on every rider’s map', 'Never public: only riders on the ride see shared ones', 'Add one at your location with one tap']}
+              text="Press and hold the map to drop a waypoint with one of 15 symbols: camp, fuel, water, food, a gate, a trailhead, a water crossing, a hazard and more, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
+              points={['Shared waypoints show on every rider’s map', 'Every symbol has its own drawing, easy to read for color-blind riders, and hazards stand out as triangles', 'Planned stops show what they’re for right on the stop sign', 'Never public: only riders on the ride see shared ones']}
             />
             <Step
               n={5}
@@ -258,7 +262,7 @@ export function Showcase() {
           <div className="qr-copy">
             <h2 id="nav-title" className="section-title">Map Mode When It’s Just You</h2>
             <p>
-              Not every ride is a group ride. Map Mode is your offroad map for the rest: every trail and road with your speed,
+              Not every ride is a group ride. Map Mode is your offroad map for the rest, one tap from any screen: every trail and road with your speed,
               elevation, heading, trip miles and moving time, a recorder that draws your line as you ride, and Map a Custom Trail to draw one that isn’t marked
               anywhere. Track Line shows exactly where you’ve been, a new colour each day. Keep your trails private, or share
               them with every rider.
@@ -286,6 +290,7 @@ export function Showcase() {
             </p>
             <ul className="ticks">
               <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
+              <li><b>Will It Fit?</b> Tap a trail to see its width limit: 50 inch Forest Service trails, and widths riders add to any public trail. Add your machine’s width in the Garage and the card tells you if it fits.</li>
               <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
@@ -304,6 +309,7 @@ export function Showcase() {
           <div className="more-grid">
             <div className="more-list">
               <Feature title="Nothing Buried">Four tabs along the bottom: Rides, Find, Groups and You. Every ride opens in four parts, Details, Map, Riders and Chat, with what to do next right under its name. Any sheet swipes down to close, and times take a few taps, no typing.</Feature>
+              <Feature title="Dark, Light or Your Own Theme">Ride in the dark Night Navy look, switch to Light for bright sun, or let it match your phone. Pick Night Navy, Carbon true black, Desert or Forest. Color Blind Mode swaps rider status, trail and Track Line colors for ones color blind riders can tell apart, with a symbol on every rider who needs a look.</Feature>
               <Feature title="Status Taps You Can Trust">Tap On My Way or Need Fuel and everyone on the ride gets a notification. A light comes on for each rider who has it, and Cancel takes it back with a follow-up so nobody turns around for nothing.</Feature>
               <Feature title="Every Notification in One Place">Missed a ping or swiped it away? Tap the bell on the Rides tab to see the last 30 days, with rider alerts in red so they stand out. Open one, swipe it away, or Clear All, and your phone’s own list clears too.</Feature>
               <Feature title="Ride Day Weather and Daylight">Every upcoming ride shows the meet day’s forecast, with a heads-up for storms, high wind or heat, and a daylight bar that tells you if the group gets back after dark.</Feature>
@@ -315,7 +321,7 @@ export function Showcase() {
               <Feature title="Garage and Fuel Range">Add your machines with photos and every part of the build. Your tank, extra fuel and mileage give a full range, a safe turnaround and a safe trip.</Feature>
               <Feature title="Trip Planner">Packing checklists for each trip, linked to the ride and the machine you’re taking.</Feature>
               <Feature title="Ride Summary and Ride Card">After the ride, see the miles and the group’s totals, then share a ride card.</Feature>
-              <Feature title="Badges and Ranks">Earn Bronze, Silver and Gold badges for leading rides, riding tail gunner, riding with your crew and racking up miles, plus the trails you share and rate. Your levels add up to a rank from Rookie to Legend, and they’re earned from real GPS tracks, so nobody can fake one.</Feature>
+              <Feature title="Badges and Ranks">Earn Bronze, Silver and Gold badges for leading rides, riding tail gunner, riding with your crew and racking up miles, plus the trails you share and rate. Your levels add up to a rank from Rookie to Legend, and they’re earned from real GPS tracks, so nobody can fake one. Riders who represent OnMyLead wear the blue Brand Ambassador badge.</Feature>
               <Feature title="Out Riding">At a park for the weekend? Switch on Out Riding to see which riders you know are out near you, or anyone nearby who chose the same, and message them. Riders see roughly how far away you are, never where, and it turns itself off.</Feature>
               <Feature title="Your Feed">See what your friends, the leaders you follow and your riding groups have been riding, the badges they earned and the trails they shared, right on Home. Pick whose posts you see and who sees yours, from friends only to nobody.</Feature>
               <Feature title="Social: Like, Comment and Post">Like any ride, badge, trail or post in your Feed, and open Social to see all your friends’ activity and every comment. Pro riders post ride reports and photos to their profile, comment, and share their rides and badges to Facebook, Instagram or X with one tap. Tap anyone’s picture to see it full size. Your location never goes in a post or a share.</Feature>
@@ -325,9 +331,13 @@ export function Showcase() {
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for 15 minutes to 8 hours, until an end date up to a year out, or until you turn it off, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
+              <Feature title="Tilt Meter and Crash Alert">See your roll and pitch over the map, with a full tilt meter whose axle and wheels lean as you do. Zero it for your mount, set your own limits and get a buzz before a steep side hill. In Ride Mode, a hard hit or a rollover starts a 30 second I’m OK countdown, and if you don’t answer, your group gets an EMERGENCY alert with your location. It works with no signal and sends once you reconnect. It never calls 911.</Feature>
               <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>
+              {referralsOn ? (
+                <Feature title="Invite Friends, Both Save">Send your link to a riding buddy who’s new to OnMyLead. When they finish their first ride, you both get your first year of Pro Annual for ${REFERRAL_PRICE.discounted} instead of ${REFERRAL_PRICE.annual}, through the App Store or Google Play.</Feature>
+              ) : null}
               <Feature title="Events">Rallies, poker runs and ride weekends on one shareable page: dates, place, photos, an agenda of concerts, raffles and runs, and the group rides to join. Pro riders post them, add co-hosts and pick a Ride Manager for each ride. Anyone can see them and say they’re going.</Feature>
             </div>
             <figure className="phone">

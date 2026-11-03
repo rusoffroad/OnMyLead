@@ -3,7 +3,7 @@ import { ReactNode, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Logo } from '@/components/logo';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { ADMIN_SECTIONS, sectionFor, type AdminSection } from './nav';
 import { AdminColors, useLayoutSize } from './tokens';
 
@@ -98,7 +98,7 @@ function Account({ email, onSignOut }: { email: string | null; onSignOut: () => 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   root: { flex: 1, backgroundColor: AdminColors.page, minHeight: '100%' as unknown as number },
   rail: { width: 240, backgroundColor: AdminColors.rail, borderRightWidth: 1, borderRightColor: AdminColors.railLine, paddingHorizontal: 12, paddingTop: 20 },
   brand: { paddingHorizontal: 8, paddingBottom: 18, gap: 4, alignItems: 'flex-start' },
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
   menuBtn: { backgroundColor: AdminColors.panel, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1, borderColor: AdminColors.line },
   menuBtnText: { fontFamily: font(700), fontSize: 14.5, color: AdminColors.text },
   phoneMenu: { flex: 1, backgroundColor: AdminColors.rail },
-});
+}));

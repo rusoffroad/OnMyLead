@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { BottomSheet } from '@/components/bottom-sheet';
 import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { RADIUS_CHOICES, radiusLabel } from '@/core/home';
 import type { Ride } from '@/lib/types';
 import { Home, homeStyles, HomeCard, Pill } from './parts';
@@ -115,7 +115,7 @@ export function RadiusSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pills: { position: 'absolute', left: 10, top: 10, flexDirection: 'row', gap: 6 },
   body: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 14, gap: 2 },
   chip: {
@@ -129,4 +129,4 @@ const styles = StyleSheet.create({
   preset: { borderRadius: Radius.pill, borderWidth: 1, borderColor: Home.line, paddingHorizontal: 14, paddingVertical: 9, minHeight: 40, justifyContent: 'center' },
   presetOn: { borderColor: Colors.accent, backgroundColor: 'rgba(229,38,46,0.14)' },
   presetText: { color: Colors.text, fontFamily: font(600), fontSize: 14 },
-});
+}));

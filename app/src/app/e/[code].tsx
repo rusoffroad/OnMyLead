@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState, type ReactNode } from 'react';
-import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
 
 import { AgendaTimeline, Cover, DateStub, PeopleSheet } from '@/components/events/parts';
 import { AddRideSheet, AgendaSheet } from '@/components/events/sheets';
@@ -14,7 +14,7 @@ import { RiderDot } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/constants/site';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   eventDates, eventLink, eventPhase, MAX_COHOSTS, MAX_EVENT_PHOTOS, nextRsvp, pickablePeople, rsvpLine,
   type AgendaItem, type EventDetail, type EventRide, type Person, type Rsvp,
@@ -632,7 +632,7 @@ function RideRowCard({ r, host, busy, onManager, onRemove }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   columns: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.five },
   column: { gap: Spacing.four, minWidth: 0 },
   hero: { borderRadius: 22, overflow: 'hidden' },
@@ -679,4 +679,4 @@ const styles = StyleSheet.create({
   iconBtn: { width: 48, height: 48, borderRadius: Radius.control, backgroundColor: Home.panel2, alignItems: 'center', justifyContent: 'center' },
   getApp: { gap: 10, padding: 16, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(229,38,46,0.45)', backgroundColor: 'rgba(229,38,46,0.06)' },
   getAppTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22 },
-});
+}));

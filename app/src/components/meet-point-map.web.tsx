@@ -7,7 +7,7 @@ import { Colors, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { ll, satelliteMap } from '@/lib/web-map';
 
-const PIN = `<div class="oml-meet"><svg width="34" height="44" viewBox="0 0 34 44"><path d="M17 42C17 42 3 26.5 3 16.5a14 14 0 0 1 28 0C31 26.5 17 42 17 42Z" fill="${Colors.accent}" stroke="${Colors.background}" stroke-width="3"/><circle cx="17" cy="16.5" r="5.5" fill="#FFFFFF"/></svg></div>`;
+const pinHtml = () => `<div class="oml-meet"><svg width="34" height="44" viewBox="0 0 34 44"><path d="M17 42C17 42 3 26.5 3 16.5a14 14 0 0 1 28 0C31 26.5 17 42 17 42Z" fill="${Colors.accent}" stroke="${Colors.background}" stroke-width="3"/><circle cx="17" cy="16.5" r="5.5" fill="#FFFFFF"/></svg></div>`;
 
 /**
  * Create a Ride on the website: click the satellite map to drop the meeting point, drag the pin
@@ -55,7 +55,7 @@ export function MeetPointMap({ value, onPick }: { value: LatLng | null; onPick: 
       pin.current = L.marker(ll(value), {
         draggable: true,
         title: 'Meeting point, drag to move',
-        icon: L.divIcon({ className: '', iconSize: [34, 44], iconAnchor: [17, 42], html: PIN }),
+        icon: L.divIcon({ className: '', iconSize: [34, 44], iconAnchor: [17, 42], html: pinHtml() }),
       }).addTo(m);
       pin.current.on('dragend', () => {
         const p = pin.current!.getLatLng();

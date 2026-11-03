@@ -1,9 +1,9 @@
 import { Image } from 'expo-image';
-import { Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 
 /**
  * A rider's picture (or a post photo) full size over a dark backdrop, so you can actually see it.
@@ -40,7 +40,7 @@ export function PhotoViewer({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   backdrop: { flex: 1, backgroundColor: 'rgba(4,10,20,0.94)', alignItems: 'center', justifyContent: 'center', gap: Spacing.three, padding: Spacing.four },
   close: {
     position: 'absolute', right: Spacing.three, width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center',
@@ -48,4 +48,4 @@ const styles = StyleSheet.create({
   },
   name: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 30, lineHeight: 34, textAlign: 'center' },
   caption: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 15, lineHeight: 21, textAlign: 'center', maxWidth: 520 },
-});
+}));

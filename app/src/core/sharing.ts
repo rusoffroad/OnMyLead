@@ -149,3 +149,13 @@ export function shareEndText(expiresAt: number | null, now: number): string {
   });
   return `until ${day}, ${time}`;
 }
+
+/**
+ * Family link tokens: random bytes as lowercase hex (18 bytes → 36 characters). The bytes come
+ * from expo-crypto in `lib/api.ts`; Hermes (iPhone and Android) has no global `crypto`.
+ */
+export const FAMILY_LINK_TOKEN_BYTES = 18;
+
+export function bytesToHex(bytes: ArrayLike<number>): string {
+  return Array.from(bytes, (b) => (b & 0xff).toString(16).padStart(2, '0')).join('');
+}

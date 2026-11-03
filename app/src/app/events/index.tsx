@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { EventCardView } from '@/components/events/parts';
 import { RadiusChip, RadiusSheet } from '@/components/home/public-rides';
@@ -9,7 +9,7 @@ import { Home, Pill } from '@/components/home/parts';
 import PageHead from '@/components/page-head';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Segmented } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { EVENTS_NOT_SWITCHED_ON, sortCards, type EventCard } from '@/core/events';
 import { parseRadius, RADIUS_STORAGE_KEY } from '@/core/home';
 import { useLayout } from '@/hooks/use-layout';
@@ -157,7 +157,7 @@ function rowsOf<T>(items: T[], n: number): (T | null)[][] {
   return rows;
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { gap: Spacing.three },
   headWide: { flexDirection: 'row', alignItems: 'flex-end' },
   title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 32, lineHeight: 35 },
@@ -165,4 +165,4 @@ const styles = StyleSheet.create({
   gridRow: { flexDirection: 'row', gap: Spacing.three, alignItems: 'stretch' },
   empty: { gap: 6, padding: Spacing.four, borderRadius: 22, borderWidth: 1, borderColor: Home.line, borderStyle: 'dashed' },
   emptyTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22 },
-});
+}));

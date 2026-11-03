@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { badgeTitle } from '@/core/badges';
 import { useRiderBadges } from '@/lib/badges';
 import { BadgePatch } from './badge-patch';
@@ -124,7 +124,7 @@ export function RiderRows({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   scrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },
   sheet: {
     maxHeight: '70%', backgroundColor: Colors.backgroundElement, paddingHorizontal: Spacing.three, paddingTop: Spacing.two,
@@ -149,4 +149,4 @@ const styles = StyleSheet.create({
   go: { minHeight: 40, paddingHorizontal: 12, borderRadius: 20, justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   goNarrow: { width: 40, paddingHorizontal: 0, alignItems: 'center' },
   goText: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
-});
+}));

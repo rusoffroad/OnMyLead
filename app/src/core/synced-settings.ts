@@ -87,6 +87,7 @@ export const DEVICE_ONLY: Record<string, string> = {
   'onmylead.riderAgreement': 'The Rider Agreement is agreed once per download, by design',
   'onmylead.appSettings': 'A cache of the server’s announcements',
   'onmylead.storeVersion': 'A cache of the store’s latest version',
+  'onmylead.referral.pending': 'A friend link opened before signing up, claimed by whoever signs in on this device',
   'osm-template.v1': 'A cache of the trail map address',
   'tilt.calibration': 'Tilt calibration (the Zero reading): each device sits differently in its mount',
 };

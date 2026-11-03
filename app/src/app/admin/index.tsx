@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import {
   AdminColors, AdminPage, BarList, Columns, DateRangePicker, Empty, ErrorNote, Loading, Panel, rangeFor, SeriesColors,
   StatGrid, StatTile, TimeSeriesChart, type DateRange,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { bucketFor, fmtAgo, fmtInt, fmtMoney, fmtPct } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
 import { growthSummary } from '@/lib/admin-growth';
@@ -162,7 +162,7 @@ function LinkText({ label, href }: { label: string; href: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { fontFamily: font(500), fontSize: 13, color: AdminColors.faint },
   recent: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, paddingHorizontal: 6, borderRadius: 8 },
   recentLine: { borderTopWidth: 1, borderTopColor: AdminColors.line },
@@ -173,4 +173,4 @@ const styles = StyleSheet.create({
   attnLabel: { fontFamily: font(600), fontSize: 15, color: AdminColors.text },
   attnValue: { fontFamily: font(800, 'display'), fontSize: 28 },
   link: { fontFamily: font(600), fontSize: 14, color: AdminColors.blue },
-});
+}));

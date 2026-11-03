@@ -56,6 +56,8 @@ export function tapTarget(data: TapData | undefined): string | null {
   if (!data) return null;
   // A new badge opens Badges.
   if (data.type === 'badge') return '/badges';
+  // A refer-a-friend reward opens Invite Friends, where it is claimed.
+  if (data.type === 'referral') return '/invite-friends';
   const groupId = id(data.groupId);
   if (data.type === 'group_message' && groupId) return `/groups/${groupId}/chat`;
   // A direct message opens the conversation with whoever sent it.

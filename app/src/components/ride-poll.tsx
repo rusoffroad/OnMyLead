@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Field } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   checkPoll, MAX_POLL_CHOICE, MAX_POLL_CHOICES, MAX_POLL_QUESTION, MIN_POLL_CHOICES, POLL_STARTERS, tallyPoll, voteCountLabel,
   type PollVote,
@@ -143,7 +143,7 @@ export function PollComposer({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   question: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 26, letterSpacing: 0.2 },
   choice: {
     minHeight: 50,
@@ -167,4 +167,4 @@ const styles = StyleSheet.create({
   starterText: { color: Colors.text, fontFamily: font(600), fontSize: 15 },
   remove: { minHeight: 48, justifyContent: 'center', paddingHorizontal: Spacing.one },
   removeText: { color: Colors.sky, fontFamily: font(600), fontSize: 15 },
-});
+}));
