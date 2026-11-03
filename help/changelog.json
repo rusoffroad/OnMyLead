@@ -2,6 +2,18 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "tilt-and-crash-alert",
+      "ride-mode",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "tilt-calibrate",
+    "why": "Chris asked for the tilt meter to stay off until it has been calibrated, with a Calibrate button, and for his wording of the calibration message. The Zero section is now Calibrate It for Your Mount. Ride Mode and Map Mode articles mention the Calibrate Tilt tile."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "refer-a-friend"
     ],
     "kind": "review",
