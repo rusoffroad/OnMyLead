@@ -53,7 +53,7 @@
       "privacy",
       "profile-picture"
     ],
-    "kind": "new",
+    "kind": "add",
     "by": "pr",
     "ref": "social-hub",
     "why": "Chris asked for likes, comments and interaction on every feed item, a Social area with friends, activity and comments, posts on your profile, big profile pictures with small files, sharing to Facebook, Instagram and X, a PRO tag, and comment/post/share for Pro only. New Social article; Feed, Free vs Pro, Likes and Comments notifications, reporting posts and comments, privacy of posts and photos, and full-size profile pictures added in 2.0 release blocks. The unreleased Instagram rule now only flags Instagram sign-in, since sharing to Instagram is real."
