@@ -2,6 +2,32 @@
   {
     "date": "2026-11-02",
     "slugs": [
+      "ride-summary-and-ride-again",
+      "badges-and-ranks"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-miles-fix",
+    "why": "Fixed: a 4 mile test ride showed about 60 miles on the ride summary. Distance now leaves out rough locations, GPS bounces, jumps while the phone says it is standing still, and gaps with location off, and points from an earlier ride no longer join the next one. The articles say what counts; written in 1.0.4 release blocks."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
+      "accurate-location",
+      "battery-saver",
+      "getting-started",
+      "location-sharing",
+      "ride-mode",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "ride-miles-fix",
+    "why": "Checked after the ride miles fix changed how lib/location.ts saves the ride track (per ride, with each fix's accuracy, skipping fixes rougher than 100 m). Sharing, Ride Mode and Battery Saver work the same for riders, so no text changed; what counts toward distance is in Ride Summary and Ride Again."
+  },
+  {
+    "date": "2026-11-02",
+    "slugs": [
       "music-controls",
       "ride-mode",
       "navigation-mode",

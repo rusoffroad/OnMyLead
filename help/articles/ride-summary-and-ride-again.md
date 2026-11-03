@@ -9,6 +9,8 @@ sources:
   - app/src/components/ride-summary.tsx
   - app/src/components/ride-card.tsx
   - app/src/core/summary.ts
+  - app/src/lib/location.ts
+  - supabase/migrations/20261102200000_ride_miles_cleanup.sql
   - app/src/app/r/[code].tsx
   - app/src/app/ride/new.tsx
   - app/src/app/(tabs)/index.tsx
@@ -32,6 +34,16 @@ The summary has three parts.
 Your **Distance** and how long you were **Out For**, plus a map of your route. Only you can see your route.
 
 Your stats come from sharing your location in Ride Mode. If you didn't share, there's no track for you on that ride. See [Location Sharing](/help/location-sharing).
+
+:::release 1.0.4
+Your distance counts only the miles you actually rode. OnMyLead leaves out:
+
+- spots where your phone said its location was rough (off by more than about 100 m, or 330 ft), such as indoors or with Approximate Location on;
+- GPS jumps, where your dot bounces away and straight back, or moves while your phone says you're standing still;
+- time when your location was off for more than five minutes, such as with the app closed. The miles across that gap aren't guessed with a straight line, so turn sharing on before you roll out.
+
+If your distance looks short, check that your phone has a good location (see [Make Your Location Accurate](/help/accurate-location)) and that you shared for the whole ride.
+:::
 
 **Moving Time**, **Average Speed**, **Top Speed** and **Climbing** are part of Advanced Ride Statistics. This is a Pro feature. See [Free and Pro](/help/free-vs-pro). Your full stats are saved either way.
 

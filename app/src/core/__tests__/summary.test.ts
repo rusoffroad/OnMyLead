@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { metersToMiles } from '../geo';
 import {
-  downsample, dropSpikes, elevationGainM, formatDuration, formatMiles, haversineM, parseTrack, projectRoute, rideCardLines,
+  cleanTrack, downsample, dropBounces, dropRough, dropSpikes, elevationGainM, formatDuration, formatMiles, haversineM, parseTrack, projectRoute, rideCardLines,
   rideCardText, smoothTrack, summarizeTrack, type TrackPoint,
 } from '../summary';
 
 const T0 = 1_760_000_000;
-const pt = (lat: number, lng: number, t: number, speedMps: number | null = null, altitudeM: number | null = null): TrackPoint => ({
-  lat, lng, t, speedMps, altitudeM,
+const pt = (lat: number, lng: number, t: number, speedMps: number | null = null, altitudeM: number | null = null, accuracyM: number | null = null): TrackPoint => ({
+  lat, lng, t, speedMps, altitudeM, accuracyM,
 });
 /** A straight drive north: `n` fixes, 0.001 deg (about 111 m) apart, every `dt` seconds. */
 const drive = (n: number, dt = 10, from = 0) =>
@@ -35,7 +35,7 @@ describe('parseTrack', () => {
     ];
     const pts = parseTrack(raw);
     expect(pts.map((p) => p.t)).toEqual([T0, T0 + 10, T0 + 20]);
-    expect(pts[0]).toEqual({ lng: -109.5, lat: 38.5, t: T0, speedMps: null, altitudeM: 1200 });
+    expect(pts[0]).toEqual({ lng: -109.5, lat: 38.5, t: T0, speedMps: null, altitudeM: 1200, accuracyM: null });
     expect(parseTrack('nope')).toEqual([]);
   });
 });
@@ -153,5 +153,80 @@ describe('ride card', () => {
     const text = rideCardText(card);
     expect(text).toBe('Moab Saturday · Sat, Oct 10\n43 miles · 6 riders\nOnMyLead, presented by RUS Offroad');
     expect(text).not.toMatch(/\d+\.\d{3,}/); // never coordinates
+  });
+});
+
+// The 1.0.3 bug: a 4 mile test ride showed about 60 miles on the ride summary.
+describe('ride miles match the ride', () => {
+  /** About 4 miles north at 11 m/s, one fix every 10 s (590 fixes is about 6.4 km). */
+  const fourMiles = () => drive(59, 10);
+  const realMiles = () => metersToMiles(summarizeTrack(fourMiles()).distanceM);
+
+  it('a clean drive still measures right', () => {
+    expect(realMiles()).toBeCloseTo(metersToMiles(58 * 111.2), 1);
+  });
+
+  it('does not join points left over from an earlier ride 30 miles away', () => {
+    // Yesterday's leftover queue: a few fixes near home, hours before this ride.
+    const home = Array.from({ length: 5 }, (_, i) => pt(38.07 + i * 0.001, -109.5, T0 - 20_000 + i * 10, 11));
+    const s = summarizeTrack([...home, ...fourMiles()]);
+    // Only the leftover fixes' own 444 m counts, not the 30 miles between them and this ride.
+    expect(metersToMiles(s.distanceM)).toBeCloseTo(realMiles() + metersToMiles(4 * 111.2), 1);
+  });
+
+  it('skips a stale first fix from somewhere else instead of the whole ride', () => {
+    const stale = pt(38.2, -109.5, T0 - 30, null); // 33 km south, 30 s before the first real fix
+    const clean = dropSpikes([stale, ...fourMiles()]);
+    expect(clean).toHaveLength(59);
+    expect(clean[0].lat).toBeCloseTo(38.5, 6);
+    expect(metersToMiles(summarizeTrack([stale, ...fourMiles()]).distanceM)).toBeCloseTo(realMiles(), 1);
+  });
+
+  it('does not count a phone bouncing 140 m every 2 seconds', () => {
+    // Parked for 30 minutes with a rough fix: every other fix jumps 140 m east and back (70 m/s).
+    const bounce = Array.from({ length: 900 }, (_, i) => pt(38.6, -109.5 + (i % 2) * 0.0016, T0 + i * 2, 0, null, 30));
+    expect(metersToMiles(summarizeTrack(bounce).distanceM)).toBeLessThan(0.1);
+    // 100 m bounces are under the spike speed (50 m/s), so the bounce rule is what stops them.
+    const softer = Array.from({ length: 900 }, (_, i) => pt(38.6, -109.5 + (i % 2) * 0.00115, T0 + i * 2, null));
+    expect(dropBounces(softer).filter((p) => p.lng !== -109.5).length).toBeLessThanOrEqual(1); // only a final fix can't be checked
+    expect(metersToMiles(summarizeTrack(softer).distanceM)).toBeLessThan(0.1);
+  });
+
+  it('ignores fixes the phone reports as rough', () => {
+    const rough = fourMiles().map((p, i) => (i % 3 === 1 ? { ...p, lat: p.lat + 0.01, accuracyM: 1500 } : { ...p, accuracyM: 8 }));
+    expect(dropRough(rough)).toHaveLength(59 - 20);
+    // The last fix (index 58) is one of the rough ones, so the ride ends one fix early.
+    expect(metersToMiles(summarizeTrack(rough).distanceM)).toBeCloseTo(metersToMiles(57 * 111.2), 1);
+  });
+
+  it('does not count a slow wander smaller than the fixes\' own accuracy', () => {
+    const parked = Array.from({ length: 120 }, (_, i) => pt(38.6 + (i % 2) * 0.0004, -109.5, T0 + i * 30, null, null, 60));
+    expect(summarizeTrack(parked).distanceM).toBe(0);
+  });
+
+  it('does not count a gap with location off as a straight line', () => {
+    const first = drive(20, 10);
+    const later = drive(20, 10, 0).map((p) => ({ ...p, lat: p.lat + 0.3, t: p.t + 3600 }));
+    const s = summarizeTrack([...first, ...later]);
+    expect(metersToMiles(s.distanceM)).toBeCloseTo(metersToMiles(38 * 111.2), 1);
+  });
+
+  it('skips a jump the phone\'s own speed says did not happen', () => {
+    const pts = [pt(38.6, -109.5, T0, 0), pt(38.6, -109.5, T0 + 15, 0), pt(38.603, -109.5, T0 + 30, 0), pt(38.603, -109.5, T0 + 45, 0)];
+    expect(summarizeTrack(pts, { smoothWindow: 1 }).distanceM).toBe(0);
+  });
+
+  it('keeps a real stop, U-turn and climb at crawling speed', () => {
+    const crawl = Array.from({ length: 40 }, (_, i) => pt(38.6 + i * 0.00025, -109.5, T0 + i * 60, 0.5, null, 5)); // 28 m a minute
+    expect(summarizeTrack(crawl).distanceM).toBeGreaterThan(900);
+    const out = drive(10, 10);
+    const back = out.slice(0, 9).reverse().map((p, i) => ({ ...p, t: out[9].t + (i + 1) * 10 }));
+    expect(cleanTrack([...out, ...back])).toHaveLength(19);
+  });
+
+  it('reads the stored accuracy, and tracks from older builds without it', () => {
+    const [a, b] = parseTrack([[-109.5, 38.5, T0, 3, 1200, 12], [-109.5, 38.501, T0 + 10, 3]]);
+    expect(a.accuracyM).toBe(12);
+    expect(b.accuracyM).toBeNull();
   });
 });
