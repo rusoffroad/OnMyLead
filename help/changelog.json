@@ -2,7 +2,6 @@
   {
     "date": "2026-11-03",
     "slugs": [
-<<<<<<< HEAD
       "navigation-mode"
     ],
     "kind": "update",
@@ -22,7 +21,10 @@
     "by": "pr",
     "ref": "map-mode-dash",
     "why": "Checked against the Map Mode dash change: Full Map's slim bar still keeps speed, Follow Me works the same (Android now opens Map Mode zoomed in on you, as iPhone already did), and the website showcase only gained the new readings in Map Mode's text and screenshot. No change to these articles."
-=======
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "home-screen",
       "events",
       "create-a-ride",
@@ -41,7 +43,6 @@
     "by": "pr",
     "ref": "home-cards-fix",
     "why": "In 2.0 the Create a Ride card is now dark like Find a Ride (red flag icon instead of a red background), and both cards fill and line up evenly. The guide now names the card by its look. Events now sits right under Join, Create and Find, above Map Mode (Chris asked to move it up). Other guides that describe the home screen were checked; only the tablet guide's list changed."
->>>>>>> origin/main
   },
   {
     "date": "2026-11-03",
