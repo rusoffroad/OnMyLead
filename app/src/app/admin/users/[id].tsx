@@ -4,14 +4,16 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, DataTable, Empty, ErrorNote, Fields, Loading, Panel, planTone, StatGrid,
-  ROLE, StatTile, StatusBadge, useConfirm, useToast,
+  ROLE, SocialContentCard, StatTile, StatusBadge, SuspendPanel, useConfirm, useToast,
 } from '@/components/admin';
 import { font } from '@/constants/theme';
 import { actionLabel, daysLeft, fmtAgo, fmtDate, fmtDateTime, fmtInt } from '@/core/admin-format';
+import { suspensionLabel } from '@/core/moderation';
 import * as admin from '@/lib/admin';
 import * as growthApi from '@/lib/admin-growth';
 import { adminRemoveAvatar, useAvatar } from '@/lib/avatars';
 import { RiderPhoto } from '@/components/rider-photo';
+import { adminRiderSocial } from '@/lib/social';
 
 const STATUS: Record<string, string> = { scheduled: 'Upcoming', live: 'Riding Now', ended: 'Completed', cancelled: 'Cancelled' };
 
@@ -23,6 +25,9 @@ export default function UserDetail() {
   const [busy, setBusy] = useState<string | null>(null);
   // Test accounts are left out of rider counts (Signups and Downloads). Hidden until that server update is on.
   const growth = admin.useAdminData(() => growthApi.growthSummary(null, null), [id]);
+  // Their Rider Safety and Liability Agreement records (empty until the migration is live).
+  const agreements = admin.useAdminData(() => admin.riderAgreements('', 0, 20, id), [id]);
+  const social = admin.useAdminData(() => adminRiderSocial(id), [id]);
   const photo = useAvatar(id);
 
   const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
@@ -51,18 +56,6 @@ export default function UserDetail() {
   const isAdmin = s.is_admin;
   const comps = data.grants.filter((g) => g.source === 'comp' && !g.revoked_at && (!g.ends_at || new Date(g.ends_at) > new Date()));
 
-  const suspend = async () => {
-    const r = await confirm({
-      title: `Suspend ${name}?`,
-      message: 'They are signed out and can\'t sign in until you reactivate the account. Their rides, groups and data stay as they are.',
-      confirmLabel: 'Suspend Account', tone: 'danger', reasonLabel: 'Reason (kept in the audit log)', reasonRequired: true,
-    });
-    if (r.ok) run('suspend', () => admin.suspendUser(p.id, r.reason ?? ''), 'Account suspended.');
-  };
-  const reactivate = async () => {
-    const r = await confirm({ title: `Reactivate ${name}?`, message: 'They can sign in again straight away.', confirmLabel: 'Reactivate Account' });
-    if (r.ok) run('reactivate', () => admin.reactivateUser(p.id), 'Account reactivated.');
-  };
   const isTest = !!growth.data?.test_list.some((t) => t.user_id === p.id);
   const toggleTest = async () => {
     const r = await confirm(isTest
@@ -140,7 +133,7 @@ export default function UserDetail() {
       actions={
         <>
           <StatusBadge label={s.pro_source === 'comp' ? 'Pro (Complimentary)' : s.label} tone={planTone(s.label)} />
-          {s.suspended ? <StatusBadge label="Suspended" tone="danger" /> : null}
+          {s.suspended ? <StatusBadge label={suspensionLabel(p.banned_until) ?? 'Suspended'} tone="danger" /> : null}
           {s.deletion_requested ? <StatusBadge label="Deletion Requested" tone="warn" /> : null}
         </>
       }>
@@ -253,6 +246,49 @@ export default function UserDetail() {
         </Panel>
       </Columns>
 
+      <Panel title="Posts and Comments">
+        {social.data && !social.data.posts.length && !social.data.comments.length ? (
+          <Empty text="No posts or comments on the Feed." />
+        ) : null}
+        {social.data?.posts.map((c) => (
+          <SocialContentCard
+            key={c.id}
+            onDone={social.reload}
+            c={{
+              kind: 'post', id: c.id, authorId: id, body: c.body, photoPath: c.photo_path, createdAt: c.created_at,
+              hiddenAt: c.hidden_at, hiddenReason: c.hidden_reason, hiddenBy: c.hidden_by,
+              note: `${c.likes} likes, ${c.comments} comments${c.reports ? `, ${c.reports} reports` : ''}`,
+            }}
+          />
+        ))}
+        {social.data?.comments.map((c) => (
+          <SocialContentCard
+            key={c.id}
+            onDone={social.reload}
+            c={{
+              kind: 'comment', id: c.id, authorId: id, body: c.body, createdAt: c.created_at,
+              hiddenAt: c.hidden_at, hiddenReason: c.hidden_reason, hiddenBy: c.hidden_by,
+              note: `On ${c.owner_name}’s ${c.item_key.split(':')[0]}${c.reports ? `, ${c.reports} reports` : ''}`,
+            }}
+          />
+        ))}
+      </Panel>
+
+      <Panel title="Safety Agreement" right={<AdminButton title="All Agreements" small onPress={() => router.push('/admin/agreements')} />}>
+        {agreements.error ? <Text style={styles.note}>Agreement records aren&apos;t available yet.</Text> : null}
+        {agreements.data && agreements.data.rows.length === 0 ? (
+          <Empty text={`Hasn’t agreed to version ${agreements.data.current_version} yet. They’re asked the next time they open the app or the website.`} />
+        ) : null}
+        {agreements.data?.rows.map((a) => (
+          <View key={a.id} style={styles.audit}>
+            <Text style={styles.auditAction}>
+              Agreed to version {a.agreement_version}{a.text_matches ? '' : ' (different text shown)'}, {[a.platform, a.device, a.app_version].filter(Boolean).join(', ')}{a.ip_address ? `, IP ${a.ip_address}` : ''}
+            </Text>
+            <Text style={styles.auditAt}>{fmtDateTime(a.accepted_at)}</Text>
+          </View>
+        ))}
+      </Panel>
+
       <Panel title="Admin History">
         {data.audit.length === 0 ? <Empty text="No admin actions on this account." /> : null}
         {data.audit.map((a) => (
@@ -265,7 +301,7 @@ export default function UserDetail() {
 
       {!isAdmin ? (
         <Panel title="Account">
-          <Text style={styles.note}>Suspending signs the rider out and blocks sign-in. Deleting is permanent.</Text>
+          <Text style={styles.note}>Suspending signs the rider out and blocks sign-in for a set time. A ban and deleting are permanent.</Text>
           {growth.data ? (
             <Text style={styles.note}>{isTest ? 'Test account: left out of rider counts.' : 'Counted as a real rider on Signups and Downloads.'}</Text>
           ) : null}
@@ -273,11 +309,9 @@ export default function UserDetail() {
             {growth.data ? (
               <AdminButton title={isTest ? 'Count as Rider' : 'Mark as Test Account'} onPress={toggleTest} loading={busy === 'test'} />
             ) : null}
-            {s.suspended
-              ? <AdminButton title="Reactivate Account" kind="primary" onPress={reactivate} loading={busy === 'reactivate'} />
-              : <AdminButton title="Suspend Account" kind="danger" onPress={suspend} loading={busy === 'suspend'} />}
             <AdminButton title="Delete Account" kind="danger" onPress={del} loading={busy === 'delete'} />
           </View>
+          <SuspendPanel userId={p.id} name={name} bannedUntil={s.suspended ? p.banned_until : null} onDone={reload} />
         </Panel>
       ) : null}
     </AdminPage>

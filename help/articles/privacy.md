@@ -4,8 +4,9 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
+  - supabase/migrations/20261102800000_abuse_reports.sql
   - app/src/app/privacy.tsx
   - app/src/app/r/[code].tsx
   - app/src/core/geo.ts
@@ -81,6 +82,18 @@ Anyone with your family link can see your last location until that share ends. S
 Only you and the other rider can see that you're friends, or that one of you sent a request. Nobody can search for riders by name: a rider can only send you a request if they've ridden with you, share a riding group with you, can see you in Out Riding, have messaged with you, or have your friend link. Being friends never shares your location. See [Add Friends](/help/friends).
 :::
 
+:::release 2.0
+## Reports
+
+The OnMyLead team can't read your direct messages or chats. The one exception is a report: when a rider reports another rider, their messages with that rider (direct messages, and what either of them wrote in the last 30 days in a group or ride chat they share) are saved with the report so the team can look into it. Only the OnMyLead team can read them, and every time they're opened it's logged. See [Report or Block a Rider](/help/report-and-block).
+
+## Your Feed
+
+Home's **Feed** shows your finished rides, badges, shared trails and group rides to **Friends Only** unless you change it. Under **Customize**, **Who Sees Your Activity** can be **Friends and Followers** or **Nobody**. A ride is named only to riders who were on it, or if it was public. Your location is never in a feed. Blocked riders never see your posts. See [Your Home Screen](/help/home-screen).
+
+The same setting decides who can see your posts, likes and comments in Social and your activity on your profile. Photos you post are made smaller and have no location added. Anyone who can see a post can see its photo, and like any photo, someone with its address could pass it on. Sharing to Facebook, Instagram or X only happens when you tap **Share**, and a share never includes your location. See [Like, Comment and Post in Social](/help/social).
+:::
+
 ## Blocked Riders
 
 When you block a rider, nothing tells them, and they can't see who has blocked them. See [Report or Block a Rider](/help/report-and-block).
@@ -93,6 +106,10 @@ On Android, Google delivers notifications (Firebase Cloud Messaging), handles pu
 
 :::release 1.0.4
 [Music Controls](/help/music-controls) read what's playing only on your phone. On Android, the optional Notification Access is used only to see the song and the app playing it; OnMyLead never reads or keeps your notifications.
+:::
+
+:::release 2.0
+When you agree to the Rider Safety and Liability Agreement, a record of it is saved (your account, the version, the time, the device and app version, and your IP address). Other riders never see it, and it's kept as a legal record if you delete your account. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement#what-gets-saved).
 :::
 
 You can delete your account and its data at any time. See [Delete Your Account](/help/delete-account).

@@ -4,7 +4,7 @@ summary: Hide the bars and panels on any map so the map fills your screen, and b
 category: routes-maps
 order: 12
 release: "1.0.4"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/core/freeride.ts
   - app/src/components/full-map.tsx

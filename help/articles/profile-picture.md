@@ -4,11 +4,12 @@ summary: Take or choose a photo so riders know who's who. It shows next to your 
 category: account
 order: 21
 release: "1.0.3"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/components/avatar-editor.tsx
   - app/src/components/rider-photo.tsx
   - app/src/components/convoy.tsx
+  - app/src/components/photo-viewer.tsx
   - app/src/lib/avatars.ts
   - app/src/core/avatar.ts
   - app/src/app/ride-name.tsx
@@ -43,6 +44,10 @@ The first time, the app asks to use your camera or your photos. Only the photo y
 
 :::tip
 Every picture is cropped square and made smaller before it's uploaded, so it loads quickly even on one bar of signal.
+:::
+
+:::release 2.0
+Pictures are kept under 200 KB, and anyone can tap a rider's picture to see it full size.
 :::
 
 ## On the Website

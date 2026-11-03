@@ -4,7 +4,7 @@ summary: What every OnMyLead account gets for free, what OnMyLead Pro adds, and 
 category: pro
 order: 10
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/core/pro.ts
   - app/src/core/entitlements.ts
@@ -37,7 +37,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Live Tracking, SOS and Ride Bubble | Yes | Yes |
 | Ride Chat and Voting | Yes | Yes |
 | Draw Routes and Follow Leaders | Yes | Yes |
-| Navigate: Offroad Map, Measure, Rate Trails | Yes | Yes |
+| Navigate (Map Mode From 2.0): Offroad Map, Draw and Measure, Rate Trails | Yes | Yes |
 | Record and Share Your Trails | No | Yes |
 | Group Rides on Your Trails | No | Yes |
 | Import GPX Routes | No | Yes |
@@ -48,6 +48,13 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Advanced Trip Planning | No | Yes |
 | Advanced Ride Statistics | No | Yes |
 | Premium Ride Cards | No | Yes |
+
+:::release 2.0
+| | Free | Pro |
+|---|---|---|
+| Social Feed: See, Like and Read Comments | Yes | Yes |
+| Post, Comment and Share to Social Media | No | Yes |
+:::
 
 ## Always Free
 
@@ -80,6 +87,9 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 - **Advanced Trip Planning:** plan several trips at once, start from packing lists, copy trips and link them to rides. One active trip and the fuel check stay free. See [Trip Planner](/help/trip-planner).
 - **Advanced Ride Statistics:** moving time, average and top speed, climbing and the group's totals after every ride. Distance and time out stay free.
 - **Premium Ride Cards:** share your ride with the Full Stats and Big Number layouts. The standard card stays free.
+:::release 2.0
+- **Post, Comment and Share:** post ride reports with a photo on your profile, comment on your friends' rides, badges, trails and posts, and share your rides, badges and posts to Facebook, Instagram or X. Seeing Social, reading comments and liking stay free. Pro riders show a gold **PRO** tag next to their name. See [Like, Comment and Post in Social](/help/social).
+:::
 
 When you tap something that needs Pro, a short prompt explains it. Tap **See OnMyLead Pro** to see the plans, or **Not Now** to close it.
 

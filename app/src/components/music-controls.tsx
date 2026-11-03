@@ -3,12 +3,12 @@ import { Modal, Platform, Pressable, StyleSheet, Text, View, type StyleProp, typ
 import Svg, { Path, Rect } from 'react-native-svg';
 
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, GlassSurface, Radius, RideColors, Spacing } from '@/constants/theme';
 import { musicButtonLabel, nowPlaying, stepVolume, VOLUME_STEPS, volumePercent, type MusicCommand, type MusicView } from '@/core/music';
 import { setMusicControls } from '@/hooks/use-music-controls';
 import { askMusicAccess, canOpenSpotify, musicCommand, openSpotify, readMusic, setMusicVolume, SystemVolumeSlider } from '@/lib/music';
 
-const glass = { backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, borderColor: Colors.border } as const;
+const glass = GlassSurface;
 
 /** The music note drawn for the Music button (filled heads read at a glance on a bumpy mount). */
 function NoteGlyph({ size = 24, color = Colors.text }: { size?: number; color?: string }) {

@@ -26,12 +26,12 @@ export default function MyTrails() {
   return (
     <Screen width="readable">
       <Stack.Screen options={{ title: 'My Trails' }} />
-      <Button title="Open Navigate" onPress={() => router.push('/nav')} />
+      <Button title="Open Map Mode" onPress={() => router.push('/nav')} />
       {loaded && !trails.length ? (
         <View style={styles.empty}>
           <ThemedText type="heading">No Trails Yet</ThemedText>
           <ThemedText themeColor="textSecondary">
-            In Navigate, tap Record and ride, or Measure to draw a line on the map. Trails stay on this phone until you share them. A rider trail you save shows here too.
+            In Map Mode, tap Record and ride, or Draw to map a custom trail. Trails stay on this phone until you share them. A rider trail you save shows here too.
           </ThemedText>
         </View>
       ) : null}

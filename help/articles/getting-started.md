@@ -22,7 +22,7 @@ sources:
   - app/src/components/message-alerts.tsx
   - app/src/app/notifications.tsx
   - app/app.json
-related: [sign-in, ride-name-and-profile, create-a-ride, join-a-ride, find-a-ride, riding-groups, notification-settings, location-sharing, pro-trial, free-vs-pro]
+related: [home-screen, sign-in, ride-name-and-profile, create-a-ride, join-a-ride, find-a-ride, riding-groups, notification-settings, location-sharing, pro-trial, free-vs-pro]
 keywords: [install, download, new, start, tabs, home, first time, setup, permissions, website, iphone, ipad]
 ---
 
@@ -31,6 +31,12 @@ OnMyLead is a group ride app for off-road riders. The leader creates a ride, the
 ## Get the App
 
 OnMyLead runs on iPhone, iPad, Android phones and Android tablets. Download **OnMyLead** free from the App Store on an iPhone or iPad, or from Google Play on an Android phone or tablet, then open it. It's the same account, rides and Pro plan on every device, and iPhone and Android riders ride together on the same map.
+
+:::release 2.0
+## Agree Before You Ride
+
+The first time you open the app, the **Before You Ride** screen shows the Rider Safety and Liability Agreement. Read it, tick the box and tap **I Agree**. On onmylead.com it shows after you sign in. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement).
+:::
 
 ## Make Your Account
 
@@ -57,6 +63,7 @@ On a tablet they run down the left edge instead. See [Use OnMyLead on a Tablet](
 
 Your home screen.
 
+:::until 2.0
 - **Create a Ride**: start a ride that you lead. Free accounts create one ride a month. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
 - **Join a Ride**: type an invite code and tap **Open**. See [Join a Ride](/help/join-a-ride).
 - **Find a Ride**: opens the Find tab.
@@ -68,6 +75,17 @@ Your home screen.
 :::
 :::release 1.0.3
 - **Navigate**: your offroad map when you're not on a group ride. Record, share and rate trails, and measure distances. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
+:::
+:::
+
+:::release 2.0
+- **Join a Ride** is the big red card at the top: type the invite code and tap **Join**. Joining is always free and unlimited.
+- **Create a Ride** shows how many rides you have left this month on Free, or **Unlimited** on Pro. **Find a Ride** shows how many public rides are near you.
+- **Map Mode**: your offroad map, **Map a Custom Trail** and the **Track Line** switch.
+- **Your Next Ride**, **Ride Invites** and **Past Rides**; **Your Group**; **Public Rides Near You**; your **Feed**; **Your Badges**; **Your Toolkit**; and **Help & Support**.
+- **The bell** and your picture at the top right open your notifications and the **You** tab.
+
+See [Your Home Screen](/help/home-screen) for each part.
 :::
 
 ### Find

@@ -4,7 +4,10 @@ import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
 import { Colors, font } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
+import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
+import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
+import type { DayLine } from '@/core/track-line';
 import { cameraCenterFor, openMapCenter } from '@/core/map-center';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
@@ -25,16 +28,18 @@ export type NavMapHandle = {
 export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
 
+/** Map Mode's own dot reports every second; the follow camera glides for about that long. */
+const FOLLOW_MS = followCamDurationMs(1000);
 const toCoords = (pts: LatLng[]) => pts.map((p) => ({ latitude: p.lat, longitude: p.lng }));
 
 /**
- * Navigation Mode's map: satellite or topo with every trail layer (agency, OpenStreetMap and rider
+ * Map Mode's map: satellite or topo with every trail layer (agency, OpenStreetMap and rider
  * trails), the rider's own location, the trail being recorded (a bright cream line), a trail being
  * followed (the route red, with start and finish), and the distance finder's points. A tap measures
  * while measuring; otherwise it looks up the trail under the finger.
  */
 export function NavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, trackLines, obstacles, onObstacle, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -55,6 +60,11 @@ export function NavMap({
   onUserMove?: () => void;
   /** The website draws the rider's arrow from this; the phones read their own map dot. */
   meHeading?: number | null;
+  /** Track Line: where the rider has been, one colour per day, oldest first. */
+  trackLines?: DayLine[];
+  /** Named spots on the trail being drawn, recorded or followed. */
+  obstacles?: Obstacle[];
+  onObstacle?: (o: Obstacle) => void;
   ref?: Ref<NavMapHandle>;
 }) {
   const map = useRef<MapView>(null);
@@ -106,9 +116,9 @@ export function NavMap({
     Promise.all([m.coordinateForPoint({ x: w / 2, y: h / 2 }), m.coordinateForPoint(open)])
       .then(([here, there]) => {
         const c = cameraCenterFor(followMe, { lat: here.latitude, lng: here.longitude }, { lat: there.latitude, lng: there.longitude });
-        m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: 600 });
+        m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: FOLLOW_MS });
       })
-      .catch(() => m.animateCamera({ center: target }, { duration: 600 }));
+      .catch(() => m.animateCamera({ center: target }, { duration: FOLLOW_MS }));
     // Only when the followed spot moves; the panels' padding is read as it is then.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [followMe]);
@@ -150,7 +160,7 @@ export function NavMap({
         region.current = r;
         onCenter?.({ lat: r.latitude, lng: r.longitude });
         trail.mapProps.onRegionChangeComplete(r);
-        map.current?.getCamera().then((c) => setMapHeading(Math.round(c.heading ?? 0))).catch(() => {});
+        map.current?.getCamera().then((c) => setMapHeading(Math.round((c.heading ?? 0) / 5) * 5 % 360)).catch(() => {});
       }}
       onPress={(e) => {
         if (e.nativeEvent.action === 'marker-press') return;
@@ -161,6 +171,9 @@ export function NavMap({
       onLongPress={(e) => trail.identifyAt(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)}>
       <TrailTiles trail={trail} />
       <OwnHeadingMarker own={own} mapHeading={mapHeading} />
+      {(trackLines ?? []).map((d) => d.pieces.map((piece, i) => (
+        <Polyline key={`t${d.key}${i}`} coordinates={toCoords(piece)} strokeColor={d.color} strokeWidth={4} zIndex={3} tappable={false} />
+      )))}
       {following && following.length > 1 ? (
         <>
           <RouteLine points={following} />
@@ -184,6 +197,20 @@ export function NavMap({
           <View style={styles.pin}><Text style={styles.pinText}>{i + 1}</Text></View>
         </Marker>
       ))}
+      {(obstacles ?? []).map((o) => (
+        <Marker
+          key={o.id}
+          coordinate={{ latitude: o.lat, longitude: o.lng }}
+          anchor={{ x: 0.5, y: 1 }}
+          zIndex={8}
+          onPress={() => onObstacle?.(o)}
+          accessibilityLabel={o.name}>
+          <MarkerBody style={{ alignItems: 'center', maxWidth: 180 }}>
+            <Text style={[styles.obstacle, { borderColor: OBSTACLE_INK[o.kind] }]} numberOfLines={1}>{o.name}</Text>
+            <View style={[styles.obstacleDot, { backgroundColor: OBSTACLE_INK[o.kind] }]} />
+          </MarkerBody>
+        </Marker>
+      ))}
       {found ? (
         <Marker coordinate={{ latitude: found.lat, longitude: found.lng }} anchor={{ x: 0.5, y: 1 }} tappable={false} accessibilityLabel={`Search result: ${found.name}`}>
           <MarkerBody style={{ alignItems: 'center', maxWidth: 220 }}>
@@ -203,5 +230,10 @@ const styles = StyleSheet.create({
   },
   pinText: { color: Colors.text, fontFamily: font(800), fontSize: 11 },
   found: { color: Colors.background, backgroundColor: MEASURE_INK, fontFamily: font(700), fontSize: 13, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 10, overflow: 'hidden' },
+  obstacle: {
+    color: Colors.text, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, fontFamily: font(700), fontSize: 12,
+    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 9, overflow: 'hidden',
+  },
+  obstacleDot: { width: 10, height: 10, borderRadius: 5, marginTop: 3, borderWidth: 2, borderColor: Colors.background },
   foundDot: { width: 10, height: 10, borderRadius: 5, marginTop: 4, backgroundColor: MEASURE_INK, borderWidth: 2, borderColor: Colors.background },
 });

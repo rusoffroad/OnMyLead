@@ -4,7 +4,7 @@ summary: The bell on the Rides tab lists the notifications OnMyLead sent you in 
 category: account
 order: 25
 release: "1.0.4"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/inbox.tsx
   - app/src/components/inbox-bell.tsx

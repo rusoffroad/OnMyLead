@@ -4,7 +4,7 @@ summary: On an iPad or Android tablet the map fills the screen, with the riders,
 category: getting-started
 order: 40
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/core/layout.ts
   - app/src/hooks/use-layout.ts
@@ -35,7 +35,13 @@ You can also run OnMyLead next to another app (Split View or Slide Over on an iP
 
 On a tablet, **Rides**, **Find**, **Groups** and **You** run down the left edge of the screen instead of along the bottom.
 
+:::until 2.0
 On **Rides**, with the tablet sideways, **Create a Ride**, **Join a Ride** and **Find a Ride** stay on the left and your rides are listed beside them.
+:::
+
+:::release 2.0
+On **Rides**, with the tablet sideways, **Join a Ride**, **Create a Ride**, **Find a Ride**, **Map Mode**, your toolkit and help stay on the left, and your rides, group, public rides, feed and badges are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
+:::
 
 ## Ride Mode on a Tablet
 
@@ -47,7 +53,7 @@ The live map fills the screen.
 - The ride name, your sharing timer and any announcement stay at the top of the left side.
 
 :::release 1.0.4
-Tap **✎ Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
+Tap **Message** at the top of the buttons panel to type a message to the group. It opens as a card in the middle of the screen.
 :::
 
 :::release 1.0.3

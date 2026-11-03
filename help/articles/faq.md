@@ -4,7 +4,7 @@ summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, 
 category: troubleshooting
 order: 20
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - supabase/migrations/20261018000000_pro_entitlements.sql
   - app/src/core/pro.ts
@@ -87,6 +87,12 @@ Only when you stop it. Sharing with chosen riders or a family link set to **Unti
 ## Does Live Tracking Work With No Cell Service?
 
 No. Positions only update when a phone has a connection. [Offline maps](/help/offline-maps) keep the map and route on your screen, and riders without service show where they were last seen.
+
+:::release 2.0
+## Why Does the App Ask Me to Agree to a Safety Agreement?
+
+Riding is risky, and OnMyLead can't keep you safe on its own. Before you use the app, you agree that you ride at your own risk, won't use your phone while moving, and only ride where it's allowed. You're asked once, and again only if the agreement changes. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement).
+:::
 
 ## Can I Use OnMyLead on an iPad or Android Phone?
 

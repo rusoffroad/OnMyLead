@@ -316,7 +316,7 @@ export default function RouteBuilder() {
         onClose={() => setPicking(false)}
         onPick={(t) => {
           setPicking(false);
-          // A trail from Navigation Mode comes in like an imported track: followed as recorded.
+          // A trail from Map Mode comes in like an imported track: followed as recorded.
           setImported(trailAsRoute(trailLine(t), t.details.name || null));
           draft.clear();
         }}
