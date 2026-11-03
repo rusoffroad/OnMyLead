@@ -143,7 +143,7 @@ function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
     <View style={[styles.honor, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${h.name}${fresh ? ', new' : ''}. ${h.what}.`}>
       <BadgePatch badge={h.key} level={1} size={88} />
       <View style={{ flex: 1, gap: 4 }}>
-        <View style={styles.titleRow}>
+        <View style={[styles.titleRow, { alignItems: 'flex-start' }]}>
           <Text style={styles.honorName}>{h.name}</Text>
           {fresh ? <Text style={[styles.fresh, { backgroundColor: AMBASSADOR_COLORS.arrow, color: '#FFFFFF' }]}>New</Text> : null}
         </View>
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   name: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 24, lineHeight: 28, flexShrink: 1 },
   fresh: {
-    color: Colors.background, backgroundColor: PATCH_COLORS[3].cloth, fontFamily: font(700), fontSize: 12,
+    flexShrink: 0, color: Colors.background, backgroundColor: PATCH_COLORS[3].cloth, fontFamily: font(700), fontSize: 12,
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill, overflow: 'hidden',
   },
   level: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
