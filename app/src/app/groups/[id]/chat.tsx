@@ -249,7 +249,7 @@ export default function GroupChat() {
                           accessibilityRole="button"
                           onPress={() => {
                             setMenuFor(null);
-                            setReporting({ kind: 'rider', userId: m.user_id, rideId: m.ride_id, name: nameOf(m.user_id) });
+                            setReporting({ kind: 'rider', userId: m.user_id, rideId: m.ride_id, name: nameOf(m.user_id), source: 'group_chat', groupId: id });
                           }}
                           style={styles.smallBtn}>
                           <Text style={styles.smallBtnText}>Report Rider</Text>

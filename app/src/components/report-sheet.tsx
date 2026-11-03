@@ -8,17 +8,22 @@ import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Field } from '@/components/ui';
 import { Colors, font, Spacing } from '@/constants/theme';
+import type { ReportSource } from '@/core/moderation';
 import { REPORT_REASONS } from '@/core/pro';
 import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { sendReport } from '@/lib/pro';
 
+// source: where the report was sent from, so the Admin Dashboard can say (2.0).
 type Target =
-  | { kind: 'ride'; rideId: string; name: string }
+  | { kind: 'ride'; rideId: string; name: string; source?: ReportSource }
   // context: added to the report for the owner, such as the direct message being reported.
-  | { kind: 'rider'; userId: string; rideId?: string | null; name: string; context?: string };
+  // groupId: the riding group chat it was sent from, so that chat is saved with the report first.
+  | { kind: 'rider'; userId: string; rideId?: string | null; name: string; context?: string; source?: ReportSource; groupId?: string | null };
 
 /**
- * Report Ride / Report Rider: a reason, an optional note, and it goes to the OnMyLead owner.
+ * Report Ride / Report Rider: a reason, an optional note, and it goes to the OnMyLead owner,
+ * who gets an email. For a rider, the messages between the two riders are saved with the report
+ * on the server so the owner can read what was said (migration 20261102800000_abuse_reports.sql).
  * The person reported is never told who reported them. A rider can also be blocked from here,
  * instead of or after reporting them.
  */
@@ -52,6 +57,8 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
         kind: target.kind,
         rideId: target.rideId ?? null,
         userId: target.kind === 'rider' ? target.userId : null,
+        groupId: target.kind === 'rider' ? target.groupId ?? null : null,
+        source: target.source ?? null,
         reason,
         details: [details.trim(), target.kind === 'rider' ? target.context?.trim() : ''].filter(Boolean).join('\n\n'),
       });
@@ -101,6 +108,14 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               </ThemedText>
               <Choice label="What’s Wrong" options={reasons.map((r) => ({ value: r as string | null, label: r }))} value={reason} onChange={setReason} />
               <Field label="Anything Else (Optional)" value={details} onChangeText={setDetails} multiline maxLength={1000} placeholder="What happened, and when" />
+              {rider ? (
+                <View style={styles.notice}>
+                  <Icon name="chat" size={20} color={Colors.sky} />
+                  <ThemedText type="small" style={{ flex: 1 }}>
+                    Your messages with {rider.name} are attached, so the OnMyLead team can read what was said. Nobody else sees them.
+                  </ThemedText>
+                </View>
+              ) : null}
               <ErrorText error={error} />
               <Button title="Send Report" big loading={busy} disabled={!reason} onPress={send} style={{ backgroundColor: Colors.danger }} />
               {canBlock ? (
@@ -129,6 +144,10 @@ const styles = StyleSheet.create({
   sheet: {
     flexShrink: 1, backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
+  },
+  notice: {
+    flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-start', backgroundColor: Colors.background,
+    borderWidth: 1, borderColor: Colors.border, borderRadius: 14, padding: Spacing.three,
   },
   grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, marginBottom: Spacing.one },
   title: { flex: 1, color: Colors.text, fontFamily: font(800, 'display'), fontSize: 28, lineHeight: 30 },

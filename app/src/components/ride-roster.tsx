@@ -236,7 +236,7 @@ export function RideRoster({
                       color={Colors.textSecondary}
                       title="Report Rider"
                       caption="Tell the OnMyLead team about a problem. They aren’t told it was you."
-                      onPress={() => setReporting({ kind: 'rider', userId: m.user_id, rideId: ride.id, name: nameOf(m.user_id) })}
+                      onPress={() => setReporting({ kind: 'rider', userId: m.user_id, rideId: ride.id, name: nameOf(m.user_id), source: 'roster' })}
                     />
                   ) : null}
                   {me && m.user_id !== me && !blocks.off ? (

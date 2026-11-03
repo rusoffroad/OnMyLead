@@ -142,7 +142,7 @@ export function localToday(now: Date = new Date()): string {
 
 export const REPORT_REASONS = {
   ride: ['Unsafe Plan', 'Spam or Scam', 'Offensive Content', 'Something Else'],
-  rider: ['Harassment', 'Unsafe Riding', 'Spam or Scam', 'Fake Account', 'Inappropriate Photo', 'Something Else'],
+  rider: ['Harassment', 'Threats', 'Unsafe Riding', 'Spam or Scam', 'Fake Account', 'Inappropriate Photo', 'Something Else'],
 } as const;
 
 /** Apple's standard licence agreement serves as the Terms of Use for subscriptions. */

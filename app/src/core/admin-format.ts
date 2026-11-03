@@ -97,6 +97,7 @@ export function bucketFor(range: DateRange): 'day' | 'week' | 'month' {
 export function actionLabel(action: string): string {
   const known: Record<string, string> = {
     'user.suspend': 'Suspended Account',
+    'user.ban': 'Banned Account',
     'user.reactivate': 'Reactivated Account',
     'user.delete': 'Deleted Account',
     'user.delete_failed': 'Account Deletion Failed',
@@ -109,6 +110,7 @@ export function actionLabel(action: string): string {
     'report.resolved': 'Resolved Report',
     'report.dismissed': 'Dismissed Report',
     'report.open': 'Reopened Report',
+    'report.view': 'Opened Reported Conversation',
     'feature_plan.set': 'Changed Feature Access',
     'trial.extend': 'Extended Trial',
     'pro.comp_grant': 'Granted Complimentary Pro',

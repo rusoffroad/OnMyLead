@@ -58,6 +58,10 @@
       {
         "kind": "fixed",
         "text": "Your ride summary, ride card and Mile Eater badge now count only the miles you actually rode. A phone with a rough location, GPS jumps, points left over from an earlier ride, or time with location off could add miles that weren't ridden: one short test ride showed about 60 miles. Those are now left out."
+      },
+      {
+        "kind": "new",
+        "text": "Report a Rider from the You tab. Pick anyone you've messaged, ridden with, added as a friend or blocked, and report them for harassment, threats or anything else. Your messages with them are saved with the report so the OnMyLead team can read what was said, and riders who break the rules can be suspended or banned. They're never told who reported them."
       }
     ]
   },

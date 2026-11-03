@@ -4,7 +4,7 @@ summary: Sign in with Apple, Google or Facebook, an email and password, or an em
 category: account
 order: 10
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
   - app/src/app/sign-in.tsx
   - app/src/app/reset-password.tsx

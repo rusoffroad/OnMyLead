@@ -134,7 +134,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   "tickets", group links (`/g/[code]`), invite a group to a ride, leave / delete **[Pro]** to
   create.
 - Follow leaders and see their upcoming rides.
-- Blocked riders list; report rider or ride.
+- Blocked riders list; report rider or ride; You > Report a Rider (2.0) for anyone you messaged, friended, rode with or blocked.
 
 ### Garage, Trips and Extras
 - Garage: machines with photo, VIN decode, specs, fuel range (full, safe turnaround, safe trip),
@@ -172,7 +172,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Overview, Signups and Downloads (real riders without test and admin accounts, marking test
   accounts, App Store and Google Play downloads), Store Reviews (both stores' ratings and reviews,
   replies posted to the store), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
-  Subscriptions, Promo Codes (App Store Connect offer codes), Reports, Analytics, App Health
+  Subscriptions, Promo Codes (App Store Connect offer codes), Reports (2.0: report page with the saved conversation, suspend 1/7/30/90 days or ban), Analytics, App Health
   (Sentry, push tokens by iPhone / Android, server checks), Exports, Settings (trial days, feature
   plans, flags, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
   the App Store phased release, minimum and latest app version, a notice for chosen versions;

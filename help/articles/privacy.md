@@ -4,8 +4,9 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-02
+updated: 2026-11-03
 sources:
+  - supabase/migrations/20261102800000_abuse_reports.sql
   - app/src/app/privacy.tsx
   - app/src/app/r/[code].tsx
   - app/src/core/geo.ts
@@ -79,6 +80,12 @@ Anyone with your family link can see your last location until that share ends. S
 ## Friends
 
 Only you and the other rider can see that you're friends, or that one of you sent a request. Nobody can search for riders by name: a rider can only send you a request if they've ridden with you, share a riding group with you, can see you in Out Riding, have messaged with you, or have your friend link. Being friends never shares your location. See [Add Friends](/help/friends).
+:::
+
+:::release 2.0
+## Reports
+
+The OnMyLead team can't read your direct messages or chats. The one exception is a report: when a rider reports another rider, their messages with that rider (direct messages, and what either of them wrote in the last 30 days in a group or ride chat they share) are saved with the report so the team can look into it. Only the OnMyLead team can read them, and every time they're opened it's logged. See [Report or Block a Rider](/help/report-and-block).
 :::
 
 ## Blocked Riders
