@@ -5,7 +5,7 @@ export default function Privacy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="November 2, 2026"
+      updated="November 3, 2026"
       intro={`OnMyLead is made by ${COMPANY}. This page explains what the app and onmylead.com collect, why, and the choices you have. The short version: your location is never public, you choose who sees it, and sharing always ends.`}
       sections={[
         {
@@ -24,6 +24,7 @@ export default function Privacy() {
             'What you add: rides, routes, waypoints, Garage machines and photos, trip checklists, Starlink setup, riding groups, ride chat messages and poll votes. Waypoints you drop are only yours unless the ride’s leader shares them with the riders on that ride.',
             'Device and app: a push notification token and your notification settings, crash reports (through Sentry) and basic usage events, such as a ride being created, so we can fix problems and improve the app. Crash reports never include your location.',
             'Purchases: if you buy Pro, Apple sends us the subscription’s status and transaction details. We never see your card or payment details.',
+            'Safety agreement: when you agree to the Rider Safety and Liability Agreement, we save a record of it: your account, email address and ride name, which version you agreed to and a fingerprint of its exact text, the time, the app version, the kind of device and its system version, language, IP address and browser. It is never shown to other riders.',
             'Website: onmylead.com uses Cloudflare Web Analytics, which counts visits without cookies.',
             'Music Controls: to show what’s playing and let you pause, skip and change the volume, the app reads the current song, artist and music app on your phone. It never leaves your phone. On Android, the optional Notification Access you can allow for this is used only to see what’s playing; the app never reads or keeps your notifications.',
           ],
@@ -40,7 +41,7 @@ export default function Privacy() {
           title: 'Your Choices',
           body: [
             'You can stop sharing your location at any time, change notification settings in Profile, and turn off location or notifications in your phone’s settings.',
-            'You can delete your account from You > Delete Account. Your account, the rides you organize, your Garage, trips, groups and location history are deleted right away.',
+            'You can delete your account from You > Delete Account. Your account, the rides you organize, your Garage, trips, groups and location history are deleted right away. We keep the record of your safety agreement, because it is a legal record of what you agreed to.',
             `Email ${SUPPORT_EMAIL} to ask for a copy of your data or to ask any privacy question.`,
           ],
         },
