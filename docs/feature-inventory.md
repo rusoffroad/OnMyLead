@@ -140,6 +140,14 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   Feed with Customize (`home_feed`, `rider_feed_settings`) **[flag home_feed]**, Your Badges, Your
   Toolkit, Help & Support. Two columns at Expanded width.
 
+### Badge Leaderboard (2.1)
+- `app/leaderboard.tsx` (your place, Everywhere / country / state filters, the board, Show Me on the
+  Leaderboard; TwoPane on tablets) and `app/leaderboard-area.tsx` (Where You Ride: country search,
+  state or province for US / CA / MX / AU, Use My Location on the apps). Rules in
+  `core/leaderboard.ts` and `core/areas.ts`; server `badge_leaderboard`, `badge_leaderboard_areas`,
+  `my_leaderboard_settings`, `set_leaderboard_settings` (migration 20261104050000). Opened from
+  Badges and Home's Your Badges.
+
 ### Social (2.0)
 - `app/social/index.tsx` (Activity / Friends / My Posts; TwoPane on tablets), `social/item.tsx` (one
   item with likers and every comment), `social/rider/[id].tsx` (profile, PRO tag, stats, timeline),

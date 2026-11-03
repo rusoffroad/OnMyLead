@@ -18,8 +18,8 @@ sources:
   - app/src/components/rider-list.tsx
   - app/src/components/ride-roster.tsx
   - supabase/migrations/20261101500000_rider_badges.sql
-related: [ride-name-and-profile, leader-sweep-and-tail-gunner, ride-summary-and-ride-again, notification-settings]
-keywords: [badges, brand ambassador, ambassador, founder, rank, ranking, achievements, levels, trail boss, tail gunner, crew rider, mile eater, trailblazer, mapmaker, trail scout, expert leader, legend]
+related: [badge-leaderboard, ride-name-and-profile, leader-sweep-and-tail-gunner, ride-summary-and-ride-again, notification-settings]
+keywords: [badges, leaderboard, brand ambassador, ambassador, founder, rank, ranking, achievements, levels, trail boss, tail gunner, crew rider, mile eater, trailblazer, mapmaker, trail scout, expert leader, legend]
 ---
 
 Badges show what you have done on OnMyLead. Each badge has three levels, **Bronze**, **Silver** and **Gold**, and the levels you earn add up to your rank.
@@ -98,3 +98,9 @@ You get a notification, for example **New Badge: Trail Boss Silver**. Tap it to 
 ## Other Riders' Badges
 
 Each rider's top badge shows as a small patch beside their name in the ride's **Going** list, the **Riders** list in **Ride Mode** and the riders list beside the map on a tablet. Other riders see your badges and rank level, never your exact ride count or miles.
+
+:::release 2.1
+## The Leaderboard
+
+See how your badge levels compare with other riders, everywhere or in your country and state, from **Leaderboard** on **Badges**. See [See the Badge Leaderboard](/help/badge-leaderboard).
+:::
