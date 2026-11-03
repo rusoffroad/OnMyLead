@@ -51,7 +51,10 @@
       "route-builder",
       "subscribe-to-pro",
       "trip-planner",
-      "waypoints-and-planned-stops"
+      "waypoints-and-planned-stops",
+      "garage",
+      "profile-picture",
+      "qr-codes"
     ],
     "kind": "update",
     "by": "pr",
