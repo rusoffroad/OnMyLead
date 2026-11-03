@@ -92,12 +92,14 @@ export function NavMap({
     },
   }));
 
-  // Open on the rider the first time their location is known.
+  // Open on the rider the first time their location is known, at riding zoom. Android's map drops
+  // camera moves sent before it is ready (it stayed zoomed out on the whole state), so wait for it.
+  const [ready, setReady] = useState(false);
   useEffect(() => {
-    if (!center || centered.current) return;
+    if (!center || !ready || centered.current) return;
     centered.current = true;
     map.current?.animateToRegion({ latitude: center.lat, longitude: center.lng, latitudeDelta: 0.04, longitudeDelta: 0.04 }, 1);
-  }, [center]);
+  }, [center, ready]);
 
   // Follow-me camera: slide the map (same zoom and heading) so the rider stays in the open part of
   // the map between the panels. Moves under a couple of meters are GPS jitter and skipped.
@@ -145,6 +147,7 @@ export function NavMap({
       onUserLocationChange={own.onUserLocationChange}
       userLocationUpdateInterval={1000}
       userLocationFastestInterval={1000}
+      onMapReady={() => setReady(true)}
       showsCompass
       showsScale
       tintColor={Colors.text}

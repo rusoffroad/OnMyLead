@@ -30,6 +30,9 @@ import {
 } from '@/core/nav-trails';
 import { newObstacleId, nextName, type Obstacle, type ObstacleKind } from '@/core/obstacles';
 import { dayLines, TRACK_DAY_COLORS, TRACK_LINE_SWITCH_KEY } from '@/core/track-line';
+import {
+  addTripFix, dashHeading, EMPTY_TRIP, headingReadout, movingReadout, parseTrip, TRIP_STORAGE_KEY, type TripMeter,
+} from '@/core/trip-meter';
 import type { Place } from '@/core/places';
 import { cumulativeM, lineLengthM } from '@/core/route';
 import { useFullMap } from '@/hooks/use-full-map';
@@ -98,21 +101,75 @@ export default function NavMode() {
   const [altitude, setAltitude] = useState<number | null>(null);
   const [noLocation, setNoLocation] = useState(false);
   const fixListener = useRef<(l: Location.LocationObject) => void>(() => {});
+  // The phone's compass, for the Heading readout while standing still (phones only).
+  const [compass, setCompass] = useState<number | null>(null);
+  // Trip meter: miles and moving time while Map Mode is open, kept on this phone until reset.
+  const [trip, setTripState] = useState<TripMeter>(EMPTY_TRIP);
+  const tripRef = useRef<TripMeter>(EMPTY_TRIP);
+  const tripSaved = useRef(0);
+  const saveTrip = useCallback((t: TripMeter) => {
+    tripSaved.current = t.distanceM;
+    AsyncStorage.setItem(TRIP_STORAGE_KEY, JSON.stringify({ distanceM: Math.round(t.distanceM), movingS: Math.round(t.movingS) })).catch(() => {});
+  }, []);
+  const setTrip = useCallback((t: TripMeter) => {
+    tripRef.current = t;
+    setTripState(t);
+  }, []);
+  const resetTrip = useCallback(() => {
+    if (Platform.OS !== 'web') Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    const fresh = { ...EMPTY_TRIP, last: tripRef.current.last };
+    setTrip(fresh);
+    saveTrip(fresh);
+  }, [saveTrip, setTrip]);
 
   useFocusEffect(
     useCallback(() => {
       let sub: Location.LocationSubscription | null = null;
+      let headingSub: Location.LocationSubscription | null = null;
       let gone = false;
+      AsyncStorage.getItem(TRIP_STORAGE_KEY)
+        .then((raw) => {
+          if (gone || !raw) return;
+          const t = parseTrip(JSON.parse(raw));
+          // A fix may already have landed: keep it as the anchor.
+          setTrip({ ...t, last: tripRef.current.last });
+          tripSaved.current = t.distanceM;
+        })
+        .catch(() => {});
       foregroundPermission({ get: () => Location.getForegroundPermissionsAsync(), request: () => Location.requestForegroundPermissionsAsync() })
         .then(async (p) => {
           if (gone) return;
           if (p.status !== 'granted') return setNoLocation(true);
           setNoLocation(false);
+          // Open on the rider straight away from the phone's last known spot, while GPS warms up.
+          Location.getLastKnownPositionAsync({ maxAge: 10 * 60_000 })
+            .then((l) => {
+              if (!gone && l) setMe((m) => m ?? { lat: l.coords.latitude, lng: l.coords.longitude });
+            })
+            .catch(() => {});
+          if (Platform.OS !== 'web') {
+            Location.watchHeadingAsync((h) => {
+              const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading;
+              if (!(deg >= 0)) return;
+              // Only a real turn re-draws the panel; the compass reports many times a second.
+              setCompass((c) => (c != null && Math.abs(((deg - c + 540) % 360) - 180) < 3 ? c : Math.round(deg) % 360));
+            })
+              .then((s) => {
+                if (gone) s.remove();
+                else headingSub = s;
+              })
+              .catch(() => {});
+          }
           sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.BestForNavigation, distanceInterval: 3, timeInterval: 1000 }, (l) => {
             setMe({ lat: l.coords.latitude, lng: l.coords.longitude });
             setSpeed(l.coords.speed != null && l.coords.speed >= 0 ? l.coords.speed : null);
             setMeHeading(riderHeading({ speedMps: l.coords.speed, headingDeg: l.coords.heading }, true));
             setAltitude(l.coords.altitude ?? null);
+            const t = addTripFix(tripRef.current, { lat: l.coords.latitude, lng: l.coords.longitude, accuracy: l.coords.accuracy ?? null, speedMps: l.coords.speed, timestamp: l.timestamp });
+            if (t !== tripRef.current) {
+              setTrip(t);
+              if (t.distanceM - tripSaved.current >= 50) saveTrip(t);
+            }
             fixListener.current(l);
           });
           if (gone) sub.remove();
@@ -123,9 +180,13 @@ export default function NavMode() {
       return () => {
         gone = true;
         sub?.remove();
+        headingSub?.remove();
+        saveTrip(tripRef.current);
+        // The next visit starts a fresh step from wherever the rider is then.
+        tripRef.current = { ...tripRef.current, last: null };
         flushTrackLine();
       };
-    }, []),
+    }, [saveTrip, setTrip]),
   );
 
   // --- Recording ----------------------------------------------------------------
@@ -556,6 +617,9 @@ export default function NavMode() {
               progress={progress}
               speed={speed}
               altitude={altitude}
+              heading={dashHeading(meHeading, compass)}
+              trip={trip}
+              onResetTrip={resetTrip}
               noLocation={noLocation}
               rateable={rateable}
               onRate={() => followed?.publicTrail && trail.pick(followed.publicTrail)}
@@ -655,12 +719,12 @@ function ModeTabs({ mode, onChange, recording }: { mode: Mode; onChange: (m: Mod
 }
 
 /** One big number with its unit and a small label, like a gauge on a dash. */
-function Gauge({ value, unit, label, big }: { value: string; unit?: string; label: string; big?: boolean }) {
+function Gauge({ value, unit, label, big, small, inCell }: { value: string; unit?: string; label: string; big?: boolean; small?: boolean; inCell?: boolean }) {
   return (
-    <View style={styles.gauge} accessible accessibilityLabel={`${label} ${value} ${unit ?? ''}`}>
-      <Text style={[styles.gaugeValue, big && styles.gaugeBig]} numberOfLines={1} adjustsFontSizeToFit>
+    <View style={[styles.gauge, small && !inCell && styles.dashCell]} accessible accessibilityLabel={`${label} ${value} ${unit ?? ''}`}>
+      <Text style={[styles.gaugeValue, big && styles.gaugeBig, small && styles.gaugeSmall]} numberOfLines={1} adjustsFontSizeToFit>
         {value}
-        {unit ? <Text style={styles.gaugeUnit}> {unit}</Text> : null}
+        {unit ? <Text style={[styles.gaugeUnit, small && styles.gaugeUnitSmall]}> {unit}</Text> : null}
       </Text>
       <Text style={styles.gaugeLabel}>{label}</Text>
     </View>
@@ -668,13 +732,16 @@ function Gauge({ value, unit, label, big }: { value: string; unit?: string; labe
 }
 
 function ExplorePanel({
-  open, followed, progress, speed, altitude, noLocation, rateable, onRate, onStop, onMyTrails, trackOn, onTrack, onClearTrack, hasTrack,
+  open, followed, progress, speed, altitude, heading, trip, onResetTrip, noLocation, rateable, onRate, onStop, onMyTrails, trackOn, onTrack, onClearTrack, hasTrack,
 }: {
   open: boolean;
   followed: Followed | null;
   progress: ReturnType<typeof followProgress>;
   speed: number | null;
   altitude: number | null;
+  heading: number | null;
+  trip: TripMeter;
+  onResetTrip: () => void;
   noLocation: boolean;
   rateable: boolean;
   onRate: () => void;
@@ -687,6 +754,10 @@ function ExplorePanel({
 }) {
   const mph = speed != null ? String(Math.round(speed * MPS_TO_MPH)) : '–';
   const elev = altitude != null ? feet(altitude)!.replace(' ft', '') : '–';
+  const [hdg, deg] = headingReadout(heading);
+  const [tripV, tripU] = feetOrMiles(trip.distanceM).split(' ');
+  const [movV, movU] = movingReadout(trip.movingS);
+  const following = !!(followed && progress);
   return (
     <>
       {followed ? (
@@ -710,8 +781,23 @@ function ExplorePanel({
         ) : (
           <Gauge big value={mph} unit="mph" label="Speed" />
         )}
-        <Gauge value={elev} unit="ft" label="Elevation" />
-        {followed && progress ? <Gauge value={mph} unit="mph" label="Speed" /> : null}
+        {/* The dash: a 2 by 2 grid filling the rest of the row. */}
+        <View style={styles.dash}>
+          {following ? <Gauge small value={mph} unit="mph" label="Speed" /> : <Gauge small value={elev} unit="ft" label="Elevation" />}
+          {following ? <Gauge small value={elev} unit="ft" label="Elevation" /> : <Gauge small value={hdg} unit={deg} label="Heading" />}
+          <Pressable
+            onLongPress={onResetTrip}
+            delayLongPress={600}
+            accessibilityRole="button"
+            accessibilityLabel={`Trip ${tripV} ${tripU}`}
+            accessibilityHint="Press and hold to reset the trip"
+            accessibilityActions={[{ name: 'longpress', label: 'Reset Trip' }]}
+            onAccessibilityAction={(e) => e.nativeEvent.actionName === 'longpress' && onResetTrip()}
+            style={styles.dashCell}>
+            <Gauge small inCell value={tripV} unit={tripU} label="Trip" />
+          </Pressable>
+          {following ? <Gauge small value={hdg} unit={deg} label="Heading" /> : <Gauge small value={movV} unit={movU} label="Moving" />}
+        </View>
       </View>
       {open ? (
         noLocation ? (
@@ -942,6 +1028,10 @@ const styles = themedStyles(() => ({
   gauge: { flexShrink: 1, gap: 0 },
   gaugeValue: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 34 },
   gaugeBig: { fontSize: 52, lineHeight: 54 },
+  gaugeSmall: { fontSize: 22, lineHeight: 26 },
+  gaugeUnitSmall: { fontSize: 14 },
+  dash: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', rowGap: 6, columnGap: 12, paddingLeft: 16, borderLeftWidth: 1, borderLeftColor: Glass.edge, alignSelf: 'stretch', alignContent: 'center' },
+  dashCell: { width: '45%', flexGrow: 1 },
   gaugeUnit: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 20 },
   gaugeLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   follow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 12, borderLeftWidth: 3, borderLeftColor: Colors.accent },
