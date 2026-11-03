@@ -71,11 +71,16 @@ export function RiderAgreementGate() {
               accessibilityRole="checkbox"
               accessibilityState={{ checked }}
               accessibilityLabel={a.checkbox}
+              hitSlop={8}
               style={({ pressed }) => [styles.check, pressed && { opacity: 0.8 }]}>
-              <View style={[styles.box, checked && styles.boxOn]}>
-                {checked ? <Icon name="check" size={20} color="#fff" /> : null}
+              {/* The whole row is the checkbox: the box and the words never take the touch
+                  themselves (on iPhone a Text inside a Pressable can swallow a tap). */}
+              <View pointerEvents="none" style={styles.checkInner}>
+                <View style={[styles.box, checked && styles.boxOn]}>
+                  {checked ? <Icon name="check" size={20} color="#fff" /> : null}
+                </View>
+                <ThemedText style={styles.checkText} suppressHighlighting accessible={false}>{a.checkbox}</ThemedText>
               </View>
-              <ThemedText style={styles.checkText}>{a.checkbox}</ThemedText>
             </Pressable>
             <Button title="I Agree" big disabled={!checked} onPress={acceptRiderAgreement} style={{ alignSelf: 'stretch' }} />
             <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
@@ -109,7 +114,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four, paddingTop: Spacing.three, paddingBottom: Spacing.three, gap: Spacing.two,
     borderTopWidth: 1, borderTopColor: Colors.backgroundElement, backgroundColor: Colors.background,
   },
-  check: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two, paddingVertical: 4 },
+  check: { paddingVertical: 6, borderRadius: 10 },
+  checkInner: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
   box: { width: 30, height: 30, borderRadius: 8, borderWidth: 2, borderColor: Colors.textSecondary, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   boxOn: { backgroundColor: Colors.accent, borderColor: Colors.accent },
   checkText: { flex: 1, fontFamily: font(600), fontSize: 16, lineHeight: 22, color: Colors.text },
