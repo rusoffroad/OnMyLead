@@ -17,7 +17,7 @@ const PHOTO = require('../../assets/images/starlink-mini-mount-v2.webp');
 /**
  * A clearly labelled ad for the RUS Starlink Mini Mount V2 (Morelock Series) on the Starlink page.
  * The name, copy and photo are fixed here; only the price comes from the live store, so store
- * wording never shows. Without the store it still shows (no price) and links to the product page. The owner
+ * wording never shows. Without the store it still shows (with the $249 set here) and links to the product page. The owner
  * can switch it off on the Admin Dashboard (Starlink Mount Ad).
  */
 export function StarlinkMountAd() {
@@ -36,7 +36,7 @@ export function StarlinkMountAd() {
 
   if (!on) return null;
 
-  const price = formatPrice(product?.priceCents ?? null);
+  const price = formatPrice(product?.priceCents ?? STARLINK_MOUNT.priceCents);
   const size = wide ? 160 : 112;
   return (
     <Card>
