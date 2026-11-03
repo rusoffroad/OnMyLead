@@ -2,6 +2,17 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "voice",
+      "ride-bubble"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "natural-voice",
+    "why": "Chris asked for spoken alerts that don't sound like a robot. Ride Mode now reads alerts in the most natural voice on the phone (Premium or Enhanced, never a voice that needs service), and You > Voice lets riders hear and pick one. New article; Ride Bubble links to it."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",
