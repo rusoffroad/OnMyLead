@@ -11,7 +11,8 @@ import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import { withoutBlocked } from '@/core/blocks';
 import { checkMessage, MAX_MESSAGE_LENGTH } from '@/core/chat';
 import {
@@ -27,7 +28,7 @@ import { useSession } from '@/lib/session';
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
 /** Ride tickets carry the ride's moment in one colour: green riding now, blue coming up, grey over. */
-const PHASE_COLOR: Record<RidePhase, string> = { live: RideColors.green, upcoming: Colors.sky, over: RideColors.unknown };
+const PHASE_COLOR: Record<RidePhase, string> = { get live() { return RideColors.green; }, get upcoming() { return Colors.sky; }, get over() { return RideColors.unknown; } };
 
 /** First things a group usually says, for an empty chat. */
 const STARTERS = ['Who’s in this weekend?', 'Anyone need a spot on a trailer?', 'Post your photos from the last ride'];
@@ -182,7 +183,7 @@ export default function GroupChat() {
           style={{ flex: 1 }}
           contentContainerStyle={styles.thread}
           {...keyboardScroll}
-          indicatorStyle="white"
+          indicatorStyle={scrollIndicator()}
           onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
           {chat.off ? (
             <View style={styles.note}>
@@ -436,7 +437,7 @@ function RideTicket({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   page: { flex: 1, backgroundColor: Colors.background },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.two, paddingHorizontal: Spacing.three, paddingTop: Spacing.one, paddingBottom: 10,
@@ -470,7 +471,7 @@ const styles = StyleSheet.create({
   bubble: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 18 },
   bubbleMine: { backgroundColor: Colors.sky },
   bubbleTheirs: { backgroundColor: Colors.backgroundElement },
-  bubbleFailed: { backgroundColor: '#5A2230' },
+  bubbleFailed: { backgroundColor: withAlpha(Colors.danger, 0.35) },
   body: { color: Colors.text, fontFamily: font(500), fontSize: 17, lineHeight: 23 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 4 },
   time: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12 },
@@ -516,4 +517,4 @@ const styles = StyleSheet.create({
   ticketNotch: { position: 'absolute', right: -7, top: '50%', marginTop: -7, width: 14, height: 14, borderRadius: 7, backgroundColor: Colors.background },
   ticketName: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17, lineHeight: 20 },
   ticketWhen: { fontFamily: font(600), fontSize: 12 },
-});
+}));

@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll, TextBox } from '@/components/keyboard';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { charactersLeft, checkRideMessage, isBuiltInReply, RIDE_MESSAGE_MAX } from '@/core/ride-message';
 
 type Props = {
@@ -134,7 +134,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
   // On a tablet the sheet is a card in the middle of the screen, not a strip across the bottom.
   wrapTablet: { justifyContent: 'center', alignItems: 'center', padding: Spacing.four },
@@ -159,4 +159,4 @@ const styles = StyleSheet.create({
   keep: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 48 },
   box: { width: 28, height: 28, borderRadius: 8, borderWidth: 2, borderColor: Colors.textSecondary, alignItems: 'center', justifyContent: 'center' },
   boxOn: { backgroundColor: Colors.sky, borderColor: Colors.sky },
-});
+}));

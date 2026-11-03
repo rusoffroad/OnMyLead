@@ -1,12 +1,12 @@
 import { router, usePathname } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { RIDER_AGREEMENT, type RiderAgreement } from '@/core/rider-agreement';
 import { acceptRiderAgreement, useNeedsRiderAgreement } from '@/lib/rider-agreement';
 
@@ -47,7 +47,7 @@ export function RiderAgreementGate() {
         <View style={styles.column}>
           <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator>
             <View style={styles.badge}>
-              <Icon name="warning" size={34} color={Colors.text} strokeWidth={2.2} />
+              <Icon name="warning" size={34} color={Colors.onAccent} strokeWidth={2.2} />
             </View>
             <ThemedText style={styles.title} accessibilityRole="header">Before You Ride</ThemedText>
             <ThemedText style={styles.lead}>{a.summary}</ThemedText>
@@ -93,7 +93,7 @@ export function RiderAgreementGate() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   cover: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: Colors.background, zIndex: 999, elevation: 999 },
   // Phones and tablets alike: one readable column, never stretched across an iPad or Android tablet.
   column: { flex: 1, width: '100%', maxWidth: 620, alignSelf: 'center' },
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
   box: { width: 30, height: 30, borderRadius: 8, borderWidth: 2, borderColor: Colors.textSecondary, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   boxOn: { backgroundColor: Colors.accent, borderColor: Colors.accent },
   checkText: { flex: 1, fontFamily: font(600), fontSize: 16, lineHeight: 22, color: Colors.text },
-});
+}));

@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, DataTable, Empty, ErrorNote, Fields, Loading, Panel, planTone, StatGrid,
   ROLE, SocialContentCard, StatTile, StatusBadge, SuspendPanel, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { actionLabel, daysLeft, fmtAgo, fmtDate, fmtDateTime, fmtInt } from '@/core/admin-format';
 import { suspensionLabel } from '@/core/moderation';
 import * as admin from '@/lib/admin';
@@ -318,7 +318,7 @@ export default function UserDetail() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   banner: { flexDirection: 'row', alignItems: 'center', gap: 16, flexWrap: 'wrap', borderRadius: 14, borderWidth: 1, borderColor: `${AdminColors.amber}66`, backgroundColor: `${AdminColors.amber}14`, padding: 16 },
   bannerTitle: { fontFamily: font(700), fontSize: 15.5, color: AdminColors.text },
   bannerText: { fontFamily: font(500), fontSize: 14.5, color: AdminColors.dim },
@@ -339,4 +339,4 @@ const styles = StyleSheet.create({
   audit: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, paddingVertical: 8, borderTopWidth: 1, borderTopColor: AdminColors.line },
   auditAction: { fontFamily: font(600), fontSize: 14.5, color: AdminColors.text },
   auditAt: { fontFamily: font(500), fontSize: 13.5, color: AdminColors.dim },
-});
+}));

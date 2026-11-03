@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { appVersion, openStore, useUpdateState } from '@/lib/app-update';
 
 // "Not Now" lasts until the app is closed and opened again.
@@ -53,7 +53,7 @@ export function UpdateRequired() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   cover: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: Colors.background, zIndex: 1000, elevation: 1000 },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: Spacing.four },
   // Phones and tablets alike: a centred column, never stretched across an iPad or Android tablet.
@@ -61,4 +61,4 @@ const styles = StyleSheet.create({
   badge: { width: 76, height: 76, borderRadius: 38, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: font(800, 'display'), fontSize: 32, lineHeight: 36, color: Colors.text, textAlign: 'center' },
   text: { fontFamily: font(500), fontSize: 17, lineHeight: 24, color: Colors.text, textAlign: 'center' },
-});
+}));

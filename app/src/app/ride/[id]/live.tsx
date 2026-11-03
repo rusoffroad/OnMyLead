@@ -4,9 +4,7 @@ import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
@@ -30,13 +28,14 @@ import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Glass, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
 import { BATTERY_PLANS, batteryBannerTag } from '@/core/battery';
 import { tally } from '@/core/broadcast';
+import { withAlpha } from '@/core/color';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
@@ -1113,7 +1112,7 @@ export default function RideMode() {
               {offlineSince != null ? (
                 <Text style={styles.sidebarNote}>You have no service. Times are from the last update you got.</Text>
               ) : null}
-              <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle="white">
+              <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle={scrollIndicator()}>
                 <RiderRows
                   riders={mapRiders}
                   meId={me}
@@ -1539,7 +1538,7 @@ function AlertChip({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: 6 },
   topRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 20, paddingLeft: 8, paddingRight: 10, paddingVertical: 7,
@@ -1552,7 +1551,7 @@ const styles = StyleSheet.create({
   topSub: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12, flexShrink: 1 },
   groupChip: { paddingHorizontal: 10, minHeight: 30, borderRadius: 15, justifyContent: 'center', borderWidth: 1 },
   groupChipRed: { backgroundColor: Glass.redTint, borderColor: Glass.redEdge },
-  groupChipGreen: { backgroundColor: 'rgba(60,195,107,0.10)', borderColor: 'rgba(60,195,107,0.4)' },
+  groupChipGreen: { backgroundColor: withAlpha(RideColors.green, 0.1), borderColor: withAlpha(RideColors.green, 0.4) },
   groupChipText: { fontFamily: font(700), fontSize: 13 },
   shareDot: { width: 7, height: 7, borderRadius: 4 },
   shareBanner: {
@@ -1670,4 +1669,4 @@ const styles = StyleSheet.create({
   sheet: { flexShrink: 1, backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
   sheetTitle: { color: Colors.text },
   sheetBody: { color: Colors.textSecondary },
-});
+}));

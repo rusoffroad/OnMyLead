@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FullMapBar } from '@/components/full-map';
@@ -12,7 +12,7 @@ import { Button, ErrorText } from '@/components/ui';
 import { WaypointMap } from '@/components/waypoint-map';
 import { WaypointRow } from '@/components/waypoint-row';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { rideLeaderIds } from '@/core/chat';
 import { fullMapPadding } from '@/core/full-map';
 import type { LatLng } from '@/core/geo';
@@ -175,7 +175,7 @@ export default function RideWaypoints() {
           <>
             <Text style={styles.hint}>{hint}</Text>
             {wp.waypoints.length ? (
-              <ScrollView style={{ maxHeight: wide ? 420 : 220 }} indicatorStyle="white">
+              <ScrollView style={{ maxHeight: wide ? 420 : 220 }} indicatorStyle={scrollIndicator()}>
                 {wp.waypoints.map((w, i) => (
                   <WaypointRow key={w.id} waypoint={w} stop={stopNumber(w, wp.waypoints)} me={me} ownerName={nameOf} first={i === 0} onPress={() => setTarget({ type: 'view', waypoint: w })} />
                 ))}
@@ -213,14 +213,14 @@ export default function RideWaypoints() {
 
 const PANEL_W = 400;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
   panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1, borderColor: Colors.border },
   panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, zIndex: 30 },
   topRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10,
-    backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48,
+    backgroundColor: Glass.panel, borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48,
   },
   search: {
     flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12,
@@ -230,10 +230,10 @@ const styles = StyleSheet.create({
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   panel: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    backgroundColor: Glass.panel, borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
   panelInner: { padding: Spacing.three, paddingTop: 4, gap: 10 },
   offline: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   hint: { color: Colors.text, fontFamily: font(600), fontSize: 16, lineHeight: 22 },
   privacy: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, textAlign: 'center' },
-});
+}));

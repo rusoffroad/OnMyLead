@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Switch, Text, TextInput, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, ErrorNote, FilterChips, Loading, Panel, TrialSettings, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtDateTime } from '@/core/admin-format';
 import { APP_FLAG_KEYS, APP_FLAGS } from '@/core/app-settings';
 import * as admin from '@/lib/admin';
@@ -201,7 +201,7 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
             <Text style={styles.small}>{APP_FLAGS[k].hint}</Text>
           </View>
           <Text style={[styles.small, { color: flags[k] === false ? AdminColors.danger : AdminColors.dim }]}>{flags[k] === false ? 'Off' : 'On'}</Text>
-          <Switch value={flags[k] !== false} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor={AdminColors.text} {...({ activeThumbColor: AdminColors.text } as object)} accessibilityLabel={APP_FLAGS[k].label} />
+          <Switch value={flags[k] !== false} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={APP_FLAGS[k].label} />
         </View>
       ))}
       {keys.length ? <Text style={[styles.label, { paddingTop: 6 }]}>Other Flags</Text> : null}
@@ -209,7 +209,7 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
       {keys.map((k) => (
         <View key={k} style={styles.flag}>
           <Text style={[styles.label, { flex: 1 }]}>{k}</Text>
-          <Switch value={flags[k]} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor={AdminColors.text} {...({ activeThumbColor: AdminColors.text } as object)} accessibilityLabel={k} />
+          <Switch value={flags[k]} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={k} />
           <AdminButton title="Remove" kind="danger" small onPress={() => {
             const next = { ...flags };
             delete next[k];
@@ -226,7 +226,7 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   text: { fontFamily: font(500), fontSize: 14.5, lineHeight: 21, color: AdminColors.dim },
   small: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.faint },
   label: { fontFamily: font(700), fontSize: 15, color: AdminColors.text },
@@ -234,4 +234,4 @@ const styles = StyleSheet.create({
   num: { width: 80, textAlign: 'center', fontFamily: font(700), fontSize: 16, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingVertical: 6 },
   input: { fontFamily: font(500), fontSize: 15, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9 },
   flag: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6, borderTopWidth: 1, borderTopColor: AdminColors.line },
-});
+}));

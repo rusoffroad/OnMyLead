@@ -1,9 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import { router, type Href } from 'expo-router';
 import type { BottomTabBarProps } from 'expo-router/tabs';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { Icon, type IconName } from './icon';
 
 export type TabSpec = { name: string; title: string; icon: IconName; needsAccount?: boolean };
@@ -62,7 +62,7 @@ export function TabBar({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   bar: {
     flexDirection: 'row', backgroundColor: Colors.background, borderTopWidth: 1, borderTopColor: Colors.backgroundElement,
     paddingHorizontal: 8,
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 4, borderBottomRightRadius: 4, backgroundColor: 'transparent',
   },
   label: { fontFamily: font(700, 'display'), fontSize: 14, lineHeight: 16, letterSpacing: 0.3 },
-});
+}));

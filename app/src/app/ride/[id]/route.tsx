@@ -2,7 +2,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
@@ -14,7 +14,7 @@ import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { TrailPickerSheet } from '@/components/trail-picker-sheet';
 import { Button, ErrorText } from '@/components/ui';
 import Svg, { Path } from 'react-native-svg';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { fullMapPadding } from '@/core/full-map';
 import type { LatLng } from '@/core/geo';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
@@ -366,7 +366,7 @@ function ModeSwitch({ follow, onChange }: { follow: boolean; onChange: (on: bool
 
 const PANEL_W = 400;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
   panelFloating: { left: 12, right: 'auto', bottom: 12, width: PANEL_W, borderRadius: 24, borderWidth: 1, borderColor: Colors.border },
   panelWide: { top: 88, bottom: 'auto', left: 20, right: 'auto', width: PANEL_W, borderRadius: 24, boxShadow: '0 12px 40px rgba(0,0,0,0.5)' },
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, zIndex: 30 },
   topRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: 'rgba(10,22,38,0.9)', borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48,
+    backgroundColor: Glass.panel, borderRadius: Radius.control, paddingHorizontal: 14, minHeight: 48,
   },
   search: {
     flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, marginLeft: 10,
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   panel: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    backgroundColor: 'rgba(10,22,38,0.97)', borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    backgroundColor: Glass.panel, borderTopLeftRadius: 24, borderTopRightRadius: 24,
   },
   panelInner: { padding: Spacing.three, paddingTop: 4, gap: 10 },
   panelFolded: { gap: 4 },
@@ -409,4 +409,4 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: Spacing.two },
   flex: { flex: 1 },
   privacy: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, textAlign: 'center' },
-});
+}));

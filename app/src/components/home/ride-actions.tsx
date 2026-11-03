@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { JOIN_QUOTA, type Quota } from '@/core/home';
 import { Gradient, Home, Pill } from './parts';
 
@@ -132,7 +132,7 @@ function Tile({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   hero: { borderRadius: 28, padding: 22, overflow: 'hidden', gap: Spacing.three },
   heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
   heroTitle: { color: '#fff', fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 44 },
@@ -157,4 +157,4 @@ const styles = StyleSheet.create({
   tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 28 },
   tileDetail: { color: Home.muted, fontFamily: font(500), fontSize: 13, lineHeight: 17, minHeight: 34 },
   tilePill: { marginTop: 'auto', flexDirection: 'row' },
-});
+}));

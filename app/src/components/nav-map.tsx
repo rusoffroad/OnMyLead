@@ -2,7 +2,7 @@ import { useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } f
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, MapLabelText, themedStyles } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
 import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
@@ -223,7 +223,7 @@ export function NavMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pin: {
     minWidth: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
     backgroundColor: Colors.background, borderWidth: 2.5, borderColor: MEASURE_INK,
@@ -231,9 +231,9 @@ const styles = StyleSheet.create({
   pinText: { color: Colors.text, fontFamily: font(800), fontSize: 11 },
   found: { color: Colors.background, backgroundColor: MEASURE_INK, fontFamily: font(700), fontSize: 13, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 10, overflow: 'hidden' },
   obstacle: {
-    color: Colors.text, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, fontFamily: font(700), fontSize: 12,
+    color: MapLabelText, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, fontFamily: font(700), fontSize: 12,
     paddingHorizontal: 8, paddingVertical: 3, borderRadius: 9, overflow: 'hidden',
   },
   obstacleDot: { width: 10, height: 10, borderRadius: 5, marginTop: 3, borderWidth: 2, borderColor: Colors.background },
   foundDot: { width: 10, height: 10, borderRadius: 5, marginTop: 4, backgroundColor: MEASURE_INK, borderWidth: 2, borderColor: Colors.background },
-});
+}));

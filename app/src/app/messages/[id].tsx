@@ -10,7 +10,8 @@ import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import { checkMessage, MAX_MESSAGE_LENGTH } from '@/core/chat';
 import { dayLabel } from '@/core/group-chat';
 import { dmReportDetails, leftBeforeReply, NOT_SWITCHED_ON } from '@/core/out-riding';
@@ -175,7 +176,7 @@ export default function Conversation() {
             style={{ flex: 1 }}
             contentContainerStyle={styles.thread}
             {...keyboardScroll}
-            indicatorStyle="white"
+            indicatorStyle={scrollIndicator()}
             onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
             {chat.off ? (
               <View style={styles.note}>
@@ -298,7 +299,7 @@ export default function Conversation() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   page: { flex: 1, backgroundColor: Colors.background },
   // Tablets and wide windows: a readable column, not a stretched phone.
   column: { flex: 1, width: '100%', maxWidth: 760, alignSelf: 'center' },
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
   bubble: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 18 },
   bubbleMine: { backgroundColor: Colors.sky, borderBottomRightRadius: 6 },
   bubbleTheirs: { backgroundColor: Colors.backgroundElement, borderBottomLeftRadius: 6 },
-  bubbleFailed: { backgroundColor: '#5A2230' },
+  bubbleFailed: { backgroundColor: withAlpha(Colors.danger, 0.35) },
   body: { color: Colors.text, fontFamily: font(500), fontSize: 17, lineHeight: 23 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 4 },
   time: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12 },
@@ -350,4 +351,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12, fontFamily: font(500), fontSize: 17,
   },
   send: { width: 46, height: 46, borderRadius: 23, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
-});
+}));

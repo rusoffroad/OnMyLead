@@ -1,7 +1,7 @@
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { rideAllowanceText, type Entitlements } from '@/core/entitlements';
 import { planHeadline, PRIVACY_URL, shortDate, TERMS_URL } from '@/core/pro';
 import { disclosureText, SITE_TERMS_URL, type Store } from '@/core/purchases';
@@ -66,7 +66,7 @@ export function Disclosures({ store = 'apple' }: { store?: Store | null }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   status: { gap: Spacing.two, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderWidth: 1.5, borderColor: Colors.backgroundSelected },
   statusLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   statusHeadline: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 32, marginTop: -4 },
@@ -75,4 +75,4 @@ const styles = StyleSheet.create({
   postUsed: { backgroundColor: Colors.border },
   postNow: { height: 22, backgroundColor: Colors.accent },
   postWeek: { height: 14 },
-});
+}));

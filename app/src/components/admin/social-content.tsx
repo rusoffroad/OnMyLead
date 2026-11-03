@@ -1,8 +1,8 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtDateTime } from '@/core/admin-format';
 import { adminDeletePost, adminSetCommentHidden, adminSetPostHidden, postPhotoAddress } from '@/lib/social';
 import { AdminButton } from './button';
@@ -84,10 +84,10 @@ export function SocialContentCard({ c, onDone }: { c: SocialContent; onDone: () 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: { backgroundColor: AdminColors.page, borderRadius: 12, padding: 14, gap: 8 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'space-between' },
   meta: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.dim, flexShrink: 1 },
   body: { fontFamily: font(500), fontSize: 15, lineHeight: 21, color: AdminColors.text },
   photo: { width: '100%', maxWidth: 360, aspectRatio: 4 / 3, borderRadius: 10, backgroundColor: AdminColors.panel },
-});
+}));

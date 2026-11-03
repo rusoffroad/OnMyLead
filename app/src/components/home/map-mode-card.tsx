@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, Switch, Text, View } from 'react-native';
 import Svg, { Circle, Path, Polyline, Rect } from 'react-native-svg';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { dayLines, TRACK_DAY_COLORS, type TrackDays } from '@/core/track-line';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { Home, homeStyles, HomeCard, Pill } from './parts';
@@ -122,7 +122,7 @@ export function MapModeCard({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   mapPill: { position: 'absolute', left: 10, top: 10 },
   body: { padding: 16, paddingTop: 14, gap: 12 },
   title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 24, lineHeight: 26 },
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
   day: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   dayLine: { width: 14, height: 3, borderRadius: 2 },
   dayText: { color: Home.muted, fontFamily: font(500), fontSize: 12 },
-});
+}));

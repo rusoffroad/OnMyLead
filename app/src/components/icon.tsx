@@ -75,6 +75,8 @@ const PATHS = {
   book: ['M12 6.8C10 5.2 7 4.6 3.5 5.1v13c3.5-.5 6.5.1 8.5 1.7', 'M12 6.8c2-1.6 5-2.2 8.5-1.7v13c-3.5-.5-6.5.1-8.5 1.7', 'M12 6.8v13'],
   // Opens a page outside the app (the website).
   external: ['M14 4.5h5.5V10', 'M19.5 4.5L11.5 12.5', 'M17.5 13.5v6h-13v-13h6'],
+  // A half-filled circle: Appearance (Dark, Light and themes).
+  theme: ['M12 3.5a8.5 8.5 0 0 1 0 17z'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
@@ -84,7 +86,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {PATHS[name].map((d) => (
-        <Path key={d} d={d} stroke={color} fill={fill ?? 'none'} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+        <Path key={d} d={d} stroke={color} fill={fill ?? (name === 'theme' ? color : 'none')} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       ))}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
@@ -98,6 +100,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
         </>
       ) : null}
       {name === 'block' ? <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'theme' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'help' ? <Circle cx={12} cy={12} r={9.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'signal' ? <Circle cx={12} cy={12} r={1.8} fill={color} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'sliders' ? (

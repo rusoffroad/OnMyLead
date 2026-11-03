@@ -5,7 +5,7 @@ import { SheetRoot, SwipeSheet } from '@/components/swipe-sheet';
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { MAPS_APP_LABEL, mapsAppsFor, pickedApp, type DirectionsRow, type DirectionsTarget } from '@/core/directions';
 import { MAPS_APPS_TEXT, openDirections, openIn, useMapsPreference, useWebDirectionsPrompt } from '@/lib/directions';
 
@@ -114,13 +114,13 @@ export function DirectionsHost() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   list: { borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.backgroundElement, borderWidth: 1, borderColor: Colors.border },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, minHeight: 64 },
   rowLine: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
-  sign: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#14294A' },
+  sign: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   app: { color: Colors.sky, fontFamily: font(700), fontSize: 14 },
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     position: 'absolute', left: 0, right: 0, bottom: 0,
     backgroundColor: Colors.background, borderTopLeftRadius: 28, borderTopRightRadius: 28,
@@ -129,4 +129,4 @@ const styles = StyleSheet.create({
   webSheet: { alignSelf: 'center', maxWidth: 480, marginHorizontal: 'auto', paddingBottom: Spacing.four, paddingTop: Spacing.four },
   grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, marginBottom: Spacing.one },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 26 },
-});
+}));

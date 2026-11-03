@@ -4,7 +4,7 @@ import { ActivityIndicator, Keyboard, Platform, Pressable, ScrollView, StyleShee
 import { Icon } from '@/components/icon';
 import { keyboardScroll, TextBox } from '@/components/keyboard';
 import { iconFor } from '@/components/place-search';
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Glass, Radius, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { placeDetail, PLACES_CREDIT, type Place } from '@/core/places';
 import { usePlaceSearch } from '@/hooks/use-place-search';
@@ -94,16 +94,16 @@ export function MapSearch({ near, onPick, onClose }: { near?: LatLng | null; onP
 /** The trail sand used across the route builder. */
 const SAND = '#ECCD91';
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: {
     flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48, paddingHorizontal: 14,
-    backgroundColor: 'rgba(10,22,38,0.94)', borderRadius: Radius.control, borderWidth: 1.5, borderColor: Colors.sky,
+    backgroundColor: Glass.panel, borderRadius: Radius.control, borderWidth: 1.5, borderColor: Colors.sky,
   },
   input: { flex: 1, fontSize: 17, fontFamily: font(500), color: Colors.text, paddingVertical: 10 },
   clear: { color: Colors.textSecondary, fontSize: 22, lineHeight: 24 },
   cancel: { color: Colors.sky, fontFamily: font(700), fontSize: 16 },
   list: {
-    marginTop: 6, borderRadius: Radius.control, overflow: 'hidden', backgroundColor: 'rgba(10,22,38,0.97)',
+    marginTop: 6, borderRadius: Radius.control, overflow: 'hidden', backgroundColor: Glass.panel,
     borderWidth: 1, borderColor: Colors.border, boxShadow: '0 12px 32px rgba(0,0,0,0.45)',
   },
   result: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 9, minHeight: 52 },
@@ -112,4 +112,4 @@ const styles = StyleSheet.create({
   detail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
   note: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14, padding: 14 },
   credit: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 11, paddingHorizontal: 12, paddingVertical: 6, textAlign: 'right' },
-});
+}));

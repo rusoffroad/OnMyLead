@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { Colors, font, RideColors } from '@/constants/theme';
+import { Colors, font, RideColors, themedStyles } from '@/constants/theme';
 import { initialOf } from '@/core/profile';
 import { RiderPhoto } from './rider-photo';
 
@@ -50,7 +50,7 @@ function InitialDot({ name, lead, size, ring }: { name: string | null; lead?: bo
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 6 },
   trail: { position: 'absolute', left: 8, right: 8, height: 2, borderRadius: 1, backgroundColor: Colors.border },
   more: {
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   moreText: { color: Colors.text, fontFamily: font(700, 'display') },
-});
+}));

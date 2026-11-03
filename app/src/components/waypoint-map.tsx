@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
@@ -116,7 +116,7 @@ export function WaypointMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   found: { alignItems: 'center', maxWidth: 220 },
   foundText: {
     color: Colors.background, backgroundColor: '#ECCD91', fontFamily: font(700), fontSize: 13,
@@ -124,4 +124,4 @@ const styles = StyleSheet.create({
   },
   foundStem: { width: 2, height: 10, backgroundColor: '#ECCD91' },
   foundDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#ECCD91', borderWidth: 2, borderColor: Colors.background },
-});
+}));

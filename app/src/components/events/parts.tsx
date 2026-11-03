@@ -10,7 +10,7 @@ import { Icon } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
 import { RiderDot } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   agendaByDay, agendaKindLabel, agendaKindTone, agendaTime, cardPlace, dateBlock, eventDates, eventPhase,
   type AgendaItem, type EventCard, type Person,
@@ -18,7 +18,7 @@ import {
 import { photoUrl } from '@/lib/events';
 
 /** Red for riding, gold for prizes and shows, blue for everything else, on the agenda rail. */
-export const TONE = { red: Colors.accent, gold: Home.gold, blue: Colors.sky } as const;
+export const TONE = { get red() { return Colors.accent; }, get gold() { return Home.gold; }, get blue() { return Colors.sky; } } as const;
 
 /**
  * The ticket stub: the event's first day as a torn-off ticket (red month band, big day number).
@@ -212,7 +212,7 @@ export function PeopleSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   stub: { backgroundColor: '#F4F1E8', borderRadius: 8, overflow: 'hidden', alignItems: 'center', paddingBottom: 6 },
   stubBand: { alignSelf: 'stretch', backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
   stubMonth: { color: '#fff', fontFamily: font(800, 'display'), letterSpacing: 1 },
@@ -243,4 +243,4 @@ const styles = StyleSheet.create({
   people: { backgroundColor: Colors.background, borderRadius: Radius.card, overflow: 'hidden' },
   personRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10, minHeight: 56 },
   rule: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
-});
+}));
