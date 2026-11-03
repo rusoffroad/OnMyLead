@@ -2,6 +2,17 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "starlink",
+      "rus-gear"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "starlink-mount-ad-photo",
+    "why": "Chris supplied the product photo for the Starlink Mini Mount V2 ad; the app now always shows it, so only the price comes from the store. The ad's description now says it installs on a Milwaukee Packout and also works with magnets (Chris's wording). The ad shows $249 when the store can't be reached. Gear From RUS Offroad works the same (rus-match.ts only gained the ad's fixed details)."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "create-a-ride-on-the-website"
     ],
     "kind": "update",

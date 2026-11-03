@@ -59,7 +59,7 @@ Reading the dish only works in the iPhone app, not on the website.
 :::release 2.0
 ## RUS Starlink Mini Mount V2
 
-Below **Your Dish**, the Starlink page shows an ad for the RUS Offroad Starlink Mini Mount V2 (Morelock Series), made by the team behind OnMyLead. Tap **Shop the Mount** to open its page at rusoffroad.com. The photo and price come from the RUS Offroad store when it can be reached.
+Below **Your Dish**, the Starlink page shows an ad for the RUS Offroad Starlink Mini Mount V2 (Morelock Series), a Starlink Mini mount that installs on a Milwaukee Packout and also works with magnets. Tap **Shop the Mount** to open its page at rusoffroad.com. The price comes from the RUS Offroad store when it can be reached, and shows $249 when it can't.
 :::
 
 ## Save Your Plan

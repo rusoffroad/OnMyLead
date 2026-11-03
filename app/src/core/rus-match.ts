@@ -248,14 +248,16 @@ export function findBySlug(products: RusProduct[], slug: string): RusProduct | n
 
 /**
  * The RUS Starlink Mini Mount V2 (Morelock Series), advertised on the Starlink page. The app
- * shows its own fixed name and copy, never the store's product text, and takes only the photo
- * and price from the live store.
+ * shows its own fixed name, copy and photo, never the store's product text, and takes only the
+ * price from the live store.
  */
 export const STARLINK_MOUNT = {
   slug: 'starlink-mini-mount-v2-morelock-series',
   url: `${RUS_ORIGIN}/product/starlink-mini-mount-v2-morelock-series/`,
   title: 'Starlink Mini Mount V2',
   series: 'Morelock Series',
+  /** Shown when the store can't be reached (Chris, 2026-11-03); the live store price wins. */
+  priceCents: 24900,
 } as const;
 
 /** Where the ad's button goes: the live product (with attribution) or, if the store is unreachable, its page. */
