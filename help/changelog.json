@@ -6,6 +6,16 @@
     ],
     "kind": "update",
     "by": "pr",
+    "ref": "starlink-mount-ad-photo",
+    "why": "Chris supplied the product photo for the Starlink Mini Mount V2 ad; the app now always shows it, so only the price comes from the store."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "starlink"
+    ],
+    "kind": "update",
+    "by": "pr",
     "ref": "starlink-mount-ad",
     "why": "Chris asked for an ad for the RUS Starlink Mini Mount V2 (Morelock Series) on the Starlink page. The Starlink guide says where it shows and what Shop the Mount does, in a 2.0 release block."
   },
