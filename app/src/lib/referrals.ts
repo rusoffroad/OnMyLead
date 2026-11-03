@@ -1,5 +1,5 @@
 /**
- * Refer a friend (core/referrals and migration 20261103000000_referrals.sql), on every device.
+ * Refer a friend (core/referrals and migration 20261103800000_referrals.sql), on every device.
  *
  * - A friend link opened while signed out is remembered on the device; once that rider signs in
  *   (normally a brand-new account), the invite is recorded. The server decides whether it counts.

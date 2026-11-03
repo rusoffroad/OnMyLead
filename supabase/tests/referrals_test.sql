@@ -1,4 +1,4 @@
--- Refer a friend (20261103000000_referrals.sql): invites, the first-ride reward for both riders,
+-- Refer a friend (20261103800000_referrals.sql): invites, the first-ride reward for both riders,
 -- claiming it the Apple or Google way, and Admin > Referrals. Runs after events_test.sql
 -- (run_local.sh): as_user and expect_refused come from privacy_test.sql, as_admin_session from
 -- admin_test.sql.

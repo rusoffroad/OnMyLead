@@ -18,7 +18,7 @@ const reward = (over: Partial<ReferralReward> = {}): ReferralReward => ({
 
 describe('refer a friend rules', () => {
   it('match referral_rules() in the migration', () => {
-    const sql = readFileSync(join(__dirname, '../../../../supabase/migrations/20261103000000_referrals.sql'), 'utf8');
+    const sql = readFileSync(join(__dirname, '../../../../supabase/migrations/20261103800000_referrals.sql'), 'utf8');
     const rule = (k: string) => sql.match(new RegExp(`'${k}', '?([\\w-]+)'?`))?.[1];
     expect(Number(rule('new_account_days'))).toBe(REFERRAL_RULES.newAccountDays);
     expect(Number(rule('min_ride_minutes'))).toBe(REFERRAL_RULES.minRideMinutes);

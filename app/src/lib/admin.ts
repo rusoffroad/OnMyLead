@@ -284,7 +284,7 @@ export const riderAgreements = (search: string, page: number, pageSize = 50, use
 export const riderAgreementExport = (from: string, to: string) =>
   adminRpc<AgreementRow[]>('admin_rider_agreement_export', { p_from: from, p_to: to });
 
-// ---- Refer a friend (migration 20261103000000_referrals.sql) ----
+// ---- Refer a friend (migration 20261103800000_referrals.sql) ----
 
 export type ReferralRewardRow = { claim_kind: 'apple_code' | 'google_offer' | 'google_defer' | null; claimed_at: string | null; redeemed_at: string | null } | null;
 export type ReferralRow = {

@@ -7,7 +7,7 @@
  * server (Apple guideline 3.1.1): a one-time Apple offer code on iPhone and iPad, the Google Play
  * offer 'referral-50' on Android, or, for a rider already paying through Google Play, the next
  * bill pushed back 6 months. The server decides everything (migration
- * 20261103000000_referrals.sql); this file reads its answers and words them.
+ * 20261103800000_referrals.sql); this file reads its answers and words them.
  */
 import type { Store } from './entitlements';
 import { PRICES } from './pro';

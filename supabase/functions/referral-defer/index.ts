@@ -1,7 +1,7 @@
 // Refer a friend, for a rider who already pays for Pro through Google Play: Play's 50%-off offer
 // only works on a new purchase, so their reward pushes the next bill back about 6 months instead
 // (the same value as half off a year). The app calls this after claim_referral_reward('google')
-// answered { kind: 'google_defer' } (migration 20261103000000_referrals.sql).
+// answered { kind: 'google_defer' } (migration 20261103800000_referrals.sql).
 //
 // POST {} with the rider's Supabase session.
 // 200 { deferred: true, expiresAt }   done now, or done before (the same answer again)
