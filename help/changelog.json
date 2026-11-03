@@ -2,6 +2,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "rider-safety-agreement"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "rider-agreement-once",
+    "why": "Fixed before release: signing out no longer shows the Before You Ride screen again on a device where someone already agreed (Chris: once when the app is downloaded unless it changes). The article now says so."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "events",
       "privacy"
     ],
