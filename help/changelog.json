@@ -2,6 +2,19 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "social",
+      "out-riding",
+      "group-chat",
+      "report-and-block"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "social",
+    "why": "Bug fix (Chris 2026-11-03, 2.0 build 8: the keyboard hid the comment box on a Social post). The comment box, direct messages and group chat now stay above the keyboard on iPhone, iPad and Android. The steps and labels are the same, so the articles only get a new updated: date."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "tilt-and-crash-alert",
       "directions",
       "emergency-and-safety",
