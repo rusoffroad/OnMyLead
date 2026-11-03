@@ -50,6 +50,11 @@ The stopped and no-update times are the same for every setting.
 ## What Everyone Sees
 
 - A yellow or red ring around a rider's dot on the map.
+
+:::release 2.0
+With **Color Blind Mode** on (**You** > **Appearance**), the ring is yellow or orange-red, OK riders show sky blue, and a **!** or **✕** appears before the rider's name. See [Change the Look](/help/appearance).
+:::
+
 - At the top of Ride Mode, **Together** in green, or the number of red riders, such as **2 Separated**, in red. Tap it to see every rider and when they last updated.
 
 ## What the Leader and Tail Gunner See
