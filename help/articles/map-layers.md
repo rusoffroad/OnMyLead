@@ -63,6 +63,10 @@ Each style has a small picture of how it looks; the one you're using has a blue 
 - **Satellite**: aerial imagery with road and place labels. This is the default.
 - **Topo**: the USGS topographic map, with contour lines.
 
+:::release 2.1
+- **3D Terrain**: satellite on the real shape of the land, with contour lines and peak heights. It shows in Ride Mode and Map Mode; the other maps show plain satellite while it's picked. See [3D Terrain](/help/3d-terrain).
+:::
+
 ## Public Trails and Roads
 
 Turn **Public Trails and Roads** on to draw trail and road lines on the map. It's on unless you turn it off.

@@ -9,7 +9,8 @@ import { distanceM } from './geo';
  */
 
 export type TrailSourceId = 'mvum' | 'blm' | 'fsclosed';
-export type BaseMap = 'satellite' | 'topo';
+/** terrain is 3D Terrain (core/terrain): satellite on raised ground; flat maps draw it as satellite. */
+export type BaseMap = 'satellite' | 'topo' | 'terrain';
 
 export const FS_MVUM = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_MVUM_02/MapServer';
 export const BLM_ROUTES = 'https://gis.blm.gov/arcgis/rest/services/transportation/BLM_Natl_GTLF/MapServer';

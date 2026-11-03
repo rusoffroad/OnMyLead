@@ -5,8 +5,12 @@ import type { MapPressEvent, Region } from 'react-native-maps';
 
 import { boxInside, nearestRiderTrail, paddedBox, RIDER_TRAILS_MIN_Z, type PublicTrail } from '@/core/nav-trails';
 import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
+import { terrainBoxes } from '@/core/offline-maps';
+import { terrainShows } from '@/core/terrain';
 import { mapZoom, metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
+import { useOfflineMaps } from '@/lib/offline-maps';
+import { useTerrainAvailable } from '@/lib/terrain';
 import { publicTrailsIn, type Box } from '@/lib/nav-trails';
 import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
@@ -16,7 +20,12 @@ const KEY = 'map.layers.v1';
 export const RIDER_TRAILS_KEY = 'map.riderTrails.v1';
 
 export type TrailMap = {
+  /** The rider's map style. 3D Terrain is drawn only where `terrain3d` says; flat maps draw it as satellite. */
   base: BaseMap;
+  /** 3D Terrain can be picked here (the build has Mapbox and the owner hasn't switched it off). */
+  terrainAvailable: boolean;
+  /** Ride Mode and Map Mode draw the 3D map now (see core/terrain terrainShows). */
+  terrain3d: boolean;
   trails: boolean;
   /** True when trails are on but the map is too far out to draw them. */
   zoomInHint: boolean;
@@ -96,6 +105,11 @@ export function useTrailMap(): TrailMap {
   const riderBox = useRef<Box | null>(null);
   const riderLoad = useRef(0);
   const [picked, setPicked] = useState<PublicTrail | null>(null);
+  const terrainAvailable = useTerrainAvailable();
+  const downloads = useOfflineMaps();
+  const savedTerrain = useMemo(() => terrainBoxes(downloads), [downloads]);
+  // Where the map is, kept only to a few decimals, for the no-signal 3D check.
+  const [where, setWhere] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     AsyncStorage.getItem(KEY)
@@ -103,7 +117,7 @@ export function useTrailMap(): TrailMap {
         if (!v) return;
         // `trails` from the first version defaulted to off, so only the newer `trailsOn` choice counts.
         const saved = JSON.parse(v) as { base?: BaseMap; trailsOn?: boolean };
-        if (saved.base === 'topo' || saved.base === 'satellite') setBaseState(saved.base);
+        if (saved.base === 'topo' || saved.base === 'satellite' || saved.base === 'terrain') setBaseState(saved.base);
         if (typeof saved.trailsOn === 'boolean') setTrailsState(saved.trailsOn);
       })
       .catch(() => {});
@@ -201,6 +215,9 @@ export function useTrailMap(): TrailMap {
     (r: Region, z?: number) => {
       region.current = r;
       zoomNow.current = z ?? null;
+      const lat = Math.round(r.latitude * 100) / 100;
+      const lng = Math.round(r.longitude * 100) / 100;
+      setWhere((w) => (w && w.lat === lat && w.lng === lng ? w : { lat, lng }));
       setZoom(z ?? mapZoom(r, width.current));
       refreshOsm();
       refreshRiders();
@@ -263,8 +280,14 @@ export function useTrailMap(): TrailMap {
     return trailLabels(osm, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
   }, [osm, zoom]);
 
+  // Picked but not offered any more (switched off, or a build without Mapbox): plain satellite.
+  const shownBase: BaseMap = base === 'terrain' && !terrainAvailable ? 'satellite' : base;
+  const terrain3d = terrainShows({ picked: shownBase === 'terrain', available: terrainAvailable, offline, center: where, saved: savedTerrain });
+
   return {
-    base,
+    base: shownBase,
+    terrainAvailable,
+    terrain3d,
     trails,
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
     osmLines: trails ? drawn : [],
@@ -287,7 +310,7 @@ export function useTrailMap(): TrailMap {
     identifyAt,
     mapProps: {
       // Topo replaces Apple's map content; Android has to be told there is no base map under it.
-      mapType: base === 'satellite' ? 'hybrid' : Platform.OS === 'android' ? 'none' : 'standard',
+      mapType: shownBase !== 'topo' ? 'hybrid' : Platform.OS === 'android' ? 'none' : 'standard',
       onPress,
       onRegionChangeComplete: (r: Region) => onRegion(r),
       onLayout: (e: LayoutChangeEvent) => {

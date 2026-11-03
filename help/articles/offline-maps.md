@@ -17,6 +17,7 @@ sources:
   - app/src/core/trails.ts
   - app/src/lib/offline-maps.ts
   - app/src/lib/offline-maps.web.ts
+  - app/src/lib/terrain-offline.ts
   - app/src/lib/trail-tiles.ts
   - app/src/lib/map-signal.ts
   - app/src/app/(tabs)/profile.tsx
@@ -51,6 +52,10 @@ The screen shows how much space your maps use, how much is free on your phone, y
 
 The quickest way. It saves satellite, topo and trails around the ride's route.
 
+:::release 2.1
+If your map style is 3D Terrain, **Download This Ride's Map** on the ride's map saves 3D Terrain too. The ride list on Offline Maps saves the flat maps only; use **Download a Map Area** to add 3D Terrain there.
+:::
+
 From Offline Maps:
 
 1. Under **Your Rides**, find the ride. Each one shows about how much space it needs.
@@ -69,6 +74,9 @@ From the ride's map:
 1. On Offline Maps, tap **Download a Map Area**.
 2. Move and zoom the map until the frame holds the area you'll ride. The frame's size in miles shows in its corner.
 3. Pick the maps to save: **Satellite**, **Topo** and **Trails**. All three are on to start.
+:::release 2.1
+   You can also pick **3D Terrain** so the 3D map works there with no signal. It's a bigger download (a 20-mile-square area is roughly 150 MB more), so it's only ticked to start if your map style is 3D Terrain.
+:::
 4. Check the estimate under the choices.
 5. Tap **Download This Area**.
 
@@ -108,6 +116,10 @@ Download before you leave, while you have good signal. Then open the ride once s
 - **Satellite**: USGS aerial photos.
 - **Topo**: the USGS topo map.
 - **Trails**: Forest Service and BLM lines, plus OpenStreetMap tracks (map data © OpenStreetMap contributors).
+
+:::release 2.1
+- **3D Terrain**: Mapbox's satellite photos, land height, contour lines and names, saved by Mapbox inside the app. While it saves, the download shows **Saving 3D Terrain** and how far along it is. With no signal, Ride Mode and Map Mode show 3D only over an area with 3D Terrain saved; anywhere else they show the flat downloaded map.
+:::
 
 :::release 1.0.1
 The Forest Service's closed roads are saved too, so closed lines still show red with no signal. Seasonal closures need a signal to load.

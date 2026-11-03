@@ -28,7 +28,7 @@ export function TrailTiles({ trail, base = trail.base }: { trail: TrailMap; base
   const { trails, offline } = trail;
   return (
     <>
-      {base === 'satellite' && offline ? (
+      {base !== 'topo' && offline ? (
         <UrlTile
           urlTemplate={USGS_IMAGERY}
           offlineMode

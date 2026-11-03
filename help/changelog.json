@@ -2,6 +2,18 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "3d-terrain",
+      "map-layers",
+      "offline-maps"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "3d-terrain",
+    "why": "New 3D Terrain map style for Ride Mode and Map Mode (Chris asked for an onX-style 3D topo view, without copying onX): Mapbox satellite on raised ground with contour lines and peak heights in feet, plus 3D Terrain in Offline Maps downloads. Publishes with the 2.1 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",

@@ -10,6 +10,7 @@ import { cameraCenterFor, fitInset, isFarOut, openMapCenter, rideViewCorners } f
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
+import { GroupTerrainMap } from './group-terrain-map';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RiderMarker } from './rider-marker';
 import { RouteEnds, RouteLine } from './route-overlay';
@@ -35,6 +36,19 @@ function around(p: { latitude: number; longitude: number }) {
   ];
 }
 
+type GroupMapProps = Parameters<typeof FlatGroupMap>[0];
+
+/**
+ * Ride Mode's live map: the 3D Terrain map when the rider picked it and it can show here
+ * (use-trail-map terrain3d), otherwise the flat Apple or Google map below.
+ */
+export function GroupMap(props: GroupMapProps) {
+  if (props.trail?.terrain3d) {
+    return <GroupTerrainMap {...props} trail={props.trail} edgePadding={props.edgePadding ?? FIT_PADDING} />;
+  }
+  return <FlatGroupMap {...props} />;
+}
+
 /**
  * Live group map. Every rider is the same grey dot with their ride name beside it; the leader is
  * the one bigger blue dot, so a glance finds them. A yellow or red ring means Ride Bubble trouble,
@@ -42,7 +56,7 @@ function around(p: { latitude: number; longitude: number }) {
  * drawn hollow at where they were last seen, with the age on the tag, so an old position never
  * passes for a live one.
  */
-export function GroupMap({
+function FlatGroupMap({
   riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding = FIT_PADDING, fallback,
   onReady, onUserMove, follow, locationEveryMs = 1000, ref,
 }: {

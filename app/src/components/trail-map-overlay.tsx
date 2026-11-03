@@ -6,7 +6,7 @@ import Svg, { Ellipse, Path, Rect } from 'react-native-svg';
 import { Colors, font, Glass, GlassSurface, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_INK, vehicleLabel, type PublicTrail } from '@/core/nav-trails';
-import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, statusLine, type OfflineChoice } from '@/core/offline-maps';
+import { formatBytes, IMAGERY_ATTRIBUTION, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import { TOPO_ATTRIBUTION, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
@@ -63,8 +63,8 @@ export function TrailMapOverlay({
           accessibilityState={{ expanded: open }}
           hitSlop={6}
           onPress={() => setOpen((o) => !o)}
-          style={({ pressed }) => [styles.fab, (open || trail.trails || trail.base === 'topo') && styles.fabOn, pressed && { opacity: 0.8 }]}>
-          <LayersIcon color={trail.trails || trail.base === 'topo' ? SAND : Colors.text} />
+          style={({ pressed }) => [styles.fab, (open || trail.trails || trail.base !== 'satellite') && styles.fabOn, pressed && { opacity: 0.8 }]}>
+          <LayersIcon color={trail.trails || trail.base !== 'satellite' ? SAND : Colors.text} />
         </Pressable>
         )}
         {trail.offline && (!open || bare) ? (
@@ -121,24 +121,31 @@ function LayersPanel({
     <View style={styles.panel} accessibilityViewIsModal={false}>
       <Text style={styles.panelTitle}>Map Style</Text>
       <View style={styles.bases} accessibilityRole="radiogroup" accessibilityLabel="Map style">
-        {(['satellite', 'topo'] as BaseMap[]).map((b) => {
+        {(trail.terrainAvailable ? (['satellite', 'topo', 'terrain'] as BaseMap[]) : (['satellite', 'topo'] as BaseMap[])).map((b) => {
           const on = trail.base === b;
           return (
             <Pressable
               key={b}
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
-              accessibilityLabel={b === 'satellite' ? 'Satellite' : 'Topo'}
+              accessibilityLabel={BASE_NAME[b]}
               onPress={() => trail.setBase(b)}
               style={({ pressed }) => [styles.base, pressed && { opacity: 0.8 }]}>
               <View style={[styles.baseThumb, on && styles.baseThumbOn]}>
                 <StyleThumb base={b} />
               </View>
-              <Text style={[styles.baseText, on && { color: Colors.text }]}>{b === 'satellite' ? 'Satellite' : 'Topo'}</Text>
+              <Text style={[styles.baseText, on && { color: Colors.text }]}>{BASE_NAME[b]}</Text>
             </Pressable>
           );
         })}
       </View>
+      {trail.base === 'terrain' ? (
+        <Text style={styles.fine}>
+          {trail.terrain3d
+            ? `Satellite on the real shape of the land, with contour lines and peak heights in feet. ${WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.'} Shows in Ride Mode and Map Mode.`
+            : 'No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.'}
+        </Text>
+      ) : null}
 
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
@@ -186,7 +193,7 @@ function LayersPanel({
         />
       </Pressable>
 
-      {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} /> : null}
+      {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} terrain={trail.terrainAvailable && trail.base === 'terrain'} /> : null}
       {!WEB ? (
         <Pressable accessibilityRole="link" onPress={() => router.push('/maps')} hitSlop={6} style={styles.link}>
           <Text style={styles.linkText}>Offline Maps</Text>
@@ -198,8 +205,22 @@ function LayersPanel({
   );
 }
 
+const BASE_NAME: Record<BaseMap, string> = { satellite: 'Satellite', topo: 'Topo', terrain: '3D Terrain' };
+
 /** A small picture of each map style, so the choice is seen rather than read. */
 function StyleThumb({ base }: { base: BaseMap }) {
+  if (base === 'terrain') {
+    return (
+      <Svg width="100%" height="100%" viewBox="0 0 100 64" preserveAspectRatio="xMidYMid slice">
+        <Rect width={100} height={64} fill="#24466F" />
+        <Path d="M0 40 L22 18 L34 28 L52 8 L70 26 L82 18 L100 34 L100 64 L0 64 Z" fill="#3D4A30" />
+        <Path d="M52 8 L60 16 L56 18 L50 14 L44 18 Z" fill="#E9E3D2" />
+        <Path d="M0 50 C18 40 30 46 44 36 S70 30 100 42" stroke="#FFFFFF" strokeOpacity={0.45} strokeWidth={1} fill="none" />
+        <Path d="M0 58 C20 50 34 56 50 46 S76 42 100 52" stroke="#FFFFFF" strokeOpacity={0.45} strokeWidth={1} fill="none" />
+        <Path d="M6 62 C24 52 40 54 54 40" stroke={TRAIL_INK.trail} strokeWidth={2.4} strokeDasharray="5 3" fill="none" />
+      </Svg>
+    );
+  }
   if (base === 'topo') {
     return (
       <Svg width="100%" height="100%" viewBox="0 0 100 64" preserveAspectRatio="xMidYMid slice">
@@ -221,13 +242,17 @@ function StyleThumb({ base }: { base: BaseMap }) {
   );
 }
 
-const ALL: OfflineChoice[] = OFFLINE_CHOICES.map((c) => c.id);
+const FLAT: OfflineChoice[] = ['satellite', 'topo', 'trails'];
 
-/** One tap saves satellite, topo and trails around the ride's route; then shows how it is going. */
-function RideMapDownload({ ride, route }: { ride: { id: string; name: string }; route: LatLng[] }) {
+/**
+ * One tap saves satellite, topo and trails around the ride's route (and 3D Terrain, for a rider
+ * whose map style is 3D Terrain); then shows how it is going.
+ */
+function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: string }; route: LatLng[]; terrain: boolean }) {
   const maps = useOfflineMaps();
   const saved = rideDownload(maps, ride.id);
-  const estimate = useMemo(() => (saved ? 0 : planRide(route, ALL).bytes), [route, saved]);
+  const ALL = useMemo<OfflineChoice[]>(() => (terrain ? [...FLAT, 'terrain'] : FLAT), [terrain]);
+  const estimate = useMemo(() => (saved ? 0 : planRide(route, ALL).bytes), [route, saved, ALL]);
   const busy = saved?.status === 'downloading';
   const pct = saved && saved.total ? Math.round(((saved.saved + saved.failed) / saved.total) * 100) : 0;
 
@@ -242,7 +267,7 @@ function RideMapDownload({ ride, route }: { ride: { id: string; name: string }; 
           <Text style={styles.saveText}>Download This Ride’s Map</Text>
           <ProTag feature="offline_maps" />
         </View>
-        <Text style={styles.saveSub}>{`Satellite, Topo and Trails, About ${formatBytes(estimate)}`}</Text>
+        <Text style={styles.saveSub}>{`${terrain ? 'Satellite, Topo, Trails and 3D Terrain' : 'Satellite, Topo and Trails'}, About ${formatBytes(estimate)}`}</Text>
       </Pressable>
     );
   }
