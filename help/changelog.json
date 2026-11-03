@@ -2,6 +2,16 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "ride-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "leader-line-ends",
+    "why": "Chris asked for the leader to sit all the way to the left of the leader line and the tail gunner all the way to the right. In 2.0 the line pins the leader to the left end and the tail gunner to the right end, with everyone else between them by how far behind the leader they are, on routes and Freerides; the route's start, finish and miles-done fill are no longer drawn on it. Ride Mode's route and Freeride sections now say so (the old rear-left, front-right text stays until 2.0 is live). Full Map and Fuel Range describe the line without its direction, so they are unchanged (reviewed)."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "tilt-and-crash-alert",
       "directions",
       "emergency-and-safety",

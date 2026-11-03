@@ -74,6 +74,41 @@ export function layoutDots(
   return sized.map((d, i) => ({ id: d.id, size: d.size, x: Math.round(x[i] * 10) / 10 }));
 }
 
+/** How far past the ends the leader and tail are put, so no tie can slide a rider outside them. */
+const PIN_M = TIE_M * 10;
+
+/**
+ * The leader line: the leader pinned to the far left edge, the tail gunner pinned to the far
+ * right edge, and everyone else in running order between them, each placed by how far behind
+ * the leader they are (as a share of the leader-to-tail-gunner gap), without overlapping.
+ *
+ * When the leader isn't on the line, the rider out front takes the left edge; when there's no
+ * tail gunner on it, the rider furthest back takes the right edge. A rider ahead of the leader
+ * still sits just right of the leader, and one behind the tail gunner just left of them, so the
+ * ends always belong to the leader and the tail gunner. `ranked` is rankRiders' output.
+ */
+export function convoyLayout(
+  ranked: RankedRider[],
+  sizeOf: (r: RankedRider) => number,
+  width: number,
+  opts: { gap?: number; minScale?: number } = {},
+): DotSpot[] {
+  if (!ranked.length || width <= 0) return [];
+  const lead = ranked.find((r) => r.role === 'leader') ?? ranked[0];
+  const others = ranked.filter((r) => r.id !== lead.id);
+  const tail = [...others].reverse().find((r) => r.role === 'sweep') ?? others[others.length - 1];
+  if (!tail) {
+    const size = sizeOf(lead);
+    return [{ id: lead.id, size, x: Math.min(width / 2, size / 2) }];
+  }
+  const front = lead.place!.alongM;
+  const span = Math.max(1, front - tail.place!.alongM);
+  const pos = (r: RankedRider) =>
+    r.id === lead.id ? -PIN_M : r.id === tail.id ? span + PIN_M : Math.max(0, Math.min(span, front - r.place!.alongM));
+  // layoutDots runs low to high along the line, so feed it distance behind the leader.
+  return layoutDots(ranked.map((r) => ({ id: r.id, alongM: pos(r), size: sizeOf(r) })), span, width, opts);
+}
+
 const ordinal = (n: number) => {
   const t = n % 100;
   const s = t >= 11 && t <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th';

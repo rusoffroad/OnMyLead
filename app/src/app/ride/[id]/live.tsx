@@ -1257,7 +1257,6 @@ export default function RideMode() {
               if (stripCompact) setCompactStripH(h);
             }}>
           <RouteStrip
-            lengthM={route.route?.lengthM ?? freerideLine?.lengthM ?? 0}
             riders={route.route ? placed : freerideLine?.placed ?? []}
             meId={me}
             summary={routeSummary}
