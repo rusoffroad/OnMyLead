@@ -2,6 +2,29 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-dash",
+    "why": "Map Mode's Explore panel had empty space next to speed and elevation (Chris). It now also shows Heading, Trip miles and Moving time; press and hold Trip to reset it. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "full-map",
+      "follow-me",
+      "getting-started",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "map-mode-dash",
+    "why": "Checked against the Map Mode dash change: Full Map's slim bar still keeps speed, Follow Me works the same (Android now opens Map Mode zoomed in on you, as iPhone already did), and the website showcase only gained the new readings in Map Mode's text and screenshot. No change to these articles."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "rider-safety-agreement"
     ],
     "kind": "update",
