@@ -2,6 +2,19 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "navigation-mode",
+      "getting-started",
+      "home-screen",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-mode-button",
+    "why": "Chris asked to make Map Mode more visible. A white Map Mode button now sits in the middle of the tab bar (under Find on tablets and the website menu), so the offroad map is one tap from any tab, and the Home card's button reads Open Map Mode. Comes with the 2.0 update."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "navigation-mode"
     ],
     "kind": "update",

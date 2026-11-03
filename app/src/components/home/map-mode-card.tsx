@@ -10,7 +10,7 @@ import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { Home, homeStyles, HomeCard, Pill } from './parts';
 
 const W = 340;
-const H = 120;
+const H = 150;
 
 /** The rider's own Track Line squeezed into the card, or a quiet trail-map sketch before there is one. */
 function MiniMap({ days }: { days: TrackDays }) {
@@ -60,7 +60,7 @@ function MiniMap({ days }: { days: TrackDays }) {
 
 /**
  * Map Mode on the home screen: the offroad map for riding solo, in the same card language as the
- * ride and group cards. Open Map, Map a Custom Trail (draw one that isn't on any map), and the
+ * ride and group cards. Open Map Mode, Map a Custom Trail (draw one that isn't on any map), and the
  * Track Line switch with its day colours.
  */
 export function MapModeCard({
@@ -76,8 +76,11 @@ export function MapModeCard({
       </Pressable>
       <View style={styles.body}>
         <View>
-          <Text style={styles.title} accessibilityRole="header">Map Mode</Text>
-          <Text style={homeStyles.muted}>Riding solo? Your offroad map, rider trails and your own.</Text>
+          <View style={styles.titleRow}>
+            <Icon name="map" size={26} color={Colors.text} strokeWidth={2.4} />
+            <Text style={styles.title} accessibilityRole="header">Map Mode</Text>
+          </View>
+          <Text style={homeStyles.muted}>Riding solo? Your offroad map with speed, elevation, rider trails and your own.</Text>
         </View>
         <View style={styles.buttons}>
           <Pressable
@@ -85,7 +88,7 @@ export function MapModeCard({
             onPress={() => router.push('/nav')}
             style={({ pressed }) => [styles.btn, styles.btnGo, pressed && { opacity: 0.85 }]}>
             <Icon name="map" size={18} color={Colors.background} strokeWidth={2.4} />
-            <Text style={[styles.btnText, { color: Colors.background }]}>Open Map</Text>
+            <Text style={[styles.btnText, { color: Colors.background }]}>Open Map Mode</Text>
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -125,10 +128,11 @@ export function MapModeCard({
 const styles = StyleSheet.create({
   mapPill: { position: 'absolute', left: 10, top: 10 },
   body: { padding: 16, paddingTop: 14, gap: 12 },
-  title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 24, lineHeight: 26 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
+  title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 32 },
   buttons: { flexDirection: 'row', gap: 10 },
   btn: {
-    flex: 1, minHeight: 46, borderRadius: 14, borderWidth: 1, borderColor: Home.line, backgroundColor: Home.panel2,
+    flex: 1, minHeight: 52, borderRadius: 14, borderWidth: 1, borderColor: Home.line, backgroundColor: Home.panel2,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: Spacing.two, paddingVertical: 6,
   },
   btnGo: { backgroundColor: Colors.text, borderColor: 'transparent' },

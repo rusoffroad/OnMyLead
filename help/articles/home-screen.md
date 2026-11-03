@@ -45,7 +45,7 @@ Right under Join, Create and Find, the **Events** card opens the Events area: ra
 
 Your offroad map for when you're not on a group ride. The card shows a small map with your Track Line, and how many rider trails are near you when location is allowed.
 
-- **Open Map** opens Map Mode.
+- **Open Map Mode** opens Map Mode. The white **Map Mode** button in the tab bar opens it too, from any tab.
 - **Map a Custom Trail** opens Map Mode ready to draw a trail that isn't marked on any map.
 - **Track Line** draws where you've been, a new colour each day: today red, yesterday blue, older days gold.
 
