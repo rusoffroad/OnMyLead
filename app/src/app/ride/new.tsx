@@ -2,6 +2,7 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
+import { EventOrRide } from '@/components/events/event-or-ride';
 import { ThemedText } from '@/components/themed-text';
 import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
@@ -301,6 +302,7 @@ export default function NewRide() {
           </Pressable>
         </View>
       ) : null}
+      {!event ? <EventOrRide from="create-ride" /> : null}
       <ThemedText type="heading">What Kind of Ride?</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <KindCard

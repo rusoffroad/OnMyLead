@@ -2,6 +2,43 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "events",
+      "find-a-ride",
+      "create-a-ride",
+      "home-screen"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "events",
+    "why": "Chris 2026-11-03 asked for an explainer of events vs public rides, and for Events to stand out more. New Event or Public Ride? section in Events, short notes in Find a Ride and Create a Ride, and the Home screen's Events card is now gold."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "approvals-and-waitlist",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "free-vs-pro",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "invite-riders",
+      "place-search",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "events",
+    "why": "Reviewed, no change to these steps: Find a Ride and Create a Ride gained the Event or Public Ride? explainer (covered in Events, Find a Ride and Create a Ride), and the website's Events feature line mentions it."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "ride-mode",
       "full-map",
       "fuel-range"

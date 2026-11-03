@@ -3,6 +3,7 @@ import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
+import { EventOrRide } from '@/components/events/event-or-ride';
 import { EventCardView } from '@/components/events/parts';
 import { RadiusChip, RadiusSheet } from '@/components/home/public-rides';
 import { Home, Pill } from '@/components/home/parts';
@@ -92,6 +93,8 @@ export default function EventsScreen() {
               {session && !can('create_events') ? <Pill text="Pro" tone="gold" style={{ alignSelf: layout.wide ? 'flex-end' : 'center' }} /> : null}
             </View>
           </View>
+
+          <EventOrRide from="events" />
 
           {session ? (
             <Segmented<Tab>
