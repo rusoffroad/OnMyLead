@@ -44,7 +44,7 @@ A ride that's part of an event shows **Part of** and the event's name at the top
 
 ## Create an Event (Pro)
 
-1. Open **Events** and tap **Create an Event**. On Free, this opens the Pro prompt.
+1. Open **Events** and tap **Create an Event**. On Free, the button carries a small gold **Pro** tag and opens the Pro prompt.
 2. Give it a name and details, and pick **Public** (shows in Events for everyone) or **Link Only** (only people with the link).
 3. Under **When**, pick the first day and the start time. For more than one day, tap **Several Days** and pick the last day (up to 31 days).
 4. Under **Where**, search a place or tap the map, and check the **Place Name**. Everyone who sees the event sees this place, so pick a public spot like a venue, park, campground or trailhead.

@@ -87,7 +87,7 @@ export default function EventsScreen() {
               </ThemedText>
             </View>
             <View style={{ gap: 6, alignItems: layout.wide ? 'flex-end' : 'stretch' }}>
-              <Button title="Create an Event" onPress={create} style={layout.wide ? { minWidth: 220 } : undefined} />
+              <Button title="Create an Event" pro="create_events" onPress={create} style={layout.wide ? { minWidth: 220 } : undefined} />
               {session && !can('create_events') ? <Pill text="Pro" tone="gold" style={{ alignSelf: layout.wide ? 'flex-end' : 'center' }} /> : null}
             </View>
           </View>

@@ -2,6 +2,17 @@
   {
     "date": "2026-11-03",
     "slugs": [
+      "events",
+      "free-vs-pro"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "pro-tags",
+    "why": "Create an Event (Pro since the Events change) now carries the gold Pro tag on Free too; Events and Free and Pro say so."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
       "free-vs-pro"
     ],
     "kind": "update",
