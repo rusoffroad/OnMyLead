@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { SUSPEND_DAYS, suspendLabel, suspensionLabel, suspensionOf } from '@/core/moderation';
 import * as admin from '@/lib/admin';
 
@@ -85,10 +85,10 @@ export function SuspendPanel({ userId, name, bannedUntil, reportId, onDone }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { gap: 10 },
   label: { fontFamily: font(700), fontSize: 14, color: AdminColors.dim },
   status: { fontFamily: font(700, 'display'), fontSize: 22, color: AdminColors.amber },
   note: { fontFamily: font(500), fontSize: 13.5, lineHeight: 19, color: AdminColors.dim },
   rule: { height: 1, backgroundColor: AdminColors.line, marginVertical: 4 },
-});
+}));

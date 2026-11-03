@@ -1,12 +1,9 @@
 import { BottomTabBarHeightContext } from 'expo-router/tabs';
 import { ReactNode, useContext, useState } from 'react';
-import {
-  ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View,
-  type PressableProps, type StyleProp, type TextInputProps, type ViewStyle,
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { font, MaxContentWidth, Radius, Spacing } from '@/constants/theme';
+import { font, MaxContentWidth, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { READABLE_WIDTH } from '@/core/layout';
 import { useTheme } from '@/hooks/use-theme';
 import type { FeatureKey } from '@/core/entitlements';
@@ -35,7 +32,7 @@ export function Screen({
           // Keep the field being typed in above the keyboard, and let a drag or a tap on empty space put the keyboard away.
           automaticallyAdjustKeyboardInsets
           {...keyboardScroll}
-          indicatorStyle="white" contentContainerStyle={{ paddingBottom: Spacing.five }}>
+          indicatorStyle={scrollIndicator()} contentContainerStyle={{ paddingBottom: Spacing.five }}>
           {inner}
         </ScrollView>
       ) : (
@@ -220,7 +217,7 @@ export function ErrorText({ error }: { error: string | null }) {
   return <ThemedText style={{ color: theme.danger, fontWeight: 600 }} accessibilityLiveRegion="polite">{error}</ThemedText>;
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   content: { padding: Spacing.three, gap: Spacing.three, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
   button: { minHeight: 52, borderRadius: Radius.control, paddingHorizontal: Spacing.three, alignItems: 'center', justifyContent: 'center' },
   buttonBig: { minHeight: 68, borderRadius: 18 },
@@ -238,4 +235,4 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   chip: { borderRadius: Radius.pill, paddingHorizontal: 16, minHeight: 40, justifyContent: 'center' },
   chipText: { fontSize: 15, fontFamily: font(600) },
-});
+}));

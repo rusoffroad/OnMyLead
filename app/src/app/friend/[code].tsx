@@ -1,11 +1,11 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { RiderDot } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { FRIENDS_NOT_SWITCHED_ON, requestResultLine, type FriendPreview } from '@/core/friends';
 import { linkResultLine, type LinkResult } from '@/core/referrals';
 import { useAppSettings } from '@/lib/app-settings';
@@ -139,7 +139,7 @@ export default function FriendLink() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   top: { gap: Spacing.three, paddingTop: Spacing.three },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 40, lineHeight: 43, letterSpacing: -0.4 },
   done: { color: RideColors.green, fontFamily: font(700), fontSize: 17 },
@@ -147,4 +147,4 @@ const styles = StyleSheet.create({
     color: Colors.text, fontFamily: font(600), fontSize: 16, lineHeight: 22, padding: Spacing.three,
     borderRadius: 12, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.accent, overflow: 'hidden',
   },
-});
+}));

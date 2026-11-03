@@ -2,12 +2,15 @@ import { View } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 
 import { Colors } from '@/constants/theme';
-import type { BadgeKey, BadgeLevel } from '@/core/badges';
+import { isHonor, type BadgeKey, type BadgeLevel, type EarnedBadgeKey } from '@/core/badges';
 
 /**
  * A badge drawn as a sewn-on trail patch: a shield cut from Bronze, Silver or Gold cloth with a
  * stitched edge, the badge's mark in the middle and one to three stitches for the level, so the
  * level reads without relying on colour. Not earned yet: an empty outline.
+ *
+ * Brand Ambassador is cut from different cloth on purpose: the logo's blue with white stitching,
+ * the logo's white ridgeline and its red lead arrow, so it never reads as a riding level.
  */
 
 /** Cloth and edge colours per level. */
@@ -18,7 +21,7 @@ export const PATCH_COLORS: Record<BadgeLevel, { cloth: string; edge: string }> =
 };
 
 /** Marks on a 24 grid, drawn in navy thread. */
-const MARKS: Record<BadgeKey, string[]> = {
+const MARKS: Record<EarnedBadgeKey, string[]> = {
   // The leader's flag.
   trail_boss: ['M9 18V6.5', 'M9 6.5h7.5l-2 2.8 2 2.8H9'],
   // Chevrons at the back of the line.
@@ -35,6 +38,9 @@ const MARKS: Record<BadgeKey, string[]> = {
   trail_scout: ['M12 5.8l1.9 3.9 4.2.6-3 3 .7 4.2L12 15.5l-3.8 2 .7-4.2-3-3 4.2-.6z'],
 };
 
+/** Brand Ambassador cloth: the logo's blue and red, white thread. */
+export const AMBASSADOR_COLORS = { cloth: '#1F5FD6', edge: '#0B2A66', thread: '#FFFFFF', arrow: '#E5262E', arrowLight: '#FF5A5F' };
+
 const SHIELD = 'M24 2.5L43 9.5V25C43 35.5 34.5 42 24 45.5C13.5 42 5 35.5 5 25V9.5Z';
 const STITCH = 'M24 6.6L39.2 12.2V25C39.2 33.4 32.6 38.8 24 41.6C15.4 38.8 8.8 33.4 8.8 25V12.2Z';
 
@@ -46,6 +52,7 @@ export function BadgePatch({
   level: BadgeLevel | 0;
   size?: number;
 }) {
+  if (isHonor(badge)) return <AmbassadorPatch size={size} held={level > 0} />;
   const earned = level > 0;
   const c = earned ? PATCH_COLORS[level as BadgeLevel] : null;
   const ink = earned ? Colors.background : Colors.textSecondary;
@@ -76,6 +83,33 @@ export function BadgePatch({
               <Circle key={i} cx={24 + (i - (level - 1) / 2) * 5} cy={36} r={1.5} fill={ink} />
             ))
           : null}
+      </Svg>
+    </View>
+  );
+}
+
+/** The Brand Ambassador patch. Beside a name (tiny) it is just the shield and the red lead arrow. */
+function AmbassadorPatch({ size, held }: { size: number; held: boolean }) {
+  const a = AMBASSADOR_COLORS;
+  const tiny = size < 28;
+  return (
+    <View style={{ width: size, height: size }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Svg width={size} height={size} viewBox="0 0 48 48">
+        <Path d={SHIELD} fill={held ? a.cloth : Colors.backgroundSelected} stroke={held ? a.edge : Colors.border} strokeWidth={tiny ? 3 : 2.5} strokeLinejoin="round" />
+        {!tiny ? (
+          <Path d={STITCH} fill="none" stroke={held ? a.thread : Colors.border} strokeOpacity={held ? 0.85 : 1} strokeWidth={1.2} strokeDasharray="2.2 2" strokeLinejoin="round" />
+        ) : null}
+        {tiny ? (
+          <Path d="M24 11.5L33.5 36L24 31L14.5 36Z" fill={held ? a.arrow : 'none'} stroke={held ? a.thread : Colors.textSecondary} strokeWidth={2.2} strokeLinejoin="round" />
+        ) : (
+          <G>
+            {/* The ridgeline from the logo. */}
+            <Path d="M12.5 27L19 18.5L22.2 22.3L27 15.5L35.5 27" fill="none" stroke={held ? a.thread : Colors.textSecondary} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+            {/* The red lead arrow, folded like the logo's. */}
+            <Path d="M24 23.5L30.5 37.5L24 34.2L17.5 37.5Z" fill={held ? a.arrow : 'none'} stroke={held ? a.thread : Colors.textSecondary} strokeWidth={1.2} strokeLinejoin="round" />
+            {held ? <Path d="M24 23.5L30.5 37.5L24 34.2Z" fill={a.arrowLight} /> : null}
+          </G>
+        )}
       </Svg>
     </View>
   );

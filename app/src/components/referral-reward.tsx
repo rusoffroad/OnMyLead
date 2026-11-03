@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 
 import { ProShield } from '@/components/pro-gate';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { deviceStore, otherStoreBlock, PRODUCTS } from '@/core/purchases';
 import { claimErrorLine, REFERRAL_PRICE, rewardAction, rewardLines, rewardState, type ReferralReward } from '@/core/referrals';
 import { useEntitlements } from '@/lib/entitlements';
@@ -96,10 +96,10 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pass: {
     gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card,
-    backgroundColor: '#1A2238', borderWidth: 2, borderColor: Colors.gold,
+    backgroundColor: Colors.backgroundElement, borderWidth: 2, borderColor: Colors.gold,
   },
   passDone: { borderColor: Colors.border, backgroundColor: Colors.backgroundElement },
   stub: { gap: Spacing.two },
@@ -111,4 +111,4 @@ const styles = StyleSheet.create({
   perforation: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
   was: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 20, textDecorationLine: 'line-through' },
   price: { color: Colors.gold, fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 46, letterSpacing: -0.5 },
-});
+}));

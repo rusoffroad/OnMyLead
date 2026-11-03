@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Empty, ErrorNote, FilterChips, Loading, Pager, Panel, SearchBox, StatusBadge, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo } from '@/core/admin-format';
 import { inches } from '@/core/trail-width';
 import { useAdminData } from '@/lib/admin';
@@ -101,11 +101,11 @@ export default function TrailWidths() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { flexDirection: 'row', gap: 14, alignItems: 'center', flexWrap: 'wrap' },
   width: { fontFamily: font(800, 'display'), fontSize: 30, color: AdminColors.text, minWidth: 64 },
   titleRow: { flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
   name: { fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 22, color: AdminColors.text },
   sub: { fontFamily: font(500), fontSize: 13.5, color: AdminColors.dim },
   actions: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-});
+}));

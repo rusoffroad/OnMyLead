@@ -1,13 +1,13 @@
 import * as Clipboard from 'expo-clipboard';
 import { Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Share, StyleSheet, Text, View } from 'react-native';
+import { Share, Text, View } from 'react-native';
 
 import { ReferralRewardCard } from '@/components/referral-reward';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { friendLink } from '@/core/friends';
 import { sideColumnWidth } from '@/core/layout';
 import { inviteMessage, inviteStatus, inviteSummary, REFERRAL_PRICE, REFERRAL_RULES } from '@/core/referrals';
@@ -126,7 +126,7 @@ export default function InviteFriends() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   hero: { overflow: 'hidden', gap: Spacing.two, paddingTop: Spacing.two, paddingBottom: Spacing.one },
   contours: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   contour: { position: 'absolute', borderWidth: 1, borderColor: 'rgba(229,38,46,0.14)' },
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
   },
   rowName: { flex: 1, color: Colors.text, fontFamily: font(700), fontSize: 16 },
   rowState: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
-});
+}));

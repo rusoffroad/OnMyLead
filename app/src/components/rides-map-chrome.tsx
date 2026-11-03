@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import type { Bounds } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
 import type { Ride } from '@/lib/types';
@@ -138,7 +138,7 @@ export function MapOverlay({
 
 const glass = 'rgba(10, 22, 38, 0.86)';
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pinWrap: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
   halo: { position: 'absolute', width: 30, height: 30, borderRadius: 15, opacity: 0.3 },
   pin: { width: 18, height: 18, borderRadius: 9, borderWidth: 3, borderColor: Colors.background },
@@ -171,4 +171,4 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
   },
   searchText: { color: Colors.onAccent, fontFamily: font(700), fontSize: 15 },
-});
+}));

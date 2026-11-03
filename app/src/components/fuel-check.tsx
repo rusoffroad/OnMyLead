@@ -10,7 +10,7 @@ import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { myVehicles, setMyVehicle, type VehicleWithCost } from '@/lib/api';
 import type { Ride, RideMember } from '@/lib/types';
 
-const COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: RideColors.yellow, over: RideColors.red };
+const COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
 
 /**
  * Pick which machine you're bringing, and if the ride has a planned distance, check it

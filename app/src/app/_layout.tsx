@@ -8,8 +8,9 @@ import { BarlowCondensed_600SemiBold } from '@expo-google-fonts/barlow-condensed
 import { BarlowCondensed_700Bold } from '@expo-google-fonts/barlow-condensed/700Bold';
 import { BarlowCondensed_800ExtraBold } from '@expo-google-fonts/barlow-condensed/800ExtraBold';
 import { useFonts } from 'expo-font';
-import { DarkTheme, Stack, ThemeProvider, useSegments, type Theme } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, useRouter, useSegments, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
@@ -18,10 +19,11 @@ import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
 import { RiderAgreementGate } from '@/components/rider-agreement';
 import { UpdateRequired } from '@/components/update-required';
-import { Colors, font, NavigationColors } from '@/constants/theme';
+import { Colors, currentScheme, font, NavigationColors } from '@/constants/theme';
 // Starts crash reporting before anything else can fail (off when no DSN is set).
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { logScreen, startAppLog } from '@/lib/app-log';
+import { startAppearance, takeReturnPath, useAppearance } from '@/lib/appearance';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
 import { startOrientationRule } from '@/lib/orientation';
@@ -33,6 +35,8 @@ import { startRiderAgreement } from '@/lib/rider-agreement';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
 startAppLog();
+// The rider's theme (Dark / Light / Match Phone, Color Blind Mode), before anything draws.
+startAppearance();
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ duration: 400, fade: true });
@@ -45,7 +49,10 @@ const launchedAt = Date.now();
 // Back returns to it instead of leaving the app. The website keeps its own history.
 export const unstable_settings = Platform.OS === 'web' ? {} : { initialRouteName: '(tabs)' };
 
-const theme: Theme = { ...DarkTheme, dark: true, colors: { ...DarkTheme.colors, ...NavigationColors } };
+function navigationTheme(): Theme {
+  const base = currentScheme() === 'light' ? DefaultTheme : DarkTheme;
+  return { ...base, dark: currentScheme() === 'dark', colors: { ...base.colors, ...NavigationColors } };
+}
 
 function RootLayout() {
   const [loaded, error] = useFonts({
@@ -55,6 +62,20 @@ function RootLayout() {
   const ready = loaded || !!error;
   // The route pattern ("ride/[id]/live"), not the path, so reports group by screen.
   const screen = '/' + useSegments().join('/');
+  // Every colour comes from the rider's theme; when it changes, the app redraws from the top.
+  const { version } = useAppearance();
+  const router = useRouter();
+
+  useEffect(() => {
+    // The redraw starts the phone apps on Home: go back to the screen the change was made on.
+    const to = takeReturnPath();
+    if (!to || Platform.OS === 'web') return;
+    const t = setTimeout(() => {
+      router.navigate('/profile');
+      router.push(to as never);
+    }, 0);
+    return () => clearTimeout(t);
+  }, [version, router]);
 
   useEffect(() => {
     setCrashScreen(screen);
@@ -85,16 +106,18 @@ function RootLayout() {
   if (!ready) return null;
 
   return (
-    <ThemeProvider value={theme}>
+    <ThemeProvider key={version} value={navigationTheme()}>
+      <StatusBar style={currentScheme() === 'light' ? 'dark' : 'light'} />
       <Stack
-        screenOptions={{
+        // A function, so the header picks up the new theme when the app redraws.
+        screenOptions={() => ({
           headerBackButtonDisplayMode: 'minimal',
           headerShadowVisible: false,
           headerStyle: { backgroundColor: Colors.background },
           headerTintColor: Colors.text,
           headerTitleStyle: { fontFamily: font(700, 'display'), fontSize: 21, color: Colors.text },
           contentStyle: { backgroundColor: Colors.background },
-        }}>
+        })}>
         <Stack.Screen name="(tabs)" options={{ title: 'OnMyLead', headerShown: false }} />
         <Stack.Screen name="sign-in" options={{ title: 'Welcome', presentation: 'modal' }} />
         <Stack.Screen name="reset-password" options={{ title: 'New Password' }} />
@@ -123,6 +146,8 @@ function RootLayout() {
         <Stack.Screen name="blocked" options={{ title: 'Blocked Riders' }} />
         <Stack.Screen name="report-rider" options={{ title: 'Report a Rider' }} />
         <Stack.Screen name="battery" options={{ title: 'Battery Saver' }} />
+        <Stack.Screen name="appearance" options={{ title: 'Appearance' }} />
+        <Stack.Screen name="tilt" options={{ title: 'Tilt' }} />
         <Stack.Screen name="voice" options={{ title: 'Voice' }} />
         <Stack.Screen name="pro" options={{ title: '' }} />
         <Stack.Screen name="subscription" options={{ title: 'Subscription' }} />

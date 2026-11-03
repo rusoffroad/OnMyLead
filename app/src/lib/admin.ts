@@ -304,3 +304,12 @@ export const referrals = () => adminRpc<AdminReferrals>('admin_referrals');
 export const addReferralCodes = (codes: string[], batch: string, expiresOn: string, environment: 'Production' | 'Sandbox') =>
   adminRpc<number>('admin_add_referral_codes', { p_codes: codes, p_batch: batch, p_expires_on: expiresOn, p_environment: environment });
 export const removeReferralCodes = (batch: string) => adminRpc<number>('admin_remove_referral_codes', { p_batch: batch });
+
+// Brand Ambassador and other badges OnMyLead gives (20261103700000_brand_ambassador.sql).
+export type HonorKey = 'ambassador';
+export type AdminBadge = { badge: string; level: number; earned_at: string };
+export type BadgeHolder = { user_id: string; display_name: string | null; email: string | null; granted_at: string };
+export const userBadges = (userId: string) => adminRpc<AdminBadge[]>('admin_user_badges', { p_user: userId });
+export const badgeHolders = (badge: HonorKey) => adminRpc<BadgeHolder[]>('admin_badge_holders', { p_badge: badge });
+export const grantBadge = (userId: string, badge: HonorKey) => adminRpc<boolean>('admin_grant_badge', { p_user: userId, p_badge: badge });
+export const revokeBadge = (userId: string, badge: HonorKey) => adminRpc<boolean>('admin_revoke_badge', { p_user: userId, p_badge: badge });

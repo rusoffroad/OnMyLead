@@ -2,8 +2,8 @@
   {
     "version": "2.0",
     "title": "A New Home, Social, Events and Map Mode",
-    "intro": "OnMyLead 2.0 is the biggest update yet. A new Home screen puts Join a Ride, Create a Ride and Find a Ride up front, with public rides near you, your group, your badges and a Feed of what your friends have been riding. Social lets you like and comment on your friends' rides, badges and trails, post ride reports with a photo and see any rider's profile. Events brings rallies, poker runs and ride weekends to one page with their agenda and group rides. Navigate is now Map Mode, with custom trails, a Track Line of where you've been and named spots like water crossings. Ride Mode is cleaner and smoother, with your own typed messages, Follow Me, Full Map and Music Controls. Invite a friend who's new to OnMyLead, and when they finish their first ride you both get Pro Annual at half price for the first year. And there's a notifications inbox, easier Leave Ride, better handling of rough locations, Report a Rider, a Rider Safety Agreement, gold Pro tags and ride miles that match the ride, and trails now show width limits so you know your machine fits.",
-    "whatsNew": "What's new in 2.0:\n\n• New Home screen with a Feed of your friends' rides.\n• Social: like, comment and post.\n• Events: rallies and ride weekends.\n• Invite Friends: both save 50%.\n• Map Mode (was Navigate): custom trails, Track Line.\n• Smoother Ride Mode; type your own messages.\n• Notifications bell on Rides.\n• Leave Ride; organizers hand off.\n• Full Map, Follow Me, Music Controls.\n• Freeride line; rough locations flagged.\n• Report a Rider.\n• Gold Pro tags.\n• Trail width limits; ride miles fixed.",
+    "intro": "OnMyLead 2.0 is the biggest update yet. A new Home screen puts Join a Ride, Create a Ride and Find a Ride up front, with public rides near you, your group, your badges and a Feed of what your friends have been riding. Social lets you like and comment on your friends' rides, badges and trails, post ride reports with a photo and see any rider's profile. Events brings rallies, poker runs and ride weekends to one page with their agenda and group rides. Navigate is now Map Mode, with custom trails, a Track Line of where you've been and named spots like water crossings. You can pick Light or Dark, four themes and a Color Blind Mode. Ride Mode is cleaner and smoother, with your own typed messages, a Beverage Break quick reply, Follow Me, Full Map and Music Controls. Invite a friend who's new to OnMyLead, and when they finish their first ride you both get Pro Annual at half price for the first year. And there's a notifications inbox, easier Leave Ride, better handling of rough locations, Report a Rider, a Rider Safety Agreement, gold Pro tags and ride miles that match the ride, and trails now show width limits so you know your machine fits.",
+    "whatsNew": "What's new in 2.0:\n\n• New Home screen with a Feed of your friends' rides.\n• Social: like, comment and post.\n• Events: rallies and ride weekends.\n• Invite Friends: both save 50%.\n• Map Mode (was Navigate): custom trails, Track Line.\n• Smoother Ride Mode; custom messages.\n• Light mode, themes, Color Blind Mode.\n• Notifications bell.\n• Leave Ride; organizers hand off.\n• Full Map, Follow Me, Music Controls.\n• Freeride line.\n• Report a Rider. Gold Pro tags.\n• Trail width limits; ride miles fixed.",
     "apple": null,
     "google": null,
     "notes": [
@@ -29,7 +29,11 @@
       },
       {
         "kind": "new",
-        "text": "Navigate is now Map Mode. Map a Custom Trail from the Draw tab, turn on Track Line to see where you've been (one colour per day, kept 7 days on your phone only), and mark named spots like obstacles, hazards, water crossings and viewpoints that travel with the trail. Shared trails are now full length, with an optional Hide My Start for recordings."
+        "text": "Navigate is now Map Mode, with its own blue button in the middle of the tab bar so your offroad map is one tap from any tab. Map a Custom Trail from the Draw tab, turn on Track Line to see where you've been (one colour per day, kept 7 days on your phone only), and mark named spots like obstacles, hazards, water crossings and viewpoints that travel with the trail. Shared trails are now full length, with an optional Hide My Start for recordings."
+      },
+      {
+        "kind": "new",
+        "text": "Light mode and themes. Go to You > Appearance to pick Dark, Light or Match Phone, and one of four themes: Night Navy, Carbon (true black), Desert or Forest. Color Blind Mode switches rider status, trail and Track Line colors to ones that color blind riders can tell apart, and adds a symbol to riders who need a look."
       },
       {
         "kind": "improved",
@@ -130,6 +134,18 @@
       {
         "kind": "improved",
         "text": "Planning a group ride on a trail with a width limit shows the limit on the Riding banner and adds it to the ride's instructions for everyone who joins."
+      },
+      {
+        "kind": "fixed",
+        "text": "Share My Location with a family link showed an error (\"Property 'crypto' doesn't exist\") on iPhone, iPad and Android, and no link was made. Family links work again."
+      },
+      {
+        "kind": "new",
+        "text": "Tilt meter and Crash Alert. A Tilt tile in Map Mode and Ride Mode shows your vehicle's roll and pitch, turning amber, then red, near your limits; tap it for a full tilt meter. Zero it for your phone mount, set your own warning angles and get a buzz (or a spoken angle) before a steep lean. In Ride Mode, Crash Alert watches for a hard hit or a rollover: a 30 second I'm OK countdown starts, and if you don't answer, your group gets an EMERGENCY alert with your location. It never calls 911. Find it all under You, Tilt and Crash Alert."
+      },
+      {
+        "kind": "new",
+        "text": "Brand Ambassador: a new blue badge OnMyLead gives to the riders who represent the app. Ambassadors see it at the top of Badges, and everyone sees it beside their name, on the Feed and on their profile."
       }
     ]
   },

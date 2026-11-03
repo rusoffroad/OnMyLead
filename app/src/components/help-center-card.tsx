@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 
@@ -50,7 +50,7 @@ export function GuideLink({ slug, title = 'Read the Guide' }: { slug: string; ti
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -73,4 +73,4 @@ const styles = StyleSheet.create({
   urlText: { color: Colors.sky, fontFamily: font(700), fontSize: 15, lineHeight: 20 },
   guide: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingVertical: 2 },
   guideText: { color: Colors.sky, fontFamily: font(700), fontSize: 15, lineHeight: 20 },
-});
+}));

@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { AvatarEditor } from '@/components/avatar-editor';
 import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, MapLabelText, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } from '@/core/profile';
 import { myRideName, saveRideName } from '@/lib/api';
 import { useSession } from '@/lib/session';
@@ -140,7 +140,7 @@ function NamePreview({ userId, name }: { userId: string | undefined; name: strin
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   meta: { flexDirection: 'row', gap: Spacing.two, marginTop: -Spacing.two },
   preview: {
     overflow: 'hidden', borderRadius: Radius.card, backgroundColor: '#0E1D31', borderWidth: 1, borderColor: Colors.backgroundSelected,
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
   dot: { width: 38, height: 38, borderRadius: 19, backgroundColor: RideColors.rider, alignItems: 'center', justifyContent: 'center' },
   initial: { color: '#fff', fontFamily: font(800), fontSize: 18 },
   label: { backgroundColor: 'rgba(10,22,38,0.85)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2, maxWidth: 280 },
-  labelText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 30, lineHeight: 36 },
+  labelText: { color: MapLabelText, fontFamily: font(700, 'display'), fontSize: 30, lineHeight: 36 },
   chatLine: { alignSelf: 'stretch', backgroundColor: Colors.backgroundElement, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, gap: 2 },
   chatName: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
   chatBody: { color: Colors.text, fontFamily: font(500), fontSize: 15 },
-});
+}));

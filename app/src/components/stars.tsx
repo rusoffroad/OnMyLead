@@ -1,8 +1,8 @@
 import * as Haptics from 'expo-haptics';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 
 const STAR = 'M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z';
 
@@ -55,7 +55,7 @@ export function StarScore({ average, count, color, empty = 'No Ratings Yet' }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', gap: 2 },
   hit: { width: 46, height: 46, alignItems: 'center', justifyContent: 'center' },
   word: { fontFamily: font(700), fontSize: 15, paddingLeft: 6 },
@@ -63,4 +63,4 @@ const styles = StyleSheet.create({
   avg: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   count: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
   none: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
-});
+}));

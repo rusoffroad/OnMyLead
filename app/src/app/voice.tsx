@@ -1,11 +1,11 @@
 import { Stack } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { AUTO_VOICE, resolveVoice, suggestDownload, VOICE_SAMPLE, voiceChoices, voiceLabel, voiceTier, type PhoneVoice } from '@/core/voice';
 import { deviceLanguage, installedVoices, setVoiceChoice, speakWith, stopSpeaking, useVoiceChoice } from '@/lib/voice';
 
@@ -140,7 +140,7 @@ function VoiceRow({ title, detail, on, recommended, playing, onPick, onPlay }: {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   list: { gap: Spacing.two },
   row: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.two,
@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
   playOn: { backgroundColor: Colors.sky },
   playText: { color: Colors.sky, fontFamily: font(700), fontSize: 15 },
   tip: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: RideColors.yellow, padding: Spacing.three, gap: 4 },
-});
+}));

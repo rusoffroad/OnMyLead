@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { BadgePatch } from '@/components/badge-patch';
 import { BottomSheet } from '@/components/bottom-sheet';
@@ -9,7 +9,7 @@ import { Icon, type IconName } from '@/components/icon';
 import { PhotoViewer } from '@/components/photo-viewer';
 import { ReportSheet } from '@/components/report-sheet';
 import { RiderPhoto } from '@/components/rider-photo';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { feedHref, feedStat, timeAgo } from '@/core/feed';
 import { canShareOut, commentsLabel, itemHref, profileHref, socialLine, toggleLike, type SocialItem } from '@/core/social';
 import { confirmAsync } from '@/lib/confirm';
@@ -212,7 +212,7 @@ function MenuItem({ icon, label, onPress, danger }: { icon: IconName; label: str
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: { backgroundColor: Social.panel, borderRadius: 22, borderWidth: 1, borderColor: Social.line, padding: 16, gap: 12 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
@@ -228,11 +228,11 @@ const styles = StyleSheet.create({
   openText: { color: Colors.sky, fontFamily: font(600), fontSize: 14 },
   previews: { gap: 4, paddingTop: 2 },
   viewAll: { color: Social.muted, fontFamily: font(600), fontSize: 13 },
-  preview: { color: '#C9D3E1', fontFamily: font(500), fontSize: 14, lineHeight: 19 },
+  preview: { color: Colors.textSoft, fontFamily: font(500), fontSize: 14, lineHeight: 19 },
   actions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: Social.line, marginHorizontal: -8, paddingTop: 6, marginBottom: -6 },
   action: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, minHeight: 44, borderRadius: 12 },
   actionText: { color: Social.muted, fontFamily: font(600), fontSize: 14 },
   error: { color: Colors.danger, fontFamily: font(600), fontSize: 13 },
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 50, paddingHorizontal: 8, borderRadius: 12 },
   menuText: { color: Colors.text, fontFamily: font(600), fontSize: 16 },
-});
+}));

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Text as SvgText } from 'react-native-svg';
 
@@ -8,7 +8,7 @@ import { Icon } from '@/components/icon';
 import { ProChip } from '@/components/pro-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import type { FeatureKey } from '@/core/entitlements';
 import { FEATURE_INFO, nextReset, type ProBlock } from '@/core/pro';
 import { closeProGate, showProGate, useProGatePrompt } from '@/lib/pro';
@@ -112,8 +112,8 @@ export function ProLock({ feature, title, detail }: { feature: FeatureKey; title
   );
 }
 
-const styles = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+const styles = themedStyles(() => ({
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three,
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.border, borderStyle: 'dashed',
   },
   lockIcon: { width: 34, height: 34, borderRadius: 10, backgroundColor: 'rgba(229,38,46,0.14)', alignItems: 'center', justifyContent: 'center' },
-});
+}));

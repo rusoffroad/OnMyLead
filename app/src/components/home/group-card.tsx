@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import type { GroupChatSummary } from '@/core/group-chat';
 import { timeAgo } from '@/core/feed';
 import type { RidingGroup } from '@/lib/groups';
@@ -84,7 +84,7 @@ export function NoGroupCard() {
 const initials = (name: string) =>
   name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || 'G';
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: { padding: 16, gap: 14 },
   empty: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: Spacing.two,
   },
   btnText: { color: Colors.text, fontFamily: font(700), fontSize: 14, flexShrink: 1 },
-});
+}));

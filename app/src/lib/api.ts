@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
 
 import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
@@ -15,7 +16,7 @@ import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import { cleanRideName } from '@/core/profile';
 import { fromStored, toStored, type RideRoute } from '@/core/route';
-import { startShare, type ShareScope } from '@/core/sharing';
+import { bytesToHex, FAMILY_LINK_TOKEN_BYTES, startShare, type ShareScope } from '@/core/sharing';
 import { itemsFromRideNotes, localDate, templateById, type TemplateItem, type TripCategory } from '@/core/trips';
 import { track } from './analytics';
 import { readPhotoBytes, type PickedPhoto } from './photo-bytes';
@@ -391,10 +392,10 @@ export async function sharedLocationByToken(token: string): Promise<SharedLocati
   return rows[0] ?? null;
 }
 
+// expo-crypto, not the global `crypto`: Hermes on iPhone and Android has no `crypto` global, so
+// `crypto.getRandomValues` threw "Property 'crypto' doesn't exist" on Share My Location.
 function randomToken(): string {
-  const bytes = new Uint8Array(18);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return bytesToHex(Crypto.getRandomBytes(FAMILY_LINK_TOKEN_BYTES));
 }
 
 // --- Ride Mode --------------------------------------------------------------
