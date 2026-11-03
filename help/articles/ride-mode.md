@@ -258,7 +258,7 @@ The bar also has **Controls**, with a badge counting any other alerts. Tap it, o
 Tap the round **Music** button above **Center on Me** to pause, skip or change the volume of the music on your phone without leaving Ride Mode. See [Control Your Music While You Ride](/help/music-controls).
 :::
 
-:::release 2.0.1
+:::release 2.1
 ## Spoken Alerts
 
 Ride Mode reads announcements, regroup points, a rider falling behind and Mechanical Issue out loud in the most natural voice on your phone. To hear and pick another voice, go to **You** > **Voice**. See [Choose the Voice for Spoken Alerts](/help/voice).

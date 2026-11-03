@@ -3,7 +3,7 @@ title: Choose the Voice for Spoken Alerts
 summary: Pick the natural-sounding voice that reads Ride Mode alerts out loud, hear each one first, and download a better free voice that works with no service.
 category: ride-mode
 order: 47
-release: "2.0.1"
+release: "2.1"
 updated: 2026-11-03
 sources:
   - app/src/app/voice.tsx

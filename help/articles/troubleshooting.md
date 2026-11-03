@@ -77,7 +77,7 @@ On Android, check **Settings > Apps > OnMyLead > Notifications**, including the 
 
 **Need Help** and **EMERGENCY** alerts from your group always come through, even in quiet hours, as long as iPhone notifications are allowed for OnMyLead.
 
-:::release 2.0.1
+:::release 2.1
 ## The Spoken Alerts Sound Robotic
 
 Your phone may only have its small standard voice. Open **You** > **Voice** to hear the voices on your phone, and follow the steps there to download a free Premium or Enhanced voice. See [Choose the Voice for Spoken Alerts](/help/voice).
