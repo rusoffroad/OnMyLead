@@ -137,12 +137,20 @@ export type ReportRow = {
   // reported rider's suspension. Missing until that migration runs.
   source?: ReportSource | null; group_id?: string | null; group_name?: string | null;
   messages_copied?: number; reported_banned_until?: string | null;
+  // 2.0 Social (migration 20261102900000): a reported post or comment and its text when reported.
+  post_id?: string | null; comment_id?: string | null; reported_text?: string | null;
 };
 export type ReportMessage = {
   source: 'dm' | 'group_chat' | 'ride_chat'; source_id: string | null; source_name: string | null;
   sender_id: string | null; sender_name: string | null; body: string; sent_at: string;
 };
-export type ReportDetail = ReportRow & { reporters_on_user?: number; messages: ReportMessage[] };
+type ReportedContent = { id: string; body: string | null; created_at: string; hidden_at: string | null; hidden_reason: string | null; hidden_by: string | null; reporters: number };
+export type ReportDetail = ReportRow & {
+  reporters_on_user?: number; messages: ReportMessage[];
+  reported_photo?: string | null;
+  post?: (ReportedContent & { photo_path: string | null }) | null;
+  comment?: (ReportedContent & { item_key: string; owner_name: string }) | null;
+};
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed';
 export type AuditRow = { id: number; actor_id?: string; actor_name?: string | null; action: string; target_type?: string | null; target_id?: string | null; before?: unknown; after?: unknown; created_at: string };
 

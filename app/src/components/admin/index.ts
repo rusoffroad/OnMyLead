@@ -8,6 +8,7 @@ export { AdminGate } from './gate';
 export { ADMIN_SECTIONS, sectionFor, type AdminSection } from './nav';
 export { AdminPage, Columns, ComingSoon, Empty, ErrorNote, Fields, Loading, Panel } from './page';
 export { AdminShell } from './shell';
+export { SocialContentCard, type SocialContent } from './social-content';
 export { SuspendPanel } from './suspend-panel';
 export { TrialSettings } from './trial-settings';
 export { RIDE_STATUS, ROLE, VISIBILITY } from './labels';

@@ -9,13 +9,23 @@ import { RiderPhoto } from '@/components/rider-photo';
 import { Button, ErrorText } from '@/components/ui';
 import { Colors, font, Radius, Spacing } from '@/constants/theme';
 import {
-  feedHref, feedLine, feedStat, KIND_CHOICES, SHARE_WITH_CHOICES, SHOW_FROM_CHOICES, timeAgo, toggleKind,
-  type FeedItem, type FeedSettings,
+  feedHref, feedLine, feedStat, KIND_CHOICES, SHARE_WITH_CHOICES, SHOW_FROM_CHOICES, timeAgo, toggleKind, type FeedSettings,
 } from '@/core/feed';
+import { commentsLabel, itemHref, toggleLike, type SocialItem } from '@/core/social';
+import { setLike } from '@/lib/social';
 import { faceColor, Home, homeStyles, HomeCard, Initial } from './parts';
 
-/** The Feed: a few recent posts from friends, follows and groups. Out riding first. */
-export function FeedList({ items, emptyText }: { items: FeedItem[]; emptyText: string }) {
+/** Opens an item inside Social: Social first, then the item on top, so Back lands in Social. */
+export function openInSocial(key: string | null) {
+  router.push('/social');
+  if (key) router.push(itemHref(key) as never);
+}
+
+/**
+ * The Feed: a few recent posts from friends, follows and groups, out riding first. Each one can be
+ * liked right here (the heart), and tapping it opens it in Social with every comment.
+ */
+export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; emptyText: string; onChange?: (i: number, next: SocialItem) => void }) {
   if (!items.length) {
     return (
       <HomeCard style={styles.empty}>
@@ -29,34 +39,54 @@ export function FeedList({ items, emptyText }: { items: FeedItem[]; emptyText: s
       {items.map((item, i) => {
         const href = feedHref(item);
         const stat = feedStat(item);
-        const body = (
-          <View style={styles.item}>
-            <View>
-              <RiderPhoto userId={item.actorId} size={42} fallback={<Initial name={item.actorName} size={42} color={faceColor(item.actorId)} />} />
-              {item.kind === 'out' ? <View style={styles.live} /> : null}
-            </View>
-            <View style={{ flex: 1, gap: 3 }}>
-              <Text style={styles.line}>
-                <Text style={{ fontFamily: font(700) }}>{item.actorName} </Text>
-                {feedLine(item)}
-              </Text>
-              <Text style={[homeStyles.muted, { fontSize: 12 }]}>
-                {item.kind === 'out' ? 'Riding now' : timeAgo(item.at)}
-                {stat ? `  ·  ${stat}` : ''}
-              </Text>
-            </View>
-            {item.badge ? <BadgePatch badge={item.badge.badge} level={item.badge.level} size={34} /> : null}
-            {href ? <Icon name="chevron" size={18} color={Home.muted} /> : null}
-          </View>
-        );
+        const like = async () => {
+          if (!item.key || !onChange) return;
+          const next = toggleLike(item);
+          onChange(i, next);
+          try {
+            onChange(i, { ...next, likeCount: await setLike(item.key, next.liked) });
+          } catch {
+            onChange(i, item);
+          }
+        };
+        const open = () => (item.key ? openInSocial(item.key) : href ? router.push(href as never) : router.push('/social'));
         return (
           <Fragment key={`${item.kind}${item.actorId}${item.at}${i}`}>
             {i > 0 ? <View style={styles.divider} /> : null}
-            {href ? (
-              <Pressable accessibilityRole="link" onPress={() => router.push(href as never)} style={({ pressed }) => pressed && { backgroundColor: Home.panel2 }}>
-                {body}
+            <View style={styles.item}>
+              <View>
+                <RiderPhoto userId={item.actorId} name={item.actorName} size={42} fallback={<Initial name={item.actorName} size={42} color={faceColor(item.actorId)} />} />
+                {item.kind === 'out' ? <View style={styles.live} /> : null}
+              </View>
+              <Pressable
+                accessibilityRole="link"
+                accessibilityHint={item.key ? 'Opens it in Social with the comments' : undefined}
+                onPress={open}
+                style={({ pressed }) => [{ flex: 1, gap: 3 }, pressed && { opacity: 0.7 }]}>
+                <Text style={styles.line} numberOfLines={item.kind === 'post' ? 3 : undefined}>
+                  <Text style={{ fontFamily: font(700) }}>{item.actorName} </Text>
+                  {item.kind === 'post' ? item.body ?? 'posted a photo' : feedLine(item)}
+                </Text>
+                <Text style={[homeStyles.muted, { fontSize: 12 }]}>
+                  {item.kind === 'out' ? 'Riding now' : timeAgo(item.at)}
+                  {stat ? `  ·  ${stat}` : ''}
+                  {item.commentCount ? `  ·  ${commentsLabel(item.commentCount)}` : ''}
+                </Text>
               </Pressable>
-            ) : body}
+              {item.badge ? <BadgePatch badge={item.badge.badge} level={item.badge.level} size={34} /> : null}
+              {item.key && onChange ? (
+                <Pressable
+                  onPress={like}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={item.liked ? 'Unlike' : 'Like'}
+                  accessibilityState={{ selected: item.liked }}
+                  style={styles.heart}>
+                  <Icon name="heart" size={22} color={item.liked ? '#FF4D57' : Home.muted} fill={item.liked ? '#FF4D57' : undefined} />
+                  {item.likeCount ? <Text style={[styles.heartCount, item.liked && { color: '#FF4D57' }]}>{item.likeCount}</Text> : null}
+                </Pressable>
+              ) : href ? <Icon name="chevron" size={18} color={Home.muted} /> : null}
+            </View>
           </Fragment>
         );
       })}
@@ -153,6 +183,8 @@ const styles = StyleSheet.create({
   empty: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
   item: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
   divider: { height: 1, backgroundColor: Home.line },
+  heart: { alignItems: 'center', minWidth: 32, gap: 1 },
+  heartCount: { color: Home.muted, fontFamily: font(700), fontSize: 11 },
   live: { position: 'absolute', right: -1, bottom: -1, width: 13, height: 13, borderRadius: 7, backgroundColor: Home.mint, borderWidth: 2, borderColor: Home.panel },
   line: { color: Colors.text, fontFamily: font(500), fontSize: 15, lineHeight: 20 },
   groupTitle: { color: Home.muted, fontFamily: font(700), fontSize: 12, letterSpacing: 1, textTransform: 'uppercase' },

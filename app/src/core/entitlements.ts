@@ -22,11 +22,13 @@ export type FeatureKey =
   | 'premium_ride_cards'
   | 'record_trails'
   | 'share_trails'
-  | 'trail_rides';
+  | 'trail_rides'
+  | 'social_posts';
 
 export const FEATURE_KEYS: FeatureKey[] = [
   'create_ride', 'import_gpx', 'offline_maps', 'saved_groups', 'create_poll', 'ride_history',
   'advanced_trip_planning', 'advanced_stats', 'premium_ride_cards', 'record_trails', 'share_trails', 'trail_rides',
+  'social_posts',
 ];
 
 /** Names for prompts and the comparison table (Title Case). */
@@ -43,6 +45,7 @@ export const FEATURE_NAMES: Record<FeatureKey, string> = {
   record_trails: 'Record Your Trails',
   share_trails: 'Share Your Trails',
   trail_rides: 'Group Rides on Your Trails',
+  social_posts: 'Post, Comment and Share',
 };
 
 export type AccountType = 'free' | 'pro' | 'admin';
@@ -231,7 +234,7 @@ export function applyClock(e: Entitlements, now = Date.now()): Entitlements {
     rideAllowance: 1,
     historyLimit: 5,
     features: { ...ALL_ON, import_gpx: false, offline_maps: false, saved_groups: false, create_poll: false,
-      advanced_trip_planning: false, advanced_stats: false, premium_ride_cards: false },
+      advanced_trip_planning: false, advanced_stats: false, premium_ride_cards: false, social_posts: false },
   };
 }
 

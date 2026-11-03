@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, DataTable, Empty, ErrorNote, Fields, Loading, Panel, planTone, StatGrid,
-  ROLE, StatTile, StatusBadge, SuspendPanel, useConfirm, useToast,
+  ROLE, SocialContentCard, StatTile, StatusBadge, SuspendPanel, useConfirm, useToast,
 } from '@/components/admin';
 import { font } from '@/constants/theme';
 import { actionLabel, daysLeft, fmtAgo, fmtDate, fmtDateTime, fmtInt } from '@/core/admin-format';
@@ -13,6 +13,7 @@ import * as admin from '@/lib/admin';
 import * as growthApi from '@/lib/admin-growth';
 import { adminRemoveAvatar, useAvatar } from '@/lib/avatars';
 import { RiderPhoto } from '@/components/rider-photo';
+import { adminRiderSocial } from '@/lib/social';
 
 const STATUS: Record<string, string> = { scheduled: 'Upcoming', live: 'Riding Now', ended: 'Completed', cancelled: 'Cancelled' };
 
@@ -26,6 +27,7 @@ export default function UserDetail() {
   const growth = admin.useAdminData(() => growthApi.growthSummary(null, null), [id]);
   // Their Rider Safety and Liability Agreement records (empty until the migration is live).
   const agreements = admin.useAdminData(() => admin.riderAgreements('', 0, 20, id), [id]);
+  const social = admin.useAdminData(() => adminRiderSocial(id), [id]);
   const photo = useAvatar(id);
 
   const run = async (key: string, fn: () => Promise<unknown>, done: string) => {
@@ -243,6 +245,34 @@ export default function UserDetail() {
           ))}
         </Panel>
       </Columns>
+
+      <Panel title="Posts and Comments">
+        {social.data && !social.data.posts.length && !social.data.comments.length ? (
+          <Empty text="No posts or comments on the Feed." />
+        ) : null}
+        {social.data?.posts.map((c) => (
+          <SocialContentCard
+            key={c.id}
+            onDone={social.reload}
+            c={{
+              kind: 'post', id: c.id, authorId: id, body: c.body, photoPath: c.photo_path, createdAt: c.created_at,
+              hiddenAt: c.hidden_at, hiddenReason: c.hidden_reason, hiddenBy: c.hidden_by,
+              note: `${c.likes} likes, ${c.comments} comments${c.reports ? `, ${c.reports} reports` : ''}`,
+            }}
+          />
+        ))}
+        {social.data?.comments.map((c) => (
+          <SocialContentCard
+            key={c.id}
+            onDone={social.reload}
+            c={{
+              kind: 'comment', id: c.id, authorId: id, body: c.body, createdAt: c.created_at,
+              hiddenAt: c.hidden_at, hiddenReason: c.hidden_reason, hiddenBy: c.hidden_by,
+              note: `On ${c.owner_name}’s ${c.item_key.split(':')[0]}${c.reports ? `, ${c.reports} reports` : ''}`,
+            }}
+          />
+        ))}
+      </Panel>
 
       <Panel title="Safety Agreement" right={<AdminButton title="All Agreements" small onPress={() => router.push('/admin/agreements')} />}>
         {agreements.error ? <Text style={styles.note}>Agreement records aren&apos;t available yet.</Text> : null}

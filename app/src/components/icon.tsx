@@ -67,16 +67,20 @@ const PATHS = {
   draw: ['M7 17.5c3.5-.8 3-5.5 6-7.5s3.5-2.6 4.2-3.2'],
   download: ['M3.5 6.5L9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5-5.5 2.5z', 'M12 9.5v6', 'M9.5 13.2L12 15.7l2.5-2.5'],
   trackLine: ['M3.5 18c2.5-4 5-1 7.5-5s4-6 9.5-7'],
+  // Social (2.0): like, share, a photo.
+  heart: ['M12 20s-7.6-4.6-9.1-9.4C1.9 7.4 4.1 4.5 7.3 4.5c2 0 3.6 1.1 4.7 2.8 1.1-1.7 2.7-2.8 4.7-2.8 3.2 0 5.4 2.9 4.4 6.1C19.6 15.4 12 20 12 20z'],
+  share: ['M12 3.5v11', 'M8 7.2l4-3.7 4 3.7', 'M7 10.5H5v10h14v-10h-2'],
+  image: ['M3.5 5h17v14h-17z', 'M3.5 16.5l5-5 4 4 2.5-2.5 5.5 5.5'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
 
 /** A small line icon set drawn for OnMyLead, so it renders the same on iOS, Android and the web. */
-export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
+export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fill }: { name: IconName; size?: number; color?: string; strokeWidth?: number; fill?: string }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {PATHS[name].map((d) => (
-        <Path key={d} d={d} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+        <Path key={d} d={d} stroke={color} fill={fill ?? 'none'} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       ))}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
@@ -105,6 +109,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2 }: 
           <Circle cx={19} cy={5.5} r={2} stroke={color} strokeWidth={strokeWidth} />
         </>
       ) : null}
+      {name === 'image' ? <Circle cx={15.5} cy={9} r={1.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'search' ? <Circle cx={10.5} cy={10.5} r={6.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'machine' ? (
         <>
