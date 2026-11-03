@@ -231,3 +231,34 @@ export function formatPrice(cents: number | null): string | null {
   if (cents == null) return null;
   return `$${(cents / 100).toFixed(cents % 100 ? 2 : 0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 }
+
+// --- Featured products ---------------------------------------------------------------
+
+/** The product page's slug: the last path segment of its permalink ("/product/<slug>/"). */
+export function productSlug(permalink: string): string | null {
+  const m = /\/product\/([^/?#]+)\/?(?:[?#]|$)/i.exec(permalink);
+  return m ? decodeURIComponent(m[1]).toLowerCase() : null;
+}
+
+/** One product from the store list by its page slug, or null when the list doesn't have it. */
+export function findBySlug(products: RusProduct[], slug: string): RusProduct | null {
+  const want = slug.toLowerCase();
+  return products.find((p) => productSlug(p.permalink) === want) ?? null;
+}
+
+/**
+ * The RUS Starlink Mini Mount V2 (Morelock Series), advertised on the Starlink page. The app
+ * shows its own fixed name and copy, never the store's product text, and takes only the photo
+ * and price from the live store.
+ */
+export const STARLINK_MOUNT = {
+  slug: 'starlink-mini-mount-v2-morelock-series',
+  url: `${RUS_ORIGIN}/product/starlink-mini-mount-v2-morelock-series/`,
+  title: 'Starlink Mini Mount V2',
+  series: 'Morelock Series',
+} as const;
+
+/** Where the ad's button goes: the live product (with attribution) or, if the store is unreachable, its page. */
+export function featuredUrl(p: RusProduct | null, fallback: string, campaign: string): string {
+  return p ? withParams(p.permalink, utm(campaign)) : withParams(fallback, utm(campaign));
+}

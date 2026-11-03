@@ -4,11 +4,11 @@
  */
 import * as WebBrowser from 'expo-web-browser';
 
-import { RUS_ORIGIN, buyUrl, parseStoreProducts, storeUrl, type RusProduct } from '@/core/rus-match';
+import { RUS_ORIGIN, buyUrl, featuredUrl, parseStoreProducts, storeUrl, type RusProduct } from '@/core/rus-match';
 import { track } from './analytics';
 
 export type { GearSuggestion, RiderVehicle, RusProduct } from '@/core/rus-match';
-export { formatPrice, matchProducts } from '@/core/rus-match';
+export { STARLINK_MOUNT, findBySlug, formatPrice, matchProducts } from '@/core/rus-match';
 
 const PRODUCTS_URL = `${RUS_ORIGIN}/wp-json/wc/store/v1/products?per_page=100`;
 const FRESH_MS = 15 * 60_000;
@@ -53,4 +53,10 @@ export async function openProduct(p: RusProduct, campaign: string) {
 export async function openStore(campaign: string) {
   track('rus_store_opened', { campaign });
   await WebBrowser.openBrowserAsync(storeUrl(campaign));
+}
+
+/** Open a featured product page (an ad), live product if the store answered, else its known page. */
+export async function openFeatured(p: RusProduct | null, fallbackUrl: string, campaign: string) {
+  track('rus_product_opened', { product_id: p?.id ?? null, campaign });
+  await WebBrowser.openBrowserAsync(featuredUrl(p, fallbackUrl, campaign));
 }
