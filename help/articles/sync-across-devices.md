@@ -14,6 +14,8 @@ sources:
   - app/src/app/maps/index.tsx
   - app/src/app/(tabs)/profile.tsx
   - app/src/lib/voice.ts
+  - app/src/lib/tilt.ts
+  - app/src/lib/appearance-sync.ts
   - supabase/migrations/20261103300000_account_sync.sql
 related: [navigation-mode, offline-maps, privacy, use-onmylead-on-a-tablet, sign-in]
 keywords: [sync, cloud, backup, two phones, ipad and iphone, new phone, same account, settings, devices, restore trails]
@@ -32,6 +34,8 @@ Your rides, chats, friends, groups, Garage, trips, Starlink setup, notification 
 - The **Track Line** switch (the line itself stays on each device, see below)
 - **Directions**: which maps app Navigate opens. If you picked Apple Maps, an Android phone asks each time, since it doesn't have Apple Maps.
 - **Music Controls**
+- **Appearance**: Dark, Light or Match Phone, your theme and Color Blind Mode
+- **Tilt**: your warning angles, Warn Me, the spoken warnings, showing the tile, and Crash Alert (the Zero stays on each device)
 - **Voice**: the voice that speaks your alerts. A device that doesn't have that voice uses its best one.
 - Your saved quick replies for ride chat
 - Which panels you keep open or folded in Ride Mode, Map Mode, Route Builder and Waypoints
@@ -54,6 +58,7 @@ Some things are about one device, so they stay on it:
 
 - **Battery Saver**: it's about this device's battery, and an iPad on the charger may not need it.
 - **Track Line**: the line of where you've been is location history, so it never leaves the device.
+- The tilt meter's **Zero**: each phone sits differently in its mount.
 - A recording in progress (it backs up as soon as you save the trail).
 - The downloaded map squares themselves.
 - The Rider Safety and Liability Agreement: you agree once on each device you install OnMyLead on.
