@@ -24,7 +24,9 @@ export function Toolkit({ tools, columns }: { tools: typeof TOOLKIT; columns: nu
           style={({ pressed }) => [styles.tool, { width: `${100 / columns}%` }, pressed && { opacity: 0.75 }]}>
           <View style={styles.icon}>
             <Gradient colors={[Home.panel2, Home.panel]} radius={18} />
-            <Icon name={ICONS[t.key]} size={24} color={Colors.text} strokeWidth={2} />
+            <View>
+              <Icon name={ICONS[t.key]} size={24} color={Colors.text} strokeWidth={2} />
+            </View>
           </View>
           <Text style={styles.label} numberOfLines={2}>{t.label}</Text>
         </Pressable>

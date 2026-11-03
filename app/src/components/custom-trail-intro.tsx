@@ -25,7 +25,19 @@ export function CustomTrailIntro({
 }: { visible: boolean; rules: TrailRules; onStart: (dontShowAgain: boolean) => void; onClose: () => void }) {
   const [skip, setSkip] = useState(false);
   return (
-    <BottomSheet visible={visible} onClose={onClose} title="How Custom Trails Work" footer={<Button title="Start Mapping" onPress={() => onStart(skip)} />}>
+    <BottomSheet visible={visible} onClose={onClose} title="How Custom Trails Work" footer={
+      <View style={{ gap: 4 }}>
+      <Pressable
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: skip }}
+          onPress={() => setSkip(!skip)}
+          style={styles.check}>
+          <View style={[styles.box, skip && styles.boxOn]}>{skip ? <Icon name="check" size={16} color="#fff" strokeWidth={3} /> : null}</View>
+          <Text style={styles.body}>Don’t show this again</Text>
+        </Pressable>
+        <Button title="Start Mapping" onPress={() => onStart(skip)} />
+      </View>
+    }>
       {STEPS.map((s, i) => (
         <View key={s.title} style={styles.step}>
           <View style={styles.num}>
@@ -43,14 +55,6 @@ export function CustomTrailIntro({
           If {trailRuleWords(rules)}, it comes off the public map automatically. You’re told, it stays on your phone, and you can fix it and share it again. The admin can also take down a trail that breaks the rules.
         </Text>
       </View>
-      <Pressable
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: skip }}
-        onPress={() => setSkip(!skip)}
-        style={styles.check}>
-        <View style={[styles.box, skip && styles.boxOn]}>{skip ? <Icon name="check" size={16} color="#fff" strokeWidth={3} /> : null}</View>
-        <Text style={styles.body}>Don’t show this again</Text>
-      </Pressable>
     </BottomSheet>
   );
 }

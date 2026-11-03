@@ -44,7 +44,8 @@ export function BottomSheet({
 }
 
 const styles = StyleSheet.create({
-  scrim: { flex: 1, alignSelf: 'stretch' },
+  // No focus ring around the dimmed area on the website (the sheet takes focus when it opens).
+  scrim: { flex: 1, alignSelf: 'stretch', outlineWidth: 0 },
   sheet: {
     flexShrink: 1, maxHeight: '88%', backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,

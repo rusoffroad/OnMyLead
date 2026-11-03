@@ -93,7 +93,7 @@ export function MapModeCard({
             onPress={() => router.push('/nav?draw=1')}
             style={({ pressed }) => [styles.btn, pressed && { opacity: 0.85 }]}>
             <Icon name="draw" size={18} color={Colors.text} strokeWidth={2.2} />
-            <Text style={styles.btnText} numberOfLines={1}>Map a Custom Trail</Text>
+            <Text style={styles.btnText} numberOfLines={2}>Map a Custom Trail</Text>
           </Pressable>
         </View>
         <View style={styles.track}>
@@ -129,10 +129,10 @@ const styles = StyleSheet.create({
   buttons: { flexDirection: 'row', gap: 10 },
   btn: {
     flex: 1, minHeight: 46, borderRadius: 14, borderWidth: 1, borderColor: Home.line, backgroundColor: Home.panel2,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: Spacing.two,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: Spacing.two, paddingVertical: 6,
   },
   btnGo: { backgroundColor: Colors.text, borderColor: 'transparent' },
-  btnText: { color: Colors.text, fontFamily: font(700), fontSize: 14, flexShrink: 1 },
+  btnText: { color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 17, flexShrink: 1, textAlign: 'center' },
   track: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: Home.line },
   trackTitle: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   days: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
