@@ -40,7 +40,7 @@ Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free
 - **Music Controls**
 - **Appearance**: Dark, Light or Match Phone, your theme and Color Blind Mode
 - **Language**: the language you picked, or Match Phone (then each device follows its own language)
-- **Tilt**: your warning angles, Warn Me, the spoken warnings, showing the tile, and Crash Alert (the Zero stays on each device)
+- **Tilt**: your warning angles, Warn Me, the spoken warnings, the Tilt Meter switch, and Crash Alert (the Zero stays on each device)
 - **Voice**: the voice that speaks your alerts. A device that doesn't have that voice uses its best one.
 - Your saved quick replies for ride chat
 - Which panels you keep open or folded in Ride Mode, Map Mode, Route Builder and Waypoints

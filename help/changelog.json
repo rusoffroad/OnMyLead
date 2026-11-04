@@ -41,6 +41,19 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "tilt-and-crash-alert",
+      "sync-across-devices",
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "tilt-off-switch",
+    "why": "Chris asked for an easy way to turn the angle indicator off. A Tilt Meter On/Off switch now sits under the Crash Alert switch at the top of the Tilt screen (it replaces Show in Map Mode and Ride Mode and also stops tilt warnings). New section Turn the Tilt Meter Off. The website showcase's Tilt card mentions the switch; those two articles are unchanged (only the date)."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "language",
       "home-screen",
       "sync-across-devices"
