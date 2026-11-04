@@ -35,6 +35,12 @@ describe('liveNotice', () => {
 });
 
 describe('flagOn', () => {
+  it('keeps a flag that needs setup first off until the owner switches it on', () => {
+    expect(flagOn(NO_SETTINGS, 'apple_web_sign_in')).toBe(false);
+    expect(flagOn({ ...NO_SETTINGS, flags: { apple_web_sign_in: false } }, 'apple_web_sign_in')).toBe(false);
+    expect(flagOn({ ...NO_SETTINGS, flags: { apple_web_sign_in: true } }, 'apple_web_sign_in')).toBe(true);
+  });
+
   it('leaves features on unless switched off', () => {
     expect(flagOn(NO_SETTINGS, 'starlink')).toBe(true);
     expect(flagOn({ ...NO_SETTINGS, flags: { starlink: true } }, 'starlink')).toBe(true);
