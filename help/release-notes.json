@@ -3,13 +3,13 @@
     "version": "2.1",
     "title": "One Map Everywhere, 3D Terrain, Bluetooth Sharing and the Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders close by on the same ride pass spots, status taps and EMERGENCY alerts to each other over Bluetooth. And the new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so the map looks and works the same on your phone, your tablet and the website.",
-    "whatsNew": "What's new in 2.1:\n\n• Every map is now Mapbox: the same satellite, topo and trails on phone, tablet and the website, and a live Ride Mode map on the website.\n• 3D Terrain: satellite on the real shape of the land, with contour lines and peak heights. Tilt it, turn it, save it offline.\n• Bluetooth Sharing: with no service, nearby riders still see your spot, status taps and EMERGENCY, phone to phone.\n• Badge Leaderboard: see where you rank in your state, country or everywhere.",
+    "whatsNew": "What's new in 2.1:\n\n• Every map is now Mapbox: the same satellite, topo and trails on phone, tablet and the website, and a live Ride Mode map on the website.\n• 3D Terrain: satellite on the real shape of the land, with contour lines and peak heights. Tilt further and hills stand taller. Save it offline.\n• Bluetooth Sharing: with no service, nearby riders still see your spot, status taps and EMERGENCY, phone to phone.\n• Badge Leaderboard: see where you rank in your state, country or everywhere.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "improved",
-        "text": "Every map in the app is now drawn by Mapbox: Ride Mode, Map Mode, the route builder, waypoints, Find a Ride and Offline Maps' area picker, on iPhone, iPad, Android and onmylead.com. A map looks and works the same wherever you open it, and the website's Ride Mode now shows the same live map as the phone. Free accounts get Mapbox's outdoors map with roads, trails and contours."
+        "text": "Every map in the app is now drawn by Mapbox: Ride Mode, Map Mode, the route builder, waypoints, Find a Ride and Offline Maps' area picker, on iPhone, iPad, Android and onmylead.com. A map looks and works the same wherever you open it, and the website's Ride Mode now shows the same live map as the phone. Free accounts get Mapbox's outdoors map with roads, trails and contours. The meeting-point map is on the phone and tablet too, a trail's page previews it on a real map, and in 3D Terrain tilting further raises the land."
       },
       {
         "kind": "new",
