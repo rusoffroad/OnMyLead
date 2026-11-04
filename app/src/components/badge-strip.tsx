@@ -20,15 +20,15 @@ export function BadgeStrip({ mine }: { mine: MyBadges }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Badges.${honors.map((h) => ` ${h.name}.`).join('')} Your rank is ${rank.name}, ${rank.levels} levels earned.${fresh ? ` ${fresh} new.` : ''}`}
+      accessibilityLabel={[t('Badges.'), ...honors.map((h) => `${t(h.name)}.`), t('Your rank is {name}, {levels} levels earned.', { name: t(rank.name), levels: rank.levels }), fresh ? t('{n} new.', { n: fresh }) : ''].filter(Boolean).join(' ')}
       onPress={() => router.push('/badges')}
       style={({ pressed }) => [styles.badges, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.badgesHead}>
-        <Text style={styles.rankName}>{rank.name}</Text>
+        <Text style={styles.rankName}>{t(rank.name)}</Text>
         <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }} numberOfLines={1}>
-          {rank.next ? `${rank.next.min - rank.levels} more ${rank.next.min - rank.levels === 1 ? 'level' : 'levels'} for ${rank.next.name}` : t('The top rank')}
+          {rank.next ? (rank.next.min - rank.levels === 1 ? t('1 more level for {name}', { name: t(rank.next.name) }) : t('{n} more levels for {name}', { n: rank.next.min - rank.levels, name: t(rank.next.name) })) : t('The top rank')}
         </ThemedText>
-        {fresh ? <Text style={styles.newPill}>{fresh === 1 ? t('New Badge') : `${fresh} New`}</Text> : null}
+        {fresh ? <Text style={styles.newPill}>{fresh === 1 ? t('New Badge') : t('{n} New', { n: fresh })}</Text> : null}
       </View>
       <View style={styles.patches}>
         {honors.map((h) => (

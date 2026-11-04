@@ -1,4 +1,4 @@
-import { coreLocale } from './i18n';
+import { coreLocale, tc } from './i18n';
 
 /**
  * Rider badges and ranks, as riders see them on every device. The server earns them
@@ -165,8 +165,8 @@ export function progressFor(def: BadgeDef, value: number, level: BadgeLevel | 0)
   const prevGoal = level === 0 ? 0 : def.thresholds[level - 1];
   const fraction = goal == null ? 1 : Math.max(0, Math.min(1, (value - prevGoal) / (goal - prevGoal)));
   const line = goal == null
-    ? `${fmt(value)} ${plural(def, value)}`
-    : `${fmt(Math.min(value, goal))} of ${fmt(goal)} ${plural(def, goal)} for ${LEVEL_NAME[(level + 1) as BadgeLevel]}`;
+    ? tc('{n} {unit}', { n: fmt(value), unit: tc(plural(def, value)) })
+    : tc('{n} of {goal} {unit} for {level}', { n: fmt(Math.min(value, goal)), goal: fmt(goal), unit: tc(plural(def, goal)), level: tc(LEVEL_NAME[(level + 1) as BadgeLevel]) });
   return { def, level, value, goal, fraction, line };
 }
 
@@ -195,7 +195,7 @@ export function topBadge(earned: Pick<EarnedBadge, 'badge' | 'level'>[]): { badg
 
 /** "Trail Boss Silver"; honors have no level, so just "Brand Ambassador". */
 export const badgeTitle = (b: { badge: BadgeKey; level: BadgeLevel }) =>
-  isHonor(b.badge) ? HONOR_BY_KEY[b.badge].name : `${BADGE_BY_KEY[b.badge].name} ${LEVEL_NAME[b.level]}`;
+  isHonor(b.badge) ? tc(HONOR_BY_KEY[b.badge].name) : tc('{name} {level}', { name: tc(BADGE_BY_KEY[b.badge].name), level: tc(LEVEL_NAME[b.level]) });
 
 /** New badges the rider hasn't seen, highest first. */
 export function unseen(mine: MyBadges): EarnedBadge[] {
