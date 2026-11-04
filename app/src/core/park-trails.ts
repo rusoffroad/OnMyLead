@@ -223,6 +223,20 @@ export function parksInView(parks: ParkSummary[], view: { minLat: number; minLng
   return parks.filter((p) => p.box.maxLat >= view.minLat && p.box.minLat <= view.maxLat && p.box.maxLng >= view.minLng && p.box.minLng <= view.maxLng);
 }
 
+const inBox = (pt: LatLng, b: ParkSummary['box']) => pt.lat >= b.minLat && pt.lat <= b.maxLat && pt.lng >= b.minLng && pt.lng <= b.maxLng;
+
+/**
+ * The OpenStreetMap track lines and name tags that fall inside a mapped park's box, dropped: the
+ * park's own trails (the same lines, colored by level and named without the "(lvl 3)" tag) are
+ * drawn there instead, so the two never sit on top of each other. Lines outside every park stay.
+ */
+export function outsideParks<T extends { parts?: LatLng[][]; at?: LatLng }>(items: T[], parks: ParkSummary[]): T[] {
+  const boxes = parks.filter((p) => p.trailCount > 0).map((p) => p.box);
+  if (!boxes.length || !items.length) return items;
+  const covered = (pt: LatLng | undefined) => !!pt && boxes.some((b) => inBox(pt, b));
+  return items.filter((it) => !covered(it.at ?? it.parts?.[0]?.[0]));
+}
+
 /** "57 trails · 28.8 mi" under a park's name. */
 export function parkSummaryLine(p: ParkSummary, metric = false): string {
   return tc('{n} trails · {len}', { n: p.trailCount, len: parkTrailLength(p.trailM, metric) });

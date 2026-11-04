@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { encodePolyline } from '../polyline';
 import {
-  drawableParkTrails, midpoint, parkLevelLabel, parkPieces, parkSummaryLine, parkTrailColor, parkTrailLabels, parkTrailLength, parksInView,
+  drawableParkTrails, midpoint, outsideParks, parkLevelLabel, parkPieces, parkSummaryLine, parkTrailColor, parkTrailLabels, parkTrailLength, parksInView,
   parseParkSummary, parseParkTrail, parseParkTrails, PARK_LEVEL_COLORS, type ParkTrail,
 } from '../park-trails';
 import { TRAIL_INK } from '../trails';
@@ -87,6 +87,21 @@ describe('how park trails are drawn', () => {
     const p = parkPieces([t({ level: 4, kind: 'trail' }), t({ id: 'r', kind: 'road', level: null })]);
     expect(p[0]).toMatchObject({ key: 'park-aaaaaaaa-0000-4000-8000-000000000001', color: PARK_LEVEL_COLORS[4], road: false, closed: false });
     expect(p[1]).toMatchObject({ key: 'park-r', color: TRAIL_INK.road, road: true });
+  });
+});
+
+describe('OpenStreetMap lines inside a drawn park', () => {
+  const park = { parkOsmId: 1, parkName: 'Hidden Falls', parkState: 'TX', parkWebsite: null, trailCount: 5, trailM: 1000, center: { lat: 30.6, lng: -98.15 }, box: { minLat: 30.58, minLng: -98.18, maxLat: 30.62, maxLng: -98.12 } };
+  const inside = { key: 'in', parts: [[{ lat: 30.6, lng: -98.15 }, { lat: 30.61, lng: -98.14 }]] };
+  const outside = { key: 'out', parts: [[{ lat: 30.7, lng: -98.15 }, { lat: 30.71, lng: -98.14 }]] };
+  it('drops the lines and tags the park trails replace, keeps the rest', () => {
+    expect(outsideParks([inside, outside], [park]).map((l) => l.key)).toEqual(['out']);
+    expect(outsideParks([{ key: 't', at: { lat: 30.6, lng: -98.15 } }, { key: 'u', at: { lat: 31, lng: -98 } }], [park]).map((l) => l.key)).toEqual(['u']);
+  });
+  it('changes nothing without a park with trails', () => {
+    const lines = [inside, outside];
+    expect(outsideParks(lines, [])).toBe(lines);
+    expect(outsideParks(lines, [{ ...park, trailCount: 0 }])).toBe(lines);
   });
 });
 

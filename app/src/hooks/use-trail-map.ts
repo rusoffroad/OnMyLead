@@ -5,7 +5,7 @@ import type { MapPressEvent, Region } from 'react-native-maps';
 
 import { boxInside, nearestRiderTrail, paddedBox, RIDER_TRAILS_MIN_Z, type PublicTrail } from '@/core/nav-trails';
 import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
-import { drawableParkTrails, PARK_NAMES_MIN_Z, PARK_TRAILS_MIN_Z, parkTrailLabels, parksInView, type ParkLabel, type ParkSummary, type ParkTrail } from '@/core/park-trails';
+import { drawableParkTrails, outsideParks, PARK_NAMES_MIN_Z, PARK_TRAILS_MIN_Z, parkTrailLabels, parksInView, type ParkLabel, type ParkSummary, type ParkTrail } from '@/core/park-trails';
 import { terrainBoxes } from '@/core/offline-maps';
 import { lookFor, mapboxDraws, type MapLook } from '@/core/terrain';
 import { mapZoom, metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
@@ -24,6 +24,7 @@ const KEY = 'map.layers.v1';
 export const RIDER_TRAILS_KEY = 'map.riderTrails.v1';
 /** Show the trails of offroad parks (core/park-trails). On unless the rider hid them. */
 export const PARK_TRAILS_KEY = 'map.parkTrails.v1';
+const EMPTY_PARKS: ParkSummary[] = [];
 
 export type TrailMap = {
   /** The rider's map style. 3D Terrain is drawn only where `terrain3d` says; flat maps draw it as satellite. */
@@ -397,6 +398,11 @@ export function useTrailMap(): TrailMap {
     return parkTrailLabels(parkDrawn, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
   }, [parkOn, parkDrawn, zoom]);
   const parksShown = useMemo(() => (parkOn && viewBox && zoom >= PARK_NAMES_MIN_Z ? parksInView(parks, viewBox) : []), [parkOn, parks, zoom, viewBox]);
+  // Where a park's trails are drawn, the plain OpenStreetMap copies of the same lines step aside.
+  const parksDrawn = parkOn && zoom >= PARK_TRAILS_MIN_Z && parkDrawn.length ? parksShown : EMPTY_PARKS;
+  const osmShown = useMemo(() => outsideParks(drawn, parksDrawn), [drawn, parksDrawn]);
+  const labelsShown = useMemo(() => outsideParks(labels, parksDrawn), [labels, parksDrawn]);
+  const closedShown = useMemo(() => outsideParks(closed, parksDrawn), [closed, parksDrawn]);
 
   // Free riders get satellite (map layers are Pro); 3D Terrain picked but not offered any more
   // (switched off, or a build without Mapbox) is plain satellite too.
@@ -413,9 +419,9 @@ export function useTrailMap(): TrailMap {
     terrain3d,
     trails,
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
-    osmLines: trails ? drawn : [],
-    labels: trails ? labels : [],
-    closedLines: trails ? closed : [],
+    osmLines: trails ? osmShown : [],
+    labels: trails ? labelsShown : [],
+    closedLines: trails ? closedShown : [],
     closerForTracks: trails && zoom >= TRAILS_MIN_Z && zoom < OSM_VIEW_MIN_Z,
     offline,
     setBase,
