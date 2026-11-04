@@ -20,6 +20,7 @@ import { confirmAsync, showNotice } from '@/lib/confirm';
 import { stopSendingLocationFor } from '@/lib/location';
 import type { Ride, RideMember } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 type Props = {
   ride: Pick<Ride, 'id' | 'name' | 'status' | 'organizer_id'>;
   members: RideMember[];
@@ -57,7 +58,7 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
       setPicking(false);
       onLeft(what);
     } catch (e) {
-      showNotice('Could Not Leave', friendlyLeaveError(e instanceof Error ? e.message : String(e)));
+      showNotice(t('Could Not Leave'), friendlyLeaveError(e instanceof Error ? e.message : String(e)));
     } finally {
       setBusy(false);
     }
@@ -68,7 +69,7 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
     if (kind === 'handOff') return setPicking(true);
     if (kind === 'cancel') {
       const p = leaveAloneCancelPrompt(ride.name, ridersToTell(members, me));
-      if (await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride')) run(() => cancelRide(ride.id), 'cancelled');
+      if (await confirmAsync(p.title, p.message, p.confirm, t('Keep Ride'))) run(() => cancelRide(ride.id), 'cancelled');
       return;
     }
     const p = leaveConfirm(kind, ride.name, ride.status, {
@@ -76,7 +77,7 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
       sharing,
       waitlisted: mine?.status === 'waitlisted',
     });
-    if (await confirmAsync(p.title, p.message, p.confirm, 'Stay')) run(() => leaveRide(ride.id), 'left');
+    if (await confirmAsync(p.title, p.message, p.confirm, t('Stay'))) run(() => leaveRide(ride.id), 'left');
   }
 
   const label = LEAVE_LABEL[kind];
@@ -104,7 +105,7 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
           onPick={async (m) => {
             const name = m.profiles?.display_name || 'this rider';
             const p = handOffAndLeavePrompt(ride.name, name);
-            if (!(await confirmAsync(p.title, p.message, p.confirm, 'Back'))) return;
+            if (!(await confirmAsync(p.title, p.message, p.confirm, t('Back')))) return;
             run(async () => {
               await handOffRide(ride.id, m.user_id);
               await leaveRide(ride.id);
@@ -112,7 +113,7 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
           }}
           onCancelInstead={async () => {
             const p = leaveAloneCancelPrompt(ride.name, ridersToTell(members, me), false);
-            if (await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride')) run(() => cancelRide(ride.id), 'cancelled');
+            if (await confirmAsync(p.title, p.message, p.confirm, t('Keep Ride'))) run(() => cancelRide(ride.id), 'cancelled');
           }}
         />
       ) : null}
@@ -138,13 +139,11 @@ function HandOffSheet({
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
-        <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
+        <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={t('Close')} accessibilityRole="button" />
         <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
           <View style={styles.grip} />
-          <Text style={styles.title} accessibilityRole="header">Who Takes Over?</Text>
-          <ThemedText type="small" themeColor="textSecondary">
-            You’re the organizer of {ride.name}. Pick who organizes and leads it after you leave.
-          </ThemedText>
+          <Text style={styles.title} accessibilityRole="header">{t('Who Takes Over?')}</Text>
+          <ThemedText type="small" themeColor="textSecondary">{t('You’re the organizer of {name}. Pick who organizes and leads it after you leave.', { name: ride.name })}</ThemedText>
           <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.two }}>
             {riders.map((m) => {
               const name = m.profiles?.display_name || 'Rider';
@@ -168,8 +167,8 @@ function HandOffSheet({
               );
             })}
           </SheetScroll>
-          <Button title="Cancel the Ride Instead" kind="ghost" disabled={busy} onPress={onCancelInstead} />
-          <Button title="Stay on the Ride" kind="secondary" disabled={busy} onPress={onClose} />
+          <Button title={t('Cancel the Ride Instead')} kind="ghost" disabled={busy} onPress={onCancelInstead} />
+          <Button title={t('Stay on the Ride')} kind="secondary" disabled={busy} onPress={onClose} />
         </SwipeSheet>
       </SheetRoot>
     </Modal>

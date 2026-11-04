@@ -15,6 +15,7 @@ import { commentsLabel, itemHref, toggleLike, type SocialItem } from '@/core/soc
 import { setLike } from '@/lib/social';
 import { faceColor, Home, homeStyles, HomeCard, Initial } from './parts';
 
+import { t } from '@/lib/i18n';
 /** Opens an item inside Social: Social first, then the item on top, so Back lands in Social. */
 export function openInSocial(key: string | null) {
   router.push('/social');
@@ -123,31 +124,31 @@ export function FeedSheet({
     }
   };
   return (
-    <BottomSheet visible={visible} onClose={onClose} title="Customize Feed" footer={<Button title="Save" loading={saving} onPress={save} />}>
-      <Group title="Show Posts From">
+    <BottomSheet visible={visible} onClose={onClose} title={t('Customize Feed')} footer={<Button title={t('Save')} loading={saving} onPress={save} />}>
+      <Group title={t('Show Posts From')}>
         {SHOW_FROM_CHOICES.map((c) => (
-          <Radio key={c.value} label={c.label} detail={c.detail} on={draft.showFrom === c.value} onPress={() => setDraft({ ...draft, showFrom: c.value })} />
+          <Radio key={c.value} label={t(c.label)} detail={t(c.detail)} on={draft.showFrom === c.value} onPress={() => setDraft({ ...draft, showFrom: c.value })} />
         ))}
       </Group>
-      <Group title="What Shows">
+      <Group title={t('What Shows')}>
         {KIND_CHOICES.map((c) => (
           <View key={c.value} style={styles.toggle}>
-            <Text style={[styles.optLabel, { flex: 1 }]}>{c.label}</Text>
+            <Text style={[styles.optLabel, { flex: 1 }]}>{t(c.label)}</Text>
             <Switch
               value={draft.kinds.includes(c.value)}
               onValueChange={() => setDraft({ ...draft, kinds: toggleKind(draft.kinds, c.value) })}
-              accessibilityLabel={c.label}
+              accessibilityLabel={t(c.label)}
               trackColor={{ true: Colors.accent, false: Home.panel2 }}
               thumbColor="#fff"
             />
           </View>
         ))}
       </Group>
-      <Group title="Who Sees Your Activity">
+      <Group title={t('Who Sees Your Activity')}>
         {SHARE_WITH_CHOICES.map((c) => (
-          <Radio key={c.value} label={c.label} detail={c.detail} on={draft.shareWith === c.value} onPress={() => setDraft({ ...draft, shareWith: c.value })} />
+          <Radio key={c.value} label={t(c.label)} detail={t(c.detail)} on={draft.shareWith === c.value} onPress={() => setDraft({ ...draft, shareWith: c.value })} />
         ))}
-        <Text style={[homeStyles.muted, { fontSize: 12 }]}>Your location is never in anyone’s feed. Out Riding posts follow your Out Riding setting.</Text>
+        <Text style={[homeStyles.muted, { fontSize: 12 }]}>{t('Your location is never in anyone’s feed. Out Riding posts follow your Out Riding setting.')}</Text>
       </Group>
       <ErrorText error={error} />
     </BottomSheet>

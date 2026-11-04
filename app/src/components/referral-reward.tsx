@@ -11,6 +11,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { buy } from '@/lib/purchases';
 import { applyPlayDeferral, claimReward, openAppleRedeem } from '@/lib/referrals';
 
+import { t } from '@/lib/i18n';
 /**
  * The refer-a-friend reward, shaped like a trail pass: what was earned on the left of the
  * perforation, the price on the right, and one button that claims it the way this device's store
@@ -75,19 +76,19 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
           <ProShield size={34} />
           <Text style={styles.title} accessibilityRole="header">{lines.title}</Text>
         </View>
-        <ThemedText type="small" style={{ color: Colors.text }}>{lines.body}</ThemedText>
-        {lines.note ? <ThemedText type="small" themeColor="textSecondary">{lines.note}</ThemedText> : null}
+        <ThemedText type="small" style={{ color: Colors.text }}>{t(lines.body)}</ThemedText>
+        {lines.note ? <ThemedText type="small" themeColor="textSecondary">{t(lines.note)}</ThemedText> : null}
       </View>
       {live && state !== 'google_defer_pending' ? <View style={styles.tear} /> : null}
       {live && state !== 'google_defer_pending' ? (
         <View style={styles.perforation} accessible accessibilityLabel={`$${REFERRAL_PRICE.discounted} for the first year instead of $${REFERRAL_PRICE.annual}`}>
           <Text style={styles.was}>${REFERRAL_PRICE.annual}</Text>
           <Text style={styles.price}>${REFERRAL_PRICE.discounted}</Text>
-          <ThemedText type="small" themeColor="textSecondary">First Year</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('First Year')}</ThemedText>
         </View>
       ) : null}
       {action?.kind === 'claim' ? (
-        <Button title={action.title} big loading={busy} onPress={claim} />
+        <Button title={t(action.title)} big loading={busy} onPress={claim} />
       ) : action ? (
         <ThemedText type="small" style={{ color: Colors.text }}>{action.message}</ThemedText>
       ) : null}

@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /** Trip planner: checklist categories, starter templates, progress and merging. Pure, no I/O. */
 
 /** Checklist categories in display order. Ids match the database check constraint. */
@@ -20,7 +22,7 @@ export type TripCategory = (typeof TRIP_CATEGORIES)[number]['id'];
 const CATEGORY_ORDER = new Map<string, number>(TRIP_CATEGORIES.map((c, i) => [c.id, i]));
 
 export const isTripCategory = (s: string): s is TripCategory => CATEGORY_ORDER.has(s);
-export const categoryLabel = (id: string) => TRIP_CATEGORIES.find((c) => c.id === id)?.label ?? 'Other';
+export const categoryLabel = (id: string) => TRIP_CATEGORIES.find((c) => c.id === id)?.label ?? tc('Other');
 
 export type TemplateItem = { name: string; category: TripCategory; quantity?: number; notes?: string };
 export type TripTemplate = { id: string; label: string; blurb: string; items: TemplateItem[] };
@@ -173,7 +175,7 @@ export function progress(items: { checked: boolean }[]): Progress {
     total,
     done: total > 0 && packed === total,
     fraction: total ? packed / total : 0,
-    label: total ? `${packed} of ${total} packed` : 'Nothing on the list yet',
+    label: total ? tc('{packed} of {total} packed', { packed, total }) : tc('Nothing on the list yet'),
   };
 }
 

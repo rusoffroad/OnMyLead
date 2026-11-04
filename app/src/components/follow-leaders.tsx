@@ -6,6 +6,7 @@ import { followLeader, followStates, NotSwitchedOnError, unfollowLeader } from '
 import { RiderDot } from './convoy';
 import { ThemedText } from './themed-text';
 
+import { t } from '@/lib/i18n';
 type Leader = { id: string; name: string; following: boolean };
 
 /**
@@ -44,7 +45,7 @@ export function FollowLeaders({ ids, organizerId }: { ids: string[]; organizerId
   if (off) {
     return (
       <ThemedText type="small" themeColor="textSecondary">
-        Follow This Leader is not switched on yet. It starts working with the next server update.
+        {t('Follow This Leader is not switched on yet. It starts working with the next server update.')}
       </ThemedText>
     );
   }
@@ -62,7 +63,7 @@ export function FollowLeaders({ ids, organizerId }: { ids: string[]; organizerId
             accessibilityRole="button"
             accessibilityState={{ selected: l.following, busy: busy === l.id }}
             accessibilityLabel={l.following ? `Following ${l.name}. Tap to unfollow` : `Follow ${l.name}`}
-            accessibilityHint="Get a notification when they post a new public ride"
+            accessibilityHint={t('Get a notification when they post a new public ride')}
             disabled={busy === l.id}
             onPress={() => toggle(l)}
             style={({ pressed }) => [styles.button, l.following ? styles.on : styles.offBtn, pressed && { opacity: 0.8 }]}>

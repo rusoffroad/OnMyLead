@@ -53,34 +53,34 @@ export default function FriendLink() {
       });
   }, [code, loading, session]);
 
-  if (loading) return <Screen><ThemedText themeColor="textSecondary">Loading…</ThemedText></Screen>;
+  if (loading) return <Screen><ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText></Screen>;
 
   if (!session) {
     return (
       <Screen>
         <Stack.Screen options={{ title: t('Add Friend') }} />
         <View style={styles.top}>
-          <Text style={styles.title}>A Rider Wants to Be Friends</Text>
+          <Text style={styles.title}>{t('A Rider Wants to Be Friends')}</Text>
           <ThemedText themeColor="textSecondary">
-            Friends on OnMyLead see each other when they’re out riding nearby and can message any time. Sign in to see who sent this link.
+            {t('Friends on OnMyLead see each other when they’re out riding nearby and can message any time. Sign in to see who sent this link.')}
           </ThemedText>
           {referralsOn ? (
-            <Text style={styles.offer}>New to OnMyLead? Create your account with this link. When you finish your first ride, you and your friend both get 50% off Pro Annual.</Text>
+            <Text style={styles.offer}>{t('New to OnMyLead? Create your account with this link. When you finish your first ride, you and your friend both get 50% off Pro Annual.')}</Text>
           ) : null}
         </View>
-        <Button title="Create a Free Account" big onPress={() => router.push('/sign-in?mode=create')} />
-        <Button title="I Already Have an Account" kind="ghost" onPress={() => router.push('/sign-in')} />
+        <Button title={t('Create a Free Account')} big onPress={() => router.push('/sign-in?mode=create')} />
+        <Button title={t('I Already Have an Account')} kind="ghost" onPress={() => router.push('/sign-in')} />
       </Screen>
     );
   }
 
-  if (preview === undefined) return <Screen><ThemedText themeColor="textSecondary">Loading…</ThemedText></Screen>;
+  if (preview === undefined) return <Screen><ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText></Screen>;
   if (preview === null) {
     return (
       <Screen>
         <Stack.Screen options={{ title: t('Add Friend') }} />
         <ThemedText>{error ?? 'This friend link doesn’t work anymore. Ask for a new one.'}</ThemedText>
-        <Button title="Go to Friends" kind="secondary" onPress={() => router.replace('/friends')} />
+        <Button title={t('Go to Friends')} kind="secondary" onPress={() => router.replace('/friends')} />
       </Screen>
     );
   }
@@ -126,7 +126,7 @@ export default function FriendLink() {
       {done ? <Text style={styles.done}>{done}</Text> : null}
       <ErrorText error={error} />
       {done || preview.relation === 'friends' || preview.relation === 'self' || preview.relation === 'sent' ? (
-        <Button title="Go to Friends" big kind={done ? 'primary' : 'secondary'} onPress={() => router.replace('/friends')} />
+        <Button title={t('Go to Friends')} big kind={done ? 'primary' : 'secondary'} onPress={() => router.replace('/friends')} />
       ) : (
         <Button
           title={preview.relation === 'received' ? 'Accept Friend Request' : 'Add Friend'}

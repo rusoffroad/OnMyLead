@@ -1,3 +1,5 @@
+import { coreLocale, tc } from './i18n';
+
 /**
  * The ride date picker's calendar math: which days a ride can be set for, the month grid, the
  * quick picks and the plain-words labels. Pure and in local time, so iPhone, iPad, Android and the
@@ -164,7 +166,7 @@ export type QuickDay = { day: Date; label: string };
 /** The one-tap days above the calendar: Today, Tomorrow, and the coming Saturday and Sunday (Sat, Sun). */
 export function quickDays(today: Date): QuickDay[] {
   const t = startOfDay(today);
-  const out: QuickDay[] = [{ day: t, label: 'Today' }, { day: addDays(t, 1), label: 'Tomorrow' }];
+  const out: QuickDay[] = [{ day: t, label: tc('Today') }, { day: addDays(t, 1), label: tc('Tomorrow') }];
   for (const [weekday, label] of [[6, 'Sat'], [0, 'Sun']] as const) {
     const d = t.getDay() === weekday ? t : nextWeekday(t, weekday);
     if (!out.some((q) => sameDay(q.day, d))) out.push({ day: d, label });
@@ -174,7 +176,7 @@ export function quickDays(today: Date): QuickDay[] {
 
 /** "Saturday, November 14" (with the year when it isn't this year). */
 export function longDayText(day: Date, today: Date): string {
-  return day.toLocaleDateString('en-US', {
+  return day.toLocaleDateString(coreLocale(), {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -184,19 +186,19 @@ export function longDayText(day: Date, today: Date): string {
 
 /** "November 2026", the calendar's heading. */
 export function monthText(month: Date): string {
-  return month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  return month.toLocaleDateString(coreLocale(), { month: 'long', year: 'numeric' });
 }
 
 /** How far off the day is, in plain words: "Today", "Tomorrow", "In 5 Days", "In 3 Weeks", "In 4 Months", "In 2 Years". */
 export function daysAwayText(day: Date, today: Date): string {
   const n = Math.round((startOfDay(day).getTime() - startOfDay(today).getTime()) / 86_400_000);
-  if (n <= 0) return 'Today';
-  if (n === 1) return 'Tomorrow';
-  if (n < 14) return `In ${n} Days`;
-  if (n < 60) return `In ${Math.round(n / 7)} Weeks`;
+  if (n <= 0) return tc('Today');
+  if (n === 1) return tc('Tomorrow');
+  if (n < 14) return tc('In {n} Days', { n });
+  if (n < 60) return tc('In {v} Weeks', { v: Math.round(n / 7) });
   const months = Math.round(n / 30.44);
-  if (months < 12) return `In ${months} Months`;
-  return n < 548 ? 'In a Year' : `In ${Math.round(n / 365.25)} Years`;
+  if (months < 12) return tc('In {months} Months', { months });
+  return n < 548 ? tc('In a Year') : tc('In {v} Years', { v: Math.round(n / 365.25) });
 }
 
 /** The meet time on that day: `minutes` after midnight, by the wall clock (so DST days stay right). */

@@ -6,6 +6,7 @@ import { Icon } from '@/components/icon';
 import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import { eventForRide } from '@/lib/events';
 
+import { t } from '@/lib/i18n';
 /** "Part of Moab Spring Rally": on a ride's page when the ride is one of an event's group rides. */
 export function PartOfEvent({ rideId }: { rideId: string }) {
   const [ev, setEv] = useState<{ share_code: string; title: string; label: string | null } | null>(null);
@@ -27,7 +28,7 @@ export function PartOfEvent({ rideId }: { rideId: string }) {
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.8 }]}>
       <Icon name="calendar" size={16} color={Colors.accent} />
       <View style={{ flex: 1 }}>
-        <Text style={styles.text} numberOfLines={1}>Part of {ev.title}{ev.label ? `: ${ev.label}` : ''}</Text>
+        <Text style={styles.text} numberOfLines={1}>{t('Part of {title}{v}', { title: ev.title, v: ev.label ? `: ${ev.label}` : '' })}</Text>
       </View>
       <Icon name="chevron" size={16} color={Colors.textSecondary} />
     </Pressable>

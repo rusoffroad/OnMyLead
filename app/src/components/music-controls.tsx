@@ -11,6 +11,7 @@ import { requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
 import { askMusicAccess, canOpenSpotify, musicCommand, openSpotify, readMusic, setMusicVolume, SystemVolumeSlider } from '@/lib/music';
 
+import { t as tr } from '@/lib/i18n';
 const glass = GlassSurface;
 
 /** The music note drawn for the Music button (filled heads read at a glance on a bumpy mount). */
@@ -58,7 +59,7 @@ export function MusicButton({ onPress, style, size = 48 }: { onPress: () => void
       onPress={() => requirePro('music_controls') && onPress()}
       accessibilityRole="button"
       accessibilityLabel={musicButtonLabel(null)}
-      accessibilityHint="Play, pause, skip and volume for the music on your phone"
+      accessibilityHint={tr('Play, pause, skip and volume for the music on your phone')}
       hitSlop={6}
       style={({ pressed }) => [styles.fab, { width: size, height: size, borderRadius: size / 2, opacity: pressed ? 0.8 : 1 }, style]}>
       <NoteGlyph size={Math.round(size * 0.5)} />
@@ -131,13 +132,13 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={close}>
       <SheetRoot style={[styles.wrap, tablet && styles.wrapTablet]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel="Close Music Controls" />
+        <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel={tr('Close Music Controls')} />
         <SwipeSheet onClose={close} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
           <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 18 }}>
             {hidden ? (
               <View style={{ gap: 12 }} accessibilityLiveRegion="polite">
-                <Text style={styles.title}>Music Button Hidden</Text>
-                <Text style={styles.note}>Turn it back on any time under You, Music Controls.</Text>
+                <Text style={styles.title}>{tr('Music Button Hidden')}</Text>
+                <Text style={styles.note}>{tr('Turn it back on any time under You, Music Controls.')}</Text>
                 <Pressable
                   onPress={() => {
                     setMusicControls(true);
@@ -145,7 +146,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                   }}
                   accessibilityRole="button"
                   style={({ pressed }) => [styles.wide, { opacity: pressed ? 0.8 : 1 }]}>
-                  <Text style={styles.wideText}>Undo</Text>
+                  <Text style={styles.wideText}>{tr('Undo')}</Text>
                 </Pressable>
               </View>
             ) : (
@@ -155,8 +156,8 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                     <View style={[styles.dot, { backgroundColor: v?.playing ? RideColors.green : Colors.textSecondary }]} />
                     <Text style={styles.sourceText} numberOfLines={1}>{v?.source ?? 'Music'}</Text>
                   </View>
-                  <Pressable onPress={close} accessibilityRole="button" accessibilityLabel="Close Music Controls" hitSlop={10} style={styles.close}>
-                    <Text style={styles.closeText}>Close</Text>
+                  <Pressable onPress={close} accessibilityRole="button" accessibilityLabel={tr('Close Music Controls')} hitSlop={10} style={styles.close}>
+                    <Text style={styles.closeText}>{tr('Close')}</Text>
                   </Pressable>
                 </View>
 
@@ -170,7 +171,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                     <Pressable
                       onPress={() => press('previous')}
                       accessibilityRole="button"
-                      accessibilityLabel="Previous Song"
+                      accessibilityLabel={tr('Previous Song')}
                       style={({ pressed }) => [styles.skip, { opacity: pressed ? 0.75 : 1 }]}>
                       <Transport kind="previous" size={34} color={Colors.text} />
                     </Pressable>
@@ -184,7 +185,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                     <Pressable
                       onPress={() => press('next')}
                       accessibilityRole="button"
-                      accessibilityLabel="Next Song"
+                      accessibilityLabel={tr('Next Song')}
                       style={({ pressed }) => [styles.skip, { opacity: pressed ? 0.75 : 1 }]}>
                       <Transport kind="next" size={34} color={Colors.text} />
                     </Pressable>
@@ -193,7 +194,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
 
                 <VolumeRow volume={v?.volume ?? null} onChange={volumeTo} />
 
-                {v?.note ? <Text style={styles.note}>{v.note}</Text> : null}
+                {v?.note ? <Text style={styles.note}>{tr(v.note)}</Text> : null}
 
                 {v?.ask ? (
                   <Pressable
@@ -201,7 +202,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                     accessibilityRole="button"
                     accessibilityHint={v.ask === 'android_listener' ? 'Opens Settings. Switch on Notification Access for OnMyLead Music Controls' : undefined}
                     style={({ pressed }) => [styles.wide, { opacity: pressed ? 0.8 : 1 }]}>
-                    <Text style={styles.wideText}>Show Song Names</Text>
+                    <Text style={styles.wideText}>{tr('Show Song Names')}</Text>
                     <Text style={styles.wideSub}>
                       {v.ask === 'android_listener'
                         ? 'Android shares what’s playing only with apps you allow under Notification Access. OnMyLead never reads your notifications.'
@@ -211,13 +212,13 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                 ) : null}
 
                 {showSpotify ? (
-                  <Pressable onPress={openSpotify} accessibilityRole="button" accessibilityHint="Leaves OnMyLead" style={({ pressed }) => [styles.wide, { opacity: pressed ? 0.8 : 1 }]}>
-                    <Text style={styles.wideText}>Open Spotify</Text>
+                  <Pressable onPress={openSpotify} accessibilityRole="button" accessibilityHint={tr('Leaves OnMyLead')} style={({ pressed }) => [styles.wide, { opacity: pressed ? 0.8 : 1 }]}>
+                    <Text style={styles.wideText}>{tr('Open Spotify')}</Text>
                   </Pressable>
                 ) : null}
 
-                <Pressable onPress={hide} accessibilityRole="button" accessibilityHint="Hides the Music button. Turn it back on under You" hitSlop={8} style={styles.hide}>
-                  <Text style={styles.hideText}>Hide Music Button</Text>
+                <Pressable onPress={hide} accessibilityRole="button" accessibilityHint={tr('Hides the Music button. Turn it back on under You')} hitSlop={8} style={styles.hide}>
+                  <Text style={styles.hideText}>{tr('Hide Music Button')}</Text>
                 </Pressable>
               </>
             )}
@@ -239,7 +240,7 @@ function VolumeRow({ volume, onChange }: { volume: number | null; onChange: (v: 
       <Pressable
         onPress={() => onChange(stepVolume(volume, -1))}
         accessibilityRole="button"
-        accessibilityLabel="Volume Down"
+        accessibilityLabel={tr('Volume Down')}
         style={({ pressed }) => [styles.volBtn, { opacity: pressed ? 0.75 : 1 }]}>
         <Text style={styles.volBtnText}>−</Text>
       </Pressable>
@@ -247,7 +248,7 @@ function VolumeRow({ volume, onChange }: { volume: number | null; onChange: (v: 
         {SystemVolumeSlider ? (
           <SystemVolumeSlider tint={Colors.sky} style={{ height: 44 }} />
         ) : (
-          <View style={styles.meter} accessibilityRole="adjustable" accessibilityLabel="Volume" accessibilityValue={pct ? { text: pct } : undefined}
+          <View style={styles.meter} accessibilityRole="adjustable" accessibilityLabel={tr('Volume')} accessibilityValue={pct ? { text: pct } : undefined}
             accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
             onAccessibilityAction={(e) => onChange(stepVolume(volume, e.nativeEvent.actionName === 'increment' ? 1 : -1))}>
             {Array.from({ length: VOLUME_STEPS }, (_, i) => {
@@ -263,12 +264,12 @@ function VolumeRow({ volume, onChange }: { volume: number | null; onChange: (v: 
             })}
           </View>
         )}
-        <Text style={styles.volLabel}>Volume{pct ? ` ${pct}` : ''}</Text>
+        <Text style={styles.volLabel}>{tr('Volume{v}', { v: pct ? ` ${pct}` : '' })}</Text>
       </View>
       <Pressable
         onPress={() => onChange(stepVolume(volume, 1))}
         accessibilityRole="button"
-        accessibilityLabel="Volume Up"
+        accessibilityLabel={tr('Volume Up')}
         style={({ pressed }) => [styles.volBtn, { opacity: pressed ? 0.75 : 1 }]}>
         <Text style={styles.volBtnText}>+</Text>
       </Pressable>

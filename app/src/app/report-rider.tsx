@@ -16,6 +16,7 @@ import { friendSuggestions, useFriends } from '@/lib/friends';
 import { myDmThreads } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 /**
  * You > Report a Rider: report someone without finding the ride or chat first. Lists riders this
  * rider has messaged, friended, ridden with or blocked, each opening the usual report sheet.
@@ -62,25 +63,23 @@ export default function ReportRider() {
   return (
     <Screen>
       <ThemedText themeColor="textSecondary">
-        Pick who you want to report for harassment, threats or anything else that breaks the rider rules. It goes to the
-        OnMyLead team. They aren’t told who reported them. If anyone is in danger, call 911.
+        {t('Pick who you want to report for harassment, threats or anything else that breaks the rider rules. It goes to the OnMyLead team. They aren’t told who reported them. If anyone is in danger, call 911.')}
       </ThemedText>
-      <Field label="Search" value={query} onChangeText={setQuery} placeholder="Rider name" autoCorrect={false} returnKeyType="search" />
+      <Field label={t('Search')} value={query} onChangeText={setQuery} placeholder={t('Rider name')} autoCorrect={false} returnKeyType="search" />
       <ErrorText error={error} />
       {!loaded ? (
-        <ThemedText themeColor="textSecondary">Loading…</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>
       ) : !sections.length ? (
         <View style={styles.note}>
           <ThemedText type="smallBold">{query ? 'No Riders Match' : 'Nobody to Report Yet'}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            Riders you’ve messaged, ridden with, added as friends or blocked show here. You can also report a rider from their
-            message, a ride’s Going list or Out Riding.
+            {t('Riders you’ve messaged, ridden with, added as friends or blocked show here. You can also report a rider from their message, a ride’s Going list or Out Riding.')}
           </ThemedText>
         </View>
       ) : (
         sections.map((s) => (
           <View key={s.title} style={{ gap: Spacing.two }}>
-            <ThemedText type="smallBold" themeColor="textSecondary">{s.title}</ThemedText>
+            <ThemedText type="smallBold" themeColor="textSecondary">{t(s.title)}</ThemedText>
             <View style={styles.list}>
               {s.people.map((p, i) => (
                 <Pressable
@@ -92,7 +91,7 @@ export default function ReportRider() {
                   <View style={styles.dot}><Text style={styles.initial}>{initialOf(p.name)}</Text></View>
                   <View style={{ flex: 1, gap: 2 }}>
                     <ThemedText style={{ fontWeight: 600 }} numberOfLines={1}>{p.name}</ThemedText>
-                    <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{p.detail}</ThemedText>
+                    <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{t(p.detail)}</ThemedText>
                   </View>
                   <Icon name="flagged" size={20} color={Colors.textSecondary} />
                 </Pressable>

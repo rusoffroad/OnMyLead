@@ -8,6 +8,7 @@ import type { Ride } from '@/lib/types';
 import { Icon } from './icon';
 import { ThemedText } from './themed-text';
 
+import { t } from '@/lib/i18n';
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
 /** Rows that share one surface, divided by hairlines, like an iOS grouped list. */
@@ -33,7 +34,7 @@ function DateBlock({ ride }: { ride: Ride }) {
     return (
       <View style={[styles.date, { backgroundColor: theme.accent }]}>
         <View style={styles.liveDot} />
-        <Text style={[styles.dateSmall, { color: '#fff' }]}>Live</Text>
+        <Text style={[styles.dateSmall, { color: '#fff' }]}>{t('Live')}</Text>
       </View>
     );
   }

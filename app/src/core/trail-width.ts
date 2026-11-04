@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Trail width limits: how wide a machine can be and still fit a trail. Pure, no I/O.
  *
@@ -74,9 +76,9 @@ export function parseWidth(text: string, min = WIDTH_MIN_IN, max = WIDTH_MAX_IN)
   const t = text.trim().replace(/["”]|\s*(in|inch|inches)$/i, '').trim();
   if (!t) return { ok: true, value: null };
   const n = Number(t);
-  if (!Number.isFinite(n)) return { ok: false, error: 'Enter the width in inches, like 50.' };
+  if (!Number.isFinite(n)) return { ok: false, error: tc('Enter the width in inches, like 50.') };
   const r = Math.round(n);
-  if (r < min || r > max) return { ok: false, error: `Width is ${min} to ${max} inches.` };
+  if (r < min || r > max) return { ok: false, error: tc('Width is {min} to {max} inches.', { min, max }) };
   return { ok: true, value: r };
 }
 
@@ -116,18 +118,18 @@ export function shownWidth(agencyIn: number | null, riders: RiderWidths): WidthS
   if (agencyIn != null) {
     return {
       widthIn: agencyIn,
-      label: `${inches(agencyIn)} Width Limit`,
+      label: tc('{v} Width Limit', { v: inches(agencyIn) }),
       detail:
         riders.widthIn != null && riders.widthIn !== agencyIn
-          ? `From the Forest Service vehicle rules. Riders report ${inches(riders.widthIn)}.`
-          : 'From the Forest Service vehicle rules.',
+          ? tc('From the Forest Service vehicle rules. Riders report {v}.', { v: inches(riders.widthIn) })
+          : tc('From the Forest Service vehicle rules.'),
     };
   }
   if (riders.widthIn != null) {
     return {
       widthIn: riders.widthIn,
-      label: `${inches(riders.widthIn)} Width Limit`,
-      detail: riders.count === 1 ? 'Added by 1 rider.' : `Middle of ${riders.count} riders' entries.`,
+      label: tc('{v} Width Limit', { v: inches(riders.widthIn) }),
+      detail: riders.count === 1 ? tc('Added by 1 rider.') : tc('Middle of {count} riders\' entries.', { count: riders.count }),
     };
   }
   return null;
@@ -159,5 +161,5 @@ export function rigFit(limitIn: number | null, vehicles: FitVehicle[]): RigFit {
 
 /** A Garage vehicle's name for the fit line: nickname, else "make model". */
 export function fitName(v: { nickname?: string | null; make?: string | null; model?: string | null }): string {
-  return v.nickname?.trim() || [v.make, v.model].filter((s) => s?.trim()).join(' ') || 'Machine';
+  return v.nickname?.trim() || [v.make, v.model].filter((s) => s?.trim()).join(' ') || tc('Machine');
 }

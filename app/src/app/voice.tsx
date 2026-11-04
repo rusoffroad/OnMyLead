@@ -11,7 +11,7 @@ import { showsProTag } from '@/core/entitlements';
 import { ProTag } from '@/components/pro-tag';
 import { requirePro, useEntitlements } from '@/lib/pro';
 import { deviceLanguage, installedVoices, setVoiceChoice, speakWith, stopSpeaking, useVoiceChoice } from '@/lib/voice';
-import { t } from '@/lib/i18n';
+import { t as tr } from '@/lib/i18n';
 
 /** Where a rider gets a better free voice, per device. Steps are the same on iPhone and iPad. */
 const DOWNLOAD_STEPS: Record<string, string> = {
@@ -54,9 +54,9 @@ export default function VoiceScreen() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: t('Voice') }} />
+      <Stack.Screen options={{ title: tr('Voice') }} />
       <ThemedText themeColor="textSecondary">
-        The voice that reads Ride Mode alerts out loud: announcements, regroup points, a rider falling behind and Mechanical Issue. Every voice here is on this device, so it keeps talking with no service.
+        {tr('The voice that reads Ride Mode alerts out loud: announcements, regroup points, a rider falling behind and Mechanical Issue. Every voice here is on this device, so it keeps talking with no service.')}
       </ThemedText>
 
       {voices == null ? (
@@ -66,11 +66,11 @@ export default function VoiceScreen() {
           {showsProTag(ent, 'natural_voices') ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <ProTag feature="natural_voices" />
-              <ThemedText type="small" themeColor="textSecondary">Automatic is free. Pick your own voice with Pro.</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">{tr('Automatic is free. Pick your own voice with Pro.')}</ThemedText>
             </View>
           ) : null}
           <VoiceRow
-            title="Automatic"
+            title={tr('Automatic')}
             detail={auto ? `Best voice on this device: ${voiceLabel(auto, choices)}` : 'This device’s standard voice'}
             on={autoOn}
             recommended
@@ -95,18 +95,18 @@ export default function VoiceScreen() {
 
       {voices != null && suggestDownload(voices, lang) ? (
         <View style={styles.tip} accessibilityLiveRegion="polite">
-          <ThemedText type="smallBold">Get a More Natural Voice</ThemedText>
+          <ThemedText type="smallBold">{tr('Get a More Natural Voice')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{DOWNLOAD_STEPS[Platform.OS] ?? DOWNLOAD_STEPS.web}</ThemedText>
-          {Platform.OS !== 'web' ? <Button title="Check Again" kind="secondary" onPress={() => load(true)} style={{ marginTop: Spacing.two }} /> : null}
+          {Platform.OS !== 'web' ? <Button title={tr('Check Again')} kind="secondary" onPress={() => load(true)} style={{ marginTop: Spacing.two }} /> : null}
         </View>
       ) : Platform.OS === 'ios' ? (
         <ThemedText type="small" themeColor="textSecondary">
-          More voices: Settings &gt; Accessibility &gt; Read &amp; Speak &gt; Voices. Premium voices sound the most natural. Siri’s own voice isn’t available to apps.
+          {tr('More voices: Settings > Accessibility > Read & Speak > Voices. Premium voices sound the most natural. Siri’s own voice isn’t available to apps.')}
         </ThemedText>
       ) : null}
 
       <ThemedText type="small" themeColor="textSecondary">
-        This setting is for this device only. Spoken alerts play through your phone speaker, headset or helmet comms.
+        {tr('This setting is for this device only. Spoken alerts play through your phone speaker, headset or helmet comms.')}
       </ThemedText>
     </Screen>
   );
@@ -134,7 +134,7 @@ function VoiceRow({ title, detail, on, recommended, playing, onPick, onPlay }: {
         <View style={{ flex: 1, gap: 2 }}>
           <View style={styles.titleRow}>
             <Text style={styles.title}>{title}</Text>
-            {recommended ? <Text style={styles.recommended}>Recommended</Text> : null}
+            {recommended ? <Text style={styles.recommended}>{tr('Recommended')}</Text> : null}
           </View>
           <Text style={styles.detail}>{detail}</Text>
         </View>

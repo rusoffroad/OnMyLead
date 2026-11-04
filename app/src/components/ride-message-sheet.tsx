@@ -9,6 +9,7 @@ import { Button } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { charactersLeft, checkRideMessage, isBuiltInReply, RIDE_MESSAGE_MAX } from '@/core/ride-message';
 
+import { t as tr } from '@/lib/i18n';
 type Props = {
   visible: boolean;
   tablet: boolean;
@@ -57,12 +58,12 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
       <SheetRoot style={[styles.wrap, tablet && styles.wrapTablet]}>
         <KeyboardLift style={tablet ? styles.liftTablet : undefined}>
           <SwipeSheet onClose={close} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
-            <ThemedText type="subtitle" style={{ color: Colors.text }}>Message the Group</ThemedText>
+            <ThemedText type="subtitle" style={{ color: Colors.text }}>{tr('Message the Group')}</ThemedText>
             <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} {...keyboardScroll}>
               {saved.length ? (
                 <View style={{ gap: 8 }}>
                   <View style={styles.savedHead}>
-                    <ThemedText type="smallBold" style={{ color: Colors.textSecondary }}>My Quick Replies</ThemedText>
+                    <ThemedText type="smallBold" style={{ color: Colors.textSecondary }}>{tr('My Quick Replies')}</ThemedText>
                     <Pressable
                       onPress={() => setEditing((e) => !e)}
                       accessibilityRole="button"
@@ -93,7 +94,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
                   setText(t);
                   if (error) setError(null);
                 }}
-                placeholder="Gas stop at the next town"
+                placeholder={tr('Gas stop at the next town')}
                 placeholderTextColor={Colors.textSecondary}
                 autoFocus={!saved.length}
                 autoCapitalize="sentences"
@@ -102,7 +103,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
                 returnKeyType="send"
                 onSubmitEditing={() => send(text, keep && canKeep)}
                 maxLength={RIDE_MESSAGE_MAX + 40}
-                accessibilityLabel="Your message to the group"
+                accessibilityLabel={tr('Your message to the group')}
                 style={styles.input}
               />
               <View style={styles.meta}>
@@ -117,16 +118,16 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
                 disabled={!canKeep}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: keep && canKeep, disabled: !canKeep }}
-                accessibilityLabel="Save as one of my quick replies"
+                accessibilityLabel={tr('Save as one of my quick replies')}
                 style={({ pressed }) => [styles.keep, { opacity: !canKeep ? 0.4 : pressed ? 0.75 : 1 }]}>
                 <View style={[styles.box, keep && canKeep && styles.boxOn]}>
                   {keep && canKeep ? <Icon name="check" size={18} color="#fff" /> : null}
                 </View>
-                <ThemedText style={{ color: Colors.text, flex: 1 }}>Save as One of My Quick Replies</ThemedText>
+                <ThemedText style={{ color: Colors.text, flex: 1 }}>{tr('Save as One of My Quick Replies')}</ThemedText>
               </Pressable>
             </SheetScroll>
-            <Button title="Send to Everyone" big onPress={() => send(text, keep && canKeep)} style={{ backgroundColor: Colors.sky }} />
-            <Button title="Cancel" kind="secondary" onPress={close} />
+            <Button title={tr('Send to Everyone')} big onPress={() => send(text, keep && canKeep)} style={{ backgroundColor: Colors.sky }} />
+            <Button title={tr('Cancel')} kind="secondary" onPress={close} />
           </SwipeSheet>
         </KeyboardLift>
       </SheetRoot>

@@ -10,6 +10,7 @@ import { APP_FLAGS, liveNotice, noticeKey, type AppFlag, type Notice } from '@/c
 import { dismissNotice, useAppSettings, useFlag } from '@/lib/app-settings';
 import { openStore, useUpdateState, useVersionNotice } from '@/lib/app-update';
 
+import { t } from '@/lib/i18n';
 const untilText = (iso: string) =>
   new Date(iso).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
@@ -33,7 +34,7 @@ export function AppNotices() {
   return (
     <View style={{ gap: 10 }}>
       {versionNotice ? (
-        <NoticeCard notice={versionNotice} color={RideColors.yellow} tint={Colors.backgroundElement} icon="warning" title="About This Version" />
+        <NoticeCard notice={versionNotice} color={RideColors.yellow} tint={Colors.backgroundElement} icon="warning" title={t('About This Version')} />
       ) : null}
       {showUpdate && update.kind === 'available' ? (
         <NoticeCard
@@ -41,14 +42,14 @@ export function AppNotices() {
           color={Colors.sky}
           tint="rgba(59,134,247,0.12)"
           icon="bell"
-          title="Update Available"
+          title={t('Update Available')}
           closeLabel="Close update notice"
           onClose={() => dismissNotice(updateKey)}
-          action={<Button title="Update" onPress={openStore} style={{ alignSelf: 'flex-start', marginTop: 6 }} />}
+          action={<Button title={t('Update')} onPress={openStore} style={{ alignSelf: 'flex-start', marginTop: 6 }} />}
         />
       ) : null}
       {maintenance ? (
-        <NoticeCard notice={maintenance} color={RideColors.yellow} tint={Colors.backgroundElement} icon="warning" title="Planned Maintenance" />
+        <NoticeCard notice={maintenance} color={RideColors.yellow} tint={Colors.backgroundElement} icon="warning" title={t('Planned Maintenance')} />
       ) : null}
       {showAnnouncement ? (
         <NoticeCard notice={announcement} color={Colors.sky} tint="rgba(59,134,247,0.12)" icon="megaphone" onClose={() => dismissNotice(noticeKey(announcement))} />
@@ -69,7 +70,7 @@ function NoticeCard({ notice, color, tint, icon, title, onClose, closeLabel = 'C
       <View style={{ flex: 1, gap: 2 }}>
         {title ? <ThemedText style={[styles.title, { color }]}>{title}</ThemedText> : null}
         <ThemedText style={styles.text}>{notice.text}</ThemedText>
-        {notice.until && title ? <ThemedText type="small" themeColor="textSecondary">Until {untilText(notice.until)}</ThemedText> : null}
+        {notice.until && title ? <ThemedText type="small" themeColor="textSecondary">{t('Until {v}', { v: untilText(notice.until) })}</ThemedText> : null}
         {action}
       </View>
       {onClose ? (
@@ -88,9 +89,9 @@ export function FlagGate({ flag, children }: { flag: AppFlag; children: ReactNod
   return (
     <Screen>
       <View style={{ gap: 12, paddingTop: 24 }}>
-        <ThemedText type="subtitle">{APP_FLAGS[flag].label} Is Off for Now</ThemedText>
-        <ThemedText themeColor="textSecondary">It&apos;s switched off while we work on it. Everything you saved is kept, and your rides work as usual.</ThemedText>
-        <Button title="Back to Home" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+        <ThemedText type="subtitle">{t('{label} Is Off for Now', { label: APP_FLAGS[flag].label })}</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('It\'s switched off while we work on it. Everything you saved is kept, and your rides work as usual.')}</ThemedText>
+        <Button title={t('Back to Home')} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
       </View>
     </Screen>
   );

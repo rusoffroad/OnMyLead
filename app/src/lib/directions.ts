@@ -6,6 +6,7 @@ import { MAPS_APP_LABEL, mapsAppsFor, mapsUrl, pickedApp, type DirectionsTarget,
 import { requirePro } from '@/lib/pro';
 import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
+import { tc } from '@/core/i18n';
 /**
  * The one way OnMyLead hands a rider over to Apple Maps or Google Maps (see core/directions.ts).
  * Every Navigate button calls openDirections, so the choice of app and the links are the same
@@ -85,8 +86,8 @@ export async function openDirections(t: DirectionsTarget, opts?: { safety?: bool
     const apps = mapsAppsFor('ios');
     ActionSheetIOS.showActionSheetWithOptions(
       {
-        title: `Directions to ${t.title}`,
-        message: t.via?.length ? 'Maps keeps to roads between the route’s stops, so off-road parts may differ.' : undefined,
+        title: tc('Directions to {title}', { title: t.title }),
+        message: t.via?.length ? tc('Maps keeps to roads between the route’s stops, so off-road parts may differ.') : undefined,
         options: [...apps.map((a) => MAPS_APP_LABEL[a]), 'Cancel'],
         cancelButtonIndex: apps.length,
         userInterfaceStyle: 'dark',

@@ -12,6 +12,7 @@ import { myTrips, type TripWithCounts } from '@/lib/api';
 import { requireTripSlot } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 export default function TripsScreen() {
   return (
     <FlagGate flag="trip_planner">
@@ -36,8 +37,8 @@ function Trips() {
     return (
       <Screen>
         <Card>
-          <ThemedText type="heading">Sign In to Plan Your Trips</ThemedText>
-          <Button title="Sign In" onPress={() => router.push('/sign-in')} />
+          <ThemedText type="heading">{t('Sign In to Plan Your Trips')}</ThemedText>
+          <Button title={t('Sign In')} onPress={() => router.push('/sign-in')} />
         </Card>
       </Screen>
     );
@@ -45,11 +46,11 @@ function Trips() {
 
   return (
     <Screen>
-      <Button title="Plan a New Trip" big onPress={async () => (await requireTripSlot()) && router.push('/trips/new')} />
+      <Button title={t('Plan a New Trip')} big onPress={async () => (await requireTripSlot()) && router.push('/trips/new')} />
       <ErrorText error={error} />
       {trips && trips.length === 0 ? (
         <ThemedText themeColor="textSecondary">
-          No trips yet. Make a packing list once, tick things off as they go in the rig, and reuse it next time.
+          {t('No trips yet. Make a packing list once, tick things off as they go in the rig, and reuse it next time.')}
         </ThemedText>
       ) : null}
       {trips?.map((trip) => {

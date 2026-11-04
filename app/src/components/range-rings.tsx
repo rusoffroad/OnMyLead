@@ -4,6 +4,7 @@ import Svg, { Circle, Line } from 'react-native-svg';
 import { Colors, font, RideColors, themedStyles } from '@/constants/theme';
 import { ringFraction, ringMiles, ringSpot, type NearbyRider } from '@/core/out-riding';
 
+import { t } from '@/lib/i18n';
 /**
  * Who's out nearby as range rings: you in the middle, each rider on the ring for roughly how far
  * away they are. Distance only: the angle is made up from the rider's id, never their direction,
@@ -42,9 +43,9 @@ export function RangeRings({
         </Svg>
         {rings.map((m) => (
           // Along the right-hand spoke, just under it, clear of the middle.
-          <Text key={m} style={[styles.ringLabel, { left: c + outer * ringFraction(m, radius) - 34, top: c + 4 }]}>{m} mi</Text>
+          <Text key={m} style={[styles.ringLabel, { left: c + outer * ringFraction(m, radius) - 34, top: c + 4 }]}>{t('{m} mi', { m })}</Text>
         ))}
-        <Text style={[styles.you, { left: c - 20, top: c - 9 }]}>You</Text>
+        <Text style={[styles.you, { left: c - 20, top: c - 9 }]}>{t('You')}</Text>
         {riders.map((r) => {
           const s = ringSpot(r.user_id, r.miles, radius);
           const a = (s.angle * Math.PI) / 180;
@@ -66,7 +67,7 @@ export function RangeRings({
           );
         })}
       </View>
-      <Text style={styles.caption}>Rings show roughly how far, never which way.</Text>
+      <Text style={styles.caption}>{t('Rings show roughly how far, never which way.')}</Text>
     </View>
   );
 }

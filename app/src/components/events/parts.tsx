@@ -17,6 +17,7 @@ import {
 } from '@/core/events';
 import { photoUrl } from '@/lib/events';
 
+import { t } from '@/lib/i18n';
 /** Red for riding, gold for prizes and shows, blue for everything else, on the agenda rail. */
 export const TONE = { get red() { return Colors.accent; }, get gold() { return Home.gold; }, get blue() { return Colors.sky; } } as const;
 
@@ -89,11 +90,11 @@ export function EventCardView({ e, width, compact }: { e: EventCard; width?: num
         <Gradient colors={['rgba(16,30,51,0)', 'rgba(16,30,51,0.85)']} />
         <DateStub iso={e.starts_at} size="sm" style={styles.cardStub} />
         <View style={styles.cardPills}>
-          {phase === 'now' ? <Pill text="Happening Now" tone="out" /> : null}
-          {phase === 'cancelled' ? <Pill text="Cancelled" tone="out" /> : null}
-          {phase === 'over' ? <Pill text="Over" tone="dark" /> : null}
-          {e.i_host ? <Pill text="Hosting" tone="gold" /> : e.mine === 'going' ? <Pill text="Going" tone="dark" /> : e.mine === 'interested' ? <Pill text="Interested" tone="dark" /> : null}
-          {e.visibility === 'unlisted' && e.i_host ? <Pill text="Link Only" tone="dark" /> : null}
+          {phase === 'now' ? <Pill text={t('Happening Now')} tone="out" /> : null}
+          {phase === 'cancelled' ? <Pill text={t('Cancelled')} tone="out" /> : null}
+          {phase === 'over' ? <Pill text={t('Over')} tone="dark" /> : null}
+          {e.i_host ? <Pill text={t('Hosting')} tone="gold" /> : e.mine === 'going' ? <Pill text={t('Going')} tone="dark" /> : e.mine === 'interested' ? <Pill text={t('Interested')} tone="dark" /> : null}
+          {e.visibility === 'unlisted' && e.i_host ? <Pill text={t('Link Only')} tone="dark" /> : null}
         </View>
       </View>
       <View style={styles.cardBody}>
@@ -126,7 +127,7 @@ export function AgendaTimeline({ items, onEdit }: { items: AgendaItem[]; onEdit?
     <View style={{ gap: Spacing.four }}>
       {days.map((d) => (
         <View key={d.key} style={{ gap: Spacing.two }}>
-          <Text style={styles.dayTitle} accessibilityRole="header">{d.title}</Text>
+          <Text style={styles.dayTitle} accessibilityRole="header">{t(d.title)}</Text>
           <View>
             {d.items.map((it, i) => {
               const tone = TONE[agendaKindTone(it.kind)];
@@ -140,7 +141,7 @@ export function AgendaTimeline({ items, onEdit }: { items: AgendaItem[]; onEdit?
                   </View>
                   <View style={[styles.agBody, !last && { paddingBottom: Spacing.three }]}>
                     <Text style={[styles.agKind, { color: tone }]}>{agendaKindLabel(it.kind)}</Text>
-                    <Text style={styles.agTitle}>{it.title}</Text>
+                    <Text style={styles.agTitle}>{t(it.title)}</Text>
                     {it.place ? (
                       <View style={styles.foot}>
                         <Icon name="pin" size={13} color={Home.muted} />
@@ -183,7 +184,7 @@ export function PeopleSheet({
       {people.length > 6 ? (
         <View style={styles.search}>
           <Icon name="search" size={18} color={Colors.textSecondary} />
-          <TextBox value={q} onChangeText={setQ} placeholder="Search by name" placeholderTextColor={Colors.textSecondary} style={styles.searchInput} />
+          <TextBox value={q} onChangeText={setQ} placeholder={t('Search by name')} placeholderTextColor={Colors.textSecondary} style={styles.searchInput} />
         </View>
       ) : null}
       {onClear ? (

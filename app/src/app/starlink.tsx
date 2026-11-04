@@ -21,6 +21,7 @@ import {
 } from '@/lib/starlink';
 import { useTheme } from '@/hooks/use-theme';
 
+import { t as tr } from '@/lib/i18n';
 const numText = (n: number | null | undefined) => (n == null ? '' : String(n));
 
 export default function StarlinkPageScreen() {
@@ -36,7 +37,7 @@ function StarlinkPage() {
   return (
     <Screen>
       <ThemedText themeColor="textSecondary">
-        See how your dish is doing, keep your plan details handy, and work out how long your batteries will run it.
+        {tr('See how your dish is doing, keep your plan details handy, and work out how long your batteries will run it.')}
       </ThemedText>
       <DishStatusCard />
       <StarlinkMountAd />
@@ -136,12 +137,9 @@ function DishStatusCard() {
   if (!dishReadSupported) {
     return (
       <Card>
-        <ThemedText type="heading">Your Dish</ThemedText>
-        <ThemedText>
-          Reading your dish only works in the OnMyLead phone app. Your dish talks to devices on its own Wi-Fi at {DISH_HOST},
-          and web browsers block a secure web page from reaching it.
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">You can still save your plan and use the power calculator below.</ThemedText>
+        <ThemedText type="heading">{tr('Your Dish')}</ThemedText>
+        <ThemedText>{tr('Reading your dish only works in the OnMyLead phone app. Your dish talks to devices on its own Wi-Fi at {DISH_HOST}, and web browsers block a secure web page from reaching it.', { DISH_HOST })}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{tr('You can still save your plan and use the power calculator below.')}</ThemedText>
       </Card>
     );
   }
@@ -151,22 +149,22 @@ function DishStatusCard() {
   return (
     <Card>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <ThemedText type="heading">Your Dish</ThemedText>
+        <ThemedText type="heading">{tr('Your Dish')}</ThemedText>
         {live ? (
-          <Tag label="Live" color={RideColors.green} solid />
+          <Tag label={tr('Live')} color={RideColors.green} solid />
         ) : s && ageS != null ? (
-          <ThemedText type="small" themeColor="textSecondary">Last read {formatSeconds(ageS)} ago</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('Last read {v} ago', { v: formatSeconds(ageS) })}</ThemedText>
         ) : null}
       </View>
       {!s && !failure && !connecting ? (
         <ThemedText type="small" themeColor="textSecondary">
-          Join your Starlink Wi-Fi, then tap Connect. This page then stays live while it is open.
+          {tr('Join your Starlink Wi-Fi, then tap Connect. This page then stays live while it is open.')}
         </ThemedText>
       ) : null}
 
       {failure ? (
         <View style={{ gap: Spacing.one }}>
-          <ThemedText type="subtitle">Can’t Reach Your Dish</ThemedText>
+          <ThemedText type="subtitle">{tr('Can’t Reach Your Dish')}</ThemedText>
           <ThemedText>
             {failure.kind === 'refused' || failure.kind === 'unreadable'
               ? 'Your dish answered but we could not read it. A Starlink software update may have changed things. Try again later.'
@@ -184,22 +182,22 @@ function DishStatusCard() {
           </View>
           <ThemedText>{dishHeadline(s)}</ThemedText>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three }}>
-            <Stat label="Download Now" value={formatMbps(s.downlinkBps)} />
-            <Stat label="Upload Now" value={formatMbps(s.uplinkBps)} />
-            <Stat label="Latency" value={s.latencyMs == null ? '—' : `${Math.round(s.latencyMs)} ms`} />
-            <Stat label="Sky Blocked" value={formatPercent(s.obstructionFraction)} />
-            <Stat label="Dropped Pings" value={formatPercent(s.dropRate)} />
-            <Stat label="Up For" value={formatUptime(s.uptimeS)} />
+            <Stat label={tr('Download Now')} value={formatMbps(s.downlinkBps)} />
+            <Stat label={tr('Upload Now')} value={formatMbps(s.uplinkBps)} />
+            <Stat label={tr('Latency')} value={s.latencyMs == null ? '—' : `${Math.round(s.latencyMs)} ms`} />
+            <Stat label={tr('Sky Blocked')} value={formatPercent(s.obstructionFraction)} />
+            <Stat label={tr('Dropped Pings')} value={formatPercent(s.dropRate)} />
+            <Stat label={tr('Up For')} value={formatUptime(s.uptimeS)} />
           </View>
           {s.alerts.length ? (
             <View style={{ gap: Spacing.one }}>
-              <ThemedText style={{ fontWeight: 700 }}>Alerts</ThemedText>
+              <ThemedText style={{ fontWeight: 700 }}>{tr('Alerts')}</ThemedText>
               {s.alerts.map((a) => (
                 <ThemedText key={a.code} style={{ color: RideColors.yellow, fontWeight: 600 }}>{a.text}</ThemedText>
               ))}
             </View>
           ) : (
-            <ThemedText type="small" themeColor="textSecondary">No alerts.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{tr('No alerts.')}</ThemedText>
           )}
           {h && h.samples > 0 ? <HistoryView h={h} /> : null}
           <ThemedText type="small" themeColor="textSecondary">
@@ -224,8 +222,7 @@ function DishStatusCard() {
       ) : null}
       {connecting && !s ? <ActivityIndicator color={theme.accent} /> : null}
       <ThemedText type="small" themeColor="textSecondary">
-        This uses your dish’s built-in local connection, which SpaceX doesn’t officially support. A Starlink update can break it;
-        everything else on this page keeps working.
+        {tr('This uses your dish’s built-in local connection, which SpaceX doesn’t officially support. A Starlink update can break it; everything else on this page keeps working.')}
       </ThemedText>
     </Card>
   );
@@ -237,7 +234,7 @@ function HistoryView({ h }: { h: DishHistory }) {
   const peak = Math.max(1, ...h.timeline.map((m) => m.avgDownlinkBps ?? 0));
   return (
     <View style={{ gap: Spacing.one }}>
-      <ThemedText style={{ fontWeight: 700 }}>Last {h.minutes || 1} Min</ThemedText>
+      <ThemedText style={{ fontWeight: 700 }}>{tr('Last {v} Min', { v: h.minutes || 1 })}</ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 48, gap: 3 }}>
         {h.timeline.map((m, i) => (
           <View
@@ -252,13 +249,9 @@ function HistoryView({ h }: { h: DishHistory }) {
           />
         ))}
       </View>
-      <ThemedText type="small">
-        {formatMbps(h.avgDownlinkBps)} down on average (peak {formatMbps(h.peakDownlinkBps)}), {formatMbps(h.avgUplinkBps)} up
-        {h.avgLatencyMs != null ? `, ${Math.round(h.avgLatencyMs)} ms latency` : ''}.{' '}
-        {h.outages
-          ? `Dropped ${h.outages} ${h.outages === 1 ? 'time' : 'times'} for ${formatSeconds(h.outageSeconds)} in total (longest ${formatSeconds(h.longestOutageS)}).`
-          : 'No dropouts.'}
-      </ThemedText>
+      <ThemedText type="small">{tr('{v} down on average (peak {v2}), {v3} up{v4}. {v5}', { v: formatMbps(h.avgDownlinkBps), v2: formatMbps(h.peakDownlinkBps), v3: formatMbps(h.avgUplinkBps), v4: h.avgLatencyMs != null ? `, ${tr('{ms} ms latency', { ms: Math.round(h.avgLatencyMs) })}` : '', v5: h.outages
+          ? tr(h.outages === 1 ? 'Dropped {n} time for {total} in total (longest {longest}).' : 'Dropped {n} times for {total} in total (longest {longest}).', { n: h.outages, total: formatSeconds(h.outageSeconds), longest: formatSeconds(h.longestOutageS) })
+          : tr('No dropouts.') })}</ThemedText>
     </View>
   );
 }
@@ -365,7 +358,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
       if (!r.ok) return setError(`${label}: enter a number.`);
       if (r.value != null && r.value > maxV) return setError(`${label}: that is more than ${maxV}.`);
     }
-    if (num(usable) != null && num(usable)! < 1) return setError('Usable %: enter 1 to 100.');
+    if (num(usable) != null && num(usable)! < 1) return setError(tr('Usable %: enter 1 to 100.'));
     setBusy(true);
     try {
       await saveStarlinkSetup(vehicleId, {
@@ -396,8 +389,8 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
     <>
       {vehicles.length ? (
         <Choice
-          label="Setup For"
-          options={[{ value: null, label: 'General' }, ...vehicles.map((v) => ({ value: v.id as string | null, label: v.nickname || vehicleTitle(v) }))]}
+          label={tr('Setup For')}
+          options={[{ value: null, label: tr('General') }, ...vehicles.map((v) => ({ value: v.id as string | null, label: v.nickname || vehicleTitle(v) }))]}
           value={vehicleId}
           onChange={(v) => {
             setLoaded(false);
@@ -409,34 +402,34 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
 
       {signedIn ? (
         <Card>
-          <ThemedText type="heading">My Plan</ThemedText>
+          <ThemedText type="heading">{tr('My Plan')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            Starlink doesn’t share plan or usage details with other apps, so jot them down here. Check usage in the Starlink app.
+            {tr('Starlink doesn’t share plan or usage details with other apps, so jot them down here. Check usage in the Starlink app.')}
           </ThemedText>
-          <Field label="Plan" value={planName} onChangeText={setPlanName} placeholder="e.g. Roam Unlimited" maxLength={80} />
+          <Field label={tr('Plan')} value={planName} onChangeText={setPlanName} placeholder={tr('e.g. Roam Unlimited')} maxLength={80} />
           <View style={{ flexDirection: 'row', gap: Spacing.two }}>
             <View style={{ flex: 1 }}>
-              <Field label="Monthly Cost ($)" value={cost} onChangeText={setCost} keyboardType="decimal-pad" placeholder="0.00" />
+              <Field label={tr('Monthly Cost ($)')} value={cost} onChangeText={setCost} keyboardType="decimal-pad" placeholder="0.00" />
             </View>
             <View style={{ flex: 1 }}>
-              <Field label="Data Cap (GB)" value={cap} onChangeText={setCap} keyboardType="decimal-pad" placeholder="Unlimited" />
+              <Field label={tr('Data Cap (GB)')} value={cap} onChangeText={setCap} keyboardType="decimal-pad" placeholder={tr('Unlimited')} />
             </View>
           </View>
-          <Choice label="Dish" options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
-          <Choice label="Powered By" options={POWER_SOURCES.map((p) => ({ value: p.value as PowerSource | null, label: p.label }))} value={source} onChange={setSource} />
-          <Field label="Notes" value={notes} onChangeText={setNotes} multiline placeholder="Mount, cable length, router settings" maxLength={1000} />
+          <Choice label={tr('Dish')} options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
+          <Choice label={tr('Powered By')} options={POWER_SOURCES.map((p) => ({ value: p.value as PowerSource | null, label: p.label }))} value={source} onChange={setSource} />
+          <Field label={tr('Notes')} value={notes} onChangeText={setNotes} multiline placeholder={tr('Mount, cable length, router settings')} maxLength={1000} />
         </Card>
       ) : null}
 
       <Card>
-        <ThemedText type="heading">Power Budget</ThemedText>
+        <ThemedText type="heading">{tr('Power Budget')}</ThemedText>
         {!signedIn ? (
-          <Choice label="Dish" options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
+          <Choice label={tr('Dish')} options={DISH_MODELS.map((d) => ({ value: d.value as DishModel | null, label: d.label }))} value={model} onChange={setModel} />
         ) : null}
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
             <Field
-              label="Dish Watts"
+              label={tr('Dish Watts')}
               value={watts}
               onChangeText={setWatts}
               keyboardType="decimal-pad"
@@ -445,64 +438,62 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
             />
           </View>
           <View style={{ flex: 1 }}>
-            <Field label="Hours per Day" value={hours} onChangeText={setHours} keyboardType="decimal-pad" placeholder="8" />
+            <Field label={tr('Hours per Day')} value={hours} onChangeText={setHours} keyboardType="decimal-pad" placeholder="8" />
           </View>
         </View>
         <Choice
-          label="Battery Size In"
-          options={[{ value: 'wh' as const, label: 'Watt-Hours' }, { value: 'ah' as const, label: 'Amp-Hours + Volts' }]}
+          label={tr('Battery Size In')}
+          options={[{ value: 'wh' as const, label: tr('Watt-Hours') }, { value: 'ah' as const, label: tr('Amp-Hours + Volts') }]}
           value={batteryMode}
           onChange={setBatteryMode}
         />
         {batteryMode === 'wh' ? (
-          <Field label="Battery (Wh)" value={wh} onChangeText={setWh} keyboardType="decimal-pad" placeholder="e.g. 1024" hint="On the label of most power stations" />
+          <Field label={tr('Battery (Wh)')} value={wh} onChangeText={setWh} keyboardType="decimal-pad" placeholder="e.g. 1024" hint={tr('On the label of most power stations')} />
         ) : (
           <View style={{ flexDirection: 'row', gap: Spacing.two }}>
             <View style={{ flex: 1 }}>
-              <Field label="Battery (Ah)" value={ah} onChangeText={setAh} keyboardType="decimal-pad" placeholder="e.g. 100" />
+              <Field label={tr('Battery (Ah)')} value={ah} onChangeText={setAh} keyboardType="decimal-pad" placeholder="e.g. 100" />
             </View>
             <View style={{ flex: 1 }}>
-              <Field label="Volts" value={volts} onChangeText={setVolts} keyboardType="decimal-pad" placeholder="12" />
+              <Field label={tr('Volts')} value={volts} onChangeText={setVolts} keyboardType="decimal-pad" placeholder="12" />
             </View>
           </View>
         )}
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
-            <Field label="Usable %" value={usable} onChangeText={setUsable} keyboardType="number-pad" hint="Lithium 90, lead-acid 50" />
+            <Field label={tr('Usable %')} value={usable} onChangeText={setUsable} keyboardType="number-pad" hint={tr('Lithium 90, lead-acid 50')} />
           </View>
           <View style={{ flex: 1 }}>
-            <Field label="Solar Watts" value={solar} onChangeText={setSolar} keyboardType="decimal-pad" placeholder="0" />
+            <Field label={tr('Solar Watts')} value={solar} onChangeText={setSolar} keyboardType="decimal-pad" placeholder="0" />
           </View>
           <View style={{ flex: 1 }}>
-            <Field label="Sun Hours" value={sun} onChangeText={setSun} keyboardType="decimal-pad" hint="Per day" />
+            <Field label={tr('Sun Hours')} value={sun} onChangeText={setSun} keyboardType="decimal-pad" hint={tr('Per day')} />
           </View>
         </View>
 
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three, paddingTop: Spacing.two }}>
-          <Stat label="Battery Runtime" value={budget.usableWh > 0 && dishWatts > 0 ? (budget.runtimeHours >= 10 ? `${Math.round(budget.runtimeHours)} h` : formatHours(budget.runtimeHours)) : '—'} />
-          <Stat label="Dish Uses / Day" value={formatWh(budget.dailyUseWh)} />
-          <Stat label="Solar Adds / Day" value={formatWh(budget.dailySolarWh)} />
+          <Stat label={tr('Battery Runtime')} value={budget.usableWh > 0 && dishWatts > 0 ? (budget.runtimeHours >= 10 ? `${Math.round(budget.runtimeHours)} h` : formatHours(budget.runtimeHours)) : '—'} />
+          <Stat label={tr('Dish Uses / Day')} value={formatWh(budget.dailyUseWh)} />
+          <Stat label={tr('Solar Adds / Day')} value={formatWh(budget.dailySolarWh)} />
         </View>
-        <ThemedText type="heading" style={{ color: budget.dailyBalanceWh >= 0 ? RideColors.green : RideColors.red }}>
-          Daily balance: {budget.dailyBalanceWh >= 0 ? '+' : '−'}{formatWh(Math.abs(budget.dailyBalanceWh))}
-        </ThemedText>
+        <ThemedText type="heading" style={{ color: budget.dailyBalanceWh >= 0 ? RideColors.green : RideColors.red }}>{tr('Daily balance: {v}{v2}', { v: budget.dailyBalanceWh >= 0 ? '+' : '−', v2: formatWh(Math.abs(budget.dailyBalanceWh)) })}</ThemedText>
         <ThemedText>{budgetSummary(budget, hoursPerDay)}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          Estimates. Assumes 90% conversion efficiency and 75% of panel rating. Snow melt, heat and heavy use draw more.
+          {tr('Estimates. Assumes 90% conversion efficiency and 75% of panel rating. Snow melt, heat and heavy use draw more.')}
         </ThemedText>
       </Card>
 
       {!signedIn ? (
         <Card>
-          <ThemedText type="heading">Sign In to Save Your Plan and Power Setup</ThemedText>
-          <Button title="Sign In" onPress={() => router.push('/sign-in')} />
+          <ThemedText type="heading">{tr('Sign In to Save Your Plan and Power Setup')}</ThemedText>
+          <Button title={tr('Sign In')} onPress={() => router.push('/sign-in')} />
         </Card>
       ) : null}
       {!signedIn ? null : (
         <>
           <ErrorText error={error} />
           {saved ? <ThemedText style={{ color: RideColors.green, fontWeight: 700 }}>{saved}</ThemedText> : null}
-          <Button title="Save" big loading={busy} disabled={!loaded} onPress={save} />
+          <Button title={tr('Save')} big loading={busy} disabled={!loaded} onPress={save} />
         </>
       )}
     </>

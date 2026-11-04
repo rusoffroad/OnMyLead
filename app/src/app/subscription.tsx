@@ -56,9 +56,9 @@ export default function SubscriptionScreen() {
         <PlanStatus ent={ent} />
       ) : (
         <View style={styles.off}>
-          <Text style={styles.offTitle}>Not Switched On Yet</Text>
+          <Text style={styles.offTitle}>{t('Not Switched On Yet')}</Text>
           <ThemedText type="small" themeColor="textSecondary">
-            OnMyLead Pro starts with the next server update. Until then every feature stays open to you.
+            {t('OnMyLead Pro starts with the next server update. Until then every feature stays open to you.')}
           </ThemedText>
         </View>
       )}
@@ -66,12 +66,12 @@ export default function SubscriptionScreen() {
       {upgrade ? (
         <Button title={ent.label === 'Pro Trial' ? 'Keep Pro After the Trial' : 'Upgrade to Pro'} big onPress={() => router.push('/pro')} />
       ) : (
-        <Button title="See What Pro Includes" kind="secondary" onPress={() => router.push('/pro')} />
+        <Button title={t('See What Pro Includes')} kind="secondary" onPress={() => router.push('/pro')} />
       )}
 
       <View style={styles.list}>
         <Row
-          title="Manage Subscription"
+          title={t('Manage Subscription')}
           detail={ent.store?.store === 'google' || (!ent.store && google) ? 'Change plans or cancel in Google Play' : 'Change plans or cancel in your App Store account'}
           busy={busy === 'manage'}
           onPress={() => run('manage', async () => {
@@ -82,7 +82,7 @@ export default function SubscriptionScreen() {
           })}
         />
         <Row
-          title="Restore Purchases"
+          title={t('Restore Purchases')}
           detail={google ? 'Bought Pro on another Android device? Bring it here' : 'Bought Pro on another iPhone or iPad? Bring it here'}
           busy={busy === 'restore'}
           onPress={() => run('restore', async () => {
@@ -93,7 +93,7 @@ export default function SubscriptionScreen() {
           })}
         />
         <Row
-          title="Redeem Promo Code"
+          title={t('Redeem Promo Code')}
           detail={google ? 'Enter an OnMyLead promo code in Google Play' : 'Enter an OnMyLead offer code from Apple'}
           busy={busy === 'redeem'}
           last
@@ -109,7 +109,7 @@ export default function SubscriptionScreen() {
       {note ? <ThemedText type="small" style={{ color: Colors.text }} accessibilityLiveRegion="polite">{note}</ThemedText> : null}
 
       <ThemedText type="small" themeColor="textSecondary">
-        Live tracking, SOS, Ride Bubble, Mechanical Issue alerts, family links and joining rides are free on every plan.
+        {t('Live tracking, SOS, Ride Bubble, Mechanical Issue alerts, family links and joining rides are free on every plan.')}
       </ThemedText>
     </Screen>
   );

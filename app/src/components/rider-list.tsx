@@ -10,6 +10,7 @@ import type { MapRider } from './group-map-types';
 import { Icon } from './icon';
 import { RiderDot } from './rider-dot';
 
+import { t } from '@/lib/i18n';
 const ROLE_NAME = { leader: 'Leader', sweep: 'Tail Gunner', rider: null } as const;
 const ORDER = { live: 0, delayed: 1, lost: 2 } as const;
 
@@ -35,17 +36,17 @@ export function RiderList({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <SheetRoot>
-      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close Riders" />
+      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={t('Close Riders')} />
       <SwipeSheet onClose={onClose} style={styles.sheet} accessibilityViewIsModal>
         <View style={styles.grip} />
         <View style={styles.head}>
-          <Text style={styles.title}>Riders</Text>
+          <Text style={styles.title}>{t('Riders')}</Text>
           <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" style={styles.close}>
-            <Text style={styles.closeText}>Done</Text>
+            <Text style={styles.closeText}>{t('Done')}</Text>
           </Pressable>
         </View>
         {offline ? (
-          <Text style={styles.offline}>You have no service. Times are from the last update you got.</Text>
+          <Text style={styles.offline}>{t('You have no service. Times are from the last update you got.')}</Text>
         ) : null}
         <SheetScroll contentContainerStyle={{ gap: Spacing.two, paddingBottom: Spacing.four }}>
           <RiderRows riders={riders} meId={meId} onNavigate={onNavigate} extra={extra} />

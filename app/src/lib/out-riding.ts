@@ -19,6 +19,7 @@ import { currentPosition } from './location';
 import { useSession } from './session';
 import { supabase } from './supabase';
 
+import { tc } from '@/core/i18n';
 export class OutRidingOffError extends Error {
   constructor() {
     super(NOT_SWITCHED_ON);
@@ -217,7 +218,7 @@ export async function clearDmThread(threadId: string) {
 /** A rider's name, for a conversation opened before there's anything in the list. */
 export async function riderName(userId: string): Promise<string> {
   const { data } = await supabase.from('profiles').select('display_name').eq('id', userId).maybeSingle();
-  return (data as { display_name?: string } | null)?.display_name?.trim() || 'Rider';
+  return (data as { display_name?: string } | null)?.display_name?.trim() || tc('Rider');
 }
 
 /** The conversation open on screen right now, so its own push doesn't also show as a banner. */

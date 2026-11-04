@@ -5,6 +5,7 @@ import type { Entitlements, Store, StoreSubscription } from './entitlements';
 import { PRICES } from './pro';
 import { RESERVED_PLAY_OFFERS } from './referrals';
 
+import { tc } from './i18n';
 export const PRODUCTS = {
   monthly: 'com.rusoffroad.onmylead.pro.monthly',
   annual: 'com.rusoffroad.onmylead.pro.annual',
@@ -92,12 +93,12 @@ export function otherStoreBlock(ent: Entitlements, here: Store): { store: Store;
   if (other.status === 'active' || other.status === 'grace') {
     return {
       store: other.store,
-      message: `You already have OnMyLead Pro through ${name}, and it works here too. There’s nothing to buy. To move it to ${STORE_NAMES[here]}, cancel it on your ${device} and subscribe here after it ends.`,
+      message: tc('You already have OnMyLead Pro through {name}, and it works here too. There’s nothing to buy. To move it to {v}, cancel it on your {device} and subscribe here after it ends.', { name, v: STORE_NAMES[here], device }),
     };
   }
   return {
     store: other.store,
-    message: `Your OnMyLead Pro subscription through ${name} is ${other.status === 'paused' ? 'paused' : 'waiting on a payment'}. Resume or fix it on your ${device}, or cancel it there before subscribing here, so you aren’t charged twice.`,
+    message: tc('Your OnMyLead Pro subscription through {name} is {v}. Resume or fix it on your {device}, or cancel it there before subscribing here, so you aren’t charged twice.', { name, v: other.status === 'paused' ? 'paused' : 'waiting on a payment', device }),
   };
 }
 
@@ -122,14 +123,14 @@ export function manageTarget(ent: Entitlements, here: Store | null): { kind: 'st
     kind: 'web',
     store,
     url: MANAGE_URLS[store],
-    message: sub ? `Your Pro subscription is billed by ${STORE_NAMES[store]}. Change or cancel it ${where}.` : 'Subscriptions are bought in the OnMyLead app.',
+    message: sub ? tc('Your Pro subscription is billed by {v}. Change or cancel it {where}.', { v: STORE_NAMES[store], where }) : tc('Subscriptions are bought in the OnMyLead app.'),
   };
 }
 
 /** What Restore Purchases says afterwards. */
 export function restoreMessage(here: Store, restored: number): string {
-  if (restored) return 'Your Pro subscription is restored.';
-  return here === 'google' ? 'No OnMyLead Pro purchase found for this Google account.' : 'No OnMyLead Pro purchase found for this Apple ID.';
+  if (restored) return tc('Your Pro subscription is restored.');
+  return here === 'google' ? tc('No OnMyLead Pro purchase found for this Google account.') : tc('No OnMyLead Pro purchase found for this Apple ID.');
 }
 
 /**
@@ -166,7 +167,7 @@ export function disclosureText(store: 'apple' | 'google' | null | undefined): st
     return `${price} Payment is charged to your Google Play account when you confirm. The subscription renews automatically at the end of each period until you cancel. Cancel anytime in the Play Store app under Profile > Payments & Subscriptions > Subscriptions; Pro stays on until the end of the period you paid for. ${trial}`;
   }
   if (!store) {
-    return `${price} Pro is bought in the OnMyLead app, through the app store on your phone, and renews automatically until you cancel it in that store. ${trial}`;
+    return tc('{price} Pro is bought in the OnMyLead app, through the app store on your phone, and renews automatically until you cancel it in that store. {trial}', { price, trial });
   }
-  return `${price} Payment is charged to your Apple ID when you confirm. The subscription renews automatically unless you turn it off at least 24 hours before the end of the current period, and renewal is charged within the 24 hours before the period ends. Manage or cancel anytime in your App Store account settings. ${trial}`;
+  return tc('{price} Payment is charged to your Apple ID when you confirm. The subscription renews automatically unless you turn it off at least 24 hours before the end of the current period, and renewal is charged within the 24 hours before the period ends. Manage or cancel anytime in your App Store account settings. {trial}', { price, trial });
 }

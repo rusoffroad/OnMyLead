@@ -2,6 +2,7 @@ import type { LatLng } from './geo';
 import { distanceM } from './geo';
 import { mvumWidthLimitIn, trailLineKey } from './trail-width';
 
+import { tc } from './i18n';
 /**
  * Public trail and road data for the ride maps. Everything here is free U.S. government data
  * with no key: the Forest Service Motor Vehicle Use Map (MVUM), BLM's public route network, and
@@ -481,8 +482,8 @@ export function mvumSeason(props: Record<string, unknown>, on: Date): { allowed:
   return {
     allowed,
     closure: {
-      label: 'Closed for the Season',
-      detail: `The Forest Service travel map closes it to every vehicle on this date${opens ? `. It opens again ${opens}` : ''}.`,
+      label: tc('Closed for the Season'),
+      detail: tc('The Forest Service travel map closes it to every vehicle on this date{v}.', { v: opens ? `. It opens again ${opens}` : '' }),
     },
   };
 }
@@ -522,14 +523,14 @@ export function parseFsClosed(props: Record<string, unknown>): TrailInfo {
   return {
     source: 'fsclosed',
     kind: 'road',
-    title: name && id && !name.includes(id) ? `${name} (Road ${id})` : name ?? (id ? `Road ${id}` : 'Forest Service road'),
+    title: name && id && !name.includes(id) ? tc('{name} (Road {id})', { name, id }) : name ?? (id ? tc('Road {id}', { id }) : tc('Forest Service road')),
     where: null,
     allowed: [],
     seasonal: false,
     miles: Number.isFinite(miles) && miles > 0 ? Math.round(miles * 10) / 10 : null,
     surface: tidy(props.surface_type),
     attribution: TRAIL_SOURCES.fsclosed.attribution,
-    closure: { label: 'Closed to Motor Vehicles', detail: 'The Forest Service lists this road as closed to motorized use.' },
+    closure: { label: tc('Closed to Motor Vehicles'), detail: tc('The Forest Service lists this road as closed to motorized use.') },
     widthLimitIn: null,
     lineKey: trailLineKey('fsclosed', props),
   };
@@ -543,14 +544,14 @@ export function parseBlm(props: Record<string, unknown>): TrailInfo {
   return {
     source: 'blm',
     kind: /trail|single track|atv|motorcycle/i.test(mode ?? '') ? 'trail' : 'road',
-    title: tidy(props.ROUTE_PRMRY_NM) ?? 'BLM route',
+    title: tidy(props.ROUTE_PRMRY_NM) ?? tc('BLM route'),
     where: str(props.ADMIN_ST) ? `BLM land, ${str(props.ADMIN_ST)}` : 'BLM land',
     allowed,
     seasonal: !!str(props.PLAN_SEASON_RSTRCT_CODE) && !/^n/i.test(str(props.PLAN_SEASON_RSTRCT_CODE)!),
     miles: Number.isFinite(miles) && miles > 0 ? Math.round(miles * 10) / 10 : null,
     surface: tidy(props.OBSRVE_SRFCE_TYPE),
     attribution: ohv ? `${TRAIL_SOURCES.blm.attribution} (OHV: ${ohv})` : TRAIL_SOURCES.blm.attribution,
-    closure: ohv?.toLowerCase() === 'closed' ? { label: 'Closed to Off-Highway Vehicles', detail: "BLM's travel plan closes this route to off-highway vehicles." } : null,
+    closure: ohv?.toLowerCase() === 'closed' ? { label: tc('Closed to Off-Highway Vehicles'), detail: tc('BLM\'s travel plan closes this route to off-highway vehicles.') } : null,
     widthLimitIn: null,
     lineKey: trailLineKey('blm', props),
   };

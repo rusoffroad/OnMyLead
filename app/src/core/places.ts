@@ -1,6 +1,7 @@
 import { normalizeState } from './discovery';
 import { distanceM, type LatLng } from './geo';
 
+import { tc } from './i18n';
 /**
  * Finding a place by name ("Hidden Falls Adventure Park", "Hell's Revenge Trailhead") or by street
  * address ("501 Congress Ave, Austin") for a meeting point, a destination or a ride search. The names come from OpenStreetMap through Photon, a free search
@@ -95,8 +96,8 @@ const KINDS: Record<string, string> = {
 const title = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
 export function kindOf(key?: string, value?: string): string {
-  if (!key) return 'Place';
-  return KINDS[`${key}/${value}`] ?? (key === 'highway' ? 'Road' : key === 'place' ? 'Area' : title(value && value !== 'yes' ? value : key));
+  if (!key) return tc('Place');
+  return KINDS[`${key}/${value}`] ?? (key === 'highway' ? tc('Road') : key === 'place' ? tc('Area') : title(value && value !== 'yes' ? value : key));
 }
 
 type PhotonFeature = {
@@ -164,7 +165,7 @@ export function parsePlaces(json: unknown): Place[] {
 /** One line under the name: "Trailhead in Moab, Utah", "Restaurant at 501 Congress Avenue, Austin". */
 export function placeDetail(p: Place): string {
   if (p.address) return [`${p.kind} at ${p.address}`, p.where.split(', ')[0] || null].filter(Boolean).join(', ');
-  if (p.kind === 'Address') return p.where ? `Street Address in ${p.where}` : 'Street Address';
+  if (p.kind === 'Address') return p.where ? tc('Street Address in {where}', { where: p.where }) : tc('Street Address');
   return p.where ? `${p.kind} in ${p.where}` : p.kind;
 }
 

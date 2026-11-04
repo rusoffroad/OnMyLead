@@ -152,28 +152,28 @@ export default function You() {
         </>
       ) : (
         <View style={styles.signedOut}>
-          <ThemedText type="subtitle">Ride with Your Crew</ThemedText>
-          <ThemedText themeColor="textSecondary">Sign in to create rides, save your Garage and keep your riding groups.</ThemedText>
-          <Button title="Sign In or Create a Free Account" onPress={() => router.push('/sign-in?mode=create')} />
+          <ThemedText type="subtitle">{t('Ride with Your Crew')}</ThemedText>
+          <ThemedText themeColor="textSecondary">{t('Sign in to create rides, save your Garage and keep your riding groups.')}</ThemedText>
+          <Button title={t('Sign In or Create a Free Account')} onPress={() => router.push('/sign-in?mode=create')} />
         </View>
       )}
 
-      <MenuGroup title="Your Gear">
-        <MenuRow icon="machine" color={Colors.accent} title="Garage" detail="Your machines, mods and fuel range" onPress={needsAccount('/garage')} />
+      <MenuGroup title={t('Your Gear')}>
+        <MenuRow icon="machine" color={Colors.accent} title={t('Garage')} detail={t('Your machines, mods and fuel range')} onPress={needsAccount('/garage')} />
         {tripsOn ? (
-          <MenuRow icon="checklist" color={RideColors.green} title="Trip Planner" detail="Packing lists you tick off and reuse" onPress={needsAccount('/trips')} />
+          <MenuRow icon="checklist" color={RideColors.green} title={t('Trip Planner')} detail={t('Packing lists you tick off and reuse')} onPress={needsAccount('/trips')} />
         ) : null}
-        <MenuRow icon="map" color={Colors.sky} title="Offline Maps" detail={offlineSummary} onPress={() => router.push('/maps')} />
+        <MenuRow icon="map" color={Colors.sky} title={t('Offline Maps')} detail={offlineSummary} onPress={() => router.push('/maps')} />
       </MenuGroup>
 
-      <MenuGroup title="On the Trail">
+      <MenuGroup title={t('On the Trail')}>
         {navOn ? (
-          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Map Mode" detail={myTrails.length ? `${t('Your offroad map')}. ${myTrails.length === 1 ? t('1 trail') : t('{n} trails', { n: myTrails.length })}` : t('Your offroad map: trails, record, draw')} onPress={() => router.push('/nav')} />
+          <MenuRow icon="map" color={RIDER_TRAIL_INK} title={t('Map Mode')} detail={myTrails.length ? `${t('Your offroad map')}. ${myTrails.length === 1 ? t('1 trail') : t('{n} trails', { n: myTrails.length })}` : t('Your offroad map: trails, record, draw')} onPress={() => router.push('/nav')} />
         ) : null}
         <MenuRow
           icon="map"
           color={RIDER_TRAIL_INK}
-          title="Rider Trails on Maps"
+          title={t('Rider Trails on Maps')}
           detail={riderTrails ? 'Showing trails riders mapped and shared, as mint dotted lines' : 'Hidden. Only agency and OpenStreetMap trails show'}
           right={
             <Switch
@@ -182,14 +182,14 @@ export default function You() {
               trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
               thumbColor="#FFFFFF"
               {...({ activeThumbColor: '#FFFFFF' } as object)}
-              accessibilityLabel="Rider Trails on Maps"
+              accessibilityLabel={t('Rider Trails on Maps')}
             />
           }
         />
         <MenuRow
           icon="follow"
           color={Colors.sky}
-          title="Follow Me on Maps"
+          title={t('Follow Me on Maps')}
           detail={followMe ? 'The map keeps your dot in view in Ride Mode and Map Mode' : 'Off. The map stays where you put it'}
           right={
             <Switch
@@ -198,23 +198,23 @@ export default function You() {
               trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
               thumbColor="#FFFFFF"
               {...({ activeThumbColor: '#FFFFFF' } as object)}
-              accessibilityLabel="Follow Me on Maps"
+              accessibilityLabel={t('Follow Me on Maps')}
             />
           }
         />
-        <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail={sharingUntil != null ? t('Sharing now, {until}. Tap to stop', { until: shareEndText(sharingUntil, sharingCheckedAt) }) : t('With chosen riders or family, for as long as you pick')} onPress={needsAccount('/share')} />
+        <MenuRow icon="pin" color={Colors.sky} title={t('Share My Location')} detail={sharingUntil != null ? t('Sharing now, {until}. Tap to stop', { until: shareEndText(sharingUntil, sharingCheckedAt) }) : t('With chosen riders or family, for as long as you pick')} onPress={needsAccount('/share')} />
         <MenuRow
           icon="battery"
           color={batteryMode === 'best' ? RideColors.green : RideColors.yellow}
-          title="Battery Saver"
+          title={t('Battery Saver')}
           detail={`${t(BATTERY_PLANS[batteryMode].label)}. ${t(BATTERY_PLANS[batteryMode].short)}`}
           onPress={() => router.push('/battery')}
         />
-        <MenuRow icon="theme" color={Colors.sky} title="Appearance" detail={describeAppearance(appearance, t)} onPress={() => router.push('/appearance')} />
+        <MenuRow icon="theme" color={Colors.sky} title={t('Appearance')} detail={describeAppearance(appearance, t)} onPress={() => router.push('/appearance')} />
         <MenuRow
           icon="globe"
           color={Colors.sky}
-          title="Language"
+          title={t('Language')}
           detail={`${languageByCode(language.language).flag} ${describeLanguage(language.choice, language.language, t('Match Phone'))}`}
           onPress={() => router.push('/language' as Href)}
         />
@@ -222,15 +222,15 @@ export default function You() {
           <MenuRow
             icon="tilt"
             color={RideColors.green}
-            title="Tilt and Crash Alert"
-            detail="Roll and pitch meter, tilt warnings, and an alert to your group after a crash"
+            title={t('Tilt and Crash Alert')}
+            detail={t('Roll and pitch meter, tilt warnings, and an alert to your group after a crash')}
             onPress={() => router.push('/tilt')}
           />
         ) : null}
         <MenuRow
           icon="voice"
           color={Colors.sky}
-          title="Voice"
+          title={t('Voice')}
           detail={voiceChoice === AUTO_VOICE ? 'Automatic. The most natural voice on this device reads Ride Mode alerts' : 'Your pick reads Ride Mode alerts'}
           onPress={() => router.push('/voice')}
         />
@@ -238,7 +238,7 @@ export default function You() {
           <MenuRow
             icon="music"
             color={Colors.sky}
-            title="Music Controls"
+            title={t('Music Controls')}
             detail={musicMine ? 'A Music button in Ride Mode and Map Mode: play, pause, skip and volume' : 'Hidden. Turn it on for a Music button in Ride Mode and Map Mode'}
             right={
               <Switch
@@ -247,23 +247,23 @@ export default function You() {
                 trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
                 thumbColor="#FFFFFF"
                 {...({ activeThumbColor: '#FFFFFF' } as object)}
-                accessibilityLabel="Music Controls"
+                accessibilityLabel={t('Music Controls')}
               />
             }
           />
         ) : null}
         {starlinkOn ? (
-          <MenuRow icon="dish" color={RideColors.yellow} title="Starlink" detail="Your dish, your plan and battery run time" onPress={() => router.push('/starlink')} />
+          <MenuRow icon="dish" color={RideColors.yellow} title="Starlink" detail={t('Your dish, your plan and battery run time')} onPress={() => router.push('/starlink')} />
         ) : null}
       </MenuGroup>
 
       {session ? (
-        <MenuGroup title="Settings">
-          <MenuRow icon="bell" color={RideColors.sweep} title="Notifications" detail={settingsSummary(notifications)} onPress={() => router.push('/notifications')} />
+        <MenuGroup title={t('Settings')}>
+          <MenuRow icon="bell" color={RideColors.sweep} title={t('Notifications')} detail={settingsSummary(notifications)} onPress={() => router.push('/notifications')} />
           <MenuRow
             icon="turn"
             color={RideColors.green}
-            title="Directions"
+            title={t('Directions')}
             detail={t('Navigate opens: {app}', { app: directionsSummary })}
             onPress={() => setDirectionsOpen(!directionsOpen)}
             right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{directionsOpen ? 'Done' : 'Change'}</ThemedText>}>
@@ -272,7 +272,7 @@ export default function You() {
                 value={mapsPref}
                 onChange={setMapsPreference}
                 options={[
-                  { value: 'ask' as MapsPreference, label: 'Ask Each Time' },
+                  { value: 'ask' as MapsPreference, label: t('Ask Each Time') },
                   ...mapsAppsFor(Platform.OS).map((a) => ({ value: a as MapsPreference, label: MAPS_APP_LABEL[a] })),
                 ]}
               />
@@ -282,26 +282,26 @@ export default function You() {
             <MenuRow
               icon="sync"
               color={Colors.sky}
-              title="Sync Across Devices"
+              title={t('Sync Across Devices')}
               detail={syncLine}
               onPress={() => {
                 if (!requirePro('sync')) return;
                 syncSettingsNow();
                 backupTrailsNow();
               }}
-              right={can('sync') ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Sync Now</ThemedText> : <ProTag feature="sync" />}
+              right={can('sync') ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{t('Sync Now')}</ThemedText> : <ProTag feature="sync" />}
             />
           ) : null}
-          <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
+          <MenuRow icon="star" color={RideColors.yellow} title={t('Subscription')} detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
           {referralsOn ? (
-            <MenuRow icon="addFriend" color={Colors.accent} title="Invite Friends" detail="You both get 50% off Pro Annual when they finish a ride" onPress={() => router.push('/invite-friends')} />
+            <MenuRow icon="addFriend" color={Colors.accent} title={t('Invite Friends')} detail={t('You both get 50% off Pro Annual when they finish a ride')} onPress={() => router.push('/invite-friends')} />
           ) : null}
-          <MenuRow icon="block" color={Colors.danger} title="Blocked Riders" detail={blockedSummary} onPress={() => router.push('/blocked')} />
+          <MenuRow icon="block" color={Colors.danger} title={t('Blocked Riders')} detail={blockedSummary} onPress={() => router.push('/blocked')} />
           {ent.accountType === 'admin' ? (
             <MenuRow
               icon="lock"
               color={Colors.accent}
-              title="Admin Dashboard"
+              title={t('Admin Dashboard')}
               detail={Platform.OS === 'web' ? 'Users, rides, reports and settings' : 'Opens onmylead.com/admin'}
               onPress={() => (Platform.OS === 'web' ? router.push('/admin') : Linking.openURL('https://onmylead.com/admin'))}
             />
@@ -311,14 +311,14 @@ export default function You() {
 
       {session ? (
         <>
-          <MenuGroup title="Account">
-            <MenuRow icon="person" title="Email" detail={`${session.user.email ?? t('No email on this account')}. ${t('Only you see this.')}`} />
+          <MenuGroup title={t('Account')}>
+            <MenuRow icon="person" title={t('Email')} detail={`${session.user.email ?? t('No email on this account')}. ${t('Only you see this.')}`} />
             {social ? (
               <MenuRow
                 icon="people"
                 color={Colors.sky}
                 title={socialSetting(social).title}
-                detail={socialSetting(social).detail}
+                detail={t(socialSetting(social).detail)}
                 right={
                   <Switch
                     value={social.shown}
@@ -337,7 +337,7 @@ export default function You() {
         </>
       ) : null}
 
-      <MenuGroup title="Help">
+      <MenuGroup title={t('Help')}>
         <MenuRow
           icon="book"
           color={Colors.sky}
@@ -347,17 +347,17 @@ export default function You() {
           right={<Icon name="external" size={18} color={Colors.sky} />}
         />
         {session ? (
-          <MenuRow icon="flagged" color={Colors.danger} title="Report a Rider" detail="Harassment, threats or abuse. Goes to the OnMyLead team" onPress={() => router.push('/report-rider')} />
+          <MenuRow icon="flagged" color={Colors.danger} title={t('Report a Rider')} detail={t('Harassment, threats or abuse. Goes to the OnMyLead team')} onPress={() => router.push('/report-rider')} />
         ) : null}
-        <MenuRow icon="wrench" color={Colors.accent} title="Report a Bug" detail="Something not working? Send it with a screenshot" onPress={() => router.push('/contact?topic=problem')} />
-        <MenuRow icon="mail" color={Colors.sky} title="Contact Us" detail="An idea, a billing question or anything else" onPress={() => router.push('/contact')} />
-        <MenuRow icon="checklist" color={Colors.textSecondary} title="Help and Support" detail="Quick answers to common questions" onPress={() => router.push('/support')} />
+        <MenuRow icon="wrench" color={Colors.accent} title={t('Report a Bug')} detail={t('Something not working? Send it with a screenshot')} onPress={() => router.push('/contact?topic=problem')} />
+        <MenuRow icon="mail" color={Colors.sky} title={t('Contact Us')} detail={t('An idea, a billing question or anything else')} onPress={() => router.push('/contact')} />
+        <MenuRow icon="checklist" color={Colors.textSecondary} title={t('Help and Support')} detail={t('Quick answers to common questions')} onPress={() => router.push('/support')} />
       </MenuGroup>
 
       {session ? (
         <>
           <Button
-            title="Sign Out"
+            title={t('Sign Out')}
             kind="ghost"
             onPress={async () => {
               await signOut();
@@ -370,16 +370,16 @@ export default function You() {
 
       <View style={styles.legal}>
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/terms')}>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Terms</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>{t('Terms')}</ThemedText>
         </Pressable>
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/rider-agreement')}>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Safety Agreement</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>{t('Safety Agreement')}</ThemedText>
         </Pressable>
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/privacy')}>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Privacy</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>{t('Privacy')}</ThemedText>
         </Pressable>
         <Pressable accessibilityRole="link" hitSlop={8} onPress={() => router.push('/support')}>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>Help</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.legalLink}>{t('Help')}</ThemedText>
         </Pressable>
       </View>
     </Screen>
@@ -427,9 +427,9 @@ function DeleteAccount() {
 
   const ask = async () => {
     const ok = await confirmAsync(
-      'Delete Your Account?',
-      'Your account, rides you organize, Garage, trips and groups will be permanently deleted. Rides you organize are removed for everyone on them. This can’t be undone. If you pay for Pro, cancel it in your Apple subscriptions too.',
-      'Delete Account',
+      t('Delete Your Account?'),
+      t('Your account, rides you organize, Garage, trips and groups will be permanently deleted. Rides you organize are removed for everyone on them. This can’t be undone. If you pay for Pro, cancel it in your Apple subscriptions too.'),
+      t('Delete Account'),
     );
     if (!ok) return;
     setState('busy');
@@ -466,7 +466,7 @@ function DeleteAccount() {
   return (
     <View style={{ gap: Spacing.two }}>
       <ErrorText error={error} />
-      <Button title="Delete Account" kind="ghost" loading={state === 'busy'} onPress={ask} style={styles.deleteButton} />
+      <Button title={t('Delete Account')} kind="ghost" loading={state === 'busy'} onPress={ask} style={styles.deleteButton} />
     </View>
   );
 }

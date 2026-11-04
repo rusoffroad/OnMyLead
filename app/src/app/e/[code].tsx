@@ -92,13 +92,13 @@ export default function EventPage() {
     }
   }
 
-  if (ev === undefined) return <Screen><ThemedText themeColor="textSecondary">Loading…</ThemedText></Screen>;
+  if (ev === undefined) return <Screen><ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText></Screen>;
   if (ev === null) {
     return (
       <Screen>
         <Stack.Screen options={{ title: t('Event') }} />
         <ThemedText>{notFound}</ThemedText>
-        <Button title="See All Events" kind="secondary" onPress={() => router.replace('/events')} />
+        <Button title={t('See All Events')} kind="secondary" onPress={() => router.replace('/events')} />
       </Screen>
     );
   }
@@ -115,7 +115,7 @@ export default function EventPage() {
       const nav = globalThis.navigator as Navigator | undefined;
       if (nav?.share) return nav.share({ title: e.title, text: message, url: link }).catch(() => {});
       await nav?.clipboard?.writeText(link).catch(() => {});
-      return showNotice('Link Copied', link);
+      return showNotice(t('Link Copied'), link);
     }
     await Share.share({ message });
   };
@@ -133,7 +133,7 @@ export default function EventPage() {
 
   const addPhotos = async (source: 'camera' | 'library') => {
     const room = MAX_EVENT_PHOTOS - e.photos.length;
-    if (room <= 0) return showNotice('Photos Full', `An event can have up to ${MAX_EVENT_PHOTOS} photos. Remove one to add another.`);
+    if (room <= 0) return showNotice(t('Photos Full'), `An event can have up to ${MAX_EVENT_PHOTOS} photos. Remove one to add another.`);
     try {
       const picked = await pickEventPhotos(source, room);
       if (!picked.length) return;
@@ -168,17 +168,17 @@ export default function EventPage() {
     if (pick.kind === 'cohost') return act('cohost', () => addCohost(e.id, p.id));
     await act('manager', async () => {
       const r = await setRideManager(e.id, pick.ride.ride_id, p.id);
-      if (r === 'invited') showNotice('Invite Sent', `${p.name} is invited to ${pick.ride.name}. They manage it as a Co-Organizer once they join.`);
+      if (r === 'invited') showNotice(t('Invite Sent'), `${p.name} is invited to ${pick.ride.name}. They manage it as a Co-Organizer once they join.`);
     });
   };
 
   const cancelToggle = async () => {
     const cancelling = e.status !== 'cancelled';
-    if (cancelling && !(await confirmAsync('Cancel This Event?', 'It stays on its link marked Cancelled, and nobody can say they’re going. The group rides aren’t cancelled; cancel them on their own pages if needed.', 'Cancel Event', 'Keep It'))) return;
+    if (cancelling && !(await confirmAsync(t('Cancel This Event?'), t('It stays on its link marked Cancelled, and nobody can say they’re going. The group rides aren’t cancelled; cancel them on their own pages if needed.'), t('Cancel Event'), t('Keep It')))) return;
     act('cancel', () => setEventCancelled(e.id, cancelling));
   };
   const remove = async () => {
-    if (!(await confirmAsync('Delete This Event?', 'The event, its photos and agenda are deleted for good. Its group rides stay.', 'Delete Event', 'Keep It'))) return;
+    if (!(await confirmAsync(t('Delete This Event?'), t('The event, its photos and agenda are deleted for good. Its group rides stay.'), t('Delete Event'), t('Keep It')))) return;
     setBusy('delete');
     try {
       await deleteEvent(e);
@@ -196,10 +196,10 @@ export default function EventPage() {
       <Cover path={cover} seed={e.id} height={layout.wide ? 260 : 220} radius={22} />
       <Gradient colors={['rgba(10,22,38,0)', 'rgba(10,22,38,0.25)', 'rgba(10,22,38,0.95)']} radius={22} />
       <View style={styles.heroPills}>
-        {phase === 'now' ? <Pill text="Happening Now" tone="out" /> : null}
-        {phase === 'cancelled' ? <Pill text="Cancelled" tone="out" /> : null}
-        {phase === 'over' ? <Pill text="Over" tone="dark" /> : null}
-        {e.visibility === 'unlisted' ? <Pill text="Link Only" tone="dark" /> : null}
+        {phase === 'now' ? <Pill text={t('Happening Now')} tone="out" /> : null}
+        {phase === 'cancelled' ? <Pill text={t('Cancelled')} tone="out" /> : null}
+        {phase === 'over' ? <Pill text={t('Over')} tone="dark" /> : null}
+        {e.visibility === 'unlisted' ? <Pill text={t('Link Only')} tone="dark" /> : null}
       </View>
       <View style={styles.heroFoot}>
         <DateStub iso={e.starts_at} size="lg" />
@@ -214,9 +214,7 @@ export default function EventPage() {
   const hiddenNote = e.hidden ? (
     <View style={styles.warn}>
       <Icon name="warning" size={20} color={Colors.danger} />
-      <ThemedText type="small" style={{ flex: 1 }}>
-        The OnMyLead team hid this event, so only its hosts can see it.{e.hidden_reason ? ` Reason: ${e.hidden_reason}` : ''} Questions? Use Contact Us.
-      </ThemedText>
+      <ThemedText type="small" style={{ flex: 1 }}>{t('The OnMyLead team hid this event, so only its hosts can see it.{v} Questions? Use Contact Us.', { v: e.hidden_reason ? ` ${t('Reason: {reason}', { reason: e.hidden_reason })}` : '' })}</ThemedText>
     </View>
   ) : null;
 
@@ -225,27 +223,27 @@ export default function EventPage() {
       <Fact icon="pin" title={e.location_name} detail={e.location_address ?? e.state ?? undefined} action="Directions" onAction={directions} />
       <Fact icon="people" title={rsvpLine(e.rsvp)} detail={e.going_riders.length ? e.going_riders.slice(0, 3).map((p) => p.name).join(', ') + (e.rsvp.going > 3 ? ' and more' : '') : undefined} />
       {e.website_url ? (
-        <Fact icon="go" title="Website and Tickets" detail={e.website_url.replace(/^https?:\/\//, '')} action="Open" onAction={() => Linking.openURL(e.website_url!)} />
+        <Fact icon="go" title={t('Website and Tickets')} detail={e.website_url.replace(/^https?:\/\//, '')} action="Open" onAction={() => Linking.openURL(e.website_url!)} />
       ) : null}
     </View>
   );
 
   const rsvpRow = phase === 'cancelled' || phase === 'over' ? null : (
     <View style={styles.rsvpRow}>
-      <RsvpButton label="Going" icon="check" on={e.rsvp.mine === 'going'} busy={busy === 'rsvp:going'} onPress={() => tapRsvp('going')} primary />
-      <RsvpButton label="Interested" icon="star" on={e.rsvp.mine === 'interested'} busy={busy === 'rsvp:interested'} onPress={() => tapRsvp('interested')} />
-      <RsvpButton label="Share" icon="join" on={false} onPress={share} />
+      <RsvpButton label={t('Going')} icon="check" on={e.rsvp.mine === 'going'} busy={busy === 'rsvp:going'} onPress={() => tapRsvp('going')} primary />
+      <RsvpButton label={t('Interested')} icon="star" on={e.rsvp.mine === 'interested'} busy={busy === 'rsvp:interested'} onPress={() => tapRsvp('interested')} />
+      <RsvpButton label={t('Share')} icon="join" on={false} onPress={share} />
     </View>
   );
 
   const getApp = Platform.OS === 'web' && !session ? (
     <View style={styles.getApp}>
-      <Text style={styles.getAppTitle}>Ride It With OnMyLead</Text>
+      <Text style={styles.getAppTitle}>{t('Ride It With OnMyLead')}</Text>
       <ThemedText type="small" themeColor="textSecondary">
-        Get the free app to say you’re going, join the group rides and keep the group together on the trail.
+        {t('Get the free app to say you’re going, join the group rides and keep the group together on the trail.')}
       </ThemedText>
       <Button
-        title="Get the App, Free"
+        title={t('Get the App, Free')}
         onPress={() => {
           const ua = typeof navigator === 'undefined' ? '' : navigator.userAgent;
           const store = isAndroid(ua) ? PLAY_STORE_URL : APP_STORE_URL ?? PLAY_STORE_URL;
@@ -253,12 +251,12 @@ export default function EventPage() {
           if (store) Linking.openURL(store);
         }}
       />
-      <Button title="Sign In" kind="secondary" onPress={() => router.push('/sign-in')} />
+      <Button title={t('Sign In')} kind="secondary" onPress={() => router.push('/sign-in')} />
     </View>
   ) : null;
 
   const photos = e.photos.length > 1 || (e.am_host && e.photos.length) ? (
-    <Section title="Photos" right={e.am_host ? `${e.photos.length} of ${MAX_EVENT_PHOTOS}` : undefined}>
+    <Section title={t('Photos')} right={e.am_host ? `${e.photos.length} of ${MAX_EVENT_PHOTOS}` : undefined}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
         {e.photos.map((p, i) => {
           const url = photoUrl(p.path);
@@ -270,7 +268,7 @@ export default function EventPage() {
               disabled={!e.am_host}
               onPress={() => setPhotoMenu(p)}>
               {url ? <Image source={{ uri: url }} style={styles.thumb} contentFit="cover" transition={120} /> : null}
-              {i === 0 && e.am_host ? <Pill text="Cover" tone="dark" style={styles.coverPill} /> : null}
+              {i === 0 && e.am_host ? <Pill text={t('Cover')} tone="dark" style={styles.coverPill} /> : null}
             </Pressable>
           );
         })}
@@ -279,28 +277,28 @@ export default function EventPage() {
   ) : null;
 
   const about = e.details ? (
-    <Section title="About">
+    <Section title={t('About')}>
       <ThemedText style={{ lineHeight: 23 }}>{e.details}</ThemedText>
     </Section>
   ) : null;
 
   const agenda = e.agenda.length || e.am_host ? (
     <Section
-      title="Agenda"
-      action={e.am_host ? { label: 'Add', onPress: () => { setAgendaItem(null); setAgendaOpen(true); } } : undefined}>
+      title={t('Agenda')}
+      action={e.am_host ? { label: t('Add'), onPress: () => { setAgendaItem(null); setAgendaOpen(true); } } : undefined}>
       {e.agenda.length ? (
         <AgendaTimeline items={e.agenda} onEdit={e.am_host ? (it) => { setAgendaItem(it); setAgendaOpen(true); } : undefined} />
       ) : (
-        <Empty text="Add what’s happening and when: group rides, poker runs, concerts, raffles, shows, food. Everyone who opens the event sees it." />
+        <Empty text={t('Add what’s happening and when: group rides, poker runs, concerts, raffles, shows, food. Everyone who opens the event sees it.')} />
       )}
     </Section>
   ) : null;
 
   const rides = e.rides.length || e.am_host ? (
     <Section
-      title="Group Rides"
+      title={t('Group Rides')}
       action={e.am_host ? {
-        label: 'Add', onPress: () => {
+        label: t('Add'), onPress: () => {
           setLinkable(null);
           setAddRide(true);
           linkableRides(e.id).then(setLinkable).catch(() => setLinkable([]));
@@ -316,14 +314,14 @@ export default function EventPage() {
               busy={busy}
               onManager={() => openPeople({ kind: 'manager', ride: r })}
               onRemove={async () => {
-                if (!(await confirmAsync('Take This Ride Off the Event?', `${r.name} stays on as a ride; it just isn’t part of ${e.title} any more.`, 'Take Off', 'Keep'))) return;
+                if (!(await confirmAsync(t('Take This Ride Off the Event?'), `${r.name} stays on as a ride; it just isn’t part of ${e.title} any more.`, t('Take Off'), t('Keep')))) return;
                 act(`unlink:${r.ride_id}`, () => unlinkRide(e.id, r.ride_id));
               }}
             />
           ))}
         </View>
       ) : (
-        <Empty text="Add the event’s group rides, one per day or skill level. Pick a Ride Manager for each so the right person runs it." />
+        <Empty text={t('Add the event’s group rides, one per day or skill level. Pick a Ride Manager for each so the right person runs it.')} />
       )}
     </Section>
   ) : null;
@@ -343,19 +341,19 @@ export default function EventPage() {
 
   const hosts = session && e.owner ? (
     <Section
-      title="Hosts"
-      action={e.am_owner && e.hosts.length < MAX_COHOSTS ? { label: 'Add Co-Host', onPress: () => openPeople({ kind: 'cohost' }) } : undefined}>
+      title={t('Hosts')}
+      action={e.am_owner && e.hosts.length < MAX_COHOSTS ? { label: t('Add Co-Host'), onPress: () => openPeople({ kind: 'cohost' }) } : undefined}>
       <View style={{ gap: 8 }}>
-        <PersonRow p={e.owner} note="Host" />
+        <PersonRow p={e.owner} note={t('Host')} />
         {e.hosts.map((h) => (
           <PersonRow
             key={h.id}
             p={h}
-            note="Co-Host"
+            note={t('Co-Host')}
             action={e.am_owner || h.id === me ? {
               label: h.id === me ? 'Step Down' : 'Remove',
               onPress: async () => {
-                if (!(await confirmAsync(h.id === me ? 'Step Down as Co-Host?' : `Remove ${h.name}?`, 'They can no longer edit the event.', h.id === me ? 'Step Down' : 'Remove', 'Keep'))) return;
+                if (!(await confirmAsync(h.id === me ? 'Step Down as Co-Host?' : `Remove ${h.name}?`, t('They can no longer edit the event.'), h.id === me ? 'Step Down' : 'Remove', t('Keep')))) return;
                 act('cohost', () => removeCohost(e.id, h.id));
               },
             } : undefined}
@@ -364,7 +362,7 @@ export default function EventPage() {
       </View>
       {e.am_owner ? (
         <ThemedText type="small" themeColor="textSecondary">
-          Co-hosts edit the event, its photos and agenda, and add the rides they organize.
+          {t('Co-hosts edit the event, its photos and agenda, and add the rides they organize.')}
         </ThemedText>
       ) : null}
     </Section>
@@ -372,9 +370,9 @@ export default function EventPage() {
 
   const hostTools = e.am_host ? (
     <View style={styles.tools}>
-      <Tool icon="draw" label="Edit Details" onPress={() => router.push(`/events/new?id=${e.id}`)} />
+      <Tool icon="draw" label={t('Edit Details')} onPress={() => router.push(`/events/new?id=${e.id}`)} />
       <Tool icon="download" label={busy?.startsWith('photos') ? `Adding ${busy.split(':')[1] ?? ''}` : 'Add Photos'} onPress={() => addPhotos('library')} />
-      {Platform.OS !== 'web' ? <Tool icon="locate" label="Take a Photo" onPress={() => addPhotos('camera')} /> : null}
+      {Platform.OS !== 'web' ? <Tool icon="locate" label={t('Take a Photo')} onPress={() => addPhotos('camera')} /> : null}
     </View>
   ) : null;
 
@@ -383,9 +381,9 @@ export default function EventPage() {
       {e.am_host ? (
         <Button title={e.status === 'cancelled' ? 'Bring the Event Back' : 'Cancel Event'} kind="secondary" loading={busy === 'cancel'} onPress={cancelToggle} />
       ) : null}
-      {e.am_owner ? <Button title="Delete Event" kind="ghost" loading={busy === 'delete'} onPress={remove} /> : null}
+      {e.am_owner ? <Button title={t('Delete Event')} kind="ghost" loading={busy === 'delete'} onPress={remove} /> : null}
       {session && !e.am_host && e.owner ? (
-        <Button title="Report This Event" kind="ghost" onPress={() => setReporting(true)} />
+        <Button title={t('Report This Event')} kind="ghost" onPress={() => setReporting(true)} />
       ) : null}
     </View>
   );
@@ -394,7 +392,7 @@ export default function EventPage() {
     <View style={styles.newNote}>
       <Icon name="check" size={20} color={Home.mint} />
       <ThemedText type="small" style={{ flex: 1 }}>
-        Your event is up. Add photos, the agenda and the group rides below, then share the link.
+        {t('Your event is up. Add photos, the agenda and the group rides below, then share the link.')}
       </ThemedText>
     </View>
   ) : null;
@@ -453,16 +451,16 @@ export default function EventPage() {
           act('manager', () => setRideManager(e.id, r.ride_id, null));
         } : undefined}
       />
-      <BottomSheet visible={!!photoMenu} onClose={() => setPhotoMenu(null)} title="Photo">
+      <BottomSheet visible={!!photoMenu} onClose={() => setPhotoMenu(null)} title={t('Photo')}>
         {photoMenu && photoUrl(photoMenu.path) ? <Image source={{ uri: photoUrl(photoMenu.path)! }} style={styles.preview} contentFit="cover" /> : null}
         {photoMenu && e.photos[0]?.id !== photoMenu.id ? (
-          <Button title="Make It the Cover" kind="secondary" onPress={() => {
+          <Button title={t('Make It the Cover')} kind="secondary" onPress={() => {
             const p = photoMenu;
             setPhotoMenu(null);
             act('cover', () => makeCover(p.id));
           }} />
         ) : null}
-        <Button title="Remove Photo" kind="danger" onPress={() => {
+        <Button title={t('Remove Photo')} kind="danger" onPress={() => {
           const p = photoMenu;
           setPhotoMenu(null);
           if (p) act('photo', () => removeEventPhoto(p.id));
@@ -517,7 +515,7 @@ function Section({ title, right, action, children }: {
         {action ? (
           <Pressable accessibilityRole="button" accessibilityLabel={`${action.label}: ${title}`} hitSlop={10} onPress={action.onPress} style={styles.addBtn}>
             <Icon name="plus" size={16} color={Colors.sky} />
-            <Text style={styles.addText}>{action.label}</Text>
+            <Text style={styles.addText}>{t(action.label)}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -583,7 +581,7 @@ function PersonRow({ p, note, action }: { p: Person; note: string; action?: { la
       </View>
       {action ? (
         <Pressable accessibilityRole="button" onPress={action.onPress} hitSlop={8}>
-          <Text style={[styles.addText, { color: Colors.textSecondary }]}>{action.label}</Text>
+          <Text style={[styles.addText, { color: Colors.textSecondary }]}>{t(action.label)}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -599,24 +597,21 @@ function RideRowCard({ r, host, busy, onManager, onRemove }: {
     <View style={styles.rideCard}>
       <Pressable accessibilityRole="link" disabled={!r.invite_code} onPress={open} style={({ pressed }) => [{ gap: 3 }, pressed && { opacity: 0.85 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          {r.label ? <Text style={styles.rideLabel} numberOfLines={1}>{r.label}</Text> : null}
+          {r.label ? <Text style={styles.rideLabel} numberOfLines={1}>{t(r.label)}</Text> : null}
           {status ? <Pill text={status} tone={r.status === 'live' ? 'out' : 'dark'} /> : null}
-          {r.visibility === 'private' ? <Pill text="Private" tone="dark" /> : null}
+          {r.visibility === 'private' ? <Pill text={t('Private')} tone="dark" /> : null}
         </View>
         <Text style={styles.rideName} numberOfLines={2}>{r.name}</Text>
         <Text style={styles.muted} numberOfLines={1}>
           {rideWhen(r.meet_at)}{r.meet_area_label ? `, near ${r.meet_area_label}` : ''}
         </Text>
-        <Text style={styles.muted}>
-          {r.going} {r.going === 1 ? 'Rider' : 'Riders'} Going{r.my_status === 'joined' ? ', including you' : ''}
-          {r.manager ? `. Ride Manager: ${r.manager.name}` : ''}
-        </Text>
+        <Text style={styles.muted}>{`${t(r.going === 1 ? '{n} Rider Going' : '{n} Riders Going', { n: r.going })}${r.my_status === 'joined' ? t(', including you') : ''}${r.manager ? `. ${t('Ride Manager: {name}', { name: r.manager.name })}` : ''}`}</Text>
       </Pressable>
       <View style={styles.rideActions}>
         {r.invite_code ? (
           <Button title={r.my_status === 'joined' ? 'Open Ride' : 'See Ride and Join'} kind={r.my_status === 'joined' ? 'secondary' : 'primary'} onPress={open} style={{ flex: 1 }} />
         ) : (
-          <View style={[styles.inviteOnly, { flex: 1 }]}><Text style={styles.muted}>Invite Only: Ask a Host</Text></View>
+          <View style={[styles.inviteOnly, { flex: 1 }]}><Text style={styles.muted}>{t('Invite Only: Ask a Host')}</Text></View>
         )}
         {host && r.i_manage ? (
           <Pressable accessibilityRole="button" accessibilityLabel={`Ride Manager for ${r.name}`} onPress={onManager} style={styles.iconBtn} disabled={busy === 'manager'}>

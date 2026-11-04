@@ -19,6 +19,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { useSession } from '@/lib/session';
 import { riderProfile, riderTimeline, SocialOffError } from '@/lib/social';
 
+import { t } from '@/lib/i18n';
 /**
  * A rider's profile: their picture big (tap it for full size), name, the Pro tag if they have Pro,
  * their totals, and their posts, rides, badges and trails, newest first. Riders only see someone's
@@ -85,21 +86,21 @@ export default function RiderProfileScreen() {
           {statLine(profile).map((s) => (
             <View key={s.label} style={styles.stat}>
               <Text style={styles.statValue}>{s.value}</Text>
-              <Text style={styles.statLabel}>{s.label}</Text>
+              <Text style={styles.statLabel}>{t(s.label)}</Text>
             </View>
           ))}
         </View>
       ) : null}
       <View style={styles.buttons}>
         {profile.me ? (
-          <Button title="Edit Name and Picture" kind="secondary" onPress={() => router.push('/ride-name')} style={styles.button} />
+          <Button title={t('Edit Name and Picture')} kind="secondary" onPress={() => router.push('/ride-name')} style={styles.button} />
         ) : profile.blocked ? null : (
           <>
             {profile.relation === 'friends' ? (
-              <Button title="Message" onPress={() => router.push(`/messages/${profile.id}` as never)} style={styles.button} />
+              <Button title={t('Message')} onPress={() => router.push(`/messages/${profile.id}` as never)} style={styles.button} />
             ) : null}
             <AddFriendButton userId={profile.id} name={profile.name} style={styles.button} />
-            <Button title="Report" kind="ghost" onPress={() => setReporting(true)} style={styles.button} />
+            <Button title={t('Report')} kind="ghost" onPress={() => setReporting(true)} style={styles.button} />
           </>
         )}
       </View>
@@ -107,9 +108,9 @@ export default function RiderProfileScreen() {
   );
 
   const body = profile.blocked ? (
-    <Text style={styles.muted}>You and {profile.name} can’t see each other’s activity. Unblock them from You, Blocked Riders.</Text>
+    <Text style={styles.muted}>{t('You and {name} can’t see each other’s activity. Unblock them from You, Blocked Riders.', { name: profile.name })}</Text>
   ) : !profile.canSee ? (
-    <Text style={styles.muted}>{profile.name} shares rides, badges and posts with their friends. Become friends to see them here.</Text>
+    <Text style={styles.muted}>{t('{name} shares rides, badges and posts with their friends. Become friends to see them here.', { name: profile.name })}</Text>
   ) : timeline.items == null ? null : (
     <View style={{ gap: 14 }}>
       {profile.me ? <ComposePrompt userId={profile.id} name={profile.name} pro={can(ent, 'social_posts')} /> : null}

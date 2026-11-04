@@ -37,7 +37,7 @@ import { startSettingsSync } from '@/lib/settings-sync';
 import { startAppearanceSync } from '@/lib/appearance-sync';
 import { startLanguageSync } from '@/lib/language-sync';
 import { backupTrailsNow } from '@/lib/trail-backup';
-import { t, takeLanguageReturnPath, useLanguage } from '@/lib/i18n';
+import { t as tr, takeLanguageReturnPath, useLanguage } from '@/lib/i18n';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
 startAppLog();
@@ -133,59 +133,59 @@ function RootLayout() {
           contentStyle: { backgroundColor: Colors.background },
         })}>
         <Stack.Screen name="(tabs)" options={{ title: 'OnMyLead', headerShown: false }} />
-        <Stack.Screen name="sign-in" options={{ title: t('Welcome'), presentation: 'modal' }} />
-        <Stack.Screen name="reset-password" options={{ title: t('New Password') }} />
-        <Stack.Screen name="ride/new" options={{ title: t('Create a Ride') }} />
+        <Stack.Screen name="sign-in" options={{ title: tr('Welcome'), presentation: 'modal' }} />
+        <Stack.Screen name="reset-password" options={{ title: tr('New Password') }} />
+        <Stack.Screen name="ride/new" options={{ title: tr('Create a Ride') }} />
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
-        <Stack.Screen name="invite-friends" options={{ title: t('Invite Friends') }} />
-        <Stack.Screen name="events/index" options={{ title: t('Events') }} />
-        <Stack.Screen name="events/new" options={{ title: t('Create an Event') }} />
+        <Stack.Screen name="invite-friends" options={{ title: tr('Invite Friends') }} />
+        <Stack.Screen name="events/index" options={{ title: tr('Events') }} />
+        <Stack.Screen name="events/new" options={{ title: tr('Create an Event') }} />
         <Stack.Screen name="e/[code]" options={{ title: '' }} />
-        <Stack.Screen name="ride/[id]/live" options={{ title: t('Ride Mode'), headerShown: false }} />
-        <Stack.Screen name="ride/[id]/route" options={{ title: t('Route'), headerShown: false }} />
-        <Stack.Screen name="ride/[id]/waypoints" options={{ title: t('Waypoints'), headerShown: false }} />
-        <Stack.Screen name="garage/index" options={{ title: t('Garage') }} />
-        <Stack.Screen name="garage/new" options={{ title: t('Add to Garage') }} />
+        <Stack.Screen name="ride/[id]/live" options={{ title: tr('Ride Mode'), headerShown: false }} />
+        <Stack.Screen name="ride/[id]/route" options={{ title: tr('Route'), headerShown: false }} />
+        <Stack.Screen name="ride/[id]/waypoints" options={{ title: tr('Waypoints'), headerShown: false }} />
+        <Stack.Screen name="garage/index" options={{ title: tr('Garage') }} />
+        <Stack.Screen name="garage/new" options={{ title: tr('Add to Garage') }} />
         <Stack.Screen name="garage/[id]/index" options={{ title: '' }} />
-        <Stack.Screen name="garage/[id]/edit" options={{ title: t('Edit Machine') }} />
-        <Stack.Screen name="trips/index" options={{ title: t('Trip Planner') }} />
-        <Stack.Screen name="trips/new" options={{ title: t('New Trip') }} />
+        <Stack.Screen name="garage/[id]/edit" options={{ title: tr('Edit Machine') }} />
+        <Stack.Screen name="trips/index" options={{ title: tr('Trip Planner') }} />
+        <Stack.Screen name="trips/new" options={{ title: tr('New Trip') }} />
         <Stack.Screen name="trips/[id]/index" options={{ title: '' }} />
-        <Stack.Screen name="trips/[id]/edit" options={{ title: t('Edit Trip') }} />
+        <Stack.Screen name="trips/[id]/edit" options={{ title: tr('Edit Trip') }} />
         <Stack.Screen name="starlink" options={{ title: 'Starlink' }} />
-        <Stack.Screen name="ride-name" options={{ title: t('Your Name and Picture') }} />
-        <Stack.Screen name="inbox" options={{ title: t('Notifications') }} />
-        <Stack.Screen name="notifications" options={{ title: t('Notification Settings') }} />
-        <Stack.Screen name="badges" options={{ title: t('Badges') }} />
-        <Stack.Screen name="blocked" options={{ title: t('Blocked Riders') }} />
-        <Stack.Screen name="report-rider" options={{ title: t('Report a Rider') }} />
-        <Stack.Screen name="battery" options={{ title: t('Battery Saver') }} />
-        <Stack.Screen name="appearance" options={{ title: t('Appearance') }} />
-        <Stack.Screen name="language" options={{ title: t('Language') }} />
-        <Stack.Screen name="tilt" options={{ title: t('Tilt') }} />
-        <Stack.Screen name="voice" options={{ title: t('Voice') }} />
+        <Stack.Screen name="ride-name" options={{ title: tr('Your Name and Picture') }} />
+        <Stack.Screen name="inbox" options={{ title: tr('Notifications') }} />
+        <Stack.Screen name="notifications" options={{ title: tr('Notification Settings') }} />
+        <Stack.Screen name="badges" options={{ title: tr('Badges') }} />
+        <Stack.Screen name="blocked" options={{ title: tr('Blocked Riders') }} />
+        <Stack.Screen name="report-rider" options={{ title: tr('Report a Rider') }} />
+        <Stack.Screen name="battery" options={{ title: tr('Battery Saver') }} />
+        <Stack.Screen name="appearance" options={{ title: tr('Appearance') }} />
+        <Stack.Screen name="language" options={{ title: tr('Language') }} />
+        <Stack.Screen name="tilt" options={{ title: tr('Tilt') }} />
+        <Stack.Screen name="voice" options={{ title: tr('Voice') }} />
         <Stack.Screen name="pro" options={{ title: '' }} />
-        <Stack.Screen name="subscription" options={{ title: t('Subscription') }} />
-        <Stack.Screen name="maps/index" options={{ title: t('Offline Maps') }} />
-        <Stack.Screen name="maps/area" options={{ title: t('Pick an Area'), headerShown: false }} />
-        <Stack.Screen name="nav/index" options={{ title: t('Map Mode'), headerShown: false }} />
-        <Stack.Screen name="nav/trails" options={{ title: t('My Trails') }} />
-        <Stack.Screen name="nav/trail/[id]" options={{ title: t('Trail') }} />
-        <Stack.Screen name="nav/public/[id]" options={{ title: t('Rider Trail') }} />
-        <Stack.Screen name="share" options={{ title: t('Share My Location') }} />
-        <Stack.Screen name="f/[token]" options={{ title: t('Shared Location') }} />
-        <Stack.Screen name="groups/new" options={{ title: t('New Group') }} />
+        <Stack.Screen name="subscription" options={{ title: tr('Subscription') }} />
+        <Stack.Screen name="maps/index" options={{ title: tr('Offline Maps') }} />
+        <Stack.Screen name="maps/area" options={{ title: tr('Pick an Area'), headerShown: false }} />
+        <Stack.Screen name="nav/index" options={{ title: tr('Map Mode'), headerShown: false }} />
+        <Stack.Screen name="nav/trails" options={{ title: tr('My Trails') }} />
+        <Stack.Screen name="nav/trail/[id]" options={{ title: tr('Trail') }} />
+        <Stack.Screen name="nav/public/[id]" options={{ title: tr('Rider Trail') }} />
+        <Stack.Screen name="share" options={{ title: tr('Share My Location') }} />
+        <Stack.Screen name="f/[token]" options={{ title: tr('Shared Location') }} />
+        <Stack.Screen name="groups/new" options={{ title: tr('New Group') }} />
         <Stack.Screen name="groups/[id]/index" options={{ title: '' }} />
-        <Stack.Screen name="groups/[id]/chat" options={{ title: t('Group Chat'), headerShown: false }} />
-        <Stack.Screen name="out-riding" options={{ title: t('Out Riding') }} />
-        <Stack.Screen name="messages/index" options={{ title: t('Messages') }} />
-        <Stack.Screen name="messages/[id]" options={{ title: t('Message'), headerShown: false }} />
-        <Stack.Screen name="g/[code]" options={{ title: t('Riding Group') }} />
-        <Stack.Screen name="friends" options={{ title: t('Friends') }} />
-        <Stack.Screen name="friend/[code]" options={{ title: t('Add Friend') }} />
-        <Stack.Screen name="social/index" options={{ title: t('Social') }} />
-        <Stack.Screen name="social/item" options={{ title: t('Post'), headerShown: false }} />
-        <Stack.Screen name="social/new" options={{ title: t('New Post'), presentation: 'modal' }} />
+        <Stack.Screen name="groups/[id]/chat" options={{ title: tr('Group Chat'), headerShown: false }} />
+        <Stack.Screen name="out-riding" options={{ title: tr('Out Riding') }} />
+        <Stack.Screen name="messages/index" options={{ title: tr('Messages') }} />
+        <Stack.Screen name="messages/[id]" options={{ title: tr('Message'), headerShown: false }} />
+        <Stack.Screen name="g/[code]" options={{ title: tr('Riding Group') }} />
+        <Stack.Screen name="friends" options={{ title: tr('Friends') }} />
+        <Stack.Screen name="friend/[code]" options={{ title: tr('Add Friend') }} />
+        <Stack.Screen name="social/index" options={{ title: tr('Social') }} />
+        <Stack.Screen name="social/item" options={{ title: tr('Post'), headerShown: false }} />
+        <Stack.Screen name="social/new" options={{ title: tr('New Post'), presentation: 'modal' }} />
         <Stack.Screen name="social/rider/[id]" options={{ title: '' }} />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
         <Stack.Screen name="terms" options={{ title: '' }} />
@@ -193,7 +193,7 @@ function RootLayout() {
         <Stack.Screen name="rider-agreement" options={{ title: '' }} />
         <Stack.Screen name="support" options={{ title: '' }} />
         <Stack.Screen name="contact" options={{ title: '' }} />
-        <Stack.Screen name="admin" options={{ title: 'OnMyLead Admin', headerShown: false }} />
+        <Stack.Screen name="admin" options={{ title: tr('OnMyLead Admin'), headerShown: false }} />
       </Stack>
       <MessageAlerts />
       {/* iPad, Android tablets and the website are Pro; joining and Ride Mode stay open. */}

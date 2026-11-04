@@ -51,7 +51,7 @@ export default function BadgesScreen() {
     return (
       <Screen width="readable">
         <Stack.Screen options={{ title: t('Badges') }} />
-        <ThemedText themeColor="textSecondary">Sign in to earn badges for the rides you lead, join and finish.</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Sign in to earn badges for the rides you lead, join and finish.')}</ThemedText>
       </Screen>
     );
   }
@@ -69,7 +69,7 @@ export default function BadgesScreen() {
     return (
       <Screen width="readable">
         <Stack.Screen options={{ title: t('Badges') }} />
-        <ThemedText themeColor="textSecondary">Badges start working with the next server update.</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Badges start working with the next server update.')}</ThemedText>
       </Screen>
     );
   }
@@ -88,7 +88,7 @@ export default function BadgesScreen() {
       ))}
       <RankCard rank={rank} />
       <ErrorText error={error} />
-      {error ? <Button title="Try Again" kind="secondary" onPress={load} /> : null}
+      {error ? <Button title={t('Try Again')} kind="secondary" onPress={load} /> : null}
 
       <View style={{ gap: Spacing.three }}>
         {rows.map((row) => (
@@ -102,10 +102,7 @@ export default function BadgesScreen() {
       </View>
 
       <ThemedText type="small" themeColor="textSecondary" style={{ maxWidth: 640 }}>
-        A ride counts once it ends, for riders whose own location track covers at least half a mile. Leading, tail gunning and
-        group rides need at least two riders with a track. Badges are earned on the server from what you really ride, so they
-        can’t be added by hand. OnMyLead Founder and Brand Ambassador are the exceptions: OnMyLead gives them, and they
-        don’t count toward your rank.
+        {t('A ride counts once it ends, for riders whose own location track covers at least half a mile. Leading, tail gunning and group rides need at least two riders with a track. Badges are earned on the server from what you really ride, so they can’t be added by hand. OnMyLead Founder and Brand Ambassador are the exceptions: OnMyLead gives them, and they don’t count toward your rank.')}
       </ThemedText>
     </Screen>
   );
@@ -120,7 +117,7 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
       style={styles.rank}
       accessible
       accessibilityLabel={`Your rank is ${rank.name}. ${rank.levels} badge levels earned.${rank.next ? ` ${toGo} more for ${rank.next.name}.` : ''}`}>
-      <ThemedText type="small" themeColor="textSecondary">Your Rank</ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">{t('Your Rank')}</ThemedText>
       <Text style={styles.rankName}>{rank.name}</Text>
       <ThemedText themeColor="textSecondary">
         {rank.levels === 1 ? '1 badge level earned' : `${rank.levels} badge levels earned`}
@@ -146,9 +143,9 @@ function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
       <View style={{ flex: 1, gap: 4 }}>
         <View style={[styles.titleRow, { alignItems: 'flex-start' }]}>
           <Text style={styles.honorName}>{h.name}</Text>
-          {fresh ? <Text style={[styles.fresh, { backgroundColor: AMBASSADOR_COLORS.arrow, color: '#FFFFFF' }]}>New</Text> : null}
+          {fresh ? <Text style={[styles.fresh, { backgroundColor: AMBASSADOR_COLORS.arrow, color: '#FFFFFF' }]}>{t('New')}</Text> : null}
         </View>
-        <ThemedText themeColor="textSecondary">{h.what}. Riders see it beside your name.</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('{what}. Riders see it beside your name.', { what: h.what })}</ThemedText>
       </View>
     </View>
   );
@@ -167,7 +164,7 @@ function BadgeCard({ p, fresh, grid }: { p: BadgeProgress; fresh: boolean; grid:
       <View style={{ flex: 1, gap: 4 }}>
         <View style={styles.titleRow}>
           <Text style={[styles.name, !earned && { color: Colors.textSecondary }]} numberOfLines={1}>{p.def.name}</Text>
-          {fresh ? <Text style={styles.fresh}>New</Text> : null}
+          {fresh ? <Text style={styles.fresh}>{t('New')}</Text> : null}
         </View>
         <Text style={[styles.level, earned && { color: PATCH_COLORS[p.level as BadgeLevel].cloth }]}>{levelName}</Text>
         <ThemedText type="small" themeColor="textSecondary">{p.def.what}</ThemedText>

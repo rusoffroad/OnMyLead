@@ -10,6 +10,7 @@ import type { LatLng } from '@/core/geo';
 import { placeDetail, PLACES_CREDIT, type Place } from '@/core/places';
 import { usePlaceSearch } from '@/hooks/use-place-search';
 
+import { t as tr } from '@/lib/i18n';
 export const iconFor = (p: Place): IconName => (p.kind === 'Trailhead' || p.kind === 'Trail' ? 'flag' : p.kind === 'Address' ? 'home' : 'pin');
 
 /**
@@ -62,7 +63,7 @@ export function PlaceSearch({
         />
         {busy ? <ActivityIndicator color={Colors.textSecondary} /> : null}
         {query && !busy ? (
-          <Pressable accessibilityRole="button" accessibilityLabel="Clear Search" hitSlop={10} onPress={() => { setQuery(''); setPicked(null); }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={tr('Clear Search')} hitSlop={10} onPress={() => { setQuery(''); setPicked(null); }}>
             <ThemedText themeColor="textSecondary" style={{ fontSize: 20, lineHeight: 22 }}>×</ThemedText>
           </Pressable>
         ) : null}
@@ -73,9 +74,7 @@ export function PlaceSearch({
       {places ? (
         <View style={styles.list} accessibilityRole="list">
           {places.length === 0 ? (
-            <ThemedText type="small" themeColor="textSecondary" style={{ padding: Spacing.three }}>
-              Nothing found for “{q}”. Try the full name, a street address with the town, or a nearby town.
-            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={{ padding: Spacing.three }}>{tr('Nothing found for “{q}”. Try the full name, a street address with the town, or a nearby town.', { q })}</ThemedText>
           ) : (
             places.map((p, i) => (
               <Pressable

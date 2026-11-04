@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Music Controls: play/pause, skip and volume for the music already playing on the phone, without
  * leaving OnMyLead. The native side (modules/onmylead-music) reports a raw state; this file turns
@@ -76,7 +78,7 @@ export function musicView(raw: unknown, os: string): MusicView {
     if (otherAudio) {
       return {
         mode: 'volume_only', source: 'Another App', title: null, artist: null, playing: true, volume, ask: null,
-        note: 'Apple lets OnMyLead change the volume of music from other apps, like Spotify, but not skip songs. Use your headset or helmet buttons to skip.',
+        note: tc('Apple lets OnMyLead change the volume of music from other apps, like Spotify, but not skip songs. Use your headset or helmet buttons to skip.'),
       };
     }
     const access = str(o.access);
@@ -84,7 +86,7 @@ export function musicView(raw: unknown, os: string): MusicView {
     return {
       mode: 'controls', source: 'Apple Music', title, artist: str(o.artist), playing: applePlaying, volume,
       ask: !title && access === 'ask' && bool(o.appleHasItem) ? 'ios_library' : null,
-      note: applePlaying || bool(o.appleHasItem) ? null : 'Nothing is playing. Play starts Apple Music.',
+      note: applePlaying || bool(o.appleHasItem) ? null : tc('Nothing is playing. Play starts Apple Music.'),
     };
   }
   // Android. With notification access the phone says which app is playing and what; without it the
@@ -101,7 +103,7 @@ export function musicView(raw: unknown, os: string): MusicView {
     playing,
     volume,
     ask: access ? null : 'android_listener',
-    note: playing || (access && hasSession) ? null : 'Nothing is playing. Play resumes the app you last listened to.',
+    note: playing || (access && hasSession) ? null : tc('Nothing is playing. Play resumes the app you last listened to.'),
   };
 }
 
@@ -121,9 +123,9 @@ export function volumePercent(v: number | null): string | null {
 
 /** What the Music button says to a screen reader. */
 export function musicButtonLabel(view: MusicView | null): string {
-  if (!view || !view.playing) return 'Music Controls';
+  if (!view || !view.playing) return tc('Music Controls');
   const what = view.title ? `${view.title}${view.artist ? ` by ${view.artist}` : ''}` : view.source;
-  return `Music Controls. Playing ${what}`;
+  return tc('Music Controls. Playing {what}', { what });
 }
 
 /** The two lines at the top of the sheet. */

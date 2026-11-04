@@ -10,6 +10,7 @@ import { ThemedText } from './themed-text';
 import { Button } from './ui';
 import { ProTag } from './pro-tag';
 
+import { t } from '@/lib/i18n';
 /**
  * Invite a whole riding group to this ride in one tap. Shown to the ride's organizers inside the
  * invite card. Each invited rider gets a notification and sees the ride on their home screen.
@@ -42,17 +43,17 @@ export function GroupInvite({ rideId }: { rideId: string }) {
 
   return (
     <View style={styles.wrap}>
-      <ThemedText type="heading" style={{ fontSize: 20 }}>Invite a Group</ThemedText>
+      <ThemedText type="heading" style={{ fontSize: 20 }}>{t('Invite a Group')}</ThemedText>
       {off ? (
-        <ThemedText type="small" themeColor="textSecondary">Riding groups are not switched on yet. They start working with the next server update.</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('Riding groups are not switched on yet. They start working with the next server update.')}</ThemedText>
       ) : groups === null ? null : groups.length === 0 ? (
         <Pressable accessibilityRole="button" onPress={openNewGroup} style={styles.empty}>
           <View style={{ flex: 1, gap: 2 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <ThemedText style={{ fontWeight: 700, flexShrink: 1 }}>Save Your Crew as a Group</ThemedText>
+              <ThemedText style={{ fontWeight: 700, flexShrink: 1 }}>{t('Save Your Crew as a Group')}</ThemedText>
               <ProTag feature="saved_groups" />
             </View>
-            <ThemedText type="small" themeColor="textSecondary">Then invite everyone to your next ride in one tap.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Then invite everyone to your next ride in one tap.')}</ThemedText>
           </View>
           <Icon name="chevron" color={Colors.textSecondary} />
         </Pressable>
@@ -65,11 +66,11 @@ export function GroupInvite({ rideId }: { rideId: string }) {
                 <Convoy names={g.riders.map((r) => r.name)} ids={g.riders.map((r) => r.id)} size={22} max={5} />
               </View>
               {done[g.id] ? (
-                <View style={styles.sent} accessibilityLabel="Invited">
+                <View style={styles.sent} accessibilityLabel={t('Invited')}>
                   <Icon name="check" color="#fff" size={22} strokeWidth={2.6} />
                 </View>
               ) : (
-                <Button title="Invite All" loading={busy === g.id} onPress={() => invite(g)} style={{ minHeight: 44 }} />
+                <Button title={t('Invite All')} loading={busy === g.id} onPress={() => invite(g)} style={{ minHeight: 44 }} />
               )}
             </View>
             <ThemedText type="small" themeColor="textSecondary">

@@ -7,6 +7,7 @@ import type { LatLng } from '@/core/geo';
 import type { MapRider } from './group-map-types';
 import { RiderPin } from './rider-pin';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * The map position of a rider's dot. When a new fix comes in, the dot slides there over about a
  * second (see core/glide) instead of jumping, and a slide cut short by the next fix carries on
@@ -80,7 +81,7 @@ export const RiderMarker = memo(
       <Marker
         coordinate={{ latitude: at.lat, longitude: at.lng }}
         title={r.name}
-        description={r.detail}
+        description={tr(r.detail)}
         anchor={{ x: 0.5, y: 0.5 }}
         tracksViewChanges={tracks}
         onPress={() => onPress(r.id)}

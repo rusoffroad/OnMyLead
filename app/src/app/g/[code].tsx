@@ -46,7 +46,7 @@ export default function GroupLink() {
     }
   };
 
-  if (preview === undefined) return <Screen><ThemedText themeColor="textSecondary">Loading…</ThemedText></Screen>;
+  if (preview === undefined) return <Screen><ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText></Screen>;
   if (preview === null) {
     return (
       <Screen>
@@ -63,21 +63,19 @@ export default function GroupLink() {
     <Screen>
       <Stack.Screen options={{ title: t('Riding Group') }} />
       <View style={{ gap: Spacing.three, paddingTop: Spacing.three }}>
-        <ThemedText themeColor="textSecondary">{preview.owner_name} invited you to their riding group</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('{owner_name} invited you to their riding group', { owner_name: preview.owner_name })}</ThemedText>
         <Text style={styles.title}>{preview.name}</Text>
         <Convoy names={dots} size={40} max={7} />
-        <ThemedText themeColor="textSecondary">
-          {ridersLabel(preview.riders)}. Everyone in the group gets invited to its rides in one tap.
-        </ThemedText>
+        <ThemedText themeColor="textSecondary">{t('{v}. Everyone in the group gets invited to its rides in one tap.', { v: ridersLabel(preview.riders) })}</ThemedText>
       </View>
       <ErrorText error={error} />
       {preview.is_member ? (
-        <Button title="Open Group" big onPress={() => router.replace(`/groups/${preview.id}`)} />
+        <Button title={t('Open Group')} big onPress={() => router.replace(`/groups/${preview.id}`)} />
       ) : (
         <Button title={session ? 'Join Group' : 'Create a Free Account to Join'} big loading={busy} onPress={join} />
       )}
       {!session ? (
-        <Button title="I Already Have an Account" kind="ghost" onPress={() => router.push('/sign-in')} />
+        <Button title={t('I Already Have an Account')} kind="ghost" onPress={() => router.push('/sign-in')} />
       ) : null}
     </Screen>
   );

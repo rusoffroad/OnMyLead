@@ -23,7 +23,7 @@ import { confirmAsync } from '@/lib/confirm';
 import { myGroupChats, myJoinedRides, setGroupChatMuted, setOpenGroupChat } from '@/lib/group-chat';
 import { getGroup, type RidingGroup } from '@/lib/groups';
 import { useSession } from '@/lib/session';
-import { t } from '@/lib/i18n';
+import { t as tr } from '@/lib/i18n';
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
@@ -101,9 +101,9 @@ export default function GroupChat() {
     setMenuFor(null);
     const theirs = m.user_id !== me;
     const ok = await confirmAsync(
-      'Clear This Message?',
+      tr('Clear This Message?'),
       theirs ? `You run this group, so you can clear ${nameOf(m.user_id)}’s message. It disappears for everyone.` : 'It disappears from the group chat for everyone. This can’t be undone.',
-      'Clear',
+      tr('Clear'),
     );
     if (ok) chat.clear(m.id);
   }
@@ -116,11 +116,11 @@ export default function GroupChat() {
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.page}>
-      <Stack.Screen options={{ headerShown: false, title: group?.name ?? t('Group Chat') }} />
+      <Stack.Screen options={{ headerShown: false, title: group?.name ?? tr('Group Chat') }} />
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Back"
+          accessibilityLabel={tr('Back')}
           hitSlop={12}
           onPress={() => (router.canGoBack() ? router.back() : router.replace(`/groups/${id}`))}
           style={styles.back}>
@@ -128,7 +128,7 @@ export default function GroupChat() {
             <Icon name="chevron" color={Colors.text} size={26} />
           </View>
         </Pressable>
-        <Pressable accessibilityRole="button" accessibilityHint="Open the group" onPress={() => router.push(`/groups/${id}`)} style={{ flex: 1 }}>
+        <Pressable accessibilityRole="button" accessibilityHint={tr('Open the group')} onPress={() => router.push(`/groups/${id}`)} style={{ flex: 1 }}>
           <Text style={styles.title} numberOfLines={1}>{group?.name ?? 'Group Chat'}</Text>
           <Text style={styles.sub} numberOfLines={1}>
             {group ? `${group.riders.length} ${group.riders.length === 1 ? 'Rider' : 'Riders'}` : ' '}
@@ -154,7 +154,7 @@ export default function GroupChat() {
             accessibilityState={{ selected: !focusRide }}
             onPress={() => focusOn(null)}
             style={[styles.allChip, !focusRide && styles.allChipOn]}>
-            <Text style={[styles.allChipText, !focusRide && { color: Colors.background }]}>All Talk</Text>
+            <Text style={[styles.allChipText, !focusRide && { color: Colors.background }]}>{tr('All Talk')}</Text>
           </Pressable>
           {talkedAbout.map((r) => (
             <RideTicket
@@ -170,9 +170,9 @@ export default function GroupChat() {
 
       {focusRide && rideById.get(focusRide) ? (
         <View style={styles.focusBar}>
-          <Text style={styles.focusText} numberOfLines={1}>Only Talk About {rideById.get(focusRide)!.name}</Text>
+          <Text style={styles.focusText} numberOfLines={1}>{tr('Only Talk About {name}', { name: rideById.get(focusRide)!.name })}</Text>
           <Pressable accessibilityRole="button" hitSlop={8} onPress={() => router.push(`/r/${rideById.get(focusRide)!.invite_code}`)}>
-            <Text style={styles.focusLink}>Open the Ride</Text>
+            <Text style={styles.focusLink}>{tr('Open the Ride')}</Text>
           </Pressable>
         </View>
       ) : null}
@@ -187,17 +187,15 @@ export default function GroupChat() {
           onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
           {chat.off ? (
             <View style={styles.note}>
-              <ThemedText type="smallBold">Not Switched On Yet</ThemedText>
+              <ThemedText type="smallBold">{tr('Not Switched On Yet')}</ThemedText>
               <ThemedText type="small" themeColor="textSecondary">{NOT_SWITCHED_ON}</ThemedText>
             </View>
           ) : null}
 
           {chat.loaded && !chat.off && !messages.length && !chat.pending.length ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyTitle}>Start the Conversation</Text>
-              <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 300 }}>
-                Everyone in {group?.name ?? 'the group'} sees what you post here. Plan the next ride, share how the last one went.
-              </ThemedText>
+              <Text style={styles.emptyTitle}>{tr('Start the Conversation')}</Text>
+              <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 300 }}>{tr('Everyone in {v} sees what you post here. Plan the next ride, share how the last one went.', { v: group?.name ?? tr('the group') })}</ThemedText>
               <View style={{ gap: Spacing.two, alignSelf: 'stretch', marginTop: Spacing.two }}>
                 {STARTERS.map((s) => (
                   <Pressable key={s} accessibilityRole="button" onPress={() => setDraft(s)} style={styles.starter}>
@@ -210,7 +208,7 @@ export default function GroupChat() {
 
           {focusRide && !shown.length ? (
             <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', marginTop: Spacing.four }}>
-              Nothing about this ride yet.
+              {tr('Nothing about this ride yet.')}
             </ThemedText>
           ) : null}
 
@@ -242,7 +240,7 @@ export default function GroupChat() {
                         self ? styles.bubbleMine : styles.bubbleTheirs,
                         self ? { borderBottomRightRadius: lastInRun ? 6 : 18 } : { borderBottomLeftRadius: lastInRun ? 6 : 18 },
                       ]}>
-                      <Text style={[styles.body, self && { color: '#fff' }]}>{m.body}</Text>
+                      <Text style={[styles.body, self && { color: '#fff' }]}>{tr(m.body)}</Text>
                     </Pressable>
                     {menuOpen ? (
                       <View style={styles.menu}>
@@ -253,7 +251,7 @@ export default function GroupChat() {
                             setReporting({ kind: 'rider', userId: m.user_id, rideId: m.ride_id, name: nameOf(m.user_id), source: 'group_chat', groupId: id });
                           }}
                           style={styles.smallBtn}>
-                          <Text style={styles.smallBtnText}>Report Rider</Text>
+                          <Text style={styles.smallBtnText}>{tr('Report Rider')}</Text>
                         </Pressable>
                         {!blocks.off ? (
                           <Pressable
@@ -263,12 +261,12 @@ export default function GroupChat() {
                               confirmAndBlock(m.user_id, nameOf(m.user_id));
                             }}
                             style={styles.smallBtn}>
-                            <Text style={styles.smallBtnText}>Block Rider</Text>
+                            <Text style={styles.smallBtnText}>{tr('Block Rider')}</Text>
                           </Pressable>
                         ) : null}
                         {canClear ? (
                           <Pressable accessibilityRole="button" onPress={() => clear(m)} style={styles.smallBtn}>
-                            <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>Clear</Text>
+                            <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>{tr('Clear')}</Text>
                           </Pressable>
                         ) : null}
                       </View>
@@ -290,7 +288,7 @@ export default function GroupChat() {
               <View style={[styles.col, { alignItems: 'flex-end' }]}>
                 {p.rideId && rideById.get(p.rideId) ? <RideTicket ride={rideById.get(p.rideId)!} compact /> : null}
                 <View style={[styles.bubble, styles.bubbleMine, { borderBottomRightRadius: 6, opacity: p.state === 'sending' ? 0.6 : 1 }, p.state === 'failed' && styles.bubbleFailed]}>
-                  <Text style={[styles.body, { color: '#fff' }]}>{p.body}</Text>
+                  <Text style={[styles.body, { color: '#fff' }]}>{tr(p.body)}</Text>
                 </View>
                 <View style={styles.meta}>
                   <SendBadge state={p.state} />
@@ -300,10 +298,10 @@ export default function GroupChat() {
                     {p.error ? <Text style={styles.failText}>{p.error}</Text> : null}
                     <View style={{ flexDirection: 'row', gap: Spacing.two }}>
                       <Pressable accessibilityRole="button" onPress={() => chat.retry(p.localId)} style={[styles.smallBtn, { backgroundColor: Colors.accent }]}>
-                        <Text style={styles.smallBtnText}>Retry</Text>
+                        <Text style={styles.smallBtnText}>{tr('Retry')}</Text>
                       </Pressable>
                       <Pressable accessibilityRole="button" onPress={() => chat.discard(p.localId)} style={styles.smallBtn}>
-                        <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>Remove</Text>
+                        <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>{tr('Remove')}</Text>
                       </Pressable>
                     </View>
                   </>
@@ -318,7 +316,7 @@ export default function GroupChat() {
           <View style={styles.composer}>
             {picking ? (
               <View style={styles.picker}>
-                <ThemedText type="smallBold" themeColor="textSecondary">Which Ride Is This About?</ThemedText>
+                <ThemedText type="smallBold" themeColor="textSecondary">{tr('Which Ride Is This About?')}</ThemedText>
                 {mine.length ? (
                   mine.slice(0, 8).map((r) => (
                     <RideTicket
@@ -335,7 +333,7 @@ export default function GroupChat() {
                   ))
                 ) : (
                   <ThemedText type="small" themeColor="textSecondary">
-                    Join or create a ride and you can talk about it here.
+                    {tr('Join or create a ride and you can talk about it here.')}
                   </ThemedText>
                 )}
               </View>
@@ -348,7 +346,7 @@ export default function GroupChat() {
                   onPress={() => setAboutRide(null)}
                   style={[styles.aboutChip, { borderColor: PHASE_COLOR[ridePhase(about)] }]}>
                   <View style={[styles.aboutDot, { backgroundColor: PHASE_COLOR[ridePhase(about)] }]} />
-                  <Text style={styles.aboutText} numberOfLines={1}>About {about.name}</Text>
+                  <Text style={styles.aboutText} numberOfLines={1}>{tr('About {name}', { name: about.name })}</Text>
                   <Icon name="close" size={14} color={Colors.textSecondary} />
                 </Pressable>
               ) : (
@@ -373,12 +371,12 @@ export default function GroupChat() {
                 placeholderTextColor={Colors.textSecondary}
                 maxLength={MAX_MESSAGE_LENGTH}
                 multiline
-                accessibilityLabel="Message"
+                accessibilityLabel={tr('Message')}
                 style={styles.input}
               />
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Send"
+                accessibilityLabel={tr('Send')}
                 disabled={!draft.trim()}
                 onPress={() => send()}
                 style={({ pressed }) => [styles.send, !draft.trim() && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>

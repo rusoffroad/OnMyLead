@@ -20,6 +20,7 @@ import { buy, loadProducts, manageSubscription, PRODUCTS, redeemOfferCode, resto
 import { useMyReferrals } from '@/lib/referrals';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 type Product = Awaited<ReturnType<typeof loadProducts>>[number];
 
 type Period = 'annual' | 'monthly';
@@ -104,7 +105,7 @@ export default function ProScreen() {
         </View>
         <ProShield size={76} />
         <Text style={styles.heroTitle} accessibilityRole="header">OnMyLead Pro</Text>
-        <Text style={styles.heroBody}>Lead as many rides as you like, ride with no signal and keep every ride you’ve been on.</Text>
+        <Text style={styles.heroBody}>{t('Lead as many rides as you like, ride with no signal and keep every ride you’ve been on.')}</Text>
       </View>
 
       {ent.switchedOn ? <PlanStatus ent={ent} /> : null}
@@ -112,7 +113,7 @@ export default function ProScreen() {
       {rewardLive && reward ? <ReferralRewardCard reward={reward} onChanged={() => { referrals.reload(); refresh(); }} /> : null}
 
       {admin ? null : paid ? (
-        <Button title="Manage Subscription" kind="secondary" loading={busy === 'manage'} onPress={manage} />
+        <Button title={t('Manage Subscription')} kind="secondary" loading={busy === 'manage'} onPress={manage} />
       ) : blocked ? (
         <View style={styles.blocked} accessibilityLiveRegion="polite">
           <ThemedText type="small" style={{ color: Colors.text }}>{blocked.message}</ThemedText>
@@ -128,7 +129,7 @@ export default function ProScreen() {
               detail={`${annualPerMonth()} a Month. Save About ${annualSavingsPercent()}%`}
               best
             />
-            <PlanOption on={period === 'monthly'} onPress={() => setPeriod('monthly')} name="Monthly" price={`${priceOf('monthly')} a Month`} detail="Cancel anytime" />
+            <PlanOption on={period === 'monthly'} onPress={() => setPeriod('monthly')} name="Monthly" price={`${priceOf('monthly')} a Month`} detail={t('Cancel anytime')} />
           </View>
           <Button
             title={`Subscribe for ${priceOf(period)} a ${period === 'annual' ? 'Year' : 'Month'}`}
@@ -140,24 +141,24 @@ export default function ProScreen() {
       )}
       {note ? <ThemedText type="small" style={{ color: Colors.text, textAlign: 'center' }} accessibilityLiveRegion="polite">{note}</ThemedText> : null}
 
-      <Text style={styles.sectionTitle} accessibilityRole="header">Free and Pro</Text>
+      <Text style={styles.sectionTitle} accessibilityRole="header">{t('Free and Pro')}</Text>
       <Comparison />
 
       <View style={styles.links}>
-        <LinkButton title="Restore Purchases" busy={busy === 'restore'} onPress={() => run('restore', async () => {
+        <LinkButton title={t('Restore Purchases')} busy={busy === 'restore'} onPress={() => run('restore', async () => {
           if (!store) return notYet;
           const r = await restore();
           await refresh();
           return restoreMessage(store, r.restored);
         })} />
-        <LinkButton title="Redeem Promo Code" busy={busy === 'redeem'} onPress={() => run('redeem', async () => {
+        <LinkButton title={t('Redeem Promo Code')} busy={busy === 'redeem'} onPress={() => run('redeem', async () => {
           if (!store) return notYet;
           if (blocked) return blocked.message;
           await redeemOfferCode();
           return store === 'google' ? 'After you redeem the code in Google Play, come back here and Pro turns on.' : null;
         })} />
-        {admin || paid ? null : <LinkButton title="Manage Subscription" busy={busy === 'manage'} onPress={manage} />}
-        {session && referralsOn ? <LinkButton title="Invite Friends, Both Get 50% Off" onPress={() => router.push('/invite-friends')} /> : null}
+        {admin || paid ? null : <LinkButton title={t('Manage Subscription')} busy={busy === 'manage'} onPress={manage} />}
+        {session && referralsOn ? <LinkButton title={t('Invite Friends, Both Get 50% Off')} onPress={() => router.push('/invite-friends')} /> : null}
       </View>
 
       <Disclosures store={store} />
@@ -179,7 +180,7 @@ function PlanOption({ on, onPress, name, price, detail, best }: { on: boolean; o
           <Text style={styles.optionName}>{name}</Text>
           {best ? (
             <View style={styles.best}>
-              <Text style={styles.bestText}>Best Value</Text>
+              <Text style={styles.bestText}>{t('Best Value')}</Text>
             </View>
           ) : null}
         </View>
@@ -203,7 +204,7 @@ function Comparison() {
     <View style={styles.table}>
       <View style={[styles.row, styles.headRow]}>
         <Text style={[styles.rowLabel, styles.headText]} />
-        <Text style={[styles.col, styles.headText]}>Free</Text>
+        <Text style={[styles.col, styles.headText]}>{t('Free')}</Text>
         <Text style={[styles.col, styles.headText, { color: Colors.accent }]}>Pro</Text>
       </View>
       {COMPARISON.map((r, i) => (
@@ -212,7 +213,7 @@ function Comparison() {
           style={[styles.row, i > 0 && styles.rule]}
           accessible
           accessibilityLabel={`${r.label}. Free: ${r.free === true ? 'included' : r.free === false ? 'not included' : r.free}. Pro: ${r.pro === true ? 'included' : r.pro}`}>
-          <Text style={styles.rowLabel}>{r.label}</Text>
+          <Text style={styles.rowLabel}>{t(r.label)}</Text>
           <View style={styles.colBox}>{cell(r.free, false)}</View>
           <View style={styles.colBox}>{cell(r.pro, true)}</View>
         </View>

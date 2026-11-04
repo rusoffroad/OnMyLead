@@ -6,10 +6,11 @@ import { Screen } from '@/components/ui';
 import { createTrip } from '@/lib/api';
 import { requireTripSlot } from '@/lib/pro';
 
+import { t } from '@/lib/i18n';
 export default function NewTrip() {
   return (
     <Screen width="readable">
-      <ThemedText themeColor="textSecondary">Name it now. You can add a starter list on the next screen.</ThemedText>
+      <ThemedText themeColor="textSecondary">{t('Name it now. You can add a starter list on the next screen.')}</ThemedText>
       <TripForm
         saveLabel="Create Trip"
         onSave={async (input) => {

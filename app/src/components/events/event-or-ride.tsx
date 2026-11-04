@@ -7,6 +7,7 @@ import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/
 import { EVENT_OR_RIDE } from '@/core/events';
 import { openHelpCenter } from '@/lib/help-center';
 
+import { t } from '@/lib/i18n';
 type From = 'events' | 'find' | 'create-ride' | 'create-event';
 
 /**
@@ -19,8 +20,8 @@ export function EventOrRide({ from }: { from: From }) {
   const [open, setOpen] = useState(false);
   const other =
     from === 'events' || from === 'create-event'
-      ? { title: 'Find a Public Ride', go: () => router.push('/find') }
-      : { title: 'See Events', go: () => router.push('/events') };
+      ? { title: t('Find a Public Ride'), go: () => router.push('/find') }
+      : { title: t('See Events'), go: () => router.push('/events') };
 
   return (
     <View style={styles.box}>
@@ -44,7 +45,7 @@ export function EventOrRide({ from }: { from: From }) {
               <Text style={styles.link}>{other.title}</Text>
             </Pressable>
             <Pressable accessibilityRole="link" hitSlop={8} onPress={() => openHelpCenter('events')}>
-              <Text style={styles.link}>Learn More</Text>
+              <Text style={styles.link}>{t('Learn More')}</Text>
             </Pressable>
           </View>
         </View>

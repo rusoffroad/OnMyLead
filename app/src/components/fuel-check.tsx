@@ -10,6 +10,7 @@ import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { myVehicles, setMyVehicle, type VehicleWithCost } from '@/lib/api';
 import type { Ride, RideMember } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 const COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
 
 /**
@@ -55,35 +56,27 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
       {advice ? (
         <>
           <ThemedText style={{ fontSize: 18, lineHeight: 24, fontWeight: 700 }}>{advice.line}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            {ride.route_miles} mile route. {vehicleTitle(vehicle!)} goes about {Math.round(range!.fullRangeMiles)} miles on{' '}
-            {vehicle!.extra_fuel_gallons ? `${range!.totalGallons} gal (${vehicle!.tank_gallons} tank + ${vehicle!.extra_fuel_gallons} extra)` : 'a full tank'}.
-            Trail miles burn more fuel than you think; the thirds rule keeps a reserve.
-          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('{route_miles} mile route. {v} goes about {v2} miles on {v3}. Trail miles burn more fuel than you think; the thirds rule keeps a reserve.', { route_miles: ride.route_miles, v: vehicleTitle(vehicle!), v2: Math.round(range!.fullRangeMiles), v3: vehicle!.extra_fuel_gallons ? t('{total} gal ({tank} tank + {extra} extra)', { total: range!.totalGallons, tank: vehicle!.tank_gallons, extra: vehicle!.extra_fuel_gallons }) : t('a full tank') })}</ThemedText>
         </>
       ) : vehicle && !range ? (
         <View style={{ gap: Spacing.two }}>
-          <ThemedText type="small" themeColor="textSecondary">
-            Add tank size and mpg to {vehicleTitle(vehicle)} to check your fuel for this ride.
-          </ThemedText>
-          <Button title="Edit Machine" kind="secondary" onPress={() => router.push(`/garage/${vehicle.id}/edit`)} />
+          <ThemedText type="small" themeColor="textSecondary">{t('Add tank size and mpg to {v} to check your fuel for this ride.', { v: vehicleTitle(vehicle) })}</ThemedText>
+          <Button title={t('Edit Machine')} kind="secondary" onPress={() => router.push(`/garage/${vehicle.id}/edit`)} />
         </View>
       ) : !vehicle && ride.route_miles ? (
-        <ThemedText type="small" themeColor="textSecondary">
-          This route is about {ride.route_miles} miles. Pick the machine you’re bringing to check your fuel range.
-        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('This route is about {route_miles} miles. Pick the machine you’re bringing to check your fuel range.', { route_miles: ride.route_miles })}</ThemedText>
       ) : null}
 
       {canChange && vehicles.length ? (
         <Choice
-          label="Bringing"
-          options={[...vehicles.map((v) => ({ value: v.id as string | null, label: vehicleTitle(v) })), { value: null, label: 'None / Riding Along' }]}
+          label={t('Bringing')}
+          options={[...vehicles.map((v) => ({ value: v.id as string | null, label: vehicleTitle(v) })), { value: null, label: t('None / Riding Along') }]}
           value={mine.vehicle_id}
           onChange={(v) => (busy || v === mine.vehicle_id ? undefined : pick(v))}
         />
       ) : null}
       {canChange && !vehicles.length ? (
-        <Button title="Add Your Machine to the Garage" kind="secondary" onPress={() => router.push('/garage/new')} />
+        <Button title={t('Add Your Machine to the Garage')} kind="secondary" onPress={() => router.push('/garage/new')} />
       ) : null}
       <ErrorText error={error} />
     </Card>

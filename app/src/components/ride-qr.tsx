@@ -5,6 +5,7 @@ import Svg, { Path, Rect } from 'react-native-svg';
 import { Colors } from '@/constants/theme';
 import { qrModules, qrPath } from '@/core/qr';
 
+import { t } from '@/lib/i18n';
 /** Quiet zone around the code, in modules. Four is the standard; two scans fine off a phone screen. */
 const MARGIN = 2;
 
@@ -22,7 +23,7 @@ export function QrCode({ value, size, style }: { value: string; size: number; st
     <View
       accessible
       accessibilityRole="image"
-      accessibilityLabel="QR code for this ride. Scan it with a phone camera to open the ride."
+      accessibilityLabel={t('QR code for this ride. Scan it with a phone camera to open the ride.')}
       style={[{ width: size, height: size, borderRadius: size * 0.06, overflow: 'hidden', backgroundColor: '#FFFFFF' }, style]}>
       <Svg width={size} height={size} viewBox={`0 0 ${units} ${units}`}>
         <Rect x={0} y={0} width={units} height={units} fill="#FFFFFF" />

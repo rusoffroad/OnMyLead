@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Ride chat and announcements.
  *
@@ -43,9 +45,9 @@ export type MessageCheck = { ok: true; body: string } | { ok: false; error: stri
 /** Trim and validate what a rider typed before it goes to the database. */
 export function checkMessage(raw: string): MessageCheck {
   const body = raw.trim();
-  if (!body) return { ok: false, error: 'Type a message first.' };
+  if (!body) return { ok: false, error: tc('Type a message first.') };
   if (body.length > MAX_MESSAGE_LENGTH) {
-    return { ok: false, error: `Keep it under ${MAX_MESSAGE_LENGTH} characters (${body.length} now).` };
+    return { ok: false, error: tc('Keep it under {MAX_MESSAGE_LENGTH} characters ({length} now).', { MAX_MESSAGE_LENGTH, length: body.length }) };
   }
   return { ok: true, body };
 }
@@ -133,7 +135,7 @@ export function messageActionsNotSwitchedOn(message: string): boolean {
 /** What Ride Mode says out loud for a new announcement. */
 export function spokenAnnouncement(senderName: string | null | undefined, body: string): string {
   const who = senderName?.trim() || 'the organizer';
-  return `Announcement from ${who}. ${body}`;
+  return tc('Announcement from {who}. {body}', { who, body });
 }
 
 /**
@@ -171,22 +173,22 @@ export function alertTitle(
 
 /** Turn a database error into something a rider can act on. */
 export function friendlyChatError(message: string): string {
-  if (messageActionsNotSwitchedOn(message)) return 'Clear and Mark Resolved aren’t switched on yet.';
-  if (/only the sender can resolve/i.test(message)) return 'Only the person who sent it can mark it resolved.';
-  if (/only the sender can clear/i.test(message)) return 'Only the person who sent it can clear it, or it’s already gone.';
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return 'No signal. Check your connection and tap Retry.';
+  if (messageActionsNotSwitchedOn(message)) return tc('Clear and Mark Resolved aren’t switched on yet.');
+  if (/only the sender can resolve/i.test(message)) return tc('Only the person who sent it can mark it resolved.');
+  if (/only the sender can clear/i.test(message)) return tc('Only the person who sent it can clear it, or it’s already gone.');
+  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and tap Retry.');
   if (/poll_options|ride_poll_votes|vote_on_poll/i.test(message) && /column|relation|schema cache|does not exist|could not find/i.test(message)) {
-    return 'Polls aren’t switched on yet.';
+    return tc('Polls aren’t switched on yet.');
   }
-  if (/poll choices repeat/i.test(message)) return 'Each choice needs to be different.';
-  if (/poll choice too long/i.test(message)) return 'Keep each choice under 60 characters.';
-  if (/poll question too long/i.test(message)) return 'Keep the question under 200 characters.';
-  if (/poll choice is empty|poll_size|check constraint/i.test(message)) return 'A poll needs 2 to 5 choices.';
-  if (/not one of the poll choices|poll not found/i.test(message)) return 'That choice isn’t in this poll.';
-  if (/only riders on this ride can vote/i.test(message)) return 'Only riders on this ride can vote.';
-  if (/slow down/i.test(message)) return 'You’re sending a lot. Wait a minute and try again.';
-  if (/row-level security|violates row-level/i.test(message)) return 'Only riders on this ride can chat here.';
-  if (/audience/i.test(message)) return 'Leader-only messages aren’t switched on yet. Send it to everyone for now.';
-  if (/too long/i.test(message)) return `Keep it under ${MAX_MESSAGE_LENGTH} characters.`;
+  if (/poll choices repeat/i.test(message)) return tc('Each choice needs to be different.');
+  if (/poll choice too long/i.test(message)) return tc('Keep each choice under 60 characters.');
+  if (/poll question too long/i.test(message)) return tc('Keep the question under 200 characters.');
+  if (/poll choice is empty|poll_size|check constraint/i.test(message)) return tc('A poll needs 2 to 5 choices.');
+  if (/not one of the poll choices|poll not found/i.test(message)) return tc('That choice isn’t in this poll.');
+  if (/only riders on this ride can vote/i.test(message)) return tc('Only riders on this ride can vote.');
+  if (/slow down/i.test(message)) return tc('You’re sending a lot. Wait a minute and try again.');
+  if (/row-level security|violates row-level/i.test(message)) return tc('Only riders on this ride can chat here.');
+  if (/audience/i.test(message)) return tc('Leader-only messages aren’t switched on yet. Send it to everyone for now.');
+  if (/too long/i.test(message)) return tc('Keep it under {MAX_MESSAGE_LENGTH} characters.', { MAX_MESSAGE_LENGTH });
   return message;
 }

@@ -23,6 +23,7 @@ import { track } from '@/lib/analytics';
 import { currentPosition, stateAt } from '@/lib/location';
 import type { Ride } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 type Mode = 'near' | 'state';
 type Found = Ride & { distanceMi?: number };
 
@@ -185,15 +186,15 @@ function FindRides() {
         value={mode}
         onChange={switchMode}
         options={[
-          { value: 'near', label: 'Near Me' },
-          { value: 'state', label: 'By State' },
+          { value: 'near', label: t('Near Me') },
+          { value: 'state', label: t('By State') },
         ]}
       />
 
-      <PlaceSearch label="Search Near a Place" near={here} onPick={goToPlace} />
+      <PlaceSearch label={t('Search Near a Place')} near={here} onPick={goToPlace} />
       {place ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
-          <ThemedText style={{ flex: 1, fontWeight: 600 }}>Rides Near {place.name}</ThemedText>
+          <ThemedText style={{ flex: 1, fontWeight: 600 }}>{t('Rides Near {name}', { name: place.name })}</ThemedText>
           <Button title={here ? 'Back to Near Me' : 'Clear'} kind="ghost" onPress={clearPlace} />
         </View>
       ) : null}
@@ -202,11 +203,11 @@ function FindRides() {
         <Card>
           <ThemedText>{locating ? 'Finding where you are…' : 'Turn on location to see rides near you, or pick your state below.'}</ThemedText>
           {!locating && locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
-          {!locating ? <Button title="Use My Location" onPress={locate} /> : null}
+          {!locating ? <Button title={t('Use My Location')} onPress={locate} /> : null}
         </Card>
       ) : null}
 
-      {mode === 'state' && !state ? <ThemedText type="heading">Pick a State</ThemedText> : null}
+      {mode === 'state' && !state ? <ThemedText type="heading">{t('Pick a State')}</ThemedText> : null}
       {(!state && !locating) || pickingState ? statePicker : null}
 
       <ErrorText error={error} />
@@ -219,7 +220,7 @@ function FindRides() {
 
       {mode === 'near' && origin && !area ? (
         <Choice
-          label="How Far Will You Go?"
+          label={t('How Far Will You Go?')}
           value={radius}
           onChange={setRadius}
           options={RADIUS_CHOICES_MI.map((mi) => ({ value: mi, label: `${mi} Miles` }))}
@@ -227,12 +228,12 @@ function FindRides() {
       ) : null}
       {area ? <Button title={mode === 'near' && origin ? (place ? `Back to Rides Near ${place.name}` : 'Back to Rides Near Me') : `Back to All of ${state?.name ?? 'the State'}`} kind="ghost" onPress={() => setArea(null)} /> : null}
 
-      {loading ? <ThemedText themeColor="textSecondary">Looking for rides…</ThemedText> : null}
+      {loading ? <ThemedText themeColor="textSecondary">{t('Looking for rides…')}</ThemedText> : null}
       {rides && !loading ? (
         rides.length === 0 ? (
           <Card>
             <ThemedText>{empty}</ThemedText>
-            <Button title="Create a Public Ride" onPress={() => router.push('/ride/new?type=public')} />
+            <Button title={t('Create a Public Ride')} onPress={() => router.push('/ride/new?type=public')} />
           </Card>
         ) : (
           <Section title={`${rides.length} ${rides.length === 1 ? 'Ride' : 'Rides'}${area ? ' in This Map Area' : ''}`} />
@@ -269,7 +270,7 @@ function FindRides() {
         mainScroll={false}
         main={map ?? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <ThemedText themeColor="textSecondary">The map opens on your location or the state you pick.</ThemedText>
+            <ThemedText themeColor="textSecondary">{t('The map opens on your location or the state you pick.')}</ThemedText>
           </View>
         )}
       />

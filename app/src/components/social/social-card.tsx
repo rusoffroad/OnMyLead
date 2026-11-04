@@ -19,6 +19,7 @@ import { faceColor, Initial } from '../home/parts';
 import { ProTag, Social } from './parts';
 import { ShareSheet } from './share-sheet';
 
+import { t } from '@/lib/i18n';
 const OPEN_LABEL: Partial<Record<SocialItem['kind'], string>> = { trail: 'Open Trail', group: 'Open Ride', out: 'See Who’s Out' };
 
 /**
@@ -62,7 +63,7 @@ export function SocialCard({
   const remove = async () => {
     setMenu(false);
     if (item.kind !== 'post' || !item.key) return;
-    const ok = await confirmAsync('Delete This Post?', 'It comes off your profile and your friends’ feeds, with its likes and comments.', 'Delete');
+    const ok = await confirmAsync(t('Delete This Post?'), t('It comes off your profile and your friends’ feeds, with its likes and comments.'), t('Delete'));
     if (!ok) return;
     try {
       await deletePost(item.key.slice('post:'.length));
@@ -80,7 +81,7 @@ export function SocialCard({
           {stat ? <Text style={styles.stat}>{`  ${stat}`}</Text> : null}
         </Text>
       ) : null}
-      {item.body ? <Text style={styles.post} numberOfLines={full ? undefined : 8}>{item.body}</Text> : null}
+      {item.body ? <Text style={styles.post} numberOfLines={full ? undefined : 8}>{t(item.body)}</Text> : null}
       {item.badge ? (
         <View style={styles.badgeRow}>
           <BadgePatch badge={item.badge.badge} level={item.badge.level} size={full ? 72 : 52} />
@@ -107,19 +108,19 @@ export function SocialCard({
             {item.kind === 'post' ? '  ·  Post' : ''}
           </Text>
         </Pressable>
-        <Pressable onPress={() => setMenu(true)} hitSlop={10} accessibilityRole="button" accessibilityLabel="More" style={styles.more}>
+        <Pressable onPress={() => setMenu(true)} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('More')} style={styles.more}>
           <Icon name="more" size={22} color={Social.muted} strokeWidth={3} />
         </Pressable>
       </View>
 
       {open ? (
-        <Pressable onPress={open} accessibilityRole="link" accessibilityHint="Opens it with all the comments" style={({ pressed }) => pressed && { opacity: 0.85 }}>
+        <Pressable onPress={open} accessibilityRole="link" accessibilityHint={t('Opens it with all the comments')} style={({ pressed }) => pressed && { opacity: 0.85 }}>
           {body}
         </Pressable>
       ) : body}
 
       {item.photoUrl ? (
-        <Pressable onPress={() => setPhotoOpen(true)} accessibilityRole="imagebutton" accessibilityLabel="See the photo full size">
+        <Pressable onPress={() => setPhotoOpen(true)} accessibilityRole="imagebutton" accessibilityLabel={t('See the photo full size')}>
           <Image source={{ uri: item.photoUrl }} contentFit="cover" transition={120} style={styles.photo} accessibilityIgnoresInvertColors />
         </Pressable>
       ) : null}
@@ -134,12 +135,12 @@ export function SocialCard({
       {!full && item.comments.length ? (
         <Pressable onPress={open} style={styles.previews} accessibilityRole="link" accessibilityLabel={`${commentsLabel(item.commentCount)}. Open to read them all.`}>
           {item.commentCount > item.comments.length ? (
-            <Text style={styles.viewAll}>View All {item.commentCount} Comments</Text>
+            <Text style={styles.viewAll}>{t('View All {commentCount} Comments', { commentCount: item.commentCount })}</Text>
           ) : null}
           {item.comments.map((c) => (
             <Text key={c.id} style={styles.preview} numberOfLines={2}>
               <Text style={{ fontFamily: font(700), color: Colors.text }}>{c.authorName}  </Text>
-              {c.body}
+              {t(c.body)}
             </Text>
           ))}
         </Pressable>
@@ -160,18 +161,18 @@ export function SocialCard({
             onPress={() => router.push(`${itemHref(item.key!)}&comment=1` as never)}
             a11y={commentsLabel(item.commentCount)}
           />
-          {canShareOut(item) ? <Action icon="share" label="Share" onPress={share} a11y="Share to Facebook, Instagram, X and more" /> : <View style={{ flex: 1 }} />}
+          {canShareOut(item) ? <Action icon="share" label={t('Share')} onPress={share} a11y="Share to Facebook, Instagram, X and more" /> : <View style={{ flex: 1 }} />}
         </View>
       ) : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <PhotoViewer uri={photoOpen ? item.photoUrl : null} square={false} caption={item.body} onClose={() => setPhotoOpen(false)} />
+      <PhotoViewer uri={photoOpen ? item.photoUrl : null} square={false} caption={t(item.body)} onClose={() => setPhotoOpen(false)} />
       <ShareSheet item={sharing ? item : null} onClose={() => setSharing(false)} />
       <BottomSheet visible={menu} onClose={() => setMenu(false)} title={item.mine ? 'Your Post' : item.actorName}>
         <View style={{ gap: 4 }}>
           <MenuItem icon="person" label={item.mine ? 'View Your Profile' : `View ${item.actorName}’s Profile`} onPress={() => { setMenu(false); router.push(profileHref(item.actorId) as never); }} />
-          {canShareOut(item) ? <MenuItem icon="share" label="Share to Other Apps" onPress={() => { setMenu(false); share(); }} /> : null}
-          {item.mine && item.kind === 'post' ? <MenuItem icon="trash" label="Delete Post" danger onPress={remove} /> : null}
+          {canShareOut(item) ? <MenuItem icon="share" label={t('Share to Other Apps')} onPress={() => { setMenu(false); share(); }} /> : null}
+          {item.mine && item.kind === 'post' ? <MenuItem icon="trash" label={t('Delete Post')} danger onPress={remove} /> : null}
           {!item.mine ? (
             <MenuItem icon="flagged" label={item.kind === 'post' ? 'Report This Post' : `Report ${item.actorName}`} danger onPress={() => { setMenu(false); setReport(true); }} />
           ) : null}

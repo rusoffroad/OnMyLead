@@ -8,6 +8,7 @@ import { track } from '@/lib/analytics';
 import { QrCode } from './ride-qr';
 import { Button } from './ui';
 
+import { t } from '@/lib/i18n';
 /**
  * Top of a ride's web page (where a scanned QR code lands when OnMyLead isn't installed): get the
  * app, or open this ride in it. On an iPhone or iPad that's two buttons and the App Store, on Android
@@ -24,7 +25,7 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
 
   const download = store ? (
     <Button
-      title="Get the App, Free"
+      title={t('Get the App, Free')}
       onPress={() => {
         track('web_get_app', { from: 'ride_page' });
         Linking.openURL(store);
@@ -32,7 +33,7 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
     />
   ) : (
     <View style={styles.soon} accessibilityRole="text">
-      <Text style={styles.soonText}>Coming Soon to the App Store</Text>
+      <Text style={styles.soonText}>{t('Coming Soon to the App Store')}</Text>
     </View>
   );
 
@@ -40,7 +41,7 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
     <View style={styles.card}>
       <View style={styles.row}>
         <View style={{ flex: 1, gap: Spacing.one }}>
-          <Text style={styles.title} accessibilityRole="header">This Ride Lives in the OnMyLead App</Text>
+          <Text style={styles.title} accessibilityRole="header">{t('This Ride Lives in the OnMyLead App')}</Text>
           <Text style={styles.body}>
             {iphone
               ? 'Already have it? Open the ride right where you left off. New here? Get the app, then scan or open the link again.'
@@ -53,7 +54,7 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
       </View>
       <View style={styles.actions}>
         {iphone ? (
-          <Button title="Open in the App" kind="secondary" style={{ flex: 1 }} onPress={() => Linking.openURL(appRideUrl(inviteCode))} />
+          <Button title={t('Open in the App')} kind="secondary" style={{ flex: 1 }} onPress={() => Linking.openURL(appRideUrl(inviteCode))} />
         ) : null}
         <View style={{ flex: 1 }}>{download}</View>
       </View>

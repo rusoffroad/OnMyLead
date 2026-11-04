@@ -12,6 +12,7 @@ import {
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { TILE_MAX_AGE_S, tileCachePath } from '@/lib/trail-tiles';
 
+import { t as tr } from '@/lib/i18n';
 const TEMPLATES = Object.fromEntries(TRAIL_SOURCE_IDS.map((id) => [id, trailTileTemplate(TRAIL_SOURCES[id])]));
 
 /**
@@ -177,7 +178,7 @@ const NameTag = memo(
         accessibilityLabel={label.closed ? `${label.name}, closed` : label.name}>
         <View style={[styles.tag, label.closed && styles.tagClosed]}>
           <Text style={styles.tagText} numberOfLines={1}>{label.name}</Text>
-          {label.closed ? <Text style={styles.tagClosedText}>Closed</Text> : null}
+          {label.closed ? <Text style={styles.tagClosedText}>{tr('Closed')}</Text> : null}
         </View>
       </Marker>
     );

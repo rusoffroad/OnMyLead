@@ -36,6 +36,7 @@ import { useSession } from '@/lib/session';
 import { handleProError, requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
 
+import { t as tr } from '@/lib/i18n';
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
 
 const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : null);
@@ -195,12 +196,12 @@ export default function NewRide() {
     setError(null);
     const dayDate = new Date(day);
     const meetAt = at(dayDate, parseTime(meetTime));
-    if (!kind) return setError('Pick Public or Private at the top.');
-    if (!name.trim()) return setError('Give the ride a name.');
-    if (!meetAt) return setError('Pick a meeting time.');
-    if (!canRideOn(dayDate, new Date())) return setError('Pick a day from today up to three years out.');
-    if (!parsedCoords) return setError('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".');
-    if (!routePlan) return setError('Pick Mapped or Freeride under The Route.');
+    if (!kind) return setError(tr('Pick Public or Private at the top.'));
+    if (!name.trim()) return setError(tr('Give the ride a name.'));
+    if (!meetAt) return setError(tr('Pick a meeting time.'));
+    if (!canRideOn(dayDate, new Date())) return setError(tr('Pick a day from today up to three years out.'));
+    if (!parsedCoords) return setError(tr('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".'));
+    if (!routePlan) return setError(tr('Pick Mapped or Freeride under The Route.'));
     if (!codeCheckOk(codeCheck)) return setError(codeCheck === 'checking' ? 'Checking your invite code. Try again in a second.' : 'Pick a different invite code, or clear it to get one made for you.');
     setBusy(true);
     try {
@@ -259,12 +260,12 @@ export default function NewRide() {
     <Screen width="readable">
       {Platform.OS === 'web' ? (
         <ThemedText type="small" themeColor="textSecondary">
-          Plan it here on the big screen. The ride, its route and its stops show up in the OnMyLead app on your iPhone as soon as you save.
+          {tr('Plan it here on the big screen. The ride, its route and its stops show up in the OnMyLead app on your iPhone as soon as you save.')}
         </ThemedText>
       ) : null}
       {copiedFrom ? (
         <View style={{ gap: 2, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
-          <ThemedText style={{ fontWeight: 700 }}>Riding {copiedFrom} Again</ThemedText>
+          <ThemedText style={{ fontWeight: 700 }}>{tr('Riding {copiedFrom} Again', { copiedFrom })}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             {copiedRoute
               ? 'The details, meeting point and route are filled in. Pick the day, check the times and create it.'
@@ -274,14 +275,14 @@ export default function NewRide() {
       ) : null}
       {fromTrail ? (
         <View style={{ gap: 2, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
-          <ThemedText style={{ fontWeight: 700 }}>Riding {fromTrail}</ThemedText>
+          <ThemedText style={{ fontWeight: 700 }}>{tr('Riding {fromTrail}', { fromTrail })}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            The trail is the route, and its start is the meeting point. Change anything, pick the day and create it.
+            {tr('The trail is the route, and its start is the meeting point. Change anything, pick the day and create it.')}
           </ThemedText>
           {trailWidth != null ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
               <WidthIcon />
-              <ThemedText style={{ fontWeight: 700 }}>{inches(trailWidth)} Width Limit</ThemedText>
+              <ThemedText style={{ fontWeight: 700 }}>{tr('{v} Width Limit', { v: inches(trailWidth) })}</ThemedText>
             </View>
           ) : null}
           <RigFitLine limitIn={trailWidth} garage={garage} />
@@ -289,9 +290,9 @@ export default function NewRide() {
       ) : null}
       {event ? (
         <View style={{ gap: 2, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.accent }}>
-          <ThemedText style={{ fontWeight: 700 }}>For Your Event</ThemedText>
+          <ThemedText style={{ fontWeight: 700 }}>{tr('For Your Event')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            Once it’s created, this ride shows under the event’s Group Rides.
+            {tr('Once it’s created, this ride shows under the event’s Group Rides.')}
           </ThemedText>
         </View>
       ) : null}
@@ -299,53 +300,53 @@ export default function NewRide() {
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement }}>
           <ThemedText type="small" style={{ flex: 1, fontWeight: 600 }}>{allowance}</ThemedText>
           <Pressable accessibilityRole="link" onPress={() => router.push('/pro')} hitSlop={8}>
-            <ThemedText type="linkPrimary">Unlimited With Pro</ThemedText>
+            <ThemedText type="linkPrimary">{tr('Unlimited With Pro')}</ThemedText>
           </Pressable>
         </View>
       ) : null}
       {!event ? <EventOrRide from="create-ride" /> : null}
-      <ThemedText type="heading">What Kind of Ride?</ThemedText>
+      <ThemedText type="heading">{tr('What Kind of Ride?')}</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <KindCard
-          title="Public"
-          detail="Open to anyone. Found by riders near you or in your state."
+          title={tr('Public')}
+          detail={tr('Open to anyone. Found by riders near you or in your state.')}
           on={kind === 'public'}
           onPress={() => setKind('public')}
         />
         <KindCard
-          title="Private"
-          detail="Only friends you invite by link, text or email."
+          title={tr('Private')}
+          detail={tr('Only friends you invite by link, text or email.')}
           on={kind === 'private'}
           onPress={() => setKind('private')}
         />
       </View>
 
-      <Field label="Ride Name" value={name} onChangeText={setName} placeholder="Saturday Hell's Revenge run" />
+      <Field label={tr('Ride Name')} value={name} onChangeText={setName} placeholder={tr('Saturday Hell\'s Revenge run')} />
 
       <Card>
-        <ThemedText type="heading">When</ThemedText>
+        <ThemedText type="heading">{tr('When')}</ThemedText>
         <RideDatePicker value={day} onChange={setDay} />
-        <TimePicker label="Meet At" value={meetTime} onChange={setMeetTime} />
+        <TimePicker label={tr('Meet At')} value={meetTime} onChange={setMeetTime} />
       </Card>
 
       <Card>
-        <ThemedText type="heading">Meeting Point</ThemedText>
+        <ThemedText type="heading">{tr('Meeting Point')}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          Only joined riders see the exact spot. Public pages show the area within about a mile.
+          {tr('Only joined riders see the exact spot. Public pages show the area within about a mile.')}
         </ThemedText>
-        <PlaceSearch label="Search a Place or Address" onPick={pickPlace} />
+        <PlaceSearch label={tr('Search a Place or Address')} onPick={pickPlace} />
         <MeetPointMap value={parsedCoords ? { lat: Number(parsedCoords[1]), lng: Number(parsedCoords[2]) } : null} onPick={pickOnMap} />
-        <Button title="Use My Current Location" kind="secondary" onPress={useMyLocation} />
-        <Field label="Coordinates" value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
-        <Field label="Place Name" value={meetLabel} onChangeText={setMeetLabel} placeholder="Gas station on Main St, Moab, UT" />
+        <Button title={tr('Use My Current Location')} kind="secondary" onPress={useMyLocation} />
+        <Field label={tr('Coordinates')} value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
+        <Field label={tr('Place Name')} value={meetLabel} onChangeText={setMeetLabel} placeholder={tr('Gas station on Main St, Moab, UT')} />
         {kind === 'public' ? (
           <View style={{ gap: Spacing.one }}>
-            <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>State</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('State')}</ThemedText>
             <ThemedText>
               {meetState ? `Listed in ${stateByCode(meetState)?.name}.` : 'Set the meeting point and we fill this in, or pick it.'}
             </ThemedText>
             {meetState && !pickingState ? (
-              <Button title="Change State" kind="ghost" onPress={() => setPickingState(true)} />
+              <Button title={tr('Change State')} kind="ghost" onPress={() => setPickingState(true)} />
             ) : (
               <Choice
                 value={meetState}
@@ -361,18 +362,18 @@ export default function NewRide() {
       </Card>
 
       <View style={{ gap: Spacing.two }}>
-        <ThemedText type="heading">The Route</ThemedText>
+        <ThemedText type="heading">{tr('The Route')}</ThemedText>
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <KindCard
-            title="Mapped"
-            detail="Draw the route or import a GPX next. Riders follow it in Ride Mode."
+            title={tr('Mapped')}
+            detail={tr('Draw the route or import a GPX next. Riders follow it in Ride Mode.')}
             on={routePlan === 'mapped'}
             onPress={() => requirePro('route_builder') && setRoutePlan('mapped')}
             pro="route_builder"
           />
           <KindCard
-            title="Freeride"
-            detail="No set route. Everyone follows the leader."
+            title={tr('Freeride')}
+            detail={tr('No set route. Everyone follows the leader.')}
             on={routePlan === 'freeride'}
             onPress={() => setRoutePlan('freeride')}
           />
@@ -380,100 +381,97 @@ export default function NewRide() {
       </View>
 
       <Card>
-        <ThemedText type="heading">Who’s Riding</ThemedText>
-        <MultiChoice label="Vehicles Welcome" options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
+        <ThemedText type="heading">{tr('Who’s Riding')}</ThemedText>
+        <MultiChoice label={tr('Vehicles Welcome')} options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
         {kind === 'public' ? (
           <Choice
-            label="Joining"
+            label={tr('Joining')}
             value={joinPolicy}
             onChange={setJoinPolicy}
             options={[
-              { value: 'open', label: 'Anyone Can Join' },
-              { value: 'approval', label: 'I Approve Riders' },
+              { value: 'open', label: tr('Anyone Can Join') },
+              { value: 'approval', label: tr('I Approve Riders') },
             ]}
           />
         ) : null}
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
-            <Field label="Max Vehicles" value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder="No limit" />
+            <Field label={tr('Max Vehicles')} value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder={tr('No limit')} />
           </View>
           <View style={{ flex: 1 }}>
-            <Field label="Max Riders" value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder="No limit" />
+            <Field label={tr('Max Riders')} value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder={tr('No limit')} />
           </View>
         </View>
       </Card>
 
       <Card>
-        <ThemedText type="heading">Invite Code</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Riders open the ride with its link, QR code or this code. Leave it empty and OnMyLead makes one, or type your own so it’s easy to say out loud.
-          {kind === 'private' ? ' Anyone with the code can join, so pick one that’s hard to guess.' : ''}
-        </ThemedText>
-        <ShareCodeField kind="ride" label="Your Own Code (Optional)" value={inviteCode} onChange={setInviteCode} onCheck={setCodeCheck} />
+        <ThemedText type="heading">{tr('Invite Code')}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{tr('Riders open the ride with its link, QR code or this code. Leave it empty and OnMyLead makes one, or type your own so it’s easy to say out loud.{v}', { v: kind === 'private' ? ` ${tr('Anyone with the code can join, so pick one that’s hard to guess.')}` : '' })}</ThemedText>
+        <ShareCodeField kind="ride" label={tr('Your Own Code (Optional)')} value={inviteCode} onChange={setInviteCode} onCheck={setCodeCheck} />
       </Card>
 
       {groups.length ? (
         <Card>
-          <ThemedText type="heading">Invite a Group</ThemedText>
+          <ThemedText type="heading">{tr('Invite a Group')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            Everyone in the groups you pick gets a notification and sees the ride on their home screen. They join with one tap.
+            {tr('Everyone in the groups you pick gets a notification and sees the ride on their home screen. They join with one tap.')}
           </ThemedText>
-          <MultiChoice label="Your Riding Groups" options={[...new Set(groups.map((g) => g.name))]} value={groupNames} onChange={setGroupNames} />
+          <MultiChoice label={tr('Your Riding Groups')} options={[...new Set(groups.map((g) => g.name))]} value={groupNames} onChange={setGroupNames} />
         </Card>
       ) : null}
 
       <Button title={more ? 'Fewer Details' : 'Add Route, Difficulty and More'} kind="ghost" onPress={() => setMore(!more)} />
       {more ? (
         <Card>
-          <Field label="Description" value={description} onChangeText={setDescription} multiline />
+          <Field label={tr('Description')} value={description} onChangeText={setDescription} multiline />
           <TimePicker
-            label="Departure Time (Optional)"
+            label={tr('Departure Time (Optional)')}
             value={departTime}
             onChange={setDepartTime}
             optional
             suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 30)}
           />
           <TimePicker
-            label="Expected Finish (Optional)"
+            label={tr('Expected Finish (Optional)')}
             value={finishTime}
             onChange={setFinishTime}
             optional
             suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 8 * 60)}
           />
-          <PlaceSearch label="Search a Destination" onPick={(p) => setDestination(placeLabel(p))} />
+          <PlaceSearch label={tr('Search a Destination')} onPick={(p) => setDestination(placeLabel(p))} />
           <Field
-            label="Destination"
+            label={tr('Destination')}
             value={destination}
             onChangeText={setDestination}
-            placeholder="Trailhead, town or street address"
-            hint="Anyone who can see the ride sees this. Riders get directions to it in Apple Maps or Google Maps."
+            placeholder={tr('Trailhead, town or street address')}
+            hint={tr('Anyone who can see the ride sees this. Riders get directions to it in Apple Maps or Google Maps.')}
           />
-          <Field label="Route Length (Miles)" value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint="Used to warn riders whose fuel range is too short." />
+          <Field label={tr('Route Length (Miles)')} value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint={tr('Used to warn riders whose fuel range is too short.')} />
           <Choice
-            label="Difficulty"
+            label={tr('Difficulty')}
             value={difficulty}
             onChange={setDifficulty}
-            options={[{ value: 'easy', label: 'Easy' }, { value: 'moderate', label: 'Moderate' }, { value: 'hard', label: 'Hard' }, { value: 'extreme', label: 'Extreme' }]}
+            options={[{ value: 'easy', label: tr('Easy') }, { value: 'moderate', label: tr('Moderate') }, { value: 'hard', label: tr('Hard') }, { value: 'extreme', label: tr('Extreme') }]}
           />
           <Choice
-            label="Experience"
+            label={tr('Experience')}
             value={experience}
             onChange={setExperience}
-            options={[{ value: 'beginner', label: 'Beginner' }, { value: 'intermediate', label: 'Intermediate' }, { value: 'advanced', label: 'Advanced' }, { value: 'expert', label: 'Expert' }]}
+            options={[{ value: 'beginner', label: tr('Beginner') }, { value: 'intermediate', label: tr('Intermediate') }, { value: 'advanced', label: tr('Advanced') }, { value: 'expert', label: tr('Expert') }]}
           />
-          <Field label="What to Bring" value={whatToBring} onChangeText={setWhatToBring} multiline />
-          <Field label="Required Equipment" value={requiredEquipment} onChangeText={setRequiredEquipment} multiline placeholder="Whip flag, helmet, spare belt" />
-          <Field label="Fuel" value={fuelNotes} onChangeText={setFuelNotes} placeholder="Full tank, no gas on the trail" />
-          <Field label="Instructions for Joined Riders" value={instructions} onChangeText={setInstructions} multiline />
+          <Field label={tr('What to Bring')} value={whatToBring} onChangeText={setWhatToBring} multiline />
+          <Field label={tr('Required Equipment')} value={requiredEquipment} onChangeText={setRequiredEquipment} multiline placeholder={tr('Whip flag, helmet, spare belt')} />
+          <Field label={tr('Fuel')} value={fuelNotes} onChangeText={setFuelNotes} placeholder={tr('Full tank, no gas on the trail')} />
+          <Field label={tr('Instructions for Joined Riders')} value={instructions} onChangeText={setInstructions} multiline />
           <Choice
-            label="Ride Bubble"
+            label={tr('Ride Bubble')}
             value={bubble}
             onChange={setBubble}
             options={[
-              { value: 'default', label: 'Standard' },
-              { value: 'tight_trail', label: 'Tight Trail' },
-              { value: 'desert', label: 'Desert' },
-              { value: 'highway', label: 'Highway' },
+              { value: 'default', label: tr('Standard') },
+              { value: 'tight_trail', label: tr('Tight Trail') },
+              { value: 'desert', label: tr('Desert') },
+              { value: 'highway', label: tr('Highway') },
             ]}
           />
         </Card>

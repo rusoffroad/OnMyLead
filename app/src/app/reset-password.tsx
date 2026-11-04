@@ -6,6 +6,7 @@ import { Button, ErrorText, Field, Screen } from '@/components/ui';
 import { parseAuthLink } from '@/core/auth-link';
 import { completeAuthLink, updatePassword, useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 /**
  * The password-reset email lands here (Supabase's built-in email), or on /auth-callback first (our
  * branded one). Either way the link signs the rider in for this one step.
@@ -31,25 +32,25 @@ export default function ResetPassword() {
   if (loading) {
     return (
       <Screen width="readable">
-        <ThemedText>Opening your reset link…</ThemedText>
+        <ThemedText>{t('Opening your reset link…')}</ThemedText>
       </Screen>
     );
   }
   if (!session) {
     return (
       <Screen width="readable">
-        <ThemedText type="subtitle">This Link Has Expired</ThemedText>
-        <ThemedText>Ask for a new reset link from the sign-in screen, and open it on this device.</ThemedText>
-        <Button title="Back to Sign In" onPress={() => router.replace('/sign-in')} />
+        <ThemedText type="subtitle">{t('This Link Has Expired')}</ThemedText>
+        <ThemedText>{t('Ask for a new reset link from the sign-in screen, and open it on this device.')}</ThemedText>
+        <Button title={t('Back to Sign In')} onPress={() => router.replace('/sign-in')} />
       </Screen>
     );
   }
   return (
     <Screen width="readable">
-      <ThemedText type="subtitle">Choose a New Password</ThemedText>
-      <Field label="New Password" value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder="At least 8 characters" />
+      <ThemedText type="subtitle">{t('Choose a New Password')}</ThemedText>
+      <Field label={t('New Password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder={t('At least 8 characters')} />
       <Button
-        title="Save Password"
+        title={t('Save Password')}
         loading={busy}
         disabled={password.length < 8}
         onPress={async () => {

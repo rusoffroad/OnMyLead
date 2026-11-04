@@ -35,7 +35,7 @@ export default function InviteFriends() {
     return (
       <Screen>
         <Stack.Screen options={{ title: t('Invite Friends') }} />
-        {error ? <ErrorText error={error} /> : <ThemedText themeColor="textSecondary">Loading…</ThemedText>}
+        {error ? <ErrorText error={error} /> : <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>}
       </Screen>
     );
   }
@@ -50,7 +50,7 @@ export default function InviteFriends() {
           <View key={i} style={[styles.contour, { width: 160 + i * 90, height: 120 + i * 70, borderRadius: 80 + i * 45, top: -40 - i * 20, right: -70 - i * 34 }]} />
         ))}
       </View>
-      <Text style={styles.heroTitle} accessibilityRole="header">Ride Together, Save Together</Text>
+      <Text style={styles.heroTitle} accessibilityRole="header">{t('Ride Together, Save Together')}</Text>
       <ThemedText themeColor="textSecondary" style={{ maxWidth: 420 }}>
         {data.enabled
           ? `Send your link to a riding buddy who’s new to OnMyLead. When they finish their first ride, you both get Pro Annual for $${REFERRAL_PRICE.discounted} the first year instead of $${REFERRAL_PRICE.annual}.`
@@ -61,9 +61,9 @@ export default function InviteFriends() {
 
   const linkCard = data.enabled && code ? (
     <View style={styles.card}>
-      <ThemedText type="heading" style={{ fontSize: 20 }}>Your Invite Link</ThemedText>
+      <ThemedText type="heading" style={{ fontSize: 20 }}>{t('Your Invite Link')}</ThemedText>
       <Text style={styles.link} selectable numberOfLines={2}>{link ?? code}</Text>
-      <Button title="Share Invite" big onPress={() => Share.share({ message: inviteMessage(link, code) }).catch(() => {})} />
+      <Button title={t('Share Invite')} big onPress={() => Share.share({ message: inviteMessage(link, code) }).catch(() => {})} />
       <Button
         title={copied ? 'Copied' : 'Copy Link'}
         kind="secondary"
@@ -73,7 +73,7 @@ export default function InviteFriends() {
         }}
       />
       <ThemedText type="small" themeColor="textSecondary">
-        It’s also your friend link, so they can add you as a friend too.
+        {t('It’s also your friend link, so they can add you as a friend too.')}
       </ThemedText>
     </View>
   ) : null;
@@ -82,7 +82,7 @@ export default function InviteFriends() {
 
   const invites = (
     <View style={{ gap: Spacing.two }}>
-      <ThemedText type="heading" style={{ fontSize: 22 }}>Your Invites</ThemedText>
+      <ThemedText type="heading" style={{ fontSize: 22 }}>{t('Your Invites')}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{inviteSummary(data)}</ThemedText>
       {data.invites.map((i, n) => (
         <View key={`${i.joinedAt}-${n}`} style={styles.row} accessible accessibilityLabel={`${i.name}, ${inviteStatus(i)}`}>
@@ -102,7 +102,7 @@ export default function InviteFriends() {
 
   const rules = (
     <View style={{ gap: Spacing.one }}>
-      <ThemedText type="smallBold">How It Works</ThemedText>
+      <ThemedText type="smallBold">{t('How It Works')}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         {`Your friend creates a new account with your link within ${REFERRAL_RULES.newAccountDays} days and finishes a ride that ran at least ${REFERRAL_RULES.minRideMinutes} minutes. Each rider can earn the discount once, and it can be claimed for 6 months. On iPhone and iPad it’s an App Store offer code; on Android it’s a Google Play offer. If you already pay for Pro on Google Play, your next bill moves back 6 months instead. The discount covers the first year of Pro Annual, which then renews at the regular price unless you cancel.`}
       </ThemedText>

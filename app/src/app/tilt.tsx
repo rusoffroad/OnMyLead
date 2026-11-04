@@ -32,9 +32,9 @@ function NoSensors() {
   return (
     <Screen width="readable">
       <Stack.Screen options={{ title: tr('Tilt') }} />
-      <ThemedText type="subtitle">Tilt Is in the App</ThemedText>
+      <ThemedText type="subtitle">{tr('Tilt Is in the App')}</ThemedText>
       <ThemedText themeColor="textSecondary">
-        The roll and pitch meter and Crash Alert read the motion sensors in your phone or tablet, so they’re in the OnMyLead app for iPhone, iPad and Android, not on the website.
+        {tr('The roll and pitch meter and Crash Alert read the motion sensors in your phone or tablet, so they’re in the OnMyLead app for iPhone, iPad and Android, not on the website.')}
       </ThemedText>
     </Screen>
   );
@@ -65,12 +65,12 @@ function TiltMeter() {
       calibrated ? 'Zero the Tilt Meter' : 'Calibrate the Tilt Meter',
       `Place your phone where it will be mounted, with the vehicle on flat and level ground, then press ${zeroWord} to calibrate it.`,
       zeroWord,
-      'Cancel',
+      tr('Cancel'),
     );
     if (!ok) return;
     const m = latestMotion();
     if (!m || !zeroTilt(m.gravity)) {
-      showNotice('No Reading Yet', 'The motion sensors haven’t sent a reading yet. Hold still for a second and try again.');
+      showNotice(tr('No Reading Yet'), tr('The motion sensors haven’t sent a reading yet. Hold still for a second and try again.'));
       return;
     }
     resetTiltMax();
@@ -81,8 +81,8 @@ function TiltMeter() {
       <Stack.Screen options={{ title: tr('Tilt') }} />
       {!available ? (
         <View style={styles.notice}>
-          <ThemedText type="smallBold">No Motion Sensors Found</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">This device doesn’t report tilt, so the meter can’t show a reading.</ThemedText>
+          <ThemedText type="smallBold">{tr('No Motion Sensors Found')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('This device doesn’t report tilt, so the meter can’t show a reading.')}</ThemedText>
         </View>
       ) : null}
 
@@ -97,47 +97,47 @@ function TiltMeter() {
       </View>
 
       <View style={styles.actions}>
-        <Button title={zeroWord} onPress={zero} style={{ flex: 1 }} accessibilityHint="Sets level for how the phone sits in its mount" />
-        {calibrated ? <Button title="Reset Max" kind="secondary" onPress={resetTiltMax} style={{ flex: 1 }} /> : null}
+        <Button title={zeroWord} onPress={zero} style={{ flex: 1 }} accessibilityHint={tr('Sets level for how the phone sits in its mount')} />
+        {calibrated ? <Button title={tr('Reset Max')} kind="secondary" onPress={resetTiltMax} style={{ flex: 1 }} /> : null}
       </View>
       <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
         {calibrated
           ? 'Zeroed for your mount. Zero again if you move the phone.'
           : 'The tilt meter is off until you calibrate it. Place your phone where it will be mounted, with the vehicle on flat and level ground, then press Calibrate.'}
         {settings.calibration ? (
-          <Text onPress={clearZero} style={styles.link} accessibilityRole="button"> Clear Zero</Text>
+          <Text onPress={clearZero} style={styles.link} accessibilityRole="button"> {tr('Clear Zero')}</Text>
         ) : null}
       </ThemedText>
 
       <View style={[styles.cards, sideBySide && styles.cardsRow]}>
         <View style={[styles.card, sideBySide && { flex: 1 }]}>
-          <Text style={styles.cardTitle}>Tilt Warnings</Text>
-          <Row title="Warn Me" detail="Buzzes when you lean past your limit." value={settings.warn} onChange={setTiltWarnings} />
-          <Limit label="Roll Limit" value={limits.roll} disabled={!settings.warn} onChange={(v) => setTiltLimits({ ...limits, roll: v })} />
-          <Limit label="Pitch Limit" value={limits.pitch} disabled={!settings.warn} onChange={(v) => setTiltLimits({ ...limits, pitch: v })} />
-          <Row title="Say It Out Loud" detail="Speaks the angle, like “Roll 28 left”." value={settings.voice} onChange={setTiltVoice} disabled={!settings.warn} />
-          <Row title="Show in Map Mode and Ride Mode" detail="The Tilt tile over the map." value={settings.show} onChange={setTiltShown} />
+          <Text style={styles.cardTitle}>{tr('Tilt Warnings')}</Text>
+          <Row title={tr('Warn Me')} detail={tr('Buzzes when you lean past your limit.')} value={settings.warn} onChange={setTiltWarnings} />
+          <Limit label={tr('Roll Limit')} value={limits.roll} disabled={!settings.warn} onChange={(v) => setTiltLimits({ ...limits, roll: v })} />
+          <Limit label={tr('Pitch Limit')} value={limits.pitch} disabled={!settings.warn} onChange={(v) => setTiltLimits({ ...limits, pitch: v })} />
+          <Row title={tr('Say It Out Loud')} detail={tr('Speaks the angle, like “Roll 28 left”.')} value={settings.voice} onChange={setTiltVoice} disabled={!settings.warn} />
+          <Row title={tr('Show in Map Mode and Ride Mode')} detail={tr('The Tilt tile over the map.')} value={settings.show} onChange={setTiltShown} />
           <ThemedText type="small" themeColor="textSecondary">
-            Every vehicle tips at a different angle. These are reminders, not a promise you won’t roll. On a motorcycle, turn Warn Me off: leaning into turns is normal.
+            {tr('Every vehicle tips at a different angle. These are reminders, not a promise you won’t roll. On a motorcycle, turn Warn Me off: leaning into turns is normal.')}
           </ThemedText>
         </View>
 
         <View style={[styles.card, sideBySide && { flex: 1 }]}>
           <View style={styles.cardHead}>
             <Icon name="warning" size={20} color={RideColors.red} />
-            <Text style={styles.cardTitle}>Crash Alert</Text>
+            <Text style={styles.cardTitle}>{tr('Crash Alert')}</Text>
           </View>
           <ThemedText type="small" themeColor="textSecondary">
-            In Ride Mode, a hard hit or a rollover followed by a stop starts a 30 second countdown. If you don’t tap I’m OK, your group gets an EMERGENCY alert with your location. A dropped phone doesn’t set it off.
+            {tr('In Ride Mode, a hard hit or a rollover followed by a stop starts a 30 second countdown. If you don’t tap I’m OK, your group gets an EMERGENCY alert with your location. A dropped phone doesn’t set it off.')}
           </ThemedText>
           <View accessibilityRole="radiogroup" style={{ gap: Spacing.one, opacity: crash.enabled ? 1 : 0.5 }}>
-            <Text style={styles.rowTitle}>Sensitivity</Text>
+            <Text style={styles.rowTitle}>{tr('Sensitivity')}</Text>
             {CRASH_SENSITIVITIES.map((o) => (
               <Sensitivity key={o.value} {...o} on={crash.sensitivity === o.value} disabled={!crash.enabled} onPress={(v) => setCrashSettings({ ...crash, sensitivity: v })} />
             ))}
           </View>
           <ThemedText type="small" themeColor="textSecondary">
-            Crash Alert tells your group only. It doesn’t call 911 or emergency services. It works while Ride Mode is open, and with no signal the alert sends as soon as your phone reconnects.
+            {tr('Crash Alert tells your group only. It doesn’t call 911 or emergency services. It works while Ride Mode is open, and with no signal the alert sends as soon as your phone reconnects.')}
           </ThemedText>
         </View>
       </View>
@@ -152,14 +152,14 @@ function CrashToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => 
       onPress={() => onChange(!on)}
       accessibilityRole="switch"
       accessibilityState={{ checked: on }}
-      accessibilityLabel="Crash Alert"
+      accessibilityLabel={tr('Crash Alert')}
       accessibilityHint={on ? 'Turns Crash Alert off' : 'Turns Crash Alert on'}
       style={({ pressed }) => [styles.toggle, on ? styles.toggleOn : styles.toggleOff, pressed && { opacity: 0.85 }]}>
       <View style={[styles.toggleIcon, { backgroundColor: on ? RideColors.red : Colors.backgroundSelected }]}>
         <Icon name="warning" size={22} color={on ? '#FFFFFF' : Colors.textSecondary} strokeWidth={2.3} />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.toggleTitle}>Crash Alert {on ? 'On' : 'Off'}</Text>
+        <Text style={styles.toggleTitle}>{tr('Crash Alert {v}', { v: on ? tr('On') : tr('Off') })}</Text>
         <Text style={styles.rowDetail}>
           {on ? 'Watching for a crash while Ride Mode is open.' : 'Your group won’t be told automatically if you crash.'}
         </Text>

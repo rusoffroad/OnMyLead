@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { clockParts, fromClockParts, minutesLabel, minutesText, parseTime } from '@/core/time';
 
+import { t } from '@/lib/i18n';
 const HOURS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 /** Wide enough for all twelve hours (or minutes) in one row: tablets and the website. */
@@ -93,7 +94,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
             })}
           </View>
 
-          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>Hour</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{t('Hour')}</ThemedText>
           <View style={styles.grid} accessibilityRole="radiogroup" accessibilityLabel={`${label}, hour`}>
             {HOURS.map((h) => {
               const on = parts?.hour === h;
@@ -111,7 +112,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
             })}
           </View>
 
-          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>Minute</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{t('Minute')}</ThemedText>
           <View style={styles.grid} accessibilityRole="radiogroup" accessibilityLabel={`${label}, minute`}>
             {MINUTES.map((m) => {
               const on = parts?.minute === m;
@@ -141,7 +142,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
               }}
               hitSlop={8}
               style={({ pressed }) => [styles.clear, { opacity: pressed ? 0.7 : 1 }]}>
-              <ThemedText type="smallBold" themeColor="textSecondary">Clear</ThemedText>
+              <ThemedText type="smallBold" themeColor="textSecondary">{t('Clear')}</ThemedText>
             </Pressable>
           ) : null}
         </View>

@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Notification settings: what a rider hears about, and when.
  *
@@ -143,8 +145,8 @@ export function settingsFromRow(row: Partial<Record<keyof NotificationSettings, 
 /** "10 PM", "6:30 AM", "Noon", "Midnight". */
 export function formatClock(minutes: number): string {
   const m = ((Math.round(minutes) % 1440) + 1440) % 1440;
-  if (m === 0) return 'Midnight';
-  if (m === 720) return 'Noon';
+  if (m === 0) return tc('Midnight');
+  if (m === 720) return tc('Noon');
   const h = Math.floor(m / 60);
   const min = m % 60;
   const h12 = h % 12 === 0 ? 12 : h % 12;
@@ -202,13 +204,18 @@ export function planReminders(rides: ReminderRide[], minutesBefore: number | nul
     if (!Number.isFinite(meet)) continue;
     const at = meet - minutesBefore * 60_000;
     if (at <= now + 30_000) continue;
-    const when = minutesBefore >= 1440 ? 'tomorrow' : `in ${minutesBefore >= 60 ? `${minutesBefore / 60} hour${minutesBefore === 60 ? '' : 's'}` : `${minutesBefore} minutes`}`;
     const where = r.meet_area_label?.trim();
     out.push({
       rideId: r.id,
       at: new Date(at),
-      title: `${r.name} ${minutesBefore >= 1440 ? 'is tomorrow' : `starts ${when}`}`,
-      body: where ? `Meeting near ${where}. Tap for the details and what to bring.` : 'Tap for the meeting spot and what to bring.',
+      title: minutesBefore >= 1440
+        ? tc('{name} is tomorrow', { name: r.name })
+        : minutesBefore === 60
+          ? tc('{name} starts in 1 hour', { name: r.name })
+          : minutesBefore > 60
+            ? tc('{name} starts in {hours} hours', { name: r.name, hours: minutesBefore / 60 })
+            : tc('{name} starts in {minutes} minutes', { name: r.name, minutes: minutesBefore }),
+      body: where ? tc('Meeting near {where}. Tap for the details and what to bring.', { where }) : tc('Tap for the meeting spot and what to bring.'),
     });
   }
   return out.sort((a, b) => a.at.getTime() - b.at.getTime()).slice(0, 40);

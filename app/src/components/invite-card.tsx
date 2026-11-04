@@ -16,6 +16,7 @@ import { RideQrSheet } from './ride-qr-sheet';
 import { ThemedText } from './themed-text';
 import { Button, Card } from './ui';
 
+import { t } from '@/lib/i18n';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
 /**
@@ -63,16 +64,16 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
         <Pressable
           onPress={() => setShowQr(true)}
           accessibilityRole="button"
-          accessibilityLabel="Show the ride's QR code full screen"
+          accessibilityLabel={t('Show the ride\'s QR code full screen')}
           style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}>
           <QrCode value={link} size={116} />
         </Pressable>
         <View style={{ flex: 1, gap: Spacing.one }}>
           <View style={{ borderRadius: Radius.control, borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border, paddingVertical: 8, alignItems: 'center' }}>
-            <ThemedText type="small" themeColor="textSecondary">Invite Code</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Invite Code')}</ThemedText>
             <ThemedText selectable numberOfLines={1} style={{ ...codeTextSize(ride.invite_code, 28), fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
           </View>
-          <Button title="Show QR Code" kind="secondary" style={{ minHeight: 44 }} onPress={() => { setShowQr(true); track('invite_qr_shown', { platform: Platform.OS }); }} />
+          <Button title={t('Show QR Code')} kind="secondary" style={{ minHeight: 44 }} onPress={() => { setShowQr(true); track('invite_qr_shown', { platform: Platform.OS }); }} />
         </View>
       </View>
       {canChange ? (
@@ -85,10 +86,10 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
           onSaved={(c) => onCodeChanged?.(c)}
         />
       ) : null}
-      <Button title="Share Invite" big onPress={() => send('sheet')} />
+      <Button title={t('Share Invite')} big onPress={() => send('sheet')} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Text" kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
-        <Button title="Email" kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
+        <Button title={t('Text')} kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
+        <Button title={t('Email')} kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
         <Button
           title={copied ? 'Copied' : 'Copy Link'}
           kind="secondary"

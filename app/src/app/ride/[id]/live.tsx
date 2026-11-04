@@ -91,6 +91,7 @@ import { speak } from '@/lib/voice';
 import { requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
 
+import { t } from '@/lib/i18n';
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
 
@@ -217,7 +218,7 @@ export default function RideMode() {
   const [meet, setMeet] = useState<{ lat: number; lng: number; label: string | null } | null>(null);
   const [panelH, setPanelH] = useState(0);
   const openNewWaypoint = useCallback((at: { lat: number; lng: number }) => {
-    if (!wp.switchedOn) return Alert.alert('Not Switched On Yet', WAYPOINTS_NOT_SWITCHED_ON);
+    if (!wp.switchedOn) return Alert.alert(t('Not Switched On Yet'), WAYPOINTS_NOT_SWITCHED_ON);
     if (!requirePro('waypoints')) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setWpTarget({ type: 'new', at });
@@ -329,7 +330,7 @@ export default function RideMode() {
             // sharing, so say once that nothing is being sent instead of failing quietly.
             if (warnedLocationOff.current) return;
             warnedLocationOff.current = true;
-            showNotice('Location Is Off', 'OnMyLead can’t see your location, so your group won’t see you move. Turn on location for OnMyLead in Settings to keep sharing.');
+            showNotice(t('Location Is Off'), t('OnMyLead can’t see your location, so your group won’t see you move. Turn on location for OnMyLead in Settings to keep sharing.'));
           });
         }
         else if (!shareChecked.current) setAskShare(true);
@@ -675,7 +676,7 @@ export default function RideMode() {
       setShare(s);
       setAskShare(false);
     } catch (e) {
-      Alert.alert('Could Not Start Sharing', e instanceof Error ? e.message : String(e));
+      Alert.alert(t('Could Not Start Sharing'), e instanceof Error ? e.message : String(e));
     } finally {
       setBusy(false);
     }
@@ -748,7 +749,7 @@ export default function RideMode() {
     try {
       await broadcast.cancel();
     } catch (e) {
-      Alert.alert('Could Not Cancel', e instanceof Error ? e.message : String(e));
+      Alert.alert(t('Could Not Cancel'), e instanceof Error ? e.message : String(e));
       return;
     }
     if (b.kind === 'reply') {
@@ -777,7 +778,7 @@ export default function RideMode() {
       await dropRegroup(id, p.lat, p.lng, 'Regroup here');
       refresh();
     } catch (e) {
-      Alert.alert('Could Not Set Regroup Point', e instanceof Error ? e.message : String(e));
+      Alert.alert(t('Could Not Set Regroup Point'), e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -824,16 +825,16 @@ export default function RideMode() {
         ]);
       } catch {
         setLocating(false);
-        Alert.alert('Location Is Off', 'Allow OnMyLead to use your location in Settings to center the map on you.', [
-          { text: 'Not Now', style: 'cancel' },
-          { text: 'Open Settings', onPress: () => Linking.openSettings().catch(() => {}) },
+        Alert.alert(t('Location Is Off'), t('Allow OnMyLead to use your location in Settings to center the map on you.'), [
+          { text: t('Not Now'), style: 'cancel' },
+          { text: t('Open Settings'), onPress: () => Linking.openSettings().catch(() => {}) },
         ]);
         return;
       }
       setLocating(false);
     }
     if (!at) {
-      Alert.alert('No Location Yet', "Your phone hasn't found where you are yet. Try again in a moment.");
+      Alert.alert(t('No Location Yet'), t('Your phone hasn\'t found where you are yet. Try again in a moment.'));
       return;
     }
     opening.current = 'done';
@@ -890,7 +891,7 @@ export default function RideMode() {
       at = myFix ?? (me && positions[me] ? { lat: positions[me].lat, lng: positions[me].lng } : null);
     }
     if (at) openNewWaypoint(at);
-    else Alert.alert('No Location Yet', 'Press and hold the map where you want the waypoint.');
+    else Alert.alert(t('No Location Yet'), t('Press and hold the map where you want the waypoint.'));
   }
 
   async function sendEmergency() {
@@ -898,7 +899,7 @@ export default function RideMode() {
     const tapId = newTapId();
     showMine(tapId, 'emergency');
     await broadcast.send(
-      { id: tapId, kind: 'status', label: 'EMERGENCY Alert', urgent: true },
+      { id: tapId, kind: 'status', label: t('EMERGENCY Alert'), urgent: true },
       async (tid) => sendStatusReliably(id, 'emergency', await spotNow(), tid),
     );
   }
@@ -948,7 +949,7 @@ export default function RideMode() {
 
   const navigateTo = (lat: number, lng: number, title = 'There') => openDirections({ title, to: { lat, lng } });
   // To a rider who sent Need Help, EMERGENCY or a crash alert: always free.
-  const navigateToRiderInNeed = (lat: number, lng: number) => openDirections({ title: 'There', to: { lat, lng } }, { safety: true });
+  const navigateToRiderInNeed = (lat: number, lng: number) => openDirections({ title: t('There'), to: { lat, lng } }, { safety: true });
   const directionRows = rideDirections({
     regroup,
     meet,
@@ -1014,7 +1015,7 @@ export default function RideMode() {
         pointerEvents="box-none"
         style={[styles.top, tablet && [styles.topTablet, { width: sideW + 2 * Spacing.two, bottom: panelBottom - Spacing.two }]]}>
         <View style={styles.topRow} onLayout={(e) => setTopRowBottom(Math.round(e.nativeEvent.layout.y + e.nativeEvent.layout.height))}>
-          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="Back" style={styles.backBtn}>
+          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Back')} style={styles.backBtn}>
             <Icon name="back" size={18} color={Colors.text} strokeWidth={2.6} />
           </Pressable>
           <Pressable
@@ -1063,31 +1064,27 @@ export default function RideMode() {
               onPress={() => void precise.fix()}
               style={[styles.shareBanner, styles.amberBanner]}
               accessibilityRole="button"
-              accessibilityLabel={LOCATION_PROBLEM_BANNER[precise.problem]}>
+              accessibilityLabel={t(LOCATION_PROBLEM_BANNER[precise.problem])}>
               <Icon name="warning" size={18} color={Glass.amber} strokeWidth={2.2} />
               <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
-                {LOCATION_PROBLEM_BANNER[precise.problem]}
+                {t(LOCATION_PROBLEM_BANNER[precise.problem])}
               </Text>
             </Pressable>
           ) : null}
           {offlineSince != null ? (
             <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
               <View style={styles.offlineDot} />
-              <Text style={styles.offlineText}>
-                No Service. Riders Show Where They Were Last Seen{activeShare ? ', and Yours Sends When Service Returns' : ''}.
-              </Text>
+              <Text style={styles.offlineText}>{activeShare ? t('No Service. Riders Show Where They Were Last Seen, and Yours Sends When Service Returns.') : t('No Service. Riders Show Where They Were Last Seen.')}</Text>
             </View>
           ) : null}
           {activeShare && shareOpen ? (
             <View style={styles.shareBanner}>
-              <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>
-                Sharing, {formatRemaining(shareLeft)}{batteryBannerTag(batteryMode)}
-              </Text>
+              <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>{t('Sharing, {v}{v2}', { v: formatRemaining(shareLeft), v2: batteryBannerTag(batteryMode) })}</Text>
               <Pressable onPress={endShare} hitSlop={8} accessibilityRole="button" style={styles.shareAction}>
-                <Text style={styles.shareActionText}>Stop</Text>
+                <Text style={styles.shareActionText}>{t('Stop')}</Text>
               </Pressable>
-              <Pressable onPress={toggleShareOpen} hitSlop={8} accessibilityRole="button" accessibilityLabel="Hide sharing details" style={styles.shareAction}>
-                <Text style={styles.shareActionText}>Hide</Text>
+              <Pressable onPress={toggleShareOpen} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Hide sharing details')} style={styles.shareAction}>
+                <Text style={styles.shareActionText}>{t('Hide')}</Text>
               </Pressable>
             </View>
           ) : null}
@@ -1097,7 +1094,7 @@ export default function RideMode() {
               accessibilityRole="button"
               style={[styles.shareBanner, styles.amberBanner]}>
               <Icon name="regroup" size={18} color={Glass.amber} strokeWidth={2.2} />
-              <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>Regroup point set. Tap to navigate</Text>
+              <Text style={[styles.shareText, { flex: 1, textAlign: 'left' }]}>{t('Regroup point set. Tap to navigate')}</Text>
             </Pressable>
           ) : null}
           {announcement ? (
@@ -1110,8 +1107,8 @@ export default function RideMode() {
                 <Icon name="megaphone" size={18} color={Glass.amber} strokeWidth={2.1} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.announcementLabel} numberOfLines={1}>{nameOf(announcement.user_id)} · Tap to Hear Again</Text>
-                <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
+                <Text style={styles.announcementLabel} numberOfLines={1}>{t('{v} · Tap to Hear Again', { v: nameOf(announcement.user_id) })}</Text>
+                <Text style={styles.announcementText} numberOfLines={3}>{t(announcement.body)}</Text>
               </View>
             </Pressable>
           ) : null}
@@ -1122,24 +1119,22 @@ export default function RideMode() {
             <Animated.View {...sidebar.panHandlers} style={[styles.sidebar, { transform: [{ translateX: sidebar.drag }] }]}>
               <View style={styles.sidebarHead}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.sidebarTitle}>Riders</Text>
-                  <Text style={[styles.sidebarState, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>
-                    {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'}, {joined.length} on the Ride
-                  </Text>
+                  <Text style={styles.sidebarTitle}>{t('Riders')}</Text>
+                  <Text style={[styles.sidebarState, { color: bubble.alerts.length ? RideColors.red : RideColors.green }]}>{t('{v}, {length} on the Ride', { v: bubble.alerts.length ? t('{n} Separated', { n: bubble.alerts.length }) : t('Together'), length: joined.length })}</Text>
                 </View>
                 <Pressable
                   onPress={() => sidebar.setOpen(false)}
                   accessibilityRole="button"
                   accessibilityState={{ expanded: true }}
-                  accessibilityLabel="Hide the riders"
-                  accessibilityHint="You can also swipe the list left to hide it"
+                  accessibilityLabel={t('Hide the riders')}
+                  accessibilityHint={t('You can also swipe the list left to hide it')}
                   hitSlop={8}
                   style={styles.sidebarFold}>
-                  <Text style={styles.sidebarFoldText}>◀ Hide</Text>
+                  <Text style={styles.sidebarFoldText}>{t('◀ Hide')}</Text>
                 </Pressable>
               </View>
               {offlineSince != null ? (
-                <Text style={styles.sidebarNote}>You have no service. Times are from the last update you got.</Text>
+                <Text style={styles.sidebarNote}>{t('You have no service. Times are from the last update you got.')}</Text>
               ) : null}
               <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle={scrollIndicator()}>
                 <RiderRows
@@ -1163,7 +1158,7 @@ export default function RideMode() {
               <Text style={styles.sidebarShowText}>
                 {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'}
               </Text>
-              <Text style={styles.sidebarShowText}>Show Riders ▶</Text>
+              <Text style={styles.sidebarShowText}>{t('Show Riders ▶')}</Text>
             </Pressable>
           )
         ) : null}
@@ -1174,13 +1169,13 @@ export default function RideMode() {
         <Pressable
           onPress={() => setDirectionsOpen(true)}
           accessibilityRole="button"
-          accessibilityLabel="Directions in Apple Maps or Google Maps"
+          accessibilityLabel={t('Directions in Apple Maps or Google Maps')}
           style={({ pressed }) => [
             styles.wpFab, styles.directionsFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 },
             tablet && { left: layout.width - EDGE - panelW },
           ]}>
           <Icon name="turn" size={24} color={Colors.sky} strokeWidth={2.1} />
-          <Text style={styles.wpFabText}>Directions</Text>
+          <Text style={styles.wpFabText}>{t('Directions')}</Text>
           <ProTag feature="directions" style={styles.fabPro} />
         </Pressable>
       ) : null}
@@ -1189,11 +1184,11 @@ export default function RideMode() {
         <Pressable
           onPress={dropWaypointHere}
           accessibilityRole="button"
-          accessibilityLabel="Add a waypoint at your location"
-          accessibilityHint="You can also press and hold the map to drop one anywhere"
+          accessibilityLabel={t('Add a waypoint at your location')}
+          accessibilityHint={t('You can also press and hold the map to drop one anywhere')}
           style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
           <WaypointBlaze symbol="spot" shared={false} size={24} />
-          <Text style={styles.wpFabText}>Add Waypoint</Text>
+          <Text style={styles.wpFabText}>{t('Add Waypoint')}</Text>
           <ProTag feature="waypoints" style={styles.fabPro} />
         </Pressable>
       ) : null}
@@ -1211,7 +1206,7 @@ export default function RideMode() {
           onPress={centerOnMe}
           disabled={locating}
           accessibilityRole="button"
-          accessibilityLabel="Center the map on you"
+          accessibilityLabel={t('Center the map on you')}
           accessibilityState={{ busy: locating }}
           hitSlop={6}
           style={({ pressed }) => [
@@ -1284,7 +1279,7 @@ export default function RideMode() {
               accessibilityRole="button"
               accessibilityState={{ expanded: panelOpen }}
               accessibilityLabel={panelOpen ? 'Hide the message and status buttons' : 'Show the message and status buttons'}
-              accessibilityHint="You can also swipe the panel down to hide it or up to show it"
+              accessibilityHint={t('You can also swipe the panel down to hide it or up to show it')}
               hitSlop={8}
               style={styles.handle}>
               <View style={styles.handleBar} />
@@ -1293,12 +1288,12 @@ export default function RideMode() {
             <Pressable
               onPress={() => requirePro('quick_replies') && setMessageOpen(true)}
               accessibilityRole="button"
-              accessibilityLabel="Type a Message"
-              accessibilityHint="Write your own message to everyone on this ride, or send one of your saved quick replies"
+              accessibilityLabel={t('Type a Message')}
+              accessibilityHint={t('Write your own message to everyone on this ride, or send one of your saved quick replies')}
               hitSlop={8}
               style={({ pressed }) => [styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
               <Icon name="chat" size={16} color={Colors.text} strokeWidth={2.2} />
-              <Text style={styles.typeText}>Message</Text>
+              <Text style={styles.typeText}>{t('Message')}</Text>
               <ProTag feature="quick_replies" />
             </Pressable>
           </View>
@@ -1328,8 +1323,8 @@ export default function RideMode() {
                   <Icon name="warning" size={18} color={r.status === 'yellow' ? Glass.amber : Glass.softRed} strokeWidth={2.2} />
                   <Text style={styles.alertText}>{r.message}</Text>
                   <View style={styles.alertActions}>
-                    {p ? <AlertChip label="Navigate" onPress={() => navigateToRiderInNeed(p.lat, p.lng)} /> : null}
-                    {canRegroup ? <AlertChip label="Regroup" onPress={regroupHere} /> : null}
+                    {p ? <AlertChip label={t('Navigate')} onPress={() => navigateToRiderInNeed(p.lat, p.lng)} /> : null}
+                    {canRegroup ? <AlertChip label={t('Regroup')} onPress={regroupHere} /> : null}
                   </View>
                 </View>
               );
@@ -1342,10 +1337,10 @@ export default function RideMode() {
                     <Icon name="warning" size={18} color={isUrgentCall(s.status) ? Glass.softRed : Glass.amber} strokeWidth={2.2} />
                   )}
                   <Text style={styles.alertText}>
-                    <Text style={{ fontFamily: font(700) }}>{m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}</Text>, {ago(s.tapped_at, now)}
+                    <Text style={{ fontFamily: font(700) }}>{m.profiles?.display_name || 'Rider'}: {t(STATUS_LABEL[s.status])}</Text>, {ago(s.tapped_at, now)}
                   </Text>
                   <View style={styles.alertActions}>
-                    {spot ? <AlertChip label="Navigate" onPress={() => navigateToRiderInNeed(spot.lat, spot.lng)} /> : null}
+                    {spot ? <AlertChip label={t('Navigate')} onPress={() => navigateToRiderInNeed(spot.lat, spot.lng)} /> : null}
                     <Pressable
                       onPress={() => setDismissedCalls((d) => new Set(d).add(callKey(m.user_id, s)))}
                       accessibilityRole="button"
@@ -1366,14 +1361,14 @@ export default function RideMode() {
             <BreakdownBadge size={28} />
             <View style={{ flex: 1 }}>
               <Text style={styles.myBreakdownTitle}>{MECHANICAL_LABEL}</Text>
-              <Text style={styles.myBreakdownBody}>Your leader and tail gunner can see where you are.</Text>
+              <Text style={styles.myBreakdownBody}>{t('Your leader and tail gunner can see where you are.')}</Text>
             </View>
             <Pressable
               onPress={() => tapStatus('ok')}
               accessibilityRole="button"
-              accessibilityLabel="Fixed. Send status OK"
+              accessibilityLabel={t('Fixed. Send status OK')}
               style={({ pressed }) => [styles.myBreakdownOk, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.myBreakdownOkText}>Fixed, I’m OK</Text>
+              <Text style={styles.myBreakdownOkText}>{t('Fixed, I’m OK')}</Text>
             </Pressable>
           </View>
         ) : null}
@@ -1381,15 +1376,15 @@ export default function RideMode() {
         {myStatus && myStatus.status !== 'ok' && myStatus.status !== 'mechanical' && isActiveCall(myStatus, now) ? (
           <View style={[styles.myBreakdown, { borderLeftColor: isUrgentCall(myStatus.status) ? RideColors.red : RideColors.yellow }]}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.myBreakdownTitle}>Your Status: {STATUS_LABEL[myStatus.status]}</Text>
-              <Text style={styles.myBreakdownBody}>The group sees it until you mark it resolved.</Text>
+              <Text style={styles.myBreakdownTitle}>{t('Your Status: {v}', { v: t(STATUS_LABEL[myStatus.status]) })}</Text>
+              <Text style={styles.myBreakdownBody}>{t('The group sees it until you mark it resolved.')}</Text>
             </View>
             <Pressable
               onPress={() => tapStatus('ok')}
               accessibilityRole="button"
               accessibilityLabel={`Resolved. Clear ${STATUS_LABEL[myStatus.status]} and send status OK`}
               style={({ pressed }) => [styles.myBreakdownOk, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.myBreakdownOkText}>Resolved, I’m OK</Text>
+              <Text style={styles.myBreakdownOkText}>{t('Resolved, I’m OK')}</Text>
             </Pressable>
           </View>
         ) : null}
@@ -1400,7 +1395,7 @@ export default function RideMode() {
               onPress={showMenus}
               accessibilityRole="button"
               accessibilityLabel={restoreA11yLabel(foldedCount)}
-              accessibilityHint="Brings back messages, status buttons and the ride. You can also swipe the bar up"
+              accessibilityHint={t('Brings back messages, status buttons and the ride. You can also swipe the bar up')}
               style={({ pressed }) => [styles.foldedShow, styles.fullMapBarBtn, { opacity: pressed ? 0.75 : 1 }]}>
               <Icon name="collapse" size={20} color={Colors.text} strokeWidth={2.4} />
               <Text style={styles.foldedShowText}>{RESTORE_LABEL}</Text>
@@ -1414,9 +1409,9 @@ export default function RideMode() {
             <Pressable
               onPress={() => tapStatus('emergency')}
               accessibilityRole="button"
-              accessibilityLabel="Send status EMERGENCY"
+              accessibilityLabel={t('Send status EMERGENCY')}
               style={({ pressed }) => [styles.foldedSos, styles.fullMapBarBtn, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={[styles.statusText, styles.sosText]}>EMERGENCY</Text>
+              <Text style={[styles.statusText, styles.sosText]}>{t('EMERGENCY')}</Text>
             </Pressable>
           </View>
         ) : !panelOpen ? (
@@ -1426,7 +1421,7 @@ export default function RideMode() {
               accessibilityRole="button"
               accessibilityLabel={foldedCount ? `Show buttons and ${foldedCount} more alerts` : 'Show the message and status buttons'}
               style={({ pressed }) => [styles.foldedShow, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.foldedShowText}>Buttons ▲</Text>
+              <Text style={styles.foldedShowText}>{t('Buttons ▲')}</Text>
               {foldedCount ? (
                 <View style={styles.foldedBadge}>
                   <Text style={styles.foldedBadgeText}>{foldedCount}</Text>
@@ -1445,9 +1440,9 @@ export default function RideMode() {
             <Pressable
               onPress={() => tapStatus('emergency')}
               accessibilityRole="button"
-              accessibilityLabel="Send status EMERGENCY"
+              accessibilityLabel={t('Send status EMERGENCY')}
               style={({ pressed }) => [styles.foldedSos, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={[styles.statusText, styles.sosText]}>EMERGENCY</Text>
+              <Text style={[styles.statusText, styles.sosText]}>{t('EMERGENCY')}</Text>
             </Pressable>
           </View>
         ) : null}
@@ -1517,9 +1512,9 @@ export default function RideMode() {
         <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <KeyboardLift>
           <SwipeSheet onClose={() => setAskShare(false)} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
-            <ThemedText type="subtitle" style={styles.sheetTitle}>Share Your Location with This Ride?</ThemedText>
+            <ThemedText type="subtitle" style={styles.sheetTitle}>{t('Share Your Location with This Ride?')}</ThemedText>
             <ThemedText type="small" style={styles.sheetBody}>
-              Only riders on this ride will see you. Sharing always stops when the ride ends or you leave it.
+              {t('Only riders on this ride will see you. Sharing always stops when the ride ends or you leave it.')}
             </ThemedText>
             <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} {...keyboardScroll}>
               <SharePicker
@@ -1530,7 +1525,7 @@ export default function RideMode() {
                 busy={busy}
               />
             </SheetScroll>
-            <Button title="Not Now" kind="secondary" onPress={() => setAskShare(false)} />
+            <Button title={t('Not Now')} kind="secondary" onPress={() => setAskShare(false)} />
           </SwipeSheet>
           </KeyboardLift>
         </SheetRoot>
@@ -1542,9 +1537,9 @@ export default function RideMode() {
             onClose={() => setSosOpen(false)}
             style={[styles.sheet, tablet && styles.sheetTablet, { borderTopColor: RideColors.red, borderTopWidth: 6 }]}
             accessibilityViewIsModal>
-            <ThemedText type="subtitle" style={styles.sheetTitle}>Emergency</ThemedText>
+            <ThemedText type="subtitle" style={styles.sheetTitle}>{t('Emergency')}</ThemedText>
             <ThemedText style={styles.sheetBody}>
-              This alerts everyone on the ride with your location. It does not contact emergency services. Call 911 if anyone is hurt.
+              {t('This alerts everyone on the ride with your location. It does not contact emergency services. Call 911 if anyone is hurt.')}
             </ThemedText>
             {myPos ? (
               <ThemedText style={[styles.sheetBody, { fontSize: 24, fontWeight: 800, color: Colors.text }]}>
@@ -1552,8 +1547,8 @@ export default function RideMode() {
               </ThemedText>
             ) : null}
             <HoldButton
-              title="Alert My Group"
-              accessibilityLabel="Alert my group: send EMERGENCY to everyone on this ride"
+              title={t('Alert My Group')}
+              accessibilityLabel={t('Alert my group: send EMERGENCY to everyone on this ride')}
               onHold={() => {
                 // Close the sheet first so the Sending card shows at once; the send keeps going
                 // (and retries from the outbox) after the sheet is gone.
@@ -1561,8 +1556,8 @@ export default function RideMode() {
                 sendEmergency();
               }}
             />
-            <Button title="Call 911" kind="danger" onPress={() => Linking.openURL('tel:911')} />
-            <Button title="Cancel" kind="secondary" onPress={() => setSosOpen(false)} />
+            <Button title={t('Call 911')} kind="danger" onPress={() => Linking.openURL('tel:911')} />
+            <Button title={t('Cancel')} kind="secondary" onPress={() => setSosOpen(false)} />
           </SwipeSheet>
         </SheetRoot>
       </Modal>

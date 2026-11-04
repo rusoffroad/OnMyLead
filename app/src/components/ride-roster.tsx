@@ -23,6 +23,7 @@ import { BadgePatch } from './badge-patch';
 import { useSocialProfiles } from '@/lib/social-profile';
 import type { Ride, RideMember } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 const ROLE_COLOR: Record<RideMember['role'], string> = {
   get organizer() { return Colors.accent; },
   get co_organizer() { return Colors.accent; },
@@ -70,7 +71,7 @@ export function RideRoster({
   async function friendPress(m: RideMember) {
     const name = nameOf(m.user_id);
     const rel = relationTo(friends.list, m.user_id, me);
-    if (rel === 'friends' && !(await confirmAsync(`Remove ${name}?`, 'You’ll stop being friends. They aren’t told.', 'Remove'))) return;
+    if (rel === 'friends' && !(await confirmAsync(`Remove ${name}?`, t('You’ll stop being friends. They aren’t told.'), t('Remove')))) return;
     setBusy(`friend-${m.user_id}`);
     setError(null);
     setFriendNote(null);
@@ -124,7 +125,7 @@ export function RideRoster({
 
   return (
     <Card>
-      <ThemedText type="heading">Going ({joined.length})</ThemedText>
+      <ThemedText type="heading">{t('Going ({length})', { length: joined.length })}</ThemedText>
       <RideLine leader={leaderIds.length ? leaderIds.map(nameOf).join(', ') : null} tail={tailId ? nameOf(tailId) : null} middle={Math.max(0, joined.length - leaderIds.length - (tailId ? 1 : 0))} />
 
       <View>
@@ -228,8 +229,8 @@ export function RideRoster({
                         />
                         <Action
                           color={Colors.sky}
-                          title="Message"
-                          caption="Only the two of you see it."
+                          title={t('Message')}
+                          caption={t('Only the two of you see it.')}
                           onPress={() => router.push(`/messages/${m.user_id}`)}
                         />
                       </>
@@ -239,8 +240,8 @@ export function RideRoster({
                   {me && m.user_id !== me ? (
                     <Action
                       color={Colors.textSecondary}
-                      title="Report Rider"
-                      caption="Tell the OnMyLead team about a problem. They aren’t told it was you."
+                      title={t('Report Rider')}
+                      caption={t('Tell the OnMyLead team about a problem. They aren’t told it was you.')}
                       onPress={() => setReporting({ kind: 'rider', userId: m.user_id, rideId: ride.id, name: nameOf(m.user_id), source: 'roster' })}
                     />
                   ) : null}
@@ -263,7 +264,7 @@ export function RideRoster({
 
       <ErrorText error={error} />
       <ReportSheet target={reporting} onClose={() => setReporting(null)} />
-      {waitlisted ? <ThemedText type="small" themeColor="textSecondary">{waitlisted} on the waitlist</ThemedText> : null}
+      {waitlisted ? <ThemedText type="small" themeColor="textSecondary">{t('{waitlisted} on the waitlist', { waitlisted })}</ThemedText> : null}
     </Card>
   );
 }
@@ -289,11 +290,11 @@ function RideLine({ leader, tail, middle }: { leader: string | null; tail: strin
       </View>
       <View style={styles.lineLabels}>
         <View style={{ flex: 1 }}>
-          <ThemedText type="small" themeColor="textSecondary">Leader</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('Leader')}</ThemedText>
           <ThemedText numberOfLines={1} style={[styles.lineName, { color: RideColors.leader }]}>{leader ?? 'Not set'}</ThemedText>
         </View>
         <View style={{ flex: 1, alignItems: 'flex-end' }}>
-          <ThemedText type="small" themeColor="textSecondary">Tail Gunner</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('Tail Gunner')}</ThemedText>
           <ThemedText numberOfLines={1} style={[styles.lineName, { color: tail ? RideColors.sweep : Colors.textSecondary }]}>{tail ?? 'Not picked yet'}</ThemedText>
         </View>
       </View>

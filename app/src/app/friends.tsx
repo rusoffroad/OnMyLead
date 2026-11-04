@@ -112,7 +112,7 @@ export default function Friends() {
     <>
       {friends.off ? (
         <View style={styles.note}>
-          <ThemedText type="smallBold">Not Switched On Yet</ThemedText>
+          <ThemedText type="smallBold">{t('Not Switched On Yet')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{FRIENDS_NOT_SWITCHED_ON}</ThemedText>
         </View>
       ) : null}
@@ -132,19 +132,19 @@ export default function Friends() {
     <>
 
       <View style={styles.linkCard}>
-        <ThemedText type="heading" style={{ fontSize: 20 }}>Your Friend Link</ThemedText>
+        <ThemedText type="heading" style={{ fontSize: 20 }}>{t('Your Friend Link')}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          Send it to a riding buddy. They open it, and you’re friends once you accept.
+          {t('Send it to a riding buddy. They open it, and you’re friends once you accept.')}
         </ThemedText>
         {code ? (
           <View style={styles.codeBox}>
             <Text style={[styles.code, codeTextSize(spaced(code), 34)]} numberOfLines={1} accessibilityLabel={`Friend code ${code.split('').join(' ')}`} selectable>{spaced(code)}</Text>
           </View>
         ) : null}
-        <Button title="Share Friend Link" disabled={!code} onPress={() => share('sheet')} style={{ backgroundColor: Colors.sky }} />
+        <Button title={t('Share Friend Link')} disabled={!code} onPress={() => share('sheet')} style={{ backgroundColor: Colors.sky }} />
         <View style={styles.btnRow}>
-          <Button title="Text" kind="secondary" style={{ flex: 1 }} disabled={!code} onPress={() => share('text')} />
-          <Button title="Email" kind="secondary" style={{ flex: 1 }} disabled={!code} onPress={() => share('email')} />
+          <Button title={t('Text')} kind="secondary" style={{ flex: 1 }} disabled={!code} onPress={() => share('text')} />
+          <Button title={t('Email')} kind="secondary" style={{ flex: 1 }} disabled={!code} onPress={() => share('email')} />
           <Button
             title={copied ? 'Copied' : 'Copy'}
             kind="secondary"
@@ -160,7 +160,7 @@ export default function Friends() {
           <ShareCodeEditor
             kind="friend"
             current={code}
-            note="Your old link and code stop working. Your friends stay friends."
+            note={t('Your old link and code stop working. Your friends stay friends.')}
             save={setFriendCode}
             onSaved={(c) => {
               setCode(c);
@@ -171,21 +171,21 @@ export default function Friends() {
         <Pressable
           accessibilityRole="button"
           onPress={async () => {
-            if (!(await confirmAsync('Make a new link?', 'Your old link and code stop working. Your friends stay friends.', 'New Link'))) return;
+            if (!(await confirmAsync(t('Make a new link?'), t('Your old link and code stop working. Your friends stay friends.'), t('New Link')))) return;
             act('reset', async () => {
               setCode(await resetFriendCode());
               setCopied(false);
             });
           }}
           style={{ minHeight: 40, justifyContent: 'center' }}>
-          <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Make a New Link</ThemedText>
+          <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{t('Make a New Link')}</ThemedText>
         </Pressable>
       </View>
 
       <View style={styles.linkCard}>
         <Field
-          label="Got a Friend Code?"
-          hint="Paste their friend link or type their code."
+          label={t('Got a Friend Code?')}
+          hint={t('Paste their friend link or type their code.')}
           value={typed}
           onChangeText={setTyped}
           autoCapitalize="characters"
@@ -195,7 +195,7 @@ export default function Friends() {
           onSubmitEditing={() => typedCode && router.push(`/friend/${typedCode}`)}
         />
         <Button
-          title="Look Up"
+          title={t('Look Up')}
           kind="secondary"
           disabled={!typedCode}
           onPress={() => {
@@ -231,25 +231,25 @@ export default function Friends() {
 
       {received.length ? (
         <>
-          <Section title="Friend Requests" />
+          <Section title={t('Friend Requests')} />
           {received.map((f) =>
             row(f, `Asked ${shortDate(f.since)}`, (
               <>
-                <Button title="Accept" loading={busy === `yes-${f.user_id}`} style={styles.small} onPress={() => act(`yes-${f.user_id}`, async () => {
+                <Button title={t('Accept')} loading={busy === `yes-${f.user_id}`} style={styles.small} onPress={() => act(`yes-${f.user_id}`, async () => {
                   await respondFriendRequest(f.user_id, true);
                   return `You and ${f.display_name} are friends now.`;
                 })} />
-                <Button title="Decline" kind="ghost" loading={busy === `no-${f.user_id}`} style={styles.small} onPress={() => act(`no-${f.user_id}`, () => respondFriendRequest(f.user_id, false))} />
+                <Button title={t('Decline')} kind="ghost" loading={busy === `no-${f.user_id}`} style={styles.small} onPress={() => act(`no-${f.user_id}`, () => respondFriendRequest(f.user_id, false))} />
               </>
             )),
           )}
         </>
       ) : null}
 
-      <Section title="Friends" />
+      <Section title={t('Friends')} />
       {friends.loaded && !mine.length ? (
         <ThemedText type="small" themeColor="textSecondary">
-          No friends yet. Add riders you’ve ridden with below, or send your friend link.
+          {t('No friends yet. Add riders you’ve ridden with below, or send your friend link.')}
         </ThemedText>
       ) : null}
       {mine.map((f) =>
@@ -270,7 +270,7 @@ export default function Friends() {
                 accessibilityLabel={`Remove ${f.display_name}`}
                 hitSlop={6}
                 onPress={async () => {
-                  if (!(await confirmAsync(`Remove ${f.display_name}?`, 'You’ll stop being friends. They aren’t told.', 'Remove'))) return;
+                  if (!(await confirmAsync(`Remove ${f.display_name}?`, t('You’ll stop being friends. They aren’t told.'), t('Remove')))) return;
                   act(`rm-${f.user_id}`, () => removeFriend(f.user_id));
                 }}
                 style={styles.iconBtn}>
@@ -284,10 +284,10 @@ export default function Friends() {
 
       {sent.length ? (
         <>
-          <Section title="Requests You Sent" />
+          <Section title={t('Requests You Sent')} />
           {sent.map((f) =>
             row(f, `Waiting Since ${shortDate(f.since)}`, (
-              <Button title="Cancel" kind="ghost" loading={busy === `rm-${f.user_id}`} style={styles.small} onPress={() => act(`rm-${f.user_id}`, () => removeFriend(f.user_id))} />
+              <Button title={t('Cancel')} kind="ghost" loading={busy === `rm-${f.user_id}`} style={styles.small} onPress={() => act(`rm-${f.user_id}`, () => removeFriend(f.user_id))} />
             )),
           )}
         </>
@@ -295,10 +295,10 @@ export default function Friends() {
 
       {suggestions.length ? (
         <>
-          <Section title="Riders You Know" />
+          <Section title={t('Riders You Know')} />
           {suggestions.filter((s) => !blocks.ids.has(s.user_id)).map((s) =>
             row(s, s.reason, (
-              <Button title="Add" loading={busy === `add-${s.user_id}`} style={[styles.small, { backgroundColor: RideColors.green }]} onPress={() => act(`add-${s.user_id}`, async () =>
+              <Button title={t('Add')} loading={busy === `add-${s.user_id}`} style={[styles.small, { backgroundColor: RideColors.green }]} onPress={() => act(`add-${s.user_id}`, async () =>
                 requestResultLine(await sendFriendRequest(s.user_id), s.display_name))} />
             )),
           )}

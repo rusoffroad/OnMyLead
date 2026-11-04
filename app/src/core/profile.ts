@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Ride names: the name other riders see on the group map, the rider list and in ride chat.
  * Anyone can pick a nickname. The database tidies and trims the same way (see the
@@ -18,8 +20,8 @@ export function cleanRideName(raw: string): string {
 /** Why a name can't be saved, in words for the rider, or null when it's fine. */
 export function rideNameProblem(raw: string): string | null {
   const name = cleanRideName(raw);
-  if (!name) return 'Type the name other riders should see.';
-  if ([...name].length > MAX_RIDE_NAME) return `Keep it to ${MAX_RIDE_NAME} characters so it fits on the map.`;
+  if (!name) return tc('Type the name other riders should see.');
+  if ([...name].length > MAX_RIDE_NAME) return tc('Keep it to {MAX_RIDE_NAME} characters so it fits on the map.', { MAX_RIDE_NAME });
   return null;
 }
 

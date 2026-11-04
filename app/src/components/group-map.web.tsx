@@ -11,6 +11,7 @@ import { RiderDot } from './rider-dot';
 import { RouteSketch } from './route-sketch';
 import { waypointDots } from './waypoint-blaze';
 
+import { t } from '@/lib/i18n';
 export type { GroupMapHandle, MapRider } from './group-map-types';
 
 /**
@@ -57,19 +58,19 @@ export function GroupMap({
     const stops = waypointDots((waypoints ?? []).filter((w) => w.planned_stop));
     return (
       <View style={[StyleSheet.absoluteFill, styles.sketchWrap]}>
-        <RouteSketch points={route} dots={[...stops, ...dots]} width={360} height={300} style={{ borderRadius: 0 }} label="The route with the group on it" />
+        <RouteSketch points={route} dots={[...stops, ...dots]} width={360} height={300} style={{ borderRadius: 0 }} label={t('The route with the group on it')} />
       </View>
     );
   }
   return (
     <View style={[StyleSheet.absoluteFill, styles.wrap]}>
-      {regroup ? <Text style={styles.regroup}>Regroup point: {regroup.lat.toFixed(4)}, {regroup.lng.toFixed(4)}</Text> : null}
+      {regroup ? <Text style={styles.regroup}>{t('Regroup point: {v}, {v2}', { v: regroup.lat.toFixed(4), v2: regroup.lng.toFixed(4) })}</Text> : null}
       {riders.map((r) => (
         <View key={r.id} style={styles.row}>
           <RiderDot role={r.role} freshness={r.freshness?.state ?? null} />
           <Text style={[styles.name, r.role === 'leader' && { color: RideColors.leader }]}>{r.name}{r.role === 'leader' ? ', leader' : ''}</Text>
           {r.breakdown ? <BreakdownBadge /> : null}
-          <Text style={styles.detail}>{r.detail}</Text>
+          <Text style={styles.detail}>{t(r.detail)}</Text>
         </View>
       ))}
     </View>

@@ -5,6 +5,7 @@ import { Colors, font, GlassSurface, themedStyles } from '@/constants/theme';
 import { FOLLOW_ME_LABEL, type FollowMeStatus } from '@/core/follow-camera';
 import { Icon } from './icon';
 
+import { t } from '@/lib/i18n';
 export const FOLLOW_ME_H = 48;
 
 const HINT: Record<FollowMeStatus, string> = {
@@ -36,7 +37,7 @@ export function FollowMeButton({
         onPress();
       }}
       accessibilityRole="switch"
-      accessibilityLabel="Follow Me"
+      accessibilityLabel={t('Follow Me')}
       accessibilityHint={HINT[status]}
       accessibilityState={{ checked: status !== 'off' }}
       accessibilityValue={{ text: FOLLOW_ME_LABEL[status] }}
@@ -52,7 +53,7 @@ export function FollowMeButton({
       <View style={status === 'off' ? styles.offIcon : undefined}>
         <Icon name="follow" size={compact ? 22 : 20} color={ink} strokeWidth={2.3} />
       </View>
-      {compact ? null : <Text style={[styles.label, { color: following ? '#FFFFFF' : status === 'paused' ? Colors.sky : Colors.text }]}>{FOLLOW_ME_LABEL[status]}</Text>}
+      {compact ? null : <Text style={[styles.label, { color: following ? '#FFFFFF' : status === 'paused' ? Colors.sky : Colors.text }]}>{t(FOLLOW_ME_LABEL[status])}</Text>}
     </Pressable>
   );
 }

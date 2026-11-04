@@ -14,6 +14,7 @@ import { Field } from './ui';
 import { ProLock } from './pro-gate';
 import { useCan } from '@/lib/pro';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * What the field knows about the code typed so far. `unchecked`: the server couldn't be asked (no
  * signal), so saving is allowed and the database checks it then. `off`: the server doesn't have
@@ -31,7 +32,7 @@ export const codeCheckOk = (c: CodeCheck) => c === 'empty' || c === 'unchecked' 
  */
 export function ShareCodeField(props: ShareCodeFieldProps) {
   // Custom codes are Pro: Free riders see the Pro row, and the made-up code is used.
-  if (!useCan('custom_codes')) return <ProLock feature="custom_codes" title="Your Own Code" detail="Pick an easy code to share" />;
+  if (!useCan('custom_codes')) return <ProLock feature="custom_codes" title={tr('Your Own Code')} detail={tr('Pick an easy code to share')} />;
   return <ShareCodeFieldInner {...props} />;
 }
 

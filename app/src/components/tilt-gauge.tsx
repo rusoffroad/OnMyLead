@@ -5,6 +5,7 @@ import Svg, { Circle, G, Line, Path, Rect } from 'react-native-svg';
 import { Colors, font, Glass, RideColors, themedStyles } from '@/constants/theme';
 import { CAUTION_SHARE, degrees, pitchSide, rollSide, tiltLevel, type TiltLevel } from '@/core/tilt';
 
+import { t } from '@/lib/i18n';
 /** Level colors: the same green, amber and red the Ride Bubble uses, so riders already know them. */
 // Getters, so the colours follow the theme and Color Blind Mode.
 export const LEVEL_INK: Record<TiltLevel, string> = {
@@ -146,8 +147,8 @@ export const TiltDial = memo(function TiltDial({
         <Text style={styles.side}>{side || 'Level'}</Text>
       </View>
       <View style={styles.maxRow}>
-        <Text style={styles.max}>Max {lo} {Math.round(max[0])}°</Text>
-        <Text style={styles.max}>Max {hi} {Math.round(max[1])}°</Text>
+        <Text style={styles.max}>{t('Max {lo} {v}°', { lo, v: Math.round(max[0]) })}</Text>
+        <Text style={styles.max}>{t('Max {hi} {v}°', { hi, v: Math.round(max[1]) })}</Text>
       </View>
     </View>
   );

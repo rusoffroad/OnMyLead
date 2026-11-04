@@ -9,6 +9,7 @@
 
 import { can, trialBadgeText, type Entitlements, type FeatureKey, type ProError } from './entitlements';
 
+import { coreLocale } from './i18n';
 /** Free history shows this many past rides. */
 export const FREE_HISTORY = 5;
 
@@ -228,7 +229,7 @@ export function canStartTrip(ent: Entitlements, trips: { starts_on: string | nul
 export function shortDate(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 /** Today in the phone's own calendar, as YYYY-MM-DD (how trip dates are stored). */

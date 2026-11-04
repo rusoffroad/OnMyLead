@@ -79,18 +79,18 @@ export default function EventsScreen() {
   return (
     <>
       <Stack.Screen options={{ title: t('Events') }} />
-      <PageHead><title>Events | OnMyLead</title></PageHead>
+      <PageHead><title>{t('Events | OnMyLead')}</title></PageHead>
       <Screen width="wide">
         <View style={{ gap: Spacing.four }}>
           <View style={[styles.head, layout.wide && styles.headWide]}>
             <View style={{ flex: 1, gap: 6 }}>
-              <Text style={styles.title} accessibilityRole="header">Rallies, Runs and Ride Weekends</Text>
+              <Text style={styles.title} accessibilityRole="header">{t('Rallies, Runs and Ride Weekends')}</Text>
               <ThemedText themeColor="textSecondary">
-                See what’s happening, who’s going, the agenda and the group rides to join.
+                {t('See what’s happening, who’s going, the agenda and the group rides to join.')}
               </ThemedText>
             </View>
             <View style={{ gap: 6, alignItems: layout.wide ? 'flex-end' : 'stretch' }}>
-              <Button title="Create an Event" pro="create_events" onPress={create} style={layout.wide ? { minWidth: 220 } : undefined} />
+              <Button title={t('Create an Event')} pro="create_events" onPress={create} style={layout.wide ? { minWidth: 220 } : undefined} />
               {session && !can('create_events') ? <Pill text="Pro" tone="gold" style={{ alignSelf: layout.wide ? 'flex-end' : 'center' }} /> : null}
             </View>
           </View>
@@ -99,7 +99,7 @@ export default function EventsScreen() {
 
           {session ? (
             <Segmented<Tab>
-              options={[{ value: 'upcoming', label: 'Coming Up' }, { value: 'mine', label: `Yours${mine?.length ? ` (${mine.length})` : ''}` }]}
+              options={[{ value: 'upcoming', label: t('Coming Up') }, { value: 'mine', label: `Yours${mine?.length ? ` (${mine.length})` : ''}` }]}
               value={tab}
               onChange={setTab}
             />
@@ -117,7 +117,7 @@ export default function EventsScreen() {
           {off ? (
             <ThemedText themeColor="textSecondary">{EVENTS_NOT_SWITCHED_ON}</ThemedText>
           ) : list == null ? (
-            <ThemedText themeColor="textSecondary">Loading…</ThemedText>
+            <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>
           ) : list.length === 0 ? (
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>

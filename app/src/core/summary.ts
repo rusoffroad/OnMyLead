@@ -18,6 +18,7 @@
 import { MOVING_SPEED_MPS } from './bubble';
 import { distanceM, metersToMiles, type LatLng } from './geo';
 
+import { coreLocale, tc } from './i18n';
 export type TrackPoint = LatLng & {
   /** Epoch seconds. */
   t: number;
@@ -295,14 +296,14 @@ export function summarizeTrack(points: TrackPoint[], opts: { movingMps?: number;
 export const mph = (mps: number) => mps * 2.236936;
 export const formatMiles = (m: number) => `${metersToMiles(m) < 10 ? metersToMiles(m).toFixed(1) : Math.round(metersToMiles(m))} mi`;
 export const formatMph = (mps: number) => `${Math.round(mph(mps))} mph`;
-export const formatFeet = (m: number) => `${Math.round(m * 3.28084).toLocaleString('en-US')} ft`;
+export const formatFeet = (m: number) => `${Math.round(m * 3.28084).toLocaleString(coreLocale())} ft`;
 
 /** "2 h 05 min", "45 min", "0 min". */
 export function formatDuration(sec: number): string {
   const totalMin = Math.max(0, Math.round(sec / 60));
   const h = Math.floor(totalMin / 60);
   const m = totalMin % 60;
-  return h ? `${h} h ${String(m).padStart(2, '0')} min` : `${m} min`;
+  return h ? tc('{h} h {v} min', { h, v: String(m).padStart(2, '0') }) : `${m} min`;
 }
 
 // --- Route map ------------------------------------------------------------------

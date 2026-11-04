@@ -15,6 +15,7 @@ import type { PickedPhoto } from '@/lib/photo-bytes';
 import { forgetGarageWidths } from '@/lib/trail-width';
 import type { Vehicle } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 const str = (n: number | null | undefined) => (n == null ? '' : String(n));
 const text = (s: string) => (s.trim() ? s.trim() : null);
 
@@ -88,16 +89,16 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
 
   async function save() {
     setError(null);
-    if (!kind) return setError('Pick Vehicle or SXS/UTV first.');
+    if (!kind) return setError(t('Pick Vehicle or SXS/UTV first.'));
     const yearN = year.trim() ? Number(year.trim()) : null;
-    if (yearN != null && !(Number.isInteger(yearN) && yearN >= 1900 && yearN <= 2100)) return setError('Year should look like 2022.');
+    if (yearN != null && !(Number.isInteger(yearN) && yearN >= 1900 && yearN <= 2100)) return setError(t('Year should look like 2022.'));
     const priceP = parseDollars(price);
     if (!priceP.ok) return setError(`Purchase price: ${priceP.error}`);
     const nums = { hours: parseAmount(hours), odometer: parseAmount(odometer), tank: tankN, extra: extraN, mpg: mpgN };
     const bad = Object.entries(nums).find(([, p]) => !p.ok);
     if (bad) return setError(`Check the ${bad[0] === 'extra' ? 'extra fuel' : bad[0]} number.`);
     const val = (p: ReturnType<typeof parseAmount>) => (p.ok ? p.value : null);
-    if (!text(nickname) && !text(make) && !text(model)) return setError('Give it a nickname or a make and model.');
+    if (!text(nickname) && !text(make) && !text(model)) return setError(t('Give it a nickname or a make and model.'));
     const widthP = parseWidth(width, VEHICLE_WIDTH_MIN_IN, WIDTH_MAX_IN);
     if (!widthP.ok) return setError(`Width: ${widthP.error}`);
 
@@ -152,75 +153,73 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
 
   return (
     <>
-      <Choice label="What Are You Adding?" options={VEHICLE_KINDS} value={kind} onChange={setKind} />
+      <Choice label={t('What Are You Adding?')} options={VEHICLE_KINDS} value={kind} onChange={setKind} />
 
       <Card>
         {shownPhoto ? (
-          <Image source={{ uri: shownPhoto }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 10 }} contentFit="cover" accessibilityLabel="Photo of your machine" />
+          <Image source={{ uri: shownPhoto }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: 10 }} contentFit="cover" accessibilityLabel={t('Photo of your machine')} />
         ) : (
-          <ThemedText type="small" themeColor="textSecondary">Add a photo of your machine.</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('Add a photo of your machine.')}</ThemedText>
         )}
         <Button title={shownPhoto ? 'Change Photo' : 'Choose Photo'} kind="secondary" onPress={pickPhoto} />
       </Card>
 
-      <Field label="Nickname" value={nickname} onChangeText={setNickname} placeholder="Dusty" />
+      <Field label={t('Nickname')} value={nickname} onChangeText={setNickname} placeholder={t('Dusty')} />
       <Row>
         <Half>
-          <Field label="Year" value={year} onChangeText={setYear} keyboardType="number-pad" placeholder="2022" maxLength={4} />
+          <Field label={t('Year')} value={year} onChangeText={setYear} keyboardType="number-pad" placeholder="2022" maxLength={4} />
         </Half>
         <Half>
-          <Field label="Make" value={make} onChangeText={setMake} placeholder={kind === 'sxs_utv' ? 'Polaris' : 'Toyota'} />
+          <Field label={t('Make')} value={make} onChangeText={setMake} placeholder={kind === 'sxs_utv' ? 'Polaris' : 'Toyota'} />
         </Half>
       </Row>
       <Row>
         <Half>
-          <Field label="Model" value={model} onChangeText={setModel} placeholder={kind === 'sxs_utv' ? 'RZR Pro R' : 'Tacoma'} />
+          <Field label={t('Model')} value={model} onChangeText={setModel} placeholder={kind === 'sxs_utv' ? 'RZR Pro R' : 'Tacoma'} />
         </Half>
         <Half>
-          <Field label="Trim" value={trim} onChangeText={setTrim} placeholder="Optional" />
+          <Field label={t('Trim')} value={trim} onChangeText={setTrim} placeholder={t('Optional')} />
         </Half>
       </Row>
-      <Field label="VIN" value={vin} onChangeText={setVin} autoCapitalize="characters" autoCorrect={false} maxLength={17} placeholder="Optional" />
-      <Button title="Fill Year, Make and Model From VIN" kind="secondary" loading={vinBusy} disabled={!vin.trim()} onPress={lookUpVin} />
+      <Field label={t('VIN')} value={vin} onChangeText={setVin} autoCapitalize="characters" autoCorrect={false} maxLength={17} placeholder={t('Optional')} />
+      <Button title={t('Fill Year, Make and Model From VIN')} kind="secondary" loading={vinBusy} disabled={!vin.trim()} onPress={lookUpVin} />
       {vinNote ? <ThemedText type="small" themeColor="textSecondary">{vinNote}</ThemedText> : null}
 
-      <Field label="Purchase Price ($)" value={price} onChangeText={setPrice} keyboardType="decimal-pad" placeholder="Optional" />
+      <Field label={t('Purchase Price ($)')} value={price} onChangeText={setPrice} keyboardType="decimal-pad" placeholder={t('Optional')} />
       <Row>
         <Half>
-          <Field label="Engine Hours" value={hours} onChangeText={setHours} keyboardType="decimal-pad" />
+          <Field label={t('Engine Hours')} value={hours} onChangeText={setHours} keyboardType="decimal-pad" />
         </Half>
         <Half>
-          <Field label="Odometer (Miles)" value={odometer} onChangeText={setOdometer} keyboardType="decimal-pad" />
+          <Field label={t('Odometer (Miles)')} value={odometer} onChangeText={setOdometer} keyboardType="decimal-pad" />
         </Half>
       </Row>
 
       <Card>
-        <ThemedText type="heading">Fuel and Mileage</ThemedText>
+        <ThemedText type="heading">{t('Fuel and Mileage')}</ThemedText>
         <Row>
           <Half>
-            <Field label="Tank (gal)" value={tank} onChangeText={setTank} keyboardType="decimal-pad" placeholder="10" />
+            <Field label={t('Tank (gal)')} value={tank} onChangeText={setTank} keyboardType="decimal-pad" placeholder="10" />
           </Half>
           <Half>
-            <Field label="Extra Fuel (gal)" value={extra} onChangeText={setExtra} keyboardType="decimal-pad" placeholder="0" />
+            <Field label={t('Extra Fuel (gal)')} value={extra} onChangeText={setExtra} keyboardType="decimal-pad" placeholder="0" />
           </Half>
         </Row>
-        <Field label="Miles per Gallon" value={mpg} onChangeText={setMpg} keyboardType="decimal-pad" placeholder="12" hint="Your real-world trail mpg, not the sticker." />
+        <Field label={t('Miles per Gallon')} value={mpg} onChangeText={setMpg} keyboardType="decimal-pad" placeholder="12" hint={t('Your real-world trail mpg, not the sticker.')} />
         {range ? (
-          <ThemedText type="small" themeColor="textSecondary">
-            About {Math.round(range.fullRangeMiles)} miles on {range.totalGallons} gallons. Turn around by {Math.round(range.safeTurnaroundMiles)} miles out.
-          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('About {v} miles on {totalGallons} gallons. Turn around by {v2} miles out.', { v: Math.round(range.fullRangeMiles), totalGallons: range.totalGallons, v2: Math.round(range.safeTurnaroundMiles) })}</ThemedText>
         ) : null}
       </Card>
 
       <Card>
-        <ThemedText type="heading">Trail Fit</ThemedText>
+        <ThemedText type="heading">{t('Trail Fit')}</ThemedText>
         <Field
-          label="Width (Inches)"
+          label={t('Width (Inches)')}
           value={width}
           onChangeText={setWidth}
           keyboardType="number-pad"
           placeholder={kind === 'sxs_utv' ? '64' : '80'}
-          hint="Widest point, tire to tire. Trails with a width limit show whether it fits."
+          hint={t('Widest point, tire to tire. Trails with a width limit show whether it fits.')}
         />
         {(() => {
           const p = parseWidth(width, VEHICLE_WIDTH_MIN_IN, WIDTH_MAX_IN);

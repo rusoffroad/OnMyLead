@@ -10,6 +10,7 @@ import {
   parseTypedDate, rangeYears, sameDay, startOfDay, typedDateText, type DayRange,
 } from '@/core/calendar';
 
+import { t } from '@/lib/i18n';
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -92,7 +93,7 @@ export function DateCalendar({ value, onChange, range, note }: Props) {
   return (
     <View style={styles.wrap}>
       <View style={{ gap: 6 }}>
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>Type a Date</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{t('Type a Date')}</ThemedText>
         <View style={[styles.typeRow, { borderColor: typedError ? Colors.danger : 'transparent' }]}>
           <Icon name="calendar" size={20} color={Colors.textSecondary} />
           <TextBox
@@ -100,7 +101,7 @@ export function DateCalendar({ value, onChange, range, note }: Props) {
             onChangeText={onType}
             onBlur={onLeave}
             onSubmitEditing={onLeave}
-            placeholder="MM/DD/YYYY"
+            placeholder={t('MM/DD/YYYY')}
             placeholderTextColor="#5F7190"
             selectionColor={Colors.sky}
             keyboardType="number-pad"
@@ -109,7 +110,7 @@ export function DateCalendar({ value, onChange, range, note }: Props) {
             autoComplete="off"
             selectTextOnFocus
             autoCorrect={false}
-            accessibilityLabel="Type a date, month, day, year"
+            accessibilityLabel={t('Type a date, month, day, year')}
             accessibilityHint={`Any day from ${rangeText}`}
             style={[styles.typeInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
           />
@@ -172,7 +173,7 @@ function DayGrid({ month, picked, today, range, onPick }: {
         {WEEKDAYS.map((w, col) => (
           <View key={col} style={[styles.cell, isWeekend(col) && styles.band, isWeekend(col) && styles.bandTop]}>
             <ThemedText
-              accessibilityLabel={WEEKDAY_NAMES[col]}
+              accessibilityLabel={t(WEEKDAY_NAMES[col])}
               style={[styles.weekday, { color: isWeekend(col) ? Colors.sky : Colors.textSecondary }]}>
               {w}
             </ThemedText>

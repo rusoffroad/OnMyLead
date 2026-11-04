@@ -7,6 +7,7 @@ import type { LatLng } from '@/core/geo';
 import type { Ride } from '@/lib/types';
 import { MarkerBody } from './marker-body';
 
+import { t } from '@/lib/i18n';
 /** What the Find a ride map needs, shared by the native map and the web one. */
 export type RidesMapProps = {
   rides: (Ride & { distanceMi?: number })[];
@@ -53,13 +54,13 @@ export function RidePin({ ride }: { ride: Pick<Ride, 'status'> }) {
 export function RideBubble({ ride }: { ride: Ride & { distanceMi?: number } }) {
   return (
     <View style={styles.bubble}>
-      {ride.status === 'live' ? <Text style={styles.live}>Live Now</Text> : null}
+      {ride.status === 'live' ? <Text style={styles.live}>{t('Live Now')}</Text> : null}
       <Text style={styles.bubbleTitle} numberOfLines={2}>{ride.name}</Text>
       <Text style={styles.bubbleText}>
         {meetsLabel(ride)}
         {ride.distanceMi != null ? `, ${ride.distanceMi < 1 ? 'under 1' : Math.round(ride.distanceMi)} mi away` : ''}
       </Text>
-      <Text style={styles.bubbleLink}>Open Ride</Text>
+      <Text style={styles.bubbleLink}>{t('Open Ride')}</Text>
     </View>
   );
 }
@@ -84,12 +85,12 @@ export function MapControls({
         </View>
       ) : null}
       <View style={styles.zoomStack}>
-        <RoundButton icon="plus" label="Zoom in" onPress={onZoomIn} />
+        <RoundButton icon="plus" label={t('Zoom in')} onPress={onZoomIn} />
         <View style={styles.rule} />
-        <RoundButton icon="minus" label="Zoom out" onPress={onZoomOut} />
+        <RoundButton icon="minus" label={t('Zoom out')} onPress={onZoomOut} />
       </View>
       <View style={styles.zoomStack}>
-        <RoundButton icon="locate" label="Back to my state" onPress={onRecenter} />
+        <RoundButton icon="locate" label={t('Back to my state')} onPress={onRecenter} />
       </View>
     </View>
   );
@@ -128,7 +129,7 @@ export function MapOverlay({
         <View style={styles.bottom} pointerEvents="box-none">
           <Pressable accessibilityRole="button" onPress={onSearch} style={({ pressed }) => [styles.search, pressed && styles.pressed]}>
             <Icon name="search" size={16} color={Colors.onAccent} strokeWidth={2.4} />
-            <Text style={styles.searchText}>Search This Area</Text>
+            <Text style={styles.searchText}>{t('Search This Area')}</Text>
           </Pressable>
         </View>
       ) : null}

@@ -10,6 +10,7 @@ import { STARLINK_MOUNT, findBySlug, formatPrice, openFeatured, rusProducts, typ
 import { ThemedText } from './themed-text';
 import { Button, Card } from './ui';
 
+import { t } from '@/lib/i18n';
 const CAMPAIGN = 'starlink page mount';
 // Chris's product photo (2026-11-03), bundled so the ad always shows it.
 const PHOTO = require('../../assets/images/starlink-mini-mount-v2.webp');
@@ -41,7 +42,7 @@ export function StarlinkMountAd() {
   return (
     <Card>
       <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 700, letterSpacing: 1 }}>
-        AD · FROM RUS OFFROAD
+        {t('AD · FROM RUS OFFROAD')}
       </ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.three }}>
         <Image
@@ -55,13 +56,13 @@ export function StarlinkMountAd() {
           <ThemedText type="subtitle">{STARLINK_MOUNT.title}</ThemedText>
           <ThemedText style={{ color: theme.accent, fontWeight: 700 }}>{STARLINK_MOUNT.series}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            A Starlink Mini mount that installs on a Milwaukee Packout. Also works with magnets.
+            {t('A Starlink Mini mount that installs on a Milwaukee Packout. Also works with magnets.')}
           </ThemedText>
           {price ? <ThemedText style={{ fontWeight: 700 }}>{price}</ThemedText> : null}
         </View>
       </View>
       <Button
-        title="Shop the Mount"
+        title={t('Shop the Mount')}
         accessibilityLabel={`Shop the ${STARLINK_MOUNT.title} ${STARLINK_MOUNT.series} at rusoffroad.com`}
         accessibilityRole="link"
         onPress={() => openFeatured(product, STARLINK_MOUNT.url, CAMPAIGN)}

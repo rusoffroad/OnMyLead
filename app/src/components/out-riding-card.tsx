@@ -12,6 +12,7 @@ import { useBlocks } from '@/lib/blocks';
 import { refreshFriends, useFriends } from '@/lib/friends';
 import { myDmThreads, nearbyRiders, useMyOutRiding } from '@/lib/out-riding';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * The way into Out Riding, Messages and Friends, at the top of the Groups tab. Off: one line on
  * what it does. On: who's out within 10 miles at a glance. Each part hides until the server has it.
@@ -65,7 +66,7 @@ export function OutRidingCard() {
             <Text style={styles.sub}>{endsLabel(me.status.expires_at)}</Text>
           </>
         ) : (
-          <Text style={styles.sub}>Heading out? Switch it on to see which riders are out near you, and message them.</Text>
+          <Text style={styles.sub}>{tr('Heading out? Switch it on to see which riders are out near you, and message them.')}</Text>
         )}
       </Pressable>
       {hasThreads ? (
@@ -75,7 +76,7 @@ export function OutRidingCard() {
           onPress={() => router.push('/messages')}
           style={({ pressed }) => [styles.row, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <Icon name="mail" color={Colors.sky} />
-          <Text style={styles.rowText}>Messages</Text>
+          <Text style={styles.rowText}>{tr('Messages')}</Text>
           {badge ? <Text style={styles.unread}>{badge}</Text> : null}
           <Icon name="chevron" color={Colors.textSecondary} />
         </Pressable>
@@ -88,7 +89,7 @@ export function OutRidingCard() {
           style={({ pressed }) => [styles.row, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <Icon name="addFriend" color={RideColors.green} />
           <View style={{ flex: 1, paddingVertical: 8 }}>
-            <Text style={styles.rowText}>Friends</Text>
+            <Text style={styles.rowText}>{tr('Friends')}</Text>
             <Text style={styles.rowSub} numberOfLines={1}>{line}</Text>
           </View>
           {requests ? <Text style={styles.unread}>{requests}</Text> : null}

@@ -12,6 +12,7 @@ import { shareHeadline, shareSubline, shareText, type SocialItem } from '@/core/
 import { shareActivity, shareActivityText } from '@/lib/share-activity';
 import { Home, Initial, faceColor } from '../home/parts';
 
+import { t } from '@/lib/i18n';
 const wordmark = require('../../../assets/images/logo-wordmark.png');
 const WEB_URL = (process.env.EXPO_PUBLIC_WEB_URL ?? 'https://onmylead.com').replace(/\/+$/, '') || 'https://onmylead.com';
 
@@ -40,7 +41,7 @@ export function ShareCard({ item }: { item: SocialItem }) {
         <Text style={styles.sub} numberOfLines={4} {...tagged('sub')}>{shareSubline(item)}</Text>
       </View>
       <View style={styles.bottom}>
-        <Text style={styles.url}>onmylead.com</Text>
+        <Text style={styles.url}>{t('onmylead.com')}</Text>
         <Image source={wordmark} contentFit="contain" style={styles.logo} accessibilityLabel="OnMyLead" />
       </View>
     </View>
@@ -81,11 +82,11 @@ export function ShareSheet({ item, onClose }: { item: SocialItem | null; onClose
         setError(null);
         onClose();
       }}
-      title="Share to Other Apps"
+      title={t('Share to Other Apps')}
       footer={
         <View style={{ gap: 8 }}>
-          <Button title="Share Picture" loading={busy === 'image'} disabled={!!busy} onPress={() => run('image')} />
-          <Button title="Share Text Only" kind="secondary" loading={busy === 'text'} disabled={!!busy} onPress={() => run('text')} />
+          <Button title={t('Share Picture')} loading={busy === 'image'} disabled={!!busy} onPress={() => run('image')} />
+          <Button title={t('Share Text Only')} kind="secondary" loading={busy === 'text'} disabled={!!busy} onPress={() => run('text')} />
         </View>
       }>
       {item ? (
@@ -94,7 +95,7 @@ export function ShareSheet({ item, onClose }: { item: SocialItem | null; onClose
             <ShareCard item={item} />
           </View>
           <Text style={styles.caption}>{text}</Text>
-          <Text style={styles.hint}>Pick Facebook, Instagram, X or any app on the next screen. Your location is never in a share.</Text>
+          <Text style={styles.hint}>{t('Pick Facebook, Instagram, X or any app on the next screen. Your location is never in a share.')}</Text>
           {note ? <Text style={styles.note}>{note}</Text> : null}
           <ErrorText error={error} />
         </View>

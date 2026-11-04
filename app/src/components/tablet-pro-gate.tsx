@@ -17,6 +17,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 /**
  * OnMyLead on an iPad, an Android tablet or the website is part of Pro (feature tablet_web). For a
  * signed-in Free rider this covers every screen except the ones core/tablet-gate keeps open, so
@@ -52,29 +53,29 @@ export function TabletProGate() {
         <ScrollView contentContainerStyle={styles.scroll}>
           <View style={styles.column}>
             <ProChip style={{ alignSelf: 'flex-start' }} />
-            <ThemedText style={styles.title} accessibilityRole="header">{info.title}</ThemedText>
+            <ThemedText style={styles.title} accessibilityRole="header">{t(info.title)}</ThemedText>
             <ThemedText style={styles.lead}>
               {`OnMyLead on ${Platform.OS === 'web' ? 'the website' : 'a tablet'} is part of OnMyLead Pro. Joining a ride and following the leader are free on every device.`}
             </ThemedText>
 
             <View style={styles.card}>
-              <ThemedText type="subtitle">Join a Ride</ThemedText>
+              <ThemedText type="subtitle">{t('Join a Ride')}</ThemedText>
               <Field
-                label="Ride Code"
+                label={t('Ride Code')}
                 value={code}
                 onChangeText={setCode}
                 autoCapitalize="characters"
                 autoCorrect={false}
                 returnKeyType="go"
                 onSubmitEditing={join}
-                placeholder="MOAB-2026"
+                placeholder={t('MOAB-2026')}
               />
-              <Button title="Join" big disabled={!code.trim()} onPress={join} />
+              <Button title={t('Join')} big disabled={!code.trim()} onPress={join} />
             </View>
 
             {rides.length ? (
               <View style={styles.card}>
-                <ThemedText type="subtitle">Your Rides</ThemedText>
+                <ThemedText type="subtitle">{t('Your Rides')}</ThemedText>
                 {rides.map((r) => (
                   <Pressable
                     key={r.id}
@@ -91,8 +92,8 @@ export function TabletProGate() {
               </View>
             ) : null}
 
-            <Button title="See OnMyLead Pro" big onPress={() => router.push('/pro')} />
-            <Button title="Your Account" kind="secondary" onPress={() => router.push('/profile')} />
+            <Button title={t('See OnMyLead Pro')} big onPress={() => router.push('/pro')} />
+            <Button title={t('Your Account')} kind="secondary" onPress={() => router.push('/profile')} />
           </View>
         </ScrollView>
       </SafeAreaView>

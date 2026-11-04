@@ -2,6 +2,7 @@ import type { LatLng } from './geo';
 import { OSM_MAX_Z, OSM_MIN_Z } from './osm-trails';
 import { boxAround, offlineTilePlan, tileFor, tilesInBox, TOPO_MAX_NATIVE_Z, TRAILS_MIN_Z, type Box, type Tile } from './trails';
 
+import { tc } from './i18n';
 /**
  * Downloaded maps for riding with no signal. A download is either a box the rider framed on the
  * map, or the area around a ride's route. Everything comes from free public map services (USGS
@@ -140,7 +141,7 @@ export function boxMiles(box: Box): { wide: number; tall: number } {
 export function formatBoxMiles(box: Box): string {
   const { wide, tall } = boxMiles(box);
   const r = (n: number) => (n < 10 ? n.toFixed(1).replace(/\.0$/, '') : String(Math.round(n)));
-  return `${r(wide)} × ${r(tall)} Miles`;
+  return tc('{v} × {v2} Miles', { v: r(wide), v2: r(tall) });
 }
 
 export function boxesOverlap(a: Box, b: Box): boolean {
@@ -171,11 +172,11 @@ export function statusLine(m: OfflineMap): string {
   const pct = m.total ? Math.floor(((m.saved + m.failed) / m.total) * 100) : 0;
   switch (m.status) {
     case 'downloading':
-      return `Downloading, ${pct}%`;
+      return tc('Downloading, {pct}%', { pct });
     case 'paused':
-      return `Paused at ${pct}%`;
+      return tc('Paused at {pct}%', { pct });
     case 'partial':
-      return `${formatBytes(m.bytes)}, ${m.failed} Pieces Missing`;
+      return tc('{v}, {failed} Pieces Missing', { v: formatBytes(m.bytes), failed: m.failed });
     default:
       return formatBytes(m.bytes);
   }

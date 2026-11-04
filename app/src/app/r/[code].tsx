@@ -51,6 +51,7 @@ import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
 import type { Ride, RideMember, RidePrivateDetails } from '@/lib/types';
 
+import { t as tr } from '@/lib/i18n';
 const when = (iso: string) =>
   new Date(iso).toLocaleString(undefined, { weekday: 'long', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const time = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
@@ -115,8 +116,8 @@ export default function RidePage() {
     }
   }
 
-  if (ride === undefined) return <Screen><ThemedText themeColor="textSecondary">Loading…</ThemedText></Screen>;
-  if (ride === null) return <Screen><ThemedText>We couldn’t find that ride. Check the link or code.</ThemedText></Screen>;
+  if (ride === undefined) return <Screen><ThemedText themeColor="textSecondary">{tr('Loading…')}</ThemedText></Screen>;
+  if (ride === null) return <Screen><ThemedText>{tr('We couldn’t find that ride. Check the link or code.')}</ThemedText></Screen>;
 
   const mine = members.find((m) => m.user_id === me);
   const isOrganizer = ride.organizer_id === me;
@@ -146,14 +147,14 @@ export default function RidePage() {
   // The buttons sit far below the page's error line, so a failure pops up where the organizer is looking.
   const cancel = async () => {
     const p = cancelPrompt(ride.name, toTell);
-    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
+    if (!(await confirmAsync(p.title, p.message, p.confirm, tr('Keep Ride')))) return;
     setBusy('cancel');
     try {
       await cancelRide(ride.id);
       resyncReminders();
       await load();
     } catch (e) {
-      showNotice('Couldn’t Cancel the Ride', e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(tr('Couldn’t Cancel the Ride'), e instanceof Error ? e.message : 'Something went wrong.');
     } finally {
       setBusy(null);
     }
@@ -161,14 +162,14 @@ export default function RidePage() {
 
   const remove = async () => {
     const p = deletePrompt(ride.name, toTell, over);
-    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return;
+    if (!(await confirmAsync(p.title, p.message, p.confirm, tr('Keep Ride')))) return;
     setBusy('delete');
     try {
       await deleteRide(ride.id);
       resyncReminders();
       router.replace('/');
     } catch (e) {
-      showNotice('Couldn’t Delete the Ride', e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(tr('Couldn’t Delete the Ride'), e instanceof Error ? e.message : 'Something went wrong.');
       setBusy(null);
     }
   };
@@ -217,20 +218,20 @@ export default function RidePage() {
       <View style={{ gap: Spacing.two }}>
         <PartOfEvent rideId={ride.id} />
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-          {ride.status === 'live' ? <Tag label="Live Now" color={Colors.accent} solid /> : null}
+          {ride.status === 'live' ? <Tag label={tr('Live Now')} color={Colors.accent} solid /> : null}
           {countdown ? <Tag label={countdown} color={Colors.accent} /> : null}
-          {ride.status === 'ended' ? <Tag label="Ended" color={Colors.textSecondary} /> : null}
-          {ride.status === 'cancelled' ? <Tag label="Cancelled" color={Colors.danger} /> : null}
+          {ride.status === 'ended' ? <Tag label={tr('Ended')} color={Colors.textSecondary} /> : null}
+          {ride.status === 'cancelled' ? <Tag label={tr('Cancelled')} color={Colors.danger} /> : null}
           {ride.difficulty ? <Tag label={cap(ride.difficulty)} color={Colors.sky} /> : null}
           <Tag label={ride.visibility === 'private' ? 'Private, Invite Only' : ride.visibility === 'public' ? 'Public' : 'Anyone with the Link'} color={Colors.textSecondary} />
         </View>
         <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{ride.name}</ThemedText>
         <ThemedText style={{ color: Colors.sky, fontWeight: 700, fontSize: 17 }}>{when(ride.meet_at)}</ThemedText>
-        {ride.description ? <ThemedText themeColor="textSecondary">{ride.description}</ThemedText> : null}
+        {ride.description ? <ThemedText themeColor="textSecondary">{tr(ride.description)}</ThemedText> : null}
       </View>
       {cancelled ? (
         <View style={styles.cancelled} accessibilityRole="alert">
-          <ThemedText type="heading">This Ride Is Cancelled</ThemedText>
+          <ThemedText type="heading">{tr('This Ride Is Cancelled')}</ThemedText>
           <ThemedText themeColor="textSecondary">
             {isManager
               ? 'Everyone who had joined was sent a notification and an email.'
@@ -244,40 +245,40 @@ export default function RidePage() {
 
       {/* What to do next sits right under the name: start the ride, join, check in or enter Ride Mode. */}
       {isManager && ride.status === 'scheduled' ? (
-        <Button title="Start Ride Mode" big loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
+        <Button title={tr('Start Ride Mode')} big loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
       ) : null}
       {cancelled ? null : !mine || mine.status === 'cancelled' || mine.status === 'declined' ? (
         ride.status === 'ended' ? (
-          <ThemedText>This ride has ended.</ThemedText>
+          <ThemedText>{tr('This ride has ended.')}</ThemedText>
         ) : (
           <Button title={me ? (ride.join_policy === 'approval' ? 'Request to Join' : 'Join Ride') : 'Sign In to Join'} big loading={busy === 'join'} onPress={join} />
         )
       ) : mine.status === 'invited' ? (
         ride.status === 'ended' || ride.status === 'cancelled' ? (
-          <ThemedText>This ride has {ride.status}.</ThemedText>
+          <ThemedText>{tr('This ride has {status}.', { status: ride.status })}</ThemedText>
         ) : (
           <Card style={{ borderWidth: 2, borderColor: Colors.sky }}>
-            <ThemedText type="heading">You’re Invited</ThemedText>
+            <ThemedText type="heading">{tr('You’re Invited')}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
               {ride.join_policy === 'approval' ? 'No waiting for approval: you’re on the list.' : 'Join to see the exact meeting spot and the group.'}
             </ThemedText>
-            <Button title="Join Ride" big loading={busy === 'join'} onPress={join} />
-            <Button title="No Thanks" kind="secondary" loading={busy === 'decline'} onPress={() => act('decline', () => declineRideInvite(ride.id))} />
+            <Button title={tr('Join Ride')} big loading={busy === 'join'} onPress={join} />
+            <Button title={tr('No Thanks')} kind="secondary" loading={busy === 'decline'} onPress={() => act('decline', () => declineRideInvite(ride.id))} />
           </Card>
         )
       ) : mine.status === 'pending' ? (
-        <ThemedText>Your request is waiting for the organizer.</ThemedText>
+        <ThemedText>{tr('Your request is waiting for the organizer.')}</ThemedText>
       ) : mine.status === 'waitlisted' ? (
-        <ThemedText>You’re on the waitlist. You’ll move up automatically if a spot opens.</ThemedText>
+        <ThemedText>{tr('You’re on the waitlist. You’ll move up automatically if a spot opens.')}</ThemedText>
       ) : (
         <View style={{ gap: Spacing.two }}>
           {ride.status === 'live' ? (
-            <Button title="Enter Ride Mode" big onPress={() => router.push(`/ride/${ride.id}/live`)} />
+            <Button title={tr('Enter Ride Mode')} big onPress={() => router.push(`/ride/${ride.id}/live`)} />
           ) : null}
           {!mine.checked_in_at && ride.status !== 'ended' ? (
-            <Button title="I'm Here and Ready" kind="secondary" loading={busy === 'checkin'} onPress={() => act('checkin', () => checkIn(ride.id))} />
+            <Button title={tr('I\'m Here and Ready')} kind="secondary" loading={busy === 'checkin'} onPress={() => act('checkin', () => checkIn(ride.id))} />
           ) : mine.checked_in_at ? (
-            <ThemedText>Checked in at {time(mine.checked_in_at)}</ThemedText>
+            <ThemedText>{tr('Checked in at {v}', { v: time(mine.checked_in_at) })}</ThemedText>
           ) : null}
         </View>
       )}
@@ -332,10 +333,10 @@ export default function RidePage() {
           ) : null}
           {mine && ['joined', 'pending', 'waitlisted'].includes(mine.status) && ride.status !== 'cancelled' ? (
             <Button
-              title="Plan What to Bring"
+              title={tr('Plan What to Bring')}
               kind="secondary"
               loading={busy === 'trip'}
-              accessibilityHint="Opens your packing checklist for this ride"
+              accessibilityHint={tr('Opens your packing checklist for this ride')}
               onPress={() => act('trip', async () => {
                 // An existing trip for this ride always opens; a new one counts toward Free's one active trip.
                 const existing = (await myTrips()).find((t) => t.ride_id === ride.id);
@@ -350,15 +351,15 @@ export default function RidePage() {
 
       {show('details') && isManager && (ride.status === 'live' || canCancel(ride.status, isManager) || isOrganizer) ? (
         <Card>
-          <ThemedText type="heading">You’re Organizing</ThemedText>
+          <ThemedText type="heading">{tr('You’re Organizing')}</ThemedText>
           {ride.status === 'live' ? (
-            <Button title="End Ride for Everyone" kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
+            <Button title={tr('End Ride for Everyone')} kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
           ) : null}
           {isOrganizer ? (
             <Button
               title={over ? 'Ride Again' : 'Copy This Ride'}
               kind={over ? 'primary' : 'secondary'}
-              accessibilityHint="Starts a new ride with this one's details and route. You pick the day."
+              accessibilityHint={tr('Starts a new ride with this one\'s details and route. You pick the day.')}
               onPress={() => requirePro('create_ride') && router.push(`/ride/new?copy=${ride.id}`)}
             />
           ) : null}
@@ -366,10 +367,10 @@ export default function RidePage() {
             <View style={[styles.callOff, ride.status !== 'live' && !isOrganizer && styles.callOffAlone]}>
               <View style={{ flexDirection: 'row', gap: Spacing.two }}>
                 {canCancel(ride.status, isManager) ? (
-                  <Button title="Cancel Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
+                  <Button title={tr('Cancel Ride')} kind="ghost" style={{ flex: 1 }} loading={busy === 'cancel'} disabled={!!busy} onPress={cancel} />
                 ) : null}
                 {isOrganizer ? (
-                  <Button title="Delete Ride" kind="ghost" style={{ flex: 1 }} loading={busy === 'delete'} disabled={!!busy} onPress={remove} />
+                  <Button title={tr('Delete Ride')} kind="ghost" style={{ flex: 1 }} loading={busy === 'delete'} disabled={!!busy} onPress={remove} />
                 ) : null}
               </View>
               <ThemedText type="small" themeColor="textSecondary">
@@ -392,7 +393,7 @@ export default function RidePage() {
             <Card>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
                 <ThemedText type="heading">{route?.name || (ride.freeride ? 'Freeride' : 'The Route')}</ThemedText>
-                {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{miles(route.lengthM)} mi</ThemedText> : null}
+                {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{tr('{v} mi', { v: miles(route.lengthM) })}</ThemedText> : null}
               </View>
               {route ? (
                 <>
@@ -408,11 +409,11 @@ export default function RidePage() {
                 </>
               ) : ride.freeride ? (
                 <ThemedText themeColor="textSecondary">
-                  Freeride: no mapped route. Everyone follows the leader, and Ride Mode shows where each rider is.
+                  {tr('Freeride: no mapped route. Everyone follows the leader, and Ride Mode shows where each rider is.')}
                 </ThemedText>
               ) : (
                 <ThemedText themeColor="textSecondary">
-                  Draw the trail on the map or import a GPX file. Riders see it in Ride Mode with everyone placed along it.
+                  {tr('Draw the trail on the map or import a GPX file. Riders see it in Ride Mode with everyone placed along it.')}
                 </ThemedText>
               )}
               {isManager && ride.status !== 'ended' && ride.status !== 'cancelled' ? (
@@ -428,7 +429,7 @@ export default function RidePage() {
           {isJoined && !cancelled && waypoints.switchedOn && (stops.length || (canPlanStops && ride.status !== 'ended')) ? (
             <Card>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <ThemedText type="heading">Planned Stops</ThemedText>
+                <ThemedText type="heading">{tr('Planned Stops')}</ThemedText>
                 {stops.length ? <ThemedText style={{ color: Colors.accent, fontWeight: 700 }}>{stops.length}</ThemedText> : null}
               </View>
               {stops.length ? (
@@ -446,7 +447,7 @@ export default function RidePage() {
               )}
               {canPlanStops && ride.status !== 'ended' ? (
                 <Button
-                  title="Add a Planned Stop"
+                  title={tr('Add a Planned Stop')}
                   kind={stops.length ? 'secondary' : 'primary'}
                   disabled={!waypoints.stopsSwitchedOn}
                   pro="waypoints"
@@ -458,7 +459,7 @@ export default function RidePage() {
           {isJoined && !cancelled ? (
             <Card>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <ThemedText type="heading">Waypoints</ThemedText>
+                <ThemedText type="heading">{tr('Waypoints')}</ThemedText>
                 {otherWaypoints.length ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{otherWaypoints.length}</ThemedText> : null}
               </View>
               {!waypoints.switchedOn ? (
@@ -469,7 +470,7 @@ export default function RidePage() {
                     <WaypointRow key={w.id} waypoint={w} me={me} ownerName={nameOf} first={i === 0} onPress={() => router.push(`/ride/${ride.id}/waypoints`)} />
                   ))}
                   {otherWaypoints.length > 3 ? (
-                    <ThemedText type="small" themeColor="textSecondary">and {otherWaypoints.length - 3} more</ThemedText>
+                    <ThemedText type="small" themeColor="textSecondary">{tr('and {v} more', { v: otherWaypoints.length - 3 })}</ThemedText>
                   ) : null}
                 </View>
               ) : (
@@ -495,12 +496,12 @@ export default function RidePage() {
         <>
           {isManager && pending.length ? (
             <Card>
-              <ThemedText type="heading">Waiting for You</ThemedText>
+              <ThemedText type="heading">{tr('Waiting for You')}</ThemedText>
               {pending.map((m) => (
                 <View key={m.user_id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
-                  <ThemedText style={{ flex: 1 }}>{m.profiles?.display_name || 'Rider'} wants to join</ThemedText>
-                  <Button title="Approve" onPress={() => act('approve', () => approveMember(ride.id, m.user_id, true))} />
-                  <Button title="Decline" kind="secondary" onPress={() => act('decline', () => approveMember(ride.id, m.user_id, false))} />
+                  <ThemedText style={{ flex: 1 }}>{tr('{v} wants to join', { v: m.profiles?.display_name || tr('Rider') })}</ThemedText>
+                  <Button title={tr('Approve')} onPress={() => act('approve', () => approveMember(ride.id, m.user_id, true))} />
+                  <Button title={tr('Decline')} kind="secondary" onPress={() => act('decline', () => approveMember(ride.id, m.user_id, false))} />
                 </View>
               ))}
             </Card>
@@ -536,17 +537,17 @@ export default function RidePage() {
           onPress={() => setReporting({ kind: 'ride', rideId: ride.id, name: ride.name, source: 'ride' })}
           hitSlop={6}
           style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
-          <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13, textDecorationLine: 'underline' }}>Report Ride</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13, textDecorationLine: 'underline' }}>{tr('Report Ride')}</ThemedText>
         </Pressable>
       ) : null}
       <ReportSheet target={reporting} onClose={() => setReporting(null)} />
 
       <Pressable
         accessibilityRole="link"
-        accessibilityLabel="OnMyLead is presented by RUS Offroad"
+        accessibilityLabel={tr('OnMyLead is presented by RUS Offroad')}
         onPress={() => openStore('ride_page')}
         style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: Spacing.three }}>
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13 }}>Presented by RUS Offroad</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 13 }}>{tr('Presented by RUS Offroad')}</ThemedText>
       </Pressable>
     </>
   );
@@ -604,7 +605,7 @@ function SectionTabs({
             accessibilityLabel={count ? `${s.label}, ${count} waiting` : s.label}
             onPress={() => onChange(s.key)}
             style={styles.tab}>
-            <Text style={[styles.tabLabel, { color: on ? Colors.text : Colors.textSecondary }]}>{s.label}</Text>
+            <Text style={[styles.tabLabel, { color: on ? Colors.text : Colors.textSecondary }]}>{tr(s.label)}</Text>
             {count ? (
               <View style={styles.tabCount}>
                 <Text style={styles.tabCountText}>{count}</Text>

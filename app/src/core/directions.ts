@@ -7,6 +7,7 @@
 import { cumulativeM } from './route';
 import type { LatLng } from './geo';
 
+import { tc } from './i18n';
 export type MapsApp = 'apple' | 'google';
 /** What the rider picked in Profile: always the same app, or ask each time. */
 export type MapsPreference = MapsApp | 'ask';
@@ -105,20 +106,20 @@ export function rideDirections(opts: {
   regroup?: LatLng | null;
 }): DirectionsRow[] {
   const rows: DirectionsRow[] = [];
-  if (opts.regroup) rows.push({ key: 'regroup', title: 'Regroup Point', detail: 'Where the leader asked everyone to meet up', target: { title: 'the Regroup Point', to: opts.regroup } });
+  if (opts.regroup) rows.push({ key: 'regroup', title: tc('Regroup Point'), detail: tc('Where the leader asked everyone to meet up'), target: { title: tc('the Regroup Point'), to: opts.regroup } });
   const m = opts.meet;
-  if (m) rows.push({ key: 'meet', title: 'Meeting Point', detail: m.label?.trim() || `${m.lat.toFixed(4)}, ${m.lng.toFixed(4)}`, target: { title: 'the Meeting Point', to: m } });
+  if (m) rows.push({ key: 'meet', title: tc('Meeting Point'), detail: m.label?.trim() || `${m.lat.toFixed(4)}, ${m.lng.toFixed(4)}`, target: { title: tc('the Meeting Point'), to: m } });
   const partway = (opts.alongM ?? 0) > 50;
   const r = opts.route ? routeDirections(opts.route, 'the End of the Route', partway ? opts.alongM : null) : null;
   if (r) {
     rows.push({
       key: 'route',
-      title: partway ? 'Continue Along the Route' : 'Along the Route',
-      detail: r.via?.length ? `Through ${r.via.length} ${r.via.length === 1 ? 'stop' : 'stops'} on the route, on roads where Maps has them` : 'To the end of the route',
+      title: partway ? tc('Continue Along the Route') : tc('Along the Route'),
+      detail: r.via?.length ? tc('Through {length} {v} on the route, on roads where Maps has them', { length: r.via.length, v: r.via.length === 1 ? 'stop' : 'stops' }) : tc('To the end of the route'),
       target: r,
     });
   }
   const d = opts.destination?.trim();
-  if (d) rows.push({ key: 'destination', title: 'Destination', detail: d, target: { title: d, to: d } });
+  if (d) rows.push({ key: 'destination', title: tc('Destination'), detail: d, target: { title: d, to: d } });
   return rows;
 }

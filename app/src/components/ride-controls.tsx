@@ -9,6 +9,7 @@ import type { RiderStatusKind } from '@/lib/types';
 import { Icon, type IconName } from './icon';
 import { SheetRoot, SwipeSheet } from './swipe-sheet';
 
+import { t } from '@/lib/i18n';
 /** A light tap you can feel, so a rider wearing gloves knows a button took. */
 export function tapFeel() {
   if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
@@ -77,10 +78,10 @@ export function PanelActions({ onRegroup, onEmergency }: { onRegroup?: () => voi
             onRegroup();
           }}
           accessibilityRole="button"
-          accessibilityLabel="Regroup at my location"
+          accessibilityLabel={t('Regroup at my location')}
           style={({ pressed }) => [styles.big, styles.regroup, pressed && styles.pressed]}>
           <Icon name="regroup" size={18} color={Colors.background} strokeWidth={2.4} />
-          <Text style={[styles.bigText, { color: Colors.background }]}>Regroup Here</Text>
+          <Text style={[styles.bigText, { color: Colors.background }]}>{t('Regroup Here')}</Text>
         </Pressable>
       ) : null}
       <Pressable
@@ -89,10 +90,10 @@ export function PanelActions({ onRegroup, onEmergency }: { onRegroup?: () => voi
           onEmergency();
         }}
         accessibilityRole="button"
-        accessibilityLabel="Send status EMERGENCY"
-        accessibilityHint="Opens the emergency alert. You hold a button there to send it"
+        accessibilityLabel={t('Send status EMERGENCY')}
+        accessibilityHint={t('Opens the emergency alert. You hold a button there to send it')}
         style={({ pressed }) => [styles.big, styles.sos, pressed && styles.pressed]}>
-        <Text style={[styles.bigText, { color: Glass.softRed }]}>EMERGENCY</Text>
+        <Text style={[styles.bigText, { color: Glass.softRed }]}>{t('EMERGENCY')}</Text>
       </Pressable>
     </View>
   );
@@ -125,20 +126,20 @@ export function StatusSheet({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <SheetRoot style={[styles.wrap, tablet && styles.wrapTablet]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel={t('Close')} accessibilityRole="button" />
         <SwipeSheet
           onClose={onClose}
           style={[styles.sheet, tablet ? styles.sheetTablet : { paddingBottom: Math.max(insets.bottom, Spacing.three) }]}
           accessibilityViewIsModal>
           <View style={styles.grab} />
           <View style={styles.head}>
-            <Text style={styles.title} accessibilityRole="header">Tell the Group</Text>
-            <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel="Done">
-              <Text style={styles.done}>Done</Text>
+            <Text style={styles.title} accessibilityRole="header">{t('Tell the Group')}</Text>
+            <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('Done')}>
+              <Text style={styles.done}>{t('Done')}</Text>
             </Pressable>
           </View>
           <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 10 }} showsVerticalScrollIndicator={false}>
-            <Section label="On the Move">
+            <Section label={t('On the Move')}>
               {QUICK_REPLIES.map((q) => (
                 <QuickTile
                   key={q}
@@ -153,7 +154,7 @@ export function StatusSheet({
                 <QuickTile key={k} label={labels[k]} on={myStatus === k} onPress={pick(() => onStatus(k))} a11y={`Send status ${labels[k]}`} style={styles.third} />
               ))}
             </Section>
-            <Section label="Trouble">
+            <Section label={t('Trouble')}>
               {TROUBLE_STATUSES.map((k) => (
                 <QuickTile
                   key={k}
@@ -192,7 +193,7 @@ export function QuickRow({ lastReply, onReply, onMore }: { lastReply: string | n
       ))}
       <QuickTile
         icon="more"
-        label="More"
+        label={t('More')}
         onPress={onMore}
         a11y="More statuses"
         style={styles.quarter}

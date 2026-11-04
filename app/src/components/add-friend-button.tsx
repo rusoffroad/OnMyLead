@@ -7,6 +7,7 @@ import { confirmAsync, showNotice } from '@/lib/confirm';
 import { FriendsOffError, removeFriend, respondFriendRequest, sendFriendRequest, useFriends } from '@/lib/friends';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 const TITLES = {
   none: 'Add Friend',
   sent: 'Cancel Friend Request',
@@ -44,7 +45,7 @@ export function AddFriendButton({
         await respondFriendRequest(userId, true);
       } else if (relation === 'sent') {
         await removeFriend(userId);
-      } else if (await confirmAsync(`Remove ${name}?`, 'You’ll stop being friends. They aren’t told.', 'Remove')) {
+      } else if (await confirmAsync(`Remove ${name}?`, t('You’ll stop being friends. They aren’t told.'), t('Remove'))) {
         await removeFriend(userId);
       }
       onDone?.();
@@ -55,5 +56,5 @@ export function AddFriendButton({
     }
   }
 
-  return <Button title={TITLES[relation]} kind={kind} loading={busy} style={style} onPress={press} />;
+  return <Button title={t(TITLES[relation])} kind={kind} loading={busy} style={style} onPress={press} />;
 }

@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Block Rider (see migration 20261020000000_blocked_riders.sql).
  *
@@ -33,7 +35,7 @@ export function sortBlocked(list: BlockedRider[]): BlockedRider[] {
 export function blockPrompt(name: string): { title: string; message: string; confirm: string } {
   const who = name.trim() || 'This Rider';
   return {
-    title: `Block ${who}?`,
+    title: tc('Block {who}?', { who }),
     message:
       `You won’t see ${who === 'This Rider' ? 'their' : `${who}’s`} messages in ride chat or group chat, or get chat notifications from them. `
       + 'They won’t be told. Need Help and EMERGENCY alerts still come through. You can unblock them from You, Blocked Riders.',

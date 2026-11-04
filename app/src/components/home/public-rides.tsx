@@ -57,7 +57,7 @@ export function PublicRidesRail({ rides, width }: { rides: Near[]; width: number
           <HomeCard>
             <CardMap seed={r.id} />
             <View style={styles.pills}>
-              {r.status === 'live' ? <Pill text="Live Now" tone="out" /> : null}
+              {r.status === 'live' ? <Pill text={t('Live Now')} tone="out" /> : null}
               {distance(r.distanceMi) ? <Pill tone="dark" text={distance(r.distanceMi)!} /> : null}
             </View>
             <View style={styles.body}>
@@ -92,7 +92,7 @@ export function RadiusSheet({
   visible, radius, located, onPick, onClose,
 }: { visible: boolean; radius: number; located: boolean; onPick: (mi: number) => void; onClose: () => void }) {
   return (
-    <BottomSheet visible={visible} onClose={onClose} title={t('Show Rides Within')} footer={<Button title="Done" onPress={onClose} />}>
+    <BottomSheet visible={visible} onClose={onClose} title={t('Show Rides Within')} footer={<Button title={t('Done')} onPress={onClose} />}>
       <Text style={styles.big}>
         {radius === 0 ? t('Anywhere') : radius.toLocaleString(currentLocale())}
         {radius === 0 ? null : <Text style={styles.bigUnit}> {t('miles')}</Text>}

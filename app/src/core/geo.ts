@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 export type LatLng = { lat: number; lng: number };
 
 const EARTH_RADIUS_M = 6_371_008.8;
@@ -41,6 +43,6 @@ export function fuzzLocation(p: LatLng, gridMiles = 1): LatLng {
 /** "1.7 miles" / "0.3 miles" / "450 feet" for alert copy. */
 export function formatDistance(m: number): string {
   const mi = metersToMiles(m);
-  if (mi < 0.2) return `${Math.round(m * 3.28084 / 10) * 10} feet`;
-  return `${mi.toFixed(1)} miles`;
+  if (mi < 0.2) return tc('{n} feet', { n: Math.round(m * 3.28084 / 10) * 10 });
+  return tc('{n} miles', { n: mi.toFixed(1) });
 }

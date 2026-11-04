@@ -13,6 +13,7 @@ import { faceColor, Initial } from '../home/parts';
 import { ProTag, Social } from './parts';
 import { SocialCard } from './social-card';
 
+import { t } from '@/lib/i18n';
 /** A list of items that can change (likes) or go away (a deleted post) without reloading. */
 export function useItems() {
   const [items, setItems] = useState<SocialItem[] | null>(null);
@@ -45,7 +46,7 @@ export function ItemList({
       {items.map((item, i) => (
         <SocialCard key={item.key ?? `${item.kind}${item.actorId}${item.at}`} item={item} onChange={(n) => update(i, n)} onDeleted={() => remove(i)} />
       ))}
-      {more ? <Button title="Show Older" kind="secondary" loading={loadingMore} onPress={more} /> : null}
+      {more ? <Button title={t('Show Older')} kind="secondary" loading={loadingMore} onPress={more} /> : null}
     </View>
   );
 }
@@ -58,10 +59,10 @@ export function ComposePrompt({ userId, name, pro }: { userId: string; name: str
         if (requirePro('social_posts')) router.push('/social/new');
       }}
       accessibilityRole="button"
-      accessibilityLabel="Post a ride report to your profile"
+      accessibilityLabel={t('Post a ride report to your profile')}
       style={({ pressed }) => [styles.compose, pressed && { backgroundColor: Social.panel2 }]}>
       <RiderPhoto userId={userId} size={40} zoom={false} fallback={<Initial name={name} size={40} color={faceColor(userId)} />} />
-      <Text style={styles.composeText}>Post a ride report…</Text>
+      <Text style={styles.composeText}>{t('Post a ride report…')}</Text>
       {pro ? <Icon name="image" size={22} color={Social.muted} /> : <ProTag />}
     </Pressable>
   );
@@ -76,7 +77,7 @@ export function FriendRows({ list, limit }: { list: Friend[]; limit?: number }) 
       {received.length ? (
         <Pressable onPress={() => router.push('/friends')} style={styles.requests} accessibilityRole="link">
           <Icon name="addFriend" size={20} color={Colors.sky} />
-          <Text style={styles.requestsText}>{received.length} Friend {received.length === 1 ? 'Request' : 'Requests'}</Text>
+          <Text style={styles.requestsText}>{t(received.length === 1 ? '{n} Friend Request' : '{n} Friend Requests', { n: received.length })}</Text>
           <Icon name="chevron" size={16} color={Colors.sky} />
         </Pressable>
       ) : null}
@@ -85,7 +86,7 @@ export function FriendRows({ list, limit }: { list: Friend[]; limit?: number }) 
           {shown.map((f, i) => <FriendRow key={f.user_id} friend={f} first={i === 0} />)}
         </View>
       ) : (
-        <Text style={styles.emptyText}>No friends yet. Add the riders you ride with and their rides, badges and posts show up here.</Text>
+        <Text style={styles.emptyText}>{t('No friends yet. Add the riders you ride with and their rides, badges and posts show up here.')}</Text>
       )}
       <Button
         title={limit && friends.length > limit ? `See All ${friends.length} Friends` : 'Add and Manage Friends'}

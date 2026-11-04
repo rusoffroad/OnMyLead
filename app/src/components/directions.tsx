@@ -10,6 +10,7 @@ import { MAPS_APP_LABEL, mapsAppsFor, pickedApp, type DirectionsRow, type Direct
 import { MAPS_APPS_TEXT, openDirections, openIn, useMapsPreference, useWebDirectionsPrompt } from '@/lib/directions';
 import { ProTag } from './pro-tag';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * Places to get turn-by-turn directions to, one row each. A tap opens the rider's maps app, or asks
  * Apple Maps or Google Maps first when they haven't picked one in Profile.
@@ -31,9 +32,9 @@ export function DirectionsList({ rows, onOpen }: { rows: DirectionsRow[]; onOpen
           </View>
           <View style={{ flex: 1, gap: 1 }}>
             <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{r.title}</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>{r.detail}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>{tr(r.detail)}</ThemedText>
           </View>
-          {app ? <Text style={styles.app}>{MAPS_APP_LABEL[app]}</Text> : <Icon name="chevron" size={20} color={Colors.textSecondary} />}
+          {app ? <Text style={styles.app}>{tr(MAPS_APP_LABEL[app])}</Text> : <Icon name="chevron" size={20} color={Colors.textSecondary} />}
         </Pressable>
       ))}
     </View>
@@ -47,7 +48,7 @@ export function DirectionsCard({ rows }: { rows: DirectionsRow[] }) {
     <View style={{ gap: Spacing.two }}>
       <View style={{ gap: 2 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <ThemedText type="heading">Directions</ThemedText>
+          <ThemedText type="heading">{tr('Directions')}</ThemedText>
           <ProTag feature="directions" />
         </View>
         <ThemedText type="small" themeColor="textSecondary">{`Turn-by-turn on the roads, in ${MAPS_APPS_TEXT}.`}</ThemedText>
@@ -68,20 +69,20 @@ export function DirectionsSheet({ visible, rows, onClose }: { visible: boolean; 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
-      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
+      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
       <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
         <View style={styles.grip} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={styles.title} accessibilityRole="header">Directions</Text>
+          <Text style={styles.title} accessibilityRole="header">{tr('Directions')}</Text>
           <ProTag feature="directions" />
         </View>
-        <ThemedText type="small" themeColor="textSecondary">For the road. Off road, follow the leader and the route on this map.</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{tr('For the road. Off road, follow the leader and the route on this map.')}</ThemedText>
         {rows.length ? (
           <DirectionsList rows={rows} onOpen={open} />
         ) : (
-          <ThemedText themeColor="textSecondary">Nothing to get directions to yet. Tap a waypoint or a rider to navigate to them.</ThemedText>
+          <ThemedText themeColor="textSecondary">{tr('Nothing to get directions to yet. Tap a waypoint or a rider to navigate to them.')}</ThemedText>
         )}
-        <Button title="Close" kind="ghost" onPress={onClose} />
+        <Button title={tr('Close')} kind="ghost" onPress={onClose} />
       </SwipeSheet>
       </SheetRoot>
     </Modal>
@@ -95,12 +96,12 @@ export function DirectionsHost() {
   return (
     <Modal visible={!!target} transparent animationType="fade" onRequestClose={close}>
       <SheetRoot>
-      <Pressable style={styles.scrim} onPress={close} accessibilityLabel="Close" accessibilityRole="button" />
+      <Pressable style={styles.scrim} onPress={close} accessibilityLabel={tr('Close')} accessibilityRole="button" />
       {target ? (
         <SwipeSheet onClose={close} style={[styles.sheet, styles.webSheet]} accessibilityViewIsModal>
-          <Text style={styles.title} accessibilityRole="header">Directions to {target.title}</Text>
+          <Text style={styles.title} accessibilityRole="header">{tr('Directions to {title}', { title: target.title })}</Text>
           {target.via?.length ? (
-            <ThemedText type="small" themeColor="textSecondary">Maps keeps to roads between the route’s stops, so off-road parts may differ.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{tr('Maps keeps to roads between the route’s stops, so off-road parts may differ.')}</ThemedText>
           ) : null}
           {mapsAppsFor('web').map((a) => (
             <Button
@@ -113,7 +114,7 @@ export function DirectionsHost() {
               }}
             />
           ))}
-          <Button title="Cancel" kind="ghost" onPress={close} />
+          <Button title={tr('Cancel')} kind="ghost" onPress={close} />
         </SwipeSheet>
       ) : null}
       </SheetRoot>

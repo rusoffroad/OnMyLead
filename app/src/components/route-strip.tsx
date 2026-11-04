@@ -8,6 +8,7 @@ import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
 import { convoyLayout, describeRank, groupSpread, rankRiders } from '@/core/route-order';
 
+import { t as tr } from '@/lib/i18n';
 const RANGE_COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
 
 /** Dot sizes on the line, before a big group shrinks them to fit. */
@@ -88,11 +89,11 @@ export function RouteStrip({
         ].join(' ')}>
         {freeride ? (
           freeride.waiting ? (
-            <Text style={styles.of}>Waiting for the Leader</Text>
+            <Text style={styles.of}>{tr('Waiting for the Leader')}</Text>
           ) : fs?.spread ? (
             <Text style={styles.big}>
               {spreadNum}
-              <Text style={styles.of}> {spreadUnit.join(' ')} spread</Text>
+              <Text style={styles.of}>{tr('{v} spread', { v: spreadUnit.join(' ') })}</Text>
             </Text>
           ) : (
             <Text style={styles.of}>{fs?.ends}</Text>
@@ -100,10 +101,10 @@ export function RouteStrip({
         ) : summary ? (
           <Text style={styles.big}>
             {summary.doneMi}
-            <Text style={styles.of}> of {summary.totalMi} mi</Text>
+            <Text style={styles.of}>{tr('of {totalMi} mi', { totalMi: summary.totalMi })}</Text>
           </Text>
         ) : (
-          <Text style={styles.of}>Route · {ranked.length ? `${ranked.length} on the line` : 'nobody placed yet'}</Text>
+          <Text style={styles.of}>{tr('Route · {v}', { v: ranked.length ? tr('{n} on the line', { n: ranked.length }) : tr('nobody placed yet') })}</Text>
         )}
         <Text style={styles.toGo}>{freeride ? (freeride.waiting || !fs?.spread ? 'Freeride' : fs.ends) : summary ? summary.toGo : offline ? 'Saved route, no signal' : ''}</Text>
       </View>
@@ -175,7 +176,7 @@ export function RouteStrip({
           {summary.compared}
         </Text>
       ) : (
-        <Text style={styles.compared}>Share your location to see where you are on the route.</Text>
+        <Text style={styles.compared}>{tr('Share your location to see where you are on the route.')}</Text>
       )}
       {range && !compact ? (
         <View style={styles.range}>

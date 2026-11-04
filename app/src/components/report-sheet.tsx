@@ -14,6 +14,7 @@ import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { sendReport } from '@/lib/pro';
 import { reportContent } from '@/lib/social';
 
+import { t } from '@/lib/i18n';
 // source: where the report was sent from, so the Admin Dashboard can say (2.0).
 type Target =
   | { kind: 'ride'; rideId: string; name: string; source?: ReportSource }
@@ -85,7 +86,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
   return (
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={close} statusBarTranslucent>
       <SheetRoot>
-      <Pressable style={styles.scrim} onPress={close} accessibilityLabel="Close" accessibilityRole="button" />
+      <Pressable style={styles.scrim} onPress={close} accessibilityLabel={t('Close')} accessibilityRole="button" />
       {target ? (
         <KeyboardLift>
         <SwipeSheet onClose={close} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
@@ -93,18 +94,16 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
           <SheetScroll {...keyboardScroll} style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.three }}>
           {sent ? (
             <>
-              <Text style={styles.title} accessibilityRole="header">Report Sent</Text>
-              <ThemedText>
-                Thanks. OnMyLead looks at every report. {target.kind === 'event' ? 'The host' : target.name} isn’t told who sent it. If anyone is in danger, call 911.
-              </ThemedText>
+              <Text style={styles.title} accessibilityRole="header">{t('Report Sent')}</Text>
+              <ThemedText>{t('Thanks. OnMyLead looks at every report. {v} isn’t told who sent it. If anyone is in danger, call 911.', { v: target.kind === 'event' ? t('The host') : target.name })}</ThemedText>
               {canBlock ? (
                 blocked ? (
-                  <ThemedText type="small" themeColor="textSecondary">Blocked. You won’t see their messages.</ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">{t('Blocked. You won’t see their messages.')}</ThemedText>
                 ) : (
-                  <Button title="Also Block This Rider" kind="secondary" onPress={() => confirmAndBlock(rider!.userId, rider!.name)} />
+                  <Button title={t('Also Block This Rider')} kind="secondary" onPress={() => confirmAndBlock(rider!.userId, rider!.name)} />
                 )
               ) : null}
-              <Button title="Done" big onPress={close} />
+              <Button title={t('Done')} big onPress={close} />
             </>
           ) : (
             <>
@@ -114,31 +113,27 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
                   {target.kind === 'ride' ? 'Report This Ride' : target.kind === 'event' ? 'Report This Event' : target.postId ? 'Report This Post' : target.commentId ? 'Report This Comment' : `Report ${target.name}`}
                 </Text>
               </View>
-              <ThemedText type="small" themeColor="textSecondary">
-                Goes to the OnMyLead team, not to the {target.kind === 'ride' ? 'organizer' : target.kind === 'event' ? 'host' : 'rider'}. If anyone is in danger, call 911.
-              </ThemedText>
-              <Choice label="What’s Wrong" options={reasons.map((r) => ({ value: r as string | null, label: r }))} value={reason} onChange={setReason} />
-              <Field label="Anything Else (Optional)" value={details} onChangeText={setDetails} multiline maxLength={1000} placeholder="What happened, and when" />
+              <ThemedText type="small" themeColor="textSecondary">{t('Goes to the OnMyLead team, not to the {v}. If anyone is in danger, call 911.', { v: target.kind === 'ride' ? t('organizer') : target.kind === 'event' ? t('host') : t('rider') })}</ThemedText>
+              <Choice label={t('What’s Wrong')} options={reasons.map((r) => ({ value: r as string | null, label: r }))} value={reason} onChange={setReason} />
+              <Field label={t('Anything Else (Optional)')} value={details} onChangeText={setDetails} multiline maxLength={1000} placeholder={t('What happened, and when')} />
               {rider ? (
                 <View style={styles.notice}>
                   <Icon name="chat" size={20} color={Colors.sky} />
-                  <ThemedText type="small" style={{ flex: 1 }}>
-                    Your messages with {rider.name} are attached, so the OnMyLead team can read what was said. Nobody else sees them.
-                  </ThemedText>
+                  <ThemedText type="small" style={{ flex: 1 }}>{t('Your messages with {name} are attached, so the OnMyLead team can read what was said. Nobody else sees them.', { name: rider.name })}</ThemedText>
                 </View>
               ) : null}
               <ErrorText error={error} />
-              <Button title="Send Report" big loading={busy} disabled={!reason} onPress={send} style={{ backgroundColor: Colors.danger }} />
+              <Button title={t('Send Report')} big loading={busy} disabled={!reason} onPress={send} style={{ backgroundColor: Colors.danger }} />
               {canBlock ? (
                 <Button
                   title={blocked ? 'Blocked' : 'Block This Rider'}
                   kind="secondary"
                   disabled={blocked}
-                  accessibilityHint="Hides their messages from you. They aren’t told."
+                  accessibilityHint={t('Hides their messages from you. They aren’t told.')}
                   onPress={() => confirmAndBlock(rider!.userId, rider!.name)}
                 />
               ) : null}
-              <Button title="Cancel" kind="ghost" onPress={close} />
+              <Button title={t('Cancel')} kind="ghost" onPress={close} />
             </>
           )}
           </SheetScroll>

@@ -18,6 +18,7 @@ import { requirePro } from '@/lib/pro';
 import { shareRideCard } from '@/lib/share-card';
 import type { Ride, RideMember } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 const cardDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -88,65 +89,60 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
   return (
     <View style={{ gap: Spacing.three }}>
       <Card>
-        <ThemedText type="heading">Your Ride</ThemedText>
+        <ThemedText type="heading">{t('Your Ride')}</ThemedText>
         {points === undefined ? (
-          <ThemedText type="small" themeColor="textSecondary">Loading your track…</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('Loading your track…')}</ThemedText>
         ) : summary ? (
           <>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three }}>
-              <Stat label="Distance" value={formatMiles(summary.distanceM)} />
-              <Stat label="Out For" value={formatDuration(summary.elapsedSec)} />
+              <Stat label={t('Distance')} value={formatMiles(summary.distanceM)} />
+              <Stat label={t('Out For')} value={formatDuration(summary.elapsedSec)} />
               {advanced ? (
                 <>
-                  <Stat label="Moving Time" value={formatDuration(summary.movingTimeSec)} />
-                  <Stat label="Average Speed" value={summary.movingTimeSec ? formatMph(summary.avgMovingSpeedMps) : '—'} />
-                  <Stat label="Top Speed" value={formatMph(summary.maxSpeedMps)} />
-                  {summary.elevationGainM != null ? <Stat label="Climbing" value={formatFeet(summary.elevationGainM)} /> : null}
+                  <Stat label={t('Moving Time')} value={formatDuration(summary.movingTimeSec)} />
+                  <Stat label={t('Average Speed')} value={summary.movingTimeSec ? formatMph(summary.avgMovingSpeedMps) : '—'} />
+                  <Stat label={t('Top Speed')} value={formatMph(summary.maxSpeedMps)} />
+                  {summary.elevationGainM != null ? <Stat label={t('Climbing')} value={formatFeet(summary.elevationGainM)} /> : null}
                 </>
               ) : null}
             </View>
-            {advanced ? null : <ProLock feature="advanced_stats" title="Speed, Climbing and Moving Time" detail="Your full stats from this ride are saved" />}
+            {advanced ? null : <ProLock feature="advanced_stats" title={t('Speed, Climbing and Moving Time')} detail={t('Your full stats from this ride are saved')} />}
             <RouteMap route={summary.route} />
-            <ThemedText type="small" themeColor="textSecondary">Only you can see your route.</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Only you can see your route.')}</ThemedText>
           </>
         ) : (
           <ThemedText type="small" themeColor="textSecondary">
-            No track for you on this ride. Your stats come from sharing your location in Ride Mode.
+            {t('No track for you on this ride. Your stats come from sharing your location in Ride Mode.')}
           </ThemedText>
         )}
       </Card>
 
       <Card>
-        <ThemedText type="heading">The Group</ThemedText>
-        <ThemedText>
-          {finished.length} {finished.length === 1 ? 'rider' : 'riders'} finished:{' '}
-          {finished.map((m) => m.profiles?.display_name || 'Rider').join(', ')}
-        </ThemedText>
+        <ThemedText type="heading">{t('The Group')}</ThemedText>
+        <ThemedText>{t(finished.length === 1 ? '{n} rider finished: {names}' : '{n} riders finished: {names}', { n: finished.length, names: finished.map((m) => m.profiles?.display_name || t('Rider')).join(', ') })}</ThemedText>
         {group && group.riders_tracked > 0 && advanced ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: Spacing.three }}>
-            {group.longest_miles != null ? <Stat label="Longest" value={`${group.longest_miles} mi`} /> : null}
-            {group.average_miles != null ? <Stat label="Average" value={`${group.average_miles} mi`} /> : null}
-            {group.top_speed_mph != null ? <Stat label="Group Top Speed" value={`${group.top_speed_mph} mph`} /> : null}
+            {group.longest_miles != null ? <Stat label={t('Longest')} value={`${group.longest_miles} mi`} /> : null}
+            {group.average_miles != null ? <Stat label={t('Average')} value={`${group.average_miles} mi`} /> : null}
+            {group.top_speed_mph != null ? <Stat label={t('Group Top Speed')} value={`${group.top_speed_mph} mph`} /> : null}
           </View>
         ) : null}
-        {group && group.riders_tracked > 0 && !advanced ? <ProLock feature="advanced_stats" title="The Group’s Totals" detail="Longest, average and top speed" /> : null}
+        {group && group.riders_tracked > 0 && !advanced ? <ProLock feature="advanced_stats" title={t('The Group’s Totals')} detail={t('Longest, average and top speed')} /> : null}
         {group && group.riders_tracked > 0 && advanced ? (
-          <ThemedText type="small" themeColor="textSecondary">
-            From {group.riders_tracked} {group.riders_tracked === 1 ? 'rider' : 'riders'} who shared location. Totals only; nobody’s route is shown.
-          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t(group.riders_tracked === 1 ? 'From {n} rider who shared location. Totals only; nobody’s route is shown.' : 'From {n} riders who shared location. Totals only; nobody’s route is shown.', { n: group.riders_tracked })}</ThemedText>
         ) : null}
       </Card>
 
       <Card>
-        <ThemedText type="heading">Ride Card</ThemedText>
+        <ThemedText type="heading">{t('Ride Card')}</ThemedText>
         <Segmented
           options={CARD_LAYOUTS.map((l) => ({ value: l.value, label: premium || l.value === 'standard' ? l.label : `${l.label} (Pro)` }))}
           value={layout}
           onChange={(l) => (l === 'standard' || requirePro('premium_ride_cards')) && setLayout(l)}
         />
         <RideCard ref={cardRef} card={card} layout={premium ? layout : 'standard'} extras={extras} />
-        <Button title="Share Ride Card" loading={sharing} onPress={share} />
-        <ThemedText type="small" themeColor="textSecondary">The card never shows the meeting point or anyone’s route.</ThemedText>
+        <Button title={t('Share Ride Card')} loading={sharing} onPress={share} />
+        <ThemedText type="small" themeColor="textSecondary">{t('The card never shows the meeting point or anyone’s route.')}</ThemedText>
         {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
         <ErrorText error={error} />
       </Card>

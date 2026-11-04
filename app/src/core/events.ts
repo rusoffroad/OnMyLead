@@ -9,6 +9,7 @@
 
 import { SITE_URL } from './ride-link';
 
+import { coreLocale, tc } from './i18n';
 export const EVENT_PHOTO_BUCKET = 'event-photos';
 /** Longest side of a saved event photo, in pixels (wide photos stay wide, unlike profile pictures). */
 export const EVENT_PHOTO_MAX = 1600;
@@ -60,7 +61,7 @@ export const AGENDA_KINDS: { kind: AgendaKind; label: string }[] = [
 ];
 
 export function agendaKindLabel(kind: string): string {
-  return AGENDA_KINDS.find((k) => k.kind === kind)?.label ?? 'Other';
+  return AGENDA_KINDS.find((k) => k.kind === kind)?.label ?? tc('Other');
 }
 
 /** Each agenda kind's color on the timeline: red for riding, gold for prizes, blue for the rest. */
@@ -227,9 +228,9 @@ export function dayChip(d: Date): string {
 /** "12 Going", "1 Going · 3 Interested" style count line (no names). */
 export function rsvpLine(r: { going: number; interested: number }): string {
   const parts: string[] = [];
-  if (r.going) parts.push(`${r.going.toLocaleString('en-US')} Going`);
-  if (r.interested) parts.push(`${r.interested.toLocaleString('en-US')} Interested`);
-  return parts.length ? parts.join(', ') : 'Be the first to say you’re going';
+  if (r.going) parts.push(`${r.going.toLocaleString(coreLocale())} Going`);
+  if (r.interested) parts.push(`${r.interested.toLocaleString(coreLocale())} Interested`);
+  return parts.length ? parts.join(', ') : tc('Be the first to say you’re going');
 }
 
 export type EventForm = {
@@ -241,18 +242,18 @@ export type EventForm = {
 /** Checks the form and returns the server's fields, or the first problem in plain words. */
 export function eventPayload(f: EventForm, now: Date = new Date()): { ok: true; payload: Record<string, unknown> } | { ok: false; error: string } {
   const title = f.title.trim();
-  if (title.length < 2) return { ok: false, error: 'Give the event a name.' };
-  if (title.length > 100) return { ok: false, error: 'Keep the name under 100 characters.' };
-  if (!f.startDay) return { ok: false, error: 'Pick the day the event starts.' };
+  if (title.length < 2) return { ok: false, error: tc('Give the event a name.') };
+  if (title.length > 100) return { ok: false, error: tc('Keep the name under 100 characters.') };
+  if (!f.startDay) return { ok: false, error: tc('Pick the day the event starts.') };
   const start = at(f.startDay, f.startMinutes ?? 9 * 60);
   const end = at(f.endDay ?? f.startDay, f.endMinutes ?? (f.endDay && !sameDate(f.endDay, f.startDay) ? 17 * 60 : Math.max(f.startMinutes ?? 9 * 60, 17 * 60)));
-  if (end < start) return { ok: false, error: 'The event can’t end before it starts.' };
-  if (end.getTime() - start.getTime() > MAX_EVENT_DAYS * 86400000) return { ok: false, error: `An event can last up to ${MAX_EVENT_DAYS} days.` };
-  if (end.getTime() < now.getTime() - 86400000) return { ok: false, error: 'Pick dates that haven’t passed.' };
-  if (!f.locationName.trim()) return { ok: false, error: 'Say where the event is: a venue, park or town.' };
-  if (f.details.length > 5000) return { ok: false, error: 'Keep the details under 5,000 characters.' };
+  if (end < start) return { ok: false, error: tc('The event can’t end before it starts.') };
+  if (end.getTime() - start.getTime() > MAX_EVENT_DAYS * 86400000) return { ok: false, error: tc('An event can last up to {MAX_EVENT_DAYS} days.', { MAX_EVENT_DAYS }) };
+  if (end.getTime() < now.getTime() - 86400000) return { ok: false, error: tc('Pick dates that haven’t passed.') };
+  if (!f.locationName.trim()) return { ok: false, error: tc('Say where the event is: a venue, park or town.') };
+  if (f.details.length > 5000) return { ok: false, error: tc('Keep the details under 5,000 characters.') };
   const web = f.websiteUrl.trim();
-  if (web && !/^(https?:\/\/)?[^\s/$.?#][^\s]*\.[^\s]{2,}$/i.test(web)) return { ok: false, error: 'Check the website address.' };
+  if (web && !/^(https?:\/\/)?[^\s/$.?#][^\s]*\.[^\s]{2,}$/i.test(web)) return { ok: false, error: tc('Check the website address.') };
   return {
     ok: true,
     payload: {
@@ -282,9 +283,9 @@ export function minutesOf(iso: string): number {
 /** A friendly message for a server refusal. */
 export function friendlyEventError(message: string): string {
   if (/save_event|events_list|event_detail|rider_events|schema cache|does not exist|PGRST202/i.test(message)) return EVENTS_NOT_SWITCHED_ON;
-  if (/event not found/i.test(message)) return 'We couldn’t find that event. It may have been removed, or the link is wrong.';
+  if (/event not found/i.test(message)) return tc('We couldn’t find that event. It may have been removed, or the link is wrong.');
   const clean = message.replace(/^.*?ERROR:\s*/i, '').trim();
-  return clean ? clean.charAt(0).toUpperCase() + clean.slice(1).replace(/([^.!?])$/, '$1.') : 'Something went wrong.';
+  return clean ? clean.charAt(0).toUpperCase() + clean.slice(1).replace(/([^.!?])$/, '$1.') : tc('Something went wrong.');
 }
 
 /** What the RSVP buttons say and do. */
@@ -304,7 +305,7 @@ export function sortCards(cards: EventCard[], now: Date = new Date()): EventCard
 export function cardPlace(c: Pick<EventCard, 'location_name' | 'state' | 'distance_mi'>): string {
   const where = c.state && !c.location_name.includes(c.state) ? `${c.location_name}, ${c.state}` : c.location_name;
   if (c.distance_mi == null) return where;
-  return `${where}, ${c.distance_mi < 1 ? 'under 1 mi' : `${Math.round(c.distance_mi).toLocaleString('en-US')} mi`} away`;
+  return tc('{where}, {v} away', { where, v: c.distance_mi < 1 ? 'under 1 mi' : `${Math.round(c.distance_mi).toLocaleString(coreLocale())} mi` });
 }
 
 /** Riders who can be picked as a co-host or ride manager: friends and ride mates, once each, not me. */
@@ -314,7 +315,7 @@ export function pickablePeople(friends: Person[], mates: Person[], me: string | 
   for (const p of [...friends, ...mates]) {
     if (!p.id || seen.has(p.id)) continue;
     seen.add(p.id);
-    out.push({ id: p.id, name: p.name?.trim() || 'Rider' });
+    out.push({ id: p.id, name: p.name?.trim() || tc('Rider') });
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }

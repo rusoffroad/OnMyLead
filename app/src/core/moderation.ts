@@ -1,3 +1,5 @@
+import { coreLocale, tc } from './i18n';
+
 // Reporting and moderation rules shared by the app and the Admin Dashboard (2.0).
 // Pure TypeScript: no React Native, so it is unit tested in core/__tests__.
 
@@ -27,7 +29,7 @@ export function reportSourceLabel(source: string | null | undefined): string | n
 export const SUSPEND_DAYS = [1, 7, 30, 90] as const;
 
 export function suspendLabel(days: number): string {
-  return days === 1 ? '1 Day' : `${days} Days`;
+  return days === 1 ? tc('1 Day') : `${days} Days`;
 }
 
 /** Auth has no "forever": a ban is about 100 years, so anything over 10 years counts as permanent. */
@@ -47,8 +49,8 @@ export function suspensionOf(bannedUntil: string | null | undefined, now: Date =
 export function suspensionLabel(bannedUntil: string | null | undefined, now: Date = new Date()): string | null {
   const s = suspensionOf(bannedUntil, now);
   if (s.state === 'none') return null;
-  if (s.state === 'banned') return 'Banned';
-  return `Suspended until ${s.until.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: s.until.getFullYear() === now.getFullYear() ? undefined : 'numeric' })}`;
+  if (s.state === 'banned') return tc('Banned');
+  return tc('Suspended until {v}', { v: s.until.toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric', year: s.until.getFullYear() === now.getFullYear() ? undefined : 'numeric' }) });
 }
 
 type Msg = { source: 'dm' | 'group_chat' | 'ride_chat'; source_id: string | null; source_name: string | null; sent_at: string };
@@ -110,10 +112,10 @@ export function reportablePeople(input: {
       return !q || p.name.toLowerCase().includes(q);
     });
   const sections: ReportableSection[] = [
-    { title: 'Messaged', people: take(input.dms.map((d) => ({ userId: d.other_id, name: d.other_name || 'Rider', detail: 'Direct messages' }))) },
-    { title: 'Friends', people: take(input.friends.filter((f) => f.status === 'friends').map((f) => ({ userId: f.user_id, name: f.display_name || 'Rider', detail: 'Friend' }))) },
-    { title: 'Ridden With', people: take(input.known.map((k) => ({ userId: k.user_id, name: k.display_name || 'Rider', detail: k.reason }))) },
-    { title: 'Blocked', people: take(input.blocked.map((b) => ({ userId: b.userId, name: b.name || 'Rider', detail: 'You blocked them' }))) },
+    { title: tc('Messaged'), people: take(input.dms.map((d) => ({ userId: d.other_id, name: d.other_name || tc('Rider'), detail: tc('Direct messages') }))) },
+    { title: tc('Friends'), people: take(input.friends.filter((f) => f.status === 'friends').map((f) => ({ userId: f.user_id, name: f.display_name || tc('Rider'), detail: tc('Friend') }))) },
+    { title: tc('Ridden With'), people: take(input.known.map((k) => ({ userId: k.user_id, name: k.display_name || tc('Rider'), detail: k.reason }))) },
+    { title: tc('Blocked'), people: take(input.blocked.map((b) => ({ userId: b.userId, name: b.name || tc('Rider'), detail: tc('You blocked them') }))) },
   ];
   return sections.filter((s) => s.people.length);
 }

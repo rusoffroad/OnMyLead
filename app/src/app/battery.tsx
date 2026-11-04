@@ -29,27 +29,25 @@ export default function BatteryScreen() {
   async function pick(next: BatteryMode) {
     if (next === mode) return;
     const warning = batteryWarning(mode, next);
-    if (warning && !(await confirmAsync(warning.title, warning.message, warning.confirm, 'Keep Current'))) return;
+    if (warning && !(await confirmAsync(warning.title, warning.message, warning.confirm, t('Keep Current')))) return;
     setError(null);
     setBatteryMode(next);
     // A share that is running switches now, not at the next share.
-    applyBatteryPlan().catch(() => setError('Saved, but your current share didn’t switch over. Open Ride Mode to restart sharing with the new setting.'));
+    applyBatteryPlan().catch(() => setError(t('Saved, but your current share didn’t switch over. Open Ride Mode to restart sharing with the new setting.')));
   }
 
   return (
     <Screen width={sideBySide ? 'page' : 'readable'}>
       <Stack.Screen options={{ title: t('Battery Saver') }} />
       <ThemedText themeColor="textSecondary">
-        How often this device tells your group where you are while you share your location. Fewer updates use less battery.
+        {t('How often this device tells your group where you are while you share your location. Fewer updates use less battery.')}
       </ThemedText>
 
       {mode !== DEFAULT_BATTERY_MODE ? (
         <View style={styles.warn} accessibilityLiveRegion="polite">
-          <ThemedText type="smallBold">Your Group Sees You Less Often</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            Your dot can trail up to {BATTERY_PLANS[mode].heartbeatSec} seconds behind you, so you’re harder to follow and to find if you stop.
-          </ThemedText>
-          <Button title="Switch Back to Best Accuracy" kind="secondary" onPress={() => pick(DEFAULT_BATTERY_MODE)} style={{ marginTop: Spacing.two }} />
+          <ThemedText type="smallBold">{t('Your Group Sees You Less Often')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{t('Your dot can trail up to {heartbeatSec} seconds behind you, so you’re harder to follow and to find if you stop.', { heartbeatSec: BATTERY_PLANS[mode].heartbeatSec })}</ThemedText>
+          <Button title={t('Switch Back to Best Accuracy')} kind="secondary" onPress={() => pick(DEFAULT_BATTERY_MODE)} style={{ marginTop: Spacing.two }} />
         </View>
       ) : null}
 
@@ -61,7 +59,7 @@ export default function BatteryScreen() {
       <ErrorText error={error} />
 
       <ThemedText type="small" themeColor="textSecondary">
-        This setting is for this device only. Need Help, EMERGENCY and your other taps still send right away on every setting. Other riders aren’t told which one you picked.
+        {t('This setting is for this device only. Need Help, EMERGENCY and your other taps still send right away on every setting. Other riders aren’t told which one you picked.')}
       </ThemedText>
     </Screen>
   );
@@ -79,12 +77,12 @@ function Option({ mode, on, wide, onPress }: { mode: BatteryMode; on: boolean; w
       style={({ pressed }) => [styles.option, wide && { flex: 1 }, on && styles.optionOn, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.optionHead}>
         <View style={[styles.radio, on && styles.radioOn]}>{on ? <View style={styles.radioDot} /> : null}</View>
-        <Text style={styles.optionTitle}>{p.label}</Text>
-        {recommended ? <Text style={styles.recommended}>Recommended</Text> : null}
+        <Text style={styles.optionTitle}>{t(p.label)}</Text>
+        {recommended ? <Text style={styles.recommended}>{t('Recommended')}</Text> : null}
       </View>
       <Trail heartbeatSec={p.heartbeatSec} fuzzy={p.accuracy === 'balanced'} on={on} />
-      <Text style={styles.short}>{p.short}</Text>
-      <Text style={styles.detail}>{p.detail}</Text>
+      <Text style={styles.short}>{t(p.short)}</Text>
+      <Text style={styles.detail}>{t(p.detail)}</Text>
     </Pressable>
   );
 }

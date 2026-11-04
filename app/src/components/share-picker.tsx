@@ -11,6 +11,7 @@ import { clockText, parseTime } from '@/core/time';
 import { ThemedText } from './themed-text';
 import { Button, ErrorText } from './ui';
 
+import { t as tr } from '@/lib/i18n';
 const label = (min: number) => (min < 60 ? `${min} Min` : min === 60 ? '1 Hour' : `${min / 60} Hours`);
 
 /** A sensible end time for a day picked on the calendar: 6 pm, or an hour from now when that's later today. */
@@ -101,7 +102,7 @@ export function SharePicker({
         onPress={() => setCalendarOpen((o) => !o)}
         style={({ pressed }) => [styles.endRow, { borderColor: calendarOpen ? Colors.accent : Colors.border, opacity: pressed ? 0.85 : 1 }]}>
         <Icon name="calendar" size={20} color={calendarOpen ? Colors.accent : Colors.text} />
-        <ThemedText style={[styles.endRowText, { flex: 1 }]}>Pick an End Date</ThemedText>
+        <ThemedText style={[styles.endRowText, { flex: 1 }]}>{tr('Pick an End Date')}</ThemedText>
         <ThemedText type="smallBold" themeColor="textSecondary">{calendarOpen ? 'Hide' : 'Calendar'}</ThemedText>
       </Pressable>
 
@@ -111,11 +112,11 @@ export function SharePicker({
             value={day}
             onChange={pickDay}
             range={{ first: today, last: sameDateMonthsLater(now, 12) }}
-            note="Sharing stops on its own at the day and time you pick, up to a year out."
+            note={tr('Sharing stops on its own at the day and time you pick, up to a year out.')}
           />
           {day ? (
             <>
-              <TimePicker label="Stop Sharing At" value={time} onChange={(t) => { setTime(t); setError(null); }} />
+              <TimePicker label={tr('Stop Sharing At')} value={time} onChange={(t) => { setTime(t); setError(null); }} />
               <Button
                 title={problem ? 'Share Until Then' : `Share ${capitalize(shareEndText(endAt, now.getTime()))}`}
                 big

@@ -6,6 +6,7 @@ import { Colors, font, themedStyles } from '@/constants/theme';
 import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { stopTimeLabel, waypointAudience, type Waypoint } from '@/core/waypoints';
 
+import { t } from '@/lib/i18n';
 /** One waypoint in a list: its blaze, name, symbol and who sees it. A planned stop shows its number and time. */
 export function WaypointRow({
   waypoint: w, me, ownerName, onPress, first, stop,
@@ -34,7 +35,7 @@ export function WaypointRow({
         <Text style={[styles.meta, w.shared && { color: Colors.sky }, w.planned_stop && styles.stopMeta]} numberOfLines={1}>
           {audience}
         </Text>
-        {w.planned_stop && w.note ? <Text style={styles.note} numberOfLines={2}>{w.note}</Text> : null}
+        {w.planned_stop && w.note ? <Text style={styles.note} numberOfLines={2}>{t(w.note)}</Text> : null}
       </View>
       <Icon name="chevron" size={18} color={Colors.textSecondary} />
     </Pressable>

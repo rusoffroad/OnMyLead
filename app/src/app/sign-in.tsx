@@ -96,8 +96,8 @@ export default function SignIn() {
           setNotice(null);
         }}
         options={[
-          { value: 'sign_in', label: 'Sign In' },
-          { value: 'create', label: 'Create Account' },
+          { value: 'sign_in', label: t('Sign In') },
+          { value: 'create', label: t('Create Account') },
         ]}
       />
 
@@ -117,19 +117,19 @@ export default function SignIn() {
       ) : null}
 
       {mode === 'create' ? (
-        <Field label="Your Name" value={name} onChangeText={setName} placeholder="What riders will see" autoComplete="name" />
+        <Field label={t('Your Name')} value={name} onChangeText={setName} placeholder={t('What riders will see')} autoComplete="name" />
       ) : null}
       <Field
-        label="Email"
+        label={t('Email')}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder={t('you@example.com')}
       />
       <Field
-        label="Password"
+        label={t('Password')}
         value={password}
         onChangeText={setPassword}
         secureTextEntry

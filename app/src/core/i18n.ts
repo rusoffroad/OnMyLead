@@ -116,9 +116,9 @@ export function newerLanguageSetting(local: LanguageSetting, remote: LanguageSet
 }
 
 /** Fills {name} placeholders. A placeholder with no value is left as it is, so a gap is visible. */
-export function fillPlaceholders(text: string, vars?: Record<string, string | number>): string {
+export function fillPlaceholders(text: string, vars?: Record<string, string | number | null | undefined>): string {
   if (!vars) return text;
-  return text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in vars ? String(vars[name]) : whole));
+  return text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in vars ? String(vars[name] ?? '') : whole));
 }
 
 /** The {name} placeholders in a line, sorted, for checking a translation keeps them all. */
@@ -132,7 +132,7 @@ export type Dictionary = Readonly<Record<string, string>>;
  * One line in the rider's language: its translation if there is one, else the English as written.
  * Text that isn't a string (a number, nothing) comes back as it is.
  */
-export function translateWith(dict: Dictionary | null | undefined, text: string, vars?: Record<string, string | number>): string {
+export function translateWith(dict: Dictionary | null | undefined, text: string, vars?: Record<string, string | number | null | undefined>): string {
   const found = dict && Object.prototype.hasOwnProperty.call(dict, text) ? dict[text] : undefined;
   return fillPlaceholders(found || text, vars);
 }
@@ -141,4 +141,23 @@ export function translateWith(dict: Dictionary | null | undefined, text: string,
 export function describeLanguage(choice: LanguageChoice, shown: LanguageCode, matchPhoneWord: string): string {
   const name = languageByCode(shown).name;
   return choice === AUTO_LANGUAGE ? `${name} (${matchPhoneWord})` : name;
+}
+
+type Translator = (text: string, vars?: Record<string, string | number | null | undefined>) => string;
+let coreTranslator: Translator = (text, vars) => fillPlaceholders(text, vars);
+let coreLocaleTag = 'en-US';
+
+/**
+ * Translation for text built in core/ (time left, statuses, summaries). Core stays pure: the app
+ * (lib/i18n.ts) plugs in the rider's language at launch, and tests get English.
+ */
+export function tc(text: string, vars?: Record<string, string | number | null | undefined>): string {
+  return coreTranslator(text, vars);
+}
+/** The rider's BCP-47 tag for dates and numbers built in core/ ('en-US' in tests). */
+export const coreLocale = () => coreLocaleTag;
+/** lib/i18n.ts calls this at launch and on every language change. */
+export function setCoreTranslator(tr: Translator, locale: string) {
+  coreTranslator = tr;
+  coreLocaleTag = locale;
 }

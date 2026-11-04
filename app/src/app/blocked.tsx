@@ -10,6 +10,7 @@ import { initialOf } from '@/core/profile';
 import { loadBlocks, unblockRider, useBlocks } from '@/lib/blocks';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 /** Blocked Riders: everyone this rider blocked, by ride name, each with Unblock. */
 export default function BlockedRiders() {
   const { session, loading } = useSession();
@@ -43,22 +44,21 @@ export default function BlockedRiders() {
   return (
     <Screen>
       <ThemedText themeColor="textSecondary">
-        You don’t see their messages in ride chat or group chat, or get chat notifications from them. They aren’t told.
-        Need Help and EMERGENCY alerts from a ride you’re on always come through.
+        {t('You don’t see their messages in ride chat or group chat, or get chat notifications from them. They aren’t told. Need Help and EMERGENCY alerts from a ride you’re on always come through.')}
       </ThemedText>
       <ErrorText error={error} />
       {blocks.off ? (
         <View style={styles.note}>
-          <ThemedText type="smallBold">Not Switched On Yet</ThemedText>
+          <ThemedText type="smallBold">{t('Not Switched On Yet')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{BLOCKS_NOT_SWITCHED_ON}</ThemedText>
         </View>
       ) : !blocks.loaded ? (
-        <ThemedText themeColor="textSecondary">Loading…</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>
       ) : !blocks.list.length ? (
         <View style={styles.note}>
-          <ThemedText type="smallBold">Nobody Blocked</ThemedText>
+          <ThemedText type="smallBold">{t('Nobody Blocked')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            To block a rider, tap them in a ride’s Going list, or long press one of their messages.
+            {t('To block a rider, tap them in a ride’s Going list, or long press one of their messages.')}
           </ThemedText>
         </View>
       ) : (
@@ -70,7 +70,7 @@ export default function BlockedRiders() {
               </View>
               <ThemedText style={{ flex: 1, fontWeight: 600 }} numberOfLines={1}>{b.name}</ThemedText>
               <Button
-                title="Unblock"
+                title={t('Unblock')}
                 kind="secondary"
                 loading={busy === b.userId}
                 accessibilityLabel={`Unblock ${b.name}`}

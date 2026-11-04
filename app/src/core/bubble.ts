@@ -8,6 +8,7 @@
 import { distanceM, formatDistance, LatLng, milesToMeters } from './geo';
 import { certainGapM } from './precise-location';
 
+import { tc } from './i18n';
 export type RideRole = 'leader' | 'sweep' | 'rider';
 export type BubbleStatus = 'green' | 'yellow' | 'red' | 'unknown';
 export type BubbleReason = 'ok' | 'distance' | 'stopped' | 'no_update' | 'not_sharing';
@@ -155,8 +156,8 @@ export function computeBubble(
 }
 
 function minutes(sec: number): string {
-  const m = Math.max(1, Math.round(sec / 60));
-  return `${m} minute${m === 1 ? '' : 's'}`;
+  const n = Math.max(1, Math.round(sec / 60));
+  return n === 1 ? tc('{n} minute', { n }) : tc('{n} minutes', { n });
 }
 
 function alertMessage(
@@ -166,22 +167,26 @@ function alertMessage(
   fresh: BubbleRider[],
 ): string {
   if (s.reason === 'no_update') {
-    return `No update from ${r.name} for ${minutes(s.sinceUpdateSec ?? 0)}. Showing last known location.`;
+    return tc('No update from {name} for {v}. Showing last known location.', { name: r.name, v: minutes(s.sinceUpdateSec ?? 0) });
   }
-  const where = s.nearestM != null ? `${formatDistance(s.nearestM)} ${direction(r, leader, fresh)} the group` : 'away from the group';
   const moving =
-    s.stoppedSec != null && s.stoppedSec >= 60 ? ` Last moving ${minutes(s.stoppedSec)} ago.` : '';
+    s.stoppedSec != null && s.stoppedSec >= 60 ? ` ${tc('Last moving {time} ago.', { time: minutes(s.stoppedSec) })}` : '';
   if (s.reason === 'stopped' && (s.nearestM ?? 0) < 100) {
-    return `${r.name} has stopped.${moving}`;
+    return tc('{name} has stopped.{moving}', { name: r.name, moving });
   }
-  return `${r.name} is ${where}.${moving}`;
+  if (s.nearestM == null) return tc('{name} is away from the group.{moving}', { name: r.name, moving });
+  const vars = { name: r.name, distance: formatDistance(s.nearestM), moving };
+  const dir = direction(r, leader, fresh);
+  if (dir === 'behind') return tc('{name} is {distance} behind the group.{moving}', vars);
+  if (dir === 'ahead of') return tc('{name} is {distance} ahead of the group.{moving}', vars);
+  return tc('{name} is {distance} away from the group.{moving}', vars);
 }
 
 /**
  * "behind" or "ahead of": project the rider's offset from the rest of the group onto the
  * group's direction of travel (the leader's heading, else the average heading of moving riders).
  */
-function direction(r: BubbleRider, leader: BubbleRider | undefined, fresh: BubbleRider[]): string {
+function direction(r: BubbleRider, leader: BubbleRider | undefined, fresh: BubbleRider[]): 'behind' | 'ahead of' | 'away from' {
   const rest = fresh.filter((o) => o.id !== r.id);
   if (!r.fix || !rest.length) return 'away from';
   const heading = groupHeading(leader, rest);

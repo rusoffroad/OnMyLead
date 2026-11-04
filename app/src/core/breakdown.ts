@@ -5,6 +5,7 @@
  */
 import type { LatLng } from './geo';
 
+import { tc } from './i18n';
 export type StatusKind =
   | 'ok' | 'stopped' | 'need_fuel' | 'mechanical' | 'flat_tire' | 'stuck' | 'lost' | 'need_help' | 'emergency';
 
@@ -38,7 +39,7 @@ export function breakdownSpot(s: TappedStatus | undefined, live: LatLng | null |
 
 /** Leader and tail gunner hear this once per tap, so nobody has to look down to know. */
 export function spokenBreakdown(name: string): string {
-  return `${name} has a mechanical issue. Their location is on the map.`;
+  return tc('{name} has a mechanical issue. Their location is on the map.', { name });
 }
 
 /** Key for "already announced": a new tap of the same button is a new breakdown. */

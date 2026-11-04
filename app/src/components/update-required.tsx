@@ -8,6 +8,7 @@ import { Button } from '@/components/ui';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { appVersion, openStore, useUpdateState } from '@/lib/app-update';
 
+import { t } from '@/lib/i18n';
 // "Not Now" lasts until the app is closed and opened again.
 let notNow = false;
 
@@ -20,7 +21,7 @@ export function UpdateRequired() {
   const state = useUpdateState();
   const [hidden, setHidden] = useState(notNow);
   if (state.kind !== 'required' || hidden) return null;
-  const store = Platform.OS === 'android' ? 'Google Play' : 'the App Store';
+  const store = Platform.OS === 'android' ? 'Google Play' : t('the App Store');
   return (
     <View style={styles.cover} accessibilityViewIsModal>
       <SafeAreaView style={{ flex: 1 }}>
@@ -29,13 +30,11 @@ export function UpdateRequired() {
             <View style={styles.badge}>
               <Icon name="warning" size={40} color={Colors.text} strokeWidth={2.2} />
             </View>
-            <ThemedText style={styles.title} accessibilityRole="header">Please Update OnMyLead</ThemedText>
-            <ThemedText style={styles.text}>
-              This version ({appVersion()}) has a problem that&apos;s fixed in version {state.minimum} or newer, which is in {store} now. Updating keeps all your rides, groups and settings.
-            </ThemedText>
-            <Button title="Update Now" big onPress={openStore} style={{ alignSelf: 'stretch' }} />
+            <ThemedText style={styles.title} accessibilityRole="header">{t('Please Update OnMyLead')}</ThemedText>
+            <ThemedText style={styles.text}>{t('This version ({v}) has a problem that\'s fixed in version {minimum} or newer, which is in {store} now. Updating keeps all your rides, groups and settings.', { v: appVersion(), minimum: state.minimum, store })}</ThemedText>
+            <Button title={t('Update Now')} big onPress={openStore} style={{ alignSelf: 'stretch' }} />
             <Button
-              title="Not Now"
+              title={t('Not Now')}
               kind="ghost"
               onPress={() => {
                 notNow = true;
@@ -44,7 +43,7 @@ export function UpdateRequired() {
               style={{ alignSelf: 'stretch' }}
             />
             <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
-              On a ride with no signal? Tap Not Now. Ride Mode and Help and SOS keep working, and we&apos;ll ask again next time you open the app.
+              {t('On a ride with no signal? Tap Not Now. Ride Mode and Help and SOS keep working, and we\'ll ask again next time you open the app.')}
             </ThemedText>
           </View>
         </ScrollView>

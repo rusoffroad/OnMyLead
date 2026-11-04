@@ -31,6 +31,7 @@ import { useSession } from '@/lib/session';
 import type { Ride, RideMember } from '@/lib/types';
 import { requirePro } from '@/lib/pro';
 
+import { t } from '@/lib/i18n';
 /**
  * Every waypoint on a ride, on a map and in a list: the leader's shared ones and your own. Press and
  * hold the map to drop one (click it on the website), or add one where you're standing. Only riders
@@ -151,17 +152,17 @@ export default function RideWaypoints() {
           <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
         ) : (
           <View style={styles.topRow}>
-            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={{ flexShrink: 1 }}>
+            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel={t('Back')} style={{ flexShrink: 1 }}>
               <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
             </Pressable>
             <Pressable
               onPress={() => setSearching(looking.current ?? center)}
               accessibilityRole="button"
-              accessibilityLabel="Search the Map for a Place"
+              accessibilityLabel={t('Search the Map for a Place')}
               hitSlop={8}
               style={({ pressed }) => [styles.search, pressed && { opacity: 0.8 }]}>
               <Icon name="search" size={17} color={Colors.text} />
-              <Text style={styles.searchText}>Search</Text>
+              <Text style={styles.searchText}>{t('Search')}</Text>
             </Pressable>
           </View>
         )}
@@ -172,7 +173,7 @@ export default function RideWaypoints() {
       <Animated.View {...fold.panHandlers} style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 4 }]}>
         <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Waypoints" fromTop={wide} onFullMap={fullMap.enter} />
-        {wp.offline ? <Text style={styles.offline}>Saved on This Phone</Text> : null}
+        {wp.offline ? <Text style={styles.offline}>{t('Saved on This Phone')}</Text> : null}
         {fold.open ? (
           <>
             <Text style={styles.hint}>{hint}</Text>
@@ -184,8 +185,8 @@ export default function RideWaypoints() {
               </ScrollView>
             ) : null}
             <ErrorText error={error} />
-            {mine ? <Button title="Add at My Location" big pro="waypoints" loading={locating} disabled={!wp.switchedOn} onPress={() => requirePro('waypoints') && addHere()} /> : null}
-            <Text style={styles.privacy}>Waypoints are never public. Shared ones and planned stops show only to riders on this ride.</Text>
+            {mine ? <Button title={t('Add at My Location')} big pro="waypoints" loading={locating} disabled={!wp.switchedOn} onPress={() => requirePro('waypoints') && addHere()} /> : null}
+            <Text style={styles.privacy}>{t('Waypoints are never public. Shared ones and planned stops show only to riders on this ride.')}</Text>
           </>
         ) : null}
         {!fold.open ? <ErrorText error={error} /> : null}

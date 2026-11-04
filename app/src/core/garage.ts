@@ -2,6 +2,7 @@
 
 import { fuelRange, type FuelRange } from './fuel';
 
+import { tc } from './i18n';
 export type VehicleKind = 'vehicle' | 'sxs_utv';
 
 export const VEHICLE_KINDS: { value: VehicleKind; label: string }[] = [
@@ -9,7 +10,7 @@ export const VEHICLE_KINDS: { value: VehicleKind; label: string }[] = [
   { value: 'sxs_utv', label: 'SXS/UTV' },
 ];
 
-export const kindLabel = (k: VehicleKind) => (k === 'sxs_utv' ? 'SXS/UTV' : 'Vehicle');
+export const kindLabel = (k: VehicleKind) => (k === 'sxs_utv' ? 'SXS/UTV' : tc('Vehicle'));
 
 /** The major areas of a build, in display order. Ids match the database check constraint. */
 export const AREAS = [
@@ -31,7 +32,7 @@ export type AreaId = (typeof AREAS)[number]['id'];
 const AREA_ORDER = new Map<string, number>(AREAS.map((a, i) => [a.id, i]));
 
 export const isAreaId = (s: string): s is AreaId => AREA_ORDER.has(s);
-export const areaLabel = (id: string) => AREAS.find((a) => a.id === id)?.label ?? 'Other';
+export const areaLabel = (id: string) => AREAS.find((a) => a.id === id)?.label ?? tc('Other');
 
 export type GarageVehicle = {
   kind: VehicleKind;
@@ -67,11 +68,11 @@ export function parseDollars(input: string): MoneyParse {
   if (!input.trim()) return { ok: true, cents: null };
   const s = input.trim().replace(/^\$/, '').replace(/,/g, '').trim();
   const m = s.match(/^(\d+)(?:\.(\d{0,2}))?$|^\.(\d{1,2})$/);
-  if (!m) return { ok: false, error: 'Enter an amount like 1299.99' };
+  if (!m) return { ok: false, error: tc('Enter an amount like 1299.99') };
   const whole = m[1] ?? '0';
   const frac = (m[2] ?? m[3] ?? '').padEnd(2, '0');
   const cents = Number(whole) * 100 + Number(frac);
-  if (!Number.isSafeInteger(cents)) return { ok: false, error: 'That amount is too large' };
+  if (!Number.isSafeInteger(cents)) return { ok: false, error: tc('That amount is too large') };
   return { ok: true, cents };
 }
 
@@ -135,7 +136,7 @@ export function buildTotals<T extends GarageItem>(items: T[]): BuildTotals<T> {
 export function vehicleTitle(v: Pick<GarageVehicle, 'nickname' | 'year' | 'make' | 'model' | 'trim'>): string {
   const ymm = [v.year, v.make, v.model, v.trim].filter((x) => x != null && String(x).trim() !== '').join(' ');
   if (v.nickname?.trim()) return ymm ? `${v.nickname.trim()} (${ymm})` : v.nickname.trim();
-  return ymm || 'My machine';
+  return ymm || tc('My machine');
 }
 
 /** Fuel range for a vehicle, or null until tank size and mpg are both known. */

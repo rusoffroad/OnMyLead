@@ -13,6 +13,7 @@ import { parseObstacles, type Obstacle } from './obstacles';
 import { distanceM, METERS_PER_MILE, type LatLng } from './geo';
 import { cumulativeM, lineLengthM, locateOnRoute, makeRoute, simplifyLine, type RideRoute } from './route';
 
+import { coreLocale, tc } from './i18n';
 // --- What a trail is ---------------------------------------------------------
 
 export type Difficulty = 'easy' | 'moderate' | 'hard' | 'extreme';
@@ -401,7 +402,7 @@ export function parseTrailRules(raw: unknown): TrailRules {
 /** The rule in words: "3 or more riders rate it 1 or 2 stars for accuracy, and they're at least half of all ratings". */
 export function trailRuleWords(r: TrailRules): string {
   const share = r.badShare === 0.5 ? 'half' : r.badShare === 1 ? 'all' : `${Math.round(r.badShare * 100)}%`;
-  return `${r.minBad} or more riders rate it 1 or 2 stars for accuracy, and they’re at least ${share} of all its ratings`;
+  return tc('{minBad} or more riders rate it 1 or 2 stars for accuracy, and they’re at least {share} of all its ratings', { minBad: r.minBad, share });
 }
 
 export const ACCURACY_WORDS = ['', 'Way Off', 'Mostly Off', 'Close', 'Accurate', 'Spot On'];
@@ -409,7 +410,7 @@ export const QUALITY_WORDS = ['', 'Not Worth It', 'Meh', 'Good', 'Great', 'Epic'
 
 /** "4.6 (12)" or "No Ratings Yet". */
 export function ratingSummary(average: number | null, count: number): string {
-  if (!count || average == null) return 'No Ratings Yet';
+  if (!count || average == null) return tc('No Ratings Yet');
   return `${average.toFixed(1)} (${count})`;
 }
 
@@ -423,7 +424,7 @@ export function feetOrMiles(m: number): string {
   return `${mi.toFixed(1)} mi`;
 }
 
-export const feet = (m: number | null) => (m == null ? null : `${Math.round(m * 3.28084).toLocaleString('en-US')} ft`);
+export const feet = (m: number | null) => (m == null ? null : `${Math.round(m * 3.28084).toLocaleString(coreLocale())} ft`);
 
 /** "1:05:12" or "12:04". */
 export function clock(seconds: number): string {
@@ -552,8 +553,8 @@ export const unseenHidden = (local: LocalTrail[]) => local.filter((l) => l.share
 /** "Mapped by Mia · Mar 2026". */
 export function mappedBy(t: Pick<PublicTrail, 'mapper' | 'createdAt'>): string {
   const d = Date.parse(t.createdAt);
-  const when = Number.isNaN(d) ? '' : ` · ${new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}`;
-  return `Mapped by ${t.mapper}${when}`;
+  const when = Number.isNaN(d) ? '' : ` · ${new Date(d).toLocaleDateString(coreLocale(), { month: 'short', year: 'numeric', timeZone: 'UTC' })}`;
+  return tc('Mapped by {mapper}{when}', { mapper: t.mapper, when });
 }
 
 // --- Rider trails on every map ---------------------------------------------------

@@ -11,6 +11,7 @@ import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { ACCURACY_WORDS, feetOrMiles, QUALITY_WORDS, RIDER_TRAIL_INK, type PublicTrail } from '@/core/nav-trails';
 import { rateTrail } from '@/lib/nav-trails';
 
+import { t } from '@/lib/i18n';
 const GOLD = '#F5C451';
 
 /**
@@ -61,40 +62,40 @@ export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
   return (
     <Modal visible={!!trail} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
-        <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
+        <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={t('Close')} accessibilityRole="button" />
         {trail ? (
           <KeyboardLift>
             <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
               <View style={styles.grip} />
               <SheetScroll {...keyboardScroll} style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.three }}>
                 <View style={{ gap: 4 }}>
-                  <Text style={styles.badge}>User Submitted Trail</Text>
-                  <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>Rate {trail.name}</Text>
+                  <Text style={styles.badge}>{t('User Submitted Trail')}</Text>
+                  <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>{t('Rate {name}', { name: trail.name })}</Text>
                 </View>
                 {done ? (
                   <>
                     <ThemedText>{done}</ThemedText>
-                    <Button title="Done" big onPress={onClose} />
+                    <Button title={t('Done')} big onPress={onClose} />
                   </>
                 ) : (
                   <>
                     <View style={{ gap: 6 }}>
-                      <Text style={styles.q}>How Good Is It to Ride?</Text>
-                      <StarInput label="Trail quality" value={quality} onChange={setQuality} words={QUALITY_WORDS} color={GOLD} />
+                      <Text style={styles.q}>{t('How Good Is It to Ride?')}</Text>
+                      <StarInput label={t('Trail quality')} value={quality} onChange={setQuality} words={QUALITY_WORDS} color={GOLD} />
                     </View>
                     <View style={{ gap: 6 }}>
-                      <Text style={styles.q}>Rode It? How Accurate Is the Line?</Text>
+                      <Text style={styles.q}>{t('Rode It? How Accurate Is the Line?')}</Text>
                       <ThemedText type="small" themeColor="textSecondary">
                         {ridden && ridden > 0
                           ? `You followed ${feetOrMiles(ridden)} of it in Map Mode.`
                           : 'Only rate this if you rode it. Does the line on the map match the trail on the ground?'}
                       </ThemedText>
-                      <StarInput label="Line accuracy" value={accuracy} onChange={setAccuracy} words={ACCURACY_WORDS} color={RIDER_TRAIL_INK} />
+                      <StarInput label={t('Line accuracy')} value={accuracy} onChange={setAccuracy} words={ACCURACY_WORDS} color={RIDER_TRAIL_INK} />
                     </View>
-                    <Field label="Note for the Mapper (Optional)" value={note} onChangeText={setNote} multiline maxLength={300} placeholder="Washed out past the creek, use the bypass" />
+                    <Field label={t('Note for the Mapper (Optional)')} value={note} onChangeText={setNote} multiline maxLength={300} placeholder={t('Washed out past the creek, use the bypass')} />
                     <ErrorText error={error} />
-                    <Button title="Save Rating" big loading={busy} disabled={quality == null && accuracy == null} onPress={send} />
-                    <Button title="Cancel" kind="ghost" onPress={onClose} />
+                    <Button title={t('Save Rating')} big loading={busy} disabled={quality == null && accuracy == null} onPress={send} />
+                    <Button title={t('Cancel')} kind="ghost" onPress={onClose} />
                   </>
                 )}
               </SheetScroll>

@@ -10,7 +10,7 @@ import type { FeatureKey } from '@/core/entitlements';
 import { keyboardScroll, TextBox } from './keyboard';
 import { ProTag } from './pro-tag';
 import { ThemedText } from './themed-text';
-import { tx } from '@/lib/i18n';
+import { t, tx } from '@/lib/i18n';
 
 /**
  * A page. `width` caps how wide its content gets on a tablet or a wide window: 'page' (the default,
@@ -169,7 +169,7 @@ export function Choice<T extends string | number | null>({
       {label ? <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{label}</ThemedText> : null}
       <View style={styles.chips}>
         {options.map((o) => (
-          <Chip key={String(o.value)} role="radio" label={o.label} on={o.value === value} onPress={() => onChange(o.value)} />
+          <Chip key={String(o.value)} role="radio" label={t(o.label)} on={o.value === value} onPress={() => onChange(o.value)} />
         ))}
       </View>
     </View>

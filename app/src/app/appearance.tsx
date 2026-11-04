@@ -33,11 +33,11 @@ export default function AppearanceScreen() {
 
       <View style={styles.group}>
         <View style={styles.titleRow}>
-          <ThemedText type="subtitle">Mode</ThemedText>
+          <ThemedText type="subtitle">{t('Mode')}</ThemedText>
           <ProTag feature="themes" />
         </View>
         <ThemedText type="small" themeColor="textSecondary">
-          Light is easier to read in bright sun. Match Phone follows your device’s own Dark Mode setting.
+          {t('Light is easier to read in bright sun. Match Phone follows your device’s own Dark Mode setting.')}
         </ThemedText>
         <Segmented
           options={MODES}
@@ -49,10 +49,10 @@ export default function AppearanceScreen() {
 
       <View style={styles.group}>
         <View style={styles.titleRow}>
-          <ThemedText type="subtitle">Theme</ThemedText>
+          <ThemedText type="subtitle">{t('Theme')}</ThemedText>
           <ProTag feature="themes" />
         </View>
-        <ThemedText type="small" themeColor="textSecondary">Each theme has a dark and a light version.</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('Each theme has a dark and a light version.')}</ThemedText>
         <View style={styles.skins} accessibilityRole="radiogroup">
           {SKINS.map((s) => (
             <SkinCard key={s.id} skin={s} on={s.id === appearance.skin} columns={columns} onPress={() => (s.id === DEFAULT_APPEARANCE.skin || requirePro('themes')) && setAppearance({ skin: s.id }, HERE)} />
@@ -61,7 +61,7 @@ export default function AppearanceScreen() {
       </View>
 
       <View style={styles.group}>
-        <ThemedText type="subtitle">Color Blind Mode</ThemedText>
+        <ThemedText type="subtitle">{t('Color Blind Mode')}</ThemedText>
         <Pressable
           accessibilityRole="switch"
           accessibilityState={{ checked: appearance.colorBlind }}
@@ -72,8 +72,7 @@ export default function AppearanceScreen() {
           <View style={{ flex: 1, gap: 2 }}>
             <ThemedText type="smallBold">{appearance.colorBlind ? 'On' : 'Off'}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
-              Rider status, alerts, trail ratings and your Track Line switch to colors that red-green and blue-yellow color blind riders can tell
-              apart, and each status gets a symbol so color is never the only clue.
+              {t('Rider status, alerts, trail ratings and your Track Line switch to colors that red-green and blue-yellow color blind riders can tell apart, and each status gets a symbol so color is never the only clue.')}
             </ThemedText>
           </View>
           <Switch
@@ -90,7 +89,7 @@ export default function AppearanceScreen() {
       </View>
 
       <ThemedText type="small" themeColor="textSecondary">
-        Saved on this device. The maps, logo red and logo blue look the same in every theme.
+        {t('Saved on this device. The maps, logo red and logo blue look the same in every theme.')}
       </ThemedText>
     </Screen>
   );
@@ -123,7 +122,7 @@ function SkinCard({ skin, on, columns, onPress }: { skin: Skin; on: boolean; col
         {on ? <Icon name="check" size={18} color={Colors.sky} strokeWidth={2.6} /> : null}
       </View>
       <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>
-        {skin.blurb}
+        {t(skin.blurb)}
       </ThemedText>
     </Pressable>
   );
@@ -133,9 +132,9 @@ function SkinCard({ skin, on, columns, onPress }: { skin: Skin; on: boolean; col
 function Preview() {
   const cb = colorBlindOn();
   const statuses = [
-    { tone: 'green' as const, label: 'Together' },
-    { tone: 'yellow' as const, label: 'Falling Behind' },
-    { tone: 'red' as const, label: 'Separated' },
+    { tone: 'green' as const, label: t('Together') },
+    { tone: 'yellow' as const, label: t('Falling Behind') },
+    { tone: 'red' as const, label: t('Separated') },
   ];
   return (
     <View style={styles.preview} accessibilityLabel={t('Preview of rider status, trail rating and Track Line colors')}>

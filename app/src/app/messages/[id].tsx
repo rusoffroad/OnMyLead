@@ -20,6 +20,7 @@ import { confirmAsync } from '@/lib/confirm';
 import { clearDmThread, riderName, setDmMuted, setOpenDm } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
 
+import { t as tr } from '@/lib/i18n';
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
 const STARTERS = ['Where are you parked?', 'Which trail are you on?', 'Want to ride together?'];
@@ -85,9 +86,9 @@ export default function Conversation() {
     setMenu(false);
     if (!chat.threadId) return;
     const ok = await confirmAsync(
-      'Delete This Conversation?',
+      tr('Delete This Conversation?'),
       `It’s removed from your Messages. ${who} keeps their copy. If they message you again, it comes back.`,
-      'Delete',
+      tr('Delete'),
     );
     if (!ok) return;
     await clearDmThread(chat.threadId).catch(() => {});
@@ -102,7 +103,7 @@ export default function Conversation() {
         <View style={styles.header}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Back"
+            accessibilityLabel={tr('Back')}
             hitSlop={12}
             onPress={() => (router.canGoBack() ? router.back() : router.replace('/messages'))}
             style={styles.back}>
@@ -127,7 +128,7 @@ export default function Conversation() {
           ) : null}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="More"
+            accessibilityLabel={tr('More')}
             accessibilityState={{ expanded: menu }}
             onPress={() => setMenu(!menu)}
             style={styles.pill}>
@@ -148,7 +149,7 @@ export default function Conversation() {
                 const theirs = [...chat.messages].reverse().find((m) => m.sender_id !== me);
                 if (id) setReporting({ kind: 'rider', userId: id, name: who, context: dmReportDetails(theirs?.body), source: 'dm' });
               }}>
-              <Text style={styles.smallBtnText}>Report Rider</Text>
+              <Text style={styles.smallBtnText}>{tr('Report Rider')}</Text>
             </Pressable>
             {!blocks.off && !blocked ? (
               <Pressable
@@ -158,12 +159,12 @@ export default function Conversation() {
                   setMenu(false);
                   if (id) confirmAndBlock(id, who);
                 }}>
-                <Text style={styles.smallBtnText}>Block Rider</Text>
+                <Text style={styles.smallBtnText}>{tr('Block Rider')}</Text>
               </Pressable>
             ) : null}
             {chat.threadId ? (
               <Pressable accessibilityRole="button" style={styles.smallBtn} onPress={deleteConversation}>
-                <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>Delete Conversation</Text>
+                <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>{tr('Delete Conversation')}</Text>
               </Pressable>
             ) : null}
           </View>
@@ -179,17 +180,15 @@ export default function Conversation() {
             onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
             {chat.off ? (
               <View style={styles.note}>
-                <ThemedText type="smallBold">Not Switched On Yet</ThemedText>
+                <ThemedText type="smallBold">{tr('Not Switched On Yet')}</ThemedText>
                 <ThemedText type="small" themeColor="textSecondary">{NOT_SWITCHED_ON}</ThemedText>
               </View>
             ) : null}
 
             {chat.loaded && !chat.off && !chat.messages.length && !chat.pending.length ? (
               <View style={styles.empty}>
-                <Text style={styles.emptyTitle}>Say Hi to {who}</Text>
-                <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 320 }}>
-                  Only {who} sees what you send. Until they reply you can send {left ?? 3}. If you meet up with someone new, meet at a trailhead or staging area.
-                </ThemedText>
+                <Text style={styles.emptyTitle}>{tr('Say Hi to {who}', { who })}</Text>
+                <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 320 }}>{tr('Only {who} sees what you send. Until they reply you can send {v}. If you meet up with someone new, meet at a trailhead or staging area.', { who, v: left ?? 3 })}</ThemedText>
                 <View style={{ gap: Spacing.two, alignSelf: 'stretch', marginTop: Spacing.two }}>
                   {STARTERS.map((s) => (
                     <Pressable key={s} accessibilityRole="button" onPress={() => setDraft(s)} style={styles.starter}>
@@ -212,7 +211,7 @@ export default function Conversation() {
                         delayLongPress={350}
                         accessibilityHint={self ? undefined : 'Long press to report this message'}
                         style={[styles.bubble, self ? styles.bubbleMine : styles.bubbleTheirs]}>
-                        <Text style={[styles.body, self && { color: '#fff' }]}>{m.body}</Text>
+                        <Text style={[styles.body, self && { color: '#fff' }]}>{tr(m.body)}</Text>
                       </Pressable>
                       <View style={styles.meta}>
                         <Text style={styles.time}>{clock(m.sent_at)}</Text>
@@ -228,7 +227,7 @@ export default function Conversation() {
               <View key={p.localId} style={[styles.row, styles.rowMine]}>
                 <View style={[styles.col, { alignItems: 'flex-end' }]}>
                   <View style={[styles.bubble, styles.bubbleMine, { opacity: p.state === 'sending' ? 0.6 : 1 }, p.state === 'failed' && styles.bubbleFailed]}>
-                    <Text style={[styles.body, { color: '#fff' }]}>{p.body}</Text>
+                    <Text style={[styles.body, { color: '#fff' }]}>{tr(p.body)}</Text>
                   </View>
                   <View style={styles.meta}>
                     <SendBadge state={p.state} />
@@ -238,10 +237,10 @@ export default function Conversation() {
                       {p.error ? <Text style={styles.failText}>{p.error}</Text> : null}
                       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
                         <Pressable accessibilityRole="button" onPress={() => chat.retry(p.localId)} style={[styles.smallBtn, { backgroundColor: Colors.accent }]}>
-                          <Text style={styles.smallBtnText}>Retry</Text>
+                          <Text style={styles.smallBtnText}>{tr('Retry')}</Text>
                         </Pressable>
                         <Pressable accessibilityRole="button" onPress={() => chat.discard(p.localId)} style={styles.smallBtn}>
-                          <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>Remove</Text>
+                          <Text style={[styles.smallBtnText, { color: Colors.textSecondary }]}>{tr('Remove')}</Text>
                         </Pressable>
                       </View>
                     </>
@@ -260,7 +259,7 @@ export default function Conversation() {
                 </Text>
               ) : null}
               {blocked ? (
-                <Text style={styles.waitNote}>You blocked {who}. Unblock them from You, Blocked Riders to message them.</Text>
+                <Text style={styles.waitNote}>{tr('You blocked {who}. Unblock them from You, Blocked Riders to message them.', { who })}</Text>
               ) : (
                 <View style={styles.inputRow}>
                   <TextBox
@@ -273,12 +272,12 @@ export default function Conversation() {
                     placeholderTextColor={Colors.textSecondary}
                     maxLength={MAX_MESSAGE_LENGTH}
                     multiline
-                    accessibilityLabel="Message"
+                    accessibilityLabel={tr('Message')}
                     style={styles.input}
                   />
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="Send"
+                    accessibilityLabel={tr('Send')}
                     disabled={!draft.trim() || left === 0}
                     onPress={() => send()}
                     style={({ pressed }) => [styles.send, (!draft.trim() || left === 0) && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>

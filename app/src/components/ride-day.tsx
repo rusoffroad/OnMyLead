@@ -8,6 +8,7 @@ import { daylightBar, daylightCheck, FORECAST_DAYS, spanText, sunTimes, weatherW
 import { useRideForecast } from '@/lib/forecast';
 import type { Ride } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 const clock = (d: Date) => d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
 /** Night on the daylight bar: the navy of the page, a step down from the card. */
@@ -31,8 +32,8 @@ export function RideDay({ ride }: { ride: Ride }) {
   return (
     <Card>
       <View style={styles.head}>
-        <ThemedText type="heading">Ride Day</ThemedText>
-        {forecast ? <ThemedText type="small" themeColor="textSecondary">{forecast.summary}</ThemedText> : null}
+        <ThemedText type="heading">{t('Ride Day')}</ThemedText>
+        {forecast ? <ThemedText type="small" themeColor="textSecondary">{t(forecast.summary)}</ThemedText> : null}
       </View>
 
       {forecast ? (
@@ -41,16 +42,14 @@ export function RideDay({ ride }: { ride: Ride }) {
             {forecast.highF}°<Text style={styles.low}> / {forecast.lowF}°</Text>
           </Text>
           <View style={styles.stats}>
-            {forecast.rainChance != null ? <Stat label="Rain" value={`${forecast.rainChance}%`} /> : null}
+            {forecast.rainChance != null ? <Stat label={t('Rain')} value={`${forecast.rainChance}%`} /> : null}
             {forecast.windMph != null ? (
-              <Stat label="Wind" value={`${forecast.windMph} mph`} detail={forecast.gustMph && forecast.gustMph > forecast.windMph + 5 ? `gusts ${forecast.gustMph}` : undefined} />
+              <Stat label={t('Wind')} value={`${forecast.windMph} mph`} detail={forecast.gustMph && forecast.gustMph > forecast.windMph + 5 ? `gusts ${forecast.gustMph}` : undefined} />
             ) : null}
           </View>
         </View>
       ) : forecast === null ? (
-        <ThemedText type="small" themeColor="textSecondary">
-          The weather shows up here {FORECAST_DAYS} days before the ride.
-        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('The weather shows up here {FORECAST_DAYS} days before the ride.', { FORECAST_DAYS })}</ThemedText>
       ) : null}
 
       {warnings.map((w) => (
@@ -83,17 +82,15 @@ export function RideDay({ ride }: { ride: Ride }) {
             </View>
           </View>
           <View style={styles.sunLabels}>
-            <ThemedText type="small" themeColor="textSecondary">Sunrise {clock(sun.sunrise)}</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">Sunset {clock(sun.sunset)}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Sunrise {v}', { v: clock(sun.sunrise) })}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Sunset {v}', { v: clock(sun.sunset) })}</ThemedText>
           </View>
           <DaylightLine kind={daylight.kind} minutes={'minutes' in daylight ? daylight.minutes : 0} finish={finish} sunset={sun.sunset} />
         </View>
       ) : null}
 
       {forecast ? (
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 12 }}>
-          Forecast for {ride.meet_area_label ? `the area near ${ride.meet_area_label}` : 'the meeting area'}. Weather data by Open-Meteo.com.
-        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 12 }}>{t('Forecast for {v}. Weather data by Open-Meteo.com.', { v: ride.meet_area_label ? t('the area near {place}', { place: ride.meet_area_label }) : t('the meeting area') })}</ThemedText>
       ) : null}
     </Card>
   );
@@ -111,26 +108,20 @@ function Stat({ label, value, detail }: { label: string; value: string; detail?:
 
 function DaylightLine({ kind, minutes, finish, sunset }: { kind: string; minutes: number; finish: Date | null; sunset: Date }) {
   if (kind === 'unknown' || !finish) {
-    return <ThemedText type="small" themeColor="textSecondary">Add a Back By time and we’ll check it against sunset.</ThemedText>;
+    return <ThemedText type="small" themeColor="textSecondary">{t('Add a Back By time and we’ll check it against sunset.')}</ThemedText>;
   }
   if (kind === 'dark') {
     return (
-      <ThemedText style={[styles.verdict, { color: Colors.accent }]}>
-        Back {spanText(minutes)} after dark. Bring lights.
-      </ThemedText>
+      <ThemedText style={[styles.verdict, { color: Colors.accent }]}>{t('Back {v} after dark. Bring lights.', { v: spanText(minutes) })}</ThemedText>
     );
   }
   if (kind === 'close') {
     return (
-      <ThemedText style={[styles.verdict, { color: RideColors.yellow }]}>
-        Back {spanText(minutes)} before sunset. Little room for a breakdown.
-      </ThemedText>
+      <ThemedText style={[styles.verdict, { color: RideColors.yellow }]}>{t('Back {v} before sunset. Little room for a breakdown.', { v: spanText(minutes) })}</ThemedText>
     );
   }
   return (
-    <ThemedText style={styles.verdict}>
-      Back by {clock(finish)}, {spanText(minutes)} before sunset at {clock(sunset)}.
-    </ThemedText>
+    <ThemedText style={styles.verdict}>{t('Back by {v}, {v2} before sunset at {v3}.', { v: clock(finish), v2: spanText(minutes), v3: clock(sunset) })}</ThemedText>
   );
 }
 

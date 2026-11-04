@@ -5,6 +5,7 @@ import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 
+import { t } from '@/lib/i18n';
 /**
  * The way into the Help Center at onmylead.com/help: step-by-step guides for every feature. Shown
  * at the top of Help and Support so it's the first thing riders see when they need help.
@@ -23,7 +24,7 @@ export function HelpCenterCard() {
       <View style={styles.body}>
         <Text style={styles.title}>{HELP_CENTER_TITLE}</Text>
         <Text style={styles.detail}>
-          Step-by-step instructions for everything in OnMyLead, from your first ride to offline maps and Pro.
+          {t('Step-by-step instructions for everything in OnMyLead, from your first ride to offline maps and Pro.')}
         </Text>
         <View style={styles.url}>
           <Text style={styles.urlText}>{HELP_CENTER_DISPLAY}</Text>

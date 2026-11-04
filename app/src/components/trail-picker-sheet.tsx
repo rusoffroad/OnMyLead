@@ -9,6 +9,7 @@ import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { feetOrMiles, RIDER_TRAIL_INK, trackStats, type LocalTrail } from '@/core/nav-trails';
 import { trailLine, useLocalTrails } from '@/lib/nav-trails';
 
+import { t as tr } from '@/lib/i18n';
 /** Pick one of My Trails (Map Mode) to use as a ride's route. */
 export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolean; onPick: (t: LocalTrail) => void; onClose: () => void }) {
   const insets = useSafeAreaInsets();
@@ -16,10 +17,10 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
-        <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
+        <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
         <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
           <View style={styles.grip} />
-          <Text style={styles.title} accessibilityRole="header">Use One of My Trails</Text>
+          <Text style={styles.title} accessibilityRole="header">{tr('Use One of My Trails')}</Text>
           <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.two }}>
             {trails.length ? (
               trails.map((t) => (
@@ -33,11 +34,11 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
               ))
             ) : (
               <ThemedText themeColor="textSecondary">
-                No trails yet. Record or draw one in Map Mode, or save a rider trail, and it shows here.
+                {tr('No trails yet. Record or draw one in Map Mode, or save a rider trail, and it shows here.')}
               </ThemedText>
             )}
           </SheetScroll>
-          <Button title="Cancel" kind="ghost" onPress={onClose} />
+          <Button title={tr('Cancel')} kind="ghost" onPress={onClose} />
         </SwipeSheet>
       </SheetRoot>
     </Modal>
