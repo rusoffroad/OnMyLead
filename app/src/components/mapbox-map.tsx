@@ -7,7 +7,7 @@ import type { LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import {
-  cameraPadding, fitCorners, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON, regionFromCamera,
+  cameraPadding, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON, regionFromCamera,
   TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_SOURCES, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE, TOPO_SOURCE_ID, trailZoomFromMapbox,
   type MapLook,
 } from '@/core/terrain';
@@ -68,7 +68,8 @@ export function MapboxMap({
   children?: ReactNode;
   ref?: Ref<MapboxMapHandle>;
 }) {
-  const shown: MapLook = look ?? trail.look;
+  // A map told to stay flat shows 3D Terrain as plain satellite.
+  const shown: MapLook = look ?? (tilt === false ? flatLook(trail.look) : trail.look);
   const tilts = tilt ?? shown === 'terrain';
   const view = useRef<Mapbox.MapView>(null);
   const camera = useRef<Mapbox.Camera>(null);

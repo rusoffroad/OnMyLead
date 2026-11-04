@@ -9,6 +9,7 @@ sources:
   - app/src/app/(tabs)/find.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/rides-map.tsx
+  - app/src/components/rides-mapbox-map.tsx
   - app/src/components/rides-map-chrome.tsx
   - app/src/components/ride-row.tsx
   - app/src/core/discovery.ts
@@ -60,6 +61,9 @@ Rides in that state show soonest first. To switch states, tap the state's name i
 
 - Each dot is a ride. Blue dots are upcoming rides. Red, glowing dots are live now.
 - Tap a dot to see the ride's name, time and distance, then tap **Open Ride**.
+:::release 2.1
+- Tap the map away from a dot to close the ride's card. The map is drawn by Mapbox, the same on the phone and the website.
+:::
 - Move or zoom the map, then tap **Search This Area** to see rides there. To return, tap the button under the map that starts with **Back to**, such as **Back to Rides Near Me**.
 - Use the **+** and **-** buttons to zoom, and the location button to recenter the map.
 

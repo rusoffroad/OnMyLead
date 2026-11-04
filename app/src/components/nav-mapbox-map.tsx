@@ -9,9 +9,12 @@ import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
 import type { Place } from '@/core/places';
 import type { DayLine } from '@/core/track-line';
 import { snapRadiusM } from '@/core/trail-router';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
+import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle } from './mapbox-map';
+import { StopPin, WaypointPin } from './waypoint-blaze';
 
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
 
@@ -27,7 +30,7 @@ const FOLLOW_MS = followCamDurationMs(1000);
  */
 export function NavMapboxMap({
   trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading,
-  trackLines, obstacles, onObstacle, ref,
+  trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -46,6 +49,11 @@ export function NavMapboxMap({
   trackLines?: DayLine[];
   obstacles?: Obstacle[];
   onObstacle?: (o: Obstacle) => void;
+  /** Waypoints on the map (the rider's own and shared ones); tap a blaze to open it. */
+  waypoints?: Waypoint[];
+  onPressWaypoint?: (w: Waypoint) => void;
+  /** Press and hold the map: the screen decides (drop a waypoint, or look up the trail). Missing: the trail lookup. */
+  onLongPressMap?: (p: LatLng) => void;
   ref?: Ref<NavMapHandle>;
 }) {
   const map = useRef<MapboxMapHandle>(null);
@@ -119,7 +127,7 @@ export function NavMapboxMap({
       initial={center ? { center, zoom: 13 } : null}
       lines={lines}
       onPress={(p) => (measuring ? onMeasure(p, snapRadiusM(mpp.current)) : trail.identifyAt(p.lat, p.lng))}
-      onLongPress={(p) => trail.identifyAt(p.lat, p.lng)}
+      onLongPress={onLongPressMap ?? ((p) => trail.identifyAt(p.lat, p.lng))}
       onUserMove={onUserMove}
       scaleBar
       onReady={() => setReady(true)}
@@ -143,6 +151,20 @@ export function NavMapboxMap({
           </MapboxMarker>
         </>
       ) : null}
+      {(waypoints ?? []).map((w) => (
+        <MapboxMarker key={`w-${w.id}`} at={w}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            onPress={() => onPressWaypoint?.(w)}>
+            {w.planned_stop ? (
+              <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
+            ) : (
+              <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
+            )}
+          </Pressable>
+        </MapboxMarker>
+      ))}
       {measureTaps.map((p, i) => (
         <MapboxMarker key={`m${i}`} at={p}>
           <View style={styles.pin}><Text style={styles.pinText}>{i + 1}</Text></View>

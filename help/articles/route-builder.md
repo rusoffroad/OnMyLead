@@ -10,6 +10,7 @@ sources:
   - app/src/app/r/[code].tsx
   - app/src/app/ride/new.tsx
   - app/src/components/route-builder-map.tsx
+  - app/src/components/route-builder-mapbox-map.tsx
   - app/src/components/route-builder-map.web.tsx
   - app/src/components/map-search.tsx
   - app/src/components/trail-map-overlay.tsx
@@ -136,6 +137,10 @@ You can build the route at onmylead.com too, using the same steps:
 - On a wide screen, the tools panel sits beside the map.
 
 On a tablet held sideways, the tools panel sits beside the map; swipe it up or tap **Hide** to fold it. Held upright, it floats in the bottom corner of the map.
+
+:::release 2.1
+The route builder's map is drawn by Mapbox on every device from 2.1, so it looks the same on the phone and the website. Tapping, dragging a numbered point and the trail lines work as described here. It stays flat: with **3D Terrain** picked, the builder shows plain satellite.
+:::
 
 The website's map has the same layers button: switch to **Topo**, turn trail lines on or off, and see trail names and closed trails in red. A click adds a point while you draw, so to see a trail's card, click its line on a route you aren't editing (an imported GPX route). See [Map Layers and Trails](/help/map-layers). A route you save on the website is in the app as soon as you save it.
 

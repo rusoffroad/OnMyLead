@@ -114,7 +114,7 @@ The screen stays on while Navigate is open.
 
 :::release 2.0
 :::release 2.1
-Pick **3D Terrain** under **Map Style** to explore on the real shape of the land, with contour lines and peak heights. Recording, Track Line and the distance finder work the same in 3D. See [3D Terrain](/help/3d-terrain).
+From 2.1 Map Mode's map is drawn by Mapbox on every device and on onmylead.com, so it looks the same everywhere. Pick **3D Terrain** under **Map Style** to explore on the real shape of the land, with contour lines and peak heights. Recording, Track Line and the distance finder work the same in 3D. See [3D Terrain](/help/3d-terrain).
 :::
 
 ## Track Line

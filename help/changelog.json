@@ -4,6 +4,48 @@
     "slugs": [
       "3d-terrain",
       "map-layers",
+      "find-a-ride",
+      "route-builder",
+      "waypoints-and-planned-stops",
+      "create-a-ride-on-the-website",
+      "offline-maps",
+      "ride-mode",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "mapbox-maps",
+    "why": "Chris (2026-11-04): \"lets just do the full mapbox integration now\". From 2.1 every map (Ride Mode, Map Mode, route builder, waypoints, Find a Ride, area picker, the website's meeting point) is drawn by Mapbox on every device, the website's Ride Mode gets a live map, Free riders get Mapbox's outdoors map, and the 2.0 maps stay as the fallback with no token, with the Mapbox Maps switch off, or with no signal outside a saved pack."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "bluetooth-sharing",
+      "directions",
+      "emergency-and-safety",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "location-sharing",
+      "place-search",
+      "ride-bubble",
+      "ride-chat",
+      "rus-gear",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "mapbox-maps",
+    "why": "Checked against the Mapbox switch: Ride Mode's buttons, panels, statuses, chat, Follow Me, Full Map, Ride Bubble, fuel, directions, place search, the tablet layout and the app settings work the same for riders (only the map underneath changed, and the website's Ride Mode now has Center on Me, which the Follow Me article already describes for the live map), so these articles stay as they are."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "3d-terrain",
+      "map-layers",
       "offline-maps",
       "ride-mode",
       "navigation-mode",

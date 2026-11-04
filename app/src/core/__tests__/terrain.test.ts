@@ -5,7 +5,7 @@ import {
   offlineChoices, planArea, planRide, statusLine, terrainBoxes, terrainBytes, type OfflineMap,
 } from '../offline-maps';
 import {
-  cameraPadding, circlePolygon, feetLabel, fitCorners, insideBox, linesGeoJSON, lookFor, lookPitch, mapboxDraws, mapboxStyleFor,
+  cameraPadding, circlePolygon, feetLabel, fitCorners, flatLook, insideBox, linesGeoJSON, lookFor, lookPitch, mapboxDraws, mapboxStyleFor,
   mapboxTileTemplate, mapboxZoomFor, metersPerPointAt, metersToFeet, OUTDOORS_STYLE_URL, packBounds, packName, pointsGeoJSON,
   regionFromCamera, TERRAIN_IDS, TERRAIN_SOURCES, TERRAIN_STYLE_URL, terrainLayers, terrainShows, tightPoints, TOPO_RASTER_SOURCE,
   trailZoomFromMapbox,
@@ -195,9 +195,11 @@ describe('map looks', () => {
     expect(TOPO_RASTER_SOURCE.maxzoom).toBe(16);
   });
 
-  it('tilts only 3D Terrain', () => {
+  it('tilts only 3D Terrain, and flat maps show it as satellite', () => {
     expect(lookPitch('terrain')).toBe(60);
     expect(lookPitch('satellite')).toBe(0);
+    expect(flatLook('terrain')).toBe('satellite');
+    expect(flatLook('topo')).toBe('topo');
   });
 
   it('draws with Mapbox whenever allowed with signal', () => {

@@ -14,12 +14,15 @@ import {
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
+import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
+import { StopPin, WaypointPin } from './waypoint-blaze';
 
 export type NavMapHandle = {
   /** Move the map to a point, keeping a close zoom. */
@@ -50,7 +53,8 @@ export function NavMap(props: NavMapProps) {
  * while measuring; otherwise it looks up the trail under the finger.
  */
 function FlatNavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, trackLines, obstacles, onObstacle, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, trackLines, obstacles, onObstacle,
+  waypoints, onPressWaypoint, onLongPressMap, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -76,6 +80,11 @@ function FlatNavMap({
   /** Named spots on the trail being drawn, recorded or followed. */
   obstacles?: Obstacle[];
   onObstacle?: (o: Obstacle) => void;
+  /** Waypoints on the map (the rider's own and shared ones); tap a blaze to open it. */
+  waypoints?: Waypoint[];
+  onPressWaypoint?: (w: Waypoint) => void;
+  /** Press and hold the map: the screen decides (drop a waypoint, or look up the trail). Missing: the trail lookup. */
+  onLongPressMap?: (p: LatLng) => void;
   ref?: Ref<NavMapHandle>;
 }) {
   const map = useRef<MapView>(null);
@@ -212,7 +221,11 @@ function FlatNavMap({
         if (measuring) onMeasure({ lat: c.latitude, lng: c.longitude }, snapM());
         else trail.mapProps.onPress(e);
       }}
-      onLongPress={(e) => trail.identifyAt(e.nativeEvent.coordinate.latitude, e.nativeEvent.coordinate.longitude)}>
+      onLongPress={(e) => {
+        const c = e.nativeEvent.coordinate;
+        if (onLongPressMap) onLongPressMap({ lat: c.latitude, lng: c.longitude });
+        else trail.identifyAt(c.latitude, c.longitude);
+      }}>
       <TrailTiles trail={trail} />
       <OwnHeadingMarker own={own} mapHeading={mapHeading} />
       {(trackLines ?? []).map((d) => d.pieces.map((piece, i) => (
@@ -236,6 +249,24 @@ function FlatNavMap({
           <Polyline coordinates={meas} strokeColor={MEASURE_INK} strokeWidth={3.5} lineDashPattern={[8, 5]} zIndex={6} tappable={false} />
         </>
       ) : null}
+      {(waypoints ?? []).map((w) => (
+        <Marker
+          key={`w-${w.id}`}
+          coordinate={{ latitude: w.lat, longitude: w.lng }}
+          anchor={{ x: 0.5, y: 0.5 }}
+          onPress={(e) => {
+            e.stopPropagation?.();
+            onPressWaypoint?.(w);
+          }}
+          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+          zIndex={w.planned_stop ? 4 : w.shared ? 3 : 2}>
+          {w.planned_stop ? (
+            <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
+          ) : (
+            <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
+          )}
+        </Marker>
+      ))}
       {measureTaps.map((p, i) => (
         <Marker key={`m${i}`} coordinate={{ latitude: p.lat, longitude: p.lng }} anchor={{ x: 0.5, y: 0.5 }} tappable={false} zIndex={7}>
           <View style={styles.pin}><Text style={styles.pinText}>{i + 1}</Text></View>

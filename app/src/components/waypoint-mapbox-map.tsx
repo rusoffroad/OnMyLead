@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
 import { Colors, font, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
@@ -66,7 +66,9 @@ export function WaypointMapboxMap({
       initial={center ? { center, zoom: 12.5 } : null}
       lines={lines}
       onReady={() => setReady(true)}
-      onLongPress={onLongPressMap}
+      // On the website a click drops a waypoint (as its map always has); a right-click looks up the trail.
+      onPress={Platform.OS === 'web' ? onLongPressMap : undefined}
+      onLongPress={Platform.OS === 'web' ? undefined : onLongPressMap}
       onIdle={(c) => onCenter?.(c.center)}>
       {route && route.length > 1 ? (
         <>

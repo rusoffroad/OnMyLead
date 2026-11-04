@@ -48,6 +48,11 @@ export function lookFor(base: BaseMap, layersPro: boolean): MapLook {
   return layersPro ? base : 'standard';
 }
 
+/** The look for a map that stays flat (the route builder, waypoints): 3D Terrain shows as plain satellite there. */
+export function flatLook(look: MapLook): MapLook {
+  return look === 'terrain' ? 'satellite' : look;
+}
+
 /** How far the map tilts for a look: only 3D Terrain is tilted. */
 export function lookPitch(look: MapLook): number {
   return look === 'terrain' ? TERRAIN_PITCH : 0;

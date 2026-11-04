@@ -13,6 +13,7 @@ sources:
   - app/src/components/time-picker.tsx
   - app/src/components/waypoint-row.tsx
   - app/src/components/waypoint-map.tsx
+  - app/src/components/waypoint-mapbox-map.tsx
   - app/src/components/waypoint-map.web.tsx
   - app/src/components/map-search.tsx
   - app/src/hooks/use-ride-waypoints.ts
@@ -153,6 +154,10 @@ Tap a waypoint on the map or in the list to open it. You'll see its symbol, who 
 ## On the Website
 
 The waypoints map works on onmylead.com too. Click the map to drop a waypoint, and click a waypoint to open it.
+
+:::release 2.1
+From 2.1 the waypoints map is drawn by Mapbox on every device, so it looks the same on the phone and the website. On the website, right-click a trail line to see its card.
+:::
 
 On a tablet held sideways, the waypoint list sits beside the map; swipe it up or tap **Hide** to fold it.
 

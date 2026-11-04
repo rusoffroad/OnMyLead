@@ -6,10 +6,10 @@ order: 52
 release: "2.1"
 updated: 2026-11-04
 sources:
-  - app/src/components/terrain-map.tsx
-  - app/src/components/terrain-map.web.tsx
-  - app/src/components/group-terrain-map.tsx
-  - app/src/components/nav-terrain-map.tsx
+  - app/src/components/mapbox-map.tsx
+  - app/src/components/mapbox-map.web.tsx
+  - app/src/components/group-mapbox-map.tsx
+  - app/src/components/nav-mapbox-map.tsx
   - app/src/components/trail-map-overlay.tsx
   - app/src/core/terrain.ts
   - app/src/hooks/use-trail-map.ts
@@ -56,4 +56,4 @@ Follow Me and Center on Me work the same as on the flat map.
 
 ## On iPhone, iPad, Android and the Website
 
-3D Terrain works the same on iPhone, iPad, Android phones and tablets. On the website it's in Map Mode; the website's Ride Mode page has no live map.
+3D Terrain works the same on iPhone, iPad, Android phones and tablets, and on the website in Ride Mode and Map Mode. Every map in the app is drawn by Mapbox from 2.1, so the other maps look the same as this one, just flat. See [Map Layers and Trails](/help/map-layers).
