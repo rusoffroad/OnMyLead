@@ -46,7 +46,7 @@ The ride's name, day, meeting time and meeting point can't be changed after the 
 2. In the **You're Organizing** card on **Details**, tap **Edit Ride Details**.
 3. Change what you need and tap **Save Changes**. **Cancel** leaves everything as it was.
 
-You can change the name, the day and meeting time, the departure and expected finish times, the meeting point (search a place, use your location, type coordinates, or tap the map on onmylead.com), the place name, the state a public ride is listed in, the description, destination, route length, difficulty, experience, the vehicles welcome, whether you approve riders, the vehicle and rider limits, what to bring, required equipment, fuel notes and the instructions joined riders see.
+You can change the name, the day and meeting time, the departure and expected finish times, the meeting point (search a place, use your location, type coordinates, or tap the map on onmylead.com), the place name, the state a public ride is listed in, the description, destination, route length, difficulty, experience, the vehicles welcome, whether you approve riders, the vehicle and rider limits, what to bring, required equipment, fuel notes and the instructions joined riders see (on a ride whose meeting point never saved, the instructions box appears once you pick the point).
 
 The box above **Save Changes** says what the save will do before you tap it:
 

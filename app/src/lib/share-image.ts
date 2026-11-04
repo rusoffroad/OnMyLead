@@ -15,7 +15,9 @@ import { captureRef } from 'react-native-view-shot';
 export async function snapshotForShare(
   view: RefObject<View | null>, opts: { width: number; height?: number; name: string },
 ): Promise<string> {
-  const raw = await captureRef(view, { format: 'png', quality: 1, width: opts.width, height: opts.height, result: 'tmpfile' });
+  const captured = await captureRef(view, { format: 'png', quality: 1, width: opts.width, height: opts.height, result: 'tmpfile' });
+  // react-native-view-shot hands back a bare path on iOS; expo-file-system wants a file:// address.
+  const raw = captured.startsWith('file://') ? captured : `file://${captured}`;
   const ctx = ImageManipulator.ImageManipulator.manipulate(raw);
   ctx.resize(opts.height ? { width: opts.width, height: opts.height } : { width: opts.width });
   const image = await ctx.renderAsync();
@@ -36,8 +38,7 @@ export async function snapshotForShare(
 
 function discard(uri: string) {
   try {
-    // react-native-view-shot hands back a bare path on iOS; File wants a file:// address.
-    new File(uri.startsWith('file://') ? uri : `file://${uri}`).delete();
+    new File(uri).delete();
   } catch {
     // A temp file the OS clears later.
   }

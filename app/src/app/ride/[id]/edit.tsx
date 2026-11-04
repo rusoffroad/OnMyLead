@@ -58,7 +58,15 @@ export default function EditRide() {
     })().catch((e) => setError(e instanceof Error ? e.message : t('Could not load the ride.')));
   }, [id, me]);
 
-  const set = <K extends keyof RideEditForm>(key: K, value: RideEditForm[K]) => setForm((f) => (f ? { ...f, [key]: value } : f));
+  const set = <K extends keyof RideEditForm>(key: K, value: RideEditForm[K]) =>
+    setForm((f) => {
+      if (!f) return f;
+      const next = { ...f, [key]: value };
+      // On a ride whose spot never saved, instructions go up with the spot and the box shows once
+      // one is picked; clearing the spot clears them too, rather than dropping them quietly on save.
+      if (key === 'coords' && !details && !parseCoords(String(value))) next.instructions = '';
+      return next;
+    });
 
   // What saving would do right now, worked out as the leader types.
   const preview = useMemo(() => (ride && form ? ridePatch(ride, details, form, new Date()) : null), [ride, details, form]);
@@ -85,6 +93,7 @@ export default function EditRide() {
 
   const whenWhere = canEditWhenAndWhere(ride.status);
   const spot = parseCoords(form.coords);
+  const instructionsShown = !!(details || (whenWhere && spot));
 
   async function pickPlace(p: Place) {
     set('coords', `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
@@ -223,7 +232,7 @@ export default function EditRide() {
         <Field label={t('What to Bring')} value={form.whatToBring} onChangeText={(v) => set('whatToBring', v)} multiline />
         <Field label={t('Required Equipment')} value={form.requiredEquipment} onChangeText={(v) => set('requiredEquipment', v)} multiline placeholder={t('Whip flag, helmet, spare belt')} />
         <Field label={t('Fuel')} value={form.fuelNotes} onChangeText={(v) => set('fuelNotes', v)} placeholder={t('Full tank, no gas on the trail')} />
-        {details || (whenWhere && spot) ? (
+        {instructionsShown ? (
           <Field label={t('Instructions for Joined Riders')} value={form.instructions} onChangeText={(v) => set('instructions', v)} multiline />
         ) : null}
       </Card>
