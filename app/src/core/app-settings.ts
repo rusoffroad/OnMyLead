@@ -27,6 +27,7 @@ export const NO_SETTINGS: AppSettings = { announcement: null, maintenance: null,
 /** The flags the app reads, with the names and notes the Settings page shows (Title Case). */
 export const APP_FLAGS = {
   find_a_ride: { label: 'Find a Ride', hint: 'The Find a Ride button and map, and Public Rides on the home screen. Invite codes and links still work.' },
+  scout: { label: 'Scout (Places to Ride)', hint: 'The Places to Ride switch on the Find tab (off-road parks, OHV areas and trails near the rider, and Suggest a Place). Place pages already open still work.' },
   trip_planner: { label: 'Trip Planner', hint: 'The Trip Planner in the home screen toolkit. Saved trips are kept.' },
   starlink: { label: 'Starlink', hint: 'The Starlink page in the home screen toolkit.' },
   rus_gear: { label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },

@@ -7,7 +7,7 @@ import { circlePolygon } from '@/core/terrain';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { Ride } from '@/lib/types';
 import { MapboxMap, MapboxMarker, type MapFill, type MapboxMapHandle } from './mapbox-map';
-import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, type RidesMapProps } from './rides-map-chrome';
+import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, SpotBubble, SpotPin, type RidesMapProps } from './rides-map-chrome';
 import { t } from '@/lib/i18n';
 
 const FIT = { top: 24, right: 24, bottom: 24, left: 24 };
@@ -18,7 +18,7 @@ const FIT = { top: 24, right: 24, bottom: 24, left: 24 };
  * the flat map (rides-map.tsx). Always satellite here, whatever the rider's Map Style.
  */
 export function RidesMapboxMap({
-  rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail,
+  rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail, spots, onOpenSpot,
 }: RidesMapProps & { trail: TrailMap }) {
   const map = useRef<MapboxMapHandle>(null);
   const [ready, setReady] = useState(false);
@@ -46,6 +46,7 @@ export function RidesMapboxMap({
     [circle],
   );
   const picked = open ? rides.find((r) => r.id === open) ?? null : null;
+  const pickedSpot = open?.startsWith('spot:') ? spots?.find((s) => `spot:${s.id}` === open) ?? null : null;
 
   return (
     <View style={mapFrameStyle(height, full)}>
@@ -76,6 +77,20 @@ export function RidesMapboxMap({
             </Pressable>
           </MapboxMarker>
         ))}
+        {spots?.map((s) => (
+          <MapboxMarker key={`spot-${s.id}`} at={{ lat: s.lat, lng: s.lng }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={s.name} onPress={() => setOpen((o) => (o === `spot:${s.id}` ? null : `spot:${s.id}`))}>
+              <SpotPin spot={s} />
+            </Pressable>
+          </MapboxMarker>
+        ))}
+        {pickedSpot ? (
+          <MapboxMarker at={{ lat: pickedSpot.lat, lng: pickedSpot.lng }} anchor={{ x: 0.5, y: 1.1 }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('Open {name}', { name: pickedSpot.name })} onPress={() => onOpenSpot?.(pickedSpot)}>
+              <SpotBubble spot={pickedSpot} />
+            </Pressable>
+          </MapboxMarker>
+        ) : null}
         {picked ? (
           <MapboxMarker at={{ lat: picked.meet_area_lat, lng: picked.meet_area_lng }} anchor={{ x: 0.5, y: 1.1 }}>
             <Pressable accessibilityRole="button" accessibilityLabel={t('Open {name}', { name: picked.name })} onPress={() => onOpen(picked as Ride)}>
@@ -87,7 +102,8 @@ export function RidesMapboxMap({
       <MapOverlay
         title={title}
         onPressTitle={onPressTitle}
-        count={rides.length}
+        count={spots ? spots.length : rides.length}
+        places={!!spots}
         moved={moved}
         onSearch={
           onSearchArea

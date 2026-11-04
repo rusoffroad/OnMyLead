@@ -96,6 +96,12 @@ Once you've joined a ride, the ride and its details stay on the left, and **Map*
 **Leave Ride** is at the bottom of the left side of the ride page, and at the bottom of the **Riders** list in Ride Mode. See [Join a Ride](/help/join-a-ride).
 :::
 
+:::release 2.1
+## Scout on a Tablet
+
+In [Scout](/help/scout) (**Find** > **Places to Ride**), the distance slider, the filters and the list of places sit on the left and the map fills the rest of the screen, sideways or upright. A place's page puts its details on the left and its map beside them.
+:::
+
 ## Draw a Route and Add Waypoints
 
 With the tablet sideways, the route tools and the waypoint list sit in a panel beside the map. Swipe the panel up or tap **Hide** to fold it. With the tablet upright, the panel floats in the bottom corner of the map; swipe it down to fold it.

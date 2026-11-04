@@ -33,6 +33,10 @@ const css = () => `
 .oml-pin { position: relative; width: 30px; height: 30px; }
 .oml-pin i { position: absolute; left: 6px; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid ${Colors.background}; }
 .oml-pin b { position: absolute; inset: 0; border-radius: 50%; background: ${Colors.accent}; opacity: .3; }
+.oml-spot { position: relative; width: 22px; height: 22px; margin: 4px; border-radius: 7px; background: ${Colors.gold}; border: 2.5px solid ${Colors.background}; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
+.oml-spot::after { content: ''; position: absolute; left: 5px; top: 5px; width: 7px; height: 7px; border-radius: 2px; background: ${Colors.background}; }
+.oml-spot[data-kind="trailhead"]::after { border-radius: 50%; }
+.oml-spot[data-kind="track"]::after { left: 4px; top: 7px; width: 9px; height: 3px; }
 .oml-pop .live { color: ${Colors.accent}; font-family: Barlow_700Bold, sans-serif; font-size: 13px; }
 .oml-pop .t { font-family: BarlowCondensed_700Bold, sans-serif; font-size: 19px; line-height: 22px; color: ${Colors.text}; }
 .oml-pop .s { color: ${Colors.textSecondary}; font-size: 14px; margin-top: 2px; }
