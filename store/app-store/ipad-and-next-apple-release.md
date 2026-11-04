@@ -42,27 +42,31 @@ buttons on one screen, which upright leaves only a sliver of map between the two
 | Google Play 10-inch tablet | 2560 × 1600 | `store/google-play/screenshots/tablet-10/` |
 | Google Play 7-inch tablet | 1920 × 1200 | `store/google-play/screenshots/tablet-7/` |
 
+**2.0 update (2026-11-04):** all sets were re-shot for 2.0 with ten screens; Google Play takes the
+first 8. `store/app-store/listing.md` has the order and captions.
+
 | # | Screen | Caption |
 |---|---|---|
 | 01 | Ride Mode: riders sidebar, live map, status buttons | Everyone on One Live Map |
-| 02 | Ride page, Riders tab: invite card beside the ride | Invite Riders With a Code or QR |
-| 03 | Create a Ride | Plan the Ride on the Big Screen |
-| 04 | Route builder beside the map | Routes That Follow the Trail |
-| 05 | Find a Ride: list beside the map | Find Rides Near You |
-| 06 | Riding group chat | Chat With Your Riding Group |
-| 07 | Offline maps | Save Maps for Places With No Signal |
-| 08 | Ride page, Chat tab with polls | Ride Chat and Quick Polls |
+| 02 | Home: Join a Ride, your group, public rides, Feed | Join a Ride in Seconds |
+| 03 | Map Mode with the tilt tile | Map Mode for Any Trail |
+| 04 | Tilt Meter and Crash Alert | Tilt Meter and Crash Alert |
+| 05 | Events | Rallies, Runs and Ride Weekends |
+| 06 | Social | Share the Ride With Friends |
+| 07 | Badges with Founder and Brand Ambassador | Earn Badges as You Ride |
+| 08 | Route builder beside the map | Routes That Follow the Trail |
+| 09 | Appearance in Light mode | Themes and Light Mode |
+| 10 | Offline maps | Save Maps for Places With No Signal |
 
-Upload in file order. Review copies are in the project folder `onmylead/app-store/screenshots/ipad/`
-and `onmylead/google-play/screenshots/`.
+Upload in file order. Review copies are in the project folder `onmylead/store-2.0/`.
 
 **How they are made.** The real screens from the shared code, exported for web with mock data
 (Slickrock Saturday, the Saturday Crew) by `store/tools/web-shots/build.sh`, which swaps the
 website's stand-ins for what the apps show (the live map on satellite, saved offline maps, no
 "get the app" card or website-only lines). `store/tools/web-shots/shoot.mjs` captures them at
 1366 × 1024 (iPad), 1280 × 800 (10-inch) and 960 × 600 (7-inch) points at 2×, Mountain time, and
-`store/tools/frame_tablet.py` adds the caption band and the device frame. To redo a set after a
-screen changes, run those three steps; then compare against a real iPad and Android tablet once a
+`store/tools/frame_tablet.py` adds the caption band and the device frame. `bash store/tools/web-shots/shots.sh OUT_DIR` runs all
+three steps for every set (phones too, framed by `store/tools/frame_phone.py`); then compare against a real iPad and Android tablet once a
 tablet build exists, and re-shoot anything that differs.
 
 ## 4. Apple Checks for an iPad Build

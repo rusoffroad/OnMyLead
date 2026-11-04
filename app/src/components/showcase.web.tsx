@@ -68,6 +68,7 @@ export function Showcase() {
           <img src="/showcase/logo-lockup.png" alt="OnMyLead" width={158} height={36} />
         </a>
         <nav aria-label="Sections">
+          <a href="#new" onClick={jump('new')}>New in 2.0</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
           <a href="#features" onClick={jump('features')}>Features</a>
@@ -112,6 +113,8 @@ export function Showcase() {
       </section>
 
       <PromoVideo />
+
+      <NewIn2 />
 
       <main>
         <section id="how" className="how" aria-labelledby="how-title">
@@ -326,6 +329,7 @@ export function Showcase() {
               <Feature title="Trip Planner">Packing checklists for each trip, linked to the ride and the machine you’re taking.</Feature>
               <Feature title="Ride Summary and Ride Card">After the ride, see the miles and the group’s totals, then share a ride card.</Feature>
               <Feature title="Badges and Ranks">Earn Bronze, Silver and Gold badges for leading rides, riding tail gunner, riding with your crew and racking up miles, plus the trails you share and rate. Your levels add up to a rank from Rookie to Legend, and they’re earned from real GPS tracks, so nobody can fake one. Riders who represent OnMyLead wear the blue Brand Ambassador badge.</Feature>
+              <Feature title="Badge Leaderboard">See where you rank against riders everywhere, in your country or in your state, by the badge levels you’ve earned. Pick where you ride from, or switch off Show Me to stay off the board. It only ever shows your state or country, never where you are.</Feature>
               <Feature title="Out Riding">At a park for the weekend? Switch on Out Riding to see which riders you know are out near you, or anyone nearby who chose the same, and message them. Riders see roughly how far away you are, never where, and it turns itself off.</Feature>
               <Feature title="Your Feed">See what your friends, the leaders you follow and your riding groups have been riding, the badges they earned and the trails they shared, right on Home. Pick whose posts you see and who sees yours, from friends only to nobody.</Feature>
               <Feature title="Social: Like, Comment and Post">Like any ride, badge, trail or post in your Feed, and open Social to see all your friends’ activity and every comment. Pro riders post ride reports and photos to their profile, comment, and share their rides and badges to Facebook, Instagram or X with one tap. Tap anyone’s picture to see it full size. Your location never goes in a post or a share.</Feature>
@@ -335,7 +339,7 @@ export function Showcase() {
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for 15 minutes to 8 hours, until an end date up to a year out, or until you turn it off, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
-              <Feature title="Tilt Meter and Crash Alert">See your roll and pitch over the map, with a full tilt meter whose axle and wheels lean as you do. Zero it for your mount, set your own limits and get a buzz before a steep side hill. In Ride Mode, a hard hit or a rollover starts a 30 second I’m OK countdown, and if you don’t answer, your group gets an EMERGENCY alert with your location. It works with no signal and sends once you reconnect. It never calls 911.</Feature>
+              <Feature title="Tilt Meter and Crash Alert">See your roll and pitch over the map, with a full tilt meter whose axle and wheels lean as you do. Zero it for your mount, set your own limits and get a buzz before a steep side hill, or switch it off with one tap. In Ride Mode, a hard hit or a rollover starts a 30 second I’m OK countdown, and if you don’t answer, your group gets an EMERGENCY alert with your location. It works with no signal and sends once you reconnect. It never calls 911.</Feature>
               <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>
@@ -558,6 +562,40 @@ function Step({ n, shot, alt, title, text, points }: { n: number; shot: string; 
         </ul>
       </div>
     </li>
+  );
+}
+
+// The headline features of OnMyLead 2.0, each with the real screen (rendered from the app's code
+// with sample riders; remake with store/tools/web-shots/shots.sh).
+const NEW_IN_2 = [
+  { shot: 'home-2', title: 'A New Home', text: 'Join a Ride up front with a box for the code, Create and Find under it, public rides near you, your group and a Feed of your friends’ rides.', alt: 'The new Home screen: the live ride card, the red Join a Ride card with its code box, and the Create a Ride and Find a Ride tiles' },
+  { shot: 'map-mode', title: 'Map Mode', text: 'Your offroad map for solo rides: speed, elevation, heading and trip, custom trails, Track Line and named spots. Free for 8 hours a month.', alt: 'Map Mode on satellite with trails, speed, elevation, heading, trip miles, roll and pitch' },
+  { shot: 'tilt', title: 'Tilt Meter and Crash Alert', text: 'Roll and pitch over the map with your own limits. In Ride Mode, a hard hit or a rollover starts an I’m OK countdown before your group is alerted. It never calls 911.', alt: 'The Tilt screen with Crash Alert on and the roll and pitch dials' },
+  { shot: 'events', title: 'Events', text: 'Rallies, poker runs and ride weekends on one shareable page, with the agenda and the group rides to join.', alt: 'The Events screen with Moab Spring Rally coming up' },
+  { shot: 'social', title: 'Social', text: 'Like and comment on your friends’ rides, badges and trails, and post ride reports with a photo. Your location never goes in a post.', alt: 'The Social screen with posts from riders, likes and comments' },
+  { shot: 'badges', title: 'Badges and Ranks', text: 'Earn Bronze, Silver and Gold from real GPS tracks and climb from Rookie to Legend. Look for the Founder and Brand Ambassador badges.', alt: 'The Badges screen with the OnMyLead Founder and Brand Ambassador badges and the rider’s rank, Veteran' },
+  { shot: 'themes', title: 'Light Mode and Themes', text: 'Dark, Light or Match Phone, four themes and Color Blind Mode, in 12 languages. Your settings follow you to every device.', alt: 'The Appearance screen in Light mode with the Night Navy, Carbon, Desert and Forest themes' },
+];
+
+function NewIn2() {
+  return (
+    <section id="new" className="new2" aria-labelledby="new-title">
+      <div className="new2-inner">
+        <h2 id="new-title" className="section-title">New in OnMyLead 2.0</h2>
+        <p className="section-lede">The biggest update yet, on iPhone, iPad and Android.</p>
+        <ul className="new2-grid">
+          {NEW_IN_2.map((f) => (
+            <li key={f.shot} className="new2-card">
+              <figure className="phone">
+                <img src={`/showcase/${f.shot}.webp`} alt={f.alt} loading="lazy" width={786} height={1596} />
+              </figure>
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 
@@ -947,6 +985,22 @@ const CSS = `
   background: rgba(10, 22, 38, 0.6); color: #fff; font-family: ${display7}; font-size: 17px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .film-btn:hover { background: rgba(10, 22, 38, 0.82); border-color: rgba(241, 244, 248, 0.55); }
 .film-btn[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); }
+
+/* New in 2.0 */
+.new2 { padding: 120px 0 20px; }
+.new2-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); }
+.new2-grid { list-style: none; margin: 56px 0 0; padding: 0; display: grid; gap: 44px 28px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.new2-card .phone { padding: 7px; border-radius: 34px; }
+.new2-card .phone img { border-radius: 27px; display: block; }
+.new2-card h3 { margin-top: 22px; font-size: 30px; line-height: 1; }
+.new2-card p { margin-top: 8px; color: var(--soft); font-size: 16px; line-height: 1.45; }
+@media (max-width: 640px) {
+  .new2 { padding-top: 72px; }
+  .new2-grid { grid-auto-flow: column; grid-auto-columns: 72%; grid-template-columns: none; overflow-x: auto;
+    scroll-snap-type: x mandatory; padding-bottom: 12px; gap: 18px; }
+  .new2-card { scroll-snap-align: start; }
+}
 
 /* How it works */
 .how { padding: 150px 0 40px; }
