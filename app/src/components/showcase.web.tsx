@@ -68,6 +68,7 @@ export function Showcase() {
           <img src="/showcase/logo-lockup.png" alt="OnMyLead" width={158} height={36} />
         </a>
         <nav aria-label="Sections">
+          <a href="#new" onClick={jump('new')}>New in 2.0</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
           <a href="#features" onClick={jump('features')}>Features</a>
@@ -112,6 +113,8 @@ export function Showcase() {
       </section>
 
       <PromoVideo />
+
+      <NewIn2 />
 
       <main>
         <section id="how" className="how" aria-labelledby="how-title">
@@ -560,6 +563,40 @@ function Step({ n, shot, alt, title, text, points }: { n: number; shot: string; 
   );
 }
 
+// The headline features of OnMyLead 2.0, each with the real screen (rendered from the app's code
+// with sample riders; remake with store/tools/web-shots/shots.sh).
+const NEW_IN_2 = [
+  { shot: 'home-2', title: 'A New Home', text: 'Join a Ride up front with a box for the code, Create and Find under it, public rides near you, your group and a Feed of your friends’ rides.', alt: 'The new Home screen: the live ride card, the red Join a Ride card with its code box, and the Create a Ride and Find a Ride tiles' },
+  { shot: 'map-mode', title: 'Map Mode', text: 'Your offroad map for solo rides: speed, elevation, heading and trip, custom trails, Track Line and named spots. Free for 8 hours a month.', alt: 'Map Mode on satellite with trails, speed, elevation, heading, trip miles, roll and pitch' },
+  { shot: 'tilt', title: 'Tilt Meter and Crash Alert', text: 'Roll and pitch over the map with your own limits. In Ride Mode, a hard hit or a rollover starts an I’m OK countdown before your group is alerted. It never calls 911.', alt: 'The Tilt screen with Crash Alert on and the roll and pitch dials' },
+  { shot: 'events', title: 'Events', text: 'Rallies, poker runs and ride weekends on one shareable page, with the agenda and the group rides to join.', alt: 'The Events screen with Moab Spring Rally coming up' },
+  { shot: 'social', title: 'Social', text: 'Like and comment on your friends’ rides, badges and trails, and post ride reports with a photo. Your location never goes in a post.', alt: 'The Social screen with posts from riders, likes and comments' },
+  { shot: 'badges', title: 'Badges and Ranks', text: 'Earn Bronze, Silver and Gold from real GPS tracks and climb from Rookie to Legend. Look for the Founder and Brand Ambassador badges.', alt: 'The Badges screen with the OnMyLead Founder and Brand Ambassador badges and the rider’s rank, Veteran' },
+  { shot: 'themes', title: 'Light Mode and Themes', text: 'Dark, Light or Match Phone, four themes and Color Blind Mode, in 12 languages. Your settings follow you to every device.', alt: 'The Appearance screen in Light mode with the Night Navy, Carbon, Desert and Forest themes' },
+];
+
+function NewIn2() {
+  return (
+    <section id="new" className="new2" aria-labelledby="new-title">
+      <div className="new2-inner">
+        <h2 id="new-title" className="section-title">New in OnMyLead 2.0</h2>
+        <p className="section-lede">The biggest update yet, on iPhone, iPad and Android.</p>
+        <ul className="new2-grid">
+          {NEW_IN_2.map((f) => (
+            <li key={f.shot} className="new2-card">
+              <figure className="phone">
+                <img src={`/showcase/${f.shot}.webp`} alt={f.alt} loading="lazy" width={786} height={1596} />
+              </figure>
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 function Feature({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="feature">
@@ -946,6 +983,22 @@ const CSS = `
   background: rgba(10, 22, 38, 0.6); color: #fff; font-family: ${display7}; font-size: 17px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .film-btn:hover { background: rgba(10, 22, 38, 0.82); border-color: rgba(241, 244, 248, 0.55); }
 .film-btn[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); }
+
+/* New in 2.0 */
+.new2 { padding: 120px 0 20px; }
+.new2-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); }
+.new2-grid { list-style: none; margin: 56px 0 0; padding: 0; display: grid; gap: 44px 28px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.new2-card .phone { padding: 7px; border-radius: 34px; }
+.new2-card .phone img { border-radius: 27px; display: block; }
+.new2-card h3 { margin-top: 22px; font-size: 30px; line-height: 1; }
+.new2-card p { margin-top: 8px; color: var(--soft); font-size: 16px; line-height: 1.45; }
+@media (max-width: 640px) {
+  .new2 { padding-top: 72px; }
+  .new2-grid { grid-auto-flow: column; grid-auto-columns: 72%; grid-template-columns: none; overflow-x: auto;
+    scroll-snap-type: x mandatory; padding-bottom: 12px; gap: 18px; }
+  .new2-card { scroll-snap-align: start; }
+}
 
 /* How it works */
 .how { padding: 150px 0 40px; }
