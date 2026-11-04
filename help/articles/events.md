@@ -72,7 +72,7 @@ Some events are presented (sponsored) by a company. Those show **Presented by** 
 5. Add a website or ticket link if there is one, and tap **Create Event**.
 
 :::release 2.1
-From 2.1 the map under **Where** is on every device, not only the website: tap it to drop the place, and drag the pin to fine-tune it.
+From 2.1 the map under **Where** is on every device, not only the website, and opens near where you are: tap it to drop the place, and drag the pin to fine-tune it.
 :::
 
 The event opens, ready for the rest.

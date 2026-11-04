@@ -40,7 +40,7 @@ Using OnMyLead on the website is a Pro feature. See [Free and Pro](/help/free-vs
 4. Fill in the **Ride Name**, the day under **When**, and the **Meet At** time. Click **Calendar**, then type the date (such as 06/12/2027) in **Type a Date** or click it on the calendar. Click the month's name to jump to another year and month. Any day from today up to three years out works. For **Meet At**, click the time, then click **AM** or **PM**, the hour and the minute; no typing needed. You can also press Tab to move between them and Enter to pick.
 5. Set the **Meeting Point**: type a park, trailhead, town or address in **Search a Place or Address** (just above the map) and pick it, or click the satellite map to drop the pin, then drag the pin to fine-tune it. You can also use your location or type coordinates, and the pin moves there.
 :::release 2.1
-   From 2.1 the meeting-point map is Mapbox's satellite map, the same one the app uses. Clicking and dragging work the same.
+   From 2.1 the meeting-point map is Mapbox's satellite map, the same one the app uses, and it opens near where you are if the browser shares your location. Clicking and dragging work the same.
 :::
 6. Under **The Route**, pick **Mapped** or **Freeride**.
 7. Fill in anything else you want, then click **Create Public Ride** or **Create Private Ride**.

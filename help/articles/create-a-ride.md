@@ -47,7 +47,7 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 10. Tap **Create Public Ride** or **Create Private Ride**.
 
 :::release 2.1
-From 2.1 a satellite map sits under **Search a Place or Address**, on every device. Tap it to drop the meeting point there, then drag the pin to fine-tune the spot. Searching a place, **Use My Current Location** and typed **Coordinates** move the pin too. (The map needs a signal; without one, set the point by search, location or coordinates as before.)
+From 2.1 a satellite map sits under **Search a Place or Address**, on every device. It opens near where you are. Tap it to drop the meeting point there, then drag the pin to fine-tune the spot. Searching a place, **Use My Current Location** and typed **Coordinates** move the pin too. (The map needs a signal; without one, set the point by search, location or coordinates as before.)
 :::
 
 :::release 2.0
