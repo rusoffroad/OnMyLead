@@ -302,6 +302,12 @@ Riders close to you on the same ride keep moving with no service, over Bluetooth
 
 Status taps and quick replies you make with no service wait on your phone and send on their own when you get signal.
 
+:::release 2.1
+## See the Land in 3D
+
+Tap the layers button and pick **3D Terrain** under **Map Style** to see the ride on the real shape of the land, with contour lines and peak heights. Rider dots, the route, waypoints and the regroup pin all show the same way. See [3D Terrain](/help/3d-terrain).
+:::
+
 ## Leave Ride Mode
 
 :::until 2.0

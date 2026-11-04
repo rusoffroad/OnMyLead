@@ -119,6 +119,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 ### Maps
 - `react-native-maps`: Apple Maps on iOS; Google Maps on Android **[Android gap]** (no Maps API
   key configured, so maps are blank on Android today).
+- 3D Terrain (2.1, Mapbox; needs the Mapbox token): Ride Mode and Map Mode on all devices and the website's Map Mode, contours and peaks in feet, Offline Maps 3D downloads, Admin flag terrain_3d.
 - Layers: Satellite, Topo, public Trails and roads (OpenFreeMap / OSM tiles, attribution). Trail name tags, Forest Service names and numbers, and closed trails and roads in red (FS closed roads, BLM OHV-closed routes, OSM access=no, today's FS seasonal closures); same layers and panel on the website's route builder, waypoints and Find maps (1.0.1 / next website deploy).
 - Offline maps (`/maps`, `/maps/area`): download an area or a ride's area, sizes, delete **[Pro]**;
   app only.

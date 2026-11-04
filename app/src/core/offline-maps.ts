@@ -18,13 +18,35 @@ export const IMAGERY_ATTRIBUTION = 'USGS The National Map: Orthoimagery';
 /** USGS caches its aerial photos to zoom 16, like the topo. */
 export const IMAGERY_MAX_NATIVE_Z = 16;
 
-/** What riders pick from. "Trails" downloads the Forest Service, BLM and OpenStreetMap layers. */
-export type OfflineChoice = 'satellite' | 'topo' | 'trails';
+/**
+ * What riders pick from. "Trails" downloads the Forest Service, BLM and OpenStreetMap layers.
+ * "3D Terrain" is saved by Mapbox itself (lib/terrain-offline), not as squares, and is offered
+ * only where 3D Terrain is (see offlineChoices).
+ */
+export type OfflineChoice = 'satellite' | 'topo' | 'trails' | 'terrain';
 export const OFFLINE_CHOICES: { id: OfflineChoice; label: string; layers: OfflineLayer[] }[] = [
   { id: 'satellite', label: 'Satellite', layers: ['imagery'] },
   { id: 'topo', label: 'Topo', layers: ['topo'] },
   { id: 'trails', label: 'Trails', layers: ['mvum', 'blm', 'fsclosed', 'osm'] },
+  { id: 'terrain', label: '3D Terrain', layers: [] },
 ];
+
+/** The choices a rider sees: 3D Terrain only when it is offered on this phone. */
+export function offlineChoices(terrain: boolean) {
+  return OFFLINE_CHOICES.filter((c) => terrain || c.id !== 'terrain');
+}
+
+/**
+ * About how much a 3D Terrain download takes: Mapbox's satellite photo, land height, contours and
+ * names for every 512-point square from zoom 8 to 15 (Mapbox's zoom), measured at about 90 KB a
+ * square together. An estimate for the screens only.
+ */
+export const TERRAIN_SQUARE_BYTES = 90_000;
+export function terrainBytes(box: Box, minZ = 8, maxZ = 15): number {
+  let n = 0;
+  for (let z = minZ; z <= maxZ; z++) n += countInBox(box, z);
+  return n * TERRAIN_SQUARE_BYTES;
+}
 
 export function layersFor(choices: OfflineChoice[]): OfflineLayer[] {
   return OFFLINE_CHOICES.filter((c) => choices.includes(c.id)).flatMap((c) => c.layers);
@@ -97,17 +119,19 @@ export function countInBox(box: Box, z: number): number {
 export type DownloadPlan = { layers: LayerPlan[]; tiles: number; bytes: number; tooBig: OfflineLayer[] };
 
 export function planArea(box: Box, choices: OfflineChoice[]): DownloadPlan {
-  return summarize(layersFor(choices).map((l) => [l, areaLayerPlan(box, l)] as const));
+  return summarize(layersFor(choices).map((l) => [l, areaLayerPlan(box, l)] as const), choices.includes('terrain') ? terrainBytes(box) : 0);
 }
 
 export function planRide(route: LatLng[], choices: OfflineChoice[]): DownloadPlan {
-  return summarize(layersFor(choices).map((l) => [l, rideLayerPlan(route, l)] as const));
+  const box = choices.includes('terrain') ? rideBox(route) : null;
+  return summarize(layersFor(choices).map((l) => [l, rideLayerPlan(route, l)] as const), box ? terrainBytes(box) : 0);
 }
 
-function summarize(entries: (readonly [OfflineLayer, LayerPlan | null])[]): DownloadPlan {
+/** `extraBytes`: Mapbox's 3D Terrain download, which isn't counted in squares. */
+function summarize(entries: (readonly [OfflineLayer, LayerPlan | null])[], extraBytes = 0): DownloadPlan {
   const layers = entries.map(([, p]) => p).filter((p): p is LayerPlan => !!p);
   const tiles = layers.reduce((n, p) => n + p.tiles.length, 0);
-  const bytes = layers.reduce((n, p) => n + p.tiles.length * AVG_TILE_BYTES[p.layer], 0);
+  const bytes = layers.reduce((n, p) => n + p.tiles.length * AVG_TILE_BYTES[p.layer], 0) + extraBytes;
   return { layers, tiles, bytes, tooBig: entries.filter(([, p]) => !p).map(([l]) => l) };
 }
 
@@ -165,9 +189,29 @@ export type OfflineMap = {
   /** Space the saved squares take on the phone. */
   bytes: number;
   createdAt: string;
+  /** 3D Terrain picked: Mapbox's download of it, and how far along it is (0 to 100). */
+  terrain?: TerrainSave;
+  terrainPct?: number;
 };
 
+export type TerrainSave = 'saving' | 'saved' | 'failed';
+
+/** Boxes whose 3D Terrain is on the phone, so the 3D map can show there with no signal. */
+export function terrainBoxes(maps: OfflineMap[]): Box[] {
+  return maps.filter((m) => m.terrain === 'saved').map((m) => m.box);
+}
+
 export function statusLine(m: OfflineMap): string {
+  const flat = flatStatusLine(m);
+  if (m.terrain === 'saving' && m.status !== 'downloading' && m.status !== 'paused') {
+    return `Saving 3D Terrain, ${Math.floor(m.terrainPct ?? 0)}%`;
+  }
+  if (m.terrain === 'failed') return m.total ? `${flat}, 3D Terrain Not Saved` : '3D Terrain Not Saved';
+  if (m.terrain === 'saved' && !m.total) return '3D Terrain Saved';
+  return flat;
+}
+
+function flatStatusLine(m: OfflineMap): string {
   const pct = m.total ? Math.floor(((m.saved + m.failed) / m.total) * 100) : 0;
   switch (m.status) {
     case 'downloading':
