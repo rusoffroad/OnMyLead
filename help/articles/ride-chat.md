@@ -92,6 +92,10 @@ Quick replies sent from Ride Mode, like **On My Way**, also show in the ride cha
 So do messages typed in Ride Mode with **Message**.
 :::
 
+:::release 2.1
+With no service, a quick reply or message from a rider close by arrives over Bluetooth and shows here marked **Via Bluetooth** until OnMyLead has it. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::
+
 ## Message Pop-Ups
 
 When a new message arrives on a ride you're on, a pop-up slides in at the top of the screen, whatever screen you're on.

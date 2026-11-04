@@ -63,6 +63,45 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "bluetooth-sharing",
+      "status-buttons",
+      "ride-chat",
+      "ride-mode",
+      "emergency-and-safety"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "bluetooth-mesh",
+    "why": "Bluetooth Sharing (2.1) grows into a mesh (Chris: the person in the back can talk to the rest of the crew over Bluetooth, and a phone that gets a newer position broadcasts it to the rest): every tap and message goes on the air with or without service, typed messages travel in parts, phones pass items along up to six hops, a phone with service bridges what the server knows to riders with none, the tap card says Reached over Bluetooth and Seen by from Bluetooth receipts, chat shows Via Bluetooth, and the radio slows down with service and nobody in range or on Max Battery Saver."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "directions",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "group-chat",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "privacy",
+      "report-and-block",
+      "ride-bubble",
+      "ride-polls",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "bluetooth-mesh",
+    "why": "Checked against the Bluetooth mesh change: Ride Mode, the chat, the showcase and the outbox gained Bluetooth hooks (every tap and message also goes to nearby phones; a Via Bluetooth tag on messages heard phone to phone), and nothing these articles describe works differently."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "events"
     ],
     "kind": "add",

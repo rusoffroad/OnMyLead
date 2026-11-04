@@ -48,6 +48,11 @@ class OnMyLeadNearbyModule : Module() {
       radio?.sendNow(frames)
     }
 
+    // "normal" or "low" (core/nearby.ts nearbyPower): how hard the radio scans, advertises and sends.
+    Function("setPower") { level: String ->
+      radio?.setPower(level == "low")
+    }
+
     Function("drain") {
       radio?.drain() ?: emptyList<String>()
     }

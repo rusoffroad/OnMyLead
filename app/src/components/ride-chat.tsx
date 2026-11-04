@@ -189,6 +189,7 @@ export function RideChat({
                     {leaderOnly ? (mine ? ', to the leader only' : ', to you only as leader') : ''}, {clock(m.sent_at)}
                   </ThemedText>
                   {resolved ? <Tag label="Resolved" color={RideColors.green} /> : null}
+                  {m.via === 'bluetooth' ? <Tag label="Via Bluetooth" color={Colors.sky} /> : null}
                   {mine ? <SendBadge state="sent" iconOnly={m.id !== myLatestId || pending.length > 0} /> : null}
                   {mine && canManage ? (
                     <Pressable
