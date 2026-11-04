@@ -7,6 +7,7 @@ release: "1.0"
 updated: 2026-11-03
 sources:
   - app/src/app/ride/new.tsx
+  - app/src/components/events/event-or-ride.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/invite-card.tsx
   - app/src/core/entitlements.ts
@@ -42,6 +43,10 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 8. Under **The Route**, tap **Mapped** (you draw the route or import a GPX file next) or **Freeride** (no set route, everyone follows the leader).
 9. Under **Who's Riding**, pick the **Vehicles Welcome**.
 10. Tap **Create Public Ride** or **Create Private Ride**.
+
+:::release 2.0
+Planning a rally or a ride weekend with several rides? That's an event, not one ride. Tap **Event or Public Ride?** at the top of Create a Ride to see the difference, or see [Events](/help/events).
+:::
 
 If you picked **Mapped**, the route builder opens right away so you can draw the trail. See [Build a Route](/help/route-builder). Once the ride is saved you land on its page, ready to invite riders.
 

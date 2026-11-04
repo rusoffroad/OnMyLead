@@ -12,6 +12,7 @@ sources:
   - app/src/components/rides-map-chrome.tsx
   - app/src/components/ride-row.tsx
   - app/src/core/discovery.ts
+  - app/src/components/events/event-or-ride.tsx
   - app/src/lib/api.ts
 related: [join-a-ride, create-a-ride, place-search, approvals-and-waitlist]
 keywords: [find, search, discover, browse, near me, nearby, local rides, by state, public rides, map]
@@ -76,6 +77,10 @@ Dots sit on the ride's general meeting area, within about a mile. The exact meet
 Find shows public rides that are coming up or live right now. Each ride in the list shows its date, time, general area, difficulty, distance and the vehicles welcome. Tap a ride to open its page and join. See [Join a Ride](/help/join-a-ride).
 
 If there are no rides yet, tap **Create a Public Ride** to start one. See [Create a Ride](/help/create-a-ride).
+
+:::release 2.0
+Looking for a rally or a ride weekend? Those are events. Tap **Event or Public Ride?** under the search to see the difference and **See Events** to browse them. See [Events](/help/events).
+:::
 
 :::tip
 The **Rides** tab also lists a few upcoming **Public Rides**. Tap **Find Rides on the Map** (or **See All on the Map**, which shows how many there are) to see them all.

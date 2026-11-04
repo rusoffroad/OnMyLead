@@ -22,6 +22,22 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
   const level = on ? overallLevel(t!, limits) : 'ok';
   const ink = on ? LEVEL_INK[level] : Colors.textSecondary;
   const short = (side: string) => (side === 'Left' ? 'L' : side === 'Right' ? 'R' : side);
+  // Never calibrated: the meter is off, and the tile asks for a calibration instead.
+  if (!reading.zeroed) {
+    return (
+      <Pressable
+        onPress={() => router.push('/tilt')}
+        accessibilityRole="button"
+        accessibilityLabel="Calibrate Tilt"
+        accessibilityHint="Opens the tilt meter so you can calibrate it"
+        hitSlop={6}
+        style={({ pressed }) => [bar ? styles.bar : styles.pill, pressed && { opacity: 0.8 }, style]}>
+        <Icon name="tilt" size={bar ? 22 : 20} color={Colors.textSecondary} strokeWidth={2.3} />
+        <Text style={[styles.calibrate, bar && { flex: 1 }]} numberOfLines={1}>Calibrate Tilt</Text>
+        {bar ? <Icon name="chevron" size={18} color={Colors.textSecondary} /> : null}
+      </Pressable>
+    );
+  }
   return (
     <Pressable
       onPress={() => router.push('/tilt')}
@@ -82,5 +98,6 @@ const styles = themedStyles(() => ({
   value: { fontFamily: font(800, 'display'), fontSize: 18, lineHeight: 21, fontVariant: ['tabular-nums'] },
   valueBar: { fontSize: 22, lineHeight: 25 },
   side: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 15 },
+  calibrate: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   rule: { width: 1, alignSelf: 'stretch', marginVertical: 6, backgroundColor: Glass.edge },
 }));

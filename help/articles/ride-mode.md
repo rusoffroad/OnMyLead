@@ -180,26 +180,39 @@ Tap **Navigate** next to a live rider, or **Go to Last Seen** for a rider whose 
 
 ## See Where You Are on the Route
 
+:::until 2.0
 When the ride has a route, the route strip at the bottom shows the whole route as one straight line from start to finish, with each rider placed by how far along they are. It shows your miles so far, such as **12.3 of 40.1 mi**, and how far you have to go. Below the line it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
+:::
+
+:::release 2.0
+When the ride has a route, the line at the bottom shows your miles so far, such as **12.3 of 40.1 mi**, and how far you have to go. Below the line it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
+:::
 
 If you've added your machine in the [Garage](/help/garage) with its fuel details, the strip also says whether your range covers the route. See [Fuel Range](/help/fuel-range).
 
-:::release 1.0.3
 ### See the Whole Group in Order
 
+:::until 2.0
 Every rider who is sharing has a dot on the route line, strung out in running order: the rear on the left, the front on the right. Each dot sits as close to the rider's real spot as it can, and riders bunched together line up side by side instead of hiding each other, so the leader can see everyone between the front and the rear at a glance.
+:::
+
+:::release 2.0
+Every rider who is sharing has a dot on the leader line, strung out in running order. The leader is always at the far left and the tail gunner is always at the far right. Everyone else sits between them by how far behind the leader they are, and riders bunched together line up side by side instead of hiding each other, so the leader can see the whole group at a glance.
+
+- If the leader isn't sharing, the rider out front takes the left end. With no tail gunner sharing, the rider furthest back takes the right end.
+- A rider who gets ahead of the leader, or drops behind the tail gunner, still shows just inside the ends; tap their dot to see how far ahead or behind they are.
+:::
 
 - **L** in blue is the leader, **S** in purple is the tail gunner, and the red **You** dot is you. Other riders show their initial.
 - A hollow dot is a rider off the route. A grey dashed dot is where a rider was last seen.
 - Tap a dot to see who it is and their place, such as "Mia · 3rd of 6 · 0.4 mi behind the leader".
 - Riders who aren't sharing their location aren't on the line.
 - With a big group, the dots get smaller to fit the line.
-:::
 
 :::release 2.0
 ### See the Group Behind the Leader on a Freeride
 
-A Freeride has no route, so the line at the bottom of Ride Mode shows the group behind the leader instead. The leader is on the right, the rider furthest back is on the left, and everyone else is in order between them.
+A Freeride has no route, so the line at the bottom of Ride Mode shows the group behind the leader instead. The leader is at the far left, the tail gunner (or the rider furthest back) is at the far right, and everyone else is in order between them.
 
 - The top of the line shows how spread out the group is, such as **0.9 mi spread, Leader to Tail Gunner**. When everyone is close, it says how many riders are together.
 - Below the line it tells you where you stand, for example "The leader is 0.3 mi ahead". The leader sees how far back the tail gunner (or the last rider) is.
@@ -260,7 +273,7 @@ The bar also has **Controls**, with a badge counting any other alerts. Tap it, o
 Tap the round **Music** button above **Center on Me** to pause, skip or change the volume of the music on your phone without leaving Ride Mode. See [Control Your Music While You Ride](/help/music-controls).
 
 :::release 2.0
-The **Tilt** tile on the left of the map shows your vehicle's roll and pitch; tap it for the full tilt meter. **Crash Alert** also runs while Ride Mode is open: after a hard hit or a rollover it counts down 30 seconds, and if you don't tap **I'm OK**, your group gets an EMERGENCY alert. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
+The **Tilt** tile on the left of the map shows your vehicle's roll and pitch (until you calibrate the tilt meter it says **Calibrate Tilt**); tap it for the full tilt meter. **Crash Alert** also runs while Ride Mode is open: after a hard hit or a rollover it counts down 30 seconds, and if you don't tap **I'm OK**, your group gets an EMERGENCY alert. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
 :::
 :::
 
