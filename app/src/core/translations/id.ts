@@ -310,6 +310,9 @@ const dict: Record<string, string> = {
   "Your offroad map": "Peta offroad kamu",
   "miles": "mil",
   'Next': 'Berikutnya',
+  "Leaderboard": "Papan Peringkat",
+  "Badge leaderboard": "Papan peringkat lencana",
+  "Where You Ride": "Tempat Kamu Berkendara",
 };
 
 export default dict;
