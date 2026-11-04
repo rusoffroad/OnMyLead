@@ -28,15 +28,16 @@ async function sendOrQueue(item: Item): Promise<boolean> {
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error('timed out')), SEND_TIMEOUT_MS);
   });
+  // Nearby riders on the same ride hear it over Bluetooth right away (lib/nearby.ts), with or
+  // without service: the ones with no service get it from this phone, and if this phone has no
+  // service the first of their phones to get it passes it to the server.
+  if (item.kind === 'status') nearbyStatus(item.rideId, item);
+  else nearbyReply(item.rideId, item);
   try {
     await Promise.race([deliver(item), timeout]);
     return true;
   } catch {
     await AsyncStorage.setItem(KEY, JSON.stringify([...(await read()), item]));
-    // No service: nearby riders on the same ride still hear it over Bluetooth (lib/nearby.ts),
-    // and the first of their phones to get service passes it to the server.
-    if (item.kind === 'status') nearbyStatus(item.rideId, item);
-    else nearbyReply(item.rideId, item);
     return false;
   } finally {
     clearTimeout(timer);

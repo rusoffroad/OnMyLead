@@ -27,6 +27,8 @@ export type ChatMessage = {
   resolved_at?: string | null;
   sent_at: string;
   created_at: string;
+  /** Heard phone to phone (core/nearby), not from the server yet. Gone once the server has it. */
+  via?: 'bluetooth';
 };
 
 /** Longest message the database accepts (it enforces the same limit). */
@@ -90,6 +92,8 @@ export function reconcileMessages(current: ChatMessage[], page: ChatMessage[], l
   const oldest = Math.min(...times);
   const keep = current.filter((m) => {
     if (ids.has(m.id)) return false;
+    // Heard over Bluetooth: the server may not have it yet (the sender has no service).
+    if (m.via) return true;
     const t = Date.parse(m.created_at);
     return t > newest || (page.length >= limit && t < oldest);
   });

@@ -1,8 +1,10 @@
 /**
- * Bluetooth Sharing: with no cell service, Ride Mode passes riders' spots, status taps and quick
- * replies to nearby riders on the same ride, phone to phone (modules/onmylead-nearby is the radio,
- * core/nearby.ts the packets and relay rules). When any phone gets service back, it uploads what
- * it heard (bluetooth_relay_upload), so the whole group shows up for everyone else too.
+ * Bluetooth Sharing: with no cell service, Ride Mode passes riders' spots, status taps, quick
+ * replies and typed messages to nearby riders on the same ride, phone to phone (modules/onmylead-nearby
+ * is the radio, core/nearby.ts the packets and the mesh rules). Every phone passes on what it hears,
+ * so the group stays in touch through the riders in between. A phone with service is a gateway: it
+ * puts what the server knows on the air for the riders near it, and uploads what it heard from them
+ * (bluetooth_relay_upload), so the whole group shows up for everyone else too.
  *
  * Safe everywhere: on the website and in builds without the module, `nearbyAvailable` is false and
  * every function here does nothing.
@@ -16,11 +18,12 @@ import { requireOptionalNativeModule } from 'expo';
 import * as Crypto from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import { useSyncExternalStore } from 'react';
-import { PermissionsAndroid, Platform } from 'react-native';
+import { AppState, PermissionsAndroid, Platform } from 'react-native';
 
 import {
-  NEARBY_INBOX_UUID, NEARBY_OUTBOX_UUID, NEARBY_SERVICE_UUID, NearbyMesh, fromBase64, fromE7, sealFrame, toBase64, uploadRow,
-  type NearbyItem, type NearbyPosition, type NearbyStatus,
+  ACK_DELIVERED, ACK_SEEN, FLAG_FROM_SERVER, FLAG_POSSIBLE_CRASH, NEARBY_INBOX_UUID, NEARBY_OUTBOX_UUID, NEARBY_SERVICE_UUID, NearbyMesh,
+  fromBase64, fromE7, nearbyPower, sealFrame, toBase64, uploadRow,
+  type NearbyItem, type NearbyPosition, type NearbyPower, type NearbyStatus,
 } from '@/core/nearby';
 import { supabase } from './supabase';
 import type { Position, RiderStatusKind } from './types';
@@ -31,6 +34,7 @@ type NearbyNative = {
   stop(): void;
   setOutgoing(frames: string[]): void;
   sendNow(frames: string[]): void;
+  setPower(level: string): void;
   drain(): string[];
   getState(): { state: string; peers: number };
   addListener(event: 'onFrame', l: (e: { data: string }) => void): { remove(): void };
@@ -51,30 +55,43 @@ export const nearbyAvailable = (() => {
 /** 'on' | 'off' (Bluetooth switched off) | 'unauthorized' | 'unsupported' | 'idle' (not running). */
 export type NearbyRadioState = 'on' | 'off' | 'unauthorized' | 'unsupported' | 'starting' | 'idle';
 
+export type NearbyStatusRow = { id: string; user_id: string; status: RiderStatusKind; tapped_at: string; lat: number | null; lng: number | null; possible_crash: boolean };
+export type NearbyReplyRow = { id: string; user_id: string; body: string; at: string };
+export type NearbyAckRow = { userId: string; state: number; at: number };
+
 export type NearbyView = {
   state: NearbyRadioState;
   /** Phones connected right now. */
   peers: number;
+  /** How hard the radio is working. */
+  power: NearbyPower;
   /** Newest spot heard over Bluetooth per rider, shaped like a server row. */
   positions: Record<string, Position>;
   /** Newest status tap heard over Bluetooth per rider. */
-  statuses: Record<string, { id: string; user_id: string; status: RiderStatusKind; tapped_at: string; lat: number | null; lng: number | null; possible_crash: boolean }>;
-  /** Quick replies heard over Bluetooth, newest first. */
-  replies: { id: string; user_id: string; body: string; at: string }[];
+  statuses: Record<string, NearbyStatusRow>;
+  /** Quick replies and messages heard over Bluetooth, newest first. */
+  replies: NearbyReplyRow[];
+  /** Receipts heard for this rider's own taps and messages, by item id: whose phone got it, who saw it. */
+  acks: Record<string, NearbyAckRow[]>;
 };
 
-const EMPTY: NearbyView = { state: 'idle', peers: 0, positions: {}, statuses: {}, replies: [] };
+const EMPTY: NearbyView = { state: 'idle', peers: 0, power: 'normal', positions: {}, statuses: {}, replies: [], acks: {} };
 
-const ROUND_MS = 4_000;
+const ROUND_MS: Record<NearbyPower, number> = { normal: 4_000, low: 10_000 };
 const UPLOAD_MS = 20_000;
 
 type Session = {
   rideId: string;
   mesh: NearbyMesh;
   sharing: boolean;
+  online: boolean;
+  batterySaver: boolean;
+  power: NearbyPower;
   timer: ReturnType<typeof setInterval>;
   subs: { remove(): void }[];
   lastUpload: number;
+  /** Items from other riders this phone got but the rider hasn't seen yet (app not in front). */
+  unseen: Map<string, number>;
 };
 
 let session: Session | null = null;
@@ -207,10 +224,15 @@ export async function startNearby(rideId: string, myId: string): Promise<void> {
   const mesh = new NearbyMesh({ rideId, ...keys }, myId);
   const subs = [
     native.addListener('onFrame', (e) => receive(e.data)),
-    native.addListener('onState', (e) => publish({ state: e.state as NearbyRadioState, peers: e.peers })),
+    native.addListener('onState', (e) => {
+      publish({ state: e.state as NearbyRadioState, peers: e.peers });
+      applyPower();
+    }),
+    // Back in front: everything that arrived while the app was away counts as seen now.
+    AppState.addEventListener('change', (s) => s === 'active' && markUnseenSeen()),
   ];
-  const timer = setInterval(round, ROUND_MS);
-  session = { rideId, mesh, sharing: false, timer, subs, lastUpload: 0 };
+  const timer = setInterval(round, ROUND_MS.normal);
+  session = { rideId, mesh, sharing: false, online: true, batterySaver: false, power: 'normal', timer, subs, lastUpload: 0, unseen: new Map() };
   publish({ ...EMPTY, state: 'starting' });
   try {
     native.start(NEARBY_SERVICE_UUID, NEARBY_INBOX_UUID, NEARBY_OUTBOX_UUID);
@@ -240,6 +262,33 @@ export function setNearbySharing(rideId: string, sharing: boolean) {
   pushOutgoing();
 }
 
+/**
+ * What the radio should know to pick its power: whether this phone has service and whether the
+ * rider chose Max Battery Saver. Ride Mode keeps this in step.
+ */
+export function setNearbyConditions(rideId: string, c: { online: boolean; batterySaver: boolean }) {
+  const s = session;
+  if (!s || s.rideId !== rideId) return;
+  if (s.online === c.online && s.batterySaver === c.batterySaver) return;
+  s.online = c.online;
+  s.batterySaver = c.batterySaver;
+  applyPower();
+}
+
+function applyPower() {
+  const s = session;
+  if (!s || !native) return;
+  const next = nearbyPower({ online: s.online, peers: view.peers, batterySaver: s.batterySaver });
+  if (next === s.power) return;
+  s.power = next;
+  clearInterval(s.timer);
+  s.timer = setInterval(round, ROUND_MS[next]);
+  try {
+    native.setPower(next);
+  } catch {}
+  publish({ power: next });
+}
+
 /** This rider's newest fix (lib/location.ts calls this for every fix, even with the screen off). */
 export function nearbyOwnFix(fix: { lat: number; lng: number; accuracyM: number | null; speedMps: number | null; headingDeg: number | null; at: number }) {
   const s = session;
@@ -247,25 +296,77 @@ export function nearbyOwnFix(fix: { lat: number; lng: number; accuracyM: number 
   if (s.mesh.ownPosition(fix)) pushOutgoing();
 }
 
-/** A status tap that couldn't go out over the internet (lib/outbox.ts). */
+/** A status tap of this rider's (lib/outbox.ts, every tap, with or without service). */
 export function nearbyStatus(rideId: string, t: { id?: string; status: RiderStatusKind; lat: number | null; lng: number | null; tappedAt: string; possibleCrash?: boolean }) {
   const s = session;
   if (!s || s.rideId !== rideId || !t.id || !native) return;
-  const item = s.mesh.ownStatus({ id: t.id, status: t.status, flags: t.possibleCrash ? 1 : 0, lat: t.lat, lng: t.lng, at: Date.parse(t.tappedAt) });
+  const item = s.mesh.ownStatus({ id: t.id, status: t.status, flags: t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0, lat: t.lat, lng: t.lng, at: Date.parse(t.tappedAt) });
   sendNow([item]);
 }
 
-/** A quick reply that couldn't go out over the internet (lib/outbox.ts). */
+/** A quick reply or typed message of this rider's (lib/outbox.ts, every one). */
 export function nearbyReply(rideId: string, r: { id?: string; body: string; tappedAt: string }) {
   const s = session;
   if (!s || s.rideId !== rideId || !r.id || !native) return;
-  sendNow([s.mesh.ownReply({ id: r.id, body: r.body, at: Date.parse(r.tappedAt) })]);
+  sendNow(s.mesh.ownReply({ id: r.id, body: r.body, at: Date.parse(r.tappedAt) }));
 }
 
 /** A tap the rider cancelled stops going out. */
 export function nearbyForget(id: string) {
   session?.mesh.forget(id);
   pushOutgoing();
+}
+
+/** This rider saw these other riders' taps or messages on screen (hooks/use-broadcast useAcknowledge). */
+export function nearbySeen(rideId: string, ids: string[]) {
+  const s = session;
+  if (!s || s.rideId !== rideId || !ids.length) return;
+  const now = Date.now();
+  const items: NearbyItem[] = [];
+  for (const id of ids) {
+    s.unseen.delete(id.toLowerCase());
+    const a = s.mesh.ownAck(id, ACK_SEEN, now);
+    if (a) items.push(a);
+  }
+  if (items.length) sendNow(items);
+}
+
+function markUnseenSeen() {
+  const s = session;
+  if (!s || !s.unseen.size) return;
+  const ids = [...s.unseen.keys()];
+  s.unseen.clear();
+  nearbySeen(s.rideId, ids);
+}
+
+// ---------------------------------------------------------------------------
+// Gateway: with service, what the server knows goes on the air for riders near this phone.
+// ---------------------------------------------------------------------------
+
+/**
+ * Ride Mode's latest picture of the ride from the server. Anything newer than what this phone
+ * already has goes out on the next round (and at once to phones already connected).
+ */
+export function nearbyBridge(rideId: string, data: {
+  positions?: Position[];
+  statuses?: { id: string; user_id: string; status: RiderStatusKind; tapped_at: string; lat: number | null; lng: number | null; possible_crash?: boolean | null }[];
+  messages?: { id: string; user_id: string; body: string; sent_at: string }[];
+}) {
+  const s = session;
+  if (!s || s.rideId !== rideId || !native) return;
+  let changed = false;
+  for (const p of data.positions ?? []) {
+    // A spot this phone heard over Bluetooth comes back here from Ride Mode's own state: the mesh
+    // already has it and says no, so nothing echoes.
+    if (s.mesh.bridgePosition(p.user_id, { lat: p.lat, lng: p.lng, accuracyM: p.accuracy_m ?? null, speedMps: p.speed_mps ?? null, headingDeg: p.heading_deg ?? null, at: Date.parse(p.recorded_at) })) changed = true;
+  }
+  for (const t of data.statuses ?? []) {
+    if (s.mesh.bridgeStatus({ id: t.id, userId: t.user_id, status: t.status, possibleCrash: !!t.possible_crash, lat: t.lat, lng: t.lng, at: Date.parse(t.tapped_at) })) changed = true;
+  }
+  for (const m of data.messages ?? []) {
+    if (s.mesh.bridgeReply({ id: m.id, userId: m.user_id, body: m.body, at: Date.parse(m.sent_at) }).length) changed = true;
+  }
+  if (changed) pushOutgoing();
 }
 
 function sendNow(items: NearbyItem[]) {
@@ -288,13 +389,13 @@ function pushOutgoing() {
 }
 
 export type NearbyEvent =
-  | { kind: 'position'; position: Position }
-  | { kind: 'status'; status: NearbyView['statuses'][string] }
-  | { kind: 'reply'; reply: NearbyView['replies'][number] };
+  | { kind: 'position'; position: Position; fromServer: boolean }
+  | { kind: 'status'; status: NearbyStatusRow; fromServer: boolean }
+  | { kind: 'reply'; reply: NearbyReplyRow; fromServer: boolean };
 
 const itemListeners = new Set<(e: NearbyEvent) => void>();
 
-/** Each new spot, tap or reply heard over Bluetooth, as it arrives. Returns the unsubscribe. */
+/** Each new spot, tap or message heard over Bluetooth, as it arrives. Returns the unsubscribe. */
 export function onNearbyEvent(l: (e: NearbyEvent) => void): () => void {
   itemListeners.add(l);
   return () => {
@@ -316,20 +417,35 @@ function receive(b64: string) {
     item = null;
   }
   if (!item) return;
+  const fromServer = (item.flags & FLAG_FROM_SERVER) !== 0;
   if (item.kind === 'position') {
     const position = asPosition(item);
     publish({ positions: { ...view.positions, [item.userId]: position } });
-    emit({ kind: 'position', position });
-  } else if (item.kind === 'status') {
+    emit({ kind: 'position', position, fromServer });
+    return;
+  }
+  if (item.kind === 'ack') {
+    // The sender's card (hooks/use-broadcast) looks its own tap up here; receipts for others' taps
+    // are small and age out with the mesh.
+    publish({ acks: { ...view.acks, [item.id]: s.mesh.acksFor(item.id) } });
+    return;
+  }
+  // Their phone got it. Seen follows when the rider's screen shows it (nearbySeen), or when the
+  // app comes back in front.
+  const active = AppState.currentState === 'active';
+  const ack = s.mesh.ownAck(item.id, active ? ACK_SEEN : ACK_DELIVERED, Date.now());
+  if (!active) s.unseen.set(item.id, Date.now());
+  if (item.kind === 'status') {
     const status = asStatus(item);
     const prev = view.statuses[item.userId];
     if (!prev || Date.parse(prev.tapped_at) <= item.at * 1000) publish({ statuses: { ...view.statuses, [item.userId]: status } });
-    emit({ kind: 'status', status });
+    emit({ kind: 'status', status, fromServer });
   } else {
     const reply = { id: item.id, user_id: item.userId, body: item.body, at: new Date(item.at * 1000).toISOString() };
     publish({ replies: [reply, ...view.replies].slice(0, 50) });
-    emit({ kind: 'reply', reply });
+    emit({ kind: 'reply', reply, fromServer });
   }
+  if (ack) sendNow([ack]);
   // A new item goes on to the next phone with the next round.
 }
 
@@ -378,11 +494,11 @@ function asPosition(p: NearbyPosition): Position {
   };
 }
 
-function asStatus(s: NearbyStatus) {
+function asStatus(s: NearbyStatus): NearbyStatusRow {
   return {
     id: s.id, user_id: s.userId, status: s.status, tapped_at: new Date(s.at * 1000).toISOString(),
     lat: s.latE7 == null ? null : fromE7(s.latE7), lng: s.lngE7 == null ? null : fromE7(s.lngE7),
-    possible_crash: (s.flags & 1) === 1,
+    possible_crash: (s.flags & FLAG_POSSIBLE_CRASH) === FLAG_POSSIBLE_CRASH,
   };
 }
 

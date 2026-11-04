@@ -4,7 +4,7 @@ summary: Tell the whole group what's happening with one tap, see who got it, and
 category: ride-mode
 order: 20
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/ride-controls.tsx
   - app/src/app/ride/[id]/live.tsx
@@ -128,6 +128,10 @@ Tap **Controls**, or swipe the bar up, to bring the rest back.
 
 Under the headline, the card spells it out, for example "Seen by Sam and Alex. 2 notified by push." or "All 5 riders got it." Tap **✕** to hide the card. It also goes away on its own after 10 minutes.
 
+:::release 2.1
+A blue ring also means a nearby rider's phone got it over Bluetooth, and the line says **Reached Sam over Bluetooth** until it shows on their screen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::
+
 ## Take It Back
 
 Tapped the wrong button? Tap **Cancel** on the card. The status or quick reply is taken back for everyone, the group is told to ignore it, and the notification they got is replaced with one saying you cancelled it.
@@ -137,7 +141,7 @@ Tapped the wrong button? Tap **Cancel** on the card. The status or quick reply i
 If your tap can't go out within a few seconds, the card says **Is Waiting for Signal**. Your tap is saved on your phone and sends by itself when you get service, stamped with the time you tapped it. Tap **Retry Now** to try again right away, or **Cancel** to drop it.
 
 :::release 2.1
-While it waits, riders close by on the same ride still get it over Bluetooth, and if one of their phones gets signal first, it sends it for you. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+While it waits, riders close by on the same ride still get it over Bluetooth, and the card names them: **No signal here. Seen by Sam over Bluetooth.** If one of their phones gets signal first, it sends it for you. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 ## Clear Your Status
