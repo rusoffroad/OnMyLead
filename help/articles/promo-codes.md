@@ -4,7 +4,7 @@ summary: Got an OnMyLead promo code? Redeem it in the app through Apple to get O
 category: pro
 order: 50
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/subscription.tsx
   - app/src/app/pro.tsx

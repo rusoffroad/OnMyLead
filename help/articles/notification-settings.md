@@ -4,7 +4,7 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/notifications.tsx
   - app/src/core/notifications.ts

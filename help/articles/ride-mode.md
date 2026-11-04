@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/tilt-tile.tsx
   - app/src/hooks/use-crash-alert.ts
