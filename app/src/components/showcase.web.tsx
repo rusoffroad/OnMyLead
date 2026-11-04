@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_MAP_FEATURES, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -295,6 +295,12 @@ export function Showcase() {
             </p>
             <ul className="ticks">
               <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
+              {SHOWCASE_MAP_FEATURES ? (
+                <li><b>Map Features.</b> Pick what the map shows: highways and paved roads in blue, dirt roads, street-legal-only roads, off-road trails, width-limited trails, and hiking trails in their own pink dash-dot so you never mistake one for a ride. Turn on national forests, BLM land, national and state parks, and Texas property lines, then tap the map to see whose land you’re on.</li>
+              ) : null}
+              {SHOWCASE_PARK_TRAILS ? (
+                <li><b>Offroad Park Trails.</b> The trails of Hidden Falls, Katemcy Rocks, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR and about fifty more parks and OHV areas, drawn on every map in the park’s own levels: green for 1 and 2, blue 3, white 4, red 5, with the park’s name from far out and trail names up close. Tap one for its level and length.</li>
+              ) : null}
               {SHOWCASE_3D_TERRAIN ? (
                 <li><b>3D Terrain.</b> One tap on the 3D button in Ride Mode and Map Mode shows satellite on the real shape of the ridges and canyons, with contour lines and peak heights in feet. Tilt and turn it, and save it in Offline Maps for no-signal riding.</li>
               ) : null}
@@ -327,6 +333,7 @@ export function Showcase() {
               <Feature title="Your Music, Without Leaving the Map">Tap the Music button in Ride Mode to pause, skip a song or turn it up, with buttons big enough for gloves. On Android it works with Spotify, YouTube Music, Pandora and the rest; on iPhone and iPad with Apple Music, plus the volume of any app. Don’t want it? Hide it.</Feature>
               <Feature title="CarPlay, New in 2.1">Plug your iPhone into a CarPlay truck or Jeep and your ride is on the car screen: big buttons for OK, Stopped, Need Fuel, Mechanical Issue and Need Help, your group, Regroup Here for the leader, and EMERGENCY. When a rider falls behind or needs help, it pops up on the dash.</Feature>
               <Feature title="Edit Ride Details, New in 2.1">Plans change. The organizer changes the name, day, time, meeting point or any detail from the ride page, on the phone or at onmylead.com. Everyone on the ride is told about a new time or meeting spot, and the ride page shows what changed.</Feature>
+              <Feature title="Scout: Places to Ride, New in 2.1">Find a new place to ride. Scout, on the Find tab, shows off-road parks, OHV areas, trail systems, trailheads and motocross tracks around you, 250 miles out to start and anywhere from 10 to 1,000 on the slider. Each place has directions, the public rides coming up there and Create a Ride Here. Places come from the Forest Service, BLM and OpenStreetMap, and riders suggest the ones we’re missing.</Feature>
               <Feature title="Ride Again">Ran a great ride? One tap copies it, meeting point and route included. Pick the new day and send the invite.</Feature>
               <Feature title="Planned Stops">The leader marks where the whole ride will stop for fuel, lunch or camp, with a time. Everyone on the ride sees them numbered on the map, in order, and nobody else does.</Feature>
               <Feature title="Directions in Apple Maps or Google Maps">Search a street address, a trailhead or a town for the meeting point. One tap opens turn-by-turn on the roads to the meeting point, the destination, a waypoint or along the route.</Feature>

@@ -127,6 +127,10 @@ Download before you leave, while you have good signal. Then open the ride once s
 
 :::release 1.0.1
 The Forest Service's closed roads are saved too, so closed lines still show red with no signal. Seasonal closures need a signal to load.
+
+:::release 2.1
+**Trails** also saves the Forest Service's hiking trails. With no signal, a downloaded map shows every saved trail line whatever you picked in **Map Features**, since the lines are saved together. Land boundaries (national forests, BLM land, parks and property lines) aren't saved yet; they show when you have signal. See [Map Layers and Trails](/help/map-layers).
+:::
 :::
 
 Trail and topo areas you've already looked at with signal are also kept on your phone for a while, but only a download makes sure the whole area is there.

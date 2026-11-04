@@ -42,6 +42,10 @@ Or swipe the panel down: a long swipe (or a quick flick) goes straight to Full M
 
 In [Find a Ride](/help/find-a-ride), tap the **Full Map** button at the top of the buttons on the map's right edge.
 
+:::release 2.1
+[Scout](/help/scout) (**Places to Ride** on the Find tab) has the same **Full Map** button.
+:::
+
 ## Bring the Buttons Back
 
 Tap **Controls** in the bar at the bottom, or swipe the bar up.

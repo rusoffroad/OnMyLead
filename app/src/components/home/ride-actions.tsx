@@ -31,7 +31,11 @@ const quotaText = (text: string) => {
   return left ? t('{n} Left This Month', { n: left[1] }) : t(text);
 };
 
-/** Join a Ride: the big red card at the top, with the invite code box right in it. */
+/**
+ * Join a Ride: the big red card at the top, with the invite code box right in it. Kept short so
+ * Join, Create, Find, Events and Map Mode all fit on one phone screen (Chris 2026-11-04); the code
+ * box's own placeholder says what to type, so there's no extra line for it.
+ */
 export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: string) => void; onOpen: () => void }) {
   const ready = code.trim().length >= 4;
   return (
@@ -39,10 +43,9 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
       <Gradient colors={['#F0323A', '#C41820', '#9E1218']} angle="diagonal" radius={28} />
       <Topo />
       <View style={styles.heroTop}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.heroTitle} accessibilityRole="header">{t('Join a Ride')}</Text>
-          <Text style={styles.heroDetail}>{t('Got a code from the leader? Type it here.')}</Text>
-        </View>
+        <Text style={styles.heroTitle} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+          {t('Join a Ride')}
+        </Text>
         <Pill text={quotaText(JOIN_QUOTA.text)} tone="onRed" />
       </View>
       <View style={styles.codeBox}>
@@ -56,7 +59,7 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
           placeholder={t('Invite code, e.g. 7F3A9C21')}
           placeholderTextColor="rgba(255,255,255,0.62)"
           selectionColor="#fff"
-          accessibilityLabel={t('Invite code')}
+          accessibilityLabel={t('Got a code from the leader? Type it here.')}
           style={styles.codeInput}
         />
         <Pressable
@@ -113,8 +116,9 @@ export function ActionTiles({
 /**
  * One half of the Create / Find pair. Both are the same dark card (Join a Ride above is the one
  * red card); Create gets red only as an accent: its icon chip and a thin red edge along the top.
- * Icon, title and detail line up across the pair, and the pill always sits on the card's bottom
- * edge, so the two cards read as one even row whatever the text wraps to.
+ * Icon and title sit side by side and the pill always sits on the card's bottom edge, so the two
+ * cards read as one even row whatever the text wraps to. The detail line is read out by screen
+ * readers but not shown, which keeps the home screen's five actions on one screen.
  */
 function Tile({
   icon, title, detail, onPress, pill, accent,
@@ -125,14 +129,13 @@ function Tile({
       accessibilityLabel={`${title}. ${detail}`}
       onPress={onPress}
       style={({ pressed }) => [styles.tile, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-      <Gradient colors={[Home.panel2, Home.panel]} radius={22} />
+      <Gradient colors={[Home.panel2, Home.panel]} radius={20} />
       {accent ? <View style={styles.accentEdge} /> : null}
-      <View style={[styles.tileIcon, accent && styles.tileIconRed]}>
-        <Icon name={icon} size={22} color={accent ? Colors.accent : Colors.text} strokeWidth={2.4} />
-      </View>
-      <View style={styles.tileBody}>
+      <View style={styles.tileHead}>
+        <View style={[styles.tileIcon, accent && styles.tileIconRed]}>
+          <Icon name={icon} size={20} color={accent ? Colors.accent : Colors.text} strokeWidth={2.4} />
+        </View>
         <Text style={styles.tileTitle} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
-        <Text style={styles.tileDetail} numberOfLines={2}>{detail}</Text>
       </View>
       {pill ? <View style={styles.tilePill}>{pill}</View> : null}
     </Pressable>
@@ -140,28 +143,26 @@ function Tile({
 }
 
 const styles = themedStyles(() => ({
-  hero: { borderRadius: 28, padding: 22, overflow: 'hidden', gap: Spacing.three },
-  heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
-  heroTitle: { color: '#fff', fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 44 },
-  heroDetail: { color: 'rgba(255,255,255,0.84)', fontFamily: font(500), fontSize: 15, lineHeight: 20, marginTop: 6 },
+  hero: { borderRadius: 26, paddingHorizontal: 18, paddingTop: 16, paddingBottom: 14, overflow: 'hidden', gap: 10 },
+  heroTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  heroTitle: { flex: 1, color: '#fff', fontFamily: font(800, 'display'), fontSize: 38, lineHeight: 40 },
   codeBox: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.two, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)',
-    backgroundColor: 'rgba(0,0,0,0.22)', paddingLeft: 14, padding: 6,
+    backgroundColor: 'rgba(0,0,0,0.22)', paddingLeft: 14, padding: 5,
   },
   codeInput: { flex: 1, minWidth: 0, minHeight: 44, color: '#fff', fontFamily: font(600), fontSize: 17, letterSpacing: 1.5 },
-  codeGo: { backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 18, minHeight: 44, justifyContent: 'center' },
+  codeGo: { backgroundColor: '#fff', borderRadius: 11, paddingHorizontal: 18, minHeight: 44, justifyContent: 'center' },
   codeGoText: { color: '#B3161D', fontFamily: font(700, 'display'), fontSize: 19 },
-  scan: { color: 'rgba(255,255,255,0.75)', fontFamily: font(500), fontSize: 13, marginTop: -6 },
+  scan: { color: 'rgba(255,255,255,0.75)', fontFamily: font(500), fontSize: 12.5, lineHeight: 16, marginTop: -3 },
   pair: { flexDirection: 'row', alignItems: 'stretch', gap: 12 },
   tile: {
-    flex: 1, minHeight: 168, borderRadius: 22, padding: 16, overflow: 'hidden', gap: 14,
+    flex: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 13, overflow: 'hidden', gap: 10,
     borderWidth: 1, borderColor: Home.line, backgroundColor: Home.panel,
   },
   accentEdge: { position: 'absolute', left: 0, right: 0, top: 0, height: 3, backgroundColor: Colors.accent },
-  tileIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)' },
+  tileHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  tileIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)' },
   tileIconRed: { backgroundColor: 'rgba(229,38,46,0.14)', borderWidth: 1, borderColor: 'rgba(229,38,46,0.38)' },
-  tileBody: { gap: 4 },
-  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 28 },
-  tileDetail: { color: Home.muted, fontFamily: font(500), fontSize: 13, lineHeight: 17, minHeight: 34 },
+  tileTitle: { flex: 1, minWidth: 0, color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 23 },
   tilePill: { marginTop: 'auto', flexDirection: 'row' },
 }));

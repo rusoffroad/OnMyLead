@@ -147,6 +147,8 @@ function RootLayout() {
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
         <Stack.Screen name="invite-friends" options={{ title: tr('Invite Friends') }} />
         <Stack.Screen name="events/index" options={{ title: tr('Events') }} />
+        <Stack.Screen name="spot/[id]" options={{ title: tr('Place to Ride') }} />
+        <Stack.Screen name="spot/suggest" options={{ title: tr('Suggest a Place') }} />
         <Stack.Screen name="events/new" options={{ title: tr('Create an Event') }} />
         <Stack.Screen name="e/[code]" options={{ title: '' }} />
         <Stack.Screen name="ride/[id]/live" options={{ title: tr('Ride Mode'), headerShown: false }} />

@@ -67,6 +67,9 @@ describe('every theme stays readable', () => {
         expect(contrast(p.colors.sky, s.background)).toBeGreaterThanOrEqual(3);
         expect(contrast(p.colors.gold, s.backgroundElement)).toBeGreaterThanOrEqual(3);
         expect(contrast(p.glass.amber, s.backgroundElement)).toBeGreaterThanOrEqual(3);
+        // Scout teal: its chips and signs read on cards, and the picture on a sign reads on the teal.
+        expect(contrast(p.colors.scout, s.backgroundElement)).toBeGreaterThanOrEqual(3);
+        expect(contrast(p.colors.onScout, p.colors.scout)).toBeGreaterThanOrEqual(4.5);
       });
     }
 

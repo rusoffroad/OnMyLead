@@ -13,9 +13,9 @@ import { Home, homeStyles, Pill } from './parts';
 import { t } from '@/lib/i18n';
 
 /**
- * Events on the home screen: a gold-edged row under the ride actions (gold so it stands apart
- * from the red Join and blue Map Mode without moving anything; Chris 2026-11-03 "make events a
- * little more visible"). It shows your next event (one
+ * Events on the home screen: a gold-edged row right under Create a Ride and Find a Ride, above
+ * Map Mode (Chris 2026-11-04; gold so it stands apart from the red Join and blue Map Mode, Chris
+ * 2026-11-03 "make events a little more visible"). It shows your next event (one
  * you host or are going to), else the next public one near you, and opens the Events area.
  * Never asks for location; with it, nearby events count first.
  */
@@ -61,12 +61,14 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
           <Text style={homeStyles.cardTitle}>{t('Events')}</Text>
           {count ? <Pill text={t('{n} Coming Up', { n: count })} tone="gold" /> : null}
         </View>
-        <Text style={styles.tagline} numberOfLines={1}>{t('Rallies, poker runs and ride weekends')}</Text>
+        {/* One line under the title, so the card stays short: your next event, else what Events are. */}
         {next ? (
-          <Text style={homeStyles.muted} numberOfLines={1}>
+          <Text style={styles.tagline} numberOfLines={1}>
             {`${next.yours ? `${t('Yours')}: ` : `${t('Next')}: `}${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}`}
           </Text>
-        ) : null}
+        ) : (
+          <Text style={styles.tagline} numberOfLines={1}>{t('Rallies, poker runs and ride weekends')}</Text>
+        )}
       </View>
       <Icon name="chevron" size={18} color={Home.gold} />
     </Pressable>
@@ -75,10 +77,10 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
 
 const styles = themedStyles(() => ({
   card: {
-    flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 14,
-    borderRadius: 22, backgroundColor: withAlpha(Home.gold, 0.1), borderWidth: 1, borderColor: withAlpha(Home.gold, 0.5),
+    flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10,
+    borderRadius: 20, backgroundColor: withAlpha(Home.gold, 0.1), borderWidth: 1, borderColor: withAlpha(Home.gold, 0.5),
   },
-  icon: { width: 48, height: 48, borderRadius: 12, backgroundColor: Home.gold, alignItems: 'center', justifyContent: 'center' },
+  icon: { width: 44, height: 44, borderRadius: 12, backgroundColor: Home.gold, alignItems: 'center', justifyContent: 'center' },
   tagline: { color: Home.gold, fontFamily: font(600), fontSize: 13, lineHeight: 18 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
 }));

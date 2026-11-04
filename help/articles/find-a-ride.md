@@ -15,7 +15,7 @@ sources:
   - app/src/core/discovery.ts
   - app/src/components/events/event-or-ride.tsx
   - app/src/lib/api.ts
-related: [join-a-ride, create-a-ride, place-search, approvals-and-waitlist]
+related: [join-a-ride, create-a-ride, place-search, approvals-and-waitlist, scout]
 keywords: [find, search, discover, browse, near me, nearby, local rides, by state, public rides, map]
 screenshots:
   - file: find.webp
@@ -25,6 +25,10 @@ screenshots:
 Looking for people to ride with? The **Find** tab shows public rides near you or anywhere in a state. Private rides never show here. You need an invite link or code for those. See [Join a Ride](/help/join-a-ride).
 
 ![Find a Ride, near you or by state](/help/img/find.webp)
+
+:::release 2.1
+Looking for somewhere to ride instead of a group? Tap **Places to Ride** at the top of the **Find** tab to open Scout: off-road parks, OHV areas, trail systems and trailheads near you. See [Find Places to Ride With Scout](/help/scout).
+:::
 
 ## Find Rides Near You
 

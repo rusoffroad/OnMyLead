@@ -35,6 +35,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   // Maps
   'map.layers.v1': 'Base map (Satellite, Topo, ...) and the trail layer switch',
   'map.riderTrails.v1': 'Show trails other riders shared',
+  'map.parkTrails.v1': 'Show the trails of offroad parks',
   'map.followMe.v1': 'Follow Me on live maps',
   'nav.trackLineOn.v1': 'The Track Line switch (the line itself stays on the device)',
   'nav.measureTrails.v1': 'Map Mode measures along trails',

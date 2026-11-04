@@ -1,11 +1,10 @@
 import { router } from 'expo-router';
-import { Pressable, Switch, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Icon } from '@/components/icon';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
-import { TRACK_DAY_COLORS } from '@/core/track-line';
-import { Gradient, Pill } from './parts';
+import { Gradient } from './parts';
 import { currentLocale, t } from '@/lib/i18n';
 
 /** Logo blue, deepening to the bottom corner: Map Mode's own colour, next to Join's red. */
@@ -28,28 +27,43 @@ function TrailArt() {
 }
 
 /**
- * Map Mode on the home screen: a blue action card in the same family as Join a Ride, right under
- * Create and Find. Open Map Mode, Map a Custom Trail (draw one that isn't on any map), and the
- * Track Line switch with its day colours.
+ * Map Mode on the home screen: a blue action card in the same family as Join a Ride, under Create,
+ * Find and Events. Open Map Mode, Map a Custom Trail (draw one that isn't on any map), and the
+ * Track Line switch as a small chip beside the title. Kept short so Join, Create, Find, Events and
+ * Map Mode all fit on one phone screen (Chris 2026-11-04); the description and the rider-trail
+ * count are read out by screen readers.
  */
 export function MapModeCard({
   trailsNear, trackOn, onTrack,
 }: { trailsNear: number | null; trackOn: boolean; onTrack: (on: boolean) => void }) {
+  const near = trailsNear
+    ? ` ${trailsNear === 1 ? t('1 trail near you') : t('{n} trails near you', { n: trailsNear.toLocaleString(currentLocale()) })}.`
+    : '';
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={t('Open Map Mode')} onPress={() => router.push('/nav')} style={styles.card}>
-      <Gradient colors={BLUE} angle="diagonal" radius={28} />
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${t('Open Map Mode')}. ${t('Riding solo? Your offroad map with speed, elevation, rider trails and your own.')}${near}`}
+      onPress={() => router.push('/nav')}
+      style={styles.card}>
+      <Gradient colors={BLUE} angle="diagonal" radius={26} />
       <TrailArt />
       <View style={styles.top}>
-        <View style={{ flex: 1 }}>
-          <View style={styles.titleRow}>
-            <Icon name="map" size={30} color="#fff" strokeWidth={2.4} />
-            <Text style={styles.title} accessibilityRole="header">{t('Map Mode')}</Text>
-          </View>
-          <Text style={styles.detail}>{t('Riding solo? Your offroad map with speed, elevation, rider trails and your own.')}</Text>
+        <View style={styles.titleRow}>
+          <Icon name="map" size={26} color="#fff" strokeWidth={2.4} />
+          <Text style={styles.title} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{t('Map Mode')}</Text>
         </View>
-        {trailsNear ? (
-          <Pill tone="onRed" text={trailsNear === 1 ? t('1 trail near you') : t('{n} trails near you', { n: trailsNear.toLocaleString(currentLocale()) })} />
-        ) : null}
+        <Pressable
+          accessibilityRole="switch"
+          accessibilityState={{ checked: trackOn }}
+          accessibilityLabel={t('Track Line. Draws where you’ve been, a new color each day')}
+          hitSlop={6}
+          onPress={() => onTrack(!trackOn)}
+          style={styles.track}>
+          <Text style={styles.trackTitle} numberOfLines={1}>{t('Track Line')}</Text>
+          <View style={[styles.knob, trackOn && styles.knobOn]}>
+            <View style={[styles.dot, trackOn && styles.dotOn]} />
+          </View>
+        </Pressable>
       </View>
       <View style={styles.buttons}>
         <Pressable
@@ -57,7 +71,7 @@ export function MapModeCard({
           onPress={() => router.push('/nav')}
           style={({ pressed }) => [styles.btn, styles.btnGo, pressed && { opacity: 0.85 }]}>
           <Icon name="map" size={18} color={BLUE_INK} strokeWidth={2.4} />
-          <Text style={[styles.btnText, { color: BLUE_INK }]}>{t('Open Map Mode')}</Text>
+          <Text style={[styles.btnText, { color: BLUE_INK }]} numberOfLines={2}>{t('Open Map Mode')}</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
@@ -68,49 +82,30 @@ export function MapModeCard({
           <Text style={styles.btnText} numberOfLines={2}>{t('Map a Custom Trail')}</Text>
         </Pressable>
       </View>
-      <View style={styles.track}>
-        <Icon name="trackLine" size={22} color="#fff" />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.trackTitle}>{t('Track Line')}</Text>
-          <View style={styles.days}>
-            {[['Today', TRACK_DAY_COLORS[0]], ['Yesterday', TRACK_DAY_COLORS[1]], ['Older', TRACK_DAY_COLORS[2]]].map(([label, c]) => (
-              <View key={label} style={styles.day}>
-                <View style={[styles.dayLine, { backgroundColor: c }]} />
-                <Text style={styles.dayText}>{t(label)}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-        <Switch
-          value={trackOn}
-          onValueChange={onTrack}
-          accessibilityLabel={t('Track Line. Draws where you’ve been, a new color each day')}
-          trackColor={{ true: '#0F2F6E', false: 'rgba(0,0,0,0.28)' }}
-          thumbColor="#fff"
-        />
-      </View>
     </Pressable>
   );
 }
 
 const styles = themedStyles(() => ({
-  card: { borderRadius: 28, padding: 22, overflow: 'hidden', gap: Spacing.three },
-  art: { position: 'absolute', right: -10, top: -8 },
-  top: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { color: '#fff', fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 44 },
-  detail: { color: 'rgba(255,255,255,0.86)', fontFamily: font(500), fontSize: 15, lineHeight: 20, marginTop: 6 },
+  card: { borderRadius: 26, paddingHorizontal: 18, paddingVertical: 16, overflow: 'hidden', gap: 12 },
+  art: { position: 'absolute', right: 80, top: -40, opacity: 0.7 },
+  top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.two },
+  titleRow: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  title: { flexShrink: 1, color: '#fff', fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 36 },
+  track: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 32, borderRadius: 16, paddingLeft: 11, paddingRight: 4,
+    backgroundColor: 'rgba(0,0,0,0.2)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)', flexShrink: 0, maxWidth: '55%',
+  },
+  trackTitle: { color: '#fff', fontFamily: font(700), fontSize: 13, flexShrink: 1 },
+  knob: { width: 36, height: 22, borderRadius: 11, padding: 2, backgroundColor: 'rgba(0,0,0,0.28)', justifyContent: 'center' },
+  knobOn: { backgroundColor: '#0F2F6E', alignItems: 'flex-end' },
+  dot: { width: 18, height: 18, borderRadius: 9, backgroundColor: 'rgba(255,255,255,0.7)' },
+  dotOn: { backgroundColor: '#fff' },
   buttons: { flexDirection: 'row', gap: 10 },
   btn: {
-    flex: 1, minHeight: 52, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.32)', backgroundColor: 'rgba(0,0,0,0.18)',
+    flex: 1, minHeight: 46, borderRadius: 13, borderWidth: 1, borderColor: 'rgba(255,255,255,0.32)', backgroundColor: 'rgba(0,0,0,0.18)',
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: Spacing.two, paddingVertical: 6,
   },
   btnGo: { backgroundColor: '#fff', borderColor: 'transparent' },
   btnText: { color: '#fff', fontFamily: font(700), fontSize: 14, lineHeight: 17, flexShrink: 1, textAlign: 'center' },
-  track: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 14, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.22)' },
-  trackTitle: { color: '#fff', fontFamily: font(700), fontSize: 15 },
-  days: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
-  day: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  dayLine: { width: 16, height: 5, borderRadius: 3, borderWidth: 1, borderColor: 'rgba(255,255,255,0.75)' },
-  dayText: { color: 'rgba(255,255,255,0.8)', fontFamily: font(500), fontSize: 12 },
 }));
