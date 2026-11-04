@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { FullMapButton } from '@/components/full-map';
 import { Colors, font, themedStyles } from '@/constants/theme';
+import { t } from '@/lib/i18n';
 
 /**
  * The grab bar at the top of a foldable map panel (see usePanelFold): tap it to fold or open, and
@@ -26,12 +27,12 @@ function Handle({ open, onToggle, what, fromTop }: { open: boolean; onToggle: ()
       onPress={onToggle}
       accessibilityRole="button"
       accessibilityState={{ expanded: open }}
-      accessibilityLabel={open ? `Hide the ${what.toLowerCase()}` : `Show the ${what.toLowerCase()}`}
-      accessibilityHint={fromTop ? 'You can also swipe the panel up to hide it or down to show it' : 'You can also swipe the panel down to hide it or up to show it'}
+      accessibilityLabel={open ? t('Hide the {v}', { v: t(what) }) : t('Show the {v}', { v: t(what) })}
+      accessibilityHint={fromTop ? t('You can also swipe the panel up to hide it or down to show it') : t('You can also swipe the panel down to hide it or up to show it')}
       hitSlop={8}
       style={styles.handle}>
       <View style={styles.bar} />
-      <Text style={styles.text}>{open ? 'Hide' : `Show ${what}`} {down ? '▼' : '▲'}</Text>
+      <Text style={styles.text}>{open ? t('Hide') : t('Show {what}', { what: t(what) })} {down ? '▼' : '▲'}</Text>
     </Pressable>
   );
 }

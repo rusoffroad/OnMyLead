@@ -10,6 +10,7 @@ import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { drawRoute, esc, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { octagon } from './waypoint-blaze';
+import { t as tr } from '@/lib/i18n';
 
 /** The same blaze as the app (WaypointBlaze): a diamond, or a warning triangle for hazards, with the symbol on it. */
 const blaze = (shared: boolean, symbol: WaypointSymbol) => {
@@ -142,7 +143,7 @@ export function WaypointMap({
       });
       L.marker(ll(w), {
         icon,
-        title: w.planned_stop ? `Planned stop ${n ?? ''}, ${w.name}, ${symbolLabel(symbol)}` : `${symbolLabel(symbol)} waypoint, ${w.name}`,
+        title: w.planned_stop ? tr('Planned stop {v}, {name}, {v2}', { v: n ?? '', name: w.name, v2: symbolLabel(symbol) }) : `${symbolLabel(symbol)} waypoint, ${w.name}`,
         zIndexOffset: w.planned_stop ? 500 : w.shared ? 400 : 300,
       })
         .on('click', () => cb.current.onPressWaypoint(w))

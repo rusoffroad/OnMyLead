@@ -44,10 +44,10 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
           <Text style={styles.title} accessibilityRole="header">{t('This Ride Lives in the OnMyLead App')}</Text>
           <Text style={styles.body}>
             {iphone
-              ? 'Already have it? Open the ride right where you left off. New here? Get the app, then scan or open the link again.'
+              ? t('Already have it? Open the ride right where you left off. New here? Get the app, then scan or open the link again.')
               : android
-                ? 'Get the app, then open the link again and the ride opens right in OnMyLead.'
-                : 'Scan this with your phone’s camera to open the ride on your phone. Your group shares one live map and chat, and the leader’s route.'}
+                ? t('Get the app, then open the link again and the ride opens right in OnMyLead.')
+                : t('Scan this with your phone’s camera to open the ride on your phone. Your group shares one live map and chat, and the leader’s route.')}
           </Text>
         </View>
         {iphone || android ? null : <QrCode value={rideLink(inviteCode)} size={112} />}

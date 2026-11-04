@@ -14,8 +14,8 @@ export function HelpCenterCard() {
   return (
     <Pressable
       accessibilityRole="link"
-      accessibilityLabel={`${HELP_CENTER_TITLE}. Step-by-step instructions for everything in OnMyLead.`}
-      accessibilityHint={`Opens ${HELP_CENTER_DISPLAY}`}
+      accessibilityLabel={t('{v}. Step-by-step instructions for everything in OnMyLead.', { v: HELP_CENTER_TITLE })}
+      accessibilityHint={t('Opens {v}', { v: HELP_CENTER_DISPLAY })}
       onPress={() => openHelpCenter()}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.tile}>
@@ -41,7 +41,7 @@ export function GuideLink({ slug, title = 'Read the Guide' }: { slug: string; ti
     <Pressable
       accessibilityRole="link"
       accessibilityLabel={title}
-      accessibilityHint={`Opens the guide on ${HELP_CENTER_DISPLAY}`}
+      accessibilityHint={t('Opens the guide on {v}', { v: HELP_CENTER_DISPLAY })}
       hitSlop={8}
       onPress={() => openHelpCenter(slug)}
       style={({ pressed }) => [styles.guide, pressed && { opacity: 0.7 }]}>

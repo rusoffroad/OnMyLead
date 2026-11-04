@@ -68,7 +68,7 @@ function FindRides() {
         const code = await stateAt(p);
         setStateCode((s) => s ?? code);
       })
-      .catch((e) => setLocError(e instanceof Error ? e.message : 'Could not get your location.'))
+      .catch((e) => setLocError(e instanceof Error ? e.message : t('Could not get your location.')))
       .finally(() => setLocating(false));
 
   const locate = () => {
@@ -105,7 +105,7 @@ function FindRides() {
           results: found.length,
         });
       } catch (e) {
-        if (live) setError(e instanceof Error ? e.message : 'Could not load rides.');
+        if (live) setError(e instanceof Error ? e.message : t('Could not load rides.'));
       } finally {
         if (live) setLoading(false);
       }
@@ -155,9 +155,9 @@ function FindRides() {
   );
 
   const empty =
-    area ? 'No public rides in this map area yet.'
-    : mode === 'near' && origin ? `No public rides within ${radius} miles${place ? ` of ${place.name}` : ''} yet.`
-    : `No public rides in ${state?.name ?? 'this state'} yet.`;
+    area ? t('No public rides in this map area yet.')
+    : mode === 'near' && origin ? t('No public rides within {radius} miles{v} yet.', { radius, v: place ? ` of ${place.name}` : '' })
+    : t('No public rides in {v} yet.', { v: state?.name ?? 'this state' });
 
   const map = frame ? (
         <RidesMap
@@ -195,13 +195,13 @@ function FindRides() {
       {place ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
           <ThemedText style={{ flex: 1, fontWeight: 600 }}>{t('Rides Near {name}', { name: place.name })}</ThemedText>
-          <Button title={here ? 'Back to Near Me' : 'Clear'} kind="ghost" onPress={clearPlace} />
+          <Button title={here ? t('Back to Near Me') : t('Clear')} kind="ghost" onPress={clearPlace} />
         </View>
       ) : null}
 
       {mode === 'near' && !origin ? (
         <Card>
-          <ThemedText>{locating ? 'Finding where you are…' : 'Turn on location to see rides near you, or pick your state below.'}</ThemedText>
+          <ThemedText>{locating ? t('Finding where you are…') : t('Turn on location to see rides near you, or pick your state below.')}</ThemedText>
           {!locating && locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
           {!locating ? <Button title={t('Use My Location')} onPress={locate} /> : null}
         </Card>
@@ -226,7 +226,7 @@ function FindRides() {
           options={RADIUS_CHOICES_MI.map((mi) => ({ value: mi, label: `${mi} Miles` }))}
         />
       ) : null}
-      {area ? <Button title={mode === 'near' && origin ? (place ? `Back to Rides Near ${place.name}` : 'Back to Rides Near Me') : `Back to All of ${state?.name ?? 'the State'}`} kind="ghost" onPress={() => setArea(null)} /> : null}
+      {area ? <Button title={mode === 'near' && origin ? (place ? t('Back to Rides Near {name}', { name: place.name }) : t('Back to Rides Near Me')) : t('Back to All of {v}', { v: state?.name ?? 'the State' })} kind="ghost" onPress={() => setArea(null)} /> : null}
 
       {loading ? <ThemedText themeColor="textSecondary">{t('Looking for rides…')}</ThemedText> : null}
       {rides && !loading ? (
@@ -236,7 +236,7 @@ function FindRides() {
             <Button title={t('Create a Public Ride')} onPress={() => router.push('/ride/new?type=public')} />
           </Card>
         ) : (
-          <Section title={`${rides.length} ${rides.length === 1 ? 'Ride' : 'Rides'}${area ? ' in This Map Area' : ''}`} />
+          <Section title={`${rides.length} ${rides.length === 1 ? t('Ride') : t('Rides')}${area ? t(' in This Map Area') : ''}`} />
         )
       ) : null}
       {rides?.length ? (
@@ -246,7 +246,7 @@ function FindRides() {
               key={r.id}
               ride={r}
               note={[
-                r.distanceMi != null ? `${r.distanceMi < 1 ? 'Under 1' : Math.round(r.distanceMi)} mi away` : null,
+                r.distanceMi != null ? `${r.distanceMi < 1 ? t('Under 1') : Math.round(r.distanceMi)} mi away` : null,
                 r.vehicle_types.length ? r.vehicle_types.join(', ') : null,
               ].filter(Boolean).join(', ') || undefined}
             />

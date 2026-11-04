@@ -65,7 +65,7 @@ function Trips() {
                   {dates ? <ThemedText type="small" themeColor="textSecondary">{dates}</ThemedText> : null}
                 </View>
                 <ProgressBar fraction={p.fraction} done={p.done} />
-                <ThemedText type="small" themeColor="textSecondary">{p.done ? `All ${p.total} packed` : p.label}</ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">{p.done ? t('All {total} packed', { total: p.total }) : p.label}</ThemedText>
               </Card>
             </Pressable>
           </Link>

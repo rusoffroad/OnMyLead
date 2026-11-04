@@ -21,7 +21,7 @@ export function UpdateRequired() {
   const state = useUpdateState();
   const [hidden, setHidden] = useState(notNow);
   if (state.kind !== 'required' || hidden) return null;
-  const store = Platform.OS === 'android' ? 'Google Play' : t('the App Store');
+  const store = Platform.OS === 'android' ? t('Google Play') : t('the App Store');
   return (
     <View style={styles.cover} accessibilityViewIsModal>
       <SafeAreaView style={{ flex: 1 }}>

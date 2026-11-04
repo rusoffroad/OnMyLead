@@ -79,11 +79,11 @@ export default function OfflineMaps() {
         <Text style={styles.heroBody}>
           {t('Download an area or a ride before you leave. Ride Mode switches to it on its own when the signal drops.')}
         </Text>
-        <View style={styles.gauge} accessible accessibilityLabel={`${formatBytes(used)} of maps saved${free != null ? `, ${formatBytes(free)} free on this phone` : ''}`}>
-          <Text style={styles.gaugeBig}>{maps.length ? formatBytes(used) : 'None Yet'}</Text>
+        <View style={styles.gauge} accessible accessibilityLabel={t('{v} of maps saved{v2}', { v: formatBytes(used), v2: free != null ? `, ${formatBytes(free)} free on this phone` : '' })}>
+          <Text style={styles.gaugeBig}>{maps.length ? formatBytes(used) : t('None Yet')}</Text>
           <Text style={styles.gaugeSmall}>
-            {maps.length === 1 ? '1 Map Saved' : `${maps.length} Maps Saved`}
-            {free != null ? `   ${formatBytes(free)} Free on This Phone` : ''}
+            {maps.length === 1 ? t('1 Map Saved') : t('{length} Maps Saved', { length: maps.length })}
+            {free != null ? t('   {v} Free on This Phone', { v: formatBytes(free) }) : ''}
           </Text>
         </View>
       </View>
@@ -133,7 +133,7 @@ function OtherDeviceOffer({ area }: { area: SyncedOfflineArea }) {
       <MapSheet ride={area.kind === 'ride'} dim />
       <View style={{ flex: 1, gap: 3 }}>
         <Text style={styles.offerName} numberOfLines={1}>{area.name}</Text>
-        <Text style={styles.offerSub}>{`About ${formatBytes(plan.bytes)}`}</Text>
+        <Text style={styles.offerSub}>{t('About {v}', { v: formatBytes(plan.bytes) })}</Text>
       </View>
       <SmallButton title={t('Hide')} onPress={() => forgetOtherDeviceArea(area.id)} />
       <SmallButton

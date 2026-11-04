@@ -70,7 +70,7 @@ export default function AppearanceScreen() {
           onPress={() => setAppearance({ colorBlind: !appearance.colorBlind }, HERE)}
           style={({ pressed }) => [styles.switchRow, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <View style={{ flex: 1, gap: 2 }}>
-            <ThemedText type="smallBold">{appearance.colorBlind ? 'On' : 'Off'}</ThemedText>
+            <ThemedText type="smallBold">{appearance.colorBlind ? t('On') : t('Off')}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
               {t('Rider status, alerts, trail ratings and your Track Line switch to colors that red-green and blue-yellow color blind riders can tell apart, and each status gets a symbol so color is never the only clue.')}
             </ThemedText>
@@ -157,10 +157,10 @@ function Preview() {
         ))}
       </View>
       <View style={styles.previewRow}>
-        {['Today', 'Yesterday', '2 Days Ago'].map((label, i) => (
+        {[t('Track Today'), t('Track Yesterday'), t('Track 2 Days Ago')].map((label, i) => (
           <View key={label} style={styles.legend}>
             <View style={[styles.line, { backgroundColor: TRACK_DAY_COLORS[i] }]} />
-            <Text style={styles.legendText}>{t(`Track ${label}`)}</Text>
+            <Text style={styles.legendText}>{label}</Text>
           </View>
         ))}
       </View>

@@ -155,7 +155,7 @@ export function NavTerrainMap({
       ))}
       {found ? (
         <TerrainMarker at={found} anchor={{ x: 0.5, y: 1 }}>
-          <View accessible accessibilityLabel={`Search result: ${found.name}`} style={{ alignItems: 'center', maxWidth: 220 }}>
+          <View accessible accessibilityLabel={t('Search result: {name}', { name: found.name })} style={{ alignItems: 'center', maxWidth: 220 }}>
             <Text style={styles.found} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundDot} />
           </View>

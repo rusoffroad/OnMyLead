@@ -64,7 +64,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
       const a = res.assets[0];
       setPhoto({ uri: a.uri, mimeType: a.mimeType ?? null, file: a.file ?? null });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not open your photos.');
+      setError(e instanceof Error ? e.message : t('Could not open your photos.'));
     }
   }
 
@@ -81,7 +81,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
       if (found.trim) setTrim(found.trim);
       setVinNote('Filled in from the VIN. Check it looks right.');
     } catch (e) {
-      setVinNote(e instanceof Error ? e.message : 'VIN lookup failed. Enter the details by hand.');
+      setVinNote(e instanceof Error ? e.message : t('VIN lookup failed. Enter the details by hand.'));
     } finally {
       setVinBusy(false);
     }
@@ -93,10 +93,10 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
     const yearN = year.trim() ? Number(year.trim()) : null;
     if (yearN != null && !(Number.isInteger(yearN) && yearN >= 1900 && yearN <= 2100)) return setError(t('Year should look like 2022.'));
     const priceP = parseDollars(price);
-    if (!priceP.ok) return setError(`Purchase price: ${priceP.error}`);
+    if (!priceP.ok) return setError(t('Purchase price: {error}', { error: priceP.error }));
     const nums = { hours: parseAmount(hours), odometer: parseAmount(odometer), tank: tankN, extra: extraN, mpg: mpgN };
     const bad = Object.entries(nums).find(([, p]) => !p.ok);
-    if (bad) return setError(`Check the ${bad[0] === 'extra' ? 'extra fuel' : bad[0]} number.`);
+    if (bad) return setError(t('Check the {v} number.', { v: bad[0] === 'extra' ? 'extra fuel' : bad[0] }));
     const val = (p: ReturnType<typeof parseAmount>) => (p.ok ? p.value : null);
     if (!text(nickname) && !text(make) && !text(model)) return setError(t('Give it a nickname or a make and model.'));
     const widthP = parseWidth(width, VEHICLE_WIDTH_MIN_IN, WIDTH_MAX_IN);
@@ -137,13 +137,13 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
         try {
           saved = await setVehiclePhoto(saved, photo);
         } catch (e) {
-          return setError(`Saved, but the photo did not upload (${e instanceof Error ? e.message : String(e)}). Tap save to try again.`);
+          return setError(t('Saved, but the photo did not upload ({v}). Tap save to try again.', { v: e instanceof Error ? e.message : String(e) }));
         }
       }
       forgetGarageWidths();
       onSaved(saved);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save.');
+      setError(e instanceof Error ? e.message : t('Could not save.'));
     } finally {
       setBusy(false);
     }
@@ -161,7 +161,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
         ) : (
           <ThemedText type="small" themeColor="textSecondary">{t('Add a photo of your machine.')}</ThemedText>
         )}
-        <Button title={shownPhoto ? 'Change Photo' : 'Choose Photo'} kind="secondary" onPress={pickPhoto} />
+        <Button title={shownPhoto ? t('Change Photo') : t('Choose Photo')} kind="secondary" onPress={pickPhoto} />
       </Card>
 
       <Field label={t('Nickname')} value={nickname} onChangeText={setNickname} placeholder={t('Dusty')} />
@@ -225,14 +225,14 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
           const p = parseWidth(width, VEHICLE_WIDTH_MIN_IN, WIDTH_MAX_IN);
           return p.ok && p.value != null ? (
             <ThemedText type="small" themeColor="textSecondary">
-              {p.value <= 50 ? `${inches(p.value)} fits 50" trails.` : `${inches(p.value)} is too wide for 50" trails.`}
+              {p.value <= 50 ? `${inches(p.value)} fits 50" trails.` : t('{v} is too wide for 50" trails.', { v: inches(p.value) })}
             </ThemedText>
           ) : null;
         })()}
       </Card>
 
       <ErrorText error={error} />
-      <Button title={current ? 'Save Changes' : 'Add to Garage'} big loading={busy} onPress={save} />
+      <Button title={current ? t('Save Changes') : t('Add to Garage')} big loading={busy} onPress={save} />
     </>
   );
 }

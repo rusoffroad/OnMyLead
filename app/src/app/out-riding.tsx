@@ -178,7 +178,7 @@ export default function OutRiding() {
         </View>
       ) : (
         <View style={styles.statusCard}>
-          <Text style={styles.statusTitle}>{on ? 'Change Out Riding' : 'Going Riding?'}</Text>
+          <Text style={styles.statusTitle}>{on ? tr('Change Out Riding') : tr('Going Riding?')}</Text>
           {!on ? (
             <ThemedText type="small" themeColor="textSecondary">
               {tr('Switch on Out Riding to see who else is out near you, like friends showing online in a game. Off until you switch it on.')}
@@ -289,8 +289,8 @@ export default function OutRiding() {
       {riders && !visible.length ? (
         <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
           {shownScope === 'riders'
-            ? 'Your friends and riders you know show up here when they switch on Out Riding too.'
-            : 'Anyone at the same park shows up here once they switch on Out Riding with Everyone Nearby.'}
+            ? tr('Your friends and riders you know show up here when they switch on Out Riding too.')
+            : tr('Anyone at the same park shows up here once they switch on Out Riding with Everyone Nearby.')}
         </ThemedText>
       ) : null}
 
@@ -310,19 +310,19 @@ export default function OutRiding() {
                     {distanceLabel(r.miles)}{r.spot ? `, at ${r.spot}` : ''}
                   </Text>
                   <Text style={styles.riderSub} numberOfLines={1}>
-                    {myFriends.has(r.user_id) ? 'Friend' : r.known ? 'Ridden With You' : 'New Rider'}, {outSince(r.since, now)}
+                    {myFriends.has(r.user_id) ? tr('Friend') : r.known ? tr('Ridden With You') : tr('New Rider')}, {outSince(r.since, now)}
                   </Text>
                 </View>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`Message ${r.display_name}`}
+                  accessibilityLabel={tr('Message {display_name}', { display_name: r.display_name })}
                   onPress={() => router.push(`/messages/${r.user_id}`)}
                   style={({ pressed }) => [styles.msgBtn, pressed && { opacity: 0.8 }]}>
                   <Icon name="mail" color="#fff" size={20} />
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`More for ${r.display_name}`}
+                  accessibilityLabel={tr('More for {display_name}', { display_name: r.display_name })}
                   accessibilityState={{ expanded: open }}
                   hitSlop={8}
                   onPress={() => setMenuFor(open ? null : r.user_id)}

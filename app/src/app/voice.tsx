@@ -71,7 +71,7 @@ export default function VoiceScreen() {
           ) : null}
           <VoiceRow
             title={tr('Automatic')}
-            detail={auto ? `Best voice on this device: ${voiceLabel(auto, choices)}` : 'This device’s standard voice'}
+            detail={auto ? tr('Best voice on this device: {v}', { v: voiceLabel(auto, choices) }) : tr('This device’s standard voice')}
             on={autoOn}
             recommended
             playing={playing === AUTO_VOICE}
@@ -127,7 +127,7 @@ function VoiceRow({ title, detail, on, recommended, playing, onPick, onPlay }: {
       <Pressable
         accessibilityRole="radio"
         accessibilityState={{ checked: on }}
-        accessibilityLabel={`${title}${recommended ? ', recommended' : ''}. ${detail}`}
+        accessibilityLabel={`${title}${recommended ? tr(', recommended') : ''}. ${detail}`}
         onPress={onPick}
         style={({ pressed }) => [styles.pick, pressed && { opacity: 0.7 }]}>
         <View style={[styles.radio, on && styles.radioOn]}>{on ? <View style={styles.radioDot} /> : null}</View>
@@ -141,12 +141,12 @@ function VoiceRow({ title, detail, on, recommended, playing, onPick, onPlay }: {
       </Pressable>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Play Sample, ${title}`}
+        accessibilityLabel={tr('Play Sample, {title}', { title })}
         hitSlop={6}
         onPress={onPlay}
         style={({ pressed }) => [styles.play, playing && styles.playOn, pressed && { opacity: 0.7 }]}>
         <Icon name="voice" size={20} color={playing ? Colors.text : Colors.sky} />
-        <Text style={[styles.playText, playing && { color: Colors.text }]}>{playing ? 'Playing' : 'Play'}</Text>
+        <Text style={[styles.playText, playing && { color: Colors.text }]}>{playing ? tr('Playing') : tr('Play')}</Text>
       </Pressable>
     </View>
   );

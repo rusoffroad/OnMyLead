@@ -76,7 +76,7 @@ export default function TripPage() {
       await updateTripItem(item.id, { checked });
     } catch (e) {
       setItems((list) => list.map((i) => (i.id === item.id ? { ...i, checked: !checked } : i)));
-      setError(e instanceof Error ? e.message : 'Could not save. Check your signal and try again.');
+      setError(e instanceof Error ? e.message : tr('Could not save. Check your signal and try again.'));
     }
   }
 
@@ -87,7 +87,7 @@ export default function TripPage() {
     try {
       await fn();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      setError(e instanceof Error ? e.message : tr('Something went wrong.'));
     } finally {
       setBusy(null);
     }
@@ -98,10 +98,10 @@ export default function TripPage() {
       if (!requirePro('advanced_trip_planning')) return;
       const tpl = TRIP_TEMPLATES.find((x) => x.id === templateId)!;
       const add = itemsToAdd(items, tpl.items);
-      if (!add.length) return setNote(`Everything from "${tpl.label}" is already on your list.`);
+      if (!add.length) return setNote(tr('Everything from "{label}" is already on your list.', { label: tpl.label }));
       const start = items.reduce((m, i) => Math.max(m, i.position), -1) + 1;
       await addTripItems(trip.id, add, start);
-      setNote(`Added ${add.length} item${add.length === 1 ? '' : 's'} from "${tpl.label}".`);
+      setNote(tr('Added {length} item{v} from "{label}".', { length: add.length, v: add.length === 1 ? '' : 's', label: tpl.label }));
       setShowTemplates(false);
       await load();
     });
@@ -122,7 +122,7 @@ export default function TripPage() {
 
   const remove = () =>
     run('delete', async () => {
-      if (!(await confirmAsync(tr('Delete this trip?'), `${trip.name} and its ${items.length} item(s) will be removed.`))) return;
+      if (!(await confirmAsync(tr('Delete this trip?'), tr('{name} and its {length} item(s) will be removed.', { name: trip.name, length: items.length })))) return;
       await deleteTrip(trip.id);
       router.replace('/trips');
     });
@@ -140,7 +140,7 @@ export default function TripPage() {
       <View style={{ gap: Spacing.one }}>
         <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{trip.name}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {[dates, vehicle ? `Taking ${vehicle.nickname || vehicleTitle(vehicle)}` : null].filter(Boolean).join(', ') || 'No dates set'}
+          {[dates, vehicle ? tr('Taking {v}', { v: vehicle.nickname || vehicleTitle(vehicle) }) : null].filter(Boolean).join(', ') || 'No dates set'}
         </ThemedText>
         {ride ? (
           <Link href={`/r/${ride.invite_code}`} asChild>
@@ -153,7 +153,7 @@ export default function TripPage() {
 
       <Card>
         <ThemedText type="subtitle" style={{ fontSize: 36, lineHeight: 38, color: p.done ? RideColors.green : theme.text }}>
-          {p.done ? `All ${p.total} packed` : p.label}
+          {p.done ? tr('All {total} packed', { total: p.total }) : p.label}
         </ThemedText>
         <ProgressBar fraction={p.fraction} done={p.done} />
       </Card>
@@ -276,7 +276,7 @@ function CheckRow({ item, onToggle, onEdit }: { item: TripItem; onToggle: () => 
       </Pressable>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Edit ${item.name}`}
+        accessibilityLabel={tr('Edit {name}', { name: item.name })}
         onPress={onEdit}
         hitSlop={8}
         style={{ minWidth: 56, alignItems: 'center', justifyContent: 'center' }}>
@@ -311,7 +311,7 @@ function ItemForm({
     try {
       await onSave({ name: name.trim(), category, quantity, notes: notes.trim() || null });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save.');
+      setError(e instanceof Error ? e.message : tr('Could not save.'));
       setBusy(false);
     }
   }
@@ -333,7 +333,7 @@ function ItemForm({
       <ErrorText error={error} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title={tr('Cancel')} kind="secondary" style={{ flex: 1 }} onPress={onCancel} />
-        <Button title={item ? 'Save' : 'Add'} style={{ flex: 1 }} loading={busy} onPress={save} />
+        <Button title={item ? tr('Save') : tr('Add')} style={{ flex: 1 }} loading={busy} onPress={save} />
       </View>
       {onDelete ? <Button title={tr('Remove Item')} kind="danger" onPress={onDelete} /> : null}
     </Card>

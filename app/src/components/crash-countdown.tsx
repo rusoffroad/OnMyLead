@@ -54,7 +54,7 @@ export function CrashCountdown({
     <Modal visible animationType="fade" transparent={false} onRequestClose={onOk} supportedOrientations={['portrait', 'landscape']}>
       <SafeAreaView style={styles.page}>
         <View style={styles.top} accessibilityLiveRegion="assertive">
-          <Text style={styles.title} accessibilityRole="header">{cause === 'rollover' ? 'Rollover Detected' : 'Crash Detected'}</Text>
+          <Text style={styles.title} accessibilityRole="header">{cause === 'rollover' ? t('Rollover Detected') : t('Crash Detected')}</Text>
           <Text style={styles.body}>{t('Your group gets an EMERGENCY alert with your location in')}</Text>
           <Text style={styles.count} accessibilityLabel={`${left} seconds`}>{left}</Text>
           <View style={styles.track}>

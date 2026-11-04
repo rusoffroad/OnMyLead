@@ -68,7 +68,7 @@ export function ShareSheet({ item, onClose }: { item: SocialItem | null; onClose
       const msg = how === 'image' ? await shareActivity(card, text, item.kind) : await shareActivityText(text, item.kind);
       setNote(msg);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t share. Try again.');
+      setError(e instanceof Error ? e.message : t('Couldn’t share. Try again.'));
     } finally {
       setBusy(null);
     }

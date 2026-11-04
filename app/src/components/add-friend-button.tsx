@@ -40,17 +40,17 @@ export function AddFriendButton({
     try {
       if (relation === 'none') {
         const r = await sendFriendRequest(userId);
-        showNotice(r === 'accepted' ? 'Friends' : 'Friend Request Sent', requestResultLine(r, name));
+        showNotice(r === 'accepted' ? t('Friends') : t('Friend Request Sent'), requestResultLine(r, name));
       } else if (relation === 'received') {
         await respondFriendRequest(userId, true);
       } else if (relation === 'sent') {
         await removeFriend(userId);
-      } else if (await confirmAsync(`Remove ${name}?`, t('You’ll stop being friends. They aren’t told.'), t('Remove'))) {
+      } else if (await confirmAsync(t('Remove {name}?', { name }), t('You’ll stop being friends. They aren’t told.'), t('Remove'))) {
         await removeFriend(userId);
       }
       onDone?.();
     } catch (e) {
-      showNotice(e instanceof FriendsOffError ? 'Not Switched On Yet' : 'Couldn’t Do That', (e as Error).message);
+      showNotice(e instanceof FriendsOffError ? t('Not Switched On Yet') : t('Couldn’t Do That'), (e as Error).message);
     } finally {
       setBusy(false);
     }

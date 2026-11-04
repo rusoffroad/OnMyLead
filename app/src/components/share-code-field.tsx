@@ -80,8 +80,8 @@ function ShareCodeFieldInner({
   const good = check === 'available' || check === 'yours';
   const line =
     check === 'empty' ? null
-    : check === 'checking' ? 'Checking…'
-    : check === 'unchecked' ? 'Couldn’t check it right now. It’s checked again when you save.'
+    : check === 'checking' ? tr('Checking…')
+    : check === 'unchecked' ? tr('Couldn’t check it right now. It’s checked again when you save.')
     : check === 'off' ? SHARE_CODES_NOT_SWITCHED_ON
     : shareCodeLine(check, kind);
 

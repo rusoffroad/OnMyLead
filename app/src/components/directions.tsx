@@ -24,7 +24,7 @@ export function DirectionsList({ rows, onOpen }: { rows: DirectionsRow[]; onOpen
         <Pressable
           key={r.key}
           accessibilityRole="button"
-          accessibilityLabel={`Directions to ${r.title}${app ? ` in ${MAPS_APP_LABEL[app]}` : ''}. ${r.detail}`}
+          accessibilityLabel={tr('Directions to {title}{v}. {detail}', { title: r.title, v: app ? ` in ${MAPS_APP_LABEL[app]}` : '', detail: r.detail })}
           onPress={() => (onOpen ?? openDirections)(r.target)}
           style={({ pressed }) => [styles.row, i > 0 && styles.rowLine, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <View style={styles.sign}>
@@ -51,7 +51,7 @@ export function DirectionsCard({ rows }: { rows: DirectionsRow[] }) {
           <ThemedText type="heading">{tr('Directions')}</ThemedText>
           <ProTag feature="directions" />
         </View>
-        <ThemedText type="small" themeColor="textSecondary">{`Turn-by-turn on the roads, in ${MAPS_APPS_TEXT}.`}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{tr('Turn-by-turn on the roads, in {v}.', { v: MAPS_APPS_TEXT })}</ThemedText>
       </View>
       <DirectionsList rows={rows} />
     </View>
@@ -106,7 +106,7 @@ export function DirectionsHost() {
           {mapsAppsFor('web').map((a) => (
             <Button
               key={a}
-              title={`Open in ${MAPS_APP_LABEL[a]}`}
+              title={tr('Open in {v}', { v: MAPS_APP_LABEL[a] })}
               kind={a === 'apple' ? 'primary' : 'secondary'}
               onPress={() => {
                 close();

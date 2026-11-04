@@ -16,7 +16,7 @@ import { t as tr } from '@/lib/i18n';
 const when = (iso: string | null) => {
   if (!iso) return '';
   const day = dayLabel(iso);
-  return day === 'Today' ? new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : day;
+  return day === tr('Today') ? new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : day;
 };
 
 /**
@@ -80,7 +80,7 @@ export default function Messages() {
               <Pressable
                 key={t.thread_id}
                 accessibilityRole="button"
-                accessibilityLabel={`${t.other_name}${unread ? `, ${unread}` : ''}${t.muted ? ', muted' : ''}`}
+                accessibilityLabel={`${t.other_name}${unread ? `, ${unread}` : ''}${t.muted ? tr(', muted') : ''}`}
                 onPress={() => router.push(`/messages/${t.other_id}`)}
                 style={({ pressed }) => [styles.row, i > 0 && styles.rule, pressed && { backgroundColor: Colors.backgroundSelected }]}>
                 <RiderDot userId={t.other_id} name={t.other_name} size={42} />

@@ -51,7 +51,7 @@ export function SocialCard({
       onChange({ ...next, likeCount: n });
     } catch (e) {
       onChange(item);
-      if (!(e instanceof ProNeededError)) setError(e instanceof Error ? e.message : 'Couldn’t like that. Try again.');
+      if (!(e instanceof ProNeededError)) setError(e instanceof Error ? e.message : t('Couldn’t like that. Try again.'));
     }
   };
 
@@ -69,7 +69,7 @@ export function SocialCard({
       await deletePost(item.key.slice('post:'.length));
       onDeleted?.();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t delete it. Try again.');
+      setError(e instanceof Error ? e.message : t('Couldn’t delete it. Try again.'));
     }
   };
 
@@ -100,12 +100,12 @@ export function SocialCard({
           accessibilityRole="link"
           accessibilityLabel={`${item.actorName}’s profile`}>
           <View style={styles.nameRow}>
-            <Text style={styles.name} numberOfLines={1}>{item.mine ? 'You' : item.actorName}</Text>
+            <Text style={styles.name} numberOfLines={1}>{item.mine ? t('You') : item.actorName}</Text>
             {item.actorPro ? <ProTag /> : null}
           </View>
           <Text style={styles.when}>
-            {item.kind === 'out' ? 'Riding now' : timeAgo(item.at)}
-            {item.kind === 'post' ? '  ·  Post' : ''}
+            {item.kind === 'out' ? t('Riding now') : timeAgo(item.at)}
+            {item.kind === 'post' ? t('  ·  Post') : ''}
           </Text>
         </Pressable>
         <Pressable onPress={() => setMenu(true)} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('More')} style={styles.more}>
@@ -133,7 +133,7 @@ export function SocialCard({
       ) : null}
 
       {!full && item.comments.length ? (
-        <Pressable onPress={open} style={styles.previews} accessibilityRole="link" accessibilityLabel={`${commentsLabel(item.commentCount)}. Open to read them all.`}>
+        <Pressable onPress={open} style={styles.previews} accessibilityRole="link" accessibilityLabel={t('{v}. Open to read them all.', { v: commentsLabel(item.commentCount) })}>
           {item.commentCount > item.comments.length ? (
             <Text style={styles.viewAll}>{t('View All {commentCount} Comments', { commentCount: item.commentCount })}</Text>
           ) : null}
@@ -150,14 +150,14 @@ export function SocialCard({
         <View style={styles.actions}>
           <Action
             icon="heart"
-            label={item.likeCount ? String(item.likeCount) : 'Like'}
+            label={item.likeCount ? String(item.likeCount) : t('Like')}
             on={item.liked}
             onPress={like}
             a11y={item.liked ? `Unlike. ${item.likeCount} likes` : `Like. ${item.likeCount} likes`}
           />
           <Action
             icon="chat"
-            label={item.commentCount ? String(item.commentCount) : 'Comment'}
+            label={item.commentCount ? String(item.commentCount) : t('Comment')}
             onPress={() => router.push(`${itemHref(item.key!)}&comment=1` as never)}
             a11y={commentsLabel(item.commentCount)}
           />
@@ -168,13 +168,13 @@ export function SocialCard({
 
       <PhotoViewer uri={photoOpen ? item.photoUrl : null} square={false} caption={t(item.body)} onClose={() => setPhotoOpen(false)} />
       <ShareSheet item={sharing ? item : null} onClose={() => setSharing(false)} />
-      <BottomSheet visible={menu} onClose={() => setMenu(false)} title={item.mine ? 'Your Post' : item.actorName}>
+      <BottomSheet visible={menu} onClose={() => setMenu(false)} title={item.mine ? t('Your Post') : item.actorName}>
         <View style={{ gap: 4 }}>
-          <MenuItem icon="person" label={item.mine ? 'View Your Profile' : `View ${item.actorName}’s Profile`} onPress={() => { setMenu(false); router.push(profileHref(item.actorId) as never); }} />
+          <MenuItem icon="person" label={item.mine ? t('View Your Profile') : t('View {actorName}’s Profile', { actorName: item.actorName })} onPress={() => { setMenu(false); router.push(profileHref(item.actorId) as never); }} />
           {canShareOut(item) ? <MenuItem icon="share" label={t('Share to Other Apps')} onPress={() => { setMenu(false); share(); }} /> : null}
           {item.mine && item.kind === 'post' ? <MenuItem icon="trash" label={t('Delete Post')} danger onPress={remove} /> : null}
           {!item.mine ? (
-            <MenuItem icon="flagged" label={item.kind === 'post' ? 'Report This Post' : `Report ${item.actorName}`} danger onPress={() => { setMenu(false); setReport(true); }} />
+            <MenuItem icon="flagged" label={item.kind === 'post' ? t('Report This Post') : t('Report {actorName}', { actorName: item.actorName })} danger onPress={() => { setMenu(false); setReport(true); }} />
           ) : null}
         </View>
       </BottomSheet>

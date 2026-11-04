@@ -39,7 +39,7 @@ export default function SubscriptionScreen() {
     try {
       setNote(await fn());
     } catch (e) {
-      setNote(e instanceof Error ? e.message : 'Something went wrong. Try again.');
+      setNote(e instanceof Error ? e.message : t('Something went wrong. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -64,7 +64,7 @@ export default function SubscriptionScreen() {
       )}
 
       {upgrade ? (
-        <Button title={ent.label === 'Pro Trial' ? 'Keep Pro After the Trial' : 'Upgrade to Pro'} big onPress={() => router.push('/pro')} />
+        <Button title={ent.label === 'Pro Trial' ? t('Keep Pro After the Trial') : t('Upgrade to Pro')} big onPress={() => router.push('/pro')} />
       ) : (
         <Button title={t('See What Pro Includes')} kind="secondary" onPress={() => router.push('/pro')} />
       )}
@@ -72,7 +72,7 @@ export default function SubscriptionScreen() {
       <View style={styles.list}>
         <Row
           title={t('Manage Subscription')}
-          detail={ent.store?.store === 'google' || (!ent.store && google) ? 'Change plans or cancel in Google Play' : 'Change plans or cancel in your App Store account'}
+          detail={ent.store?.store === 'google' || (!ent.store && google) ? t('Change plans or cancel in Google Play') : t('Change plans or cancel in your App Store account')}
           busy={busy === 'manage'}
           onPress={() => run('manage', async () => {
             const target = manageTarget(ent, store);
@@ -83,7 +83,7 @@ export default function SubscriptionScreen() {
         />
         <Row
           title={t('Restore Purchases')}
-          detail={google ? 'Bought Pro on another Android device? Bring it here' : 'Bought Pro on another iPhone or iPad? Bring it here'}
+          detail={google ? t('Bought Pro on another Android device? Bring it here') : t('Bought Pro on another iPhone or iPad? Bring it here')}
           busy={busy === 'restore'}
           onPress={() => run('restore', async () => {
             if (!store) return notYet;
@@ -94,7 +94,7 @@ export default function SubscriptionScreen() {
         />
         <Row
           title={t('Redeem Promo Code')}
-          detail={google ? 'Enter an OnMyLead promo code in Google Play' : 'Enter an OnMyLead offer code from Apple'}
+          detail={google ? t('Enter an OnMyLead promo code in Google Play') : t('Enter an OnMyLead offer code from Apple')}
           busy={busy === 'redeem'}
           last
           onPress={() => run('redeem', async () => {
@@ -102,7 +102,7 @@ export default function SubscriptionScreen() {
             const blocked = otherStoreBlock(ent, store);
             if (blocked) return blocked.message;
             await redeemOfferCode();
-            return google ? 'After you redeem the code in Google Play, come back here and Pro turns on.' : null;
+            return google ? t('After you redeem the code in Google Play, come back here and Pro turns on.') : null;
           })}
         />
       </View>

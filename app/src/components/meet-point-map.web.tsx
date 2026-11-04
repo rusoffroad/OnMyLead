@@ -77,7 +77,7 @@ export function MeetPointMap({ value, onPick }: { value: LatLng | null; onPick: 
         <div ref={el} className="omlmap" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
       </View>
       <ThemedText type="small" themeColor="textSecondary">
-        {value ? 'Drag the pin to fine-tune the spot.' : 'Click the map to drop the meeting point, or search above.'}
+        {value ? t('Drag the pin to fine-tune the spot.') : t('Click the map to drop the meeting point, or search above.')}
       </ThemedText>
     </View>
   );

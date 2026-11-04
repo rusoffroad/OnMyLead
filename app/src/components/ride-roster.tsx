@@ -71,7 +71,7 @@ export function RideRoster({
   async function friendPress(m: RideMember) {
     const name = nameOf(m.user_id);
     const rel = relationTo(friends.list, m.user_id, me);
-    if (rel === 'friends' && !(await confirmAsync(`Remove ${name}?`, t('You’ll stop being friends. They aren’t told.'), t('Remove')))) return;
+    if (rel === 'friends' && !(await confirmAsync(t('Remove {name}?', { name }), t('You’ll stop being friends. They aren’t told.'), t('Remove')))) return;
     setBusy(`friend-${m.user_id}`);
     setError(null);
     setFriendNote(null);
@@ -79,10 +79,10 @@ export function RideRoster({
       if (rel === 'none') setFriendNote(requestResultLine(await sendFriendRequest(m.user_id), name));
       else if (rel === 'received') {
         await respondFriendRequest(m.user_id, true);
-        setFriendNote(`You and ${name} are friends now.`);
+        setFriendNote(t('You and {name} are friends now.', { name }));
       } else await removeFriend(m.user_id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      setError(e instanceof Error ? e.message : t('Something went wrong.'));
     } finally {
       setBusy(null);
     }
@@ -104,7 +104,7 @@ export function RideRoster({
       setOpen(null);
       await onChanged();
     } catch (e) {
-      setError(friendlyRoleError(e instanceof Error ? e.message : 'Something went wrong.'));
+      setError(friendlyRoleError(e instanceof Error ? e.message : t('Something went wrong.')));
     } finally {
       setBusy(null);
     }
@@ -136,8 +136,8 @@ export function RideRoster({
           const isOpen = open === m.user_id && can;
           const leads = leaderIds.includes(m.user_id);
           const roleLine = [
-            leads && m.role !== 'leader' ? `${ROLE_LABEL[m.role]} and leader` : m.role !== 'rider' ? ROLE_LABEL[m.role] : null,
-            m.checked_in_at ? 'Here' : null,
+            leads && m.role !== 'leader' ? t('{v} and leader', { v: ROLE_LABEL[m.role] }) : m.role !== 'rider' ? ROLE_LABEL[m.role] : null,
+            m.checked_in_at ? t('Here') : null,
           ].filter(Boolean).join(', ');
           return (
             <View key={m.user_id} style={[i > 0 && styles.divider]}>
@@ -146,7 +146,7 @@ export function RideRoster({
                 onPress={() => toggle(m.user_id)}
                 accessibilityRole={can ? 'button' : undefined}
                 accessibilityState={can ? { expanded: isOpen } : undefined}
-                accessibilityHint={can ? 'Shows what you can do for this rider' : undefined}
+                accessibilityHint={can ? t('Shows what you can do for this rider') : undefined}
                 style={({ pressed }) => [styles.row, pressed && { opacity: 0.7 }]}>
                 <RiderPhoto
                   userId={m.user_id}
@@ -184,8 +184,8 @@ export function RideRoster({
                   {actions.handOff ? (
                     <Action
                       color={RideColors.leader}
-                      title={actions.handOff === 'ride' ? 'Give Them the Ride' : 'Hand Them the Lead'}
-                      caption={actions.handOff === 'ride' ? 'They organize and lead. You ride along.' : 'They lead from here. You ride along.'}
+                      title={actions.handOff === 'ride' ? t('Give Them the Ride') : t('Hand Them the Lead')}
+                      caption={actions.handOff === 'ride' ? t('They organize and lead. You ride along.') : t('They lead from here. You ride along.')}
                       busy={busy === `handoff-${m.user_id}`}
                       onPress={() => handOff(m, actions.handOff!)}
                     />
@@ -194,8 +194,8 @@ export function RideRoster({
                     <Action
                       color={RideColors.leader}
                       on={m.role === 'leader'}
-                      title={m.role === 'leader' ? 'Remove as Leader' : 'Make Leader'}
-                      caption={m.role === 'leader' ? 'You lead again.' : 'They ride up front. You keep organizing.'}
+                      title={m.role === 'leader' ? t('Remove as Leader') : t('Make Leader')}
+                      caption={m.role === 'leader' ? t('You lead again.') : t('They ride up front. You keep organizing.')}
                       busy={busy === `leader-${m.user_id}`}
                       onPress={() => run(`leader-${m.user_id}`, () => setMemberRole(ride.id, m.user_id, m.role === 'leader' ? 'rider' : 'leader'))}
                     />
@@ -204,8 +204,8 @@ export function RideRoster({
                     <Action
                       color={RideColors.sweep}
                       on={m.role === 'sweep'}
-                      title={m.role === 'sweep' ? 'Remove as Tail Gunner' : 'Make Tail Gunner'}
-                      caption={m.role === 'sweep' ? 'Nobody rides at the rear.' : tailId ? `Rides at the rear instead of ${nameOf(tailId)}.` : 'Rides at the rear so nobody gets left behind.'}
+                      title={m.role === 'sweep' ? t('Remove as Tail Gunner') : t('Make Tail Gunner')}
+                      caption={m.role === 'sweep' ? t('Nobody rides at the rear.') : tailId ? t('Rides at the rear instead of {v}.', { v: nameOf(tailId) }) : t('Rides at the rear so nobody gets left behind.')}
                       busy={busy === `tail-${m.user_id}`}
                       onPress={() => run(`tail-${m.user_id}`, () => setTailGunner(ride.id, m.role === 'sweep' ? null : m.user_id))}
                     />
@@ -219,10 +219,10 @@ export function RideRoster({
                           on={rel === 'friends'}
                           title={{ none: 'Add Friend', sent: 'Cancel Friend Request', received: 'Accept Friend Request', friends: 'Remove Friend', self: '' }[rel]}
                           caption={
-                            rel === 'friends' ? 'You see each other in Out Riding and can message any time.'
-                            : rel === 'sent' ? 'Waiting for them to accept.'
-                            : rel === 'received' ? 'They asked to be your friend.'
-                            : 'See each other in Out Riding and message any time.'
+                            rel === 'friends' ? t('You see each other in Out Riding and can message any time.')
+                            : rel === 'sent' ? t('Waiting for them to accept.')
+                            : rel === 'received' ? t('They asked to be your friend.')
+                            : t('See each other in Out Riding and message any time.')
                           }
                           busy={busy === `friend-${m.user_id}`}
                           onPress={() => friendPress(m)}
@@ -249,8 +249,8 @@ export function RideRoster({
                     <Action
                       color={Colors.textSecondary}
                       on={blocks.ids.has(m.user_id)}
-                      title={blocks.ids.has(m.user_id) ? 'Unblock Rider' : 'Block Rider'}
-                      caption={blocks.ids.has(m.user_id) ? 'You don’t see their chat messages. Unblock to see them again.' : 'Hide their chat messages from you. They aren’t told.'}
+                      title={blocks.ids.has(m.user_id) ? t('Unblock Rider') : t('Block Rider')}
+                      caption={blocks.ids.has(m.user_id) ? t('You don’t see their chat messages. Unblock to see them again.') : t('Hide their chat messages from you. They aren’t told.')}
                       busy={busy === `block-${m.user_id}`}
                       onPress={() => toggleBlock(m)}
                     />
@@ -275,7 +275,7 @@ function RideLine({ leader, tail, middle }: { leader: string | null; tail: strin
   return (
     <View
       accessible
-      accessibilityLabel={`Leader ${leader ?? 'not set'}. Tail gunner ${tail ?? 'not picked yet'}.`}
+      accessibilityLabel={t('Leader {v}. Tail gunner {v2}.', { v: leader ?? 'not set', v2: tail ?? 'not picked yet' })}
       style={styles.line}>
       <View style={styles.lineTrack}>
         <View style={[styles.endDot, { backgroundColor: RideColors.leader }]} />
@@ -311,7 +311,7 @@ function Action({ title, caption, color, on, busy, onPress }: { title: string; c
       onPress={onPress}
       style={({ pressed }) => [styles.action, { borderLeftColor: color, opacity: busy ? 0.5 : pressed ? 0.75 : 1 }]}>
       <View style={{ flex: 1, gap: 1 }}>
-        <ThemedText style={{ fontWeight: 700, color: on ? Colors.text : color }}>{busy ? 'Saving…' : title}</ThemedText>
+        <ThemedText style={{ fontWeight: 700, color: on ? Colors.text : color }}>{busy ? t('Saving…') : title}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">{caption}</ThemedText>
       </View>
     </Pressable>

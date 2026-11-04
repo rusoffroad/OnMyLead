@@ -167,8 +167,8 @@ function DishStatusCard() {
           <ThemedText type="subtitle">{tr('Can’t Reach Your Dish')}</ThemedText>
           <ThemedText>
             {failure.kind === 'refused' || failure.kind === 'unreadable'
-              ? 'Your dish answered but we could not read it. A Starlink software update may have changed things. Try again later.'
-              : 'Join your Starlink Wi-Fi and allow OnMyLead to use your local network (Settings › OnMyLead). We keep trying every 10 seconds.'}
+              ? tr('Your dish answered but we could not read it. A Starlink software update may have changed things. Try again later.')
+              : tr('Join your Starlink Wi-Fi and allow OnMyLead to use your local network (Settings › OnMyLead). We keep trying every 10 seconds.')}
           </ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{failure.message}</ThemedText>
         </View>
@@ -202,11 +202,11 @@ function DishStatusCard() {
           {h && h.samples > 0 ? <HistoryView h={h} /> : null}
           <ThemedText type="small" themeColor="textSecondary">
             {[
-              facing && s.elevationDeg != null ? `Facing ${facing}, ${Math.round(s.elevationDeg)}° up` : null,
+              facing && s.elevationDeg != null ? tr('Facing {facing}, {v}° up', { facing, v: Math.round(s.elevationDeg) }) : null,
               s.gpsSats != null ? `GPS ${s.gpsValid ? 'locked' : 'searching'}, ${s.gpsSats} sats` : null,
-              s.ethSpeedMbps ? `Ethernet ${s.ethSpeedMbps} Mbps` : null,
-              s.softwareVersion ? `Software ${s.softwareVersion}` : null,
-              s.hardwareVersion ? `Hardware ${s.hardwareVersion}` : null,
+              s.ethSpeedMbps ? tr('Ethernet {ethSpeedMbps} Mbps', { ethSpeedMbps: s.ethSpeedMbps }) : null,
+              s.softwareVersion ? tr('Software {softwareVersion}', { softwareVersion: s.softwareVersion }) : null,
+              s.hardwareVersion ? tr('Hardware {hardwareVersion}', { hardwareVersion: s.hardwareVersion }) : null,
             ].filter(Boolean).join('. ')}
           </ThemedText>
         </View>
@@ -214,7 +214,7 @@ function DishStatusCard() {
 
       {!live ? (
         <Button
-          title={connecting ? 'Connecting…' : failure ? 'Retry Now' : 'Connect to My Dish'}
+          title={connecting ? tr('Connecting…') : failure ? tr('Retry Now') : tr('Connect to My Dish')}
           big
           disabled={connecting}
           onPress={connect}
@@ -348,7 +348,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
     setError(null);
     setSaved(null);
     const c = parseDollars(cost);
-    if (!c.ok) return setError(`Monthly cost: ${c.error}`);
+    if (!c.ok) return setError(tr('Monthly cost: {error}', { error: c.error }));
     const fields: [string, string, number][] = [
       ['Data cap', cap, Infinity], ['Dish watts', watts, 1000], ['Hours per day', hours, 24], ['Battery Wh', wh, 1_000_000],
       ['Battery Ah', ah, 100_000], ['Volts', volts, 1000], ['Usable %', usable, 100], ['Solar watts', solar, 100_000], ['Sun hours', sun, 24],
@@ -356,7 +356,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
     for (const [label, text, maxV] of fields) {
       const r = parseAmount(text);
       if (!r.ok) return setError(`${label}: enter a number.`);
-      if (r.value != null && r.value > maxV) return setError(`${label}: that is more than ${maxV}.`);
+      if (r.value != null && r.value > maxV) return setError(tr('{label}: that is more than {maxV}.', { label, maxV }));
     }
     if (num(usable) != null && num(usable)! < 1) return setError(tr('Usable %: enter 1 to 100.'));
     setBusy(true);
@@ -379,7 +379,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
       });
       setSaved('Saved.');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save.');
+      setError(e instanceof Error ? e.message : tr('Could not save.'));
     } finally {
       setBusy(false);
     }
@@ -434,7 +434,7 @@ function SetupForm({ signedIn }: { signedIn: boolean }) {
               onChangeText={setWatts}
               keyboardType="decimal-pad"
               placeholder={typical ? String(typical) : 'e.g. 35'}
-              hint={range ? `Typical ${range[0]}-${range[1]} W` : 'Pick your dish above'}
+              hint={range ? tr('Typical {v}-{v2} W', { v: range[0], v2: range[1] }) : tr('Pick your dish above')}
             />
           </View>
           <View style={{ flex: 1 }}>

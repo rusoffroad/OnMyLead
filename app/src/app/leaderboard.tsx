@@ -43,7 +43,7 @@ export default function LeaderboardScreen() {
     setError(null);
     fetchLeaderboard(f)
       .then(setBoard)
-      .catch((e: Error) => setError(`Couldn’t load the leaderboard. ${e.message}`));
+      .catch((e: Error) => setError(t('Couldn’t load the leaderboard. {message}', { message: e.message })));
   }, []);
 
   const changeFilter = useCallback((f: LeaderFilter) => {
@@ -114,14 +114,14 @@ export default function LeaderboardScreen() {
     <View style={{ gap: Spacing.three }}>
       <View style={styles.headRow}>
         <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>{filterTitle(f)}</Text>
-        {board ? <ThemedText type="small" themeColor="textSecondary">{board.total === 1 ? '1 rider' : `${board.total.toLocaleString('en-US')} riders`}</ThemedText> : null}
+        {board ? <ThemedText type="small" themeColor="textSecondary">{board.total === 1 ? t('1 rider') : `${board.total.toLocaleString('en-US')} riders`}</ThemedText> : null}
       </View>
       <ErrorText error={error} />
       {error ? <Button title={t('Try Again')} kind="secondary" onPress={() => loadBoard(f)} /> : null}
       {board === undefined && !error ? <ActivityIndicator color={Colors.text} style={{ marginTop: Spacing.four }} /> : null}
       {board && !board.rows.length ? (
         <ThemedText themeColor="textSecondary">
-          {f.country ? `No riders from ${filterTitle(f)} on the board yet. Riders show here once they pick where they ride from and earn a badge level.` : 'No riders on the board yet.'}
+          {f.country ? t('No riders from {v} on the board yet. Riders show here once they pick where they ride from and earn a badge level.', { v: filterTitle(f) }) : t('No riders on the board yet.')}
         </ThemedText>
       ) : null}
       {board ? (
@@ -207,7 +207,7 @@ function Settings({ settings, busy, onShown }: { settings: LeaderSettings | null
     <View style={{ gap: Spacing.three }}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={where ? `You ride from ${where}. Change it` : 'Pick where you ride from'}
+        accessibilityLabel={where ? t('You ride from {where}. Change it', { where }) : t('Pick where you ride from')}
         onPress={() => router.push('/leaderboard-area')}
         style={({ pressed }) => [styles.setting, pressed && { backgroundColor: Colors.backgroundSelected }]}>
         <Icon name="pin" size={20} color={Colors.sky} />
@@ -215,7 +215,7 @@ function Settings({ settings, busy, onShown }: { settings: LeaderSettings | null
           <ThemedText style={{ fontWeight: 600 }}>{t('Where You Ride')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{where ?? 'Pick your state or country'}</ThemedText>
         </View>
-        <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{where ? 'Change' : 'Pick'}</ThemedText>
+        <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{where ? t('Change') : t('Pick')}</ThemedText>
       </Pressable>
 
       {settings ? (
@@ -224,7 +224,7 @@ function Settings({ settings, busy, onShown }: { settings: LeaderSettings | null
           <View style={{ flex: 1 }}>
             <ThemedText style={{ fontWeight: 600 }}>{t('Show Me on the Leaderboard')}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
-              {settings.shown ? 'Riders see your name, badges and area here' : 'Hidden. Riders don’t see you here'}
+              {settings.shown ? t('Riders see your name, badges and area here') : t('Hidden. Riders don’t see you here')}
             </ThemedText>
           </View>
           <Switch
@@ -266,7 +266,7 @@ function Filters({
           value={filter.state}
           onChange={(s) => onChange({ country: filter.country, state: s })}
           options={[
-            { value: null, label: `All of ${countryName(filter.country)}` },
+            { value: null, label: t('All of {v}', { v: countryName(filter.country) }) },
             ...states.sort((a, b) => (stateName(filter.country, a) ?? a).localeCompare(stateName(filter.country, b) ?? b)).map((s) => ({ value: s, label: stateName(filter.country, s) ?? s })),
           ]}
         />
@@ -285,7 +285,7 @@ function Row({ r, first, showCountry }: { r: LeaderRow; first: boolean; showCoun
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${ordinal(r.place)}, ${r.me ? 'you' : r.name}. ${rank}. ${levelsLine(r)}.${area ? ` ${area}.` : ''}${r.top ? ` Top badge ${badgeTitle(r.top)}.` : ''}`}
+      accessibilityLabel={`${ordinal(r.place)}, ${r.me ? 'you' : r.name}. ${rank}. ${levelsLine(r)}.${area ? ` ${area}.` : ''}${r.top ? t(' Top badge {v}.', { v: badgeTitle(r.top) }) : ''}`}
       onPress={() => router.push(profileHref(r.userId) as never)}
       style={({ pressed }) => [styles.row, !first && styles.rowLine, r.me && styles.rowMe, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={[styles.place, medal ? { backgroundColor: medal } : null]}>

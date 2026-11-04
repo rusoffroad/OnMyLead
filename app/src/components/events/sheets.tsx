@@ -69,7 +69,7 @@ export function AgendaSheet({
       onSaved();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Couldn’t save it.');
+      setError(err instanceof Error ? err.message : t('Couldn’t save it.'));
     } finally {
       setBusy(false);
     }
@@ -77,14 +77,14 @@ export function AgendaSheet({
 
   async function remove() {
     if (!item) return;
-    if (!(await confirmAsync(t('Remove From the Agenda?'), `“${item.title}” comes off the agenda for everyone.`, t('Remove'), t('Keep')))) return;
+    if (!(await confirmAsync(t('Remove From the Agenda?'), t('“{title}” comes off the agenda for everyone.', { title: item.title }), t('Remove'), t('Keep')))) return;
     setBusy(true);
     try {
       await deleteAgendaItem(item.id);
       onSaved();
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Couldn’t remove it.');
+      setError(err instanceof Error ? err.message : t('Couldn’t remove it.'));
     } finally {
       setBusy(false);
     }
@@ -94,8 +94,8 @@ export function AgendaSheet({
     <BottomSheet
       visible={visible}
       onClose={onClose}
-      title={item ? 'Edit Agenda Item' : 'Add to the Agenda'}
-      footer={<Button title={item ? 'Save' : 'Add to the Agenda'} big loading={busy} onPress={save} />}>
+      title={item ? t('Edit Agenda Item') : t('Add to the Agenda')}
+      footer={<Button title={item ? t('Save') : t('Add to the Agenda')} big loading={busy} onPress={save} />}>
       <Choice<AgendaKind> label={t('What Is It')} options={AGENDA_KINDS.map((k) => ({ value: k.kind, label: k.label }))} value={kind} onChange={setKind} />
       <Field label={t('Name')} value={title} onChangeText={setTitle} maxLength={100} placeholder={t('Poker Run, Raffle Drawing, Live Music')} />
       {days.length > 1 ? (
@@ -134,7 +134,7 @@ export function AddRideSheet({
       onAdded();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t add the ride.');
+      setError(e instanceof Error ? e.message : t('Couldn’t add the ride.'));
     } finally {
       setBusy(null);
     }
@@ -163,14 +163,14 @@ export function AddRideSheet({
             <Pressable
               key={r.ride_id}
               accessibilityRole="button"
-              accessibilityLabel={`Add ${r.name}`}
+              accessibilityLabel={t('Add {name}', { name: r.name })}
               disabled={!!busy}
               onPress={() => add(r)}
               style={({ pressed }) => [styles.row, i > 0 && styles.rule, pressed && { backgroundColor: Colors.backgroundSelected }]}>
               <View style={{ flex: 1 }}>
                 <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{r.name}</ThemedText>
                 <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-                  {when(r.meet_at)}{r.visibility === 'private' ? ', Private' : ''}{r.meet_area_label ? `, ${r.meet_area_label}` : ''}
+                  {when(r.meet_at)}{r.visibility === 'private' ? t(', Private') : ''}{r.meet_area_label ? `, ${r.meet_area_label}` : ''}
                 </ThemedText>
               </View>
               <Icon name={busy === r.ride_id ? 'clock' : 'plus'} size={20} color={Colors.sky} />

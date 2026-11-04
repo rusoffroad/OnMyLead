@@ -28,7 +28,7 @@ export function PinnedAnnouncement({ message, senderName }: { message: ChatMessa
   return (
     <View
       accessibilityRole="summary"
-      accessibilityLabel={`Announcement from ${senderName}: ${message.body}`}
+      accessibilityLabel={t('Announcement from {senderName}: {body}', { senderName, body: message.body })}
       style={{ backgroundColor: RideColors.yellow, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.one }}>
       <ThemedText type="small" style={{ color: '#3A2600', fontWeight: 700 }}>{t('Announcement from {senderName}, {v}', { senderName, v: dayAndClock(message.sent_at) })}</ThemedText>
       <ThemedText style={{ color: '#1A1100', fontSize: 19, lineHeight: 25, fontWeight: 700 }}>{t(message.body)}</ThemedText>
@@ -117,7 +117,7 @@ export function RideChat({
   }
 
   const options: { value: SendTo; label: string }[] = [{ value: 'everyone', label: t('Everyone') }];
-  if (leaderName) options.push({ value: 'leader', label: `Leader Only (${leaderName})` });
+  if (leaderName) options.push({ value: 'leader', label: t('Leader Only ({leaderName})', { leaderName }) });
   if (canAnnounce) options.push({ value: 'announcement', label: t('Announcement (Pinned, Read Aloud)') });
   if (canPoll && onSendPoll) options.push({ value: 'poll', label: t('Quick Poll') });
   const announcing = sendTo === 'announcement';
@@ -134,16 +134,16 @@ export function RideChat({
         onPress={toggleOpen}
         accessibilityRole="button"
         accessibilityState={{ expanded: open }}
-        accessibilityLabel={open ? 'Hide ride chat' : `Show ride chat, ${messages.length} messages`}
+        accessibilityLabel={open ? t('Hide ride chat') : t('Show ride chat, {length} messages', { length: messages.length })}
         hitSlop={8}
         style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 }}>
         <ThemedText type="heading">{t('Ride Chat{v}', { v: !open && messages.length ? ` (${messages.length})` : '' })}</ThemedText>
-        <ThemedText type="smallBold" style={{ color: theme.sky }}>{open ? 'Hide ▲' : 'Show ▼'}</ThemedText>
+        <ThemedText type="smallBold" style={{ color: theme.sky }}>{open ? t('Hide ▲') : t('Show ▼')}</ThemedText>
       </Pressable>
       {!open ? (
         last ? (
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            {last.user_id === me ? 'You' : nameOf(last.user_id)}: {isPoll(last) ? `Poll: ${last.body}` : last.body}
+            {last.user_id === me ? t('You') : nameOf(last.user_id)}: {isPoll(last) ? `Poll: ${last.body}` : last.body}
           </ThemedText>
         ) : null
       ) : (
@@ -152,7 +152,7 @@ export function RideChat({
             {t('Only riders on this ride can see this. Don’t type while driving: Ride Mode has one-tap replies.')}
           </ThemedText>
           {messages.length > visible.length ? (
-            <Button title={`Show ${messages.length - visible.length} Earlier`} kind="secondary" onPress={() => setShowAll(true)} />
+            <Button title={t('Show {v} Earlier', { v: messages.length - visible.length })} kind="secondary" onPress={() => setShowAll(true)} />
           ) : null}
           {messages.length === 0 ? <ThemedText type="small" themeColor="textSecondary">{t('No messages yet. Say hi.')}</ThemedText> : null}
           {visible.map((m) => {
@@ -169,7 +169,7 @@ export function RideChat({
                 disabled={!flaggable}
                 onLongPress={flaggable ? () => setMenuFor(menuOpen ? null : m.id) : undefined}
                 delayLongPress={350}
-                accessibilityHint={flaggable ? 'Long press to report or block this rider' : undefined}
+                accessibilityHint={flaggable ? t('Long press to report or block this rider') : undefined}
                 style={{
                   borderTopWidth: 1,
                   borderTopColor: theme.backgroundSelected,
@@ -183,9 +183,9 @@ export function RideChat({
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
                   {!mine ? <RiderDot userId={m.user_id} name={nameOf(m.user_id)} size={20} zoom /> : null}
                   <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
-                    {announcement ? 'Announcement from ' : poll ? 'Poll from ' : ''}
-                    {mine ? 'You' : nameOf(m.user_id)}
-                    {leaderOnly ? (mine ? ', to the leader only' : ', to you only as leader') : ''}, {clock(m.sent_at)}
+                    {announcement ? t('Announcement from ') : poll ? t('Poll from ') : ''}
+                    {mine ? t('You') : nameOf(m.user_id)}
+                    {leaderOnly ? (mine ? t(', to the leader only') : t(', to you only as leader')) : ''}, {clock(m.sent_at)}
                   </ThemedText>
                   {resolved ? <Tag label={t('Resolved')} color={RideColors.green} /> : null}
                   {mine ? <SendBadge state="sent" iconOnly={m.id !== myLatestId || pending.length > 0} /> : null}
@@ -194,7 +194,7 @@ export function RideChat({
                       onPress={() => setMenuFor(menuOpen ? null : m.id)}
                       accessibilityRole="button"
                       accessibilityState={{ expanded: menuOpen }}
-                      accessibilityLabel={menuOpen ? 'Close message options' : 'Message options: Mark Resolved or Clear'}
+                      accessibilityLabel={menuOpen ? t('Close message options') : t('Message options: Mark Resolved or Clear')}
                       hitSlop={12}
                       style={({ pressed }) => [chatStyles.more, { opacity: pressed ? 0.6 : 1 }, menuOpen && { backgroundColor: theme.backgroundSelected }]}>
                       <Text style={chatStyles.moreText}>•••</Text>
@@ -243,7 +243,7 @@ export function RideChat({
                     <View style={chatStyles.actions}>
                       {onResolve ? (
                         <Button
-                          title={resolved ? 'Reopen' : 'Mark Resolved'}
+                          title={resolved ? t('Reopen') : t('Mark Resolved')}
                           kind="secondary"
                           onPress={() => {
                             setMenuFor(null);
@@ -267,8 +267,8 @@ export function RideChat({
               style={{ borderTopWidth: 1, borderTopColor: theme.backgroundSelected, paddingTop: Spacing.two, gap: 2 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
                 <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
-                  {p.kind === 'announcement' ? 'Announcement from You' : 'You'}
-                  {p.audience === 'leader' ? ', to the leader only' : ''}, {clock(p.at)}
+                  {p.kind === 'announcement' ? t('Announcement from You') : t('You')}
+                  {p.audience === 'leader' ? t(', to the leader only') : ''}, {clock(p.at)}
                 </ThemedText>
                 <SendBadge state={p.state} />
               </View>
@@ -295,16 +295,16 @@ export function RideChat({
           ) : (
             <>
               <Field
-                label={announcing ? 'Announcement' : sendTo === 'leader' ? 'Message to the Leader' : 'Message'}
+                label={announcing ? t('Announcement') : sendTo === 'leader' ? t('Message to the Leader') : t('Message')}
                 value={draft}
                 onChangeText={setDraft}
-                placeholder={announcing ? 'Fuel stop in Green River at 11' : sendTo === 'leader' ? 'Only you and the leader see this' : 'Message the group'}
+                placeholder={announcing ? t('Fuel stop in Green River at 11') : sendTo === 'leader' ? t('Only you and the leader see this') : t('Message the group')}
                 maxLength={MAX_MESSAGE_LENGTH}
                 multiline
               />
               <ErrorText error={localError ?? error} />
               <Button
-                title={announcing ? 'Post Announcement' : sendTo === 'leader' ? 'Send to Leader' : 'Send to Everyone'}
+                title={announcing ? t('Post Announcement') : sendTo === 'leader' ? t('Send to Leader') : t('Send to Everyone')}
                 onPress={send}
               />
             </>

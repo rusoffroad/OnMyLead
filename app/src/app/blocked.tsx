@@ -35,7 +35,7 @@ export default function BlockedRiders() {
     try {
       await unblockRider(userId);
     } catch (e) {
-      setError(`Couldn’t unblock them. ${e instanceof Error ? e.message : 'Try again.'}`);
+      setError(t('Couldn’t unblock them. {v}', { v: e instanceof Error ? e.message : 'Try again.' }));
     } finally {
       setBusy(null);
     }
@@ -73,7 +73,7 @@ export default function BlockedRiders() {
                 title={t('Unblock')}
                 kind="secondary"
                 loading={busy === b.userId}
-                accessibilityLabel={`Unblock ${b.name}`}
+                accessibilityLabel={t('Unblock {name}', { name: b.name })}
                 onPress={() => unblock(b.userId)}
               />
             </View>

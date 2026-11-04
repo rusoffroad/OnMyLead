@@ -93,7 +93,7 @@ export function HoldButton({
             ]}
           />
         </View>
-        <Text style={styles.text}>{phase === 'holding' ? 'Keep Holding…' : title}</Text>
+        <Text style={styles.text}>{phase === 'holding' ? t('Keep Holding…') : title}</Text>
       </Pressable>
       <Text
         style={[styles.hint, phase === 'too-short' && styles.hintWarn]}

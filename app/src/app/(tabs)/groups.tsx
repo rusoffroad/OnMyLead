@@ -114,8 +114,8 @@ export default function Groups() {
       ) : null}
       {follows.length || followers ? (
         <ThemedText type="small" themeColor="textSecondary">
-          {follows.length ? 'You get a notification when they post a new public ride. ' : ''}
-          {followers ? `${followers} ${followers === 1 ? 'rider follows' : 'riders follow'} you.` : ''}
+          {follows.length ? t('You get a notification when they post a new public ride. ') : ''}
+          {followers ? `${followers} ${followers === 1 ? t('rider follows') : t('riders follow')} you.` : ''}
         </ThemedText>
       ) : null}
       {leaderRides.length ? (
@@ -153,12 +153,12 @@ function GroupCard({ group, chat, me }: { group: RidingGroup; chat?: GroupChatSu
       </View>
       <Convoy names={group.riders.map((r) => r.name)} ids={group.riders.map((r) => r.id)} max={7} />
       <ThemedText type="small" themeColor="textSecondary">
-        {group.mine ? ridersLabel(group.riders.length) : `${ridersLabel(group.riders.length)}, Run By ${group.ownerName}`}
+        {group.mine ? ridersLabel(group.riders.length) : t('{v}, Run By {ownerName}', { v: ridersLabel(group.riders.length), ownerName: group.ownerName })}
       </ThemedText>
       {preview ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Open ${group.name} group chat${unread ? `, ${unread}` : ''}`}
+          accessibilityLabel={t('Open {name} group chat{v}', { name: group.name, v: unread ? `, ${unread}` : '' })}
           onPress={() => router.push(`/groups/${group.id}/chat`)}
           style={({ pressed }) => [styles.chatLine, pressed && { opacity: 0.7 }]}>
           <ThemedText type="small" style={{ flex: 1, color: unread ? Colors.text : Colors.textSecondary }} numberOfLines={1}>{preview}</ThemedText>

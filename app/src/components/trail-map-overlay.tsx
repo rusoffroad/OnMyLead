@@ -82,7 +82,7 @@ export function TrailMapOverlay({
 
       {(trail.zoomInHint || trail.closerForTracks) && !open && !bare ? (
         <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
-          <Text style={styles.hintText}>{trail.zoomInHint ? 'Zoom In to See Trails' : 'Zoom In for Park and Local Trails'}</Text>
+          <Text style={styles.hintText}>{trail.zoomInHint ? tr('Zoom In to See Trails') : tr('Zoom In for Park and Local Trails')}</Text>
         </View>
       ) : null}
 
@@ -149,15 +149,15 @@ function LayersPanel({
       {trail.base === 'terrain' ? (
         <Text style={styles.fine}>
           {trail.terrain3d
-            ? `Satellite on the real shape of the land, with contour lines and peak heights in feet. ${WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.'} Shows in Ride Mode and Map Mode.`
-            : 'No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.'}
+            ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.' })
+            : tr('No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.')}
         </Text>
       ) : null}
 
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => requirePro('map_layers') && trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.rowTitle}>{tr('Public Trails and Roads')}</Text>
-          <Text style={styles.rowSub}>{`Forest Service, BLM and OpenStreetMap, including off-road parks, with names and closures. ${lookupHint}`.trim()}</Text>
+          <Text style={styles.rowSub}>{tr('Forest Service, BLM and OpenStreetMap, including off-road parks, with names and closures. {lookupHint}', { lookupHint }).trim()}</Text>
         </View>
         <Switch
           value={trail.trails}
@@ -276,14 +276,14 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
           <Text style={styles.saveText}>{tr('Download This Ride’s Map')}</Text>
           <ProTag feature="offline_maps" />
         </View>
-        <Text style={styles.saveSub}>{`${terrain ? 'Satellite, Topo, Trails and 3D Terrain' : 'Satellite, Topo and Trails'}, About ${formatBytes(estimate)}`}</Text>
+        <Text style={styles.saveSub}>{`${terrain ? tr('Satellite, Topo, Trails and 3D Terrain') : tr('Satellite, Topo and Trails')}, About ${formatBytes(estimate)}`}</Text>
       </Pressable>
     );
   }
   return (
     <View style={styles.saved}>
       <View style={{ flex: 1, gap: 4 }}>
-        <Text style={styles.rowTitle}>{busy ? 'Downloading Ride Map' : saved.status === 'ready' ? 'Ride Map Downloaded' : 'Ride Map'}</Text>
+        <Text style={styles.rowTitle}>{busy ? tr('Downloading Ride Map') : saved.status === 'ready' ? tr('Ride Map Downloaded') : tr('Ride Map')}</Text>
         <Text style={styles.savedSub}>{statusLine(saved)}</Text>
         {busy || saved.status === 'paused' ? (
           <View style={styles.track}>
@@ -297,7 +297,7 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
         </Pressable>
       ) : saved.status !== 'ready' ? (
         <Pressable accessibilityRole="button" onPress={() => resumeDownload(saved.id)} hitSlop={8} style={styles.mini}>
-          <Text style={styles.miniText}>{saved.status === 'paused' ? 'Resume' : 'Finish'}</Text>
+          <Text style={styles.miniText}>{saved.status === 'paused' ? tr('Resume') : tr('Finish')}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -305,7 +305,7 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
 }
 
 export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => void }) {
-  const facts = [info.source === 'osm' ? 'Track' : info.kind === 'trail' ? 'Trail' : 'Road', info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
+  const facts = [info.source === 'osm' ? tr('Track') : info.kind === 'trail' ? tr('Trail') : tr('Road'), info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
   return (
     <View style={styles.card} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
@@ -329,12 +329,12 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
       <TrailWidthRow key={`${info.source}|${info.lineKey ?? info.title}|${info.at?.lat}|${info.at?.lng}`} info={info} />
       {info.allowed.length ? (
         <View style={styles.allowed}>
-          <Text style={styles.allowedLabel}>{info.seasonal ? 'Open To, by Season' : 'Open To'}</Text>
+          <Text style={styles.allowedLabel}>{info.seasonal ? tr('Open To, by Season') : tr('Open To')}</Text>
           {info.allowed.slice(0, 6).map((a) => (
             <View key={a.vehicle} style={styles.allowedRow}>
               <Text style={styles.allowedName}>{a.vehicle}</Text>
               <Text style={[styles.allowedDates, a.closedNow && styles.closedNow]}>
-                {[a.closedNow ? 'Closed Now' : null, a.dates].filter(Boolean).join('  ')}
+                {[a.closedNow ? tr('Closed Now') : null, a.dates].filter(Boolean).join('  ')}
               </Text>
             </View>
           ))}
@@ -366,7 +366,7 @@ function LegendLine({ color, label, dashed, closed, dotted }: { color: string; l
  * dotted line), who mapped it and when, its ratings, and offers Rate, Navigate and Details.
  */
 export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrail; onClose: () => void; onRate: () => void; onFollow: () => void }) {
-  const facts = [feetOrMiles(t.lengthM), t.maxWidthIn != null ? `${inches(t.maxWidthIn)} Width Limit` : null, t.vehicles.map(vehicleLabel).join(', ')]
+  const facts = [feetOrMiles(t.lengthM), t.maxWidthIn != null ? tr('{v} Width Limit', { v: inches(t.maxWidthIn) }) : null, t.vehicles.map(vehicleLabel).join(', ')]
     .filter(Boolean)
     .join('   ');
   const garage = useGarageWidths();
@@ -408,7 +408,7 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
       <View style={styles.actions}>
         {!t.mine ? (
           <Pressable accessibilityRole="button" onPress={onRate} style={({ pressed }) => [styles.action, styles.actionMain, pressed && { opacity: 0.85 }]}>
-            <Text style={[styles.actionText, { color: Colors.background }]}>{t.myScore != null || t.myQuality != null ? 'Change Rating' : 'Rate Trail'}</Text>
+            <Text style={[styles.actionText, { color: Colors.background }]}>{t.myScore != null || t.myQuality != null ? tr('Change Rating') : tr('Rate Trail')}</Text>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" onPress={onFollow} style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}>

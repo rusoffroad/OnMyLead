@@ -68,7 +68,7 @@ export function DateCalendar({ value, onChange, range, note }: Props) {
       return;
     }
     if (!inRange(d, range)) {
-      setTypedError(`Pick a day from ${rangeText}.`);
+      setTypedError(t('Pick a day from {rangeText}.', { rangeText }));
       setMonth(addMonths(clampToRange(d, range), 0));
       return;
     }
@@ -111,7 +111,7 @@ export function DateCalendar({ value, onChange, range, note }: Props) {
             selectTextOnFocus
             autoCorrect={false}
             accessibilityLabel={t('Type a date, month, day, year')}
-            accessibilityHint={`Any day from ${rangeText}`}
+            accessibilityHint={t('Any day from {rangeText}', { rangeText })}
             style={[styles.typeInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
           />
         </View>
@@ -126,7 +126,7 @@ export function DateCalendar({ value, onChange, range, note }: Props) {
         <MonthArrow back disabled={choosing || !canPageMonth(month, -1, range)} onPress={() => setMonth(addMonths(month, -1))} />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${monthText(month)}. ${choosing ? 'Back to the days' : 'Choose a month or year'}`}
+          accessibilityLabel={`${monthText(month)}. ${choosing ? t('Back to the days') : t('Choose a month or year')}`}
           accessibilityState={{ expanded: choosing }}
           onPress={() => setChoosing((c) => !c)}
           hitSlop={6}
@@ -281,7 +281,7 @@ function MonthArrow({ back, disabled, onPress }: { back?: boolean; disabled: boo
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={back ? 'Previous Month' : 'Next Month'}
+      accessibilityLabel={back ? t('Previous Month') : t('Next Month')}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}

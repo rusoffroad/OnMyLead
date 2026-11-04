@@ -40,7 +40,7 @@ export default function PublicTrailPage() {
   const load = useCallback(() => {
     getPublicTrail(id)
       .then(setT)
-      .catch((e) => setError(e instanceof Error ? e.message : 'Couldn’t load the trail.'))
+      .catch((e) => setError(e instanceof Error ? e.message : tr('Couldn’t load the trail.')))
       .finally(() => setLoaded(true));
   }, [id]);
   useEffect(load, [load]);
@@ -48,7 +48,7 @@ export default function PublicTrailPage() {
   if (!t) {
     return (
       <Screen width="readable">
-        <ThemedText themeColor="textSecondary">{loaded ? 'This trail isn’t on the public map any more.' : 'Loading…'}</ThemedText>
+        <ThemedText themeColor="textSecondary">{loaded ? tr('This trail isn’t on the public map any more.') : tr('Loading…')}</ThemedText>
         <ErrorText error={error} />
       </Screen>
     );
@@ -58,8 +58,8 @@ export default function PublicTrailPage() {
   // on this phone stays in My Trails (delete it there too if they want it gone).
   async function removeMine() {
     const msg = savedCopy
-      ? 'It comes off the public map with its photos and ratings. Your copy stays in My Trails. Rides that used it keep their route.'
-      : 'It comes off the public map with its photos and ratings. Rides that used it keep their route.';
+      ? tr('It comes off the public map with its photos and ratings. Your copy stays in My Trails. Rides that used it keep their route.')
+      : tr('It comes off the public map with its photos and ratings. Rides that used it keep their route.');
     if (!(await confirmAsync(tr('Delete Your Trail?'), msg, tr('Delete'), tr('Keep It')))) return;
     setDeleting(true);
     try {
@@ -67,7 +67,7 @@ export default function PublicTrailPage() {
       else await deleteSharedTrail(t!.id, t!.photos);
       router.back();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t delete it.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t delete it.'));
     } finally {
       setDeleting(false);
     }
@@ -77,7 +77,7 @@ export default function PublicTrailPage() {
     try {
       return await savePublicTrail(t!);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save it.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t save it.'));
       return null;
     }
   }
@@ -88,7 +88,7 @@ export default function PublicTrailPage() {
     t.highPointM != null ? { label: tr('High Point'), value: feet(t.highPointM)! } : null,
     t.maxWidthIn != null ? { label: tr('Width Limit'), value: `${t.maxWidthIn}"` } : null,
   ].filter((f): f is { label: string; value: string } => !!f);
-  const more = [surfaceLabel(t.surface), seasonLabel(t.season), t.oneWay ? 'One Way' : null].filter(Boolean);
+  const more = [surfaceLabel(t.surface), seasonLabel(t.season), t.oneWay ? tr('One Way') : null].filter(Boolean);
 
   const info = (
     <>
@@ -145,11 +145,11 @@ export default function PublicTrailPage() {
 
   const side = (
     <>
-      <RouteMap route={t.points} color={RIDER_TRAIL_INK} dotted label={`Map of ${t.name}`} />
+      <RouteMap route={t.points} color={RIDER_TRAIL_INK} dotted label={tr('Map of {name}', { name: t.name })} />
       {t.photos.length ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.two }}>
           {t.photos.map((p) => (
-            <Image key={p} source={{ uri: p }} style={styles.photo} contentFit="cover" accessibilityLabel={`Photo of ${t.name}`} />
+            <Image key={p} source={{ uri: p }} style={styles.photo} contentFit="cover" accessibilityLabel={tr('Photo of {name}', { name: t.name })} />
           ))}
         </ScrollView>
       ) : null}
@@ -162,7 +162,7 @@ export default function PublicTrailPage() {
       <Button title={tr('Navigate')} big onPress={() => router.push(`/nav?follow=${t.id}`)} />
       {!t.mine ? (
         <Button
-          title={t.myScore != null || t.myQuality != null ? 'Change Your Rating' : 'Rate This Trail'}
+          title={t.myScore != null || t.myQuality != null ? tr('Change Your Rating') : tr('Rate This Trail')}
           kind="secondary"
           pro="rate_trails"
           onPress={() => requirePro('rate_trails') && setRating(true)}
@@ -175,7 +175,7 @@ export default function PublicTrailPage() {
           <Button title={tr('Delete Your Trail')} kind="ghost" loading={deleting} onPress={removeMine} />
         </>
       ) : (
-        <Button title={savedCopy ? 'Saved to My Trails' : 'Save to My Trails'} kind="secondary" disabled={!!savedCopy} onPress={save} />
+        <Button title={savedCopy ? tr('Saved to My Trails') : tr('Save to My Trails')} kind="secondary" disabled={!!savedCopy} onPress={save} />
       )}
       <Button
         title={tr('Plan a Group Ride on This Trail')}

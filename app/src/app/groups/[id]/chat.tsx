@@ -102,7 +102,7 @@ export default function GroupChat() {
     const theirs = m.user_id !== me;
     const ok = await confirmAsync(
       tr('Clear This Message?'),
-      theirs ? `You run this group, so you can clear ${nameOf(m.user_id)}’s message. It disappears for everyone.` : 'It disappears from the group chat for everyone. This can’t be undone.',
+      theirs ? tr('You run this group, so you can clear {v}’s message. It disappears for everyone.', { v: nameOf(m.user_id) }) : tr('It disappears from the group chat for everyone. This can’t be undone.'),
       tr('Clear'),
     );
     if (ok) chat.clear(m.id);
@@ -131,18 +131,18 @@ export default function GroupChat() {
         <Pressable accessibilityRole="button" accessibilityHint={tr('Open the group')} onPress={() => router.push(`/groups/${id}`)} style={{ flex: 1 }}>
           <Text style={styles.title} numberOfLines={1}>{group?.name ?? 'Group Chat'}</Text>
           <Text style={styles.sub} numberOfLines={1}>
-            {group ? `${group.riders.length} ${group.riders.length === 1 ? 'Rider' : 'Riders'}` : ' '}
-            {muted ? ', Muted' : ''}
+            {group ? `${group.riders.length} ${group.riders.length === 1 ? tr('Rider') : tr('Riders')}` : ' '}
+            {muted ? tr(', Muted') : ''}
           </Text>
         </Pressable>
         {!chat.off ? (
           <Pressable
             accessibilityRole="switch"
             accessibilityState={{ checked: muted }}
-            accessibilityLabel={muted ? 'Unmute this group chat' : 'Mute this group chat'}
+            accessibilityLabel={muted ? tr('Unmute this group chat') : tr('Mute this group chat')}
             onPress={toggleMute}
             style={[styles.mute, muted && { backgroundColor: Colors.backgroundSelected }]}>
-            <Text style={[styles.muteText, muted && { color: Colors.textSecondary }]}>{muted ? 'Unmute' : 'Mute'}</Text>
+            <Text style={[styles.muteText, muted && { color: Colors.textSecondary }]}>{muted ? tr('Unmute') : tr('Mute')}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -234,7 +234,7 @@ export default function GroupChat() {
                     <Pressable
                       onLongPress={self ? () => clear(m) : () => setMenuFor(menuOpen ? null : m.id)}
                       delayLongPress={350}
-                      accessibilityHint={self ? 'Long press to clear it' : 'Long press to report or block this rider'}
+                      accessibilityHint={self ? tr('Long press to clear it') : tr('Long press to report or block this rider')}
                       style={[
                         styles.bubble,
                         self ? styles.bubbleMine : styles.bubbleTheirs,
@@ -342,7 +342,7 @@ export default function GroupChat() {
               {about ? (
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`About ${about.name}. Tap to send it without a ride.`}
+                  accessibilityLabel={tr('About {name}. Tap to send it without a ride.', { name: about.name })}
                   onPress={() => setAboutRide(null)}
                   style={[styles.aboutChip, { borderColor: PHASE_COLOR[ridePhase(about)] }]}>
                   <View style={[styles.aboutDot, { backgroundColor: PHASE_COLOR[ridePhase(about)] }]} />
@@ -356,7 +356,7 @@ export default function GroupChat() {
                   onPress={() => setPicking(!picking)}
                   style={styles.aboutChip}>
                   <Icon name="flag" size={14} color={Colors.sky} />
-                  <Text style={[styles.aboutText, { color: Colors.sky }]}>{picking ? 'Not About a Ride' : 'About a Ride'}</Text>
+                  <Text style={[styles.aboutText, { color: Colors.sky }]}>{picking ? tr('Not About a Ride') : tr('About a Ride')}</Text>
                 </Pressable>
               )}
             </View>
@@ -367,7 +367,7 @@ export default function GroupChat() {
                   setDraft(t);
                   if (localError) setLocalError(null);
                 }}
-                placeholder={`Message ${group?.name ?? 'the group'}`}
+                placeholder={tr('Message {v}', { v: group?.name ?? 'the group' })}
                 placeholderTextColor={Colors.textSecondary}
                 maxLength={MAX_MESSAGE_LENGTH}
                 multiline
@@ -418,7 +418,7 @@ function RideTicket({
       accessibilityRole={accessibilityRole}
       accessibilityState={accessibilityRole === 'radio' ? { selected: !!selected } : undefined}
       accessibilityLabel={`${ride.name}, ${when}`}
-      accessibilityHint={compact ? 'Show only the talk about this ride. Long press to open the ride.' : 'Long press to open the ride.'}
+      accessibilityHint={compact ? tr('Show only the talk about this ride. Long press to open the ride.') : tr('Long press to open the ride.')}
       style={[
         styles.ticket,
         { borderLeftColor: color },

@@ -21,7 +21,7 @@ export function WaypointRow({
 }) {
   const time = stopTimeLabel(w.stop_time);
   const audience = w.planned_stop
-    ? [`Stop ${stop ?? ''}`.trim(), time, symbolLabel(waypointSymbol(w))].filter(Boolean).join(', ')
+    ? [t('Stop {v}', { v: stop ?? '' }).trim(), time, symbolLabel(waypointSymbol(w))].filter(Boolean).join(', ')
     : `${symbolLabel(waypointSymbol(w))}, ${waypointAudience(w, me, ownerName(w.user_id))}`;
   return (
     <Pressable

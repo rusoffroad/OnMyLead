@@ -57,7 +57,7 @@ export default function LeaderboardAreaScreen() {
         setCountry(found.country);
         setState(found.state);
         setQuery('');
-        if (!found.state && statesOf(found.country).length) setNote(`Pick your ${stateWord(found.country).toLowerCase()} below.`);
+        if (!found.state && statesOf(found.country).length) setNote(t('Pick your {v} below.', { v: stateWord(found.country).toLowerCase() }));
       }
     } catch (e) {
       setError((e as Error).message);
@@ -73,7 +73,7 @@ export default function LeaderboardAreaScreen() {
       await saveLeaderArea(c, s);
       router.back();
     } catch (e) {
-      setError(`That didn’t save. ${(e as Error).message}`);
+      setError(t('That didn’t save. {message}', { message: (e as Error).message }));
     } finally {
       setBusy(false);
     }
@@ -96,7 +96,7 @@ export default function LeaderboardAreaScreen() {
       {saved === null && !error ? <ActivityIndicator color={Colors.text} /> : null}
 
       {canDetectArea ? (
-        <Button title={locating ? 'Finding Your State…' : 'Use My Location'} kind="secondary" loading={locating} onPress={useMyLocation} />
+        <Button title={locating ? t('Finding Your State…') : t('Use My Location')} kind="secondary" loading={locating} onPress={useMyLocation} />
       ) : null}
       {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
 
@@ -105,7 +105,7 @@ export default function LeaderboardAreaScreen() {
         {country ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Country: ${countryName(country)}. Change it`}
+            accessibilityLabel={t('Country: {v}. Change it', { v: countryName(country) })}
             onPress={() => {
               setCountry(null);
               setState(null);
@@ -154,7 +154,7 @@ export default function LeaderboardAreaScreen() {
 
       <ErrorText error={error} />
       <Button
-        title={country ? `Save ${areaLabel(country, state) ?? ''}`.trim() : 'Save'}
+        title={country ? t('Save {v}', { v: areaLabel(country, state) ?? '' }).trim() : t('Save')}
         disabled={!country || needsState || !changed || busy}
         loading={busy}
         onPress={() => save(country, state)}

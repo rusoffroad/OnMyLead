@@ -67,9 +67,9 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
                     <Pressable
                       onPress={() => setEditing((e) => !e)}
                       accessibilityRole="button"
-                      accessibilityLabel={editing ? 'Done removing quick replies' : 'Remove quick replies'}
+                      accessibilityLabel={editing ? tr('Done removing quick replies') : tr('Remove quick replies')}
                       hitSlop={8}>
-                      <Text style={styles.link}>{editing ? 'Done' : 'Edit'}</Text>
+                      <Text style={styles.link}>{editing ? tr('Done') : tr('Edit')}</Text>
                     </Pressable>
                   </View>
                   <View style={styles.chips}>
@@ -78,7 +78,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
                         key={s}
                         onPress={() => (editing ? onRemove(s) : send(s, false))}
                         accessibilityRole="button"
-                        accessibilityLabel={editing ? `Remove quick reply: ${s}` : `Send to the group: ${s}`}
+                        accessibilityLabel={editing ? tr('Remove quick reply: {s}', { s }) : tr('Send to the group: {s}', { s })}
                         style={({ pressed }) => [styles.chip, editing && styles.chipEditing, { opacity: pressed ? 0.75 : 1 }]}>
                         {editing ? <Icon name="close" size={16} color={Colors.text} /> : null}
                         <Text style={[styles.chipText, editing && { color: Colors.text }]} numberOfLines={2}>{s}</Text>

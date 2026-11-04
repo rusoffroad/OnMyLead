@@ -42,7 +42,7 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
     try {
       await onSave({ name: name.trim(), starts_on: s || null, ends_on: e || null, ride_id: rideId, vehicle_id: vehicleId });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save.');
+      setError(err instanceof Error ? err.message : t('Could not save.'));
       setBusy(false);
     }
   }

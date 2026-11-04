@@ -69,13 +69,13 @@ export default function NotificationsScreen() {
       const feedOff = FEED_TOPICS.some((k) => k in patch) && /feed_activity|schema cache/i.test((e as Error).message);
       const accountOff = ACCOUNT_SETTINGS.some((k) => k in patch) && /account_push|account_emails|schema cache/i.test((e as Error).message);
       setError(
-        feedOff ? 'Likes and Comments notifications are not switched on yet. They start working with the next server update.'
-        : friendsOff ? 'Friend Request notifications are not switched on yet. They start working with the next server update.'
-        : dmOff ? 'Direct Message notifications are not switched on yet. They start working with the next server update.'
-        : chatOff ? 'Riding Group Chat notifications are not switched on yet. They start working with the next server update.'
-        : groupsOff ? 'Ride Invites and Leaders You Follow are not switched on yet. They start working with the next server update.'
-        : accountOff ? 'Account notifications are not switched on yet. They start working with the next server update.'
-        : `Couldn’t save that. ${(e as Error).message}`,
+        feedOff ? tr('Likes and Comments notifications are not switched on yet. They start working with the next server update.')
+        : friendsOff ? tr('Friend Request notifications are not switched on yet. They start working with the next server update.')
+        : dmOff ? tr('Direct Message notifications are not switched on yet. They start working with the next server update.')
+        : chatOff ? tr('Riding Group Chat notifications are not switched on yet. They start working with the next server update.')
+        : groupsOff ? tr('Ride Invites and Leaders You Follow are not switched on yet. They start working with the next server update.')
+        : accountOff ? tr('Account notifications are not switched on yet. They start working with the next server update.')
+        : tr('Couldn’t save that. {message}', { message: (e as Error).message }),
       );
     }
   };
@@ -89,7 +89,7 @@ export default function NotificationsScreen() {
           {tr('Your choices here apply on your phone too.')}
         </Note>
       ) : permission === 'denied' ? (
-        <Note tone="warn" title={tr('Notifications Are Off for OnMyLead')} action={{ title: Platform.OS === 'android' ? 'Open Settings' : 'Open iPhone Settings', onPress: openPhoneSettings }}>
+        <Note tone="warn" title={tr('Notifications Are Off for OnMyLead')} action={{ title: Platform.OS === 'android' ? tr('Open Settings') : tr('Open iPhone Settings'), onPress: openPhoneSettings }}>
           {tr('Your phone is blocking them, so nothing below can reach you. Turn on Allow Notifications for OnMyLead.')}
         </Note>
       ) : permission === 'undetermined' && session ? (
@@ -225,7 +225,7 @@ function QuietHours({
         <ToggleRow
           first
           title={tr('Silence Overnight')}
-          detail={on ? `Silent for ${hours % 1 ? hours.toFixed(1) : hours} hours a day. Help alerts still come through.` : 'Hold everything but help alerts overnight.'}
+          detail={on ? tr('Silent for {v} hours a day. Help alerts still come through.', { v: hours % 1 ? hours.toFixed(1) : hours }) : tr('Hold everything but help alerts overnight.')}
           value={on}
           disabled={disabled}
           onChange={(v) => onChange({ quiet_hours: v })}
@@ -235,7 +235,7 @@ function QuietHours({
             <View
               style={styles.strip}
               accessible
-              accessibilityLabel={`Quiet from ${formatClock(settings.quiet_start)} until ${formatClock(settings.quiet_end)}`}>
+              accessibilityLabel={tr('Quiet from {v} until {v2}', { v: formatClock(settings.quiet_start), v2: formatClock(settings.quiet_end) })}>
               {segments.map(([a, b]) => (
                 <View key={a} style={[styles.night, { left: `${a * 100}%`, width: `${(b - a) * 100}%` }]}>
                   {STARS.filter((x) => x >= a && x <= b).map((x) => (
@@ -265,9 +265,9 @@ function Clock({ label, minutes, onStep }: { label: string; minutes: number; onS
     <View style={styles.clock}>
       <Text style={styles.clockLabel}>{label}</Text>
       <View style={styles.clockRow}>
-        <StepButton sign="−" label={`${label} half an hour earlier`} onPress={() => onStep(-1)} />
+        <StepButton sign="−" label={tr('{label} half an hour earlier', { label })} onPress={() => onStep(-1)} />
         <Text style={styles.clockTime} accessibilityLiveRegion="polite">{formatClock(minutes)}</Text>
-        <StepButton sign="+" label={`${label} half an hour later`} onPress={() => onStep(1)} />
+        <StepButton sign="+" label={tr('{label} half an hour later', { label })} onPress={() => onStep(1)} />
       </View>
     </View>
   );

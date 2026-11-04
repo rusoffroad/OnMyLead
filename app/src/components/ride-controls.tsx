@@ -146,12 +146,12 @@ export function StatusSheet({
                   label={q}
                   on={lastReply === q}
                   onPress={pick(() => onReply(q))}
-                  a11y={`Send to the group: ${q}`}
+                  a11y={t('Send to the group: {q}', { q })}
                   style={styles.third}
                 />
               ))}
               {MOVE_STATUSES.map((k) => (
-                <QuickTile key={k} label={labels[k]} on={myStatus === k} onPress={pick(() => onStatus(k))} a11y={`Send status ${labels[k]}`} style={styles.third} />
+                <QuickTile key={k} label={labels[k]} on={myStatus === k} onPress={pick(() => onStatus(k))} a11y={t('Send status {v}', { v: labels[k] })} style={styles.third} />
               ))}
             </Section>
             <Section label={t('Trouble')}>
@@ -162,7 +162,7 @@ export function StatusSheet({
                   tone={tone(k)}
                   on={myStatus === k}
                   onPress={pick(() => onStatus(k))}
-                  a11y={`Send status ${labels[k]}`}
+                  a11y={t('Send status {v}', { v: labels[k] })}
                   style={styles.third}
                 />
               ))}
@@ -189,7 +189,7 @@ export function QuickRow({ lastReply, onReply, onMore }: { lastReply: string | n
   return (
     <View style={styles.row}>
       {PANEL_REPLIES.map((q) => (
-        <QuickTile key={q} icon={REPLY_ICON[q]} label={q} on={lastReply === q} onPress={() => onReply(q)} a11y={`Send to the group: ${q}`} style={styles.quarter} />
+        <QuickTile key={q} icon={REPLY_ICON[q]} label={q} on={lastReply === q} onPress={() => onReply(q)} a11y={t('Send to the group: {q}', { q })} style={styles.quarter} />
       ))}
       <QuickTile
         icon="more"

@@ -178,7 +178,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                     <Pressable
                       onPress={() => press('toggle')}
                       accessibilityRole="button"
-                      accessibilityLabel={v?.playing ? 'Pause' : 'Play'}
+                      accessibilityLabel={v?.playing ? tr('Pause') : tr('Play')}
                       style={({ pressed }) => [styles.play, { transform: [{ scale: pressed ? 0.96 : 1 }] }]}>
                       <Transport kind={v?.playing ? 'pause' : 'toggle'} size={48} color="#fff" />
                     </Pressable>
@@ -200,13 +200,13 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
                   <Pressable
                     onPress={() => void askMusicAccess().then(refresh)}
                     accessibilityRole="button"
-                    accessibilityHint={v.ask === 'android_listener' ? 'Opens Settings. Switch on Notification Access for OnMyLead Music Controls' : undefined}
+                    accessibilityHint={v.ask === 'android_listener' ? tr('Opens Settings. Switch on Notification Access for OnMyLead Music Controls') : undefined}
                     style={({ pressed }) => [styles.wide, { opacity: pressed ? 0.8 : 1 }]}>
                     <Text style={styles.wideText}>{tr('Show Song Names')}</Text>
                     <Text style={styles.wideSub}>
                       {v.ask === 'android_listener'
-                        ? 'Android shares what’s playing only with apps you allow under Notification Access. OnMyLead never reads your notifications.'
-                        : 'Lets OnMyLead show the Apple Music song. It stays on your phone.'}
+                        ? tr('Android shares what’s playing only with apps you allow under Notification Access. OnMyLead never reads your notifications.')
+                        : tr('Lets OnMyLead show the Apple Music song. It stays on your phone.')}
                     </Text>
                   </Pressable>
                 ) : null}

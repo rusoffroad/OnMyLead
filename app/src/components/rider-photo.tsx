@@ -5,6 +5,7 @@ import { Pressable } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { useAvatar } from '@/lib/avatars';
 import { PhotoViewer } from './photo-viewer';
+import { t } from '@/lib/i18n';
 
 /**
  * A rider's profile picture as a circle of `size`, or `fallback` (their initial dot, or their
@@ -50,7 +51,7 @@ export function RiderPhoto({
       <Pressable
         onPress={() => setOpen(true)}
         accessibilityRole="imagebutton"
-        accessibilityLabel={name ? `See ${name}’s picture` : 'See picture'}
+        accessibilityLabel={name ? t('See {name}’s picture', { name }) : t('See picture')}
         hitSlop={4}
         style={({ pressed }) => pressed && { opacity: 0.8 }}>
         {image}

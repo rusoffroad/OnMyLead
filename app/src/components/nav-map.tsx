@@ -20,6 +20,7 @@ import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
+import { t as tr } from '@/lib/i18n';
 
 export type NavMapHandle = {
   /** Move the map to a point, keeping a close zoom. */
@@ -256,7 +257,7 @@ function FlatNavMap({
         </Marker>
       ))}
       {found ? (
-        <Marker coordinate={{ latitude: found.lat, longitude: found.lng }} anchor={{ x: 0.5, y: 1 }} tappable={false} accessibilityLabel={`Search result: ${found.name}`}>
+        <Marker coordinate={{ latitude: found.lat, longitude: found.lng }} anchor={{ x: 0.5, y: 1 }} tappable={false} accessibilityLabel={tr('Search result: {name}', { name: found.name })}>
           <MarkerBody style={{ alignItems: 'center', maxWidth: 220 }}>
             <Text style={styles.found} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundDot} />

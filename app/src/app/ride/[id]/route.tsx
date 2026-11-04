@@ -99,7 +99,7 @@ export default function RouteBuilder() {
         if (route?.source === 'gpx' || route?.source === 'trail') setImported(route);
         else if (route) loadDraft(route);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load the ride.'))
+      .catch((e) => setError(e instanceof Error ? e.message : tr('Could not load the ride.')))
       .finally(() => setLoaded(true));
   }, [id, loadDraft]);
 
@@ -145,7 +145,7 @@ export default function RouteBuilder() {
       setImported(r);
       draft.clear();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not read that file.');
+      setError(e instanceof Error ? e.message : tr('Could not read that file.'));
     } finally {
       setBusy(null);
     }
@@ -165,7 +165,7 @@ export default function RouteBuilder() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       leave();
     } catch (e) {
-      if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not save the route.');
+      if (!handleProError(e)) setError(e instanceof Error ? e.message : tr('Could not save the route.'));
     } finally {
       setBusy(null);
     }
@@ -174,19 +174,19 @@ export default function RouteBuilder() {
   const click = web ? 'click' : 'tap';
   const hint = imported
     ? imported.source === 'trail'
-      ? `Your trail${imported.name ? ` “${imported.name}”` : ''}. Clear it to draw your own.`
-      : `Imported${imported.name ? ` “${imported.name}”` : ' from GPX'}. Clear it to draw your own.`
+      ? tr('Your trail{v}. Clear it to draw your own.', { v: imported.name ? ` “${imported.name}”` : '' })
+      : tr('Imported{v}. Clear it to draw your own.', { v: imported.name ? ` “${imported.name}”` : ' from GPX' })
     : taps.length === 0
-      ? `${web ? 'Click' : 'Tap'} the map where the ride starts, or Search for the trailhead.`
+      ? tr('{v} the map where the ride starts, or Search for the trailhead.', { v: web ? 'Click' : 'Tap' })
       : draft.lastNoTrail
-        ? 'No mapped trail joins those points, so that part is a straight line. Add a point on the trail or zoom in.'
+        ? tr('No mapped trail joins those points, so that part is a straight line. Add a point on the trail or zoom in.')
         : taps.length === 1
           ? follow
-            ? `Now ${click} further along the trail. The route follows it for you.`
-            : `Now ${click} the next turn or landmark.`
+            ? tr('Now {click} further along the trail. The route follows it for you.', { click })
+            : tr('Now {click} the next turn or landmark.', { click })
           : follow
-            ? `Keep ${web ? 'clicking' : 'tapping'} along the trail. Drag a point to move it${web ? ', or press Ctrl+Z to undo' : ''}.`
-            : `Straight lines between points. Switch to Follow Trails to snap to the trail.`;
+            ? tr('Keep {v} along the trail. Drag a point to move it{v2}.', { v: web ? 'clicking' : 'tapping', v2: web ? ', or press Ctrl+Z to undo' : '' })
+            : tr('Straight lines between points. Switch to Follow Trails to snap to the trail.');
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -213,7 +213,7 @@ export default function RouteBuilder() {
           cardTop={insets.top + 118}
           route={route?.points}
           ride={ride}
-          lookupHint={imported ? 'Tap a line to see who can ride it.' : 'Press and hold a line to see who can ride it.'}
+          lookupHint={imported ? tr('Tap a line to see who can ride it.') : tr('Press and hold a line to see who can ride it.')}
         />
       ) : null}
 
@@ -262,7 +262,7 @@ export default function RouteBuilder() {
           <View style={styles.readoutRight}>
             {!open && draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
             <Text style={styles.count}>
-              {imported ? `${imported.points.length} track points` : `${taps.length} ${taps.length === 1 ? 'point' : 'points'}`}
+              {imported ? tr('{length} track points', { length: imported.points.length }) : `${taps.length} ${taps.length === 1 ? 'point' : 'points'}`}
             </Text>
             {!open && !imported ? (
               <Pressable
@@ -283,7 +283,7 @@ export default function RouteBuilder() {
             <View style={styles.hintRow}>
               {draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
               <Text style={[styles.hint, { flex: 1 }]} accessibilityLiveRegion="polite">
-                {draft.finding ? 'Finding the trail…' : hint}
+                {draft.finding ? tr('Finding the trail…') : hint}
               </Text>
             </View>
             <View style={styles.row}>
@@ -307,7 +307,7 @@ export default function RouteBuilder() {
         {open ? (
           <>
             <Button
-              title={route ? 'Save Route' : saved ? 'Remove Route' : 'Save Route'}
+              title={route ? tr('Save Route') : saved ? tr('Remove Route') : tr('Save Route')}
               kind={!route && saved ? 'danger' : 'primary'}
               big
               disabled={!changed || (!route && !saved) || draft.finding}

@@ -117,7 +117,7 @@ export function WaypointSheet({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save the waypoint. Try again.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t save the waypoint. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -134,15 +134,15 @@ export function WaypointSheet({
       await reorderPlannedStops(rideId, ids);
       onChanged({ stopOrder: ids });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t move the stop. Try again.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t move the stop. Try again.'));
     } finally {
       setBusy(null);
     }
   }
 
   async function remove(w: Waypoint) {
-    const others = w.shared ? ' Everyone on the ride stops seeing it.' : '';
-    if (!(await confirmAsync(`Remove ${w.name}?`, `This takes it off the map.${others}`, tr('Remove'), tr('Keep')))) return;
+    const others = w.shared ? tr(' Everyone on the ride stops seeing it.') : '';
+    if (!(await confirmAsync(tr('Remove {name}?', { name: w.name }), tr('This takes it off the map.{others}', { others }), tr('Remove'), tr('Keep')))) return;
     setBusy('remove');
     setError(null);
     try {
@@ -150,7 +150,7 @@ export function WaypointSheet({
       onChanged({ removedId: w.id });
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t remove the waypoint. Try again.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t remove the waypoint. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -164,7 +164,7 @@ export function WaypointSheet({
   const stopCount = plannedStops(existing).length;
   // Someone else's planned stop stays a planned stop: the leader can change it, not take it away.
   const lockedStop = !!viewing?.planned_stop && viewing.user_id !== me;
-  const noun = stopForm ? 'Planned Stop' : 'Waypoint';
+  const noun = stopForm ? tr('Planned Stop') : tr('Waypoint');
   return (
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
@@ -179,7 +179,7 @@ export function WaypointSheet({
                   <View style={styles.head}>
                     {stopForm ? <StopSign n={formStopN} size={42} symbol={symbol} /> : <WaypointBlaze symbol={symbol} shared={canShare && audience !== 'me'} size={40} />}
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.title} accessibilityRole="header">{viewing ? `Edit ${noun}` : `New ${noun}`}</Text>
+                      <Text style={styles.title} accessibilityRole="header">{viewing ? tr('Edit {noun}', { noun }) : tr('New {noun}', { noun })}</Text>
                       {at ? <Text style={styles.coords}>{at.lat.toFixed(5)}, {at.lng.toFixed(5)}</Text> : null}
                     </View>
                   </View>
@@ -221,7 +221,7 @@ export function WaypointSheet({
                     value={note}
                     onChangeText={setNote}
                     maxLength={WAYPOINT_NOTE_MAX}
-                    placeholder={stopForm ? '30 minutes, fill up and grab lunch' : 'Deep ruts on the left side'}
+                    placeholder={stopForm ? tr('30 minutes, fill up and grab lunch') : tr('Deep ruts on the left side')}
                   />
 
                   {canShare && !lockedStop ? (
@@ -230,7 +230,7 @@ export function WaypointSheet({
                       <AudienceChoice
                         on={audience === 'stop'}
                         title={tr('Planned Stop')}
-                        body={stopsOn ? 'The whole ride stops here. Numbered on every rider’s map.' : PLANNED_STOPS_NOT_SWITCHED_ON}
+                        body={stopsOn ? tr('The whole ride stops here. Numbered on every rider’s map.') : PLANNED_STOPS_NOT_SWITCHED_ON}
                         onPress={() => setAudience('stop')}
                         tone="stop"
                         disabled={!stopsOn}
@@ -257,7 +257,7 @@ export function WaypointSheet({
                   )}
 
                   <ErrorText error={error} />
-                  <Button title={`Save ${noun}`} big loading={busy === 'save'} onPress={save} />
+                  <Button title={tr('Save {noun}', { noun })} big loading={busy === 'save'} onPress={save} />
                   <Button title={tr('Cancel')} kind="ghost" onPress={() => (viewing ? setEditing(false) : onClose())} />
                   {!viewing && Platform.OS !== 'web' ? (
                     <Text style={styles.tip}>{tr('Tip: press and hold anywhere on the map to drop a waypoint there.')}</Text>
@@ -271,7 +271,7 @@ export function WaypointSheet({
                       <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>{viewing.name}</Text>
                       {viewing.planned_stop ? (
                         <Text style={[styles.meta, { color: Colors.text }]}>
-                          {[`Planned Stop ${viewN ?? ''}`.trim(), stopTimeLabel(viewing.stop_time), symbolLabel(waypointSymbol(viewing))].filter(Boolean).join(', ')}
+                          {[tr('Planned Stop {v}', { v: viewN ?? '' }).trim(), stopTimeLabel(viewing.stop_time), symbolLabel(waypointSymbol(viewing))].filter(Boolean).join(', ')}
                         </Text>
                       ) : (
                         <Text style={[styles.meta, viewing.shared && { color: Colors.sky }]}>

@@ -47,7 +47,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
         setPoints(p);
         setGroup(g);
       })
-      .catch((e) => live && setError(e instanceof Error ? e.message : 'Could not load the summary.'));
+      .catch((e) => live && setError(e instanceof Error ? e.message : t('Could not load the summary.')));
     return () => {
       live = false;
     };
@@ -80,7 +80,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
       setNote(await shareRideCard(card, cardRef, WEB_URL ? `${WEB_URL}/r/${ride.invite_code}` : undefined));
       track('ride_card_shared', { has_track: !!summary });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not share.');
+      setError(e instanceof Error ? e.message : t('Could not share.'));
     } finally {
       setSharing(false);
     }

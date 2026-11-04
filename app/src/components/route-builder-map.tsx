@@ -11,6 +11,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { MarkerBody } from './marker-body';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
+import { t } from '@/lib/i18n';
 
 /**
  * Satellite map for building a route: tap to add the next point, drag a point to move it.
@@ -112,7 +113,7 @@ export function RouteBuilderMap({
           anchor={{ x: 0.5, y: 1 }}
           tappable={false}
           tracksViewChanges={false}
-          accessibilityLabel={`Search result: ${found.name}`}
+          accessibilityLabel={t('Search result: {name}', { name: found.name })}
           zIndex={2}>
           <MarkerBody style={styles.found}>
             <Text style={styles.foundText} numberOfLines={1}>{found.name}</Text>

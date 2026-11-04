@@ -56,8 +56,8 @@ export default function ProScreen() {
   // Pro running (or stuck on a payment) on the other store: don't sell it twice.
   const blocked = store ? otherStoreBlock(ent, store) : null;
   const notYet = !store
-    ? 'Subscriptions are in the OnMyLead app. Pro you buy there works here too.'
-    : 'Subscriptions open in an upcoming update. Until then your plan stays as it is and nothing is charged.';
+    ? t('Subscriptions are in the OnMyLead app. Pro you buy there works here too.')
+    : t('Subscriptions open in an upcoming update. Until then your plan stays as it is and nothing is charged.');
   const storeName = store === 'google' ? 'Google Play' : 'Apple';
 
   async function run(key: string, fn: () => Promise<string | null>) {
@@ -66,7 +66,7 @@ export default function ProScreen() {
     try {
       setNote(await fn());
     } catch (e) {
-      setNote(e instanceof Error ? e.message : 'Something went wrong. Try again.');
+      setNote(e instanceof Error ? e.message : t('Something went wrong. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -81,7 +81,7 @@ export default function ProScreen() {
         await refresh();
         return 'You’re on OnMyLead Pro. Thanks for riding with us.';
       }
-      return r.reason === 'cancelled' ? null : r.reason === 'pending' ? `Waiting on ${storeName} to approve the purchase.` : r.reason === 'ios_only' ? notYet : 'The purchase didn’t go through. You weren’t charged.';
+      return r.reason === 'cancelled' ? null : r.reason === 'pending' ? t('Waiting on {storeName} to approve the purchase.', { storeName }) : r.reason === 'ios_only' ? notYet : t('The purchase didn’t go through. You weren’t charged.');
     });
 
   // The store's own screen when this device's store bills it, else the other store's page.
@@ -126,13 +126,13 @@ export default function ProScreen() {
               onPress={() => setPeriod('annual')}
               name="Annual"
               price={`${priceOf('annual')} a Year`}
-              detail={`${annualPerMonth()} a Month. Save About ${annualSavingsPercent()}%`}
+              detail={t('{v} a Month. Save About {v2}%', { v: annualPerMonth(), v2: annualSavingsPercent() })}
               best
             />
             <PlanOption on={period === 'monthly'} onPress={() => setPeriod('monthly')} name="Monthly" price={`${priceOf('monthly')} a Month`} detail={t('Cancel anytime')} />
           </View>
           <Button
-            title={`Subscribe for ${priceOf(period)} a ${period === 'annual' ? 'Year' : 'Month'}`}
+            title={t('Subscribe for {v} a {v2}', { v: priceOf(period), v2: period === 'annual' ? 'Year' : 'Month' })}
             big
             loading={busy === 'buy'}
             onPress={subscribe}
@@ -155,7 +155,7 @@ export default function ProScreen() {
           if (!store) return notYet;
           if (blocked) return blocked.message;
           await redeemOfferCode();
-          return store === 'google' ? 'After you redeem the code in Google Play, come back here and Pro turns on.' : null;
+          return store === 'google' ? t('After you redeem the code in Google Play, come back here and Pro turns on.') : null;
         })} />
         {admin || paid ? null : <LinkButton title={t('Manage Subscription')} busy={busy === 'manage'} onPress={manage} />}
         {session && referralsOn ? <LinkButton title={t('Invite Friends, Both Get 50% Off')} onPress={() => router.push('/invite-friends')} /> : null}
@@ -171,7 +171,7 @@ function PlanOption({ on, onPress, name, price, detail, best }: { on: boolean; o
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ selected: on }}
-      accessibilityLabel={`${name}, ${price}${best ? ', Best Value' : ''}. ${detail}`}
+      accessibilityLabel={`${name}, ${price}${best ? t(', Best Value') : ''}. ${detail}`}
       onPress={onPress}
       style={[styles.option, on && styles.optionOn]}>
       <View style={[styles.radio, on && styles.radioOn]}>{on ? <View style={styles.radioDot} /> : null}</View>
@@ -194,7 +194,7 @@ function PlanOption({ on, onPress, name, price, detail, best }: { on: boolean; o
 function Comparison() {
   const cell = (v: boolean | string, pro: boolean) =>
     typeof v === 'string' ? (
-      <Text style={[styles.cellText, pro && { color: Colors.text }]}>{v}</Text>
+      <Text style={[styles.cellText, pro && { color: Colors.text }]}>{t(v)}</Text>
     ) : v ? (
       <Icon name="check" size={20} color={pro ? Colors.accent : RideColors.green} strokeWidth={2.6} />
     ) : (
@@ -212,7 +212,7 @@ function Comparison() {
           key={r.label}
           style={[styles.row, i > 0 && styles.rule]}
           accessible
-          accessibilityLabel={`${r.label}. Free: ${r.free === true ? 'included' : r.free === false ? 'not included' : r.free}. Pro: ${r.pro === true ? 'included' : r.pro}`}>
+          accessibilityLabel={t('{label}. Free: {free}. Pro: {pro}', { label: t(r.label), free: r.free === true ? t('included') : r.free === false ? t('not included') : t(r.free), pro: r.pro === true ? t('included') : t(r.pro as string) })}>
           <Text style={styles.rowLabel}>{t(r.label)}</Text>
           <View style={styles.colBox}>{cell(r.free, false)}</View>
           <View style={styles.colBox}>{cell(r.pro, true)}</View>

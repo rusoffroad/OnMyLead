@@ -60,7 +60,7 @@ export default function ResetPassword() {
             await updatePassword(password);
             router.replace('/');
           } catch (e) {
-            setError(e instanceof Error ? e.message : 'Something went wrong.');
+            setError(e instanceof Error ? e.message : t('Something went wrong.'));
           } finally {
             setBusy(false);
           }

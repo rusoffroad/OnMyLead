@@ -65,14 +65,14 @@ export default function ShareMyLocation() {
       await startSendingLocation(null, isUntilTurnedOff(endAt) ? null : endAt);
       if (s.link_token) {
         const url = WEB_URL ? `${WEB_URL}/f/${s.link_token}` : s.link_token;
-        const when = isUntilTurnedOff(endAt) ? 'Follow my location' : `Follow my location ${shareEndText(endAt, Date.now())}`;
+        const when = isUntilTurnedOff(endAt) ? tr('Follow my location') : tr('Follow my location {v}', { v: shareEndText(endAt, Date.now()) });
         await Share.share({ message: `${when}: ${url}` });
       }
       setPicked([]);
       setFamilyLink(false);
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not start sharing.');
+      setError(e instanceof Error ? e.message : tr('Could not start sharing.'));
     } finally {
       setBusy(false);
     }
@@ -106,7 +106,7 @@ export default function ShareMyLocation() {
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
               <Button title={tr('Stop Sharing')} kind="danger" style={{ flex: 1 }} onPress={() => stop(s)} />
               {untilOff ? null : (
-                <Button title={nearEnd ? 'Ending Soon · Add 1 Hr' : 'Add 1 Hour'} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
+                <Button title={nearEnd ? tr('Ending Soon · Add 1 Hr') : tr('Add 1 Hour')} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
               )}
             </View>
           </Card>

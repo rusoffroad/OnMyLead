@@ -171,7 +171,7 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Join Rides and Follow the Leader', free: 'Unlimited', pro: 'Unlimited' },
   { label: 'Live Tracking, SOS, Crash Alert and Ride Bubble', free: true, pro: true },
   { label: 'Ride Chat', free: true, pro: true },
-  { label: 'Map Mode', free: `${FREE_MAP_HOURS} Hours a Month`, pro: 'Unlimited' },
+  { label: 'Map Mode', free: '8 Hours a Month', pro: 'Unlimited' },
   { label: 'Social Feed: See, Like and Read Comments', free: true, pro: true },
   { label: 'Badges, Events and Friends', free: true, pro: true },
   { label: 'Draw Routes, Waypoints and Directions', free: false, pro: true },

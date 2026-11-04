@@ -17,14 +17,14 @@ export default function Support() {
       title={t('Help and Support')}
       updated="November 3, 2026"
       lead={<HelpCenterCard />}
-      intro={`Something not working, or a question about OnMyLead? Send us a message with the Contact Us form below, or email ${SUPPORT_EMAIL}, and a real person at ${COMPANY} will answer, usually within a day.`}
+      intro={t('Something not working, or a question about OnMyLead? Send us a message with the Contact Us form below, or email {v}, and a real person at {v2} will answer, usually within a day.', { v: SUPPORT_EMAIL, v2: COMPANY })}
       action={{ title: t('Contact Us'), href: '/contact' }}
       sections={[
         {
           title: t('Joining a Ride'),
           guide: SUPPORT_GUIDES.joining,
           body: [
-            `Ask the organizer for the ride code or link, or scan their QR code with your ${ANDROID ? 'phone’s' : 'iPhone'} camera. Then tap Join a Ride on the Rides tab.`,
+            t('Ask the organizer for the ride code or link, or scan their QR code with your {v} camera. Then tap Join a Ride on the Rides tab.', { v: ANDROID ? 'phone’s' : 'iPhone' }),
             'Your location is only shared with the ride while you are sharing, and sharing always stops when the ride ends or your timer runs out.',
           ],
         },
@@ -47,8 +47,8 @@ export default function Support() {
               : 'Manage or cancel Pro in You > Subscription > Manage Subscription, or in your iPhone’s Settings > Apple Account > Subscriptions.',
             'New phone or reinstalled the app? Sign in, then tap Restore Purchases in You > Subscription. Pro works on every device you sign in to with the same OnMyLead account.',
             ANDROID
-              ? 'Refunds are handled by Google Play at play.google.com/store/account/orderhistory.'
-              : 'Refunds are handled by Apple at reportaproblem.apple.com.',
+              ? t('Refunds are handled by Google Play at play.google.com/store/account/orderhistory.')
+              : t('Refunds are handled by Apple at reportaproblem.apple.com.'),
           ],
         },
         {
@@ -56,7 +56,7 @@ export default function Support() {
           guide: SUPPORT_GUIDES.reporting,
           body: [
             'Tap a rider in a ride’s Riders list, or press and hold one of their messages, to report or block them. Blocked riders’ messages are hidden from you, and they are not told.',
-            `We review every report within 24 hours. For anything urgent, email ${SUPPORT_EMAIL}.`,
+            t('We review every report within 24 hours. For anything urgent, email {v}.', { v: SUPPORT_EMAIL }),
           ],
         },
         {

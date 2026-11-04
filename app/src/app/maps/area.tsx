@@ -163,11 +163,11 @@ async function placeName(box: Box): Promise<string> {
   try {
     const [place] = await Location.reverseGeocodeAsync(center);
     const town = place?.city || place?.subregion || place?.region;
-    if (town) return `Near ${town}`;
+    if (town) return t('Near {town}', { town });
   } catch {
     // No geocoder or no signal.
   }
-  return `Map Area, ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+  return t('Map Area, {v}', { v: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) });
 }
 
 const styles = themedStyles(() => ({

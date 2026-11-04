@@ -92,7 +92,7 @@ export default function RidePage() {
         if (d) setRoute((await getRideRoute(r.id)).route);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not load the ride.');
+      setError(e instanceof Error ? e.message : tr('Could not load the ride.'));
     }
   }, [code, me]);
 
@@ -110,7 +110,7 @@ export default function RidePage() {
       await fn();
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      setError(e instanceof Error ? e.message : tr('Something went wrong.'));
     } finally {
       setBusy(null);
     }
@@ -154,7 +154,7 @@ export default function RidePage() {
       resyncReminders();
       await load();
     } catch (e) {
-      showNotice(tr('Couldn’t Cancel the Ride'), e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(tr('Couldn’t Cancel the Ride'), e instanceof Error ? e.message : tr('Something went wrong.'));
     } finally {
       setBusy(null);
     }
@@ -169,7 +169,7 @@ export default function RidePage() {
       resyncReminders();
       router.replace('/');
     } catch (e) {
-      showNotice(tr('Couldn’t Delete the Ride'), e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(tr('Couldn’t Delete the Ride'), e instanceof Error ? e.message : tr('Something went wrong.'));
       setBusy(null);
     }
   };
@@ -223,7 +223,7 @@ export default function RidePage() {
           {ride.status === 'ended' ? <Tag label={tr('Ended')} color={Colors.textSecondary} /> : null}
           {ride.status === 'cancelled' ? <Tag label={tr('Cancelled')} color={Colors.danger} /> : null}
           {ride.difficulty ? <Tag label={cap(ride.difficulty)} color={Colors.sky} /> : null}
-          <Tag label={ride.visibility === 'private' ? 'Private, Invite Only' : ride.visibility === 'public' ? 'Public' : 'Anyone with the Link'} color={Colors.textSecondary} />
+          <Tag label={ride.visibility === 'private' ? tr('Private, Invite Only') : ride.visibility === 'public' ? tr('Public') : tr('Anyone with the Link')} color={Colors.textSecondary} />
         </View>
         <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{ride.name}</ThemedText>
         <ThemedText style={{ color: Colors.sky, fontWeight: 700, fontSize: 17 }}>{when(ride.meet_at)}</ThemedText>
@@ -234,8 +234,8 @@ export default function RidePage() {
           <ThemedText type="heading">{tr('This Ride Is Cancelled')}</ThemedText>
           <ThemedText themeColor="textSecondary">
             {isManager
-              ? 'Everyone who had joined was sent a notification and an email.'
-              : `${nameOf(ride.organizer_id)} called it off. You don’t need to do anything.`}
+              ? tr('Everyone who had joined was sent a notification and an email.')
+              : tr('{v} called it off. You don’t need to do anything.', { v: nameOf(ride.organizer_id) })}
           </ThemedText>
         </View>
       ) : null}
@@ -251,7 +251,7 @@ export default function RidePage() {
         ride.status === 'ended' ? (
           <ThemedText>{tr('This ride has ended.')}</ThemedText>
         ) : (
-          <Button title={me ? (ride.join_policy === 'approval' ? 'Request to Join' : 'Join Ride') : 'Sign In to Join'} big loading={busy === 'join'} onPress={join} />
+          <Button title={me ? (ride.join_policy === 'approval' ? tr('Request to Join') : tr('Join Ride')) : tr('Sign In to Join')} big loading={busy === 'join'} onPress={join} />
         )
       ) : mine.status === 'invited' ? (
         ride.status === 'ended' || ride.status === 'cancelled' ? (
@@ -260,7 +260,7 @@ export default function RidePage() {
           <Card style={{ borderWidth: 2, borderColor: Colors.sky }}>
             <ThemedText type="heading">{tr('You’re Invited')}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
-              {ride.join_policy === 'approval' ? 'No waiting for approval: you’re on the list.' : 'Join to see the exact meeting spot and the group.'}
+              {ride.join_policy === 'approval' ? tr('No waiting for approval: you’re on the list.') : tr('Join to see the exact meeting spot and the group.')}
             </ThemedText>
             <Button title={tr('Join Ride')} big loading={busy === 'join'} onPress={join} />
             <Button title={tr('No Thanks')} kind="secondary" loading={busy === 'decline'} onPress={() => act('decline', () => declineRideInvite(ride.id))} />
@@ -301,7 +301,7 @@ export default function RidePage() {
           <Card style={{ gap: 0, paddingVertical: Spacing.one }}>
             {(
               [
-                ['Meet', details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? `Near ${ride.meet_area_label}` : 'Shown after you join'],
+                ['Meet', details ? `${details.meet_label ?? 'Pinned location'} (${details.meet_lat.toFixed(4)}, ${details.meet_lng.toFixed(4)})` : ride.meet_area_label ? tr('Near {meet_area_label}', { meet_area_label: ride.meet_area_label }) : tr('Shown after you join')],
                 ride.depart_at ? ['Departs', time(ride.depart_at)] : null,
                 ride.expected_finish_at ? ['Back By', time(ride.expected_finish_at)] : null,
                 ride.destination_label ? ['Destination', ride.destination_label] : null,
@@ -357,7 +357,7 @@ export default function RidePage() {
           ) : null}
           {isOrganizer ? (
             <Button
-              title={over ? 'Ride Again' : 'Copy This Ride'}
+              title={over ? tr('Ride Again') : tr('Copy This Ride')}
               kind={over ? 'primary' : 'secondary'}
               accessibilityHint={tr('Starts a new ride with this one\'s details and route. You pick the day.')}
               onPress={() => requirePro('create_ride') && router.push(`/ride/new?copy=${ride.id}`)}
@@ -375,8 +375,8 @@ export default function RidePage() {
               </View>
               <ThemedText type="small" themeColor="textSecondary">
                 {over
-                  ? 'Deleting removes the ride, its chat and its route for everyone.'
-                  : 'Everyone who joined gets a notification and an email either way. Cancel keeps the ride in their list; delete removes it.'}
+                  ? tr('Deleting removes the ride, its chat and its route for everyone.')
+                  : tr('Everyone who joined gets a notification and an email either way. Cancel keeps the ride in their list; delete removes it.')}
               </ThemedText>
             </View>
           ) : null}
@@ -392,7 +392,7 @@ export default function RidePage() {
           {details && (route || (isManager && ride.status !== 'ended' && ride.status !== 'cancelled')) ? (
             <Card>
               <View style={{ flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <ThemedText type="heading">{route?.name || (ride.freeride ? 'Freeride' : 'The Route')}</ThemedText>
+                <ThemedText type="heading">{route?.name || (ride.freeride ? tr('Freeride') : tr('The Route'))}</ThemedText>
                 {route ? <ThemedText style={{ color: Colors.sky, fontWeight: 700 }}>{tr('{v} mi', { v: miles(route.lengthM) })}</ThemedText> : null}
               </View>
               {route ? (
@@ -403,8 +403,8 @@ export default function RidePage() {
                   />
                   <ThemedText type="small" themeColor="textSecondary">
                     {ride.status === 'live'
-                      ? 'Open Ride Mode to see where you and everyone else are on it.'
-                      : 'Saved on your phone once you’ve opened it, so it’s there without signal.'}
+                      ? tr('Open Ride Mode to see where you and everyone else are on it.')
+                      : tr('Saved on your phone once you’ve opened it, so it’s there without signal.')}
                   </ThemedText>
                 </>
               ) : ride.freeride ? (
@@ -418,7 +418,7 @@ export default function RidePage() {
               )}
               {isManager && ride.status !== 'ended' && ride.status !== 'cancelled' ? (
                 <Button
-                  title={route ? 'Edit Route' : ride.freeride ? 'Map a Route Anyway' : 'Build the Route'}
+                  title={route ? tr('Edit Route') : ride.freeride ? tr('Map a Route Anyway') : tr('Build the Route')}
                   kind={route || ride.freeride ? 'secondary' : 'primary'}
                   pro="route_builder"
                   onPress={() => requirePro('route_builder') && router.push(`/ride/${ride.id}/route`)}
@@ -441,7 +441,7 @@ export default function RidePage() {
               ) : (
                 <ThemedText themeColor="textSecondary">
                   {waypoints.stopsSwitchedOn
-                    ? 'Mark where the group will stop for fuel, lunch or camp. Every rider sees them numbered on the map, in order.'
+                    ? tr('Mark where the group will stop for fuel, lunch or camp. Every rider sees them numbered on the map, in order.')
                     : PLANNED_STOPS_NOT_SWITCHED_ON}
                 </ThemedText>
               )}
@@ -476,12 +476,12 @@ export default function RidePage() {
               ) : (
                 <ThemedText themeColor="textSecondary">
                   {leaderIds.includes(me ?? '') || isManager
-                    ? 'Mark camp, fuel, a viewpoint or a hazard. Share each one with the whole ride, or keep it to yourself.'
-                    : 'Mark camp, fuel, a viewpoint or a hazard. Your waypoints are only for you; the leader’s shared ones show here too.'}
+                    ? tr('Mark camp, fuel, a viewpoint or a hazard. Share each one with the whole ride, or keep it to yourself.')
+                    : tr('Mark camp, fuel, a viewpoint or a hazard. Your waypoints are only for you; the leader’s shared ones show here too.')}
                 </ThemedText>
               )}
               <Button
-                title={otherWaypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
+                title={otherWaypoints.length ? tr('Open Waypoints Map') : tr('Add a Waypoint')}
                 kind={otherWaypoints.length ? 'secondary' : 'primary'}
                 disabled={!waypoints.switchedOn}
                 pro={otherWaypoints.length ? undefined : 'waypoints'}

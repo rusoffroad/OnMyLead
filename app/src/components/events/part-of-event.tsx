@@ -23,7 +23,7 @@ export function PartOfEvent({ rideId }: { rideId: string }) {
   return (
     <Pressable
       accessibilityRole="link"
-      accessibilityLabel={`Part of ${ev.title}. Open the event`}
+      accessibilityLabel={t('Part of {title}. Open the event', { title: ev.title })}
       onPress={() => router.push(`/e/${ev.share_code}`)}
       style={({ pressed }) => [styles.row, pressed && { opacity: 0.8 }]}>
       <Icon name="calendar" size={16} color={Colors.accent} />

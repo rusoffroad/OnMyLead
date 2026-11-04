@@ -129,7 +129,7 @@ const TABLET_PANEL_TOP = 112;
 const ago = (iso: string | null | undefined, now: number) => {
   if (!iso) return 'no location yet';
   const s = Math.max(0, Math.round((now - Date.parse(iso)) / 1000));
-  return s < 60 ? 'just now' : `${Math.round(s / 60)} min ago`;
+  return s < 60 ? t('just now') : t('{v} min ago', { v: Math.round(s / 60) });
 };
 
 type RideSnapshot = {
@@ -588,14 +588,14 @@ export default function RideMode() {
       // The arrow only follows this rider's own shared fix, never a breakdown spot.
       headingDeg: spot === p ? riderHeading(p ? { speedMps: p.speed_mps, headingDeg: p.heading_deg } : null, live) : null,
       detail: [
-        !freshness ? 'Not Sharing' : live ? 'Live' : freshness.state === 'lost' ? freshness.label : `Last Seen ${freshness.ago}`,
+        !freshness ? t('Not Sharing') : live ? t('Live') : freshness.state === 'lost' ? freshness.label : t('Last Seen {ago}', { ago: freshness.ago }),
         // A speed is only true while the fix is live.
         live && p?.speed_mps != null ? `${Math.round(p.speed_mps * 2.237)} mph` : null,
         // Their phone only shares a rough spot (Approximate Location): the dot can be a mile or more off.
-        spot === p && isApproximateFix(p?.accuracy_m) ? 'Approximate Location' : null,
+        spot === p && isApproximateFix(p?.accuracy_m) ? t('Approximate Location') : null,
         st ? STATUS_LABEL[st.status] : null,
         // This spot came phone to phone, not over the internet.
-        p && nearby.positions[m.user_id]?.recorded_at === p.recorded_at ? 'Via Bluetooth' : null,
+        p && nearby.positions[m.user_id]?.recorded_at === p.recorded_at ? t('Via Bluetooth') : null,
       ].filter(Boolean).join(' · '),
     };
   });
@@ -641,7 +641,7 @@ export default function RideMode() {
     if (!route.route || !v || !r) return null;
     const routeMi = route.route.lengthM / 1609.344;
     const check = checkRideRange(routeMi, { tankGallons: v.tank_gallons!, extraGallons: v.extra_fuel_gallons ?? 0, mpg: v.mpg! });
-    return { check, text: `${RANGE_LABEL[check]}. ${v.nickname?.trim() || vehicleTitle(v)} goes about ${Math.round(r.fullRangeMiles)} mi.` };
+    return { check, text: t('{v}. {v2} goes about {v3} mi.', { v: RANGE_LABEL[check], v2: v.nickname?.trim() || vehicleTitle(v), v3: Math.round(r.fullRangeMiles) }) };
   }, [vehicles, mine?.vehicle_id, route.route]);
 
   const callKey = (userId: string, s: TappedStatus) => `${userId}:${s.status}:${s.tapped_at}`;
@@ -964,7 +964,7 @@ export default function RideMode() {
     watchesBubble: !!watchesBubble,
     canRegroup: !!canRegroup,
     riders: mapRiders.map((r) => ({
-      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? ' (Tail Gunner)' : ''}`,
+      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? t(' (Tail Gunner)') : ''}`,
       detail: r.detail,
     })),
     helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || 'Rider', status: STATUS_LABEL[s.status] })),
@@ -1068,8 +1068,8 @@ export default function RideMode() {
             accessibilityState={activeShare ? { expanded: shareOpen } : undefined}
             accessibilityLabel={
               activeShare
-                ? `${ride?.name ?? 'Ride'}. Sharing your location, ${formatRemaining(shareLeft)}. Tap for details`
-                : `${ride?.name ?? 'Ride'}. Not sharing your location. Tap to share`
+                ? t('{v}. Sharing your location, {v2}. Tap for details', { v: ride?.name ?? 'Ride', v2: formatRemaining(shareLeft) })
+                : t('{v}. Not sharing your location. Tap to share', { v: ride?.name ?? 'Ride' })
             }
             style={styles.topTitleWrap}>
             <Text style={styles.topText} numberOfLines={1}>{ride?.name ?? 'Ride'}</Text>
@@ -1077,8 +1077,8 @@ export default function RideMode() {
               <View style={[styles.shareDot, { backgroundColor: activeShare ? RideColors.green : Colors.textSecondary }]} />
               <Text style={styles.topSub} numberOfLines={1}>
                 {activeShare
-                  ? formatRemainingShort(shareLeft) === 'On' ? 'Sharing' : `Sharing · ${formatRemainingShort(shareLeft)} Left`
-                  : 'Not Sharing · Tap to Share'}
+                  ? formatRemainingShort(shareLeft) === t('On') ? t('Sharing') : t('Sharing · {v} Left', { v: formatRemainingShort(shareLeft) })
+                  : t('Not Sharing · Tap to Share')}
               </Text>
             </View>
           </Pressable>
@@ -1087,10 +1087,10 @@ export default function RideMode() {
               onPress={() => setRidersOpen(true)}
               hitSlop={10}
               accessibilityRole="button"
-              accessibilityLabel={`${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}. Tap to see every rider and when they last updated`}
+              accessibilityLabel={t('{v}. Tap to see every rider and when they last updated', { v: bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together' })}
               style={({ pressed }) => [styles.groupChip, bubble.alerts.length ? styles.groupChipRed : styles.groupChipGreen, pressed && { opacity: 0.75 }]}>
               <Text style={[styles.groupChipText, { color: bubble.alerts.length ? Glass.softRed : RideColors.green }]}>
-                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'}
+                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : t('Together')}
               </Text>
             </Pressable>
           )}
@@ -1152,7 +1152,7 @@ export default function RideMode() {
             <Pressable
               onPress={() => speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
               accessibilityRole="button"
-              accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
+              accessibilityLabel={t('Announcement from {v}: {body}. Tap to hear it again.', { v: nameOf(announcement.user_id), body: announcement.body })}
               style={styles.announcement}>
               <View style={styles.announcementIcon}>
                 <Icon name="megaphone" size={18} color={Glass.amber} strokeWidth={2.1} />
@@ -1203,11 +1203,11 @@ export default function RideMode() {
               onPress={() => sidebar.setOpen(true)}
               accessibilityRole="button"
               accessibilityState={{ expanded: false }}
-              accessibilityLabel={`Show the riders. ${bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together'}`}
+              accessibilityLabel={t('Show the riders. {v}', { v: bubble.alerts.length ? `${bubble.alerts.length} separated` : 'Together' })}
               style={({ pressed }) => [styles.sidebarShow, { opacity: pressed ? 0.8 : 1 }]}>
               <View style={[styles.shareDot, { backgroundColor: bubble.alerts.length ? RideColors.red : RideColors.green }]} />
               <Text style={styles.sidebarShowText}>
-                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : 'Together'}
+                {bubble.alerts.length ? `${bubble.alerts.length} Separated` : t('Together')}
               </Text>
               <Text style={styles.sidebarShowText}>{t('Show Riders ▶')}</Text>
             </Pressable>
@@ -1329,7 +1329,7 @@ export default function RideMode() {
               onPress={() => setPanelOpen(!panelOpen)}
               accessibilityRole="button"
               accessibilityState={{ expanded: panelOpen }}
-              accessibilityLabel={panelOpen ? 'Hide the message and status buttons' : 'Show the message and status buttons'}
+              accessibilityLabel={panelOpen ? t('Hide the message and status buttons') : t('Show the message and status buttons')}
               accessibilityHint={t('You can also swipe the panel down to hide it or up to show it')}
               hitSlop={8}
               style={styles.handle}>
@@ -1395,7 +1395,7 @@ export default function RideMode() {
                     <Pressable
                       onPress={() => setDismissedCalls((d) => new Set(d).add(callKey(m.user_id, s)))}
                       accessibilityRole="button"
-                      accessibilityLabel={`Dismiss ${m.profiles?.display_name || 'Rider'}'s ${STATUS_LABEL[s.status]} on my screen`}
+                      accessibilityLabel={t('Dismiss {v}’s {v2} on my screen', { v: m.profiles?.display_name || 'Rider', v2: STATUS_LABEL[s.status] })}
                       hitSlop={12}
                       style={styles.callDismiss}>
                       <Icon name="close" size={16} color={Colors.textSecondary} strokeWidth={2.4} />
@@ -1433,7 +1433,7 @@ export default function RideMode() {
             <Pressable
               onPress={() => tapStatus('ok')}
               accessibilityRole="button"
-              accessibilityLabel={`Resolved. Clear ${STATUS_LABEL[myStatus.status]} and send status OK`}
+              accessibilityLabel={t('Resolved. Clear {v} and send status OK', { v: STATUS_LABEL[myStatus.status] })}
               style={({ pressed }) => [styles.myBreakdownOk, { opacity: pressed ? 0.75 : 1 }]}>
               <Text style={styles.myBreakdownOkText}>{t('Resolved, I’m OK')}</Text>
             </Pressable>
@@ -1470,7 +1470,7 @@ export default function RideMode() {
             <Pressable
               onPress={() => setPanelOpen(true)}
               accessibilityRole="button"
-              accessibilityLabel={foldedCount ? `Show buttons and ${foldedCount} more alerts` : 'Show the message and status buttons'}
+              accessibilityLabel={foldedCount ? t('Show buttons and {foldedCount} more alerts', { foldedCount }) : t('Show the message and status buttons')}
               style={({ pressed }) => [styles.foldedShow, { opacity: pressed ? 0.75 : 1 }]}>
               <Text style={styles.foldedShowText}>{t('Buttons ▲')}</Text>
               {foldedCount ? (
@@ -1483,7 +1483,7 @@ export default function RideMode() {
               <Pressable
                 onPress={() => tapStatus('mechanical')}
                 accessibilityRole="button"
-                accessibilityLabel={`Send status ${MECHANICAL_LABEL}`}
+                accessibilityLabel={t('Send status {v}', { v: MECHANICAL_LABEL })}
                 style={({ pressed }) => [styles.foldedMech, { opacity: pressed ? 0.75 : 1 }]}>
                 <Text style={[styles.statusText, styles.mechText]}>{MECHANICAL_LABEL}</Text>
               </Pressable>

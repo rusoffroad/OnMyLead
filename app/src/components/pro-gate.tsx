@@ -41,7 +41,7 @@ function promptCopy(block: ProBlock): { title: string; body: string; need: strin
     const reset = nextReset().toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' });
     return {
       title: t('You’ve Created This Month’s Free Ride'),
-      body: `Free accounts create ${block.allowance === 1 ? 'one ride' : `${block.allowance} rides`} a month, and your next one opens on ${reset}. Joining other rides stays free.`,
+      body: t('Free accounts create {v} a month, and your next one opens on {reset}. Joining other rides stays free.', { v: block.allowance === 1 ? 'one ride' : `${block.allowance} rides`, reset }),
       need: 'Pro creates as many rides as you lead.',
     };
   }
@@ -98,7 +98,7 @@ export function ProLock({ feature, title, detail }: { feature: FeatureKey; title
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${title ?? info.title}. Part of OnMyLead Pro`}
+      accessibilityLabel={t('{v}. Part of OnMyLead Pro', { v: title ?? info.title })}
       onPress={() => showProGate({ kind: 'pro_required', feature })}
       style={({ pressed }) => [styles.lock, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.lockIcon}>

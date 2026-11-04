@@ -59,7 +59,7 @@ export default function NewGroup() {
         <ThemedText type="subtitle" numberOfLines={2}>{cleanGroupName(name) || 'Your Crew'}</ThemedText>
         <Convoy names={[null, ...pickedNames]} />
         <ThemedText type="small" themeColor="textSecondary">
-          {picked.length ? `You and ${picked.length} ${picked.length === 1 ? 'rider' : 'riders'}.` : 'Just you so far.'}
+          {picked.length ? t('You and {length} {v}.', { length: picked.length, v: picked.length === 1 ? 'rider' : 'riders' }) : t('Just you so far.')}
         </ThemedText>
       </Card>
 

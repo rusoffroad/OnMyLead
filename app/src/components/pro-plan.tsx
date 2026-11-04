@@ -20,7 +20,7 @@ export function PlanStatus({ ent }: { ent: Entitlements }) {
         <>
           <TrialTrail daysLeft={days} />
           <ThemedText type="small" themeColor="textSecondary">
-            {`Ends ${shortDate(ent.trialEndsAt)}. No payment needed, and you’re never charged when it ends. Your rides, routes, groups and maps stay yours; new Pro actions move to Free unless you subscribe.`}
+            {t('Ends {v}. No payment needed, and you’re never charged when it ends. Your rides, routes, groups and maps stay yours; new Pro actions move to Free unless you subscribe.', { v: shortDate(ent.trialEndsAt) })}
           </ThemedText>
         </>
       ) : ent.label === 'Admin' ? (
@@ -28,8 +28,8 @@ export function PlanStatus({ ent }: { ent: Entitlements }) {
       ) : ent.label === 'Pro' ? (
         <ThemedText type="small" themeColor="textSecondary">
           {ent.proSource === 'comp'
-            ? ent.proUntil ? `Complimentary Pro until ${shortDate(ent.proUntil)}.` : 'Complimentary Pro from OnMyLead.'
-            : ent.proUntil ? `Renews or ends ${shortDate(ent.proUntil)}.${ent.store ? ` Billed by ${ent.store.store === 'google' ? 'Google Play' : 'the App Store'}.` : ''} Change it in Manage Subscription.` : 'Every Pro feature is on.'}
+            ? ent.proUntil ? t('Complimentary Pro until {v}.', { v: shortDate(ent.proUntil) }) : t('Complimentary Pro from OnMyLead.')
+            : ent.proUntil ? t('Renews or ends {v}.{v2} Change it in Manage Subscription.', { v: shortDate(ent.proUntil), v2: ent.store ? ` Billed by ${ent.store.store === 'google' ? 'Google Play' : 'the App Store'}.` : '' }) : t('Every Pro feature is on.')}
         </ThemedText>
       ) : rides ? (
         <ThemedText type="small" themeColor="textSecondary">{t('{rides}. Joining rides and every safety feature stay free.', { rides })}</ThemedText>

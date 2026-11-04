@@ -12,6 +12,7 @@ import { MarkerBody } from './marker-body';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { StopPin, WaypointPin } from './waypoint-blaze';
+import { t } from '@/lib/i18n';
 
 /**
  * The ride's waypoints on a satellite (or topo) map, with the route under them. Press and hold
@@ -86,7 +87,7 @@ export function WaypointMap({
           anchor={{ x: 0.5, y: 1 }}
           tappable={false}
           tracksViewChanges={false}
-          accessibilityLabel={`Search result: ${found.name}`}
+          accessibilityLabel={t('Search result: {name}', { name: found.name })}
           zIndex={2}>
           <MarkerBody style={styles.found}>
             <Text style={styles.foundText} numberOfLines={1}>{found.name}</Text>
@@ -104,7 +105,7 @@ export function WaypointMap({
             e.stopPropagation?.();
             onPressWaypoint(w);
           }}
-          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+          accessibilityLabel={w.planned_stop ? t('Planned stop {v}, {name}, {v2}', { v: stopNumber(w, waypoints ?? []), name: w.name, v2: symbolLabel(waypointSymbol(w)) }) : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
           zIndex={w.planned_stop ? 5 : w.shared ? 4 : 3}>
           {w.planned_stop ? (
             <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />

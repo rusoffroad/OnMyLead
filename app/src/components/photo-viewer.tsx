@@ -30,7 +30,7 @@ export function PhotoViewer({
             contentFit={square ? 'cover' : 'contain'}
             transition={150}
             accessibilityIgnoresInvertColors
-            accessibilityLabel={name ? `${name}’s picture` : 'Picture'}
+            accessibilityLabel={name ? `${name}’s picture` : t('Picture')}
             style={[{ width: side, height: side }, square ? { borderRadius: side / 2 } : { borderRadius: 18 }]}
           />
         ) : null}

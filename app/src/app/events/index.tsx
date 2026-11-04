@@ -99,7 +99,7 @@ export default function EventsScreen() {
 
           {session ? (
             <Segmented<Tab>
-              options={[{ value: 'upcoming', label: t('Coming Up') }, { value: 'mine', label: `Yours${mine?.length ? ` (${mine.length})` : ''}` }]}
+              options={[{ value: 'upcoming', label: t('Coming Up') }, { value: 'mine', label: t('Yours{v}', { v: mine?.length ? ` (${mine.length})` : '' }) }]}
               value={tab}
               onChange={setTab}
             />
@@ -108,7 +108,7 @@ export default function EventsScreen() {
           {tab === 'upcoming' && radius != null ? (
             <View style={styles.row}>
               <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
-                {located ? 'Public events, soonest first.' : 'Public events everywhere. Allow location to see the ones near you first.'}
+                {located ? t('Public events, soonest first.') : t('Public events everywhere. Allow location to see the ones near you first.')}
               </ThemedText>
               {located ? <RadiusChip radius={radius} onPress={() => setRadiusOpen(true)} /> : null}
             </View>
@@ -121,14 +121,14 @@ export default function EventsScreen() {
           ) : list.length === 0 ? (
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>
-                {tab === 'mine' ? 'Nothing Here Yet' : 'No Public Events Coming Up'}
+                {tab === 'mine' ? t('Nothing Here Yet') : t('No Public Events Coming Up')}
               </Text>
               <ThemedText themeColor="textSecondary">
                 {tab === 'mine'
-                  ? 'Events you host, co-host or say you’re going to show up here.'
+                  ? t('Events you host, co-host or say you’re going to show up here.')
                   : located && radius
-                    ? `Nothing within ${radius.toLocaleString('en-US')} miles yet. Widen the distance, or create one and it shows here for everyone.`
-                    : 'Create one and it shows here for everyone.'}
+                    ? t('Nothing within {v} miles yet. Widen the distance, or create one and it shows here for everyone.', { v: radius.toLocaleString('en-US') })
+                    : t('Create one and it shows here for everyone.')}
               </ThemedText>
             </View>
           ) : (

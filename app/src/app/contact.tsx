@@ -243,8 +243,8 @@ export default function ContactScreen() {
             )}
             <ThemedText type="small" themeColor="textSecondary">
               {Platform.OS === 'web'
-                ? 'Your browser and a short log of what the page just did go with your message, to help us fix it. Never your location or anything you typed.'
-                : 'Your phone model, app version and a short log of what the app just did go with your message, to help us fix it. Never your location or anything you typed.'}
+                ? tr('Your browser and a short log of what the page just did go with your message, to help us fix it. Never your location or anything you typed.')
+                : tr('Your phone model, app version and a short log of what the app just did go with your message, to help us fix it. Never your location or anything you typed.')}
             </ThemedText>
           </View>
         ) : null}

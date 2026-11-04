@@ -68,7 +68,7 @@ export function MapSearch({ near, onPick, onClose }: { near?: LatLng | null; onP
                   <Pressable
                     key={p.id}
                     accessibilityRole="button"
-                    accessibilityLabel={`Go to ${p.name}, ${placeDetail(p)}`}
+                    accessibilityLabel={t('Go to {name}, {v}', { name: p.name, v: placeDetail(p) })}
                     onPress={() => pick(p)}
                     style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => [
                       styles.result,

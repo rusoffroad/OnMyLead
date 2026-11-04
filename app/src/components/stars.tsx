@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Colors, font, themedStyles } from '@/constants/theme';
+import { t } from '@/lib/i18n';
 
 const STAR = 'M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z';
 
@@ -17,7 +18,7 @@ export function StarInput({ value, onChange, words, color, label }: {
 }) {
   return (
     <View style={{ gap: 4 }}>
-      <View style={styles.row} accessibilityRole="adjustable" accessibilityLabel={label} accessibilityValue={{ text: value ? `${value} of 5, ${words[value]}` : 'Not rated' }}
+      <View style={styles.row} accessibilityRole="adjustable" accessibilityLabel={label} accessibilityValue={{ text: value ? `${value} of 5, ${words[value]}` : t('Not rated') }}
         accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
         onAccessibilityAction={(e) => onChange(Math.max(1, Math.min(5, (value ?? 0) + (e.nativeEvent.actionName === 'increment' ? 1 : -1))))}>
         {[1, 2, 3, 4, 5].map((n) => (
@@ -36,7 +37,7 @@ export function StarInput({ value, onChange, words, color, label }: {
           </Pressable>
         ))}
       </View>
-      <Text style={[styles.word, { color: value ? color : Colors.textSecondary }]}>{value ? words[value] : 'Tap a Star'}</Text>
+      <Text style={[styles.word, { color: value ? color : Colors.textSecondary }]}>{value ? words[value] : t('Tap a Star')}</Text>
     </View>
   );
 }

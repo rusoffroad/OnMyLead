@@ -42,7 +42,7 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
   const send = async (how: 'sheet' | 'text' | 'email') => {
     track('invite_shared', { platform: Platform.OS, how, visibility: ride.visibility });
     if (how === 'sheet') return Share.share({ message });
-    const url = how === 'text' ? smsUrl(message, Platform.OS) : mailUrl(`Join "${ride.name}" on OnMyLead`, message);
+    const url = how === 'text' ? smsUrl(message, Platform.OS) : mailUrl(t('Join "{name}" on OnMyLead', { name: ride.name }), message);
     try {
       await Linking.openURL(url);
     } catch {
@@ -53,12 +53,12 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
   return (
     <Card style={fresh ? { borderWidth: 2, borderColor: Colors.accent } : undefined}>
       <ThemedText type={fresh ? 'subtitle' : 'heading'}>
-        {fresh ? (isPrivate ? 'Your Private Ride Is Ready' : 'Your Ride Is Live in Search') : 'Invite Riders'}
+        {fresh ? (isPrivate ? t('Your Private Ride Is Ready') : t('Your Ride Is Live in Search')) : t('Invite Riders')}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         {isPrivate
-          ? 'Only people you send this to can find it. They can scan the QR code, open the link or type the code.'
-          : 'Anyone can find it near them or in your state. Send it to friends too.'}
+          ? t('Only people you send this to can find it. They can scan the QR code, open the link or type the code.')
+          : t('Anyone can find it near them or in your state. Send it to friends too.')}
       </ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.three }}>
         <Pressable
@@ -81,7 +81,7 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
           kind="ride"
           id={ride.id}
           current={ride.invite_code}
-          note={`The old link, QR code and code stop working. Riders already on the ride stay on it.${isPrivate ? ' Anyone with the code can join, so pick one that’s hard to guess.' : ''}`}
+          note={t('The old link, QR code and code stop working. Riders already on the ride stay on it.{v}', { v: isPrivate ? ' Anyone with the code can join, so pick one that’s hard to guess.' : '' })}
           save={(c) => setRideCode(ride.id, c)}
           onSaved={(c) => onCodeChanged?.(c)}
         />
@@ -91,7 +91,7 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
         <Button title={t('Text')} kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
         <Button title={t('Email')} kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
         <Button
-          title={copied ? 'Copied' : 'Copy Link'}
+          title={copied ? t('Copied') : t('Copy Link')}
           kind="secondary"
           style={{ flex: 1 }}
           onPress={async () => {

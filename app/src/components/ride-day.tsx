@@ -37,7 +37,7 @@ export function RideDay({ ride }: { ride: Ride }) {
       </View>
 
       {forecast ? (
-        <View style={styles.weather} accessible accessibilityLabel={`${forecast.summary}. High ${forecast.highF}, low ${forecast.lowF}.${forecast.rainChance != null ? ` ${forecast.rainChance} percent chance of rain.` : ''}${forecast.windMph != null ? ` Wind ${forecast.windMph} miles per hour.` : ''}`}>
+        <View style={styles.weather} accessible accessibilityLabel={`${forecast.summary}. High ${forecast.highF}, low ${forecast.lowF}.${forecast.rainChance != null ? t(' {rainChance} percent chance of rain.', { rainChance: forecast.rainChance }) : ''}${forecast.windMph != null ? t(' Wind {windMph} miles per hour.', { windMph: forecast.windMph }) : ''}`}>
           <Text style={styles.temp}>
             {forecast.highF}°<Text style={styles.low}> / {forecast.lowF}°</Text>
           </Text>
@@ -63,7 +63,7 @@ export function RideDay({ ride }: { ride: Ride }) {
         <View style={{ gap: 6 }}>
           <View
             accessible
-            accessibilityLabel={`Sunrise ${clock(sun.sunrise)}, sunset ${clock(sun.sunset)}. The ride runs from ${clock(start)}${finish ? ` to ${clock(finish)}` : ''}.`}
+            accessibilityLabel={t('Sunrise {v}, sunset {v2}. The ride runs from {v3}{v4}.', { v: clock(sun.sunrise), v2: clock(sun.sunset), v3: clock(start), v4: finish ? ` to ${clock(finish)}` : '' })}
             style={{ gap: 4, marginTop: Spacing.one }}>
             <View style={styles.track}>
               <View style={[styles.daylight, { left: pct(bar.sunrise), width: pct(bar.sunset - bar.sunrise) }]} />

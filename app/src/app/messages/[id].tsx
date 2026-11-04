@@ -87,7 +87,7 @@ export default function Conversation() {
     if (!chat.threadId) return;
     const ok = await confirmAsync(
       tr('Delete This Conversation?'),
-      `It’s removed from your Messages. ${who} keeps their copy. If they message you again, it comes back.`,
+      tr('It’s removed from your Messages. {who} keeps their copy. If they message you again, it comes back.', { who }),
       tr('Delete'),
     );
     if (!ok) return;
@@ -114,16 +114,16 @@ export default function Conversation() {
           <RiderDot userId={id} name={who} size={40} zoom />
           <View style={{ flex: 1 }}>
             <Text style={styles.title} numberOfLines={1}>{who}</Text>
-            <Text style={styles.sub} numberOfLines={1}>{blocked ? 'Blocked' : muted ? 'Muted' : 'Direct Message'}</Text>
+            <Text style={styles.sub} numberOfLines={1}>{blocked ? tr('Blocked') : muted ? tr('Muted') : tr('Direct Message')}</Text>
           </View>
           {chat.threadId ? (
             <Pressable
               accessibilityRole="switch"
               accessibilityState={{ checked: muted }}
-              accessibilityLabel={muted ? 'Unmute this conversation' : 'Mute this conversation'}
+              accessibilityLabel={muted ? tr('Unmute this conversation') : tr('Mute this conversation')}
               onPress={toggleMute}
               style={[styles.pill, muted && { backgroundColor: Colors.backgroundSelected }]}>
-              <Text style={[styles.pillText, muted && { color: Colors.textSecondary }]}>{muted ? 'Unmute' : 'Mute'}</Text>
+              <Text style={[styles.pillText, muted && { color: Colors.textSecondary }]}>{muted ? tr('Unmute') : tr('Mute')}</Text>
             </Pressable>
           ) : null}
           <Pressable
@@ -209,7 +209,7 @@ export default function Conversation() {
                       <Pressable
                         onLongPress={self || !id ? undefined : () => setReporting({ kind: 'rider', userId: id, name: who, context: dmReportDetails(m.body), source: 'dm' })}
                         delayLongPress={350}
-                        accessibilityHint={self ? undefined : 'Long press to report this message'}
+                        accessibilityHint={self ? undefined : tr('Long press to report this message')}
                         style={[styles.bubble, self ? styles.bubbleMine : styles.bubbleTheirs]}>
                         <Text style={[styles.body, self && { color: '#fff' }]}>{tr(m.body)}</Text>
                       </Pressable>
@@ -255,7 +255,7 @@ export default function Conversation() {
             <View style={styles.composer}>
               {left !== null && chat.messages.length > 0 ? (
                 <Text style={styles.waitNote}>
-                  {left > 0 ? `You can send ${left} more until ${who} replies.` : `Wait for ${who} to reply before sending more.`}
+                  {left > 0 ? tr('You can send {left} more until {who} replies.', { left, who }) : tr('Wait for {who} to reply before sending more.', { who })}
                 </Text>
               ) : null}
               {blocked ? (
@@ -268,7 +268,7 @@ export default function Conversation() {
                       setDraft(t);
                       if (localError) setLocalError(null);
                     }}
-                    placeholder={`Message ${who}`}
+                    placeholder={tr('Message {who}', { who })}
                     placeholderTextColor={Colors.textSecondary}
                     maxLength={MAX_MESSAGE_LENGTH}
                     multiline

@@ -226,11 +226,11 @@ function Limit({ label, value, onChange, disabled }: { label: string; value: num
       accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
       onAccessibilityAction={(e) => !disabled && step(e.nativeEvent.actionName === 'increment' ? 1 : -1)}>
       <Text style={[styles.rowTitle, { flex: 1 }]}>{label}</Text>
-      <Pressable disabled={disabled || value <= TILT_LIMIT_MIN} onPress={() => step(-1)} style={styles.stepBtn} hitSlop={6} accessibilityLabel={`Lower ${label}`}>
+      <Pressable disabled={disabled || value <= TILT_LIMIT_MIN} onPress={() => step(-1)} style={styles.stepBtn} hitSlop={6} accessibilityLabel={tr('Lower {label}', { label })}>
         <Icon name="minus" size={20} color={Colors.text} />
       </Pressable>
       <Text style={styles.limitValue}>{value}°</Text>
-      <Pressable disabled={disabled || value >= TILT_LIMIT_MAX} onPress={() => step(1)} style={styles.stepBtn} hitSlop={6} accessibilityLabel={`Raise ${label}`}>
+      <Pressable disabled={disabled || value >= TILT_LIMIT_MAX} onPress={() => step(1)} style={styles.stepBtn} hitSlop={6} accessibilityLabel={tr('Raise {label}', { label })}>
         <Icon name="plus" size={20} color={Colors.text} />
       </Pressable>
     </View>

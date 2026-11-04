@@ -57,7 +57,7 @@ export default function TrailDetail() {
   if (!saved || !details || !extra) {
     return (
       <Screen width="readable">
-        <ThemedText themeColor="textSecondary">{loaded ? 'That trail isn’t on this device.' : 'Loading…'}</ThemedText>
+        <ThemedText themeColor="textSecondary">{loaded ? tr('That trail isn’t on this device.') : tr('Loading…')}</ThemedText>
       </Screen>
     );
   }
@@ -90,7 +90,7 @@ export default function TrailDetail() {
       if (next.shared) await shareTrail(next);
       if (fresh) router.back();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t save.'));
     } finally {
       setBusy(null);
     }
@@ -104,7 +104,7 @@ export default function TrailDetail() {
     if (!session) return router.push('/sign-in');
     if (!saved!.shared && !(await confirmAsync(
       tr('Share with Everyone?'),
-      `Every OnMyLead rider will see ${trimmed ? `this trail (minus the first and last ${feetOrMiles(SHARE_TRIM_M)}, with Hide My Start on)` : 'the whole trail'}, its named spots, photos and your ride name. Riders can rate it; if several say it’s inaccurate it’s hidden from them, but it stays on your phone.`,
+      tr('Every OnMyLead rider will see {v}, its named spots, photos and your ride name. Riders can rate it; if several say it’s inaccurate it’s hidden from them, but it stays on your phone.', { v: trimmed ? `this trail (minus the first and last ${feetOrMiles(SHARE_TRIM_M)}, with Hide My Start on)` : 'the whole trail' }),
       tr('Share'),
       tr('Not Now'),
     ))) return;
@@ -114,7 +114,7 @@ export default function TrailDetail() {
       await shareTrail(await saveLocalTrail(draft));
     } catch (e) {
       if (handleProError(e)) return;
-      setError(e instanceof Error ? e.message : 'Couldn’t share the trail.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t share the trail.'));
     } finally {
       setBusy(null);
     }
@@ -126,14 +126,14 @@ export default function TrailDetail() {
     try {
       await stopSharing(saved!);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t stop sharing.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t stop sharing.'));
     } finally {
       setBusy(null);
     }
   }
 
   async function addPhoto() {
-    if (saved!.photos.length >= MAX_PHOTOS) return showNotice(tr('Photo Limit'), `A trail can have up to ${MAX_PHOTOS} photos.`);
+    if (saved!.photos.length >= MAX_PHOTOS) return showNotice(tr('Photo Limit'), tr('A trail can have up to {v} photos.', { v: MAX_PHOTOS }));
     setBusy('photo');
     try {
       const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: Platform.OS === 'web' ? 0.5 : 0.7 });
@@ -141,21 +141,21 @@ export default function TrailDetail() {
       const a = res.assets[0];
       await addLocalPhoto({ ...saved!, details: details! }, { uri: a.uri, mimeType: a.mimeType ?? null });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t add that photo.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t add that photo.'));
     } finally {
       setBusy(null);
     }
   }
 
   async function remove() {
-    const msg = saved!.shared ? 'It’s deleted from this phone and taken off the public map.' : 'It’s deleted from this phone.';
+    const msg = saved!.shared ? tr('It’s deleted from this phone and taken off the public map.') : tr('It’s deleted from this phone.');
     if (!(await confirmAsync(tr('Delete This Trail?'), msg, tr('Delete'), tr('Keep It')))) return;
     setBusy('delete');
     try {
       await deleteLocalTrail(saved!.id);
       router.back();
     } catch (e) {
-      setError(e instanceof Error ? `Couldn’t take it off the public map, so it wasn’t deleted. ${e.message}` : 'Couldn’t delete.');
+      setError(e instanceof Error ? tr('Couldn’t take it off the public map, so it wasn’t deleted. {message}', { message: e.message }) : tr('Couldn’t delete.'));
     } finally {
       setBusy(null);
     }
@@ -251,8 +251,8 @@ export default function TrailDetail() {
       {saved.shared && saved.shared.status !== 'public' ? (
         <ThemedText type="small" themeColor="textSecondary">
           {saved.shared.hiddenReason === 'admin'
-            ? 'OnMyLead took this trail off the public map. It’s still yours here.'
-            : 'Several riders rated this line inaccurate, so other riders can’t see it. It’s still yours here. Record it again and share the new one.'}
+            ? tr('OnMyLead took this trail off the public map. It’s still yours here.')
+            : tr('Several riders rated this line inaccurate, so other riders can’t see it. It’s still yours here. Record it again and share the new one.')}
         </ThemedText>
       ) : null}
       <Section title={tr('Named Spots')} right={<Text style={styles.count}>{extra.obstacles.length}</Text>} />
@@ -282,7 +282,7 @@ export default function TrailDetail() {
         ))}
         {saved.photos.length < MAX_PHOTOS ? (
           <Pressable accessibilityRole="button" onPress={addPhoto} style={[styles.photo, styles.addPhoto]}>
-            <Text style={styles.addText}>{busy === 'photo' ? '…' : '+ Photo'}</Text>
+            <Text style={styles.addText}>{busy === 'photo' ? '…' : tr('+ Photo')}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -298,7 +298,7 @@ export default function TrailDetail() {
         </View>
       ) : null}
       <ErrorText error={error} />
-      <Button title={saved.shared ? 'Save Changes' : 'Save on This Phone'} big={!canShare} loading={busy === 'save'} disabled={!changed && !fresh} onPress={save} kind={canShare ? 'secondary' : 'primary'} />
+      <Button title={saved.shared ? tr('Save Changes') : tr('Save on This Phone')} big={!canShare} loading={busy === 'save'} disabled={!changed && !fresh} onPress={save} kind={canShare ? 'secondary' : 'primary'} />
       {canShare ? (
         saved.shared ? (
           <Button title={tr('Stop Sharing')} kind="secondary" loading={busy === 'stop'} onPress={unshare} />

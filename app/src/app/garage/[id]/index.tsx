@@ -77,7 +77,7 @@ export default function VehiclePage() {
     try {
       setNote(await shareBuildSheet(title, buildSheetText(vehicle!, items)));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not share.');
+      setError(e instanceof Error ? e.message : t('Could not share.'));
     }
   }
 
@@ -86,17 +86,17 @@ export default function VehiclePage() {
     try {
       setNote(await shareCsv(exportFileBase(vehicle!), buildCsv(vehicle!, items)));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not export.');
+      setError(e instanceof Error ? e.message : t('Could not export.'));
     }
   }
 
   async function removeVehicle() {
-    if (!(await confirmAsync(t('Delete this machine?'), `${title} and its ${items.length} build item(s) will be removed.`))) return;
+    if (!(await confirmAsync(t('Delete this machine?'), t('{title} and its {length} build item(s) will be removed.', { title, length: items.length })))) return;
     try {
       await deleteVehicle(vehicle!);
       router.replace('/garage');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not delete.');
+      setError(e instanceof Error ? e.message : t('Could not delete.'));
     }
   }
 
@@ -107,14 +107,14 @@ export default function VehiclePage() {
       setEditing(null);
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not remove.');
+      setError(e instanceof Error ? e.message : t('Could not remove.'));
     }
   }
 
   return (
     <Screen>
       {vehicle.photo_url ? (
-        <Image source={{ uri: vehicle.photo_url }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: Radius.card }} contentFit="cover" accessibilityLabel={`Photo of ${title}`} />
+        <Image source={{ uri: vehicle.photo_url }} style={{ width: '100%', aspectRatio: 4 / 3, borderRadius: Radius.card }} contentFit="cover" accessibilityLabel={t('Photo of {title}', { title })} />
       ) : null}
       <View style={{ gap: Spacing.one }}>
         <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{vehicle.nickname?.trim() || title}</ThemedText>
@@ -183,7 +183,7 @@ export default function VehiclePage() {
                 key={item.id}
                 disabled={!mine}
                 accessibilityRole={mine ? 'button' : undefined}
-                accessibilityHint={mine ? 'Edit this item' : undefined}
+                accessibilityHint={mine ? t('Edit this item') : undefined}
                 onPress={() => setEditing(item)}
                 style={{ borderTopWidth: 1, borderTopColor: theme.backgroundSelected, paddingTop: Spacing.two, gap: 2 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: Spacing.two }}>
@@ -192,7 +192,7 @@ export default function VehiclePage() {
                 </View>
                 {item.installed_on || item.notes ? (
                   <ThemedText type="small" themeColor="textSecondary">
-                    {[item.installed_on ? `Installed ${item.installed_on}` : null, item.notes].filter(Boolean).join(' · ')}
+                    {[item.installed_on ? t('Installed {installed_on}', { installed_on: item.installed_on }) : null, item.notes].filter(Boolean).join(' · ')}
                   </ThemedText>
                 ) : null}
               </Pressable>
@@ -286,7 +286,7 @@ function ItemForm({
         notes: notes.trim() || null,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save.');
+      setError(e instanceof Error ? e.message : t('Could not save.'));
       setBusy(false);
     }
   }
@@ -308,7 +308,7 @@ function ItemForm({
       <ErrorText error={error} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <Button title={t('Cancel')} kind="secondary" style={{ flex: 1 }} onPress={onCancel} />
-        <Button title={item ? 'Save' : 'Add'} style={{ flex: 1 }} loading={busy} onPress={save} />
+        <Button title={item ? t('Save') : t('Add')} style={{ flex: 1 }} loading={busy} onPress={save} />
       </View>
       {onDelete ? <Button title={t('Remove Item')} kind="danger" onPress={onDelete} /> : null}
     </Card>

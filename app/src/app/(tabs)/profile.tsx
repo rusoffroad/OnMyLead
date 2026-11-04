@@ -139,7 +139,7 @@ export default function You() {
   const offlineSummary = offlineMaps.length
     ? `${offlineMaps.length === 1 ? t('1 map') : t('{n} maps', { n: offlineMaps.length })}, ${formatBytes(offlineMaps.reduce((n, m) => n + m.bytes, 0))}`
     : t('For riding with no signal');
-  const subscriptionSummary = ent.switchedOn ? planHeadline(ent) : 'Pro, Restore Purchases and Promo Codes';
+  const subscriptionSummary = ent.switchedOn ? planHeadline(ent) : t('Pro, Restore Purchases and Promo Codes');
   const blockedSummary = blocks.list.length
     ? `${blocks.list.length === 1 ? t('1 rider') : t('{n} riders', { n: blocks.list.length })}. ${t('They aren’t told.')}`
     : t('Riders whose messages you don’t see');
@@ -177,7 +177,7 @@ export default function You() {
           icon="map"
           color={RIDER_TRAIL_INK}
           title={t('Rider Trails on Maps')}
-          detail={riderTrails ? 'Showing trails riders mapped and shared, as mint dotted lines' : 'Hidden. Only agency and OpenStreetMap trails show'}
+          detail={riderTrails ? t('Showing trails riders mapped and shared, as mint dotted lines') : t('Hidden. Only agency and OpenStreetMap trails show')}
           right={
             <Switch
               value={riderTrails}
@@ -193,7 +193,7 @@ export default function You() {
           icon="follow"
           color={Colors.sky}
           title={t('Follow Me on Maps')}
-          detail={followMe ? 'The map keeps your dot in view in Ride Mode and Map Mode' : 'Off. The map stays where you put it'}
+          detail={followMe ? t('The map keeps your dot in view in Ride Mode and Map Mode') : t('Off. The map stays where you put it')}
           right={
             <Switch
               value={followMe}
@@ -234,7 +234,7 @@ export default function You() {
           icon="voice"
           color={Colors.sky}
           title={t('Voice')}
-          detail={voiceChoice === AUTO_VOICE ? 'Automatic. The most natural voice on this device reads Ride Mode alerts' : 'Your pick reads Ride Mode alerts'}
+          detail={voiceChoice === AUTO_VOICE ? t('Automatic. The most natural voice on this device reads Ride Mode alerts') : t('Your pick reads Ride Mode alerts')}
           onPress={() => router.push('/voice')}
         />
         {musicAvailable && musicFlag ? (
@@ -242,7 +242,7 @@ export default function You() {
             icon="music"
             color={Colors.sky}
             title={t('Music Controls')}
-            detail={musicMine ? 'A Music button in Ride Mode and Map Mode: play, pause, skip and volume' : 'Hidden. Turn it on for a Music button in Ride Mode and Map Mode'}
+            detail={musicMine ? t('A Music button in Ride Mode and Map Mode: play, pause, skip and volume') : t('Hidden. Turn it on for a Music button in Ride Mode and Map Mode')}
             right={
               <Switch
                 value={musicMine}
@@ -261,8 +261,8 @@ export default function You() {
             color={Colors.sky}
             title={t('Bluetooth Sharing')}
             detail={bluetoothMine
-              ? 'With no service, Ride Mode passes spots and alerts to nearby riders on your ride'
-              : 'Off. Turn it on to keep sharing with nearby riders when there is no service'}
+              ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
+              : t('Off. Turn it on to keep sharing with nearby riders when there is no service')}
             right={
               <Switch
                 value={bluetoothMine}
@@ -289,7 +289,7 @@ export default function You() {
             title={t('Directions')}
             detail={t('Navigate opens: {app}', { app: directionsSummary })}
             onPress={() => setDirectionsOpen(!directionsOpen)}
-            right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{directionsOpen ? 'Done' : 'Change'}</ThemedText>}>
+            right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{directionsOpen ? t('Done') : t('Change')}</ThemedText>}>
             {directionsOpen ? (
               <Choice
                 value={mapsPref}
@@ -325,7 +325,7 @@ export default function You() {
               icon="lock"
               color={Colors.accent}
               title={t('Admin Dashboard')}
-              detail={Platform.OS === 'web' ? 'Users, rides, reports and settings' : 'Opens onmylead.com/admin'}
+              detail={Platform.OS === 'web' ? t('Users, rides, reports and settings') : t('Opens onmylead.com/admin')}
               onPress={() => (Platform.OS === 'web' ? router.push('/admin') : Linking.openURL('https://onmylead.com/admin'))}
             />
           ) : null}
@@ -432,7 +432,7 @@ function Identity({ userId, name, plan }: { userId: string | undefined; name: st
       <View style={{ flex: 1, gap: 2 }}>
         <Text style={styles.name} numberOfLines={1}>{picked ? name : name === '' ? t('Pick Your Ride Name') : ' '}</Text>
         <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-          {picked ? 'Your name and picture. Tap to change' : 'Other riders see you as Rider until you do'}
+          {picked ? t('Your name and picture. Tap to change') : t('Other riders see you as Rider until you do')}
         </ThemedText>
         {plan ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 700 }}>{plan}</ThemedText> : null}
       </View>
@@ -477,11 +477,11 @@ function DeleteAccount() {
   if (state === 'sent' || state === 'off') {
     return (
       <View style={styles.deleteNote} accessibilityLiveRegion="polite">
-        <ThemedText style={{ fontWeight: 600 }}>{state === 'sent' ? 'Deletion Requested' : 'Not Switched On Yet'}</ThemedText>
+        <ThemedText style={{ fontWeight: 600 }}>{state === 'sent' ? t('Deletion Requested') : t('Not Switched On Yet')}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {state === 'sent'
-            ? 'Your account and its data will be deleted within 7 days. If you pay for OnMyLead Pro, cancel it in your Apple subscriptions so you aren’t billed again.'
-            : 'Account deletion starts working with the next server update.'}
+            ? t('Your account and its data will be deleted within 7 days. If you pay for OnMyLead Pro, cancel it in your Apple subscriptions so you aren’t billed again.')
+            : t('Account deletion starts working with the next server update.')}
         </ThemedText>
       </View>
     );

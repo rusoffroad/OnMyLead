@@ -76,7 +76,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
       });
       setSent(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t send the report. Try again.');
+      setError(e instanceof Error ? e.message : t('Couldn’t send the report. Try again.'));
     } finally {
       setBusy(false);
     }
@@ -110,7 +110,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
                 <Icon name="flagged" size={22} color={Colors.danger} />
                 <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>
-                  {target.kind === 'ride' ? 'Report This Ride' : target.kind === 'event' ? 'Report This Event' : target.postId ? 'Report This Post' : target.commentId ? 'Report This Comment' : `Report ${target.name}`}
+                  {target.kind === 'ride' ? t('Report This Ride') : target.kind === 'event' ? t('Report This Event') : target.postId ? t('Report This Post') : target.commentId ? t('Report This Comment') : t('Report {name}', { name: target.name })}
                 </Text>
               </View>
               <ThemedText type="small" themeColor="textSecondary">{t('Goes to the OnMyLead team, not to the {v}. If anyone is in danger, call 911.', { v: target.kind === 'ride' ? t('organizer') : target.kind === 'event' ? t('host') : t('rider') })}</ThemedText>
@@ -126,7 +126,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
               <Button title={t('Send Report')} big loading={busy} disabled={!reason} onPress={send} style={{ backgroundColor: Colors.danger }} />
               {canBlock ? (
                 <Button
-                  title={blocked ? 'Blocked' : 'Block This Rider'}
+                  title={blocked ? t('Blocked') : t('Block This Rider')}
                   kind="secondary"
                   disabled={blocked}
                   accessibilityHint={t('Hides their messages from you. They aren’t told.')}

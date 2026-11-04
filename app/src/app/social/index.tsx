@@ -105,7 +105,7 @@ export default function SocialScreen() {
       items={mine.items}
       update={mine.update}
       remove={mine.remove}
-      empty={pro ? 'Your posts, rides, badges and trails show here. Post a ride report to get started.' : 'Your rides, badges and trails show here. With Pro you can post ride reports and photos too.'}
+      empty={pro ? t('Your posts, rides, badges and trails show here. Post a ride report to get started.') : t('Your rides, badges and trails show here. With Pro you can post ride reports and photos too.')}
     />
   );
   const freeNote = !pro && !off ? (

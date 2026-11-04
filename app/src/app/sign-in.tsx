@@ -41,7 +41,7 @@ export default function SignIn() {
     try {
       await fn();
     } catch (e) {
-      setError(friendly(e instanceof Error ? e.message : 'Something went wrong.'));
+      setError(friendly(e instanceof Error ? e.message : t('Something went wrong.')));
     } finally {
       setBusy(null);
     }
@@ -110,7 +110,7 @@ export default function SignIn() {
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }} accessibilityRole="text">
             <View style={{ flex: 1, height: 1, backgroundColor: Colors.border }} />
-            <ThemedText type="small" themeColor="textSecondary">{mode === 'create' ? 'Or Create One With Your Email' : 'Or Use Your Email'}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{mode === 'create' ? t('Or Create One With Your Email') : t('Or Use Your Email')}</ThemedText>
             <View style={{ flex: 1, height: 1, backgroundColor: Colors.border }} />
           </View>
         </>
@@ -134,10 +134,10 @@ export default function SignIn() {
         onChangeText={setPassword}
         secureTextEntry
         autoComplete={mode === 'create' ? 'new-password' : 'current-password'}
-        placeholder={mode === 'create' ? 'At least 8 characters' : ''}
+        placeholder={mode === 'create' ? t('At least 8 characters') : ''}
       />
       <Button
-        title={mode === 'create' ? 'Create Account' : 'Sign In'}
+        title={mode === 'create' ? t('Create Account') : t('Sign In')}
         big
         loading={busy === 'submit'}
         disabled={!emailOk || password.length < (mode === 'create' ? 8 : 1) || (mode === 'create' && !name.trim())}
@@ -156,7 +156,7 @@ export default function SignIn() {
             })
           }>
           <ThemedText type="link" style={{ color: emailOk ? Colors.sky : Colors.textSecondary }}>
-            {emailOk ? 'Forgot your password? Email me a reset link' : 'Forgot your password? Enter your email above first'}
+            {emailOk ? t('Forgot your password? Email me a reset link') : t('Forgot your password? Enter your email above first')}
           </ThemedText>
         </Pressable>
       ) : null}
@@ -173,7 +173,7 @@ export default function SignIn() {
           })
         }>
         <ThemedText type="link" style={{ color: emailOk ? Colors.sky : Colors.textSecondary }}>
-          {emailOk ? 'Or email me a sign-in link instead (no password)' : 'Or enter your email to get a sign-in link instead'}
+          {emailOk ? t('Or email me a sign-in link instead (no password)') : t('Or enter your email to get a sign-in link instead')}
         </ThemedText>
       </Pressable>
 

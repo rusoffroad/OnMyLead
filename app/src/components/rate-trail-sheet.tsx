@@ -50,10 +50,10 @@ export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
     setError(null);
     try {
       const r = await rateTrail(trail.id, accuracy, quality, note.trim() || null);
-      setDone(r.status === 'hidden' ? 'Thanks. Enough riders said this line is off, so it’s now hidden from the public map.' : 'Thanks. Your rating helps other riders pick a trail.');
+      setDone(r.status === 'hidden' ? t('Thanks. Enough riders said this line is off, so it’s now hidden from the public map.') : t('Thanks. Your rating helps other riders pick a trail.'));
       onRated?.(r.status);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save your rating. Try again.');
+      setError(e instanceof Error ? e.message : t('Couldn’t save your rating. Try again.'));
     } finally {
       setBusy(false);
     }
@@ -87,8 +87,8 @@ export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
                       <Text style={styles.q}>{t('Rode It? How Accurate Is the Line?')}</Text>
                       <ThemedText type="small" themeColor="textSecondary">
                         {ridden && ridden > 0
-                          ? `You followed ${feetOrMiles(ridden)} of it in Map Mode.`
-                          : 'Only rate this if you rode it. Does the line on the map match the trail on the ground?'}
+                          ? t('You followed {v} of it in Map Mode.', { v: feetOrMiles(ridden) })
+                          : t('Only rate this if you rode it. Does the line on the map match the trail on the ground?')}
                       </ThemedText>
                       <StarInput label={t('Line accuracy')} value={accuracy} onChange={setAccuracy} words={ACCURACY_WORDS} color={RIDER_TRAIL_INK} />
                     </View>

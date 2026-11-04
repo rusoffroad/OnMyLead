@@ -37,10 +37,10 @@ export function ObstacleSheet({
     <BottomSheet
       visible={visible}
       onClose={onClose}
-      title={editing ? 'Edit Spot' : 'Mark a Spot'}
+      title={editing ? t('Edit Spot') : t('Mark a Spot')}
       footer={
         <View style={{ gap: Spacing.two }}>
-          <Button title={editing ? 'Save' : 'Add to Trail'} onPress={() => onSave(cleanName(name, kind), kind)} />
+          <Button title={editing ? t('Save') : t('Add to Trail')} onPress={() => onSave(cleanName(name, kind), kind)} />
           {editing && onRemove ? <Button title={t('Remove')} kind="ghost" onPress={onRemove} /> : null}
         </View>
       }>

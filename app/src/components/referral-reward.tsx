@@ -45,8 +45,8 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
       } else if (r.kind === 'apple_code') {
         const opened = await openAppleRedeem(r.url);
         setNote(opened
-          ? 'Confirm the code in the App Store. Pro turns on here as soon as Apple confirms it.'
-          : `Open the App Store and redeem code ${r.code}.`);
+          ? t('Confirm the code in the App Store. Pro turns on here as soon as Apple confirms it.')
+          : t('Open the App Store and redeem code {code}.', { code: r.code }));
       } else if (r.kind === 'google_offer') {
         const res = await buy(PRODUCTS.annual, r.offerId);
         if (res.ok) {
@@ -54,14 +54,14 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
           setNote('You’re on Pro Annual at half price for your first year.');
         } else if (res.reason !== 'cancelled') {
           setNote(res.reason === 'pending'
-            ? 'Waiting on Google Play to approve the purchase.'
-            : 'Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.');
+            ? t('Waiting on Google Play to approve the purchase.')
+            : t('Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.'));
         }
       } else {
         const d = await applyPlayDeferral();
         setNote(d.ok
-          ? `Done. Your next Google Play bill moved back 6 months${d.expiresAt ? `, to ${new Date(d.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}.`
-          : 'Google Play didn’t answer. Your reward is saved; try again in a minute.');
+          ? t('Done. Your next Google Play bill moved back 6 months{v}.', { v: d.expiresAt ? `, to ${new Date(d.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : '' })
+          : t('Google Play didn’t answer. Your reward is saved; try again in a minute.'));
       }
       onChanged();
     } finally {
@@ -81,7 +81,7 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
       </View>
       {live && state !== 'google_defer_pending' ? <View style={styles.tear} /> : null}
       {live && state !== 'google_defer_pending' ? (
-        <View style={styles.perforation} accessible accessibilityLabel={`$${REFERRAL_PRICE.discounted} for the first year instead of $${REFERRAL_PRICE.annual}`}>
+        <View style={styles.perforation} accessible accessibilityLabel={t('${discounted} for the first year instead of ${annual}', { discounted: REFERRAL_PRICE.discounted, annual: REFERRAL_PRICE.annual })}>
           <Text style={styles.was}>${REFERRAL_PRICE.annual}</Text>
           <Text style={styles.price}>${REFERRAL_PRICE.discounted}</Text>
           <ThemedText type="small" themeColor="textSecondary">{t('First Year')}</ThemedText>

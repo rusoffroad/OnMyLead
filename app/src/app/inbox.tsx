@@ -60,7 +60,7 @@ export default function Inbox() {
       await clearInboxItems([i.id]);
       return true;
     } catch (e) {
-      showNotice(t('Couldn’t Clear It'), e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(t('Couldn’t Clear It'), e instanceof Error ? e.message : t('Something went wrong.'));
       return false;
     }
   };
@@ -70,7 +70,7 @@ export default function Inbox() {
     try {
       await clearInbox();
     } catch (e) {
-      showNotice(t('Couldn’t Clear Notifications'), e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(t('Couldn’t Clear Notifications'), e instanceof Error ? e.message : t('Something went wrong.'));
     } finally {
       setBusy(false);
     }
@@ -82,8 +82,8 @@ export default function Inbox() {
       {items.length ? (
         <View style={styles.bar}>
           <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
-            {unread ? `${unread} New` : 'All Read'}
-            {SWIPE ? '. Swipe Left to Clear' : ''}
+            {unread ? `${unread} New` : t('All Read')}
+            {SWIPE ? t('. Swipe Left to Clear') : ''}
           </ThemedText>
           {unread ? <Chip label={t('Mark All Read')} onPress={() => markInboxRead()} /> : null}
           <Chip label={t('Clear All')} onPress={clearAll} disabled={busy} />
@@ -96,8 +96,8 @@ export default function Inbox() {
           title={t('You’re All Caught Up')}
           detail={
             Platform.OS === 'web'
-              ? 'Notifications OnMyLead sends to your phone app show up here too, for 30 days.'
-              : 'Ride messages, rider alerts, ride changes, invites and friend requests show up here for 30 days.'
+              ? t('Notifications OnMyLead sends to your phone app show up here too, for 30 days.')
+              : t('Ride messages, rider alerts, ride changes, invites and friend requests show up here for 30 days.')
           }
         />
       ) : null}
@@ -138,7 +138,7 @@ function Row({ item, onPress, onClear }: { item: InboxItem; onPress: () => void;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${unread ? 'New. ' : ''}${item.title}. ${item.body}${more ? `. ${more}` : ''}. ${when}`}
+      accessibilityLabel={`${unread ? t('New. ') : ''}${item.title}. ${item.body}${more ? `. ${more}` : ''}. ${when}`}
       accessibilityActions={onClear ? [{ name: 'clear', label: t('Clear') }] : undefined}
       onAccessibilityAction={(e) => e.nativeEvent.actionName === 'clear' && onClear?.()}
       onPress={onPress}
@@ -160,7 +160,7 @@ function Row({ item, onPress, onClear }: { item: InboxItem; onPress: () => void;
       </View>
       {unread ? <View style={[styles.dot, { backgroundColor: color }]} /> : null}
       {onClear ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={`Clear ${item.title}`} hitSlop={8} onPress={onClear} style={styles.clear}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('Clear {title}', { title: item.title })} hitSlop={8} onPress={onClear} style={styles.clear}>
           <Icon name="close" size={16} color={Colors.textSecondary} />
         </Pressable>
       ) : null}

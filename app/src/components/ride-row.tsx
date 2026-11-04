@@ -51,7 +51,7 @@ export function RideRow({ ride, note }: { ride: Ride; note?: string }) {
   const theme = useTheme();
   const cancelled = ride.status === 'cancelled';
   const meta = [
-    cancelled ? 'Cancelled' : ride.status === 'live' ? 'Riding now' : clock(ride.meet_at),
+    cancelled ? t('Cancelled') : ride.status === 'live' ? t('Riding now') : clock(ride.meet_at),
     ride.meet_area_label ? `near ${ride.meet_area_label}` : null,
   ].filter(Boolean).join(', ');
   return (

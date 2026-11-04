@@ -36,7 +36,7 @@ export function FollowLeaders({ ids, organizerId }: { ids: string[]; organizerId
       await (l.following ? unfollowLeader(l.id) : followLeader(l.id));
       setLeaders((all) => all.map((x) => (x.id === l.id ? { ...x, following: !x.following } : x)));
     } catch (e) {
-      setError(e instanceof NotSwitchedOnError ? 'Following leaders is not switched on yet.' : (e as Error).message);
+      setError(e instanceof NotSwitchedOnError ? t('Following leaders is not switched on yet.') : (e as Error).message);
     } finally {
       setBusy(null);
     }
@@ -56,18 +56,18 @@ export function FollowLeaders({ ids, organizerId }: { ids: string[]; organizerId
         <View key={l.id} style={styles.row}>
           <RiderDot name={l.name} lead size={36} />
           <View style={{ flex: 1 }}>
-            <ThemedText type="small" themeColor="textSecondary">{l.id === organizerId ? 'Organizer' : 'Ride Leader'}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{l.id === organizerId ? t('Organizer') : t('Ride Leader')}</ThemedText>
             <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{l.name}</ThemedText>
           </View>
           <Pressable
             accessibilityRole="button"
             accessibilityState={{ selected: l.following, busy: busy === l.id }}
-            accessibilityLabel={l.following ? `Following ${l.name}. Tap to unfollow` : `Follow ${l.name}`}
+            accessibilityLabel={l.following ? t('Following {name}. Tap to unfollow', { name: l.name }) : t('Follow {name}', { name: l.name })}
             accessibilityHint={t('Get a notification when they post a new public ride')}
             disabled={busy === l.id}
             onPress={() => toggle(l)}
             style={({ pressed }) => [styles.button, l.following ? styles.on : styles.offBtn, pressed && { opacity: 0.8 }]}>
-            <Text style={[styles.buttonText, { color: l.following ? Colors.sky : '#fff' }]}>{l.following ? 'Following' : 'Follow'}</Text>
+            <Text style={[styles.buttonText, { color: l.following ? Colors.sky : '#fff' }]}>{l.following ? t('Following') : t('Follow')}</Text>
           </Pressable>
         </View>
       ))}

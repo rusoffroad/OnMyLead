@@ -93,7 +93,7 @@ export default function RideNameScreen() {
 
       <ErrorText error={error ?? problem} />
       <Button
-        title={justSaved && !changed ? 'Name Saved' : 'Save Name'}
+        title={justSaved && !changed ? tr('Name Saved') : tr('Save Name')}
         big
         loading={busy}
         disabled={!changed || !!problem}
@@ -108,7 +108,7 @@ export default function RideNameScreen() {
 function NamePreview({ userId, name }: { userId: string | undefined; name: string }) {
   const shown = shownName(name);
   return (
-    <View style={styles.preview} accessible accessibilityLabel={`Other riders see you as ${shown}`}>
+    <View style={styles.preview} accessible accessibilityLabel={tr('Other riders see you as {shown}', { shown })}>
       <View style={styles.contours}>
         {[0, 1, 2, 3].map((i) => (
           <View key={i} style={[styles.contour, { width: 120 + i * 70, height: 120 + i * 70, borderRadius: 60 + i * 35 }]} />

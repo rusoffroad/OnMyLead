@@ -39,7 +39,7 @@ export default function BadgesScreen() {
           markBadgesSeen().catch(() => {});
         }
       })
-      .catch((e: Error) => setError(`Couldn’t load your badges. ${e.message}`));
+      .catch((e: Error) => setError(t('Couldn’t load your badges. {message}', { message: e.message })));
   }, [session]);
 
   useFocusEffect(
@@ -118,12 +118,12 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
     <View
       style={styles.rank}
       accessible
-      accessibilityLabel={`Your rank is ${rank.name}. ${rank.levels} badge levels earned.${rank.next ? ` ${toGo} more for ${rank.next.name}.` : ''}`}>
+      accessibilityLabel={t('Your rank is {name}. {levels} badge levels earned.{v}', { name: rank.name, levels: rank.levels, v: rank.next ? ` ${toGo} more for ${rank.next.name}.` : '' })}>
       <ThemedText type="small" themeColor="textSecondary">{t('Your Rank')}</ThemedText>
       <Text style={styles.rankName}>{rank.name}</Text>
       <ThemedText themeColor="textSecondary">
-        {rank.levels === 1 ? '1 badge level earned' : `${rank.levels} badge levels earned`}
-        {rank.next ? `. ${toGo} more for ${rank.next.name}.` : '. The top rank.'}
+        {rank.levels === 1 ? t('1 badge level earned') : t('{levels} badge levels earned', { levels: rank.levels })}
+        {rank.next ? t('. {toGo} more for {name}.', { toGo, name: rank.next.name }) : t('. The top rank.')}
       </ThemedText>
       <View style={styles.ladder}>
         {RANKS.map((r, i) => (
@@ -158,7 +158,7 @@ function LeaderboardLink() {
 /** An honor OnMyLead gave you (Brand Ambassador): the big blue patch, above your rank. */
 function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
   return (
-    <View style={[styles.honor, { borderColor: h.key === 'founder' ? FOUNDER_COLORS.cloth : AMBASSADOR_COLORS.cloth }, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${h.name}${fresh ? ', new' : ''}. ${h.what}.`}>
+    <View style={[styles.honor, { borderColor: h.key === 'founder' ? FOUNDER_COLORS.cloth : AMBASSADOR_COLORS.cloth }, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${h.name}${fresh ? t(', new') : ''}. ${h.what}.`}>
       <BadgePatch badge={h.key} level={1} size={88} />
       <View style={{ flex: 1, gap: 4 }}>
         <View style={[styles.titleRow, { alignItems: 'flex-start' }]}>
@@ -173,13 +173,13 @@ function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
 
 function BadgeCard({ p, fresh, grid }: { p: BadgeProgress; fresh: boolean; grid: boolean }) {
   const earned = p.level > 0;
-  const levelName = earned ? LEVEL_NAME[p.level as BadgeLevel] : 'Not Earned Yet';
+  const levelName = earned ? LEVEL_NAME[p.level as BadgeLevel] : t('Not Earned Yet');
   const barColor = earned && p.goal == null ? PATCH_COLORS[3].cloth : earned ? PATCH_COLORS[p.level as BadgeLevel].cloth : Colors.textSecondary;
   return (
     <View
       style={[styles.card, grid && styles.gridCell, fresh && styles.cardFresh]}
       accessible
-      accessibilityLabel={`${p.def.name}, ${levelName}${fresh ? ', new' : ''}. ${p.def.what}. ${p.line}.`}>
+      accessibilityLabel={`${p.def.name}, ${levelName}${fresh ? t(', new') : ''}. ${p.def.what}. ${p.line}.`}>
       <BadgePatch badge={p.def.key} level={p.level} size={64} />
       <View style={{ flex: 1, gap: 4 }}>
         <View style={styles.titleRow}>

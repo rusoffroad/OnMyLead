@@ -55,7 +55,7 @@ export function TabletProGate() {
             <ProChip style={{ alignSelf: 'flex-start' }} />
             <ThemedText style={styles.title} accessibilityRole="header">{t(info.title)}</ThemedText>
             <ThemedText style={styles.lead}>
-              {`OnMyLead on ${Platform.OS === 'web' ? 'the website' : 'a tablet'} is part of OnMyLead Pro. Joining a ride and following the leader are free on every device.`}
+              {t('OnMyLead on {v} is part of OnMyLead Pro. Joining a ride and following the leader are free on every device.', { v: Platform.OS === 'web' ? 'the website' : 'a tablet' })}
             </ThemedText>
 
             <View style={styles.card}>
@@ -84,7 +84,7 @@ export function TabletProGate() {
                     style={({ pressed }) => [styles.ride, pressed && { opacity: 0.8 }]}>
                     <View style={{ flex: 1, gap: 2 }}>
                       <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{r.name}</ThemedText>
-                      <ThemedText type="small" themeColor="textSecondary">{r.status === 'live' ? 'Riding Now. Open Ride Mode' : new Date(r.meet_at).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</ThemedText>
+                      <ThemedText type="small" themeColor="textSecondary">{r.status === 'live' ? t('Riding Now. Open Ride Mode') : new Date(r.meet_at).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</ThemedText>
                     </View>
                     <Icon name="chevron" size={18} color={Colors.textSecondary} />
                   </Pressable>

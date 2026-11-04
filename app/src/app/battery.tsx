@@ -72,7 +72,7 @@ function Option({ mode, on, wide, onPress }: { mode: BatteryMode; on: boolean; w
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ checked: on }}
-      accessibilityLabel={`${p.label}${recommended ? ', recommended' : ''}. ${p.detail}`}
+      accessibilityLabel={`${p.label}${recommended ? t(', recommended') : ''}. ${p.detail}`}
       onPress={onPress}
       style={({ pressed }) => [styles.option, wide && { flex: 1 }, on && styles.optionOn, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.optionHead}>

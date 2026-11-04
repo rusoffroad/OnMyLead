@@ -7,6 +7,7 @@ import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
+import { t as tr } from '@/lib/i18n';
 
 /**
  * The route builder's map on the web: satellite imagery, click to add the next point, drag a
@@ -130,7 +131,7 @@ export function RouteBuilderMap({
         iconAnchor: [13, 13],
         html: `<div class="oml-tap${i === 0 ? ' first' : last ? ' last' : ''}">${i + 1}</div>`,
       });
-      const mk = L.marker(ll(w), { icon, draggable: editable, title: `Point ${i + 1}${editable ? ', drag to move' : ''}`, zIndexOffset: 500 }).addTo(g);
+      const mk = L.marker(ll(w), { icon, draggable: editable, title: tr('Point {v}{v2}', { v: i + 1, v2: editable ? ', drag to move' : '' }), zIndexOffset: 500 }).addTo(g);
       mk.on('dragend', () => {
         const p = mk.getLatLng();
         if (map.current) cb.current.onMove(i, { lat: p.lat, lng: p.lng }, snapM(map.current));

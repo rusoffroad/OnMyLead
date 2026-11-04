@@ -40,7 +40,7 @@ export function PollCard({
             onPress={() => !mine && me && onVote(i)}
             accessibilityRole="radio"
             accessibilityState={{ selected: mine }}
-            accessibilityLabel={`${label}, ${tally.counts[i]} ${tally.counts[i] === 1 ? 'vote' : 'votes'}${mine ? ', your vote' : ''}`}
+            accessibilityLabel={`${label}, ${tally.counts[i]} ${tally.counts[i] === 1 ? 'vote' : 'votes'}${mine ? tr(', your vote') : ''}`}
             style={({ pressed }) => [styles.choice, mine && styles.choiceMine, pressed && { opacity: 0.85 }]}>
             <View
               style={[
@@ -58,7 +58,7 @@ export function PollCard({
       })}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <ThemedText type="small" themeColor="textSecondary">
-          {voteCountLabel(tally.total)}. {tally.mine == null ? 'Tap a choice to vote.' : 'Tap another choice to change your vote.'}
+          {voteCountLabel(tally.total)}. {tally.mine == null ? tr('Tap a choice to vote.') : tr('Tap another choice to change your vote.')}
         </ThemedText>
         <ProTag feature="vote_polls" />
       </View>
@@ -115,7 +115,7 @@ export function PollComposer({
               setError(null);
             }}
             accessibilityRole="button"
-            accessibilityLabel={`Start with ${s.question}`}
+            accessibilityLabel={tr('Start with {question}', { question: s.question })}
             style={({ pressed }) => [styles.starter, pressed && { opacity: 0.8 }]}>
             <Text style={styles.starterText}>{s.question}</Text>
           </Pressable>
@@ -125,13 +125,13 @@ export function PollComposer({
       {choices.map((c, i) => (
         <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
-            <Field label={`Choice ${i + 1}`} value={c} onChangeText={(t) => setChoice(i, t)} maxLength={MAX_POLL_CHOICE} />
+            <Field label={tr('Choice {v}', { v: i + 1 })} value={c} onChangeText={(t) => setChoice(i, t)} maxLength={MAX_POLL_CHOICE} />
           </View>
           {choices.length > MIN_POLL_CHOICES ? (
             <Pressable
               onPress={() => setChoices((prev) => prev.filter((_, j) => j !== i))}
               accessibilityRole="button"
-              accessibilityLabel={`Remove Choice ${i + 1}`}
+              accessibilityLabel={tr('Remove Choice {v}', { v: i + 1 })}
               hitSlop={8}
               style={styles.remove}>
               <Text style={styles.removeText}>{tr('Remove')}</Text>

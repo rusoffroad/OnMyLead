@@ -28,7 +28,7 @@ export function RideQrSheet({
     setBusy(true);
     track('invite_shared', { platform: Platform.OS, how: 'qr' });
     try {
-      await shareQrCode(card, message, `Join "${rideName}" on OnMyLead`);
+      await shareQrCode(card, message, t('Join "{rideName}" on OnMyLead', { rideName }));
     } catch {
       // The share sheet was closed or isn't available; nothing to tell the rider.
     } finally {

@@ -67,7 +67,7 @@ export function RusGear({
               {[formatPrice(product.priceCents), reason].filter(Boolean).join(' · ')}
             </ThemedText>
           </View>
-          <Button title={t('Buy')} kind="secondary" accessibilityLabel={`Buy ${product.name} from RUS Offroad`} onPress={() => openProduct(product, campaign)} />
+          <Button title={t('Buy')} kind="secondary" accessibilityLabel={t('Buy {name} from RUS Offroad', { name: product.name })} onPress={() => openProduct(product, campaign)} />
         </View>
       ))}
       <Pressable accessibilityRole="link" onPress={() => openStore(campaign)} style={{ minHeight: 44, justifyContent: 'center' }}>

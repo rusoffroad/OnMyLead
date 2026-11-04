@@ -123,7 +123,7 @@ export default function NewRide() {
       setCopiedRoute(route);
       setCopiedFrom(src.name);
       setMore(true);
-    })().catch((e) => setError(e instanceof Error ? e.message : 'Could not copy that ride.'));
+    })().catch((e) => setError(e instanceof Error ? e.message : tr('Could not copy that ride.')));
   }, [copy]);
 
   // Plan a Group Ride on This Trail (Map Mode): the trail becomes the route, its start the meeting point.
@@ -146,7 +146,7 @@ export default function NewRide() {
       setTrailWidth(t.details.maxWidthIn);
       // Riders who join see the limit in the ride's instructions.
       if (t.details.maxWidthIn != null) {
-        const note = `Trail width limit: ${inches(t.details.maxWidthIn)}. Wider machines won't fit.`;
+        const note = tr('Trail width limit: {v}. Wider machines won’t fit.', { v: inches(t.details.maxWidthIn) });
         setInstructions((v) => (v.includes('width limit') ? v : v ? `${v}\n${note}` : note));
         setMore(true);
       }
@@ -173,7 +173,7 @@ export default function NewRide() {
       setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
       setMeetState(await stateAt(p));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not get your location.');
+      setError(e instanceof Error ? e.message : tr('Could not get your location.'));
     }
   }
 
@@ -202,7 +202,7 @@ export default function NewRide() {
     if (!canRideOn(dayDate, new Date())) return setError(tr('Pick a day from today up to three years out.'));
     if (!parsedCoords) return setError(tr('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".'));
     if (!routePlan) return setError(tr('Pick Mapped or Freeride under The Route.'));
-    if (!codeCheckOk(codeCheck)) return setError(codeCheck === 'checking' ? 'Checking your invite code. Try again in a second.' : 'Pick a different invite code, or clear it to get one made for you.');
+    if (!codeCheckOk(codeCheck)) return setError(codeCheck === 'checking' ? tr('Checking your invite code. Try again in a second.') : tr('Pick a different invite code, or clear it to get one made for you.'));
     setBusy(true);
     try {
       const lat = Number(parsedCoords[1]);
@@ -247,7 +247,7 @@ export default function NewRide() {
       // A mapped ride goes straight to the route builder; saving it lands back on the new ride.
       if (routePlan === 'mapped' && !routeCopied) router.push(`/ride/${ride.id}/route`);
     } catch (e) {
-      if (!handleProError(e)) setError(e instanceof Error ? friendlyShareCodeError(e.message, 'ride') : 'Could not create the ride.');
+      if (!handleProError(e)) setError(e instanceof Error ? friendlyShareCodeError(e.message, 'ride') : tr('Could not create the ride.'));
     } finally {
       setBusy(false);
     }
@@ -268,8 +268,8 @@ export default function NewRide() {
           <ThemedText style={{ fontWeight: 700 }}>{tr('Riding {copiedFrom} Again', { copiedFrom })}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             {copiedRoute
-              ? 'The details, meeting point and route are filled in. Pick the day, check the times and create it.'
-              : 'The details and meeting point are filled in. Pick the day, check the times and create it.'}
+              ? tr('The details, meeting point and route are filled in. Pick the day, check the times and create it.')
+              : tr('The details and meeting point are filled in. Pick the day, check the times and create it.')}
           </ThemedText>
         </View>
       ) : null}
@@ -343,7 +343,7 @@ export default function NewRide() {
           <View style={{ gap: Spacing.one }}>
             <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('State')}</ThemedText>
             <ThemedText>
-              {meetState ? `Listed in ${stateByCode(meetState)?.name}.` : 'Set the meeting point and we fill this in, or pick it.'}
+              {meetState ? tr('Listed in {name}.', { name: stateByCode(meetState)?.name }) : tr('Set the meeting point and we fill this in, or pick it.')}
             </ThemedText>
             {meetState && !pickingState ? (
               <Button title={tr('Change State')} kind="ghost" onPress={() => setPickingState(true)} />
@@ -420,7 +420,7 @@ export default function NewRide() {
         </Card>
       ) : null}
 
-      <Button title={more ? 'Fewer Details' : 'Add Route, Difficulty and More'} kind="ghost" onPress={() => setMore(!more)} />
+      <Button title={more ? tr('Fewer Details') : tr('Add Route, Difficulty and More')} kind="ghost" onPress={() => setMore(!more)} />
       {more ? (
         <Card>
           <Field label={tr('Description')} value={description} onChangeText={setDescription} multiline />
@@ -479,7 +479,7 @@ export default function NewRide() {
 
       <ErrorText error={error} />
       <Button
-        title={kind === 'public' ? 'Create Public Ride' : kind === 'private' ? 'Create Private Ride' : 'Create Ride'}
+        title={kind === 'public' ? tr('Create Public Ride') : kind === 'private' ? tr('Create Private Ride') : tr('Create Ride')}
         big
         loading={busy}
         onPress={submit}

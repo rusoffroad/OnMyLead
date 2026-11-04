@@ -43,7 +43,7 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
     <Pressable
       onPress={() => router.push('/tilt')}
       accessibilityRole="button"
-      accessibilityLabel={t ? `Tilt. ${describeTilt(t)}${reading.zeroed ? '' : '. Not zeroed yet'}` : 'Tilt'}
+      accessibilityLabel={t ? `Tilt. ${describeTilt(t)}${reading.zeroed ? '' : tr('. Not zeroed yet')}` : tr('Tilt')}
       accessibilityHint={tr('Opens the tilt meter')}
       hitSlop={6}
       style={({ pressed }) => [

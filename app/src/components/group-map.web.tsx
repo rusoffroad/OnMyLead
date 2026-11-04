@@ -68,7 +68,7 @@ export function GroupMap({
       {riders.map((r) => (
         <View key={r.id} style={styles.row}>
           <RiderDot role={r.role} freshness={r.freshness?.state ?? null} />
-          <Text style={[styles.name, r.role === 'leader' && { color: RideColors.leader }]}>{r.name}{r.role === 'leader' ? ', leader' : ''}</Text>
+          <Text style={[styles.name, r.role === 'leader' && { color: RideColors.leader }]}>{r.name}{r.role === 'leader' ? t(', leader') : ''}</Text>
           {r.breakdown ? <BreakdownBadge /> : null}
           <Text style={styles.detail}>{t(r.detail)}</Text>
         </View>

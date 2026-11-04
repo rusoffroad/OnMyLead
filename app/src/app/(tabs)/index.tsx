@@ -204,7 +204,7 @@ export default function HomeScreen() {
     try {
       await (action === 'delete' ? deleteRide(ride.id) : leaveRide(ride.id));
     } catch (e) {
-      const what = action === 'delete' ? 'Couldn’t Delete the Ride' : action === 'decline' ? 'Couldn’t Decline the Ride' : 'Couldn’t Leave the Ride';
+      const what = action === 'delete' ? t('Couldn’t Delete the Ride') : action === 'decline' ? t('Couldn’t Decline the Ride') : t('Couldn’t Leave the Ride');
       showNotice(what, e instanceof Error ? e.message : t('Something went wrong.'));
       return false;
     }
@@ -351,9 +351,9 @@ export default function HomeScreen() {
       ) : null}
       {going.length ? (
         <Block
-          title={going.length === 1 || !moreRides ? 'Your Next Ride' : 'Your Rides'}
+          title={going.length === 1 || !moreRides ? t('Your Next Ride') : t('Your Rides')}
           right={going.length > 1 ? (
-            <HeadLink title={moreRides ? 'Show Less' : t('All {n}', { n: going.length })} onPress={() => setMoreRides(!moreRides)} label={moreRides ? 'Show only your next ride' : t('Show all {n} of your rides', { n: going.length })} />
+            <HeadLink title={moreRides ? t('Show Less') : t('All {n}', { n: going.length })} onPress={() => setMoreRides(!moreRides)} label={moreRides ? t('Show only your next ride') : t('Show all {n} of your rides', { n: going.length })} />
           ) : undefined}>
           <RowGroup>
             {(moreRides ? going : going.slice(0, 1)).map((m) =>
@@ -409,7 +409,7 @@ export default function HomeScreen() {
               : t('Everything is switched off in Customize.')}
           />
           {feed.length > FEED_SHOWN ? (
-            <HeadLink title={feedAll ? 'Show Less' : t('Show {n} More', { n: feed.length - FEED_SHOWN })} onPress={() => setFeedAll(!feedAll)} />
+            <HeadLink title={feedAll ? t('Show Less') : t('Show {n} More', { n: feed.length - FEED_SHOWN })} onPress={() => setFeedAll(!feedAll)} />
           ) : null}
         </>
       )}

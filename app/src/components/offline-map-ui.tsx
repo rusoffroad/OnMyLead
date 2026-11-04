@@ -41,7 +41,7 @@ export function DownloadRow({ map }: { map: OfflineMap }) {
   const busy = map.status === 'downloading';
   const pct = map.total ? (map.saved + map.failed) / map.total : 0;
   const confirmDelete = () =>
-    Alert.alert(`Delete ${map.name}?`, t('It comes off this phone. You can download it again any time you have signal.'), [
+    Alert.alert(t('Delete {name}?', { name: map.name }), t('It comes off this phone. You can download it again any time you have signal.'), [
       { text: t('Keep'), style: 'cancel' },
       { text: t('Delete'), style: 'destructive', onPress: () => deleteOfflineMap(map.id) },
     ]);

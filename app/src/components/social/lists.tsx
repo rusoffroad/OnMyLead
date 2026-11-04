@@ -89,7 +89,7 @@ export function FriendRows({ list, limit }: { list: Friend[]; limit?: number }) 
         <Text style={styles.emptyText}>{t('No friends yet. Add the riders you ride with and their rides, badges and posts show up here.')}</Text>
       )}
       <Button
-        title={limit && friends.length > limit ? `See All ${friends.length} Friends` : 'Add and Manage Friends'}
+        title={limit && friends.length > limit ? t('See All {length} Friends', { length: friends.length }) : t('Add and Manage Friends')}
         kind="secondary"
         onPress={() => router.push('/friends')}
       />
@@ -107,7 +107,7 @@ function FriendRow({ friend, first }: { friend: Friend; first: boolean }) {
       <RiderPhoto userId={friend.user_id} name={friend.display_name} size={40} fallback={<Initial name={friend.display_name} size={40} color={faceColor(friend.user_id)} />} />
       <View style={{ flex: 1 }}>
         <Text style={styles.rowName} numberOfLines={1}>{friend.display_name || 'Rider'}</Text>
-        <Text style={styles.rowSub}>{friend.out_now ? 'Out riding now' : 'Friend'}</Text>
+        <Text style={styles.rowSub}>{friend.out_now ? t('Out riding now') : t('Friend')}</Text>
       </View>
       <Icon name="chevron" size={18} color={Social.muted} />
     </Pressable>

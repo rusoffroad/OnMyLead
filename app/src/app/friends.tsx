@@ -118,11 +118,11 @@ export default function Friends() {
       ) : null}
 
       <View style={styles.hero}>
-        <Text style={styles.heroTitle}>{mine.length ? `${mine.length} ${mine.length === 1 ? 'Friend' : 'Friends'}` : 'Your Riding Friends'}</Text>
+        <Text style={styles.heroTitle}>{mine.length ? `${mine.length} ${mine.length === 1 ? t('Friend') : t('Friends')}` : t('Your Riding Friends')}</Text>
         <ThemedText type="small" themeColor="textSecondary">
           {out
-            ? `${out} out riding near you right now.`
-            : 'Friends see each other in Out Riding and can message any time. Nobody sees where you are.'}
+            ? t('{out} out riding near you right now.', { out })
+            : t('Friends see each other in Out Riding and can message any time. Nobody sees where you are.')}
         </ThemedText>
       </View>
     </>
@@ -138,7 +138,7 @@ export default function Friends() {
         </ThemedText>
         {code ? (
           <View style={styles.codeBox}>
-            <Text style={[styles.code, codeTextSize(spaced(code), 34)]} numberOfLines={1} accessibilityLabel={`Friend code ${code.split('').join(' ')}`} selectable>{spaced(code)}</Text>
+            <Text style={[styles.code, codeTextSize(spaced(code), 34)]} numberOfLines={1} accessibilityLabel={t('Friend code {v}', { v: code.split('').join(' ') })} selectable>{spaced(code)}</Text>
           </View>
         ) : null}
         <Button title={t('Share Friend Link')} disabled={!code} onPress={() => share('sheet')} style={{ backgroundColor: Colors.sky }} />
@@ -146,7 +146,7 @@ export default function Friends() {
           <Button title={t('Text')} kind="secondary" style={{ flex: 1 }} disabled={!code} onPress={() => share('text')} />
           <Button title={t('Email')} kind="secondary" style={{ flex: 1 }} disabled={!code} onPress={() => share('email')} />
           <Button
-            title={copied ? 'Copied' : 'Copy'}
+            title={copied ? t('Copied') : t('Copy')}
             kind="secondary"
             style={{ flex: 1 }}
             disabled={!code}
@@ -233,11 +233,11 @@ export default function Friends() {
         <>
           <Section title={t('Friend Requests')} />
           {received.map((f) =>
-            row(f, `Asked ${shortDate(f.since)}`, (
+            row(f, t('Asked {v}', { v: shortDate(f.since) }), (
               <>
                 <Button title={t('Accept')} loading={busy === `yes-${f.user_id}`} style={styles.small} onPress={() => act(`yes-${f.user_id}`, async () => {
                   await respondFriendRequest(f.user_id, true);
-                  return `You and ${f.display_name} are friends now.`;
+                  return t('You and {display_name} are friends now.', { display_name: f.display_name });
                 })} />
                 <Button title={t('Decline')} kind="ghost" loading={busy === `no-${f.user_id}`} style={styles.small} onPress={() => act(`no-${f.user_id}`, () => respondFriendRequest(f.user_id, false))} />
               </>
@@ -255,22 +255,22 @@ export default function Friends() {
       {mine.map((f) =>
         row(
           f,
-          f.out_now ? `Out Riding, ${distanceLabel(f.miles ?? 0)}${f.spot ? `, at ${f.spot}` : ''}` : `Friends Since ${shortDate(f.since)}`,
+          f.out_now ? t('Out Riding, {v}{v2}', { v: distanceLabel(f.miles ?? 0), v2: f.spot ? `, at ${f.spot}` : '' }) : t('Friends Since {v}', { v: shortDate(f.since) }),
           (
             <>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Message ${f.display_name}`}
+                accessibilityLabel={t('Message {display_name}', { display_name: f.display_name })}
                 onPress={() => router.push(`/messages/${f.user_id}`)}
                 style={({ pressed }) => [styles.msgBtn, pressed && { opacity: 0.8 }]}>
                 <Icon name="mail" color="#fff" size={20} />
               </Pressable>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Remove ${f.display_name}`}
+                accessibilityLabel={t('Remove {display_name}', { display_name: f.display_name })}
                 hitSlop={6}
                 onPress={async () => {
-                  if (!(await confirmAsync(`Remove ${f.display_name}?`, t('You’ll stop being friends. They aren’t told.'), t('Remove')))) return;
+                  if (!(await confirmAsync(t('Remove {display_name}?', { display_name: f.display_name }), t('You’ll stop being friends. They aren’t told.'), t('Remove')))) return;
                   act(`rm-${f.user_id}`, () => removeFriend(f.user_id));
                 }}
                 style={styles.iconBtn}>
@@ -286,7 +286,7 @@ export default function Friends() {
         <>
           <Section title={t('Requests You Sent')} />
           {sent.map((f) =>
-            row(f, `Waiting Since ${shortDate(f.since)}`, (
+            row(f, t('Waiting Since {v}', { v: shortDate(f.since) }), (
               <Button title={t('Cancel')} kind="ghost" loading={busy === `rm-${f.user_id}`} style={styles.small} onPress={() => act(`rm-${f.user_id}`, () => removeFriend(f.user_id))} />
             )),
           )}

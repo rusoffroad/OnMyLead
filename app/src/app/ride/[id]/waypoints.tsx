@@ -76,7 +76,7 @@ export default function RideWaypoints() {
         setRoute(rt.route);
         setCenter(d ? { lat: d.meet_lat, lng: d.meet_lng } : r ? { lat: r.meet_area_lat, lng: r.meet_area_lng } : null);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load the ride.'))
+      .catch((e) => setError(e instanceof Error ? e.message : t('Could not load the ride.')))
       .finally(() => setLoaded(true));
   }, [id]);
 
@@ -99,7 +99,7 @@ export default function RideWaypoints() {
     try {
       openNew(await currentPosition());
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t find your location.');
+      setError(e instanceof Error ? e.message : t('Couldn’t find your location.'));
     } finally {
       setLocating(false);
     }
@@ -110,20 +110,20 @@ export default function RideWaypoints() {
 
   const navigateTo = (lat: number, lng: number, title = 'This Waypoint') => openDirections({ title, to: { lat, lng } });
 
-  const drop = web ? 'Click' : 'Press and hold';
+  const drop = web ? t('Click') : t('Press and hold');
   const hint = !mine
-    ? 'Join the ride to add and see its waypoints.'
+    ? t('Join the ride to add and see its waypoints.')
     : !wp.switchedOn
       ? WAYPOINTS_NOT_SWITCHED_ON
       : addingStop && !wp.stopsSwitchedOn
         ? PLANNED_STOPS_NOT_SWITCHED_ON
       : found
-        ? `${drop} the map at ${found.name} to drop ${addingStop ? 'the stop' : 'a waypoint'} there.`
+        ? t('{drop} the map at {name} to drop {v} there.', { drop, name: found.name, v: addingStop ? 'the stop' : 'a waypoint' })
       : addingStop
-        ? `${drop} the map where the group will stop, or Search for the place. Stops are numbered in the order you add them.`
+        ? t('{drop} the map where the group will stop, or Search for the place. Stops are numbered in the order you add them.', { drop })
       : canShare
-        ? `${drop} the map to drop a waypoint, or Search for a place. You choose whether the whole ride sees it.`
-        : `${drop} the map to drop a waypoint, or Search for a place. Yours are only for you.`;
+        ? t('{drop} the map to drop a waypoint, or Search for a place. You choose whether the whole ride sees it.', { drop })
+        : t('{drop} the map to drop a waypoint, or Search for a place. Yours are only for you.', { drop });
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>

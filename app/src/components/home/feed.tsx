@@ -61,7 +61,7 @@ export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; 
               </View>
               <Pressable
                 accessibilityRole="link"
-                accessibilityHint={item.key ? 'Opens it in Social with the comments' : undefined}
+                accessibilityHint={item.key ? t('Opens it in Social with the comments') : undefined}
                 onPress={open}
                 style={({ pressed }) => [{ flex: 1, gap: 3 }, pressed && { opacity: 0.7 }]}>
                 <Text style={styles.line} numberOfLines={item.kind === 'post' ? 3 : undefined}>
@@ -69,7 +69,7 @@ export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; 
                   {item.kind === 'post' ? item.body ?? 'posted a photo' : feedLine(item)}
                 </Text>
                 <Text style={[homeStyles.muted, { fontSize: 12 }]}>
-                  {item.kind === 'out' ? 'Riding now' : timeAgo(item.at)}
+                  {item.kind === 'out' ? t('Riding now') : timeAgo(item.at)}
                   {stat ? `  ·  ${stat}` : ''}
                   {item.commentCount ? `  ·  ${commentsLabel(item.commentCount)}` : ''}
                 </Text>
@@ -80,7 +80,7 @@ export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; 
                   onPress={like}
                   hitSlop={8}
                   accessibilityRole="button"
-                  accessibilityLabel={item.liked ? 'Unlike' : 'Like'}
+                  accessibilityLabel={item.liked ? t('Unlike') : t('Like')}
                   accessibilityState={{ selected: item.liked }}
                   style={styles.heart}>
                   <Icon name="heart" size={22} color={item.liked ? '#FF4D57' : Home.muted} fill={item.liked ? '#FF4D57' : undefined} />
@@ -118,7 +118,7 @@ export function FeedSheet({
       await onSave(draft);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save. Try again.');
+      setError(e instanceof Error ? e.message : t('Couldn’t save. Try again.'));
     } finally {
       setSaving(false);
     }

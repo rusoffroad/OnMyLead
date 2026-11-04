@@ -58,7 +58,7 @@ export function RideBubble({ ride }: { ride: Ride & { distanceMi?: number } }) {
       <Text style={styles.bubbleTitle} numberOfLines={2}>{ride.name}</Text>
       <Text style={styles.bubbleText}>
         {meetsLabel(ride)}
-        {ride.distanceMi != null ? `, ${ride.distanceMi < 1 ? 'under 1' : Math.round(ride.distanceMi)} mi away` : ''}
+        {ride.distanceMi != null ? `, ${ride.distanceMi < 1 ? t('under 1') : Math.round(ride.distanceMi)} mi away` : ''}
       </Text>
       <Text style={styles.bubbleLink}>{t('Open Ride')}</Text>
     </View>
@@ -81,7 +81,7 @@ export function MapControls({
     <View style={styles.controls} pointerEvents="box-none">
       {onToggleFull ? (
         <View style={styles.zoomStack}>
-          <RoundButton icon={full ? 'collapse' : 'expand'} label={full ? 'Exit Full Map' : 'Full Map'} onPress={onToggleFull} />
+          <RoundButton icon={full ? 'collapse' : 'expand'} label={full ? t('Exit Full Map') : t('Full Map')} onPress={onToggleFull} />
         </View>
       ) : null}
       <View style={styles.zoomStack}>
@@ -112,7 +112,7 @@ export function MapOverlay({
         {title ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={onPressTitle ? `${title}, change state` : title}
+            accessibilityLabel={onPressTitle ? t('{title}, change state', { title }) : title}
             disabled={!onPressTitle}
             onPress={onPressTitle}
             style={({ pressed }) => [styles.chip, pressed && styles.pressed]}>
@@ -122,7 +122,7 @@ export function MapOverlay({
         ) : null}
         <View style={[styles.chip, styles.count]}>
           <View style={[styles.countDot, { backgroundColor: Colors.sky }]} />
-          <Text style={styles.chipText}>{count === 0 ? 'No rides here yet' : `${count} ${count === 1 ? 'Ride' : 'Rides'}`}</Text>
+          <Text style={styles.chipText}>{count === 0 ? t('No rides here yet') : `${count} ${count === 1 ? t('Ride') : t('Rides')}`}</Text>
         </View>
       </View>
       {moved && onSearch ? (

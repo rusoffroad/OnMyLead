@@ -88,11 +88,11 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
         onPress={press}
         disabled={busy}
         accessibilityRole="button"
-        accessibilityLabel={kind === 'handOff' ? 'Leave Ride. First pick who takes the ride over' : label}
+        accessibilityLabel={kind === 'handOff' ? t('Leave Ride. First pick who takes the ride over') : label}
         accessibilityState={{ busy }}
         style={({ pressed }) => [styles.bar, dark && styles.barDark, { opacity: busy ? 0.5 : pressed ? 0.75 : 1 }, style]}>
         <Icon name="leave" size={20} color={Colors.danger} />
-        <Text style={styles.barText}>{busy ? 'Leaving…' : label}</Text>
+        <Text style={styles.barText}>{busy ? t('Leaving…') : label}</Text>
       </Pressable>
       {kind === 'handOff' ? (
         <HandOffSheet
@@ -153,7 +153,7 @@ function HandOffSheet({
                   disabled={busy}
                   onPress={() => onPick(m)}
                   accessibilityRole="button"
-                  accessibilityLabel={`Give the ride to ${name} and leave`}
+                  accessibilityLabel={t('Give the ride to {name} and leave', { name })}
                   style={({ pressed }) => [styles.rider, { opacity: busy ? 0.5 : pressed ? 0.75 : 1 }]}>
                   <RiderPhoto userId={m.user_id} size={40} zoom={false} fallback={<Initial name={name} lead={m.role === 'leader'} />} />
                   <View style={{ flex: 1, gap: 2 }}>

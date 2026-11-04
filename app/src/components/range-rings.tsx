@@ -19,7 +19,7 @@ export function RangeRings({
   const dot = Math.max(26, Math.round(size / 11));
   return (
     <View style={{ width: size, alignSelf: 'center', gap: 6 }}>
-      <View style={{ width: size, height: size }} accessible accessibilityLabel={`${riders.length} riders out within ${radius} miles`}>
+      <View style={{ width: size, height: size }} accessible accessibilityLabel={t('{length} riders out within {radius} miles', { length: riders.length, radius })}>
         <Svg width={size} height={size}>
           {/* Crosshair ticks, faint: a range finder, not a compass. */}
           <Line x1={c} y1={c - outer - 8} x2={c} y2={c - outer + 6} stroke={Colors.border} strokeWidth={1.5} />
@@ -55,7 +55,7 @@ export function RangeRings({
             <Pressable
               key={r.user_id}
               accessibilityRole="button"
-              accessibilityLabel={`${r.display_name}, ${r.miles < 1 ? 'under a mile' : `about ${r.miles} miles`} away`}
+              accessibilityLabel={`${r.display_name}, ${r.miles < 1 ? t('under a mile') : `about ${r.miles} miles`} away`}
               onPress={onPick ? () => onPick(r) : undefined}
               hitSlop={6}
               style={[

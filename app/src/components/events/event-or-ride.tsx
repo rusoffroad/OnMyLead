@@ -33,7 +33,7 @@ export function EventOrRide({ from }: { from: From }) {
         style={({ pressed }) => [styles.head, pressed && { opacity: 0.7 }]}>
         <Icon name="help" size={18} color={Colors.sky} />
         <Text style={styles.question}>{EVENT_OR_RIDE.question}</Text>
-        <Text style={styles.link}>{open ? 'Hide' : EVENT_OR_RIDE.link}</Text>
+        <Text style={styles.link}>{open ? t('Hide') : EVENT_OR_RIDE.link}</Text>
       </Pressable>
       {open ? (
         <View style={styles.body}>

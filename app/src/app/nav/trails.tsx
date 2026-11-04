@@ -38,7 +38,7 @@ export default function MyTrails() {
       ) : null}
       {trails.length ? (
         <>
-          <Section title={`${trails.length} ${trails.length === 1 ? 'Trail' : 'Trails'}`} />
+          <Section title={`${trails.length} ${trails.length === 1 ? tr('Trail') : tr('Trails')}`} />
           <RowGroup>
             {trails.map((t) => {
               const badge = shareBadge(t);
@@ -53,7 +53,7 @@ export default function MyTrails() {
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={styles.name} numberOfLines={1}>{t.details.name || 'Unnamed Trail'}</Text>
                     <Text style={styles.sub} numberOfLines={1}>
-                      {[feetOrMiles(len), difficultyLabel(t.details.difficulty), t.source === 'drawn' ? 'Drawn' : t.source === 'recorded' ? new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null]
+                      {[feetOrMiles(len), difficultyLabel(t.details.difficulty), t.source === 'drawn' ? tr('Drawn') : t.source === 'recorded' ? new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null]
                         .filter(Boolean)
                         .join('   ')}
                     </Text>

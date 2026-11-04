@@ -61,7 +61,7 @@ export default function RiderProfileScreen() {
     }, [session, loading, id, setItems]),
   );
 
-  const title = profile?.me ? 'Your Profile' : profile?.name ?? 'Rider';
+  const title = profile?.me ? t('Your Profile') : profile?.name ?? 'Rider';
   if (!profile) {
     return (
       <Screen width="readable">
@@ -118,7 +118,7 @@ export default function RiderProfileScreen() {
         items={timeline.items}
         update={timeline.update}
         remove={timeline.remove}
-        empty={profile.me ? 'Nothing here yet. Your posts, rides, badges and trails show here.' : `Nothing from ${profile.name} in the last year yet.`}
+        empty={profile.me ? t('Nothing here yet. Your posts, rides, badges and trails show here.') : t('Nothing from {name} in the last year yet.', { name: profile.name })}
       />
     </View>
   );

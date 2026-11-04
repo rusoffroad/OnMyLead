@@ -48,7 +48,7 @@ export default function ReportRider() {
         if (!live) return;
         setDms(d.status === 'fulfilled' ? d.value : []);
         setKnown(k.status === 'fulfilled' ? k.value : []);
-        setError(d.status === 'rejected' && k.status === 'rejected' ? 'Couldn’t load your riders. Check your connection and try again.' : null);
+        setError(d.status === 'rejected' && k.status === 'rejected' ? t('Couldn’t load your riders. Check your connection and try again.') : null);
         setLoaded(true);
       });
       return () => { live = false; };
@@ -71,7 +71,7 @@ export default function ReportRider() {
         <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>
       ) : !sections.length ? (
         <View style={styles.note}>
-          <ThemedText type="smallBold">{query ? 'No Riders Match' : 'Nobody to Report Yet'}</ThemedText>
+          <ThemedText type="smallBold">{query ? t('No Riders Match') : t('Nobody to Report Yet')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             {t('Riders you’ve messaged, ridden with, added as friends or blocked show here. You can also report a rider from their message, a ride’s Going list or Out Riding.')}
           </ThemedText>
@@ -86,7 +86,7 @@ export default function ReportRider() {
                   key={p.userId}
                   style={({ pressed }) => [styles.row, i > 0 && styles.divider, pressed && { backgroundColor: Colors.backgroundSelected }]}
                   accessibilityRole="button"
-                  accessibilityLabel={`Report ${p.name}`}
+                  accessibilityLabel={t('Report {name}', { name: p.name })}
                   onPress={() => setReporting({ kind: 'rider', userId: p.userId, name: p.name, source: 'you' })}>
                   <View style={styles.dot}><Text style={styles.initial}>{initialOf(p.name)}</Text></View>
                   <View style={{ flex: 1, gap: 2 }}>

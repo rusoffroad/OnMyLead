@@ -48,7 +48,7 @@ export function RideDatePicker({ value, onChange }: { value: number; onChange: (
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Ride day ${longDayText(picked, today)}. ${open ? 'Hide' : 'Show'} the calendar`}
+        accessibilityLabel={t('Ride day {v}. {v2} the calendar', { v: longDayText(picked, today), v2: open ? 'Hide' : 'Show' })}
         accessibilityState={{ expanded: open }}
         onPress={() => setOpen((o) => !o)}
         style={({ pressed }) => [styles.picked, { borderColor: open ? Colors.accent : Colors.border, opacity: pressed ? 0.85 : 1 }]}>
@@ -60,7 +60,7 @@ export function RideDatePicker({ value, onChange }: { value: number; onChange: (
         </View>
         <View style={styles.calendarButton}>
           <Icon name="calendar" size={20} color={open ? Colors.accent : Colors.text} />
-          <ThemedText type="smallBold">{open ? 'Done' : 'Calendar'}</ThemedText>
+          <ThemedText type="smallBold">{open ? t('Done') : t('Calendar')}</ThemedText>
         </View>
       </Pressable>
 

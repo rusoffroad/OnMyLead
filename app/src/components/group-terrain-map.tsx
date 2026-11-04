@@ -138,7 +138,7 @@ export function GroupTerrainMap({
         <TerrainMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            accessibilityLabel={w.planned_stop ? t('Planned stop {v}, {name}, {v2}', { v: stopNumber(w, waypoints), name: w.name, v2: symbolLabel(waypointSymbol(w)) }) : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
             onPress={() => onPressWaypoint?.(w)}>
             {w.planned_stop ? (
               <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} />

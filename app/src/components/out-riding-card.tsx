@@ -51,12 +51,12 @@ export function OutRidingCard() {
     <View style={{ gap: Spacing.two }}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={on ? `You’re Out Riding. ${countLine(shown, DEFAULT_RADIUS)}` : 'Out Riding. See which riders are out near you.'}
+        accessibilityLabel={on ? tr('You’re Out Riding. {v}', { v: countLine(shown, DEFAULT_RADIUS) }) : tr('Out Riding. See which riders are out near you.')}
         onPress={() => router.push('/out-riding')}
         style={({ pressed }) => [styles.card, on && styles.cardOn, pressed && { backgroundColor: Colors.backgroundSelected }]}>
         <View style={styles.top}>
           <View style={[styles.dot, on ? styles.dotOn : null]} />
-          <Text style={styles.title}>{on ? 'You’re Out Riding' : 'Out Riding'}</Text>
+          <Text style={styles.title}>{on ? tr('You’re Out Riding') : tr('Out Riding')}</Text>
           <Icon name="chevron" color={Colors.textSecondary} />
         </View>
         {on && me.status ? (
@@ -72,7 +72,7 @@ export function OutRidingCard() {
       {hasThreads ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Messages${badge ? `, ${badge}` : ''}`}
+          accessibilityLabel={tr('Messages{v}', { v: badge ? `, ${badge}` : '' })}
           onPress={() => router.push('/messages')}
           style={({ pressed }) => [styles.row, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <Icon name="mail" color={Colors.sky} />

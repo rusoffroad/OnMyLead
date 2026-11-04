@@ -42,7 +42,7 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
       await setMyVehicle(ride.id, id, mine.riders);
       onChanged();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not change your machine.');
+      setError(e instanceof Error ? e.message : t('Could not change your machine.'));
     } finally {
       setBusy(false);
     }
@@ -52,7 +52,7 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
 
   return (
     <Card style={advice ? { borderLeftWidth: 4, borderLeftColor: COLOR[advice.check] } : undefined}>
-      <ThemedText type="heading" style={advice ? { color: COLOR[advice.check] } : undefined}>{advice ? RANGE_LABEL[advice.check] : 'Your Machine'}</ThemedText>
+      <ThemedText type="heading" style={advice ? { color: COLOR[advice.check] } : undefined}>{advice ? RANGE_LABEL[advice.check] : t('Your Machine')}</ThemedText>
       {advice ? (
         <>
           <ThemedText style={{ fontSize: 18, lineHeight: 24, fontWeight: 700 }}>{advice.line}</ThemedText>

@@ -36,7 +36,7 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
   const riders = [...tally.seen.map((id) => ({ id, s: 'seen' as const })), ...tally.notified.map((id) => ({ id, s: 'pushed' as const })),
     ...tally.waiting.map((id) => ({ id, s: 'waiting' as const }))];
   const detail = out && card.state === 'sent'
-    ? receiptsOn ? tallyLine(tally, nameOf) : 'Sent. Seen receipts aren’t switched on yet.'
+    ? receiptsOn ? tallyLine(tally, nameOf) : t('Sent. Seen receipts aren’t switched on yet.')
     : stateDetail(card.state);
   const canCancel = card.state === 'sent' || card.state === 'queued' || card.state === 'sending';
 
@@ -91,7 +91,7 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
           <Pressable
             onPress={onCancel}
             accessibilityRole="button"
-            accessibilityLabel={`Cancel ${card.label}`}
+            accessibilityLabel={t('Cancel {label}', { label: card.label })}
             accessibilityHint={t('Takes it back and tells the group to ignore it')}
             hitSlop={6}
             style={({ pressed }) => [styles.cancel, { opacity: pressed ? 0.7 : 1 }]}>

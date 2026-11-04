@@ -28,7 +28,7 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
                   <TrailThumb points={trailLine(t)} color={t.savedFrom ? RIDER_TRAIL_INK : '#F6F1E3'} dotted={!!t.savedFrom} size={48} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.name} numberOfLines={1}>{t.details.name || 'Unnamed Trail'}</Text>
-                    <Text style={styles.sub}>{feetOrMiles(trackStats(t.points).lengthM)}{t.savedFrom ? `   Mapped by ${t.savedFrom.mapper}` : ''}</Text>
+                    <Text style={styles.sub}>{feetOrMiles(trackStats(t.points).lengthM)}{t.savedFrom ? tr('   Mapped by {mapper}', { mapper: t.savedFrom.mapper }) : ''}</Text>
                   </View>
                 </Pressable>
               ))

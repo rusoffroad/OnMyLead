@@ -63,7 +63,7 @@ export function StarlinkMountAd() {
       </View>
       <Button
         title={t('Shop the Mount')}
-        accessibilityLabel={`Shop the ${STARLINK_MOUNT.title} ${STARLINK_MOUNT.series} at rusoffroad.com`}
+        accessibilityLabel={t('Shop the {title} {series} at rusoffroad.com', { title: STARLINK_MOUNT.title, series: STARLINK_MOUNT.series })}
         accessibilityRole="link"
         onPress={() => openFeatured(product, STARLINK_MOUNT.url, CAMPAIGN)}
       />

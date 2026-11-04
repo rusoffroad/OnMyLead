@@ -28,7 +28,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
       const asset = await pickAvatar(source);
       if (!asset) return;
       await saveAvatar(asset);
-      setDone(photo ? 'Picture changed.' : 'Picture saved. Riders see it next to your name.');
+      setDone(photo ? t('Picture changed.') : t('Picture saved. Riders see it next to your name.'));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -70,8 +70,8 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
           <Text style={styles.title}>{t('Profile Picture')}</Text>
           <ThemedText type="small" themeColor="textSecondary">
             {photo
-              ? 'Shows next to your name in rider lists, chat, Messages and Friends.'
-              : 'Add a photo so riders know who’s who. Until then they see your initial.'}
+              ? t('Shows next to your name in rider lists, chat, Messages and Friends.')
+              : t('Add a photo so riders know who’s who. Until then they see your initial.')}
           </ThemedText>
         </View>
       </View>
@@ -87,7 +87,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
           />
         ) : null}
         <Button
-          title={photo ? 'Choose New Photo' : 'Choose Photo'}
+          title={photo ? t('Choose New Photo') : t('Choose Photo')}
           kind="secondary"
           loading={busy === 'library'}
           disabled={!!busy && busy !== 'library'}

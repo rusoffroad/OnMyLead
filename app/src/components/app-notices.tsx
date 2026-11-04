@@ -38,7 +38,7 @@ export function AppNotices() {
       ) : null}
       {showUpdate && update.kind === 'available' ? (
         <NoticeCard
-          notice={{ text: `Version ${update.latest} is in ${Platform.OS === 'android' ? 'Google Play' : 'the App Store'}.` }}
+          notice={{ text: t('Version {latest} is in {v}.', { latest: update.latest, v: Platform.OS === 'android' ? 'Google Play' : 'the App Store' }) }}
           color={Colors.sky}
           tint="rgba(59,134,247,0.12)"
           icon="bell"

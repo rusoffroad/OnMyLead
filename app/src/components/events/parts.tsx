@@ -103,8 +103,8 @@ export function EventCardView({ e, width, compact }: { e: EventCard; width?: num
         <Text style={styles.muted} numberOfLines={1}>{cardPlace(e)}</Text>
         <View style={styles.cardFoot}>
           {e.going ? <Foot icon="people" text={`${e.going.toLocaleString('en-US')} Going`} /> : null}
-          {e.rides ? <Foot icon="go" text={`${e.rides} ${e.rides === 1 ? 'Ride' : 'Rides'}`} /> : null}
-          {e.agenda ? <Foot icon="calendar" text={`${e.agenda} on the Agenda`} /> : null}
+          {e.rides ? <Foot icon="go" text={`${e.rides} ${e.rides === 1 ? t('Ride') : t('Rides')}`} /> : null}
+          {e.agenda ? <Foot icon="calendar" text={t('{agenda} on the Agenda', { agenda: e.agenda })} /> : null}
         </View>
       </View>
     </Pressable>
@@ -154,7 +154,7 @@ export function AgendaTimeline({ items, onEdit }: { items: AgendaItem[]; onEdit?
                 </View>
               );
               return onEdit ? (
-                <Pressable key={it.id} accessibilityRole="button" accessibilityLabel={`Edit ${it.title}`} onPress={() => onEdit(it)}
+                <Pressable key={it.id} accessibilityRole="button" accessibilityLabel={t('Edit {title}', { title: it.title })} onPress={() => onEdit(it)}
                   style={({ pressed }) => pressed && { opacity: 0.7 }}>
                   {body}
                 </Pressable>
@@ -196,7 +196,7 @@ export function PeopleSheet({
       {shown.length ? (
         <View style={styles.people}>
           {shown.map((p, i) => (
-            <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={`Pick ${p.name}`} onPress={() => onPick(p)}
+            <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={t('Pick {name}', { name: p.name })} onPress={() => onPick(p)}
               style={({ pressed }) => [styles.personRow, i > 0 && styles.rule, pressed && { backgroundColor: Colors.backgroundSelected }]}>
               <RiderDot userId={p.id} name={p.name} size={34} />
               <ThemedText style={{ flex: 1, fontWeight: 600 }} numberOfLines={1}>{p.name}</ThemedText>
@@ -206,7 +206,7 @@ export function PeopleSheet({
         </View>
       ) : (
         <ThemedText type="small" themeColor="textSecondary">
-          {people.length ? 'No one by that name.' : 'Add friends or ride with people first, and they show up here.'}
+          {people.length ? t('No one by that name.') : t('Add friends or ride with people first, and they show up here.')}
         </ThemedText>
       )}
     </BottomSheet>

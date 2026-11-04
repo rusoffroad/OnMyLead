@@ -50,7 +50,7 @@ async function toAlert(m: ChatMessage): Promise<Alert> {
   return {
     id: m.id,
     title: alertTitle(m, who, ride?.name),
-    body: m.poll_options?.length ? `${m.body} Tap to vote.` : m.body,
+    body: m.poll_options?.length ? tr('{body} Tap to vote.', { body: m.body }) : m.body,
     inviteCode: ride?.invite_code ?? null,
     accent: announcement ? RideColors.yellow : isLeaderOnly(m) ? RideColors.leader : Colors.accent,
     seconds: announcement ? 10 : 6,
@@ -142,7 +142,7 @@ export function MessageAlerts() {
       <Pressable
         accessibilityRole="alert"
         accessibilityLiveRegion="polite"
-        accessibilityLabel={`${current.title}: ${current.body}. Tap to open the ride.`}
+        accessibilityLabel={tr('{title}: {body}. Tap to open the ride.', { title: current.title, body: current.body })}
         onPress={() => {
           dismiss();
           if (current.inviteCode) router.push({ pathname: '/r/[code]', params: { code: current.inviteCode } });
@@ -154,7 +154,7 @@ export function MessageAlerts() {
           {queue.length > 1 ? (
             <View style={styles.moreRow}>
               <Text style={styles.more}>{tr('+{v} More', { v: queue.length - 1 })}</Text>
-              <Pressable accessibilityRole="button" accessibilityLabel={`Dismiss all ${queue.length}`} hitSlop={10} onPress={dismissAll}>
+              <Pressable accessibilityRole="button" accessibilityLabel={tr('Dismiss all {length}', { length: queue.length })} hitSlop={10} onPress={dismissAll}>
                 <Text style={styles.dismissAll}>{tr('Dismiss All')}</Text>
               </Pressable>
             </View>

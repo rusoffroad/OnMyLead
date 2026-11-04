@@ -64,7 +64,7 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
       Keyboard.dismiss();
       setEditing(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save the width.');
+      setError(e instanceof Error ? e.message : t('Couldn’t save the width.'));
     } finally {
       setBusy(false);
     }
@@ -122,7 +122,7 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
       ) : canAdd ? (
         <Pressable accessibilityRole="button" hitSlop={6} onPress={open} style={({ pressed }) => [styles.add, pressed && { opacity: 0.75 }]}>
           {shown ? null : <WidthIcon size={16} />}
-          <Text style={styles.addText}>{widths.mine != null ? `Change Your Width (${inches(widths.mine)})` : 'Add Width Limit'}</Text>
+          <Text style={styles.addText}>{widths.mine != null ? t('Change Your Width ({v})', { v: inches(widths.mine) }) : t('Add Width Limit')}</Text>
         </Pressable>
       ) : null}
     </View>

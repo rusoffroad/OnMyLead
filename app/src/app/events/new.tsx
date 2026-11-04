@@ -101,7 +101,7 @@ export default function EventForm() {
       if (id) router.back();
       else router.replace(`/e/${saved.share_code}?new=1`);
     } catch (e) {
-      if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Couldn’t save the event.');
+      if (!handleProError(e)) setError(e instanceof Error ? e.message : t('Couldn’t save the event.'));
     } finally {
       setBusy(false);
     }
@@ -140,8 +140,8 @@ export default function EventForm() {
           />
           <ThemedText type="small" themeColor="textSecondary">
             {visibility === 'public'
-              ? 'Shows in Events for every rider, and anyone with the link can open it.'
-              : 'Only people you send the link to can open it.'}
+              ? t('Shows in Events for every rider, and anyone with the link can open it.')
+              : t('Only people you send the link to can open it.')}
           </ThemedText>
         </Card>
 
@@ -150,7 +150,7 @@ export default function EventForm() {
           <DateCalendar value={startDay} onChange={(d) => {
             setStartDay(d);
             if (endDay && endDay < d) setEndDay(d);
-          }} range={range} note={multiDay ? 'The first day.' : undefined} />
+          }} range={range} note={multiDay ? t('The first day.') : undefined} />
           <TimePicker label={t('Starts At')} value={startTime} onChange={setStartTime} suggest={9 * 60} />
           <Choice<'one' | 'many'>
             options={[{ value: 'one', label: t('One Day') }, { value: 'many', label: t('Several Days') }]}
@@ -160,7 +160,7 @@ export default function EventForm() {
           {multiDay ? (
             <DateCalendar value={endDay} onChange={setEndDay} range={{ first: startDay ?? range.first, last: addDays(startDay ?? today, 31) }} note={t('The last day. Up to 31 days.')} />
           ) : null}
-          <TimePicker label={multiDay ? 'Ends At (Last Day)' : 'Ends At'} value={endTime} onChange={setEndTime} suggest={17 * 60} />
+          <TimePicker label={multiDay ? t('Ends At (Last Day)') : t('Ends At')} value={endTime} onChange={setEndTime} suggest={17 * 60} />
         </Card>
 
         <Card>
@@ -186,7 +186,7 @@ export default function EventForm() {
         </Card>
 
         <ErrorText error={error} />
-        <Button title={id ? 'Save Changes' : 'Create Event'} big loading={busy} onPress={submit} />
+        <Button title={id ? t('Save Changes') : t('Create Event')} big loading={busy} onPress={submit} />
         {!id ? (
           <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
             {t('Next you can add photos, the agenda, co-hosts and the group rides.')}

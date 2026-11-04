@@ -5,6 +5,7 @@ import { BadgePatch } from '@/components/badge-patch';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { BADGES, bestLevels, honorsHeld, rankFor, unseen, type MyBadges } from '@/core/badges';
+import { t } from '@/lib/i18n';
 
 /**
  * Your rank and all seven badges as a row of patches: earned ones in their Bronze, Silver or Gold
@@ -25,9 +26,9 @@ export function BadgeStrip({ mine }: { mine: MyBadges }) {
       <View style={styles.badgesHead}>
         <Text style={styles.rankName}>{rank.name}</Text>
         <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }} numberOfLines={1}>
-          {rank.next ? `${rank.next.min - rank.levels} more ${rank.next.min - rank.levels === 1 ? 'level' : 'levels'} for ${rank.next.name}` : 'The top rank'}
+          {rank.next ? `${rank.next.min - rank.levels} more ${rank.next.min - rank.levels === 1 ? 'level' : 'levels'} for ${rank.next.name}` : t('The top rank')}
         </ThemedText>
-        {fresh ? <Text style={styles.newPill}>{fresh === 1 ? 'New Badge' : `${fresh} New`}</Text> : null}
+        {fresh ? <Text style={styles.newPill}>{fresh === 1 ? t('New Badge') : `${fresh} New`}</Text> : null}
       </View>
       <View style={styles.patches}>
         {honors.map((h) => (
