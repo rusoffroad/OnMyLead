@@ -12,7 +12,45 @@
     "kind": "fix",
     "by": "pr",
     "ref": "release-test-2-1",
-    "why": "The 2.1 release test pass. Hiking path names now follow the Hiking Trails switch instead of Off-Road Trails (map-layers); a park's miles count its trails only, matching the trail count beside them (park-trails). Also fixed with no rider-visible article change (sync-across-devices, waypoints-and-planned-stops and navigation-mode logged for their sources): a Map Mode waypoint added while a sync was in flight is no longer dropped; a Free account on a shared phone sees only its own saved trails; a ride whose meeting spot never saved can be given one from Edit Ride Details; and a report can't be filed in another rider's name. The Google Play referral deferral is also done once, never twice, on a retry. refer-a-friend logged for its source; riders see no difference."
+    "why": "The 2.1 release test pass. Hiking path names now follow the Hiking Trails switch instead of Off-Road Trails (map-layers); a park's miles count its trails only, matching the trail count beside them (park-trails). Also fixed with no rider-visible article change (sync-across-devices, waypoints-and-planned-stops and navigation-mode logged for their sources): a Map Mode waypoint added while a sync was in flight is no longer dropped; a Free account on a shared phone sees only its own saved trails; a ride whose meeting spot never saved can be given one from Edit Ride Details; and a report can't be filed in another rider's name. The Google Play referral deferral is also done once, never twice, on a retry. refer-a-friend logged for its source; riders see no difference.",
+      "carplay",
+      "ride-mode",
+      "language",
+      "faq"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "carplay",
+    "why": "Apple granted OnMyLead the CarPlay Driving Task entitlement on 2026-11-04 after Chris asked for CarPlay in the next build. The CarPlay screen built in October is switched on for 2.1 and now speaks the rider's app language; this new article explains starting it, the buttons, alerts and what stays on the phone. It publishes when 2.1 is in the App Store."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "bluetooth-sharing",
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "getting-started",
+      "location-sharing",
+      "manage-subscription",
+      "profile-picture",
+      "promo-codes",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "subscribe-to-pro",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "carplay-touched",
+    "why": "The CarPlay change touches Ride Mode (car screen labels in the rider's language), app.json (CarPlay switched on) and the store listing (CarPlay note for App Review). Riders see no difference in these articles' screens, so they only get a new updated: date."
   },
   {
     "date": "2026-11-04",

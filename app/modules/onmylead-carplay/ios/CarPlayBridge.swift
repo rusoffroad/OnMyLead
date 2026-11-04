@@ -12,6 +12,37 @@ struct RiderRow: Equatable {
   let detail: String
 }
 
+/// The car screen's fixed words in the rider's language (carPlayLabels in src/core/carplay.ts).
+/// English until the phone sends them.
+struct CarPlayLabels: Equatable {
+  var waitingTitle = "No Ride Running"
+  var waitingDetail = "Open Ride Mode on your phone and your group shows up here."
+  var group = "Group"
+  var nobodySharing = "Nobody Is Sharing Yet"
+  var confirmEmergency = "Send EMERGENCY with your location to everyone on the ride?"
+  var alertGroup = "Alert My Group"
+  var cancel = "Cancel"
+  var ok = "OK"
+
+  init() {}
+
+  init(_ d: [String: Any]?) {
+    func word(_ key: String, _ fallback: String) -> String {
+      guard let s = d?[key] as? String, !s.isEmpty else { return fallback }
+      return s
+    }
+    let en = CarPlayLabels()
+    waitingTitle = word("waitingTitle", en.waitingTitle)
+    waitingDetail = word("waitingDetail", en.waitingDetail)
+    group = word("group", en.group)
+    nobodySharing = word("nobodySharing", en.nobodySharing)
+    confirmEmergency = word("confirmEmergency", en.confirmEmergency)
+    alertGroup = word("alertGroup", en.alertGroup)
+    cancel = word("cancel", en.cancel)
+    ok = word("ok", en.ok)
+  }
+}
+
 /// What Ride Mode on the phone last sent (shape: CarPlayState in src/core/carplay.ts).
 struct RideState: Equatable {
   let title: String
@@ -19,8 +50,10 @@ struct RideState: Equatable {
   let riders: [RiderRow]
   let alertId: String?
   let alertText: String?
+  let labels: CarPlayLabels?
 
   init(_ d: [String: Any]) {
+    labels = d["labels"] == nil ? nil : CarPlayLabels(d["labels"] as? [String: Any])
     title = d["title"] as? String ?? "OnMyLead"
     buttons = (d["buttons"] as? [[String: Any]] ?? []).compactMap { b in
       guard let id = b["id"] as? String, let title = b["title"] as? String else { return nil }
@@ -44,6 +77,14 @@ final class CarPlayBridge {
   private var state: RideState?
   private var grid: CPGridTemplate?
   private var shownAlertId: String?
+  private var labels = CarPlayLabels()
+
+  func setLabels(_ next: CarPlayLabels) {
+    guard next != labels else { return }
+    labels = next
+    // The waiting screen is the only one built from labels alone; redraw it in the new language.
+    if state == nil { render() }
+  }
 
   func connect(_ interface: CPInterfaceController) {
     self.interface = interface
@@ -58,6 +99,7 @@ final class CarPlayBridge {
 
   func update(_ next: RideState?) {
     guard next != state else { return }
+    if let l = next?.labels { labels = l }
     let hadRide = state != nil
     state = next
     // Once the problem clears, the same rider separating again alerts again.
@@ -79,7 +121,7 @@ final class CarPlayBridge {
       let waiting = CPInformationTemplate(
         title: "OnMyLead",
         layout: .leading,
-        items: [CPInformationItem(title: "No ride running", detail: "Open Ride Mode on your phone and your group shows up here.")],
+        items: [CPInformationItem(title: labels.waitingTitle, detail: labels.waitingDetail)],
         actions: []
       )
       interface.setRootTemplate(waiting, animated: false, completion: nil)
@@ -114,26 +156,26 @@ final class CarPlayBridge {
   private func showGroup() {
     guard let interface, let state else { return }
     let items = state.riders.map { CPListItem(text: $0.title, detailText: $0.detail) }
-    let list = CPListTemplate(title: "Group", sections: [CPListSection(items: items)])
-    list.emptyViewTitleVariants = ["Nobody is sharing yet"]
+    let list = CPListTemplate(title: labels.group, sections: [CPListSection(items: items)])
+    list.emptyViewTitleVariants = [labels.nobodySharing]
     interface.pushTemplate(list, animated: true, completion: nil)
   }
 
   private func confirmEmergency() {
-    let send = CPAlertAction(title: "Alert my group", style: .destructive) { [weak self] _ in
+    let send = CPAlertAction(title: labels.alertGroup, style: .destructive) { [weak self] _ in
       self?.emit?("emergency_confirmed")
       self?.interface?.dismissTemplate(animated: true, completion: nil)
     }
-    let cancel = CPAlertAction(title: "Cancel", style: .cancel) { [weak self] _ in
+    let cancel = CPAlertAction(title: labels.cancel, style: .cancel) { [weak self] _ in
       self?.interface?.dismissTemplate(animated: true, completion: nil)
     }
-    present(CPAlertTemplate(titleVariants: ["Send EMERGENCY with your location to everyone on the ride?"], actions: [send, cancel]))
+    present(CPAlertTemplate(titleVariants: [labels.confirmEmergency], actions: [send, cancel]))
   }
 
   private func showAlertIfNew(_ state: RideState) {
     guard let id = state.alertId, let text = state.alertText, id != shownAlertId else { return }
     shownAlertId = id
-    let ok = CPAlertAction(title: "OK", style: .default) { [weak self] _ in
+    let ok = CPAlertAction(title: labels.ok, style: .default) { [weak self] _ in
       self?.interface?.dismissTemplate(animated: true, completion: nil)
     }
     present(CPAlertTemplate(titleVariants: [text], actions: [ok]))

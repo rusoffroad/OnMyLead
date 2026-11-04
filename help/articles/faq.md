@@ -110,6 +110,12 @@ Yes. OnMyLead is in the App Store for iPhone and iPad, and on Google Play for An
 
  iPhone and Android riders can join the same ride, see each other on the map and chat together.
 
+:::release 2.1
+## Does OnMyLead Work With CarPlay?
+
+Yes, on iPhone. Open Ride Mode on your phone, connect to your car and tap **OnMyLead** on the car screen. See [Use OnMyLead on CarPlay](/help/carplay). OnMyLead doesn't support Android Auto.
+:::
+
 ## How Do I See What Changed in an Update?
 
 Every version's changes are listed in the [Release Notes](/help/release-notes), newest first, with when it reached the App Store and Google Play. To get the latest version, update OnMyLead from the App Store or Google Play.

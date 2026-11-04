@@ -3182,6 +3182,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "Jalur Taman di Peta",
   "Showing the trails of offroad parks, colored by the park’s level": "Menampilkan jalur taman offroad, diwarnai menurut tingkat taman",
   "Hidden. Offroad park trails stay off every map": "Disembunyikan. Jalur taman tidak muncul di peta mana pun",
+  // CarPlay
+  " (Leader)": " (Leader)",
+  "A rider is separated": "Seorang rider terpisah",
+  "Group Together": "Grup bersama",
+  "No Ride Running": "Tidak ada riding berjalan",
+  "Open Ride Mode on your phone and your group shows up here.": "Buka Mode Riding di ponselmu dan grupmu muncul di sini.",
+  "Group": "Grup",
+  "Nobody Is Sharing Yet": "Belum ada yang berbagi",
+  "Send EMERGENCY with your location to everyone on the ride?": "Kirim DARURAT dengan lokasimu ke semua orang di riding?",
+  "Running Late": "Terlambat",
+  "Need a Minute": "Butuh semenit",
 };
 
 export default dict;

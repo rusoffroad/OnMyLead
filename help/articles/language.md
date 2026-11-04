@@ -53,6 +53,7 @@ To go back to following your phone, tap **Match Phone** at the top of the list. 
 - Spoken alerts in Ride Mode are read in your language. If the voice you picked under **You** > **Voice** speaks another language, your phone's own voice for your language reads them instead.
 - Status buttons and the built-in quick replies (like **Need Fuel** or **Flat Tire**) show in each rider's own language, so a rider who reads Spanish sees them in Spanish even if you sent them in English.
 - Push notifications on your lock screen, the Terms of Use and the Privacy Policy are still in English.
+- The [CarPlay](/help/carplay) screen in your car uses the same language as the app.
 :::
 - Things riders write stay the way they wrote them: ride names, chat, posts, group names and trail names.
 - On iPhone and iPad, the permission messages (location, camera, photos, motion) also show in your language.

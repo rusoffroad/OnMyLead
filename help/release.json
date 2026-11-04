@@ -36,19 +36,6 @@
   ],
   "unreleased": [
     {
-      "feature": "CarPlay",
-      "why": "Built, but switched off until Apple grants the CarPlay entitlement (ONMYLEAD_CARPLAY=1 builds only).",
-      "sources": [
-        "app/modules/onmylead-carplay/**",
-        "app/plugins/with-carplay.js",
-        "app/src/lib/carplay.ts",
-        "app/src/core/carplay.ts"
-      ],
-      "words": [
-        "CarPlay"
-      ]
-    },
-    {
       "feature": "Instagram and TikTok sign-in",
       "why": "Not supported. Sharing a post to Instagram (2.0) is fine; signing in with Instagram is not.",
       "sources": [],
