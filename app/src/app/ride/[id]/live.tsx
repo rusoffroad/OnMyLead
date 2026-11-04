@@ -88,6 +88,8 @@ import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
 import { speak } from '@/lib/voice';
+import { requirePro } from '@/lib/pro';
+import { ProTag } from '@/components/pro-tag';
 
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
@@ -216,6 +218,7 @@ export default function RideMode() {
   const [panelH, setPanelH] = useState(0);
   const openNewWaypoint = useCallback((at: { lat: number; lng: number }) => {
     if (!wp.switchedOn) return Alert.alert('Not Switched On Yet', WAYPOINTS_NOT_SWITCHED_ON);
+    if (!requirePro('waypoints')) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setWpTarget({ type: 'new', at });
   }, [wp.switchedOn]);
@@ -944,6 +947,8 @@ export default function RideMode() {
   }, []);
 
   const navigateTo = (lat: number, lng: number, title = 'There') => openDirections({ title, to: { lat, lng } });
+  // To a rider who sent Need Help, EMERGENCY or a crash alert: always free.
+  const navigateToRiderInNeed = (lat: number, lng: number) => openDirections({ title: 'There', to: { lat, lng } }, { safety: true });
   const directionRows = rideDirections({
     regroup,
     meet,
@@ -1176,6 +1181,7 @@ export default function RideMode() {
           ]}>
           <Icon name="turn" size={24} color={Colors.sky} strokeWidth={2.1} />
           <Text style={styles.wpFabText}>Directions</Text>
+          <ProTag feature="directions" style={styles.fabPro} />
         </Pressable>
       ) : null}
 
@@ -1188,6 +1194,7 @@ export default function RideMode() {
           style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
           <WaypointBlaze symbol="spot" shared={false} size={24} />
           <Text style={styles.wpFabText}>Add Waypoint</Text>
+          <ProTag feature="waypoints" style={styles.fabPro} />
         </Pressable>
       ) : null}
 
@@ -1284,7 +1291,7 @@ export default function RideMode() {
             </Pressable>
             <FullMapButton onPress={enterFullMap} style={styles.fullMapBtn} />
             <Pressable
-              onPress={() => setMessageOpen(true)}
+              onPress={() => requirePro('quick_replies') && setMessageOpen(true)}
               accessibilityRole="button"
               accessibilityLabel="Type a Message"
               accessibilityHint="Write your own message to everyone on this ride, or send one of your saved quick replies"
@@ -1292,6 +1299,7 @@ export default function RideMode() {
               style={({ pressed }) => [styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
               <Icon name="chat" size={16} color={Colors.text} strokeWidth={2.2} />
               <Text style={styles.typeText}>Message</Text>
+              <ProTag feature="quick_replies" />
             </Pressable>
           </View>
         )}
@@ -1320,7 +1328,7 @@ export default function RideMode() {
                   <Icon name="warning" size={18} color={r.status === 'yellow' ? Glass.amber : Glass.softRed} strokeWidth={2.2} />
                   <Text style={styles.alertText}>{r.message}</Text>
                   <View style={styles.alertActions}>
-                    {p ? <AlertChip label="Navigate" onPress={() => navigateTo(p.lat, p.lng)} /> : null}
+                    {p ? <AlertChip label="Navigate" onPress={() => navigateToRiderInNeed(p.lat, p.lng)} /> : null}
                     {canRegroup ? <AlertChip label="Regroup" onPress={regroupHere} /> : null}
                   </View>
                 </View>
@@ -1337,7 +1345,7 @@ export default function RideMode() {
                     <Text style={{ fontFamily: font(700) }}>{m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}</Text>, {ago(s.tapped_at, now)}
                   </Text>
                   <View style={styles.alertActions}>
-                    {spot ? <AlertChip label="Navigate" onPress={() => navigateTo(spot.lat, spot.lng)} /> : null}
+                    {spot ? <AlertChip label="Navigate" onPress={() => navigateToRiderInNeed(spot.lat, spot.lng)} /> : null}
                     <Pressable
                       onPress={() => setDismissedCalls((d) => new Set(d).add(callKey(m.user_id, s)))}
                       accessibilityRole="button"
@@ -1692,6 +1700,7 @@ const styles = themedStyles(() => ({
     borderRadius: 22, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
   directionsFab: { left: 12 },
+  fabPro: { marginLeft: 2 },
   locateFab: {
     position: 'absolute', right: 12, width: LOCATE_SIZE, height: LOCATE_SIZE, borderRadius: LOCATE_SIZE / 2,
     alignItems: 'center', justifyContent: 'center',

@@ -4,10 +4,11 @@ summary: Find rallies, poker runs and ride weekends, see the agenda and join the
 category: joining
 order: 60
 release: "2.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/events/index.tsx
   - app/src/app/events/new.tsx
+  - app/src/components/events/event-or-ride.tsx
   - app/src/app/e/[code].tsx
   - app/src/components/events/parts.tsx
   - app/src/components/events/sheets.tsx
@@ -17,14 +18,25 @@ sources:
   - app/src/lib/events.ts
   - supabase/migrations/20261102950000_events.sql
 related: [home-screen, join-a-ride, create-a-ride, organizer-controls, free-vs-pro, report-and-block]
-keywords: [event, events, rally, poker run, concert, raffle, show, meetup, ride weekend, agenda, schedule, co-host, ride manager, going, interested, rsvp, event link]
+keywords: [event or public ride, difference, event vs ride, event, events, rally, poker run, concert, raffle, show, meetup, ride weekend, agenda, schedule, co-host, ride manager, going, interested, rsvp, event link]
 ---
 
 Events are the big days: a rally, a poker run, a club weekend or a meetup. An event has its dates, a place, photos, an **Agenda** of what's happening and when (group rides, poker runs, concerts, raffles, shows, food), and the **Group Rides** you can join. Anyone can see events. Pro riders create them.
 
+## Event or Public Ride?
+
+They're different things, and an event can hold public rides.
+
+- A **Public Ride** is one ride on one day: a leader, a meeting point and a time. Anyone nearby finds it in **Find a Ride**, joins it, and you ride together in Ride Mode. See [Find a Ride](/help/find-a-ride) and [Create a Ride](/help/create-a-ride).
+- An **Event** is a bigger gathering, like a rally, poker run or ride weekend. It has dates, a place, photos, an agenda and **Going** or **Interested**, and it can hold several group rides that you join one by one.
+
+Just riding? Create a Public Ride. Running a rally or a weekend? Create an Event and add its rides to it.
+
+In the app, **Event or Public Ride?** on Events, Find a Ride, Create a Ride and Create an Event opens the same explanation. Tap **What's the Difference?** to open it and **Hide** to close it. It's the same on iPhone, iPad, Android and the website.
+
 ## Find an Event
 
-1. On the **Rides** tab, tap the **Events** card (right under Create a Ride and Find a Ride).
+1. On the **Rides** tab, tap the gold **Events** card (under Create a Ride, Find a Ride and Map Mode).
 2. **Coming Up** lists public events, soonest first. With location allowed, it shows the ones within your distance (the same distance as Public Rides Near You); tap the distance chip to change it.
 3. Tap an event to open it.
 

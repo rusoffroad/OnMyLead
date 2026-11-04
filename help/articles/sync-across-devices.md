@@ -25,6 +25,10 @@ Sign in with the same account on every device you use (iPhone, iPad, Android pho
 
 Your rides, chats, friends, groups, Garage, trips, Starlink setup, notification settings and profile were always kept with your account. Now your app settings and your own trails are too.
 
+:::release 2.0
+Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Sync** row on the You tab carries a **Pro** tag. Your account, rides, chats, friends and groups are on every device for free.
+:::
+
 ## What Follows Your Account
 
 **Settings**

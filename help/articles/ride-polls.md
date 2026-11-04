@@ -30,6 +30,10 @@ The ride's leader, the organizer and co-organizers can post polls. Every rider o
 
 Creating a poll: This is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free plan, picking **Quick Poll** shows **Create Ride Polls**, marked Pro, instead of the poll form. Voting stays free for everyone.
 
+:::release 2.0
+From version 2.0, voting on a poll is also a Pro feature. On a Free account, the vote line carries a **Pro** tag. Reading a poll and its results stays free.
+:::
+
 ## Post a Poll
 
 1. Open the ride and tap **Chat**.

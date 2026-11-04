@@ -4,7 +4,7 @@ summary: Add your rig or side-by-side with a photo, fill details from the VIN, t
 category: account
 order: 40
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/garage/**
   - app/src/components/vehicle-form.tsx
@@ -70,6 +70,10 @@ It uses the thirds rule: a third out, a third back, a third in reserve. If a mac
 Your Garage also powers the fuel check on a ride. See [Fuel Range](/help/fuel-range).
 
 ## Track Your Build
+
+:::release 2.0
+Tracking parts, the Build Sheet and the CSV export are Pro features. See [Free and Pro](/help/free-vs-pro). Your machines, their specs and the fuel range stay free.
+:::
 
 1. Open a machine.
 2. Tap **Add a Part or Extra**.

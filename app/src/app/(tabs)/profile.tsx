@@ -48,6 +48,8 @@ import { musicAvailable } from '@/lib/music';
 import { syncSettingsNow, useSyncStatus, useSyncSummary } from '@/lib/settings-sync';
 import { backupTrailsNow } from '@/lib/trail-backup';
 import { t, useLanguage } from '@/lib/i18n';
+import { requirePro } from '@/lib/pro';
+import { ProTag } from '@/components/pro-tag';
 
 /**
  * The You tab: everything that isn't a ride, in one place and in plain groups. Your name up top,
@@ -68,7 +70,7 @@ export default function You() {
   const { appearance } = useAppearance();
   const language = useLanguage();
   const voiceChoice = useVoiceChoice();
-  const { ent } = useEntitlements();
+  const { ent, can } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
   const referralsOn = referralsSwitchedOn(useAppSettings().settings.flags);
   const starlinkOn = useFlag('starlink');
@@ -283,10 +285,11 @@ export default function You() {
               title="Sync Across Devices"
               detail={syncLine}
               onPress={() => {
+                if (!requirePro('sync')) return;
                 syncSettingsNow();
                 backupTrailsNow();
               }}
-              right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Sync Now</ThemedText>}
+              right={can('sync') ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Sync Now</ThemedText> : <ProTag feature="sync" />}
             />
           ) : null}
           <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />

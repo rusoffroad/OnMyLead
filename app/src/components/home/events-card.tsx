@@ -4,7 +4,8 @@ import { Pressable, Text, View } from 'react-native';
 
 import { DateStub } from '@/components/events/parts';
 import { Icon } from '@/components/icon';
-import { Colors, themedStyles } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import { eventDates, sortCards, type EventCard } from '@/core/events';
 import { myEvents, upcomingEvents } from '@/lib/events';
 import { positionIfAllowed } from '@/lib/location';
@@ -12,7 +13,9 @@ import { Home, homeStyles, Pill } from './parts';
 import { t } from '@/lib/i18n';
 
 /**
- * Events on the home screen: one quiet row under the ride actions. It shows your next event (one
+ * Events on the home screen: a gold-edged row under the ride actions (gold so it stands apart
+ * from the red Join and blue Map Mode without moving anything; Chris 2026-11-03 "make events a
+ * little more visible"). It shows your next event (one
  * you host or are going to), else the next public one near you, and opens the Events area.
  * Never asks for location; with it, nearby events count first.
  */
@@ -51,27 +54,31 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
       {next ? (
         <DateStub iso={next.e.starts_at} size="sm" />
       ) : (
-        <View style={styles.icon}><Icon name="calendar" size={22} color={Colors.text} /></View>
+        <View style={styles.icon}><Icon name="calendar" size={24} color={Colors.background} /></View>
       )}
-      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+      <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
         <View style={styles.titleRow}>
           <Text style={homeStyles.cardTitle}>{t('Events')}</Text>
-          {count ? <Pill text={t('{n} Coming Up', { n: count })} /> : null}
+          {count ? <Pill text={t('{n} Coming Up', { n: count })} tone="gold" /> : null}
         </View>
-        <Text style={homeStyles.muted} numberOfLines={1}>
-          {next ? `${next.yours ? `${t('Yours')}: ` : ''}${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}` : t('Rallies, poker runs and ride weekends')}
-        </Text>
+        <Text style={styles.tagline} numberOfLines={1}>{t('Rallies, poker runs and ride weekends')}</Text>
+        {next ? (
+          <Text style={homeStyles.muted} numberOfLines={1}>
+            {`${next.yours ? `${t('Yours')}: ` : `${t('Next')}: `}${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}`}
+          </Text>
+        ) : null}
       </View>
-      <Icon name="chevron" size={18} color={Home.muted} />
+      <Icon name="chevron" size={18} color={Home.gold} />
     </Pressable>
   );
 }
 
 const styles = themedStyles(() => ({
   card: {
-    flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 14, paddingVertical: 12,
-    borderRadius: 22, backgroundColor: Home.panel, borderWidth: 1, borderColor: Home.line,
+    flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 14,
+    borderRadius: 22, backgroundColor: withAlpha(Home.gold, 0.1), borderWidth: 1, borderColor: withAlpha(Home.gold, 0.5),
   },
-  icon: { width: 46, height: 46, borderRadius: 12, backgroundColor: Home.panel2, alignItems: 'center', justifyContent: 'center' },
+  icon: { width: 48, height: 48, borderRadius: 12, backgroundColor: Home.gold, alignItems: 'center', justifyContent: 'center' },
+  tagline: { color: Home.gold, fontFamily: font(600), fontSize: 13, lineHeight: 18 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
 }));

@@ -309,6 +309,7 @@ const dict: Record<string, string> = {
   "Help Center: How-To Guides": "सहायता केंद्र: गाइड",
   "Your offroad map": "आपका ऑफ़रोड मैप",
   "miles": "मील",
+  'Next': 'अगला',
 };
 
 export default dict;

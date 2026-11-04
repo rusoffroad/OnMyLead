@@ -41,7 +41,7 @@ When one of your rides is live, a card says **Your ride is live. Tap to open Rid
 
 ## Events
 
-Right under Join, Create and Find, the **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
+Under Join, Create, Find and Map Mode, the gold **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
 
 ## Map Mode
 

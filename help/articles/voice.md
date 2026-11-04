@@ -4,7 +4,7 @@ summary: Pick the natural-sounding voice that reads Ride Mode alerts out loud, h
 category: ride-mode
 order: 47
 release: "2.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/voice.tsx
   - app/src/core/voice.ts
@@ -16,6 +16,10 @@ keywords: [voice, speech, spoken alerts, text to speech, robot, robotic, read al
 Ride Mode reads some things out loud so you don't have to look at your phone: announcements from the leader, **Regroup Point Set**, a rider falling behind the group (leader and tail gunner) and a **Mechanical Issue** tap. OnMyLead reads them in the most natural voice on your phone, and you can pick a different one.
 
 Every voice OnMyLead uses is stored on your phone, so spoken alerts keep working with no service.
+
+:::release 2.0
+Picking a voice is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, alerts are still read out loud with the **Automatic** voice. If you picked a voice before version 2.0, the app keeps it.
+:::
 
 ## Pick a Voice
 

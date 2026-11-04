@@ -7,6 +7,7 @@ import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
 import { ThemedText } from '@/components/themed-text';
 import { TimePicker } from '@/components/time-picker';
+import { EventOrRide } from '@/components/events/event-or-ride';
 import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import { addDays, rideDayRange, startOfDay } from '@/core/calendar';
@@ -120,6 +121,7 @@ export default function EventForm() {
     <Screen width="readable">
       <Stack.Screen options={{ title: id ? t('Edit Event') : t('Create an Event') }} />
       <View style={{ gap: Spacing.three }}>
+        {!id ? <EventOrRide from="create-event" /> : null}
         <Card>
           <Field label="Event Name" value={title} onChangeText={setTitle} maxLength={100} placeholder="Moab Spring Rally" />
           <Field

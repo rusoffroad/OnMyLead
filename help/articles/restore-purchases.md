@@ -4,7 +4,7 @@ summary: Bring your OnMyLead Pro subscription back after getting a new iPhone, r
 category: pro
 order: 60
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/subscription.tsx
   - app/src/app/pro.tsx

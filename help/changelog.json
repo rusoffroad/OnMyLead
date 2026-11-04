@@ -1,6 +1,6 @@
 [
   {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "slugs": [
       "language",
       "home-screen",
@@ -12,7 +12,7 @@
     "why": "New in 2.0 (Chris 2026-11-03: \"add an option to change the language of the app\"). OnMyLead follows the phone's language in 12 languages, English otherwise, with a flag switcher on Home and You > Language; the choice syncs across devices. New article; Home and Sync Across Devices mention it."
   },
   {
-    "date": "2026-11-03",
+    "date": "2026-11-04",
     "slugs": [
       "appearance",
       "badges-and-ranks",
@@ -69,6 +69,146 @@
     "by": "pr",
     "ref": "language",
     "why": "Reviewed, no change to the steps: the language switcher (2.0) passes screen titles, buttons, menus and alerts through the rider's language. In English every label reads exactly as before, so these articles only get a new updated: date. The new Change the App's Language article covers what switches."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "free-vs-pro",
+      "custom-codes",
+      "directions",
+      "music-controls",
+      "waypoints-and-planned-stops",
+      "ride-polls",
+      "garage",
+      "sync-across-devices",
+      "appearance",
+      "voice",
+      "map-layers",
+      "status-buttons",
+      "route-builder",
+      "create-a-ride",
+      "use-onmylead-on-a-tablet",
+      "navigation-mode",
+      "faq",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "pro-tiers",
+    "why": "Chris set the 2.0 Free and Pro tiers. Many features move to Pro (drawing routes, waypoints, directions, map layers, custom trails, saving and rating trails, Track Line, named spots, custom codes, your own messages, music controls, poll voting, the garage build sheet, sync, themes, voices, and tablets and the website). Map Mode is free for 8 hours a month and never counts while on a group ride. Joining a ride, following the leader and every safety feature stay free on every device. Each article says what is Pro in a 2.0 block and names the gold Pro tag."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "accurate-location",
+      "approvals-and-waitlist",
+      "badges-and-ranks",
+      "battery-saver",
+      "check-in",
+      "contact-support",
+      "delete-account",
+      "edit-cancel-or-delete-a-ride",
+      "emergency-and-safety",
+      "follow-leaders",
+      "follow-me",
+      "friends",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "import-gpx",
+      "invite-riders",
+      "join-a-ride",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "organizer-controls",
+      "place-search",
+      "privacy",
+      "pro-trial",
+      "profile-picture",
+      "promo-codes",
+      "refer-a-friend",
+      "report-and-block",
+      "ride-bubble",
+      "ride-chat",
+      "ride-day-and-weather",
+      "ride-mode",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "riding-groups",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "subscribe-to-pro",
+      "trip-planner",
+      "troubleshooting"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "pro-tiers",
+    "why": "Reviewed for the 2.0 Free and Pro tiers: these screens only gained Pro tags or Pro checks on buttons covered in Free and Pro and the feature articles, so the steps here are unchanged."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "events",
+      "find-a-ride",
+      "create-a-ride",
+      "home-screen"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "events",
+    "why": "Chris 2026-11-03 asked for an explainer of events vs public rides, and for Events to stand out more. New Event or Public Ride? section in Events, short notes in Find a Ride and Create a Ride, and the Home screen's Events card is now gold."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "approvals-and-waitlist",
+      "create-a-ride-on-the-website",
+      "custom-codes",
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "free-vs-pro",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "invite-riders",
+      "place-search",
+      "ride-bubble",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "events",
+    "why": "Reviewed, no change to these steps: Find a Ride and Create a Ride gained the Event or Public Ride? explainer (covered in Events, Find a Ride and Create a Ride), and the website's Events feature line mentions it."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "ride-mode",
+      "full-map",
+      "fuel-range"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "leader-line-ends",
+    "why": "Chris asked for the leader to sit all the way to the left of the leader line and the tail gunner all the way to the right. In 2.0 the line pins the leader to the left end and the tail gunner to the right end, with everyone else between them by how far behind the leader they are, on routes and Freerides; the route's start, finish and miles-done fill are no longer drawn on it. Ride Mode's route and Freeride sections now say so (the old rear-left, front-right text stays until 2.0 is live). Full Map and Fuel Range describe the line without its direction, so they are unchanged (reviewed)."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "tilt-and-crash-alert",
+      "ride-mode",
+      "navigation-mode"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "tilt-calibrate",
+    "why": "Chris asked for the tilt meter to stay off until it has been calibrated, with a Calibrate button, and for his wording of the calibration message. The Zero section is now Calibrate It for Your Mount. Ride Mode and Map Mode articles mention the Calibrate Tilt tile."
   },
   {
     "date": "2026-11-03",

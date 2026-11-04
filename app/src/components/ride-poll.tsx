@@ -9,6 +9,7 @@ import {
   type PollVote,
 } from '@/core/polls';
 import type { ChatMessage } from '@/core/chat';
+import { ProTag } from './pro-tag';
 
 /**
  * A quick poll in the ride chat. Each choice is one big tap target with a bar showing its
@@ -54,9 +55,12 @@ export function PollCard({
           </Pressable>
         );
       })}
-      <ThemedText type="small" themeColor="textSecondary">
-        {voteCountLabel(tally.total)}. {tally.mine == null ? 'Tap a choice to vote.' : 'Tap another choice to change your vote.'}
-      </ThemedText>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <ThemedText type="small" themeColor="textSecondary">
+          {voteCountLabel(tally.total)}. {tally.mine == null ? 'Tap a choice to vote.' : 'Tap another choice to change your vote.'}
+        </ThemedText>
+        <ProTag feature="vote_polls" />
+      </View>
     </View>
   );
 }

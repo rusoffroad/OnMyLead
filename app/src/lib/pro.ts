@@ -5,7 +5,7 @@ import type { ReportSource } from '@/core/moderation';
 import { canStartTrip, localToday, type ProBlock } from '@/core/pro';
 import { myTrips } from './api';
 import { track } from './analytics';
-import { currentEntitlements, refreshEntitlements } from './entitlements';
+import { currentEntitlements, refreshEntitlements, useEntitlements } from './entitlements';
 import { supabase } from './supabase';
 
 export { currentEntitlements, refreshEntitlements, useEntitlements } from './entitlements';
@@ -48,6 +48,12 @@ export function requirePro(feature: FeatureKey): boolean {
   if (can(currentEntitlements(), feature)) return true;
   showProGate(feature === 'create_ride' ? rideLimitBlock() : { kind: 'pro_required', feature });
   return false;
+}
+
+/** Whether the rider can use a feature now, as a hook (re-renders when the plan changes). */
+export function useCan(feature: FeatureKey): boolean {
+  const { ent } = useEntitlements();
+  return can(ent, feature);
 }
 
 /** If the server refused because of the plan, open the prompt and return true; the caller skips its own error. */

@@ -10,9 +10,8 @@
  * took another way, or were already behind when this phone started keeping the trail) is placed
  * by straight-line distance instead, and their dot is drawn hollow.
  *
- * The line runs from the rear of the group on the left to the leader on the right, scaled to the
- * group's spread (never less than half a mile, so a tight group sits bunched at the leader's end
- * rather than spread across the whole bar).
+ * Each rider's spot is measured back from the leader along that path. The strip draws it with the
+ * leader pinned to the left edge and the tail gunner to the right edge (route-order convoyLayout).
  */
 import { distanceM, formatDistance, metersToMiles, type LatLng } from './geo';
 import { cumulativeM, locateOnRoute, miles, type PlacedRider, type RouteRider } from './route';

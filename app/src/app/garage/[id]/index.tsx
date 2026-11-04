@@ -19,6 +19,7 @@ import { shareBuildSheet, shareCsv } from '@/lib/export';
 import { useTheme } from '@/hooks/use-theme';
 import { useSession } from '@/lib/session';
 import type { Vehicle, VehicleItem } from '@/lib/types';
+import { requirePro } from '@/lib/pro';
 
 const miles = (n: number) => `${Math.round(n)} mi`;
 
@@ -156,7 +157,7 @@ export default function VehiclePage() {
       {mine && editing === 'new' ? (
         <ItemForm onCancel={() => setEditing(null)} onSave={async (input) => { await addVehicleItem(vehicle.id, input); setEditing(null); await load(); }} />
       ) : mine ? (
-        <Button title="Add a Part or Extra" kind="secondary" onPress={() => setEditing('new')} />
+        <Button title="Add a Part or Extra" kind="secondary" pro="garage_build" onPress={() => requirePro('garage_build') && setEditing('new')} />
       ) : null}
 
       {totals.itemCount === 0 ? (
@@ -217,8 +218,8 @@ export default function VehiclePage() {
 
       <ThemedText type="heading">Export</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Build Sheet" kind="secondary" style={{ flex: 1 }} onPress={exportSheet} />
-        <Button title="CSV" kind="secondary" style={{ flex: 1 }} onPress={exportCsv} />
+        <Button title="Build Sheet" kind="secondary" pro="garage_build" style={{ flex: 1 }} onPress={() => requirePro('garage_build') && exportSheet()} />
+        <Button title="CSV" kind="secondary" pro="garage_build" style={{ flex: 1 }} onPress={() => requirePro('garage_build') && exportCsv()} />
       </View>
       {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
       <ErrorText error={error} />

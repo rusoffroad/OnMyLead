@@ -36,6 +36,10 @@ OnMyLead's maps can show public trails and roads over satellite imagery or a top
 
 ![Trail lines and rider dots on the satellite map](/help/img/map.webp)
 
+:::release 2.0
+Satellite, topo and the trails layer are Pro features. See [Free and Pro](/help/free-vs-pro). On a Free account, **Map Style** carries a **Pro** tag and the map shows the standard map.
+:::
+
 ## Open the Layers
 
 The layers button is the round button with a stacked layers icon in the top-right corner of the map. You'll find it on:

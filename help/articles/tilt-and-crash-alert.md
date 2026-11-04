@@ -4,7 +4,7 @@ summary: See your vehicle's roll and pitch, get warned before a steep lean, and 
 category: safety-privacy
 order: 52
 release: "2.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/tilt.tsx
   - app/src/components/tilt-gauge.tsx
@@ -29,21 +29,18 @@ The **Tilt** tile shows your roll and pitch over the map:
 - In **Map Mode**, under your speed and the dash.
 - In **Ride Mode**, on the left side of the map above the panel. On a tablet it sits in the map's bottom-left corner. It hides in Full Map and when there isn't room.
 
-The numbers turn amber as you get close to your limit and red at it. Tap the tile to open the full **Tilt** screen, with an axle seen from behind that leans with your roll, two wheels seen from the side that tip with your pitch, and the biggest lean each way under each one. Tap **Reset Max** to clear those.
+The numbers turn amber as you get close to your limit and red at it. Tap the tile to open the full **Tilt** screen, with an axle seen from behind that leans with your roll, two wheels seen from the side that tip with your pitch, and the biggest lean each way under each one. Tap **Reset Max** to clear those (it shows once the meter is calibrated).
 
 You can also open it from the **You** tab: tap **Tilt and Crash Alert**. The screen stays on while it's open, so you can leave it up on your mount.
 
-## Zero It for Your Mount
+## Calibrate It for Your Mount
 
-Your phone probably doesn't sit flat in its mount, so zero the meter once you've mounted it:
+The tilt meter is off until you calibrate it, because your phone probably doesn't sit flat in its mount. Until then the Tilt screen shows **Calibrate** instead of readings, and the tile in Map Mode and Ride Mode says **Calibrate Tilt**. Tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers.
 
-1. Park on flat, level ground.
-2. Put the phone in its mount the way you ride.
-3. Open **Tilt** and tap **Zero**, then **Zero** again to confirm.
+1. Place your phone where it will be mounted, with the vehicle on flat and level ground.
+2. Open **Tilt** and press **Calibrate**, then **Calibrate** again to confirm.
 
-That reading becomes level. Zero again whenever you move the phone or switch vehicles. The Zero is kept on this phone only, since each phone sits differently. Tap **Clear Zero** to remove it.
-
-Until you zero it, the meter treats the phone's nearest plain position (lying flat, standing upright or on its side) as level, so a phone standing in a dash mount reads close to level. That reading is only rough, so the numbers stay blue instead of turning amber or red, tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers. Zero it to turn those on.
+That reading becomes level, and the meter turns on. After that the button says **Zero**: press it again whenever you move the phone or switch vehicles. The calibration is kept on this phone only, since each phone sits differently. Tap **Clear Zero** to remove it, which turns the meter off until you calibrate again.
 
 ## Tilt Warnings
 

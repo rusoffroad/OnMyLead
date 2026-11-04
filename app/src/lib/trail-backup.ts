@@ -9,6 +9,8 @@ import { allLocalTrails, putBackedUpTrails, readTombstones, setTrailBackupHooks,
 import { readPhotoBytes } from './photo-bytes';
 import { isBackendConfigured, supabase } from './supabase';
 import { restorePhoto } from './trail-photo-files';
+import { can } from '@/core/entitlements';
+import { currentEntitlements } from './entitlements';
 
 /**
  * The rider's private trail backup (core/trail-backup.ts has the rules): every recorded, drawn and
@@ -62,6 +64,8 @@ export function backupTrailsNow(): Promise<void> {
 }
 
 async function run() {
+  // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
+  if (!can(currentEntitlements(), 'sync')) return;
   if (!isBackendConfigured) return;
   const { data: auth } = await supabase.auth.getSession();
   const me = auth.session?.user.id ?? null;

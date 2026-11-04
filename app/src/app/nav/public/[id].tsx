@@ -164,7 +164,8 @@ export default function PublicTrailPage() {
         <Button
           title={t.myScore != null || t.myQuality != null ? 'Change Your Rating' : 'Rate This Trail'}
           kind="secondary"
-          onPress={() => setRating(true)}
+          pro="rate_trails"
+          onPress={() => requirePro('rate_trails') && setRating(true)}
           style={{ borderWidth: 2, borderColor: RIDER_TRAIL_INK }}
         />
       ) : null}

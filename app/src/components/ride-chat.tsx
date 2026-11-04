@@ -16,6 +16,7 @@ import { isPoll, type PollVote } from '@/core/polls';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useTheme } from '@/hooks/use-theme';
 import { confirmAsync } from '@/lib/confirm';
+import { requirePro } from '@/lib/pro';
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 const dayAndClock = (iso: string) =>
@@ -202,7 +203,7 @@ export function RideChat({
                   ) : null}
                 </View>
                 {poll ? (
-                  <PollCard message={m} votes={votes} me={me} onVote={(choice) => onVote?.(m.id, choice)} />
+                  <PollCard message={m} votes={votes} me={me} onVote={(choice) => requirePro('vote_polls') && onVote?.(m.id, choice)} />
                 ) : (
                   <ThemedText
                     style={[
@@ -286,7 +287,7 @@ export function RideChat({
           ))}
           {options.length > 1 ? <Choice label="Send To" options={options} value={sendTo} onChange={setSendTo} /> : null}
           {sendTo === 'poll' && (pollLocked || parseProError(error)?.kind === 'pro_required') ? (
-            <ProLock feature="create_poll" title="Create Ride Polls" detail="Part of Pro. Everyone can still vote." />
+            <ProLock feature="create_poll" title="Create Ride Polls" detail="Ask the group a quick question" />
           ) : sendTo === 'poll' ? (
             <>
               <PollComposer pollsOn={pollsOn} onSend={sendPoll} />

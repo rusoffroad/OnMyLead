@@ -17,6 +17,7 @@ import { Platform } from 'react-native';
 import { DirectionsHost } from '@/components/directions';
 import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
+import { TabletProGate } from '@/components/tablet-pro-gate';
 import { RiderAgreementGate } from '@/components/rider-agreement';
 import { UpdateRequired } from '@/components/update-required';
 import { Colors, currentScheme, font, NavigationColors } from '@/constants/theme';
@@ -195,6 +196,8 @@ function RootLayout() {
         <Stack.Screen name="admin" options={{ title: 'OnMyLead Admin', headerShown: false }} />
       </Stack>
       <MessageAlerts />
+      {/* iPad, Android tablets and the website are Pro; joining and Ride Mode stay open. */}
+      <TabletProGate />
       <ProGateHost />
       <DirectionsHost />
       {/* Before You Ride: the safety and liability agreement, until the rider agrees. */}
