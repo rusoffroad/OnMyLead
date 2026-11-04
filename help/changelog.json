@@ -2,6 +2,16 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "whats-new-in-2-0"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "store-2.0",
+    "why": "Chris 2026-11-04: update the website, docs and store screenshots with all the 2.0 features. New What's New in OnMyLead 2.0 guide (published with 2.0) linking each feature's guide; the 2.0 release notes now name the Tilt Meter, Crash Alert, Founder and Ambassador badges and sync, and the store What's New text was rewritten to fit 500 characters with them."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "language",
       "home-screen",
       "sync-across-devices"
