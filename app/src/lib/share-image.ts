@@ -18,14 +18,17 @@ export async function snapshotForShare(
   const captured = await captureRef(view, { format: 'png', quality: 1, width: opts.width, height: opts.height, result: 'tmpfile' });
   // react-native-view-shot hands back a bare path on iOS; expo-file-system wants a file:// address.
   const raw = captured.startsWith('file://') ? captured : `file://${captured}`;
-  const ctx = ImageManipulator.ImageManipulator.manipulate(raw);
-  ctx.resize(opts.height ? { width: opts.width, height: opts.height } : { width: opts.width });
-  const image = await ctx.renderAsync();
-  const saved = await image.saveAsync({ compress: 1, format: ImageManipulator.SaveFormat.PNG });
-  // The full-size capture (up to 3x the card, tens of MB) is let go now, not when the garbage
-  // collector or the OS gets to it.
-  (image as { release?: () => void }).release?.();
-  discard(raw);
+  let saved: { uri: string };
+  try {
+    const ctx = ImageManipulator.ImageManipulator.manipulate(raw);
+    ctx.resize(opts.height ? { width: opts.width, height: opts.height } : { width: opts.width });
+    const image = await ctx.renderAsync();
+    saved = await image.saveAsync({ compress: 1, format: ImageManipulator.SaveFormat.PNG });
+    (image as { release?: () => void }).release?.();
+  } finally {
+    // The full-size capture (up to 3x the card, tens of MB) is let go now, shrunk or not.
+    discard(raw);
+  }
   try {
     const out = new File(Paths.cache, `${opts.name}.png`);
     await new File(saved.uri).copy(out, { overwrite: true });

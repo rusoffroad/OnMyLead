@@ -17,11 +17,34 @@ describe('single flight', () => {
     expect(runs).toBe(1);
     release();
     await first;
-    expect(runs).toBe(1);
+    // The queued pass starts the moment the first one ends.
+    expect(runs).toBe(2);
     await second;
     expect(runs).toBe(2);
     await go();
     expect(runs).toBe(3);
+  });
+  it('a call made as one pass ends waits its turn behind the queued pass, never beside it', async () => {
+    let runs = 0;
+    let inFlight = 0;
+    let most = 0;
+    let release: () => void = () => {};
+    const go = singleFlight(async () => {
+      runs += 1;
+      inFlight += 1;
+      most = Math.max(most, inFlight);
+      if (runs === 1) await new Promise<void>((r) => (release = r));
+      inFlight -= 1;
+    });
+    const first = go();
+    const queued = go();
+    release();
+    await first;
+    const late = go();
+    expect(late).not.toBe(queued);
+    await late;
+    expect(runs).toBe(3);
+    expect(most).toBe(1);
   });
   it('reports a failed pass to whoever asked for it, and runs again after', async () => {
     let runs = 0;

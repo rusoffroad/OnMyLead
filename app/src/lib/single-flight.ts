@@ -6,19 +6,26 @@
  */
 export function singleFlight(run: () => Promise<void>): () => Promise<void> {
   let running: Promise<void> | null = null;
-  let queued: Promise<void> | null = null;
+  let queued: { promise: Promise<void>; resolve: () => void; reject: (e: unknown) => void } | null = null;
   const start = (): Promise<void> => {
     if (running) {
-      queued ??= running
-        .catch(() => {})
-        .then(() => {
-          queued = null;
-          return start();
+      if (!queued) {
+        let resolve: () => void = () => {};
+        let reject: (e: unknown) => void = () => {};
+        const promise = new Promise<void>((res, rej) => {
+          resolve = res;
+          reject = rej;
         });
-      return queued;
+        queued = { promise, resolve, reject };
+      }
+      return queued.promise;
     }
     running = run().finally(() => {
       running = null;
+      // Started right here, before any other caller can get a word in, so one change is one pass.
+      const next = queued;
+      queued = null;
+      if (next) start().then(next.resolve, next.reject);
     });
     return running;
   };

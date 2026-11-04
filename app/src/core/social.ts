@@ -345,7 +345,7 @@ export function socialNotSwitchedOn(message: string | null | undefined, code?: s
 export function isTransientError(message: string | null | undefined): boolean {
   // "cancelled" and "timed out" only as the fetch layer words them, so a server message about a
   // cancelled ride or a statement timeout isn't retried and called no signal.
-  return /network request failed|failed to fetch|fetch failed|network error|load failed|UnexpectedException: cancelled|^(the )?(request )?(cancelled|timed out)\b/i
+  return /network request (failed|timed out)|failed to fetch|fetch failed|network error|load failed|UnexpectedException: cancelled|^(the )?(request )?(cancelled|timed out)\b/i
     .test(message ?? '');
 }
 

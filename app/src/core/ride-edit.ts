@@ -273,9 +273,10 @@ export function ridePatch(
     changed.add('details');
   }
   // A ride with no private row yet gets one only with a spot, so instructions ride along with it
-  // (the edit screen shows the box once a spot is picked).
+  // (the edit screen shows the box once a spot is picked) and can't go up on their own.
   const instructions = text(form.instructions);
-  if ((details || form.coords.trim()) && instructions !== (details?.instructions ?? null)) {
+  if (instructions !== (details?.instructions ?? null)) {
+    if (!details && !form.coords.trim()) return { error: tc('Set the meeting point before adding instructions.') };
     p.instructions = instructions;
     changed.add('details');
   }

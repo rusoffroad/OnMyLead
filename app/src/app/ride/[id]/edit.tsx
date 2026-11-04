@@ -59,14 +59,7 @@ export default function EditRide() {
   }, [id, me]);
 
   const set = <K extends keyof RideEditForm>(key: K, value: RideEditForm[K]) =>
-    setForm((f) => {
-      if (!f) return f;
-      const next = { ...f, [key]: value };
-      // On a ride whose spot never saved, instructions go up with the spot and the box shows once
-      // one is picked; clearing the spot clears them too, rather than dropping them quietly on save.
-      if (key === 'coords' && !details && !parseCoords(String(value))) next.instructions = '';
-      return next;
-    });
+    setForm((f) => (f ? { ...f, [key]: value } : f));
 
   // What saving would do right now, worked out as the leader types.
   const preview = useMemo(() => (ride && form ? ridePatch(ride, details, form, new Date()) : null), [ride, details, form]);
@@ -283,6 +276,8 @@ function SaveBar({
   onSave: () => void;
 }) {
   const patch = preview && !('error' in preview) ? preview : null;
+  // What stops the save as the leader types (a half-typed spot, instructions with no spot yet).
+  const notYet = preview && 'error' in preview ? preview.error : null;
   const label = patch ? changeLabel(patch.changed) : null;
   const tells = !live && !!patch && (patch.changed.includes('time') || patch.changed.includes('place'));
   return (
@@ -294,10 +289,10 @@ function SaveBar({
           borderLeftColor: label ? (tells ? Colors.accent : Colors.sky) : Colors.border,
           backgroundColor: label ? withAlpha(tells ? Colors.accent : Colors.sky, 0.1) : Colors.backgroundElement,
         }}>
-        <ThemedText style={{ fontWeight: 700 }}>{label ?? t('No Changes Yet')}</ThemedText>
+        <ThemedText style={{ fontWeight: 700 }}>{label ?? (notYet ? t('Not Ready to Save') : t('No Changes Yet'))}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {!label
-            ? t('Change anything above, then save. Riders see the new details right away.')
+            ? notYet ?? t('Change anything above, then save. Riders see the new details right away.')
             : tells
               ? t('Everyone on the ride gets a notification, and the ride page shows what changed.')
               : t('No notification for this. Riders see it on the ride page, marked Updated.')}
