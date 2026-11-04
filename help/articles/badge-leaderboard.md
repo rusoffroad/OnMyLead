@@ -4,7 +4,7 @@ summary: See where you rank against other riders by badges earned, everywhere or
 category: account
 order: 26
 release: "2.1"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/leaderboard.tsx
   - app/src/app/leaderboard-area.tsx

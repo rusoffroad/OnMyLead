@@ -2,6 +2,41 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "badge-leaderboard",
+      "badges-and-ranks",
+      "privacy",
+      "home-screen"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "badge-leaderboard",
+    "why": "Chris asked for a leaderboard for the badges, filtered by country and state. New article for the Leaderboard and Where You Ride (country and state, Use My Location, Show Me on the Leaderboard); Earn Badges and Ranks links to it, What Other Riders Can See says what the leaderboard shows, and Home's Your Badges gains a Leaderboard link. All in 2.1 blocks until that version is live."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "getting-started",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "promo-codes",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "badge-leaderboard",
+    "why": "Reviewed for the badge leaderboard. Home only gained a Leaderboard link beside Your Badges, the app gained two new screens and the website showcase a Badge Leaderboard line; nothing these articles describe changed."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "language",
       "home-screen",
       "sync-across-devices"
@@ -219,41 +254,6 @@
     "by": "pr",
     "ref": "refer-a-friend",
     "why": "Reviewed, no change for riders: Admin > Referrals now keeps Apple offer codes that are all letters and shows code expiry dates on the right day."
-  },
-  {
-    "date": "2026-11-03",
-    "slugs": [
-      "badge-leaderboard",
-      "badges-and-ranks",
-      "privacy",
-      "home-screen"
-    ],
-    "kind": "new",
-    "by": "pr",
-    "ref": "badge-leaderboard",
-    "why": "Chris asked for a leaderboard for the badges, filtered by country and state. New article for the Leaderboard and Where You Ride (country and state, Use My Location, Show Me on the Leaderboard); Earn Badges and Ranks links to it and What Other Riders Can See says what the leaderboard shows. All in 2.1 blocks until that version is live. Home's Your Badges gains a Leaderboard link (2.1 block in Your Home Screen)."
-  },
-  {
-    "date": "2026-11-03",
-    "slugs": [
-      "create-a-ride-on-the-website",
-      "create-a-ride",
-      "edit-cancel-or-delete-a-ride",
-      "find-a-ride",
-      "free-vs-pro",
-      "getting-started",
-      "join-a-ride",
-      "leader-sweep-and-tail-gunner",
-      "notifications-inbox",
-      "promo-codes",
-      "ride-name-and-profile",
-      "ride-summary-and-ride-again",
-      "use-onmylead-on-a-tablet"
-    ],
-    "kind": "update",
-    "by": "pr",
-    "ref": "badge-leaderboard",
-    "why": "Reviewed for the badge leaderboard. Home only gained a Leaderboard link beside Your Badges, the app gained two new screens and the website showcase a Badge Leaderboard line; nothing these articles describe changed."
   },
   {
     "date": "2026-11-03",

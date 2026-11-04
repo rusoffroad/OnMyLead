@@ -4,7 +4,7 @@ summary: What's on the Rides tab from version 2.0. Join, create and find rides, 
 category: getting-started
 order: 15
 release: "2.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/leaderboard.tsx
   - app/src/components/home/events-card.tsx
