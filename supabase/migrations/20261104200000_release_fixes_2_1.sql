@@ -191,3 +191,20 @@ end;
 $$;
 revoke execute on function reports_social_fill() from public, anon, authenticated;
 
+
+-- 4. Google Play referral deferral, done once: referral-defer now reserves the reward
+--    (referral_mark_deferred) before asking Google, and puts it back with this if Google says no,
+--    so a retry can never push the same subscription out twice.
+create or replace function referral_unmark_deferred(p_user uuid)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  update referral_rewards set deferred_at = null, redeemed_at = null
+  where user_id = p_user and claim_kind = 'google_defer' and deferred_at is not null;
+end;
+$$;
+revoke execute on function referral_unmark_deferred(uuid) from public, anon, authenticated;
+do $$ begin
+  if exists (select 1 from pg_roles where rolname = 'service_role') then
+    grant execute on function referral_unmark_deferred(uuid) to service_role;
+  end if;
+end $$;

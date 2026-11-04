@@ -189,6 +189,11 @@ do $$ begin
   if (select expires_at from play_subscriptions where purchase_token = 'hal-monthly-token') < now() + interval '200 days' then
     raise exception 'FAIL: deferral not reflected in the subscription';
   end if;
+  -- Google said no after the reward was reserved: the reward goes back, and marking again takes.
+  perform referral_unmark_deferred('00000000-0000-0000-0000-000000000f05');
+  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'deferred_at') is not null then raise exception 'FAIL: deferral not put back'; end if;
+  perform referral_mark_deferred('00000000-0000-0000-0000-000000000f05', now() + interval '202 days');
+  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'deferred_at') is null then raise exception 'FAIL: deferral not re-recorded'; end if;
 end $$;
 
 -- R8. Gus rides later: Gus gets his reward, Rex still has just one.
