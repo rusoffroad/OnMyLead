@@ -46,9 +46,10 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
     junction.current = JUNCTION_ZOOM_START;
   }, []);
 
-  const step = useCallback(async (f: FollowFix, inset: Inset, durationMs: number) => {
+  /** Moves the map for this fix; false when a slower step is still running (the fix is skipped). */
+  const step = useCallback(async (f: FollowFix, inset: Inset, durationMs: number): Promise<boolean> => {
     const m = map.current;
-    if (!m || busy.current) return;
+    if (!m || busy.current) return false;
     busy.current = true;
     try {
       const cam = m.camera();
@@ -68,7 +69,7 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
         junction.current = r.next;
         if (r.zoom != null) {
           m.centerOn(f, leadInset(inset, size, screenHeading), { zoom: r.zoom, duration: JUNCTION_ZOOM_MS });
-          return;
+          return true;
         }
       }
 
@@ -79,6 +80,7 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       frame.current = followFrameAfter(frame.current, move);
       if (move.kind === 'zoom-out') m.zoomTo(move.zoom, ZOOM_OUT_MS);
       else if (move.kind === 'pan') m.centerOn(f, move.inset, { duration: durationMs });
+      return true;
     } finally {
       busy.current = false;
     }

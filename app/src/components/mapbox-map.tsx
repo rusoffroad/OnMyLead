@@ -183,7 +183,12 @@ export function MapboxMap({
     const p = s.properties;
     const center = { lat: p.center[1], lng: p.center[0] };
     zoom.current = p.zoom;
-    trail.onRegion(regionFromCamera(center, p.zoom, size.current), trailZoomFromMapbox(p.zoom));
+    // The settle timer in camChanged usually asked for this region already; ask only if it hasn't yet.
+    if (settle.current) {
+      clearTimeout(settle.current);
+      settle.current = null;
+      trail.onRegion(regionFromCamera(center, p.zoom, size.current), trailZoomFromMapbox(p.zoom));
+    }
     onIdle?.({
       center,
       zoom: p.zoom,

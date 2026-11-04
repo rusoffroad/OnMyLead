@@ -28,8 +28,12 @@ export async function parkTrailsIn(box: Box): Promise<ParkTrail[]> {
   return trails;
 }
 
-/** Keeps each park whose every line was inside the box (a partial view would be saved short). */
+/**
+ * Keeps each park whose every line was inside the box (a partial view would be saved short). An
+ * answer cut at the server's line limit may be missing some park's lines, so none is kept then.
+ */
 async function rememberParks(trails: ParkTrail[], box: Box) {
+  if (trails.length >= PARK_TRAILS_MAX_LINES) return;
   const byPark = new Map<number, ParkTrail[]>();
   for (const t of trails) byPark.set(t.parkOsmId, [...(byPark.get(t.parkOsmId) ?? []), t]);
   const parks = await loadParks();

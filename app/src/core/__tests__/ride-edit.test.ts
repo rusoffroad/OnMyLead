@@ -76,6 +76,13 @@ describe('formFromRide', () => {
 });
 
 describe('ridePatch', () => {
+  it('gives a ride with no saved spot one, and leaves it alone until the leader fills it in', () => {
+    expect(isEmptyPatch(patch({}, ride, null))).toBe(true);
+    const p = patch({ coords: '38.57, -109.55', meetLabel: 'Lions Park' }, ride, null);
+    expect(p.private).toMatchObject({ meet_lat: 38.57, meet_lng: -109.55, meet_label: 'Lions Park' });
+    expect(p.changed).toContain('place');
+  });
+
   it('sends only the name when only the name changed', () => {
     const p = patch({ name: '  Fins and Things  ' });
     expect(p.ride).toEqual({ name: 'Fins and Things' });

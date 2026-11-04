@@ -148,7 +148,7 @@ export default function EditRide() {
     </Locked>
   );
 
-  const where = whenWhere && details ? (
+  const where = whenWhere ? (
     <Card>
       <ThemedText type="heading">{t('Meeting Point')}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">

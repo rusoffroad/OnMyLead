@@ -196,12 +196,13 @@ export function ridePatch(
       changed.add('details');
     }
 
-    // The exact spot only reaches riders on the ride; the leader always has it, but stay safe if not.
-    if (details) {
+    // The exact spot only reaches riders on the ride; the leader always has it. A ride whose spot
+    // never saved (no private row) keeps the form's spot box empty until the leader fills it.
+    if (details || form.coords.trim()) {
       const spot = parseCoords(form.coords);
       if (!spot) return { error: tc('Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".') };
       const label = text(form.meetLabel);
-      const moved = coordsText(spot.lat, spot.lng) !== coordsText(details.meet_lat, details.meet_lng);
+      const moved = !details || coordsText(spot.lat, spot.lng) !== coordsText(details.meet_lat, details.meet_lng);
       if (moved) {
         p.meet_lat = spot.lat;
         p.meet_lng = spot.lng;
@@ -213,12 +214,12 @@ export function ridePatch(
         }
         changed.add('place');
       }
-      if (label !== (details.meet_label ?? null)) {
+      if (label !== (details?.meet_label ?? null)) {
         p.meet_label = label;
         changed.add('place');
       }
       const areaLabel = label ? publicAreaLabel(label) : ride.meet_area_label;
-      if ((moved || label !== (details.meet_label ?? null)) && areaLabel !== ride.meet_area_label) r.meet_area_label = areaLabel;
+      if ((moved || label !== (details?.meet_label ?? null)) && areaLabel !== ride.meet_area_label) r.meet_area_label = areaLabel;
     }
     if (ride.visibility === 'public' && form.meetState !== (ride.meet_state ?? null) && form.meetState) {
       r.meet_state = form.meetState;

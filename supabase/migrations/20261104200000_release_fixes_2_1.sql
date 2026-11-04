@@ -192,19 +192,48 @@ $$;
 revoke execute on function reports_social_fill() from public, anon, authenticated;
 
 
--- 4. Google Play referral deferral, done once: referral-defer now reserves the reward
---    (referral_mark_deferred) before asking Google, and puts it back with this if Google says no,
---    so a retry can never push the same subscription out twice.
+-- 4. Google Play referral deferral, done once. referral-defer reserves the reward
+--    (referral_reserve_deferral) before asking Google, records Google's answer with
+--    referral_mark_deferred, and puts the reward back with referral_unmark_deferred when Google
+--    refused; a reward that is reserved but not confirmed is never reserved again, so a retry
+--    can't push the same subscription out twice.
+create or replace function referral_reserve_deferral(p_user uuid)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  update referral_rewards set deferred_at = now()
+  where user_id = p_user and claim_kind = 'google_defer' and deferred_at is null;
+end;
+$$;
+-- Confirms the deferral: the reward is redeemed and the subscription row takes Google's own expiry.
+create or replace function referral_mark_deferred(p_user uuid, p_new_expiry timestamptz)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  update referral_rewards set deferred_at = coalesce(deferred_at, now()), redeemed_at = coalesce(redeemed_at, now())
+  where user_id = p_user and claim_kind = 'google_defer';
+  update play_subscriptions set expires_at = p_new_expiry, updated_at = now()
+  where purchase_token = referral_play_token(p_user) and expires_at is distinct from p_new_expiry;
+end;
+$$;
+-- Google refused: the reservation comes off a reward that was never confirmed.
 create or replace function referral_unmark_deferred(p_user uuid)
 returns void language plpgsql security definer set search_path = public as $$
 begin
-  update referral_rewards set deferred_at = null, redeemed_at = null
-  where user_id = p_user and claim_kind = 'google_defer' and deferred_at is not null;
+  update referral_rewards set deferred_at = null
+  where user_id = p_user and claim_kind = 'google_defer' and deferred_at is not null and redeemed_at is null;
 end;
 $$;
-revoke execute on function referral_unmark_deferred(uuid) from public, anon, authenticated;
+-- The target now says whether the deferral is confirmed (redeemed_at), not only reserved.
+create or replace function referral_defer_target(p_user uuid)
+returns jsonb language sql stable security definer set search_path = public as $$
+  select jsonb_build_object('reward_id', w.id, 'deferred_at', w.deferred_at, 'redeemed_at', w.redeemed_at, 'purchase_token', s.purchase_token,
+                            'product_id', s.product_id, 'expires_at', s.expires_at, 'defer_days', (referral_rules() ->> 'defer_days')::int)
+  from referral_rewards w
+  left join play_subscriptions s on s.purchase_token = referral_play_token(p_user)
+  where w.user_id = p_user and w.claim_kind = 'google_defer';
+$$;
+revoke execute on function referral_reserve_deferral(uuid), referral_unmark_deferred(uuid) from public, anon, authenticated;
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then
-    grant execute on function referral_unmark_deferred(uuid) to service_role;
+    grant execute on function referral_reserve_deferral(uuid), referral_unmark_deferred(uuid) to service_role;
   end if;
 end $$;

@@ -170,9 +170,6 @@ export function toggleKind(kinds: SpotKind[], k: SpotKind): SpotKind[] {
   return next.length === SPOT_KINDS.length ? [] : SPOT_KINDS.map((x) => x.kind).filter((x) => next.includes(x));
 }
 
-/** "Under 1 mi", "42 mi". */
-export const distanceText = (mi: number) => (mi < 1 ? 'Under 1 mi' : `${Math.round(mi).toLocaleString('en-US')} mi`);
-
 /** Where a place is, for its row: "Ocala National Forest, FL" or "Burnet County, Texas". */
 export function placeLine(s: Pick<Spot, 'areaName' | 'state'>): string {
   const state = stateByCode(s.state)?.name ?? s.state;

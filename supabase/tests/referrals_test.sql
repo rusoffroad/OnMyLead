@@ -179,6 +179,16 @@ select as_user('00000000-0000-0000-0000-000000000f05');
 set role authenticated;
 insert into ref_out values ('hal_google', claim_referral_reward('google'));
 reset role;
+-- Reserve, Google refuses, the reward goes back unredeemed; reserve again and confirm.
+select referral_reserve_deferral('00000000-0000-0000-0000-000000000f05');
+do $$ begin
+  if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is null then raise exception 'FAIL: not reserved'; end if;
+  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'redeemed_at') is not null then raise exception 'FAIL: reserved counts as redeemed'; end if;
+  perform referral_unmark_deferred('00000000-0000-0000-0000-000000000f05');
+  if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is not null then raise exception 'FAIL: reservation not lifted'; end if;
+  if (select redeemed_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is not null then raise exception 'FAIL: redeemed by a refused deferral'; end if;
+end $$;
+select referral_reserve_deferral('00000000-0000-0000-0000-000000000f05');
 select referral_mark_deferred('00000000-0000-0000-0000-000000000f05', now() + interval '202 days');
 do $$ begin
   if (select v #>> '{reward,role}' from ref_out where name = 'hal_view') <> 'friend' then
@@ -189,11 +199,14 @@ do $$ begin
   if (select expires_at from play_subscriptions where purchase_token = 'hal-monthly-token') < now() + interval '200 days' then
     raise exception 'FAIL: deferral not reflected in the subscription';
   end if;
-  -- Google said no after the reward was reserved: the reward goes back, and marking again takes.
+  -- A confirmed deferral stays confirmed: unmark only lifts an unconfirmed reservation.
   perform referral_unmark_deferred('00000000-0000-0000-0000-000000000f05');
-  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'deferred_at') is not null then raise exception 'FAIL: deferral not put back'; end if;
-  perform referral_mark_deferred('00000000-0000-0000-0000-000000000f05', now() + interval '202 days');
-  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'deferred_at') is null then raise exception 'FAIL: deferral not re-recorded'; end if;
+  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'deferred_at') is null then raise exception 'FAIL: a confirmed deferral was put back'; end if;
+  -- Google's own expiry wins even when it is earlier than the planned one.
+  perform referral_mark_deferred('00000000-0000-0000-0000-000000000f05', now() + interval '190 days');
+  if (select expires_at from play_subscriptions where purchase_token = 'hal-monthly-token') > now() + interval '191 days' then
+    raise exception 'FAIL: an earlier Google expiry was not taken';
+  end if;
 end $$;
 
 -- R8. Gus rides later: Gus gets his reward, Rex still has just one.
