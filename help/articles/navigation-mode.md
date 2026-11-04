@@ -6,6 +6,7 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-04
 sources:
+  - app/src/components/route-map.tsx
   - app/src/lib/map-waypoints.ts
   - app/src/components/nav-map.tsx
   - app/src/components/nav-map.web.tsx
@@ -117,7 +118,7 @@ The screen stays on while Navigate is open.
 
 :::release 2.0
 :::release 2.1
-Pick **3D Terrain** under **Map Style** to explore on the real shape of the land, with contour lines and peak heights. Recording, Track Line and the distance finder work the same in 3D. See [3D Terrain](/help/3d-terrain).
+From 2.1 Map Mode's map is drawn by Mapbox on every device and on onmylead.com, so it looks the same everywhere, and a trail's page shows the trail on a real map (your map look, with the trails around it) instead of a line drawing. Pick **3D Terrain** under **Map Style** to explore on the real shape of the land, with contour lines and peak heights. Recording, Track Line and the distance finder work the same in 3D. See [3D Terrain](/help/3d-terrain).
 :::
 
 :::release 2.1

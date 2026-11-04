@@ -13,6 +13,7 @@ sources:
   - app/src/components/time-picker.tsx
   - app/src/components/waypoint-row.tsx
   - app/src/components/waypoint-map.tsx
+  - app/src/components/waypoint-mapbox-map.tsx
   - app/src/components/waypoint-map.web.tsx
   - app/src/components/map-search.tsx
   - app/src/hooks/use-ride-waypoints.ts
@@ -182,7 +183,7 @@ Tap a waypoint on the map or in the list to open it. You'll see its symbol, who 
 The waypoints map works on onmylead.com too. Click the map to drop a waypoint, and click a waypoint to open it.
 
 :::release 2.1
-Ride Mode on the website shows the route sketch rather than a live map, so add ride waypoints from the ride's waypoints map there.
+From 2.1 the waypoints map is drawn by Mapbox on every device, so it looks the same on the phone and the website, and Ride Mode on the website has a live map where you can press and hold too. On the website, right-click a trail line to see its card. If the Mapbox map isn't available there, Ride Mode on the website shows the route sketch instead, so add ride waypoints from the ride's waypoints map.
 :::
 
 On a tablet held sideways, the waypoint list sits beside the map; swipe it up or tap **Hide** to fold it.

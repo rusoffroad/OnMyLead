@@ -714,9 +714,9 @@ export default function RideMode() {
   // Center on Me. On a phone it sits on the right just above the panel, over Add Waypoint when
   // that is there, and shows when there is room (folding the panel always makes room). On a
   // tablet it sits in the open map's bottom corner, just left of the panel, so it is always there.
-  // The web has no live map to move, so it has no button.
+  // The website has a live map to move only with Mapbox; otherwise it has no button.
   const locateBottom = tablet ? panelBottom : panelBottom + panelH + 12 + (mine && wpFabFits ? WP_FAB_H + 8 : 0);
-  const locateFits = Platform.OS !== 'web' && !!panelH &&
+  const locateFits = (Platform.OS !== 'web' || trail.mapbox) && !!panelH &&
     (tablet || screenH - locateBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
   // Music (when the rider has it on) sits right above Center on Me, and only when there is room.
   // In Full Map it moves into the slim bar instead.
@@ -919,8 +919,10 @@ export default function RideMode() {
   // The rider dragged or pinched the map before their spot was known: leave the map where they put it.
   const [mapMoved, setMapMoved] = useState(false);
   const [openFix, setOpenFix] = useState<{ lat: number; lng: number } | null>(null);
+  const liveMap = Platform.OS !== 'web' || trail.mapbox;
   useEffect(() => {
-    if (Platform.OS === 'web') return;
+    // The website's sketch has nothing to center; its Mapbox map does.
+    if (!liveMap) return;
     let gone = false;
     (async () => {
       const p = await Location.getForegroundPermissionsAsync().catch(() => null);
@@ -940,7 +942,7 @@ export default function RideMode() {
     return () => {
       gone = true;
     };
-  }, []);
+  }, [liveMap]);
   const openAt = openFix ?? myFix;
   // On a phone, wait until the panel is measured so the rider lands above it, not under it.
   const openLaidOut = mapReady && (tablet || panelH > 0);

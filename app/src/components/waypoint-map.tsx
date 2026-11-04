@@ -8,16 +8,25 @@ import type { Place } from '@/core/places';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { WaypointMapboxMap } from './waypoint-mapbox-map';
 import { MarkerBody } from './marker-body';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
+type WaypointMapProps = Parameters<typeof FlatWaypointMap>[0];
+
+/** The waypoints map: Mapbox when this build and the owner allow it and it can draw here (use-trail-map mapbox), otherwise the flat map below. */
+export function WaypointMap(props: WaypointMapProps) {
+  if (props.trail.mapbox) return <WaypointMapboxMap {...props} />;
+  return <FlatWaypointMap {...props} />;
+}
+
 /**
  * The ride's waypoints on a satellite (or topo) map, with the route under them. Press and hold
  * anywhere to drop a new one; tap a blaze to open it.
  */
-export function WaypointMap({
+function FlatWaypointMap({
   waypoints, route, center, trail, onPressWaypoint, onLongPressMap, found, onCenter,
 }: {
   waypoints: Waypoint[];

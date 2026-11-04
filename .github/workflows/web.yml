@@ -30,8 +30,8 @@ jobs:
       # and the database rules (RLS) decide what it can see.
       EXPO_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_RvOJ7J3hFqBhP4CBJuXYow_OzCJ3zV3
       EXPO_PUBLIC_WEB_URL: https://onmylead.com
-      # Mapbox public token for 3D Terrain (repo Settings > Secrets and variables > Actions >
-      # Variables > MAPBOX_PUBLIC_TOKEN). Empty: the website simply doesn't offer 3D Terrain.
+      # Mapbox public token for every map (repo Settings > Secrets and variables > Actions >
+      # Variables > MAPBOX_PUBLIC_TOKEN). Empty: the website keeps its Leaflet maps, without 3D Terrain.
       EXPO_PUBLIC_MAPBOX_TOKEN: ${{ vars.MAPBOX_PUBLIC_TOKEN }}
       EXPO_OFFLINE: '1'
     steps:

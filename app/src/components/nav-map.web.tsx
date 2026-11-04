@@ -7,12 +7,12 @@ import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
 import type { DayLine } from '@/core/track-line';
-import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
-import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
+import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { NavTerrainMap } from '@/components/nav-terrain-map';
+import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { blaze, stopSign } from './waypoint-map.web';
 
@@ -29,9 +29,9 @@ const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;heig
 
 type NavMapProps = Parameters<typeof FlatNavMap>[0];
 
-/** Map Mode's map: 3D Terrain when the rider picked it and it can show here, otherwise the flat map. */
+/** Map Mode's map: Mapbox when this build and the owner allow it and it can draw here, otherwise the flat map. */
 export function NavMap(props: NavMapProps) {
-  if (props.trail.terrain3d) return <NavTerrainMap {...props} />;
+  if (props.trail.mapbox) return <NavMapboxMap {...props} />;
   return <FlatNavMap {...props} />;
 }
 
@@ -206,6 +206,25 @@ function FlatNavMap({
         icon: L.divIcon({ className: '', iconSize: [24, 24], iconAnchor: [12, 12], html: `<div class="oml-tap">${i + 1}</div>` }),
       }).addTo(g);
     });
+    for (const w of waypoints ?? []) {
+      const n = w.planned_stop ? stopNumber(w, waypoints ?? []) : null;
+      const symbol = waypointSymbol(w);
+      const time = w.planned_stop ? stopTimeLabel(w.stop_time) : null;
+      const cls = w.planned_stop ? 'stop' : w.shared ? 'shared' : '';
+      const size = w.planned_stop ? 34 : 30;
+      L.marker(ll(w), {
+        icon: L.divIcon({
+          className: '',
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+          html: `<div class="oml-wp ${cls}" style="width:${size}px;height:${size}px">${w.planned_stop ? stopSign(n, symbol) : blaze(w.shared, symbol)}<span>${esc(w.name)}${time ? `<small>${esc(time)}</small>` : ''}</span></div>`,
+        }),
+        title: w.planned_stop ? `Planned stop ${n ?? ''}, ${w.name}, ${symbolLabel(symbol)}` : `${symbolLabel(symbol)} waypoint, ${w.name}`,
+        zIndexOffset: w.planned_stop ? 500 : w.shared ? 400 : 300,
+      })
+        .on('click', () => cb.current.onPressWaypoint?.(w))
+        .addTo(g);
+    }
     for (const o of obstacles ?? []) {
       const pin = L.marker(ll(o), {
         keyboard: true,

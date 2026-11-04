@@ -8,12 +8,12 @@ import { followCamDurationMs } from '@/core/glide';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
 import type { Place } from '@/core/places';
 import type { DayLine } from '@/core/track-line';
-import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
-import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { snapRadiusM } from '@/core/trail-router';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
+import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
-import { TerrainMap, TerrainMarker, type TerrainLine, type TerrainMapHandle } from './terrain-map';
+import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle } from './mapbox-map';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
@@ -23,11 +23,12 @@ const MEASURE_INK = '#ECCD91';
 const FOLLOW_MS = followCamDurationMs(1000);
 
 /**
- * Map Mode in 3D Terrain: the trail being recorded, a followed trail, Track Line, the distance
- * finder, obstacles and a search result, on Mapbox's raised satellite ground. Same props as the
- * flat Map Mode map (nav-map.tsx), so the screen doesn't care which one draws.
+ * Map Mode on Mapbox: the trail being recorded, a followed trail, Track Line, the distance
+ * finder, obstacles and a search result, in the rider's look (satellite, topo or 3D Terrain's
+ * raised ground). Same props as the flat Map Mode map (nav-map.tsx), so the screen doesn't care
+ * which one draws.
  */
-export function NavTerrainMap({
+export function NavMapboxMap({
   trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading,
   trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
 }: {
@@ -55,10 +56,12 @@ export function NavTerrainMap({
   onLongPressMap?: (p: LatLng) => void;
   ref?: Ref<NavMapHandle>;
 }) {
-  const map = useRef<TerrainMapHandle>(null);
-  // How many riders use 3D Terrain (Admin > Analytics), to watch Mapbox's free allowance.
+  const map = useRef<MapboxMapHandle>(null);
+  // How many riders open a Mapbox map, and in which look (Admin > Analytics), to watch Mapbox's free allowance.
   useEffect(() => {
-    track('terrain_3d_opened', { platform: Platform.OS, screen: 'map_mode' });
+    track('mapbox_map_opened', { platform: Platform.OS, screen: 'map_mode', look: trail.look });
+    // Once per map, not per look change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const pad = padding ?? [120, 50, 320, 50];
   const inset = { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] };
@@ -108,8 +111,8 @@ export function NavTerrainMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [found]);
 
-  const lines = useMemo<TerrainLine[]>(() => {
-    const out: TerrainLine[] = [];
+  const lines = useMemo<MapLine[]>(() => {
+    const out: MapLine[] = [];
     for (const d of trackLines ?? []) out.push({ id: `track-${d.key}`, points: d.pieces, color: d.color, width: 4 });
     if (following && following.length > 1) out.push({ id: 'following', points: following, color: Colors.accent, width: 5, casing: Colors.background, casingWidth: 9 });
     if (recorded.length > 1) out.push({ id: 'recorded', points: recorded, color: RECORD_INK, width: 4.5, casing: Colors.background, casingWidth: 8 });
@@ -118,7 +121,7 @@ export function NavTerrainMap({
   }, [trackLines, following, recorded, measure]);
 
   return (
-    <TerrainMap
+    <MapboxMap
       ref={map}
       trail={trail}
       initial={center ? { center, zoom: 13 } : null}
@@ -126,6 +129,7 @@ export function NavTerrainMap({
       onPress={(p) => (measuring ? onMeasure(p, snapRadiusM(mpp.current)) : trail.identifyAt(p.lat, p.lng))}
       onLongPress={(p) => (onLongPressMap ? onLongPressMap(p) : trail.identifyAt(p.lat, p.lng))}
       onUserMove={onUserMove}
+      scaleBar
       onReady={() => setReady(true)}
       onIdle={(c) => {
         mpp.current = c.metersPerPoint;
@@ -133,27 +137,41 @@ export function NavTerrainMap({
       }}>
       {/* The website draws the rider's own dot; the apps' map draws it (with its arrow) itself. */}
       {Platform.OS === 'web' && center ? (
-        <TerrainMarker at={center}>
+        <MapboxMarker at={center}>
           <View accessible accessibilityLabel="You are here" style={styles.me}>
             {meHeading != null ? <View style={[styles.meArrow, { transform: [{ rotate: `${Math.round(meHeading)}deg` }] }]} /> : null}
           </View>
-        </TerrainMarker>
+        </MapboxMarker>
       ) : null}
       {following && following.length > 1 ? (
         <>
-          <TerrainMarker at={following[0]}><View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: '#34C759' }]} /></TerrainMarker>
-          <TerrainMarker at={following[following.length - 1]}>
+          <MapboxMarker at={following[0]}><View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: '#34C759' }]} /></MapboxMarker>
+          <MapboxMarker at={following[following.length - 1]}>
             <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
-          </TerrainMarker>
+          </MapboxMarker>
         </>
       ) : null}
+      {(waypoints ?? []).map((w) => (
+        <MapboxMarker key={`w-${w.id}`} at={w}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            onPress={() => onPressWaypoint?.(w)}>
+            {w.planned_stop ? (
+              <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
+            ) : (
+              <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
+            )}
+          </Pressable>
+        </MapboxMarker>
+      ))}
       {measureTaps.map((p, i) => (
-        <TerrainMarker key={`m${i}`} at={p}>
+        <MapboxMarker key={`m${i}`} at={p}>
           <View style={styles.pin}><Text style={styles.pinText}>{i + 1}</Text></View>
-        </TerrainMarker>
+        </MapboxMarker>
       ))}
       {waypoints?.map((w) => (
-        <TerrainMarker key={`w-${w.id}`} at={w}>
+        <MapboxMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
@@ -164,25 +182,25 @@ export function NavTerrainMap({
               <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
             )}
           </Pressable>
-        </TerrainMarker>
+        </MapboxMarker>
       ))}
       {(obstacles ?? []).map((o) => (
-        <TerrainMarker key={o.id} at={o} anchor={{ x: 0.5, y: 1 }}>
+        <MapboxMarker key={o.id} at={o} anchor={{ x: 0.5, y: 1 }}>
           <Pressable accessibilityRole="button" accessibilityLabel={o.name} onPress={() => onObstacle?.(o)} style={{ alignItems: 'center', maxWidth: 180 }}>
             <Text style={[styles.obstacle, { borderColor: OBSTACLE_INK[o.kind] }]} numberOfLines={1}>{o.name}</Text>
             <View style={[styles.obstacleDot, { backgroundColor: OBSTACLE_INK[o.kind] }]} />
           </Pressable>
-        </TerrainMarker>
+        </MapboxMarker>
       ))}
       {found ? (
-        <TerrainMarker at={found} anchor={{ x: 0.5, y: 1 }}>
+        <MapboxMarker at={found} anchor={{ x: 0.5, y: 1 }}>
           <View accessible accessibilityLabel={`Search result: ${found.name}`} style={{ alignItems: 'center', maxWidth: 220 }}>
             <Text style={styles.found} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundDot} />
           </View>
-        </TerrainMarker>
+        </MapboxMarker>
       ) : null}
-    </TerrainMap>
+    </MapboxMap>
   );
 }
 

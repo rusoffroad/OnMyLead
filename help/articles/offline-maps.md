@@ -122,7 +122,7 @@ Download before you leave, while you have good signal. Then open the ride once s
 - **Trails**: Forest Service and BLM lines, plus OpenStreetMap tracks (map data © OpenStreetMap contributors).
 
 :::release 2.1
-- **3D Terrain**: Mapbox's satellite photos, land height, contour lines and names, saved by Mapbox inside the app. While it saves, the download shows **Saving 3D Terrain** and how far along it is. With no signal, Ride Mode and Map Mode show 3D only over an area with 3D Terrain saved; anywhere else they show the flat downloaded map.
+- **3D Terrain**: Mapbox's satellite photos, land height, contour lines and names, saved by Mapbox inside the app. While it saves, the download shows **Saving 3D Terrain** and how far along it is. With no signal, the Satellite and 3D Terrain styles show Mapbox's map only over an area with 3D Terrain saved; anywhere else, and in the Topo style, the app shows the flat downloaded map (USGS photos, topo and trails), so you always have a map.
 :::
 
 :::release 1.0.1

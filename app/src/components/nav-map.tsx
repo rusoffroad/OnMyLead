@@ -8,16 +8,16 @@ import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
 import type { DayLine } from '@/core/track-line';
-import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
-import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import {
   cameraCenterFor, OPENING_CHECK_MS, OPENING_DELTA, OPENING_START, openingMoveWanted, openingReached, openMapCenter, type OpeningCamera,
 } from '@/core/map-center';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
+import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { NavTerrainMap } from '@/components/nav-terrain-map';
+import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RouteEnds, RouteLine } from './route-overlay';
@@ -40,9 +40,9 @@ const toCoords = (pts: LatLng[]) => pts.map((p) => ({ latitude: p.lat, longitude
 
 type NavMapProps = Parameters<typeof FlatNavMap>[0];
 
-/** Map Mode's map: 3D Terrain when the rider picked it and it can show here, otherwise the flat map. */
+/** Map Mode's map: Mapbox when this build and the owner allow it and it can draw here, otherwise the flat map. */
 export function NavMap(props: NavMapProps) {
-  if (props.trail.terrain3d) return <NavTerrainMap {...props} />;
+  if (props.trail.mapbox) return <NavMapboxMap {...props} />;
   return <FlatNavMap {...props} />;
 }
 
@@ -249,6 +249,24 @@ function FlatNavMap({
           <Polyline coordinates={meas} strokeColor={MEASURE_INK} strokeWidth={3.5} lineDashPattern={[8, 5]} zIndex={6} tappable={false} />
         </>
       ) : null}
+      {(waypoints ?? []).map((w) => (
+        <Marker
+          key={`w-${w.id}`}
+          coordinate={{ latitude: w.lat, longitude: w.lng }}
+          anchor={{ x: 0.5, y: 0.5 }}
+          onPress={(e) => {
+            e.stopPropagation?.();
+            onPressWaypoint?.(w);
+          }}
+          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+          zIndex={w.planned_stop ? 4 : w.shared ? 3 : 2}>
+          {w.planned_stop ? (
+            <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
+          ) : (
+            <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
+          )}
+        </Marker>
+      ))}
       {measureTaps.map((p, i) => (
         <Marker key={`m${i}`} coordinate={{ latitude: p.lat, longitude: p.lng }} anchor={{ x: 0.5, y: 0.5 }} tappable={false} zIndex={7}>
           <View style={styles.pin}><Text style={styles.pinText}>{i + 1}</Text></View>

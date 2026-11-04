@@ -1,16 +1,26 @@
 import type { LatLng } from './geo';
-import type { Box } from './trails';
+import { TOPO_MAX_NATIVE_Z, USGS_TOPO, type BaseMap, type Box } from './trails';
 
 /**
- * 3D Terrain: the satellite map draped over the real shape of the land, with contour lines and
- * peak heights, on Ride Mode and Map Mode. Drawn by Mapbox on every device (iPhone and iPad with
- * @rnmapbox/maps, Android the same, the website with mapbox-gl), so it looks the same everywhere.
- * Everything here is plain data shared by those three maps, so it is written and tested once.
+ * The Mapbox map every screen draws (Ride Mode, Map Mode, the route builder, waypoints, Find a
+ * Ride, the area picker and the website's meeting-point picker), on every device (iPhone and iPad
+ * with @rnmapbox/maps, Android the same, the website with mapbox-gl), so a map looks the same
+ * everywhere. It has four looks (MapLook): the standard outdoors map for Free riders, Satellite,
+ * Topo (the USGS topo map drawn over Mapbox) and 3D Terrain: the satellite map draped over the
+ * real shape of the land, with contour lines and peak heights, tilted. Everything here is plain
+ * data shared by the native and web maps, so it is written and tested once.
  *
  * Mapbox is free up to 25,000 monthly riders on the apps and 50,000 website map loads a month.
- * The owner can switch 3D Terrain off for everyone with the `terrain_3d` flag (Admin > Settings),
- * and with no Mapbox token in the build the choice simply isn't offered.
+ * The owner can switch Mapbox off for everyone with the `mapbox_maps` flag (Admin > Settings) and
+ * 3D Terrain alone with `terrain_3d`; with no Mapbox token in the build nothing here is used and
+ * the Apple, Google and Leaflet maps draw instead (the flat maps), as before 2.1.
  */
+
+/** How the map looks: what Free riders get, then the three Map Style choices. */
+export type MapLook = 'standard' | 'satellite' | 'topo' | 'terrain';
+
+/** Mapbox's outdoors style: roads, trails, contours and hillshade on a light map. */
+export const OUTDOORS_STYLE_URL = 'mapbox://styles/mapbox/outdoors-v12';
 
 /** Satellite photos with roads and place names, Mapbox's own style. */
 export const TERRAIN_STYLE_URL = 'mapbox://styles/mapbox/satellite-streets-v12';
@@ -21,12 +31,87 @@ export const CONTOUR_TILESET = 'mapbox://mapbox.mapbox-terrain-v2';
 /** Peaks and their heights (layer `natural_label`, maki "mountain" or "volcano"). */
 export const STREETS_TILESET = 'mapbox://mapbox.mapbox-streets-v8';
 
+/** The Mapbox style each look starts from (Topo draws the USGS map over it, 3D Terrain raises it). */
+export const MAPBOX_STYLES: Record<MapLook, string> = {
+  standard: OUTDOORS_STYLE_URL,
+  satellite: TERRAIN_STYLE_URL,
+  topo: OUTDOORS_STYLE_URL,
+  terrain: TERRAIN_STYLE_URL,
+};
+
+export function mapboxStyleFor(look: MapLook): string {
+  return MAPBOX_STYLES[look];
+}
+
+/** The look a rider's Map Style choice gives: Free riders get the standard map (map layers are Pro). */
+export function lookFor(base: BaseMap, layersPro: boolean): MapLook {
+  return layersPro ? base : 'standard';
+}
+
+/** The look for a map that stays flat (the route builder, waypoints): 3D Terrain shows as plain satellite there. */
+export function flatLook(look: MapLook): MapLook {
+  return look === 'terrain' ? 'satellite' : look;
+}
+
+/** How far the map tilts for a look: only 3D Terrain is tilted. */
+export function lookPitch(look: MapLook): number {
+  return look === 'terrain' ? TERRAIN_PITCH : 0;
+}
+
+/** The USGS topo map as a Mapbox raster source, drawn over the outdoors style for the Topo look. */
+export const TOPO_SOURCE_ID = 'oml-usgs-topo';
+export const TOPO_LAYER_ID = 'oml-usgs-topo-layer';
+export const TOPO_RASTER_SOURCE = { type: 'raster', tiles: [USGS_TOPO], tileSize: 256, maxzoom: TOPO_MAX_NATIVE_Z } as const;
+
+/**
+ * Whether Mapbox draws the map now. With signal, whenever this build and the owner allow it. With
+ * no signal only over an area whose 3D Terrain was downloaded (Mapbox's own pack holds the
+ * satellite photos and land height for Satellite and 3D Terrain): anywhere else, or in the Topo
+ * and standard looks, the flat map shows, since it has the squares downloaded on the phone.
+ * Before the map knows where it is (`center` null) with no signal, it stays flat.
+ */
+export function mapboxDraws(opts: { available: boolean; look: MapLook; offline: boolean; center: LatLng | null; saved: Box[] }): boolean {
+  if (!opts.available) return false;
+  if (!opts.offline) return true;
+  if (opts.look !== 'satellite' && opts.look !== 'terrain') return false;
+  const c = opts.center;
+  return !!c && opts.saved.some((b) => insideBox(c, b));
+}
+
+/** A circle on the ground as a GeoJSON polygon (`n` corners), for a Mapbox fill layer. */
+export function circlePolygon(center: LatLng, meters: number, n = 64): GeoJSON.Feature<GeoJSON.Polygon> {
+  const latR = meters / 111_320;
+  const lngR = meters / (111_320 * Math.cos((center.lat * Math.PI) / 180));
+  const ring: [number, number][] = [];
+  for (let i = 0; i <= n; i++) {
+    const a = (i / n) * 2 * Math.PI;
+    ring.push([center.lng + lngR * Math.cos(a), center.lat + latR * Math.sin(a)]);
+  }
+  return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } };
+}
+
 /** Raised half again above real life, which reads as true on a phone-sized screen. */
 export const TERRAIN_EXAGGERATION = 1.5;
 /** How far the map tilts when 3D Terrain opens, in degrees from straight down. */
 export const TERRAIN_PITCH = 60;
 /** Mapbox lets the map tilt to 85; past about 75 a phone shows mostly sky. */
 export const TERRAIN_MAX_PITCH = 75;
+/** The most the terrain is raised, at the steepest tilt. */
+export const TERRAIN_MAX_EXAGGERATION = 3;
+
+/**
+ * How much to raise the terrain for a tilt (degrees from straight down): true to life looking
+ * down, the usual 1.5x where 3D Terrain opens, and up to 3x as a two-finger drag tilts the map
+ * further, so the steepness grows with the view.
+ */
+export function terrainExaggeration(pitch: number): number {
+  const p = Math.max(0, Math.min(TERRAIN_MAX_PITCH, pitch));
+  const ex = p <= TERRAIN_PITCH
+    ? 1 + (TERRAIN_EXAGGERATION - 1) * (p / TERRAIN_PITCH)
+    : TERRAIN_EXAGGERATION + (TERRAIN_MAX_EXAGGERATION - TERRAIN_EXAGGERATION) * ((p - TERRAIN_PITCH) / (TERRAIN_MAX_PITCH - TERRAIN_PITCH));
+  // In steps, so a map isn't re-rendered for every fraction of a degree.
+  return Math.round(ex * 20) / 20;
+}
 
 /** Source and layer ids the app adds on top of Mapbox's style. */
 export const TERRAIN_IDS = {
@@ -190,10 +275,7 @@ export function terrainShows(opts: {
   center: LatLng | null;
   saved: Box[];
 }): boolean {
-  if (!opts.picked || !opts.available) return false;
-  if (!opts.offline) return true;
-  const c = opts.center;
-  return !!c && opts.saved.some((b) => insideBox(c, b));
+  return opts.picked && mapboxDraws({ available: opts.available, look: 'terrain', offline: opts.offline, center: opts.center, saved: opts.saved });
 }
 
 /** Zooms a 3D Terrain download keeps: from a whole region down to riding close. */

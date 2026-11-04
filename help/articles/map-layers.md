@@ -11,6 +11,9 @@ sources:
   - app/src/core/trail-width.ts
   - app/src/lib/trail-width.ts
   - app/src/components/trail-tiles.tsx
+  - app/src/components/mapbox-map.tsx
+  - app/src/components/mapbox-map.web.tsx
+  - app/src/core/terrain.ts
   - app/src/components/trail-tiles.web.tsx
   - app/src/hooks/use-trail-map.ts
   - app/src/core/trails.ts
@@ -58,6 +61,14 @@ Tap it to open the **Map Style** panel. Tap it again to close the panel.
 :::
 
 Your choices are remembered on your phone and used on every map in the app.
+
+:::release 2.1
+## One Map Everywhere
+
+From 2.1 every map in the app, on iPhone, iPad, Android and onmylead.com, is drawn by Mapbox, so a map looks and works the same wherever you open it: the same satellite photos, the same topo, the same trail lines and names, and the same pinch, turn and tap. The website's Ride Mode now has the same live map as the apps.
+
+On a Free account the map is Mapbox's outdoors map, with roads, trails, contour lines and shaded hills. Satellite, Topo and 3D Terrain are Pro.
+:::
 
 ## Satellite or Topo
 

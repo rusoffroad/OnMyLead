@@ -1,12 +1,16 @@
 [
   {
     "version": "2.1",
-    "title": "3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
-    "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead.",
-    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint; the group gets a ding.",
+    "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
+    "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
+    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint; the group gets a ding.\n• All maps on Mapbox; tilt 3D taller.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "improved",
+        "text": "Every map in the app is now drawn by Mapbox: Ride Mode, Map Mode, the route builder, waypoints, Find a Ride and Offline Maps' area picker, on iPhone, iPad, Android and onmylead.com. A map looks and works the same wherever you open it, and the website's Ride Mode now shows the same live map as the phone. Free accounts get Mapbox's outdoors map with roads, trails and contours. The meeting-point map is on the phone and tablet too, a trail's page previews it on a real map, and in 3D Terrain tilting further raises the land."
+      },
       {
         "kind": "new",
         "text": "Edit Ride Details: the organizer or a co-organizer can change a ride's name, day, times, meeting point and details after creating it, from the ride page on the app and onmylead.com. Everyone on the ride gets a notification about a new time or meeting point, and the ride page shows what changed for a week. Once the ride is live, the day, times and meeting point are locked and the rest can still change."

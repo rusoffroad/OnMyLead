@@ -8,6 +8,7 @@ import type { Place } from '@/core/places';
 import { symbolInfo, symbolLabel, symbolSvgMarkup, warningTriangle, waypointSymbol, type WaypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { WaypointMapboxMap } from './waypoint-mapbox-map';
 import { drawRoute, esc, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { octagon } from './waypoint-blaze';
 
@@ -31,12 +32,20 @@ export const stopSign = (n: number | null, symbol: WaypointSymbol) =>
       : `<circle cx="31" cy="3" r="8.5" fill="#FFFFFF" stroke="${Colors.background}" stroke-width="1.5"/><g transform="translate(25.4 -2.6)">${symbolSvgMarkup(symbol, Colors.background, 11.2, true)}</g>`
   }</svg>`;
 
+type WaypointMapProps = Parameters<typeof FlatWaypointMap>[0];
+
+/** The waypoints map: Mapbox when this build and the owner allow it and it can draw here (use-trail-map mapbox), otherwise the flat map below. */
+export function WaypointMap(props: WaypointMapProps) {
+  if (props.trail.mapbox) return <WaypointMapboxMap {...props} />;
+  return <FlatWaypointMap {...props} />;
+}
+
 /**
  * The ride's waypoints on the web: satellite imagery, the route under them, the leader's planned
  * stops as numbered stop signs, over the same trail layers as the phone. Click anywhere to drop a
  * new one; click a blaze to open it.
  */
-export function WaypointMap({
+function FlatWaypointMap({
   waypoints, route, center, trail, onPressWaypoint, onLongPressMap, padding, found, onCenter,
 }: {
   waypoints: Waypoint[];

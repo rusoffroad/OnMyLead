@@ -8,16 +8,25 @@ import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { RouteBuilderMapboxMap } from './route-builder-mapbox-map';
 import { MarkerBody } from './marker-body';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
+
+type RouteBuilderMapProps = Parameters<typeof FlatRouteBuilderMap>[0];
+
+/** The route builder's map: Mapbox when this build and the owner allow it and it can draw here (use-trail-map mapbox), otherwise the flat map below. */
+export function RouteBuilderMap(props: RouteBuilderMapProps) {
+  if (props.trail?.mapbox) return <RouteBuilderMapboxMap {...props} trail={props.trail} />;
+  return <FlatRouteBuilderMap {...props} />;
+}
 
 /**
  * Satellite map for building a route: tap to add the next point, drag a point to move it.
  * An imported track is shown as is (no points to drag). Each tap carries how far it may snap to
  * a trail: about a fingertip at the zoom it was made.
  */
-export function RouteBuilderMap({
+function FlatRouteBuilderMap({
   points, waypoints, center, editable, onAdd, onMove, trail, pending = [], found, onCenter,
 }: {
   points: LatLng[];
