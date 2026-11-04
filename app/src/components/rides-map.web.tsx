@@ -79,10 +79,10 @@ function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onO
   useEffect(() => flyTo(frame), [frameKey]);
 
   // Always satellite here, as on the phone; trails follow the rider's Map Layers choice.
-  const { trails, osmLines, closedLines, labels } = trail;
+  const { trails, agencyLayers, osmLines, closedLines, labels } = trail;
   useEffect(() => {
-    tracks.current?.update({ base: 'satellite', trails, osmLines, closedLines, labels });
-  }, [trails, osmLines, closedLines, labels]);
+    tracks.current?.update({ base: 'satellite', trails, agencyLayers, osmLines, closedLines, labels });
+  }, [trails, agencyLayers, osmLines, closedLines, labels]);
 
   useEffect(() => {
     const g = layer.current;

@@ -31,7 +31,7 @@ import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
 import { DEFAULT_FEED_SETTINGS, FEED_NOT_SWITCHED_ON, type FeedSettings } from '@/core/feed';
 import type { SocialItem } from '@/core/social';
 import type { GroupChatSummary } from '@/core/group-chat';
-import { createQuota, findCount, firstName, greeting, parseRadius, RADIUS_STORAGE_KEY, toolkitFor } from '@/core/home';
+import { createQuota, findCount, firstName, greeting, parseRadius, RADIUS_STORAGE_KEY, shortHome, toolkitFor } from '@/core/home';
 import { historySplit } from '@/core/pro';
 import { rowActionFor } from '@/core/row-swipe';
 import { TRACK_LINE_SWITCH_KEY } from '@/core/track-line';
@@ -281,11 +281,15 @@ export default function HomeScreen() {
     </View>
   );
 
-  const hello = (
+  // Small phones leave the greeting out so the five actions below still fit on one screen.
+  const short = !layout.wide && shortHome(layout.height);
+  const hello = short && friendsOut === 0 ? null : (
     <View style={{ gap: 6 }}>
-      <Text style={styles.hello} accessibilityRole="header">
-        {t(greeting())}{name ? `, ${name}` : ''}
-      </Text>
+      {short ? null : (
+        <Text style={styles.hello} accessibilityRole="header">
+          {t(greeting())}{name ? `, ${name}` : ''}
+        </Text>
+      )}
       {friendsOut > 0 ? (
         <Pressable accessibilityRole="link" onPress={() => router.push('/out-riding')} style={styles.pulseRow}>
           <View style={styles.pulse} />
@@ -322,8 +326,10 @@ export default function HomeScreen() {
     </>
   );
 
+  // Join, then Create and Find, then Events, then Map Mode, all on one phone screen without
+  // scrolling (Chris 2026-11-04, mock approved). The sign-in link for visitors comes after them.
   const actions = (
-    <>
+    <View style={{ gap: 12 }}>
       <JoinHero code={code} onCode={setCode} onOpen={openCode} />
       <ActionTiles
         quota={session ? createQuota(ent) : null}
@@ -334,12 +340,12 @@ export default function HomeScreen() {
         onCreate={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
         onFind={() => router.push('/find')}
       />
-      {navOn ? <MapModeCard trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       <EventsCard signedIn={!!session} radius={radius} />
+      {navOn ? <MapModeCard trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       {!loading && !session ? (
         <Button title={t('Sign In or Create a Free Account')} kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
-    </>
+    </View>
   );
 
   const ridesBlock = (
@@ -474,13 +480,15 @@ export default function HomeScreen() {
     <>
       <Screen top width={layout.expanded ? 'wide' : 'readable'}>
         <View style={{ gap: 28 }}>
-          {header}
+          {layout.expanded ? header : null}
           {layout.expanded ? (
             <View style={styles.columns}>
               <View style={styles.column}>
-                {hello}
-                {nudgeAndLive}
-                {actions}
+                <View style={styles.lead}>
+                  {hello}
+                  {nudgeAndLive}
+                  {actions}
+                </View>
                 {toolkitBlock}
                 <HelpRow />
               </View>
@@ -495,9 +503,12 @@ export default function HomeScreen() {
             </View>
           ) : (
             <>
-              {hello}
-              {nudgeAndLive}
-              {actions}
+              <View style={styles.lead}>
+                {header}
+                {hello}
+                {nudgeAndLive}
+                {actions}
+              </View>
               {ridesBlock}
               {groupBlock}
               {publicBlock}
@@ -534,11 +545,13 @@ const styles = themedStyles(() => ({
   logo: { width: 150, height: 52 },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(230,194,122,0.5)', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  hello: { color: Colors.text, fontFamily: font(600), fontSize: 28, lineHeight: 33 },
+  hello: { color: Colors.text, fontFamily: font(600), fontSize: 24, lineHeight: 29 },
   pulseRow: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start' },
   pulse: { width: 8, height: 8, borderRadius: 4, backgroundColor: Home.mint },
   columns: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.five },
   column: { flex: 1, minWidth: 0, gap: 28 },
+  /** The top of Home (logo, greeting, Join, Create, Find, Events, Map Mode): tighter, so it fits on one screen. */
+  lead: { gap: 12 },
   live: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, borderWidth: 2, borderColor: Colors.accent, padding: 14, backgroundColor: Home.panel },
   liveDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.accent },
   nudge: {

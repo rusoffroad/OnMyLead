@@ -25,6 +25,10 @@ keywords: [home, home screen, rides tab, main screen, feed, activity, customize 
 
 The **Rides** tab is your home screen. It puts the three things riders do most at the top (join, create and find a ride), then Map Mode, events, your rides, your crew and what your friends have been up to.
 
+:::release 2.1
+Join a Ride, Create a Ride, Find a Ride, Events and Map Mode all fit on the first screen, without scrolling, in that order. Scroll down for your rides, your crew and what your friends have been up to. On small phones like the iPhone SE, the greeting line is left out to make room.
+:::
+
 ## At the Top
 
 - **Good morning**, **Good afternoon** or **Good evening** with your ride name. When friends are out riding, a line under it says how many. Tap it for [Who's Riding](/help/out-riding).
@@ -42,15 +46,33 @@ When one of your rides is live, a card says **Your ride is live. Tap to open Rid
 
 ## Events
 
-Under Join, Create, Find and Map Mode, the gold **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
+:::until 2.1
+Under Join, Create, Find and Map Mode, the gold **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up.
+:::
+
+:::release 2.1
+Right under **Create a Ride** and **Find a Ride**, the gold **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up.
+:::
+
+See [Events](/help/events).
 
 ## Map Mode
 
+:::until 2.1
 Your offroad map for when you're not on a group ride. It's the blue card right under **Create a Ride** and **Find a Ride**, and shows how many rider trails are near you when location is allowed.
+:::
+
+:::release 2.1
+Your offroad map for when you're not on a group ride. It's the blue card under **Events**.
+:::
 
 - **Open Map Mode** opens Map Mode. The blue **Map Mode** button in the tab bar opens it too, from any tab.
 - **Map a Custom Trail** opens Map Mode ready to draw a trail that isn't marked on any map.
 - **Track Line** draws where you've been, a new colour each day: today red, yesterday blue, older days gold.
+
+:::release 2.1
+The **Track Line** switch is the small switch in the top corner of the Map Mode card. Tap it to turn the line on or off.
+:::
 
 See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
 
@@ -127,7 +149,7 @@ Opens Help and Support. At the top, **Help Center: How-To Guides** opens these s
 
 ## On a Tablet
 
-In landscape, and on a big window, Home has two columns: join, create, find, Map Mode, events, your toolkit and help on the left; your rides, group, public rides, feed and badges on the right. In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+In landscape, and on a big window, Home has two columns: join, create, find, events, Map Mode, your toolkit and help on the left; your rides, group, public rides, feed and badges on the right. In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 
 ## On the Website
 
