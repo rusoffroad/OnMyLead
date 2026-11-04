@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Settings that follow the rider's account: change one on the iPhone and the iPad, the Android
  * phone, the tablet and onmylead.com pick it up the next time they sync (lib/settings-sync.ts,
@@ -233,18 +235,18 @@ export function areasToOffer(values: (string | null)[], onDevice: { id: string; 
 
 /** The You tab's line under Sync Across Devices. */
 export function syncSummary(s: { lastSyncedAt: number | null; syncing: boolean; failed: boolean }, now: number): string {
-  if (s.syncing) return 'Syncing now…';
+  if (s.syncing) return tc('Syncing now…');
   const when = s.lastSyncedAt == null ? null : agoText(now - s.lastSyncedAt);
-  if (s.failed) return when ? `Waiting for signal. Last synced ${when}` : 'Waiting for signal to sync';
-  return when ? `Settings and trails on all your devices. Synced ${when}` : 'Settings and trails on all your devices';
+  if (s.failed) return when ? tc('Waiting for signal. Last synced {when}', { when }) : tc('Waiting for signal to sync');
+  return when ? tc('Settings and trails on all your devices. Synced {when}', { when }) : tc('Settings and trails on all your devices');
 }
 
 export function agoText(ms: number): string {
   const m = Math.floor(Math.max(0, ms) / 60_000);
-  if (m < 1) return 'just now';
-  if (m < 60) return `${m} min ago`;
+  if (m < 1) return tc('just now');
+  if (m < 60) return tc('{m} min ago', { m });
   const h = Math.floor(m / 60);
-  if (h < 24) return h === 1 ? '1 hour ago' : `${h} hours ago`;
+  if (h < 24) return h === 1 ? tc('1 hour ago') : tc('{h} hours ago', { h });
   const d = Math.floor(h / 24);
-  return d === 1 ? 'yesterday' : `${d} days ago`;
+  return d === 1 ? tc('yesterday') : tc('{d} days ago', { d });
 }

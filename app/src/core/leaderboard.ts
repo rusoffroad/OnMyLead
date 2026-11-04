@@ -7,6 +7,7 @@
 import { areaLabel, countryName, stateName } from './areas';
 import { parseBadgeRows, RANKS, topBadge, type BadgeKey, type BadgeLevel } from './badges';
 
+import { tc } from './i18n';
 export type LeaderRow = {
   place: number;
   userId: string;
@@ -46,7 +47,7 @@ function parseRow(raw: unknown): LeaderRow | null {
   return {
     place,
     userId: r.user_id,
-    name: typeof r.name === 'string' && r.name.trim() ? r.name : 'Rider',
+    name: typeof r.name === 'string' && r.name.trim() ? r.name : tc('Rider'),
     levels: num(r.levels),
     gold: num(r.gold),
     silver: num(r.silver),
@@ -98,8 +99,8 @@ export function rankName(levels: number): string {
 
 /** "Everywhere", "United States", "Texas". */
 export function filterTitle(f: LeaderFilter): string {
-  if (!f.country) return 'Everywhere';
-  return (f.state ? stateName(f.country, f.state) : countryName(f.country)) ?? 'Everywhere';
+  if (!f.country) return tc('Everywhere');
+  return (f.state ? stateName(f.country, f.state) : countryName(f.country)) ?? tc('Everywhere');
 }
 
 /** The filter a rider starts on: their own state if they picked one, else their country, else everywhere. */
@@ -124,11 +125,11 @@ export function ordinal(n: number): string {
 
 /** What the rider's own card says about where they stand on this board. */
 export function myStanding(board: Leaderboard | null, settings: LeaderSettings | null, filter: LeaderFilter): string {
-  if (settings && !settings.shown) return 'You’re hidden from the leaderboard. Turn on Show Me to be listed.';
-  if (board?.me) return `You’re ${ordinal(board.me.place)} of ${board.total} in ${filterTitle(filter)}.`;
+  if (settings && !settings.shown) return tc('You’re hidden from the leaderboard. Turn on Show Me to be listed.');
+  if (board?.me) return tc('You’re {v} of {total} in {v2}.', { v: ordinal(board.me.place), total: board.total, v2: filterTitle(filter) });
   if (filter.country && settings && (settings.country !== filter.country || (filter.state && settings.state !== filter.state))) {
     const where = areaLabel(settings.country, settings.state);
-    return where ? `You ride from ${where}, so you’re not on this board.` : 'Pick where you ride from to be on country and state boards.';
+    return where ? tc('You ride from {where}, so you’re not on this board.', { where }) : tc('Pick where you ride from to be on country and state boards.');
   }
-  return 'Earn your first badge level to get on the board.';
+  return tc('Earn your first badge level to get on the board.');
 }

@@ -15,6 +15,7 @@ import { RiderPin } from './rider-pin';
 import { TerrainMap, TerrainMarker, type TerrainLine, type TerrainMapHandle, type TerrainOwnFix } from './terrain-map';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
+import { t } from '@/lib/i18n';
 type Inset = { top: number; right: number; bottom: number; left: number };
 
 /**
@@ -181,10 +182,10 @@ function RouteEnds3d({ points }: { points: LatLng[] }) {
   return (
     <>
       <TerrainMarker at={a}>
-        <View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: RideColors.green }]} />
+        <View accessible accessibilityLabel={t('Start')} style={[styles.end, { backgroundColor: RideColors.green }]} />
       </TerrainMarker>
       <TerrainMarker at={b}>
-        <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}>
+        <View accessible accessibilityLabel={t('Finish')} style={[styles.end, { backgroundColor: Colors.text }]}>
           <View style={styles.finishCore} />
         </View>
       </TerrainMarker>

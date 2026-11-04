@@ -13,6 +13,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
 import { TerrainMap, TerrainMarker, type TerrainLine, type TerrainMapHandle } from './terrain-map';
 
+import { t } from '@/lib/i18n';
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
 
 const RECORD_INK = '#F6F1E3';
@@ -126,16 +127,16 @@ export function NavTerrainMap({
       {/* The website draws the rider's own dot; the apps' map draws it (with its arrow) itself. */}
       {Platform.OS === 'web' && center ? (
         <TerrainMarker at={center}>
-          <View accessible accessibilityLabel="You are here" style={styles.me}>
+          <View accessible accessibilityLabel={t('You are here')} style={styles.me}>
             {meHeading != null ? <View style={[styles.meArrow, { transform: [{ rotate: `${Math.round(meHeading)}deg` }] }]} /> : null}
           </View>
         </TerrainMarker>
       ) : null}
       {following && following.length > 1 ? (
         <>
-          <TerrainMarker at={following[0]}><View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: '#34C759' }]} /></TerrainMarker>
+          <TerrainMarker at={following[0]}><View accessible accessibilityLabel={t('Start')} style={[styles.end, { backgroundColor: '#34C759' }]} /></TerrainMarker>
           <TerrainMarker at={following[following.length - 1]}>
-            <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
+            <View accessible accessibilityLabel={t('Finish')} style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
           </TerrainMarker>
         </>
       ) : null}

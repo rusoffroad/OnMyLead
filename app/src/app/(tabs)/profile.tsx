@@ -259,7 +259,7 @@ export default function You() {
           <MenuRow
             icon="bluetooth"
             color={Colors.sky}
-            title="Bluetooth Sharing"
+            title={t('Bluetooth Sharing')}
             detail={bluetoothMine
               ? 'With no service, Ride Mode passes spots and alerts to nearby riders on your ride'
               : 'Off. Turn it on to keep sharing with nearby riders when there is no service'}
@@ -270,7 +270,7 @@ export default function You() {
                 trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
                 thumbColor="#FFFFFF"
                 {...({ activeThumbColor: '#FFFFFF' } as object)}
-                accessibilityLabel="Bluetooth Sharing"
+                accessibilityLabel={t('Bluetooth Sharing')}
               />
             }
           />

@@ -142,13 +142,13 @@ function LeaderboardLink() {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Leaderboard. See where you rank in your state, your country and everywhere"
+      accessibilityLabel={t('Leaderboard. See where you rank in your state, your country and everywhere')}
       onPress={() => router.push('/leaderboard')}
       style={({ pressed }) => [styles.leaderLink, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <Icon name="trophy" size={26} color={PATCH_COLORS[3].cloth} />
       <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.leaderTitle}>Leaderboard</Text>
-        <ThemedText type="small" themeColor="textSecondary">See where you rank in your state, your country and everywhere</ThemedText>
+        <Text style={styles.leaderTitle}>{t('Leaderboard')}</Text>
+        <ThemedText type="small" themeColor="textSecondary">{t('See where you rank in your state, your country and everywhere')}</ThemedText>
       </View>
       <Icon name="chevron" size={18} color={Colors.textSecondary} />
     </Pressable>

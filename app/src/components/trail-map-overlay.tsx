@@ -135,13 +135,13 @@ function LayersPanel({
               key={b}
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
-              accessibilityLabel={BASE_NAME[b]}
+              accessibilityLabel={tr(BASE_NAME[b])}
               onPress={() => requirePro('map_layers') && trail.setBase(b)}
               style={({ pressed }) => [styles.base, pressed && { opacity: 0.8 }]}>
               <View style={[styles.baseThumb, on && styles.baseThumbOn]}>
                 <StyleThumb base={b} />
               </View>
-              <Text style={[styles.baseText, on && { color: Colors.text }]}>{BASE_NAME[b]}</Text>
+              <Text style={[styles.baseText, on && { color: Colors.text }]}>{tr(BASE_NAME[b])}</Text>
             </Pressable>
           );
         })}

@@ -205,10 +205,10 @@ export function terrainBoxes(maps: OfflineMap[]): Box[] {
 export function statusLine(m: OfflineMap): string {
   const flat = flatStatusLine(m);
   if (m.terrain === 'saving' && m.status !== 'downloading' && m.status !== 'paused') {
-    return `Saving 3D Terrain, ${Math.floor(m.terrainPct ?? 0)}%`;
+    return tc('Saving 3D Terrain, {v}%', { v: Math.floor(m.terrainPct ?? 0) });
   }
-  if (m.terrain === 'failed') return m.total ? `${flat}, 3D Terrain Not Saved` : '3D Terrain Not Saved';
-  if (m.terrain === 'saved' && !m.total) return '3D Terrain Saved';
+  if (m.terrain === 'failed') return m.total ? tc('{flat}, 3D Terrain Not Saved', { flat }) : tc('3D Terrain Not Saved');
+  if (m.terrain === 'saved' && !m.total) return tc('3D Terrain Saved');
   return flat;
 }
 
