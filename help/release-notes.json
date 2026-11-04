@@ -3,10 +3,22 @@
     "version": "2.1",
     "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
-    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages phone to phone.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint; the group gets a ding.\n• Map Features: roads, hiking, land.\n• CarPlay: status taps and your group on the car screen.",
+    "whatsNew": "What's new in 2.1:\n\n• New rider dot with the arrow built in; leader blue, tail gunner violet.\n• Map zooms in at intersections, then back out.\n• Edit Ride Details later.\n• Bluetooth Sharing: no service? Your ride still gets your spot, taps, EMERGENCY and messages, phone to phone.\n• Badge Leaderboard: your rank everywhere or in your state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint.\n• Map Features: roads, hiking, land.\n• CarPlay support.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "A new rider dot with the arrow built in: every live rider is a glossy disc with a white rim and a white arrow pointing the way they're heading, and it keeps pointing their last way while they're stopped. The leader is the biggest dot, in blue; the tail gunner is next, in violet; everyone else is graphite. Your own dot is cyan with a soft beam ahead of it, and its arrow always shows which way you're facing: the way you're riding while you move, your phone's compass when you stop."
+      },
+      {
+        "kind": "improved",
+        "text": "The map keeps up with you without jumping: your dot moves through the middle of the map, the map zooms out one step the first time you near an edge, and after that it slides to keep you on screen with more of the way ahead showing. Center on Me starts that over."
+      },
+      {
+        "kind": "new",
+        "text": "Zoom In at Intersections: while the map follows you, it zooms in as you come up on a junction of roads or trails so you can see the turn, then zooms back out once you're through. On by default; turn it off in the You tab under On the Trail."
+      },
       {
         "kind": "new",
         "text": "Scout: find places to ride. Tap Places to Ride at the top of the Find tab to see off-road parks, OHV areas, trail systems, trailheads and motocross tracks around you, 250 miles out to start; slide the distance anywhere from 10 to 1,000 miles. Filter by kind, tap a place for directions, its website and the public rides coming up there, or tap Create a Ride Here to start one with the meeting point already set. Places come from the Forest Service, BLM and OpenStreetMap, and you can suggest one we're missing. Also on onmylead.com."

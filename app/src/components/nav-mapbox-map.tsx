@@ -13,6 +13,7 @@ import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
+import { useFollowCamera } from './use-follow-camera';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle } from './mapbox-map';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
@@ -30,7 +31,7 @@ const FOLLOW_MS = followCamDurationMs(1000);
  * which one draws.
  */
 export function NavMapboxMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove,
   trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
 }: {
   trail: TrailMap;
@@ -46,6 +47,7 @@ export function NavMapboxMap({
   padding?: [number, number, number, number];
   followMe?: LatLng | null;
   onUserMove?: () => void;
+  /** The flat maps draw the rider's arrow from this; the Mapbox map draws your dot (with its arrow) itself. */
   meHeading?: number | null;
   trackLines?: DayLine[];
   obstacles?: Obstacle[];
@@ -72,9 +74,12 @@ export function NavMapboxMap({
   // Meters per point where the map last came to rest, for the distance finder's snap radius.
   const mpp = useRef(12);
 
+  const cam = useFollowCamera(map);
   useImperativeHandle(ref, () => ({
     centerOn(p) {
       followed.current = p;
+      // Center on Me allows the one zoom out again.
+      cam.stop();
       map.current?.centerOn(p, undefined, { zoom: 13.5 });
     },
     fit(points) {
@@ -90,15 +95,20 @@ export function NavMapboxMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center, ready]);
 
-  // Follow-me camera, as on the flat map.
+  // Follow-me camera (core/follow-camera): zoom out once, then move the map to keep the dot on
+  // screen, and zoom in at intersections when that's on. Course and speed come from the map's own fix.
+  const own = useRef<{ course: number | null; speed: number | null }>({ course: null, speed: null });
   useEffect(() => {
     if (!followMe) {
+      if (followed.current) cam.stop();
       followed.current = null;
       return;
     }
     if (!followCamShouldMove(followed.current, followMe)) return;
+    const first = !followed.current;
     followed.current = followMe;
-    map.current?.centerOn(followMe, inset, { duration: FOLLOW_MS });
+    if (first) cam.start(followMe, inset);
+    else void cam.step({ ...followMe, ...own.current }, inset, FOLLOW_MS);
     // Only when the followed spot moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [followMe]);
@@ -132,18 +142,13 @@ export function NavMapboxMap({
       onUserMove={onUserMove}
       scaleBar
       onReady={() => setReady(true)}
+      onOwnFix={(f) => {
+        own.current = { course: f.course, speed: f.speed };
+      }}
       onIdle={(c) => {
         mpp.current = c.metersPerPoint;
         onCenter?.(c.center);
       }}>
-      {/* The website draws the rider's own dot; the apps' map draws it (with its arrow) itself. */}
-      {Platform.OS === 'web' && center ? (
-        <MapboxMarker at={center}>
-          <View accessible accessibilityLabel={t('You are here')} style={styles.me}>
-            {meHeading != null ? <View style={[styles.meArrow, { transform: [{ rotate: `${Math.round(meHeading)}deg` }] }]} /> : null}
-          </View>
-        </MapboxMarker>
-      ) : null}
       {following && following.length > 1 ? (
         <>
           <MapboxMarker at={following[0]}><View accessible accessibilityLabel={t('Start')} style={[styles.end, { backgroundColor: '#34C759' }]} /></MapboxMarker>
@@ -206,14 +211,6 @@ export function NavMapboxMap({
 }
 
 const styles = themedStyles(() => ({
-  me: {
-    width: 18, height: 18, borderRadius: 9, backgroundColor: '#2F80FF', borderWidth: 3, borderColor: '#FFFFFF',
-    alignItems: 'center', justifyContent: 'flex-start',
-  },
-  meArrow: {
-    position: 'absolute', top: -14, width: 0, height: 0, borderLeftWidth: 7, borderRightWidth: 7, borderBottomWidth: 10,
-    borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: '#FFFFFF',
-  },
   end: { width: 20, height: 20, borderRadius: 10, borderWidth: 3, borderColor: Colors.background, alignItems: 'center', justifyContent: 'center' },
   finishCore: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.background },
   pin: {

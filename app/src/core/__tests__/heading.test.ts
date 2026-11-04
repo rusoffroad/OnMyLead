@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ownFix, riderHeading, screenAngle } from '../heading';
+import { heldHeading, HELD_HEADING_MS, ownArrow, ownFix, riderHeading, screenAngle } from '../heading';
 
 describe('riderHeading', () => {
   it('uses the GPS course while a live rider is moving', () => {
@@ -49,5 +49,24 @@ describe('ownFix', () => {
   it('ignores a dot with no position', () => {
     expect(ownFix(null)).toBeNull();
     expect(ownFix({ latitude: null, longitude: -109.5 })).toBeNull();
+  });
+});
+
+describe('the arrow on your own dot always shows', () => {
+  it('uses the GPS course while moving, the compass when stopped, else the last course', () => {
+    expect(ownArrow({ speedMps: 10, headingDeg: 45 }, 300, null)).toEqual({ deg: 45, moving: true });
+    expect(ownArrow({ speedMps: 0, headingDeg: -1 }, 300, 45)).toEqual({ deg: 300, moving: false });
+    expect(ownArrow({ speedMps: 0, headingDeg: -1 }, null, 45)).toEqual({ deg: 45, moving: false });
+    expect(ownArrow(null, -1, null)).toEqual({ deg: null, moving: false });
+  });
+});
+
+describe("other riders' arrows stay on after they stop", () => {
+  it('holds the last heading while live, for a while', () => {
+    const h = heldHeading(null, { speedMps: 10, headingDeg: 90 }, true, 0);
+    expect(h).toEqual({ deg: 90, at: 0 });
+    expect(heldHeading(h, { speedMps: 0, headingDeg: -1 }, true, 60_000)).toBe(h);
+    expect(heldHeading(h, { speedMps: 0, headingDeg: -1 }, true, HELD_HEADING_MS + 1)).toBeNull();
+    expect(heldHeading(h, { speedMps: 10, headingDeg: 90 }, false, 1)).toBeNull();
   });
 });

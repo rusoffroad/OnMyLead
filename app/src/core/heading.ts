@@ -40,3 +40,38 @@ export function ownFix(
   if (!c || c.latitude == null || c.longitude == null || !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return null;
   return { lat: c.latitude, lng: c.longitude, headingDeg: riderHeading({ speedMps: c.speed, headingDeg: c.heading }, true) };
 }
+
+/**
+ * The arrow on this phone's own dot, which always shows (2.1): the GPS course while moving faster
+ * than a walk, else the phone's compass (the way the phone faces), else the last course it had.
+ * `moving` tells the dot to draw its long beam rather than the short one.
+ */
+export function ownArrow(
+  fix: { speedMps?: number | null; headingDeg?: number | null } | null | undefined,
+  compassDeg: number | null | undefined,
+  lastCourseDeg: number | null | undefined,
+): { deg: number | null; moving: boolean } {
+  const course = riderHeading(fix, true);
+  if (course != null) return { deg: course, moving: true };
+  if (compassDeg != null && Number.isFinite(compassDeg) && compassDeg >= 0) return { deg: ((compassDeg % 360) + 360) % 360, moving: false };
+  return { deg: lastCourseDeg ?? null, moving: false };
+}
+
+/** How long another rider's dot keeps pointing their last way after they slow down (ms). */
+export const HELD_HEADING_MS = 10 * 60_000;
+
+/**
+ * Another rider's arrow: their heading while moving, and their last heading for a while after they
+ * stop (phones send no direction when standing still), so the arrow stays on while they're live.
+ */
+export function heldHeading(
+  prev: { deg: number; at: number } | null | undefined,
+  fix: { speedMps?: number | null; headingDeg?: number | null } | null | undefined,
+  live: boolean,
+  nowMs: number,
+): { deg: number; at: number } | null {
+  if (!live) return null;
+  const h = riderHeading(fix, true);
+  if (h != null) return { deg: h, at: nowMs };
+  return prev && nowMs - prev.at <= HELD_HEADING_MS ? prev : null;
+}

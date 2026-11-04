@@ -10,6 +10,7 @@ import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
 import type { GroupMapHandle, MapRider } from './group-map-types';
+import { useFollowCamera } from './use-follow-camera';
 import { useGlide } from './use-glide';
 import { RiderPin } from './rider-pin';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle, type MapboxOwnFix } from './mapbox-map';
@@ -68,34 +69,39 @@ export function GroupMapboxMap({
     onUserMove?.();
   }, [onUserMove]);
 
+  const cam = useFollowCamera(map);
   useImperativeHandle(ref, () => ({
     centerOn: async (p, inset, opts) => {
       fitted.current = 'route';
+      // Center on Me allows the follow camera's one zoom out again.
+      cam.stop();
       map.current?.centerOn(p, inset, opts);
     },
-  }), []);
+  }), [cam]);
 
-  // Follow Me: keep the rider's own spot in the open map as they move (jitter under a couple of meters skipped).
+  // Follow Me: keep the rider's own spot on screen as they move (core/follow-camera: zoom out
+  // once, then move the map), zooming in at intersections when that's on (jitter under a couple of meters skipped).
   const onOwnFix = useCallback((f: MapboxOwnFix) => {
     lastFix.current = { lat: f.lat, lng: f.lng };
     const fl = followRef.current;
     if (!fl || !followCamShouldMove(followed.current, f)) return;
     followed.current = { lat: f.lat, lng: f.lng };
     fitted.current = 'route';
-    map.current?.centerOn(f, fl.inset, { duration: followCamDurationMs(everyMs.current) });
-  }, []);
+    void cam.step(f, fl.inset, followCamDurationMs(everyMs.current));
+  }, [cam]);
   const followOn = !!follow;
   useEffect(() => {
     if (!followOn) {
       followed.current = null;
+      cam.stop();
       return;
     }
     const f = lastFix.current;
     if (f && followRef.current) {
       followed.current = f;
-      map.current?.centerOn(f, followRef.current.inset);
+      cam.start(f, followRef.current.inset);
     }
-  }, [followOn]);
+  }, [followOn, cam]);
 
   // Frame the group (and the route) once, as the flat map does; then the rider's moves win.
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   FOLLOW_CAM_START, FOLLOW_ME_LABEL, FOLLOW_NEAR_M, followCamActive, followCamReducer, followCamShouldMove, followMeStatus, followMeTap,
-  nearFollowedTrail, type FollowCamEvent,
+  nearFollowedTrail, type FollowCamEvent, FOLLOW_FRAME_START, FOLLOW_MIN_ZOOM, followBox, followFrameAfter, followMove, insideFollowBox, leadInset,
 } from '../follow-camera';
 
 const run = (...events: FollowCamEvent[]) => events.reduce(followCamReducer, FOLLOW_CAM_START);
@@ -81,5 +81,58 @@ describe('Follow Me switch', () => {
     expect(followMeTap('off')).toBe('turn-on');
     expect(followMeTap('paused')).toBe('resume');
     expect(followMeTap('following')).toBe('turn-off');
+  });
+});
+
+describe('keeping the dot on screen: zoom out once, then move the map', () => {
+  const size = { width: 400, height: 800 };
+  const inset = { top: 100, right: 0, bottom: 300, left: 0 };
+  // Open map: x 0-400, y 100-500; box: x 80-320, y 180-420.
+
+  it('leaves the map alone while the dot is in the middle', () => {
+    expect(followMove(FOLLOW_FRAME_START, { pt: { x: 200, y: 300 }, size, inset, zoom: 14, screenHeadingDeg: 0 })).toEqual({ kind: 'stay' });
+    expect(insideFollowBox({ x: 81, y: 419 }, size, inset)).toBe(true);
+  });
+
+  it('zooms out one step the first time the dot nears an edge', () => {
+    const m = followMove(FOLLOW_FRAME_START, { pt: { x: 200, y: 150 }, size, inset, zoom: 14, screenHeadingDeg: 0 });
+    expect(m).toEqual({ kind: 'zoom-out', zoom: 13 });
+    expect(followFrameAfter(FOLLOW_FRAME_START, m)).toEqual({ zoomedOut: true });
+  });
+
+  it('moves the map every time after that, never zooming out again', () => {
+    const frame = { zoomedOut: true };
+    const m = followMove(frame, { pt: { x: 380, y: 300 }, size, inset, zoom: 13, screenHeadingDeg: 90 });
+    expect(m.kind).toBe('pan');
+    expect(followFrameAfter(frame, m)).toBe(frame);
+  });
+
+  it('moves instead of zooming while zoomed in at a junction, when too far out, or when the dot is way off screen', () => {
+    expect(followMove(FOLLOW_FRAME_START, { pt: { x: 0, y: 300 }, size, inset, zoom: 17, screenHeadingDeg: 0, noZoomOut: true }).kind).toBe('pan');
+    expect(followMove(FOLLOW_FRAME_START, { pt: { x: 0, y: 300 }, size, inset, zoom: FOLLOW_MIN_ZOOM + 0.5, screenHeadingDeg: 0 }).kind).toBe('pan');
+    expect(followMove(FOLLOW_FRAME_START, { pt: { x: 5000, y: 300 }, size, inset, zoom: 14, screenHeadingDeg: 0 }).kind).toBe('pan');
+  });
+
+  it('keeps the dot in view when the map cannot say where it is', () => {
+    expect(followMove(FOLLOW_FRAME_START, { pt: null, size, inset, zoom: 14, screenHeadingDeg: null })).toEqual({ kind: 'pan', inset });
+  });
+
+  it('puts the dot behind the middle so the way ahead has room', () => {
+    // Heading up the screen: the dot goes below the middle, so the top inset grows.
+    const up = leadInset(inset, size, 0);
+    expect(up.top).toBeGreaterThan(inset.top);
+    expect(up.bottom).toBe(inset.bottom);
+    // Heading right: the dot goes left of the middle, so the right inset grows.
+    const right = leadInset(inset, size, 90);
+    expect(right.right).toBeGreaterThan(0);
+    expect(right.left).toBe(0);
+    expect(Math.round(right.top)).toBe(inset.top);
+    expect(leadInset(inset, size, null)).toBe(inset);
+  });
+
+  it('never turns the box inside out on a tiny open map', () => {
+    const b = followBox({ width: 100, height: 100 }, { top: 40, right: 40, bottom: 40, left: 40 });
+    expect(b.left).toBeLessThanOrEqual(b.right);
+    expect(b.top).toBeLessThanOrEqual(b.bottom);
   });
 });

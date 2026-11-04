@@ -6,6 +6,9 @@ order: 50
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - app/src/components/rider-pin.tsx
+  - app/src/components/rider-puck.tsx
+  - app/src/components/rider-dot.tsx
   - app/src/core/leaving.ts
   - app/src/components/leave-ride.tsx
   - app/src/components/ride-roster.tsx
@@ -29,6 +32,12 @@ Every group ride needs someone up front and someone at the back. OnMyLead shows 
 - **Rider**: everyone else.
 
 On the **Riders** section of the ride page, the line at the top of the **Going** list shows who is **Leader** and who is **Tail Gunner** (or "Not picked yet").
+
+:::release 2.1
+## On the Map
+
+In Ride Mode the leader and the tail gunner stand out from everyone else: the leader is the biggest dot, in blue with a blue name tag, and the tail gunner is the next biggest, in violet with a violet name tag. Every other rider is a graphite dot with a dark name tag. The riders list uses the same colors.
+:::
 
 ## Make Someone Leader
 

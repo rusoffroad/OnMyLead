@@ -44,7 +44,7 @@ import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
 import { RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
 import { isVerticalSwipe } from '@/core/panel-swipe';
-import { riderHeading } from '@/core/heading';
+import { heldHeading } from '@/core/heading';
 import { positionsFilter, rosterKey } from '@/core/live-costs';
 import { applyPositionChange, RosterGate, type PositionChange } from '@/core/live-roster';
 import { RANGE_LABEL, checkRideRange } from '@/core/fuel';
@@ -595,6 +595,8 @@ export default function RideMode() {
   }, [statuses, watchesBubble, me, nameOf]);
 
   const offlineSince = viewerOfflineSince(lastHeardAt, now);
+  // Each rider's last heading, so their arrow stays on after they stop while they're live (core/heading heldHeading).
+  const [heldHeadings] = useState(() => new Map<string, { deg: number; at: number }>());
   const mapRiders: MapRider[] = joined.map((m) => {
     const p = positions[m.user_id];
     const b = bubble.riders.find((x) => x.riderId === m.user_id);
@@ -609,6 +611,12 @@ export default function RideMode() {
       freshness = f.state === 'live' ? f : { ...f, state: 'delayed', label: f.ago };
     }
     const live = freshness?.state === 'live';
+    function heldArrow(id: string, fix: { speedMps: number | null; headingDeg: number | null } | null, isLive: boolean): number | null {
+      const h = heldHeading(heldHeadings.get(id), fix, isLive, now);
+      if (h) heldHeadings.set(id, h);
+      else heldHeadings.delete(id);
+      return h?.deg ?? null;
+    }
     return {
       id: m.user_id,
       name: m.profiles?.display_name || 'Rider',
@@ -619,7 +627,7 @@ export default function RideMode() {
       freshness,
       breakdown: st?.status === 'mechanical',
       // The arrow only follows this rider's own shared fix, never a breakdown spot.
-      headingDeg: spot === p ? riderHeading(p ? { speedMps: p.speed_mps, headingDeg: p.heading_deg } : null, live) : null,
+      headingDeg: spot === p ? heldArrow(m.user_id, p ? { speedMps: p.speed_mps, headingDeg: p.heading_deg } : null, live) : null,
       detail: [
         !freshness ? t('Not Sharing') : live ? t('Live') : freshness.state === 'lost' ? freshness.label : t('Last Seen {ago}', { ago: freshness.ago }),
         // A speed is only true while the fix is live.

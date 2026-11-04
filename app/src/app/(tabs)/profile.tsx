@@ -37,6 +37,7 @@ import { loadTrails, useLocalTrails } from '@/lib/nav-trails';
 import { PARK_TRAILS_KEY, RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useFollowMePref } from '@/hooks/use-follow-me';
+import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { signOut, useSession } from '@/lib/session';
 import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
@@ -86,6 +87,7 @@ export default function You() {
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
   const [followMe, setFollowMe] = useFollowMePref();
+  const [intersectionZoom, setIntersectionZoom] = useIntersectionZoomPref();
   useEffect(() => {
     loadTrails();
   }, []);
@@ -220,6 +222,22 @@ export default function You() {
               thumbColor="#FFFFFF"
               {...({ activeThumbColor: '#FFFFFF' } as object)}
               accessibilityLabel={t('Follow Me on Maps')}
+            />
+          }
+        />
+        <MenuRow
+          icon="turn"
+          color={Colors.sky}
+          title={t('Zoom In at Intersections')}
+          detail={intersectionZoom ? t('While following you, the map zooms in as you reach a junction, then back out') : t('Off. The map keeps its zoom at junctions')}
+          right={
+            <Switch
+              value={intersectionZoom}
+              onValueChange={setIntersectionZoom}
+              trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
+              accessibilityLabel={t('Zoom In at Intersections')}
             />
           }
         />

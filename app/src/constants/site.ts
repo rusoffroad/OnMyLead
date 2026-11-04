@@ -48,5 +48,11 @@ export const SHOWCASE_3D_TERRAIN: boolean = false;
  * off). Off until the app version with Map Features (2.1) is live in the stores.
  */
 export const SHOWCASE_MAP_FEATURES: boolean = false;
+
+/**
+ * The rider dot and Zoom In at Intersections line in the showcase (2.1). Off until that version is
+ * live in the stores.
+ */
+export const SHOWCASE_INTERSECTION_ZOOM: boolean = false;
 /** The Park Trails line in the showcase. Off until the app version with park trails (2.1) is live in the stores. */
 export const SHOWCASE_PARK_TRAILS: boolean = false;

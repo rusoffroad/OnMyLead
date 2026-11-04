@@ -6,6 +6,7 @@ order: 10
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - app/src/components/rider-puck.tsx
   - app/src/core/freshness.ts
   - app/src/components/rider-dot.tsx
   - app/src/app/ride/[id]/live.tsx
@@ -35,7 +36,13 @@ Start here when something doesn't work the way you expect. If your problem isn't
 A rider's dot turns hollow when their last position is more than a minute old, and shows **No Signal** with a dashed grey ring after about 3 minutes. A sharing phone checks in at least every 15 seconds while it has service, so this usually means that rider lost service.
 
 :::release 1.0.3
+:::until 2.1
 A live rider's dot has a bold white ring (the leader's is solid blue). A last-seen rider's dot is a thin grey ring instead.
+:::
+:::
+
+:::release 2.1
+A live rider's dot is a solid disc with a white rim and an arrow inside it (blue for the leader, violet for the tail gunner, graphite for everyone else). A last-seen rider's dot is a thin grey ring with no arrow instead.
 :::
 
 If **everyone** suddenly shows as last seen, it's probably your phone. After about 35 seconds without hearing from the server, Ride Mode shows **No Service. Riders Show Where They Were Last Seen**. It doesn't mark the others as lost because of your own dropout.
