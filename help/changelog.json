@@ -2,6 +2,20 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "profile-picture",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "block-activity-recognition",
+    "why": "Android build config only: the app no longer asks for the physical activity permission that expo-sensors added for its unused step counter (Google Play refused 2.0 with it). Riders see no difference; these articles only get a new updated: date."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "whats-new-in-2-0",
       "getting-started",
       "create-a-ride-on-the-website",
