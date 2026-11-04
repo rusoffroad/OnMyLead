@@ -146,7 +146,11 @@ See [Send a Status or Quick Reply](/help/status-buttons).
 Tap **Message** at the top left of the panel to type your own message to the group or send one of your saved quick replies. See [Type Your Own Message](/help/status-buttons).
 :::
 
-Above the panel are two buttons: **Directions** (on the left) for Apple Maps or Google Maps, and **Add Waypoint** (on the right) to mark your spot. You can also press and hold anywhere on the map to drop a waypoint there. See [Get Directions](/help/directions) and [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
+Above the panel are two buttons: **Directions** (on the left) for Apple Maps or Google Maps, and **Add Waypoint** (on the right) to mark your spot. You can also press and hold anywhere on the map to drop a waypoint there.
+:::release 2.1
+When the leader shares one during the ride, everyone else gets a notification with a sound. See [New Waypoint Alerts](/help/waypoints-and-planned-stops#new-waypoint-alerts).
+:::
+See [Get Directions](/help/directions) and [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
 
 On Android, **Directions** opens Google Maps, and while you share, a **Sharing Your Location** notification stays in the notification shade. Tap it to come back to OnMyLead. If your phone restarted or the app was updated while you were sharing, opening Ride Mode starts that notification and your sharing again.
 
@@ -297,7 +301,7 @@ If your phone can't reach the server for a short while, a banner says **No Servi
 :::
 
 :::release 2.1
-Riders close to you on the same ride keep moving with no service, over Bluetooth, and the banner says **No Service. Sharing With 2 Nearby Phones Over Bluetooth**. Riders out of Bluetooth range show where they were last seen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+Riders close to you on the same ride keep moving with no service, over Bluetooth, and the banner says **No Service. Sharing With 2 Nearby Phones Over Bluetooth**. Your status taps, quick replies and messages reach them too, phones pass everything along the group, and the card under your tap names who got it. Riders out of Bluetooth range show where they were last seen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 Status taps and quick replies you make with no service wait on your phone and send on their own when you get signal.

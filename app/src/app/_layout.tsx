@@ -36,6 +36,7 @@ import { startRiderAgreement } from '@/lib/rider-agreement';
 import { startSettingsSync } from '@/lib/settings-sync';
 import { startAppearanceSync } from '@/lib/appearance-sync';
 import { startLanguageSync } from '@/lib/language-sync';
+import { backupMapWaypointsNow } from '@/lib/map-waypoints';
 import { backupTrailsNow } from '@/lib/trail-backup';
 import { t, takeLanguageReturnPath, useLanguage } from '@/lib/i18n';
 
@@ -99,11 +100,14 @@ function RootLayout() {
   useEffect(() => startRiderAgreement(), []);
   // A friend link opened before signing up counts as an invite once the new account signs in.
   useEffect(() => startReferrals(), []);
-  // Settings and Map Mode trails follow the account to the rider's other devices.
+  // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();
     startLanguageSync();
-    startSettingsSync(backupTrailsNow);
+    startSettingsSync(() => {
+      backupTrailsNow();
+      backupMapWaypointsNow();
+    });
   }, []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.
@@ -144,6 +148,7 @@ function RootLayout() {
         <Stack.Screen name="ride/[id]/live" options={{ title: t('Ride Mode'), headerShown: false }} />
         <Stack.Screen name="ride/[id]/route" options={{ title: t('Route'), headerShown: false }} />
         <Stack.Screen name="ride/[id]/waypoints" options={{ title: t('Waypoints'), headerShown: false }} />
+        <Stack.Screen name="ride/[id]/edit" options={{ title: t('Edit Ride Details') }} />
         <Stack.Screen name="garage/index" options={{ title: t('Garage') }} />
         <Stack.Screen name="garage/new" options={{ title: t('Add to Garage') }} />
         <Stack.Screen name="garage/[id]/index" options={{ title: '' }} />

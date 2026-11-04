@@ -80,10 +80,10 @@ function FlatNavMap({
   /** Named spots on the trail being drawn, recorded or followed. */
   obstacles?: Obstacle[];
   onObstacle?: (o: Obstacle) => void;
-  /** Waypoints on the map (the rider's own and shared ones); tap a blaze to open it. */
+  /** Waypoints on the map: Map Mode's own, and the ride's when the rider is on a live group ride. */
   waypoints?: Waypoint[];
   onPressWaypoint?: (w: Waypoint) => void;
-  /** Press and hold the map: the screen decides (drop a waypoint, or look up the trail). Missing: the trail lookup. */
+  /** Press and hold (right-click on the website): when set, called instead of looking up the trail there. */
   onLongPressMap?: (p: LatLng) => void;
   ref?: Ref<NavMapHandle>;
 }) {
@@ -222,9 +222,9 @@ function FlatNavMap({
         else trail.mapProps.onPress(e);
       }}
       onLongPress={(e) => {
-        const c = e.nativeEvent.coordinate;
-        if (onLongPressMap) onLongPressMap({ lat: c.latitude, lng: c.longitude });
-        else trail.identifyAt(c.latitude, c.longitude);
+        const { latitude: lat, longitude: lng } = e.nativeEvent.coordinate;
+        if (onLongPressMap) onLongPressMap({ lat, lng });
+        else trail.identifyAt(lat, lng);
       }}>
       <TrailTiles trail={trail} />
       <OwnHeadingMarker own={own} mapHeading={mapHeading} />
@@ -270,6 +270,25 @@ function FlatNavMap({
       {measureTaps.map((p, i) => (
         <Marker key={`m${i}`} coordinate={{ latitude: p.lat, longitude: p.lng }} anchor={{ x: 0.5, y: 0.5 }} tappable={false} zIndex={7}>
           <View style={styles.pin}><Text style={styles.pinText}>{i + 1}</Text></View>
+        </Marker>
+      ))}
+      {waypoints?.map((w) => (
+        <Marker
+          key={`w-${w.id}`}
+          coordinate={{ latitude: w.lat, longitude: w.lng }}
+          anchor={{ x: 0.5, y: 0.5 }}
+          onPress={(e) => {
+            // Keep the tap from also reaching the map (which looks up trails).
+            e.stopPropagation?.();
+            onPressWaypoint?.(w);
+          }}
+          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+          zIndex={w.planned_stop ? 6 : 5}>
+          {w.planned_stop ? (
+            <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
+          ) : (
+            <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
+          )}
         </Marker>
       ))}
       {(obstacles ?? []).map((o) => (

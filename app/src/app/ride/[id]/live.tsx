@@ -81,7 +81,7 @@ import { showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { useFlag } from '@/lib/app-settings';
-import { onNearbyEvent, setNearbySharing, startNearby, stopNearby, useNearby } from '@/lib/nearby';
+import { nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbySharing, startNearby, stopNearby, useNearby } from '@/lib/nearby';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
@@ -176,7 +176,8 @@ export default function RideMode() {
   const stripRef = useCallback((v: View | null) => {
     if (!v) setStripH(0);
   }, []);
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // waypoint: opened from a "new waypoint" notification; that waypoint's sheet opens once it's loaded.
+  const { id, waypoint: openWaypointId } = useLocalSearchParams<{ id: string; waypoint?: string }>();
   const { session } = useSession();
   const me = session?.user.id;
 
@@ -224,6 +225,16 @@ export default function RideMode() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setWpTarget({ type: 'new', at });
   }, [wp.switchedOn]);
+  // A tapped "new waypoint" notification: show that waypoint (once per notification).
+  // (Set while rendering, once the waypoint has loaded.)
+  const [shownWaypoint, setShownWaypoint] = useState<string | null>(null);
+  if (openWaypointId && shownWaypoint !== openWaypointId) {
+    const w = wp.waypoints.find((x) => x.id === openWaypointId);
+    if (w) {
+      setShownWaypoint(openWaypointId);
+      setWpTarget({ type: 'view', waypoint: w });
+    }
+  }
 
   // Announcements: only the latest is shown, and it is read aloud so nobody has to look down.
   const chat = useRideChat(id, !!mine);
@@ -483,6 +494,21 @@ export default function RideMode() {
   useEffect(() => {
     setNearbySharing(id, !!activeShare);
   }, [id, activeShare, nearby.state]);
+  // With service and nobody in Bluetooth range the radio idles; Max Battery Saver slows it too.
+  const meOffline = viewerOfflineSince(lastHeardAt, now) != null;
+  useEffect(() => {
+    setNearbyConditions(id, { online: !meOffline, batterySaver: batteryMode === 'saver' });
+  }, [id, meOffline, batteryMode, nearby.state]);
+  // Gateway: what this phone knows from the server goes out over Bluetooth to riders near it with
+  // no service (the mesh keeps only what is newer, so nothing it heard over Bluetooth echoes).
+  useEffect(() => {
+    if (nearby.state !== 'on') return;
+    nearbyBridge(id, {
+      positions: Object.values(positions),
+      statuses: Object.entries(statuses).flatMap(([user_id, s]) => (s.id ? [{ id: s.id, user_id, status: s.status, tapped_at: s.tapped_at, lat: s.lat ?? null, lng: s.lng ?? null }] : [])),
+      messages: chat.messages.filter((m) => m.kind === 'status' && !m.via).map((m) => ({ id: m.id, user_id: m.user_id, body: m.body, sent_at: m.sent_at })),
+    });
+  }, [id, nearby.state, positions, statuses, chat.messages]);
   useEffect(
     () =>
       onNearbyEvent((e) => {
@@ -501,8 +527,9 @@ export default function RideMode() {
             return { ...prev, [e.status.user_id]: tap };
           });
         } else if (memberIds.current.has(e.reply.user_id)) {
-          // No chat over Bluetooth, so a quick reply is read out, the way announcements are.
+          // Read out, the way announcements are; the chat shows it too (hooks/use-ride-chat).
           speak(`${nameOf(e.reply.user_id)}: ${e.reply.body}`);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }),
     [nameOf],
@@ -530,7 +557,6 @@ export default function RideMode() {
 
   // Spoken alert once per rider each time they turn red (leader and tail gunner only). Not while
   // this phone has no service: everyone goes quiet then, and that is our signal, not theirs.
-  const meOffline = viewerOfflineSince(lastHeardAt, now) != null;
   useEffect(() => {
     if (!watchesBubble || meOffline) return;
     const red = new Set(bubble.alerts.map((a) => a.riderId));

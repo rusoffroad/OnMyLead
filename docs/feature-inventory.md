@@ -97,11 +97,15 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - CarPlay ride screen **[iOS-only]**, switched off until Apple grants the entitlement. No Android
   Auto.
 
-- Bluetooth Sharing (2.1): with no service, Ride Mode passes spots (sharing riders), status taps
-  incl. EMERGENCY and quick replies between nearby riders on the ride over Bluetooth LE, relayed up
-  to 3 hops, uploaded by the first phone with signal. `core/nearby.ts`, `lib/nearby.ts`,
-  `modules/onmylead-nearby` (Swift + Kotlin), migration `20261104060000_bluetooth_sharing.sql`.
-  You > Bluetooth Sharing switch; **[flag]** `bluetooth_sharing`. Apps only (not the website).
+- Bluetooth Sharing mesh (2.1): with no service, Ride Mode passes spots (sharing riders), status
+  taps incl. EMERGENCY, quick replies and typed messages (in parts) between riders on the ride over
+  Bluetooth LE, relayed up to 6 hops; a phone with service bridges the server's view to riders with
+  none; delivered/seen receipts feed the tap card (Reached over Bluetooth, Seen by) and chat shows
+  Via Bluetooth; the first phone with signal uploads spots, taps, messages and receipts; the radio
+  idles with service and no peers or on Max Battery Saver. `core/nearby.ts`, `lib/nearby.ts`,
+  `modules/onmylead-nearby` (Swift + Kotlin), migrations `20261104060000_bluetooth_sharing.sql`,
+  `20261104100000_bluetooth_mesh.sql`. You > Bluetooth Sharing switch; **[flag]**
+  `bluetooth_sharing`. Apps only (not the website).
 
 ### Chat and Polls
 - Ride chat to everyone or to the leader only, in-app pop-ups, resolve / clear messages.
@@ -113,6 +117,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   Straight Line, drag, search, undo, clear, save / remove; web wide layout ≥ 900 px.
 - Import GPX **[Pro]**. No GPX export.
 - Waypoints (shared or only you, press and hold, at my location) and numbered Planned Stops. 15 waypoint symbols, color-blind friendly, shown on planned stops too (2.0).
+- 2.1: press and hold in Map Mode too (private Map Mode waypoints on the device, backed up with Sync; the live ride's when sharing location with one), and New Waypoint Alerts: riders' phones ding when the leader shares a waypoint or planned stop during a live ride.
 - Directions to the meeting point, a rider or a waypoint in Apple Maps or Google Maps.
 - Fuel range on the ride (route length vs each rider's machine range).
 

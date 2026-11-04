@@ -49,10 +49,10 @@ export function NavMapboxMap({
   trackLines?: DayLine[];
   obstacles?: Obstacle[];
   onObstacle?: (o: Obstacle) => void;
-  /** Waypoints on the map (the rider's own and shared ones); tap a blaze to open it. */
+  /** Waypoints on the map: Map Mode's own, and the ride's when the rider is on a live group ride. */
   waypoints?: Waypoint[];
   onPressWaypoint?: (w: Waypoint) => void;
-  /** Press and hold the map: the screen decides (drop a waypoint, or look up the trail). Missing: the trail lookup. */
+  /** Press and hold (right-click on the website): when set, called instead of looking up the trail there. */
   onLongPressMap?: (p: LatLng) => void;
   ref?: Ref<NavMapHandle>;
 }) {
@@ -127,7 +127,7 @@ export function NavMapboxMap({
       initial={center ? { center, zoom: 13 } : null}
       lines={lines}
       onPress={(p) => (measuring ? onMeasure(p, snapRadiusM(mpp.current)) : trail.identifyAt(p.lat, p.lng))}
-      onLongPress={onLongPressMap ?? ((p) => trail.identifyAt(p.lat, p.lng))}
+      onLongPress={(p) => (onLongPressMap ? onLongPressMap(p) : trail.identifyAt(p.lat, p.lng))}
       onUserMove={onUserMove}
       scaleBar
       onReady={() => setReady(true)}
@@ -168,6 +168,20 @@ export function NavMapboxMap({
       {measureTaps.map((p, i) => (
         <MapboxMarker key={`m${i}`} at={p}>
           <View style={styles.pin}><Text style={styles.pinText}>{i + 1}</Text></View>
+        </MapboxMarker>
+      ))}
+      {waypoints?.map((w) => (
+        <MapboxMarker key={`w-${w.id}`} at={w}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            onPress={() => onPressWaypoint?.(w)}>
+            {w.planned_stop ? (
+              <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
+            ) : (
+              <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
+            )}
+          </Pressable>
         </MapboxMarker>
       ))}
       {(obstacles ?? []).map((o) => (

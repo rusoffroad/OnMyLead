@@ -10,15 +10,16 @@ import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDateTime } from '@/core/admin-format';
 import { eventDates, type EventDetail } from '@/core/events';
 import { useAdminData } from '@/lib/admin';
-import { adminEvents, adminRemoveEventPhoto, adminSetEventHidden, getEvent, photoUrl, type AdminEventRow } from '@/lib/events';
+import { adminEvents, adminRemoveEventPhoto, adminSetEventHidden, adminSetEventPresenter, getEvent, photoUrl, type AdminEventRow } from '@/lib/events';
 
 const PAGE = 50;
-type Filter = 'reported' | 'upcoming' | 'hidden' | 'all';
+type Filter = 'reported' | 'upcoming' | 'presented' | 'hidden' | 'all';
 
 /**
  * Events riders posted (2.0). Reported events come first. Hide an event (only its hosts still see
  * it, with the reason), show it again, or take down a single photo. Every action is written to the
- * Audit Log. Reports themselves are answered on the Reports page (source: Event Page).
+ * Audit Log. Reports themselves are answered on the Reports page (source: Event Page). Presented By
+ * marks an event as sponsored (2.1): riders see "Presented by RUS Offroad" in gold on its card and page.
  */
 export default function AdminEvents() {
   const [filter, setFilter] = useState<Filter>('reported');
@@ -41,6 +42,26 @@ export default function AdminEvents() {
     try {
       await adminSetEventHidden(e.id, hidden, r.reason ?? '');
       toast(hidden ? 'Event hidden.' : 'Event is showing again.');
+      reload();
+    } catch (err) {
+      toast((err as Error).message, 'danger');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const present = async (e: AdminEventRow) => {
+    const r = await confirm({
+      title: e.presented_by ? 'Change Who Presents This Event?' : 'Present This Event?',
+      message: `Riders see "Presented by …" in gold on "${e.title}" in Events and on its page. RUS Offroad also gets a Shop RUS Offroad button there. Leave the name blank to take it off.`,
+      confirmLabel: e.presented_by ? 'Save Presenter' : 'Present Event',
+      reasonLabel: 'Presented By', reasonPlaceholder: 'RUS Offroad', reasonInitial: e.presented_by ?? 'RUS Offroad',
+    });
+    if (!r.ok) return;
+    setBusy(e.id);
+    try {
+      await adminSetEventPresenter(e.id, r.reason ?? '');
+      toast(r.reason?.trim() ? `Presented by ${r.reason.trim()}.` : 'Presenter removed.');
       reload();
     } catch (err) {
       toast((err as Error).message, 'danger');
@@ -82,6 +103,7 @@ export default function AdminEvents() {
         options={[
           { value: 'reported', label: 'Reported' },
           { value: 'upcoming', label: 'Upcoming' },
+          { value: 'presented', label: 'Presented By' },
           { value: 'hidden', label: 'Hidden' },
           { value: 'all', label: 'All' },
         ]}
@@ -102,6 +124,7 @@ export default function AdminEvents() {
                 {e.hidden_at ? <StatusBadge label="Hidden" tone="warn" /> : null}
                 {e.status === 'cancelled' ? <StatusBadge label="Cancelled" tone="muted" /> : null}
                 {e.visibility === 'unlisted' ? <StatusBadge label="Link Only" tone="neutral" /> : null}
+                {e.presented_by ? <StatusBadge label={`Presented by ${e.presented_by}`} tone="pro" /> : null}
                 {e.open_reports ? <StatusBadge label={`${e.open_reports} Open ${e.open_reports === 1 ? 'Report' : 'Reports'}`} tone="danger" /> : null}
               </View>
               <Text style={styles.sub}>{eventDates(e.starts_at, e.ends_at)} at {e.location_name}{e.state ? `, ${e.state}` : ''}</Text>
@@ -122,6 +145,7 @@ export default function AdminEvents() {
           <View style={styles.actions}>
             <AdminButton small title="Host" onPress={() => router.push(`/admin/users/${e.owner_id}`)} />
             <AdminButton small title="Open Event Page" onPress={() => router.push(`/e/${e.share_code}`)} />
+            <AdminButton small title={e.presented_by ? 'Presenter' : 'Present This Event'} loading={busy === e.id} onPress={() => present(e)} />
             {e.photos ? <AdminButton small title={open?.id === e.id ? 'Hide Photos' : 'Photos'} onPress={() => showPhotos(e)} /> : null}
             {e.reports ? <AdminButton small title="Reports" onPress={() => router.push('/admin/reports')} /> : null}
           </View>

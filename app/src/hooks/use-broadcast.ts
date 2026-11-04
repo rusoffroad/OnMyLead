@@ -1,13 +1,14 @@
 import * as Crypto from 'expo-crypto';
 import * as Haptics from 'expo-haptics';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
 import {
-  BROADCAST_SHOWN_MS, broadcastNotSwitchedOn, CANCELLED_SHOWN_MS, mergeReceipts, toAcknowledge,
+  BROADCAST_SHOWN_MS, bluetoothReceipts, broadcastNotSwitchedOn, CANCELLED_SHOWN_MS, mergeReceipts, toAcknowledge,
   type Broadcast, type Receipt,
 } from '@/core/broadcast';
 import { ackRideItems, cancelRideItem, myReceipts } from '@/lib/api';
+import { nearbySeen, useNearby } from '@/lib/nearby';
 import { flushOutbox, pendingIds, removeFromOutbox } from '@/lib/outbox';
 import { newChannel, supabase } from '@/lib/supabase';
 
@@ -165,7 +166,16 @@ export function useBroadcast(rideId: string, me: string | null | undefined, fall
     };
   }, [liveId, me]);
 
-  return { card, receipts, receiptsOn, send, cancel, retry, dismiss, checkQueued };
+  // Receipts heard over Bluetooth (lib/nearby): whose phone got the tap and who saw it, with or
+  // without service. Merged with the server's, so a tap waiting for signal still shows who has it.
+  const nearby = useNearby();
+  const bluetooth = card ? nearby.acks[card.id] : undefined;
+  const allReceipts = useMemo(
+    () => (card && bluetooth?.length ? mergeReceipts(receipts, bluetoothReceipts(card.id, bluetooth)) : receipts),
+    [card, bluetooth, receipts],
+  );
+
+  return { card, receipts: allReceipts, receiptsOn, send, cancel, retry, dismiss, checkQueued };
 }
 
 /**
@@ -186,6 +196,8 @@ export function useAcknowledge(
     const ids = toAcknowledge(items, me, done.current, Date.now());
     if (!ids.length) return;
     for (const id of ids) done.current.add(id);
+    // Nearby riders' phones hear "seen" over Bluetooth at once, with or without service.
+    nearbySeen(rideId, ids);
     ackRideItems(rideId, ids).catch((e) => {
       const message = e instanceof Error ? e.message : String(e);
       if (broadcastNotSwitchedOn(message)) off.current = true;

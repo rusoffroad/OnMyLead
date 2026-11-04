@@ -47,6 +47,11 @@ public class OnMyLeadNearbyModule: Module {
       self.radio?.sendNow(frames.compactMap { Data(base64Encoded: $0) })
     }
 
+    // "normal" or "low" (core/nearby.ts nearbyPower): how often the radio sends and looks for phones.
+    Function("setPower") { (level: String) in
+      self.radio?.setPower(low: level == "low")
+    }
+
     Function("drain") { () -> [String] in
       self.radio?.drain() ?? []
     }
@@ -66,6 +71,10 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   private static let maxPeers = 8
   private static let roundSeconds = 4.0
   private static let rescanSeconds = 30.0
+  // Low power (service, nobody in range, or Max Battery Saver): send and look less often. Phones
+  // that connect are still served at once, so a rider coming into range is not kept waiting.
+  private static let lowRoundSeconds = 10.0
+  private static let lowRescanSeconds = 90.0
   private static let maxBuffered = 500
 
   private let service: CBUUID
@@ -89,6 +98,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   private var timer: DispatchSourceTimer?
   private var lastScan = Date.distantPast
   private var state = "starting"
+  private var low = false
 
   var onFrame: ((String) -> Void)?
   var onState: ((String, Int) -> Void)?
@@ -104,11 +114,25 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       // Creating the managers shows the Bluetooth permission prompt the first time.
       self.central = CBCentralManager(delegate: self, queue: self.queue)
       self.peripheral = CBPeripheralManager(delegate: self, queue: self.queue)
-      let t = DispatchSource.makeTimerSource(queue: self.queue)
-      t.schedule(deadline: .now() + NearbyRadio.roundSeconds, repeating: NearbyRadio.roundSeconds)
-      t.setEventHandler { [weak self] in self?.round() }
-      t.resume()
-      self.timer = t
+      self.schedule()
+    }
+  }
+
+  private func schedule() {
+    timer?.cancel()
+    let every = low ? NearbyRadio.lowRoundSeconds : NearbyRadio.roundSeconds
+    let t = DispatchSource.makeTimerSource(queue: queue)
+    t.schedule(deadline: .now() + every, repeating: every)
+    t.setEventHandler { [weak self] in self?.round() }
+    t.resume()
+    timer = t
+  }
+
+  func setPower(low: Bool) {
+    queue.async {
+      guard self.low != low else { return }
+      self.low = low
+      if self.timer != nil { self.schedule() }
     }
   }
 
@@ -164,7 +188,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   private func round() {
     // Scanning without duplicates reports each phone once per scan, so start a fresh scan now and
     // then to find phones that dropped out and came back.
-    if let c = central, c.state == .poweredOn, Date().timeIntervalSince(lastScan) > NearbyRadio.rescanSeconds {
+    let rescan = low ? NearbyRadio.lowRescanSeconds : NearbyRadio.rescanSeconds
+    if let c = central, c.state == .poweredOn, Date().timeIntervalSince(lastScan) > rescan {
       c.stopScan()
       scan()
     }

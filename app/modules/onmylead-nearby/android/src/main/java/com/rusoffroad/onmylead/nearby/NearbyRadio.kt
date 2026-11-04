@@ -51,6 +51,9 @@ class NearbyRadio(
   companion object {
     private const val MAX_PEERS = 8
     private const val ROUND_MS = 4_000L
+    // Low power (service, nobody in range, or Max Battery Saver): send less often and let the
+    // chip scan and advertise in its low-power duty cycle. Phones that connect are served at once.
+    private const val LOW_ROUND_MS = 10_000L
     private const val MAX_BUFFERED = 500
     private const val MAX_QUEUE = 64
     private const val WANT_MTU = 247
@@ -87,6 +90,7 @@ class NearbyRadio(
   private val received = ArrayList<String>()
   private var state = "starting"
   private var running = false
+  private var low = false
 
   // ---------------------------------------------------------------------------------------------
   // Called from JavaScript (any thread); everything else runs on `handler`.
@@ -99,7 +103,7 @@ class NearbyRadio(
     openServer()
     startScan()
     report("on")
-    handler.postDelayed(::round, ROUND_MS)
+    handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
   }
 
   fun stop() {
@@ -138,6 +142,24 @@ class NearbyRadio(
   }
 
   fun snapshot(): Map<String, Any> = mapOf("state" to state, "peers" to peerCount())
+
+  fun setPower(low: Boolean) = handler.post {
+    if (this.low == low) return@post
+    this.low = low
+    if (!running) return@post
+    // Scan and advertise settings are fixed at start: restart both with the new ones.
+    try {
+      if (scanning) adapter?.bluetoothLeScanner?.stopScan(scanCallback)
+      if (advertising) adapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
+    } catch (_: Exception) {}
+    scanning = false
+    advertising = false
+    val a = adapter
+    if (a != null && a.isEnabled) {
+      startAdvertising()
+      startScan()
+    }
+  }
 
   // ---------------------------------------------------------------------------------------------
 
@@ -180,7 +202,7 @@ class NearbyRadio(
       if (state != "on") report("on")
       send(outgoing)
     }
-    handler.postDelayed(::round, ROUND_MS)
+    handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
   }
 
   private fun send(frames: List<ByteArray>) {
@@ -259,7 +281,8 @@ class NearbyRadio(
     val adv = adapter?.bluetoothLeAdvertiser ?: return
     if (advertising) return
     val settings = AdvertiseSettings.Builder()
-      .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
+      .setAdvertiseMode(if (low) AdvertiseSettings.ADVERTISE_MODE_LOW_POWER else AdvertiseSettings.ADVERTISE_MODE_BALANCED)
+      // Full transmit power either way: range is the point, and it costs little next to scanning.
       .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
       .setConnectable(true)
       .build()
@@ -338,7 +361,9 @@ class NearbyRadio(
   private fun startScan() {
     val scanner = adapter?.bluetoothLeScanner ?: return
     val filter = ScanFilter.Builder().setServiceUuid(ParcelUuid(service)).build()
-    val settings = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_BALANCED).build()
+    val settings = ScanSettings.Builder()
+      .setScanMode(if (low) ScanSettings.SCAN_MODE_LOW_POWER else ScanSettings.SCAN_MODE_BALANCED)
+      .build()
     try {
       scanner.startScan(listOf(filter), settings, scanCallback)
       scanning = true
