@@ -31,6 +31,17 @@ export function MeetPointMapboxMap({ value, onPick, trail }: { value: LatLng | n
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, value?.lat, value?.lng]);
 
+  // With no meeting point yet, open near the rider (the first location fix) rather than zoomed out
+  // over the whole country, unless they've already moved the map or set the point.
+  const homed = useRef(false);
+  const firstFix = useRef<LatLng | null>(null);
+  const home = () => {
+    if (homed.current || value || !ready || !firstFix.current) return;
+    homed.current = true;
+    map.current?.centerOn(firstFix.current, undefined, { zoom: 11, animated: false });
+  };
+  useEffect(home, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <View style={{ gap: 6 }}>
       <View style={{ height: 320, borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement }}>
@@ -41,6 +52,13 @@ export function MeetPointMapboxMap({ value, onPick, trail }: { value: LatLng | n
           tilt={false}
           initial={value ? { center: value, zoom: 14 } : null}
           onReady={() => setReady(true)}
+          onUserMove={() => {
+            homed.current = true;
+          }}
+          onOwnFix={(f) => {
+            firstFix.current ??= { lat: f.lat, lng: f.lng };
+            home();
+          }}
           onPress={pick}>
           {value ? (
             <MapboxMarker id="meet-point" at={value} anchor={{ x: 0.5, y: 0.95 }} draggable onDragEnd={pick}>

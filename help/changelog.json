@@ -2,6 +2,17 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "create-a-ride",
+      "events"
+    ],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "meet-point-map-home",
+    "why": "Device check of the Mapbox switch (#223): the meeting-point map opened zoomed out over the whole region. It now opens near the rider's location until they set the point or move the map."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "3d-terrain",
       "map-layers",
       "find-a-ride",
