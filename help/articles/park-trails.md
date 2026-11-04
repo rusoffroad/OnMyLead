@@ -43,7 +43,7 @@ Where a park rates its trails (Hidden Falls does, level 1 to 5), the line takes 
 - **Thin white**: a park road.
 - **Red dashes**: a trail the park has closed.
 
-The legend is in the layers panel next to **Park Trails**.
+The key is in the map panel: under **Map Features**, the **Park Trails** row in the **Trails** group shows the four level colors.
 
 ## Tap a Trail
 
@@ -51,7 +51,7 @@ Tap a park trail to see its card: the park's name, the trail's name, its level (
 
 ## Turn Park Trails Off
 
-Tap the layers button on any map and switch **Park Trails** off. The same choice is on the **You** tab as **Park Trails on Maps**. Either switch changes every map, on every device you're signed in on.
+Tap the layers button on any map and, under **Map Features**, tap the **Park Trails** row in the **Trails** group to turn it off. The same choice is on the **You** tab as **Park Trails on Maps**. Either one changes every map, on every device you're signed in on. Park Trails is free for everyone, like Rider Trails, so it stays even without Pro.
 
 ## With No Signal
 

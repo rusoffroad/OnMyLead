@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import Svg, { Ellipse, Path, Rect } from 'react-native-svg';
 
 import { Colors, font, Glass, GlassSurface, Radius, themedStyles } from '@/constants/theme';
@@ -9,7 +9,8 @@ import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_IN
 import { formatBytes, IMAGERY_ATTRIBUTION, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import { PARK_LEVEL_COLORS, PARK_LEVEL_LEGEND, PARK_TRAILS_ATTRIBUTION, parkLevelLabel, parkTrailColor, parkTrailLength, type ParkTrail } from '@/core/park-trails';
-import { TOPO_ATTRIBUTION, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, type BaseMap, type TrailInfo } from '@/core/trails';
+import { FEATURE_GROUPS, FEATURE_INK, MAP_FEATURE_IDS, MAP_FEATURES, type MapFeature, type MapFeatureId } from '@/core/map-features';
+import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
@@ -56,12 +57,15 @@ export function TrailMapOverlay({
 }) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState<PublicTrail | null>(null);
+  const osmOn = (['highways', 'roads', 'dirtRoads', 'offroad', 'hiking', 'closed'] as MapFeatureId[]).some((id) => trail.features[id]);
   const credit = [
     trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null,
-    ...(trail.trails ? [...TRAIL_SOURCE_IDS.map((id) => TRAIL_SOURCES[id].attribution), OSM_ATTRIBUTION] : trail.parkTrailsOn ? [PARK_TRAILS_ATTRIBUTION] : []),
+    ...trail.agencyLayers.map((a) => a.attribution),
+    osmOn ? OSM_ATTRIBUTION : trail.parkTrailsOn ? PARK_TRAILS_ATTRIBUTION : null,
   ]
     .filter(Boolean)
     .join(', ');
+  const anyOn = MAP_FEATURE_IDS.some((id) => trail.features[id]);
 
   return (
     <>
@@ -69,12 +73,12 @@ export function TrailMapOverlay({
         {bare ? null : (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={tr('Map layers')}
+          accessibilityLabel={tr('Map Style and Features')}
           accessibilityState={{ expanded: open }}
           hitSlop={6}
           onPress={() => setOpen((o) => !o)}
-          style={({ pressed }) => [styles.fab, (open || trail.trails || trail.base !== 'satellite') && styles.fabOn, pressed && { opacity: 0.8 }]}>
-          <LayersIcon color={trail.trails || trail.base !== 'satellite' ? SAND : Colors.text} />
+          style={({ pressed }) => [styles.fab, (open || anyOn || trail.base !== 'satellite') && styles.fabOn, pressed && { opacity: 0.8 }]}>
+          <LayersIcon color={anyOn || trail.base !== 'satellite' ? SAND : Colors.text} />
         </Pressable>
         )}
         {threeD && trail.terrainAvailable && trail.mapbox && (!open || bare) ? <ThreeDButton trail={trail} /> : null}
@@ -84,7 +88,7 @@ export function TrailMapOverlay({
             <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>
           </View>
         ) : null}
-        {open && !bare ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} /> : null}
+        {open && !bare ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} top={top} bottom={bottom} /> : null}
       </View>
 
       {(trail.zoomInHint || trail.closerForTracks) && !open && !bare ? (
@@ -111,6 +115,8 @@ export function TrailMapOverlay({
             <ParkTrailCard t={trail.pickedPark} onClose={() => trail.pickPark(null)} />
           ) : trail.info ? (
             <TrailCard info={trail.info} onClose={trail.clearInfo} />
+          ) : trail.land ? (
+            <LandCard land={trail.land} onClose={trail.clearLand} />
           ) : null}
         </View>
       ) : null}
@@ -128,10 +134,17 @@ export function TrailMapOverlay({
 }
 
 function LayersPanel({
-  trail, route, ride, lookupHint, credit,
-}: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string }) {
+  trail, route, ride, lookupHint, credit, top, bottom,
+}: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string; top: number; bottom: number }) {
+  const { height } = useWindowDimensions();
+  // Under the layers button and clear of the screen's own bottom panel; the list scrolls inside.
+  const maxHeight = Math.max(240, height - top - 52 - Math.max(96, bottom + 90));
   return (
-    <View style={styles.panel} accessibilityViewIsModal={false}>
+    <ScrollView
+      style={[styles.panel, { maxHeight }]}
+      contentContainerStyle={styles.panelBody}
+      showsVerticalScrollIndicator
+      accessibilityViewIsModal={false}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <Text style={styles.panelTitle}>{tr('Map Style')}</Text>
         <ProTag feature="map_layers" style={{ alignSelf: 'auto' }} />
@@ -163,73 +176,7 @@ function LayersPanel({
         </Text>
       ) : null}
 
-      <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => requirePro('map_layers') && trail.setTrails(!trail.trails)} style={styles.row}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.rowTitle}>{tr('Public Trails and Roads')}</Text>
-          <Text style={styles.rowSub}>{tr('Forest Service, BLM and OpenStreetMap, including off-road parks, with names and closures. {lookupHint}', { lookupHint }).trim()}</Text>
-        </View>
-        <Switch
-          value={trail.trails}
-          onValueChange={(on) => {
-            if (requirePro('map_layers')) trail.setTrails(on);
-          }}
-          trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-          thumbColor="#FFFFFF"
-          {...({ activeThumbColor: '#FFFFFF' } as object)}
-          ios_backgroundColor={Colors.backgroundSelected}
-        />
-      </Pressable>
-
-      {trail.trails ? (
-        <View style={{ gap: 6 }}>
-          <View style={styles.legend}>
-            <LegendLine dashed color={TRAIL_INK.trail} label={tr('Trail')} />
-            <LegendLine color={TRAIL_INK.road} label={tr('Road')} />
-            <LegendLine dashed closed color={TRAIL_INK.closed} label={tr('Closed')} />
-          </View>
-          <Text style={styles.fine}>
-            {tr('Closed means the Forest Service, BLM or OpenStreetMap lists it closed or private today, from their published travel plans and seasons. It is not a live gate report, so check posted signs and local orders.')}
-          </Text>
-        </View>
-      ) : null}
-
-      <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.riderTrailsOn }} onPress={() => trail.setRiderTrails(!trail.riderTrailsOn)} style={styles.row}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <View style={styles.legendItem}>
-            <Text style={styles.rowTitle}>{tr('Rider Trails')}</Text>
-            <LegendLine color={RIDER_TRAIL_INK} label="" dotted />
-          </View>
-          <Text style={styles.rowSub}>{tr('Trails OnMyLead riders mapped and shared. User submitted, so check them against signs.')}</Text>
-        </View>
-        <Switch
-          value={trail.riderTrailsOn}
-          onValueChange={trail.setRiderTrails}
-          trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-          thumbColor="#FFFFFF"
-          {...({ activeThumbColor: '#FFFFFF' } as object)}
-          ios_backgroundColor={Colors.backgroundSelected}
-        />
-      </Pressable>
-
-      <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.parkTrailsOn }} onPress={() => trail.setParkTrails(!trail.parkTrailsOn)} style={styles.row}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <View style={styles.legendItem}>
-            <Text style={styles.rowTitle}>{tr('Park Trails')}</Text>
-            {PARK_LEVEL_LEGEND.map((l) => (
-              <LegendLine key={l.level} color={PARK_LEVEL_COLORS[l.level]} label={l.label} />
-            ))}
-          </View>
-          <Text style={styles.rowSub}>{tr('The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.')}</Text>
-        </View>
-        <Switch
-          value={trail.parkTrailsOn}
-          onValueChange={trail.setParkTrails}
-          trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-          thumbColor="#FFFFFF"
-          {...({ activeThumbColor: '#FFFFFF' } as object)}
-          ios_backgroundColor={Colors.backgroundSelected}
-        />
-      </Pressable>
+      <MapFeaturesList trail={trail} lookupHint={lookupHint} />
 
       {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} terrain={trail.terrainAvailable && trail.base === 'terrain'} /> : null}
       {!WEB ? (
@@ -239,6 +186,170 @@ function LayersPanel({
         </Pressable>
       ) : null}
       {credit ? <Text style={styles.fine}>{tr('Map data: {credit}', { credit })}</Text> : null}
+    </ScrollView>
+  );
+}
+
+/**
+ * Map Features: every kind of line and land the map can show, grouped as Roads, Trails and Land,
+ * each with a sample of exactly how it looks on the map. Tapping a row turns it on or off; each
+ * group has one tap to show or hide all of it. Choices are saved and follow the rider to their
+ * other devices.
+ */
+function MapFeaturesList({ trail, lookupHint }: { trail: TrailMap; lookupHint: string }) {
+  const set = (id: MapFeatureId, on: boolean) => {
+    // Rider Trails and Park Trails are free for everyone; the rest are part of map layers (Pro).
+    if (id === 'riderTrails' || id === 'parkTrails' || requirePro('map_layers')) trail.setFeature(id, on);
+  };
+  return (
+    <View style={{ gap: 14 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={styles.panelTitle}>{tr('Map Features')}</Text>
+        <ProTag feature="map_layers" style={{ alignSelf: 'auto' }} />
+      </View>
+      {FEATURE_GROUPS.map((g) => {
+        const list = MAP_FEATURES.filter((f) => f.group === g.id);
+        const allOn = list.every((f) => trail.features[f.id]);
+        return (
+          <View key={g.id} style={styles.group} accessibilityRole="list" accessibilityLabel={tr(g.name)}>
+            <View style={styles.groupHead}>
+              <Text style={styles.groupTitle}>{tr(g.name)}</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={allOn ? tr('Hide All {group}', { group: tr(g.name) }) : tr('Show All {group}', { group: tr(g.name) })}
+                hitSlop={8}
+                onPress={() => {
+                  if (!requirePro('map_layers')) return;
+                  for (const f of list) if (trail.features[f.id] !== !allOn) trail.setFeature(f.id, !allOn);
+                }}>
+                <Text style={styles.groupAll}>{allOn ? tr('Hide All') : tr('Show All')}</Text>
+              </Pressable>
+            </View>
+            {list.map((f) => (
+              <FeatureRow key={f.id} feature={f} on={trail.features[f.id]} onToggle={(on) => set(f.id, on)} />
+            ))}
+            {g.id === 'trails' ? (
+              <Text style={styles.fine}>
+                {tr('Closures come from Forest Service, BLM and OpenStreetMap travel plans and seasons, not live gate reports. Check posted signs and local orders. {lookupHint}', { lookupHint }).trim()}
+              </Text>
+            ) : g.id === 'land' ? (
+              <Text style={styles.fine}>{tr('Tap the map to see whose land you are on. Boundaries come from public records and can lag behind the real ones, so obey posted signs.')}</Text>
+            ) : null}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+/** One feature: its sample, its name and what it is, and whether it shows. The whole row is the switch. */
+function FeatureRow({ feature, on, onToggle }: { feature: MapFeature; on: boolean; onToggle: (on: boolean) => void }) {
+  return (
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityState={{ checked: on }}
+      accessibilityLabel={tr(feature.name)}
+      accessibilityHint={tr(feature.detail)}
+      onPress={() => onToggle(!on)}
+      style={({ pressed }) => [styles.feature, on && styles.featureOn, pressed && { opacity: 0.85 }]}>
+      <FeatureSample feature={feature} on={on} />
+      <View style={{ flex: 1, gap: 1 }}>
+        <Text style={[styles.featureName, !on && { color: Colors.textSecondary }]} numberOfLines={1}>{tr(feature.name)}</Text>
+        <Text style={styles.featureDetail} numberOfLines={2}>{tr(feature.detail)}</Text>
+      </View>
+      <View style={[styles.tick, on && styles.tickOn]}>
+        {on ? (
+          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+            <Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}
+
+/**
+ * A small square of map with the feature drawn on it the way the map draws it: the same color,
+ * width, dashes and casing (core/map-features), so the key and the map never disagree. Off, it
+ * fades to a grey outline of itself.
+ */
+function FeatureSample({ feature, on }: { feature: MapFeature; on: boolean }) {
+  const ink = feature.ink;
+  const color = on ? ink.color : '#7B8794';
+  const ground = '#1B2A1E';
+  if (feature.group === 'land') {
+    return (
+      <Svg width={44} height={32} viewBox="0 0 44 32" style={styles.sample}>
+        <Rect width={44} height={32} fill={ground} />
+        {feature.id === 'private' ? (
+          <>
+            <Path d="M0 12H44M18 0V32M30 12V32" stroke={color} strokeWidth={1.2} />
+            <Path d="M30 22H44" stroke={color} strokeWidth={1.2} />
+          </>
+        ) : (
+          <Path d="M8 4 L36 7 L40 26 L14 29 L4 18 Z" fill={color} fillOpacity={(ink.fill ?? 0.16) * 1.6} stroke={color} strokeWidth={ink.width} strokeLinejoin="round" />
+        )}
+      </Svg>
+    );
+  }
+  const d = 'M2 24 C12 24 14 8 24 8 S36 16 42 10';
+  const scale = 0.8;
+  if (feature.id === 'parkTrails') {
+    // Park trails come in the park's level colors: the sample shows the four, green to red.
+    const levels = PARK_LEVEL_LEGEND;
+    return (
+      <Svg width={44} height={32} viewBox="0 0 44 32" style={styles.sample}>
+        <Rect width={44} height={32} fill={ground} />
+        {levels.map((l, i) => (
+          <Path key={l.level} d={`M2 ${6 + i * 6.5} C12 ${6 + i * 6.5} 20 ${4 + i * 6.5} 42 ${5 + i * 6.5}`} stroke={on ? PARK_LEVEL_COLORS[l.level] : '#7B8794'} strokeWidth={ink.width * scale * 0.7} strokeLinecap="round" fill="none" />
+        ))}
+      </Svg>
+    );
+  }
+  return (
+    <Svg width={44} height={32} viewBox="0 0 44 32" style={styles.sample}>
+      <Rect width={44} height={32} fill={ground} />
+      {ink.casing ? <Path d={d} stroke="rgba(10,22,38,0.9)" strokeWidth={(ink.width + 3.2) * scale} strokeLinecap="round" fill="none" /> : (
+        <Path d={d} stroke="rgba(10,22,38,0.6)" strokeWidth={(ink.width + 1.6) * scale} fill="none" />
+      )}
+      <Path
+        d={d}
+        stroke={color}
+        strokeWidth={ink.width * scale}
+        strokeDasharray={ink.dash ? ink.dash.map((n) => n * scale).join(' ') : undefined}
+        strokeLinecap={feature.id === 'riderTrails' ? 'round' : 'butt'}
+        fill="none"
+      />
+    </Svg>
+  );
+}
+
+/** Whose land a tap is on: the park, forest or BLM land (or a Texas parcel), who runs it and whether the public may enter. */
+export function LandCard({ land, onClose }: { land: LandInfo; onClose: () => void }) {
+  const ink = FEATURE_INK[land.kind === 'public' ? 'blm' : land.kind];
+  const kindName: Record<LandInfo['kind'], string> = {
+    nationalForest: 'National Forest', blm: 'BLM Land', nationalPark: 'National Park', statePark: 'State Park', public: 'Public Land', private: 'Private Property',
+  };
+  const facts = [land.manager, land.acres != null ? tr('{n} acres', { n: land.acres.toLocaleString('en-US') }) : null].filter(Boolean);
+  return (
+    <View style={[styles.card, { borderColor: ink }]} accessibilityLiveRegion="polite">
+      <View style={styles.cardHead}>
+        <View style={{ flex: 1, gap: 3 }}>
+          <View style={styles.userRow}>
+            <View style={[styles.landDot, { backgroundColor: ink }]} />
+            <Text style={[styles.userText, { color: ink }]}>{tr(kindName[land.kind])}</Text>
+          </View>
+          <Text style={styles.cardTitle} numberOfLines={2}>{tr(land.title)}</Text>
+          {facts.length ? <Text style={styles.rowSub} numberOfLines={2}>{facts.join('   ')}</Text> : null}
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr('Close')} hitSlop={10} onPress={onClose} style={styles.close}>
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <Path d="M6 6l12 12M18 6L6 18" stroke={Colors.textSecondary} strokeWidth={2.5} strokeLinecap="round" />
+          </Svg>
+        </Pressable>
+      </View>
+      {land.access ? <Text style={styles.facts}>{tr(land.access)}</Text> : null}
+      <Text style={styles.fine}>{tr('From {attribution}. Boundaries can be out of date; posted signs win.', { attribution: land.attribution })}</Text>
     </View>
   );
 }
@@ -334,7 +445,7 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
 }
 
 export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => void }) {
-  const facts = [info.source === 'osm' ? tr('Track') : info.kind === 'trail' ? tr('Trail') : tr('Road'), info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
+  const facts = [info.hiking ? tr('Hiking Trail') : info.source === 'osm' ? tr('Track') : info.kind === 'trail' ? tr('Trail') : tr('Road'), info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
   return (
     <View style={styles.card} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
@@ -374,18 +485,6 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
         <Text style={styles.rowSub}>{"The agency data doesn't list which vehicles can use this one."}</Text>
       )}
       <Text style={styles.fine}>{tr('From {attribution}. Check posted signs and closures before you ride.', { attribution: info.attribution })}</Text>
-    </View>
-  );
-}
-
-function LegendLine({ color, label, dashed, closed, dotted }: { color: string; label: string; dashed?: boolean; closed?: boolean; dotted?: boolean }) {
-  return (
-    <View style={styles.legendItem}>
-      <Svg width={28} height={10}>
-        <Path d="M2 5H26" stroke={Colors.background} strokeWidth={7} strokeLinecap="round" />
-        <Path d="M3 5H25" stroke={color} strokeWidth={dotted ? 3.6 : 3.2} strokeLinecap={dotted ? 'round' : 'butt'} strokeDasharray={dotted ? '0.1 6' : closed ? '3.5 3.5' : dashed ? '6 3.5' : undefined} />
-      </Svg>
-      {label ? <Text style={styles.legendText}>{label}</Text> : null}
     </View>
   );
 }
@@ -523,7 +622,20 @@ const styles = themedStyles(() => ({
   fab3dTextOn: { color: '#FFFFFF' },
   hint: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.pill, ...glass },
   hintText: { color: Colors.text, fontFamily: font(600), fontSize: 13 },
-  panel: { width: 288, borderRadius: Radius.card, padding: 14, gap: 12, ...glass },
+  panel: { width: 300, borderRadius: Radius.card, ...glass },
+  panelBody: { padding: 14, gap: 12 },
+  group: { gap: 6 },
+  groupHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingTop: 2 },
+  groupTitle: { color: SAND, fontFamily: font(700), fontSize: 15 },
+  groupAll: { color: Colors.sky, fontFamily: font(600), fontSize: 13 },
+  feature: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 48, paddingVertical: 5, paddingLeft: 5, paddingRight: 8, borderRadius: Radius.control, borderWidth: 1, borderColor: 'transparent' },
+  featureOn: { backgroundColor: 'rgba(255,255,255,0.05)', borderColor: Glass.edge },
+  featureName: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
+  featureDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12, lineHeight: 15 },
+  sample: { borderRadius: 7, overflow: 'hidden' },
+  tick: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: Colors.textSecondary, alignItems: 'center', justifyContent: 'center' },
+  tickOn: { backgroundColor: Colors.sky, borderColor: Colors.sky },
+  landDot: { width: 10, height: 10, borderRadius: 3 },
   panelTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20 },
   bases: { flexDirection: 'row', gap: 10 },
   base: { flex: 1, gap: 6, alignItems: 'center' },

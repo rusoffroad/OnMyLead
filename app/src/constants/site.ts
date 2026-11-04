@@ -42,5 +42,11 @@ export const MAPBOX_PUBLIC_TOKEN = '';
  * the stores and the Mapbox token above is set, so the website never shows what riders can't get.
  */
 export const SHOWCASE_3D_TERRAIN: boolean = false;
+
+/**
+ * The Map Features line in the showcase (roads, hiking trails and land boundaries you switch on and
+ * off). Off until the app version with Map Features (2.1) is live in the stores.
+ */
+export const SHOWCASE_MAP_FEATURES: boolean = false;
 /** The Park Trails line in the showcase. Off until the app version with park trails (2.1) is live in the stores. */
 export const SHOWCASE_PARK_TRAILS: boolean = false;

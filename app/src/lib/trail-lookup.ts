@@ -1,13 +1,14 @@
 import type { LatLng } from '@/core/geo';
 import { osmTilesForRegion, type ViewRegion } from '@/core/osm-trails';
 import {
-  closedSeasonalLines, identifyUrl, nearestTrail, SEASONAL_MAX_TILES, SEASONAL_MIN_Z, SEASONAL_TILE_Z, seasonalQueryUrl,
+  closedSeasonalLines, identifyUrl, inTexas, landQueryUrl, PADUS, PADUS_FIELDS, parcelIdentifyUrl, parsePadus, parseParcel, type LandInfo, nearestTrail, SEASONAL_MAX_TILES, SEASONAL_MIN_Z, SEASONAL_TILE_Z, seasonalQueryUrl,
   TRAIL_SOURCES, type ClosedLine, type GeoJsonLine, type TrailInfo, type TrailSourceId,
 } from '@/core/trails';
 
 /**
  * The trail layer's questions to the agencies' map servers, shared by the apps and the website
- * (deploy/security-headers.conf allows apps.fs.usda.gov and gis.blm.gov). Only the map square or
+ * (deploy/security-headers.conf allows apps.fs.usda.gov, gis.blm.gov, edits.nationalmap.gov for PAD-US land and
+ * feature.geographic.texas.gov for Texas parcels). Only the map square or
  * the tapped spot is sent, never anything about the rider.
  */
 
@@ -34,6 +35,23 @@ export async function identifyTrail(p: LatLng, sources: TrailSourceId[], radiusM
     }),
   );
   return nearestTrail(p, results, radiusM);
+}
+
+/**
+ * Whose land a tap is on, for the land Map Features that are on: a park or forest from PAD-US
+ * first, then (in Texas, with Property Lines on) the parcel. Null with nothing on or no answer.
+ */
+export async function identifyLand(
+  p: LatLng,
+  on: { nationalForest: boolean; blm: boolean; nationalPark: boolean; statePark: boolean; private: boolean },
+): Promise<LandInfo | null> {
+  const anyPublic = on.nationalForest || on.blm || on.nationalPark || on.statePark;
+  const [padus, parcel] = await Promise.all([
+    anyPublic ? getJson<{ features?: { attributes: Record<string, unknown> }[] }>(landQueryUrl(PADUS, p, PADUS_FIELDS)) : null,
+    on.private && inTexas(p) ? getJson<{ results?: { attributes: Record<string, unknown> }[] }>(parcelIdentifyUrl(p)) : null,
+  ]);
+  const land = padus ? parsePadus((padus.features ?? []).map((f) => f.attributes), on) : null;
+  return land ?? (parcel ? parseParcel((parcel.results ?? []).map((r) => r.attributes)) : null);
 }
 
 /** Answers per square and day, newest last, so panning back doesn't ask again. */

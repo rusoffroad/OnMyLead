@@ -4,6 +4,7 @@ import L from 'leaflet';
 
 import { Colors, Glass, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { FEATURE_BY_ID, type AgencyLayer } from '@/core/map-features';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkSummaryLine, PARK_NAMES_MIN_Z, type ParkLabel, type ParkPiece, type ParkSummary } from '@/core/park-trails';
 import { OSM_ATTRIBUTION, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
@@ -125,7 +126,20 @@ function casedLine(g: L.LayerGroup, part: LatLng[], closed: boolean) {
 
 /** OpenStreetMap trails, like the phone's trail layer. */
 export function drawOsmTracks(g: L.LayerGroup, lines: OsmTrail[]) {
-  for (const t of lines) for (const part of t.parts) casedLine(g, part, t.closed);
+  for (const t of lines) {
+    for (const part of t.parts) {
+      if (t.kind === 'path') hikingLine(g, part);
+      else casedLine(g, part, t.closed);
+    }
+  }
+}
+
+/** A hiking path: thin pink dash-dots on a light casing, lighter than anything a vehicle uses (core/map-features). */
+function hikingLine(g: L.LayerGroup, part: LatLng[]) {
+  const ink = FEATURE_BY_ID.hiking.ink;
+  const line = part.map(ll);
+  L.polyline(line, { color: 'rgba(10,22,38,0.6)', weight: ink.width + 1.6, interactive: false }).addTo(g);
+  L.polyline(line, { color: ink.color, weight: ink.width, dashArray: (ink.dash ?? []).join(' '), interactive: false }).addTo(g);
 }
 
 /** Forest Service routes closed for the season today. */
@@ -161,6 +175,8 @@ class BoxTiles extends L.TileLayer {
 export type TrailLayerState = {
   base: BaseMap;
   trails: boolean;
+  /** The agency trail and land layers for the Map Features that are on (useTrailMap agencyLayers); missing: every trail layer. */
+  agencyLayers?: AgencyLayer[];
   osmLines: OsmTrail[];
   closedLines: ClosedLine[];
   labels: TrailLabel[];
@@ -211,9 +227,20 @@ export function trailLayers(m: L.Map) {
   m.createPane('oml-topo').style.zIndex = '250';
   m.createPane('oml-agency').style.zIndex = '300';
   const topo = L.tileLayer(USGS_TOPO, { pane: 'oml-topo', maxZoom: 19, maxNativeZoom: TOPO_MAX_NATIVE_Z, attribution: TOPO_ATTRIBUTION });
-  const agency = TRAIL_SOURCE_IDS.map(
-    (id) => new BoxTiles(trailTileTemplate(TRAIL_SOURCES[id]), { pane: 'oml-agency', minZoom: TRAILS_MIN_Z, maxZoom: 19, attribution: TRAIL_SOURCES[id].attribution }),
-  );
+  m.createPane('oml-land').style.zIndex = '280';
+  const every: AgencyLayer[] = TRAIL_SOURCE_IDS.map((id) => ({
+    id, key: id, template: trailTileTemplate(TRAIL_SOURCES[id]), minZ: TRAILS_MIN_Z, attribution: TRAIL_SOURCES[id].attribution, land: false,
+  }));
+  // One Leaflet layer per agency layer key, made when first shown and kept for when it's switched back on.
+  const agency = new Map<string, L.TileLayer>();
+  const layerFor = (a: AgencyLayer) => {
+    let l = agency.get(a.key);
+    if (!l) {
+      l = new BoxTiles(a.template, { pane: a.land ? 'oml-land' : 'oml-agency', minZoom: a.minZ, maxZoom: 19, attribution: a.attribution });
+      agency.set(a.key, l);
+    }
+    return l;
+  };
   const riders = L.layerGroup().addTo(m);
   const parks = L.layerGroup().addTo(m);
   const lines = L.layerGroup().addTo(m);
@@ -225,7 +252,10 @@ export function trailLayers(m: L.Map) {
   return {
     update(t: TrailLayerState) {
       show(topo, t.base === 'topo');
-      for (const a of agency) show(a, t.trails);
+      const want = t.agencyLayers ?? (t.trails ? every : []);
+      const keys = new Set(want.map((a) => a.key));
+      for (const [key, layer] of agency) if (!keys.has(key)) show(layer, false);
+      for (const a of want) show(layerFor(a), true);
       lines.clearLayers();
       tags.clearLayers();
       riders.clearLayers();
@@ -236,6 +266,7 @@ export function trailLayers(m: L.Map) {
         m.attributionControl.removeAttribution(OSM_ATTRIBUTION);
         return;
       }
+      // osmLines, closedLines and labels already follow the Map Features (useTrailMap).
       drawOsmTracks(lines, t.osmLines);
       drawClosedLines(lines, t.closedLines);
       drawTrailLabels(tags, t.labels);

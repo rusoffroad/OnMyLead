@@ -3,7 +3,7 @@
     "version": "2.1",
     "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
-    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint; the group gets a ding.\n• Faster Mapbox maps with a 3D button.",
+    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint; the group gets a ding.\n• Map Features: roads, hiking, land.",
     "apple": null,
     "google": null,
     "notes": [
@@ -22,6 +22,10 @@
       {
         "kind": "new",
         "text": "A 3D button on the map in Ride Mode and Map Mode: one tap tilts the map into 3D Terrain, another lays it flat again in the style you had. It stays on the map in Full Map too."
+      },
+      {
+        "kind": "new",
+        "text": "Map Features: the map layers panel now lists every kind of line and land the map can show, each with a picture of how it looks, to turn on and off. Highways and freeways are heavy blue lines and paved public roads lighter blue, so they never look like trails. Dirt roads are white, Forest Service roads open only to street-legal vehicles are lavender, trails limited to 50-inch machines or dirt bikes are orange, and hiking trails are a thinner pink dash-dot, so you can tell at a glance where you can't ride. Turn on National Forests, BLM Land, National Parks, State Parks and, in Texas, Property Lines, then tap the map to see whose land you're on and whether it's open to the public. Your choices follow you to your other devices."
       },
       {
         "kind": "improved",

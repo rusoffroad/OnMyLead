@@ -9,12 +9,13 @@ import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
 import {
   AGENCY_TILE_SIZE, cameraPadding, EMPTY_LINES, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxAgencyTemplate, mapboxStyleFor, metersPerPointAt,
-  NATIVE_TRACKS_MIN_ZOOM, nativeTracks, OSM_CLOSED_TRACK_FILTER, OSM_NAMED_TRACK_FILTER, OSM_OPEN_TRACK_FILTER, OSM_SOURCE_ID, OSM_TRACK_FILTER, pointsGeoJSON,
+  NATIVE_TRACKS_MIN_ZOOM, nativeTracks, OSM_SOURCE_ID, pointsGeoJSON,
   regionFromCamera, TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_SOURCES, terrainExaggeration, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE,
   TOPO_SOURCE_ID, trailZoomFromMapbox, type MapLook,
 } from '@/core/terrain';
 import { OSM_TILEJSON } from '@/core/osm-trails';
-import { TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate } from '@/core/trails';
+import { FEATURE_BY_ID, osmFeatureLayers, type AgencyLayer } from '@/core/map-features';
+import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
@@ -35,6 +36,11 @@ function loadGl(): Promise<GL> {
 
 const OPEN_DASH = [9 / 3.2, 5 / 3.2];
 const CLOSED_DASH = [5 / 3.2, 5 / 3.2];
+const HIKE = FEATURE_BY_ID.hiking.ink;
+const HIKE_DASH = (HIKE.dash ?? []).map((d) => Math.max(0.1, d / HIKE.width));
+const OSM_LAYERS = osmFeatureLayers();
+/** An empty layer marking where the agency squares go: below OpenStreetMap lines (added after it). */
+const AGENCY_ANCHOR = 'oml-agency-anchor';
 
 /** Everything the app adds to a Mapbox style for a look, in drawing order (added again after each style change). */
 function addLayers(m: MapboxMap_, look: MapLook) {
@@ -48,25 +54,22 @@ function addLayers(m: MapboxMap_, look: MapLook) {
     m.addSource(TOPO_SOURCE_ID, TOPO_RASTER_SOURCE as never);
     m.addLayer({ id: TOPO_LAYER_ID, type: 'raster', source: TOPO_SOURCE_ID });
   }
-  for (const id of TRAIL_SOURCE_IDS) {
-    m.addSource(`oml-agency-${id}`, { type: 'raster', tiles: [mapboxAgencyTemplate(trailTileTemplate(TRAIL_SOURCES[id]))], tileSize: AGENCY_TILE_SIZE, minzoom: TRAILS_MIN_Z - 1 });
-    m.addLayer({ id: `oml-agency-${id}`, type: 'raster', source: `oml-agency-${id}`, paint: { 'raster-fade-duration': 0 } });
-  }
-  // OpenStreetMap tracks drawn by Mapbox from the vector squares, close in (core/terrain NATIVE_TRACKS_MIN_ZOOM).
+  // The agencies' trail and land squares go in under this marker as the Map Features change (see syncAgency).
+  m.addSource(AGENCY_ANCHOR, { type: 'geojson', data: EMPTY_LINES });
+  m.addLayer({ id: AGENCY_ANCHOR, type: 'line', source: AGENCY_ANCHOR, paint: { 'line-opacity': 0 } });
+  // OpenStreetMap roads, tracks and paths drawn by Mapbox from the vector squares (core/map-features).
   m.addSource(OSM_SOURCE_ID, { type: 'vector', url: OSM_TILEJSON });
-  const osm = { source: OSM_SOURCE_ID, 'source-layer': 'transportation', minzoom: NATIVE_TRACKS_MIN_ZOOM } as const;
-  m.addLayer({ id: 'oml-osm-case', type: 'line', ...osm, filter: OSM_TRACK_FILTER as never, layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 6.5 } });
-  m.addLayer({ id: 'oml-osm-open', type: 'line', ...osm, filter: OSM_OPEN_TRACK_FILTER as never, paint: { 'line-color': TRAIL_INK.trail, 'line-width': 3.2, 'line-dasharray': OPEN_DASH } });
-  m.addLayer({ id: 'oml-osm-closed', type: 'line', ...osm, filter: OSM_CLOSED_TRACK_FILTER as never, paint: { 'line-color': TRAIL_INK.closed, 'line-width': 3.2, 'line-dasharray': CLOSED_DASH } });
-  m.addLayer({
-    id: 'oml-osm-names', type: 'symbol', ...osm, 'source-layer': 'transportation_name', filter: OSM_NAMED_TRACK_FILTER as never,
-    layout: { 'symbol-placement': 'line', 'text-field': ['get', 'name'], 'text-size': 12, 'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'], 'text-max-angle': 30, 'symbol-spacing': 320 },
-    paint: { 'text-color': '#FFFFFF', 'text-halo-color': 'rgba(10,22,38,0.92)', 'text-halo-width': 1.6 },
-  });
+  for (const l of OSM_LAYERS) {
+    m.addLayer({
+      id: l.id, type: l.type, source: OSM_SOURCE_ID, 'source-layer': l.sourceLayer, minzoom: l.minzoom, filter: l.filter as never,
+      layout: { ...l.layout, visibility: 'none' } as never, paint: l.paint as never,
+    });
+  }
   m.addSource('oml-tracks', { type: 'geojson', data: EMPTY_LINES });
-  m.addLayer({ id: 'oml-tracks-case', type: 'line', source: 'oml-tracks', layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 6.5 } });
-  m.addLayer({ id: 'oml-tracks-open', type: 'line', source: 'oml-tracks', filter: ['!=', ['get', 'closed'], true], paint: { 'line-color': TRAIL_INK.trail, 'line-width': 3.2, 'line-dasharray': OPEN_DASH } });
-  m.addLayer({ id: 'oml-tracks-closed', type: 'line', source: 'oml-tracks', filter: ['==', ['get', 'closed'], true], paint: { 'line-color': TRAIL_INK.closed, 'line-width': 3.2, 'line-dasharray': CLOSED_DASH } });
+  m.addLayer({ id: 'oml-tracks-hike', type: 'line', source: 'oml-tracks', filter: ['==', ['get', 'path'], true], paint: { 'line-color': HIKE.color, 'line-width': HIKE.width, 'line-dasharray': HIKE_DASH } });
+  m.addLayer({ id: 'oml-tracks-case', type: 'line', source: 'oml-tracks', filter: ['!=', ['get', 'path'], true], layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 6.5 } });
+  m.addLayer({ id: 'oml-tracks-open', type: 'line', source: 'oml-tracks', filter: ['all', ['!=', ['get', 'closed'], true], ['!=', ['get', 'path'], true]], paint: { 'line-color': TRAIL_INK.trail, 'line-width': 3.2, 'line-dasharray': OPEN_DASH } });
+  m.addLayer({ id: 'oml-tracks-closed', type: 'line', source: 'oml-tracks', filter: ['all', ['==', ['get', 'closed'], true], ['!=', ['get', 'path'], true]], paint: { 'line-color': TRAIL_INK.closed, 'line-width': 3.2, 'line-dasharray': CLOSED_DASH } });
   m.addSource('oml-closures', { type: 'geojson', data: EMPTY_LINES });
   m.addLayer({ id: 'oml-closures-case', type: 'line', source: 'oml-closures', layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 6.5 } });
   m.addLayer({ id: 'oml-closures-line', type: 'line', source: 'oml-closures', paint: { 'line-color': TRAIL_INK.closed, 'line-width': 3.2, 'line-dasharray': CLOSED_DASH } });
@@ -100,9 +103,33 @@ function addLayers(m: MapboxMap_, look: MapLook) {
 }
 
 /** The app's own track lines and names: drawn only out to where Mapbox draws the tracks itself. */
-const OWN_TRACK_IDS = ['oml-tracks-case', 'oml-tracks-open', 'oml-tracks-closed', 'oml-trail-names'];
-const NATIVE_TRACK_IDS = ['oml-osm-case', 'oml-osm-open', 'oml-osm-closed', 'oml-osm-names'];
-const TRAIL_LAYER_IDS = [...OWN_TRACK_IDS, 'oml-closures-case', 'oml-closures-line', ...TRAIL_SOURCE_IDS.map((id) => `oml-agency-${id}`)];
+const OWN_TRACK_IDS = ['oml-tracks-hike', 'oml-tracks-case', 'oml-tracks-open', 'oml-tracks-closed', 'oml-trail-names'];
+const TRAIL_LAYER_IDS = [...OWN_TRACK_IDS, 'oml-closures-case', 'oml-closures-line'];
+
+/**
+ * Puts the agency trail and land squares for the Map Features that are on onto the map, under
+ * the app's own lines, and takes off the ones no longer wanted. Each layer's id carries its key,
+ * so changing the choices makes a fresh layer rather than reusing squares drawn for other ones.
+ */
+function syncAgency(m: MapboxMap_, want: AgencyLayer[], offline: boolean) {
+  const keep = new Set(offline ? [] : want.map((a) => `oml-agency-${a.key}`));
+  const style = m.getStyle();
+  for (const l of style?.layers ?? []) {
+    if (l.id.startsWith('oml-agency-') && !keep.has(l.id)) {
+      m.removeLayer(l.id);
+      if (m.getSource(l.id)) m.removeSource(l.id);
+    }
+  }
+  if (offline) return;
+  for (const a of want) {
+    const id = `oml-agency-${a.key}`;
+    if (m.getLayer(id)) continue;
+    m.addSource(id, { type: 'raster', tiles: [mapboxAgencyTemplate(a.template)], tileSize: AGENCY_TILE_SIZE, minzoom: a.minZ - 1 });
+    // Land first, under the trails; everything under the OpenStreetMap lines and the app's own.
+    const before = a.land ? want.find((b) => !b.land && m.getLayer(`oml-agency-${b.key}`)) : undefined;
+    m.addLayer({ id, type: 'raster', source: id, paint: { 'raster-fade-duration': 0 } }, before ? `oml-agency-${before.key}` : AGENCY_ANCHOR);
+  }
+}
 
 /**
  * The Mapbox map on the website (mapbox-gl), the same picture and the same props as the apps'
@@ -291,16 +318,16 @@ export function MapboxMap({
   }), [map]);
 
   // Trail layers follow the rider's choices, like the flat maps.
-  const { trails, offline, osmLines, closedLines, labels, riderTrails, parkTrails, parkLabels, parks } = trail;
+  const { trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks } = trail;
   useEffect(() => {
     if (!map || !styled) return;
+    syncAgency(map, agencyLayers, offline);
     for (const id of TRAIL_LAYER_IDS) {
       if (!map.getLayer(id)) continue;
-      const agency = id.startsWith('oml-agency-');
-      map.setLayoutProperty(id, 'visibility', trails && !(agency && offline) ? 'visible' : 'none');
+      map.setLayoutProperty(id, 'visibility', trails ? 'visible' : 'none');
     }
+    for (const l of OSM_LAYERS) if (map.getLayer(l.id)) map.setLayoutProperty(l.id, 'visibility', !offline && features[l.feature] ? 'visible' : 'none');
     const native = nativeTracks(trails, offline);
-    for (const id of NATIVE_TRACK_IDS) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', native ? 'visible' : 'none');
     for (const id of OWN_TRACK_IDS) if (map.getLayer(id)) map.setLayerZoomRange(id, 0, native ? NATIVE_TRACKS_MIN_ZOOM : 24);
     const src = (id: string) => map.getSource(id) as { setData?: (d: unknown) => void } | undefined;
     src('oml-tracks')?.setData?.(linesGeoJSON(osmLines.flatMap((t) => t.parts.map((points, i) => ({ key: `${t.key}-${i}`, points, props: { closed: t.closed } })))));
@@ -310,7 +337,7 @@ export function MapboxMap({
     src('oml-park-trails')?.setData?.(linesGeoJSON(parkPieces(parkTrails).map((p) => ({ key: p.key, points: p.points, props: { color: p.color, closed: p.closed, road: p.road } }))));
     src('oml-park-names')?.setData?.(pointsGeoJSON(parkLabels.map((l) => ({ key: `pl-${l.key}`, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))));
     src('oml-park-titles')?.setData?.(pointsGeoJSON(parks.map((p) => ({ key: `park-${p.parkOsmId}`, at: p.center, props: { name: p.parkName, sub: parkSummaryLine(p) } }))));
-  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, parkTrails, parkLabels, parks]);
+  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks]);
 
   // The screen's own fills and lines, redrawn when they change (and after a style change wiped them).
   const drawn = useRef<string[]>([]);

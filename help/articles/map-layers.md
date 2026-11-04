@@ -1,6 +1,6 @@
 ---
 title: Map Layers and Trails
-summary: Switch between satellite and topo, show public trails and roads with their names and closures, and tap a trail to see which vehicles can ride it.
+summary: Switch between satellite and topo, pick which roads, trails and land boundaries show in Map Features, and tap a trail or a piece of land to see who can ride it.
 category: routes-maps
 order: 50
 release: "1.0"
@@ -16,6 +16,7 @@ sources:
   - app/src/core/terrain.ts
   - app/src/components/trail-tiles.web.tsx
   - app/src/hooks/use-trail-map.ts
+  - app/src/core/map-features.ts
   - app/src/core/trails.ts
   - app/src/core/osm-trails.ts
   - app/src/lib/trail-tiles.ts
@@ -29,7 +30,7 @@ sources:
   - app/src/components/rides-map.web.tsx
   - app/src/components/waypoint-map.web.tsx
 related: [offline-maps, route-builder, ride-mode, find-a-ride, waypoints-and-planned-stops, park-trails]
-keywords: [rider trails, user submitted trails, closed, closure, closed trail, seasonal closure, trail names, road names, labels, layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
+keywords: [map features, highways, freeways, paved roads, hiking trails, street legal, width limit, land boundaries, national forest, blm land, national park, state park, property lines, private property, parcels, pad-us, rider trails, user submitted trails, closed, closure, closed trail, seasonal closure, trail names, road names, labels, layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
 screenshots:
   - file: map.webp
     shows: app/src/components/trail-tiles.tsx
@@ -60,6 +61,10 @@ Tap it to open the **Map** panel. Tap it again to close the panel.
 Tap it to open the **Map Style** panel. Tap it again to close the panel.
 :::
 
+:::release 2.1
+The panel has **Map Style** at the top and **Map Features** under it. On a phone the panel scrolls if it's taller than the space above Ride Mode's or Map Mode's bottom panel.
+:::
+
 Your choices are remembered on your phone and used on every map in the app.
 
 :::release 2.1
@@ -85,9 +90,51 @@ Each style has a small picture of how it looks; the one you're using has a blue 
 - **3D Terrain**: satellite on the real shape of the land, with contour lines and peak heights. It shows in Ride Mode and Map Mode; the other maps show plain satellite while it's picked. See [3D Terrain](/help/3d-terrain).
 :::
 
+:::release 2.1
+## Map Features
+
+**Map Features** lists every kind of line and land the map can show, in three groups: **Roads**, **Trails** and **Land**. Each row has a small picture of exactly how it looks on the map, its name and a line about what it is. Tap a row to turn it on or off; a blue check means it's showing. **Show All** and **Hide All** next to a group's name turn the whole group on or off.
+
+### Roads
+
+- **Highways and Freeways**: interstates, freeways and major highways, a heavy solid blue line. They show from far out.
+- **Paved Public Roads**: state, county and town roads, a lighter blue line, with route numbers or names when zoomed in.
+- **Dirt Roads**: Forest Service, BLM and county dirt roads, a solid white line.
+- **Street-Legal Only**: Forest Service roads open only to plated, highway-legal vehicles, a solid lavender line. Take an unplated UTV or dirt bike somewhere else.
+
+### Trails
+
+- **Off-Road Trails**: motorized trails and dirt tracks, bold amber dashes, with names.
+- **Width-Limited Trails**: Forest Service trails open only to vehicles 50 inches wide or less, or only to dirt bikes, shorter orange dashes.
+- **Hiking Trails**: foot and horse trails with no motor vehicles, a thinner pink dash-dot line with a light outline, so it never looks like a trail you can drive. They come from Forest Service trails closed to motor vehicles, BLM non-motorized trails and OpenStreetMap paths.
+- **Closures**: red dashes. See [Closed Trails and Roads](#closed-trails-and-roads).
+- **Rider Trails**: mint dots. See [Rider Trails](#rider-trails).
+- **Park Trails**: the trails of offroad parks in the park's own level colors (green, blue, white, red). Free for everyone. See [Park Trails](#park-trails).
+
+Roads, trails and closures are all on unless you turn them off. Highways, paved roads and hiking paths from OpenStreetMap are drawn on Mapbox maps (every map from 2.1); on the rare map that falls back to Apple, Google or the website's basic map, the base map shows roads in its own colors.
+
+### Land
+
+Land is off until you turn it on, since it tints the whole map:
+
+- **National Forests**: Forest Service land and grasslands, tinted green with a green edge.
+- **BLM Land**: Bureau of Land Management land, tinted gold.
+- **National Parks**: national parks, monuments and recreation areas, tinted purple.
+- **State Parks**: state parks and state recreation areas, tinted teal.
+- **Property Lines**: private parcel lines in coral, in Texas for now. They show when you're zoomed in to a few blocks across. No owner names are shown.
+
+Land shows from about a few counties across, with each area's name when you're zoomed in. Tap the map with land on to see a card with whose land it is: the area's name, who manages it, whether it's open to the public and its size. In Texas, with **Property Lines** on, tapping private land shows **Property Parcel**, its county and acres. If you tap a trail, its card comes first.
+
+Land boundaries come from public records (USGS PAD-US and the Texas Geographic Information Office) and can be out of date. Posted signs and fences always win. Land doesn't download with an offline map yet; it shows when you have signal.
+
+Your Map Features choices are saved and follow you to your other devices.
+:::
+
+:::until 2.1
 ## Public Trails and Roads
 
 Turn **Public Trails and Roads** on to draw trail and road lines on the map. It's on unless you turn it off.
+:::
 
 :::until 1.0.1
 - **Trail**: a dashed sand-colored line.
@@ -116,7 +163,7 @@ The lines come from:
 - **Bureau of Land Management**: BLM routes.
 
 :::release 2.1
-BLM moved its route map to a new address in 2026, which kept BLM lines from showing for a while. From 2.1 they show again: motorized roads in white, motorized trails as amber dashes, and trails closed to motor vehicles as red dashes.
+BLM moved its route map to a new address in 2026, which kept BLM lines from showing for a while. From 2.1 they show again: motorized roads in white, motorized trails as amber dashes, and trails closed to motor vehicles as pink hiking trails.
 
 Trail lines also show up faster when you zoom in. The Forest Service and BLM draw their lines on request, so the map now asks them for far fewer, bigger pieces at a time, and close in, Mapbox draws OpenStreetMap tracks and their names itself as you pinch, instead of waiting for the map to finish loading.
 :::
@@ -140,20 +187,20 @@ Trail lines show from pretty far out. Forest Service and BLM lines appear when t
 
 Trails other riders mapped and shared in [Navigate](/help/navigation-mode) are drawn as **mint dotted lines**, so you can tell them apart from agency and OpenStreetMap trails. They show once you zoom in to about a county's width, when you're signed in. Tap one to see its card: it says **User Submitted Trail**, who mapped it, its difficulty, its **Quality** and **Line Accuracy** stars, and has **Rate Trail**, **Navigate** and **Details**.
 
-Turn **Rider Trails** off in the panel to hide them. The same choice is on the **You** tab as **Rider Trails on Maps**. They're on unless you turn them off.
+Turn **Rider Trails** off in the panel (in **Map Features** from 2.1) to hide them. The same choice is on the **You** tab as **Rider Trails on Maps**. They're on unless you turn them off.
 :::
 
 :::release 2.1
 ## Park Trails
 
-The trails of offroad parks (Hidden Falls Adventure Park, Katemcy Rocks, Hollister Hills and about fifty more) draw on every map as **solid lines with a dark edge**, colored by the park's own level where it rates its trails, with the park's name from far out. Switch **Park Trails** off in the panel to hide them. See [Offroad Park Trails](/help/park-trails).
+The trails of offroad parks (Hidden Falls Adventure Park, Katemcy Rocks, Hollister Hills and about fifty more) draw on every map as **solid lines with a dark edge**, colored by the park's own level where it rates its trails, with the park's name from far out. The **Park Trails** row in the **Trails** group of Map Features turns them off; it's free for everyone. See [Offroad Park Trails](/help/park-trails).
 :::
 
 The map on the **Find a Ride** tab shows trail lines too when you zoom in, following the choice you made here.
 
 ## See Who Can Ride a Trail
 
-1. Make sure **Public Trails and Roads** is on and you're zoomed in.
+1. Make sure **Public Trails and Roads** is on (from 2.1, the trail and road rows in **Map Features**) and you're zoomed in.
 2. Tap a trail or road line. In the route builder, press and hold instead, since a tap adds a route point.
 3. A card shows the trail's name, where it is, whether it's a trail, road or track, the segment's miles and surface when known.
 
@@ -220,7 +267,7 @@ When your phone loses signal, a **No Signal** tag with **Downloaded Map** appear
 
 ## On the Website
 
-The website's route builder and waypoints map have the same layers button and map panel: **Satellite** or **Topo**, **Public Trails and Roads**, the trail and road names, and closed trails in red. The satellite map shows road names too. Zoomed in, the **Find a Ride** map shows the trail lines and names as well.
+The website's route builder and waypoints map have the same layers button and map panel: **Satellite** or **Topo**, **Public Trails and Roads** (from 2.1, every **Map Features** row, including land), the trail and road names, and closed trails in red. The satellite map shows road names too. Zoomed in, the **Find a Ride** map shows the trail lines and names as well.
 
 On the website, click a trail line to see its card when you're not adding points: on a route imported from a GPX file, for example. On the waypoints map a click adds a waypoint, so read the names on the map there. Downloading maps for no signal is only in the app.
 
@@ -228,6 +275,8 @@ On the website, click a trail line to see its card when you're not adding points
 
 - Trails and roads: USDA Forest Service MVUM and Forest Service roads, Bureau of Land Management, and map data © OpenStreetMap contributors, © OpenMapTiles, served by OpenFreeMap.
 - Topo: USGS The National Map.
+- Land (from 2.1): USGS PAD-US for national forests, BLM land and parks, and the Texas Geographic Information Office (StratMap land parcels) for Texas property lines.
+- Hiking trails (from 2.1): USDA Forest Service trails.
 - Satellite with no signal: USGS The National Map: Orthoimagery.
 
 The credits for what's showing are listed at the bottom of the layers panel. Loading map squares only sends the area being looked at, never anything about you.

@@ -90,10 +90,10 @@ function FlatRouteBuilderMap({
 
   const riderLines = useMemo(() => (trail?.riderTrails ?? []).map((t) => t.points), [trail?.riderTrails]);
   const parkLines = useMemo(() => parkPieces(trail?.parkTrails ?? []), [trail?.parkTrails]);
-  const { base, trails, osmLines, closedLines, labels } = trail ?? { base: 'satellite' as const, trails: false, osmLines: [], closedLines: [], labels: [] };
+  const { base, trails, agencyLayers, osmLines, closedLines, labels } = trail ?? { base: 'satellite' as const, trails: false, agencyLayers: [], osmLines: [], closedLines: [], labels: [] };
   useEffect(() => {
-    tracks.current?.update({ base, trails, osmLines, closedLines, labels, riderLines, parkPieces: parkLines, parkLabels: trail?.parkLabels ?? [], parks: trail?.parks ?? [] });
-  }, [base, trails, osmLines, closedLines, labels, riderLines, parkLines, trail?.parkLabels, trail?.parks]);
+    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkPieces: parkLines, parkLabels: trail?.parkLabels ?? [], parks: trail?.parks ?? [] });
+  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkLines, trail?.parkLabels, trail?.parks]);
 
   // Go to a searched place: the whole area when it has one, else close in on the spot.
   useEffect(() => {
