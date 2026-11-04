@@ -1,6 +1,6 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState, type ComponentProps } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { DirectionsCard } from '@/components/directions';
 import { PartOfEvent } from '@/components/events/part-of-event';
@@ -20,7 +20,7 @@ import { waypointDots } from '@/components/waypoint-blaze';
 import { WaypointRow } from '@/components/waypoint-row';
 import { TwoPane } from '@/components/two-pane';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { withoutBlocked } from '@/core/blocks';
 import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
@@ -419,7 +419,8 @@ export default function RidePage() {
                 <Button
                   title={route ? 'Edit Route' : ride.freeride ? 'Map a Route Anyway' : 'Build the Route'}
                   kind={route || ride.freeride ? 'secondary' : 'primary'}
-                  onPress={() => router.push(`/ride/${ride.id}/route`)}
+                  pro="route_builder"
+                  onPress={() => requirePro('route_builder') && router.push(`/ride/${ride.id}/route`)}
                 />
               ) : null}
             </Card>
@@ -448,7 +449,8 @@ export default function RidePage() {
                   title="Add a Planned Stop"
                   kind={stops.length ? 'secondary' : 'primary'}
                   disabled={!waypoints.stopsSwitchedOn}
-                  onPress={() => router.push(`/ride/${ride.id}/waypoints?stop=1`)}
+                  pro="waypoints"
+                  onPress={() => requirePro('waypoints') && router.push(`/ride/${ride.id}/waypoints?stop=1`)}
                 />
               ) : null}
             </Card>
@@ -481,7 +483,8 @@ export default function RidePage() {
                 title={otherWaypoints.length ? 'Open Waypoints Map' : 'Add a Waypoint'}
                 kind={otherWaypoints.length ? 'secondary' : 'primary'}
                 disabled={!waypoints.switchedOn}
-                onPress={() => router.push(`/ride/${ride.id}/waypoints`)}
+                pro={otherWaypoints.length ? undefined : 'waypoints'}
+                onPress={() => (otherWaypoints.length || requirePro('waypoints')) && router.push(`/ride/${ride.id}/waypoints`)}
               />
             </Card>
           ) : null}
@@ -624,7 +627,7 @@ function Info({ label, value, first }: { label: string; value: string; first: bo
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   cancelled: {
     gap: Spacing.one,
     padding: Spacing.three,
@@ -641,6 +644,6 @@ const styles = StyleSheet.create({
   tabLabel: { fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
   tabCount: { minWidth: 20, height: 20, borderRadius: 10, paddingHorizontal: 5, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
   tabCountText: { color: '#fff', fontFamily: font(700), fontSize: 12, lineHeight: 14 },
-});
+}));
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

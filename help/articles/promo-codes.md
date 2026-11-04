@@ -4,7 +4,7 @@ summary: Got an OnMyLead promo code? Redeem it in the app through Apple to get O
 category: pro
 order: 50
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/subscription.tsx
   - app/src/app/pro.tsx
@@ -26,6 +26,10 @@ OnMyLead promo codes are Apple offer codes for OnMyLead Pro. You redeem them thr
 Apple shows what the code gives you before you confirm. Once Apple accepts the code, OnMyLead checks it and your plan changes to **Pro**. This can take a moment.
 
 You can also tap **Redeem Promo Code** at the bottom of the Pro screen.
+
+:::release 2.0
+A 50% off code you earned by inviting a friend opens from **Invite Friends** with the code already filled in. See [Invite Friends and Get 50% Off Pro](/help/refer-a-friend).
+:::
 
 ## Redeem a Code on Android
 

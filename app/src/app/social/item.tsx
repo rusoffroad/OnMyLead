@@ -1,16 +1,16 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
-import { keyboardScroll, TextBox } from '@/components/keyboard';
+import { KeyboardScreen, keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { RiderPhoto } from '@/components/rider-photo';
 import { faceColor, Initial } from '@/components/home/parts';
 import { ProTag, Social } from '@/components/social/parts';
 import { SocialCard } from '@/components/social/social-card';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, scrollIndicator, themedStyles } from '@/constants/theme';
 import { can } from '@/core/entitlements';
 import { timeAgo } from '@/core/feed';
 import { COMMENT_MAX, isItemKey, likesLine, profileHref, SOCIAL_NOT_SWITCHED_ON, type Comment, type SocialItem } from '@/core/social';
@@ -20,6 +20,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { addComment, deleteComment, feedItem, itemComments, itemLikers, ProNeededError, SocialOffError } from '@/lib/social';
+import { t } from '@/lib/i18n';
 
 /**
  * One Feed item with every comment and who liked it, opened from the Feed, Social, a profile or a
@@ -110,7 +111,7 @@ export default function SocialItemScreen() {
 
   return (
     <SafeAreaView edges={['top', 'bottom', 'left', 'right']} style={styles.page}>
-      <Stack.Screen options={{ headerShown: false, title: 'Post' }} />
+      <Stack.Screen options={{ headerShown: false, title: t('Post') }} />
       <View style={[styles.column, layout.wide && { maxWidth: 720 }]}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" accessibilityLabel="Back" hitSlop={12} onPress={back} style={styles.back}>
@@ -122,8 +123,8 @@ export default function SocialItemScreen() {
           </Pressable>
         </View>
 
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={styles.body} {...keyboardScroll} indicatorStyle="white">
+        <KeyboardScreen>
+          <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={styles.body} {...keyboardScroll} indicatorStyle={scrollIndicator()}>
             {off ? <Text style={styles.muted}>{SOCIAL_NOT_SWITCHED_ON}</Text> : null}
             {item === null && !off ? (
               <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
@@ -200,7 +201,7 @@ export default function SocialItemScreen() {
                     onPress={send}
                     style={({ pressed }) => [styles.send, (!draft.trim() || sending) && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>
                     <View style={{ transform: [{ rotate: '-90deg' }] }}>
-                      <Icon name="chevron" color="#fff" size={24} strokeWidth={2.8} />
+                      <Icon name="chevron" color={(!draft.trim() || sending) ? Colors.textSecondary : '#fff'} size={24} strokeWidth={2.8} />
                     </View>
                   </Pressable>
                 </View>
@@ -214,7 +215,7 @@ export default function SocialItemScreen() {
               </Pressable>
             )
           ) : null}
-        </KeyboardAvoidingView>
+        </KeyboardScreen>
       </View>
       <ReportSheet
         target={reporting ? { kind: 'rider', userId: reporting.authorId, name: reporting.authorName, source: 'comment', commentId: reporting.id } : null}
@@ -224,7 +225,7 @@ export default function SocialItemScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   page: { flex: 1, backgroundColor: Colors.background },
   column: { flex: 1, width: '100%', alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8 },
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
   headLink: { color: Colors.sky, fontFamily: font(600), fontSize: 15, paddingHorizontal: 8 },
   body: { padding: 16, gap: 14, paddingBottom: 32 },
   muted: { color: Social.muted, fontFamily: font(500), fontSize: 14, lineHeight: 20 },
-  likes: { color: '#C9D3E1', fontFamily: font(600), fontSize: 14, lineHeight: 19 },
+  likes: { color: Colors.textSoft, fontFamily: font(600), fontSize: 14, lineHeight: 19 },
   section: { color: Colors.text, fontFamily: font(600, 'display'), fontSize: 22, marginTop: 4 },
   comment: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   bubble: { flex: 1, backgroundColor: Social.panel, borderRadius: 16, borderTopLeftRadius: 4, borderWidth: 1, borderColor: Social.line, padding: 12, gap: 4 },
@@ -257,4 +258,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(230,194,122,0.08)', borderWidth: 1, borderColor: 'rgba(230,194,122,0.35)',
   },
   lockedText: { flex: 1, color: Colors.text, fontFamily: font(500), fontSize: 14, lineHeight: 19 },
-});
+}));

@@ -1,7 +1,7 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import { choicesLabel, statusLine, type OfflineMap } from '@/core/offline-maps';
 import { deleteOfflineMap, pauseDownload, resumeDownload } from '@/lib/offline-maps';
 import type { FeatureKey } from '@/core/entitlements';
@@ -88,7 +88,7 @@ export function SmallButton({ title, onPress, strong, disabled, pro }: { title: 
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   sheet: { borderRadius: 10, backgroundColor: '#0D1C31', borderWidth: 1, borderColor: Colors.border, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   name: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 22 },
@@ -100,4 +100,4 @@ const styles = StyleSheet.create({
   small: { flexDirection: 'row', gap: 6, minHeight: 34, minWidth: 76, paddingHorizontal: 12, borderRadius: Radius.control - 4, backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center' },
   smallStrong: { backgroundColor: Colors.accent },
   smallText: { color: Colors.text, fontFamily: font(600), fontSize: 14 },
-});
+}));

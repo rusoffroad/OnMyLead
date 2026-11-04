@@ -113,6 +113,7 @@ export function inboxLook(item: Pick<InboxItem, 'kind' | 'data'>): { icon: Inbox
       return { icon: 'chat', tone: 'social' };
     case 'badge':
     case 'trial':
+    case 'referral':
       return { icon: 'star', tone: 'account' };
     case 'trail_hidden':
       return { icon: 'map', tone: 'account' };

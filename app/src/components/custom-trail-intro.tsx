@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { BottomSheet } from '@/components/bottom-sheet';
 import { Icon, type IconName } from '@/components/icon';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import { trailRuleWords, type TrailRules } from '@/core/nav-trails';
 
 export const CUSTOM_TRAIL_INTRO_KEY = 'nav.customTrailIntro.v1';
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
   { icon: 'draw', title: 'Draw It', body: 'Tap along the trail. Follow Trails snaps to lines on the map; Straight Line is for trails that aren’t marked anywhere. Name spots like ledges and crossings as you go.' },
-  { icon: 'lock', title: 'It Stays Private', body: 'Your trail is saved on this phone only. Nobody sees it unless you share it.' },
+  { icon: 'lock', title: 'It Stays Private', body: 'Your trail is saved privately to your account. Nobody sees it unless you share it.' },
   { icon: 'people', title: 'Share With Riders (Pro)', body: 'Shared trails show in full on every rider’s map, mint dotted, with your ride name as the mapper.' },
   { icon: 'star', title: 'Riders Rate It', body: 'Riders who ride a quarter of it (or a full kilometer) rate how accurate the line is, 1 to 5 stars.' },
 ];
@@ -59,7 +59,7 @@ export function CustomTrailIntro({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   step: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   num: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   stepTitle: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
@@ -69,4 +69,4 @@ const styles = StyleSheet.create({
   check: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44, alignSelf: 'flex-start' },
   box: { width: 24, height: 24, borderRadius: 6, borderWidth: 2, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
   boxOn: { backgroundColor: Colors.accent, borderColor: Colors.accent },
-});
+}));

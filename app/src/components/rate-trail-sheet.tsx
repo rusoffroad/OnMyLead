@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
@@ -7,7 +7,7 @@ import { StarInput } from '@/components/stars';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { ACCURACY_WORDS, feetOrMiles, QUALITY_WORDS, RIDER_TRAIL_INK, type PublicTrail } from '@/core/nav-trails';
 import { rateTrail } from '@/lib/nav-trails';
 
@@ -106,8 +106,8 @@ export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
   );
 }
 
-const styles = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+const styles = themedStyles(() => ({
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     flexShrink: 1, backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
@@ -117,4 +117,4 @@ const styles = StyleSheet.create({
   badge: { color: RIDER_TRAIL_INK, fontFamily: font(700), fontSize: 14 },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 28, lineHeight: 30 },
   q: { color: Colors.text, fontFamily: font(700), fontSize: 17 },
-});
+}));

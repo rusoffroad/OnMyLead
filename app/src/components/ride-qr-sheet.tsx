@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import { Modal, Platform, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { codeTextSize } from '@/core/share-code';
 import { track } from '@/lib/analytics';
 import { shareQrCode } from '@/lib/share-qr';
@@ -65,7 +65,7 @@ export function RideQrSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   grip: { position: 'absolute', alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, zIndex: 1 },
   page: { flexGrow: 1, justifyContent: 'center', gap: Spacing.three, paddingHorizontal: Spacing.four, width: '100%', maxWidth: 480, alignSelf: 'center' },
   card: {
@@ -78,4 +78,4 @@ const styles = StyleSheet.create({
   codeLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
   code: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 32, letterSpacing: 4 },
   help: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 15, lineHeight: 21, textAlign: 'center' },
-});
+}));

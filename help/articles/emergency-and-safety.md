@@ -4,7 +4,7 @@ summary: What the EMERGENCY button does and doesn't do, how Need Help works, and
 category: safety-privacy
 order: 50
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/hold-button.tsx
@@ -14,10 +14,11 @@ sources:
   - app/src/lib/outbox.ts
   - app/src/app/notifications.tsx
   - app/src/app/support.tsx
+  - app/src/core/crash-detect.ts
   - app/src/app/terms.tsx
   - supabase/migrations/20261015000000_notification_settings.sql
   - supabase/migrations/20261019300000_status_broadcast.sql
-related: [status-buttons, ride-mode, location-sharing, family-link, notification-settings, offline-maps]
+related: [tilt-and-crash-alert, status-buttons, ride-mode, location-sharing, family-link, notification-settings, offline-maps]
 keywords: [emergency, sos, 911, help, need help, accident, injury, hurt, crash, safety, rescue, tablet]
 ---
 
@@ -61,6 +62,10 @@ When the alert goes out:
 - Help and EMERGENCY notifications are always on for every rider, even in quiet hours, and they come through even from a rider someone has blocked.
 
 You see a card showing whose phones have the alert. If you sent it by mistake, tap **Cancel** on the card and the group is told to ignore it. See [Send a Status or Quick Reply](/help/status-buttons).
+
+:::release 2.0
+**Crash Alert** can also send it for you: if your phone detects a hard hit or a rollover in Ride Mode and you don't tap **I'm OK** within 30 seconds, your group gets the EMERGENCY alert with your location. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
+:::
 
 ## What EMERGENCY Doesn't Do
 

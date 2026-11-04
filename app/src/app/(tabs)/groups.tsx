@@ -8,7 +8,7 @@ import { OutRidingCard } from '@/components/out-riding-card';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { previewLine, unreadLabel, type GroupChatSummary } from '@/core/group-chat';
 import { NOT_SWITCHED_ON, ridersLabel } from '@/core/groups';
 import { useBlocks } from '@/lib/blocks';
@@ -18,6 +18,7 @@ import {
 } from '@/lib/groups';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
+import { t } from '@/lib/i18n';
 
 /** Out Riding and your messages, your riding groups, the groups you're in, and the leaders you follow. */
 export default function Groups() {
@@ -66,7 +67,7 @@ export default function Groups() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Riding Groups' }} />
+      <Stack.Screen options={{ title: t('Riding Groups') }} />
       <OutRidingCard />
       <ThemedText themeColor="textSecondary">
         Save the people you ride with. When you create a ride, invite the whole group in one tap.
@@ -181,7 +182,7 @@ function EmptyCrew() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky, padding: Spacing.three, gap: 4 },
   card: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: 10 },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
@@ -197,4 +198,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill,
   },
   rule: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
-});
+}));

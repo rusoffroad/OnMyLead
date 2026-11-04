@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { type ReactElement, type ReactNode, useCallback, useEffect, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
 import { AppNotices } from '@/components/app-notices';
 import { BadgeStrip } from '@/components/badge-strip';
@@ -15,6 +15,7 @@ import { ActionTiles, JoinHero } from '@/components/home/ride-actions';
 import { HelpRow, Toolkit } from '@/components/home/toolkit';
 import { Icon } from '@/components/icon';
 import { InboxBell } from '@/components/inbox-bell';
+import { LanguageButton } from '@/components/language-button';
 import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
 import { RideRow, RowGroup } from '@/components/ride-row';
@@ -23,7 +24,7 @@ import { Showcase } from '@/components/showcase';
 import { ROW_ACTION_HINT, SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { flagOn } from '@/core/app-settings';
 import type { MyBadges } from '@/core/badges';
 import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
@@ -50,10 +51,12 @@ import { publicTrailsIn } from '@/lib/nav-trails';
 import { currentNotificationSettings } from '@/lib/notification-settings';
 import { requirePro } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
+import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
-import { setTrackLineOn, useTrackDays } from '@/lib/track-line';
+import { setTrackLineOn } from '@/lib/track-line';
 import type { Ride, RideMember } from '@/lib/types';
+import { currentLocale, t } from '@/lib/i18n';
 
 /** Feed posts shown before Show More: enough to feel alive, not enough to scroll past everything else. */
 const FEED_SHOWN = 4;
@@ -96,7 +99,6 @@ export default function HomeScreen() {
   const [feedAll, setFeedAll] = useState(false);
   const [moreRides, setMoreRides] = useState(false);
   const [trailsNear, setTrailsNear] = useState<number | null>(trailCount?.n ?? null);
-  const trackDays = useTrackDays();
   const [trackOn, , setTrackSwitch] = useRememberedToggle(TRACK_LINE_SWITCH_KEY, false);
 
   // Signing out (or into another account) must not leave the last rider's things on screen.
@@ -202,8 +204,8 @@ export default function HomeScreen() {
     try {
       await (action === 'delete' ? deleteRide(ride.id) : leaveRide(ride.id));
     } catch (e) {
-      const what = action === 'delete' ? 'Delete' : action === 'decline' ? 'Decline' : 'Leave';
-      showNotice(`Couldn’t ${what} the Ride`, e instanceof Error ? e.message : 'Something went wrong.');
+      const what = action === 'delete' ? 'Couldn’t Delete the Ride' : action === 'decline' ? 'Couldn’t Decline the Ride' : 'Couldn’t Leave the Ride';
+      showNotice(what, e instanceof Error ? e.message : t('Something went wrong.'));
       return false;
     }
     setMine((all) => all.filter((x) => x.ride_id !== m.ride_id));
@@ -250,7 +252,7 @@ export default function HomeScreen() {
 
   const pickRadius = (mi: number) => {
     setRadius(mi);
-    AsyncStorage.setItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
+    setSyncedItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
   };
   const switchTrack = (on: boolean) => {
     setTrackSwitch(on);
@@ -262,29 +264,33 @@ export default function HomeScreen() {
       <View style={styles.logo}>
         <Logo height={52} />
       </View>
-      {session ? (
-        <View style={styles.topRight}>
-          <InboxBell compact />
-          <Pressable accessibilityRole="button" accessibilityLabel="You: profile and settings" hitSlop={4} onPress={() => router.push('/profile')}>
-            <View style={styles.avatar}>
-              <RiderPhoto userId={uid} size={40} zoom={false} fallback={<Initial name={name || 'R'} size={40} />} ring={0} />
-            </View>
-          </Pressable>
-        </View>
-      ) : null}
+      <View style={styles.topRight}>
+        {/* The language switcher: a flag every rider can spot, signed in or not. */}
+        <LanguageButton />
+        {session ? (
+          <>
+            <InboxBell compact />
+            <Pressable accessibilityRole="button" accessibilityLabel={t('You: profile and settings')} hitSlop={4} onPress={() => router.push('/profile')}>
+              <View style={styles.avatar}>
+                <RiderPhoto userId={uid} size={40} zoom={false} fallback={<Initial name={name || 'R'} size={40} />} ring={0} />
+              </View>
+            </Pressable>
+          </>
+        ) : null}
+      </View>
     </View>
   );
 
   const hello = (
     <View style={{ gap: 6 }}>
       <Text style={styles.hello} accessibilityRole="header">
-        {greeting()}{name ? `, ${name}` : ''}
+        {t(greeting())}{name ? `, ${name}` : ''}
       </Text>
       {friendsOut > 0 ? (
         <Pressable accessibilityRole="link" onPress={() => router.push('/out-riding')} style={styles.pulseRow}>
           <View style={styles.pulse} />
           <Text style={homeStyles.muted}>
-            {friendsOut} {friendsOut === 1 ? 'friend is' : 'friends are'} out riding now
+            {friendsOut === 1 ? t('1 friend is out riding now') : t('{n} friends are out riding now', { n: friendsOut })}
           </Text>
         </Pressable>
       ) : null}
@@ -322,12 +328,14 @@ export default function HomeScreen() {
       <ActionTiles
         quota={session ? createQuota(ent) : null}
         findOn={findOn}
-        findText={radius != null ? findCount(others.length, located ? radius : 0) : null}
+        findText={radius != null && findCount(others.length, located ? radius : 0)
+          ? located && radius ? t('{n} Within {distance}', { n: others.length, distance: t('{n} mi', { n: radius.toLocaleString(currentLocale()) }) }) : t('{n} Coming Up', { n: others.length })
+          : null}
         onCreate={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
         onFind={() => router.push('/find')}
       />
+      {navOn ? <MapModeCard trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       <EventsCard signedIn={!!session} radius={radius} />
-      {navOn ? <MapModeCard days={trackDays} trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       {!loading && !session ? (
         <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
@@ -338,18 +346,18 @@ export default function HomeScreen() {
     <>
       {invites.length ? (
         <Block title="Ride Invites">
-          <RowGroup>{invites.map((m) => swipeRow(m, <RideRow ride={m.rides} note="You’re invited. Tap to join" />))}</RowGroup>
+          <RowGroup>{invites.map((m) => swipeRow(m, <RideRow ride={m.rides} note={t('You’re invited. Tap to join')} />))}</RowGroup>
         </Block>
       ) : null}
       {going.length ? (
         <Block
           title={going.length === 1 || !moreRides ? 'Your Next Ride' : 'Your Rides'}
           right={going.length > 1 ? (
-            <HeadLink title={moreRides ? 'Show Less' : `All ${going.length}`} onPress={() => setMoreRides(!moreRides)} label={moreRides ? 'Show only your next ride' : `Show all ${going.length} of your rides`} />
+            <HeadLink title={moreRides ? 'Show Less' : t('All {n}', { n: going.length })} onPress={() => setMoreRides(!moreRides)} label={moreRides ? 'Show only your next ride' : t('Show all {n} of your rides', { n: going.length })} />
           ) : undefined}>
           <RowGroup>
             {(moreRides ? going : going.slice(0, 1)).map((m) =>
-              swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? roleLabel(m.role) : m.status.replace('_', ' ')} />))}
+              swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? t(roleLabel(m.role)) : m.status.replace('_', ' ')} />))}
           </RowGroup>
           {ROW_ACTION_HINT ? <Text style={[homeStyles.muted, { fontSize: 12 }]}>{ROW_ACTION_HINT}</Text> : null}
         </Block>
@@ -358,7 +366,7 @@ export default function HomeScreen() {
   );
 
   const groupBlock = session && groups ? (
-    <Block title="Your Group" right={groups.length > 1 ? <HeadLink title={`All ${groups.length}`} onPress={() => router.push('/groups')} /> : undefined}>
+    <Block title="Your Group" right={groups.length > 1 ? <HeadLink title={t('All {n}', { n: groups.length })} onPress={() => router.push('/groups')} /> : undefined}>
       {group ? <GroupCard group={group} chat={chatFor(group.id)} outNow={groupOut} uid={uid} /> : <NoGroupCard />}
     </Block>
   ) : null;
@@ -370,12 +378,12 @@ export default function HomeScreen() {
       ) : (
         <Text style={homeStyles.muted}>
           {radius != null && located && radius > 0
-            ? `No public rides coming up within ${radius.toLocaleString('en-US')} miles. Widen the distance, or create one and it shows here for everyone.`
-            : 'No public rides coming up. Create one and it shows here for everyone.'}
+            ? t('No public rides coming up within {n} miles. Widen the distance, or create one and it shows here for everyone.', { n: radius.toLocaleString(currentLocale()) })
+            : t('No public rides coming up. Create one and it shows here for everyone.')}
         </Text>
       )}
       {others.length > RAIL_MAX ? (
-        <Button title={`See All ${others.length} on the Map`} kind="secondary" onPress={() => router.push('/find')} />
+        <Button title={t('See All {n} on the Map', { n: others.length })} kind="secondary" onPress={() => router.push('/find')} />
       ) : null}
     </Block>
   ) : null;
@@ -390,18 +398,18 @@ export default function HomeScreen() {
         </View>
       )}>
       {feed == null ? null : feedOff ? (
-        <Text style={homeStyles.muted}>{FEED_NOT_SWITCHED_ON}</Text>
+        <Text style={homeStyles.muted}>{t(FEED_NOT_SWITCHED_ON)}</Text>
       ) : (
         <>
           <FeedList
             items={feedAll ? feed : feed.slice(0, FEED_SHOWN)}
             onChange={(i, next) => setFeed((list) => (list ? list.map((x, j) => (j === i ? next : x)) : list))}
             emptyText={feedSettings.kinds.length
-              ? 'Nothing new yet. When friends ride, earn badges or share trails, it shows here.'
-              : 'Everything is switched off in Customize.'}
+              ? t('Nothing new yet. When friends ride, earn badges or share trails, it shows here.')
+              : t('Everything is switched off in Customize.')}
           />
           {feed.length > FEED_SHOWN ? (
-            <HeadLink title={feedAll ? 'Show Less' : `Show ${feed.length - FEED_SHOWN} More`} onPress={() => setFeedAll(!feedAll)} />
+            <HeadLink title={feedAll ? 'Show Less' : t('Show {n} More', { n: feed.length - FEED_SHOWN })} onPress={() => setFeedAll(!feedAll)} />
           ) : null}
         </>
       )}
@@ -417,13 +425,13 @@ export default function HomeScreen() {
   const pastBlock = past.shown.length ? (
     <Block title="Past Rides">
       <RowGroup>
-        {past.shown.map((m) => swipeRow(m, <RideRow ride={m.rides} note={m.rides.status === 'cancelled' ? 'Cancelled' : 'Ended'} />))}
+        {past.shown.map((m) => swipeRow(m, <RideRow ride={m.rides} note={t(m.rides.status === 'cancelled' ? 'Cancelled' : 'Ended')} />))}
       </RowGroup>
       {past.hidden ? (
         <ProLock
           feature="ride_history"
-          title={`See ${past.hidden} Older ${past.hidden === 1 ? 'Ride' : 'Rides'}`}
-          detail={`Free shows your last ${past.shown.length}. They’re all saved.`}
+          title={past.hidden === 1 ? t('See 1 Older Ride') : t('See {n} Older Rides', { n: past.hidden })}
+          detail={t('Free shows your last {n}. They’re all saved.', { n: past.shown.length })}
         />
       ) : null}
     </Block>
@@ -514,9 +522,9 @@ function Block({ title, right, children }: { title: string; right?: ReactNode; c
 const roleLabel = (role: RideMember['role']) =>
   ({ organizer: 'You Organize', co_organizer: 'Co-Organizer', leader: 'You Lead', sweep: 'Tail Gunner', rider: 'Going' })[role];
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   top: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Spacing.one },
-  logo: { width: 66, height: 52 },
+  logo: { width: 150, height: 52 },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(230,194,122,0.5)', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   hello: { color: Colors.text, fontFamily: font(600), fontSize: 28, lineHeight: 33 },
@@ -530,4 +538,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, padding: 14, borderLeftWidth: 4, borderLeftColor: Colors.sky,
     backgroundColor: Home.panel,
   },
-});
+}));

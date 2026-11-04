@@ -2,13 +2,15 @@ import { useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } f
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, MapLabelText, themedStyles } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
 import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
 import type { DayLine } from '@/core/track-line';
-import { cameraCenterFor, openMapCenter } from '@/core/map-center';
+import {
+  cameraCenterFor, OPENING_CHECK_MS, OPENING_DELTA, OPENING_START, openingMoveWanted, openingReached, openMapCenter, type OpeningCamera,
+} from '@/core/map-center';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
@@ -72,7 +74,8 @@ export function NavMap({
   const width = useRef(390);
   const size = useRef({ width: 390, height: 800 });
   const followed = useRef<LatLng | null>(null);
-  const centered = useRef(false);
+  const opening = useRef<OpeningCamera>({ ...OPENING_START });
+  const openingTarget = useRef<LatLng | null>(null);
   // The arrow on the rider's own dot (the phone draws the dot itself, never with a direction).
   const own = useOwnLocation();
   const [mapHeading, setMapHeading] = useState(0);
@@ -81,6 +84,7 @@ export function NavMap({
 
   useImperativeHandle(ref, () => ({
     centerOn(p) {
+      opening.current.done = true;
       // The follow-me camera takes over from this spot once the rider moves.
       followed.current = p;
       const d = region.current ? Math.min(region.current.latitudeDelta, 0.05) : 0.03;
@@ -92,14 +96,31 @@ export function NavMap({
     },
   }));
 
-  // Open on the rider the first time their location is known, at riding zoom. Android's map drops
-  // camera moves sent before it is ready (it stayed zoomed out on the whole state), so wait for it.
+  // Open on the rider the first time their location is known, at riding zoom (core/map-center
+  // OpeningCamera). The first fix can land after the map is ready (a cold start with no GPS yet),
+  // and Android's map drops camera moves sent before it is ready or laid out (it stayed zoomed out
+  // on the whole state), so the move is checked and sent again until the map is on the rider.
+  // Dragging the map or searching first stops it.
   const [ready, setReady] = useState(false);
+  const [recheck, setRecheck] = useState(0);
   useEffect(() => {
-    if (!center || !ready || centered.current) return;
-    centered.current = true;
-    map.current?.animateToRegion({ latitude: center.lat, longitude: center.lng, latitudeDelta: 0.04, longitudeDelta: 0.04 }, 1);
-  }, [center, ready]);
+    // A map that never reports ready still gets the opening move (and its checks).
+    const t = setTimeout(() => setReady(true), 3000);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    if (!ready || !openingMoveWanted(opening.current, center)) return;
+    const target = center!;
+    if (openingReached(region.current, target)) {
+      opening.current.done = true;
+      return;
+    }
+    opening.current.tries += 1;
+    openingTarget.current = target;
+    map.current?.animateToRegion({ latitude: target.lat, longitude: target.lng, latitudeDelta: OPENING_DELTA, longitudeDelta: OPENING_DELTA }, 1);
+    const t = setTimeout(() => setRecheck((n) => n + 1), OPENING_CHECK_MS);
+    return () => clearTimeout(t);
+  }, [center, ready, recheck]);
 
   // Follow-me camera: slide the map (same zoom and heading) so the rider stays in the open part of
   // the map between the panels. Moves under a couple of meters are GPS jitter and skipped.
@@ -108,6 +129,9 @@ export function NavMap({
       followed.current = null;
       return;
     }
+    // Until the opening move lands, it does the centering: the follow camera keeps the zoom, which
+    // on a cold start is still the whole state.
+    if (openingMoveWanted(opening.current, followMe)) return;
     if (!followCamShouldMove(followed.current, followMe)) return;
     followed.current = followMe;
     const m = map.current;
@@ -151,16 +175,24 @@ export function NavMap({
       showsCompass
       showsScale
       tintColor={Colors.text}
-      initialRegion={center ? { latitude: center.lat, longitude: center.lng, latitudeDelta: 0.04, longitudeDelta: 0.04 } : { latitude: 39.5, longitude: -105.8, latitudeDelta: 6, longitudeDelta: 6 }}
+      initialRegion={center ? { latitude: center.lat, longitude: center.lng, latitudeDelta: OPENING_DELTA, longitudeDelta: OPENING_DELTA } : { latitude: 39.5, longitude: -105.8, latitudeDelta: 6, longitudeDelta: 6 }}
       onLayout={(e) => {
         width.current = e.nativeEvent.layout.width;
         size.current = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height };
         trail.mapProps.onLayout(e);
       }}
-      onPanDrag={() => onUserMove?.()}
+      onPanDrag={() => {
+        opening.current.userMoved = true;
+        onUserMove?.();
+      }}
       onRegionChangeComplete={(r, details) => {
-        if (details?.isGesture) onUserMove?.();
+        if (details?.isGesture) {
+          opening.current.userMoved = true;
+          onUserMove?.();
+        }
         region.current = r;
+        const target = openingTarget.current;
+        if (target && !opening.current.done && openingReached(r, target)) opening.current.done = true;
         onCenter?.({ lat: r.latitude, lng: r.longitude });
         trail.mapProps.onRegionChangeComplete(r);
         map.current?.getCamera().then((c) => setMapHeading(Math.round((c.heading ?? 0) / 5) * 5 % 360)).catch(() => {});
@@ -226,7 +258,7 @@ export function NavMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pin: {
     minWidth: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
     backgroundColor: Colors.background, borderWidth: 2.5, borderColor: MEASURE_INK,
@@ -234,9 +266,9 @@ const styles = StyleSheet.create({
   pinText: { color: Colors.text, fontFamily: font(800), fontSize: 11 },
   found: { color: Colors.background, backgroundColor: MEASURE_INK, fontFamily: font(700), fontSize: 13, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 10, overflow: 'hidden' },
   obstacle: {
-    color: Colors.text, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, fontFamily: font(700), fontSize: 12,
+    color: MapLabelText, backgroundColor: 'rgba(10,22,38,0.92)', borderWidth: 1.5, fontFamily: font(700), fontSize: 12,
     paddingHorizontal: 8, paddingVertical: 3, borderRadius: 9, overflow: 'hidden',
   },
   obstacleDot: { width: 10, height: 10, borderRadius: 5, marginTop: 3, borderWidth: 2, borderColor: Colors.background },
   foundDot: { width: 10, height: 10, borderRadius: 5, marginTop: 4, backgroundColor: MEASURE_INK, borderWidth: 2, borderColor: Colors.background },
-});
+}));

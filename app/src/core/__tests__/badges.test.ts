@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   allProgress, BADGES, parseBadgeRows, parseMyBadges, progressFor, BADGE_BY_KEY, rankFor, topBadge, unseen, badgeTitle,
+  badgeName, HONORS, honorsHeld,
 } from '../badges';
 
 const migration = readFileSync(resolve(__dirname, '../../../../supabase/migrations/20261101500000_rider_badges.sql'), 'utf8');
@@ -87,5 +88,41 @@ describe('top badge and new badges', () => {
       { badge: 'mile_eater', level: 1, seen: true },
     ] });
     expect(unseen(mine).map((b) => b.badge)).toEqual(['trail_boss', 'crew_rider']);
+  });
+});
+
+describe('Brand Ambassador', () => {
+  // The newest migration that redefines the honors (each one repeats the whole list).
+  const amb = readFileSync(resolve(__dirname, '../../../../supabase/migrations/20261103900000_founder_badge.sql'), 'utf8');
+
+  it('every honor is in the table check, the push text and the honor list on the server', () => {
+    for (const h of HONORS) {
+      expect(amb).toMatch(new RegExp(`badge in \\([^)]*'${h.key}'`));
+      expect(amb).toContain(`('${h.key}', '${h.name}'`);
+      expect(amb).toMatch(new RegExp(`values [^$]*\\('${h.key}'\\)`));
+    }
+  });
+
+  it('Founder comes before Brand Ambassador beside the name', () => {
+    expect(topBadge([{ badge: 'ambassador', level: 1 }, { badge: 'founder', level: 1 }, { badge: 'mile_eater', level: 3 }])).toEqual({ badge: 'founder', level: 1 });
+    expect(badgeTitle({ badge: 'founder', level: 1 })).toBe('OnMyLead Founder');
+    expect(rankFor([{ badge: 'founder', level: 1 }]).levels).toBe(0);
+  });
+
+  it('parses at level 1 only', () => {
+    expect(parseBadgeRows([{ badge: 'ambassador', level: 1 }, { badge: 'ambassador', level: 2 }]).map((b) => `${b.badge}${b.level}`)).toEqual(['ambassador1']);
+  });
+
+  it("doesn't count toward a rank or show as a progress bar", () => {
+    expect(rankFor([{ badge: 'ambassador', level: 1 }])).toEqual({ name: 'Rookie', levels: 0, next: { name: 'Rider', min: 1 } });
+    const list = allProgress({ stats: {}, badges: [{ badge: 'ambassador', level: 1, earnedAt: null, seen: true }] });
+    expect(list.map((p) => p.def.key)).toEqual(BADGES.map((b) => b.key));
+    expect(honorsHeld([{ badge: 'ambassador' }, { badge: 'trail_boss' }]).map((h) => h.key)).toEqual(['ambassador']);
+  });
+
+  it('shows beside the name ahead of earned badges, with no level in its title', () => {
+    expect(topBadge([{ badge: 'trail_boss', level: 3 }, { badge: 'ambassador', level: 1 }])).toEqual({ badge: 'ambassador', level: 1 });
+    expect(badgeTitle({ badge: 'ambassador', level: 1 })).toBe('Brand Ambassador');
+    expect(badgeName('ambassador')).toBe('Brand Ambassador');
   });
 });

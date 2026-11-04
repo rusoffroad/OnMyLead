@@ -1,6 +1,6 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { Colors, RideColors } from '@/constants/theme';
+import { Colors, RideColors, themedStyles } from '@/constants/theme';
 import { Icon } from './icon';
 
 /**
@@ -18,6 +18,6 @@ export function BreakdownBadge({ size = 20 }: { size?: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   badge: { alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow, borderWidth: 2, borderColor: Colors.background },
-});
+}));

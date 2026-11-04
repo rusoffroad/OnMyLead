@@ -1,16 +1,16 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useRef, useState, type ComponentProps } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddFriendButton } from '@/components/add-friend-button';
 import { RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
-import { keyboardScroll, TextBox } from '@/components/keyboard';
+import { KeyboardScreen, keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
 import { SendBadge } from '@/components/ride-chat';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, currentScheme, font, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { checkMessage, MAX_MESSAGE_LENGTH } from '@/core/chat';
 import { dayLabel } from '@/core/group-chat';
 import { dmReportDetails, leftBeforeReply, NOT_SWITCHED_ON } from '@/core/out-riding';
@@ -169,13 +169,13 @@ export default function Conversation() {
           </View>
         ) : null}
 
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardScreen>
           <ScrollView
             ref={scroller}
             style={{ flex: 1 }}
             contentContainerStyle={styles.thread}
             {...keyboardScroll}
-            indicatorStyle="white"
+            indicatorStyle={scrollIndicator()}
             onContentSizeChange={() => scroller.current?.scrollToEnd({ animated: false })}>
             {chat.off ? (
               <View style={styles.note}>
@@ -283,7 +283,7 @@ export default function Conversation() {
                     onPress={() => send()}
                     style={({ pressed }) => [styles.send, (!draft.trim() || left === 0) && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>
                     <View style={{ transform: [{ rotate: '-90deg' }] }}>
-                      <Icon name="chevron" color="#fff" size={24} strokeWidth={2.8} />
+                      <Icon name="chevron" color={(!draft.trim() || left === 0) ? Colors.textSecondary : '#fff'} size={24} strokeWidth={2.8} />
                     </View>
                   </Pressable>
                 </View>
@@ -291,14 +291,14 @@ export default function Conversation() {
               {localError ? <Text style={styles.failText}>{localError}</Text> : null}
             </View>
           ) : null}
-        </KeyboardAvoidingView>
+        </KeyboardScreen>
       </View>
       <ReportSheet target={reporting} onClose={() => setReporting(null)} />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   page: { flex: 1, backgroundColor: Colors.background },
   // Tablets and wide windows: a readable column, not a stretched phone.
   column: { flex: 1, width: '100%', maxWidth: 760, alignSelf: 'center' },
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   bubble: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 18 },
   bubbleMine: { backgroundColor: Colors.sky, borderBottomRightRadius: 6 },
   bubbleTheirs: { backgroundColor: Colors.backgroundElement, borderBottomLeftRadius: 6 },
-  bubbleFailed: { backgroundColor: '#5A2230' },
+  bubbleFailed: { backgroundColor: currentScheme() === 'light' ? Colors.danger : '#5A2230' },
   body: { color: Colors.text, fontFamily: font(500), fontSize: 17, lineHeight: 23 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginHorizontal: 4 },
   time: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12 },
@@ -350,4 +350,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12, fontFamily: font(500), fontSize: 17,
   },
   send: { width: 46, height: 46, borderRadius: 23, backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center' },
-});
+}));

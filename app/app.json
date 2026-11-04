@@ -6,7 +6,7 @@
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "onmylead",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "backgroundColor": "#0A1626",
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead.app",
@@ -20,7 +20,7 @@
         "UIBackgroundModes": ["bluetooth-central", "bluetooth-peripheral"],
         "NSLocationWhenInUseUsageDescription": "Your location is shared only with riders you choose, only while you are sharing, so your group can stay together.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Keeps sharing with your ride while your phone is locked on the mount. Sharing always stops when your timer ends or the ride ends.",
-        "UIStatusBarStyle": "UIStatusBarStyleLightContent",
+        "UIStatusBarStyle": "UIStatusBarStyleDefault",
         "UISupportedInterfaceOrientations": [
           "UIInterfaceOrientationPortrait",
           "UIInterfaceOrientationPortraitUpsideDown"
@@ -219,8 +219,30 @@
       "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
+    "locales": {
+      "es": "./locales/es.json",
+      "pt": "./locales/pt.json",
+      "fr": "./locales/fr.json",
+      "de": "./locales/de.json",
+      "it": "./locales/it.json",
+      "ru": "./locales/ru.json",
+      "zh-Hans": "./locales/zh-Hans.json",
+      "ja": "./locales/ja.json",
+      "ko": "./locales/ko.json",
+      "hi": "./locales/hi.json",
+      "id": "./locales/id.json"
+    },
     "plugins": [
       "expo-router",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": ["en", "es", "pt", "fr", "de", "it", "ru", "zh-Hans", "ja", "ko", "hi", "id"],
+            "android": ["en", "es", "pt", "fr", "de", "it", "ru", "zh-CN", "ja", "ko", "hi", "id"]
+          }
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -251,6 +273,12 @@
           "photosPermission": "Choose a profile picture or a photo of your machine for your garage. Only the photo you pick is uploaded.",
           "cameraPermission": "Take a profile picture or a photo of your machine. Only the photo you take is uploaded.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "OnMyLead uses motion sensors for the tilt meter and to detect a possible crash in Ride Mode so it can alert your group."
         }
       ],
       "./plugins/with-starlink-local-network",

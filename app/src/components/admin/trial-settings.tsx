@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Switch, Text, TextInput, View } from 'react-native';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import * as admin from '@/lib/admin';
 import { AdminButton } from './button';
 import { useConfirm, useToast } from './dialogs';
@@ -48,7 +48,7 @@ export function TrialSettings({ days, auto, onSaved }: { days: number | undefine
           <Text style={styles.label}>Automatic Pro Trial</Text>
           <Text style={styles.hint}>Every new account starts with Pro, no payment details needed.</Text>
         </View>
-        <Switch value={a} onValueChange={setA} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor={AdminColors.text} {...({ activeThumbColor: AdminColors.text } as object)} accessibilityLabel="Automatic Pro Trial" />
+        <Switch value={a} onValueChange={setA} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel="Automatic Pro Trial" />
       </View>
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
@@ -64,9 +64,9 @@ export function TrialSettings({ days, auto, onSaved }: { days: number | undefine
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   row: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   label: { fontFamily: font(700), fontSize: 15, color: AdminColors.text },
   hint: { fontFamily: font(500), fontSize: 13.5, lineHeight: 19, color: AdminColors.dim },
   input: { width: 80, textAlign: 'center', fontFamily: font(800, 'display'), fontSize: 24, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingVertical: 6 },
-});
+}));

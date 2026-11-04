@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, DataTable, Empty, ErrorNote, Fields, Loading, Panel, StatGrid, StatTile, StatusBadge,
   useConfirm, useToast, RIDE_STATUS, ROLE, VISIBILITY,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { actionLabel, fmtAgo, fmtDateTime, fmtInt } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
 
@@ -157,7 +157,7 @@ export default function RideDetail() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   desc: { fontFamily: font(500), fontSize: 14.5, lineHeight: 21, color: AdminColors.text },
   note: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.faint },
   report: { paddingVertical: 10, borderTopWidth: 1, borderTopColor: AdminColors.line, gap: 4 },
@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
   audit: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, paddingVertical: 8, borderTopWidth: 1, borderTopColor: AdminColors.line },
   auditAction: { fontFamily: font(600), fontSize: 14.5, color: AdminColors.text },
   auditAt: { fontFamily: font(500), fontSize: 13.5, color: AdminColors.dim },
-});
+}));

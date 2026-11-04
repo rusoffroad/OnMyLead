@@ -10,6 +10,8 @@ import { useMapSignal } from '@/lib/map-signal';
 import { publicTrailsIn, type Box } from '@/lib/nav-trails';
 import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
+import { useCan } from '@/lib/pro';
+import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 const KEY = 'map.layers.v1';
 /** Show trails other riders mapped and shared (Navigation Mode). On unless the rider hid them. */
@@ -72,7 +74,11 @@ const byKey = <T extends { key: string }>(a: T, b: T) => (a.key < b.key ? -1 : a
 export function useTrailMap(): TrailMap {
   const [base, setBaseState] = useState<BaseMap>('satellite');
   // On unless the rider turned it off: trails are the reason most riders open the map.
-  const [trails, setTrailsState] = useState(true);
+  const [trailsChoice, setTrailsState] = useState(true);
+  // Map layers are Pro: Free riders get the standard map with no topo and no trails layer. Their
+  // saved choice is kept, so it comes back the moment they're on Pro.
+  const layersPro = useCan('map_layers');
+  const trails = trailsChoice && layersPro;
   const [osm, setOsm] = useState<OsmTrail[]>([]);
   const [closed, setClosed] = useState<ClosedLine[]>([]);
   const [zoom, setZoom] = useState(12);
@@ -98,23 +104,32 @@ export function useTrailMap(): TrailMap {
   const [picked, setPicked] = useState<PublicTrail | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY)
-      .then((v) => {
-        if (!v) return;
+    const applyLayers = (v: string | null) => {
+      if (!v) return;
+      try {
         // `trails` from the first version defaulted to off, so only the newer `trailsOn` choice counts.
         const saved = JSON.parse(v) as { base?: BaseMap; trailsOn?: boolean };
         if (saved.base === 'topo' || saved.base === 'satellite') setBaseState(saved.base);
         if (typeof saved.trailsOn === 'boolean') setTrailsState(saved.trailsOn);
-      })
-      .catch(() => {});
+      } catch {
+        // Not a saved choice.
+      }
+    };
+    const applyRiders = (v: string | null) => {
+      riderOnRef.current = v !== '0';
+      setRiderOn(v !== '0');
+    };
+    AsyncStorage.getItem(KEY).then(applyLayers).catch(() => {});
     AsyncStorage.getItem(RIDER_TRAILS_KEY)
-      .then((v) => {
-        if (v === '0') {
-          riderOnRef.current = false;
-          setRiderOn(false);
-        }
-      })
+      .then((v) => v === '0' && applyRiders(v))
       .catch(() => {});
+    // Picked on another device (lib/settings-sync).
+    const offLayers = onSyncedChange(KEY, applyLayers);
+    const offRiders = onSyncedChange(RIDER_TRAILS_KEY, applyRiders);
+    return () => {
+      offLayers();
+      offRiders();
+    };
   }, []);
 
   /** Rider trails for the region on screen; skips the call while the map stays inside the last box. */
@@ -144,13 +159,13 @@ export function useTrailMap(): TrailMap {
     setRiderOn(on);
     if (!on) setPicked(null);
     else refreshRiders(true);
-    AsyncStorage.setItem(RIDER_TRAILS_KEY, on ? '1' : '0').catch(() => {});
+    setSyncedItem(RIDER_TRAILS_KEY, on ? '1' : '0').catch(() => {});
   };
 
-  const save = (next: { base: BaseMap; trailsOn: boolean }) => AsyncStorage.setItem(KEY, JSON.stringify(next)).catch(() => {});
+  const save = (next: { base: BaseMap; trailsOn: boolean }) => setSyncedItem(KEY, JSON.stringify(next)).catch(() => {});
   const setBase = (b: BaseMap) => {
     setBaseState(b);
-    save({ base: b, trailsOn: trails });
+    save({ base: b, trailsOn: trailsChoice });
   };
 
   const refreshOsm = useCallback(() => {
@@ -264,7 +279,7 @@ export function useTrailMap(): TrailMap {
   }, [osm, zoom]);
 
   return {
-    base,
+    base: layersPro ? base : 'satellite',
     trails,
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
     osmLines: trails ? drawn : [],
@@ -287,7 +302,7 @@ export function useTrailMap(): TrailMap {
     identifyAt,
     mapProps: {
       // Topo replaces Apple's map content; Android has to be told there is no base map under it.
-      mapType: base === 'satellite' ? 'hybrid' : Platform.OS === 'android' ? 'none' : 'standard',
+      mapType: !layersPro ? 'standard' : base === 'satellite' ? 'hybrid' : Platform.OS === 'android' ? 'none' : 'standard',
       onPress,
       onRegionChangeComplete: (r: Region) => onRegion(r),
       onLayout: (e: LayoutChangeEvent) => {

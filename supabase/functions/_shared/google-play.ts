@@ -116,6 +116,26 @@ export async function acknowledge(productId: string, purchaseToken: string): Pro
   if (!res.ok && res.status !== 400) throw new Error(`Google Play acknowledge ${res.status}`);
 }
 
+/**
+ * Pushes a subscription's next bill back (purchases.subscriptions.defer), for the refer-a-friend
+ * reward of a rider who already pays through Google Play. Google only accepts it when the expiry
+ * we send is the subscription's current one. Returns the new expiry.
+ */
+export async function deferSubscription(productId: string, purchaseToken: string, expectedExpiryMs: number, desiredExpiryMs: number): Promise<number> {
+  const res = await fetch(
+    `${API}/${encodeURIComponent(PACKAGE_NAME)}/purchases/subscriptions/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}:defer`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${await accessToken()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deferralInfo: { expectedExpiryTimeMillis: String(expectedExpiryMs), desiredExpiryTimeMillis: String(desiredExpiryMs) } }),
+      signal: AbortSignal.timeout(10_000),
+    },
+  );
+  const body = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(`Google Play defer ${res.status}`);
+  return Number(body?.newExpiryTimeMillis) || desiredExpiryMs;
+}
+
 /** Stores Google's state (play_save_subscription in migration 20261027000000) and returns the owner. */
 export async function savePlay(row: PlayRow, user: string | null, fromApp: boolean, order: PlayOrder | null): Promise<string | null> {
   const { data, error } = await db.rpc('play_save_subscription', { p_row: row, p_user: user, p_from_app: fromApp, p_order: order });

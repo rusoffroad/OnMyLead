@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState, type ReactNode } from 'react';
-import { Linking, Platform, Pressable, Share, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, Share, Text, View } from 'react-native';
 
 import { RiderDot } from '@/components/convoy';
 import { ShareCodeEditor } from '@/components/share-code-editor';
@@ -9,7 +9,7 @@ import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
 import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { mailUrl, smsUrl } from '@/core/discovery';
 import {
   friendInviteMessage, friendLink, FRIENDS_NOT_SWITCHED_ON, readFriendCode, requestResultLine, splitFriends,
@@ -27,6 +27,7 @@ import {
 } from '@/lib/friends';
 import { useSession } from '@/lib/session';
 import { setFriendCode } from '@/lib/share-codes';
+import { t } from '@/lib/i18n';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
@@ -308,7 +309,7 @@ export default function Friends() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Friends' }} />
+      <Stack.Screen options={{ title: t('Friends') }} />
       {wide ? (
         <TwoPane side={<>{head}{linkCards}</>} main={main} sideWidth={sideColumnWidth(width)} />
       ) : (
@@ -322,7 +323,7 @@ export default function Friends() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky, padding: Spacing.three, gap: 4 },
   hero: { gap: 6, paddingTop: Spacing.two },
   heroTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 40, lineHeight: 42, letterSpacing: -0.4 },
@@ -347,4 +348,4 @@ const styles = StyleSheet.create({
   small: { minHeight: 42, paddingHorizontal: 14 },
   msgBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: Colors.sky, alignItems: 'center', justifyContent: 'center' },
   iconBtn: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
-});
+}));

@@ -1,10 +1,10 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AppState, Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { hiddenByBlock } from '@/core/blocks';
 import { alertTitle, isLeaderOnly, isResolved, shouldAlert, type ChatMessage } from '@/core/chat';
 import type { NotificationSettings } from '@/core/notifications';
@@ -168,7 +168,7 @@ export function MessageAlerts() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { position: 'absolute', left: Spacing.three, right: Spacing.three, alignItems: 'center', zIndex: 1000, elevation: 1000 },
   card: {
     width: '100%',
@@ -193,4 +193,4 @@ const styles = StyleSheet.create({
   close: { paddingHorizontal: Spacing.one, alignItems: 'center', gap: 2 },
   closeText: { color: Colors.textSecondary, fontSize: 16 },
   closeLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 11 },
-});
+}));

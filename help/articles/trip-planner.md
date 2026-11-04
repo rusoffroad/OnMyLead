@@ -4,7 +4,7 @@ summary: Make a packing checklist for a trip, tick things off as they go in the 
 category: account
 order: 50
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/trips/**
   - app/src/components/trip-form.tsx

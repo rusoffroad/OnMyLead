@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, Empty, ErrorNote, FilterChips, Loading, Panel, SocialContentCard, StatusBadge, SuspendPanel,
   useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtDateTime } from '@/core/admin-format';
 import { conversationsOf, reportSourceLabel } from '@/core/moderation';
 import * as admin from '@/lib/admin';
@@ -170,7 +170,7 @@ export default function ReportDetail() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   dim: { fontFamily: font(500), fontSize: 13.5, lineHeight: 19, color: AdminColors.dim },
   thread: { backgroundColor: AdminColors.page, borderRadius: 12, padding: 14, gap: 10 },
   day: { fontFamily: font(600), fontSize: 12, color: AdminColors.faint, textAlign: 'center' },
@@ -180,4 +180,4 @@ const styles = StyleSheet.create({
   who: { fontFamily: font(700), fontSize: 12, color: AdminColors.dim },
   body: { fontFamily: font(500), fontSize: 15, lineHeight: 21, color: AdminColors.text },
   row: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-});
+}));

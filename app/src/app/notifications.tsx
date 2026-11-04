@@ -4,7 +4,7 @@ import { AppState, Platform, Pressable, StyleSheet, Switch, Text, View } from 'r
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import {
   ACCOUNT_SETTINGS, DEFAULT_SETTINGS, DM_TOPICS, FEED_TOPICS, formatClock, FRIEND_TOPICS, GROUP_CHAT_TOPICS, GROUP_TOPICS, quietLengthHours, quietSegments, REMINDER_OPTIONS, stepClock, TOPIC_GROUPS,
   type NotificationSettings,
@@ -12,6 +12,7 @@ import {
 import { loadNotificationSettings, saveNotificationSettings } from '@/lib/notification-settings';
 import { askPushPermission, openPhoneSettings, pushPermission, syncRideReminders, type PushPermission } from '@/lib/push';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /** What a rider hears about, and when. Every change saves as soon as it's made. */
 export default function NotificationsScreen() {
@@ -81,7 +82,7 @@ export default function NotificationsScreen() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Notifications' }} />
+      <Stack.Screen options={{ title: t('Notifications') }} />
 
       {Platform.OS === 'web' ? (
         <Note tone="info" title="Notifications Come to the iPhone App">
@@ -195,9 +196,9 @@ function ToggleRow({
         disabled={disabled}
         onValueChange={onChange}
         trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }}
-        thumbColor={Colors.text}
+        thumbColor="#FFFFFF"
         ios_backgroundColor={Colors.backgroundSelected}
-        {...(Platform.OS === 'web' ? { activeThumbColor: Colors.text } : {})}
+        {...(Platform.OS === 'web' ? { activeThumbColor: '#FFFFFF' } : {})}
         accessibilityElementsHidden
         importantForAccessibility="no"
       />
@@ -297,7 +298,7 @@ function Note({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   dim: { opacity: 0.5 },
   note: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, padding: Spacing.three, gap: 4 },
   always: {
@@ -327,4 +328,4 @@ const styles = StyleSheet.create({
   clockTime: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 24, lineHeight: 28, flexShrink: 1, textAlign: 'center' },
   step: { width: 40, height: 40, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
   stepText: { color: Colors.text, fontFamily: font(600), fontSize: 24, lineHeight: 26 },
-});
+}));

@@ -1,0 +1,12 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "位置情報は、共有している間だけ、あなたが選んだライダーにのみ共有され、グループがまとまって走れるようにします。",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "スマホをマウントに固定してロックしている間も、ライドとの共有を続けます。タイマーかライドが終わると、共有は必ず停止します。",
+    "NSAppleMusicUsageDescription": "音楽コントロールに Apple Music の曲名を表示します。情報はスマホの中にとどまります。",
+    "NSPhotoLibraryUsageDescription": "プロフィール写真やガレージ用の車両写真を選びます。アップロードされるのは選んだ写真だけです。",
+    "NSCameraUsageDescription": "プロフィール写真や車両写真を撮影します。アップロードされるのは撮影した写真だけです。",
+    "NSMotionUsageDescription": "OnMyLead はモーションセンサーを傾きメーターに使い、ライドモードで事故の可能性を検知してグループに知らせます。",
+    "NSLocalNetworkUsageDescription": "OnMyLead は Starlink アンテナの Wi-Fi に接続して状態を表示します。ネットワーク上のほかの機器には触れません。",
+    "NSBluetoothAlwaysUsageDescription": "携帯の電波がないとき、ライドモードはBluetoothでライドの位置とアラートを同じライドの近くのライダーに送ります。送信される内容はすべてあなたのライド専用に暗号化されます。"
+  }
+}

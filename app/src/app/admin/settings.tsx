@@ -1,16 +1,16 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Switch, Text, TextInput, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, ErrorNote, FilterChips, Loading, Panel, TrialSettings, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtDateTime } from '@/core/admin-format';
 import { APP_FLAG_KEYS, APP_FLAGS } from '@/core/app-settings';
 import * as admin from '@/lib/admin';
 
-const FEATURES: Record<string, { label: string; hint: string; allowance?: string }> = {
+const FEATURES: Record<string, { label: string; hint: string; allowance?: string; allowanceOnFree?: boolean }> = {
   create_ride: { label: 'Create Rides', hint: 'Free accounts get a monthly allowance (UTC months).', allowance: 'Free Rides per Month' },
   ride_history: { label: 'Ride History', hint: 'Free accounts see their most recent rides.', allowance: 'Free Rides Shown' },
   import_gpx: { label: 'Import GPX Routes', hint: 'Drawing routes by hand stays free.' },
@@ -21,6 +21,29 @@ const FEATURES: Record<string, { label: string; hint: string; allowance?: string
   advanced_stats: { label: 'Advanced Ride Statistics', hint: 'Speed, elevation and the group breakdown.' },
   premium_ride_cards: { label: 'Premium Ride Cards', hint: 'The standard card stays free.' },
   create_events: { label: 'Create Events', hint: 'Seeing events, saying you’re going and co-hosting stay free.' },
+  record_trails: { label: 'Record Trails', hint: 'Map Mode recording.' },
+  share_trails: { label: 'Share Trails', hint: 'Sharing to the public map. Seeing and following stay free.' },
+  trail_rides: { label: 'Group Rides on Your Trails', hint: 'A trail as a ride’s route.' },
+  social_posts: { label: 'Post, Comment and Share', hint: 'Seeing Social, liking and reading comments stay free.' },
+  custom_codes: { label: 'Custom Share Codes', hint: 'Every ride and group still gets a made-up code.' },
+  quick_replies: { label: 'Your Own Messages and Quick Replies', hint: 'Ride Mode. Status buttons, Need Help and EMERGENCY stay free.' },
+  music_controls: { label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode.' },
+  vote_polls: { label: 'Vote on Ride Polls', hint: 'Reading polls stays free.' },
+  route_builder: { label: 'Draw Ride Routes', hint: 'Freeride and following the leader’s route stay free.' },
+  waypoints: { label: 'Add Waypoints and Planned Stops', hint: 'Seeing the leader’s waypoints stays free.' },
+  directions: { label: 'Directions', hint: 'Apple or Google Maps. Directions to a rider who needs help stay free.' },
+  map_layers: { label: 'Map Layers', hint: 'Satellite, topo and the trails layer. The standard map stays free.' },
+  map_mode: { label: 'Map Mode', hint: 'Free hours each UTC month, counted only off group rides. Empty = unlimited.', allowance: 'Free Hours per Month', allowanceOnFree: true },
+  custom_trails: { label: 'Map a Custom Trail', hint: 'Map Mode Draw tab.' },
+  save_trails: { label: 'Save Trails', hint: 'My Trails.' },
+  rate_trails: { label: 'Rate Trails', hint: 'Seeing ratings stays free.' },
+  track_line: { label: 'Track Line', hint: 'Where you’ve been, 7 days.' },
+  trail_spots: { label: 'Named Spots on Trails', hint: 'Seeing spots on shared trails stays free.' },
+  garage_build: { label: 'Garage Build Sheet', hint: 'Parts, costs, Build Sheet, CSV. Machines and fuel range stay free.' },
+  sync: { label: 'Sync Across Devices', hint: 'Settings and Map Mode trails.' },
+  themes: { label: 'Themes and Light Mode', hint: 'Dark and Color Blind Mode stay free.' },
+  natural_voices: { label: 'Natural Voices', hint: 'Automatic voice stays free.' },
+  tablet_web: { label: 'iPad, Android Tablets and the Website', hint: 'Joining rides and Ride Mode stay free everywhere.' },
 };
 
 type Notice = { text: string; until?: string } | null;
@@ -86,7 +109,8 @@ function FeatureRow({ plan, onSaved }: { plan: admin.FeaturePlan; onSaved: () =>
   const save = async () => {
     const r = await confirm({
       title: `Change ${meta.label}?`,
-      message: minPlan === 'free' ? `${meta.label} becomes free for everyone.` : `${meta.label} needs Pro${meta.allowance && allowance != null ? `, with ${allowance} for Free accounts` : ''}. Free accounts keep everything they already made.`,
+      message: minPlan === 'free' && meta.allowanceOnFree && allowance != null ? `${meta.label} is free for ${allowance} hours a month, unlimited on Pro.`
+        : minPlan === 'free' ? `${meta.label} becomes free for everyone.` : `${meta.label} needs Pro${meta.allowance && allowance != null ? `, with ${allowance} for Free accounts` : ''}. Free accounts keep everything they already made.`,
       confirmLabel: 'Save',
     });
     if (!r.ok) return;
@@ -108,7 +132,7 @@ function FeatureRow({ plan, onSaved }: { plan: admin.FeaturePlan; onSaved: () =>
         <Text style={styles.small}>{meta.hint}</Text>
       </View>
       <FilterChips options={[{ value: 'free', label: 'Free' }, { value: 'pro', label: 'Pro' }]} value={minPlan} onChange={setMinPlan} />
-      {meta.allowance && minPlan === 'pro' ? (
+      {meta.allowance && (meta.allowanceOnFree ? minPlan === 'free' : minPlan === 'pro') ? (
         <View style={{ gap: 3 }}>
           <Text style={styles.small}>{meta.allowance}</Text>
           <TextInput value={allow} onChangeText={(t) => setAllow(t.replace(/\D/g, '').slice(0, 4))} keyboardType="number-pad" style={styles.num} accessibilityLabel={meta.allowance} />
@@ -201,7 +225,7 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
             <Text style={styles.small}>{APP_FLAGS[k].hint}</Text>
           </View>
           <Text style={[styles.small, { color: flags[k] === false ? AdminColors.danger : AdminColors.dim }]}>{flags[k] === false ? 'Off' : 'On'}</Text>
-          <Switch value={flags[k] !== false} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor={AdminColors.text} {...({ activeThumbColor: AdminColors.text } as object)} accessibilityLabel={APP_FLAGS[k].label} />
+          <Switch value={flags[k] !== false} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={APP_FLAGS[k].label} />
         </View>
       ))}
       {keys.length ? <Text style={[styles.label, { paddingTop: 6 }]}>Other Flags</Text> : null}
@@ -209,7 +233,7 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
       {keys.map((k) => (
         <View key={k} style={styles.flag}>
           <Text style={[styles.label, { flex: 1 }]}>{k}</Text>
-          <Switch value={flags[k]} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor={AdminColors.text} {...({ activeThumbColor: AdminColors.text } as object)} accessibilityLabel={k} />
+          <Switch value={flags[k]} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={k} />
           <AdminButton title="Remove" kind="danger" small onPress={() => {
             const next = { ...flags };
             delete next[k];
@@ -226,7 +250,7 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   text: { fontFamily: font(500), fontSize: 14.5, lineHeight: 21, color: AdminColors.dim },
   small: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.faint },
   label: { fontFamily: font(700), fontSize: 15, color: AdminColors.text },
@@ -234,4 +258,4 @@ const styles = StyleSheet.create({
   num: { width: 80, textAlign: 'center', fontFamily: font(700), fontSize: 16, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingVertical: 6 },
   input: { fontFamily: font(500), fontSize: 15, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9 },
   flag: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6, borderTopWidth: 1, borderTopColor: AdminColors.line },
-});
+}));

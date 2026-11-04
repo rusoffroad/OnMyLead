@@ -1,6 +1,6 @@
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState, type ComponentProps } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
 import { AddFriendButton } from '@/components/add-friend-button';
 import { RiderDot } from '@/components/convoy';
@@ -10,7 +10,7 @@ import { ReportSheet } from '@/components/report-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
 import { Button, ErrorText, Field, Screen, Section, Segmented } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { friendIds, splitFriends } from '@/core/friends';
 import { sideColumnWidth } from '@/core/layout';
 import {
@@ -22,6 +22,7 @@ import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { useFriends } from '@/lib/friends';
 import { goOutRiding, nearbyRiders, OutRidingOffError, refreshOutRiding, stopOutRiding, updateOutRiding, useMyOutRiding } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /** How often the list refreshes while the screen is open. */
 const LIST_EVERY_MS = 60_000;
@@ -375,7 +376,7 @@ export default function OutRiding() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Out Riding' }} />
+      <Stack.Screen options={{ title: t('Out Riding') }} />
       {wide ? (
         <TwoPane side={status} main={list} sideWidth={sideColumnWidth(width)} />
       ) : (
@@ -389,7 +390,7 @@ export default function OutRiding() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky, padding: Spacing.three, gap: 4 },
   statusCard: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.three },
   statusOn: { borderWidth: 2, borderColor: RideColors.green },
@@ -435,4 +436,4 @@ const styles = StyleSheet.create({
   menu: { flexDirection: 'row', gap: Spacing.two, flexWrap: 'wrap' },
   menuBtn: { flex: 1, minHeight: 44 },
   offPreview: { alignItems: 'center', gap: Spacing.three, paddingTop: Spacing.three, opacity: 0.85 },
-});
+}));

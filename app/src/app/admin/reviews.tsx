@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import {
@@ -7,7 +7,7 @@ import {
   tabular, useLayoutSize, useToast,
 } from '@/components/admin';
 import { ExternalLink, Fact, Notice } from '@/components/admin-insights';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDate, fmtInt } from '@/core/admin-format';
 import { needsRefresh, STORE_NAME, storeState, type StoreKey } from '@/core/admin-growth';
 import {
@@ -19,7 +19,7 @@ import * as api from '@/lib/admin-reviews';
 
 const PAGE = 30;
 const STORES: StoreKey[] = ['apple', 'google'];
-const STAR = AdminColors.amber;
+
 
 /** Ratings and reviews from the App Store and Google Play, newest first, with replies. */
 export default function StoreReviews() {
@@ -145,9 +145,9 @@ function Scoreboard({ totals, stars, onStars }: { totals: ReturnType<typeof comb
                 onPress={() => onStars(n)}
                 style={({ hovered }) => [styles.histRow, (hovered || on) && { backgroundColor: AdminColors.raised }]}>
                 <Text style={[styles.histLabel, tabular]}>{n}</Text>
-                <Star size={13} color={STAR} />
+                <Star size={13} color={AdminColors.amber} />
                 <View style={styles.histTrack}>
-                  <View style={[styles.histFill, { flex: shares[i] || 0.0001, backgroundColor: on || stars == null ? STAR : `${STAR}66` }]} />
+                  <View style={[styles.histFill, { flex: shares[i] || 0.0001, backgroundColor: on || stars == null ? AdminColors.amber : `${AdminColors.amber}66` }]} />
                   <View style={{ flex: 1 - shares[i] || 0.0001 }} />
                 </View>
                 <Text style={[styles.histCount, tabular]}>{fmtInt(totals.stars[i])}</Text>
@@ -183,7 +183,7 @@ function StoreLine({ store, info, configured, history }: { store: StoreKey; info
 function Stars({ n, size }: { n: number; size: number }) {
   return (
     <View style={{ flexDirection: 'row', gap: 1 }} accessibilityLabel={`${n} out of 5 stars`} accessible>
-      {[1, 2, 3, 4, 5].map((i) => <Star key={i} size={size} color={i <= n ? STAR : AdminColors.line} />)}
+      {[1, 2, 3, 4, 5].map((i) => <Star key={i} size={size} color={i <= n ? AdminColors.amber : AdminColors.line} />)}
     </View>
   );
 }
@@ -281,7 +281,7 @@ function ReviewCard({ r, connected, onReplied }: { r: Review; connected: boolean
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   filters: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
   score: { flexDirection: 'row', gap: 28, alignItems: 'center' },
   big: { gap: 6, minWidth: 170 },
@@ -305,4 +305,4 @@ const styles = StyleSheet.create({
     minHeight: 110, borderWidth: 1, borderColor: AdminColors.line, borderRadius: 10, padding: 12, color: AdminColors.text,
     fontFamily: font(500), fontSize: 15, lineHeight: 21, backgroundColor: AdminColors.panel, textAlignVertical: 'top',
   },
-});
+}));

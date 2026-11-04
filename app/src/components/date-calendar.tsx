@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   addMonths, canPageMonth, clampToRange, formatTypedDate, inRange, longDayText, monthGrid, monthInRange, monthText,
   parseTypedDate, rangeYears, sameDay, startOfDay, typedDateText, type DayRange,
@@ -293,7 +293,7 @@ function MonthArrow({ back, disabled, onPress }: { back?: boolean; disabled: boo
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { gap: Spacing.three, alignSelf: 'center', maxWidth: 480, width: '100%' },
   typeRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.two, paddingHorizontal: 14, minHeight: 52,
@@ -325,4 +325,4 @@ const styles = StyleSheet.create({
   },
   monthChipText: { fontSize: 17, fontFamily: font(600) },
   pickDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.accent },
-});
+}));

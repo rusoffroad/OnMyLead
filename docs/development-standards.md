@@ -65,8 +65,16 @@ Tablet rules:
   the visual order.
 - **Densities.** Use vector icons and `@2x/@3x` (iOS) / density-independent assets (Android); never
   hard-code pixel sizes for images.
-- **Same branding everywhere:** dark theme from `app/src/constants/theme.ts`, logo red/blue,
-  Barlow, Title Case UI text, "Create a Ride" the loud home button.
+- **Same branding everywhere:** colours from `app/src/constants/theme.ts`, logo red/blue,
+  Barlow, Title Case UI text, Join a Ride the loud home button.
+- **Themes (2.0).** Riders pick Dark (default, Night Navy), Light or Match Phone, one of four
+  themes, and Color Blind Mode (You > Appearance, `core/appearance.ts`). So: take every surface and
+  text colour from `Colors` / `Glass` / `RideColors`, write module styles with `themedStyles(() =>
+  ({...}))` instead of `StyleSheet.create`, and never copy a theme colour into a module-level
+  constant (use a getter or read it in render). Literal colours are only for things that look the
+  same in every theme: white on logo red, map name tags (`MapLabelText`), the share card. New
+  status colours go in `RIDE_INK` and `RIDE_INK_CB` and must pass the colour blind tests in
+  `core/__tests__/appearance.test.ts`. Check new screens in Light as well as Dark.
 
 ## 3. Platform Differences
 
@@ -124,6 +132,10 @@ Live rider tracking is the most important feature. On every device:
   One person has one Pro state no matter which store they paid in; a second store purchase while
   one is active must be blocked or flagged, never stacked.
 - Schema-qualify extension calls (`extensions.gen_random_bytes`).
+- Settings a rider would expect on every device follow the account: add the storage key to
+  `SYNCED_SETTINGS` in `app/src/core/synced-settings.ts`, write it with `setSyncedItem` and listen
+  with `onSyncedChange` (`app/src/lib/settings-sync.ts`). Something about one device (calibration,
+  battery, downloaded files, location history) goes in `DEVICE_ONLY` with the reason instead.
 - Edge functions can't be type-checked in the cloud; keep them small and tested where possible.
 
 ## 6. Testing Matrix

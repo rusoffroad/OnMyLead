@@ -1,6 +1,6 @@
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
-import { Colors, RideColors } from '@/constants/theme';
+import { Colors, RideColors, themedStyles } from '@/constants/theme';
 import type { RideRole } from '@/core/bubble';
 import type { Freshness } from '@/core/freshness';
 
@@ -30,7 +30,7 @@ export function RiderDot({ role, freshness, size }: { role: RideRole; freshness:
   return <View style={[shape, styles.off]} />;
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   live: {
     borderWidth: 3.5, borderColor: '#FFFFFF', backgroundColor: Colors.background,
     // A soft dark edge keeps the white ring crisp on pale ground.
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   leaderHollow: { borderColor: RideColors.leader },
   lost: { borderColor: Colors.text, borderStyle: 'dashed' },
   off: { borderWidth: 1.5, borderColor: Colors.border },
-});
+}));

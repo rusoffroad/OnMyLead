@@ -4,7 +4,7 @@ summary: Who rides up front, who rides at the rear, and how to make someone lead
 category: rides
 order: 50
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/core/leaving.ts
   - app/src/components/leave-ride.tsx

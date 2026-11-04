@@ -16,6 +16,9 @@ const PATHS = {
   // A navigation arrowhead, for Follow Me (the map keeps moving with you).
   follow: ['M12 3.5l7.5 17-7.5-4.2-7.5 4.2z'],
   check: ['M5 12.5l4.5 4.5L19 7.5'],
+  // Two arrows chasing each other, for Sync Across Devices.
+  globe: ['M3.5 12h17', 'M12 3.5c2.5 2.6 3.7 5.4 3.7 8.5s-1.2 5.9-3.7 8.5', 'M12 3.5C9.5 6.1 8.3 8.9 8.3 12s1.2 5.9 3.7 8.5'],
+  sync: ['M19.5 10a7.8 7.8 0 0 0-14-3.2L4 8.5', 'M4 4v4.5h4.5', 'M4.5 14a7.8 7.8 0 0 0 14 3.2l1.5-1.7', 'M20 20v-4.5h-4.5'],
   search: ['M15.5 15.5L20.5 20.5'],
   person: ['M4.5 20.5c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6'],
   wrench: ['M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z'],
@@ -37,6 +40,7 @@ const PATHS = {
   // A rider with a plus, for Friends and Add Friend.
   addFriend: ['M3.5 20.5c.8-3.8 3.6-6 7-6 2.6 0 4.8 1.3 6 3.5', 'M19 7.5v6', 'M16 10.5h6'],
   people: ['M2.5 19.5c.6-3 3-4.8 6-4.8s5.4 1.8 6 4.8', 'M15.8 14.9c2.5.3 4.4 1.9 5 4.6'],
+  cup: ['M5 8.5h11v5.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z', 'M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16', 'M8.5 3.5v2.5', 'M12.5 3.5v2.5'],
   map: ['M3.5 6.5L9 4l6 2.5L20.5 4v13.5L15 20l-6-2.5-5.5 2.5z', 'M9 4v13.5', 'M15 6.5V20'],
   // A speech bubble, for chat in the Notifications inbox.
   chat: ['M4 5h16v11H10l-4.5 3.5V16H4z'],
@@ -53,6 +57,8 @@ const PATHS = {
   collapse: ['M20 10h-6V4', 'M14 10l6.5-6.5', 'M4 14h6v6', 'M10 14l-6.5 6.5'],
   // A music note, for Music Controls.
   music: ['M9 17.5V5.8l10.5-2.3v11.7', 'M9 9l10.5-2.3', 'M9 17.5a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z', 'M19.5 15.2a2.8 2.4 0 1 1-5.6 0a2.8 2.4 0 1 1 5.6 0z'],
+  // A speaker with sound waves, for Voice.
+  voice: ['M4 9.5h3.5L12 5.5v13l-4.5-4H4z', 'M15.5 9a4 4 0 0 1 0 6', 'M18.3 6.3a8 8 0 0 1 0 11.4'],
   battery: ['M3 7.5h15v9H3z', 'M20.5 10.5v3', 'M11.5 9l-2.5 3.2h3L9.5 15'],
   go: ['M5 12h13', 'M13 6l6 6-6 6'],
   more: ['M5 12h.01', 'M12 12h.01', 'M19 12h.01'],
@@ -76,6 +82,10 @@ const PATHS = {
   book: ['M12 6.8C10 5.2 7 4.6 3.5 5.1v13c3.5-.5 6.5.1 8.5 1.7', 'M12 6.8c2-1.6 5-2.2 8.5-1.7v13c-3.5-.5-6.5.1-8.5 1.7', 'M12 6.8v13'],
   // Opens a page outside the app (the website).
   external: ['M14 4.5h5.5V10', 'M19.5 4.5L11.5 12.5', 'M17.5 13.5v6h-13v-13h6'],
+  // A half-filled circle: Appearance (Dark, Light and themes).
+  theme: ['M12 3.5a8.5 8.5 0 0 1 0 17z'],
+  // Tilt meter: a level base and a leaning arm over its scale.
+  tilt: ['M3.5 18.5h17', 'M4.5 18.5a7.5 7.5 0 0 1 15 0', 'M12 18.5l4.6-6.2'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
@@ -85,7 +95,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {PATHS[name].map((d) => (
-        <Path key={d} d={d} stroke={color} fill={fill ?? 'none'} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+        <Path key={d} d={d} stroke={color} fill={fill ?? (name === 'theme' ? color : 'none')} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       ))}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
@@ -99,6 +109,8 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
         </>
       ) : null}
       {name === 'block' ? <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'globe' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'theme' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'help' ? <Circle cx={12} cy={12} r={9.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'signal' ? <Circle cx={12} cy={12} r={1.8} fill={color} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'sliders' ? (

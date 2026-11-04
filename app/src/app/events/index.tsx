@@ -1,15 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
+import { EventOrRide } from '@/components/events/event-or-ride';
 import { EventCardView } from '@/components/events/parts';
 import { RadiusChip, RadiusSheet } from '@/components/home/public-rides';
 import { Home, Pill } from '@/components/home/parts';
 import PageHead from '@/components/page-head';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Segmented } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { EVENTS_NOT_SWITCHED_ON, sortCards, type EventCard } from '@/core/events';
 import { parseRadius, RADIUS_STORAGE_KEY } from '@/core/home';
 import { useLayout } from '@/hooks/use-layout';
@@ -17,7 +18,9 @@ import { useEntitlements } from '@/lib/entitlements';
 import { myEvents, upcomingEvents } from '@/lib/events';
 import { positionIfAllowed } from '@/lib/location';
 import { requirePro } from '@/lib/pro';
+import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 type Tab = 'upcoming' | 'mine';
 
@@ -61,7 +64,7 @@ export default function EventsScreen() {
 
   const pickRadius = (mi: number) => {
     setRadius(mi);
-    AsyncStorage.setItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
+    setSyncedItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
   };
 
   const create = () => {
@@ -75,7 +78,7 @@ export default function EventsScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Events' }} />
+      <Stack.Screen options={{ title: t('Events') }} />
       <PageHead><title>Events | OnMyLead</title></PageHead>
       <Screen width="wide">
         <View style={{ gap: Spacing.four }}>
@@ -91,6 +94,8 @@ export default function EventsScreen() {
               {session && !can('create_events') ? <Pill text="Pro" tone="gold" style={{ alignSelf: layout.wide ? 'flex-end' : 'center' }} /> : null}
             </View>
           </View>
+
+          <EventOrRide from="events" />
 
           {session ? (
             <Segmented<Tab>
@@ -156,7 +161,7 @@ function rowsOf<T>(items: T[], n: number): (T | null)[][] {
   return rows;
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { gap: Spacing.three },
   headWide: { flexDirection: 'row', alignItems: 'flex-end' },
   title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 32, lineHeight: 35 },
@@ -164,4 +169,4 @@ const styles = StyleSheet.create({
   gridRow: { flexDirection: 'row', gap: Spacing.three, alignItems: 'stretch' },
   empty: { gap: 6, padding: Spacing.four, borderRadius: 22, borderWidth: 1, borderColor: Home.line, borderStyle: 'dashed' },
   emptyTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22 },
-});
+}));

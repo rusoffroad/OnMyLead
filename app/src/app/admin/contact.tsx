@@ -1,12 +1,12 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Empty, ErrorNote, FilterChips, Loading, Pager, Panel, StatusBadge, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDateTime } from '@/core/admin-format';
 import { CONTACT_TOPICS } from '@/core/contact';
 import * as admin from '@/lib/admin';
@@ -124,7 +124,7 @@ function BugDetails({ m }: { m: admin.ContactRow }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   fact: { fontFamily: font(600), color: AdminColors.text },
   shot: { width: '100%', maxWidth: 360, height: 640, borderRadius: 10, backgroundColor: AdminColors.page },
   log: { fontFamily: 'monospace', fontSize: 12, lineHeight: 17, color: AdminColors.text, backgroundColor: AdminColors.page, borderRadius: 10, padding: 12 },
@@ -133,4 +133,4 @@ const styles = StyleSheet.create({
   topic: { fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24, color: AdminColors.text },
   sub: { fontFamily: font(500), fontSize: 13.5, color: AdminColors.dim },
   message: { fontFamily: font(500), fontSize: 15, lineHeight: 22, color: AdminColors.text, backgroundColor: AdminColors.page, borderRadius: 10, padding: 12 },
-});
+}));

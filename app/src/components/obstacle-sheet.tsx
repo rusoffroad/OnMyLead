@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { BottomSheet } from '@/components/bottom-sheet';
 import { TextBox } from '@/components/keyboard';
 import { Button } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { cleanName, MAX_OBSTACLE_NAME, OBSTACLE_INK, OBSTACLE_KINDS, type ObstacleKind } from '@/core/obstacles';
 
 /**
@@ -72,7 +72,7 @@ export function ObstacleSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   kinds: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   kind: {
     flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: Radius.pill, borderWidth: 1.5, borderColor: Colors.border,
@@ -85,4 +85,4 @@ const styles = StyleSheet.create({
     fontFamily: font(600), fontSize: 17,
   },
   hint: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
-});
+}));

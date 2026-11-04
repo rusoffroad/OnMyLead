@@ -7,7 +7,9 @@ import {
   finishedStatus, planArea, planRide, rideBox, tileKey, tilesToRemove, type DownloadPlan, type OfflineChoice,
   type OfflineLayer, type OfflineMap,
 } from '@/core/offline-maps';
+import { areasToOffer, OFFLINE_AREA_PREFIX, offlineAreaKey, offlineAreaValue, type SyncedOfflineArea } from '@/core/synced-settings';
 import { fillTemplate, type Box, type Tile } from '@/core/trails';
+import { hasSyncedEntry, onSyncedPrefix, setSyncedItem, syncedValues } from '@/lib/settings-sync';
 import { templateFor, tileFile } from '@/lib/trail-tiles';
 
 /**
@@ -58,6 +60,51 @@ async function load() {
     maps = [];
   }
   emit();
+  // Downloads made before sync existed: list them with the account once, so other devices offer them.
+  for (const m of maps) if (!(await hasSyncedEntry(offlineAreaKey(m.id)))) listWithAccount(m);
+  refreshOffers();
+}
+
+// --- The areas the rider saved on their other devices (core/synced-settings) ------------------
+
+let offers: SyncedOfflineArea[] = [];
+const offerListeners = new Set<() => void>();
+
+function listWithAccount(m: OfflineMap) {
+  setSyncedItem(offlineAreaKey(m.id), offlineAreaValue(m)).catch(() => {});
+}
+
+async function refreshOffers() {
+  offers = areasToOffer(Object.values(await syncedValues(OFFLINE_AREA_PREFIX)), maps);
+  offerListeners.forEach((l) => l());
+}
+onSyncedPrefix(OFFLINE_AREA_PREFIX, () => {
+  refreshOffers();
+});
+
+/** Map areas saved on the rider's other devices that this one doesn't have yet. */
+export function useOtherDeviceAreas(): SyncedOfflineArea[] {
+  return useSyncExternalStore(
+    (l) => {
+      offerListeners.add(l);
+      load().then(refreshOffers);
+      return () => void offerListeners.delete(l);
+    },
+    () => offers,
+    () => offers,
+  );
+}
+
+/** Download, on this device, an area saved on another one (same id, so it isn't offered again). */
+export async function downloadFromOtherDevice(a: SyncedOfflineArea): Promise<string> {
+  const choices = a.choices.filter((c): c is OfflineChoice => c === 'satellite' || c === 'topo' || c === 'trails');
+  const use = choices.length ? choices : (['satellite', 'topo', 'trails'] as OfflineChoice[]);
+  return start({ name: a.name, kind: a.kind, rideId: a.rideId, box: a.box }, planArea(a.box, use), use, a.id, a.createdAt);
+}
+
+/** Stop offering an area from another device here (it stays on that device). */
+export function forgetOtherDeviceArea(id: string) {
+  setSyncedItem(offlineAreaKey(id), null).catch(() => {});
 }
 
 function subscribe(l: () => void) {
@@ -90,18 +137,22 @@ export async function downloadRide(rideId: string, name: string, route: LatLng[]
   return start({ name, kind: 'ride', rideId, box: rideBox(route)! }, planRide(route, choices), choices);
 }
 
-async function start(base: Pick<OfflineMap, 'name' | 'kind' | 'rideId' | 'box'>, plan: DownloadPlan, choices: OfflineChoice[]) {
+async function start(
+  base: Pick<OfflineMap, 'name' | 'kind' | 'rideId' | 'box'>, plan: DownloadPlan, choices: OfflineChoice[], syncedId?: string, syncedAt?: string,
+) {
   await load();
-  const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+  const id = syncedId ?? `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
   const manifest: Manifest = { layers: plan.layers.map((p) => ({ layer: p.layer, tiles: p.tiles.map((t) => [t.z, t.x, t.y]) })) };
   if (!MANIFESTS.exists) MANIFESTS.create({ intermediates: true, idempotent: true });
   manifestFile(id).write(JSON.stringify(manifest));
   maps = [
-    { ...base, id, choices, status: 'paused', total: plan.tiles, saved: 0, failed: 0, bytes: 0, createdAt: new Date().toISOString() },
+    { ...base, id, choices, status: 'paused', total: plan.tiles, saved: 0, failed: 0, bytes: 0, createdAt: syncedAt || new Date().toISOString() },
     ...maps,
   ];
   persist();
   emit();
+  if (!syncedId) listWithAccount(maps[0]);
+  refreshOffers();
   resumeDownload(id);
   return id;
 }
@@ -204,9 +255,13 @@ export async function deleteOfflineMap(id: string) {
   if (running === id) stopRequested = id;
   const others = maps.filter((m) => m.id !== id);
   const mine = await readManifest(id);
+  const gone = maps.find((m) => m.id === id);
   maps = others;
   persist();
   emit();
+  // Deleted by the rider: other devices stop offering it (their own copies stay). A ride's map
+  // refreshed by downloadRide is listed again under its new id.
+  if (gone) setSyncedItem(offlineAreaKey(id), null).catch(() => {});
   if (!mine) return;
   const keys = (m: Manifest) => m.layers.flatMap(({ layer, tiles }) => tiles.map(([z, x, y]) => tileKey(layer, { z, x, y })));
   const keep: string[] = [];
@@ -232,6 +287,8 @@ export async function deleteOfflineMap(id: string) {
 
 export function renameOfflineMap(id: string, name: string) {
   update(id, { name: name.trim() || 'Map Area' });
+  const m = maps.find((x) => x.id === id);
+  if (m) listWithAccount(m);
 }
 
 /** Free space left on the phone, in bytes, or null when the phone won't say. */

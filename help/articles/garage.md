@@ -4,18 +4,19 @@ summary: Add your rig or side-by-side with a photo, fill details from the VIN, t
 category: account
 order: 40
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/garage/**
   - app/src/components/vehicle-form.tsx
   - app/src/core/garage.ts
+  - app/src/core/trail-width.ts
   - app/src/core/fuel.ts
   - app/src/lib/export.ts
   - app/src/lib/export.web.ts
   - app/src/app/(tabs)/profile.tsx
   - app/app.json
 related: [fuel-range, trip-planner, starlink, rus-gear]
-keywords: [garage, vehicle, machine, rig, truck, jeep, sxs, utv, side by side, vin, build sheet, mods, parts, csv, fuel range, mpg, tablet]
+keywords: [garage, width, trail width, vehicle, machine, rig, truck, jeep, sxs, utv, side by side, vin, build sheet, mods, parts, csv, fuel range, mpg, tablet]
 screenshots:
   - file: vehicle.webp
     shows: app/src/app/garage/[id]/index.tsx
@@ -42,6 +43,10 @@ On Android, the system photo picker opens, and OnMyLead only gets the photo you 
 4. Fill in a **Nickname**, or the **Year**, **Make** and **Model**. You need a nickname or a make and model. **Trim** is optional.
 5. Add the rest if you like: **VIN**, **Purchase Price ($)**, **Engine Hours** and **Odometer (Miles)**.
 6. Under **Fuel and Mileage**, enter **Tank (gal)**, any **Extra Fuel (gal)** you carry and **Miles per Gallon**. Use your real-world trail mileage, not the sticker.
+
+:::release 2.0
+Under **Trail Fit**, enter the machine's **Width (Inches)** at its widest point, tire to tire. Trails with a width limit then tell you whether it fits, on the trail card, a trail's page and when you plan a ride on a trail. See [Map Layers and Trails](/help/map-layers).
+:::
 7. Tap **Add to Garage**.
 
 ## Fill In Details From the VIN
@@ -65,6 +70,10 @@ It uses the thirds rule: a third out, a third back, a third in reserve. If a mac
 Your Garage also powers the fuel check on a ride. See [Fuel Range](/help/fuel-range).
 
 ## Track Your Build
+
+:::release 2.0
+Tracking parts, the Build Sheet and the CSV export are Pro features. See [Free and Pro](/help/free-vs-pro). Your machines, their specs and the fuel range stay free.
+:::
 
 1. Open a machine.
 2. Tap **Add a Part or Extra**.

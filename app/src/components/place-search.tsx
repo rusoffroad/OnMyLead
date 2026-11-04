@@ -4,7 +4,8 @@ import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import type { LatLng } from '@/core/geo';
 import { placeDetail, PLACES_CREDIT, type Place } from '@/core/places';
 import { usePlaceSearch } from '@/hooks/use-place-search';
@@ -83,7 +84,7 @@ export function PlaceSearch({
                 accessibilityLabel={`${p.name}, ${placeDetail(p)}`}
                 onPress={() => pick(p)}
                 style={({ pressed }) => [styles.row, i > 0 && styles.rowLine, pressed && { backgroundColor: Colors.backgroundSelected }]}>
-                <View style={[styles.badge, iconFor(p) === 'flag' && { backgroundColor: '#2A1620' }]}>
+                <View style={[styles.badge, iconFor(p) === 'flag' && { backgroundColor: withAlpha(Colors.accent, 0.14) }]}>
                   <Icon name={iconFor(p)} size={18} color={iconFor(p) === 'flag' ? Colors.accent : Colors.sky} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -100,7 +101,7 @@ export function PlaceSearch({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   box: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.two, minHeight: 52, paddingHorizontal: 14,
     borderRadius: Radius.control, borderWidth: 1.5, backgroundColor: Colors.backgroundSelected,
@@ -109,6 +110,6 @@ const styles = StyleSheet.create({
   list: { borderRadius: Radius.control, overflow: 'hidden', backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12, paddingVertical: 10, minHeight: 56 },
   rowLine: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
-  badge: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: '#14294A' },
+  badge: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   credit: { fontSize: 11, paddingHorizontal: 12, paddingVertical: 6, textAlign: 'right' },
-});
+}));

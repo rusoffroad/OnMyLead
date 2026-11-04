@@ -1,28 +1,30 @@
 import { useWindowDimensions } from 'react-native';
 
-import { Colors, RideColors } from '@/constants/theme';
+import { Colors, currentScheme, RideColors } from '@/constants/theme';
+
+const light = () => currentScheme() === 'light';
 
 /**
- * The dashboard sits on the app's navy. The rail is a shade deeper so the page reads as the lit
+ * The dashboard follows the rider's theme (dark navy by default). The rail is a shade deeper so the page reads as the lit
  * surface; the logo red marks where you are and what will change something, blue marks Pro.
  */
 export const AdminColors = {
-  rail: '#07101D',
-  railLine: '#14243C',
-  page: Colors.background,
-  panel: Colors.backgroundElement,
-  raised: Colors.backgroundSelected,
-  line: '#1E3354',
-  text: Colors.text,
-  dim: Colors.textSecondary,
-  faint: '#5F7190',
-  red: Colors.accent,
-  blue: Colors.sky,
-  green: RideColors.green,
-  amber: RideColors.yellow,
-  violet: RideColors.sweep,
-  slate: RideColors.unknown,
-  danger: RideColors.red,
+  get rail() { return light() ? Colors.backgroundSelected : '#07101D'; },
+  get railLine() { return light() ? Colors.border : '#14243C'; },
+  get page() { return Colors.background; },
+  get panel() { return Colors.backgroundElement; },
+  get raised() { return Colors.backgroundSelected; },
+  get line() { return light() ? Colors.border : '#1E3354'; },
+  get text() { return Colors.text; },
+  get dim() { return Colors.textSecondary; },
+  get faint() { return light() ? '#6B7A90' : '#5F7190'; },
+  get red() { return Colors.accent; },
+  get blue() { return Colors.sky; },
+  get green() { return RideColors.green; },
+  get amber() { return RideColors.yellow; },
+  get violet() { return RideColors.sweep; },
+  get slate() { return RideColors.unknown; },
+  get danger() { return RideColors.red; },
 } as const;
 
 export type Tone = 'neutral' | 'pro' | 'trial' | 'free' | 'admin' | 'ok' | 'warn' | 'danger' | 'muted';
@@ -43,12 +45,12 @@ export function toneColor(tone: Tone = 'neutral'): string {
 
 /** Chart colours that read on the navy, in the order series should use them. */
 export const SeriesColors = {
-  red: AdminColors.red,
-  blue: AdminColors.blue,
-  green: AdminColors.green,
-  amber: AdminColors.amber,
-  violet: AdminColors.violet,
-  slate: AdminColors.slate,
+  get red() { return AdminColors.red; },
+  get blue() { return AdminColors.blue; },
+  get green() { return AdminColors.green; },
+  get amber() { return AdminColors.amber; },
+  get violet() { return AdminColors.violet; },
+  get slate() { return AdminColors.slate; },
 } as const;
 
 export type LayoutSize = 'phone' | 'tablet' | 'desktop';

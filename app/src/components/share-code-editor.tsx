@@ -6,6 +6,8 @@ import { cleanShareCode, type ShareCodeKind } from '@/core/share-code';
 import { codeCheckOk, ShareCodeField, type CodeCheck } from './share-code-field';
 import { ThemedText } from './themed-text';
 import { Button } from './ui';
+import { ProTag } from './pro-tag';
+import { requirePro } from '@/lib/pro';
 
 /**
  * "Choose Your Own Code" for a ride, a riding group or a friend link: a link that opens a box to
@@ -51,8 +53,9 @@ export function ShareCodeEditor({ kind, id, current, note, save, onSaved }: {
 
   if (!open) {
     return (
-      <Pressable accessibilityRole="button" onPress={() => setOpen(true)} style={{ minHeight: 40, justifyContent: 'center' }} hitSlop={4}>
+      <Pressable accessibilityRole="button" onPress={() => requirePro('custom_codes') && setOpen(true)} style={{ minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start' }} hitSlop={4}>
         <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Choose Your Own Code</ThemedText>
+        <ProTag feature="custom_codes" />
       </Pressable>
     );
   }

@@ -1,14 +1,14 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { headline, stateDetail, tallyLine, type Broadcast, type BroadcastState, type Tally } from '@/core/broadcast';
 
 const TINT: Record<BroadcastState, string> = {
-  sending: Colors.sky,
-  sent: RideColors.green,
-  queued: RideColors.yellow,
-  cancelling: Colors.textSecondary,
-  cancelled: Colors.textSecondary,
+  get sending() { return Colors.sky; },
+  get sent() { return RideColors.green; },
+  get queued() { return RideColors.yellow; },
+  get cancelling() { return Colors.textSecondary; },
+  get cancelled() { return Colors.textSecondary; },
 };
 
 /** Most dots the card shows before it just counts. */
@@ -102,7 +102,7 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: {
     backgroundColor: Colors.backgroundElement,
     borderRadius: Radius.control,
@@ -135,4 +135,4 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18,
   },
   cancelText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 18 },
-});
+}));

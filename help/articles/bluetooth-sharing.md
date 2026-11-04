@@ -4,7 +4,7 @@ summary: With no cell service, Ride Mode passes spots, status taps and quick rep
 category: ride-mode
 order: 25
 release: "2.1"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/core/nearby.ts
   - app/src/lib/nearby.ts

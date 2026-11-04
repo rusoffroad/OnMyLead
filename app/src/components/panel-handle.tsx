@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { FullMapButton } from '@/components/full-map';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 
 /**
  * The grab bar at the top of a foldable map panel (see usePanelFold): tap it to fold or open, and
@@ -36,9 +36,9 @@ function Handle({ open, onToggle, what, fromTop }: { open: boolean; onToggle: ()
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   full: { position: 'absolute', right: 0, top: 3 },
   handle: { alignItems: 'center', gap: 4, minHeight: 40, justifyContent: 'center' },
   bar: { width: 44, height: 5, borderRadius: 3, backgroundColor: Colors.textSecondary, opacity: 0.6 },
   text: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 13 },
-});
+}));

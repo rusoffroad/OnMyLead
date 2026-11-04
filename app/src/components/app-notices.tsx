@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, themedStyles } from '@/constants/theme';
 import { APP_FLAGS, liveNotice, noticeKey, type AppFlag, type Notice } from '@/core/app-settings';
 import { dismissNotice, useAppSettings, useFlag } from '@/lib/app-settings';
 import { openStore, useUpdateState, useVersionNotice } from '@/lib/app-update';
@@ -96,9 +96,9 @@ export function FlagGate({ flag, children }: { flag: AppFlag; children: ReactNod
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   card: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, borderRadius: Radius.card, borderLeftWidth: 4, paddingVertical: 14, paddingLeft: 14, paddingRight: 10 },
   title: { fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
   text: { fontFamily: font(500), fontSize: 16, lineHeight: 22, color: Colors.text },
   close: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center', marginTop: -6 },
-});
+}));

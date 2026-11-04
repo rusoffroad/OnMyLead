@@ -1,16 +1,17 @@
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { TrailThumb } from '@/components/trail-thumb';
 import { Button, Screen, Section } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { shareBadge } from '@/components/trail-badge';
 import { difficultyLabel, feetOrMiles, RIDER_TRAIL_INK, trackStats } from '@/core/nav-trails';
 import { loadTrails, syncMyTrails, trailLine, useLocalTrails } from '@/lib/nav-trails';
+import { t } from '@/lib/i18n';
 
 /** My Trails: every trail on this phone, recorded, drawn with the distance finder, or saved. */
 export default function MyTrails() {
@@ -25,13 +26,13 @@ export default function MyTrails() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'My Trails' }} />
+      <Stack.Screen options={{ title: t('My Trails') }} />
       <Button title="Open Map Mode" onPress={() => router.push('/nav')} />
       {loaded && !trails.length ? (
         <View style={styles.empty}>
           <ThemedText type="heading">No Trails Yet</ThemedText>
           <ThemedText themeColor="textSecondary">
-            In Map Mode, tap Record and ride, or Draw to map a custom trail. Trails stay on this phone until you share them. A rider trail you save shows here too.
+            In Map Mode, tap Record and ride, or Draw to map a custom trail. Your trails are private until you share them, and they show on every device you sign in on. A rider trail you save shows here too.
           </ThemedText>
         </View>
       ) : null}
@@ -69,10 +70,10 @@ export default function MyTrails() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   empty: { gap: Spacing.two, paddingVertical: Spacing.three },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, minHeight: 80 },
   name: { color: Colors.text, fontFamily: font(700), fontSize: 17 },
   sub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14 },
   badge: { fontFamily: font(700), fontSize: 13 },
-});
+}));

@@ -16,8 +16,8 @@
   {
     "version": "2.0",
     "title": "A New Home, Social, Events and Map Mode",
-    "intro": "OnMyLead 2.0 is the biggest update yet. A new Home screen puts Join a Ride, Create a Ride and Find a Ride up front, with public rides near you, your group, your badges and a Feed of what your friends have been riding. Social lets you like and comment on your friends' rides, badges and trails, post ride reports with a photo and see any rider's profile. Events brings rallies, poker runs and ride weekends to one page with their agenda and group rides. Navigate is now Map Mode, with custom trails, a Track Line of where you've been and named spots like water crossings. Ride Mode is cleaner and smoother, with your own typed messages, Follow Me, Full Map and Music Controls. And there's a notifications inbox, easier Leave Ride, better handling of rough locations, Report a Rider, a Rider Safety Agreement, gold Pro tags and ride miles that match the ride.",
-    "whatsNew": "What's new in 2.0:\n\n• New Home screen with a Feed of your friends' rides.\n• Social: like, comment and post.\n• Events: rallies and ride weekends.\n• Map Mode (was Navigate): custom trails, Track Line.\n• Cleaner, smoother Ride Mode; type your own messages.\n• Notifications bell on the Rides tab.\n• Leave Ride; organizers can hand off.\n• Full Map, Follow Me, Music Controls.\n• Freeride rider line; rough locations flagged.\n• Report a Rider.\n• Gold Pro tags show what Pro adds.\n• Ride miles fixed.",
+    "intro": "OnMyLead 2.0 is the biggest update yet. A new Home screen puts Join a Ride, Create a Ride and Find a Ride up front, with public rides near you, your group, your badges and a Feed of what your friends have been riding. Social lets you like and comment on your friends' rides, badges and trails, post ride reports with a photo and see any rider's profile. Events brings rallies, poker runs and ride weekends to one page with their agenda and group rides. Navigate is now Map Mode, with custom trails, a Track Line of where you've been and named spots like water crossings. You can pick Light or Dark, four themes and a Color Blind Mode, and the app now speaks 12 languages. Ride Mode is cleaner and smoother, with your own typed messages, a Beverage Break quick reply, Follow Me, Full Map and Music Controls. Invite a friend who's new to OnMyLead, and when they finish their first ride you both get Pro Annual at half price for the first year. And there's a notifications inbox, easier Leave Ride, better handling of rough locations, Report a Rider, a Rider Safety Agreement, gold Pro tags, new Free and Pro plans (joining a ride and following the leader stay free and unlimited, and Map Mode is free for 8 hours a month) and ride miles that match the ride, and trails now show width limits so you know your machine fits.",
+    "whatsNew": "What's new in 2.0:\n\n• New Home screen with a Feed of your friends' rides.\n• Social: like, comment and post.\n• Events: rallies and ride weekends.\n• Invite Friends: both save 50%.\n• Map Mode (was Navigate): custom trails, Track Line.\n• Smoother Ride Mode.\n• Light mode, themes, Color Blind Mode.\n• Notifications bell.\n• 12 languages.\n• Leave Ride; organizers hand off.\n• Full Map, Follow Me, Music Controls.\n• Freeride line.\n• Report a Rider. New Pro tiers.\n• Trail width limits; ride miles fixed.",
     "apple": null,
     "google": null,
     "notes": [
@@ -39,7 +39,19 @@
       },
       {
         "kind": "new",
-        "text": "Navigate is now Map Mode. Map a Custom Trail from the Draw tab, turn on Track Line to see where you've been (one colour per day, kept 7 days on your phone only), and mark named spots like obstacles, hazards, water crossings and viewpoints that travel with the trail. Shared trails are now full length, with an optional Hide My Start for recordings."
+        "text": "Not sure whether you need an event or a public ride? Tap Event or Public Ride? on Events, Find a Ride or either Create screen for a quick explanation. Events also has a gold card on Home so it's easier to spot."
+      },
+      {
+        "kind": "new",
+        "text": "Invite Friends, under You > Settings. Share your invite link with a rider who's new to OnMyLead. When they finish their first ride, you both get Pro Annual for $14.99 your first year instead of $29.99. On iPhone and iPad it's an App Store offer code, filled in for you; on Android it's a Google Play offer. Already paying for Pro on Google Play? Your next bill moves back 6 months instead."
+      },
+      {
+        "kind": "new",
+        "text": "Navigate is now Map Mode, with its own blue button in the middle of the tab bar so your offroad map is one tap from any tab. Map a Custom Trail from the Draw tab, turn on Track Line to see where you've been (one colour per day, kept 7 days on your phone only), and mark named spots like obstacles, hazards, water crossings and viewpoints that travel with the trail. Shared trails are now full length, with an optional Hide My Start for recordings."
+      },
+      {
+        "kind": "new",
+        "text": "Light mode and themes. Go to You > Appearance to pick Dark, Light or Match Phone, and one of four themes: Night Navy, Carbon (true black), Desert or Forest. Color Blind Mode switches rider status, trail and Track Line colors to ones that color blind riders can tell apart, and adds a symbol to riders who need a look."
       },
       {
         "kind": "improved",
@@ -54,8 +66,12 @@
         "text": "Type your own message in Ride Mode: tap Message, write a short line like \"Gas stop at the next town\" and tap Send to Everyone. It goes out like a quick reply, with the same Seen by lights and Cancel, and waits for signal if you have none. Check Save as One of My Quick Replies to send it again in one tap next time."
       },
       {
+        "kind": "improved",
+        "text": "The leader line in Ride Mode now always has the leader at the far left and the tail gunner at the far right, with everyone else in order between them by how far back they are, on routes and Freerides. Your miles done and to go still show above the line."
+      },
+      {
         "kind": "new",
-        "text": "The rider line on Freeride rides. With no mapped route, Ride Mode's line shows the leader on the right and every sharing rider in order behind them, measured along the path the leader has ridden, so bends and switchbacks count. It shows how spread out the group is, from the leader to the tail gunner, and tells you how far ahead the leader is. The leader's path stays on your phone and isn't uploaded."
+        "text": "The rider line on Freeride rides. With no mapped route, Ride Mode's line shows the leader at the far left, the tail gunner at the far right and every sharing rider in order between them, measured along the path the leader has ridden, so bends and switchbacks count. It shows how spread out the group is, from the leader to the tail gunner, and tells you how far ahead the leader is. The leader's path stays on your phone and isn't uploaded."
       },
       {
         "kind": "new",
@@ -64,6 +80,10 @@
       {
         "kind": "new",
         "text": "Follow Me: in Ride Mode and Map Mode the map now moves with you as you ride, so your dot stays in view without dragging the map. Drag or pinch the map to look around and it pauses; tap Paused or Center on Me to follow you again, or tap Following to turn it off. Your phone remembers the choice, and Follow Me on Maps in the You tab switches it too."
+      },
+      {
+        "kind": "fixed",
+        "text": "The keyboard could cover the box you were typing in when you commented on a post or wrote a direct message, so you couldn't see your words. The box now stays just above the keyboard on iPhone, iPad and Android, in comments, direct messages and group chat."
       },
       {
         "kind": "fixed",
@@ -120,6 +140,58 @@
       {
         "kind": "new",
         "text": "The Starlink page now features the RUS Starlink Mini Mount V2 (Morelock Series), made by RUS Offroad, the team behind OnMyLead. Tap Shop the Mount to see it in the store."
+      },
+      {
+        "kind": "new",
+        "text": "Waypoint symbols: pick from 15, including the new Gate, Trailhead, Water Crossing, Food, Restroom, First Aid, Repair and Photo Spot. Each has its own drawing and hazards sit on a triangle, so they're easy to tell apart for color-blind riders too. Planned stops show their symbol on the stop sign."
+      },
+      {
+        "kind": "new",
+        "text": "Trail width limits. Forest Service trails open only to ATVs and side-by-sides 50 inches or less now show a 50\" Width Limit on their card, and any public trail can show the width other riders found. The card shows the middle of everyone's entries, so one wrong number doesn't change it."
+      },
+      {
+        "kind": "new",
+        "text": "Add Width Limit: tap a Forest Service, BLM or OpenStreetMap trail, tap Add Width Limit and type the narrowest gap in inches. Change or remove your own entry any time."
+      },
+      {
+        "kind": "new",
+        "text": "Add your machine's width in the Garage under Trail Fit. Trail cards, a trail's page and Plan a Group Ride on This Trail then say whether it fits or is too wide."
+      },
+      {
+        "kind": "improved",
+        "text": "Planning a group ride on a trail with a width limit shows the limit on the Riding banner and adds it to the ride's instructions for everyone who joins."
+      },
+      {
+        "kind": "fixed",
+        "text": "Share My Location with a family link showed an error (\"Property 'crypto' doesn't exist\") on iPhone, iPad and Android, and no link was made. Family links work again."
+      },
+      {
+        "kind": "new",
+        "text": "Tilt meter and Crash Alert. A Tilt tile in Map Mode and Ride Mode shows your vehicle's roll and pitch, turning amber, then red, near your limits; tap it for a full tilt meter. Zero it for your phone mount, set your own warning angles and get a buzz (or a spoken angle) before a steep lean. In Ride Mode, Crash Alert watches for a hard hit or a rollover: a 30 second I'm OK countdown starts, and if you don't answer, your group gets an EMERGENCY alert with your location. It never calls 911. Find it all under You, Tilt and Crash Alert."
+      },
+      {
+        "kind": "new",
+        "text": "Brand Ambassador and OnMyLead Founder: two new badges OnMyLead gives. Ambassadors wear a blue patch and the Founder a red one with a flag on the summit. They show at the top of Badges, beside the rider's name, on the Feed and on their profile."
+      },
+      {
+        "kind": "new",
+        "text": "Sync Across Devices. Sign in with the same account on your iPhone, iPad, Android phone or tablet, or onmylead.com, and your settings follow you: map style, Follow Me, directions app, Appearance, voice, tilt warnings and more. Your Map Mode trails and their photos are backed up privately to your account, so they're in My Trails on every device. Offline Maps lists the areas you downloaded on your other devices so you can get them in one tap. You > Sync Across Devices shows when it last synced."
+      },
+      {
+        "kind": "improved",
+        "text": "A new look for the OnMyLead logo, with RUS Offroad bigger and to the right of OnMyLead."
+      },
+      {
+        "kind": "fixed",
+        "text": "Map Mode could open zoomed out over the whole state, with Zoom In to See Trails, when your phone didn't have your location yet (most often on Android right after starting the phone). It now moves to you as soon as your location comes in, unless you've already moved the map yourself."
+      },
+      {
+        "kind": "improved",
+        "text": "New Free and Pro plans. Joining a ride, following the leader, Ride Mode, ride chat and every safety feature stay free and unlimited on every device, and Map Mode is free for 8 hours a month (the clock never runs while you're on a group ride). Pro adds unlimited Map Mode, map layers, drawing routes, waypoints, directions, custom trails, saving and rating trails, Track Line, named spots, custom codes, your own messages, music controls, poll voting, the garage build sheet, sync, themes, voices, and OnMyLead on an iPad, an Android tablet and the website. A gold Pro tag marks each one on a Free account."
+        },
+        {
+        "kind": "new",
+        "text": "OnMyLead now speaks 12 languages: English, Spanish, Portuguese, French, German, Italian, Russian, Chinese, Japanese, Korean, Hindi and Indonesian. It starts in your phone's language when it's one of them, and English when it isn't. Tap the flag at the top of Home (or You > Language) to switch, and your other devices switch too. Some newer screens are still in English while they're translated."
       }
     ]
   },

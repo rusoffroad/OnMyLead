@@ -3,7 +3,7 @@
  * Social area, rider profiles and sharing to other apps. This file turns the server's rows into
  * what the screens say and holds the limits, so they're tested without a phone.
  */
-import { BADGE_BY_KEY, LEVEL_NAME } from './badges';
+import { badgeTitle, HONOR_BY_KEY, isHonor } from './badges';
 import { feedLine, feedStat, parseFeed, type FeedItem } from './feed';
 import { METERS_PER_MILE } from './geo';
 
@@ -254,7 +254,7 @@ export function shareHeadline(item: FeedItem & { body?: string | null }): string
     case 'ride':
       return item.miles != null && item.miles > 0 ? `${miles(item.miles)} Miles` : item.title ?? 'Ride Done';
     case 'badge':
-      return item.badge ? `${BADGE_BY_KEY[item.badge.badge].name} ${LEVEL_NAME[item.badge.level]}` : 'New Badge';
+      return item.badge ? badgeTitle(item.badge) : 'New Badge';
     case 'trail':
       return item.title ?? 'New Trail';
     default:
@@ -271,7 +271,7 @@ export function shareSubline(item: FeedItem & { body?: string | null }): string 
       return others > 0 ? `${where} with ${others} ${others === 1 ? 'rider' : 'riders'}` : where;
     }
     case 'badge':
-      return 'Badge earned on OnMyLead';
+      return item.badge && isHonor(item.badge.badge) ? 'Given by OnMyLead' : 'Badge earned on OnMyLead';
     case 'trail': {
       const len = item.lengthM != null && item.lengthM > 0 ? `${miles(item.lengthM / METERS_PER_MILE)} mi custom trail` : 'Custom trail';
       return `${len} on OnMyLead`;
@@ -296,7 +296,9 @@ export function shareText(item: FeedItem & { body?: string | null; mine: boolean
       break;
     }
     case 'badge':
-      text = `${who} earned the ${shareHeadline(item)} badge.`;
+      text = item.badge && isHonor(item.badge.badge)
+        ? `${who} ${HONOR_BY_KEY[item.badge.badge].share[item.mine ? 0 : 1]}.`
+        : `${who} earned the ${shareHeadline(item)} badge.`;
       break;
     case 'trail':
       text = item.mine ? `I mapped a trail: ${item.title ?? 'a custom trail'}.` : `Check out ${item.title ?? 'this trail'}, mapped by ${item.actorName}.`;

@@ -5,9 +5,10 @@ import { SheetRoot, SwipeSheet } from '@/components/swipe-sheet';
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { MAPS_APP_LABEL, mapsAppsFor, pickedApp, type DirectionsRow, type DirectionsTarget } from '@/core/directions';
 import { MAPS_APPS_TEXT, openDirections, openIn, useMapsPreference, useWebDirectionsPrompt } from '@/lib/directions';
+import { ProTag } from './pro-tag';
 
 /**
  * Places to get turn-by-turn directions to, one row each. A tap opens the rider's maps app, or asks
@@ -45,7 +46,10 @@ export function DirectionsCard({ rows }: { rows: DirectionsRow[] }) {
   return (
     <View style={{ gap: Spacing.two }}>
       <View style={{ gap: 2 }}>
-        <ThemedText type="heading">Directions</ThemedText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <ThemedText type="heading">Directions</ThemedText>
+          <ProTag feature="directions" />
+        </View>
         <ThemedText type="small" themeColor="textSecondary">{`Turn-by-turn on the roads, in ${MAPS_APPS_TEXT}.`}</ThemedText>
       </View>
       <DirectionsList rows={rows} />
@@ -67,7 +71,10 @@ export function DirectionsSheet({ visible, rows, onClose }: { visible: boolean; 
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
       <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
         <View style={styles.grip} />
-        <Text style={styles.title} accessibilityRole="header">Directions</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={styles.title} accessibilityRole="header">Directions</Text>
+          <ProTag feature="directions" />
+        </View>
         <ThemedText type="small" themeColor="textSecondary">For the road. Off road, follow the leader and the route on this map.</ThemedText>
         {rows.length ? (
           <DirectionsList rows={rows} onOpen={open} />
@@ -114,13 +121,13 @@ export function DirectionsHost() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   list: { borderRadius: 18, overflow: 'hidden', backgroundColor: Colors.backgroundElement, borderWidth: 1, borderColor: Colors.border },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, minHeight: 64 },
   rowLine: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
-  sign: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: '#14294A' },
+  sign: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   app: { color: Colors.sky, fontFamily: font(700), fontSize: 14 },
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     position: 'absolute', left: 0, right: 0, bottom: 0,
     backgroundColor: Colors.background, borderTopLeftRadius: 28, borderTopRightRadius: 28,
@@ -129,4 +136,4 @@ const styles = StyleSheet.create({
   webSheet: { alignSelf: 'center', maxWidth: 480, marginHorizontal: 'auto', paddingBottom: Spacing.four, paddingTop: Spacing.four },
   grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border, marginBottom: Spacing.one },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 26 },
-});
+}));

@@ -1,15 +1,16 @@
 import { Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Text, useWindowDimensions, View } from 'react-native';
 
-import { BadgePatch, PATCH_COLORS } from '@/components/badge-patch';
+import { AMBASSADOR_COLORS, BadgePatch, FOUNDER_COLORS, PATCH_COLORS } from '@/components/badge-patch';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
-import { allProgress, LEVEL_NAME, RANKS, rankFor, type BadgeLevel, type BadgeProgress, type MyBadges } from '@/core/badges';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { allProgress, honorsHeld, LEVEL_NAME, RANKS, rankFor, type BadgeLevel, type BadgeProgress, type HonorDef, type MyBadges } from '@/core/badges';
 import { widthClass } from '@/core/layout';
 import { fetchMyBadges, forgetRiderBadge, markBadgesSeen } from '@/lib/badges';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /**
  * Badges: your rank and every badge, earned or not, with how far you are from the next level.
@@ -49,7 +50,7 @@ export default function BadgesScreen() {
   if (!session) {
     return (
       <Screen width="readable">
-        <Stack.Screen options={{ title: 'Badges' }} />
+        <Stack.Screen options={{ title: t('Badges') }} />
         <ThemedText themeColor="textSecondary">Sign in to earn badges for the rides you lead, join and finish.</ThemedText>
       </Screen>
     );
@@ -58,7 +59,7 @@ export default function BadgesScreen() {
   if (mine === undefined && !error) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Badges' }} />
+        <Stack.Screen options={{ title: t('Badges') }} />
         <ActivityIndicator color={Colors.text} style={{ marginTop: Spacing.five }} />
       </Screen>
     );
@@ -67,20 +68,24 @@ export default function BadgesScreen() {
   if (mine === null) {
     return (
       <Screen width="readable">
-        <Stack.Screen options={{ title: 'Badges' }} />
+        <Stack.Screen options={{ title: t('Badges') }} />
         <ThemedText themeColor="textSecondary">Badges start working with the next server update.</ThemedText>
       </Screen>
     );
   }
 
   const rank = rankFor(mine?.badges ?? []);
+  const honors = honorsHeld(mine?.badges ?? []);
   const progress = mine ? allProgress(mine) : [];
   const rows: BadgeProgress[][] = [];
   for (let i = 0; i < progress.length; i += columns) rows.push(progress.slice(i, i + columns));
 
   return (
     <Screen width={columns > 1 ? 'wide' : 'page'}>
-      <Stack.Screen options={{ title: 'Badges' }} />
+      <Stack.Screen options={{ title: t('Badges') }} />
+      {honors.map((h) => (
+        <HonorCard key={h.key} h={h} fresh={fresh.has(h.key)} />
+      ))}
       <RankCard rank={rank} />
       <ErrorText error={error} />
       {error ? <Button title="Try Again" kind="secondary" onPress={load} /> : null}
@@ -99,7 +104,8 @@ export default function BadgesScreen() {
       <ThemedText type="small" themeColor="textSecondary" style={{ maxWidth: 640 }}>
         A ride counts once it ends, for riders whose own location track covers at least half a mile. Leading, tail gunning and
         group rides need at least two riders with a track. Badges are earned on the server from what you really ride, so they
-        can’t be added by hand.
+        can’t be added by hand. OnMyLead Founder and Brand Ambassador are the exceptions: OnMyLead gives them, and they
+        don’t count toward your rank.
       </ThemedText>
     </Screen>
   );
@@ -132,6 +138,22 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
   );
 }
 
+/** An honor OnMyLead gave you (Brand Ambassador): the big blue patch, above your rank. */
+function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
+  return (
+    <View style={[styles.honor, { borderColor: h.key === 'founder' ? FOUNDER_COLORS.cloth : AMBASSADOR_COLORS.cloth }, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${h.name}${fresh ? ', new' : ''}. ${h.what}.`}>
+      <BadgePatch badge={h.key} level={1} size={88} />
+      <View style={{ flex: 1, gap: 4 }}>
+        <View style={[styles.titleRow, { alignItems: 'flex-start' }]}>
+          <Text style={styles.honorName}>{h.name}</Text>
+          {fresh ? <Text style={[styles.fresh, { backgroundColor: AMBASSADOR_COLORS.arrow, color: '#FFFFFF' }]}>New</Text> : null}
+        </View>
+        <ThemedText themeColor="textSecondary">{h.what}. Riders see it beside your name.</ThemedText>
+      </View>
+    </View>
+  );
+}
+
 function BadgeCard({ p, fresh, grid }: { p: BadgeProgress; fresh: boolean; grid: boolean }) {
   const earned = p.level > 0;
   const levelName = earned ? LEVEL_NAME[p.level as BadgeLevel] : 'Not Earned Yet';
@@ -158,7 +180,12 @@ function BadgeCard({ p, fresh, grid }: { p: BadgeProgress; fresh: boolean; grid:
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
+  honor: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card,
+    backgroundColor: Colors.backgroundElement, borderWidth: 1, borderColor: AMBASSADOR_COLORS.cloth,
+  },
+  honorName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 34, flexShrink: 1 },
   rank: { gap: Spacing.one, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   rankName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 52, lineHeight: 56 },
   ladder: { flexDirection: 'row', gap: 6, marginTop: Spacing.two },
@@ -178,10 +205,10 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   name: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 24, lineHeight: 28, flexShrink: 1 },
   fresh: {
-    color: Colors.background, backgroundColor: PATCH_COLORS[3].cloth, fontFamily: font(700), fontSize: 12,
+    flexShrink: 0, color: Colors.background, backgroundColor: PATCH_COLORS[3].cloth, fontFamily: font(700), fontSize: 12,
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill, overflow: 'hidden',
   },
   level: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 14 },
   track: { height: 6, borderRadius: 3, backgroundColor: Colors.backgroundSelected, overflow: 'hidden', marginTop: 4 },
   fill: { height: '100%', borderRadius: 3 },
-});
+}));

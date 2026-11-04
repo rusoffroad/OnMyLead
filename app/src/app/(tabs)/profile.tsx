@@ -1,6 +1,6 @@
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, type Href } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, Switch, Text, View } from 'react-native';
 
 import { BadgeStrip } from '@/components/badge-strip';
 import { Icon } from '@/components/icon';
@@ -8,19 +8,25 @@ import { MenuGroup, MenuRow } from '@/components/menu';
 import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { initialOf } from '@/core/profile';
 import { type MyBadges } from '@/core/badges';
 import { MAPS_APP_LABEL, mapsAppsFor, type MapsPreference } from '@/core/directions';
+import { describeAppearance } from '@/core/appearance';
+import { describeLanguage, languageByCode } from '@/core/i18n';
 import { BATTERY_PLANS } from '@/core/battery';
+import { AUTO_VOICE } from '@/core/voice';
 import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
 import { shareEndText } from '@/core/sharing';
 import { deleteMyAccount, myActiveShares, myRideName } from '@/lib/api';
-import { useFlag } from '@/lib/app-settings';
+import { useAppSettings, useFlag } from '@/lib/app-settings';
+import { referralsSwitchedOn } from '@/core/referrals';
 import { fetchMyBadges } from '@/lib/badges';
+import { useAppearance } from '@/lib/appearance';
 import { useBatteryMode } from '@/lib/battery';
+import { useVoiceChoice } from '@/lib/voice';
 import { useBlocks } from '@/lib/blocks';
 import { confirmAsync } from '@/lib/confirm';
 import { setMapsPreference, useMapsPreference } from '@/lib/directions';
@@ -40,6 +46,11 @@ import { nearbyAvailable, useBluetoothSharingSetting } from '@/lib/nearby';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 import { musicAvailable } from '@/lib/music';
+import { syncSettingsNow, useSyncStatus, useSyncSummary } from '@/lib/settings-sync';
+import { backupTrailsNow } from '@/lib/trail-backup';
+import { t, useLanguage } from '@/lib/i18n';
+import { requirePro } from '@/lib/pro';
+import { ProTag } from '@/components/pro-tag';
 
 /**
  * The You tab: everything that isn't a ride, in one place and in plain groups. Your name up top,
@@ -55,8 +66,14 @@ export default function You() {
   const notifications = useNotificationSettings();
   const mapsPref = useMapsPreference();
   const batteryMode = useBatteryMode();
-  const { ent } = useEntitlements();
+  const syncLine = useSyncSummary();
+  const syncAvailable = useSyncStatus().available;
+  const { appearance } = useAppearance();
+  const language = useLanguage();
+  const voiceChoice = useVoiceChoice();
+  const { ent, can } = useEntitlements();
   const tripsOn = useFlag('trip_planner');
+  const referralsOn = referralsSwitchedOn(useAppSettings().settings.flags);
   const starlinkOn = useFlag('starlink');
   const offlineMaps = useOfflineMaps();
   const navOn = useFlag('nav_mode');
@@ -111,7 +128,7 @@ export default function You() {
     try {
       setSocial(await setSocialProfileShown(on));
     } catch {
-      setSocialError('That didn’t save. Check your connection and try again.');
+      setSocialError(t('That didn’t save. Check your connection and try again.'));
     } finally {
       setSocialBusy(false);
     }
@@ -120,13 +137,13 @@ export default function You() {
   if (loading) return <Screen><View /></Screen>;
 
   const offlineSummary = offlineMaps.length
-    ? `${offlineMaps.length === 1 ? '1 map' : `${offlineMaps.length} maps`}, ${formatBytes(offlineMaps.reduce((n, m) => n + m.bytes, 0))}`
-    : 'For riding with no signal';
+    ? `${offlineMaps.length === 1 ? t('1 map') : t('{n} maps', { n: offlineMaps.length })}, ${formatBytes(offlineMaps.reduce((n, m) => n + m.bytes, 0))}`
+    : t('For riding with no signal');
   const subscriptionSummary = ent.switchedOn ? planHeadline(ent) : 'Pro, Restore Purchases and Promo Codes';
   const blockedSummary = blocks.list.length
-    ? `${blocks.list.length === 1 ? '1 rider' : `${blocks.list.length} riders`}. They aren’t told.`
-    : 'Riders whose messages you don’t see';
-  const directionsSummary = mapsPref === 'ask' ? 'Ask each time' : MAPS_APP_LABEL[mapsPref];
+    ? `${blocks.list.length === 1 ? t('1 rider') : t('{n} riders', { n: blocks.list.length })}. ${t('They aren’t told.')}`
+    : t('Riders whose messages you don’t see');
+  const directionsSummary = mapsPref === 'ask' ? t('Ask each time') : MAPS_APP_LABEL[mapsPref];
   const needsAccount = (href: Parameters<typeof router.push>[0]) => () => router.push(session ? href : '/sign-in');
 
   return (
@@ -154,7 +171,7 @@ export default function You() {
 
       <MenuGroup title="On the Trail">
         {navOn ? (
-          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Map Mode" detail={myTrails.length ? `Your offroad map. ${myTrails.length} ${myTrails.length === 1 ? 'trail' : 'trails'} on this phone` : 'Your offroad map: trails, record, draw'} onPress={() => router.push('/nav')} />
+          <MenuRow icon="map" color={RIDER_TRAIL_INK} title="Map Mode" detail={myTrails.length ? `${t('Your offroad map')}. ${myTrails.length === 1 ? t('1 trail') : t('{n} trails', { n: myTrails.length })}` : t('Your offroad map: trails, record, draw')} onPress={() => router.push('/nav')} />
         ) : null}
         <MenuRow
           icon="map"
@@ -166,8 +183,8 @@ export default function You() {
               value={riderTrails}
               onValueChange={setRiderTrails}
               trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-              thumbColor={Colors.text}
-              {...({ activeThumbColor: Colors.text } as object)}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
               accessibilityLabel="Rider Trails on Maps"
             />
           }
@@ -182,19 +199,43 @@ export default function You() {
               value={followMe}
               onValueChange={setFollowMe}
               trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-              thumbColor={Colors.text}
-              {...({ activeThumbColor: Colors.text } as object)}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
               accessibilityLabel="Follow Me on Maps"
             />
           }
         />
-        <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail={sharingUntil != null ? `Sharing now, ${shareEndText(sharingUntil, sharingCheckedAt)}. Tap to stop` : 'With chosen riders or family, for as long as you pick'} onPress={needsAccount('/share')} />
+        <MenuRow icon="pin" color={Colors.sky} title="Share My Location" detail={sharingUntil != null ? t('Sharing now, {until}. Tap to stop', { until: shareEndText(sharingUntil, sharingCheckedAt) }) : t('With chosen riders or family, for as long as you pick')} onPress={needsAccount('/share')} />
         <MenuRow
           icon="battery"
           color={batteryMode === 'best' ? RideColors.green : RideColors.yellow}
           title="Battery Saver"
-          detail={`${BATTERY_PLANS[batteryMode].label}. ${BATTERY_PLANS[batteryMode].short}`}
+          detail={`${t(BATTERY_PLANS[batteryMode].label)}. ${t(BATTERY_PLANS[batteryMode].short)}`}
           onPress={() => router.push('/battery')}
+        />
+        <MenuRow icon="theme" color={Colors.sky} title="Appearance" detail={describeAppearance(appearance, t)} onPress={() => router.push('/appearance')} />
+        <MenuRow
+          icon="globe"
+          color={Colors.sky}
+          title="Language"
+          detail={`${languageByCode(language.language).flag} ${describeLanguage(language.choice, language.language, t('Match Phone'))}`}
+          onPress={() => router.push('/language' as Href)}
+        />
+        {Platform.OS !== 'web' ? (
+          <MenuRow
+            icon="tilt"
+            color={RideColors.green}
+            title="Tilt and Crash Alert"
+            detail="Roll and pitch meter, tilt warnings, and an alert to your group after a crash"
+            onPress={() => router.push('/tilt')}
+          />
+        ) : null}
+        <MenuRow
+          icon="voice"
+          color={Colors.sky}
+          title="Voice"
+          detail={voiceChoice === AUTO_VOICE ? 'Automatic. The most natural voice on this device reads Ride Mode alerts' : 'Your pick reads Ride Mode alerts'}
+          onPress={() => router.push('/voice')}
         />
         {musicAvailable && musicFlag ? (
           <MenuRow
@@ -207,8 +248,8 @@ export default function You() {
                 value={musicMine}
                 onValueChange={setMusicMine}
                 trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                thumbColor={Colors.text}
-                {...({ activeThumbColor: Colors.text } as object)}
+                thumbColor="#FFFFFF"
+                {...({ activeThumbColor: '#FFFFFF' } as object)}
                 accessibilityLabel="Music Controls"
               />
             }
@@ -227,8 +268,8 @@ export default function You() {
                 value={bluetoothMine}
                 onValueChange={setBluetoothMine}
                 trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                thumbColor={Colors.text}
-                {...({ activeThumbColor: Colors.text } as object)}
+                thumbColor="#FFFFFF"
+                {...({ activeThumbColor: '#FFFFFF' } as object)}
                 accessibilityLabel="Bluetooth Sharing"
               />
             }
@@ -246,7 +287,7 @@ export default function You() {
             icon="turn"
             color={RideColors.green}
             title="Directions"
-            detail={`Navigate opens: ${directionsSummary}`}
+            detail={t('Navigate opens: {app}', { app: directionsSummary })}
             onPress={() => setDirectionsOpen(!directionsOpen)}
             right={<ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{directionsOpen ? 'Done' : 'Change'}</ThemedText>}>
             {directionsOpen ? (
@@ -260,7 +301,24 @@ export default function You() {
               />
             ) : null}
           </MenuRow>
+          {syncAvailable ? (
+            <MenuRow
+              icon="sync"
+              color={Colors.sky}
+              title="Sync Across Devices"
+              detail={syncLine}
+              onPress={() => {
+                if (!requirePro('sync')) return;
+                syncSettingsNow();
+                backupTrailsNow();
+              }}
+              right={can('sync') ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Sync Now</ThemedText> : <ProTag feature="sync" />}
+            />
+          ) : null}
           <MenuRow icon="star" color={RideColors.yellow} title="Subscription" detail={subscriptionSummary} onPress={() => router.push('/subscription')} />
+          {referralsOn ? (
+            <MenuRow icon="addFriend" color={Colors.accent} title="Invite Friends" detail="You both get 50% off Pro Annual when they finish a ride" onPress={() => router.push('/invite-friends')} />
+          ) : null}
           <MenuRow icon="block" color={Colors.danger} title="Blocked Riders" detail={blockedSummary} onPress={() => router.push('/blocked')} />
           {ent.accountType === 'admin' ? (
             <MenuRow
@@ -277,7 +335,7 @@ export default function You() {
       {session ? (
         <>
           <MenuGroup title="Account">
-            <MenuRow icon="person" title="Email" detail={`${session.user.email ?? 'No email on this account'}. Only you see this.`} />
+            <MenuRow icon="person" title="Email" detail={`${session.user.email ?? t('No email on this account')}. ${t('Only you see this.')}`} />
             {social ? (
               <MenuRow
                 icon="people"
@@ -290,8 +348,8 @@ export default function You() {
                     disabled={socialBusy}
                     onValueChange={toggleSocial}
                     trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                    thumbColor={Colors.text}
-                    {...({ activeThumbColor: Colors.text } as object)}
+                    thumbColor="#FFFFFF"
+                    {...({ activeThumbColor: '#FFFFFF' } as object)}
                     accessibilityLabel={socialSetting(social).title}
                   />
                 }
@@ -307,7 +365,7 @@ export default function You() {
           icon="book"
           color={Colors.sky}
           title={HELP_CENTER_TITLE}
-          detail={`Step-by-step instructions for every feature, at ${HELP_CENTER_DISPLAY}`}
+          detail={t('Step-by-step instructions for every feature, at {site}', { site: HELP_CENTER_DISPLAY })}
           onPress={() => openHelpCenter()}
           right={<Icon name="external" size={18} color={Colors.sky} />}
         />
@@ -357,7 +415,7 @@ function Identity({ userId, name, plan }: { userId: string | undefined; name: st
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={picked ? `Your ride name is ${name}. Change it or your profile picture` : 'Pick your ride name and profile picture'}
+      accessibilityLabel={picked ? t('Your ride name is {name}. Change it or your profile picture', { name: name! }) : t('Pick your ride name and profile picture')}
       onPress={() => router.push('/ride-name')}
       style={({ pressed }) => [styles.identity, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.ring}>
@@ -372,7 +430,7 @@ function Identity({ userId, name, plan }: { userId: string | undefined; name: st
         />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.name} numberOfLines={1}>{picked ? name : name === '' ? 'Pick Your Ride Name' : ' '}</Text>
+        <Text style={styles.name} numberOfLines={1}>{picked ? name : name === '' ? t('Pick Your Ride Name') : ' '}</Text>
         <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
           {picked ? 'Your name and picture. Tap to change' : 'Other riders see you as Rider until you do'}
         </ThemedText>
@@ -411,7 +469,7 @@ function DeleteAccount() {
       if (/request_account_deletion|schema cache|does not exist/i.test(message)) setState('off');
       else {
         setState('idle');
-        setError(`Couldn’t send that. ${message}`);
+        setError(`${t('Couldn’t send that.')} ${message}`);
       }
     }
   };
@@ -436,7 +494,7 @@ function DeleteAccount() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   identity: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderRadius: Radius.card, padding: Spacing.three,
     backgroundColor: Colors.backgroundElement,
@@ -450,4 +508,4 @@ const styles = StyleSheet.create({
   legalLink: { fontSize: 13, textDecorationLine: 'underline' },
   deleteButton: { borderColor: Colors.danger },
   deleteNote: { gap: 4, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
-});
+}));
