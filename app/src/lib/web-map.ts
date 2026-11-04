@@ -35,6 +35,8 @@ const css = () => `
 .oml-pin { position: relative; width: 30px; height: 30px; }
 .oml-pin i { position: absolute; left: 6px; top: 6px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid ${Colors.background}; }
 .oml-pin b { position: absolute; inset: 0; border-radius: 50%; background: ${Colors.accent}; opacity: .3; }
+.oml-spot { width: 30px; height: 30px; border-radius: 9px; background: ${Colors.scout}; border: 2px solid ${Colors.background}; box-sizing: border-box; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
+.oml-spot svg { display: block; }
 .oml-pop .live { color: ${Colors.accent}; font-family: Barlow_700Bold, sans-serif; font-size: 13px; }
 .oml-pop .t { font-family: BarlowCondensed_700Bold, sans-serif; font-size: 19px; line-height: 22px; color: ${Colors.text}; }
 .oml-pop .s { color: ${Colors.textSecondary}; font-size: 14px; margin-top: 2px; }

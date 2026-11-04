@@ -1,9 +1,10 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FlagGate } from '@/components/app-notices';
+import { Scout } from '@/components/scout/scout';
 import { EventOrRide } from '@/components/events/event-or-ride';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { PlaceSearch } from '@/components/place-search';
@@ -20,6 +21,7 @@ import { useLayout } from '@/hooks/use-layout';
 import type { Place } from '@/core/places';
 import { publicRidesInArea, publicRidesInState, publicRidesNear } from '@/lib/api';
 import { track } from '@/lib/analytics';
+import { useFlag } from '@/lib/app-settings';
 import { currentPosition, stateAt } from '@/lib/location';
 import type { Ride } from '@/lib/types';
 
@@ -35,12 +37,41 @@ type Found = Ride & { distanceMi?: number };
 export default function FindRidesScreen() {
   return (
     <FlagGate flag="find_a_ride">
-      <FindRides />
+      <FindTab />
     </FlagGate>
   );
 }
 
-function FindRides() {
+type View2 = 'rides' | 'places';
+
+/**
+ * The Find tab holds two searches: public rides (below) and places to ride (Scout,
+ * components/scout/scout.tsx), switched at the top. /find?view=places opens on places.
+ */
+function FindTab() {
+  const params = useLocalSearchParams<{ view?: string }>();
+  const navigation = useNavigation();
+  const scoutOn = useFlag('scout');
+  const view: View2 = params.view === 'places' ? 'places' : 'rides';
+  const places = scoutOn && view === 'places';
+  useEffect(() => {
+    navigation.setOptions({ title: places ? t('Scout') : t('Find a Ride') });
+  }, [navigation, places]);
+  const pick = (v: View2) => router.setParams({ view: v });
+  const top = scoutOn ? (
+    <Segmented<View2>
+      value={view}
+      onChange={pick}
+      options={[
+        { value: 'rides', label: t('Rides') },
+        { value: 'places', label: t('Places to Ride') },
+      ]}
+    />
+  ) : null;
+  return places ? <Scout top={top} /> : <FindRides top={top} />;
+}
+
+function FindRides({ top }: { top: React.ReactNode }) {
   const layout = useLayout();
   const insets = useSafeAreaInsets();
   // Full Map: the map fills the screen (on a tablet, the list beside it tucks away). Starts off
@@ -182,6 +213,7 @@ function FindRides() {
   ) : null;
   const search = (
     <>
+      {top}
       <Segmented<Mode>
         value={mode}
         onChange={switchMode}

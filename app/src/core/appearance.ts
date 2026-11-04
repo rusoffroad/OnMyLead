@@ -71,9 +71,9 @@ export const SKINS: Skin[] = [
 export const skinById = (id: SkinId) => SKINS.find((s) => s.id === id) ?? SKINS[0];
 
 /** Brand colours, tuned per scheme so they read on dark and on light surfaces. */
-const BRAND: Record<Scheme, { accent: string; sky: string; danger: string; gold: string; amber: string; softRed: string }> = {
-  dark: { accent: '#E5262E', sky: '#3B86F7', danger: '#F03E3E', gold: '#E6C27A', amber: '#F2B233', softRed: '#FF6B70' },
-  light: { accent: '#D61F27', sky: '#1F6FE5', danger: '#D42A2A', gold: '#8A6512', amber: '#9A6300', softRed: '#C8242B' },
+const BRAND: Record<Scheme, { accent: string; sky: string; danger: string; gold: string; amber: string; softRed: string; scout: string; onScout: string }> = {
+  dark: { accent: '#E5262E', sky: '#3B86F7', danger: '#F03E3E', gold: '#E6C27A', amber: '#F2B233', softRed: '#FF6B70', scout: '#2EE6C4', onScout: '#06261F' },
+  light: { accent: '#D61F27', sky: '#1F6FE5', danger: '#D42A2A', gold: '#8A6512', amber: '#9A6300', softRed: '#C8242B', scout: '#007A68', onScout: '#FFFFFF' },
 };
 
 /** Rider status (Ride Bubble), roles and the dots on the map. */
@@ -114,7 +114,7 @@ export const MAP_INK_CB: MapInk = {
 
 export type Palette = {
   scheme: Scheme;
-  colors: Surfaces & { textSoft: string; accent: string; onAccent: string; sky: string; danger: string; gold: string; scrim: string };
+  colors: Surfaces & { textSoft: string; accent: string; onAccent: string; sky: string; danger: string; gold: string; scout: string; onScout: string; scrim: string };
   glass: { panel: string; tile: string; edge: string; redTint: string; redEdge: string; amberTint: string; amber: string; softRed: string };
   ride: RideInk;
   map: MapInk;
@@ -133,7 +133,7 @@ export function buildPalette(a: Appearance, system?: string | null): Palette {
   const dark = scheme === 'dark';
   return {
     scheme,
-    colors: { ...s, textSoft: mix(s.text, s.textSecondary, 0.5), accent: b.accent, onAccent: '#FFFFFF', sky: b.sky, danger: b.danger, gold: b.gold, scrim: dark ? 'rgba(3,9,18,0.72)' : 'rgba(10,22,38,0.42)' },
+    colors: { ...s, textSoft: mix(s.text, s.textSecondary, 0.5), accent: b.accent, onAccent: '#FFFFFF', sky: b.sky, danger: b.danger, gold: b.gold, scout: b.scout, onScout: b.onScout, scrim: dark ? 'rgba(3,9,18,0.72)' : 'rgba(10,22,38,0.42)' },
     glass: {
       panel: withAlpha(s.backgroundElement, dark ? 0.95 : 0.96),
       tile: dark ? 'rgba(255,255,255,0.06)' : 'rgba(10,22,38,0.05)',

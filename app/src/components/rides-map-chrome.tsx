@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Icon, type IconName } from '@/components/icon';
 import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import type { Bounds } from '@/core/discovery';
+import { spotKindInfo, type Spot } from '@/core/spots';
 import type { LatLng } from '@/core/geo';
 import type { Ride } from '@/lib/types';
 import { MarkerBody } from './marker-body';
@@ -28,6 +29,9 @@ export type RidesMapProps = {
   /** Full Map: the map fills the screen. `onToggleFull` adds the button that switches it. */
   full?: boolean;
   onToggleFull?: () => void;
+  /** Scout: places to ride, drawn as Scout signs. With these, the count chip counts places, not rides. */
+  spots?: Spot[];
+  onOpenSpot?: (spot: Spot) => void;
 };
 
 /** The map's frame: a rounded card in the page, or square corners when it fills the screen. */
@@ -65,6 +69,38 @@ export function RideBubble({ ride }: { ride: Ride & { distanceMi?: number } }) {
   );
 }
 
+/**
+ * A place to ride on the map: a Scout trail sign (a rounded square) with its kind drawn on it, so it
+ * reads apart from ride dots (circles) and waypoints (diamonds) by shape as well as colour.
+ */
+export function SpotPin({ spot }: { spot: Pick<Spot, 'kind'> }) {
+  return (
+    <MarkerBody style={styles.spotWrap}>
+      <View style={styles.sign}>
+        <Icon name={spotKindInfo(spot.kind).icon} size={18} color={Colors.onScout} strokeWidth={2.2} />
+      </View>
+    </MarkerBody>
+  );
+}
+
+/** "Under 1 mi", "42 mi away", in the rider's language. */
+export const awayText = (mi: number) => (mi < 1 ? t('Under 1 mi') : t('{n} mi away', { n: Math.round(mi).toLocaleString('en-US') }));
+
+/** The bubble that opens over a place. */
+export function SpotBubble({ spot }: { spot: Spot }) {
+  return (
+    <View style={styles.bubble}>
+      <Text style={[styles.live, { color: Colors.scout }]}>{t(spotKindInfo(spot.kind).one)}</Text>
+      <Text style={styles.bubbleTitle} numberOfLines={2}>{spot.name}</Text>
+      <Text style={styles.bubbleText}>
+        {awayText(spot.distanceMi)}
+        {spot.ridesComingUp ? `, ${spot.ridesComingUp === 1 ? t('1 ride coming up') : t('{n} rides coming up', { n: spot.ridesComingUp })}` : ''}
+      </Text>
+      <Text style={styles.bubbleLink}>{t('Open Place')}</Text>
+    </View>
+  );
+}
+
 function RoundButton({ icon, label, onPress }: { icon: IconName; label: string; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} hitSlop={4} style={({ pressed }) => [styles.round, pressed && styles.pressed]}>
@@ -98,11 +134,13 @@ export function MapControls({
 
 /** The state label (top left), the ride count, and "Search this area" when the map has moved. */
 export function MapOverlay({
-  title, onPressTitle, count, moved, onSearch,
+  title, onPressTitle, count, moved, onSearch, places,
 }: {
   title?: string | null;
   onPressTitle?: () => void;
   count: number;
+  /** Count places to ride (Scout) instead of rides. */
+  places?: boolean;
   moved: boolean;
   onSearch?: () => void;
 }) {
@@ -121,8 +159,12 @@ export function MapOverlay({
           </Pressable>
         ) : null}
         <View style={[styles.chip, styles.count]}>
-          <View style={[styles.countDot, { backgroundColor: Colors.sky }]} />
-          <Text style={styles.chipText}>{count === 0 ? t('No rides here yet') : `${count} ${count === 1 ? t('Ride') : t('Rides')}`}</Text>
+          <View style={[styles.countDot, { backgroundColor: places ? Colors.scout : Colors.sky }]} />
+          <Text style={styles.chipText}>
+            {places
+              ? count === 0 ? t('No places here yet') : count === 1 ? t('1 Place') : t('{n} Places', { n: count })
+              : count === 0 ? t('No rides here yet') : `${count} ${count === 1 ? t('Ride') : t('Rides')}`}
+          </Text>
         </View>
       </View>
       {moved && onSearch ? (
@@ -141,7 +183,13 @@ const glass = 'rgba(10, 22, 38, 0.86)';
 
 const styles = themedStyles(() => ({
   pinWrap: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
+  spotWrap: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
   halo: { position: 'absolute', width: 30, height: 30, borderRadius: 15, opacity: 0.3 },
+  sign: {
+    width: 30, height: 30, borderRadius: 9, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.scout, borderWidth: 2, borderColor: Colors.background,
+    shadowColor: '#000', shadowOpacity: 0.45, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 3,
+  },
   pin: { width: 18, height: 18, borderRadius: 9, borderWidth: 3, borderColor: Colors.background },
   bubble: {
     width: 220, padding: 12, gap: 2, borderRadius: 14, backgroundColor: Colors.backgroundElement,

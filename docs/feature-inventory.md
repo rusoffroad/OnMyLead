@@ -74,6 +74,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   promotion, check-in (I'm Here and Ready), leave ride.
 - Invite card: Share, Text, Email, Copy Link, Show QR Code.
 - Find a Ride **[flag]**: Near Me / By State, place search, radius, map with search this area.
+- Scout, Places to Ride (2.1) **[flag scout]**: Find tab switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10-1,000 mi (250 default), kind filters, place pages with Create a Ride Here, directions and nearby public rides; Suggest a Place reviewed in Admin > Places to Ride. Data: USFS, BLM, OpenStreetMap (riding_spots).
 - Universal Links for onmylead.com/r/*, /g/* **[iOS-only]**; **[Android gap]** no App Links.
 
 ### Ride Mode and Live Tracking
