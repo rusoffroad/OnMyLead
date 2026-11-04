@@ -157,6 +157,8 @@ function RootLayout() {
         <Stack.Screen name="inbox" options={{ title: t('Notifications') }} />
         <Stack.Screen name="notifications" options={{ title: t('Notification Settings') }} />
         <Stack.Screen name="badges" options={{ title: t('Badges') }} />
+        <Stack.Screen name="leaderboard" options={{ title: t('Leaderboard') }} />
+        <Stack.Screen name="leaderboard-area" options={{ title: t('Where You Ride') }} />
         <Stack.Screen name="blocked" options={{ title: t('Blocked Riders') }} />
         <Stack.Screen name="report-rider" options={{ title: t('Report a Rider') }} />
         <Stack.Screen name="battery" options={{ title: t('Battery Saver') }} />

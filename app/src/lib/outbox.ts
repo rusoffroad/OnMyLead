@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SEND_TIMEOUT_MS } from '@/core/broadcast';
 import { sendRideMessage, sendRiderStatus } from './api';
+import { nearbyForget, nearbyReply, nearbyStatus } from './nearby';
 import type { RiderStatusKind } from './types';
 
 const KEY = 'ride.outbox.v1';
@@ -32,6 +33,10 @@ async function sendOrQueue(item: Item): Promise<boolean> {
     return true;
   } catch {
     await AsyncStorage.setItem(KEY, JSON.stringify([...(await read()), item]));
+    // No service: nearby riders on the same ride still hear it over Bluetooth (lib/nearby.ts),
+    // and the first of their phones to get service passes it to the server.
+    if (item.kind === 'status') nearbyStatus(item.rideId, item);
+    else nearbyReply(item.rideId, item);
     return false;
   } finally {
     clearTimeout(timer);
@@ -86,6 +91,7 @@ export async function removeFromOutbox(id: string): Promise<boolean> {
   const left = items.filter((i) => i.id !== id);
   if (left.length === items.length) return false;
   await AsyncStorage.setItem(KEY, JSON.stringify(left));
+  nearbyForget(id);
   return true;
 }
 

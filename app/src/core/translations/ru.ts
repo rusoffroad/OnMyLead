@@ -310,6 +310,12 @@ const dict: Record<string, string> = {
   "Your offroad map": "Ваша внедорожная карта",
   "miles": "миль",
   'Next': 'Далее',
+  "Leaderboard": "Таблица лидеров",
+  "Badge leaderboard": "Таблица лидеров по значкам",
+  "Where You Ride": "Где вы катаетесь",
+  "Bluetooth Sharing": "Обмен по Bluetooth",
+  "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Без связи режим поездки передаёт местоположения и сигналы ближайшим райдерам вашей поездки",
+  "Off. Turn it on to keep sharing with nearby riders when there is no service": "Выключено. Включите, чтобы делиться с ближайшими райдерами, когда нет связи",
 };
 
 export default dict;
