@@ -336,7 +336,7 @@ export function rideAllowanceText(e: Entitlements): string | null {
 /** "Pro Trial — 12 Days Remaining" while a trial runs. */
 export function trialBadgeText(e: Entitlements): string | null {
   if (e.proSource !== 'trial' || e.trialDaysLeft === null) return null;
-  return tc('Pro Trial — {trialDaysLeft} {v} Remaining', { trialDaysLeft: e.trialDaysLeft, v: e.trialDaysLeft === 1 ? 'Day' : 'Days' });
+  return e.trialDaysLeft === 1 ? tc('Pro Trial — 1 Day Remaining') : tc('Pro Trial — {trialDaysLeft} Days Remaining', { trialDaysLeft: e.trialDaysLeft });
 }
 
 export type ProError =

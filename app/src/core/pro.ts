@@ -9,7 +9,7 @@
 
 import { can, trialBadgeText, type Entitlements, type FeatureKey, type ProError } from './entitlements';
 
-import { coreLocale } from './i18n';
+import { coreLocale, tc } from './i18n';
 /** Free history shows this many past rides. */
 export const FREE_HISTORY = 5;
 
@@ -18,7 +18,7 @@ export const FREE_MAP_HOURS = 8;
 
 /** The plan line, e.g. "Pro Trial — 12 Days Remaining", "Pro" or "Free". */
 export function planHeadline(ent: Entitlements): string {
-  return trialBadgeText(ent) ?? ent.label;
+  return trialBadgeText(ent) ?? tc(ent.label);
 }
 
 /** The first day of next UTC month, when the Free allowance resets. */

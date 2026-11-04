@@ -124,15 +124,15 @@ export default function ProScreen() {
             <PlanOption
               on={period === 'annual'}
               onPress={() => setPeriod('annual')}
-              name="Annual"
-              price={`${priceOf('annual')} a Year`}
+              name={t('Annual')}
+              price={t('{v} a Year', { v: priceOf('annual') })}
               detail={t('{v} a Month. Save About {v2}%', { v: annualPerMonth(), v2: annualSavingsPercent() })}
               best
             />
-            <PlanOption on={period === 'monthly'} onPress={() => setPeriod('monthly')} name="Monthly" price={`${priceOf('monthly')} a Month`} detail={t('Cancel anytime')} />
+            <PlanOption on={period === 'monthly'} onPress={() => setPeriod('monthly')} name={t('Monthly')} price={t('{v} a Month', { v: priceOf('monthly') })} detail={t('Cancel anytime')} />
           </View>
           <Button
-            title={t('Subscribe for {v} a {v2}', { v: priceOf(period), v2: period === 'annual' ? 'Year' : 'Month' })}
+            title={period === 'annual' ? t('Subscribe for {v} a Year', { v: priceOf(period) }) : t('Subscribe for {v} a Month', { v: priceOf(period) })}
             big
             loading={busy === 'buy'}
             onPress={subscribe}
