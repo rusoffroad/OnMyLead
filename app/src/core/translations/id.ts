@@ -310,6 +310,12 @@ const dict: Record<string, string> = {
   "Your offroad map": "Peta offroad kamu",
   "miles": "mil",
   'Next': 'Berikutnya',
+  "Leaderboard": "Papan Peringkat",
+  "Badge leaderboard": "Papan peringkat lencana",
+  "Where You Ride": "Tempat Kamu Berkendara",
+  "Bluetooth Sharing": "Berbagi Bluetooth",
+  "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Tanpa sinyal, Mode Riding meneruskan lokasi dan peringatan ke rider terdekat di riding kamu",
+  "Off. Turn it on to keep sharing with nearby riders when there is no service": "Mati. Nyalakan agar tetap berbagi dengan rider terdekat saat tidak ada sinyal",
 };
 
 export default dict;

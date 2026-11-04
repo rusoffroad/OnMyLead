@@ -80,6 +80,8 @@ import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay'
 import { showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
+import { useFlag } from '@/lib/app-settings';
+import { onNearbyEvent, setNearbySharing, startNearby, stopNearby, useNearby } from '@/lib/nearby';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
@@ -467,6 +469,45 @@ export default function RideMode() {
     }
   }, [activeShare]);
 
+  // Bluetooth Sharing (lib/nearby.ts): with no service, spots, taps and quick replies still pass
+  // between nearby riders on this ride. Runs for joined riders while Ride Mode is open; a rider's
+  // own spot goes out only while they are sharing with the ride.
+  const bluetoothFlag = useFlag('bluetooth_sharing');
+  const nearby = useNearby();
+  const iAmJoined = !!me && joined.some((m) => m.user_id === me);
+  useEffect(() => {
+    if (!me || !iAmJoined || rideOver || !bluetoothFlag) return;
+    void startNearby(id, me);
+    return () => stopNearby();
+  }, [id, me, iAmJoined, rideOver, bluetoothFlag]);
+  useEffect(() => {
+    setNearbySharing(id, !!activeShare);
+  }, [id, activeShare, nearby.state]);
+  useEffect(
+    () =>
+      onNearbyEvent((e) => {
+        if (e.kind === 'position') {
+          if (!memberIds.current.has(e.position.user_id)) return;
+          setPositions((prev) => {
+            const old = prev[e.position.user_id];
+            return old && Date.parse(old.recorded_at) >= Date.parse(e.position.recorded_at) ? prev : { ...prev, [e.position.user_id]: e.position };
+          });
+        } else if (e.kind === 'status') {
+          if (!memberIds.current.has(e.status.user_id)) return;
+          setStatuses((prev) => {
+            const old = prev[e.status.user_id];
+            if (old && (old.id === e.status.id || Date.parse(old.tapped_at) > Date.parse(e.status.tapped_at))) return prev;
+            const { user_id: _u, possible_crash: _c, ...tap } = e.status;
+            return { ...prev, [e.status.user_id]: tap };
+          });
+        } else if (memberIds.current.has(e.reply.user_id)) {
+          // No chat over Bluetooth, so a quick reply is read out, the way announcements are.
+          speak(`${nameOf(e.reply.user_id)}: ${e.reply.body}`);
+        }
+      }),
+    [nameOf],
+  );
+
   const settings: BubbleSettings = useMemo(() => {
     if (!ride) return BUBBLE_PRESETS.default;
     return ride.bubble_preset === 'custom' ? BUBBLE_PRESETS.default : BUBBLE_PRESETS[ride.bubble_preset as BubblePreset];
@@ -552,6 +593,8 @@ export default function RideMode() {
         // Their phone only shares a rough spot (Approximate Location): the dot can be a mile or more off.
         spot === p && isApproximateFix(p?.accuracy_m) ? 'Approximate Location' : null,
         st ? STATUS_LABEL[st.status] : null,
+        // This spot came phone to phone, not over the internet.
+        p && nearby.positions[m.user_id]?.recorded_at === p.recorded_at ? 'Via Bluetooth' : null,
       ].filter(Boolean).join(' · '),
     };
   });
@@ -1074,7 +1117,9 @@ export default function RideMode() {
             <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
               <View style={styles.offlineDot} />
               <Text style={styles.offlineText}>
-                No Service. Riders Show Where They Were Last Seen{activeShare ? ', and Yours Sends When Service Returns' : ''}.
+                {nearby.state === 'on' && nearby.peers > 0
+                  ? `No Service. Sharing With ${nearby.peers} Nearby ${nearby.peers === 1 ? 'Phone' : 'Phones'} Over Bluetooth${activeShare ? '' : ' (Your Spot Stays Private Until You Share)'}.`
+                  : `No Service. Riders Show Where They Were Last Seen${activeShare ? ', and Yours Sends When Service Returns' : ''}.`}
               </Text>
             </View>
           ) : null}

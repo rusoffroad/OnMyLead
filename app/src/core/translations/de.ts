@@ -310,6 +310,12 @@ const dict: Record<string, string> = {
   "Your offroad map": "Deine Offroad-Karte",
   "miles": "Meilen",
   'Next': 'Nächstes',
+  "Leaderboard": "Bestenliste",
+  "Badge leaderboard": "Abzeichen-Bestenliste",
+  "Where You Ride": "Wo du fährst",
+  "Bluetooth Sharing": "Bluetooth-Teilen",
+  "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Ohne Empfang gibt der Tourmodus Standorte und Alarme an Fahrer in der Nähe auf deiner Tour weiter",
+  "Off. Turn it on to keep sharing with nearby riders when there is no service": "Aus. Schalte es ein, um ohne Empfang weiter mit Fahrern in der Nähe zu teilen",
 };
 
 export default dict;

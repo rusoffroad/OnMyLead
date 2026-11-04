@@ -292,8 +292,12 @@ If your phone's location is rough, a yellow banner says why: **Precise Location 
 
 If your phone can't reach the server for a short while, a banner says **No Service. Riders Show Where They Were Last Seen**. Everyone else's dots switch to last seen with their ages, because your phone can't hear new positions. If you're sharing, the banner adds that yours sends when service returns.
 
-:::warning
-Live positions only update when a phone has a connection. With an offline map downloaded, you keep the map and the route on screen with no signal, but other riders' dots don't move until your phone, and theirs, get service again.
+:::until 2.1
+**Live positions only update when a phone has a connection.** With an offline map downloaded, you keep the map and the route on screen with no signal, but other riders' dots don't move until your phone, and theirs, get service again.
+:::
+
+:::release 2.1
+Riders close to you on the same ride keep moving with no service, over Bluetooth, and the banner says **No Service. Sharing With 2 Nearby Phones Over Bluetooth**. Riders out of Bluetooth range show where they were last seen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 Status taps and quick replies you make with no service wait on your phone and send on their own when you get signal.

@@ -6,6 +6,7 @@
     "NSPhotoLibraryUsageDescription": "プロフィール写真やガレージ用の車両写真を選びます。アップロードされるのは選んだ写真だけです。",
     "NSCameraUsageDescription": "プロフィール写真や車両写真を撮影します。アップロードされるのは撮影した写真だけです。",
     "NSMotionUsageDescription": "OnMyLead はモーションセンサーを傾きメーターに使い、ライドモードで事故の可能性を検知してグループに知らせます。",
-    "NSLocalNetworkUsageDescription": "OnMyLead は Starlink アンテナの Wi-Fi に接続して状態を表示します。ネットワーク上のほかの機器には触れません。"
+    "NSLocalNetworkUsageDescription": "OnMyLead は Starlink アンテナの Wi-Fi に接続して状態を表示します。ネットワーク上のほかの機器には触れません。",
+    "NSBluetoothAlwaysUsageDescription": "携帯の電波がないとき、ライドモードはBluetoothでライドの位置とアラートを同じライドの近くのライダーに送ります。送信される内容はすべてあなたのライド専用に暗号化されます。"
   }
 }

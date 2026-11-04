@@ -6,6 +6,7 @@
     "NSPhotoLibraryUsageDescription": "Elige una foto de perfil o una foto de tu vehículo para tu garaje. Solo se sube la foto que elijas.",
     "NSCameraUsageDescription": "Toma una foto de perfil o una foto de tu vehículo. Solo se sube la foto que tomes.",
     "NSMotionUsageDescription": "OnMyLead usa los sensores de movimiento para el medidor de inclinación y para detectar un posible accidente en el Modo Ruta y avisar a tu grupo.",
-    "NSLocalNetworkUsageDescription": "OnMyLead se conecta a tu antena Starlink en su wifi para mostrar su estado. No toca nada más de tu red."
+    "NSLocalNetworkUsageDescription": "OnMyLead se conecta a tu antena Starlink en su wifi para mostrar su estado. No toca nada más de tu red.",
+    "NSBluetoothAlwaysUsageDescription": "Sin cobertura móvil, el Modo Ruta pasa por Bluetooth las ubicaciones y alertas de tu ruta a los motoristas cercanos de la misma ruta. Todo lo que se envía está cifrado solo para tu ruta."
   }
 }

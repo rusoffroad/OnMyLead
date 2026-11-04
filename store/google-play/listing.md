@@ -33,74 +33,90 @@ Billing, Firebase Cloud Messaging, Google Maps) next to Apple, and shared screen
 
 ### Short description (80)
 
-Plan the ride, share one code and see your whole group on one live map.
+Group rides on one live map, plus Map Mode, Crash Alert, Events and Social.
 
-(71 characters.)
+(75 characters. Updated for 2.0.)
 
 ### Full description (4000)
 
-Paste as is. It is the App Store description with the Apple-only wording changed for Google Play
+Paste as is (updated for 2.0, 3375 characters). It is the App Store description with the Apple-only wording changed for Google Play
 (subscription paragraph, terms link, "phone" instead of "iPhone").
 
 ```text
-OnMyLead keeps a group ride together. Side-by-sides, Jeeps, dirt bikes, ATVs or trucks: the leader creates the ride, riders join with a code, a link or a QR code, and everyone sees each other on one map until the ride ends.
+OnMyLead keeps a group ride together. Side-by-sides, Jeeps, dirt bikes, ATVs or trucks: the leader creates the ride, riders join with a code, a link or a QR code, and everyone sees each other on one live map until the ride ends.
+
+NEW IN 2.0
+• A new Home: Join a Ride up front, public rides near you, your group and a Feed of your friends' rides
+• Map Mode: your offroad map for solo rides, with custom trails, Track Line and named spots
+• Tilt Meter and Crash Alert: roll and pitch on the map, and a hard hit or rollover starts an I'm OK countdown before your group is alerted
+• Events: rallies, poker runs and ride weekends with an agenda and group rides to join
+• Social: like and comment on friends' rides, badges and trails, and post ride reports
+• Badges and ranks from Rookie to Legend, plus the Founder and Brand Ambassador badges
+• Light mode, four themes and Color Blind Mode
+• 12 languages, and your trails and settings sync across your devices
+• Invite Friends: when a new rider finishes their first ride, you both save on Pro Annual
 
 PLAN THE RIDE
 • Create a ride in seconds with a meeting point, a time and an optional route
-• Draw a route that follows the trail, or import a GPX file
+• Draw a route that follows the trail, add waypoints and planned stops, or import a GPX file
+• Trail width limits tell you if your machine fits
 • Check every rider's fuel range against the route before you leave
 • Ride Day card with the weather, sunrise and sunset for the meeting area
-• Make a ride public so others can find it on the map, or keep it private with a code
 
 ON THE TRAIL
 • Ride Mode puts the live group map and big status buttons on one screen
-• Regroup Here, Need Help, Mechanical Issue and EMERGENCY reach the whole group with one tap, with lights showing who has seen it
+• The leader line shows the leader on the left, the tail gunner on the right and everyone in between
+• Regroup Here, Need Help, Mechanical Issue and EMERGENCY reach the whole group with one tap
 • Ride Bubble tells the leader when someone falls behind
-• Leader, sweep and tail gunner roles, and hand the lead to another rider
-• Planned stops and waypoints for fuel, lunch and hazards
-• Ride chat to everyone or to the leader only, with quick polls
-• Offline maps keep the map and route on screen when you lose service, and each rider's dot shows how old their last position is
+• Spoken alerts, ride chat, quick polls, Follow Me, Full Map and Music Controls
+• Offline maps keep the map and route on screen when you lose service, and every rider's dot shows how fresh it is
 
-AFTER THE RIDE
-• Ride summary and a shareable ride card
-• Ride Again with the same crew and route
-
-RIDING GROUPS
-• Keep your regular crew in a group with its own chat
-• Invite the whole group to a ride in one tap
-• Follow a leader to hear about their next ride
-
-ONE RIDE, EVERY PHONE
-• Android and iPhone riders join the same ride and see each other on the same map
-• Sign in on another phone or tablet and your rides, groups and Pro come with you
+RIDING GROUPS AND FRIENDS
+• Keep your regular crew in a group with its own chat, and invite them all in one tap
+• Add friends, message them and see who's out riding nearby, without sharing where you are
 
 YOUR PRIVACY
 • Your location is shared only with the ride you join, only while you are sharing, and sharing always ends
-• A notification shows whenever OnMyLead is sharing your location
 • Public rides show a rounded meeting area, never your exact spot
 • Report or block any rider
 
-ALSO INSIDE
-• Garage for your machines, mods and fuel range
-• Trip Planner checklists you reuse
-• Starlink dish status and battery run time
+OnMyLead is free to ride: join as many rides as you like, follow the leader, use Ride Mode and every safety feature, create one ride a month and use Map Mode 8 hours a month. Every new account gets 30 days of OnMyLead Pro with no payment and no automatic charge.
 
-OnMyLead is free. Free accounts create one ride a month and join as many as they like, and the safety features are always free. Every new account gets 30 days of OnMyLead Pro with no payment and no automatic charge.
-
-OnMyLead Pro adds unlimited rides, GPX import, offline maps, saved riding groups, polls, full ride history and premium ride cards: $4.99 a month or $29.99 a year (US prices). Payment is charged to your Google Play account. Subscriptions renew automatically until you cancel, and you can manage or cancel them any time in Google Play > Payments & subscriptions. Pro bought on one store works on every device you sign in to.
+OnMyLead Pro adds unlimited rides and Map Mode, Android tablets and the website, routes, waypoints, map layers, trail recording and sharing, offline maps, GPX import, events, themes, sync and more: $4.99 a month or $29.99 a year (US prices). Payment is charged to your Google Play account. Subscriptions renew automatically until you cancel, and you can manage or cancel them any time in Google Play > Payments & subscriptions. Pro bought on one store works on every device you sign in to.
 
 Terms of Use: https://onmylead.com/terms
 Privacy Policy: https://onmylead.com/privacy
 
-OnMyLead is not an emergency service. In an emergency, call 911 or your local emergency number first.
+OnMyLead is not an emergency service, and Crash Alert never calls 911. In an emergency, call 911 or your local emergency number first.
 
 Made by RUS Offroad.
 ```
 
-Check before pasting: the "ONE RIDE, EVERY PHONE" bullets and "Pro bought on one store works on
-every device" are true only once F18 is verified across platforms and F46 ships. If either is not
-done at the first Play release, delete those lines (the rest is true today on Android builds that
-pass the conditions above).
+Check before pasting: "Pro bought on one store works on every device" is true only once F46
+ships. If it has not at the first Play release, delete that sentence (the rest is true today on
+Android builds that pass the conditions above).
+
+### What's new (500), version 2.0
+
+The same text as `whatsNew` for 2.0 in `help/release-notes.json` (498 characters):
+
+```text
+What's new in 2.0:
+
+• New Home with a Feed of your friends' rides.
+• Social: like, comment and post.
+• Events: rallies and ride weekends.
+• Map Mode: custom trails, Track Line.
+• Tilt Meter and Crash Alert.
+• Smoother Ride Mode, Full Map, Follow Me.
+• Light mode, 4 themes, Color Blind Mode.
+• 12 languages. Sync across devices.
+• Invite Friends: both save 50%.
+• Founder and Ambassador badges.
+• Trail width limits, waypoint symbols.
+• Notifications bell, Music Controls.
+• New Free and Pro plans.
+```
 
 ### Graphics
 
@@ -113,9 +129,10 @@ pass the conditions above).
 | 10-inch tablet screenshots | up to 8, 9:16 or 16:9 | `store/google-play/screenshots/tablet-10/` 01 to 08, 2560 × 1600 |
 | Promo video | YouTube URL, optional | Chris's promo film if he puts it on YouTube; otherwise leave blank |
 
-Upload the phone screenshots in file order. Each shows the real app screen, rendered from the
-shared code at an Android phone size (412 × 915 dp), inside a plain Android-style frame with the
-same captions as the App Store set.
+Upload each set in file order, replacing the 1.0 set. Each shows the real app screen, rendered
+from the shared code with mock data, inside a plain Android-style frame with the same captions as
+the App Store set (2.0: Ride Mode, Home, Map Mode, Tilt Meter and Crash Alert, Events, Social,
+Badges, routes). Remake them with `bash store/tools/web-shots/shots.sh OUT_DIR`.
 
 ## App Content (Policy > App content)
 

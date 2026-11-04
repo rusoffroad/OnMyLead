@@ -21,6 +21,7 @@ import { isApproximatePermission, shouldAskForGoogleAccuracy, shouldAskForPrecis
 import type { BatteryPlan } from '@/core/battery';
 import { batteryPlan } from './battery';
 import { supabase } from './supabase';
+import { nearbyOwnFix } from './nearby';
 import { recordTrackFixes } from './track-line';
 
 export const LOCATION_TASK = 'ride-location-updates';
@@ -116,6 +117,13 @@ export async function handleLocations(locations: Location.LocationObject[]) {
     ]);
     await writeQueue(queue);
   }
+
+  // Nearby riders hear it over Bluetooth too, with or without service (lib/nearby.ts; only while
+  // Ride Mode has Bluetooth Sharing running and this rider is sharing with the ride).
+  nearbyOwnFix({
+    lat: next.lat, lng: next.lng, accuracyM: latest.coords.accuracy ?? null,
+    speedMps: latest.coords.speed ?? null, headingDeg: latest.coords.heading ?? null, at: next.at,
+  });
 
   try {
     const { data } = await supabase.auth.getSession();

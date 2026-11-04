@@ -71,7 +71,13 @@ You see a card showing whose phones have the alert. If you sent it by mistake, t
 
 - It doesn't call or text 911, emergency services, or anyone else.
 - It doesn't reach anyone who isn't on the ride.
+:::until 2.1
 - It can't send without a connection. With no service, the alert waits on your phone and sends by itself when you get signal. Riders also need service to receive it.
+:::
+
+:::release 2.1
+- With no service, it reaches only riders on the ride within Bluetooth range (about 30 to 100 meters, passed along by up to three phones), and it waits on your phone and sends by itself when you get signal. If any nearby rider's phone gets signal first, it sends the alert for you. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::
 
 ## Need Help
 
