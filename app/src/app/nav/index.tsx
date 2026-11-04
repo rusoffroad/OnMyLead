@@ -109,14 +109,15 @@ export default function NavMode() {
   const floating = layout.wide && !wide;
   const trail = useTrailMap();
   const map = useRef<NavMapHandle>(null);
-  const fold = usePanelFold('nav.panelOpen.v1', true, wide ? 'up' : 'down');
-  const open = fold.open;
   const [musicOpen, setMusicOpen] = useState(false);
   const musicOn = useMusicControls();
   // Full Map: the top bar, layers and panel tuck away; one slim bar keeps the number that matters
   // (speed, miles left on the trail, or the measured length) and Center on Me stays.
   const fullMap = useFullMap('nav.fullMap.v1');
   const full = fullMap.full;
+  // A long swipe down on the panel (or a swipe on the folded panel) goes straight to Full Map.
+  const fold = usePanelFold('nav.panelOpen.v1', true, wide ? 'up' : 'down', true, fullMap.enter);
+  const open = fold.open;
   const [mode, setMode] = useState<Mode>('explore');
   const { trails: local } = useLocalTrails();
 
@@ -567,6 +568,7 @@ export default function NavMode() {
       />
       <TrailMapOverlay
         trail={trail}
+        threeD
         bare={full}
         top={full ? insets.top + 12 : insets.top + 66}
         cardTop={full ? insets.top + 64 : wide ? insets.top + 118 : undefined}

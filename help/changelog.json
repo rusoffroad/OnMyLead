@@ -33,6 +33,39 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "map-layers",
+      "3d-terrain",
+      "full-map",
+      "ride-mode",
+      "bluetooth-sharing",
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "follow-me",
+      "fuel-range",
+      "getting-started",
+      "import-gpx",
+      "language",
+      "location-sharing",
+      "navigation-mode",
+      "offline-maps",
+      "place-search",
+      "ride-bubble",
+      "ride-chat",
+      "route-builder",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "map-speed-3d-swipe",
+    "why": "Chris found roads and trails took a few seconds to appear after zooming in, the 3D map hard to find behind the layers button, and wanted to swipe the panel down for Full Map. Trail lines now load much faster (bigger, fewer agency map pieces; Mapbox draws OpenStreetMap tracks itself; loading starts when the map stops moving), BLM routes show again after BLM moved its server, a 3D button sits under the layers button in Ride Mode and Map Mode, and a long swipe down on a map panel goes to Full Map. The other listed articles describe screens these files touch (Ride Mode, Map Mode, the route builder, Waypoints, the trail layers); riders see no other difference there, so they only get a new updated: date."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "bluetooth-sharing",
       "troubleshooting",
       "ride-mode"

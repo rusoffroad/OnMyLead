@@ -100,6 +100,10 @@ Once you've joined a ride, the ride and its details stay on the left, and **Map*
 
 With the tablet sideways, the route tools and the waypoint list sit in a panel beside the map. Swipe the panel up or tap **Hide** to fold it. With the tablet upright, the panel floats in the bottom corner of the map; swipe it down to fold it.
 
+:::release 2.1
+A long swipe the way the panel folds (up beside the map, down when it floats at the bottom), or a swipe on the folded panel, goes straight to [Full Map](/help/full-map).
+:::
+
 ## Find a Ride
 
 Search and the list of rides sit on the left, with the map filling the rest of the screen.

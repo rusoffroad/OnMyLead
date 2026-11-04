@@ -46,6 +46,8 @@ export type TrailMap = {
   /** No signal: the map draws only squares saved on the phone (see lib/offline-maps). */
   offline: boolean;
   setBase: (b: BaseMap) => void;
+  /** The map's 3D button: 3D Terrain on, or back to the flat style the rider had before (Satellite unless it was Topo). */
+  toggle3d: () => void;
   setTrails: (on: boolean) => void;
   /** Trails riders mapped and shared, drawn mint and dotted (see core/nav-trails). */
   riderTrailsOn: boolean;
@@ -98,6 +100,8 @@ export function useTrailMap(): TrailMap {
   const [info, setInfo] = useState<TrailInfo | null>(null);
   const [looking, setLooking] = useState(false);
   const region = useRef<Region | null>(null);
+  // The flat style 3D Terrain was turned on from, so the 3D button can go back to it.
+  const flatBase = useRef<BaseMap>('satellite');
   const zoomNow = useRef<number | null>(null);
   const width = useRef(390);
   const lookup = useRef(0);
@@ -128,7 +132,10 @@ export function useTrailMap(): TrailMap {
       try {
         // `trails` from the first version defaulted to off, so only the newer `trailsOn` choice counts.
         const saved = JSON.parse(v) as { base?: BaseMap; trailsOn?: boolean };
-        if (saved.base === 'topo' || saved.base === 'satellite' || saved.base === 'terrain') setBaseState(saved.base);
+        if (saved.base === 'topo' || saved.base === 'satellite' || saved.base === 'terrain') {
+          if (saved.base !== 'terrain') flatBase.current = saved.base;
+          setBaseState(saved.base);
+        }
         if (typeof saved.trailsOn === 'boolean') setTrailsState(saved.trailsOn);
       } catch {
         // Not a saved choice.
@@ -183,6 +190,7 @@ export function useTrailMap(): TrailMap {
 
   const save = (next: { base: BaseMap; trailsOn: boolean }) => setSyncedItem(KEY, JSON.stringify(next)).catch(() => {});
   const setBase = (b: BaseMap) => {
+    if (b !== 'terrain') flatBase.current = b;
     setBaseState(b);
     save({ base: b, trailsOn: trailsChoice });
   };
@@ -321,6 +329,7 @@ export function useTrailMap(): TrailMap {
     closerForTracks: trails && zoom >= TRAILS_MIN_Z && zoom < OSM_VIEW_MIN_Z,
     offline,
     setBase,
+    toggle3d: () => setBase(shownBase === 'terrain' ? flatBase.current : 'terrain'),
     setTrails,
     riderTrailsOn: riderOn,
     setRiderTrails,

@@ -31,7 +31,7 @@ const WEB = Platform.OS === 'web';
  * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false,
+  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, threeD = false,
 }: {
   trail: TrailMap;
   /** Where the layers button sits. */
@@ -48,8 +48,10 @@ export function TrailMapOverlay({
   onFollow?: (t: PublicTrail) => void;
   /** Meters of a rider trail covered in Map Mode (for the rating sheet). */
   ridden?: (t: PublicTrail) => number | null;
-  /** Full Map: no layers button or zoom hint, just the No Signal tag and a tapped trail's card. */
+  /** Full Map: no layers button or zoom hint, just the 3D button, the No Signal tag and a tapped trail's card. */
   bare?: boolean;
+  /** A map that can tilt (Ride Mode, Map Mode): adds the one-tap 3D button under the layers button. */
+  threeD?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState<PublicTrail | null>(null);
@@ -71,6 +73,7 @@ export function TrailMapOverlay({
           <LayersIcon color={trail.trails || trail.base !== 'satellite' ? SAND : Colors.text} />
         </Pressable>
         )}
+        {threeD && trail.terrainAvailable && trail.mapbox && (!open || bare) ? <ThreeDButton trail={trail} /> : null}
         {trail.offline && (!open || bare) ? (
           <View style={styles.offline} accessible accessibilityLabel={tr('No signal. The map is showing what\'s downloaded on this phone.')}>
             <Text style={styles.offlineText}>{tr('No Signal')}</Text>
@@ -422,6 +425,26 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
   );
 }
 
+/**
+ * One tap between the flat map and 3D Terrain, so riders don't have to find it in Map Layers.
+ * Lit while 3D is on; tapping again goes back to the style the rider had (Satellite or Topo).
+ */
+function ThreeDButton({ trail }: { trail: TrailMap }) {
+  const on = trail.base === 'terrain';
+  return (
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityLabel={tr('3D Terrain')}
+      accessibilityState={{ checked: on }}
+      accessibilityHint={on ? tr('Lays the map flat again') : tr('Tilts the map and raises the mountains')}
+      hitSlop={6}
+      onPress={() => requirePro('map_layers') && trail.toggle3d()}
+      style={({ pressed }) => [styles.fab, on && styles.fab3dOn, pressed && { opacity: 0.8 }]}>
+      <Text style={[styles.fab3dText, on && styles.fab3dTextOn]}>3D</Text>
+    </Pressable>
+  );
+}
+
 function LayersIcon({ color }: { color: string }) {
   return (
     <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
@@ -437,6 +460,9 @@ const styles = themedStyles(() => ({
   corner: { position: 'absolute', right: 12, alignItems: 'flex-end', gap: 8, zIndex: 20 },
   fab: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', ...glass },
   fabOn: { borderColor: SAND },
+  fab3dOn: { backgroundColor: Colors.sky, borderColor: Colors.sky },
+  fab3dText: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 16, letterSpacing: 0.5 },
+  fab3dTextOn: { color: '#FFFFFF' },
   hint: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.pill, ...glass },
   hintText: { color: Colors.text, fontFamily: font(600), fontSize: 13 },
   panel: { width: 288, borderRadius: Radius.card, padding: 14, gap: 12, ...glass },

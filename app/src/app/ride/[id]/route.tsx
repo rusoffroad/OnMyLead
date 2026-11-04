@@ -83,11 +83,11 @@ export default function RouteBuilder() {
   const wide = layout.expanded;
   const floating = layout.wide && !wide;
   // The tools panel folds down to the miles and Undo (swipe it down, or tap the handle) to see more map.
-  const fold = usePanelFold('route.panelOpen.v1', true, wide ? 'up' : 'down');
-  const open = fold.open;
   // Full Map: the top bar, layers and tools tuck away; the miles and Undo stay in a slim bar.
   const fullMap = useFullMap('route.fullMap.v1');
   const full = fullMap.full;
+  const fold = usePanelFold('route.panelOpen.v1', true, wide ? 'up' : 'down', true, fullMap.enter);
+  const open = fold.open;
 
   useEffect(() => {
     Promise.all([getRide(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])

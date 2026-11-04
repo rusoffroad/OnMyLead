@@ -15,7 +15,15 @@ export type TrailSourceId = 'mvum' | 'blm' | 'fsclosed';
 export type BaseMap = 'satellite' | 'topo' | 'terrain';
 
 export const FS_MVUM = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_MVUM_02/MapServer';
-export const BLM_ROUTES = 'https://gis.blm.gov/arcgis/rest/services/transportation/BLM_Natl_GTLF/MapServer';
+/**
+ * BLM's public route network. BLM moved it here in 2026 (the old BLM_Natl_GTLF service answers
+ * "not found"), split into layers by what may use the route: 0 and 1 roads open or limited to
+ * motor vehicles, 2 and 3 trails open or limited to motor vehicles, 4 and 5 trails closed to them
+ * (non-motorized and non-mechanized). Layers 6 and 7 are routes not yet assessed, left off.
+ */
+export const BLM_ROUTES = 'https://gis.blm.gov/arcgis/rest/services/transportation/BLM_Natl_GTLF_Public_Display/MapServer';
+/** BLM_ROUTES layers: motorized roads, motorized trails, and trails closed to motor vehicles. */
+export const BLM_LAYERS = { roads: [0, 1], trails: [2, 3], closed: [4, 5] } as const;
 /** Forest Service roads; layer 1 is every system road the agency lists as closed to motor vehicles. */
 export const FS_ROADS = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_RoadBasic_01/MapServer';
 export const USGS_TOPO = 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}';
@@ -139,17 +147,13 @@ export const TRAIL_SOURCES: Record<TrailSourceId, TrailSource> = {
     name: 'BLM routes',
     attribution: 'Bureau of Land Management',
     service: BLM_ROUTES,
-    identifyLayers: [0],
-    // Routes BLM's travel plan closes to off-highway vehicles get the closed style.
-    dynamicLayers: cased(301, 0, INK.road, ROAD_W, {
-      labelExpression: '[ROUTE_PRMRY_NM]',
-      top: {
-        type: 'uniqueValue',
-        field1: 'PLAN_OHV_ROUTE_DSGNTN',
-        defaultSymbol: line(INK.road, ROAD_W).symbol,
-        uniqueValueInfos: [{ value: 'Closed', symbol: line(INK.closed, CLOSED_W, 'esriSLSDash').symbol }],
-      },
-    }),
+    identifyLayers: [...BLM_LAYERS.trails, ...BLM_LAYERS.roads, ...BLM_LAYERS.closed],
+    // Open routes first so they draw over closed ones; routes closed to off-highway vehicles get the closed style.
+    dynamicLayers: [
+      ...BLM_LAYERS.trails.flatMap((l) => cased(310 + l * 10, l, INK.trail, TRAIL_W, { style: 'esriSLSDash', labelExpression: '[ROUTE_PRMRY_NM]' })),
+      ...BLM_LAYERS.roads.flatMap((l) => cased(310 + l * 10, l, INK.road, ROAD_W, { labelExpression: '[ROUTE_PRMRY_NM]' })),
+      ...BLM_LAYERS.closed.flatMap((l) => cased(310 + l * 10, l, INK.closed, CLOSED_W, { style: 'esriSLSDash', labelExpression: '[ROUTE_PRMRY_NM]', labelColor: INK.closedLabel })),
+    ],
   },
   fsclosed: {
     id: 'fsclosed',

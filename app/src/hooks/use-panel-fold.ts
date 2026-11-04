@@ -2,7 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { useCallback, useMemo, useState } from 'react';
 import { Animated, LayoutAnimation, PanResponder, Platform } from 'react-native';
 
-import { isHorizontalSwipe, isVerticalSwipe, swipeResultToward, type FoldDirection } from '@/core/panel-swipe';
+import { isHorizontalSwipe, isVerticalSwipe, swipeAction, type FoldDirection } from '@/core/panel-swipe';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 
 /**
@@ -12,8 +12,9 @@ import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
  * down or up, translateX for one that folds left. `direction` is the way it folds: down for a sheet
  * at the bottom (phones), up for a panel hanging from the top beside the map (tablets and the wide
  * website), left for a sidebar (Ride Mode's riders on a tablet). `swipe` false leaves only the tap.
+ * With `onFull`, a long swipe (or a swipe on the folded panel) enters Full Map (core/panel-swipe swipeAction).
  */
-export function usePanelFold(key: string, swipe = true, direction: FoldDirection = 'down', initial = true) {
+export function usePanelFold(key: string, swipe = true, direction: FoldDirection = 'down', initial = true, onFull?: () => void) {
   const [open, , setOpenRaw] = useRememberedToggle(key, initial);
   const setOpen = useCallback((on: boolean) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -30,15 +31,18 @@ export function usePanelFold(key: string, swipe = true, direction: FoldDirection
         drag.setValue(direction === 'left' ? Math.min(0, g.dx) : direction === 'up' ? Math.min(0, g.dy) : Math.max(0, g.dy));
       },
       onPanResponderRelease: (_e, g) => {
-        const result = swipeResultToward(direction, open, g.dx, g.dy, g.vx, g.vy);
+        const action = swipeAction(direction, open, g.dx, g.dy, g.vx, g.vy);
+        const result = action === 'full' && !onFull ? (open ? 'fold' : null) : action;
         if (!result) return settle();
-        Haptics.selectionAsync();
         drag.setValue(0);
+        // Full Map buzzes itself (useFullMap); the panel stays as it was for when the controls come back.
+        if (result === 'full') return onFull?.();
+        if (Platform.OS !== 'web') Haptics.selectionAsync();
         setOpen(result === 'open');
       },
       onPanResponderTerminate: settle,
     });
-  }, [open, setOpen, drag, direction]);
+  }, [open, setOpen, drag, direction, onFull]);
 
   return { open, setOpen, drag, panHandlers: swipe ? responder.panHandlers : {} };
 }

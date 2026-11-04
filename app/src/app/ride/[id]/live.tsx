@@ -243,12 +243,13 @@ export default function RideMode() {
   const chat = useRideChat(id, !!mine);
   // Riders can fold the reply and status buttons away (tap the handle or swipe down) to see more map.
   // Emergency, and calls for help, always stay.
-  const { open: panelFoldOpen, setOpen: setPanelOpen, drag: panelDrag, panHandlers: panelSwipeHandlers } = usePanelFold('ride.modePanelOpen.v1');
   // Full Map: everything over the map tucks away except a slim bar at the bottom with the route
   // line (every rider's dot in running order), Controls to bring it all back (tap, or swipe the
   // bar up), Center on Me, and Emergency, which is always one tap away. Calls for help from other
   // riders still show in the bar. The phone remembers it, like Full Map on every other map.
   const { full: fullMap, enter: enterFullMap, exit: exitFullMap } = useFullMap('ride.fullMap.v1');
+  // A long swipe down on the panel (or a swipe down on the folded panel) goes straight to Full Map.
+  const { open: panelFoldOpen, setOpen: setPanelOpen, drag: panelDrag, panHandlers: panelSwipeHandlers } = usePanelFold('ride.modePanelOpen.v1', true, 'down', true, enterFullMap);
   const panelOpen = panelFoldOpen && !fullMap;
   const showMenus = useCallback(() => {
     exitFullMap();
@@ -1078,6 +1079,7 @@ export default function RideMode() {
       {/* In Full Map only No Signal and a tapped trail's card stay; the layers button tucks away. */}
       <TrailMapOverlay
         trail={trail}
+        threeD
         bare={fullMap}
         top={tablet || fullMap ? insets.top + EDGE : insets.top + 66}
         cardTop={tablet || fullMap ? insets.top + 64 : insets.top + 118}
@@ -1350,6 +1352,12 @@ export default function RideMode() {
           { transform: [{ translateY: fullMap ? 0 : panelDrag }] },
         ]}>
       <SafeAreaView edges={tablet ? [] : ['bottom']} style={[styles.bottom, tablet && styles.bottomTablet]}>
+        {/* In Full Map a small grab bar says the bar swipes up to bring everything back. */}
+        {fullMap ? (
+          <View pointerEvents="none" style={styles.fullGrab}>
+            <View style={styles.handleBar} />
+          </View>
+        ) : null}
         {stripShown ? (
           <View
             ref={stripRef}
@@ -1768,6 +1776,7 @@ const styles = themedStyles(() => ({
   sosText: { color: Glass.softRed },
   actions: { flexDirection: 'row', gap: Spacing.two },
   handle: { alignItems: 'center', minHeight: 40, justifyContent: 'center', marginTop: -6 },
+  fullGrab: { alignItems: 'center', paddingBottom: 6, marginTop: -4 },
   handleBar: { width: 38, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.22)' },
   fullMapBtn: { position: 'absolute', right: 0, top: -4 },
   // Mirrors Full Map on the left of the handle: Type a Message.

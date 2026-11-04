@@ -192,8 +192,14 @@ describe('closures', () => {
     const t = trailTileTemplate(TRAIL_SOURCES.fsclosed);
     expect(t).toContain('EDW_RoadBasic_01');
     expect(decodeURIComponent(t)).toContain('\\"CLOSED\\"');
-    const blm = JSON.parse(decodeURIComponent(trailTileTemplate(TRAIL_SOURCES.blm).split('dynamicLayers=')[1].split('&')[0]));
-    expect(blm[0].drawingInfo.renderer.uniqueValueInfos[0].value).toBe('Closed');
+    const blmUrl = trailTileTemplate(TRAIL_SOURCES.blm);
+    // BLM moved its route network in 2026; the old address answers "not found".
+    expect(blmUrl).toContain('BLM_Natl_GTLF_Public_Display');
+    const blm = JSON.parse(decodeURIComponent(blmUrl.split('dynamicLayers=')[1].split('&')[0])) as { source: { mapLayerId: number }; drawingInfo: { renderer: { symbol: { color: number[] } } } }[];
+    // Trails closed to motor vehicles (layers 4 and 5) are drawn last, under the open ones, in the closed red.
+    expect(blm.at(-2)?.source.mapLayerId).toBe(5);
+    expect(blm.at(-2)?.drawingInfo.renderer.symbol.color).toEqual([255, 69, 58, 255]);
+    expect(blm.map((l) => l.source.mapLayerId)).not.toContain(6);
   });
 
   it('asks for seasonal routes in a square and keeps the ones closed today', () => {

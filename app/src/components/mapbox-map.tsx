@@ -7,10 +7,12 @@ import type { LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import {
-  cameraPadding, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON, regionFromCamera,
+  AGENCY_TILE_SIZE, cameraPadding, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxAgencyTemplate, mapboxStyleFor, metersPerPointAt, NATIVE_TRACKS_MIN_ZOOM,
+  nativeTracks, OSM_CLOSED_TRACK_FILTER, OSM_NAMED_TRACK_FILTER, OSM_OPEN_TRACK_FILTER, OSM_SOURCE_ID, OSM_TRACK_FILTER, pointsGeoJSON, regionFromCamera, SETTLE_MS,
   TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_SOURCES, terrainExaggeration, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE, TOPO_SOURCE_ID, trailZoomFromMapbox,
   type MapLook,
 } from '@/core/terrain';
+import { OSM_TILEJSON } from '@/core/osm-trails';
 import { TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
@@ -29,7 +31,7 @@ const RIDE_ZOOM = 13.5;
 /** Mapbox's zoom below which the map counts as zoomed far out (a state or more across). */
 const FAR_OUT_ZOOM = 8;
 
-const AGENCY = TRAIL_SOURCE_IDS.map((id) => ({ id, tiles: [mapboxTileTemplate(trailTileTemplate(TRAIL_SOURCES[id]))] }));
+const AGENCY = TRAIL_SOURCE_IDS.map((id) => ({ id, tiles: [mapboxAgencyTemplate(trailTileTemplate(TRAIL_SOURCES[id]))] }));
 const TERRAIN_STYLE_JSON = { version: 8, sources: TERRAIN_SOURCES, layers: terrainLayers() };
 
 /**
@@ -125,9 +127,22 @@ export function MapboxMap({
     isFarOut: () => zoom.current < FAR_OUT_ZOOM,
   }), []);
 
+  // Trail names, closures and rider trails load as soon as the camera rests (SETTLE_MS), rather
+  // than when Mapbox calls the map idle, which waits for every square on screen to arrive.
+  const settle = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (settle.current) clearTimeout(settle.current);
+  }, []);
   const camChanged = useCallback((s: Mapbox.MapState) => {
     const p = s.properties;
     zoom.current = p.zoom;
+    if (settle.current) clearTimeout(settle.current);
+    const center = { lat: p.center[1], lng: p.center[0] };
+    const z = p.zoom;
+    settle.current = setTimeout(() => {
+      settle.current = null;
+      trail.onRegion(regionFromCamera(center, z, size.current), trailZoomFromMapbox(z));
+    }, SETTLE_MS);
     const h = Math.round((p.heading ?? 0) / 5) * 5 % 360;
     if (h !== heading.current) {
       heading.current = h;
@@ -135,7 +150,7 @@ export function MapboxMap({
     }
     if (shown === 'terrain') setExaggeration(terrainExaggeration(p.pitch ?? 0));
     if (s.gestures?.isGestureActive) onUserMove?.();
-  }, [onCamera, onUserMove, shown]);
+  }, [onCamera, onUserMove, shown, trail]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
     const p = s.properties;
@@ -261,33 +276,62 @@ const CLOSED_DASH = [5 / 3.2, 5 / 3.2];
  */
 const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
   const { trails, offline, osmLines, closedLines, labels, riderTrails } = trail;
-  const tracks = useMemo(() => linesGeoJSON([
-    ...osmLines.flatMap((t) => t.parts.map((points, i) => ({ key: `${t.key}-${i}`, points, props: { closed: t.closed } }))),
-    ...closedLines.flatMap((l) => l.parts.map((points, i) => ({ key: `c-${l.key}-${i}`, points, props: { closed: true } }))),
-  ]), [osmLines, closedLines]);
+  const native = nativeTracks(trails, offline);
+  // Where Mapbox draws the tracks itself, the app's own copies stop at that zoom.
+  const ownMax = native ? NATIVE_TRACKS_MIN_ZOOM : 24;
+  const tracks = useMemo(() => linesGeoJSON(
+    osmLines.flatMap((t) => t.parts.map((points, i) => ({ key: `${t.key}-${i}`, points, props: { closed: t.closed } }))),
+  ), [osmLines]);
+  const closures = useMemo(() => linesGeoJSON(
+    closedLines.flatMap((l) => l.parts.map((points, i) => ({ key: `c-${l.key}-${i}`, points, props: { closed: true } }))),
+  ), [closedLines]);
+  const shown = trails ? 'visible' : 'none';
   const names = useMemo(() => pointsGeoJSON(labels.map((l) => ({ key: l.key, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))), [labels]);
   const riders = useMemo(() => linesGeoJSON(riderTrails.map((t) => ({ key: t.id, points: t.points }))), [riderTrails]);
   return (
     <>
       {trails && !offline
         ? AGENCY.map((a) => (
-            <Mapbox.RasterSource key={a.id} id={`oml-agency-${a.id}`} tileUrlTemplates={a.tiles} tileSize={256} minZoomLevel={TRAILS_MIN_Z}>
-              <Mapbox.RasterLayer id={`oml-agency-${a.id}-layer`} sourceID={`oml-agency-${a.id}`} style={{ rasterOpacity: 1 }} />
+            <Mapbox.RasterSource key={a.id} id={`oml-agency-${a.id}`} tileUrlTemplates={a.tiles} tileSize={AGENCY_TILE_SIZE} minZoomLevel={TRAILS_MIN_Z - 1}>
+              <Mapbox.RasterLayer id={`oml-agency-${a.id}-layer`} sourceID={`oml-agency-${a.id}`} style={{ rasterOpacity: 1, rasterFadeDuration: 0 }} />
             </Mapbox.RasterSource>
           ))
         : null}
+      {native ? (
+        <Mapbox.VectorSource id={OSM_SOURCE_ID} url={OSM_TILEJSON}>
+          <Mapbox.LineLayer id="oml-osm-case" sourceLayerID="transportation" filter={OSM_TRACK_FILTER} minZoomLevel={NATIVE_TRACKS_MIN_ZOOM} style={{ lineColor: TRAIL_INK.casing, lineWidth: 6.5, lineJoin: 'round' }} />
+          <Mapbox.LineLayer id="oml-osm-open" sourceLayerID="transportation" filter={OSM_OPEN_TRACK_FILTER} minZoomLevel={NATIVE_TRACKS_MIN_ZOOM} style={{ lineColor: TRAIL_INK.trail, lineWidth: 3.2, lineDasharray: OPEN_DASH }} />
+          <Mapbox.LineLayer id="oml-osm-closed" sourceLayerID="transportation" filter={OSM_CLOSED_TRACK_FILTER} minZoomLevel={NATIVE_TRACKS_MIN_ZOOM} style={{ lineColor: TRAIL_INK.closed, lineWidth: 3.2, lineDasharray: CLOSED_DASH }} />
+          <Mapbox.SymbolLayer
+            id="oml-osm-names"
+            sourceLayerID="transportation_name"
+            filter={OSM_NAMED_TRACK_FILTER}
+            minZoomLevel={NATIVE_TRACKS_MIN_ZOOM}
+            style={{
+              symbolPlacement: 'line', textField: ['get', 'name'], textSize: 12, textFont: ['DIN Pro Bold', 'Arial Unicode MS Bold'],
+              textColor: '#FFFFFF', textHaloColor: 'rgba(10,22,38,0.92)', textHaloWidth: 1.6, textMaxAngle: 30, symbolSpacing: 320,
+            }}
+          />
+        </Mapbox.VectorSource>
+      ) : null}
       <Mapbox.ShapeSource id="oml-tracks" shape={tracks}>
-        <Mapbox.LineLayer id="oml-tracks-case" style={{ lineColor: TRAIL_INK.casing, lineWidth: 6.5, lineJoin: 'round', visibility: trails ? 'visible' : 'none' }} />
+        <Mapbox.LineLayer id="oml-tracks-case" maxZoomLevel={ownMax} style={{ lineColor: TRAIL_INK.casing, lineWidth: 6.5, lineJoin: 'round', visibility: shown }} />
         <Mapbox.LineLayer
           id="oml-tracks-open"
           filter={['!=', ['get', 'closed'], true]}
-          style={{ lineColor: TRAIL_INK.trail, lineWidth: 3.2, lineDasharray: OPEN_DASH, visibility: trails ? 'visible' : 'none' }}
+          maxZoomLevel={ownMax}
+          style={{ lineColor: TRAIL_INK.trail, lineWidth: 3.2, lineDasharray: OPEN_DASH, visibility: shown }}
         />
         <Mapbox.LineLayer
           id="oml-tracks-closed"
           filter={['==', ['get', 'closed'], true]}
-          style={{ lineColor: TRAIL_INK.closed, lineWidth: 3.2, lineDasharray: CLOSED_DASH, visibility: trails ? 'visible' : 'none' }}
+          maxZoomLevel={ownMax}
+          style={{ lineColor: TRAIL_INK.closed, lineWidth: 3.2, lineDasharray: CLOSED_DASH, visibility: shown }}
         />
+      </Mapbox.ShapeSource>
+      <Mapbox.ShapeSource id="oml-closures" shape={closures}>
+        <Mapbox.LineLayer id="oml-closures-case" style={{ lineColor: TRAIL_INK.casing, lineWidth: 6.5, lineJoin: 'round', visibility: shown }} />
+        <Mapbox.LineLayer id="oml-closures-line" style={{ lineColor: TRAIL_INK.closed, lineWidth: 3.2, lineDasharray: CLOSED_DASH, visibility: shown }} />
       </Mapbox.ShapeSource>
       <Mapbox.ShapeSource id="oml-rider-trails" shape={riders}>
         <Mapbox.LineLayer id="oml-rider-trails-case" style={{ lineColor: TRAIL_INK.casing, lineWidth: 7, lineJoin: 'round' }} />
@@ -296,6 +340,7 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
       <Mapbox.ShapeSource id="oml-trail-names" shape={names}>
         <Mapbox.SymbolLayer
           id="oml-trail-names-text"
+          maxZoomLevel={ownMax}
           style={{
             textField: ['get', 'name'],
             textSize: 12,
