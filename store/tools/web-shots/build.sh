@@ -2,8 +2,8 @@
 # Store screenshots: a web export of the app that shows what the iPad and Android apps show, with
 # mock data. Never deployed. Usage (repo root, after `npm ci` in app/):
 #   bash store/tools/web-shots/build.sh OUT_DIR
-#   DPR=2 WAIT=9000 node store/tools/web-shots/shoot.mjs OUT_DIR/dist RAW_DIR "01-live|/ride/<id>/live|1366|1024" ...
-# The exact shot list is in store/app-store/ipad-and-next-apple-release.md.
+#   (or bash store/tools/web-shots/shots.sh OUT_DIR to build, shoot and frame every set)
+# The shot list is in shots.sh.
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../../.." && pwd)
 OUT=$(mkdir -p "$1" && cd "$1" && pwd)
@@ -17,6 +17,10 @@ cd "$OUT/app"
 cp "$HERE/group-map.web.tsx" src/components/group-map.web.tsx          # live map on satellite, like the apps
 cp "$HERE/offline-maps.web.ts" src/lib/offline-maps.web.ts             # three saved maps
 cp src/components/get-the-app.tsx src/components/get-the-app.web.tsx   # no "get the app" card in the app
+cp "$HERE/motion.web.ts" src/lib/motion.web.ts                         # a phone leaning in its mount
+sed -i "s/if (Platform.OS === 'web') return <NoSensors \/>;/if (false) return <NoSensors \/>;/" src/app/tilt.tsx
+sed -i "s/const tiltOn = Platform.OS !== 'web' \&\& /const tiltOn = /" src/app/nav/index.tsx
+sed -i "s/const tiltShown = Platform.OS !== 'web' \&\& /const tiltShown = /" "src/app/ride/[id]/live.tsx"
 sed -i "s/if (Platform.OS === 'web') {/if (false) {/" src/app/maps/index.tsx
 sed -i "s/{Platform.OS === 'web' ? (/{false ? (/" src/app/ride/new.tsx
 sed -i "s/const web = Platform.OS === 'web';/const web = false;/" "src/app/ride/[id]/route.tsx"

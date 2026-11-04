@@ -37,6 +37,33 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "whats-new-in-2-0",
+      "getting-started",
+      "create-a-ride-on-the-website",
+      "subscribe-to-pro",
+      "manage-subscription"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "store-2.0",
+    "why": "Chris 2026-11-04: update the website, docs and store screenshots with all the 2.0 features. New What's New in OnMyLead 2.0 guide (published with 2.0) linking each feature's guide; the 2.0 release notes now name the Tilt Meter, Crash Alert, Founder and Ambassador badges and sync, and the store What's New text was rewritten to fit 500 characters with them. Getting Started and Create a Ride on the Website were reviewed for the showcase's new section, and Subscribe to Pro and Manage Your Subscription for the new store listing text: prices and steps are unchanged, so no edits."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "tilt-and-crash-alert",
+      "sync-across-devices",
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "tilt-off-switch",
+    "why": "Chris asked for an easy way to turn the angle indicator off. A Tilt Meter On/Off switch now sits under the Crash Alert switch at the top of the Tilt screen (it replaces Show in Map Mode and Ride Mode and also stops tilt warnings). New section Turn the Tilt Meter Off. The website showcase's Tilt card mentions the switch; those two articles are unchanged (only the date)."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "language",
       "home-screen",
       "sync-across-devices"

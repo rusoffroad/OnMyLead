@@ -62,7 +62,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'voice.choice.v1': 'The voice for spoken alerts (a device without it uses its best installed voice)',
   'tilt.limits': 'Roll and pitch warning angles',
   'tilt.voice': 'Spoken tilt warnings on or off',
-  'tilt.show': 'Show the Tilt tile in Map Mode and Ride Mode',
+  'tilt.show': 'Tilt Meter on or off (the Tilt tile in Map Mode and Ride Mode)',
   'tilt.warn': 'Tilt warnings on or off',
   'crash.alert': 'Crash Alert on or off and its sensitivity',
   // Settings from other threads register here as they land (waypoint symbols, units).
