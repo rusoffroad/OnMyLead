@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createQuota, DEFAULT_RADIUS_MI, findCount, firstName, greeting, JOIN_QUOTA, parseRadius, radiusLabel, TOOLKIT, toolkitFor } from '../home';
+import { createQuota, DEFAULT_RADIUS_MI, findCount, firstName, greeting, JOIN_QUOTA, parseRadius, radiusLabel, SHORT_HOME_HEIGHT, shortHome, TOOLKIT, toolkitFor } from '../home';
 import { ALL_KINDS, DEFAULT_FEED_SETTINGS, feedLine, feedNotSwitchedOn, feedStat, parseFeed, parseFeedSettings, sortFeed, timeAgo, toggleKind, type FeedItem } from '../feed';
 import { addFix, colorForDay, dayKey, dayLabel, dayLines, daysAgo, parseTrackDays, pruneDays, TRACK_DAY_COLORS, TRACK_DAYS_KEPT } from '../track-line';
 import { cleanName, distanceToLineM, MAX_OBSTACLES, nextName, obstaclesForSharing, parseObstacles, type Obstacle } from '../obstacles';
@@ -234,5 +234,16 @@ describe('custom trail rules and feed links', () => {
     expect(feedHref({ ...base, kind: 'out' })).toBe('/out-riding');
     expect(feedHref({ ...base, kind: 'ride' })).toBeNull();
     expect(feedHref({ ...base, kind: 'group', rideCode: null })).toBeNull();
+  });
+});
+
+describe('shortHome', () => {
+  it('drops the greeting only on short phones, so the five home actions fit on one screen', () => {
+    expect(shortHome(667)).toBe(true); // iPhone SE
+    expect(shortHome(640)).toBe(true); // small Android phone
+    expect(shortHome(812)).toBe(false); // iPhone mini
+    expect(shortHome(852)).toBe(false); // iPhone Pro
+    expect(shortHome(SHORT_HOME_HEIGHT)).toBe(false);
+    expect(shortHome(0)).toBe(false); // not measured yet
   });
 });

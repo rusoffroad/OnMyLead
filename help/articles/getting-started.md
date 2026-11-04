@@ -93,6 +93,10 @@ Your home screen.
 - **Your Next Ride**, **Ride Invites** and **Past Rides**; **Your Group**; **Public Rides Near You**; your **Feed**; **Your Badges**; **Your Toolkit**; and **Help & Support**.
 - **The bell** and your picture at the top right open your notifications and the **You** tab.
 
+:::release 2.1
+- **Events**, the gold card right under **Create a Ride** and **Find a Ride**, with **Map Mode** under it. Join, Create, Find, Events and Map Mode all fit on the first screen.
+:::
+
 See [Your Home Screen](/help/home-screen) for each part.
 :::
 
