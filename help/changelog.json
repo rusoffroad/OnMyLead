@@ -3,7 +3,8 @@
     "date": "2026-11-04",
     "slugs": [
       "create-a-ride",
-      "events"
+      "events",
+      "create-a-ride-on-the-website"
     ],
     "kind": "fix",
     "by": "pr",
