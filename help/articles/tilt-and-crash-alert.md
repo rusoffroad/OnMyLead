@@ -33,6 +33,10 @@ The numbers turn amber as you get close to your limit and red at it. Tap the til
 
 You can also open it from the **You** tab: tap **Tilt and Crash Alert**. The screen stays on while it's open, so you can leave it up on your mount.
 
+## Turn the Tilt Meter Off
+
+Don't want it? At the top of the Tilt screen, under the Crash Alert switch, tap **Tilt Meter On** to turn it off. The Tilt tile leaves Map Mode and Ride Mode, the Tilt screen hides the readings, and tilt warnings stop. Crash Alert keeps working on its own switch. Tap **Tilt Meter Off** to bring it back. The switch follows your account to your other devices.
+
 ## Calibrate It for Your Mount
 
 The tilt meter is off until you calibrate it, because your phone probably doesn't sit flat in its mount. Until then the Tilt screen shows **Calibrate** instead of readings, and the tile in Map Mode and Ride Mode says **Calibrate Tilt**. Tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers.
@@ -50,7 +54,7 @@ With **Warn Me** on, your phone buzzes when you lean past your limit for more th
 Every vehicle tips at a different angle, and load, tires and ground all change it. The limits are reminders, not a promise you won't roll.
 :::
 
-On a motorcycle, turn **Warn Me** off, since leaning into turns is normal. To hide the tile, turn off **Show in Map Mode and Ride Mode**. Your limits and these switches follow your account to your other devices.
+On a motorcycle, turn **Warn Me** off, since leaning into turns is normal. To hide the tile, turn the **Tilt Meter** off at the top of the screen. Your limits and these switches follow your account to your other devices.
 
 ## Crash Alert
 

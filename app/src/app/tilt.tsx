@@ -90,7 +90,14 @@ function TiltMeter() {
         on={crash.enabled}
         onChange={(enabled) => setCrashSettings({ ...crash, enabled })}
       />
+      <BigToggle
+        name="Tilt Meter" icon="tilt" ink={Colors.sky} on={settings.show} onChange={setTiltShown}
+        onText="Roll and pitch on this screen and in Map Mode and Ride Mode."
+        offText="No tilt tile, readings or tilt warnings. Crash Alert still works."
+      />
 
+      {settings.show ? (
+        <>
       <View style={[styles.dials, sideBySide && styles.dialsRow]}>
         <TiltDial axis="roll" angle={calibrated ? (t?.roll ?? null) : null} limit={limits.roll} max={calibrated ? [reading.max.rollLeft, reading.max.rollRight] : [0, 0]} width={dialW} zeroed={reading.zeroed} />
         <TiltDial axis="pitch" angle={calibrated ? (t?.pitch ?? null) : null} limit={limits.pitch} max={calibrated ? [reading.max.pitchDown, reading.max.pitchUp] : [0, 0]} width={dialW} zeroed={reading.zeroed} />
@@ -108,19 +115,22 @@ function TiltMeter() {
           <Text onPress={clearZero} style={styles.link} accessibilityRole="button"> Clear Zero</Text>
         ) : null}
       </ThemedText>
+        </>
+      ) : null}
 
       <View style={[styles.cards, sideBySide && styles.cardsRow]}>
+        {settings.show ? (
         <View style={[styles.card, sideBySide && { flex: 1 }]}>
           <Text style={styles.cardTitle}>Tilt Warnings</Text>
           <Row title="Warn Me" detail="Buzzes when you lean past your limit." value={settings.warn} onChange={setTiltWarnings} />
           <Limit label="Roll Limit" value={limits.roll} disabled={!settings.warn} onChange={(v) => setTiltLimits({ ...limits, roll: v })} />
           <Limit label="Pitch Limit" value={limits.pitch} disabled={!settings.warn} onChange={(v) => setTiltLimits({ ...limits, pitch: v })} />
           <Row title="Say It Out Loud" detail="Speaks the angle, like “Roll 28 left”." value={settings.voice} onChange={setTiltVoice} disabled={!settings.warn} />
-          <Row title="Show in Map Mode and Ride Mode" detail="The Tilt tile over the map." value={settings.show} onChange={setTiltShown} />
           <ThemedText type="small" themeColor="textSecondary">
             Every vehicle tips at a different angle. These are reminders, not a promise you won’t roll. On a motorcycle, turn Warn Me off: leaning into turns is normal.
           </ThemedText>
         </View>
+        ) : null}
 
         <View style={[styles.card, sideBySide && { flex: 1 }]}>
           <View style={styles.cardHead}>
@@ -148,28 +158,37 @@ function TiltMeter() {
 /** The big Crash Alert switch at the top of the screen: one tap on or off, synced to your other devices. */
 function CrashToggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
   return (
+    <BigToggle
+      name="Crash Alert" icon="warning" ink={RideColors.red} on={on} onChange={onChange}
+      onText="Watching for a crash while Ride Mode is open."
+      offText="Your group won’t be told automatically if you crash."
+    />
+  );
+}
+
+/** The big on/off switches at the top of the screen: one tap, synced to your other devices. */
+function BigToggle({ name, icon, ink, on, onChange, onText, offText }: { name: string; icon: 'warning' | 'tilt'; ink: string; on: boolean; onChange: (v: boolean) => void; onText: string; offText: string }) {
+  return (
     <Pressable
       onPress={() => onChange(!on)}
       accessibilityRole="switch"
       accessibilityState={{ checked: on }}
-      accessibilityLabel="Crash Alert"
-      accessibilityHint={on ? 'Turns Crash Alert off' : 'Turns Crash Alert on'}
-      style={({ pressed }) => [styles.toggle, on ? styles.toggleOn : styles.toggleOff, pressed && { opacity: 0.85 }]}>
-      <View style={[styles.toggleIcon, { backgroundColor: on ? RideColors.red : Colors.backgroundSelected }]}>
-        <Icon name="warning" size={22} color={on ? '#FFFFFF' : Colors.textSecondary} strokeWidth={2.3} />
+      accessibilityLabel={name}
+      accessibilityHint={on ? `Turns ${name} off` : `Turns ${name} on`}
+      style={({ pressed }) => [styles.toggle, on ? { borderColor: ink } : styles.toggleOff, pressed && { opacity: 0.85 }]}>
+      <View style={[styles.toggleIcon, { backgroundColor: on ? ink : Colors.backgroundSelected }]}>
+        <Icon name={icon} size={22} color={on ? '#FFFFFF' : Colors.textSecondary} strokeWidth={2.3} />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
-        <Text style={styles.toggleTitle}>Crash Alert {on ? 'On' : 'Off'}</Text>
-        <Text style={styles.rowDetail}>
-          {on ? 'Watching for a crash while Ride Mode is open.' : 'Your group won’t be told automatically if you crash.'}
-        </Text>
+        <Text style={styles.toggleTitle}>{name} {on ? 'On' : 'Off'}</Text>
+        <Text style={styles.rowDetail}>{on ? onText : offText}</Text>
       </View>
       <Switch
         value={on}
         onValueChange={onChange}
         accessibilityElementsHidden
         importantForAccessibility="no"
-        trackColor={{ true: RideColors.red, false: Colors.backgroundSelected }}
+        trackColor={{ true: ink, false: Colors.backgroundSelected }}
         thumbColor="#FFFFFF"
       />
     </Pressable>
@@ -238,9 +257,8 @@ function Sensitivity({ value, label, detail, on, disabled, onPress }: { value: C
 
 const styles = themedStyles(() => ({
   notice: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: RideColors.yellow, padding: Spacing.three, gap: 4 },
-  toggle: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card, borderWidth: 2, width: '100%', maxWidth: 640, alignSelf: 'center' },
-  toggleOn: { backgroundColor: Colors.backgroundElement, borderColor: RideColors.red },
-  toggleOff: { backgroundColor: Colors.backgroundElement, borderColor: Colors.border },
+  toggle: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card, borderWidth: 2, backgroundColor: Colors.backgroundElement, width: '100%', maxWidth: 640, alignSelf: 'center' },
+  toggleOff: { borderColor: Colors.border },
   toggleIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   toggleTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 24 },
   dials: { alignItems: 'center', gap: Spacing.four, paddingTop: Spacing.two },
