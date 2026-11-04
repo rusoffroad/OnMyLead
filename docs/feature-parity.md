@@ -33,7 +33,7 @@ web build and the Android emulator.
 | ID | Feature | iPhone | iPad | Android Phone | Android Tablet | Backend | Admin | Docs | Release | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
 | F01 | Email sign-up, sign-in, reset, email link | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ sign-in | iOS 1.0 | |
-| F02 | Sign in with Apple | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ sign-in | iOS 1.0 | Android needs web OAuth path (optional, E04) |
+| F02 | Sign in with Apple | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ Settings flag apple_web_sign_in (off until set) | ✅ sign-in | iOS 1.0; website and Android 2.1 | 2026-11-04: the website and Android use Apple's web sign-in through Supabase once Chris sets up the Services ID and secret (docs/web-sign-in-with-apple.md, secret script scripts/release/apple-web-secret.mjs) and switches the flag on. Owed: Chris's Apple Developer + Supabase steps, then a web and Android device check (E04 kept for the record). |
 | F03 | Sign in with Google | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ sign-in | iOS 1.0 | Android: browser fallback works in theory; native client needs SHA-1 |
 | F04 | Sign in with Facebook | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ sign-in | iOS 1.0 | |
 | F05 | Ride name, social profile | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ ride-name-and-profile | iOS 1.0 | |
@@ -158,7 +158,7 @@ web build and the Android emulator.
 | E01 | CarPlay | iPhone only | Needs Apple's CarPlay entitlement (requested); off unless `ONMYLEAD_CARPLAY=1`. Android Auto is not planned; iPad and Android tablets have no car mode. |
 | E02 | Admin Dashboard | Website only | Owner tool at onmylead.com/admin; phone apps link to it. |
 | E03 | Offline maps | Apps only | The website can't store map tiles. |
-| E04 | Sign in with Apple on Android | Optional | Apple doesn't ship a native sheet on Android; web OAuth works if wanted. |
+| E04 | Sign in with Apple on Android and the website | Browser flow | Apple ships its sheet only on iPhone and iPad; Android and onmylead.com open Apple's web sign-in in a browser sheet instead (same account), once the owner's apple_web_sign_in flag is on. |
 | E05 | Purchases | Per store | Apple devices buy through the App Store, Android through Google Play, the website sells nothing; one Pro state on the server for all. |
 | E06 | Recording a trail in Navigate | Apps only | Recording needs continuous GPS with the screen on, which a browser tab can't keep. The website has Explore, Measure, My Trails (kept in that browser), sharing and ratings. |
 | E07 | Music Controls: play, pause and skip for other apps | Android only (iPhone/iPad: Apple Music only); none on the website | Apple has no API for apps to control another app's playback; Spotify's iOS remote SDK is limited to apps Spotify approves, so on iPhone and iPad Spotify and other apps get volume (MPVolumeView) and Open Spotify. Browsers can't reach the phone's music. |

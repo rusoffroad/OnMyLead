@@ -58,10 +58,11 @@ describe('social sign-in buttons', () => {
     expect(socialProviders({ external: { apple: false, google: false } }, 'ios')).toEqual([]);
   });
 
-  it('keeps Apple to the iPhone until the website has its own Apple setup', () => {
+  it('keeps Apple to the iPhone until the owner switches on Apple’s web sign-in for the website and Android', () => {
     expect(socialProviders(all, 'web')).toEqual(['google', 'facebook']);
     expect(socialProviders(all, 'web', { webApple: true })).toEqual(['apple', 'google', 'facebook']);
     expect(socialProviders(all, 'android')).toEqual(['google', 'facebook']);
+    expect(socialProviders(all, 'android', { webApple: true })).toEqual(['apple', 'google', 'facebook']);
   });
 
   it('shows nothing when the settings can’t be read', () => {

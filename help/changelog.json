@@ -2,6 +2,16 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "sign-in"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "apple-web-sign-in",
+    "why": "Sign in with Apple on onmylead.com and Android through Apple's web sign-in, behind the owner's new apple_web_sign_in flag (off until the Apple Services ID and secret are set up in Supabase, docs/web-sign-in-with-apple.md). The article now says the button is there when it's switched on instead of 'may not be there'."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "edit-cancel-or-delete-a-ride",
       "faq",
       "organizer-controls",

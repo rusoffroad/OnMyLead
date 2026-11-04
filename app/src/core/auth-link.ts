@@ -156,7 +156,9 @@ export function socialProviders(
   if (!external || typeof external !== 'object') return [];
   const on = (p: SocialProvider) => external[p] === true;
   const out: SocialProvider[] = [];
-  if (on('apple') && (platform === 'ios' || (platform === 'web' && opts.webApple))) out.push('apple');
+  // iPhone and iPad have Apple's own sheet. The website and Android use Apple's web sign-in, which
+  // needs a Services ID and secret in Supabase first, so the owner switches it on (opts.webApple).
+  if (on('apple') && (platform === 'ios' || ((platform === 'web' || platform === 'android') && opts.webApple))) out.push('apple');
   if (on('google')) out.push('google');
   if (on('facebook')) out.push('facebook');
   return out;
