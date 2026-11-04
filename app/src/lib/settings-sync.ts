@@ -6,6 +6,8 @@ import {
   isSyncedKey, mergeSynced, parseSyncedMap, seedFromDevice, stamp, syncSummary, SYNCED_SETTINGS, type SyncedMap,
 } from '@/core/synced-settings';
 import { isBackendConfigured, supabase } from './supabase';
+import { can } from '@/core/entitlements';
+import { currentEntitlements } from './entitlements';
 
 /**
  * Settings that follow the account across devices (core/synced-settings.ts has the list and the
@@ -144,6 +146,8 @@ export function syncSettingsNow(): Promise<void> {
 }
 
 async function run() {
+  // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
+  if (!can(currentEntitlements(), 'sync')) return;
   if (!isBackendConfigured) return;
   const { data: auth } = await supabase.auth.getSession();
   const me = auth.session?.user.id;

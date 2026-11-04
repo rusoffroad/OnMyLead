@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  applyClock, can, daysLeft, FEATURE_KEYS, isEntitlementsMissing, NOT_SWITCHED_ON, parseEntitlements, parseProError,
+  applyClock, can, daysLeft, FEATURE_KEYS, isEntitlementsMissing, NOT_SWITCHED_ON, parseEntitlements, parseProError, PRO_BY_DEFAULT,
   rideAllowanceText, showsProTag, trialBadgeText,
 } from '../entitlements';
 
@@ -74,6 +74,17 @@ describe('entitlements', () => {
     expect(can(ended, 'offline_maps')).toBe(false);
     const apple = parseEntitlements({ ...trial, pro_source: 'apple', pro_until: iso(NOW + DAY) }, NOW);
     expect(applyClock(apple, NOW + 40 * DAY).label).toBe('Pro');
+  });
+
+  it('turns every 2.0 Pro feature off when a trial ends, but keeps free Map Mode and joining', () => {
+    const e = parseEntitlements({ ...trial, features: Object.fromEntries(FEATURE_KEYS.map((k) => [k, true])) }, NOW);
+    const ended = applyClock(e, NOW + 13 * DAY);
+    for (const k of PRO_BY_DEFAULT) expect(can(ended, k)).toBe(false);
+    expect(can(ended, 'route_builder')).toBe(false);
+    expect(can(ended, 'tablet_web')).toBe(false);
+    expect(can(ended, 'map_mode')).toBe(true);
+    expect(PRO_BY_DEFAULT).not.toContain('map_mode');
+    expect(PRO_BY_DEFAULT).not.toContain('create_ride');
   });
 
   it('counts days left', () => {

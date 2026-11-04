@@ -12,6 +12,9 @@ import { can, trialBadgeText, type Entitlements, type FeatureKey, type ProError 
 /** Free history shows this many past rides. */
 export const FREE_HISTORY = 5;
 
+/** Free Map Mode hours each UTC month (feature_plans map_mode allowance; Admin can change it). */
+export const FREE_MAP_HOURS = 8;
+
 /** The plan line, e.g. "Pro Trial — 12 Days Remaining", "Pro" or "Free". */
 export function planHeadline(ent: Entitlements): string {
   return trialBadgeText(ent) ?? ent.label;
@@ -83,29 +86,112 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
     title: 'Create Events',
     body: 'Post rallies, poker runs and ride weekends with photos, an agenda and their group rides. Seeing events, saying you’re going and co-hosting stay free.',
   },
+  custom_codes: {
+    title: 'Custom Share Codes',
+    body: 'Pick your own easy code for a ride, group or friend link. Every ride and group still gets a free code that works.',
+  },
+  quick_replies: {
+    title: 'Your Own Messages',
+    body: 'Type your own one-line message to the group in Ride Mode and save your favorite quick replies. The status buttons, Need Help and EMERGENCY stay free.',
+  },
+  music_controls: {
+    title: 'Music Controls',
+    body: 'Play, pause, skip and change the volume from Ride Mode and Map Mode without leaving the map. Your music app itself stays free to use.',
+  },
+  vote_polls: {
+    title: 'Vote on Ride Polls',
+    body: 'Answer the group’s quick questions in ride chat. Reading the poll and its results stays free.',
+  },
+  route_builder: {
+    title: 'Draw Ride Routes',
+    body: 'Draw the route for your ride on the map, snapped to trails and roads. Freeride rides and following the leader’s route stay free.',
+  },
+  waypoints: {
+    title: 'Waypoints and Planned Stops',
+    body: 'Drop waypoints and plan stops with symbols for fuel, camp, hazards and more. Seeing the leader’s waypoints on a ride stays free.',
+  },
+  directions: {
+    title: 'Directions',
+    body: 'Hand any spot to Apple Maps or Google Maps for turn-by-turn directions. Directions to a rider who needs help stay free.',
+  },
+  map_layers: {
+    title: 'Map Layers',
+    body: 'Switch between satellite, topo and the trails layer with trail names and closures. The standard map stays free.',
+  },
+  map_mode: {
+    title: 'Unlimited Map Mode',
+    body: 'Free includes hours of Map Mode every month. Pro has no limit. Riding with a group in Ride Mode is always unlimited.',
+  },
+  custom_trails: {
+    title: 'Map a Custom Trail',
+    body: 'Draw a trail on the map and measure distances along it. Following trails stays free.',
+  },
+  save_trails: {
+    title: 'Save Your Trails',
+    body: 'Keep the trails you draw and record in My Trails, with photos and details. Following other riders’ trails stays free.',
+  },
+  rate_trails: {
+    title: 'Rate Trails',
+    body: 'Rate how good a trail is and how accurate its line is. Seeing ratings stays free.',
+  },
+  track_line: {
+    title: 'Track Line',
+    body: 'See where you’ve been on the map, a new color each day, for the last 7 days. Your dot on the map stays free.',
+  },
+  trail_spots: {
+    title: 'Named Spots on Trails',
+    body: 'Mark obstacles, hazards, water crossings and viewpoints on your trails. Seeing spots on shared trails stays free.',
+  },
+  garage_build: {
+    title: 'Garage Build Sheet',
+    body: 'Track parts and extras with costs, build totals, the Build Sheet and CSV export. Your machines, specs and fuel range stay free.',
+  },
+  sync: {
+    title: 'Sync Across Devices',
+    body: 'Your settings and Map Mode trails follow you to every phone, tablet and the website. Your account and rides are on every device for free.',
+  },
+  themes: {
+    title: 'Themes and Light Mode',
+    body: 'Pick Light, Match Phone or one of four themes. Dark mode and Color Blind Mode stay free.',
+  },
+  natural_voices: {
+    title: 'Natural Voices',
+    body: 'Pick a natural-sounding voice for spoken alerts. Alerts are still read out loud on Free.',
+  },
+  tablet_web: {
+    title: 'iPad, Android Tablets and the Website',
+    body: 'Use OnMyLead on a big screen. Joining a ride and following the leader stay free on every device.',
+  },
 };
 
 /** The comparison on the Pro screen. true = included, false = not, a string = the amount. */
 export const COMPARISON: { label: string; free: boolean | string; pro: boolean | string }[] = [
   { label: 'Create Rides', free: '1 a Month', pro: 'Unlimited' },
-  { label: 'Join Rides', free: 'Unlimited', pro: 'Unlimited' },
-  { label: 'Live Tracking, SOS and Ride Bubble', free: true, pro: true },
-  { label: 'Ride Chat and Voting', free: true, pro: true },
-  { label: 'Draw Routes and Follow Leaders', free: true, pro: true },
-  { label: 'Map Mode: Offroad Map, Custom Trails, Rate Trails', free: true, pro: true },
+  { label: 'Join Rides and Follow the Leader', free: 'Unlimited', pro: 'Unlimited' },
+  { label: 'Live Tracking, SOS, Crash Alert and Ride Bubble', free: true, pro: true },
+  { label: 'Ride Chat', free: true, pro: true },
+  { label: 'Map Mode', free: `${FREE_MAP_HOURS} Hours a Month`, pro: 'Unlimited' },
   { label: 'Social Feed: See, Like and Read Comments', free: true, pro: true },
-  { label: 'Post, Comment and Share to Social Media', free: false, pro: true },
-  { label: 'Record and Share Your Trails', free: false, pro: true },
+  { label: 'Badges, Events and Friends', free: true, pro: true },
+  { label: 'Draw Routes, Waypoints and Directions', free: false, pro: true },
+  { label: 'Map Layers: Satellite, Topo and Trails', free: false, pro: true },
+  { label: 'Draw, Record, Save, Rate and Share Trails', free: false, pro: true },
+  { label: 'Track Line and Named Spots', free: false, pro: true },
   { label: 'Group Rides on Your Trails', free: false, pro: true },
   { label: 'Import GPX Routes', free: false, pro: true },
   { label: 'Offline Maps', free: false, pro: true },
-  { label: 'Saved Riding Groups', free: false, pro: true },
-  { label: 'Create Ride Polls', free: false, pro: true },
-  { label: 'Ride History', free: `Last ${FREE_HISTORY}`, pro: 'All' },
-  { label: 'Advanced Trip Planning', free: false, pro: true },
-  { label: 'Advanced Ride Statistics', free: false, pro: true },
-  { label: 'Premium Ride Cards', free: false, pro: true },
+  { label: 'Post, Comment and Share to Social Media', free: false, pro: true },
   { label: 'Create Events', free: false, pro: true },
+  { label: 'Saved Riding Groups and Custom Codes', free: false, pro: true },
+  { label: 'Create and Vote on Ride Polls', free: false, pro: true },
+  { label: 'Your Own Messages and Music Controls', free: false, pro: true },
+  { label: 'Ride History', free: `Last ${FREE_HISTORY}`, pro: 'All' },
+  { label: 'Advanced Ride Statistics and Premium Cards', free: false, pro: true },
+  { label: 'Advanced Trip Planning', free: false, pro: true },
+  { label: 'Garage Build Sheet', free: false, pro: true },
+  { label: 'Themes, Light Mode and Natural Voices', free: false, pro: true },
+  { label: 'Sync Across Devices', free: false, pro: true },
+  { label: 'iPad, Android Tablets and the Website', free: false, pro: true },
 ];
 
 export const PRICES = { monthly: 4.99, annual: 29.99 } as const;

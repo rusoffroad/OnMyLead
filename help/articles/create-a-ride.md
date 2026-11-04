@@ -64,6 +64,10 @@ If the trail has a width limit, the **Riding** banner shows it (and whether your
 Only riders who have joined see the exact meeting spot. Public pages show the general area, within about a mile.
 :::
 
+:::release 2.0
+A **Mapped** ride, where you draw the route, is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, **Mapped** carries a **Pro** tag; pick **Freeride** to create the ride for free.
+:::
+
 ## Pick the Day
 
 :::until 1.0.1

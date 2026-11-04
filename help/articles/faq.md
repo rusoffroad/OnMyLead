@@ -32,6 +32,10 @@ keywords: [questions, faq, release notes, what's new, update, update required, u
 
 Yes. Free accounts create one ride each calendar month and can join as many rides as they like, and the safety features are always free. [OnMyLead Pro](/help/free-vs-pro) adds unlimited rides and more.
 
+:::release 2.0
+From version 2.0, Free also includes 8 hours of Map Mode a month, and joining a ride and following the leader stay free and unlimited on every device. Using OnMyLead on an iPad, an Android tablet or the website, and extras like map layers, drawing routes, waypoints and directions, are part of Pro.
+:::
+
 ## I Deleted the Ride I Made This Month. Can I Make Another on Free?
 
 No. A ride counts when it's created, so cancelling or deleting it doesn't give it back, and copying a ride or using **Ride Again** counts as a new ride. Your next free ride opens on the 1st of next month (UTC).

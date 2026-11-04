@@ -17,6 +17,10 @@ Ride Mode reads some things out loud so you don't have to look at your phone: an
 
 Every voice OnMyLead uses is stored on your phone, so spoken alerts keep working with no service.
 
+:::release 2.0
+Picking a voice is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, alerts are still read out loud with the **Automatic** voice. If you picked a voice before version 2.0, the app keeps it.
+:::
+
 ## Pick a Voice
 
 1. Go to the **You** tab and tap **Voice**.

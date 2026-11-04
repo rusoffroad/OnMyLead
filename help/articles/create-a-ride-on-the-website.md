@@ -26,6 +26,10 @@ You can plan a ride on the big screen at onmylead.com. It's the same ride as one
 
 ![Drawing a route on onmylead.com](/help/img/web-route.webp)
 
+:::release 2.0
+Using OnMyLead on the website is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the website still lets you join a ride, open your rides and follow the leader in Ride Mode.
+:::
+
 ## Create a Ride on the Web
 
 1. Go to onmylead.com and click **Create a Ride on the Web**.

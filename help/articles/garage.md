@@ -71,6 +71,10 @@ Your Garage also powers the fuel check on a ride. See [Fuel Range](/help/fuel-ra
 
 ## Track Your Build
 
+:::release 2.0
+Tracking parts, the Build Sheet and the CSV export are Pro features. See [Free and Pro](/help/free-vs-pro). Your machines, their specs and the fuel range stay free.
+:::
+
 1. Open a machine.
 2. Tap **Add a Part or Extra**.
 3. Pick the **Area**, like **Wheels & Tires**, **Suspension**, **Lighting** or **Recovery**.

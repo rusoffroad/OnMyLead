@@ -26,6 +26,10 @@ keywords: [ipad, android tablet, tablet, landscape, split view, sidebar, big scr
 
 OnMyLead works the same on a tablet as on a phone, with the same account, rides and Pro plan. A tablet just gets layouts made for the bigger screen: the map fills it, and the riders, the ride details and your buttons sit beside the map instead of on top of it.
 
+:::release 2.0
+Using OnMyLead on a tablet or the website is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, a tablet or the website opens a screen with **Join a Ride**, **Your Rides**, **See OnMyLead Pro** and **Your Account**. Joining a ride, the ride page and Ride Mode always work, so you can follow the leader on any device for free.
+:::
+
 ## Turn It Either Way
 
 Hold the tablet upright or sideways; every screen works both ways. Phones stay upright.

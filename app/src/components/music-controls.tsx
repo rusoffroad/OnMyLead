@@ -7,6 +7,8 @@ import { Colors, font, GlassSurface, Radius, RideColors, Spacing, themedStyles }
 import { withAlpha } from '@/core/color';
 import { musicButtonLabel, nowPlaying, stepVolume, VOLUME_STEPS, volumePercent, type MusicCommand, type MusicView } from '@/core/music';
 import { setMusicControls } from '@/hooks/use-music-controls';
+import { requirePro } from '@/lib/pro';
+import { ProTag } from '@/components/pro-tag';
 import { askMusicAccess, canOpenSpotify, musicCommand, openSpotify, readMusic, setMusicVolume, SystemVolumeSlider } from '@/lib/music';
 
 const glass = GlassSurface;
@@ -53,13 +55,14 @@ function Transport({ kind, size, color }: { kind: MusicCommand | 'pause'; size: 
 export function MusicButton({ onPress, style, size = 48 }: { onPress: () => void; style?: StyleProp<ViewStyle>; size?: number }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => requirePro('music_controls') && onPress()}
       accessibilityRole="button"
       accessibilityLabel={musicButtonLabel(null)}
       accessibilityHint="Play, pause, skip and volume for the music on your phone"
       hitSlop={6}
       style={({ pressed }) => [styles.fab, { width: size, height: size, borderRadius: size / 2, opacity: pressed ? 0.8 : 1 }, style]}>
       <NoteGlyph size={Math.round(size * 0.5)} />
+      <ProTag feature="music_controls" style={{ position: 'absolute', bottom: -8 }} />
     </Pressable>
   );
 }

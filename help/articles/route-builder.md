@@ -29,7 +29,15 @@ keywords: [route builder, draw route, map a route, trail snapping, follow trails
 
 A route is the line your group will follow. Once it's saved, every rider on the ride sees it on the ride page and in Ride Mode, with everyone placed along it. You draw it by tapping points on a satellite map, and OnMyLead follows the trails between your taps for you.
 
-Drawing a route is free. Bringing one in from a GPX file is covered in [Import a GPX Route](/help/import-gpx).
+:::until 2.0
+Drawing a route is free.
+:::
+
+:::release 2.0
+Drawing a route is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, **Mapped** on Create a Ride and **Build the Route** carry a **Pro** tag. Freeride rides, and following the leader's route on a ride, stay free.
+:::
+
+Bringing one in from a GPX file is covered in [Import a GPX Route](/help/import-gpx).
 
 :::release 1.0.3
 To ride one of your own trails from [Navigate](/help/navigation-mode), tap **Use One of My Trails** in the route builder and pick it. The trail is used as the route just as you recorded or drew it. This is a Pro feature, like GPX import. Clear it to draw your own.

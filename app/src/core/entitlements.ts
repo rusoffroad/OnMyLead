@@ -24,13 +24,52 @@ export type FeatureKey =
   | 'share_trails'
   | 'trail_rides'
   | 'social_posts'
-  | 'create_events';
+  | 'create_events'
+  | 'custom_codes'
+  | 'quick_replies'
+  | 'music_controls'
+  | 'vote_polls'
+  | 'route_builder'
+  | 'waypoints'
+  | 'directions'
+  | 'map_layers'
+  | 'map_mode'
+  | 'custom_trails'
+  | 'save_trails'
+  | 'rate_trails'
+  | 'track_line'
+  | 'trail_spots'
+  | 'garage_build'
+  | 'sync'
+  | 'themes'
+  | 'natural_voices'
+  | 'tablet_web';
 
 export const FEATURE_KEYS: FeatureKey[] = [
   'create_ride', 'import_gpx', 'offline_maps', 'saved_groups', 'create_poll', 'ride_history',
   'advanced_trip_planning', 'advanced_stats', 'premium_ride_cards', 'record_trails', 'share_trails', 'trail_rides',
   'social_posts',
   'create_events',
+  // 2.0 tiers (Chris 2026-11-03, migration 20261104000000_pro_tiers.sql).
+  'custom_codes',
+  'quick_replies',
+  'music_controls',
+  'vote_polls',
+  'route_builder',
+  'waypoints',
+  'directions',
+  'map_layers',
+  'map_mode',
+  'custom_trails',
+  'save_trails',
+  'rate_trails',
+  'track_line',
+  'trail_spots',
+  'garage_build',
+  'sync',
+  'themes',
+  'natural_voices',
+  'tablet_web',
 ];
 
 /** Names for prompts and the comparison table (Title Case). */
@@ -49,7 +88,35 @@ export const FEATURE_NAMES: Record<FeatureKey, string> = {
   trail_rides: 'Group Rides on Your Trails',
   social_posts: 'Post, Comment and Share',
   create_events: 'Create Events',
+  custom_codes: 'Custom Share Codes',
+  quick_replies: 'Your Own Messages and Quick Replies',
+  music_controls: 'Music Controls',
+  vote_polls: 'Vote on Ride Polls',
+  route_builder: 'Draw Ride Routes',
+  waypoints: 'Add Waypoints and Planned Stops',
+  directions: 'Directions in Apple or Google Maps',
+  map_layers: 'Map Layers',
+  map_mode: 'Unlimited Map Mode',
+  custom_trails: 'Map a Custom Trail',
+  save_trails: 'Save Trails to My Trails',
+  rate_trails: 'Rate Trails',
+  track_line: 'Track Line',
+  trail_spots: 'Named Spots on Trails',
+  garage_build: 'Garage Parts and Build Sheet',
+  sync: 'Sync Across Devices',
+  themes: 'Themes and Light Mode',
+  natural_voices: 'Natural Voices',
+  tablet_web: 'iPad, Android Tablets and the Website',
 };
+
+/** Pro-only by default (feature_plans min_plan 'pro'); used when a cached Pro answer runs out on the device. */
+export const PRO_BY_DEFAULT: FeatureKey[] = [
+  'import_gpx', 'offline_maps', 'saved_groups', 'create_poll', 'advanced_trip_planning', 'advanced_stats',
+  'premium_ride_cards', 'record_trails', 'share_trails', 'trail_rides', 'social_posts', 'create_events',
+  'custom_codes', 'quick_replies', 'music_controls', 'vote_polls', 'route_builder', 'waypoints', 'directions',
+  'map_layers', 'custom_trails', 'save_trails', 'rate_trails', 'track_line', 'trail_spots', 'garage_build',
+  'sync', 'themes', 'natural_voices', 'tablet_web',
+];
 
 export type AccountType = 'free' | 'pro' | 'admin';
 export type ProSource = 'trial' | 'apple' | 'google' | 'comp' | 'admin' | null;
@@ -236,8 +303,7 @@ export function applyClock(e: Entitlements, now = Date.now()): Entitlements {
     trialDaysLeft: null,
     rideAllowance: 1,
     historyLimit: 5,
-    features: { ...ALL_ON, import_gpx: false, offline_maps: false, saved_groups: false, create_poll: false,
-      advanced_trip_planning: false, advanced_stats: false, premium_ride_cards: false, social_posts: false },
+    features: { ...ALL_ON, ...Object.fromEntries(PRO_BY_DEFAULT.map((k) => [k, false])) },
   };
 }
 
