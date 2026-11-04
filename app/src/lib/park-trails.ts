@@ -97,9 +97,9 @@ export async function parkList(refresh = true): Promise<ParkSummary[]> {
   // Every map screen asks; the list changes rarely, so the server is asked at most every 10 minutes.
   if (!refresh || (parksCache && Date.now() - fetchedAt < PARK_LIST_FRESH_MS)) return saved;
   try {
-    fetchedAt = Date.now();
     const { data, error } = await supabase.rpc('park_trail_parks');
     if (error) throw new Error(error.message);
+    fetchedAt = Date.now();
     const parks = parseParkSummaries(data);
     if (parks.length || !saved.length) {
       parksCache = parks;

@@ -205,18 +205,22 @@ export function useTrailMap(): TrailMap {
     };
     // The You tab's own keys ('1' / '0') win over the panel's saved layers for these two, in
     // either direction, so a switch turned back on in the You tab shows the trails again.
-    const applyRiders = (v: string | null) => {
-      if (v !== '0' && v !== '1') return;
-      riderOnRef.current = v === '1';
-      setRiderOn(v === '1');
-      featuresRef.current = { ...featuresRef.current, riderTrails: v === '1' };
+    // On first read a missing key leaves the panel's saved layers alone; a synced null (another
+    // rider signed in, lib/settings-sync) means that account's default, on.
+    const applyRiders = (v: string | null, synced = false) => {
+      if (v !== '0' && v !== '1' && !synced) return;
+      const on = v !== '0';
+      riderOnRef.current = on;
+      setRiderOn(on);
+      featuresRef.current = { ...featuresRef.current, riderTrails: on };
       setFeatureState(featuresRef.current);
     };
-    const applyParks = (v: string | null) => {
-      if (v !== '0' && v !== '1') return;
-      parkOnRef.current = v === '1';
-      setParkOn(v === '1');
-      featuresRef.current = { ...featuresRef.current, parkTrails: v === '1' };
+    const applyParks = (v: string | null, synced = false) => {
+      if (v !== '0' && v !== '1' && !synced) return;
+      const on = v !== '0';
+      parkOnRef.current = on;
+      setParkOn(on);
+      featuresRef.current = { ...featuresRef.current, parkTrails: on };
       setFeatureState(featuresRef.current);
     };
     Promise.all([AsyncStorage.getItem(KEY), AsyncStorage.getItem(RIDER_TRAILS_KEY), AsyncStorage.getItem(PARK_TRAILS_KEY)])
@@ -231,8 +235,8 @@ export function useTrailMap(): TrailMap {
     parkList(true).then((fresh) => fresh.length && setParks(fresh)).catch(() => {});
     // Picked on another device (lib/settings-sync).
     const offLayers = onSyncedChange(KEY, applyLayers);
-    const offRiders = onSyncedChange(RIDER_TRAILS_KEY, applyRiders);
-    const offParks = onSyncedChange(PARK_TRAILS_KEY, applyParks);
+    const offRiders = onSyncedChange(RIDER_TRAILS_KEY, (v) => applyRiders(v, true));
+    const offParks = onSyncedChange(PARK_TRAILS_KEY, (v) => applyParks(v, true));
     return () => {
       offLayers();
       offRiders();

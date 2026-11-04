@@ -21,6 +21,8 @@ export async function snapshotForShare(
   const saved = await image.saveAsync(
     opts.png ? { compress: 1, format: ImageManipulator.SaveFormat.PNG } : { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG },
   );
+  // The full-size capture (up to 3x the card) is let go now, not when the garbage collector gets to it.
+  (image as { release?: () => void }).release?.();
   try {
     const out = new File(Paths.cache, `${opts.name}.${opts.png ? 'png' : 'jpg'}`);
     await new File(saved.uri).copy(out, { overwrite: true });

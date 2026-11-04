@@ -162,7 +162,8 @@ export function rewardState(reward: ReferralReward | null, now: number = Date.no
   if (!reward) return { state: 'none' };
   if (reward.claimKind === 'apple_code' && reward.appleCode) return { state: 'apple_code', code: reward.appleCode };
   if (reward.redeemedAt) return { state: 'used' };
-  if (reward.claimKind === 'google_defer') return reward.deferredAt ? { state: 'used' } : { state: 'google_defer_pending' };
+  // deferred_at alone is a reservation (Google not yet confirmed); redeemed_at above is the confirmation.
+  if (reward.claimKind === 'google_defer') return { state: 'google_defer_pending' };
   if (reward.claimKind === 'google_offer') return { state: 'google_offer' };
   if (Date.parse(reward.expiresAt) <= now) return { state: 'expired' };
   return { state: 'ready' };

@@ -57,6 +57,7 @@ export function GroupMapboxMap({
   const [mapHeading, setMapHeading] = useState(0);
   const lastFix = useRef<LatLng | null>(null);
   const followed = useRef<LatLng | null>(null);
+  const followRun = useRef(0);
   const followRef = useRef(follow);
   const everyMs = useRef(locationEveryMs);
   useEffect(() => {
@@ -88,12 +89,15 @@ export function GroupMapboxMap({
     fitted.current = 'route';
     // Only a fix the camera used counts as followed, so one skipped while a step is still
     // running (a slow junction lookup) doesn't make the next one look like jitter.
+    const run = followRun.current;
     void cam.step(f, fl.inset, followCamDurationMs(everyMs.current)).then((took) => {
-      if (took) followed.current = { lat: f.lat, lng: f.lng };
+      // Not after Follow Me was switched off or restarted while the step ran.
+      if (took && run === followRun.current) followed.current = { lat: f.lat, lng: f.lng };
     });
   }, [cam]);
   const followOn = !!follow;
   useEffect(() => {
+    followRun.current++;
     if (!followOn) {
       followed.current = null;
       cam.stop();

@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
   if (target.deferred_at) {
     const { data: reserved } = await db.from('play_events').select('payload')
       .eq('type', 'REFERRAL_DEFER_RESERVED').eq('purchase_token', target.purchase_token)
-      .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      .order('received_at', { ascending: false }).limit(1).maybeSingle();
     const asked = Date.parse(reserved?.payload?.to ?? '');
     const from = Date.parse(reserved?.payload?.from ?? '');
     if (Number.isFinite(asked) && Math.abs(current - asked) < DAY) return await confirm(user.id, target.purchase_token, from, current);
@@ -77,13 +77,13 @@ Deno.serve(async (req) => {
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     console.error('Google Play deferral failed', message);
-    if (/^Google Play defer \d+$/.test(message)) {
-      // Google answered no: nothing moved, so the reward goes back for another try.
+    if (/^Google Play defer 4\d\d$/.test(message)) {
+      // Google answered no (a 4xx): nothing moved, so the reward goes back for another try.
       const { error: undoError } = await db.rpc('referral_unmark_deferred', { p_user: user.id });
       if (undoError) console.error('referral_unmark_deferred failed', undoError.message);
       return json({ error: 'retry' }, 503);
     }
-    // No answer (timeout, dropped connection): Google may have deferred anyway. Its subscription says.
+    // No answer (timeout, dropped connection, a 5xx): Google may have deferred anyway. Its subscription says.
     let moved: number | null = null;
     try {
       const again = Date.parse(proLineItem(await getSubscription(target.purchase_token))?.expiryTime ?? '');

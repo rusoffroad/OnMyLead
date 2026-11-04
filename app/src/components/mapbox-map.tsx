@@ -168,7 +168,7 @@ export function MapboxMap({
     const z = p.zoom;
     settle.current = setTimeout(() => {
       settle.current = null;
-      reported.current = `${center.lat.toFixed(5)},${center.lng.toFixed(5)},${z.toFixed(2)}`;
+      reported.current = `${center.lat.toFixed(5)},${center.lng.toFixed(5)},${z.toFixed(2)},${size.current.width}x${size.current.height}`;
       trail.onRegion(regionFromCamera(center, z, size.current), trailZoomFromMapbox(z));
     }, SETTLE_MS);
     const h = Math.round((p.heading ?? 0) / 5) * 5 % 360;
@@ -187,7 +187,7 @@ export function MapboxMap({
     zoom.current = p.zoom;
     // The settle timer in camChanged usually asked for this region already; ask only when it
     // hasn't (a pending timer, or a rest the camera never announced, such as the first load).
-    const key = `${center.lat.toFixed(5)},${center.lng.toFixed(5)},${p.zoom.toFixed(2)}`;
+    const key = `${center.lat.toFixed(5)},${center.lng.toFixed(5)},${p.zoom.toFixed(2)},${size.current.width}x${size.current.height}`;
     if (settle.current || reported.current !== key) {
       if (settle.current) clearTimeout(settle.current);
       settle.current = null;
