@@ -1,6 +1,9 @@
 // Korean. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "이어받을 다른 라이더가 없어서 나가면 라이드가 취소됩니다.",
+  "Your location sharing for this ride stops.": "이 라이드의 위치 공유가 중지됩니다.",
+  "The lead goes back to the organizer.": "리드가 주최자에게 돌아갑니다.",
   "Language": "언어",
   "Change language": "언어 변경",
   "Map Mode. Open your offroad map": "지도 모드. 오프로드 지도 열기",

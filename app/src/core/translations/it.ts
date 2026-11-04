@@ -1,6 +1,9 @@
 // Italian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Nessun altro si è unito per prendere il comando, quindi uscire annulla l’uscita.",
+  "Your location sharing for this ride stops.": "La condivisione della tua posizione per questa uscita si ferma.",
+  "The lead goes back to the organizer.": "La guida torna all’organizzatore.",
   "Language": "Lingua",
   "Change language": "Cambia lingua",
   "Map Mode. Open your offroad map": "Modalità Mappa. Apri la tua mappa fuoristrada",

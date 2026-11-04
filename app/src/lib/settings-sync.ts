@@ -166,6 +166,7 @@ async function run() {
       stamps = { ...seedFromDevice(Object.fromEntries(pairs), sameAccount), ...stamps };
     }
 
+    const sent = stamps;
     const { data, error } = await supabase.rpc('sync_rider_settings', { p_changes: stamps });
     if (error) {
       // The server update hasn't run yet: stay quiet, keep everything on the device, try next time.
@@ -176,7 +177,16 @@ async function run() {
       throw new Error(error.message);
     }
     const remote = parseSyncedMap(data);
-    const { merged, apply } = mergeSynced(stamps, remote);
+    // The server merged what was sent with the account copy (newer wins, stamps capped at its
+    // clock plus a minute), so its answer settles every key it holds, even where this device's
+    // clock ran ahead; a key the rider changed while the call was out keeps its new stamp.
+    const settled: SyncedMap = { ...stamps };
+    for (const [k, r] of Object.entries(remote)) if (sent[k] && stamps[k] === sent[k]) settled[k] = r;
+    const { merged, apply } = mergeSynced(settled, remote);
+    for (const [k, r] of Object.entries(remote)) {
+      const was = sent[k];
+      if (was && stamps[k] === was && was.v !== r.v) apply[k] = r;
+    }
     for (const [k, e] of Object.entries(apply)) {
       await writeLocal(k, e.v);
       tell(k, e.v);

@@ -95,8 +95,8 @@ export function leaveConfirm(
   const p = leavePrompt(rideName, rideStatus);
   if (rideStatus === 'ended' || rideStatus === 'cancelled') return p;
   const extra = [
-    opts.sharing && rideStatus !== 'live' ? 'Your location sharing for this ride stops.' : '',
-    opts.leads ? 'The lead goes back to the organizer.' : '',
+    opts.sharing && rideStatus !== 'live' ? tc('Your location sharing for this ride stops.') : '',
+    opts.leads ? tc('The lead goes back to the organizer.') : '',
   ].filter(Boolean);
   return extra.length ? { ...p, message: `${p.message} ${extra.join(' ')}` } : p;
 }
@@ -115,8 +115,8 @@ export function handOffAndLeavePrompt(rideName: string, name: string): Prompt {
  * means cancelling; otherwise they chose to cancel rather than hand the ride over.
  */
 export function leaveAloneCancelPrompt(rideName: string, waiting: number, alone = true): Prompt {
-  const why = alone ? 'Nobody else has joined to take it over, so leaving cancels the ride. ' : '';
-  const others = waiting === 1 ? '1 rider' : `${waiting} riders`;
+  const why = alone ? `${tc('Nobody else has joined to take it over, so leaving cancels the ride.')} ` : '';
+  const others = waiting === 1 ? tc('1 rider') : tc('{n} riders', { n: waiting });
   return {
     title: tc('Cancel {rideName}?', { rideName }),
     message: waiting

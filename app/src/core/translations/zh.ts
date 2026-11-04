@@ -1,6 +1,9 @@
 // Chinese (Simplified). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "没有其他人加入来接手，所以退出将取消此次骑行。",
+  "Your location sharing for this ride stops.": "你在本次骑行中的位置共享将停止。",
+  "The lead goes back to the organizer.": "领队身份交回给组织者。",
   "Language": "语言",
   "Change language": "更改语言",
   "Map Mode. Open your offroad map": "地图模式。打开你的越野地图",
