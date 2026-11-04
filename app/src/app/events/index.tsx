@@ -3,6 +3,7 @@ import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
+import { EventOrRide } from '@/components/events/event-or-ride';
 import { EventCardView } from '@/components/events/parts';
 import { RadiusChip, RadiusSheet } from '@/components/home/public-rides';
 import { Home, Pill } from '@/components/home/parts';
@@ -19,6 +20,7 @@ import { positionIfAllowed } from '@/lib/location';
 import { requirePro } from '@/lib/pro';
 import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 type Tab = 'upcoming' | 'mine';
 
@@ -76,7 +78,7 @@ export default function EventsScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Events' }} />
+      <Stack.Screen options={{ title: t('Events') }} />
       <PageHead><title>Events | OnMyLead</title></PageHead>
       <Screen width="wide">
         <View style={{ gap: Spacing.four }}>
@@ -92,6 +94,8 @@ export default function EventsScreen() {
               {session && !can('create_events') ? <Pill text="Pro" tone="gold" style={{ alignSelf: layout.wide ? 'flex-end' : 'center' }} /> : null}
             </View>
           </View>
+
+          <EventOrRide from="events" />
 
           {session ? (
             <Segmented<Tab>

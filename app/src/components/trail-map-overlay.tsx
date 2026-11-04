@@ -96,7 +96,7 @@ export function TrailMapOverlay({
             <RiderTrailCard
               t={trail.picked}
               onClose={() => trail.pick(null)}
-              onRate={() => setRating(trail.picked)}
+              onRate={() => requirePro('rate_trails') && setRating(trail.picked)}
               onFollow={() => (onFollow ? onFollow(trail.picked!) : router.push(`/nav?follow=${trail.picked!.id}`))}
             />
           ) : trail.info ? (
@@ -122,7 +122,10 @@ function LayersPanel({
 }: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string }) {
   return (
     <View style={styles.panel} accessibilityViewIsModal={false}>
-      <Text style={styles.panelTitle}>Map Style</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={styles.panelTitle}>Map Style</Text>
+        <ProTag feature="map_layers" style={{ alignSelf: 'auto' }} />
+      </View>
       <View style={styles.bases} accessibilityRole="radiogroup" accessibilityLabel="Map style">
         {(['satellite', 'topo'] as BaseMap[]).map((b) => {
           const on = trail.base === b;
@@ -132,7 +135,7 @@ function LayersPanel({
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
               accessibilityLabel={b === 'satellite' ? 'Satellite' : 'Topo'}
-              onPress={() => trail.setBase(b)}
+              onPress={() => requirePro('map_layers') && trail.setBase(b)}
               style={({ pressed }) => [styles.base, pressed && { opacity: 0.8 }]}>
               <View style={[styles.baseThumb, on && styles.baseThumbOn]}>
                 <StyleThumb base={b} />
@@ -143,14 +146,16 @@ function LayersPanel({
         })}
       </View>
 
-      <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => trail.setTrails(!trail.trails)} style={styles.row}>
+      <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => requirePro('map_layers') && trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.rowTitle}>Public Trails and Roads</Text>
           <Text style={styles.rowSub}>{`Forest Service, BLM and OpenStreetMap, including off-road parks, with names and closures. ${lookupHint}`.trim()}</Text>
         </View>
         <Switch
           value={trail.trails}
-          onValueChange={trail.setTrails}
+          onValueChange={(on) => {
+            if (requirePro('map_layers')) trail.setTrails(on);
+          }}
           trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
           thumbColor="#FFFFFF"
           {...({ activeThumbColor: '#FFFFFF' } as object)}

@@ -31,7 +31,7 @@ import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { confirmAsync } from '@/lib/confirm';
-import { handleProError, requirePro, useEntitlements } from '@/lib/pro';
+import { handleProError, requirePro, useCan, useEntitlements } from '@/lib/pro';
 import { readPickedText } from '@/lib/read-text';
 import type { Ride } from '@/lib/types';
 
@@ -47,6 +47,14 @@ import type { Ride } from '@/lib/types';
  */
 export default function RouteBuilder() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  // Drawing a route is Pro: a Free rider who lands here (an old link, a new ride) gets the Pro prompt.
+  const routePro = useCan('route_builder');
+  useEffect(() => {
+    if (routePro) return;
+    requirePro('route_builder');
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  }, [routePro, id]);
   const [ride, setRide] = useState<Ride | null>(null);
   const [center, setCenter] = useState<LatLng | null>(null);
   const [saved, setSaved] = useState<RideRoute | null>(null);

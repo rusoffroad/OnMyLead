@@ -11,6 +11,7 @@ import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { shareBadge } from '@/components/trail-badge';
 import { difficultyLabel, feetOrMiles, RIDER_TRAIL_INK, trackStats } from '@/core/nav-trails';
 import { loadTrails, syncMyTrails, trailLine, useLocalTrails } from '@/lib/nav-trails';
+import { t } from '@/lib/i18n';
 
 /** My Trails: every trail on this phone, recorded, drawn with the distance finder, or saved. */
 export default function MyTrails() {
@@ -25,7 +26,7 @@ export default function MyTrails() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'My Trails' }} />
+      <Stack.Screen options={{ title: t('My Trails') }} />
       <Button title="Open Map Mode" onPress={() => router.push('/nav')} />
       {loaded && !trails.length ? (
         <View style={styles.empty}>

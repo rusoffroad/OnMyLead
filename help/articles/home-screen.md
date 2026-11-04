@@ -11,6 +11,7 @@ sources:
   - app/src/app/(tabs)/index.tsx
   - app/src/components/home/**
   - app/src/components/inbox-bell.tsx
+  - app/src/components/language-button.tsx
   - app/src/components/badge-strip.tsx
   - app/src/components/bottom-sheet.tsx
   - app/src/core/home.ts
@@ -27,6 +28,7 @@ The **Rides** tab is your home screen. It puts the three things riders do most a
 ## At the Top
 
 - **Good morning**, **Good afternoon** or **Good evening** with your ride name. When friends are out riding, a line under it says how many. Tap it for [Who's Riding](/help/out-riding).
+- **The flag** shows the language the app is in (for example 🇺🇸 EN). Tap it to pick another. It shows when you're signed out too. See [Change the App's Language](/help/language).
 - **The bell** opens your notifications, with a red number for new ones. See [See and Clear Your Notifications](/help/notifications-inbox).
 - **Your picture** (or your first letter) opens the **You** tab.
 
@@ -40,7 +42,7 @@ When one of your rides is live, a card says **Your ride is live. Tap to open Rid
 
 ## Events
 
-Right under Join, Create and Find, the **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
+Under Join, Create, Find and Map Mode, the gold **Events** card opens the Events area: rallies, poker runs and ride weekends. It shows your next event (one you host or said you're going to), or else the next public event near you, and how many are coming up. See [Events](/help/events).
 
 ## Map Mode
 

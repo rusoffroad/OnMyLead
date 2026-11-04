@@ -3,6 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import type { SocialProvider } from '@/core/auth-link';
+import { t } from '@/lib/i18n';
 
 /**
  * One "Continue with ..." button. Each provider's wording and mark follow its own rules: Apple's
@@ -21,7 +22,7 @@ export function SocialButton({ provider, loading, disabled, onPress }: { provide
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={LABEL[provider]}
+      accessibilityLabel={t(LABEL[provider])}
       disabled={disabled || loading}
       onPress={onPress}
       style={({ pressed }) => [
@@ -36,7 +37,7 @@ export function SocialButton({ provider, loading, disabled, onPress }: { provide
           <View style={styles.mark}>
             <ProviderMark provider={provider} />
           </View>
-          <Text style={[styles.text, { color: fg }]}>{LABEL[provider]}</Text>
+          <Text style={[styles.text, { color: fg }]}>{t(LABEL[provider])}</Text>
         </>
       )}
     </Pressable>

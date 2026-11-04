@@ -4,7 +4,7 @@ summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, 
 category: troubleshooting
 order: 20
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - supabase/migrations/20261018000000_pro_entitlements.sql
   - app/src/core/pro.ts
@@ -31,6 +31,10 @@ keywords: [questions, faq, release notes, what's new, update, update required, u
 ## Is OnMyLead Free?
 
 Yes. Free accounts create one ride each calendar month and can join as many rides as they like, and the safety features are always free. [OnMyLead Pro](/help/free-vs-pro) adds unlimited rides and more.
+
+:::release 2.0
+From version 2.0, Free also includes 8 hours of Map Mode a month, and joining a ride and following the leader stay free and unlimited on every device. Using OnMyLead on an iPad, an Android tablet or the website, and extras like map layers, drawing routes, waypoints and directions, are part of Pro.
+:::
 
 ## I Deleted the Ride I Made This Month. Can I Make Another on Free?
 

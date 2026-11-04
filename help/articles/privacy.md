@@ -4,7 +4,7 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - supabase/migrations/20261104050000_badge_leaderboard.sql
   - supabase/migrations/20261102950000_events.sql

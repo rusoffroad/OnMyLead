@@ -37,6 +37,10 @@ Ride Mode has big buttons so you can tell the group what's going on without typi
 Don't use your phone while you're moving. Pull over first, then tap.
 :::
 
+:::release 2.0
+Typing your own message and saving your own quick replies are Pro features. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Message** button carries a **Pro** tag. The status buttons, Need Help, EMERGENCY and Mechanical Issue stay free.
+:::
+
 ## Quick Replies
 
 :::until 2.0

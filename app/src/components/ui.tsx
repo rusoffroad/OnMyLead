@@ -10,6 +10,7 @@ import type { FeatureKey } from '@/core/entitlements';
 import { keyboardScroll, TextBox } from './keyboard';
 import { ProTag } from './pro-tag';
 import { ThemedText } from './themed-text';
+import { tx } from '@/lib/i18n';
 
 /**
  * A page. `width` caps how wide its content gets on a tablet or a wide window: 'page' (the default,
@@ -75,23 +76,24 @@ export function Button({ title, kind = 'primary', big, loading, disabled, style,
         <ActivityIndicator color={fg} />
       ) : pro ? (
         <View style={styles.buttonRow}>
-          <Text style={[styles.buttonText, big && styles.buttonTextBig, { color: fg, flexShrink: 1 }]}>{title}</Text>
+          <Text style={[styles.buttonText, big && styles.buttonTextBig, { color: fg, flexShrink: 1 }]}>{tx(title)}</Text>
           <ProTag feature={pro} />
         </View>
       ) : (
-        <Text style={[styles.buttonText, big && styles.buttonTextBig, { color: fg }]}>{title}</Text>
+        <Text style={[styles.buttonText, big && styles.buttonTextBig, { color: fg }]}>{tx(title)}</Text>
       )}
     </Pressable>
   );
 }
 
-export function Field({ label, hint, style, onFocus, onBlur, ...rest }: TextInputProps & { label: string; hint?: string }) {
+export function Field({ label, hint, style, onFocus, onBlur, placeholder, ...rest }: TextInputProps & { label: string; hint?: string }) {
   const theme = useTheme();
   const [focused, setFocused] = useState(false);
   return (
     <View style={{ gap: 6 }}>
       <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{label}</ThemedText>
       <TextBox
+        placeholder={tx(placeholder)}
         placeholderTextColor="#5F7190"
         selectionColor={theme.sky}
         onFocus={(e) => {
@@ -135,7 +137,7 @@ export function Tag({ label, color, solid }: { label: string; color: string; sol
   return (
     <View style={[styles.tag, { backgroundColor: solid ? color : `${color}26` }]}>
       {solid ? <View style={styles.tagDot} /> : null}
-      <Text style={[styles.tagText, { color: solid ? '#fff' : color }]}>{label}</Text>
+      <Text style={[styles.tagText, { color: solid ? '#fff' : color }]}>{tx(label)}</Text>
     </View>
   );
 }
@@ -148,7 +150,7 @@ function Chip({ label, on, onPress, role }: { label: string; on: boolean; onPres
       accessibilityState={role === 'radio' ? { selected: on } : { checked: on }}
       onPress={onPress}
       style={[styles.chip, { backgroundColor: on ? theme.accent : theme.backgroundSelected }]}>
-      <Text style={[styles.chipText, { color: on ? theme.onAccent : theme.text }]}>{label}</Text>
+      <Text style={[styles.chipText, { color: on ? theme.onAccent : theme.text }]}>{tx(label)}</Text>
     </Pressable>
   );
 }
@@ -188,7 +190,7 @@ export function Segmented<T extends string>({ options, value, onChange }: { opti
             accessibilityState={{ selected: on }}
             onPress={() => onChange(o.value)}
             style={[styles.segment, on && { backgroundColor: theme.backgroundSelected }]}>
-            <Text style={[styles.chipText, { color: on ? theme.text : theme.textSecondary }]}>{o.label}</Text>
+            <Text style={[styles.chipText, { color: on ? theme.text : theme.textSecondary }]}>{tx(o.label)}</Text>
           </Pressable>
         );
       })}

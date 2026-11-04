@@ -5,12 +5,15 @@ import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Screen, Segmented } from '@/components/ui';
 import { colorBlindOn, Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
-import { MODES, SKINS, statusSymbol, type Skin } from '@/core/appearance';
+import { DEFAULT_APPEARANCE, MODES, SKINS, statusSymbol, type Skin } from '@/core/appearance';
 import { withAlpha } from '@/core/color';
 import { MEDIUM_MIN } from '@/core/layout';
 import { DIFFICULTIES } from '@/core/nav-trails';
 import { TRACK_DAY_COLORS } from '@/core/track-line';
 import { setAppearance, useAppearance } from '@/lib/appearance';
+import { t } from '@/lib/i18n';
+import { ProTag } from '@/components/pro-tag';
+import { requirePro } from '@/lib/pro';
 
 const HERE = '/appearance';
 
@@ -26,22 +29,33 @@ export default function AppearanceScreen() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Appearance' }} />
+      <Stack.Screen options={{ title: t('Appearance') }} />
 
       <View style={styles.group}>
-        <ThemedText type="subtitle">Mode</ThemedText>
+        <View style={styles.titleRow}>
+          <ThemedText type="subtitle">Mode</ThemedText>
+          <ProTag feature="themes" />
+        </View>
         <ThemedText type="small" themeColor="textSecondary">
           Light is easier to read in bright sun. Match Phone follows your device’s own Dark Mode setting.
         </ThemedText>
-        <Segmented options={MODES} value={appearance.mode} onChange={(mode) => setAppearance({ mode }, HERE)} />
+        <Segmented
+          options={MODES}
+          value={appearance.mode}
+          // Dark is free; Light and Match Phone are part of Pro (themes).
+          onChange={(mode) => (mode === DEFAULT_APPEARANCE.mode || requirePro('themes')) && setAppearance({ mode }, HERE)}
+        />
       </View>
 
       <View style={styles.group}>
-        <ThemedText type="subtitle">Theme</ThemedText>
+        <View style={styles.titleRow}>
+          <ThemedText type="subtitle">Theme</ThemedText>
+          <ProTag feature="themes" />
+        </View>
         <ThemedText type="small" themeColor="textSecondary">Each theme has a dark and a light version.</ThemedText>
         <View style={styles.skins} accessibilityRole="radiogroup">
           {SKINS.map((s) => (
-            <SkinCard key={s.id} skin={s} on={s.id === appearance.skin} columns={columns} onPress={() => setAppearance({ skin: s.id }, HERE)} />
+            <SkinCard key={s.id} skin={s} on={s.id === appearance.skin} columns={columns} onPress={() => (s.id === DEFAULT_APPEARANCE.skin || requirePro('themes')) && setAppearance({ skin: s.id }, HERE)} />
           ))}
         </View>
       </View>
@@ -51,8 +65,8 @@ export default function AppearanceScreen() {
         <Pressable
           accessibilityRole="switch"
           accessibilityState={{ checked: appearance.colorBlind }}
-          accessibilityLabel="Color Blind Mode"
-          accessibilityHint="Uses colors that red-green and blue-yellow color blind riders can tell apart"
+          accessibilityLabel={t('Color Blind Mode')}
+          accessibilityHint={t('Uses colors that red-green and blue-yellow color blind riders can tell apart')}
           onPress={() => setAppearance({ colorBlind: !appearance.colorBlind }, HERE)}
           style={({ pressed }) => [styles.switchRow, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <View style={{ flex: 1, gap: 2 }}>
@@ -87,7 +101,7 @@ function SkinCard({ skin, on, columns, onPress }: { skin: Skin; on: boolean; col
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ checked: on }}
-      accessibilityLabel={`${skin.name}. ${skin.blurb}`}
+      accessibilityLabel={`${t(skin.name)}. ${t(skin.blurb)}`}
       onPress={onPress}
       style={({ pressed }) => [
         styles.skin,
@@ -104,7 +118,7 @@ function SkinCard({ skin, on, columns, onPress }: { skin: Skin; on: boolean; col
       </View>
       <View style={styles.skinHead}>
         <Text style={styles.skinName} numberOfLines={1}>
-          {skin.name}
+          {t(skin.name)}
         </Text>
         {on ? <Icon name="check" size={18} color={Colors.sky} strokeWidth={2.6} /> : null}
       </View>
@@ -124,14 +138,14 @@ function Preview() {
     { tone: 'red' as const, label: 'Separated' },
   ];
   return (
-    <View style={styles.preview} accessibilityLabel="Preview of rider status, trail rating and Track Line colors">
+    <View style={styles.preview} accessibilityLabel={t('Preview of rider status, trail rating and Track Line colors')}>
       <View style={styles.previewRow}>
         {statuses.map((s) => (
           <View key={s.tone} style={[styles.chip, { borderColor: withAlpha(RideColors[s.tone], 0.6), backgroundColor: withAlpha(RideColors[s.tone], 0.12) }]}>
             <View style={[styles.dot, { backgroundColor: RideColors[s.tone] }]}>
               {cb ? <Text style={styles.dotSymbol}>{statusSymbol(s.tone)}</Text> : null}
             </View>
-            <Text style={styles.chipText}>{s.label}</Text>
+            <Text style={styles.chipText}>{t(s.label)}</Text>
           </View>
         ))}
       </View>
@@ -139,7 +153,7 @@ function Preview() {
         {DIFFICULTIES.map((d) => (
           <View key={d.value} style={styles.legend}>
             <View style={[styles.line, { backgroundColor: d.color }, d.value === 'hard' && styles.lineEdge]} />
-            <Text style={styles.legendText}>{d.label}</Text>
+            <Text style={styles.legendText}>{t(d.label)}</Text>
           </View>
         ))}
       </View>
@@ -147,7 +161,7 @@ function Preview() {
         {['Today', 'Yesterday', '2 Days Ago'].map((label, i) => (
           <View key={label} style={styles.legend}>
             <View style={[styles.line, { backgroundColor: TRACK_DAY_COLORS[i] }]} />
-            <Text style={styles.legendText}>Track {label}</Text>
+            <Text style={styles.legendText}>{t(`Track ${label}`)}</Text>
           </View>
         ))}
       </View>
@@ -157,6 +171,7 @@ function Preview() {
 
 const styles = themedStyles(() => ({
   group: { gap: Spacing.two, marginTop: Spacing.three },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   skins: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: Spacing.two, marginTop: Spacing.one },
   skin: {
     gap: 6, padding: 10, borderRadius: Radius.card, borderWidth: 2, borderColor: Colors.border, backgroundColor: Colors.backgroundElement,

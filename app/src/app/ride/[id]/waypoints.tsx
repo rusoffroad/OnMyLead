@@ -29,6 +29,7 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition } from '@/lib/location';
 import { useSession } from '@/lib/session';
 import type { Ride, RideMember } from '@/lib/types';
+import { requirePro } from '@/lib/pro';
 
 /**
  * Every waypoint on a ride, on a map and in a list: the leader's shared ones and your own. Press and
@@ -87,6 +88,7 @@ export default function RideWaypoints() {
 
   const openNew = (at: LatLng) => {
     if (!wp.switchedOn) return setError(WAYPOINTS_NOT_SWITCHED_ON);
+    if (!requirePro('waypoints')) return;
     setError(null);
     setTarget({ type: 'new', at });
   };
@@ -182,7 +184,7 @@ export default function RideWaypoints() {
               </ScrollView>
             ) : null}
             <ErrorText error={error} />
-            {mine ? <Button title="Add at My Location" big loading={locating} disabled={!wp.switchedOn} onPress={addHere} /> : null}
+            {mine ? <Button title="Add at My Location" big pro="waypoints" loading={locating} disabled={!wp.switchedOn} onPress={() => requirePro('waypoints') && addHere()} /> : null}
             <Text style={styles.privacy}>Waypoints are never public. Shared ones and planned stops show only to riders on this ride.</Text>
           </>
         ) : null}

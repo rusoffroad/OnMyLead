@@ -1,0 +1,11 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Lokasimu hanya dibagikan ke rider yang kamu pilih, dan hanya selama kamu berbagi, agar grupmu tetap bersama.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Tetap berbagi dengan riding-mu saat ponsel terkunci di dudukan. Berbagi selalu berhenti saat timer atau riding berakhir.",
+    "NSAppleMusicUsageDescription": "Menampilkan nama lagu Apple Music di kontrol musik. Tetap di ponselmu.",
+    "NSPhotoLibraryUsageDescription": "Pilih foto profil atau foto kendaraan untuk garasimu. Hanya foto yang kamu pilih yang diunggah.",
+    "NSCameraUsageDescription": "Ambil foto profil atau foto kendaraanmu. Hanya foto yang kamu ambil yang diunggah.",
+    "NSMotionUsageDescription": "OnMyLead memakai sensor gerak untuk meter kemiringan dan untuk mendeteksi kemungkinan kecelakaan di Mode Riding agar bisa memperingatkan grupmu.",
+    "NSLocalNetworkUsageDescription": "OnMyLead terhubung ke antena Starlink-mu lewat Wi-Fi-nya untuk menampilkan statusnya. Tidak ada hal lain di jaringanmu yang disentuh."
+  }
+}

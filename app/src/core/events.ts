@@ -19,6 +19,25 @@ export const MAX_COHOSTS = 10;
 
 export const EVENTS_NOT_SWITCHED_ON = 'Events aren’t switched on yet. They start working with the next server update.';
 
+/**
+ * The one explainer for "Event or Public Ride?", shown on Events, Find a Ride and both Create
+ * screens on every device, and matched by the Help Center's Events guide. Riders asked what the
+ * difference is (2026-11-03).
+ */
+export const EVENT_OR_RIDE = {
+  question: 'Event or Public Ride?',
+  link: 'What’s the Difference?',
+  ride: {
+    title: 'Public Ride',
+    text: 'One ride on one day: a leader, a meeting point and a time. Anyone nearby finds it in Find a Ride, joins, and rides together in Ride Mode.',
+  },
+  event: {
+    title: 'Event',
+    text: 'A bigger gathering, like a rally, poker run or ride weekend. It has dates, a place, photos, an agenda and Going or Interested, and it can hold several group rides you join one by one.',
+  },
+  pick: 'Just riding? Create a Public Ride. Running a rally or a weekend? Create an Event and add its rides to it.',
+} as const;
+
 export type EventStatus = 'scheduled' | 'cancelled';
 export type EventVisibility = 'public' | 'unlisted';
 export type Rsvp = 'going' | 'interested';

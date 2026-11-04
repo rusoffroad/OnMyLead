@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FlagGate } from '@/components/app-notices';
+import { EventOrRide } from '@/components/events/event-or-ride';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { PlaceSearch } from '@/components/place-search';
 import { RidesMap } from '@/components/rides-map';
@@ -209,6 +210,7 @@ function FindRides() {
       {(!state && !locating) || pickingState ? statePicker : null}
 
       <ErrorText error={error} />
+      <EventOrRide from="find" />
 
     </>
   );

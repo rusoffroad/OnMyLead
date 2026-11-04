@@ -12,6 +12,7 @@ import {
 import { loadNotificationSettings, saveNotificationSettings } from '@/lib/notification-settings';
 import { askPushPermission, openPhoneSettings, pushPermission, syncRideReminders, type PushPermission } from '@/lib/push';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /** What a rider hears about, and when. Every change saves as soon as it's made. */
 export default function NotificationsScreen() {
@@ -81,7 +82,7 @@ export default function NotificationsScreen() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Notifications' }} />
+      <Stack.Screen options={{ title: t('Notifications') }} />
 
       {Platform.OS === 'web' ? (
         <Note tone="info" title="Notifications Come to the iPhone App">

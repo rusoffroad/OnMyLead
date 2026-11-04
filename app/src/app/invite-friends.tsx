@@ -13,6 +13,7 @@ import { sideColumnWidth } from '@/core/layout';
 import { inviteMessage, inviteStatus, inviteSummary, REFERRAL_PRICE, REFERRAL_RULES } from '@/core/referrals';
 import { useLayout } from '@/hooks/use-layout';
 import { useMyReferrals } from '@/lib/referrals';
+import { t } from '@/lib/i18n';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
@@ -33,7 +34,7 @@ export default function InviteFriends() {
   if (!data) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Invite Friends' }} />
+        <Stack.Screen options={{ title: t('Invite Friends') }} />
         {error ? <ErrorText error={error} /> : <ThemedText themeColor="textSecondary">Loading…</ThemedText>}
       </Screen>
     );
@@ -110,7 +111,7 @@ export default function InviteFriends() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Invite Friends' }} />
+      <Stack.Screen options={{ title: t('Invite Friends') }} />
       {wide ? (
         <TwoPane side={<>{hero}{reward}{linkCard}</>} main={<>{invites}{rules}</>} sideWidth={sideColumnWidth(width)} />
       ) : (

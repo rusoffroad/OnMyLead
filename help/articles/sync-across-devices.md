@@ -25,6 +25,10 @@ Sign in with the same account on every device you use (iPhone, iPad, Android pho
 
 Your rides, chats, friends, groups, Garage, trips, Starlink setup, notification settings and profile were always kept with your account. Now your app settings and your own trails are too.
 
+:::release 2.0
+Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Sync** row on the You tab carries a **Pro** tag. Your account, rides, chats, friends and groups are on every device for free.
+:::
+
 ## What Follows Your Account
 
 **Settings**
@@ -35,6 +39,7 @@ Your rides, chats, friends, groups, Garage, trips, Starlink setup, notification 
 - **Directions**: which maps app Navigate opens. If you picked Apple Maps, an Android phone asks each time, since it doesn't have Apple Maps.
 - **Music Controls**
 - **Appearance**: Dark, Light or Match Phone, your theme and Color Blind Mode
+- **Language**: the language you picked, or Match Phone (then each device follows its own language)
 - **Tilt**: your warning angles, Warn Me, the spoken warnings, showing the tile, and Crash Alert (the Zero stays on each device)
 - **Voice**: the voice that speaks your alerts. A device that doesn't have that voice uses its best one.
 - Your saved quick replies for ride chat

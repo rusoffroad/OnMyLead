@@ -4,7 +4,7 @@ summary: Hand off to Apple Maps or Google Maps for turn-by-turn directions to th
 category: routes-maps
 order: 70
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/directions.tsx
   - app/src/core/directions.ts
@@ -22,6 +22,10 @@ OnMyLead hands you over to Apple Maps or Google Maps for turn-by-turn directions
 On Android, directions open in Google Maps, since Android phones and tablets don't have Apple Maps.
 
 Only the place you want to go is sent to the maps app, nothing about you.
+
+:::release 2.0
+Directions are a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Directions** buttons carry a **Pro** tag. Directions to a rider who taps Need Help, EMERGENCY or Mechanical Issue, or who falls behind the group, always stay free.
+:::
 
 ## Get Directions to the Meeting Point
 

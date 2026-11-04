@@ -16,6 +16,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { refreshFriends, useFriends } from '@/lib/friends';
 import { useSession } from '@/lib/session';
 import { riderTimeline, socialFeed, SocialOffError } from '@/lib/social';
+import { t } from '@/lib/i18n';
 
 const PAGE = 25;
 
@@ -84,7 +85,7 @@ export default function SocialScreen() {
     }
   };
 
-  if (!me) return <Screen><Stack.Screen options={{ title: 'Social' }} /></Screen>;
+  if (!me) return <Screen><Stack.Screen options={{ title: t('Social') }} /></Screen>;
 
   const compose = off ? null : <ComposePrompt userId={me} name={name || 'You'} pro={pro} />;
   const activity = off ? (
@@ -114,7 +115,7 @@ export default function SocialScreen() {
   if (layout.wide) {
     return (
       <>
-        <Stack.Screen options={{ title: 'Social' }} />
+        <Stack.Screen options={{ title: t('Social') }} />
         <TwoPane
           sideWidth={sideColumnWidth(layout.width)}
           side={
@@ -140,7 +141,7 @@ export default function SocialScreen() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Social' }} />
+      <Stack.Screen options={{ title: t('Social') }} />
       <View style={{ gap: 16 }}>
         {compose}
         <Segmented

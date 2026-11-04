@@ -217,8 +217,30 @@
       "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
+    "locales": {
+      "es": "./locales/es.json",
+      "pt": "./locales/pt.json",
+      "fr": "./locales/fr.json",
+      "de": "./locales/de.json",
+      "it": "./locales/it.json",
+      "ru": "./locales/ru.json",
+      "zh-Hans": "./locales/zh-Hans.json",
+      "ja": "./locales/ja.json",
+      "ko": "./locales/ko.json",
+      "hi": "./locales/hi.json",
+      "id": "./locales/id.json"
+    },
     "plugins": [
       "expo-router",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": ["en", "es", "pt", "fr", "de", "it", "ru", "zh-Hans", "ja", "ko", "hi", "id"],
+            "android": ["en", "es", "pt", "fr", "de", "it", "ru", "zh-CN", "ja", "ko", "hi", "id"]
+          }
+        }
+      ],
       [
         "expo-splash-screen",
         {

@@ -36,6 +36,10 @@ Waypoints are named spots you drop on a ride's map, such as camp, fuel, water, a
 
 Waypoints are never public. Shared ones and planned stops show only to riders on that ride.
 
+:::release 2.0
+Adding waypoints and planned stops is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, **Add Waypoint**, **Add a Waypoint**, **Add a Planned Stop** and **Add at My Location** carry a **Pro** tag. Seeing the leader's waypoints and stops on a ride, and following them in Ride Mode, stay free.
+:::
+
 ## Who Sees What
 
 - **Your waypoints**: only you see them, unless you can share (below).

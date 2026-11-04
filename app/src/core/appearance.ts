@@ -184,8 +184,8 @@ export function newerAppearance(local: Appearance, remote: Appearance): Appearan
 }
 
 /** One line for the You tab row, e.g. "Night Navy, Dark" or "Desert, Match Phone, Color Blind". */
-export function describeAppearance(a: Appearance): string {
+export function describeAppearance(a: Appearance, tr: (s: string) => string = (s) => s): string {
   const parts = [skinById(a.skin).name, MODES.find((m) => m.value === a.mode)?.label ?? 'Dark'];
   if (a.colorBlind) parts.push('Color Blind');
-  return parts.join(', ');
+  return parts.map(tr).join(', ');
 }

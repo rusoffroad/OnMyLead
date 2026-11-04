@@ -11,6 +11,7 @@ import { dayLabel, unreadLabel } from '@/core/group-chat';
 import { dmPreview, NOT_SWITCHED_ON, type DmThread } from '@/core/out-riding';
 import { myDmThreads, OutRidingOffError } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 const when = (iso: string | null) => {
   if (!iso) return '';
@@ -51,7 +52,7 @@ export default function Messages() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Messages' }} />
+      <Stack.Screen options={{ title: t('Messages') }} />
       {off ? (
         <View style={styles.note}>
           <ThemedText type="smallBold">Not Switched On Yet</ThemedText>

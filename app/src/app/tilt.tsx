@@ -17,6 +17,7 @@ import { latestMotion, motionAvailable } from '@/lib/motion';
 import {
   clearZero, setCrashSettings, setTiltLimits, setTiltShown, setTiltVoice, setTiltWarnings, useTiltSettings, zeroTilt,
 } from '@/lib/tilt';
+import { t as tr } from '@/lib/i18n';
 
 /**
  * Tilt: a roll and pitch meter (inclinometer) from the phone's motion sensors, plus the Crash Alert
@@ -30,7 +31,7 @@ export default function TiltScreen() {
 function NoSensors() {
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Tilt' }} />
+      <Stack.Screen options={{ title: tr('Tilt') }} />
       <ThemedText type="subtitle">Tilt Is in the App</ThemedText>
       <ThemedText themeColor="textSecondary">
         The roll and pitch meter and Crash Alert read the motion sensors in your phone or tablet, so they’re in the OnMyLead app for iPhone, iPad and Android, not on the website.
@@ -55,11 +56,15 @@ function TiltMeter() {
   const { limits, crash } = settings;
   const t = reading.tilt;
 
+  // Never zeroed: the meter is off until the rider calibrates it, and the button says Calibrate.
+  const calibrated = !!settings.calibration;
+  const zeroWord = calibrated ? 'Zero' : 'Calibrate';
+
   async function zero() {
     const ok = await confirmAsync(
-      'Zero the Tilt Meter',
-      'Park on flat, level ground with the phone in its mount the way you ride, then tap Zero. That reading becomes level.',
-      'Zero',
+      calibrated ? 'Zero the Tilt Meter' : 'Calibrate the Tilt Meter',
+      `Place your phone where it will be mounted, with the vehicle on flat and level ground, then press ${zeroWord} to calibrate it.`,
+      zeroWord,
       'Cancel',
     );
     if (!ok) return;
@@ -73,7 +78,7 @@ function TiltMeter() {
 
   return (
     <Screen width={sideBySide ? 'wide' : 'readable'}>
-      <Stack.Screen options={{ title: 'Tilt' }} />
+      <Stack.Screen options={{ title: tr('Tilt') }} />
       {!available ? (
         <View style={styles.notice}>
           <ThemedText type="smallBold">No Motion Sensors Found</ThemedText>
@@ -87,18 +92,18 @@ function TiltMeter() {
       />
 
       <View style={[styles.dials, sideBySide && styles.dialsRow]}>
-        <TiltDial axis="roll" angle={t?.roll ?? null} limit={limits.roll} max={[reading.max.rollLeft, reading.max.rollRight]} width={dialW} zeroed={reading.zeroed} />
-        <TiltDial axis="pitch" angle={t?.pitch ?? null} limit={limits.pitch} max={[reading.max.pitchDown, reading.max.pitchUp]} width={dialW} zeroed={reading.zeroed} />
+        <TiltDial axis="roll" angle={calibrated ? (t?.roll ?? null) : null} limit={limits.roll} max={calibrated ? [reading.max.rollLeft, reading.max.rollRight] : [0, 0]} width={dialW} zeroed={reading.zeroed} />
+        <TiltDial axis="pitch" angle={calibrated ? (t?.pitch ?? null) : null} limit={limits.pitch} max={calibrated ? [reading.max.pitchDown, reading.max.pitchUp] : [0, 0]} width={dialW} zeroed={reading.zeroed} />
       </View>
 
       <View style={styles.actions}>
-        <Button title="Zero" onPress={zero} style={{ flex: 1 }} accessibilityHint="Sets level for how the phone sits in its mount" />
-        <Button title="Reset Max" kind="secondary" onPress={resetTiltMax} style={{ flex: 1 }} />
+        <Button title={zeroWord} onPress={zero} style={{ flex: 1 }} accessibilityHint="Sets level for how the phone sits in its mount" />
+        {calibrated ? <Button title="Reset Max" kind="secondary" onPress={resetTiltMax} style={{ flex: 1 }} /> : null}
       </View>
       <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
-        {settings.calibration
+        {calibrated
           ? 'Zeroed for your mount. Zero again if you move the phone.'
-          : 'Not zeroed yet, so the reading is only rough and warnings and the rollover check are off. Mount the phone, park on level ground and tap Zero.'}
+          : 'The tilt meter is off until you calibrate it. Place your phone where it will be mounted, with the vehicle on flat and level ground, then press Calibrate.'}
         {settings.calibration ? (
           <Text onPress={clearZero} style={styles.link} accessibilityRole="button"> Clear Zero</Text>
         ) : null}

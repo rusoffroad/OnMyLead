@@ -11,6 +11,7 @@ import { allProgress, honorsHeld, LEVEL_NAME, RANKS, rankFor, type BadgeLevel, t
 import { widthClass } from '@/core/layout';
 import { fetchMyBadges, forgetRiderBadge, markBadgesSeen } from '@/lib/badges';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /**
  * Badges: your rank and every badge, earned or not, with how far you are from the next level.
@@ -50,7 +51,7 @@ export default function BadgesScreen() {
   if (!session) {
     return (
       <Screen width="readable">
-        <Stack.Screen options={{ title: 'Badges' }} />
+        <Stack.Screen options={{ title: t('Badges') }} />
         <ThemedText themeColor="textSecondary">Sign in to earn badges for the rides you lead, join and finish.</ThemedText>
       </Screen>
     );
@@ -59,7 +60,7 @@ export default function BadgesScreen() {
   if (mine === undefined && !error) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Badges' }} />
+        <Stack.Screen options={{ title: t('Badges') }} />
         <ActivityIndicator color={Colors.text} style={{ marginTop: Spacing.five }} />
       </Screen>
     );
@@ -68,7 +69,7 @@ export default function BadgesScreen() {
   if (mine === null) {
     return (
       <Screen width="readable">
-        <Stack.Screen options={{ title: 'Badges' }} />
+        <Stack.Screen options={{ title: t('Badges') }} />
         <ThemedText themeColor="textSecondary">Badges start working with the next server update.</ThemedText>
       </Screen>
     );
@@ -82,7 +83,7 @@ export default function BadgesScreen() {
 
   return (
     <Screen width={columns > 1 ? 'wide' : 'page'}>
-      <Stack.Screen options={{ title: 'Badges' }} />
+      <Stack.Screen options={{ title: t('Badges') }} />
       {honors.map((h) => (
         <HonorCard key={h.key} h={h} fresh={fresh.has(h.key)} />
       ))}

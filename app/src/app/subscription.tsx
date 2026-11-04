@@ -11,6 +11,7 @@ import { manageSubscription, redeemOfferCode, restore } from '@/lib/purchases';
 import { useSession } from '@/lib/session';
 import { PlanStatus } from '@/components/pro-plan';
 import { deviceStore, manageTarget, otherStoreBlock, restoreMessage } from '@/core/purchases';
+import { t } from '@/lib/i18n';
 
 /** Profile > Settings > Subscription: your plan, this month's rides, and the store's subscription controls. */
 export default function SubscriptionScreen() {
@@ -49,7 +50,7 @@ export default function SubscriptionScreen() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Subscription' }} />
+      <Stack.Screen options={{ title: t('Subscription') }} />
 
       {ent.switchedOn ? (
         <PlanStatus ent={ent} />

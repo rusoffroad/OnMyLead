@@ -59,6 +59,19 @@ async function readContext(): Promise<TrackContext> {
   return raw ? JSON.parse(raw) : { rideId: null, lastMovedAt: null };
 }
 
+/** True while this phone is sharing its location on a group ride (Map Mode's Free clock doesn't run then). */
+export async function sharingOnRide(): Promise<boolean> {
+  try {
+    const ctx = await readContext();
+    if (!ctx.rideId) return false;
+    if (ctx.until != null && ctx.until < Date.now()) return false;
+    if (Platform.OS === 'web') return true;
+    return await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK);
+  } catch {
+    return false;
+  }
+}
+
 async function writeContext(ctx: TrackContext) {
   await AsyncStorage.setItem(CONTEXT_KEY, JSON.stringify(ctx));
 }
