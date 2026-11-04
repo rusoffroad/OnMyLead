@@ -186,7 +186,8 @@ Review notes (paste as is):
 >
 > Contact Us (You > Contact Us, and onmylead.com/contact) sends a message to the developer.
 >
-> CarPlay is not included in this version.
+> CarPlay is included from version 2.1 (Driving Task entitlement granted 2026-11-04). App Review
+> may ask how to try it: start a ride in Ride Mode, then open OnMyLead on the CarPlay screen.
 
 ## Screenshots
 

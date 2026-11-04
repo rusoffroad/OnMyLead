@@ -3182,6 +3182,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "地図にパークトレイルを表示",
   "Showing the trails of offroad parks, colored by the park’s level": "オフロードパークのトレイルを、パークのレベルごとに色分けして表示しています",
   "Hidden. Offroad park trails stay off every map": "非表示。パークトレイルはどの地図にも表示されません",
+  // CarPlay
+  " (Leader)": "（リーダー）",
+  "A rider is separated": "はぐれたライダーがいます",
+  "Group Together": "グループはまとまっています",
+  "No Ride Running": "ライド中ではありません",
+  "Open Ride Mode on your phone and your group shows up here.": "スマートフォンでライドモードを開くと、ここにグループが表示されます。",
+  "Group": "グループ",
+  "Nobody Is Sharing Yet": "まだ誰も共有していません",
+  "Send EMERGENCY with your location to everyone on the ride?": "ライドの全員に位置情報付きで緊急通知を送りますか？",
+  "Running Late": "遅れます",
+  "Need a Minute": "少し待って",
 };
 
 export default dict;

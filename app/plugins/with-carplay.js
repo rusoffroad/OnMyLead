@@ -1,12 +1,15 @@
 // CarPlay screen for Ride Mode (native code: modules/onmylead-carplay).
 //
-// A CarPlay app needs an Apple-granted entitlement. Apple gives it only to paid developer
-// accounts that request it (category: Driving Task), and a free Apple ID cannot sign an app
-// that has it, so this stays off for the phone build until Apple grants it.
+// A CarPlay app needs an Apple-granted entitlement. Apple granted CarPlay Driving Task to the
+// RUS Offroad LLC team on 2026-11-04, so app.json turns this on ("enabled": true) for the
+// store build. A build signed by another team (a free Apple ID) can't carry the entitlement:
+// set ONMYLEAD_CARPLAY=0 for that build to leave CarPlay out. ONMYLEAD_CARPLAY=1 still forces
+// it on for a one-off build.
 //
-// Turn it on with "enabled": true on this plugin in app.json once Apple has granted the
-// entitlement, or ONMYLEAD_CARPLAY=1 for a one-off build (the Xcode Simulator's CarPlay
-// window works without Apple's grant).
+// The window scene keeps UIApplicationSupportsMultipleScenes false (with-scene-lifecycle): the
+// CarPlay scene connects anyway, and true would let iPad open a second app window, which the
+// app (one React Native root) doesn't support. If the CarPlay Simulator ever fails to show the
+// app with false, that is the switch to look at.
 //
 // Keep this plugin listed BEFORE ./plugins/with-scene-lifecycle in app.json: Info.plist mods
 // run in reverse order, so this runs after that plugin has written the scene manifest.
@@ -16,7 +19,8 @@ const ENTITLEMENT = 'com.apple.developer.carplay-driving-task';
 const CARPLAY_ROLE = 'CPTemplateApplicationSceneSessionRoleApplication';
 
 module.exports = function withCarPlay(config, { enabled = false } = {}) {
-  const on = enabled || process.env.ONMYLEAD_CARPLAY === '1';
+  const flag = process.env.ONMYLEAD_CARPLAY;
+  const on = flag === '0' ? false : enabled || flag === '1';
 
   config = withEntitlementsPlist(config, (c) => {
     if (on) c.modResults[ENTITLEMENT] = true;
@@ -28,7 +32,6 @@ module.exports = function withCarPlay(config, { enabled = false } = {}) {
     const manifest = c.modResults.UIApplicationSceneManifest ?? { UISceneConfigurations: {} };
     manifest.UISceneConfigurations = manifest.UISceneConfigurations ?? {};
     if (on) {
-      manifest.UIApplicationSupportsMultipleScenes = true;
       manifest.UISceneConfigurations[CARPLAY_ROLE] = [
         {
           UISceneClassName: 'CPTemplateApplicationScene',

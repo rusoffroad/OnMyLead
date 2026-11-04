@@ -2,7 +2,7 @@
 //   - ios/, android/, .env files, keystores, service-account keys and google-services.json with
 //     secrets are never committed;
 //   - config plugins with-scene-lifecycle and with-push-entitlement stay before expo-notifications;
-//   - CarPlay stays off in app.json (it is turned on per build with ONMYLEAD_CARPLAY=1);
+//   - with-carplay stays before with-scene-lifecycle (Info.plist mods run in reverse order);
 //   - both apps keep the same identifier, com.rusoffroad.onmylead.app.
 // Usage: node scripts/ci/check-config.mjs
 import { execFileSync } from 'node:child_process';
@@ -37,8 +37,8 @@ for (const name of ['./plugins/with-scene-lifecycle', './plugins/with-push-entit
   if (i < 0) errors.push(`app.json: plugin ${name} is missing.`);
   else if (notifications >= 0 && i > notifications) errors.push(`app.json: ${name} must stay before expo-notifications.`);
 }
-const carplay = plugins.find(([n]) => n === './plugins/with-carplay');
-if (carplay?.[1]?.enabled) errors.push('app.json: with-carplay is enabled. CarPlay stays off until Apple grants the entitlement (build with ONMYLEAD_CARPLAY=1 instead).');
+const carplayAt = at('./plugins/with-carplay');
+if (carplayAt >= 0 && carplayAt > at('./plugins/with-scene-lifecycle')) errors.push('app.json: ./plugins/with-carplay must stay before ./plugins/with-scene-lifecycle (it adds the CarPlay scene to that manifest).');
 if (app.ios?.bundleIdentifier !== ID) errors.push(`app.json: ios.bundleIdentifier must stay ${ID}.`);
 if (app.android?.package !== ID) errors.push(`app.json: android.package must stay ${ID}.`);
 

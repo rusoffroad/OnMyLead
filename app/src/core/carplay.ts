@@ -4,11 +4,14 @@
  * to: the group's state as the title, one-tap status and reply buttons, the group list, and
  * an alert when someone falls out of the Ride Bubble.
  */
+import { tc } from './i18n';
 
 export type CarPlayButton = { id: string; title: string; symbol: string };
 export type CarPlayRow = { title: string; detail: string };
 export type CarPlayState = {
   title: string;
+  /** The car screen's fixed words in the rider's language (CarPlayBridge.swift falls back to English). */
+  labels: CarPlayLabels;
   buttons: CarPlayButton[];
   riders: CarPlayRow[];
   /** Shown once per id as a CarPlay alert. */
@@ -24,6 +27,35 @@ export type CarPlayInput = {
   riders: CarPlayRow[];
   helpCalls: { name: string; status: string }[];
 };
+
+export type CarPlayLabels = {
+  waitingTitle: string;
+  waitingDetail: string;
+  group: string;
+  nobodySharing: string;
+  confirmEmergency: string;
+  alertGroup: string;
+  cancel: string;
+  ok: string;
+};
+
+/** The words on CarPlay screens the phone doesn't build per ride (the waiting screen, the group list, alerts). */
+export function carPlayLabels(): CarPlayLabels {
+  return {
+    waitingTitle: tc('No Ride Running'),
+    waitingDetail: tc('Open Ride Mode on your phone and your group shows up here.'),
+    group: tc('Group'),
+    nobodySharing: tc('Nobody Is Sharing Yet'),
+    confirmEmergency: tc('Send EMERGENCY with your location to everyone on the ride?'),
+    alertGroup: tc('Alert My Group'),
+    cancel: tc('Cancel'),
+    ok: tc('OK'),
+  };
+}
+
+/** Every button title, so tests can check each language has them. */
+export const CARPLAY_BUTTON_TITLES = (): string[] =>
+  [GROUP_BUTTON, ...CARPLAY_STATUS_BUTTONS, ...CARPLAY_REPLY_BUTTONS, REGROUP_BUTTON, EMERGENCY_BUTTON].map((b) => b.title);
 
 /** Button ids the phone acts on. Status ids match rider_statuses kinds. */
 export const CARPLAY_STATUS_BUTTONS: CarPlayButton[] = [
@@ -44,10 +76,10 @@ export const EMERGENCY_BUTTON: CarPlayButton = { id: 'emergency', title: 'EMERGE
 export function carPlayState(i: CarPlayInput): CarPlayState {
   const alerts = i.watchesBubble ? i.separated : [];
   const title = alerts.length
-    ? `${alerts.length} Separated`
+    ? tc('{n} Separated', { n: alerts.length })
     : i.helpCalls.length
       ? `${i.helpCalls[0].name}: ${i.helpCalls[0].status}`
-      : 'Group Together';
+      : tc('Group Together');
   const buttons = [
     GROUP_BUTTON,
     ...CARPLAY_STATUS_BUTTONS,
@@ -62,7 +94,9 @@ export function carPlayState(i: CarPlayInput): CarPlayState {
     : alerts.length
       ? { id: `sep:${alerts.map((a) => a.riderId).sort().join(',')}`, text: alerts[0].message }
       : null;
-  return { title: `${i.rideName} · ${title}`.slice(0, 60), buttons: buttons.slice(0, 8), riders: i.riders, alert };
+  // Button ids stay English (the phone acts on them); only the titles are translated.
+  const shown = buttons.slice(0, 8).map((b) => ({ ...b, title: tc(b.title) }));
+  return { title: `${i.rideName} · ${title}`.slice(0, 60), labels: carPlayLabels(), buttons: shown, riders: i.riders, alert };
 }
 
 /** What a CarPlay button press means for Ride Mode. */

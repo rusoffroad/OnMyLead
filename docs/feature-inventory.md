@@ -11,7 +11,7 @@ Per-device status for each feature: `docs/feature-parity.md`.
 | App | One Expo SDK 57 + Expo Router codebase (React Native 0.86, TypeScript). Builds the iPhone app, could build Android today, and exports the website. No `ios/` or `android/` in git (prebuild). | `app/` |
 | Shared logic | Pure TypeScript rules with vitest tests (bubble, sharing, fuel, joining, entitlements, help...) | `app/src/core/` |
 | Platform code | 20 `*.web.ts(x)` files; no `*.ios` / `*.android` files; ~77 `Platform.OS` branches (mostly web vs native) | `app/src/lib/`, `app/src/components/` |
-| Native extras | CarPlay Expo module (Swift, Apple only, off); config plugins: Starlink local network (iOS + Android), CarPlay, Sentry, scene lifecycle, push entitlement | `app/modules/`, `app/plugins/` |
+| Native extras | CarPlay Expo module (Swift, Apple only, on from 2.1); config plugins: Starlink local network (iOS + Android), CarPlay, Sentry, scene lifecycle, push entitlement | `app/modules/`, `app/plugins/` |
 | Backend | One Supabase project: 29 migrations, RLS on every table, realtime, pg_net, pg_cron, Vault | `supabase/migrations/` |
 | Edge functions | notify-ride-message, appstore-verify, appstore-notifications, admin-api, admin-integrations, store-downloads, store-reviews, store-releases, contact-form, delete-account | `supabase/functions/` |
 | Database tests | 18 SQL test files + a concurrency test on real Postgres | `supabase/tests/` |
@@ -95,8 +95,9 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   announcement read aloud, Regroup Here, Navigate to a rider, Mechanical Issue spoken to leaders.
 - Emergency sheet: Alert My Group (hold), Call 911.
 - Keep-awake, speech, haptics, route progress strip, directions sheet, add waypoint.
-- CarPlay ride screen **[iOS-only]**, switched off until Apple grants the entitlement. No Android
-  Auto.
+- CarPlay ride screen **[iOS-only]** (2.1; Apple granted the Driving Task entitlement 2026-11-04):
+  status buttons, Group list, Regroup Here or Running Late, EMERGENCY with confirm, help-call and
+  separation alerts, in the app's language. No Android Auto.
 
 - Bluetooth Sharing mesh (2.1): with no service, Ride Mode passes spots (sharing riders), status
   taps incl. EMERGENCY, quick replies and typed messages (in parts) between riders on the ride over

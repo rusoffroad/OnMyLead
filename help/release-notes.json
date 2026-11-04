@@ -3,7 +3,7 @@
     "version": "2.1",
     "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
-    "whatsNew": "What's new in 2.1:\n\n• New rider dot with the arrow built in; leader blue, tail gunner violet.\n• Map zooms in at intersections, then back out.\n• Edit Ride Details later.\n• Bluetooth Sharing: no service? Your ride still gets your spot, taps, EMERGENCY and messages, phone to phone.\n• Badge Leaderboard: your rank everywhere or in your state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint.\n• Map Features: roads, hiking, land.",
+    "whatsNew": "What's new in 2.1:\n\n• New rider dot with the arrow built in; leader blue, tail gunner violet.\n• Map zooms in at intersections, then back out.\n• Edit Ride Details later.\n• Bluetooth Sharing: no service? Your ride still gets your spot, taps, EMERGENCY and messages, phone to phone.\n• Badge Leaderboard: your rank everywhere or in your state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint.\n• Map Features: roads, hiking, land.\n• CarPlay support.",
     "apple": null,
     "google": null,
     "notes": [
@@ -82,6 +82,10 @@
       {
         "kind": "improved",
         "text": "Home fits on one screen: Join a Ride, Create a Ride, Find a Ride, Events and Map Mode are all on the first screen without scrolling, with Events right under Create and Find. The cards are shorter, and Track Line is a small switch in the corner of the Map Mode card."
+      },
+      {
+        "kind": "new",
+        "text": "CarPlay: plug your iPhone into a CarPlay car (or connect wirelessly) during a ride and OnMyLead shows on the car screen. One tap sends OK, Stopped, Need Fuel, Mechanical Issue or Need Help to the group, Regroup Here (organizer and leader) or Running Late, and EMERGENCY asks once before it alerts everyone. Group lists every rider, and the leader and tail gunner get an alert on the car screen when someone falls behind. Open Ride Mode on your phone first; the car screen follows it."
       }
     ]
   },
