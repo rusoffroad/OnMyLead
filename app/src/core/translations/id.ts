@@ -1,6 +1,18 @@
 // Indonesian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Balas",
+  "Unlike comment": "Batal suka komentar",
+  "Like comment": "Suka komentar",
+  "Reply to {authorName}": "Balas {authorName}",
+  "yourself": "diri sendiri",
+  "Replying to {name}": "Membalas {name}",
+  "Cancel reply": "Batalkan balasan",
+  "Post reply": "Kirim balasan",
+  "posted a photo": "memposting foto",
+  "{name}’s photo. Opens it in Social": "Foto {name}. Membukanya di Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Berkomentar dan membalas adalah bagian dari OnMyLead Pro. Membaca dan menyukai tetap gratis.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Belum ada yang baru. Saat teman memposting foto, riding, mendapat lencana, atau membagikan jalur, akan muncul di sini.",
   "Language": "Bahasa",
   "Change language": "Ganti bahasa",
   "Map Mode. Open your offroad map": "Mode Peta. Buka peta offroad kamu",

@@ -1,6 +1,18 @@
 // Chinese (Simplified). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "回复",
+  "Unlike comment": "取消点赞评论",
+  "Like comment": "点赞评论",
+  "Reply to {authorName}": "回复 {authorName}",
+  "yourself": "自己",
+  "Replying to {name}": "正在回复 {name}",
+  "Cancel reply": "取消回复",
+  "Post reply": "发布回复",
+  "posted a photo": "发布了一张照片",
+  "{name}’s photo. Opens it in Social": "{name} 的照片。在 Social 中打开",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "评论和回复属于 OnMyLead Pro。阅读和点赞仍然免费。",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "还没有新动态。当好友发布照片、骑行、获得徽章或分享路线时，会显示在这里。",
   "Language": "语言",
   "Change language": "更改语言",
   "Map Mode. Open your offroad map": "地图模式。打开你的越野地图",

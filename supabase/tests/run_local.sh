@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the migrations, then the privacy, approval and ride limit, riding group, group chat, Pro, report, admin analytics, admin, clear/resolve, waypoint, planned stop, waypoint symbol, status button, block, social profile, contact form, Help Center, Google Play Billing, admin growth, store reviews, release controls, badge, Out Riding, Navigation Mode trail, custom share code, profile photo, notification inbox, ride miles, home feed, rider agreement, abuse report, social, event, trail width, Brand Ambassador, referral, account sync and Pro tier and badge leaderboard Bluetooth Sharing, Bluetooth mesh, Edit Ride Details and event presenter, waypoint alert and Scout (riding spots) tests, against a throwaway local Postgres database.
+# Runs the migrations, then the privacy, approval and ride limit, riding group, group chat, Pro, report, admin analytics, admin, clear/resolve, waypoint, planned stop, waypoint symbol, status button, block, social profile, contact form, Help Center, Google Play Billing, admin growth, store reviews, release controls, badge, Out Riding, Navigation Mode trail, custom share code, profile photo, notification inbox, ride miles, home feed, rider agreement, abuse report, social, comment like and reply, event, trail width, Brand Ambassador, referral, account sync and Pro tier and badge leaderboard Bluetooth Sharing, Bluetooth mesh, Edit Ride Details and event presenter, waypoint alert and Scout (riding spots) tests, against a throwaway local Postgres database.
 # Runs the migrations, then the privacy, approval and ride limit, riding group, group chat, Pro, report, admin analytics, admin, clear/resolve, waypoint, planned stop, waypoint symbol, status button, block, social profile, contact form, Help Center, Google Play Billing, admin growth, store reviews, release controls, badge, Out Riding, Navigation Mode trail, Park Trails, custom share code, profile photo, notification inbox, ride miles, home feed, rider agreement, abuse report, social, event, trail width, Brand Ambassador, referral, account sync and Pro tier and badge leaderboard Bluetooth Sharing, Bluetooth mesh, Edit Ride Details and event presenter and waypoint alert tests, against a throwaway local Postgres database.
 # Usage: PGHOST=... PGPORT=... PGUSER=postgres ./supabase/tests/run_local.sh
 set -euo pipefail
@@ -43,6 +43,7 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/rider_agreement_test.sql" \
   -f "$here/abuse_reports_test.sql" \
   -f "$here/social_hub_test.sql" \
+  -f "$here/comment_replies_test.sql" \
   -f "$here/events_test.sql" \
   -f "$here/trail_widths_test.sql" \
   -f "$here/brand_ambassador_test.sql" \

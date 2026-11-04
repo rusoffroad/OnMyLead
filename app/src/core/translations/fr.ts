@@ -1,6 +1,18 @@
 // French. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Répondre",
+  "Unlike comment": "Je n’aime plus ce commentaire",
+  "Like comment": "J’aime ce commentaire",
+  "Reply to {authorName}": "Répondre à {authorName}",
+  "yourself": "vous-même",
+  "Replying to {name}": "Réponse à {name}",
+  "Cancel reply": "Annuler la réponse",
+  "Post reply": "Publier la réponse",
+  "posted a photo": "a publié une photo",
+  "{name}’s photo. Opens it in Social": "Photo de {name}. L’ouvre dans Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Commenter et répondre font partie d’OnMyLead Pro. Lire et aimer restent gratuits.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Rien de nouveau. Quand vos amis publient des photos, roulent, gagnent des badges ou partagent des pistes, ça s’affiche ici.",
   "Language": "Langue",
   "Change language": "Changer de langue",
   "Map Mode. Open your offroad map": "Mode Carte. Ouvrir votre carte tout-terrain",

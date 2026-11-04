@@ -1,6 +1,6 @@
 ---
 title: Like, Comment and Post in Social
-summary: See everything your friends are up to, like and comment on rides, badges and trails, post ride reports with a photo, and share to Facebook, Instagram or X.
+summary: See everything your friends are up to, like and comment on rides, badges and trails, like and reply to comments, post ride reports with a photo, and share to Facebook, Instagram or X.
 category: groups
 order: 27
 release: "2.0"
@@ -17,8 +17,10 @@ sources:
   - app/src/lib/share-activity.ts
   - app/src/lib/share-activity.web.ts
   - supabase/migrations/20261102900000_social_hub.sql
+  - supabase/migrations/20261104220000_comment_likes_replies.sql
+  - app/src/components/home/feed.tsx
 related: [home-screen, friends, profile-picture, free-vs-pro, report-and-block, notification-settings, privacy]
-keywords: [social, timeline, feed, like, likes, heart, comment, comments, post, ride report, photo, profile, rider profile, pro badge, pro tag, share, facebook, instagram, x, twitter, share card, friends activity]
+keywords: [social, timeline, feed, like, likes, heart, comment, comments, reply, replies, like a comment, reply to a comment, photos, post, ride report, photo, profile, rider profile, pro badge, pro tag, share, facebook, instagram, x, twitter, share card, friends activity]
 ---
 
 **Social** is where you see everything your friends and the riders you follow have been up to: finished rides, badges, shared trails, group rides and posts. You can like anything, read every comment, and open any rider's profile.
@@ -37,6 +39,16 @@ On a phone, Social has three tabs: **Activity** (everyone's posts), **Friends** 
 - Type in the box at the bottom (up to 500 characters) and tap the red arrow.
 
 You can delete your own comments. You can also delete any comment on your own posts, rides, badges and trails.
+
+:::release 2.1
+## Like and Reply to Comments
+
+- Tap **Like** under a comment to like it. The heart turns red and shows how many riders liked it. Tap it again to take the like back.
+- Tap **Reply** under a comment. "Replying to" and the rider's name show above the box; type your reply and tap the red arrow. Tap **✕** to go back to a plain comment.
+- Replies sit under the comment they answer, a step in. Replying to a reply keeps it in the same conversation and starts it with **@** and the name of the rider you answered.
+
+The rider whose comment you like or answer gets a notification. Deleting a comment deletes its replies too.
+:::
 
 ## Post on Your Profile
 
@@ -78,6 +90,10 @@ On the website, **Share Picture** opens your browser's share menu. If your brows
 | Comment | No | Yes |
 | Post on your profile | No | Yes |
 | Share to Facebook, Instagram and X | No | Yes |
+
+:::release 2.1
+Liking a comment is free. Replying to a comment is part of commenting, so it needs Pro.
+:::
 
 Riders with Pro (or the Pro Trial) show a gold **PRO** tag next to their name. See [Free and Pro](/help/free-vs-pro).
 

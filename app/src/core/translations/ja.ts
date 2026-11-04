@@ -1,6 +1,18 @@
 // Japanese. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "返信",
+  "Unlike comment": "コメントのいいねを取り消す",
+  "Like comment": "コメントにいいね",
+  "Reply to {authorName}": "{authorName} に返信",
+  "yourself": "自分",
+  "Replying to {name}": "{name} に返信中",
+  "Cancel reply": "返信をキャンセル",
+  "Post reply": "返信を投稿",
+  "posted a photo": "写真を投稿しました",
+  "{name}’s photo. Opens it in Social": "{name} の写真。Social で開きます",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "コメントと返信は OnMyLead Pro の機能です。閲覧といいねは無料のままです。",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "まだ新着はありません。友達が写真を投稿したり、走ったり、バッジを獲得したり、トレイルを共有したりすると、ここに表示されます。",
   "Language": "言語",
   "Change language": "言語を変更",
   "Map Mode. Open your offroad map": "マップモード。オフロードマップを開く",

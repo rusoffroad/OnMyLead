@@ -1,6 +1,18 @@
 // Korean. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "답글",
+  "Unlike comment": "댓글 좋아요 취소",
+  "Like comment": "댓글 좋아요",
+  "Reply to {authorName}": "{authorName}에게 답글",
+  "yourself": "나",
+  "Replying to {name}": "{name}에게 답글 작성 중",
+  "Cancel reply": "답글 취소",
+  "Post reply": "답글 게시",
+  "posted a photo": "사진을 게시했습니다",
+  "{name}’s photo. Opens it in Social": "{name}의 사진. Social에서 엽니다",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "댓글과 답글은 OnMyLead Pro 기능입니다. 읽기와 좋아요는 계속 무료입니다.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "아직 새 소식이 없습니다. 친구가 사진을 올리거나 라이딩하거나 배지를 받거나 트레일을 공유하면 여기에 표시됩니다.",
   "Language": "언어",
   "Change language": "언어 변경",
   "Map Mode. Open your offroad map": "지도 모드. 오프로드 지도 열기",

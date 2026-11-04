@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_MAP_FEATURES, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_MAP_FEATURES, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -344,7 +344,7 @@ export function Showcase() {
               <Feature title="Badge Leaderboard">See where you rank against riders everywhere, in your country or in your state, by the badge levels you’ve earned. Pick where you ride from, or switch off Show Me to stay off the board. It only ever shows your state or country, never where you are.</Feature>
               <Feature title="Out Riding">At a park for the weekend? Switch on Out Riding to see which riders you know are out near you, or anyone nearby who chose the same, and message them. Riders see roughly how far away you are, never where, and it turns itself off.</Feature>
               <Feature title="Your Feed">See what your friends, the leaders you follow and your riding groups have been riding, the badges they earned and the trails they shared, right on Home. Pick whose posts you see and who sees yours, from friends only to nobody.</Feature>
-              <Feature title="Social: Like, Comment and Post">Like any ride, badge, trail or post in your Feed, and open Social to see all your friends’ activity and every comment. Pro riders post ride reports and photos to their profile, comment, and share their rides and badges to Facebook, Instagram or X with one tap. Tap anyone’s picture to see it full size. Your location never goes in a post or a share.</Feature>
+              <Feature title="Social: Like, Comment and Post">Like any ride, badge, trail or post in your Feed, and open Social to see all your friends’ activity and every comment. Pro riders post ride reports and photos to their profile, comment, and share their rides and badges to Facebook, Instagram or X with one tap. Tap anyone’s picture to see it full size.{SHOWCASE_COMMENT_REPLIES ? ' Like any comment, reply to keep the conversation going, and see friends’ photos right in your Feed.' : ''} Your location never goes in a post or a share.</Feature>
               <Feature title="Friends">Add the riders you ride with as friends, or share your friend link. Friends see each other when they’re out riding nearby and can message any time, without ever sharing where they are.</Feature>
               <Feature title="Profile Pictures">Take a photo or pick one from your library, cropped square and shrunk to a small file. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
               <Feature title="Pick Your Own Code">Give your ride, riding group or friend link a code that’s easy to say at the trailhead, like MOAB-2026. OnMyLead checks as you type that nobody else has it.</Feature>

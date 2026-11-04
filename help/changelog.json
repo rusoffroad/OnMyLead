@@ -2,6 +2,19 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "social",
+      "home-screen",
+      "notification-settings",
+      "free-vs-pro"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "comment-likes-replies",
+    "why": "Chris asked to like and reply to comments, and to see friends' photos and posts on every feed. Social now explains Like and Reply under each comment and that replying needs Pro; Home Screen says friends' post photos show in the Feed; Notification Settings covers likes and replies on your comments; Free and Pro says comment likes are free. Publishes with 2.1."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "carplay",
       "ride-mode",
       "language",
