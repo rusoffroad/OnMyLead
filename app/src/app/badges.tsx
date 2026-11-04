@@ -118,12 +118,12 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
     <View
       style={styles.rank}
       accessible
-      accessibilityLabel={t('Your rank is {name}. {levels} badge levels earned.{v}', { name: rank.name, levels: rank.levels, v: rank.next ? ` ${toGo} more for ${rank.next.name}.` : '' })}>
+      accessibilityLabel={t('Your rank is {name}. {levels} badge levels earned', { name: t(rank.name), levels: rank.levels }) + (rank.next ? t('. {toGo} more for {name}.', { toGo, name: t(rank.next.name) }) : t('. The top rank.'))}>
       <ThemedText type="small" themeColor="textSecondary">{t('Your Rank')}</ThemedText>
-      <Text style={styles.rankName}>{rank.name}</Text>
+      <Text style={styles.rankName}>{t(rank.name)}</Text>
       <ThemedText themeColor="textSecondary">
         {rank.levels === 1 ? t('1 badge level earned') : t('{levels} badge levels earned', { levels: rank.levels })}
-        {rank.next ? t('. {toGo} more for {name}.', { toGo, name: rank.next.name }) : t('. The top rank.')}
+        {rank.next ? t('. {toGo} more for {name}.', { toGo, name: t(rank.next.name) }) : t('. The top rank.')}
       </ThemedText>
       <View style={styles.ladder}>
         {RANKS.map((r, i) => (
@@ -158,14 +158,14 @@ function LeaderboardLink() {
 /** An honor OnMyLead gave you (Brand Ambassador): the big blue patch, above your rank. */
 function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
   return (
-    <View style={[styles.honor, { borderColor: h.key === 'founder' ? FOUNDER_COLORS.cloth : AMBASSADOR_COLORS.cloth }, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${h.name}${fresh ? t(', new') : ''}. ${h.what}.`}>
+    <View style={[styles.honor, { borderColor: h.key === 'founder' ? FOUNDER_COLORS.cloth : AMBASSADOR_COLORS.cloth }, fresh && { borderColor: AMBASSADOR_COLORS.arrow }]} accessible accessibilityLabel={`${t(h.name)}${fresh ? t(', new') : ''}. ${t(h.what)}.`}>
       <BadgePatch badge={h.key} level={1} size={88} />
       <View style={{ flex: 1, gap: 4 }}>
         <View style={[styles.titleRow, { alignItems: 'flex-start' }]}>
-          <Text style={styles.honorName}>{h.name}</Text>
+          <Text style={styles.honorName}>{t(h.name)}</Text>
           {fresh ? <Text style={[styles.fresh, { backgroundColor: AMBASSADOR_COLORS.arrow, color: '#FFFFFF' }]}>{t('New')}</Text> : null}
         </View>
-        <ThemedText themeColor="textSecondary">{t('{what}. Riders see it beside your name.', { what: h.what })}</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('{what}. Riders see it beside your name.', { what: t(h.what) })}</ThemedText>
       </View>
     </View>
   );
@@ -173,21 +173,21 @@ function HonorCard({ h, fresh }: { h: HonorDef; fresh: boolean }) {
 
 function BadgeCard({ p, fresh, grid }: { p: BadgeProgress; fresh: boolean; grid: boolean }) {
   const earned = p.level > 0;
-  const levelName = earned ? LEVEL_NAME[p.level as BadgeLevel] : t('Not Earned Yet');
+  const levelName = earned ? t(LEVEL_NAME[p.level as BadgeLevel]) : t('Not Earned Yet');
   const barColor = earned && p.goal == null ? PATCH_COLORS[3].cloth : earned ? PATCH_COLORS[p.level as BadgeLevel].cloth : Colors.textSecondary;
   return (
     <View
       style={[styles.card, grid && styles.gridCell, fresh && styles.cardFresh]}
       accessible
-      accessibilityLabel={`${p.def.name}, ${levelName}${fresh ? t(', new') : ''}. ${p.def.what}. ${p.line}.`}>
+      accessibilityLabel={`${t(p.def.name)}, ${levelName}${fresh ? t(', new') : ''}. ${t(p.def.what)}. ${p.line}.`}>
       <BadgePatch badge={p.def.key} level={p.level} size={64} />
       <View style={{ flex: 1, gap: 4 }}>
         <View style={styles.titleRow}>
-          <Text style={[styles.name, !earned && { color: Colors.textSecondary }]} numberOfLines={1}>{p.def.name}</Text>
+          <Text style={[styles.name, !earned && { color: Colors.textSecondary }]} numberOfLines={1}>{t(p.def.name)}</Text>
           {fresh ? <Text style={styles.fresh}>{t('New')}</Text> : null}
         </View>
         <Text style={[styles.level, earned && { color: PATCH_COLORS[p.level as BadgeLevel].cloth }]}>{levelName}</Text>
-        <ThemedText type="small" themeColor="textSecondary">{p.def.what}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t(p.def.what)}</ThemedText>
         <View style={styles.track}>
           <View style={[styles.fill, { width: `${Math.round(p.fraction * 100)}%`, backgroundColor: barColor }]} />
         </View>

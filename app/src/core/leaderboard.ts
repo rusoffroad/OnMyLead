@@ -94,7 +94,7 @@ export function parseSettings(raw: unknown): LeaderSettings {
 export function rankName(levels: number): string {
   let name: string = RANKS[0].name;
   for (const r of RANKS) if (levels >= r.min) name = r.name;
-  return name;
+  return tc(name);
 }
 
 /** "Everywhere", "United States", "Texas". */
@@ -111,9 +111,9 @@ export function startingFilter(s: LeaderSettings | null): LeaderFilter {
 
 /** "12 levels: 2 Gold, 3 Silver, 2 Bronze" for screen readers and the row's second line. */
 export function levelsLine(r: Pick<LeaderRow, 'levels' | 'gold' | 'silver' | 'bronze'>): string {
-  const parts = [r.gold && `${r.gold} Gold`, r.silver && `${r.silver} Silver`, r.bronze && `${r.bronze} Bronze`].filter(Boolean);
-  const lv = r.levels === 1 ? '1 level' : `${r.levels} levels`;
-  return parts.length ? `${lv}: ${parts.join(', ')}` : lv;
+  const parts = [r.gold && tc('{n} Gold', { n: r.gold }), r.silver && tc('{n} Silver', { n: r.silver }), r.bronze && tc('{n} Bronze', { n: r.bronze })].filter(Boolean);
+  const lv = r.levels === 1 ? tc('1 level') : tc('{n} levels', { n: r.levels });
+  return parts.length ? tc('{lv}: {parts}', { lv, parts: parts.join(', ') }) : lv;
 }
 
 /** "1st", "2nd", "3rd", "11th", "22nd". */
