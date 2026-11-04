@@ -36,7 +36,8 @@ export async function snapshotForShare(
 
 function discard(uri: string) {
   try {
-    new File(uri).delete();
+    // react-native-view-shot hands back a bare path on iOS; File wants a file:// address.
+    new File(uri.startsWith('file://') ? uri : `file://${uri}`).delete();
   } catch {
     // A temp file the OS clears later.
   }

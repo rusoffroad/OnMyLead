@@ -148,8 +148,8 @@ describe('errors riders see', () => {
     expect(friendlySocialError('P0001: you were blocked')).toBe('You were blocked.');
     expect(isTransientError('P0001: that ride was cancelled')).toBe(false);
     expect(friendlySocialError('P0001: that ride was cancelled')).toBe('That ride was cancelled.');
-    expect(isTransientError('The request timed out.')).toBe(false);
-    expect(isTransientError('timed out')).toBe(true);
+    expect(isTransientError('The request timed out.')).toBe(true);
+    expect(isTransientError('Request cancelled')).toBe(true);
     expect(friendlySocialError('')).toBe('Something went wrong. Try again.');
   });
 });

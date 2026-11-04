@@ -2967,7 +2967,6 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Le nom doit faire moins de {v} caractères.',
   'Check the departure time.': 'Vérifiez l’heure de départ.',
   'Check the expected finish time.': 'Vérifiez l’heure de retour prévue.',
-  'Pick the meeting point on the map first.': 'Choisissez d’abord le point de rendez-vous sur la carte.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Définissez le point de rendez-vous : cherchez un lieu, touchez la carte ou collez des coordonnées comme "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'La longueur de l’itinéraire est un nombre de miles, comme 42.5.',
   '{list} and {last}': '{list} et {last}',

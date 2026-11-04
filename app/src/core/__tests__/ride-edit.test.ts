@@ -85,7 +85,7 @@ describe('ridePatch', () => {
     const both = patch({ coords: '38.57, -109.55', instructions: 'Air down at the lot' }, ride, null);
     expect(both.private).toMatchObject({ meet_lat: 38.57, instructions: 'Air down at the lot' });
     expect(both.changed).toEqual(['place', 'details']);
-    expect(ridePatch(ride, null, { ...formFromRide(ride, null), instructions: 'Air down' }, now)).toEqual({ error: 'Pick the meeting point on the map first.' });
+    expect(isEmptyPatch(patch({ instructions: 'Air down' }, ride, null))).toBe(true);
   });
 
   it('sends only the name when only the name changed', () => {

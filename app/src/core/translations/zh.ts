@@ -2967,7 +2967,6 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': '名称请少于 {v} 个字符。',
   'Check the departure time.': '请检查出发时间。',
   'Check the expected finish time.': '请检查预计结束时间。',
-  'Pick the meeting point on the map first.': '请先在地图上选择集合点。',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': '设置集合点：搜索地点、点按地图或粘贴坐标，如 "38.57, -109.55"。',
   'Route length is a number of miles, like 42.5.': '路线长度是英里数，例如 42.5。',
   '{list} and {last}': '{list}和{last}',

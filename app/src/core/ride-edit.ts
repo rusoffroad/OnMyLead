@@ -272,10 +272,10 @@ export function ridePatch(
     r.join_policy = form.joinPolicy;
     changed.add('details');
   }
+  // A ride with no private row yet gets one only with a spot, so instructions ride along with it
+  // (the edit screen shows the box once a spot is picked).
   const instructions = text(form.instructions);
-  if (instructions !== (details?.instructions ?? null)) {
-    // A ride with no private row yet gets one only with a spot (the server insists on one).
-    if (!details && !form.coords.trim()) return { error: tc('Pick the meeting point on the map first.') };
+  if ((details || form.coords.trim()) && instructions !== (details?.instructions ?? null)) {
     p.instructions = instructions;
     changed.add('details');
   }

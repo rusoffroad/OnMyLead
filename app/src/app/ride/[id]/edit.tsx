@@ -223,7 +223,7 @@ export default function EditRide() {
         <Field label={t('What to Bring')} value={form.whatToBring} onChangeText={(v) => set('whatToBring', v)} multiline />
         <Field label={t('Required Equipment')} value={form.requiredEquipment} onChangeText={(v) => set('requiredEquipment', v)} multiline placeholder={t('Whip flag, helmet, spare belt')} />
         <Field label={t('Fuel')} value={form.fuelNotes} onChangeText={(v) => set('fuelNotes', v)} placeholder={t('Full tank, no gas on the trail')} />
-        {details ? (
+        {details || (whenWhere && spot) ? (
           <Field label={t('Instructions for Joined Riders')} value={form.instructions} onChangeText={(v) => set('instructions', v)} multiline />
         ) : null}
       </Card>
