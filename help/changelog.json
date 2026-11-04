@@ -12,7 +12,11 @@
     "kind": "fix",
     "by": "pr",
     "ref": "release-test-2-1",
-    "why": "The 2.1 release test pass. Hiking path names now follow the Hiking Trails switch instead of Off-Road Trails (map-layers); a park's miles count its trails only, matching the trail count beside them (park-trails). Also fixed with no rider-visible article change (sync-across-devices, waypoints-and-planned-stops and navigation-mode logged for their sources): a Map Mode waypoint added while a sync was in flight is no longer dropped; a Free account on a shared phone sees only its own saved trails; a ride whose meeting spot never saved can be given one from Edit Ride Details; and a report can't be filed in another rider's name. The Google Play referral deferral is also done once, never twice, on a retry. refer-a-friend logged for its source; riders see no difference.",
+    "why": "The 2.1 release test pass. Hiking path names now follow the Hiking Trails switch instead of Off-Road Trails (map-layers); a park's miles count its trails only, matching the trail count beside them (park-trails). Also fixed with no rider-visible article change (sync-across-devices, waypoints-and-planned-stops and navigation-mode logged for their sources): a Map Mode waypoint added while a sync was in flight is no longer dropped; a Free account on a shared phone sees only its own saved trails; a ride whose meeting spot never saved can be given one from Edit Ride Details; and a report can't be filed in another rider's name. The Google Play referral deferral is also done once, never twice, on a retry. refer-a-friend logged for its source; riders see no difference."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "carplay",
       "ride-mode",
       "language",
