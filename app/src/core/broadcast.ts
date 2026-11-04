@@ -25,13 +25,22 @@ export type Broadcast = {
   urgent?: boolean;
 };
 
-export type Receipt = { item_id: string; user_id: string; seen_at: string | null; pushed_at: string | null };
+export type Receipt = {
+  item_id: string;
+  user_id: string;
+  seen_at: string | null;
+  pushed_at: string | null;
+  /** Their phone got it over Bluetooth (core/nearby), whether or not they have seen it yet. */
+  reached_at?: string | null;
+};
 
 export type Tally = {
   /** Riders whose app has the tap. */
   seen: string[];
   /** Riders a push went to whose app hasn't shown it yet. */
   notified: string[];
+  /** Riders whose phone got it over Bluetooth and hasn't shown it yet. */
+  reached: string[];
   /** Everyone else on the ride. */
   waiting: string[];
 };
@@ -39,14 +48,23 @@ export type Tally = {
 /** Splits the other riders on the ride by how far the tap got to them. */
 export function tally(itemId: string, receipts: Receipt[], riderIds: string[]): Tally {
   const mine = new Map(receipts.filter((r) => r.item_id === itemId).map((r) => [r.user_id, r]));
-  const out: Tally = { seen: [], notified: [], waiting: [] };
+  const out: Tally = { seen: [], notified: [], reached: [], waiting: [] };
   for (const id of riderIds) {
     const r = mine.get(id);
     if (r?.seen_at) out.seen.push(id);
     else if (r?.pushed_at) out.notified.push(id);
+    else if (r?.reached_at) out.reached.push(id);
     else out.waiting.push(id);
   }
   return out;
+}
+
+/** Receipts heard over Bluetooth (core/nearby acksFor), shaped like the server's rows. */
+export function bluetoothReceipts(itemId: string, acks: { userId: string; state: number; at: number }[]): Receipt[] {
+  return acks.map((a) => {
+    const at = new Date(a.at * 1000).toISOString();
+    return { item_id: itemId, user_id: a.userId, seen_at: a.state >= 2 ? at : null, pushed_at: null, reached_at: at };
+  });
 }
 
 const names = (ids: string[], nameOf: (id: string) => string) => {
@@ -57,14 +75,27 @@ const names = (ids: string[], nameOf: (id: string) => string) => {
 
 /** One line under the tap: who has it. */
 export function tallyLine(t: Tally, nameOf: (id: string) => string): string {
-  const total = t.seen.length + t.notified.length + t.waiting.length;
+  const total = t.seen.length + t.notified.length + t.reached.length + t.waiting.length;
   if (!total) return 'Nobody else has joined the ride yet.';
   if (t.seen.length === total) return total === 1 ? `${nameOf(t.seen[0])} got it.` : `All ${total} riders got it.`;
   const parts: string[] = [];
   if (t.seen.length) parts.push(`Seen by ${names(t.seen, nameOf)}`);
   if (t.notified.length) parts.push(`${t.notified.length} notified by push`);
+  if (t.reached.length) parts.push(`Reached ${names(t.reached, nameOf)} over Bluetooth`);
   if (!parts.length) return `Sent to ${total === 1 ? '1 rider' : `${total} riders`}. Waiting for their phones.`;
   return `${parts.join('. ')}.`;
+}
+
+/**
+ * Under a tap that is waiting for signal: who has it anyway, over Bluetooth. Null when nobody
+ * nearby has got it yet (the card then says it sends when service returns).
+ */
+export function queuedLine(t: Tally, nameOf: (id: string) => string): string | null {
+  if (!t.seen.length && !t.reached.length) return null;
+  const parts: string[] = [];
+  if (t.seen.length) parts.push(`Seen by ${names(t.seen, nameOf)} over Bluetooth`);
+  if (t.reached.length) parts.push(`Reached ${names(t.reached, nameOf)} over Bluetooth`);
+  return `No signal here. ${parts.join('. ')}. It sends to everyone when you get service.`;
 }
 
 /** The big line on the card. */
@@ -132,7 +163,10 @@ export function mergeReceipts(current: Receipt[], incoming: Receipt[]): Receipt[
   for (const r of incoming) {
     const k = `${r.item_id}:${r.user_id}`;
     const had = map.get(k);
-    map.set(k, { ...r, seen_at: r.seen_at ?? had?.seen_at ?? null, pushed_at: r.pushed_at ?? had?.pushed_at ?? null });
+    map.set(k, {
+      ...r, seen_at: r.seen_at ?? had?.seen_at ?? null, pushed_at: r.pushed_at ?? had?.pushed_at ?? null,
+      reached_at: r.reached_at ?? had?.reached_at ?? null,
+    });
   }
   return [...map.values()];
 }

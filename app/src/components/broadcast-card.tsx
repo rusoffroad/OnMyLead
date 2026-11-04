@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
-import { headline, stateDetail, tallyLine, type Broadcast, type BroadcastState, type Tally } from '@/core/broadcast';
+import { headline, queuedLine, stateDetail, tallyLine, type Broadcast, type BroadcastState, type Tally } from '@/core/broadcast';
 
 const TINT: Record<BroadcastState, string> = {
   get sending() { return Colors.sky; },
@@ -33,10 +33,13 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
   const tint = card.urgent && card.state === 'sent' ? Colors.danger : TINT[card.state];
   const out = card.state === 'sent' || card.state === 'cancelling';
   const riders = [...tally.seen.map((id) => ({ id, s: 'seen' as const })), ...tally.notified.map((id) => ({ id, s: 'pushed' as const })),
-    ...tally.waiting.map((id) => ({ id, s: 'waiting' as const }))];
+    ...tally.reached.map((id) => ({ id, s: 'reached' as const })), ...tally.waiting.map((id) => ({ id, s: 'waiting' as const }))];
+  // Waiting for signal, but nearby phones got it over Bluetooth: say who.
+  const queuedNearby = card.state === 'queued' ? queuedLine(tally, nameOf) : null;
   const detail = out && card.state === 'sent'
     ? receiptsOn ? tallyLine(tally, nameOf) : 'Sent. Seen receipts aren’t switched on yet.'
-    : stateDetail(card.state);
+    : queuedNearby ?? stateDetail(card.state);
+  const lights = (out && receiptsOn) || !!queuedNearby;
   const canCancel = card.state === 'sent' || card.state === 'queued' || card.state === 'sending';
 
   return (
@@ -69,18 +72,18 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
       {canCancel ? (
         <View style={styles.bottom}>
           <View style={styles.lights} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            {out && receiptsOn ? riders.slice(0, MAX_DOTS).map(({ id, s }) => (
+            {lights ? riders.slice(0, MAX_DOTS).map(({ id, s }) => (
               <View
                 key={id}
                 style={[
                   styles.light,
                   s === 'seen' && { backgroundColor: RideColors.green, borderColor: RideColors.green },
-                  s === 'pushed' && { borderColor: Colors.sky },
+                  (s === 'pushed' || s === 'reached') && { borderColor: Colors.sky },
                 ]}>
                 <Text style={[styles.initial, s === 'seen' && { color: Colors.background }]}>{nameOf(id).trim().charAt(0).toUpperCase() || '?'}</Text>
               </View>
             )) : null}
-            {out && receiptsOn && riders.length > MAX_DOTS ? <Text style={styles.more}>+{riders.length - MAX_DOTS}</Text> : null}
+            {lights && riders.length > MAX_DOTS ? <Text style={styles.more}>+{riders.length - MAX_DOTS}</Text> : null}
           </View>
           {card.state === 'queued' ? (
             <Pressable onPress={onRetry} accessibilityRole="button" style={({ pressed }) => [styles.retry, { opacity: pressed ? 0.75 : 1 }]}>

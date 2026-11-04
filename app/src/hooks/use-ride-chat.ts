@@ -10,6 +10,7 @@ import { mergeVotes, pollsNotSwitchedOn, type PollVote } from '@/core/polls';
 import {
   clearRideMessage, rideMessages, ridePollVotes, sendRideMessage, sendRidePoll, setMessageResolved, voteOnPoll,
 } from '@/lib/api';
+import { onNearbyEvent } from '@/lib/nearby';
 import { useSession } from '@/lib/session';
 import { newChannel, supabase } from '@/lib/supabase';
 import { useAcknowledge } from './use-broadcast';
@@ -54,6 +55,17 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
     [messages],
   );
   useAcknowledge(enabled ? rideId : null, session?.user.id, quickReplies);
+
+  // A quick reply or message heard over Bluetooth (no service) shows here too, marked Via
+  // Bluetooth, and is replaced by the server's copy when any phone uploads it.
+  useEffect(() => {
+    if (!rideId || !enabled) return;
+    return onNearbyEvent((e) => {
+      if (e.kind !== 'reply') return;
+      const m: ChatMessage = { id: e.reply.id, ride_id: rideId, user_id: e.reply.user_id, kind: 'status', body: e.reply.body, sent_at: e.reply.at, created_at: e.reply.at, via: 'bluetooth' };
+      setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : mergeMessages(prev, [m])));
+    });
+  }, [rideId, enabled]);
 
   const reload = useCallback(
     () =>

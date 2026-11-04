@@ -2,6 +2,20 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "bluetooth-sharing",
+      "status-buttons",
+      "ride-chat",
+      "ride-mode",
+      "emergency-and-safety"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "bluetooth-mesh",
+    "why": "Bluetooth Sharing (2.1) grows into a mesh (Chris: the person in the back can talk to the rest of the crew over Bluetooth, and a phone that gets a newer position broadcasts it to the rest): every tap and message goes on the air with or without service, typed messages travel in parts, phones pass items along up to six hops, a phone with service bridges what the server knows to riders with none, the tap card says Reached over Bluetooth and Seen by from Bluetooth receipts, chat shows Via Bluetooth, and the radio slows down with service and nobody in range or on Max Battery Saver."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "3d-terrain",
       "map-layers",
       "offline-maps",

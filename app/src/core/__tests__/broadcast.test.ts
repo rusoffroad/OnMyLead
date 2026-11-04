@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ACK_WINDOW_MS, broadcastNotSwitchedOn, headline, isDuplicateSend, mergeReceipts, stateDetail, tally, tallyLine, toAcknowledge,
+  ACK_WINDOW_MS, bluetoothReceipts, broadcastNotSwitchedOn, headline, isDuplicateSend, mergeReceipts, queuedLine, stateDetail, tally,
+  tallyLine, toAcknowledge,
   type Receipt,
 } from '../broadcast';
 
@@ -13,28 +14,39 @@ const nameOf = (id: string) => NAMES[id] ?? 'Rider';
 describe('tally', () => {
   it('splits riders into seen, notified by push and waiting', () => {
     const t = tally('x', [r('a', true, true), r('b', false, true), r('z', true, false, 'other')], ['a', 'b', 'c']);
-    expect(t).toEqual({ seen: ['a'], notified: ['b'], waiting: ['c'] });
+    expect(t).toEqual({ seen: ['a'], notified: ['b'], reached: [], waiting: ['c'] });
   });
 
   it('only counts riders still on the ride', () => {
-    expect(tally('x', [r('gone', true)], ['a'])).toEqual({ seen: [], notified: [], waiting: ['a'] });
+    expect(tally('x', [r('gone', true)], ['a'])).toEqual({ seen: [], notified: [], reached: [], waiting: ['a'] });
   });
 });
 
 describe('tallyLine', () => {
   it('says when everyone has it', () => {
-    expect(tallyLine({ seen: ['a', 'b'], notified: [], waiting: [] }, nameOf)).toBe('All 2 riders got it.');
-    expect(tallyLine({ seen: ['a'], notified: [], waiting: [] }, nameOf)).toBe('Sam got it.');
+    expect(tallyLine({ seen: ['a', 'b'], notified: [], reached: [], waiting: [] }, nameOf)).toBe('All 2 riders got it.');
+    expect(tallyLine({ seen: ['a'], notified: [], reached: [], waiting: [] }, nameOf)).toBe('Sam got it.');
   });
 
   it('names who has seen it and counts pushes', () => {
-    expect(tallyLine({ seen: ['a'], notified: ['b', 'c'], waiting: ['d'] }, nameOf)).toBe('Seen by Sam. 2 notified by push.');
-    expect(tallyLine({ seen: ['a', 'b', 'c'], notified: [], waiting: ['d'] }, nameOf)).toBe('Seen by Sam, Alex and 1 more.');
+    expect(tallyLine({ seen: ['a'], notified: ['b', 'c'], reached: [], waiting: ['d'] }, nameOf)).toBe('Seen by Sam. 2 notified by push.');
+    expect(tallyLine({ seen: ['a', 'b', 'c'], notified: [], reached: [], waiting: ['d'] }, nameOf)).toBe('Seen by Sam, Alex and 1 more.');
+  });
+
+  it('names whose phone got it over Bluetooth, and says so under a tap waiting for signal', () => {
+    const rows = bluetoothReceipts('x', [{ userId: 'a', state: 2, at: 1762300800 }, { userId: 'b', state: 1, at: 1762300801 }]);
+    expect(rows[0]).toEqual({ item_id: 'x', user_id: 'a', seen_at: '2025-11-05T00:00:00.000Z', pushed_at: null, reached_at: '2025-11-05T00:00:00.000Z' });
+    expect(rows[1].seen_at).toBeNull();
+    const t = tally('x', mergeReceipts([r('b', false, true)], rows), ['a', 'b', 'c']);
+    expect(t).toEqual({ seen: ['a'], notified: ['b'], reached: [], waiting: ['c'] });
+    expect(tallyLine(tally('x', rows, ['a', 'b', 'c']), nameOf)).toBe('Seen by Sam. Reached Alex over Bluetooth.');
+    expect(queuedLine(tally('x', rows, ['a', 'b', 'c']), nameOf)).toBe('No signal here. Seen by Sam over Bluetooth. Reached Alex over Bluetooth. It sends to everyone when you get service.');
+    expect(queuedLine(tally('x', [], ['a']), nameOf)).toBeNull();
   });
 
   it('is honest while nobody has it yet', () => {
-    expect(tallyLine({ seen: [], notified: [], waiting: ['a', 'b'] }, nameOf)).toBe('Sent to 2 riders. Waiting for their phones.');
-    expect(tallyLine({ seen: [], notified: [], waiting: [] }, nameOf)).toBe('Nobody else has joined the ride yet.');
+    expect(tallyLine({ seen: [], notified: [], reached: [], waiting: ['a', 'b'] }, nameOf)).toBe('Sent to 2 riders. Waiting for their phones.');
+    expect(tallyLine({ seen: [], notified: [], reached: [], waiting: [] }, nameOf)).toBe('Nobody else has joined the ride yet.');
   });
 });
 
