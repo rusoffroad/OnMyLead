@@ -1,8 +1,9 @@
-import { Stack, useFocusEffect } from 'expo-router';
+import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { AMBASSADOR_COLORS, BadgePatch, FOUNDER_COLORS, PATCH_COLORS } from '@/components/badge-patch';
+import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
@@ -87,6 +88,7 @@ export default function BadgesScreen() {
         <HonorCard key={h.key} h={h} fresh={fresh.has(h.key)} />
       ))}
       <RankCard rank={rank} />
+      <LeaderboardLink />
       <ErrorText error={error} />
       {error ? <Button title={t('Try Again')} kind="secondary" onPress={load} /> : null}
 
@@ -132,6 +134,24 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
         ))}
       </View>
     </View>
+  );
+}
+
+/** The way to the leaderboard: where you rank in your state, your country and everywhere. */
+function LeaderboardLink() {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel="Leaderboard. See where you rank in your state, your country and everywhere"
+      onPress={() => router.push('/leaderboard')}
+      style={({ pressed }) => [styles.leaderLink, pressed && { backgroundColor: Colors.backgroundSelected }]}>
+      <Icon name="trophy" size={26} color={PATCH_COLORS[3].cloth} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.leaderTitle}>Leaderboard</Text>
+        <ThemedText type="small" themeColor="textSecondary">See where you rank in your state, your country and everywhere</ThemedText>
+      </View>
+      <Icon name="chevron" size={18} color={Colors.textSecondary} />
+    </Pressable>
   );
 }
 
@@ -184,6 +204,8 @@ const styles = themedStyles(() => ({
   },
   honorName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 34, flexShrink: 1 },
   rank: { gap: Spacing.one, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
+  leaderLink: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
+  leaderTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 22, lineHeight: 26 },
   rankName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 52, lineHeight: 56 },
   ladder: { flexDirection: 'row', gap: 6, marginTop: Spacing.two },
   rung: { flex: 1, gap: 6 },

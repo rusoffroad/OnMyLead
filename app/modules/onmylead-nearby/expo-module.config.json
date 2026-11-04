@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["OnMyLeadNearbyModule"]
+  },
+  "android": {
+    "modules": ["com.rusoffroad.onmylead.nearby.OnMyLeadNearbyModule"]
+  }
+}

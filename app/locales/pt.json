@@ -6,6 +6,7 @@
     "NSPhotoLibraryUsageDescription": "Escolha uma foto de perfil ou uma foto do seu veículo para a garagem. Só a foto escolhida é enviada.",
     "NSCameraUsageDescription": "Tire uma foto de perfil ou uma foto do seu veículo. Só a foto tirada é enviada.",
     "NSMotionUsageDescription": "O OnMyLead usa os sensores de movimento para o medidor de inclinação e para detectar um possível acidente no Modo Passeio e avisar o seu grupo.",
-    "NSLocalNetworkUsageDescription": "O OnMyLead se conecta à sua antena Starlink pelo Wi-Fi dela para mostrar o status. Nada mais na sua rede é tocado."
+    "NSLocalNetworkUsageDescription": "O OnMyLead se conecta à sua antena Starlink pelo Wi-Fi dela para mostrar o status. Nada mais na sua rede é tocado.",
+    "NSBluetoothAlwaysUsageDescription": "Sem sinal de celular, o Modo Passeio passa por Bluetooth as localizações e alertas do seu passeio para pilotos próximos no mesmo passeio. Tudo o que é enviado é criptografado só para o seu passeio."
   }
 }

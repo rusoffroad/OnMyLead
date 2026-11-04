@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, show public trails and roads with th
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/trail-map-overlay.tsx
   - app/src/components/trail-width-row.tsx
@@ -69,6 +69,10 @@ Each style has a small picture of how it looks; the one you're using has a blue 
 
 - **Satellite**: aerial imagery with road and place labels. This is the default.
 - **Topo**: the USGS topographic map, with contour lines.
+
+:::release 2.1
+- **3D Terrain**: satellite on the real shape of the land, with contour lines and peak heights. It shows in Ride Mode and Map Mode; the other maps show plain satellite while it's picked. See [3D Terrain](/help/3d-terrain).
+:::
 
 ## Public Trails and Roads
 

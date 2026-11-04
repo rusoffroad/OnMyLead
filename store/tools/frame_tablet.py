@@ -1,7 +1,7 @@
 """Frames tablet screenshots for the App Store (iPad) and Google Play (Android tablets).
 
 Input: raw landscape screen captures from the web export with mock data (see
-store/app-store/ipad-and-next-apple-release.md), named 01-*.png to 08-*.png. Output: the same
+store/app-store/ipad-and-next-apple-release.md), named 01-*.png to 10-*.png (Google Play takes the first 8). Output: the same
 size, with the caption band and red trail line of the phone sets and the screen inside a plain
 iPad or Android tablet frame with a status bar.
 
@@ -25,13 +25,15 @@ EDGE = (40, 56, 80)
 
 CAPTIONS = {
     '01': 'Everyone on One Live Map',
-    '02': 'Invite Riders With a Code or QR',
-    '03': 'Plan the Ride on the Big Screen',
-    '04': 'Routes That Follow the Trail',
-    '05': 'Find Rides Near You',
-    '06': 'Chat With Your Riding Group',
-    '07': 'Save Maps for Places With No Signal',
-    '08': 'Ride Chat and Quick Polls',
+    '02': 'Join a Ride in Seconds',
+    '03': 'Map Mode for Any Trail',
+    '04': 'Tilt Meter and Crash Alert',
+    '05': 'Rallies, Runs and Ride Weekends',
+    '06': 'Share the Ride With Friends',
+    '07': 'Earn Badges as You Ride',
+    '08': 'Routes That Follow the Trail',
+    '09': 'Themes and Light Mode',
+    '10': 'Save Maps for Places With No Signal',
 }
 
 
@@ -57,7 +59,7 @@ def wave(d, W, y, amp, width, first, last):
 def status_bar(img, kind, h):
     d = ImageDraw.Draw(img)
     f = ImageFont.truetype(str(FONTS / 'barlow/600SemiBold/Barlow_600SemiBold.ttf'), int(h * 0.55))
-    left = '10:30  Tue Oct 14' if kind == 'ipad' else '10:30'
+    left = '9:41  Tue Nov 4' if kind == 'ipad' else '9:41'
     d.text((h * 0.9, h / 2), left, font=f, fill=TEXT, anchor='lm')
     W = img.width
     bx = W - h * 0.9
@@ -104,7 +106,9 @@ def frame(kind, src_path, out_path, idx, count):
 if __name__ == '__main__':
     kind, raw, dest = sys.argv[1], Path(sys.argv[2]), ROOT / sys.argv[3]
     dest.mkdir(parents=True, exist_ok=True)
-    files = sorted(raw.glob('0*.png'))
+    files = sorted(f for f in raw.glob('[01]*.png') if f.name[:2] in CAPTIONS)
+    if kind == 'android':
+        files = files[:8]  # Google Play shows at most 8 per tablet size
     for i, f in enumerate(files):
         frame(kind, f, dest / f.name, i, len(files))
         print('framed', dest / f.name)

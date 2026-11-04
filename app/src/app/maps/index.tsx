@@ -7,7 +7,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Screen, Section } from '@/components/ui';
 import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
-import { formatBytes, IMAGERY_ATTRIBUTION, OFFLINE_CHOICES, type OfflineChoice } from '@/core/offline-maps';
+import { formatBytes, IMAGERY_ATTRIBUTION, type OfflineChoice } from '@/core/offline-maps';
 import { getRideRoute, myRides } from '@/lib/api';
 import type { SyncedOfflineArea } from '@/core/synced-settings';
 import {
@@ -18,7 +18,8 @@ import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
 import { t } from '@/lib/i18n';
 
-const ALL: OfflineChoice[] = OFFLINE_CHOICES.map((c) => c.id);
+/** A ride's one-tap download: the flat maps (3D Terrain is added from Download an Area). */
+const ALL: OfflineChoice[] = ['satellite', 'topo', 'trails'];
 
 type RideWithRoute = { ride: Ride; route: LatLng[] };
 

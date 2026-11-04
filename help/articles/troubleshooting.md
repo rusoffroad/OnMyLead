@@ -68,6 +68,12 @@ Closing Ride Mode or locking your phone doesn't stop sharing. Sharing ends when 
 
 It waits on your phone as **Waiting for Signal** and sends by itself as soon as you have service, stamped with the time you tapped it. You can tap **Retry Now** or **Cancel**. See [Status Buttons](/help/status-buttons).
 
+:::release 2.1
+## Nearby Riders Don't Show Up Over Bluetooth
+
+Bluetooth Sharing reaches about 30 to 100 meters between phones. Check that Bluetooth is on in the phone's settings, that OnMyLead is allowed to use Bluetooth (iPhone and iPad: **Settings > OnMyLead > Bluetooth**; Android: **Settings > Apps > OnMyLead > Permissions > Nearby devices**), that **Bluetooth Sharing** is on in the You tab, and that you opened Ride Mode once with service. Riders only send their spot while they share with the ride. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::
+
 ## I'm Not Getting Alerts
 
 1. Check that notifications are allowed for OnMyLead in your iPhone's **Settings > Notifications > OnMyLead**.
@@ -100,6 +106,12 @@ Zoom in. Forest Service and BLM lines appear when the map is about 60 miles acro
 ## My Offline Map Download Stopped
 
 Closing the app pauses a running download. Open **You > Offline Maps** and tap **Resume**, or **Finish** if some pieces are missing. If the area says **Too big for one download**, zoom in so the frame covers less. See [Offline Maps](/help/offline-maps).
+
+:::release 2.1
+## The 3D Map Went Flat
+
+With no signal, Ride Mode and Map Mode show 3D Terrain only over an area you saved with **3D Terrain** ticked in Offline Maps. Anywhere else they show the flat downloaded map, so you still have a map. The 3D view comes back with signal. See [3D Terrain](/help/3d-terrain).
+:::
 
 ## I Don't See a Fuel Check on My Ride
 

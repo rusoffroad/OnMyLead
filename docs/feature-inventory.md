@@ -97,6 +97,12 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - CarPlay ride screen **[iOS-only]**, switched off until Apple grants the entitlement. No Android
   Auto.
 
+- Bluetooth Sharing (2.1): with no service, Ride Mode passes spots (sharing riders), status taps
+  incl. EMERGENCY and quick replies between nearby riders on the ride over Bluetooth LE, relayed up
+  to 3 hops, uploaded by the first phone with signal. `core/nearby.ts`, `lib/nearby.ts`,
+  `modules/onmylead-nearby` (Swift + Kotlin), migration `20261104060000_bluetooth_sharing.sql`.
+  You > Bluetooth Sharing switch; **[flag]** `bluetooth_sharing`. Apps only (not the website).
+
 ### Chat and Polls
 - Ride chat to everyone or to the leader only, in-app pop-ups, resolve / clear messages.
 - Polls in ride chat (create **[Pro]**, vote free) **[flag]**.
@@ -113,6 +119,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 ### Maps
 - `react-native-maps`: Apple Maps on iOS; Google Maps on Android **[Android gap]** (no Maps API
   key configured, so maps are blank on Android today).
+- 3D Terrain (2.1, Mapbox; needs the Mapbox token): Ride Mode and Map Mode on all devices and the website's Map Mode, contours and peaks in feet, Offline Maps 3D downloads, Admin flag terrain_3d.
 - Layers: Satellite, Topo, public Trails and roads (OpenFreeMap / OSM tiles, attribution). Trail name tags, Forest Service names and numbers, and closed trails and roads in red (FS closed roads, BLM OHV-closed routes, OSM access=no, today's FS seasonal closures); same layers and panel on the website's route builder, waypoints and Find maps (1.0.1 / next website deploy).
 - Offline maps (`/maps`, `/maps/area`): download an area or a ride's area, sizes, delete **[Pro]**;
   app only.
@@ -139,6 +146,14 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   Ride Invites, Your Group, Public Rides Near You (remembered radius, never prompts for location),
   Feed with Customize (`home_feed`, `rider_feed_settings`) **[flag home_feed]**, Your Badges, Your
   Toolkit, Help & Support. Two columns at Expanded width.
+
+### Badge Leaderboard (2.1)
+- `app/leaderboard.tsx` (your place, Everywhere / country / state filters, the board, Show Me on the
+  Leaderboard; TwoPane on tablets) and `app/leaderboard-area.tsx` (Where You Ride: country search,
+  state or province for US / CA / MX / AU, Use My Location on the apps). Rules in
+  `core/leaderboard.ts` and `core/areas.ts`; server `badge_leaderboard`, `badge_leaderboard_areas`,
+  `my_leaderboard_settings`, `set_leaderboard_settings` (migration 20261104050000). Opened from
+  Badges and Home's Your Badges.
 
 ### Social (2.0)
 - `app/social/index.tsx` (Activity / Friends / My Posts; TwoPane on tablets), `social/item.tsx` (one

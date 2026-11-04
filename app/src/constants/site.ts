@@ -28,3 +28,17 @@ export const RUS_URL = 'https://rusoffroad.com';
 
 /** Where riders and Apple reach us. Shown on the Support, Terms and Privacy pages. */
 export const SUPPORT_EMAIL = 'support@rusoffroad.com';
+
+/**
+ * Mapbox's public token for the 3D Terrain map (Ride Mode and Map Mode, apps and website). Kept
+ * out of this public repo: builds read EXPO_PUBLIC_MAPBOX_TOKEN (app/.env on the Mac, the
+ * MAPBOX_PUBLIC_TOKEN Actions variable for the website). Empty: 3D Terrain isn't offered and every
+ * map stays as it was.
+ */
+export const MAPBOX_PUBLIC_TOKEN = '';
+
+/**
+ * The 3D Terrain line in the showcase. Off until the app version with 3D Terrain (2.1) is live in
+ * the stores and the Mapbox token above is set, so the website never shows what riders can't get.
+ */
+export const SHOWCASE_3D_TERRAIN: boolean = false;

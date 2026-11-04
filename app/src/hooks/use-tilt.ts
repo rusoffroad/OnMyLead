@@ -57,7 +57,7 @@ function onMotion(s: MotionSample) {
   const max = trackMax(shown.max, smoothed);
   const step = stepWarning(warn, smoothed, settings.limits, s.t);
   warn = step.state;
-  if (step.announce && settings.warn && zeroed) {
+  if (step.announce && settings.show && settings.warn && zeroed) {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
     if (settings.voice) speak(step.announce.text);
   }

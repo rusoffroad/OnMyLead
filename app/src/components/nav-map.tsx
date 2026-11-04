@@ -15,6 +15,7 @@ import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import { metersPerPoint } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { NavTerrainMap } from '@/components/nav-terrain-map';
 import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RouteEnds, RouteLine } from './route-overlay';
@@ -34,13 +35,21 @@ const MEASURE_INK = '#ECCD91';
 const FOLLOW_MS = followCamDurationMs(1000);
 const toCoords = (pts: LatLng[]) => pts.map((p) => ({ latitude: p.lat, longitude: p.lng }));
 
+type NavMapProps = Parameters<typeof FlatNavMap>[0];
+
+/** Map Mode's map: 3D Terrain when the rider picked it and it can show here, otherwise the flat map. */
+export function NavMap(props: NavMapProps) {
+  if (props.trail.terrain3d) return <NavTerrainMap {...props} />;
+  return <FlatNavMap {...props} />;
+}
+
 /**
  * Map Mode's map: satellite or topo with every trail layer (agency, OpenStreetMap and rider
  * trails), the rider's own location, the trail being recorded (a bright cream line), a trail being
  * followed (the route red, with start and finish), and the distance finder's points. A tap measures
  * while measuring; otherwise it looks up the trail under the finger.
  */
-export function NavMap({
+function FlatNavMap({
   trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, trackLines, obstacles, onObstacle, ref,
 }: {
   trail: TrailMap;

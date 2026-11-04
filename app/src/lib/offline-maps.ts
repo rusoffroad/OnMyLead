@@ -10,6 +10,7 @@ import {
 import { areasToOffer, OFFLINE_AREA_PREFIX, offlineAreaKey, offlineAreaValue, type SyncedOfflineArea } from '@/core/synced-settings';
 import { fillTemplate, type Box, type Tile } from '@/core/trails';
 import { hasSyncedEntry, onSyncedPrefix, setSyncedItem, syncedValues } from '@/lib/settings-sync';
+import { deleteTerrain, pauseTerrain, saveTerrain } from '@/lib/terrain-offline';
 import { templateFor, tileFile } from '@/lib/trail-tiles';
 
 import { tc } from '@/core/i18n';
@@ -61,6 +62,8 @@ async function load() {
     maps = [];
   }
   emit();
+  // A 3D Terrain save cut off when the app closed carries on (Mapbox keeps what it already saved).
+  for (const m of maps) if (m.terrain === 'saving' && m.status !== 'paused') startTerrain(m.id);
   // Downloads made before sync existed: list them with the account once, so other devices offer them.
   for (const m of maps) if (!(await hasSyncedEntry(offlineAreaKey(m.id)))) listWithAccount(m);
   refreshOffers();
@@ -147,7 +150,10 @@ async function start(
   if (!MANIFESTS.exists) MANIFESTS.create({ intermediates: true, idempotent: true });
   manifestFile(id).write(JSON.stringify(manifest));
   maps = [
-    { ...base, id, choices, status: 'paused', total: plan.tiles, saved: 0, failed: 0, bytes: 0, createdAt: syncedAt || new Date().toISOString() },
+    {
+      ...base, id, choices, status: 'paused', total: plan.tiles, saved: 0, failed: 0, bytes: 0, createdAt: syncedAt || new Date().toISOString(),
+      ...(choices.includes('terrain') ? { terrain: 'saving' as const, terrainPct: 0 } : {}),
+    },
     ...maps,
   ];
   persist();
@@ -158,8 +164,20 @@ async function start(
   return id;
 }
 
+/** Mapbox saves 3D Terrain alongside the squares; its progress lands on the same download. */
+function startTerrain(id: string) {
+  const m = maps.find((x) => x.id === id);
+  if (!m || !m.choices.includes('terrain') || m.terrain === 'saved') return;
+  saveTerrain(id, m.box, (terrain, terrainPct) => {
+    if (!maps.some((x) => x.id === id)) return;
+    // Saved to the phone's list only when it ends; progress in between is just shown.
+    update(id, { terrain, terrainPct }, terrain !== 'saving');
+  });
+}
+
 /** Continue a paused or partly failed download. Squares already on the phone are skipped. */
 export function resumeDownload(id: string) {
+  startTerrain(id);
   if (running === id || queue.includes(id)) return;
   update(id, { status: 'downloading' });
   queue.push(id);
@@ -167,6 +185,7 @@ export function resumeDownload(id: string) {
 }
 
 export function pauseDownload(id: string) {
+  pauseTerrain(id);
   if (running === id) stopRequested = id;
   else if (queue.includes(id)) {
     queue = queue.filter((q) => q !== id);
@@ -255,6 +274,7 @@ export async function deleteOfflineMap(id: string) {
   queue = queue.filter((q) => q !== id);
   if (running === id) stopRequested = id;
   const others = maps.filter((m) => m.id !== id);
+  if (maps.find((m) => m.id === id)?.choices.includes('terrain')) deleteTerrain(id);
   const mine = await readManifest(id);
   const gone = maps.find((m) => m.id === id);
   maps = others;

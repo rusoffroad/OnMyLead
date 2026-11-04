@@ -2,6 +2,188 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "3d-terrain",
+      "map-layers",
+      "offline-maps",
+      "ride-mode",
+      "navigation-mode",
+      "troubleshooting"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "3d-terrain",
+    "why": "New 3D Terrain map style for Ride Mode and Map Mode (Chris asked for an onX-style 3D topo view, without copying onX): Mapbox satellite on raised ground with contour lines and peak heights in feet, plus 3D Terrain in Offline Maps downloads. Publishes with the 2.1 update. Like the other map styles, 3D Terrain is a Pro feature."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "faq",
+      "follow-me",
+      "full-map",
+      "garage",
+      "getting-started",
+      "pro-trial",
+      "profile-picture",
+      "ride-bubble",
+      "route-builder",
+      "rus-gear",
+      "subscribe-to-pro",
+      "sync-across-devices",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "3d-terrain",
+    "why": "Checked against the 3D Terrain change (brought up to date with 2.0): the flat maps, Follow Me, Full Map, Ride Bubble, the route builder, syncing across devices, the website showcase (its new line stays off until 2.1 is live), prices and app settings work the same for riders, so these articles stay as they are."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "accurate-location",
+      "bluetooth-sharing",
+      "fuel-range",
+      "full-map",
+      "ride-bubble",
+      "ride-chat",
+      "ride-mode",
+      "rus-gear",
+      "sync-across-devices",
+      "waypoints-and-planned-stops",
+      "refer-a-friend"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "bluetooth-sharing",
+    "why": "Re-checked after bringing Bluetooth Sharing (2.1) up to date with main: it adds the Bluetooth Sharing switch on the You tab and Bluetooth hooks in Ride Mode; nothing these articles describe works differently."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "status-buttons",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "bluetooth-sharing",
+    "why": "2.1 release blocks: a status tap waiting for signal still reaches nearby riders over Bluetooth, and a troubleshooting entry for nearby riders not showing up over Bluetooth."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "accurate-location",
+      "badges-and-ranks",
+      "battery-saver",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "getting-started",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "profile-picture",
+      "report-and-block",
+      "ride-bubble",
+      "ride-chat",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "rus-gear",
+      "sign-in",
+      "starlink",
+      "trip-planner",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "bluetooth-sharing",
+    "why": "Checked against the Bluetooth Sharing change (2.1): it adds a Bluetooth Sharing switch on the You tab, an admin flag, Ride Mode's no-service banner and Bluetooth hooks in sending; nothing these articles describe works differently."
+  },
+  {
+    "date": "2026-11-03",
+    "slugs": [
+      "bluetooth-sharing",
+      "ride-mode",
+      "location-sharing",
+      "emergency-and-safety"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "bluetooth-sharing",
+    "why": "New for 2.1: Bluetooth Sharing. Chris asked for a way for riders to keep updating each other with no cell service. Ride Mode now passes spots, status taps (including EMERGENCY) and quick replies between nearby riders on the same ride over Bluetooth, relayed up to three phones, and uploads them when any phone gets signal. New article; Ride Mode, Location Sharing and Emergency articles say what changes with no service, in 2.1 release blocks."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "badge-leaderboard",
+      "badges-and-ranks",
+      "privacy",
+      "home-screen"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "badge-leaderboard",
+    "why": "Chris asked for a leaderboard for the badges, filtered by country and state. New article for the Leaderboard and Where You Ride (country and state, Use My Location, Show Me on the Leaderboard); Earn Badges and Ranks links to it, What Other Riders Can See says what the leaderboard shows, and Home's Your Badges gains a Leaderboard link. All in 2.1 blocks until that version is live."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "free-vs-pro",
+      "getting-started",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "promo-codes",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "badge-leaderboard",
+    "why": "Reviewed for the badge leaderboard. Home only gained a Leaderboard link beside Your Badges, the app gained two new screens and the website showcase a Badge Leaderboard line; nothing these articles describe changed."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "whats-new-in-2-0",
+      "getting-started",
+      "create-a-ride-on-the-website",
+      "subscribe-to-pro",
+      "manage-subscription"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "store-2.0",
+    "why": "Chris 2026-11-04: update the website, docs and store screenshots with all the 2.0 features. New What's New in OnMyLead 2.0 guide (published with 2.0) linking each feature's guide; the 2.0 release notes now name the Tilt Meter, Crash Alert, Founder and Ambassador badges and sync, and the store What's New text was rewritten to fit 500 characters with them. Getting Started and Create a Ride on the Website were reviewed for the showcase's new section, and Subscribe to Pro and Manage Your Subscription for the new store listing text: prices and steps are unchanged, so no edits."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "tilt-and-crash-alert",
+      "sync-across-devices",
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "tilt-off-switch",
+    "why": "Chris asked for an easy way to turn the angle indicator off. A Tilt Meter On/Off switch now sits under the Crash Alert switch at the top of the Tilt screen (it replaces Show in Map Mode and Ride Mode and also stops tilt warnings). New section Turn the Tilt Meter Off. The website showcase's Tilt card mentions the switch; those two articles are unchanged (only the date)."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "language",
       "home-screen",
       "sync-across-devices"

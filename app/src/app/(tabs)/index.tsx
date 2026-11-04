@@ -417,7 +417,14 @@ export default function HomeScreen() {
   ) : null;
 
   const badgeBlock = session && badges ? (
-    <Block title={t('Your Badges')} right={<HeadLink title={t('See All')} onPress={() => router.push('/badges')} label={t('See all badges')} />}>
+    <Block
+      title={t('Your Badges')}
+      right={
+        <View style={{ flexDirection: 'row', gap: Spacing.three }}>
+          <HeadLink title={t('Leaderboard')} onPress={() => router.push('/leaderboard')} label={t('Badge leaderboard')} />
+          <HeadLink title={t('See All')} onPress={() => router.push('/badges')} label={t('See all badges')} />
+        </View>
+      }>
       <BadgeStrip mine={badges} />
     </Block>
   ) : null;

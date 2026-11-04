@@ -2174,6 +2174,12 @@ const dict: Record<string, string> = {
   "{name} is {distance} away from the group.{moving}": "{name} è a {distance} dal gruppo.{moving}",
   "{n} feet": "{n} piedi",
   "{n} miles": "{n} miglia",
+  "Leaderboard": "Classifica",
+  "Badge leaderboard": "Classifica dei badge",
+  "Where You Ride": "Dove guidi",
+  "Bluetooth Sharing": "Condivisione Bluetooth",
+  "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Senza campo, la Modalità Uscita passa posizioni e avvisi ai rider vicini della tua uscita",
+  "Off. Turn it on to keep sharing with nearby riders when there is no service": "Disattivata. Attivala per continuare a condividere con i rider vicini quando non c’è campo",
 };
 
 export default dict;

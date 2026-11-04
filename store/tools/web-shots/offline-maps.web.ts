@@ -1,5 +1,6 @@
 import type { LatLng } from '@/core/geo';
 import { planArea, planRide, type OfflineChoice, type OfflineMap } from '@/core/offline-maps';
+import type { SyncedOfflineArea } from '@/core/synced-settings';
 import type { Box } from '@/core/trails';
 
 /** The web build has no native map to save squares for, so there are never any downloads. */
@@ -24,3 +25,10 @@ export function pauseDownload(_id: string) {}
 export async function deleteOfflineMap(_id: string) {}
 export function renameOfflineMap(_id: string, _name: string) {}
 export const freeSpace = (): number | null => 41.8 * 1024 * 1024 * 1024;
+// Areas saved on another device (sync): none in the screenshots.
+const noAreas: SyncedOfflineArea[] = [];
+export const useOtherDeviceAreas = () => noAreas;
+export async function downloadFromOtherDevice(_a: SyncedOfflineArea) {
+  return '';
+}
+export function forgetOtherDeviceArea(_id: string) {}

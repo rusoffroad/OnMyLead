@@ -10,6 +10,7 @@ import type { DayLine } from '@/core/track-line';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { NavTerrainMap } from '@/components/nav-terrain-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
@@ -23,12 +24,20 @@ const meDotHtml = (heading: number | null | undefined) =>
     : `<div style="position:relative;width:18px;height:18px">${ME_DOT}<div aria-hidden="true" style="position:absolute;left:-13px;top:-13px;width:44px;height:44px;transform:rotate(${Math.round(heading)}deg);pointer-events:none"><div style="position:absolute;left:12px;top:0;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:14px solid rgba(10,22,38,.85)"></div><div style="position:absolute;left:14.5px;top:3px;width:0;height:0;border-left:7.5px solid transparent;border-right:7.5px solid transparent;border-bottom:10.5px solid #fff"></div></div></div>`;
 const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;height:18px;border-radius:9px;background:#2F80FF;border:3px solid #FFFFFF;box-sizing:border-box;box-shadow:0 0 0 6px rgba(47,128,255,.25),0 2px 4px rgba(0,0,0,.5)"></div>';
 
+type NavMapProps = Parameters<typeof FlatNavMap>[0];
+
+/** Map Mode's map: 3D Terrain when the rider picked it and it can show here, otherwise the flat map. */
+export function NavMap(props: NavMapProps) {
+  if (props.trail.terrain3d) return <NavTerrainMap {...props} />;
+  return <FlatNavMap {...props} />;
+}
+
 /**
  * Map Mode's map on the website: the phone's layers on Leaflet (satellite or topo, agency,
  * OpenStreetMap and rider trails), a followed trail in route red, a recorded line, and the distance
  * finder. A click measures while measuring; otherwise it shows the trail under it.
  */
-export function NavMap({
+function FlatNavMap({
   trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, trackLines, obstacles, onObstacle, ref,
 }: {
   trail: TrailMap;

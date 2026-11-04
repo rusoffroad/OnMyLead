@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+  <!--
+    Bluetooth Sharing (src/core/nearby.ts): Ride Mode passes encrypted ride packets to nearby
+    OnMyLead phones when there is no service. Android 12+ asks for "Nearby devices"; older Android
+    needs the classic Bluetooth permissions plus location (which Ride Mode already has).
+    Bluetooth is never used to work out where anyone is, so scanning is marked neverForLocation.
+  -->
+  <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+  <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" tools:targetApi="s" />
+  <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+  <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+  <!-- Phones without Bluetooth Low Energy can still install the app; they just don't relay. -->
+  <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+</manifest>
