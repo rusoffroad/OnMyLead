@@ -3034,6 +3034,17 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D-Gelände',
   'Lays the map flat again': 'Legt die Karte wieder flach',
   'Tilts the map and raises the mountains': 'Neigt die Karte und hebt die Berge an',
+  // CarPlay
+  " (Leader)": " (Leader)",
+  "A rider is separated": "Ein Fahrer ist abgehängt",
+  "Group Together": "Gruppe zusammen",
+  "No Ride Running": "Keine Tour aktiv",
+  "Open Ride Mode on your phone and your group shows up here.": "Öffne den Tourmodus auf deinem Handy, dann erscheint deine Gruppe hier.",
+  "Group": "Gruppe",
+  "Nobody Is Sharing Yet": "Noch teilt niemand",
+  "Send EMERGENCY with your location to everyone on the ride?": "NOTFALL mit deinem Standort an alle auf der Tour senden?",
+  "Running Late": "Verspäte mich",
+  "Need a Minute": "Brauche kurz",
 };
 
 export default dict;

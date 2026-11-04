@@ -4,12 +4,14 @@
  */
 import { requireOptionalNativeModule } from 'expo';
 
-import type { CarPlayState } from '@/core/carplay';
+import { carPlayLabels, type CarPlayLabels, type CarPlayState } from '@/core/carplay';
 
 type Subscription = { remove(): void };
 type CarPlayNative = {
   setRide(state: CarPlayState): void;
   clearRide(): void;
+  /** Missing in the first CarPlay builds; optional so an older native module still works. */
+  setLabels?(labels: CarPlayLabels): void;
   addListener(event: 'onAction', listener: (e: { id: string }) => void): Subscription;
 };
 
@@ -27,4 +29,9 @@ export function clearCarPlay() {
 
 export function onCarPlayAction(listener: (id: string) => void): Subscription {
   return native?.addListener('onAction', (e) => listener(e.id)) ?? { remove() {} };
+}
+
+/** Sends the car screen's fixed words in the rider's language. The root layout calls it at launch and on a language change. */
+export function syncCarPlayLabels() {
+  native?.setLabels?.(carPlayLabels());
 }

@@ -32,6 +32,7 @@ import { startOrientationRule } from '@/lib/orientation';
 import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
 import { startReferrals } from '@/lib/referrals';
+import { syncCarPlayLabels } from '@/lib/carplay';
 import { startRiderAgreement } from '@/lib/rider-agreement';
 import { startSettingsSync } from '@/lib/settings-sync';
 import { startAppearanceSync } from '@/lib/appearance-sync';
@@ -85,6 +86,9 @@ function RootLayout() {
     }, 0);
     return () => clearTimeout(t);
   }, [version, langVersion, router]);
+
+  // The CarPlay screen's fixed words follow the app's language (does nothing off iPhone).
+  useEffect(() => syncCarPlayLabels(), [langVersion]);
 
   useEffect(() => {
     setCrashScreen(screen);

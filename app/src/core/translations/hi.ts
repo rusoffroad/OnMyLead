@@ -3034,6 +3034,17 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D भूभाग',
   'Lays the map flat again': 'नक्शे को फिर से सपाट करता है',
   'Tilts the map and raises the mountains': 'नक्शे को झुकाता है और पहाड़ों को उभारता है',
+  // CarPlay
+  " (Leader)": " (लीडर)",
+  "A rider is separated": "एक राइडर अलग हो गया है",
+  "Group Together": "ग्रुप साथ है",
+  "No Ride Running": "कोई राइड नहीं चल रही",
+  "Open Ride Mode on your phone and your group shows up here.": "अपने फ़ोन पर राइड मोड खोलें और आपका ग्रुप यहाँ दिखेगा।",
+  "Group": "ग्रुप",
+  "Nobody Is Sharing Yet": "अभी कोई शेयर नहीं कर रहा",
+  "Send EMERGENCY with your location to everyone on the ride?": "राइड पर सभी को अपनी लोकेशन के साथ EMERGENCY भेजें?",
+  "Running Late": "देर हो रही है",
+  "Need a Minute": "एक मिनट चाहिए",
 };
 
 export default dict;

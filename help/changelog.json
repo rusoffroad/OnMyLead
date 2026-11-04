@@ -2,6 +2,16 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "carplay"
+    ],
+    "kind": "new",
+    "by": "pr",
+    "ref": "carplay",
+    "why": "Apple granted OnMyLead the CarPlay Driving Task entitlement on 2026-11-04 after Chris asked for CarPlay in the next build. The CarPlay screen built in October is switched on for 2.1 and now speaks the rider's app language; this new article explains starting it, the buttons, alerts and what stays on the phone. It publishes when 2.1 is in the App Store."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "map-layers",
       "3d-terrain",
       "full-map",

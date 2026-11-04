@@ -3034,6 +3034,17 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D 지형',
   'Lays the map flat again': '지도를 다시 평평하게 합니다',
   'Tilts the map and raises the mountains': '지도를 기울이고 산을 입체로 보여줍니다',
+  // CarPlay
+  " (Leader)": " (리더)",
+  "A rider is separated": "라이더가 떨어졌습니다",
+  "Group Together": "그룹 함께 있음",
+  "No Ride Running": "진행 중인 라이드 없음",
+  "Open Ride Mode on your phone and your group shows up here.": "휴대폰에서 라이드 모드를 열면 그룹이 여기에 표시됩니다.",
+  "Group": "그룹",
+  "Nobody Is Sharing Yet": "아직 공유하는 사람이 없음",
+  "Send EMERGENCY with your location to everyone on the ride?": "라이드의 모든 사람에게 내 위치와 함께 긴급 알림을 보낼까요?",
+  "Running Late": "늦어요",
+  "Need a Minute": "잠깐만요",
 };
 
 export default dict;

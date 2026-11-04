@@ -994,15 +994,15 @@ export default function RideMode() {
 
   // CarPlay: the car screen mirrors the group's state and sends button presses back here.
   const car = carPlayState({
-    rideName: ride?.name ?? 'Ride',
-    separated: bubble.alerts.map((a) => ({ riderId: a.riderId, message: a.message ?? 'A rider is separated' })),
+    rideName: ride?.name ?? t('Ride'),
+    separated: bubble.alerts.map((a) => ({ riderId: a.riderId, message: a.message ?? t('A rider is separated') })),
     watchesBubble: !!watchesBubble,
     canRegroup: !!canRegroup,
     riders: mapRiders.map((r) => ({
-      title: `${r.name}${r.role === 'leader' ? ' (Leader)' : r.role === 'sweep' ? t(' (Tail Gunner)') : ''}`,
+      title: `${r.name}${r.role === 'leader' ? t(' (Leader)') : r.role === 'sweep' ? t(' (Tail Gunner)') : ''}`,
       detail: r.detail,
     })),
-    helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || 'Rider', status: STATUS_LABEL[s.status] })),
+    helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || t('Rider'), status: t(STATUS_LABEL[s.status]) })),
   });
   const carKey = JSON.stringify(car);
   useEffect(() => {

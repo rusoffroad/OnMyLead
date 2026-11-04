@@ -91,7 +91,7 @@ Keep screens shared. When a device needs different native behavior, put it behin
 | Google sign-in | Native iOS client | Android OAuth client (needs the app signing SHA-1) |
 | Background location | "Always" permission + background mode, blue pill | Foreground service (type location) with the visible Sharing Your Location notification, started by the rider; While Using permission is enough, so the app never requests `ACCESS_BACKGROUND_LOCATION` |
 | Maps | Apple Maps (react-native-maps) | Google Maps SDK (react-native-maps; key from `GOOGLE_MAPS_ANDROID_API_KEY` at prebuild, see `docs/android-build.md`) |
-| CarPlay / Android Auto | CarPlay behind `ONMYLEAD_CARPLAY=1` | Not built (exception) |
+| CarPlay / Android Auto | CarPlay (Driving Task entitlement, on in app.json; `ONMYLEAD_CARPLAY=0` leaves it out) | Not built (exception) |
 | Starlink local status | Local network permission | Cleartext network security config for the dish |
 
 Every row that isn't built yet on one side is a ⬜ in the parity tracker, not an assumption.

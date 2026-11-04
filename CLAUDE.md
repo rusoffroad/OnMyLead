@@ -79,7 +79,8 @@ pass; the Help Center and showcase are updated; the parity tracker row is update
 - Never commit `ios/`, `android/`, `.env`, keystores, `google-services.json` with secrets, or
   service-account keys. Native config goes in `app/app.json` and config plugins.
 - Config plugins `with-scene-lifecycle` and `with-push-entitlement` stay before
-  `expo-notifications`. CarPlay stays behind `ONMYLEAD_CARPLAY=1`.
+  `expo-notifications`. CarPlay is on (Apple granted the entitlement); `with-carplay` stays before
+  `with-scene-lifecycle`.
 
 Full standards (layouts, location, billing, testing matrix, store rules):
 `docs/development-standards.md`. What the app does today: `docs/feature-inventory.md`.

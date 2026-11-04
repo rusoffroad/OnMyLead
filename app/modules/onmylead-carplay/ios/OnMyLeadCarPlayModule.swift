@@ -22,6 +22,10 @@ public class OnMyLeadCarPlayModule: Module {
       DispatchQueue.main.async { CarPlayBridge.shared.update(RideState(state)) }
     }
 
+    Function("setLabels") { (labels: [String: Any]) in
+      DispatchQueue.main.async { CarPlayBridge.shared.setLabels(CarPlayLabels(labels)) }
+    }
+
     Function("clearRide") {
       DispatchQueue.main.async { CarPlayBridge.shared.update(nil) }
     }

@@ -3034,6 +3034,17 @@ const dict: Record<string, string> = {
   '3D Terrain': 'Medan 3D',
   'Lays the map flat again': 'Mengembalikan peta menjadi datar',
   'Tilts the map and raises the mountains': 'Memiringkan peta dan menonjolkan pegunungan',
+  // CarPlay
+  " (Leader)": " (Leader)",
+  "A rider is separated": "Seorang rider terpisah",
+  "Group Together": "Grup bersama",
+  "No Ride Running": "Tidak ada riding berjalan",
+  "Open Ride Mode on your phone and your group shows up here.": "Buka Mode Riding di ponselmu dan grupmu muncul di sini.",
+  "Group": "Grup",
+  "Nobody Is Sharing Yet": "Belum ada yang berbagi",
+  "Send EMERGENCY with your location to everyone on the ride?": "Kirim DARURAT dengan lokasimu ke semua orang di riding?",
+  "Running Late": "Terlambat",
+  "Need a Minute": "Butuh semenit",
 };
 
 export default dict;
