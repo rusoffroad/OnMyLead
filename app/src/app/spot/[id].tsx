@@ -98,7 +98,7 @@ export default function SpotScreen() {
     <>
       <View style={styles.head}>
         <View style={styles.kindTag}>
-          <Icon name={kind.icon} size={14} color={Colors.background} strokeWidth={2.6} />
+          <Icon name={kind.icon} size={16} color={Colors.onScout} strokeWidth={2.4} />
           <Text style={styles.kindText}>{t(kind.one)}</Text>
         </View>
         <Text style={styles.name} accessibilityRole="header">{spot.name}</Text>
@@ -162,9 +162,9 @@ const styles = themedStyles(() => ({
   head: { gap: 4 },
   kindTag: {
     flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4,
-    borderRadius: Radius.pill, backgroundColor: Colors.gold,
+    borderRadius: Radius.pill, backgroundColor: Colors.scout,
   },
-  kindText: { color: Colors.background, fontFamily: font(700), fontSize: 13 },
+  kindText: { color: Colors.onScout, fontFamily: font(700), fontSize: 13 },
   name: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 38, marginTop: 4 },
   away: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20 },
   site: {

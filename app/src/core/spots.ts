@@ -34,12 +34,12 @@ export type SpotDetail = Omit<Spot, 'distanceMi' | 'ridesComingUp'> & {
 };
 
 /** Kinds in the order the filter shows them, with a plural for the chips and a singular for a place. */
-export const SPOT_KINDS: { kind: SpotKind; label: string; one: string; icon: 'flag' | 'layers' | 'map' | 'pin' | 'trophy' }[] = [
-  { kind: 'park', label: 'Off-Road Parks', one: 'Off-Road Park', icon: 'flag' },
-  { kind: 'ohv_area', label: 'OHV Areas', one: 'OHV Area', icon: 'layers' },
-  { kind: 'trail_system', label: 'Trail Systems', one: 'Trail System', icon: 'map' },
-  { kind: 'trailhead', label: 'Trailheads', one: 'Trailhead', icon: 'pin' },
-  { kind: 'track', label: 'Motocross Tracks', one: 'Motocross Track', icon: 'trophy' },
+export const SPOT_KINDS: { kind: SpotKind; label: string; one: string; icon: 'spotPark' | 'spotOhv' | 'spotTrails' | 'spotTrailhead' | 'spotTrack' }[] = [
+  { kind: 'park', label: 'Off-Road Parks', one: 'Off-Road Park', icon: 'spotPark' },
+  { kind: 'ohv_area', label: 'OHV Areas', one: 'OHV Area', icon: 'spotOhv' },
+  { kind: 'trail_system', label: 'Trail Systems', one: 'Trail System', icon: 'spotTrails' },
+  { kind: 'trailhead', label: 'Trailheads', one: 'Trailhead', icon: 'spotTrailhead' },
+  { kind: 'track', label: 'Motocross Tracks', one: 'Motocross Track', icon: 'spotTrack' },
 ];
 const KIND_SET = new Set<string>(SPOT_KINDS.map((k) => k.kind));
 export const isSpotKind = (v: unknown): v is SpotKind => typeof v === 'string' && KIND_SET.has(v);

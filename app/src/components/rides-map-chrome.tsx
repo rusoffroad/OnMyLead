@@ -29,7 +29,7 @@ export type RidesMapProps = {
   /** Full Map: the map fills the screen. `onToggleFull` adds the button that switches it. */
   full?: boolean;
   onToggleFull?: () => void;
-  /** Scout: places to ride, drawn as gold signs. With these, the count chip counts places, not rides. */
+  /** Scout: places to ride, drawn as Scout signs. With these, the count chip counts places, not rides. */
   spots?: Spot[];
   onOpenSpot?: (spot: Spot) => void;
 };
@@ -70,14 +70,14 @@ export function RideBubble({ ride }: { ride: Ride & { distanceMi?: number } }) {
 }
 
 /**
- * A place to ride on the map: a gold trail sign (a rounded square) with its kind drawn on it, so it
+ * A place to ride on the map: a Scout trail sign (a rounded square) with its kind drawn on it, so it
  * reads apart from ride dots (circles) and waypoints (diamonds) by shape as well as colour.
  */
 export function SpotPin({ spot }: { spot: Pick<Spot, 'kind'> }) {
   return (
-    <MarkerBody style={styles.pinWrap}>
+    <MarkerBody style={styles.spotWrap}>
       <View style={styles.sign}>
-        <Icon name={spotKindInfo(spot.kind).icon} size={15} color={Colors.background} strokeWidth={2.6} />
+        <Icon name={spotKindInfo(spot.kind).icon} size={18} color={Colors.onScout} strokeWidth={2.2} />
       </View>
     </MarkerBody>
   );
@@ -90,7 +90,7 @@ export const awayText = (mi: number) => (mi < 1 ? t('Under 1 mi') : t('{n} mi aw
 export function SpotBubble({ spot }: { spot: Spot }) {
   return (
     <View style={styles.bubble}>
-      <Text style={[styles.live, { color: Colors.gold }]}>{t(spotKindInfo(spot.kind).one)}</Text>
+      <Text style={[styles.live, { color: Colors.scout }]}>{t(spotKindInfo(spot.kind).one)}</Text>
       <Text style={styles.bubbleTitle} numberOfLines={2}>{spot.name}</Text>
       <Text style={styles.bubbleText}>
         {awayText(spot.distanceMi)}
@@ -159,7 +159,7 @@ export function MapOverlay({
           </Pressable>
         ) : null}
         <View style={[styles.chip, styles.count]}>
-          <View style={[styles.countDot, { backgroundColor: places ? Colors.gold : Colors.sky }]} />
+          <View style={[styles.countDot, { backgroundColor: places ? Colors.scout : Colors.sky }]} />
           <Text style={styles.chipText}>
             {places
               ? count === 0 ? t('No places here yet') : count === 1 ? t('1 Place') : t('{n} Places', { n: count })
@@ -183,10 +183,12 @@ const glass = 'rgba(10, 22, 38, 0.86)';
 
 const styles = themedStyles(() => ({
   pinWrap: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
+  spotWrap: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
   halo: { position: 'absolute', width: 30, height: 30, borderRadius: 15, opacity: 0.3 },
   sign: {
-    width: 26, height: 26, borderRadius: 8, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.gold, borderWidth: 2.5, borderColor: Colors.background,
+    width: 30, height: 30, borderRadius: 9, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.scout, borderWidth: 2, borderColor: Colors.background,
+    shadowColor: '#000', shadowOpacity: 0.45, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 3,
   },
   pin: { width: 18, height: 18, borderRadius: 9, borderWidth: 3, borderColor: Colors.background },
   bubble: {

@@ -7,6 +7,7 @@ import { spotKindInfo } from '@/core/spots';
 import { Colors } from '@/constants/theme';
 import { regionMoved, type Bounds } from '@/core/discovery';
 import { useTrailMap, type TrailMap } from '@/hooks/use-trail-map';
+import { iconSvg } from '@/components/icon';
 import { RidesMapboxMap } from '@/components/rides-mapbox-map';
 import { esc, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { t } from '@/lib/i18n';
@@ -107,11 +108,11 @@ function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onO
       L.marker([r.meet_area_lat, r.meet_area_lng], { icon, title: r.name, zIndexOffset: r.status === 'live' ? 1000 : 0 }).bindPopup(pop, { closeButton: false, offset: [0, -8] }).addTo(g);
     }
     for (const s of spots ?? []) {
-      const icon = L.divIcon({ className: '', iconSize: [30, 30], iconAnchor: [15, 15], html: `<div class="oml-spot" data-kind="${s.kind}"></div>` });
+      const icon = L.divIcon({ className: '', iconSize: [34, 34], iconAnchor: [17, 17], html: `<div class="oml-spot" data-kind="${s.kind}">${iconSvg(spotKindInfo(s.kind).icon, { size: 18, color: Colors.onScout, strokeWidth: 2.2 })}</div>` });
       const pop = document.createElement('div');
       pop.className = 'oml-pop';
       const rides = s.ridesComingUp ? `, ${s.ridesComingUp === 1 ? t('1 ride coming up') : t('{n} rides coming up', { n: s.ridesComingUp })}` : '';
-      pop.innerHTML = `<div class="live" style="color:${Colors.gold}">${esc(t(spotKindInfo(s.kind).one))}</div><div class="t">${esc(s.name)}</div><div class="s">${esc(awayText(s.distanceMi) + rides)}</div><button>${esc(t('Open Place'))}</button>`;
+      pop.innerHTML = `<div class="live" style="color:${Colors.scout}">${esc(t(spotKindInfo(s.kind).one))}</div><div class="t">${esc(s.name)}</div><div class="s">${esc(awayText(s.distanceMi) + rides)}</div><button>${esc(t('Open Place'))}</button>`;
       pop.querySelector('button')!.addEventListener('click', () => openSpotRef.current?.(s));
       L.marker([s.lat, s.lng], { icon, title: s.name }).bindPopup(pop, { closeButton: false, offset: [0, -8] }).addTo(g);
     }

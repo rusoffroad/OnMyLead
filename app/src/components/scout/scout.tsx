@@ -149,7 +149,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
                 accessibilityLabel={`${t(k.label)}, ${counts[k.kind]}`}
                 onPress={() => setKinds((ks) => toggleKind(ks, k.kind))}
                 style={({ pressed }) => [styles.kind, on && styles.kindOn, pressed && { opacity: 0.7 }]}>
-                <Icon name={k.icon} size={15} color={on ? Colors.background : Colors.gold} strokeWidth={2.4} />
+                <Icon name={k.icon} size={15} color={on ? Colors.onScout : Colors.scout} strokeWidth={2.4} />
                 <Text style={[styles.kindText, on && styles.kindTextOn]}>{t(k.label)}</Text>
                 <Text style={[styles.kindCount, on && styles.kindTextOn]}>{counts[k.kind]}</Text>
               </Pressable>
@@ -255,10 +255,10 @@ const styles = themedStyles(() => ({
     flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, minHeight: 40,
     borderRadius: Radius.pill, borderWidth: 1.5, borderColor: Colors.backgroundSelected, backgroundColor: Colors.backgroundElement,
   },
-  kindOn: { backgroundColor: Colors.gold, borderColor: Colors.gold },
+  kindOn: { backgroundColor: Colors.scout, borderColor: Colors.scout },
   kindText: { color: Colors.text, fontFamily: font(600), fontSize: 15 },
   kindCount: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 16 },
-  kindTextOn: { color: Colors.background },
+  kindTextOn: { color: Colors.onScout },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: Spacing.three, paddingVertical: 12, minHeight: 64 },
   away: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 18 },
   suggest: {

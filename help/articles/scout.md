@@ -27,7 +27,7 @@ Scout finds places to ride near you: off-road parks, OHV areas, trail systems, t
 2. Tap **Places to Ride** at the top. (**Rides** takes you back to public rides.)
 3. Allow location if asked. If location is off, tap **Use My Location**, or search a town or park instead.
 
-Places show on the map as gold signs and in a list under it (beside it on a tablet or a wide screen), nearest first. Each place shows what kind it is, where it is, how far away it is and how many public rides are coming up there.
+Places show on the map as teal signs, with a picture of the kind of place (a flag on a peak for an off-road park, a quad for an OHV area, a forked trail for a trail system, a signpost for a trailhead and a checkered flag for a motocross track), and in a list under it (beside it on a tablet or a wide screen), nearest first. Each place shows what kind it is, where it is, how far away it is and how many public rides are coming up there.
 
 ## Change How Far Scout Looks
 
