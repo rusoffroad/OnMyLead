@@ -2,6 +2,16 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "home-screen"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "home-fit-one-screen",
+    "why": "Chris asked to move Events just below Create a Ride and Find a Ride and to fit Join, Create, Find, Events and Map Mode on one screen without scrolling (mock approved). From 2.1 the order is Join, Create and Find, Events, Map Mode; the cards are shorter, Track Line is a small switch in the Map Mode card's corner, and small phones leave out the greeting."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "bluetooth-sharing",
       "troubleshooting",
       "ride-mode"
