@@ -2,6 +2,37 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "home-screen",
+      "getting-started",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "home-fit-one-screen",
+    "why": "Chris asked to move Events just below Create a Ride and Find a Ride and to fit Join, Create, Find, Events and Map Mode on one screen without scrolling (mock approved). From 2.1 the order is Join, Create and Find, Events, Map Mode; the cards are shorter, Track Line is a small switch in the Map Mode card's corner, and small phones leave out the greeting."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "events",
+      "find-a-ride",
+      "free-vs-pro",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "home-fit-one-screen",
+    "why": "Checked against the new one-screen home layout: these guides only link to the home screen and their steps don't change, so only the date moved."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "map-layers",
       "offline-maps",
       "3d-terrain",

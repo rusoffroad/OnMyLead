@@ -58,6 +58,10 @@
       {
         "kind": "new",
         "text": "Press and hold the map in Ride Mode or Map Mode to drop a waypoint right there, then tap it to edit or remove it. On a group ride the leader's waypoints are shared with everyone, and the other riders' phones ding with \"Lou added a new waypoint: Fuel Stop\". Tap it to see the waypoint in Ride Mode. In Map Mode on your own, waypoints are yours, saved on your phone for no-signal riding and synced to your other devices with Pro."
+      },
+      {
+        "kind": "improved",
+        "text": "Home fits on one screen: Join a Ride, Create a Ride, Find a Ride, Events and Map Mode are all on the first screen without scrolling, with Events right under Create and Find. The cards are shorter, and Track Line is a small switch in the corner of the Map Mode card."
       }
     ]
   },

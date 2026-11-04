@@ -78,3 +78,15 @@ export const TOOLKIT: { key: ToolKey; label: string; href: string }[] = [
 export function toolkitFor(on: { trip_planner: boolean; starlink: boolean }): typeof TOOLKIT {
   return TOOLKIT.filter((t) => (t.key === 'trips' ? on.trip_planner : t.key === 'starlink' ? on.starlink : true));
 }
+
+/**
+ * Below this window height (points) the home screen drops the greeting line, so Join, Create, Find,
+ * Events and Map Mode still fit on one screen on the small iPhones (SE, 667) and small Android
+ * phones. The mini (812) and up have room for it. Chris 2026-11-04: "fit ... on one screen without scrolling".
+ */
+export const SHORT_HOME_HEIGHT = 700;
+
+/** True when the greeting should be left out to keep the home screen's actions on one screen. */
+export function shortHome(windowHeight: number): boolean {
+  return windowHeight > 0 && windowHeight < SHORT_HOME_HEIGHT;
+}
