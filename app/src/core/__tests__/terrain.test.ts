@@ -5,8 +5,9 @@ import {
   offlineChoices, planArea, planRide, statusLine, terrainBoxes, terrainBytes, type OfflineMap,
 } from '../offline-maps';
 import {
-  cameraPadding, feetLabel, fitCorners, insideBox, linesGeoJSON, mapboxTileTemplate, mapboxZoomFor, metersPerPointAt, metersToFeet,
-  packBounds, packName, pointsGeoJSON, regionFromCamera, TERRAIN_IDS, TERRAIN_SOURCES, terrainLayers, terrainShows, tightPoints,
+  cameraPadding, circlePolygon, feetLabel, fitCorners, insideBox, linesGeoJSON, lookFor, lookPitch, mapboxDraws, mapboxStyleFor,
+  mapboxTileTemplate, mapboxZoomFor, metersPerPointAt, metersToFeet, OUTDOORS_STYLE_URL, packBounds, packName, pointsGeoJSON,
+  regionFromCamera, TERRAIN_IDS, TERRAIN_SOURCES, TERRAIN_STYLE_URL, terrainLayers, terrainShows, tightPoints, TOPO_RASTER_SOURCE,
   trailZoomFromMapbox,
 } from '../terrain';
 import { mapZoom, TRAIL_SOURCES, trailTileTemplate } from '../trails';
@@ -169,5 +170,60 @@ describe('owner switch', () => {
     expect(APP_FLAGS.terrain_3d.label).toBe('3D Terrain');
     expect(flagOn(parseAppSettings({ flags: {} }), 'terrain_3d')).toBe(true);
     expect(flagOn(parseAppSettings({ flags: { terrain_3d: false } }), 'terrain_3d')).toBe(false);
+  });
+
+  it('has a Mapbox Maps flag that brings every map back to the 2.0 maps', () => {
+    expect(APP_FLAGS.mapbox_maps.label).toBe('Mapbox Maps');
+    expect(flagOn(parseAppSettings({ flags: {} }), 'mapbox_maps')).toBe(true);
+    expect(flagOn(parseAppSettings({ flags: { mapbox_maps: false } }), 'mapbox_maps')).toBe(false);
+  });
+});
+
+describe('map looks', () => {
+  it('gives Free riders the standard map and Pro riders their Map Style', () => {
+    expect(lookFor('terrain', false)).toBe('standard');
+    expect(lookFor('topo', true)).toBe('topo');
+    expect(lookFor('terrain', true)).toBe('terrain');
+  });
+
+  it('starts each look from a Mapbox style, with the USGS map over the topo look', () => {
+    expect(mapboxStyleFor('standard')).toBe(OUTDOORS_STYLE_URL);
+    expect(mapboxStyleFor('topo')).toBe(OUTDOORS_STYLE_URL);
+    expect(mapboxStyleFor('satellite')).toBe(TERRAIN_STYLE_URL);
+    expect(mapboxStyleFor('terrain')).toBe(TERRAIN_STYLE_URL);
+    expect(TOPO_RASTER_SOURCE.tiles[0]).toContain('USGSTopo');
+    expect(TOPO_RASTER_SOURCE.maxzoom).toBe(16);
+  });
+
+  it('tilts only 3D Terrain', () => {
+    expect(lookPitch('terrain')).toBe(60);
+    expect(lookPitch('satellite')).toBe(0);
+  });
+
+  it('draws with Mapbox whenever allowed with signal', () => {
+    const base = { available: true, offline: false, center: { lat: 38.6, lng: -109.6 }, saved: [] };
+    expect(mapboxDraws({ ...base, look: 'standard' })).toBe(true);
+    expect(mapboxDraws({ ...base, look: 'topo' })).toBe(true);
+    expect(mapboxDraws({ ...base, available: false, look: 'satellite' })).toBe(false);
+  });
+
+  it('with no signal, draws with Mapbox only over a saved pack and only satellite or 3D', () => {
+    const base = { available: true, offline: true, center: { lat: 38.6, lng: -109.6 }, saved: [MOAB] };
+    expect(mapboxDraws({ ...base, look: 'satellite' })).toBe(true);
+    expect(mapboxDraws({ ...base, look: 'terrain' })).toBe(true);
+    // Topo and the standard map are saved as squares for the flat map, not in Mapbox's pack.
+    expect(mapboxDraws({ ...base, look: 'topo' })).toBe(false);
+    expect(mapboxDraws({ ...base, look: 'standard' })).toBe(false);
+    expect(mapboxDraws({ ...base, look: 'satellite', saved: [] })).toBe(false);
+    expect(mapboxDraws({ ...base, look: 'satellite', center: null })).toBe(false);
+  });
+
+  it('draws a search ring as a polygon about the right size', () => {
+    const ring = circlePolygon({ lat: 38.6, lng: -109.6 }, 1609.344 * 25);
+    const pts = ring.geometry.coordinates[0];
+    expect(pts).toHaveLength(65);
+    expect(pts[0]).toEqual(pts[64]);
+    // 25 miles north of the center is about 0.36 degrees of latitude.
+    expect(Math.max(...pts.map((p) => p[1])) - 38.6).toBeCloseTo(0.361, 2);
   });
 });

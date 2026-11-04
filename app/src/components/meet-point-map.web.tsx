@@ -5,15 +5,24 @@ import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, Radius } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { useTrailMap } from '@/hooks/use-trail-map';
 import { ll, satelliteMap } from '@/lib/web-map';
+import { MeetPointMapboxMap } from './meet-point-mapbox-map';
 
 const pinHtml = () => `<div class="oml-meet"><svg width="34" height="44" viewBox="0 0 34 44"><path d="M17 42C17 42 3 26.5 3 16.5a14 14 0 0 1 28 0C31 26.5 17 42 17 42Z" fill="${Colors.accent}" stroke="${Colors.background}" stroke-width="3"/><circle cx="17" cy="16.5" r="5.5" fill="#FFFFFF"/></svg></div>`;
+
+/** The meeting-point picker: Mapbox when this build and the owner allow it, otherwise the Leaflet map below. */
+export function MeetPointMap(props: { value: LatLng | null; onPick: (p: LatLng) => void }) {
+  const trail = useTrailMap();
+  if (trail.mapbox) return <MeetPointMapboxMap {...props} trail={trail} />;
+  return <FlatMeetPointMap {...props} />;
+}
 
 /**
  * Create a Ride on the website: click the satellite map to drop the meeting point, drag the pin
  * to fine-tune it. Searching a place or typing coordinates moves the pin here too.
  */
-export function MeetPointMap({ value, onPick }: { value: LatLng | null; onPick: (p: LatLng) => void }) {
+function FlatMeetPointMap({ value, onPick }: { value: LatLng | null; onPick: (p: LatLng) => void }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const pin = useRef<L.Marker | null>(null);

@@ -1,4 +1,4 @@
-import type { Map as MapboxMap, Marker as MapboxMarker } from 'mapbox-gl';
+import type { Map as MapboxMap_, Marker as MapboxMarker_ } from 'mapbox-gl';
 import { createContext, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
 import { createPortal } from 'react-dom';
 import { StyleSheet, View } from 'react-native';
@@ -7,23 +7,24 @@ import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import {
-  cameraPadding, EMPTY_LINES, fitCorners, linesGeoJSON, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON, regionFromCamera, TERRAIN_EXAGGERATION,
-  TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_PITCH, TERRAIN_SOURCES, TERRAIN_STYLE_URL, terrainLayers, trailZoomFromMapbox,
+  cameraPadding, EMPTY_LINES, fitCorners, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON,
+  regionFromCamera, TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_SOURCES, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE,
+  TOPO_SOURCE_ID, trailZoomFromMapbox, type MapLook,
 } from '@/core/terrain';
 import { TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN } from '@/lib/terrain';
-import type { TerrainLine, TerrainMapHandle, TerrainOwnFix } from './terrain-map-types';
+import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
-export type { TerrainLine, TerrainMapHandle, TerrainOwnFix } from './terrain-map-types';
+export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
 const RIDE_ZOOM = 13.5;
 const FAR_OUT_ZOOM = 8;
-const MapCtx = createContext<MapboxMap | null>(null);
+const MapCtx = createContext<MapboxMap_ | null>(null);
 
 type GL = typeof import('mapbox-gl');
 let glLoad: Promise<GL> | null = null;
-/** mapbox-gl is big, so the website loads it only when someone opens 3D Terrain. */
+/** mapbox-gl is big, so the website loads it only when a map opens. */
 function loadGl(): Promise<GL> {
   glLoad ??= import('@/lib/mapbox-web').then((m) => m.default);
   return glLoad;
@@ -32,12 +33,18 @@ function loadGl(): Promise<GL> {
 const OPEN_DASH = [9 / 3.2, 5 / 3.2];
 const CLOSED_DASH = [5 / 3.2, 5 / 3.2];
 
-/** Everything the app adds to Mapbox's satellite style, in drawing order. */
-function addLayers(m: MapboxMap) {
-  for (const [id, src] of Object.entries(TERRAIN_SOURCES)) m.addSource(id, src as never);
-  m.setTerrain({ source: TERRAIN_IDS.dem, exaggeration: TERRAIN_EXAGGERATION });
-  m.setFog({ color: '#9DB8D6', 'high-color': '#24466F', 'horizon-blend': 0.08, 'space-color': Colors.background, 'star-intensity': 0 } as never);
-  for (const l of terrainLayers()) m.addLayer(l as never);
+/** Everything the app adds to a Mapbox style for a look, in drawing order (added again after each style change). */
+function addLayers(m: MapboxMap_, look: MapLook) {
+  if (look === 'terrain') {
+    for (const [id, src] of Object.entries(TERRAIN_SOURCES)) m.addSource(id, src as never);
+    m.setTerrain({ source: TERRAIN_IDS.dem, exaggeration: TERRAIN_EXAGGERATION });
+    m.setFog({ color: '#9DB8D6', 'high-color': '#24466F', 'horizon-blend': 0.08, 'space-color': Colors.background, 'star-intensity': 0 } as never);
+    for (const l of terrainLayers()) m.addLayer(l as never);
+  }
+  if (look === 'topo') {
+    m.addSource(TOPO_SOURCE_ID, TOPO_RASTER_SOURCE as never);
+    m.addLayer({ id: TOPO_LAYER_ID, type: 'raster', source: TOPO_SOURCE_ID });
+  }
   for (const id of TRAIL_SOURCE_IDS) {
     m.addSource(`oml-agency-${id}`, { type: 'raster', tiles: [mapboxTileTemplate(trailTileTemplate(TRAIL_SOURCES[id]))], tileSize: 256, minzoom: TRAILS_MIN_Z - 1 });
     m.addLayer({ id: `oml-agency-${id}`, type: 'raster', source: `oml-agency-${id}` });
@@ -60,28 +67,39 @@ function addLayers(m: MapboxMap) {
 const TRAIL_LAYER_IDS = ['oml-tracks-case', 'oml-tracks-open', 'oml-tracks-closed', 'oml-trail-names', ...TRAIL_SOURCE_IDS.map((id) => `oml-agency-${id}`)];
 
 /**
- * The 3D Terrain map on the website (mapbox-gl), the same picture and the same props as the
- * apps' (terrain-map.tsx). Drag pans, right-drag or Ctrl-drag turns and tilts, scroll zooms.
+ * The Mapbox map on the website (mapbox-gl), the same picture and the same props as the apps'
+ * (mapbox-map.tsx). Drag pans, scroll zooms; in 3D Terrain, right-drag or Ctrl-drag turns and tilts.
  */
-export function TerrainMap({
-  trail, initial, lines, onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle, children, ref,
+export function MapboxMap({
+  trail, look, tilt, rotate = true, compass = true, scaleBar = false, initial, lines, fills, onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle,
+  children, ref,
 }: {
   trail: TrailMap;
+  look?: MapLook;
+  tilt?: boolean;
+  rotate?: boolean;
+  compass?: boolean;
+  scaleBar?: boolean;
   initial?: { center: LatLng; zoom?: number } | null;
-  lines?: TerrainLine[];
+  lines?: MapLine[];
+  fills?: MapFill[];
   onPress?: (p: LatLng) => void;
   onLongPress?: (p: LatLng) => void;
   onUserMove?: () => void;
   onReady?: () => void;
   onCamera?: (c: { heading: number }) => void;
-  onOwnFix?: (f: TerrainOwnFix) => void;
-  onIdle?: (c: { center: LatLng; metersPerPoint: number }) => void;
+  onOwnFix?: (f: MapboxOwnFix) => void;
+  onIdle?: (c: MapIdle) => void;
   children?: ReactNode;
-  ref?: Ref<TerrainMapHandle>;
+  ref?: Ref<MapboxMapHandle>;
 }) {
+  const shown: MapLook = look ?? trail.look;
+  const tilts = tilt ?? shown === 'terrain';
   const el = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<MapboxMap | null>(null);
-  const [styled, setStyled] = useState(false);
+  const [map, setMap] = useState<MapboxMap_ | null>(null);
+  // Counts style loads: the app's layers and lines are added again after each one.
+  const [styled, setStyled] = useState(0);
+  const lookRef = useRef(shown);
   const cb = useRef({ onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle, trail });
   useEffect(() => {
     cb.current = { onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle, trail };
@@ -89,26 +107,31 @@ export function TerrainMap({
 
   useEffect(() => {
     let gone = false;
-    let made: MapboxMap | null = null;
+    let made: MapboxMap_ | null = null;
     loadGl().then((gl) => {
       if (gone || !el.current) return;
       gl.accessToken = MAPBOX_TOKEN;
       const m = new gl.Map({
         container: el.current,
-        style: TERRAIN_STYLE_URL,
+        style: mapboxStyleFor(lookRef.current),
         center: initial ? [initial.center.lng, initial.center.lat] : [-105.8, 39.5],
         zoom: initial?.zoom ?? (initial ? RIDE_ZOOM : 4),
-        pitch: TERRAIN_PITCH,
+        pitch: lookPitch(lookRef.current),
         maxPitch: TERRAIN_MAX_PITCH,
         attributionControl: true,
       });
       made = m;
       // Bottom left: the top right holds the app's own layers button.
-      m.addControl(new gl.NavigationControl({ visualizePitch: true }), 'bottom-left');
+      if (compass) m.addControl(new gl.NavigationControl({ visualizePitch: true }), 'bottom-left');
+      if (scaleBar) m.addControl(new gl.ScaleControl({ unit: 'imperial' }), 'bottom-right');
+      let first = true;
       m.on('style.load', () => {
-        addLayers(m);
-        setStyled(true);
-        cb.current.onReady?.();
+        addLayers(m, lookRef.current);
+        setStyled((n) => n + 1);
+        if (first) {
+          first = false;
+          cb.current.onReady?.();
+        }
       });
       type Ev = { lngLat: { lat: number; lng: number } };
       const at = (e: Ev) => ({ lat: e.lngLat.lat, lng: e.lngLat.lng });
@@ -132,8 +155,14 @@ export function TerrainMap({
       const report = () => {
         const c = m.getCenter();
         const { clientWidth: width, clientHeight: height } = m.getContainer();
+        const b = m.getBounds();
         cb.current.trail.onRegion(regionFromCamera({ lat: c.lat, lng: c.lng }, m.getZoom(), { width, height }), trailZoomFromMapbox(m.getZoom()));
-        cb.current.onIdle?.({ center: { lat: c.lat, lng: c.lng }, metersPerPoint: metersPerPointAt(c.lat, m.getZoom()) });
+        cb.current.onIdle?.({
+          center: { lat: c.lat, lng: c.lng },
+          zoom: m.getZoom(),
+          bounds: { minLat: b.getSouth(), maxLat: b.getNorth(), minLng: b.getWest(), maxLng: b.getEast() },
+          metersPerPoint: metersPerPointAt(c.lat, m.getZoom()),
+        });
       };
       m.on('moveend', report);
       m.once('load', report);
@@ -156,6 +185,31 @@ export function TerrainMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // A new look: a new Mapbox style (its 'style.load' adds the app's layers back), tilted or flat.
+  useEffect(() => {
+    if (!map) return;
+    if (lookRef.current !== shown) {
+      lookRef.current = shown;
+      map.setStyle(mapboxStyleFor(shown));
+      map.easeTo({ pitch: lookPitch(shown), duration: 600 });
+    }
+    if (tilts) {
+      map.setMaxPitch(TERRAIN_MAX_PITCH);
+      map.touchPitch.enable();
+    } else {
+      map.easeTo({ pitch: 0, duration: 300 });
+      map.touchPitch.disable();
+      map.setMaxPitch(0);
+    }
+    if (rotate) {
+      map.dragRotate.enable();
+      map.touchZoomRotate.enableRotation();
+    } else {
+      map.dragRotate.disable();
+      map.touchZoomRotate.disableRotation();
+    }
+  }, [map, shown, tilts, rotate]);
+
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {
       if (!map) return;
@@ -173,6 +227,14 @@ export function TerrainMap({
       if (!c || !map) return;
       map.fitBounds([c[1], c[0]], { padding: inset, duration: animated ? 600 : 0, pitch: map.getPitch() });
     },
+    zoomBy(levels) {
+      map?.zoomTo(Math.max(1, Math.min(22, map.getZoom() + levels)), { duration: 250 });
+    },
+    async pointAt(x, y) {
+      if (!map) return null;
+      const p = map.unproject([x, y]);
+      return { lat: p.lat, lng: p.lng };
+    },
     isFarOut: () => (map ? map.getZoom() < FAR_OUT_ZOOM : true),
   }), [map]);
 
@@ -181,6 +243,7 @@ export function TerrainMap({
   useEffect(() => {
     if (!map || !styled) return;
     for (const id of TRAIL_LAYER_IDS) {
+      if (!map.getLayer(id)) continue;
       const agency = id.startsWith('oml-agency-');
       map.setLayoutProperty(id, 'visibility', trails && !(agency && offline) ? 'visible' : 'none');
     }
@@ -193,16 +256,22 @@ export function TerrainMap({
     src('oml-rider-trails')?.setData?.(linesGeoJSON(riderTrails.map((t) => ({ key: t.id, points: t.points }))));
   }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails]);
 
-  // The screen's own lines, redrawn when they change.
+  // The screen's own fills and lines, redrawn when they change (and after a style change wiped them).
   const drawn = useRef<string[]>([]);
   useEffect(() => {
     if (!map || !styled) return;
     for (const id of drawn.current) {
-      if (map.getLayer(`${id}-case`)) map.removeLayer(`${id}-case`);
-      if (map.getLayer(`${id}-ink`)) map.removeLayer(`${id}-ink`);
+      for (const suffix of ['-case', '-ink', '-fill', '-line']) if (map.getLayer(`${id}${suffix}`)) map.removeLayer(`${id}${suffix}`);
       if (map.getSource(id)) map.removeSource(id);
     }
     drawn.current = [];
+    for (const f of fills ?? []) {
+      const id = `oml-fill-${f.id}`;
+      map.addSource(id, { type: 'geojson', data: f.polygon });
+      map.addLayer({ id: `${id}-fill`, type: 'fill', source: id, paint: { 'fill-color': f.color, 'fill-opacity': f.opacity } });
+      map.addLayer({ id: `${id}-line`, type: 'line', source: id, paint: { 'line-color': f.stroke, 'line-width': f.strokeWidth } });
+      drawn.current.push(id);
+    }
     for (const l of lines ?? []) {
       const id = `oml-line-${l.id}`;
       const pieces = Array.isArray(l.points[0]) ? (l.points as LatLng[][]) : [l.points as LatLng[]];
@@ -217,32 +286,44 @@ export function TerrainMap({
       });
       drawn.current.push(id);
     }
-  }, [map, styled, lines]);
+  }, [map, styled, lines, fills]);
 
   return (
     <View style={StyleSheet.absoluteFill}>
       {/* Mapbox's zoom, compass and tilt buttons sit above Full Map's bar in the bottom-left corner. */}
-      <style>{'.oml-terrain .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-group{margin-bottom:96px}'}</style>
-      <div ref={el} className="oml-terrain" style={{ position: 'absolute', inset: 0, zIndex: 0, background: Colors.background }} />
+      <style>{'.oml-mapbox .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-group{margin-bottom:96px}'}</style>
+      <div ref={el} className="oml-mapbox" style={{ position: 'absolute', inset: 0, zIndex: 0, background: Colors.background }} />
       <MapCtx.Provider value={map}>{children}</MapCtx.Provider>
     </View>
   );
 }
 
-/** A pin on the website's 3D map: any view, drawn by React into a Mapbox marker. */
-export function TerrainMarker({
-  at, anchor = { x: 0.5, y: 0.5 }, children,
-}: { at: LatLng; anchor?: { x: number; y: number }; children: ReactNode }) {
+/**
+ * A pin on the website's map: any view, drawn by React into a Mapbox marker. Clicks on it stay on
+ * it (the map doesn't also hear them); a draggable pin reports where it was dropped.
+ */
+export function MapboxMarker({
+  at, anchor = { x: 0.5, y: 0.5 }, draggable, onDragEnd, children,
+}: { id?: string; at: LatLng; anchor?: { x: number; y: number }; draggable?: boolean; onDragEnd?: (p: LatLng) => void; children: ReactNode }) {
   const map = useContext(MapCtx);
   const holder = useMemo(() => (typeof document === 'undefined' ? null : document.createElement('div')), []);
-  const marker = useRef<MapboxMarker | null>(null);
+  const marker = useRef<MapboxMarker_ | null>(null);
+  const drop = useRef(onDragEnd);
+  useEffect(() => {
+    drop.current = onDragEnd;
+  }, [onDragEnd]);
   useEffect(() => {
     if (!map || !holder) return;
     let gone = false;
     loadGl().then((gl) => {
       if (gone) return;
       holder.style.transform = '';
-      marker.current = new gl.Marker({ element: holder, anchor: 'top-left', offset: [0, 0] }).setLngLat([at.lng, at.lat]).addTo(map);
+      const mk = new gl.Marker({ element: holder, anchor: 'top-left', offset: [0, 0], draggable: !!draggable }).setLngLat([at.lng, at.lat]).addTo(map);
+      mk.on('dragend', () => {
+        const p = mk.getLngLat();
+        drop.current?.({ lat: p.lat, lng: p.lng });
+      });
+      marker.current = mk;
     });
     return () => {
       gone = true;
@@ -251,13 +332,20 @@ export function TerrainMarker({
     };
     // Made once per map; the position is moved below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, holder]);
+  }, [map, holder, draggable]);
   useEffect(() => {
     marker.current?.setLngLat([at.lng, at.lat]);
   }, [at.lat, at.lng]);
   if (!holder) return null;
   return createPortal(
-    <div style={{ transform: `translate(${-anchor.x * 100}%, ${-anchor.y * 100}%)` }}>{children}</div>,
+    <div
+      style={{ transform: `translate(${-anchor.x * 100}%, ${-anchor.y * 100}%)`, cursor: draggable ? 'grab' : undefined }}
+      onClick={(e) => e.stopPropagation()}>
+      {children}
+    </div>,
     holder,
   );
 }
+
+export const TerrainMap = MapboxMap;
+export const TerrainMarker = MapboxMarker;

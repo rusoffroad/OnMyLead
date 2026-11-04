@@ -5,7 +5,15 @@ import { View } from 'react-native';
 import { TrailTiles } from '@/components/trail-tiles';
 import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, type RidesMapProps } from '@/components/rides-map-chrome';
 import { boundsOfRegion, regionFor, regionMoved, zoomRegion } from '@/core/discovery';
-import { useTrailMap } from '@/hooks/use-trail-map';
+import { useTrailMap, type TrailMap } from '@/hooks/use-trail-map';
+import { RidesMapboxMap } from '@/components/rides-mapbox-map';
+
+/** Find a Ride's map: Mapbox when this build and the owner allow it and it can draw here, otherwise the flat map below. */
+export function RidesMap(props: RidesMapProps) {
+  const trail = useTrailMap();
+  if (trail.mapbox) return <RidesMapboxMap {...props} trail={trail} />;
+  return <FlatRidesMap {...props} trail={trail} />;
+}
 
 /**
  * Public rides as pins on a map the rider can pinch, pan and zoom. Opens on the rider's state.
@@ -13,7 +21,7 @@ import { useTrailMap } from '@/hooks/use-trail-map';
  * off-road park tracks show too (the rider's Map Layers choice from the ride maps).
  * The web build uses rides-map.web.tsx.
  */
-export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull }: RidesMapProps) {
+function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail }: RidesMapProps & { trail: TrailMap }) {
   const map = useRef<MapView>(null);
   const [initial] = useState(() => regionFor(frame));
   const region = useRef<Region>(initial);
@@ -21,7 +29,6 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
   const anchor = useRef(boundsOfRegion(initial));
   const settling = useRef(true);
   const [moved, setMoved] = useState(false);
-  const trail = useTrailMap();
 
   const flyTo = (r: Region) => {
     settling.current = true;

@@ -10,18 +10,19 @@ import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
 import type { GroupMapHandle, MapRider } from './group-map-types';
-import { useGlide } from './rider-marker';
+import { useGlide } from './use-glide';
 import { RiderPin } from './rider-pin';
-import { TerrainMap, TerrainMarker, type TerrainLine, type TerrainMapHandle, type TerrainOwnFix } from './terrain-map';
+import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle, type MapboxOwnFix } from './mapbox-map';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
 type Inset = { top: number; right: number; bottom: number; left: number };
 
 /**
- * Ride Mode's live map in 3D Terrain: the same riders, route, waypoints and regroup pin as the
- * flat map (group-map.tsx), framed and followed the same way, on Mapbox's raised satellite ground.
+ * Ride Mode's live map on Mapbox: the same riders, route, waypoints and regroup pin as the flat
+ * map (group-map.tsx), framed and followed the same way, in the rider's look (satellite, topo or
+ * 3D Terrain's raised satellite ground).
  */
-export function GroupTerrainMap({
+export function GroupMapboxMap({
   riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding, fallback,
   onReady, onUserMove, follow, locationEveryMs = 1000, ref,
 }: {
@@ -42,10 +43,12 @@ export function GroupTerrainMap({
   locationEveryMs?: number;
   ref?: Ref<GroupMapHandle>;
 }) {
-  const map = useRef<TerrainMapHandle>(null);
-  // How many riders use 3D Terrain (Admin > Analytics), to watch Mapbox's free allowance.
+  const map = useRef<MapboxMapHandle>(null);
+  // How many riders open a Mapbox map, and in which look (Admin > Analytics), to watch Mapbox's free allowance.
   useEffect(() => {
-    track('terrain_3d_opened', { platform: Platform.OS, screen: 'ride_mode' });
+    track('mapbox_map_opened', { platform: Platform.OS, screen: 'ride_mode', look: trail.look });
+    // Once per map, not per look change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [ready, setReady] = useState(false);
   const fitted = useRef<'no' | 'riders' | 'route'>('no');
@@ -72,7 +75,7 @@ export function GroupTerrainMap({
   }), []);
 
   // Follow Me: keep the rider's own spot in the open map as they move (jitter under a couple of meters skipped).
-  const onOwnFix = useCallback((f: TerrainOwnFix) => {
+  const onOwnFix = useCallback((f: MapboxOwnFix) => {
     lastFix.current = { lat: f.lat, lng: f.lng };
     const fl = followRef.current;
     if (!fl || !followCamShouldMove(followed.current, f)) return;
@@ -108,7 +111,7 @@ export function GroupTerrainMap({
     }
   }, [ready, riders, route, edgePadding, fallback]);
 
-  const lines = useMemo<TerrainLine[]>(
+  const lines = useMemo<MapLine[]>(
     () => (route && route.length > 1 ? [{ id: 'route', points: route, color: Colors.accent, width: 5, casing: Colors.background, casingWidth: 9 }] : []),
     [route],
   );
@@ -119,7 +122,7 @@ export function GroupTerrainMap({
   const onRider = useCallback((id: string) => pressRider.current?.(id), []);
 
   return (
-    <TerrainMap
+    <MapboxMap
       ref={map}
       trail={trail}
       initial={fallback ? { center: fallback } : null}
@@ -134,7 +137,7 @@ export function GroupTerrainMap({
       onOwnFix={onOwnFix}>
       {route && route.length > 1 ? <RouteEnds3d points={route} /> : null}
       {waypoints?.map((w) => (
-        <TerrainMarker key={`w-${w.id}`} at={w}>
+        <MapboxMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
@@ -145,7 +148,7 @@ export function GroupTerrainMap({
               <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
             )}
           </Pressable>
-        </TerrainMarker>
+        </MapboxMarker>
       ))}
       {riders
         .filter((r) => r.lat != null && r.lng != null && r.id !== meId)
@@ -153,13 +156,13 @@ export function GroupTerrainMap({
           <RiderPin3d key={r.id} rider={r} mapHeading={mapHeading} onPress={onRider} />
         ))}
       {regroup ? (
-        <TerrainMarker at={{ lat: regroup.lat, lng: regroup.lng }} anchor={{ x: 0.5, y: 1 }}>
+        <MapboxMarker at={{ lat: regroup.lat, lng: regroup.lng }} anchor={{ x: 0.5, y: 1 }}>
           <View accessible accessibilityLabel={regroup.label ?? 'Regroup here'} style={styles.regroup}>
             <View style={styles.regroupDot} />
           </View>
-        </TerrainMarker>
+        </MapboxMarker>
       ) : null}
-    </TerrainMap>
+    </MapboxMap>
   );
 }
 
@@ -167,11 +170,11 @@ export function GroupTerrainMap({
 const RiderPin3d = memo(function RiderPin3d({ rider: r, mapHeading, onPress }: { rider: MapRider; mapHeading: number; onPress: (id: string) => void }) {
   const at = useGlide(r.lat!, r.lng!);
   return (
-    <TerrainMarker at={at}>
+    <MapboxMarker at={at}>
       <Pressable accessibilityRole="button" accessibilityLabel={`${r.name}, ${r.detail}`} onPress={() => onPress(r.id)}>
         <RiderPin rider={r} mapHeading={mapHeading} />
       </Pressable>
-    </TerrainMarker>
+    </MapboxMarker>
   );
 });
 
@@ -180,14 +183,14 @@ function RouteEnds3d({ points }: { points: LatLng[] }) {
   const b = points[points.length - 1];
   return (
     <>
-      <TerrainMarker at={a}>
+      <MapboxMarker at={a}>
         <View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: RideColors.green }]} />
-      </TerrainMarker>
-      <TerrainMarker at={b}>
+      </MapboxMarker>
+      <MapboxMarker at={b}>
         <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}>
           <View style={styles.finishCore} />
         </View>
-      </TerrainMarker>
+      </MapboxMarker>
     </>
   );
 }

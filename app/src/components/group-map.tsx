@@ -11,7 +11,7 @@ import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
-import { GroupTerrainMap } from './group-terrain-map';
+import { GroupMapboxMap } from './group-mapbox-map';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RiderMarker } from './rider-marker';
 import { RouteEnds, RouteLine } from './route-overlay';
@@ -40,12 +40,12 @@ function around(p: { latitude: number; longitude: number }) {
 type GroupMapProps = Parameters<typeof FlatGroupMap>[0];
 
 /**
- * Ride Mode's live map: the 3D Terrain map when the rider picked it and it can show here
- * (use-trail-map terrain3d), otherwise the flat Apple or Google map below.
+ * Ride Mode's live map: Mapbox when this build and the owner allow it and it can draw here
+ * (use-trail-map mapbox), otherwise the flat Apple or Google map below.
  */
 export function GroupMap(props: GroupMapProps) {
-  if (props.trail?.terrain3d) {
-    return <GroupTerrainMap {...props} trail={props.trail} edgePadding={props.edgePadding ?? FIT_PADDING} />;
+  if (props.trail?.mapbox) {
+    return <GroupMapboxMap {...props} trail={props.trail} edgePadding={props.edgePadding ?? FIT_PADDING} />;
   }
   return <FlatGroupMap {...props} />;
 }

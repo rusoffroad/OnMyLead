@@ -10,7 +10,7 @@ import type { DayLine } from '@/core/track-line';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { NavTerrainMap } from '@/components/nav-terrain-map';
+import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
@@ -26,9 +26,9 @@ const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;heig
 
 type NavMapProps = Parameters<typeof FlatNavMap>[0];
 
-/** Map Mode's map: 3D Terrain when the rider picked it and it can show here, otherwise the flat map. */
+/** Map Mode's map: Mapbox when this build and the owner allow it and it can draw here, otherwise the flat map. */
 export function NavMap(props: NavMapProps) {
-  if (props.trail.terrain3d) return <NavTerrainMap {...props} />;
+  if (props.trail.mapbox) return <NavMapboxMap {...props} />;
   return <FlatNavMap {...props} />;
 }
 

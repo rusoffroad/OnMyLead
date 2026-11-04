@@ -5,13 +5,22 @@ import MapView, { type Region } from 'react-native-maps';
 import { Colors } from '@/constants/theme';
 import type { Box } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { AreaPickerMapboxMap } from './area-picker-mapbox-map';
 import { TrailTiles } from './trail-tiles';
+
+type AreaPickerMapProps = Parameters<typeof FlatAreaPickerMap>[0];
+
+/** The area picker's map: Mapbox when this build and the owner allow it and it can draw here, otherwise the flat map below. */
+export function AreaPickerMap(props: AreaPickerMapProps) {
+  if (props.trail.mapbox) return <AreaPickerMapboxMap {...props} />;
+  return <FlatAreaPickerMap {...props} />;
+}
 
 /**
  * The map behind the area picker. Whatever sits inside the frame (insets from the screen edges)
  * is the area to download; after every pan or zoom the frame's corners are turned into a box.
  */
-export function AreaPickerMap({
+function FlatAreaPickerMap({
   trail, frame, start, onBox,
 }: {
   trail: TrailMap;

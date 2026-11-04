@@ -7,17 +7,22 @@ import type { LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import {
-  cameraPadding, fitCorners, linesGeoJSON, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON, regionFromCamera, TERRAIN_EXAGGERATION,
-  TERRAIN_IDS, TERRAIN_PITCH, TERRAIN_SOURCES, TERRAIN_STYLE_URL, terrainLayers, trailZoomFromMapbox,
+  cameraPadding, fitCorners, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON, regionFromCamera,
+  TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_SOURCES, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE, TOPO_SOURCE_ID, trailZoomFromMapbox,
+  type MapLook,
 } from '@/core/terrain';
 import { TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
-import { MAPBOX_TOKEN, terrainBuilt } from '@/lib/terrain';
-import type { TerrainLine, TerrainMapHandle, TerrainOwnFix } from './terrain-map-types';
+import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
+import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
-export type { TerrainLine, TerrainMapHandle, TerrainOwnFix } from './terrain-map-types';
+export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
-if (terrainBuilt) Mapbox.setAccessToken(MAPBOX_TOKEN);
+if (mapboxBuilt) {
+  Mapbox.setAccessToken(MAPBOX_TOKEN);
+  // No third-party trackers: Mapbox's usage telemetry stays off.
+  Mapbox.setTelemetryEnabled(false);
+}
 
 /** Riding distance in Mapbox's zoom, used when a far-out map is asked to center on a rider. */
 const RIDE_ZOOM = 13.5;
@@ -28,18 +33,27 @@ const AGENCY = TRAIL_SOURCE_IDS.map((id) => ({ id, tiles: [mapboxTileTemplate(tr
 const TERRAIN_STYLE_JSON = { version: 8, sources: TERRAIN_SOURCES, layers: terrainLayers() };
 
 /**
- * The 3D Terrain map (core/terrain) for iPhone, iPad and Android: Mapbox satellite on raised
- * ground with contour lines and peak heights, the same trail layers as the flat maps, the
- * screen's own lines (`lines`, drawn in order) and markers (`children`, TerrainMarker). One finger
- * pans, two fingers pinch, turn and (dragged up or down) tilt the map.
+ * The Mapbox map for iPhone, iPad and Android (core/terrain): the rider's look (standard,
+ * satellite, topo or 3D Terrain), the same trail layers as the flat maps, the screen's own lines
+ * (`lines`, drawn in order), fills and markers (`children`, MapboxMarker). One finger pans, two
+ * fingers pinch and turn, and in 3D Terrain tilt the map.
  */
-export function TerrainMap({
-  trail, initial, lines, onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle, children, ref,
+export function MapboxMap({
+  trail, look, tilt, rotate = true, compass = true, scaleBar = false, initial, lines, fills, onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle,
+  children, ref,
 }: {
   trail: TrailMap;
+  /** The look to draw; missing: the rider's own choice. */
+  look?: MapLook;
+  /** Whether two fingers can tilt the map (3D Terrain by default). */
+  tilt?: boolean;
+  rotate?: boolean;
+  compass?: boolean;
+  scaleBar?: boolean;
   /** Where to open (a Mapbox zoom). Missing: over the lower 48 until the screen frames something. */
   initial?: { center: LatLng; zoom?: number } | null;
-  lines?: TerrainLine[];
+  lines?: MapLine[];
+  fills?: MapFill[];
   /** A tap; without one, a tap looks up the trail under the finger. */
   onPress?: (p: LatLng) => void;
   onLongPress?: (p: LatLng) => void;
@@ -49,12 +63,14 @@ export function TerrainMap({
   /** The camera's turn from north, for heading arrows on pins. */
   onCamera?: (c: { heading: number }) => void;
   /** Each fix of the phone's own location (Follow Me). */
-  onOwnFix?: (f: TerrainOwnFix) => void;
-  /** The map came to rest: its middle, and about how many meters one point covers there. */
-  onIdle?: (c: { center: LatLng; metersPerPoint: number }) => void;
+  onOwnFix?: (f: MapboxOwnFix) => void;
+  onIdle?: (c: MapIdle) => void;
   children?: ReactNode;
-  ref?: Ref<TerrainMapHandle>;
+  ref?: Ref<MapboxMapHandle>;
 }) {
+  const shown: MapLook = look ?? trail.look;
+  const tilts = tilt ?? shown === 'terrain';
+  const view = useRef<Mapbox.MapView>(null);
   const camera = useRef<Mapbox.Camera>(null);
   const size = useRef({ width: 390, height: 800 });
   const zoom = useRef(initial?.zoom ?? 4);
@@ -63,6 +79,14 @@ export function TerrainMap({
   useEffect(() => {
     ownFix.current = onOwnFix;
   }, [onOwnFix]);
+
+  // Switching to or from 3D Terrain tilts the map up or lays it flat again.
+  const firstLook = useRef(shown);
+  useEffect(() => {
+    if (firstLook.current === shown) return;
+    firstLook.current = shown;
+    camera.current?.setCamera({ pitch: lookPitch(shown), animationDuration: 600, animationMode: 'easeTo' });
+  }, [shown]);
 
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {
@@ -79,6 +103,17 @@ export function TerrainMap({
       const c = fitCorners(points);
       if (!c) return;
       camera.current?.fitBounds(c[0], c[1], [inset.top, inset.right, inset.bottom, inset.left], animated ? 600 : 0);
+    },
+    zoomBy(levels) {
+      camera.current?.zoomTo(Math.max(1, Math.min(22, zoom.current + levels)), 250);
+    },
+    async pointAt(x, y) {
+      try {
+        const p = await view.current?.getCoordinateFromView([x, y]);
+        return p ? { lat: p[1], lng: p[0] } : null;
+      } catch {
+        return null;
+      }
     },
     isFarOut: () => zoom.current < FAR_OUT_ZOOM,
   }), []);
@@ -99,7 +134,12 @@ export function TerrainMap({
     const center = { lat: p.center[1], lng: p.center[0] };
     zoom.current = p.zoom;
     trail.onRegion(regionFromCamera(center, p.zoom, size.current), trailZoomFromMapbox(p.zoom));
-    onIdle?.({ center, metersPerPoint: metersPerPointAt(center.lat, p.zoom) });
+    onIdle?.({
+      center,
+      zoom: p.zoom,
+      bounds: { minLat: p.bounds.sw[1], maxLat: p.bounds.ne[1], minLng: p.bounds.sw[0], maxLng: p.bounds.ne[0] },
+      metersPerPoint: metersPerPointAt(center.lat, p.zoom),
+    });
   }, [trail, onIdle]);
 
   const at = (f: GeoJSON.Feature<GeoJSON.Point>): LatLng => ({ lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] });
@@ -112,15 +152,18 @@ export function TerrainMap({
         trail.mapProps.onLayout(e);
       }}>
       <Mapbox.MapView
+        ref={view}
         style={StyleSheet.absoluteFill}
-        styleURL={TERRAIN_STYLE_URL}
+        styleURL={mapboxStyleFor(shown)}
         projection="mercator"
-        compassEnabled
+        compassEnabled={compass}
         compassPosition={{ top: 8, right: 8 }}
-        scaleBarEnabled={false}
+        scaleBarEnabled={scaleBar}
+        scaleBarPosition={{ bottom: 28, left: 8 }}
         logoPosition={{ bottom: 6, left: 8 }}
         attributionPosition={{ bottom: 4, right: 8 }}
-        pitchEnabled
+        pitchEnabled={tilts}
+        rotateEnabled={rotate}
         onDidFinishLoadingMap={onReady}
         onCameraChanged={camChanged}
         onMapIdle={idle}
@@ -131,15 +174,27 @@ export function TerrainMap({
           defaultSettings={{
             centerCoordinate: initial ? [initial.center.lng, initial.center.lat] : [-105.8, 39.5],
             zoomLevel: initial?.zoom ?? (initial ? RIDE_ZOOM : 4),
-            pitch: TERRAIN_PITCH,
+            pitch: lookPitch(shown),
           }}
         />
-        <Mapbox.RasterDemSource id={TERRAIN_IDS.dem} url={TERRAIN_SOURCES[TERRAIN_IDS.dem].url} tileSize={512} maxZoomLevel={14}>
-          <Mapbox.Terrain style={{ exaggeration: TERRAIN_EXAGGERATION }} />
-        </Mapbox.RasterDemSource>
-        <Mapbox.Atmosphere style={{ color: '#9DB8D6', highColor: '#24466F', horizonBlend: 0.08, spaceColor: Colors.background, starIntensity: 0 }} />
-        <Mapbox.Style json={TERRAIN_STYLE_JSON as never} />
+        {shown === 'terrain' ? (
+          <>
+            <Mapbox.RasterDemSource id={TERRAIN_IDS.dem} url={TERRAIN_SOURCES[TERRAIN_IDS.dem].url} tileSize={512} maxZoomLevel={14}>
+              <Mapbox.Terrain style={{ exaggeration: TERRAIN_EXAGGERATION }} />
+            </Mapbox.RasterDemSource>
+            <Mapbox.Atmosphere style={{ color: '#9DB8D6', highColor: '#24466F', horizonBlend: 0.08, spaceColor: Colors.background, starIntensity: 0 }} />
+            <Mapbox.Style json={TERRAIN_STYLE_JSON as never} />
+          </>
+        ) : null}
+        {shown === 'topo' ? (
+          <Mapbox.RasterSource id={TOPO_SOURCE_ID} tileUrlTemplates={TOPO_RASTER_SOURCE.tiles as unknown as string[]} tileSize={256} maxZoomLevel={TOPO_RASTER_SOURCE.maxzoom}>
+            <Mapbox.RasterLayer id={TOPO_LAYER_ID} sourceID={TOPO_SOURCE_ID} style={{ rasterOpacity: 1 }} />
+          </Mapbox.RasterSource>
+        ) : null}
         <TrailLayers trail={trail} />
+        {(fills ?? []).map((f) => (
+          <Fill key={f.id} fill={f} />
+        ))}
         {(lines ?? []).map((l) => (
           <Line key={l.id} line={l} />
         ))}
@@ -155,7 +210,7 @@ export function TerrainMap({
 }
 
 /** A screen's line: navy casing, then the colored line, optionally dashed (in points). */
-const Line = memo(function Line({ line }: { line: TerrainLine }) {
+const Line = memo(function Line({ line }: { line: MapLine }) {
   const shape = useMemo(() => linesGeoJSON(
     (Array.isArray(line.points[0]) ? (line.points as LatLng[][]) : [line.points as LatLng[]]).map((pts, i) => ({ key: `${line.id}-${i}`, points: pts })),
   ), [line.id, line.points]);
@@ -176,11 +231,21 @@ const Line = memo(function Line({ line }: { line: TerrainLine }) {
   );
 });
 
+/** A filled shape with an outline (Find a Ride's search ring). */
+const Fill = memo(function Fill({ fill }: { fill: MapFill }) {
+  return (
+    <Mapbox.ShapeSource id={`oml-fill-${fill.id}`} shape={fill.polygon}>
+      <Mapbox.FillLayer id={`oml-fill-${fill.id}-fill`} style={{ fillColor: fill.color, fillOpacity: fill.opacity }} />
+      <Mapbox.LineLayer id={`oml-fill-${fill.id}-line`} style={{ lineColor: fill.stroke, lineWidth: fill.strokeWidth }} />
+    </Mapbox.ShapeSource>
+  );
+});
+
 const OPEN_DASH = [9 / 3.2, 5 / 3.2];
 const CLOSED_DASH = [5 / 3.2, 5 / 3.2];
 
 /**
- * Public trails in 3D, matching the flat maps: the agencies' own squares draped on the ground,
+ * Public trails, matching the flat maps: the agencies' own squares draped on the ground,
  * OpenStreetMap tracks and today's seasonal closures as amber or red dashes on navy, trail
  * names, and rider-mapped trails as mint dots.
  */
@@ -237,15 +302,37 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
   );
 });
 
-/** A pin on the 3D map: any view, anchored at `anchor` (0 to 1 across and down the view). */
-export function TerrainMarker({
-  at, anchor = { x: 0.5, y: 0.5 }, children,
-}: { at: LatLng; anchor?: { x: number; y: number }; children: ReactNode }) {
+/**
+ * A pin on the map: any view, anchored at `anchor` (0 to 1 across and down the view). A draggable
+ * pin (the route builder's numbered points) reports where it was dropped.
+ */
+export function MapboxMarker({
+  id, at, anchor = { x: 0.5, y: 0.5 }, draggable, onDragEnd, children,
+}: { id?: string; at: LatLng; anchor?: { x: number; y: number }; draggable?: boolean; onDragEnd?: (p: LatLng) => void; children: ReactNode }) {
+  if (draggable) {
+    return (
+      <Mapbox.PointAnnotation
+        id={id ?? `drag-${at.lat}-${at.lng}`}
+        coordinate={[at.lng, at.lat]}
+        anchor={anchor}
+        draggable
+        onDragEnd={(e) => {
+          const c = e.geometry.coordinates;
+          onDragEnd?.({ lat: c[1], lng: c[0] });
+        }}>
+        <View>{children}</View>
+      </Mapbox.PointAnnotation>
+    );
+  }
   return (
     <Mapbox.MarkerView coordinate={[at.lng, at.lat]} anchor={anchor} allowOverlap allowOverlapWithPuck>
       <View>{children}</View>
     </Mapbox.MarkerView>
   );
 }
+
+// Older names, from when only 3D Terrain was drawn by Mapbox.
+export const TerrainMap = MapboxMap;
+export const TerrainMarker = MapboxMarker;
 
 export type { Inset };
