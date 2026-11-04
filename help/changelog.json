@@ -12,6 +12,17 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "rus-gear",
+      "troubleshooting"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "apple-web-sign-in",
+    "why": "Checked against the Apple web sign-in flag: the gear suggestions flag and the emailed-link hand-off work the same for riders; only a new flag was added beside them. These articles stay as they are."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "edit-cancel-or-delete-a-ride",
       "faq",
       "organizer-controls",
