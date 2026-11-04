@@ -101,6 +101,8 @@ export function inboxLook(item: Pick<InboxItem, 'kind' | 'data'>): { icon: Inbox
       return { icon: 'clock', tone: 'ride' };
     case 'member':
       return { icon: 'people', tone: 'ride' };
+    case 'waypoint':
+      return { icon: 'pin', tone: 'ride' };
     case 'invite':
     case 'leader_ride':
       return { icon: 'flag', tone: 'social' };
@@ -137,6 +139,7 @@ export function notificationKey(raw: unknown): string | null {
   if (d.type === 'group_message') return `group:${str(d.groupId)}`;
   if (d.type === 'direct_message') return `dm:${str(d.userId)}`;
   if (d.type === 'feed_like' || d.type === 'feed_comment') return `${d.type}:${str(d.key)}`;
+  if (d.type === 'waypoint') return `waypoint:${str(d.waypointId)}`;
   const extra = d as Record<string, unknown>;
   return [d.type, str(d.rideId), str(d.change), str(extra.trailId), str(extra.stage)].join(':');
 }

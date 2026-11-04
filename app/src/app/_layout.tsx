@@ -36,6 +36,7 @@ import { startRiderAgreement } from '@/lib/rider-agreement';
 import { startSettingsSync } from '@/lib/settings-sync';
 import { startAppearanceSync } from '@/lib/appearance-sync';
 import { startLanguageSync } from '@/lib/language-sync';
+import { backupMapWaypointsNow } from '@/lib/map-waypoints';
 import { backupTrailsNow } from '@/lib/trail-backup';
 import { t, takeLanguageReturnPath, useLanguage } from '@/lib/i18n';
 
@@ -99,11 +100,14 @@ function RootLayout() {
   useEffect(() => startRiderAgreement(), []);
   // A friend link opened before signing up counts as an invite once the new account signs in.
   useEffect(() => startReferrals(), []);
-  // Settings and Map Mode trails follow the account to the rider's other devices.
+  // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();
     startLanguageSync();
-    startSettingsSync(backupTrailsNow);
+    startSettingsSync(() => {
+      backupTrailsNow();
+      backupMapWaypointsNow();
+    });
   }, []);
 
   // Pro renewals, offer codes and unfinished purchases StoreKit hands back at launch.

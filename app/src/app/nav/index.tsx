@@ -16,6 +16,7 @@ import { MapSearch } from '@/components/map-search';
 import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
+import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
 import { riderHeading } from '@/core/heading';
@@ -35,14 +36,18 @@ import {
 } from '@/core/trip-meter';
 import type { Place } from '@/core/places';
 import { cumulativeM, lineLengthM } from '@/core/route';
+import type { Waypoint } from '@/core/waypoints';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
+import { useMapModeRide } from '@/hooks/use-map-mode-ride';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { confirmAsync } from '@/lib/confirm';
+import { openDirections } from '@/lib/directions';
+import { useMapWaypoints } from '@/lib/map-waypoints';
 import {
   fetchTrailRules, getLocalTrail, getPublicTrail, loadTrails, markHiddenSeen, readRecording, saveLocalTrail, syncMyTrails, trailLine, useLocalTrails, writeRecording,
   type Recording,
@@ -113,6 +118,27 @@ export default function NavMode() {
   const full = fullMap.full;
   const [mode, setMode] = useState<Mode>('explore');
   const { trails: local } = useLocalTrails();
+
+  // --- Waypoints: press and hold the map to drop one --------------------------------
+  // On a live group ride (sharing location with it), they go to that ride like in Ride Mode, and the
+  // leader's are shared with the group. Otherwise they're the rider's own, on this device and backed
+  // up with Sync (lib/map-waypoints).
+  const groupRide = useMapModeRide(focused);
+  const mapWaypoints = useMapWaypoints();
+  const shownWaypoints = groupRide.rideId ? [...groupRide.wp.waypoints, ...mapWaypoints] : mapWaypoints;
+  const [wpTarget, setWpTarget] = useState<WaypointSheetTarget>(null);
+  // Which list the open sheet works on: the ride's, or Map Mode's own.
+  const [wpOnRide, setWpOnRide] = useState(false);
+  const openNewWaypoint = useCallback((at: LatLng) => {
+    if (!requirePro('waypoints')) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setWpOnRide(!!groupRide.rideId && groupRide.wp.switchedOn);
+    setWpTarget({ type: 'new', at });
+  }, [groupRide.rideId, groupRide.wp.switchedOn]);
+  const openWaypoint = useCallback((w: Waypoint) => {
+    setWpOnRide(!!w.ride_id);
+    setWpTarget({ type: 'view', waypoint: w });
+  }, []);
 
   // --- Where the rider is -------------------------------------------------------
   const [me, setMe] = useState<LatLng | null>(null);
@@ -534,6 +560,9 @@ export default function NavMode() {
         followMe={camOn ? me : null}
         meHeading={meHeading}
         onUserMove={() => camEvent('pan')}
+        waypoints={shownWaypoints}
+        onPressWaypoint={openWaypoint}
+        onLongPressMap={mode === 'measure' ? undefined : openNewWaypoint}
       />
       <TrailMapOverlay
         trail={trail}
@@ -542,7 +571,7 @@ export default function NavMode() {
         cardTop={full ? insets.top + 64 : wide ? insets.top + 118 : undefined}
         bottom={wide ? 12 : open ? 330 : 170}
         cardWidth={wide || floating ? 380 : undefined}
-        lookupHint="Tap a line to see what it is."
+        lookupHint="Tap a line to see what it is. Press and hold to drop a waypoint."
         onFollow={(t) => follow({ name: t.name, points: t.points, publicTrail: t, obstacles: t.obstacles })}
         ridden={(t) => (followed?.publicTrail?.id === t.id ? followCovered : null)}
       />
@@ -717,6 +746,18 @@ export default function NavMode() {
         onSave={saveSpot}
         onRemove={removeSpot}
         onClose={() => setPending(null)}
+      />
+      <WaypointSheet
+        rideId={wpOnRide && groupRide.rideId ? groupRide.rideId : undefined}
+        target={wpTarget}
+        existing={wpOnRide ? groupRide.wp.waypoints : mapWaypoints}
+        me={groupRide.me}
+        canShare={wpOnRide && groupRide.canShare}
+        stopsOn={groupRide.wp.stopsSwitchedOn}
+        ownerName={groupRide.nameOf}
+        onNavigate={(lat, lng, title = 'There') => openDirections({ title, to: { lat, lng } })}
+        onChanged={(c) => wpOnRide && groupRide.wp.apply(c)}
+        onClose={() => setWpTarget(null)}
       />
     </View>
   );

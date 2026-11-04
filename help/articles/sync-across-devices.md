@@ -6,6 +6,8 @@ order: 25
 release: "2.0"
 updated: 2026-11-04
 sources:
+  - app/src/lib/map-waypoints.ts
+  - app/src/core/map-waypoints.ts
   - app/src/core/synced-settings.ts
   - app/src/lib/settings-sync.ts
   - app/src/core/trail-backup.ts
@@ -52,6 +54,12 @@ Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free
 Every trail in **My Trails** (ones you recorded, drew or saved from other riders), with its details, named spots and photos, is backed up privately to your account. Sign in on another device and they're there. Delete a trail on one device and it's deleted on the others too.
 
 The backup is private: only you can see it. Sharing still works exactly as before. A trail only becomes public when you tap **Share with Everyone**.
+
+:::release 2.1
+**Map Mode waypoints**
+
+Waypoints you drop in Map Mode on your own (press and hold the map) are backed up privately the same way, so they show on your other devices, and a waypoint you remove on one is removed on the others. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops#press-and-hold-the-map).
+:::
 
 **Offline map areas**
 

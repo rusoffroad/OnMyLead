@@ -3,7 +3,7 @@
     "version": "2.1",
     "title": "3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead.",
-    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.",
+    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint; the group gets a ding.",
     "apple": null,
     "google": null,
     "notes": [
@@ -34,6 +34,10 @@
       {
         "kind": "new",
         "text": "Offline Maps can save 3D Terrain with an area or a ride, so the 3D map works where there's no signal. The download size shows before you start."
+      },
+      {
+        "kind": "new",
+        "text": "Press and hold the map in Ride Mode or Map Mode to drop a waypoint right there, then tap it to edit or remove it. On a group ride the leader's waypoints are shared with everyone, and the other riders' phones ding with \"Lou added a new waypoint: Fuel Stop\". Tap it to see the waypoint in Ride Mode. In Map Mode on your own, waypoints are yours, saved on your phone for no-signal riding and synced to your other devices with Pro."
       }
     ]
   },

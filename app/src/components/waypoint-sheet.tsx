@@ -19,6 +19,7 @@ import {
 } from '@/core/waypoints';
 import { symbolLabel, WAYPOINT_SYMBOLS, waypointSymbol, type WaypointSymbol } from '@/core/waypoint-symbols';
 import { confirmAsync } from '@/lib/confirm';
+import { addMapWaypoint, removeMapWaypoint, updateMapWaypoint } from '@/lib/map-waypoints';
 import { addWaypoint, removeWaypoint, reorderPlannedStops, updateWaypoint } from '@/lib/waypoints';
 
 /** Who a waypoint is for: a stop the whole ride makes, everyone's map, or just this rider. */
@@ -30,11 +31,13 @@ export type WaypointSheetTarget = { type: 'new'; at: LatLng } | { type: 'view'; 
 /**
  * Add a waypoint, or look at one. The leader (or an organizer) picks who it's for: a planned stop
  * the whole ride makes, everyone on the ride, or just them. Everyone else's waypoints are only ever theirs.
+ * With no rideId it is Map Mode's: the rider's own waypoints, kept on the device (lib/map-waypoints).
  */
 export function WaypointSheet({
   rideId, target, existing, me, canShare, stopsOn = true, startAsStop, ownerName, onNavigate, onChanged, onClose,
 }: {
-  rideId: string;
+  /** The ride; leave it out for Map Mode, where waypoints are the rider's own. */
+  rideId?: string;
   target: WaypointSheetTarget;
   existing: Waypoint[];
   me: string | null | undefined;
@@ -108,7 +111,10 @@ export function WaypointSheet({
       const share = canShare && audience !== 'me';
       // Only mention planned stops when one is involved, so plain waypoints work before that server update.
       const stop = planned ? { planned_stop: true, stop_time: time || null } : viewing?.planned_stop ? { planned_stop: false } : {};
-      if (viewing) {
+      if (!rideId) {
+        if (viewing) onChanged({ saved: await updateMapWaypoint(viewing.id, { name, symbol, note }) });
+        else if (target?.type === 'new') onChanged({ saved: await addMapWaypoint({ name, symbol, note, lat: target.at.lat, lng: target.at.lng }) });
+      } else if (viewing) {
         onChanged({ saved: await updateWaypoint(viewing.id, { name, symbol, note, shared: share, ...stop }) });
       } else if (target?.type === 'new') {
         onChanged({ saved: await addWaypoint(rideId, { name, symbol, note, lat: target.at.lat, lng: target.at.lng, shared: share, ...stop }) });
@@ -125,7 +131,7 @@ export function WaypointSheet({
   /** Move a planned stop one place earlier or later. */
   async function move(w: Waypoint, by: -1 | 1) {
     const ids = moveStop(plannedStops(existing).map((x) => x.id), w.id, by);
-    if (!ids) return;
+    if (!ids || !rideId) return;
     Haptics.selectionAsync();
     setBusy('move');
     setError(null);
@@ -145,7 +151,7 @@ export function WaypointSheet({
     setBusy('remove');
     setError(null);
     try {
-      await removeWaypoint(w.id);
+      await (rideId ? removeWaypoint(w.id) : removeMapWaypoint(w.id));
       onChanged({ removedId: w.id });
       onClose();
     } catch (e) {
@@ -164,6 +170,9 @@ export function WaypointSheet({
   // Someone else's planned stop stays a planned stop: the leader can change it, not take it away.
   const lockedStop = !!viewing?.planned_stop && viewing.user_id !== me;
   const noun = stopForm ? 'Planned Stop' : 'Waypoint';
+  // Map Mode waypoints are always the rider's own, signed in or not.
+  const mayEdit = !!viewing && (!rideId || canEditWaypoint(viewing, me, canShare));
+  const mayRemove = !!viewing && (!rideId || canRemoveWaypoint(viewing, me, canShare));
   return (
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
@@ -251,7 +260,11 @@ export function WaypointSheet({
                   ) : (
                     <View style={styles.privateNote}>
                       <Icon name="lock" size={18} color={Colors.textSecondary} />
-                      <Text style={styles.privateText}>Only you see your waypoints. The ride’s leader can share waypoints with the group.</Text>
+                      <Text style={styles.privateText}>
+                        {rideId
+                          ? 'Only you see your waypoints. The ride’s leader can share waypoints with the group.'
+                          : 'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.'}
+                      </Text>
                     </View>
                   )}
 
@@ -304,10 +317,10 @@ export function WaypointSheet({
                       />
                     </View>
                   ) : null}
-                  {canEditWaypoint(viewing, me, canShare) || canRemoveWaypoint(viewing, me, canShare) ? (
+                  {mayEdit || mayRemove ? (
                     <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-                      {canEditWaypoint(viewing, me, canShare) ? <Button title="Edit" kind="secondary" style={{ flex: 1 }} onPress={() => startEdit(viewing)} /> : null}
-                      {canRemoveWaypoint(viewing, me, canShare) ? (
+                      {mayEdit ? <Button title="Edit" kind="secondary" style={{ flex: 1 }} onPress={() => startEdit(viewing)} /> : null}
+                      {mayRemove ? (
                         <Button title="Remove" kind="ghost" style={{ flex: 1 }} loading={busy === 'remove'} onPress={() => remove(viewing)} />
                       ) : null}
                     </View>

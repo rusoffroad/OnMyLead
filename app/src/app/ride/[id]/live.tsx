@@ -176,7 +176,8 @@ export default function RideMode() {
   const stripRef = useCallback((v: View | null) => {
     if (!v) setStripH(0);
   }, []);
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // waypoint: opened from a "new waypoint" notification; that waypoint's sheet opens once it's loaded.
+  const { id, waypoint: openWaypointId } = useLocalSearchParams<{ id: string; waypoint?: string }>();
   const { session } = useSession();
   const me = session?.user.id;
 
@@ -224,6 +225,16 @@ export default function RideMode() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setWpTarget({ type: 'new', at });
   }, [wp.switchedOn]);
+  // A tapped "new waypoint" notification: show that waypoint (once per notification).
+  // (Set while rendering, once the waypoint has loaded.)
+  const [shownWaypoint, setShownWaypoint] = useState<string | null>(null);
+  if (openWaypointId && shownWaypoint !== openWaypointId) {
+    const w = wp.waypoints.find((x) => x.id === openWaypointId);
+    if (w) {
+      setShownWaypoint(openWaypointId);
+      setWpTarget({ type: 'view', waypoint: w });
+    }
+  }
 
   // Announcements: only the latest is shown, and it is read aloud so nobody has to look down.
   const chat = useRideChat(id, !!mine);

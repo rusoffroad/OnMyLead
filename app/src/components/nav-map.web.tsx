@@ -7,11 +7,14 @@ import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
 import type { DayLine } from '@/core/track-line';
+import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { NavTerrainMap } from '@/components/nav-terrain-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
+import { blaze, stopSign } from './waypoint-map.web';
 
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
 
@@ -38,7 +41,7 @@ export function NavMap(props: NavMapProps) {
  * finder. A click measures while measuring; otherwise it shows the trail under it.
  */
 function FlatNavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, trackLines, obstacles, onObstacle, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -62,6 +65,11 @@ function FlatNavMap({
   /** Named spots on the trail being drawn, recorded or followed. */
   obstacles?: Obstacle[];
   onObstacle?: (o: Obstacle) => void;
+  /** Waypoints on the map: Map Mode's own, and the ride's when the rider is on a live group ride. */
+  waypoints?: Waypoint[];
+  onPressWaypoint?: (w: Waypoint) => void;
+  /** Press and hold (right-click on the website): when set, called instead of looking up the trail there. */
+  onLongPressMap?: (p: LatLng) => void;
   ref?: Ref<NavMapHandle>;
 }) {
   const el = useRef<HTMLDivElement>(null);
@@ -73,10 +81,10 @@ function FlatNavMap({
   const userMoved = useRef(false);
   const followed = useRef<LatLng | null>(null);
   const meDot = useRef<L.Marker | null>(null);
-  const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle });
+  const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle, onPressWaypoint, onLongPressMap });
   useEffect(() => {
-    cb.current = { measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle };
-  }, [measuring, onMeasure, trail.identifyAt, trail.onRegion, onCenter, onUserMove, onObstacle]);
+    cb.current = { measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle, onPressWaypoint, onLongPressMap };
+  }, [measuring, onMeasure, trail.identifyAt, trail.onRegion, onCenter, onUserMove, onObstacle, onPressWaypoint, onLongPressMap]);
   const pad = padding ?? [120, 40, 320, 40];
   const fitPadding = { paddingTopLeft: [pad[3], pad[0]] as L.PointTuple, paddingBottomRight: [pad[1], pad[2]] as L.PointTuple };
   const snapM = (m: L.Map) => snapRadiusM((156_543.03 * Math.cos((m.getCenter().lat * Math.PI) / 180)) / 2 ** m.getZoom());
@@ -99,6 +107,11 @@ function FlatNavMap({
     m.on('click', (e: L.LeafletMouseEvent) => {
       if (cb.current.measuring) cb.current.onMeasure({ lat: e.latlng.lat, lng: e.latlng.lng }, snapM(m));
       else cb.current.identifyAt(e.latlng.lat, e.latlng.lng);
+    });
+    // Right-click, or press and hold on a touch screen (Leaflet sends both as contextmenu): a waypoint there.
+    m.on('contextmenu', (e: L.LeafletMouseEvent) => {
+      e.originalEvent?.preventDefault?.();
+      cb.current.onLongPressMap?.({ lat: e.latlng.lat, lng: e.latlng.lng });
     });
     const report = () => {
       const c = m.getCenter();
@@ -205,13 +218,31 @@ function FlatNavMap({
       }).addTo(g);
       pin.on('click', () => cb.current.onObstacle?.(o));
     }
+    for (const w of waypoints ?? []) {
+      const symbol = waypointSymbol(w);
+      const size = w.planned_stop ? 34 : 30;
+      const time = w.planned_stop ? stopTimeLabel(w.stop_time) : null;
+      const n = w.planned_stop ? stopNumber(w, waypoints ?? []) : null;
+      L.marker(ll(w), {
+        title: w.planned_stop ? `Planned stop ${n ?? ''}, ${w.name}` : `${symbolLabel(symbol)} waypoint, ${w.name}`,
+        zIndexOffset: 400,
+        icon: L.divIcon({
+          className: '',
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size / 2],
+          html: `<div class="oml-wp ${w.planned_stop ? 'stop' : w.shared ? 'shared' : ''}" style="width:${size}px;height:${size}px">${w.planned_stop ? stopSign(n, symbol) : blaze(w.shared, symbol)}<span>${esc(w.name)}${time ? `<small>${esc(time)}</small>` : ''}</span></div>`,
+        }),
+      })
+        .on('click', () => cb.current.onPressWaypoint?.(w))
+        .addTo(g);
+    }
     if (found) {
       L.marker(ll(found), {
         interactive: false,
         icon: L.divIcon({ className: '', iconSize: [0, 0], html: `<div class="oml-found"><span>${esc(found.name)}</span></div>` }),
       }).addTo(g);
     }
-  }, [following, recorded, measure, measureTaps, found, trackLines, obstacles]);
+  }, [following, recorded, measure, measureTaps, found, trackLines, obstacles, waypoints]);
 
   useEffect(() => {
     if (!found || !map.current) return;

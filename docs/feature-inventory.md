@@ -117,6 +117,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   Straight Line, drag, search, undo, clear, save / remove; web wide layout ≥ 900 px.
 - Import GPX **[Pro]**. No GPX export.
 - Waypoints (shared or only you, press and hold, at my location) and numbered Planned Stops. 15 waypoint symbols, color-blind friendly, shown on planned stops too (2.0).
+- 2.1: press and hold in Map Mode too (private Map Mode waypoints on the device, backed up with Sync; the live ride's when sharing location with one), and New Waypoint Alerts: riders' phones ding when the leader shares a waypoint or planned stop during a live ride.
 - Directions to the meeting point, a rider or a waypoint in Apple Maps or Google Maps.
 - Fuel range on the ride (route length vs each rider's machine range).
 
