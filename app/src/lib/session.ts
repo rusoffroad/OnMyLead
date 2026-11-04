@@ -1,9 +1,10 @@
 import type { Session } from '@supabase/supabase-js';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Platform } from 'react-native';
 
 import { APP_AUTH_CALLBACK, APP_RESET_PASSWORD, socialProviders, type AuthLink, type SocialProvider } from '@/core/auth-link';
+import { useFlag } from './app-settings';
 import { isBackendConfigured, supabase, supabaseUrl, supabaseKey } from './supabase';
 
 export type { SocialProvider } from '@/core/auth-link';
@@ -33,21 +34,24 @@ export function useSession() {
  * The website passes 'ios' to describe what the iPhone app offers.
  */
 export function useSocialProviders(platform: string = Platform.OS): SocialProvider[] {
-  const [providers, setProviders] = useState<SocialProvider[]>([]);
+  const [settings, setSettings] = useState<unknown>(null);
+  // Apple on the website and Android: the owner's switch (Admin > Settings), once Apple's web
+  // sign-in is set up in Supabase. A build can also force it on with EXPO_PUBLIC_WEB_APPLE_SIGN_IN=1.
+  const webApple = useFlag('apple_web_sign_in') || process.env.EXPO_PUBLIC_WEB_APPLE_SIGN_IN === '1';
   useEffect(() => {
     if (!isBackendConfigured) return;
     let live = true;
     fetch(`${supabaseUrl}/auth/v1/settings`, { headers: { apikey: supabaseKey } })
       .then((r) => (r.ok ? r.json() : null))
-      .then((settings) => {
-        if (live) setProviders(socialProviders(settings, platform, { webApple: process.env.EXPO_PUBLIC_WEB_APPLE_SIGN_IN === '1' }));
+      .then((s) => {
+        if (live) setSettings(s);
       })
       .catch(() => {});
     return () => {
       live = false;
     };
-  }, [platform]);
-  return providers;
+  }, []);
+  return useMemo(() => socialProviders(settings, platform, { webApple }), [settings, platform, webApple]);
 }
 
 /**

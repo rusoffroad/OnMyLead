@@ -6,6 +6,7 @@ order: 40
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - app/src/app/ride/[id]/edit.tsx
   - app/src/app/e/[code].tsx
   - app/src/app/r/[code].tsx
   - app/src/components/ride-roster.tsx
@@ -58,6 +59,12 @@ If you can't make it, give the ride to another rider who has joined. Open **Ride
 
 :::release 2.0
 Or tap **Leave Ride** at the bottom of the ride page: pick who takes over under **Who Takes Over?** and tap **Give Ride and Leave**. They run the ride and you're off it.
+:::
+
+:::release 2.1
+## Change the Details
+
+Tap **Edit Ride Details** in the **You're Organizing** card to change the name, day, time, meeting point and the rest. Riders hear about a new time or meeting point. See [Edit, Cancel or Delete a Ride](/help/edit-cancel-or-delete-a-ride).
 :::
 
 ## Call It Off

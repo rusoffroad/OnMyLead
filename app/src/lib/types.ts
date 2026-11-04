@@ -40,6 +40,9 @@ export type Ride = {
   status: RideStatus;
   started_at: string | null;
   ended_at: string | null;
+  /** When a leader last edited the ride, and what changed (name, time, place, details). Missing before 20261104120000. */
+  details_edited_at?: string | null;
+  details_changed?: string[] | null;
 };
 
 export type RidePrivateDetails = {
