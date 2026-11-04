@@ -6,6 +6,9 @@ order: 10
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - app/src/components/rider-puck.tsx
+  - app/src/components/own-puck.tsx
+  - app/src/core/intersections.ts
   - app/src/components/tilt-tile.tsx
   - app/src/hooks/use-crash-alert.ts
   - app/src/components/ride-controls.tsx
@@ -100,6 +103,12 @@ Each rider is a white ring with a dark center and a dark name tag, easy to spot 
 When a rider is moving, a small white arrow on the edge of their dot points the way they're heading, even when you turn the map. A rider who is stopped, or whose position is only last seen, has no arrow, because a phone can only tell direction while it moves.
 :::
 
+:::release 2.1
+From 2.1 every live rider is a glossy disc with a white rim and a white arrow built into it, pointing the way they're heading. The leader is the biggest dot, in blue with a blue name tag; the tail gunner is the next biggest, in violet with a violet name tag; everyone else is graphite with a dark name tag. A rider keeps their arrow, pointing the last way they were heading, while they're stopped and still live. A rider whose position is only last seen is a hollow ring with no arrow, as before.
+
+Your own dot is cyan, with a soft beam ahead of it. Its arrow always shows which way you're facing: the way you're riding while you move, and your phone's compass when you stop.
+:::
+
 :::release 2.0
 Riders glide smoothly to each new position instead of jumping, and with [Follow Me](/help/follow-me) on, the map moves with you in one steady motion.
 :::
@@ -122,7 +131,13 @@ Tap the round target button to move the map so you're in the middle of it. The m
 
 With **Follow Me** on (it is unless you turn it off), the map moves with you as you ride, so your dot stays in view. Drag or pinch the map to look around and it pauses; tap **Paused** or **Center on Me** to follow you again. Tap **Following** to turn it off. The button sits just left of **Center on Me**. See [Follow Me on the Map](/help/follow-me).
 
+:::until 2.1
 While you're moving, your own dot has the same white arrow as everyone else's, pointing the way you're heading.
+:::
+:::
+
+:::release 2.1
+From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step once, and after that it slides to keep you on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in the **You** tab turns that off). See [Follow Me on the Map](/help/follow-me).
 :::
 
 ### The Bottom Panel

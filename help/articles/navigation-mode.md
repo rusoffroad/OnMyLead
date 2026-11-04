@@ -6,6 +6,8 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-04
 sources:
+  - app/src/components/use-follow-camera.ts
+  - app/src/core/intersections.ts
   - app/src/components/route-map.tsx
   - app/src/lib/map-waypoints.ts
   - app/src/components/nav-map.tsx
@@ -112,6 +114,10 @@ To look around, drag or pinch the map. It stops following until you tap **Center
 With **Follow Me** on (it is unless you turn it off), the map moves with you so your dot stays in view, and while you're moving your dot has a white arrow pointing the way you're heading. The **Follow Me** button sits just left of **Center on Me** and shows **Following**.
 
 To look around, drag or pinch the map. It pauses (the button shows **Paused**) until you tap it or **Center on Me** again. The map also holds still while the **Measure** tab is open, and when you jump to a place with search. Tap **Following** to turn Follow Me off; the map then stays where you put it, even while you record. See [Follow Me on the Map](/help/follow-me).
+:::
+
+:::release 2.1
+From 2.1 the map zooms out one step the first time your dot nears an edge, then slides to keep you on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot is a cyan disc with its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
 :::
 
 The screen stays on while Navigate is open.
