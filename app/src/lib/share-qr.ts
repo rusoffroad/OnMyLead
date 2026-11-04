@@ -11,7 +11,7 @@ import { snapshotForShare } from './share-image';
 export async function shareQrCode(view: RefObject<View | null>, message: string, title: string): Promise<void> {
   if (Platform.OS !== 'web' && view.current) {
     try {
-      const uri = await snapshotForShare(view, { width: 1080, name: 'OnMyLead Invite', png: true });
+      const uri = await snapshotForShare(view, { width: 1080, name: 'OnMyLead Invite' });
       // iOS sends the picture and the text together; Android's share sheet takes one or the other, so it gets the text.
       await Share.share(Platform.OS === 'ios' ? { url: uri, message } : { message, title }, { subject: title, dialogTitle: title });
       return;

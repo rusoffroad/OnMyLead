@@ -2967,6 +2967,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'नाम {v} अक्षरों से कम रखें।',
   'Check the departure time.': 'प्रस्थान का समय जाँचें।',
   'Check the expected finish time.': 'अनुमानित समाप्ति समय जाँचें।',
+  'Pick the meeting point on the map first.': 'पहले मैप पर मीटिंग पॉइंट चुनें।',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'मीटिंग पॉइंट सेट करें: कोई जगह खोजें, मैप पर टैप करें या "38.57, -109.55" जैसे निर्देशांक पेस्ट करें।',
   'Route length is a number of miles, like 42.5.': 'रूट की लंबाई मील में एक संख्या है, जैसे 42.5।',
   '{list} and {last}': '{list} और {last}',

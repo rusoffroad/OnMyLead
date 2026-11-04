@@ -8,7 +8,7 @@
     "kind": "fix",
     "by": "pr",
     "ref": "share-picture-size",
-    "why": "Chris found that Share Picture to Facebook never finished (video, 2026-11-04): the card snapshot was taken at the screen's 3x scale as a PNG, 43 MB, which Facebook's share extension could not take. Every shared picture (Social cards, the ride summary card, the invite QR code) is now shrunk to 1080 px wide and saved as a JPEG (PNG for the QR code) named OnMyLead, a few hundred KB. social says so; qr-codes logged for its source."
+    "why": "Chris found that Share Picture to Facebook never finished (video, 2026-11-04): the card snapshot was taken at the screen's 3x scale as a PNG, 43 MB, which Facebook's share extension could not take. Every shared picture (Social cards, the ride summary card, the invite QR code) is now shrunk to 1080 px wide and saved as a PNG (the cards have rounded corners) named OnMyLead, about 1 to 2 MB. social says so; qr-codes logged for its source."
   },
   {
     "date": "2026-11-04",

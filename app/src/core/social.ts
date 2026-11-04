@@ -343,7 +343,9 @@ export function socialNotSwitchedOn(message: string | null | undefined, code?: s
  * Worth one quiet retry, and never worth showing as it is.
  */
 export function isTransientError(message: string | null | undefined): boolean {
-  return /network request failed|failed to fetch|fetch failed|network error|cancelled|timed? ?out|load failed/i.test(message ?? '');
+  // Anchored to how the fetch layer words it, so a server message about a cancelled ride isn't retried.
+  return /network request failed|failed to fetch|fetch failed|network error|load failed|UnexpectedException: cancelled|^(request )?(cancelled|timed? ?out)\b/i
+    .test(message ?? '');
 }
 
 /** What a Social screen says when a call fails: never a raw exception. */

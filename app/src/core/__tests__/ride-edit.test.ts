@@ -81,6 +81,11 @@ describe('ridePatch', () => {
     const p = patch({ coords: '38.57, -109.55', meetLabel: 'Lions Park' }, ride, null);
     expect(p.private).toMatchObject({ meet_lat: 38.57, meet_lng: -109.55, meet_label: 'Lions Park' });
     expect(p.changed).toContain('place');
+    // Instructions ride along with the spot; alone, the server would have no row to put them on.
+    const both = patch({ coords: '38.57, -109.55', instructions: 'Air down at the lot' }, ride, null);
+    expect(both.private).toMatchObject({ meet_lat: 38.57, instructions: 'Air down at the lot' });
+    expect(both.changed).toEqual(['place', 'details']);
+    expect(ridePatch(ride, null, { ...formFromRide(ride, null), instructions: 'Air down' }, now)).toEqual({ error: 'Pick the meeting point on the map first.' });
   });
 
   it('sends only the name when only the name changed', () => {

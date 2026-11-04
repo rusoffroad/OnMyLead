@@ -2967,6 +2967,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': '名前は {v} 文字未満にしてください。',
   'Check the departure time.': '出発時刻を確認してください。',
   'Check the expected finish time.': '終了予定時刻を確認してください。',
+  'Pick the meeting point on the map first.': 'まず地図で集合場所を選んでください。',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': '集合場所を設定してください。場所を検索するか、地図をタップするか、"38.57, -109.55" のような座標を貼り付けます。',
   'Route length is a number of miles, like 42.5.': 'ルートの長さはマイル数で入力します（例: 42.5）。',
   '{list} and {last}': '{list}と{last}',

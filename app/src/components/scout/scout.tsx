@@ -103,8 +103,10 @@ export function Scout({ top }: { top: React.ReactNode }) {
 
   const shown = useMemo(() => filterKinds(spots ?? [], kinds), [spots, kinds]);
   const counts = useMemo(() => kindCounts(spots ?? []), [spots]);
-  const frame = useMemo(() => (origin ? boundsAround(origin, miles) : null), [origin, miles]);
-  const ring = useMemo(() => (origin ? { center: origin, miles } : null), [origin, miles]);
+  // Like the search, the map waits for the saved distance so it doesn't frame 250 mi and then jump.
+  const ready = origin && savedMiles != null ? origin : null;
+  const frame = useMemo(() => (ready ? boundsAround(ready, miles) : null), [ready, miles]);
+  const ring = useMemo(() => (ready ? { center: ready, miles } : null), [ready, miles]);
   const open = (s: Pick<Spot, 'id'>) => router.push(`/spot/${s.id}`);
 
   const map = frame ? (

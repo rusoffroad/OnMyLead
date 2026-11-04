@@ -8,6 +8,7 @@ import {
 import { isBackendConfigured, supabase } from './supabase';
 import { can } from '@/core/entitlements';
 import { currentEntitlements } from './entitlements';
+import { singleFlight } from './single-flight';
 
 /**
  * Settings that follow the account across devices (core/synced-settings.ts has the list and the
@@ -126,24 +127,8 @@ function schedulePush() {
   }, 2_000);
 }
 
-let running: Promise<void> | null = null;
-let again = false;
-
 /** Swap changes with the account now. Safe to call often; does nothing when signed out. */
-export function syncSettingsNow(): Promise<void> {
-  if (running) {
-    again = true;
-    return running;
-  }
-  running = run().finally(() => {
-    running = null;
-    if (again) {
-      again = false;
-      syncSettingsNow();
-    }
-  });
-  return running;
-}
+export const syncSettingsNow: () => Promise<void> = singleFlight(() => run());
 
 async function run() {
   // Sync across devices is Pro: a Free account keeps its settings and trails on this device.

@@ -13,21 +13,32 @@ import { captureRef } from 'react-native-view-shot';
  * can show: about 1 to 2 MB for a photo card, far less for a QR code.
  */
 export async function snapshotForShare(
-  view: RefObject<View | null>, opts: { width: number; height?: number; name: string; png?: boolean },
+  view: RefObject<View | null>, opts: { width: number; height?: number; name: string },
 ): Promise<string> {
   const raw = await captureRef(view, { format: 'png', quality: 1, width: opts.width, height: opts.height, result: 'tmpfile' });
   const ctx = ImageManipulator.ImageManipulator.manipulate(raw);
   ctx.resize(opts.height ? { width: opts.width, height: opts.height } : { width: opts.width });
   const image = await ctx.renderAsync();
   const saved = await image.saveAsync({ compress: 1, format: ImageManipulator.SaveFormat.PNG });
-  // The full-size capture (up to 3x the card) is let go now, not when the garbage collector gets to it.
+  // The full-size capture (up to 3x the card, tens of MB) is let go now, not when the garbage
+  // collector or the OS gets to it.
   (image as { release?: () => void }).release?.();
+  discard(raw);
   try {
     const out = new File(Paths.cache, `${opts.name}.png`);
     await new File(saved.uri).copy(out, { overwrite: true });
+    discard(saved.uri);
     return out.uri;
   } catch {
     return saved.uri;
+  }
+}
+
+function discard(uri: string) {
+  try {
+    new File(uri).delete();
+  } catch {
+    // A temp file the OS clears later.
   }
 }
 

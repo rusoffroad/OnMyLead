@@ -146,6 +146,10 @@ describe('errors riders see', () => {
     expect(friendlySocialError('Network request failed')).toBe('No signal. Check your connection and tap Retry.');
     expect(friendlySocialError('UnexpectedException: something odd (at Foo.swift:1)')).toBe('Something went wrong. Try again.');
     expect(friendlySocialError('P0001: you were blocked')).toBe('You were blocked.');
+    expect(isTransientError('P0001: that ride was cancelled')).toBe(false);
+    expect(friendlySocialError('P0001: that ride was cancelled')).toBe('That ride was cancelled.');
+    expect(isTransientError('The request timed out.')).toBe(false);
+    expect(isTransientError('timed out')).toBe(true);
     expect(friendlySocialError('')).toBe('Something went wrong. Try again.');
   });
 });

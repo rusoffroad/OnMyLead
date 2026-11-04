@@ -11,6 +11,7 @@ import { isBackendConfigured, supabase } from './supabase';
 import { restorePhoto } from './trail-photo-files';
 import { can } from '@/core/entitlements';
 import { currentEntitlements } from './entitlements';
+import { singleFlight } from './single-flight';
 
 /**
  * The rider's private trail backup (core/trail-backup.ts has the rules): every recorded, drawn and
@@ -40,28 +41,12 @@ setTrailBackupHooks(() => {
   }, 4_000);
 });
 
-let running: Promise<void> | null = null;
-let again = false;
-
 /** Swap trails with the backup now. Safe to call often; does nothing when signed out. */
-export function backupTrailsNow(): Promise<void> {
-  if (running) {
-    again = true;
-    return running;
-  }
-  running = run()
-    .catch(() => {
-      // Offline, or the server doesn't have the backup yet: try again next time.
-    })
-    .finally(() => {
-      running = null;
-      if (again) {
-        again = false;
-        backupTrailsNow();
-      }
-    });
-  return running;
-}
+export const backupTrailsNow: () => Promise<void> = singleFlight(() =>
+  run().catch(() => {
+    // Offline, or the server doesn't have the backup yet: try again next time.
+  }),
+);
 
 async function run() {
   if (!isBackendConfigured) return;

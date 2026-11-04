@@ -2967,6 +2967,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': '이름은 {v}자 미만으로 입력하세요.',
   'Check the departure time.': '출발 시간을 확인하세요.',
   'Check the expected finish time.': '예상 종료 시간을 확인하세요.',
+  'Pick the meeting point on the map first.': '먼저 지도에서 집결지를 선택하세요.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': '집결지를 설정하세요. 장소를 검색하거나 지도를 탭하거나 "38.57, -109.55" 같은 좌표를 붙여넣으세요.',
   'Route length is a number of miles, like 42.5.': '경로 길이는 마일 단위 숫자입니다(예: 42.5).',
   '{list} and {last}': '{list} 및 {last}',

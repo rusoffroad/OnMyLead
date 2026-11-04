@@ -223,13 +223,12 @@ export function useTrailMap(): TrailMap {
       featuresRef.current = { ...featuresRef.current, parkTrails: on };
       setFeatureState(featuresRef.current);
     };
-    Promise.all([AsyncStorage.getItem(KEY), AsyncStorage.getItem(RIDER_TRAILS_KEY), AsyncStorage.getItem(PARK_TRAILS_KEY)])
-      .then(([layers, riders, parks]) => {
-        applyLayers(layers);
-        applyRiders(riders);
-        applyParks(parks);
-      })
-      .catch(() => {});
+    const read = (k: string) => AsyncStorage.getItem(k).catch(() => null);
+    Promise.all([read(KEY), read(RIDER_TRAILS_KEY), read(PARK_TRAILS_KEY)]).then(([layers, riders, parks]) => {
+      applyLayers(layers);
+      applyRiders(riders);
+      applyParks(parks);
+    });
     // The park list (names from far out) comes from the phone first, then the server.
     parkList(false).then((saved) => saved.length && setParks(saved)).catch(() => {});
     parkList(true).then((fresh) => fresh.length && setParks(fresh)).catch(() => {});
