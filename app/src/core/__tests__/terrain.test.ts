@@ -9,8 +9,9 @@ import {
   mapboxTileTemplate, mapboxZoomFor, metersPerPointAt, metersToFeet, OUTDOORS_STYLE_URL, packBounds, packName, pointsGeoJSON,
   regionFromCamera, TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_PITCH, TERRAIN_SOURCES, TERRAIN_STYLE_URL, terrainExaggeration, terrainLayers,
   terrainShows, tightPoints, TOPO_RASTER_SOURCE,
-  trailZoomFromMapbox,
+  trailZoomFromMapbox, AGENCY_TILE_SIZE, mapboxAgencyTemplate, nativeTracks, NATIVE_TRACKS_MIN_ZOOM, OSM_CLOSED_TRACK_FILTER, OSM_OPEN_TRACK_FILTER,
 } from '../terrain';
+import { OSM_MIN_Z } from '../osm-trails';
 import { mapZoom, TRAIL_SOURCES, trailTileTemplate } from '../trails';
 
 const MOAB = { minLat: 38.5, maxLat: 38.8, minLng: -109.8, maxLng: -109.4 };
@@ -82,6 +83,25 @@ describe('trail squares in 3D', () => {
     const t = mapboxTileTemplate(trailTileTemplate(TRAIL_SOURCES.mvum));
     expect(t).toContain('bbox={bbox-epsg-3857}');
     expect(t).not.toContain('{minX}');
+  });
+});
+
+describe('trails that load fast', () => {
+  it('asks the agencies for a quarter as many squares, at the same sharpness', () => {
+    const t = mapboxAgencyTemplate(trailTileTemplate(TRAIL_SOURCES.mvum));
+    expect(AGENCY_TILE_SIZE).toBe(512);
+    expect(t).toContain('size=1024,1024');
+    expect(t).toContain('dpi=192');
+    expect(t).toContain('bbox={bbox-epsg-3857}');
+  });
+
+  it('lets Mapbox draw OpenStreetMap tracks itself from the zoom their squares start, only with a signal', () => {
+    expect(NATIVE_TRACKS_MIN_ZOOM).toBe(OSM_MIN_Z);
+    expect(nativeTracks(true, false)).toBe(true);
+    expect(nativeTracks(true, true)).toBe(false);
+    expect(nativeTracks(false, false)).toBe(false);
+    expect(JSON.stringify(OSM_OPEN_TRACK_FILTER)).toContain('"track"');
+    expect(JSON.stringify(OSM_CLOSED_TRACK_FILTER)).toContain('["==",["get","access"],"no"]');
   });
 });
 

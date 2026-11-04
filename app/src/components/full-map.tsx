@@ -63,6 +63,8 @@ export function FullMapBar({
       pointerEvents="box-none"
       style={[styles.wrap, { bottom: Math.max(insets.bottom, 12) }, wide ? styles.wrapWide : { left: Math.max(insets.left, 12), right: Math.max(insets.right, 12) }]}>
       <View style={styles.bar}>
+        {/* The small grab bar: swipe it (or the whole bar) up to bring the controls back. */}
+        <View pointerEvents="none" style={styles.grab} />
         <Pressable
           onPress={onRestore}
           accessibilityRole="button"
@@ -123,6 +125,7 @@ const styles = themedStyles(() => ({
     flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: FULL_MAP_BAR_H, padding: 4, paddingRight: 8,
     borderRadius: Radius.control + 6, ...glass,
   },
+  grab: { position: 'absolute', top: 4, alignSelf: 'center', left: '50%', marginLeft: -18, width: 36, height: 4, borderRadius: 2, backgroundColor: Colors.textSecondary, opacity: 0.5 },
   restore: {
     flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48, paddingHorizontal: 16,
     borderRadius: Radius.control + 2, backgroundColor: Colors.backgroundSelected,

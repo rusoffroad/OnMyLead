@@ -3031,6 +3031,9 @@ const dict: Record<string, string> = {
   'Rate trails so riders know what to expect': 'Valuta i sentieri perché i rider sappiano cosa aspettarsi',
   'The rider who started OnMyLead': 'Il rider che ha creato OnMyLead',
   'Given by OnMyLead to the riders who represent it': 'Assegnato da OnMyLead ai rider che lo rappresentano',
+  '3D Terrain': 'Terreno 3D',
+  'Lays the map flat again': 'Riporta la mappa in piano',
+  'Tilts the map and raises the mountains': 'Inclina la mappa e solleva le montagne',
 };
 
 export default dict;

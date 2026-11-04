@@ -15,6 +15,7 @@ sources:
   - app/src/hooks/use-trail-map.ts
   - app/src/lib/terrain.ts
   - app/src/lib/terrain-offline.ts
+  - app/src/hooks/use-panel-fold.ts
 related: [map-layers, offline-maps, ride-mode, navigation-mode]
 keywords: [3d, 3d map, terrain, elevation, contour, contour lines, topo, peaks, mountains, tilt, pitch, mapbox, hills, ridges, tablet]
 ---
@@ -24,12 +25,13 @@ keywords: [3d, 3d map, terrain, elevation, contour, contour lines, topo, peaks, 
 ## Turn On 3D Terrain
 
 1. Open Ride Mode or Map Mode.
-2. Tap the layers button in the top-right corner of the map.
-3. Under **Map Style**, tap **3D Terrain**.
+2. Tap the round **3D** button in the top-right corner of the map, just under the layers button.
 
-The map tilts to show the land in 3D. Your choice is remembered and used in Ride Mode and Map Mode. Other maps, like the route builder and Find a Ride, show plain satellite while 3D Terrain is picked.
+The map tilts to show the land in 3D and the button turns blue. Tap **3D** again to lay the map flat; it goes back to the style you had before (Satellite or Topo). The **3D** button also stays on the map in [Full Map](/help/full-map).
 
-To go back, tap **Satellite** or **Topo**.
+You can also pick **3D Terrain** under **Map Style** in the layers panel, and go back by tapping **Satellite** or **Topo** there.
+
+Your choice is remembered and used in Ride Mode and Map Mode. Other maps, like the route builder and Find a Ride, show plain satellite while 3D Terrain is picked.
 
 3D Terrain is a map style, so like the other map styles it's a Pro feature. See [Free and Pro](/help/free-vs-pro).
 

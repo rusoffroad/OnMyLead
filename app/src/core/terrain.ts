@@ -258,6 +258,45 @@ export function mapboxTileTemplate(template: string): string {
   return template.replace('{minX},{minY},{maxX},{maxY}', '{bbox-epsg-3857}');
 }
 
+/**
+ * The agencies' trail squares as Mapbox asks for them: 512-point squares drawn at 1024 pixels.
+ * Each square is drawn on demand by the agency's server (about half a second), so a quarter as
+ * many requests per screen is what makes trails show quickly after a zoom. The pixels per point
+ * and the map scale the server sees are unchanged, so lines and labels look the same.
+ */
+export const AGENCY_TILE_SIZE = 512;
+
+export function mapboxAgencyTemplate(template: string): string {
+  return mapboxTileTemplate(template).replace('size=512,512', 'size=1024,1024');
+}
+
+/**
+ * OpenStreetMap tracks drawn by Mapbox itself, straight from OpenFreeMap's vector squares, from this
+ * Mapbox zoom in (the closest squares that carry tracks, core/osm-trails OSM_MIN_Z). They stream in
+ * while the rider pinches, like Mapbox's own roads. Further out, and with no signal, the app draws
+ * the tracks it read itself (useTrailMap osmLines).
+ */
+export const NATIVE_TRACKS_MIN_ZOOM = 13;
+export const OSM_SOURCE_ID = 'oml-osm';
+
+/** Whether Mapbox draws the tracks itself now: trails on and a signal to fetch squares with. */
+export function nativeTracks(trails: boolean, offline: boolean): boolean {
+  return trails && !offline;
+}
+
+/** Mapbox filters for OpenStreetMap tracks (OpenMapTiles class "track"), open or closed (access "no"). */
+export const OSM_TRACK_FILTER = ['==', ['get', 'class'], 'track'] as const;
+export const OSM_OPEN_TRACK_FILTER = ['all', ['==', ['get', 'class'], 'track'], ['!=', ['get', 'access'], 'no']] as const;
+export const OSM_CLOSED_TRACK_FILTER = ['all', ['==', ['get', 'class'], 'track'], ['==', ['get', 'access'], 'no']] as const;
+export const OSM_NAMED_TRACK_FILTER = ['all', ['==', ['get', 'class'], 'track'], ['has', 'name']] as const;
+
+/**
+ * How long the camera must sit still before the app loads trail names, closures and rider trails
+ * for the new view. Mapbox's own "idle" waits for every square on screen, including the agencies'
+ * slow ones, which held everything else back by seconds.
+ */
+export const SETTLE_MS = 180;
+
 export function insideBox(p: LatLng, b: Box): boolean {
   return p.lat >= b.minLat && p.lat <= b.maxLat && p.lng >= b.minLng && p.lng <= b.maxLng;
 }
