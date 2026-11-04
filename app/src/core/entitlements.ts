@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * OnMyLead Pro: what the rider's plan allows, as the server reports it (my_entitlements() in
  * migration 20261018000000_pro_entitlements.sql). The server is the judge; the app only uses
@@ -328,13 +330,13 @@ export function showsProTag(e: Entitlements, feature: FeatureKey): boolean {
 /** "Rides Created This Month: 0 of 1", or null when unlimited. */
 export function rideAllowanceText(e: Entitlements): string | null {
   if (!e.switchedOn || e.rideAllowance === null) return null;
-  return `Rides Created This Month: ${Math.min(e.ridesCreatedThisMonth, e.rideAllowance)} of ${e.rideAllowance}`;
+  return tc('Rides Created This Month: {v} of {rideAllowance}', { v: Math.min(e.ridesCreatedThisMonth, e.rideAllowance), rideAllowance: e.rideAllowance });
 }
 
 /** "Pro Trial — 12 Days Remaining" while a trial runs. */
 export function trialBadgeText(e: Entitlements): string | null {
   if (e.proSource !== 'trial' || e.trialDaysLeft === null) return null;
-  return `Pro Trial — ${e.trialDaysLeft} ${e.trialDaysLeft === 1 ? 'Day' : 'Days'} Remaining`;
+  return e.trialDaysLeft === 1 ? tc('Pro Trial — 1 Day Remaining') : tc('Pro Trial — {trialDaysLeft} Days Remaining', { trialDaysLeft: e.trialDaysLeft });
 }
 
 export type ProError =

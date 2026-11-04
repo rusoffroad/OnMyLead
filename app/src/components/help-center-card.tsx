@@ -5,6 +5,7 @@ import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 
+import { t } from '@/lib/i18n';
 /**
  * The way into the Help Center at onmylead.com/help: step-by-step guides for every feature. Shown
  * at the top of Help and Support so it's the first thing riders see when they need help.
@@ -13,8 +14,8 @@ export function HelpCenterCard() {
   return (
     <Pressable
       accessibilityRole="link"
-      accessibilityLabel={`${HELP_CENTER_TITLE}. Step-by-step instructions for everything in OnMyLead.`}
-      accessibilityHint={`Opens ${HELP_CENTER_DISPLAY}`}
+      accessibilityLabel={t('{v}. Step-by-step instructions for everything in OnMyLead.', { v: HELP_CENTER_TITLE })}
+      accessibilityHint={t('Opens {v}', { v: HELP_CENTER_DISPLAY })}
       onPress={() => openHelpCenter()}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.tile}>
@@ -23,7 +24,7 @@ export function HelpCenterCard() {
       <View style={styles.body}>
         <Text style={styles.title}>{HELP_CENTER_TITLE}</Text>
         <Text style={styles.detail}>
-          Step-by-step instructions for everything in OnMyLead, from your first ride to offline maps and Pro.
+          {t('Step-by-step instructions for everything in OnMyLead, from your first ride to offline maps and Pro.')}
         </Text>
         <View style={styles.url}>
           <Text style={styles.urlText}>{HELP_CENTER_DISPLAY}</Text>
@@ -40,7 +41,7 @@ export function GuideLink({ slug, title = 'Read the Guide' }: { slug: string; ti
     <Pressable
       accessibilityRole="link"
       accessibilityLabel={title}
-      accessibilityHint={`Opens the guide on ${HELP_CENTER_DISPLAY}`}
+      accessibilityHint={t('Opens the guide on {v}', { v: HELP_CENTER_DISPLAY })}
       hitSlop={8}
       onPress={() => openHelpCenter(slug)}
       style={({ pressed }) => [styles.guide, pressed && { opacity: 0.7 }]}>

@@ -15,6 +15,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { blaze, stopSign } from './waypoint-map.web';
+import { t as tr } from '@/lib/i18n';
 
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
 
@@ -219,7 +220,7 @@ function FlatNavMap({
           iconAnchor: [size / 2, size / 2],
           html: `<div class="oml-wp ${cls}" style="width:${size}px;height:${size}px">${w.planned_stop ? stopSign(n, symbol) : blaze(w.shared, symbol)}<span>${esc(w.name)}${time ? `<small>${esc(time)}</small>` : ''}</span></div>`,
         }),
-        title: w.planned_stop ? `Planned stop ${n ?? ''}, ${w.name}, ${symbolLabel(symbol)}` : `${symbolLabel(symbol)} waypoint, ${w.name}`,
+        title: w.planned_stop ? tr('Planned stop {v}, {name}, {v2}', { v: n ?? '', name: w.name, v2: symbolLabel(symbol) }) : tr('{v} waypoint, {name}', { v: symbolLabel(symbol), name: w.name }),
         zIndexOffset: w.planned_stop ? 500 : w.shared ? 400 : 300,
       })
         .on('click', () => cb.current.onPressWaypoint?.(w))
@@ -243,7 +244,7 @@ function FlatNavMap({
       const time = w.planned_stop ? stopTimeLabel(w.stop_time) : null;
       const n = w.planned_stop ? stopNumber(w, waypoints ?? []) : null;
       L.marker(ll(w), {
-        title: w.planned_stop ? `Planned stop ${n ?? ''}, ${w.name}` : `${symbolLabel(symbol)} waypoint, ${w.name}`,
+        title: w.planned_stop ? tr('Planned stop {v}, {name}', { v: n ?? '', name: w.name }) : tr('{v} waypoint, {name}', { v: symbolLabel(symbol), name: w.name }),
         zIndexOffset: 400,
         icon: L.divIcon({
           className: '',

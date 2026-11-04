@@ -7,6 +7,7 @@ import { Colors, font, GlassSurface, Radius, RideColors, themedStyles } from '@/
 import { FULL_MAP_BAR_H, RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
 import { isVerticalSwipe } from '@/core/panel-swipe';
 
+import { t } from '@/lib/i18n';
 const glass = GlassSurface;
 
 /**
@@ -18,12 +19,12 @@ export function FullMapButton({ onPress, style }: { onPress: () => void; style?:
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel="Full Map"
-      accessibilityHint="Hides the bars and panels so the map fills the screen. Tap Controls to bring them back"
+      accessibilityLabel={t('Full Map')}
+      accessibilityHint={t('Hides the bars and panels so the map fills the screen. Tap Controls to bring them back')}
       hitSlop={8}
       style={({ pressed }) => [styles.fullBtn, pressed && { opacity: 0.75 }, style]}>
       <Icon name="expand" size={16} color={Colors.text} strokeWidth={2.4} />
-      <Text style={styles.fullText}>Full Map</Text>
+      <Text style={styles.fullText}>{t('Full Map')}</Text>
     </Pressable>
   );
 }
@@ -66,7 +67,7 @@ export function FullMapBar({
           onPress={onRestore}
           accessibilityRole="button"
           accessibilityLabel={restoreA11yLabel(waiting)}
-          accessibilityHint="You can also swipe the bar up"
+          accessibilityHint={t('You can also swipe the bar up')}
           hitSlop={6}
           style={({ pressed }) => [styles.restore, pressed && { opacity: 0.8 }]}>
           <Icon name="collapse" size={18} color={Colors.text} strokeWidth={2.4} />

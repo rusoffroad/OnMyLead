@@ -7,6 +7,7 @@ import type { TiltReading } from '@/hooks/use-tilt';
 import { Icon } from './icon';
 import { LEVEL_INK } from './tilt-gauge';
 
+import { t as tr } from '@/lib/i18n';
 export const TILT_TILE_H = 48;
 
 /**
@@ -28,12 +29,12 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
       <Pressable
         onPress={() => router.push('/tilt')}
         accessibilityRole="button"
-        accessibilityLabel="Calibrate Tilt"
-        accessibilityHint="Opens the tilt meter so you can calibrate it"
+        accessibilityLabel={tr('Calibrate Tilt')}
+        accessibilityHint={tr('Opens the tilt meter so you can calibrate it')}
         hitSlop={6}
         style={({ pressed }) => [bar ? styles.bar : styles.pill, pressed && { opacity: 0.8 }, style]}>
         <Icon name="tilt" size={bar ? 22 : 20} color={Colors.textSecondary} strokeWidth={2.3} />
-        <Text style={[styles.calibrate, bar && { flex: 1 }]} numberOfLines={1}>Calibrate Tilt</Text>
+        <Text style={[styles.calibrate, bar && { flex: 1 }]} numberOfLines={1}>{tr('Calibrate Tilt')}</Text>
         {bar ? <Icon name="chevron" size={18} color={Colors.textSecondary} /> : null}
       </Pressable>
     );
@@ -42,8 +43,8 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
     <Pressable
       onPress={() => router.push('/tilt')}
       accessibilityRole="button"
-      accessibilityLabel={t ? `Tilt. ${describeTilt(t)}${reading.zeroed ? '' : '. Not zeroed yet'}` : 'Tilt'}
-      accessibilityHint="Opens the tilt meter"
+      accessibilityLabel={t ? `Tilt. ${describeTilt(t)}${reading.zeroed ? '' : tr('. Not zeroed yet')}` : tr('Tilt')}
+      accessibilityHint={tr('Opens the tilt meter')}
       hitSlop={6}
       style={({ pressed }) => [
         bar ? styles.bar : styles.pill,
@@ -53,7 +54,7 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
       ]}>
       <Icon name="tilt" size={bar ? 22 : 20} color={ink} strokeWidth={2.3} />
       <Axis
-        label="Roll"
+        label={tr('Roll')}
         value={t ? `${degrees(t.roll)}°` : '–'}
         side={t ? (bar ? rollSide(t.roll) : short(rollSide(t.roll))) : ''}
         ink={on && tiltLevel(t!.roll, limits.roll) !== 'ok' ? LEVEL_INK[tiltLevel(t.roll, limits.roll)] : Colors.text}
@@ -61,7 +62,7 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
       />
       <View style={styles.rule} />
       <Axis
-        label="Pitch"
+        label={tr('Pitch')}
         value={t ? `${degrees(t.pitch)}°` : '–'}
         side={t ? pitchSide(t.pitch) : ''}
         ink={on && tiltLevel(t!.pitch, limits.pitch) !== 'ok' ? LEVEL_INK[tiltLevel(t.pitch, limits.pitch)] : Colors.text}

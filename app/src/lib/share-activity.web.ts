@@ -5,6 +5,7 @@ import type { View } from 'react-native';
 import { font as appFont } from '@/constants/theme';
 import { track } from './analytics';
 
+import { tc } from '@/core/i18n';
 const W = 1080;
 const H = 1350;
 
@@ -114,7 +115,7 @@ export async function shareActivity(view: RefObject<View | null>, text: string, 
     download('onmylead-activity.png', blob);
     await Clipboard.setStringAsync(text).catch(() => {});
     track('activity_shared', { kind, as: 'download', platform: 'web' });
-    return 'Picture downloaded and caption copied. Post it on Facebook, Instagram or X.';
+    return tc('Picture downloaded and caption copied. Post it on Facebook, Instagram or X.');
   }
   return shareActivityText(text, kind);
 }
@@ -131,5 +132,5 @@ export async function shareActivityText(text: string, kind: string): Promise<str
   }
   await Clipboard.setStringAsync(text);
   track('activity_shared', { kind, as: 'copy', platform: 'web' });
-  return 'Copied. Paste it into Facebook, Instagram or X.';
+  return tc('Copied. Paste it into Facebook, Instagram or X.');
 }

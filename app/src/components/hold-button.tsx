@@ -5,6 +5,7 @@ import { Animated, Easing, Platform, Pressable, Text, View } from 'react-native'
 import { Colors, font, themedStyles } from '@/constants/theme';
 import { HOLD_TO_SEND_MS, holdHint, holdOutcome, type HoldPhase } from '@/core/hold-to-send';
 
+import { t } from '@/lib/i18n';
 /**
  * A big button that acts only after it is held for `holdMs`. A bar fills across it while the
  * finger is down, the hint below says to keep holding, and letting go early says why nothing was
@@ -79,7 +80,7 @@ export function HoldButton({
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel ?? title}
         accessibilityHint={holdHint('idle', holdMs)}
-        accessibilityActions={[{ name: 'activate', label: 'Send' }, { name: 'longpress', label: 'Send' }]}
+        accessibilityActions={[{ name: 'activate', label: t('Send') }, { name: 'longpress', label: t('Send') }]}
         onAccessibilityAction={() => fire()}
         onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}
         style={[styles.button, { backgroundColor: color }]}>
@@ -92,7 +93,7 @@ export function HoldButton({
             ]}
           />
         </View>
-        <Text style={styles.text}>{phase === 'holding' ? 'Keep Holding…' : title}</Text>
+        <Text style={styles.text}>{phase === 'holding' ? t('Keep Holding…') : title}</Text>
       </Pressable>
       <Text
         style={[styles.hint, phase === 'too-short' && styles.hintWarn]}

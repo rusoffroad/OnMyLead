@@ -13,6 +13,7 @@ import { hasSyncedEntry, onSyncedPrefix, setSyncedItem, syncedValues } from '@/l
 import { deleteTerrain, pauseTerrain, saveTerrain } from '@/lib/terrain-offline';
 import { templateFor, tileFile } from '@/lib/trail-tiles';
 
+import { tc } from '@/core/i18n';
 /**
  * Downloaded maps. The squares go into the same folders the ride maps already read from
  * (lib/trail-tiles), so a downloaded area simply shows, signal or not. Each download keeps a list
@@ -306,7 +307,7 @@ export async function deleteOfflineMap(id: string) {
 }
 
 export function renameOfflineMap(id: string, name: string) {
-  update(id, { name: name.trim() || 'Map Area' });
+  update(id, { name: name.trim() || tc('Map Area') });
   const m = maps.find((x) => x.id === id);
   if (m) listWithAccount(m);
 }

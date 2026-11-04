@@ -17,6 +17,7 @@ import { useTrailMap } from '@/hooks/use-trail-map';
 import { downloadArea, planArea } from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
 
+import { t } from '@/lib/i18n';
 const SIDE = 18;
 
 /** Frame an area on the map and download it for riding with no signal. */
@@ -62,7 +63,7 @@ export default function PickArea() {
   if (Platform.OS === 'web') {
     return (
       <View style={[styles.root, { padding: 24, paddingTop: insets.top + 24 }]}>
-        <Text style={styles.note}>Offline maps are in the iPhone app.</Text>
+        <Text style={styles.note}>{t('Offline maps are in the iPhone app.')}</Text>
       </View>
     );
   }
@@ -94,10 +95,10 @@ export default function PickArea() {
 
       <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
         <View style={styles.topRow}>
-          <Pressable onPress={() => router.back()} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back">
-            <Text style={styles.topText}>‹ Offline Maps</Text>
+          <Pressable onPress={() => router.back()} hitSlop={16} accessibilityRole="button" accessibilityLabel={t('Back')}>
+            <Text style={styles.topText}>{t('‹ Offline Maps')}</Text>
           </Pressable>
-          <Text style={[styles.topText, { color: Colors.textSecondary }]}>Pick an Area</Text>
+          <Text style={[styles.topText, { color: Colors.textSecondary }]}>{t('Pick an Area')}</Text>
         </View>
       </SafeAreaView>
 
@@ -107,7 +108,7 @@ export default function PickArea() {
         onLayout={(e) => setPanelH(Math.round(e.nativeEvent.layout.height))}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 8 }]}>
         <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Map Choices" />
-        {fold.open ? <Text style={styles.hint}>Move and zoom the map until the frame holds the area you’ll ride.</Text> : null}
+        {fold.open ? <Text style={styles.hint}>{t('Move and zoom the map until the frame holds the area you’ll ride.')}</Text> : null}
         {fold.open ? (
           <View style={styles.chips} accessibilityRole="none">
             {offlineChoices(trail.terrainAvailable).map((c) => {
@@ -129,17 +130,17 @@ export default function PickArea() {
           {!box ? (
             <ActivityIndicator color={SAND} />
           ) : !choices.length ? (
-            <Text style={styles.estimateSub}>Pick at least one map to download.</Text>
+            <Text style={styles.estimateSub}>{t('Pick at least one map to download.')}</Text>
           ) : tooBig ? (
-            <Text style={[styles.estimateSub, { color: Colors.danger }]}>Too big for one download. Zoom in a little.</Text>
+            <Text style={[styles.estimateSub, { color: Colors.danger }]}>{t('Too big for one download. Zoom in a little.')}</Text>
           ) : plan ? (
             <>
-              <Text style={styles.estimateBig}>About {formatBytes(plan.bytes)}</Text>
-              <Text style={styles.estimateSub}>{plan.tiles.toLocaleString()} map pieces</Text>
+              <Text style={styles.estimateBig}>{t('About {v}', { v: formatBytes(plan.bytes) })}</Text>
+              <Text style={styles.estimateSub}>{t('{v} map pieces', { v: plan.tiles.toLocaleString() })}</Text>
             </>
           ) : null}
         </View>
-        <Button title="Download This Area" pro="offline_maps" big loading={starting} disabled={!plan || tooBig || !choices.length} onPress={download} />
+        <Button title={t('Download This Area')} pro="offline_maps" big loading={starting} disabled={!plan || tooBig || !choices.length} onPress={download} />
       </SafeAreaView>
       </Animated.View>
     </View>
@@ -162,11 +163,11 @@ async function placeName(box: Box): Promise<string> {
   try {
     const [place] = await Location.reverseGeocodeAsync(center);
     const town = place?.city || place?.subregion || place?.region;
-    if (town) return `Near ${town}`;
+    if (town) return t('Near {town}', { town });
   } catch {
     // No geocoder or no signal.
   }
-  return `Map Area, ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+  return t('Map Area, {v}', { v: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) });
 }
 
 const styles = themedStyles(() => ({

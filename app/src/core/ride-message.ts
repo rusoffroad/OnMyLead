@@ -10,6 +10,7 @@
  */
 import { QUICK_REPLIES } from './chat';
 
+import { tc } from './i18n';
 /** Longest custom Ride Mode message: it is the push title, so it has to read at a glance. */
 export const RIDE_MESSAGE_MAX = 120;
 /** How many of their own quick replies a rider can keep. */
@@ -25,9 +26,9 @@ export function tidyRideMessage(raw: string): string {
 /** Tidy and validate what the rider typed in Ride Mode before it is sent. */
 export function checkRideMessage(raw: string): RideMessageCheck {
   const body = tidyRideMessage(raw);
-  if (!body) return { ok: false, error: 'Type a message first.' };
+  if (!body) return { ok: false, error: tc('Type a message first.') };
   if (body.length > RIDE_MESSAGE_MAX) {
-    return { ok: false, error: `Keep it under ${RIDE_MESSAGE_MAX} characters (${body.length} now).` };
+    return { ok: false, error: tc('Keep it under {RIDE_MESSAGE_MAX} characters ({length} now).', { RIDE_MESSAGE_MAX, length: body.length }) };
   }
   return { ok: true, body };
 }

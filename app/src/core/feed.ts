@@ -6,6 +6,7 @@
 import { badgeTitle, HONOR_BY_KEY, isBadgeKey, isHonor, type BadgeKey, type BadgeLevel } from './badges';
 import { METERS_PER_MILE } from './geo';
 
+import { coreLocale, tc } from './i18n';
 export type FeedKind = 'out' | 'ride' | 'badge' | 'trail' | 'group' | 'post';
 export type ShowFrom = 'friends' | 'follows' | 'groups';
 export type ShareWith = 'friends' | 'followers' | 'nobody';
@@ -112,13 +113,13 @@ export function toggleKind(kinds: FeedKind[], kind: FeedKind): FeedKind[] {
   return ALL_KINDS.filter((k) => on.has(k));
 }
 
-const miles = (mi: number) => (mi >= 10 ? Math.round(mi).toLocaleString('en-US') : (Math.round(mi * 10) / 10).toString());
+const miles = (mi: number) => (mi >= 10 ? Math.round(mi).toLocaleString(coreLocale()) : (Math.round(mi * 10) / 10).toString());
 
 /** What one post says after the rider's name, e.g. "rode Black Bear Pass with 6 riders". */
 export function feedLine(item: FeedItem): string {
   switch (item.kind) {
     case 'out':
-      return item.title ? `is out riding at ${item.title}` : 'is out riding right now';
+      return item.title ? tc('is out riding at {title}', { title: item.title }) : tc('is out riding right now');
     case 'ride': {
       const others = item.riders != null ? Math.max(0, Math.round(item.riders) - 1) : 0;
       const what = item.title ? `rode ${item.title}` : 'finished a ride';
@@ -126,20 +127,20 @@ export function feedLine(item: FeedItem): string {
     }
     case 'badge':
       if (item.badge && isHonor(item.badge.badge)) return HONOR_BY_KEY[item.badge.badge].feed;
-      return item.badge ? `earned ${badgeTitle(item.badge)}` : 'earned a badge';
+      return item.badge ? `earned ${badgeTitle(item.badge)}` : tc('earned a badge');
     case 'trail':
-      return item.title ? `shared a trail, ${item.title}` : 'shared a trail';
+      return item.title ? tc('shared a trail, {title}', { title: item.title }) : tc('shared a trail');
     case 'post':
       return 'posted';
     case 'group':
-      return item.groupName ? `posted a ride to ${item.groupName}${item.title ? `, ${item.title}` : ''}` : `posted a group ride${item.title ? `, ${item.title}` : ''}`;
+      return item.groupName ? tc('posted a ride to {groupName}{v}', { groupName: item.groupName, v: item.title ? `, ${item.title}` : '' }) : tc('posted a group ride{v}', { v: item.title ? `, ${item.title}` : '' });
   }
 }
 
 /** The small numbers under a post: miles for a ride, length for a trail. */
 export function feedStat(item: FeedItem): string | null {
   if (item.kind === 'ride' && item.miles != null && item.miles > 0) return `${miles(item.miles)} mi`;
-  if (item.kind === 'trail' && item.lengthM != null && item.lengthM > 0) return `${miles(item.lengthM / METERS_PER_MILE)} mi long`;
+  if (item.kind === 'trail' && item.lengthM != null && item.lengthM > 0) return tc('{v} mi long', { v: miles(item.lengthM / METERS_PER_MILE) });
   return null;
 }
 
@@ -148,14 +149,14 @@ export function timeAgo(iso: string, now: Date = new Date()): string {
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return '';
   const mins = Math.floor((now.getTime() - t) / 60_000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins} min ago`;
+  if (mins < 1) return tc('Just now');
+  if (mins < 60) return tc('{mins} min ago', { mins });
   const hours = Math.floor(mins / 60);
   if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
   const days = Math.floor(hours / 24);
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days} days ago`;
-  return new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (days === 1) return tc('Yesterday');
+  if (days < 7) return tc('{days} days ago', { days });
+  return new Date(t).toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric' });
 }
 
 /** Out riding posts always come first (they're happening now), then newest first. */

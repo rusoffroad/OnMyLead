@@ -11,6 +11,7 @@ import { cleanRideName, initialOf, MAX_RIDE_NAME, rideNameProblem, shownName } f
 import { myRideName, saveRideName } from '@/lib/api';
 import { useSession } from '@/lib/session';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * Your ride name (nickname) and profile picture: what every other rider sees on the map, the
  * rider list and in chat.
@@ -66,7 +67,7 @@ export default function RideNameScreen() {
       {session ? <AvatarEditor userId={session.user.id} name={clean || saved || ''} /> : null}
 
       <Field
-        label="Ride Name"
+        label={tr('Ride Name')}
         value={name}
         onChangeText={(t) => {
           setName(t);
@@ -74,16 +75,16 @@ export default function RideNameScreen() {
           setError(null);
         }}
         onSubmitEditing={save}
-        placeholder="A nickname works, e.g. Dusty"
+        placeholder={tr('A nickname works, e.g. Dusty')}
         autoCapitalize="words"
         autoCorrect={false}
         returnKeyType="done"
         maxLength={MAX_RIDE_NAME + 8}
-        accessibilityHint="The name other riders see on the map, the rider list and in ride chat"
+        accessibilityHint={tr('The name other riders see on the map, the rider list and in ride chat')}
       />
       <View style={styles.meta}>
         <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
-          Shows on the group map, the rider list and in ride chat.
+          {tr('Shows on the group map, the rider list and in ride chat.')}
         </ThemedText>
         <ThemedText type="small" style={{ color: length > MAX_RIDE_NAME ? Colors.danger : Colors.textSecondary, fontWeight: 600 }}>
           {length}/{MAX_RIDE_NAME}
@@ -92,7 +93,7 @@ export default function RideNameScreen() {
 
       <ErrorText error={error ?? problem} />
       <Button
-        title={justSaved && !changed ? 'Name Saved' : 'Save Name'}
+        title={justSaved && !changed ? tr('Name Saved') : tr('Save Name')}
         big
         loading={busy}
         disabled={!changed || !!problem}
@@ -107,7 +108,7 @@ export default function RideNameScreen() {
 function NamePreview({ userId, name }: { userId: string | undefined; name: string }) {
   const shown = shownName(name);
   return (
-    <View style={styles.preview} accessible accessibilityLabel={`Other riders see you as ${shown}`}>
+    <View style={styles.preview} accessible accessibilityLabel={tr('Other riders see you as {shown}', { shown })}>
       <View style={styles.contours}>
         {[0, 1, 2, 3].map((i) => (
           <View key={i} style={[styles.contour, { width: 120 + i * 70, height: 120 + i * 70, borderRadius: 60 + i * 35 }]} />
@@ -130,11 +131,11 @@ function NamePreview({ userId, name }: { userId: string | undefined; name: strin
         </View>
       </View>
       <View style={styles.chatLine}>
-        <Text style={styles.chatName} numberOfLines={1}>{shown}, 9:41 AM</Text>
-        <Text style={styles.chatBody}>Fuel stop at the next turnout</Text>
+        <Text style={styles.chatName} numberOfLines={1}>{tr('{shown}, 9:41 AM', { shown })}</Text>
+        <Text style={styles.chatBody}>{tr('Fuel stop at the next turnout')}</Text>
       </View>
       <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
-        This is how the group sees you.
+        {tr('This is how the group sees you.')}
       </ThemedText>
     </View>
   );

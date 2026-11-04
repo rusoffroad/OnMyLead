@@ -12,6 +12,7 @@ import { track } from '@/lib/analytics';
 import { completeAuthLink } from '@/lib/session';
 import { supabase } from '@/lib/supabase';
 
+import { t as tr } from '@/lib/i18n';
 type Next = State | { step: 'go'; to: '/' | '/reset-password' };
 
 /** Signs in with the link and says where the screen goes next. */
@@ -107,17 +108,17 @@ export default function AuthCallback() {
       {state.step === 'working' ? (
         <View style={{ alignItems: 'center', gap: Spacing.three }}>
           <ActivityIndicator color={Colors.text} />
-          <ThemedText>Signing you in…</ThemedText>
+          <ThemedText>{tr('Signing you in…')}</ThemedText>
         </View>
       ) : null}
 
       {state.step === 'choose' ? (
         <Card style={{ gap: Spacing.three, borderLeftWidth: 4, borderLeftColor: Colors.accent }}>
-          <ThemedText type="subtitle">Open OnMyLead</ThemedText>
-          <ThemedText themeColor="textSecondary">Finish signing in inside the app, or carry on here in the browser.</ThemedText>
-          <Button title="Open in the App" big onPress={openApp} />
+          <ThemedText type="subtitle">{tr('Open OnMyLead')}</ThemedText>
+          <ThemedText themeColor="textSecondary">{tr('Finish signing in inside the app, or carry on here in the browser.')}</ThemedText>
+          <Button title={tr('Open in the App')} big onPress={openApp} />
           <Button
-            title="Continue on the Website"
+            title={tr('Continue on the Website')}
             kind="secondary"
             onPress={() => {
               setState({ step: 'working' });
@@ -130,27 +131,27 @@ export default function AuthCallback() {
       {state.step === 'done' ? (
         <Card style={{ gap: Spacing.two, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
           <ThemedText type="subtitle" accessibilityLiveRegion="polite">{state.title}</ThemedText>
-          <ThemedText themeColor="textSecondary">{state.body}</ThemedText>
-          <Button title="Let’s Ride" onPress={() => leave(state.to)} />
+          <ThemedText themeColor="textSecondary">{tr(state.body)}</ThemedText>
+          <Button title={tr('Let’s Ride')} onPress={() => leave(state.to)} />
         </Card>
       ) : null}
 
       {state.step === 'elsewhere' ? (
         <Card style={{ gap: Spacing.three, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
-          <ThemedText type="subtitle">Your Email Is Confirmed</ThemedText>
+          <ThemedText type="subtitle">{tr('Your Email Is Confirmed')}</ThemedText>
           <ThemedText themeColor="textSecondary">
-            This link opened somewhere other than where you signed up, so sign in once more with your email and password.
+            {tr('This link opened somewhere other than where you signed up, so sign in once more with your email and password.')}
           </ThemedText>
-          {iphoneWeb ? <Button title="Open in the App" big onPress={() => Linking.openURL(appAuthLink(link))} /> : null}
-          <Button title="Sign In" kind={iphoneWeb ? 'secondary' : 'primary'} big={!iphoneWeb} onPress={() => router.replace('/sign-in')} />
+          {iphoneWeb ? <Button title={tr('Open in the App')} big onPress={() => Linking.openURL(appAuthLink(link))} /> : null}
+          <Button title={tr('Sign In')} kind={iphoneWeb ? 'secondary' : 'primary'} big={!iphoneWeb} onPress={() => router.replace('/sign-in')} />
         </Card>
       ) : null}
 
       {state.step === 'failed' ? (
         <Card style={{ gap: Spacing.three, borderLeftWidth: 4, borderLeftColor: Colors.danger }}>
-          <ThemedText type="subtitle">That Link Didn’t Work</ThemedText>
+          <ThemedText type="subtitle">{tr('That Link Didn’t Work')}</ThemedText>
           <ThemedText themeColor="textSecondary">{state.message}</ThemedText>
-          <Button title="Back to Sign In" onPress={() => router.replace('/sign-in')} />
+          <Button title={tr('Back to Sign In')} onPress={() => router.replace('/sign-in')} />
         </Card>
       ) : null}
     </Screen>

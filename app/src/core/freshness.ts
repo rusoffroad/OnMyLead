@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * How fresh a rider's location is, and how to say so.
  *
@@ -34,16 +36,16 @@ export type RiderFreshness = {
 
 export function formatAgo(ageSec: number): string {
   const s = Math.max(0, Math.floor(ageSec));
-  if (s < 60) return 'Just Now';
+  if (s < 60) return tc('Just Now');
   const totalMin = Math.floor(s / 60);
-  if (totalMin < 60) return `${totalMin} Min Ago`;
+  if (totalMin < 60) return tc('{totalMin} Min Ago', { totalMin });
   const totalHr = Math.floor(totalMin / 60);
   if (totalHr >= 24) {
     const d = Math.floor(totalHr / 24);
     return `${d} ${d === 1 ? 'Day' : 'Days'} Ago`;
   }
   const m = totalMin % 60;
-  return m === 0 ? `${totalHr} Hr Ago` : `${totalHr} Hr ${m} Min Ago`;
+  return m === 0 ? tc('{totalHr} Hr Ago', { totalHr }) : tc('{totalHr} Hr {m} Min Ago', { totalHr, m });
 }
 
 /**

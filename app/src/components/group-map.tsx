@@ -17,6 +17,7 @@ import { RiderMarker } from './rider-marker';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { StopPin, WaypointPin } from './waypoint-blaze';
+import { t } from '@/lib/i18n';
 
 export type { GroupMapHandle, MapRider } from './group-map-types';
 
@@ -245,7 +246,7 @@ function FlatGroupMap({
             e.stopPropagation?.();
             onPressWaypoint?.(w);
           }}
-          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+          accessibilityLabel={w.planned_stop ? t('Planned stop {v}, {name}, {v2}', { v: stopNumber(w, waypoints ?? []), name: w.name, v2: symbolLabel(waypointSymbol(w)) }) : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
           zIndex={w.planned_stop ? 4 : w.shared ? 3 : 2}>
           {w.planned_stop ? (
             <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />

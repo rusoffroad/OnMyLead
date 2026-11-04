@@ -31,6 +31,7 @@ import { useSession } from '@/lib/session';
 import { useSocialProfiles } from '@/lib/social-profile';
 import type { Ride } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 const day = (iso: string) => new Date(iso).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
@@ -86,7 +87,7 @@ export default function GroupPage() {
     }
   }
 
-  if (group === undefined) return <Screen><ThemedText themeColor="textSecondary">Loading…</ThemedText></Screen>;
+  if (group === undefined) return <Screen><ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText></Screen>;
   if (group === null) {
     return (
       <Screen>
@@ -103,7 +104,7 @@ export default function GroupPage() {
 
   const send = async (how: 'sheet' | 'text' | 'email') => {
     if (how === 'sheet') return Share.share({ message });
-    const url = how === 'text' ? smsUrl(message, Platform.OS) : mailUrl(`Join "${group.name}" on OnMyLead`, message);
+    const url = how === 'text' ? smsUrl(message, Platform.OS) : mailUrl(t('Join "{name}" on OnMyLead', { name: group.name }), message);
     await Linking.openURL(url).catch(() => Share.share({ message }));
   };
 
@@ -114,11 +115,11 @@ export default function GroupPage() {
       <View style={styles.hero}>
         {renaming !== null ? (
           <View style={{ gap: Spacing.two, alignSelf: 'stretch' }}>
-            <Field label="Group Name" value={renaming} onChangeText={setRenaming} autoFocus maxLength={MAX_GROUP_NAME + 8} returnKeyType="done" />
+            <Field label={t('Group Name')} value={renaming} onChangeText={setRenaming} autoFocus maxLength={MAX_GROUP_NAME + 8} returnKeyType="done" />
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-              <Button title="Cancel" kind="secondary" style={{ flex: 1 }} onPress={() => setRenaming(null)} />
+              <Button title={t('Cancel')} kind="secondary" style={{ flex: 1 }} onPress={() => setRenaming(null)} />
               <Button
-                title="Save Name"
+                title={t('Save Name')}
                 style={{ flex: 1 }}
                 loading={busy === 'rename'}
                 onPress={() => {
@@ -137,12 +138,12 @@ export default function GroupPage() {
           <Pressable
             disabled={!owner}
             accessibilityRole={owner ? 'button' : 'header'}
-            accessibilityHint={owner ? 'Rename the group' : undefined}
+            accessibilityHint={owner ? t('Rename the group') : undefined}
             onPress={() => setRenaming(group.name)}
             style={{ alignSelf: 'stretch' }}>
             <Text style={styles.title}>{group.name}</Text>
             <ThemedText type="small" themeColor="textSecondary">
-              {owner ? `${ridersLabel(group.riders.length)}. Tap the name to rename it.` : `${ridersLabel(group.riders.length)}, Run By ${group.ownerName}`}
+              {owner ? t('{v}. Tap the name to rename it.', { v: ridersLabel(group.riders.length) }) : t('{v}, Run By {ownerName}', { v: ridersLabel(group.riders.length), ownerName: group.ownerName })}
             </ThemedText>
           </Pressable>
         )}
@@ -155,7 +156,7 @@ export default function GroupPage() {
         onPress={() => router.push(`/groups/${group.id}/chat`)}
       />
 
-      <Button title="Invite to a Ride" big onPress={() => setPicking(picking === 'ride' ? null : 'ride')} />
+      <Button title={t('Invite to a Ride')} big onPress={() => setPicking(picking === 'ride' ? null : 'ride')} />
       {notice ? (
         <View style={styles.notice} accessibilityLiveRegion="polite">
           <Icon name="check" color="#3CC36B" size={20} strokeWidth={2.6} />
@@ -169,7 +170,7 @@ export default function GroupPage() {
               <Pressable
                 key={r.id}
                 accessibilityRole="button"
-                accessibilityLabel={`Invite ${group.name} to ${r.name}`}
+                accessibilityLabel={t('Invite {name} to {v}', { name: group.name, v: r.name })}
                 disabled={!!busy}
                 onPress={() =>
                   act(`ride:${r.id}`, async () => {
@@ -181,15 +182,15 @@ export default function GroupPage() {
                 style={({ pressed }) => [styles.rideRow, i > 0 && styles.rule, pressed && { backgroundColor: Colors.backgroundSelected }]}>
                 <View style={{ flex: 1 }}>
                   <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{r.name}</ThemedText>
-                  <ThemedText type="small" themeColor="textSecondary">{r.status === 'live' ? 'Riding Now' : day(r.meet_at)}</ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">{r.status === 'live' ? t('Riding Now') : day(r.meet_at)}</ThemedText>
                 </View>
-                <ThemedText style={{ color: Colors.accent, fontWeight: 700 }}>{busy === `ride:${r.id}` ? 'Inviting…' : 'Invite'}</ThemedText>
+                <ThemedText style={{ color: Colors.accent, fontWeight: 700 }}>{busy === `ride:${r.id}` ? t('Inviting…') : t('Invite')}</ThemedText>
               </Pressable>
             ))
           ) : (
             <View style={{ padding: Spacing.three, gap: Spacing.two }}>
-              <ThemedText themeColor="textSecondary">You’re not organizing an upcoming ride. Create one and invite the group from there.</ThemedText>
-              <Button title="Create a Ride" kind="secondary" onPress={() => router.push('/ride/new')} />
+              <ThemedText themeColor="textSecondary">{t('You’re not organizing an upcoming ride. Create one and invite the group from there.')}</ThemedText>
+              <Button title={t('Create a Ride')} kind="secondary" onPress={() => router.push('/ride/new')} />
             </View>
           )}
         </View>
@@ -197,31 +198,31 @@ export default function GroupPage() {
 
       <ErrorText error={error} />
 
-      <Section title="Riders" right={<ThemedText themeColor="textSecondary">{group.riders.length}</ThemedText>} />
+      <Section title={t('Riders')} right={<ThemedText themeColor="textSecondary">{group.riders.length}</ThemedText>} />
       <View style={styles.list}>
         {group.riders.map((r, i) => (
           <View key={r.id} style={[styles.riderRow, i > 0 && styles.rule]}>
             <RiderPhoto userId={r.id} size={36} fallback={<SocialPhoto profile={social.get(r.id)} size={36} fallback={<RiderDot name={r.name} lead={r.isOwner} size={36} />} />} />
             <View style={{ flex: 1 }}>
               <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{r.id === me ? `${r.name} (You)` : r.name}</ThemedText>
-              {r.isOwner ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Runs This Group</ThemedText> : null}
+              {r.isOwner ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{t('Runs This Group')}</ThemedText> : null}
               {social.get(r.id) ? <SocialTag profile={social.get(r.id)!} /> : null}
             </View>
             {owner && !r.isOwner ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Remove ${r.name} from the group`}
+                accessibilityLabel={t('Remove {name} from the group', { name: r.name })}
                 hitSlop={8}
                 onPress={async () => {
                   if (!requirePro('saved_groups')) return;
-                  if (!(await confirmAsync(`Remove ${r.name}?`, 'They stop getting this group’s ride invites. You can add them back later.', 'Remove'))) return;
+                  if (!(await confirmAsync(t('Remove {name}?', { name: r.name }), t('They stop getting this group’s ride invites. You can add them back later.'), t('Remove')))) return;
                   act(`remove:${r.id}`, async () => {
                     await removeGroupRider(group.id, r.id);
                     await load();
                   });
                 }}
                 style={styles.remove}>
-                <Text style={styles.removeText}>Remove</Text>
+                <Text style={styles.removeText}>{t('Remove')}</Text>
               </Pressable>
             ) : null}
           </View>
@@ -231,12 +232,12 @@ export default function GroupPage() {
       {owner ? (
         picking === 'riders' ? (
           <View style={{ gap: Spacing.two }}>
-            <Section title="Add Riders You’ve Ridden With" />
+            <Section title={t('Add Riders You’ve Ridden With')} />
             {addable.length ? (
               <>
                 <RiderPicker mates={addable} picked={picked} onChange={setPicked} />
                 <Button
-                  title={picked.length ? `Add ${picked.length} ${picked.length === 1 ? 'Rider' : 'Riders'}` : 'Add Riders'}
+                  title={picked.length ? t('Add {length} {v}', { length: picked.length, v: picked.length === 1 ? 'Rider' : 'Riders' }) : t('Add Riders')}
                   disabled={!picked.length}
                   loading={busy === 'add'}
                   onPress={() =>
@@ -250,12 +251,12 @@ export default function GroupPage() {
                 />
               </>
             ) : (
-              <ThemedText themeColor="textSecondary">Everyone you’ve ridden with is already in the group. Send the link below to anyone else.</ThemedText>
+              <ThemedText themeColor="textSecondary">{t('Everyone you’ve ridden with is already in the group. Send the link below to anyone else.')}</ThemedText>
             )}
           </View>
         ) : (
           <Button
-            title="Add Riders You’ve Ridden With"
+            title={t('Add Riders You’ve Ridden With')}
             pro="saved_groups"
             kind="secondary"
             onPress={() => {
@@ -268,16 +269,16 @@ export default function GroupPage() {
       ) : null}
 
       <View style={styles.linkCard}>
-        <ThemedText type="heading">Invite by Link</ThemedText>
+        <ThemedText type="heading">{t('Invite by Link')}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          For friends who aren’t on OnMyLead yet. They open the link, make a free account and join the group.
+          {t('For friends who aren’t on OnMyLead yet. They open the link, make a free account and join the group.')}
         </ThemedText>
-        <Button title="Share Group Link" onPress={() => send('sheet')} style={{ backgroundColor: Colors.sky }} />
+        <Button title={t('Share Group Link')} onPress={() => send('sheet')} style={{ backgroundColor: Colors.sky }} />
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-          <Button title="Text" kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
-          <Button title="Email" kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
+          <Button title={t('Text')} kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
+          <Button title={t('Email')} kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
           <Button
-            title={copied ? 'Copied' : 'Copy'}
+            title={copied ? t('Copied') : t('Copy')}
             kind="secondary"
             style={{ flex: 1 }}
             onPress={async () => {
@@ -286,13 +287,13 @@ export default function GroupPage() {
             }}
           />
         </View>
-        <ThemedText type="small" themeColor="textSecondary" selectable>Group Code: {group.inviteCode}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" selectable>{t('Group Code: {inviteCode}', { inviteCode: group.inviteCode })}</ThemedText>
         {owner ? (
           <ShareCodeEditor
             kind="group"
             id={group.id}
             current={group.inviteCode}
-            note="The old link stops working. Everyone already in the group stays in."
+            note={t('The old link stops working. Everyone already in the group stays in.')}
             save={(c) => setGroupCode(group.id, c)}
             onSaved={() => {
               setCopied(false);
@@ -304,7 +305,7 @@ export default function GroupPage() {
           <Pressable
             accessibilityRole="button"
             onPress={async () => {
-              if (!(await confirmAsync('Make a new link?', 'The old link stops working. Everyone already in the group stays in.', 'New Link'))) return;
+              if (!(await confirmAsync(t('Make a new link?'), t('The old link stops working. Everyone already in the group stays in.'), t('New Link')))) return;
               act('reset', async () => {
                 await resetGroupLink(group.id);
                 setCopied(false);
@@ -312,17 +313,17 @@ export default function GroupPage() {
               });
             }}
             style={{ minHeight: 40, justifyContent: 'center' }}>
-            <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Make a New Link</ThemedText>
+            <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{t('Make a New Link')}</ThemedText>
           </Pressable>
         ) : null}
       </View>
 
       {owner ? (
         <Button
-          title="Delete Group"
+          title={t('Delete Group')}
           kind="ghost"
           onPress={async () => {
-            if (!(await confirmAsync(`Delete ${group.name}?`, 'The group goes away for everyone in it. Rides you already invited it to stay as they are.'))) return;
+            if (!(await confirmAsync(t('Delete {name}?', { name: group.name }), t('The group goes away for everyone in it. Rides you already invited it to stay as they are.')))) return;
             act('delete', async () => {
               await deleteGroup(group.id);
               router.back();
@@ -331,10 +332,10 @@ export default function GroupPage() {
         />
       ) : (
         <Button
-          title="Leave Group"
+          title={t('Leave Group')}
           kind="ghost"
           onPress={async () => {
-            if (!(await confirmAsync(`Leave ${group.name}?`, 'You stop getting this group’s ride invites. The group link brings you back.', 'Leave'))) return;
+            if (!(await confirmAsync(t('Leave {name}?', { name: group.name }), t('You stop getting this group’s ride invites. The group link brings you back.'), t('Leave')))) return;
             act('leave', async () => {
               await leaveGroup(group.id);
               router.back();
@@ -352,7 +353,7 @@ function ChatCard({ summary, preview, onPress }: { summary: GroupChatSummary | n
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Group Chat${unread ? `, ${unread}` : ''}`}
+      accessibilityLabel={t('Group Chat{v}', { v: unread ? `, ${unread}` : '' })}
       onPress={onPress}
       style={({ pressed }) => [styles.chatCard, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.chatBubbles}>
@@ -361,12 +362,12 @@ function ChatCard({ summary, preview, onPress }: { summary: GroupChatSummary | n
       </View>
       <View style={{ flex: 1, gap: 2 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.two }}>
-          <Text style={styles.chatTitle}>Group Chat</Text>
+          <Text style={styles.chatTitle}>{t('Group Chat')}</Text>
           {unread ? <Text style={styles.unread}>{unread}</Text> : null}
-          {summary?.muted ? <ThemedText type="small" themeColor="textSecondary">Muted</ThemedText> : null}
+          {summary?.muted ? <ThemedText type="small" themeColor="textSecondary">{t('Muted')}</ThemedText> : null}
         </View>
         <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-          {summary === null ? 'Not switched on yet' : preview ?? 'Talk about the next ride, or the last one.'}
+          {summary === null ? t('Not switched on yet') : preview ?? 'Talk about the next ride, or the last one.'}
         </ThemedText>
       </View>
       <Icon name="chevron" color={Colors.textSecondary} />

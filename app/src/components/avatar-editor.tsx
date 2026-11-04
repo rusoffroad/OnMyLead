@@ -9,6 +9,7 @@ import { canUseCamera, pickAvatar, removeAvatar, saveAvatar, useAvatar, type Ava
 import { confirmAsync } from '@/lib/confirm';
 import { RiderPhoto } from './rider-photo';
 
+import { t } from '@/lib/i18n';
 /**
  * Profile Picture: take one with the camera (app) or choose one from the photo library, cropped
  * square; change or remove it. Riders without one keep their initial.
@@ -27,7 +28,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
       const asset = await pickAvatar(source);
       if (!asset) return;
       await saveAvatar(asset);
-      setDone(photo ? 'Picture changed.' : 'Picture saved. Riders see it next to your name.');
+      setDone(photo ? t('Picture changed.') : t('Picture saved. Riders see it next to your name.'));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -36,7 +37,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
   };
 
   const remove = async () => {
-    const ok = await confirmAsync('Remove Your Picture?', 'Other riders see your initial instead.', 'Remove');
+    const ok = await confirmAsync(t('Remove Your Picture?'), t('Other riders see your initial instead.'), t('Remove'));
     if (!ok) return;
     setError(null);
     setDone(null);
@@ -66,18 +67,18 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
           />
         </View>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.title}>Profile Picture</Text>
+          <Text style={styles.title}>{t('Profile Picture')}</Text>
           <ThemedText type="small" themeColor="textSecondary">
             {photo
-              ? 'Shows next to your name in rider lists, chat, Messages and Friends.'
-              : 'Add a photo so riders know who’s who. Until then they see your initial.'}
+              ? t('Shows next to your name in rider lists, chat, Messages and Friends.')
+              : t('Add a photo so riders know who’s who. Until then they see your initial.')}
           </ThemedText>
         </View>
       </View>
       <View style={styles.buttons}>
         {canUseCamera ? (
           <Button
-            title="Take Photo"
+            title={t('Take Photo')}
             kind="secondary"
             loading={busy === 'camera'}
             disabled={!!busy && busy !== 'camera'}
@@ -86,7 +87,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
           />
         ) : null}
         <Button
-          title={photo ? 'Choose New Photo' : 'Choose Photo'}
+          title={photo ? t('Choose New Photo') : t('Choose Photo')}
           kind="secondary"
           loading={busy === 'library'}
           disabled={!!busy && busy !== 'library'}
@@ -95,7 +96,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
         />
         {photo ? (
           <Button
-            title="Remove"
+            title={t('Remove')}
             kind="ghost"
             loading={busy === 'remove'}
             disabled={!!busy && busy !== 'remove'}
@@ -107,7 +108,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
       {done ? <ThemedText type="small" style={{ color: RideColors.green, fontWeight: 700 }}>{done}</ThemedText> : null}
       <ErrorText error={error} />
       <ThemedText type="small" themeColor="textSecondary">
-        Signed-in riders can see it, like your ride name. Keep it friendly: the OnMyLead team removes photos that break the rules.
+        {t('Signed-in riders can see it, like your ride name. Keep it friendly: the OnMyLead team removes photos that break the rules.')}
       </ThemedText>
     </View>
   );

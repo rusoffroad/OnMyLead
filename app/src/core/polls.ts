@@ -7,6 +7,7 @@
 
 import type { ChatMessage } from './chat';
 
+import { tc } from './i18n';
 export const MIN_POLL_CHOICES = 2;
 export const MAX_POLL_CHOICES = 5;
 export const MAX_POLL_QUESTION = 200;
@@ -31,12 +32,12 @@ export type PollCheck = { ok: true; question: string; choices: string[] } | { ok
 export function checkPoll(rawQuestion: string, rawChoices: string[]): PollCheck {
   const question = rawQuestion.trim();
   const choices = rawChoices.map((c) => c.trim()).filter(Boolean);
-  if (!question) return { ok: false, error: 'Type a question first.' };
-  if (question.length > MAX_POLL_QUESTION) return { ok: false, error: `Keep the question under ${MAX_POLL_QUESTION} characters.` };
-  if (choices.length < MIN_POLL_CHOICES) return { ok: false, error: 'Add at least two choices.' };
-  if (choices.length > MAX_POLL_CHOICES) return { ok: false, error: `Up to ${MAX_POLL_CHOICES} choices.` };
-  if (choices.some((c) => c.length > MAX_POLL_CHOICE)) return { ok: false, error: `Keep each choice under ${MAX_POLL_CHOICE} characters.` };
-  if (new Set(choices.map((c) => c.toLowerCase())).size !== choices.length) return { ok: false, error: 'Each choice needs to be different.' };
+  if (!question) return { ok: false, error: tc('Type a question first.') };
+  if (question.length > MAX_POLL_QUESTION) return { ok: false, error: tc('Keep the question under {MAX_POLL_QUESTION} characters.', { MAX_POLL_QUESTION }) };
+  if (choices.length < MIN_POLL_CHOICES) return { ok: false, error: tc('Add at least two choices.') };
+  if (choices.length > MAX_POLL_CHOICES) return { ok: false, error: tc('Up to {MAX_POLL_CHOICES} choices.', { MAX_POLL_CHOICES }) };
+  if (choices.some((c) => c.length > MAX_POLL_CHOICE)) return { ok: false, error: tc('Keep each choice under {MAX_POLL_CHOICE} characters.', { MAX_POLL_CHOICE }) };
+  if (new Set(choices.map((c) => c.toLowerCase())).size !== choices.length) return { ok: false, error: tc('Each choice needs to be different.') };
   return { ok: true, question, choices };
 }
 
@@ -73,7 +74,7 @@ export function mergeVotes(current: PollVote[], incoming: PollVote[]): PollVote[
 
 /** "3 Votes", "1 Vote", "No Votes Yet". */
 export function voteCountLabel(total: number): string {
-  if (!total) return 'No Votes Yet';
+  if (!total) return tc('No Votes Yet');
   return `${total} ${total === 1 ? 'Vote' : 'Votes'}`;
 }
 

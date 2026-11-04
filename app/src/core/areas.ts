@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Countries and states for the badge leaderboard (riders pick where they ride from). Codes are
  * what the server stores (migration 20261104050000_badge_leaderboard.sql): ISO 3166-1 alpha-2 for
@@ -302,7 +304,7 @@ export const STATES: Record<string, State[]> = {
 
 /** What a state is called in each country ("State", "Province"). */
 export const STATE_WORD: Record<string, string> = { US: 'State', CA: 'Province', MX: 'State', AU: 'State' };
-export const stateWord = (country: string | null | undefined) => (country && STATE_WORD[country]) || 'State';
+export const stateWord = (country: string | null | undefined) => (country && STATE_WORD[country]) || tc('State');
 
 const COUNTRY_BY_CODE = new Map(COUNTRIES.map((c) => [c.code, c]));
 

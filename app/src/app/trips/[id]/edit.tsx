@@ -7,6 +7,7 @@ import { ErrorText, Screen } from '@/components/ui';
 import { getTrip, updateTrip } from '@/lib/api';
 import type { Trip } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 export default function EditTrip() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [trip, setTrip] = useState<Trip | null | undefined>(undefined);
@@ -19,7 +20,7 @@ export default function EditTrip() {
   return (
     <Screen width="readable">
       <ErrorText error={error} />
-      {trip === null ? <ThemedText>That trip is not in your list.</ThemedText> : null}
+      {trip === null ? <ThemedText>{t('That trip is not in your list.')}</ThemedText> : null}
       {trip ? (
         <TripForm
           trip={trip}

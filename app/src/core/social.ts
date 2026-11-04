@@ -7,6 +7,7 @@ import { badgeTitle, HONOR_BY_KEY, isHonor } from './badges';
 import { feedLine, feedStat, parseFeed, type FeedItem } from './feed';
 import { METERS_PER_MILE } from './geo';
 
+import { coreLocale, tc } from './i18n';
 /** Longest post and comment, in characters (the database checks the same). */
 export const POST_MAX = 500;
 export const COMMENT_MAX = 500;
@@ -166,7 +167,7 @@ export function parseProfile(v: unknown): RiderProfile | null {
   if (!str(o.id)) return null;
   return {
     id: o.id as string,
-    name: str(o.name) ?? 'Rider',
+    name: str(o.name) ?? tc('Rider'),
     me: o.me === true,
     blocked: o.blocked === true,
     relation: RELATIONS.includes(o.relation as FriendRelationName) ? (o.relation as FriendRelationName) : 'none',
@@ -185,16 +186,16 @@ export function parseProfile(v: unknown): RiderProfile | null {
 /** "Liked by you and 3 others", "Liked by Ben", "Be the first to like this". */
 export function likesLine(count: number, liked: boolean, firstName?: string | null): string {
   const n = Math.max(0, Math.round(count));
-  if (n === 0) return 'Be the first to like this';
-  if (liked) return n === 1 ? 'You like this' : `You and ${n - 1} ${n - 1 === 1 ? 'other' : 'others'} like this`;
-  if (n === 1) return firstName ? `${firstName} likes this` : '1 like';
-  return `${n.toLocaleString('en-US')} likes`;
+  if (n === 0) return tc('Be the first to like this');
+  if (liked) return n === 1 ? tc('You like this') : tc('You and {v} {v2} like this', { v: n - 1, v2: n - 1 === 1 ? 'other' : 'others' });
+  if (n === 1) return firstName ? tc('{firstName} likes this', { firstName }) : tc('1 like');
+  return `${n.toLocaleString(coreLocale())} likes`;
 }
 
 /** "1 Comment", "12 Comments", "Comment". */
 export function commentsLabel(count: number): string {
   const n = Math.max(0, Math.round(count));
-  return n === 0 ? 'Comment' : `${n.toLocaleString('en-US')} ${n === 1 ? 'Comment' : 'Comments'}`;
+  return n === 0 ? tc('Comment') : `${n.toLocaleString(coreLocale())} ${n === 1 ? 'Comment' : 'Comments'}`;
 }
 
 /** Optimistic like toggle: the item as it looks right after the tap. */
@@ -246,19 +247,19 @@ export function canShareOut(item: Pick<FeedItem, 'kind'> & { mine: boolean }): b
   return item.mine;
 }
 
-const miles = (mi: number) => (mi >= 10 ? Math.round(mi).toLocaleString('en-US') : (Math.round(mi * 10) / 10).toString());
+const miles = (mi: number) => (mi >= 10 ? Math.round(mi).toLocaleString(coreLocale()) : (Math.round(mi * 10) / 10).toString());
 
 /** The big words on the share card, e.g. "84 Miles", "Mile Eater Gold", "Black Bear Pass". */
 export function shareHeadline(item: FeedItem & { body?: string | null }): string {
   switch (item.kind) {
     case 'ride':
-      return item.miles != null && item.miles > 0 ? `${miles(item.miles)} Miles` : item.title ?? 'Ride Done';
+      return item.miles != null && item.miles > 0 ? `${miles(item.miles)} Miles` : item.title ?? tc('Ride Done');
     case 'badge':
-      return item.badge ? badgeTitle(item.badge) : 'New Badge';
+      return item.badge ? badgeTitle(item.badge) : tc('New Badge');
     case 'trail':
-      return item.title ?? 'New Trail';
+      return item.title ?? tc('New Trail');
     default:
-      return 'Ride Report';
+      return tc('Ride Report');
   }
 }
 
@@ -271,10 +272,10 @@ export function shareSubline(item: FeedItem & { body?: string | null }): string 
       return others > 0 ? `${where} with ${others} ${others === 1 ? 'rider' : 'riders'}` : where;
     }
     case 'badge':
-      return item.badge && isHonor(item.badge.badge) ? 'Given by OnMyLead' : 'Badge earned on OnMyLead';
+      return item.badge && isHonor(item.badge.badge) ? tc('Given by OnMyLead') : tc('Badge earned on OnMyLead');
     case 'trail': {
       const len = item.lengthM != null && item.lengthM > 0 ? `${miles(item.lengthM / METERS_PER_MILE)} mi custom trail` : 'Custom trail';
-      return `${len} on OnMyLead`;
+      return tc('{len} on OnMyLead', { len });
     }
     default:
       return item.body ?? '';
@@ -313,9 +314,9 @@ export function shareText(item: FeedItem & { body?: string | null; mine: boolean
 /** "posted 3 photos" style counts for the profile header. */
 export function statLine(p: Pick<RiderProfile, 'rides' | 'miles' | 'badges'>): { value: string; label: string }[] {
   return [
-    { value: (p.rides ?? 0).toLocaleString('en-US'), label: p.rides === 1 ? 'Ride' : 'Rides' },
-    { value: miles(p.miles ?? 0), label: 'Miles' },
-    { value: (p.badges ?? 0).toLocaleString('en-US'), label: p.badges === 1 ? 'Badge' : 'Badges' },
+    { value: (p.rides ?? 0).toLocaleString(coreLocale()), label: p.rides === 1 ? tc('Ride') : tc('Rides') },
+    { value: miles(p.miles ?? 0), label: tc('Miles') },
+    { value: (p.badges ?? 0).toLocaleString(coreLocale()), label: p.badges === 1 ? tc('Badge') : tc('Badges') },
   ];
 }
 
@@ -324,7 +325,7 @@ export function sinceLine(iso: string | null): string | null {
   if (!iso) return null;
   const t = Date.parse(iso);
   if (!Number.isFinite(t)) return null;
-  return `Riding since ${new Date(t).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+  return tc('Riding since {v}', { v: new Date(t).toLocaleDateString(coreLocale(), { month: 'short', year: 'numeric' }) });
 }
 
 export const SOCIAL_NOT_SWITCHED_ON = 'Likes, comments and posts start with the next server update.';

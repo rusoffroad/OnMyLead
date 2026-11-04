@@ -21,6 +21,10 @@ Every voice OnMyLead uses is stored on your phone, so spoken alerts keep working
 Picking a voice is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, alerts are still read out loud with the **Automatic** voice. If you picked a voice before version 2.0, the app keeps it.
 :::
 
+:::release 2.1
+Alerts are read in the language the app is in (see [Change the App's Language](/help/language)). If the voice you picked speaks a different language, your phone's own voice for the app's language reads them instead.
+:::
+
 ## Pick a Voice
 
 1. Go to the **You** tab and tap **Voice**.

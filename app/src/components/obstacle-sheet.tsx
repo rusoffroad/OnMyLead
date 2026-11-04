@@ -7,6 +7,7 @@ import { Button } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { cleanName, MAX_OBSTACLE_NAME, OBSTACLE_INK, OBSTACLE_KINDS, type ObstacleKind } from '@/core/obstacles';
 
+import { t } from '@/lib/i18n';
 /**
  * Name a spot on a trail: "Waterfall Ledge", "Deep Crossing". Used while drawing a custom trail,
  * while recording, and on the trail's page. `editing` adds Remove.
@@ -36,11 +37,11 @@ export function ObstacleSheet({
     <BottomSheet
       visible={visible}
       onClose={onClose}
-      title={editing ? 'Edit Spot' : 'Mark a Spot'}
+      title={editing ? t('Edit Spot') : t('Mark a Spot')}
       footer={
         <View style={{ gap: Spacing.two }}>
-          <Button title={editing ? 'Save' : 'Add to Trail'} onPress={() => onSave(cleanName(name, kind), kind)} />
-          {editing && onRemove ? <Button title="Remove" kind="ghost" onPress={onRemove} /> : null}
+          <Button title={editing ? t('Save') : t('Add to Trail')} onPress={() => onSave(cleanName(name, kind), kind)} />
+          {editing && onRemove ? <Button title={t('Remove')} kind="ghost" onPress={onRemove} /> : null}
         </View>
       }>
       <View style={styles.kinds}>
@@ -52,7 +53,7 @@ export function ObstacleSheet({
             onPress={() => setKind(k.value)}
             style={[styles.kind, kind === k.value && { borderColor: OBSTACLE_INK[k.value], backgroundColor: 'rgba(255,255,255,0.05)' }]}>
             <View style={[styles.dot, { backgroundColor: OBSTACLE_INK[k.value] }]} />
-            <Text style={styles.kindText}>{k.label}</Text>
+            <Text style={styles.kindText}>{t(k.label)}</Text>
           </Pressable>
         ))}
       </View>
@@ -60,14 +61,14 @@ export function ObstacleSheet({
         value={name}
         onChangeText={setName}
         maxLength={MAX_OBSTACLE_NAME}
-        placeholder="Name, e.g. Waterfall Ledge"
+        placeholder={t('Name, e.g. Waterfall Ledge')}
         placeholderTextColor={Colors.textSecondary}
-        accessibilityLabel="Spot name"
+        accessibilityLabel={t('Spot name')}
         returnKeyType="done"
         onSubmitEditing={() => onSave(cleanName(name, kind), kind)}
         style={styles.input}
       />
-      <Text style={styles.hint}>Riders who follow this trail see the name on the map. Shared trails show spots along the shared line only.</Text>
+      <Text style={styles.hint}>{t('Riders who follow this trail see the name on the map. Shared trails show spots along the shared line only.')}</Text>
     </BottomSheet>
   );
 }

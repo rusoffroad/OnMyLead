@@ -1,6 +1,7 @@
 import { formatDistance, metersToMiles } from './geo';
 import { miles, type PlacedRider } from './route';
 
+import { tc } from './i18n';
 /**
  * The group's running order along the route: every placed rider ranked from the front (1) to the
  * rear, and laid out on the route line so no dot hides another while each stays as close as it
@@ -137,5 +138,5 @@ export function describeRank(r: RankedRider, ranked: RankedRider[], name: string
 export function groupSpread(ranked: RankedRider[]): string | null {
   if (ranked.length < 2) return null;
   const span = ranked[ranked.length - 1].backM;
-  return `${ranked.length} riders over ${span < 30 ? 'a few yards' : short(span)}`;
+  return tc('{length} riders over {v}', { length: ranked.length, v: span < 30 ? 'a few yards' : short(span) });
 }

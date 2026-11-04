@@ -7,6 +7,7 @@ import { VehicleForm } from '@/components/vehicle-form';
 import { getVehicle } from '@/lib/api';
 import type { Vehicle } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 export default function EditVehicle() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [vehicle, setVehicle] = useState<Vehicle | null | undefined>(undefined);
@@ -19,7 +20,7 @@ export default function EditVehicle() {
   return (
     <Screen width="readable">
       <ErrorText error={error} />
-      {vehicle === null ? <ThemedText>That machine is not in your garage.</ThemedText> : null}
+      {vehicle === null ? <ThemedText>{t('That machine is not in your garage.')}</ThemedText> : null}
       {vehicle ? <VehicleForm vehicle={vehicle} onSaved={() => (router.canGoBack() ? router.back() : router.replace(`/garage/${id}`))} /> : null}
     </Screen>
   );

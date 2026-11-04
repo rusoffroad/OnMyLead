@@ -10,6 +10,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle } from './mapbox-map';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
+import { t } from '@/lib/i18n';
 const FOUND_INK = '#ECCD91';
 
 /**
@@ -72,15 +73,15 @@ export function WaypointMapboxMap({
       onIdle={(c) => onCenter?.(c.center)}>
       {route && route.length > 1 ? (
         <>
-          <MapboxMarker at={route[0]}><View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: '#3CC36B' }]} /></MapboxMarker>
+          <MapboxMarker at={route[0]}><View accessible accessibilityLabel={t('Start')} style={[styles.end, { backgroundColor: '#3CC36B' }]} /></MapboxMarker>
           <MapboxMarker at={route[route.length - 1]}>
-            <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
+            <View accessible accessibilityLabel={t('Finish')} style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
           </MapboxMarker>
         </>
       ) : null}
       {found ? (
         <MapboxMarker at={found} anchor={{ x: 0.5, y: 1 }}>
-          <View accessible accessibilityLabel={`Search result: ${found.name}`} style={styles.found}>
+          <View accessible accessibilityLabel={t('Search result: {name}', { name: found.name })} style={styles.found}>
             <Text style={styles.foundText} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundStem} />
             <View style={styles.foundDot} />
@@ -91,7 +92,7 @@ export function WaypointMapboxMap({
         <MapboxMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            accessibilityLabel={w.planned_stop ? t('Planned stop {v}, {name}, {v2}', { v: stopNumber(w, waypoints), name: w.name, v2: symbolLabel(waypointSymbol(w)) }) : t('{v} waypoint, {name}', { v: symbolLabel(waypointSymbol(w)), name: w.name })}
             onPress={() => onPressWaypoint(w)}>
             {w.planned_stop ? (
               <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />

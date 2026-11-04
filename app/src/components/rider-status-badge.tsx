@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { Colors, RideColors, themedStyles } from '@/constants/theme';
 import { Icon } from './icon';
 
+import { t } from '@/lib/i18n';
 /**
  * The small amber wrench on a rider's dot and list row while they have a Mechanical Issue.
  * Amber, not red: red stays for help calls and EMERGENCY.
@@ -11,7 +12,7 @@ export function BreakdownBadge({ size = 20 }: { size?: number }) {
   return (
     <View
       accessible
-      accessibilityLabel="Mechanical Issue"
+      accessibilityLabel={t('Mechanical Issue')}
       style={[styles.badge, { width: size, height: size, borderRadius: size / 2 }]}>
       <Icon name="wrench" size={size * 0.62} color={Colors.background} strokeWidth={2.6} />
     </View>

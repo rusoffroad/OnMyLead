@@ -8,6 +8,7 @@ import type { LatLng } from '@/core/geo';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MapboxMap, MapboxMarker, type MapboxMapHandle } from './mapbox-map';
 
+import { t } from '@/lib/i18n';
 /**
  * The meeting-point map on Mapbox (Create a Ride and Create an Event, every device): tap or click
  * the satellite map to drop the meeting point, drag the pin to fine-tune it. Searching a place or
@@ -62,7 +63,7 @@ export function MeetPointMapboxMap({ value, onPick, trail }: { value: LatLng | n
           onPress={pick}>
           {value ? (
             <MapboxMarker id="meet-point" at={value} anchor={{ x: 0.5, y: 0.95 }} draggable onDragEnd={pick}>
-              <View accessible accessibilityLabel="Meeting point, drag to move">
+              <View accessible accessibilityLabel={t('Meeting point, drag to move')}>
                 <Svg width={34} height={44} viewBox="0 0 34 44">
                   <Path d="M17 42C17 42 3 26.5 3 16.5a14 14 0 0 1 28 0C31 26.5 17 42 17 42Z" fill={Colors.accent} stroke={Colors.background} strokeWidth={3} />
                   <Circle cx={17} cy={16.5} r={5.5} fill="#FFFFFF" />
@@ -73,7 +74,7 @@ export function MeetPointMapboxMap({ value, onPick, trail }: { value: LatLng | n
         </MapboxMap>
       </View>
       <ThemedText type="small" themeColor="textSecondary">
-        {value ? 'Drag the pin to fine-tune the spot.' : `${Platform.OS === 'web' ? 'Click' : 'Tap'} the map to drop the meeting point, or search above.`}
+        {value ? t('Drag the pin to fine-tune the spot.') : Platform.OS === 'web' ? t('Click the map to drop the meeting point, or search above.') : t('Tap the map to drop the meeting point, or search above.')}
       </ThemedText>
     </View>
   );

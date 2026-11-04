@@ -8,6 +8,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import type { Ride } from '@/lib/types';
 import { MapboxMap, MapboxMarker, type MapFill, type MapboxMapHandle } from './mapbox-map';
 import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, type RidesMapProps } from './rides-map-chrome';
+import { t } from '@/lib/i18n';
 
 const FIT = { top: 24, right: 24, bottom: 24, left: 24 };
 
@@ -77,7 +78,7 @@ export function RidesMapboxMap({
         ))}
         {picked ? (
           <MapboxMarker at={{ lat: picked.meet_area_lat, lng: picked.meet_area_lng }} anchor={{ x: 0.5, y: 1.1 }}>
-            <Pressable accessibilityRole="button" accessibilityLabel={`Open ${picked.name}`} onPress={() => onOpen(picked as Ride)}>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('Open {name}', { name: picked.name })} onPress={() => onOpen(picked as Ride)}>
               <RideBubble ride={picked} />
             </Pressable>
           </MapboxMarker>

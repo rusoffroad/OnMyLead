@@ -5,6 +5,7 @@ import { Colors, font, themedStyles } from '@/constants/theme';
 import { badgeText } from '@/core/inbox';
 import { useInbox } from '@/lib/inbox';
 import { Icon } from './icon';
+import { t } from '@/lib/i18n';
 
 /**
  * The bell at the top right of the Rides tab: opens Notifications, with a logo-red count of the
@@ -16,7 +17,7 @@ export function InboxBell({ compact }: { compact?: boolean } = {}) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={unread ? `Notifications, ${unread} new` : 'Notifications'}
+      accessibilityLabel={unread ? `Notifications, ${unread} new` : t('Notifications')}
       hitSlop={6}
       onPress={() => router.push('/inbox')}
       style={({ pressed }) => [styles.bell, compact && styles.compact, { opacity: pressed ? 0.75 : 1 }]}>

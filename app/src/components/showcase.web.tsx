@@ -151,7 +151,7 @@ export function Showcase() {
               alt="The ride’s waypoints map: numbered planned stops tagged fuel and food, a shared Washout hazard triangle, a gate, a water crossing and a camp only you see"
               title="Mark the Trail"
               text="Press and hold the map to drop a waypoint with one of 15 symbols: camp, fuel, water, food, a gate, a trailhead, a water crossing, a hazard and more, with a note. The leader chooses Everyone on the Ride or Just Me, and everyone else’s waypoints stay their own."
-              points={['Shared waypoints show on every rider’s map', 'New in 2.1: everyone’s phone dings when the leader shares a new waypoint on the ride, and press and hold works in Map Mode too', 'Every symbol has its own drawing, easy to read for color-blind riders, and hazards stand out as triangles', 'Planned stops show what they’re for right on the stop sign', 'Never public: only riders on the ride see shared ones']}
+              points={['Shared waypoints show on every rider’s map', 'Every symbol has its own drawing, easy to read for color-blind riders, and hazards stand out as triangles', 'Planned stops show what they’re for right on the stop sign', 'Never public: only riders on the ride see shared ones']}
             />
             <Step
               n={5}
@@ -303,7 +303,7 @@ export function Showcase() {
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
               <li><b>A Family Link.</b> People at home follow along on a read-only page, no app needed.</li>
-              <li><b>Bluetooth Sharing, New in 2.1.</b> With no service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages phone to phone over Bluetooth, about 100 to 300 feet a hop, and every phone passes them along the group. Encrypted for your ride only. The first phone to get a bar sends it all on.</li>
+              <li><b>Bluetooth Sharing, New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on.</li>
             </ul>
           </div>
           <figure className="signal-map">

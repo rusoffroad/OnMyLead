@@ -4,6 +4,7 @@ import Pbf from 'pbf';
 import type { LatLng } from './geo';
 import { distanceToLineM, tileFor, type Tile, type TrailInfo } from './trails';
 
+import { tc } from './i18n';
 /**
  * Dirt tracks from OpenStreetMap, the source that covers what the Forest Service and BLM don't:
  * private off-road parks, state land and county roads (Hidden Falls Adventure Park's named trails,
@@ -178,14 +179,14 @@ export function nearestOsmTrail(p: LatLng, trails: OsmTrail[], maxM: number): Tr
   return {
     source: 'osm',
     kind: 'trail',
-    title: best.t.name ?? 'Unnamed Track',
+    title: best.t.name ?? tc('Unnamed Track'),
     where: null,
     allowed: [],
     seasonal: false,
     miles: null,
     surface: best.t.surface ? best.t.surface.charAt(0).toUpperCase() + best.t.surface.slice(1) : null,
     attribution: OSM_ATTRIBUTION,
-    closure: closed ? { label: 'No Public Access', detail: 'OpenStreetMap marks this track closed or private.' } : null,
+    closure: closed ? { label: tc('No Public Access'), detail: tc('OpenStreetMap marks this track closed or private.') } : null,
     widthLimitIn: null,
     lineKey: null,
     at: p,

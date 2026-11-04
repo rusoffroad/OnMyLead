@@ -1,5 +1,6 @@
 import * as Clipboard from 'expo-clipboard';
 
+import { tc } from '@/core/i18n';
 function download(name: string, type: string, text: string) {
   const url = URL.createObjectURL(new Blob([text], { type }));
   const a = document.createElement('a');
@@ -22,11 +23,11 @@ export async function shareBuildSheet(title: string, text: string): Promise<stri
     }
   }
   await Clipboard.setStringAsync(text);
-  return 'Build sheet copied. Paste it anywhere.';
+  return tc('Build sheet copied. Paste it anywhere.');
 }
 
 /** Browser: download the CSV file. */
 export async function shareCsv(fileBase: string, csv: string): Promise<string | null> {
   download(`${fileBase}.csv`, 'text/csv;charset=utf-8', csv);
-  return 'CSV downloaded.';
+  return tc('CSV downloaded.');
 }

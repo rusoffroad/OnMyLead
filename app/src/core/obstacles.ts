@@ -6,6 +6,7 @@
  */
 import { distanceM, type LatLng } from './geo';
 
+import { tc } from './i18n';
 export type ObstacleKind = 'obstacle' | 'hazard' | 'water' | 'view';
 export type Obstacle = { id: string; lat: number; lng: number; name: string; kind: ObstacleKind };
 
@@ -24,7 +25,7 @@ export const OBSTACLE_KINDS: { value: ObstacleKind; label: string }[] = [
 /** Pin colours on the map, one per kind. */
 export const OBSTACLE_INK: Record<ObstacleKind, string> = { obstacle: '#FF9F43', hazard: '#FF4545', water: '#3B86F7', view: '#57E3C3' };
 
-export const kindLabel = (k: ObstacleKind) => OBSTACLE_KINDS.find((o) => o.value === k)?.label ?? 'Obstacle';
+export const kindLabel = (k: ObstacleKind) => OBSTACLE_KINDS.find((o) => o.value === k)?.label ?? tc('Obstacle');
 
 const isKind = (v: unknown): v is ObstacleKind => OBSTACLE_KINDS.some((o) => o.value === v);
 

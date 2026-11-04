@@ -2,6 +2,7 @@ import { Text, View } from 'react-native';
 
 import { Colors, font, Glass, themedStyles } from '@/constants/theme';
 
+import { t } from '@/lib/i18n';
 /** The Social area's own shades, matching the 2.0 home cards. */
 export const Social = {
   get panel() { return Colors.backgroundElement; },
@@ -22,8 +23,8 @@ export function ProTag({ size = 'small' }: { size?: 'small' | 'large' }) {
     <View
       style={[styles.tag, big && styles.tagBig]}
       accessible
-      accessibilityLabel="OnMyLead Pro rider">
-      <Text style={[styles.text, big && styles.textBig]}>PRO</Text>
+      accessibilityLabel={t('OnMyLead Pro rider')}>
+      <Text style={[styles.text, big && styles.textBig]}>{t('PRO')}</Text>
     </View>
   );
 }

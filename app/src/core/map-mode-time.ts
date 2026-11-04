@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Map Mode time on Free (2.0): a number of free hours each UTC month, counted only while Map Mode
  * is on screen and the rider isn't on a group ride (Ride Mode and following the leader are always
@@ -38,10 +40,10 @@ export const mapClockRuns = (s: { onScreen: boolean; appActive: boolean; onGroup
 /** "5 h 20 m Left This Month", "45 m Left This Month", "No Time Left This Month", or null when unlimited. */
 export function mapTimeLeftText(left: number | null): string | null {
   if (left == null) return null;
-  if (left <= 0) return 'No Map Mode Time Left This Month';
+  if (left <= 0) return tc('No Map Mode Time Left This Month');
   const mins = Math.ceil(left / 60);
   const h = Math.floor(mins / 60);
   const m = mins % 60;
   const parts = [h ? `${h} h` : null, m || !h ? `${m} m` : null].filter(Boolean).join(' ');
-  return `${parts} Left This Month`;
+  return tc('{parts} Left This Month', { parts });
 }

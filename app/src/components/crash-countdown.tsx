@@ -7,6 +7,7 @@ import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/const
 import { COUNTDOWN_S, secondsLeft, type CrashCause } from '@/core/crash-detect';
 import { speak, stopSpeaking } from '@/lib/voice';
 
+import { t } from '@/lib/i18n';
 /**
  * The Crash Alert countdown: full screen and loud, so a rider who is fine can stop it with one tap
  * and a rider who isn't gets help without doing anything. At zero it calls `onSend` once.
@@ -53,8 +54,8 @@ export function CrashCountdown({
     <Modal visible animationType="fade" transparent={false} onRequestClose={onOk} supportedOrientations={['portrait', 'landscape']}>
       <SafeAreaView style={styles.page}>
         <View style={styles.top} accessibilityLiveRegion="assertive">
-          <Text style={styles.title} accessibilityRole="header">{cause === 'rollover' ? 'Rollover Detected' : 'Crash Detected'}</Text>
-          <Text style={styles.body}>Your group gets an EMERGENCY alert with your location in</Text>
+          <Text style={styles.title} accessibilityRole="header">{cause === 'rollover' ? t('Rollover Detected') : t('Crash Detected')}</Text>
+          <Text style={styles.body}>{t('Your group gets an EMERGENCY alert with your location in')}</Text>
           <Text style={styles.count} accessibilityLabel={`${left} seconds`}>{left}</Text>
           <View style={styles.track}>
             <View style={[styles.fill, { width: `${Math.round(progress * 100)}%` }]} />
@@ -64,10 +65,10 @@ export function CrashCountdown({
           <Pressable
             onPress={onOk}
             accessibilityRole="button"
-            accessibilityLabel="I’m OK"
-            accessibilityHint="Cancels the crash alert"
+            accessibilityLabel={t('I’m OK')}
+            accessibilityHint={t('Cancels the crash alert')}
             style={({ pressed }) => [styles.ok, pressed && { opacity: 0.85 }]}>
-            <Text style={styles.okText}>I’m OK</Text>
+            <Text style={styles.okText}>{t('I’m OK')}</Text>
           </Pressable>
           <Pressable
             onPress={() => {
@@ -76,22 +77,22 @@ export function CrashCountdown({
               onSend();
             }}
             accessibilityRole="button"
-            accessibilityLabel="Alert My Group Now"
+            accessibilityLabel={t('Alert My Group Now')}
             style={({ pressed }) => [styles.now, pressed && { opacity: 0.85 }]}>
-            <Text style={styles.nowText}>Alert My Group Now</Text>
+            <Text style={styles.nowText}>{t('Alert My Group Now')}</Text>
           </Pressable>
           {onTurnOff ? (
             <Pressable
               onPress={onTurnOff}
               accessibilityRole="button"
-              accessibilityLabel="I’m OK, Turn Off Crash Alert"
-              accessibilityHint="Cancels this alert and stops watching for crashes. Turn it back on in Tilt."
+              accessibilityLabel={t('I’m OK, Turn Off Crash Alert')}
+              accessibilityHint={t('Cancels this alert and stops watching for crashes. Turn it back on in Tilt.')}
               hitSlop={8}
               style={({ pressed }) => [styles.off, pressed && { opacity: 0.7 }]}>
-              <Text style={styles.offText}>I’m OK, Turn Off Crash Alert</Text>
+              <Text style={styles.offText}>{t('I’m OK, Turn Off Crash Alert')}</Text>
             </Pressable>
           ) : null}
-          <Text style={styles.note}>This tells your group only. It doesn’t call 911.</Text>
+          <Text style={styles.note}>{t('This tells your group only. It doesn’t call 911.')}</Text>
         </View>
       </SafeAreaView>
     </Modal>

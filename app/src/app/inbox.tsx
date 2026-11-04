@@ -15,6 +15,7 @@ import { confirmAsync, showNotice } from '@/lib/confirm';
 import { clearInbox, clearInboxItems, markInboxRead, useInbox } from '@/lib/inbox';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 /** Each kind of notification keeps one color, so a glance down the list finds the rider alerts. */
 const TONE: Record<InboxTone, string> = {
   get alert() { return RideColors.red; },
@@ -43,8 +44,8 @@ export default function Inbox() {
   if (!session) {
     return (
       <Screen width="readable">
-        <Empty title="Sign In to See Notifications" detail="Ride messages, rider alerts, invites and friend requests show up here." />
-        <Button title="Sign In" onPress={() => router.push('/sign-in')} />
+        <Empty title={t('Sign In to See Notifications')} detail={t('Ride messages, rider alerts, invites and friend requests show up here.')} />
+        <Button title={t('Sign In')} onPress={() => router.push('/sign-in')} />
       </Screen>
     );
   }
@@ -59,17 +60,17 @@ export default function Inbox() {
       await clearInboxItems([i.id]);
       return true;
     } catch (e) {
-      showNotice('Couldn’t Clear It', e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(t('Couldn’t Clear It'), e instanceof Error ? e.message : t('Something went wrong.'));
       return false;
     }
   };
   const clearAll = async () => {
-    if (!(await confirmAsync('Clear All Notifications?', 'They’re removed here and from this device’s notification list.', 'Clear All', 'Keep'))) return;
+    if (!(await confirmAsync(t('Clear All Notifications?'), t('They’re removed here and from this device’s notification list.'), t('Clear All'), t('Keep')))) return;
     setBusy(true);
     try {
       await clearInbox();
     } catch (e) {
-      showNotice('Couldn’t Clear Notifications', e instanceof Error ? e.message : 'Something went wrong.');
+      showNotice(t('Couldn’t Clear Notifications'), e instanceof Error ? e.message : t('Something went wrong.'));
     } finally {
       setBusy(false);
     }
@@ -81,22 +82,22 @@ export default function Inbox() {
       {items.length ? (
         <View style={styles.bar}>
           <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
-            {unread ? `${unread} New` : 'All Read'}
-            {SWIPE ? '. Swipe Left to Clear' : ''}
+            {unread ? `${unread} New` : t('All Read')}
+            {SWIPE ? t('. Swipe Left to Clear') : ''}
           </ThemedText>
-          {unread ? <Chip label="Mark All Read" onPress={() => markInboxRead()} /> : null}
-          <Chip label="Clear All" onPress={clearAll} disabled={busy} />
+          {unread ? <Chip label={t('Mark All Read')} onPress={() => markInboxRead()} /> : null}
+          <Chip label={t('Clear All')} onPress={clearAll} disabled={busy} />
         </View>
       ) : null}
 
-      {off ? <Empty title="Almost Ready" detail={INBOX_NOT_SWITCHED_ON} /> : null}
+      {off ? <Empty title={t('Almost Ready')} detail={INBOX_NOT_SWITCHED_ON} /> : null}
       {!off && loaded && !items.length ? (
         <Empty
-          title="You’re All Caught Up"
+          title={t('You’re All Caught Up')}
           detail={
             Platform.OS === 'web'
-              ? 'Notifications OnMyLead sends to your phone app show up here too, for 30 days.'
-              : 'Ride messages, rider alerts, ride changes, invites and friend requests show up here for 30 days.'
+              ? t('Notifications OnMyLead sends to your phone app show up here too, for 30 days.')
+              : t('Ride messages, rider alerts, ride changes, invites and friend requests show up here for 30 days.')
           }
         />
       ) : null}
@@ -104,7 +105,7 @@ export default function Inbox() {
 
       {sections.map((s) => (
         <View key={s.title} style={{ gap: Spacing.two }}>
-          <ThemedText style={styles.section}>{s.title}</ThemedText>
+          <ThemedText style={styles.section}>{t(s.title)}</ThemedText>
           <RowGroup>
             {s.items.map((i) =>
               SWIPE ? (
@@ -121,7 +122,7 @@ export default function Inbox() {
 
       <Pressable accessibilityRole="button" onPress={() => router.push('/notifications')} style={[styles.settings, layout.wide && { alignSelf: 'flex-start' }]}>
         <Icon name="bell" size={20} color={Colors.textSecondary} />
-        <ThemedText type="small" themeColor="textSecondary">Notification Settings</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('Notification Settings')}</ThemedText>
         <Icon name="chevron" size={18} color={Colors.textSecondary} />
       </Pressable>
     </Screen>
@@ -137,8 +138,8 @@ function Row({ item, onPress, onClear }: { item: InboxItem; onPress: () => void;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${unread ? 'New. ' : ''}${item.title}. ${item.body}${more ? `. ${more}` : ''}. ${when}`}
-      accessibilityActions={onClear ? [{ name: 'clear', label: 'Clear' }] : undefined}
+      accessibilityLabel={`${unread ? t('New. ') : ''}${item.title}. ${item.body}${more ? `. ${more}` : ''}. ${when}`}
+      accessibilityActions={onClear ? [{ name: 'clear', label: t('Clear') }] : undefined}
       onAccessibilityAction={(e) => e.nativeEvent.actionName === 'clear' && onClear?.()}
       onPress={onPress}
       style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => [styles.row, (pressed || hovered) && { backgroundColor: Colors.backgroundSelected }]}>
@@ -148,18 +149,18 @@ function Row({ item, onPress, onClear }: { item: InboxItem; onPress: () => void;
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <View style={styles.titleLine}>
           <ThemedText numberOfLines={2} style={[styles.title, !unread && { color: Colors.textSecondary, fontFamily: font(600) }]}>
-            {item.title}
+            {t(item.title)}
           </ThemedText>
           <ThemedText type="small" style={[styles.when, unread && { color }]}>{when}</ThemedText>
         </View>
         {item.body ? (
-          <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>{item.body}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>{t(item.body)}</ThemedText>
         ) : null}
         {more ? <ThemedText type="small" style={{ color, fontFamily: font(700) }}>{more}</ThemedText> : null}
       </View>
       {unread ? <View style={[styles.dot, { backgroundColor: color }]} /> : null}
       {onClear ? (
-        <Pressable accessibilityRole="button" accessibilityLabel={`Clear ${item.title}`} hitSlop={8} onPress={onClear} style={styles.clear}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('Clear {title}', { title: item.title })} hitSlop={8} onPress={onClear} style={styles.clear}>
           <Icon name="close" size={16} color={Colors.textSecondary} />
         </Pressable>
       ) : null}

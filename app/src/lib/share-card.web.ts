@@ -6,6 +6,7 @@ import { CARD_COLORS } from '@/components/ride-card';
 import { font as appFont } from '@/constants/theme';
 import { rideCardLines, rideCardText, type RideCardData } from '@/core/summary';
 
+import { tc } from '@/core/i18n';
 const SIZE = 1080;
 
 function loadImage(src: string): Promise<HTMLImageElement | null> {
@@ -122,8 +123,8 @@ export async function shareRideCard(card: RideCardData, view: RefObject<View | n
       }
     }
     download(name, blob);
-    return 'Ride card downloaded.';
+    return tc('Ride card downloaded.');
   }
   await Clipboard.setStringAsync(rideCardText(card, url));
-  return 'Ride summary copied. Paste it anywhere.';
+  return tc('Ride summary copied. Paste it anywhere.');
 }

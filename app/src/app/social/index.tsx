@@ -95,7 +95,7 @@ export default function SocialScreen() {
       items={feed.items}
       update={feed.update}
       remove={feed.remove}
-      empty="Nothing here yet. When your friends ride, earn badges, share trails or post, it shows up here for you to like and comment on."
+      empty={t('Nothing here yet. When your friends ride, earn badges, share trails or post, it shows up here for you to like and comment on.')}
       more={hasMore ? more : undefined}
       loadingMore={loadingMore}
     />
@@ -105,11 +105,11 @@ export default function SocialScreen() {
       items={mine.items}
       update={mine.update}
       remove={mine.remove}
-      empty={pro ? 'Your posts, rides, badges and trails show here. Post a ride report to get started.' : 'Your rides, badges and trails show here. With Pro you can post ride reports and photos too.'}
+      empty={pro ? t('Your posts, rides, badges and trails show here. Post a ride report to get started.') : t('Your rides, badges and trails show here. With Pro you can post ride reports and photos too.')}
     />
   );
   const freeNote = !pro && !off ? (
-    <Text style={styles.free}>On Free you can see everything and like it. Pro lets you post, comment and share to Facebook, Instagram and X.</Text>
+    <Text style={styles.free}>{t('On Free you can see everything and like it. Pro lets you post, comment and share to Facebook, Instagram and X.')}</Text>
   ) : null;
 
   if (layout.wide) {
@@ -120,16 +120,16 @@ export default function SocialScreen() {
           sideWidth={sideColumnWidth(layout.width)}
           side={
             <View style={{ gap: 18 }}>
-              <Text style={styles.title} accessibilityRole="header">Your Friends</Text>
+              <Text style={styles.title} accessibilityRole="header">{t('Your Friends')}</Text>
               <FriendRows list={friends.list} limit={12} />
-              <Button title="View Your Profile" kind="secondary" onPress={() => router.push(profileHref(me) as never)} />
+              <Button title={t('View Your Profile')} kind="secondary" onPress={() => router.push(profileHref(me) as never)} />
               {freeNote}
             </View>
           }
           main={
             <View style={{ gap: 16, maxWidth: 680, width: '100%', alignSelf: 'center' }}>
               {compose}
-              <Segmented options={[{ value: 'activity', label: 'Activity' }, { value: 'mine', label: 'My Posts' }]} value={tab === 'friends' ? 'activity' : tab} onChange={setTab} />
+              <Segmented options={[{ value: 'activity', label: t('Activity') }, { value: 'mine', label: t('My Posts') }]} value={tab === 'friends' ? 'activity' : tab} onChange={setTab} />
               <ErrorText error={error} />
               {tab === 'mine' ? myPosts : activity}
             </View>
@@ -145,7 +145,7 @@ export default function SocialScreen() {
       <View style={{ gap: 16 }}>
         {compose}
         <Segmented
-          options={[{ value: 'activity', label: 'Activity' }, { value: 'friends', label: 'Friends' }, { value: 'mine', label: 'My Posts' }]}
+          options={[{ value: 'activity', label: t('Activity') }, { value: 'friends', label: t('Friends') }, { value: 'mine', label: t('My Posts') }]}
           value={tab}
           onChange={setTab}
         />

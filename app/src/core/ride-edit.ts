@@ -1,3 +1,4 @@
+import { tc } from './i18n';
 import { atMinutes, canRideOn, startOfDay } from './calendar';
 import { fuzzLocation } from './geo';
 import { clockText, parseTime } from './time';
@@ -157,8 +158,8 @@ export function ridePatch(
   now: Date,
 ): { error: string } | RidePatch {
   const name = form.name.trim();
-  if (!name) return { error: 'Give the ride a name.' };
-  if (name.length > NAME_MAX) return { error: `Keep the name under ${NAME_MAX} characters.` };
+  if (!name) return { error: tc('Give the ride a name.') };
+  if (name.length > NAME_MAX) return { error: tc('Keep the name under {v} characters.', { v: NAME_MAX }) };
 
   const r: Partial<EditableRide> = {};
   const p: Partial<EditablePrivate> = {};
@@ -172,14 +173,14 @@ export function ridePatch(
   if (canEditWhenAndWhere(ride.status)) {
     const dayDate = new Date(form.day);
     const meet = atMinutes(dayDate, parseTime(form.meetTime));
-    if (!meet) return { error: 'Pick a meeting time.' };
+    if (!meet) return { error: tc('Pick a meeting time.') };
     const dayChanged = startOfDay(new Date(ride.meet_at)).getTime() !== startOfDay(dayDate).getTime();
     // A ride already on its day can keep it even after midnight passes; a new day must be bookable.
-    if (dayChanged && !canRideOn(dayDate, now)) return { error: 'Pick a day from today up to three years out.' };
+    if (dayChanged && !canRideOn(dayDate, now)) return { error: tc('Pick a day from today up to three years out.') };
     const depart = form.departTime.trim() ? atMinutes(dayDate, parseTime(form.departTime)) : null;
-    if (form.departTime.trim() && !depart) return { error: 'Check the departure time.' };
+    if (form.departTime.trim() && !depart) return { error: tc('Check the departure time.') };
     const finish = form.finishTime.trim() ? atMinutes(dayDate, parseTime(form.finishTime)) : null;
-    if (form.finishTime.trim() && !finish) return { error: 'Check the expected finish time.' };
+    if (form.finishTime.trim() && !finish) return { error: tc('Check the expected finish time.') };
     if (!sameTime(meet.toISOString(), ride.meet_at)) {
       r.meet_at = meet.toISOString();
       changed.add('time');
@@ -198,7 +199,7 @@ export function ridePatch(
     // The exact spot only reaches riders on the ride; the leader always has it, but stay safe if not.
     if (details) {
       const spot = parseCoords(form.coords);
-      if (!spot) return { error: 'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".' };
+      if (!spot) return { error: tc('Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".') };
       const label = text(form.meetLabel);
       const moved = coordsText(spot.lat, spot.lng) !== coordsText(details.meet_lat, details.meet_lng);
       if (moved) {
@@ -260,7 +261,7 @@ export function ridePatch(
   }
   const milesTyped = form.routeMiles.trim();
   const miles = milesTyped ? Number(milesTyped) : null;
-  if (miles != null && (!Number.isFinite(miles) || miles < 0)) return { error: 'Route length is a number of miles, like 42.5.' };
+  if (miles != null && (!Number.isFinite(miles) || miles < 0)) return { error: tc('Route length is a number of miles, like 42.5.') };
   if (miles !== (ride.route_miles ?? null)) {
     r.route_miles = miles;
     changed.add('details');
@@ -287,26 +288,26 @@ export function isEmptyPatch(patch: RidePatch): boolean {
   return !Object.keys(patch.ride).length && !patch.private;
 }
 
-const CHANGE_WORDS: Record<RideChange, string> = { name: 'Name', time: 'Time', place: 'Meeting Point', details: 'Details' };
+const CHANGE_WORDS: Record<RideChange, () => string> = { name: () => tc('Name'), time: () => tc('Time'), place: () => tc('Meeting Point'), details: () => tc('Details') };
 
 /** "New Time and Meeting Point", "New Name, Time and Details": the tag riders see on the ride page. */
 export function changeLabel(changed: readonly string[]): string | null {
-  const words = (['name', 'time', 'place', 'details'] as RideChange[]).filter((c) => changed.includes(c)).map((c) => CHANGE_WORDS[c]);
+  const words = (['name', 'time', 'place', 'details'] as RideChange[]).filter((c) => changed.includes(c)).map((c) => CHANGE_WORDS[c]());
   if (!words.length) return null;
-  const list = words.length === 1 ? words[0] : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
-  return `New ${list}`;
+  const list = words.length === 1 ? words[0] : tc('{list} and {last}', { list: words.slice(0, -1).join(', '), last: words[words.length - 1] });
+  return tc('New {list}', { list });
 }
 
 /** How long ago the leader last changed the ride, for "Updated 5 min ago". Null past a week (old news). */
 export function editedAgo(editedAt: string | null | undefined, now: Date): string | null {
   if (!editedAt) return null;
   const mins = Math.floor((now.getTime() - new Date(editedAt).getTime()) / 60000);
-  if (!Number.isFinite(mins) || mins < 0) return 'Updated Just Now';
-  if (mins < 1) return 'Updated Just Now';
-  if (mins < 60) return `Updated ${mins} min Ago`;
+  if (!Number.isFinite(mins) || mins < 0) return tc('Updated Just Now');
+  if (mins < 1) return tc('Updated Just Now');
+  if (mins < 60) return tc('Updated {mins} min Ago', { mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `Updated ${hours} hr Ago`;
+  if (hours < 24) return tc('Updated {hours} hr Ago', { hours });
   const days = Math.floor(hours / 24);
   if (days > 7) return null;
-  return days === 1 ? 'Updated Yesterday' : `Updated ${days} Days Ago`;
+  return days === 1 ? tc('Updated Yesterday') : tc('Updated {days} Days Ago', { days });
 }

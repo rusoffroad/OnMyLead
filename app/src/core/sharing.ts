@@ -1,3 +1,5 @@
+import { coreLocale, tc } from './i18n';
+
 /**
  * Location sharing sessions. Sharing is always explicit, scoped (a ride or named people),
  * time-limited and revocable. These pure functions decide whether a session is live.
@@ -34,9 +36,9 @@ export const MIN_SHARE_END_MIN = 5;
 
 /** Why a chosen end time (epoch ms) can't be used, or null when it's fine. */
 export function shareEndProblem(endAt: number | null, now: number): string | null {
-  if (endAt == null || !Number.isFinite(endAt)) return 'Pick a day and a time.';
-  if (endAt < now + MIN_SHARE_END_MIN * 60_000) return 'Pick a time later than now.';
-  if (endAt > now + MAX_SHARE_END_DAYS * 86_400_000) return 'Pick a day within the next year.';
+  if (endAt == null || !Number.isFinite(endAt)) return tc('Pick a day and a time.');
+  if (endAt < now + MIN_SHARE_END_MIN * 60_000) return tc('Pick a time later than now.');
+  if (endAt > now + MAX_SHARE_END_DAYS * 86_400_000) return tc('Pick a day within the next year.');
   return null;
 }
 
@@ -110,22 +112,22 @@ export function revokeShare(s: ShareSession, now: number): ShareSession {
 const openEnded = (ms: number | null) => ms == null || ms >= 1000 * 365 * 86_400_000;
 
 export function formatRemaining(ms: number | null): string {
-  if (openEnded(ms)) return 'until you turn it off';
+  if (openEnded(ms)) return tc('until you turn it off');
   const totalMin = Math.ceil(ms! / 60_000);
-  if (totalMin >= 48 * 60) return `${Math.floor(totalMin / (24 * 60))} days left`;
+  if (totalMin >= 48 * 60) return tc('{v} days left', { v: Math.floor(totalMin / (24 * 60)) });
   if (totalMin >= 24 * 60) {
     const h = Math.floor((totalMin - 24 * 60) / 60);
-    return h === 0 ? '1 day left' : `1 day ${h} hr left`;
+    return h === 0 ? tc('1 day left') : tc('1 day {h} hr left', { h });
   }
   const h = Math.floor(totalMin / 60);
   const m = totalMin % 60;
-  if (h === 0) return `${m} min left`;
-  return m === 0 ? `${h} hr left` : `${h} hr ${m} min left`;
+  if (h === 0) return tc('{m} min left', { m });
+  return m === 0 ? tc('{h} hr left', { h }) : tc('{h} hr {m} min left', { h, m });
 }
 
 /** The tiny version for the folded sharing pill in Ride Mode: "1h 20m", "45m", or "On" with no timer. */
 export function formatRemainingShort(ms: number | null): string {
-  if (openEnded(ms)) return 'On';
+  if (openEnded(ms)) return tc('On');
   const totalMin = Math.max(1, Math.ceil(ms! / 60_000));
   if (totalMin >= 24 * 60) return `${Math.floor(totalMin / (24 * 60))}d`;
   const h = Math.floor(totalMin / 60);
@@ -139,15 +141,15 @@ export function formatRemainingShort(ms: number | null): string {
  * 6:00 PM" (today), or "until Sat, Nov 14, 6:00 PM".
  */
 export function shareEndText(expiresAt: number | null, now: number): string {
-  if (isUntilTurnedOff(expiresAt)) return 'until you turn it off';
+  if (isUntilTurnedOff(expiresAt)) return tc('until you turn it off');
   const end = new Date(expiresAt!);
-  const time = end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const time = end.toLocaleTimeString(coreLocale(), { hour: 'numeric', minute: '2-digit' });
   const n = new Date(now);
   if (end.toDateString() === n.toDateString()) return `until ${time}`;
-  const day = end.toLocaleDateString('en-US', {
+  const day = end.toLocaleDateString(coreLocale(), {
     weekday: 'short', month: 'short', day: 'numeric', ...(end.getFullYear() === n.getFullYear() ? {} : { year: 'numeric' }),
   });
-  return `until ${day}, ${time}`;
+  return tc('until {day}, {time}', { day, time });
 }
 
 /**

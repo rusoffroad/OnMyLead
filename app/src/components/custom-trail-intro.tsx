@@ -7,6 +7,7 @@ import { Button } from '@/components/ui';
 import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import { trailRuleWords, type TrailRules } from '@/core/nav-trails';
 
+import { t } from '@/lib/i18n';
 export const CUSTOM_TRAIL_INTRO_KEY = 'nav.customTrailIntro.v1';
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
@@ -25,7 +26,7 @@ export function CustomTrailIntro({
 }: { visible: boolean; rules: TrailRules; onStart: (dontShowAgain: boolean) => void; onClose: () => void }) {
   const [skip, setSkip] = useState(false);
   return (
-    <BottomSheet visible={visible} onClose={onClose} title="How Custom Trails Work" footer={
+    <BottomSheet visible={visible} onClose={onClose} title={t('How Custom Trails Work')} footer={
       <View style={{ gap: 4 }}>
       <Pressable
           accessibilityRole="checkbox"
@@ -33,9 +34,9 @@ export function CustomTrailIntro({
           onPress={() => setSkip(!skip)}
           style={styles.check}>
           <View style={[styles.box, skip && styles.boxOn]}>{skip ? <Icon name="check" size={16} color="#fff" strokeWidth={3} /> : null}</View>
-          <Text style={styles.body}>Don’t show this again</Text>
+          <Text style={styles.body}>{t('Don’t show this again')}</Text>
         </Pressable>
-        <Button title="Start Mapping" onPress={() => onStart(skip)} />
+        <Button title={t('Start Mapping')} onPress={() => onStart(skip)} />
       </View>
     }>
       {STEPS.map((s, i) => (
@@ -44,16 +45,14 @@ export function CustomTrailIntro({
             <Icon name={s.icon} size={20} color={Colors.text} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={styles.stepTitle}>{i + 1}. {s.title}</Text>
-            <Text style={styles.body}>{s.body}</Text>
+            <Text style={styles.stepTitle}>{i + 1}. {t(s.title)}</Text>
+            <Text style={styles.body}>{t(s.body)}</Text>
           </View>
         </View>
       ))}
       <View style={styles.down}>
-        <Text style={styles.downTitle}>When a Trail Comes Down</Text>
-        <Text style={styles.body}>
-          If {trailRuleWords(rules)}, it comes off the public map automatically. You’re told, it stays on your phone, and you can fix it and share it again. The admin can also take down a trail that breaks the rules.
-        </Text>
+        <Text style={styles.downTitle}>{t('When a Trail Comes Down')}</Text>
+        <Text style={styles.body}>{t('If {v}, it comes off the public map automatically. You’re told, it stays on your phone, and you can fix it and share it again. The admin can also take down a trail that breaks the rules.', { v: trailRuleWords(rules) })}</Text>
       </View>
     </BottomSheet>
   );

@@ -19,6 +19,7 @@ import { useGarageWidths } from '@/lib/trail-width';
 import { StarScore } from './stars';
 import { ProTag } from '@/components/pro-tag';
 
+import { t as tr } from '@/lib/i18n';
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
 
@@ -62,7 +63,7 @@ export function TrailMapOverlay({
         {bare ? null : (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Map layers"
+          accessibilityLabel={tr('Map layers')}
           accessibilityState={{ expanded: open }}
           hitSlop={6}
           onPress={() => setOpen((o) => !o)}
@@ -71,9 +72,9 @@ export function TrailMapOverlay({
         </Pressable>
         )}
         {trail.offline && (!open || bare) ? (
-          <View style={styles.offline} accessible accessibilityLabel="No signal. The map is showing what's downloaded on this phone.">
-            <Text style={styles.offlineText}>No Signal</Text>
-            <Text style={styles.offlineSub}>Downloaded Map</Text>
+          <View style={styles.offline} accessible accessibilityLabel={tr('No signal. The map is showing what\'s downloaded on this phone.')}>
+            <Text style={styles.offlineText}>{tr('No Signal')}</Text>
+            <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>
           </View>
         ) : null}
         {open && !bare ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} /> : null}
@@ -81,7 +82,7 @@ export function TrailMapOverlay({
 
       {(trail.zoomInHint || trail.closerForTracks) && !open && !bare ? (
         <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
-          <Text style={styles.hintText}>{trail.zoomInHint ? 'Zoom In to See Trails' : 'Zoom In for Park and Local Trails'}</Text>
+          <Text style={styles.hintText}>{trail.zoomInHint ? tr('Zoom In to See Trails') : tr('Zoom In for Park and Local Trails')}</Text>
         </View>
       ) : null}
 
@@ -90,7 +91,7 @@ export function TrailMapOverlay({
           {trail.looking ? (
             <View style={styles.looking}>
               <ActivityIndicator color={SAND} size="small" />
-              <Text style={styles.lookingText}>Checking that trail</Text>
+              <Text style={styles.lookingText}>{tr('Checking that trail')}</Text>
             </View>
           ) : trail.picked ? (
             <RiderTrailCard
@@ -123,10 +124,10 @@ function LayersPanel({
   return (
     <View style={styles.panel} accessibilityViewIsModal={false}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Text style={styles.panelTitle}>Map Style</Text>
+        <Text style={styles.panelTitle}>{tr('Map Style')}</Text>
         <ProTag feature="map_layers" style={{ alignSelf: 'auto' }} />
       </View>
-      <View style={styles.bases} accessibilityRole="radiogroup" accessibilityLabel="Map style">
+      <View style={styles.bases} accessibilityRole="radiogroup" accessibilityLabel={tr('Map style')}>
         {(trail.terrainAvailable ? (['satellite', 'topo', 'terrain'] as BaseMap[]) : (['satellite', 'topo'] as BaseMap[])).map((b) => {
           const on = trail.base === b;
           return (
@@ -134,13 +135,13 @@ function LayersPanel({
               key={b}
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
-              accessibilityLabel={BASE_NAME[b]}
+              accessibilityLabel={tr(BASE_NAME[b])}
               onPress={() => requirePro('map_layers') && trail.setBase(b)}
               style={({ pressed }) => [styles.base, pressed && { opacity: 0.8 }]}>
               <View style={[styles.baseThumb, on && styles.baseThumbOn]}>
                 <StyleThumb base={b} />
               </View>
-              <Text style={[styles.baseText, on && { color: Colors.text }]}>{BASE_NAME[b]}</Text>
+              <Text style={[styles.baseText, on && { color: Colors.text }]}>{tr(BASE_NAME[b])}</Text>
             </Pressable>
           );
         })}
@@ -148,15 +149,15 @@ function LayersPanel({
       {trail.base === 'terrain' ? (
         <Text style={styles.fine}>
           {trail.terrain3d
-            ? `Satellite on the real shape of the land, with contour lines and peak heights in feet. ${WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.'} Shows in Ride Mode and Map Mode.`
-            : 'No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.'}
+            ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.' })
+            : tr('No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.')}
         </Text>
       ) : null}
 
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.trails }} onPress={() => requirePro('map_layers') && trail.setTrails(!trail.trails)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.rowTitle}>Public Trails and Roads</Text>
-          <Text style={styles.rowSub}>{`Forest Service, BLM and OpenStreetMap, including off-road parks, with names and closures. ${lookupHint}`.trim()}</Text>
+          <Text style={styles.rowTitle}>{tr('Public Trails and Roads')}</Text>
+          <Text style={styles.rowSub}>{tr('Forest Service, BLM and OpenStreetMap, including off-road parks, with names and closures. {lookupHint}', { lookupHint }).trim()}</Text>
         </View>
         <Switch
           value={trail.trails}
@@ -173,12 +174,12 @@ function LayersPanel({
       {trail.trails ? (
         <View style={{ gap: 6 }}>
           <View style={styles.legend}>
-            <LegendLine dashed color={TRAIL_INK.trail} label="Trail" />
-            <LegendLine color={TRAIL_INK.road} label="Road" />
-            <LegendLine dashed closed color={TRAIL_INK.closed} label="Closed" />
+            <LegendLine dashed color={TRAIL_INK.trail} label={tr('Trail')} />
+            <LegendLine color={TRAIL_INK.road} label={tr('Road')} />
+            <LegendLine dashed closed color={TRAIL_INK.closed} label={tr('Closed')} />
           </View>
           <Text style={styles.fine}>
-            Closed means the Forest Service, BLM or OpenStreetMap lists it closed or private today, from their published travel plans and seasons. It is not a live gate report, so check posted signs and local orders.
+            {tr('Closed means the Forest Service, BLM or OpenStreetMap lists it closed or private today, from their published travel plans and seasons. It is not a live gate report, so check posted signs and local orders.')}
           </Text>
         </View>
       ) : null}
@@ -186,10 +187,10 @@ function LayersPanel({
       <Pressable accessibilityRole="switch" accessibilityState={{ checked: trail.riderTrailsOn }} onPress={() => trail.setRiderTrails(!trail.riderTrailsOn)} style={styles.row}>
         <View style={{ flex: 1, gap: 2 }}>
           <View style={styles.legendItem}>
-            <Text style={styles.rowTitle}>Rider Trails</Text>
+            <Text style={styles.rowTitle}>{tr('Rider Trails')}</Text>
             <LegendLine color={RIDER_TRAIL_INK} label="" dotted />
           </View>
-          <Text style={styles.rowSub}>Trails OnMyLead riders mapped and shared. User submitted, so check them against signs.</Text>
+          <Text style={styles.rowSub}>{tr('Trails OnMyLead riders mapped and shared. User submitted, so check them against signs.')}</Text>
         </View>
         <Switch
           value={trail.riderTrailsOn}
@@ -204,11 +205,11 @@ function LayersPanel({
       {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} terrain={trail.terrainAvailable && trail.base === 'terrain'} /> : null}
       {!WEB ? (
         <Pressable accessibilityRole="link" onPress={() => router.push('/maps')} hitSlop={6} style={styles.link}>
-          <Text style={styles.linkText}>Offline Maps</Text>
+          <Text style={styles.linkText}>{tr('Offline Maps')}</Text>
           <Text style={styles.linkText}>›</Text>
         </Pressable>
       ) : null}
-      {credit ? <Text style={styles.fine}>Map data: {credit}</Text> : null}
+      {credit ? <Text style={styles.fine}>{tr('Map data: {credit}', { credit })}</Text> : null}
     </View>
   );
 }
@@ -268,21 +269,21 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityHint="Saves satellite, topo and trails around this ride's route for riding with no signal"
+        accessibilityHint={tr('Saves satellite, topo and trails around this ride\'s route for riding with no signal')}
         onPress={() => requirePro('offline_maps') && downloadRide(ride.id, ride.name, route, ALL)}
         style={({ pressed }) => [styles.save, pressed && { opacity: 0.85 }]}>
         <View style={styles.saveRow}>
-          <Text style={styles.saveText}>Download This Ride’s Map</Text>
+          <Text style={styles.saveText}>{tr('Download This Ride’s Map')}</Text>
           <ProTag feature="offline_maps" />
         </View>
-        <Text style={styles.saveSub}>{`${terrain ? 'Satellite, Topo, Trails and 3D Terrain' : 'Satellite, Topo and Trails'}, About ${formatBytes(estimate)}`}</Text>
+        <Text style={styles.saveSub}>{`${terrain ? tr('Satellite, Topo, Trails and 3D Terrain') : tr('Satellite, Topo and Trails')}, About ${formatBytes(estimate)}`}</Text>
       </Pressable>
     );
   }
   return (
     <View style={styles.saved}>
       <View style={{ flex: 1, gap: 4 }}>
-        <Text style={styles.rowTitle}>{busy ? 'Downloading Ride Map' : saved.status === 'ready' ? 'Ride Map Downloaded' : 'Ride Map'}</Text>
+        <Text style={styles.rowTitle}>{busy ? tr('Downloading Ride Map') : saved.status === 'ready' ? tr('Ride Map Downloaded') : tr('Ride Map')}</Text>
         <Text style={styles.savedSub}>{statusLine(saved)}</Text>
         {busy || saved.status === 'paused' ? (
           <View style={styles.track}>
@@ -292,11 +293,11 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
       </View>
       {busy ? (
         <Pressable accessibilityRole="button" onPress={() => pauseDownload(saved.id)} hitSlop={8} style={styles.mini}>
-          <Text style={styles.miniText}>Pause</Text>
+          <Text style={styles.miniText}>{tr('Pause')}</Text>
         </Pressable>
       ) : saved.status !== 'ready' ? (
         <Pressable accessibilityRole="button" onPress={() => resumeDownload(saved.id)} hitSlop={8} style={styles.mini}>
-          <Text style={styles.miniText}>{saved.status === 'paused' ? 'Resume' : 'Finish'}</Text>
+          <Text style={styles.miniText}>{saved.status === 'paused' ? tr('Resume') : tr('Finish')}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -304,15 +305,15 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
 }
 
 export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => void }) {
-  const facts = [info.source === 'osm' ? 'Track' : info.kind === 'trail' ? 'Trail' : 'Road', info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
+  const facts = [info.source === 'osm' ? tr('Track') : info.kind === 'trail' ? tr('Trail') : tr('Road'), info.miles != null ? `${info.miles} mi segment` : null, info.surface].filter(Boolean);
   return (
     <View style={styles.card} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.cardTitle} numberOfLines={2}>{info.title}</Text>
+          <Text style={styles.cardTitle} numberOfLines={2}>{tr(info.title)}</Text>
           {info.where ? <Text style={styles.rowSub} numberOfLines={1}>{info.where}</Text> : null}
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={10} onPress={onClose} style={styles.close}>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr('Close')} hitSlop={10} onPress={onClose} style={styles.close}>
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
             <Path d="M6 6l12 12M18 6L6 18" stroke={Colors.textSecondary} strokeWidth={2.5} strokeLinecap="round" />
           </Svg>
@@ -320,30 +321,30 @@ export function TrailCard({ info, onClose }: { info: TrailInfo; onClose: () => v
       </View>
       {info.closure ? (
         <View style={styles.closure} accessibilityRole="alert">
-          <Text style={styles.closureLabel}>{info.closure.label}</Text>
-          <Text style={styles.closureText}>{info.closure.detail}</Text>
+          <Text style={styles.closureLabel}>{tr(info.closure.label)}</Text>
+          <Text style={styles.closureText}>{tr(info.closure.detail)}</Text>
         </View>
       ) : null}
       <Text style={styles.facts}>{facts.join('   ')}</Text>
       <TrailWidthRow key={`${info.source}|${info.lineKey ?? info.title}|${info.at?.lat}|${info.at?.lng}`} info={info} />
       {info.allowed.length ? (
         <View style={styles.allowed}>
-          <Text style={styles.allowedLabel}>{info.seasonal ? 'Open To, by Season' : 'Open To'}</Text>
+          <Text style={styles.allowedLabel}>{info.seasonal ? tr('Open To, by Season') : tr('Open To')}</Text>
           {info.allowed.slice(0, 6).map((a) => (
             <View key={a.vehicle} style={styles.allowedRow}>
               <Text style={styles.allowedName}>{a.vehicle}</Text>
               <Text style={[styles.allowedDates, a.closedNow && styles.closedNow]}>
-                {[a.closedNow ? 'Closed Now' : null, a.dates].filter(Boolean).join('  ')}
+                {[a.closedNow ? tr('Closed Now') : null, a.dates].filter(Boolean).join('  ')}
               </Text>
             </View>
           ))}
         </View>
       ) : info.source === 'osm' ? (
-        <Text style={styles.rowSub}>Mapped by riders on OpenStreetMap. Parks and private land need permission or a pass.</Text>
+        <Text style={styles.rowSub}>{tr('Mapped by riders on OpenStreetMap. Parks and private land need permission or a pass.')}</Text>
       ) : (
         <Text style={styles.rowSub}>{"The agency data doesn't list which vehicles can use this one."}</Text>
       )}
-      <Text style={styles.fine}>From {info.attribution}. Check posted signs and closures before you ride.</Text>
+      <Text style={styles.fine}>{tr('From {attribution}. Check posted signs and closures before you ride.', { attribution: info.attribution })}</Text>
     </View>
   );
 }
@@ -365,7 +366,7 @@ function LegendLine({ color, label, dashed, closed, dotted }: { color: string; l
  * dotted line), who mapped it and when, its ratings, and offers Rate, Navigate and Details.
  */
 export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrail; onClose: () => void; onRate: () => void; onFollow: () => void }) {
-  const facts = [feetOrMiles(t.lengthM), t.maxWidthIn != null ? `${inches(t.maxWidthIn)} Width Limit` : null, t.vehicles.map(vehicleLabel).join(', ')]
+  const facts = [feetOrMiles(t.lengthM), t.maxWidthIn != null ? tr('{v} Width Limit', { v: inches(t.maxWidthIn) }) : null, t.vehicles.map(vehicleLabel).join(', ')]
     .filter(Boolean)
     .join('   ');
   const garage = useGarageWidths();
@@ -375,12 +376,12 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
         <View style={{ flex: 1, gap: 3 }}>
           <View style={styles.userRow}>
             <Svg width={22} height={8}><Path d="M3 4H19" stroke={RIDER_TRAIL_INK} strokeWidth={3.6} strokeLinecap="round" strokeDasharray="0.1 5.5" /></Svg>
-            <Text style={styles.userText}>User Submitted Trail</Text>
+            <Text style={styles.userText}>{tr('User Submitted Trail')}</Text>
           </View>
           <Text style={styles.cardTitle} numberOfLines={2}>{t.name}</Text>
           <Text style={styles.rowSub} numberOfLines={1}>{mappedBy(t)}</Text>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close" hitSlop={10} onPress={onClose} style={styles.close}>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr('Close')} hitSlop={10} onPress={onClose} style={styles.close}>
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
             <Path d="M6 6l12 12M18 6L6 18" stroke={Colors.textSecondary} strokeWidth={2.5} strokeLinecap="round" />
           </Svg>
@@ -396,25 +397,25 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
       <RigFitLine limitIn={t.maxWidthIn} garage={garage} />
       <View style={styles.scores}>
         <View style={styles.scoreCol}>
-          <Text style={styles.scoreLabel}>Quality</Text>
-          <StarScore average={t.quality} count={t.qualityCount} color="#F5C451" empty="Not Rated" />
+          <Text style={styles.scoreLabel}>{tr('Quality')}</Text>
+          <StarScore average={t.quality} count={t.qualityCount} color="#F5C451" empty={tr('Not Rated')} />
         </View>
         <View style={styles.scoreCol}>
-          <Text style={styles.scoreLabel}>Line Accuracy</Text>
-          <StarScore average={t.average} count={t.ratingCount} color={RIDER_TRAIL_INK} empty="Not Rated" />
+          <Text style={styles.scoreLabel}>{tr('Line Accuracy')}</Text>
+          <StarScore average={t.average} count={t.ratingCount} color={RIDER_TRAIL_INK} empty={tr('Not Rated')} />
         </View>
       </View>
       <View style={styles.actions}>
         {!t.mine ? (
           <Pressable accessibilityRole="button" onPress={onRate} style={({ pressed }) => [styles.action, styles.actionMain, pressed && { opacity: 0.85 }]}>
-            <Text style={[styles.actionText, { color: Colors.background }]}>{t.myScore != null || t.myQuality != null ? 'Change Rating' : 'Rate Trail'}</Text>
+            <Text style={[styles.actionText, { color: Colors.background }]}>{t.myScore != null || t.myQuality != null ? tr('Change Rating') : tr('Rate Trail')}</Text>
           </Pressable>
         ) : null}
         <Pressable accessibilityRole="button" onPress={onFollow} style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.actionText}>Navigate</Text>
+          <Text style={styles.actionText}>{tr('Navigate')}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={() => router.push(`/nav/public/${t.id}`)} style={({ pressed }) => [styles.action, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.actionText}>Details</Text>
+          <Text style={styles.actionText}>{tr('Details')}</Text>
         </Pressable>
       </View>
     </View>

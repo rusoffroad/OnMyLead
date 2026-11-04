@@ -65,7 +65,7 @@ export default function OfflineMaps() {
     return (
       <Screen>
         <Stack.Screen options={{ title: t('Offline Maps') }} />
-        <ThemedText themeColor="textSecondary">Offline maps are in the iPhone app, where Ride Mode can use them with no signal.</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Offline maps are in the iPhone app, where Ride Mode can use them with no signal.')}</ThemedText>
       </Screen>
     );
   }
@@ -75,24 +75,24 @@ export default function OfflineMaps() {
       <Stack.Screen options={{ title: t('Offline Maps') }} />
 
       <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Maps for No Signal</Text>
+        <Text style={styles.heroTitle}>{t('Maps for No Signal')}</Text>
         <Text style={styles.heroBody}>
-          Download an area or a ride before you leave. Ride Mode switches to it on its own when the signal drops.
+          {t('Download an area or a ride before you leave. Ride Mode switches to it on its own when the signal drops.')}
         </Text>
-        <View style={styles.gauge} accessible accessibilityLabel={`${formatBytes(used)} of maps saved${free != null ? `, ${formatBytes(free)} free on this phone` : ''}`}>
-          <Text style={styles.gaugeBig}>{maps.length ? formatBytes(used) : 'None Yet'}</Text>
+        <View style={styles.gauge} accessible accessibilityLabel={t('{v} of maps saved{v2}', { v: formatBytes(used), v2: free != null ? `, ${formatBytes(free)} free on this phone` : '' })}>
+          <Text style={styles.gaugeBig}>{maps.length ? formatBytes(used) : t('None Yet')}</Text>
           <Text style={styles.gaugeSmall}>
-            {maps.length === 1 ? '1 Map Saved' : `${maps.length} Maps Saved`}
-            {free != null ? `   ${formatBytes(free)} Free on This Phone` : ''}
+            {maps.length === 1 ? t('1 Map Saved') : t('{length} Maps Saved', { length: maps.length })}
+            {free != null ? t('   {v} Free on This Phone', { v: formatBytes(free) }) : ''}
           </Text>
         </View>
       </View>
 
-      <Button title="Download a Map Area" pro="offline_maps" big onPress={() => requirePro('offline_maps') && router.push('/maps/area')} />
+      <Button title={t('Download a Map Area')} pro="offline_maps" big onPress={() => requirePro('offline_maps') && router.push('/maps/area')} />
 
       {maps.length ? (
         <>
-          <Section title="On This Phone" />
+          <Section title={t('On This Phone')} />
           {maps.map((m) => (
             <DownloadRow key={m.id} map={m} />
           ))}
@@ -101,7 +101,7 @@ export default function OfflineMaps() {
 
       {session && elsewhere.length ? (
         <>
-          <Section title="On Your Other Devices" />
+          <Section title={t('On Your Other Devices')} />
           {elsewhere.map((a) => (
             <OtherDeviceOffer key={a.id} area={a} />
           ))}
@@ -112,17 +112,14 @@ export default function OfflineMaps() {
         <ActivityIndicator color={SAND} style={{ marginTop: 8 }} />
       ) : notDownloaded.length ? (
         <>
-          <Section title="Your Rides" />
+          <Section title={t('Your Rides')} />
           {notDownloaded.map((r) => (
             <RideOffer key={r.ride.id} ride={r.ride} route={r.route} />
           ))}
         </>
       ) : null}
 
-      <ThemedText type="small" themeColor="textSecondary">
-        Maps come from free public sources: {IMAGERY_ATTRIBUTION}, USGS topo, USDA Forest Service MVUM and the Bureau of Land
-        Management. Satellite with no signal uses the USGS aerial photos, since the live satellite view can’t be saved ahead of time.
-      </ThemedText>
+      <ThemedText type="small" themeColor="textSecondary">{t('Maps come from free public sources: {IMAGERY_ATTRIBUTION}, USGS topo, USDA Forest Service MVUM and the Bureau of Land Management. Satellite with no signal uses the USGS aerial photos, since the live satellite view can’t be saved ahead of time.', { IMAGERY_ATTRIBUTION })}</ThemedText>
     </Screen>
   );
 }
@@ -136,11 +133,11 @@ function OtherDeviceOffer({ area }: { area: SyncedOfflineArea }) {
       <MapSheet ride={area.kind === 'ride'} dim />
       <View style={{ flex: 1, gap: 3 }}>
         <Text style={styles.offerName} numberOfLines={1}>{area.name}</Text>
-        <Text style={styles.offerSub}>{`About ${formatBytes(plan.bytes)}`}</Text>
+        <Text style={styles.offerSub}>{t('About {v}', { v: formatBytes(plan.bytes) })}</Text>
       </View>
-      <SmallButton title="Hide" onPress={() => forgetOtherDeviceArea(area.id)} />
+      <SmallButton title={t('Hide')} onPress={() => forgetOtherDeviceArea(area.id)} />
       <SmallButton
-        title="Download"
+        title={t('Download')}
         pro="offline_maps"
         strong
         disabled={starting}
@@ -166,7 +163,7 @@ function RideOffer({ ride, route }: RideWithRoute) {
         <Text style={styles.offerSub}>{`${when}   About ${formatBytes(plan.bytes)}`}</Text>
       </View>
       <SmallButton
-        title="Download"
+        title={t('Download')}
         pro="offline_maps"
         strong
         disabled={starting}

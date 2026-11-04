@@ -16,6 +16,7 @@ import { RideQrSheet } from './ride-qr-sheet';
 import { ThemedText } from './themed-text';
 import { Button, Card } from './ui';
 
+import { t } from '@/lib/i18n';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
 /**
@@ -41,7 +42,7 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
   const send = async (how: 'sheet' | 'text' | 'email') => {
     track('invite_shared', { platform: Platform.OS, how, visibility: ride.visibility });
     if (how === 'sheet') return Share.share({ message });
-    const url = how === 'text' ? smsUrl(message, Platform.OS) : mailUrl(`Join "${ride.name}" on OnMyLead`, message);
+    const url = how === 'text' ? smsUrl(message, Platform.OS) : mailUrl(t('Join "{name}" on OnMyLead', { name: ride.name }), message);
     try {
       await Linking.openURL(url);
     } catch {
@@ -52,27 +53,27 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
   return (
     <Card style={fresh ? { borderWidth: 2, borderColor: Colors.accent } : undefined}>
       <ThemedText type={fresh ? 'subtitle' : 'heading'}>
-        {fresh ? (isPrivate ? 'Your Private Ride Is Ready' : 'Your Ride Is Live in Search') : 'Invite Riders'}
+        {fresh ? (isPrivate ? t('Your Private Ride Is Ready') : t('Your Ride Is Live in Search')) : t('Invite Riders')}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         {isPrivate
-          ? 'Only people you send this to can find it. They can scan the QR code, open the link or type the code.'
-          : 'Anyone can find it near them or in your state. Send it to friends too.'}
+          ? t('Only people you send this to can find it. They can scan the QR code, open the link or type the code.')
+          : t('Anyone can find it near them or in your state. Send it to friends too.')}
       </ThemedText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.three }}>
         <Pressable
           onPress={() => setShowQr(true)}
           accessibilityRole="button"
-          accessibilityLabel="Show the ride's QR code full screen"
+          accessibilityLabel={t('Show the ride\'s QR code full screen')}
           style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}>
           <QrCode value={link} size={116} />
         </Pressable>
         <View style={{ flex: 1, gap: Spacing.one }}>
           <View style={{ borderRadius: Radius.control, borderWidth: 1.5, borderStyle: 'dashed', borderColor: Colors.border, paddingVertical: 8, alignItems: 'center' }}>
-            <ThemedText type="small" themeColor="textSecondary">Invite Code</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Invite Code')}</ThemedText>
             <ThemedText selectable numberOfLines={1} style={{ ...codeTextSize(ride.invite_code, 28), fontFamily: font(800, 'display') }}>{ride.invite_code}</ThemedText>
           </View>
-          <Button title="Show QR Code" kind="secondary" style={{ minHeight: 44 }} onPress={() => { setShowQr(true); track('invite_qr_shown', { platform: Platform.OS }); }} />
+          <Button title={t('Show QR Code')} kind="secondary" style={{ minHeight: 44 }} onPress={() => { setShowQr(true); track('invite_qr_shown', { platform: Platform.OS }); }} />
         </View>
       </View>
       {canChange ? (
@@ -80,17 +81,17 @@ export function InviteCard({ ride, fresh, manager, onCodeChanged }: {
           kind="ride"
           id={ride.id}
           current={ride.invite_code}
-          note={`The old link, QR code and code stop working. Riders already on the ride stay on it.${isPrivate ? ' Anyone with the code can join, so pick one that’s hard to guess.' : ''}`}
+          note={t('The old link, QR code and code stop working. Riders already on the ride stay on it.{v}', { v: isPrivate ? ' Anyone with the code can join, so pick one that’s hard to guess.' : '' })}
           save={(c) => setRideCode(ride.id, c)}
           onSaved={(c) => onCodeChanged?.(c)}
         />
       ) : null}
-      <Button title="Share Invite" big onPress={() => send('sheet')} />
+      <Button title={t('Share Invite')} big onPress={() => send('sheet')} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Text" kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
-        <Button title="Email" kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
+        <Button title={t('Text')} kind="secondary" style={{ flex: 1 }} onPress={() => send('text')} />
+        <Button title={t('Email')} kind="secondary" style={{ flex: 1 }} onPress={() => send('email')} />
         <Button
-          title={copied ? 'Copied' : 'Copy Link'}
+          title={copied ? t('Copied') : t('Copy Link')}
           kind="secondary"
           style={{ flex: 1 }}
           onPress={async () => {

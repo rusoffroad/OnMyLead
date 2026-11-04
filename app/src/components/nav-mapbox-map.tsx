@@ -16,6 +16,7 @@ import { track } from '@/lib/analytics';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle } from './mapbox-map';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
+import { t } from '@/lib/i18n';
 export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng[]) => void };
 
 const RECORD_INK = '#F6F1E3';
@@ -138,16 +139,16 @@ export function NavMapboxMap({
       {/* The website draws the rider's own dot; the apps' map draws it (with its arrow) itself. */}
       {Platform.OS === 'web' && center ? (
         <MapboxMarker at={center}>
-          <View accessible accessibilityLabel="You are here" style={styles.me}>
+          <View accessible accessibilityLabel={t('You are here')} style={styles.me}>
             {meHeading != null ? <View style={[styles.meArrow, { transform: [{ rotate: `${Math.round(meHeading)}deg` }] }]} /> : null}
           </View>
         </MapboxMarker>
       ) : null}
       {following && following.length > 1 ? (
         <>
-          <MapboxMarker at={following[0]}><View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: '#34C759' }]} /></MapboxMarker>
+          <MapboxMarker at={following[0]}><View accessible accessibilityLabel={t('Start')} style={[styles.end, { backgroundColor: '#34C759' }]} /></MapboxMarker>
           <MapboxMarker at={following[following.length - 1]}>
-            <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
+            <View accessible accessibilityLabel={t('Finish')} style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
           </MapboxMarker>
         </>
       ) : null}
@@ -155,7 +156,7 @@ export function NavMapboxMap({
         <MapboxMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            accessibilityLabel={w.planned_stop ? t('Planned stop {v}, {name}, {v2}', { v: stopNumber(w, waypoints ?? []), name: w.name, v2: symbolLabel(waypointSymbol(w)) }) : t('{v} waypoint, {name}', { v: symbolLabel(waypointSymbol(w)), name: w.name })}
             onPress={() => onPressWaypoint?.(w)}>
             {w.planned_stop ? (
               <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
@@ -174,7 +175,7 @@ export function NavMapboxMap({
         <MapboxMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            accessibilityLabel={w.planned_stop ? t('Planned stop {v}, {name}', { v: stopNumber(w, waypoints), name: w.name }) : t('{v} waypoint, {name}', { v: symbolLabel(waypointSymbol(w)), name: w.name })}
             onPress={() => onPressWaypoint?.(w)}>
             {w.planned_stop ? (
               <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
@@ -194,7 +195,7 @@ export function NavMapboxMap({
       ))}
       {found ? (
         <MapboxMarker at={found} anchor={{ x: 0.5, y: 1 }}>
-          <View accessible accessibilityLabel={`Search result: ${found.name}`} style={{ alignItems: 'center', maxWidth: 220 }}>
+          <View accessible accessibilityLabel={t('Search result: {name}', { name: found.name })} style={{ alignItems: 'center', maxWidth: 220 }}>
             <Text style={styles.found} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundDot} />
           </View>

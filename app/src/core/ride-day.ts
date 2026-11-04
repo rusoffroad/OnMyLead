@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Ride day: when the sun comes up and goes down at the meeting spot, what the weather is doing,
  * and how long until the ride starts. Pure functions so they run offline and in tests.
@@ -57,7 +59,7 @@ export function spanText(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   if (!h) return `${m} min`;
-  return m ? `${h} hr ${m} min` : `${h} hr`;
+  return m ? tc('{h} hr {m} min', { h, m }) : `${h} hr`;
 }
 
 /**
@@ -156,17 +158,17 @@ export function parseForecast(json: unknown, meetAt: Date): DayForecast | null {
 
 /** WMO weather codes in plain words. */
 export function weatherWords(code: number | null): string {
-  if (code == null) return 'Forecast';
-  if (code === 0) return 'Clear';
-  if (code <= 2) return 'Partly Cloudy';
-  if (code === 3) return 'Overcast';
-  if (code <= 48) return 'Fog';
-  if (code <= 57) return 'Drizzle';
-  if (code <= 67) return 'Rain';
-  if (code <= 77) return 'Snow';
-  if (code <= 82) return 'Rain Showers';
-  if (code <= 86) return 'Snow Showers';
-  return 'Thunderstorms';
+  if (code == null) return tc('Forecast');
+  if (code === 0) return tc('Clear');
+  if (code <= 2) return tc('Partly Cloudy');
+  if (code === 3) return tc('Overcast');
+  if (code <= 48) return tc('Fog');
+  if (code <= 57) return tc('Drizzle');
+  if (code <= 67) return tc('Rain');
+  if (code <= 77) return tc('Snow');
+  if (code <= 82) return tc('Rain Showers');
+  if (code <= 86) return tc('Snow Showers');
+  return tc('Thunderstorms');
 }
 
 /** Things worth a heads-up before loading the trailer. Empty when the day looks fine. */
@@ -188,14 +190,14 @@ export function weatherWarnings(f: DayForecast): string[] {
 export function startsIn(meetAt: Date, now: Date): string | null {
   const min = Math.round((meetAt.getTime() - now.getTime()) / 60_000);
   if (min < 0) return null;
-  if (min < 1) return 'Starting Now';
-  if (min < 60) return `Starts in ${min} min`;
+  if (min < 1) return tc('Starting Now');
+  if (min < 60) return tc('Starts in {min} min', { min });
   const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const days = Math.round((startOfDay(meetAt) - startOfDay(now)) / DAY_MS);
   if (days === 0 || min < 12 * 60) {
     const h = Math.round(min / 60);
-    return `Starts in ${h} ${h === 1 ? 'hour' : 'hours'}`;
+    return tc('Starts in {h} {v}', { h, v: h === 1 ? 'hour' : 'hours' });
   }
-  if (days === 1) return 'Tomorrow';
-  return `In ${days} Days`;
+  if (days === 1) return tc('Tomorrow');
+  return tc('In {days} Days', { days });
 }

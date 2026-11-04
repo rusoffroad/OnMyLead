@@ -8,6 +8,7 @@ import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
 import { convoyLayout, describeRank, groupSpread, rankRiders } from '@/core/route-order';
 
+import { t as tr } from '@/lib/i18n';
 const RANGE_COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
 
 /** Dot sizes on the line, before a big group shrinks them to fit. */
@@ -69,7 +70,7 @@ export function RouteStrip({
   const pickedRider = picked ? ranked.find((r) => r.id === picked) : undefined;
   const pickedSpot = pickedRider ? spots.get(pickedRider.id) : undefined;
   const spread = groupSpread(ranked);
-  const offWord = freeride ? "off the leader's path" : 'off the route';
+  const offWord = freeride ? tr('off the leader’s path') : tr('off the route');
   const describe = (r: (typeof ranked)[number]) => describeRank(r, ranked, nameOf(r.id), meId, offWord);
   const fs = freeride?.summary;
   const [spreadNum, ...spreadUnit] = fs?.spread?.split(' ') ?? [];
@@ -80,19 +81,19 @@ export function RouteStrip({
         style={styles.head}
         accessible
         accessibilityLabel={freeride ? [
-          freeride.waiting ? 'Freeride. Waiting for the leader to share their location.' : fs?.spread ? `Freeride. The group is spread over ${fs.spread}, ${fs.ends}.` : `Freeride. ${fs?.ends}.`,
+          freeride.waiting ? tr('Freeride. Waiting for the leader to share their location.') : fs?.spread ? tr('Freeride. The group is spread over {spread}, {ends}.', { spread: fs.spread, ends: fs.ends }) : `Freeride. ${fs?.ends}.`,
           fs?.compared ?? '',
         ].join(' ') : [
-          summary ? `Mile ${summary.doneMi} of ${summary.totalMi}. ${summary.compared} ${summary.offRoute ?? ''}` : `Route, ${ranked.length} riders on it`,
-          spread ? `${spread}, front to rear.` : '',
+          summary ? tr('Mile {doneMi} of {totalMi}. {compared} {v}', { doneMi: summary.doneMi, totalMi: summary.totalMi, compared: summary.compared, v: summary.offRoute ?? '' }) : tr('Route, {length} riders on it', { length: ranked.length }),
+          spread ? tr('{spread}, front to rear.', { spread }) : '',
         ].join(' ')}>
         {freeride ? (
           freeride.waiting ? (
-            <Text style={styles.of}>Waiting for the Leader</Text>
+            <Text style={styles.of}>{tr('Waiting for the Leader')}</Text>
           ) : fs?.spread ? (
             <Text style={styles.big}>
               {spreadNum}
-              <Text style={styles.of}> {spreadUnit.join(' ')} spread</Text>
+              <Text style={styles.of}>{tr('{v} spread', { v: spreadUnit.join(' ') })}</Text>
             </Text>
           ) : (
             <Text style={styles.of}>{fs?.ends}</Text>
@@ -100,12 +101,12 @@ export function RouteStrip({
         ) : summary ? (
           <Text style={styles.big}>
             {summary.doneMi}
-            <Text style={styles.of}> of {summary.totalMi} mi</Text>
+            <Text style={styles.of}>{tr('of {totalMi} mi', { totalMi: summary.totalMi })}</Text>
           </Text>
         ) : (
-          <Text style={styles.of}>Route · {ranked.length ? `${ranked.length} on the line` : 'nobody placed yet'}</Text>
+          <Text style={styles.of}>{tr('Route · {v}', { v: ranked.length ? tr('{n} on the line', { n: ranked.length }) : tr('nobody placed yet') })}</Text>
         )}
-        <Text style={styles.toGo}>{freeride ? (freeride.waiting || !fs?.spread ? 'Freeride' : fs.ends) : summary ? summary.toGo : offline ? 'Saved route, no signal' : ''}</Text>
+        <Text style={styles.toGo}>{freeride ? (freeride.waiting || !fs?.spread ? tr('Freeride') : fs.ends) : summary ? summary.toGo : offline ? tr('Saved route, no signal') : ''}</Text>
       </View>
 
       <View style={styles.track} onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}>
@@ -120,7 +121,7 @@ export function RouteStrip({
           // No spot until the line has been measured: draw nothing rather than a dot in the wrong place.
           if (!spot) return null;
           const size = spot.size;
-          const letter = mine ? 'You' : r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : initialOf(nameOf(r.id));
+          const letter = mine ? tr('You') : r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : initialOf(nameOf(r.id));
           const filled = r.place!.onRoute && !lastSeen;
           return (
             <Pressable
@@ -128,7 +129,7 @@ export function RouteStrip({
               onPress={() => setPicked((p) => (p === r.id ? null : r.id))}
               hitSlop={4}
               accessibilityRole="button"
-              accessibilityLabel={`${describe(r)}${lastSeen ? ', last seen here' : ''}`}
+              accessibilityLabel={`${describe(r)}${lastSeen ? tr(', last seen here') : ''}`}
               style={[
                 styles.dot,
                 {
@@ -166,7 +167,7 @@ export function RouteStrip({
       {compact ? null : freeride ? (
         <Text style={styles.compared}>
           {freeride.waiting
-            ? 'The line fills in once the leader shares their location.'
+            ? tr('The line fills in once the leader shares their location.')
             : fs?.compared ?? 'Share your location to see how far you are behind the leader.'}
         </Text>
       ) : summary ? (
@@ -175,7 +176,7 @@ export function RouteStrip({
           {summary.compared}
         </Text>
       ) : (
-        <Text style={styles.compared}>Share your location to see where you are on the route.</Text>
+        <Text style={styles.compared}>{tr('Share your location to see where you are on the route.')}</Text>
       )}
       {range && !compact ? (
         <View style={styles.range}>

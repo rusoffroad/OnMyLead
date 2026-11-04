@@ -5,6 +5,7 @@
  */
 import type { SocialProvider } from './auth-link';
 
+import { tc } from './i18n';
 export type SocialProfile = {
   user_id: string;
   provider: SocialProvider;
@@ -17,15 +18,15 @@ export const PROVIDER_NAME: Record<SocialProvider, string> = { apple: 'Apple', g
 
 /** "Eva Ridgeway on Google", or "Signed In With Apple" when the account shares no name. */
 export function socialLine(p: Pick<SocialProfile, 'provider' | 'name'>): string {
-  return p.name ? `${p.name} on ${PROVIDER_NAME[p.provider]}` : `Signed In With ${PROVIDER_NAME[p.provider]}`;
+  return p.name ? `${p.name} on ${PROVIDER_NAME[p.provider]}` : tc('Signed In With {v}', { v: PROVIDER_NAME[p.provider] });
 }
 
 /** The You tab's setting row. */
 export function socialSetting(p: Pick<SocialProfile, 'provider' | 'shown'>): { title: string; detail: string } {
   const service = PROVIDER_NAME[p.provider];
   return {
-    title: `Show My ${service} Profile`,
-    detail: p.shown ? `Riders you ride with see your ${service} name and photo.` : `Off. Riders you ride with don’t see it.`,
+    title: tc('Show My {service} Profile', { service }),
+    detail: p.shown ? tc('Riders you ride with see your {service} name and photo.', { service }) : tc('Off. Riders you ride with don’t see it.'),
   };
 }
 

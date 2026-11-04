@@ -70,28 +70,28 @@ export default function Groups() {
       <Stack.Screen options={{ title: t('Riding Groups') }} />
       <OutRidingCard />
       <ThemedText themeColor="textSecondary">
-        Save the people you ride with. When you create a ride, invite the whole group in one tap.
+        {t('Save the people you ride with. When you create a ride, invite the whole group in one tap.')}
       </ThemedText>
 
       {off ? (
         <View style={styles.note}>
-          <ThemedText type="smallBold">Not Switched On Yet</ThemedText>
+          <ThemedText type="smallBold">{t('Not Switched On Yet')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{NOT_SWITCHED_ON}</ThemedText>
         </View>
       ) : null}
       <ErrorText error={error} />
 
-      <Button title="New Group" pro="saved_groups" big disabled={off} onPress={openNewGroup} />
+      <Button title={t('New Group')} pro="saved_groups" big disabled={off} onPress={openNewGroup} />
 
       {groups && !groups.length && !off ? <EmptyCrew /> : null}
 
-      {mine.length ? <Section title="Your Groups" /> : null}
+      {mine.length ? <Section title={t('Your Groups')} /> : null}
       {mine.map((g) => <GroupCard key={g.id} group={g} chat={chats.get(g.id)} me={session?.user.id} />)}
 
-      {theirs.length ? <Section title="Groups You’re In" /> : null}
+      {theirs.length ? <Section title={t('Groups You’re In')} /> : null}
       {theirs.map((g) => <GroupCard key={g.id} group={g} chat={chats.get(g.id)} me={session?.user.id} />)}
 
-      {follows.length || followers ? <Section title="Leaders You Follow" /> : null}
+      {follows.length || followers ? <Section title={t('Leaders You Follow')} /> : null}
       {follows.length ? (
         <View style={styles.list}>
           {follows.map((f, i) => (
@@ -99,7 +99,7 @@ export default function Groups() {
               <RiderDot name={f.name} lead size={32} />
               <ThemedText style={{ flex: 1, fontWeight: 700 }} numberOfLines={1}>{f.name}</ThemedText>
               <Button
-                title="Unfollow"
+                title={t('Unfollow')}
                 kind="ghost"
                 style={{ minHeight: 40 }}
                 onPress={async () => {
@@ -114,13 +114,13 @@ export default function Groups() {
       ) : null}
       {follows.length || followers ? (
         <ThemedText type="small" themeColor="textSecondary">
-          {follows.length ? 'You get a notification when they post a new public ride. ' : ''}
-          {followers ? `${followers} ${followers === 1 ? 'rider follows' : 'riders follow'} you.` : ''}
+          {follows.length ? t('You get a notification when they post a new public ride. ') : ''}
+          {followers ? `${followers} ${followers === 1 ? t('rider follows') : t('riders follow')} you.` : ''}
         </ThemedText>
       ) : null}
       {leaderRides.length ? (
         <>
-          <Section title="Their Upcoming Rides" />
+          <Section title={t('Their Upcoming Rides')} />
           <RowGroup>
             {leaderRides.map((r) => (
               <RideRow key={r.id} ride={r} note={`By ${follows.find((f) => f.id === r.organizer_id)?.name ?? 'a leader you follow'}`} />
@@ -130,7 +130,7 @@ export default function Groups() {
       ) : null}
       {!follows.length && !off ? (
         <ThemedText type="small" themeColor="textSecondary">
-          Tap Follow on a ride page to hear when that leader posts a new public ride.
+          {t('Tap Follow on a ride page to hear when that leader posts a new public ride.')}
         </ThemedText>
       ) : null}
     </Screen>
@@ -153,12 +153,12 @@ function GroupCard({ group, chat, me }: { group: RidingGroup; chat?: GroupChatSu
       </View>
       <Convoy names={group.riders.map((r) => r.name)} ids={group.riders.map((r) => r.id)} max={7} />
       <ThemedText type="small" themeColor="textSecondary">
-        {group.mine ? ridersLabel(group.riders.length) : `${ridersLabel(group.riders.length)}, Run By ${group.ownerName}`}
+        {group.mine ? ridersLabel(group.riders.length) : t('{v}, Run By {ownerName}', { v: ridersLabel(group.riders.length), ownerName: group.ownerName })}
       </ThemedText>
       {preview ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Open ${group.name} group chat${unread ? `, ${unread}` : ''}`}
+          accessibilityLabel={t('Open {name} group chat{v}', { name: group.name, v: unread ? `, ${unread}` : '' })}
           onPress={() => router.push(`/groups/${group.id}/chat`)}
           style={({ pressed }) => [styles.chatLine, pressed && { opacity: 0.7 }]}>
           <ThemedText type="small" style={{ flex: 1, color: unread ? Colors.text : Colors.textSecondary }} numberOfLines={1}>{preview}</ThemedText>
@@ -174,9 +174,9 @@ function EmptyCrew() {
   return (
     <View style={[styles.card, { alignItems: 'center', paddingVertical: Spacing.four }]}>
       <Convoy names={['You', 'Dusty', 'Kai', 'Mo', 'Reese', 'Tess']} size={30} />
-      <ThemedText style={{ fontWeight: 700, textAlign: 'center' }}>No Groups Yet</ThemedText>
+      <ThemedText style={{ fontWeight: 700, textAlign: 'center' }}>{t('No Groups Yet')}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 300 }}>
-        Make one for the friends you ride with most weekends. Add people you’ve ridden with, or send the group link to anyone else.
+        {t('Make one for the friends you ride with most weekends. Add people you’ve ridden with, or send the group link to anyone else.')}
       </ThemedText>
     </View>
   );

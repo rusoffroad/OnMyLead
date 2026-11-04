@@ -12,6 +12,7 @@
 import type { Store } from './entitlements';
 import { PRICES } from './pro';
 
+import { coreLocale, tc } from './i18n';
 /** Mirrors referral_rules() in the migration; the unit test checks they match. */
 export const REFERRAL_RULES = {
   newAccountDays: 7,
@@ -89,10 +90,10 @@ export function parseMyReferrals(raw: unknown): MyReferrals {
   const invites = Array.isArray(raw.invites)
     ? raw.invites.flatMap((i): ReferralInvite[] => {
         if (!isObj(i) || !str(i.joined_at)) return [];
-        return [{ name: str(i.name) ?? 'Rider', joinedAt: str(i.joined_at)!, rodeAt: str(i.rode_at) }];
+        return [{ name: str(i.name) ?? tc('Rider'), joinedAt: str(i.joined_at)!, rodeAt: str(i.rode_at) }];
       })
     : [];
-  const by = isObj(raw.invited_by) ? { name: str(raw.invited_by.name) ?? 'Rider', rodeAt: str(raw.invited_by.rode_at) } : null;
+  const by = isObj(raw.invited_by) ? { name: str(raw.invited_by.name) ?? tc('Rider'), rodeAt: str(raw.invited_by.rode_at) } : null;
   return {
     enabled: raw.enabled === true,
     code: str(raw.code),
@@ -131,7 +132,7 @@ export function parseLinkResult(raw: unknown): LinkResult | null {
 
 /** A line for the friend who opened an invite link, or null when there is nothing to say. */
 export function linkResultLine(r: LinkResult | null, inviter: string): string | null {
-  if (r === 'linked') return `${inviter} invited you. Finish your first ride and you both get 50% off Pro Annual.`;
+  if (r === 'linked') return tc('{inviter} invited you. Finish your first ride and you both get 50% off Pro Annual.', { inviter });
   return null;
 }
 
@@ -178,20 +179,20 @@ export function rewardAction(reward: ReferralReward | null, store: Store | null,
   | null {
   const s = rewardState(reward, now);
   if (s.state === 'none' || s.state === 'expired' || s.state === 'used') return null;
-  if (!store) return { kind: 'in_app', message: 'Claim your discount in the OnMyLead app on your iPhone, iPad or Android device.' };
+  if (!store) return { kind: 'in_app', message: tc('Claim your discount in the OnMyLead app on your iPhone, iPad or Android device.') };
   if (s.state === 'apple_code' && store === 'google') {
-    return { kind: 'other_store', message: 'You claimed this discount as an Apple offer code. Redeem it on your iPhone or iPad.' };
+    return { kind: 'other_store', message: tc('You claimed this discount as an Apple offer code. Redeem it on your iPhone or iPad.') };
   }
   if ((s.state === 'google_offer' || s.state === 'google_defer_pending') && store === 'apple') {
-    return { kind: 'other_store', message: 'You claimed this discount on Google Play. Use it on your Android phone or tablet.' };
+    return { kind: 'other_store', message: tc('You claimed this discount on Google Play. Use it on your Android phone or tablet.') };
   }
-  if (s.state === 'apple_code') return { kind: 'claim', title: 'Redeem Your Code' };
-  if (s.state === 'google_offer') return { kind: 'claim', title: 'Get 50% Off in Google Play' };
-  if (s.state === 'google_defer_pending') return { kind: 'claim', title: 'Apply Your Reward' };
-  return { kind: 'claim', title: 'Claim 50% Off' };
+  if (s.state === 'apple_code') return { kind: 'claim', title: tc('Redeem Your Code') };
+  if (s.state === 'google_offer') return { kind: 'claim', title: tc('Get 50% Off in Google Play') };
+  if (s.state === 'google_defer_pending') return { kind: 'claim', title: tc('Apply Your Reward') };
+  return { kind: 'claim', title: tc('Claim 50% Off') };
 }
 
-const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const fmt = (iso: string) => new Date(iso).toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric', year: 'numeric' });
 
 /** The lines on the reward card. */
 export function rewardLines(reward: ReferralReward, now: number = Date.now()): { title: string; body: string; note: string | null } {
@@ -200,17 +201,17 @@ export function rewardLines(reward: ReferralReward, now: number = Date.now()): {
   const price = `Your first year of Pro Annual is half price, then it renews at $${REFERRAL_PRICE.annual} a year.`;
   switch (s.state) {
     case 'expired':
-      return { title: 'Your 50% Off Has Expired', body: `${thanks} The discount could be claimed until ${fmt(reward.expiresAt)}.`, note: null };
+      return { title: tc('Your 50% Off Has Expired'), body: tc('{thanks} The discount could be claimed until {v}.', { thanks, v: fmt(reward.expiresAt) }), note: null };
     case 'used':
       return reward.claimKind === 'google_defer'
-        ? { title: 'Reward Applied', body: 'Your next Google Play bill was pushed back 6 months. Thanks for spreading the word.', note: null }
-        : { title: 'Reward Used', body: 'You’re on Pro Annual at half price for your first year. Thanks for spreading the word.', note: null };
+        ? { title: tc('Reward Applied'), body: tc('Your next Google Play bill was pushed back 6 months. Thanks for spreading the word.'), note: null }
+        : { title: tc('Reward Used'), body: tc('You’re on Pro Annual at half price for your first year. Thanks for spreading the word.'), note: null };
     case 'apple_code':
-      return { title: 'Your 50% Off Code', body: `${thanks} ${price}`, note: `Code ${s.code}. Redeem it in the App Store before it expires.` };
+      return { title: tc('Your 50% Off Code'), body: `${thanks} ${price}`, note: tc('Code {code}. Redeem it in the App Store before it expires.', { code: s.code }) };
     case 'google_defer_pending':
-      return { title: 'You Earned 6 Months', body: `${thanks} You already pay for Pro on Google Play, so your next bill moves back 6 months instead.`, note: null };
+      return { title: tc('You Earned 6 Months'), body: tc('{thanks} You already pay for Pro on Google Play, so your next bill moves back 6 months instead.', { thanks }), note: null };
     default:
-      return { title: 'You Earned 50% Off Pro Annual', body: `${thanks} ${price}`, note: `Claim by ${fmt(reward.expiresAt)}.` };
+      return { title: tc('You Earned 50% Off Pro Annual'), body: `${thanks} ${price}`, note: tc('Claim by {v}.', { v: fmt(reward.expiresAt) }) };
   }
 }
 
@@ -218,30 +219,30 @@ export function rewardLines(reward: ReferralReward, now: number = Date.now()): {
 export function claimErrorLine(r: Extract<ClaimResult, { kind: 'error' }>): string {
   switch (r.error) {
     case 'no_codes':
-      return 'We’re out of discount codes for a moment. Try again tomorrow; your reward is saved.';
+      return tc('We’re out of discount codes for a moment. Try again tomorrow; your reward is saved.');
     case 'expired':
-      return 'This discount has expired.';
+      return tc('This discount has expired.');
     case 'used':
-      return 'You’ve already used this discount.';
+      return tc('You’ve already used this discount.');
     case 'claimed_on_other_store':
-      return r.store === 'apple' ? 'You claimed this discount as an Apple offer code. Redeem it on your iPhone or iPad.' : 'You claimed this discount on Google Play.';
+      return r.store === 'apple' ? tc('You claimed this discount as an Apple offer code. Redeem it on your iPhone or iPad.') : tc('You claimed this discount on Google Play.');
     case 'no_reward':
-      return 'There’s no discount to claim yet. It unlocks when an invited friend finishes their first ride.';
+      return tc('There’s no discount to claim yet. It unlocks when an invited friend finishes their first ride.');
     default:
-      return 'Something went wrong. Try again.';
+      return tc('Something went wrong. Try again.');
   }
 }
 
 /** An invite's progress, in words. */
 export function inviteStatus(i: ReferralInvite): string {
-  return i.rodeAt ? 'First Ride Done' : 'Joined, No Ride Yet';
+  return i.rodeAt ? tc('First Ride Done') : tc('Joined, No Ride Yet');
 }
 
 /** The headline count on Invite Friends. */
 export function inviteSummary(r: MyReferrals): string {
-  if (!r.invited) return 'No friends have joined with your link yet.';
+  if (!r.invited) return tc('No friends have joined with your link yet.');
   const joined = `${r.invited} ${r.invited === 1 ? 'friend' : 'friends'} joined`;
-  return r.rode ? `${joined}, ${r.rode} finished a first ride.` : `${joined}.`;
+  return r.rode ? tc('{joined}, {rode} finished a first ride.', { joined, rode: r.rode }) : `${joined}.`;
 }
 
 /** Google Play offer ids the regular Subscribe button must never pick on its own. */

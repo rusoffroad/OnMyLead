@@ -1,3 +1,5 @@
+import { coreLocale, tc } from './i18n';
+
 /**
  * Group Chat: a group text inside each riding group (migration 20261019400000_group_chat.sql).
  *
@@ -62,12 +64,12 @@ export function groupChatNotSwitchedOn(message: string | null | undefined, code?
 /** Turn a database error into something a rider can act on. */
 export function friendlyGroupChatError(message: string): string {
   if (groupChatNotSwitchedOn(message)) return NOT_SWITCHED_ON;
-  if (/only the sender or the group/i.test(message)) return 'Only the person who sent it, or whoever runs the group, can clear it.';
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return 'No signal. Check your connection and tap Retry.';
-  if (/slow down/i.test(message)) return 'You’re sending a lot. Wait a minute and try again.';
-  if (/row-level security|violates row-level/i.test(message)) return 'Only riders in this group can post here, about rides they’re on.';
-  if (/too long/i.test(message)) return 'Keep it under 500 characters.';
-  if (/group not found/i.test(message)) return 'You’re no longer in this group.';
+  if (/only the sender or the group/i.test(message)) return tc('Only the person who sent it, or whoever runs the group, can clear it.');
+  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and tap Retry.');
+  if (/slow down/i.test(message)) return tc('You’re sending a lot. Wait a minute and try again.');
+  if (/row-level security|violates row-level/i.test(message)) return tc('Only riders in this group can post here, about rides they’re on.');
+  if (/too long/i.test(message)) return tc('Keep it under 500 characters.');
+  if (/group not found/i.test(message)) return tc('You’re no longer in this group.');
   return message;
 }
 
@@ -110,11 +112,11 @@ const startOfDay = (t: number) => {
 export function dayLabel(iso: string, now = Date.now()): string {
   const t = Date.parse(iso);
   const days = Math.round((startOfDay(now) - startOfDay(t)) / 86_400_000);
-  if (days === 0) return 'Today';
-  if (days === 1) return 'Yesterday';
+  if (days === 0) return tc('Today');
+  if (days === 1) return tc('Yesterday');
   const d = new Date(t);
   const sameYear = d.getFullYear() === new Date(now).getFullYear();
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) });
+  return d.toLocaleDateString(coreLocale(), { weekday: 'short', month: 'short', day: 'numeric', ...(sameYear ? {} : { year: 'numeric' }) });
 }
 
 /** How a message sits in the conversation: a new day above it, and whether it starts a run. */
@@ -155,11 +157,11 @@ export function ridePhase(r: Pick<ChatRide, 'status'>): RidePhase {
 
 /** The small line on a ride ticket: "Riding Now", "Sat, Oct 17, 8:00 AM", "Ride Over" or "Cancelled". */
 export function rideWhen(r: Pick<ChatRide, 'status' | 'meet_at'>, now = Date.now()): string {
-  if (r.status === 'live') return 'Riding Now';
-  if (r.status === 'cancelled') return 'Cancelled';
-  if (r.status !== 'scheduled') return 'Ride Over';
+  if (r.status === 'live') return tc('Riding Now');
+  if (r.status === 'cancelled') return tc('Cancelled');
+  if (r.status !== 'scheduled') return tc('Ride Over');
   const day = dayLabel(r.meet_at, now);
-  const time = new Date(r.meet_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  const time = new Date(r.meet_at).toLocaleTimeString(coreLocale(), { hour: 'numeric', minute: '2-digit' });
   return `${day === 'Today' ? 'Today' : day === 'Yesterday' ? 'Yesterday' : day}, ${time}`;
 }
 
@@ -201,7 +203,7 @@ export function ridesTalkedAbout(messages: GroupMessage[], rides: ChatRide[]): C
 /** "3 new", "99+ new", or nothing. */
 export function unreadLabel(n: number): string | null {
   if (n <= 0) return null;
-  return n > 99 ? '99+ New' : `${n} New`;
+  return n > 99 ? tc('99+ New') : `${n} New`;
 }
 
 /**

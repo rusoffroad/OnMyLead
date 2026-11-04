@@ -22,6 +22,7 @@ import { confirmAsync } from '@/lib/confirm';
 import { addMapWaypoint, removeMapWaypoint, updateMapWaypoint } from '@/lib/map-waypoints';
 import { addWaypoint, removeWaypoint, reorderPlannedStops, updateWaypoint } from '@/lib/waypoints';
 
+import { t as tr } from '@/lib/i18n';
 /** Who a waypoint is for: a stop the whole ride makes, everyone's map, or just this rider. */
 type Audience = 'stop' | 'everyone' | 'me';
 const audienceOf = (w: Waypoint): Audience => (w.planned_stop ? 'stop' : w.shared ? 'everyone' : 'me');
@@ -104,7 +105,7 @@ export function WaypointSheet({
     if (problem) return setError(problem);
     const planned = canShare && audience === 'stop';
     const time = planned ? parseStopTime(stopTime) : '';
-    if (time == null) return setError('That time looks off. Try "12:30 pm".');
+    if (time == null) return setError(tr('That time looks off. Try "12:30 pm".'));
     setBusy('save');
     setError(null);
     try {
@@ -122,7 +123,7 @@ export function WaypointSheet({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save the waypoint. Try again.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t save the waypoint. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -139,15 +140,15 @@ export function WaypointSheet({
       await reorderPlannedStops(rideId, ids);
       onChanged({ stopOrder: ids });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t move the stop. Try again.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t move the stop. Try again.'));
     } finally {
       setBusy(null);
     }
   }
 
   async function remove(w: Waypoint) {
-    const others = w.shared ? ' Everyone on the ride stops seeing it.' : '';
-    if (!(await confirmAsync(`Remove ${w.name}?`, `This takes it off the map.${others}`, 'Remove', 'Keep'))) return;
+    const others = w.shared ? tr(' Everyone on the ride stops seeing it.') : '';
+    if (!(await confirmAsync(tr('Remove {name}?', { name: w.name }), tr('This takes it off the map.{others}', { others }), tr('Remove'), tr('Keep')))) return;
     setBusy('remove');
     setError(null);
     try {
@@ -155,7 +156,7 @@ export function WaypointSheet({
       onChanged({ removedId: w.id });
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t remove the waypoint. Try again.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t remove the waypoint. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -169,14 +170,14 @@ export function WaypointSheet({
   const stopCount = plannedStops(existing).length;
   // Someone else's planned stop stays a planned stop: the leader can change it, not take it away.
   const lockedStop = !!viewing?.planned_stop && viewing.user_id !== me;
-  const noun = stopForm ? 'Planned Stop' : 'Waypoint';
+  const noun = stopForm ? tr('Planned Stop') : tr('Waypoint');
   // Map Mode waypoints are always the rider's own, signed in or not.
   const mayEdit = !!viewing && (!rideId || canEditWaypoint(viewing, me, canShare));
   const mayRemove = !!viewing && (!rideId || canRemoveWaypoint(viewing, me, canShare));
   return (
     <Modal visible={!!target} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
-      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close" accessibilityRole="button" />
+      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
       {target ? (
         <KeyboardLift>
           <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
@@ -187,12 +188,12 @@ export function WaypointSheet({
                   <View style={styles.head}>
                     {stopForm ? <StopSign n={formStopN} size={42} symbol={symbol} /> : <WaypointBlaze symbol={symbol} shared={canShare && audience !== 'me'} size={40} />}
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.title} accessibilityRole="header">{viewing ? `Edit ${noun}` : `New ${noun}`}</Text>
+                      <Text style={styles.title} accessibilityRole="header">{viewing ? tr('Edit {noun}', { noun }) : tr('New {noun}', { noun })}</Text>
                       {at ? <Text style={styles.coords}>{at.lat.toFixed(5)}, {at.lng.toFixed(5)}</Text> : null}
                     </View>
                   </View>
 
-                  <View style={styles.symbols} accessibilityRole="radiogroup" accessibilityLabel="Symbol">
+                  <View style={styles.symbols} accessibilityRole="radiogroup" accessibilityLabel={tr('Symbol')}>
                     {WAYPOINT_SYMBOLS.map((k) => {
                       const on = k.symbol === symbol;
                       return (
@@ -200,79 +201,79 @@ export function WaypointSheet({
                           key={k.symbol}
                           accessibilityRole="radio"
                           accessibilityState={{ selected: on }}
-                          accessibilityLabel={k.label}
+                          accessibilityLabel={tr(k.label)}
                           onPress={() => pickSymbol(k.symbol)}
                           style={({ pressed }) => [styles.symbol, on && styles.symbolOn, pressed && !on && { opacity: 0.7 }]}>
                           <WaypointGlyph symbol={k.symbol} size={22} color={on ? Colors.background : Colors.text} />
-                          <Text style={[styles.symbolText, on && { color: Colors.background }]} numberOfLines={2}>{k.label}</Text>
+                          <Text style={[styles.symbolText, on && { color: Colors.background }]} numberOfLines={2}>{tr(k.label)}</Text>
                         </Pressable>
                       );
                     })}
                   </View>
 
                   <Field
-                    label="Name"
+                    label={tr('Name')}
                     value={name}
                     onChangeText={(t) => {
                       setName(t);
                       setNameTouched(true);
                     }}
                     maxLength={WAYPOINT_NAME_MAX}
-                    placeholder="Lunch at the Overlook"
+                    placeholder={tr('Lunch at the Overlook')}
                     returnKeyType="done"
                   />
                   {stopForm ? (
-                    <TimePicker label="Planned Time (Optional)" value={stopTime} onChange={setStopTime} optional suggest={12 * 60} />
+                    <TimePicker label={tr('Planned Time (Optional)')} value={stopTime} onChange={setStopTime} optional suggest={12 * 60} />
                   ) : null}
                   <Field
-                    label="Note (Optional)"
+                    label={tr('Note (Optional)')}
                     value={note}
                     onChangeText={setNote}
                     maxLength={WAYPOINT_NOTE_MAX}
-                    placeholder={stopForm ? '30 minutes, fill up and grab lunch' : 'Deep ruts on the left side'}
+                    placeholder={stopForm ? tr('30 minutes, fill up and grab lunch') : tr('Deep ruts on the left side')}
                   />
 
                   {canShare && !lockedStop ? (
                     <View style={{ gap: 6 }} accessibilityRole="radiogroup">
-                      <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>What It Is</ThemedText>
+                      <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('What It Is')}</ThemedText>
                       <AudienceChoice
                         on={audience === 'stop'}
-                        title="Planned Stop"
-                        body={stopsOn ? 'The whole ride stops here. Numbered on every rider’s map.' : PLANNED_STOPS_NOT_SWITCHED_ON}
+                        title={tr('Planned Stop')}
+                        body={stopsOn ? tr('The whole ride stops here. Numbered on every rider’s map.') : PLANNED_STOPS_NOT_SWITCHED_ON}
                         onPress={() => setAudience('stop')}
                         tone="stop"
                         disabled={!stopsOn}
                       />
                       <AudienceChoice
                         on={audience === 'everyone'}
-                        title="Everyone on the Ride"
-                        body="Shows on every rider’s map."
+                        title={tr('Everyone on the Ride')}
+                        body={tr('Shows on every rider’s map.')}
                         onPress={() => setAudience('everyone')}
                         tone="shared"
                       />
-                      <AudienceChoice on={audience === 'me'} title="Just Me" body="Only you see it." onPress={() => setAudience('me')} />
+                      <AudienceChoice on={audience === 'me'} title={tr('Just Me')} body={tr('Only you see it.')} onPress={() => setAudience('me')} />
                     </View>
                   ) : lockedStop ? (
                     <View style={styles.privateNote}>
                       <Icon name="person" size={18} color={Colors.textSecondary} />
-                      <Text style={styles.privateText}>A planned stop shows on every rider’s map.</Text>
+                      <Text style={styles.privateText}>{tr('A planned stop shows on every rider’s map.')}</Text>
                     </View>
                   ) : (
                     <View style={styles.privateNote}>
                       <Icon name="lock" size={18} color={Colors.textSecondary} />
                       <Text style={styles.privateText}>
                         {rideId
-                          ? 'Only you see your waypoints. The ride’s leader can share waypoints with the group.'
-                          : 'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.'}
+                          ? tr('Only you see your waypoints. The ride’s leader can share waypoints with the group.')
+                          : tr('Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.')}
                       </Text>
                     </View>
                   )}
 
                   <ErrorText error={error} />
-                  <Button title={`Save ${noun}`} big loading={busy === 'save'} onPress={save} />
-                  <Button title="Cancel" kind="ghost" onPress={() => (viewing ? setEditing(false) : onClose())} />
+                  <Button title={tr('Save {noun}', { noun })} big loading={busy === 'save'} onPress={save} />
+                  <Button title={tr('Cancel')} kind="ghost" onPress={() => (viewing ? setEditing(false) : onClose())} />
                   {!viewing && Platform.OS !== 'web' ? (
-                    <Text style={styles.tip}>Tip: press and hold anywhere on the map to drop a waypoint there.</Text>
+                    <Text style={styles.tip}>{tr('Tip: press and hold anywhere on the map to drop a waypoint there.')}</Text>
                   ) : null}
                 </>
               ) : viewing ? (
@@ -283,7 +284,7 @@ export function WaypointSheet({
                       <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>{viewing.name}</Text>
                       {viewing.planned_stop ? (
                         <Text style={[styles.meta, { color: Colors.text }]}>
-                          {[`Planned Stop ${viewN ?? ''}`.trim(), stopTimeLabel(viewing.stop_time), symbolLabel(waypointSymbol(viewing))].filter(Boolean).join(', ')}
+                          {[tr('Planned Stop {v}', { v: viewN ?? '' }).trim(), stopTimeLabel(viewing.stop_time), symbolLabel(waypointSymbol(viewing))].filter(Boolean).join(', ')}
                         </Text>
                       ) : (
                         <Text style={[styles.meta, viewing.shared && { color: Colors.sky }]}>
@@ -293,23 +294,23 @@ export function WaypointSheet({
                     </View>
                   </View>
                   {viewing.planned_stop ? (
-                    <Text style={styles.privateText}>Every rider on the ride sees this stop. Added by {viewing.user_id === me ? 'you' : ownerName(viewing.user_id)}.</Text>
+                    <Text style={styles.privateText}>{tr('Every rider on the ride sees this stop. Added by {v}.', { v: viewing.user_id === me ? tr('you') : ownerName(viewing.user_id) })}</Text>
                   ) : null}
-                  {viewing.note ? <ThemedText>{viewing.note}</ThemedText> : null}
+                  {viewing.note ? <ThemedText>{tr(viewing.note)}</ThemedText> : null}
                   <Text style={styles.coords}>{viewing.lat.toFixed(5)}, {viewing.lng.toFixed(5)}</Text>
                   <ErrorText error={error} />
-                  <Button title="Navigate" big onPress={() => onNavigate(viewing.lat, viewing.lng, viewing.name)} />
+                  <Button title={tr('Navigate')} big onPress={() => onNavigate(viewing.lat, viewing.lng, viewing.name)} />
                   {viewing.planned_stop && canShare && stopCount > 1 && viewN ? (
                     <View style={{ flexDirection: 'row', gap: Spacing.two }}>
                       <Button
-                        title="Move Earlier"
+                        title={tr('Move Earlier')}
                         kind="secondary"
                         style={{ flex: 1 }}
                         disabled={viewN <= 1 || busy === 'move'}
                         onPress={() => move(viewing, -1)}
                       />
                       <Button
-                        title="Move Later"
+                        title={tr('Move Later')}
                         kind="secondary"
                         style={{ flex: 1 }}
                         disabled={viewN >= stopCount || busy === 'move'}
@@ -319,13 +320,13 @@ export function WaypointSheet({
                   ) : null}
                   {mayEdit || mayRemove ? (
                     <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-                      {mayEdit ? <Button title="Edit" kind="secondary" style={{ flex: 1 }} onPress={() => startEdit(viewing)} /> : null}
+                      {mayEdit ? <Button title={tr('Edit')} kind="secondary" style={{ flex: 1 }} onPress={() => startEdit(viewing)} /> : null}
                       {mayRemove ? (
-                        <Button title="Remove" kind="ghost" style={{ flex: 1 }} loading={busy === 'remove'} onPress={() => remove(viewing)} />
+                        <Button title={tr('Remove')} kind="ghost" style={{ flex: 1 }} loading={busy === 'remove'} onPress={() => remove(viewing)} />
                       ) : null}
                     </View>
                   ) : null}
-                  <Button title="Close" kind="ghost" onPress={onClose} />
+                  <Button title={tr('Close')} kind="ghost" onPress={onClose} />
                 </>
               ) : null}
             </SheetScroll>

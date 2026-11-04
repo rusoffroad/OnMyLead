@@ -93,7 +93,7 @@ export default function SocialItemScreen() {
   };
 
   const remove = async (c: Comment) => {
-    const ok = await confirmAsync('Delete This Comment?', c.mine ? 'It comes off for everyone.' : `${c.authorName}’s comment comes off your post for everyone.`, 'Delete');
+    const ok = await confirmAsync(t('Delete This Comment?'), c.mine ? t('It comes off for everyone.') : t('{authorName}’s comment comes off your post for everyone.', { authorName: c.authorName }), t('Delete'));
     if (!ok) return;
     try {
       await deleteComment(c.id);
@@ -114,12 +114,12 @@ export default function SocialItemScreen() {
       <Stack.Screen options={{ headerShown: false, title: t('Post') }} />
       <View style={[styles.column, layout.wide && { maxWidth: 720 }]}>
         <View style={styles.header}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Back" hitSlop={12} onPress={back} style={styles.back}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('Back')} hitSlop={12} onPress={back} style={styles.back}>
             <Icon name="back" color={Colors.text} size={26} />
           </Pressable>
-          <Text style={styles.headTitle} accessibilityRole="header">{item?.kind === 'post' ? 'Post' : 'Activity'}</Text>
+          <Text style={styles.headTitle} accessibilityRole="header">{item?.kind === 'post' ? t('Post') : t('Activity')}</Text>
           <Pressable accessibilityRole="link" onPress={() => router.push('/social')} hitSlop={8}>
-            <Text style={styles.headLink}>Social</Text>
+            <Text style={styles.headLink}>{t('Social')}</Text>
           </Pressable>
         </View>
 
@@ -139,7 +139,7 @@ export default function SocialItemScreen() {
                   </Text>
                 ) : null}
                 <Text style={styles.section} accessibilityRole="header">
-                  {comments.length ? `${comments.length} ${comments.length === 1 ? 'Comment' : 'Comments'}` : 'Comments'}
+                  {comments.length ? `${comments.length} ${comments.length === 1 ? t('Comment') : t('Comments')}` : t('Comments')}
                 </Text>
                 {comments.length ? (
                   <View style={{ gap: 14 }}>
@@ -149,20 +149,20 @@ export default function SocialItemScreen() {
                         <View style={styles.bubble}>
                           <View style={styles.commentHead}>
                             <Pressable onPress={() => router.push(profileHref(c.authorId) as never)} accessibilityRole="link" style={{ flexShrink: 1 }}>
-                              <Text style={styles.commentName} numberOfLines={1}>{c.mine ? 'You' : c.authorName}</Text>
+                              <Text style={styles.commentName} numberOfLines={1}>{c.mine ? t('You') : c.authorName}</Text>
                             </Pressable>
                             <Text style={styles.commentWhen}>{timeAgo(c.at)}</Text>
                           </View>
-                          <Text style={styles.commentBody} selectable>{c.body}</Text>
+                          <Text style={styles.commentBody} selectable>{t(c.body)}</Text>
                           <View style={styles.commentActions}>
                             {c.canDelete ? (
-                              <Pressable onPress={() => remove(c)} hitSlop={8} accessibilityRole="button" accessibilityLabel="Delete comment">
-                                <Text style={styles.commentAction}>Delete</Text>
+                              <Pressable onPress={() => remove(c)} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Delete comment')}>
+                                <Text style={styles.commentAction}>{t('Delete')}</Text>
                               </Pressable>
                             ) : null}
                             {!c.mine ? (
-                              <Pressable onPress={() => setReporting(c)} hitSlop={8} accessibilityRole="button" accessibilityLabel={`Report ${c.authorName}’s comment`}>
-                                <Text style={styles.commentAction}>Report</Text>
+                              <Pressable onPress={() => setReporting(c)} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Report {authorName}’s comment', { authorName: c.authorName })}>
+                                <Text style={styles.commentAction}>{t('Report')}</Text>
                               </Pressable>
                             ) : null}
                           </View>
@@ -171,7 +171,7 @@ export default function SocialItemScreen() {
                     ))}
                   </View>
                 ) : (
-                  <Text style={styles.muted}>{pro ? 'No comments yet. Say something.' : 'No comments yet.'}</Text>
+                  <Text style={styles.muted}>{pro ? t('No comments yet. Say something.') : t('No comments yet.')}</Text>
                 )}
               </>
             ) : null}
@@ -186,17 +186,17 @@ export default function SocialItemScreen() {
                     ref={input}
                     value={draft}
                     onChangeText={setDraft}
-                    placeholder={`Comment on ${item.mine ? 'your' : `${item.actorName}’s`} ${item.kind === 'post' ? 'post' : item.kind}`}
+                    placeholder={t('Comment on {v} {v2}', { v: item.mine ? 'your' : `${item.actorName}’s`, v2: item.kind === 'post' ? 'post' : item.kind })}
                     placeholderTextColor={Colors.textSecondary}
                     maxLength={COMMENT_MAX}
                     multiline
-                    accessibilityLabel="Comment"
+                    accessibilityLabel={t('Comment')}
                     style={styles.input}
                     onSubmitEditing={Platform.OS === 'web' ? send : undefined}
                   />
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="Post comment"
+                    accessibilityLabel={t('Post comment')}
                     disabled={!draft.trim() || sending}
                     onPress={send}
                     style={({ pressed }) => [styles.send, (!draft.trim() || sending) && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>
@@ -205,12 +205,12 @@ export default function SocialItemScreen() {
                     </View>
                   </Pressable>
                 </View>
-                {draft.length > COMMENT_MAX - 60 ? <Text style={styles.count}>{COMMENT_MAX - draft.length} left</Text> : null}
+                {draft.length > COMMENT_MAX - 60 ? <Text style={styles.count}>{t('{v} left', { v: COMMENT_MAX - draft.length })}</Text> : null}
               </View>
             ) : (
               <Pressable onPress={() => requirePro('social_posts')} accessibilityRole="button" style={styles.locked}>
                 <ProTag />
-                <Text style={styles.lockedText}>Commenting is part of OnMyLead Pro. Reading and liking stay free.</Text>
+                <Text style={styles.lockedText}>{t('Commenting is part of OnMyLead Pro. Reading and liking stay free.')}</Text>
                 <Icon name="chevron" size={18} color={Social.gold} />
               </Pressable>
             )

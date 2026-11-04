@@ -9,6 +9,7 @@ import { useTrailMap } from '@/hooks/use-trail-map';
 import { ll, satelliteMap } from '@/lib/web-map';
 import { MeetPointMapboxMap } from './meet-point-mapbox-map';
 
+import { t } from '@/lib/i18n';
 const pinHtml = () => `<div class="oml-meet"><svg width="34" height="44" viewBox="0 0 34 44"><path d="M17 42C17 42 3 26.5 3 16.5a14 14 0 0 1 28 0C31 26.5 17 42 17 42Z" fill="${Colors.accent}" stroke="${Colors.background}" stroke-width="3"/><circle cx="17" cy="16.5" r="5.5" fill="#FFFFFF"/></svg></div>`;
 
 /** The meeting-point picker: Mapbox when this build and the owner allow it, otherwise the Leaflet map below. */
@@ -63,7 +64,7 @@ function FlatMeetPointMap({ value, onPick }: { value: LatLng | null; onPick: (p:
     if (!pin.current) {
       pin.current = L.marker(ll(value), {
         draggable: true,
-        title: 'Meeting point, drag to move',
+        title: t('Meeting point, drag to move'),
         icon: L.divIcon({ className: '', iconSize: [34, 44], iconAnchor: [17, 42], html: pinHtml() }),
       }).addTo(m);
       pin.current.on('dragend', () => {
@@ -85,7 +86,7 @@ function FlatMeetPointMap({ value, onPick }: { value: LatLng | null; onPick: (p:
         <div ref={el} className="omlmap" style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
       </View>
       <ThemedText type="small" themeColor="textSecondary">
-        {value ? 'Drag the pin to fine-tune the spot.' : 'Click the map to drop the meeting point, or search above.'}
+        {value ? t('Drag the pin to fine-tune the spot.') : t('Click the map to drop the meeting point, or search above.')}
       </ThemedText>
     </View>
   );

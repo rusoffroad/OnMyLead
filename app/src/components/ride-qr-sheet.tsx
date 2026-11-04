@@ -11,6 +11,7 @@ import { QrCode } from './ride-qr';
 import { SheetRoot, SheetScroll, SwipeSheet } from './swipe-sheet';
 import { Button } from './ui';
 
+import { t } from '@/lib/i18n';
 /**
  * The ride's QR code, full screen, for a rider to scan off your phone at the trailhead. The card
  * in the middle (logo, ride name, code) is also the picture "Share QR Code" sends. Swipe it down,
@@ -27,7 +28,7 @@ export function RideQrSheet({
     setBusy(true);
     track('invite_shared', { platform: Platform.OS, how: 'qr' });
     try {
-      await shareQrCode(card, message, `Join "${rideName}" on OnMyLead`);
+      await shareQrCode(card, message, t('Join "{rideName}" on OnMyLead', { rideName }));
     } catch {
       // The share sheet was closed or isn't available; nothing to tell the rider.
     } finally {
@@ -47,17 +48,17 @@ export function RideQrSheet({
           <Logo height={56} />
           <Text style={styles.name} numberOfLines={3}>{rideName}</Text>
           <QrCode value={link} size={264} style={{ alignSelf: 'center' }} />
-          <Text style={styles.scan}>Scan with Your Phone Camera to Join</Text>
+          <Text style={styles.scan}>{t('Scan with Your Phone Camera to Join')}</Text>
           <View style={styles.codeRow}>
-            <Text style={styles.codeLabel}>Or Enter Code</Text>
+            <Text style={styles.codeLabel}>{t('Or Enter Code')}</Text>
             <Text selectable numberOfLines={1} style={[styles.code, codeTextSize(inviteCode, 32)]}>{inviteCode}</Text>
           </View>
         </View>
         <Text style={styles.help}>
-          Riders with OnMyLead go straight to this ride. Everyone else lands on its page with a link to get the app.
+          {t('Riders with OnMyLead go straight to this ride. Everyone else lands on its page with a link to get the app.')}
         </Text>
-        <Button title="Share QR Code" big loading={busy} onPress={share} accessibilityHint="Sends this QR code and the ride link by text, email or any app" />
-        <Button title="Done" kind="secondary" onPress={onClose} />
+        <Button title={t('Share QR Code')} big loading={busy} onPress={share} accessibilityHint={t('Sends this QR code and the ride link by text, email or any app')} />
+        <Button title={t('Done')} kind="secondary" onPress={onClose} />
       </SheetScroll>
       </SwipeSheet>
       </SheetRoot>

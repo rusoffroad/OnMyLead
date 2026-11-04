@@ -7,6 +7,7 @@ import type { MapRider } from './group-map-types';
 import { MarkerBody } from './marker-body';
 import { RIDER_DOT, RiderDot } from './rider-dot';
 import { BreakdownBadge } from './rider-status-badge';
+import { t } from '@/lib/i18n';
 
 /** Wide enough for a 24-character name or "No Signal, 25 Min Ago"; the dot sits dead centre so the anchor stays on it. */
 const PIN_W = 300;
@@ -53,7 +54,7 @@ export function RiderPin({ rider: r, mapHeading }: { rider: MapRider; /** How fa
         </Text>
         {f && !live ? (
           <Text style={[styles.age, f.state === 'lost' && styles.lostAge]} numberOfLines={1}>
-            {f.state === 'lost' ? f.label : `Last Seen ${f.ago}`}
+            {f.state === 'lost' ? f.label : t('Last Seen {ago}', { ago: f.ago })}
           </Text>
         ) : null}
       </View>

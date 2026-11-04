@@ -8,6 +8,7 @@ import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle } from './mapbox-map';
 
+import { t } from '@/lib/i18n';
 const PENDING_INK = '#F1F4F8';
 const FOUND_INK = '#ECCD91';
 
@@ -82,15 +83,15 @@ export function RouteBuilderMapboxMap({
       }}>
       {ends ? (
         <>
-          <MapboxMarker at={points[0]}><View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: '#3CC36B' }]} /></MapboxMarker>
+          <MapboxMarker at={points[0]}><View accessible accessibilityLabel={t('Start')} style={[styles.end, { backgroundColor: '#3CC36B' }]} /></MapboxMarker>
           <MapboxMarker at={points[points.length - 1]}>
-            <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
+            <View accessible accessibilityLabel={t('Finish')} style={[styles.end, { backgroundColor: Colors.text }]}><View style={styles.finishCore} /></View>
           </MapboxMarker>
         </>
       ) : null}
       {found ? (
         <MapboxMarker at={found} anchor={{ x: 0.5, y: 1 }}>
-          <View accessible accessibilityLabel={`Search result: ${found.name}`} style={styles.found}>
+          <View accessible accessibilityLabel={t('Search result: {name}', { name: found.name })} style={styles.found}>
             <Text style={styles.foundText} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundStem} />
             <View style={styles.foundDot} />
@@ -101,7 +102,7 @@ export function RouteBuilderMapboxMap({
         const last = i === waypoints.length - 1 && i > 0;
         return (
           <MapboxMarker key={`p${i}`} id={`route-point-${i}`} at={w} draggable={editable} onDragEnd={(p) => onMove(i, p, snapRadiusM(mpp.current))}>
-            <View accessible accessibilityLabel={`Point ${i + 1}${editable ? ', drag to move' : ''}`} style={[styles.pin, i === 0 && styles.first, last && styles.last]}>
+            <View accessible accessibilityLabel={editable ? t('Point {v}, drag to move', { v: i + 1 }) : t('Point {v}', { v: i + 1 })} style={[styles.pin, i === 0 && styles.first, last && styles.last]}>
               <Text style={[styles.num, last && { color: Colors.background }]}>{i + 1}</Text>
             </View>
           </MapboxMarker>

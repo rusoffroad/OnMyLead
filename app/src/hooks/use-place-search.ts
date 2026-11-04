@@ -4,6 +4,7 @@ import type { LatLng } from '@/core/geo';
 import { MIN_QUERY, type Place } from '@/core/places';
 import { searchPlaces } from '@/lib/places';
 
+import { tc } from '@/core/i18n';
 const WAIT_MS = 350;
 
 /**
@@ -33,7 +34,7 @@ export function usePlaceSearch(query: string, near: LatLng | null | undefined, a
           setResult({
             q,
             places: null,
-            error: e instanceof Error && e.message.startsWith('Place search') ? e.message : 'No signal for place search. Try again with service.',
+            error: e instanceof Error && e.message.startsWith('Place search') ? e.message : tc('No signal for place search. Try again with service.'),
           });
         });
     }, WAIT_MS);
