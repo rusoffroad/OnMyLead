@@ -49,9 +49,14 @@ Riders farther away than that show where they were last seen, as before. See [Us
 - **Keep Bluetooth on.** If Bluetooth is off in the phone's settings, nothing goes out.
 - **Download the ride's map.** See [Offline Maps](/help/offline-maps).
 
-## Turn It Off
+## Turn It On or Off
 
-Bluetooth Sharing is on by default. To turn it off, open **You** and switch off **Bluetooth Sharing**. Your status taps, messages and location still go over the internet whenever you have service.
+Bluetooth Sharing is on by default. Turn it off or back on in either place:
+
+- **You:** switch **Bluetooth Sharing** off or on.
+- **Ride Mode:** when you have no service, the no-service banner has a **Bluetooth On** button. Tap it to turn Bluetooth Sharing off (it then says **Bluetooth Off**), and tap again to turn it back on. It starts again right away.
+
+With it off, your phone doesn't use Bluetooth for OnMyLead at all. Your status taps, messages and location still go over the internet whenever you have service.
 
 ## Privacy
 

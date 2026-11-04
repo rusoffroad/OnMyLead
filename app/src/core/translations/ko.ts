@@ -2177,6 +2177,10 @@ const dict: Record<string, string> = {
   "Badge leaderboard": "배지 리더보드",
   "Where You Ride": "라이딩 지역",
   "Bluetooth Sharing": "블루투스 공유",
+  "Bluetooth Sharing Is Off.": "블루투스 공유가 꺼져 있습니다.",
+  "Bluetooth Off": "블루투스 끄기",
+  "Bluetooth On": "블루투스 켜기",
+  "Passes spots, taps and messages to nearby riders on this ride when there is no service": "신호가 없을 때 이 라이드의 근처 라이더에게 위치, 상태, 메시지를 전달합니다",
   "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "신호가 없을 때 라이드 모드가 같은 라이드의 근처 라이더에게 위치와 알림을 전달합니다",
   "Off. Turn it on to keep sharing with nearby riders when there is no service": "꺼짐. 켜면 신호가 없을 때도 근처 라이더와 계속 공유합니다",
   // 2.1: leaderboard, Bluetooth sharing, 3D Terrain and tilt calibration.

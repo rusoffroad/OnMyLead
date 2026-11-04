@@ -81,7 +81,9 @@ import { showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { useFlag } from '@/lib/app-settings';
-import { nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbySharing, startNearby, stopNearby, useNearby } from '@/lib/nearby';
+import {
+  nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
+} from '@/lib/nearby';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
@@ -486,13 +488,17 @@ export default function RideMode() {
   // between nearby riders on this ride. Runs for joined riders while Ride Mode is open; a rider's
   // own spot goes out only while they are sharing with the ride.
   const bluetoothFlag = useFlag('bluetooth_sharing');
+  // The rider's own switch (You > Bluetooth Sharing, or the no-service banner here). On by default;
+  // turning it back on in Ride Mode starts Bluetooth again at once.
+  const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  const bluetoothOffered = nearbyAvailable && bluetoothFlag;
   const nearby = useNearby();
   const iAmJoined = !!me && joined.some((m) => m.user_id === me);
   useEffect(() => {
-    if (!me || !iAmJoined || rideOver || !bluetoothFlag) return;
+    if (!me || !iAmJoined || rideOver || !bluetoothFlag || !bluetoothMine) return;
     void startNearby(id, me);
     return () => stopNearby();
-  }, [id, me, iAmJoined, rideOver, bluetoothFlag]);
+  }, [id, me, iAmJoined, rideOver, bluetoothFlag, bluetoothMine]);
   useEffect(() => {
     setNearbySharing(id, !!activeShare);
   }, [id, activeShare, nearby.state]);
@@ -1155,7 +1161,22 @@ export default function RideMode() {
                   : activeShare
                     ? t('No Service. Riders Show Where They Were Last Seen, and Yours Sends When Service Returns.')
                     : t('No Service. Riders Show Where They Were Last Seen.')}
+                {bluetoothOffered && !bluetoothMine ? ` ${t('Bluetooth Sharing Is Off.')}` : ''}
               </Text>
+              {bluetoothOffered ? (
+                <Pressable
+                  onPress={() => setBluetoothMine(!bluetoothMine)}
+                  hitSlop={8}
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: bluetoothMine }}
+                  accessibilityLabel={t('Bluetooth Sharing')}
+                  accessibilityHint={t('Passes spots, taps and messages to nearby riders on this ride when there is no service')}
+                  style={[styles.shareAction, styles.btChip, bluetoothMine && styles.btChipOn]}>
+                  <Icon name="bluetooth" size={14} color={bluetoothMine ? Colors.sky : Colors.textSecondary} strokeWidth={2.2} />
+                  {/* Shows what it is now, like a switch; tapping flips it. */}
+                  <Text style={styles.shareActionText}>{bluetoothMine ? t('Bluetooth On') : t('Bluetooth Off')}</Text>
+                </Pressable>
+              ) : null}
             </View>
           ) : null}
           {activeShare && shareOpen ? (
@@ -1692,6 +1713,8 @@ const styles = themedStyles(() => ({
   shareText: { color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 18, textAlign: 'center' },
   shareAction: { minHeight: 32, paddingHorizontal: 12, borderRadius: 12, justifyContent: 'center', backgroundColor: Glass.tile },
   shareActionText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
+  btChip: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: 'transparent' },
+  btChipOn: { borderColor: Colors.sky },
   // Tablets: the top bar, banners and riders become a column on the left, as tall as the screen.
   topTablet: { right: 'auto' },
   sidebar: {

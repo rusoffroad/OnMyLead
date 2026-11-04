@@ -2177,6 +2177,10 @@ const dict: Record<string, string> = {
   "Badge leaderboard": "Classificação de insígnias",
   "Where You Ride": "Onde você pilota",
   "Bluetooth Sharing": "Compartilhar por Bluetooth",
+  "Bluetooth Sharing Is Off.": "O compartilhamento por Bluetooth está desligado.",
+  "Bluetooth Off": "Bluetooth Não",
+  "Bluetooth On": "Bluetooth Sim",
+  "Passes spots, taps and messages to nearby riders on this ride when there is no service": "Passa posições, status e mensagens aos pilotos próximos neste passeio quando não há sinal",
   "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Sem sinal, o Modo Passeio passa localizações e alertas para pilotos próximos do seu passeio",
   "Off. Turn it on to keep sharing with nearby riders when there is no service": "Desligado. Ligue para continuar compartilhando com pilotos próximos quando não houver sinal",
   // 2.1: leaderboard, Bluetooth sharing, 3D Terrain and tilt calibration.

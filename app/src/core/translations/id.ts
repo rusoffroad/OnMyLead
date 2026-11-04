@@ -2177,6 +2177,10 @@ const dict: Record<string, string> = {
   "Badge leaderboard": "Papan peringkat lencana",
   "Where You Ride": "Tempat Kamu Berkendara",
   "Bluetooth Sharing": "Berbagi Bluetooth",
+  "Bluetooth Sharing Is Off.": "Berbagi Bluetooth mati.",
+  "Bluetooth Off": "Bluetooth Mati",
+  "Bluetooth On": "Bluetooth Nyala",
+  "Passes spots, taps and messages to nearby riders on this ride when there is no service": "Meneruskan lokasi, status, dan pesan ke pengendara terdekat di perjalanan ini saat tidak ada sinyal",
   "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Tanpa sinyal, Mode Riding meneruskan lokasi dan peringatan ke rider terdekat di riding kamu",
   "Off. Turn it on to keep sharing with nearby riders when there is no service": "Mati. Nyalakan agar tetap berbagi dengan rider terdekat saat tidak ada sinyal",
   // 2.1: leaderboard, Bluetooth sharing, 3D Terrain and tilt calibration.
