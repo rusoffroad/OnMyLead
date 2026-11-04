@@ -1,12 +1,16 @@
 [
   {
     "version": "2.1",
-    "title": "The Badge Leaderboard",
-    "intro": "See where you rank. The new Leaderboard ranks riders by the badges they earned by riding, everywhere or in your country and state.",
-    "whatsNew": "What's new in 2.1:\n\n• Badge Leaderboard: see where you rank against riders everywhere, in your country or in your state. Pick where you ride from, or turn off Show Me to stay off it.",
+    "title": "Bluetooth Sharing and the Badge Leaderboard",
+    "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders close by on the same ride pass spots, status taps and EMERGENCY alerts to each other over Bluetooth. And the new Leaderboard ranks riders by the badges they earned by riding.",
+    "whatsNew": "What's new in 2.1:\n\n• Bluetooth Sharing: with no service, nearby riders on your ride still see your spot, status taps and EMERGENCY, phone to phone.\n• The first phone to get signal sends what it heard.\n• Badge Leaderboard: see where you rank everywhere, in your country or your state. Turn off Show Me to stay off it.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Bluetooth Sharing: when there's no cell service, Ride Mode passes your spot (while you're sharing with the ride), your status taps, EMERGENCY and quick replies to nearby riders on the same ride over Bluetooth, about 100 to 300 feet between phones, passed along by up to three phones. Their details say Via Bluetooth, and the no-service banner says how many phones are in range. When any phone on the ride gets signal, it sends what it heard so everyone else sees it too. Everything is encrypted for your ride only. Turn it off any time on the You tab."
+      },
       {
         "kind": "new",
         "text": "Badge Leaderboard. Open it from Badges or from Your Badges on Home to see riders ranked by the badge levels they earned by riding, with Gold and then Silver breaking ties. Filter by country, then by state or province in the United States, Canada, Mexico and Australia. Pick where you ride from (Use My Location fills it in on your phone and saves only the country and state), and turn off Show Me on the Leaderboard any time to leave it. On a tablet your place and the filters sit beside the board."
@@ -188,8 +192,8 @@
       {
         "kind": "improved",
         "text": "New Free and Pro plans. Joining a ride, following the leader, Ride Mode, ride chat and every safety feature stay free and unlimited on every device, and Map Mode is free for 8 hours a month (the clock never runs while you're on a group ride). Pro adds unlimited Map Mode, map layers, drawing routes, waypoints, directions, custom trails, saving and rating trails, Track Line, named spots, custom codes, your own messages, music controls, poll voting, the garage build sheet, sync, themes, voices, and OnMyLead on an iPad, an Android tablet and the website. A gold Pro tag marks each one on a Free account."
-        },
-        {
+      },
+      {
         "kind": "new",
         "text": "OnMyLead now speaks 12 languages: English, Spanish, Portuguese, French, German, Italian, Russian, Chinese, Japanese, Korean, Hindi and Indonesian. It starts in your phone's language when it's one of them, and English when it isn't. Tap the flag at the top of Home (or You > Language) to switch, and your other devices switch too. Some newer screens are still in English while they're translated."
       }

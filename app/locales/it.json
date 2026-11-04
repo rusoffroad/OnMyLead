@@ -6,6 +6,7 @@
     "NSPhotoLibraryUsageDescription": "Scegli una foto profilo o una foto del tuo mezzo per il garage. Viene caricata solo la foto che scegli.",
     "NSCameraUsageDescription": "Scatta una foto profilo o una foto del tuo mezzo. Viene caricata solo la foto che scatti.",
     "NSMotionUsageDescription": "OnMyLead usa i sensori di movimento per l’indicatore di inclinazione e per rilevare un possibile incidente in Modalità Uscita e avvisare il tuo gruppo.",
-    "NSLocalNetworkUsageDescription": "OnMyLead si collega alla tua parabola Starlink tramite il suo Wi-Fi per mostrarne lo stato. Nient’altro sulla tua rete viene toccato."
+    "NSLocalNetworkUsageDescription": "OnMyLead si collega alla tua parabola Starlink tramite il suo Wi-Fi per mostrarne lo stato. Nient’altro sulla tua rete viene toccato.",
+    "NSBluetoothAlwaysUsageDescription": "Senza campo, la Modalità Uscita passa via Bluetooth le posizioni e gli avvisi della tua uscita ai rider vicini della stessa uscita. Tutto ciò che viene inviato è cifrato solo per la tua uscita."
   }
 }

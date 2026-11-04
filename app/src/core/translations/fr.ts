@@ -313,6 +313,9 @@ const dict: Record<string, string> = {
   "Leaderboard": "Classement",
   "Badge leaderboard": "Classement des badges",
   "Where You Ride": "Où tu roules",
+  "Bluetooth Sharing": "Partage Bluetooth",
+  "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Sans réseau, le Mode Balade transmet positions et alertes aux pilotes proches de votre balade",
+  "Off. Turn it on to keep sharing with nearby riders when there is no service": "Désactivé. Activez-le pour continuer à partager avec les pilotes proches quand il n’y a pas de réseau",
 };
 
 export default dict;
