@@ -2966,6 +2966,26 @@ const dict: Record<string, string> = {
   'Updated {hours} hr Ago': 'Vor {hours} Std. aktualisiert',
   'Updated Yesterday': 'Gestern aktualisiert',
   'Updated {days} Days Ago': 'Vor {days} Tagen aktualisiert',
+  // 2.1: Bluetooth mesh, tap-and-hold waypoints and the Mapbox maps.
+  '{v} waypoint, {name}': 'Wegpunkt {v}, {name}',
+  'Tap the map to drop the meeting point, or search above.': 'Tippe auf die Karte, um den Treffpunkt zu setzen, oder suche oben.',
+  'Planned stop {v}, {name}': 'Geplanter Halt {v}, {name}',
+  'Open {name}': '{name} öffnen',
+  'Point {v}': 'Punkt {v}',
+  'Point {v}, drag to move': 'Punkt {v}, zum Verschieben ziehen',
+  'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.': 'Auf deiner Karte gespeichert. Nur du siehst ihn. Auf einer Gruppentour werden die Wegpunkte des Leaders mit allen geteilt.',
+  'No signal here. {v}. It sends to everyone when you get service.': 'Kein Netz hier. {v}. Es geht an alle, sobald du Empfang hast.',
+  'Reached {v} over Bluetooth': '{v} über Bluetooth erreicht',
+  'Seen by {v} over Bluetooth': 'Gesehen von {v} über Bluetooth',
+  'Seen by {v}': 'Gesehen von {v}',
+  '{n} notified by push': '{n} per Push benachrichtigt',
+  '{total} riders': '{total} Fahrer',
+  'Announcement from {who}': 'Ankündigung von {who}',
+  'Poll from {who}': 'Umfrage von {who}',
+  '{who} (to you, the leader)': '{who} (an dich, den Leader)',
+  'Everything on': 'Alles an',
+  'Help alerts only': 'Nur Hilfe-Alarme',
+  '{off} turned off': '{off} ausgeschaltet',
 };
 
 export default dict;

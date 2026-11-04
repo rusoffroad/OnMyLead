@@ -47,6 +47,7 @@ import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 import { musicAvailable } from '@/lib/music';
 import { syncSettingsNow, useSyncStatus, useSyncSummary } from '@/lib/settings-sync';
+import { backupMapWaypointsNow } from '@/lib/map-waypoints';
 import { backupTrailsNow } from '@/lib/trail-backup';
 import { t, useLanguage } from '@/lib/i18n';
 import { requirePro } from '@/lib/pro';
@@ -311,6 +312,7 @@ export default function You() {
                 if (!requirePro('sync')) return;
                 syncSettingsNow();
                 backupTrailsNow();
+                backupMapWaypointsNow();
               }}
               right={can('sync') ? <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{t('Sync Now')}</ThemedText> : <ProTag feature="sync" />}
             />

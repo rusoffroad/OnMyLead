@@ -6,10 +6,10 @@ order: 52
 release: "2.1"
 updated: 2026-11-04
 sources:
-  - app/src/components/terrain-map.tsx
-  - app/src/components/terrain-map.web.tsx
-  - app/src/components/group-terrain-map.tsx
-  - app/src/components/nav-terrain-map.tsx
+  - app/src/components/mapbox-map.tsx
+  - app/src/components/mapbox-map.web.tsx
+  - app/src/components/group-mapbox-map.tsx
+  - app/src/components/nav-mapbox-map.tsx
   - app/src/components/trail-map-overlay.tsx
   - app/src/core/terrain.ts
   - app/src/hooks/use-trail-map.ts
@@ -35,11 +35,11 @@ To go back, tap **Satellite** or **Topo**.
 
 ## Move Around in 3D
 
-- **Tilt**: drag up or down with two fingers.
+- **Tilt**: drag up or down with two fingers. The further you tilt, the steeper the land is drawn: looking straight down it's true to life, and at the steepest tilt hills and canyons stand up to three times their real height, so a ridge reads at a glance. Tilt back and it settles down again.
 - **Turn**: twist with two fingers. The compass in the corner shows north; tap it to face north again.
 - **Zoom and pan**: pinch and drag, as on any map.
 
-On the website, right-drag or hold Ctrl and drag to tilt and turn, or use the zoom, compass and tilt buttons in the bottom-left corner.
+On the website, right-drag or hold Ctrl and drag to tilt and turn (two fingers on a touch screen), or use the zoom, compass and tilt buttons in the bottom-left corner. Tilting further raises the land there too.
 
 ## What's on the Map
 
@@ -56,4 +56,4 @@ Follow Me and Center on Me work the same as on the flat map.
 
 ## On iPhone, iPad, Android and the Website
 
-3D Terrain works the same on iPhone, iPad, Android phones and tablets. On the website it's in Map Mode; the website's Ride Mode page has no live map.
+3D Terrain works the same on iPhone, iPad, Android phones and tablets, and on the website in Ride Mode and Map Mode. Every map in the app is drawn by Mapbox from 2.1, so the other maps look the same as this one, just flat. See [Map Layers and Trails](/help/map-layers).

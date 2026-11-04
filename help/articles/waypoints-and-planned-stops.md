@@ -13,6 +13,7 @@ sources:
   - app/src/components/time-picker.tsx
   - app/src/components/waypoint-row.tsx
   - app/src/components/waypoint-map.tsx
+  - app/src/components/waypoint-mapbox-map.tsx
   - app/src/components/waypoint-map.web.tsx
   - app/src/components/map-search.tsx
   - app/src/hooks/use-ride-waypoints.ts
@@ -23,8 +24,14 @@ sources:
   - supabase/migrations/20261018500000_ride_waypoints.sql
   - supabase/migrations/20261019200000_planned_stops.sql
   - supabase/migrations/20261103400000_waypoint_symbols.sql
-related: [route-builder, leader-sweep-and-tail-gunner, ride-mode, directions, privacy]
-keywords: [search, find a place, waypoint, pin, marker, symbol, icon, camp, fuel stop, lunch stop, hazard, viewpoint, parking, gate, trailhead, water crossing, food, restroom, first aid, repair, photo spot, color blind, planned stop, stops]
+  - supabase/migrations/20261104150000_waypoint_alerts.sql
+  - app/src/app/nav/index.tsx
+  - app/src/hooks/use-map-mode-ride.ts
+  - app/src/core/map-waypoints.ts
+  - app/src/lib/map-waypoints.ts
+  - supabase/functions/notify-ride-message/index.ts
+related: [route-builder, leader-sweep-and-tail-gunner, ride-mode, navigation-mode, notification-settings, directions, privacy]
+keywords: [press and hold, long press, tap and hold, waypoint alert, new waypoint notification, map mode waypoint, search, find a place, waypoint, pin, marker, symbol, icon, camp, fuel stop, lunch stop, hazard, viewpoint, parking, gate, trailhead, water crossing, food, restroom, first aid, repair, photo spot, color blind, planned stop, stops]
 screenshots:
   - file: waypoints.webp
     shows: app/src/app/ride/[id]/waypoints.tsx
@@ -74,6 +81,27 @@ To find a spot by name, tap **Search** at the top of the waypoints map and type 
 :::
 
 In Ride Mode, tap **Add Waypoint** to drop one where you are, or press and hold the map. See [Ride Mode](/help/ride-mode).
+
+:::release 2.1
+## Press and Hold the Map
+
+In Ride Mode and Map Mode, press and hold anywhere on the map. The **New Waypoint** sheet opens for that spot: pick a symbol, change the name if you like, add a note and tap **Save Waypoint**. On onmylead.com, right-click the map in Map Mode instead (or press and hold on a touch screen).
+
+- **On a group ride** (Ride Mode, or Map Mode while you're sharing your location with a live ride): the waypoint goes on that ride. If you're the leader or an organizer it starts as **Everyone on the Ride**, so the whole group sees it. Other riders' waypoints are just for them.
+- **In Map Mode on your own**: the waypoint is yours and saved on your phone, so it works with no signal. With [Sync Across Devices](/help/sync-across-devices) (Pro) it also shows on your other devices.
+
+While the **Draw** tab is open in Map Mode, taps add points to the line, so press and hold doesn't drop waypoints until you switch tabs.
+
+To change one later, tap it on the map, then tap **Edit** (name, symbol, note) or **Remove**.
+
+## New Waypoint Alerts
+
+When the leader or an organizer shares a waypoint or a planned stop while the ride is live, everyone else on the ride gets a notification with a sound, like "Lou added a new waypoint: Fuel Stop". Tap it to open Ride Mode with that waypoint showing. It also goes into your [Notifications](/help/notifications-inbox).
+
+- It goes out once per waypoint: when it's added for everyone, or when a **Just Me** waypoint is switched to **Everyone on the Ride**. Editing it afterwards doesn't send another.
+- Waypoints set up before the ride starts don't send alerts. They're on the map when riders open Ride Mode.
+- New waypoint alerts follow the **Announcements** switch in [Notification Settings](/help/notification-settings) and your quiet hours.
+:::
 
 Names can be up to 60 characters and notes up to 280.
 
@@ -154,6 +182,10 @@ Tap a waypoint on the map or in the list to open it. You'll see its symbol, who 
 
 The waypoints map works on onmylead.com too. Click the map to drop a waypoint, and click a waypoint to open it.
 
+:::release 2.1
+From 2.1 the waypoints map is drawn by Mapbox on every device, so it looks the same on the phone and the website, and Ride Mode on the website has a live map where you can press and hold too. On the website, right-click a trail line to see its card. If the Mapbox map isn't available there, Ride Mode on the website shows the route sketch instead, so add ride waypoints from the ride's waypoints map.
+:::
+
 On a tablet held sideways, the waypoint list sits beside the map; swipe it up or tap **Hide** to fold it.
 
 :::release 2.0
@@ -167,6 +199,10 @@ The waypoints you can see are saved on your phone, so they stay on the map witho
 ## Limits
 
 Each rider can add up to 100 waypoints on a ride. If you reach that, remove one to add another.
+
+:::release 2.1
+In Map Mode you can keep up to 2,000 waypoints of your own.
+:::
 
 :::note
 Waypoints are different from the numbered points you tap when drawing a route. Route points shape the line; waypoints mark places along the way.

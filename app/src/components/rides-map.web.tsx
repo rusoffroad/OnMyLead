@@ -5,18 +5,26 @@ import { View } from 'react-native';
 import { mapFrameStyle, MapControls, MapOverlay, meetsLabel, pinColor, type RidesMapProps } from '@/components/rides-map-chrome';
 import { Colors } from '@/constants/theme';
 import { regionMoved, type Bounds } from '@/core/discovery';
-import { useTrailMap } from '@/hooks/use-trail-map';
+import { useTrailMap, type TrailMap } from '@/hooks/use-trail-map';
+import { RidesMapboxMap } from '@/components/rides-mapbox-map';
 import { esc, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { t } from '@/lib/i18n';
 
 const toLatLngBounds = (b: Bounds) => L.latLngBounds([b.minLat, b.minLng], [b.maxLat, b.maxLng]);
 const fromLatLngBounds = (b: L.LatLngBounds): Bounds => ({ minLat: b.getSouth(), maxLat: b.getNorth(), minLng: b.getWest(), maxLng: b.getEast() });
 
+/** Find a Ride's map: Mapbox when this build and the owner allow it and it can draw here, otherwise the flat map below. */
+export function RidesMap(props: RidesMapProps) {
+  const trail = useTrailMap();
+  if (trail.mapbox) return <RidesMapboxMap {...props} trail={trail} />;
+  return <FlatRidesMap {...props} trail={trail} />;
+}
+
 /**
  * The Find a ride map on the web: satellite imagery with road and place names, same pins and
  * controls as the phone. Zoomed in, the trail layers show too, as they do on the phone.
  */
-export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull }: RidesMapProps) {
+function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail }: RidesMapProps & { trail: TrailMap }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
@@ -27,7 +35,6 @@ export function RidesMap({ rides, frame, frameKey, circle, title, onPressTitle, 
     openRef.current = onOpen;
   }, [onOpen]);
   const [moved, setMoved] = useState(false);
-  const trail = useTrailMap();
   const tracks = useRef<ReturnType<typeof trailLayers> | null>(null);
   const onRegion = useRef(trail.onRegion);
   useEffect(() => {

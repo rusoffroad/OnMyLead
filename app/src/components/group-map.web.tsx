@@ -6,6 +6,7 @@ import type { LatLng } from '@/core/geo';
 import type { Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
+import { GroupMapboxMap } from './group-mapbox-map';
 import { BreakdownBadge } from './rider-status-badge';
 import { RiderDot } from './rider-dot';
 import { RouteSketch } from './route-sketch';
@@ -14,11 +15,22 @@ import { waypointDots } from './waypoint-blaze';
 import { t } from '@/lib/i18n';
 export type { GroupMapHandle, MapRider } from './group-map-types';
 
+type GroupMapProps = Parameters<typeof SketchGroupMap>[0];
+
 /**
- * The web build has no native map. With a route, draw it with the riders on it; without one,
- * show the group as a list so the screen still works.
+ * Ride Mode's map on the website: the live Mapbox map when this build and the owner allow it
+ * (the same riders, route and waypoints as the apps), otherwise the sketch below.
  */
-export function GroupMap({
+export function GroupMap(props: GroupMapProps) {
+  if (props.trail?.mapbox) return <GroupMapboxMap {...props} trail={props.trail} edgePadding={props.edgePadding ?? { top: 80, right: 60, bottom: 80, left: 60 }} />;
+  return <SketchGroupMap {...props} />;
+}
+
+/**
+ * Without Mapbox the web build has no live map. With a route, draw it with the riders on it;
+ * without one, show the group as a list so the screen still works.
+ */
+function SketchGroupMap({
   riders, regroup, route, waypoints,
 }: {
   riders: MapRider[];

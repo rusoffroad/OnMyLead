@@ -32,6 +32,10 @@ Several messages from the same chat are kept together in one line, with **+2 Mor
 
 Tap a notification to go straight to what it's about, the same as tapping it on your lock screen: Ride Mode for a rider's status or a ride going live, the ride's chat for a message, Friends for a friend request, and so on. It's marked read.
 
+:::release 2.1
+A new waypoint from the leader opens Ride Mode with that waypoint showing.
+:::
+
 To mark everything read without opening it, tap **Mark All Read**.
 
 ## Clear Notifications

@@ -6,11 +6,11 @@ import type { MapPressEvent, Region } from 'react-native-maps';
 import { boxInside, nearestRiderTrail, paddedBox, RIDER_TRAILS_MIN_Z, type PublicTrail } from '@/core/nav-trails';
 import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
 import { terrainBoxes } from '@/core/offline-maps';
-import { terrainShows } from '@/core/terrain';
+import { lookFor, mapboxDraws, type MapLook } from '@/core/terrain';
 import { mapZoom, metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
 import { useOfflineMaps } from '@/lib/offline-maps';
-import { useTerrainAvailable } from '@/lib/terrain';
+import { useMapboxAvailable, useTerrainAvailable } from '@/lib/terrain';
 import { publicTrailsIn, type Box } from '@/lib/nav-trails';
 import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
@@ -26,7 +26,11 @@ export type TrailMap = {
   base: BaseMap;
   /** 3D Terrain can be picked here (the build has Mapbox and the owner hasn't switched it off). */
   terrainAvailable: boolean;
-  /** Ride Mode and Map Mode draw the 3D map now (see core/terrain terrainShows). */
+  /** How the map looks: standard for Free riders, else the rider's Map Style (core/terrain MapLook). */
+  look: MapLook;
+  /** Every map draws with Mapbox now (see core/terrain mapboxDraws); otherwise the flat Apple, Google or Leaflet map. */
+  mapbox: boolean;
+  /** Ride Mode and Map Mode draw the 3D map now (Mapbox in the 3D Terrain look). */
   terrain3d: boolean;
   trails: boolean;
   /** True when trails are on but the map is too far out to draw them. */
@@ -111,6 +115,7 @@ export function useTrailMap(): TrailMap {
   const riderBox = useRef<Box | null>(null);
   const riderLoad = useRef(0);
   const [picked, setPicked] = useState<PublicTrail | null>(null);
+  const mapboxAvailable = useMapboxAvailable();
   const terrainAvailable = useTerrainAvailable();
   const downloads = useOfflineMaps();
   const savedTerrain = useMemo(() => terrainBoxes(downloads), [downloads]);
@@ -298,11 +303,15 @@ export function useTrailMap(): TrailMap {
   // Free riders get satellite (map layers are Pro); 3D Terrain picked but not offered any more
   // (switched off, or a build without Mapbox) is plain satellite too.
   const shownBase: BaseMap = !layersPro ? 'satellite' : base === 'terrain' && !terrainAvailable ? 'satellite' : base;
-  const terrain3d = terrainShows({ picked: shownBase === 'terrain', available: terrainAvailable, offline, center: where, saved: savedTerrain });
+  const look = lookFor(shownBase, layersPro);
+  const mapbox = mapboxDraws({ available: mapboxAvailable, look, offline, center: where, saved: savedTerrain });
+  const terrain3d = mapbox && look === 'terrain';
 
   return {
     base: shownBase,
     terrainAvailable,
+    look,
+    mapbox,
     terrain3d,
     trails,
     zoomInHint: trails && zoom < TRAILS_MIN_Z,

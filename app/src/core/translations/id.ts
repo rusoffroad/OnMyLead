@@ -2966,6 +2966,26 @@ const dict: Record<string, string> = {
   'Updated {hours} hr Ago': 'Diperbarui {hours} jam lalu',
   'Updated Yesterday': 'Diperbarui kemarin',
   'Updated {days} Days Ago': 'Diperbarui {days} hari lalu',
+  // 2.1: Bluetooth mesh, tap-and-hold waypoints and the Mapbox maps.
+  '{v} waypoint, {name}': 'Waypoint {v}, {name}',
+  'Tap the map to drop the meeting point, or search above.': 'Ketuk peta untuk meletakkan titik kumpul, atau cari di atas.',
+  'Planned stop {v}, {name}': 'Pemberhentian terencana {v}, {name}',
+  'Open {name}': 'Buka {name}',
+  'Point {v}': 'Titik {v}',
+  'Point {v}, drag to move': 'Titik {v}, seret untuk memindahkan',
+  'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.': 'Disimpan di peta Anda. Hanya Anda yang melihatnya. Di ride grup, waypoint leader dibagikan ke semua orang.',
+  'No signal here. {v}. It sends to everyone when you get service.': 'Tidak ada sinyal di sini. {v}. Akan terkirim ke semua orang saat Anda mendapat sinyal.',
+  'Reached {v} over Bluetooth': 'Sampai ke {v} lewat Bluetooth',
+  'Seen by {v} over Bluetooth': 'Dilihat oleh {v} lewat Bluetooth',
+  'Seen by {v}': 'Dilihat oleh {v}',
+  '{n} notified by push': '{n} diberi tahu lewat notifikasi',
+  '{total} riders': '{total} rider',
+  'Announcement from {who}': 'Pengumuman dari {who}',
+  'Poll from {who}': 'Polling dari {who}',
+  '{who} (to you, the leader)': '{who} (untuk Anda, leader)',
+  'Everything on': 'Semua aktif',
+  'Help alerts only': 'Hanya peringatan bantuan',
+  '{off} turned off': '{off} dimatikan',
 };
 
 export default dict;

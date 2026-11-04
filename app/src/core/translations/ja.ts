@@ -2966,6 +2966,26 @@ const dict: Record<string, string> = {
   'Updated {hours} hr Ago': '{hours} 時間前に更新',
   'Updated Yesterday': '昨日更新',
   'Updated {days} Days Ago': '{days} 日前に更新',
+  // 2.1: Bluetooth mesh, tap-and-hold waypoints and the Mapbox maps.
+  '{v} waypoint, {name}': '{v}のウェイポイント、{name}',
+  'Tap the map to drop the meeting point, or search above.': '地図をタップして集合場所を置くか、上で検索してください。',
+  'Planned stop {v}, {name}': '予定停止地点 {v}、{name}',
+  'Open {name}': '{name} を開く',
+  'Point {v}': 'ポイント {v}',
+  'Point {v}, drag to move': 'ポイント {v}、ドラッグで移動',
+  'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.': 'あなたの地図に保存されました。見えるのはあなただけです。グループライドでは、リーダーのウェイポイントが全員に共有されます。',
+  'No signal here. {v}. It sends to everyone when you get service.': 'ここは圏外です。{v}。電波が戻ると全員に送信されます。',
+  'Reached {v} over Bluetooth': 'Bluetooth で {v} に届きました',
+  'Seen by {v} over Bluetooth': 'Bluetooth 経由で {v} が確認',
+  'Seen by {v}': '{v} が確認',
+  '{n} notified by push': '{n} 人にプッシュ通知済み',
+  '{total} riders': '{total} 人のライダー',
+  'Announcement from {who}': '{who} からのお知らせ',
+  'Poll from {who}': '{who} からの投票',
+  '{who} (to you, the leader)': '{who}（リーダーのあなた宛て）',
+  'Everything on': 'すべてオン',
+  'Help alerts only': '救助アラートのみ',
+  '{off} turned off': '{off} 件オフ',
 };
 
 export default dict;

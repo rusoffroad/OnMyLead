@@ -2966,6 +2966,26 @@ const dict: Record<string, string> = {
   'Updated {hours} hr Ago': '{hours} 小时前更新',
   'Updated Yesterday': '昨天更新',
   'Updated {days} Days Ago': '{days} 天前更新',
+  // 2.1: Bluetooth mesh, tap-and-hold waypoints and the Mapbox maps.
+  '{v} waypoint, {name}': '{v}航点，{name}',
+  'Tap the map to drop the meeting point, or search above.': '点按地图放置集合点，或在上方搜索。',
+  'Planned stop {v}, {name}': '计划停靠点 {v}，{name}',
+  'Open {name}': '打开 {name}',
+  'Point {v}': '点 {v}',
+  'Point {v}, drag to move': '点 {v}，拖动可移动',
+  'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.': '已保存到你的地图。只有你能看到。在团体活动中，领队的航点会与所有人共享。',
+  'No signal here. {v}. It sends to everyone when you get service.': '此处无信号。{v}。有信号后会发送给所有人。',
+  'Reached {v} over Bluetooth': '已通过蓝牙送达 {v}',
+  'Seen by {v} over Bluetooth': '{v} 已通过蓝牙查看',
+  'Seen by {v}': '{v} 已查看',
+  '{n} notified by push': '{n} 人已收到推送',
+  '{total} riders': '{total} 位骑手',
+  'Announcement from {who}': '来自 {who} 的公告',
+  'Poll from {who}': '来自 {who} 的投票',
+  '{who} (to you, the leader)': '{who}（发给你，领队）',
+  'Everything on': '全部开启',
+  'Help alerts only': '仅求助警报',
+  '{off} turned off': '已关闭 {off} 项',
 };
 
 export default dict;

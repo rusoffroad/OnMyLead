@@ -61,7 +61,7 @@ export const TOPIC_GROUPS: TopicGroup[] = [
     title: 'On the Trail',
     topics: [
       { key: 'rider_status', title: 'Rider Status', detail: 'Status buttons and quick replies from Ride Mode, like On My Way, Need Fuel and Flat Tire, and when a rider cancels one.' },
-      { key: 'announcements', title: 'Announcements', detail: 'What the organizer tells the whole group.' },
+      { key: 'announcements', title: 'Announcements', detail: 'What the organizer tells the whole group, and new waypoints the leader shares during the ride.' },
     ],
   },
   {
@@ -183,7 +183,7 @@ export function quietSegments(start: number, end: number): [number, number][] {
 export function settingsSummary(s: NotificationSettings): string {
   const topics = TOPIC_GROUPS.flatMap((g) => g.topics);
   const off = topics.filter((t) => !s[t.key]).length;
-  const parts = [off === 0 ? 'Everything on' : off === topics.length ? 'Help alerts only' : `${off} turned off`];
+  const parts = [off === 0 ? tc('Everything on') : off === topics.length ? tc('Help alerts only') : tc('{off} turned off', { off })];
   if (s.quiet_hours) parts.push(`quiet ${formatClock(s.quiet_start)} to ${formatClock(s.quiet_end)}`);
   return parts.join(', ');
 }

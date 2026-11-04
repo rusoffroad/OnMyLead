@@ -2966,6 +2966,26 @@ const dict: Record<string, string> = {
   'Updated {hours} hr Ago': '{hours} घंटे पहले अपडेट हुआ',
   'Updated Yesterday': 'कल अपडेट हुआ',
   'Updated {days} Days Ago': '{days} दिन पहले अपडेट हुआ',
+  // 2.1: Bluetooth mesh, tap-and-hold waypoints and the Mapbox maps.
+  '{v} waypoint, {name}': '{v} वेपॉइंट, {name}',
+  'Tap the map to drop the meeting point, or search above.': 'मीटिंग पॉइंट रखने के लिए मैप पर टैप करें, या ऊपर खोजें।',
+  'Planned stop {v}, {name}': 'नियोजित पड़ाव {v}, {name}',
+  'Open {name}': '{name} खोलें',
+  'Point {v}': 'बिंदु {v}',
+  'Point {v}, drag to move': 'बिंदु {v}, हिलाने के लिए खींचें',
+  'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.': 'आपके मैप पर सहेजा गया। इसे सिर्फ़ आप देखते हैं। ग्रुप राइड में लीडर के वेपॉइंट सबके साथ साझा होते हैं।',
+  'No signal here. {v}. It sends to everyone when you get service.': 'यहाँ सिग्नल नहीं है। {v}। सर्विस मिलते ही यह सबको भेज दिया जाएगा।',
+  'Reached {v} over Bluetooth': 'ब्लूटूथ से {v} तक पहुँचा',
+  'Seen by {v} over Bluetooth': 'ब्लूटूथ से {v} ने देखा',
+  'Seen by {v}': '{v} ने देखा',
+  '{n} notified by push': '{n} को पुश से सूचित किया',
+  '{total} riders': '{total} राइडर',
+  'Announcement from {who}': '{who} की घोषणा',
+  'Poll from {who}': '{who} का पोल',
+  '{who} (to you, the leader)': '{who} (आपको, लीडर को)',
+  'Everything on': 'सब चालू',
+  'Help alerts only': 'सिर्फ़ मदद अलर्ट',
+  '{off} turned off': '{off} बंद',
 };
 
 export default dict;

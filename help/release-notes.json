@@ -1,12 +1,16 @@
 [
   {
     "version": "2.1",
-    "title": "3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
-    "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders close by on the same ride pass spots, status taps and EMERGENCY alerts to each other over Bluetooth. And the new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead.",
-    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Nearby riders still see your spot, taps and EMERGENCY, phone to phone.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.",
+    "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
+    "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
+    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint; the group gets a ding.\n• All maps on Mapbox; tilt 3D taller.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "improved",
+        "text": "Every map in the app is now drawn by Mapbox: Ride Mode, Map Mode, the route builder, waypoints, Find a Ride and Offline Maps' area picker, on iPhone, iPad, Android and onmylead.com. A map looks and works the same wherever you open it, and the website's Ride Mode now shows the same live map as the phone. Free accounts get Mapbox's outdoors map with roads, trails and contours. The meeting-point map is on the phone and tablet too, a trail's page previews it on a real map, and in 3D Terrain tilting further raises the land."
+      },
       {
         "kind": "new",
         "text": "Edit Ride Details: the organizer or a co-organizer can change a ride's name, day, times, meeting point and details after creating it, from the ride page on the app and onmylead.com. Everyone on the ride gets a notification about a new time or meeting point, and the ride page shows what changed for a week. Once the ride is live, the day, times and meeting point are locked and the rest can still change."
@@ -21,7 +25,7 @@
       },
       {
         "kind": "new",
-        "text": "Bluetooth Sharing: when there's no cell service, Ride Mode passes your spot (while you're sharing with the ride), your status taps, EMERGENCY and quick replies to nearby riders on the same ride over Bluetooth, about 100 to 300 feet between phones, passed along by up to three phones. Their details say Via Bluetooth, and the no-service banner says how many phones are in range. When any phone on the ride gets signal, it sends what it heard so everyone else sees it too. Everything is encrypted for your ride only. Turn it off any time on the You tab."
+        "text": "Bluetooth Sharing: when there's no cell service, Ride Mode passes your spot (while you're sharing with the ride), your status taps, EMERGENCY, quick replies and typed messages to nearby riders on the same ride over Bluetooth, about 100 to 300 feet between phones, and every phone passes along what it hears, up to six phones down the line, so the back of the group can reach the front. Phones that get a newer spot for any rider pass that on too, and a phone with signal shares what OnMyLead knows with the riders near it that have none. The card under your tap says whose phone got it over Bluetooth and who has seen it, even while it waits for signal. Messages heard over Bluetooth show in chat marked Via Bluetooth. When any phone on the ride gets signal, it sends what it heard so everyone else sees it too. Everything is encrypted for your ride only, and the radio idles when you have service and nobody is in range. Turn it off any time on the You tab."
       },
       {
         "kind": "new",
@@ -36,8 +40,8 @@
         "text": "Offline Maps can save 3D Terrain with an area or a ride, so the 3D map works where there's no signal. The download size shows before you start."
       },
       {
-        "kind": "improved",
-        "text": "The whole app now speaks your language. Ride Mode, Map Mode, ride and group pages, chat, Events, Social, Friends, Garage, Trips, Starlink, Tilt, Pro and every alert and message from OnMyLead switch to any of the 12 languages, not just the main screens. Spoken Ride Mode alerts are read in your language, and status buttons and quick replies show in each rider's own language."
+        "kind": "new",
+        "text": "Press and hold the map in Ride Mode or Map Mode to drop a waypoint right there, then tap it to edit or remove it. On a group ride the leader's waypoints are shared with everyone, and the other riders' phones ding with \"Lou added a new waypoint: Fuel Stop\". Tap it to see the waypoint in Ride Mode. In Map Mode on your own, waypoints are yours, saved on your phone for no-signal riding and synced to your other devices with Pro."
       }
     ]
   },

@@ -6,8 +6,17 @@ import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { RouteBuilderMapboxMap } from './route-builder-mapbox-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { t as tr } from '@/lib/i18n';
+
+type RouteBuilderMapProps = Parameters<typeof FlatRouteBuilderMap>[0];
+
+/** The route builder's map: Mapbox when this build and the owner allow it and it can draw here (use-trail-map mapbox), otherwise the flat map below. */
+export function RouteBuilderMap(props: RouteBuilderMapProps) {
+  if (props.trail?.mapbox) return <RouteBuilderMapboxMap {...props} trail={props.trail} />;
+  return <FlatRouteBuilderMap {...props} />;
+}
 
 /**
  * The route builder's map on the web: satellite imagery, click to add the next point, drag a
@@ -15,7 +24,7 @@ import { t as tr } from '@/lib/i18n';
  * (lib/web-map.ts trailLayers) are the phone's: agency lines from zoom 9, OpenStreetMap tracks and
  * their names from zoom 13, closures in red. While not drawing, a click shows the trail under it.
  */
-export function RouteBuilderMap({
+function FlatRouteBuilderMap({
   points, waypoints, center, editable, onAdd, onMove, padding, trail, pending = [], found, onCenter,
 }: {
   points: LatLng[];

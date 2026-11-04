@@ -2966,6 +2966,26 @@ const dict: Record<string, string> = {
   'Updated {hours} hr Ago': '{hours}시간 전 업데이트됨',
   'Updated Yesterday': '어제 업데이트됨',
   'Updated {days} Days Ago': '{days}일 전 업데이트됨',
+  // 2.1: Bluetooth mesh, tap-and-hold waypoints and the Mapbox maps.
+  '{v} waypoint, {name}': '{v} 웨이포인트, {name}',
+  'Tap the map to drop the meeting point, or search above.': '지도를 탭해 집결지를 놓거나 위에서 검색하세요.',
+  'Planned stop {v}, {name}': '계획된 정차 {v}, {name}',
+  'Open {name}': '{name} 열기',
+  'Point {v}': '지점 {v}',
+  'Point {v}, drag to move': '지점 {v}, 드래그하여 이동',
+  'Saved on your map. Only you see it. On a group ride, the leader’s waypoints are shared with everyone.': '내 지도에 저장되었습니다. 나만 볼 수 있습니다. 그룹 라이드에서는 리더의 웨이포인트가 모두에게 공유됩니다.',
+  'No signal here. {v}. It sends to everyone when you get service.': '여기는 신호가 없습니다. {v}. 신호가 잡히면 모두에게 전송됩니다.',
+  'Reached {v} over Bluetooth': '블루투스로 {v}에게 전달됨',
+  'Seen by {v} over Bluetooth': '블루투스로 {v}이(가) 확인함',
+  'Seen by {v}': '{v}이(가) 확인함',
+  '{n} notified by push': '{n}명에게 푸시 알림 전송됨',
+  '{total} riders': '라이더 {total}명',
+  'Announcement from {who}': '{who}의 공지',
+  'Poll from {who}': '{who}의 투표',
+  '{who} (to you, the leader)': '{who} (리더인 나에게)',
+  'Everything on': '모두 켬',
+  'Help alerts only': '도움 알림만',
+  '{off} turned off': '{off}개 끔',
 };
 
 export default dict;

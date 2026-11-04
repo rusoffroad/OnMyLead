@@ -8,12 +8,13 @@ import type { Place } from '@/core/places';
 import { symbolInfo, symbolLabel, symbolSvgMarkup, warningTriangle, waypointSymbol, type WaypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { WaypointMapboxMap } from './waypoint-mapbox-map';
 import { drawRoute, esc, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { octagon } from './waypoint-blaze';
 import { t as tr } from '@/lib/i18n';
 
 /** The same blaze as the app (WaypointBlaze): a diamond, or a warning triangle for hazards, with the symbol on it. */
-const blaze = (shared: boolean, symbol: WaypointSymbol) => {
+export const blaze = (shared: boolean, symbol: WaypointSymbol) => {
   const fill = shared ? Colors.sky : Colors.text;
   const ink = shared ? '#FFFFFF' : Colors.background;
   const triangle = symbolInfo(symbol).shape === 'triangle';
@@ -25,19 +26,27 @@ const blaze = (shared: boolean, symbol: WaypointSymbol) => {
 };
 
 /** A planned stop's sign, with what it's for (fuel, food) on a small white tag at its corner. */
-const stopSign = (n: number | null, symbol: WaypointSymbol) =>
+export const stopSign = (n: number | null, symbol: WaypointSymbol) =>
   `<svg width="34" height="34" viewBox="0 0 34 34" overflow="visible"><polygon points="${octagon(17, 17, 16.5)}" fill="${Colors.background}"/><polygon points="${octagon(17, 17, 14.5)}" fill="#FFFFFF"/><polygon points="${octagon(17, 17, 12.5)}" fill="${Colors.accent}"/><text x="17" y="22.5" text-anchor="middle" fill="#FFFFFF" font-family="BarlowCondensed_800ExtraBold, sans-serif" font-size="17">${n ?? ''}</text>${
     symbol === 'spot'
       ? ''
       : `<circle cx="31" cy="3" r="8.5" fill="#FFFFFF" stroke="${Colors.background}" stroke-width="1.5"/><g transform="translate(25.4 -2.6)">${symbolSvgMarkup(symbol, Colors.background, 11.2, true)}</g>`
   }</svg>`;
 
+type WaypointMapProps = Parameters<typeof FlatWaypointMap>[0];
+
+/** The waypoints map: Mapbox when this build and the owner allow it and it can draw here (use-trail-map mapbox), otherwise the flat map below. */
+export function WaypointMap(props: WaypointMapProps) {
+  if (props.trail.mapbox) return <WaypointMapboxMap {...props} />;
+  return <FlatWaypointMap {...props} />;
+}
+
 /**
  * The ride's waypoints on the web: satellite imagery, the route under them, the leader's planned
  * stops as numbered stop signs, over the same trail layers as the phone. Click anywhere to drop a
  * new one; click a blaze to open it.
  */
-export function WaypointMap({
+function FlatWaypointMap({
   waypoints, route, center, trail, onPressWaypoint, onLongPressMap, padding, found, onCenter,
 }: {
   waypoints: Waypoint[];
