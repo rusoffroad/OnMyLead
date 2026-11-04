@@ -35,6 +35,7 @@ export const APP_FLAGS = {
   music_controls: { label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
   nav_mode: { label: 'Map Mode', hint: 'The Map Mode card on the home screen (offroad map, recording, custom trails and sharing). Trails on riders’ phones are kept; rider trails on maps still show.' },
   terrain_3d: { label: '3D Terrain', hint: 'The 3D Terrain map style in Ride Mode and Map Mode (Mapbox: free up to 25,000 riders a month). Off: riders who picked it see the flat satellite map.' },
+  referrals: { label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
 } as const satisfies Record<string, { label: string; hint: string }>;
 

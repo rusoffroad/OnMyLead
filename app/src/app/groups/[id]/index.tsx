@@ -11,7 +11,8 @@ import { SocialPhoto, SocialTag } from '@/components/social-tag';
 import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import { mailUrl, smsUrl } from '@/core/discovery';
 import {
   groupInviteMessage, groupLink, groupNameProblem, invitedLine, MAX_GROUP_NAME, ridersLabel, type RideMate,
@@ -373,7 +374,7 @@ function ChatCard({ summary, preview, onPress }: { summary: GroupChatSummary | n
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   chatCard: {
     flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: Colors.backgroundElement, borderRadius: Radius.card,
     paddingHorizontal: Spacing.three, paddingVertical: 14,
@@ -387,7 +388,7 @@ const styles = StyleSheet.create({
   },
   hero: { gap: Spacing.three, alignItems: 'flex-start' },
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 46, letterSpacing: -0.5 },
-  notice: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: 'rgba(60,195,107,0.10)', borderRadius: Radius.control, padding: 12 },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: withAlpha(RideColors.green, 0.1), borderRadius: Radius.control, padding: 12 },
   list: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, overflow: 'hidden' },
   rule: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
   rideRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, minHeight: 60 },
@@ -395,4 +396,4 @@ const styles = StyleSheet.create({
   remove: { minHeight: 36, paddingHorizontal: 12, borderRadius: Radius.pill, backgroundColor: Colors.backgroundSelected, justifyContent: 'center' },
   removeText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
   linkCard: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.two, marginTop: Spacing.two },
-});
+}));

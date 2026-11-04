@@ -4,7 +4,7 @@ summary: Switch on Out Riding to see which riders are out near you right now, ro
 category: groups
 order: 25
 release: "1.0.3"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/out-riding.tsx
   - app/src/app/messages/index.tsx

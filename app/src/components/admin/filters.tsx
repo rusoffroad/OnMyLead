@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { customRange, rangeFor, type DateRange, type RangePreset } from '@/core/admin-format';
 import { AdminColors } from './tokens';
 
@@ -125,7 +125,7 @@ function DateInput({ label, value, onChange }: { label: string; value: string; o
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   search: {
     flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: AdminColors.page, borderRadius: 12,
     borderWidth: 1.5, borderColor: AdminColors.line, paddingHorizontal: 12, minHeight: 44, flexGrow: 1, maxWidth: 420,
@@ -144,4 +144,4 @@ const styles = StyleSheet.create({
   },
   apply: { backgroundColor: AdminColors.red, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 9 },
   applyText: { fontFamily: font(700), fontSize: 14, color: '#FFFFFF' },
-});
+}));

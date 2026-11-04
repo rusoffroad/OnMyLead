@@ -8,7 +8,7 @@ import { ObstacleSheet } from '@/components/obstacle-sheet';
 import { RouteMap } from '@/components/route-map';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Field, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   clock, DIFFICULTIES, feet, feetOrMiles, MAX_PHOTOS, RIDER_TRAIL_INK, SEASONS, shareProblems, SHARE_TRIM_M, SURFACES, trackStats, TRAIL_VEHICLES,
   type Difficulty, type LocalTrail, type Season, type Surface, type TrailDetails, type TrailVehicle,
@@ -22,6 +22,7 @@ import {
 import { handleProError, requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { shareBadge } from '@/components/trail-badge';
+import { t } from '@/lib/i18n';
 
 /**
  * One of your trails: its line and numbers, the details riders need (name, difficulty, vehicles,
@@ -56,7 +57,7 @@ export default function TrailDetail() {
   if (!saved || !details || !extra) {
     return (
       <Screen width="readable">
-        <ThemedText themeColor="textSecondary">{loaded ? 'That trail isn’t on this phone.' : 'Loading…'}</ThemedText>
+        <ThemedText themeColor="textSecondary">{loaded ? 'That trail isn’t on this device.' : 'Loading…'}</ThemedText>
       </Screen>
     );
   }
@@ -120,7 +121,7 @@ export default function TrailDetail() {
   }
 
   async function unshare() {
-    if (!(await confirmAsync('Stop Sharing?', 'The trail comes off the public map and its ratings are removed. It stays on this phone.', 'Stop Sharing', 'Keep Sharing'))) return;
+    if (!(await confirmAsync('Stop Sharing?', 'The trail comes off the public map and its ratings are removed. It stays in My Trails.', 'Stop Sharing', 'Keep Sharing'))) return;
     setBusy('stop');
     try {
       await stopSharing(saved!);
@@ -217,7 +218,7 @@ export default function TrailDetail() {
           <Text style={styles.switchTitle}>One Way</Text>
           <ThemedText type="small" themeColor="textSecondary">Ride it only in the direction it was recorded.</ThemedText>
         </View>
-        <Switch value={details.oneWay} onValueChange={(v) => set('oneWay', v)} trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }} thumbColor={Colors.text} />
+        <Switch value={details.oneWay} onValueChange={(v) => set('oneWay', v)} trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }} thumbColor="#FFFFFF" />
       </Pressable>
       {saved.source === 'recorded' && canShare ? (
         <Pressable accessibilityRole="switch" accessibilityState={{ checked: extra.hideStart }} onPress={() => setExtra({ ...extra, hideStart: !extra.hideStart })} style={styles.switchRow}>
@@ -227,7 +228,7 @@ export default function TrailDetail() {
               When shared, leave off the first and last {feetOrMiles(SHARE_TRIM_M)}, for a trail that starts at your house or camp. Off shares the whole trail.
             </ThemedText>
           </View>
-          <Switch value={extra.hideStart} onValueChange={(v) => setExtra({ ...extra, hideStart: v })} trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }} thumbColor={Colors.text} />
+          <Switch value={extra.hideStart} onValueChange={(v) => setExtra({ ...extra, hideStart: v })} trackColor={{ true: Colors.accent, false: Colors.backgroundSelected }} thumbColor="#FFFFFF" />
         </Pressable>
       ) : null}
       <Field label="Notes (Optional)" value={details.description} onChangeText={(v) => set('description', v)} multiline maxLength={1000} placeholder="Water crossing after the second gate. Great view at the top." />
@@ -315,7 +316,7 @@ export default function TrailDetail() {
 
   return (
     <Screen width={layout.expanded ? 'wide' : 'readable'}>
-      <Stack.Screen options={{ title: details.name || 'Trail' }} />
+      <Stack.Screen options={{ title: details.name || t('Trail') }} />
       {layout.expanded ? (
         <View style={styles.columns}>
           <View style={styles.column}>{side}</View>
@@ -340,7 +341,7 @@ export default function TrailDetail() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   columns: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.four },
   column: { flex: 1, minWidth: 0, gap: Spacing.three },
   label: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
@@ -369,4 +370,4 @@ const styles = StyleSheet.create({
   spotName: { flex: 1, color: Colors.text, fontFamily: font(600), fontSize: 15 },
   problems: { gap: 4, padding: 12, borderRadius: Radius.control, backgroundColor: 'rgba(255,176,32,0.12)', borderWidth: 1, borderColor: '#FFB020' },
   problem: { color: Colors.text, fontFamily: font(600), fontSize: 15 },
-});
+}));

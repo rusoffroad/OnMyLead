@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { actionLabel, bucketFor, customRange, daysLeft, fmtAgo, fmtInt, fmtMoney, fmtPct, rangeFor } from '../admin-format';
+import { actionLabel, bucketFor, customRange, daysLeft, fmtAgo, fmtDate, fmtInt, fmtMoney, fmtPct, rangeFor } from '../admin-format';
 
 const now = new Date('2026-10-12T20:00:00Z');
 
@@ -61,5 +61,13 @@ describe('actionLabel', () => {
     expect(actionLabel('trial.extend')).toBe('Extended Trial');
     expect(actionLabel('promo.create')).toBe('Promo Create');
     expect(actionLabel('setting.set_trial_days')).toBe('Setting Set Trial Days');
+  });
+});
+
+describe('fmtDate', () => {
+  it('shows a plain date as that calendar day in every time zone', () => {
+    expect(fmtDate('2027-05-03')).toBe('May 3, 2027');
+    expect(fmtDate(null)).toBe('—');
+    expect(fmtDate('nope')).toBe('—');
   });
 });

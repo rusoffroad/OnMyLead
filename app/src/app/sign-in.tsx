@@ -20,6 +20,7 @@ import {
   useSocialProviders,
   type SocialProvider,
 } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 type Mode = 'sign_in' | 'create';
 
@@ -58,7 +59,7 @@ export default function SignIn() {
         const { needsConfirmation } = await signUpWithPassword(cleanEmail, password, name.trim());
         track('sign_up', { method: 'password' });
         if (needsConfirmation) {
-          setNotice(`Almost done. We sent a link to ${cleanEmail}. Tap it on this device to confirm your email, and you'll be signed in.`);
+          setNotice(t('Almost done. We sent a link to {email}. Tap it on this device to confirm your email, and you’ll be signed in.', { email: cleanEmail }));
           return;
         }
       } else {
@@ -151,7 +152,7 @@ export default function SignIn() {
           onPress={() =>
             run('reset', async () => {
               await sendPasswordReset(cleanEmail);
-              setNotice(`We sent a link to ${cleanEmail} to set a new password.`);
+              setNotice(t('We sent a link to {email} to set a new password.', { email: cleanEmail }));
             })
           }>
           <ThemedText type="link" style={{ color: emailOk ? Colors.sky : Colors.textSecondary }}>
@@ -168,7 +169,7 @@ export default function SignIn() {
           run('link', async () => {
             await sendCode(cleanEmail);
             track('sign_in_link_sent', {});
-            setNotice(`We sent a sign-in link to ${cleanEmail}. Tap it on this device. No password needed, and it creates your account if you're new.`);
+            setNotice(t('We sent a sign-in link to {email}. Tap it on this device. No password needed, and it creates your account if you’re new.', { email: cleanEmail }));
           })
         }>
         <ThemedText type="link" style={{ color: emailOk ? Colors.sky : Colors.textSecondary }}>

@@ -2,6 +2,7 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
+import { EventOrRide } from '@/components/events/event-or-ride';
 import { ThemedText } from '@/components/themed-text';
 import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
@@ -10,13 +11,17 @@ import { TimePicker } from '@/components/time-picker';
 import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-code-field';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import type { BubblePreset } from '@/core/bubble';
-import { rideAllowanceText } from '@/core/entitlements';
+import { rideAllowanceText, type FeatureKey } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
 import { trailAsRoute } from '@/core/nav-trails';
+import { inches } from '@/core/trail-width';
+import { RigFitLine, WidthIcon } from '@/components/trail-width-row';
+import { useGarageWidths } from '@/lib/trail-width';
 import { metersToMiles } from '@/core/geo';
 import { getLocalTrail, loadTrails, trailLine } from '@/lib/nav-trails';
 import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
@@ -28,7 +33,8 @@ import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
 import { currentPosition, stateAt } from '@/lib/location';
 import { useSession } from '@/lib/session';
-import { handleProError } from '@/lib/pro';
+import { handleProError, requirePro } from '@/lib/pro';
+import { ProTag } from '@/components/pro-tag';
 
 const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
 
@@ -121,6 +127,8 @@ export default function NewRide() {
 
   // Plan a Group Ride on This Trail (Map Mode): the trail becomes the route, its start the meeting point.
   const [fromTrail, setFromTrail] = useState<string | null>(null);
+  const [trailWidth, setTrailWidth] = useState<number | null>(null);
+  const garage = useGarageWidths();
   useEffect(() => {
     if (!trail) return;
     loadTrails().then(() => {
@@ -134,6 +142,13 @@ export default function NewRide() {
       setRouteMiles((m) => m || String(Math.round(metersToMiles(route.lengthM) * 10) / 10));
       if (start) setCoords((c) => c || `${start.lat.toFixed(5)}, ${start.lng.toFixed(5)}`);
       setFromTrail(t.details.name || 'Your Trail');
+      setTrailWidth(t.details.maxWidthIn);
+      // Riders who join see the limit in the ride's instructions.
+      if (t.details.maxWidthIn != null) {
+        const note = `Trail width limit: ${inches(t.details.maxWidthIn)}. Wider machines won't fit.`;
+        setInstructions((v) => (v.includes('width limit') ? v : v ? `${v}\n${note}` : note));
+        setMore(true);
+      }
     });
   }, [trail]);
 
@@ -263,6 +278,13 @@ export default function NewRide() {
           <ThemedText type="small" themeColor="textSecondary">
             The trail is the route, and its start is the meeting point. Change anything, pick the day and create it.
           </ThemedText>
+          {trailWidth != null ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 }}>
+              <WidthIcon />
+              <ThemedText style={{ fontWeight: 700 }}>{inches(trailWidth)} Width Limit</ThemedText>
+            </View>
+          ) : null}
+          <RigFitLine limitIn={trailWidth} garage={garage} />
         </View>
       ) : null}
       {event ? (
@@ -281,6 +303,7 @@ export default function NewRide() {
           </Pressable>
         </View>
       ) : null}
+      {!event ? <EventOrRide from="create-ride" /> : null}
       <ThemedText type="heading">What Kind of Ride?</ThemedText>
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <KindCard
@@ -344,7 +367,8 @@ export default function NewRide() {
             title="Mapped"
             detail="Draw the route or import a GPX next. Riders follow it in Ride Mode."
             on={routePlan === 'mapped'}
-            onPress={() => setRoutePlan('mapped')}
+            onPress={() => requirePro('route_builder') && setRoutePlan('mapped')}
+            pro="route_builder"
           />
           <KindCard
             title="Freeride"
@@ -467,7 +491,7 @@ export default function NewRide() {
 }
 
 /** One of two choices (Public or Private, Mapped or Freeride): a big tappable card, outlined in red when picked. */
-function KindCard({ title, detail, on, onPress }: { title: string; detail: string; on: boolean; onPress: () => void }) {
+function KindCard({ title, detail, on, onPress, pro }: { title: string; detail: string; on: boolean; onPress: () => void; pro?: FeatureKey }) {
   return (
     <Pressable
       accessibilityRole="radio"
@@ -475,9 +499,12 @@ function KindCard({ title, detail, on, onPress }: { title: string; detail: strin
       onPress={onPress}
       style={{
         flex: 1, gap: Spacing.one, padding: Spacing.three, minHeight: 128, borderRadius: Radius.card, borderWidth: 2,
-        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? '#2A1620' : Colors.backgroundElement,
+        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? withAlpha(Colors.accent, 0.14) : Colors.backgroundElement,
       }}>
-      <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
+        {pro ? <ProTag feature={pro} /> : null}
+      </View>
       <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText>
     </Pressable>
   );

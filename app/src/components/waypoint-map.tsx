@@ -2,10 +2,11 @@ import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MarkerBody } from './marker-body';
 import { RouteEnds, RouteLine } from './route-overlay';
@@ -103,12 +104,12 @@ export function WaypointMap({
             e.stopPropagation?.();
             onPressWaypoint(w);
           }}
-          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}` : `Waypoint ${w.name}`}
+          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
           zIndex={w.planned_stop ? 5 : w.shared ? 4 : 3}>
           {w.planned_stop ? (
-            <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} />
+            <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
           ) : (
-            <WaypointPin name={w.name} kind={w.kind} shared={w.shared} />
+            <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
           )}
         </Marker>
       ))}
@@ -116,7 +117,7 @@ export function WaypointMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   found: { alignItems: 'center', maxWidth: 220 },
   foundText: {
     color: Colors.background, backgroundColor: '#ECCD91', fontFamily: font(700), fontSize: 13,
@@ -124,4 +125,4 @@ const styles = StyleSheet.create({
   },
   foundStem: { width: 2, height: 10, backgroundColor: '#ECCD91' },
   foundDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#ECCD91', borderWidth: 2, borderColor: Colors.background },
-});
+}));

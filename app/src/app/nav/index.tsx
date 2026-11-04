@@ -4,7 +4,7 @@ import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
@@ -16,7 +16,7 @@ import { MapSearch } from '@/components/map-search';
 import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
-import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
 import { riderHeading } from '@/core/heading';
 import { useFollowMe } from '@/hooks/use-follow-me';
@@ -40,14 +40,20 @@ import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRouteDraft } from '@/hooks/use-route-draft';
+import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { confirmAsync } from '@/lib/confirm';
 import {
   fetchTrailRules, getLocalTrail, getPublicTrail, loadTrails, markHiddenSeen, readRecording, saveLocalTrail, syncMyTrails, trailLine, useLocalTrails, writeRecording,
   type Recording,
 } from '@/lib/nav-trails';
-import { requirePro } from '@/lib/pro';
+import { requirePro, showProGate, useCan } from '@/lib/pro';
+import { useMapModeTime } from '@/lib/map-mode-time';
+import { mapTimeLeftText } from '@/core/map-mode-time';
+import { useTiltSettings } from '@/lib/tilt';
+import { TiltTile } from '@/components/tilt-tile';
 import { clearTrackLine, flushTrackLine, recordTrackFixes, setTrackLineOn, useTrackDays } from '@/lib/track-line';
+import { setSyncedItem } from '@/lib/settings-sync';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { ProTag } from '@/components/pro-tag';
@@ -76,6 +82,21 @@ const MPS_TO_MPH = 2.23694;
  */
 export default function NavMode() {
   const params = useLocalSearchParams<{ follow?: string; trail?: string; draw?: string }>();
+  const trackLinePro = useCan('track_line');
+  // Free riders get a number of Map Mode hours each month; riding with a group never counts.
+  const [focused, setFocused] = useState(true);
+  useFocusEffect(useCallback(() => {
+    setFocused(true);
+    return () => setFocused(false);
+  }, []));
+  const mapTime = useMapModeTime(focused);
+  const mapTimeText = mapTime.onGroupRide ? null : mapTimeLeftText(mapTime.left);
+  useEffect(() => {
+    if (!mapTime.usedUp) return;
+    showProGate({ kind: 'pro_required', feature: 'map_mode' });
+    if (router.canGoBack()) router.back();
+    else router.replace('/');
+  }, [mapTime.usedUp]);
   const insets = useSafeAreaInsets();
   const layout = useLayout();
   const wide = layout.expanded;
@@ -362,11 +383,13 @@ export default function NavMode() {
   }, []);
   useEffect(() => {
     if (params.draw !== '1') return;
-    // From the home screen's Map a Custom Trail: open on Draw.
+    // From the home screen's Map a Custom Trail: open on Draw (Pro).
+    if (!requirePro('custom_trails')) return;
     Promise.resolve().then(() => setMode('measure'));
     showIntroIfNew();
   }, [params.draw, showIntroIfNew]);
   const changeMode = (m: Mode) => {
+    if (m === 'measure' && !requirePro('custom_trails')) return;
     setMode(m);
     if (m === 'measure') showIntroIfNew();
   };
@@ -376,6 +399,7 @@ export default function NavMode() {
   const [marking, setMarking] = useState(false);
   const [pending, setPending] = useState<Pending | null>(null);
   const markAt = (p: LatLng, where: 'draw' | 'rec') => {
+    if (!requirePro('trail_spots')) return;
     const list = where === 'draw' ? drawObs : rec?.obstacles ?? [];
     setPending({ ...p, where, name: nextName(list), kind: 'obstacle' });
   };
@@ -408,10 +432,13 @@ export default function NavMode() {
   };
 
   // --- Track Line ---------------------------------------------------------------------
-  const [trackOn, , setTrackSwitch] = useRememberedToggle(TRACK_LINE_SWITCH_KEY, false);
+  const [trackSwitch, , setTrackSwitch] = useRememberedToggle(TRACK_LINE_SWITCH_KEY, false);
+  // Track Line is Pro; a Free rider's saved switch is kept for when they're on Pro.
+  const trackOn = trackSwitch && trackLinePro;
   const trackDays = useTrackDays();
   const trackLines = useMemo(() => (trackOn ? dayLines(trackDays, now) : []), [trackOn, trackDays, now]);
   const switchTrack = (on: boolean) => {
+    if (on && !requirePro('track_line')) return;
     setTrackSwitch(on);
     setTrackLineOn(on);
     Haptics.selectionAsync();
@@ -422,6 +449,7 @@ export default function NavMode() {
 
   async function saveMeasure() {
     if (draft.points.length < 2) return;
+    if (!requirePro('save_trails')) return;
     const nowIso = new Date().toISOString();
     const t: LocalTrail = {
       id: newTrailId(),
@@ -609,6 +637,11 @@ export default function NavMode() {
         <SafeAreaView edges={wide || floating ? [] : ['bottom']} style={[styles.panelInner, !open && { gap: 6 }]}>
           <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Navigation Tools" fromTop={wide} onFullMap={fullMap.enter} />
           <ModeTabs mode={mode} onChange={changeMode} recording={!!rec} />
+          {mapTimeText ? (
+            <Text style={styles.mapTime} accessibilityLiveRegion="polite" onPress={() => showProGate({ kind: 'pro_required', feature: 'map_mode' })}>
+              {`Free Map Mode: ${mapTimeText}`}
+            </Text>
+          ) : null}
 
           {mode === 'explore' ? (
             <ExplorePanel
@@ -661,7 +694,7 @@ export default function NavMode() {
               onSave={saveMeasure}
               spots={drawObs.length}
               marking={marking}
-              onMark={() => setMarking(!marking)}
+              onMark={() => (marking || requirePro('trail_spots')) && setMarking(!marking)}
             />
           )}
         </SafeAreaView>
@@ -674,7 +707,7 @@ export default function NavMode() {
         onClose={() => setIntro(false)}
         onStart={(skip) => {
           setIntro(false);
-          if (skip) AsyncStorage.setItem(CUSTOM_TRAIL_INTRO_KEY, '1').catch(() => {});
+          if (skip) setSyncedItem(CUSTOM_TRAIL_INTRO_KEY, '1').catch(() => {});
         }}
       />
       <ObstacleSheet
@@ -711,6 +744,7 @@ function ModeTabs({ mode, onChange, recording }: { mode: Mode; onChange: (m: Mod
             style={[styles.tab, on && styles.tabOn]}>
             {t.value === 'record' && recording ? <View style={styles.recDot} /> : null}
             <Text style={[styles.tabText, on && { color: Colors.text }]}>{t.label}</Text>
+            {t.value === 'measure' ? <ProTag feature="custom_trails" style={{ marginLeft: 6 }} /> : null}
           </Pressable>
         );
       })}
@@ -758,6 +792,10 @@ function ExplorePanel({
   const [tripV, tripU] = feetOrMiles(trip.distanceM).split(' ');
   const [movV, movU] = movingReadout(trip.movingS);
   const following = !!(followed && progress);
+  // The Tilt tile under the dash (phones and tablets; the website has no motion sensors).
+  const tiltSettings = useTiltSettings();
+  const tiltOn = Platform.OS !== 'web' && tiltSettings.show;
+  const tilt = useTilt(tiltSettings, tiltOn);
   return (
     <>
       {followed ? (
@@ -799,6 +837,7 @@ function ExplorePanel({
           {following ? <Gauge small value={hdg} unit={deg} label="Heading" /> : <Gauge small value={movV} unit={movU} label="Moving" />}
         </View>
       </View>
+      {tiltOn ? <TiltTile bar reading={tilt} limits={tiltSettings.limits} /> : null}
       {open ? (
         noLocation ? (
           <Text style={styles.hint}>Location is off for OnMyLead, so the map can’t show where you are. Turn it on in Settings to record and follow trails.</Text>
@@ -822,7 +861,10 @@ function ExplorePanel({
         <View style={styles.track}>
           <Icon name="trackLine" size={22} color={trackOn ? TRACK_DAY_COLORS[0] : Colors.textSecondary} />
           <View style={{ flex: 1, gap: 3 }}>
-            <Text style={styles.wideBtnText}>Track Line</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={styles.wideBtnText}>Track Line</Text>
+              <ProTag feature="track_line" style={{ alignSelf: 'auto' }} />
+            </View>
             <View style={styles.days}>
               {(['Today', 'Yesterday', 'Older'] as const).map((label, i) => (
                 <View key={label} style={styles.day}>
@@ -921,7 +963,10 @@ function RecordPanel({
         disabled={!onMark}
         onPress={() => onMark?.()}
         style={({ pressed }) => [styles.wideBtn, !onMark && { opacity: 0.45 }, pressed && { opacity: 0.85 }]}>
-        <Text style={styles.wideBtnText}>Mark a Spot Here</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={styles.wideBtnText}>Mark a Spot Here</Text>
+          <ProTag feature="trail_spots" style={{ alignSelf: 'auto' }} />
+        </View>
         <Text style={styles.dayText}>{spots ? `${spots} marked` : 'Ledges, crossings, views'}</Text>
       </Pressable>
       {open ? (
@@ -980,7 +1025,10 @@ function MeasurePanel({
         accessibilityLabel={marking ? 'Cancel marking a spot' : 'Mark a spot on the trail, like a ledge or water crossing'}
         onPress={onMark}
         style={({ pressed }) => [styles.wideBtn, marking && { borderWidth: 1.5, borderColor: SAND }, pressed && { opacity: 0.85 }]}>
-        <Text style={styles.wideBtnText}>{marking ? 'Cancel Marking' : 'Mark a Spot'}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={styles.wideBtnText}>{marking ? 'Cancel Marking' : 'Mark a Spot'}</Text>
+          <ProTag feature="trail_spots" style={{ alignSelf: 'auto' }} />
+        </View>
         <Text style={styles.dayText}>{spots ? `${spots} marked` : 'Ledges, crossings, views'}</Text>
       </Pressable>
       <View style={styles.row}>
@@ -993,6 +1041,7 @@ function MeasurePanel({
         {open ? (
           <Pressable accessibilityRole="button" disabled={taps < 2 || finding} onPress={onSave} style={({ pressed }) => [styles.ctl, { flexGrow: 1.5 }, (taps < 2 || finding) && { opacity: 0.4 }, pressed && { opacity: 0.85 }]}>
             <Text style={styles.ctlText}>Save Trail</Text>
+            <ProTag feature="save_trails" />
           </Pressable>
         ) : null}
       </View>
@@ -1002,7 +1051,7 @@ function MeasurePanel({
 
 const glass = GlassSurface;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   flex: { flex: 1 },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: Spacing.two, zIndex: 30 },
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
@@ -1052,6 +1101,7 @@ const styles = StyleSheet.create({
   recDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: RideColors.red },
   recState: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   row: { flexDirection: 'row', gap: Spacing.two },
+  mapTime: { color: Colors.gold, fontFamily: font(700), fontSize: 13, textAlign: 'center' },
   ctl: { flex: 1, minHeight: 50, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   ctlMain: { flexGrow: 1.6, backgroundColor: RECORD_INK, borderColor: RECORD_INK },
   ctlText: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
@@ -1061,4 +1111,4 @@ const styles = StyleSheet.create({
   day: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   dayLine: { width: 14, height: 3, borderRadius: 2 },
   dayText: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12 },
-});
+}));

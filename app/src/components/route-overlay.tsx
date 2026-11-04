@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Marker, Polyline } from 'react-native-maps';
 
-import { Colors, RideColors } from '@/constants/theme';
+import { Colors, RideColors, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 
 const coords = (points: LatLng[]) => points.map((p) => ({ latitude: p.lat, longitude: p.lng }));
@@ -42,7 +42,7 @@ export function RouteEnds({ points }: { points: LatLng[] }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   end: { width: 20, height: 20, borderRadius: 10, borderWidth: 3, borderColor: Colors.background, alignItems: 'center', justifyContent: 'center' },
   finishCore: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.background },
-});
+}));

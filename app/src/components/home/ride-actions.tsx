@@ -1,12 +1,13 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { JOIN_QUOTA, type Quota } from '@/core/home';
 import { Gradient, Home, Pill } from './parts';
+import { t } from '@/lib/i18n';
 
 /** Faint contour lines in the corner of the red cards: trail-map texture, not decoration for its own sake. */
 function Topo({ size = 220 }: { size?: number }) {
@@ -24,6 +25,12 @@ function Topo({ size = 220 }: { size?: number }) {
   );
 }
 
+/** A plan label ("Unlimited", "2 Left This Month") in the rider's language. */
+const quotaText = (text: string) => {
+  const left = /^(\d+) Left This Month$/.exec(text);
+  return left ? t('{n} Left This Month', { n: left[1] }) : t(text);
+};
+
 /** Join a Ride: the big red card at the top, with the invite code box right in it. */
 export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: string) => void; onOpen: () => void }) {
   const ready = code.trim().length >= 4;
@@ -33,10 +40,10 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
       <Topo />
       <View style={styles.heroTop}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.heroTitle} accessibilityRole="header">Join a Ride</Text>
-          <Text style={styles.heroDetail}>Got a code from the leader? Type it here.</Text>
+          <Text style={styles.heroTitle} accessibilityRole="header">{t('Join a Ride')}</Text>
+          <Text style={styles.heroDetail}>{t('Got a code from the leader? Type it here.')}</Text>
         </View>
-        <Pill text={JOIN_QUOTA.text} tone="onRed" />
+        <Pill text={quotaText(JOIN_QUOTA.text)} tone="onRed" />
       </View>
       <View style={styles.codeBox}>
         <TextBox
@@ -46,23 +53,23 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
           autoCapitalize="characters"
           autoCorrect={false}
           returnKeyType="go"
-          placeholder="Invite code, e.g. 7F3A9C21"
+          placeholder={t('Invite code, e.g. 7F3A9C21')}
           placeholderTextColor="rgba(255,255,255,0.62)"
           selectionColor="#fff"
-          accessibilityLabel="Invite code"
+          accessibilityLabel={t('Invite code')}
           style={styles.codeInput}
         />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Join with this code"
+          accessibilityLabel={t('Join with this code')}
           accessibilityState={{ disabled: !ready }}
           disabled={!ready}
           onPress={onOpen}
           style={({ pressed }) => [styles.codeGo, { opacity: ready ? (pressed ? 0.85 : 1) : 0.55 }]}>
-          <Text style={styles.codeGoText}>Join</Text>
+          <Text style={styles.codeGoText}>{t('Join')}</Text>
         </Pressable>
       </View>
-      <Text style={styles.scan}>Or open the ride link or QR code with your camera.</Text>
+      <Text style={styles.scan}>{t('Or open the ride link or QR code with your camera.')}</Text>
     </View>
   );
 }
@@ -82,22 +89,22 @@ export function ActionTiles({
       <Tile
         accent
         icon="flag"
-        title="Create a Ride"
-        detail="You lead. Public or friends only."
+        title={t('Create a Ride')}
+        detail={t('You lead. Public or friends only.')}
         onPress={onCreate}
         pill={quota ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={quota.upgrade ? `${quota.text}. See Pro for unlimited rides` : `${quota.text} rides with Pro`}
+            accessibilityLabel={quota.upgrade ? t('{quota}. See Pro for unlimited rides', { quota: quotaText(quota.text) }) : t('{quota} rides with Pro', { quota: quotaText(quota.text) })}
             disabled={!quota.upgrade}
             hitSlop={8}
             onPress={() => router.push('/pro')}>
-            <Pill text={quota.text} tone={quota.tone === 'pro' ? 'gold' : quota.tone === 'out' ? 'out' : 'plain'} />
+            <Pill text={quotaText(quota.text)} tone={quota.tone === 'pro' ? 'gold' : quota.tone === 'out' ? 'out' : 'plain'} />
           </Pressable>
         ) : null}
       />
       {findOn ? (
-        <Tile icon="search" title="Find a Ride" detail="Near you or by state" onPress={onFind} pill={findText ? <Pill text={findText} /> : null} />
+        <Tile icon="search" title={t('Find a Ride')} detail={t('Near you or by state')} onPress={onFind} pill={findText ? <Pill text={findText} /> : null} />
       ) : null}
     </View>
   );
@@ -121,10 +128,10 @@ function Tile({
       <Gradient colors={[Home.panel2, Home.panel]} radius={22} />
       {accent ? <View style={styles.accentEdge} /> : null}
       <View style={[styles.tileIcon, accent && styles.tileIconRed]}>
-        <Icon name={icon} size={22} color={accent ? Colors.accent : '#fff'} strokeWidth={2.4} />
+        <Icon name={icon} size={22} color={accent ? Colors.accent : Colors.text} strokeWidth={2.4} />
       </View>
       <View style={styles.tileBody}>
-        <Text style={styles.tileTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
+        <Text style={styles.tileTitle} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
         <Text style={styles.tileDetail} numberOfLines={2}>{detail}</Text>
       </View>
       {pill ? <View style={styles.tilePill}>{pill}</View> : null}
@@ -132,7 +139,7 @@ function Tile({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   hero: { borderRadius: 28, padding: 22, overflow: 'hidden', gap: Spacing.three },
   heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
   heroTitle: { color: '#fff', fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 44 },
@@ -157,4 +164,4 @@ const styles = StyleSheet.create({
   tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 28 },
   tileDetail: { color: Home.muted, fontFamily: font(500), fontSize: 13, lineHeight: 17, minHeight: 34 },
   tilePill: { marginTop: 'auto', flexDirection: 'row' },
-});
+}));

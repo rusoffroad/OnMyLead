@@ -17,6 +17,10 @@ keywords: [music, spotify, apple music, youtube music, pandora, podcast, radio, 
 
 Music Controls let you pause, skip and turn the music up or down without switching apps, so the group map stays on your screen. They control the music already playing on your phone, from the app you play it in.
 
+:::release 2.0
+Music controls are a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the music button carries a **Pro** tag. Your music app itself keeps playing as usual.
+:::
+
 ## Open Music Controls
 
 1. In **Ride Mode** or **Navigate**, tap the round **Music** button with the music note. It sits on the right, just above **Center on Me**.

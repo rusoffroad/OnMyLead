@@ -7,7 +7,7 @@ import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { TimePicker } from '@/components/time-picker';
 import { Button, Choice, ErrorText, Field } from '@/components/ui';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { AGENDA_KINDS, atMinutesOf, dayChip, eventDays, minutesOf, type AgendaItem, type AgendaKind, type EventDetail } from '@/core/events';
 import { minutesText, parseTime } from '@/core/time';
 import { confirmAsync } from '@/lib/confirm';
@@ -182,8 +182,8 @@ export function AddRideSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   list: { backgroundColor: Colors.background, borderRadius: Radius.card, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, paddingHorizontal: 14, paddingVertical: 12, minHeight: 60 },
   rule: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
-});
+}));

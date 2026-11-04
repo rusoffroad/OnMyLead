@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Line } from 'react-native-svg';
 
-import { Colors, font, RideColors } from '@/constants/theme';
+import { Colors, font, RideColors, themedStyles } from '@/constants/theme';
 import { ringFraction, ringMiles, ringSpot, type NearbyRider } from '@/core/out-riding';
 
 /**
@@ -71,10 +71,10 @@ export function RangeRings({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   ringLabel: { position: 'absolute', width: 30, textAlign: 'right', color: Colors.textSecondary, fontFamily: font(600, 'display'), fontSize: 13 },
   you: { position: 'absolute', width: 40, textAlign: 'center', color: '#fff', fontFamily: font(800, 'display'), fontSize: 14, lineHeight: 18 },
   dot: { position: 'absolute', alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: Colors.background },
   initial: { color: '#fff', fontFamily: font(800) },
   caption: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, textAlign: 'center' },
-});
+}));

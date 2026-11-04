@@ -1,14 +1,15 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { Convoy } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { NOT_SWITCHED_ON, ridersLabel } from '@/core/groups';
 import { groupPreview, joinGroup, NotSwitchedOnError, type GroupPreview } from '@/lib/groups';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /**
  * A riding group's invite link (onmylead.com/g/<code>). Shows the group's name, who runs it and
@@ -49,7 +50,7 @@ export default function GroupLink() {
   if (preview === null) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Riding Group' }} />
+        <Stack.Screen options={{ title: t('Riding Group') }} />
         <ThemedText>{error ?? 'This group link doesn’t work anymore. Ask for a new one.'}</ThemedText>
       </Screen>
     );
@@ -60,7 +61,7 @@ export default function GroupLink() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Riding Group' }} />
+      <Stack.Screen options={{ title: t('Riding Group') }} />
       <View style={{ gap: Spacing.three, paddingTop: Spacing.three }}>
         <ThemedText themeColor="textSecondary">{preview.owner_name} invited you to their riding group</ThemedText>
         <Text style={styles.title}>{preview.name}</Text>
@@ -82,6 +83,6 @@ export default function GroupLink() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 48, lineHeight: 50, letterSpacing: -0.5 },
-});
+}));

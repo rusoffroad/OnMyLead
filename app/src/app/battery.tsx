@@ -1,15 +1,16 @@
 import { Stack } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { BATTERY_MODES, BATTERY_PLANS, batteryWarning, DEFAULT_BATTERY_MODE, type BatteryMode } from '@/core/battery';
 import { EXPANDED_MIN } from '@/core/layout';
 import { setBatteryMode, useBatteryMode } from '@/lib/battery';
 import { confirmAsync } from '@/lib/confirm';
 import { applyBatteryPlan } from '@/lib/location';
+import { t } from '@/lib/i18n';
 
 /** The stretch of riding each trail shows, so the dots compare across the three choices. */
 const TRAIL_SEC = 90;
@@ -37,7 +38,7 @@ export default function BatteryScreen() {
 
   return (
     <Screen width={sideBySide ? 'page' : 'readable'}>
-      <Stack.Screen options={{ title: 'Battery Saver' }} />
+      <Stack.Screen options={{ title: t('Battery Saver') }} />
       <ThemedText themeColor="textSecondary">
         How often this device tells your group where you are while you share your location. Fewer updates use less battery.
       </ThemedText>
@@ -115,7 +116,7 @@ function Trail({ heartbeatSec, fuzzy, on }: { heartbeatSec: number; fuzzy: boole
 const DOT = 10;
 const HALO = 24;
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   warn: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: RideColors.yellow, padding: Spacing.three, gap: 4 },
   options: { gap: Spacing.two },
   optionsRow: { flexDirection: 'row', alignItems: 'stretch' },
@@ -141,4 +142,4 @@ const styles = StyleSheet.create({
   dotNow: { width: DOT + 4, height: DOT + 4, borderRadius: (DOT + 4) / 2, borderWidth: 2, borderColor: Colors.text },
   short: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20 },
   detail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14, lineHeight: 19 },
-});
+}));

@@ -4,9 +4,12 @@ summary: Switch between satellite and topo, show public trails and roads with th
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/trail-map-overlay.tsx
+  - app/src/components/trail-width-row.tsx
+  - app/src/core/trail-width.ts
+  - app/src/lib/trail-width.ts
   - app/src/components/trail-tiles.tsx
   - app/src/components/trail-tiles.web.tsx
   - app/src/hooks/use-trail-map.ts
@@ -32,6 +35,10 @@ screenshots:
 OnMyLead's maps can show public trails and roads over satellite imagery or a topo map. Tap a trail to see its name and which vehicles are allowed on it.
 
 ![Trail lines and rider dots on the satellite map](/help/img/map.webp)
+
+:::release 2.0
+Satellite, topo and the trails layer are Pro features. See [Free and Pro](/help/free-vs-pro). On a Free account, **Map Style** carries a **Pro** tag and the map shows the standard map.
+:::
 
 ## Open the Layers
 
@@ -134,6 +141,29 @@ If the trail or road is closed today, a red box at the top of the card says so, 
 :::
 
 For an OpenStreetMap track, the card says it was mapped by riders on OpenStreetMap, and that parks and private land need permission or a pass.
+
+:::release 2.0
+## Trail Width Limits
+
+Some trails only fit narrow machines. When the card knows a trail's width limit, it shows it under the trail's name, for example **50" Width Limit**:
+
+- **Forest Service trails** open only to ATVs and side-by-sides 50 inches or less show **50" Width Limit**, from the Forest Service's own vehicle rules.
+- **Any public trail** (Forest Service, BLM or OpenStreetMap) can show a width other riders added. The card shows the middle of everyone's entries, so one wrong number doesn't change it, and says how many riders added one.
+
+If you added widths to your machines in the [Garage](/help/garage), the card also says whether they fit, for example **Your RZR Is Too Wide (64")** in red or **Your Grizzly Fits (48")** in green.
+
+### Add a Width Limit
+
+Found a gate, a posted limit or a narrow gap? Add it so other riders know before they go.
+
+1. Tap the trail line to open its card. You need to be signed in and have signal.
+2. Tap **Add Width Limit**.
+3. Type the narrowest width in inches (30 to 120) and tap **Save Width**.
+
+Your width counts once per trail. To change it, tap **Change Your Width** on the same trail. To take it back, tap **Change Your Width**, then **Remove My Width**. OnMyLead can remove a width that's far off from what other riders found.
+
+Trails other riders mapped show the width their mapper entered. See [Map Mode](/help/navigation-mode).
+:::
 
 :::warning
 Map data can be out of date. Always check posted signs and closures before you ride.

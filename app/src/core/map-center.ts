@@ -99,3 +99,36 @@ export function fitInset(size: { width: number; height: number }, inset: Inset):
 export function shouldCenterOnOpen(s: { done: boolean; userMoved: boolean; mapReady: boolean; at: LatLng | null }): boolean {
   return !s.done && !s.userMoved && s.mapReady && s.at != null;
 }
+
+/**
+ * Map Mode's opening camera: the map opens on the rider at riding zoom the first time their
+ * location is known, even when that first fix lands after the map is ready (a cold start with no
+ * GPS fix yet) or the phone's map drops the first move (Android ignores camera moves sent before it
+ * has laid out, and stayed on the whole state). The move is checked against where the map ended up
+ * and sent again, a few times at most, until the map is really on the rider. Once the rider moves
+ * the map by hand (or searches for a place), the opening camera leaves the map alone.
+ */
+export type OpeningCamera = { done: boolean; userMoved: boolean; tries: number };
+export const OPENING_START: OpeningCamera = { done: false, userMoved: false, tries: 0 };
+/** Riding zoom the map opens at (degrees of latitude across). */
+export const OPENING_DELTA = 0.04;
+export const OPENING_MAX_TRIES = 8;
+/** How long to wait after a move before checking it landed. */
+export const OPENING_CHECK_MS = 700;
+
+export type MapRegion = { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number };
+
+/** Whether to (re)send the opening move now. */
+export function openingMoveWanted(s: OpeningCamera, center: LatLng | null): boolean {
+  return !!center && !s.done && !s.userMoved && s.tries < OPENING_MAX_TRIES;
+}
+
+/** Whether the map shows `target` near its middle at about riding zoom (not the whole state). */
+export function openingReached(region: MapRegion | null, target: LatLng): boolean {
+  if (!region) return false;
+  if (!(region.latitudeDelta <= OPENING_DELTA * 2)) return false;
+  return (
+    Math.abs(region.latitude - target.lat) <= region.latitudeDelta / 4 &&
+    Math.abs(wrapLng(region.longitude - target.lng)) <= region.longitudeDelta / 4
+  );
+}

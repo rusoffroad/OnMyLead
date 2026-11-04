@@ -1,0 +1,11 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "Tu ubicación solo se comparte con los pilotos que elijas, y solo mientras compartes, para que tu grupo se mantenga unido.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "Sigue compartiendo con tu ruta mientras el teléfono está bloqueado en el soporte. Compartir siempre se detiene cuando termina tu temporizador o la ruta.",
+    "NSAppleMusicUsageDescription": "Muestra el nombre de la canción de Apple Music en los controles de música. Se queda en tu teléfono.",
+    "NSPhotoLibraryUsageDescription": "Elige una foto de perfil o una foto de tu vehículo para tu garaje. Solo se sube la foto que elijas.",
+    "NSCameraUsageDescription": "Toma una foto de perfil o una foto de tu vehículo. Solo se sube la foto que tomes.",
+    "NSMotionUsageDescription": "OnMyLead usa los sensores de movimiento para el medidor de inclinación y para detectar un posible accidente en el Modo Ruta y avisar a tu grupo.",
+    "NSLocalNetworkUsageDescription": "OnMyLead se conecta a tu antena Starlink en su wifi para mostrar su estado. No toca nada más de tu red."
+  }
+}

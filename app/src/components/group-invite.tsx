@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { invitedLine, namesLine, ridersLabel } from '@/core/groups';
 import { inviteGroupToRide, myGroups, NotSwitchedOnError, openNewGroup, type RidingGroup } from '@/lib/groups';
 import { Convoy } from './convoy';
@@ -83,11 +83,11 @@ export function GroupInvite({ rideId }: { rideId: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { gap: Spacing.two, paddingTop: Spacing.two, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
   group: { backgroundColor: Colors.backgroundSelected, borderRadius: Radius.control, padding: 12, gap: 8 },
   groupTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
   name: { fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 26 },
   sent: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#2F9E5B', alignItems: 'center', justifyContent: 'center' },
   empty: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: Colors.backgroundSelected, borderRadius: Radius.control, padding: 14 },
-});
+}));

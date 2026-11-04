@@ -11,6 +11,8 @@ import { shareCodeStatus, ShareCodesOffError } from '@/lib/share-codes';
 import { Icon } from './icon';
 import { ThemedText } from './themed-text';
 import { Field } from './ui';
+import { ProLock } from './pro-gate';
+import { useCan } from '@/lib/pro';
 
 /**
  * What the field knows about the code typed so far. `unchecked`: the server couldn't be asked (no
@@ -27,9 +29,13 @@ export const codeCheckOk = (c: CodeCheck) => c === 'empty' || c === 'unchecked' 
  * away, then whether the code is free, asked of the database once typing pauses. Same on every
  * device; on the web it is an ordinary text box.
  */
-export function ShareCodeField({
-  kind, id, value, onChange, onCheck, label = 'Your Own Code', hint, placeholder = 'MOAB-2026', autoFocus,
-}: {
+export function ShareCodeField(props: ShareCodeFieldProps) {
+  // Custom codes are Pro: Free riders see the Pro row, and the made-up code is used.
+  if (!useCan('custom_codes')) return <ProLock feature="custom_codes" title="Your Own Code" detail="Pick an easy code to share" />;
+  return <ShareCodeFieldInner {...props} />;
+}
+
+type ShareCodeFieldProps = {
   kind: ShareCodeKind;
   /** The ride or group being changed, so its current code reads as its own. */
   id?: string | null;
@@ -40,7 +46,11 @@ export function ShareCodeField({
   hint?: string;
   placeholder?: string;
   autoFocus?: boolean;
-}) {
+};
+
+function ShareCodeFieldInner({
+  kind, id, value, onChange, onCheck, label = 'Your Own Code', hint, placeholder = 'MOAB-2026', autoFocus,
+}: ShareCodeFieldProps) {
   const theme = useTheme();
   const code = cleanShareCode(value);
   const problem = code ? shareCodeProblem(code) : null;

@@ -4,7 +4,7 @@ summary: What to check when riders don't show on the map, alerts don't arrive, a
 category: troubleshooting
 order: 10
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/core/freshness.ts
   - app/src/components/rider-dot.tsx
@@ -76,6 +76,12 @@ It waits on your phone as **Waiting for Signal** and sends by itself as soon as 
 On Android, check **Settings > Apps > OnMyLead > Notifications**, including the **Rider Alerts**, **Ride Chat** and **Ride Updates** categories.
 
 **Need Help** and **EMERGENCY** alerts from your group always come through, even in quiet hours, as long as iPhone notifications are allowed for OnMyLead.
+
+:::release 2.0
+## The Spoken Alerts Sound Robotic
+
+Your phone may only have its small standard voice. Open **You** > **Voice** to hear the voices on your phone, and follow the steps there to download a free Premium or Enhanced voice. See [Choose the Voice for Spoken Alerts](/help/voice).
+:::
 
 ## Part of My Route Is a Straight Line
 

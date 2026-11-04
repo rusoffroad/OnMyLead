@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { DateCalendar } from '@/components/date-calendar';
 import { daysAwayText, longDayText, quickDays, rideDayRange, sameDay, startOfDay } from '@/core/calendar';
 
@@ -75,7 +75,7 @@ export function RideDatePicker({ value, onChange }: { value: number; onChange: (
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   chip: { borderRadius: Radius.pill, paddingHorizontal: 16, minHeight: 40, justifyContent: 'center' },
   chipText: { fontSize: 15, fontFamily: font(600) },
@@ -85,4 +85,4 @@ const styles = StyleSheet.create({
   },
   pickedDay: { fontSize: 26, lineHeight: 30, fontFamily: font(700, 'display') },
   calendarButton: { alignItems: 'center', gap: 2, minWidth: 64 },
-});
+}));

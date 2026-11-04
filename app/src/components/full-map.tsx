@@ -1,9 +1,9 @@
 import { useMemo, type ReactNode } from 'react';
-import { PanResponder, Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { PanResponder, Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
-import { Colors, font, GlassSurface, Radius, RideColors } from '@/constants/theme';
+import { Colors, font, GlassSurface, Radius, RideColors, themedStyles } from '@/constants/theme';
 import { FULL_MAP_BAR_H, RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
 import { isVerticalSwipe } from '@/core/panel-swipe';
 
@@ -110,7 +110,7 @@ export function BarChip({ title, onPress, disabled, label }: { title: string; on
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   fullBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 34, paddingHorizontal: 12,
     borderRadius: 17, backgroundColor: Colors.backgroundSelected,
@@ -138,4 +138,4 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
   },
   chipText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
-});
+}));

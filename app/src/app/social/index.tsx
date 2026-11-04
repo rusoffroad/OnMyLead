@@ -1,12 +1,12 @@
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { ComposePrompt, FriendRows, ItemList, useItems } from '@/components/social/lists';
 import { Social } from '@/components/social/parts';
 import { TwoPane } from '@/components/two-pane';
 import { Button, ErrorText, Screen, Segmented } from '@/components/ui';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { can } from '@/core/entitlements';
 import { profileHref, SOCIAL_NOT_SWITCHED_ON, type SocialTab } from '@/core/social';
 import { sideColumnWidth } from '@/core/layout';
@@ -16,6 +16,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { refreshFriends, useFriends } from '@/lib/friends';
 import { useSession } from '@/lib/session';
 import { riderTimeline, socialFeed, SocialOffError } from '@/lib/social';
+import { t } from '@/lib/i18n';
 
 const PAGE = 25;
 
@@ -84,7 +85,7 @@ export default function SocialScreen() {
     }
   };
 
-  if (!me) return <Screen><Stack.Screen options={{ title: 'Social' }} /></Screen>;
+  if (!me) return <Screen><Stack.Screen options={{ title: t('Social') }} /></Screen>;
 
   const compose = off ? null : <ComposePrompt userId={me} name={name || 'You'} pro={pro} />;
   const activity = off ? (
@@ -114,7 +115,7 @@ export default function SocialScreen() {
   if (layout.wide) {
     return (
       <>
-        <Stack.Screen options={{ title: 'Social' }} />
+        <Stack.Screen options={{ title: t('Social') }} />
         <TwoPane
           sideWidth={sideColumnWidth(layout.width)}
           side={
@@ -140,7 +141,7 @@ export default function SocialScreen() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Social' }} />
+      <Stack.Screen options={{ title: t('Social') }} />
       <View style={{ gap: 16 }}>
         {compose}
         <Segmented
@@ -156,8 +157,8 @@ export default function SocialScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   title: { color: Colors.text, fontFamily: font(600, 'display'), fontSize: 24 },
   muted: { color: Social.muted, fontFamily: font(500), fontSize: 14, lineHeight: 20 },
   free: { color: Social.muted, fontFamily: font(500), fontSize: 13, lineHeight: 18, textAlign: 'center' },
-});
+}));

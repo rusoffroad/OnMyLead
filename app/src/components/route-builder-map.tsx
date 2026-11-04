@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
@@ -138,7 +138,7 @@ export function RouteBuilderMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   pin: {
     minWidth: 26, height: 26, borderRadius: 13, paddingHorizontal: 4, alignItems: 'center', justifyContent: 'center',
     backgroundColor: Colors.background, borderWidth: 2.5, borderColor: Colors.accent,
@@ -153,4 +153,4 @@ const styles = StyleSheet.create({
   foundStem: { width: 2, height: 10, backgroundColor: '#ECCD91' },
   foundDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#ECCD91', borderWidth: 2, borderColor: Colors.background },
   num: { color: '#fff', fontFamily: font(800), fontSize: 12 },
-});
+}));

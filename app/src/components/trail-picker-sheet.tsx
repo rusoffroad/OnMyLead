@@ -1,11 +1,11 @@
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { TrailThumb } from '@/components/trail-thumb';
 import { Button } from '@/components/ui';
-import { Colors, font, Spacing } from '@/constants/theme';
+import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { feetOrMiles, RIDER_TRAIL_INK, trackStats, type LocalTrail } from '@/core/nav-trails';
 import { trailLine, useLocalTrails } from '@/lib/nav-trails';
 
@@ -33,7 +33,7 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
               ))
             ) : (
               <ThemedText themeColor="textSecondary">
-                No trails on this phone yet. Record or draw one in Map Mode, or save a rider trail, and it shows here.
+                No trails yet. Record or draw one in Map Mode, or save a rider trail, and it shows here.
               </ThemedText>
             )}
           </SheetScroll>
@@ -44,8 +44,8 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
   );
 }
 
-const styles = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+const styles = themedStyles(() => ({
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     flexShrink: 1, maxHeight: '80%', backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
@@ -56,4 +56,4 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 8, borderRadius: 14, backgroundColor: Colors.backgroundSelected },
   name: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
   sub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14 },
-});
+}));

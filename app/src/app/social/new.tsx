@@ -2,13 +2,13 @@ import { Image } from 'expo-image';
 import type { ImagePickerAsset } from 'expo-image-picker';
 import { router, Stack } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
 import { ProTag, Social } from '@/components/social/parts';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { can } from '@/core/entitlements';
 import { POST_MAX } from '@/core/social';
 import { canUseCamera } from '@/lib/avatars';
@@ -16,6 +16,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { createPost, pickPostPhoto, ProNeededError } from '@/lib/social';
+import { t } from '@/lib/i18n';
 
 /**
  * New Post: a ride report for your profile and your friends' feeds, with one optional photo.
@@ -62,7 +63,7 @@ export default function NewPost() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'New Post' }} />
+      <Stack.Screen options={{ title: t('New Post') }} />
       <View style={{ gap: 16 }}>
         {!pro ? (
           <Pressable onPress={() => requirePro('social_posts')} style={styles.locked} accessibilityRole="button">
@@ -110,7 +111,7 @@ export default function NewPost() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   input: {
     minHeight: 160, borderRadius: 18, backgroundColor: Social.panel, borderWidth: 1, borderColor: Social.line, color: Colors.text,
     padding: 16, paddingTop: 16, fontFamily: font(500), fontSize: 18, lineHeight: 25, textAlignVertical: 'top',
@@ -128,4 +129,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(230,194,122,0.08)', borderWidth: 1, borderColor: 'rgba(230,194,122,0.35)',
   },
   lockedText: { flex: 1, color: Colors.text, fontFamily: font(600), fontSize: 15 },
-});
+}));

@@ -69,6 +69,8 @@ function FlatNavMap({
   const layer = useRef<L.LayerGroup | null>(null);
   const tracks = useRef<ReturnType<typeof trailLayers> | null>(null);
   const centered = useRef(false);
+  // The rider dragged the map before their location was known: don't pull it back to them.
+  const userMoved = useRef(false);
   const followed = useRef<LatLng | null>(null);
   const meDot = useRef<L.Marker | null>(null);
   const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle });
@@ -104,7 +106,10 @@ function FlatNavMap({
       reportRegion(m, cb.current.onRegion);
     };
     m.on('moveend', report);
-    m.on('dragstart', () => cb.current.onUserMove?.());
+    m.on('dragstart', () => {
+      userMoved.current = true;
+      cb.current.onUserMove?.();
+    });
     frame(m, [], center);
     map.current = m;
     report();
@@ -117,7 +122,7 @@ function FlatNavMap({
   }, []);
 
   useEffect(() => {
-    if (!center || centered.current || !map.current) return;
+    if (!center || centered.current || userMoved.current || !map.current) return;
     centered.current = true;
     map.current.setView(ll(center), 13);
   }, [center]);

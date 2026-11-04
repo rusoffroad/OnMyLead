@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TimePicker } from '@/components/time-picker';
@@ -10,13 +10,14 @@ import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field } from '@/components/ui';
 import { StopSign, WaypointBlaze, WaypointGlyph } from '@/components/waypoint-blaze';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import {
-  canEditWaypoint, canRemoveWaypoint, kindLabel, moveStop, parseStopTime, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber,
-  stopTimeInput, stopTimeLabel, suggestWaypointName, WAYPOINT_KINDS, WAYPOINT_NAME_MAX, WAYPOINT_NOTE_MAX, waypointAudience,
-  waypointNameProblem, type Waypoint, type WaypointKind,
+  canEditWaypoint, canRemoveWaypoint, moveStop, parseStopTime, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber,
+  stopTimeInput, stopTimeLabel, suggestWaypointName, WAYPOINT_NAME_MAX, WAYPOINT_NOTE_MAX, waypointAudience,
+  waypointNameProblem, type Waypoint,
 } from '@/core/waypoints';
+import { symbolLabel, WAYPOINT_SYMBOLS, waypointSymbol, type WaypointSymbol } from '@/core/waypoint-symbols';
 import { confirmAsync } from '@/lib/confirm';
 import { addWaypoint, removeWaypoint, reorderPlannedStops, updateWaypoint } from '@/lib/waypoints';
 
@@ -50,7 +51,7 @@ export function WaypointSheet({
 }) {
   const insets = useSafeAreaInsets();
   const [editing, setEditing] = useState(false);
-  const [kind, setKind] = useState<WaypointKind>('spot');
+  const [symbol, setSymbol] = useState<WaypointSymbol>('spot');
   const [name, setName] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
   const [note, setNote] = useState('');
@@ -62,14 +63,14 @@ export function WaypointSheet({
   const viewing = target?.type === 'view' ? target.waypoint : null;
   const form = target?.type === 'new' || editing;
 
-  // Start each sheet fresh: a new one named after its kind (reset while rendering, when the target changes).
+  // Start each sheet fresh: a new one named after its symbol (reset while rendering, when the target changes).
   const [seen, setSeen] = useState<WaypointSheetTarget>(null);
   if (seen !== target) {
     setSeen(target);
     setError(null);
     setEditing(false);
     if (target?.type === 'new') {
-      setKind('spot');
+      setSymbol('spot');
       setName(suggestWaypointName('spot', existing));
       setNameTouched(false);
       setNote('');
@@ -80,7 +81,7 @@ export function WaypointSheet({
   }
 
   function startEdit(w: Waypoint) {
-    setKind(w.kind);
+    setSymbol(waypointSymbol(w));
     setName(w.name);
     setNameTouched(true);
     setNote(w.note ?? '');
@@ -89,9 +90,9 @@ export function WaypointSheet({
     setEditing(true);
   }
 
-  function pickKind(k: WaypointKind) {
+  function pickSymbol(k: WaypointSymbol) {
     Haptics.selectionAsync();
-    setKind(k);
+    setSymbol(k);
     if (!nameTouched) setName(suggestWaypointName(k, existing));
   }
 
@@ -108,9 +109,9 @@ export function WaypointSheet({
       // Only mention planned stops when one is involved, so plain waypoints work before that server update.
       const stop = planned ? { planned_stop: true, stop_time: time || null } : viewing?.planned_stop ? { planned_stop: false } : {};
       if (viewing) {
-        onChanged({ saved: await updateWaypoint(viewing.id, { name, kind, note, shared: share, ...stop }) });
+        onChanged({ saved: await updateWaypoint(viewing.id, { name, symbol, note, shared: share, ...stop }) });
       } else if (target?.type === 'new') {
-        onChanged({ saved: await addWaypoint(rideId, { name, kind, note, lat: target.at.lat, lng: target.at.lng, shared: share, ...stop }) });
+        onChanged({ saved: await addWaypoint(rideId, { name, symbol, note, lat: target.at.lat, lng: target.at.lng, shared: share, ...stop }) });
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onClose();
@@ -175,30 +176,30 @@ export function WaypointSheet({
               {form ? (
                 <>
                   <View style={styles.head}>
-                    {stopForm ? <StopSign n={formStopN} size={42} /> : <WaypointBlaze kind={kind} shared={canShare && audience !== 'me'} size={40} />}
+                    {stopForm ? <StopSign n={formStopN} size={42} symbol={symbol} /> : <WaypointBlaze symbol={symbol} shared={canShare && audience !== 'me'} size={40} />}
                     <View style={{ flex: 1 }}>
                       <Text style={styles.title} accessibilityRole="header">{viewing ? `Edit ${noun}` : `New ${noun}`}</Text>
                       {at ? <Text style={styles.coords}>{at.lat.toFixed(5)}, {at.lng.toFixed(5)}</Text> : null}
                     </View>
                   </View>
 
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.kinds} accessibilityRole="radiogroup">
-                    {WAYPOINT_KINDS.map((k) => {
-                      const on = k.kind === kind;
+                  <View style={styles.symbols} accessibilityRole="radiogroup" accessibilityLabel="Symbol">
+                    {WAYPOINT_SYMBOLS.map((k) => {
+                      const on = k.symbol === symbol;
                       return (
                         <Pressable
-                          key={k.kind}
+                          key={k.symbol}
                           accessibilityRole="radio"
                           accessibilityState={{ selected: on }}
                           accessibilityLabel={k.label}
-                          onPress={() => pickKind(k.kind)}
-                          style={[styles.kind, on && styles.kindOn]}>
-                          <WaypointGlyph kind={k.kind} size={22} color={on ? Colors.background : Colors.text} />
-                          <Text style={[styles.kindText, on && { color: Colors.background }]}>{k.label}</Text>
+                          onPress={() => pickSymbol(k.symbol)}
+                          style={({ pressed }) => [styles.symbol, on && styles.symbolOn, pressed && !on && { opacity: 0.7 }]}>
+                          <WaypointGlyph symbol={k.symbol} size={22} color={on ? Colors.background : Colors.text} />
+                          <Text style={[styles.symbolText, on && { color: Colors.background }]} numberOfLines={2}>{k.label}</Text>
                         </Pressable>
                       );
                     })}
-                  </ScrollView>
+                  </View>
 
                   <Field
                     label="Name"
@@ -264,16 +265,16 @@ export function WaypointSheet({
               ) : viewing ? (
                 <>
                   <View style={styles.head}>
-                    {viewing.planned_stop ? <StopSign n={viewN} size={46} /> : <WaypointBlaze kind={viewing.kind} shared={viewing.shared} size={44} />}
+                    {viewing.planned_stop ? <StopSign n={viewN} size={46} symbol={waypointSymbol(viewing)} /> : <WaypointBlaze symbol={waypointSymbol(viewing)} shared={viewing.shared} size={44} />}
                     <View style={{ flex: 1 }}>
                       <Text style={styles.title} accessibilityRole="header" numberOfLines={2}>{viewing.name}</Text>
                       {viewing.planned_stop ? (
                         <Text style={[styles.meta, { color: Colors.text }]}>
-                          {[`Planned Stop ${viewN ?? ''}`.trim(), stopTimeLabel(viewing.stop_time), kindLabel(viewing.kind)].filter(Boolean).join(', ')}
+                          {[`Planned Stop ${viewN ?? ''}`.trim(), stopTimeLabel(viewing.stop_time), symbolLabel(waypointSymbol(viewing))].filter(Boolean).join(', ')}
                         </Text>
                       ) : (
                         <Text style={[styles.meta, viewing.shared && { color: Colors.sky }]}>
-                          {kindLabel(viewing.kind)}, {waypointAudience(viewing, me, ownerName(viewing.user_id))}
+                          {symbolLabel(waypointSymbol(viewing))}, {waypointAudience(viewing, me, ownerName(viewing.user_id))}
                         </Text>
                       )}
                     </View>
@@ -354,8 +355,8 @@ function AudienceChoice({
   );
 }
 
-const styles = StyleSheet.create({
-  scrim: { flex: 1, backgroundColor: 'rgba(3,9,18,0.72)' },
+const styles = themedStyles(() => ({
+  scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     flexShrink: 1, backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
     paddingHorizontal: Spacing.four, paddingTop: Spacing.two, gap: Spacing.three, borderTopWidth: 1, borderColor: Colors.border,
@@ -365,13 +366,14 @@ const styles = StyleSheet.create({
   title: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 28, lineHeight: 30 },
   meta: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 15 },
   coords: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14, fontVariant: ['tabular-nums'] },
-  kinds: { gap: Spacing.two, paddingRight: Spacing.two },
-  kind: {
-    minWidth: 76, height: 66, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', gap: 4,
-    backgroundColor: Colors.backgroundSelected, paddingHorizontal: 10,
+  // Five across on every screen (15 symbols, three rows), so none hide off the edge.
+  symbols: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  symbol: {
+    flexBasis: '18%', flexGrow: 1, minHeight: 64, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', gap: 3,
+    backgroundColor: Colors.backgroundSelected, paddingHorizontal: 2, paddingVertical: 6,
   },
-  kindOn: { backgroundColor: Colors.text },
-  kindText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
+  symbolOn: { backgroundColor: Colors.text },
+  symbolText: { color: Colors.text, fontFamily: font(700), fontSize: 12, lineHeight: 14, textAlign: 'center' },
   audience: {
     flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 60, paddingHorizontal: 14, paddingVertical: 10,
     borderRadius: Radius.control, borderWidth: 2, borderColor: Colors.border,
@@ -383,4 +385,4 @@ const styles = StyleSheet.create({
   privateNote: { flexDirection: 'row', gap: 10, alignItems: 'center', padding: 12, borderRadius: Radius.control, backgroundColor: Colors.backgroundSelected },
   privateText: { flex: 1, color: Colors.textSecondary, fontFamily: font(500), fontSize: 14, lineHeight: 19 },
   tip: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, textAlign: 'center' },
-});
+}));

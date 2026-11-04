@@ -4,7 +4,7 @@ summary: Plan a ride on onmylead.com from your computer, drop the meeting point 
 category: rides
 order: 20
 release: web
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/ride/new.tsx
   - app/src/components/meet-point-map.web.tsx
@@ -25,6 +25,10 @@ screenshots:
 You can plan a ride on the big screen at onmylead.com. It's the same ride as one made in the app: the ride, its route and its stops show up in the OnMyLead app on your phone or tablet as soon as you save. Ride Mode and live tracking stay in the app.
 
 ![Drawing a route on onmylead.com](/help/img/web-route.webp)
+
+:::release 2.0
+Using OnMyLead on the website is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the website still lets you join a ride, open your rides and follow the leader in Ride Mode.
+:::
 
 ## Create a Ride on the Web
 

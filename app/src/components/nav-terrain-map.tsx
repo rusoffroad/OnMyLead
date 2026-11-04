@@ -1,7 +1,7 @@
 import { useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 
-import { Colors, font } from '@/constants/theme';
+import { Colors, font, themedStyles } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { followCamDurationMs } from '@/core/glide';
@@ -164,7 +164,7 @@ export function NavTerrainMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   me: {
     width: 18, height: 18, borderRadius: 9, backgroundColor: '#2F80FF', borderWidth: 3, borderColor: '#FFFFFF',
     alignItems: 'center', justifyContent: 'flex-start',
@@ -187,4 +187,4 @@ const styles = StyleSheet.create({
   },
   obstacleDot: { width: 10, height: 10, borderRadius: 5, marginTop: 3, borderWidth: 2, borderColor: Colors.background },
   foundDot: { width: 10, height: 10, borderRadius: 5, marginTop: 4, backgroundColor: MEASURE_INK, borderWidth: 2, borderColor: Colors.background },
-});
+}));

@@ -8,6 +8,7 @@ import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
 import { cameraCenterFor, fitInset, isFarOut, openMapCenter, rideViewCorners } from '@/core/map-center';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
 import { GroupTerrainMap } from './group-terrain-map';
@@ -244,12 +245,12 @@ function FlatGroupMap({
             e.stopPropagation?.();
             onPressWaypoint?.(w);
           }}
-          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}` : `Waypoint ${w.name}`}
+          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
           zIndex={w.planned_stop ? 4 : w.shared ? 3 : 2}>
           {w.planned_stop ? (
-            <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} />
+            <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
           ) : (
-            <WaypointPin name={w.name} kind={w.kind} shared={w.shared} />
+            <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
           )}
         </Marker>
       ))}

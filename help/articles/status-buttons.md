@@ -37,6 +37,10 @@ Ride Mode has big buttons so you can tell the group what's going on without typi
 Don't use your phone while you're moving. Pull over first, then tap.
 :::
 
+:::release 2.0
+Typing your own message and saving your own quick replies are Pro features. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Message** button carries a **Pro** tag. The status buttons, Need Help, EMERGENCY and Mechanical Issue stay free.
+:::
+
 ## Quick Replies
 
 :::until 2.0
@@ -44,13 +48,16 @@ The four blue buttons send a short message to the group. They also show in the r
 :::
 
 :::release 2.0
-Quick replies send a short message to the group. They also show in the ride chat. **On My Way**, **Need a Minute** and **All Good** sit on the bottom panel. Tap **More** for **Running Late** and every status.
+Quick replies send a short message to the group. They also show in the ride chat. **On My Way**, **Need a Minute** and **All Good** sit on the bottom panel. Tap **More** for **Running Late**, **Beverage Break** and every status.
 :::
 
 - **On My Way**
 - **Running Late**
 - **Need a Minute**
 - **All Good**
+:::release 2.0
+- **Beverage Break**
+:::
 
 :::release 2.0
 ## Type Your Own Message

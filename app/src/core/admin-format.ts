@@ -24,7 +24,10 @@ export function fmtPct(ratio: number | string | null | undefined): string {
 
 export function fmtDate(iso: string | null | undefined): string {
   if (!iso) return '—';
-  const d = new Date(iso);
+  // A plain date (2027-05-03) is a calendar day, not midnight UTC, so it must not shift a day
+  // in time zones west of UTC.
+  const day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  const d = day ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])) : new Date(iso);
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
@@ -115,6 +118,8 @@ export function actionLabel(action: string): string {
     'trial.extend': 'Extended Trial',
     'pro.comp_grant': 'Granted Complimentary Pro',
     'pro.grant_revoke': 'Revoked Complimentary Pro',
+    'badge.grant': 'Gave a Badge (Brand Ambassador or Founder)',
+    'badge.revoke': 'Took Back a Badge (Brand Ambassador or Founder)',
     'setting.update': 'Changed a Setting',
     'review.reply': 'Replied to a Store Review',
     'review.reply_edit': 'Changed a Store Review Reply',

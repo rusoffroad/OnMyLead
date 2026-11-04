@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   agendaByDay, agendaKindLabel, agendaKindTone, agendaTime, cardPlace, dateBlock, eventDates, eventDays, eventLink, eventPayload,
   eventPhase, eventPhotoPath, eventPhotoUrl, fitWithin, friendlyEventError, nextRsvp, pickablePeople, rsvpLine, sortCards,
-  EVENTS_NOT_SWITCHED_ON, type AgendaItem, type EventCard, type EventForm,
+  EVENT_OR_RIDE, EVENTS_NOT_SWITCHED_ON, type AgendaItem, type EventCard, type EventForm,
 } from '../events';
 
 const EV = '0f8b1c2d-3e4f-4a5b-8c6d-7e8f9a0b1c2d';
@@ -139,5 +139,18 @@ describe('lists and wording', () => {
     expect(friendlyEventError('Could not find the function public.save_event in the schema cache')).toBe(EVENTS_NOT_SWITCHED_ON);
     expect(friendlyEventError('event not found')).toMatch(/couldn’t find/);
     expect(friendlyEventError('an event can have up to 12 photos')).toBe('An event can have up to 12 photos.');
+  });
+});
+
+describe('event or public ride explainer', () => {
+  it('says what each one is, in plain words', () => {
+    expect(EVENT_OR_RIDE.question).toBe('Event or Public Ride?');
+    expect(EVENT_OR_RIDE.ride.text).toMatch(/Find a Ride/);
+    expect(EVENT_OR_RIDE.event.text).toMatch(/agenda/);
+    expect(EVENT_OR_RIDE.event.text).toMatch(/several group rides/);
+    for (const t of [EVENT_OR_RIDE.ride.text, EVENT_OR_RIDE.event.text, EVENT_OR_RIDE.pick]) {
+      expect(t.length).toBeLessThan(200);
+      expect(t).not.toMatch(/—/);
+    }
   });
 });

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Line, Path, Rect } from 'react-native-svg';
 
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtInt } from '@/core/admin-format';
 import { AdminColors, tabular, toneColor, type Tone } from './tokens';
 
@@ -122,7 +122,7 @@ export function BarList({ items, format = fmtInt }: { items: { label: string; va
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   legend: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, alignItems: 'center', minHeight: 20 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   swatch: { width: 10, height: 10, borderRadius: 3 },
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
   barValue: { fontFamily: font(700), fontSize: 14, color: AdminColors.text },
   barTrack: { height: 8, borderRadius: 4, backgroundColor: AdminColors.page, overflow: 'hidden' },
   barFill: { height: 8, borderRadius: 4 },
-});
+}));

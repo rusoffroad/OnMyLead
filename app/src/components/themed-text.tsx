@@ -1,7 +1,8 @@
 import { StyleSheet, Text, type TextProps, type TextStyle } from 'react-native';
 
-import { font, Fonts, ThemeColor } from '@/constants/theme';
+import { font, Fonts, ThemeColor, themedStyles } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { tx } from '@/lib/i18n';
 
 export type ThemedTextProps = TextProps & {
   type?: 'default' | 'title' | 'subtitle' | 'heading' | 'small' | 'smallBold' | 'link' | 'linkPrimary' | 'code';
@@ -10,10 +11,11 @@ export type ThemedTextProps = TextProps & {
 
 const DISPLAY = new Set(['title', 'subtitle', 'heading']);
 
-export function ThemedText({ style, type = 'default', themeColor, ...rest }: ThemedTextProps) {
+export function ThemedText({ style, type = 'default', themeColor, children, ...rest }: ThemedTextProps) {
   const theme = useTheme();
   const flat = StyleSheet.flatten([{ color: theme[themeColor ?? 'text'] }, styles[type], type === 'linkPrimary' && { color: theme.sky }, style]) as TextStyle;
-  return <Text style={withFont(flat, DISPLAY.has(type) ? 'display' : 'body')} {...rest} />;
+  // Plain text is shown in the rider's language (lib/i18n); anything else is drawn as given.
+  return <Text style={withFont(flat, DISPLAY.has(type) ? 'display' : 'body')} {...rest}>{tx(children)}</Text>;
 }
 
 /**
@@ -27,7 +29,7 @@ export function withFont(style: TextStyle, cut: 'body' | 'display' = 'body'): Te
   return { ...rest, fontFamily: font(fontWeight, display ? 'display' : 'body') };
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   default: { fontSize: 16, lineHeight: 23, fontWeight: 500 },
   small: { fontSize: 14, lineHeight: 20, fontWeight: 500 },
   smallBold: { fontSize: 14, lineHeight: 20, fontWeight: 700 },
@@ -39,4 +41,4 @@ const styles = StyleSheet.create({
   link: { fontSize: 15, lineHeight: 22, fontWeight: 600 },
   linkPrimary: { fontSize: 15, lineHeight: 22, fontWeight: 600 },
   code: { fontFamily: Fonts.mono, fontSize: 12 },
-});
+}));

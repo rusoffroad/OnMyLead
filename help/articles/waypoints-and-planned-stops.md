@@ -1,6 +1,6 @@
 ---
 title: Waypoints and Planned Stops
-summary: Mark camp, fuel, water or a hazard on a ride's map, and let the leader plan numbered stops for the whole group.
+summary: Mark camp, fuel, water, a gate or a hazard on a ride's map, and let the leader plan numbered stops for the whole group.
 category: routes-maps
 order: 30
 release: "1.0"
@@ -17,21 +17,28 @@ sources:
   - app/src/components/map-search.tsx
   - app/src/hooks/use-ride-waypoints.ts
   - app/src/core/waypoints.ts
+  - app/src/core/waypoint-symbols.ts
+  - app/src/components/waypoint-blaze.tsx
   - app/src/lib/waypoints.ts
   - supabase/migrations/20261018500000_ride_waypoints.sql
   - supabase/migrations/20261019200000_planned_stops.sql
+  - supabase/migrations/20261103400000_waypoint_symbols.sql
 related: [route-builder, leader-sweep-and-tail-gunner, ride-mode, directions, privacy]
-keywords: [search, find a place, waypoint, pin, marker, camp, fuel stop, lunch stop, hazard, viewpoint, parking, planned stop, stops]
+keywords: [search, find a place, waypoint, pin, marker, symbol, icon, camp, fuel stop, lunch stop, hazard, viewpoint, parking, gate, trailhead, water crossing, food, restroom, first aid, repair, photo spot, color blind, planned stop, stops]
 screenshots:
   - file: waypoints.webp
     shows: app/src/app/ride/[id]/waypoints.tsx
 ---
 
-Waypoints are named spots you drop on a ride's map: camp, fuel, water, a viewpoint, a hazard or parking. Your own waypoints are only for you. The ride's leader can also share waypoints with everyone on the ride, and plan numbered stops the whole group will make.
+Waypoints are named spots you drop on a ride's map, such as camp, fuel, water, a viewpoint, a hazard or parking. Your own waypoints are only for you. The ride's leader can also share waypoints with everyone on the ride, and plan numbered stops the whole group will make.
 
 ![Planned stops and waypoints on a ride](/help/img/waypoints.webp)
 
 Waypoints are never public. Shared ones and planned stops show only to riders on that ride.
+
+:::release 2.0
+Adding waypoints and planned stops is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, **Add Waypoint**, **Add a Waypoint**, **Add a Planned Stop** and **Add at My Location** carry a **Pro** tag. Seeing the leader's waypoints and stops on a ride, and following them in Ride Mode, stay free.
+:::
 
 ## Who Sees What
 
@@ -48,7 +55,12 @@ You need to have joined the ride to add or see its waypoints.
 1. Open the ride and tap the **Map** tab.
 2. Under **Waypoints**, tap **Add a Waypoint** (or **Open Waypoints Map** if there are some already).
 3. Press and hold the map where you want it (click it on onmylead.com). To mark where you're standing, tap **Add at My Location** instead.
+:::until 2.0
 4. Pick what it is: **Spot**, **Camp**, **Fuel**, **Water**, **Viewpoint**, **Hazard** or **Parking**. The name fills in for you.
+:::
+:::release 2.0
+4. Pick its symbol. The name fills in for you. See [Waypoint Symbols](#waypoint-symbols) below.
+:::
 5. Change the **Name** if you like, and add a **Note (Optional)**.
 6. If you're the leader or an organizer, choose who it's for under **What It Is** (see below).
 7. Tap **Save Waypoint**.
@@ -64,6 +76,38 @@ To find a spot by name, tap **Search** at the top of the waypoints map and type 
 In Ride Mode, tap **Add Waypoint** to drop one where you are, or press and hold the map. See [Ride Mode](/help/ride-mode).
 
 Names can be up to 60 characters and notes up to 280.
+
+:::release 2.0
+## Waypoint Symbols
+
+Every waypoint has a symbol, so you can tell what it is at a glance on the map. There are 15:
+
+| Symbol | Use it for |
+| --- | --- |
+| **Spot** | Anything else |
+| **Camp** | A campsite or where you'll stay the night |
+| **Fuel** | A gas station or fuel cache |
+| **Water** | Drinking water or a refill |
+| **Food** | Lunch, a restaurant or a snack stop |
+| **Viewpoint** | A scenic overlook |
+| **Photo Spot** | A good place for group photos |
+| **Hazard** | A washout, drop-off or anything to watch for |
+| **Water Crossing** | A creek or river crossing |
+| **Gate** | A gate to open and close behind the group |
+| **Trailhead** | Where a trail starts |
+| **Parking** | Trailer or vehicle parking |
+| **Restroom** | A toilet or outhouse |
+| **First Aid** | A first aid kit, clinic or help point |
+| **Repair** | A shop, or a good place to work on a vehicle |
+
+Each symbol has its own drawing, so they're easy to tell apart without relying on color, including for color-blind riders. **Hazard** and **Water Crossing** sit on a triangle instead of a diamond, so warnings stand out by shape. Shared waypoints are blue and your own are white.
+
+A planned stop shows its symbol on a small white tag at the corner of its numbered stop sign, so everyone sees whether the stop is for fuel, food or camp.
+
+To change a symbol, tap the waypoint, tap **Edit**, and pick another one.
+
+The symbols show on the phone, the tablet and onmylead.com. Riders who haven't updated the app yet see the newer symbols as the closest older one (a **Gate** shows as a **Spot**, a **Water Crossing** as a **Hazard**) until they update.
+:::
 
 ### Sharing a Waypoint (Leader and Organizers)
 
@@ -100,7 +144,7 @@ The leader or an organizer can edit any planned stop on the ride, even ones some
 
 ## View, Navigate, Edit or Remove
 
-Tap a waypoint on the map or in the list to open it. You'll see its type, who it's from, the note and its coordinates.
+Tap a waypoint on the map or in the list to open it. You'll see its symbol, who it's from, the note and its coordinates.
 
 - **Navigate**: get directions in your maps app. See [Directions](/help/directions).
 - **Edit**: change it. You can edit your own waypoints. The leader or an organizer can also edit planned stops.

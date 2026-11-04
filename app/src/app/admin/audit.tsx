@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { AdminColors, AdminPage, DataTable, ErrorNote, Pager, Panel, SearchBox, type Column } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { actionLabel, fmtDateTime } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
 
@@ -67,7 +67,7 @@ export default function Audit() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   action: { fontFamily: font(700), fontSize: 14.5, color: AdminColors.text },
   detail: { fontFamily: font(500), fontSize: 14, color: AdminColors.dim },
-});
+}));

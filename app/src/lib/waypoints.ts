@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { symbolKind } from '@/core/waypoint-symbols';
 import {
-  cleanWaypointName, friendlyWaypointError, isPlannedStopsNotSwitchedOn, isWaypointsNotSwitchedOn, sortWaypoints, type Waypoint,
-  type WaypointKind,
+  cleanWaypointName, friendlyWaypointError, isPlannedStopsNotSwitchedOn, isSymbolsNotSwitchedOn, isWaypointsNotSwitchedOn, sortWaypoints,
+  type Waypoint, type WaypointSymbol,
 } from '@/core/waypoints';
 import { track } from './analytics';
 import { supabase } from './supabase';
@@ -49,7 +50,7 @@ export async function rideWaypoints(rideId: string): Promise<WaypointList> {
 }
 
 export type WaypointDraft = {
-  name: string; kind: WaypointKind; note?: string | null; lat: number; lng: number; shared: boolean;
+  name: string; symbol: WaypointSymbol; note?: string | null; lat: number; lng: number; shared: boolean;
   /** A planned stop (always shared), with its time ("12:30") or null. */
   planned_stop?: boolean;
   stop_time?: string | null;
@@ -59,28 +60,47 @@ export type WaypointDraft = {
 const stopFields = (w: Partial<WaypointDraft>) =>
   w.planned_stop ? { planned_stop: true, shared: true, stop_time: w.stop_time || null } : w.planned_stop === false ? { planned_stop: false } : {};
 
-export async function addWaypoint(rideId: string, w: WaypointDraft): Promise<Waypoint> {
-  const { data, error } = await supabase
-    .from('ride_waypoints')
-    .insert({
-      ride_id: rideId, name: cleanWaypointName(w.name), kind: w.kind, note: w.note?.trim() || null, lat: w.lat, lng: w.lng, shared: w.shared,
-      ...stopFields(w),
-    })
-    .select('*')
-    .single();
+/**
+ * The symbol as the server stores it: kind (the nearest original one, for older app builds) plus
+ * symbol. A server from before the symbols update has no symbol column; saves then send the kind alone.
+ */
+const symbolFields = (symbol: WaypointSymbol, withSymbol: boolean) => ({ kind: symbolKind(symbol), ...(withSymbol ? { symbol } : {}) });
+
+/** Run a save with the symbol; if the server doesn't know symbols yet, run it again with the kind alone. */
+async function withSymbolFallback<T>(save: (withSymbol: boolean) => PromiseLike<{ data: T; error: DbError }>): Promise<T> {
+  let { data, error } = await save(true);
+  if (error && isSymbolsNotSwitchedOn(error.message, error.code)) ({ data, error } = await save(false));
   check(error);
-  track(w.planned_stop ? 'planned_stop_added' : 'waypoint_added', { kind: w.kind, shared: w.shared });
+  return data;
+}
+
+export async function addWaypoint(rideId: string, w: WaypointDraft): Promise<Waypoint> {
+  const data = await withSymbolFallback((withSymbol) =>
+    supabase
+      .from('ride_waypoints')
+      .insert({
+        ride_id: rideId, name: cleanWaypointName(w.name), ...symbolFields(w.symbol, withSymbol), note: w.note?.trim() || null,
+        lat: w.lat, lng: w.lng, shared: w.shared, ...stopFields(w),
+      })
+      .select('*')
+      .single(),
+  );
+  track(w.planned_stop ? 'planned_stop_added' : 'waypoint_added', { kind: symbolKind(w.symbol), symbol: w.symbol, shared: w.shared });
   return data as Waypoint;
 }
 
 export async function updateWaypoint(
   id: string,
-  patch: Partial<Pick<WaypointDraft, 'name' | 'kind' | 'note' | 'shared' | 'planned_stop' | 'stop_time'>>,
+  patch: Partial<Pick<WaypointDraft, 'name' | 'symbol' | 'note' | 'shared' | 'planned_stop' | 'stop_time'>>,
 ): Promise<Waypoint> {
-  const { planned_stop, stop_time, ...rest } = patch;
-  const next = { ...rest, ...(rest.name != null ? { name: cleanWaypointName(rest.name) } : {}), ...stopFields({ planned_stop, stop_time }) };
-  const { data, error } = await supabase.from('ride_waypoints').update(next).eq('id', id).select('*');
-  check(error);
+  const { planned_stop, stop_time, symbol, ...rest } = patch;
+  const next = (withSymbol: boolean) => ({
+    ...rest,
+    ...(rest.name != null ? { name: cleanWaypointName(rest.name) } : {}),
+    ...(symbol ? symbolFields(symbol, withSymbol) : {}),
+    ...stopFields({ planned_stop, stop_time }),
+  });
+  const data = await withSymbolFallback((withSymbol) => supabase.from('ride_waypoints').update(next(withSymbol)).eq('id', id).select('*'));
   if (!data?.length) throw new Error('Only the rider who added this waypoint can change it.');
   return data[0] as Waypoint;
 }

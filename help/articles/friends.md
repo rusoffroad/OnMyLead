@@ -4,7 +4,7 @@ summary: Add riders as friends so you see each other when you're out riding near
 category: groups
 order: 26
 release: "1.0.3"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/friends.tsx
   - app/src/app/friend/[code].tsx
@@ -51,6 +51,10 @@ They get a notification and see your request at the top of their Friends screen.
 4. Accept their request on your Friends screen.
 
 To stop an old link working, tap **Make a New Link**. Your friends stay friends.
+
+:::release 2.0
+If your buddy is new to OnMyLead and creates their account with your link, it also counts as an invite: when they finish their first ride, you both get 50% off Pro Annual. See [Invite Friends and Get 50% Off Pro](/help/refer-a-friend).
+:::
 
 ## Answer a Friend Request
 

@@ -1,9 +1,9 @@
 import { Image } from 'expo-image';
 import { useState, type ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Colors, Spacing } from '@/constants/theme';
+import { Colors, Spacing, themedStyles } from '@/constants/theme';
 import { socialLine, type SocialProfile } from '@/core/social-profile';
 import { ProviderMark } from './social-button';
 
@@ -31,6 +31,6 @@ export function SocialPhoto({ profile, size, fallback }: { profile: SocialProfil
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   tag: { flexDirection: 'row', alignItems: 'center', gap: Spacing.one },
-});
+}));

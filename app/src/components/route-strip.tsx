@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
-import { Colors, font, RideColors } from '@/constants/theme';
+import { Colors, font, RideColors, themedStyles } from '@/constants/theme';
 import type { FreerideSummary } from '@/core/freeride';
 import type { RangeCheck } from '@/core/fuel';
 import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
-import { describeRank, groupSpread, layoutDots, rankRiders } from '@/core/route-order';
+import { convoyLayout, describeRank, groupSpread, rankRiders } from '@/core/route-order';
 
-const RANGE_COLOR: Record<RangeCheck, string> = { ok: RideColors.green, tight: RideColors.yellow, over: RideColors.red };
+const RANGE_COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
 
 /** Dot sizes on the line, before a big group shrinks them to fit. */
 const SIZE = { me: 30, leader: 28, sweep: 24, rider: 22 } as const;
@@ -17,19 +17,19 @@ const LABEL_MS = 4000;
 const LABEL_W = 190;
 
 /**
- * The whole route as one straight line, start to finish, with every sharing rider's dot strung
- * along it in running order: the rear on the left, the front on the right. Each dot sits as near
- * its real spot as it can without hiding a neighbor, so a bunched-up group reads as a string of
- * dots rather than one blob, and the leader sees everyone between the front and the rear. Tap a
- * dot for the rider's name and place. One glance answers "where am I compared with everyone
- * else?" without reading a map.
+ * The leader line: every sharing rider's dot strung out in running order, with the leader pinned
+ * to the far left edge and the tail gunner pinned to the far right edge (core/route-order
+ * convoyLayout). Everyone else sits between them by how far behind the leader they are, as near
+ * that spot as they can without hiding a neighbor, so a bunched-up group reads as a string of
+ * dots rather than one blob. Tap a dot for the rider's name and place. The head still shows the
+ * miles done and to go on a route, so one glance answers both "how far along are we?" and "where
+ * am I in the group?" without reading a map.
  *
- * On a Freeride (no mapped route) the same line shows the group behind the leader instead: the
- * leader on the right, the rear on the left, measured along the leader's own path (core/freeride),
- * with the group's spread in place of the miles done.
+ * On a Freeride (no mapped route) the distances are measured along the leader's own path
+ * (core/freeride), with the group's spread in place of the miles done.
  */
 export function RouteStrip({
-  lengthM, riders, meId, summary, nameOf, offline, range, compact, lastSeenIds, freeride,
+  riders, meId, summary, nameOf, offline, range, compact, lastSeenIds, freeride,
 }: {
   /** A Freeride: no route, so the line is the group behind the leader. */
   freeride?: { summary: FreerideSummary; waiting: boolean } | null;
@@ -39,20 +39,19 @@ export function RouteStrip({
   compact?: boolean;
   /** Whether this rider's machine (from the garage) can do the whole route. */
   range?: { check: RangeCheck; text: string } | null;
-  lengthM: number;
+  /** No longer used: the line is the group, leader to tail gunner, not the route. Kept so callers needn't change. */
+  lengthM?: number;
   riders: PlacedRider[];
   meId: string | undefined;
   summary: MyRouteSummary | null;
   nameOf: (id: string) => string;
   offline?: boolean;
 }) {
-  const pct = (m: number) => `${Math.max(0, Math.min(100, (m / Math.max(1, lengthM)) * 100))}%` as const;
   const ranked = rankRiders(riders);
-  const me = ranked.find((r) => r.id === meId);
   const [width, setWidth] = useState(0);
   const sizeOf = (r: PlacedRider) => (r.id === meId ? SIZE.me : SIZE[r.role]);
   const spots = new Map(
-    layoutDots(ranked.map((r) => ({ id: r.id, alongM: r.place!.alongM, size: sizeOf(r) })), lengthM, width).map((d) => [d.id, d]),
+    convoyLayout(ranked, sizeOf, width).map((d) => [d.id, d]),
   );
   // Draw me last so my dot sits on top, then the leader and sweep over the riders.
   const order = [...ranked].sort((a, b) => layer(a) - layer(b));
@@ -111,13 +110,6 @@ export function RouteStrip({
 
       <View style={styles.track} onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}>
         <View style={styles.rail} />
-        {freeride ? null : (
-          <>
-            {me?.place ? <View style={[styles.done, { width: pct(me.place.alongM) }]} /> : null}
-            <View style={[styles.cap, { left: 0, backgroundColor: RideColors.green }]} />
-            <View style={[styles.cap, styles.finish, { right: 0 }]} />
-          </>
-        )}
         {order.map((r) => {
           const mine = r.id === meId;
           const lastSeen = !mine && !!lastSeenIds?.includes(r.id);
@@ -125,7 +117,9 @@ export function RouteStrip({
             ? Colors.textSecondary
             : r.role === 'leader' ? RideColors.leader : mine ? Colors.accent : r.role === 'sweep' ? RideColors.sweep : RideColors.rider;
           const spot = spots.get(r.id);
-          const size = spot?.size ?? sizeOf(r);
+          // No spot until the line has been measured: draw nothing rather than a dot in the wrong place.
+          if (!spot) return null;
+          const size = spot.size;
           const letter = mine ? 'You' : r.role === 'leader' ? 'L' : r.role === 'sweep' ? 'S' : initialOf(nameOf(r.id));
           const filled = r.place!.onRoute && !lastSeen;
           return (
@@ -138,7 +132,7 @@ export function RouteStrip({
               style={[
                 styles.dot,
                 {
-                  left: spot ? spot.x : pct(r.place!.alongM),
+                  left: spot.x,
                   width: size,
                   height: size,
                   borderRadius: size / 2,
@@ -193,7 +187,7 @@ export function RouteStrip({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { gap: 8, paddingHorizontal: 4, paddingBottom: 4 },
   head: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
   big: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 36 },
@@ -201,9 +195,6 @@ const styles = StyleSheet.create({
   toGo: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
   track: { height: 34, justifyContent: 'center', marginHorizontal: 10 },
   rail: { position: 'absolute', left: 0, right: 0, height: 6, borderRadius: 3, backgroundColor: Colors.backgroundSelected },
-  done: { position: 'absolute', left: 0, height: 6, borderRadius: 3, backgroundColor: Colors.accent },
-  cap: { position: 'absolute', width: 12, height: 12, borderRadius: 6, marginLeft: -6, marginRight: -6, borderWidth: 2, borderColor: Colors.background },
-  finish: { backgroundColor: Colors.text },
   dot: { position: 'absolute', top: '50%', borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   letter: { color: '#fff', fontFamily: font(800), fontSize: 11 },
   label: {
@@ -215,4 +206,4 @@ const styles = StyleSheet.create({
   rangeDot: { width: 10, height: 10, borderRadius: 5 },
   rangeText: { flex: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },
   compared: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20 },
-});
+}));

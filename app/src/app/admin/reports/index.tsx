@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Empty, ErrorNote, FilterChips, Loading, Pager, Panel, StatusBadge, useConfirm, useToast,
 } from '@/components/admin';
-import { font } from '@/constants/theme';
+import { font, themedStyles } from '@/constants/theme';
 import { fmtAgo, fmtDateTime } from '@/core/admin-format';
 import { reportSourceLabel, suspensionLabel } from '@/core/moderation';
 import * as admin from '@/lib/admin';
@@ -107,11 +107,11 @@ export default function Reports() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   head: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' },
   reason: { fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24, color: AdminColors.text },
   sub: { fontFamily: font(500), fontSize: 13.5, color: AdminColors.dim },
   details: { fontFamily: font(500), fontSize: 15, lineHeight: 22, color: AdminColors.text, backgroundColor: AdminColors.page, borderRadius: 10, padding: 12 },
   actions: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   links: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-});
+}));

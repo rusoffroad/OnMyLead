@@ -4,7 +4,7 @@ summary: See the satellite map on the real shape of the land in Ride Mode and Ma
 category: routes-maps
 order: 52
 release: "2.1"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/terrain-map.tsx
   - app/src/components/terrain-map.web.tsx
@@ -30,6 +30,8 @@ keywords: [3d, 3d map, terrain, elevation, contour, contour lines, topo, peaks, 
 The map tilts to show the land in 3D. Your choice is remembered and used in Ride Mode and Map Mode. Other maps, like the route builder and Find a Ride, show plain satellite while 3D Terrain is picked.
 
 To go back, tap **Satellite** or **Topo**.
+
+3D Terrain is a map style, so like the other map styles it's a Pro feature. See [Free and Pro](/help/free-vs-pro).
 
 ## Move Around in 3D
 

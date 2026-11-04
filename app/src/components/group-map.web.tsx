@@ -1,7 +1,7 @@
 import type { Ref } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Colors, font, RideColors } from '@/constants/theme';
+import { Colors, font, RideColors, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
@@ -76,11 +76,11 @@ export function GroupMap({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   wrap: { padding: 16, paddingTop: 140, gap: 10, backgroundColor: Colors.background },
   sketchWrap: { paddingTop: 120, backgroundColor: '#0D1C31' },
   regroup: { color: RideColors.yellow, fontFamily: font(700), fontSize: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   name: { color: Colors.text, fontFamily: font(700), fontSize: 16 },
   detail: { color: Colors.textSecondary, fontFamily: font(500), flex: 1 },
-});
+}));

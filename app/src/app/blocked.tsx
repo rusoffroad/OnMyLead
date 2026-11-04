@@ -1,10 +1,10 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { BLOCKS_NOT_SWITCHED_ON } from '@/core/blocks';
 import { initialOf } from '@/core/profile';
 import { loadBlocks, unblockRider, useBlocks } from '@/lib/blocks';
@@ -84,11 +84,11 @@ export default function BlockedRiders() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   note: { gap: 4, padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   list: { borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, minHeight: 64, paddingHorizontal: 14, paddingVertical: 10 },
   divider: { borderTopWidth: 1, borderTopColor: Colors.backgroundSelected },
   dot: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.backgroundSelected, alignItems: 'center', justifyContent: 'center' },
   initial: { color: Colors.textSecondary, fontFamily: font(800), fontSize: 16 },
-});
+}));

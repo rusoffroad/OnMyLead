@@ -1,18 +1,22 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, View } from 'react-native';
 
 import { DownloadRow, MapSheet, SAND, SmallButton } from '@/components/offline-map-ui';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen, Section } from '@/components/ui';
-import { Colors, font, Radius } from '@/constants/theme';
+import { Colors, font, Radius, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { formatBytes, IMAGERY_ATTRIBUTION, type OfflineChoice } from '@/core/offline-maps';
 import { getRideRoute, myRides } from '@/lib/api';
-import { downloadRide, freeSpace, planRide, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
+import type { SyncedOfflineArea } from '@/core/synced-settings';
+import {
+  downloadFromOtherDevice, downloadRide, forgetOtherDeviceArea, freeSpace, planArea, planRide, rideDownload, useOfflineMaps, useOtherDeviceAreas,
+} from '@/lib/offline-maps';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
+import { t } from '@/lib/i18n';
 
 /** A ride's one-tap download: the flat maps (3D Terrain is added from Download an Area). */
 const ALL: OfflineChoice[] = ['satellite', 'topo', 'trails'];
@@ -26,6 +30,7 @@ type RideWithRoute = { ride: Ride; route: LatLng[] };
 export default function OfflineMaps() {
   const { session } = useSession();
   const maps = useOfflineMaps();
+  const elsewhere = useOtherDeviceAreas();
   const [rides, setRides] = useState<RideWithRoute[] | null>(null);
 
   useEffect(() => {
@@ -59,7 +64,7 @@ export default function OfflineMaps() {
   if (Platform.OS === 'web') {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Offline Maps' }} />
+        <Stack.Screen options={{ title: t('Offline Maps') }} />
         <ThemedText themeColor="textSecondary">Offline maps are in the iPhone app, where Ride Mode can use them with no signal.</ThemedText>
       </Screen>
     );
@@ -67,7 +72,7 @@ export default function OfflineMaps() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Offline Maps' }} />
+      <Stack.Screen options={{ title: t('Offline Maps') }} />
 
       <View style={styles.hero}>
         <Text style={styles.heroTitle}>Maps for No Signal</Text>
@@ -94,6 +99,15 @@ export default function OfflineMaps() {
         </>
       ) : null}
 
+      {session && elsewhere.length ? (
+        <>
+          <Section title="On Your Other Devices" />
+          {elsewhere.map((a) => (
+            <OtherDeviceOffer key={a.id} area={a} />
+          ))}
+        </>
+      ) : null}
+
       {session && rides == null ? (
         <ActivityIndicator color={SAND} style={{ marginTop: 8 }} />
       ) : notDownloaded.length ? (
@@ -110,6 +124,33 @@ export default function OfflineMaps() {
         Management. Satellite with no signal uses the USGS aerial photos, since the live satellite view can’t be saved ahead of time.
       </ThemedText>
     </Screen>
+  );
+}
+
+/** An area the rider saved on another device: download the same squares here in one tap. */
+function OtherDeviceOffer({ area }: { area: SyncedOfflineArea }) {
+  const plan = useMemo(() => planArea(area.box, ALL), [area.box]);
+  const [starting, setStarting] = useState(false);
+  return (
+    <View style={styles.offer}>
+      <MapSheet ride={area.kind === 'ride'} dim />
+      <View style={{ flex: 1, gap: 3 }}>
+        <Text style={styles.offerName} numberOfLines={1}>{area.name}</Text>
+        <Text style={styles.offerSub}>{`About ${formatBytes(plan.bytes)}`}</Text>
+      </View>
+      <SmallButton title="Hide" onPress={() => forgetOtherDeviceArea(area.id)} />
+      <SmallButton
+        title="Download"
+        pro="offline_maps"
+        strong
+        disabled={starting}
+        onPress={async () => {
+          if (!requirePro('offline_maps')) return;
+          setStarting(true);
+          await downloadFromOtherDevice(area);
+        }}
+      />
+    </View>
   );
 }
 
@@ -139,7 +180,7 @@ function RideOffer({ ride, route }: RideWithRoute) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   hero: { gap: 10, paddingVertical: 4 },
   heroTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 36 },
   heroBody: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 16, lineHeight: 22 },
@@ -152,4 +193,4 @@ const styles = StyleSheet.create({
   offer: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement },
   offerName: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20, lineHeight: 22 },
   offerSub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13 },
-});
+}));

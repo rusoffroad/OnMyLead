@@ -4,9 +4,10 @@ summary: Pick public or private, set the day, time and meeting point, choose a m
 category: rides
 order: 10
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/ride/new.tsx
+  - app/src/components/events/event-or-ride.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/invite-card.tsx
   - app/src/core/entitlements.ts
@@ -43,16 +44,28 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 9. Under **Who's Riding**, pick the **Vehicles Welcome**.
 10. Tap **Create Public Ride** or **Create Private Ride**.
 
+:::release 2.0
+Planning a rally or a ride weekend with several rides? That's an event, not one ride. Tap **Event or Public Ride?** at the top of Create a Ride to see the difference, or see [Events](/help/events).
+:::
+
 If you picked **Mapped**, the route builder opens right away so you can draw the trail. See [Build a Route](/help/route-builder). Once the ride is saved you land on its page, ready to invite riders.
 
 :::release 1.0.3
 ### Ride One of Your Trails
 
 This is a Pro feature. Open a trail in [Navigate](/help/navigation-mode) and tap **Plan a Group Ride on This Trail**. The new ride starts with the trail's name, the trail as its route and its start as the meeting point, under a **Riding** banner. Pick the day, change anything you like and create it.
+
+:::release 2.0
+If the trail has a width limit, the **Riding** banner shows it (and whether your Garage machines fit), and the ride's **Instructions for Joined Riders** start with a line like "Trail width limit: 50". Wider machines won't fit." so everyone who joins sees it. Edit or delete that line like any other.
+:::
 :::
 
 :::tip
 Only riders who have joined see the exact meeting spot. Public pages show the general area, within about a mile.
+:::
+
+:::release 2.0
+A **Mapped** ride, where you draw the route, is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, **Mapped** carries a **Pro** tag; pick **Freeride** to create the ride for free.
 :::
 
 ## Pick the Day

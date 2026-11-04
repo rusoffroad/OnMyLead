@@ -3,7 +3,7 @@
  * and your riding groups have been up to. This file turns the server's rows into what the Feed
  * says, and holds the choices on the Customize sheet. Pure, so it is tested without a phone.
  */
-import { BADGE_BY_KEY, isBadgeKey, LEVEL_NAME, type BadgeKey, type BadgeLevel } from './badges';
+import { badgeTitle, HONOR_BY_KEY, isBadgeKey, isHonor, type BadgeKey, type BadgeLevel } from './badges';
 import { METERS_PER_MILE } from './geo';
 
 export type FeedKind = 'out' | 'ride' | 'badge' | 'trail' | 'group' | 'post';
@@ -125,7 +125,8 @@ export function feedLine(item: FeedItem): string {
       return others > 0 ? `${what} with ${others} ${others === 1 ? 'rider' : 'riders'}` : what;
     }
     case 'badge':
-      return item.badge ? `earned ${BADGE_BY_KEY[item.badge.badge].name} ${LEVEL_NAME[item.badge.level]}` : 'earned a badge';
+      if (item.badge && isHonor(item.badge.badge)) return HONOR_BY_KEY[item.badge.badge].feed;
+      return item.badge ? `earned ${badgeTitle(item.badge)}` : 'earned a badge';
     case 'trail':
       return item.title ? `shared a trail, ${item.title}` : 'shared a trail';
     case 'post':

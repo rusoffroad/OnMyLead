@@ -4,7 +4,7 @@ summary: Take or choose a photo so riders know who's who. It shows next to your 
 category: account
 order: 21
 release: "1.0.3"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/avatar-editor.tsx
   - app/src/components/rider-photo.tsx

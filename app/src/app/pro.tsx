@@ -1,18 +1,24 @@
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { ReferralRewardCard } from '@/components/referral-reward';
 import { ProShield } from '@/components/pro-gate';
 import { Disclosures, PlanStatus } from '@/components/pro-plan';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
-import { Colors, font, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
 import { annualPerMonth, annualSavingsPercent, COMPARISON, PRICES } from '@/core/pro';
 import { deviceStore, manageTarget, otherStoreBlock, restoreMessage } from '@/core/purchases';
+import { referralsSwitchedOn, rewardState } from '@/core/referrals';
+import { useAppSettings } from '@/lib/app-settings';
 import { track } from '@/lib/analytics';
 import { useEntitlements } from '@/lib/entitlements';
 import { buy, loadProducts, manageSubscription, PRODUCTS, redeemOfferCode, restore } from '@/lib/purchases';
+import { useMyReferrals } from '@/lib/referrals';
+import { useSession } from '@/lib/session';
 
 type Product = Awaited<ReturnType<typeof loadProducts>>[number];
 
@@ -25,6 +31,12 @@ export default function ProScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const { session } = useSession();
+  const referrals = useMyReferrals(!!session);
+  const referralsOn = referralsSwitchedOn(useAppSettings().settings.flags);
+  // A discount earned by inviting (or being invited by) a friend, while it can still be used.
+  const reward = referrals.data?.reward ?? null;
+  const rewardLive = !!reward && !['none', 'expired', 'used'].includes(rewardState(reward).state);
 
   useEffect(() => {
     track('pro_screen_viewed', { plan: ent.label });
@@ -97,6 +109,8 @@ export default function ProScreen() {
 
       {ent.switchedOn ? <PlanStatus ent={ent} /> : null}
 
+      {rewardLive && reward ? <ReferralRewardCard reward={reward} onChanged={() => { referrals.reload(); refresh(); }} /> : null}
+
       {admin ? null : paid ? (
         <Button title="Manage Subscription" kind="secondary" loading={busy === 'manage'} onPress={manage} />
       ) : blocked ? (
@@ -143,6 +157,7 @@ export default function ProScreen() {
           return store === 'google' ? 'After you redeem the code in Google Play, come back here and Pro turns on.' : null;
         })} />
         {admin || paid ? null : <LinkButton title="Manage Subscription" busy={busy === 'manage'} onPress={manage} />}
+        {session && referralsOn ? <LinkButton title="Invite Friends, Both Get 50% Off" onPress={() => router.push('/invite-friends')} /> : null}
       </View>
 
       <Disclosures store={store} />
@@ -215,7 +230,7 @@ function LinkButton({ title, onPress, busy }: { title: string; onPress: () => vo
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   hero: { overflow: 'hidden', gap: Spacing.two, paddingTop: Spacing.three, paddingBottom: Spacing.two },
   contours: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   contour: { position: 'absolute', borderWidth: 1, borderColor: 'rgba(59,134,247,0.12)' },
@@ -225,7 +240,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: Spacing.three, borderRadius: Radius.card,
     backgroundColor: Colors.backgroundElement, borderWidth: 2, borderColor: Colors.backgroundElement, minHeight: 76,
   },
-  optionOn: { borderColor: Colors.accent, backgroundColor: '#1A2238' },
+  optionOn: { borderColor: Colors.accent, backgroundColor: withAlpha(Colors.accent, 0.1) },
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
   radioOn: { borderColor: Colors.accent },
   radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.accent },
@@ -248,4 +263,4 @@ const styles = StyleSheet.create({
   link: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 52, paddingHorizontal: Spacing.three, borderBottomWidth: 1, borderBottomColor: Colors.backgroundSelected },
   linkText: { color: Colors.sky, fontFamily: font(600), fontSize: 16 },
   blocked: { padding: Spacing.three, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky },
-});
+}));

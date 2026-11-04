@@ -1,10 +1,11 @@
 import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, View } from 'react-native';
 
-import { Colors, RideColors } from '@/constants/theme';
+import { Colors, RideColors, themedStyles } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { followCamDurationMs } from '@/core/glide';
+import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
@@ -136,12 +137,12 @@ export function GroupTerrainMap({
         <TerrainMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}` : `Waypoint ${w.name}`}
+            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
             onPress={() => onPressWaypoint?.(w)}>
             {w.planned_stop ? (
               <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} />
             ) : (
-              <WaypointPin name={w.name} kind={w.kind} shared={w.shared} />
+              <WaypointPin name={w.name} symbol={waypointSymbol(w)} shared={w.shared} />
             )}
           </Pressable>
         </TerrainMarker>
@@ -191,7 +192,7 @@ function RouteEnds3d({ points }: { points: LatLng[] }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   end: { width: 20, height: 20, borderRadius: 10, borderWidth: 3, borderColor: Colors.background, alignItems: 'center', justifyContent: 'center' },
   finishCore: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.background },
   regroup: {
@@ -199,4 +200,4 @@ const styles = StyleSheet.create({
     backgroundColor: RideColors.yellow, borderWidth: 3, borderColor: Colors.background, alignItems: 'center', justifyContent: 'center',
   },
   regroupDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: Colors.background },
-});
+}));

@@ -3,13 +3,22 @@
  * (award_rider_badges in migration 20261101500000_rider_badges.sql); this file names them, mirrors
  * the thresholds in badge_levels() for the progress bars, and works out the rank. The unit test
  * checks the thresholds against that migration so the two can't drift.
+ *
+ * Honors (OnMyLead Founder and Brand Ambassador, migrations 20261103700000_brand_ambassador.sql and
+ * 20261103900000_founder_badge.sql) are the exception: one
+ * level, never earned by riding, given and taken back only from the Admin Dashboard. They don't
+ * count toward a rank, and a rider who holds one shows it beside their name.
  */
 
-export type BadgeKey = 'trail_boss' | 'tail_gunner' | 'crew_rider' | 'mile_eater' | 'trailblazer' | 'mapmaker' | 'trail_scout';
+/** Badges earned by riding, each with Bronze, Silver and Gold. */
+export type EarnedBadgeKey = 'trail_boss' | 'tail_gunner' | 'crew_rider' | 'mile_eater' | 'trailblazer' | 'mapmaker' | 'trail_scout';
+/** Badges OnMyLead gives (one level, stored as level 1). */
+export type HonorKey = 'founder' | 'ambassador';
+export type BadgeKey = EarnedBadgeKey | HonorKey;
 export type BadgeLevel = 1 | 2 | 3;
 
 export type BadgeDef = {
-  key: BadgeKey;
+  key: EarnedBadgeKey;
   name: string;
   /** What earns it, in a few words. */
   what: string;
@@ -30,15 +39,45 @@ export const BADGES: BadgeDef[] = [
   { key: 'trail_scout', name: 'Trail Scout', what: 'Rate trails so riders know what to expect', unit: ['trail rated', 'trails rated'], thresholds: [5, 25, 100], trails: true },
 ];
 
-export const BADGE_BY_KEY = Object.fromEntries(BADGES.map((b) => [b.key, b])) as Record<BadgeKey, BadgeDef>;
+export type HonorDef = {
+  key: HonorKey;
+  name: string;
+  /** What it means, in a few words. */
+  what: string;
+  /** The Feed line after the rider's name, e.g. "became an OnMyLead Brand Ambassador". */
+  feed: string;
+  /** The share caption after "I" / the rider's name, without the full stop. */
+  share: [mine: string, theirs: string];
+};
+
+/** In display order: the first one a rider holds is the one beside their name. */
+export const HONORS: HonorDef[] = [
+  {
+    key: 'founder', name: 'OnMyLead Founder', what: 'The rider who started OnMyLead',
+    feed: 'is the OnMyLead Founder', share: ['founded OnMyLead', 'founded OnMyLead'],
+  },
+  {
+    key: 'ambassador', name: 'Brand Ambassador', what: 'Given by OnMyLead to the riders who represent it',
+    feed: 'became an OnMyLead Brand Ambassador', share: ['am an OnMyLead Brand Ambassador', 'is an OnMyLead Brand Ambassador'],
+  },
+];
+
+export const BADGE_BY_KEY = Object.fromEntries(BADGES.map((b) => [b.key, b])) as Record<EarnedBadgeKey, BadgeDef>;
+export const HONOR_BY_KEY = Object.fromEntries(HONORS.map((h) => [h.key, h])) as Record<HonorKey, HonorDef>;
+
+export const isHonor = (v: unknown): v is HonorKey => typeof v === 'string' && v in HONOR_BY_KEY;
+
+/** Any badge's name, earned or honor. */
+export const badgeName = (key: BadgeKey) => (isHonor(key) ? HONOR_BY_KEY[key].name : BADGE_BY_KEY[key].name);
 
 export const LEVEL_NAME: Record<BadgeLevel, string> = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
 
-export const isBadgeKey = (v: unknown): v is BadgeKey => typeof v === 'string' && v in BADGE_BY_KEY;
+export const isEarnedBadgeKey = (v: unknown): v is EarnedBadgeKey => typeof v === 'string' && v in BADGE_BY_KEY;
+export const isBadgeKey = (v: unknown): v is BadgeKey => isEarnedBadgeKey(v) || isHonor(v);
 
 export type EarnedBadge = { badge: BadgeKey; level: BadgeLevel; earnedAt: string | null; seen: boolean };
 
-export type MyBadges = { stats: Partial<Record<BadgeKey, number>>; badges: EarnedBadge[] };
+export type MyBadges = { stats: Partial<Record<EarnedBadgeKey, number>>; badges: EarnedBadge[] };
 
 /** Reads my_badges(); unknown badges (from a newer server) and bad rows are dropped. */
 export function parseMyBadges(raw: unknown): MyBadges {
@@ -48,7 +87,7 @@ export function parseMyBadges(raw: unknown): MyBadges {
   if (r.stats && typeof r.stats === 'object') {
     for (const [k, v] of Object.entries(r.stats as Record<string, unknown>)) {
       const n = typeof v === 'number' ? v : Number(v);
-      if (isBadgeKey(k) && Number.isFinite(n)) out.stats[k] = n;
+      if (isEarnedBadgeKey(k) && Number.isFinite(n)) out.stats[k] = n;
     }
   }
   if (Array.isArray(r.badges)) out.badges = parseBadgeRows(r.badges);
@@ -64,6 +103,8 @@ export function parseBadgeRows(rows: unknown): EarnedBadge[] {
     const { badge, level, earned_at, seen } = row as Record<string, unknown>;
     const lv = Number(level);
     if (!isBadgeKey(badge) || !(lv === 1 || lv === 2 || lv === 3)) continue;
+    // Honors have one level.
+    if (isHonor(badge) && lv !== 1) continue;
     out.push({ badge, level: lv, earnedAt: typeof earned_at === 'string' ? earned_at : null, seen: seen !== false });
   }
   return out;
@@ -76,7 +117,12 @@ export function bestLevels(earned: Pick<EarnedBadge, 'badge' | 'level'>[]): Part
   return best;
 }
 
-/** Ranks by how many levels a rider has earned (21 in all). */
+/** The honors a rider holds, in display order. */
+export function honorsHeld(earned: Pick<EarnedBadge, 'badge'>[]): HonorDef[] {
+  return HONORS.filter((h) => earned.some((e) => e.badge === h.key));
+}
+
+/** Ranks by how many levels a rider has earned by riding (21 in all; honors don't count). */
 export const RANKS = [
   { name: 'Rookie', min: 0 },
   { name: 'Rider', min: 1 },
@@ -88,7 +134,8 @@ export const RANKS = [
 export type Rank = { name: string; levels: number; next: { name: string; min: number } | null };
 
 export function rankFor(earned: Pick<EarnedBadge, 'badge' | 'level'>[]): Rank {
-  const levels = Object.values(bestLevels(earned)).reduce<number>((n, l) => n + (l ?? 0), 0);
+  const best = bestLevels(earned);
+  const levels = BADGES.reduce<number>((n, b) => n + (best[b.key] ?? 0), 0);
   let i = 0;
   while (i + 1 < RANKS.length && levels >= RANKS[i + 1].min) i++;
   const next = RANKS[i + 1] ?? null;
@@ -128,10 +175,13 @@ export function allProgress(mine: MyBadges): BadgeProgress[] {
 }
 
 /**
- * The one badge to show beside a rider's name: their highest level, and among equals the one
- * earliest in BADGES (leading before miles). Null when they have none.
+ * The one badge to show beside a rider's name: an honor (Brand Ambassador) when they hold one,
+ * otherwise their highest level, and among equals the one earliest in BADGES (leading before
+ * miles). Null when they have none.
  */
 export function topBadge(earned: Pick<EarnedBadge, 'badge' | 'level'>[]): { badge: BadgeKey; level: BadgeLevel } | null {
+  const honor = honorsHeld(earned)[0];
+  if (honor) return { badge: honor.key, level: 1 };
   const best = bestLevels(earned);
   let top: { badge: BadgeKey; level: BadgeLevel } | null = null;
   for (const def of BADGES) {
@@ -141,7 +191,9 @@ export function topBadge(earned: Pick<EarnedBadge, 'badge' | 'level'>[]): { badg
   return top;
 }
 
-export const badgeTitle = (b: { badge: BadgeKey; level: BadgeLevel }) => `${BADGE_BY_KEY[b.badge].name} ${LEVEL_NAME[b.level]}`;
+/** "Trail Boss Silver"; honors have no level, so just "Brand Ambassador". */
+export const badgeTitle = (b: { badge: BadgeKey; level: BadgeLevel }) =>
+  isHonor(b.badge) ? HONOR_BY_KEY[b.badge].name : `${BADGE_BY_KEY[b.badge].name} ${LEVEL_NAME[b.level]}`;
 
 /** New badges the rider hasn't seen, highest first. */
 export function unseen(mine: MyBadges): EarnedBadge[] {

@@ -24,9 +24,23 @@ import { supabase } from './supabase';
 const KEY = 'nav.trails.v1';
 /** A recording in progress, saved as it grows so a crash or a dead battery keeps the trail. */
 const RECORDING_KEY = 'nav.recording.v1';
+/** Trails deleted here, by id, with the time: the delete reaches the rider's other devices (lib/trail-backup). */
+const TOMBSTONES_KEY = 'nav.trailTombstones.v1';
 
 let trails: LocalTrail[] = [];
 let loaded = false;
+/** The signed-in rider: trails backed up to another account on this device are not shown. */
+let viewer: string | null = null;
+/** Called after every change, so the backup can follow (set by lib/trail-backup). */
+let changed: () => void = () => {};
+export function setTrailBackupHooks(onChange: () => void) {
+  changed = onChange;
+}
+export function setTrailViewer(id: string | null) {
+  if (viewer === id) return;
+  viewer = id;
+  publish();
+}
 const listeners = new Set<() => void>();
 const publish = () => listeners.forEach((l) => l());
 
@@ -62,11 +76,57 @@ async function persist(next: LocalTrail[]) {
   await AsyncStorage.setItem(KEY, JSON.stringify(next));
 }
 
+const byNewest = (list: LocalTrail[]) => [...list].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
 type Snapshot = { trails: LocalTrail[]; loaded: boolean };
 let snap: Snapshot = { trails, loaded };
-const getSnapshot = () => (snap.trails === trails && snap.loaded === loaded ? snap : (snap = { trails, loaded }));
+let snapViewer: string | null = null;
+let snapSource: LocalTrail[] = trails;
+const getSnapshot = () => {
+  if (snapSource === trails && snap.loaded === loaded && snapViewer === viewer) return snap;
+  snapSource = trails;
+  snapViewer = viewer;
+  const shown = viewer ? trails.filter((t) => !t.owner || t.owner === viewer) : trails;
+  return (snap = { trails: shown, loaded });
+};
 
-/** The trails on this phone, newest first. */
+/** Every trail on the device (all accounts), for the backup. */
+export async function allLocalTrails(): Promise<LocalTrail[]> {
+  await loadTrails();
+  return trails;
+}
+
+/**
+ * Write trails that came from the backup (or claim trails for it) without counting it as a change
+ * here: their updatedAt stays as it was, so they aren't sent straight back.
+ */
+export async function putBackedUpTrails(put: LocalTrail[], remove: string[] = []): Promise<void> {
+  await loadTrails();
+  if (!put.length && !remove.length) return;
+  // A trail edited here while the sync ran keeps the edit (it goes up next time).
+  put = put.filter((t) => {
+    const now = trails.find((x) => x.id === t.id);
+    return !now || now.updatedAt <= t.updatedAt;
+  });
+  const ids = new Set([...put.map((t) => t.id), ...remove]);
+  for (const t of trails) if (remove.includes(t.id)) for (const p of t.photos) dropPhoto(p);
+  await persist(byNewest([...put, ...trails.filter((t) => !ids.has(t.id))]));
+}
+
+export async function readTombstones(): Promise<Record<string, number>> {
+  try {
+    const raw = JSON.parse((await AsyncStorage.getItem(TOMBSTONES_KEY)) ?? '{}') as Record<string, unknown>;
+    return Object.fromEntries(Object.entries(raw).filter((e): e is [string, number] => typeof e[1] === 'number'));
+  } catch {
+    return {};
+  }
+}
+
+export async function writeTombstones(next: Record<string, number>): Promise<void> {
+  await AsyncStorage.setItem(TOMBSTONES_KEY, JSON.stringify(next)).catch(() => {});
+}
+
+/** The rider's trails on this device, newest first (and backed up to their account). */
 export function useLocalTrails(): Snapshot {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
@@ -77,11 +137,12 @@ export const getLocalTrail = (id: string) => trails.find((t) => t.id === id) ?? 
 export async function saveLocalTrail(t: LocalTrail): Promise<LocalTrail> {
   await loadTrails();
   const next = { ...t, updatedAt: new Date().toISOString() };
-  await persist([next, ...trails.filter((x) => x.id !== t.id)].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+  await persist(byNewest([next, ...trails.filter((x) => x.id !== t.id)]));
+  changed();
   return next;
 }
 
-/** Delete a trail from the phone (and its public copy, if it was shared). */
+/** Delete a trail from this device, the rider's backup and other devices (and its public copy, if it was shared). */
 export async function deleteLocalTrail(id: string): Promise<void> {
   await loadTrails();
   const t = getLocalTrail(id);
@@ -89,6 +150,9 @@ export async function deleteLocalTrail(id: string): Promise<void> {
   if (t.shared) await stopSharing(t);
   for (const p of t.photos) dropPhoto(p);
   await persist(trails.filter((x) => x.id !== id));
+  // Remembered so the delete reaches the backup and the rider's other devices.
+  if (t.owner || viewer) await writeTombstones({ ...(await readTombstones()), [id]: Date.now() });
+  changed();
 }
 
 /** Copy a picked photo next to the trail so it stays after the picker's cache is cleared. */

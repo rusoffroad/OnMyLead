@@ -4,8 +4,10 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
+  - app/src/components/tilt-tile.tsx
+  - app/src/components/trail-width-row.tsx
   - app/src/components/music-controls.tsx
   - app/src/app/nav/index.tsx
   - app/src/core/trip-meter.ts
@@ -27,7 +29,7 @@ sources:
   - app/src/core/nav-trails.ts
   - app/src/lib/nav-trails.ts
   - supabase/migrations/20261101600000_nav_trails.sql
-related: [home-screen, follow-me, map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
+related: [sync-across-devices, home-screen, follow-me, map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
 keywords: [map mode, custom trail, map a custom trail, draw a trail, track line, breadcrumb, where i have been, obstacle, named spot, hide my start, navigate, navigation, nav mode, navigation mode, offroad map, gps, record a trail, track, my trails, share a trail, rider trails, user submitted trails, rate a trail, trail rating, accuracy, distance finder, measure, ruler, how far, trail photos, difficulty]
 ---
 
@@ -47,15 +49,20 @@ At the top of the map are three tabs: **Explore**, **Record** and **Measure**. S
 :::
 
 :::release 2.0
-**Map Mode** (called Navigate before version 2.0) is OnMyLead's offroad map for when you're not on a group ride. It has the same trails and roads as the rest of the app, shows where you are, and lets you map your own trails by drawing or recording them, keep them on your phone or share them with every rider. The map, following trails, drawing and measuring, Track Line and rating trails are free. Recording, sharing your trails and planning group rides on them are part of [OnMyLead Pro](/help/free-vs-pro).
+**Map Mode** (called Navigate before version 2.0) is OnMyLead's offroad map for when you're not on a group ride. It has the same trails and roads as the rest of the app, shows where you are, and lets you map your own trails by drawing or recording them, keep them on your phone or share them with every rider. Free accounts get 8 hours of Map Mode a month, with the standard map and following trails. The clock never runs while you're sharing your location on a group ride, and Pro has no limit. Map layers, drawing, recording, saving, rating and sharing trails, Track Line, named spots and planning group rides on your trails are part of [OnMyLead Pro](/help/free-vs-pro).
+
+On a Free account, the top of Map Mode shows your time left, like **Free Map Mode: 5 h 20 m Left This Month**. The clock only runs while Map Mode is on your screen. When the month's time is used up, Map Mode offers **See OnMyLead Pro** and opens again at the start of the next month. See [Free and Pro](/help/free-vs-pro#free-map-mode-time).
 
 ## Open Map Mode
 
-- On Home, tap **Open Map** (or the little map) on the **Map Mode** card.
+- From any tab, tap the blue **Map Mode** button in the middle of the bar at the bottom of the screen. On a tablet, and on onmylead.com on a computer, it's in the menu down the left edge, under **Find**.
+- On Home, tap **Open Map Mode** (or the little map) on the **Map Mode** card.
 - To map a trail that isn't marked anywhere, tap **Map a Custom Trail** on the same card. Map Mode opens on the **Draw** tab.
 - Or on the **You** tab, tap **Map Mode** under **On the Trail**.
 
 At the bottom of the map are three tabs: **Explore**, **Record** and **Draw**. Swipe the panel down to see more of the map, and up to bring it back.
+
+Map Mode opens on where you are, close enough to see the trails. If your phone is still finding your location (say, right after you turn it on), the map moves to you as soon as it does, unless you've already moved the map yourself.
 :::
 
 :::release 2.0
@@ -85,6 +92,10 @@ Next to your speed are four readings:
 To start a new trip, press and hold **Trip**. Trip and Moving only count while Map Mode is open, and they're kept on your phone only. When you follow a trail, the big number shows the miles left, and **Speed** moves into the readings in place of **Moving**.
 :::
 
+:::release 2.0
+Under the readings, the **Tilt** tile shows your **Roll** and **Pitch**, turning amber, then red, near your limits. Until you calibrate the tilt meter it says **Calibrate Tilt**. Tap it for the full tilt meter. See [Use the Tilt Meter and Crash Alert](/help/tilt-and-crash-alert).
+:::
+
 ### The Map Follows You
 
 :::until 2.0
@@ -108,11 +119,15 @@ Pick **3D Terrain** under **Map Style** to explore on the real shape of the land
 
 ## Track Line
 
-**Track Line** draws exactly where you've been, in a different colour each day, so today's line is easy to tell from yesterday's: today is red, yesterday blue, and older days gold and other colours. It keeps the last 7 days.
+**Track Line** draws exactly where you've been, in a different color each day, so today's line is easy to tell from yesterday's: today is red, yesterday blue, and older days gold and other colors. It keeps the last 7 days.
+
+:::release 2.0
+Track Line is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Track Line** switch carries a **Pro** tag.
+:::
 
 1. Turn on **Track Line** on Home's **Map Mode** card, or at the bottom of the **Explore** tab.
 2. Ride. Your line is drawn on the map while Map Mode is open, and also while you share your location on a group ride.
-3. To delete every day of it, tap **Clear** next to the colours, then **Clear**.
+3. To delete every day of it, tap **Clear** next to the colors, then **Clear**.
 
 Track Line is kept on this phone only. It is never shared or sent to OnMyLead. It isn't a recording: to keep a trail, record or draw it.
 :::
@@ -161,6 +176,8 @@ Tap **Mark a Spot Here** to name the place you're at, like a ledge, a water cros
 
 The **Draw** tab maps a trail that isn't marked on any map, and measures distances.
 
+Map a Custom Trail, **Mark a Spot** and **Save Trail** are Pro features. See [Free and Pro](/help/free-vs-pro). On a Free account, the **Draw** tab and those buttons carry a **Pro** tag.
+
 The first time you open it, **How Custom Trails Work** explains how custom trails stay private, how sharing and ratings work, and when a shared trail comes down. Tick **Don't show this again** to skip it next time, then tap **Start Mapping**.
 
 1. Tap the **Draw** tab (or **Map a Custom Trail** on Home).
@@ -177,7 +194,7 @@ Tap **My Trails** in Explore (or the trail chip on the map) to see every trail o
 
 On a trail you can:
 
-- Name it and add details: **Difficulty** (Easy, Moderate, Hard or Extreme), **Vehicles That Fit**, **Surface**, **Season**, a width limit, **One Way** and notes.
+- Name it and add details: **Difficulty** (Easy, Moderate, Hard or Extreme), **Vehicles That Fit**, **Surface**, **Season**, **Width Limit (Inches, Optional)** for the narrowest gate or gap, **One Way** and notes.
 - Add up to 6 photos. Press and hold a photo to remove it.
 - See its distance, climb, high point and, for a recording, moving time.
 - **Follow in Navigate**, **Plan a Group Ride on This Trail** or **Delete Trail**.
@@ -186,7 +203,13 @@ On a trail you can:
 - See its **Named Spots**. Tap one to rename it, change its kind or **Remove** it, then tap **Save Changes** (or **Save on This Phone**).
 :::
 
+:::until 2.0
 Trails stay on your phone until you share them. Deleting the app deletes them too.
+:::
+
+:::release 2.0
+Your trails are backed up privately to your account, so they're in My Trails on every device you sign in on, and deleting the app doesn't lose them. Nobody else sees them until you share them. See [Use OnMyLead on More Than One Device](/help/sync-across-devices).
+:::
 
 ## Share a Trail With Every Rider
 
@@ -221,6 +244,10 @@ Only the rider who mapped a trail can delete it.
 
 The trail is deleted from your phone. If you shared it, it also comes off the public map with its photos and ratings. If that can't happen (with no signal, for example), the app says so and keeps the trail, so try again with a signal.
 
+:::release 2.0
+It's deleted from your backup and your other devices too, the next time each one syncs.
+:::
+
 On a trail you shared, the trail's page also has **Delete Your Trail**. It takes the trail off the public map and keeps the copy on this phone in My Trails.
 
 Group rides that already used the trail as their route keep their route.
@@ -232,6 +259,10 @@ Trails other riders shared are called rider trails. They're drawn as **mint dott
 Tap one to see its card. It says **User Submitted Trail**, who mapped it, the difficulty, distance, its **Quality** and **Line Accuracy** stars, and buttons to rate it, navigate it or see the details. The details page adds the vehicles, notes, photos and **Save to My Trails**.
 
 :::release 2.0
+If the mapper entered a width limit, the card and details page show it (**Width Limit**). With widths on your machines in the [Garage](/help/garage), they also say whether your machine fits or is too wide.
+:::
+
+:::release 2.0
 When you follow a rider trail, the spots its mapper named show on the map with their names.
 :::
 
@@ -240,6 +271,11 @@ When you follow a rider trail, the spots its mapper named show on the map with t
 On the **You** tab, under **On the Trail**, turn off **Rider Trails on Maps**. You can also turn off **Rider Trails** in the map's layers panel. They're on unless you turn them off.
 
 ## Rate a Rider Trail
+
+:::release 2.0
+Rating trails is a Pro feature. See [Free and Pro](/help/free-vs-pro). Seeing a trail's ratings stays free.
+:::
+
 
 1. Tap a rider trail, then **Rate Trail** (or **Rate This Trail** on its page).
 2. Give the trail's **Quality** from 1 to 5 stars: is it worth riding?

@@ -4,7 +4,7 @@ summary: On an iPad or Android tablet the map fills the screen, with the riders,
 category: getting-started
 order: 40
 release: "1.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/e/[code].tsx
   - app/src/core/layout.ts
@@ -26,6 +26,10 @@ keywords: [ipad, android tablet, tablet, landscape, split view, sidebar, big scr
 
 OnMyLead works the same on a tablet as on a phone, with the same account, rides and Pro plan. A tablet just gets layouts made for the bigger screen: the map fills it, and the riders, the ride details and your buttons sit beside the map instead of on top of it.
 
+:::release 2.0
+Using OnMyLead on a tablet or the website is a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free account, a tablet or the website opens a screen with **Join a Ride**, **Your Rides**, **See OnMyLead Pro** and **Your Account**. Joining a ride, the ride page and Ride Mode always work, so you can follow the leader on any device for free.
+:::
+
 ## Turn It Either Way
 
 Hold the tablet upright or sideways; every screen works both ways. Phones stay upright.
@@ -35,13 +39,16 @@ You can also run OnMyLead next to another app (Split View or Slide Over on an iP
 ## Getting Around
 
 On a tablet, **Rides**, **Find**, **Groups** and **You** run down the left edge of the screen instead of along the bottom.
+:::release 2.0
+The blue **Map Mode** button sits under **Find** and opens your offroad map full screen.
+:::
 
 :::until 2.0
 On **Rides**, with the tablet sideways, **Create a Ride**, **Join a Ride** and **Find a Ride** stay on the left and your rides are listed beside them.
 :::
 
 :::release 2.0
-On **Rides**, with the tablet sideways, **Join a Ride**, **Create a Ride**, **Find a Ride**, **Events**, **Map Mode**, your toolkit and help stay on the left, and your rides, group, public rides, feed and badges are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
+On **Rides**, with the tablet sideways, **Join a Ride**, **Create a Ride**, **Find a Ride**, **Map Mode**, **Events**, your toolkit and help stay on the left, and your rides, group, public rides, feed and badges are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
 :::
 
 ## Ride Mode on a Tablet

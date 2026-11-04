@@ -1,23 +1,25 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { BadgePatch } from '@/components/badge-patch';
 import { ThemedText } from '@/components/themed-text';
-import { Colors, font, Radius, Spacing } from '@/constants/theme';
-import { BADGES, bestLevels, rankFor, unseen, type MyBadges } from '@/core/badges';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { BADGES, bestLevels, honorsHeld, rankFor, unseen, type MyBadges } from '@/core/badges';
 
 /**
  * Your rank and all seven badges as a row of patches: earned ones in their Bronze, Silver or Gold
- * cloth, the rest as empty outlines. New ones are called out. Tap for Badges.
+ * cloth, the rest as empty outlines, after any honor (Brand Ambassador) the rider holds. New ones
+ * are called out. Tap for Badges.
  */
 export function BadgeStrip({ mine }: { mine: MyBadges }) {
   const rank = rankFor(mine.badges);
   const best = bestLevels(mine.badges);
   const fresh = unseen(mine).length;
+  const honors = honorsHeld(mine.badges);
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Badges. Your rank is ${rank.name}, ${rank.levels} levels earned.${fresh ? ` ${fresh} new.` : ''}`}
+      accessibilityLabel={`Badges.${honors.map((h) => ` ${h.name}.`).join('')} Your rank is ${rank.name}, ${rank.levels} levels earned.${fresh ? ` ${fresh} new.` : ''}`}
       onPress={() => router.push('/badges')}
       style={({ pressed }) => [styles.badges, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.badgesHead}>
@@ -28,6 +30,9 @@ export function BadgeStrip({ mine }: { mine: MyBadges }) {
         {fresh ? <Text style={styles.newPill}>{fresh === 1 ? 'New Badge' : `${fresh} New`}</Text> : null}
       </View>
       <View style={styles.patches}>
+        {honors.map((h) => (
+          <BadgePatch key={h.key} badge={h.key} level={1} size={36} />
+        ))}
         {BADGES.map((b) => (
           <BadgePatch key={b.key} badge={b.key} level={best[b.key] ?? 0} size={36} />
         ))}
@@ -36,7 +41,7 @@ export function BadgeStrip({ mine }: { mine: MyBadges }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   badges: { gap: Spacing.two, borderRadius: Radius.card, padding: Spacing.three, backgroundColor: Colors.backgroundElement },
   badgesHead: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
   rankName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 24, lineHeight: 28 },
@@ -45,4 +50,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 2, borderRadius: Radius.pill, overflow: 'hidden',
   },
   patches: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
-});
+}));

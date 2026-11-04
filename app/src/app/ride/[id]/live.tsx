@@ -2,11 +2,8 @@ import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
-import * as Speech from 'expo-speech';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, StyleSheet, Text, View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
@@ -23,6 +20,8 @@ import { PanelActions, QuickRow, StatusSheet, tapFeel } from '@/components/ride-
 import { RideMessageSheet } from '@/components/ride-message-sheet';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
+import { CrashCountdown } from '@/components/crash-countdown';
+import { TILT_TILE_H, TiltTile } from '@/components/tilt-tile';
 import { SharePicker } from '@/components/share-picker';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
@@ -30,14 +29,16 @@ import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Glass, Radius, RideColors, Spacing } from '@/constants/theme';
+import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
 import { BATTERY_PLANS, batteryBannerTag } from '@/core/battery';
 import { tally } from '@/core/broadcast';
+import { withAlpha } from '@/core/color';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
+import { crashMessage, type CrashCause } from '@/core/crash-detect';
 import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
@@ -57,6 +58,7 @@ import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { newTapId, useAcknowledge, useBroadcast } from '@/hooks/use-broadcast';
+import { useCrashAlert } from '@/hooks/use-crash-alert';
 import { useFollowMe } from '@/hooks/use-follow-me';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
@@ -67,6 +69,7 @@ import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRideChat } from '@/hooks/use-ride-chat';
 import { useSavedReplies } from '@/hooks/use-saved-replies';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
+import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
@@ -79,10 +82,14 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
+import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
+import { speak } from '@/lib/voice';
+import { requirePro } from '@/lib/pro';
+import { ProTag } from '@/components/pro-tag';
 
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
@@ -211,6 +218,7 @@ export default function RideMode() {
   const [panelH, setPanelH] = useState(0);
   const openNewWaypoint = useCallback((at: { lat: number; lng: number }) => {
     if (!wp.switchedOn) return Alert.alert('Not Switched On Yet', WAYPOINTS_NOT_SWITCHED_ON);
+    if (!requirePro('waypoints')) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setWpTarget({ type: 'new', at });
   }, [wp.switchedOn]);
@@ -274,7 +282,7 @@ export default function RideMode() {
     const old = firstAnnouncement.current && Date.now() - Date.parse(announcement.created_at) > 10 * 60_000;
     firstAnnouncement.current = false;
     if (old || announcement.user_id === me) return;
-    Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body));
+    speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body));
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }, [announcement, me, nameOf]);
 
@@ -358,6 +366,10 @@ export default function RideMode() {
   const placesMe = hasRoute || freeride;
   // Battery Saver also slows this screen's own work: the blue dot and the backup check for riders.
   const batteryMode = useBatteryMode();
+  // Tilt meter tile and Crash Alert (phones and tablets; the website has no motion sensors).
+  const tiltSettings = useTiltSettings();
+  const tiltShown = Platform.OS !== 'web' && tiltSettings.show;
+  const tiltReading = useTilt(tiltSettings, tiltShown);
   // Approximate Location (Android) or Precise off (iPhone, iPad) puts this rider miles from where they are.
   const precise = usePreciseLocation(me ? positions[me]?.accuracy_m : null);
   const { followEveryM, refreshSec } = BATTERY_PLANS[batteryMode];
@@ -396,7 +408,7 @@ export default function RideMode() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'regroup_points', filter: `ride_id=eq.${id}` }, () => {
         activeRegroup(id).then((rg) => {
           setRegroup(rg);
-          if (rg) Speech.speak('Regroup point set.');
+          if (rg) speak('Regroup point set.');
         });
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rides', filter: `id=eq.${id}` }, (payload) => {
@@ -483,7 +495,7 @@ export default function RideMode() {
     const red = new Set(bubble.alerts.map((a) => a.riderId));
     for (const a of bubble.alerts) {
       if (!announced.current.has(a.riderId) && a.message) {
-        Speech.speak(a.message);
+        speak(a.message);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
     }
@@ -502,7 +514,7 @@ export default function RideMode() {
       heard.add(key);
       // Opening Ride Mode doesn't read out a breakdown from long ago.
       if (Date.now() - Date.parse(s.tapped_at) > BREAKDOWN_SPEAK_WITHIN_MS) continue;
-      Speech.speak(spokenBreakdown(nameOf(userId)));
+      speak(spokenBreakdown(nameOf(userId)));
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
   }, [statuses, watchesBubble, me, nameOf]);
@@ -642,6 +654,10 @@ export default function RideMode() {
   const musicBottom = locateBottom + LOCATE_SIZE + 10;
   const musicFits = musicOn && locateFits && !fullMap &&
     (tablet || screenH - musicBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
+  // The Tilt tile: on a phone on the left, level with Music (above Center on Me's row); on a tablet
+  // in the open map's bottom-left corner. Only when there is room; Full Map hides it.
+  const tiltFits = tiltShown && locateFits && !fullMap &&
+    (tablet || screenH - musicBottom - TILT_TILE_H >= shownBannersBottom + Spacing.two);
   // The first framing of the group keeps it clear of the panels over the map.
   const sidebarOpen = sidebar.open;
   const fitPadding = useMemo(
@@ -887,6 +903,16 @@ export default function RideMode() {
     );
   }
 
+  // Crash Alert: a crash while riding starts the I'm OK countdown; at zero the group gets the
+  // EMERGENCY alert plus a chat line saying why, both through the outbox (so they go out on reconnect).
+  const crash = useCrashAlert(tiltSettings.crash, !!mine);
+  function sendCrashAlert(cause: CrashCause) {
+    crash.dismiss();
+    void sendEmergency();
+    const body = crashMessage(cause);
+    void broadcast.send({ id: newTapId(), kind: 'reply', label: body }, (tid) => sendQuickReplyReliably(id, body, tid));
+  }
+
   // CarPlay: the car screen mirrors the group's state and sends button presses back here.
   const car = carPlayState({
     rideName: ride?.name ?? 'Ride',
@@ -921,6 +947,8 @@ export default function RideMode() {
   }, []);
 
   const navigateTo = (lat: number, lng: number, title = 'There') => openDirections({ title, to: { lat, lng } });
+  // To a rider who sent Need Help, EMERGENCY or a crash alert: always free.
+  const navigateToRiderInNeed = (lat: number, lng: number) => openDirections({ title: 'There', to: { lat, lng } }, { safety: true });
   const directionRows = rideDirections({
     regroup,
     meet,
@@ -1074,7 +1102,7 @@ export default function RideMode() {
           ) : null}
           {announcement ? (
             <Pressable
-              onPress={() => Speech.speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
+              onPress={() => speak(spokenAnnouncement(nameOf(announcement.user_id), announcement.body))}
               accessibilityRole="button"
               accessibilityLabel={`Announcement from ${nameOf(announcement.user_id)}: ${announcement.body}. Tap to hear it again.`}
               style={styles.announcement}>
@@ -1113,7 +1141,7 @@ export default function RideMode() {
               {offlineSince != null ? (
                 <Text style={styles.sidebarNote}>You have no service. Times are from the last update you got.</Text>
               ) : null}
-              <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle="white">
+              <ScrollView style={{ flexShrink: 1 }} contentContainerStyle={{ gap: 6, paddingBottom: 4 }} indicatorStyle={scrollIndicator()}>
                 <RiderRows
                   riders={mapRiders}
                   meId={me}
@@ -1153,6 +1181,7 @@ export default function RideMode() {
           ]}>
           <Icon name="turn" size={24} color={Colors.sky} strokeWidth={2.1} />
           <Text style={styles.wpFabText}>Directions</Text>
+          <ProTag feature="directions" style={styles.fabPro} />
         </Pressable>
       ) : null}
 
@@ -1163,8 +1192,9 @@ export default function RideMode() {
           accessibilityLabel="Add a waypoint at your location"
           accessibilityHint="You can also press and hold the map to drop one anywhere"
           style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
-          <WaypointBlaze kind="spot" shared={false} size={24} />
+          <WaypointBlaze symbol="spot" shared={false} size={24} />
           <Text style={styles.wpFabText}>Add Waypoint</Text>
+          <ProTag feature="waypoints" style={styles.fabPro} />
         </Pressable>
       ) : null}
 
@@ -1190,6 +1220,22 @@ export default function RideMode() {
           ]}>
           {locating ? <ActivityIndicator color={Colors.sky} /> : <Icon name="locate" size={26} color={Colors.sky} strokeWidth={2.2} />}
         </Pressable>
+      ) : null}
+
+      {tiltFits ? (
+        <TiltTile
+          reading={tiltReading}
+          limits={tiltSettings.limits}
+          style={tablet ? { bottom: panelBottom, left: (sidebar.open ? sideW + EDGE : 0) + EDGE } : { bottom: musicBottom, left: 12 }}
+        />
+      ) : null}
+      {crash.alarm ? (
+        <CrashCountdown cause={crash.alarm.cause} startedAt={crash.alarm.startedAt} onOk={crash.dismiss} onSend={() => sendCrashAlert(crash.alarm!.cause)}
+          onTurnOff={() => {
+            crash.dismiss();
+            setCrashSettings({ ...tiltSettings.crash, enabled: false });
+          }}
+        />
       ) : null}
 
       {musicFits ? (
@@ -1245,7 +1291,7 @@ export default function RideMode() {
             </Pressable>
             <FullMapButton onPress={enterFullMap} style={styles.fullMapBtn} />
             <Pressable
-              onPress={() => setMessageOpen(true)}
+              onPress={() => requirePro('quick_replies') && setMessageOpen(true)}
               accessibilityRole="button"
               accessibilityLabel="Type a Message"
               accessibilityHint="Write your own message to everyone on this ride, or send one of your saved quick replies"
@@ -1253,6 +1299,7 @@ export default function RideMode() {
               style={({ pressed }) => [styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
               <Icon name="chat" size={16} color={Colors.text} strokeWidth={2.2} />
               <Text style={styles.typeText}>Message</Text>
+              <ProTag feature="quick_replies" />
             </Pressable>
           </View>
         )}
@@ -1281,7 +1328,7 @@ export default function RideMode() {
                   <Icon name="warning" size={18} color={r.status === 'yellow' ? Glass.amber : Glass.softRed} strokeWidth={2.2} />
                   <Text style={styles.alertText}>{r.message}</Text>
                   <View style={styles.alertActions}>
-                    {p ? <AlertChip label="Navigate" onPress={() => navigateTo(p.lat, p.lng)} /> : null}
+                    {p ? <AlertChip label="Navigate" onPress={() => navigateToRiderInNeed(p.lat, p.lng)} /> : null}
                     {canRegroup ? <AlertChip label="Regroup" onPress={regroupHere} /> : null}
                   </View>
                 </View>
@@ -1298,7 +1345,7 @@ export default function RideMode() {
                     <Text style={{ fontFamily: font(700) }}>{m.profiles?.display_name || 'Rider'}: {STATUS_LABEL[s.status]}</Text>, {ago(s.tapped_at, now)}
                   </Text>
                   <View style={styles.alertActions}>
-                    {spot ? <AlertChip label="Navigate" onPress={() => navigateTo(spot.lat, spot.lng)} /> : null}
+                    {spot ? <AlertChip label="Navigate" onPress={() => navigateToRiderInNeed(spot.lat, spot.lng)} /> : null}
                     <Pressable
                       onPress={() => setDismissedCalls((d) => new Set(d).add(callKey(m.user_id, s)))}
                       accessibilityRole="button"
@@ -1539,7 +1586,7 @@ function AlertChip({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themedStyles(() => ({
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: 6 },
   topRow: {
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 20, paddingLeft: 8, paddingRight: 10, paddingVertical: 7,
@@ -1552,7 +1599,7 @@ const styles = StyleSheet.create({
   topSub: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 12, flexShrink: 1 },
   groupChip: { paddingHorizontal: 10, minHeight: 30, borderRadius: 15, justifyContent: 'center', borderWidth: 1 },
   groupChipRed: { backgroundColor: Glass.redTint, borderColor: Glass.redEdge },
-  groupChipGreen: { backgroundColor: 'rgba(60,195,107,0.10)', borderColor: 'rgba(60,195,107,0.4)' },
+  groupChipGreen: { backgroundColor: withAlpha(RideColors.green, 0.1), borderColor: withAlpha(RideColors.green, 0.4) },
   groupChipText: { fontFamily: font(700), fontSize: 13 },
   shareDot: { width: 7, height: 7, borderRadius: 4 },
   shareBanner: {
@@ -1653,6 +1700,7 @@ const styles = StyleSheet.create({
     borderRadius: 22, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
   directionsFab: { left: 12 },
+  fabPro: { marginLeft: 2 },
   locateFab: {
     position: 'absolute', right: 12, width: LOCATE_SIZE, height: LOCATE_SIZE, borderRadius: LOCATE_SIZE / 2,
     alignItems: 'center', justifyContent: 'center',
@@ -1670,4 +1718,4 @@ const styles = StyleSheet.create({
   sheet: { flexShrink: 1, backgroundColor: Colors.backgroundElement, padding: Spacing.four, gap: 12, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
   sheetTitle: { color: Colors.text },
   sheetBody: { color: Colors.textSecondary },
-});
+}));
