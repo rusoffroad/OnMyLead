@@ -19,14 +19,17 @@ export async function snapshotForShare(
   // react-native-view-shot hands back a bare path on iOS; expo-file-system wants a file:// address.
   const raw = captured.startsWith('file://') ? captured : `file://${captured}`;
   let saved: { uri: string };
+  let image: { release?: () => void } | null = null;
   try {
     const ctx = ImageManipulator.ImageManipulator.manipulate(raw);
     ctx.resize(opts.height ? { width: opts.width, height: opts.height } : { width: opts.width });
-    const image = await ctx.renderAsync();
-    saved = await image.saveAsync({ compress: 1, format: ImageManipulator.SaveFormat.PNG });
-    (image as { release?: () => void }).release?.();
+    const rendered = await ctx.renderAsync();
+    image = rendered;
+    saved = await rendered.saveAsync({ compress: 1, format: ImageManipulator.SaveFormat.PNG });
   } finally {
-    // The full-size capture (up to 3x the card, tens of MB) is let go now, shrunk or not.
+    // The rendered bitmap and the full-size capture (up to 3x the card, tens of MB) are let go
+    // now, shrunk or not.
+    image?.release?.();
     discard(raw);
   }
   try {

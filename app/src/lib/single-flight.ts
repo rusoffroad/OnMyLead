@@ -25,7 +25,13 @@ export function singleFlight(run: () => Promise<void>): () => Promise<void> {
       // Started right here, before any other caller can get a word in, so one change is one pass.
       const next = queued;
       queued = null;
-      if (next) start().then(next.resolve, next.reject);
+      if (next) {
+        try {
+          start().then(next.resolve, next.reject);
+        } catch (e) {
+          next.reject(e);
+        }
+      }
     });
     return running;
   };

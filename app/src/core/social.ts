@@ -8,6 +8,7 @@ import { feedLine, feedStat, parseFeed, type FeedItem } from './feed';
 import { METERS_PER_MILE } from './geo';
 
 import { coreLocale, tc } from './i18n';
+import { isTransientError } from './errors';
 /** Longest post and comment, in characters (the database checks the same). */
 export const POST_MAX = 500;
 export const COMMENT_MAX = 500;
@@ -337,17 +338,7 @@ export function socialNotSwitchedOn(message: string | null | undefined, code?: s
       && /does not exist|could not find|schema cache/i.test(message ?? ''));
 }
 
-/**
- * A request that never got an answer: no signal, or iOS cancelled it (the app was sent to the
- * background mid-request, or the network changed: "fetch failed: UnexpectedException: cancelled").
- * Worth one quiet retry, and never worth showing as it is.
- */
-export function isTransientError(message: string | null | undefined): boolean {
-  // "cancelled" and "timed out" only as the fetch layer words them, so a server message about a
-  // cancelled ride or a statement timeout isn't retried and called no signal.
-  return /network request (failed|timed out)|failed to fetch|fetch failed|network error|load failed|UnexpectedException: cancelled|^(the )?(request )?(cancelled|timed out)\b/i
-    .test(message ?? '');
-}
+export { isTransientError };
 
 /** What a Social screen says when a call fails: never a raw exception. */
 export function friendlySocialError(message: string | null | undefined, tc: (s: string) => string = (s) => s): string {

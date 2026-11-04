@@ -1,4 +1,5 @@
 import { coreLocale, tc } from './i18n';
+import { isTransientError } from './errors';
 
 /**
  * Out Riding: see who else is out riding near you, and message them (migration
@@ -170,7 +171,7 @@ export function outRidingNotSwitchedOn(message: string | null | undefined, code?
 /** Turn a database error into something a rider can act on. */
 export function friendlyOutRidingError(message: string): string {
   if (outRidingNotSwitchedOn(message)) return NOT_SWITCHED_ON;
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and try again.');
+  if (isTransientError(message)) return tc('No signal. Check your connection and try again.');
   if (/out_riding_rate/i.test(message)) return tc('Your area was updated a lot this hour. It’ll update again soon.');
   if (/a location is needed/i.test(message)) return tc('OnMyLead needs your location to show who’s out near you.');
   if (/slow down/i.test(message)) return tc('You’re sending a lot. Wait a minute and try again.');

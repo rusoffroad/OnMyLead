@@ -86,7 +86,9 @@ export default function EditRide() {
 
   const whenWhere = canEditWhenAndWhere(ride.status);
   const spot = parseCoords(form.coords);
-  const instructionsShown = !!(details || (whenWhere && spot));
+  // On a ride whose spot never saved, the instructions box comes with the spot, and stays while it
+  // holds text so the "set the meeting point first" reason never points at a hidden field.
+  const instructionsShown = !!(details || (whenWhere && (spot || form.instructions)));
 
   async function pickPlace(p: Place) {
     set('coords', `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
