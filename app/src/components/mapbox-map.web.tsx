@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
 import {
@@ -19,6 +20,7 @@ import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
+import { OwnPuck, useOwnPuckStore } from './own-puck';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -169,6 +171,7 @@ export function MapboxMap({
   // Counts style loads: the app's layers and lines are added again after each one.
   const [styled, setStyled] = useState(0);
   const lookRef = useRef(shown);
+  const own = useOwnPuckStore();
   const cb = useRef({ onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle, trail });
   useEffect(() => {
     cb.current = { onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle, trail };
@@ -228,6 +231,7 @@ export function MapboxMap({
         const h = Math.round(((m.getBearing() + 360) % 360) / 5) * 5 % 360;
         if (h !== heading) {
           heading = h;
+          own.setHeading(h);
           cb.current.onCamera?.({ heading: h });
         }
       });
@@ -248,7 +252,11 @@ export function MapboxMap({
       // The browser's own location, for Follow Me (the website has no other way to know it).
       if (typeof navigator !== 'undefined' && navigator.geolocation) {
         const watch = navigator.geolocation.watchPosition(
-          (p) => cb.current.onOwnFix?.({ lat: p.coords.latitude, lng: p.coords.longitude, course: p.coords.heading, speed: p.coords.speed }),
+          (p) => {
+            const f = { lat: p.coords.latitude, lng: p.coords.longitude, course: p.coords.heading, speed: p.coords.speed };
+            own.setFix(f);
+            cb.current.onOwnFix?.(f);
+          },
           () => {},
           { enableHighAccuracy: true, maximumAge: 5000 },
         );
@@ -315,6 +323,29 @@ export function MapboxMap({
       return { lat: p.lat, lng: p.lng };
     },
     isFarOut: () => (map ? map.getZoom() < FAR_OUT_ZOOM : true),
+    async project(p) {
+      if (!map) return null;
+      const pt = map.project([p.lng, p.lat]);
+      return { x: pt.x, y: pt.y };
+    },
+    camera: () => {
+      if (!map) return { zoom: 4, heading: 0, width: 390, height: 800 };
+      const c = map.getContainer();
+      return { zoom: map.getZoom(), heading: map.getBearing(), width: c.clientWidth, height: c.clientHeight };
+    },
+    zoomTo(z, duration = 700) {
+      map?.easeTo({ zoom: z, duration });
+    },
+    async roadsNear(p, radiusPt) {
+      if (!map) return [];
+      const pt = map.project([p.lng, p.lat]);
+      try {
+        const fs = map.queryRenderedFeatures([[pt.x - radiusPt, pt.y - radiusPt], [pt.x + radiusPt, pt.y + radiusPt]]);
+        return junctionLines(fs as never);
+      } catch {
+        return [];
+      }
+    },
   }), [map]);
 
   // Trail layers follow the rider's choices, like the flat maps.
@@ -376,7 +407,11 @@ export function MapboxMap({
       {/* Mapbox's zoom, compass and tilt buttons sit above Full Map's bar in the bottom-left corner. */}
       <style>{'.oml-mapbox .mapboxgl-ctrl-bottom-left .mapboxgl-ctrl-group{margin-bottom:96px}'}</style>
       <div ref={el} className="oml-mapbox" style={{ position: 'absolute', inset: 0, zIndex: 0, background: Colors.background }} />
-      <MapCtx.Provider value={map}>{children}</MapCtx.Provider>
+      <MapCtx.Provider value={map}>
+        {children}
+        {/* Your own dot, with its arrow built in (own-puck). */}
+        <OwnPuck store={own} Marker={MapboxMarker} />
+      </MapCtx.Provider>
     </View>
   );
 }

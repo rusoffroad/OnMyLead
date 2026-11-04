@@ -17,15 +17,44 @@ sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/nav/index.tsx
   - app/src/app/(tabs)/profile.tsx
+  - app/src/core/intersections.ts
+  - app/src/hooks/use-intersection-zoom.ts
+  - app/src/components/use-follow-camera.ts
+  - app/src/components/fallback-follow.ts
+  - app/src/components/own-puck.tsx
+  - app/src/components/rider-puck.tsx
+  - app/src/lib/compass.ts
 related: [ride-mode, navigation-mode, full-map, use-onmylead-on-a-tablet]
-keywords: [follow me, follow, map follows me, keep me centered, auto center, recenter, map moves with me, tracking mode, my arrow, heading, direction arrow, which way am i going, my dot, blue dot]
+keywords: [zoom in at intersections, intersection zoom, junction, auto zoom, zoom out, keep dot on screen, compass, follow me, follow, map follows me, keep me centered, auto center, recenter, map moves with me, tracking mode, my arrow, heading, direction arrow, which way am i going, my dot, blue dot]
 ---
 
-With **Follow Me** on, the map in [Ride Mode](/help/ride-mode) and [Navigate](/help/navigation-mode) moves with you as you ride, so your dot stays in view and you never have to drag the map to find yourself. The map keeps your zoom and doesn't turn; it slides so you stay in the open part of the map, clear of the panels.
+With **Follow Me** on, the map in [Ride Mode](/help/ride-mode) and [Navigate](/help/navigation-mode) moves with you as you ride, so your dot stays in view and you never have to drag the map to find yourself.
+
+:::until 2.1
+The map keeps your zoom and doesn't turn; it slides so you stay in the open part of the map, clear of the panels.
 
 ## Your Own Arrow
 
 While you're moving faster than a walk (about 4 mph), a small white arrow on the edge of your own blue dot points the way you're heading, the same arrow every other rider's dot gets. It stays true when you turn the map. When you stop, the arrow goes away, because a phone can only tell direction while it moves.
+:::
+
+:::release 2.1
+## How the Map Keeps Up With You
+
+Your dot moves freely through the middle of the map. When it gets close to an edge of the open part of the map (clear of the panels), the map zooms out one step, once. After that, each time your dot nears an edge again, the map slides to bring you back, placing your dot a little behind the middle so you see more of the way ahead. The map never turns.
+
+Tapping **Center on Me**, or picking Follow Me back up after a pause, starts fresh: the map may zoom out one step again the next time you near an edge.
+
+## Zoom In at Intersections
+
+While the map is following you and you're moving, it zooms in as you come up on a junction of roads or trails, about 9 seconds before you reach it, so you can see the turn up close. Once you're through, it zooms back out to where it was. It works with any road, track or trail drawn on the map, including on a downloaded map with no signal.
+
+**Zoom In at Intersections** is on until you turn it off in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
+
+## Your Dot
+
+Your own dot is a cyan disc with a white arrow built into it and a soft beam ahead of it. The arrow always shows which way you're facing: the direction you're riding while you move, and your phone's compass when you're stopped, so it turns as you turn. The beam is long while you ride and shorter when you stop. It stays true when you turn the map.
+:::
 
 ## The Follow Me Button
 
@@ -52,3 +81,7 @@ In [Full Map](/help/full-map), **Follow Me** stays on the map as a round arrow b
 - **iPhone and Android phones:** **Follow Me** and **Center on Me** sit on the right, just above the bottom panel. If the panel fills the screen, fold it to see them.
 - **iPad and Android tablets:** both sit at the bottom of the map, just left of the buttons panel in Ride Mode, and in the bottom corner in Navigate.
 - **Website:** Navigate has **Follow Me** too, and shows your arrow when your browser reports your direction (most phones do while you move; computers usually don't). Ride Mode on the website shows the route instead of a live map, so it has no Follow Me button.
+
+:::release 2.1
+The website has no compass, so on onmylead.com your dot keeps pointing the last way you were heading when you stop.
+:::

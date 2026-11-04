@@ -46,6 +46,14 @@ export type MapboxMapHandle = {
   /** The spot under a point of the map (x, y from the top-left corner). */
   pointAt: (x: number, y: number) => Promise<LatLng | null>;
   isFarOut: () => boolean;
+  /** Where a spot is on screen (points from the top-left corner), or null while the map can't say. */
+  project: (p: LatLng) => Promise<{ x: number; y: number } | null>;
+  /** The camera now: Mapbox zoom, turn from north (degrees) and the map's size in points. */
+  camera: () => { zoom: number; heading: number; width: number; height: number };
+  /** Zoom to a Mapbox zoom, keeping the middle where it is. */
+  zoomTo: (zoom: number, duration?: number) => void;
+  /** Road, track and trail lines drawn within `radiusPt` points of a spot (Zoom In at Intersections). */
+  roadsNear: (p: LatLng, radiusPt: number) => Promise<LatLng[][]>;
 };
 
 // Older names, kept for the files written when only 3D Terrain was drawn by Mapbox.

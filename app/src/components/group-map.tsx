@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 
 import { Colors, RideColors } from '@/constants/theme';
-import { followCamShouldMove } from '@/core/follow-camera';
+import { FOLLOW_FRAME_START, followCamShouldMove, type FollowFrame } from '@/core/follow-camera';
 import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
 import { cameraCenterFor, fitInset, isFarOut, openMapCenter, rideViewCorners } from '@/core/map-center';
@@ -11,6 +11,7 @@ import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
+import { fallbackFollowStep } from './fallback-follow';
 import { GroupMapboxMap } from './group-mapbox-map';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RiderMarker } from './rider-marker';
@@ -156,6 +157,7 @@ function FlatGroupMap({
     followRef.current = follow;
   }, [follow]);
   const followed = useRef<LatLng | null>(null);
+  const frame = useRef<FollowFrame>(FOLLOW_FRAME_START);
   const everyMs = useRef(locationEveryMs);
   useEffect(() => {
     everyMs.current = locationEveryMs;
@@ -170,12 +172,18 @@ function FlatGroupMap({
     const fl = followRef.current;
     if (!fl || !followCamShouldMove(followed.current, f)) return;
     followed.current = { lat: f.lat, lng: f.lng };
-    // As long as the phone takes to report the next spot, so the map moves in one steady glide.
-    centerMap(f, fl.inset, { duration: followCamDurationMs(everyMs.current) });
+    const m = map.current;
+    if (!m) return;
+    // The dot rides through the middle; near an edge the map zooms out once, then moves (core/follow-camera).
+    void fallbackFollowStep(m, f, fl.inset, size.current, frame).then((move) => {
+      // As long as the phone takes to report the next spot, so the map moves in one steady glide.
+      if (move === 'pan') centerMap(f, fl.inset, { duration: followCamDurationMs(everyMs.current) });
+    });
   }, [centerMap]));
   // Follow Me just came on (or back on): go to the rider at once rather than at their next step.
   const followOn = !!follow;
   useEffect(() => {
+    frame.current = FOLLOW_FRAME_START;
     if (!followOn) {
       followed.current = null;
       return;
@@ -188,7 +196,11 @@ function FlatGroupMap({
   }, [followOn, own, centerMap]);
 
   useImperativeHandle(ref, () => ({
-    centerOn: (p, inset, opts) => centerMap(p, inset, opts),
+    centerOn: (p, inset, opts) => {
+      // Center on Me allows the one zoom out again.
+      frame.current = FOLLOW_FRAME_START;
+      return centerMap(p, inset, opts);
+    },
   }), [centerMap]);
 
   useEffect(() => {

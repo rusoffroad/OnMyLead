@@ -4,8 +4,8 @@ import { Colors, RideColors, themedStyles } from '@/constants/theme';
 import type { RideRole } from '@/core/bubble';
 import type { Freshness } from '@/core/freshness';
 
-/** Default dot sizes: the leader is the bigger blue one. */
-export const RIDER_DOT = { leader: 26, rider: 20 } as const;
+/** Default dot sizes: the leader is the biggest (blue), the tail gunner next (violet). */
+export const RIDER_DOT = { leader: 26, sweep: 24, rider: 20 } as const;
 
 /**
  * One rider's dot, shared by the map and the rider list so both say the same thing. A live rider
@@ -17,13 +17,14 @@ export const RIDER_DOT = { leader: 26, rider: 20 } as const;
  */
 export function RiderDot({ role, freshness, size }: { role: RideRole; freshness: Freshness | null; size?: number }) {
   const leader = role === 'leader';
-  const d = size ?? (leader ? RIDER_DOT.leader : RIDER_DOT.rider);
+  const sweep = role === 'sweep';
+  const d = size ?? (leader ? RIDER_DOT.leader : sweep ? RIDER_DOT.sweep : RIDER_DOT.rider);
   const shape = { width: d, height: d, borderRadius: d / 2 };
   if (freshness === 'live') {
-    return <View style={[shape, styles.live, leader && styles.leaderLive]} />;
+    return <View style={[shape, styles.live, leader && styles.leaderLive, sweep && styles.sweepLive]} />;
   }
   if (freshness === 'delayed') {
-    return <View style={[shape, styles.hollow, leader && styles.leaderHollow]} />;
+    return <View style={[shape, styles.hollow, leader && styles.leaderHollow, sweep && styles.sweepHollow]} />;
   }
   if (freshness === 'lost') return <View style={[shape, styles.hollow, styles.lost]} />;
   // Not sharing: a faint ring, as there is no position to stand for.
@@ -40,6 +41,9 @@ const styles = themedStyles(() => ({
   leaderLive: { backgroundColor: RideColors.leader },
   hollow: { borderWidth: 2.5, borderColor: Colors.textSecondary, backgroundColor: 'rgba(10,22,38,0.7)' },
   leaderHollow: { borderColor: RideColors.leader },
+  // The tail gunner rides at the rear in their own violet, so the group's two ends always stand out.
+  sweepLive: { backgroundColor: RideColors.sweep },
+  sweepHollow: { borderColor: RideColors.sweep },
   lost: { borderColor: Colors.text, borderStyle: 'dashed' },
   off: { borderWidth: 1.5, borderColor: Colors.border },
 }));
