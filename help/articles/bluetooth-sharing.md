@@ -12,7 +12,7 @@ sources:
   - app/src/lib/outbox.ts
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/(tabs)/profile.tsx
-  - supabase/migrations/20261103600000_bluetooth_sharing.sql
+  - supabase/migrations/20261104060000_bluetooth_sharing.sql
 related: [ride-mode, location-sharing, emergency-and-safety, status-buttons, offline-maps, privacy]
 keywords: [bluetooth, no service, no signal, offline, dead zone, mesh, relay, nearby, out of range, no cell]
 ---

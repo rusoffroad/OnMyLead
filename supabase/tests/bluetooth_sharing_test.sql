@@ -1,4 +1,4 @@
--- Bluetooth Sharing (migration 20261103600000_bluetooth_sharing.sql): who gets the ride's keys, and
+-- Bluetooth Sharing (migration 20261104060000_bluetooth_sharing.sql): who gets the ride's keys, and
 -- which relayed spots and taps the server accepts. Runs after privacy_test.sql (run_local.sh), which
 -- sets up as_user and grants every table to authenticated, so these checks lean on row level
 -- security and the functions alone. Each block raises an exception if a rule is broken.

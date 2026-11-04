@@ -13,7 +13,7 @@
  * - Each packet also carries a code made with the sending rider's own key (HMAC-SHA256), which
  *   only that rider and the server know. Other phones pass it on untouched; when any phone gets
  *   service and uploads what it heard, the server checks the code (supabase migration
- *   20261103600000_bluetooth_sharing.sql), so nobody can place another rider somewhere they are not.
+ *   20261104060000_bluetooth_sharing.sql), so nobody can place another rider somewhere they are not.
  * - Only riders sharing their location send it; a phone relays others for a limited time and
  *   number of hops, and forgets them when the ride ends.
  */

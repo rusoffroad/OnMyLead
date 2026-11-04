@@ -100,7 +100,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Bluetooth Sharing (2.1): with no service, Ride Mode passes spots (sharing riders), status taps
   incl. EMERGENCY and quick replies between nearby riders on the ride over Bluetooth LE, relayed up
   to 3 hops, uploaded by the first phone with signal. `core/nearby.ts`, `lib/nearby.ts`,
-  `modules/onmylead-nearby` (Swift + Kotlin), migration `20261103600000_bluetooth_sharing.sql`.
+  `modules/onmylead-nearby` (Swift + Kotlin), migration `20261104060000_bluetooth_sharing.sql`.
   You > Bluetooth Sharing switch; **[flag]** `bluetooth_sharing`. Apps only (not the website).
 
 ### Chat and Polls
