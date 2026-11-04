@@ -2,6 +2,19 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "badge-leaderboard",
+      "badges-and-ranks",
+      "home-screen",
+      "language"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "language-badges",
+    "why": "Device check of the 2.1 build in Spanish found the You tab's badge line (\"3 more levels for Veteran\") still in English. Badge names, levels (Bronze, Silver, Gold), what each badge is for, the progress lines and the leaderboard level counts now follow the app's language too. In English nothing changes, so these articles only get a new updated: date."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "create-a-ride",
       "events",
       "create-a-ride-on-the-website"
