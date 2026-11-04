@@ -23,6 +23,7 @@ import { confirmAsync } from '@/lib/confirm';
 import { myGroupChats, myJoinedRides, setGroupChatMuted, setOpenGroupChat } from '@/lib/group-chat';
 import { getGroup, type RidingGroup } from '@/lib/groups';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
@@ -115,7 +116,7 @@ export default function GroupChat() {
 
   return (
     <SafeAreaView edges={['top', 'bottom']} style={styles.page}>
-      <Stack.Screen options={{ headerShown: false, title: group?.name ?? 'Group Chat' }} />
+      <Stack.Screen options={{ headerShown: false, title: group?.name ?? t('Group Chat') }} />
       <View style={styles.header}>
         <Pressable
           accessibilityRole="button"

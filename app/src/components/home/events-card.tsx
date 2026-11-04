@@ -10,6 +10,7 @@ import { eventDates, sortCards, type EventCard } from '@/core/events';
 import { myEvents, upcomingEvents } from '@/lib/events';
 import { positionIfAllowed } from '@/lib/location';
 import { Home, homeStyles, Pill } from './parts';
+import { t } from '@/lib/i18n';
 
 /**
  * Events on the home screen: a gold-edged row under the ride actions (gold so it stands apart
@@ -44,8 +45,8 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
   );
 
   const label = next
-    ? `${next.yours ? 'Your next event' : 'Next event'}: ${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}. Open Events`
-    : 'Events: rallies, poker runs and ride weekends. Open Events';
+    ? t(next.yours ? 'Your next event: {event}. Open Events' : 'Next event: {event}. Open Events', { event: `${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}` })
+    : t('Events: rallies, poker runs and ride weekends. Open Events');
 
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={() => router.push('/events')}
@@ -57,13 +58,13 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
       )}
       <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
         <View style={styles.titleRow}>
-          <Text style={homeStyles.cardTitle}>Events</Text>
-          {count ? <Pill text={`${count} Coming Up`} tone="gold" /> : null}
+          <Text style={homeStyles.cardTitle}>{t('Events')}</Text>
+          {count ? <Pill text={t('{n} Coming Up', { n: count })} tone="gold" /> : null}
         </View>
-        <Text style={styles.tagline} numberOfLines={1}>Rallies, poker runs and ride weekends</Text>
+        <Text style={styles.tagline} numberOfLines={1}>{t('Rallies, poker runs and ride weekends')}</Text>
         {next ? (
           <Text style={homeStyles.muted} numberOfLines={1}>
-            {`${next.yours ? 'Yours: ' : 'Next: '}${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}`}
+            {`${next.yours ? `${t('Yours')}: ` : `${t('Next')}: `}${next.e.title}, ${eventDates(next.e.starts_at, next.e.ends_at)}`}
           </Text>
         ) : null}
       </View>

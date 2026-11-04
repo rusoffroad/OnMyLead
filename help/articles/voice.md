@@ -4,7 +4,7 @@ summary: Pick the natural-sounding voice that reads Ride Mode alerts out loud, h
 category: ride-mode
 order: 47
 release: "2.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/voice.tsx
   - app/src/core/voice.ts

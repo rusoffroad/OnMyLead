@@ -5,6 +5,7 @@ import { Icon, type IconName } from '@/components/icon';
 import { Colors, font, themedStyles } from '@/constants/theme';
 import type { TOOLKIT, ToolKey } from '@/core/home';
 import { Gradient, Home, homeStyles, HomeCard } from './parts';
+import { t as tr } from '@/lib/i18n';
 
 const ICONS: Record<ToolKey, IconName> = {
   out_riding: 'signal', friends: 'people', garage: 'machine', trips: 'calendar',
@@ -19,7 +20,7 @@ export function Toolkit({ tools, columns }: { tools: typeof TOOLKIT; columns: nu
         <Pressable
           key={t.key}
           accessibilityRole="button"
-          accessibilityLabel={t.label}
+          accessibilityLabel={tr(t.label)}
           onPress={() => router.push(t.href as never)}
           style={({ pressed }) => [styles.tool, { width: `${100 / columns}%` }, pressed && { opacity: 0.75 }]}>
           <View style={styles.icon}>
@@ -28,7 +29,7 @@ export function Toolkit({ tools, columns }: { tools: typeof TOOLKIT; columns: nu
               <Icon name={ICONS[t.key]} size={24} color={Colors.text} strokeWidth={2} />
             </View>
           </View>
-          <Text style={styles.label} numberOfLines={2}>{t.label}</Text>
+          <Text style={styles.label} numberOfLines={2}>{tr(t.label)}</Text>
         </Pressable>
       ))}
     </View>
@@ -38,15 +39,15 @@ export function Toolkit({ tools, columns }: { tools: typeof TOOLKIT; columns: nu
 /** Help & Support: the Help Center's how-to guides, contact, and reporting a problem, one tap from home. */
 export function HelpRow() {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel="Help and Support. How-to guides, contact us, report a problem" onPress={() => router.push('/support')}>
+    <Pressable accessibilityRole="button" accessibilityLabel={tr('Help and Support. How-to guides, contact us, report a problem')} onPress={() => router.push('/support')}>
       {({ pressed }) => (
         <HomeCard style={[styles.help, pressed && { backgroundColor: Home.panel2 }]}>
           <View style={styles.helpIcon}>
             <Icon name="help" size={22} color={Colors.sky} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={homeStyles.cardTitle}>Help & Support</Text>
-            <Text style={homeStyles.muted}>How-to guides, contact us, report a problem</Text>
+            <Text style={homeStyles.cardTitle}>{tr('Help & Support')}</Text>
+            <Text style={homeStyles.muted}>{tr('How-to guides, contact us, report a problem')}</Text>
           </View>
           <Icon name="chevron" color={Home.muted} />
         </HomeCard>

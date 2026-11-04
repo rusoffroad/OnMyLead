@@ -16,6 +16,7 @@ import {
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
+import { t } from '@/lib/i18n';
 
 const ALL: OfflineChoice[] = OFFLINE_CHOICES.map((c) => c.id);
 
@@ -62,7 +63,7 @@ export default function OfflineMaps() {
   if (Platform.OS === 'web') {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Offline Maps' }} />
+        <Stack.Screen options={{ title: t('Offline Maps') }} />
         <ThemedText themeColor="textSecondary">Offline maps are in the iPhone app, where Ride Mode can use them with no signal.</ThemedText>
       </Screen>
     );
@@ -70,7 +71,7 @@ export default function OfflineMaps() {
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: 'Offline Maps' }} />
+      <Stack.Screen options={{ title: t('Offline Maps') }} />
 
       <View style={styles.hero}>
         <Text style={styles.heroTitle}>Maps for No Signal</Text>

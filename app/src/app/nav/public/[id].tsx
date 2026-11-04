@@ -19,6 +19,7 @@ import { confirmAsync } from '@/lib/confirm';
 import { deleteSharedTrail, getPublicTrail, savePublicTrail, stopSharing, useLocalTrails } from '@/lib/nav-trails';
 import { requirePro } from '@/lib/pro';
 import { useGarageWidths } from '@/lib/trail-width';
+import { t as tr } from '@/lib/i18n';
 
 /**
  * A trail another rider mapped and shared. It says it's user submitted up front, who mapped it and
@@ -191,7 +192,7 @@ export default function PublicTrailPage() {
 
   return (
     <Screen width={layout.expanded ? 'wide' : 'readable'}>
-      <Stack.Screen options={{ title: 'Rider Trail' }} />
+      <Stack.Screen options={{ title: tr('Rider Trail') }} />
       {layout.expanded ? (
         <View style={styles.columns}>
           <View style={styles.column}>{side}{actions}</View>

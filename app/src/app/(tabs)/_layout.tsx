@@ -6,6 +6,7 @@ import { Colors, font } from '@/constants/theme';
 import { useLayout } from '@/hooks/use-layout';
 import { useFlag } from '@/lib/app-settings';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 /**
  * The app's four homes: Rides, Find, Groups and You. Every other screen (a ride, the Garage,
@@ -34,9 +35,9 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: Colors.background },
       }}>
       <Tabs.Screen name="index" options={{ title: 'OnMyLead', headerShown: false }} />
-      <Tabs.Screen name="find" options={{ title: 'Find a Ride' }} />
-      <Tabs.Screen name="groups" options={{ title: 'Riding Groups' }} />
-      <Tabs.Screen name="profile" options={{ title: 'You' }} />
+      <Tabs.Screen name="find" options={{ title: t('Find a Ride') }} />
+      <Tabs.Screen name="groups" options={{ title: t('Riding Groups') }} />
+      <Tabs.Screen name="profile" options={{ title: t('You') }} />
     </Tabs>
   );
 }

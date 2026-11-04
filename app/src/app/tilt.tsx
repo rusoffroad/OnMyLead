@@ -17,6 +17,7 @@ import { latestMotion, motionAvailable } from '@/lib/motion';
 import {
   clearZero, setCrashSettings, setTiltLimits, setTiltShown, setTiltVoice, setTiltWarnings, useTiltSettings, zeroTilt,
 } from '@/lib/tilt';
+import { t as tr } from '@/lib/i18n';
 
 /**
  * Tilt: a roll and pitch meter (inclinometer) from the phone's motion sensors, plus the Crash Alert
@@ -30,7 +31,7 @@ export default function TiltScreen() {
 function NoSensors() {
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Tilt' }} />
+      <Stack.Screen options={{ title: tr('Tilt') }} />
       <ThemedText type="subtitle">Tilt Is in the App</ThemedText>
       <ThemedText themeColor="textSecondary">
         The roll and pitch meter and Crash Alert read the motion sensors in your phone or tablet, so they’re in the OnMyLead app for iPhone, iPad and Android, not on the website.
@@ -77,7 +78,7 @@ function TiltMeter() {
 
   return (
     <Screen width={sideBySide ? 'wide' : 'readable'}>
-      <Stack.Screen options={{ title: 'Tilt' }} />
+      <Stack.Screen options={{ title: tr('Tilt') }} />
       {!available ? (
         <View style={styles.notice}>
           <ThemedText type="smallBold">No Motion Sensors Found</ThemedText>

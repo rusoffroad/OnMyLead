@@ -56,6 +56,8 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'onmylead.dismissedNotices': 'Announcements the rider closed',
   // Appearance (themes thread; lib/appearance applies a change from another device)
   'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
+  // Language (lib/i18n applies a change from another device)
+  'onmylead.language': 'The app language, or Match Phone',
   // Ride Mode alerts (their threads; each writes its key with setSyncedItem once both branches are in)
   'voice.choice.v1': 'The voice for spoken alerts (a device without it uses its best installed voice)',
   'tilt.limits': 'Roll and pitch warning angles',

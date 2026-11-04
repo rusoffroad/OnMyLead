@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { useLayout } from '@/hooks/use-layout';
+import { tx } from '@/lib/i18n';
 
 /**
  * A sheet that slides up over the screen with a title, a scrolling body and swipe-down to close
@@ -32,7 +33,7 @@ export function BottomSheet({
           accessibilityViewIsModal
           style={[styles.sheet, layout.wide && styles.sheetWide, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]}>
           <View style={styles.grip} />
-          <Text style={styles.title} accessibilityRole="header">{title}</Text>
+          <Text style={styles.title} accessibilityRole="header">{tx(title)}</Text>
           <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={{ gap: Spacing.three, paddingBottom: Spacing.two }}>
             {children}
           </SheetScroll>

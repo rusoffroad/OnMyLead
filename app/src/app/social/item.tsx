@@ -20,6 +20,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { addComment, deleteComment, feedItem, itemComments, itemLikers, ProNeededError, SocialOffError } from '@/lib/social';
+import { t } from '@/lib/i18n';
 
 /**
  * One Feed item with every comment and who liked it, opened from the Feed, Social, a profile or a
@@ -110,7 +111,7 @@ export default function SocialItemScreen() {
 
   return (
     <SafeAreaView edges={['top', 'bottom', 'left', 'right']} style={styles.page}>
-      <Stack.Screen options={{ headerShown: false, title: 'Post' }} />
+      <Stack.Screen options={{ headerShown: false, title: t('Post') }} />
       <View style={[styles.column, layout.wide && { maxWidth: 720 }]}>
         <View style={styles.header}>
           <Pressable accessibilityRole="button" accessibilityLabel="Back" hitSlop={12} onPress={back} style={styles.back}>

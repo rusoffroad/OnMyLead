@@ -1,0 +1,11 @@
+{
+  "ios": {
+    "NSLocationWhenInUseUsageDescription": "你的位置只会在你共享期间分享给你选择的骑手，好让你的队伍不走散。",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "手机锁屏固定在支架上时，继续与你的骑行共享位置。计时结束或骑行结束时，共享总会停止。",
+    "NSAppleMusicUsageDescription": "在音乐控制中显示 Apple Music 歌曲名称。信息只保留在你的手机上。",
+    "NSPhotoLibraryUsageDescription": "为你的车库选择头像或车辆照片。只会上传你选择的照片。",
+    "NSCameraUsageDescription": "拍摄头像或车辆照片。只会上传你拍摄的照片。",
+    "NSMotionUsageDescription": "OnMyLead 使用运动传感器显示倾斜仪表，并在骑行模式中检测可能的事故，以便提醒你的队伍。",
+    "NSLocalNetworkUsageDescription": "OnMyLead 通过 Wi-Fi 连接你的 Starlink 天线来显示其状态。不会触碰你网络中的其他任何设备。"
+  }
+}

@@ -31,6 +31,7 @@ import {
 import { useFriends } from '@/lib/friends';
 import { rideMates } from '@/lib/groups';
 import { useSession } from '@/lib/session';
+import { t } from '@/lib/i18n';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 const rideWhen = (iso: string) =>
@@ -95,7 +96,7 @@ export default function EventPage() {
   if (ev === null) {
     return (
       <Screen>
-        <Stack.Screen options={{ title: 'Event' }} />
+        <Stack.Screen options={{ title: t('Event') }} />
         <ThemedText>{notFound}</ThemedText>
         <Button title="See All Events" kind="secondary" onPress={() => router.replace('/events')} />
       </Screen>

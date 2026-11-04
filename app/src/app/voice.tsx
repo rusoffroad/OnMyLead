@@ -11,6 +11,7 @@ import { showsProTag } from '@/core/entitlements';
 import { ProTag } from '@/components/pro-tag';
 import { requirePro, useEntitlements } from '@/lib/pro';
 import { deviceLanguage, installedVoices, setVoiceChoice, speakWith, stopSpeaking, useVoiceChoice } from '@/lib/voice';
+import { t } from '@/lib/i18n';
 
 /** Where a rider gets a better free voice, per device. Steps are the same on iPhone and iPad. */
 const DOWNLOAD_STEPS: Record<string, string> = {
@@ -53,7 +54,7 @@ export default function VoiceScreen() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Voice' }} />
+      <Stack.Screen options={{ title: t('Voice') }} />
       <ThemedText themeColor="textSecondary">
         The voice that reads Ride Mode alerts out loud: announcements, regroup points, a rider falling behind and Mechanical Issue. Every voice here is on this device, so it keeps talking with no service.
       </ThemedText>

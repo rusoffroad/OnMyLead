@@ -17,6 +17,7 @@ const PATHS = {
   follow: ['M12 3.5l7.5 17-7.5-4.2-7.5 4.2z'],
   check: ['M5 12.5l4.5 4.5L19 7.5'],
   // Two arrows chasing each other, for Sync Across Devices.
+  globe: ['M3.5 12h17', 'M12 3.5c2.5 2.6 3.7 5.4 3.7 8.5s-1.2 5.9-3.7 8.5', 'M12 3.5C9.5 6.1 8.3 8.9 8.3 12s1.2 5.9 3.7 8.5'],
   sync: ['M19.5 10a7.8 7.8 0 0 0-14-3.2L4 8.5', 'M4 4v4.5h4.5', 'M4.5 14a7.8 7.8 0 0 0 14 3.2l1.5-1.7', 'M20 20v-4.5h-4.5'],
   search: ['M15.5 15.5L20.5 20.5'],
   person: ['M4.5 20.5c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6'],
@@ -107,6 +108,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
         </>
       ) : null}
       {name === 'block' ? <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={strokeWidth} /> : null}
+      {name === 'globe' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'theme' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'help' ? <Circle cx={12} cy={12} r={9.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'signal' ? <Circle cx={12} cy={12} r={1.8} fill={color} stroke={color} strokeWidth={strokeWidth} /> : null}

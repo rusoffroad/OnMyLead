@@ -16,6 +16,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { createPost, pickPostPhoto, ProNeededError } from '@/lib/social';
+import { t } from '@/lib/i18n';
 
 /**
  * New Post: a ride report for your profile and your friends' feeds, with one optional photo.
@@ -62,7 +63,7 @@ export default function NewPost() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'New Post' }} />
+      <Stack.Screen options={{ title: t('New Post') }} />
       <View style={{ gap: 16 }}>
         {!pro ? (
           <Pressable onPress={() => requirePro('social_posts')} style={styles.locked} accessibilityRole="button">

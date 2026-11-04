@@ -22,6 +22,7 @@ import {
 import { handleProError, requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { shareBadge } from '@/components/trail-badge';
+import { t } from '@/lib/i18n';
 
 /**
  * One of your trails: its line and numbers, the details riders need (name, difficulty, vehicles,
@@ -315,7 +316,7 @@ export default function TrailDetail() {
 
   return (
     <Screen width={layout.expanded ? 'wide' : 'readable'}>
-      <Stack.Screen options={{ title: details.name || 'Trail' }} />
+      <Stack.Screen options={{ title: details.name || t('Trail') }} />
       {layout.expanded ? (
         <View style={styles.columns}>
           <View style={styles.column}>{side}</View>

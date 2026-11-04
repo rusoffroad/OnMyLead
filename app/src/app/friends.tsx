@@ -27,6 +27,7 @@ import {
 } from '@/lib/friends';
 import { useSession } from '@/lib/session';
 import { setFriendCode } from '@/lib/share-codes';
+import { t } from '@/lib/i18n';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
@@ -308,7 +309,7 @@ export default function Friends() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Friends' }} />
+      <Stack.Screen options={{ title: t('Friends') }} />
       {wide ? (
         <TwoPane side={<>{head}{linkCards}</>} main={main} sideWidth={sideColumnWidth(width)} />
       ) : (

@@ -6,6 +6,7 @@ import { Icon } from '@/components/icon';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { TRACK_DAY_COLORS } from '@/core/track-line';
 import { Gradient, Pill } from './parts';
+import { currentLocale, t } from '@/lib/i18n';
 
 /** Logo blue, deepening to the bottom corner: Map Mode's own colour, next to Join's red. */
 const BLUE = ['#4C95FF', '#2F6FE0', '#1A4AA8'];
@@ -35,19 +36,19 @@ export function MapModeCard({
   trailsNear, trackOn, onTrack,
 }: { trailsNear: number | null; trackOn: boolean; onTrack: (on: boolean) => void }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel="Open Map Mode" onPress={() => router.push('/nav')} style={styles.card}>
+    <Pressable accessibilityRole="button" accessibilityLabel={t('Open Map Mode')} onPress={() => router.push('/nav')} style={styles.card}>
       <Gradient colors={BLUE} angle="diagonal" radius={28} />
       <TrailArt />
       <View style={styles.top}>
         <View style={{ flex: 1 }}>
           <View style={styles.titleRow}>
             <Icon name="map" size={30} color="#fff" strokeWidth={2.4} />
-            <Text style={styles.title} accessibilityRole="header">Map Mode</Text>
+            <Text style={styles.title} accessibilityRole="header">{t('Map Mode')}</Text>
           </View>
-          <Text style={styles.detail}>Riding solo? Your offroad map with speed, elevation, rider trails and your own.</Text>
+          <Text style={styles.detail}>{t('Riding solo? Your offroad map with speed, elevation, rider trails and your own.')}</Text>
         </View>
         {trailsNear ? (
-          <Pill tone="onRed" text={`${trailsNear.toLocaleString('en-US')} ${trailsNear === 1 ? 'trail' : 'trails'} near you`} />
+          <Pill tone="onRed" text={trailsNear === 1 ? t('1 trail near you') : t('{n} trails near you', { n: trailsNear.toLocaleString(currentLocale()) })} />
         ) : null}
       </View>
       <View style={styles.buttons}>
@@ -56,26 +57,26 @@ export function MapModeCard({
           onPress={() => router.push('/nav')}
           style={({ pressed }) => [styles.btn, styles.btnGo, pressed && { opacity: 0.85 }]}>
           <Icon name="map" size={18} color={BLUE_INK} strokeWidth={2.4} />
-          <Text style={[styles.btnText, { color: BLUE_INK }]}>Open Map Mode</Text>
+          <Text style={[styles.btnText, { color: BLUE_INK }]}>{t('Open Map Mode')}</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Map a Custom Trail. Draw a trail that isn't marked anywhere"
+          accessibilityLabel={t('Map a Custom Trail. Draw a trail that isn’t marked anywhere')}
           onPress={() => router.push('/nav?draw=1')}
           style={({ pressed }) => [styles.btn, pressed && { opacity: 0.85 }]}>
           <Icon name="draw" size={18} color="#fff" strokeWidth={2.2} />
-          <Text style={styles.btnText} numberOfLines={2}>Map a Custom Trail</Text>
+          <Text style={styles.btnText} numberOfLines={2}>{t('Map a Custom Trail')}</Text>
         </Pressable>
       </View>
       <View style={styles.track}>
         <Icon name="trackLine" size={22} color="#fff" />
         <View style={{ flex: 1 }}>
-          <Text style={styles.trackTitle}>Track Line</Text>
+          <Text style={styles.trackTitle}>{t('Track Line')}</Text>
           <View style={styles.days}>
             {[['Today', TRACK_DAY_COLORS[0]], ['Yesterday', TRACK_DAY_COLORS[1]], ['Older', TRACK_DAY_COLORS[2]]].map(([label, c]) => (
               <View key={label} style={styles.day}>
                 <View style={[styles.dayLine, { backgroundColor: c }]} />
-                <Text style={styles.dayText}>{label}</Text>
+                <Text style={styles.dayText}>{t(label)}</Text>
               </View>
             ))}
           </View>
@@ -83,7 +84,7 @@ export function MapModeCard({
         <Switch
           value={trackOn}
           onValueChange={onTrack}
-          accessibilityLabel="Track Line. Draws where you've been, a new colour each day"
+          accessibilityLabel={t('Track Line. Draws where you’ve been, a new color each day')}
           trackColor={{ true: '#0F2F6E', false: 'rgba(0,0,0,0.28)' }}
           thumbColor="#fff"
         />
