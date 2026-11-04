@@ -62,14 +62,19 @@ async function readContext(): Promise<TrackContext> {
 
 /** True while this phone is sharing its location on a group ride (Map Mode's Free clock doesn't run then). */
 export async function sharingOnRide(): Promise<boolean> {
+  return (await sharingRideId()) != null;
+}
+
+/** The group ride this phone is sharing its location on right now, or null (Map Mode adds waypoints to it). */
+export async function sharingRideId(): Promise<string | null> {
   try {
     const ctx = await readContext();
-    if (!ctx.rideId) return false;
-    if (ctx.until != null && ctx.until < Date.now()) return false;
-    if (Platform.OS === 'web') return true;
-    return await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK);
+    if (!ctx.rideId) return null;
+    if (ctx.until != null && ctx.until < Date.now()) return null;
+    if (Platform.OS === 'web') return ctx.rideId;
+    return (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) ? ctx.rideId : null;
   } catch {
-    return false;
+    return null;
   }
 }
 

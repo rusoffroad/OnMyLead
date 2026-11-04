@@ -2,6 +2,19 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "waypoints-and-planned-stops",
+      "navigation-mode",
+      "notification-settings",
+      "ride-mode"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "tap-and-hold-waypoints",
+    "why": "Chris asked for press and hold on the map in Ride Mode and Map Mode to drop an editable waypoint, shared with the group on a group ride, with a ding on the other riders' phones when the leader adds one. New: press and hold in Map Mode (your own waypoints, kept on the phone and synced with Pro, or the live ride's when you're sharing with one), and New Waypoint Alerts for riders when the leader shares a waypoint or planned stop during a live ride. Publishes with the 2.1 update."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "faq",
       "garage",
       "getting-started",

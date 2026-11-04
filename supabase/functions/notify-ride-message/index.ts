@@ -21,7 +21,9 @@
 // and accepted requests ({"type":"friend_request"} / {"type":"friend_accept"}) come from
 // push_batch_friends (migration 20261101800000_friends.sql). Likes and comments on the Feed
 // ({"type":"feed_like"} / {"type":"feed_comment"}) come from push_batch_feed (migration
-// 20261102900000_social_hub.sql), which skips riders who blocked the other rider.
+// 20261102900000_social_hub.sql), which skips riders who blocked the other rider. A shared waypoint
+// added on a live ride ({"type":"waypoint"}) comes from push_batch_waypoint (migration
+// 20261104150000_waypoint_alerts.sql).
 // Chat pushes skip riders who blocked the sender (blockersOf, migration
 // 20261020000000_blocked_riders.sql); status taps such as Need Help and EMERGENCY never do.
 //
@@ -56,6 +58,7 @@ const GROUP_EVENTS = new Set(['group_message']);
 const DM_EVENTS = new Set(['direct_message']);
 const FRIEND_EVENTS = new Set(['friend_request', 'friend_accept']);
 const FEED_EVENTS = new Set(['feed_like', 'feed_comment']);
+const WAYPOINT_EVENTS = new Set(['waypoint']);
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -97,7 +100,9 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
           ? 'push_batch_dm'
           : FRIEND_EVENTS.has(event.type)
             ? 'push_batch_friends'
-            : FEED_EVENTS.has(event.type) ? 'push_batch_feed' : 'push_batch';
+            : FEED_EVENTS.has(event.type)
+              ? 'push_batch_feed'
+              : WAYPOINT_EVENTS.has(event.type) ? 'push_batch_waypoint' : 'push_batch';
   const { data: rows, error } = await db.rpc(batch, { p_event: event });
   if (error) return { error: error.message };
 

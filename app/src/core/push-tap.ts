@@ -20,6 +20,7 @@ export type TapData = {
   threadId?: unknown;
   userId?: unknown;
   key?: unknown;
+  waypointId?: unknown;
 };
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -49,7 +50,7 @@ const id = (v: unknown) => (typeof v === 'string' && v ? v : null);
 
 /**
  * The screen a tapped notification opens: Ride Mode for a live ride or a rider's status, a
- * riding group's chat for its messages, Badges for a new badge, My Trails for a hidden trail, else the ride page (its chat for a message). Null when
+ * riding group's chat for its messages, Ride Mode with the waypoint open for a new shared waypoint, Badges for a new badge, My Trails for a hidden trail, else the ride page (its chat for a message). Null when
  * the notification isn't about a ride or group (the app then just opens).
  */
 export function tapTarget(data: TapData | undefined): string | null {
@@ -72,6 +73,9 @@ export function tapTarget(data: TapData | undefined): string | null {
   // "Your shared trail is hidden": the rider's trails in Map Mode.
   if (data.type === 'trail_hidden') return '/nav/trails';
   const rideId = id(data.rideId);
+  // "Lou added a new waypoint": Ride Mode, with that waypoint open.
+  const waypointId = id(data.waypointId);
+  if (data.type === 'waypoint' && rideId) return `/ride/${rideId}/live${waypointId ? `?waypoint=${encodeURIComponent(waypointId)}` : ''}`;
   // Status taps, Ride Mode quick replies (messages with an itemId) and their cancellations open
   // Ride Mode, where the group is.
   const rideModeTap = data.type === 'status' || data.type === 'cancelled' || (data.type === 'message' && typeof data.itemId === 'string');

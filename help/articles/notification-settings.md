@@ -6,6 +6,7 @@ order: 30
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - supabase/migrations/20261104150000_waypoint_alerts.sql
   - app/src/app/notifications.tsx
   - app/src/core/notifications.ts
   - app/src/lib/notification-settings.ts
@@ -43,6 +44,9 @@ Everything below starts on.
 
 - **Rider Status**: status buttons and quick replies from Ride Mode, like **On My Way**, **Need Fuel** and **Flat Tire**, and when a rider cancels one.
 - **Announcements**: what the organizer tells the whole group.
+:::release 2.1
+- **Announcements** also cover new waypoints the leader shares while the ride is live. See [New Waypoint Alerts](/help/waypoints-and-planned-stops#new-waypoint-alerts).
+:::
 
 :::release 2.0
 Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status** setting too.

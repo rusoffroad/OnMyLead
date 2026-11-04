@@ -12,7 +12,7 @@ import { drawRoute, esc, ll, reportRegion, satelliteMap, trailLayers } from '@/l
 import { octagon } from './waypoint-blaze';
 
 /** The same blaze as the app (WaypointBlaze): a diamond, or a warning triangle for hazards, with the symbol on it. */
-const blaze = (shared: boolean, symbol: WaypointSymbol) => {
+export const blaze = (shared: boolean, symbol: WaypointSymbol) => {
   const fill = shared ? Colors.sky : Colors.text;
   const ink = shared ? '#FFFFFF' : Colors.background;
   const triangle = symbolInfo(symbol).shape === 'triangle';
@@ -24,7 +24,7 @@ const blaze = (shared: boolean, symbol: WaypointSymbol) => {
 };
 
 /** A planned stop's sign, with what it's for (fuel, food) on a small white tag at its corner. */
-const stopSign = (n: number | null, symbol: WaypointSymbol) =>
+export const stopSign = (n: number | null, symbol: WaypointSymbol) =>
   `<svg width="34" height="34" viewBox="0 0 34 34" overflow="visible"><polygon points="${octagon(17, 17, 16.5)}" fill="${Colors.background}"/><polygon points="${octagon(17, 17, 14.5)}" fill="#FFFFFF"/><polygon points="${octagon(17, 17, 12.5)}" fill="${Colors.accent}"/><text x="17" y="22.5" text-anchor="middle" fill="#FFFFFF" font-family="BarlowCondensed_800ExtraBold, sans-serif" font-size="17">${n ?? ''}</text>${
     symbol === 'spot'
       ? ''

@@ -6,6 +6,9 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-04
 sources:
+  - app/src/lib/map-waypoints.ts
+  - app/src/components/nav-map.tsx
+  - app/src/components/nav-map.web.tsx
   - app/src/components/tilt-tile.tsx
   - app/src/components/trail-width-row.tsx
   - app/src/components/music-controls.tsx
@@ -115,6 +118,12 @@ The screen stays on while Navigate is open.
 :::release 2.0
 :::release 2.1
 Pick **3D Terrain** under **Map Style** to explore on the real shape of the land, with contour lines and peak heights. Recording, Track Line and the distance finder work the same in 3D. See [3D Terrain](/help/3d-terrain).
+:::
+
+:::release 2.1
+### Drop a Waypoint
+
+Press and hold the map to drop a waypoint there (right-click on onmylead.com). Tapping the map still shows what a trail is. Your Map Mode waypoints are yours alone and stay on your phone with no signal; with Sync they follow you to your other devices. If you're sharing your location with a live group ride, the waypoint goes on that ride instead, and the leader's are shared with the group. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops#press-and-hold-the-map).
 :::
 
 ## Track Line
