@@ -15,6 +15,31 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "contact-support",
+      "create-a-ride",
+      "create-a-ride-on-the-website",
+      "edit-cancel-or-delete-a-ride",
+      "find-a-ride",
+      "getting-started",
+      "join-a-ride",
+      "language",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "pro-trial",
+      "profile-picture",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "subscribe-to-pro",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "comment-likes-replies-touched",
+    "why": "The comment likes and replies change touches the Rides tab (the Feed's empty text and photo thumbnails), Admin > Users (reply and like counts on a rider's comments), the translations (new Like, Reply and Replying to lines) and site.ts (a showcase switch that stays off until 2.1 is live). Riders see no difference in these articles' screens, so they only get a new updated: date."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "carplay",
       "ride-mode",
       "language",

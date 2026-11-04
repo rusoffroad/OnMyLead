@@ -1,6 +1,6 @@
 ---
 title: Like, Comment and Post in Social
-summary: See everything your friends are up to, like and comment on rides, badges and trails, like and reply to comments, post ride reports with a photo, and share to Facebook, Instagram or X.
+summary: See what your friends are up to, like and comment on rides, badges and trails, reply to comments, post ride reports with a photo, and share them.
 category: groups
 order: 27
 release: "2.0"
