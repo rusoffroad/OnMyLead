@@ -1,9 +1,8 @@
 import * as Sharing from 'expo-sharing';
 import type { RefObject } from 'react';
 import { Platform, Share, type View } from 'react-native';
-import { captureRef } from 'react-native-view-shot';
-
 import { track } from './analytics';
+import { shareMime, snapshotForShare } from './share-image';
 
 /**
  * Share an activity card (a snapshot of the card on screen) to Facebook, Instagram, X, Messages
@@ -14,8 +13,8 @@ import { track } from './analytics';
 export async function shareActivity(view: RefObject<View | null>, text: string, kind: string): Promise<string | null> {
   try {
     if (view.current && (await Sharing.isAvailableAsync())) {
-      const uri = await captureRef(view, { format: 'png', quality: 1, width: 1080, height: 1350, result: 'tmpfile' });
-      await Sharing.shareAsync(uri, { mimeType: 'image/png', UTI: 'public.png', dialogTitle: 'Share to Facebook, Instagram, X and More' });
+      const uri = await snapshotForShare(view, { width: 1080, height: 1350, name: 'OnMyLead' });
+      await Sharing.shareAsync(uri, { ...shareMime(), dialogTitle: 'Share to Facebook, Instagram, X and More' });
       track('activity_shared', { kind, as: 'image', platform: Platform.OS });
       return null;
     }
