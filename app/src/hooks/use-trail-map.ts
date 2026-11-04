@@ -203,24 +203,28 @@ export function useTrailMap(): TrailMap {
         // Not a saved choice.
       }
     };
+    // The You tab's own keys ('1' / '0') win over the panel's saved layers for these two, in
+    // either direction, so a switch turned back on in the You tab shows the trails again.
     const applyRiders = (v: string | null) => {
-      riderOnRef.current = v !== '0';
-      setRiderOn(v !== '0');
-      featuresRef.current = { ...featuresRef.current, riderTrails: v !== '0' };
+      if (v !== '0' && v !== '1') return;
+      riderOnRef.current = v === '1';
+      setRiderOn(v === '1');
+      featuresRef.current = { ...featuresRef.current, riderTrails: v === '1' };
       setFeatureState(featuresRef.current);
     };
-    AsyncStorage.getItem(KEY).then(applyLayers).catch(() => {});
-    AsyncStorage.getItem(RIDER_TRAILS_KEY)
-      .then((v) => v === '0' && applyRiders(v))
-      .catch(() => {});
     const applyParks = (v: string | null) => {
-      parkOnRef.current = v !== '0';
-      setParkOn(v !== '0');
-      featuresRef.current = { ...featuresRef.current, parkTrails: v !== '0' };
+      if (v !== '0' && v !== '1') return;
+      parkOnRef.current = v === '1';
+      setParkOn(v === '1');
+      featuresRef.current = { ...featuresRef.current, parkTrails: v === '1' };
       setFeatureState(featuresRef.current);
     };
-    AsyncStorage.getItem(PARK_TRAILS_KEY)
-      .then((v) => v === '0' && applyParks(v))
+    Promise.all([AsyncStorage.getItem(KEY), AsyncStorage.getItem(RIDER_TRAILS_KEY), AsyncStorage.getItem(PARK_TRAILS_KEY)])
+      .then(([layers, riders, parks]) => {
+        applyLayers(layers);
+        applyRiders(riders);
+        applyParks(parks);
+      })
       .catch(() => {});
     // The park list (names from far out) comes from the phone first, then the server.
     parkList(false).then((saved) => saved.length && setParks(saved)).catch(() => {});

@@ -14,6 +14,10 @@ import type { Box } from './nav-trails';
  */
 
 const PARKS_KEY = 'park-trails.parks.v1';
+const PARK_LIST_FRESH_MS = 10 * 60_000;
+let fetchedAt = 0;
+/** Park id to a stamp of the lines last written for it this session. */
+const kept = new Map<number, string>();
 const PARK_KEY = (osmId: number) => `park-trails.park.${osmId}.v1`;
 
 export async function parkTrailsIn(box: Box): Promise<ParkTrail[]> {
@@ -40,7 +44,12 @@ async function rememberParks(trails: ParkTrail[], box: Box) {
   for (const [id, lines] of byPark) {
     const p = parks.find((x) => x.parkOsmId === id);
     const whole = p ? p.box.minLat >= box.minLat && p.box.maxLat <= box.maxLat && p.box.minLng >= box.minLng && p.box.maxLng <= box.maxLng : false;
-    if (whole) await AsyncStorage.setItem(PARK_KEY(id), JSON.stringify(lines.map(raw)));
+    if (!whole) continue;
+    // The same lines as last time: nothing to write again.
+    const stamp = `${lines.length}:${lines.map((l) => l.id).sort().join(',')}`;
+    if (kept.get(id) === stamp) continue;
+    await AsyncStorage.setItem(PARK_KEY(id), JSON.stringify(lines.map(raw)));
+    kept.set(id, stamp);
   }
 }
 
@@ -85,8 +94,10 @@ async function loadParks(): Promise<ParkSummary[]> {
 /** Every park with trails: from the phone first, then the server (saved for next time). */
 export async function parkList(refresh = true): Promise<ParkSummary[]> {
   const saved = await loadParks();
-  if (!refresh) return saved;
+  // Every map screen asks; the list changes rarely, so the server is asked at most every 10 minutes.
+  if (!refresh || (parksCache && Date.now() - fetchedAt < PARK_LIST_FRESH_MS)) return saved;
   try {
+    fetchedAt = Date.now();
     const { data, error } = await supabase.rpc('park_trail_parks');
     if (error) throw new Error(error.message);
     const parks = parseParkSummaries(data);

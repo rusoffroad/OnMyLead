@@ -47,13 +47,18 @@ Deno.serve(async (req) => {
   }
   if (!Number.isFinite(current)) return json({ error: 'no_reward' }, 400);
   const days = Number(target.defer_days) || 182;
-  const known = Date.parse(target.expires_at ?? '');
 
   // Reserve the reward before asking Google, so a retry after a half-finished call can't defer the
-  // same subscription twice. A reward already reserved means an earlier call got no answer from
-  // Google: if the subscription now ends later than we last knew, that call went through.
+  // same subscription twice. The reservation notes the expiry Google was asked for: a reward
+  // already reserved means an earlier call got no answer, and if the subscription now ends on
+  // that date, that call went through.
   if (target.deferred_at) {
-    if (Number.isFinite(known) && current > known) return await confirm(user.id, target.purchase_token, known, current);
+    const { data: reserved } = await db.from('play_events').select('payload')
+      .eq('type', 'REFERRAL_DEFER_RESERVED').eq('purchase_token', target.purchase_token)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle();
+    const asked = Date.parse(reserved?.payload?.to ?? '');
+    const from = Date.parse(reserved?.payload?.from ?? '');
+    if (Number.isFinite(asked) && Math.abs(current - asked) < DAY) return await confirm(user.id, target.purchase_token, from, current);
   } else {
     const { error: reserveError } = await db.rpc('referral_reserve_deferral', { p_user: user.id });
     if (reserveError) {
@@ -61,6 +66,11 @@ Deno.serve(async (req) => {
       return json({ error: 'retry' }, 503);
     }
   }
+  await db.from('play_events').insert({
+    type: 'REFERRAL_DEFER_RESERVED',
+    purchase_token: target.purchase_token,
+    payload: { user_id: user.id, from: new Date(current).toISOString(), to: new Date(current + days * DAY).toISOString() },
+  });
   let next: number;
   try {
     next = await deferSubscription(target.product_id, target.purchase_token, current, current + days * DAY);

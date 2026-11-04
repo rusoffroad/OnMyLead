@@ -36,7 +36,10 @@ export function Scout({ top }: { top: React.ReactNode }) {
   const layout = useLayout();
   const insets = useSafeAreaInsets();
   const fullMap = useFullMap(null);
-  const [miles, setMiles] = useState(SCOUT_DEFAULT_MILES);
+  // The saved distance is read first, so the first search isn't run twice (default, then saved).
+  const [savedMiles, setSavedMiles] = useState<number | null>(null);
+  const miles = savedMiles ?? SCOUT_DEFAULT_MILES;
+  const setMiles = setSavedMiles;
   const [here, setHere] = useState<LatLng | null>(null);
   const [place, setPlace] = useState<Place | null>(null);
   const [locating, setLocating] = useState(true);
@@ -48,7 +51,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    readScoutMiles().then(setMiles);
+    readScoutMiles().then(setSavedMiles).catch(() => setSavedMiles(SCOUT_DEFAULT_MILES));
   }, []);
 
   const findHere = () =>
@@ -70,6 +73,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
     let live = true;
     const run = async () => {
       if (!origin) return setSpots(null);
+      if (savedMiles == null) return;
       setLoading(true);
       setError(null);
       try {
@@ -90,7 +94,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
     };
     // origin is a new object only when the rider or the searched place moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin, miles]);
+  }, [origin, savedMiles]);
 
   const changeMiles = (m: number) => {
     setMiles(m);
