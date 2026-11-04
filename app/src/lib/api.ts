@@ -16,6 +16,7 @@ import type { JoinPolicy, MemberStatus } from '@/core/joining';
 import type { AreaId, VehicleKind } from '@/core/garage';
 import { cleanRideName } from '@/core/profile';
 import { fromStored, toStored, type RideRoute } from '@/core/route';
+import { isEmptyPatch, type RidePatch } from '@/core/ride-edit';
 import { bytesToHex, FAMILY_LINK_TOKEN_BYTES, startShare, type ShareScope } from '@/core/sharing';
 import { itemsFromRideNotes, localDate, templateById, type TemplateItem, type TripCategory } from '@/core/trips';
 import { track } from './analytics';
@@ -118,6 +119,25 @@ export async function createRide(r: NewRide): Promise<Ride> {
   );
   track('ride_created', { visibility: r.visibility, join_policy: r.joinPolicy, max_vehicles: r.maxVehicles ?? null });
   return ride;
+}
+
+/**
+ * Saves an edit from the Edit Ride Details screen (core/ride-edit.ts makes the patch). The
+ * edit_ride RPC (20261104120000) saves both rows at once and tells riders; before that migration
+ * is applied the same change goes straight to the tables, which the ride's leaders could always
+ * update, and the rides_notify trigger still sends the new time and meeting spot notifications.
+ */
+export async function editRide(rideId: string, patch: RidePatch): Promise<void> {
+  if (isEmptyPatch(patch)) return;
+  const res = await supabase.rpc('edit_ride', { p_ride: rideId, p_fields: patch.ride, p_private: patch.private });
+  if (!res.error) {
+    track('ride_edited', { changed: patch.changed.join(',') });
+    return;
+  }
+  if (!/edit_ride|PGRST202|schema cache/i.test(`${res.error.code ?? ''} ${res.error.message}`)) throw new Error(res.error.message);
+  if (patch.private) unwrap(await supabase.from('ride_private_details').update(patch.private).eq('ride_id', rideId));
+  if (Object.keys(patch.ride).length) unwrap(await supabase.from('rides').update(patch.ride).eq('id', rideId));
+  track('ride_edited', { changed: patch.changed.join(','), fallback: true });
 }
 
 export async function getRide(idOrCode: string): Promise<Ride | null> {

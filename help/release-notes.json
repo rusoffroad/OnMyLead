@@ -3,10 +3,14 @@
     "version": "2.1",
     "title": "3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders close by on the same ride pass spots, status taps and EMERGENCY alerts to each other over Bluetooth. And the new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead.",
-    "whatsNew": "What's new in 2.1:\n\n• Bluetooth Sharing: with no service, nearby riders on your ride still see your spot, status taps and EMERGENCY, phone to phone.\n• The first phone to get signal sends what it heard.\n• Badge Leaderboard: see where you rank everywhere, in your country or your state. Turn off Show Me to stay off it.\n• 3D Terrain: a new map style with satellite on the real shape of the land, contour lines and peak heights. Save it in Offline Maps too.",
+    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the name, day, time, meeting point and details after creating a ride. Riders hear.\n• Bluetooth Sharing: with no service, nearby riders on your ride still see your spot, status taps and EMERGENCY, phone to phone. The first phone to get signal sends what it heard.\n• Badge Leaderboard: see where you rank everywhere, in your country or your state.\n• 3D Terrain: satellite on the real shape of the land, with contours and peak heights. Works offline too.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Edit Ride Details: the organizer or a co-organizer can change a ride's name, day, times, meeting point and details after creating it, from the ride page on the app and onmylead.com. Everyone on the ride gets a notification about a new time or meeting point, and the ride page shows what changed for a week. Once the ride is live, the day, times and meeting point are locked and the rest can still change."
+      },
       {
         "kind": "new",
         "text": "Bluetooth Sharing: when there's no cell service, Ride Mode passes your spot (while you're sharing with the ride), your status taps, EMERGENCY and quick replies to nearby riders on the same ride over Bluetooth, about 100 to 300 feet between phones, passed along by up to three phones. Their details say Via Bluetooth, and the no-service banner says how many phones are in range. When any phone on the ride gets signal, it sends what it heard so everyone else sees it too. Everything is encrypted for your ride only. Turn it off any time on the You tab."

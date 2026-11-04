@@ -6,6 +6,7 @@ order: 20
 release: web
 updated: 2026-11-04
 sources:
+  - app/src/app/ride/[id]/edit.tsx
   - app/src/app/ride/new.tsx
   - app/src/components/meet-point-map.web.tsx
   - app/src/components/showcase.web.tsx
@@ -52,6 +53,12 @@ You can also add numbered planned stops for fuel, lunch or camp. See [Waypoints 
 
 :::release 1.0.1
 The waypoints map has the same **Search**, so you can jump to a place before you click to drop a stop.
+:::
+
+:::release 2.1
+## Change It Later
+
+Open the ride on onmylead.com and click **Edit Ride Details** in the **You're Organizing** card to change the name, day, time, meeting point (click the map to move the pin) and the rest. See [Edit, Cancel or Delete a Ride](/help/edit-cancel-or-delete-a-ride).
 :::
 
 ## Share It

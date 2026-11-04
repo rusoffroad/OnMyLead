@@ -2,6 +2,19 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "organizer-controls",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "edit-ride-details",
+    "why": "Edit Ride Details (2.1): the organizer or a co-organizer can change a ride's name, day, times, meeting point and details after creating it, on the app and onmylead.com, until it goes live (then only the name and details). Riders are notified of a new time or meeting point and the ride page shows what changed. The old 'copy the ride and cancel the original' advice stays for 2.0 riders until 2.1 is live."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "3d-terrain",
       "map-layers",
       "offline-maps",

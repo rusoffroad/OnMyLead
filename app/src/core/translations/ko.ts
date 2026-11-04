@@ -316,6 +316,7 @@ const dict: Record<string, string> = {
   "Bluetooth Sharing": "블루투스 공유",
   "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "신호가 없을 때 라이드 모드가 같은 라이드의 근처 라이더에게 위치와 알림을 전달합니다",
   "Off. Turn it on to keep sharing with nearby riders when there is no service": "꺼짐. 켜면 신호가 없을 때도 근처 라이더와 계속 공유합니다",
+  "Edit Ride Details": "라이드 정보 수정",
 };
 
 export default dict;
