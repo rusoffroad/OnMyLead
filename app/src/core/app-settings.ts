@@ -38,7 +38,12 @@ export const APP_FLAGS = {
   bluetooth_sharing: { label: 'Bluetooth Sharing', hint: 'Ride Mode passing spots and alerts between nearby riders over Bluetooth when there is no service (app 2.1). Off stops the Bluetooth radio; sharing and alerts over the internet are not affected.' },
   referrals: { label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
-} as const satisfies Record<string, { label: string; hint: string }>;
+  apple_web_sign_in: {
+    label: 'Sign in with Apple on the Website and Android',
+    hint: 'Continue with Apple on onmylead.com and in the Android app, through Apple’s web sign-in. Off until the Apple Services ID and its secret are set up in Supabase (docs/web-sign-in-with-apple.md); on before that, the button fails.',
+    offUntilSet: true,
+  },
+} as const satisfies Record<string, { label: string; hint: string; offUntilSet?: boolean }>;
 
 export type AppFlag = keyof typeof APP_FLAGS;
 
@@ -70,9 +75,14 @@ export function liveNotice(n: Notice | null, now: number = Date.now()): Notice |
   return n;
 }
 
-/** True unless the owner switched the feature off. */
+/** Flags that need setting up first (an Apple secret, say) start off; the owner switches them on. */
+export function flagOffUntilSet(flag: AppFlag): boolean {
+  return (APP_FLAGS[flag] as { offUntilSet?: boolean }).offUntilSet === true;
+}
+
+/** True unless the owner switched the feature off (or, for a flag that starts off, until the owner switched it on). */
 export function flagOn(s: AppSettings, flag: AppFlag): boolean {
-  return s.flags[flag] !== false;
+  return flagOffUntilSet(flag) ? s.flags[flag] === true : s.flags[flag] !== false;
 }
 
 /** A short key for one notice's wording, so dismissing it hides that text only; new text shows again. */

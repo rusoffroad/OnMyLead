@@ -44,6 +44,18 @@
       "getting-started",
       "group-chat",
       "home-screen",
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride",
+      "custom-codes",
+      "delete-account",
+      "directions",
+      "family-link",
+      "find-a-ride",
+      "follow-leaders",
+      "free-vs-pro",
+      "fuel-range",
+      "getting-started",
       "import-gpx",
       "invite-riders",
       "join-a-ride",
@@ -67,6 +79,10 @@
       "refer-a-friend",
       "report-and-block",
       "restore-purchases",
+      "place-search",
+      "privacy",
+      "promo-codes",
+      "report-and-block",
       "ride-bubble",
       "ride-chat",
       "ride-day-and-weather",
@@ -93,6 +109,104 @@
     "by": "pr",
     "ref": "language-phase-2",
     "why": "Reviewed, no change to the steps: 2.1 passes the remaining screens, alerts and messages through the rider's language. In English every label reads exactly as before, so these articles only get a new updated: date. Change the App's Language covers what switches."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "events"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "event-presenter",
+    "why": "Presented By events (2.1): the owner marks an event as presented by RUS Offroad (or another sponsor) from Admin > Events, and riders see it in gold on the event's card and page, with Shop RUS Offroad on the page. New Presented By section, published with 2.1."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "sign-in"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "apple-web-sign-in",
+    "why": "Sign in with Apple on onmylead.com and Android through Apple's web sign-in, behind the owner's new apple_web_sign_in flag (off until the Apple Services ID and secret are set up in Supabase, docs/web-sign-in-with-apple.md). The article now says the button is there when it's switched on instead of 'may not be there'."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "rus-gear",
+      "troubleshooting"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "apple-web-sign-in",
+    "why": "Checked against the Apple web sign-in flag: the gear suggestions flag and the emailed-link hand-off work the same for riders; only a new flag was added beside them. These articles stay as they are."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "edit-cancel-or-delete-a-ride",
+      "faq",
+      "organizer-controls",
+      "create-a-ride-on-the-website"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "edit-ride-details",
+    "why": "Edit Ride Details (2.1): the organizer or a co-organizer can change a ride's name, day, times, meeting point and details after creating it, on the app and onmylead.com, until it goes live (then only the name and details). Riders are notified of a new time or meeting point and the ride page shows what changed. The old 'copy the ride and cancel the original' advice stays for 2.0 riders until 2.1 is live."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "approvals-and-waitlist",
+      "check-in",
+      "create-a-ride",
+      "custom-codes",
+      "delete-account",
+      "directions",
+      "family-link",
+      "find-a-ride",
+      "follow-leaders",
+      "free-vs-pro",
+      "fuel-range",
+      "getting-started",
+      "import-gpx",
+      "invite-riders",
+      "join-a-ride",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "place-search",
+      "privacy",
+      "promo-codes",
+      "report-and-block",
+      "ride-bubble",
+      "ride-chat",
+      "ride-day-and-weather",
+      "ride-mode",
+      "ride-polls",
+      "ride-summary-and-ride-again",
+      "riding-groups",
+      "route-builder",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "edit-ride-details",
+    "why": "Checked against Edit Ride Details: the ride page only gained the Edit Ride Details button in You're Organizing and an Updated line under the time, and Create a Ride only moved its vehicle list to shared code, so joining, approvals, check-in, chat, polls, roles, the route builder, stops, directions, fuel, weather, codes, sharing and the tablet layout work the same for riders. These articles stay as they are."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "profile-picture",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "block-activity-recognition",
+    "why": "Android build config only: the app no longer asks for the physical activity permission that expo-sensors added for its unused step counter (Google Play refused 2.0 with it). Riders see no difference; these articles only get a new updated: date."
   },
   {
     "date": "2026-11-04",

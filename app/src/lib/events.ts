@@ -157,13 +157,18 @@ export async function makeCover(photoId: string) {
 export type AdminEventRow = {
   id: string; share_code: string; title: string; starts_at: string; ends_at: string; location_name: string; state: string | null;
   visibility: string; status: string; hidden_at: string | null; hidden_reason: string | null; created_at: string;
+  presented_by?: string | null; presented_at?: string | null;
   owner_id: string; owner_name: string | null; going: number; rides: number; photos: number; reports: number; open_reports: number;
 };
-export async function adminEvents(filter: 'all' | 'reported' | 'hidden' | 'upcoming', page = 0): Promise<{ rows: AdminEventRow[]; total: number }> {
+export async function adminEvents(filter: 'all' | 'reported' | 'hidden' | 'upcoming' | 'presented', page = 0): Promise<{ rows: AdminEventRow[]; total: number }> {
   return call('admin_events', { p_filter: filter, p_page: page, p_page_size: 50 });
 }
 export async function adminSetEventHidden(eventId: string, hidden: boolean, reason: string) {
   await call('admin_set_event_hidden', { p_event: eventId, p_hidden: hidden, p_reason: reason });
+}
+/** Set who presents (sponsors) an event, or clear it with a blank name. Admin only (20261104130000). */
+export async function adminSetEventPresenter(eventId: string, presentedBy: string) {
+  await call('admin_set_event_presenter', { p_event: eventId, p_presented_by: presentedBy });
 }
 export async function adminRemoveEventPhoto(photoId: string, reason: string) {
   const path = await call<string>('admin_remove_event_photo', { p_photo: photoId, p_reason: reason });

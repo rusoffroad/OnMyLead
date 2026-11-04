@@ -12,10 +12,11 @@ import { RiderDot } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
-  agendaByDay, agendaKindLabel, agendaKindTone, agendaTime, cardPlace, dateBlock, eventDates, eventPhase,
+  agendaByDay, agendaKindLabel, agendaKindTone, agendaTime, cardPlace, dateBlock, eventDates, eventPhase, isRusOffroad, presenterLabel,
   type AgendaItem, type EventCard, type Person,
 } from '@/core/events';
 import { photoUrl } from '@/lib/events';
+import { openStore } from '@/lib/rus';
 
 import { t } from '@/lib/i18n';
 /** Red for riding, gold for prizes and shows, blue for everything else, on the agenda rail. */
@@ -98,6 +99,7 @@ export function EventCardView({ e, width, compact }: { e: EventCard; width?: num
         </View>
       </View>
       <View style={styles.cardBody}>
+        {presenterLabel(e.presented_by) ? <Text style={styles.presenter} numberOfLines={1}>{presenterLabel(e.presented_by)}</Text> : null}
         <Text style={styles.cardTitle} numberOfLines={2}>{e.title}</Text>
         <Text style={styles.muted} numberOfLines={1}>{eventDates(e.starts_at, e.ends_at)}</Text>
         <Text style={styles.muted} numberOfLines={1}>{cardPlace(e)}</Text>
@@ -108,6 +110,32 @@ export function EventCardView({ e, width, compact }: { e: EventCard; width?: num
         </View>
       </View>
     </Pressable>
+  );
+}
+
+/**
+ * The presenter's card on the event page: "Presented by RUS Offroad" in gold with a Shop button
+ * when RUS Offroad presents it (the owner sets this from Admin > Events; hosts can't).
+ */
+export function PresentedBy({ name }: { name: string | null | undefined }) {
+  const label = presenterLabel(name);
+  if (!label) return null;
+  const rus = isRusOffroad(name);
+  return (
+    <View style={styles.presentedCard} accessibilityRole="text" accessibilityLabel={label}>
+      <View style={styles.presentedStripe} />
+      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+        <Text style={styles.presentedLead}>{label}</Text>
+        <Text style={styles.muted} numberOfLines={2}>
+          {rus ? 'Parts, lights and mounts from the people who built OnMyLead.' : 'This event’s sponsor.'}
+        </Text>
+      </View>
+      {rus ? (
+        <Pressable accessibilityRole="button" onPress={() => openStore('event_presenter')} hitSlop={8} style={({ pressed }) => [styles.presentedShop, pressed && { opacity: 0.85 }]}>
+          <Text style={styles.presentedShopText}>Shop RUS Offroad</Text>
+        </Pressable>
+      ) : null}
+    </View>
   );
 }
 
@@ -225,6 +253,15 @@ const styles = themedStyles(() => ({
   cardPills: { position: 'absolute', top: 10, right: 10, flexDirection: 'row', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '80%' },
   cardBody: { paddingHorizontal: 14, paddingTop: 22, paddingBottom: 14, gap: 3 },
   cardTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24 },
+  presenter: { color: Home.gold, fontFamily: font(700), fontSize: 12, letterSpacing: 0.2, marginBottom: 1 },
+  presentedCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, paddingLeft: 0, borderRadius: 20, overflow: 'hidden',
+    backgroundColor: 'rgba(230,194,122,0.08)', borderWidth: 1, borderColor: 'rgba(230,194,122,0.4)',
+  },
+  presentedStripe: { width: 5, alignSelf: 'stretch', backgroundColor: Home.gold, marginRight: 2 },
+  presentedLead: { color: Home.gold, fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
+  presentedShop: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: Radius.pill, backgroundColor: Home.gold },
+  presentedShopText: { color: '#0A1626', fontFamily: font(700), fontSize: 14 },
   cardFoot: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 6 },
   muted: { color: Home.muted, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
   foot: { flexDirection: 'row', alignItems: 'center', gap: 4 },

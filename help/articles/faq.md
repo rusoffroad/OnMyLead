@@ -6,6 +6,7 @@ order: 20
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - app/src/app/ride/[id]/edit.tsx
   - supabase/migrations/20261018000000_pro_entitlements.sql
   - app/src/core/pro.ts
   - app/src/components/pro-plan.tsx
@@ -60,7 +61,12 @@ If you bought Pro on Android, Google Play bills it: cancel it in Google Play too
 
 ## Can I Change My Ride's Time or Meeting Point?
 
+:::until 2.1
 Not after it's created. Tap **Copy This Ride** to make a new ride with the same details and route, pick the new day, then cancel the old ride. See [Edit, Cancel or Delete a Ride](/help/edit-cancel-or-delete-a-ride).
+:::
+:::release 2.1
+Yes, until the ride goes live. On the ride page, tap **Edit Ride Details** in the **You're Organizing** card, change the day, time or meeting point and save. Everyone on the ride gets a notification, and the ride page shows what changed. See [Edit, Cancel or Delete a Ride](/help/edit-cancel-or-delete-a-ride).
+:::
 
 ## My Ride Still Says Live. How Do I End It?
 

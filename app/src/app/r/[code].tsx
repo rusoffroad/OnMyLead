@@ -29,6 +29,7 @@ import { leadersToFollow } from '@/core/groups';
 import { counts } from '@/core/joining';
 import { sideColumnWidth } from '@/core/layout';
 import { startsIn } from '@/core/ride-day';
+import { canEditRide, changeLabel, editedAgo } from '@/core/ride-edit';
 import { miles, type RideRoute } from '@/core/route';
 import { canShareWaypoints, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
 import { useLayout } from '@/hooks/use-layout';
@@ -227,7 +228,8 @@ export default function RidePage() {
         </View>
         <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{ride.name}</ThemedText>
         <ThemedText style={{ color: Colors.sky, fontWeight: 700, fontSize: 17 }}>{when(ride.meet_at)}</ThemedText>
-        {ride.description ? <ThemedText themeColor="textSecondary">{tr(ride.description)}</ThemedText> : null}
+        {!over ? <EditedLine ride={ride} /> : null}
+        {ride.description ? <ThemedText themeColor="textSecondary">{ride.description}</ThemedText> : null}
       </View>
       {cancelled ? (
         <View style={styles.cancelled} accessibilityRole="alert">
@@ -352,6 +354,14 @@ export default function RidePage() {
       {show('details') && isManager && (ride.status === 'live' || canCancel(ride.status, isManager) || isOrganizer) ? (
         <Card>
           <ThemedText type="heading">{tr('You’re Organizing')}</ThemedText>
+          {canEditRide(ride.status, isManager) ? (
+            <Button
+              title={tr('Edit Ride Details')}
+              kind="secondary"
+              accessibilityHint={tr('Change the name, day and time, meeting point and details. Riders are told about a new time or meeting point.')}
+              onPress={() => router.push(`/ride/${ride.id}/edit`)}
+            />
+          ) : null}
           {ride.status === 'live' ? (
             <Button title={tr('End Ride for Everyone')} kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
           ) : null}
@@ -648,3 +658,16 @@ const styles = themedStyles(() => ({
 }));
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** "Updated 2 hr Ago: New Time and Meeting Point", under the ride's time for a week after a leader edits it. */
+function EditedLine({ ride }: { ride: Ride }) {
+  const ago = editedAgo(ride.details_edited_at, new Date());
+  if (!ago) return null;
+  const what = changeLabel(ride.details_changed ?? []);
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} accessibilityRole="text">
+      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.accent }} />
+      <ThemedText type="small" style={{ fontWeight: 700 }}>{what ? `${ago}: ${what}` : ago}</ThemedText>
+    </View>
+  );
+}

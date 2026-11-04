@@ -94,6 +94,8 @@ export type EventDetail = {
   location_name: string; location_address: string | null; lat: number | null; lng: number | null; state: string | null;
   website_url: string | null; visibility: EventVisibility; status: EventStatus; hidden: boolean; hidden_reason: string | null;
   am_owner: boolean; am_host: boolean;
+  /** Who presents (sponsors) the event, set by the owner from Admin > Events. Missing before 20261104130000. */
+  presented_by?: string | null;
   /** Null signed out: names only reach signed-in riders. */
   owner: Person | null;
   hosts: Person[];
@@ -110,7 +112,20 @@ export type EventCard = {
   status: EventStatus; visibility: EventVisibility; hidden: boolean;
   cover_path: string | null; going: number; rides: number; agenda: number;
   mine: Rsvp | null; i_host: boolean; distance_mi: number | null;
+  /** Who presents (sponsors) the event, set from Admin > Events. Missing before 20261104130000. */
+  presented_by?: string | null;
 };
+
+/** "Presented by RUS Offroad": the gold mark on a sponsored event's card and page. Null when nobody presents it. */
+export function presenterLabel(name: string | null | undefined): string | null {
+  const n = name?.trim();
+  return n ? `Presented by ${n}` : null;
+}
+
+/** The presenter is RUS Offroad itself, so the event page can offer Shop RUS Offroad. */
+export function isRusOffroad(name: string | null | undefined): boolean {
+  return /^rus\s*off\s*road(\s|$|,|\.)/i.test(name?.trim() ?? '');
+}
 
 /** https://onmylead.com/e/CODE */
 export function eventLink(shareCode: string, webUrl?: string | null): string {

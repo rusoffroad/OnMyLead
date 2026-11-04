@@ -3,7 +3,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useCallback, useState, type ReactNode } from 'react';
 import { Linking, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
 
-import { AgendaTimeline, Cover, DateStub, PeopleSheet } from '@/components/events/parts';
+import { AgendaTimeline, Cover, DateStub, PeopleSheet, PresentedBy } from '@/components/events/parts';
 import { AddRideSheet, AgendaSheet } from '@/components/events/sheets';
 import { BottomSheet } from '@/components/bottom-sheet';
 import { Gradient, Home, Pill } from '@/components/home/parts';
@@ -218,6 +218,7 @@ export default function EventPage() {
     </View>
   ) : null;
 
+  const presented = <PresentedBy name={e.presented_by} />;
   const facts = (
     <View style={styles.facts}>
       <Fact icon="pin" title={e.location_name} detail={e.location_address ?? e.state ?? undefined} action="Directions" onAction={directions} />
@@ -404,6 +405,7 @@ export default function EventPage() {
       {newNote}
       {rsvpRow}
       {getApp}
+      {presented}
       {facts}
       {hostTools}
       {photos}

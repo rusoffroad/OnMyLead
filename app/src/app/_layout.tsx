@@ -144,6 +144,7 @@ function RootLayout() {
         <Stack.Screen name="ride/[id]/live" options={{ title: tr('Ride Mode'), headerShown: false }} />
         <Stack.Screen name="ride/[id]/route" options={{ title: tr('Route'), headerShown: false }} />
         <Stack.Screen name="ride/[id]/waypoints" options={{ title: tr('Waypoints'), headerShown: false }} />
+        <Stack.Screen name="ride/[id]/edit" options={{ title: tr('Edit Ride Details') }} />
         <Stack.Screen name="garage/index" options={{ title: tr('Garage') }} />
         <Stack.Screen name="garage/new" options={{ title: tr('Add to Garage') }} />
         <Stack.Screen name="garage/[id]/index" options={{ title: '' }} />
