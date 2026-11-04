@@ -2,6 +2,17 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "bluetooth-sharing",
+      "troubleshooting"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "bluetooth-ride-mode-switch",
+    "why": "Chris asked to be able to turn the Bluetooth location sharing on and off, on by default. Besides the You tab switch, the no-service banner in Ride Mode now has a Bluetooth On/Off button, and turning it back on in Ride Mode starts Bluetooth again at once (before, it waited until Ride Mode was reopened)."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "badge-leaderboard",
       "badges-and-ranks",
       "home-screen",

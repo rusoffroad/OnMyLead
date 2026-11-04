@@ -2177,6 +2177,10 @@ const dict: Record<string, string> = {
   "Badge leaderboard": "徽章排行榜",
   "Where You Ride": "你的骑行地区",
   "Bluetooth Sharing": "蓝牙共享",
+  "Bluetooth Sharing Is Off.": "蓝牙共享已关闭。",
+  "Bluetooth Off": "关闭蓝牙",
+  "Bluetooth On": "打开蓝牙",
+  "Passes spots, taps and messages to nearby riders on this ride when there is no service": "没有信号时，把位置、状态和消息传给这次骑行中附近的骑手",
   "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "没有信号时，骑行模式会把位置和警报传给同一骑行中附近的骑手",
   "Off. Turn it on to keep sharing with nearby riders when there is no service": "已关闭。打开后，没有信号时也能继续与附近的骑手共享",
   // 2.1: leaderboard, Bluetooth sharing, 3D Terrain and tilt calibration.

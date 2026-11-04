@@ -2177,6 +2177,10 @@ const dict: Record<string, string> = {
   "Badge leaderboard": "バッジのリーダーボード",
   "Where You Ride": "走るエリア",
   "Bluetooth Sharing": "Bluetooth共有",
+  "Bluetooth Sharing Is Off.": "Bluetooth共有はオフです。",
+  "Bluetooth Off": "Bluetoothオフ",
+  "Bluetooth On": "Bluetoothオン",
+  "Passes spots, taps and messages to nearby riders on this ride when there is no service": "圏外のとき、このライドの近くのライダーに位置、ステータス、メッセージを届けます",
   "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "圏外のとき、ライドモードは同じライドの近くのライダーに位置とアラートを送ります",
   "Off. Turn it on to keep sharing with nearby riders when there is no service": "オフ。オンにすると、圏外でも近くのライダーと共有を続けます",
   // 2.1: leaderboard, Bluetooth sharing, 3D Terrain and tilt calibration.
