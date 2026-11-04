@@ -3164,6 +3164,20 @@ const dict: Record<string, string> = {
   "That website doesn’t look right.": "ウェブサイトが正しくないようです。",
   "Keep the note under 500 characters.": "メモは 500 文字以内にしてください。",
   "Sign in to suggest a place.": "場所を提案するにはサインインしてください。",
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "パークトレイル",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "オフロードパークのトレイル。パークが評価している場合はパーク独自のレベル（1が最も易しく5が最も難しい）で表示します。OpenStreetMapのデータです。パークの公式マップも確認してください。",
+  "Park Road": "パーク内道路",
+  "Park Trail": "パークトレイル",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "レベルはOpenStreetMap（{credit}）に記録されたパーク独自の評価です。嵐や整備作業のあとはトレイルが変わるため、パークの公式マップを確認してください。",
+  "Level {n} of 5": "レベル {n} / 5",
+  "{n} m": "{n} m",
+  "{n} km": "{n} km",
+  "{n} ft": "{n} フィート",
+  "{n} trails · {len}": "{n} 本のトレイル · {len}",
+  "Park Trails on Maps": "地図にパークトレイルを表示",
+  "Showing the trails of offroad parks, colored by the park’s level": "オフロードパークのトレイルを、パークのレベルごとに色分けして表示しています",
+  "Hidden. Offroad park trails stay off every map": "非表示。パークトレイルはどの地図にも表示されません",
 };
 
 export default dict;

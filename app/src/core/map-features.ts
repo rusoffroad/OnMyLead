@@ -26,6 +26,7 @@ export type MapFeatureId =
   | 'hiking'
   | 'closed'
   | 'riderTrails'
+  | 'parkTrails'
   | 'nationalForest'
   | 'blm'
   | 'nationalPark'
@@ -76,6 +77,8 @@ export const FEATURE_INK = {
   hiking: '#FF5CCB',
   closed: TRAIL_INK.closed,
   rider: '#57E3C3',
+  /** Park trails are colored by the park's level (core/park-trails); this is the level 1-2 green, for the key. */
+  park: '#3CC36B',
   nationalForest: '#2FB36B',
   blm: '#E0A93B',
   nationalPark: '#9A6BFF',
@@ -119,6 +122,10 @@ export const MAP_FEATURES: MapFeature[] = [
   {
     id: 'riderTrails', group: 'trails', name: 'Rider Trails', detail: 'Trails OnMyLead riders mapped and shared.',
     ink: { color: FEATURE_INK.rider, width: 4, dash: [0.1, 6], casing: true }, on: true,
+  },
+  {
+    id: 'parkTrails', group: 'trails', name: 'Park Trails', detail: 'The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.',
+    ink: { color: FEATURE_INK.park, width: 4, casing: true }, on: true,
   },
   {
     id: 'nationalForest', group: 'land', name: 'National Forests', detail: 'Forest Service land and grasslands.',

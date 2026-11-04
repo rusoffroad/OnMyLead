@@ -34,7 +34,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { useNotificationSettings } from '@/lib/notification-settings';
 import { useOfflineMaps } from '@/lib/offline-maps';
 import { loadTrails, useLocalTrails } from '@/lib/nav-trails';
-import { RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
+import { PARK_TRAILS_KEY, RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useFollowMePref } from '@/hooks/use-follow-me';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
@@ -84,6 +84,7 @@ export default function You() {
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
+  const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
   const [followMe, setFollowMe] = useFollowMePref();
   useEffect(() => {
     loadTrails();
@@ -187,6 +188,22 @@ export default function You() {
               thumbColor="#FFFFFF"
               {...({ activeThumbColor: '#FFFFFF' } as object)}
               accessibilityLabel={t('Rider Trails on Maps')}
+            />
+          }
+        />
+        <MenuRow
+          icon="map"
+          color={Colors.sky}
+          title={t('Park Trails on Maps')}
+          detail={parkTrails ? t('Showing the trails of offroad parks, colored by the park’s level') : t('Hidden. Offroad park trails stay off every map')}
+          right={
+            <Switch
+              value={parkTrails}
+              onValueChange={setParkTrails}
+              trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
+              accessibilityLabel={t('Park Trails on Maps')}
             />
           }
         />

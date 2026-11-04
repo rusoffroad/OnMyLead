@@ -3164,6 +3164,20 @@ const dict: Record<string, string> = {
   "That website doesn’t look right.": "Il sito web non sembra corretto.",
   "Keep the note under 500 characters.": "Tieni la nota sotto i 500 caratteri.",
   "Sign in to suggest a place.": "Accedi per suggerire un posto.",
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "Sentieri dei parchi",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "I sentieri dei parchi offroad, con i livelli del parco (1 il più facile, 5 il più difficile) dove li valuta. Da OpenStreetMap; controlla la mappa ufficiale del parco.",
+  "Park Road": "Strada del parco",
+  "Park Trail": "Sentiero del parco",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "I livelli sono le valutazioni del parco come mappate in OpenStreetMap ({credit}). I sentieri cambiano dopo tempeste e giornate di lavori, quindi controlla la mappa ufficiale del parco.",
+  "Level {n} of 5": "Livello {n} di 5",
+  "{n} m": "{n} m",
+  "{n} km": "{n} km",
+  "{n} ft": "{n} ft",
+  "{n} trails · {len}": "{n} sentieri · {len}",
+  "Park Trails on Maps": "Sentieri dei parchi sulle mappe",
+  "Showing the trails of offroad parks, colored by the park’s level": "Mostra i sentieri dei parchi offroad, colorati per livello del parco",
+  "Hidden. Offroad park trails stay off every map": "Nascosti. I sentieri dei parchi non compaiono su nessuna mappa",
 };
 
 export default dict;

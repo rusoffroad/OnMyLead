@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { followCamShouldMove } from '@/core/follow-camera';
+import { parkPieces } from '@/core/park-trails';
 import type { LatLng } from '@/core/geo';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
 import type { DayLine } from '@/core/track-line';
@@ -180,10 +181,11 @@ function FlatNavMap({
   }, [measuring]);
 
   const riderLines = useMemo(() => trail.riderTrails.map((t) => t.points), [trail.riderTrails]);
+  const parkLines = useMemo(() => parkPieces(trail.parkTrails), [trail.parkTrails]);
   const { base, trails, agencyLayers, osmLines, closedLines, labels } = trail;
   useEffect(() => {
-    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines });
-  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines]);
+    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkPieces: parkLines, parkLabels: trail.parkLabels, parks: trail.parks });
+  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkLines, trail.parkLabels, trail.parks]);
 
   useEffect(() => {
     const g = layer.current;

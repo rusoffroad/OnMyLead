@@ -3164,6 +3164,20 @@ const dict: Record<string, string> = {
   "That website doesn’t look right.": "यह वेबसाइट सही नहीं लगती।",
   "Keep the note under 500 characters.": "नोट 500 अक्षरों से कम रखें।",
   "Sign in to suggest a place.": "जगह सुझाने के लिए साइन इन करें।",
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "पार्क ट्रेल",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "ऑफरोड पार्कों के ट्रेल, पार्क के अपने स्तरों में (1 सबसे आसान से 5 सबसे कठिन) जहाँ पार्क उन्हें रेट करता है। OpenStreetMap से; पार्क का आधिकारिक नक्शा ज़रूर देखें।",
+  "Park Road": "पार्क सड़क",
+  "Park Trail": "पार्क ट्रेल",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "स्तर पार्क की अपनी रेटिंग हैं, जैसी OpenStreetMap ({credit}) में दर्ज हैं। तूफ़ान और काम के दिनों के बाद ट्रेल बदल जाते हैं, इसलिए पार्क का आधिकारिक नक्शा देखें।",
+  "Level {n} of 5": "स्तर {n} / 5",
+  "{n} m": "{n} मी",
+  "{n} km": "{n} किमी",
+  "{n} ft": "{n} फ़ीट",
+  "{n} trails · {len}": "{n} ट्रेल · {len}",
+  "Park Trails on Maps": "नक्शों पर पार्क ट्रेल",
+  "Showing the trails of offroad parks, colored by the park’s level": "ऑफरोड पार्कों के ट्रेल दिखा रहा है, पार्क के स्तर के रंग में",
+  "Hidden. Offroad park trails stay off every map": "छिपे हुए। पार्क ट्रेल किसी भी नक्शे पर नहीं दिखते",
 };
 
 export default dict;

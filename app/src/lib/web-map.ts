@@ -6,6 +6,7 @@ import { Colors, Glass, RideColors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { FEATURE_BY_ID, type AgencyLayer } from '@/core/map-features';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
+import { parkSummaryLine, PARK_NAMES_MIN_Z, type ParkLabel, type ParkPiece, type ParkSummary } from '@/core/park-trails';
 import { OSM_ATTRIBUTION, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
 import {
   fillTemplate, TOPO_ATTRIBUTION, TOPO_MAX_NATIVE_Z, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate, USGS_TOPO,
@@ -62,6 +63,8 @@ const css = () => `
   padding: 1px 7px; border-radius: 6px; background: rgba(10,22,38,.86); border: 1px solid rgba(255,196,61,.75); color: #fff; font: 12px Barlow_700Bold, sans-serif; pointer-events: none; }
 .oml-trail-tag span { overflow: hidden; text-overflow: ellipsis; }
 .oml-trail-tag.closed { border-color: ${TRAIL_INK.closed}; }
+.oml-park-title { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; max-width: 180px; padding: 4px 9px; border-radius: 8px; background: rgba(10,22,38,0.9); border: 1px solid rgba(255,255,255,0.35); color: #fff; font: 13px/1.2 Barlow_800ExtraBold, sans-serif; text-align: center; pointer-events: none; }
+.oml-park-title small { font: 11px Barlow_600SemiBold, sans-serif; opacity: 0.8; white-space: nowrap; }
 .oml-trail-tag b { color: ${TRAIL_INK.closed}; font: 11px Barlow_800ExtraBold, sans-serif; text-transform: uppercase; }
 .oml-meet { width: 34px; height: 44px; }
 .oml-meet svg { display: block; filter: drop-shadow(0 3px 4px rgba(0,0,0,.55)); }
@@ -181,7 +184,30 @@ export type TrailLayerState = {
   labels: TrailLabel[];
   /** Trails riders mapped and shared (Map Mode), drawn mint and dotted; their own toggle. */
   riderLines?: LatLng[][];
+  /** Offroad park trails in the park's level colors (core/park-trails), with their names and the parks' names. */
+  parkPieces?: ParkPiece[];
+  parkLabels?: ParkLabel[];
+  parks?: ParkSummary[];
 };
+
+/** Park trails: navy casing, then a solid line in the park's level color; closed ones dashed red. */
+export function drawParkTrails(g: L.LayerGroup, pieces: ParkPiece[], labels: ParkLabel[], parks: ParkSummary[], zoom: number) {
+  for (const p of pieces) {
+    const line = p.points.map(ll);
+    L.polyline(line, { color: TRAIL_INK.casing, weight: p.road ? 5.2 : 7, interactive: false }).addTo(g);
+    L.polyline(line, { color: p.color, weight: p.road ? 2.4 : 4, dashArray: p.closed ? '5 5' : undefined, lineCap: 'round', interactive: false }).addTo(g);
+  }
+  drawTrailLabels(g, labels);
+  if (zoom >= PARK_NAMES_MIN_Z) {
+    for (const park of parks) {
+      L.marker(ll(park.center), {
+        interactive: false,
+        keyboard: false,
+        icon: L.divIcon({ className: '', iconSize: [0, 0], html: `<div class="oml-park-title"><span>${esc(park.parkName)}</span><small>${esc(parkSummaryLine(park))}</small></div>` }),
+      }).addTo(g);
+    }
+  }
+}
 
 /** Rider trails: navy casing, then mint dots, so they never pass for an agency trail. */
 export function drawRiderTrails(g: L.LayerGroup, lines: LatLng[][]) {
@@ -218,6 +244,7 @@ export function trailLayers(m: L.Map) {
     return l;
   };
   const riders = L.layerGroup().addTo(m);
+  const parks = L.layerGroup().addTo(m);
   const lines = L.layerGroup().addTo(m);
   const tags = L.layerGroup().addTo(m);
   const show = (layer: L.Layer, on: boolean) => {
@@ -235,6 +262,8 @@ export function trailLayers(m: L.Map) {
       tags.clearLayers();
       riders.clearLayers();
       drawRiderTrails(riders, t.riderLines ?? []);
+      parks.clearLayers();
+      drawParkTrails(parks, t.parkPieces ?? [], t.parkLabels ?? [], t.parks ?? [], m.getZoom());
       if (!t.trails) {
         m.attributionControl.removeAttribution(OSM_ATTRIBUTION);
         return;

@@ -2,6 +2,55 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "park-trails",
+      "map-layers"
+    ],
+    "kind": "feature",
+    "why": "Chris asked for the trails of as many offroad parks as possible, including Hidden Falls Adventure Park, shown to every user. The trails of 55 parks and OHV areas mapped in OpenStreetMap (3,819 lines, 1,529 miles; Hidden Falls with its level 1 to 5 ratings and closed trails) now draw on every map for everyone, colored by the park's level, with park names from far out and a Park Trails row in Map Features (Trails group, free for everyone) and a Park Trails on Maps switch on the You tab. Park-published maps (copyrighted) and paid trail data were not used. New article park-trails; map-layers gets a short pointer in its Rider Trails section."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "3d-terrain",
+      "badges-and-ranks",
+      "bluetooth-sharing",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-me",
+      "full-map",
+      "garage",
+      "getting-started",
+      "language",
+      "location-sharing",
+      "manage-subscription",
+      "navigation-mode",
+      "notification-settings",
+      "offline-maps",
+      "pro-trial",
+      "profile-picture",
+      "refer-a-friend",
+      "report-and-block",
+      "ride-name-and-profile",
+      "route-builder",
+      "sign-in",
+      "starlink",
+      "subscribe-to-pro",
+      "sync-across-devices",
+      "trip-planner",
+      "troubleshooting",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "park-trails",
+    "why": "Park Trails touched code these articles share: the map components every screen draws with (park lines ride along the same layers as agency trails and OpenStreetMap tracks), the trail-map hook, the You tab (a new Park Trails on Maps row), synced settings and the site constants. Nothing these articles describe changed; dates bumped after a review of each against the code."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "appearance",
       "approvals-and-waitlist",
       "create-a-ride",

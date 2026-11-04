@@ -5,6 +5,7 @@ import type { MapPressEvent, Region } from 'react-native-maps';
 
 import { boxInside, nearestRiderTrail, paddedBox, RIDER_TRAILS_MIN_Z, type PublicTrail } from '@/core/nav-trails';
 import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
+import { drawableParkTrails, outsideParks, PARK_NAMES_MIN_Z, PARK_TRAILS_MIN_Z, parkTrailLabels, parksInView, type ParkLabel, type ParkSummary, type ParkTrail } from '@/core/park-trails';
 import { terrainBoxes } from '@/core/offline-maps';
 import { lookFor, mapboxDraws, type MapLook } from '@/core/terrain';
 import { anyLand, anyTrails, defaultFeatures, featureKey, readFeatures, type AgencyLayer, type FeatureChoices, type MapFeatureId } from '@/core/map-features';
@@ -16,6 +17,7 @@ import { useMapSignal } from '@/lib/map-signal';
 import { useOfflineMaps } from '@/lib/offline-maps';
 import { useMapboxAvailable, useTerrainAvailable } from '@/lib/terrain';
 import { publicTrailsIn, type Box } from '@/lib/nav-trails';
+import { parkList, parkTrailsIn, savedParkTrailsIn } from '@/lib/park-trails';
 import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
 import { identifyLand } from '@/lib/trail-lookup';
@@ -26,6 +28,9 @@ const KEY = 'map.layers.v1';
 const NO_FEATURES = Object.fromEntries(Object.keys(defaultFeatures()).map((k) => [k, false])) as FeatureChoices;
 /** Show trails other riders mapped and shared (Navigation Mode). On unless the rider hid them. */
 export const RIDER_TRAILS_KEY = 'map.riderTrails.v1';
+/** Show the trails of offroad parks (core/park-trails). On unless the rider hid them; free for everyone, like Rider Trails. */
+export const PARK_TRAILS_KEY = 'map.parkTrails.v1';
+const EMPTY_PARKS: ParkSummary[] = [];
 
 export type { AgencyLayer } from '@/core/map-features';
 
@@ -75,6 +80,17 @@ export type TrailMap = {
   pick: (t: PublicTrail | null) => void;
   /** Load the rider trails on screen again (after sharing or rating one). */
   reloadRiderTrails: () => void;
+  /** Trails of offroad parks (core/park-trails), colored by the park's level: the Park Trails map feature. */
+  parkTrailsOn: boolean;
+  setParkTrails: (on: boolean) => void;
+  parkTrails: ParkTrail[];
+  /** Name tags for the named park trails on screen. */
+  parkLabels: ParkLabel[];
+  /** Parks with trails in view, named on the map from far out (PARK_NAMES_MIN_Z). */
+  parks: ParkSummary[];
+  /** The park trail the rider tapped: its card names the park and the level. */
+  pickedPark: ParkTrail | null;
+  pickPark: (t: ParkTrail | null) => void;
   /**
    * Feed a map's region changes in (mapProps does this; maps with their own handler call it).
    * A web map passes its real zoom, since a wide browser window shows far more than a phone.
@@ -111,9 +127,9 @@ export function useTrailMap(): TrailMap {
   // Map layers are Pro: Free riders get the standard map with no topo and no Map Features. Their
   // saved choices are kept, so they come back the moment they're on Pro.
   const layersPro = useCan('map_layers');
-  // Rider Trails were never Pro, so a Free rider's own choice for them still counts.
+  // Rider Trails and Park Trails were never Pro, so a Free rider's own choice for them still counts.
   const features = useMemo(
-    () => (layersPro ? featureChoice : { ...NO_FEATURES, riderTrails: featureChoice.riderTrails }),
+    () => (layersPro ? featureChoice : { ...NO_FEATURES, riderTrails: featureChoice.riderTrails, parkTrails: featureChoice.parkTrails }),
     [layersPro, featureChoice],
   );
   const trails = anyTrails(features);
@@ -145,6 +161,16 @@ export function useTrailMap(): TrailMap {
   const riderBox = useRef<Box | null>(null);
   const riderLoad = useRef(0);
   const [picked, setPicked] = useState<PublicTrail | null>(null);
+  const [parkOn, setParkOn] = useState(true);
+  const parkOnRef = useRef(true);
+  const [parkTrails, setParkTrailsList] = useState<ParkTrail[]>([]);
+  const parkRef = useRef<ParkTrail[]>([]);
+  const parkBox = useRef<Box | null>(null);
+  const parkLoad = useRef(0);
+  const [parks, setParks] = useState<ParkSummary[]>([]);
+  const [pickedPark, setPickedPark] = useState<ParkTrail | null>(null);
+  // The map's box (padded, to two decimals so a small pan changes nothing), for the park names.
+  const [viewBox, setViewBox] = useState<Box | null>(null);
   const mapboxAvailable = useMapboxAvailable();
   const terrainAvailable = useTerrainAvailable();
   const downloads = useOfflineMaps();
@@ -164,12 +190,15 @@ export function useTrailMap(): TrailMap {
           setBaseState(saved.base);
         }
         const next = readFeatures(saved);
-        // Rider Trails had its own key before Map Features; that key still wins when it says off.
+        // Rider Trails and Park Trails have their own keys too (the You tab writes them); off there still wins.
         if (!riderOnRef.current) next.riderTrails = false;
+        if (!parkOnRef.current) next.parkTrails = false;
         featuresRef.current = next;
         setFeatureState(next);
         riderOnRef.current = next.riderTrails;
         setRiderOn(next.riderTrails);
+        parkOnRef.current = next.parkTrails;
+        setParkOn(next.parkTrails);
       } catch {
         // Not a saved choice.
       }
@@ -184,12 +213,26 @@ export function useTrailMap(): TrailMap {
     AsyncStorage.getItem(RIDER_TRAILS_KEY)
       .then((v) => v === '0' && applyRiders(v))
       .catch(() => {});
+    const applyParks = (v: string | null) => {
+      parkOnRef.current = v !== '0';
+      setParkOn(v !== '0');
+      featuresRef.current = { ...featuresRef.current, parkTrails: v !== '0' };
+      setFeatureState(featuresRef.current);
+    };
+    AsyncStorage.getItem(PARK_TRAILS_KEY)
+      .then((v) => v === '0' && applyParks(v))
+      .catch(() => {});
+    // The park list (names from far out) comes from the phone first, then the server.
+    parkList(false).then((saved) => saved.length && setParks(saved)).catch(() => {});
+    parkList(true).then((fresh) => fresh.length && setParks(fresh)).catch(() => {});
     // Picked on another device (lib/settings-sync).
     const offLayers = onSyncedChange(KEY, applyLayers);
     const offRiders = onSyncedChange(RIDER_TRAILS_KEY, applyRiders);
+    const offParks = onSyncedChange(PARK_TRAILS_KEY, applyParks);
     return () => {
       offLayers();
       offRiders();
+      offParks();
     };
   }, []);
 
@@ -215,6 +258,26 @@ export function useTrailMap(): TrailMap {
       .catch(() => {});
   }, []);
 
+  /** Park trails for the region on screen; saved parks draw with no signal. */
+  const refreshParks = useCallback((force = false) => {
+    const r = region.current;
+    if (!r || !parkOnRef.current) return;
+    const z = zoomNow.current ?? mapZoom(r, width.current);
+    if (z < PARK_TRAILS_MIN_Z) return;
+    const view = { minLat: r.latitude - r.latitudeDelta / 2, maxLat: r.latitude + r.latitudeDelta / 2, minLng: r.longitude - r.longitudeDelta / 2, maxLng: r.longitude + r.longitudeDelta / 2 };
+    if (!force && parkBox.current && boxInside(view, parkBox.current)) return;
+    const box = paddedBox(r);
+    const id = ++parkLoad.current;
+    (offlineRef.current ? savedParkTrailsIn(box) : parkTrailsIn(box).catch(() => savedParkTrailsIn(box)))
+      .then((list) => {
+        if (id !== parkLoad.current) return;
+        parkBox.current = box;
+        parkRef.current = list;
+        setParkTrailsList((prev) => (sameLines(prev, list) ? prev : list));
+      })
+      .catch(() => {});
+  }, []);
+
   // `trailsOn` is still written for app versions from before Map Features, which read only that.
   const save = (b: BaseMap, f: FeatureChoices) => setSyncedItem(KEY, JSON.stringify({ base: b, trailsOn: anyTrails(f), features: f })).catch(() => {});
 
@@ -225,6 +288,17 @@ export function useTrailMap(): TrailMap {
     else refreshRiders(true);
     setSyncedItem(RIDER_TRAILS_KEY, on ? '1' : '0').catch(() => {});
     featuresRef.current = { ...featuresRef.current, riderTrails: on };
+    setFeatureState(featuresRef.current);
+    save(baseRef.current, featuresRef.current);
+  };
+
+  const setParkTrails = (on: boolean) => {
+    parkOnRef.current = on;
+    setParkOn(on);
+    if (!on) setPickedPark(null);
+    else refreshParks(true);
+    setSyncedItem(PARK_TRAILS_KEY, on ? '1' : '0').catch(() => {});
+    featuresRef.current = { ...featuresRef.current, parkTrails: on };
     setFeatureState(featuresRef.current);
     save(baseRef.current, featuresRef.current);
   };
@@ -267,6 +341,7 @@ export function useTrailMap(): TrailMap {
 
   const setFeature = (id: MapFeatureId, on: boolean) => {
     if (id === 'riderTrails') return setRiderTrails(on);
+    if (id === 'parkTrails') return setParkTrails(on);
     const next = { ...featuresRef.current, [id]: on };
     featuresRef.current = next;
     setFeatureState(next);
@@ -303,11 +378,14 @@ export function useTrailMap(): TrailMap {
       const lat = Math.round(r.latitude * 100) / 100;
       const lng = Math.round(r.longitude * 100) / 100;
       setWhere((w) => (w && w.lat === lat && w.lng === lng ? w : { lat, lng }));
+      const vb = { minLat: Math.floor((r.latitude - r.latitudeDelta) * 100) / 100, maxLat: Math.ceil((r.latitude + r.latitudeDelta) * 100) / 100, minLng: Math.floor((r.longitude - r.longitudeDelta) * 100) / 100, maxLng: Math.ceil((r.longitude + r.longitudeDelta) * 100) / 100 };
+      setViewBox((b) => (b && b.minLat === vb.minLat && b.maxLat === vb.maxLat && b.minLng === vb.minLng && b.maxLng === vb.maxLng ? b : vb));
       setZoom(z ?? mapZoom(r, width.current));
       refreshOsm();
       refreshRiders();
+      refreshParks();
     },
-    [refreshOsm, refreshRiders],
+    [refreshOsm, refreshRiders, refreshParks],
   );
 
   const identifyAt = useCallback(
@@ -325,6 +403,20 @@ export function useTrailMap(): TrailMap {
         }
       }
       setPicked(null);
+      // Then a park trail: its card names the park and its level.
+      if (parkOnRef.current && region.current && parkRef.current.length) {
+        const radius = Math.min(400, Math.max(15, metersPerPoint(region.current, width.current) * 22));
+        const hit = nearestRiderTrail({ lat, lng }, parkRef.current, radius);
+        if (hit) {
+          ++lookup.current;
+          setLooking(false);
+          setInfo(null);
+          setLand(null);
+          setPickedPark(hit);
+          return;
+        }
+      }
+      setPickedPark(null);
       setLand(null);
       const f = featuresRef.current;
       const landOn = layersPro && anyLand(f);
@@ -387,6 +479,20 @@ export function useTrailMap(): TrailMap {
     return trailLabels(shownOsm, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
   }, [shownOsm, zoom]);
 
+  const parkDrawn = useMemo(() => (parkOn ? drawableParkTrails(parkTrails, zoom, Platform.OS === 'web' ? 1500 : undefined) : []), [parkOn, parkTrails, zoom]);
+  const parkLabels = useMemo(() => {
+    if (!parkOn || zoom < 12) return [];
+    const perPt = 360 / (256 * 2 ** Math.max(1, zoom));
+    const lat = parkDrawn[0]?.points[0]?.lat ?? 0;
+    return parkTrailLabels(parkDrawn, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
+  }, [parkOn, parkDrawn, zoom]);
+  const parksShown = useMemo(() => (parkOn && viewBox && zoom >= PARK_NAMES_MIN_Z ? parksInView(parks, viewBox) : []), [parkOn, parks, zoom, viewBox]);
+  // Where a park's trails are drawn, the plain OpenStreetMap copies of the same lines step aside.
+  const parksDrawn = parkOn && zoom >= PARK_TRAILS_MIN_Z && parkDrawn.length ? parksShown : EMPTY_PARKS;
+  const osmShown = useMemo(() => outsideParks(drawn, parksDrawn), [drawn, parksDrawn]);
+  const labelsShown = useMemo(() => outsideParks(labels, parksDrawn), [labels, parksDrawn]);
+  const closedShown = useMemo(() => outsideParks(closed, parksDrawn), [closed, parksDrawn]);
+
   const agencyLayers = useMemo<AgencyLayer[]>(() => {
     const on = (Object.keys(features) as MapFeatureId[]).filter((id) => features[id]);
     const trailLayers = TRAIL_SOURCE_IDS.flatMap((id: TrailSourceId) => {
@@ -433,9 +539,9 @@ export function useTrailMap(): TrailMap {
     land,
     clearLand: () => setLand(null),
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
-    osmLines: trails ? drawn : [],
-    labels: trails ? labels : [],
-    closedLines: features.closed ? closed : [],
+    osmLines: trails ? osmShown : [],
+    labels: trails ? labelsShown : [],
+    closedLines: features.closed ? closedShown : [],
     closerForTracks: trails && zoom >= TRAILS_MIN_Z && zoom < OSM_VIEW_MIN_Z,
     offline,
     setBase,
@@ -447,6 +553,13 @@ export function useTrailMap(): TrailMap {
     picked: riderOn ? picked : null,
     pick: setPicked,
     reloadRiderTrails: () => refreshRiders(true),
+    parkTrailsOn: parkOn,
+    setParkTrails,
+    parkTrails: parkDrawn,
+    parkLabels,
+    parks: parksShown,
+    pickedPark: parkOn ? pickedPark : null,
+    pickPark: setPickedPark,
     onRegion,
     info,
     looking,

@@ -3164,6 +3164,20 @@ const dict: Record<string, string> = {
   "That website doesn’t look right.": "Situs web itu sepertinya salah.",
   "Keep the note under 500 characters.": "Catatan maksimal 500 karakter.",
   "Sign in to suggest a place.": "Masuk untuk menyarankan tempat.",
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "Jalur Taman",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "Jalur di taman offroad, dengan tingkat versi taman itu sendiri (1 termudah sampai 5 tersulit) bila taman menilainya. Dari OpenStreetMap; periksa peta resmi taman.",
+  "Park Road": "Jalan Taman",
+  "Park Trail": "Jalur Taman",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "Tingkat adalah penilaian taman itu sendiri seperti yang dipetakan di OpenStreetMap ({credit}). Jalur berubah setelah badai dan hari kerja, jadi periksa peta resmi taman.",
+  "Level {n} of 5": "Tingkat {n} dari 5",
+  "{n} m": "{n} m",
+  "{n} km": "{n} km",
+  "{n} ft": "{n} kaki",
+  "{n} trails · {len}": "{n} jalur · {len}",
+  "Park Trails on Maps": "Jalur Taman di Peta",
+  "Showing the trails of offroad parks, colored by the park’s level": "Menampilkan jalur taman offroad, diwarnai menurut tingkat taman",
+  "Hidden. Offroad park trails stay off every map": "Disembunyikan. Jalur taman tidak muncul di peta mana pun",
 };
 
 export default dict;

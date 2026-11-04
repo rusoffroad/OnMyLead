@@ -29,7 +29,7 @@ sources:
   - app/src/components/route-builder-map.web.tsx
   - app/src/components/rides-map.web.tsx
   - app/src/components/waypoint-map.web.tsx
-related: [offline-maps, route-builder, ride-mode, find-a-ride, waypoints-and-planned-stops]
+related: [offline-maps, route-builder, ride-mode, find-a-ride, waypoints-and-planned-stops, park-trails]
 keywords: [map features, highways, freeways, paved roads, hiking trails, street legal, width limit, land boundaries, national forest, blm land, national park, state park, property lines, private property, parcels, pad-us, rider trails, user submitted trails, closed, closure, closed trail, seasonal closure, trail names, road names, labels, layers, topo, topographic, satellite, trails, forest service, mvum, blm, openstreetmap, osm, legal trails, vehicle access, ohv, utv, map type, tablet]
 screenshots:
   - file: map.webp
@@ -109,6 +109,7 @@ Each style has a small picture of how it looks; the one you're using has a blue 
 - **Hiking Trails**: foot and horse trails with no motor vehicles, a thinner pink dash-dot line with a light outline, so it never looks like a trail you can drive. They come from Forest Service trails closed to motor vehicles, BLM non-motorized trails and OpenStreetMap paths.
 - **Closures**: red dashes. See [Closed Trails and Roads](#closed-trails-and-roads).
 - **Rider Trails**: mint dots. See [Rider Trails](#rider-trails).
+- **Park Trails**: the trails of offroad parks in the park's own level colors (green, blue, white, red). Free for everyone. See [Park Trails](#park-trails).
 
 Roads, trails and closures are all on unless you turn them off. Highways, paved roads and hiking paths from OpenStreetMap are drawn on Mapbox maps (every map from 2.1); on the rare map that falls back to Apple, Google or the website's basic map, the base map shows roads in its own colors.
 
@@ -187,6 +188,12 @@ Trail lines show from pretty far out. Forest Service and BLM lines appear when t
 Trails other riders mapped and shared in [Navigate](/help/navigation-mode) are drawn as **mint dotted lines**, so you can tell them apart from agency and OpenStreetMap trails. They show once you zoom in to about a county's width, when you're signed in. Tap one to see its card: it says **User Submitted Trail**, who mapped it, its difficulty, its **Quality** and **Line Accuracy** stars, and has **Rate Trail**, **Navigate** and **Details**.
 
 Turn **Rider Trails** off in the panel (in **Map Features** from 2.1) to hide them. The same choice is on the **You** tab as **Rider Trails on Maps**. They're on unless you turn them off.
+:::
+
+:::release 2.1
+## Park Trails
+
+The trails of offroad parks (Hidden Falls Adventure Park, Katemcy Rocks, Hollister Hills and about fifty more) draw on every map as **solid lines with a dark edge**, colored by the park's own level where it rates its trails, with the park's name from far out. The **Park Trails** row in the **Trails** group of Map Features turns them off; it's free for everyone. See [Offroad Park Trails](/help/park-trails).
 :::
 
 The map on the **Find a Ride** tab shows trail lines too when you zoom in, following the choice you made here.

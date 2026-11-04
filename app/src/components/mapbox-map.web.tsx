@@ -6,6 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
+import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
 import {
   AGENCY_TILE_SIZE, cameraPadding, EMPTY_LINES, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxAgencyTemplate, mapboxStyleFor, metersPerPointAt,
   NATIVE_TRACKS_MIN_ZOOM, nativeTracks, OSM_SOURCE_ID, pointsGeoJSON,
@@ -75,6 +76,24 @@ function addLayers(m: MapboxMap_, look: MapLook) {
   m.addSource('oml-rider-trails', { type: 'geojson', data: EMPTY_LINES });
   m.addLayer({ id: 'oml-rider-trails-case', type: 'line', source: 'oml-rider-trails', layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 7 } });
   m.addLayer({ id: 'oml-rider-trails-dots', type: 'line', source: 'oml-rider-trails', layout: { 'line-cap': 'round' }, paint: { 'line-color': RIDER_TRAIL_INK, 'line-width': 4, 'line-dasharray': [0.25, 2] } });
+  m.addSource('oml-park-trails', { type: 'geojson', data: EMPTY_LINES });
+  m.addLayer({ id: 'oml-park-trails-case', type: 'line', source: 'oml-park-trails', layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': ['case', ['get', 'road'], 5.2, 7] } });
+  m.addLayer({
+    id: 'oml-park-trails-line', type: 'line', source: 'oml-park-trails', layout: { 'line-join': 'round', 'line-cap': 'round' },
+    paint: { 'line-color': ['get', 'color'], 'line-width': ['case', ['get', 'road'], 2.4, 4], 'line-dasharray': ['case', ['get', 'closed'], ['literal', CLOSED_DASH], ['literal', [1, 0]]] },
+  });
+  m.addSource('oml-park-names', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  m.addLayer({
+    id: 'oml-park-names', type: 'symbol', source: 'oml-park-names',
+    layout: { 'text-field': ['get', 'name'], 'text-size': 12, 'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'], 'text-max-width': 14 },
+    paint: { 'text-color': ['case', ['get', 'closed'], '#FF8A80', '#FFFFFF'], 'text-halo-color': 'rgba(10,22,38,0.92)', 'text-halo-width': 1.6 },
+  });
+  m.addSource('oml-park-titles', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  m.addLayer({
+    id: 'oml-park-titles', type: 'symbol', source: 'oml-park-titles', minzoom: PARK_NAMES_MIN_Z,
+    layout: { 'text-field': ['format', ['get', 'name'], { 'font-scale': 1 }, '\n', {}, ['get', 'sub'], { 'font-scale': 0.8 }], 'text-size': 14, 'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'], 'text-justify': 'center', 'text-max-width': 12 },
+    paint: { 'text-color': '#FFFFFF', 'text-halo-color': 'rgba(10,22,38,0.95)', 'text-halo-width': 2 },
+  });
   m.addSource('oml-trail-names', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
   m.addLayer({
     id: 'oml-trail-names', type: 'symbol', source: 'oml-trail-names',
@@ -299,7 +318,7 @@ export function MapboxMap({
   }), [map]);
 
   // Trail layers follow the rider's choices, like the flat maps.
-  const { trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers } = trail;
+  const { trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks } = trail;
   useEffect(() => {
     if (!map || !styled) return;
     syncAgency(map, agencyLayers, offline);
@@ -315,7 +334,10 @@ export function MapboxMap({
     src('oml-closures')?.setData?.(linesGeoJSON(closedLines.flatMap((l) => l.parts.map((points, i) => ({ key: `c-${l.key}-${i}`, points, props: { closed: true } })))));
     src('oml-trail-names')?.setData?.(pointsGeoJSON(labels.map((l) => ({ key: l.key, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))));
     src('oml-rider-trails')?.setData?.(linesGeoJSON(riderTrails.map((t) => ({ key: t.id, points: t.points }))));
-  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers]);
+    src('oml-park-trails')?.setData?.(linesGeoJSON(parkPieces(parkTrails).map((p) => ({ key: p.key, points: p.points, props: { color: p.color, closed: p.closed, road: p.road } }))));
+    src('oml-park-names')?.setData?.(pointsGeoJSON(parkLabels.map((l) => ({ key: `pl-${l.key}`, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))));
+    src('oml-park-titles')?.setData?.(pointsGeoJSON(parks.map((p) => ({ key: `park-${p.parkOsmId}`, at: p.center, props: { name: p.parkName, sub: parkSummaryLine(p) } }))));
+  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks]);
 
   // The screen's own fills and lines, redrawn when they change (and after a style change wiped them).
   const drawn = useRef<string[]>([]);

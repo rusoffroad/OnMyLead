@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import type { LatLng } from '@/core/geo';
+import { parkPieces } from '@/core/park-trails';
 import type { Place } from '@/core/places';
 import { snapRadiusM } from '@/core/trail-router';
 import type { TrailMap } from '@/hooks/use-trail-map';
@@ -88,10 +89,11 @@ function FlatRouteBuilderMap({
   }, []);
 
   const riderLines = useMemo(() => (trail?.riderTrails ?? []).map((t) => t.points), [trail?.riderTrails]);
+  const parkLines = useMemo(() => parkPieces(trail?.parkTrails ?? []), [trail?.parkTrails]);
   const { base, trails, agencyLayers, osmLines, closedLines, labels } = trail ?? { base: 'satellite' as const, trails: false, agencyLayers: [], osmLines: [], closedLines: [], labels: [] };
   useEffect(() => {
-    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines });
-  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines]);
+    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkPieces: parkLines, parkLabels: trail?.parkLabels ?? [], parks: trail?.parks ?? [] });
+  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkLines, trail?.parkLabels, trail?.parks]);
 
   // Go to a searched place: the whole area when it has one, else close in on the spot.
   useEffect(() => {

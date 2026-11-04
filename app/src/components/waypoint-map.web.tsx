@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import { parkPieces } from '@/core/park-trails';
 import type { Place } from '@/core/places';
 import { symbolInfo, symbolLabel, symbolSvgMarkup, warningTriangle, waypointSymbol, type WaypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
@@ -97,10 +98,11 @@ function FlatWaypointMap({
   }, []);
 
   const riderLines = useMemo(() => trail.riderTrails.map((t) => t.points), [trail.riderTrails]);
+  const parkLines = useMemo(() => parkPieces(trail.parkTrails), [trail.parkTrails]);
   const { base, trails, agencyLayers, osmLines, closedLines, labels } = trail;
   useEffect(() => {
-    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines });
-  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines]);
+    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkPieces: parkLines, parkLabels: trail.parkLabels, parks: trail.parks });
+  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines, parkLines, trail.parkLabels, trail.parks]);
 
   // Go to a searched place: the whole area when it has one, else close in on the spot.
   useEffect(() => {

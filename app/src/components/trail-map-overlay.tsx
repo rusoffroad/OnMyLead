@@ -8,6 +8,7 @@ import type { LatLng } from '@/core/geo';
 import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_INK, vehicleLabel, type PublicTrail } from '@/core/nav-trails';
 import { formatBytes, IMAGERY_ATTRIBUTION, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
+import { PARK_LEVEL_COLORS, PARK_LEVEL_LEGEND, PARK_TRAILS_ATTRIBUTION, parkLevelLabel, parkTrailColor, parkTrailLength, type ParkTrail } from '@/core/park-trails';
 import { FEATURE_GROUPS, FEATURE_INK, MAP_FEATURE_IDS, MAP_FEATURES, type MapFeature, type MapFeatureId } from '@/core/map-features';
 import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
@@ -60,7 +61,7 @@ export function TrailMapOverlay({
   const credit = [
     trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null,
     ...trail.agencyLayers.map((a) => a.attribution),
-    osmOn ? OSM_ATTRIBUTION : null,
+    osmOn ? OSM_ATTRIBUTION : trail.parkTrailsOn ? PARK_TRAILS_ATTRIBUTION : null,
   ]
     .filter(Boolean)
     .join(', ');
@@ -110,6 +111,8 @@ export function TrailMapOverlay({
               onRate={() => requirePro('rate_trails') && setRating(trail.picked)}
               onFollow={() => (onFollow ? onFollow(trail.picked!) : router.push(`/nav?follow=${trail.picked!.id}`))}
             />
+          ) : trail.pickedPark ? (
+            <ParkTrailCard t={trail.pickedPark} onClose={() => trail.pickPark(null)} />
           ) : trail.info ? (
             <TrailCard info={trail.info} onClose={trail.clearInfo} />
           ) : trail.land ? (
@@ -195,8 +198,8 @@ function LayersPanel({
  */
 function MapFeaturesList({ trail, lookupHint }: { trail: TrailMap; lookupHint: string }) {
   const set = (id: MapFeatureId, on: boolean) => {
-    // Rider Trails were always free; the rest are part of map layers (Pro).
-    if (id === 'riderTrails' || requirePro('map_layers')) trail.setFeature(id, on);
+    // Rider Trails and Park Trails are free for everyone; the rest are part of map layers (Pro).
+    if (id === 'riderTrails' || id === 'parkTrails' || requirePro('map_layers')) trail.setFeature(id, on);
   };
   return (
     <View style={{ gap: 14 }}>
@@ -291,6 +294,18 @@ function FeatureSample({ feature, on }: { feature: MapFeature; on: boolean }) {
   }
   const d = 'M2 24 C12 24 14 8 24 8 S36 16 42 10';
   const scale = 0.8;
+  if (feature.id === 'parkTrails') {
+    // Park trails come in the park's level colors: the sample shows the four, green to red.
+    const levels = PARK_LEVEL_LEGEND;
+    return (
+      <Svg width={44} height={32} viewBox="0 0 44 32" style={styles.sample}>
+        <Rect width={44} height={32} fill={ground} />
+        {levels.map((l, i) => (
+          <Path key={l.level} d={`M2 ${6 + i * 6.5} C12 ${6 + i * 6.5} 20 ${4 + i * 6.5} 42 ${5 + i * 6.5}`} stroke={on ? PARK_LEVEL_COLORS[l.level] : '#7B8794'} strokeWidth={ink.width * scale * 0.7} strokeLinecap="round" fill="none" />
+        ))}
+      </Svg>
+    );
+  }
   return (
     <Svg width={44} height={32} viewBox="0 0 44 32" style={styles.sample}>
       <Rect width={44} height={32} fill={ground} />
@@ -535,6 +550,38 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
   );
 }
 
+/** A tapped park trail: the park, the trail's name and level, its length, and the OpenStreetMap credit. */
+export function ParkTrailCard({ t, onClose }: { t: ParkTrail; onClose: () => void }) {
+  const color = parkTrailColor(t);
+  const facts = [parkTrailLength(t.lengthM), t.oneway ? tr('One Way') : null, t.surface ? t.surface.replace(/_/g, ' ') : null].filter(Boolean).join('   ');
+  return (
+    <View style={[styles.card, styles.parkCard]} accessibilityLiveRegion="polite">
+      <View style={styles.cardHead}>
+        <View style={{ flex: 1, gap: 3 }}>
+          <View style={styles.userRow}>
+            <Svg width={22} height={8}><Path d="M3 4H19" stroke={color} strokeWidth={3.6} strokeLinecap="round" /></Svg>
+            <Text style={[styles.userText, { color: Colors.textSecondary }]} numberOfLines={1}>{t.parkName}</Text>
+          </View>
+          <Text style={styles.cardTitle} numberOfLines={2}>{t.name ?? (t.kind === 'road' ? tr('Park Road') : tr('Park Trail'))}</Text>
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr('Close')} hitSlop={10} onPress={onClose} style={styles.close}>
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <Path d="M6 6l12 12M18 6L6 18" stroke={Colors.textSecondary} strokeWidth={2.5} strokeLinecap="round" />
+          </Svg>
+        </Pressable>
+      </View>
+      <View style={styles.userRow}>
+        <View style={[styles.diff, { borderColor: color }]}>
+          <View style={[styles.diffDot, { backgroundColor: color }]} />
+          <Text style={styles.diffText}>{parkLevelLabel(t)}</Text>
+        </View>
+        <Text style={[styles.facts, { flex: 1 }]} numberOfLines={2}>{facts}</Text>
+      </View>
+      <Text style={styles.fine}>{tr('Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.', { credit: t.attribution })}</Text>
+    </View>
+  );
+}
+
 /**
  * One tap between the flat map and 3D Terrain, so riders don't have to find it in Map Layers.
  * Lit while 3D is on; tapping again goes back to the style the rider had (Satellite or Topo).
@@ -635,6 +682,7 @@ const styles = themedStyles(() => ({
   allowedDates: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 14 },
   fine: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12, lineHeight: 16 },
   riderCard: { borderColor: 'rgba(87,227,195,0.55)', gap: 10 },
+  parkCard: { borderColor: 'rgba(255,255,255,0.35)', gap: 10 },
   userRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   userText: { color: RIDER_TRAIL_INK, fontFamily: font(700), fontSize: 13 },
   diff: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1.5, borderRadius: Radius.pill, paddingHorizontal: 10, paddingVertical: 3 },
