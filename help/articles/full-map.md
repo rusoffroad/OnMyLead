@@ -6,6 +6,8 @@ order: 12
 release: "2.0"
 updated: 2026-11-04
 sources:
+  - app/src/hooks/use-panel-fold.ts
+  - app/src/core/panel-swipe.ts
   - app/src/core/freeride.ts
   - app/src/components/full-map.tsx
   - app/src/hooks/use-full-map.ts
@@ -34,11 +36,20 @@ Tap **Full Map** at the right end of the panel's grab bar, at the top of the pan
 - [Draw a Route](/help/route-builder)
 - [Waypoints and Planned Stops](/help/waypoints-and-planned-stops)
 
+:::release 2.1
+Or swipe the panel down: a long swipe (or a quick flick) goes straight to Full Map. A short swipe folds the panel down to its grab bar as before, and swiping down again on the folded panel goes to Full Map. On a tablet, where the panel hangs from the top beside the map, swipe it up instead.
+:::
+
 In [Find a Ride](/help/find-a-ride), tap the **Full Map** button at the top of the buttons on the map's right edge.
 
 ## Bring the Buttons Back
 
-Tap **Controls** in the bar at the bottom, or swipe the bar up. Everything comes back the way you left it. In Find a Ride, tap the same corner button again (**Exit Full Map**).
+Tap **Controls** in the bar at the bottom, or swipe the bar up.
+
+:::release 2.1
+The bar has a small grab handle on top as a reminder that it swipes up.
+:::
+ Everything comes back the way you left it. In Find a Ride, tap the same corner button again (**Exit Full Map**).
 
 Your phone remembers Full Map for each map, so it opens the same way next time. Find a Ride always opens with its list.
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isHorizontalSwipe, isVerticalSwipe, swipeResult, swipeResultToward } from '../panel-swipe';
+import { isHorizontalSwipe, isVerticalSwipe, swipeAction, swipeResult, swipeResultToward } from '../panel-swipe';
 
 describe('Ride Mode panel swipe', () => {
   it('only treats mostly-vertical drags as swipes', () => {
@@ -44,5 +44,25 @@ describe('Tablet side panels', () => {
   it('keeps the phone sheet folding down', () => {
     expect(swipeResultToward('down', true, 0, 60, 0, 0)).toBe('fold');
     expect(swipeResultToward('down', false, 0, -60, 0, 0)).toBe('open');
+  });
+});
+
+describe('Swipe down to Full Map', () => {
+  it('folds on an ordinary swipe and goes Full Map on a long or fast one', () => {
+    expect(swipeAction('down', true, 0, 60, 0, 0.2)).toBe('fold');
+    expect(swipeAction('down', true, 0, 200, 0, 0.2)).toBe('full');
+    expect(swipeAction('down', true, 0, 30, 0, 2)).toBe('full');
+  });
+
+  it('goes Full Map on a swipe down on the folded panel, and still opens on a swipe up', () => {
+    expect(swipeAction('down', false, 0, 60, 0, 0.2)).toBe('full');
+    expect(swipeAction('down', false, 0, -60, 0, -0.2)).toBe('open');
+    expect(swipeAction('down', false, 0, 10, 0, 0.1)).toBeNull();
+  });
+
+  it('works the other way for a panel hanging from the top, and never for a sidebar', () => {
+    expect(swipeAction('up', true, 0, -200, 0, -0.2)).toBe('full');
+    expect(swipeAction('up', false, 0, -60, 0, -0.2)).toBe('full');
+    expect(swipeAction('left', true, -300, 0, -3, 0)).toBe('fold');
   });
 });

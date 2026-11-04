@@ -7,10 +7,12 @@ import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import {
-  cameraPadding, EMPTY_LINES, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON,
+  AGENCY_TILE_SIZE, cameraPadding, EMPTY_LINES, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxAgencyTemplate, mapboxStyleFor, metersPerPointAt,
+  NATIVE_TRACKS_MIN_ZOOM, nativeTracks, OSM_CLOSED_TRACK_FILTER, OSM_NAMED_TRACK_FILTER, OSM_OPEN_TRACK_FILTER, OSM_SOURCE_ID, OSM_TRACK_FILTER, pointsGeoJSON,
   regionFromCamera, TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_SOURCES, terrainExaggeration, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE,
   TOPO_SOURCE_ID, trailZoomFromMapbox, type MapLook,
 } from '@/core/terrain';
+import { OSM_TILEJSON } from '@/core/osm-trails';
 import { TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN } from '@/lib/terrain';
@@ -46,13 +48,27 @@ function addLayers(m: MapboxMap_, look: MapLook) {
     m.addLayer({ id: TOPO_LAYER_ID, type: 'raster', source: TOPO_SOURCE_ID });
   }
   for (const id of TRAIL_SOURCE_IDS) {
-    m.addSource(`oml-agency-${id}`, { type: 'raster', tiles: [mapboxTileTemplate(trailTileTemplate(TRAIL_SOURCES[id]))], tileSize: 256, minzoom: TRAILS_MIN_Z - 1 });
-    m.addLayer({ id: `oml-agency-${id}`, type: 'raster', source: `oml-agency-${id}` });
+    m.addSource(`oml-agency-${id}`, { type: 'raster', tiles: [mapboxAgencyTemplate(trailTileTemplate(TRAIL_SOURCES[id]))], tileSize: AGENCY_TILE_SIZE, minzoom: TRAILS_MIN_Z - 1 });
+    m.addLayer({ id: `oml-agency-${id}`, type: 'raster', source: `oml-agency-${id}`, paint: { 'raster-fade-duration': 0 } });
   }
+  // OpenStreetMap tracks drawn by Mapbox from the vector squares, close in (core/terrain NATIVE_TRACKS_MIN_ZOOM).
+  m.addSource(OSM_SOURCE_ID, { type: 'vector', url: OSM_TILEJSON });
+  const osm = { source: OSM_SOURCE_ID, 'source-layer': 'transportation', minzoom: NATIVE_TRACKS_MIN_ZOOM } as const;
+  m.addLayer({ id: 'oml-osm-case', type: 'line', ...osm, filter: OSM_TRACK_FILTER as never, layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 6.5 } });
+  m.addLayer({ id: 'oml-osm-open', type: 'line', ...osm, filter: OSM_OPEN_TRACK_FILTER as never, paint: { 'line-color': TRAIL_INK.trail, 'line-width': 3.2, 'line-dasharray': OPEN_DASH } });
+  m.addLayer({ id: 'oml-osm-closed', type: 'line', ...osm, filter: OSM_CLOSED_TRACK_FILTER as never, paint: { 'line-color': TRAIL_INK.closed, 'line-width': 3.2, 'line-dasharray': CLOSED_DASH } });
+  m.addLayer({
+    id: 'oml-osm-names', type: 'symbol', ...osm, 'source-layer': 'transportation_name', filter: OSM_NAMED_TRACK_FILTER as never,
+    layout: { 'symbol-placement': 'line', 'text-field': ['get', 'name'], 'text-size': 12, 'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'], 'text-max-angle': 30, 'symbol-spacing': 320 },
+    paint: { 'text-color': '#FFFFFF', 'text-halo-color': 'rgba(10,22,38,0.92)', 'text-halo-width': 1.6 },
+  });
   m.addSource('oml-tracks', { type: 'geojson', data: EMPTY_LINES });
   m.addLayer({ id: 'oml-tracks-case', type: 'line', source: 'oml-tracks', layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 6.5 } });
   m.addLayer({ id: 'oml-tracks-open', type: 'line', source: 'oml-tracks', filter: ['!=', ['get', 'closed'], true], paint: { 'line-color': TRAIL_INK.trail, 'line-width': 3.2, 'line-dasharray': OPEN_DASH } });
   m.addLayer({ id: 'oml-tracks-closed', type: 'line', source: 'oml-tracks', filter: ['==', ['get', 'closed'], true], paint: { 'line-color': TRAIL_INK.closed, 'line-width': 3.2, 'line-dasharray': CLOSED_DASH } });
+  m.addSource('oml-closures', { type: 'geojson', data: EMPTY_LINES });
+  m.addLayer({ id: 'oml-closures-case', type: 'line', source: 'oml-closures', layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 6.5 } });
+  m.addLayer({ id: 'oml-closures-line', type: 'line', source: 'oml-closures', paint: { 'line-color': TRAIL_INK.closed, 'line-width': 3.2, 'line-dasharray': CLOSED_DASH } });
   m.addSource('oml-rider-trails', { type: 'geojson', data: EMPTY_LINES });
   m.addLayer({ id: 'oml-rider-trails-case', type: 'line', source: 'oml-rider-trails', layout: { 'line-join': 'round' }, paint: { 'line-color': TRAIL_INK.casing, 'line-width': 7 } });
   m.addLayer({ id: 'oml-rider-trails-dots', type: 'line', source: 'oml-rider-trails', layout: { 'line-cap': 'round' }, paint: { 'line-color': RIDER_TRAIL_INK, 'line-width': 4, 'line-dasharray': [0.25, 2] } });
@@ -64,7 +80,10 @@ function addLayers(m: MapboxMap_, look: MapLook) {
   });
 }
 
-const TRAIL_LAYER_IDS = ['oml-tracks-case', 'oml-tracks-open', 'oml-tracks-closed', 'oml-trail-names', ...TRAIL_SOURCE_IDS.map((id) => `oml-agency-${id}`)];
+/** The app's own track lines and names: drawn only out to where Mapbox draws the tracks itself. */
+const OWN_TRACK_IDS = ['oml-tracks-case', 'oml-tracks-open', 'oml-tracks-closed', 'oml-trail-names'];
+const NATIVE_TRACK_IDS = ['oml-osm-case', 'oml-osm-open', 'oml-osm-closed', 'oml-osm-names'];
+const TRAIL_LAYER_IDS = [...OWN_TRACK_IDS, 'oml-closures-case', 'oml-closures-line', ...TRAIL_SOURCE_IDS.map((id) => `oml-agency-${id}`)];
 
 /**
  * The Mapbox map on the website (mapbox-gl), the same picture and the same props as the apps'
@@ -261,11 +280,12 @@ export function MapboxMap({
       const agency = id.startsWith('oml-agency-');
       map.setLayoutProperty(id, 'visibility', trails && !(agency && offline) ? 'visible' : 'none');
     }
+    const native = nativeTracks(trails, offline);
+    for (const id of NATIVE_TRACK_IDS) if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', native ? 'visible' : 'none');
+    for (const id of OWN_TRACK_IDS) if (map.getLayer(id)) map.setLayerZoomRange(id, 0, native ? NATIVE_TRACKS_MIN_ZOOM : 24);
     const src = (id: string) => map.getSource(id) as { setData?: (d: unknown) => void } | undefined;
-    src('oml-tracks')?.setData?.(linesGeoJSON([
-      ...osmLines.flatMap((t) => t.parts.map((points, i) => ({ key: `${t.key}-${i}`, points, props: { closed: t.closed } }))),
-      ...closedLines.flatMap((l) => l.parts.map((points, i) => ({ key: `c-${l.key}-${i}`, points, props: { closed: true } }))),
-    ]));
+    src('oml-tracks')?.setData?.(linesGeoJSON(osmLines.flatMap((t) => t.parts.map((points, i) => ({ key: `${t.key}-${i}`, points, props: { closed: t.closed } })))));
+    src('oml-closures')?.setData?.(linesGeoJSON(closedLines.flatMap((l) => l.parts.map((points, i) => ({ key: `c-${l.key}-${i}`, points, props: { closed: true } })))));
     src('oml-trail-names')?.setData?.(pointsGeoJSON(labels.map((l) => ({ key: l.key, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))));
     src('oml-rider-trails')?.setData?.(linesGeoJSON(riderTrails.map((t) => ({ key: t.id, points: t.points }))));
   }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails]);

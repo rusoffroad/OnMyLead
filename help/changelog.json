@@ -2,6 +2,19 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "map-layers",
+      "3d-terrain",
+      "full-map",
+      "ride-mode"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "map-speed-3d-swipe",
+    "why": "Chris found roads and trails took a few seconds to appear after zooming in, the 3D map hard to find behind the layers button, and wanted to swipe the panel down for Full Map. Trail lines now load much faster (bigger, fewer agency map pieces; Mapbox draws OpenStreetMap tracks itself; loading starts when the map stops moving), BLM routes show again after BLM moved its server, a 3D button sits under the layers button in Ride Mode and Map Mode, and a long swipe down on a map panel goes to Full Map."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "badge-leaderboard",
       "badges-and-ranks",
       "home-screen",

@@ -31,3 +31,23 @@ export function swipeResultToward(direction: FoldDirection, open: boolean, dx: n
   if (direction === 'up') return swipeResult(open, -dy, -vy);
   return swipeResult(open, dy, vy);
 }
+
+/** A swipe this long (points) or fast (points per ms) the way a panel folds goes straight to Full Map. */
+export const FULL_SWIPE_DISTANCE = 150;
+export const FULL_SWIPE_VELOCITY = 1.6;
+
+/**
+ * What letting go does on a panel that can also enter Full Map (core/full-map): an ordinary swipe
+ * the way it folds folds it, a long or fast one (or any such swipe on a panel already folded)
+ * hides everything for the full-screen map, leaving the small Full Map bar to swipe back up.
+ * Sidebars (folding left) never enter Full Map.
+ */
+export function swipeAction(direction: FoldDirection, open: boolean, dx: number, dy: number, vx: number, vy: number): 'fold' | 'open' | 'full' | null {
+  const result = swipeResultToward(direction, open, dx, dy, vx, vy);
+  if (direction === 'left') return result;
+  const along = direction === 'up' ? -dy : dy;
+  const speed = direction === 'up' ? -vy : vy;
+  if (open && (along > FULL_SWIPE_DISTANCE || speed > FULL_SWIPE_VELOCITY)) return 'full';
+  if (!open && swipeResultToward(direction, true, dx, dy, vx, vy) === 'fold') return 'full';
+  return result;
+}

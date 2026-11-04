@@ -114,6 +114,12 @@ The lines come from:
 
 - **USDA Forest Service**: the Motor Vehicle Use Map roads and trails.
 - **Bureau of Land Management**: BLM routes.
+
+:::release 2.1
+BLM moved its route map to a new address in 2026, which kept BLM lines from showing for a while. From 2.1 they show again: motorized roads in white, motorized trails as amber dashes, and trails closed to motor vehicles as red dashes.
+
+Trail lines also show up faster when you zoom in. The Forest Service and BLM draw their lines on request, so the map now asks them for far fewer, bigger pieces at a time, and close in, Mapbox draws OpenStreetMap tracks and their names itself as you pinch, instead of waiting for the map to finish loading.
+:::
 - **OpenStreetMap**: tracks mapped by riders, including off-road parks, state land and county roads.
 
 :::until 1.0.2

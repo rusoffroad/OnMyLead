@@ -3027,6 +3027,9 @@ const dict: Record<string, string> = {
   'Rate trails so riders know what to expect': '评价路线，让骑手知道会遇到什么',
   'The rider who started OnMyLead': '创立 OnMyLead 的骑手',
   'Given by OnMyLead to the riders who represent it': '由 OnMyLead 授予代表它的骑手',
+  '3D Terrain': '3D 地形',
+  'Lays the map flat again': '将地图恢复为平面',
+  'Tilts the map and raises the mountains': '倾斜地图并立体显示山脉',
 };
 
 export default dict;

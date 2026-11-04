@@ -51,10 +51,10 @@ export default function RideWaypoints() {
   const wide = layout.expanded;
   const floating = layout.wide && !wide;
   // Swipe the panel down (or tap its handle) to fold it to its handle and see more map.
-  const fold = usePanelFold('waypoints.panelOpen.v1', true, wide ? 'up' : 'down');
   // Full Map: the top bar, layers and panel tuck away. Press and hold still drops a waypoint.
   const fullMap = useFullMap('waypoints.fullMap.v1');
   const full = fullMap.full;
+  const fold = usePanelFold('waypoints.panelOpen.v1', true, wide ? 'up' : 'down', true, fullMap.enter);
   const [ride, setRide] = useState<Ride | null>(null);
   const [members, setMembers] = useState<RideMember[]>([]);
   const [route, setRoute] = useState<RideRoute | null>(null);
