@@ -50,6 +50,10 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 From 2.1 a satellite map sits under **Search a Place or Address**, on every device. It opens near where you are. Tap it to drop the meeting point there, then drag the pin to fine-tune the spot. Searching a place, **Use My Current Location** and typed **Coordinates** move the pin too. (The map needs a signal; without one, set the point by search, location or coordinates as before.)
 :::
 
+:::release 2.1
+Found a park in [Scout](/help/scout)? Tap **Create a Ride Here** on its page: Create a Ride opens as a public ride with the meeting point and **Place Name** already set to the park. Move the pin if your group meets somewhere else, such as the park's gate or a gas station nearby.
+:::
+
 :::release 2.0
 Planning a rally or a ride weekend with several rides? That's an event, not one ride. Tap **Event or Public Ride?** at the top of Create a Ride to see the difference, or see [Events](/help/events).
 :::

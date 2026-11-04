@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import { EventOrRide } from '@/components/events/event-or-ride';
+import { spotFromParams } from '@/core/spots';
 import { ThemedText } from '@/components/themed-text';
 import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
@@ -46,7 +47,8 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  const { type, copy, trail, group, event } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string }>();
+  const { type, copy, trail, group, event, spot, lat, lng, state } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string }>();
+  const [fromSpot] = useState(() => (copy ? null : spotFromParams({ spot, lat, lng, state })));
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
@@ -56,8 +58,8 @@ export default function NewRide() {
   const [meetTime, setMeetTime] = useState('8:00 am');
   const [departTime, setDepartTime] = useState('');
   const [finishTime, setFinishTime] = useState('');
-  const [meetLabel, setMeetLabel] = useState('');
-  const [coords, setCoords] = useState('');
+  const [meetLabel, setMeetLabel] = useState(fromSpot?.name ?? '');
+  const [coords, setCoords] = useState(fromSpot ? `${fromSpot.lat.toFixed(5)}, ${fromSpot.lng.toFixed(5)}` : '');
   const [destination, setDestination] = useState('');
   const [vehicleTypes, setVehicleTypes] = useState<string[]>(['SXS/UTV']);
   const [difficulty, setDifficulty] = useState<string | null>(null);
@@ -71,7 +73,7 @@ export default function NewRide() {
   const [instructions, setInstructions] = useState('');
   const [kind, setKind] = useState<Kind | null>(type === 'public' || type === 'private' ? type : null);
   const [routePlan, setRoutePlan] = useState<RoutePlan | null>(null);
-  const [meetState, setMeetState] = useState<string | null>(null);
+  const [meetState, setMeetState] = useState<string | null>(fromSpot?.state ?? null);
   const [pickingState, setPickingState] = useState(false);
   const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>('open');
   const [bubble, setBubble] = useState<BubblePreset>('default');
@@ -86,6 +88,13 @@ export default function NewRide() {
   /** Ride Again: the ride this one copies, and its route, which comes along when the new ride is saved. */
   const [copiedFrom, setCopiedFrom] = useState<string | null>(null);
   const [copiedRoute, setCopiedRoute] = useState<RideRoute | null>(null);
+
+  // Create a Ride Here, from a Scout place page: the meeting point starts on the place (fields below).
+  useEffect(() => {
+    if (fromSpot && !fromSpot.state && !copy) stateAt(fromSpot).then(setMeetState).catch(() => {});
+    // Only the link the screen opened with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!copy) return;

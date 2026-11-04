@@ -8,6 +8,10 @@
     "google": null,
     "notes": [
       {
+        "kind": "new",
+        "text": "Scout: find places to ride. Tap Places to Ride at the top of the Find tab to see off-road parks, OHV areas, trail systems, trailheads and motocross tracks around you, 250 miles out to start; slide the distance anywhere from 10 to 1,000 miles. Filter by kind, tap a place for directions, its website and the public rides coming up there, or tap Create a Ride Here to start one with the meeting point already set. Places come from the Forest Service, BLM and OpenStreetMap, and you can suggest one we're missing. Also on onmylead.com."
+      },
+      {
         "kind": "improved",
         "text": "Every map in the app is now drawn by Mapbox: Ride Mode, Map Mode, the route builder, waypoints, Find a Ride and Offline Maps' area picker, on iPhone, iPad, Android and onmylead.com. A map looks and works the same wherever you open it, and the website's Ride Mode now shows the same live map as the phone. Free accounts get Mapbox's outdoors map with roads, trails and contours. The meeting-point map is on the phone and tablet too, a trail's page previews it on a real map, and in 3D Terrain tilting further raises the land."
       },

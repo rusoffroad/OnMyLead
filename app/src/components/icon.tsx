@@ -87,7 +87,27 @@ const PATHS = {
   theme: ['M12 3.5a8.5 8.5 0 0 1 0 17z'],
   // Tilt meter: a level base and a leaning arm over its scale.
   tilt: ['M3.5 18.5h17', 'M4.5 18.5a7.5 7.5 0 0 1 15 0', 'M12 18.5l4.6-6.2'],
+  // Scout's places to ride, one picture per kind of place.
+  // Off-road park: a ridge with a flag planted on its peak.
+  spotPark: ['M2.5 20.5L9 10l3.5 5.5 2.5-3.5 6.5 8.5z', 'M9 10V3.5', 'M9 3.5h5l-1.3 1.8L14 7H9'],
+  // OHV area: a quad from the side.
+  spotOhv: [
+    'M2.5 16.5a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0', 'M14.5 16.5a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0',
+    'M3 12.5c1-1.7 2.2-2.5 4-2.5h9.5c1.9 0 3.4.9 4.5 2.5', 'M8 10l1-2.5h4.5', 'M15.5 10l1.3-3.5H19',
+  ],
+  // Trail system: a winding trail that forks to a trail marker.
+  spotTrails: ['M7 21c0-3.5 5-4 5-7.5S7 9 7.5 3', 'M11.6 12.2c2.4-.5 4-1.6 5-3.6'],
+  // Trailhead: a signpost with two arrow boards.
+  spotTrailhead: ['M11 21V3.5', 'M11 5h7.5l2 2.25-2 2.25H11', 'M11 12.5H5.5l-2 2.25 2 2.25H11', 'M8 21h6'],
+  // Motocross track: a checkered flag.
+  spotTrack: ['M4.5 21.5V3.5', 'M4.5 3.5h16v11h-16z'],
 } as const;
+
+/** Solid parts drawn under an icon's lines (the trail marker, the flag's checks). */
+const FILLS: Partial<Record<keyof typeof PATHS, string[]>> = {
+  spotTrails: ['M17.5 4.2l2.6 2.6-2.6 2.6-2.6-2.6z'],
+  spotTrack: ['M4.5 3.5h5.3V9H4.5z', 'M15.2 3.5h5.3V9h-5.3z', 'M9.8 9h5.4v5.5H9.8z'],
+};
 
 export type IconName = keyof typeof PATHS;
 
@@ -98,6 +118,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
       {PATHS[name].map((d) => (
         <Path key={d} d={d} stroke={color} fill={fill ?? (name === 'theme' ? color : 'none')} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
       ))}
+      {FILLS[name]?.map((d) => <Path key={d} d={d} fill={color} stroke={color} strokeWidth={1} strokeLinejoin="round" />)}
       {name === 'pin' ? <Circle cx={12} cy={9.5} r={2.6} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'person' ? <Circle cx={12} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'addFriend' ? <Circle cx={10.5} cy={8} r={3.8} stroke={color} strokeWidth={strokeWidth} /> : null}
@@ -137,4 +158,14 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
       ) : null}
     </Svg>
   );
+}
+
+/**
+ * The same icon as SVG markup, for pins the website's map draws in HTML (Leaflet). Only for icons
+ * made of paths (the Scout place icons); circles drawn separately above aren't included.
+ */
+export function iconSvg(name: IconName, { size = 24, color = Colors.text, strokeWidth = 2 }: { size?: number; color?: string; strokeWidth?: number } = {}) {
+  const lines = PATHS[name].map((d) => `<path d="${d}" stroke="${color}" fill="none" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"/>`);
+  const fills = (FILLS[name] ?? []).map((d) => `<path d="${d}" fill="${color}" stroke="${color}" stroke-width="1" stroke-linejoin="round"/>`);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" aria-hidden="true">${lines.join('')}${fills.join('')}</svg>`;
 }
