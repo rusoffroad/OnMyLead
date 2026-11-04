@@ -2,12 +2,44 @@
   {
     "date": "2026-11-04",
     "slugs": [
-      "carplay"
+      "carplay",
+      "ride-mode",
+      "language",
+      "faq"
     ],
     "kind": "new",
     "by": "pr",
     "ref": "carplay",
     "why": "Apple granted OnMyLead the CarPlay Driving Task entitlement on 2026-11-04 after Chris asked for CarPlay in the next build. The CarPlay screen built in October is switched on for 2.1 and now speaks the rider's app language; this new article explains starting it, the buttons, alerts and what stays on the phone. It publishes when 2.1 is in the App Store."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "bluetooth-sharing",
+      "create-a-ride-on-the-website",
+      "directions",
+      "emergency-and-safety",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "garage",
+      "getting-started",
+      "location-sharing",
+      "manage-subscription",
+      "profile-picture",
+      "promo-codes",
+      "ride-bubble",
+      "ride-chat",
+      "status-buttons",
+      "subscribe-to-pro",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "carplay-touched",
+    "why": "The CarPlay change touches Ride Mode (car screen labels in the rider's language), app.json (CarPlay switched on) and the store listing (CarPlay note for App Review). Riders see no difference in these articles' screens, so they only get a new updated: date."
   },
   {
     "date": "2026-11-04",

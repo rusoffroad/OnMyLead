@@ -272,6 +272,12 @@ The bar also has **Controls**, with a badge counting any other alerts. Tap it, o
 
 :::release 2.0
 :::release 2.0
+:::release 2.1
+## On the Car Screen
+
+If your vehicle has Apple CarPlay, connect your iPhone and tap **OnMyLead** on the car screen while Ride Mode is open. You get big status buttons, your group and EMERGENCY on the dash. See [Use OnMyLead on CarPlay](/help/carplay).
+:::
+
 ## Control Your Music
 
 Tap the round **Music** button above **Center on Me** to pause, skip or change the volume of the music on your phone without leaving Ride Mode. See [Control Your Music While You Ride](/help/music-controls).
