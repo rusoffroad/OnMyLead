@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_MAP_FEATURES, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -295,6 +295,9 @@ export function Showcase() {
             </p>
             <ul className="ticks">
               <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
+              {SHOWCASE_MAP_FEATURES ? (
+                <li><b>Map Features.</b> Pick what the map shows: highways and paved roads in blue, dirt roads, street-legal-only roads, off-road trails, width-limited trails, and hiking trails in their own pink dash-dot so you never mistake one for a ride. Turn on national forests, BLM land, national and state parks, and Texas property lines, then tap the map to see whose land you’re on.</li>
+              ) : null}
               {SHOWCASE_3D_TERRAIN ? (
                 <li><b>3D Terrain.</b> One tap on the 3D button in Ride Mode and Map Mode shows satellite on the real shape of the ridges and canyons, with contour lines and peak heights in feet. Tilt and turn it, and save it in Offline Maps for no-signal riding.</li>
               ) : null}

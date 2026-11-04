@@ -17,7 +17,8 @@ const ROOT = new Directory(Paths.document, 'map-tiles');
 
 export type TileLayerId = OfflineLayer;
 
-export function tileCachePath(layer: TileLayerId): string {
+/** A layer's folder: an OfflineLayer, or an agency layer drawn for some Map Features only (its own folder, see useTrailMap agencyLayers). */
+export function tileCachePath(layer: TileLayerId | string): string {
   return new Directory(ROOT, layer).uri.replace(/\/+$/, '');
 }
 

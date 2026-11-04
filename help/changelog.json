@@ -2,6 +2,16 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "map-layers"
+    ],
+    "kind": "change",
+    "by": "pr",
+    "ref": "map-features",
+    "why": "Chris asked to mark public roads and highways in a different color from trails, give hiking trails their own color and look, and add a panel (not a copy of onX's layers) to turn map features on and off, including national forest, BLM, national and state park boundaries and private property lines. The map panel now has Map Features with Roads (highways, paved roads, dirt roads, street-legal-only roads), Trails (off-road, width-limited, hiking, closures, rider trails) and Land (national forests, BLM land, national parks, state parks, Texas property lines), and tapping the map with land on says whose land it is. Ships in 2.1, so the new text is in release 2.1 blocks."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "map-layers",
       "3d-terrain",
       "full-map",

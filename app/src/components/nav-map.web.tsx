@@ -180,10 +180,10 @@ function FlatNavMap({
   }, [measuring]);
 
   const riderLines = useMemo(() => trail.riderTrails.map((t) => t.points), [trail.riderTrails]);
-  const { base, trails, osmLines, closedLines, labels } = trail;
+  const { base, trails, agencyLayers, osmLines, closedLines, labels } = trail;
   useEffect(() => {
-    tracks.current?.update({ base, trails, osmLines, closedLines, labels, riderLines });
-  }, [base, trails, osmLines, closedLines, labels, riderLines]);
+    tracks.current?.update({ base, trails, agencyLayers, osmLines, closedLines, labels, riderLines });
+  }, [base, trails, agencyLayers, osmLines, closedLines, labels, riderLines]);
 
   useEffect(() => {
     const g = layer.current;

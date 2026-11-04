@@ -6,15 +6,12 @@ import { IMAGERY_MAX_NATIVE_Z, USGS_IMAGERY } from '@/core/offline-maps';
 import { font } from '@/constants/theme';
 import { RIDER_TRAIL_INK, type PublicTrail } from '@/core/nav-trails';
 import type { OsmTrail, TrailLabel } from '@/core/osm-trails';
-import {
-  TOPO_MAX_NATIVE_Z, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate, USGS_TOPO, type BaseMap, type ClosedLine,
-} from '@/core/trails';
+import { FEATURE_BY_ID } from '@/core/map-features';
+import { TOPO_MAX_NATIVE_Z, TRAIL_INK, USGS_TOPO, type BaseMap, type ClosedLine } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { TILE_MAX_AGE_S, tileCachePath } from '@/lib/trail-tiles';
 
 import { t as tr } from '@/lib/i18n';
-const TEMPLATES = Object.fromEntries(TRAIL_SOURCE_IDS.map((id) => [id, trailTileTemplate(TRAIL_SOURCES[id])]));
-
 /**
  * The topo base map and the public trails overlay, drawn as tiles inside a MapView. Put it first
  * among the map's children so routes and rider pins draw on top. Every tile seen is kept on the
@@ -26,7 +23,7 @@ const TEMPLATES = Object.fromEntries(TRAIL_SOURCE_IDS.map((id) => [id, trailTile
  * `base` overrides the rider's choice (Find a Ride is always satellite).
  */
 export function TrailTiles({ trail, base = trail.base }: { trail: TrailMap; base?: BaseMap }) {
-  const { trails, offline } = trail;
+  const { trails, offline, agencyLayers } = trail;
   return (
     <>
       {base !== 'topo' && offline ? (
@@ -49,19 +46,18 @@ export function TrailTiles({ trail, base = trail.base }: { trail: TrailMap; base
           zIndex={-2}
         />
       ) : null}
-      {trails
-        ? TRAIL_SOURCE_IDS.map((id) => (
-            <WMSTile
-              key={id}
-              urlTemplate={TEMPLATES[id]}
-              minimumZ={TRAILS_MIN_Z}
-              tileCachePath={tileCachePath(id)}
-              tileCacheMaxAge={TILE_MAX_AGE_S}
-              offlineMode={offline}
-              zIndex={-1}
-            />
-          ))
-        : null}
+      {/* Land under trails; each layer keeps its own saved squares (see useTrailMap agencyLayers). */}
+      {agencyLayers.map((a) => (
+        <WMSTile
+          key={a.key}
+          urlTemplate={a.template}
+          minimumZ={a.minZ}
+          tileCachePath={tileCachePath(a.key)}
+          tileCacheMaxAge={TILE_MAX_AGE_S}
+          offlineMode={offline}
+          zIndex={a.land ? -1.5 : -1}
+        />
+      ))}
       {trails && trail.osmLines.length ? <OsmLines lines={trail.osmLines} /> : null}
       {trails && trail.closedLines.length ? <ClosedLines lines={trail.closedLines} /> : null}
       {trails && trail.labels.length ? <Labels labels={trail.labels} /> : null}
@@ -81,8 +77,19 @@ const CLOSED_DASH = [5, 5];
  * Memoized on the line itself: Apple Maps takes a line off the map and puts it back on every prop
  * change, so redrawing unchanged lines on each pan or zoom made every trail flash.
  */
-const Cased = memo(function Cased({ part, closed }: { part: Part; closed: boolean }) {
+const HIKE = FEATURE_BY_ID.hiking.ink;
+
+const Cased = memo(function Cased({ part, closed, path }: { part: Part; closed: boolean; path?: boolean }) {
   const c = useMemo(() => coords(part), [part]);
+  if (path) {
+    // Hiking: thin pink dash-dots on a light casing, lighter than anything a vehicle uses.
+    return (
+      <>
+        <Polyline coordinates={c} strokeColor="rgba(10,22,38,0.6)" strokeWidth={HIKE.width + 1.6} zIndex={0} tappable={false} />
+        <Polyline coordinates={c} strokeColor={HIKE.color} strokeWidth={HIKE.width} lineDashPattern={HIKE.dash} zIndex={0} tappable={false} />
+      </>
+    );
+  }
   return (
     <>
       <Polyline coordinates={c} strokeColor={TRAIL_INK.casing} strokeWidth={6.5} zIndex={0} tappable={false} />
@@ -106,7 +113,7 @@ const Cased = memo(function Cased({ part, closed }: { part: Part; closed: boolea
 const OsmLines = memo(function OsmLines({ lines }: { lines: OsmTrail[] }) {
   return (
     <>
-      {lines.map((t) => t.parts.map((part, i) => <Cased key={`${t.key}-${i}`} part={part} closed={t.closed} />))}
+      {lines.map((t) => t.parts.map((part, i) => <Cased key={`${t.key}-${i}`} part={part} closed={t.closed} path={t.kind === 'path'} />))}
     </>
   );
 });
