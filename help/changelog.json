@@ -16,6 +16,31 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "create-a-ride-on-the-website",
+      "directions",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "group-chat",
+      "leader-sweep-and-tail-gunner",
+      "location-sharing",
+      "privacy",
+      "report-and-block",
+      "ride-bubble",
+      "ride-polls",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "bluetooth-mesh",
+    "why": "Checked against the Bluetooth mesh change: Ride Mode, the chat, the showcase and the outbox gained Bluetooth hooks (every tap and message also goes to nearby phones; a Via Bluetooth tag on messages heard phone to phone), and nothing these articles describe works differently."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "events"
     ],
     "kind": "add",
