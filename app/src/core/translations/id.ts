@@ -3034,19 +3034,6 @@ const dict: Record<string, string> = {
   '3D Terrain': 'Medan 3D',
   'Lays the map flat again': 'Mengembalikan peta menjadi datar',
   'Tilts the map and raises the mountains': 'Memiringkan peta dan menonjolkan pegunungan',
-<<<<<<< HEAD
-  // CarPlay
-  " (Leader)": " (Leader)",
-  "A rider is separated": "Seorang rider terpisah",
-  "Group Together": "Grup bersama",
-  "No Ride Running": "Tidak ada riding berjalan",
-  "Open Ride Mode on your phone and your group shows up here.": "Buka Mode Riding di ponselmu dan grupmu muncul di sini.",
-  "Group": "Grup",
-  "Nobody Is Sharing Yet": "Belum ada yang berbagi",
-  "Send EMERGENCY with your location to everyone on the ride?": "Kirim DARURAT dengan lokasimu ke semua orang di riding?",
-  "Running Late": "Terlambat",
-  "Need a Minute": "Butuh semenit",
-=======
   "Map Style and Features": "Gaya dan Fitur Peta",
   "Map Features": "Fitur Peta",
   "Hide All {group}": "Sembunyikan Semua: {group}",
@@ -3191,7 +3178,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "Jalur Taman di Peta",
   "Showing the trails of offroad parks, colored by the park’s level": "Menampilkan jalur taman offroad, diwarnai menurut tingkat taman",
   "Hidden. Offroad park trails stay off every map": "Disembunyikan. Jalur taman tidak muncul di peta mana pun",
->>>>>>> origin/main
+  // CarPlay
+  " (Leader)": " (Leader)",
+  "A rider is separated": "Seorang rider terpisah",
+  "Group Together": "Grup bersama",
+  "No Ride Running": "Tidak ada riding berjalan",
+  "Open Ride Mode on your phone and your group shows up here.": "Buka Mode Riding di ponselmu dan grupmu muncul di sini.",
+  "Group": "Grup",
+  "Nobody Is Sharing Yet": "Belum ada yang berbagi",
+  "Send EMERGENCY with your location to everyone on the ride?": "Kirim DARURAT dengan lokasimu ke semua orang di riding?",
+  "Running Late": "Terlambat",
+  "Need a Minute": "Butuh semenit",
 };
 
 export default dict;

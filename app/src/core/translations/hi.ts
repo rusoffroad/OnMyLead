@@ -3034,19 +3034,6 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D भूभाग',
   'Lays the map flat again': 'नक्शे को फिर से सपाट करता है',
   'Tilts the map and raises the mountains': 'नक्शे को झुकाता है और पहाड़ों को उभारता है',
-<<<<<<< HEAD
-  // CarPlay
-  " (Leader)": " (लीडर)",
-  "A rider is separated": "एक राइडर अलग हो गया है",
-  "Group Together": "ग्रुप साथ है",
-  "No Ride Running": "कोई राइड नहीं चल रही",
-  "Open Ride Mode on your phone and your group shows up here.": "अपने फ़ोन पर राइड मोड खोलें और आपका ग्रुप यहाँ दिखेगा।",
-  "Group": "ग्रुप",
-  "Nobody Is Sharing Yet": "अभी कोई शेयर नहीं कर रहा",
-  "Send EMERGENCY with your location to everyone on the ride?": "राइड पर सभी को अपनी लोकेशन के साथ EMERGENCY भेजें?",
-  "Running Late": "देर हो रही है",
-  "Need a Minute": "एक मिनट चाहिए",
-=======
   "Map Style and Features": "मानचित्र शैली और फ़ीचर",
   "Map Features": "मानचित्र फ़ीचर",
   "Hide All {group}": "सभी छिपाएँ: {group}",
@@ -3191,7 +3178,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "नक्शों पर पार्क ट्रेल",
   "Showing the trails of offroad parks, colored by the park’s level": "ऑफरोड पार्कों के ट्रेल दिखा रहा है, पार्क के स्तर के रंग में",
   "Hidden. Offroad park trails stay off every map": "छिपे हुए। पार्क ट्रेल किसी भी नक्शे पर नहीं दिखते",
->>>>>>> origin/main
+  // CarPlay
+  " (Leader)": " (लीडर)",
+  "A rider is separated": "एक राइडर अलग हो गया है",
+  "Group Together": "ग्रुप साथ है",
+  "No Ride Running": "कोई राइड नहीं चल रही",
+  "Open Ride Mode on your phone and your group shows up here.": "अपने फ़ोन पर राइड मोड खोलें और आपका ग्रुप यहाँ दिखेगा।",
+  "Group": "ग्रुप",
+  "Nobody Is Sharing Yet": "अभी कोई शेयर नहीं कर रहा",
+  "Send EMERGENCY with your location to everyone on the ride?": "राइड पर सभी को अपनी लोकेशन के साथ EMERGENCY भेजें?",
+  "Running Late": "देर हो रही है",
+  "Need a Minute": "एक मिनट चाहिए",
 };
 
 export default dict;

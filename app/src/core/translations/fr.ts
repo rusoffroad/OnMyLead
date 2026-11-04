@@ -3034,19 +3034,6 @@ const dict: Record<string, string> = {
   '3D Terrain': 'Terrain 3D',
   'Lays the map flat again': 'Remet la carte à plat',
   'Tilts the map and raises the mountains': 'Incline la carte et fait ressortir les montagnes',
-<<<<<<< HEAD
-  // CarPlay
-  " (Leader)": " (leader)",
-  "A rider is separated": "Un pilote est séparé",
-  "Group Together": "Groupe réuni",
-  "No Ride Running": "Aucune balade en cours",
-  "Open Ride Mode on your phone and your group shows up here.": "Ouvre le Mode Balade sur ton téléphone et ton groupe apparaîtra ici.",
-  "Group": "Groupe",
-  "Nobody Is Sharing Yet": "Personne ne partage encore",
-  "Send EMERGENCY with your location to everyone on the ride?": "Envoyer une URGENCE avec ta position à tous les participants ?",
-  "Running Late": "En retard",
-  "Need a Minute": "Une minute",
-=======
   "Map Style and Features": "Style et éléments de la carte",
   "Map Features": "Éléments de la carte",
   "Hide All {group}": "Tout masquer : {group}",
@@ -3191,7 +3178,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "Pistes des parcs sur les cartes",
   "Showing the trails of offroad parks, colored by the park’s level": "Affiche les pistes des parcs tout-terrain, colorées selon le niveau du parc",
   "Hidden. Offroad park trails stay off every map": "Masquées. Les pistes des parcs n’apparaissent sur aucune carte",
->>>>>>> origin/main
+  // CarPlay
+  " (Leader)": " (leader)",
+  "A rider is separated": "Un pilote est séparé",
+  "Group Together": "Groupe réuni",
+  "No Ride Running": "Aucune balade en cours",
+  "Open Ride Mode on your phone and your group shows up here.": "Ouvre le Mode Balade sur ton téléphone et ton groupe apparaîtra ici.",
+  "Group": "Groupe",
+  "Nobody Is Sharing Yet": "Personne ne partage encore",
+  "Send EMERGENCY with your location to everyone on the ride?": "Envoyer une URGENCE avec ta position à tous les participants ?",
+  "Running Late": "En retard",
+  "Need a Minute": "Une minute",
 };
 
 export default dict;

@@ -3034,19 +3034,6 @@ const dict: Record<string, string> = {
   '3D Terrain': 'Terreno 3D',
   'Lays the map flat again': 'Deixa o mapa plano de novo',
   'Tilts the map and raises the mountains': 'Inclina o mapa e eleva as montanhas',
-<<<<<<< HEAD
-  // CarPlay
-  " (Leader)": " (líder)",
-  "A rider is separated": "Um piloto se separou",
-  "Group Together": "Grupo junto",
-  "No Ride Running": "Nenhum passeio em andamento",
-  "Open Ride Mode on your phone and your group shows up here.": "Abra o Modo Passeio no seu celular e seu grupo aparece aqui.",
-  "Group": "Grupo",
-  "Nobody Is Sharing Yet": "Ninguém compartilhando ainda",
-  "Send EMERGENCY with your location to everyone on the ride?": "Enviar EMERGÊNCIA com sua localização para todos no passeio?",
-  "Running Late": "Vou atrasar",
-  "Need a Minute": "Preciso de um minuto",
-=======
   "Map Style and Features": "Estilo e elementos do mapa",
   "Map Features": "Elementos do mapa",
   "Hide All {group}": "Ocultar tudo: {group}",
@@ -3191,7 +3178,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "Trilhas de parques nos mapas",
   "Showing the trails of offroad parks, colored by the park’s level": "Mostrando as trilhas dos parques off-road, coloridas pelo nível do parque",
   "Hidden. Offroad park trails stay off every map": "Ocultas. As trilhas de parques ficam fora de todos os mapas",
->>>>>>> origin/main
+  // CarPlay
+  " (Leader)": " (líder)",
+  "A rider is separated": "Um piloto se separou",
+  "Group Together": "Grupo junto",
+  "No Ride Running": "Nenhum passeio em andamento",
+  "Open Ride Mode on your phone and your group shows up here.": "Abra o Modo Passeio no seu celular e seu grupo aparece aqui.",
+  "Group": "Grupo",
+  "Nobody Is Sharing Yet": "Ninguém compartilhando ainda",
+  "Send EMERGENCY with your location to everyone on the ride?": "Enviar EMERGÊNCIA com sua localização para todos no passeio?",
+  "Running Late": "Vou atrasar",
+  "Need a Minute": "Preciso de um minuto",
 };
 
 export default dict;

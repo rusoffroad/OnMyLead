@@ -3034,19 +3034,6 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D地形',
   'Lays the map flat again': '地図を平面に戻します',
   'Tilts the map and raises the mountains': '地図を傾けて山を立体的に表示します',
-<<<<<<< HEAD
-  // CarPlay
-  " (Leader)": "（リーダー）",
-  "A rider is separated": "はぐれたライダーがいます",
-  "Group Together": "グループはまとまっています",
-  "No Ride Running": "ライド中ではありません",
-  "Open Ride Mode on your phone and your group shows up here.": "スマートフォンでライドモードを開くと、ここにグループが表示されます。",
-  "Group": "グループ",
-  "Nobody Is Sharing Yet": "まだ誰も共有していません",
-  "Send EMERGENCY with your location to everyone on the ride?": "ライドの全員に位置情報付きで緊急通知を送りますか？",
-  "Running Late": "遅れます",
-  "Need a Minute": "少し待って",
-=======
   "Map Style and Features": "地図スタイルと表示項目",
   "Map Features": "地図の表示項目",
   "Hide All {group}": "すべて非表示：{group}",
@@ -3191,7 +3178,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "地図にパークトレイルを表示",
   "Showing the trails of offroad parks, colored by the park’s level": "オフロードパークのトレイルを、パークのレベルごとに色分けして表示しています",
   "Hidden. Offroad park trails stay off every map": "非表示。パークトレイルはどの地図にも表示されません",
->>>>>>> origin/main
+  // CarPlay
+  " (Leader)": "（リーダー）",
+  "A rider is separated": "はぐれたライダーがいます",
+  "Group Together": "グループはまとまっています",
+  "No Ride Running": "ライド中ではありません",
+  "Open Ride Mode on your phone and your group shows up here.": "スマートフォンでライドモードを開くと、ここにグループが表示されます。",
+  "Group": "グループ",
+  "Nobody Is Sharing Yet": "まだ誰も共有していません",
+  "Send EMERGENCY with your location to everyone on the ride?": "ライドの全員に位置情報付きで緊急通知を送りますか？",
+  "Running Late": "遅れます",
+  "Need a Minute": "少し待って",
 };
 
 export default dict;

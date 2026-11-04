@@ -3034,19 +3034,6 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D 地形',
   'Lays the map flat again': '将地图恢复为平面',
   'Tilts the map and raises the mountains': '倾斜地图并立体显示山脉',
-<<<<<<< HEAD
-  // CarPlay
-  " (Leader)": "（领队）",
-  "A rider is separated": "有骑手掉队了",
-  "Group Together": "队伍在一起",
-  "No Ride Running": "没有进行中的骑行",
-  "Open Ride Mode on your phone and your group shows up here.": "在手机上打开骑行模式，你的队伍会显示在这里。",
-  "Group": "队伍",
-  "Nobody Is Sharing Yet": "还没有人共享",
-  "Send EMERGENCY with your location to everyone on the ride?": "向本次骑行的所有人发送带你位置的紧急求助？",
-  "Running Late": "我会迟到",
-  "Need a Minute": "等我一下",
-=======
   "Map Style and Features": "地图样式和要素",
   "Map Features": "地图要素",
   "Hide All {group}": "全部隐藏：{group}",
@@ -3191,7 +3178,17 @@ const dict: Record<string, string> = {
   "Park Trails on Maps": "在地图上显示公园赛道",
   "Showing the trails of offroad parks, colored by the park’s level": "显示越野公园的赛道，按公园等级着色",
   "Hidden. Offroad park trails stay off every map": "已隐藏。公园赛道不会出现在任何地图上",
->>>>>>> origin/main
+  // CarPlay
+  " (Leader)": "（领队）",
+  "A rider is separated": "有骑手掉队了",
+  "Group Together": "队伍在一起",
+  "No Ride Running": "没有进行中的骑行",
+  "Open Ride Mode on your phone and your group shows up here.": "在手机上打开骑行模式，你的队伍会显示在这里。",
+  "Group": "队伍",
+  "Nobody Is Sharing Yet": "还没有人共享",
+  "Send EMERGENCY with your location to everyone on the ride?": "向本次骑行的所有人发送带你位置的紧急求助？",
+  "Running Late": "我会迟到",
+  "Need a Minute": "等我一下",
 };
 
 export default dict;
