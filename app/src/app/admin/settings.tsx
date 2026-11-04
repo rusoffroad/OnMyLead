@@ -7,7 +7,7 @@ import {
 } from '@/components/admin';
 import { font, themedStyles } from '@/constants/theme';
 import { fmtDateTime } from '@/core/admin-format';
-import { APP_FLAG_KEYS, APP_FLAGS } from '@/core/app-settings';
+import { APP_FLAG_KEYS, APP_FLAGS, flagOffUntilSet, type AppFlag } from '@/core/app-settings';
 import * as admin from '@/lib/admin';
 
 const FEATURES: Record<string, { label: string; hint: string; allowance?: string; allowanceOnFree?: boolean }> = {
@@ -197,6 +197,8 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
   const toast = useToast();
   const confirm = useConfirm();
   const keys = Object.keys(flags).filter((k) => !(k in APP_FLAGS)).sort();
+  // Most flags are on until switched off; a flag that needs setup first is off until switched on.
+  const isOn = (k: AppFlag) => (flagOffUntilSet(k) ? flags[k] === true : flags[k] !== false);
   const changed = JSON.stringify(flags) !== JSON.stringify(value);
   const newKey = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 
@@ -217,15 +219,15 @@ function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: ()
 
   return (
     <View style={{ gap: 10 }}>
-      <Text style={styles.small}>Switch an extra off for everyone without an app update. Everything stays on unless you switch it off here. Safety features (Ride Mode, Help and SOS, Mechanical Issue, sharing, chat and joining) have no switch.</Text>
+      <Text style={styles.small}>Switch an extra off for everyone without an app update. Everything stays on unless you switch it off here, except a feature that needs setting up first, which stays off until you switch it on. Safety features (Ride Mode, Help and SOS, Mechanical Issue, sharing, chat and joining) have no switch.</Text>
       {APP_FLAG_KEYS.map((k) => (
         <View key={k} style={styles.flag}>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.label}>{APP_FLAGS[k].label}</Text>
             <Text style={styles.small}>{APP_FLAGS[k].hint}</Text>
           </View>
-          <Text style={[styles.small, { color: flags[k] === false ? AdminColors.danger : AdminColors.dim }]}>{flags[k] === false ? 'Off' : 'On'}</Text>
-          <Switch value={flags[k] !== false} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={APP_FLAGS[k].label} />
+          <Text style={[styles.small, { color: !isOn(k) ? AdminColors.danger : AdminColors.dim }]}>{isOn(k) ? 'On' : 'Off'}</Text>
+          <Switch value={isOn(k)} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={APP_FLAGS[k].label} />
         </View>
       ))}
       {keys.length ? <Text style={[styles.label, { paddingTop: 6 }]}>Other Flags</Text> : null}

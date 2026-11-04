@@ -3,10 +3,22 @@
     "version": "2.1",
     "title": "3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead.",
-    "whatsNew": "What's new in 2.1:\n\n• Bluetooth Sharing: with no service, riders on your ride still get your spot, status taps, EMERGENCY and messages, phone to phone, passed along the group.\n• Your tap card says whose phone got it over Bluetooth and who saw it.\n• The first phone to get signal sends what it heard.\n• Badge Leaderboard: see where you rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, with contours and peak heights. Save it in Offline Maps too.",
+    "whatsNew": "What's new in 2.1:\n\n• Edit Ride Details: change the time, meeting point and details later.\n• Bluetooth Sharing: no service? Riders on your ride still get your spot, taps, EMERGENCY and messages, phone to phone, passed along the group. Your tap card says who got it.\n• Badge Leaderboard: your rank everywhere, in your country or state.\n• 3D Terrain: satellite on the real shape of the land, offline too.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Edit Ride Details: the organizer or a co-organizer can change a ride's name, day, times, meeting point and details after creating it, from the ride page on the app and onmylead.com. Everyone on the ride gets a notification about a new time or meeting point, and the ride page shows what changed for a week. Once the ride is live, the day, times and meeting point are locked and the rest can still change."
+      },
+      {
+        "kind": "new",
+        "text": "Continue with Apple on Android and at onmylead.com, through Apple's web sign-in, once it's switched on. It signs you into the same account as Apple on your iPhone."
+      },
+      {
+        "kind": "new",
+        "text": "Presented by RUS Offroad: events that RUS Offroad presents show it in gold on their card and page, with a Shop RUS Offroad button."
+      },
       {
         "kind": "new",
         "text": "Bluetooth Sharing: when there's no cell service, Ride Mode passes your spot (while you're sharing with the ride), your status taps, EMERGENCY, quick replies and typed messages to nearby riders on the same ride over Bluetooth, about 100 to 300 feet between phones, and every phone passes along what it hears, up to six phones down the line, so the back of the group can reach the front. Phones that get a newer spot for any rider pass that on too, and a phone with signal shares what OnMyLead knows with the riders near it that have none. The card under your tap says whose phone got it over Bluetooth and who has seen it, even while it waits for signal. Messages heard over Bluetooth show in chat marked Via Bluetooth. When any phone on the ride gets signal, it sends what it heard so everyone else sees it too. Everything is encrypted for your ride only, and the radio idles when you have service and nobody is in range. Turn it off any time on the You tab."

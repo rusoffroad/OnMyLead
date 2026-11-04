@@ -316,6 +316,7 @@ const dict: Record<string, string> = {
   "Bluetooth Sharing": "Condivisione Bluetooth",
   "With no service, Ride Mode passes spots and alerts to nearby riders on your ride": "Senza campo, la Modalità Uscita passa posizioni e avvisi ai rider vicini della tua uscita",
   "Off. Turn it on to keep sharing with nearby riders when there is no service": "Disattivata. Attivala per continuare a condividere con i rider vicini quando non c’è campo",
+  "Edit Ride Details": "Modifica i dettagli dell’uscita",
 };
 
 export default dict;

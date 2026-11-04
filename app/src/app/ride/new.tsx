@@ -19,6 +19,7 @@ import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
 import type { RideRoute } from '@/core/route';
 import { trailAsRoute } from '@/core/nav-trails';
+import { VEHICLE_TYPES } from '@/core/ride-edit';
 import { inches } from '@/core/trail-width';
 import { RigFitLine, WidthIcon } from '@/components/trail-width-row';
 import { useGarageWidths } from '@/lib/trail-width';
@@ -36,7 +37,6 @@ import { useSession } from '@/lib/session';
 import { handleProError, requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
 
-const VEHICLE_TYPES = ['SXS/UTV', 'ATV', 'Dirt Bike', 'Motorcycle', 'Jeep/4x4', 'Truck', 'Overland Rig', 'Snowmobile', 'Car'];
 
 const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : null);
 

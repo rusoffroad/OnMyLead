@@ -6,6 +6,7 @@ order: 10
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - app/src/core/app-settings.ts
   - app/src/app/sign-in.tsx
   - app/src/app/reset-password.tsx
   - app/src/app/auth-callback.tsx
@@ -42,7 +43,7 @@ Depending on what's turned on, you'll see **Continue with Apple**, **Continue wi
 With Apple, the name on your Apple Account is used as your ride name the first time you sign in, if Apple shares it. You can change it any time. See [Your Ride Name and Profile](/help/ride-name-and-profile).
 
 :::note
-On the website, **Continue with Apple** may not be there. Use Apple in the iPhone app, or sign in on the website another way.
+On the website and on Android, **Continue with Apple** uses Apple's web sign-in: the page goes to Apple and comes straight back. It's only there when it's been switched on; if you don't see it, use Apple in the iPhone app or sign in another way. The Android app needs version 2.1 or later for it.
 :::
 
 ## Create an Account With Email and a Password
