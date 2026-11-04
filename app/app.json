@@ -305,7 +305,8 @@
           "color": "#E5262E",
           "defaultChannel": "ride-updates"
         }
-      ]
+      ],
+      "@rnmapbox/maps"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -113,6 +113,10 @@ To look around, drag or pinch the map. It pauses (the button shows **Paused**) u
 The screen stays on while Navigate is open.
 
 :::release 2.0
+:::release 2.1
+Pick **3D Terrain** under **Map Style** to explore on the real shape of the land, with contour lines and peak heights. Recording, Track Line and the distance finder work the same in 3D. See [3D Terrain](/help/3d-terrain).
+:::
+
 ## Track Line
 
 **Track Line** draws exactly where you've been, in a different color each day, so today's line is easy to tell from yesterday's: today is red, yesterday blue, and older days gold and other colors. It keeps the last 7 days.

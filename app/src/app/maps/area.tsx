@@ -10,7 +10,7 @@ import { PanelHandle } from '@/components/panel-handle';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button } from '@/components/ui';
 import { Colors, font, Radius, themedStyles } from '@/constants/theme';
-import { formatBoxMiles, formatBytes, OFFLINE_CHOICES, type OfflineChoice } from '@/core/offline-maps';
+import { formatBoxMiles, formatBytes, offlineChoices, type OfflineChoice } from '@/core/offline-maps';
 import type { Box } from '@/core/trails';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useTrailMap } from '@/hooks/use-trail-map';
@@ -25,7 +25,11 @@ export default function PickArea() {
   const trail = useTrailMap();
   const [start, setStart] = useState<{ lat: number; lng: number } | null | undefined>(undefined);
   const [box, setBox] = useState<Box | null>(null);
-  const [choices, setChoices] = useState<OfflineChoice[]>(OFFLINE_CHOICES.map((c) => c.id));
+  const [flat, setFlat] = useState<OfflineChoice[]>(['satellite', 'topo', 'trails']);
+  // 3D Terrain is a big download, so it starts ticked only for riders who ride with the 3D map.
+  const [terrainTicked, setTerrainTicked] = useState<boolean | null>(null);
+  const terrainOn = trail.terrainAvailable && (terrainTicked ?? trail.base === 'terrain');
+  const choices = useMemo<OfflineChoice[]>(() => (terrainOn ? [...flat, 'terrain'] : flat), [flat, terrainOn]);
   const [panelH, setPanelH] = useState(300);
   const [starting, setStarting] = useState(false);
   // Swipe the panel down (or tap its handle) to fold the choices away: the frame grows into the room.
@@ -43,7 +47,8 @@ export default function PickArea() {
   const plan = useMemo(() => (box && choices.length ? planArea(box, choices) : null), [box, choices]);
   const tooBig = !!plan && plan.tooBig.length > 0;
 
-  const toggle = (id: OfflineChoice) => setChoices((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c, id]));
+  const toggle = (id: OfflineChoice) =>
+    id === 'terrain' ? setTerrainTicked(!terrainOn) : setFlat((c) => (c.includes(id) ? c.filter((x) => x !== id) : [...c, id]));
 
   const download = async () => {
     if (!box || !plan || tooBig) return;
@@ -105,7 +110,7 @@ export default function PickArea() {
         {fold.open ? <Text style={styles.hint}>Move and zoom the map until the frame holds the area you’ll ride.</Text> : null}
         {fold.open ? (
           <View style={styles.chips} accessibilityRole="none">
-            {OFFLINE_CHOICES.map((c) => {
+            {offlineChoices(trail.terrainAvailable).map((c) => {
               const on = choices.includes(c.id);
               return (
                 <Pressable

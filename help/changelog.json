@@ -16,6 +16,45 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "3d-terrain",
+      "map-layers",
+      "offline-maps",
+      "ride-mode",
+      "navigation-mode",
+      "troubleshooting"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "3d-terrain",
+    "why": "New 3D Terrain map style for Ride Mode and Map Mode (Chris asked for an onX-style 3D topo view, without copying onX): Mapbox satellite on raised ground with contour lines and peak heights in feet, plus 3D Terrain in Offline Maps downloads. Publishes with the 2.1 update. Like the other map styles, 3D Terrain is a Pro feature."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "faq",
+      "follow-me",
+      "full-map",
+      "garage",
+      "getting-started",
+      "pro-trial",
+      "profile-picture",
+      "ride-bubble",
+      "route-builder",
+      "rus-gear",
+      "subscribe-to-pro",
+      "sync-across-devices",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "3d-terrain",
+    "why": "Checked against the 3D Terrain change (brought up to date with 2.0): the flat maps, Follow Me, Full Map, Ride Bubble, the route builder, syncing across devices, the website showcase (its new line stays off until 2.1 is live), prices and app settings work the same for riders, so these articles stay as they are."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "accurate-location",
       "bluetooth-sharing",
       "fuel-range",
