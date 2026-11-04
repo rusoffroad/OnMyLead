@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { ThemedText } from '@/components/themed-text';
@@ -9,8 +9,9 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { MapboxMap, MapboxMarker, type MapboxMapHandle } from './mapbox-map';
 
 /**
- * Create a Ride on the website, on Mapbox: click the satellite map to drop the meeting point, drag
- * the pin to fine-tune it. Searching a place or typing coordinates moves the pin here too.
+ * The meeting-point map on Mapbox (Create a Ride and Create an Event, every device): tap or click
+ * the satellite map to drop the meeting point, drag the pin to fine-tune it. Searching a place or
+ * typing coordinates moves the pin here too.
  */
 export function MeetPointMapboxMap({ value, onPick, trail }: { value: LatLng | null; onPick: (p: LatLng) => void; trail: TrailMap }) {
   const map = useRef<MapboxMapHandle>(null);
@@ -54,7 +55,7 @@ export function MeetPointMapboxMap({ value, onPick, trail }: { value: LatLng | n
         </MapboxMap>
       </View>
       <ThemedText type="small" themeColor="textSecondary">
-        {value ? 'Drag the pin to fine-tune the spot.' : 'Click the map to drop the meeting point, or search above.'}
+        {value ? 'Drag the pin to fine-tune the spot.' : `${Platform.OS === 'web' ? 'Click' : 'Tap'} the map to drop the meeting point, or search above.`}
       </ThemedText>
     </View>
   );

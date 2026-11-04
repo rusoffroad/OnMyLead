@@ -10,12 +10,14 @@
       "create-a-ride-on-the-website",
       "offline-maps",
       "ride-mode",
-      "navigation-mode"
+      "navigation-mode",
+      "create-a-ride",
+      "events"
     ],
     "kind": "update",
     "by": "pr",
     "ref": "mapbox-maps",
-    "why": "Chris (2026-11-04): \"lets just do the full mapbox integration now\". From 2.1 every map (Ride Mode, Map Mode, route builder, waypoints, Find a Ride, area picker, the website's meeting point) is drawn by Mapbox on every device, the website's Ride Mode gets a live map, Free riders get Mapbox's outdoors map, and the 2.0 maps stay as the fallback with no token, with the Mapbox Maps switch off, or with no signal outside a saved pack."
+    "why": "Chris (2026-11-04): \"lets just do the full mapbox integration now\". From 2.1 every map (Ride Mode, Map Mode, route builder, waypoints, Find a Ride, area picker, the website's meeting point) is drawn by Mapbox on every device, the website's Ride Mode gets a live map, Free riders get Mapbox's outdoors map, and the 2.0 maps stay as the fallback with no token, with the Mapbox Maps switch off, or with no signal outside a saved pack. Chris (2026-11-04): \"when you use two fingers to move on any map when in 3d mode it will exaggerate the steepness of the terrain. Also make the main map use the map box also on any map\": tilting further raises the terrain on every 3D map, and the last maps follow: the meeting-point map on the phone and tablet (Create a Ride, Create an Event) and the trail preview on a trail's page."
   },
   {
     "date": "2026-11-04",

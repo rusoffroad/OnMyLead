@@ -7,7 +7,8 @@ import {
 import {
   cameraPadding, circlePolygon, feetLabel, fitCorners, flatLook, insideBox, linesGeoJSON, lookFor, lookPitch, mapboxDraws, mapboxStyleFor,
   mapboxTileTemplate, mapboxZoomFor, metersPerPointAt, metersToFeet, OUTDOORS_STYLE_URL, packBounds, packName, pointsGeoJSON,
-  regionFromCamera, TERRAIN_IDS, TERRAIN_SOURCES, TERRAIN_STYLE_URL, terrainLayers, terrainShows, tightPoints, TOPO_RASTER_SOURCE,
+  regionFromCamera, TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_PITCH, TERRAIN_SOURCES, TERRAIN_STYLE_URL, terrainExaggeration, terrainLayers,
+  terrainShows, tightPoints, TOPO_RASTER_SOURCE,
   trailZoomFromMapbox,
 } from '../terrain';
 import { mapZoom, TRAIL_SOURCES, trailTileTemplate } from '../trails';
@@ -227,5 +228,23 @@ describe('map looks', () => {
     expect(pts[0]).toEqual(pts[64]);
     // 25 miles north of the center is about 0.36 degrees of latitude.
     expect(Math.max(...pts.map((p) => p[1])) - 38.6).toBeCloseTo(0.361, 2);
+  });
+});
+
+describe('terrainExaggeration', () => {
+  it('is true to life looking straight down and the usual 1.5x where 3D Terrain opens', () => {
+    expect(terrainExaggeration(0)).toBe(1);
+    expect(terrainExaggeration(TERRAIN_PITCH)).toBe(TERRAIN_EXAGGERATION);
+  });
+  it('grows to 3x as a two-finger drag tilts the map to its limit, and no further', () => {
+    expect(terrainExaggeration(TERRAIN_MAX_PITCH)).toBe(3);
+    expect(terrainExaggeration(89)).toBe(3);
+    expect(terrainExaggeration(-5)).toBe(1);
+    const mid = terrainExaggeration((TERRAIN_PITCH + TERRAIN_MAX_PITCH) / 2);
+    expect(mid).toBeGreaterThan(TERRAIN_EXAGGERATION);
+    expect(mid).toBeLessThan(3);
+  });
+  it('moves in steps of 0.05 so a map is not redrawn for every fraction of a degree', () => {
+    expect(terrainExaggeration(31) * 20).toBe(Math.round(terrainExaggeration(31) * 20));
   });
 });

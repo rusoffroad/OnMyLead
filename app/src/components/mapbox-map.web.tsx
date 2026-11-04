@@ -8,7 +8,7 @@ import type { LatLng } from '@/core/geo';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import {
   cameraPadding, EMPTY_LINES, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON,
-  regionFromCamera, TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_SOURCES, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE,
+  regionFromCamera, TERRAIN_IDS, TERRAIN_MAX_PITCH, TERRAIN_SOURCES, terrainExaggeration, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE,
   TOPO_SOURCE_ID, trailZoomFromMapbox, type MapLook,
 } from '@/core/terrain';
 import { TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate } from '@/core/trails';
@@ -37,7 +37,7 @@ const CLOSED_DASH = [5 / 3.2, 5 / 3.2];
 function addLayers(m: MapboxMap_, look: MapLook) {
   if (look === 'terrain') {
     for (const [id, src] of Object.entries(TERRAIN_SOURCES)) m.addSource(id, src as never);
-    m.setTerrain({ source: TERRAIN_IDS.dem, exaggeration: TERRAIN_EXAGGERATION });
+    m.setTerrain({ source: TERRAIN_IDS.dem, exaggeration: terrainExaggeration(m.getPitch()) });
     m.setFog({ color: '#9DB8D6', 'high-color': '#24466F', 'horizon-blend': 0.08, 'space-color': Colors.background, 'star-intensity': 0 } as never);
     for (const l of terrainLayers()) m.addLayer(l as never);
   }
@@ -68,11 +68,12 @@ const TRAIL_LAYER_IDS = ['oml-tracks-case', 'oml-tracks-open', 'oml-tracks-close
 
 /**
  * The Mapbox map on the website (mapbox-gl), the same picture and the same props as the apps'
- * (mapbox-map.tsx). Drag pans, scroll zooms; in 3D Terrain, right-drag or Ctrl-drag turns and tilts.
+ * (mapbox-map.tsx). Drag pans, scroll zooms; in 3D Terrain, right-drag or Ctrl-drag (two fingers on a
+ * touch screen) turns and tilts, and the further it tilts the more the terrain is raised.
  */
 export function MapboxMap({
-  trail, look, tilt, rotate = true, compass = true, scaleBar = false, initial, lines, fills, onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle,
-  children, ref,
+  trail, look, tilt, rotate = true, compass = true, scaleBar = false, interactive = true, initial, lines, fills, onPress, onLongPress, onUserMove, onReady, onCamera,
+  onOwnFix, onIdle, children, ref,
 }: {
   trail: TrailMap;
   look?: MapLook;
@@ -80,6 +81,8 @@ export function MapboxMap({
   rotate?: boolean;
   compass?: boolean;
   scaleBar?: boolean;
+  /** Off: a still map that ignores the mouse (no pan, zoom, tilt or clicks). */
+  interactive?: boolean;
   initial?: { center: LatLng; zoom?: number } | null;
   lines?: MapLine[];
   fills?: MapFill[];
@@ -120,6 +123,7 @@ export function MapboxMap({
         pitch: lookPitch(lookRef.current),
         maxPitch: TERRAIN_MAX_PITCH,
         attributionControl: true,
+        interactive,
       });
       made = m;
       // Bottom left: the top right holds the app's own layers button.
@@ -145,6 +149,15 @@ export function MapboxMap({
       m.on('zoomstart', userMove);
       m.on('rotatestart', userMove);
       m.on('pitchstart', userMove);
+      // Tilting further raises the terrain (only while 3D Terrain is on the map).
+      let exaggeration = 0;
+      m.on('pitch', () => {
+        if (!m.getTerrain()) return;
+        const ex = terrainExaggeration(m.getPitch());
+        if (ex === exaggeration) return;
+        exaggeration = ex;
+        m.setTerrain({ source: TERRAIN_IDS.dem, exaggeration: ex });
+      });
       let heading = 0;
       m.on('rotate', () => {
         const h = Math.round(((m.getBearing() + 360) % 360) / 5) * 5 % 360;
@@ -194,7 +207,7 @@ export function MapboxMap({
       map.setStyle(mapboxStyleFor(shown));
       map.easeTo({ pitch: lookPitch(shown), duration: 600 });
     }
-    if (tilts) {
+    if (tilts && interactive) {
       map.setMaxPitch(TERRAIN_MAX_PITCH);
       map.touchPitch.enable();
     } else {
@@ -209,7 +222,7 @@ export function MapboxMap({
       map.dragRotate.disable();
       map.touchZoomRotate.disableRotation();
     }
-  }, [map, shown, tilts, rotate]);
+  }, [map, shown, tilts, rotate, interactive]);
 
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {

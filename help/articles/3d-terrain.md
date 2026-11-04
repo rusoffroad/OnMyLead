@@ -35,11 +35,11 @@ To go back, tap **Satellite** or **Topo**.
 
 ## Move Around in 3D
 
-- **Tilt**: drag up or down with two fingers.
+- **Tilt**: drag up or down with two fingers. The further you tilt, the steeper the land is drawn: looking straight down it's true to life, and at the steepest tilt hills and canyons stand up to three times their real height, so a ridge reads at a glance. Tilt back and it settles down again.
 - **Turn**: twist with two fingers. The compass in the corner shows north; tap it to face north again.
 - **Zoom and pan**: pinch and drag, as on any map.
 
-On the website, right-drag or hold Ctrl and drag to tilt and turn, or use the zoom, compass and tilt buttons in the bottom-left corner.
+On the website, right-drag or hold Ctrl and drag to tilt and turn (two fingers on a touch screen), or use the zoom, compass and tilt buttons in the bottom-left corner. Tilting further raises the land there too.
 
 ## What's on the Map
 

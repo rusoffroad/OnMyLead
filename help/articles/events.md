@@ -6,6 +6,8 @@ order: 60
 release: "2.0"
 updated: 2026-11-04
 sources:
+  - app/src/components/meet-point-mapbox-map.tsx
+  - app/src/components/meet-point-map.tsx
   - app/src/app/events/index.tsx
   - app/src/app/events/new.tsx
   - app/src/components/events/event-or-ride.tsx
@@ -61,6 +63,10 @@ A ride that's part of an event shows **Part of** and the event's name at the top
 3. Under **When**, pick the first day and the start time. For more than one day, tap **Several Days** and pick the last day (up to 31 days).
 4. Under **Where**, search a place or tap the map, and check the **Place Name**. Everyone who sees the event sees this place, so pick a public spot like a venue, park, campground or trailhead.
 5. Add a website or ticket link if there is one, and tap **Create Event**.
+
+:::release 2.1
+From 2.1 the map under **Where** is on every device, not only the website: tap it to drop the place, and drag the pin to fine-tune it.
+:::
 
 The event opens, ready for the rest.
 

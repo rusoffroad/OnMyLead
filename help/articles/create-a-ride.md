@@ -6,6 +6,8 @@ order: 10
 release: "1.0"
 updated: 2026-11-04
 sources:
+  - app/src/components/meet-point-mapbox-map.tsx
+  - app/src/components/meet-point-map.tsx
   - app/src/app/ride/new.tsx
   - app/src/components/events/event-or-ride.tsx
   - app/src/app/(tabs)/index.tsx
@@ -43,6 +45,10 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 8. Under **The Route**, tap **Mapped** (you draw the route or import a GPX file next) or **Freeride** (no set route, everyone follows the leader).
 9. Under **Who's Riding**, pick the **Vehicles Welcome**.
 10. Tap **Create Public Ride** or **Create Private Ride**.
+
+:::release 2.1
+From 2.1 a satellite map sits under **Search a Place or Address**, on every device. Tap it to drop the meeting point there, then drag the pin to fine-tune the spot. Searching a place, **Use My Current Location** and typed **Coordinates** move the pin too. (The map needs a signal; without one, set the point by search, location or coordinates as before.)
+:::
 
 :::release 2.0
 Planning a rally or a ride weekend with several rides? That's an event, not one ride. Tap **Event or Public Ride?** at the top of Create a Ride to see the difference, or see [Events](/help/events).

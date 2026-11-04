@@ -1,5 +1,5 @@
 import Mapbox from '@rnmapbox/maps';
-import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, type ReactNode, type Ref } from 'react';
+import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
@@ -8,7 +8,7 @@ import type { Inset } from '@/core/map-center';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import {
   cameraPadding, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxStyleFor, metersPerPointAt, mapboxTileTemplate, pointsGeoJSON, regionFromCamera,
-  TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_SOURCES, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE, TOPO_SOURCE_ID, trailZoomFromMapbox,
+  TERRAIN_EXAGGERATION, TERRAIN_IDS, TERRAIN_SOURCES, terrainExaggeration, terrainLayers, TOPO_LAYER_ID, TOPO_RASTER_SOURCE, TOPO_SOURCE_ID, trailZoomFromMapbox,
   type MapLook,
 } from '@/core/terrain';
 import { TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate } from '@/core/trails';
@@ -36,10 +36,12 @@ const TERRAIN_STYLE_JSON = { version: 8, sources: TERRAIN_SOURCES, layers: terra
  * The Mapbox map for iPhone, iPad and Android (core/terrain): the rider's look (standard,
  * satellite, topo or 3D Terrain), the same trail layers as the flat maps, the screen's own lines
  * (`lines`, drawn in order), fills and markers (`children`, MapboxMarker). One finger pans, two
- * fingers pinch and turn, and in 3D Terrain tilt the map.
+ * fingers pinch and turn, and in 3D Terrain tilt the map: the further it tilts, the more the
+ * terrain is raised (core/terrain terrainExaggeration). `interactive={false}` makes a still
+ * picture, for a preview inside a page.
  */
 export function MapboxMap({
-  trail, look, tilt, rotate = true, compass = true, scaleBar = false, initial, lines, fills, onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle,
+  trail, look, tilt, rotate = true, compass = true, scaleBar = false, interactive = true, initial, lines, fills, onPress, onLongPress, onUserMove, onReady, onCamera, onOwnFix, onIdle,
   children, ref,
 }: {
   trail: TrailMap;
@@ -50,6 +52,8 @@ export function MapboxMap({
   rotate?: boolean;
   compass?: boolean;
   scaleBar?: boolean;
+  /** Off: a still map that ignores touches (no pan, zoom, tilt or taps). */
+  interactive?: boolean;
   /** Where to open (a Mapbox zoom). Missing: over the lower 48 until the screen frames something. */
   initial?: { center: LatLng; zoom?: number } | null;
   lines?: MapLine[];
@@ -76,6 +80,8 @@ export function MapboxMap({
   const size = useRef({ width: 390, height: 800 });
   const zoom = useRef(initial?.zoom ?? 4);
   const heading = useRef(0);
+  // How much the terrain is raised, following the tilt (only while 3D Terrain is shown).
+  const [exaggeration, setExaggeration] = useState(TERRAIN_EXAGGERATION);
   const ownFix = useRef(onOwnFix);
   useEffect(() => {
     ownFix.current = onOwnFix;
@@ -127,8 +133,9 @@ export function MapboxMap({
       heading.current = h;
       onCamera?.({ heading: h });
     }
+    if (shown === 'terrain') setExaggeration(terrainExaggeration(p.pitch ?? 0));
     if (s.gestures?.isGestureActive) onUserMove?.();
-  }, [onCamera, onUserMove]);
+  }, [onCamera, onUserMove, shown]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
     const p = s.properties;
@@ -163,13 +170,15 @@ export function MapboxMap({
         scaleBarPosition={{ bottom: 28, left: 8 }}
         logoPosition={{ bottom: 6, left: 8 }}
         attributionPosition={{ bottom: 4, right: 8 }}
-        pitchEnabled={tilts}
-        rotateEnabled={rotate}
+        pitchEnabled={interactive && tilts}
+        rotateEnabled={interactive && rotate}
+        scrollEnabled={interactive}
+        zoomEnabled={interactive}
         onDidFinishLoadingMap={onReady}
         onCameraChanged={camChanged}
         onMapIdle={idle}
-        onPress={(f) => (onPress ? onPress(at(f)) : trail.identifyAt(at(f).lat, at(f).lng))}
-        onLongPress={onLongPress ? (f) => onLongPress(at(f)) : (f) => trail.identifyAt(at(f).lat, at(f).lng)}>
+        onPress={interactive ? (f) => (onPress ? onPress(at(f)) : trail.identifyAt(at(f).lat, at(f).lng)) : undefined}
+        onLongPress={!interactive ? undefined : onLongPress ? (f) => onLongPress(at(f)) : (f) => trail.identifyAt(at(f).lat, at(f).lng)}>
         <Mapbox.Camera
           ref={camera}
           defaultSettings={{
@@ -181,7 +190,7 @@ export function MapboxMap({
         {shown === 'terrain' ? (
           <>
             <Mapbox.RasterDemSource id={TERRAIN_IDS.dem} url={TERRAIN_SOURCES[TERRAIN_IDS.dem].url} tileSize={512} maxZoomLevel={14}>
-              <Mapbox.Terrain style={{ exaggeration: TERRAIN_EXAGGERATION }} />
+              <Mapbox.Terrain style={{ exaggeration }} />
             </Mapbox.RasterDemSource>
             <Mapbox.Atmosphere style={{ color: '#9DB8D6', highColor: '#24466F', horizonBlend: 0.08, spaceColor: Colors.background, starIntensity: 0 }} />
             <Mapbox.Style json={TERRAIN_STYLE_JSON as never} />

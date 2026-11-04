@@ -96,6 +96,22 @@ export const TERRAIN_EXAGGERATION = 1.5;
 export const TERRAIN_PITCH = 60;
 /** Mapbox lets the map tilt to 85; past about 75 a phone shows mostly sky. */
 export const TERRAIN_MAX_PITCH = 75;
+/** The most the terrain is raised, at the steepest tilt. */
+export const TERRAIN_MAX_EXAGGERATION = 3;
+
+/**
+ * How much to raise the terrain for a tilt (degrees from straight down): true to life looking
+ * down, the usual 1.5x where 3D Terrain opens, and up to 3x as a two-finger drag tilts the map
+ * further, so the steepness grows with the view.
+ */
+export function terrainExaggeration(pitch: number): number {
+  const p = Math.max(0, Math.min(TERRAIN_MAX_PITCH, pitch));
+  const ex = p <= TERRAIN_PITCH
+    ? 1 + (TERRAIN_EXAGGERATION - 1) * (p / TERRAIN_PITCH)
+    : TERRAIN_EXAGGERATION + (TERRAIN_MAX_EXAGGERATION - TERRAIN_EXAGGERATION) * ((p - TERRAIN_PITCH) / (TERRAIN_MAX_PITCH - TERRAIN_PITCH));
+  // In steps, so a map isn't re-rendered for every fraction of a degree.
+  return Math.round(ex * 20) / 20;
+}
 
 /** Source and layer ids the app adds on top of Mapbox's style. */
 export const TERRAIN_IDS = {
