@@ -64,13 +64,14 @@ export function backupTrailsNow(): Promise<void> {
 }
 
 async function run() {
-  // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
-  if (!can(currentEntitlements(), 'sync')) return;
   if (!isBackendConfigured) return;
   const { data: auth } = await supabase.auth.getSession();
   const me = auth.session?.user.id ?? null;
+  // Whoever is signed in sees their own trails (and the device's unowned ones), Pro or not.
   setTrailViewer(me);
   if (!me) return;
+  // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
+  if (!can(currentEntitlements(), 'sync')) return;
 
   const { data: list, error } = await supabase.from('rider_trail_backups').select('trail_id, deleted, updated_at');
   if (error) throw new Error(error.message);

@@ -26,7 +26,7 @@ OnMyLead draws the trails of offroad parks on every map: Ride Mode, Map Mode, th
 ## See a Park's Trails
 
 1. Open any map and zoom in to about a county's width. Park trails draw as **solid lines with a dark edge**, so they don't look like the dashed amber agency trails or the mint dotted rider trails.
-2. From farther out, each park's **name** sits on the map with how many trails and miles are mapped, so you can see where the parks are while you pan across the state.
+2. From farther out, each park's **name** sits on the map with how many trails and miles are mapped (trails only, not the park's roads), so you can see where the parks are while you pan across the state.
 3. Zoom in closer and the trail **names** appear along the lines.
 
 Park trails show for everyone, signed in or not, and they're on unless you turn them off.

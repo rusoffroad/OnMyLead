@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { parseParkSummaries, parseParkTrails, type ParkSummary, type ParkTrail } from '@/core/park-trails';
+import { PARK_TRAILS_MAX_LINES, parseParkSummaries, parseParkTrails, type ParkSummary, type ParkTrail } from '@/core/park-trails';
 import { encodePolyline } from '@/core/polyline';
 import { supabase } from '@/lib/supabase';
 
@@ -19,6 +19,8 @@ const PARK_KEY = (osmId: number) => `park-trails.park.${osmId}.v1`;
 export async function parkTrailsIn(box: Box): Promise<ParkTrail[]> {
   const { data, error } = await supabase.rpc('park_trails_in_area', {
     p_min_lat: box.minLat, p_min_lng: box.minLng, p_max_lat: box.maxLat, p_max_lng: box.maxLng,
+    // As many lines as the map draws, so a big park isn't cut short at the server's default.
+    p_limit: PARK_TRAILS_MAX_LINES,
   });
   if (error) throw new Error(error.message);
   const trails = parseParkTrails(data);

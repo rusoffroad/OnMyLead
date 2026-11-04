@@ -129,15 +129,25 @@ function backupSoon() {
 }
 
 let running: Promise<void> | null = null;
+let again = false;
 
 /** Swap Map Mode waypoints with the backup now. Safe to call often; does nothing when signed out or offline. */
 export function backupMapWaypointsNow(): Promise<void> {
-  running ??= run()
+  if (running) {
+    // A change made while a sync is in flight goes up in one more pass, not lost until the next trigger.
+    again = true;
+    return running;
+  }
+  running = run()
     .catch(() => {
       // Offline, or the server doesn't have the backup yet: try again next time.
     })
     .finally(() => {
       running = null;
+      if (again) {
+        again = false;
+        backupMapWaypointsNow();
+      }
     });
   return running;
 }
