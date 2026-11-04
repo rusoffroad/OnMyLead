@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
 import { Marker, type UserLocationChangeEvent } from 'react-native-maps';
 
 import { ownFix, screenAngle, type OwnFix } from '@/core/heading';
+import { useCompass } from '@/lib/compass';
 import { MarkerBody } from './marker-body';
+import { OWN_PUCK_D } from './own-puck';
+import { puckBox, RiderPuck, YOU_INK } from './rider-puck';
 
 import { t } from '@/lib/i18n';
-/** Around the phone's own blue dot (about 22 points on iPhone, 20 dp on Android) with the wedge just outside it. */
-const BOX = 52;
-
 export type OwnLocation = {
   /** The newest fix of the phone's own dot. */
   last: { current: OwnFix | null };
@@ -48,41 +47,32 @@ export function useOwnLocation(onFix?: (f: OwnFix) => void): OwnLocation {
 }
 
 /**
- * The arrow on this phone's own dot: the same white wedge every other rider's dot gets, drawn
- * around the blue dot the phone draws itself, only while moving faster than a walk.
+ * This phone's own dot on the flat maps (used when Mapbox is off): the same cyan puck with its
+ * arrow built in as on the Mapbox maps, drawn over the dot the phone draws itself. The arrow always
+ * shows: the GPS direction while moving, the compass when stopped, else the last direction.
  */
 export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHeading?: number | null }) {
   const [fix, setFix] = useState<OwnFix | null>(own.last.current);
-  useEffect(() => own.subscribe(setFix), [own]);
-  if (!fix || fix.headingDeg == null) return null;
+  const [lastCourse, setLastCourse] = useState<number | null>(null);
+  useEffect(() => own.subscribe((f) => {
+    setFix(f);
+    if (f.headingDeg != null) setLastCourse(f.headingDeg);
+  }), [own]);
+  const compass = useCompass();
+  if (!fix) return null;
+  const moving = fix.headingDeg != null;
+  const deg = fix.headingDeg ?? (compass != null && compass >= 0 ? compass : lastCourse);
+  const box = puckBox(OWN_PUCK_D, true);
   return (
     <Marker
       coordinate={{ latitude: fix.lat, longitude: fix.lng }}
       anchor={{ x: 0.5, y: 0.5 }}
       tappable={false}
       zIndex={9}
-      accessibilityLabel={t('The way you are heading')}>
-      <MarkerBody style={styles.box} pointerEvents="none">
-        <View style={[styles.box, { transform: [{ rotate: `${Math.round(screenAngle(fix.headingDeg, mapHeading))}deg` }] }]}>
-          <View style={styles.edge} />
-          <View style={styles.arrow} />
-        </View>
+      accessibilityLabel={t('You are here')}>
+      <MarkerBody style={{ width: box, height: box }} pointerEvents="none">
+        <RiderPuck color={YOU_INK} d={OWN_PUCK_D} beam moving={moving} angle={deg == null ? null : screenAngle(deg, mapHeading)} />
       </MarkerBody>
     </Marker>
   );
 }
-
-const styles = StyleSheet.create({
-  box: { width: BOX, height: BOX, alignItems: 'center' },
-  // The same wedge as RiderPin's, drawn with borders so iPhone, iPad and Android render it alike.
-  edge: {
-    position: 'absolute', top: 0, width: 0, height: 0, borderStyle: 'solid',
-    borderLeftWidth: 10, borderRightWidth: 10, borderBottomWidth: 14,
-    borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: 'rgba(10,22,38,0.85)',
-  },
-  arrow: {
-    position: 'absolute', top: 3, width: 0, height: 0, borderStyle: 'solid',
-    borderLeftWidth: 7.5, borderRightWidth: 7.5, borderBottomWidth: 10.5,
-    borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: '#FFFFFF',
-  },
-});

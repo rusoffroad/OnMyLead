@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 
 import { Colors, font, MapLabelText, themedStyles } from '@/constants/theme';
-import { followCamShouldMove } from '@/core/follow-camera';
+import { FOLLOW_FRAME_START, followCamShouldMove, type FollowFrame } from '@/core/follow-camera';
 import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
@@ -18,6 +18,7 @@ import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { NavMapboxMap } from '@/components/nav-mapbox-map';
+import { fallbackFollowStep } from './fallback-follow';
 import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RouteEnds, RouteLine } from './route-overlay';
@@ -93,6 +94,7 @@ function FlatNavMap({
   const width = useRef(390);
   const size = useRef({ width: 390, height: 800 });
   const followed = useRef<LatLng | null>(null);
+  const frame = useRef<FollowFrame>(FOLLOW_FRAME_START);
   const opening = useRef<OpeningCamera>({ ...OPENING_START });
   const openingTarget = useRef<LatLng | null>(null);
   // The arrow on the rider's own dot (the phone draws the dot itself, never with a direction).
@@ -104,8 +106,9 @@ function FlatNavMap({
   useImperativeHandle(ref, () => ({
     centerOn(p) {
       opening.current.done = true;
-      // The follow-me camera takes over from this spot once the rider moves.
+      // The follow-me camera takes over from this spot once the rider moves, and may zoom out once again.
       followed.current = p;
+      frame.current = FOLLOW_FRAME_START;
       const d = region.current ? Math.min(region.current.latitudeDelta, 0.05) : 0.03;
       map.current?.animateToRegion({ latitude: p.lat, longitude: p.lng, latitudeDelta: d, longitudeDelta: d }, 450);
     },
@@ -146,6 +149,7 @@ function FlatNavMap({
   useEffect(() => {
     if (!followMe) {
       followed.current = null;
+      frame.current = FOLLOW_FRAME_START;
       return;
     }
     // Until the opening move lands, it does the centering: the follow camera keeps the zoom, which
@@ -157,13 +161,18 @@ function FlatNavMap({
     if (!m) return;
     const target = { latitude: followMe.lat, longitude: followMe.lng };
     const { width: w, height: h } = size.current;
-    const open = openMapCenter(size.current, { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] });
-    Promise.all([m.coordinateForPoint({ x: w / 2, y: h / 2 }), m.coordinateForPoint(open)])
+    const inset = { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] };
+    const open = openMapCenter(size.current, inset);
+    // The dot rides through the middle; near an edge the map zooms out once, then moves (core/follow-camera).
+    void fallbackFollowStep(m, followMe, inset, size.current, frame).then((move) => {
+      if (move !== 'pan') return;
+      Promise.all([m.coordinateForPoint({ x: w / 2, y: h / 2 }), m.coordinateForPoint(open)])
       .then(([here, there]) => {
         const c = cameraCenterFor(followMe, { lat: here.latitude, lng: here.longitude }, { lat: there.latitude, lng: there.longitude });
         m.animateCamera({ center: { latitude: c.lat, longitude: c.lng } }, { duration: FOLLOW_MS });
       })
       .catch(() => m.animateCamera({ center: target }, { duration: FOLLOW_MS }));
+    });
     // Only when the followed spot moves; the panels' padding is read as it is then.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [followMe]);

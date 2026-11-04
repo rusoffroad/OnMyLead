@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
+import { junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
 import {
@@ -19,6 +20,7 @@ import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
+import { OwnPuck, useOwnPuckStore } from './own-puck';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -83,6 +85,7 @@ export function MapboxMap({
   const size = useRef({ width: 390, height: 800 });
   const zoom = useRef(initial?.zoom ?? 4);
   const heading = useRef(0);
+  const own = useOwnPuckStore();
   // How much the terrain is raised, following the tilt (only while 3D Terrain is shown).
   const [exaggeration, setExaggeration] = useState(TERRAIN_EXAGGERATION);
   const ownFix = useRef(onOwnFix);
@@ -126,6 +129,28 @@ export function MapboxMap({
       }
     },
     isFarOut: () => zoom.current < FAR_OUT_ZOOM,
+    async project(p) {
+      try {
+        const pt = await view.current?.getPointInView([p.lng, p.lat]);
+        return pt ? { x: pt[0], y: pt[1] } : null;
+      } catch {
+        return null;
+      }
+    },
+    camera: () => ({ zoom: zoom.current, heading: heading.current, ...size.current }),
+    zoomTo(z, duration = 700) {
+      camera.current?.setCamera({ zoomLevel: z, animationDuration: duration, animationMode: 'easeTo' });
+    },
+    async roadsNear(p, radiusPt) {
+      try {
+        const pt = await view.current?.getPointInView([p.lng, p.lat]);
+        if (!pt) return [];
+        const fc = await view.current?.queryRenderedFeaturesInRect([pt[1] - radiusPt, pt[0] - radiusPt, pt[1] + radiusPt, pt[0] + radiusPt], [], null);
+        return junctionLines((fc?.features ?? []) as never);
+      } catch {
+        return [];
+      }
+    },
   }), []);
 
   // Trail names, closures and rider trails load as soon as the camera rests (SETTLE_MS), rather
@@ -147,11 +172,12 @@ export function MapboxMap({
     const h = Math.round((p.heading ?? 0) / 5) * 5 % 360;
     if (h !== heading.current) {
       heading.current = h;
+      own.setHeading(h);
       onCamera?.({ heading: h });
     }
     if (shown === 'terrain') setExaggeration(terrainExaggeration(p.pitch ?? 0));
     if (s.gestures?.isGestureActive) onUserMove?.();
-  }, [onCamera, onUserMove, shown, trail]);
+  }, [onCamera, onUserMove, shown, trail, own]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
     const p = s.properties;
@@ -226,10 +252,13 @@ export function MapboxMap({
         ))}
         <Mapbox.UserLocation visible={false} minDisplacement={1} onUpdate={(loc) => {
           const c = loc.coords;
-          ownFix.current?.({ lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null });
+          const f = { lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null };
+          own.setFix(f);
+          ownFix.current?.(f);
         }} />
-        <Mapbox.LocationPuck puckBearingEnabled puckBearing="course" pulsing={{ isEnabled: false }} />
         {children}
+        {/* Your own dot, with its arrow built in (own-puck), above everything else. */}
+        <OwnPuck store={own} Marker={MapboxMarker} />
       </Mapbox.MapView>
     </View>
   );

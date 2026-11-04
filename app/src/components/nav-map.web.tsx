@@ -3,7 +3,7 @@ import { useEffect, useImperativeHandle, useMemo, useRef, type Ref } from 'react
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
-import { followCamShouldMove } from '@/core/follow-camera';
+import { FOLLOW_FRAME_START, followCamShouldMove, followFrameAfter, followMove, type FollowFrame } from '@/core/follow-camera';
 import { parkPieces } from '@/core/park-trails';
 import type { LatLng } from '@/core/geo';
 import { OBSTACLE_INK, type Obstacle } from '@/core/obstacles';
@@ -15,6 +15,8 @@ import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
+import { OWN_PUCK_D } from './own-puck';
+import { puckBox, puckSvg, YOU_INK } from './rider-puck';
 import { blaze, stopSign } from './waypoint-map.web';
 import { t as tr } from '@/lib/i18n';
 
@@ -23,11 +25,10 @@ export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng
 export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
 /** The rider's dot with the white wedge every moving rider gets, turned to their heading. */
+/** Your own dot on the website's flat map: the cyan puck with its arrow built in (rider-puck). */
+const ME_BOX = puckBox(OWN_PUCK_D, true);
 const meDotHtml = (heading: number | null | undefined) =>
-  heading == null
-    ? ME_DOT
-    : `<div style="position:relative;width:18px;height:18px">${ME_DOT}<div aria-hidden="true" style="position:absolute;left:-13px;top:-13px;width:44px;height:44px;transform:rotate(${Math.round(heading)}deg);pointer-events:none"><div style="position:absolute;left:12px;top:0;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:14px solid rgba(10,22,38,.85)"></div><div style="position:absolute;left:14.5px;top:3px;width:0;height:0;border-left:7.5px solid transparent;border-right:7.5px solid transparent;border-bottom:10.5px solid #fff"></div></div></div>`;
-const ME_DOT = '<div role="img" aria-label="You are here" style="width:18px;height:18px;border-radius:9px;background:#2F80FF;border:3px solid #FFFFFF;box-sizing:border-box;box-shadow:0 0 0 6px rgba(47,128,255,.25),0 2px 4px rgba(0,0,0,.5)"></div>';
+  `<div role="img" aria-label="You are here">${puckSvg(YOU_INK, OWN_PUCK_D, heading ?? null, true, heading != null)}</div>`;
 
 type NavMapProps = Parameters<typeof FlatNavMap>[0];
 
@@ -82,6 +83,7 @@ function FlatNavMap({
   // The rider dragged the map before their location was known: don't pull it back to them.
   const userMoved = useRef(false);
   const followed = useRef<LatLng | null>(null);
+  const followFrame = useRef<FollowFrame>(FOLLOW_FRAME_START);
   const meDot = useRef<L.Marker | null>(null);
   const cb = useRef({ measuring, onMeasure, identifyAt: trail.identifyAt, onRegion: trail.onRegion, onCenter, onUserMove, onObstacle, onPressWaypoint, onLongPressMap });
   useEffect(() => {
@@ -94,6 +96,7 @@ function FlatNavMap({
   useImperativeHandle(ref, () => ({
     centerOn(p) {
       followed.current = p;
+      followFrame.current = FOLLOW_FRAME_START;
       map.current?.setView(ll(p), Math.max(map.current.getZoom(), 14), { animate: true });
     },
     fit(points) {
@@ -151,7 +154,7 @@ function FlatNavMap({
       meDot.current = null;
       return;
     }
-    const icon = L.divIcon({ className: '', iconSize: [18, 18], iconAnchor: [9, 9], html: meDotHtml(meHeading) });
+    const icon = L.divIcon({ className: '', iconSize: [ME_BOX, ME_BOX], iconAnchor: [ME_BOX / 2, ME_BOX / 2], html: meDotHtml(meHeading) });
     if (meDot.current) {
       meDot.current.setLatLng(ll(center));
       meDot.current.setIcon(icon);
@@ -165,10 +168,20 @@ function FlatNavMap({
     const m = map.current;
     if (!followMe) {
       followed.current = null;
+      followFrame.current = FOLLOW_FRAME_START;
       return;
     }
     if (!m || !followCamShouldMove(followed.current, followMe)) return;
     followed.current = followMe;
+    // The dot rides through the middle; near an edge the map zooms out once, then moves (core/follow-camera).
+    const sz = m.getSize();
+    const move = followMove(followFrame.current, {
+      pt: m.latLngToContainerPoint(ll(followMe)), size: { width: sz.x, height: sz.y },
+      inset: { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] }, zoom: m.getZoom(), screenHeadingDeg: null,
+    });
+    followFrame.current = followFrameAfter(followFrame.current, move);
+    if (move.kind === 'zoom-out') m.setZoom(move.zoom, { animate: true });
+    if (move.kind !== 'pan') return;
     const z = m.getZoom();
     const p = m.project(ll(followMe), z).add([(pad[1] - pad[3]) / 2, (pad[2] - pad[0]) / 2]);
     m.panTo(m.unproject(p, z), { animate: true, duration: 0.6 });
