@@ -7,19 +7,27 @@ import { boxInside, nearestRiderTrail, paddedBox, RIDER_TRAILS_MIN_Z, type Publi
 import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrail, type TrailLabel } from '@/core/osm-trails';
 import { terrainBoxes } from '@/core/offline-maps';
 import { lookFor, mapboxDraws, type MapLook } from '@/core/terrain';
-import { mapZoom, metersPerPoint, TRAIL_SOURCE_IDS, TRAILS_MIN_Z, type BaseMap, type ClosedLine, type TrailInfo } from '@/core/trails';
+import { anyLand, anyTrails, defaultFeatures, featureKey, readFeatures, type AgencyLayer, type FeatureChoices, type MapFeatureId } from '@/core/map-features';
+import {
+  LAND_SOURCE_IDS, LAND_SOURCES, mapZoom, metersPerPoint, sourceFeatures, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate,
+  type BaseMap, type ClosedLine, type LandInfo, type TrailInfo, type TrailSourceId,
+} from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
 import { useOfflineMaps } from '@/lib/offline-maps';
 import { useMapboxAvailable, useTerrainAvailable } from '@/lib/terrain';
 import { publicTrailsIn, type Box } from '@/lib/nav-trails';
 import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
+import { identifyLand } from '@/lib/trail-lookup';
 import { useCan } from '@/lib/pro';
 import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 const KEY = 'map.layers.v1';
+const NO_FEATURES = Object.fromEntries(Object.keys(defaultFeatures()).map((k) => [k, false])) as FeatureChoices;
 /** Show trails other riders mapped and shared (Navigation Mode). On unless the rider hid them. */
 export const RIDER_TRAILS_KEY = 'map.riderTrails.v1';
+
+export type { AgencyLayer } from '@/core/map-features';
 
 export type TrailMap = {
   /** The rider's map style. 3D Terrain is drawn only where `terrain3d` says; flat maps draw it as satellite. */
@@ -32,7 +40,16 @@ export type TrailMap = {
   mapbox: boolean;
   /** Ride Mode and Map Mode draw the 3D map now (Mapbox in the 3D Terrain look). */
   terrain3d: boolean;
+  /** True when any trail Map Feature is on (Dirt Roads, Off-Road Trails, Hiking Trails and so on). */
   trails: boolean;
+  /** Each Map Feature on or off (core/map-features), for a Pro rider; all off for a Free rider. */
+  features: FeatureChoices;
+  setFeature: (id: MapFeatureId, on: boolean) => void;
+  /** The agencies' trail and land layers to draw for the features that are on. */
+  agencyLayers: AgencyLayer[];
+  /** Whose land a tap landed on (land features on and no trail under the finger). */
+  land: LandInfo | null;
+  clearLand: () => void;
   /** True when trails are on but the map is too far out to draw them. */
   zoomInHint: boolean;
   /** OpenStreetMap tracks to draw (TrailTiles), once the map is in to OSM_VIEW_MIN_Z (about 15 miles across). */
@@ -88,12 +105,19 @@ const byKey = <T extends { key: string }>(a: T, b: T) => (a.key < b.key ? -1 : a
  */
 export function useTrailMap(): TrailMap {
   const [base, setBaseState] = useState<BaseMap>('satellite');
-  // On unless the rider turned it off: trails are the reason most riders open the map.
-  const [trailsChoice, setTrailsState] = useState(true);
-  // Map layers are Pro: Free riders get the standard map with no topo and no trails layer. Their
-  // saved choice is kept, so it comes back the moment they're on Pro.
+  // Every road and trail feature on unless the rider turned it off: trails are the reason most riders open the map.
+  const [featureChoice, setFeatureState] = useState<FeatureChoices>(defaultFeatures);
+  const featuresRef = useRef(featureChoice);
+  // Map layers are Pro: Free riders get the standard map with no topo and no Map Features. Their
+  // saved choices are kept, so they come back the moment they're on Pro.
   const layersPro = useCan('map_layers');
-  const trails = trailsChoice && layersPro;
+  // Rider Trails were never Pro, so a Free rider's own choice for them still counts.
+  const features = useMemo(
+    () => (layersPro ? featureChoice : { ...NO_FEATURES, riderTrails: featureChoice.riderTrails }),
+    [layersPro, featureChoice],
+  );
+  const trails = anyTrails(features);
+  const [land, setLand] = useState<LandInfo | null>(null);
   const [osm, setOsm] = useState<OsmTrail[]>([]);
   const [closed, setClosed] = useState<ClosedLine[]>([]);
   const [zoom, setZoom] = useState(12);
@@ -102,6 +126,8 @@ export function useTrailMap(): TrailMap {
   const region = useRef<Region | null>(null);
   // The flat style 3D Terrain was turned on from, so the 3D button can go back to it.
   const flatBase = useRef<BaseMap>('satellite');
+  // The style as last set, read by the setters (which can run before a re-render).
+  const baseRef = useRef<BaseMap>('satellite');
   const zoomNow = useRef<number | null>(null);
   const width = useRef(390);
   const lookup = useRef(0);
@@ -131,12 +157,19 @@ export function useTrailMap(): TrailMap {
       if (!v) return;
       try {
         // `trails` from the first version defaulted to off, so only the newer `trailsOn` choice counts.
-        const saved = JSON.parse(v) as { base?: BaseMap; trailsOn?: boolean };
+        const saved = JSON.parse(v) as { base?: BaseMap; trailsOn?: boolean; features?: unknown };
         if (saved.base === 'topo' || saved.base === 'satellite' || saved.base === 'terrain') {
           if (saved.base !== 'terrain') flatBase.current = saved.base;
+          baseRef.current = saved.base;
           setBaseState(saved.base);
         }
-        if (typeof saved.trailsOn === 'boolean') setTrailsState(saved.trailsOn);
+        const next = readFeatures(saved);
+        // Rider Trails had its own key before Map Features; that key still wins when it says off.
+        if (!riderOnRef.current) next.riderTrails = false;
+        featuresRef.current = next;
+        setFeatureState(next);
+        riderOnRef.current = next.riderTrails;
+        setRiderOn(next.riderTrails);
       } catch {
         // Not a saved choice.
       }
@@ -144,6 +177,8 @@ export function useTrailMap(): TrailMap {
     const applyRiders = (v: string | null) => {
       riderOnRef.current = v !== '0';
       setRiderOn(v !== '0');
+      featuresRef.current = { ...featuresRef.current, riderTrails: v !== '0' };
+      setFeatureState(featuresRef.current);
     };
     AsyncStorage.getItem(KEY).then(applyLayers).catch(() => {});
     AsyncStorage.getItem(RIDER_TRAILS_KEY)
@@ -180,19 +215,25 @@ export function useTrailMap(): TrailMap {
       .catch(() => {});
   }, []);
 
+  // `trailsOn` is still written for app versions from before Map Features, which read only that.
+  const save = (b: BaseMap, f: FeatureChoices) => setSyncedItem(KEY, JSON.stringify({ base: b, trailsOn: anyTrails(f), features: f })).catch(() => {});
+
   const setRiderTrails = (on: boolean) => {
     riderOnRef.current = on;
     setRiderOn(on);
     if (!on) setPicked(null);
     else refreshRiders(true);
     setSyncedItem(RIDER_TRAILS_KEY, on ? '1' : '0').catch(() => {});
+    featuresRef.current = { ...featuresRef.current, riderTrails: on };
+    setFeatureState(featuresRef.current);
+    save(baseRef.current, featuresRef.current);
   };
 
-  const save = (next: { base: BaseMap; trailsOn: boolean }) => setSyncedItem(KEY, JSON.stringify(next)).catch(() => {});
   const setBase = (b: BaseMap) => {
     if (b !== 'terrain') flatBase.current = b;
+    baseRef.current = b;
     setBaseState(b);
-    save({ base: b, trailsOn: trailsChoice });
+    save(b, featuresRef.current);
   };
 
   const refreshOsm = useCallback(() => {
@@ -224,12 +265,28 @@ export function useTrailMap(): TrailMap {
       .catch(() => {});
   }, []);
 
+  const setFeature = (id: MapFeatureId, on: boolean) => {
+    if (id === 'riderTrails') return setRiderTrails(on);
+    const next = { ...featuresRef.current, [id]: on };
+    featuresRef.current = next;
+    setFeatureState(next);
+    trailsRef.current = anyTrails(next);
+    if (!trailsRef.current) setInfo(null);
+    if (!anyLand(next)) setLand(null);
+    refreshOsm();
+    save(baseRef.current, next);
+  };
+
+  /** The old single switch: every trail feature on or off together. */
   const setTrails = (on: boolean) => {
-    setTrailsState(on);
+    const next = { ...featuresRef.current };
+    for (const id of ['dirtRoads', 'streetLegal', 'offroad', 'narrow', 'hiking', 'closed'] as MapFeatureId[]) next[id] = on;
+    featuresRef.current = next;
+    setFeatureState(next);
     trailsRef.current = on;
     if (!on) setInfo(null);
     refreshOsm();
-    save({ base, trailsOn: on });
+    save(baseRef.current, next);
   };
 
   // Load once the saved choice is read, and again when the signal comes back or drops.
@@ -268,8 +325,19 @@ export function useTrailMap(): TrailMap {
         }
       }
       setPicked(null);
+      setLand(null);
+      const f = featuresRef.current;
+      const landOn = layersPro && anyLand(f);
+      // Nothing under the finger but land: say whose land it is.
+      const lookLand = (id: number) => {
+        if (!landOn) return;
+        identifyLand({ lat, lng }, f).then((l) => {
+          if (id === lookup.current) setLand(l);
+        }).catch(() => {});
+      };
       if (!trails || !region.current || (zoomNow.current ?? mapZoom(region.current, width.current)) < TRAILS_MIN_Z) {
         setInfo(null);
+        lookLand(++lookup.current);
         return;
       }
       // About a fingertip (22 points) around the tap, whatever the zoom.
@@ -278,15 +346,20 @@ export function useTrailMap(): TrailMap {
       // OpenStreetMap tracks are already on the phone; the agencies' answer wins because it says who may ride.
       const local = nearestOsmTrail({ lat, lng }, osmRef.current, radius);
       setLooking(true);
-      identifyTrail({ lat, lng }, TRAIL_SOURCE_IDS, radius)
+      // Only sources whose lines are showing: a hidden layer can't be what the rider tapped.
+      const shown = TRAIL_SOURCE_IDS.filter((sid) => sourceFeatures(TRAIL_SOURCES[sid]).some((t) => f[t as MapFeatureId]));
+      identifyTrail({ lat, lng }, shown, radius)
         .then((found) => {
-          if (id === lookup.current) setInfo(found ?? local);
+          if (id !== lookup.current) return;
+          const hit = found ?? (f.offroad || f.closed || f.hiking ? local : null);
+          setInfo(hit);
+          if (!hit) lookLand(id);
         })
         .finally(() => {
           if (id === lookup.current) setLooking(false);
         });
     },
-    [trails],
+    [trails, layersPro],
   );
 
   const onPress = useCallback(
@@ -299,14 +372,46 @@ export function useTrailMap(): TrailMap {
   );
 
   // Leaflet draws lines cheaply and a browser window shows more of the map, so the website draws more.
-  const drawn = useMemo(() => drawableOsm(osm, Platform.OS === 'web' ? 1500 : undefined), [osm]);
+  // Only the kinds of line whose Map Feature is on: open tracks, closed tracks, hiking paths.
+  const { offroad, closed: closedOn, hiking } = features;
+  const shownOsm = useMemo(
+    () => osm.filter((t) => (t.kind === 'path' ? hiking : t.closed ? closedOn : offroad)),
+    [osm, offroad, closedOn, hiking],
+  );
+  const drawn = useMemo(() => drawableOsm(shownOsm, Platform.OS === 'web' ? 1500 : undefined), [shownOsm]);
   // Each phone tag is a small native view, so the phone keeps fewer than the website.
   // A tag is about 120 by 24 points; degrees per point at this zoom keep tags from overlapping.
   const labels = useMemo(() => {
     const perPt = 360 / (256 * 2 ** Math.max(1, zoom));
-    const lat = osm[0]?.parts[0]?.[0]?.lat ?? 0;
-    return trailLabels(osm, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
-  }, [osm, zoom]);
+    const lat = shownOsm[0]?.parts[0]?.[0]?.lat ?? 0;
+    return trailLabels(shownOsm, Platform.OS === 'web' ? 60 : 24, { lng: perPt * 120, lat: perPt * 24 * Math.cos((lat * Math.PI) / 180) });
+  }, [shownOsm, zoom]);
+
+  const agencyLayers = useMemo<AgencyLayer[]>(() => {
+    const on = (Object.keys(features) as MapFeatureId[]).filter((id) => features[id]);
+    const trailLayers = TRAIL_SOURCE_IDS.flatMap((id: TrailSourceId) => {
+      const tags = sourceFeatures(TRAIL_SOURCES[id]);
+      const shown = tags.filter((t) => on.includes(t as MapFeatureId));
+      if (!shown.length) return [];
+      // With no signal only the saved squares can show, and downloads save every trail layer.
+      const all = shown.length === tags.length || offline;
+      return [{
+        id,
+        key: all ? id : `${id}-${featureKey(shown as MapFeatureId[])}`,
+        template: trailTileTemplate(TRAIL_SOURCES[id], all ? undefined : shown),
+        minZ: TRAILS_MIN_Z,
+        attribution: TRAIL_SOURCES[id].attribution,
+        land: false,
+      }];
+    });
+    const landLayers = LAND_SOURCE_IDS.flatMap((id) => {
+      const src = LAND_SOURCES[id];
+      const shown = sourceFeatures(src).filter((t) => on.includes(t as MapFeatureId));
+      if (!shown.length) return [];
+      return [{ id, key: `${id}-${featureKey(shown as MapFeatureId[])}`, template: trailTileTemplate(src, shown), minZ: src.minZ, attribution: src.attribution, land: true }];
+    });
+    return [...landLayers, ...trailLayers];
+  }, [features, offline]);
 
   // Free riders get satellite (map layers are Pro); 3D Terrain picked but not offered any more
   // (switched off, or a build without Mapbox) is plain satellite too.
@@ -322,10 +427,15 @@ export function useTrailMap(): TrailMap {
     mapbox,
     terrain3d,
     trails,
+    features,
+    setFeature,
+    agencyLayers,
+    land,
+    clearLand: () => setLand(null),
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
     osmLines: trails ? drawn : [],
     labels: trails ? labels : [],
-    closedLines: trails ? closed : [],
+    closedLines: features.closed ? closed : [],
     closerForTracks: trails && zoom >= TRAILS_MIN_Z && zoom < OSM_VIEW_MIN_Z,
     offline,
     setBase,

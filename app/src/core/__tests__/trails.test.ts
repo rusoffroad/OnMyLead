@@ -67,7 +67,10 @@ describe('tile URLs', () => {
     expect(t).toContain('{minX}');
     expect(t).toContain('transparent=true');
     const dynamic = JSON.parse(decodeURIComponent(t.split('dynamicLayers=')[1].split('&')[0]));
-    expect(dynamic.map((l: { source: { mapLayerId: number } }) => l.source.mapLayerId)).toEqual([2, 2, 1, 1]);
+    // Trails (width-limited, then the rest) over roads (street-legal only, then the rest), each cased.
+    expect(dynamic.map((l: { source: { mapLayerId: number } }) => l.source.mapLayerId)).toEqual([2, 2, 2, 2, 1, 1, 1, 1]);
+    // The Map Feature tags stay on the phone.
+    expect(JSON.stringify(dynamic)).not.toContain('feature');
     const filled = fillTemplate(t, { z: 12, x: 778, y: 1573 });
     expect(filled).not.toMatch(/\{(minX|minY|maxX|maxY)\}/);
   });
@@ -188,7 +191,8 @@ describe('closures', () => {
   });
 
   it('draws closed roads below the open layers, and labels them', () => {
-    expect(TRAIL_SOURCE_IDS[0]).toBe('fsclosed');
+    // Hiking trails go under everything vehicles use, then closed roads, then the open routes.
+    expect(TRAIL_SOURCE_IDS.slice(0, 2)).toEqual(['fstrails', 'fsclosed']);
     const t = trailTileTemplate(TRAIL_SOURCES.fsclosed);
     expect(t).toContain('EDW_RoadBasic_01');
     expect(decodeURIComponent(t)).toContain('\\"CLOSED\\"');
@@ -196,9 +200,9 @@ describe('closures', () => {
     // BLM moved its route network in 2026; the old address answers "not found".
     expect(blmUrl).toContain('BLM_Natl_GTLF_Public_Display');
     const blm = JSON.parse(decodeURIComponent(blmUrl.split('dynamicLayers=')[1].split('&')[0])) as { source: { mapLayerId: number }; drawingInfo: { renderer: { symbol: { color: number[] } } } }[];
-    // Trails closed to motor vehicles (layers 4 and 5) are drawn last, under the open ones, in the closed red.
+    // Trails closed to motor vehicles (layers 4 and 5) are BLM's foot and horse trails: drawn last, under the open ones, as pink hiking trails.
     expect(blm.at(-2)?.source.mapLayerId).toBe(5);
-    expect(blm.at(-2)?.drawingInfo.renderer.symbol.color).toEqual([255, 69, 58, 255]);
+    expect(blm.at(-2)?.drawingInfo.renderer.symbol.color).toEqual([255, 92, 203, 255]);
     expect(blm.map((l) => l.source.mapLayerId)).not.toContain(6);
   });
 

@@ -46,8 +46,13 @@ export type OsmTrail = {
    * "no"): gated, closed or private. Only the drawn copies carry it; the named copies don't.
    */
   closed: boolean;
+  /** track: a dirt track (Off-Road Trails); path: a foot or horse path (Hiking Trails). Older saved squares say neither: a track. */
+  kind?: 'track' | 'path';
   parts: LatLng[][];
 };
+
+/** OpenStreetMap paths riders mean by hiking trail (OpenMapTiles class path; footway is mostly sidewalks). */
+const HIKING_SUBCLASSES = new Set(['path', 'bridleway']);
 
 /**
  * Which square zoom to read for a (real) map zoom, or null when the map is too far out for tracks.
@@ -106,7 +111,9 @@ export function decodeOsmTrails(data: Uint8Array, t: Tile): OsmTrail[] {
     if (!layer) continue;
     for (let i = 0; i < layer.length; i++) {
       const f = layer.feature(i);
-      if (f.type !== 2 || f.properties.class !== 'track') continue;
+      const cls = f.properties.class;
+      const path = cls === 'path' && HIKING_SUBCLASSES.has(String(f.properties.subclass));
+      if (f.type !== 2 || (cls !== 'track' && !path)) continue;
       const name = str(f.properties.name);
       // The name layer only adds names; its unnamed lines are already in `transportation`.
       if (layerName === 'transportation_name' && !name) continue;
@@ -120,6 +127,7 @@ export function decodeOsmTrails(data: Uint8Array, t: Tile): OsmTrail[] {
         name,
         surface: str(f.properties.surface),
         closed: f.properties.access === 'no',
+        kind: path ? 'path' : 'track',
         parts,
       });
     }
@@ -176,17 +184,23 @@ export function nearestOsmTrail(p: LatLng, trails: OsmTrail[], maxM: number): Tr
   }
   if (!best) return null;
   const closed = best.t.closed || !!line?.t.closed;
+  const path = best.t.kind === 'path' || line?.t.kind === 'path';
   return {
+    hiking: path,
     source: 'osm',
     kind: 'trail',
-    title: best.t.name ?? tc('Unnamed Track'),
+    title: best.t.name ?? (path ? tc('Unnamed Path') : tc('Unnamed Track')),
     where: null,
     allowed: [],
     seasonal: false,
     miles: null,
     surface: best.t.surface ? best.t.surface.charAt(0).toUpperCase() + best.t.surface.slice(1) : null,
     attribution: OSM_ATTRIBUTION,
-    closure: closed ? { label: tc('No Public Access'), detail: tc('OpenStreetMap marks this track closed or private.') } : null,
+    closure: closed
+      ? { label: tc('No Public Access'), detail: tc('OpenStreetMap marks this track closed or private.') }
+      : path
+        ? { label: tc('Hiking Trail, No Motor Vehicles'), detail: tc('OpenStreetMap maps this as a path for hikers, horses or bikes. Check posted signs before taking a vehicle on it.') }
+        : null,
     widthLimitIn: null,
     lineKey: null,
     at: p,

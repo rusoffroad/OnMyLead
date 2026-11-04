@@ -10,7 +10,9 @@ import { tc } from './i18n';
  * nothing about a rider is ever sent: only the map square being looked at.
  */
 
-export type TrailSourceId = 'mvum' | 'blm' | 'fsclosed';
+export type TrailSourceId = 'mvum' | 'blm' | 'fsclosed' | 'fstrails';
+/** Map Features (core/map-features) that agency layers are tagged with; kept as strings here to avoid an import loop. */
+type FeatureTag = 'dirtRoads' | 'streetLegal' | 'offroad' | 'narrow' | 'hiking' | 'closed' | 'nationalForest' | 'blm' | 'nationalPark' | 'statePark' | 'private';
 /** terrain is 3D Terrain (core/terrain): satellite on raised ground; flat maps draw it as satellite. */
 export type BaseMap = 'satellite' | 'topo' | 'terrain';
 
@@ -26,6 +28,8 @@ export const BLM_ROUTES = 'https://gis.blm.gov/arcgis/rest/services/transportati
 export const BLM_LAYERS = { roads: [0, 1], trails: [2, 3], closed: [4, 5] } as const;
 /** Forest Service roads; layer 1 is every system road the agency lists as closed to motor vehicles. */
 export const FS_ROADS = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_RoadBasic_01/MapServer';
+/** National Forest System trails, with what each one is open to (`terra_motorized` 'N' is no motor vehicles). Drawn from about zoom 11. */
+export const FS_TRAILS = 'https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TrailNFSPublish_01/MapServer';
 export const USGS_TOPO = 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}';
 
 /** USGS caches its topo to zoom 16; closer than that the phone scales the zoom 16 tile up. */
@@ -43,6 +47,12 @@ const INK = {
   trail: [255, 196, 61, 255],
   road: [246, 248, 251, 255],
   closed: [255, 69, 58, 255],
+  /** Width-limited trails (50" or narrower, or dirt bikes only): orange, shorter dashes. */
+  narrow: [255, 122, 26, 255],
+  /** Street-legal-only Forest Service roads: lavender. */
+  streetLegal: [185, 163, 255, 255],
+  /** Hiking trails: pink dash-dots, thinner, no heavy casing. */
+  hiking: [255, 92, 203, 255],
   casing: [10, 22, 38, 215],
   label: [255, 255, 255, 255],
   closedLabel: [255, 138, 128, 255],
@@ -85,10 +95,19 @@ type UniqueRenderer = {
   uniqueValueInfos: { value: string; symbol: Renderer['symbol'] }[];
 };
 
+type FillRenderer = {
+  type: 'simple';
+  symbol: { type: 'esriSFS'; style: string; color: number[]; outline: Renderer['symbol'] };
+};
+
 type DynamicLayer = {
   id: number;
   source: { type: 'mapLayer'; mapLayerId: number };
-  drawingInfo: { renderer: Renderer | UniqueRenderer; showLabels?: boolean; labelingInfo?: ReturnType<typeof label> };
+  /** Only the rows matching this (ArcGIS SQL), so one agency layer can be split by kind of route. */
+  definitionExpression?: string;
+  drawingInfo: { renderer: Renderer | UniqueRenderer | FillRenderer; showLabels?: boolean; labelingInfo?: unknown[] };
+  /** Which Map Feature switch shows it (core/map-features). Not sent to the server. */
+  feature?: FeatureTag;
 };
 
 /**
@@ -97,26 +116,43 @@ type DynamicLayer = {
  */
 function cased(
   baseId: number, mapLayerId: number, color: number[], width: number,
-  { style, labelExpression, labelColor, top }: { style?: string; labelExpression?: string; labelColor?: number[]; top?: UniqueRenderer } = {},
+  { style, labelExpression, labelColor, top, where, feature, casing = true }: {
+    style?: string; labelExpression?: string; labelColor?: number[]; top?: UniqueRenderer; where?: string; feature?: FeatureTag; casing?: boolean;
+  } = {},
 ): DynamicLayer[] {
   const line1: DynamicLayer = {
     id: baseId,
     source: { type: 'mapLayer', mapLayerId },
     drawingInfo: { renderer: top ?? line(color, width, style) },
   };
+  if (where) line1.definitionExpression = where;
+  if (feature) line1.feature = feature;
   if (labelExpression) {
     line1.drawingInfo.showLabels = true;
     line1.drawingInfo.labelingInfo = label(labelExpression, labelColor);
   }
-  return [
-    line1,
-    { id: baseId + 1, source: { type: 'mapLayer', mapLayerId }, drawingInfo: { renderer: line(INK.casing, width + 2.6) } },
-  ];
+  const under: DynamicLayer = {
+    id: baseId + 1,
+    source: { type: 'mapLayer', mapLayerId },
+    // Hiking trails get a thin casing: they should read as lighter than anything a vehicle uses.
+    drawingInfo: { renderer: line(casing ? INK.casing : [10, 22, 38, 150], casing ? width + 2.6 : width + 1.2) },
+  };
+  if (where) under.definitionExpression = where;
+  if (feature) under.feature = feature;
+  return [line1, under];
 }
+
+/** MVUM `symbol` codes (the agency's own map legend): trails open only to vehicles 50" or less, or only to motorcycles. */
+export const MVUM_NARROW_SYMBOLS = ['7', '8', '9', '10', '16', '17'];
+/** MVUM road `symbol` codes for roads open to highway-legal vehicles only. */
+export const MVUM_STREET_LEGAL_SYMBOLS = ['3', '4'];
+const inList = (field: string, values: string[]) => `${field} IN (${values.map((v) => `'${v}'`).join(',')})`;
+const notInList = (field: string, values: string[]) => `(${field} IS NULL OR ${field} NOT IN (${values.map((v) => `'${v}'`).join(',')}))`;
 
 const TRAIL_W = 2.6;
 const ROAD_W = 2.2;
 const CLOSED_W = 2.2;
+const HIKE_W = 1.8;
 
 export type TrailSource = {
   id: TrailSourceId;
@@ -136,10 +172,14 @@ export const TRAIL_SOURCES: Record<TrailSourceId, TrailSource> = {
     attribution: 'USDA Forest Service MVUM',
     service: FS_MVUM,
     identifyLayers: [2, 1],
-    // Layer 2 is MVUM trails, layer 1 MVUM roads. Trails sit above roads. Labels read "Name 123".
+    // Layer 2 is MVUM trails, layer 1 MVUM roads, each split by the agency's own legend: trails for
+    // vehicles 50" or less (or dirt bikes only) are width-limited, roads for highway-legal vehicles
+    // only are street-legal. Trails sit above roads. Labels read "Name 123".
     dynamicLayers: [
-      ...cased(201, 2, INK.trail, TRAIL_W, { style: 'esriSLSDash', labelExpression: '[name] CONCAT " " CONCAT [id]' }),
-      ...cased(101, 1, INK.road, ROAD_W, { labelExpression: '[name] CONCAT " " CONCAT [id]' }),
+      ...cased(211, 2, INK.narrow, TRAIL_W, { style: 'esriSLSShortDash', where: inList('symbol', MVUM_NARROW_SYMBOLS), feature: 'narrow', labelExpression: '[name] CONCAT " " CONCAT [id]' }),
+      ...cased(201, 2, INK.trail, TRAIL_W, { style: 'esriSLSDash', where: notInList('symbol', MVUM_NARROW_SYMBOLS), feature: 'offroad', labelExpression: '[name] CONCAT " " CONCAT [id]' }),
+      ...cased(111, 1, INK.streetLegal, ROAD_W, { where: inList('symbol', MVUM_STREET_LEGAL_SYMBOLS), feature: 'streetLegal', labelExpression: '[name] CONCAT " " CONCAT [id]' }),
+      ...cased(101, 1, INK.road, ROAD_W, { where: notInList('symbol', MVUM_STREET_LEGAL_SYMBOLS), feature: 'dirtRoads', labelExpression: '[name] CONCAT " " CONCAT [id]' }),
     ],
   },
   blm: {
@@ -148,11 +188,12 @@ export const TRAIL_SOURCES: Record<TrailSourceId, TrailSource> = {
     attribution: 'Bureau of Land Management',
     service: BLM_ROUTES,
     identifyLayers: [...BLM_LAYERS.trails, ...BLM_LAYERS.roads, ...BLM_LAYERS.closed],
-    // Open routes first so they draw over closed ones; routes closed to off-highway vehicles get the closed style.
+    // Open routes first so they draw over the rest. Routes closed to motor vehicles are BLM's foot
+    // and horse trails, drawn as hiking trails (their card still says closed to off-highway vehicles).
     dynamicLayers: [
-      ...BLM_LAYERS.trails.flatMap((l) => cased(310 + l * 10, l, INK.trail, TRAIL_W, { style: 'esriSLSDash', labelExpression: '[ROUTE_PRMRY_NM]' })),
-      ...BLM_LAYERS.roads.flatMap((l) => cased(310 + l * 10, l, INK.road, ROAD_W, { labelExpression: '[ROUTE_PRMRY_NM]' })),
-      ...BLM_LAYERS.closed.flatMap((l) => cased(310 + l * 10, l, INK.closed, CLOSED_W, { style: 'esriSLSDash', labelExpression: '[ROUTE_PRMRY_NM]', labelColor: INK.closedLabel })),
+      ...BLM_LAYERS.trails.flatMap((l) => cased(310 + l * 10, l, INK.trail, TRAIL_W, { style: 'esriSLSDash', feature: 'offroad', labelExpression: '[ROUTE_PRMRY_NM]' })),
+      ...BLM_LAYERS.roads.flatMap((l) => cased(310 + l * 10, l, INK.road, ROAD_W, { feature: 'dirtRoads', labelExpression: '[ROUTE_PRMRY_NM]' })),
+      ...BLM_LAYERS.closed.flatMap((l) => cased(310 + l * 10, l, INK.hiking, HIKE_W, { style: 'esriSLSDashDot', feature: 'hiking', casing: false, labelExpression: '[ROUTE_PRMRY_NM]' })),
     ],
   },
   fsclosed: {
@@ -161,25 +202,133 @@ export const TRAIL_SOURCES: Record<TrailSourceId, TrailSource> = {
     attribution: 'USDA Forest Service roads',
     service: FS_ROADS,
     identifyLayers: [1],
-    dynamicLayers: cased(401, 1, INK.closed, CLOSED_W, { style: 'esriSLSDash', labelExpression: '"CLOSED"', labelColor: INK.closedLabel }),
+    dynamicLayers: cased(401, 1, INK.closed, CLOSED_W, { style: 'esriSLSDash', feature: 'closed', labelExpression: '"CLOSED"', labelColor: INK.closedLabel }),
+  },
+  fstrails: {
+    id: 'fstrails',
+    name: 'Forest Service hiking trails',
+    attribution: 'USDA Forest Service trails',
+    service: FS_TRAILS,
+    identifyLayers: [0],
+    // National Forest System trails closed to motor vehicles: the forests' hiking and horse trails.
+    dynamicLayers: cased(501, 0, INK.hiking, HIKE_W, { style: 'esriSLSDashDot', where: "terra_motorized = 'N'", feature: 'hiking', casing: false, labelExpression: '[trail_name]' }),
   },
 };
 
-/** Closed roads first, so an open trail drawn over the same line wins. */
-export const TRAIL_SOURCE_IDS: TrailSourceId[] = ['fsclosed', 'mvum', 'blm'];
+/** Closed roads first, so an open trail drawn over the same line wins; hiking trails under everything a vehicle uses. */
+export const TRAIL_SOURCE_IDS: TrailSourceId[] = ['fstrails', 'fsclosed', 'mvum', 'blm'];
 export const TOPO_ATTRIBUTION = 'USGS The National Map';
+
+/** The layers to draw: all of them, or only those tagged with a feature in `only`. The tags stay on the phone. */
+export function pickLayers(layers: DynamicLayer[], only?: readonly string[]): Omit<DynamicLayer, 'feature'>[] {
+  return layers.filter((l) => !only || !l.feature || only.includes(l.feature)).map(({ feature: _f, ...rest }) => rest);
+}
 
 /**
  * Tile URL template for react-native-maps' WMSTile ({minX}..{maxY} are Web Mercator meters).
  * Asks for a 512 px image at 192 dpi for each 256 pt tile, so lines stay crisp on Retina screens.
+ * `only` limits it to the Map Features that are on (core/map-features); without it every layer
+ * is drawn, which is also what downloads for riding with no signal save.
  */
-export function trailTileTemplate(source: TrailSource): string {
-  const dynamic = encodeURIComponent(JSON.stringify(source.dynamicLayers));
+export function trailTileTemplate(source: { service: string; dynamicLayers: DynamicLayer[] }, only?: readonly string[]): string {
+  return exportTemplate(source.service, pickLayers(source.dynamicLayers, only));
+}
+
+export function exportTemplate(service: string, layers: Omit<DynamicLayer, 'feature'>[]): string {
+  const dynamic = encodeURIComponent(JSON.stringify(layers));
   return (
-    `${source.service}/export?bbox={minX},{minY},{maxX},{maxY}&bboxSR=3857&imageSR=3857` +
+    `${service}/export?bbox={minX},{minY},{maxX},{maxY}&bboxSR=3857&imageSR=3857` +
     `&size=512,512&dpi=192&format=png32&transparent=true&dynamicLayers=${dynamic}&f=image`
   );
 }
+
+/** The feature tags a source's layers carry, so a map can tell whether any of them is on. */
+export function sourceFeatures(source: { dynamicLayers: DynamicLayer[] }): string[] {
+  return [...new Set(source.dynamicLayers.map((l) => l.feature).filter((f): f is FeatureTag => !!f))];
+}
+
+// ---------------------------------------------------------------------------------------------
+// Land: who manages it (national forest, BLM, national and state parks) from USGS PAD-US, and
+// private property lines from Texas's free statewide parcel map. Drawn as a light tint with a
+// solid edge, from the agencies' map servers like the trail layers.
+
+export type LandSourceId = 'padus' | 'txparcels';
+
+export const PADUS = 'https://edits.nationalmap.gov/arcgis/rest/services/PAD-US/PAD_US_4_1/MapServer';
+export const TX_PARCELS = 'https://feature.geographic.texas.gov/arcgis/rest/services/Parcels/stratmap_land_parcels_48_most_recent/MapServer';
+
+/** Land tints show from about a few counties across (a national forest reads as a shape, not a smear). */
+export const LAND_MIN_Z = 7;
+/** Property lines are dense in towns; they wait until a few blocks fill the screen. */
+export const PARCELS_MIN_Z = 14;
+
+const rgba = (hex: string, a: number) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16), Math.round(a * 255)];
+
+function landLayer(id: number, where: string, hex: string, feature: FeatureTag): DynamicLayer {
+  return {
+    id,
+    source: { type: 'mapLayer', mapLayerId: 0 },
+    definitionExpression: where,
+    feature,
+    drawingInfo: {
+      renderer: {
+        type: 'simple',
+        symbol: { type: 'esriSFS', style: 'esriSFSSolid', color: rgba(hex, 0.24), outline: { type: 'esriSLS', style: 'esriSLSSolid', color: rgba(hex, 1), width: 1.6 } },
+      },
+      showLabels: true,
+      labelingInfo: [
+        {
+          labelExpression: '[Unit_Nm]',
+          labelPlacement: 'esriServerPolygonPlacementAlwaysHorizontal',
+          symbol: { type: 'esriTS', color: rgba(hex, 1), haloColor: [10, 22, 38, 255], haloSize: 2, font: { family: 'Arial', size: 10, weight: 'bold' } },
+          minScale: 600000,
+        },
+      ],
+    },
+  };
+}
+
+/** Land colors (core/map-features FEATURE_INK), repeated as hex so this file stays free of imports. */
+const LAND_HEX = { nationalForest: '#2FB36B', blm: '#E0A93B', nationalPark: '#9A6BFF', statePark: '#1FBFD6', private: '#FF6B6B' } as const;
+
+export type LandSource = { id: LandSourceId; attribution: string; service: string; minZ: number; dynamicLayers: DynamicLayer[] };
+
+export const LAND_SOURCES: Record<LandSourceId, LandSource> = {
+  padus: {
+    id: 'padus',
+    attribution: 'USGS PAD-US',
+    service: PADUS,
+    minZ: LAND_MIN_Z,
+    // Layer 0 is PAD-US "Fee" land: who owns and manages each piece (Mang_Name, Des_Tp is its kind).
+    dynamicLayers: [
+      landLayer(1, "Mang_Name = 'USFS'", LAND_HEX.nationalForest, 'nationalForest'),
+      landLayer(2, "Mang_Name = 'BLM'", LAND_HEX.blm, 'blm'),
+      landLayer(3, "Mang_Name = 'NPS'", LAND_HEX.nationalPark, 'nationalPark'),
+      landLayer(4, "Des_Tp IN ('SP','SREC')", LAND_HEX.statePark, 'statePark'),
+    ],
+  },
+  txparcels: {
+    id: 'txparcels',
+    attribution: 'Texas Geographic Information Office (StratMap land parcels)',
+    service: TX_PARCELS,
+    minZ: PARCELS_MIN_Z,
+    // Lines only: no owner names are drawn or shown.
+    dynamicLayers: [
+      {
+        id: 1,
+        source: { type: 'mapLayer', mapLayerId: 0 },
+        feature: 'private',
+        drawingInfo: {
+          renderer: {
+            type: 'simple',
+            symbol: { type: 'esriSFS', style: 'esriSFSNull', color: [0, 0, 0, 0], outline: { type: 'esriSLS', style: 'esriSLSSolid', color: rgba(LAND_HEX.private, 0.95), width: 1 } },
+          },
+        },
+      },
+    ],
+  },
+};
+export const LAND_SOURCE_IDS: LandSourceId[] = ['padus', 'txparcels'];
 
 /** The same URL with a real tile's box filled in, for saving tiles ahead of a ride. */
 export function fillTemplate(template: string, t: Tile): string {
@@ -383,6 +532,8 @@ export type TrailInfo = {
   lineKey: string | null;
   /** Where the rider tapped, for matching width entries on lines with no lasting id. */
   at?: LatLng;
+  /** A foot or horse trail (Hiking Trails), not a route for vehicles. */
+  hiking?: boolean;
 };
 
 /** MVUM vehicle columns in the order riders think about them, with plain names. */
@@ -541,6 +692,36 @@ export function parseFsClosed(props: Record<string, unknown>): TrailInfo {
   };
 }
 
+/** A National Forest System trail closed to motor vehicles: a hiking (and often horse or bike) trail. */
+export function parseFsTrail(props: Record<string, unknown>): TrailInfo {
+  const rawName = str(props.trail_name);
+  const name = rawName ? titleCase(rawName) : null;
+  const no = str(props.trail_no);
+  const uses: VehicleAccess[] = [
+    ['hiker_pedestrian_managed', 'Hikers'],
+    ['pack_saddle_managed', 'Horses and pack animals'],
+    ['bicycle_managed', 'Mountain bikes'],
+  ]
+    .filter(([f]) => !!str(props[f]))
+    .map(([, label]) => ({ vehicle: label, dates: null }));
+  const miles = Number(props.gis_miles ?? props.segment_length);
+  return {
+    source: 'fstrails',
+    kind: 'trail',
+    hiking: true,
+    title: name && no && !name.includes(no) ? tc('{name} (Trail {id})', { name, id: no }) : name ?? (no ? tc('Trail {id}', { id: no }) : tc('Forest Service trail')),
+    where: null,
+    allowed: uses,
+    seasonal: false,
+    miles: Number.isFinite(miles) && miles > 0 ? Math.round(miles * 10) / 10 : null,
+    surface: tidy(props.trail_surface),
+    attribution: TRAIL_SOURCES.fstrails.attribution,
+    closure: { label: tc('Hiking Trail, No Motor Vehicles'), detail: tc('The Forest Service lists this trail as closed to motorized use.') },
+    widthLimitIn: null,
+    lineKey: null,
+  };
+}
+
 export function parseBlm(props: Record<string, unknown>): TrailInfo {
   const mode = tidy(props.PLAN_MODE_TRNSPRT) ?? tidy(props.OBSRVE_MODE_TRNSPRT);
   const ohv = str(props.PLAN_OHV_ROUTE_DSGNTN);
@@ -575,7 +756,13 @@ export function nearestTrail(
       if (d > maxM || (best && d >= best.d)) continue;
       const props = f.properties ?? {};
       const info =
-        r.source === 'mvum' ? parseMvum(props, r.layerId === 2 ? 'trail' : 'road') : r.source === 'fsclosed' ? parseFsClosed(props) : parseBlm(props);
+        r.source === 'mvum'
+          ? parseMvum(props, r.layerId === 2 ? 'trail' : 'road')
+          : r.source === 'fsclosed'
+            ? parseFsClosed(props)
+            : r.source === 'fstrails'
+              ? parseFsTrail(props)
+              : parseBlm(props);
       best = { d, info };
     }
   }
@@ -635,4 +822,107 @@ export function closedSeasonalLines(features: GeoJsonLine[], layerId: number, on
     out.push({ key: `mvum${layerId}-${str(props.objectid) ?? str(props.id) ?? out.length}`, title: info.title, opens: nextOpening(ranges, on), parts });
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Tap the map to see whose land it is.
+
+export type LandInfo = {
+  /** "Manti-La Sal National Forest", or "Private Property". */
+  title: string;
+  /** "U.S. Forest Service", "Texas Parks and Wildlife". */
+  manager: string | null;
+  /** National Forest, BLM land, National Park, State Park, or Private. */
+  kind: 'nationalForest' | 'blm' | 'nationalPark' | 'statePark' | 'public' | 'private';
+  /** Open, Restricted, Closed or Unknown, from PAD-US. */
+  access: string | null;
+  acres: number | null;
+  attribution: string;
+};
+
+/** ArcGIS query for the land polygon under a point (no shapes come back, only its facts). */
+export function landQueryUrl(service: string, p: LatLng, fields: string[], where = '1=1'): string {
+  return (
+    `${service}/0/query?where=${encodeURIComponent(where)}&geometry=${p.lng.toFixed(6)},${p.lat.toFixed(6)}&geometryType=esriGeometryPoint&inSR=4326` +
+    `&spatialRel=esriSpatialRelIntersects&outFields=${fields.join(',')}&returnGeometry=false&resultRecordCount=5&f=json`
+  );
+}
+
+export const PADUS_FIELDS = ['Unit_Nm', 'Mang_Name', 'Loc_Mang', 'Des_Tp', 'Pub_Access', 'GIS_Acres'];
+
+const AGENCY_NAMES: Record<string, string> = {
+  USFS: 'U.S. Forest Service',
+  BLM: 'Bureau of Land Management',
+  NPS: 'National Park Service',
+  FWS: 'U.S. Fish and Wildlife Service',
+  USBR: 'Bureau of Reclamation',
+  DOD: 'Department of Defense',
+};
+const ACCESS: Record<string, string> = { OA: 'Open to the public', RA: 'Restricted access', XA: 'Closed to the public', UK: 'Access unknown' };
+
+/**
+ * The land piece a rider tapped, from PAD-US answers. Parks and forests beat the wider pieces
+ * they sit in, so a state park inside BLM land reads as the park. Only kinds the rider has on count.
+ */
+export function parsePadus(rows: Record<string, unknown>[], on: { nationalForest?: boolean; blm?: boolean; nationalPark?: boolean; statePark?: boolean }): LandInfo | null {
+  const kindOf = (r: Record<string, unknown>): LandInfo['kind'] | null => {
+    const mang = str(r.Mang_Name);
+    const des = str(r.Des_Tp);
+    if (des === 'SP' || des === 'SREC') return on.statePark ? 'statePark' : null;
+    if (mang === 'NPS') return on.nationalPark ? 'nationalPark' : null;
+    if (mang === 'USFS') return on.nationalForest ? 'nationalForest' : null;
+    if (mang === 'BLM') return on.blm ? 'blm' : null;
+    return null;
+  };
+  const rank: Record<LandInfo['kind'], number> = { statePark: 0, nationalPark: 1, nationalForest: 2, blm: 3, public: 4, private: 5 };
+  const hits = rows.map((r) => ({ r, kind: kindOf(r) })).filter((h): h is { r: Record<string, unknown>; kind: LandInfo['kind'] } => !!h.kind);
+  if (!hits.length) return null;
+  hits.sort((a, b) => rank[a.kind] - rank[b.kind]);
+  const { r, kind } = hits[0];
+  const mang = str(r.Mang_Name);
+  const acres = Number(r.GIS_Acres);
+  const fallback = kind === 'blm' ? tc('BLM Land') : kind === 'nationalForest' ? tc('National Forest') : kind === 'nationalPark' ? tc('National Park') : tc('State Park');
+  return {
+    title: str(r.Unit_Nm) ?? fallback,
+    manager: (mang && AGENCY_NAMES[mang]) ?? str(r.Loc_Mang),
+    kind,
+    access: ACCESS[str(r.Pub_Access) ?? 'UK'] ?? null,
+    acres: Number.isFinite(acres) && acres > 0 ? Math.round(acres) : null,
+    attribution: LAND_SOURCES.padus.attribution,
+  };
+}
+
+/**
+ * The Texas parcel map answers "identify" (not "query"): the parcel under a point. Its answer
+ * includes owner details, which the app ignores; only size and county are read.
+ */
+export function parcelIdentifyUrl(p: LatLng): string {
+  const d = 0.001;
+  return (
+    `${TX_PARCELS}/identify?geometry=${p.lng.toFixed(6)},${p.lat.toFixed(6)}&geometryType=esriGeometryPoint&sr=4326&layers=all:0&tolerance=1` +
+    `&mapExtent=${(p.lng - d).toFixed(6)},${(p.lat - d).toFixed(6)},${(p.lng + d).toFixed(6)},${(p.lat + d).toFixed(6)}&imageDisplay=200,200,96&returnGeometry=false&f=json`
+  );
+}
+
+/** Roughly Texas, so taps elsewhere don't ask the Texas parcel map. */
+export function inTexas(p: LatLng): boolean {
+  return p.lat > 25.8 && p.lat < 36.6 && p.lng > -106.7 && p.lng < -93.5;
+}
+
+/** A Texas parcel: size and county only. Owner names are public record but are never shown. */
+export function parseParcel(rows: Record<string, unknown>[]): LandInfo | null {
+  const raw = rows[0];
+  if (!raw) return null;
+  const r = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k.toLowerCase(), v]));
+  // GIS_AREA is in acres.
+  const acres = Number(r.gis_area);
+  const county = str(r.county);
+  return {
+    title: tc('Property Parcel'),
+    manager: county ? tc('{county} County, Texas', { county: titleCase(county) }) : null,
+    kind: 'private',
+    access: tc('Private unless posted otherwise. Ask the owner before riding here.'),
+    acres: !Number.isFinite(acres) || acres <= 0 ? null : acres < 10 ? Math.round(acres * 10) / 10 : Math.round(acres),
+    attribution: LAND_SOURCES.txparcels.attribution,
+  };
 }
