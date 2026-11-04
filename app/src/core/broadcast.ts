@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Ride Mode's status buttons and quick replies, seen from the rider who tapped one: what went
  * out, who on the ride has it, and taking it back.
@@ -70,19 +72,19 @@ export function bluetoothReceipts(itemId: string, acks: { userId: string; state:
 const names = (ids: string[], nameOf: (id: string) => string) => {
   const n = ids.map(nameOf);
   if (n.length <= 2) return n.join(' and ');
-  return `${n.slice(0, 2).join(', ')} and ${n.length - 2} more`;
+  return tc('{v} and {v2} more', { v: n.slice(0, 2).join(', '), v2: n.length - 2 });
 };
 
 /** One line under the tap: who has it. */
 export function tallyLine(t: Tally, nameOf: (id: string) => string): string {
   const total = t.seen.length + t.notified.length + t.reached.length + t.waiting.length;
-  if (!total) return 'Nobody else has joined the ride yet.';
-  if (t.seen.length === total) return total === 1 ? `${nameOf(t.seen[0])} got it.` : `All ${total} riders got it.`;
+  if (!total) return tc('Nobody else has joined the ride yet.');
+  if (t.seen.length === total) return total === 1 ? tc('{v} got it.', { v: nameOf(t.seen[0]) }) : tc('All {total} riders got it.', { total });
   const parts: string[] = [];
-  if (t.seen.length) parts.push(`Seen by ${names(t.seen, nameOf)}`);
-  if (t.notified.length) parts.push(`${t.notified.length} notified by push`);
-  if (t.reached.length) parts.push(`Reached ${names(t.reached, nameOf)} over Bluetooth`);
-  if (!parts.length) return `Sent to ${total === 1 ? '1 rider' : `${total} riders`}. Waiting for their phones.`;
+  if (t.seen.length) parts.push(tc('Seen by {v}', { v: names(t.seen, nameOf) }));
+  if (t.notified.length) parts.push(tc('{n} notified by push', { n: t.notified.length }));
+  if (t.reached.length) parts.push(tc('Reached {v} over Bluetooth', { v: names(t.reached, nameOf) }));
+  if (!parts.length) return tc('Sent to {v}. Waiting for their phones.', { v: total === 1 ? tc('1 rider') : tc('{total} riders', { total }) });
   return `${parts.join('. ')}.`;
 }
 
@@ -93,18 +95,18 @@ export function tallyLine(t: Tally, nameOf: (id: string) => string): string {
 export function queuedLine(t: Tally, nameOf: (id: string) => string): string | null {
   if (!t.seen.length && !t.reached.length) return null;
   const parts: string[] = [];
-  if (t.seen.length) parts.push(`Seen by ${names(t.seen, nameOf)} over Bluetooth`);
-  if (t.reached.length) parts.push(`Reached ${names(t.reached, nameOf)} over Bluetooth`);
-  return `No signal here. ${parts.join('. ')}. It sends to everyone when you get service.`;
+  if (t.seen.length) parts.push(tc('Seen by {v} over Bluetooth', { v: names(t.seen, nameOf) }));
+  if (t.reached.length) parts.push(tc('Reached {v} over Bluetooth', { v: names(t.reached, nameOf) }));
+  return tc('No signal here. {v}. It sends to everyone when you get service.', { v: parts.join('. ') });
 }
 
 /** The big line on the card. */
 export function headline(b: Pick<Broadcast, 'label' | 'state'>): string {
   switch (b.state) {
-    case 'sending': return `Sending ${b.label}`;
-    case 'sent': return `${b.label} Sent to the Group`;
-    case 'queued': return `${b.label} Is Waiting for Signal`;
-    case 'cancelling': return `Cancelling ${b.label}`;
+    case 'sending': return tc('Sending {label}', { label: b.label });
+    case 'sent': return tc('{label} Sent to the Group', { label: b.label });
+    case 'queued': return tc('{label} Is Waiting for Signal', { label: b.label });
+    case 'cancelling': return tc('Cancelling {label}', { label: b.label });
     case 'cancelled': return `${b.label} Cancelled`;
   }
 }
@@ -112,10 +114,10 @@ export function headline(b: Pick<Broadcast, 'label' | 'state'>): string {
 /** The small line under it when there are no receipts to show. */
 export function stateDetail(state: BroadcastState): string | null {
   switch (state) {
-    case 'sending': return 'Telling the group now.';
-    case 'queued': return 'No signal here. It sends by itself when you get service.';
-    case 'cancelling': return 'Taking it back from the group.';
-    case 'cancelled': return 'The group was told to ignore it.';
+    case 'sending': return tc('Telling the group now.');
+    case 'queued': return tc('No signal here. It sends by itself when you get service.');
+    case 'cancelling': return tc('Taking it back from the group.');
+    case 'cancelled': return tc('The group was told to ignore it.');
     default: return null;
   }
 }

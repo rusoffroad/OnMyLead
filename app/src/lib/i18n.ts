@@ -7,6 +7,7 @@ import {
   newerLanguageSetting,
   parseLanguageSetting,
   resolveLanguage,
+  setCoreTranslator,
   translateWith,
   type LanguageChoice,
   type LanguageCode,
@@ -40,12 +41,14 @@ const publish = () => listeners.forEach((l) => l());
 const syncListeners = new Set<(s: LanguageSetting) => void>();
 
 function tellPage() {
+  setCoreTranslator(t, languageByCode(current).locale);
   if (Platform.OS === 'web' && typeof document !== 'undefined') document.documentElement.lang = languageByCode(current).locale;
 }
 tellPage();
 
 /** The line in the rider's language (English when it isn't translated yet). See core/i18n.ts. */
-export function t(text: string, vars?: Record<string, string | number>): string {
+export function t(text: string | null | undefined, vars?: Record<string, string | number | null | undefined>): string {
+  if (!text) return text ?? '';
   return translateWith(current === 'en' ? null : TRANSLATIONS[current], text, vars);
 }
 

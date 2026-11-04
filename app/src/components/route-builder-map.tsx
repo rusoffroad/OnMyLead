@@ -12,6 +12,7 @@ import { RouteBuilderMapboxMap } from './route-builder-mapbox-map';
 import { MarkerBody } from './marker-body';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
+import { t } from '@/lib/i18n';
 
 type RouteBuilderMapProps = Parameters<typeof FlatRouteBuilderMap>[0];
 
@@ -121,7 +122,7 @@ function FlatRouteBuilderMap({
           anchor={{ x: 0.5, y: 1 }}
           tappable={false}
           tracksViewChanges={false}
-          accessibilityLabel={`Search result: ${found.name}`}
+          accessibilityLabel={t('Search result: {name}', { name: found.name })}
           zIndex={2}>
           <MarkerBody style={styles.found}>
             <Text style={styles.foundText} numberOfLines={1}>{found.name}</Text>

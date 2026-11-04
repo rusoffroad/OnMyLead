@@ -16,6 +16,7 @@ import { registerForPush, resetPushRegistration, syncRideReminders, useNotificat
 import { useSession } from '@/lib/session';
 import { newChannel, supabase } from '@/lib/supabase';
 
+import { t as tr } from '@/lib/i18n';
 type Alert = { id: string; title: string; body: string; inviteCode: string | null; accent: string; seconds: number };
 
 const names = new Map<string, string>();
@@ -49,7 +50,7 @@ async function toAlert(m: ChatMessage): Promise<Alert> {
   return {
     id: m.id,
     title: alertTitle(m, who, ride?.name),
-    body: m.poll_options?.length ? `${m.body} Tap to vote.` : m.body,
+    body: m.poll_options?.length ? tr('{body} Tap to vote.', { body: m.body }) : m.body,
     inviteCode: ride?.invite_code ?? null,
     accent: announcement ? RideColors.yellow : isLeaderOnly(m) ? RideColors.leader : Colors.accent,
     seconds: announcement ? 10 : 6,
@@ -141,7 +142,7 @@ export function MessageAlerts() {
       <Pressable
         accessibilityRole="alert"
         accessibilityLiveRegion="polite"
-        accessibilityLabel={`${current.title}: ${current.body}. Tap to open the ride.`}
+        accessibilityLabel={tr('{title}: {body}. Tap to open the ride.', { title: current.title, body: current.body })}
         onPress={() => {
           dismiss();
           if (current.inviteCode) router.push({ pathname: '/r/[code]', params: { code: current.inviteCode } });
@@ -149,19 +150,19 @@ export function MessageAlerts() {
         style={[styles.card, { borderLeftColor: current.accent }]}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.title} numberOfLines={1}>{current.title}</Text>
-          <Text style={styles.body} numberOfLines={3}>{current.body}</Text>
+          <Text style={styles.body} numberOfLines={3}>{tr(current.body)}</Text>
           {queue.length > 1 ? (
             <View style={styles.moreRow}>
-              <Text style={styles.more}>+{queue.length - 1} More</Text>
-              <Pressable accessibilityRole="button" accessibilityLabel={`Dismiss all ${queue.length}`} hitSlop={10} onPress={dismissAll}>
-                <Text style={styles.dismissAll}>Dismiss All</Text>
+              <Text style={styles.more}>{tr('+{v} More', { v: queue.length - 1 })}</Text>
+              <Pressable accessibilityRole="button" accessibilityLabel={tr('Dismiss all {length}', { length: queue.length })} hitSlop={10} onPress={dismissAll}>
+                <Text style={styles.dismissAll}>{tr('Dismiss All')}</Text>
               </Pressable>
             </View>
           ) : null}
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Dismiss" hitSlop={12} onPress={dismiss} style={styles.close}>
+        <Pressable accessibilityRole="button" accessibilityLabel={tr('Dismiss')} hitSlop={12} onPress={dismiss} style={styles.close}>
           <Text style={styles.closeText}>✕</Text>
-          <Text style={styles.closeLabel}>Dismiss</Text>
+          <Text style={styles.closeLabel}>{tr('Dismiss')}</Text>
         </Pressable>
       </Pressable>
     </View>

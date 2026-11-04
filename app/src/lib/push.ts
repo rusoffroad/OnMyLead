@@ -24,6 +24,7 @@ import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
 import { supabase } from './supabase';
 
+import { tc } from '@/core/i18n';
 // Chat already pops up inside the app, so only the rest gets a banner while the app is open.
 Notifications.setNotificationHandler({
   handleNotification: async (n) => {
@@ -66,15 +67,15 @@ async function createAndroidChannels() {
   const high = Notifications.AndroidImportance.HIGH;
   await Promise.all([
     Notifications.setNotificationChannelAsync('ride-alerts', {
-      name: 'Rider Alerts',
-      description: 'Need Help, EMERGENCY and other status taps from your group.',
+      name: tc('Rider Alerts'),
+      description: tc('Need Help, EMERGENCY and other status taps from your group.'),
       importance: Notifications.AndroidImportance.MAX,
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     }),
-    Notifications.setNotificationChannelAsync('ride-chat', { name: 'Ride Chat', description: 'Messages in ride and group chats.', importance: high }),
+    Notifications.setNotificationChannelAsync('ride-chat', { name: tc('Ride Chat'), description: tc('Messages in ride and group chats.'), importance: high }),
     Notifications.setNotificationChannelAsync('ride-updates', {
-      name: 'Ride Updates',
-      description: 'Ride changes, new riders, invites, reminders and account notices.',
+      name: tc('Ride Updates'),
+      description: tc('Ride changes, new riders, invites, reminders and account notices.'),
       importance: Notifications.AndroidImportance.DEFAULT,
     }),
   ]);

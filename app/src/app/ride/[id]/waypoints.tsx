@@ -31,6 +31,7 @@ import { useSession } from '@/lib/session';
 import type { Ride, RideMember } from '@/lib/types';
 import { requirePro } from '@/lib/pro';
 
+import { t } from '@/lib/i18n';
 /**
  * Every waypoint on a ride, on a map and in a list: the leader's shared ones and your own. Press and
  * hold the map to drop one (click it on the website), or add one where you're standing. Only riders
@@ -75,7 +76,7 @@ export default function RideWaypoints() {
         setRoute(rt.route);
         setCenter(d ? { lat: d.meet_lat, lng: d.meet_lng } : r ? { lat: r.meet_area_lat, lng: r.meet_area_lng } : null);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load the ride.'))
+      .catch((e) => setError(e instanceof Error ? e.message : t('Could not load the ride.')))
       .finally(() => setLoaded(true));
   }, [id]);
 
@@ -98,7 +99,7 @@ export default function RideWaypoints() {
     try {
       openNew(await currentPosition());
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t find your location.');
+      setError(e instanceof Error ? e.message : t('Couldn’t find your location.'));
     } finally {
       setLocating(false);
     }
@@ -109,20 +110,20 @@ export default function RideWaypoints() {
 
   const navigateTo = (lat: number, lng: number, title = 'This Waypoint') => openDirections({ title, to: { lat, lng } });
 
-  const drop = web ? 'Click' : 'Press and hold';
+  const drop = web ? t('Click') : t('Press and hold');
   const hint = !mine
-    ? 'Join the ride to add and see its waypoints.'
+    ? t('Join the ride to add and see its waypoints.')
     : !wp.switchedOn
       ? WAYPOINTS_NOT_SWITCHED_ON
       : addingStop && !wp.stopsSwitchedOn
         ? PLANNED_STOPS_NOT_SWITCHED_ON
       : found
-        ? `${drop} the map at ${found.name} to drop ${addingStop ? 'the stop' : 'a waypoint'} there.`
+        ? t('{drop} the map at {name} to drop {v} there.', { drop, name: found.name, v: addingStop ? 'the stop' : 'a waypoint' })
       : addingStop
-        ? `${drop} the map where the group will stop, or Search for the place. Stops are numbered in the order you add them.`
+        ? t('{drop} the map where the group will stop, or Search for the place. Stops are numbered in the order you add them.', { drop })
       : canShare
-        ? `${drop} the map to drop a waypoint, or Search for a place. You choose whether the whole ride sees it.`
-        : `${drop} the map to drop a waypoint, or Search for a place. Yours are only for you.`;
+        ? t('{drop} the map to drop a waypoint, or Search for a place. You choose whether the whole ride sees it.', { drop })
+        : t('{drop} the map to drop a waypoint, or Search for a place. Yours are only for you.', { drop });
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -151,17 +152,17 @@ export default function RideWaypoints() {
           <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
         ) : (
           <View style={styles.topRow}>
-            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={{ flexShrink: 1 }}>
+            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel={t('Back')} style={{ flexShrink: 1 }}>
               <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
             </Pressable>
             <Pressable
               onPress={() => setSearching(looking.current ?? center)}
               accessibilityRole="button"
-              accessibilityLabel="Search the Map for a Place"
+              accessibilityLabel={t('Search the Map for a Place')}
               hitSlop={8}
               style={({ pressed }) => [styles.search, pressed && { opacity: 0.8 }]}>
               <Icon name="search" size={17} color={Colors.text} />
-              <Text style={styles.searchText}>Search</Text>
+              <Text style={styles.searchText}>{t('Search')}</Text>
             </Pressable>
           </View>
         )}
@@ -172,7 +173,7 @@ export default function RideWaypoints() {
       <Animated.View {...fold.panHandlers} style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !fold.open && { gap: 4 }]}>
         <PanelHandle open={fold.open} onToggle={() => fold.setOpen(!fold.open)} what="Waypoints" fromTop={wide} onFullMap={fullMap.enter} />
-        {wp.offline ? <Text style={styles.offline}>Saved on This Phone</Text> : null}
+        {wp.offline ? <Text style={styles.offline}>{t('Saved on This Phone')}</Text> : null}
         {fold.open ? (
           <>
             <Text style={styles.hint}>{hint}</Text>
@@ -184,8 +185,8 @@ export default function RideWaypoints() {
               </ScrollView>
             ) : null}
             <ErrorText error={error} />
-            {mine ? <Button title="Add at My Location" big pro="waypoints" loading={locating} disabled={!wp.switchedOn} onPress={() => requirePro('waypoints') && addHere()} /> : null}
-            <Text style={styles.privacy}>Waypoints are never public. Shared ones and planned stops show only to riders on this ride.</Text>
+            {mine ? <Button title={t('Add at My Location')} big pro="waypoints" loading={locating} disabled={!wp.switchedOn} onPress={() => requirePro('waypoints') && addHere()} /> : null}
+            <Text style={styles.privacy}>{t('Waypoints are never public. Shared ones and planned stops show only to riders on this ride.')}</Text>
           </>
         ) : null}
         {!fold.open ? <ErrorText error={error} /> : null}

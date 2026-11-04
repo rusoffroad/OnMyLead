@@ -5,6 +5,7 @@
  */
 import { rideLeaderIds } from './chat';
 
+import { tc } from './i18n';
 export type RosterRole = 'organizer' | 'co_organizer' | 'leader' | 'sweep' | 'rider';
 type Member = { user_id: string; status: string; role: RosterRole | string };
 
@@ -69,13 +70,13 @@ export function rosterActions(
 export function handOffPrompt(kind: Exclude<HandOff, null>, name: string): { title: string; message: string; confirm: string } {
   return kind === 'ride'
     ? {
-        title: `Give the ride to ${name}?`,
-        message: `${name} becomes the organizer and leader. You stay on the ride as a rider and can't undo this yourself.`,
+        title: tc('Give the ride to {name}?', { name }),
+        message: tc('{name} becomes the organizer and leader. You stay on the ride as a rider and can\'t undo this yourself.', { name }),
         confirm: 'Give Ride',
       }
     : {
-        title: `Hand the lead to ${name}?`,
-        message: `${name} leads from here, and messages to the leader go to them. You stay on the ride as a rider.`,
+        title: tc('Hand the lead to {name}?', { name }),
+        message: tc('{name} leads from here, and messages to the leader go to them. You stay on the ride as a rider.', { name }),
         confirm: 'Hand Off',
       };
 }
@@ -83,11 +84,11 @@ export function handOffPrompt(kind: Exclude<HandOff, null>, name: string): { tit
 /** Turn a hand-off or tail gunner error into something a rider can act on. */
 export function friendlyRoleError(message: string): string {
   if (/hand_off_ride|set_tail_gunner/.test(message) && /could not find|schema cache|does not exist/i.test(message)) {
-    return 'Handing off the ride and picking a tail gunner aren’t switched on yet.';
+    return tc('Handing off the ride and picking a tail gunner aren’t switched on yet.');
   }
-  if (/joined the ride first/i.test(message)) return 'They need to join the ride first.';
-  if (/ride is over/i.test(message)) return 'This ride is over, so roles can’t change.';
-  if (/only the leader/i.test(message)) return 'Only the leader can do that.';
-  if (/can.t also be tail gunner/i.test(message)) return 'The leader and organizers ride up front, so pick another rider for tail gunner.';
+  if (/joined the ride first/i.test(message)) return tc('They need to join the ride first.');
+  if (/ride is over/i.test(message)) return tc('This ride is over, so roles can’t change.');
+  if (/only the leader/i.test(message)) return tc('Only the leader can do that.');
+  if (/can.t also be tail gunner/i.test(message)) return tc('The leader and organizers ride up front, so pick another rider for tail gunner.');
   return message;
 }

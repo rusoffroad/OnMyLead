@@ -7,6 +7,7 @@ import { refreshFriends } from './friends';
 import { useSession } from './session';
 import { supabase } from './supabase';
 
+import { tc } from '@/core/i18n';
 /**
  * The riders this rider has blocked (see core/blocks), kept in one small store so every chat
  * screen filters the same way. Loads once per signed-in rider. Until the server has the
@@ -39,7 +40,7 @@ async function fetchBlocks(): Promise<BlockedRider[]> {
   if (!rows.length) return [];
   const { data: people } = await supabase.from('profiles').select('id, display_name').in('id', rows.map((r) => r.blocked_id));
   const names = new Map(((people ?? []) as { id: string; display_name: string }[]).map((p) => [p.id, p.display_name]));
-  return sortBlocked(rows.map((r) => ({ userId: r.blocked_id, name: names.get(r.blocked_id)?.trim() || 'Rider', blockedAt: r.created_at })));
+  return sortBlocked(rows.map((r) => ({ userId: r.blocked_id, name: names.get(r.blocked_id)?.trim() || tc('Rider'), blockedAt: r.created_at })));
 }
 
 /** Loads (or with force, reloads) the blocks of whoever is signed in; null clears them on sign-out. */
@@ -96,7 +97,7 @@ export async function blockRider(userId: string, name: string) {
     throw new Error(error.message);
   }
   if (!current.ids.has(userId)) {
-    set({ list: sortBlocked([...current.list, { userId, name: name.trim() || 'Rider', blockedAt: new Date().toISOString() }]) });
+    set({ list: sortBlocked([...current.list, { userId, name: name.trim() || tc('Rider'), blockedAt: new Date().toISOString() }]) });
   }
   track('rider_blocked');
   // Blocking ends a friendship (the database removes it); show that straight away.

@@ -24,6 +24,7 @@ import { currentPosition, stateAt } from '@/lib/location';
 import { useSession } from '@/lib/session';
 import type { Ride, RidePrivateDetails } from '@/lib/types';
 
+import { t } from '@/lib/i18n';
 /**
  * Edit Ride Details: the ride's leader or a co-leader changes the name, day and times, meeting
  * point and the rest after creating it. Same screen on iPhone, iPad, Android and the website.
@@ -54,7 +55,7 @@ export default function EditRide() {
       setRide(r);
       setDetails(d);
       setForm(formFromRide(r, d));
-    })().catch((e) => setError(e instanceof Error ? e.message : 'Could not load the ride.'));
+    })().catch((e) => setError(e instanceof Error ? e.message : t('Could not load the ride.')));
   }, [id, me]);
 
   const set = <K extends keyof RideEditForm>(key: K, value: RideEditForm[K]) => setForm((f) => (f ? { ...f, [key]: value } : f));
@@ -65,19 +66,19 @@ export default function EditRide() {
   if (ride === undefined || !form) {
     return (
       <Screen>
-        {error ? <ErrorText error={error} /> : <ThemedText themeColor="textSecondary">Loading…</ThemedText>}
+        {error ? <ErrorText error={error} /> : <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>}
       </Screen>
     );
   }
-  if (ride === null) return <Screen><ThemedText>We couldn’t find that ride.</ThemedText></Screen>;
+  if (ride === null) return <Screen><ThemedText>{t('We couldn’t find that ride.')}</ThemedText></Screen>;
   if (!canEditRide(ride.status, manager)) {
     return (
       <Screen width="readable">
-        <ThemedText type="heading">{manager ? `This Ride Has ${ride.status === 'ended' ? 'Ended' : 'Been Cancelled'}` : 'Only the Ride’s Leaders Can Edit It'}</ThemedText>
+        <ThemedText type="heading">{manager ? (ride.status === 'ended' ? t('This Ride Has Ended') : t('This Ride Has Been Cancelled')) : t('Only the Ride’s Leaders Can Edit It')}</ThemedText>
         <ThemedText themeColor="textSecondary">
-          {manager ? 'Its details stay as they were. Copy it from the ride page to plan the next one.' : 'Ask the leader to make the change.'}
+          {manager ? t('Its details stay as they were. Copy it from the ride page to plan the next one.') : t('Ask the leader to make the change.')}
         </ThemedText>
-        <Button title="Back to the Ride" kind="secondary" onPress={() => router.back()} />
+        <Button title={t('Back to the Ride')} kind="secondary" onPress={() => router.back()} />
       </Screen>
     );
   }
@@ -99,7 +100,7 @@ export default function EditRide() {
       const p = await currentPosition();
       await pickOnMap(p);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not get your location.');
+      setError(e instanceof Error ? e.message : t('Could not get your location.'));
     }
   }
 
@@ -116,25 +117,25 @@ export default function EditRide() {
       if (patch.changed.includes('time')) syncRideReminders(currentNotificationSettings().reminder_minutes);
       router.back();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save the ride.');
+      setError(e instanceof Error ? e.message : t('Could not save the ride.'));
       setBusy(false);
     }
   }
 
   const when = whenWhere ? (
     <Card>
-      <ThemedText type="heading">When</ThemedText>
+      <ThemedText type="heading">{t('When')}</ThemedText>
       <RideDatePicker value={form.day} onChange={(d) => set('day', d)} />
-      <TimePicker label="Meet At" value={form.meetTime} onChange={(v) => set('meetTime', v)} />
+      <TimePicker label={t('Meet At')} value={form.meetTime} onChange={(v) => set('meetTime', v)} />
       <TimePicker
-        label="Departure Time (Optional)"
+        label={t('Departure Time (Optional)')}
         value={form.departTime}
         onChange={(v) => set('departTime', v)}
         optional
         suggest={shiftClock(parseTime(form.meetTime) ?? 8 * 60, 30)}
       />
       <TimePicker
-        label="Expected Finish (Optional)"
+        label={t('Expected Finish (Optional)')}
         value={form.finishTime}
         onChange={(v) => set('finishTime', v)}
         optional
@@ -142,25 +143,25 @@ export default function EditRide() {
       />
     </Card>
   ) : (
-    <Locked title="The Ride Is Live">
-      The day, times and meeting point stay as they are while everyone is out riding. The name and details below can still change.
+    <Locked title={t('The Ride Is Live')}>
+      {t('The day, times and meeting point stay as they are while everyone is out riding. The name and details below can still change.')}
     </Locked>
   );
 
   const where = whenWhere && details ? (
     <Card>
-      <ThemedText type="heading">Meeting Point</ThemedText>
+      <ThemedText type="heading">{t('Meeting Point')}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
-        Only joined riders see the exact spot. Public pages show the area within about a mile.
+        {t('Only joined riders see the exact spot. Public pages show the area within about a mile.')}
       </ThemedText>
-      <PlaceSearch label="Search a Place or Address" near={spot} onPick={pickPlace} />
+      <PlaceSearch label={t('Search a Place or Address')} near={spot} onPick={pickPlace} />
       <MeetPointMap value={spot} onPick={pickOnMap} />
-      <Button title="Use My Current Location" kind="secondary" onPress={useMyLocation} />
-      <Field label="Coordinates" value={form.coords} onChangeText={(v) => set('coords', v)} placeholder="38.57330, -109.54980" autoCapitalize="none" />
-      <Field label="Place Name" value={form.meetLabel} onChangeText={(v) => set('meetLabel', v)} placeholder="Gas station on Main St, Moab, UT" />
+      <Button title={t('Use My Current Location')} kind="secondary" onPress={useMyLocation} />
+      <Field label={t('Coordinates')} value={form.coords} onChangeText={(v) => set('coords', v)} placeholder="38.57330, -109.54980" autoCapitalize="none" />
+      <Field label={t('Place Name')} value={form.meetLabel} onChangeText={(v) => set('meetLabel', v)} placeholder={t('Gas station on Main St, Moab, UT')} />
       {ride.visibility === 'public' ? (
         <Choice
-          label={form.meetState ? `Listed in ${stateByCode(form.meetState)?.name ?? form.meetState}` : 'State'}
+          label={form.meetState ? t('Listed in {v}', { v: stateByCode(form.meetState)?.name ?? form.meetState }) : t('State')}
           value={form.meetState}
           onChange={(v) => set('meetState', v)}
           options={US_STATES.map((st) => ({ value: st.code, label: st.code }))}
@@ -172,65 +173,65 @@ export default function EditRide() {
   const rest = (
     <>
       <Card>
-        <ThemedText type="heading">About the Ride</ThemedText>
-        <Field label="Description" value={form.description} onChangeText={(v) => set('description', v)} multiline />
-        <PlaceSearch label="Search a Destination" onPick={(p) => set('destination', placeLabel(p))} />
-        <Field label="Destination" value={form.destination} onChangeText={(v) => set('destination', v)} placeholder="Trailhead, town or street address" />
+        <ThemedText type="heading">{t('About the Ride')}</ThemedText>
+        <Field label={t('Description')} value={form.description} onChangeText={(v) => set('description', v)} multiline />
+        <PlaceSearch label={t('Search a Destination')} onPick={(p) => set('destination', placeLabel(p))} />
+        <Field label={t('Destination')} value={form.destination} onChangeText={(v) => set('destination', v)} placeholder={t('Trailhead, town or street address')} />
         <Field
-          label="Route Length (Miles)"
+          label={t('Route Length (Miles)')}
           value={form.routeMiles}
           onChangeText={(v) => set('routeMiles', v)}
           keyboardType="decimal-pad"
-          hint="Used to warn riders whose fuel range is too short."
+          hint={t('Used to warn riders whose fuel range is too short.')}
         />
         <Choice
-          label="Difficulty"
+          label={t('Difficulty')}
           value={form.difficulty}
           onChange={(v) => set('difficulty', v)}
-          options={[{ value: 'easy', label: 'Easy' }, { value: 'moderate', label: 'Moderate' }, { value: 'hard', label: 'Hard' }, { value: 'extreme', label: 'Extreme' }]}
+          options={[{ value: 'easy', label: t('Easy') }, { value: 'moderate', label: t('Moderate') }, { value: 'hard', label: t('Hard') }, { value: 'extreme', label: t('Extreme') }]}
         />
         <Choice
-          label="Experience"
+          label={t('Experience')}
           value={form.experience}
           onChange={(v) => set('experience', v)}
-          options={[{ value: 'beginner', label: 'Beginner' }, { value: 'intermediate', label: 'Intermediate' }, { value: 'advanced', label: 'Advanced' }, { value: 'expert', label: 'Expert' }]}
+          options={[{ value: 'beginner', label: t('Beginner') }, { value: 'intermediate', label: t('Intermediate') }, { value: 'advanced', label: t('Advanced') }, { value: 'expert', label: t('Expert') }]}
         />
       </Card>
       <Card>
-        <ThemedText type="heading">Who’s Riding</ThemedText>
-        <MultiChoice label="Vehicles Welcome" options={VEHICLE_TYPES} value={form.vehicleTypes} onChange={(v) => set('vehicleTypes', v)} />
+        <ThemedText type="heading">{t('Who’s Riding')}</ThemedText>
+        <MultiChoice label={t('Vehicles Welcome')} options={VEHICLE_TYPES} value={form.vehicleTypes} onChange={(v) => set('vehicleTypes', v)} />
         {ride.visibility === 'public' ? (
           <Choice
-            label="Joining"
+            label={t('Joining')}
             value={form.joinPolicy}
             onChange={(v) => set('joinPolicy', v)}
-            options={[{ value: 'open', label: 'Anyone Can Join' }, { value: 'approval', label: 'I Approve Riders' }]}
+            options={[{ value: 'open', label: t('Anyone Can Join') }, { value: 'approval', label: t('I Approve Riders') }]}
           />
         ) : null}
         <View style={{ flexDirection: 'row', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
-            <Field label="Max Vehicles" value={form.maxVehicles} onChangeText={(v) => set('maxVehicles', v)} keyboardType="number-pad" placeholder="No limit" />
+            <Field label={t('Max Vehicles')} value={form.maxVehicles} onChangeText={(v) => set('maxVehicles', v)} keyboardType="number-pad" placeholder={t('No limit')} />
           </View>
           <View style={{ flex: 1 }}>
-            <Field label="Max Riders" value={form.maxRiders} onChangeText={(v) => set('maxRiders', v)} keyboardType="number-pad" placeholder="No limit" />
+            <Field label={t('Max Riders')} value={form.maxRiders} onChangeText={(v) => set('maxRiders', v)} keyboardType="number-pad" placeholder={t('No limit')} />
           </View>
         </View>
-        <ThemedText type="small" themeColor="textSecondary">Lowering a limit never removes anyone who already joined.</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('Lowering a limit never removes anyone who already joined.')}</ThemedText>
       </Card>
       <Card>
-        <ThemedText type="heading">Bring and Know</ThemedText>
-        <Field label="What to Bring" value={form.whatToBring} onChangeText={(v) => set('whatToBring', v)} multiline />
-        <Field label="Required Equipment" value={form.requiredEquipment} onChangeText={(v) => set('requiredEquipment', v)} multiline placeholder="Whip flag, helmet, spare belt" />
-        <Field label="Fuel" value={form.fuelNotes} onChangeText={(v) => set('fuelNotes', v)} placeholder="Full tank, no gas on the trail" />
+        <ThemedText type="heading">{t('Bring and Know')}</ThemedText>
+        <Field label={t('What to Bring')} value={form.whatToBring} onChangeText={(v) => set('whatToBring', v)} multiline />
+        <Field label={t('Required Equipment')} value={form.requiredEquipment} onChangeText={(v) => set('requiredEquipment', v)} multiline placeholder={t('Whip flag, helmet, spare belt')} />
+        <Field label={t('Fuel')} value={form.fuelNotes} onChangeText={(v) => set('fuelNotes', v)} placeholder={t('Full tank, no gas on the trail')} />
         {details ? (
-          <Field label="Instructions for Joined Riders" value={form.instructions} onChangeText={(v) => set('instructions', v)} multiline />
+          <Field label={t('Instructions for Joined Riders')} value={form.instructions} onChangeText={(v) => set('instructions', v)} multiline />
         ) : null}
       </Card>
     </>
   );
 
   const saveBar = <SaveBar preview={preview} live={!whenWhere} busy={busy} error={error} onSave={save} />;
-  const name = <Field label="Ride Name" value={form.name} onChangeText={(v) => set('name', v)} maxLength={120} />;
+  const name = <Field label={t('Ride Name')} value={form.name} onChangeText={(v) => set('name', v)} maxLength={120} />;
 
   // A tablet or wide window: When and Where on the left, the rest beside it, the save bar under both.
   if (layout.expanded) {
@@ -284,18 +285,18 @@ function SaveBar({
           borderLeftColor: label ? (tells ? Colors.accent : Colors.sky) : Colors.border,
           backgroundColor: label ? withAlpha(tells ? Colors.accent : Colors.sky, 0.1) : Colors.backgroundElement,
         }}>
-        <ThemedText style={{ fontWeight: 700 }}>{label ?? 'No Changes Yet'}</ThemedText>
+        <ThemedText style={{ fontWeight: 700 }}>{label ?? t('No Changes Yet')}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {!label
-            ? 'Change anything above, then save. Riders see the new details right away.'
+            ? t('Change anything above, then save. Riders see the new details right away.')
             : tells
-              ? 'Everyone on the ride gets a notification, and the ride page shows what changed.'
-              : 'No notification for this. Riders see it on the ride page, marked Updated.'}
+              ? t('Everyone on the ride gets a notification, and the ride page shows what changed.')
+              : t('No notification for this. Riders see it on the ride page, marked Updated.')}
         </ThemedText>
       </View>
       <ErrorText error={error} />
-      <Button title="Save Changes" big loading={busy} disabled={!label && !error} onPress={onSave} />
-      <Button title="Cancel" kind="ghost" disabled={busy} onPress={() => router.back()} />
+      <Button title={t('Save Changes')} big loading={busy} disabled={!label && !error} onPress={onSave} />
+      <Button title={t('Cancel')} kind="ghost" disabled={busy} onPress={() => router.back()} />
     </View>
   );
 }

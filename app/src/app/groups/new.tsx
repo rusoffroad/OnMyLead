@@ -29,7 +29,7 @@ export default function NewGroup() {
   const save = async () => {
     const why = groupNameProblem(name);
     if (why) return setError(why);
-    if (!codeCheckOk(codeCheck)) return setError('Pick a different group code, or clear it to get one made for you.');
+    if (!codeCheckOk(codeCheck)) return setError(t('Pick a different group code, or clear it to get one made for you.'));
     setBusy(true);
     setError(null);
     try {
@@ -47,10 +47,10 @@ export default function NewGroup() {
     <Screen width="readable">
       <Stack.Screen options={{ title: t('New Group') }} />
       <Field
-        label="Group Name"
+        label={t('Group Name')}
         value={name}
         onChangeText={setName}
-        placeholder="Saturday Crew"
+        placeholder={t('Saturday Crew')}
         autoCapitalize="words"
         maxLength={MAX_GROUP_NAME + 8}
         returnKeyType="done"
@@ -59,35 +59,35 @@ export default function NewGroup() {
         <ThemedText type="subtitle" numberOfLines={2}>{cleanGroupName(name) || 'Your Crew'}</ThemedText>
         <Convoy names={[null, ...pickedNames]} />
         <ThemedText type="small" themeColor="textSecondary">
-          {picked.length ? `You and ${picked.length} ${picked.length === 1 ? 'rider' : 'riders'}.` : 'Just you so far.'}
+          {picked.length ? t('You and {length} {v}.', { length: picked.length, v: picked.length === 1 ? 'rider' : 'riders' }) : t('Just you so far.')}
         </ThemedText>
       </Card>
 
-      <Section title="Add Riders You’ve Ridden With" />
+      <Section title={t('Add Riders You’ve Ridden With')} />
       {mates === null ? (
-        <ThemedText themeColor="textSecondary">Loading…</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>
       ) : mates.length ? (
         <RiderPicker mates={mates} picked={picked} onChange={setPicked} />
       ) : (
         <ThemedText themeColor="textSecondary">
-          Nobody yet. Once you’ve been on a ride with someone, they show up here.
+          {t('Nobody yet. Once you’ve been on a ride with someone, they show up here.')}
         </ThemedText>
       )}
       <ThemedText type="small" themeColor="textSecondary">
-        Friends who aren’t on OnMyLead yet: save the group, then send them its link.
+        {t('Friends who aren’t on OnMyLead yet: save the group, then send them its link.')}
       </ThemedText>
       <ShareCodeField
         kind="group"
-        label="Group Code (Optional)"
-        hint="It’s the end of the group’s link. Leave it empty and OnMyLead makes one."
-        placeholder="SATURDAY-CREW"
+        label={t('Group Code (Optional)')}
+        hint={t('It’s the end of the group’s link. Leave it empty and OnMyLead makes one.')}
+        placeholder={t('SATURDAY-CREW')}
         value={code}
         onChange={setCode}
         onCheck={setCodeCheck}
       />
 
       <ErrorText error={error} />
-      <Button title="Save Group" big loading={busy} onPress={save} />
+      <Button title={t('Save Group')} big loading={busy} onPress={save} />
     </Screen>
   );
 }

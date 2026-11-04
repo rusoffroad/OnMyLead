@@ -7,6 +7,7 @@ import { inches, parseWidth, rigFit, shownWidth, NO_RIDER_WIDTHS, type FitVehicl
 import type { TrailInfo } from '@/core/trails';
 import { useGarageWidths, useRiderWidths } from '@/lib/trail-width';
 
+import { t } from '@/lib/i18n';
 const SAND = '#ECCD91';
 const FITS = '#57E3C3';
 const TOO_WIDE = '#FF6B6B';
@@ -55,7 +56,7 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
   async function submit(clear = false) {
     const p = clear ? ({ ok: true, value: null } as const) : parseWidth(text);
     if (!p.ok) return setError(p.error);
-    if (!clear && p.value == null) return setError('Enter the width in inches, like 50.');
+    if (!clear && p.value == null) return setError(t('Enter the width in inches, like 50.'));
     setBusy(true);
     setError(null);
     try {
@@ -63,7 +64,7 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
       Keyboard.dismiss();
       setEditing(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save the width.');
+      setError(e instanceof Error ? e.message : t('Couldn’t save the width.'));
     } finally {
       setBusy(false);
     }
@@ -77,8 +78,8 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
         <View style={styles.head} accessible accessibilityLabel={`${shown.label}. ${shown.detail}`}>
           <WidthIcon />
           <View style={{ flex: 1 }}>
-            <Text style={styles.value}>{shown.label}</Text>
-            <Text style={styles.detail}>{shown.detail}</Text>
+            <Text style={styles.value}>{t(shown.label)}</Text>
+            <Text style={styles.detail}>{t(shown.detail)}</Text>
           </View>
         </View>
       ) : null}
@@ -86,7 +87,7 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
 
       {editing ? (
         <View style={styles.editor}>
-          <Text style={styles.detail}>The narrowest gap you measured or a posted limit, in inches.</Text>
+          <Text style={styles.detail}>{t('The narrowest gap you measured or a posted limit, in inches.')}</Text>
           <View style={styles.inputRow}>
             <TextInput
               value={text}
@@ -98,30 +99,30 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
               maxLength={3}
               autoFocus
               onSubmitEditing={() => submit()}
-              accessibilityLabel="Width limit in inches"
+              accessibilityLabel={t('Width limit in inches')}
               style={styles.input}
             />
-            <Text style={styles.unit}>in</Text>
+            <Text style={styles.unit}>{t('in')}</Text>
             <Pressable accessibilityRole="button" onPress={() => submit()} disabled={busy} style={({ pressed }) => [styles.save, pressed && { opacity: 0.8 }]}>
-              {busy ? <ActivityIndicator color={Colors.background} size="small" /> : <Text style={styles.saveText}>Save Width</Text>}
+              {busy ? <ActivityIndicator color={Colors.background} size="small" /> : <Text style={styles.saveText}>{t('Save Width')}</Text>}
             </Pressable>
           </View>
           {error ? <Text style={[styles.detail, { color: TOO_WIDE }]}>{error}</Text> : null}
           <View style={styles.links}>
             {widths.mine != null ? (
               <Pressable accessibilityRole="button" hitSlop={8} onPress={() => submit(true)} disabled={busy}>
-                <Text style={styles.link}>Remove My Width</Text>
+                <Text style={styles.link}>{t('Remove My Width')}</Text>
               </Pressable>
             ) : null}
             <Pressable accessibilityRole="button" hitSlop={8} onPress={() => (Keyboard.dismiss(), setEditing(false))}>
-              <Text style={styles.link}>Cancel</Text>
+              <Text style={styles.link}>{t('Cancel')}</Text>
             </Pressable>
           </View>
         </View>
       ) : canAdd ? (
         <Pressable accessibilityRole="button" hitSlop={6} onPress={open} style={({ pressed }) => [styles.add, pressed && { opacity: 0.75 }]}>
           {shown ? null : <WidthIcon size={16} />}
-          <Text style={styles.addText}>{widths.mine != null ? `Change Your Width (${inches(widths.mine)})` : 'Add Width Limit'}</Text>
+          <Text style={styles.addText}>{widths.mine != null ? t('Change Your Width ({v})', { v: inches(widths.mine) }) : t('Add Width Limit')}</Text>
         </Pressable>
       ) : null}
     </View>

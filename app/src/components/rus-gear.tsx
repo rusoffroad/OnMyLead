@@ -12,6 +12,7 @@ import {
 import { ThemedText } from './themed-text';
 import { Button, Card } from './ui';
 
+import { t } from '@/lib/i18n';
 /**
  * A small, clearly labelled block of RUS Offroad products that fit the rider's machine
  * (and checklist, when given). Renders nothing until products load, and nothing at all
@@ -52,8 +53,8 @@ export function RusGear({
   return (
     <Card>
       <View style={{ gap: 2 }}>
-        <ThemedText type="heading">Gear From RUS Offroad</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">Suggestions from RUS Offroad, the team behind OnMyLead.</ThemedText>
+        <ThemedText type="heading">{t('Gear From RUS Offroad')}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('Suggestions from RUS Offroad, the team behind OnMyLead.')}</ThemedText>
       </View>
       {suggestions.map(({ product, reason }) => (
         <View key={product.id} style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.three, borderTopWidth: 1, borderTopColor: theme.backgroundSelected, paddingTop: Spacing.two }}>
@@ -66,11 +67,11 @@ export function RusGear({
               {[formatPrice(product.priceCents), reason].filter(Boolean).join(' · ')}
             </ThemedText>
           </View>
-          <Button title="Buy" kind="secondary" accessibilityLabel={`Buy ${product.name} from RUS Offroad`} onPress={() => openProduct(product, campaign)} />
+          <Button title={t('Buy')} kind="secondary" accessibilityLabel={t('Buy {name} from RUS Offroad', { name: product.name })} onPress={() => openProduct(product, campaign)} />
         </View>
       ))}
       <Pressable accessibilityRole="link" onPress={() => openStore(campaign)} style={{ minHeight: 44, justifyContent: 'center' }}>
-        <ThemedText type="small" style={{ color: theme.sky, fontWeight: 700 }}>Shop more at rusoffroad.com</ThemedText>
+        <ThemedText type="small" style={{ color: theme.sky, fontWeight: 700 }}>{t('Shop more at rusoffroad.com')}</ThemedText>
       </Pressable>
     </Card>
   );

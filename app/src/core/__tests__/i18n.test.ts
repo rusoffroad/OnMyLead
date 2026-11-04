@@ -27,18 +27,18 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
-/** Every literal handed to t() (or its alias) in a file that imports it from lib/i18n. */
+/** Every literal handed to t() or tc() (or an alias) in a file that imports it from lib/i18n or core/i18n. */
 function translatedLiterals(): { file: string; text: string }[] {
   const found: { file: string; text: string }[] = [];
   for (const file of sourceFiles(SRC)) {
     const code = readFileSync(file, 'utf8');
-    const imp = /import \{([^}]*)\} from '(?:@\/lib\/i18n|\.\/i18n)'/.exec(code);
+    const imp = /import \{([^}]*)\} from '(?:@\/lib\/i18n|@\/core\/i18n|\.\/i18n|\.\.\/i18n)'/.exec(code);
     if (!imp) continue;
     const names = imp[1]
       .split(',')
       .map((s) => s.trim())
-      .map((s) => (/^(t|tx) as (\w+)$/.exec(s)?.[2] ?? s))
-      .filter((s) => s === 't' || s === 'tx' || /^\w+$/.test(s) && imp[1].includes(`as ${s}`));
+      .map((s) => (/^(t|tx|tc) as (\w+)$/.exec(s)?.[2] ?? s))
+      .filter((s) => s === 't' || s === 'tx' || s === 'tc' || /^\w+$/.test(s) && imp[1].includes(`as ${s}`));
     for (const n of names) {
       for (const m of code.matchAll(new RegExp(`\\b${n}\\(\\s*'((?:[^'\\\\]|\\\\.)*)'`, 'g'))) found.push({ file, text: m[1] });
     }

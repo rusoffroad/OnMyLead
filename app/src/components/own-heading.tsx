@@ -5,6 +5,7 @@ import { Marker, type UserLocationChangeEvent } from 'react-native-maps';
 import { ownFix, screenAngle, type OwnFix } from '@/core/heading';
 import { MarkerBody } from './marker-body';
 
+import { t } from '@/lib/i18n';
 /** Around the phone's own blue dot (about 22 points on iPhone, 20 dp on Android) with the wedge just outside it. */
 const BOX = 52;
 
@@ -60,7 +61,7 @@ export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHea
       anchor={{ x: 0.5, y: 0.5 }}
       tappable={false}
       zIndex={9}
-      accessibilityLabel="The way you are heading">
+      accessibilityLabel={t('The way you are heading')}>
       <MarkerBody style={styles.box} pointerEvents="none">
         <View style={[styles.box, { transform: [{ rotate: `${Math.round(screenAngle(fix.headingDeg, mapHeading))}deg` }] }]}>
           <View style={styles.edge} />

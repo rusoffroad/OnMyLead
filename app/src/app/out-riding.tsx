@@ -22,7 +22,7 @@ import { confirmAndBlock, useBlocks } from '@/lib/blocks';
 import { useFriends } from '@/lib/friends';
 import { goOutRiding, nearbyRiders, OutRidingOffError, refreshOutRiding, stopOutRiding, updateOutRiding, useMyOutRiding } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
-import { t } from '@/lib/i18n';
+import { t as tr } from '@/lib/i18n';
 
 /** How often the list refreshes while the screen is open. */
 const LIST_EVERY_MS = 60_000;
@@ -158,7 +158,7 @@ export default function OutRiding() {
     <>
       {off || me.off ? (
         <View style={styles.note}>
-          <ThemedText type="smallBold">Not Switched On Yet</ThemedText>
+          <ThemedText type="smallBold">{tr('Not Switched On Yet')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{NOT_SWITCHED_ON}</ThemedText>
         </View>
       ) : null}
@@ -167,28 +167,26 @@ export default function OutRiding() {
         <View style={[styles.statusCard, styles.statusOn]}>
           <View style={styles.statusTop}>
             <View style={styles.liveDot} />
-            <Text style={styles.statusTitle}>You’re Out Riding</Text>
+            <Text style={styles.statusTitle}>{tr('You’re Out Riding')}</Text>
           </View>
-          <ThemedText type="small" themeColor="textSecondary">
-            {endsLabel(me.status.expires_at, now)}. {me.status.audience === 'everyone' ? 'Everyone nearby who chose Everyone Nearby' : 'Your friends and riders you know'} can see your name and roughly how far away you are.
-          </ThemedText>
-          {me.status.spot ? <Text style={styles.spotLine}>At {me.status.spot}</Text> : null}
+          <ThemedText type="small" themeColor="textSecondary">{tr('{v}. {v2} can see your name and roughly how far away you are.', { v: endsLabel(me.status.expires_at, now), v2: me.status.audience === 'everyone' ? tr('Everyone nearby who chose Everyone Nearby') : tr('Your friends and riders you know') })}</ThemedText>
+          {me.status.spot ? <Text style={styles.spotLine}>{tr('At {spot}', { spot: me.status.spot })}</Text> : null}
           <View style={styles.btnRow}>
-            <Button title="Change" kind="secondary" style={{ flex: 1 }} onPress={() => setEditing(true)} />
-            <Button title="Turn Off" kind="secondary" loading={busy} style={{ flex: 1 }} onPress={switchOff} />
+            <Button title={tr('Change')} kind="secondary" style={{ flex: 1 }} onPress={() => setEditing(true)} />
+            <Button title={tr('Turn Off')} kind="secondary" loading={busy} style={{ flex: 1 }} onPress={switchOff} />
           </View>
         </View>
       ) : (
         <View style={styles.statusCard}>
-          <Text style={styles.statusTitle}>{on ? 'Change Out Riding' : 'Going Riding?'}</Text>
+          <Text style={styles.statusTitle}>{on ? tr('Change Out Riding') : tr('Going Riding?')}</Text>
           {!on ? (
             <ThemedText type="small" themeColor="textSecondary">
-              Switch on Out Riding to see who else is out near you, like friends showing online in a game. Off until you switch it on.
+              {tr('Switch on Out Riding to see who else is out near you, like friends showing online in a game. Off until you switch it on.')}
             </ThemedText>
           ) : null}
 
           <View style={{ gap: Spacing.two }}>
-            <ThemedText type="smallBold">Who Can See Me</ThemedText>
+            <ThemedText type="smallBold">{tr('Who Can See Me')}</ThemedText>
             {AUDIENCE_CHOICES.map((c) => {
               const sel = audience === c.value;
               return (
@@ -200,8 +198,8 @@ export default function OutRiding() {
                   style={[styles.option, sel && styles.optionOn]}>
                   <View style={[styles.radio, sel && styles.radioOn]}>{sel ? <View style={styles.radioDot} /> : null}</View>
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={styles.optionTitle}>{c.title}</Text>
-                    <Text style={styles.optionDetail}>{c.detail}</Text>
+                    <Text style={styles.optionTitle}>{tr(c.title)}</Text>
+                    <Text style={styles.optionDetail}>{tr(c.detail)}</Text>
                   </View>
                 </Pressable>
               );
@@ -210,7 +208,7 @@ export default function OutRiding() {
 
           {!on ? (
             <View style={{ gap: Spacing.two }}>
-              <ThemedText type="smallBold">Turn Off After</ThemedText>
+              <ThemedText type="smallBold">{tr('Turn Off After')}</ThemedText>
               <Segmented
                 options={DURATION_OPTIONS.map((d) => ({ value: String(d.hours), label: d.label }))}
                 value={String(hours)}
@@ -220,27 +218,24 @@ export default function OutRiding() {
           ) : null}
 
           <Field
-            label="Where You’re Riding (Optional)"
-            hint="Shown to riders who can see you. Leave it blank to just show the distance."
+            label={tr('Where You’re Riding (Optional)')}
+            hint={tr('Shown to riders who can see you. Leave it blank to just show the distance.')}
             value={spot}
             onChangeText={setSpot}
             maxLength={MAX_SPOT_LENGTH}
-            placeholder="Windrock Park"
+            placeholder={tr('Windrock Park')}
             returnKeyType="done"
           />
 
-          <ThemedText type="small" themeColor="textSecondary">
-            Riders see your name and roughly how far away you are, never where you are. It turns off on its own at the end you pick, or after {IDLE_HOURS} hours without opening OnMyLead.
-            {Platform.OS === 'web' ? ' Your browser will ask for your location.' : ''}
-          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('Riders see your name and roughly how far away you are, never where you are. It turns off on its own at the end you pick, or after {IDLE_HOURS} hours without opening OnMyLead.{v}', { IDLE_HOURS, v: Platform.OS === 'web' ? ` ${tr('Your browser will ask for your location.')}` : '' })}</ThemedText>
           <ErrorText error={error} />
           {on ? (
             <View style={styles.btnRow}>
-              <Button title="Cancel" kind="ghost" style={{ flex: 1 }} onPress={() => setEditing(false)} />
-              <Button title="Save" loading={busy} style={{ flex: 1 }} onPress={saveChanges} />
+              <Button title={tr('Cancel')} kind="ghost" style={{ flex: 1 }} onPress={() => setEditing(false)} />
+              <Button title={tr('Save')} loading={busy} style={{ flex: 1 }} onPress={saveChanges} />
             </View>
           ) : (
-            <Button title="Go Out Riding" big loading={busy || me.busy} disabled={off || me.off} onPress={switchOn} />
+            <Button title={tr('Go Out Riding')} big loading={busy || me.busy} disabled={off || me.off} onPress={switchOn} />
           )}
         </View>
       )}
@@ -248,13 +243,13 @@ export default function OutRiding() {
 
       <Pressable accessibilityRole="button" onPress={() => router.push('/messages')} style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}>
         <Icon name="mail" color={Colors.sky} />
-        <Text style={styles.linkText}>Messages</Text>
+        <Text style={styles.linkText}>{tr('Messages')}</Text>
         <Icon name="chevron" color={Colors.textSecondary} />
       </Pressable>
       {friends.loaded && !friends.off ? (
         <Pressable accessibilityRole="button" onPress={() => router.push('/friends')} style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}>
           <Icon name="addFriend" color={RideColors.green} />
-          <Text style={styles.linkText}>Friends</Text>
+          <Text style={styles.linkText}>{tr('Friends')}</Text>
           {friendRequests ? <Text style={styles.reqBadge}>{friendRequests}</Text> : null}
           <Icon name="chevron" color={Colors.textSecondary} />
         </Pressable>
@@ -266,16 +261,16 @@ export default function OutRiding() {
 
   const list = on ? (
     <>
-      <Section title="Out Near You" />
+      <Section title={tr('Out Near You')} />
       {everyoneOn ? (
         <Segmented
-          options={[{ value: 'riders', label: 'Riders I Know' }, { value: 'everyone', label: 'Everyone Nearby' }]}
+          options={[{ value: 'riders', label: tr('Riders I Know') }, { value: 'everyone', label: tr('Everyone Nearby') }]}
           value={scope}
           onChange={(v) => setScope(v as Audience)}
         />
       ) : null}
-      <View style={styles.radiusRow} accessibilityRole="radiogroup" accessibilityLabel="How far to look">
-        <Text style={styles.radiusLabel}>Within</Text>
+      <View style={styles.radiusRow} accessibilityRole="radiogroup" accessibilityLabel={tr('How far to look')}>
+        <Text style={styles.radiusLabel}>{tr('Within')}</Text>
         {RADIUS_OPTIONS.map((r) => (
           <Pressable
             key={r}
@@ -283,7 +278,7 @@ export default function OutRiding() {
             accessibilityState={{ selected: radius === r }}
             onPress={() => setRadius(r)}
             style={[styles.radiusChip, radius === r && styles.radiusChipOn]}>
-            <Text style={[styles.radiusText, radius === r && { color: Colors.background }]}>{r} Mi</Text>
+            <Text style={[styles.radiusText, radius === r && { color: Colors.background }]}>{tr('{r} Mi', { r })}</Text>
           </Pressable>
         ))}
       </View>
@@ -294,8 +289,8 @@ export default function OutRiding() {
       {riders && !visible.length ? (
         <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
           {shownScope === 'riders'
-            ? 'Your friends and riders you know show up here when they switch on Out Riding too.'
-            : 'Anyone at the same park shows up here once they switch on Out Riding with Everyone Nearby.'}
+            ? tr('Your friends and riders you know show up here when they switch on Out Riding too.')
+            : tr('Anyone at the same park shows up here once they switch on Out Riding with Everyone Nearby.')}
         </ThemedText>
       ) : null}
 
@@ -315,19 +310,19 @@ export default function OutRiding() {
                     {distanceLabel(r.miles)}{r.spot ? `, at ${r.spot}` : ''}
                   </Text>
                   <Text style={styles.riderSub} numberOfLines={1}>
-                    {myFriends.has(r.user_id) ? 'Friend' : r.known ? 'Ridden With You' : 'New Rider'}, {outSince(r.since, now)}
+                    {myFriends.has(r.user_id) ? tr('Friend') : r.known ? tr('Ridden With You') : tr('New Rider')}, {outSince(r.since, now)}
                   </Text>
                 </View>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`Message ${r.display_name}`}
+                  accessibilityLabel={tr('Message {display_name}', { display_name: r.display_name })}
                   onPress={() => router.push(`/messages/${r.user_id}`)}
                   style={({ pressed }) => [styles.msgBtn, pressed && { opacity: 0.8 }]}>
                   <Icon name="mail" color="#fff" size={20} />
                 </Pressable>
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={`More for ${r.display_name}`}
+                  accessibilityLabel={tr('More for {display_name}', { display_name: r.display_name })}
                   accessibilityState={{ expanded: open }}
                   hitSlop={8}
                   onPress={() => setMenuFor(open ? null : r.user_id)}
@@ -339,7 +334,7 @@ export default function OutRiding() {
                 <View style={styles.menu}>
                   <AddFriendButton userId={r.user_id} name={r.display_name} style={styles.menuBtn} onDone={() => setMenuFor(null)} />
                   <Button
-                    title="Report Rider"
+                    title={tr('Report Rider')}
                     kind="secondary"
                     style={styles.menuBtn}
                     onPress={() => {
@@ -349,7 +344,7 @@ export default function OutRiding() {
                   />
                   {!blocks.off ? (
                     <Button
-                      title="Block Rider"
+                      title={tr('Block Rider')}
                       kind="secondary"
                       style={styles.menuBtn}
                       onPress={() => {
@@ -369,14 +364,14 @@ export default function OutRiding() {
     <View style={styles.offPreview}>
       <RangeRings riders={[]} radius={radius} size={Math.min(ringSize, 300)} />
       <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 360 }}>
-        Switch on Out Riding to see who’s out near you. You only see others while they can see you.
+        {tr('Switch on Out Riding to see who’s out near you. You only see others while they can see you.')}
       </ThemedText>
     </View>
   );
 
   return (
     <>
-      <Stack.Screen options={{ title: t('Out Riding') }} />
+      <Stack.Screen options={{ title: tr('Out Riding') }} />
       {wide ? (
         <TwoPane side={status} main={list} sideWidth={sideColumnWidth(width)} />
       ) : (

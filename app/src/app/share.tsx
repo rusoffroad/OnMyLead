@@ -19,6 +19,7 @@ import { useBatteryMode } from '@/lib/battery';
 import { confirmAsync } from '@/lib/confirm';
 import { startSendingLocation, stopSendingLocation } from '@/lib/location';
 
+import { t as tr } from '@/lib/i18n';
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
 /**
@@ -55,7 +56,7 @@ export default function ShareMyLocation() {
   }, [shares, now]);
 
   async function start(minutes: number | null) {
-    if (!picked.length && !familyLink) return setError('Pick at least one person or turn on the family link.');
+    if (!picked.length && !familyLink) return setError(tr('Pick at least one person or turn on the family link.'));
     setBusy(true);
     setError(null);
     try {
@@ -64,14 +65,14 @@ export default function ShareMyLocation() {
       await startSendingLocation(null, isUntilTurnedOff(endAt) ? null : endAt);
       if (s.link_token) {
         const url = WEB_URL ? `${WEB_URL}/f/${s.link_token}` : s.link_token;
-        const when = isUntilTurnedOff(endAt) ? 'Follow my location' : `Follow my location ${shareEndText(endAt, Date.now())}`;
+        const when = isUntilTurnedOff(endAt) ? tr('Follow my location') : tr('Follow my location {v}', { v: shareEndText(endAt, Date.now()) });
         await Share.share({ message: `${when}: ${url}` });
       }
       setPicked([]);
       setFamilyLink(false);
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not start sharing.');
+      setError(e instanceof Error ? e.message : tr('Could not start sharing.'));
     } finally {
       setBusy(false);
     }
@@ -97,26 +98,24 @@ export default function ShareMyLocation() {
         const multiDay = left != null && !untilOff && left >= 24 * 3_600_000;
         return (
           <Card key={s.id} style={{ borderLeftWidth: 4, borderLeftColor: theme.sky }}>
-            <ThemedText type="heading" style={{ color: theme.sky }}>
-              Sharing Now, {untilOff || multiDay ? shareEndText(endAt, now) : formatRemaining(left)}
-            </ThemedText>
+            <ThemedText type="heading" style={{ color: theme.sky }}>{tr('Sharing Now, {v}', { v: untilOff || multiDay ? shareEndText(endAt, now) : formatRemaining(left) })}</ThemedText>
             {untilOff ? (
-              <ThemedText type="small" themeColor="textSecondary">This keeps going, even for days, until you tap Stop Sharing.</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">{tr('This keeps going, even for days, until you tap Stop Sharing.')}</ThemedText>
             ) : null}
-            {s.link_token ? <ThemedText type="small" themeColor="textSecondary">Includes a family link</ThemedText> : null}
+            {s.link_token ? <ThemedText type="small" themeColor="textSecondary">{tr('Includes a family link')}</ThemedText> : null}
             <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-              <Button title="Stop Sharing" kind="danger" style={{ flex: 1 }} onPress={() => stop(s)} />
+              <Button title={tr('Stop Sharing')} kind="danger" style={{ flex: 1 }} onPress={() => stop(s)} />
               {untilOff ? null : (
-                <Button title={nearEnd ? 'Ending Soon · Add 1 Hr' : 'Add 1 Hour'} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
+                <Button title={nearEnd ? tr('Ending Soon · Add 1 Hr') : tr('Add 1 Hour')} kind="secondary" style={{ flex: 1 }} onPress={() => extend(s)} />
               )}
             </View>
           </Card>
         );
       })}
 
-      <Section title="Who Can See You" />
+      <Section title={tr('Who Can See You')} />
       {friends.length === 0 ? (
-        <ThemedText themeColor="textSecondary">People you’ve ridden with show up here. You can still share a family link.</ThemedText>
+        <ThemedText themeColor="textSecondary">{tr('People you’ve ridden with show up here. You can still share a family link.')}</ThemedText>
       ) : null}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two }}>
         {friends.map((f) => {
@@ -142,13 +141,13 @@ export default function ShareMyLocation() {
             {familyLink ? <Icon name="check" size={20} color="#fff" strokeWidth={3} /> : null}
           </View>
           <View style={{ flex: 1 }}>
-            <ThemedText style={{ fontWeight: 700 }}>Family Link</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">A read-only web link for someone without the app. It stops working when sharing ends.</ThemedText>
+            <ThemedText style={{ fontWeight: 700 }}>{tr('Family Link')}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{tr('A read-only web link for someone without the app. It stops working when sharing ends.')}</ThemedText>
           </View>
         </Card>
       </Pressable>
 
-      <Section title="For How Long" />
+      <Section title={tr('For How Long')} />
       <SharePicker
         options={PERSONAL_SHARE_OPTIONS_MIN}
         openLabel="Until I Turn It Off"
@@ -157,9 +156,9 @@ export default function ShareMyLocation() {
         onPick={async (m) => {
           if (m == null) {
             const ok = await confirmAsync(
-              'Share Until You Turn It Off?',
-              'There is no time limit. Your location keeps sharing, even for days, until you come back here and tap Stop Sharing.',
-              'Share',
+              tr('Share Until You Turn It Off?'),
+              tr('There is no time limit. Your location keeps sharing, even for days, until you come back here and tap Stop Sharing.'),
+              tr('Share'),
             );
             if (ok) start(null);
           } else start(m);
@@ -168,7 +167,7 @@ export default function ShareMyLocation() {
       <ErrorText error={error} />
       <Pressable accessibilityRole="link" onPress={() => router.push('/battery')} hitSlop={6}>
         <ThemedText type="small" themeColor="textSecondary">
-          Battery Saver: {BATTERY_PLANS[batteryMode].label}. <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>Change</ThemedText>
+          Battery Saver: {tr(BATTERY_PLANS[batteryMode].label)}. <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>{tr('Change')}</ThemedText>
         </ThemedText>
       </Pressable>
     </Screen>

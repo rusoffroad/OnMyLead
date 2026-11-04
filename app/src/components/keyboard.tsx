@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, themedStyles } from '@/constants/theme';
 
+import { t } from '@/lib/i18n';
 /**
  * Every text box in the app. On iPhone it carries a Done bar above the keyboard, so the keyboard can always be
  * put away: number pads have no return key, and in a message or notes box return only starts a new line.
@@ -22,11 +23,11 @@ export const TextBox = forwardRef<TextInput, TextInputProps>(function TextBox(pr
         <View style={styles.bar}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Hide Keyboard"
+            accessibilityLabel={t('Hide Keyboard')}
             hitSlop={8}
             onPress={() => Keyboard.dismiss()}
             style={({ pressed }) => [styles.done, pressed && { opacity: 0.6 }]}>
-            <Text style={styles.doneText}>Done</Text>
+            <Text style={styles.doneText}>{t('Done')}</Text>
           </Pressable>
         </View>
       </InputAccessoryView>

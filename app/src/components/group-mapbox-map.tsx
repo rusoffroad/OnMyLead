@@ -15,6 +15,7 @@ import { RiderPin } from './rider-pin';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle, type MapboxOwnFix } from './mapbox-map';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
+import { t } from '@/lib/i18n';
 type Inset = { top: number; right: number; bottom: number; left: number };
 
 /**
@@ -140,7 +141,7 @@ export function GroupMapboxMap({
         <MapboxMarker key={`w-${w.id}`} at={w}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+            accessibilityLabel={w.planned_stop ? t('Planned stop {v}, {name}, {v2}', { v: stopNumber(w, waypoints), name: w.name, v2: symbolLabel(waypointSymbol(w)) }) : t('{v} waypoint, {name}', { v: symbolLabel(waypointSymbol(w)), name: w.name })}
             onPress={() => onPressWaypoint?.(w)}>
             {w.planned_stop ? (
               <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} />
@@ -184,10 +185,10 @@ function RouteEnds3d({ points }: { points: LatLng[] }) {
   return (
     <>
       <MapboxMarker at={a}>
-        <View accessible accessibilityLabel="Start" style={[styles.end, { backgroundColor: RideColors.green }]} />
+        <View accessible accessibilityLabel={t('Start')} style={[styles.end, { backgroundColor: RideColors.green }]} />
       </MapboxMarker>
       <MapboxMarker at={b}>
-        <View accessible accessibilityLabel="Finish" style={[styles.end, { backgroundColor: Colors.text }]}>
+        <View accessible accessibilityLabel={t('Finish')} style={[styles.end, { backgroundColor: Colors.text }]}>
           <View style={styles.finishCore} />
         </View>
       </MapboxMarker>

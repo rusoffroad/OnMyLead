@@ -11,7 +11,7 @@ import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import { shareBadge } from '@/components/trail-badge';
 import { difficultyLabel, feetOrMiles, RIDER_TRAIL_INK, trackStats } from '@/core/nav-trails';
 import { loadTrails, syncMyTrails, trailLine, useLocalTrails } from '@/lib/nav-trails';
-import { t } from '@/lib/i18n';
+import { t as tr } from '@/lib/i18n';
 
 /** My Trails: every trail on this phone, recorded, drawn with the distance finder, or saved. */
 export default function MyTrails() {
@@ -26,19 +26,19 @@ export default function MyTrails() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: t('My Trails') }} />
-      <Button title="Open Map Mode" onPress={() => router.push('/nav')} />
+      <Stack.Screen options={{ title: tr('My Trails') }} />
+      <Button title={tr('Open Map Mode')} onPress={() => router.push('/nav')} />
       {loaded && !trails.length ? (
         <View style={styles.empty}>
-          <ThemedText type="heading">No Trails Yet</ThemedText>
+          <ThemedText type="heading">{tr('No Trails Yet')}</ThemedText>
           <ThemedText themeColor="textSecondary">
-            In Map Mode, tap Record and ride, or Draw to map a custom trail. Your trails are private until you share them, and they show on every device you sign in on. A rider trail you save shows here too.
+            {tr('In Map Mode, tap Record and ride, or Draw to map a custom trail. Your trails are private until you share them, and they show on every device you sign in on. A rider trail you save shows here too.')}
           </ThemedText>
         </View>
       ) : null}
       {trails.length ? (
         <>
-          <Section title={`${trails.length} ${trails.length === 1 ? 'Trail' : 'Trails'}`} />
+          <Section title={`${trails.length} ${trails.length === 1 ? tr('Trail') : tr('Trails')}`} />
           <RowGroup>
             {trails.map((t) => {
               const badge = shareBadge(t);
@@ -53,11 +53,11 @@ export default function MyTrails() {
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={styles.name} numberOfLines={1}>{t.details.name || 'Unnamed Trail'}</Text>
                     <Text style={styles.sub} numberOfLines={1}>
-                      {[feetOrMiles(len), difficultyLabel(t.details.difficulty), t.source === 'drawn' ? 'Drawn' : t.source === 'recorded' ? new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null]
+                      {[feetOrMiles(len), difficultyLabel(t.details.difficulty), t.source === 'drawn' ? tr('Drawn') : t.source === 'recorded' ? new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null]
                         .filter(Boolean)
                         .join('   ')}
                     </Text>
-                    <Text style={[styles.badge, { color: badge.color }]}>{badge.label}</Text>
+                    <Text style={[styles.badge, { color: badge.color }]}>{tr(badge.label)}</Text>
                   </View>
                   <Icon name="chevron" color={Colors.textSecondary} />
                 </Pressable>

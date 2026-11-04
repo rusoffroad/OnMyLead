@@ -13,6 +13,7 @@ import type { FeatureKey } from '@/core/entitlements';
 import { FEATURE_INFO, nextReset, type ProBlock } from '@/core/pro';
 import { closeProGate, showProGate, useProGatePrompt } from '@/lib/pro';
 
+import { t } from '@/lib/i18n';
 /**
  * The Pro mark: a route shield, like the ones on highway and forest road signs, with PRO set in
  * the condensed Barlow the signs are drawn from.
@@ -28,7 +29,7 @@ export function ProShield({ size = 64 }: { size?: number }) {
         strokeLinejoin="round"
       />
       <SvgText x="50" y="70" fill="#FFFFFF" fontSize="36" fontFamily={font(800, 'display')} fontWeight="800" textAnchor="middle" letterSpacing="1">
-        PRO
+        {t('PRO')}
       </SvgText>
     </Svg>
   );
@@ -39,12 +40,12 @@ function promptCopy(block: ProBlock): { title: string; body: string; need: strin
   if (block.kind === 'ride_limit') {
     const reset = nextReset().toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' });
     return {
-      title: 'You’ve Created This Month’s Free Ride',
-      body: `Free accounts create ${block.allowance === 1 ? 'one ride' : `${block.allowance} rides`} a month, and your next one opens on ${reset}. Joining other rides stays free.`,
+      title: t('You’ve Created This Month’s Free Ride'),
+      body: t('Free accounts create {v} a month, and your next one opens on {reset}. Joining other rides stays free.', { v: block.allowance === 1 ? 'one ride' : `${block.allowance} rides`, reset }),
       need: 'Pro creates as many rides as you lead.',
     };
   }
-  if (!block.feature) return { title: 'OnMyLead Pro', body: 'Upgrade to use this. Joining rides and every safety feature stay free.', need: 'Part of OnMyLead Pro.' };
+  if (!block.feature) return { title: 'OnMyLead Pro', body: t('Upgrade to use this. Joining rides and every safety feature stay free.'), need: 'Part of OnMyLead Pro.' };
   const info = FEATURE_INFO[block.feature];
   return { title: info.title, body: info.body, need: 'Part of OnMyLead Pro.' };
 }
@@ -60,7 +61,7 @@ export function ProGateHost() {
   return (
     <Modal visible={!!block} transparent animationType="slide" onRequestClose={closeProGate} statusBarTranslucent>
       <SheetRoot>
-      <Pressable style={styles.scrim} onPress={closeProGate} accessibilityLabel="Close" accessibilityRole="button" />
+      <Pressable style={styles.scrim} onPress={closeProGate} accessibilityLabel={t('Close')} accessibilityRole="button" />
       {copy ? (
         <SwipeSheet onClose={closeProGate} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
           <View style={styles.grip} />
@@ -71,16 +72,16 @@ export function ProGateHost() {
               <Text style={styles.need}>{copy.need}</Text>
             </View>
           </View>
-          <ThemedText style={{ color: Colors.text }}>{copy.body}</ThemedText>
+          <ThemedText style={{ color: Colors.text }}>{t(copy.body)}</ThemedText>
           <Button
-            title="See OnMyLead Pro"
+            title={t('See OnMyLead Pro')}
             big
             onPress={() => {
               closeProGate();
               router.push('/pro');
             }}
           />
-          <Button title="Not Now" kind="ghost" onPress={closeProGate} />
+          <Button title={t('Not Now')} kind="ghost" onPress={closeProGate} />
         </SwipeSheet>
       ) : null}
       </SheetRoot>
@@ -97,7 +98,7 @@ export function ProLock({ feature, title, detail }: { feature: FeatureKey; title
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${title ?? info.title}. Part of OnMyLead Pro`}
+      accessibilityLabel={t('{v}. Part of OnMyLead Pro', { v: title ?? info.title })}
       onPress={() => showProGate({ kind: 'pro_required', feature })}
       style={({ pressed }) => [styles.lock, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.lockIcon}>

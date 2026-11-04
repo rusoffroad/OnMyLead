@@ -35,6 +35,7 @@ import { handleProError, requirePro, useCan, useEntitlements } from '@/lib/pro';
 import { readPickedText } from '@/lib/read-text';
 import type { Ride } from '@/lib/types';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * The organizer's route builder. Tap the map to lay down the route point by point, or bring in a
  * GPX track from another app. With Follow Trails on, each tap lands on the nearest trail or road
@@ -98,7 +99,7 @@ export default function RouteBuilder() {
         if (route?.source === 'gpx' || route?.source === 'trail') setImported(route);
         else if (route) loadDraft(route);
       })
-      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load the ride.'))
+      .catch((e) => setError(e instanceof Error ? e.message : tr('Could not load the ride.')))
       .finally(() => setLoaded(true));
   }, [id, loadDraft]);
 
@@ -144,14 +145,14 @@ export default function RouteBuilder() {
       setImported(r);
       draft.clear();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not read that file.');
+      setError(e instanceof Error ? e.message : tr('Could not read that file.'));
     } finally {
       setBusy(null);
     }
   }
 
   async function clear() {
-    if (route && !(await confirmAsync('Clear the route?', 'This removes every point. Nothing is saved until you tap Save Route.', 'Clear'))) return;
+    if (route && !(await confirmAsync(tr('Clear the route?'), tr('This removes every point. Nothing is saved until you tap Save Route.'), tr('Clear')))) return;
     setImported(null);
     draft.clear();
   }
@@ -164,7 +165,7 @@ export default function RouteBuilder() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       leave();
     } catch (e) {
-      if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Could not save the route.');
+      if (!handleProError(e)) setError(e instanceof Error ? e.message : tr('Could not save the route.'));
     } finally {
       setBusy(null);
     }
@@ -173,19 +174,19 @@ export default function RouteBuilder() {
   const click = web ? 'click' : 'tap';
   const hint = imported
     ? imported.source === 'trail'
-      ? `Your trail${imported.name ? ` “${imported.name}”` : ''}. Clear it to draw your own.`
-      : `Imported${imported.name ? ` “${imported.name}”` : ' from GPX'}. Clear it to draw your own.`
+      ? tr('Your trail{v}. Clear it to draw your own.', { v: imported.name ? ` “${imported.name}”` : '' })
+      : tr('Imported{v}. Clear it to draw your own.', { v: imported.name ? ` “${imported.name}”` : ' from GPX' })
     : taps.length === 0
-      ? `${web ? 'Click' : 'Tap'} the map where the ride starts, or Search for the trailhead.`
+      ? tr('{v} the map where the ride starts, or Search for the trailhead.', { v: web ? 'Click' : 'Tap' })
       : draft.lastNoTrail
-        ? 'No mapped trail joins those points, so that part is a straight line. Add a point on the trail or zoom in.'
+        ? tr('No mapped trail joins those points, so that part is a straight line. Add a point on the trail or zoom in.')
         : taps.length === 1
           ? follow
-            ? `Now ${click} further along the trail. The route follows it for you.`
-            : `Now ${click} the next turn or landmark.`
+            ? tr('Now {click} further along the trail. The route follows it for you.', { click })
+            : tr('Now {click} the next turn or landmark.', { click })
           : follow
-            ? `Keep ${web ? 'clicking' : 'tapping'} along the trail. Drag a point to move it${web ? ', or press Ctrl+Z to undo' : ''}.`
-            : `Straight lines between points. Switch to Follow Trails to snap to the trail.`;
+            ? tr('Keep {v} along the trail. Drag a point to move it{v2}.', { v: web ? 'clicking' : 'tapping', v2: web ? ', or press Ctrl+Z to undo' : '' })
+            : tr('Straight lines between points. Switch to Follow Trails to snap to the trail.');
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -212,7 +213,7 @@ export default function RouteBuilder() {
           cardTop={insets.top + 118}
           route={route?.points}
           ride={ride}
-          lookupHint={imported ? 'Tap a line to see who can ride it.' : 'Press and hold a line to see who can ride it.'}
+          lookupHint={imported ? tr('Tap a line to see who can ride it.') : tr('Press and hold a line to see who can ride it.')}
         />
       ) : null}
 
@@ -220,7 +221,7 @@ export default function RouteBuilder() {
         <FullMapBar onRestore={fullMap.exit} wide={wide || floating} credit={follow && !imported ? `Trails: ${OSM_ATTRIBUTION}` : null}>
           {draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
           <BarReadout value={route ? miles(route.lengthM) : '0.0'} unit="mi" label={`${route ? miles(route.lengthM) : 0} miles`} />
-          {!imported ? <BarChip title="Undo" label="Undo the last point" disabled={!taps.length} onPress={draft.undo} /> : null}
+          {!imported ? <BarChip title={tr('Undo')} label={tr('Undo the last point')} disabled={!taps.length} onPress={draft.undo} /> : null}
         </FullMapBar>
       ) : null}
 
@@ -230,17 +231,17 @@ export default function RouteBuilder() {
           <MapSearch near={searching} onPick={setFound} onClose={() => setSearching(false)} />
         ) : (
           <View style={styles.topRow}>
-            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={styles.flex}>
+            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel={tr('Back')} style={styles.flex}>
               <Text style={styles.topText} numberOfLines={1}>‹ {ride?.name ?? 'Ride'}</Text>
             </Pressable>
             <Pressable
               onPress={() => setSearching(looking.current ?? center)}
               accessibilityRole="button"
-              accessibilityLabel="Search the Map for a Place"
+              accessibilityLabel={tr('Search the Map for a Place')}
               hitSlop={8}
               style={({ pressed }) => [styles.search, pressed && { opacity: 0.8 }]}>
               <Icon name="search" size={17} color={Colors.text} />
-              <Text style={styles.searchText}>Search</Text>
+              <Text style={styles.searchText}>{tr('Search')}</Text>
             </Pressable>
           </View>
         )}
@@ -256,22 +257,22 @@ export default function RouteBuilder() {
         <View style={styles.readout}>
           <Text style={[styles.miles, !open && styles.milesFolded]} accessibilityLabel={`${route ? miles(route.lengthM) : 0} miles`}>
             {route ? miles(route.lengthM) : '0.0'}
-            <Text style={[styles.unit, !open && { fontSize: 18 }]}> mi</Text>
+            <Text style={[styles.unit, !open && { fontSize: 18 }]}> {tr('mi')}</Text>
           </Text>
           <View style={styles.readoutRight}>
             {!open && draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
             <Text style={styles.count}>
-              {imported ? `${imported.points.length} track points` : `${taps.length} ${taps.length === 1 ? 'point' : 'points'}`}
+              {imported ? tr('{length} track points', { length: imported.points.length }) : `${taps.length} ${taps.length === 1 ? 'point' : 'points'}`}
             </Text>
             {!open && !imported ? (
               <Pressable
                 onPress={draft.undo}
                 disabled={!taps.length}
                 accessibilityRole="button"
-                accessibilityLabel="Undo the last point"
+                accessibilityLabel={tr('Undo the last point')}
                 hitSlop={8}
                 style={({ pressed }) => [styles.undoChip, !taps.length && { opacity: 0.4 }, pressed && { opacity: 0.75 }]}>
-                <Text style={styles.undoText}>Undo</Text>
+                <Text style={styles.undoText}>{tr('Undo')}</Text>
               </Pressable>
             ) : null}
           </View>
@@ -282,16 +283,16 @@ export default function RouteBuilder() {
             <View style={styles.hintRow}>
               {draft.finding ? <ActivityIndicator size="small" color={SAND} /> : null}
               <Text style={[styles.hint, { flex: 1 }]} accessibilityLiveRegion="polite">
-                {draft.finding ? 'Finding the trail…' : hint}
+                {draft.finding ? tr('Finding the trail…') : hint}
               </Text>
             </View>
             <View style={styles.row}>
-              <Button title="Undo" kind="secondary" style={styles.flex} disabled={!!imported || !taps.length} onPress={draft.undo} />
-              <Button title="Clear" kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />
-              <Button title="Import GPX" pro="import_gpx" kind="secondary" style={[styles.flex, { flexGrow: canGpx ? 1.6 : 2.6 }]} loading={busy === 'gpx'} onPress={importGpx} />
+              <Button title={tr('Undo')} kind="secondary" style={styles.flex} disabled={!!imported || !taps.length} onPress={draft.undo} />
+              <Button title={tr('Clear')} kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />
+              <Button title={tr('Import GPX')} pro="import_gpx" kind="secondary" style={[styles.flex, { flexGrow: canGpx ? 1.6 : 2.6 }]} loading={busy === 'gpx'} onPress={importGpx} />
             </View>
             <Button
-              title="Use One of My Trails"
+              title={tr('Use One of My Trails')}
               pro="trail_rides"
               kind="secondary"
               onPress={() => {
@@ -306,19 +307,17 @@ export default function RouteBuilder() {
         {open ? (
           <>
             <Button
-              title={route ? 'Save Route' : saved ? 'Remove Route' : 'Save Route'}
+              title={route ? tr('Save Route') : saved ? tr('Remove Route') : tr('Save Route')}
               kind={!route && saved ? 'danger' : 'primary'}
               big
               disabled={!changed || (!route && !saved) || draft.finding}
               loading={busy === 'save'}
               onPress={save}
             />
-            <Text style={styles.privacy}>
-              Only riders on this ride can see the route.{web ? ' It’s in the OnMyLead app as soon as you save.' : ''}
-            </Text>
+            <Text style={styles.privacy}>{tr('Only riders on this ride can see the route.{v}', { v: web ? ` ${tr('It’s in the OnMyLead app as soon as you save.')}` : '' })}</Text>
           </>
         ) : null}
-        {follow && !imported ? <Text style={styles.credit}>Trails: {OSM_ATTRIBUTION}</Text> : null}
+        {follow && !imported ? <Text style={styles.credit}>{tr('Trails: {OSM_ATTRIBUTION}', { OSM_ATTRIBUTION })}</Text> : null}
       </SafeAreaView>
       </Animated.View>
       )}
@@ -344,11 +343,11 @@ const SAND = '#ECCD91';
  */
 function ModeSwitch({ follow, onChange }: { follow: boolean; onChange: (on: boolean) => void }) {
   const options = [
-    { on: true, label: 'Follow Trails', d: 'M2 15 C 7 15, 7 5, 12 7 S 17 15, 22 5' },
-    { on: false, label: 'Straight Line', d: 'M2 15 L 22 5' },
+    { on: true, label: tr('Follow Trails'), d: 'M2 15 C 7 15, 7 5, 12 7 S 17 15, 22 5' },
+    { on: false, label: tr('Straight Line'), d: 'M2 15 L 22 5' },
   ];
   return (
-    <View style={styles.modes} accessibilityRole="radiogroup" accessibilityLabel="How the route joins your points">
+    <View style={styles.modes} accessibilityRole="radiogroup" accessibilityLabel={tr('How the route joins your points')}>
       {options.map((o) => {
         const on = follow === o.on;
         return (
@@ -364,7 +363,7 @@ function ModeSwitch({ follow, onChange }: { follow: boolean; onChange: (on: bool
             <Svg width={24} height={20} viewBox="0 0 24 20">
               <Path d={o.d} stroke={on ? (o.on ? SAND : Colors.text) : Colors.textSecondary} strokeWidth={2.6} strokeLinecap="round" fill="none" strokeDasharray={o.on ? '5 3.5' : undefined} />
             </Svg>
-            <Text style={[styles.modeText, on && { color: Colors.text }]}>{o.label}</Text>
+            <Text style={[styles.modeText, on && { color: Colors.text }]}>{tr(o.label)}</Text>
           </Pressable>
         );
       })}

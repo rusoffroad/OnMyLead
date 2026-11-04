@@ -5,6 +5,7 @@ import { Colors, font, themedStyles } from '@/constants/theme';
 import { showsProTag, type FeatureKey } from '@/core/entitlements';
 import { useEntitlements } from '@/lib/entitlements';
 
+import { t } from '@/lib/i18n';
 /**
  * The small Pro tag beside a Pro-only button or row: a gold route shield (the Pro mark, small) and
  * "Pro" on a navy chip, so it reads the same on a red button, a blue one, a card or the map.
@@ -20,7 +21,7 @@ export function ProTag({ feature, style }: { feature: FeatureKey; style?: StyleP
 /** The chip itself, always shown (for the website showcase and places that already know the plan). */
 export function ProChip({ style }: { style?: StyleProp<ViewStyle> }) {
   return (
-    <View style={[styles.chip, style]} accessible accessibilityLabel="Pro feature" testID="pro-tag">
+    <View style={[styles.chip, style]} accessible accessibilityLabel={t('Pro feature')} testID="pro-tag">
       <Svg width={9} height={10} viewBox="0 0 100 108" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         <Path d="M50 4c14 8 30 8 42 2 4 18 4 40-2 58-7 20-22 32-40 40C32 96 17 84 10 64 4 46 4 24 8 6c12 6 28 6 42-2z" fill={Colors.gold} />
       </Svg>

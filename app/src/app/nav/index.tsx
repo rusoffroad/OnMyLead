@@ -63,6 +63,7 @@ import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { ProTag } from '@/components/pro-tag';
 
+import { t as tr } from '@/lib/i18n';
 type Mode = 'explore' | 'record' | 'measure';
 type Followed = { name: string; points: LatLng[]; publicTrail: PublicTrail | null; obstacles?: Obstacle[] };
 /** A spot being named: where it goes (the drawn line or the recording) and, when editing, which one. */
@@ -356,13 +357,13 @@ export default function NavMode() {
   async function finishRecording() {
     if (!rec) return;
     if (rec.points.length < 2) {
-      if (await confirmAsync('Nothing Recorded Yet', 'Ride a little further first. Discard this recording?', 'Discard', 'Keep Recording')) discardNow();
+      if (await confirmAsync(tr('Nothing Recorded Yet'), tr('Ride a little further first. Discard this recording?'), tr('Discard'), tr('Keep Recording'))) discardNow();
       return;
     }
     const nowIso = new Date().toISOString();
     const t: LocalTrail = {
       id: newTrailId(),
-      details: { ...EMPTY_DETAILS, name: `Trail ${new Date(rec.startedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` },
+      details: { ...EMPTY_DETAILS, name: tr('Trail {v}', { v: new Date(rec.startedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }) },
       points: rec.points,
       source: 'recorded',
       obstacles: rec.obstacles ?? [],
@@ -384,7 +385,7 @@ export default function NavMode() {
   }
 
   async function discard() {
-    if (await confirmAsync('Discard This Recording?', 'The trail you recorded is deleted from this phone.', 'Discard', 'Keep It')) discardNow();
+    if (await confirmAsync(tr('Discard This Recording?'), tr('The trail you recorded is deleted from this phone.'), tr('Discard'), tr('Keep It'))) discardNow();
   }
 
   // --- Measuring ------------------------------------------------------------------
@@ -470,7 +471,7 @@ export default function NavMode() {
     Haptics.selectionAsync();
   };
   async function clearTrack() {
-    if (await confirmAsync('Clear Track Line?', 'Every day of your Track Line is deleted from this phone.', 'Clear', 'Keep It')) clearTrackLine();
+    if (await confirmAsync(tr('Clear Track Line?'), tr('Every day of your Track Line is deleted from this phone.'), tr('Clear'), tr('Keep It'))) clearTrackLine();
   }
 
   async function saveMeasure() {
@@ -579,13 +580,13 @@ export default function NavMode() {
       {full ? (
         <FullMapBar onRestore={fullMap.exit} wide={wide || floating}>
           {rec && !rec.paused ? (
-            <View style={styles.barRec} accessible accessibilityLabel="Recording">
+            <View style={styles.barRec} accessible accessibilityLabel={tr('Recording')}>
               <View style={styles.recDot} />
-              <Text style={styles.barRecText}>Rec</Text>
+              <Text style={styles.barRecText}>{tr('Rec')}</Text>
             </View>
           ) : null}
           <BarReadout value={barValue[0]} unit={barValue[1]} />
-          {mode === 'measure' ? <BarChip title="Undo" label="Undo the last point" disabled={!draft.taps.length} onPress={draft.undo} /> : null}
+          {mode === 'measure' ? <BarChip title={tr('Undo')} label={tr('Undo the last point')} disabled={!draft.taps.length} onPress={draft.undo} /> : null}
         </FullMapBar>
       ) : null}
 
@@ -603,16 +604,16 @@ export default function NavMode() {
           />
         ) : (
           <View style={styles.topRow}>
-            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel="Back" style={styles.flex}>
-              <Text style={styles.topText} numberOfLines={1}>‹ Map Mode</Text>
+            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel={tr('Back')} style={styles.flex}>
+              <Text style={styles.topText} numberOfLines={1}>{tr('‹ Map Mode')}</Text>
             </Pressable>
             <Pressable onPress={() => router.push('/nav/trails')} accessibilityRole="button" hitSlop={8} style={({ pressed }) => [styles.chip, pressed && { opacity: 0.8 }]}>
-              <Text style={styles.chipText}>My Trails{local.length ? ` ${local.length}` : ''}</Text>
+              <Text style={styles.chipText}>{tr('My Trails{v}', { v: local.length ? ` ${local.length}` : '' })}</Text>
             </Pressable>
             <Pressable
               onPress={() => setSearching(looking.current ?? me)}
               accessibilityRole="button"
-              accessibilityLabel="Search the Map for a Place"
+              accessibilityLabel={tr('Search the Map for a Place')}
               hitSlop={8}
               style={({ pressed }) => [styles.chip, pressed && { opacity: 0.8 }]}>
               <Icon name="search" size={17} color={Colors.text} />
@@ -622,11 +623,11 @@ export default function NavMode() {
         {hidden && searching === false ? (
           <View style={styles.notice} accessibilityRole="alert">
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={styles.noticeTitle}>{hidden.details.name} Is Hidden</Text>
+              <Text style={styles.noticeTitle}>{tr('{name} Is Hidden', { name: hidden.details.name })}</Text>
               <Text style={styles.noticeText}>
                 {hidden.shared?.hiddenReason === 'admin'
-                  ? 'It was taken off the public map. It’s still saved on this phone.'
-                  : 'Riders rated its line inaccurate, so other riders can’t see it. It’s still saved on this phone. Re-record it and share again.'}
+                  ? tr('It was taken off the public map. It’s still saved on this phone.')
+                  : tr('Riders rated its line inaccurate, so other riders can’t see it. It’s still saved on this phone. Re-record it and share again.')}
               </Text>
             </View>
             <Pressable accessibilityRole="button" onPress={() => markHiddenSeen(hidden).catch(() => {})} hitSlop={8} style={styles.noticeOk}>
@@ -648,8 +649,8 @@ export default function NavMode() {
       {me ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Center on me"
-          accessibilityHint={followMe.on ? 'Centers the map on you and follows you again' : 'Centers the map on you'}
+          accessibilityLabel={tr('Center on me')}
+          accessibilityHint={followMe.on ? tr('Centers the map on you and follows you again') : tr('Centers the map on you')}
           onPress={() => {
             camEvent('center');
             map.current?.centerOn(me);
@@ -668,7 +669,7 @@ export default function NavMode() {
           <ModeTabs mode={mode} onChange={changeMode} recording={!!rec} />
           {mapTimeText ? (
             <Text style={styles.mapTime} accessibilityLiveRegion="polite" onPress={() => showProGate({ kind: 'pro_required', feature: 'map_mode' })}>
-              {`Free Map Mode: ${mapTimeText}`}
+              {tr('Free Map Mode: {mapTimeText}', { mapTimeText })}
             </Text>
           ) : null}
 
@@ -765,9 +766,9 @@ export default function NavMode() {
 
 function ModeTabs({ mode, onChange, recording }: { mode: Mode; onChange: (m: Mode) => void; recording: boolean }) {
   const tabs: { value: Mode; label: string }[] = [
-    { value: 'explore', label: 'Explore' },
-    { value: 'record', label: 'Record' },
-    { value: 'measure', label: 'Draw' },
+    { value: 'explore', label: tr('Explore') },
+    { value: 'record', label: tr('Record') },
+    { value: 'measure', label: tr('Draw') },
   ];
   return (
     <View style={styles.tabs} accessibilityRole="tablist">
@@ -784,7 +785,7 @@ function ModeTabs({ mode, onChange, recording }: { mode: Mode; onChange: (m: Mod
             }}
             style={[styles.tab, on && styles.tabOn]}>
             {t.value === 'record' && recording ? <View style={styles.recDot} /> : null}
-            <Text style={[styles.tabText, on && { color: Colors.text }]}>{t.label}</Text>
+            <Text style={[styles.tabText, on && { color: Colors.text }]}>{tr(t.label)}</Text>
             {t.value === 'measure' ? <ProTag feature="custom_trails" style={{ marginLeft: 6 }} /> : null}
           </Pressable>
         );
@@ -827,6 +828,8 @@ function ExplorePanel({
   onClearTrack: () => void;
   hasTrack: boolean;
 }) {
+  // The sentence around the colored words, split so the words can sit wherever the language puts them.
+  const mintHint = tr('{mint} are trails other riders mapped and shared.', { mint: '\u0000' }).split('\u0000');
   const mph = speed != null ? String(Math.round(speed * MPS_TO_MPH)) : '–';
   const elev = altitude != null ? feet(altitude)!.replace(' ft', '') : '–';
   const [hdg, deg] = headingReadout(heading);
@@ -842,57 +845,58 @@ function ExplorePanel({
       {followed ? (
         <View style={styles.follow}>
           <View style={{ flex: 1, gap: 2 }}>
-            <Text style={styles.followLabel}>{followed.publicTrail && !followed.publicTrail.mine ? 'Following a Rider Trail' : 'Following'}</Text>
+            <Text style={styles.followLabel}>{followed.publicTrail && !followed.publicTrail.mine ? tr('Following a Rider Trail') : tr('Following')}</Text>
             <Text style={styles.followName} numberOfLines={1}>{followed.name}</Text>
           </View>
           <Pressable accessibilityRole="button" onPress={onStop} hitSlop={8} style={styles.smallBtn}>
-            <Text style={styles.chipText}>Stop</Text>
+            <Text style={styles.chipText}>{tr('Stop')}</Text>
           </Pressable>
         </View>
       ) : null}
       <View style={styles.gauges}>
         {followed && progress ? (
           progress.onTrail ? (
-            <Gauge big value={feetOrMiles(progress.remainingM ?? 0).split(' ')[0]} unit={feetOrMiles(progress.remainingM ?? 0).split(' ')[1]} label="Left on Trail" />
+            <Gauge big value={feetOrMiles(progress.remainingM ?? 0).split(' ')[0]} unit={feetOrMiles(progress.remainingM ?? 0).split(' ')[1]} label={tr('Left on Trail')} />
           ) : (
-            <Gauge big value={feetOrMiles(progress.toStartM).split(' ')[0]} unit={feetOrMiles(progress.toStartM).split(' ')[1]} label={progress.offTrailM < progress.toStartM ? `Off Trail by ${feetOrMiles(progress.offTrailM)}` : 'To the Start'} />
+            <Gauge big value={feetOrMiles(progress.toStartM).split(' ')[0]} unit={feetOrMiles(progress.toStartM).split(' ')[1]} label={progress.offTrailM < progress.toStartM ? tr('Off Trail by {v}', { v: feetOrMiles(progress.offTrailM) }) : tr('To the Start')} />
           )
         ) : (
-          <Gauge big value={mph} unit="mph" label="Speed" />
+          <Gauge big value={mph} unit="mph" label={tr('Speed')} />
         )}
         {/* The dash: a 2 by 2 grid filling the rest of the row. */}
         <View style={styles.dash}>
-          {following ? <Gauge small value={mph} unit="mph" label="Speed" /> : <Gauge small value={elev} unit="ft" label="Elevation" />}
-          {following ? <Gauge small value={elev} unit="ft" label="Elevation" /> : <Gauge small value={hdg} unit={deg} label="Heading" />}
+          {following ? <Gauge small value={mph} unit="mph" label={tr('Speed')} /> : <Gauge small value={elev} unit="ft" label={tr('Elevation')} />}
+          {following ? <Gauge small value={elev} unit="ft" label={tr('Elevation')} /> : <Gauge small value={hdg} unit={deg} label={tr('Heading')} />}
           <Pressable
             onLongPress={onResetTrip}
             delayLongPress={600}
             accessibilityRole="button"
-            accessibilityLabel={`Trip ${tripV} ${tripU}`}
-            accessibilityHint="Press and hold to reset the trip"
-            accessibilityActions={[{ name: 'longpress', label: 'Reset Trip' }]}
+            accessibilityLabel={tr('Trip {tripV} {tripU}', { tripV, tripU })}
+            accessibilityHint={tr('Press and hold to reset the trip')}
+            accessibilityActions={[{ name: 'longpress', label: tr('Reset Trip') }]}
             onAccessibilityAction={(e) => e.nativeEvent.actionName === 'longpress' && onResetTrip()}
             style={styles.dashCell}>
-            <Gauge small inCell value={tripV} unit={tripU} label="Trip" />
+            <Gauge small inCell value={tripV} unit={tripU} label={tr('Trip')} />
           </Pressable>
-          {following ? <Gauge small value={hdg} unit={deg} label="Heading" /> : <Gauge small value={movV} unit={movU} label="Moving" />}
+          {following ? <Gauge small value={hdg} unit={deg} label={tr('Heading')} /> : <Gauge small value={movV} unit={movU} label={tr('Moving')} />}
         </View>
       </View>
       {tiltOn ? <TiltTile bar reading={tilt} limits={tiltSettings.limits} /> : null}
       {open ? (
         noLocation ? (
-          <Text style={styles.hint}>Location is off for OnMyLead, so the map can’t show where you are. Turn it on in Settings to record and follow trails.</Text>
+          <Text style={styles.hint}>{tr('Location is off for OnMyLead, so the map can’t show where you are. Turn it on in Settings to record and follow trails.')}</Text>
         ) : rateable ? (
           <Pressable accessibilityRole="button" onPress={onRate} style={({ pressed }) => [styles.rateCta, pressed && { opacity: 0.85 }]}>
-            <Text style={styles.rateText}>You’ve Ridden This Trail. Rate It</Text>
+            <Text style={styles.rateText}>{tr('You’ve Ridden This Trail. Rate It')}</Text>
           </Pressable>
         ) : !followed ? (
           <View style={{ gap: 10 }}>
             <Text style={styles.hint}>
-              Tap any line to see what it is. <Text style={{ color: RIDER_TRAIL_INK }}>Mint dotted lines</Text> are trails other riders mapped and shared.
+              {tr('Tap any line to see what it is.')}{' '}
+              {mintHint[0]}<Text style={{ color: RIDER_TRAIL_INK }}>{tr('Mint dotted lines')}</Text>{mintHint[1]}
             </Text>
             <Pressable accessibilityRole="button" onPress={onMyTrails} style={({ pressed }) => [styles.wideBtn, pressed && { opacity: 0.85 }]}>
-              <Text style={styles.wideBtnText}>My Trails</Text>
+              <Text style={styles.wideBtnText}>{tr('My Trails')}</Text>
               <Icon name="chevron" size={18} color={Colors.textSecondary} />
             </Pressable>
           </View>
@@ -903,19 +907,19 @@ function ExplorePanel({
           <Icon name="trackLine" size={22} color={trackOn ? TRACK_DAY_COLORS[0] : Colors.textSecondary} />
           <View style={{ flex: 1, gap: 3 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={styles.wideBtnText}>Track Line</Text>
+              <Text style={styles.wideBtnText}>{tr('Track Line')}</Text>
               <ProTag feature="track_line" style={{ alignSelf: 'auto' }} />
             </View>
             <View style={styles.days}>
               {(['Today', 'Yesterday', 'Older'] as const).map((label, i) => (
                 <View key={label} style={styles.day}>
                   <View style={[styles.dayLine, { backgroundColor: TRACK_DAY_COLORS[i] }]} />
-                  <Text style={styles.dayText}>{label}</Text>
+                  <Text style={styles.dayText}>{tr(label)}</Text>
                 </View>
               ))}
               {hasTrack ? (
-                <Pressable accessibilityRole="button" accessibilityLabel="Clear Track Line" hitSlop={8} onPress={onClearTrack}>
-                  <Text style={[styles.dayText, { color: Colors.sky }]}>Clear</Text>
+                <Pressable accessibilityRole="button" accessibilityLabel={tr('Clear Track Line')} hitSlop={8} onPress={onClearTrack}>
+                  <Text style={[styles.dayText, { color: Colors.sky }]}>{tr('Clear')}</Text>
                 </Pressable>
               ) : null}
             </View>
@@ -923,7 +927,7 @@ function ExplorePanel({
           <Switch
             value={trackOn}
             onValueChange={onTrack}
-            accessibilityLabel="Track Line. Draws where you've been, a new colour each day. Kept on this phone only"
+            accessibilityLabel={tr('Track Line. Draws where you\'ve been, a new colour each day. Kept on this phone only')}
             trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
             thumbColor="#fff"
           />
@@ -954,7 +958,7 @@ function RecordPanel({
       <>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Start recording a trail"
+          accessibilityLabel={tr('Start recording a trail')}
           disabled={noLocation || WEB}
           onPress={onStart}
           style={({ pressed }) => [styles.recBtn, (noLocation || WEB) && { opacity: 0.45 }, pressed && { transform: [{ scale: 0.98 }] }]}>
@@ -962,16 +966,16 @@ function RecordPanel({
             <Circle cx={15} cy={15} r={13} stroke="#fff" strokeWidth={2.5} fill="none" />
             <Circle cx={15} cy={15} r={7} fill="#fff" />
           </Svg>
-          <Text style={styles.recText}>Record a Trail</Text>
+          <Text style={styles.recText}>{tr('Record a Trail')}</Text>
           <ProTag feature="record_trails" />
         </Pressable>
         {open ? (
           <Text style={styles.hint}>
             {WEB
-              ? 'Recording works in the OnMyLead app on your phone or tablet. Here you can measure, plan and look at trails.'
+              ? tr('Recording works in the OnMyLead app on your phone or tablet. Here you can measure, plan and look at trails.')
               : noLocation
-                ? 'Turn on location for OnMyLead in Settings to record.'
-                : 'Ride and OnMyLead draws your line. It stays on this phone unless you share it. Keep Map Mode open: the screen stays on while recording.'}
+                ? tr('Turn on location for OnMyLead in Settings to record.')
+                : tr('Ride and OnMyLead draws your line. It stays on this phone unless you share it. Keep Map Mode open: the screen stays on while recording.')}
           </Text>
         ) : null}
       </>
@@ -982,37 +986,37 @@ function RecordPanel({
     <>
       <View style={styles.recHead}>
         <View style={[styles.recDot, rec.paused && { backgroundColor: Colors.textSecondary }]} />
-        <Text style={styles.recState}>{rec.paused ? 'Paused' : 'Recording'}</Text>
+        <Text style={styles.recState}>{rec.paused ? tr('Paused') : tr('Recording')}</Text>
         {!rec.paused && rec.points.length < 2 ? <ActivityIndicator size="small" color={RECORD_INK} /> : null}
       </View>
       <View style={styles.gauges}>
-        <Gauge big value={len[0]} unit={len[1]} label="Distance" />
-        <Gauge value={clock(elapsed)} label="Time" />
-        <Gauge value={stats?.gainM != null ? feet(stats.gainM)!.replace(' ft', '') : '–'} unit="ft" label="Climb" />
+        <Gauge big value={len[0]} unit={len[1]} label={tr('Distance')} />
+        <Gauge value={clock(elapsed)} label={tr('Time')} />
+        <Gauge value={stats?.gainM != null ? feet(stats.gainM)!.replace(' ft', '') : '–'} unit="ft" label={tr('Climb')} />
       </View>
       <View style={styles.row}>
         <Pressable accessibilityRole="button" onPress={() => onPause(!rec.paused)} style={({ pressed }) => [styles.ctl, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.ctlText}>{rec.paused ? 'Resume' : 'Pause'}</Text>
+          <Text style={styles.ctlText}>{rec.paused ? tr('Resume') : tr('Pause')}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={onFinish} style={({ pressed }) => [styles.ctl, styles.ctlMain, pressed && { opacity: 0.85 }]}>
-          <Text style={[styles.ctlText, { color: Colors.background }]}>Finish and Save</Text>
+          <Text style={[styles.ctlText, { color: Colors.background }]}>{tr('Finish and Save')}</Text>
         </Pressable>
       </View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Mark a spot here, like a ledge or water crossing"
+        accessibilityLabel={tr('Mark a spot here, like a ledge or water crossing')}
         disabled={!onMark}
         onPress={() => onMark?.()}
         style={({ pressed }) => [styles.wideBtn, !onMark && { opacity: 0.45 }, pressed && { opacity: 0.85 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={styles.wideBtnText}>Mark a Spot Here</Text>
+          <Text style={styles.wideBtnText}>{tr('Mark a Spot Here')}</Text>
           <ProTag feature="trail_spots" style={{ alignSelf: 'auto' }} />
         </View>
-        <Text style={styles.dayText}>{spots ? `${spots} marked` : 'Ledges, crossings, views'}</Text>
+        <Text style={styles.dayText}>{spots ? `${spots} marked` : tr('Ledges, crossings, views')}</Text>
       </Pressable>
       {open ? (
         <Pressable accessibilityRole="button" onPress={onDiscard} hitSlop={6} style={{ alignSelf: 'center', padding: 4 }}>
-          <Text style={styles.discard}>Discard Recording</Text>
+          <Text style={styles.discard}>{tr('Discard Recording')}</Text>
         </Pressable>
       ) : null}
     </>
@@ -1040,22 +1044,22 @@ function MeasurePanel({
   return (
     <>
       <View style={styles.gauges}>
-        <Gauge big value={taps > 1 ? len[0] : '0'} unit={taps > 1 ? len[1] : 'mi'} label={follows ? 'Along the Trails' : 'Straight Line'} />
-        <Gauge value={fromMeM != null ? feetOrMiles(fromMeM) : '–'} label="You to Last Point" />
+        <Gauge big value={taps > 1 ? len[0] : '0'} unit={taps > 1 ? len[1] : 'mi'} label={follows ? tr('Along the Trails') : tr('Straight Line')} />
+        <Gauge value={fromMeM != null ? feetOrMiles(fromMeM) : '–'} label={tr('You to Last Point')} />
       </View>
       {open ? (
         <>
-          <View style={styles.tabs} accessibilityRole="radiogroup" accessibilityLabel="How the distance finder joins points">
-            {[{ on: true, label: 'Follow Trails' }, { on: false, label: 'Straight Line' }].map((o) => (
+          <View style={styles.tabs} accessibilityRole="radiogroup" accessibilityLabel={tr('How the distance finder joins points')}>
+            {[{ on: true, label: tr('Follow Trails') }, { on: false, label: tr('Straight Line') }].map((o) => (
               <Pressable key={o.label} accessibilityRole="radio" accessibilityState={{ selected: follows === o.on }} onPress={() => onFollows(o.on)} style={[styles.tab, follows === o.on && styles.tabOn]}>
-                <Text style={[styles.tabText, follows === o.on && { color: Colors.text }]}>{o.label}</Text>
+                <Text style={[styles.tabText, follows === o.on && { color: Colors.text }]}>{tr(o.label)}</Text>
               </Pressable>
             ))}
           </View>
           <View style={styles.hintRow}>
             {finding ? <ActivityIndicator size="small" color={SAND} /> : null}
             <Text style={[styles.hint, { flex: 1 }]}>
-              {marking ? `${WEB ? 'Click' : 'Tap'} the map where the spot is.` : finding ? 'Finding the trail…' : taps === 0 ? `${WEB ? 'Click' : 'Tap'} the map where you want to measure from.` : taps === 1 ? `Now ${WEB ? 'click' : 'tap'} where you want to measure to.` : 'Add more points, mark spots, or save it as a custom trail.'}
+              {marking ? tr('{v} the map where the spot is.', { v: WEB ? 'Click' : 'Tap' }) : finding ? tr('Finding the trail…') : taps === 0 ? tr('{v} the map where you want to measure from.', { v: WEB ? 'Click' : 'Tap' }) : taps === 1 ? tr('Now {v} where you want to measure to.', { v: WEB ? 'click' : 'tap' }) : tr('Add more points, mark spots, or save it as a custom trail.')}
             </Text>
           </View>
         </>
@@ -1063,25 +1067,25 @@ function MeasurePanel({
       <Pressable
         accessibilityRole="button"
         accessibilityState={{ selected: marking }}
-        accessibilityLabel={marking ? 'Cancel marking a spot' : 'Mark a spot on the trail, like a ledge or water crossing'}
+        accessibilityLabel={marking ? tr('Cancel marking a spot') : tr('Mark a spot on the trail, like a ledge or water crossing')}
         onPress={onMark}
         style={({ pressed }) => [styles.wideBtn, marking && { borderWidth: 1.5, borderColor: SAND }, pressed && { opacity: 0.85 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={styles.wideBtnText}>{marking ? 'Cancel Marking' : 'Mark a Spot'}</Text>
+          <Text style={styles.wideBtnText}>{marking ? tr('Cancel Marking') : tr('Mark a Spot')}</Text>
           <ProTag feature="trail_spots" style={{ alignSelf: 'auto' }} />
         </View>
-        <Text style={styles.dayText}>{spots ? `${spots} marked` : 'Ledges, crossings, views'}</Text>
+        <Text style={styles.dayText}>{spots ? `${spots} marked` : tr('Ledges, crossings, views')}</Text>
       </Pressable>
       <View style={styles.row}>
         <Pressable accessibilityRole="button" disabled={!taps} onPress={onUndo} style={({ pressed }) => [styles.ctl, !taps && { opacity: 0.4 }, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.ctlText}>Undo</Text>
+          <Text style={styles.ctlText}>{tr('Undo')}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" disabled={!taps} onPress={onClear} style={({ pressed }) => [styles.ctl, !taps && { opacity: 0.4 }, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.ctlText}>Clear</Text>
+          <Text style={styles.ctlText}>{tr('Clear')}</Text>
         </Pressable>
         {open ? (
           <Pressable accessibilityRole="button" disabled={taps < 2 || finding} onPress={onSave} style={({ pressed }) => [styles.ctl, { flexGrow: 1.5 }, (taps < 2 || finding) && { opacity: 0.4 }, pressed && { opacity: 0.85 }]}>
-            <Text style={styles.ctlText}>Save Trail</Text>
+            <Text style={styles.ctlText}>{tr('Save Trail')}</Text>
             <ProTag feature="save_trails" />
           </Pressable>
         ) : null}

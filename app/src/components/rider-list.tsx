@@ -10,6 +10,7 @@ import type { MapRider } from './group-map-types';
 import { Icon } from './icon';
 import { RiderDot } from './rider-dot';
 
+import { t } from '@/lib/i18n';
 const ROLE_NAME = { leader: 'Leader', sweep: 'Tail Gunner', rider: null } as const;
 const ORDER = { live: 0, delayed: 1, lost: 2 } as const;
 
@@ -35,17 +36,17 @@ export function RiderList({
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <SheetRoot>
-      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel="Close Riders" />
+      <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={t('Close Riders')} />
       <SwipeSheet onClose={onClose} style={styles.sheet} accessibilityViewIsModal>
         <View style={styles.grip} />
         <View style={styles.head}>
-          <Text style={styles.title}>Riders</Text>
+          <Text style={styles.title}>{t('Riders')}</Text>
           <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" style={styles.close}>
-            <Text style={styles.closeText}>Done</Text>
+            <Text style={styles.closeText}>{t('Done')}</Text>
           </Pressable>
         </View>
         {offline ? (
-          <Text style={styles.offline}>You have no service. Times are from the last update you got.</Text>
+          <Text style={styles.offline}>{t('You have no service. Times are from the last update you got.')}</Text>
         ) : null}
         <SheetScroll contentContainerStyle={{ gap: Spacing.two, paddingBottom: Spacing.four }}>
           <RiderRows riders={riders} meId={meId} onNavigate={onNavigate} extra={extra} />
@@ -83,7 +84,7 @@ export function RiderRows({
       {sorted.map((r) => {
         const f = r.freshness;
         const role = ROLE_NAME[r.role];
-        const when = !f ? 'Not Sharing' : f.state === 'live' ? 'Live' : f.state === 'lost' ? f.label : `Last Seen ${f.ago}`;
+        const when = !f ? t('Not Sharing') : f.state === 'live' ? t('Live') : f.state === 'lost' ? f.label : t('Last Seen {ago}', { ago: f.ago });
         const whenColor = !f ? Colors.textSecondary : f.state === 'live' ? RideColors.green : f.state === 'lost' ? Colors.text : Colors.textSecondary;
         const at = r.lat != null && r.lng != null && r.id !== meId ? { lat: r.lat, lng: r.lng } : null;
         const badge = badges.get(r.id);
@@ -105,15 +106,15 @@ export function RiderRows({
             </View>
             {at ? (
               <Pressable
-                onPress={() => onNavigate(at.lat, at.lng, r.id === meId ? 'Your Last Spot' : r.name)}
+                onPress={() => onNavigate(at.lat, at.lng, r.id === meId ? t('Your Last Spot') : r.name)}
                 accessibilityRole="button"
-                accessibilityLabel={f?.state === 'live' ? `Navigate to ${r.name}` : `Navigate to where ${r.name} was last seen`}
+                accessibilityLabel={f?.state === 'live' ? t('Navigate to {name}', { name: r.name }) : t('Navigate to where {name} was last seen', { name: r.name })}
                 hitSlop={narrow ? 6 : 0}
                 style={({ pressed }) => [styles.go, narrow && styles.goNarrow, { opacity: pressed ? 0.75 : 1 }]}>
                 {narrow ? (
                   <Icon name="turn" size={20} color={Colors.sky} strokeWidth={2.2} />
                 ) : (
-                  <Text style={styles.goText}>{f?.state === 'live' ? 'Navigate' : 'Go to Last Seen'}</Text>
+                  <Text style={styles.goText}>{f?.state === 'live' ? t('Navigate') : t('Go to Last Seen')}</Text>
                 )}
               </Pressable>
             ) : null}

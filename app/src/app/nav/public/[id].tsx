@@ -40,7 +40,7 @@ export default function PublicTrailPage() {
   const load = useCallback(() => {
     getPublicTrail(id)
       .then(setT)
-      .catch((e) => setError(e instanceof Error ? e.message : 'Couldn’t load the trail.'))
+      .catch((e) => setError(e instanceof Error ? e.message : tr('Couldn’t load the trail.')))
       .finally(() => setLoaded(true));
   }, [id]);
   useEffect(load, [load]);
@@ -48,7 +48,7 @@ export default function PublicTrailPage() {
   if (!t) {
     return (
       <Screen width="readable">
-        <ThemedText themeColor="textSecondary">{loaded ? 'This trail isn’t on the public map any more.' : 'Loading…'}</ThemedText>
+        <ThemedText themeColor="textSecondary">{loaded ? tr('This trail isn’t on the public map any more.') : tr('Loading…')}</ThemedText>
         <ErrorText error={error} />
       </Screen>
     );
@@ -58,16 +58,16 @@ export default function PublicTrailPage() {
   // on this phone stays in My Trails (delete it there too if they want it gone).
   async function removeMine() {
     const msg = savedCopy
-      ? 'It comes off the public map with its photos and ratings. Your copy stays in My Trails. Rides that used it keep their route.'
-      : 'It comes off the public map with its photos and ratings. Rides that used it keep their route.';
-    if (!(await confirmAsync('Delete Your Trail?', msg, 'Delete', 'Keep It'))) return;
+      ? tr('It comes off the public map with its photos and ratings. Your copy stays in My Trails. Rides that used it keep their route.')
+      : tr('It comes off the public map with its photos and ratings. Rides that used it keep their route.');
+    if (!(await confirmAsync(tr('Delete Your Trail?'), msg, tr('Delete'), tr('Keep It')))) return;
     setDeleting(true);
     try {
       if (savedCopy?.shared?.id === t!.id) await stopSharing(savedCopy);
       else await deleteSharedTrail(t!.id, t!.photos);
       router.back();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t delete it.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t delete it.'));
     } finally {
       setDeleting(false);
     }
@@ -77,29 +77,29 @@ export default function PublicTrailPage() {
     try {
       return await savePublicTrail(t!);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Couldn’t save it.');
+      setError(e instanceof Error ? e.message : tr('Couldn’t save it.'));
       return null;
     }
   }
 
   const facts = [
-    { label: 'Distance', value: feetOrMiles(t.lengthM) },
-    t.elevationGainM != null ? { label: 'Climb', value: feet(t.elevationGainM)! } : null,
-    t.highPointM != null ? { label: 'High Point', value: feet(t.highPointM)! } : null,
-    t.maxWidthIn != null ? { label: 'Width Limit', value: `${t.maxWidthIn}"` } : null,
+    { label: tr('Distance'), value: feetOrMiles(t.lengthM) },
+    t.elevationGainM != null ? { label: tr('Climb'), value: feet(t.elevationGainM)! } : null,
+    t.highPointM != null ? { label: tr('High Point'), value: feet(t.highPointM)! } : null,
+    t.maxWidthIn != null ? { label: tr('Width Limit'), value: `${t.maxWidthIn}"` } : null,
   ].filter((f): f is { label: string; value: string } => !!f);
-  const more = [surfaceLabel(t.surface), seasonLabel(t.season), t.oneWay ? 'One Way' : null].filter(Boolean);
+  const more = [surfaceLabel(t.surface), seasonLabel(t.season), t.oneWay ? tr('One Way') : null].filter(Boolean);
 
   const info = (
     <>
       <View style={styles.userRow}>
         <Svg width={26} height={8}><Path d="M3 4H23" stroke={RIDER_TRAIL_INK} strokeWidth={3.6} strokeLinecap="round" strokeDasharray="0.1 5.5" /></Svg>
-        <Text style={styles.user}>User Submitted Trail</Text>
+        <Text style={styles.user}>{tr('User Submitted Trail')}</Text>
       </View>
       <Text style={styles.title} accessibilityRole="header">{t.name}</Text>
       <ThemedText themeColor="textSecondary">{mappedBy(t)}{t.mine ? ' (You)' : ''}</ThemedText>
       {t.status !== 'public' ? (
-        <ThemedText style={{ color: '#FFB020' }}>Hidden from other riders after accuracy ratings. Only you can see it.</ThemedText>
+        <ThemedText style={{ color: '#FFB020' }}>{tr('Hidden from other riders after accuracy ratings. Only you can see it.')}</ThemedText>
       ) : null}
       <View style={styles.userRow}>
         <View style={[styles.diff, { borderColor: difficultyColor(t.difficulty) }]}>
@@ -112,44 +112,44 @@ export default function PublicTrailPage() {
         {facts.map((f) => (
           <View key={f.label}>
             <Text style={styles.factValue}>{f.value}</Text>
-            <Text style={styles.factLabel}>{f.label}</Text>
+            <Text style={styles.factLabel}>{tr(f.label)}</Text>
           </View>
         ))}
       </View>
       <RigFitLine limitIn={t.maxWidthIn} garage={garage} />
       <View style={{ gap: 4 }}>
-        <Text style={styles.label}>Vehicles That Fit</Text>
+        <Text style={styles.label}>{tr('Vehicles That Fit')}</Text>
         <ThemedText>{t.vehicles.map(vehicleLabel).join(', ')}</ThemedText>
       </View>
       {t.description ? (
         <View style={{ gap: 4 }}>
-          <Text style={styles.label}>Notes from {t.mapper}</Text>
-          <ThemedText>{t.description}</ThemedText>
+          <Text style={styles.label}>{tr('Notes from {mapper}', { mapper: t.mapper })}</Text>
+          <ThemedText>{tr(t.description)}</ThemedText>
         </View>
       ) : null}
       <View style={styles.scores}>
         <View style={{ gap: 2 }}>
-          <Text style={styles.label}>Quality</Text>
-          <StarScore average={t.quality} count={t.qualityCount} color="#F5C451" empty="Not Rated Yet" />
+          <Text style={styles.label}>{tr('Quality')}</Text>
+          <StarScore average={t.quality} count={t.qualityCount} color="#F5C451" empty={tr('Not Rated Yet')} />
         </View>
         <View style={{ gap: 2 }}>
-          <Text style={styles.label}>Line Accuracy</Text>
-          <StarScore average={t.average} count={t.ratingCount} color={RIDER_TRAIL_INK} empty="Not Rated Yet" />
+          <Text style={styles.label}>{tr('Line Accuracy')}</Text>
+          <StarScore average={t.average} count={t.ratingCount} color={RIDER_TRAIL_INK} empty={tr('Not Rated Yet')} />
         </View>
       </View>
       <ThemedText type="small" themeColor="textSecondary">
-        Mapped by a rider, not an agency. Check posted signs, closures and land access before you ride.
+        {tr('Mapped by a rider, not an agency. Check posted signs, closures and land access before you ride.')}
       </ThemedText>
     </>
   );
 
   const side = (
     <>
-      <RouteMap route={t.points} color={RIDER_TRAIL_INK} dotted label={`Map of ${t.name}`} />
+      <RouteMap route={t.points} color={RIDER_TRAIL_INK} dotted label={tr('Map of {name}', { name: t.name })} />
       {t.photos.length ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.two }}>
           {t.photos.map((p) => (
-            <Image key={p} source={{ uri: p }} style={styles.photo} contentFit="cover" accessibilityLabel={`Photo of ${t.name}`} />
+            <Image key={p} source={{ uri: p }} style={styles.photo} contentFit="cover" accessibilityLabel={tr('Photo of {name}', { name: t.name })} />
           ))}
         </ScrollView>
       ) : null}
@@ -159,10 +159,10 @@ export default function PublicTrailPage() {
   const actions = (
     <>
       <ErrorText error={error} />
-      <Button title="Navigate" big onPress={() => router.push(`/nav?follow=${t.id}`)} />
+      <Button title={tr('Navigate')} big onPress={() => router.push(`/nav?follow=${t.id}`)} />
       {!t.mine ? (
         <Button
-          title={t.myScore != null || t.myQuality != null ? 'Change Your Rating' : 'Rate This Trail'}
+          title={t.myScore != null || t.myQuality != null ? tr('Change Your Rating') : tr('Rate This Trail')}
           kind="secondary"
           pro="rate_trails"
           onPress={() => requirePro('rate_trails') && setRating(true)}
@@ -171,14 +171,14 @@ export default function PublicTrailPage() {
       ) : null}
       {t.mine ? (
         <>
-          {savedCopy ? <Button title="Edit Your Trail" kind="secondary" onPress={() => router.push(`/nav/trail/${savedCopy.id}`)} /> : null}
-          <Button title="Delete Your Trail" kind="ghost" loading={deleting} onPress={removeMine} />
+          {savedCopy ? <Button title={tr('Edit Your Trail')} kind="secondary" onPress={() => router.push(`/nav/trail/${savedCopy.id}`)} /> : null}
+          <Button title={tr('Delete Your Trail')} kind="ghost" loading={deleting} onPress={removeMine} />
         </>
       ) : (
-        <Button title={savedCopy ? 'Saved to My Trails' : 'Save to My Trails'} kind="secondary" disabled={!!savedCopy} onPress={save} />
+        <Button title={savedCopy ? tr('Saved to My Trails') : tr('Save to My Trails')} kind="secondary" disabled={!!savedCopy} onPress={save} />
       )}
       <Button
-        title="Plan a Group Ride on This Trail"
+        title={tr('Plan a Group Ride on This Trail')}
         pro="trail_rides"
         kind="secondary"
         onPress={async () => {

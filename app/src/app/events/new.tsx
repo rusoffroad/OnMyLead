@@ -101,7 +101,7 @@ export default function EventForm() {
       if (id) router.back();
       else router.replace(`/e/${saved.share_code}?new=1`);
     } catch (e) {
-      if (!handleProError(e)) setError(e instanceof Error ? e.message : 'Couldn’t save the event.');
+      if (!handleProError(e)) setError(e instanceof Error ? e.message : t('Couldn’t save the event.'));
     } finally {
       setBusy(false);
     }
@@ -111,7 +111,7 @@ export default function EventForm() {
     return (
       <Screen width="readable">
         <Stack.Screen options={{ title: t('Edit Event') }} />
-        <ThemedText themeColor="textSecondary">Loading…</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Loading…')}</ThemedText>
         <ErrorText error={error} />
       </Screen>
     );
@@ -123,73 +123,73 @@ export default function EventForm() {
       <View style={{ gap: Spacing.three }}>
         {!id ? <EventOrRide from="create-event" /> : null}
         <Card>
-          <Field label="Event Name" value={title} onChangeText={setTitle} maxLength={100} placeholder="Moab Spring Rally" />
+          <Field label={t('Event Name')} value={title} onChangeText={setTitle} maxLength={100} placeholder={t('Moab Spring Rally')} />
           <Field
-            label="Details"
+            label={t('Details')}
             value={details}
             onChangeText={setDetails}
             multiline
             maxLength={5000}
-            placeholder="What it is, who it’s for, entry fees, what to bring, camping, rules"
+            placeholder={t('What it is, who it’s for, entry fees, what to bring, camping, rules')}
           />
           <Choice<EventVisibility>
-            label="Who Can Find It"
-            options={[{ value: 'public', label: 'Public' }, { value: 'unlisted', label: 'Link Only' }]}
+            label={t('Who Can Find It')}
+            options={[{ value: 'public', label: t('Public') }, { value: 'unlisted', label: t('Link Only') }]}
             value={visibility}
             onChange={setVisibility}
           />
           <ThemedText type="small" themeColor="textSecondary">
             {visibility === 'public'
-              ? 'Shows in Events for every rider, and anyone with the link can open it.'
-              : 'Only people you send the link to can open it.'}
+              ? t('Shows in Events for every rider, and anyone with the link can open it.')
+              : t('Only people you send the link to can open it.')}
           </ThemedText>
         </Card>
 
         <Card>
-          <ThemedText type="heading">When</ThemedText>
+          <ThemedText type="heading">{t('When')}</ThemedText>
           <DateCalendar value={startDay} onChange={(d) => {
             setStartDay(d);
             if (endDay && endDay < d) setEndDay(d);
-          }} range={range} note={multiDay ? 'The first day.' : undefined} />
-          <TimePicker label="Starts At" value={startTime} onChange={setStartTime} suggest={9 * 60} />
+          }} range={range} note={multiDay ? t('The first day.') : undefined} />
+          <TimePicker label={t('Starts At')} value={startTime} onChange={setStartTime} suggest={9 * 60} />
           <Choice<'one' | 'many'>
-            options={[{ value: 'one', label: 'One Day' }, { value: 'many', label: 'Several Days' }]}
+            options={[{ value: 'one', label: t('One Day') }, { value: 'many', label: t('Several Days') }]}
             value={multiDay ? 'many' : 'one'}
             onChange={(v) => setMultiDay(v === 'many')}
           />
           {multiDay ? (
-            <DateCalendar value={endDay} onChange={setEndDay} range={{ first: startDay ?? range.first, last: addDays(startDay ?? today, 31) }} note="The last day. Up to 31 days." />
+            <DateCalendar value={endDay} onChange={setEndDay} range={{ first: startDay ?? range.first, last: addDays(startDay ?? today, 31) }} note={t('The last day. Up to 31 days.')} />
           ) : null}
-          <TimePicker label={multiDay ? 'Ends At (Last Day)' : 'Ends At'} value={endTime} onChange={setEndTime} suggest={17 * 60} />
+          <TimePicker label={multiDay ? t('Ends At (Last Day)') : t('Ends At')} value={endTime} onChange={setEndTime} suggest={17 * 60} />
         </Card>
 
         <Card>
-          <ThemedText type="heading">Where</ThemedText>
+          <ThemedText type="heading">{t('Where')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
-            Everyone who sees the event sees this place. Pick a public spot, like a venue, park, campground or trailhead.
+            {t('Everyone who sees the event sees this place. Pick a public spot, like a venue, park, campground or trailhead.')}
           </ThemedText>
-          <PlaceSearch label="Search a Place or Address" onPick={pickPlace} />
+          <PlaceSearch label={t('Search a Place or Address')} onPick={pickPlace} />
           <MeetPointMap value={spot} onPick={pickOnMap} />
-          <Field label="Place Name" value={locationName} onChangeText={setLocationName} maxLength={120} placeholder="Old Spanish Trail Arena" />
-          <Field label="Address (Optional)" value={address} onChangeText={setAddress} maxLength={200} placeholder="3641 S Hwy 191, Moab, UT" />
+          <Field label={t('Place Name')} value={locationName} onChangeText={setLocationName} maxLength={120} placeholder={t('Old Spanish Trail Arena')} />
+          <Field label={t('Address (Optional)')} value={address} onChangeText={setAddress} maxLength={200} placeholder={t('3641 S Hwy 191, Moab, UT')} />
         </Card>
 
         <Card>
           <Field
-            label="Website or Tickets (Optional)"
+            label={t('Website or Tickets (Optional)')}
             value={website}
             onChangeText={setWebsite}
             autoCapitalize="none"
             keyboardType="url"
-            placeholder="moabrally.com"
+            placeholder={t('moabrally.com')}
           />
         </Card>
 
         <ErrorText error={error} />
-        <Button title={id ? 'Save Changes' : 'Create Event'} big loading={busy} onPress={submit} />
+        <Button title={id ? t('Save Changes') : t('Create Event')} big loading={busy} onPress={submit} />
         {!id ? (
           <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
-            Next you can add photos, the agenda, co-hosts and the group rides.
+            {t('Next you can add photos, the agenda, co-hosts and the group rides.')}
           </ThemedText>
         ) : null}
       </View>

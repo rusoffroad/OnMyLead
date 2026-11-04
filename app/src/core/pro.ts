@@ -9,6 +9,7 @@
 
 import { can, trialBadgeText, type Entitlements, type FeatureKey, type ProError } from './entitlements';
 
+import { coreLocale, tc } from './i18n';
 /** Free history shows this many past rides. */
 export const FREE_HISTORY = 5;
 
@@ -17,7 +18,7 @@ export const FREE_MAP_HOURS = 8;
 
 /** The plan line, e.g. "Pro Trial — 12 Days Remaining", "Pro" or "Free". */
 export function planHeadline(ent: Entitlements): string {
-  return trialBadgeText(ent) ?? ent.label;
+  return trialBadgeText(ent) ?? tc(ent.label);
 }
 
 /** The first day of next UTC month, when the Free allowance resets. */
@@ -170,7 +171,7 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Join Rides and Follow the Leader', free: 'Unlimited', pro: 'Unlimited' },
   { label: 'Live Tracking, SOS, Crash Alert and Ride Bubble', free: true, pro: true },
   { label: 'Ride Chat', free: true, pro: true },
-  { label: 'Map Mode', free: `${FREE_MAP_HOURS} Hours a Month`, pro: 'Unlimited' },
+  { label: 'Map Mode', free: '8 Hours a Month', pro: 'Unlimited' },
   { label: 'Social Feed: See, Like and Read Comments', free: true, pro: true },
   { label: 'Badges, Events and Friends', free: true, pro: true },
   { label: 'Draw Routes, Waypoints and Directions', free: false, pro: true },
@@ -228,7 +229,7 @@ export function canStartTrip(ent: Entitlements, trips: { starts_on: string | nul
 export function shortDate(iso: string | null): string {
   if (!iso) return '';
   const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 /** Today in the phone's own calendar, as YYYY-MM-DD (how trip dates are stored). */

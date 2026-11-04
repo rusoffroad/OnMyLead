@@ -9,6 +9,7 @@ import { Button } from './ui';
 import { ProTag } from './pro-tag';
 import { requirePro } from '@/lib/pro';
 
+import { t } from '@/lib/i18n';
 /**
  * "Choose Your Own Code" for a ride, a riding group or a friend link: a link that opens a box to
  * type the new code (checked live against the database), what changing it means, and Save. Only
@@ -54,7 +55,7 @@ export function ShareCodeEditor({ kind, id, current, note, save, onSaved }: {
   if (!open) {
     return (
       <Pressable accessibilityRole="button" onPress={() => requirePro('custom_codes') && setOpen(true)} style={{ minHeight: 40, flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start' }} hitSlop={4}>
-        <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Choose Your Own Code</ThemedText>
+        <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{t('Choose Your Own Code')}</ThemedText>
         <ProTag feature="custom_codes" />
       </Pressable>
     );
@@ -62,13 +63,13 @@ export function ShareCodeEditor({ kind, id, current, note, save, onSaved }: {
 
   return (
     <View style={{ gap: Spacing.two, padding: 12, borderRadius: Radius.control, borderWidth: 1, borderColor: Colors.border }}>
-      <ShareCodeField kind={kind} id={id} label="New Code" value={value} onChange={setValue} onCheck={setCheck} autoFocus />
+      <ShareCodeField kind={kind} id={id} label={t('New Code')} value={value} onChange={setValue} onCheck={setCheck} autoFocus />
       <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText>
       {error ? <ThemedText type="small" style={{ color: Colors.danger, fontWeight: 600 }} accessibilityLiveRegion="polite">{error}</ThemedText> : null}
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Cancel" kind="secondary" style={{ flex: 1, minHeight: 44 }} onPress={close} />
+        <Button title={t('Cancel')} kind="secondary" style={{ flex: 1, minHeight: 44 }} onPress={close} />
         <Button
-          title="Save Code"
+          title={t('Save Code')}
           style={{ flex: 1, minHeight: 44 }}
           loading={busy}
           disabled={!typed || typed === current || check === 'empty' || !codeCheckOk(check)}

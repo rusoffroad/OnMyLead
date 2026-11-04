@@ -22,6 +22,7 @@ import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
+import { t as tr } from '@/lib/i18n';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
 export type NavMapHandle = {
@@ -258,7 +259,7 @@ function FlatNavMap({
             e.stopPropagation?.();
             onPressWaypoint?.(w);
           }}
-          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints ?? [])}, ${w.name}, ${symbolLabel(waypointSymbol(w))}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+          accessibilityLabel={w.planned_stop ? tr('Planned stop {v}, {name}, {v2}', { v: stopNumber(w, waypoints ?? []), name: w.name, v2: symbolLabel(waypointSymbol(w)) }) : tr('{v} waypoint, {name}', { v: symbolLabel(waypointSymbol(w)), name: w.name })}
           zIndex={w.planned_stop ? 4 : w.shared ? 3 : 2}>
           {w.planned_stop ? (
             <StopPin name={w.name} n={stopNumber(w, waypoints ?? [])} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
@@ -282,7 +283,7 @@ function FlatNavMap({
             e.stopPropagation?.();
             onPressWaypoint?.(w);
           }}
-          accessibilityLabel={w.planned_stop ? `Planned stop ${stopNumber(w, waypoints)}, ${w.name}` : `${symbolLabel(waypointSymbol(w))} waypoint, ${w.name}`}
+          accessibilityLabel={w.planned_stop ? tr('Planned stop {v}, {name}', { v: stopNumber(w, waypoints), name: w.name }) : tr('{v} waypoint, {name}', { v: symbolLabel(waypointSymbol(w)), name: w.name })}
           zIndex={w.planned_stop ? 6 : 5}>
           {w.planned_stop ? (
             <StopPin name={w.name} n={stopNumber(w, waypoints)} time={stopTimeLabel(w.stop_time)} symbol={waypointSymbol(w)} />
@@ -306,7 +307,7 @@ function FlatNavMap({
         </Marker>
       ))}
       {found ? (
-        <Marker coordinate={{ latitude: found.lat, longitude: found.lng }} anchor={{ x: 0.5, y: 1 }} tappable={false} accessibilityLabel={`Search result: ${found.name}`}>
+        <Marker coordinate={{ latitude: found.lat, longitude: found.lng }} anchor={{ x: 0.5, y: 1 }} tappable={false} accessibilityLabel={tr('Search result: {name}', { name: found.name })}>
           <MarkerBody style={{ alignItems: 'center', maxWidth: 220 }}>
             <Text style={styles.found} numberOfLines={1}>{found.name}</Text>
             <View style={styles.foundDot} />

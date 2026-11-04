@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { headline, queuedLine, stateDetail, tallyLine, type Broadcast, type BroadcastState, type Tally } from '@/core/broadcast';
 
+import { t } from '@/lib/i18n';
 const TINT: Record<BroadcastState, string> = {
   get sending() { return Colors.sky; },
   get sent() { return RideColors.green; },
@@ -37,7 +38,7 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
   // Waiting for signal, but nearby phones got it over Bluetooth: say who.
   const queuedNearby = card.state === 'queued' ? queuedLine(tally, nameOf) : null;
   const detail = out && card.state === 'sent'
-    ? receiptsOn ? tallyLine(tally, nameOf) : 'Sent. Seen receipts aren’t switched on yet.'
+    ? receiptsOn ? tallyLine(tally, nameOf) : t('Sent. Seen receipts aren’t switched on yet.')
     : queuedNearby ?? stateDetail(card.state);
   const lights = (out && receiptsOn) || !!queuedNearby;
   const canCancel = card.state === 'sent' || card.state === 'queued' || card.state === 'sending';
@@ -63,7 +64,7 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
           {detail ? <Text style={styles.detail} numberOfLines={2}>{detail}</Text> : null}
         </View>
         {card.state === 'sent' || card.state === 'queued' ? (
-          <Pressable onPress={onDismiss} accessibilityRole="button" accessibilityLabel="Hide" hitSlop={12} style={styles.close}>
+          <Pressable onPress={onDismiss} accessibilityRole="button" accessibilityLabel={t('Hide')} hitSlop={12} style={styles.close}>
             <Text style={styles.closeText}>✕</Text>
           </Pressable>
         ) : null}
@@ -87,17 +88,17 @@ export function BroadcastCard({ card, tally, receiptsOn, nameOf, onCancel, onRet
           </View>
           {card.state === 'queued' ? (
             <Pressable onPress={onRetry} accessibilityRole="button" style={({ pressed }) => [styles.retry, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.retryText}>Retry Now</Text>
+              <Text style={styles.retryText}>{t('Retry Now')}</Text>
             </Pressable>
           ) : null}
           <Pressable
             onPress={onCancel}
             accessibilityRole="button"
-            accessibilityLabel={`Cancel ${card.label}`}
-            accessibilityHint="Takes it back and tells the group to ignore it"
+            accessibilityLabel={t('Cancel {label}', { label: card.label })}
+            accessibilityHint={t('Takes it back and tells the group to ignore it')}
             hitSlop={6}
             style={({ pressed }) => [styles.cancel, { opacity: pressed ? 0.7 : 1 }]}>
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={styles.cancelText}>{t('Cancel')}</Text>
           </Pressable>
         </View>
       ) : null}

@@ -9,6 +9,7 @@ import type { LatLng } from '@/core/geo';
 import { placeDetail, PLACES_CREDIT, type Place } from '@/core/places';
 import { usePlaceSearch } from '@/hooks/use-place-search';
 
+import { t } from '@/lib/i18n';
 /**
  * The small search over a map: type a trailhead, park, forest, town or address and pick one to move
  * the map there. It only moves the map; nothing is added to the route. Shown in place of the map's
@@ -32,24 +33,24 @@ export function MapSearch({ near, onPick, onClose }: { near?: LatLng | null; onP
           value={query}
           onChangeText={setQuery}
           autoFocus
-          placeholder="Trailhead, park, area or town"
+          placeholder={t('Trailhead, park, area or town')}
           placeholderTextColor="#5F7190"
           selectionColor={Colors.sky}
           returnKeyType="search"
           autoCorrect={false}
-          accessibilityLabel="Search the Map"
+          accessibilityLabel={t('Search the Map')}
           onSubmitEditing={() => places?.[0] && pick(places[0])}
           onKeyPress={(e) => Platform.OS === 'web' && e.nativeEvent.key === 'Escape' && onClose()}
           style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
         />
         {busy ? <ActivityIndicator size="small" color={Colors.textSecondary} /> : null}
         {query && !busy ? (
-          <Pressable accessibilityRole="button" accessibilityLabel="Clear Search" hitSlop={10} onPress={() => setQuery('')}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('Clear Search')} hitSlop={10} onPress={() => setQuery('')}>
             <Text style={styles.clear}>×</Text>
           </Pressable>
         ) : null}
-        <Pressable accessibilityRole="button" accessibilityLabel="Close Search" hitSlop={12} onPress={onClose}>
-          <Text style={styles.cancel}>Cancel</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('Close Search')} hitSlop={12} onPress={onClose}>
+          <Text style={styles.cancel}>{t('Cancel')}</Text>
         </Pressable>
       </View>
 
@@ -57,7 +58,7 @@ export function MapSearch({ near, onPick, onClose }: { near?: LatLng | null; onP
         <View style={styles.list}>
           {error ? <Text style={[styles.note, { color: Colors.danger }]}>{error}</Text> : null}
           {places?.length === 0 ? (
-            <Text style={styles.note}>Nothing found for “{q}”. Try the full name or a nearby town.</Text>
+            <Text style={styles.note}>{t('Nothing found for “{q}”. Try the full name or a nearby town.', { q })}</Text>
           ) : null}
           {places?.length ? (
             <ScrollView style={{ maxHeight: 300 }} {...keyboardScroll} accessibilityRole="list">
@@ -67,7 +68,7 @@ export function MapSearch({ near, onPick, onClose }: { near?: LatLng | null; onP
                   <Pressable
                     key={p.id}
                     accessibilityRole="button"
-                    accessibilityLabel={`Go to ${p.name}, ${placeDetail(p)}`}
+                    accessibilityLabel={t('Go to {name}, {v}', { name: p.name, v: placeDetail(p) })}
                     onPress={() => pick(p)}
                     style={({ pressed, hovered }: { pressed: boolean; hovered?: boolean }) => [
                       styles.result,

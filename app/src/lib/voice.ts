@@ -3,6 +3,7 @@ import * as Speech from 'expo-speech';
 import { useEffect, useState } from 'react';
 
 import { parseVoiceChoice, resolveVoice, type PhoneVoice } from '@/core/voice';
+import { currentLanguage, currentLocale, t } from './i18n';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
 
 /**
@@ -90,10 +91,20 @@ export function speakWith(text: string, voice: PhoneVoice | null) {
  * read, the phone's default voice speaks.
  */
 export function speak(text: string) {
+  // Alerts are spoken in the app's language. A picked voice that speaks another language would
+  // mangle the words, so the phone's own voice for the app's language reads them instead.
+  const said = t(text);
+  const lang = currentLanguage();
   Promise.all([installedVoices(), loadVoiceChoice()])
-    .then(([list, saved]) => resolveVoice(list, deviceLanguage(), saved))
+    .then(([list, saved]) => resolveVoice(list, lang === 'en' ? deviceLanguage() : currentLocale(), saved))
     .catch(() => null)
-    .then((voice) => speakWith(text, voice));
+    .then((voice) => {
+      if (lang !== 'en' && voice && !voice.language.toLowerCase().startsWith(lang)) {
+        Speech.speak(said, { language: currentLocale() });
+        return;
+      }
+      speakWith(said, voice);
+    });
 }
 
 export function stopSpeaking() {

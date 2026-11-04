@@ -7,6 +7,7 @@ import { ACTION_WIDTH, isHorizontalSwipe, ROW_ACTION_LABEL, rowSwipeResult, type
 import { useTheme } from '@/hooks/use-theme';
 import { Icon } from './icon';
 
+import { t } from '@/lib/i18n';
 /** The line over a list of swipe rows saying what a swipe does. */
 export const ROW_ACTION_HINT: string | null = 'Swipe Left to Delete or Leave';
 
@@ -92,7 +93,7 @@ export function SwipeRow({ action, onAction, children }: { action: RowAction; on
       </Animated.View>
       <Animated.View {...pan.panHandlers} style={{ backgroundColor: theme.backgroundElement, transform: [{ translateX: x }] }}>
         {children}
-        {open ? <Pressable accessibilityLabel="Close" onPress={close} style={StyleSheet.absoluteFill} /> : null}
+        {open ? <Pressable accessibilityLabel={t('Close')} onPress={close} style={StyleSheet.absoluteFill} /> : null}
       </Animated.View>
     </View>
   );

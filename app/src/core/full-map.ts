@@ -1,5 +1,6 @@
 import { swipeResult } from './panel-swipe';
 
+import { tc } from './i18n';
 /**
  * Full Map: every map screen (Ride Mode, Navigate, the route builder, waypoints, Find a Ride)
  * can tuck its bars and panels away so the map fills the screen. One small bar stays at the
@@ -12,8 +13,8 @@ export const RESTORE_LABEL = 'Controls';
 
 /** What a screen reader says for the bring-back button; `waiting` counts alerts tucked away behind it. */
 export function restoreA11yLabel(waiting = 0): string {
-  if (waiting > 0) return `Show the controls and ${waiting} ${waiting === 1 ? 'alert' : 'alerts'} waiting`;
-  return 'Show the controls';
+  if (waiting > 0) return tc('Show the controls and {waiting} {v} waiting', { waiting, v: waiting === 1 ? 'alert' : 'alerts' });
+  return tc('Show the controls');
 }
 
 /** A swipe up on the Full Map bar brings the controls back, like opening a folded panel. */

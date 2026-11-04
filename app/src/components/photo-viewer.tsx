@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icon } from '@/components/icon';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 
+import { t } from '@/lib/i18n';
 /**
  * A rider's picture (or a post photo) full size over a dark backdrop, so you can actually see it.
  * Tap anywhere, the close button, Escape on a keyboard, or Android's Back closes it. The picture
@@ -19,7 +20,7 @@ export function PhotoViewer({
   const side = Math.min(640, width - Spacing.four * 2, height - insets.top - insets.bottom - 160);
   return (
     <Modal visible={!!uri} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent supportedOrientations={['portrait', 'landscape']}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityRole="button" accessibilityLabel="Close picture">
+      <Pressable style={styles.backdrop} onPress={onClose} accessibilityRole="button" accessibilityLabel={t('Close picture')}>
         <View style={[styles.close, { top: insets.top + Spacing.three }]}>
           <Icon name="close" size={22} color="#fff" />
         </View>
@@ -29,7 +30,7 @@ export function PhotoViewer({
             contentFit={square ? 'cover' : 'contain'}
             transition={150}
             accessibilityIgnoresInvertColors
-            accessibilityLabel={name ? `${name}’s picture` : 'Picture'}
+            accessibilityLabel={name ? `${name}’s picture` : t('Picture')}
             style={[{ width: side, height: side }, square ? { borderRadius: side / 2 } : { borderRadius: 18 }]}
           />
         ) : null}

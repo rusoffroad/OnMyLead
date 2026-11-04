@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Cancelling and deleting a ride (migration 20261017000000_cancel_delete_ride).
  *
@@ -20,27 +22,27 @@ export function ridersToTell(members: Member[], me: string | null | undefined): 
   return members.filter((m) => m.user_id !== me && ['joined', 'pending', 'waitlisted'].includes(m.status)).length;
 }
 
-const people = (n: number) => (n === 1 ? '1 rider' : `${n} riders`);
+const people = (n: number) => (n === 1 ? tc('1 rider') : `${n} riders`);
 
 export type Prompt = { title: string; message: string; confirm: string };
 
 export function cancelPrompt(rideName: string, others: number): Prompt {
   return {
-    title: `Cancel ${rideName}?`,
+    title: tc('Cancel {rideName}?', { rideName }),
     message: others
-      ? `${people(others)} on this ride will get a notification and an email saying it’s cancelled. The ride stays in their list as Cancelled. This can’t be undone.`
-      : 'Nobody else has joined yet. The ride stays in your list as Cancelled. This can’t be undone.',
+      ? tc('{v} on this ride will get a notification and an email saying it’s cancelled. The ride stays in their list as Cancelled. This can’t be undone.', { v: people(others) })
+      : tc('Nobody else has joined yet. The ride stays in your list as Cancelled. This can’t be undone.'),
     confirm: 'Cancel Ride',
   };
 }
 
 export function deletePrompt(rideName: string, others: number, over: boolean): Prompt {
   return {
-    title: `Delete ${rideName}?`,
+    title: tc('Delete {rideName}?', { rideName }),
     message:
       others && !over
-        ? `It’s removed for everyone, with its chat and route. ${people(others)} on this ride will get a notification and an email saying it’s cancelled. This can’t be undone.`
-        : 'It’s removed for everyone, with its chat and route. This can’t be undone.',
+        ? tc('It’s removed for everyone, with its chat and route. {v} on this ride will get a notification and an email saying it’s cancelled. This can’t be undone.', { v: people(others) })
+        : tc('It’s removed for everyone, with its chat and route. This can’t be undone.'),
     confirm: 'Delete Ride',
   };
 }
@@ -48,11 +50,11 @@ export function deletePrompt(rideName: string, others: number, over: boolean): P
 /** Turn a cancel or delete error into something the organizer can act on. */
 export function friendlyCancelError(message: string): string {
   if (/cancel_ride|delete_ride/.test(message) && /could not find|schema cache|does not exist/i.test(message)) {
-    return 'Cancelling and deleting rides aren’t switched on yet. They start working with the next server update.';
+    return tc('Cancelling and deleting rides aren’t switched on yet. They start working with the next server update.');
   }
-  if (/only the organizer/i.test(message)) return 'Only the organizer can do that.';
-  if (/already (ended|cancelled)/i.test(message)) return 'This ride is already over.';
-  if (/ride not found/i.test(message)) return 'This ride is already gone.';
+  if (/only the organizer/i.test(message)) return tc('Only the organizer can do that.');
+  if (/already (ended|cancelled)/i.test(message)) return tc('This ride is already over.');
+  if (/ride not found/i.test(message)) return tc('This ride is already gone.');
   return message;
 }
 
@@ -60,19 +62,19 @@ export function friendlyCancelError(message: string): string {
 export function leavePrompt(rideName: string, rideStatus: Status, invited = false): Prompt {
   if (invited) {
     return {
-      title: `Decline ${rideName}?`,
-      message: 'The invite is removed from your list. You can still join later with the ride’s link or code.',
+      title: tc('Decline {rideName}?', { rideName }),
+      message: tc('The invite is removed from your list. You can still join later with the ride’s link or code.'),
       confirm: 'Decline',
     };
   }
   const over = rideStatus === 'ended' || rideStatus === 'cancelled';
   return {
-    title: `Leave ${rideName}?`,
+    title: tc('Leave {rideName}?', { rideName }),
     message: over
-      ? 'It’s removed from your Past Rides.'
+      ? tc('It’s removed from your Past Rides.')
       : rideStatus === 'live'
-        ? 'You’re taken off the ride and stop sharing your location with the group. You can rejoin with the ride’s link or code.'
-        : 'You’re taken off the ride and your spot opens up. You can rejoin with the ride’s link or code if there’s room.',
+        ? tc('You’re taken off the ride and stop sharing your location with the group. You can rejoin with the ride’s link or code.')
+        : tc('You’re taken off the ride and your spot opens up. You can rejoin with the ride’s link or code if there’s room.'),
     confirm: 'Leave Ride',
   };
 }

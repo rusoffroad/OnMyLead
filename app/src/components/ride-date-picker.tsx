@@ -7,6 +7,7 @@ import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { DateCalendar } from '@/components/date-calendar';
 import { daysAwayText, longDayText, quickDays, rideDayRange, sameDay, startOfDay } from '@/core/calendar';
 
+import { t } from '@/lib/i18n';
 /**
  * The ride's day: one tap for Today, Tomorrow or the coming weekend, or the calendar (type the date
  * or tap it) for any day up to three years out. `value` is local midnight in milliseconds. Same component on phones,
@@ -39,7 +40,7 @@ export function RideDatePicker({ value, onChange }: { value: number; onChange: (
                 setOpen(false);
               }}
               style={[styles.chip, { backgroundColor: on ? Colors.accent : Colors.backgroundSelected }]}>
-              <ThemedText style={[styles.chipText, { color: on ? Colors.onAccent : Colors.text }]}>{q.label}</ThemedText>
+              <ThemedText style={[styles.chipText, { color: on ? Colors.onAccent : Colors.text }]}>{t(q.label)}</ThemedText>
             </Pressable>
           );
         })}
@@ -47,7 +48,7 @@ export function RideDatePicker({ value, onChange }: { value: number; onChange: (
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Ride day ${longDayText(picked, today)}. ${open ? 'Hide' : 'Show'} the calendar`}
+        accessibilityLabel={t('Ride day {v}. {v2} the calendar', { v: longDayText(picked, today), v2: open ? 'Hide' : 'Show' })}
         accessibilityState={{ expanded: open }}
         onPress={() => setOpen((o) => !o)}
         style={({ pressed }) => [styles.picked, { borderColor: open ? Colors.accent : Colors.border, opacity: pressed ? 0.85 : 1 }]}>
@@ -59,7 +60,7 @@ export function RideDatePicker({ value, onChange }: { value: number; onChange: (
         </View>
         <View style={styles.calendarButton}>
           <Icon name="calendar" size={20} color={open ? Colors.accent : Colors.text} />
-          <ThemedText type="smallBold">{open ? 'Done' : 'Calendar'}</ThemedText>
+          <ThemedText type="smallBold">{open ? t('Done') : t('Calendar')}</ThemedText>
         </View>
       </Pressable>
 
@@ -68,7 +69,7 @@ export function RideDatePicker({ value, onChange }: { value: number; onChange: (
           value={picked}
           range={rideDayRange(today)}
           onChange={(d) => pick(d)}
-          note="Pick any day from today up to three years out."
+          note={t('Pick any day from today up to three years out.')}
         />
       ) : null}
     </View>

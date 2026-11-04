@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Battery Saver: how hard this phone works to keep the group's map current while it shares.
  * Pure, no I/O. The setting lives on the phone (lib/battery.ts); other riders never see it.
@@ -86,7 +88,7 @@ export function batteryWarning(from: BatteryMode, to: BatteryMode): { title: str
   const lag = `${p.heartbeatSec} seconds`;
   const extra = p.accuracy === 'balanced' ? ' It can also place you up to about 100 m (330 ft) from where you are.' : '';
   return {
-    title: `Switch to ${p.label}?`,
+    title: tc('Switch to {label}?', { label: p.label }),
     message:
       `Your group will see you up to ${lag} behind where you really are, so you're harder to follow and harder to find if you stop or need help.${extra} ` +
       'Best Accuracy is recommended whenever you can charge your phone.',

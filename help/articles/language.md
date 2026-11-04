@@ -4,13 +4,15 @@ summary: OnMyLead uses your phone's language when it speaks it, and English when
 category: account
 order: 76
 release: "2.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/app/language.tsx
   - app/src/components/language-button.tsx
   - app/src/core/i18n.ts
   - app/src/lib/i18n.ts
   - app/src/lib/language-sync.ts
+  - app/src/lib/voice.ts
+  - app/src/core/translations/es.ts
 related: [appearance, sync-across-devices, home-screen]
 keywords: [language, languages, translate, translation, spanish, español, portuguese, french, german, italian, russian, chinese, japanese, korean, hindi, indonesian, english, flag, idioma, langue, sprache]
 ---
@@ -42,7 +44,16 @@ To go back to following your phone, tap **Match Phone** at the top of the list. 
 
 ## What Changes and What Doesn't
 
+:::until 2.1
 - The main screens switch: Home, the tab bar, You and its settings, Appearance, Language, Sign In, and the titles at the top of every screen. Some newer screens are still in English while they're translated.
+:::
+
+:::release 2.1
+- The whole app switches: Home, Ride Mode, Map Mode, ride and group pages, chat, Events, Social, Friends, Garage, Trips, Starlink, Tilt, Pro and every setting, along with the alerts and messages OnMyLead shows you.
+- Spoken alerts in Ride Mode are read in your language. If the voice you picked under **You** > **Voice** speaks another language, your phone's own voice for your language reads them instead.
+- Status buttons and the built-in quick replies (like **Need Fuel** or **Flat Tire**) show in each rider's own language, so a rider who reads Spanish sees them in Spanish even if you sent them in English.
+- Push notifications on your lock screen, the Terms of Use and the Privacy Policy are still in English.
+:::
 - Things riders write stay the way they wrote them: ride names, chat, posts, group names and trail names.
 - On iPhone and iPad, the permission messages (location, camera, photos, motion) also show in your language.
 - Distances stay in miles.

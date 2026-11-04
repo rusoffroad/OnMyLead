@@ -8,6 +8,7 @@
  */
 import { tapData, type TapData } from './push-tap';
 
+import { coreLocale, tc } from './i18n';
 export type InboxItem = {
   id: string;
   kind: string;
@@ -40,7 +41,7 @@ export function badgeText(n: number): string {
 
 /** "+2 More" under a chat row that holds three messages. */
 export function moreText(count: number): string | null {
-  return count > 1 ? `+${count - 1} More` : null;
+  return count > 1 ? tc('+{v} More', { v: count - 1 }) : null;
 }
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
@@ -68,13 +69,13 @@ export function groupInbox(items: readonly InboxItem[], now: Date = new Date()):
 export function whenText(iso: string, now: Date = new Date()): string {
   const t = Date.parse(iso);
   const mins = Math.floor((now.getTime() - t) / 60_000);
-  if (mins < 1) return 'Now';
+  if (mins < 1) return tc('Now');
   if (mins < 60) return `${mins}m`;
   const d = new Date(t);
   if (t >= startOfDay(now)) return `${Math.floor(mins / 60)}h`;
-  if (t >= startOfDay(now) - 86_400_000) return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  if (t >= startOfDay(now) - 6 * 86_400_000) return d.toLocaleDateString('en-US', { weekday: 'short' });
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (t >= startOfDay(now) - 86_400_000) return d.toLocaleTimeString(coreLocale(), { hour: 'numeric', minute: '2-digit' });
+  if (t >= startOfDay(now) - 6 * 86_400_000) return d.toLocaleDateString(coreLocale(), { weekday: 'short' });
+  return d.toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric' });
 }
 
 export type InboxTone = 'alert' | 'status' | 'chat' | 'ride' | 'social' | 'account' | 'quiet';

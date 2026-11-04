@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { font } from '@/constants/theme';
 import { rideCardLines, type RideCardData } from '@/core/summary';
 
+import { t as tr } from '@/lib/i18n';
 const wordmark = require('../../assets/images/logo-wordmark.png');
 
 export type CardLayout = 'standard' | 'stats' | 'big';
@@ -37,20 +38,20 @@ export const RideCard = forwardRef<View, { card: RideCardData; layout?: CardLayo
         <Image source={wordmark} contentFit="contain" style={styles.logoSmall} accessibilityLabel="OnMyLead" />
         <View>
           <Text style={styles.bigNumber} numberOfLines={1} adjustsFontSizeToFit>{miles}</Text>
-          <Text style={styles.bigUnit}>miles on {title}</Text>
+          <Text style={styles.bigUnit}>{tr('miles on {title}', { title })}</Text>
           <Text style={styles.date}>{`${date}, ${riders}`}</Text>
         </View>
-        <Text style={styles.mark}>Presented by RUS Offroad</Text>
+        <Text style={styles.mark}>{tr('Presented by RUS Offroad')}</Text>
       </View>
     );
   }
 
   if (layout === 'stats') {
     const tiles = [
-      { label: 'Miles', value: miles },
-      { label: 'Moving', value: extras?.movingTime ?? null },
-      { label: 'Top Speed', value: extras?.topSpeed ?? null },
-      { label: 'Climbing', value: extras?.climbing ?? null },
+      { label: tr('Miles'), value: miles },
+      { label: tr('Moving'), value: extras?.movingTime ?? null },
+      { label: tr('Top Speed'), value: extras?.topSpeed ?? null },
+      { label: tr('Climbing'), value: extras?.climbing ?? null },
     ].filter((t): t is { label: string; value: string } => !!t.value);
     return (
       <View ref={ref} collapsable={false} style={styles.card}>
@@ -62,13 +63,13 @@ export const RideCard = forwardRef<View, { card: RideCardData; layout?: CardLayo
             {tiles.map((t) => (
               <View key={t.label} style={styles.tile}>
                 <Text style={styles.tileValue} numberOfLines={1} adjustsFontSizeToFit>{t.value}</Text>
-                <Text style={styles.tileLabel}>{t.label}</Text>
+                <Text style={styles.tileLabel}>{tr(t.label)}</Text>
               </View>
             ))}
           </View>
           <Text style={styles.date}>{riders}</Text>
         </View>
-        <Text style={styles.mark}>Presented by RUS Offroad</Text>
+        <Text style={styles.mark}>{tr('Presented by RUS Offroad')}</Text>
       </View>
     );
   }
@@ -85,7 +86,7 @@ export const RideCard = forwardRef<View, { card: RideCardData; layout?: CardLayo
           ))}
         </View>
       </View>
-      <Text style={styles.mark}>Presented by RUS Offroad</Text>
+      <Text style={styles.mark}>{tr('Presented by RUS Offroad')}</Text>
     </View>
   );
 });

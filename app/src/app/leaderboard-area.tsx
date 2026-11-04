@@ -10,6 +10,7 @@ import { areaLabel, countryName, searchCountries, stateWord, statesOf } from '@/
 import { canDetectArea, detectArea, fetchLeaderSettings, saveLeaderArea } from '@/lib/leaderboard';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 /** How many countries show before the rider types (the rest are a search away). */
 const FIRST_COUNTRIES = ['US', 'CA', 'MX', 'AU'];
 
@@ -56,7 +57,7 @@ export default function LeaderboardAreaScreen() {
         setCountry(found.country);
         setState(found.state);
         setQuery('');
-        if (!found.state && statesOf(found.country).length) setNote(`Pick your ${stateWord(found.country).toLowerCase()} below.`);
+        if (!found.state && statesOf(found.country).length) setNote(t('Pick your {v} below.', { v: stateWord(found.country).toLowerCase() }));
       }
     } catch (e) {
       setError((e as Error).message);
@@ -72,7 +73,7 @@ export default function LeaderboardAreaScreen() {
       await saveLeaderArea(c, s);
       router.back();
     } catch (e) {
-      setError(`That didn’t save. ${(e as Error).message}`);
+      setError(t('That didn’t save. {message}', { message: (e as Error).message }));
     } finally {
       setBusy(false);
     }
@@ -87,25 +88,24 @@ export default function LeaderboardAreaScreen() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: 'Where You Ride' }} />
+      <Stack.Screen options={{ title: t('Where You Ride') }} />
       <ThemedText themeColor="textSecondary">
-        Pick the state or country you ride from to be on its leaderboard. Riders see it beside your name there, and nowhere
-        else. It’s optional, and it never shares where you are.
+        {t('Pick the state or country you ride from to be on its leaderboard. Riders see it beside your name there, and nowhere else. It’s optional, and it never shares where you are.')}
       </ThemedText>
 
       {saved === null && !error ? <ActivityIndicator color={Colors.text} /> : null}
 
       {canDetectArea ? (
-        <Button title={locating ? 'Finding Your State…' : 'Use My Location'} kind="secondary" loading={locating} onPress={useMyLocation} />
+        <Button title={locating ? t('Finding Your State…') : t('Use My Location')} kind="secondary" loading={locating} onPress={useMyLocation} />
       ) : null}
       {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
 
       <View style={{ gap: Spacing.two }}>
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>Country</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{t('Country')}</ThemedText>
         {country ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Country: ${countryName(country)}. Change it`}
+            accessibilityLabel={t('Country: {v}. Change it', { v: countryName(country) })}
             onPress={() => {
               setCountry(null);
               setState(null);
@@ -113,15 +113,15 @@ export default function LeaderboardAreaScreen() {
             style={({ pressed }) => [styles.picked, pressed && { backgroundColor: Colors.backgroundSelected }]}>
             <Icon name="check" size={20} color={Colors.sky} />
             <ThemedText style={{ flex: 1, fontWeight: 600 }}>{countryName(country)}</ThemedText>
-            <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>Change</ThemedText>
+            <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{t('Change')}</ThemedText>
           </Pressable>
         ) : (
           <>
             <Field
-              label="Search Countries"
+              label={t('Search Countries')}
               value={query}
               onChangeText={setQuery}
-              placeholder="Type a country, e.g. Canada"
+              placeholder={t('Type a country, e.g. Canada')}
               autoCorrect={false}
               autoCapitalize="words"
               returnKeyType="search"
@@ -142,10 +142,10 @@ export default function LeaderboardAreaScreen() {
                 </Pressable>
               ))}
               {!shownCountries.length ? (
-                <ThemedText type="small" themeColor="textSecondary" style={{ padding: Spacing.three }}>No country matches “{query.trim()}”.</ThemedText>
+                <ThemedText type="small" themeColor="textSecondary" style={{ padding: Spacing.three }}>{t('No country matches “{v}”.', { v: query.trim() })}</ThemedText>
               ) : null}
             </View>
-            {!query.trim() ? <ThemedText type="small" themeColor="textSecondary">Somewhere else? Type its name.</ThemedText> : null}
+            {!query.trim() ? <ThemedText type="small" themeColor="textSecondary">{t('Somewhere else? Type its name.')}</ThemedText> : null}
           </>
         )}
       </View>
@@ -154,12 +154,12 @@ export default function LeaderboardAreaScreen() {
 
       <ErrorText error={error} />
       <Button
-        title={country ? `Save ${areaLabel(country, state) ?? ''}`.trim() : 'Save'}
+        title={country ? t('Save {v}', { v: areaLabel(country, state) ?? '' }).trim() : t('Save')}
         disabled={!country || needsState || !changed || busy}
         loading={busy}
         onPress={() => save(country, state)}
       />
-      {saved?.country ? <Button title="Remove My Area" kind="ghost" disabled={busy} onPress={() => save(null, null)} /> : null}
+      {saved?.country ? <Button title={t('Remove My Area')} kind="ghost" disabled={busy} onPress={() => save(null, null)} /> : null}
     </Screen>
   );
 }

@@ -5,6 +5,7 @@ import { Marker, Polyline } from 'react-native-maps';
 import { Colors, RideColors, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 
+import { t } from '@/lib/i18n';
 const coords = (points: LatLng[]) => points.map((p) => ({ latitude: p.lat, longitude: p.lng }));
 
 /**
@@ -30,10 +31,10 @@ export function RouteEnds({ points }: { points: LatLng[] }) {
   const b = points[points.length - 1];
   return (
     <>
-      <Marker coordinate={{ latitude: a.lat, longitude: a.lng }} anchor={{ x: 0.5, y: 0.5 }} title="Start" tracksViewChanges={false} zIndex={3}>
+      <Marker coordinate={{ latitude: a.lat, longitude: a.lng }} anchor={{ x: 0.5, y: 0.5 }} title={t('Start')} tracksViewChanges={false} zIndex={3}>
         <View style={[styles.end, { backgroundColor: RideColors.green }]} />
       </Marker>
-      <Marker coordinate={{ latitude: b.lat, longitude: b.lng }} anchor={{ x: 0.5, y: 0.5 }} title="Finish" tracksViewChanges={false} zIndex={3}>
+      <Marker coordinate={{ latitude: b.lat, longitude: b.lng }} anchor={{ x: 0.5, y: 0.5 }} title={t('Finish')} tracksViewChanges={false} zIndex={3}>
         <View style={[styles.end, { backgroundColor: Colors.text }]}>
           <View style={styles.finishCore} />
         </View>

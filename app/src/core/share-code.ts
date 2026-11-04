@@ -1,3 +1,5 @@
+import { tc } from './i18n';
+
 /**
  * Custom share codes: the code in a ride link (onmylead.com/r/CODE), a riding group link (/g/CODE)
  * and a friend link (/friend/CODE). Riders can keep the code OnMyLead made or type their own.
@@ -100,14 +102,14 @@ const NOUN: Record<ShareCodeKind, string> = { ride: 'ride', group: 'group', frie
 /** One line for the rider about a code's status. */
 export function shareCodeLine(status: ShareCodeStatus, kind: ShareCodeKind): string {
   switch (status) {
-    case 'available': return 'Available';
-    case 'yours': return `This is your ${NOUN[kind]}’s code now`;
-    case 'taken': return `Another ${NOUN[kind]} already uses this code`;
-    case 'too_short': return `Use at least ${SHARE_CODE_MIN} letters or numbers`;
-    case 'too_long': return `Use ${SHARE_CODE_MAX} characters or fewer`;
-    case 'bad_characters': return 'Use letters, numbers and single dashes only';
-    case 'reserved': return 'That code is saved for OnMyLead. Pick another';
-    case 'not_allowed': return 'That code isn’t allowed. Pick another';
+    case 'available': return tc('Available');
+    case 'yours': return tc('This is your {v}’s code now', { v: NOUN[kind] });
+    case 'taken': return tc('Another {v} already uses this code', { v: NOUN[kind] });
+    case 'too_short': return tc('Use at least {SHARE_CODE_MIN} letters or numbers', { SHARE_CODE_MIN });
+    case 'too_long': return tc('Use {SHARE_CODE_MAX} characters or fewer', { SHARE_CODE_MAX });
+    case 'bad_characters': return tc('Use letters, numbers and single dashes only');
+    case 'reserved': return tc('That code is saved for OnMyLead. Pick another');
+    case 'not_allowed': return tc('That code isn’t allowed. Pick another');
   }
 }
 
@@ -137,7 +139,7 @@ export function friendlyShareCodeError(message: string, kind: ShareCodeKind): st
   if (shareCodesNotSwitchedOn(message)) return SHARE_CODES_NOT_SWITCHED_ON;
   const status = shareCodeErrorStatus(message);
   if (status) return shareCodeLine(status, kind);
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return 'No signal. Check your connection and try again.';
+  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and try again.');
   return message;
 }
 

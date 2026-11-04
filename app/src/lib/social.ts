@@ -17,6 +17,7 @@ import { track } from './analytics';
 import { readPhotoBytes } from './photo-bytes';
 import { supabase, supabaseUrl } from './supabase';
 
+import { tc } from '@/core/i18n';
 export class SocialOffError extends Error {}
 
 type Res = { data: unknown; error: { message: string; code?: string } | null };
@@ -36,7 +37,7 @@ export class ProNeededError extends Error {}
 
 function friendly(message: string): string {
   const m = message.replace(/^[A-Z0-9]+: /, '');
-  return m ? m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.') : 'Something went wrong. Try again.';
+  return m ? m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.') : tc('Something went wrong. Try again.');
 }
 
 export async function socialFeed(limit = 30, before?: string | null): Promise<SocialItem[]> {
@@ -58,7 +59,7 @@ export async function itemComments(key: string): Promise<Comment[]> {
 export async function itemLikers(key: string): Promise<{ userId: string; name: string }[]> {
   const rows = check(await supabase.rpc('feed_item_likes', { p_key: key }));
   return Array.isArray(rows)
-    ? rows.filter((r) => r && typeof r.user_id === 'string').map((r) => ({ userId: r.user_id as string, name: (typeof r.name === 'string' && r.name) || 'Rider' }))
+    ? rows.filter((r) => r && typeof r.user_id === 'string').map((r) => ({ userId: r.user_id as string, name: (typeof r.name === 'string' && r.name) || tc('Rider') }))
     : [];
 }
 

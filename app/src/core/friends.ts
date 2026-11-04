@@ -11,6 +11,7 @@
 
 import { SHARE_CODE_MAX, SHARE_CODE_MIN } from './share-code';
 
+import { tc } from './i18n';
 /** 'friends', 'sent' (I asked them) or 'received' (they asked me). */
 export type FriendStatus = 'friends' | 'sent' | 'received';
 
@@ -77,10 +78,10 @@ export function friendIds(list: Pick<Friend, 'user_id' | 'status'>[]): Set<strin
 /** The button a rider row shows: "Add Friend", "Requested", "Accept Request" or "Friends". */
 export function friendButtonLabel(relation: FriendRelation): string {
   switch (relation) {
-    case 'friends': return 'Friends';
-    case 'sent': return 'Requested';
-    case 'received': return 'Accept Friend Request';
-    default: return 'Add Friend';
+    case 'friends': return tc('Friends');
+    case 'sent': return tc('Requested');
+    case 'received': return tc('Accept Friend Request');
+    default: return tc('Add Friend');
   }
 }
 
@@ -93,14 +94,14 @@ export function friendsLine(list: Friend[]): string {
     const out = friends.filter((f) => f.out_now).length;
     parts.push(`${friends.length} ${friends.length === 1 ? 'Friend' : 'Friends'}${out ? `, ${out} Out Riding` : ''}`);
   }
-  return parts.join(' · ') || 'Add riders you know as friends';
+  return parts.join(' · ') || tc('Add riders you know as friends');
 }
 
 /** What a sent request did, in words. */
 export function requestResultLine(result: RequestResult, name: string): string {
-  if (result === 'accepted') return `You and ${name} are friends now.`;
-  if (result === 'already') return `You’ve already asked ${name}.`;
-  return `Friend request sent to ${name}.`;
+  if (result === 'accepted') return tc('You and {name} are friends now.', { name });
+  if (result === 'already') return tc('You’ve already asked {name}.', { name });
+  return tc('Friend request sent to {name}.', { name });
 }
 
 /** https://onmylead.com/friend/CODE, or null without a web address. */
@@ -143,13 +144,13 @@ export function friendsNotSwitchedOn(message: string | null | undefined, code?: 
 /** Turn a database error into something a rider can act on. */
 export function friendlyFriendError(message: string): string {
   if (friendsNotSwitchedOn(message)) return FRIENDS_NOT_SWITCHED_ON;
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return 'No signal. Check your connection and try again.';
-  if (/friend_you_blocked/i.test(message)) return 'You blocked this rider. Unblock them from You, Blocked Riders to add them.';
-  if (/friend_daily_limit.*this week/i.test(message)) return 'You already asked this rider this week.';
-  if (/friend_daily_limit/i.test(message)) return 'You’ve sent a lot of friend requests today. Try again tomorrow.';
-  if (/friend_link_not_found/i.test(message)) return 'This friend link doesn’t work anymore. Ask for a new one.';
-  if (/friend_request_not_found/i.test(message)) return 'This request isn’t there anymore.';
-  if (/add yourself/i.test(message)) return 'That’s your own friend link.';
-  if (/friend_not_allowed/i.test(message)) return 'You can add riders you’ve ridden with or see Out Riding. For anyone else, share your friend link.';
+  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and try again.');
+  if (/friend_you_blocked/i.test(message)) return tc('You blocked this rider. Unblock them from You, Blocked Riders to add them.');
+  if (/friend_daily_limit.*this week/i.test(message)) return tc('You already asked this rider this week.');
+  if (/friend_daily_limit/i.test(message)) return tc('You’ve sent a lot of friend requests today. Try again tomorrow.');
+  if (/friend_link_not_found/i.test(message)) return tc('This friend link doesn’t work anymore. Ask for a new one.');
+  if (/friend_request_not_found/i.test(message)) return tc('This request isn’t there anymore.');
+  if (/add yourself/i.test(message)) return tc('That’s your own friend link.');
+  if (/friend_not_allowed/i.test(message)) return tc('You can add riders you’ve ridden with or see Out Riding. For anyone else, share your friend link.');
   return message;
 }

@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 
+import { t } from '@/lib/i18n';
 /** `guide`: a Help Center article slug, linked under the section as "Read the Guide". */
 export type LegalSection = { title: string; body: string[]; guide?: string };
 
@@ -28,13 +29,13 @@ export function LegalPage({ title, updated, intro, sections, action, lead }: {
       </Head>
       <View style={styles.wrap}>
         <ThemedText type="subtitle" accessibilityRole="header">{title}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">Last updated {updated}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">{t('Last updated {updated}', { updated })}</ThemedText>
         {lead ? <View style={styles.lead}>{lead}</View> : null}
         <ThemedText style={styles.p}>{intro}</ThemedText>
-        {action ? <Button title={action.title} onPress={() => router.push(action.href)} style={{ alignSelf: 'flex-start', paddingHorizontal: Spacing.four }} /> : null}
+        {action ? <Button title={t(action.title)} onPress={() => router.push(action.href)} style={{ alignSelf: 'flex-start', paddingHorizontal: Spacing.four }} /> : null}
         {sections.map((s) => (
           <View key={s.title} style={styles.section}>
-            <ThemedText type="heading" accessibilityRole="header">{s.title}</ThemedText>
+            <ThemedText type="heading" accessibilityRole="header">{t(s.title)}</ThemedText>
             {s.body.map((p, i) => (
               <ThemedText key={i} style={styles.p} themeColor="textSecondary">{p}</ThemedText>
             ))}
@@ -42,7 +43,7 @@ export function LegalPage({ title, updated, intro, sections, action, lead }: {
           </View>
         ))}
         <Button
-          title="Back to OnMyLead"
+          title={t('Back to OnMyLead')}
           kind="secondary"
           onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
           style={{ marginTop: Spacing.four }}

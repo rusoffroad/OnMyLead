@@ -5,7 +5,7 @@ import { Platform, Pressable, Text, View } from 'react-native';
 
 import { Colors, font, themedStyles } from '@/constants/theme';
 import { Icon, type IconName } from './icon';
-import { t } from '@/lib/i18n';
+import { t as tr } from '@/lib/i18n';
 
 export type TabSpec = { name: string; title: string; icon: IconName; needsAccount?: boolean };
 
@@ -32,7 +32,7 @@ function MapKey({ rail }: { rail: boolean }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t('Map Mode. Open your offroad map')}
+      accessibilityLabel={tr('Map Mode. Open your offroad map')}
       onPress={() => {
         if (Platform.OS === 'ios') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
         router.push('/nav' as Href);
@@ -42,7 +42,7 @@ function MapKey({ rail }: { rail: boolean }) {
       <View style={styles.mapTile}>
         <Icon name="map" size={22} color="#fff" strokeWidth={2.4} />
       </View>
-      <Text style={[styles.label, styles.mapLabel]} numberOfLines={1}>{t('Map Mode')}</Text>
+      <Text style={[styles.label, styles.mapLabel]} numberOfLines={1}>{tr('Map Mode')}</Text>
     </Pressable>
   );
 }
@@ -81,13 +81,13 @@ export function TabBar({
             key={route.key}
             accessibilityRole="tab"
             accessibilityState={{ selected: focused }}
-            accessibilityLabel={t(spec.title)}
+            accessibilityLabel={tr(spec.title)}
             onPress={onPress}
             onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
             style={rail ? styles.railItem : styles.item}>
             <View style={[rail ? styles.railLead : styles.lead, focused && styles.leadOn]} />
             <Icon name={spec.icon} size={25} color={color} strokeWidth={focused ? 2.4 : 2} />
-            <Text style={[styles.label, { color }]} numberOfLines={1}>{t(spec.title)}</Text>
+            <Text style={[styles.label, { color }]} numberOfLines={1}>{tr(spec.title)}</Text>
           </Pressable>
         );
         return map && route.name === mapAfter ? [tab, <MapKey key="map-mode" rail={rail} />] : tab;

@@ -9,6 +9,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import type { Ride, Trip } from '@/lib/types';
 import { Button, Card, Choice, ErrorText, Field } from './ui';
 
+import { t } from '@/lib/i18n';
 /** Name, dates, and optional ride and vehicle for a trip. Used to create and to edit. */
 export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (input: TripInput) => Promise<void>; saveLabel: string }) {
   const [name, setName] = useState(trip?.name ?? '');
@@ -31,17 +32,17 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
 
   async function save() {
     setError(null);
-    if (!name.trim()) return setError('Give the trip a name, like "Moab long weekend".');
+    if (!name.trim()) return setError(t('Give the trip a name, like "Moab long weekend".'));
     const s = startsOn.trim();
     const e = endsOn.trim();
-    if (s && !isIsoDate(s)) return setError('Start date should look like 2026-10-12.');
-    if (e && !isIsoDate(e)) return setError('End date should look like 2026-10-14.');
-    if (s && e && e < s) return setError('The trip ends before it starts.');
+    if (s && !isIsoDate(s)) return setError(t('Start date should look like 2026-10-12.'));
+    if (e && !isIsoDate(e)) return setError(t('End date should look like 2026-10-14.'));
+    if (s && e && e < s) return setError(t('The trip ends before it starts.'));
     setBusy(true);
     try {
       await onSave({ name: name.trim(), starts_on: s || null, ends_on: e || null, ride_id: rideId, vehicle_id: vehicleId });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save.');
+      setError(err instanceof Error ? err.message : t('Could not save.'));
       setBusy(false);
     }
   }
@@ -51,19 +52,19 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
 
   return (
     <Card>
-      <Field label="Trip Name" value={name} onChangeText={setName} placeholder="Moab long weekend" maxLength={120} />
+      <Field label={t('Trip Name')} value={name} onChangeText={setName} placeholder={t('Moab long weekend')} maxLength={120} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
         <View style={{ flex: 1 }}>
-          <Field label="Starts" value={startsOn} onChangeText={setStartsOn} placeholder="YYYY-MM-DD" autoCapitalize="none" maxLength={10} />
+          <Field label={t('Starts')} value={startsOn} onChangeText={setStartsOn} placeholder={t('YYYY-MM-DD')} autoCapitalize="none" maxLength={10} />
         </View>
         <View style={{ flex: 1 }}>
-          <Field label="Ends" value={endsOn} onChangeText={setEndsOn} placeholder="Optional" autoCapitalize="none" maxLength={10} />
+          <Field label={t('Ends')} value={endsOn} onChangeText={setEndsOn} placeholder={t('Optional')} autoCapitalize="none" maxLength={10} />
         </View>
       </View>
       {vehicles.length ? (
         <Choice
-          label="Taking"
-          options={[{ value: null, label: 'Not Set' }, ...vehicles.map((v) => ({ value: v.id as string | null, label: v.nickname || vehicleTitle(v) }))]}
+          label={t('Taking')}
+          options={[{ value: null, label: t('Not Set') }, ...vehicles.map((v) => ({ value: v.id as string | null, label: v.nickname || vehicleTitle(v) }))]}
           value={vehicleId}
           onChange={setVehicleId}
         />
@@ -71,11 +72,11 @@ export function TripForm({ trip, onSave, saveLabel }: { trip?: Trip; onSave: (in
       {/* Linking a trip to a ride is part of Advanced Trip Planning; an existing link always shows. */}
       {(rideOptions.length > 0 && can('advanced_trip_planning')) || !!trip?.ride_id ? (
         <Choice
-          label="For a Ride"
+          label={t('For a Ride')}
           options={[
-            { value: null, label: 'No Ride' },
+            { value: null, label: t('No Ride') },
             ...rideOptions.map((r) => ({ value: r.id as string | null, label: r.name })),
-            ...(rideId && !rideOptions.some((r) => r.id === rideId) ? [{ value: rideId as string | null, label: 'Linked Ride' }] : []),
+            ...(rideId && !rideOptions.some((r) => r.id === rideId) ? [{ value: rideId as string | null, label: t('Linked Ride') }] : []),
           ]}
           value={rideId}
           onChange={setRideId}

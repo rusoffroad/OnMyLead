@@ -9,6 +9,7 @@
 import { rideLeaderIds } from './chat';
 import { leavePrompt, type Prompt } from './cancel';
 
+import { tc } from './i18n';
 type Status = 'scheduled' | 'live' | 'ended' | 'cancelled';
 type Member = { user_id: string; status: string; role: string; profiles?: { display_name?: string | null } | null };
 
@@ -84,10 +85,10 @@ export function leaveConfirm(
   if (kind === 'decline') return leavePrompt(rideName, rideStatus, true);
   if (kind === 'withdraw') {
     return {
-      title: opts.waitlisted ? 'Leave the Waitlist?' : 'Withdraw Your Request?',
+      title: opts.waitlisted ? tc('Leave the Waitlist?') : tc('Withdraw Your Request?'),
       message: opts.waitlisted
-        ? `You’re taken off the waitlist for ${rideName}. You can join again later with the ride’s link or code.`
-        : `The organizer won’t see your request to join ${rideName} anymore. You can ask again later with the ride’s link or code.`,
+        ? tc('You’re taken off the waitlist for {rideName}. You can join again later with the ride’s link or code.', { rideName })
+        : tc('The organizer won’t see your request to join {rideName} anymore. You can ask again later with the ride’s link or code.', { rideName }),
       confirm: 'Withdraw',
     };
   }
@@ -103,8 +104,8 @@ export function leaveConfirm(
 /** The organizer picked who takes over: confirm the hand-off and leaving in one step. */
 export function handOffAndLeavePrompt(rideName: string, name: string): Prompt {
   return {
-    title: `Give ${rideName} to ${name}?`,
-    message: `${name} becomes the organizer and leader, and you leave the ride. Your location sharing for this ride stops. You can rejoin later as a rider with the ride’s link or code.`,
+    title: tc('Give {rideName} to {name}?', { rideName, name }),
+    message: tc('{name} becomes the organizer and leader, and you leave the ride. Your location sharing for this ride stops. You can rejoin later as a rider with the ride’s link or code.', { name }),
     confirm: 'Give Ride and Leave',
   };
 }
@@ -117,19 +118,19 @@ export function leaveAloneCancelPrompt(rideName: string, waiting: number, alone 
   const why = alone ? 'Nobody else has joined to take it over, so leaving cancels the ride. ' : '';
   const others = waiting === 1 ? '1 rider' : `${waiting} riders`;
   return {
-    title: `Cancel ${rideName}?`,
+    title: tc('Cancel {rideName}?', { rideName }),
     message: waiting
-      ? `${why}${others} on this ride will get a notification and an email saying it’s cancelled. This can’t be undone.`
-      : `${why}It stays in your list as Cancelled. This can’t be undone.`,
+      ? tc('{why}{others} on this ride will get a notification and an email saying it’s cancelled. This can’t be undone.', { why, others })
+      : tc('{why}It stays in your list as Cancelled. This can’t be undone.', { why }),
     confirm: 'Cancel Ride',
   };
 }
 
 /** Turn a leave or hand-off error into something the rider can act on. */
 export function friendlyLeaveError(message: string): string {
-  if (/they need to have joined/i.test(message)) return 'That rider has left the ride. Pick someone else.';
-  if (/this ride is over/i.test(message)) return 'This ride is already over.';
-  if (/ride not found/i.test(message)) return 'This ride is already gone.';
-  if (/network|fetch|offline|timed? ?out/i.test(message)) return 'No service. Try again when you have signal.';
+  if (/they need to have joined/i.test(message)) return tc('That rider has left the ride. Pick someone else.');
+  if (/this ride is over/i.test(message)) return tc('This ride is already over.');
+  if (/ride not found/i.test(message)) return tc('This ride is already gone.');
+  if (/network|fetch|offline|timed? ?out/i.test(message)) return tc('No service. Try again when you have signal.');
   return message;
 }

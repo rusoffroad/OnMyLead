@@ -7,6 +7,7 @@ import { deleteOfflineMap, pauseDownload, resumeDownload } from '@/lib/offline-m
 import type { FeatureKey } from '@/core/entitlements';
 import { ProTag } from './pro-tag';
 
+import { t } from '@/lib/i18n';
 /** Downloaded maps wear the same sand as the trails layer: sand means "map on your phone". */
 export const SAND = '#ECCD91';
 
@@ -40,9 +41,9 @@ export function DownloadRow({ map }: { map: OfflineMap }) {
   const busy = map.status === 'downloading';
   const pct = map.total ? (map.saved + map.failed) / map.total : 0;
   const confirmDelete = () =>
-    Alert.alert(`Delete ${map.name}?`, 'It comes off this phone. You can download it again any time you have signal.', [
-      { text: 'Keep', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteOfflineMap(map.id) },
+    Alert.alert(t('Delete {name}?', { name: map.name }), t('It comes off this phone. You can download it again any time you have signal.'), [
+      { text: t('Keep'), style: 'cancel' },
+      { text: t('Delete'), style: 'destructive', onPress: () => deleteOfflineMap(map.id) },
     ]);
 
   return (
@@ -62,13 +63,13 @@ export function DownloadRow({ map }: { map: OfflineMap }) {
       </View>
       <View style={styles.actions}>
         {busy ? (
-          <SmallButton title="Pause" onPress={() => pauseDownload(map.id)} />
+          <SmallButton title={t('Pause')} onPress={() => pauseDownload(map.id)} />
         ) : map.status === 'paused' ? (
-          <SmallButton title="Resume" onPress={() => resumeDownload(map.id)} strong />
+          <SmallButton title={t('Resume')} onPress={() => resumeDownload(map.id)} strong />
         ) : map.status === 'partial' ? (
-          <SmallButton title="Finish" onPress={() => resumeDownload(map.id)} strong />
+          <SmallButton title={t('Finish')} onPress={() => resumeDownload(map.id)} strong />
         ) : null}
-        <SmallButton title="Delete" onPress={confirmDelete} />
+        <SmallButton title={t('Delete')} onPress={confirmDelete} />
       </View>
     </View>
   );

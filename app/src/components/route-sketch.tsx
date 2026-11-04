@@ -6,6 +6,7 @@ import type { LatLng } from '@/core/geo';
 import { projectRoute } from '@/core/summary';
 import { octagon } from './waypoint-blaze';
 
+import { t } from '@/lib/i18n';
 export type SketchDot = LatLng & { id: string; color: string; label?: string; mine?: boolean; big?: boolean; name?: string; /** A waypoint: drawn as a trail blaze. */ diamond?: boolean; /** A hazard waypoint: a warning triangle instead of the diamond. */ triangle?: boolean; /** A planned stop: a numbered stop sign. */ stop?: number; /** Outline colour, for a live rider's white ring. */ ring?: string; /** Compass direction a moving rider is heading: a small arrow beside the dot. */ heading?: number | null };
 
 /**
@@ -110,7 +111,7 @@ export function RouteSketch({
                 : null}
               {d.label ? (
                 <SvgText x={p.x} y={p.y + 3.5} fill="#fff" fontSize={d.mine ? 8 : 10} fontFamily={FontFamilies.body[800]} textAnchor="middle">
-                  {d.label}
+                  {t(d.label)}
                 </SvgText>
               ) : null}
             </G>

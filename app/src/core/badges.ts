@@ -1,3 +1,5 @@
+import { coreLocale } from './i18n';
+
 /**
  * Rider badges and ranks, as riders see them on every device. The server earns them
  * (award_rider_badges in migration 20261101500000_rider_badges.sql); this file names them, mirrors
@@ -155,7 +157,7 @@ export type BadgeProgress = {
 };
 
 const plural = (def: BadgeDef, n: number) => (n === 1 ? def.unit[0] : def.unit[1]);
-const fmt = (n: number) => Math.floor(n).toLocaleString('en-US');
+const fmt = (n: number) => Math.floor(n).toLocaleString(coreLocale());
 
 export function progressFor(def: BadgeDef, value: number, level: BadgeLevel | 0): BadgeProgress {
   // The level shown is what the server awarded; the bar works from the counted value.

@@ -23,6 +23,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
 import type { Ride, Trip, TripItem, Vehicle } from '@/lib/types';
 
+import { t as tr } from '@/lib/i18n';
 export default function TripPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theme = useTheme();
@@ -59,8 +60,8 @@ export default function TripPage() {
   if (trip === null) {
     return (
       <Screen>
-        <ThemedText>That trip is not in your list.</ThemedText>
-        <Button title="All Trips" kind="secondary" onPress={() => router.replace('/trips')} />
+        <ThemedText>{tr('That trip is not in your list.')}</ThemedText>
+        <Button title={tr('All Trips')} kind="secondary" onPress={() => router.replace('/trips')} />
       </Screen>
     );
   }
@@ -75,7 +76,7 @@ export default function TripPage() {
       await updateTripItem(item.id, { checked });
     } catch (e) {
       setItems((list) => list.map((i) => (i.id === item.id ? { ...i, checked: !checked } : i)));
-      setError(e instanceof Error ? e.message : 'Could not save. Check your signal and try again.');
+      setError(e instanceof Error ? e.message : tr('Could not save. Check your signal and try again.'));
     }
   }
 
@@ -86,7 +87,7 @@ export default function TripPage() {
     try {
       await fn();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      setError(e instanceof Error ? e.message : tr('Something went wrong.'));
     } finally {
       setBusy(null);
     }
@@ -97,17 +98,17 @@ export default function TripPage() {
       if (!requirePro('advanced_trip_planning')) return;
       const tpl = TRIP_TEMPLATES.find((x) => x.id === templateId)!;
       const add = itemsToAdd(items, tpl.items);
-      if (!add.length) return setNote(`Everything from "${tpl.label}" is already on your list.`);
+      if (!add.length) return setNote(tr('Everything from "{label}" is already on your list.', { label: tpl.label }));
       const start = items.reduce((m, i) => Math.max(m, i.position), -1) + 1;
       await addTripItems(trip.id, add, start);
-      setNote(`Added ${add.length} item${add.length === 1 ? '' : 's'} from "${tpl.label}".`);
+      setNote(tr('Added {length} item{v} from "{label}".', { length: add.length, v: add.length === 1 ? '' : 's', label: tpl.label }));
       setShowTemplates(false);
       await load();
     });
 
   const resetChecks = () =>
     run('uncheck', async () => {
-      if (!(await confirmAsync('Uncheck everything?', 'Every item goes back to not packed. The list stays.', 'Uncheck All'))) return;
+      if (!(await confirmAsync(tr('Uncheck everything?'), tr('Every item goes back to not packed. The list stays.'), tr('Uncheck All')))) return;
       await uncheckAll(trip.id);
       await load();
     });
@@ -121,14 +122,14 @@ export default function TripPage() {
 
   const remove = () =>
     run('delete', async () => {
-      if (!(await confirmAsync('Delete this trip?', `${trip.name} and its ${items.length} item(s) will be removed.`))) return;
+      if (!(await confirmAsync(tr('Delete this trip?'), tr('{name} and its {length} item(s) will be removed.', { name: trip.name, length: items.length })))) return;
       await deleteTrip(trip.id);
       router.replace('/trips');
     });
 
   const removeItem = (item: TripItem) =>
     run('item', async () => {
-      if (!(await confirmAsync('Remove this item?', item.name, 'Remove'))) return;
+      if (!(await confirmAsync(tr('Remove this item?'), item.name, tr('Remove')))) return;
       await deleteTripItem(item.id);
       setEditing(null);
       await load();
@@ -139,12 +140,12 @@ export default function TripPage() {
       <View style={{ gap: Spacing.one }}>
         <ThemedText type="title" style={{ fontSize: 40, lineHeight: 42 }}>{trip.name}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
-          {[dates, vehicle ? `Taking ${vehicle.nickname || vehicleTitle(vehicle)}` : null].filter(Boolean).join(', ') || 'No dates set'}
+          {[dates, vehicle ? tr('Taking {v}', { v: vehicle.nickname || vehicleTitle(vehicle) }) : null].filter(Boolean).join(', ') || 'No dates set'}
         </ThemedText>
         {ride ? (
           <Link href={`/r/${ride.invite_code}`} asChild>
             <Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}>
-              <ThemedText type="link" style={{ color: theme.sky }}>For the ride: {ride.name}</ThemedText>
+              <ThemedText type="link" style={{ color: theme.sky }}>{tr('For the ride: {name}', { name: ride.name })}</ThemedText>
             </Pressable>
           </Link>
         ) : null}
@@ -152,22 +153,22 @@ export default function TripPage() {
 
       <Card>
         <ThemedText type="subtitle" style={{ fontSize: 36, lineHeight: 38, color: p.done ? RideColors.green : theme.text }}>
-          {p.done ? `All ${p.total} packed` : p.label}
+          {p.done ? tr('All {total} packed', { total: p.total }) : p.label}
         </ThemedText>
         <ProgressBar fraction={p.fraction} done={p.done} />
       </Card>
 
       {!can('advanced_trip_planning') && (items.length === 0 || showTemplates) ? (
-        <ProLock feature="advanced_trip_planning" title="Start From a Packing List" detail="Day ride, overnight and more, in one tap" />
+        <ProLock feature="advanced_trip_planning" title={tr('Start From a Packing List')} detail={tr('Day ride, overnight and more, in one tap')} />
       ) : items.length === 0 || showTemplates ? (
         <Card>
-          <ThemedText type="heading">Add a Starter List</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">One tap adds the items. Add as many as fit the trip; nothing is added twice.</ThemedText>
+          <ThemedText type="heading">{tr('Add a Starter List')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('One tap adds the items. Add as many as fit the trip; nothing is added twice.')}</ThemedText>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two }}>
             {TRIP_TEMPLATES.map((tpl) => (
               <Button
                 key={tpl.id}
-                title={tpl.label}
+                title={tr(tpl.label)}
                 kind="secondary"
                 loading={busy === tpl.id}
                 style={{ flexGrow: 1, flexBasis: '45%', minHeight: 56 }}
@@ -178,7 +179,7 @@ export default function TripPage() {
           </View>
         </Card>
       ) : (
-        <Button title="Add a Starter List" kind="ghost" onPress={() => setShowTemplates(true)} />
+        <Button title={tr('Add a Starter List')} kind="ghost" onPress={() => setShowTemplates(true)} />
       )}
 
       {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
@@ -195,7 +196,7 @@ export default function TripPage() {
           }}
         />
       ) : (
-        <Button title="Add an Item" onPress={() => setEditing('new')} />
+        <Button title={tr('Add an Item')} onPress={() => setEditing('new')} />
       )}
 
       {groupByCategory(items).map((g) => {
@@ -203,8 +204,8 @@ export default function TripPage() {
         return (
           <Card key={g.category}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <ThemedText type="heading">{g.label}</ThemedText>
-              <ThemedText style={{ fontWeight: 700, color: gp.done ? RideColors.green : theme.textSecondary }}>{gp.packed} of {gp.total}</ThemedText>
+              <ThemedText type="heading">{tr(g.label)}</ThemedText>
+              <ThemedText style={{ fontWeight: 700, color: gp.done ? RideColors.green : theme.textSecondary }}>{tr('{packed} of {total}', { packed: gp.packed, total: gp.total })}</ThemedText>
             </View>
             {g.items.map((item) =>
               editing !== 'new' && editing?.id === item.id ? (
@@ -231,17 +232,17 @@ export default function TripPage() {
 
       {items.length ? (
         <View style={{ gap: Spacing.two }}>
-          <ThemedText type="heading">After the Trip</ThemedText>
+          <ThemedText type="heading">{tr('After the Trip')}</ThemedText>
           <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-            <Button title="Uncheck All" kind="secondary" style={{ flex: 1 }} loading={busy === 'uncheck'} disabled={p.packed === 0} onPress={resetChecks} />
-            <Button title="Copy to a New Trip" pro="advanced_trip_planning" kind="secondary" style={{ flex: 1 }} loading={busy === 'copy'} onPress={copy} />
+            <Button title={tr('Uncheck All')} kind="secondary" style={{ flex: 1 }} loading={busy === 'uncheck'} disabled={p.packed === 0} onPress={resetChecks} />
+            <Button title={tr('Copy to a New Trip')} pro="advanced_trip_planning" kind="secondary" style={{ flex: 1 }} loading={busy === 'copy'} onPress={copy} />
           </View>
         </View>
       ) : null}
 
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Edit Trip" kind="secondary" style={{ flex: 1 }} onPress={() => router.push(`/trips/${trip.id}/edit`)} />
-        <Button title="Delete" kind="danger" style={{ flex: 1 }} loading={busy === 'delete'} onPress={remove} />
+        <Button title={tr('Edit Trip')} kind="secondary" style={{ flex: 1 }} onPress={() => router.push(`/trips/${trip.id}/edit`)} />
+        <Button title={tr('Delete')} kind="danger" style={{ flex: 1 }} loading={busy === 'delete'} onPress={remove} />
       </View>
     </Screen>
   );
@@ -275,11 +276,11 @@ function CheckRow({ item, onToggle, onEdit }: { item: TripItem; onToggle: () => 
       </Pressable>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Edit ${item.name}`}
+        accessibilityLabel={tr('Edit {name}', { name: item.name })}
         onPress={onEdit}
         hitSlop={8}
         style={{ minWidth: 56, alignItems: 'center', justifyContent: 'center' }}>
-        <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>Edit</ThemedText>
+        <ThemedText type="small" style={{ color: theme.sky, fontWeight: 600 }}>{tr('Edit')}</ThemedText>
       </Pressable>
     </View>
   );
@@ -303,38 +304,38 @@ function ItemForm({
 
   async function save() {
     setError(null);
-    if (!name.trim()) return setError('What do you need to bring?');
+    if (!name.trim()) return setError(tr('What do you need to bring?'));
     const quantity = Number(qty.trim() || '1');
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) return setError('Quantity should be a whole number from 1 to 999.');
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) return setError(tr('Quantity should be a whole number from 1 to 999.'));
     setBusy(true);
     try {
       await onSave({ name: name.trim(), category, quantity, notes: notes.trim() || null });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not save.');
+      setError(e instanceof Error ? e.message : tr('Could not save.'));
       setBusy(false);
     }
   }
 
   return (
     <Card style={{ borderWidth: 1.5, borderColor: theme.sky }}>
-      <Field label="Item" value={name} onChangeText={setName} placeholder="Tow strap" maxLength={200} />
+      <Field label={tr('Item')} value={name} onChangeText={setName} placeholder={tr('Tow strap')} maxLength={200} />
       <View style={{ flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' }}>
         <View style={{ width: 96 }}>
-          <Field label="How Many" value={qty} onChangeText={setQty} keyboardType="number-pad" maxLength={3} />
+          <Field label={tr('How Many')} value={qty} onChangeText={setQty} keyboardType="number-pad" maxLength={3} />
         </View>
         <View style={{ flexDirection: 'row', gap: Spacing.two, flex: 1 }}>
-          <Button title="−" kind="secondary" style={{ flex: 1 }} accessibilityLabel="One less" onPress={() => setQty(String(Math.max(1, (Number(qty) || 1) - 1)))} />
-          <Button title="+" kind="secondary" style={{ flex: 1 }} accessibilityLabel="One more" onPress={() => setQty(String(Math.min(999, (Number(qty) || 0) + 1)))} />
+          <Button title="−" kind="secondary" style={{ flex: 1 }} accessibilityLabel={tr('One less')} onPress={() => setQty(String(Math.max(1, (Number(qty) || 1) - 1)))} />
+          <Button title="+" kind="secondary" style={{ flex: 1 }} accessibilityLabel={tr('One more')} onPress={() => setQty(String(Math.min(999, (Number(qty) || 0) + 1)))} />
         </View>
       </View>
-      <Choice label="Category" options={TRIP_CATEGORIES.map((c) => ({ value: c.id as TripCategory, label: c.label }))} value={category} onChange={setCategory} />
-      <Field label="Notes" value={notes} onChangeText={setNotes} multiline placeholder="Optional: size, where it lives in the rig" maxLength={1000} />
+      <Choice label={tr('Category')} options={TRIP_CATEGORIES.map((c) => ({ value: c.id as TripCategory, label: c.label }))} value={category} onChange={setCategory} />
+      <Field label={tr('Notes')} value={notes} onChangeText={setNotes} multiline placeholder={tr('Optional: size, where it lives in the rig')} maxLength={1000} />
       <ErrorText error={error} />
       <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <Button title="Cancel" kind="secondary" style={{ flex: 1 }} onPress={onCancel} />
-        <Button title={item ? 'Save' : 'Add'} style={{ flex: 1 }} loading={busy} onPress={save} />
+        <Button title={tr('Cancel')} kind="secondary" style={{ flex: 1 }} onPress={onCancel} />
+        <Button title={item ? tr('Save') : tr('Add')} style={{ flex: 1 }} loading={busy} onPress={save} />
       </View>
-      {onDelete ? <Button title="Remove Item" kind="danger" onPress={onDelete} /> : null}
+      {onDelete ? <Button title={tr('Remove Item')} kind="danger" onPress={onDelete} /> : null}
     </Card>
   );
 }

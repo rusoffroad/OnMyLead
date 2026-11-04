@@ -20,6 +20,7 @@ import { appLogText, screenTrail } from '@/lib/app-log';
 import { deviceSummary, isTablet } from '@/lib/device-info';
 import { useSession } from '@/lib/session';
 
+import { t as tr } from '@/lib/i18n';
 const TOPIC_ICON: Record<ContactTopic, IconName> = {
   problem: 'wrench',
   feature: 'plus',
@@ -98,7 +99,7 @@ export default function ContactScreen() {
       if (why || !base64) return setError(why);
       setShot({ uri: a.uri, base64, type: a.mimeType ?? 'image/jpeg' });
     } catch {
-      setError('Your pictures couldn’t be opened. Allow OnMyLead to see your photos in Settings, or send the message without one.');
+      setError(tr('Your pictures couldn’t be opened. Allow OnMyLead to see your photos in Settings, or send the message without one.'));
     }
   };
 
@@ -107,18 +108,16 @@ export default function ContactScreen() {
   if (sentTo) {
     return (
       <Screen>
-        <Head><title>Message Sent | OnMyLead</title></Head>
+        <Head><title>{tr('Message Sent | OnMyLead')}</title></Head>
         <View style={styles.wrap}>
           <View style={styles.sent} accessibilityLiveRegion="polite">
             <View style={styles.sentMark}><Icon name="check" size={34} color={Colors.text} strokeWidth={2.6} /></View>
-            <ThemedText type="subtitle" accessibilityRole="header" style={{ textAlign: 'center' }}>Message Sent</ThemedText>
-            <ThemedText themeColor="textSecondary" style={{ textAlign: 'center' }}>
-              Thanks for writing. We’ll reply to {sentTo}, usually within a day.
-            </ThemedText>
+            <ThemedText type="subtitle" accessibilityRole="header" style={{ textAlign: 'center' }}>{tr('Message Sent')}</ThemedText>
+            <ThemedText themeColor="textSecondary" style={{ textAlign: 'center' }}>{tr('Thanks for writing. We’ll reply to {sentTo}, usually within a day.', { sentTo })}</ThemedText>
           </View>
-          <Button title="Back to OnMyLead" onPress={leave} />
+          <Button title={tr('Back to OnMyLead')} onPress={leave} />
           <Button
-            title="Send Another Message"
+            title={tr('Send Another Message')}
             kind="ghost"
             onPress={() => {
               setSentTo(null);
@@ -137,19 +136,17 @@ export default function ContactScreen() {
   return (
     <Screen>
       <Head>
-        <title>Contact Us | OnMyLead</title>
+        <title>{tr('Contact Us | OnMyLead')}</title>
         <meta name="description" content="Report a problem, ask for a feature or get help with billing. A real person at RUS Offroad reads every message." />
       </Head>
       <View style={styles.wrap}>
         <View style={{ gap: Spacing.one }}>
-          <ThemedText type="title" accessibilityRole="header">Contact Us</ThemedText>
-          <ThemedText themeColor="textSecondary">
-            Questions, problems or ideas for OnMyLead go straight to the team at {COMPANY}.
-          </ThemedText>
+          <ThemedText type="title" accessibilityRole="header">{tr('Contact Us')}</ThemedText>
+          <ThemedText themeColor="textSecondary">{tr('Questions, problems or ideas for OnMyLead go straight to the team at {COMPANY}.', { COMPANY })}</ThemedText>
         </View>
 
         <View style={{ gap: Spacing.two }}>
-          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }} nativeID="topic-label">What’s It About?</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }} nativeID="topic-label">{tr('What’s It About?')}</ThemedText>
           <View style={styles.topics} accessibilityRole="radiogroup" aria-labelledby="topic-label">
             {CONTACT_TOPICS.map((t) => {
               const on = t.value === topic;
@@ -166,7 +163,7 @@ export default function ContactScreen() {
                   <View style={[styles.topicIcon, on && { backgroundColor: Colors.accent }]}>
                     <Icon name={TOPIC_ICON[t.value]} size={18} color={on ? Colors.onAccent : Colors.textSecondary} />
                   </View>
-                  <Text style={[styles.topicText, on && { color: Colors.text }]} numberOfLines={2}>{t.label}</Text>
+                  <Text style={[styles.topicText, on && { color: Colors.text }]} numberOfLines={2}>{tr(t.label)}</Text>
                 </Pressable>
               );
             })}
@@ -176,10 +173,10 @@ export default function ContactScreen() {
         <View style={styles.pair}>
           <View style={styles.half}>
             <Field
-              label="Your Name"
+              label={tr('Your Name')}
               value={name}
               onChangeText={setName}
-              placeholder="Optional"
+              placeholder={tr('Optional')}
               autoCapitalize="words"
               autoComplete="name"
               textContentType="name"
@@ -189,13 +186,13 @@ export default function ContactScreen() {
           </View>
           <View style={styles.half}>
             <Field
-              label="Your Email"
+              label={tr('Your Email')}
               value={email}
               onChangeText={(t) => {
                 setEmail(t);
                 setError(null);
               }}
-              placeholder="So we can reply"
+              placeholder={tr('So we can reply')}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -209,13 +206,13 @@ export default function ContactScreen() {
 
         <View style={{ gap: 6 }}>
           <Field
-            label="Your Message"
+            label={tr('Your Message')}
             value={message}
             onChangeText={(t) => {
               setMessage(t);
               setError(null);
             }}
-            placeholder="Write your message here"
+            placeholder={tr('Write your message here')}
             multiline
             maxLength={MAX_CONTACT_MESSAGE}
             style={{ minHeight: 180 }}
@@ -231,23 +228,23 @@ export default function ContactScreen() {
 
         {topic === 'problem' && reportsReady ? (
           <View style={styles.report}>
-            <ThemedText type="smallBold">Add a Screenshot</ThemedText>
+            <ThemedText type="smallBold">{tr('Add a Screenshot')}</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">{screenshotHint(Platform.OS, Platform.OS !== 'web' && isTablet())}</ThemedText>
             {shot ? (
               <View style={styles.shotRow}>
-                <Image source={{ uri: shot.uri }} style={styles.shot} contentFit="cover" accessibilityLabel="Your screenshot" />
+                <Image source={{ uri: shot.uri }} style={styles.shot} contentFit="cover" accessibilityLabel={tr('Your screenshot')} />
                 <View style={{ flex: 1, gap: Spacing.two }}>
-                  <Button title="Change Screenshot" kind="secondary" onPress={pickShot} />
-                  <Button title="Remove" kind="ghost" onPress={() => setShot(null)} />
+                  <Button title={tr('Change Screenshot')} kind="secondary" onPress={pickShot} />
+                  <Button title={tr('Remove')} kind="ghost" onPress={() => setShot(null)} />
                 </View>
               </View>
             ) : (
-              <Button title="Add a Screenshot" kind="secondary" onPress={pickShot} />
+              <Button title={tr('Add a Screenshot')} kind="secondary" onPress={pickShot} />
             )}
             <ThemedText type="small" themeColor="textSecondary">
               {Platform.OS === 'web'
-                ? 'Your browser and a short log of what the page just did go with your message, to help us fix it. Never your location or anything you typed.'
-                : 'Your phone model, app version and a short log of what the app just did go with your message, to help us fix it. Never your location or anything you typed.'}
+                ? tr('Your browser and a short log of what the page just did go with your message, to help us fix it. Never your location or anything you typed.')
+                : tr('Your phone model, app version and a short log of what the app just did go with your message, to help us fix it. Never your location or anything you typed.')}
             </ThemedText>
           </View>
         ) : null}
@@ -262,9 +259,9 @@ export default function ContactScreen() {
           : null}
 
         <ErrorText error={error} />
-        <Button title="Send Message" big loading={busy} onPress={send} />
+        <Button title={tr('Send Message')} big loading={busy} onPress={send} />
         <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center' }}>
-          In an emergency, call 911 first.
+          {tr('In an emergency, call 911 first.')}
         </ThemedText>
       </View>
     </Screen>

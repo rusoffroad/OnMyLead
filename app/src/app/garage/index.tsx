@@ -11,6 +11,7 @@ import { formatDollars, kindLabel, vehicleTitle } from '@/core/garage';
 import { myVehicles, type VehicleWithCost } from '@/lib/api';
 import { useSession } from '@/lib/session';
 
+import { t } from '@/lib/i18n';
 export default function Garage() {
   const { session, loading } = useSession();
   const [vehicles, setVehicles] = useState<VehicleWithCost[] | null>(null);
@@ -27,8 +28,8 @@ export default function Garage() {
     return (
       <Screen>
         <Card>
-          <ThemedText type="heading">Sign In to Build Your Garage</ThemedText>
-          <Button title="Sign In" onPress={() => router.push('/sign-in')} />
+          <ThemedText type="heading">{t('Sign In to Build Your Garage')}</ThemedText>
+          <Button title={t('Sign In')} onPress={() => router.push('/sign-in')} />
         </Card>
       </Screen>
     );
@@ -36,10 +37,10 @@ export default function Garage() {
 
   return (
     <Screen>
-      <Button title="Add a Machine" big onPress={() => router.push('/garage/new')} />
+      <Button title={t('Add a Machine')} big onPress={() => router.push('/garage/new')} />
       <ErrorText error={error} />
       {vehicles && vehicles.length === 0 ? (
-        <ThemedText themeColor="textSecondary">Your garage is empty. Add your rig or side-by-side to track the build and fuel range.</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('Your garage is empty. Add your rig or side-by-side to track the build and fuel range.')}</ThemedText>
       ) : null}
       {vehicles?.map((v) => (
         <Link key={v.id} href={`/garage/${v.id}`} asChild>
@@ -50,16 +51,14 @@ export default function Garage() {
               ) : (
                 <View style={{ width: '100%', aspectRatio: 16 / 7, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected, gap: Spacing.one }}>
                   <Icon name="machine" size={44} color={Colors.textSecondary} strokeWidth={1.5} />
-                  <ThemedText type="small" themeColor="textSecondary">Add a photo from the machine’s page</ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">{t('Add a photo from the machine’s page')}</ThemedText>
                 </View>
               )}
               <View style={{ padding: Spacing.three, gap: Spacing.one }}>
                 <ThemedText type="subtitle" style={{ fontSize: 28, lineHeight: 30 }}>{v.nickname?.trim() || vehicleTitle(v)}</ThemedText>
                 {v.nickname?.trim() ? <ThemedText style={{ fontWeight: 600 }}>{vehicleTitle({ ...v, nickname: null })}</ThemedText> : null}
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: Spacing.one }}>
-                  <ThemedText type="small" themeColor="textSecondary">
-                    {kindLabel(v.kind)}, {v.item_count} item{v.item_count === 1 ? '' : 's'}
-                  </ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">{`${t(kindLabel(v.kind))}, ${t(v.item_count === 1 ? '{n} item' : '{n} items', { n: v.item_count })}`}</ThemedText>
                   <ThemedText type="heading" style={{ color: Colors.text }}>{formatDollars(v.build_cost_cents)}</ThemedText>
                 </View>
               </View>

@@ -7,6 +7,7 @@
 import { parseTime } from './time';
 import { symbolLabel, type WaypointKind, type WaypointSymbol } from './waypoint-symbols';
 
+import { tc } from './i18n';
 export type { WaypointKind, WaypointSymbol } from './waypoint-symbols';
 
 export type Waypoint = {
@@ -42,8 +43,8 @@ export const cleanWaypointName = (name: string) => name.replace(/\s+/g, ' ').tri
 /** What's wrong with a name, or null when it's fine. */
 export function waypointNameProblem(name: string): string | null {
   const n = cleanWaypointName(name);
-  if (!n) return 'Give the waypoint a name.';
-  if (n.length > WAYPOINT_NAME_MAX) return `Keep the name to ${WAYPOINT_NAME_MAX} characters.`;
+  if (!n) return tc('Give the waypoint a name.');
+  if (n.length > WAYPOINT_NAME_MAX) return tc('Keep the name to {WAYPOINT_NAME_MAX} characters.', { WAYPOINT_NAME_MAX });
   return null;
 }
 
@@ -81,9 +82,9 @@ export const canRemoveWaypoint = (w: Pick<Waypoint, 'user_id' | 'shared'>, me: s
 
 /** The line under a waypoint's name: who sees it. */
 export function waypointAudience(w: Pick<Waypoint, 'user_id' | 'shared' | 'planned_stop'>, me: string | null | undefined, ownerName: string): string {
-  if (w.planned_stop) return 'Planned Stop';
-  if (!w.shared) return 'Only You';
-  return w.user_id === me ? 'Shared with Everyone' : `From ${ownerName}`;
+  if (w.planned_stop) return tc('Planned Stop');
+  if (!w.shared) return tc('Only You');
+  return w.user_id === me ? tc('Shared with Everyone') : tc('From {ownerName}', { ownerName });
 }
 
 /** Planned stops first, in ride order; then the other shared ones; then your own; each oldest first. */
@@ -163,9 +164,9 @@ export const WAYPOINTS_NOT_SWITCHED_ON = 'Waypoints are not switched on yet. The
 export function friendlyWaypointError(message: string, code?: string | null): string {
   if (isPlannedStopsNotSwitchedOn(message, code)) return PLANNED_STOPS_NOT_SWITCHED_ON;
   if (isWaypointsNotSwitchedOn(message, code)) return WAYPOINTS_NOT_SWITCHED_ON;
-  if (/stops_changed/.test(message)) return 'The planned stops just changed. Close this and try again.';
-  if (/not_leader/.test(message)) return 'Only the ride’s leader can change the planned stops.';
-  if (/waypoint_limit/.test(message)) return 'You have 100 waypoints on this ride. Remove one to add another.';
-  if (/row-level security|permission denied/i.test(message)) return 'Only riders on this ride can add waypoints, and only the leader can share them.';
+  if (/stops_changed/.test(message)) return tc('The planned stops just changed. Close this and try again.');
+  if (/not_leader/.test(message)) return tc('Only the ride’s leader can change the planned stops.');
+  if (/waypoint_limit/.test(message)) return tc('You have 100 waypoints on this ride. Remove one to add another.');
+  if (/row-level security|permission denied/i.test(message)) return tc('Only riders on this ride can add waypoints, and only the leader can share them.');
   return message;
 }

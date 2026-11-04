@@ -12,6 +12,7 @@ import { useBlocks } from '@/lib/blocks';
 import { refreshFriends, useFriends } from '@/lib/friends';
 import { myDmThreads, nearbyRiders, useMyOutRiding } from '@/lib/out-riding';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * The way into Out Riding, Messages and Friends, at the top of the Groups tab. Off: one line on
  * what it does. On: who's out within 10 miles at a glance. Each part hides until the server has it.
@@ -50,12 +51,12 @@ export function OutRidingCard() {
     <View style={{ gap: Spacing.two }}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={on ? `You’re Out Riding. ${countLine(shown, DEFAULT_RADIUS)}` : 'Out Riding. See which riders are out near you.'}
+        accessibilityLabel={on ? tr('You’re Out Riding. {v}', { v: countLine(shown, DEFAULT_RADIUS) }) : tr('Out Riding. See which riders are out near you.')}
         onPress={() => router.push('/out-riding')}
         style={({ pressed }) => [styles.card, on && styles.cardOn, pressed && { backgroundColor: Colors.backgroundSelected }]}>
         <View style={styles.top}>
           <View style={[styles.dot, on ? styles.dotOn : null]} />
-          <Text style={styles.title}>{on ? 'You’re Out Riding' : 'Out Riding'}</Text>
+          <Text style={styles.title}>{on ? tr('You’re Out Riding') : tr('Out Riding')}</Text>
           <Icon name="chevron" color={Colors.textSecondary} />
         </View>
         {on && me.status ? (
@@ -65,17 +66,17 @@ export function OutRidingCard() {
             <Text style={styles.sub}>{endsLabel(me.status.expires_at)}</Text>
           </>
         ) : (
-          <Text style={styles.sub}>Heading out? Switch it on to see which riders are out near you, and message them.</Text>
+          <Text style={styles.sub}>{tr('Heading out? Switch it on to see which riders are out near you, and message them.')}</Text>
         )}
       </Pressable>
       {hasThreads ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Messages${badge ? `, ${badge}` : ''}`}
+          accessibilityLabel={tr('Messages{v}', { v: badge ? `, ${badge}` : '' })}
           onPress={() => router.push('/messages')}
           style={({ pressed }) => [styles.row, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <Icon name="mail" color={Colors.sky} />
-          <Text style={styles.rowText}>Messages</Text>
+          <Text style={styles.rowText}>{tr('Messages')}</Text>
           {badge ? <Text style={styles.unread}>{badge}</Text> : null}
           <Icon name="chevron" color={Colors.textSecondary} />
         </Pressable>
@@ -88,7 +89,7 @@ export function OutRidingCard() {
           style={({ pressed }) => [styles.row, pressed && { backgroundColor: Colors.backgroundSelected }]}>
           <Icon name="addFriend" color={RideColors.green} />
           <View style={{ flex: 1, paddingVertical: 8 }}>
-            <Text style={styles.rowText}>Friends</Text>
+            <Text style={styles.rowText}>{tr('Friends')}</Text>
             <Text style={styles.rowSub} numberOfLines={1}>{line}</Text>
           </View>
           {requests ? <Text style={styles.unread}>{requests}</Text> : null}

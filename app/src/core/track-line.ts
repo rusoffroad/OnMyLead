@@ -6,6 +6,7 @@
  */
 import { distanceM, type LatLng } from './geo';
 
+import { coreLocale, tc } from './i18n';
 /** Each day's line: [lat, lng] pairs, newest last. Keyed by the phone's local date, YYYY-MM-DD. */
 export type TrackDays = Record<string, [number, number][]>;
 
@@ -44,10 +45,10 @@ export const colorForDay = (ago: number) => TRACK_DAY_COLORS[Math.min(Math.max(0
 /** "Today", "Yesterday", or the date ("Nov 1"). */
 export function dayLabel(key: string, now: number): string {
   const ago = daysAgo(key, now);
-  if (ago === 0) return 'Today';
-  if (ago === 1) return 'Yesterday';
+  if (ago === 0) return tc('Today');
+  if (ago === 1) return tc('Yesterday');
   const [y, m, d] = key.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return new Date(y, m - 1, d).toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric' });
 }
 
 /** Read what's stored; anything malformed is dropped. */

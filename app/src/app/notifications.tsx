@@ -12,7 +12,7 @@ import {
 import { loadNotificationSettings, saveNotificationSettings } from '@/lib/notification-settings';
 import { askPushPermission, openPhoneSettings, pushPermission, syncRideReminders, type PushPermission } from '@/lib/push';
 import { useSession } from '@/lib/session';
-import { t } from '@/lib/i18n';
+import { t as tr } from '@/lib/i18n';
 
 /** What a rider hears about, and when. Every change saves as soon as it's made. */
 export default function NotificationsScreen() {
@@ -69,52 +69,52 @@ export default function NotificationsScreen() {
       const feedOff = FEED_TOPICS.some((k) => k in patch) && /feed_activity|schema cache/i.test((e as Error).message);
       const accountOff = ACCOUNT_SETTINGS.some((k) => k in patch) && /account_push|account_emails|schema cache/i.test((e as Error).message);
       setError(
-        feedOff ? 'Likes and Comments notifications are not switched on yet. They start working with the next server update.'
-        : friendsOff ? 'Friend Request notifications are not switched on yet. They start working with the next server update.'
-        : dmOff ? 'Direct Message notifications are not switched on yet. They start working with the next server update.'
-        : chatOff ? 'Riding Group Chat notifications are not switched on yet. They start working with the next server update.'
-        : groupsOff ? 'Ride Invites and Leaders You Follow are not switched on yet. They start working with the next server update.'
-        : accountOff ? 'Account notifications are not switched on yet. They start working with the next server update.'
-        : `Couldn’t save that. ${(e as Error).message}`,
+        feedOff ? tr('Likes and Comments notifications are not switched on yet. They start working with the next server update.')
+        : friendsOff ? tr('Friend Request notifications are not switched on yet. They start working with the next server update.')
+        : dmOff ? tr('Direct Message notifications are not switched on yet. They start working with the next server update.')
+        : chatOff ? tr('Riding Group Chat notifications are not switched on yet. They start working with the next server update.')
+        : groupsOff ? tr('Ride Invites and Leaders You Follow are not switched on yet. They start working with the next server update.')
+        : accountOff ? tr('Account notifications are not switched on yet. They start working with the next server update.')
+        : tr('Couldn’t save that. {message}', { message: (e as Error).message }),
       );
     }
   };
 
   return (
     <Screen>
-      <Stack.Screen options={{ title: t('Notifications') }} />
+      <Stack.Screen options={{ title: tr('Notifications') }} />
 
       {Platform.OS === 'web' ? (
-        <Note tone="info" title="Notifications Come to the iPhone App">
-          Your choices here apply on your phone too.
+        <Note tone="info" title={tr('Notifications Come to the iPhone App')}>
+          {tr('Your choices here apply on your phone too.')}
         </Note>
       ) : permission === 'denied' ? (
-        <Note tone="warn" title="Notifications Are Off for OnMyLead" action={{ title: Platform.OS === 'android' ? 'Open Settings' : 'Open iPhone Settings', onPress: openPhoneSettings }}>
-          Your phone is blocking them, so nothing below can reach you. Turn on Allow Notifications for OnMyLead.
+        <Note tone="warn" title={tr('Notifications Are Off for OnMyLead')} action={{ title: Platform.OS === 'android' ? tr('Open Settings') : tr('Open iPhone Settings'), onPress: openPhoneSettings }}>
+          {tr('Your phone is blocking them, so nothing below can reach you. Turn on Allow Notifications for OnMyLead.')}
         </Note>
       ) : permission === 'undetermined' && session ? (
         <Note
           tone="warn"
-          title="Let OnMyLead Send Notifications"
-          action={{ title: 'Turn On Notifications', onPress: () => askPushPermission(session.user.id).then(setPermission) }}>
-          So you hear when someone in your group needs help, even with the phone in your pocket.
+          title={tr('Let OnMyLead Send Notifications')}
+          action={{ title: tr('Turn On Notifications'), onPress: () => askPushPermission(session.user.id).then(setPermission) }}>
+          {tr('So you hear when someone in your group needs help, even with the phone in your pocket.')}
         </Note>
       ) : null}
 
       {switchedOn === false && !error ? (
-        <Note tone="info" title="Not Switched On Yet">
-          These settings start working with the next server update. Until then, ride chat still pops up while the app is open.
+        <Note tone="info" title={tr('Not Switched On Yet')}>
+          {tr('These settings start working with the next server update. Until then, ride chat still pops up while the app is open.')}
         </Note>
       ) : null}
       <ErrorText error={error} />
 
-      <View style={[styles.always, !editable && styles.dim]} accessible accessibilityLabel="Help and EMERGENCY alerts are always on, even in quiet hours.">
+      <View style={[styles.always, !editable && styles.dim]} accessible accessibilityLabel={tr('Help and EMERGENCY alerts are always on, even in quiet hours.')}>
         <View style={styles.sos}>
-          <Text style={styles.sosText}>SOS</Text>
+          <Text style={styles.sosText}>{tr('SOS')}</Text>
         </View>
         <View style={{ flex: 1, gap: 2 }}>
-          <Text style={styles.rowTitle}>Help and EMERGENCY</Text>
-          <Text style={styles.rowDetail}>When someone in your group taps Need help or EMERGENCY. Always on, even in quiet hours.</Text>
+          <Text style={styles.rowTitle}>{tr('Help and EMERGENCY')}</Text>
+          <Text style={styles.rowDetail}>{tr('When someone in your group taps Need help or EMERGENCY. Always on, even in quiet hours.')}</Text>
         </View>
       </View>
 
@@ -127,7 +127,7 @@ export default function NotificationsScreen() {
                 key={t.key}
                 first={i === 0}
                 title={t.title}
-                detail={t.detail}
+                detail={tr(t.detail)}
                 value={settings[t.key]}
                 disabled={!editable}
                 onChange={(v) => change({ [t.key]: v })}
@@ -135,8 +135,8 @@ export default function NotificationsScreen() {
             ))}
             {g.title === 'Before the Ride' ? (
               <ToggleRow
-                title="Email When a Ride Is Cancelled"
-                detail="An email if a ride you joined is cancelled or removed, as well as the notification."
+                title={tr('Email When a Ride Is Cancelled')}
+                detail={tr('An email if a ride you joined is cancelled or removed, as well as the notification.')}
                 value={settings.ride_emails}
                 disabled={!editable}
                 onChange={(v) => change({ ride_emails: v })}
@@ -144,8 +144,8 @@ export default function NotificationsScreen() {
             ) : null}
             {g.title === 'Your Account' ? (
               <ToggleRow
-                title="Email Me Too"
-                detail="The same Pro Trial reminders by email."
+                title={tr('Email Me Too')}
+                detail={tr('The same Pro Trial reminders by email.')}
                 value={settings.account_emails}
                 disabled={!editable}
                 onChange={(v) => change({ account_emails: v })}
@@ -153,8 +153,8 @@ export default function NotificationsScreen() {
             ) : null}
             {g.title === 'Ride Chat' ? (
               <ToggleRow
-                title="Show Message Text"
-                detail="Off keeps messages off your lock screen. You’ll see who wrote, not what."
+                title={tr('Show Message Text')}
+                detail={tr('Off keeps messages off your lock screen. You’ll see who wrote, not what.')}
                 value={settings.previews}
                 disabled={!editable}
                 onChange={(v) => change({ previews: v })}
@@ -163,8 +163,8 @@ export default function NotificationsScreen() {
           </View>
           {g.title === 'Before the Ride' ? (
             <View style={[styles.reminder, !editable && styles.dim]} pointerEvents={editable ? 'auto' : 'none'}>
-              <Text style={styles.rowTitle}>Ride reminder</Text>
-              <Text style={styles.rowDetail}>A heads-up before each ride you’ve joined, with the meeting spot.</Text>
+              <Text style={styles.rowTitle}>{tr('Ride reminder')}</Text>
+              <Text style={styles.rowDetail}>{tr('A heads-up before each ride you’ve joined, with the meeting spot.')}</Text>
               <Choice options={REMINDER_OPTIONS} value={settings.reminder_minutes} onChange={(v) => change({ reminder_minutes: v })} />
             </View>
           ) : null}
@@ -220,12 +220,12 @@ function QuietHours({
   const hours = quietLengthHours(settings.quiet_start, settings.quiet_end);
   return (
     <View style={styles.group}>
-      <Text style={styles.groupTitle} accessibilityRole="header">Quiet hours</Text>
+      <Text style={styles.groupTitle} accessibilityRole="header">{tr('Quiet hours')}</Text>
       <View style={[styles.card, { paddingBottom: on ? Spacing.three : 0 }]}>
         <ToggleRow
           first
-          title="Silence Overnight"
-          detail={on ? `Silent for ${hours % 1 ? hours.toFixed(1) : hours} hours a day. Help alerts still come through.` : 'Hold everything but help alerts overnight.'}
+          title={tr('Silence Overnight')}
+          detail={on ? tr('Silent for {v} hours a day. Help alerts still come through.', { v: hours % 1 ? hours.toFixed(1) : hours }) : tr('Hold everything but help alerts overnight.')}
           value={on}
           disabled={disabled}
           onChange={(v) => onChange({ quiet_hours: v })}
@@ -235,7 +235,7 @@ function QuietHours({
             <View
               style={styles.strip}
               accessible
-              accessibilityLabel={`Quiet from ${formatClock(settings.quiet_start)} until ${formatClock(settings.quiet_end)}`}>
+              accessibilityLabel={tr('Quiet from {v} until {v2}', { v: formatClock(settings.quiet_start), v2: formatClock(settings.quiet_end) })}>
               {segments.map(([a, b]) => (
                 <View key={a} style={[styles.night, { left: `${a * 100}%`, width: `${(b - a) * 100}%` }]}>
                   {STARS.filter((x) => x >= a && x <= b).map((x) => (
@@ -250,8 +250,8 @@ function QuietHours({
               ))}
             </View>
             <View style={styles.clocks}>
-              <Clock label="From" minutes={settings.quiet_start} onStep={(d) => onChange({ quiet_start: stepClock(settings.quiet_start, d) })} />
-              <Clock label="Until" minutes={settings.quiet_end} onStep={(d) => onChange({ quiet_end: stepClock(settings.quiet_end, d) })} />
+              <Clock label={tr('From')} minutes={settings.quiet_start} onStep={(d) => onChange({ quiet_start: stepClock(settings.quiet_start, d) })} />
+              <Clock label={tr('Until')} minutes={settings.quiet_end} onStep={(d) => onChange({ quiet_end: stepClock(settings.quiet_end, d) })} />
             </View>
           </View>
         ) : null}
@@ -265,9 +265,9 @@ function Clock({ label, minutes, onStep }: { label: string; minutes: number; onS
     <View style={styles.clock}>
       <Text style={styles.clockLabel}>{label}</Text>
       <View style={styles.clockRow}>
-        <StepButton sign="−" label={`${label} half an hour earlier`} onPress={() => onStep(-1)} />
+        <StepButton sign="−" label={tr('{label} half an hour earlier', { label })} onPress={() => onStep(-1)} />
         <Text style={styles.clockTime} accessibilityLiveRegion="polite">{formatClock(minutes)}</Text>
-        <StepButton sign="+" label={`${label} half an hour later`} onPress={() => onStep(1)} />
+        <StepButton sign="+" label={tr('{label} half an hour later', { label })} onPress={() => onStep(1)} />
       </View>
     </View>
   );
@@ -293,7 +293,7 @@ function Note({
     <View style={[styles.note, { borderLeftColor: tone === 'warn' ? RideColors.yellow : Colors.sky }]}>
       <ThemedText type="smallBold">{title}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">{children}</ThemedText>
-      {action ? <Button title={action.title} onPress={action.onPress} style={{ marginTop: Spacing.two }} /> : null}
+      {action ? <Button title={tr(action.title)} onPress={action.onPress} style={{ marginTop: Spacing.two }} /> : null}
     </View>
   );
 }

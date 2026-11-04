@@ -1,3 +1,5 @@
+import { coreLocale, tc } from './i18n';
+
 /**
  * Out Riding: see who else is out riding near you, and message them (migration
  * 20261101700000_out_riding.sql). Like "online" in a game, for riders.
@@ -99,33 +101,33 @@ export function isOut(me: MyOutRiding | null | undefined, now = Date.now()): boo
 
 /** "Under a Mile", "About 1 Mile", "About 15 Miles". Never more exact than that. */
 export function distanceLabel(miles: number): string {
-  if (!Number.isFinite(miles) || miles < 1) return 'Under a Mile';
+  if (!Number.isFinite(miles) || miles < 1) return tc('Under a Mile');
   const m = Math.round(miles);
-  return `About ${m} ${m === 1 ? 'Mile' : 'Miles'}`;
+  return tc('About {m} {v}', { m, v: m === 1 ? 'Mile' : 'Miles' });
 }
 
 /** "Out for 25 Min", "Out for 3 Hr", "Out Since Sat". */
 export function outSince(iso: string, now = Date.now()): string {
   const min = Math.max(0, Math.round((now - Date.parse(iso)) / 60_000));
-  if (min < 1) return 'Just Started';
-  if (min < 60) return `Out for ${min} Min`;
+  if (min < 1) return tc('Just Started');
+  if (min < 60) return tc('Out for {min} Min', { min });
   const hr = Math.round(min / 60);
-  if (hr < 24) return `Out for ${hr} Hr`;
-  return `Out Since ${new Date(iso).toLocaleDateString('en-US', { weekday: 'short' })}`;
+  if (hr < 24) return tc('Out for {hr} Hr', { hr });
+  return tc('Out Since {v}', { v: new Date(iso).toLocaleDateString(coreLocale(), { weekday: 'short' }) });
 }
 
 /** "On for 3 More Hours", "On Until Sun 6 PM". */
 export function endsLabel(expiresAt: string, now = Date.now()): string {
   const ms = Date.parse(expiresAt) - now;
-  if (ms <= 0) return 'Ended';
+  if (ms <= 0) return tc('Ended');
   const min = Math.round(ms / 60_000);
-  if (min < 60) return `On for ${min} More Min`;
+  if (min < 60) return tc('On for {min} More Min', { min });
   const hr = Math.round(min / 60);
-  if (hr <= 12) return `On for ${hr} More ${hr === 1 ? 'Hour' : 'Hours'}`;
+  if (hr <= 12) return tc('On for {hr} More {v}', { hr, v: hr === 1 ? 'Hour' : 'Hours' });
   const d = new Date(expiresAt);
-  const day = d.toLocaleDateString('en-US', { weekday: 'short' });
-  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: d.getMinutes() ? '2-digit' : undefined });
-  return `On Until ${day} ${time}`;
+  const day = d.toLocaleDateString(coreLocale(), { weekday: 'short' });
+  const time = d.toLocaleTimeString(coreLocale(), { hour: 'numeric', minute: d.getMinutes() ? '2-digit' : undefined });
+  return tc('On Until {day} {time}', { day, time });
 }
 
 /** Riders I know first, then nearest, then by name. */
@@ -138,13 +140,13 @@ export function sortNearby(list: NearbyRider[]): NearbyRider[] {
 
 /** The count line under the switch: "2 Riders You Know Out Nearby", "Nobody Else Out Nearby Yet". */
 export function countLine(list: NearbyRider[], radius: number): string {
-  if (!list.length) return `Nobody Else Out Within ${radius} Miles Yet`;
+  if (!list.length) return tc('Nobody Else Out Within {radius} Miles Yet', { radius });
   const known = list.filter((r) => r.known).length;
   const others = list.length - known;
   const parts: string[] = [];
   if (known) parts.push(`${known} ${known === 1 ? 'Rider' : 'Riders'} You Know`);
   if (others) parts.push(`${others} ${others === 1 ? 'Other Rider' : 'Other Riders'}`);
-  return `${parts.join(' and ')} Out Within ${radius} Miles`;
+  return tc('{v} Out Within {radius} Miles', { v: parts.join(' and '), radius });
 }
 
 /** The spot as typed, tidied: trimmed, one space between words, at most 40 characters. */
@@ -168,16 +170,16 @@ export function outRidingNotSwitchedOn(message: string | null | undefined, code?
 /** Turn a database error into something a rider can act on. */
 export function friendlyOutRidingError(message: string): string {
   if (outRidingNotSwitchedOn(message)) return NOT_SWITCHED_ON;
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return 'No signal. Check your connection and try again.';
-  if (/out_riding_rate/i.test(message)) return 'Your area was updated a lot this hour. It’ll update again soon.';
-  if (/a location is needed/i.test(message)) return 'OnMyLead needs your location to show who’s out near you.';
-  if (/slow down/i.test(message)) return 'You’re sending a lot. Wait a minute and try again.';
-  if (/dm_daily_limit/i.test(message)) return 'You’ve hit today’s message limit. Try again tomorrow.';
-  if (/dm_wait_for_reply/i.test(message)) return 'Wait for them to reply before sending more.';
-  if (/dm_you_blocked/i.test(message)) return 'You blocked this rider. Unblock them from You, Blocked Riders to message them.';
-  if (/dm_not_allowed/i.test(message)) return 'You can message your friends, riders you see Out Riding near you, or riders you’ve ridden with.';
-  if (/too long/i.test(message)) return 'Keep it under 500 characters.';
-  if (/conversation not found/i.test(message)) return 'This conversation isn’t available.';
+  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and try again.');
+  if (/out_riding_rate/i.test(message)) return tc('Your area was updated a lot this hour. It’ll update again soon.');
+  if (/a location is needed/i.test(message)) return tc('OnMyLead needs your location to show who’s out near you.');
+  if (/slow down/i.test(message)) return tc('You’re sending a lot. Wait a minute and try again.');
+  if (/dm_daily_limit/i.test(message)) return tc('You’ve hit today’s message limit. Try again tomorrow.');
+  if (/dm_wait_for_reply/i.test(message)) return tc('Wait for them to reply before sending more.');
+  if (/dm_you_blocked/i.test(message)) return tc('You blocked this rider. Unblock them from You, Blocked Riders to message them.');
+  if (/dm_not_allowed/i.test(message)) return tc('You can message your friends, riders you see Out Riding near you, or riders you’ve ridden with.');
+  if (/too long/i.test(message)) return tc('Keep it under 500 characters.');
+  if (/conversation not found/i.test(message)) return tc('This conversation isn’t available.');
   return message;
 }
 
@@ -202,7 +204,7 @@ export function mergeDirectMessages(current: DirectMessage[], incoming: DirectMe
 /** The line under a conversation: "You: On my way" or "Where are you parked?". */
 export function dmPreview(t: Pick<DmThread, 'last_body' | 'last_sender_id'>, me: string | null | undefined): string | null {
   if (!t.last_body) return null;
-  return t.last_sender_id === me ? `You: ${t.last_body}` : t.last_body;
+  return t.last_sender_id === me ? tc('You: {last_body}', { last_body: t.last_body }) : t.last_body;
 }
 
 /** Total unread across conversations, for the badge on the Messages row. Muted ones don't count. */

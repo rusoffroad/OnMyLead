@@ -68,43 +68,42 @@ export default function NewPost() {
         {!pro ? (
           <Pressable onPress={() => requirePro('social_posts')} style={styles.locked} accessibilityRole="button">
             <ProTag />
-            <Text style={styles.lockedText}>Posting is part of OnMyLead Pro.</Text>
+            <Text style={styles.lockedText}>{t('Posting is part of OnMyLead Pro.')}</Text>
           </Pressable>
         ) : null}
         <TextBox
           value={text}
           onChangeText={setText}
-          placeholder="How was the ride? Trail conditions, the crew, the view…"
+          placeholder={t('How was the ride? Trail conditions, the crew, the view…')}
           placeholderTextColor="#5F7190"
           multiline
           maxLength={POST_MAX}
           autoFocus={pro}
-          accessibilityLabel="Your post"
+          accessibilityLabel={t('Your post')}
           style={styles.input}
         />
-        <Text style={styles.count}>{POST_MAX - text.length} characters left</Text>
+        <Text style={styles.count}>{t('{v} characters left', { v: POST_MAX - text.length })}</Text>
 
         {photo ? (
           <View>
-            <Image source={{ uri: photo.uri }} contentFit="cover" style={styles.preview} accessibilityLabel="The photo for your post" />
-            <Pressable onPress={() => setPhoto(null)} style={styles.removePhoto} accessibilityRole="button" accessibilityLabel="Remove photo">
+            <Image source={{ uri: photo.uri }} contentFit="cover" style={styles.preview} accessibilityLabel={t('The photo for your post')} />
+            <Pressable onPress={() => setPhoto(null)} style={styles.removePhoto} accessibilityRole="button" accessibilityLabel={t('Remove photo')}>
               <Icon name="close" size={18} color="#fff" />
             </Pressable>
           </View>
         ) : (
           <View style={styles.photoButtons}>
             {canUseCamera ? (
-              <Button title="Take Photo" kind="secondary" loading={busy === 'camera'} disabled={!!busy} onPress={() => pick('camera')} style={{ flex: 1 }} />
+              <Button title={t('Take Photo')} kind="secondary" loading={busy === 'camera'} disabled={!!busy} onPress={() => pick('camera')} style={{ flex: 1 }} />
             ) : null}
-            <Button title="Add Photo" kind="secondary" loading={busy === 'library'} disabled={!!busy} onPress={() => pick('library')} style={{ flex: 1 }} />
+            <Button title={t('Add Photo')} kind="secondary" loading={busy === 'library'} disabled={!!busy} onPress={() => pick('library')} style={{ flex: 1 }} />
           </View>
         )}
 
         <ErrorText error={error} />
-        <Button title="Post" big loading={busy === 'post'} disabled={!!busy || (!text.trim() && !photo)} onPress={post} />
+        <Button title={t('Post')} big loading={busy === 'post'} disabled={!!busy || (!text.trim() && !photo)} onPress={post} />
         <Text style={styles.note}>
-          Shows on your profile and in the feeds of the riders your Who Sees Your Activity setting allows. Your location is never added.
-          Keep it friendly: riders can report posts, and the OnMyLead team removes ones that break the rules.
+          {t('Shows on your profile and in the feeds of the riders your Who Sees Your Activity setting allows. Your location is never added. Keep it friendly: riders can report posts, and the OnMyLead team removes ones that break the rules.')}
         </Text>
       </View>
     </Screen>

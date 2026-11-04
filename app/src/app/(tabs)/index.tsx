@@ -183,8 +183,8 @@ export default function HomeScreen() {
     return (
       <Screen top>
         <Logo />
-        <ThemedText type="subtitle">Almost Ready</ThemedText>
-        <ThemedText>Add the backend keys to app/.env (see .env.example), then restart the app.</ThemedText>
+        <ThemedText type="subtitle">{t('Almost Ready')}</ThemedText>
+        <ThemedText>{t('Add the backend keys to app/.env (see .env.example), then restart the app.')}</ThemedText>
       </Screen>
     );
   }
@@ -200,11 +200,11 @@ export default function HomeScreen() {
     } else {
       p = leavePrompt(ride.name, ride.status, action === 'decline');
     }
-    if (!(await confirmAsync(p.title, p.message, p.confirm, 'Keep Ride'))) return false;
+    if (!(await confirmAsync(p.title, p.message, p.confirm, t('Keep Ride')))) return false;
     try {
       await (action === 'delete' ? deleteRide(ride.id) : leaveRide(ride.id));
     } catch (e) {
-      const what = action === 'delete' ? 'Couldn’t Delete the Ride' : action === 'decline' ? 'Couldn’t Decline the Ride' : 'Couldn’t Leave the Ride';
+      const what = action === 'delete' ? t('Couldn’t Delete the Ride') : action === 'decline' ? t('Couldn’t Decline the Ride') : t('Couldn’t Leave the Ride');
       showNotice(what, e instanceof Error ? e.message : t('Something went wrong.'));
       return false;
     }
@@ -303,8 +303,8 @@ export default function HomeScreen() {
       {session && rideName === '' ? (
         <Pressable accessibilityRole="button" onPress={() => router.push('/ride-name')} style={styles.nudge}>
           <View style={{ flex: 1 }}>
-            <ThemedText type="heading">Pick Your Ride Name</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">Other riders see you as Rider until you do. A nickname works.</ThemedText>
+            <ThemedText type="heading">{t('Pick Your Ride Name')}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Other riders see you as Rider until you do. A nickname works.')}</ThemedText>
           </View>
           <Icon name="chevron" color={theme.textSecondary} />
         </Pressable>
@@ -314,7 +314,7 @@ export default function HomeScreen() {
           <View style={styles.liveDot} />
           <View style={{ flex: 1 }}>
             <ThemedText type="heading" numberOfLines={1}>{live.rides.name}</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">Your ride is live. Tap to open Ride Mode</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{t('Your ride is live. Tap to open Ride Mode')}</ThemedText>
           </View>
           <Icon name="chevron" color={theme.textSecondary} />
         </Pressable>
@@ -337,7 +337,7 @@ export default function HomeScreen() {
       {navOn ? <MapModeCard trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
       <EventsCard signedIn={!!session} radius={radius} />
       {!loading && !session ? (
-        <Button title="Sign In or Create a Free Account" kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
+        <Button title={t('Sign In or Create a Free Account')} kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
     </>
   );
@@ -345,15 +345,15 @@ export default function HomeScreen() {
   const ridesBlock = (
     <>
       {invites.length ? (
-        <Block title="Ride Invites">
+        <Block title={t('Ride Invites')}>
           <RowGroup>{invites.map((m) => swipeRow(m, <RideRow ride={m.rides} note={t('You’re invited. Tap to join')} />))}</RowGroup>
         </Block>
       ) : null}
       {going.length ? (
         <Block
-          title={going.length === 1 || !moreRides ? 'Your Next Ride' : 'Your Rides'}
+          title={going.length === 1 || !moreRides ? t('Your Next Ride') : t('Your Rides')}
           right={going.length > 1 ? (
-            <HeadLink title={moreRides ? 'Show Less' : t('All {n}', { n: going.length })} onPress={() => setMoreRides(!moreRides)} label={moreRides ? 'Show only your next ride' : t('Show all {n} of your rides', { n: going.length })} />
+            <HeadLink title={moreRides ? t('Show Less') : t('All {n}', { n: going.length })} onPress={() => setMoreRides(!moreRides)} label={moreRides ? t('Show only your next ride') : t('Show all {n} of your rides', { n: going.length })} />
           ) : undefined}>
           <RowGroup>
             {(moreRides ? going : going.slice(0, 1)).map((m) =>
@@ -366,13 +366,13 @@ export default function HomeScreen() {
   );
 
   const groupBlock = session && groups ? (
-    <Block title="Your Group" right={groups.length > 1 ? <HeadLink title={t('All {n}', { n: groups.length })} onPress={() => router.push('/groups')} /> : undefined}>
+    <Block title={t('Your Group')} right={groups.length > 1 ? <HeadLink title={t('All {n}', { n: groups.length })} onPress={() => router.push('/groups')} /> : undefined}>
       {group ? <GroupCard group={group} chat={chatFor(group.id)} outNow={groupOut} uid={uid} /> : <NoGroupCard />}
     </Block>
   ) : null;
 
   const publicBlock = findOn ? (
-    <Block title="Public Rides Near You" right={radius != null ? <RadiusChip radius={located ? radius : 0} onPress={() => setRadiusOpen(true)} /> : undefined}>
+    <Block title={t('Public Rides Near You')} right={radius != null ? <RadiusChip radius={located ? radius : 0} onPress={() => setRadiusOpen(true)} /> : undefined}>
       {others.length ? (
         <PublicRidesRail rides={others.slice(0, RAIL_MAX)} width={railWidth} />
       ) : (
@@ -390,11 +390,11 @@ export default function HomeScreen() {
 
   const feedBlock = session && feedOn ? (
     <Block
-      title="Feed"
+      title={t('Feed')}
       right={feedOff ? undefined : (
         <View style={{ flexDirection: 'row', gap: 18 }}>
-          <HeadLink title="Customize" onPress={() => setFeedOpen(true)} label="Customize your feed" />
-          <HeadLink title="Open Social" onPress={() => router.push('/social')} label="Open Social: all your friends, activity and comments" />
+          <HeadLink title={t('Customize')} onPress={() => setFeedOpen(true)} label={t('Customize your feed')} />
+          <HeadLink title={t('Open Social')} onPress={() => router.push('/social')} label={t('Open Social: all your friends, activity and comments')} />
         </View>
       )}>
       {feed == null ? null : feedOff ? (
@@ -409,7 +409,7 @@ export default function HomeScreen() {
               : t('Everything is switched off in Customize.')}
           />
           {feed.length > FEED_SHOWN ? (
-            <HeadLink title={feedAll ? 'Show Less' : t('Show {n} More', { n: feed.length - FEED_SHOWN })} onPress={() => setFeedAll(!feedAll)} />
+            <HeadLink title={feedAll ? t('Show Less') : t('Show {n} More', { n: feed.length - FEED_SHOWN })} onPress={() => setFeedAll(!feedAll)} />
           ) : null}
         </>
       )}
@@ -418,11 +418,11 @@ export default function HomeScreen() {
 
   const badgeBlock = session && badges ? (
     <Block
-      title="Your Badges"
+      title={t('Your Badges')}
       right={
         <View style={{ flexDirection: 'row', gap: Spacing.three }}>
-          <HeadLink title="Leaderboard" onPress={() => router.push('/leaderboard')} label="Badge leaderboard" />
-          <HeadLink title="See All" onPress={() => router.push('/badges')} label="See all badges" />
+          <HeadLink title={t('Leaderboard')} onPress={() => router.push('/leaderboard')} label={t('Badge leaderboard')} />
+          <HeadLink title={t('See All')} onPress={() => router.push('/badges')} label={t('See all badges')} />
         </View>
       }>
       <BadgeStrip mine={badges} />
@@ -430,7 +430,7 @@ export default function HomeScreen() {
   ) : null;
 
   const pastBlock = past.shown.length ? (
-    <Block title="Past Rides">
+    <Block title={t('Past Rides')}>
       <RowGroup>
         {past.shown.map((m) => swipeRow(m, <RideRow ride={m.rides} note={t(m.rides.status === 'cancelled' ? 'Cancelled' : 'Ended')} />))}
       </RowGroup>
@@ -445,7 +445,7 @@ export default function HomeScreen() {
   ) : null;
 
   const toolkitBlock = session ? (
-    <Block title="Your Toolkit">
+    <Block title={t('Your Toolkit')}>
       <Toolkit tools={tools} columns={4} />
     </Block>
   ) : null;

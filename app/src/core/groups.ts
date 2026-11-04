@@ -8,6 +8,7 @@
  */
 import { shownName } from './profile';
 
+import { tc } from './i18n';
 export const MAX_GROUP_NAME = 60;
 
 /** Group names are tidied the same way as ride names. */
@@ -17,18 +18,18 @@ export function cleanGroupName(raw: string): string {
 
 export function groupNameProblem(raw: string): string | null {
   const name = cleanGroupName(raw);
-  if (!name) return 'Give the group a name, like Saturday Crew.';
-  if ([...name].length > MAX_GROUP_NAME) return `Keep it to ${MAX_GROUP_NAME} characters.`;
+  if (!name) return tc('Give the group a name, like Saturday Crew.');
+  if ([...name].length > MAX_GROUP_NAME) return tc('Keep it to {MAX_GROUP_NAME} characters.', { MAX_GROUP_NAME });
   return null;
 }
 
 /** "Finn", "Finn and Hana", "Finn, Hana and Gus", "Finn, Hana and 5 more". */
 export function namesLine(names: (string | null | undefined)[], max = 3): string {
   const shown = names.map(shownName);
-  if (shown.length === 0) return 'Just you so far';
+  if (shown.length === 0) return tc('Just you so far');
   if (shown.length === 1) return shown[0];
   if (shown.length <= max) return `${shown.slice(0, -1).join(', ')} and ${shown[shown.length - 1]}`;
-  return `${shown.slice(0, max - 1).join(', ')} and ${shown.length - (max - 1)} more`;
+  return tc('{v} and {v2} more', { v: shown.slice(0, max - 1).join(', '), v2: shown.length - (max - 1) });
 }
 
 /** "1 Rider", "8 Riders". */
@@ -36,8 +37,8 @@ export const ridersLabel = (n: number) => `${n} ${n === 1 ? 'Rider' : 'Riders'}`
 
 /** What to say after inviting a group to a ride. */
 export function invitedLine(count: number, groupName: string): string {
-  if (count === 0) return `Everyone in ${groupName} is already invited or on the ride.`;
-  return `Invited ${count} ${count === 1 ? 'rider' : 'riders'} from ${groupName}. They get a notification and see the ride on their home screen.`;
+  if (count === 0) return tc('Everyone in {groupName} is already invited or on the ride.', { groupName });
+  return tc('Invited {count} {v} from {groupName}. They get a notification and see the ride on their home screen.', { count, v: count === 1 ? 'rider' : 'riders', groupName });
 }
 
 /** The group's link, for friends not on OnMyLead yet. */

@@ -7,6 +7,7 @@ import { Button, Card, Screen } from '@/components/ui';
 import { isUntilTurnedOff } from '@/core/sharing';
 import { sharedLocationByToken, type SharedLocation } from '@/lib/api';
 
+import { t as tr } from '@/lib/i18n';
 /** Read-only family link. Opens on the web without an account; shows nothing once sharing ends. */
 export default function FamilyLink() {
   const { token } = useLocalSearchParams<{ token: string }>();
@@ -19,8 +20,8 @@ export default function FamilyLink() {
     return () => clearInterval(t);
   }, [token]);
 
-  if (data === undefined) return <Screen><ThemedText>Loading…</ThemedText></Screen>;
-  if (!data) return <Screen><ThemedText type="subtitle">No Longer Shared</ThemedText><ThemedText>This location link has ended.</ThemedText></Screen>;
+  if (data === undefined) return <Screen><ThemedText>{tr('Loading…')}</ThemedText></Screen>;
+  if (!data) return <Screen><ThemedText type="subtitle">{tr('No Longer Shared')}</ThemedText><ThemedText>{tr('This location link has ended.')}</ThemedText></Screen>;
 
   const t = (iso: string | null) => (iso ? new Date(iso).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' }) : '—');
   // Shares can now run for days, so the end shows its date too.
@@ -34,15 +35,15 @@ export default function FamilyLink() {
       <Stack.Screen options={{ title: data.display_name }} />
       <ThemedText type="subtitle">{data.display_name}</ThemedText>
       <Card>
-        {data.ride_name ? <ThemedText>On ride: {data.ride_name}</ThemedText> : null}
-        {data.expected_finish_at ? <ThemedText>Expected back: {t(data.expected_finish_at)}</ThemedText> : null}
-        <ThemedText>Last update: {t(data.recorded_at)}</ThemedText>
-        <ThemedText>Sharing ends: {ends(data.expires_at)}</ThemedText>
+        {data.ride_name ? <ThemedText>{tr('On ride: {ride_name}', { ride_name: data.ride_name })}</ThemedText> : null}
+        {data.expected_finish_at ? <ThemedText>{tr('Expected back: {v}', { v: t(data.expected_finish_at) })}</ThemedText> : null}
+        <ThemedText>{tr('Last update: {v}', { v: t(data.recorded_at) })}</ThemedText>
+        <ThemedText>{tr('Sharing ends: {v}', { v: ends(data.expires_at) })}</ThemedText>
       </Card>
       {data.lat != null && data.lng != null ? (
-        <Button title="Open in Maps" onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}`)} />
+        <Button title={tr('Open in Maps')} onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}`)} />
       ) : (
-        <ThemedText>No location received yet.</ThemedText>
+        <ThemedText>{tr('No location received yet.')}</ThemedText>
       )}
     </Screen>
   );

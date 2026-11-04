@@ -1,3 +1,4 @@
+import { t as tr } from '@/lib/i18n';
 import { memo, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { Marker } from 'react-native-maps';
@@ -41,7 +42,7 @@ export const RiderMarker = memo(
       <Marker
         coordinate={{ latitude: at.lat, longitude: at.lng }}
         title={r.name}
-        description={r.detail}
+        description={tr(r.detail)}
         anchor={{ x: 0.5, y: 0.5 }}
         tracksViewChanges={tracks}
         onPress={() => onPress(r.id)}

@@ -11,12 +11,12 @@ import { dayLabel, unreadLabel } from '@/core/group-chat';
 import { dmPreview, NOT_SWITCHED_ON, type DmThread } from '@/core/out-riding';
 import { myDmThreads, OutRidingOffError } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
-import { t } from '@/lib/i18n';
+import { t as tr } from '@/lib/i18n';
 
 const when = (iso: string | null) => {
   if (!iso) return '';
   const day = dayLabel(iso);
-  return day === 'Today' ? new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : day;
+  return day === tr('Today') ? new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }) : day;
 };
 
 /**
@@ -52,10 +52,10 @@ export default function Messages() {
 
   return (
     <Screen width="readable">
-      <Stack.Screen options={{ title: t('Messages') }} />
+      <Stack.Screen options={{ title: tr('Messages') }} />
       {off ? (
         <View style={styles.note}>
-          <ThemedText type="smallBold">Not Switched On Yet</ThemedText>
+          <ThemedText type="smallBold">{tr('Not Switched On Yet')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{NOT_SWITCHED_ON}</ThemedText>
         </View>
       ) : null}
@@ -64,11 +64,11 @@ export default function Messages() {
       {threads && !threads.length ? (
         <View style={styles.empty}>
           <Icon name="mail" color={Colors.sky} size={34} />
-          <Text style={styles.emptyTitle}>No Messages Yet</Text>
+          <Text style={styles.emptyTitle}>{tr('No Messages Yet')}</Text>
           <ThemedText type="small" themeColor="textSecondary" style={{ textAlign: 'center', maxWidth: 320 }}>
-            Switch on Out Riding to see who’s out near you, then tap a rider to message them.
+            {tr('Switch on Out Riding to see who’s out near you, then tap a rider to message them.')}
           </ThemedText>
-          <Button title="Open Out Riding" onPress={() => router.push('/out-riding')} />
+          <Button title={tr('Open Out Riding')} onPress={() => router.push('/out-riding')} />
         </View>
       ) : null}
 
@@ -80,7 +80,7 @@ export default function Messages() {
               <Pressable
                 key={t.thread_id}
                 accessibilityRole="button"
-                accessibilityLabel={`${t.other_name}${unread ? `, ${unread}` : ''}${t.muted ? ', muted' : ''}`}
+                accessibilityLabel={`${t.other_name}${unread ? `, ${unread}` : ''}${t.muted ? tr(', muted') : ''}`}
                 onPress={() => router.push(`/messages/${t.other_id}`)}
                 style={({ pressed }) => [styles.row, i > 0 && styles.rule, pressed && { backgroundColor: Colors.backgroundSelected }]}>
                 <RiderDot userId={t.other_id} name={t.other_name} size={42} />
@@ -91,7 +91,7 @@ export default function Messages() {
                   </View>
                   <View style={styles.top}>
                     <Text style={[styles.preview, unread ? { color: Colors.text } : null]} numberOfLines={1}>{dmPreview(t, me)}</Text>
-                    {unread ? <Text style={styles.unread}>{unread}</Text> : t.muted ? <Text style={styles.time}>Muted</Text> : null}
+                    {unread ? <Text style={styles.unread}>{unread}</Text> : t.muted ? <Text style={styles.time}>{tr('Muted')}</Text> : null}
                   </View>
                 </View>
               </Pressable>

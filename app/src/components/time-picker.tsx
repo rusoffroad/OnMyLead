@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { clockParts, fromClockParts, minutesLabel, minutesText, parseTime } from '@/core/time';
 
+import { t } from '@/lib/i18n';
 const HOURS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 /** Wide enough for all twelve hours (or minutes) in one row: tablets and the website. */
@@ -48,7 +49,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
 
   // Anything a tile sets starts from the time shown, or from the suggestion when nothing is set yet.
   const base = parts ?? clockParts(suggest);
-  const shown = minutes == null ? 'Not Set' : minutesLabel(minutes);
+  const shown = minutes == null ? t('Not Set') : minutesLabel(minutes);
   const tileBasis = wide ? '7%' : '14%';
 
   return (
@@ -56,7 +57,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
       <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{label}</ThemedText>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${label}: ${shown}. ${open ? 'Done picking' : minutes == null ? 'Add a time' : 'Change the time'}`}
+        accessibilityLabel={`${label}: ${shown}. ${open ? t('Done picking') : minutes == null ? t('Add a time') : t('Change the time')}`}
         accessibilityState={{ expanded: open }}
         onPress={toggle}
         style={({ pressed }) => [styles.picked, { borderColor: open ? Colors.accent : Colors.border, opacity: pressed ? 0.85 : 1 }]}>
@@ -70,20 +71,20 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
         </View>
         <View style={styles.sideButton}>
           <Icon name="clock" size={20} color={open ? Colors.accent : Colors.text} />
-          <ThemedText type="smallBold">{open ? 'Done' : minutes == null ? 'Add' : 'Change'}</ThemedText>
+          <ThemedText type="smallBold">{open ? t('Done') : minutes == null ? t('Add') : t('Change')}</ThemedText>
         </View>
       </Pressable>
 
       {open ? (
         <View style={styles.panel} onLayout={(e) => setWide(e.nativeEvent.layout.width >= ONE_ROW_WIDTH)}>
-          <View style={styles.segment} accessibilityRole="radiogroup" accessibilityLabel={`${label}, morning or afternoon`}>
+          <View style={styles.segment} accessibilityRole="radiogroup" accessibilityLabel={t('{label}, morning or afternoon', { label })}>
             {[false, true].map((pm) => {
               const on = base.pm === pm && parts != null;
               return (
                 <Pressable
                   key={pm ? 'pm' : 'am'}
                   accessibilityRole="radio"
-                  accessibilityLabel={pm ? 'PM, afternoon and evening' : 'AM, morning'}
+                  accessibilityLabel={pm ? t('PM, afternoon and evening') : t('AM, morning')}
                   accessibilityState={{ selected: on }}
                   onPress={() => set(base.hour, base.minute, pm)}
                   style={({ pressed }) => [styles.segmentButton, on && styles.on, { opacity: pressed ? 0.85 : 1 }]}>
@@ -93,7 +94,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
             })}
           </View>
 
-          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>Hour</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{t('Hour')}</ThemedText>
           <View style={styles.grid} accessibilityRole="radiogroup" accessibilityLabel={`${label}, hour`}>
             {HOURS.map((h) => {
               const on = parts?.hour === h;
@@ -111,7 +112,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
             })}
           </View>
 
-          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>Minute</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{t('Minute')}</ThemedText>
           <View style={styles.grid} accessibilityRole="radiogroup" accessibilityLabel={`${label}, minute`}>
             {MINUTES.map((m) => {
               const on = parts?.minute === m;
@@ -119,7 +120,7 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
                 <Pressable
                   key={m}
                   accessibilityRole="radio"
-                  accessibilityLabel={`${m} minutes past`}
+                  accessibilityLabel={t('{m} minutes past', { m })}
                   accessibilityState={{ selected: on }}
                   onPress={() => set(base.hour, m, base.pm)}
                   style={({ pressed }) => [styles.tile, { flexBasis: tileBasis }, on && styles.onMinute, { opacity: pressed ? 0.85 : 1 }]}>
@@ -134,14 +135,14 @@ export function TimePicker({ label, value, onChange, optional, suggest = 8 * 60,
           {optional ? (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={`Clear ${label}`}
+              accessibilityLabel={t('Clear {label}', { label })}
               onPress={() => {
                 onChange('');
                 setOpen(false);
               }}
               hitSlop={8}
               style={({ pressed }) => [styles.clear, { opacity: pressed ? 0.7 : 1 }]}>
-              <ThemedText type="smallBold" themeColor="textSecondary">Clear</ThemedText>
+              <ThemedText type="smallBold" themeColor="textSecondary">{t('Clear')}</ThemedText>
             </Pressable>
           ) : null}
         </View>

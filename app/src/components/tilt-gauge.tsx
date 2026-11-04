@@ -5,6 +5,7 @@ import Svg, { Circle, G, Line, Path, Rect } from 'react-native-svg';
 import { Colors, font, Glass, RideColors, themedStyles } from '@/constants/theme';
 import { CAUTION_SHARE, degrees, pitchSide, rollSide, tiltLevel, type TiltLevel } from '@/core/tilt';
 
+import { t } from '@/lib/i18n';
 /** Level colors: the same green, amber and red the Ride Bubble uses, so riders already know them. */
 // Getters, so the colours follow the theme and Color Blind Mode.
 export const LEVEL_INK: Record<TiltLevel, string> = {
@@ -104,7 +105,7 @@ export const TiltDial = memo(function TiltDial({
   const needle = polar(shown, R + 2);
   const caution = limit * CAUTION_SHARE;
   const side = angle == null ? '' : axis === 'roll' ? rollSide(a) : pitchSide(a);
-  const label = axis === 'roll' ? 'Roll' : 'Pitch';
+  const label = axis === 'roll' ? t('Roll') : t('Pitch');
   const [lo, hi] = axis === 'roll' ? ['Left', 'Right'] : ['Down', 'Up'];
   const height = (width * 132) / 200;
   // The reading scales with the dial, so two dials fit on a phone screen.
@@ -114,7 +115,7 @@ export const TiltDial = memo(function TiltDial({
       style={styles.dial}
       accessible
       accessibilityRole="text"
-      accessibilityLabel={angle == null ? `${label}, no reading yet` : `${label} ${degrees(a)} degrees ${side}`.trim()}>
+      accessibilityLabel={angle == null ? t('{label}, no reading yet', { label }) : `${label} ${degrees(a)} degrees ${side}`.trim()}>
       <Svg width={width} height={height} viewBox="0 0 200 132">
         {/* Scale: ticks every 5°, longer every 15°. */}
         {Array.from({ length: (SCALE * 2) / 5 + 1 }, (_, i) => {
@@ -146,8 +147,8 @@ export const TiltDial = memo(function TiltDial({
         <Text style={styles.side}>{side || 'Level'}</Text>
       </View>
       <View style={styles.maxRow}>
-        <Text style={styles.max}>Max {lo} {Math.round(max[0])}°</Text>
-        <Text style={styles.max}>Max {hi} {Math.round(max[1])}°</Text>
+        <Text style={styles.max}>{t('Max {lo} {v}°', { lo, v: Math.round(max[0]) })}</Text>
+        <Text style={styles.max}>{t('Max {hi} {v}°', { hi, v: Math.round(max[1]) })}</Text>
       </View>
     </View>
   );

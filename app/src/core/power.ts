@@ -1,3 +1,5 @@
+import { coreLocale, tc } from './i18n';
+
 /** Starlink power budget: how long a battery runs the dish and whether solar keeps up. Pure, no I/O. */
 
 export type DishModel = 'mini' | 'standard' | 'standard_actuated' | 'high_performance' | 'flat_high_performance' | 'other';
@@ -96,24 +98,24 @@ export function powerBudget(input: PowerInput): PowerBudget {
 }
 
 export function formatHours(h: number): string {
-  if (!Number.isFinite(h)) return 'No limit';
+  if (!Number.isFinite(h)) return tc('No limit');
   const total = Math.round(h * 60);
   const hh = Math.floor(total / 60);
   const mm = total % 60;
   if (!hh) return `${mm} min`;
-  return mm ? `${hh} h ${mm} min` : `${hh} h`;
+  return mm ? tc('{hh} h {mm} min', { hh, mm }) : `${hh} h`;
 }
 
-export const formatWh = (wh: number) => `${Math.round(wh).toLocaleString('en-US')} Wh`;
+export const formatWh = (wh: number) => `${Math.round(wh).toLocaleString(coreLocale())} Wh`;
 
 /** One plain sentence about the budget. */
 export function budgetSummary(b: PowerBudget, hoursPerDay: number): string {
-  if (b.dailyUseWh === 0) return 'Enter the dish watts and hours per day to see your budget.';
-  if (b.usableWh === 0 && b.dailySolarWh === 0) return `The dish needs about ${formatWh(b.dailyUseWh)} a day. Add your battery or solar to see how long it lasts.`;
-  if (b.daysOfPower == null) return `Solar keeps up: about ${formatWh(b.dailyBalanceWh)} to spare each day at ${hoursPerDay} h a day.`;
-  if (b.usableWh === 0) return `Solar covers ${Math.round((b.dailySolarWh / b.dailyUseWh) * 100)}% of the dish's daily use. Add a battery to store it.`;
+  if (b.dailyUseWh === 0) return tc('Enter the dish watts and hours per day to see your budget.');
+  if (b.usableWh === 0 && b.dailySolarWh === 0) return tc('The dish needs about {v} a day. Add your battery or solar to see how long it lasts.', { v: formatWh(b.dailyUseWh) });
+  if (b.daysOfPower == null) return tc('Solar keeps up: about {v} to spare each day at {hoursPerDay} h a day.', { v: formatWh(b.dailyBalanceWh), hoursPerDay });
+  if (b.usableWh === 0) return tc('Solar covers {v}% of the dish\'s daily use. Add a battery to store it.', { v: Math.round((b.dailySolarWh / b.dailyUseWh) * 100) });
   const days = b.daysOfPower;
   return days < 1
-    ? `At ${hoursPerDay} h a day the battery runs out on day one, after about ${formatHours(b.runtimeHours)} of use.`
-    : `At ${hoursPerDay} h a day the battery lasts about ${days >= 10 ? Math.round(days) : days.toFixed(1).replace(/\.0$/, '')} days.`;
+    ? tc('At {hoursPerDay} h a day the battery runs out on day one, after about {v} of use.', { hoursPerDay, v: formatHours(b.runtimeHours) })
+    : tc('At {hoursPerDay} h a day the battery lasts about {v} days.', { hoursPerDay, v: days >= 10 ? Math.round(days) : days.toFixed(1).replace(/\.0$/, '') });
 }

@@ -11,6 +11,7 @@ import {
 import type { ChatMessage } from '@/core/chat';
 import { ProTag } from './pro-tag';
 
+import { t as tr } from '@/lib/i18n';
 /**
  * A quick poll in the ride chat. Each choice is one big tap target with a bar showing its
  * share of the votes, so the answer reads at a glance; tapping another choice moves the vote.
@@ -29,7 +30,7 @@ export function PollCard({
 
   return (
     <View style={{ gap: Spacing.two }} accessibilityRole="radiogroup" accessibilityLabel={`Poll: ${message.body}`}>
-      <Text style={styles.question}>{message.body}</Text>
+      <Text style={styles.question}>{tr(message.body)}</Text>
       {choices.map((label, i) => {
         const mine = tally.mine === i;
         const leading = tally.total > 0 && tally.counts[i] === lead;
@@ -39,7 +40,7 @@ export function PollCard({
             onPress={() => !mine && me && onVote(i)}
             accessibilityRole="radio"
             accessibilityState={{ selected: mine }}
-            accessibilityLabel={`${label}, ${tally.counts[i]} ${tally.counts[i] === 1 ? 'vote' : 'votes'}${mine ? ', your vote' : ''}`}
+            accessibilityLabel={`${label}, ${tally.counts[i]} ${tally.counts[i] === 1 ? 'vote' : 'votes'}${mine ? tr(', your vote') : ''}`}
             style={({ pressed }) => [styles.choice, mine && styles.choiceMine, pressed && { opacity: 0.85 }]}>
             <View
               style={[
@@ -50,14 +51,14 @@ export function PollCard({
             <Text style={[styles.choiceText, mine && { fontFamily: font(700) }]} numberOfLines={2}>
               {label}
             </Text>
-            {mine ? <Text style={styles.yours}>Your Vote</Text> : null}
+            {mine ? <Text style={styles.yours}>{tr('Your Vote')}</Text> : null}
             <Text style={styles.count}>{tally.counts[i]}</Text>
           </Pressable>
         );
       })}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <ThemedText type="small" themeColor="textSecondary">
-          {voteCountLabel(tally.total)}. {tally.mine == null ? 'Tap a choice to vote.' : 'Tap another choice to change your vote.'}
+          {voteCountLabel(tally.total)}. {tally.mine == null ? tr('Tap a choice to vote.') : tr('Tap another choice to change your vote.')}
         </ThemedText>
         <ProTag feature="vote_polls" />
       </View>
@@ -97,7 +98,7 @@ export function PollComposer({
   if (!pollsOn) {
     return (
       <ThemedText type="small" themeColor="textSecondary">
-        Polls aren’t switched on yet. They will be after the next server update.
+        {tr('Polls aren’t switched on yet. They will be after the next server update.')}
       </ThemedText>
     );
   }
@@ -114,35 +115,35 @@ export function PollComposer({
               setError(null);
             }}
             accessibilityRole="button"
-            accessibilityLabel={`Start with ${s.question}`}
+            accessibilityLabel={tr('Start with {question}', { question: s.question })}
             style={({ pressed }) => [styles.starter, pressed && { opacity: 0.8 }]}>
             <Text style={styles.starterText}>{s.question}</Text>
           </Pressable>
         ))}
       </View>
-      <Field label="Question" value={question} onChangeText={setQuestion} placeholder="Lunch stop?" maxLength={MAX_POLL_QUESTION} />
+      <Field label={tr('Question')} value={question} onChangeText={setQuestion} placeholder={tr('Lunch stop?')} maxLength={MAX_POLL_QUESTION} />
       {choices.map((c, i) => (
         <View key={i} style={{ flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.two }}>
           <View style={{ flex: 1 }}>
-            <Field label={`Choice ${i + 1}`} value={c} onChangeText={(t) => setChoice(i, t)} maxLength={MAX_POLL_CHOICE} />
+            <Field label={tr('Choice {v}', { v: i + 1 })} value={c} onChangeText={(t) => setChoice(i, t)} maxLength={MAX_POLL_CHOICE} />
           </View>
           {choices.length > MIN_POLL_CHOICES ? (
             <Pressable
               onPress={() => setChoices((prev) => prev.filter((_, j) => j !== i))}
               accessibilityRole="button"
-              accessibilityLabel={`Remove Choice ${i + 1}`}
+              accessibilityLabel={tr('Remove Choice {v}', { v: i + 1 })}
               hitSlop={8}
               style={styles.remove}>
-              <Text style={styles.removeText}>Remove</Text>
+              <Text style={styles.removeText}>{tr('Remove')}</Text>
             </Pressable>
           ) : null}
         </View>
       ))}
       {choices.length < MAX_POLL_CHOICES ? (
-        <Button title="Add Choice" kind="secondary" onPress={() => setChoices((prev) => [...prev, ''])} />
+        <Button title={tr('Add Choice')} kind="secondary" onPress={() => setChoices((prev) => [...prev, ''])} />
       ) : null}
       {error ? <ThemedText style={{ color: Colors.danger, fontWeight: 600 }}>{error}</ThemedText> : null}
-      <Button title="Post Poll" loading={busy} onPress={post} />
+      <Button title={tr('Post Poll')} loading={busy} onPress={post} />
     </View>
   );
 }
