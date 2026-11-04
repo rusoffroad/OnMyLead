@@ -58,7 +58,9 @@ Deno.serve(async (req) => {
       .order('received_at', { ascending: false }).limit(1).maybeSingle();
     const asked = Date.parse(reserved?.payload?.to ?? '');
     const from = Date.parse(reserved?.payload?.from ?? '');
-    if (Number.isFinite(asked) && Math.abs(current - asked) < DAY) return await confirm(user.id, target.purchase_token, from, current);
+    if (Number.isFinite(asked) && Number.isFinite(from) && Math.abs(current - asked) < DAY) {
+      return await confirm(user.id, target.purchase_token, from, current);
+    }
   } else {
     const { error: reserveError } = await db.rpc('referral_reserve_deferral', { p_user: user.id });
     if (reserveError) {
@@ -66,11 +68,18 @@ Deno.serve(async (req) => {
       return json({ error: 'retry' }, 503);
     }
   }
-  await db.from('play_events').insert({
+  const { error: noteError } = await db.from('play_events').insert({
     type: 'REFERRAL_DEFER_RESERVED',
     purchase_token: target.purchase_token,
     payload: { user_id: user.id, from: new Date(current).toISOString(), to: new Date(current + days * DAY).toISOString() },
   });
+  if (noteError) {
+    // Without the note a lost answer couldn't be settled later, so don't ask Google yet.
+    console.error('reservation note failed', noteError.message);
+    const { error: undoError } = await db.rpc('referral_unmark_deferred', { p_user: user.id });
+    if (undoError) console.error('referral_unmark_deferred failed', undoError.message);
+    return json({ error: 'retry' }, 503);
+  }
   let next: number;
   try {
     next = await deferSubscription(target.product_id, target.purchase_token, current, current + days * DAY);

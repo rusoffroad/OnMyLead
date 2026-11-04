@@ -10,8 +10,8 @@ import { Platform } from 'react-native';
 
 import { handleProError } from '@/lib/pro';
 import {
-  fitWithin, nextQuality, parseComment, parseProfile, parseSocial, POST_PHOTO_BUCKET, POST_PHOTO_MAX, POST_PHOTO_MAX_BYTES,
-  POST_PHOTO_QUALITY, postPhotoPath, socialNotSwitchedOn, type Comment, type RiderProfile, type SocialItem,
+  fitWithin, friendlySocialError, isTransientError, nextQuality, parseComment, parseProfile, parseSocial, POST_PHOTO_BUCKET, POST_PHOTO_MAX,
+  POST_PHOTO_MAX_BYTES, POST_PHOTO_QUALITY, postPhotoPath, socialNotSwitchedOn, type Comment, type RiderProfile, type SocialItem,
 } from '@/core/social';
 import { track } from './analytics';
 import { readPhotoBytes } from './photo-bytes';
@@ -35,29 +35,38 @@ function check(res: Res): unknown {
 /** Thrown after the Pro prompt has opened, so screens can stop without showing an error. */
 export class ProNeededError extends Error {}
 
-function friendly(message: string): string {
-  const m = message.replace(/^[A-Z0-9]+: /, '');
-  return m ? m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.') : tc('Something went wrong. Try again.');
+const friendly = (message: string) => friendlySocialError(message, tc);
+
+/**
+ * A read, tried once more after a moment when the first try never got an answer (no signal for
+ * a second, or iOS cancelling the request as the app came to the front), so a comment opened
+ * from a notification doesn't show an error for a request that would have worked.
+ */
+async function read(name: string, args: Record<string, unknown>): Promise<Res> {
+  const first = (await supabase.rpc(name, args)) as Res;
+  if (!first.error || !isTransientError(first.error.message)) return first;
+  await new Promise((r) => setTimeout(r, 600));
+  return (await supabase.rpc(name, args)) as Res;
 }
 
 export async function socialFeed(limit = 30, before?: string | null): Promise<SocialItem[]> {
-  return parseSocial(check(await supabase.rpc('social_feed', { p_limit: limit, p_before: before ?? null })), supabaseUrl);
+  return parseSocial(check(await read('social_feed', { p_limit: limit, p_before: before ?? null })), supabaseUrl);
 }
 
 export async function riderTimeline(userId: string, limit = 30, before?: string | null): Promise<SocialItem[]> {
-  return parseSocial(check(await supabase.rpc('rider_timeline', { p_user: userId, p_limit: limit, p_before: before ?? null })), supabaseUrl);
+  return parseSocial(check(await read('rider_timeline', { p_user: userId, p_limit: limit, p_before: before ?? null })), supabaseUrl);
 }
 
 export async function feedItem(key: string): Promise<SocialItem | null> {
-  return parseSocial(check(await supabase.rpc('feed_item', { p_key: key })), supabaseUrl)[0] ?? null;
+  return parseSocial(check(await read('feed_item', { p_key: key })), supabaseUrl)[0] ?? null;
 }
 
 export async function itemComments(key: string): Promise<Comment[]> {
-  return parseComment(check(await supabase.rpc('feed_item_comments', { p_key: key })));
+  return parseComment(check(await read('feed_item_comments', { p_key: key })));
 }
 
 export async function itemLikers(key: string): Promise<{ userId: string; name: string }[]> {
-  const rows = check(await supabase.rpc('feed_item_likes', { p_key: key }));
+  const rows = check(await read('feed_item_likes', { p_key: key }));
   return Array.isArray(rows)
     ? rows.filter((r) => r && typeof r.user_id === 'string').map((r) => ({ userId: r.user_id as string, name: (typeof r.name === 'string' && r.name) || tc('Rider') }))
     : [];

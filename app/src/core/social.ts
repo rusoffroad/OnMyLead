@@ -336,3 +336,21 @@ export function socialNotSwitchedOn(message: string | null | undefined, code?: s
     || (/social_feed|rider_timeline|feed_item|set_feed_like|add_feed_comment|create_rider_post|rider_profile/.test(message ?? '')
       && /does not exist|could not find|schema cache/i.test(message ?? ''));
 }
+
+/**
+ * A request that never got an answer: no signal, or iOS cancelled it (the app was sent to the
+ * background mid-request, or the network changed: "fetch failed: UnexpectedException: cancelled").
+ * Worth one quiet retry, and never worth showing as it is.
+ */
+export function isTransientError(message: string | null | undefined): boolean {
+  return /network request failed|failed to fetch|fetch failed|network error|cancelled|timed? ?out|load failed/i.test(message ?? '');
+}
+
+/** What a Social screen says when a call fails: never a raw exception. */
+export function friendlySocialError(message: string | null | undefined, tc: (s: string) => string = (s) => s): string {
+  if (isTransientError(message)) return tc('No signal. Check your connection and tap Retry.');
+  const m = (message ?? '').replace(/^[A-Z0-9]+: /, '');
+  // Technical text (a native exception, a stack location) is not for riders.
+  if (!m || /exception|\.swift|\.kt|\bat \w+\//i.test(m)) return tc('Something went wrong. Try again.');
+  return m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.');
+}

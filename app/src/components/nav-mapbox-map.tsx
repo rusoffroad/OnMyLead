@@ -105,10 +105,15 @@ export function NavMapboxMap({
       return;
     }
     if (!followCamShouldMove(followed.current, followMe)) return;
-    const first = !followed.current;
-    followed.current = followMe;
-    if (first) cam.start(followMe, inset);
-    else void cam.step({ ...followMe, ...own.current }, inset, FOLLOW_MS);
+    if (!followed.current) {
+      followed.current = followMe;
+      cam.start(followMe, inset);
+      return;
+    }
+    // Only a fix the camera used counts as followed (a step still running skips this one).
+    void cam.step({ ...followMe, ...own.current }, inset, FOLLOW_MS).then((took) => {
+      if (took && followed.current) followed.current = followMe;
+    });
     // Only when the followed spot moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [followMe]);

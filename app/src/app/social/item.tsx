@@ -11,6 +11,7 @@ import { faceColor, Initial } from '@/components/home/parts';
 import { ProTag, Social } from '@/components/social/parts';
 import { SocialCard } from '@/components/social/social-card';
 import { Colors, font, scrollIndicator, themedStyles } from '@/constants/theme';
+import { Button } from '@/components/ui';
 import { can } from '@/core/entitlements';
 import { timeAgo } from '@/core/feed';
 import { COMMENT_MAX, isItemKey, likesLine, profileHref, SOCIAL_NOT_SWITCHED_ON, type Comment, type SocialItem } from '@/core/social';
@@ -127,7 +128,10 @@ export default function SocialItemScreen() {
           <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={styles.body} {...keyboardScroll} indicatorStyle={scrollIndicator()}>
             {off ? <Text style={styles.muted}>{SOCIAL_NOT_SWITCHED_ON}</Text> : null}
             {item === null && !off ? (
-              <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
+              <>
+                <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
+                {error ? <Button title={t('Retry')} kind="secondary" onPress={() => { setError(null); void load(); }} /> : null}
+              </>
             ) : null}
             {item ? (
               <>
