@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   agendaByDay, agendaKindLabel, agendaKindTone, agendaTime, cardPlace, dateBlock, eventDates, eventDays, eventLink, eventPayload,
-  eventPhase, eventPhotoPath, eventPhotoUrl, fitWithin, friendlyEventError, nextRsvp, pickablePeople, rsvpLine, sortCards,
+  eventPhase, eventPhotoPath, eventPhotoUrl, fitWithin, friendlyEventError, isRusOffroad, nextRsvp, pickablePeople, presenterLabel, rsvpLine, sortCards,
   EVENT_OR_RIDE, EVENTS_NOT_SWITCHED_ON, type AgendaItem, type EventCard, type EventForm,
 } from '../events';
 
@@ -152,5 +152,22 @@ describe('event or public ride explainer', () => {
       expect(t.length).toBeLessThan(200);
       expect(t).not.toMatch(/—/);
     }
+  });
+});
+
+describe('presented by', () => {
+  it('labels a sponsored event and stays quiet otherwise', () => {
+    expect(presenterLabel('RUS Offroad')).toBe('Presented by RUS Offroad');
+    expect(presenterLabel('  Moab Powersports ')).toBe('Presented by Moab Powersports');
+    expect(presenterLabel('')).toBeNull();
+    expect(presenterLabel(null)).toBeNull();
+    expect(presenterLabel(undefined)).toBeNull();
+  });
+  it('knows when RUS Offroad is the presenter', () => {
+    expect(isRusOffroad('RUS Offroad')).toBe(true);
+    expect(isRusOffroad('rus offroad llc')).toBe(true);
+    expect(isRusOffroad('RUS Off Road')).toBe(true);
+    expect(isRusOffroad('Rusty Offroad')).toBe(false);
+    expect(isRusOffroad(null)).toBe(false);
   });
 });

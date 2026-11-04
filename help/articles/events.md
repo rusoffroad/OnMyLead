@@ -6,6 +6,7 @@ order: 60
 release: "2.0"
 updated: 2026-11-04
 sources:
+  - supabase/migrations/20261104130000_event_presenter.sql
   - app/src/app/events/index.tsx
   - app/src/app/events/new.tsx
   - app/src/components/events/event-or-ride.tsx
@@ -18,7 +19,7 @@ sources:
   - app/src/lib/events.ts
   - supabase/migrations/20261102950000_events.sql
 related: [home-screen, join-a-ride, create-a-ride, organizer-controls, free-vs-pro, report-and-block]
-keywords: [event or public ride, difference, event vs ride, event, events, rally, poker run, concert, raffle, show, meetup, ride weekend, agenda, schedule, co-host, ride manager, going, interested, rsvp, event link]
+keywords: [presented by, sponsor, sponsored event, event or public ride, difference, event vs ride, event, events, rally, poker run, concert, raffle, show, meetup, ride weekend, agenda, schedule, co-host, ride manager, going, interested, rsvp, event link]
 ---
 
 Events are the big days: a rally, a poker run, a club weekend or a meetup. An event has its dates, a place, photos, an **Agenda** of what's happening and when (group rides, poker runs, concerts, raffles, shows, food), and the **Group Rides** you can join. Anyone can see events. Pro riders create them.
@@ -53,6 +54,12 @@ Event links look like **onmylead.com/e/** followed by a code. Anyone can open on
 - **Group Rides** lists the event's rides, with their label (like **Day 1: Easy Group**), time, area, how many are going and the **Ride Manager**. Tap **See Ride and Join** to open the ride and join it as usual. A private ride shows **Invite Only: Ask a Host** unless you're already on it.
 
 A ride that's part of an event shows **Part of** and the event's name at the top of its page.
+
+:::release 2.1
+## Presented By
+
+Some events are presented (sponsored) by a company. Those show **Presented by** and the name in gold on their card in Events and near the top of their page. When RUS Offroad presents an event, the page also has **Shop RUS Offroad**, which opens the RUS Offroad store. Hosts can't add this themselves: the OnMyLead team sets it for a sponsor. Interested in presenting an event? Use Contact Us.
+:::
 
 ## Create an Event (Pro)
 

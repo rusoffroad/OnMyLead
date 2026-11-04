@@ -2,6 +2,16 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "events"
+    ],
+    "kind": "add",
+    "by": "pr",
+    "ref": "event-presenter",
+    "why": "Presented By events (2.1): the owner marks an event as presented by RUS Offroad (or another sponsor) from Admin > Events, and riders see it in gold on the event's card and page, with Shop RUS Offroad on the page. New Presented By section, published with 2.1."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "sign-in"
     ],
     "kind": "change",
