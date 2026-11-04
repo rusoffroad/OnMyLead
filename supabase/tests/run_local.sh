@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the migrations, then the privacy, approval and ride limit, riding group, group chat, Pro, report, admin analytics, admin, clear/resolve, waypoint, planned stop, waypoint symbol, status button, block, social profile, contact form, Help Center, Google Play Billing, admin growth, store reviews, release controls, badge, Out Riding, Navigation Mode trail, custom share code, profile photo, notification inbox, ride miles, home feed, rider agreement, abuse report, social, event, trail width, Brand Ambassador, referral, account sync and Pro tier and badge leaderboard Bluetooth Sharing, Bluetooth mesh, Edit Ride Details and event presenter and waypoint alert tests, against a throwaway local Postgres database.
+# Runs the migrations, then the privacy, approval and ride limit, riding group, group chat, Pro, report, admin analytics, admin, clear/resolve, waypoint, planned stop, waypoint symbol, status button, block, social profile, contact form, Help Center, Google Play Billing, admin growth, store reviews, release controls, badge, Out Riding, Navigation Mode trail, Park Trails, custom share code, profile photo, notification inbox, ride miles, home feed, rider agreement, abuse report, social, event, trail width, Brand Ambassador, referral, account sync and Pro tier and badge leaderboard Bluetooth Sharing, Bluetooth mesh, Edit Ride Details and event presenter and waypoint alert tests, against a throwaway local Postgres database.
 # Usage: PGHOST=... PGPORT=... PGUSER=postgres ./supabase/tests/run_local.sh
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -33,6 +33,7 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/out_riding_test.sql" \
   -f "$here/friends_test.sql" \
   -f "$here/nav_trails_test.sql" \
+  -f "$here/park_trails_test.sql" \
   -f "$here/share_codes_test.sql" \
   -f "$here/profile_photos_test.sql" \
   -f "$here/notification_inbox_test.sql" \

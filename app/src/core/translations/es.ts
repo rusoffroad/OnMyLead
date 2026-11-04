@@ -3034,6 +3034,20 @@ const dict: Record<string, string> = {
   '3D Terrain': 'Terreno 3D',
   'Lays the map flat again': 'Vuelve a poner el mapa plano',
   'Tilts the map and raises the mountains': 'Inclina el mapa y eleva las montañas',
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "Senderos de parques",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "Los senderos de los parques todoterreno, con los niveles del propio parque (1 el más fácil, 5 el más difícil) cuando los califica. De OpenStreetMap; revisa el mapa oficial del parque.",
+  "Park Road": "Camino del parque",
+  "Park Trail": "Sendero del parque",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "Los niveles son las calificaciones del propio parque tal como están en OpenStreetMap ({credit}). Los senderos cambian tras tormentas y jornadas de trabajo, así que revisa el mapa oficial del parque.",
+  "Level {n} of 5": "Nivel {n} de 5",
+  "{n} m": "{n} m",
+  "{n} km": "{n} km",
+  "{n} ft": "{n} pies",
+  "{n} trails · {len}": "{n} senderos · {len}",
+  "Park Trails on Maps": "Senderos de parques en los mapas",
+  "Showing the trails of offroad parks, colored by the park’s level": "Muestra los senderos de los parques todoterreno, coloreados según el nivel del parque",
+  "Hidden. Offroad park trails stay off every map": "Ocultos. Los senderos de parques no aparecen en ningún mapa",
 };
 
 export default dict;

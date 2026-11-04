@@ -3034,6 +3034,20 @@ const dict: Record<string, string> = {
   '3D Terrain': 'Terrain 3D',
   'Lays the map flat again': 'Remet la carte à plat',
   'Tilts the map and raises the mountains': 'Incline la carte et fait ressortir les montagnes',
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "Pistes des parcs",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "Les pistes des parcs tout-terrain, avec les niveaux du parc (1 le plus facile à 5 le plus dur) quand il les note. Issu d’OpenStreetMap ; vérifiez la carte officielle du parc.",
+  "Park Road": "Route du parc",
+  "Park Trail": "Piste du parc",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "Les niveaux sont les notes du parc telles que cartographiées dans OpenStreetMap ({credit}). Les pistes changent après les orages et les journées de travaux : vérifiez la carte officielle du parc.",
+  "Level {n} of 5": "Niveau {n} sur 5",
+  "{n} m": "{n} m",
+  "{n} km": "{n} km",
+  "{n} ft": "{n} pi",
+  "{n} trails · {len}": "{n} pistes · {len}",
+  "Park Trails on Maps": "Pistes des parcs sur les cartes",
+  "Showing the trails of offroad parks, colored by the park’s level": "Affiche les pistes des parcs tout-terrain, colorées selon le niveau du parc",
+  "Hidden. Offroad park trails stay off every map": "Masquées. Les pistes des parcs n’apparaissent sur aucune carte",
 };
 
 export default dict;

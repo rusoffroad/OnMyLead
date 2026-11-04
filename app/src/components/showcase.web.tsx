@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -297,6 +297,9 @@ export function Showcase() {
               <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
               {SHOWCASE_3D_TERRAIN ? (
                 <li><b>3D Terrain.</b> One tap on the 3D button in Ride Mode and Map Mode shows satellite on the real shape of the ridges and canyons, with contour lines and peak heights in feet. Tilt and turn it, and save it in Offline Maps for no-signal riding.</li>
+              ) : null}
+              {SHOWCASE_PARK_TRAILS ? (
+                <li><b>Offroad Park Trails, New in 2.1.</b> The trails of Hidden Falls, Katemcy Rocks, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR and about fifty more parks and OHV areas, drawn on every map in the park’s own levels: green for 1 and 2, blue 3, white 4, red 5, with the park’s name from far out and trail names up close. Tap one for its level and length.</li>
               ) : null}
               <li><b>Will It Fit?</b> Tap a trail to see its width limit: 50 inch Forest Service trails, and widths riders add to any public trail. Add your machine’s width in the Garage and the card tells you if it fits.</li>
               <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>

@@ -2,6 +2,15 @@
   {
     "date": "2026-11-04",
     "slugs": [
+      "park-trails",
+      "map-layers"
+    ],
+    "kind": "feature",
+    "why": "Chris asked for the trails of as many offroad parks as possible, including Hidden Falls Adventure Park, shown to every user. The trails of 55 parks and OHV areas mapped in OpenStreetMap (3,819 lines, 1,529 miles; Hidden Falls with its level 1 to 5 ratings and closed trails) now draw on every map for everyone, colored by the park's level, with park names from far out and a Park Trails switch in the layers panel and on the You tab. Park-published maps (copyrighted) and paid trail data were not used. New article park-trails; map-layers gets a short pointer in its Rider Trails section."
+  },
+  {
+    "date": "2026-11-04",
+    "slugs": [
       "map-layers",
       "3d-terrain",
       "full-map",

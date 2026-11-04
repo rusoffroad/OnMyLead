@@ -8,6 +8,10 @@
     "google": null,
     "notes": [
       {
+        "kind": "new",
+        "text": "Offroad park trails on every map: the trails of Hidden Falls Adventure Park, Katemcy Rocks, Wolf Caves, General Sam's, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR, Sand Mountain and about fifty more parks and OHV areas, from OpenStreetMap, drawn for everyone. Where the park rates its trails, each line takes the park's level color (green 1-2, blue 3, white 4, red 5) and closed trails show as red dashes; park names sit on the map from far out with how much is mapped, trail names appear as you zoom in, and a tap shows the park, the trail's level and its length. A park you've looked at draws again with no signal. Turn Park Trails off in the layers panel or on the You tab."
+      },
+      {
         "kind": "improved",
         "text": "Every map in the app is now drawn by Mapbox: Ride Mode, Map Mode, the route builder, waypoints, Find a Ride and Offline Maps' area picker, on iPhone, iPad, Android and onmylead.com. A map looks and works the same wherever you open it, and the website's Ride Mode now shows the same live map as the phone. Free accounts get Mapbox's outdoors map with roads, trails and contours. The meeting-point map is on the phone and tablet too, a trail's page previews it on a real map, and in 3D Terrain tilting further raises the land."
       },

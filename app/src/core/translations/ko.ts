@@ -3034,6 +3034,20 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D 지형',
   'Lays the map flat again': '지도를 다시 평평하게 합니다',
   'Tilts the map and raises the mountains': '지도를 기울이고 산을 입체로 보여줍니다',
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "파크 트레일",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "오프로드 파크의 트레일입니다. 파크가 등급을 매긴 경우 파크 자체 레벨(1이 가장 쉽고 5가 가장 어려움)로 표시합니다. OpenStreetMap 자료이니 파크의 공식 지도를 확인하세요.",
+  "Park Road": "파크 도로",
+  "Park Trail": "파크 트레일",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "레벨은 OpenStreetMap({credit})에 기록된 파크 자체 등급입니다. 폭풍이나 정비 작업 후에는 트레일이 바뀌므로 파크의 공식 지도를 확인하세요.",
+  "Level {n} of 5": "레벨 {n} / 5",
+  "{n} m": "{n} m",
+  "{n} km": "{n} km",
+  "{n} ft": "{n} 피트",
+  "{n} trails · {len}": "트레일 {n}개 · {len}",
+  "Park Trails on Maps": "지도에 파크 트레일 표시",
+  "Showing the trails of offroad parks, colored by the park’s level": "오프로드 파크의 트레일을 파크 레벨별 색상으로 표시 중",
+  "Hidden. Offroad park trails stay off every map": "숨김. 파크 트레일이 어떤 지도에도 표시되지 않습니다",
 };
 
 export default dict;

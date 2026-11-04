@@ -3034,6 +3034,20 @@ const dict: Record<string, string> = {
   '3D Terrain': 'Terreno 3D',
   'Lays the map flat again': 'Deixa o mapa plano de novo',
   'Tilts the map and raises the mountains': 'Inclina o mapa e eleva as montanhas',
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "Trilhas de parques",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "As trilhas dos parques off-road, nos níveis do próprio parque (1 mais fácil a 5 mais difícil) quando ele as classifica. Do OpenStreetMap; confira o mapa oficial do parque.",
+  "Park Road": "Estrada do parque",
+  "Park Trail": "Trilha do parque",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "Os níveis são as classificações do próprio parque como mapeadas no OpenStreetMap ({credit}). As trilhas mudam após tempestades e dias de trabalho, então confira o mapa oficial do parque.",
+  "Level {n} of 5": "Nível {n} de 5",
+  "{n} m": "{n} m",
+  "{n} km": "{n} km",
+  "{n} ft": "{n} pés",
+  "{n} trails · {len}": "{n} trilhas · {len}",
+  "Park Trails on Maps": "Trilhas de parques nos mapas",
+  "Showing the trails of offroad parks, colored by the park’s level": "Mostrando as trilhas dos parques off-road, coloridas pelo nível do parque",
+  "Hidden. Offroad park trails stay off every map": "Ocultas. As trilhas de parques ficam fora de todos os mapas",
 };
 
 export default dict;

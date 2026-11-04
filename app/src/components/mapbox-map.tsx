@@ -6,6 +6,7 @@ import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
+import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
 import {
   AGENCY_TILE_SIZE, cameraPadding, fitCorners, flatLook, linesGeoJSON, lookPitch, mapboxAgencyTemplate, mapboxStyleFor, metersPerPointAt, NATIVE_TRACKS_MIN_ZOOM,
   nativeTracks, OSM_CLOSED_TRACK_FILTER, OSM_NAMED_TRACK_FILTER, OSM_OPEN_TRACK_FILTER, OSM_SOURCE_ID, OSM_TRACK_FILTER, pointsGeoJSON, regionFromCamera, SETTLE_MS,
@@ -275,7 +276,7 @@ const CLOSED_DASH = [5 / 3.2, 5 / 3.2];
  * names, and rider-mapped trails as mint dots.
  */
 const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
-  const { trails, offline, osmLines, closedLines, labels, riderTrails } = trail;
+  const { trails, offline, osmLines, closedLines, labels, riderTrails, parkTrails, parkLabels, parks } = trail;
   const native = nativeTracks(trails, offline);
   // Where Mapbox draws the tracks itself, the app's own copies stop at that zoom.
   const ownMax = native ? NATIVE_TRACKS_MIN_ZOOM : 24;
@@ -288,6 +289,9 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
   const shown = trails ? 'visible' : 'none';
   const names = useMemo(() => pointsGeoJSON(labels.map((l) => ({ key: l.key, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))), [labels]);
   const riders = useMemo(() => linesGeoJSON(riderTrails.map((t) => ({ key: t.id, points: t.points }))), [riderTrails]);
+  const parkLines = useMemo(() => linesGeoJSON(parkPieces(parkTrails).map((p) => ({ key: p.key, points: p.points, props: { color: p.color, closed: p.closed, road: p.road } }))), [parkTrails]);
+  const parkNames = useMemo(() => pointsGeoJSON(parkLabels.map((l) => ({ key: `pl-${l.key}`, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))), [parkLabels]);
+  const parkTitles = useMemo(() => pointsGeoJSON(parks.map((p) => ({ key: `park-${p.parkOsmId}`, at: p.center, props: { name: p.parkName, sub: parkSummaryLine(p) } }))), [parks]);
   return (
     <>
       {trails && !offline
@@ -336,6 +340,33 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
       <Mapbox.ShapeSource id="oml-rider-trails" shape={riders}>
         <Mapbox.LineLayer id="oml-rider-trails-case" style={{ lineColor: TRAIL_INK.casing, lineWidth: 7, lineJoin: 'round' }} />
         <Mapbox.LineLayer id="oml-rider-trails-dots" style={{ lineColor: RIDER_TRAIL_INK, lineWidth: 4, lineCap: 'round', lineDasharray: [0.25, 2] }} />
+      </Mapbox.ShapeSource>
+      <Mapbox.ShapeSource id="oml-park-trails" shape={parkLines}>
+        <Mapbox.LineLayer id="oml-park-trails-case" style={{ lineColor: TRAIL_INK.casing, lineWidth: ['case', ['get', 'road'], 5.2, 7], lineJoin: 'round' }} />
+        <Mapbox.LineLayer
+          id="oml-park-trails-line"
+          style={{ lineColor: ['get', 'color'], lineWidth: ['case', ['get', 'road'], 2.4, 4], lineJoin: 'round', lineCap: 'round', lineDasharray: ['case', ['get', 'closed'], ['literal', CLOSED_DASH], ['literal', [1, 0]]] }}
+        />
+      </Mapbox.ShapeSource>
+      <Mapbox.ShapeSource id="oml-park-names" shape={parkNames}>
+        <Mapbox.SymbolLayer
+          id="oml-park-names-text"
+          style={{
+            textField: ['get', 'name'], textSize: 12, textFont: ['DIN Pro Bold', 'Arial Unicode MS Bold'],
+            textColor: ['case', ['get', 'closed'], '#FF8A80', '#FFFFFF'], textHaloColor: 'rgba(10,22,38,0.92)', textHaloWidth: 1.6, textMaxWidth: 14,
+          }}
+        />
+      </Mapbox.ShapeSource>
+      <Mapbox.ShapeSource id="oml-park-titles" shape={parkTitles}>
+        <Mapbox.SymbolLayer
+          id="oml-park-titles-text"
+          minZoomLevel={PARK_NAMES_MIN_Z}
+          style={{
+            textField: ['format', ['get', 'name'], { 'font-scale': 1 }, '\n', {}, ['get', 'sub'], { 'font-scale': 0.8 }],
+            textSize: 14, textFont: ['DIN Pro Bold', 'Arial Unicode MS Bold'], textJustify: 'center', textMaxWidth: 12,
+            textColor: '#FFFFFF', textHaloColor: 'rgba(10,22,38,0.95)', textHaloWidth: 2, textAllowOverlap: false,
+          }}
+        />
       </Mapbox.ShapeSource>
       <Mapbox.ShapeSource id="oml-trail-names" shape={names}>
         <Mapbox.SymbolLayer

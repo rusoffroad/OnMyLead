@@ -5,6 +5,7 @@ import { Marker, Polyline, UrlTile, WMSTile } from 'react-native-maps';
 import { IMAGERY_MAX_NATIVE_Z, USGS_IMAGERY } from '@/core/offline-maps';
 import { font } from '@/constants/theme';
 import { RIDER_TRAIL_INK, type PublicTrail } from '@/core/nav-trails';
+import { parkPieces, parkSummaryLine, type ParkPiece, type ParkSummary, type ParkTrail } from '@/core/park-trails';
 import type { OsmTrail, TrailLabel } from '@/core/osm-trails';
 import {
   TOPO_MAX_NATIVE_Z, TRAIL_INK, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate, USGS_TOPO, type BaseMap, type ClosedLine,
@@ -66,6 +67,9 @@ export function TrailTiles({ trail, base = trail.base }: { trail: TrailMap; base
       {trails && trail.closedLines.length ? <ClosedLines lines={trail.closedLines} /> : null}
       {trails && trail.labels.length ? <Labels labels={trail.labels} /> : null}
       {trail.riderTrails.length ? <RiderLines trails={trail.riderTrails} /> : null}
+      {trail.parkTrails.length ? <ParkLines trails={trail.parkTrails} /> : null}
+      {trail.parkLabels.length ? <Labels labels={trail.parkLabels} /> : null}
+      {trail.parks.length ? <ParkTitles parks={trail.parks} /> : null}
     </>
   );
 }
@@ -146,6 +150,56 @@ const RiderLines = memo(function RiderLines({ trails }: { trails: PublicTrail[] 
   );
 });
 
+/** One park trail: navy casing and a solid line in the park's level color (core/park-trails). */
+const ParkLine = memo(function ParkLine({ piece }: { piece: ParkPiece }) {
+  const c = useMemo(() => coords(piece.points), [piece.points]);
+  return (
+    <>
+      <Polyline coordinates={c} strokeColor={TRAIL_INK.casing} strokeWidth={piece.road ? 5.2 : 7} zIndex={1} tappable={false} />
+      <Polyline coordinates={c} strokeColor={piece.color} strokeWidth={piece.road ? 2.4 : 4} lineDashPattern={piece.closed ? CLOSED_DASH : undefined} lineCap="round" zIndex={1} tappable={false} />
+    </>
+  );
+});
+
+/** The trails of offroad parks (hidden with Park Trails off in Map layers). */
+const ParkLines = memo(function ParkLines({ trails }: { trails: ParkTrail[] }) {
+  const pieces = useMemo(() => parkPieces(trails), [trails]);
+  return (
+    <>
+      {pieces.map((p) => (
+        <ParkLine key={p.key} piece={p} />
+      ))}
+    </>
+  );
+});
+
+/** A park's name and how much of it is mapped, from far out, so riders see where the parks are. */
+const ParkTitles = memo(function ParkTitles({ parks }: { parks: ParkSummary[] }) {
+  return (
+    <>
+      {parks.map((p) => (
+        <ParkTitle key={p.parkOsmId} park={p} />
+      ))}
+    </>
+  );
+});
+
+const ParkTitle = memo(function ParkTitle({ park }: { park: ParkSummary }) {
+  const [track, setTrack] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setTrack(false), 600);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <Marker coordinate={{ latitude: park.center.lat, longitude: park.center.lng }} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={track} tappable={false} zIndex={2} accessibilityLabel={park.parkName}>
+      <View style={styles.parkTitle}>
+        <Text style={styles.parkTitleText} numberOfLines={2}>{park.parkName}</Text>
+        <Text style={styles.parkTitleSub} numberOfLines={1}>{parkSummaryLine(park)}</Text>
+      </View>
+    </Marker>
+  );
+});
+
 const Labels = memo(function Labels({ labels }: { labels: TrailLabel[] }) {
   return (
     <>
@@ -200,6 +254,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,196,61,0.75)',
   },
   tagClosed: { borderColor: TRAIL_INK.closed },
+  parkTitle: { maxWidth: 170, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 8, backgroundColor: 'rgba(10,22,38,0.9)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', alignItems: 'center' },
+  parkTitleText: { color: '#FFFFFF', fontFamily: font(800), fontSize: 13, textAlign: 'center' },
+  parkTitleSub: { color: 'rgba(255,255,255,0.8)', fontFamily: font(600), fontSize: 11 },
   tagText: { color: '#FFFFFF', fontFamily: font(700), fontSize: 12, flexShrink: 1 },
   tagClosedText: { color: TRAIL_INK.closed, fontFamily: font(800), fontSize: 11, textTransform: 'uppercase' },
 });

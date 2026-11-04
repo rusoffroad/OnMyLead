@@ -3034,6 +3034,20 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D-рельеф',
   'Lays the map flat again': 'Снова делает карту плоской',
   'Tilts the map and raises the mountains': 'Наклоняет карту и поднимает горы',
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "Трассы парков",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "Трассы внедорожных парков с уровнями самого парка (1 — самый лёгкий, 5 — самый сложный), где он их оценивает. Из OpenStreetMap; сверяйтесь с официальной картой парка.",
+  "Park Road": "Дорога парка",
+  "Park Trail": "Трасса парка",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "Уровни — это оценки самого парка, как они нанесены в OpenStreetMap ({credit}). Трассы меняются после гроз и рабочих дней, поэтому сверяйтесь с официальной картой парка.",
+  "Level {n} of 5": "Уровень {n} из 5",
+  "{n} m": "{n} м",
+  "{n} km": "{n} км",
+  "{n} ft": "{n} футов",
+  "{n} trails · {len}": "{n} трасс · {len}",
+  "Park Trails on Maps": "Трассы парков на картах",
+  "Showing the trails of offroad parks, colored by the park’s level": "Показывает трассы внедорожных парков, окрашенные по уровню парка",
+  "Hidden. Offroad park trails stay off every map": "Скрыто. Трассы парков не показываются ни на одной карте",
 };
 
 export default dict;

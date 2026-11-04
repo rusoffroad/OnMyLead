@@ -3034,6 +3034,20 @@ const dict: Record<string, string> = {
   '3D Terrain': '3D 地形',
   'Lays the map flat again': '将地图恢复为平面',
   'Tilts the map and raises the mountains': '倾斜地图并立体显示山脉',
+  // Park Trails (offroad park trails from OpenStreetMap)
+  "Park Trails": "公园赛道",
+  "The trails of offroad parks, in the park’s own levels (1 easiest to 5 hardest) where it rates them. From OpenStreetMap; check the park’s posted map.": "越野公园的赛道，公园有评级时按公园自己的等级显示（1 最易，5 最难）。数据来自 OpenStreetMap；请核对公园的官方地图。",
+  "Park Road": "公园道路",
+  "Park Trail": "公园赛道",
+  "Levels are the park’s own ratings as mapped in OpenStreetMap ({credit}). Trails change after storms and work days, so check the park’s posted map.": "等级是公园自己的评级，按 OpenStreetMap（{credit}）中的记录显示。暴风雨和施工日之后赛道会变化，请核对公园的官方地图。",
+  "Level {n} of 5": "等级 {n}/5",
+  "{n} m": "{n} 米",
+  "{n} km": "{n} 公里",
+  "{n} ft": "{n} 英尺",
+  "{n} trails · {len}": "{n} 条赛道 · {len}",
+  "Park Trails on Maps": "在地图上显示公园赛道",
+  "Showing the trails of offroad parks, colored by the park’s level": "显示越野公园的赛道，按公园等级着色",
+  "Hidden. Offroad park trails stay off every map": "已隐藏。公园赛道不会出现在任何地图上",
 };
 
 export default dict;

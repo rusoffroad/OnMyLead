@@ -126,6 +126,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   key configured, so maps are blank on Android today).
 - Every map on Mapbox (2.1; needs the Mapbox token, Admin flag mapbox_maps): Ride Mode, Map Mode, route builder, waypoints, Find a Ride, area picker, website meeting point and a live website Ride Mode map; Standard (Free) / Satellite / Topo / 3D Terrain looks; the 2.0 Apple, Google and Leaflet maps stay as the fallback.
 - 3D Terrain (2.1, Mapbox; needs the Mapbox token): Ride Mode and Map Mode on all devices and the website's Map Mode, contours and peaks in feet, Offline Maps 3D downloads, Admin flag terrain_3d.
+- Park Trails (2.1): the trails of 55 offroad parks and OHV areas from OpenStreetMap (`core/park-trails.ts`, table `park_trails`, import `scripts/parks/import.mjs`), on every map for everyone, colored by the park's level, park names from far out, tap card, Park Trails switch; Admin > Park Trails.
 - Layers: Satellite, Topo, public Trails and roads (OpenFreeMap / OSM tiles, attribution). Trail name tags, Forest Service names and numbers, and closed trails and roads in red (FS closed roads, BLM OHV-closed routes, OSM access=no, today's FS seasonal closures); same layers and panel on the website's route builder, waypoints and Find maps (1.0.1 / next website deploy).
 - Offline maps (`/maps`, `/maps/area`): download an area or a ride's area, sizes, delete **[Pro]**;
   app only.
