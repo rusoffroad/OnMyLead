@@ -20,18 +20,13 @@ export function singleFlight(run: () => Promise<void>): () => Promise<void> {
       }
       return queued.promise;
     }
-    running = run().finally(() => {
+    // A synchronous throw from run() rejects like any other failure (the pass still starts at once).
+    running = new Promise<void>((res) => res(run())).finally(() => {
       running = null;
       // Started right here, before any other caller can get a word in, so one change is one pass.
       const next = queued;
       queued = null;
-      if (next) {
-        try {
-          start().then(next.resolve, next.reject);
-        } catch (e) {
-          next.reject(e);
-        }
-      }
+      if (next) start().then(next.resolve, next.reject);
     });
     return running;
   };

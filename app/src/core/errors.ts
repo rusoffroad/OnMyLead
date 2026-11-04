@@ -3,9 +3,9 @@
  * background mid-request, or the network changed: "fetch failed: UnexpectedException: cancelled"),
  * or React Native's fetch timed it out ("Network request timed out"). Worth one quiet retry, and
  * never worth showing as it is. "cancelled" and "timed out" count only as the fetch layer words
- * them, so a server message about a cancelled ride or a statement timeout is shown as itself.
+ * them (either spelling), so a server message about a cancelled ride or a statement timeout is shown as itself.
  */
 export function isTransientError(message: string | null | undefined): boolean {
-  return /network request (failed|timed out)|failed to fetch|fetch failed|network error|load failed|UnexpectedException: cancelled|^(the )?(request )?(cancelled|timed out)\b/i
+  return /network request (failed|timed out)|failed to fetch|fetch failed|network error|^(TypeError: )?load failed|UnexpectedException: cancell?ed|^(the )?(request )?(cancell?ed|timed out)\b/i
     .test(message ?? '');
 }

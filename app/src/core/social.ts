@@ -338,8 +338,6 @@ export function socialNotSwitchedOn(message: string | null | undefined, code?: s
       && /does not exist|could not find|schema cache/i.test(message ?? ''));
 }
 
-export { isTransientError };
-
 /** What a Social screen says when a call fails: never a raw exception. */
 export function friendlySocialError(message: string | null | undefined, tc: (s: string) => string = (s) => s): string {
   if (isTransientError(message)) return tc('No signal. Check your connection and tap Retry.');

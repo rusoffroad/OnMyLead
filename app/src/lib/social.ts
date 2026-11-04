@@ -10,7 +10,7 @@ import { Platform } from 'react-native';
 
 import { handleProError } from '@/lib/pro';
 import {
-  fitWithin, friendlySocialError, isTransientError, nextQuality, parseComment, parseProfile, parseSocial, POST_PHOTO_BUCKET, POST_PHOTO_MAX,
+  fitWithin, friendlySocialError, nextQuality, parseComment, parseProfile, parseSocial, POST_PHOTO_BUCKET, POST_PHOTO_MAX,
   POST_PHOTO_MAX_BYTES, POST_PHOTO_QUALITY, postPhotoPath, socialNotSwitchedOn, type Comment, type RiderProfile, type SocialItem,
 } from '@/core/social';
 import { track } from './analytics';
@@ -18,6 +18,7 @@ import { readPhotoBytes } from './photo-bytes';
 import { supabase, supabaseUrl } from './supabase';
 
 import { tc } from '@/core/i18n';
+import { isTransientError } from '@/core/errors';
 export class SocialOffError extends Error {}
 
 type Res = { data: unknown; error: { message: string; code?: string } | null };

@@ -1,5 +1,6 @@
 import { File, Paths } from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
+import type { ImageRef } from 'expo-image-manipulator';
 import type { RefObject } from 'react';
 import type { View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
@@ -19,17 +20,16 @@ export async function snapshotForShare(
   // react-native-view-shot hands back a bare path on iOS; expo-file-system wants a file:// address.
   const raw = captured.startsWith('file://') ? captured : `file://${captured}`;
   let saved: { uri: string };
-  let image: { release?: () => void } | null = null;
+  let image: ImageRef | null = null;
   try {
     const ctx = ImageManipulator.ImageManipulator.manipulate(raw);
     ctx.resize(opts.height ? { width: opts.width, height: opts.height } : { width: opts.width });
-    const rendered = await ctx.renderAsync();
-    image = rendered;
-    saved = await rendered.saveAsync({ compress: 1, format: ImageManipulator.SaveFormat.PNG });
+    image = await ctx.renderAsync();
+    saved = await image.saveAsync({ compress: 1, format: ImageManipulator.SaveFormat.PNG });
   } finally {
     // The rendered bitmap and the full-size capture (up to 3x the card, tens of MB) are let go
     // now, shrunk or not.
-    image?.release?.();
+    image?.release();
     discard(raw);
   }
   try {

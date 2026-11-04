@@ -46,6 +46,26 @@ describe('single flight', () => {
     expect(runs).toBe(3);
     expect(most).toBe(1);
   });
+  it('turns a throw before the first await into a failed pass, first or queued', async () => {
+    let runs = 0;
+    let release: () => void = () => {};
+    const go = singleFlight(() => {
+      runs += 1;
+      if (runs === 1) return new Promise<void>((r) => (release = r));
+      if (runs === 2) throw new Error('at once');
+      return Promise.resolve();
+    });
+    const first = go();
+    const queued = go();
+    release();
+    await first;
+    await expect(queued).rejects.toThrow('at once');
+    await expect(go()).resolves.toBeUndefined();
+    const alone = singleFlight(() => {
+      throw new Error('sync');
+    });
+    await expect(alone()).rejects.toThrow('sync');
+  });
   it('reports a failed pass to whoever asked for it, and runs again after', async () => {
     let runs = 0;
     let fail: (e: Error) => void = () => {};

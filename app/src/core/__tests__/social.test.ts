@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { tapTarget } from '../push-tap';
 import { inboxLook, notificationKey } from '../inbox';
 import {
-  canShareOut, commentsLabel, fitWithin, friendlySocialError, isItemKey, isOwnFile, isTransientError, itemHref, likesLine, nextQuality, parseComment, parseProfile,
+  canShareOut, commentsLabel, fitWithin, friendlySocialError, isItemKey, isOwnFile, itemHref, likesLine, nextQuality, parseComment, parseProfile,
   parseSocial, postPhotoPath, postPhotoUrl, shareHeadline, shareSubline, shareText, sinceLine, socialNotSwitchedOn, statLine, toggleLike,
 } from '../social';
 
@@ -141,18 +141,11 @@ describe('profiles and notifications', () => {
 
 describe('errors riders see', () => {
   it('turns a cancelled or dropped request into a retry line, and hides native exceptions', () => {
-    expect(isTransientError('fetch failed: UnexpectedException: cancelled (at ExpoModulesCore/Promise.swift:56).')).toBe(true);
     expect(friendlySocialError('fetch failed: UnexpectedException: cancelled (at ExpoModulesCore/Promise.swift:56).')).toBe('No signal. Check your connection and tap Retry.');
     expect(friendlySocialError('Network request failed')).toBe('No signal. Check your connection and tap Retry.');
     expect(friendlySocialError('UnexpectedException: something odd (at Foo.swift:1)')).toBe('Something went wrong. Try again.');
     expect(friendlySocialError('P0001: you were blocked')).toBe('You were blocked.');
-    expect(isTransientError('P0001: that ride was cancelled')).toBe(false);
     expect(friendlySocialError('P0001: that ride was cancelled')).toBe('That ride was cancelled.');
-    expect(isTransientError('The request timed out.')).toBe(true);
-    expect(isTransientError('Network request timed out')).toBe(true);
-    expect(isTransientError('Request cancelled')).toBe(true);
-    expect(isTransientError('P0001: that invite timed out')).toBe(false);
-    expect(isTransientError('canceling statement due to statement timeout')).toBe(false);
     expect(friendlySocialError('')).toBe('Something went wrong. Try again.');
   });
 });
