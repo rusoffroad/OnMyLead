@@ -6,6 +6,8 @@ order: 20
 release: "1.0"
 updated: 2026-11-05
 sources:
+  - supabase/migrations/20261105090000_pro_bluetooth_dot_photos.sql
+  - app/src/components/app-notices.tsx
   - app/src/components/pro-plan.tsx
   - app/src/app/subscription.tsx
   - app/src/app/pro.tsx
@@ -22,6 +24,14 @@ When you make a new OnMyLead account, you get 30 days of OnMyLead Pro for free. 
 
 :::tip
 You're never charged when the trial ends. It does not turn into a paid subscription. Your account simply moves to Free unless you choose to subscribe.
+:::
+
+:::release 2.1
+## A Fresh Trial With 2.1
+
+OnMyLead 2.1 makes a few more things Pro: Bluetooth Sharing with no service, CarPlay, customizing your dot and group photos. So nobody loses anything the day it arrives, every rider who doesn't have Pro gets a fresh 30-day Pro trial when 2.1 comes out, even if you already had a trial or are partway through one. Riders who subscribe, or have Pro from OnMyLead, keep it as before.
+
+While a trial runs, Home shows **Your Pro Trial Runs Until** and the date. Close it with the **×**; it comes back only if your trial's end date changes.
 :::
 
 ## See How Many Days Are Left
@@ -63,5 +73,10 @@ Apple charges you when you confirm, and your paid subscription starts right away
 
 ## Good to Know
 
+:::until 2.1
 - Each account gets one trial.
+:::
+:::release 2.1
+- Each account gets one trial when it's made, plus the 2.1 trial above.
+:::
 - The trial is part of OnMyLead, not an Apple free trial, so it doesn't show in your Apple subscriptions.

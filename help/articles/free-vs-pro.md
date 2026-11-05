@@ -6,6 +6,9 @@ order: 10
 release: "1.0"
 updated: 2026-11-05
 sources:
+  - supabase/migrations/20261105090000_pro_bluetooth_dot_photos.sql
+  - app/src/core/carplay.ts
+  - app/src/hooks/use-dot-size.ts
   - app/src/core/pro.ts
   - app/src/core/entitlements.ts
   - app/src/lib/entitlements.ts
@@ -57,7 +60,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Premium Ride Cards | No | Yes |
 :::
 
-:::release 2.0
+:::until 2.1
 | | Free | Pro |
 |---|---|---|
 | Create Rides | 1 a Month | Unlimited |
@@ -84,6 +87,39 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Advanced Trip Planning | No | Yes |
 | Garage Build Sheet | No | Yes |
 | Themes, Light Mode and Natural Voices | No | Yes |
+| Sync Across Devices | No | Yes |
+| iPad, Android Tablets and the Website | No | Yes |
+:::
+
+:::release 2.1
+| | Free | Pro |
+|---|---|---|
+| Create Rides | 1 a Month | Unlimited |
+| Join Rides and Follow the Leader | Unlimited | Unlimited |
+| Live Tracking, SOS, Crash Alert and Ride Bubble | Yes | Yes |
+| Ride Chat | Yes | Yes |
+| Map Mode | 8 Hours a Month | Unlimited |
+| Social Feed: See, Like and Read Comments | Yes | Yes |
+| Badges, Events and Friends | Yes | Yes |
+| Draw Routes, Waypoints and Directions | No | Yes |
+| Bluetooth Sharing With No Service | No | Yes |
+| CarPlay | No | Yes |
+| Map Layers: Satellite, Topo and Trails | No | Yes |
+| Draw, Record, Save, Rate and Share Trails | No | Yes |
+| Track Line and Named Spots | No | Yes |
+| Group Rides on Your Trails | No | Yes |
+| Import GPX Routes | No | Yes |
+| Offline Maps | No | Yes |
+| Post, Comment and Share to Social Media | No | Yes |
+| Create Events | No | Yes |
+| Saved Riding Groups, Group Photos and Custom Codes | No | Yes |
+| Create and Vote on Ride Polls | No | Yes |
+| Your Own Messages and Music Controls | No | Yes |
+| Ride History | Last 5 | All |
+| Advanced Ride Statistics and Premium Cards | No | Yes |
+| Advanced Trip Planning | No | Yes |
+| Garage Build Sheet | No | Yes |
+| Themes, Light Mode, Natural Voices and Custom Dots | No | Yes |
 | Sync Across Devices | No | Yes |
 | iPad, Android Tablets and the Website | No | Yes |
 :::
@@ -170,6 +206,17 @@ Free accounts get 8 hours of Map Mode every calendar month (UTC time). Pro has n
 - **iPad, Android Tablets and the Website:** use OnMyLead on a big screen. On a Free account, a tablet or the website still lets you join a ride, open your rides, follow the leader in Ride Mode and manage your account. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 
 If you were already using a theme or a voice before 2.0, the app keeps it.
+:::
+
+:::release 2.1
+New in Pro with 2.1:
+
+- **Bluetooth Sharing With No Service:** with no cell service, Ride Mode passes spots, status taps, EMERGENCY and messages to nearby riders on your ride over Bluetooth, and phones pass them along the group. On Free, the switch shows the Pro tag. With service, live tracking, Need Help and EMERGENCY stay free. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+- **CarPlay:** see your group and send status taps from your car's screen. On Free, the car screen says **CarPlay Is Part of OnMyLead Pro**, and Ride Mode, status taps and EMERGENCY keep working on your phone. See [Use OnMyLead in CarPlay](/help/carplay).
+- **Customize Your Dot:** pick your Dot Style and Dot Size. On Free your dot is the Red, White and Blue dot at Medium. If you picked another one during a trial, it comes back when you have Pro again.
+- **Group Photos:** give a riding group you made a photo. Everyone can still see group photos for free. See [Riding Groups](/help/riding-groups).
+
+When 2.1 arrives, every rider without Pro gets a fresh 30-day Pro trial first, so nothing changes for you right away. Home shows the date your trial ends. See [Your Free 30-Day Pro Trial](/help/pro-trial).
 :::
 
 When you tap something that needs Pro, a short prompt explains it. Tap **See OnMyLead Pro** to see the plans, or **Not Now** to close it.

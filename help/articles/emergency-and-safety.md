@@ -80,7 +80,7 @@ You see a card showing whose phones have the alert. If you sent it by mistake, t
 :::
 
 :::release 2.1
-- With no service, it reaches only riders on the ride within Bluetooth range (about 30 to 100 meters, passed along by up to six phones), and it waits on your phone and sends by itself when you get signal. If any nearby rider's phone gets signal first, it sends the alert for you. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+- With no service, it reaches only riders on the ride within Bluetooth range (about 30 to 100 meters, passed along by up to six phones) who have [Bluetooth Sharing](/help/bluetooth-sharing), part of OnMyLead Pro, and it waits on your phone and sends by itself when you get signal. If any nearby rider's phone gets signal first, it sends the alert for you. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 ## Need Help

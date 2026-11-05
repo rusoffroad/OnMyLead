@@ -78,7 +78,7 @@ It waits on your phone as **Waiting for Signal** and sends by itself as soon as 
 :::release 2.1
 ## Nearby Riders Don't Show Up Over Bluetooth
 
-Bluetooth Sharing reaches about 30 to 100 meters between phones. Check that Bluetooth is on in the phone's settings, that OnMyLead is allowed to use Bluetooth (iPhone and iPad: **Settings > OnMyLead > Bluetooth**; Android: **Settings > Apps > OnMyLead > Permissions > Nearby devices**), that **Bluetooth Sharing** is on in the You tab (or the no-service banner in Ride Mode says **Bluetooth On**), and that you opened Ride Mode once with service. Riders only send their spot while they share with the ride. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+Bluetooth Sharing reaches about 30 to 100 meters between phones. Check that Bluetooth is on in the phone's settings, that OnMyLead is allowed to use Bluetooth (iPhone and iPad: **Settings > OnMyLead > Bluetooth**; Android: **Settings > Apps > OnMyLead > Permissions > Nearby devices**), that **Bluetooth Sharing** is on in the You tab (or the no-service banner in Ride Mode says **Bluetooth On**), and that you opened Ride Mode once with service. Bluetooth Sharing is part of OnMyLead Pro, so it only runs on accounts with Pro or the Pro Trial. Riders only send their spot while they share with the ride. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 ## I'm Not Getting Alerts
