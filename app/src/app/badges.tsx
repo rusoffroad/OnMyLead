@@ -129,7 +129,7 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
         {RANKS.map((r, i) => (
           <View key={r.name} style={styles.rung}>
             <View style={[styles.rungBar, i <= at && { backgroundColor: i === at ? Colors.accent : Colors.text }]} />
-            <Text style={[styles.rungName, i === at && { color: Colors.text }]} numberOfLines={1}>{r.name}</Text>
+            <Text style={[styles.rungName, i === at && { color: Colors.text }]} numberOfLines={1}>{t(r.name)}</Text>
           </View>
         ))}
       </View>

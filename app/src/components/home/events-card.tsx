@@ -59,7 +59,7 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
       <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
         <View style={styles.titleRow}>
           <Text style={homeStyles.cardTitle}>{t('Events')}</Text>
-          {count ? <Pill text={t('{n} Coming Up', { n: count })} tone="gold" /> : null}
+          {count ? <Pill text={count === 1 ? t('1 Coming Up') : t('{n} Coming Up', { n: count })} tone="gold" /> : null}
         </View>
         {/* One line under the title, so the card stays short: your next event, else what Events are. */}
         {next ? (

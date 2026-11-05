@@ -4,7 +4,7 @@ summary: Find rallies, poker runs and ride weekends, see the agenda and join the
 category: joining
 order: 60
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/meet-point-mapbox-map.tsx
   - app/src/components/meet-point-map.tsx

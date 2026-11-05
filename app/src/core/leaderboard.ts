@@ -7,7 +7,7 @@
 import { areaLabel, countryName, stateName } from './areas';
 import { parseBadgeRows, RANKS, topBadge, type BadgeKey, type BadgeLevel } from './badges';
 
-import { tc } from './i18n';
+import { ordinal, tc } from './i18n';
 export type LeaderRow = {
   place: number;
   userId: string;
@@ -116,17 +116,15 @@ export function levelsLine(r: Pick<LeaderRow, 'levels' | 'gold' | 'silver' | 'br
   return parts.length ? tc('{lv}: {parts}', { lv, parts: parts.join(', ') }) : lv;
 }
 
-/** "1st", "2nd", "3rd", "11th", "22nd". */
-export function ordinal(n: number): string {
-  const t = n % 100;
-  if (t >= 11 && t <= 13) return `${n}th`;
-  return `${n}${({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`;
-}
+export { ordinal } from './i18n';
 
 /** What the rider's own card says about where they stand on this board. */
 export function myStanding(board: Leaderboard | null, settings: LeaderSettings | null, filter: LeaderFilter): string {
   if (settings && !settings.shown) return tc('You’re hidden from the leaderboard. Turn on Show Me to be listed.');
-  if (board?.me) return tc('You’re {v} of {total} in {v2}.', { v: ordinal(board.me.place), total: board.total, v2: filterTitle(filter) });
+  if (board?.me) {
+    const vars = { v: ordinal(board.me.place), total: board.total, v2: filterTitle(filter) };
+    return filter.country ? tc('You’re {v} of {total} in {v2}.', vars) : tc('You’re {v} of {total} everywhere.', vars);
+  }
   if (filter.country && settings && (settings.country !== filter.country || (filter.state && settings.state !== filter.state))) {
     const where = areaLabel(settings.country, settings.state);
     return where ? tc('You ride from {where}, so you’re not on this board.', { where }) : tc('Pick where you ride from to be on country and state boards.');

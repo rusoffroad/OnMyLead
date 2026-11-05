@@ -22,7 +22,7 @@ import { useLayout } from '@/hooks/use-layout';
 import { fetchLeaderAreas, fetchLeaderboard, fetchLeaderSettings, saveLeaderShown } from '@/lib/leaderboard';
 import { useSession } from '@/lib/session';
 
-import { t } from '@/lib/i18n';
+import { currentLocale, t } from '@/lib/i18n';
 /**
  * The badge leaderboard: riders ranked by the badge levels they earned by riding, everywhere or
  * in one country or state. Phones: your card, the filters, then the board. Tablets and wide
@@ -114,7 +114,7 @@ export default function LeaderboardScreen() {
     <View style={{ gap: Spacing.three }}>
       <View style={styles.headRow}>
         <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>{filterTitle(f)}</Text>
-        {board ? <ThemedText type="small" themeColor="textSecondary">{board.total === 1 ? t('1 rider') : `${board.total.toLocaleString('en-US')} riders`}</ThemedText> : null}
+        {board ? <ThemedText type="small" themeColor="textSecondary">{board.total === 1 ? t('1 rider') : t('{n} riders', { n: board.total.toLocaleString(currentLocale()) })}</ThemedText> : null}
       </View>
       <ErrorText error={error} />
       {error ? <Button title={t('Try Again')} kind="secondary" onPress={() => loadBoard(f)} /> : null}
@@ -213,7 +213,7 @@ function Settings({ settings, busy, onShown }: { settings: LeaderSettings | null
         <Icon name="pin" size={20} color={Colors.sky} />
         <View style={{ flex: 1 }}>
           <ThemedText style={{ fontWeight: 600 }}>{t('Where You Ride')}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{where ?? 'Pick your state or country'}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{where ?? t('Pick your state or country')}</ThemedText>
         </View>
         <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{where ? t('Change') : t('Pick')}</ThemedText>
       </Pressable>

@@ -81,7 +81,7 @@ export function RouteStrip({
         style={styles.head}
         accessible
         accessibilityLabel={freeride ? [
-          freeride.waiting ? tr('Freeride. Waiting for the leader to share their location.') : fs?.spread ? tr('Freeride. The group is spread over {spread}, {ends}.', { spread: fs.spread, ends: fs.ends }) : `Freeride. ${fs?.ends}.`,
+          freeride.waiting ? tr('Freeride. Waiting for the leader to share their location.') : fs?.spread ? tr('Freeride. The group is spread over {spread}, {ends}.', { spread: fs.spread, ends: fs.ends }) : tr('Freeride. {ends}.', { ends: fs?.ends ?? '' }),
           fs?.compared ?? '',
         ].join(' ') : [
           summary ? tr('Mile {doneMi} of {totalMi}. {compared} {v}', { doneMi: summary.doneMi, totalMi: summary.totalMi, compared: summary.compared, v: summary.offRoute ?? '' }) : tr('Route, {length} riders on it', { length: ranked.length }),
@@ -168,7 +168,7 @@ export function RouteStrip({
         <Text style={styles.compared}>
           {freeride.waiting
             ? tr('The line fills in once the leader shares their location.')
-            : fs?.compared ?? 'Share your location to see how far you are behind the leader.'}
+            : fs?.compared ?? tr('Share your location to see how far you are behind the leader.')}
         </Text>
       ) : summary ? (
         <Text style={styles.compared}>
