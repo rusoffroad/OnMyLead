@@ -9,7 +9,7 @@
     "notes": [
       {
         "kind": "new",
-        "text": "A new rider dot with the arrow built in: every live rider is a glossy disc with a white rim and a white arrow pointing the way they're heading, and it keeps pointing their last way while they're stopped. The leader is the biggest dot, in blue; the tail gunner is next, in violet; everyone else is graphite. Your own dot is big and cyan with a soft beam ahead of it, and its arrow always shows which way you're facing: the way you're riding while you move, your phone's compass when you stop."
+        "text": "A new rider dot with the arrow built in: every live rider is a glossy disc with a white rim and a white arrow pointing the way they're heading, and it keeps pointing their last way while they're stopped. The leader is the biggest dot, in blue; the tail gunner is next, in violet; everyone else is graphite. Your own dot is big (Safety Orange unless you pick another Dot Style) with a soft beam ahead of it, and its arrow always shows which way you're facing: the way you're riding while you move, your phone's compass when you stop."
       },
       {
         "kind": "new",

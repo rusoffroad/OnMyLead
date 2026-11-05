@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Text as SvgText } from 'react-native-svg';
 
@@ -14,6 +14,7 @@ import { FEATURE_INFO, nextReset, type ProBlock } from '@/core/pro';
 import { closeProGate, showProGate, useProGatePrompt } from '@/lib/pro';
 
 import { currentLocale, t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 /**
  * The Pro mark: a route shield, like the ones on highway and forest road signs, with PRO set in
  * the condensed Barlow the signs are drawn from.
@@ -59,7 +60,7 @@ export function ProGateHost() {
   const insets = useSafeAreaInsets();
   const copy = block ? promptCopy(block) : null;
   return (
-    <Modal visible={!!block} transparent animationType="slide" onRequestClose={closeProGate} statusBarTranslucent>
+    <SheetModal visible={!!block} transparent animationType="slide" onRequestClose={closeProGate} statusBarTranslucent>
       <SheetRoot>
       <Pressable style={styles.scrim} onPress={closeProGate} accessibilityLabel={t('Close')} accessibilityRole="button" />
       {copy ? (
@@ -85,7 +86,7 @@ export function ProGateHost() {
         </SwipeSheet>
       ) : null}
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

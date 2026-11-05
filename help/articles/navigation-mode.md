@@ -124,7 +124,7 @@ To look around, drag or pinch the map. It pauses (the button shows **Paused**) u
 :::
 
 :::release 2.1
-From 2.1 the map zooms out one step the first time your dot nears an edge, then slides to keep you on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot is a cyan disc with its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
+From 2.1 the map zooms out one step the first time your dot nears an edge, then slides to keep you on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot (Safety Orange unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
 :::
 
 The screen stays on while Navigate is open.

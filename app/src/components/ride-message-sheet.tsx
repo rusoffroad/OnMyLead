@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll, TextBox } from '@/components/keyboard';
@@ -10,6 +10,7 @@ import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { charactersLeft, checkRideMessage, isBuiltInReply, RIDE_MESSAGE_MAX } from '@/core/ride-message';
 
 import { t as tr } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 type Props = {
   visible: boolean;
   tablet: boolean;
@@ -54,7 +55,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={close}>
+    <SheetModal visible={visible} animationType="slide" transparent onRequestClose={close}>
       <SheetRoot style={[styles.wrap, tablet && styles.wrapTablet]}>
         <KeyboardLift style={tablet ? styles.liftTablet : undefined}>
           <SwipeSheet onClose={close} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
@@ -131,7 +132,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
           </SwipeSheet>
         </KeyboardLift>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

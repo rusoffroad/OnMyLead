@@ -3,7 +3,7 @@ import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, AppState, Linking, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
@@ -98,6 +98,7 @@ import { requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
 
@@ -1655,7 +1656,7 @@ export default function RideMode() {
         onClose={() => setWpTarget(null)}
       />
 
-      <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
+      <SheetModal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <KeyboardLift>
           <SwipeSheet onClose={() => setAskShare(false)} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
@@ -1676,9 +1677,9 @@ export default function RideMode() {
           </SwipeSheet>
           </KeyboardLift>
         </SheetRoot>
-      </Modal>
+      </SheetModal>
 
-      <Modal visible={sosOpen} animationType="fade" transparent onRequestClose={() => setSosOpen(false)}>
+      <SheetModal visible={sosOpen} animationType="fade" transparent onRequestClose={() => setSosOpen(false)}>
         <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <SwipeSheet
             onClose={() => setSosOpen(false)}
@@ -1707,7 +1708,7 @@ export default function RideMode() {
             <Button title={t('Cancel')} kind="secondary" onPress={() => setSosOpen(false)} />
           </SwipeSheet>
         </SheetRoot>
-      </Modal>
+      </SheetModal>
     </View>
   );
 }

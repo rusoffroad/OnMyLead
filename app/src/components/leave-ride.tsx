@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -21,6 +21,7 @@ import { stopSendingLocationFor } from '@/lib/location';
 import type { Ride, RideMember } from '@/lib/types';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 type Props = {
   ride: Pick<Ride, 'id' | 'name' | 'status' | 'organizer_id'>;
   members: RideMember[];
@@ -137,7 +138,7 @@ function HandOffSheet({
   const insets = useSafeAreaInsets();
   const riders = handOffCandidates(members, me);
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <SheetModal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
         <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={t('Close')} accessibilityRole="button" />
         <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
@@ -171,7 +172,7 @@ function HandOffSheet({
           <Button title={t('Stay on the Ride')} kind="secondary" disabled={busy} onPress={onClose} />
         </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

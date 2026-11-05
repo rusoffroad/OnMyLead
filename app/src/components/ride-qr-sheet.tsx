@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Modal, Platform, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
@@ -12,6 +12,7 @@ import { SheetRoot, SheetScroll, SwipeSheet } from './swipe-sheet';
 import { Button } from './ui';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 /**
  * The ride's QR code, full screen, for a rider to scan off your phone at the trailhead. The card
  * in the middle (logo, ride name, code) is also the picture "Share QR Code" sends. Swipe it down,
@@ -37,7 +38,7 @@ export function RideQrSheet({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose} statusBarTranslucent>
+    <SheetModal visible={visible} animationType="slide" transparent onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
       <SwipeSheet onClose={onClose} style={{ flex: 1, backgroundColor: Colors.background }} accessibilityViewIsModal>
       <View style={[styles.grip, { top: insets.top + Spacing.two }]} />
@@ -62,7 +63,7 @@ export function RideQrSheet({
       </SheetScroll>
       </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

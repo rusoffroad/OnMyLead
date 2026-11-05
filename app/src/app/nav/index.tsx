@@ -25,6 +25,7 @@ import { FollowMeButton } from '@/components/follow-me-button';
 import { FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
 import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
+import { compassAllowed } from '@/lib/compass';
 import {
   acceptFix, canRate, clock, coveredM, EMPTY_DETAILS, feet, feetOrMiles, followProgress, newTrailId, RIDER_TRAIL_INK, toLatLngs, toTrackPoint,
   DEFAULT_TRAIL_RULES, trackStats, unseenHidden, type LocalTrail, type PublicTrail, type TrailRules,
@@ -186,7 +187,14 @@ export default function NavMode() {
           tripSaved.current = t.distanceM;
         })
         .catch(() => {});
-      foregroundPermission({ get: () => Location.getForegroundPermissionsAsync(), request: () => Location.requestForegroundPermissionsAsync() })
+      foregroundPermission({
+        get: () => Location.getForegroundPermissionsAsync(),
+        // Allowed just now: the compass starts at once for the dot's arrow (lib/compass).
+        request: () => Location.requestForegroundPermissionsAsync().then((p) => {
+          if (p.status === 'granted') compassAllowed();
+          return p;
+        }),
+      })
         .then(async (p) => {
           if (gone) return;
           if (p.status !== 'granted') return setNoLocation(true);

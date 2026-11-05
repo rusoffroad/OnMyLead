@@ -1,4 +1,4 @@
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
@@ -10,12 +10,13 @@ import { feetOrMiles, RIDER_TRAIL_INK, trackStats, type LocalTrail } from '@/cor
 import { trailLine, useLocalTrails } from '@/lib/nav-trails';
 
 import { t as tr } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 /** Pick one of My Trails (Map Mode) to use as a ride's route. */
 export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolean; onPick: (t: LocalTrail) => void; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const { trails } = useLocalTrails();
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <SheetModal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
         <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
         <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
@@ -41,7 +42,7 @@ export function TrailPickerSheet({ visible, onPick, onClose }: { visible: boolea
           <Button title={tr('Cancel')} kind="ghost" onPress={onClose} />
         </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

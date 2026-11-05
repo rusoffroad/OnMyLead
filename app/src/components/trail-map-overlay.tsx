@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Modal, Platform, Pressable, Switch, Text, View } from 'react-native';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, Ellipse, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
@@ -41,7 +41,7 @@ import { musicAvailable } from '@/lib/music';
 import { setTiltShown, useTiltSettings } from '@/lib/tilt';
 
 import { t as tr } from '@/lib/i18n';
-import { useSheetUp, useUrgentWaiting } from '@/lib/urgent-modal';
+import { SheetModal } from '@/components/sheet-modal';
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
 
@@ -210,26 +210,25 @@ function MapSettingsSheet({
   const pro = useCallback((feature: FeatureKey) => {
     if (can(currentEntitlements(), feature)) return true;
     onClose();
-    if (PRO_PROMPT_WAITS_FOR_DISMISS) pendingPro.current = feature;
-    else requirePro(feature);
+    if (PRO_PROMPT_WAITS_FOR_DISMISS) {
+      pendingPro.current = feature;
+      // In case the close never reports back (onDismiss), ask just after it would have finished.
+      setTimeout(() => {
+        if (pendingPro.current !== feature) return;
+        pendingPro.current = null;
+        requirePro(feature);
+      }, 700);
+    } else requirePro(feature);
     return false;
   }, [onClose]);
-  // An urgent screen (the Crash Alert countdown) closes the sheet so it can show (lib/urgent-modal).
-  const urgent = useUrgentWaiting();
-  useEffect(() => {
-    if (urgent && visible) onClose();
-  }, [urgent, visible, onClose]);
-  const shown = visible && !urgent;
-  const sheetDismissed = useSheetUp(shown);
   const dismissed = () => {
-    sheetDismissed();
     const feature = pendingPro.current;
     pendingPro.current = null;
     if (feature) requirePro(feature);
   };
   return (
     <SheetPro.Provider value={pro}>
-    <Modal visible={shown} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} onDismiss={dismissed} statusBarTranslucent>
+    <SheetModal visible={visible} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} onDismiss={dismissed} statusBarTranslucent>
       <SheetRoot style={[styles.sheetRoot, side && styles.sheetRootSide]}>
         <Pressable style={styles.sheetScrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
         <SwipeSheet
@@ -321,7 +320,7 @@ function MapSettingsSheet({
           </SheetScroll>
         </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
     </SheetPro.Provider>
   );
 }
