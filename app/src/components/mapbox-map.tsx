@@ -17,7 +17,7 @@ import {
 } from '@/core/terrain';
 import { OSM_TILEJSON } from '@/core/osm-trails';
 import { FEATURE_BY_ID, osmFeatureLayers, rnStyle } from '@/core/map-features';
-import { TRAIL_INK } from '@/core/trails';
+import { LAND_FADE_IN, TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
@@ -463,7 +463,7 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
       {!offline
         ? agencyLayers.map((a) => (
             <Mapbox.RasterSource key={a.key} id={`oml-agency-${a.key}`} tileUrlTemplates={[mapboxAgencyTemplate(a.template)]} tileSize={AGENCY_TILE_SIZE} minZoomLevel={a.minZ - 1}>
-              <Mapbox.RasterLayer id={`oml-agency-${a.key}-layer`} sourceID={`oml-agency-${a.key}`} style={{ rasterOpacity: 1, rasterFadeDuration: 0 }} />
+              <Mapbox.RasterLayer id={`oml-agency-${a.key}-layer`} sourceID={`oml-agency-${a.key}`} minZoomLevel={a.minZ} style={{ rasterOpacity: a.land ? (LAND_FADE_IN as never) : 1, rasterFadeDuration: 0 }} />
             </Mapbox.RasterSource>
           ))
         : null}

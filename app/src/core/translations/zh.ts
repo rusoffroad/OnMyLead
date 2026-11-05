@@ -2923,6 +2923,7 @@ const dict: Record<string, string> = {
   "Clear {label}": "清除{label}",
   "Saved from {mapper}": "保存自 {mapper}",
   "Zoom In to See Trails": "放大查看路线",
+  "Zoom In to See Land Boundaries": "放大查看土地边界",
   "Zoom In for Park and Local Trails": "放大查看公园和本地路线",
   "Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.": "卫星影像叠加真实地形，带等高线和以英尺计的山峰高度。{v} 在骑行模式和地图模式中显示。",
   "No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.": "这里没有信号，因此显示平面地图。在离线地图的下载中加入 3D 地形，无信号时也能查看。",

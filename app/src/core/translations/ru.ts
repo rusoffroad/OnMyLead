@@ -2923,6 +2923,7 @@ const dict: Record<string, string> = {
   "Clear {label}": "Очистить {label}",
   "Saved from {mapper}": "Сохранено от {mapper}",
   "Zoom In to See Trails": "Приблизьте, чтобы увидеть трассы",
+  "Zoom In to See Land Boundaries": "Приблизьте, чтобы увидеть границы земель",
   "Zoom In for Park and Local Trails": "Приблизьте, чтобы увидеть парки и местные трассы",
   "Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.": "Спутник на реальном рельефе, с горизонталями и высотами вершин в футах. {v} Показывается в режиме поездки и режиме карты.",
   "No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.": "Здесь нет связи, поэтому показана плоская карта. Добавьте 3D-рельеф к загрузке в Офлайн-картах, чтобы видеть его без связи.",

@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["map-layers"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "land-zoom",
+    "why": "Land boundaries (2.1) now wait until the map is about one county across and fade in, instead of covering whole states in orange and green when zoomed out. New hint Zoom In to See Land Boundaries. The guide says when land shows."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["home-screen", "invite-riders"],
     "kind": "update",
     "by": "pr",

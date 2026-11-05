@@ -2923,6 +2923,7 @@ const dict: Record<string, string> = {
   "Clear {label}": "Hapus {label}",
   "Saved from {mapper}": "Disimpan dari {mapper}",
   "Zoom In to See Trails": "Perbesar untuk Melihat Jalur",
+  "Zoom In to See Land Boundaries": "Perbesar untuk Melihat Batas Lahan",
   "Zoom In for Park and Local Trails": "Perbesar untuk Taman dan Jalur Lokal",
   "Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.": "Satelit di atas bentuk asli tanah, dengan garis kontur dan ketinggian puncak dalam kaki. {v} Tampil di Mode Riding dan Mode Peta.",
   "No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.": "Tidak ada sinyal di sini, jadi peta datar yang tampil. Tambahkan Medan 3D ke unduhan di Peta offline untuk melihatnya tanpa sinyal.",
