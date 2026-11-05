@@ -54,33 +54,31 @@ Deno.serve(async (req) => {
   // same subscription twice. The reservation notes the expiry Google was asked for: a reward
   // already reserved means an earlier call got no answer, and if the subscription now ends on
   // that date, that call went through.
+  let took: unknown;
+  let takeError: { message: string } | null;
   if (target.deferred_at) {
-    // Another call is still asking Google (a double tap, a second device): let it finish.
-    if (Date.now() - Date.parse(target.deferred_at) < IN_FLIGHT_MS) return json({ error: 'retry' }, 503);
     const { data: reserved } = await db.from('play_events').select('payload')
       .eq('type', 'REFERRAL_DEFER_RESERVED').eq('purchase_token', target.purchase_token)
       .order('received_at', { ascending: false }).limit(1).maybeSingle();
     const asked = Date.parse(reserved?.payload?.to ?? '');
     const from = Date.parse(reserved?.payload?.from ?? '');
-    // The subscription already ends on or after the asked date (a renewal since only moves it
-    // further): that call went through, so it is confirmed rather than deferred again.
-    if (Number.isFinite(asked) && Number.isFinite(from) && current >= asked - DAY) {
+    // The subscription ends on the asked date: that call went through, so confirm it.
+    if (Number.isFinite(asked) && Number.isFinite(from) && Math.abs(current - asked) < DAY) {
       return await confirm(user.id, target.purchase_token, from, current);
     }
-    // Reserved, but the subscription never moved: re-take the reservation for this call.
-    const { error: retakeError } = await db.rpc('referral_unmark_deferred', { p_user: user.id });
-    if (retakeError) {
-      console.error('referral_unmark_deferred failed', retakeError.message);
-      return json({ error: 'retry' }, 503);
-    }
+    // Another call is still asking Google (a double tap, a second device): let it finish.
+    if (Date.now() - Date.parse(target.deferred_at) < IN_FLIGHT_MS) return json({ error: 'retry' }, 503);
+    // Reserved long ago and the subscription never moved: take that same reservation over.
+    ({ data: took, error: takeError } = await db.rpc('referral_retake_deferral', { p_user: user.id, p_stale: target.deferred_at }));
+  } else {
+    ({ data: took, error: takeError } = await db.rpc('referral_reserve_deferral', { p_user: user.id }));
   }
-  const { data: took, error: reserveError } = await db.rpc('referral_reserve_deferral', { p_user: user.id });
-  if (reserveError) {
-    console.error('referral_reserve_deferral failed', reserveError.message);
+  if (takeError) {
+    console.error('reserving the deferral failed', takeError.message);
     return json({ error: 'retry' }, 503);
   }
   // false: another call took it between our read and now, and it asks Google instead.
-  if (took === false) return json({ error: 'retry' }, 503);
+  if (took !== true) return json({ error: 'retry' }, 503);
   const { error: noteError } = await db.from('play_events').insert({
     type: 'REFERRAL_DEFER_RESERVED',
     purchase_token: target.purchase_token,

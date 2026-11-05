@@ -78,17 +78,16 @@ export default function SocialItemScreen() {
   // Opened from a notification while the app was still waking up and the request got dropped:
   // try again on its own once the app is in front, so the Retry button is the last resort.
   const failed = item === null && !!error;
+  const retry = useCallback(() => {
+    setError(null);
+    setItem(undefined);
+    void load();
+  }, [load]);
   useEffect(() => {
     if (!failed) return;
-    const sub = AppState.addEventListener('change', (s) => {
-      if (s === 'active') {
-        setError(null);
-        setItem(undefined);
-        load();
-      }
-    });
+    const sub = AppState.addEventListener('change', (s) => s === 'active' && retry());
     return () => sub.remove();
-  }, [failed, load]);
+  }, [failed, retry]);
 
   const send = async () => {
     if (!key || !draft.trim()) return;
@@ -145,7 +144,7 @@ export default function SocialItemScreen() {
             {item === null && !off ? (
               <>
                 <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
-                {error ? <Button title={t('Retry')} kind="secondary" onPress={() => { setError(null); setItem(undefined); void load(); }} /> : null}
+                {error ? <Button title={t('Retry')} kind="secondary" onPress={retry} /> : null}
               </>
             ) : null}
             {item ? (

@@ -207,6 +207,16 @@ begin
   return found;
 end;
 $$;
+-- Takes over a reservation left by a call that never got an answer, only if it is still the
+-- same one (p_stale) and unconfirmed, so two retries at once can't both take it.
+create or replace function referral_retake_deferral(p_user uuid, p_stale timestamptz)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  update referral_rewards set deferred_at = now()
+  where user_id = p_user and claim_kind = 'google_defer' and deferred_at = p_stale and redeemed_at is null;
+  return found;
+end;
+$$;
 -- Confirms the deferral: the reward is redeemed and the subscription row takes Google's own expiry.
 create or replace function referral_mark_deferred(p_user uuid, p_new_expiry timestamptz)
 returns void language plpgsql security definer set search_path = public as $$
@@ -234,9 +244,9 @@ returns jsonb language sql stable security definer set search_path = public as $
   left join play_subscriptions s on s.purchase_token = referral_play_token(p_user)
   where w.user_id = p_user and w.claim_kind = 'google_defer';
 $$;
-revoke execute on function referral_reserve_deferral(uuid), referral_unmark_deferred(uuid) from public, anon, authenticated;
+revoke execute on function referral_reserve_deferral(uuid), referral_retake_deferral(uuid, timestamptz), referral_unmark_deferred(uuid) from public, anon, authenticated;
 do $$ begin
   if exists (select 1 from pg_roles where rolname = 'service_role') then
-    grant execute on function referral_reserve_deferral(uuid), referral_unmark_deferred(uuid) to service_role;
+    grant execute on function referral_reserve_deferral(uuid), referral_retake_deferral(uuid, timestamptz), referral_unmark_deferred(uuid) to service_role;
   end if;
 end $$;

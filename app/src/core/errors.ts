@@ -8,6 +8,6 @@
 export function isTransientError(message: string | null | undefined): boolean {
   // postgrest-js words a dropped fetch as "<name>: <message>" (TypeError, FetchError, AbortError).
   const m = (message ?? '').replace(/^[A-Za-z]*Error: /, '');
-  return /network request (failed|timed out)|failed to fetch|fetch failed|network ?error|^load failed|UnexpectedException: cancell?ed|IOException: canceled|^(the )?(request )?(cancell?ed|timed out)\b/i
+  return /network request (failed|timed out)|failed to fetch|fetch failed|network ?error|^load failed|UnexpectedException: cancell?ed|IOException: cancell?ed|^(the )?(request )?(cancell?ed|timed out)\b/i
     .test(m);
 }

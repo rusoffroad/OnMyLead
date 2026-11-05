@@ -33,33 +33,38 @@ export async function snapshotForShare(
   }
   try {
     // Each share gets its own folder, so the file keeps its plain name (OnMyLead.png) and a
-    // second share never overwrites one another app is still reading. Older folders go.
+    // second share never overwrites one another app is still reading.
+    tidy();
     const folder = new Directory(Paths.cache, `share-${Date.now()}`);
     folder.create({ intermediates: true, idempotent: true });
     const out = new File(folder, `${opts.name}.png`);
     await new File(saved.uri).copy(out, { overwrite: true });
     discard(saved.uri);
-    tidy(folder.uri);
     return out.uri;
   } catch {
     return saved.uri;
   }
 }
 
-let previous: string | null = null;
-let beforeThat: string | null = null;
-
-/** Keeps the last two share folders (the newest may still be in a share sheet) and deletes older. */
-function tidy(uri: string) {
-  if (beforeThat) {
-    try {
-      new Directory(beforeThat).delete();
-    } catch {
-      // The OS clears the cache later.
+/**
+ * Deletes earlier share folders, this launch's or an earlier one's, keeping only the newest (it
+ * may still be open in a share sheet). Empty folders from a failed copy go too.
+ */
+function tidy() {
+  try {
+    const folders = new Directory(Paths.cache).list()
+      .filter((d): d is Directory => d instanceof Directory && /^share-\d+$/.test(d.name))
+      .sort((a, b) => Number(b.name.slice(6)) - Number(a.name.slice(6)));
+    for (const d of folders.slice(1)) {
+      try {
+        d.delete();
+      } catch {
+        // The OS clears the cache later.
+      }
     }
+  } catch {
+    // The cache can't be listed: the OS clears it later.
   }
-  beforeThat = previous;
-  previous = uri;
 }
 
 function discard(uri: string) {

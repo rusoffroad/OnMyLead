@@ -86,7 +86,11 @@ describe('ridePatch', () => {
     expect(both.private).toMatchObject({ meet_lat: 38.57, instructions: 'Air down at the lot' });
     expect(both.changed).toEqual(['place', 'details']);
     expect(ridePatch(ride, null, { ...formFromRide(ride, null), instructions: 'Air down' }, now)).toEqual({ error: 'Set the meeting point before adding instructions.' });
-    expect(ridePatch(ride, null, { ...formFromRide(ride, null), meetLabel: 'Lions Park' }, now)).toHaveProperty('error');
+    expect(ridePatch(ride, null, { ...formFromRide(ride, null), meetLabel: 'Lions Park' }, now)).toEqual({
+      error: 'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".',
+    });
+    // A ride with a saved spot can't lose it by clearing the coordinates either.
+    expect(ridePatch(ride, details, { ...formFromRide(ride, details), coords: '' }, now)).toHaveProperty('error', expect.stringMatching(/^Set the meeting point/));
   });
 
   it('sends only the name when only the name changed', () => {

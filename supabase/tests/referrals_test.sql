@@ -184,6 +184,11 @@ do $$ begin
   if not referral_reserve_deferral('00000000-0000-0000-0000-000000000f05') then raise exception 'FAIL: first reservation not taken'; end if;
   -- A second call at the same time gets false and leaves Google to the first.
   if referral_reserve_deferral('00000000-0000-0000-0000-000000000f05') then raise exception 'FAIL: reserved twice'; end if;
+  -- Taking over a stale reservation works once, and only for the reservation that was read.
+  if referral_retake_deferral('00000000-0000-0000-0000-000000000f05', now() - interval '1 hour') then raise exception 'FAIL: retook a reservation it never read'; end if;
+  if not referral_retake_deferral('00000000-0000-0000-0000-000000000f05', (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05')) then
+    raise exception 'FAIL: could not take over the reservation';
+  end if;
   if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is null then raise exception 'FAIL: not reserved'; end if;
   if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'redeemed_at') is not null then raise exception 'FAIL: reserved counts as redeemed'; end if;
   perform referral_unmark_deferred('00000000-0000-0000-0000-000000000f05');
