@@ -47,7 +47,7 @@ function promptCopy(block: ProBlock): { title: string; body: string; need: strin
   }
   if (!block.feature) return { title: 'OnMyLead Pro', body: t('Upgrade to use this. Joining rides and every safety feature stay free.'), need: t('Part of OnMyLead Pro.') };
   const info = FEATURE_INFO[block.feature];
-  return { title: t(info.title), body: t(info.body), need: t('Part of OnMyLead Pro.') };
+  return { title: t(info.title), body: t(info.body, info.vars), need: t('Part of OnMyLead Pro.') };
 }
 
 /**

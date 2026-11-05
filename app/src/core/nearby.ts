@@ -501,8 +501,9 @@ function turnOrder(id: string, turn: number): number {
  * message gets its round instead of waiting behind the newest until it ages out.
  */
 export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn = 0): T[] {
-  if (items.length <= MAX_FRAMES_PER_ROUND) return items;
   const own = items.find((i) => i.kind === 'position' && i.userId === myId);
+  // The rider's own spot goes out first: a slow link that can't finish the round still carries it.
+  if (items.length <= MAX_FRAMES_PER_ROUND) return own ? [own, ...items.filter((i) => i !== own)] : items;
   let left = MAX_FRAMES_PER_ROUND - (own ? 1 : 0);
   const picked = new Set<T>();
   if (own) picked.add(own);
@@ -522,7 +523,8 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   if (newestOwn && newestOwn.length <= left) { for (const i of newestOwn) picked.add(i); left -= newestOwn.length; }
   // Other riders' taps leave room for at least one more whole message, so a crowd of taps can't
   // keep every message off the air.
-  const reserve = groups.some((g) => g !== newestOwn) ? MAX_REPLY_PARTS : 0;
+  const waiting = groups.filter((g) => g !== newestOwn).map((g) => g.length);
+  const reserve = waiting.length ? Math.min(...waiting) : 0;
   for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > reserve) { picked.add(i); left--; }
   // Then the other messages, whole, in an order that changes every turn (set by each message's id),
   // so every message comes up near the front within a few turns, however many arrive meanwhile.
@@ -535,7 +537,6 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   }
   // Then other riders' spots and receipts.
   for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) { picked.add(i); left--; }
-  // The rider's own spot goes out first: a slow link that can't finish the round still carries it.
   return own ? [own, ...items.filter((i) => i !== own && picked.has(i))] : items.filter((i) => picked.has(i));
 }
 

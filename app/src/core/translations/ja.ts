@@ -2776,6 +2776,7 @@ const dict: Record<string, string> = {
   "Part of OnMyLead Pro.": "OnMyLead Pro の機能です。",
   "Ride Polls": "ライド投票",
   "iPad, Android Tablets and the Website": "iPad、Android タブレット、ウェブサイト",
+  "Free shows your last {n} rides. Pro shows every ride you’ve been on. Nothing is ever deleted.": "Free では直近 {n} 件のライドを表示します。Pro では参加したすべてのライドを表示します。何も削除されません。",
   "one ride": "1 件のライド",
   "{n} rides": "{n} 件のライド",
   "Poll: {body}": "投票: {body}",

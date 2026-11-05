@@ -2776,6 +2776,7 @@ const dict: Record<string, string> = {
   "Part of OnMyLead Pro.": "Bagian dari OnMyLead Pro.",
   "Ride Polls": "Polling Perjalanan",
   "iPad, Android Tablets and the Website": "iPad, Tablet Android, dan Situs Web",
+  "Free shows your last {n} rides. Pro shows every ride you’ve been on. Nothing is ever deleted.": "Free menampilkan {n} perjalanan terakhirmu. Pro menampilkan setiap perjalanan yang pernah kamu ikuti. Tidak ada yang dihapus.",
   "one ride": "satu perjalanan",
   "{n} rides": "{n} perjalanan",
   "Poll: {body}": "Polling: {body}",

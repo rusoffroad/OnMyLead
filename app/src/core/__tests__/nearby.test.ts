@@ -324,7 +324,7 @@ describe('pickFrames', () => {
 
   it('keeps every item when they fit', () => {
     const items = [reply('m1', 0, 2, 5), reply('m1', 1, 2, 5), spot(A)];
-    expect(pickFrames(items, A)).toEqual(items);
+    expect(pickFrames(items, A)).toEqual([items[2], items[0], items[1]]);
   });
 
   it("always sends the rider's own spot and never cuts a message partway", () => {

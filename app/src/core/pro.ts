@@ -30,7 +30,8 @@ export function nextReset(now: Date = new Date()): Date {
 export type ProBlock = ProError;
 
 /** What the Pro prompt says about each feature: what it does, and what stays free. */
-export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> = {
+/** `body` is a translation key; `vars` fill its {placeholders}. */
+export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string; vars?: Record<string, number> }> = {
   create_ride: {
     title: 'Create More Rides',
     body: 'Free accounts create one ride each month. Pro creates as many as you lead. Joining rides is always free.',
@@ -53,7 +54,8 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
   },
   ride_history: {
     title: 'Full Ride History',
-    body: `Free shows your last ${FREE_HISTORY} rides. Pro shows every ride you’ve been on. Nothing is ever deleted.`,
+    body: 'Free shows your last {n} rides. Pro shows every ride you’ve been on. Nothing is ever deleted.',
+    vars: { n: FREE_HISTORY },
   },
   advanced_trip_planning: {
     title: 'Advanced Trip Planning',

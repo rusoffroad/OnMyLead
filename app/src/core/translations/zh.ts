@@ -2776,6 +2776,7 @@ const dict: Record<string, string> = {
   "Part of OnMyLead Pro.": "OnMyLead Pro 功能。",
   "Ride Polls": "骑行投票",
   "iPad, Android Tablets and the Website": "iPad、Android 平板和网站",
+  "Free shows your last {n} rides. Pro shows every ride you’ve been on. Nothing is ever deleted.": "免费版显示你最近的 {n} 次骑行。Pro 显示你参加过的每一次骑行。任何内容都不会被删除。",
   "one ride": "1 次骑行",
   "{n} rides": "{n} 次骑行",
   "Poll: {body}": "投票：{body}",
