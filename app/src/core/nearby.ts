@@ -520,7 +520,10 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   const newestOwn = groups.find((g) => g[0].userId === myId);
   // Then the rider's newest own message, whole, then other riders' taps.
   if (newestOwn && newestOwn.length <= left) { for (const i of newestOwn) picked.add(i); left -= newestOwn.length; }
-  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > 0) { picked.add(i); left--; }
+  // Other riders' taps leave room for at least one more whole message, so a crowd of taps can't
+  // keep every message off the air.
+  const reserve = groups.some((g) => g !== newestOwn) ? MAX_REPLY_PARTS : 0;
+  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > reserve) { picked.add(i); left--; }
   // Then the other messages, whole, in an order that changes every turn (set by each message's id),
   // so every message comes up near the front within a few turns, however many arrive meanwhile.
   const rest = groups.filter((g) => g !== newestOwn)
@@ -563,7 +566,8 @@ export class NearbyMesh {
 
   /** Which turn a full round is on: one more each ROTATE_MS, by one even when rounds run late. */
   private turnAt(now: number): number {
-    if (now - this.turnStarted >= ROTATE_MS) {
+    // A clock set back mid-ride starts a new turn too, so the rotation never stalls.
+    if (now - this.turnStarted >= ROTATE_MS || now < this.turnStarted) {
       if (this.turnStarted !== -Infinity) this.turn++;
       this.turnStarted = now;
     }

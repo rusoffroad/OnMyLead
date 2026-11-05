@@ -54,6 +54,8 @@ class NearbyRadio(
   companion object {
     private const val MAX_PEERS = 8
     private const val MAX_SUBSCRIBE_FAILS = 10
+    /** Refused writes of one urgent frame before it is left to later rounds. */
+    private const val MAX_URGENT_TRIES = 5
     private const val ROUND_MS = 4_000L
     // Low power (service, nobody in range, or Max Battery Saver): send less often and let the
     // chip scan and advertise in its low-power duty cycle. Phones that connect are served at once.
@@ -91,6 +93,8 @@ class NearbyRadio(
     val queue = ArrayDeque<ByteArray>()
     /** Frames sent at once (taps, messages, receipts): ahead of the round, kept until sent. */
     val urgent = ArrayDeque<ByteArray>()
+    var urgentFails = 0
+    var urgentRetry = false
   }
 
   private class Subscriber(val device: BluetoothDevice) {
@@ -100,6 +104,8 @@ class NearbyRadio(
     val queue = ArrayDeque<ByteArray>()
     /** Frames sent at once (taps, messages, receipts): ahead of the round, kept until sent. */
     val urgent = ArrayDeque<ByteArray>()
+    var urgentFails = 0
+    var urgentRetry = false
   }
 
   private val peers = HashMap<String, Peer>()
@@ -327,13 +333,21 @@ class NearbyRadio(
       ch.value = f
       p.gatt.writeCharacteristic(ch)
     }
-    if (!ok) {
+    if (ok) {
+      if (fromUrgent) p.urgentFails = 0
+    } else {
       p.busy = false
       p.queue.clear()
-      // An urgent frame is kept until sent: back to the front, tried again shortly.
-      if (fromUrgent) {
+      // An urgent frame is kept until sent: back to the front, tried again shortly (one retry
+      // waiting at a time, a few times per frame; it also goes out in later rounds).
+      if (fromUrgent && ++p.urgentFails >= MAX_URGENT_TRIES) {
+        p.urgentFails = 0
+      } else if (fromUrgent) {
         p.urgent.addFirst(f)
-        handler.postDelayed({ peerOf(p.gatt)?.let { pump(it) } }, 200)
+        if (!p.urgentRetry) {
+          p.urgentRetry = true
+          handler.postDelayed({ peerOf(p.gatt)?.let { it.urgentRetry = false; pump(it) } }, 200)
+        }
       }
     }
   }
@@ -352,12 +366,19 @@ class NearbyRadio(
       ch.value = f
       srv.notifyCharacteristicChanged(s.device, ch, false)
     }
-    if (!ok) {
+    if (ok) {
+      if (fromUrgent) s.urgentFails = 0
+    } else {
       s.busy = false
       s.queue.clear()
-      if (fromUrgent) {
+      if (fromUrgent && ++s.urgentFails >= MAX_URGENT_TRIES) {
+        s.urgentFails = 0
+      } else if (fromUrgent) {
         s.urgent.addFirst(f)
-        handler.postDelayed({ subscribers[s.device.address]?.takeIf { it === s }?.let { pump(it) } }, 200)
+        if (!s.urgentRetry) {
+          s.urgentRetry = true
+          handler.postDelayed({ subscribers[s.device.address]?.takeIf { it === s }?.let { it.urgentRetry = false; pump(it) } }, 200)
+        }
       }
     }
   }
