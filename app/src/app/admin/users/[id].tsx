@@ -13,6 +13,10 @@ import * as admin from '@/lib/admin';
 import * as growthApi from '@/lib/admin-growth';
 import { adminRemoveAvatar, useAvatar } from '@/lib/avatars';
 import { RiderPhoto } from '@/components/rider-photo';
+import { GroupPhoto } from '@/components/group-photo';
+import { groupPhotoUrl } from '@/core/group-photo';
+import { adminRemoveGroupPhoto, adminUserGroups, type AdminGroup } from '@/lib/group-photos';
+import { supabaseUrl } from '@/lib/supabase';
 import { BadgePatch } from '@/components/badge-patch';
 import { badgeTitle, HONORS, isBadgeKey, type BadgeLevel, type HonorDef } from '@/core/badges';
 import { adminRiderSocial } from '@/lib/social';
@@ -31,6 +35,8 @@ export default function UserDetail() {
   const agreements = admin.useAdminData(() => admin.riderAgreements('', 0, 20, id), [id]);
   const social = admin.useAdminData(() => adminRiderSocial(id), [id]);
   const photo = useAvatar(id);
+  // The riding groups they run, with group photos (empty until the group photo server update is on).
+  const ownGroups = admin.useAdminData(() => adminUserGroups(id), [id]);
   // Their badges (empty until the Brand Ambassador server update is on).
   const badges = admin.useAdminData(() => admin.userBadges(id), [id]);
 
@@ -132,6 +138,14 @@ export default function UserDetail() {
     });
     if (r.ok) run('photo', () => adminRemoveAvatar(p.id, r.reason ?? ''), 'Profile picture removed.');
   };
+  const removeGroupPhoto = async (g: AdminGroup) => {
+    const r = await confirm({
+      title: `Remove the ${g.name} Group Photo?`,
+      message: 'The photo is deleted and the group shows its initials again. The group and everyone in it stay as they are, and the owner can upload a new one.',
+      confirmLabel: 'Remove Photo', tone: 'danger', reasonLabel: 'Reason (kept in the audit log)', reasonRequired: true,
+    });
+    if (r.ok) run(`group-${g.id}`, () => adminRemoveGroupPhoto(g.id, id, r.reason ?? ''), 'Group photo removed.').then(ownGroups.reload);
+  };
   const revoke = async (g: admin.Grant) => {
     const r = await confirm({
       title: 'Revoke Complimentary Pro?',
@@ -219,6 +233,28 @@ export default function UserDetail() {
           <Text style={styles.note}>App Store and Google Play billing is shown as the store reports it and can&apos;t be changed here.</Text>
         </Panel>
       </Columns>
+
+      {ownGroups.data && ownGroups.data.length ? (
+        <Panel title="Riding Groups They Run">
+          {ownGroups.data.map((g) => {
+            const uri = groupPhotoUrl(supabaseUrl, g.photo_path, id);
+            return (
+              <View key={g.id} style={styles.photoRow}>
+                <GroupPhoto uri={uri} name={g.name} size={64} radius={14} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <Text style={styles.photoLabel}>{g.name}</Text>
+                  <Text style={styles.note}>{`${fmtInt(g.riders)} ${g.riders === 1 ? 'rider' : 'riders'}, made ${fmtDate(g.created_at)}`}</Text>
+                  {uri ? (
+                    <AdminButton title="Remove Group Photo" kind="danger" small onPress={() => removeGroupPhoto(g)} loading={busy === `group-${g.id}`} />
+                  ) : (
+                    <Text style={styles.note}>No group photo.</Text>
+                  )}
+                </View>
+              </View>
+            );
+          })}
+        </Panel>
+      ) : null}
 
       <Panel title="Badges">
         {badges.error ? <Text style={styles.note}>Badges aren&apos;t available here until the badge server update is on.</Text> : null}

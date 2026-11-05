@@ -74,3 +74,5 @@ export const SHOWCASE_EMERGENCY_SIREN: boolean = false;
  * lines to the Free vs Pro table (Bluetooth Sharing, Group Photos, Custom Dots).
  */
 export const SHOWCASE_NO_SERVICE: boolean = false;
+/** The Group Photos line in the showcase. Off until the app version with group photos (2.1) is live in the stores. */
+export const SHOWCASE_GROUP_PHOTOS: boolean = false;

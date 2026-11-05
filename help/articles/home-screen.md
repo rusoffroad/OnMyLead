@@ -92,6 +92,10 @@ Your riding group with the newest group chat message (or your first group), with
 - **Plan a Group Ride** starts a new ride with that group already picked to invite. Creating rides follows your plan's ride limit.
 - Tap the group's name for its page. With more than one group, **All** opens the **Groups** tab.
 
+:::release 2.1
+The card shows the group's photo next to its name, if the rider who made the group added one, or the group's initials. See [Add a Group Photo](/help/riding-groups#add-a-group-photo).
+:::
+
 No group yet? **Ride With the Same Crew?** takes you to the **Groups** tab. See [Riding Groups](/help/riding-groups).
 
 ## Public Rides Near You
