@@ -535,7 +535,8 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   }
   // Then other riders' spots and receipts.
   for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) { picked.add(i); left--; }
-  return items.filter((i) => picked.has(i));
+  // The rider's own spot goes out first: a slow link that can't finish the round still carries it.
+  return own ? [own, ...items.filter((i) => i !== own && picked.has(i))] : items.filter((i) => picked.has(i));
 }
 
 /** The key an event is kept under: taps and whole messages by id, message parts and receipts by more. */

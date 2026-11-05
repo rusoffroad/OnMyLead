@@ -22,6 +22,6 @@ export async function selectAll(table: string, columns: string, key: string): Pr
     // A short page is the last one (PAGE is the server's own cap).
     if (rows.length < PAGE) return out;
     last = rows[rows.length - 1][key];
-    if (last === undefined || last === null) throw new Error(`selectAll: ${key} must be one of the columns`);
+    if (last === undefined || last === null) throw new Error(`selectAll: ${table}.${key} is empty on a row, so it can't order the pages`);
   }
 }

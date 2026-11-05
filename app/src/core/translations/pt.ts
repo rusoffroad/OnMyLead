@@ -2774,6 +2774,8 @@ const dict: Record<string, string> = {
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "Pronto. Sua próxima cobrança do Google Play foi adiada 6 meses, para {date}.",
   "Pro creates as many rides as you lead.": "Com o Pro você cria todos os passeios que liderar.",
   "Part of OnMyLead Pro.": "Parte do OnMyLead Pro.",
+  "Ride Polls": "Enquetes do passeio",
+  "iPad, Android Tablets and the Website": "iPad, tablets Android e o site",
   "one ride": "um passeio",
   "{n} rides": "{n} passeios",
   "Poll: {body}": "Enquete: {body}",

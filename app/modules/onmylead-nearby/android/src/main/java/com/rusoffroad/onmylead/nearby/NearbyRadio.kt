@@ -337,13 +337,13 @@ class NearbyRadio(
       if (fromUrgent) p.urgentFails = 0
     } else {
       p.busy = false
-      p.queue.clear()
-      // An urgent frame is kept until sent: back to the front, tried again shortly (one retry
-      // waiting at a time, a few times per frame; it also goes out in later rounds).
-      if (fromUrgent && ++p.urgentFails >= MAX_URGENT_TRIES) {
-        p.urgentFails = 0
-      } else if (fromUrgent) {
-        p.urgent.addFirst(f)
+      // A refused round frame drops the rest of the round (the next one carries it all again); a
+      // refused urgent frame leaves the round alone.
+      if (!fromUrgent) p.queue.clear()
+      if (fromUrgent) {
+        // Given up on after a few tries (later rounds carry it), else back to the front.
+        if (++p.urgentFails >= MAX_URGENT_TRIES) p.urgentFails = 0 else p.urgent.addFirst(f)
+        // Either way the link is tried again shortly, for what is still waiting.
         if (!p.urgentRetry) {
           p.urgentRetry = true
           handler.postDelayed({ peerOf(p.gatt)?.let { it.urgentRetry = false; pump(it) } }, 200)
@@ -370,11 +370,13 @@ class NearbyRadio(
       if (fromUrgent) s.urgentFails = 0
     } else {
       s.busy = false
-      s.queue.clear()
-      if (fromUrgent && ++s.urgentFails >= MAX_URGENT_TRIES) {
-        s.urgentFails = 0
-      } else if (fromUrgent) {
-        s.urgent.addFirst(f)
+      // A refused round frame drops the rest of the round (the next one carries it all again); a
+      // refused urgent frame leaves the round alone.
+      if (!fromUrgent) s.queue.clear()
+      if (fromUrgent) {
+        // Given up on after a few tries (later rounds carry it), else back to the front.
+        if (++s.urgentFails >= MAX_URGENT_TRIES) s.urgentFails = 0 else s.urgent.addFirst(f)
+        // Either way the link is tried again shortly, for what is still waiting.
         if (!s.urgentRetry) {
           s.urgentRetry = true
           handler.postDelayed({ subscribers[s.device.address]?.takeIf { it === s }?.let { it.urgentRetry = false; pump(it) } }, 200)

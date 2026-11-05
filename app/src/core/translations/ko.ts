@@ -2774,6 +2774,8 @@ const dict: Record<string, string> = {
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "완료. 다음 Google Play 결제가 6개월 미뤄져 {date}입니다.",
   "Pro creates as many rides as you lead.": "Pro로 리드하는 라이드를 원하는 만큼 만들 수 있습니다.",
   "Part of OnMyLead Pro.": "OnMyLead Pro 기능입니다.",
+  "Ride Polls": "라이드 투표",
+  "iPad, Android Tablets and the Website": "iPad, Android 태블릿 및 웹사이트",
   "one ride": "라이드 1개",
   "{n} rides": "라이드 {n}개",
   "Poll: {body}": "투표: {body}",

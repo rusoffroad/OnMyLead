@@ -2774,6 +2774,8 @@ const dict: Record<string, string> = {
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "完了。次回の Google Play の請求が 6 か月延びて {date} になりました。",
   "Pro creates as many rides as you lead.": "Pro なら、リードするライドをいくつでも作成できます。",
   "Part of OnMyLead Pro.": "OnMyLead Pro の機能です。",
+  "Ride Polls": "ライド投票",
+  "iPad, Android Tablets and the Website": "iPad、Android タブレット、ウェブサイト",
   "one ride": "1 件のライド",
   "{n} rides": "{n} 件のライド",
   "Poll: {body}": "投票: {body}",
