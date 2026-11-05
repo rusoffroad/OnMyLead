@@ -2,6 +2,17 @@
   {
     "date": "2026-11-05",
     "slugs": [
+      "social",
+      "notifications-inbox"
+    ],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "comment-thread-fixes",
+    "why": "2.1 release test of comment likes and replies: a hidden comment's replies are hidden everywhere, including the Feed's comment count and preview, and Social says so. notifications-inbox logged for its source (a like on your comment is matched on its own); riders see no other difference. Publishes with 2.1."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
       "leader-trackline",
       "ride-mode",
       "leader-sweep-and-tail-gunner",
@@ -56,17 +67,6 @@
     "by": "pr",
     "ref": "leader-trackline-touched",
     "why": "The Leader Trackline change touches Ride Mode's screen and map (live.tsx, group-map.tsx), the map layers panel (trail-map-overlay.tsx), the shared API (api.ts, one new call) and the translations (new lines in every language). Riders see no difference in these articles' screens, so they only get a new updated: date. It also adds a hidden showcase flag (constants/site.ts, showcase.web.tsx) for the Leader Trackline line, off until 2.1 is live; plans and prices are unchanged."
-  },
-  {
-    "date": "2026-11-05",
-    "slugs": [
-      "social",
-      "notifications-inbox"
-    ],
-    "kind": "fix",
-    "by": "pr",
-    "ref": "comment-thread-fixes",
-    "why": "2.1 release test of comment likes and replies: a hidden comment's replies are hidden everywhere, including the Feed's comment count and preview, and Social says so. notifications-inbox logged for its source (a like on your comment is matched on its own); riders see no other difference. Publishes with 2.1."
   },
   {
     "date": "2026-11-05",
