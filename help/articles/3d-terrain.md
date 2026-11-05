@@ -25,7 +25,7 @@ keywords: [3d, 3d map, terrain, elevation, contour, contour lines, topo, peaks, 
 ## Turn On 3D Terrain
 
 1. Open Ride Mode or Map Mode.
-2. Tap the round **Layers** button (the stacked layers icon) in the top-right corner of the map. **Map Settings** opens.
+2. Tap the round **Map Settings** button (two sliders) in the top-right corner of the map.
 3. Under **Map Style**, tap **3D Terrain**.
 
 The map tilts to show the land in 3D. To lay it flat again, tap **Satellite** or **Topo** under **Map Style**.

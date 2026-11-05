@@ -4,8 +4,9 @@ import { Marker, type UserLocationChangeEvent } from 'react-native-maps';
 import { ownFix, screenAngle, type OwnFix } from '@/core/heading';
 import { useCompass } from '@/lib/compass';
 import { MarkerBody } from './marker-body';
-import { OWN_PUCK_D } from './own-puck';
-import { puckBox, RiderPuck, YOU_INK } from './rider-puck';
+import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
+import { ownDotBox } from '@/core/own-dot-art';
+import { OwnDot } from './own-dot';
 
 import { t } from '@/lib/i18n';
 export type OwnLocation = {
@@ -59,10 +60,12 @@ export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHea
     if (f.headingDeg != null) setLastCourse(f.headingDeg);
   }), [own]);
   const compass = useCompass();
+  const d = useOwnDotD();
+  const [style] = useDotStylePref();
   if (!fix) return null;
   const moving = fix.headingDeg != null;
   const deg = fix.headingDeg ?? (compass != null && compass >= 0 ? compass : lastCourse);
-  const box = puckBox(OWN_PUCK_D, true);
+  const box = ownDotBox(d);
   return (
     <Marker
       coordinate={{ latitude: fix.lat, longitude: fix.lng }}
@@ -71,7 +74,7 @@ export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHea
       zIndex={9}
       accessibilityLabel={t('You are here')}>
       <MarkerBody style={{ width: box, height: box }} pointerEvents="none">
-        <RiderPuck color={YOU_INK} d={OWN_PUCK_D} beam moving={moving} angle={deg == null ? null : screenAngle(deg, mapHeading)} />
+        <OwnDot style={style} d={d} moving={moving} angle={deg == null ? null : screenAngle(deg, mapHeading)} />
       </MarkerBody>
     </Marker>
   );

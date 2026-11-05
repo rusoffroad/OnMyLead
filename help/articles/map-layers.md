@@ -70,7 +70,7 @@ In Ride Mode the leader and the ride's organizers also see **Leader Trackline** 
 :::release 2.1
 ## Map Settings
 
-From 2.1 the Layers button opens **Map Settings**, one sheet for everything about the map. On a phone it slides up from the bottom; on a tablet held sideways it sits on the right so you can watch the map change. The map stays lightly visible behind it, so each change shows as you make it. Swipe it down, tap the map, or tap **X** to close it. A small blue dot on the Layers button means the map isn't showing the standard set.
+From 2.1 the stacked-layers button is the round **Map Settings** button, with a two-slider icon, and it opens **Map Settings**, one sheet for everything about the map. On a phone it slides up from the bottom; on a tablet held sideways it sits on the right so you can watch the map change. The map stays lightly visible behind it, so each change shows as you make it. Swipe it down, tap the map, or tap **X** to close it. A small blue dot on the button means the map isn't showing the standard set.
 
 - **Map Style**: **Satellite**, **Topo** and **3D Terrain**, each shown as a picture. The one you're using has a blue ring and a check.
 - **On the Map**: four big switches, each with a strip of map showing the lines it draws:
@@ -82,10 +82,16 @@ From 2.1 the Layers button opens **Map Settings**, one sheet for everything abou
   A switch is on while any of its lines shows. Tapping it turns them all off, or all on.
 - **Every Map Feature**: tap **Fine-Tune** to open the full list below, one row per kind of line or land.
 - **Leader Trackline**: for the leader and organizers in Ride Mode.
-- **Map Buttons** (Ride Mode and Map Mode): switches for **Follow Me**, **Zoom In at Intersections** (on the Mapbox map), **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available). They're the same switches as on the **You** tab, so a change shows everywhere.
+- **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Safety Orange** (an orange 3D dome with a white arrow and a silver rim, the default), **Hi-Viz Dome** (lime with a black arrow), **Reflective Ring**, **Floating Arrowhead** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on the **You** tab.
+- **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the map slides along with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
+- **Map Buttons** (Ride Mode and Map Mode): **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available).
+
+These are the same switches as on the **You** tab, so a change shows everywhere.
 - **Download This Ride's Map** (Ride Mode), **Offline Maps**, and who the map data comes from.
 
 The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
+
+From 2.1 your own dot is a safety-orange 3D dome, half again as big as before at **Medium**, so it's easy to spot on a mount. Other riders' dots keep their colors (the leader blue, the tail gunner violet), so yours stands out.
 :::
 
 Your choices are remembered on your phone and used on every map in the app.

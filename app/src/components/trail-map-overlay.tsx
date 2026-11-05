@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { ActivityIndicator, Modal, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, Ellipse, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
@@ -16,7 +16,8 @@ import {
 import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
-import { requirePro } from '@/lib/pro';
+import { can, type FeatureKey } from '@/core/entitlements';
+import { currentEntitlements, requirePro } from '@/lib/pro';
 import { RateTrailSheet } from './rate-trail-sheet';
 import { RigFitLine, TrailWidthRow } from './trail-width-row';
 import { inches } from '@/core/trail-width';
@@ -28,6 +29,11 @@ import { SheetRoot, SheetScroll, SwipeSheet } from './swipe-sheet';
 import { useLayout } from '@/hooks/use-layout';
 import { withAlpha } from '@/core/color';
 import { useFollowMePref } from '@/hooks/use-follow-me';
+import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
+import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
+import { DOT_SIZE_NAME, DOT_SIZES } from '@/core/dot-size';
+import { DOT_STYLE_INK, DOT_STYLE_NAME, DOT_STYLES } from '@/core/own-dot-art';
+import { DotSample } from './own-dot';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { useMusicControlsSetting } from '@/hooks/use-music-controls';
 import { useFlag } from '@/lib/app-settings';
@@ -63,7 +69,7 @@ export function TrailMapOverlay({
   onFollow?: (t: PublicTrail) => void;
   /** Meters of a rider trail covered in Map Mode (for the rating sheet). */
   ridden?: (t: PublicTrail) => number | null;
-  /** Full Map: no Layers button or zoom hint, just the No Signal tag and a tapped trail's card. */
+  /** Full Map: no Map Settings button or zoom hint, just the No Signal tag and a tapped trail's card. */
   bare?: boolean;
   /** Ride Mode and Map Mode: Map Settings also shows the switches for the buttons on the map (Tilt Meter, Music and so on). */
   controls?: boolean;
@@ -80,7 +86,7 @@ export function TrailMapOverlay({
   ]
     .filter(Boolean)
     .join(', ');
-  // A small dot on the Layers button says the map isn't showing the standard set.
+  // A small dot on the Map Settings button says the map isn't showing the standard set.
   const changed = trail.base !== 'satellite' || featuresChanged(trail.features);
 
   return (
@@ -95,7 +101,7 @@ export function TrailMapOverlay({
             hitSlop={6}
             onPress={() => setOpen(true)}
             style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}>
-            <LayersIcon color={Colors.text} />
+            <SettingsIcon color={Colors.text} />
             {changed ? <View style={styles.fabDot} /> : null}
           </Pressable>
         )}
@@ -163,13 +169,19 @@ export function TrailMapOverlay({
 }
 
 /**
- * Map Settings (2.1): everything about the map in one sheet, opened from the Layers button. The map
+ * Map Settings (2.1): everything about the map in one sheet, opened from the Map Settings button. The map
  * style as three pictures (Satellite, Topo, 3D Terrain), four big switches for what riders think in
  * (Streets and Roads, Off-Road Trails, Hiking Trails, Land Boundaries), every Map Feature for
  * fine-tuning, the leader's Leader Trackline, and on the riding maps the switches for the buttons on
  * the map. It slides up from the bottom on a phone and docks on the right of a tablet in landscape,
  * with a light dim so the map shows each change as it's made.
  */
+/**
+ * The Pro check for controls inside Map Settings. The sheet is a Modal, and iPhone won't show the
+ * Pro prompt (another Modal) over it, so a Free rider's tap closes the sheet and then opens the prompt.
+ */
+const SheetPro = createContext<(feature: FeatureKey) => boolean>(requirePro);
+
 function MapSettingsSheet({
   visible, onClose, trail, route, ride, lookupHint, credit, trackline, controls,
 }: {
@@ -189,7 +201,15 @@ function MapSettingsSheet({
   // A tablet in landscape (or a wide window) keeps the map in view: the sheet docks on the right.
   const side = layout.wide && layout.landscape;
   const bases: BaseMap[] = trail.terrainAvailable ? ['satellite', 'topo', 'terrain'] : ['satellite', 'topo'];
+  const pro = useCallback((feature: FeatureKey) => {
+    if (can(currentEntitlements(), feature)) return true;
+    onClose();
+    // After the sheet's own close animation, so the prompt has the screen to itself.
+    setTimeout(() => requirePro(feature), 450);
+    return false;
+  }, [onClose]);
   return (
+    <SheetPro.Provider value={pro}>
     <Modal visible={visible} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot style={[styles.sheetRoot, side && styles.sheetRootSide]}>
         <Pressable style={styles.sheetScrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
@@ -219,7 +239,7 @@ function MapSettingsSheet({
               </View>
               <View style={styles.styles} accessibilityRole="radiogroup" accessibilityLabel={tr('Map style')}>
                 {bases.map((b) => (
-                  <StyleTile key={b} base={b} on={trail.base === b} onPress={() => requirePro('map_layers') && trail.setBase(b)} />
+                  <StyleTile key={b} base={b} on={trail.base === b} onPress={() => pro('map_layers') && trail.setBase(b)} />
                 ))}
               </View>
               {trail.base === 'terrain' ? (
@@ -240,8 +260,8 @@ function MapSettingsSheet({
                     q={q}
                     on={quickLayerOn(trail.features, q)}
                     onPress={() => {
-                      if (!requirePro('map_layers')) return;
-                      for (const c of quickLayerToggle(trail.features, q)) trail.setFeature(c.id, c.on);
+                      if (!pro('map_layers')) return;
+                      trail.setFeatures(quickLayerToggle(trail.features, q));
                     }}
                   />
                 ))}
@@ -283,6 +303,7 @@ function MapSettingsSheet({
         </SwipeSheet>
       </SheetRoot>
     </Modal>
+    </SheetPro.Provider>
   );
 }
 
@@ -403,19 +424,99 @@ function MapButtons({ trail }: { trail: TrailMap }) {
   const [music, setMusic] = useMusicControlsSetting();
   const musicFlag = useFlag('music_controls');
   const [followMe, setFollowMe] = useFollowMePref();
+  const [edgeZoom, setEdgeZoom] = useEdgeZoomPref();
   const [junctions, setJunctions] = useIntersectionZoomPref();
-  const rows: { key: string; name: string; detail: string; on: boolean; set: (on: boolean) => void }[] = [
-    { key: 'follow', name: 'Follow Me', detail: 'The map moves with you as you ride.', on: followMe, set: setFollowMe },
-    ...(trail.mapbox ? [{ key: 'junctions', name: 'Zoom In at Intersections', detail: 'Closes in on a turn as you reach it, then zooms back out.', on: junctions, set: setJunctions }] : []),
+  const following: SwitchRowItem[] = [
+    { key: 'follow', name: 'Follow Me', detail: 'The map moves to keep your dot on screen as you ride.', on: followMe, set: setFollowMe },
+    { key: 'edge', name: 'Zoom Out at the Edge', detail: 'The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.', on: edgeZoom, set: setEdgeZoom, off: !followMe },
+    ...(trail.mapbox ? [{ key: 'junctions', name: 'Zoom In at Intersections', detail: 'Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.', on: junctions, set: setJunctions, off: !followMe }] : []),
+  ];
+  const buttons: SwitchRowItem[] = [
     ...(!WEB ? [{ key: 'tilt', name: 'Tilt Meter', detail: 'Roll and pitch on the map. Calibrate it on the Tilt screen.', on: tilt.show, set: setTiltShown }] : []),
     ...(musicAvailable && musicFlag ? [{ key: 'music', name: 'Music Button', detail: 'Play, pause, skip and volume without leaving the map.', on: music, set: setMusic }] : []),
   ];
   return (
+    <>
+      <DotSizeRow />
+      <SwitchGroup title="Following" rows={following} note={followMe ? null : 'Zooming works while Follow Me is on.'} />
+      {buttons.length ? <SwitchGroup title="Map Buttons" rows={buttons} /> : null}
+    </>
+  );
+}
+
+/** Your Dot: its look and its size, the same choice on every live map and the You tab. */
+function DotSizeRow() {
+  return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{tr('Map Buttons')}</Text>
+      <Text style={styles.sectionTitle}>{tr('Your Dot')}</Text>
+      <DotStyleChoice />
+      <View style={[styles.group2, styles.switchRow]}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={styles.switchName}>{tr('Dot Size')}</Text>
+          <Text style={styles.switchDetail}>{tr('How big your own dot is on the map.')}</Text>
+        </View>
+        <DotSizeChoice />
+      </View>
+    </View>
+  );
+}
+
+/** The Dot Styles as sample tiles, one tap to pick (Map Settings and the You tab). */
+export function DotStyleChoice() {
+  const [style, setStyle] = useDotStylePref();
+  return (
+    <View style={styles.dotStyles} accessibilityRole="radiogroup" accessibilityLabel={tr('Dot Style')}>
+      {DOT_STYLES.map((s) => {
+        const on = style === s;
+        return (
+          <Pressable
+            key={s}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: on }}
+            accessibilityLabel={tr(DOT_STYLE_NAME[s])}
+            onPress={() => setStyle(s)}
+            style={[styles.dotStyle, on && { borderColor: DOT_STYLE_INK[s], backgroundColor: withAlpha(DOT_STYLE_INK[s], 0.1) }]}>
+            <View style={styles.dotStyleArt}>
+              <DotSample style={s} size={40} />
+            </View>
+            <Text style={[styles.dotStyleName, on && { color: Colors.text }]} numberOfLines={2}>{tr(DOT_STYLE_NAME[s])}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/** Small, Medium, Large as one pill (Map Settings and the You tab). */
+export function DotSizeChoice() {
+  const [size, setSize] = useDotSizePref();
+  return (
+    <View style={styles.seg} accessibilityRole="radiogroup" accessibilityLabel={tr('Dot Size')}>
+      {DOT_SIZES.map((s) => (
+        <Pressable
+          key={s}
+          accessibilityRole="radio"
+          accessibilityState={{ checked: size === s }}
+          accessibilityLabel={tr(DOT_SIZE_NAME[s])}
+          onPress={() => setSize(s)}
+          hitSlop={4}
+          style={[styles.segItem, size === s && styles.segOn]}>
+          <Text style={[styles.segText, size === s && styles.segTextOn]}>{tr(DOT_SIZE_NAME[s])}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+type SwitchRowItem = { key: string; name: string; detail: string; on: boolean; set: (on: boolean) => void; /** Shown dimmed: it only works with another switch on. */ off?: boolean };
+
+function SwitchGroup({ title, rows, note }: { title: string; rows: SwitchRowItem[]; note?: string | null }) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{tr(title)}</Text>
       <View style={styles.group2}>
         {rows.map((r, i) => (
-          <View key={r.key} style={[styles.switchRow, i > 0 && styles.switchRowRule]}>
+          <View key={r.key} style={[styles.switchRow, i > 0 && styles.switchRowRule, r.off && { opacity: 0.5 }]}>
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={styles.switchName}>{tr(r.name)}</Text>
               <Text style={styles.switchDetail}>{tr(r.detail)}</Text>
@@ -426,12 +527,13 @@ function MapButtons({ trail }: { trail: TrailMap }) {
               accessibilityLabel={tr(r.name)}
               trackColor={{ false: withAlpha(Colors.textSecondary, 0.35), true: Colors.sky }}
               thumbColor="#FFFFFF"
-              {...(WEB ? { activeThumbColor: "#FFFFFF" } : {})}
+              {...(WEB ? { activeThumbColor: '#FFFFFF' } : {})}
               ios_backgroundColor={withAlpha(Colors.textSecondary, 0.35)}
             />
           </View>
         ))}
       </View>
+      {note ? <Text style={styles.fine}>{tr(note)}</Text> : null}
     </View>
   );
 }
@@ -443,9 +545,10 @@ function MapButtons({ trail }: { trail: TrailMap }) {
  * other devices.
  */
 function MapFeaturesList({ trail, lookupHint }: { trail: TrailMap; lookupHint: string }) {
+  const pro = useContext(SheetPro);
   const set = (id: MapFeatureId, on: boolean) => {
     // Rider Trails and Park Trails are free for everyone; the rest are part of map layers (Pro).
-    if (id === 'riderTrails' || id === 'parkTrails' || requirePro('map_layers')) trail.setFeature(id, on);
+    if (id === 'riderTrails' || id === 'parkTrails' || pro('map_layers')) trail.setFeature(id, on);
   };
   return (
     <View style={{ gap: 14 }}>
@@ -461,8 +564,8 @@ function MapFeaturesList({ trail, lookupHint }: { trail: TrailMap; lookupHint: s
                 accessibilityLabel={allOn ? tr('Hide All {group}', { group: tr(g.name) }) : tr('Show All {group}', { group: tr(g.name) })}
                 hitSlop={8}
                 onPress={() => {
-                  if (!requirePro('map_layers')) return;
-                  for (const f of list) if (trail.features[f.id] !== !allOn) trail.setFeature(f.id, !allOn);
+                  if (!pro('map_layers')) return;
+                  trail.setFeatures(list.filter((f) => trail.features[f.id] !== !allOn).map((f) => ({ id: f.id, on: !allOn })));
                 }}>
                 <Text style={styles.groupAll}>{allOn ? tr('Hide All') : tr('Show All')}</Text>
               </Pressable>
@@ -688,6 +791,7 @@ const FLAT: OfflineChoice[] = ['satellite', 'topo', 'trails'];
  * whose map style is 3D Terrain); then shows how it is going.
  */
 function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: string }; route: LatLng[]; terrain: boolean }) {
+  const pro = useContext(SheetPro);
   const maps = useOfflineMaps();
   const saved = rideDownload(maps, ride.id);
   const ALL = useMemo<OfflineChoice[]>(() => (terrain ? [...FLAT, 'terrain'] : FLAT), [terrain]);
@@ -700,7 +804,7 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
       <Pressable
         accessibilityRole="button"
         accessibilityHint={tr('Saves satellite, topo and trails around this ride\'s route for riding with no signal')}
-        onPress={() => requirePro('offline_maps') && downloadRide(ride.id, ride.name, route, ALL)}
+        onPress={() => pro('offline_maps') && downloadRide(ride.id, ride.name, route, ALL)}
         style={({ pressed }) => [styles.save, pressed && { opacity: 0.85 }]}>
         <View style={styles.saveRow}>
           <Text style={styles.saveText}>{tr('Download This Ride’s Map')}</Text>
@@ -872,11 +976,12 @@ export function ParkTrailCard({ t, onClose }: { t: ParkTrail; onClose: () => voi
   );
 }
 
-function LayersIcon({ color }: { color: string }) {
+/** Map Settings' button: two sliders, the sign for "settings" that reads at a glance on a map. */
+function SettingsIcon({ color }: { color: string }) {
   return (
     <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-      <Path d="M12 3.5l8.5 4.5-8.5 4.5-8.5-4.5z" stroke={color} strokeWidth={2} strokeLinejoin="round" />
-      <Path d="M3.5 12.2l8.5 4.5 8.5-4.5M3.5 16.4l8.5 4.5 8.5-4.5" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M4 8h9M19 8h1M4 16h1M11 16h9" stroke={color} strokeWidth={2.2} strokeLinecap="round" />
+      <Path d="M16 5.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM8 13.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5z" stroke={color} strokeWidth={2.2} />
     </Svg>
   );
 }
@@ -931,6 +1036,15 @@ const styles = themedStyles(() => ({
   group2: { borderRadius: 18, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge, paddingHorizontal: 14 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, minHeight: 60 },
   switchRowRule: { borderTopWidth: 1, borderTopColor: Glass.edge },
+  dotStyles: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  dotStyle: { flexGrow: 1, flexBasis: 88, maxWidth: 140, alignItems: 'center', gap: 4, paddingVertical: 10, paddingHorizontal: 6, borderRadius: 16, borderWidth: 1.5, borderColor: Glass.edge, backgroundColor: Glass.tile },
+  dotStyleArt: { height: 46, justifyContent: 'center', alignItems: 'center' },
+  dotStyleName: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 12, lineHeight: 15, textAlign: 'center' },
+  seg: { flexDirection: 'row', borderRadius: 999, padding: 3, backgroundColor: withAlpha(Colors.textSecondary, 0.18) },
+  segItem: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 7, minHeight: 32, justifyContent: 'center' },
+  segOn: { backgroundColor: Colors.sky },
+  segText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 13 },
+  segTextOn: { color: '#FFFFFF' },
   switchName: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   switchDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12, lineHeight: 16 },
   hint: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.pill, ...glass },

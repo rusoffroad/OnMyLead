@@ -50,7 +50,7 @@ The buttons are big enough to use with gloves on, but pull over before you look 
 Don't want it? Tap **Hide Music Button** at the bottom of the Music sheet, or go to the **You** tab and switch off **Music Controls**. The button disappears from Ride Mode and Navigate. Switch **Music Controls** back on in the **You** tab any time. The setting is kept on each phone or tablet separately.
 
 :::release 2.1
-From 2.1 you can also show or hide it from the map: tap the **Layers** button, then switch **Music Button** under **Map Buttons** in **Map Settings**.
+From 2.1 you can also show or hide it from the map: tap the round **Map Settings** button, then switch **Music Button** under **Map Buttons**.
 :::
 
 :::note
