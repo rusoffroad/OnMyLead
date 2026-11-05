@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, Ellipse, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
@@ -207,13 +207,17 @@ function MapSettingsSheet({
   const side = layout.wide && layout.landscape;
   const bases: BaseMap[] = trail.terrainAvailable ? ['satellite', 'topo', 'terrain'] : ['satellite', 'topo'];
   const pendingPro = useRef<FeatureKey | null>(null);
+  const proLater = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // Leaving the screen drops a Pro prompt still waiting, so it can't pop up somewhere else.
+  useEffect(() => () => clearTimeout(proLater.current), []);
   const pro = useCallback((feature: FeatureKey) => {
     if (can(currentEntitlements(), feature)) return true;
     onClose();
     if (PRO_PROMPT_WAITS_FOR_DISMISS) {
       pendingPro.current = feature;
       // In case the close never reports back (onDismiss), ask just after it would have finished.
-      setTimeout(() => {
+      clearTimeout(proLater.current);
+      proLater.current = setTimeout(() => {
         if (pendingPro.current !== feature) return;
         pendingPro.current = null;
         requirePro(feature);

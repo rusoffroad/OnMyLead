@@ -9,6 +9,13 @@ import { Platform } from 'react-native';
  * once.
  */
 const ONE_SHEET_AT_A_TIME = Platform.OS === 'ios';
+/** How long iPhone and iPad take to finish taking a Modal off screen once it's gone (ms). */
+const LEAVING_MS = 600;
+/** On iPhone and iPad, run `f` once a Modal that just went away has finished leaving the screen. */
+function afterLeaving(f: () => void): void {
+  if (ONE_SHEET_AT_A_TIME) setTimeout(f, LEAVING_MS);
+  else f();
+}
 
 let urgent = 0;
 let sheetsUp = 0;
@@ -27,8 +34,11 @@ export function useUrgentModal(): boolean {
     urgent++;
     emit();
     return () => {
-      urgent--;
-      emit();
+      // Sheets come back only once the urgent screen has left the screen (iPhone and iPad).
+      afterLeaving(() => {
+        urgent--;
+        emit();
+      });
     };
   }, []);
   const up = useSyncExternalStore(subscribe, () => sheetsUp, () => sheetsUp);
@@ -72,7 +82,8 @@ export function useSheetUp(visible: boolean): () => void {
     const t = setTimeout(down, 1500);
     return () => clearTimeout(t);
   }, [visible]);
-  useEffect(() => down, []);
+  // A sheet taken away while up still needs a moment to leave the screen (iPhone and iPad).
+  useEffect(() => () => afterLeaving(down), []);
   return () => {
     if (!visible) down();
   };
