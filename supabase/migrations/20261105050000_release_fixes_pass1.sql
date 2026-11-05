@@ -235,11 +235,9 @@ begin
          exists (select 1 from feed_comment_likes l where l.comment_id = c.id and l.user_id = v_me)
   from feed_comments c
   join profiles p on p.id = c.author_id
-  left join feed_comments par on par.id = c.parent_id
   left join feed_comments rt on rt.id = c.reply_to_id
   left join profiles rp on rp.id = rt.author_id
-  where c.item_key = p_key and c.hidden_at is null and not riders_blocked(v_me, c.author_id)
-    and (c.parent_id is null or (par.hidden_at is null and not riders_blocked(v_me, par.author_id)))
+  where c.item_key = p_key and feed_comment_shown(v_me, c)
   order by c.created_at
   limit 300;
 end;

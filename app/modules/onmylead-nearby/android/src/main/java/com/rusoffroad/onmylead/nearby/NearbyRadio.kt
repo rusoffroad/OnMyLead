@@ -269,21 +269,14 @@ class NearbyRadio(
     server = null
   }
 
-  /**
-   * Hands each link this round's frames. Every round carries everything still worth sending, so a
-   * link still working through the last round drops what it hadn't sent and takes the new round
-   * whole: a slow link can't end up holding only some parts of a message.
-   */
   private fun send(frames: List<ByteArray>) {
     if (frames.isEmpty()) return
     for (p in peers.values) {
       if (p.inbox == null) continue
-      p.queue.clear()
       for (f in frames) if (f.size <= p.mtu - 3 && p.queue.size < MAX_QUEUE) p.queue.add(f)
       pump(p)
     }
     for (s in subscribers.values) {
-      s.queue.clear()
       for (f in frames) if (f.size <= s.mtu - 3 && s.queue.size < MAX_QUEUE) s.queue.add(f)
       pump(s)
     }
@@ -494,7 +487,10 @@ class NearbyRadio(
     }
     p.busy = false
     if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) {
-      drop(p.gatt)
+      // Dropped on the next turn: this may run inside send()'s loop over the peers.
+      p.cccd = null
+      p.inbox = null
+      handler.post { peerOf(p.gatt)?.let { drop(it.gatt) } }
       return true
     }
     p.cccdRetry = true

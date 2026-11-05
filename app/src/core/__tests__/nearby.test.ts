@@ -339,5 +339,9 @@ describe('pickFrames', () => {
     for (const n of counts.values()) expect(n).toBe(6);
     // Three whole messages fit beside the own spot; a fourth would go over.
     expect(counts.size).toBe(3);
+    // Later rounds start with other messages, so every message gets a round before it ages out.
+    const seen = new Set<string>();
+    for (let turn = 0; turn < 5; turn++) for (const i of pickFrames(items, A, turn)) if (i.kind === 'reply') seen.add(i.id);
+    expect(seen.size).toBe(5);
   });
 });

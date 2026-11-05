@@ -483,29 +483,27 @@ function rank(item: NearbyItem, myId: string): number {
 /**
  * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
  * message's parts go together or not at all, so a full round never ends partway through a message.
+ * When messages don't all fit, `turn` (one more each round) rotates which go first, so an older
+ * message gets its round instead of waiting behind the newest until it ages out.
  */
-export function pickFrames<T extends NearbyItem>(items: T[], myId: string): T[] {
+export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn = 0): T[] {
   if (items.length <= MAX_FRAMES_PER_ROUND) return items;
   const own = items.find((i) => i.kind === 'position' && i.userId === myId);
-  const budget = MAX_FRAMES_PER_ROUND - (own ? 1 : 0);
-  const partsOf = new Map<string, number>();
-  for (const i of items) if (i.kind === 'reply') partsOf.set(i.id, (partsOf.get(i.id) ?? 0) + 1);
+  let left = MAX_FRAMES_PER_ROUND - (own ? 1 : 0);
   const picked = new Set<T>();
-  const whole = new Set<string>();
-  const waits = new Set<string>();
-  let used = 0; // Frames spoken for, counting the rest of a message already let in.
-  for (const i of items) {
-    if (i === own) continue;
-    if (i.kind === 'reply') {
-      if (whole.has(i.id)) { picked.add(i); continue; }
-      if (waits.has(i.id)) continue;
-      const n = partsOf.get(i.id) ?? 1;
-      if (used + n <= budget) { whole.add(i.id); picked.add(i); used += n; } else waits.add(i.id);
-      continue;
-    }
-    if (used < budget) { picked.add(i); used += 1; }
-  }
   if (own) picked.add(own);
+  // Taps first, as sending order has them.
+  for (const i of items) if (i.kind === 'status' && left > 0) { picked.add(i); left--; }
+  // Then whole messages, starting at this round's turn.
+  const messages = new Map<string, T[]>();
+  for (const i of items) if (i.kind === 'reply') messages.set(i.id, [...(messages.get(i.id) ?? []), i]);
+  const groups = [...messages.values()];
+  const start = groups.length ? turn % groups.length : 0;
+  for (const g of [...groups.slice(start), ...groups.slice(0, start)]) {
+    if (g.length <= left) { for (const i of g) picked.add(i); left -= g.length; }
+  }
+  // Then other riders' spots and receipts.
+  for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) { picked.add(i); left--; }
   return items.filter((i) => picked.has(i));
 }
 
@@ -532,6 +530,8 @@ export type OwnReplyInput = { id: string; body: string; at: number };
 export class NearbyMesh {
   private positions = new Map<string, Heard>();
   private events = new Map<string, Heard>();
+  /** Rounds sent so far: rotates which messages go first when a round is full. */
+  private turn = 0;
 
   readonly myId: string;
 
@@ -714,7 +714,7 @@ export class NearbyMesh {
     const items = this.live(now)
       .map((i) => (heard(i)?.mine ? i : { ...i, hops: i.hops + 1 }))
       .filter((i) => i.hops <= MAX_HOPS);
-    return pickFrames(items, this.myId).map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
+    return pickFrames(items, this.myId, this.turn++).map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 
   /** Newest spot heard for each other rider. */

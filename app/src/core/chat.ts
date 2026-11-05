@@ -1,11 +1,6 @@
 import { tc } from './i18n';
 import { isTransientError } from './errors';
 
-/** One line, single spaces, trimmed: how Ride Mode messages and quick replies are compared and sent. */
-export function tidyRideMessage(raw: string): string {
-  return raw.replace(/\s+/g, ' ').trim();
-}
-
 /**
  * Ride chat and announcements.
  *
@@ -13,6 +8,11 @@ export function tidyRideMessage(raw: string): string {
  * and read aloud in Ride Mode so nobody has to look at the phone while driving. In Ride Mode
  * riders can only send the canned quick replies below, never type.
  */
+
+/** One line, single spaces, trimmed: how Ride Mode messages and quick replies are compared and sent. */
+export function tidyRideMessage(raw: string): string {
+  return raw.replace(/\s+/g, ' ').trim();
+}
 
 export type MessageKind = 'chat' | 'announcement' | 'status';
 
