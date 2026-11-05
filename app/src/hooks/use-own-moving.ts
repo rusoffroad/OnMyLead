@@ -30,7 +30,11 @@ export function useOwnMoving(everyMs?: number): [boolean, (moving: boolean, fixA
     state.current = { ...state.current, gaps: [] };
     arm();
   }, [everyMs, arm]);
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    // Mounting again (a remount that keeps this state) picks the running wait back up.
+    arm();
+    return () => clearTimeout(timer.current);
+  }, [arm]);
   const feed = useCallback((isMoving: boolean, fixAtMs?: number) => {
     const next = ownMoveStep(state.current, isMoving, fixAtMs, Date.now());
     if (next === state.current) return;

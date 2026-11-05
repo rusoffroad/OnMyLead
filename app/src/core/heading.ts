@@ -62,7 +62,7 @@ export function ownArrow(
 /**
  * Your own dot, moving or stopped (2.1). A stopped fix shows the stopped look at once. Phones send
  * no location update while standing still, so a quiet spell with no new fix also means stopped:
- * two and a half fix gaps, never under 5 s, so the dot never flips between fixes mid-ride or in a
+ * two and a half fix gaps, never under 8 s, so the dot never flips between fixes mid-ride or in a
  * short GPS gap under trees. The fix gap is the longest recent gap between back-to-back moving
  * fixes, and never less than the map's own update interval when it sets one (Ride Mode's battery
  * plans on Android); with neither known, 16 s.
@@ -80,8 +80,8 @@ export type OwnMoveState = {
 };
 export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, timed: false, seenAt: null, gaps: [] };
 
-/** The shortest quiet spell that means stopped (ms). */
-export const OWN_STOPPED_AFTER_MS = 5000;
+/** The shortest quiet spell that means stopped (ms): longer than a brief GPS dropout on a once-a-second map. */
+export const OWN_STOPPED_AFTER_MS = 8000;
 /** The wait before any fix gap is known and the map gave no interval: just over Battery Saver's 15 s. */
 export const OWN_STOPPED_UNKNOWN_MS = 16_000;
 /**
@@ -100,7 +100,8 @@ export const OWN_FIX_GAPS_KEPT = 5;
  * a burst of fixes the phone held back keeps its real spacing; otherwise by when they arrived.
  */
 export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number | null | undefined, nowMs: number): OwnMoveState {
-  const fixAt = fixAtMs != null && Number.isFinite(fixAtMs) ? fixAtMs : null;
+  // A time of 0 or less is a missing one (some map builds send 0), not the fix's own time.
+  const fixAt = fixAtMs != null && Number.isFinite(fixAtMs) && fixAtMs > 0 ? fixAtMs : null;
   if (fixAt != null && prev.fixAt != null && fixAt === prev.fixAt) return prev;
   let gaps = prev.gaps;
   if (moving && prev.moving) {

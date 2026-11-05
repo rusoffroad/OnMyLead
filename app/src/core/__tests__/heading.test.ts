@@ -119,9 +119,13 @@ describe('own dot moving or stopped', () => {
     expect(ownStopWaitMs(ride(20_000, 3))).toBe(50_000);
   });
   it('measures gaps by the fixes\' own times, so a held-back burst keeps its real spacing', () => {
-    let s = ownMoveStep(OWN_MOVE_START, true, 0, 100_000);
-    for (let k = 1; k <= 3; k++) s = ownMoveStep(s, true, k * 15_000, 100_000 + k);
+    let s = ownMoveStep(OWN_MOVE_START, true, 1, 100_000);
+    for (let k = 1; k <= 3; k++) s = ownMoveStep(s, true, 1 + k * 15_000, 100_000 + k);
     expect(ownStopWaitMs(s)).toBe(37_500);
+  });
+  it('a fix time of 0 counts as no time, so the dot never sticks', () => {
+    const s = ownMoveStep(OWN_MOVE_START, true, 0, 1000);
+    expect(ownMoveStep(s, false, 0, 2000).moving).toBe(false);
   });
   it('a fix with no time of its own is never taken for a repeat', () => {
     const s = ownMoveStep(OWN_MOVE_START, true, null, 1000);
@@ -130,8 +134,8 @@ describe('own dot moving or stopped', () => {
     expect(t.moving).toBe(false);
   });
   it('a timeless fix in between does not hide a repeat, nor double the next gap', () => {
-    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 0, 0), true, null, 1000);
-    expect(ownMoveStep(s, true, 0, 1500)).toBe(s);
+    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 5, 0), true, null, 1000);
+    expect(ownMoveStep(s, true, 5, 1500)).toBe(s);
     const next = ownMoveStep(s, true, 2000, 2000);
     expect(next.gaps).toEqual([1000, 1000]);
   });
