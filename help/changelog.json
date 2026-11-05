@@ -4,8 +4,8 @@
     "slugs": ["follow-me", "privacy", "ride-bubble"],
     "kind": "fix",
     "by": "pr",
-    "ref": "release-test-pass-57-66",
-    "why": "2.1 test passes 57-66: your dot takes its stopped look as soon as the phone reports you've stopped, or after a quiet spell with no new location (about 5 seconds when the map updates every second, longer when Balanced or Max Battery Saver sends fewer updates, so it never flips between them), the same on every map (apps with or without Mapbox, and both website maps); the compass starts right after Allow even while the app is already checking; and a meeting-point pin on the website lands at its newest spot when the map finishes loading. No steps changed."
+    "ref": "release-test-pass-57-67",
+    "why": "2.1 test passes 57-67: your dot takes its stopped look as soon as the phone reports you've stopped, or after a quiet spell with no new location (about 5 seconds when the map updates every second, longer when Balanced or Max Battery Saver sends fewer updates, so it never flips between them), the same on every map (apps with or without Mapbox, and both website maps); the compass starts right after Allow even while the app is already checking; and a meeting-point pin on the website lands at its newest spot when the map finishes loading. Follow Me's Your Dot section now says when the stopped look starts."
   },
   {
     "date": "2026-11-05",

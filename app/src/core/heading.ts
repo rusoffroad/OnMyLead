@@ -74,15 +74,17 @@ export type OwnMoveState = {
   seenAt: number | null;
   /** Recent gaps between back-to-back moving fixes (ms), newest last. */
   gaps: number[];
+  /** Stopped only because the quiet spell ran out (no stopped fix came). */
+  quiet: boolean;
 };
-export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, seenAt: null, gaps: [] };
+export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, seenAt: null, gaps: [], quiet: false };
 
 /** The shortest quiet spell that means stopped (ms). */
 export const OWN_STOPPED_AFTER_MS = 5000;
 /** The wait before the map's fix rate is known (a map just opened): just over Battery Saver's 15 s. */
 export const OWN_STOPPED_UNKNOWN_MS = 16_000;
-/** A gap between moving fixes longer than this is a dead spot, not the map's fix rate (ms). */
-export const OWN_FIX_GAP_MAX_MS = 60_000;
+/** A gap between moving fixes longer than this is a dead spot, not the map's fix rate (ms): just over Battery Saver's 15 s, so the wait never grows past 50 s. */
+export const OWN_FIX_GAP_MAX_MS = 20_000;
 /** How many recent fix gaps your dot remembers (the longest of them sets the wait). */
 export const OWN_FIX_GAPS_KEPT = 5;
 
@@ -94,16 +96,18 @@ export const OWN_FIX_GAPS_KEPT = 5;
 export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number, nowMs: number): OwnMoveState {
   if (prev.fixAt != null && fixAtMs === prev.fixAt) return prev;
   let gaps = prev.gaps;
-  if (moving && prev.moving && prev.seenAt != null) {
+  // Back-to-back moving fixes, or a moving fix right after the quiet spell ran out (the fixes got
+  // slower, e.g. Battery Saver came on), show the map's fix rate; a stopped fix in between doesn't.
+  if (moving && (prev.moving || prev.quiet) && prev.seenAt != null) {
     const gap = nowMs - prev.seenAt;
     if (gap > 0 && gap <= OWN_FIX_GAP_MAX_MS) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
   }
-  return { moving, fixAt: fixAtMs, seenAt: nowMs, gaps };
+  return { moving, fixAt: fixAtMs, seenAt: nowMs, gaps, quiet: false };
 }
 
 /** The quiet spell had no new fix: stopped (the learned fix rate stays). */
 export function ownMoveTimedOut(prev: OwnMoveState): OwnMoveState {
-  return { ...prev, moving: false };
+  return { ...prev, moving: false, quiet: true };
 }
 
 /** How long to wait with no new fix before counting you stopped (ms). */

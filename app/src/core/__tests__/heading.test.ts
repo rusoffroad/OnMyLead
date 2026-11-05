@@ -101,8 +101,16 @@ describe('own dot moving or stopped', () => {
     expect(quiet.moving).toBe(false);
     expect(ownStopWaitMs(ownMoveStep(quiet, true, 50_000, 50_000))).toBe(OWN_STOPPED_AFTER_MS);
   });
-  it('ignores a dead spot over a minute as a fix gap', () => {
-    expect(ownStopWaitMs(ownMoveStep(ride(1000, 3), true, 100_000, 100_000))).toBe(OWN_STOPPED_AFTER_MS);
+  it('learns a slower fix rate after one quiet spell (Battery Saver came on mid-ride)', () => {
+    const fast = ride(1000, 5);
+    const quiet = ownMoveTimedOut(fast);
+    const next = ownMoveStep(quiet, true, 4000 + 15_000, 4000 + 15_000);
+    expect(next.moving).toBe(true);
+    expect(ownStopWaitMs(next)).toBe(37_500);
+  });
+  it('ignores a dead spot as a fix gap, so the wait never grows past 50 s', () => {
+    expect(ownStopWaitMs(ownMoveStep(ride(1000, 3), true, 30_000, 30_000))).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ride(20_000, 5))).toBe(50_000);
   });
   it('ignores a repeated fix (only the compass turned)', () => {
     const s = ownMoveStep(OWN_MOVE_START, true, 1000, 1000);
