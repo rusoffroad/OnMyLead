@@ -325,6 +325,22 @@ do $$ begin
   end if;
 end $$;
 
+-- R13. An expired reward with an unfinished bill move doesn't take a fresh code.
+insert into auth.users (id, raw_user_meta_data) values ('00000000-0000-0000-0000-000000000f08', '{"full_name":"Kai Ref"}');
+insert into referrals (referrer_id, friend_id, code) values ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000f08', 'REXREF0001');
+insert into referral_rewards (user_id, referral_id, role, expires_at, claimed_at, claim_store, claim_kind)
+select '00000000-0000-0000-0000-000000000f08', id, 'friend', now() - interval '1 day', now() - interval '200 days', 'google', 'google_defer'
+from referrals where friend_id = '00000000-0000-0000-0000-000000000f08';
+select as_user('00000000-0000-0000-0000-000000000f08');
+set role authenticated;
+insert into ref_out values ('kai_apple', claim_referral_reward('apple'));
+reset role;
+do $$ begin
+  if (select v ->> 'error' from ref_out where name = 'kai_apple') is distinct from 'expired' then
+    raise exception 'FAIL: expired reward reclaimed: %', (select v from ref_out where name = 'kai_apple');
+  end if;
+end $$;
+
 drop table ref_out;
 select as_user(null);
 \echo 'referrals_test: ok'

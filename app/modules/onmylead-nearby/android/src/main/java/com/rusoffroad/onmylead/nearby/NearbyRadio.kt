@@ -451,6 +451,38 @@ class NearbyRadio(
     peers[device.address] = Peer(gatt)
   }
 
+  /**
+   * Asks the peer for its packets (turns on notifications). The stack can refuse while another
+   * request is still going (common right after discovery on Android 13+): no callback comes then,
+   * so writes aren't held back, and it is asked again shortly, a few times.
+   */
+  @Suppress("DEPRECATION")
+  private fun subscribe(gatt: BluetoothGatt, out: BluetoothGattCharacteristic, tries: Int) {
+    val p = peers[gatt.device.address] ?: return
+    if (p.gatt !== gatt || !running) return
+    val d = out.getDescriptor(CCCD) ?: return
+    if (p.busy) {
+      if (tries < 5) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 400)
+      return
+    }
+    p.busy = true
+    val started = try {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == BluetoothStatusCodesSuccess
+      } else {
+        d.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+        gatt.writeDescriptor(d)
+      }
+    } catch (_: Exception) {
+      false
+    }
+    if (!started) {
+      p.busy = false
+      pump(p)
+      if (tries < 5) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 400)
+    }
+  }
+
   private fun drop(gatt: BluetoothGatt) {
     peers.remove(gatt.device.address)
     gatt.close()
@@ -485,18 +517,7 @@ class NearbyRadio(
         val out = s.getCharacteristic(outbox)
         if (out != null) {
           gatt.setCharacteristicNotification(out, true)
-          val d = out.getDescriptor(CCCD)
-          if (d != null) {
-            p.busy = true
-            val started = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-              gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == BluetoothStatusCodesSuccess
-            } else {
-              d.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-              gatt.writeDescriptor(d)
-            }
-            // Not accepted: no callback will come, so don't wait for one (writes still go out).
-            if (!started) p.busy = false
-          }
+          subscribe(gatt, out, 0)
         }
         report()
         send(outgoing)

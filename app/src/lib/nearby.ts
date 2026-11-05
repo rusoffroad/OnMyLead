@@ -417,7 +417,8 @@ function pushOutgoing(now = false) {
 
 // The module hands each packet over twice (as it arrives, and again from its drain buffer for
 // packets that came while JavaScript was paused): open each one once.
-const RECENT_FRAMES = 512;
+// More than the module's own buffer (500), so a drained burst never pushes out live ones.
+const RECENT_FRAMES = 1024;
 const recentFrames = new Set<string>();
 function firstTime(b64: string): boolean {
   if (recentFrames.has(b64)) return false;

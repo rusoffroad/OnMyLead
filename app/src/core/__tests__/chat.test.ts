@@ -167,5 +167,8 @@ describe('chatMessageText', () => {
     expect(chatMessageText({ kind: 'status', body: 'On My Way' }, upper)).toBe('ON MY WAY');
     expect(chatMessageText({ kind: 'chat', body: 'On My Way' }, upper)).toBe('On My Way');
     expect(chatMessageText({ kind: 'announcement', body: 'Done' }, upper)).toBe('Done');
+    // A rider's own Ride Mode message is sent the same way, but shows as typed.
+    expect(chatMessageText({ kind: 'status', body: 'Done' }, upper)).toBe('Done');
+    expect(chatMessageText({ kind: 'status', body: 'on my way' }, upper)).toBe('ON MY WAY');
   });
 });

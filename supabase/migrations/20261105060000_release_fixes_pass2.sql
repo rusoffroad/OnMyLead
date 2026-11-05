@@ -39,6 +39,7 @@ begin
     -- A deferral that never finished, for a Google Play subscription that has since ended:
     -- there's nothing left to move, so the reward is claimed afresh below (the offer, or an
     -- Apple code).
+    if w.expires_at <= now() then return jsonb_build_object('error', 'expired'); end if;
     update referral_rewards set deferred_at = null where id = w.id;
   elsif w.claim_kind = 'google_offer' and p_store = 'apple' then
     return jsonb_build_object('error', 'claimed_on_other_store', 'store', 'google');

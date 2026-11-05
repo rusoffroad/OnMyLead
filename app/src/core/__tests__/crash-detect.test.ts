@@ -271,6 +271,17 @@ describe('dropped phone', () => {
     expect(alarms).toEqual(['rollover']);
   });
 
+  it('a roll that starts just before the 15 s mark after a jump still alarms', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 8, feltG: 1 }),
+      ...every(1050, 1400, { speedMps: 8, feltG: 0.05 }),
+      ...every(1450, 15_500, { speedMps: 8, feltG: 1, roll: 5 }),
+      ...every(15_550, 16_500, { speedMps: 3, feltG: 1, roll: 80 }), // rolls right at the mark
+      ...every(16_550, 26_000, { speedMps: 0, feltG: 1, roll: 90 }),
+    ]);
+    expect(alarms).toEqual(['rollover']);
+  });
+
   it('a crash that throws the phone out of the mount still alarms', () => {
     const { alarms } = run([
       ...every(0, 500, { speedMps: 12, feltG: 1 }),

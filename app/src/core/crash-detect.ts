@@ -138,14 +138,19 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
   // After a drop the tilt is the phone's, not the vehicle's, until it's back near level for a while.
   // (Not right after a fall while moving: that may be the vehicle in the air, and a roll that ends
   // it counts. If nothing came of it within SETTLE_WINDOW_MS and the phone still lies tipped while
-  // the rider carries on, it fell off its mount, and from then on its tilt is the phone's. A phone
+  // the rider drives on, it fell off its mount, and from then on its tilt is the phone's. A phone
   // still upright in its mount after a clean landing is left alone.)
   let airborneAt = fell && airborne ? s.t : (state.airborneAt ?? null);
   let displaced = (fell && !airborne) || !!state.displaced;
   if (airborneAt != null && !fell && s.t - airborneAt > SETTLE_WINDOW_MS) {
-    airborneAt = null;
     const lying = (s.roll != null && Math.abs(s.roll) >= th.rolloverDeg) || (s.pitch != null && Math.abs(s.pitch) >= th.rolloverDeg);
-    if (lying) displaced = true;
+    const carryingOn = speed != null && speed >= DROVE_ON_MPS;
+    if (!lying) airborneAt = null;
+    else if (carryingOn) {
+      airborneAt = null;
+      displaced = true;
+    }
+    // Lying tipped and not driving on: that could be the vehicle on its side, so keep watching.
   }
   let levelSince = state.levelSince ?? null;
   if (displaced && !fell) {

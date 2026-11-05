@@ -40,11 +40,15 @@ export const MAX_MESSAGE_LENGTH = 500;
 export const MESSAGES_PER_MINUTE = 10;
 
 /**
- * The text to show for a chat message: one-tap replies and status taps (kind 'status') are the
- * app's own words, so they show in the reader's language; anything a rider typed shows as typed.
+ * The text to show for a chat message: the built-in one-tap replies are the app's own words, so
+ * they show in the reader's language; anything a rider typed (custom quick replies included) shows
+ * as typed.
  */
 export function chatMessageText(m: Pick<ChatMessage, 'kind' | 'body'>, translate: (text: string) => string): string {
-  return m.kind === 'status' ? translate(m.body) : m.body;
+  if (m.kind !== 'status') return m.body;
+  const said = m.body.trim().toLocaleLowerCase();
+  const builtIn = QUICK_REPLIES.find((q) => q.toLocaleLowerCase() === said);
+  return builtIn ? translate(builtIn) : m.body;
 }
 
 /** One-tap replies for Ride Mode. Sent as kind 'status' so the chat can show them differently. */

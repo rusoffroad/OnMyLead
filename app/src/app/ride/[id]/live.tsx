@@ -1249,7 +1249,7 @@ export default function RideMode() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.announcementLabel} numberOfLines={1}>{t('{v} · Tap to Hear Again', { v: nameOf(announcement.user_id) })}</Text>
-                <Text style={styles.announcementText} numberOfLines={3}>{t(announcement.body)}</Text>
+                <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
               </View>
             </Pressable>
           ) : null}

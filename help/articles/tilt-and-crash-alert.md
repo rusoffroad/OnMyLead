@@ -68,7 +68,7 @@ Crash Alert is on unless you turn it off. To turn it on or off, open the Tilt sc
 Choose how easily it goes off under **Sensitivity** on the Tilt screen: **Low** (only very hard hits and full rollovers, fewer false alarms on rough trails), **Normal** (recommended) or **High** (also smaller hits and steep tips). A hard bump you keep riding through doesn't count, and neither does knocking the phone while parked. Dropping your phone doesn't count either: Crash Alert notices the moment of falling and ignores the landing, and a dropped phone lying at an angle doesn't count as a rollover until it's back in its mount. If something still sets it off by mistake, tap **I'm OK**.
 
 :::release 2.1
-While you're moving, even slowly on a rock crawl, a moment of falling can be your vehicle in the air (a jump, a ledge or a tip off a rock), so a hard landing, or coming to rest on its side or roof, still counts as a crash. Only a fall while you're stopped is taken as a dropped phone. A phone that slides to the floor while you keep driving doesn't set it off; if it falls just as you pull over, tap **I'm OK**.
+While you're moving, even slowly on a rock crawl, a moment of falling can be your vehicle in the air (a jump, a ledge or a tip off a rock), so a hard landing, or coming to rest on its side or roof, still counts as a crash. Only a fall while you're stopped is taken as a dropped phone. A phone that slides to the floor while you keep driving doesn't set it off. If it falls while you're moving slowly and you stop soon after, the countdown may start: tap **I'm OK**.
 :::
 
 :::warning
