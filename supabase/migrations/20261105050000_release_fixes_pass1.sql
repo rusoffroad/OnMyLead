@@ -229,7 +229,7 @@ begin
          c.author_id = v_me, c.author_id = v_me or c.owner_id = v_me,
          c.parent_id,
          case when c.reply_to_id is not null and c.reply_to_id <> c.parent_id and rt.author_id <> c.author_id
-                   and rt.hidden_at is null and not riders_blocked(v_me, rt.author_id)
+                   and feed_comment_shown(v_me, rt)
               then coalesce(nullif(btrim(rp.display_name), ''), 'Rider') end,
          (select count(*)::int from feed_comment_likes l where l.comment_id = c.id and not riders_blocked(v_me, l.user_id)),
          exists (select 1 from feed_comment_likes l where l.comment_id = c.id and l.user_id = v_me)

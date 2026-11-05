@@ -502,16 +502,23 @@ function idOrder(id: string): number {
  */
 export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastSent: (id: string) => number = () => -1): T[] {
   const own = items.find((i) => i.kind === 'position' && i.userId === myId);
-  // The rider's own spot goes out first: a slow link that can't finish the round still carries it.
-  if (items.length <= MAX_FRAMES_PER_ROUND) return own ? [own, ...items.filter((i) => i !== own)] : items;
+  const sos = items.filter((i) => i.kind === 'status' && i.status === 'emergency');
+  // Emergencies, then the rider's own spot, go out first: a slow link that can't finish the round
+  // still carries them.
+  if (items.length <= MAX_FRAMES_PER_ROUND) {
+    const lead = own ? [...sos, own] : sos;
+    return [...lead, ...items.filter((i) => !lead.includes(i))];
+  }
   // Picked in priority order, and sent in that order too, so a link that can't finish the round
   // loses only the least important frames.
-  const out: T[] = own ? [own] : [];
-  const picked = new Set<T>(out);
-  let left = MAX_FRAMES_PER_ROUND - out.length;
+  const out: T[] = [];
+  const picked = new Set<T>();
+  let left = MAX_FRAMES_PER_ROUND;
   const take = (g: T[]) => { for (const i of g) { out.push(i); picked.add(i); } left -= g.length; };
-  // Emergencies and the rider's own taps first, as sending order has them.
-  for (const i of items) if (i.kind === 'status' && (i.status === 'emergency' || i.userId === myId) && left > 0) take([i]);
+  // Emergencies (leaving room for the own spot), the own spot, then the rider's own taps.
+  for (const i of sos) if (left > (own ? 1 : 0)) take([i]);
+  if (own) take([own]);
+  for (const i of items) if (i.kind === 'status' && i.userId === myId && !picked.has(i) && left > 0) take([i]);
   const messages = new Map<string, T[]>();
   for (const i of items) {
     if (i.kind !== 'reply') continue;
