@@ -168,7 +168,7 @@ web build and the Android emulator.
 | ID | Feature | Devices | Why |
 |---|---|---|---|
 | E01 | CarPlay | iPhone only | CarPlay runs on iPhone only (Apple granted the Driving Task entitlement 2026-11-04). Android Auto is not planned (a separate Google review and car app library); iPad and Android tablets have no car mode, and the website can't reach a car. |
-| E02 | Admin Dashboard | Website only | Owner tool at onmylead.com/admin; phone apps link to it. |
+| E02 | Admin Dashboard | Website only | Owner tool at onmylead.com/admin; phone apps link to it from the first row of the You tab (admins only, 2.1). |
 | E03 | Offline maps | Apps only | The website can't store map tiles. |
 | E04 | Sign in with Apple on Android and the website | Browser flow | Apple ships its sheet only on iPhone and iPad; Android and onmylead.com open Apple's web sign-in in a browser sheet instead (same account), once the owner's apple_web_sign_in flag is on. |
 | E05 | Purchases | Per store | Apple devices buy through the App Store, Android through Google Play, the website sells nothing; one Pro state on the server for all. |
