@@ -308,7 +308,7 @@ class NearbyRadio(
     pendingMtu.clear()
     try { server?.close() } catch (_: Exception) {}
     server = null
-    report()
+    if (running) report()
   }
 
   /**

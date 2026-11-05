@@ -90,6 +90,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   /** didAdd confirmed the service; a service that is never confirmed is added again (as on Android). */
   private var serviceConfirmed = false
   private var serviceAddedAt = Date.distantPast
+  /** The service last added: didAdd for an older one (removed by the watchdog) is ignored. */
+  private var addedService: CBMutableService?
 
   /// Phones this one connected to, by identifier.
   private var peers: [UUID: CBPeripheral] = [:]
@@ -409,6 +411,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     let s = CBMutableService(type: service, primary: true)
     s.characteristics = [inboxChar, out]
     outboxChar = out
+    addedService = s
     pm.add(s)
     serviceAdded = true
     serviceConfirmed = false
@@ -416,6 +419,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   }
 
   func peripheralManager(_ pm: CBPeripheralManager, didAdd s: CBService, error: Error?) {
+    guard let added = addedService, s === added else { return }
     guard error == nil else {
       // Not ready yet (often right after Bluetooth turns on): the next round adds it again.
       pm.removeAllServices()
@@ -438,8 +442,9 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   func peripheralManager(_ pm: CBPeripheralManager, central: CBCentral, didSubscribeTo ch: CBCharacteristic) {
     subscribers[central.identifier] = central
     report()
-    // The new phone joins the shared notify queue: what's waiting goes out now, and the next round
-    // brings it everything (urgent frames stay first).
+    // The new phone gets the round at once through the shared notify queue (urgent frames stay
+    // first); the others get the same round again, which is cheap next to a 10 s wait.
+    pendingRound = Array(outgoing.prefix(NearbyRadio.maxPendingNotify))
     drainNotify()
   }
 
