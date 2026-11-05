@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, type Ref } from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import MapView, { Marker, type Region } from 'react-native-maps';
 
 import { Colors, RideColors } from '@/constants/theme';
@@ -277,7 +277,7 @@ function FlatGroupMap({
         .map((r) => (
           <RiderMarker key={r.id} rider={r} mapHeading={mapHeading} onPress={onRiderPress} />
         ))}
-      <OwnHeadingMarker own={own} mapHeading={mapHeading} fixEveryMs={locationEveryMs} />
+      <OwnHeadingMarker own={own} mapHeading={mapHeading} fixEveryMs={Platform.OS === 'android' ? locationEveryMs : undefined} />
       {regroup ? (
         <Marker coordinate={{ latitude: regroup.lat, longitude: regroup.lng }} title={regroup.label ?? 'Regroup here'} pinColor={RideColors.yellow} />
       ) : null}

@@ -93,6 +93,16 @@ export function ownMovingAt(
   return { movingAt: moving ? nowMs : null, fixAt: fixAtMs };
 }
 
+/**
+ * Whether a fix is already older than the wait when it reaches the dot (a map opening long after
+ * the last fix, while the rider stands still), so it can't count as moving. A fix time from the
+ * future, or one more than an hour off (a phone clock jump), is trusted as fresh.
+ */
+export function ownFixStale(fixAtMs: number, nowMs: number, waitMs: number): boolean {
+  const age = nowMs - fixAtMs;
+  return age > waitMs && age < 3_600_000;
+}
+
 /** Whether your own dot still counts you as moving at `nowMs`, waiting `waitMs` (ownStoppedAfterMs). */
 export function ownStillMoving(movingAt: number | null, nowMs: number, waitMs = OWN_STOPPED_AFTER_MS): boolean {
   return movingAt != null && nowMs - movingAt < waitMs;

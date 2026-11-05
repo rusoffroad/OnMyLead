@@ -27,8 +27,8 @@ export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng
 export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
 /** Your own dot on the website's flat map, in the rider's Dot Style and Dot Size (core/own-dot-art). */
-const meDotHtml = (style: DotStyle, d: number, heading: number | null | undefined) =>
-  `<div role="img" aria-label="You are here" style="display:block;pointer-events:none">${ownDotSvg(style, d, heading == null ? null : Math.round(heading), heading != null, 'me')}</div>`;
+const meDotHtml = (style: DotStyle, d: number, heading: number | null | undefined, moving: boolean) =>
+  `<div role="img" aria-label="You are here" style="display:block;pointer-events:none">${ownDotSvg(style, d, heading == null ? null : Math.round(heading), moving, 'me')}</div>`;
 
 type NavMapProps = Parameters<typeof FlatNavMap>[0];
 
@@ -148,12 +148,13 @@ function FlatNavMap({
   // The rider's own spot (the phone maps draw it themselves), at the rider's Dot Size.
   const meD = useOwnDotD();
   const [meStyle] = useDotStylePref();
-  // Moving or stopped by the same rule as every other map: the direction shows only while moving.
+  // Moving or stopped by the same rule as every other map; stopped, the dot keeps pointing the
+  // last way the rider was heading (the website has no compass).
   const [meMoving, feedMe] = useOwnMoving();
   useEffect(() => {
     if (center) feedMe(meHeading != null);
   }, [center, meHeading, feedMe]);
-  const meShownHeading = meMoving ? meHeading : null;
+  const lastMeHeading = useRef<number | null>(null);
   useEffect(() => {
     const m = map.current;
     if (!m) return;
@@ -162,15 +163,16 @@ function FlatNavMap({
       meDot.current = null;
       return;
     }
+    if (meHeading != null) lastMeHeading.current = meHeading;
     const box = ownDotBox(meD);
-    const icon = L.divIcon({ className: '', iconSize: [box, box], iconAnchor: [box / 2, box / 2], html: meDotHtml(meStyle, meD, meShownHeading) });
+    const icon = L.divIcon({ className: '', iconSize: [box, box], iconAnchor: [box / 2, box / 2], html: meDotHtml(meStyle, meD, lastMeHeading.current, meMoving) });
     if (meDot.current) {
       meDot.current.setLatLng(ll(center));
       meDot.current.setIcon(icon);
     } else {
       meDot.current = L.marker(ll(center), { interactive: false, keyboard: false, zIndexOffset: 1000, icon }).addTo(m);
     }
-  }, [center, meShownHeading, meD, meStyle]);
+  }, [center, meHeading, meMoving, meD, meStyle]);
 
   // Follow-me camera: pan (same zoom) so the spot sits in the open map between the panels.
   useEffect(() => {
