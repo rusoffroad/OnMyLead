@@ -1,7 +1,69 @@
 [
   {
     "date": "2026-11-05",
-    "slugs": ["import-gpx", "manage-subscription", "offline-maps", "pro-trial", "ride-summary-and-ride-again", "route-builder", "trip-planner"],
+    "slugs": [
+      "map-layers",
+      "3d-terrain",
+      "ride-mode",
+      "leader-trackline",
+      "follow-me",
+      "music-controls",
+      "tilt-and-crash-alert"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings",
+    "why": "2.1: the Layers button now opens Map Settings, one sheet with the map style (3D Terrain moved here from the round 3D button, which is gone), four big switches for Streets and Roads, Off-Road Trails, Hiking Trails and Land Boundaries, every Map Feature, and the switches for Follow Me, Zoom In at Intersections, Tilt Meter and the Music button."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "full-map",
+      "language",
+      "location-sharing",
+      "navigation-mode",
+      "offline-maps",
+      "park-trails",
+      "ride-bubble",
+      "ride-chat",
+      "route-builder",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops",
+      "bluetooth-sharing",
+      "carplay",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-lag",
+    "why": "2.1: the map no longer stutters while you ride. Your own dot is drawn by the map itself again, so it glides in step with the map, and the intersection lookup asks the map for road and trail lines only. These articles describe screens that share the changed map code; riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings-showcase",
+    "why": "The website's feature list gains Map Settings and points 3D Terrain to it; it shows once 2.1 is in the stores. These guides are re-dated because they share the homepage code; nothing in them changed."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "import-gpx",
+      "manage-subscription",
+      "offline-maps",
+      "pro-trial",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "trip-planner"
+    ],
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-23",

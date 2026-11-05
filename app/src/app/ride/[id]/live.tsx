@@ -1117,7 +1117,7 @@ export default function RideMode() {
       {/* In Full Map only No Signal and a tapped trail's card stay; the layers button tucks away. */}
       <TrailMapOverlay
         trail={trail}
-        threeD
+        controls
         bare={fullMap}
         top={tablet || fullMap ? insets.top + EDGE : insets.top + 66}
         cardTop={tablet || fullMap ? insets.top + 64 : insets.top + 118}

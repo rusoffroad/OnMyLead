@@ -334,7 +334,7 @@ Status taps and quick replies you make with no service wait on your phone and se
 :::release 2.1
 ## See the Land in 3D
 
-From 2.1 the live map is drawn by Mapbox on every device, and on onmylead.com too, so the website's Ride Mode shows the same live map as the phone. Tap the round **3D** button under the layers button (or pick **3D Terrain** under **Map Style**) to see the ride on the real shape of the land, with contour lines and peak heights. Rider dots, the route, waypoints and the regroup pin all show the same way. See [3D Terrain](/help/3d-terrain).
+From 2.1 the live map is drawn by Mapbox on every device, and on onmylead.com too, so the website's Ride Mode shows the same live map as the phone. Tap the **Layers** button and pick **3D Terrain** under **Map Style** to see the ride on the real shape of the land, with contour lines and peak heights. Rider dots, the route, waypoints and the regroup pin all show the same way. See [3D Terrain](/help/3d-terrain).
 :::
 
 ## Leave Ride Mode

@@ -3231,6 +3231,23 @@ const dict: Record<string, string> = {
   "Off for Everyone": "对所有人关闭",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "在每位骑手的地图上显示你带队走过的路线。再次穿过时，较早的轨迹会变淡。",
   "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "关闭领队轨迹的功能尚未开放。下次服务器更新后即可使用。",
+  "Map Settings": "地图设置",
+  "Map style, roads, trails, land and the buttons on the map": "地图样式、道路、小径、土地和地图上的按钮",
+  "On the Map": "地图显示",
+  "Every Map Feature": "所有地图要素",
+  "Fine-Tune": "微调",
+  "Map Buttons": "地图按钮",
+  "Music Button": "音乐按钮",
+  "Streets and Roads": "街道和道路",
+  "Land Boundaries": "土地边界",
+  "Highways, paved roads and dirt roads": "高速公路、铺装道路和土路",
+  "Motorized trails, tracks and width limits": "机动车小径、车辙路和宽度限制",
+  "Foot and horse trails": "步行和骑马小径",
+  "National forests, BLM, parks and property lines": "国家森林、BLM、公园和地产界线",
+  "The map moves with you as you ride.": "骑行时地图随你移动。",
+  "Closes in on a turn as you reach it, then zooms back out.": "接近路口时放大，通过后再缩小。",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "在地图上显示侧倾和俯仰。在倾斜页面校准。",
+  "Play, pause, skip and volume without leaving the map.": "无需离开地图即可播放、暂停、切歌和调音量。",
 };
 
 export default dict;
