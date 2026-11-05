@@ -269,14 +269,21 @@ class NearbyRadio(
     server = null
   }
 
+  /**
+   * Hands each link this round's frames. Every round carries everything still worth sending, so a
+   * link still working through the last round drops what it hadn't sent and takes the new round
+   * whole: a slow link can't end up holding only some parts of a message.
+   */
   private fun send(frames: List<ByteArray>) {
     if (frames.isEmpty()) return
     for (p in peers.values) {
       if (p.inbox == null) continue
+      p.queue.clear()
       for (f in frames) if (f.size <= p.mtu - 3 && p.queue.size < MAX_QUEUE) p.queue.add(f)
       pump(p)
     }
     for (s in subscribers.values) {
+      s.queue.clear()
       for (f in frames) if (f.size <= s.mtu - 3 && s.queue.size < MAX_QUEUE) s.queue.add(f)
       pump(s)
     }
@@ -326,7 +333,7 @@ class NearbyRadio(
 
   private fun openServer() {
     val m = manager ?: return
-    val srv = m.openGattServer(context, serverCallback) ?: return
+    val srv = m.openGattServer(context, serverCallbackFor(serverGen)) ?: return
     val inboxChar = BluetoothGattCharacteristic(
       inbox,
       BluetoothGattCharacteristic.PROPERTY_WRITE or BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE,
@@ -365,13 +372,16 @@ class NearbyRadio(
     }
   }
 
-  private val serverCallback = object : BluetoothGattServerCallback() {
+  /**
+   * Callbacks for one server. Each server gets its own, holding the generation it was opened in, so
+   * anything a closed server still reports (even after the new one opened) is ignored.
+   */
+  private fun serverCallbackFor(gen: Int) = object : BluetoothGattServerCallback() {
     override fun onServiceAdded(status: Int, service: BluetoothGattService) {
-      handler.post { startAdvertising() }
+      handler.post { if (gen == serverGen) startAdvertising() }
     }
 
     override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
-      val gen = serverGen
       if (newState == BluetoothProfile.STATE_DISCONNECTED) handler.post {
         if (gen != serverGen) return@post
         subscribers.remove(device.address)
@@ -380,15 +390,15 @@ class NearbyRadio(
     }
 
     override fun onMtuChanged(device: BluetoothDevice, mtu: Int) {
-      val gen = serverGen
       handler.post { if (gen == serverGen) subscribers[device.address]?.mtu = mtu }
-      pendingMtu[device.address] = mtu
+      if (gen == serverGen) pendingMtu[device.address] = mtu
     }
 
     override fun onCharacteristicWriteRequest(
       device: BluetoothDevice, requestId: Int, characteristic: BluetoothGattCharacteristic,
       preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?,
     ) {
+      if (gen != serverGen) return
       if (characteristic.uuid == inbox && !preparedWrite && offset == 0 && value != null) deliver(value)
       if (responseNeeded) server?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
     }
@@ -397,7 +407,6 @@ class NearbyRadio(
       device: BluetoothDevice, requestId: Int, descriptor: BluetoothGattDescriptor,
       preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?,
     ) {
-      val gen = serverGen
       if (descriptor.uuid == CCCD) handler.post {
         if (gen != serverGen) return@post
         val on = value != null && value.isNotEmpty() && value[0].toInt() != 0
@@ -414,7 +423,6 @@ class NearbyRadio(
     }
 
     override fun onNotificationSent(device: BluetoothDevice, status: Int) {
-      val gen = serverGen
       handler.post {
         if (gen != serverGen) return@post
         val s = subscribers[device.address] ?: return@post

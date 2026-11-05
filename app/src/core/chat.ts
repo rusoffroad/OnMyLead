@@ -1,6 +1,11 @@
 import { tc } from './i18n';
 import { isTransientError } from './errors';
 
+/** One line, single spaces, trimmed: how Ride Mode messages and quick replies are compared and sent. */
+export function tidyRideMessage(raw: string): string {
+  return raw.replace(/\s+/g, ' ').trim();
+}
+
 /**
  * Ride chat and announcements.
  *
@@ -52,7 +57,7 @@ export function chatMessageText(m: Pick<ChatMessage, 'kind' | 'body'>, translate
 
 /** The built-in quick reply this text is (any case and spacing), if it is one. */
 export function builtInReply(body: string): QuickReply | undefined {
-  const said = body.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  const said = tidyRideMessage(body).toLocaleLowerCase();
   return QUICK_REPLIES.find((q) => q.toLocaleLowerCase() === said);
 }
 
