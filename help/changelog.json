@@ -4,8 +4,8 @@
     "slugs": ["tilt-and-crash-alert"],
     "kind": "fix",
     "by": "pr",
-    "ref": "release-test-pass-84",
-    "why": "2.1 test pass 84: on iPhone and iPad the Crash Alert countdown's 30 seconds now start once it is on screen (it can wait a moment for an open sheet to step aside), so a rider gets the whole window to tap I'm OK; the guide says so. Sheets no longer turn a landscape iPhone back to portrait."
+    "ref": "release-test-pass-84-86",
+    "why": "2.1 test passes 84-86: on iPhone and iPad the Crash Alert countdown's 30 seconds now start once it is on screen (it can wait a moment for an open sheet to step aside), so a rider gets the whole window to tap I'm OK; the guide says so. Sheets no longer turn a landscape iPhone back to portrait."
   },
   {
     "date": "2026-11-05",

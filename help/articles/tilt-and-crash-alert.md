@@ -70,7 +70,7 @@ Crash Alert is on unless you turn it off. To turn it on or off, open the Tilt sc
 4. To cancel and stop Crash Alert for now, tap **I'm OK, Turn Off Crash Alert** under the buttons. Turn it back on from the top of the Tilt screen.
 
 :::release 2.1
-If a sheet such as **Map Settings** is open when the countdown starts, it steps aside so the countdown can fill the screen, and comes back after you tap **I'm OK**. The 30 seconds start once the countdown is on screen.
+If a sheet such as **Map Settings** is open when the countdown starts, it steps aside so the countdown can fill the screen, and comes back once the countdown has gone. The 30 seconds start once the countdown is on screen (it waits at most 2 seconds for the sheet).
 :::
 
 Choose how easily it goes off under **Sensitivity** on the Tilt screen: **Low** (only very hard hits and full rollovers, fewer false alarms on rough trails), **Normal** (recommended) or **High** (also smaller hits and steep tips). A hard bump you keep riding through doesn't count, and neither does knocking the phone while parked. Dropping your phone doesn't count either: Crash Alert notices the moment of falling and ignores the landing, and a dropped phone lying at an angle doesn't count as a rollover until it's back in its mount. If something still sets it off by mistake, tap **I'm OK**.

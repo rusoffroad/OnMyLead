@@ -78,6 +78,7 @@ export function TrailMapOverlay({
   trackline?: TracklineSwitch;
 }) {
   const [open, setOpen] = useState(false);
+  const closeSheet = useCallback(() => setOpen(false), []);
   const [rating, setRating] = useState<PublicTrail | null>(null);
   const osmOn = (['highways', 'roads', 'dirtRoads', 'offroad', 'hiking', 'closed'] as MapFeatureId[]).some((id) => trail.features[id]);
   const credit = [
@@ -118,7 +119,7 @@ export function TrailMapOverlay({
       {bare ? null : (
         <MapSettingsSheet
           visible={open}
-          onClose={() => setOpen(false)}
+          onClose={closeSheet}
           trail={trail}
           route={route}
           ride={ride}
@@ -832,7 +833,7 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
           <Text style={styles.saveText}>{tr('Download This Ride’s Map')}</Text>
           <ProTag feature="offline_maps" />
         </View>
-        <Text style={styles.saveSub}>{`${terrain ? tr('Satellite, Topo, Trails and 3D Terrain') : tr('Satellite, Topo and Trails')}, About ${formatBytes(estimate)}`}</Text>
+        <Text style={styles.saveSub}>{`${terrain ? tr('Satellite, Topo, Trails and 3D Terrain') : tr('Satellite, Topo and Trails')}, ${tr('About {v}', { v: formatBytes(estimate) })}`}</Text>
       </Pressable>
     );
   }
