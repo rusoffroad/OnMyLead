@@ -7,6 +7,7 @@ import { FullMapBar } from '@/components/full-map';
 import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { PanelHandle } from '@/components/panel-handle';
+import { CompassSpot } from '@/components/compass-spot';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button, ErrorText } from '@/components/ui';
 import { WaypointMap } from '@/components/waypoint-map';
@@ -125,22 +126,28 @@ export default function RideWaypoints() {
         ? t('{drop} the map to drop a waypoint, or Search for a place. You choose whether the whole ride sees it.', { drop })
         : t('{drop} the map to drop a waypoint, or Search for a place. Yours are only for you.', { drop });
 
+  // Map Settings (top left) and the compass (top right) sit level, just under the top bar, or at
+  // the top in Full Map (core/map-corner). On a wide tablet the bar is the panel column, so they're at the top.
+  const cornerTop = full ? insets.top + 12 : wide ? insets.top + 20 : insets.top + 66;
+  const compassSpot = { top: cornerTop };
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       {loaded ? (
-        <WaypointMap
-          waypoints={wp.waypoints}
-          route={route?.points}
-          center={center}
-          trail={trail}
-          onPressWaypoint={(w) => setTarget({ type: 'view', waypoint: w })}
-          onLongPressMap={mine ? openNew : undefined}
-          found={found}
-          onCenter={(c) => (looking.current = c)}
-          padding={full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : undefined}
-        />
+        <CompassSpot.Provider value={compassSpot}>
+          <WaypointMap
+            waypoints={wp.waypoints}
+            route={route?.points}
+            center={center}
+            trail={trail}
+            onPressWaypoint={(w) => setTarget({ type: 'view', waypoint: w })}
+            onLongPressMap={mine ? openNew : undefined}
+            found={found}
+            onCenter={(c) => (looking.current = c)}
+            padding={full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : undefined}
+          />
+        </CompassSpot.Provider>
       ) : null}
-      {loaded ? <TrailMapOverlay trail={trail} bare={full} top={full ? insets.top + 12 : insets.top + 66} cardTop={full ? insets.top + 64 : insets.top + 118} route={route?.points} ride={ride} /> : null}
+      {loaded ? <TrailMapOverlay trail={trail} bare={full} top={cornerTop} left={wide && !full ? PANEL_W + 32 : undefined} cardTop={full ? insets.top + 64 : insets.top + 118} route={route?.points} ride={ride} /> : null}
 
       {full ? (
         <FullMapBar onRestore={fullMap.exit} wide={wide || floating} />

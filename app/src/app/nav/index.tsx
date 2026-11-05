@@ -15,6 +15,7 @@ import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
+import { CompassSpot } from '@/components/compass-spot';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
@@ -545,43 +546,50 @@ export default function NavMode() {
     return [speed != null ? String(Math.round(speed * MPS_TO_MPH)) : '–', 'mph'];
   })();
 
+  // Map Settings (top left) and the compass (top right) sit level, just under the top bar, or at
+  // the top in Full Map (core/map-corner). On a wide tablet the bar is the panel column, so they're at the top.
+  const cornerTop = full ? insets.top + 12 : wide ? insets.top + 20 : insets.top + 66;
+  const compassSpot = { top: cornerTop };
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <NavMap
-        ref={map}
-        trail={trail}
-        recorded={recLine}
-        following={followed?.points ?? null}
-        measure={mode === 'measure' ? draft.points : []}
-        measureTaps={mode === 'measure' ? draft.taps : []}
-        measuring={mode === 'measure'}
-        onMeasure={(p, snap) => {
-          Haptics.selectionAsync();
-          if (marking) {
-            setMarking(false);
-            markAt(p, 'draw');
-          } else draft.add(p, snap);
-        }}
-        trackLines={trackLines}
-        obstacles={mode === 'measure' ? drawObs : rec ? rec.obstacles ?? [] : followed?.obstacles ?? []}
-        onObstacle={editSpot}
-        center={me}
-        found={found}
-        onCenter={(c) => (looking.current = c)}
-        padding={panelPad}
-        followMe={camOn ? me : null}
-        meHeading={meHeading}
-        meFixAt={meFixAt}
-        onUserMove={() => camEvent('pan')}
-        waypoints={shownWaypoints}
-        onPressWaypoint={openWaypoint}
-        onLongPressMap={mode === 'measure' ? undefined : openNewWaypoint}
-      />
+      <CompassSpot.Provider value={compassSpot}>
+        <NavMap
+          ref={map}
+          trail={trail}
+          recorded={recLine}
+          following={followed?.points ?? null}
+          measure={mode === 'measure' ? draft.points : []}
+          measureTaps={mode === 'measure' ? draft.taps : []}
+          measuring={mode === 'measure'}
+          onMeasure={(p, snap) => {
+            Haptics.selectionAsync();
+            if (marking) {
+              setMarking(false);
+              markAt(p, 'draw');
+            } else draft.add(p, snap);
+          }}
+          trackLines={trackLines}
+          obstacles={mode === 'measure' ? drawObs : rec ? rec.obstacles ?? [] : followed?.obstacles ?? []}
+          onObstacle={editSpot}
+          center={me}
+          found={found}
+          onCenter={(c) => (looking.current = c)}
+          padding={panelPad}
+          followMe={camOn ? me : null}
+          meHeading={meHeading}
+          meFixAt={meFixAt}
+          onUserMove={() => camEvent('pan')}
+          waypoints={shownWaypoints}
+          onPressWaypoint={openWaypoint}
+          onLongPressMap={mode === 'measure' ? undefined : openNewWaypoint}
+        />
+      </CompassSpot.Provider>
       <TrailMapOverlay
         trail={trail}
         controls
         bare={full}
-        top={full ? insets.top + 12 : insets.top + 66}
+        top={cornerTop}
+        left={wide && !full ? PANEL_W + 32 : undefined}
         cardTop={full ? insets.top + 64 : wide ? insets.top + 118 : undefined}
         bottom={wide ? 12 : open ? 330 : 170}
         cardWidth={wide || floating ? 380 : undefined}

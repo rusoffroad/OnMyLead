@@ -1,6 +1,7 @@
 import Mapbox from '@rnmapbox/maps';
-import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { memo, useCallback, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
 import { isLatLng, type LatLng } from '@/core/geo';
@@ -25,6 +26,8 @@ import { useHasCompass } from '@/lib/compass';
 import { dotScale } from '@/core/dot-size';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
 import { useOwnMoving } from '@/hooks/use-own-moving';
+import { compassMargins } from '@/core/map-corner';
+import { CompassSpot } from './compass-spot';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -45,6 +48,9 @@ const FAR_OUT_ZOOM = 8;
  * a second; on a phone it trailed the map while the map moved and made the map stutter.
  */
 const PUCK_IMAGES = {
+  'oml-you-flag-moving': require('../../assets/images/puck/you-flag-moving.png'),
+  'oml-you-flag-stopped': require('../../assets/images/puck/you-flag-stopped.png'),
+  'oml-you-flag-still': require('../../assets/images/puck/you-flag-still.png'),
   'oml-you-dome-moving': require('../../assets/images/puck/you-dome-moving.png'),
   'oml-you-dome-stopped': require('../../assets/images/puck/you-dome-stopped.png'),
   'oml-you-ring-moving': require('../../assets/images/puck/you-ring-moving.png'),
@@ -126,6 +132,15 @@ export function MapboxMap({
   // Tells your own dot whether you're moving; the dot keeps that state itself, so a change
   // re-draws only the dot, not the whole map.
   const puckMoving = useRef<((moving: boolean, fixAtMs?: number) => void) | null>(null);
+  // The compass sits level with the screen's Map Settings button, under its top bar (core/map-corner).
+  const compassSpot = useContext(CompassSpot);
+  const safe = useSafeAreaInsets();
+  const spotTop = compassSpot?.top;
+  const spotRight = compassSpot?.right;
+  const compassAt = useMemo(
+    () => compassMargins(spotTop == null ? null : { top: spotTop, right: spotRight }, { top: safe.top, right: safe.right }, Platform.OS),
+    [spotTop, spotRight, safe.top, safe.right],
+  );
   // How much the terrain is raised, following the tilt (only while 3D Terrain is shown).
   const [exaggeration, setExaggeration] = useState(TERRAIN_EXAGGERATION);
   const ownFix = useRef(onOwnFix);
@@ -286,7 +301,7 @@ export function MapboxMap({
         styleURL={mapboxStyleFor(shown)}
         projection="mercator"
         compassEnabled={compass}
-        compassPosition={{ top: 8, right: 8 }}
+        compassPosition={compassAt}
         scaleBarEnabled={scaleBar}
         scaleBarPosition={{ bottom: 28, left: 8 }}
         logoPosition={{ bottom: 6, left: 8 }}

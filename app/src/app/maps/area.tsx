@@ -91,7 +91,7 @@ export default function PickArea() {
         </View>
       </View>
 
-      <TrailMapOverlay trail={trail} top={frame.top + 10} cardTop={frame.top + 64} lookupHint="" />
+      <TrailMapOverlay trail={trail} top={frame.top + 10} left={SIDE + 10} cardTop={frame.top + 64} lookupHint="" />
 
       <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
         <View style={styles.topRow}>

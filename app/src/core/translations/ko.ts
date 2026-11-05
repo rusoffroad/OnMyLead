@@ -3301,6 +3301,7 @@ const dict: Record<string, string> = {
   "Hi-Viz Dome": "하이비즈 돔",
   "Reflective Ring": "반사 링",
   "Floating Arrowhead": "떠 있는 화살촉",
+  "Red, White and Blue": "빨강, 하양, 파랑",
   "Safety Orange": "안전 주황",
   "Classic": "클래식",
   "Right-drag or Ctrl-drag to tilt and turn.": "오른쪽 버튼이나 Ctrl을 누른 채 드래그하면 기울이고 돌릴 수 있어요.",

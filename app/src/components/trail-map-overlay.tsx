@@ -46,18 +46,22 @@ const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
 
 /**
- * Everything drawn over a map for the trails feature: the layers button and its panel (with the
+ * Everything drawn over a map for the trails feature: the Map Settings button and its sheet (with the
  * agencies' credit), and the card for a tapped trail. Place it as a sibling after the MapView.
- * `top`, `cardTop` and `bottom` keep it clear of each screen's own header and panels; `ride` with
+ * The Map Settings button sits in the top-left corner of the map, the mirror of the compass on the
+ * right, and stays on every map all the time, Full Map included.
+ * `top`, `left`, `cardTop` and `bottom` keep it clear of each screen's own header and panels; `ride` with
  * its `route` adds a one-tap download of the ride's map for riding with no signal (apps only: the
  * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, controls = false, trackline,
+  trail, top = 12, left, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, controls = false, trackline,
 }: {
   trail: TrailMap;
-  /** Where the layers button sits. */
+  /** Where the Map Settings button sits: its top edge. */
   top?: number;
+  /** Its left edge. Defaults to 12 points in from the safe area; screens with a panel or sidebar on the left pass the edge of the open map. */
+  left?: number;
   /** Show a tapped trail's card at this distance from the top instead of at the bottom. */
   cardTop?: number;
   bottom?: number;
@@ -70,13 +74,14 @@ export function TrailMapOverlay({
   onFollow?: (t: PublicTrail) => void;
   /** Meters of a rider trail covered in Map Mode (for the rating sheet). */
   ridden?: (t: PublicTrail) => number | null;
-  /** Full Map: no Map Settings button or zoom hint, just the No Signal tag and a tapped trail's card. */
+  /** Full Map: no zoom hint. The Map Settings button, the No Signal tag and a tapped trail's card stay. */
   bare?: boolean;
   /** Ride Mode and Map Mode: Map Settings also shows the switches for the buttons on the map (Tilt Meter, Music and so on). */
   controls?: boolean;
   /** Ride Mode, for the leader (and organizers): the Leader Trackline switch for the whole ride. */
   trackline?: TracklineSwitch;
 }) {
+  const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const closeSheet = useCallback(() => setOpen(false), []);
   const [rating, setRating] = useState<PublicTrail | null>(null);
@@ -95,20 +100,18 @@ export function TrailMapOverlay({
 
   return (
     <>
-      <View pointerEvents="box-none" style={[styles.corner, { top }]}>
-        {bare ? null : (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={tr('Map Settings')}
-            accessibilityHint={tr('Map style, roads, trails, land and the buttons on the map')}
-            accessibilityState={{ expanded: open }}
-            hitSlop={6}
-            onPress={() => setOpen(true)}
-            style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}>
-            <SettingsIcon color={Colors.text} />
-            {changed ? <View style={styles.fabDot} /> : null}
-          </Pressable>
-        )}
+      <View pointerEvents="box-none" style={[styles.corner, { top, left: left ?? insets.left + 12 }]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={tr('Map Settings')}
+          accessibilityHint={tr('Map style, roads, trails, land and the buttons on the map')}
+          accessibilityState={{ expanded: open }}
+          hitSlop={6}
+          onPress={() => setOpen(true)}
+          style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}>
+          <SettingsIcon color={Colors.text} />
+          {changed ? <View style={styles.fabDot} /> : null}
+        </Pressable>
         {trail.offline ? (
           <View style={styles.offline} accessible accessibilityLabel={tr('No signal. The map is showing what\'s downloaded on this phone.')}>
             <Text style={styles.offlineText}>{tr('No Signal')}</Text>
@@ -116,19 +119,17 @@ export function TrailMapOverlay({
           </View>
         ) : null}
       </View>
-      {bare ? null : (
-        <MapSettingsSheet
-          visible={open}
-          onClose={closeSheet}
-          trail={trail}
-          route={route}
-          ride={ride}
-          lookupHint={lookupHint}
-          credit={credit}
-          trackline={trackline}
-          controls={controls}
-        />
-      )}
+      <MapSettingsSheet
+        visible={open}
+        onClose={closeSheet}
+        trail={trail}
+        route={route}
+        ride={ride}
+        lookupHint={lookupHint}
+        credit={credit}
+        trackline={trackline}
+        controls={controls}
+      />
 
       {(trail.zoomInHint || trail.closerForTracks) && !bare ? (
         <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
@@ -1012,7 +1013,7 @@ function SettingsIcon({ color }: { color: string }) {
 const glass = GlassSurface;
 
 const styles = themedStyles(() => ({
-  corner: { position: 'absolute', right: 12, alignItems: 'flex-end', gap: 8, zIndex: 20 },
+  corner: { position: 'absolute', alignItems: 'flex-start', gap: 8, zIndex: 20 },
   fab: {
     width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', ...glass,
     shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
@@ -1105,7 +1106,7 @@ const styles = themedStyles(() => ({
   miniText: { color: Colors.text, fontFamily: font(600), fontSize: 14 },
   link: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 32 },
   linkText: { color: Colors.sky, fontFamily: font(600), fontSize: 15 },
-  offline: { alignItems: 'flex-end', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, ...glass, borderColor: SAND },
+  offline: { alignItems: 'flex-start', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, ...glass, borderColor: SAND },
   offlineText: { color: SAND, fontFamily: font(700), fontSize: 13 },
   offlineSub: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 11 },
   track: { height: 4, borderRadius: 2, backgroundColor: Colors.backgroundElement, overflow: 'hidden' },

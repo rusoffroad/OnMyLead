@@ -9,13 +9,17 @@
  * up; null means no direction is known (no beam, a round centre instead of the arrow).
  */
 
-export type DotStyle = 'dome' | 'ring' | 'arrow' | 'orange' | 'classic';
+export type DotStyle = 'flag' | 'dome' | 'ring' | 'arrow' | 'orange' | 'classic';
 
-/** In the order the picker shows them; Safety Orange is the default (Chris, 2026-11-05). */
-export const DOT_STYLES: readonly DotStyle[] = ['orange', 'dome', 'ring', 'arrow', 'classic'];
-export const DEFAULT_DOT_STYLE: DotStyle = 'orange';
+/**
+ * In the order the picker shows them. Red, White and Blue is the default from 2.1 build 10 (Chris,
+ * 2026-11-05); earlier 2.1 test builds defaulted to Safety Orange. A rider who picked a style keeps it.
+ */
+export const DOT_STYLES: readonly DotStyle[] = ['flag', 'orange', 'dome', 'ring', 'arrow', 'classic'];
+export const DEFAULT_DOT_STYLE: DotStyle = 'flag';
 
 export const DOT_STYLE_NAME: Record<DotStyle, string> = {
+  flag: 'Red, White and Blue',
   dome: 'Hi-Viz Dome',
   ring: 'Reflective Ring',
   arrow: 'Floating Arrowhead',
@@ -30,6 +34,7 @@ export function parseDotStyle(v: string | null | undefined): DotStyle {
 
 /** The style's main color (the beam and halo), e.g. for an outline around a preview. */
 export const DOT_STYLE_INK: Record<DotStyle, string> = {
+  flag: '#E5233B',
   dome: '#D7FF1E',
   ring: '#D7FF1E',
   arrow: '#D7FF1E',
@@ -94,6 +99,26 @@ export function ownDotSvg(style: DotStyle, d: number, angle: number | null, movi
       + (style === 'dome'
         ? chevron(1, `url(#${id}a)`, ` stroke="#000" stroke-opacity=".3" stroke-width="${n(r * 0.04)}"`)
         : chevron(0.98, '#FFFFFF'));
+  } else if (style === 'flag') {
+    // Red, White and Blue: a white reflective rim, a red band, a thin white ring and a glossy navy
+    // dome with a white chevron (a white star when no direction is known). The white rim and navy
+    // centre keep it readable on any map and without telling red from blue.
+    defs += shadowDef
+      + `<linearGradient id="${id}r" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#C3CBD5"/><stop offset="1" stop-color="#F2F5F8"/></linearGradient>`
+      + `<radialGradient id="${id}e" cx="38%" cy="30%" r="76%"><stop offset="0" stop-color="#FF8A96"/><stop offset=".4" stop-color="#E5233B"/><stop offset="1" stop-color="#7A0A18"/></radialGradient>`
+      + `<radialGradient id="${id}d" cx="38%" cy="30%" r="76%"><stop offset="0" stop-color="#5F86E8"/><stop offset=".4" stop-color="#1B3FA0"/><stop offset="1" stop-color="#07153F"/></radialGradient>`;
+    const star = Array.from({ length: 10 }, (_, i) => {
+      const k = (i % 2 ? 0.13 : 0.32);
+      const t = (Math.PI / 5) * i;
+      return `${i ? 'L' : 'M'}${P(Math.sin(t) * k, -Math.cos(t) * k)}`;
+    }).join(' ') + ' Z';
+    body = shadow
+      + `<circle cx="${c}" cy="${c}" r="${n(r)}" fill="url(#${id}r)"/>`
+      + `<circle cx="${c}" cy="${c}" r="${n(r * 0.86)}" fill="url(#${id}e)"/>`
+      + `<circle cx="${c}" cy="${c}" r="${n(r * 0.66)}" fill="#FFFFFF"/>`
+      + `<circle cx="${c}" cy="${c}" r="${n(r * 0.6)}" fill="url(#${id}d)"/>`
+      + `<ellipse cx="${n(c - r * 0.2)}" cy="${n(c - r * 0.42)}" rx="${n(r * 0.4)}" ry="${n(r * 0.17)}" fill="#fff" fill-opacity=".4"/>`
+      + (angle == null ? `<path d="${star}" fill="#FFFFFF"/>` : chevron(0.9, '#FFFFFF'));
   } else if (style === 'ring') {
     defs += shadowDef
       + `<radialGradient id="${id}d" cx="36%" cy="28%" r="80%"><stop offset="0" stop-color="#8BE6FF"/><stop offset=".45" stop-color="#19A8E6"/><stop offset="1" stop-color="#063B5C"/></radialGradient>`

@@ -24,6 +24,7 @@ import { CrashCountdown } from '@/components/crash-countdown';
 import { TILT_TILE_H, TiltTile } from '@/components/tilt-tile';
 import { SharePicker } from '@/components/share-picker';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
+import { CompassSpot } from '@/components/compass-spot';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
@@ -773,6 +774,10 @@ export default function RideMode() {
     : panelH
       ? Math.max(BANNERS_MIN, screenH - Spacing.two - panelRest - (alertsShown ? ALERTS_MIN : 0) - topRowBottom - 6)
       : undefined;
+  // Map Settings (top left) and the compass (top right) sit level, just under the top bar, or at
+  // the top in Full Map (core/map-corner). On a tablet the bar is the riders column, so they're at the top.
+  const cornerTop = tablet || fullMap ? insets.top + EDGE : insets.top + 66;
+  const compassSpot = { top: cornerTop };
   const shownBannersBottom = fullMap ? insets.top : tablet ? panelTop : topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
   // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
   // and hold the map still drops one).
@@ -1114,33 +1119,36 @@ export default function RideMode() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <GroupMap
-        ref={groupMap}
-        riders={mapRiders}
-        meId={me}
-        regroup={regroup}
-        route={route.route?.points}
-        trackline={trackline}
-        trail={trail}
-        waypoints={wp.waypoints}
-        onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
-        onLongPressMap={mine ? openNewWaypoint : undefined}
-        edgePadding={fitPadding}
-        fallback={meet}
-        onReady={() => setMapReady(true)}
-        onUserMove={() => {
-          setMapMoved(true);
-          follow.camEvent('pan');
-        }}
-        follow={following ? { inset: openMapInset } : null}
-        locationEveryMs={batteryMode === 'best' ? 1000 : BATTERY_PLANS[batteryMode].fixEveryMs}
-      />
-      {/* In Full Map only No Signal and a tapped trail's card stay; the layers button tucks away. */}
+      <CompassSpot.Provider value={compassSpot}>
+        <GroupMap
+          ref={groupMap}
+          riders={mapRiders}
+          meId={me}
+          regroup={regroup}
+          route={route.route?.points}
+          trackline={trackline}
+          trail={trail}
+          waypoints={wp.waypoints}
+          onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
+          onLongPressMap={mine ? openNewWaypoint : undefined}
+          edgePadding={fitPadding}
+          fallback={meet}
+          onReady={() => setMapReady(true)}
+          onUserMove={() => {
+            setMapMoved(true);
+            follow.camEvent('pan');
+          }}
+          follow={following ? { inset: openMapInset } : null}
+          locationEveryMs={batteryMode === 'best' ? 1000 : BATTERY_PLANS[batteryMode].fixEveryMs}
+        />
+      </CompassSpot.Provider>
+      {/* Map Settings stays in the top-left corner of the map, Full Map included (on a tablet, just right of the riders column). */}
       <TrailMapOverlay
         trail={trail}
         controls
         bare={fullMap}
-        top={tablet || fullMap ? insets.top + EDGE : insets.top + 66}
+        top={cornerTop}
+        left={tablet && !fullMap ? sideW + 2 * Spacing.two + EDGE - Spacing.two : undefined}
         cardTop={tablet || fullMap ? insets.top + 64 : insets.top + 118}
         cardWidth={tablet ? Math.min(360, layout.width - sideW - 3 * EDGE) : undefined}
         route={route.route?.points}
@@ -1194,8 +1202,8 @@ export default function RideMode() {
         {hasBanners ? (
           <ScrollView
             style={{ maxHeight: bannersMax, flexGrow: 0 }}
-            // On a phone the map layers button sits at the right of the first banner: leave it room.
-            contentContainerStyle={{ gap: 6, paddingRight: tablet ? 0 : 58 }}
+            // On a phone Map Settings sits at the left of the first banner and the compass at its right: leave them room.
+            contentContainerStyle={{ gap: 6, paddingHorizontal: tablet ? 0 : 54 }}
             onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
             showsVerticalScrollIndicator={false}>
           {precise.problem ? (
