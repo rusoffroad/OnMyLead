@@ -77,6 +77,7 @@ describe('ownFix time', () => {
     expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: 1234 })?.atMs).toBe(1234);
     expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0 })?.atMs).toBeUndefined();
     expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: Number.NaN })?.atMs).toBeUndefined();
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: 0 })?.atMs).toBeUndefined();
   });
 });
 
@@ -100,7 +101,7 @@ describe('own dot moving or stopped', () => {
     expect(ownStopWaitMs(first, 1000)).toBe(OWN_STOPPED_AFTER_MS);
     expect(ownStopWaitMs(first, Number.NaN)).toBe(OWN_STOPPED_UNKNOWN_MS);
   });
-  it('then 2.5 of the longest recent gap between moving fixes, at least 5 s', () => {
+  it('then 2.5 of the longest recent gap between moving fixes, at least 8 s', () => {
     expect(ownStopWaitMs(ride(1000, 5))).toBe(OWN_STOPPED_AFTER_MS);
     // A quick pair of fixes never shortens the wait below the map's own interval.
     expect(ownStopWaitMs(ride(1000, 5), 15_000)).toBe(37_500);

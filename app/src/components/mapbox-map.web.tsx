@@ -484,7 +484,6 @@ export function MapboxMarker({
       marker.current = null;
     };
     // Made once per map; the position is moved below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, holder, draggable, real]);
   useEffect(() => {
     if (!isLatLng(at)) return;

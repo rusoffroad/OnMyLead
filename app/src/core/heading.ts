@@ -39,7 +39,8 @@ export function ownFix(
 ): OwnFix | null {
   if (!c || c.latitude == null || c.longitude == null || !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return null;
   const f: OwnFix = { lat: c.latitude, lng: c.longitude, headingDeg: riderHeading({ speedMps: c.speed, headingDeg: c.heading }, true) };
-  if (c.timestamp != null && Number.isFinite(c.timestamp)) f.atMs = c.timestamp;
+  // A time of 0 or less is a missing one (some map builds send 0).
+  if (c.timestamp != null && Number.isFinite(c.timestamp) && c.timestamp > 0) f.atMs = c.timestamp;
   return f;
 }
 

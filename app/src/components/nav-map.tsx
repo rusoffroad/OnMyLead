@@ -22,13 +22,13 @@ import { fallbackFollowStep } from './fallback-follow';
 import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { MAP_FIXES_FOLLOW_PLAN } from '@/lib/battery';
-
-/** How often Map Mode's flat map asks Android for the rider's spot (ms). */
-const NAV_FIX_EVERY_MS = 1000;
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { t as tr } from '@/lib/i18n';
 import { StopPin, WaypointPin } from './waypoint-blaze';
+
+/** How often Map Mode's flat map asks Android for the rider's spot (ms). */
+const NAV_FIX_EVERY_MS = 1000;
 
 export type NavMapHandle = {
   /** Move the map to a point, keeping a close zoom. */
