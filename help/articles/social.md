@@ -101,4 +101,8 @@ Riders with Pro (or the Pro Trial) show a gold **PRO** tag next to their name. S
 
 If a post or comment shouldn't be there, tap **⋯** on the post (or **Report** under a comment) and pick a reason. A post or comment that several riders report is hidden until the OnMyLead team looks at it, and the team removes ones that break the rules. Blocked riders never see your posts or comments, and you never see theirs. See [Report or Block a Rider](/help/report-and-block).
 
+:::release 2.1
+When a comment is hidden, the replies under it are hidden with it.
+:::
+
 To stop likes and comments notifications, turn off **Likes and Comments** in [Notification Settings](/help/notification-settings).

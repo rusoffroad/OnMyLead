@@ -3,6 +3,17 @@
     "date": "2026-11-05",
     "slugs": [
       "social",
+      "notifications-inbox"
+    ],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "comment-thread-fixes",
+    "why": "2.1 release test of comment likes and replies: a hidden comment's replies are hidden everywhere, including the Feed's comment count and preview, and Social says so. notifications-inbox logged for its source (a like on your comment is matched on its own); riders see no other difference. Publishes with 2.1."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "social",
       "home-screen",
       "notification-settings",
       "free-vs-pro"
