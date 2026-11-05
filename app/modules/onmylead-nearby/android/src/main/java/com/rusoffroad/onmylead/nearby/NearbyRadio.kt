@@ -359,7 +359,11 @@ class NearbyRadio(
     s.addCharacteristic(inboxChar)
     s.addCharacteristic(out)
     outboxChar = out
-    srv.addService(s)
+    if (!srv.addService(s)) {
+      // Refused at once (the stack isn't ready): no callback comes, so the next round tries again.
+      try { srv.close() } catch (_: Exception) {}
+      return
+    }
     server = srv
   }
 

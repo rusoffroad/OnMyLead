@@ -93,8 +93,13 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   private var peerInbox: [UUID: CBCharacteristic] = [:]
   /// Phones that connected to this one and subscribed to the outbox.
   private var subscribers: [UUID: CBCentral] = [:]
-  /** Frames still to notify subscribers with: the send queue was full, and iOS says when it has room. */
-  private var pendingNotify: [Data] = []
+  /**
+   * Frames still to notify subscribers with: the send queue was full, and iOS says when it has room.
+   * Urgent ones (taps, messages, receipts sent at once) go first and stay until sent; the round's
+   * own frames are replaced by each new round, which carries everything still worth sending.
+   */
+  private var pendingUrgent: [Data] = []
+  private var pendingRound: [Data] = []
 
   private var outgoing: [Data] = []
   private var received: [String] = []
@@ -154,7 +159,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       self.peers.removeAll()
       self.peerInbox.removeAll()
       self.subscribers.removeAll()
-      self.pendingNotify.removeAll()
+      self.pendingUrgent.removeAll()
+      self.pendingRound.removeAll()
       self.outgoing.removeAll()
       self.central = nil
       self.peripheral = nil
@@ -216,10 +222,13 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     guard !subscribers.isEmpty else { return }
     let batch = Array(frames.prefix(NearbyRadio.maxPendingNotify))
     if urgent {
-      // Whole, ahead of the round; the round's tail makes room when too much is waiting.
-      pendingNotify = Array((batch + pendingNotify).prefix(NearbyRadio.maxPendingNotify))
+      pendingUrgent.append(contentsOf: batch)
+      // Too much waiting: the oldest urgent frames make room (each also goes out in later rounds).
+      if pendingUrgent.count > NearbyRadio.maxPendingNotify {
+        pendingUrgent.removeFirst(pendingUrgent.count - NearbyRadio.maxPendingNotify)
+      }
     } else {
-      pendingNotify = batch
+      pendingRound = batch
     }
     drainNotify()
   }
@@ -227,11 +236,15 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   /** Notifies subscribers until iOS's send queue is full; peripheralManagerIsReady picks up the rest. */
   private func drainNotify() {
     guard let pm = peripheral, let ch = outboxChar else { return }
-    if subscribers.isEmpty { pendingNotify.removeAll(); return }
-    while let f = pendingNotify.first {
+    if subscribers.isEmpty {
+      pendingUrgent.removeAll()
+      pendingRound.removeAll()
+      return
+    }
+    while let f = pendingUrgent.first ?? pendingRound.first {
       let fits = subscribers.values.filter { f.count <= $0.maximumUpdateValueLength }
       if !fits.isEmpty && !pm.updateValue(f, for: ch, onSubscribedCentrals: fits) { return }
-      pendingNotify.removeFirst()
+      if !pendingUrgent.isEmpty { pendingUrgent.removeFirst() } else { pendingRound.removeFirst() }
     }
   }
 
@@ -321,7 +334,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     guard pm.state == .poweredOn else {
       serviceAdded = false
       subscribers.removeAll()
-      pendingNotify.removeAll()
+      pendingUrgent.removeAll()
+      pendingRound.removeAll()
       return
     }
     guard !serviceAdded else { return }
