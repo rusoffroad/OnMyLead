@@ -165,6 +165,19 @@ export default function You() {
         </View>
       )}
 
+      {session && ent.accountType === 'admin' ? (
+        // Admin only: first in the list so Chris doesn't scroll past every setting to reach it.
+        <MenuGroup>
+          <MenuRow
+            icon="lock"
+            color={Colors.accent}
+            title={t('Admin Dashboard')}
+            detail={Platform.OS === 'web' ? t('Users, rides, reports and settings') : t('Opens onmylead.com/admin')}
+            onPress={() => (Platform.OS === 'web' ? router.push('/admin') : Linking.openURL('https://onmylead.com/admin'))}
+          />
+        </MenuGroup>
+      ) : null}
+
       <MenuGroup title={t('Your Gear')}>
         <MenuRow icon="machine" color={Colors.accent} title={t('Garage')} detail={t('Your machines, mods and fuel range')} onPress={needsAccount('/garage')} />
         {tripsOn ? (
@@ -357,15 +370,6 @@ export default function You() {
             <MenuRow icon="addFriend" color={Colors.accent} title={t('Invite Friends')} detail={t('You both get 50% off Pro Annual when they finish a ride')} onPress={() => router.push('/invite-friends')} />
           ) : null}
           <MenuRow icon="block" color={Colors.danger} title={t('Blocked Riders')} detail={blockedSummary} onPress={() => router.push('/blocked')} />
-          {ent.accountType === 'admin' ? (
-            <MenuRow
-              icon="lock"
-              color={Colors.accent}
-              title={t('Admin Dashboard')}
-              detail={Platform.OS === 'web' ? t('Users, rides, reports and settings') : t('Opens onmylead.com/admin')}
-              onPress={() => (Platform.OS === 'web' ? router.push('/admin') : Linking.openURL('https://onmylead.com/admin'))}
-            />
-          ) : null}
         </MenuGroup>
       ) : null}
 
