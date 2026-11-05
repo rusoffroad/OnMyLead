@@ -344,12 +344,12 @@ describe('pickFrames', () => {
     // Least recently sent first: with room for 3 of 5, every message goes within two turns.
     const sent = new Map<string, number>();
     for (let turn = 0; turn < 2; turn++) {
-      for (const i of pickFrames(items, A, (id) => sent.get(id) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(i.id, turn); }
+      for (const i of pickFrames(items, A, (k) => sent.get(k) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(`r:${i.id}`, turn); }
     }
     expect(seen.size).toBe(5);
     // The rider's own message goes in every full round, whatever the turn.
     const mine = [0, 1, 2, 3, 4, 5].map((p) => ({ ...(reply('own', p, 6, 1) as object), userId: A } as unknown as NearbyItem));
-    for (let turn = 0; turn < 5; turn++) expect(pickFrames([...items, ...mine], A, (id) => (id === 'own' ? 99 : turn)).filter((i) => i.kind === 'reply' && i.id === 'own')).toHaveLength(6);
+    for (let turn = 0; turn < 5; turn++) expect(pickFrames([...items, ...mine], A, (k) => (k === 'r:own' ? 99 : turn)).filter((i) => i.kind === 'reply' && i.id === 'own')).toHaveLength(6);
   });
 });
 
@@ -361,23 +361,34 @@ describe('pickFrames with many taps', () => {
     const sent = new Map<string, number>();
     const seen = new Set<string>();
     for (let turn = 0; turn < 3; turn++) {
-      for (const i of pickFrames(items, A, (id) => sent.get(id) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(i.id, turn); }
+      for (const i of pickFrames(items, A, (k) => sent.get(k) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(`r:${i.id}`, turn); }
     }
     expect(seen).toEqual(new Set(['short', 'long']));
   });
 });
 
 describe('pickFrames keeps spots moving', () => {
+  const tap = (n: number) => ({ kind: 'status', userId: B, id: `t${n}`, status: 'ok', at: 100 - n, flags: 0, latE7: null, lngE7: null, hops: 0 } as unknown as NearbyItem);
+  const spot = (u: string) => ({ kind: 'position', userId: u, at: 1, latE7: 0, lngE7: 0, accuracyM: null, speedCms: null, headingDd: null, flags: 0, hops: 0 } as unknown as NearbyItem);
   it("relays other riders' spots and rotates taps when taps fill the round", () => {
-    const tap = (n: number) => ({ kind: 'status', userId: B, id: `t${n}`, status: 'ok', at: 100 - n, flags: 0, latE7: null, lngE7: null, hops: 0 } as unknown as NearbyItem);
-    const spot = (u: string) => ({ kind: 'position', userId: u, at: 1, latE7: 0, lngE7: 0, accuracyM: null, speedCms: null, headingDd: null, flags: 0, hops: 0 } as unknown as NearbyItem);
     const items = [...Array.from({ length: 30 }, (_, n) => tap(n)), spot(C), spot(B)];
     const first = pickFrames(items, A);
     expect(first.filter((i) => i.kind === 'position')).toHaveLength(2);
     // The taps left out this round lead the next one.
     const sent = new Set(first.filter((i) => i.kind === 'status').map((i) => (i as { id: string }).id));
-    const next = pickFrames(items, A, (id) => (sent.has(id) ? 0 : -1));
+    const next = pickFrames(items, A, (k) => (sent.has(k.slice(2)) ? 0 : -1));
     expect(next.filter((i) => i.kind === 'status' && !sent.has((i as { id: string }).id))).toHaveLength(30 - sent.size);
+  });
+
+  it('gives every spot a turn when there are more than the share', () => {
+    const spots = Array.from({ length: 10 }, (_, n) => spot(`r${n}`));
+    const items = [...Array.from({ length: 20 }, (_, n) => tap(n)), ...spots];
+    const sent = new Map<string, number>();
+    const seen = new Set<string>();
+    for (let turn = 0; turn < 3; turn++) {
+      for (const i of pickFrames(items, A, (k) => sent.get(k) ?? -1)) if (i.kind === 'position') { seen.add(i.userId); sent.set(`p:${i.userId}`, turn); }
+    }
+    expect(seen.size).toBe(10);
   });
 });
 
