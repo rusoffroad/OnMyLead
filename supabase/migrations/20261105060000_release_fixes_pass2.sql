@@ -5,7 +5,9 @@
 --    ended before the move happened, can be claimed again (the Play offer, or an Apple code)
 --    instead of staying stuck.
 -- 2. Shared waypoint push: once per waypoint, as 20261104150000 says. Switching a waypoint between
---    Just Me and Everyone on the Ride again no longer pushes everyone again.
+--    Just Me and Everyone on the Ride again no longer pushes everyone again. Waypoints already
+--    shared on a live ride count as announced.
+-- 3. push_batch_feed: a reply's push goes only to riders the reply is shown to.
 
 create or replace function claim_referral_reward(p_store text)
 returns jsonb language plpgsql security definer set search_path = public as $$
@@ -28,11 +30,15 @@ begin
     if p_store <> 'apple' then return jsonb_build_object('error', 'claimed_on_other_store', 'store', 'apple'); end if;
     return jsonb_build_object('kind', 'apple_code', 'code', w.apple_code,
       'url', 'https://apps.apple.com/redeem?ctx=offercodes&id=' || (v_rules ->> 'apple_app_id') || '&code=' || w.apple_code);
-  elsif w.claim_kind = 'google_defer'
-        and not (w.redeemed_at is null and w.deferred_at is null and referral_play_token(v_me) is null) then
-    return jsonb_build_object('kind', 'google_defer', 'deferred_at', w.deferred_at);
-  -- A deferral that never happened, for a Google Play subscription that has since ended: there's
-  -- nothing left to move, so the reward is claimed afresh below (the offer, or an Apple code).
+  elsif w.claim_kind = 'google_defer' then
+    if w.redeemed_at is not null or referral_play_token(v_me) is not null
+       or w.deferred_at > now() - interval '10 minutes' then
+      return jsonb_build_object('kind', 'google_defer', 'deferred_at', w.deferred_at);
+    end if;
+    -- A deferral that never finished, for a Google Play subscription that has since ended:
+    -- there's nothing left to move, so the reward is claimed afresh below (the offer, or an
+    -- Apple code).
+    update referral_rewards set deferred_at = null where id = w.id;
   elsif w.claim_kind = 'google_offer' and p_store = 'apple' then
     return jsonb_build_object('error', 'claimed_on_other_store', 'store', 'google');
   elsif w.claim_kind = 'google_offer' and p_store = 'google' then
@@ -71,6 +77,9 @@ create table if not exists ride_waypoint_alerts (
 );
 alter table ride_waypoint_alerts enable row level security;
 revoke all on ride_waypoint_alerts from public, anon, authenticated;
+insert into ride_waypoint_alerts (waypoint_id)
+select w.id from ride_waypoints w join rides r on r.id = w.ride_id where w.shared and r.status = 'live'
+on conflict (waypoint_id) do nothing;
 
 create or replace function ride_waypoints_alert() returns trigger
 language plpgsql security definer set search_path = public as $$
@@ -91,3 +100,125 @@ exception when others then
 end;
 $$;
 revoke execute on function ride_waypoints_alert() from public, anon, authenticated;
+
+create or replace function push_batch_feed(p_event jsonb)
+returns table (user_id uuid, token text, platform text, title text, body text, thread_id text, data jsonb)
+language plpgsql stable security invoker set search_path = public as $$
+#variable_conflict use_column
+declare
+  v_type text := p_event ->> 'type';
+  v_key text;
+  v_from uuid;
+  v_owner uuid;
+  v_who text;
+  v_likes int;
+  cm feed_comments;
+  v_answered uuid;
+begin
+  if current_user not in ('service_role', 'postgres') then
+    raise exception 'not allowed';
+  end if;
+  if v_type = 'feed_like' and p_event ? 'comment' then
+    select * into cm from feed_comments c where c.id = (p_event ->> 'comment')::uuid and c.hidden_at is null;
+    if not found then return; end if;
+    v_from := (p_event ->> 'from')::uuid;
+    if cm.author_id = v_from or riders_blocked(cm.author_id, v_from) then return; end if;
+    if not exists (select 1 from feed_comment_likes l where l.comment_id = cm.id and l.user_id = v_from) then return; end if;
+    select coalesce(nullif(btrim(display_name), ''), 'A rider') into v_who from profiles where id = v_from;
+    select count(*) into v_likes from feed_comment_likes l where l.comment_id = cm.id and l.user_id <> cm.author_id;
+    return query
+    select t.user_id, t.token, t.platform, 'New Like',
+           coalesce(v_who, 'A rider')
+             || case when v_likes > 1 then ' and ' || (v_likes - 1) || case when v_likes = 2 then ' other' else ' others' end else '' end
+             || ' liked your ' || case when cm.parent_id is null then 'comment' else 'reply' end
+             || case when s.previews is false then '.' else ': “' || left(cm.body, 120) || case when char_length(cm.body) > 120 then '…' else '' end || '”' end,
+           'feed',
+           jsonb_build_object('type', 'feed_like', 'key', cm.item_key, 'commentId', cm.id, 'userId', v_from, 'collapseId', 'clike:' || cm.id)
+    from push_tokens t
+    left join notification_settings s on s.user_id = t.user_id
+    where t.user_id = cm.author_id and wants_feed_push(t.user_id) and feed_can_interact(t.user_id, cm.item_key);
+  elsif v_type = 'feed_like' then
+    v_key := p_event ->> 'key';
+    v_from := (p_event ->> 'from')::uuid;
+    v_owner := feed_item_owner(v_key);
+    if v_owner is null or v_owner = v_from or riders_blocked(v_owner, v_from) then return; end if;
+    if not exists (select 1 from feed_likes l where l.item_key = v_key and l.user_id = v_from) then return; end if;
+    select coalesce(nullif(btrim(display_name), ''), 'A rider') into v_who from profiles where id = v_from;
+    select count(*) into v_likes from feed_likes l where l.item_key = v_key and l.user_id <> v_owner;
+    return query
+    select t.user_id, t.token, t.platform, 'New Like',
+           coalesce(v_who, 'A rider')
+             || case when v_likes > 1 then ' and ' || (v_likes - 1) || case when v_likes = 2 then ' other' else ' others' end else '' end
+             || ' liked ' || feed_item_phrase(v_key, v_owner, v_owner) || '.',
+           'feed',
+           jsonb_build_object('type', 'feed_like', 'key', v_key, 'userId', v_from, 'collapseId', 'like:' || v_key)
+    from push_tokens t
+    where t.user_id = v_owner and wants_feed_push(t.user_id);
+  elsif v_type = 'feed_comment' then
+    select * into cm from feed_comments c where c.id = (p_event ->> 'id')::uuid and c.hidden_at is null;
+    if not found then return; end if;
+    select coalesce(nullif(btrim(display_name), ''), 'A rider') into v_who from profiles where id = cm.author_id;
+    if cm.parent_id is not null then
+      select c.author_id into v_answered from feed_comments c where c.id = coalesce(cm.reply_to_id, cm.parent_id);
+      return query
+      with rcpt as (
+        select v_answered as uid
+        union select c.author_id from feed_comments c where c.id = cm.parent_id
+        union select cm.owner_id
+        union
+        select x.author_id from (
+          select c.author_id, max(c.created_at) as last from feed_comments c
+          where c.parent_id = cm.parent_id and c.hidden_at is null group by c.author_id
+          order by last desc limit 20
+        ) x
+      )
+      select t.user_id, t.token, t.platform, 'New Reply',
+             coalesce(v_who, 'A rider')
+               || case when r.uid = v_answered then ' replied to your comment on ' else ' replied on ' end
+               || feed_item_phrase(cm.item_key, cm.owner_id, r.uid)
+               || case when s.previews is false then '.' else ': “' || left(cm.body, 120) || case when char_length(cm.body) > 120 then '…' else '' end || '”' end,
+             'feed',
+             jsonb_build_object('type', 'feed_comment', 'key', cm.item_key, 'commentId', cm.id, 'userId', cm.author_id)
+      from rcpt r
+      join push_tokens t on t.user_id = r.uid
+      left join notification_settings s on s.user_id = t.user_id
+      where r.uid is not null and r.uid <> cm.author_id
+        -- Only riders the reply is shown to: not blocked either way, and the top comment not
+        -- hidden or by a rider they blocked (feed_comment_visible, as for liking it).
+        and feed_comment_visible(r.uid, cm.id)
+        and wants_feed_push(t.user_id);
+      return;
+    end if;
+    return query
+    with rcpt as (
+      select cm.owner_id as uid
+      union
+      select x.author_id from (
+        select c.author_id, max(c.created_at) as last from feed_comments c
+        where c.item_key = cm.item_key and c.parent_id is null and c.hidden_at is null group by c.author_id
+        order by last desc limit 20
+      ) x
+    )
+    select t.user_id, t.token, t.platform, 'New Comment',
+           coalesce(v_who, 'A rider')
+             || case when r.uid = cm.owner_id then ' commented on ' else ' also commented on ' end
+             || feed_item_phrase(cm.item_key, cm.owner_id, r.uid)
+             || case when s.previews is false then '.' else ': “' || left(cm.body, 120) || case when char_length(cm.body) > 120 then '…' else '' end || '”' end,
+           'feed',
+           jsonb_build_object('type', 'feed_comment', 'key', cm.item_key, 'commentId', cm.id, 'userId', cm.author_id)
+    from rcpt r
+    join push_tokens t on t.user_id = r.uid
+    left join notification_settings s on s.user_id = t.user_id
+    where r.uid <> cm.author_id
+      and not riders_blocked(r.uid, cm.author_id)
+      and feed_can_interact(r.uid, cm.item_key)
+      and wants_feed_push(t.user_id);
+  end if;
+end;
+$$;
+revoke execute on function push_batch_feed(jsonb) from public, anon, authenticated;
+do $$ begin
+  if exists (select 1 from pg_roles where rolname = 'service_role') then
+    grant execute on function push_batch_feed(jsonb) to service_role;
+  end if;
+end $$;

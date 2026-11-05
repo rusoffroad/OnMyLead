@@ -141,10 +141,18 @@ async function run() {
   if (!can(currentEntitlements(), 'sync')) {
     const lastAccount = await AsyncStorage.getItem(ACCOUNT_KEY).catch(() => null);
     if (lastAccount !== me) {
-      // The stamps were the last account's: this rider starts fresh if they go Pro here later.
       await load();
       stamps = {};
       saveStamps();
+      if (lastAccount) {
+        // A different rider was here: put the synced settings back to the app's defaults, as the
+        // Pro path does, so this rider (or their Pro account later) never takes the last rider's.
+        for (const k of Object.keys(SYNCED_SETTINGS)) {
+          await writeLocal(k, null);
+          tell(k, null);
+        }
+        prefixListeners.forEach((set) => set.forEach((l) => l()));
+      }
       await AsyncStorage.setItem(ACCOUNT_KEY, me).catch(() => {});
     }
     return;

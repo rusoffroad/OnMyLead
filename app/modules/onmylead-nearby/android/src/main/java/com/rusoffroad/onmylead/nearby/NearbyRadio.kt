@@ -20,7 +20,10 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
@@ -95,8 +98,43 @@ class NearbyRadio(
   // ---------------------------------------------------------------------------------------------
   // Called from JavaScript (any thread); everything else runs on `handler`.
 
+  // Bluetooth switched off and on between two rounds would leave dead scans and links behind, so
+  // the switch itself resets them; the next round starts everything again.
+  private var stateReceiverOn = false
+  private val roundTask = Runnable { round() }
+  private val stateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(c: Context, intent: Intent) {
+      val st = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+      if (st == BluetoothAdapter.STATE_TURNING_OFF || st == BluetoothAdapter.STATE_OFF) {
+        handler.post {
+          if (!running) return@post
+          resetLinks()
+          report("off")
+        }
+      } else if (st == BluetoothAdapter.STATE_ON) {
+        handler.post {
+          if (!running || !hasPermissions() || adapter == null) return@post
+          // One loop of rounds: drop the waiting one and run now.
+          handler.removeCallbacks(roundTask)
+          round()
+        }
+      }
+    }
+  }
+
   fun start() = handler.post {
     running = true
+    if (!stateReceiverOn) {
+      try {
+        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+          context.registerReceiver(stateReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+          context.registerReceiver(stateReceiver, filter)
+        }
+        stateReceiverOn = true
+      } catch (_: Exception) {}
+    }
     if (!hasPermissions()) return@post report("unauthorized")
     val a = adapter ?: return@post report("unsupported")
     if (a.isEnabled) {
@@ -107,13 +145,17 @@ class NearbyRadio(
       // Rounds keep running so the radio starts by itself once the rider turns Bluetooth on.
       report("off")
     }
-    handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
+    handler.postDelayed(roundTask, if (low) LOW_ROUND_MS else ROUND_MS)
   }
 
   fun stop() {
     handler.post {
       running = false
       handler.removeCallbacksAndMessages(null)
+      if (stateReceiverOn) {
+        try { context.unregisterReceiver(stateReceiver) } catch (_: Exception) {}
+        stateReceiverOn = false
+      }
       try {
         if (scanning) adapter?.bluetoothLeScanner?.stopScan(scanCallback)
         if (advertising) adapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
@@ -211,7 +253,7 @@ class NearbyRadio(
       if (state != "on") report("on")
       send(outgoing)
     }
-    handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
+    handler.postDelayed(roundTask, if (low) LOW_ROUND_MS else ROUND_MS)
   }
 
   private fun resetLinks() {

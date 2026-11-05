@@ -270,7 +270,7 @@ export function setNearbySharing(rideId: string, sharing: boolean) {
   if (!s || s.rideId !== rideId || s.sharing === sharing) return;
   s.sharing = sharing;
   if (!sharing) s.mesh.clearOwnPosition();
-  pushOutgoing();
+  pushOutgoing(true);
 }
 
 /**
@@ -325,7 +325,7 @@ export function nearbyReply(rideId: string, r: { id?: string; body: string; tapp
 /** A tap the rider cancelled stops going out. */
 export function nearbyForget(id: string) {
   session?.mesh.forget(id);
-  pushOutgoing();
+  pushOutgoing(true);
 }
 
 /** This rider saw these other riders' taps or messages on screen (hooks/use-broadcast useAcknowledge). */
@@ -397,17 +397,22 @@ const OUT_MIN_MS = 1_500;
 let outTimer: ReturnType<typeof setTimeout> | null = null;
 let lastOut = 0;
 
-function pushOutgoing() {
+function sealOutgoing() {
+  if (outTimer) clearTimeout(outTimer);
+  outTimer = null;
+  lastOut = Date.now();
+  const s = session;
+  if (!s || !native) return;
+  try {
+    native.setOutgoing(s.mesh.outgoing(Date.now(), nonce).map(toBase64));
+  } catch {}
+}
+
+/** `now`: something must stop going out (sharing turned off, a tap cancelled), so don't wait. */
+function pushOutgoing(now = false) {
+  if (now) return sealOutgoing();
   if (outTimer) return;
-  outTimer = setTimeout(() => {
-    outTimer = null;
-    lastOut = Date.now();
-    const s = session;
-    if (!s || !native) return;
-    try {
-      native.setOutgoing(s.mesh.outgoing(Date.now(), nonce).map(toBase64));
-    } catch {}
-  }, Math.max(0, OUT_MIN_MS - (Date.now() - lastOut)));
+  outTimer = setTimeout(sealOutgoing, Math.max(0, OUT_MIN_MS - (Date.now() - lastOut)));
 }
 
 // The module hands each packet over twice (as it arrives, and again from its drain buffer for

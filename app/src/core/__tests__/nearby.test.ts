@@ -85,6 +85,14 @@ describe('packets', () => {
     // uploads is the whole message.
     expect(fitReply('🙂'.repeat(RIDE_MESSAGE_MAX))).toBe('🙂'.repeat(RIDE_MESSAGE_MAX));
     expect(fitReply('路'.repeat(RIDE_MESSAGE_MAX))).toBe('路'.repeat(RIDE_MESSAGE_MAX));
+    // A longer message from the server is cut to whole packets, never more than receivers take.
+    for (const long of ['a' + '路'.repeat(400), '路'.repeat(176), '🙂'.repeat(300)]) {
+      const pieces = splitReply(long);
+      expect(pieces.length).toBeLessThanOrEqual(MAX_REPLY_PARTS);
+      for (const p of pieces) expect(new TextEncoder().encode(p).length).toBeLessThanOrEqual(REPLY_PART_BYTES);
+      expect(fitReply(long)).toBe(pieces.join(''));
+    }
+    expect(splitReply('')).toEqual(['']);
   });
 
   it('keeps a status without a spot', () => {

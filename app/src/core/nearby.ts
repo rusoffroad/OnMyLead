@@ -437,23 +437,25 @@ function sameBytes(a: Uint8Array, b: Uint8Array) {
 
 /** Fits a message into MAX_REPLY_PARTS packets, cutting at a whole character. */
 export function fitReply(body: string): string {
-  let out = body.trim();
-  while (enc.encode(out).length > MAX_REPLY_BYTES) out = Array.from(out).slice(0, -1).join('');
-  return out;
+  return splitReply(body).join('');
 }
 
-/** Splits a message's text into the pieces that each fit one packet, at whole characters. */
+/**
+ * Splits a message's text into the pieces that each fit one packet, at whole characters, keeping
+ * at most MAX_REPLY_PARTS pieces (the rest is cut).
+ */
 export function splitReply(body: string): string[] {
   const out: string[] = [];
   let cur = '';
-  for (const ch of fitReply(body)) {
+  for (const ch of body.trim()) {
     if (enc.encode(cur + ch).length > REPLY_PART_BYTES) {
       out.push(cur);
       cur = '';
+      if (out.length === MAX_REPLY_PARTS) return out;
     }
     cur += ch;
   }
-  out.push(cur);
+  if (cur || !out.length) out.push(cur);
   return out;
 }
 

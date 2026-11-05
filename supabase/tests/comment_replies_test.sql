@@ -211,6 +211,21 @@ select as_admin_session('00000000-0000-0000-0000-00000000ad01', 'aal2');
 select admin_set_comment_hidden(reply_id('r1'), false);
 select as_admin_session(null, 'aal1');
 
+-- R7c. A reply's push skips riders the thread is hidden from: Eli blocks Ben (who wrote the top
+-- comment), and Ann's answer to Eli no longer pushes him.
+do $$ begin
+  if not exists (select 1 from push_batch_feed(jsonb_build_object('type', 'feed_comment', 'id', reply_id('r2'))) b
+                 where b.user_id = '00000000-0000-0000-0000-000000000ee5') then
+    raise exception 'FAIL: Eli not pushed about Ann''s answer';
+  end if;
+  insert into blocked_riders (blocker_id, blocked_id) values ('00000000-0000-0000-0000-000000000ee5', '00000000-0000-0000-0000-000000000ee2');
+  if exists (select 1 from push_batch_feed(jsonb_build_object('type', 'feed_comment', 'id', reply_id('r2'))) b
+             where b.user_id = '00000000-0000-0000-0000-000000000ee5') then
+    raise exception 'FAIL: pushed a reply in a thread hidden from the rider';
+  end if;
+  delete from blocked_riders where blocker_id = '00000000-0000-0000-0000-000000000ee5' and blocked_id = '00000000-0000-0000-0000-000000000ee2';
+end $$;
+
 -- R8. Ben deletes his comment: its replies, their likes and the notifications about them go too.
 select as_user('00000000-0000-0000-0000-000000000ee2');
 set role authenticated;

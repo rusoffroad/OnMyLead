@@ -308,8 +308,9 @@ end $$;
 -- R12 (20261105060000). Ivy's reward was set to move her Play bill, but that subscription ended
 -- before it moved: claiming again gives her the Play offer instead of a stuck deferral.
 insert into referrals (referrer_id, friend_id, code) values ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000f06', 'REXREF0001');
-insert into referral_rewards (user_id, referral_id, role, expires_at, claimed_at, claim_store, claim_kind)
-select '00000000-0000-0000-0000-000000000f06', id, 'friend', now() + interval '180 days', now(), 'google', 'google_defer'
+-- (Reserved an hour ago and Google never answered.)
+insert into referral_rewards (user_id, referral_id, role, expires_at, claimed_at, claim_store, claim_kind, deferred_at)
+select '00000000-0000-0000-0000-000000000f06', id, 'friend', now() + interval '180 days', now(), 'google', 'google_defer', now() - interval '1 hour'
 from referrals where friend_id = '00000000-0000-0000-0000-000000000f06';
 select as_user('00000000-0000-0000-0000-000000000f06');
 set role authenticated;
@@ -318,6 +319,9 @@ reset role;
 do $$ begin
   if (select v ->> 'kind' from ref_out where name = 'ivy_reclaim') is distinct from 'google_offer' then
     raise exception 'FAIL: a deferral with no subscription left stayed stuck: %', (select v from ref_out where name = 'ivy_reclaim');
+  end if;
+  if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f06') is not null then
+    raise exception 'FAIL: the old reservation was left on the reward';
   end if;
   -- Hal's deferral (subscription still running) is left as it is.
   if (select claim_kind from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') <> 'google_defer' then

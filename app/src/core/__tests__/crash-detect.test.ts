@@ -240,6 +240,17 @@ describe('dropped phone', () => {
     expect(alarms).toEqual([]);
   });
 
+  it('a phone that fell to the floor while driving does not alarm when the rider later pulls over', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 12, feltG: 1 }),
+      ...every(1050, 1350, { speedMps: 12, feltG: 0.05 }),
+      s(1400, { speedMps: 12, feltG: 3, userAccel: { x: 2 * G, y: 0, z: 0 } }),
+      ...every(1450, 25_000, { speedMps: 12, feltG: 1, roll: 85 }),
+      ...every(25_050, 40_000, { speedMps: 0, feltG: 1, roll: 85 }), // pulls over to pick it up
+    ]);
+    expect(alarms).toEqual([]);
+  });
+
   it('a crash that throws the phone out of the mount still alarms', () => {
     const { alarms } = run([
       ...every(0, 500, { speedMps: 12, feltG: 1 }),

@@ -90,10 +90,12 @@ export type CrashState = {
   displaced?: boolean;
   /** Since when a displaced phone has been back near level. */
   levelSince?: number | null;
+  /** When the phone last fell at driving speed (the vehicle in the air, or a phone off its mount). */
+  airborneAt?: number | null;
 };
 
 export const INITIAL_CRASH: CrashState = {
-  lastRidingAt: null, tippedSince: null, suspect: null, quietUntil: 0, fallingSince: null, droppedAt: null, displaced: false, levelSince: null,
+  lastRidingAt: null, tippedSince: null, suspect: null, quietUntil: 0, fallingSince: null, droppedAt: null, displaced: false, levelSince: null, airborneAt: null,
 };
 
 export type CrashStep = { state: CrashState; alarm: CrashCause | null };
@@ -133,8 +135,15 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
   const droppedAt = fell && !airborne ? s.t : (state.droppedAt ?? null);
   const justDropped = droppedAt != null && s.t - droppedAt <= DROP_IGNORE_MS;
   // After a drop the tilt is the phone's, not the vehicle's, until it's back near level for a while.
-  // (Not after a fall at driving speed: that may be the vehicle in the air, and a roll after it counts.)
+  // (Not right after a fall at driving speed: that may be the vehicle in the air, and a roll that
+  // ends it counts. If nothing came of it within SETTLE_WINDOW_MS, it was the phone falling off its
+  // mount, and from then on its tilt is the phone's.)
+  let airborneAt = fell && airborne ? s.t : (state.airborneAt ?? null);
   let displaced = (fell && !airborne) || !!state.displaced;
+  if (airborneAt != null && !fell && s.t - airborneAt > SETTLE_WINDOW_MS) {
+    airborneAt = null;
+    displaced = true;
+  }
   let levelSince = state.levelSince ?? null;
   if (displaced && !fell) {
     const level = s.roll != null && s.pitch != null && Math.abs(s.roll) < REMOUNT_DEG && Math.abs(s.pitch) < REMOUNT_DEG;
@@ -144,7 +153,7 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
       levelSince = null;
     }
   } else if (fell && !airborne) levelSince = null;
-  const drop = { fallingSince, droppedAt, displaced, levelSince };
+  const drop = { fallingSince, droppedAt, displaced, levelSince, airborneAt };
 
   const tipped =
     !displaced &&
