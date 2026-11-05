@@ -171,7 +171,7 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string; var
   },
   bluetooth_sharing: {
     title: 'Bluetooth Sharing With No Service',
-    body: 'With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.',
+    body: 'With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.',
   },
   custom_dot: {
     title: 'Customize Your Dot',

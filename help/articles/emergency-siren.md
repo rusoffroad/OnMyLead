@@ -51,7 +51,7 @@ The EMERGENCY notification plays the siren as its sound, for about 27 seconds. T
 
 ## With No Service
 
-With [Bluetooth Sharing](/help/bluetooth-sharing) (part of OnMyLead Pro), an EMERGENCY from a rider within Bluetooth range sounds the siren in Ride Mode too. If OnMyLead is in the background, you get a notification with the siren that says it was sent over Bluetooth.
+With [Bluetooth Sharing](/help/bluetooth-sharing) (on every plan for EMERGENCY), an EMERGENCY from a rider within Bluetooth range sounds the siren in Ride Mode too. If OnMyLead is in the background, you get a notification with the siren that says it was sent over Bluetooth.
 
 ## On the Website
 

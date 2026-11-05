@@ -102,7 +102,7 @@ No. Positions only update when a phone has a connection. [Offline maps](/help/of
 :::
 
 :::release 2.1
-Yes, for riders close to you. With no service, OnMyLead phones on the same ride pass spots, status taps, EMERGENCY and Ride Mode messages to each other over Bluetooth, about 100 to 300 feet between phones in the open, and each phone passes them along the group, up to six phones down the line. Riders out of Bluetooth range show where they were last seen, and the first phone to get signal sends everything it heard to OnMyLead. It's part of OnMyLead Pro (every new account gets 30 days free) and on by default with Pro. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing), and download the ride's [offline map](/help/offline-maps) before you go.
+Yes, for riders close to you. With no service, OnMyLead phones on the same ride pass spots, status taps, EMERGENCY and Ride Mode messages to each other over Bluetooth, about 100 to 300 feet between phones in the open, and each phone passes them along the group, up to six phones down the line. Riders out of Bluetooth range show where they were last seen, and the first phone to get signal sends everything it heard to OnMyLead. Seeing riders, sharing your spot and messages over Bluetooth are part of OnMyLead Pro (every new account gets 30 days free); on every plan your phone passes things along and EMERGENCY goes out over Bluetooth. It's on by default. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing), and download the ride's [offline map](/help/offline-maps) before you go.
 :::
 
 :::release 2.0

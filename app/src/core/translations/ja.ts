@@ -1,13 +1,14 @@
 // Japanese. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "圏外のとき、スマートフォンがグループのアラートを中継し、緊急通報を送ります。Bluetooth での位置とメッセージは Pro です。",
+  "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "圏外のとき、近くのライダーを表示し、自分の位置、ステータス、メッセージを Bluetooth で伝えます。Free でもアラートの中継は続き、緊急通報、助けが必要、衝突アラートは Bluetooth で送られます。",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date} まで、すべての Pro 機能を無料でお使いいただけます。その後は Free で引き続き走れます。ライドへの参加、ライドモード、緊急通報は無料のままです。",
   "Your Pro Trial Runs Until {date}": "Pro トライアルは {date} まで",
   "See Pro": "Pro を見る",
   "CarPlay Is Part of OnMyLead Pro": "CarPlay は OnMyLead Pro の機能です",
   "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Free プランでも、ライドモード、ステータスボタン、緊急通報はスマートフォンで使えます。",
   "Bluetooth Sharing With No Service": "圏外での Bluetooth 共有",
-  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "圏外のとき、ライドモードは同じライドの近くのライダーに Bluetooth で位置、ステータス、メッセージを伝えます。電波があるときのライブ追跡、助けが必要、緊急通報は無料のままです。",
   "Customize Your Dot": "自分のドットをカスタマイズ",
   "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "地図上の自分のドットの見た目と大きさを選べます。赤・白・青のドットは無料のままです。",
   "Group Photos": "グループ写真",

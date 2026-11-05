@@ -85,7 +85,7 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { useFlag } from '@/lib/app-settings';
 import {
-  nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
+  nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbyRelayOnly, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
 } from '@/lib/nearby';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
@@ -503,10 +503,12 @@ export default function RideMode() {
   const bluetoothFlag = useFlag('bluetooth_sharing');
   // The rider's own switch (You > Bluetooth Sharing, or the no-service banner here). On by default;
   // turning it back on in Ride Mode starts Bluetooth again at once.
-  const [bluetoothSwitch, setBluetoothMine] = useBluetoothSharingSetting();
-  // Bluetooth Sharing is Pro (2.1): on Free the switch stays as the rider left it, but nothing runs.
+  const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1). On Free the phone still relays for the group and still sends and
+  // hears EMERGENCY, Need Help and Crash Alerts (lib/nearby relay only); spots, other taps and
+  // messages over Bluetooth need Pro.
   const bluetoothPro = useCan('bluetooth_sharing');
-  const bluetoothMine = bluetoothSwitch && bluetoothPro;
+  useEffect(() => setNearbyRelayOnly(!bluetoothPro), [bluetoothPro]);
   const bluetoothOffered = nearbyAvailable && bluetoothFlag;
   const nearby = useNearby();
   const iAmJoined = !!me && joined.some((m) => m.user_id === me);
@@ -1230,7 +1232,7 @@ export default function RideMode() {
             <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
               <View style={styles.offlineDot} />
               <Text style={styles.offlineText}>
-                {nearby.state === 'on' && nearby.peers > 0
+                {nearby.state === 'on' && nearby.peers > 0 && bluetoothPro
                   ? activeShare
                     ? t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth.' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth.', { n: nearby.peers })
                     : t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth (Your Spot Stays Private Until You Share).' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth (Your Spot Stays Private Until You Share).', { n: nearby.peers })
@@ -1241,7 +1243,7 @@ export default function RideMode() {
               </Text>
               {bluetoothOffered ? (
                 <Pressable
-                  onPress={() => (bluetoothMine ? setBluetoothMine(false) : requirePro('bluetooth_sharing') && setBluetoothMine(true))}
+                  onPress={() => setBluetoothMine(!bluetoothMine)}
                   hitSlop={8}
                   accessibilityRole="switch"
                   accessibilityState={{ checked: bluetoothMine }}

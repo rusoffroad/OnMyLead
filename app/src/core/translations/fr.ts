@@ -1,13 +1,14 @@
 // French. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Sans réseau, votre téléphone relaie les alertes pour votre groupe et envoie URGENCE. Positions et messages par Bluetooth sont Pro.",
+  "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Sans réseau, voyez les pilotes proches et transmettez-leur votre position, vos statuts et vos messages par Bluetooth. Avec Free, votre téléphone relaie toujours les alertes du groupe, et URGENCE, Besoin d’Aide et les alertes de chute partent toujours par Bluetooth.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Toutes les fonctions Pro sont à vous gratuitement jusqu’au {date}. Ensuite, vous continuez avec Free, et rejoindre des sorties, le Mode Sortie et URGENCE restent gratuits.",
   "Your Pro Trial Runs Until {date}": "Votre essai Pro dure jusqu’au {date}",
   "See Pro": "Voir Pro",
   "CarPlay Is Part of OnMyLead Pro": "CarPlay fait partie d’OnMyLead Pro",
   "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Le Mode Sortie, les statuts et URGENCE continuent de fonctionner sur votre téléphone avec l’offre Free.",
   "Bluetooth Sharing With No Service": "Partage Bluetooth sans réseau",
-  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "Sans réseau, le Mode Sortie transmet positions, statuts et messages par Bluetooth aux pilotes proches de votre sortie. Avec du réseau, le suivi en direct, Besoin d’Aide et URGENCE restent gratuits.",
   "Customize Your Dot": "Personnalisez votre point",
   "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "Choisissez l’apparence et la taille de votre propre point sur la carte. Le point bleu, blanc et rouge reste gratuit.",
   "Group Photos": "Photos de groupe",

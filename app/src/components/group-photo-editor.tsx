@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { confirmAsync } from '@/lib/confirm';
+import { requirePro } from '@/lib/pro';
 import { canUseGroupCamera, pickGroupPhoto, removeGroupPhoto, saveGroupPhoto, type GroupPhotoSource } from '@/lib/group-photos';
 import { t } from '@/lib/i18n';
 
@@ -22,6 +23,8 @@ export function GroupPhotoEditor({
   const [done, setDone] = useState<string | null>(null);
 
   const pick = async (source: GroupPhotoSource) => {
+    // Adding or changing a group photo is Pro (2.1); everyone still sees it, and removing stays free.
+    if (!requirePro('group_photos')) return;
     setError(null);
     setDone(null);
     setBusy(source);
@@ -74,6 +77,7 @@ export function GroupPhotoEditor({
             kind="secondary"
             loading={busy === 'camera'}
             disabled={!!busy && busy !== 'camera'}
+            pro="group_photos"
             onPress={() => pick('camera')}
             style={styles.button}
           />
@@ -83,6 +87,7 @@ export function GroupPhotoEditor({
           kind="secondary"
           loading={busy === 'library'}
           disabled={!!busy && busy !== 'library'}
+          pro="group_photos"
           onPress={() => pick('library')}
           style={styles.button}
         />

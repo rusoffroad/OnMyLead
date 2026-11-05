@@ -103,7 +103,7 @@ export function Showcase() {
             </p>
             {SHOWCASE_NO_SERVICE ? (
               <a className="hero-new" href="#no-service" onClick={jump('no-service')}>
-                <b>New in 2.1</b> No service? Your group still hears you, over Bluetooth, with Pro.
+                <b>New in 2.1</b> No service? Your group still hears you, over Bluetooth.
               </a>
             ) : null}
           </div>
@@ -317,7 +317,7 @@ export function Showcase() {
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
               <li><b>A Family Link.</b> People at home follow along on a read-only page, no app needed.</li>
-              <li><b>Bluetooth Sharing (Pro), New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on.</li>
+              <li><b>Bluetooth Sharing, New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on. Spots, taps and messages are Pro; EMERGENCY goes out on every plan.</li>
             </ul>
           </div>
           <figure className="signal-map">
@@ -665,9 +665,9 @@ function NoService() {
             it along, so the rider at the back reaches the leader through the riders in between.
           </p>
           <p className="ns-small">
-            New in 2.1, with OnMyLead Pro (every new account gets {TRIAL_DAYS} days of Pro free). On by default for Pro
-            riders on iPhone, iPad and Android, and they all work together. Encrypted so only riders on your ride can
-            read it.
+            New in 2.1 with OnMyLead Pro (every new account gets {TRIAL_DAYS} days of Pro free). On every plan, phones
+            pass it all along and EMERGENCY goes out over Bluetooth. iPhone, iPad and Android all work together, and
+            it’s encrypted so only riders on your ride can read it.
           </p>
         </div>
         <figure className="ns-map">

@@ -1,13 +1,14 @@
 // Italian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Senza campo, il telefono passa gli avvisi al gruppo e invia EMERGENZA. Posizioni e messaggi via Bluetooth sono Pro.",
+  "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Senza campo, vedi i piloti vicini e passa loro posizione, tocchi di stato e messaggi via Bluetooth. Con Free il telefono continua a passare gli avvisi al gruppo, ed EMERGENZA, Serve Aiuto e gli avvisi di incidente partono comunque via Bluetooth.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Tutte le funzioni Pro sono tue gratis fino al {date}. Dopo continui con Free, e unirti ai giri, la Modalità Giro ed EMERGENZA restano gratis.",
   "Your Pro Trial Runs Until {date}": "La tua prova Pro dura fino al {date}",
   "See Pro": "Vedi Pro",
   "CarPlay Is Part of OnMyLead Pro": "CarPlay fa parte di OnMyLead Pro",
   "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "La Modalità Giro, i tocchi di stato ed EMERGENZA continuano a funzionare sul telefono con il piano Free.",
   "Bluetooth Sharing With No Service": "Condivisione Bluetooth senza campo",
-  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "Senza campo, la Modalità Giro passa posizioni, tocchi di stato e messaggi via Bluetooth ai piloti vicini del tuo giro. Con il campo, il tracciamento dal vivo, Serve Aiuto ed EMERGENZA restano gratis.",
   "Customize Your Dot": "Personalizza il tuo punto",
   "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "Scegli l’aspetto e la grandezza del tuo punto sulla mappa. Il punto rosso, bianco e blu resta gratis.",
   "Group Photos": "Foto del gruppo",

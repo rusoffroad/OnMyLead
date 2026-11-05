@@ -25,7 +25,7 @@ keywords: [bluetooth, no service, no signal, offline, dead zone, mesh, relay, ne
 
 When there's no cell service, OnMyLead phones on the same ride talk to each other over Bluetooth. Riders close to you keep moving on your map, and your status taps, quick replies and typed messages reach them, with no service at all. Each phone passes on what it hears, so the rider at the back can reach the front through the riders in between. It works on iPhone, iPad, Android phones and Android tablets, and they all work with each other.
 
-Bluetooth Sharing is part of OnMyLead Pro, including the free Pro Trial. On a Free account it stays off and shows the **Pro** tag, and with service your live tracking, status taps, Need Help and EMERGENCY work as always. See [Free and Pro](/help/free-vs-pro).
+Seeing nearby riders, sharing your spot, and sending your other status taps and messages over Bluetooth are part of OnMyLead Pro, including the free Pro Trial. On every plan, your phone passes everything along for the group, and EMERGENCY, Need Help and Crash Alerts go out and come in over Bluetooth. On Free, the switch shows the **Pro** tag. With service, everything works as always on every plan. See [Free and Pro](/help/free-vs-pro).
 
 ## What It Does
 
@@ -58,12 +58,12 @@ Riders farther away than that show where they were last seen, as before. See [Us
 
 ## Turn It On or Off
 
-With Pro (or the Pro Trial), Bluetooth Sharing is on by default. Turn it off or back on in either place:
+Bluetooth Sharing is on by default. Turn it off or back on in either place:
 
 - **You:** switch **Bluetooth Sharing** off or on.
 - **Ride Mode:** when you have no service, the no-service banner has a **Bluetooth On** button. Tap it to turn Bluetooth Sharing off (it then says **Bluetooth Off**), and tap again to turn it back on. It starts again right away.
 
-On Free, turning it on opens a short OnMyLead Pro prompt instead. With it off, your phone doesn't use Bluetooth for OnMyLead at all. Your status taps, messages and location still go over the internet whenever you have service.
+With it off, your phone doesn't use Bluetooth for OnMyLead at all. Your status taps, messages and location still go over the internet whenever you have service.
 
 ## Privacy
 
@@ -84,7 +84,7 @@ Bluetooth uses far less battery than GPS, but it adds a little to Ride Mode's ba
 
 ## Good to Know
 
-- Everyone on the ride who wants to send and pass things on over Bluetooth needs Pro or the trial. A phone with it off doesn't pass anything along.
+- Phones on Free still pass everything along, so a Free rider in the middle of the group never breaks the chain. A phone with Bluetooth Sharing switched off doesn't pass anything along.
 - It isn't a satellite messenger. It doesn't reach 911 or anyone outside Bluetooth range. See [Emergency and Safety](/help/emergency-and-safety).
 - Photos, polls, announcements and leader-only messages still need service.
 - With no service, a message you get over Bluetooth shows in Ride Chat with **Via Bluetooth** until OnMyLead has it; then it looks like any other message.

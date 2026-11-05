@@ -84,9 +84,9 @@ export default function You() {
   const musicFlag = useFlag('music_controls');
   const [musicMine, setMusicMine] = useMusicControlsSetting();
   const bluetoothFlag = useFlag('bluetooth_sharing');
-  const [bluetoothSwitch, setBluetoothMine] = useBluetoothSharingSetting();
-  // Bluetooth Sharing is Pro (2.1): Free shows it off with the Pro tag, and turning it on opens the Pro prompt.
-  const bluetoothMine = bluetoothSwitch && can('bluetooth_sharing');
+  const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1). On Free the switch still runs the relay and the safety alerts.
+  const bluetoothPro = can('bluetooth_sharing');
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
@@ -334,15 +334,18 @@ export default function You() {
             icon="bluetooth"
             color={Colors.sky}
             title={t('Bluetooth Sharing')}
-            detail={bluetoothMine
-              ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
-              : t('Off. Turn it on to keep sharing with nearby riders when there is no service')}
+            onPress={bluetoothPro ? undefined : () => requirePro('bluetooth_sharing')}
+            detail={!bluetoothMine
+              ? t('Off. Turn it on to keep sharing with nearby riders when there is no service')
+              : bluetoothPro
+                ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
+                : t('With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.')}
             right={
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <ProTag feature="bluetooth_sharing" />
                 <Switch
                   value={bluetoothMine}
-                  onValueChange={(on) => { if (!on || requirePro('bluetooth_sharing')) setBluetoothMine(on); }}
+                  onValueChange={setBluetoothMine}
                   trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
                   thumbColor="#FFFFFF"
                   {...({ activeThumbColor: '#FFFFFF' } as object)}

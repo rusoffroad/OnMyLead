@@ -66,3 +66,15 @@ describe('CarPlay on Free', () => {
     expect(carPlayLabels().waitingTitle).toBe('No Ride Running');
   });
 });
+
+describe('Bluetooth on Free (relay only)', () => {
+  it('still sends and shows EMERGENCY, Need Help and Crash Alerts, nothing else', async () => {
+    const { nearbyFreeAllows, FLAG_POSSIBLE_CRASH } = await import('../nearby');
+    expect(nearbyFreeAllows({ kind: 'status', status: 'emergency' })).toBe(true);
+    expect(nearbyFreeAllows({ kind: 'status', status: 'need_help' })).toBe(true);
+    expect(nearbyFreeAllows({ kind: 'status', status: 'ok', flags: FLAG_POSSIBLE_CRASH })).toBe(true);
+    expect(nearbyFreeAllows({ kind: 'status', status: 'flat_tire' })).toBe(false);
+    expect(nearbyFreeAllows({ kind: 'position' })).toBe(false);
+    expect(nearbyFreeAllows({ kind: 'reply' })).toBe(false);
+  });
+});

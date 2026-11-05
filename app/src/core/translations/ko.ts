@@ -1,13 +1,14 @@
 // Korean. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "신호가 없으면 휴대폰이 그룹의 알림을 전달하고 긴급 상황을 보내요. 블루투스 위치와 메시지는 Pro예요.",
+  "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "신호가 없을 때 가까운 라이더를 보고 블루투스로 내 위치, 상태, 메시지를 전달하세요. Free에서도 휴대폰은 그룹의 알림을 계속 전달하고, 긴급 상황, 도움 필요, 충돌 알림은 블루투스로 계속 나가요.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date}까지 모든 Pro 기능을 무료로 쓰실 수 있어요. 그 후에는 Free로 계속 달리며, 라이드 참여, 라이드 모드, 긴급 상황은 계속 무료예요.",
   "Your Pro Trial Runs Until {date}": "Pro 체험은 {date}까지예요",
   "See Pro": "Pro 보기",
   "CarPlay Is Part of OnMyLead Pro": "CarPlay는 OnMyLead Pro에 포함돼요",
   "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Free 플랜에서도 라이드 모드, 상태 버튼, 긴급 상황은 휴대폰에서 계속 작동해요.",
   "Bluetooth Sharing With No Service": "신호 없을 때 블루투스 공유",
-  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "신호가 없으면 라이드 모드가 같은 라이드의 가까운 라이더에게 블루투스로 위치, 상태, 메시지를 전달해요. 신호가 있을 때 실시간 추적, 도움 필요, 긴급 상황은 계속 무료예요.",
   "Customize Your Dot": "내 점 꾸미기",
   "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "지도에서 내 점의 모양과 크기를 고르세요. 빨강·하양·파랑 점은 계속 무료예요.",
   "Group Photos": "그룹 사진",
