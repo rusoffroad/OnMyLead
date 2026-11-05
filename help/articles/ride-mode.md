@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/rider-puck.tsx
   - app/src/components/own-puck.tsx
@@ -111,6 +111,10 @@ Your own dot is cyan, with a soft beam ahead of it. Its arrow always shows which
 
 :::release 2.0
 Riders glide smoothly to each new position instead of jumping, and with [Follow Me](/help/follow-me) on, the map moves with you in one steady motion.
+:::
+
+:::release 2.1
+A blue line follows behind the leader, showing exactly where they rode. When the leader crosses back over it or doubles back, the older pass fades so the fresh line stands out. The leader can turn it off. See [Follow the Leader's Trackline](/help/leader-trackline).
 :::
 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.

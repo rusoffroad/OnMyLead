@@ -3210,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "Enviar EMERGÊNCIA com sua localização para todos no passeio?",
   "Running Late": "Vou atrasar",
   "Need a Minute": "Preciso de um minuto",
+  "Couldn’t Change the Trackline": "Não foi possível mudar a linha do líder",
+  "Leader Trackline": "Linha do líder",
+  "A line behind you in the leader color, on every rider’s map": "Uma linha atrás de você na cor do líder, no mapa de cada piloto",
+  "On for Everyone": "Ligada para todos",
+  "Off for Everyone": "Desligada para todos",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Mostra por onde você guiou no mapa de cada piloto. Se cruzar de novo, a passagem anterior fica apagada.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Desligar a linha do líder ainda não está disponível. Vai funcionar com a próxima atualização do servidor.",
 };
 
 export default dict;

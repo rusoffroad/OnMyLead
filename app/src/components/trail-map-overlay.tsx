@@ -20,6 +20,7 @@ import { inches } from '@/core/trail-width';
 import { useGarageWidths } from '@/lib/trail-width';
 import { StarScore } from './stars';
 import { ProTag } from '@/components/pro-tag';
+import { tracklineInk } from './leader-trackline-ink';
 
 import { t as tr } from '@/lib/i18n';
 const SAND = '#ECCD91';
@@ -33,7 +34,7 @@ const WEB = Platform.OS === 'web';
  * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, threeD = false,
+  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, threeD = false, trackline,
 }: {
   trail: TrailMap;
   /** Where the layers button sits. */
@@ -54,6 +55,8 @@ export function TrailMapOverlay({
   bare?: boolean;
   /** A map that can tilt (Ride Mode, Map Mode): adds the one-tap 3D button under the layers button. */
   threeD?: boolean;
+  /** Ride Mode, for the leader (and organizers): the Leader Trackline switch for the whole ride. */
+  trackline?: TracklineSwitch;
 }) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState<PublicTrail | null>(null);
@@ -88,7 +91,7 @@ export function TrailMapOverlay({
             <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>
           </View>
         ) : null}
-        {open && !bare ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} top={top} bottom={bottom} /> : null}
+        {open && !bare ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} top={top} bottom={bottom} trackline={trackline} /> : null}
       </View>
 
       {(trail.zoomInHint || trail.closerForTracks) && !open && !bare ? (
@@ -134,8 +137,8 @@ export function TrailMapOverlay({
 }
 
 function LayersPanel({
-  trail, route, ride, lookupHint, credit, top, bottom,
-}: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string; top: number; bottom: number }) {
+  trail, route, ride, lookupHint, credit, top, bottom, trackline,
+}: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string; top: number; bottom: number; trackline?: TracklineSwitch }) {
   const { height } = useWindowDimensions();
   // Under the layers button and clear of the screen's own bottom panel; the list scrolls inside.
   const maxHeight = Math.max(240, height - top - 52 - Math.max(96, bottom + 90));
@@ -175,6 +178,8 @@ function LayersPanel({
             : tr('No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.')}
         </Text>
       ) : null}
+
+      {trackline ? <TracklineRow sw={trackline} /> : null}
 
       <MapFeaturesList trail={trail} lookupHint={lookupHint} />
 
@@ -238,6 +243,54 @@ function MapFeaturesList({ trail, lookupHint }: { trail: TrailMap; lookupHint: s
           </View>
         );
       })}
+    </View>
+  );
+}
+
+export type TracklineSwitch = { on: boolean; busy?: boolean; onChange: (on: boolean) => void };
+
+/**
+ * The leader's Leader Trackline switch: free for everyone, and for the whole ride (every rider's
+ * map follows it). Its sample is the line itself, an older pass faded under the fresh one.
+ */
+function TracklineRow({ sw }: { sw: TracklineSwitch }) {
+  const ink = tracklineInk();
+  const fresh = sw.on ? ink.fresh : '#7B8794';
+  const old = sw.on ? ink.old : '#56606C';
+  return (
+    <View style={{ gap: 8 }}>
+      <Text style={styles.panelTitle}>{tr('Leader Trackline')}</Text>
+      <Pressable
+        accessibilityRole="switch"
+        accessibilityState={{ checked: sw.on, busy: !!sw.busy }}
+        accessibilityLabel={tr('Leader Trackline')}
+        accessibilityHint={tr('A line behind you in the leader color, on every rider’s map')}
+        disabled={sw.busy}
+        onPress={() => sw.onChange(!sw.on)}
+        style={({ pressed }) => [styles.feature, sw.on && styles.featureOn, pressed && { opacity: 0.85 }]}>
+        <Svg width={44} height={32} viewBox="0 0 44 32" style={styles.sample}>
+          <Rect width={44} height={32} fill="#1B2A1E" />
+          <Path d="M4 28 C14 26 18 6 28 6 S40 14 40 22" stroke={ink.casing} strokeWidth={4} fill="none" strokeLinecap="round" />
+          <Path d="M4 28 C14 26 18 6 28 6 S40 14 40 22" stroke={old} strokeWidth={2.2} strokeDasharray="3 3" fill="none" />
+          <Path d="M40 22 C34 26 22 22 14 12 S4 6 2 6" stroke={ink.casing} strokeWidth={5} fill="none" strokeLinecap="round" />
+          <Path d="M40 22 C34 26 22 22 14 12 S4 6 2 6" stroke={fresh} strokeWidth={3} fill="none" strokeLinecap="round" />
+        </Svg>
+        <View style={{ flex: 1, gap: 1 }}>
+          <Text style={[styles.featureName, !sw.on && { color: Colors.textSecondary }]} numberOfLines={1}>{sw.on ? tr('On for Everyone') : tr('Off for Everyone')}</Text>
+          <Text style={styles.featureDetail} numberOfLines={3}>{tr('Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.')}</Text>
+        </View>
+        {sw.busy ? (
+          <ActivityIndicator color={Colors.text} size="small" />
+        ) : (
+          <View style={[styles.tick, sw.on && styles.tickOn]}>
+            {sw.on ? (
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                <Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            ) : null}
+          </View>
+        )}
+      </Pressable>
     </View>
   );
 }

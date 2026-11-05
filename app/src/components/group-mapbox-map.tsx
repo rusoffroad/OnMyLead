@@ -9,7 +9,9 @@ import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
+import type { TracklinePieces } from '@/core/leader-trackline';
 import type { GroupMapHandle, MapRider } from './group-map-types';
+import { tracklineMapLines } from './leader-trackline-ink';
 import { useFollowCamera } from './use-follow-camera';
 import { useGlide } from './use-glide';
 import { RiderPin } from './rider-pin';
@@ -25,12 +27,13 @@ type Inset = { top: number; right: number; bottom: number; left: number };
  * 3D Terrain's raised satellite ground).
  */
 export function GroupMapboxMap({
-  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding, fallback,
+  riders, regroup, route, trackline, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding, fallback,
   onReady, onUserMove, follow, locationEveryMs = 1000, ref,
 }: {
   riders: MapRider[];
   meId?: string;
   route?: LatLng[] | null;
+  trackline?: TracklinePieces | null;
   regroup: { lat: number; lng: number; label: string | null } | null;
   onPressRider?: (id: string) => void;
   trail: TrailMap;
@@ -125,9 +128,13 @@ export function GroupMapboxMap({
     }
   }, [ready, riders, route, edgePadding, fallback]);
 
+  // The route, then the Leader Trackline over it (old passes first, the fresh one on top).
   const lines = useMemo<MapLine[]>(
-    () => (route && route.length > 1 ? [{ id: 'route', points: route, color: Colors.accent, width: 5, casing: Colors.background, casingWidth: 9 }] : []),
-    [route],
+    () => [
+      ...(route && route.length > 1 ? [{ id: 'route', points: route, color: Colors.accent, width: 5, casing: Colors.background, casingWidth: 9 }] : []),
+      ...tracklineMapLines(trackline),
+    ],
+    [route, trackline],
   );
   const pressRider = useRef(onPressRider);
   useEffect(() => {
