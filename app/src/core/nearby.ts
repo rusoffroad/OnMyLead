@@ -539,10 +539,12 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
     if (g) g.push(i); else messages.set(i.id, [i]);
   }
   const groups = [...messages.values()];
-  const newestOwn = groups.find((g) => g[0].userId === myId);
+  // The newest by time; for two in the same second, the one stored last.
+  let newestOwn: T[] | undefined;
+  for (const g of groups) if (g[0].userId === myId && (!newestOwn || g[0].at >= newestOwn[0].at)) newestOwn = g;
   // Then the rider's newest own message, whole.
   const ownFits = !!newestOwn && newestOwn.length <= left;
-  if (ownFits) take(newestOwn);
+  if (ownFits && newestOwn) take(newestOwn);
   // (When it doesn't fit now, it waits in line with the rest.)
   const ring = inLine(groups.filter((g) => !(ownFits && g === newestOwn)), (g) => roundKey(g[0]));
   // Then other riders' taps, leaving room for the first message in line that could fit,
@@ -554,6 +556,12 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   for (const g of ring) if (g.length <= left) take(g);
   for (const i of [...waiting('position'), ...waiting('ack')]) if (left > 0) take([i]);
   return out;
+}
+
+/** Milliseconds from a monotonic clock when there is one (performance.now), else the given wall time. */
+function monotonicMs(fallback: number): number {
+  const p = (globalThis as { performance?: { now?: () => number } }).performance;
+  return typeof p?.now === 'function' ? p.now() : fallback;
 }
 
 /** What the rotation tracks an item by: a rider's spot, a tap, a whole message, or a receipt. */
@@ -790,12 +798,15 @@ export class NearbyMesh {
       .map((i) => (heard(i)?.mine ? i : { ...i, hops: i.hops + 1 }))
       .filter((i) => i.hops <= MAX_HOPS);
     const ids = new Set(items.map(roundKey));
-    this.advanceTurn(now, ids);
+    // Turn timing runs on a monotonic clock, so a phone clock corrected after a dead zone can't
+    // credit items early (`now` stays the wall clock for frame times).
+    const mono = monotonicMs(now);
+    this.advanceTurn(mono, ids);
     const picked = pickFrames(items, this.myId, (id) => this.sentTurn.get(id) ?? -1);
     // Only what is still in the pick counts: anything dropped from it was replaced before it went out.
     const keys = new Set(picked.map(roundKey));
     for (const k of this.pickedNow.keys()) if (!keys.has(k)) this.pickedNow.delete(k);
-    for (const k of keys) if (!this.pickedNow.has(k)) this.pickedNow.set(k, now);
+    for (const k of keys) if (!this.pickedNow.has(k)) this.pickedNow.set(k, mono);
     return picked.map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 

@@ -54,7 +54,7 @@ class NearbyRadio(
 ) {
   companion object {
     private const val MAX_PEERS = 8
-    private const val MAX_SUBSCRIBE_FAILS = 10
+    private const val MAX_SUBSCRIBE_FAILS = 40
     /** Refused writes of one urgent frame before it is left to later rounds. */
     private const val MAX_URGENT_TRIES = 5
     /** How long a new server's service may take to register before the server is replaced. */
@@ -340,7 +340,8 @@ class NearbyRadio(
   @Suppress("DEPRECATION")
   private fun pump(p: Peer) {
     if (p.busy) return
-    if (p.cccd != null) return writeCccd(p)
+    // The notification setup goes first; while a refused one waits to be asked again, frames flow.
+    if (p.cccd != null && !p.cccdRetry) return writeCccd(p)
     val ch = p.inbox ?: return
     val fromUrgent = p.urgent.isNotEmpty()
     val f = p.urgent.removeFirstOrNull() ?: p.queue.removeFirstOrNull() ?: return
@@ -568,7 +569,8 @@ class NearbyRadio(
    * the link, and frames wait until the stack has taken it: right after discovery the stack is often
    * busy (Android 13+), and a frame write then would fail the same way and lose the queue. A refused
    * request is tried again shortly; on a link that keeps refusing, this phone stops asking and
-   * keeps writing to it one way. While the request is pending, nothing else is written on the link.
+   * keeps writing to it one way. While the request is in flight nothing else is written; while a
+   * refused one waits to be asked again, frames flow.
    */
   @Suppress("DEPRECATION")
   private fun writeCccd(p: Peer) {
@@ -594,9 +596,10 @@ class NearbyRadio(
   }
 
   /**
-   * A notification setup the stack or the peer refused: asked again after 500 ms, frames waiting
-   * behind it. On a link that keeps refusing, this phone stops asking and writes to it one way (the
-   * pump is posted, since this may run inside send()'s loop over the peers).
+   * A notification setup the stack or the peer refused: asked again after 500 ms, with frames
+   * flowing meanwhile, up to MAX_SUBSCRIBE_FAILS times (about 20 s, long enough for bonding). On a
+   * link that keeps refusing, this phone stops asking and writes to it one way (the pump is
+   * posted, since this may run inside send()'s loop over the peers).
    */
   private fun subscribeLater(p: Peer, d: BluetoothGattDescriptor) {
     if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) {
