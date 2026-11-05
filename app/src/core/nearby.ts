@@ -504,12 +504,14 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   const own = items.find((i) => i.kind === 'position' && i.userId === myId);
   // The rider's own spot goes out first: a slow link that can't finish the round still carries it.
   if (items.length <= MAX_FRAMES_PER_ROUND) return own ? [own, ...items.filter((i) => i !== own)] : items;
-  let left = MAX_FRAMES_PER_ROUND - (own ? 1 : 0);
-  const picked = new Set<T>();
-  if (own) picked.add(own);
+  // Picked in priority order, and sent in that order too, so a link that can't finish the round
+  // loses only the least important frames.
+  const out: T[] = own ? [own] : [];
+  const picked = new Set<T>(out);
+  let left = MAX_FRAMES_PER_ROUND - out.length;
+  const take = (g: T[]) => { for (const i of g) { out.push(i); picked.add(i); } left -= g.length; };
   // Emergencies and the rider's own taps first, as sending order has them.
-  const first = (i: T) => i.kind === 'status' && (i.status === 'emergency' || i.userId === myId);
-  for (const i of items) if (first(i) && left > 0) { picked.add(i); left--; }
+  for (const i of items) if (i.kind === 'status' && (i.status === 'emergency' || i.userId === myId) && left > 0) take([i]);
   const messages = new Map<string, T[]>();
   for (const i of items) {
     if (i.kind !== 'reply') continue;
@@ -520,24 +522,22 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   const groups = [...messages.values()];
   const newestOwn = groups.find((g) => g[0].userId === myId);
   // Then the rider's newest own message, whole, then other riders' taps.
-  if (newestOwn && newestOwn.length <= left) { for (const i of newestOwn) picked.add(i); left -= newestOwn.length; }
-  // Other riders' taps leave room for at least one more whole message, so a crowd of taps can't
-  // keep every message off the air.
+  if (newestOwn && newestOwn.length <= left) take(newestOwn);
+  // Other riders' taps leave room for the shortest waiting message, so a crowd of taps can't keep
+  // every message off the air.
   const waiting = groups.filter((g) => g !== newestOwn).map((g) => g.length);
   const reserve = waiting.length ? Math.min(...waiting) : 0;
-  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > reserve) { picked.add(i); left--; }
+  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > reserve) take([i]);
   // Then the other messages, whole, in an order that changes every turn (set by each message's id),
   // so every message comes up near the front within a few turns, however many arrive meanwhile.
   const rest = groups.filter((g) => g !== newestOwn)
     .map((g) => ({ g, k: turnOrder(idOf(g), turn) }))
     .sort((a, b) => a.k - b.k)
     .map((x) => x.g);
-  for (const g of rest) {
-    if (g.length <= left) { for (const i of g) picked.add(i); left -= g.length; }
-  }
+  for (const g of rest) if (g.length <= left) take(g);
   // Then other riders' spots and receipts.
-  for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) { picked.add(i); left--; }
-  return own ? [own, ...items.filter((i) => i !== own && picked.has(i))] : items.filter((i) => picked.has(i));
+  for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) take([i]);
+  return out;
 }
 
 /** The key an event is kept under: taps and whole messages by id, message parts and receipts by more. */

@@ -488,9 +488,12 @@ class NearbyRadio(
         if (gen != serverGen) return@post
         val on = value != null && value.isNotEmpty() && value[0].toInt() != 0
         if (on) {
-          subscribers.getOrPut(device.address) { Subscriber(device) }.mtu = pendingMtu[device.address] ?: 185
+          val sub = subscribers.getOrPut(device.address) { Subscriber(device) }
+          sub.mtu = pendingMtu[device.address] ?: 185
           report()
-          send(outgoing)
+          // Only the new phone gets the round at once; the others carry on with theirs.
+          enqueue(sub.queue, outgoing, sub.mtu, false)
+          pump(sub)
         } else {
           subscribers.remove(device.address)
           report()
@@ -641,10 +644,11 @@ class NearbyRadio(
         if (out != null) {
           gatt.setCharacteristicNotification(out, true)
           p.cccd = out.getDescriptor(CCCD)
-          pump(p)
         }
         report()
-        send(outgoing)
+        // Only the new phone gets the round at once; the others carry on with theirs.
+        if (p.inbox != null) enqueue(p.queue, outgoing, p.mtu, false)
+        pump(p)
       }
     }
 
