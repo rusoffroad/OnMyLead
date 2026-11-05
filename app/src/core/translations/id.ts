@@ -1,6 +1,17 @@
 // Indonesian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Shows on the group page, in everyone’s group list and on the invite link.": "Tampil di halaman grup, di daftar grup semua orang, dan di tautan undangan.",
+  "Group photo changed.": "Foto grup diganti.",
+  "Group photo saved. Everyone in the group sees it.": "Foto grup disimpan. Semua orang di grup melihatnya.",
+  "Remove the Group Photo?": "Hapus Foto Grup?",
+  "The group shows its initials instead.": "Grup menampilkan inisialnya sebagai gantinya.",
+  "Group photo removed.": "Foto grup dihapus.",
+  "Group Photo": "Foto Grup",
+  "Add a photo of the crew. It shows on the group page, in everyone’s group list and on the invite link.": "Tambahkan foto kru. Foto ini tampil di halaman grup, di daftar grup semua orang, dan di tautan undangan.",
+  "Anyone with the group link can see it. Keep it friendly: the OnMyLead team removes photos that break the rules.": "Siapa pun yang punya tautan grup bisa melihatnya. Jaga tetap ramah: tim OnMyLead menghapus foto yang melanggar aturan.",
+  "{name} group photo": "Foto grup {name}",
+  "See the {name} group photo": "Lihat foto grup {name}",
   "Reply": "Balas",
   "Unlike comment": "Batal suka komentar",
   "Like comment": "Suka komentar",

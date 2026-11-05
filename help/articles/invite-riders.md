@@ -61,6 +61,10 @@ From the ride page:
 1. Open the ride page and tap **Riders**.
 2. On the invite card, under **Invite a Group**, tap **Invite All** next to the group.
 
+:::release 2.1
+Each group shows its group photo (or its initials) beside its name.
+:::
+
 From the group:
 
 1. On the **Groups** tab, open the group.

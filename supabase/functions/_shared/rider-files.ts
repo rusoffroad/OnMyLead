@@ -5,7 +5,7 @@
 // Each bucket keeps a rider's files in a folder named after their user id.
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
-const BUCKETS = ['rider-avatars', 'rider-posts'];
+const BUCKETS = ['rider-avatars', 'rider-posts', 'group-photos'];
 
 export async function removeRiderFiles(service: SupabaseClient, userId: string): Promise<void> {
   for (const bucket of BUCKETS) {

@@ -1,13 +1,14 @@
 import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
+import { GroupPhoto } from '@/components/group-photo';
 import { Icon } from '@/components/icon';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 import type { GroupChatSummary } from '@/core/group-chat';
 import { timeAgo } from '@/core/feed';
 import type { RidingGroup } from '@/lib/groups';
 import { requirePro } from '@/lib/pro';
-import { Gradient, Home, homeStyles, HomeCard } from './parts';
+import { Home, homeStyles, HomeCard } from './parts';
 import { t } from '@/lib/i18n';
 
 /**
@@ -22,10 +23,7 @@ export function GroupCard({
   return (
     <HomeCard style={styles.card}>
       <Pressable accessibilityRole="button" accessibilityLabel={`${group.name}, ${riders === 1 ? t('1 rider') : t('{n} riders', { n: riders })}`} onPress={() => router.push(`/groups/${group.id}`)} style={styles.head}>
-        <View style={styles.mark}>
-          <Gradient colors={['#3B86F7', '#1C4F9C']} angle="diagonal" radius={14} />
-          <Text style={styles.markText}>{initials(group.name)}</Text>
-        </View>
+        <GroupPhoto uri={group.photoUrl} name={group.name} size={48} radius={14} />
         <View style={{ flex: 1 }}>
           <Text style={homeStyles.cardTitle} numberOfLines={1}>{group.name}</Text>
           <View style={styles.meta}>
@@ -82,15 +80,10 @@ export function NoGroupCard() {
   );
 }
 
-const initials = (name: string) =>
-  name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || 'G';
-
 const styles = themedStyles(() => ({
   card: { padding: 16, gap: 14 },
   empty: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  mark: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  markText: { color: '#fff', fontFamily: font(800, 'display'), fontSize: 20 },
   meta: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three, marginTop: 2 },
   out: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   outDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Home.mint },

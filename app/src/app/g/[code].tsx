@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { Convoy } from '@/components/convoy';
+import { GroupPhoto } from '@/components/group-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
@@ -12,8 +13,8 @@ import { useSession } from '@/lib/session';
 import { t } from '@/lib/i18n';
 
 /**
- * A riding group's invite link (onmylead.com/g/<code>). Shows the group's name, who runs it and
- * how many ride in it, then joins it once signed in. Who's in it shows after joining.
+ * A riding group's invite link (onmylead.com/g/<code>). Shows the group's photo and name, who runs
+ * it and how many ride in it, then joins it once signed in. Who's in it shows after joining.
  */
 export default function GroupLink() {
   const { code } = useLocalSearchParams<{ code: string }>();
@@ -63,6 +64,7 @@ export default function GroupLink() {
     <Screen>
       <Stack.Screen options={{ title: t('Riding Group') }} />
       <View style={{ gap: Spacing.three, paddingTop: Spacing.three }}>
+        {preview.photo_url ? <GroupPhoto uri={preview.photo_url} name={preview.name} zoom /> : null}
         <ThemedText themeColor="textSecondary">{t('{owner_name} invited you to their riding group', { owner_name: preview.owner_name })}</ThemedText>
         <Text style={styles.title}>{preview.name}</Text>
         <Convoy names={dots} size={40} max={7} />

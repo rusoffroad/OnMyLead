@@ -185,6 +185,9 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Groups tab: New Group, your groups, groups you're in, group chat with unread counts and ride
   "tickets", group links (`/g/[code]`), invite a group to a ride, leave / delete **[Pro]** to
   create.
+- Group Photos (2.1): the group's maker adds, changes or removes a 16:9 group photo (group page);
+  shown on the group page, Riding Groups, Home Your Group, Invite a Group and the `/g/[code]` link.
+  Admin removes one from the rider's page.
 - Follow leaders and see their upcoming rides.
 - Blocked riders list; report rider or ride; You > Report a Rider (2.0) for anyone you messaged, friended, rode with or blocked.
 
