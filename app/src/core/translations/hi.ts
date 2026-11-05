@@ -1,6 +1,21 @@
 // Hindi. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date} तक सभी Pro फ़ीचर आपके लिए मुफ़्त हैं। उसके बाद आप Free पर राइड करते रहेंगे, और राइड में जुड़ना, राइड मोड और EMERGENCY मुफ़्त रहेंगे।",
+  "Your Pro Trial Runs Until {date}": "आपका Pro ट्रायल {date} तक है",
+  "See Pro": "Pro देखें",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay, OnMyLead Pro का हिस्सा है",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Free प्लान पर भी राइड मोड, स्टेटस बटन और EMERGENCY आपके फ़ोन पर काम करते रहेंगे।",
+  "Bluetooth Sharing With No Service": "बिना नेटवर्क के Bluetooth शेयरिंग",
+  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "नेटवर्क न होने पर राइड मोड आपकी राइड के पास वाले राइडरों को Bluetooth से लोकेशन, स्टेटस और मैसेज भेजता है। नेटवर्क होने पर लाइव ट्रैकिंग, मदद चाहिए और EMERGENCY मुफ़्त रहते हैं।",
+  "Customize Your Dot": "अपना डॉट बदलें",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "मैप पर अपना डॉट कैसा दिखे और कितना बड़ा हो, चुनें। लाल, सफ़ेद और नीला डॉट मुफ़्त रहता है।",
+  "Group Photos": "ग्रुप फ़ोटो",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "अपने राइडिंग ग्रुप को एक फ़ोटो दें। ग्रुप फ़ोटो सब लोग मुफ़्त में देख सकते हैं।",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "अपनी कार की स्क्रीन से ग्रुप देखें और स्टेटस भेजें। राइड मोड, स्टेटस बटन और EMERGENCY आपके फ़ोन पर मुफ़्त रहते हैं।",
+  "Saved Riding Groups, Group Photos and Custom Codes": "सेव किए ग्रुप, ग्रुप फ़ोटो और कस्टम कोड",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "थीम, लाइट मोड, नैचुरल आवाज़ें और कस्टम डॉट",
   "Reply": "जवाब दें",
   "Unlike comment": "टिप्पणी की पसंद हटाएं",
   "Like comment": "टिप्पणी पसंद करें",

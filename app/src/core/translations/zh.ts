@@ -1,6 +1,21 @@
 // Chinese (Simplified). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "所有 Pro 功能在 {date} 之前免费归你使用。之后你将继续使用免费版，加入骑行、骑行模式和紧急求助仍然免费。",
+  "Your Pro Trial Runs Until {date}": "你的 Pro 试用期到 {date}",
+  "See Pro": "查看 Pro",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay 属于 OnMyLead Pro",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "使用免费版时，骑行模式、状态按钮和紧急求助仍可在手机上使用。",
+  "Bluetooth Sharing With No Service": "无信号时蓝牙共享",
+  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "没有信号时，骑行模式会通过蓝牙把位置、状态和消息传给同一骑行中附近的骑手。有信号时，实时追踪、需要帮助和紧急求助仍然免费。",
+  "Customize Your Dot": "自定义你的圆点",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "选择你自己的圆点在地图上的样式和大小。红白蓝圆点仍然免费。",
+  "Group Photos": "车队照片",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "为你的骑行车队设置一张照片。所有人仍可免费查看车队照片。",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "在车载屏幕上查看车队并发送状态。骑行模式、状态按钮和紧急求助在手机上仍然免费。",
+  "Saved Riding Groups, Group Photos and Custom Codes": "已保存的车队、车队照片和自定义代码",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "主题、浅色模式、自然语音和自定义圆点",
   "Reply": "回复",
   "Unlike comment": "取消点赞评论",
   "Like comment": "点赞评论",

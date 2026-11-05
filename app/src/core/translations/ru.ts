@@ -1,6 +1,21 @@
 // Russian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Все функции Pro бесплатно доступны вам до {date}. После этого вы продолжаете с Free, а вступление в поездки, режим поездки и ЭКСТРЕННЫЙ ВЫЗОВ остаются бесплатными.",
+  "Your Pro Trial Runs Until {date}": "Ваш пробный Pro действует до {date}",
+  "See Pro": "Смотреть Pro",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay входит в OnMyLead Pro",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Режим поездки, кнопки статуса и ЭКСТРЕННЫЙ ВЫЗОВ продолжают работать на телефоне с планом Free.",
+  "Bluetooth Sharing With No Service": "Обмен по Bluetooth без связи",
+  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "Без связи режим поездки передаёт местоположения, статусы и сообщения по Bluetooth ближайшим участникам вашей поездки. При наличии связи живое отслеживание, Нужна помощь и ЭКСТРЕННЫЙ ВЫЗОВ остаются бесплатными.",
+  "Customize Your Dot": "Настройте свою точку",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "Выберите, как выглядит ваша точка и какого она размера на карте. Красно-бело-синяя точка остаётся бесплатной.",
+  "Group Photos": "Фото группы",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "Добавьте фото своей группе. Все по-прежнему видят фото групп бесплатно.",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "Смотрите свою группу и отправляйте статусы с экрана автомобиля. Режим поездки, статусы и ЭКСТРЕННЫЙ ВЫЗОВ остаются бесплатными на телефоне.",
+  "Saved Riding Groups, Group Photos and Custom Codes": "Сохранённые группы, фото групп и свои коды",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "Темы, светлый режим, естественные голоса и свои точки",
   "Reply": "Ответить",
   "Unlike comment": "Убрать лайк с комментария",
   "Like comment": "Лайкнуть комментарий",

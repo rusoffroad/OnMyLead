@@ -1,6 +1,21 @@
 // Spanish. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Todas las funciones Pro son tuyas gratis hasta el {date}. Después sigues rodando con Free, y unirte a rutas, el Modo Ruta y EMERGENCIA siguen siendo gratis.",
+  "Your Pro Trial Runs Until {date}": "Tu prueba de Pro dura hasta el {date}",
+  "See Pro": "Ver Pro",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay es parte de OnMyLead Pro",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "El Modo Ruta, los toques de estado y EMERGENCIA siguen funcionando en tu teléfono con el plan Free.",
+  "Bluetooth Sharing With No Service": "Compartir por Bluetooth sin cobertura",
+  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "Sin cobertura, el Modo Ruta pasa ubicaciones, toques de estado y mensajes por Bluetooth a los pilotos cercanos de tu ruta. Con cobertura, el seguimiento en vivo, Necesito Ayuda y EMERGENCIA siguen siendo gratis.",
+  "Customize Your Dot": "Personaliza tu punto",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "Elige cómo se ve tu propio punto y qué tamaño tiene en el mapa. El punto rojo, blanco y azul sigue siendo gratis.",
+  "Group Photos": "Fotos de grupo",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "Pon una foto a tu grupo de pilotos. Todos pueden seguir viendo las fotos de grupo gratis.",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "Ve a tu grupo y envía toques de estado desde la pantalla de tu auto. El Modo Ruta, los toques de estado y EMERGENCIA siguen gratis en tu teléfono.",
+  "Saved Riding Groups, Group Photos and Custom Codes": "Grupos guardados, fotos de grupo y códigos personalizados",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "Temas, modo claro, voces naturales y puntos personalizados",
   "Reply": "Responder",
   "Unlike comment": "Quitar me gusta del comentario",
   "Like comment": "Me gusta el comentario",

@@ -103,7 +103,7 @@ export function Showcase() {
             </p>
             {SHOWCASE_NO_SERVICE ? (
               <a className="hero-new" href="#no-service" onClick={jump('no-service')}>
-                <b>New in 2.1</b> No service? Your group still hears you, over Bluetooth.
+                <b>New in 2.1</b> No service? Your group still hears you, over Bluetooth, with Pro.
               </a>
             ) : null}
           </div>
@@ -317,7 +317,7 @@ export function Showcase() {
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
               <li><b>A Family Link.</b> People at home follow along on a read-only page, no app needed.</li>
-              <li><b>Bluetooth Sharing, New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on.</li>
+              <li><b>Bluetooth Sharing (Pro), New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on.</li>
             </ul>
           </div>
           <figure className="signal-map">
@@ -662,8 +662,9 @@ function NoService() {
             it along, so the rider at the back reaches the leader through the riders in between.
           </p>
           <p className="ns-small">
-            New in 2.1. Free and on by default on iPhone, iPad and Android, and they all work together. Encrypted so
-            only riders on your ride can read it.
+            New in 2.1, with OnMyLead Pro (every new account gets {TRIAL_DAYS} days of Pro free). On by default for Pro
+            riders on iPhone, iPad and Android, and they all work together. Encrypted so only riders on your ride can
+            read it.
           </p>
         </div>
         <figure className="ns-map">
@@ -743,13 +744,14 @@ const PRO = [
   'Offline Maps',
   'Post, Comment and Share to Social Media',
   'Create Events',
-  'Saved Riding Groups and Custom Codes',
+  ...(SHOWCASE_NO_SERVICE ? ['Bluetooth Sharing With No Service'] : []),
+  SHOWCASE_NO_SERVICE ? 'Saved Riding Groups, Group Photos and Custom Codes' : 'Saved Riding Groups and Custom Codes',
   'Create and Vote on Ride Polls',
   'Your Own Messages and Music Controls',
   'Full Ride History',
   'Advanced Ride Statistics and Premium Cards',
   'Advanced Trip Planning and Garage Build Sheet',
-  'Themes, Light Mode and Natural Voices',
+  SHOWCASE_NO_SERVICE ? 'Themes, Light Mode, Natural Voices and Custom Dots' : 'Themes, Light Mode and Natural Voices',
   'Sync Across Devices',
 ];
 

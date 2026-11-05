@@ -1,6 +1,21 @@
 // Japanese. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date} まで、すべての Pro 機能を無料でお使いいただけます。その後は Free で引き続き走れます。ライドへの参加、ライドモード、緊急通報は無料のままです。",
+  "Your Pro Trial Runs Until {date}": "Pro トライアルは {date} まで",
+  "See Pro": "Pro を見る",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay は OnMyLead Pro の機能です",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Free プランでも、ライドモード、ステータスボタン、緊急通報はスマートフォンで使えます。",
+  "Bluetooth Sharing With No Service": "圏外での Bluetooth 共有",
+  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "圏外のとき、ライドモードは同じライドの近くのライダーに Bluetooth で位置、ステータス、メッセージを伝えます。電波があるときのライブ追跡、助けが必要、緊急通報は無料のままです。",
+  "Customize Your Dot": "自分のドットをカスタマイズ",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "地図上の自分のドットの見た目と大きさを選べます。赤・白・青のドットは無料のままです。",
+  "Group Photos": "グループ写真",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "ライドグループに写真を設定できます。グループ写真の閲覧はだれでも無料です。",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "車の画面でグループを確認し、ステータスを送れます。ライドモード、ステータスボタン、緊急通報はスマートフォンで無料のままです。",
+  "Saved Riding Groups, Group Photos and Custom Codes": "保存したグループ、グループ写真、カスタムコード",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "テーマ、ライトモード、自然な音声、カスタムドット",
   "Reply": "返信",
   "Unlike comment": "コメントのいいねを取り消す",
   "Like comment": "コメントにいいね",

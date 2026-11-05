@@ -84,7 +84,9 @@ export default function You() {
   const musicFlag = useFlag('music_controls');
   const [musicMine, setMusicMine] = useMusicControlsSetting();
   const bluetoothFlag = useFlag('bluetooth_sharing');
-  const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  const [bluetoothSwitch, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1): Free shows it off with the Pro tag, and turning it on opens the Pro prompt.
+  const bluetoothMine = bluetoothSwitch && can('bluetooth_sharing');
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
@@ -336,14 +338,17 @@ export default function You() {
               ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
               : t('Off. Turn it on to keep sharing with nearby riders when there is no service')}
             right={
-              <Switch
-                value={bluetoothMine}
-                onValueChange={setBluetoothMine}
-                trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                thumbColor="#FFFFFF"
-                {...({ activeThumbColor: '#FFFFFF' } as object)}
-                accessibilityLabel={t('Bluetooth Sharing')}
-              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <ProTag feature="bluetooth_sharing" />
+                <Switch
+                  value={bluetoothMine}
+                  onValueChange={(on) => { if (!on || requirePro('bluetooth_sharing')) setBluetoothMine(on); }}
+                  trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+                  thumbColor="#FFFFFF"
+                  {...({ activeThumbColor: '#FFFFFF' } as object)}
+                  accessibilityLabel={t('Bluetooth Sharing')}
+                />
+              </View>
             }
           />
         ) : null}

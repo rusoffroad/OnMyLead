@@ -9,6 +9,8 @@ import { Colors, font, Radius, RideColors, themedStyles } from '@/constants/them
 import { APP_FLAGS, liveNotice, noticeKey, type AppFlag, type Notice } from '@/core/app-settings';
 import { dismissNotice, useAppSettings, useFlag } from '@/lib/app-settings';
 import { openStore, useUpdateState, useVersionNotice } from '@/lib/app-update';
+import { useEntitlements } from '@/lib/entitlements';
+import { shortDate } from '@/core/pro';
 
 import { t } from '@/lib/i18n';
 const untilText = (iso: string) =>
@@ -19,7 +21,9 @@ const untilText = (iso: string) =>
  *   * a notice for this exact app version (Releases page), amber, such as a known problem;
  *   * "Update Available" when a newer version is in the store (Releases page), closable;
  *   * maintenance (Settings page), amber, stays until the owner clears it or its time runs out;
- *   * the announcement (Settings page), logo blue, closable (new wording shows again).
+ *   * the announcement (Settings page), logo blue, closable (new wording shows again);
+ *   * while a Pro trial runs, the day it ends, closable (a new end date, such as the 2.1 launch
+ *     trial, shows again).
  */
 export function AppNotices() {
   const { settings, dismissed } = useAppSettings();
@@ -30,7 +34,11 @@ export function AppNotices() {
   const showAnnouncement = announcement && !dismissed.includes(noticeKey(announcement));
   const updateKey = update.kind === 'available' ? `update-${update.latest}` : null;
   const showUpdate = updateKey && !dismissed.includes(updateKey);
-  if (!versionNotice && !showUpdate && !maintenance && !showAnnouncement) return null;
+  const { ent } = useEntitlements();
+  const trialKey = ent.proSource === 'trial' && ent.trialEndsAt ? `trial-${ent.trialEndsAt}` : null;
+  const trialEnds = trialKey ? shortDate(ent.trialEndsAt) : '';
+  const showTrial = !!trialKey && !!trialEnds && !dismissed.includes(trialKey);
+  if (!versionNotice && !showUpdate && !maintenance && !showAnnouncement && !showTrial) return null;
   return (
     <View style={{ gap: 10 }}>
       {versionNotice ? (
@@ -50,6 +58,18 @@ export function AppNotices() {
       ) : null}
       {maintenance ? (
         <NoticeCard notice={maintenance} color={RideColors.yellow} tint={Colors.backgroundElement} icon="warning" title={t('Planned Maintenance')} />
+      ) : null}
+      {showTrial && trialKey ? (
+        <NoticeCard
+          notice={{ text: t('Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.', { date: trialEnds }) }}
+          color={Colors.gold}
+          tint="rgba(230,194,122,0.12)"
+          icon="star"
+          title={t('Your Pro Trial Runs Until {date}', { date: trialEnds })}
+          closeLabel="Close trial notice"
+          onClose={() => dismissNotice(trialKey)}
+          action={<Button title={t('See Pro')} onPress={() => router.push('/pro')} style={{ alignSelf: 'flex-start', marginTop: 6 }} />}
+        />
       ) : null}
       {showAnnouncement ? (
         <NoticeCard notice={announcement} color={Colors.sky} tint="rgba(59,134,247,0.12)" icon="megaphone" onClose={() => dismissNotice(noticeKey(announcement))} />

@@ -96,7 +96,8 @@ import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
 import { speak } from '@/lib/voice';
-import { requirePro } from '@/lib/pro';
+import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
+import { can } from '@/core/entitlements';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
@@ -502,7 +503,10 @@ export default function RideMode() {
   const bluetoothFlag = useFlag('bluetooth_sharing');
   // The rider's own switch (You > Bluetooth Sharing, or the no-service banner here). On by default;
   // turning it back on in Ride Mode starts Bluetooth again at once.
-  const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  const [bluetoothSwitch, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1): on Free the switch stays as the rider left it, but nothing runs.
+  const bluetoothPro = useCan('bluetooth_sharing');
+  const bluetoothMine = bluetoothSwitch && bluetoothPro;
   const bluetoothOffered = nearbyAvailable && bluetoothFlag;
   const nearby = useNearby();
   const iAmJoined = !!me && joined.some((m) => m.user_id === me);
@@ -1068,9 +1072,12 @@ export default function RideMode() {
     helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || t('Rider'), status: t(STATUS_LABEL[s.status]) })),
   });
   const carKey = JSON.stringify(car);
+  // CarPlay is Pro (2.1). On Free the car keeps the Pro notice (root layout) and gets no ride.
+  const carPlayPro = useCan('carplay');
   useEffect(() => {
+    if (!carPlayPro) return clearCarPlay();
     if (ride) showRideOnCarPlay(JSON.parse(carKey));
-  }, [carKey, ride]);
+  }, [carKey, ride, carPlayPro]);
   useEffect(() => () => clearCarPlay(), []);
   const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency });
   useEffect(() => {
@@ -1078,6 +1085,7 @@ export default function RideMode() {
   });
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
+      if (!can(currentEntitlements(), 'carplay')) return;
       const a = parseCarPlayAction(buttonId);
       const act = carActions.current;
       if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
@@ -1233,7 +1241,7 @@ export default function RideMode() {
               </Text>
               {bluetoothOffered ? (
                 <Pressable
-                  onPress={() => setBluetoothMine(!bluetoothMine)}
+                  onPress={() => (bluetoothMine ? setBluetoothMine(false) : requirePro('bluetooth_sharing') && setBluetoothMine(true))}
                   hitSlop={8}
                   accessibilityRole="switch"
                   accessibilityState={{ checked: bluetoothMine }}
@@ -1243,6 +1251,7 @@ export default function RideMode() {
                   <Icon name="bluetooth" size={14} color={bluetoothMine ? Colors.sky : Colors.textSecondary} strokeWidth={2.2} />
                   {/* Shows what it is now, like a switch; tapping flips it. */}
                   <Text style={styles.shareActionText}>{bluetoothMine ? t('Bluetooth On') : t('Bluetooth Off')}</Text>
+                  <ProTag feature="bluetooth_sharing" style={{ marginLeft: 2 }} />
                 </Pressable>
               ) : null}
             </View>

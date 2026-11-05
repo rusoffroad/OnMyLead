@@ -1,6 +1,21 @@
 // German. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Alle Pro-Funktionen gehören dir bis {date} kostenlos. Danach fährst du mit Free weiter, und Touren beitreten, der Tourmodus und NOTFALL bleiben kostenlos.",
+  "Your Pro Trial Runs Until {date}": "Deine Pro-Testphase läuft bis {date}",
+  "See Pro": "Pro ansehen",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay gehört zu OnMyLead Pro",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Tourmodus, Status-Tipps und NOTFALL funktionieren mit dem Free-Plan weiter auf deinem Handy.",
+  "Bluetooth Sharing With No Service": "Bluetooth-Teilen ohne Empfang",
+  "With no service, Ride Mode passes spots, status taps and messages to nearby riders on your ride over Bluetooth. With service, live tracking, Need Help and EMERGENCY stay free.": "Ohne Empfang gibt der Tourmodus Standorte, Status-Tipps und Nachrichten per Bluetooth an Fahrer in deiner Nähe auf deiner Tour weiter. Mit Empfang bleiben Live-Tracking, Brauche Hilfe und NOTFALL kostenlos.",
+  "Customize Your Dot": "Deinen Punkt anpassen",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "Wähle, wie dein eigener Punkt aussieht und wie groß er auf der Karte ist. Der rot-weiß-blaue Punkt bleibt kostenlos.",
+  "Group Photos": "Gruppenfotos",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "Gib deiner Fahrgruppe ein Foto. Alle können Gruppenfotos weiterhin kostenlos sehen.",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "Sieh deine Gruppe und sende Status-Tipps vom Bildschirm deines Autos. Tourmodus, Status-Tipps und NOTFALL bleiben auf deinem Handy kostenlos.",
+  "Saved Riding Groups, Group Photos and Custom Codes": "Gespeicherte Gruppen, Gruppenfotos und eigene Codes",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "Designs, heller Modus, natürliche Stimmen und eigene Punkte",
   "Reply": "Antworten",
   "Unlike comment": "Kommentar nicht mehr liken",
   "Like comment": "Kommentar liken",
