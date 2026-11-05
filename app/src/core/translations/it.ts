@@ -1,6 +1,22 @@
 // Italian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Senza campo, il telefono passa gli avvisi al gruppo e invia EMERGENZA. Posizioni e messaggi via Bluetooth sono Pro.",
+  "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Senza campo, vedi i piloti vicini e passa loro posizione, tocchi di stato e messaggi via Bluetooth. Con Free il telefono continua a passare gli avvisi al gruppo, ed EMERGENZA, Serve Aiuto e gli avvisi di incidente partono comunque via Bluetooth.",
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Tutte le funzioni Pro sono tue gratis fino al {date}. Dopo continui con Free, e unirti ai giri, la Modalità Giro ed EMERGENZA restano gratis.",
+  "Your Pro Trial Runs Until {date}": "La tua prova Pro dura fino al {date}",
+  "See Pro": "Vedi Pro",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay fa parte di OnMyLead Pro",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "La Modalità Giro, i tocchi di stato ed EMERGENZA continuano a funzionare sul telefono con il piano Free.",
+  "Bluetooth Sharing With No Service": "Condivisione Bluetooth senza campo",
+  "Customize Your Dot": "Personalizza il tuo punto",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "Scegli l’aspetto e la grandezza del tuo punto sulla mappa. Il punto rosso, bianco e blu resta gratis.",
+  "Group Photos": "Foto del gruppo",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "Dai una foto al tuo gruppo di piloti. Tutti possono continuare a vedere le foto del gruppo gratis.",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "Vedi il tuo gruppo e invia tocchi di stato dallo schermo dell’auto. La Modalità Giro, i tocchi di stato ed EMERGENZA restano gratis sul telefono.",
+  "Saved Riding Groups, Group Photos and Custom Codes": "Gruppi salvati, foto del gruppo e codici personalizzati",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "Temi, modalità chiara, voci naturali e punti personalizzati",
   "Shows on the group page, in everyone’s group list and on the invite link.": "Appare nella pagina del gruppo, nell’elenco dei gruppi di tutti e nel link di invito.",
   "Group photo changed.": "Foto del gruppo cambiata.",
   "Group photo saved. Everyone in the group sees it.": "Foto del gruppo salvata. Tutti nel gruppo la vedono.",

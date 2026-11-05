@@ -1,6 +1,22 @@
 // Hindi. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "नेटवर्क न होने पर आपका फ़ोन ग्रुप के अलर्ट आगे भेजता है और EMERGENCY भेजता है। Bluetooth पर लोकेशन और मैसेज Pro हैं।",
+  "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "नेटवर्क न होने पर पास के राइडर देखें और Bluetooth से उन्हें अपनी लोकेशन, स्टेटस और मैसेज भेजें। Free पर भी आपका फ़ोन ग्रुप के अलर्ट आगे भेजता रहता है, और EMERGENCY, मदद चाहिए और क्रैश अलर्ट Bluetooth से जाते रहते हैं।",
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date} तक सभी Pro फ़ीचर आपके लिए मुफ़्त हैं। उसके बाद आप Free पर राइड करते रहेंगे, और राइड में जुड़ना, राइड मोड और EMERGENCY मुफ़्त रहेंगे।",
+  "Your Pro Trial Runs Until {date}": "आपका Pro ट्रायल {date} तक है",
+  "See Pro": "Pro देखें",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay, OnMyLead Pro का हिस्सा है",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Free प्लान पर भी राइड मोड, स्टेटस बटन और EMERGENCY आपके फ़ोन पर काम करते रहेंगे।",
+  "Bluetooth Sharing With No Service": "बिना नेटवर्क के Bluetooth शेयरिंग",
+  "Customize Your Dot": "अपना डॉट बदलें",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "मैप पर अपना डॉट कैसा दिखे और कितना बड़ा हो, चुनें। लाल, सफ़ेद और नीला डॉट मुफ़्त रहता है।",
+  "Group Photos": "ग्रुप फ़ोटो",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "अपने राइडिंग ग्रुप को एक फ़ोटो दें। ग्रुप फ़ोटो सब लोग मुफ़्त में देख सकते हैं।",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "अपनी कार की स्क्रीन से ग्रुप देखें और स्टेटस भेजें। राइड मोड, स्टेटस बटन और EMERGENCY आपके फ़ोन पर मुफ़्त रहते हैं।",
+  "Saved Riding Groups, Group Photos and Custom Codes": "सेव किए ग्रुप, ग्रुप फ़ोटो और कस्टम कोड",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "थीम, लाइट मोड, नैचुरल आवाज़ें और कस्टम डॉट",
   "Shows on the group page, in everyone’s group list and on the invite link.": "यह ग्रुप पेज पर, सभी की ग्रुप सूची में और आमंत्रण लिंक पर दिखती है।",
   "Group photo changed.": "ग्रुप फ़ोटो बदल दी गई।",
   "Group photo saved. Everyone in the group sees it.": "ग्रुप फ़ोटो सहेज दी गई। ग्रुप में सभी इसे देखते हैं।",

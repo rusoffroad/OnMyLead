@@ -85,7 +85,7 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { useFlag } from '@/lib/app-settings';
 import {
-  nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
+  nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbyRelayOnly, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
 } from '@/lib/nearby';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
@@ -96,7 +96,8 @@ import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
 import { speak } from '@/lib/voice';
-import { requirePro } from '@/lib/pro';
+import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
+import { can } from '@/core/entitlements';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
@@ -503,6 +504,11 @@ export default function RideMode() {
   // The rider's own switch (You > Bluetooth Sharing, or the no-service banner here). On by default;
   // turning it back on in Ride Mode starts Bluetooth again at once.
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1). On Free the phone still relays for the group and still sends and
+  // hears EMERGENCY, Need Help and Crash Alerts (lib/nearby relay only); spots, other taps and
+  // messages over Bluetooth need Pro.
+  const bluetoothPro = useCan('bluetooth_sharing');
+  useEffect(() => setNearbyRelayOnly(!bluetoothPro), [bluetoothPro]);
   const bluetoothOffered = nearbyAvailable && bluetoothFlag;
   const nearby = useNearby();
   const iAmJoined = !!me && joined.some((m) => m.user_id === me);
@@ -1068,9 +1074,12 @@ export default function RideMode() {
     helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || t('Rider'), status: t(STATUS_LABEL[s.status]) })),
   });
   const carKey = JSON.stringify(car);
+  // CarPlay is Pro (2.1). On Free the car keeps the Pro notice (root layout) and gets no ride.
+  const carPlayPro = useCan('carplay');
   useEffect(() => {
+    if (!carPlayPro) return clearCarPlay();
     if (ride) showRideOnCarPlay(JSON.parse(carKey));
-  }, [carKey, ride]);
+  }, [carKey, ride, carPlayPro]);
   useEffect(() => () => clearCarPlay(), []);
   const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency });
   useEffect(() => {
@@ -1078,6 +1087,7 @@ export default function RideMode() {
   });
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
+      if (!can(currentEntitlements(), 'carplay')) return;
       const a = parseCarPlayAction(buttonId);
       const act = carActions.current;
       if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
@@ -1222,7 +1232,7 @@ export default function RideMode() {
             <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
               <View style={styles.offlineDot} />
               <Text style={styles.offlineText}>
-                {nearby.state === 'on' && nearby.peers > 0
+                {nearby.state === 'on' && nearby.peers > 0 && bluetoothPro
                   ? activeShare
                     ? t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth.' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth.', { n: nearby.peers })
                     : t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth (Your Spot Stays Private Until You Share).' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth (Your Spot Stays Private Until You Share).', { n: nearby.peers })
@@ -1243,6 +1253,7 @@ export default function RideMode() {
                   <Icon name="bluetooth" size={14} color={bluetoothMine ? Colors.sky : Colors.textSecondary} strokeWidth={2.2} />
                   {/* Shows what it is now, like a switch; tapping flips it. */}
                   <Text style={styles.shareActionText}>{bluetoothMine ? t('Bluetooth On') : t('Bluetooth Off')}</Text>
+                  <ProTag feature="bluetooth_sharing" style={{ marginLeft: 2 }} />
                 </Pressable>
               ) : null}
             </View>

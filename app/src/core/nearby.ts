@@ -899,3 +899,14 @@ export function nearbyPower(s: { online: boolean; peers: number; batterySaver: b
   if (!s.online || s.peers > 0) return s.batterySaver ? 'low' : 'normal';
   return 'low';
 }
+
+/**
+ * What a phone on Free does with Bluetooth Sharing (2.1, Bluetooth Sharing is Pro): it still passes
+ * every packet along for the group (relay), and still sends and hears the safety alerts, EMERGENCY,
+ * Need Help and a Crash Alert. Seeing riders' spots, sending its own spot, other status taps and
+ * messages over Bluetooth are Pro.
+ */
+export function nearbyFreeAllows(item: { kind: string; status?: string; flags?: number }): boolean {
+  if (item.kind !== 'status') return false;
+  return item.status === 'emergency' || item.status === 'need_help' || ((item.flags ?? 0) & FLAG_POSSIBLE_CRASH) === FLAG_POSSIBLE_CRASH;
+}

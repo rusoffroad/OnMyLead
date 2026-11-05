@@ -2,7 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSyncExternalStore } from 'react';
 
 import { DOT_D, parseDotSize, type DotSize } from '@/core/dot-size';
+import { effectiveDot } from '@/core/pro';
 import { DEFAULT_DOT_STYLE, parseDotStyle, type DotStyle } from '@/core/own-dot-art';
+import { useEntitlements } from '@/lib/entitlements';
 import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 /** Dot Size (Map Settings > Your Dot): how big your own dot is on every live map, remembered with the account. */
@@ -46,14 +48,16 @@ function setDotSize(next: DotSize) {
   setSyncedItem(DOT_SIZE_KEY, next).catch(() => {});
 }
 
-/** The Dot Size choice: Medium unless the rider picked another. */
+/** The Dot Size choice: Medium unless the rider picked another (and has Pro: customizing the dot is Pro). */
 export function useDotSizePref(): [DotSize, (size: DotSize) => void] {
-  return [useSyncExternalStore(subscribe, read, read), setDotSize];
+  const { ent } = useEntitlements();
+  const saved = useSyncExternalStore(subscribe, read, read);
+  return [effectiveDot(ent, DEFAULT_DOT_STYLE, saved).size, setDotSize];
 }
 
 /** Your own dot's disc size in points, following Dot Size. */
 export function useOwnDotD(): number {
-  return DOT_D[useSyncExternalStore(subscribe, read, read)];
+  return DOT_D[useDotSizePref()[0]];
 }
 
 /** Dot Style (Map Settings > Your Dot): how your own dot looks, remembered with the account; Safety Orange unless picked. */
@@ -95,7 +99,9 @@ function setDotStyle(next: DotStyle) {
   setSyncedItem(DOT_STYLE_KEY, next).catch(() => {});
 }
 
-/** The Dot Style choice. */
+/** The Dot Style choice; the default on Free (customizing the dot is Pro), the saved pick kept for later. */
 export function useDotStylePref(): [DotStyle, (style: DotStyle) => void] {
-  return [useSyncExternalStore(subscribeStyle, readStyle, readStyle), setDotStyle];
+  const { ent } = useEntitlements();
+  const saved = useSyncExternalStore(subscribeStyle, readStyle, readStyle);
+  return [effectiveDot(ent, saved, 'medium').style, setDotStyle];
 }

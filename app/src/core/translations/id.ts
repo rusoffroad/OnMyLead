@@ -1,6 +1,22 @@
 // Indonesian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Tanpa sinyal, ponselmu meneruskan peringatan untuk grup dan mengirim DARURAT. Lokasi dan pesan lewat Bluetooth adalah Pro.",
+  "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Tanpa sinyal, lihat pengendara terdekat dan teruskan lokasi, status, dan pesanmu lewat Bluetooth. Dengan Free ponselmu tetap meneruskan peringatan untuk grup, dan DARURAT, Butuh Bantuan, serta peringatan tabrakan tetap terkirim lewat Bluetooth.",
+  "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Semua fitur Pro gratis untukmu sampai {date}. Setelah itu kamu tetap berkendara dengan Free, dan bergabung ke perjalanan, Mode Perjalanan, serta DARURAT tetap gratis.",
+  "Your Pro Trial Runs Until {date}": "Uji coba Pro-mu berlaku sampai {date}",
+  "See Pro": "Lihat Pro",
+  "CarPlay Is Part of OnMyLead Pro": "CarPlay adalah bagian dari OnMyLead Pro",
+  "Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.": "Mode Perjalanan, tombol status, dan DARURAT tetap berfungsi di ponselmu dengan paket Free.",
+  "Bluetooth Sharing With No Service": "Berbagi Bluetooth Tanpa Sinyal",
+  "Customize Your Dot": "Atur Titikmu",
+  "Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.": "Pilih tampilan dan ukuran titikmu sendiri di peta. Titik merah, putih, dan biru tetap gratis.",
+  "Group Photos": "Foto Grup",
+  "Give your riding group a photo. Everyone can still see group photos for free.": "Beri foto untuk grup berkendaramu. Semua orang tetap bisa melihat foto grup secara gratis.",
+  "CarPlay": "CarPlay",
+  "See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.": "Lihat grupmu dan kirim status dari layar mobil. Mode Perjalanan, tombol status, dan DARURAT tetap gratis di ponselmu.",
+  "Saved Riding Groups, Group Photos and Custom Codes": "Grup Tersimpan, Foto Grup, dan Kode Kustom",
+  "Themes, Light Mode, Natural Voices and Custom Dots": "Tema, Mode Terang, Suara Alami, dan Titik Kustom",
   "Shows on the group page, in everyone’s group list and on the invite link.": "Tampil di halaman grup, di daftar grup semua orang, dan di tautan undangan.",
   "Group photo changed.": "Foto grup diganti.",
   "Group photo saved. Everyone in the group sees it.": "Foto grup disimpan. Semua orang di grup melihatnya.",
