@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": [],
+    "kind": "update",
+    "by": "pr",
+    "ref": "version-2-1",
+    "why": "The app is now version 2.1 (iOS build 9, Android versionCode 9) for the 2.1 build. Its release notes are in help/release-notes.json; articles in :::release 2.1 blocks publish when Apple releases 2.1."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": [
       "leader-trackline",
       "3d-terrain",
