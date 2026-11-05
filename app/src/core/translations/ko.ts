@@ -3212,7 +3212,7 @@ const dict: Record<string, string> = {
   "Need a Minute": "잠깐만요",
   "Couldn’t Change the Trackline": "리더 트랙라인을 변경할 수 없습니다",
   "Leader Trackline": "리더 트랙라인",
-  "A line behind you in the leader color, on every rider’s map": "모든 라이더의 지도에 리더 색상으로 당신 뒤에 선을 표시",
+  "A line behind the leader in the leader color, on every rider’s map": "모든 라이더의 지도에 리더 색상으로 리더 뒤에 선을 표시",
   "On for Everyone": "모두에게 켜짐",
   "Off for Everyone": "모두에게 꺼짐",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "이끈 길을 모든 라이더의 지도에 보여 줍니다. 다시 가로지르면 이전 선이 흐려집니다.",

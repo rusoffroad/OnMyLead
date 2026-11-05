@@ -24,8 +24,16 @@ export const TRACKLINE_LOOP_M = 120;
 /**
  * Two spots further apart than this were not ridden in a straight line (this phone missed the
  * leader's spots for a while, or was closed): the line breaks there rather than cut across.
+ * Max Battery Saver and Ride Mode's backup poll hear the leader only every 45 s or so, which at
+ * highway speed is well over a kilometer, so the limit sits above that.
  */
-export const TRACKLINE_BREAK_M = 400;
+export const TRACKLINE_BREAK_M = 2_000;
+/**
+ * Distance along the line counts only once the leader moves this far from where it last counted,
+ * so GPS wander while the leader is stopped (lunch, a regroup) never adds up to a loop that would
+ * fade the whole line behind them.
+ */
+export const TRACKLINE_STILL_M = 40;
 /**
  * Riding back along an old pass, GPS drift can wander a few meters off it for a moment. Only
  * after this far off the old line does a later return count as a new crossing, so one pass back
@@ -91,14 +99,25 @@ export function lastCrossing(points: LatLng[]): { from: number; crossings: numbe
   const along = new Float64Array(n);
   // A piece longer than this is a break (not ridden): it is never drawn, so it never counts.
   const isBreak = new Uint8Array(n);
+  // Where distance along the line last counted from (see TRACKLINE_STILL_M).
+  let anchor = 0;
   for (let i = 0; i < n; i++) {
     xs[i] = (points[i].lng - points[0].lng) * kx;
     ys[i] = (points[i].lat - lat0) * ky;
     if (i > 0) {
       const step = distanceM(points[i - 1], points[i]);
       isBreak[i] = step > TRACKLINE_BREAK_M ? 1 : 0;
-      // Nor does a break count as distance along the line.
-      along[i] = along[i - 1] + (isBreak[i] ? TRACKLINE_LOOP_M : step);
+      if (isBreak[i]) {
+        // Nor does a break count as distance along the line.
+        along[i] = along[i - 1] + TRACKLINE_LOOP_M;
+        anchor = i;
+      } else {
+        // Measured from the anchor, so wander around one spot never adds up past TRACKLINE_STILL_M,
+        // while riding on it is the same as summing the steps.
+        const moved = distanceM(points[anchor], points[i]);
+        along[i] = along[anchor] + moved;
+        if (moved >= TRACKLINE_STILL_M) anchor = i;
+      }
     }
   }
   const cell = TRACKLINE_CROSS_M;
@@ -265,7 +284,9 @@ export function keepSame(prev: TracklinePieces | null | undefined, next: Trackli
     let changed = was.length !== now.length;
     const out = now.map((piece, i) => {
       const old = was[i];
-      const same = !!old && old.length === piece.length && sameSpot(old[0], piece[0]) && sameSpot(old[old.length - 1], piece[piece.length - 1]);
+      // Same last spot and about the same length: once the trail is at its limit its oldest spot
+      // drops on every new one, which alone isn't worth redrawing a piece.
+      const same = !!old && Math.abs(old.length - piece.length) <= 1 && sameSpot(old[old.length - 1], piece[piece.length - 1]);
       if (!same) changed = true;
       return same ? old : piece;
     });

@@ -3212,7 +3212,7 @@ const dict: Record<string, string> = {
   "Need a Minute": "等我一下",
   "Couldn’t Change the Trackline": "无法更改领队轨迹",
   "Leader Trackline": "领队轨迹",
-  "A line behind you in the leader color, on every rider’s map": "在每位骑手的地图上，用领队颜色在你身后画一条线",
+  "A line behind the leader in the leader color, on every rider’s map": "在每位骑手的地图上，用领队颜色在领队身后画一条线",
   "On for Everyone": "对所有人开启",
   "Off for Everyone": "对所有人关闭",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "在每位骑手的地图上显示你带队走过的路线。再次穿过时，较早的轨迹会变淡。",

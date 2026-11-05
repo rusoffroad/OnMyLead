@@ -31,7 +31,7 @@ Short wiggles, a tight hairpin, or wandering a few yards off the old line on the
 
 ## Turn It Off (Leader)
 
-The line is on for every ride unless the leader turns it off. Turning it off hides it for everyone on the ride, and turning it back on brings it back for everyone.
+The line is on for every ride unless the leader turns it off. Turning it off hides it for everyone on the ride, and turning it back on brings it back for everyone, including the part ridden while it was off.
 
 1. In Ride Mode, tap the layers button on the map.
 2. Under **Leader Trackline**, tap the row to switch between **On for Everyone** and **Off for Everyone**.
@@ -41,7 +41,7 @@ The switch shows for the leader and the ride's organizers. If nobody has the Lea
 ## Good to Know
 
 - Each phone draws the line from the leader's live position, which riders on the ride already see. Nothing new is uploaded. Your phone keeps the line for the ride you're on, so closing Ride Mode and coming back doesn't lose it, and the next ride's line replaces it.
-- If your phone stops hearing from the leader for a while (no signal, or Ride Mode was closed), the line has a gap rather than a straight line across the map. Open Ride Mode early to see the whole ride.
+- If your phone stops hearing from the leader for a while (no signal, or Ride Mode was closed), the line has a gap rather than a straight line across the map. A stop, like lunch or a regroup, doesn't fade the line behind the leader. Open Ride Mode early to see the whole ride.
 - If the leader changes partway through the ride, the line starts again from the new leader.
 - **iPhone, iPad, Android phones and Android tablets:** the line shows on every map style, including 3D Terrain and the flat Apple or Google map.
 - **Website:** the line shows on the live Mapbox map. Where the website shows only a sketch of the route, there's no line.

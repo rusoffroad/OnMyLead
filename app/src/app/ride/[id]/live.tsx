@@ -665,8 +665,15 @@ export default function RideMode() {
   // Leader Trackline: the same trail drawn on the map behind the leader, on any ride, unless the
   // leader turned it off for the ride (core/leader-trackline).
   const showTrackline = tracklineOn(ride);
-  const keepsTrail = freeride || showTrackline;
-  const trailLeaderId = keepsTrail ? leaderIds.find((l) => joined.some((m) => m.user_id === l) && spotOf(l)) ?? null : null;
+  // Kept even while the leader has the line off, so turning it back on shows the whole ride
+  // rather than a gap or a straight line across ground nobody rode.
+  const keepsTrail = true;
+  // The trail stays with the leader it follows while they are still a leader on the ride (a second
+  // leader, or a moment without a spot, would otherwise start it over for everyone).
+  const [trailLeader, setTrailLeader] = useState<string | null>(null);
+  const stillLeads = !!trailLeader && leaderIds.includes(trailLeader) && joined.some((m) => m.user_id === trailLeader);
+  const trailLeaderId = stillLeads ? trailLeader : leaderIds.find((l) => joined.some((m) => m.user_id === l) && spotOf(l)) ?? null;
+  if (trailLeaderId && trailLeaderId !== trailLeader) setTrailLeader(trailLeaderId);
   const trailLeaderAt = trailLeaderId ? spotOf(trailLeaderId) : null;
   const leaderTrail = useLeaderTrail(id, trailLeaderId, trailLeaderAt, keepsTrail);
   const trackline = useLeaderTrackline(leaderTrail?.points, showTrackline);
@@ -689,7 +696,7 @@ export default function RideMode() {
   const freerideLine = useMemo(() => {
     if (!freeride) return null;
     const riders = joined.map((m) => ({ id: m.user_id, role: bubbleRole(m.role, leaderIds.includes(m.user_id)), at: spotOf(m.user_id) }));
-    return freerideTracker.place(freeride ? leaderTrail : null, trailLeaderId, riders);
+    return freerideTracker.place(leaderTrail, trailLeaderId, riders);
   }, [freeride, joined, leaderIds, spotOf, leaderTrail, trailLeaderId, freerideTracker]);
   const freerideStrip = freerideLine ? { summary: summarizeFreeride(freerideLine, me), waiting: !freerideLine.leaderId } : null;
 

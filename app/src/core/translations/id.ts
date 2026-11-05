@@ -3212,7 +3212,7 @@ const dict: Record<string, string> = {
   "Need a Minute": "Butuh semenit",
   "Couldn’t Change the Trackline": "Tidak bisa mengubah garis pemimpin",
   "Leader Trackline": "Garis Pemimpin",
-  "A line behind you in the leader color, on every rider’s map": "Garis di belakang Anda dengan warna pemimpin, di peta setiap pengendara",
+  "A line behind the leader in the leader color, on every rider’s map": "Garis di belakang pemimpin dengan warna pemimpin, di peta setiap pengendara",
   "On for Everyone": "Aktif untuk semua",
   "Off for Everyone": "Nonaktif untuk semua",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Menunjukkan jalur yang Anda pimpin di peta setiap pengendara. Jika dilintasi lagi, lintasan lama memudar.",

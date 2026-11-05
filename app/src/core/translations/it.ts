@@ -3212,7 +3212,7 @@ const dict: Record<string, string> = {
   "Need a Minute": "Un minuto",
   "Couldn’t Change the Trackline": "Impossibile cambiare la traccia del leader",
   "Leader Trackline": "Traccia del leader",
-  "A line behind you in the leader color, on every rider’s map": "Una linea dietro di te nel colore del leader, sulla mappa di ogni pilota",
+  "A line behind the leader in the leader color, on every rider’s map": "Una linea dietro al leader nel colore del leader, sulla mappa di ogni pilota",
   "On for Everyone": "Attiva per tutti",
   "Off for Everyone": "Disattivata per tutti",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Mostra dove hai guidato sulla mappa di ogni pilota. Se la incroci di nuovo, il passaggio precedente si attenua.",

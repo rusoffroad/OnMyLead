@@ -3212,7 +3212,7 @@ const dict: Record<string, string> = {
   "Need a Minute": "Нужна минута",
   "Couldn’t Change the Trackline": "Не удалось изменить трек лидера",
   "Leader Trackline": "Трек лидера",
-  "A line behind you in the leader color, on every rider’s map": "Линия за вами цветом лидера на карте каждого райдера",
+  "A line behind the leader in the leader color, on every rider’s map": "Линия за лидером цветом лидера на карте каждого райдера",
   "On for Everyone": "Включён для всех",
   "Off for Everyone": "Выключен для всех",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Показывает, где вы вели группу, на карте каждого райдера. Если пересечь трек снова, старый проход бледнеет.",

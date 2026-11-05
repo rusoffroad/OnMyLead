@@ -3212,7 +3212,7 @@ const dict: Record<string, string> = {
   "Need a Minute": "少し待って",
   "Couldn’t Change the Trackline": "リーダートラックを変更できませんでした",
   "Leader Trackline": "リーダートラック",
-  "A line behind you in the leader color, on every rider’s map": "全ライダーの地図で、あなたの後ろにリーダーの色で線を表示",
+  "A line behind the leader in the leader color, on every rider’s map": "全ライダーの地図で、リーダーの後ろにリーダーの色で線を表示",
   "On for Everyone": "全員に表示",
   "Off for Everyone": "全員に非表示",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "先導した道を全ライダーの地図に表示します。線を再び横切ると、古い線が薄くなります。",

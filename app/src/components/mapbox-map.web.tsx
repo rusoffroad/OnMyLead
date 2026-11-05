@@ -370,36 +370,66 @@ export function MapboxMap({
     src('oml-park-titles')?.setData?.(pointsGeoJSON(parks.map((p) => ({ key: `park-${p.parkOsmId}`, at: p.center, props: { name: p.parkName, sub: parkSummaryLine(p) } }))));
   }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks]);
 
-  // The screen's own fills and lines, redrawn when they change (and after a style change wiped them).
-  const drawn = useRef<string[]>([]);
+  // The screen's own fills and lines. A line or fill whose look is unchanged only gets new data
+  // (setData), so a growing Leader Trackline doesn't tear down and re-add the route on every spot;
+  // one whose look changed, or that is gone, is taken off. A style change wiped them all.
+  const drawn = useRef<Map<string, string>>(new Map());
+  const drawnStyle = useRef(0);
   useEffect(() => {
     if (!map || !styled) return;
-    for (const id of drawn.current) {
+    if (drawnStyle.current !== styled) {
+      drawn.current = new Map();
+      drawnStyle.current = styled;
+    }
+    const remove = (id: string) => {
       for (const suffix of ['-case', '-ink', '-fill', '-line']) if (map.getLayer(`${id}${suffix}`)) map.removeLayer(`${id}${suffix}`);
       if (map.getSource(id)) map.removeSource(id);
-    }
-    drawn.current = [];
+      drawn.current.delete(id);
+    };
+    const wanted = new Set<string>();
+    // Layers stack in the order they were added, so when the wanted order differs from what is on
+    // the map (a faded old trackline appearing under the fresh one), everything is drawn again.
+    const order = [...(fills ?? []).map((f) => `oml-fill-${f.id}`), ...(lines ?? []).map((l) => `oml-line-${l.id}`)];
+    const onMap = [...drawn.current.keys()].filter((id) => order.includes(id));
+    // What stays must already be in order, and anything new must come after all of it.
+    const lastKept = onMap.length ? order.indexOf(onMap[onMap.length - 1]) : -1;
+    const inOrder = onMap.every((id, k) => k === 0 || order.indexOf(id) > order.indexOf(onMap[k - 1]));
+    const newOnTop = order.every((id, k) => drawn.current.has(id) || k > lastKept);
+    if (!inOrder || !newOnTop) for (const id of [...drawn.current.keys()]) remove(id);
+    const place = (id: string, look: string, data: unknown, add: () => void) => {
+      wanted.add(id);
+      if (drawn.current.get(id) === look && map.getSource(id)) {
+        (map.getSource(id) as { setData?: (d: unknown) => void }).setData?.(data);
+        return;
+      }
+      remove(id);
+      map.addSource(id, { type: 'geojson', data: data as never });
+      add();
+      drawn.current.set(id, look);
+    };
     for (const f of fills ?? []) {
       const id = `oml-fill-${f.id}`;
-      map.addSource(id, { type: 'geojson', data: f.polygon });
-      map.addLayer({ id: `${id}-fill`, type: 'fill', source: id, paint: { 'fill-color': f.color, 'fill-opacity': f.opacity } });
-      map.addLayer({ id: `${id}-line`, type: 'line', source: id, paint: { 'line-color': f.stroke, 'line-width': f.strokeWidth } });
-      drawn.current.push(id);
+      place(id, JSON.stringify([f.color, f.opacity, f.stroke, f.strokeWidth]), f.polygon, () => {
+        map.addLayer({ id: `${id}-fill`, type: 'fill', source: id, paint: { 'fill-color': f.color, 'fill-opacity': f.opacity } });
+        map.addLayer({ id: `${id}-line`, type: 'line', source: id, paint: { 'line-color': f.stroke, 'line-width': f.strokeWidth } });
+      });
     }
     for (const l of lines ?? []) {
       const id = `oml-line-${l.id}`;
       const pieces = Array.isArray(l.points[0]) ? (l.points as LatLng[][]) : [l.points as LatLng[]];
-      map.addSource(id, { type: 'geojson', data: linesGeoJSON(pieces.map((points, i) => ({ key: `${l.id}-${i}`, points }))) });
-      if (l.casing) {
-        map.addLayer({ id: `${id}-case`, type: 'line', source: id, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': l.casing, 'line-width': l.casingWidth ?? l.width + 4 } });
-      }
-      map.addLayer({
-        id: `${id}-ink`, type: 'line', source: id,
-        layout: { 'line-cap': l.dash ? 'butt' : 'round', 'line-join': 'round' },
-        paint: { 'line-color': l.color, 'line-width': l.width, ...(l.dash ? { 'line-dasharray': l.dash.map((d) => d / l.width) } : {}) },
-      });
-      drawn.current.push(id);
+      place(id, JSON.stringify([l.color, l.width, l.casing ?? null, l.casingWidth ?? null, l.dash ?? null]),
+        linesGeoJSON(pieces.map((points, i) => ({ key: `${l.id}-${i}`, points }))), () => {
+          if (l.casing) {
+            map.addLayer({ id: `${id}-case`, type: 'line', source: id, layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': l.casing, 'line-width': l.casingWidth ?? l.width + 4 } });
+          }
+          map.addLayer({
+            id: `${id}-ink`, type: 'line', source: id,
+            layout: { 'line-cap': l.dash ? 'butt' : 'round', 'line-join': 'round' },
+            paint: { 'line-color': l.color, 'line-width': l.width, ...(l.dash ? { 'line-dasharray': l.dash.map((d) => d / l.width) } : {}) },
+          });
+        });
     }
+    for (const id of [...drawn.current.keys()]) if (!wanted.has(id)) remove(id);
   }, [map, styled, lines, fills]);
 
   return (

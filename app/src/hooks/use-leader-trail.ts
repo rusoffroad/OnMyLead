@@ -19,9 +19,9 @@ function isStale(raw: string): boolean {
 const SAVE_EVERY_MS = 20_000;
 
 /**
- * The leader's trail on a Freeride, built on this phone from the leader's live spots (which only
- * riders on the ride receive). It is kept on the phone so leaving Ride Mode and coming back
- * doesn't lose it, and is never uploaded. Pass `enabled` false on a ride with a mapped route.
+ * The leader's trail, built on this phone from the leader's live spots (which only riders on the
+ * ride receive): the Freeride line and the Leader Trackline. It is kept on the phone so leaving
+ * Ride Mode and coming back doesn't lose it, and is never uploaded.
  */
 export function useLeaderTrail(rideId: string | undefined, leaderId: string | null, leaderAt: LatLng | null, enabled: boolean): LeaderTrail | null {
   const [trail, setTrail] = useState<LeaderTrail | null>(null);
