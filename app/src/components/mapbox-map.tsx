@@ -118,6 +118,7 @@ export function MapboxMap({
   // is still panning (Follow Me keeps the window above open on every fix). A tap (no move)
   // doesn't count, so tapping a trail mid-pan leaves Follow Me on.
   const movedAt = useRef(0);
+  const downAt = useRef<{ x: number; y: number } | null>(null);
   const autoMove = (ms: number) => {
     autoUntil.current = Math.max(autoUntil.current, Date.now() + ms + 200);
   };
@@ -257,8 +258,13 @@ export function MapboxMap({
   return (
     <View
       style={StyleSheet.absoluteFill}
-      onTouchMove={() => {
-        movedAt.current = Date.now();
+      onTouchStart={(e) => {
+        downAt.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY };
+      }}
+      onTouchMove={(e) => {
+        // Past a finger's wobble (10 points), so a tap that shifts a little stays a tap.
+        const d = downAt.current;
+        if (!d || Math.hypot(e.nativeEvent.pageX - d.x, e.nativeEvent.pageY - d.y) >= 10) movedAt.current = Date.now();
       }}
       onLayout={(e) => {
         size.current = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height };

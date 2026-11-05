@@ -25,12 +25,14 @@ function start() {
         // A map can open before the rider answers the location prompt: look again shortly
         // (not when the answer was a lasting no; the next map that opens asks again).
         if (!p.canAskAgain) return null;
-        // Each look waits twice as long, up to a minute.
-        retry ??= setTimeout(() => {
-          retry = null;
-          if (listeners.size) start();
-        }, retryMs);
-        retryMs = Math.min(60_000, retryMs * 2);
+        // Each look waits a little longer, up to 30 s.
+        if (!retry) {
+          retry = setTimeout(() => {
+            retry = null;
+            if (listeners.size) start();
+          }, retryMs);
+          retryMs = Math.min(30_000, retryMs + 5000);
+        }
         return null;
       }
       return Location.watchHeadingAsync((h) => {
@@ -58,6 +60,7 @@ function stop() {
   sub = null;
   if (retry) clearTimeout(retry);
   retry = null;
+  retryMs = 5000;
 }
 
 /** The compass heading while the calling component is on screen, or null when there is none. */
