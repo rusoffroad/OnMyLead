@@ -87,6 +87,9 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   private var peripheral: CBPeripheralManager?
   private var outboxChar: CBMutableCharacteristic?
   private var serviceAdded = false
+  /** didAdd confirmed the service; a service that is never confirmed is added again (as on Android). */
+  private var serviceConfirmed = false
+  private var serviceAddedAt = Date.distantPast
 
   /// Phones this one connected to, by identifier.
   private var peers: [UUID: CBPeripheral] = [:]
@@ -205,7 +208,18 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       c.stopScan()
       scan()
     }
-    if let pm = peripheral, pm.state == .poweredOn, !serviceAdded { peripheralManagerDidUpdateState(pm) }
+    if let pm = peripheral, pm.state == .poweredOn {
+      if serviceAdded && !serviceConfirmed && Date().timeIntervalSince(serviceAddedAt) > 15 {
+        pm.removeAllServices()
+        serviceAdded = false
+        outboxChar = nil
+        subscribers.removeAll()
+        pendingUrgent.removeAll()
+        pendingRound.removeAll()
+        report()
+      }
+      if !serviceAdded { peripheralManagerDidUpdateState(pm) }
+    }
     send(outgoing)
   }
 
@@ -257,7 +271,6 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     guard !frames.isEmpty || !urgent else { return }
     for id in peerInbox.keys {
       guard let p = peers[id], p.state == .connected else { continue }
-      if urgent && frames.isEmpty { continue }
       queueWrites(frames, to: id, urgent: urgent)
       drainWrites(p)
     }
@@ -398,6 +411,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     outboxChar = out
     pm.add(s)
     serviceAdded = true
+    serviceConfirmed = false
+    serviceAddedAt = Date()
   }
 
   func peripheralManager(_ pm: CBPeripheralManager, didAdd s: CBService, error: Error?) {
@@ -408,6 +423,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       outboxChar = nil
       return
     }
+    serviceConfirmed = true
     // No name in the advertisement: other phones see only that an OnMyLead phone is near.
     pm.startAdvertising([CBAdvertisementDataServiceUUIDsKey: [service]])
   }
@@ -422,13 +438,11 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   func peripheralManager(_ pm: CBPeripheralManager, central: CBCentral, didSubscribeTo ch: CBCharacteristic) {
     subscribers[central.identifier] = central
     report()
-    // Only the new phone gets the round at once (until iOS's queue is full; the next round brings
-    // the rest); the others carry on with theirs.
-    guard let out = outboxChar else { return }
-    for f in outgoing where f.count <= central.maximumUpdateValueLength {
-      if !pm.updateValue(f, for: out, onSubscribedCentrals: [central]) { break }
-    }
+    // The new phone joins the shared notify queue: what's waiting goes out now, and the next round
+    // brings it everything (urgent frames stay first).
+    drainNotify()
   }
+
 
 
   func peripheralManagerIsReady(toUpdateSubscribers pm: CBPeripheralManager) {

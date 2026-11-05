@@ -274,10 +274,7 @@ class NearbyRadio(
     } else {
       if (server != null && !serviceReady && SystemClock.elapsedRealtime() - serverOpenedAt > SERVICE_WAIT_MS) {
         // The stack took the service but never confirmed it: start over with a new server.
-        serverGen++
-        outboxChar = null
-        try { server?.close() } catch (_: Exception) {}
-        server = null
+        closeServer()
       }
       if (server == null) openServer() else if (serviceReady && !advertising) startAdvertising()
       if (!scanning) startScan()
@@ -296,12 +293,22 @@ class NearbyRadio(
     advertising = false
     peers.values.forEach { try { it.gatt.close() } catch (_: Exception) {} }
     peers.clear()
-    subscribers.clear()
-    pendingMtu.clear()
+    closeServer()
+  }
+
+  /**
+   * Closes the GATT server and forgets everything it served. The new generation makes anything it
+   * still reports (disconnects included) ignored, so its subscribers are dropped here.
+   */
+  private fun closeServer() {
     serverGen++
     serviceReady = false
+    outboxChar = null
+    subscribers.clear()
+    pendingMtu.clear()
     try { server?.close() } catch (_: Exception) {}
     server = null
+    report()
   }
 
   /**
@@ -462,10 +469,7 @@ class NearbyRadio(
           startAdvertising()
         } else {
           // The stack wasn't ready (often right after Bluetooth turns on): the next round opens a new server.
-          serverGen++
-          serviceReady = false
-          try { server?.close() } catch (_: Exception) {}
-          server = null
+          closeServer()
         }
       }
     }
