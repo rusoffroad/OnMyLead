@@ -1,7 +1,7 @@
 [
   {
     "date": "2026-11-05",
-    "slugs": ["follow-me", "privacy"],
+    "slugs": ["follow-me", "privacy", "ride-bubble"],
     "kind": "fix",
     "by": "pr",
     "ref": "release-test-pass-57-61",
