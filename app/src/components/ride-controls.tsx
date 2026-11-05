@@ -143,10 +143,10 @@ export function StatusSheet({
               {QUICK_REPLIES.map((q) => (
                 <QuickTile
                   key={q}
-                  label={q}
+                  label={t(q)}
                   on={lastReply === q}
                   onPress={pick(() => onReply(q))}
-                  a11y={t('Send to the group: {q}', { q })}
+                  a11y={t('Send to the group: {q}', { q: t(q) })}
                   style={styles.third}
                 />
               ))}
