@@ -254,7 +254,6 @@ export function stopNearby() {
   if (!s) return;
   session = null;
   clearInterval(s.timer);
-  recentFrames.clear();
   s.subs.forEach((x) => x.remove());
   try {
     native?.stop();
@@ -397,18 +396,6 @@ function pushOutgoing() {
   } catch {}
 }
 
-// The module hands each packet over twice (as it arrives, and again from its drain buffer for
-// packets that came while JavaScript was paused): open each one once.
-// More than the module's own buffer (500), so a drained burst never pushes out live ones.
-const RECENT_FRAMES = 1024;
-const recentFrames = new Set<string>();
-function firstTime(b64: string): boolean {
-  if (recentFrames.has(b64)) return false;
-  recentFrames.add(b64);
-  if (recentFrames.size > RECENT_FRAMES) recentFrames.delete(recentFrames.values().next().value as string);
-  return true;
-}
-
 export type NearbyEvent =
   | { kind: 'position'; position: Position; fromServer: boolean }
   | { kind: 'status'; status: NearbyStatusRow; fromServer: boolean }
@@ -430,7 +417,7 @@ function emit(e: NearbyEvent) {
 
 function receive(b64: string) {
   const s = session;
-  if (!s || !firstTime(b64)) return;
+  if (!s) return;
   let item: NearbyItem | null = null;
   try {
     item = s.mesh.receive(fromBase64(b64), Date.now());

@@ -46,9 +46,14 @@ export const MESSAGES_PER_MINUTE = 10;
  */
 export function chatMessageText(m: Pick<ChatMessage, 'kind' | 'body'>, translate: (text: string) => string): string {
   if (m.kind !== 'status') return m.body;
-  const said = m.body.trim().toLocaleLowerCase();
-  const builtIn = QUICK_REPLIES.find((q) => q.toLocaleLowerCase() === said);
+  const builtIn = builtInReply(m.body);
   return builtIn ? translate(builtIn) : m.body;
+}
+
+/** The built-in quick reply this text is (any case and spacing), if it is one. */
+export function builtInReply(body: string): QuickReply | undefined {
+  const said = body.replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+  return QUICK_REPLIES.find((q) => q.toLocaleLowerCase() === said);
 }
 
 /** One-tap replies for Ride Mode. Sent as kind 'status' so the chat can show them differently. */

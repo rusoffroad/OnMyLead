@@ -53,7 +53,8 @@ class NearbyRadio(
 ) {
   companion object {
     private const val MAX_PEERS = 8
-    private const val SUBSCRIBE_TRIES = 120
+    private const val SUBSCRIBE_TRIES = 20
+    private const val MAX_SUBSCRIBE_FAILS = 5
     private const val ROUND_MS = 4_000L
     // Low power (service, nobody in range, or Max Battery Saver): send less often and let the
     // chip scan and advertise in its low-power duty cycle. Phones that connect are served at once.
@@ -158,17 +159,7 @@ class NearbyRadio(
         try { context.unregisterReceiver(stateReceiver) } catch (_: Exception) {}
         stateReceiverOn = false
       }
-      try {
-        if (scanning) adapter?.bluetoothLeScanner?.stopScan(scanCallback)
-        if (advertising) adapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
-      } catch (_: Exception) {}
-      scanning = false
-      advertising = false
-      peers.values.forEach { it.gatt.close() }
-      peers.clear()
-      subscribers.clear()
-      server?.close()
-      server = null
+      resetLinks()
       thread.quitSafely()
     }
   }
@@ -456,7 +447,7 @@ class NearbyRadio(
   /**
    * Asks the peer for its packets (turns on notifications). The stack can refuse while another
    * request is still going (common right after discovery on Android 13+): no callback comes then,
-   * so writes aren't held back, and it is asked again every half second for as long as a minute.
+   * so writes aren't held back, and it is asked again every half second, up to SUBSCRIBE_TRIES times.
    */
   @Suppress("DEPRECATION")
   private fun subscribe(gatt: BluetoothGatt, out: BluetoothGattCharacteristic, tries: Int) {
@@ -537,10 +528,14 @@ class NearbyRadio(
         val p = peerOf(gatt) ?: return@post
         p.busy = false
         pump(p)
-        // The stack took the request but the peer refused it: ask again.
-        if (status != BluetoothGatt.GATT_SUCCESS && descriptor.uuid == CCCD) {
-          val out = descriptor.characteristic
-          if (out != null && ++p.subscribeFails < 10) handler.postDelayed({ subscribe(gatt, out, 1) }, 500)
+        // The stack took the request but the peer refused it: ask again, a few times per link.
+        if (descriptor.uuid == CCCD) {
+          if (status == BluetoothGatt.GATT_SUCCESS) {
+            p.subscribeFails = 0
+          } else {
+            val out = descriptor.characteristic
+            if (out != null && ++p.subscribeFails < MAX_SUBSCRIBE_FAILS) handler.postDelayed({ subscribe(gatt, out, 0) }, 500)
+          }
         }
       }
     }

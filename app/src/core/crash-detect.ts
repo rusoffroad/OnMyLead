@@ -6,8 +6,7 @@
  * bump that keeps rolling isn't one, and neither is a phone lifted out of its mount while parked:
  * the vehicle has to have been moving in the last few seconds. A dropped phone isn't one either: a
  * drop starts with a moment of free fall (the phone feels close to 0 g), so a hit right after a fall
- * is ignored when the vehicle is slow or parked (at driving speed the fall may be the vehicle in the
- * air, so the landing counts), and a phone left lying at an angle doesn't count as a rollover until it is back in
+ * is ignored, and a phone left lying at an angle doesn't count as a rollover until it is back in
  * its mount. The countdown is still there for anything that slips through. Pure logic: the screen
  * feeds in samples.
  */
@@ -90,12 +89,10 @@ export type CrashState = {
   displaced?: boolean;
   /** Since when a displaced phone has been back near level. */
   levelSince?: number | null;
-  /** When the phone last fell at driving speed (the vehicle in the air, or a phone off its mount). */
-  airborneAt?: number | null;
 };
 
 export const INITIAL_CRASH: CrashState = {
-  lastRidingAt: null, tippedSince: null, suspect: null, quietUntil: 0, fallingSince: null, droppedAt: null, displaced: false, levelSince: null, airborneAt: null,
+  lastRidingAt: null, tippedSince: null, suspect: null, quietUntil: 0, fallingSince: null, droppedAt: null, displaced: false, levelSince: null,
 };
 
 export type CrashStep = { state: CrashState; alarm: CrashCause | null };
@@ -128,30 +125,10 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
   const falling = s.feltG != null && Number.isFinite(s.feltG) && s.feltG < FREE_FALL_G;
   const fallingSince = falling ? (state.fallingSince ?? s.t) : null;
   const fell = fallingSince != null && s.t - fallingSince >= FREE_FALL_MS;
-  // At driving speed a free fall is as likely the vehicle in the air (a jump, a ledge, a roll) as a
-  // dropped phone, so the landing hit and a roll still count; a phone that only fell to the floor
-  // rides on and the "rode on" rule below clears it. Slower, a fall is taken as a dropped phone.
-  const airborne = speed != null && speed >= DROVE_ON_MPS;
-  const droppedAt = fell && !airborne ? s.t : (state.droppedAt ?? null);
+  const droppedAt = fell ? s.t : (state.droppedAt ?? null);
   const justDropped = droppedAt != null && s.t - droppedAt <= DROP_IGNORE_MS;
   // After a drop the tilt is the phone's, not the vehicle's, until it's back near level for a while.
-  // (Not right after a fall while moving: that may be the vehicle in the air, and a roll that ends
-  // it counts. If nothing came of it within SETTLE_WINDOW_MS and the phone still lies tipped while
-  // the rider drives on, it fell off its mount, and from then on its tilt is the phone's. A phone
-  // still upright in its mount after a clean landing is left alone.)
-  let airborneAt = fell && airborne ? s.t : (state.airborneAt ?? null);
-  let displaced = (fell && !airborne) || !!state.displaced;
-  if (airborneAt != null && !fell && s.t - airborneAt > SETTLE_WINDOW_MS) {
-    const lying = (s.roll != null && Math.abs(s.roll) >= th.rolloverDeg) || (s.pitch != null && Math.abs(s.pitch) >= th.rolloverDeg);
-    // A vehicle on its side doesn't move; a phone on the floor of one that does is off its mount.
-    const carryingOn = speed != null && speed >= STOPPED_MPS;
-    if (!lying) airborneAt = null;
-    else if (carryingOn) {
-      airborneAt = null;
-      displaced = true;
-    }
-    // Lying tipped and not driving on: that could be the vehicle on its side, so keep watching.
-  }
+  let displaced = fell || !!state.displaced;
   let levelSince = state.levelSince ?? null;
   if (displaced && !fell) {
     const level = s.roll != null && s.pitch != null && Math.abs(s.roll) < REMOUNT_DEG && Math.abs(s.pitch) < REMOUNT_DEG;
@@ -160,8 +137,8 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
       displaced = false;
       levelSince = null;
     }
-  } else if (fell && !airborne) levelSince = null;
-  const drop = { fallingSince, droppedAt, displaced, levelSince, airborneAt };
+  } else if (fell) levelSince = null;
+  const drop = { fallingSince, droppedAt, displaced, levelSince };
 
   const tipped =
     !displaced &&

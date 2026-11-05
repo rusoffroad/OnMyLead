@@ -8,7 +8,7 @@
  *
  * Riders can keep messages they send often as their own quick replies on this device.
  */
-import { QUICK_REPLIES } from './chat';
+import { builtInReply } from './chat';
 
 import { tc } from './i18n';
 /** Longest custom Ride Mode message: it is the push title, so it has to read at a glance. */
@@ -42,7 +42,7 @@ const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLower
 
 /** True when the message is already one of the built-in quick replies. */
 export function isBuiltInReply(body: string): boolean {
-  return QUICK_REPLIES.some((q) => same(q, tidyRideMessage(body)));
+  return !!builtInReply(body);
 }
 
 /**

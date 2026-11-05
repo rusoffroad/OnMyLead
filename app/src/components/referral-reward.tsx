@@ -65,7 +65,7 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
             ? t('Done. Your next Google Play bill moved back 6 months, to {date}.', {
                 date: new Date(d.expiresAt).toLocaleDateString(currentLocale(), { month: 'short', day: 'numeric', year: 'numeric' }),
               })
-            : t('Done. Your next Google Play bill moved back 6 months{v}.', { v: '' }));
+            : t('Done. Your next Google Play bill moved back 6 months.'));
       }
       onChanged();
     } finally {

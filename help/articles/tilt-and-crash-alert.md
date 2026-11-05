@@ -4,7 +4,7 @@ summary: See your vehicle's roll and pitch, get warned before a steep lean, and 
 category: safety-privacy
 order: 52
 release: "2.0"
-updated: 2026-11-05
+updated: 2026-11-04
 sources:
   - app/src/app/tilt.tsx
   - app/src/components/tilt-gauge.tsx
@@ -66,10 +66,6 @@ Crash Alert is on unless you turn it off. To turn it on or off, open the Tilt sc
 4. To cancel and stop Crash Alert for now, tap **I'm OK, Turn Off Crash Alert** under the buttons. Turn it back on from the top of the Tilt screen.
 
 Choose how easily it goes off under **Sensitivity** on the Tilt screen: **Low** (only very hard hits and full rollovers, fewer false alarms on rough trails), **Normal** (recommended) or **High** (also smaller hits and steep tips). A hard bump you keep riding through doesn't count, and neither does knocking the phone while parked. Dropping your phone doesn't count either: Crash Alert notices the moment of falling and ignores the landing, and a dropped phone lying at an angle doesn't count as a rollover until it's back in its mount. If something still sets it off by mistake, tap **I'm OK**.
-
-:::release 2.1
-At driving speed (about 10 mph and up), a moment of falling can be your vehicle in the air (a jump, a ledge or a roll), so a hard landing, or coming to rest on its side or roof, still counts as a crash. Slower than that, a fall is taken as a dropped phone, as before. A phone that slides to the floor while you keep driving doesn't set it off; if you stop right after it falls, the countdown may start: tap **I'm OK**.
-:::
 
 :::warning
 Crash Alert tells your group only. It doesn't call 911 or emergency services. It only works while Ride Mode is open and you've joined the ride. With no service the alert waits on your phone and sends as soon as it reconnects, and riders need service to receive it. See [Emergencies and Staying Safe](/help/emergency-and-safety).

@@ -2776,6 +2776,7 @@ const dict: Record<string, string> = {
   "{n} rides": "{n} rutas",
   "Poll: {body}": "Encuesta: {body}",
   "Done. Your next Google Play bill moved back 6 months{v}.": "Listo. Tu próxima factura de Google Play se retrasó 6 meses{v}.",
+  "Done. Your next Google Play bill moved back 6 months.": "Listo. Tu próxima factura de Google Play se retrasó 6 meses.",
   "Google Play didn’t answer. Your reward is saved; try again in a minute.": "Google Play no respondió. Tu recompensa está guardada; inténtalo de nuevo en un minuto.",
   "${discounted} for the first year instead of ${annual}": "${discounted} el primer año en lugar de ${annual}",
   "Couldn’t send the report. Try again.": "No se pudo enviar la denuncia. Inténtalo de nuevo.",

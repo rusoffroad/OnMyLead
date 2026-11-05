@@ -2776,6 +2776,7 @@ const dict: Record<string, string> = {
   "{n} rides": "라이드 {n}개",
   "Poll: {body}": "투표: {body}",
   "Done. Your next Google Play bill moved back 6 months{v}.": "완료. 다음 Google Play 결제가 6개월 미뤄졌습니다{v}.",
+  "Done. Your next Google Play bill moved back 6 months.": "완료. 다음 Google Play 결제가 6개월 미뤄졌습니다.",
   "Google Play didn’t answer. Your reward is saved; try again in a minute.": "Google Play가 응답하지 않았습니다. 보상은 저장되었습니다. 1분 후 다시 시도하세요.",
   "${discounted} for the first year instead of ${annual}": "첫해 ${annual} 대신 ${discounted}",
   "Couldn’t send the report. Try again.": "신고를 보낼 수 없습니다. 다시 시도하세요.",
