@@ -277,7 +277,7 @@ function FlatGroupMap({
         .map((r) => (
           <RiderMarker key={r.id} rider={r} mapHeading={mapHeading} onPress={onRiderPress} />
         ))}
-      <OwnHeadingMarker own={own} mapHeading={mapHeading} />
+      <OwnHeadingMarker own={own} mapHeading={mapHeading} everyMs={locationEveryMs} />
       {regroup ? (
         <Marker coordinate={{ latitude: regroup.lat, longitude: regroup.lng }} title={regroup.label ?? 'Regroup here'} pinColor={RideColors.yellow} />
       ) : null}

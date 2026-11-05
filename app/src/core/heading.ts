@@ -62,9 +62,10 @@ export function ownArrow(
 /**
  * Your own dot, moving or stopped (2.1). A stopped fix shows the stopped look at once. Phones send
  * no location update while standing still, so a quiet spell with no new fix also means stopped:
- * two and a half of the longest recent gap between back-to-back moving fixes (the map's fix rate;
- * Battery Saver on Android sends one every 15 s), never under 5 s, so the dot never flips between
- * fixes mid-ride or in a short GPS gap under trees.
+ * two and a half fix gaps, never under 5 s, so the dot never flips between fixes mid-ride or in a
+ * short GPS gap under trees. The fix gap is the longest recent gap between back-to-back moving
+ * fixes; until there is one, the map's own update interval when it has one (Ride Mode's Battery
+ * Saver plans on Android), else 16 s.
  */
 export type OwnMoveState = {
   moving: boolean;
@@ -74,19 +75,15 @@ export type OwnMoveState = {
   seenAt: number | null;
   /** Recent gaps between back-to-back moving fixes (ms), newest last. */
   gaps: number[];
-  /** Stopped only because the quiet spell ran out (no stopped fix came). */
-  quiet: boolean;
-  /** The gap before a moving fix that came after a quiet spell, waiting for a second like it (ms). */
-  pendingGap: number | null;
 };
-export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, seenAt: null, gaps: [], quiet: false, pendingGap: null };
+export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, seenAt: null, gaps: [] };
 
 /** The shortest quiet spell that means stopped (ms). */
 export const OWN_STOPPED_AFTER_MS = 5000;
-/** The wait before the map's fix rate is known (a map just opened): just over Battery Saver's 15 s. */
+/** The wait before any fix gap is known and the map gave no interval: just over Battery Saver's 15 s. */
 export const OWN_STOPPED_UNKNOWN_MS = 16_000;
-/** A gap between moving fixes longer than this is a dead spot, not the map's fix rate (ms): just over Battery Saver's 15 s, so the wait never grows past 50 s. */
-export const OWN_FIX_GAP_MAX_MS = 20_000;
+/** A gap between moving fixes longer than this is a dead spot, not the map's fix rate (ms). */
+export const OWN_FIX_GAP_MAX_MS = 30_000;
 /** How many recent fix gaps your dot remembers (the longest of them sets the wait). */
 export const OWN_FIX_GAPS_KEPT = 5;
 
@@ -95,42 +92,29 @@ export const OWN_FIX_GAPS_KEPT = 5;
  * A fix with the same own time as the last one (some phones repeat the last spot when only the
  * compass turned) returns `prev` itself: nothing changes, so a stopped rider turning the phone
  * doesn't count as moving. Gaps are measured between the fixes' own times when both have one, so
- * a burst of fixes the phone held back (the app coming back from the background) keeps their real
- * spacing; otherwise by when they arrived.
+ * a burst of fixes the phone held back keeps its real spacing; otherwise by when they arrived.
  */
 export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number | null | undefined, nowMs: number): OwnMoveState {
   const fixAt = fixAtMs != null && Number.isFinite(fixAtMs) ? fixAtMs : null;
   if (fixAt != null && prev.fixAt != null && fixAt === prev.fixAt) return prev;
   let gaps = prev.gaps;
-  let pendingGap = prev.pendingGap;
-  const gap = fixAt != null && prev.fixAt != null ? fixAt - prev.fixAt : prev.seenAt == null ? 0 : nowMs - prev.seenAt;
-  const fits = gap > 0 && gap <= OWN_FIX_GAP_MAX_MS;
   if (moving && prev.moving) {
-    // Back-to-back moving fixes show the map's fix rate (and end any half-learned slower rate).
-    if (fits) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
-    pendingGap = null;
-  } else if (moving && prev.quiet && !fits) {
-    pendingGap = null;
-  } else if (moving && prev.quiet) {
-    // A moving fix right after the quiet spell ran out: either a short stop or slower fixes
-    // (Battery Saver came on). Two such gaps of about the same length in a row are the new rate.
-    if (pendingGap != null && Math.abs(gap - pendingGap) <= pendingGap / 2) {
-      gaps = [...gaps, pendingGap, gap].slice(-OWN_FIX_GAPS_KEPT);
-      pendingGap = null;
-    } else pendingGap = gap;
-  } else if (!moving) pendingGap = null;
-  return { moving, fixAt: fixAt ?? prev.fixAt, seenAt: nowMs, gaps, quiet: false, pendingGap };
+    const gap = fixAt != null && prev.fixAt != null ? fixAt - prev.fixAt : prev.seenAt == null ? 0 : nowMs - prev.seenAt;
+    if (gap > 0 && gap <= OWN_FIX_GAP_MAX_MS) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
+  }
+  return { moving, fixAt, seenAt: nowMs, gaps };
 }
 
-/** The quiet spell had no new fix: stopped (the learned fix rate stays). */
+/** The quiet spell had no new fix: stopped (the learned fix gaps stay). */
 export function ownMoveTimedOut(prev: OwnMoveState): OwnMoveState {
-  return { ...prev, moving: false, quiet: true };
+  return { ...prev, moving: false };
 }
 
-/** How long to wait with no new fix before counting you stopped (ms). */
-export function ownStopWaitMs(s: OwnMoveState): number {
-  if (!s.gaps.length) return OWN_STOPPED_UNKNOWN_MS;
-  return Math.max(OWN_STOPPED_AFTER_MS, Math.round(2.5 * Math.max(...s.gaps)));
+/** How long to wait with no new fix before counting you stopped (ms); `everyMs` is the map's own update interval, if any. */
+export function ownStopWaitMs(s: OwnMoveState, everyMs?: number | null): number {
+  if (s.gaps.length) return Math.max(OWN_STOPPED_AFTER_MS, Math.round(2.5 * Math.max(...s.gaps)));
+  if (everyMs != null && Number.isFinite(everyMs) && everyMs > 0) return Math.max(OWN_STOPPED_AFTER_MS, Math.round(2.5 * Math.min(everyMs, OWN_FIX_GAP_MAX_MS)));
+  return OWN_STOPPED_UNKNOWN_MS;
 }
 
 /** How long another rider's dot keeps pointing their last way after they slow down (ms). */

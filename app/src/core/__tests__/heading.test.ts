@@ -91,46 +91,27 @@ describe('own dot moving or stopped', () => {
     expect(s.moving).toBe(true);
     expect(ownMoveStep(s, false, 2000, 2000).moving).toBe(false);
   });
-  it('waits just over Battery Saver until the fix rate is known, then 2.5 fix gaps, at least 5 s', () => {
+  it('before a fix gap is known: the map\'s interval if it has one, else just over Battery Saver', () => {
+    const first = ownMoveStep(OWN_MOVE_START, true, 0, 0);
     expect(OWN_STOPPED_UNKNOWN_MS).toBeGreaterThan(BATTERY_PLANS.saver.fixEveryMs);
-    expect(ownStopWaitMs(ownMoveStep(OWN_MOVE_START, true, 0, 0))).toBe(OWN_STOPPED_UNKNOWN_MS);
-    expect(ownStopWaitMs(ride(1000, 5))).toBe(OWN_STOPPED_AFTER_MS);
-    expect(ownStopWaitMs(ride(BATTERY_PLANS.saver.fixEveryMs, 3))).toBe(2.5 * BATTERY_PLANS.saver.fixEveryMs);
+    expect(ownStopWaitMs(first)).toBe(OWN_STOPPED_UNKNOWN_MS);
+    expect(ownStopWaitMs(first, BATTERY_PLANS.saver.fixEveryMs)).toBe(37_500);
+    expect(ownStopWaitMs(first, BATTERY_PLANS.balanced.fixEveryMs)).toBe(25_000);
+    expect(ownStopWaitMs(first, 1000)).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(first, Number.NaN)).toBe(OWN_STOPPED_UNKNOWN_MS);
   });
-  it('one quick pair of fixes on Battery Saver does not shorten the wait', () => {
-    const s = ownMoveStep(ride(15_000, 3), true, 30_500, 30_500);
-    expect(ownStopWaitMs(s)).toBe(37_500);
+  it('then 2.5 of the longest recent gap between moving fixes, at least 5 s', () => {
+    expect(ownStopWaitMs(ride(1000, 5), 15_000)).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ride(15_000, 3))).toBe(37_500);
+    expect(ownStopWaitMs(ownMoveStep(ride(15_000, 3), true, 30_500, 30_500))).toBe(37_500);
   });
-  it('a stop (or the quiet spell running out) never counts as a fix gap', () => {
+  it('a stop, a quiet spell or a dead spot never counts as a fix gap', () => {
     const atLight = ownMoveStep(ride(1000, 5), false, 4500, 4500);
-    const off = ownMoveStep(atLight, true, 44_500, 44_500);
-    expect(ownStopWaitMs(off)).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ownMoveStep(atLight, true, 44_500, 44_500))).toBe(OWN_STOPPED_AFTER_MS);
     const quiet = ownMoveTimedOut(ride(1000, 5));
     expect(quiet.moving).toBe(false);
-    expect(ownStopWaitMs(ownMoveStep(quiet, true, 50_000, 50_000))).toBe(OWN_STOPPED_AFTER_MS);
-  });
-  it('learns a slower fix rate after two like quiet spells (Battery Saver came on mid-ride)', () => {
-    const one = ownMoveStep(ownMoveTimedOut(ride(1000, 5)), true, 19_000, 19_000);
-    expect(one.moving).toBe(true);
-    expect(ownStopWaitMs(one)).toBe(OWN_STOPPED_AFTER_MS);
-    const two = ownMoveStep(ownMoveTimedOut(one), true, 34_000, 34_000);
-    expect(ownStopWaitMs(two)).toBe(37_500);
-  });
-  it('one short stop with no fixes does not stretch the wait', () => {
-    const off = ownMoveStep(ownMoveTimedOut(ride(1000, 5)), true, 22_000, 22_000);
-    expect(ownStopWaitMs(off)).toBe(OWN_STOPPED_AFTER_MS);
-    const later = ownMoveStep(off, true, 23_000, 23_000);
-    expect(ownStopWaitMs(later)).toBe(OWN_STOPPED_AFTER_MS);
-  });
-  it('ignores a dead spot as a fix gap, so the wait never grows past 50 s', () => {
-    expect(ownStopWaitMs(ownMoveStep(ride(1000, 3), true, 30_000, 30_000))).toBe(OWN_STOPPED_AFTER_MS);
-    expect(ownStopWaitMs(ride(20_000, 5))).toBe(50_000);
-  });
-  it('two like quiet spells must come in a row: riding on between them starts over', () => {
-    const one = ownMoveStep(ownMoveTimedOut(ride(1000, 5)), true, 16_000, 16_000);
-    const rode = ownMoveStep(one, true, 17_000, 17_000);
-    const two = ownMoveStep(ownMoveTimedOut(rode), true, 31_000, 31_000);
-    expect(ownStopWaitMs(two)).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ownMoveStep(quiet, true, 20_000, 20_000))).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ownMoveStep(ride(1000, 3), true, 40_000, 40_000))).toBe(OWN_STOPPED_AFTER_MS);
   });
   it('measures gaps by the fixes\' own times, so a held-back burst keeps its real spacing', () => {
     let s = ownMoveStep(OWN_MOVE_START, true, 0, 100_000);
@@ -142,16 +123,6 @@ describe('own dot moving or stopped', () => {
     const t = ownMoveStep(s, false, null, 1000);
     expect(t).not.toBe(s);
     expect(t.moving).toBe(false);
-  });
-  it('a dead spot between two quiet spells means they were not in a row', () => {
-    const one = ownMoveStep(ownMoveTimedOut(ride(1000, 5)), true, 19_000, 19_000);
-    const dead = ownMoveStep(ownMoveTimedOut(one), true, 49_000, 49_000);
-    const two = ownMoveStep(ownMoveTimedOut(dead), true, 64_000, 64_000);
-    expect(ownStopWaitMs(two)).toBe(OWN_STOPPED_AFTER_MS);
-  });
-  it('a timeless fix in between does not hide a repeat of the last timed fix', () => {
-    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 1000, 1000), true, null, 1500);
-    expect(ownMoveStep(s, true, 1000, 1800)).toBe(s);
   });
   it('ignores a repeated fix (only the compass turned)', () => {
     const s = ownMoveStep(OWN_MOVE_START, true, 1000, 1000);

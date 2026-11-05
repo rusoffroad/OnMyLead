@@ -53,10 +53,10 @@ export function useOwnLocation(onFix?: (f: OwnFix) => void): OwnLocation {
  * arrow built in as on the Mapbox maps, drawn over the dot the phone draws itself. The arrow always
  * shows: the GPS direction while moving, the compass when stopped, else the last direction.
  */
-export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHeading?: number | null }) {
+export function OwnHeadingMarker({ own, mapHeading, everyMs }: { own: OwnLocation; mapHeading?: number | null; /** The map's own update interval (ms), if it sets one. */ everyMs?: number }) {
   const [fix, setFix] = useState<OwnFix | null>(own.last.current);
   const [lastCourse, setLastCourse] = useState<number | null>(null);
-  const [moving, feed] = useOwnMoving();
+  const [moving, feed] = useOwnMoving(everyMs);
   useEffect(() => own.subscribe((f) => {
     setFix(f);
     feed(f.headingDeg != null, f.atMs);
