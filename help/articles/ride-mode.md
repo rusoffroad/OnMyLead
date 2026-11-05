@@ -119,7 +119,13 @@ A blue line follows behind the leader, showing exactly where they rode. When the
 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
 
+:::until 2.1
 To switch map layers or download the ride's map for riding with no signal, use the layers button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
+:::
+
+:::release 2.1
+To switch map layers or download the ride's map for riding with no signal, use the round **Map Settings** button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
+:::
 
 :::release 1.0.2
 ### Center the Map on You

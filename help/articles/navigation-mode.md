@@ -85,8 +85,15 @@ On a tablet, the panel sits beside the map in landscape, and floats over the cor
 **Explore** shows your speed and elevation, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
 :::
 
-:::release 2.0
+:::until 2.1
 **Explore** shows your speed big on the left, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
+:::
+
+:::release 2.1
+**Explore** shows your speed big on the left, with the map centered on you. Use the round **Map Settings** button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
+:::
+
+:::release 2.0
 
 Next to your speed are four readings:
 

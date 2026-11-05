@@ -50,7 +50,7 @@ Tapping **Center on Me**, or picking Follow Me back up after a pause, starts fre
 
 While the map is following you and you're moving, it zooms in as you come up on a junction of roads or trails, about 9 seconds before you reach it, so you can see the turn up close. Once you're through, it zooms back out to where it was. It works with any road, track or trail drawn on the map, including on a downloaded map with no signal.
 
-**Zoom In at Intersections** is on until you turn it off in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
+**Zoom In at Intersections** is on until you turn it off, either in [Map Settings](/help/map-layers) under **Following** or in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
 
 ## Your Dot
 

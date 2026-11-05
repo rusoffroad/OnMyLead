@@ -25,7 +25,13 @@ related: [follow-me, ride-mode, navigation-mode, route-builder, waypoints-and-pl
 keywords: [full map, full screen, bigger map, more map, hide buttons, hide controls, show controls, map only]
 ---
 
+:::until 2.1
 Every map in OnMyLead can fill your whole screen. **Full Map** tucks the top bar, the layers button and the panel away, and leaves one slim bar at the bottom so you can bring everything back with one tap.
+:::
+
+:::release 2.1
+Every map in OnMyLead can fill your whole screen. **Full Map** tucks the top bar, the Map Settings button and the panel away, and leaves one slim bar at the bottom so you can bring everything back with one tap.
+:::
 
 ## Turn On Full Map
 
