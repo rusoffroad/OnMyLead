@@ -12,13 +12,22 @@ let current: number | null = null;
 const listeners = new Set<(deg: number | null) => void>();
 let sub: { remove: () => void } | null = null;
 let starting = false;
+let retry: ReturnType<typeof setTimeout> | null = null;
 
 function start() {
   if (Platform.OS === 'web' || sub || starting) return;
   starting = true;
   Location.getForegroundPermissionsAsync()
     .then((p) => {
-      if (p.status !== 'granted' || !listeners.size) return null;
+      if (!listeners.size) return null;
+      if (p.status !== 'granted') {
+        // A map can open before the rider answers the location prompt: look again shortly.
+        retry ??= setTimeout(() => {
+          retry = null;
+          if (listeners.size) start();
+        }, 5000);
+        return null;
+      }
       return Location.watchHeadingAsync((h) => {
         const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading;
         if (!(deg >= 0)) return;
@@ -41,6 +50,8 @@ function start() {
 function stop() {
   sub?.remove();
   sub = null;
+  if (retry) clearTimeout(retry);
+  retry = null;
 }
 
 /** The compass heading while the calling component is on screen, or null when there is none. */
@@ -55,4 +66,22 @@ export function useCompass(): number | null {
     };
   }, []);
   return deg;
+}
+
+/**
+ * Whether the compass has given a reading while the calling component is on screen. Changes only
+ * once, so a component that needs just this doesn't redraw on every turn.
+ */
+export function useHasCompass(): boolean {
+  const [has, setHas] = useState(current != null);
+  useEffect(() => {
+    const l = (deg: number | null) => setHas(deg != null);
+    listeners.add(l);
+    start();
+    return () => {
+      listeners.delete(l);
+      if (!listeners.size) stop();
+    };
+  }, []);
+  return has;
 }

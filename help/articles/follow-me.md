@@ -53,7 +53,7 @@ While the map is following you and you're moving, it zooms in as you come up on 
 
 ## Your Dot
 
-Your own dot has an arrow built into it and a soft beam ahead of it (Safety Orange unless you pick another **Dot Style** in [Map Settings](/help/map-layers)). The arrow always shows which way you're facing: the direction you're riding while you move, and your phone's compass when you're stopped, so it turns as you turn. The beam is long while you ride and shorter when you stop. It stays true when you turn the map. If your phone or tablet has no compass reading while you're stopped, the dot shows a round centre with no arrow instead of guessing a direction.
+Your own dot has an arrow built into it and a soft beam ahead of it (Safety Orange unless you pick another **Dot Style** in [Map Settings](/help/map-layers)). The arrow always shows which way you're facing: the direction you're riding while you move, and your phone's compass when you're stopped, so it turns as you turn. The beam is long while you ride and shorter when you stop. It stays true when you turn the map. In the iPhone, iPad and Android apps, if your device has no compass reading while you're stopped, the dot shows a round centre with no arrow instead of guessing a direction.
 :::
 
 ## The Follow Me Button

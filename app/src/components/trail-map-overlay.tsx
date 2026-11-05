@@ -17,7 +17,7 @@ import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInf
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { can, type FeatureKey } from '@/core/entitlements';
-import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
+import { currentEntitlements, PRO_PROMPT_WAITS_FOR_DISMISS, requirePro, useCan } from '@/lib/pro';
 import { RateTrailSheet } from './rate-trail-sheet';
 import { RigFitLine, TrailWidthRow } from './trail-width-row';
 import { inches } from '@/core/trail-width';
@@ -205,13 +205,11 @@ function MapSettingsSheet({
   // A tablet in landscape (or a wide window) keeps the map in view: the sheet docks on the right.
   const side = layout.wide && layout.landscape;
   const bases: BaseMap[] = trail.terrainAvailable ? ['satellite', 'topo', 'terrain'] : ['satellite', 'topo'];
-  // iPhone and iPad: the prompt waits until the sheet has fully gone (onDismiss). Android and the
-  // website show it over the closing sheet straight away.
   const pendingPro = useRef<FeatureKey | null>(null);
   const pro = useCallback((feature: FeatureKey) => {
     if (can(currentEntitlements(), feature)) return true;
     onClose();
-    if (Platform.OS === 'ios') pendingPro.current = feature;
+    if (PRO_PROMPT_WAITS_FOR_DISMISS) pendingPro.current = feature;
     else requirePro(feature);
     return false;
   }, [onClose]);

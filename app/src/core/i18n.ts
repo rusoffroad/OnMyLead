@@ -159,12 +159,15 @@ export function tc(text: string, vars?: Record<string, string | number | null | 
  * (each language's "{n} (ordinal)" entry, with "1 (ordinal)" for languages that say first differently).
  */
 export function ordinal(n: number): string {
-  if (coreLocaleTag.toLowerCase().startsWith('en')) {
+  const english = () => {
     const t = n % 100;
     if (t >= 11 && t <= 13) return `${n}th`;
     return `${n}${({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[n % 10] ?? 'th'}`;
-  }
-  return n === 1 ? tc('1 (ordinal)') : tc('{n} (ordinal)', { n });
+  };
+  if (coreLocaleTag.toLowerCase().startsWith('en')) return english();
+  const said = n === 1 ? tc('1 (ordinal)') : tc('{n} (ordinal)', { n });
+  // A language without these lines yet reads the English place rather than the key.
+  return said.endsWith(' (ordinal)') ? english() : said;
 }
 
 /** The rider's BCP-47 tag for dates and numbers built in core/ ('en-US' in tests). */

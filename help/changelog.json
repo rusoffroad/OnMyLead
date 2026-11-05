@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["offline-maps", "park-trails"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-50",
+    "why": "2.1 release test, pass 50. Steps that said to tap the layers button now say Map Settings (and Fine-Tune for the Park Trails row), matching 2.1."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["follow-me"],
     "kind": "update",
     "by": "pr",

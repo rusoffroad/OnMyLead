@@ -21,7 +21,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 import { riderHeading } from '@/core/heading';
-import { useCompass } from '@/lib/compass';
+import { useHasCompass } from '@/lib/compass';
 import { dotScale } from '@/core/dot-size';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
 
@@ -341,8 +341,8 @@ const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.Mutabl
   // The images are drawn at Medium; Mapbox scales them for the rider's Dot Size.
   const [size] = useDotSizePref();
   const [style] = useDotStylePref();
-  const compass = useCompass();
-  const kind = moving ? 'moving' : compass != null ? 'stopped' : 'still';
+  const hasCompass = useHasCompass();
+  const kind = moving ? 'moving' : hasCompass ? 'stopped' : 'still';
   useEffect(() => {
     feedRef.current = setMoving;
     return () => {
