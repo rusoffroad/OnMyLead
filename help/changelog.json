@@ -1,4 +1,12 @@
 [
+  {
+    "date": "2026-11-05",
+    "slugs": ["tilt-and-crash-alert"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-81",
+    "why": "2.1 test pass 81: only iPhone and iPad close an open sheet for the Crash Alert countdown (Android and the website show it over the sheet, so nothing typed is lost); the guide now says so."
+  },
   {"date": "2026-11-05", "slugs": ["approvals-and-waitlist", "badges-and-ranks", "bluetooth-sharing", "carplay", "directions", "emergency-and-safety", "faq", "follow-me", "fuel-range", "invite-riders", "music-controls", "navigation-mode", "profile-picture", "qr-codes", "report-and-block", "ride-chat", "ride-mode", "social", "subscribe-to-pro", "tilt-and-crash-alert"], "kind": "fix", "by": "pr", "ref": "release-test-pass-80", "why": "2.1 test pass 80: on iPhone and iPad an open sheet or pop-up (Status, Music, Rider List, messages and the rest) could keep the Crash Alert countdown from showing; every sheet now closes so the countdown fills the screen. Map Mode starts the compass right after Allow. The Ride Mode and Navigate guides and the 2.1 release notes no longer call your dot cyan (it's Safety Orange unless you pick another Dot Style), and Follow Me says which maps show a round centre with no compass. Other guides only re-dated: their screens' sheets changed underneath, nothing riders do changed."},
   {
     "date": "2026-11-05",

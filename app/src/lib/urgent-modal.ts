@@ -34,9 +34,13 @@ export function useUrgentModal(): boolean {
   return !ONE_SHEET_AT_A_TIME || up === 0;
 }
 
-/** For a sheet: whether an urgent screen is waiting (the sheet should close). */
+/**
+ * For a sheet: whether it should close for an urgent screen. Only on iPhone and iPad; elsewhere
+ * the urgent screen shows over the sheet, which stays as it was (and keeps what the rider typed).
+ */
 export function useUrgentWaiting(): boolean {
-  return useSyncExternalStore(subscribe, () => urgent > 0, () => urgent > 0);
+  const waiting = useSyncExternalStore(subscribe, () => urgent > 0, () => urgent > 0);
+  return ONE_SHEET_AT_A_TIME && waiting;
 }
 
 /**
@@ -67,8 +71,8 @@ export function useSheetUp(visible: boolean): () => void {
       return;
     }
     // iPhone and iPad: onDismiss reports the end of the close; in case it never comes, give up
-    // waiting just after the close animation would have finished.
-    const t = setTimeout(down, 700);
+    // waiting well after the close animation (about 0.3 s) would have finished, even on a busy phone.
+    const t = setTimeout(down, 1500);
     return () => clearTimeout(t);
   }, [visible]);
   useEffect(() => down, []);
