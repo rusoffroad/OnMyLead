@@ -3231,6 +3231,23 @@ const dict: Record<string, string> = {
   "Off for Everyone": "Desligada para todos",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Mostra por onde você guiou no mapa de cada piloto. Se cruzar de novo, a passagem anterior fica apagada.",
   "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Desligar a linha do líder ainda não está disponível. Vai funcionar com a próxima atualização do servidor.",
+  "Map Settings": "Ajustes do Mapa",
+  "Map style, roads, trails, land and the buttons on the map": "Estilo do mapa, estradas, trilhas, terras e os botões do mapa",
+  "On the Map": "No Mapa",
+  "Every Map Feature": "Todos os Elementos do Mapa",
+  "Fine-Tune": "Ajustar",
+  "Map Buttons": "Botões do Mapa",
+  "Music Button": "Botão de Música",
+  "Streets and Roads": "Ruas e Estradas",
+  "Land Boundaries": "Limites de Terras",
+  "Highways, paved roads and dirt roads": "Rodovias, estradas pavimentadas e estradas de terra",
+  "Motorized trails, tracks and width limits": "Trilhas motorizadas, caminhos e limites de largura",
+  "Foot and horse trails": "Trilhas a pé e a cavalo",
+  "National forests, BLM, parks and property lines": "Florestas nacionais, BLM, parques e divisas de propriedade",
+  "The map moves with you as you ride.": "O mapa acompanha você enquanto anda.",
+  "Closes in on a turn as you reach it, then zooms back out.": "Aproxima um cruzamento quando você chega e depois afasta de novo.",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "Inclinação lateral e frontal no mapa. Calibre na tela de Inclinação.",
+  "Play, pause, skip and volume without leaving the map.": "Tocar, pausar, pular e volume sem sair do mapa.",
 };
 
 export default dict;

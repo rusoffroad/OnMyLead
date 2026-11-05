@@ -3231,6 +3231,23 @@ const dict: Record<string, string> = {
   "Off for Everyone": "Disattivata per tutti",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Mostra dove hai guidato sulla mappa di ogni pilota. Se la incroci di nuovo, il passaggio precedente si attenua.",
   "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Disattivare la traccia del leader non è ancora disponibile. Funzionerà con il prossimo aggiornamento del server.",
+  "Map Settings": "Impostazioni Mappa",
+  "Map style, roads, trails, land and the buttons on the map": "Stile mappa, strade, sentieri, terreni e i pulsanti sulla mappa",
+  "On the Map": "Sulla Mappa",
+  "Every Map Feature": "Tutti gli Elementi della Mappa",
+  "Fine-Tune": "Regola",
+  "Map Buttons": "Pulsanti della Mappa",
+  "Music Button": "Pulsante Musica",
+  "Streets and Roads": "Strade e Vie",
+  "Land Boundaries": "Confini dei Terreni",
+  "Highways, paved roads and dirt roads": "Autostrade, strade asfaltate e sterrate",
+  "Motorized trails, tracks and width limits": "Sentieri motorizzati, piste e limiti di larghezza",
+  "Foot and horse trails": "Sentieri a piedi e a cavallo",
+  "National forests, BLM, parks and property lines": "Foreste nazionali, BLM, parchi e confini di proprietà",
+  "The map moves with you as you ride.": "La mappa si muove con te mentre guidi.",
+  "Closes in on a turn as you reach it, then zooms back out.": "Ingrandisce un incrocio quando ci arrivi, poi torna indietro.",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "Rollio e beccheggio sulla mappa. Calibralo nella schermata Inclinazione.",
+  "Play, pause, skip and volume without leaving the map.": "Riproduci, pausa, salta e volume senza lasciare la mappa.",
 };
 
 export default dict;

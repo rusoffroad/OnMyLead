@@ -3231,6 +3231,23 @@ const dict: Record<string, string> = {
   "Off for Everyone": "Nonaktif untuk semua",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Menunjukkan jalur yang Anda pimpin di peta setiap pengendara. Jika dilintasi lagi, lintasan lama memudar.",
   "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Mematikan garis pemimpin belum tersedia. Fitur ini akan berfungsi setelah pembaruan server berikutnya.",
+  "Map Settings": "Pengaturan Peta",
+  "Map style, roads, trails, land and the buttons on the map": "Gaya peta, jalan, jalur, lahan, dan tombol di peta",
+  "On the Map": "Di Peta",
+  "Every Map Feature": "Semua Fitur Peta",
+  "Fine-Tune": "Atur Detail",
+  "Map Buttons": "Tombol Peta",
+  "Music Button": "Tombol Musik",
+  "Streets and Roads": "Jalan dan Jalan Raya",
+  "Land Boundaries": "Batas Lahan",
+  "Highways, paved roads and dirt roads": "Jalan tol, jalan aspal, dan jalan tanah",
+  "Motorized trails, tracks and width limits": "Jalur bermotor, jalan setapak, dan batas lebar",
+  "Foot and horse trails": "Jalur pejalan kaki dan berkuda",
+  "National forests, BLM, parks and property lines": "Hutan nasional, BLM, taman, dan batas properti",
+  "The map moves with you as you ride.": "Peta bergerak bersama Anda saat berkendara.",
+  "Closes in on a turn as you reach it, then zooms back out.": "Memperbesar persimpangan saat Anda tiba, lalu memperkecil lagi.",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "Kemiringan samping dan depan di peta. Kalibrasi di layar Kemiringan.",
+  "Play, pause, skip and volume without leaving the map.": "Putar, jeda, lewati, dan atur volume tanpa meninggalkan peta.",
 };
 
 export default dict;

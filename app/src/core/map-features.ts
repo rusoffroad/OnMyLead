@@ -197,6 +197,39 @@ export function anyLand(f: FeatureChoices): boolean {
   return LAND_FEATURES.some((id) => f[id]);
 }
 
+/**
+ * Map Settings' four big switches (2.1): one tap for the kinds of lines riders think in. Each
+ * covers a few Map Features; the full list stays under "Every Map Feature" for fine-tuning.
+ */
+export type QuickLayerId = 'streets' | 'offroad' | 'hiking' | 'land';
+export type QuickLayer = { id: QuickLayerId; name: string; detail: string; features: MapFeatureId[]; sample: MapFeatureId };
+
+export const QUICK_LAYERS: QuickLayer[] = [
+  { id: 'streets', name: 'Streets and Roads', detail: 'Highways, paved roads and dirt roads', features: ['highways', 'roads', 'dirtRoads', 'streetLegal'], sample: 'roads' },
+  { id: 'offroad', name: 'Off-Road Trails', detail: 'Motorized trails, tracks and width limits', features: ['offroad', 'narrow'], sample: 'offroad' },
+  { id: 'hiking', name: 'Hiking Trails', detail: 'Foot and horse trails', features: ['hiking'], sample: 'hiking' },
+  { id: 'land', name: 'Land Boundaries', detail: 'National forests, BLM, parks and property lines', features: LAND_FEATURES, sample: 'nationalForest' },
+];
+
+/** A quick switch is on when any of its features shows, so a rider who fine-tuned one still sees it lit. */
+export function quickLayerOn(f: FeatureChoices, q: QuickLayer): boolean {
+  return q.features.some((id) => f[id]);
+}
+
+/** The features to change when a quick switch is tapped: all of them on, or all of them off. */
+export function quickLayerToggle(f: FeatureChoices, q: QuickLayer): { id: MapFeatureId; on: boolean }[] {
+  const next = !quickLayerOn(f, q);
+  // Land turning on starts with the public land only: property lines are heavy and Texas-only.
+  const ids = q.id === 'land' && next ? q.features.filter((id) => id !== 'private') : q.features;
+  return ids.filter((id) => f[id] !== next).map((id) => ({ id, on: next }));
+}
+
+/** Whether anything differs from what a new rider sees (the Layers button shows a small dot). */
+export function featuresChanged(f: FeatureChoices): boolean {
+  const d = defaultFeatures();
+  return MAP_FEATURE_IDS.some((id) => f[id] !== d[id]);
+}
+
 /** A short, steady name for a set of choices, used to tell map squares drawn for different choices apart. */
 export function featureKey(ids: MapFeatureId[]): string {
   return ids.map((id) => MAP_FEATURE_IDS.indexOf(id).toString(36)).sort().join('');

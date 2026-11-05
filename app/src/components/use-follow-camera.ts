@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react';
 import { FOLLOW_FRAME_START, followFrameAfter, followMove, leadInset } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { riderHeading, screenAngle } from '@/core/heading';
-import { JUNCTION_AHEAD_M, JUNCTION_ZOOM_START, junctionZoomStep, nextJunction } from '@/core/intersections';
+import { JUNCTION_AHEAD_M, JUNCTION_LOOK_EVERY_MS, JUNCTION_ZOOM_START, junctionZoomStep, nextJunction } from '@/core/intersections';
 import type { Inset } from '@/core/map-center';
 import { metersPerPointAt } from '@/core/terrain';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
@@ -34,6 +34,7 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
   const frame = useRef(FOLLOW_FRAME_START);
   const junction = useRef(JUNCTION_ZOOM_START);
   const busy = useRef(false);
+  const lookedAt = useRef(0);
 
   const start = useCallback((p: LatLng, inset: Inset, animated = true) => {
     frame.current = FOLLOW_FRAME_START;
@@ -61,7 +62,8 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       const j = junction.current;
       if (on.current || j.state === 'in') {
         let ahead: { at: LatLng; distM: number } | null = null;
-        if (j.state === 'idle' && heading != null) {
+        if (j.state === 'idle' && heading != null && Date.now() - lookedAt.current >= JUNCTION_LOOK_EVERY_MS) {
+          lookedAt.current = Date.now();
           const radius = Math.min(700, JUNCTION_AHEAD_M / Math.max(0.05, metersPerPointAt(f.lat, cam.zoom)));
           ahead = nextJunction(f, heading, await m.roadsNear(f, radius));
         }

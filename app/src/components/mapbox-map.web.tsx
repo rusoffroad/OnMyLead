@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
-import { junctionLines } from '@/core/intersections';
+import { JUNCTION_QUERY_FILTER, junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
 import {
@@ -340,7 +340,7 @@ export function MapboxMap({
       if (!map) return [];
       const pt = map.project([p.lng, p.lat]);
       try {
-        const fs = map.queryRenderedFeatures([[pt.x - radiusPt, pt.y - radiusPt], [pt.x + radiusPt, pt.y + radiusPt]]);
+        const fs = map.queryRenderedFeatures([[pt.x - radiusPt, pt.y - radiusPt], [pt.x + radiusPt, pt.y + radiusPt]], { filter: JUNCTION_QUERY_FILTER as never });
         return junctionLines(fs as never);
       } catch {
         return [];

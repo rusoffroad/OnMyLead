@@ -3231,6 +3231,23 @@ const dict: Record<string, string> = {
   "Off for Everyone": "Выключен для всех",
   "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Показывает, где вы вели группу, на карте каждого райдера. Если пересечь трек снова, старый проход бледнеет.",
   "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Выключение трека лидера пока недоступно. Оно заработает после следующего обновления сервера.",
+  "Map Settings": "Настройки Карты",
+  "Map style, roads, trails, land and the buttons on the map": "Стиль карты, дороги, тропы, земли и кнопки на карте",
+  "On the Map": "На Карте",
+  "Every Map Feature": "Все Элементы Карты",
+  "Fine-Tune": "Настроить",
+  "Map Buttons": "Кнопки Карты",
+  "Music Button": "Кнопка Музыки",
+  "Streets and Roads": "Улицы и Дороги",
+  "Land Boundaries": "Границы Земель",
+  "Highways, paved roads and dirt roads": "Шоссе, асфальтированные и грунтовые дороги",
+  "Motorized trails, tracks and width limits": "Тропы для техники, колеи и ограничения ширины",
+  "Foot and horse trails": "Пешие и конные тропы",
+  "National forests, BLM, parks and property lines": "Национальные леса, BLM, парки и границы участков",
+  "The map moves with you as you ride.": "Карта движется вместе с вами.",
+  "Closes in on a turn as you reach it, then zooms back out.": "Приближает перекрёсток, когда вы к нему подъезжаете, затем отдаляет.",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "Крен и тангаж на карте. Откалибруйте на экране наклона.",
+  "Play, pause, skip and volume without leaving the map.": "Воспроизведение, пауза, переключение и громкость, не покидая карту.",
 };
 
 export default dict;
