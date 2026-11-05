@@ -343,6 +343,9 @@ describe('pickFrames', () => {
     const seen = new Set<string>();
     for (let turn = 0; turn < 5; turn++) for (const i of pickFrames(items, A, turn)) if (i.kind === 'reply') seen.add(i.id);
     expect(seen.size).toBe(5);
+    // The rider's own message goes in every full round, whatever the turn.
+    const mine = [0, 1, 2, 3, 4, 5].map((p) => ({ ...(reply('own', p, 6, 1) as object), userId: A } as unknown as NearbyItem));
+    for (let turn = 0; turn < 5; turn++) expect(pickFrames([...items, ...mine], A, turn).filter((i) => i.kind === 'reply' && i.id === 'own')).toHaveLength(6);
   });
 });
 

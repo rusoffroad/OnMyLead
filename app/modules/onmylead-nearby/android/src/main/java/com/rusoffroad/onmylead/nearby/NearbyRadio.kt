@@ -209,7 +209,7 @@ class NearbyRadio(
     advertising = false
     val a = adapter
     if (a != null && a.isEnabled) {
-      startAdvertising()
+      if (server != null && serviceReady) startAdvertising()
       startScan()
     }
   }
@@ -623,7 +623,7 @@ class NearbyRadio(
 
     // Android 13+.
     override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) {
-      if (characteristic.uuid == outbox) deliver(value)
+      if (characteristic.uuid == outbox) handler.post { if (peerOf(gatt) != null) deliver(value) }
     }
 
     // Android 12 and older.
@@ -631,7 +631,8 @@ class NearbyRadio(
     @Suppress("DEPRECATION")
     override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && characteristic.uuid == outbox) {
-        characteristic.value?.let { deliver(it.copyOf()) }
+        val v = characteristic.value?.copyOf() ?: return
+        handler.post { if (peerOf(gatt) != null) deliver(v) }
       }
     }
   }

@@ -504,9 +504,12 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
     const g = messages.get(i.id);
     if (g) g.push(i); else messages.set(i.id, [i]);
   }
+  // The rider's own messages first, newest first; then the rest, rotating.
   const groups = [...messages.values()];
-  const start = groups.length ? turn % groups.length : 0;
-  for (const g of [...groups.slice(start), ...groups.slice(0, start)]) {
+  const mine = groups.filter((g) => g[0].userId === myId);
+  const others = groups.filter((g) => g[0].userId !== myId);
+  const start = others.length ? turn % others.length : 0;
+  for (const g of [...mine, ...others.slice(start), ...others.slice(0, start)]) {
     if (g.length <= left) { for (const i of g) picked.add(i); left -= g.length; }
   }
   // Then other riders' spots and receipts.

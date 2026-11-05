@@ -166,7 +166,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   }
 
   func sendNow(_ frames: [Data]) {
-    queue.async { self.send(frames) }
+    queue.async { self.send(frames, urgent: true) }
   }
 
   func drain() -> [String] {
@@ -200,7 +200,11 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     send(outgoing)
   }
 
-  private func send(_ frames: [Data]) {
+  /**
+   * A round (urgent false) carries everything still worth sending, so it replaces what subscribers
+   * hadn't been sent yet; an urgent send (a tap, a message, a receipt) goes ahead of it.
+   */
+  private func send(_ frames: [Data], urgent: Bool = false) {
     guard !frames.isEmpty else { return }
     for (id, ch) in peerInbox {
       guard let p = peers[id], p.state == .connected else { continue }
@@ -210,10 +214,12 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       }
     }
     guard !subscribers.isEmpty else { return }
-    // A batch goes in whole: when too much is waiting, the oldest frames make room.
-    pendingNotify.append(contentsOf: frames.prefix(NearbyRadio.maxPendingNotify))
-    if pendingNotify.count > NearbyRadio.maxPendingNotify {
-      pendingNotify.removeFirst(pendingNotify.count - NearbyRadio.maxPendingNotify)
+    let batch = Array(frames.prefix(NearbyRadio.maxPendingNotify))
+    if urgent {
+      // Whole, ahead of the round; the round's tail makes room when too much is waiting.
+      pendingNotify = Array((batch + pendingNotify).prefix(NearbyRadio.maxPendingNotify))
+    } else {
+      pendingNotify = batch
     }
     drainNotify()
   }

@@ -9,6 +9,7 @@ const PAGE = 1000;
  * a row added or removed between pages can't shift a row out of the list or repeat one.
  */
 export async function selectAll(table: string, columns: string, key: string): Promise<unknown[]> {
+  if (!columns.split(',').some((c) => c.trim() === key)) throw new Error(`selectAll: ${key} must be one of the columns`);
   const out: unknown[] = [];
   let last: unknown = undefined;
   for (;;) {
