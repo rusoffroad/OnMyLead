@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_MAP_FEATURES, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -143,7 +143,7 @@ export function Showcase() {
               alt="Ride Mode showing every rider in running order on the route line, a Full Map button, a separated rider alert and big status buttons"
               title="Ride Together"
               text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear. On a Freeride with no mapped route, the line shows the group behind the leader and how spread out it is. On the map, a small arrow on each moving rider’s dot, yours included, shows which way they’re heading, and Ride Bubble warns everyone when someone drops back or stops moving. Riders glide smoothly between updates, and the controls sit in one clean panel: three quick replies, More for every status, and EMERGENCY always one tap away."
-              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Type your own message to the group when the buttons don’t cover it, and save the ones you send often', 'Full Map on every map gives you the whole screen (tap it or swipe the panel down), with EMERGENCY one tap away and a swipe up to bring the buttons back', 'Follow Me keeps the map moving with you as you ride: drag to look around, one tap to follow again', ...(SHOWCASE_INTERSECTION_ZOOM ? ['Every rider’s dot has the arrow built in, the leader in blue and the tail gunner in violet, and the map zooms in at intersections so you see the turn, then back out'] : [])]}
+              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Type your own message to the group when the buttons don’t cover it, and save the ones you send often', 'Full Map on every map gives you the whole screen (tap it or swipe the panel down), with EMERGENCY one tap away and a swipe up to bring the buttons back', 'Follow Me keeps the map moving with you as you ride: drag to look around, one tap to follow again', ...(SHOWCASE_INTERSECTION_ZOOM ? ['Every rider’s dot has the arrow built in, the leader in blue and the tail gunner in violet, and the map zooms in at intersections so you see the turn, then back out'] : []), ...(SHOWCASE_LEADER_TRACKLINE ? ['A line in the leader’s blue shows exactly where the leader went, and when they cross back over it or double back, the older pass fades so the fresh line stands out'] : [])]}
             />
             <Step
               n={4}

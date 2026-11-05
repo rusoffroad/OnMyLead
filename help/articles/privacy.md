@@ -51,6 +51,10 @@ Once you've joined a ride, the other riders on it can see:
 - Your status taps and quick replies from Ride Mode (and, from 2.0, messages you type there). A status tap carries your phone's location at the moment you tapped it.
 - Your live location, but only while you're sharing with the ride.
 
+:::release 2.1
+- If you're the leader, the path you've ridden while sharing, drawn as the [Leader Trackline](/help/leader-trackline). Each rider's phone draws it from the live positions it already gets; nothing extra is uploaded. You can turn it off for the ride.
+:::
+
 ## Your Live Location
 
 The server only lets someone read your location while all of these are true:

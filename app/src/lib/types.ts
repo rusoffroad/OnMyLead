@@ -43,6 +43,8 @@ export type Ride = {
   /** When a leader last edited the ride, and what changed (name, time, place, details). Missing before 20261104120000. */
   details_edited_at?: string | null;
   details_changed?: string[] | null;
+  /** Whether Ride Mode draws the Leader Trackline (the leader's switch). Missing before 20261104210000: on. */
+  leader_trackline?: boolean;
 };
 
 export type RidePrivateDetails = {

@@ -3210,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "向本次骑行的所有人发送带你位置的紧急求助？",
   "Running Late": "我会迟到",
   "Need a Minute": "等我一下",
+  "Couldn’t Change the Trackline": "无法更改领队轨迹",
+  "Leader Trackline": "领队轨迹",
+  "A line behind you in the leader color, on every rider’s map": "在每位骑手的地图上，用领队颜色在你身后画一条线",
+  "On for Everyone": "对所有人开启",
+  "Off for Everyone": "对所有人关闭",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "在每位骑手的地图上显示你带队走过的路线。再次穿过时，较早的轨迹会变淡。",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "关闭领队轨迹的功能尚未开放。下次服务器更新后即可使用。",
 };
 
 export default dict;

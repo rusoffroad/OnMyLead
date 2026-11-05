@@ -54,6 +54,7 @@ import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { FreerideTracker, summarizeFreeride } from '@/core/freeride';
+import { tracklineError, tracklineOn } from '@/core/leader-trackline';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
 import { canShareWaypoints, WAYPOINTS_NOT_SWITCHED_ON } from '@/core/waypoints';
@@ -63,6 +64,7 @@ import { useFollowMe } from '@/hooks/use-follow-me';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { useLeaderTrail } from '@/hooks/use-leader-trail';
+import { useLeaderTrackline } from '@/hooks/use-leader-trackline';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { usePreciseLocation } from '@/hooks/use-precise-location';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
@@ -73,7 +75,7 @@ import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
-  startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
+  setLeaderTrackline, startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
 import { useBatteryMode } from '@/lib/battery';
 import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay';
@@ -660,14 +662,34 @@ export default function RideMode() {
     (userId: string) => (userId === me && myFix ? myFix : positions[userId] ? { lat: positions[userId].lat, lng: positions[userId].lng } : null),
     [me, myFix, positions],
   );
-  const trailLeaderId = freeride ? leaderIds.find((l) => joined.some((m) => m.user_id === l) && spotOf(l)) ?? null : null;
+  // Leader Trackline: the same trail drawn on the map behind the leader, on any ride, unless the
+  // leader turned it off for the ride (core/leader-trackline).
+  const showTrackline = tracklineOn(ride);
+  const keepsTrail = freeride || showTrackline;
+  const trailLeaderId = keepsTrail ? leaderIds.find((l) => joined.some((m) => m.user_id === l) && spotOf(l)) ?? null : null;
   const trailLeaderAt = trailLeaderId ? spotOf(trailLeaderId) : null;
-  const leaderTrail = useLeaderTrail(id, trailLeaderId, trailLeaderAt, freeride);
+  const leaderTrail = useLeaderTrail(id, trailLeaderId, trailLeaderAt, keepsTrail);
+  const trackline = useLeaderTrackline(leaderTrail?.points, showTrackline);
+  const [tracklineBusy, setTracklineBusy] = useState(false);
+  const switchTrackline = useCallback(async (on: boolean) => {
+    if (!ride) return;
+    setTracklineBusy(true);
+    // Shows at once on this phone; every other phone picks it up from the ride's live update.
+    setRide((r) => (r ? { ...r, leader_trackline: on } : r));
+    try {
+      await setLeaderTrackline(ride.id, on);
+    } catch (e) {
+      setRide((r) => (r ? { ...r, leader_trackline: !on } : r));
+      Alert.alert(t('Couldn’t Change the Trackline'), tracklineError(e instanceof Error ? e.message : String(e)));
+    } finally {
+      setTracklineBusy(false);
+    }
+  }, [ride]);
   const [freerideTracker] = useState(() => new FreerideTracker());
   const freerideLine = useMemo(() => {
     if (!freeride) return null;
     const riders = joined.map((m) => ({ id: m.user_id, role: bubbleRole(m.role, leaderIds.includes(m.user_id)), at: spotOf(m.user_id) }));
-    return freerideTracker.place(leaderTrail, trailLeaderId, riders);
+    return freerideTracker.place(freeride ? leaderTrail : null, trailLeaderId, riders);
   }, [freeride, joined, leaderIds, spotOf, leaderTrail, trailLeaderId, freerideTracker]);
   const freerideStrip = freerideLine ? { summary: summarizeFreeride(freerideLine, me), waiting: !freerideLine.leaderId } : null;
 
@@ -1070,6 +1092,7 @@ export default function RideMode() {
         meId={me}
         regroup={regroup}
         route={route.route?.points}
+        trackline={trackline}
         trail={trail}
         waypoints={wp.waypoints}
         onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
@@ -1094,6 +1117,7 @@ export default function RideMode() {
         cardWidth={tablet ? Math.min(360, layout.width - sideW - 3 * EDGE) : undefined}
         route={route.route?.points}
         ride={ride}
+        trackline={canShareWp ? { on: showTrackline, busy: tracklineBusy, onChange: switchTrackline } : undefined}
       />
 
       {fullMap ? null : (
