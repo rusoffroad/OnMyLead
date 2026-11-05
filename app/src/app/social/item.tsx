@@ -1,5 +1,5 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -136,19 +136,27 @@ export default function SocialItemScreen() {
     setTimeout(() => input.current?.focus(), 50);
   };
 
+  const latest = useRef(comments);
+  useEffect(() => {
+    latest.current = comments;
+  }, [comments]);
   const remove = async (c: ThreadComment) => {
     const ok = await confirmAsync(t('Delete This Comment?'), c.mine ? t('It comes off for everyone.') : t('{authorName}’s comment comes off your post for everyone.', { authorName: c.authorName }), t('Delete'));
     if (!ok) return;
     try {
       await deleteComment(c.id);
-      const { list, removed } = removeComment(comments, c.id);
+      // From the list as it is now (a like or a reload may have landed while the dialog was up).
+      const { list, removed: gone } = removeComment(latest.current, c.id);
       setComments(list);
-      if (replyTo && !list.some((x) => x.id === replyTo.id)) setReplyTo(null);
-      setItem((it) => (it ? { ...it, commentCount: Math.max(0, it.commentCount - removed) } : it));
+      setReplyTo((r) => (r && (r.id === c.id || r.parentId === c.id) ? null : r));
+      setItem((it) => (it ? { ...it, commentCount: Math.max(0, it.commentCount - gone) } : it));
     } catch (e) {
       setError((e as Error).message);
     }
   };
+
+  // Regrouped only when the comments change, not on every keystroke in the composer.
+  const threadList = useMemo(() => nestThread(comments), [comments]);
 
   const back = () => (router.canGoBack() ? router.back() : router.replace('/social'));
   // Everyone who liked it but you: "You and 3 others like this" already says you did.
@@ -192,7 +200,7 @@ export default function SocialItemScreen() {
                 </Text>
                 {comments.length ? (
                   <View style={{ gap: 18 }}>
-                    {nestThread(comments).map((th) => (
+                    {threadList.map((th) => (
                       <CommentThreadView
                         key={th.comment.id}
                         thread={th}
@@ -255,11 +263,15 @@ export default function SocialItemScreen() {
                 {draft.length > COMMENT_MAX - 60 ? <Text style={styles.count}>{t('{v} left', { v: COMMENT_MAX - draft.length })}</Text> : null}
               </View>
             ) : (
+              <>
+              {/* A Free rider likes comments too, so a failed like says why here. */}
+              {error ? <Text style={[styles.error, { paddingHorizontal: 16 }]}>{error}</Text> : null}
               <Pressable onPress={() => requirePro('social_posts')} accessibilityRole="button" style={styles.locked}>
                 <ProTag />
                 <Text style={styles.lockedText}>{t('Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.')}</Text>
                 <Icon name="chevron" size={18} color={Social.gold} />
               </Pressable>
+              </>
             )
           ) : null}
         </KeyboardScreen>

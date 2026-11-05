@@ -132,6 +132,8 @@ describe('profiles and notifications', () => {
     expect(tapTarget({ type: 'feed_like', key })).toBe(`/social/item?key=${encodeURIComponent(key)}`);
     expect(inboxLook({ kind: 'feed_like', data: {} })).toEqual({ icon: 'heart', tone: 'social' });
     expect(notificationKey({ type: 'feed_comment', key })).toBe(`feed_comment:${key}`);
+    expect(notificationKey({ type: 'feed_like', key })).toBe(`feed_like:${key}`);
+    expect(notificationKey({ type: 'feed_like', key, commentId: 'c1' })).toBe(`feed_like:${key}:c1`);
   });
   it('knows when the server has no Social yet', () => {
     expect(socialNotSwitchedOn('Could not find the function public.social_feed in the schema cache')).toBe(true);
