@@ -145,7 +145,7 @@ begin
 
     elsif v_item ->> 'k' = 'a' then
       continue when v_id is null;
-      v_state := (v_item ->> 'state')::integer;
+      v_state := case when (v_item ->> 'state') ~ '^[0-9]{1,2}$' then (v_item ->> 'state')::integer end;
       continue when v_state is null or v_state not in (1, 2);
       v_text := 'a|' || p_ride || '|' || v_user || '|' || v_id || '|' || v_state || '|' || v_at;
       continue when bluetooth_mac(v_key, v_text) <> lower(coalesce(v_item ->> 'mac', ''));

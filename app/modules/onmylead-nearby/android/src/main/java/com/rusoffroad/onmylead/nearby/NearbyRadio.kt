@@ -53,8 +53,7 @@ class NearbyRadio(
 ) {
   companion object {
     private const val MAX_PEERS = 8
-    private const val SUBSCRIBE_TRIES = 20
-    private const val MAX_SUBSCRIBE_FAILS = 5
+    private const val MAX_SUBSCRIBE_FAILS = 10
     private const val ROUND_MS = 4_000L
     // Low power (service, nobody in range, or Max Battery Saver): send less often and let the
     // chip scan and advertise in its low-power duty cycle. Phones that connect are served at once.
@@ -78,6 +77,8 @@ class NearbyRadio(
 
   private class Peer(val gatt: BluetoothGatt) {
     var inbox: BluetoothGattCharacteristic? = null
+    /** Notifications from this peer still to be turned on: written before any frame. */
+    var cccd: BluetoothGattDescriptor? = null
     var subscribeFails = 0
     var mtu = 23
     var busy = false
@@ -110,7 +111,7 @@ class NearbyRadio(
       val st = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
       if (st == BluetoothAdapter.STATE_TURNING_OFF || st == BluetoothAdapter.STATE_OFF) {
         handler.post {
-          if (!running) return@post
+          if (!running || state == "off") return@post
           resetLinks()
           report("off")
         }
@@ -259,6 +260,7 @@ class NearbyRadio(
     peers.values.forEach { try { it.gatt.close() } catch (_: Exception) {} }
     peers.clear()
     subscribers.clear()
+    pendingMtu.clear()
     try { server?.close() } catch (_: Exception) {}
     server = null
   }
@@ -278,8 +280,9 @@ class NearbyRadio(
 
   @Suppress("DEPRECATION")
   private fun pump(p: Peer) {
-    val ch = p.inbox ?: return
     if (p.busy) return
+    if (p.cccd != null && writeCccd(p)) return
+    val ch = p.inbox ?: return
     val f = p.queue.removeFirstOrNull() ?: return
     p.busy = true
     val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -445,35 +448,36 @@ class NearbyRadio(
   }
 
   /**
-   * Asks the peer for its packets (turns on notifications). The stack can refuse while another
-   * request is still going (common right after discovery on Android 13+): no callback comes then,
-   * so writes aren't held back, and it is asked again every half second, up to SUBSCRIBE_TRIES times.
+   * Asks the peer for its packets (turns on notifications). The request waits its turn in the
+   * peer's write queue, ahead of every frame, so frame writes can't starve it; if the stack refuses
+   * it (busy right after discovery is common on Android 13+), the next write on the link tries again.
    */
   @Suppress("DEPRECATION")
-  private fun subscribe(gatt: BluetoothGatt, out: BluetoothGattCharacteristic, tries: Int) {
-    val p = peerOf(gatt) ?: return
-    if (!running) return
-    val d = out.getDescriptor(CCCD) ?: return
-    if (p.busy) {
-      if (tries < SUBSCRIBE_TRIES) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 500)
-      return
-    }
+  private fun writeCccd(p: Peer): Boolean {
+    val d = p.cccd ?: return false
     p.busy = true
     val started = try {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == BluetoothStatusCodesSuccess
+        p.gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == BluetoothStatusCodesSuccess
       } else {
         d.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-        gatt.writeDescriptor(d)
+        p.gatt.writeDescriptor(d)
       }
     } catch (_: Exception) {
       false
     }
-    if (!started) {
-      p.busy = false
-      pump(p)
-      if (tries < SUBSCRIBE_TRIES) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 500)
+    if (started) {
+      p.cccd = null
+      return true
     }
+    p.busy = false
+    if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) {
+      p.cccd = null
+      return false
+    }
+    // Nothing else queued to carry the retry: try again shortly.
+    if (p.queue.isEmpty()) handler.postDelayed({ peerOf(p.gatt)?.let { pump(it) } }, 500)
+    return false
   }
 
   /** The peer this link belongs to, or null for a link already closed and replaced. */
@@ -490,6 +494,11 @@ class NearbyRadio(
   private val gattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
       handler.post {
+        // A link already closed (Bluetooth switched off) or replaced: just let it go.
+        if (peerOf(gatt) == null) {
+          try { gatt.close() } catch (_: Exception) {}
+          return@post
+        }
         if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
           // Bigger packets first; services are found once the size is agreed.
           if (!gatt.requestMtu(WANT_MTU)) gatt.discoverServices()
@@ -516,7 +525,8 @@ class NearbyRadio(
         val out = s.getCharacteristic(outbox)
         if (out != null) {
           gatt.setCharacteristicNotification(out, true)
-          subscribe(gatt, out, 0)
+          p.cccd = out.getDescriptor(CCCD)
+          pump(p)
         }
         report()
         send(outgoing)
@@ -527,16 +537,11 @@ class NearbyRadio(
       handler.post {
         val p = peerOf(gatt) ?: return@post
         p.busy = false
-        pump(p)
-        // The stack took the request but the peer refused it: ask again, a few times per link.
-        if (descriptor.uuid == CCCD) {
-          if (status == BluetoothGatt.GATT_SUCCESS) {
-            p.subscribeFails = 0
-          } else {
-            val out = descriptor.characteristic
-            if (out != null && ++p.subscribeFails < MAX_SUBSCRIBE_FAILS) handler.postDelayed({ subscribe(gatt, out, 0) }, 500)
-          }
+        // The stack took the request but the peer refused it: queue it again, a few times per link.
+        if (descriptor.uuid == CCCD && status != BluetoothGatt.GATT_SUCCESS && ++p.subscribeFails < MAX_SUBSCRIBE_FAILS) {
+          p.cccd = descriptor
         }
+        pump(p)
       }
     }
 

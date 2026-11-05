@@ -5,15 +5,20 @@ const PAGE = 1000;
 
 /**
  * Every row of a list the rider reads in full (their own backups), page by page, so a long list is
- * never quietly cut at the server's row cap. `key` orders the pages so none is skipped or repeated.
+ * never quietly cut at the server's row cap. Each page starts after the last `key` already read, so
+ * a row added or removed between pages can't shift a row out of the list or repeat one.
  */
 export async function selectAll(table: string, columns: string, key: string): Promise<unknown[]> {
   const out: unknown[] = [];
-  for (let from = 0; ; from += PAGE) {
-    const { data, error } = await supabase.from(table).select(columns).order(key).range(from, from + PAGE - 1);
+  let last: unknown = undefined;
+  for (;;) {
+    let q = supabase.from(table).select(columns).order(key).limit(PAGE);
+    if (last !== undefined) q = q.gt(key, last as string);
+    const { data, error } = await q;
     if (error) throw new Error(error.message);
-    const rows = (data ?? []) as unknown[];
+    const rows = (data ?? []) as unknown as Record<string, unknown>[];
     out.push(...rows);
     if (rows.length < PAGE) return out;
+    last = rows[rows.length - 1][key];
   }
 }

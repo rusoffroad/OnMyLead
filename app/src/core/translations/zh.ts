@@ -2775,7 +2775,6 @@ const dict: Record<string, string> = {
   "one ride": "1 次骑行",
   "{n} rides": "{n} 次骑行",
   "Poll: {body}": "投票：{body}",
-  "Done. Your next Google Play bill moved back 6 months{v}.": "完成。你的下次 Google Play 扣款已推迟 6 个月{v}。",
   "Done. Your next Google Play bill moved back 6 months.": "完成。你的下次 Google Play 扣款已推迟 6 个月。",
   "Google Play didn’t answer. Your reward is saved; try again in a minute.": "Google Play 没有响应。你的奖励已保存；请一分钟后重试。",
   "${discounted} for the first year instead of ${annual}": "第一年 ${discounted}，原价 ${annual}",
