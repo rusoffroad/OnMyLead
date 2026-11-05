@@ -110,6 +110,12 @@ Zoom in. Forest Service and BLM lines appear from about zoom level 9 (**Zoom In 
 Zoom in. Forest Service and BLM lines appear when the map is about 60 miles across a phone screen (**Zoom In to See Trails**), and park and local tracks from OpenStreetMap when it's about 15 miles across (**Zoom In for Park and Local Trails**). The website shows fewer trail layers than the app. See [Map Layers](/help/map-layers).
 :::
 
+:::release 2.1
+## I Turned On Land but See No Boundaries
+
+Zoom in. National forests, BLM land and parks show once the map is about 60 miles across a phone screen (**Zoom In to See Land Boundaries**), and Texas property lines only when you're zoomed in to a few blocks. Land needs a signal to load. See [Map Layers and Trails](/help/map-layers).
+:::
+
 ## My Offline Map Download Stopped
 
 Closing the app pauses a running download. Open **You > Offline Maps** and tap **Resume**, or **Finish** if some pieces are missing. If the area says **Too big for one download**, zoom in so the frame covers less. See [Offline Maps](/help/offline-maps).

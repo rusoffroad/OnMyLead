@@ -9,6 +9,22 @@
   },
   {
     "date": "2026-11-05",
+    "slugs": ["troubleshooting"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "land-zoom",
+    "why": "New 2.1 entry: I Turned On Land but See No Boundaries (zoom in to about 60 miles across; Zoom In to See Land Boundaries)."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["3d-terrain", "full-map", "language", "leader-trackline", "offline-maps", "park-trails", "route-builder"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "land-zoom",
+    "why": "The land zoom change touched shared map code these guides list (Mapbox maps, the map overlay, useTrailMap, translations). Checked: nothing riders see in these guides changed."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["home-screen", "invite-riders"],
     "kind": "update",
     "by": "pr",
