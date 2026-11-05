@@ -45,6 +45,17 @@
   {
     "date": "2026-11-05",
     "slugs": [
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings-showcase",
+    "why": "The website's feature list gains Map Settings and points 3D Terrain to it; it shows once 2.1 is in the stores. These guides are re-dated because they share the homepage code; nothing in them changed."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
       "import-gpx",
       "manage-subscription",
       "offline-maps",
