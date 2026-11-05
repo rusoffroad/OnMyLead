@@ -2,12 +2,11 @@
 -- already in riders' hands keeps working.
 --
 -- 1. referral_settle: only a ride that actually went live counts as the friend's first ride.
--- 2. referral_play_token: a Google Play subscription in grace or paused still counts even when
---    its stored expiry has passed (the referral-defer function reads the real expiry from Google).
--- 3. claim_referral_reward: a reward claimed as a Google Play offer can't also take an Apple code.
--- 4. bluetooth_relay_upload: one bad item skips that item instead of failing the whole upload.
--- 5. badge_leaderboard: builds rows (with their badges) only for the top of the board and you.
--- 6. feed_item_thread: "replying to" names a rider only when that reply is shown to you
+-- 2. claim_referral_reward: a reward claimed as a Google Play offer can't also take an Apple code.
+-- 3. bluetooth_relay_upload: one item with bad data skips that item instead of failing the whole
+--    upload.
+-- 4. badge_leaderboard: builds rows (with their badges) only for the top of the board and you.
+-- 5. feed_item_thread: "replying to" names a rider only when that reply is shown to you
 --    (not hidden, and neither of you blocked the other).
 
 create or replace function referral_settle(p_friend uuid)
@@ -34,15 +33,6 @@ begin
   perform referral_give_reward(r.referrer_id, r.id, 'referrer', r.friend_id);
   return true;
 end;
-$$;
-
-create or replace function referral_play_token(p_user uuid)
-returns text language sql stable security definer set search_path = public as $$
-  select s.purchase_token from play_subscriptions s
-  where s.user_id = p_user and s.status in ('active', 'grace', 'paused')
-    and (s.status in ('grace', 'paused') or s.expires_at is null or s.expires_at > now())
-  order by s.expires_at desc nulls last
-  limit 1;
 $$;
 
 create or replace function claim_referral_reward(p_store text)
@@ -231,7 +221,9 @@ begin
       get diagnostics v_n = row_count;
       v_count := v_count + v_n;
     end if;
-    exception when others then
+    -- Bad data only (a value out of range, a row a constraint or a chat limit refuses). A lock
+    -- timeout or deadlock still fails the upload, so the phone tries all of it again later.
+    exception when data_exception or integrity_constraint_violation or raise_exception then
       raise warning 'bluetooth_relay_upload item skipped: %', sqlerrm;
     end;
   end loop;

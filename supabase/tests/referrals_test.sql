@@ -294,14 +294,10 @@ do $$ begin
     raise exception 'FAIL: the Google offer claim was overwritten by an Apple code';
   end if;
 end $$;
--- A Play subscription in grace or paused counts even past its stored expiry; a lapsed active one doesn't.
+-- A lapsed Play subscription (past its stored expiry) isn't a deferral target.
 insert into play_subscriptions (purchase_token, user_id, product_id, status, environment, expires_at)
-values ('jo-grace-token', '00000000-0000-0000-0000-000000000f07', 'com.rusoffroad.onmylead.pro.monthly', 'grace', 'Production', now() - interval '1 day'),
-       ('ivy-stale-token', '00000000-0000-0000-0000-000000000f06', 'com.rusoffroad.onmylead.pro.monthly', 'active', 'Production', now() - interval '1 day');
+values ('ivy-stale-token', '00000000-0000-0000-0000-000000000f06', 'com.rusoffroad.onmylead.pro.monthly', 'active', 'Production', now() - interval '1 day');
 do $$ begin
-  if referral_play_token('00000000-0000-0000-0000-000000000f07') is distinct from 'jo-grace-token' then raise exception 'FAIL: grace subscription not found'; end if;
-  update play_subscriptions set status = 'paused' where purchase_token = 'jo-grace-token';
-  if referral_play_token('00000000-0000-0000-0000-000000000f07') is distinct from 'jo-grace-token' then raise exception 'FAIL: paused subscription not found'; end if;
   if referral_play_token('00000000-0000-0000-0000-000000000f06') is not null then raise exception 'FAIL: a lapsed subscription counted'; end if;
 end $$;
 

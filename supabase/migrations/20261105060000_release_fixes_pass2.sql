@@ -8,6 +8,7 @@
 --    Just Me and Everyone on the Ride again no longer pushes everyone again. Waypoints already
 --    shared on a live ride count as announced.
 -- 3. push_batch_feed: a reply's push goes only to riders the reply is shown to.
+-- 4. referrals_on_ride_end: looks only at the ending ride's own riders.
 
 create or replace function claim_referral_reward(p_store text)
 returns jsonb language plpgsql security definer set search_path = public as $$
@@ -222,3 +223,27 @@ do $$ begin
     grant execute on function push_batch_feed(jsonb) to service_role;
   end if;
 end $$;
+
+-- 4. A ride ending checks only its own riders' referrals, not every unqualified referral.
+create or replace function referrals_on_ride_end()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  v_friend uuid;
+begin
+  for v_friend in
+    select f.friend_id from referrals f
+    where f.qualified_at is null
+      and f.friend_id in (
+        select new.organizer_id
+        union
+        select m.user_id from ride_members m where m.ride_id = new.id and m.status = 'joined')
+  loop
+    perform referral_settle(v_friend);
+  end loop;
+  return null;
+exception when others then
+  -- Never stop a ride from ending.
+  raise warning 'referrals_on_ride_end: %', sqlerrm;
+  return null;
+end;
+$$;

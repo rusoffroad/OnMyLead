@@ -2772,6 +2772,7 @@ const dict: Record<string, string> = {
   "Waiting on Google Play to approve the purchase.": "Ждём, пока Google Play подтвердит покупку.",
   "Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.": "Google Play не предложил скидку на этом устройстве. Обновите OnMyLead из Google Play и попробуйте снова. Деньги не списаны.",
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "Готово. Ваш следующий платёж в Google Play сдвинут на 6 месяцев, на {date}.",
+  "Your Google Play subscription has ended, so there’s no bill to move back. Your reward is saved; tap again in a few minutes to get the discount instead.": "Ваша подписка Google Play закончилась, поэтому сдвигать нечего. Награда сохранена; нажмите ещё раз через несколько минут, чтобы получить скидку.",
   "Done. Your next Google Play bill moved back 6 months{v}.": "Готово. Ваш следующий платёж в Google Play сдвинут на 6 месяцев{v}.",
   "Google Play didn’t answer. Your reward is saved; try again in a minute.": "Google Play не ответил. Ваша награда сохранена; попробуйте через минуту.",
   "${discounted} for the first year instead of ${annual}": "${discounted} в первый год вместо ${annual}",

@@ -57,10 +57,15 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
             ? t('Waiting on Google Play to approve the purchase.')
             : t('Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.'));
         }
+      } else if (store === 'apple') {
+        // Still set to move a Google Play bill: that happens on Android.
+        setNote(t('You claimed this discount on Google Play. Use it on your Android phone or tablet.'));
       } else {
         const d = await applyPlayDeferral();
         setNote(!d.ok
-          ? t('Google Play didn’t answer. Your reward is saved; try again in a minute.')
+          ? d.gone
+            ? t('Your Google Play subscription has ended, so there’s no bill to move back. Your reward is saved; tap again in a few minutes to get the discount instead.')
+            : t('Google Play didn’t answer. Your reward is saved; try again in a minute.')
           : d.expiresAt
             ? t('Done. Your next Google Play bill moved back 6 months, to {date}.', {
                 date: new Date(d.expiresAt).toLocaleDateString(currentLocale(), { month: 'short', day: 'numeric', year: 'numeric' }),

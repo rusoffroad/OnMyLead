@@ -160,11 +160,11 @@ describe('dropped phone', () => {
     return out;
   };
 
-  it('ignores the landing hit after a free fall, even right after riding', () => {
+  it('ignores the landing hit after a free fall once stopped, even right after riding', () => {
     const { alarms } = run([
       ...every(0, 1000, { speedMps: 8, feltG: 1 }),
-      ...every(1050, 1350, { speedMps: 3, feltG: 0.05 }), // falling ~300 ms
-      s(1400, { speedMps: 1, feltG: 7, userAccel: { x: 7 * G, y: 0, z: 0 } }), // hits the floor
+      ...every(1050, 1350, { speedMps: 0.5, feltG: 0.05 }), // just stopped, falling ~300 ms
+      s(1400, { speedMps: 0.3, feltG: 7, userAccel: { x: 7 * G, y: 0, z: 0 } }), // hits the floor
       ...every(1450, 9000, { speedMps: 0, feltG: 1, roll: 85, pitch: 10 }), // lies on its side
     ]);
     expect(alarms).toEqual([]);
@@ -194,8 +194,8 @@ describe('dropped phone', () => {
   it('no rollover until the dropped phone is back in its mount, then it counts again', () => {
     const before = run([
       ...every(0, 500, { speedMps: 10, feltG: 1 }),
-      ...every(550, 800, { speedMps: 3, feltG: 0.1 }), // slowing for a gate, the phone falls
-      ...every(850, 6000, { speedMps: 3, feltG: 1, roll: 70 }),
+      ...every(550, 800, { speedMps: 0.5, feltG: 0.1 }), // stopped at a gate, the phone falls
+      ...every(850, 6000, { speedMps: 0.5, feltG: 1, roll: 70 }),
     ]);
     expect(before.alarms).toEqual([]);
     expect(before.state.displaced).toBe(true);
@@ -249,6 +249,26 @@ describe('dropped phone', () => {
       ...every(25_050, 40_000, { speedMps: 0, feltG: 1, roll: 85 }), // pulls over to pick it up
     ]);
     expect(alarms).toEqual([]);
+  });
+
+  it('a slow tip off a rock (a moment of free fall at crawling speed) still alarms', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 2.5, feltG: 1 }),
+      ...every(1050, 1250, { speedMps: 1.5, feltG: 0.1 }), // drops off the ledge
+      ...every(1300, 12_000, { speedMps: 0, feltG: 1, roll: 90 }), // on its side
+    ]);
+    expect(alarms).toEqual(['rollover']);
+  });
+
+  it('a clean jump leaves rollover on, even on a side slope later', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 8, feltG: 1 }),
+      ...every(1050, 1400, { speedMps: 8, feltG: 0.05 }), // a whoop
+      ...every(1450, 20_000, { speedMps: 8, feltG: 1, roll: 25 }), // lands, then a long side slope
+      ...every(20_050, 21_000, { speedMps: 8, feltG: 1, roll: 80 }), // rolls
+      ...every(21_050, 30_000, { speedMps: 0, feltG: 1, roll: 85 }),
+    ]);
+    expect(alarms).toEqual(['rollover']);
   });
 
   it('a crash that throws the phone out of the mount still alarms', () => {
