@@ -13,7 +13,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "map-settings-following",
-    "why": "2.1: the map's settings button is now called Map Settings, with a two-slider icon. Map Settings gains a Following section (Follow Me, the new Zoom Out at the Edge switch, Zoom In at Intersections), Zoom Out at the Edge is also on the You tab, and your own dot is twice as big."
+    "why": "2.1: the map's settings button is now called Map Settings, with a two-slider icon. Map Settings gains a Following section (Follow Me, the new Zoom Out at the Edge switch, Zoom In at Intersections), Zoom Out at the Edge is also on the You tab, and your own dot is half again as big."
   },
   {
     "date": "2026-11-05",

@@ -90,7 +90,7 @@ These are the same switches as on the **You** tab, so a change shows everywhere.
 
 The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
 
-From 2.1 your own dot is also twice as big, so it's easy to spot on a mount.
+From 2.1 your own dot is also half again as big, so it's easy to spot on a mount.
 :::
 
 Your choices are remembered on your phone and used on every map in the app.
