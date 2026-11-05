@@ -8,16 +8,18 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
 
+import { isTransientError } from '@/core/errors';
+import { tc } from '@/core/i18n';
 import { handleProError } from '@/lib/pro';
 import {
-  fitWithin, nextQuality, parseComment, parseProfile, parseSocial, POST_PHOTO_BUCKET, POST_PHOTO_MAX, POST_PHOTO_MAX_BYTES,
-  POST_PHOTO_QUALITY, postPhotoPath, socialNotSwitchedOn, type Comment, type RiderProfile, type SocialItem,
+  fitWithin, friendlySocialError, nextQuality, parseComment, parseProfile, parseSocial, POST_PHOTO_BUCKET, POST_PHOTO_MAX,
+  POST_PHOTO_MAX_BYTES, POST_PHOTO_QUALITY, postPhotoPath, socialNotSwitchedOn, type Comment, type RiderProfile, type SocialItem,
 } from '@/core/social';
 import { track } from './analytics';
 import { readPhotoBytes } from './photo-bytes';
 import { supabase, supabaseUrl } from './supabase';
+import { whenActive } from './when-active';
 
-import { tc } from '@/core/i18n';
 export class SocialOffError extends Error {}
 
 type Res = { data: unknown; error: { message: string; code?: string } | null };
@@ -35,29 +37,41 @@ function check(res: Res): unknown {
 /** Thrown after the Pro prompt has opened, so screens can stop without showing an error. */
 export class ProNeededError extends Error {}
 
-function friendly(message: string): string {
-  const m = message.replace(/^[A-Z0-9]+: /, '');
-  return m ? m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.') : tc('Something went wrong. Try again.');
+const friendly = (message: string) => friendlySocialError(message, tc);
+
+/**
+ * A read, tried once more when the first try never got an answer (no signal for a second, or iOS
+ * cancelling the request because the app was still coming to the front: Chris tapped a comment
+ * notification and saw "fetch failed: UnexpectedException: cancelled", 2026-11-04). The retry
+ * waits for the app to be active, then a moment, so a request that would have worked doesn't
+ * show an error.
+ */
+async function read(name: string, args: Record<string, unknown>): Promise<Res> {
+  const first = (await supabase.rpc(name, args)) as Res;
+  if (!first.error || !isTransientError(first.error.message)) return first;
+  await whenActive();
+  await new Promise((r) => setTimeout(r, 600));
+  return (await supabase.rpc(name, args)) as Res;
 }
 
 export async function socialFeed(limit = 30, before?: string | null): Promise<SocialItem[]> {
-  return parseSocial(check(await supabase.rpc('social_feed', { p_limit: limit, p_before: before ?? null })), supabaseUrl);
+  return parseSocial(check(await read('social_feed', { p_limit: limit, p_before: before ?? null })), supabaseUrl);
 }
 
 export async function riderTimeline(userId: string, limit = 30, before?: string | null): Promise<SocialItem[]> {
-  return parseSocial(check(await supabase.rpc('rider_timeline', { p_user: userId, p_limit: limit, p_before: before ?? null })), supabaseUrl);
+  return parseSocial(check(await read('rider_timeline', { p_user: userId, p_limit: limit, p_before: before ?? null })), supabaseUrl);
 }
 
 export async function feedItem(key: string): Promise<SocialItem | null> {
-  return parseSocial(check(await supabase.rpc('feed_item', { p_key: key })), supabaseUrl)[0] ?? null;
+  return parseSocial(check(await read('feed_item', { p_key: key })), supabaseUrl)[0] ?? null;
 }
 
 export async function itemComments(key: string): Promise<Comment[]> {
-  return parseComment(check(await supabase.rpc('feed_item_comments', { p_key: key })));
+  return parseComment(check(await read('feed_item_comments', { p_key: key })));
 }
 
 export async function itemLikers(key: string): Promise<{ userId: string; name: string }[]> {
-  const rows = check(await supabase.rpc('feed_item_likes', { p_key: key }));
+  const rows = check(await read('feed_item_likes', { p_key: key }));
   return Array.isArray(rows)
     ? rows.filter((r) => r && typeof r.user_id === 'string').map((r) => ({ userId: r.user_id as string, name: (typeof r.name === 'string' && r.name) || tc('Rider') }))
     : [];

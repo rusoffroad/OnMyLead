@@ -215,6 +215,10 @@ select as_user('00000000-0000-0000-0000-000000000ee3');
 set role authenticated;
 select expect_refused(format($q$insert into reports (kind, reported_user_id, post_id, reason) values ('rider', '00000000-0000-0000-0000-000000000ee1', '%s', 'Spam')$q$,
   (select id from social_ids where name = 'post')), 'stranger reported an unseen post');
+-- Naming a friend of Ann's as the reporter gets the stranger nothing: reporter_id can't be set by a
+-- client at all (column grants), and the trigger checks auth.uid() anyway (20261104200000).
+select expect_refused(format($q$insert into reports (kind, reporter_id, reported_user_id, post_id, reason) values ('rider', '00000000-0000-0000-0000-000000000ee2', '00000000-0000-0000-0000-000000000ee1', '%s', 'Spam')$q$,
+  (select id from social_ids where name = 'post')), 'stranger reported as someone else');
 reset role;
 select as_user('00000000-0000-0000-0000-000000000ee2');
 set role authenticated;

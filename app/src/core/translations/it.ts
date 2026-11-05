@@ -1,6 +1,9 @@
 // Italian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Nessun altro si è unito per prendere il comando, quindi uscire annulla l’uscita.",
+  "Your location sharing for this ride stops.": "La condivisione della tua posizione per questa uscita si ferma.",
+  "The lead goes back to the organizer.": "La guida torna all’organizzatore.",
   "Language": "Lingua",
   "Change language": "Cambia lingua",
   "Map Mode. Open your offroad map": "Modalità Mappa. Apri la tua mappa fuoristrada",
@@ -2957,6 +2960,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Sull’uscita',
   'Lowering a limit never removes anyone who already joined.': 'Abbassare un limite non rimuove mai chi si è già unito.',
   'Bring and Know': 'Cosa portare e sapere',
+  'Not Ready to Save': 'Non ancora pronto da salvare',
   'No Changes Yet': 'Nessuna modifica per ora',
   'Change anything above, then save. Riders see the new details right away.': 'Cambia quello che vuoi qui sopra, poi salva. I rider vedono subito i nuovi dettagli.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Tutti nell’uscita ricevono una notifica, e la pagina dell’uscita mostra cosa è cambiato.',
@@ -2964,6 +2968,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Il nome deve avere meno di {v} caratteri.',
   'Check the departure time.': 'Controlla l’ora di partenza.',
   'Check the expected finish time.': 'Controlla l’ora di rientro prevista.',
+  'Set the meeting point before adding instructions.': 'Imposta il punto d’incontro prima di aggiungere istruzioni.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Imposta il punto d’incontro: cerca un luogo, tocca la mappa o incolla coordinate come "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'La lunghezza del percorso è un numero di miglia, come 42.5.',
   '{list} and {last}': '{list} e {last}',

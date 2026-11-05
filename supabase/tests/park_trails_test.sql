@@ -48,6 +48,11 @@ begin
   if not exists (select 1 from jsonb_array_elements(parks) p where (p ->> 'park_osm_id')::bigint = 331218708 and (p ->> 'trail_count')::int > 40) then
     raise exception 'FAIL: park list';
   end if;
+  -- Trail miles count trails only, like the count beside them (20261104200000).
+  if (select (p ->> 'trail_m')::numeric from jsonb_array_elements(parks) p where (p ->> 'park_osm_id')::bigint = 331218708)
+     <> (select sum(length_m) from park_trails where park_osm_id = 331218708 and not hidden and kind = 'trail') then
+    raise exception 'FAIL: park trail miles include roads';
+  end if;
 end $$;
 reset role;
 

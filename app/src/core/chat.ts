@@ -1,4 +1,5 @@
 import { tc } from './i18n';
+import { isTransientError } from './errors';
 
 /**
  * Ride chat and announcements.
@@ -180,7 +181,7 @@ export function friendlyChatError(message: string): string {
   if (messageActionsNotSwitchedOn(message)) return tc('Clear and Mark Resolved aren’t switched on yet.');
   if (/only the sender can resolve/i.test(message)) return tc('Only the person who sent it can mark it resolved.');
   if (/only the sender can clear/i.test(message)) return tc('Only the person who sent it can clear it, or it’s already gone.');
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and tap Retry.');
+  if (isTransientError(message)) return tc('No signal. Check your connection and tap Retry.');
   if (/poll_options|ride_poll_votes|vote_on_poll/i.test(message) && /column|relation|schema cache|does not exist|could not find/i.test(message)) {
     return tc('Polls aren’t switched on yet.');
   }

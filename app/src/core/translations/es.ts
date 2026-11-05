@@ -1,6 +1,9 @@
 // Spanish. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Nadie más se ha unido para tomar el relevo, así que salir cancela la ruta.",
+  "Your location sharing for this ride stops.": "Se deja de compartir tu ubicación en esta ruta.",
+  "The lead goes back to the organizer.": "El liderazgo vuelve al organizador.",
   "Language": "Idioma",
   "Change language": "Cambiar idioma",
   "Map Mode. Open your offroad map": "Modo Mapa. Abre tu mapa todoterreno",
@@ -2957,6 +2960,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Sobre la salida',
   'Lowering a limit never removes anyone who already joined.': 'Bajar un límite nunca quita a nadie que ya se unió.',
   'Bring and Know': 'Qué llevar y saber',
+  'Not Ready to Save': 'Aún no se puede guardar',
   'No Changes Yet': 'Sin cambios todavía',
   'Change anything above, then save. Riders see the new details right away.': 'Cambia lo que quieras arriba y guarda. Los pilotos ven los nuevos detalles enseguida.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Todos en la salida reciben una notificación, y la página de la salida muestra qué cambió.',
@@ -2964,6 +2968,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'El nombre debe tener menos de {v} caracteres.',
   'Check the departure time.': 'Revisa la hora de salida.',
   'Check the expected finish time.': 'Revisa la hora prevista de regreso.',
+  'Set the meeting point before adding instructions.': 'Fija el punto de encuentro antes de añadir instrucciones.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Define el punto de encuentro: busca un lugar, toca el mapa o pega coordenadas como "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'La longitud de la ruta es un número de millas, como 42.5.',
   '{list} and {last}': '{list} y {last}',

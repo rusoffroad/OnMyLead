@@ -86,6 +86,18 @@
       {
         "kind": "new",
         "text": "CarPlay: plug your iPhone into a CarPlay car (or connect wirelessly) during a ride and OnMyLead shows on the car screen. One tap sends OK, Stopped, Need Fuel, Mechanical Issue or Need Help to the group, Regroup Here (organizer and leader) or Running Late, and EMERGENCY asks once before it alerts everyone. Group lists every rider, and the leader and tail gunner get an alert on the car screen when someone falls behind. Open Ride Mode on your phone first; the car screen follows it."
+      },
+      {
+        "kind": "fixed",
+        "text": "Share Picture works with Facebook, Instagram and Messages again: the shared card is now a 1080 pixel picture named OnMyLead, a couple of MB at most, instead of a 40 MB file the other app couldn't take."
+      },
+      {
+        "kind": "fixed",
+        "text": "Trail names follow their own switch in Map Features: Off-Road Trails names with Off-Road Trails, hiking path names with Hiking Trails. A park's miles count its trails only. Rider Trails and Park Trails switched on in the You tab show on every map again."
+      },
+      {
+        "kind": "fixed",
+        "text": "Opening a comment or the Activity feed right as the app comes to the front no longer shows an error: the request is tried again quietly, and if there is still no signal you get a Retry button."
       }
     ]
   },

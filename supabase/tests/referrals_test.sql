@@ -179,6 +179,23 @@ select as_user('00000000-0000-0000-0000-000000000f05');
 set role authenticated;
 insert into ref_out values ('hal_google', claim_referral_reward('google'));
 reset role;
+-- Reserve, Google refuses, the reward goes back unredeemed; reserve again and confirm.
+do $$ begin
+  if not referral_reserve_deferral('00000000-0000-0000-0000-000000000f05') then raise exception 'FAIL: first reservation not taken'; end if;
+  -- A second call at the same time gets false and leaves Google to the first.
+  if referral_reserve_deferral('00000000-0000-0000-0000-000000000f05') then raise exception 'FAIL: reserved twice'; end if;
+  -- Taking over a stale reservation works once, and only for the reservation that was read.
+  if referral_retake_deferral('00000000-0000-0000-0000-000000000f05', now() - interval '1 hour') then raise exception 'FAIL: retook a reservation it never read'; end if;
+  if not referral_retake_deferral('00000000-0000-0000-0000-000000000f05', (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05')) then
+    raise exception 'FAIL: could not take over the reservation';
+  end if;
+  if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is null then raise exception 'FAIL: not reserved'; end if;
+  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'redeemed_at') is not null then raise exception 'FAIL: reserved counts as redeemed'; end if;
+  perform referral_unmark_deferred('00000000-0000-0000-0000-000000000f05');
+  if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is not null then raise exception 'FAIL: reservation not lifted'; end if;
+  if (select redeemed_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is not null then raise exception 'FAIL: redeemed by a refused deferral'; end if;
+end $$;
+select referral_reserve_deferral('00000000-0000-0000-0000-000000000f05');
 select referral_mark_deferred('00000000-0000-0000-0000-000000000f05', now() + interval '202 days');
 do $$ begin
   if (select v #>> '{reward,role}' from ref_out where name = 'hal_view') <> 'friend' then
@@ -188,6 +205,14 @@ do $$ begin
   if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'deferred_at') is null then raise exception 'FAIL: deferral not recorded'; end if;
   if (select expires_at from play_subscriptions where purchase_token = 'hal-monthly-token') < now() + interval '200 days' then
     raise exception 'FAIL: deferral not reflected in the subscription';
+  end if;
+  -- A confirmed deferral stays confirmed: unmark only lifts an unconfirmed reservation.
+  perform referral_unmark_deferred('00000000-0000-0000-0000-000000000f05');
+  if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'deferred_at') is null then raise exception 'FAIL: a confirmed deferral was put back'; end if;
+  -- Google's own expiry wins even when it is earlier than the planned one.
+  perform referral_mark_deferred('00000000-0000-0000-0000-000000000f05', now() + interval '190 days');
+  if (select expires_at from play_subscriptions where purchase_token = 'hal-monthly-token') > now() + interval '191 days' then
+    raise exception 'FAIL: an earlier Google expiry was not taken';
   end if;
 end $$;
 

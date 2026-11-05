@@ -268,6 +268,7 @@ async function sendReportEmail(event: any): Promise<{ emailed: number; email_not
 const REPORT_SOURCES: Record<string, string> = {
   dm: 'Direct Messages', group_chat: 'Riding group chat', ride_chat: 'Ride chat', ride: 'Ride page',
   roster: 'Ride’s Going list', out_riding: 'Out Riding', you: 'You > Report a Rider',
+  post: 'A post on the Feed', comment: 'A comment on the Feed', profile: 'Rider profile', event: 'Event page',
 };
 
 export function reportEmail(r: ReportEmail): { subject: string; text: string; html: string } {

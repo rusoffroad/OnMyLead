@@ -1,6 +1,9 @@
 // Portuguese (Brazil). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Ninguém mais entrou para assumir, então sair cancela o passeio.",
+  "Your location sharing for this ride stops.": "O compartilhamento da sua localização neste passeio para.",
+  "The lead goes back to the organizer.": "A liderança volta para o organizador.",
   "Language": "Idioma",
   "Change language": "Mudar idioma",
   "Map Mode. Open your offroad map": "Modo Mapa. Abra seu mapa off-road",
@@ -2957,6 +2960,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Sobre a trilha',
   'Lowering a limit never removes anyone who already joined.': 'Baixar um limite nunca remove quem já entrou.',
   'Bring and Know': 'O que levar e saber',
+  'Not Ready to Save': 'Ainda não dá para salvar',
   'No Changes Yet': 'Nenhuma alteração ainda',
   'Change anything above, then save. Riders see the new details right away.': 'Altere o que quiser acima e salve. Os pilotos veem os novos detalhes na hora.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Todos na trilha recebem uma notificação, e a página da trilha mostra o que mudou.',
@@ -2964,6 +2968,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Mantenha o nome com menos de {v} caracteres.',
   'Check the departure time.': 'Confira o horário de saída.',
   'Check the expected finish time.': 'Confira o horário previsto de retorno.',
+  'Set the meeting point before adding instructions.': 'Defina o ponto de encontro antes de adicionar instruções.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Defina o ponto de encontro: pesquise um lugar, toque no mapa ou cole coordenadas como "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'A extensão da rota é um número de milhas, como 42.5.',
   '{list} and {last}': '{list} e {last}',

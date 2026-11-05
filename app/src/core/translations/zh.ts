@@ -1,6 +1,9 @@
 // Chinese (Simplified). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "没有其他人加入来接手，所以退出将取消此次骑行。",
+  "Your location sharing for this ride stops.": "你在本次骑行中的位置共享将停止。",
+  "The lead goes back to the organizer.": "领队身份交回给组织者。",
   "Language": "语言",
   "Change language": "更改语言",
   "Map Mode. Open your offroad map": "地图模式。打开你的越野地图",
@@ -2957,6 +2960,7 @@ const dict: Record<string, string> = {
   'About the Ride': '关于活动',
   'Lowering a limit never removes anyone who already joined.': '降低上限不会移除任何已加入的人。',
   'Bring and Know': '携带与须知',
+  'Not Ready to Save': '尚不能保存',
   'No Changes Yet': '尚无更改',
   'Change anything above, then save. Riders see the new details right away.': '修改上方任意内容后保存。骑手会立即看到新详情。',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': '活动中的所有人都会收到通知，活动页面会显示更改内容。',
@@ -2964,6 +2968,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': '名称请少于 {v} 个字符。',
   'Check the departure time.': '请检查出发时间。',
   'Check the expected finish time.': '请检查预计结束时间。',
+  'Set the meeting point before adding instructions.': '请先设置集合点，再添加说明。',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': '设置集合点：搜索地点、点按地图或粘贴坐标，如 "38.57, -109.55"。',
   'Route length is a number of miles, like 42.5.': '路线长度是英里数，例如 42.5。',
   '{list} and {last}': '{list}和{last}',

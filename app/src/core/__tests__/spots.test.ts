@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  createRideHref, distanceText, filterKinds, fractionToMiles, kindCounts, milesToFraction, nearestStepIndex, parseSavedMiles,
+  createRideHref, filterKinds, fractionToMiles, kindCounts, milesToFraction, nearestStepIndex, parseSavedMiles,
   parseSpotDetail, parseSpots, placeLine, safeWebsite, SCOUT_DEFAULT_MILES, SCOUT_MILE_STEPS, sourceCredit, spotFromParams,
   stepMiles, suggestionProblem, toggleKind, websiteHost,
 } from '../spots';
@@ -86,9 +86,7 @@ describe('results', () => {
     expect(toggleKind(['park', 'ohv_area', 'trail_system', 'trailhead'], 'track')).toEqual([]);
   });
 
-  it('words distance, place and credit', () => {
-    expect(distanceText(0.4)).toBe('Under 1 mi');
-    expect(distanceText(1234.4)).toBe('1,234 mi');
+  it('words place and credit', () => {
     expect(placeLine({ areaName: 'Ocala National Forest', state: 'FL' })).toBe('Ocala National Forest, Florida');
     expect(placeLine({ areaName: null, state: 'TX' })).toBe('Texas');
     expect(placeLine({ areaName: null, state: null })).toBe('');

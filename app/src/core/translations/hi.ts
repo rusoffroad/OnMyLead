@@ -1,6 +1,9 @@
 // Hindi. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "कोई और शामिल नहीं हुआ जो इसे संभाल सके, इसलिए छोड़ने पर राइड रद्द हो जाएगी।",
+  "Your location sharing for this ride stops.": "इस राइड के लिए आपकी लोकेशन शेयरिंग बंद हो जाती है।",
+  "The lead goes back to the organizer.": "लीड वापस आयोजक के पास चली जाती है।",
   "Language": "भाषा",
   "Change language": "भाषा बदलें",
   "Map Mode. Open your offroad map": "मैप मोड। अपना ऑफ़रोड मैप खोलें",
@@ -2957,6 +2960,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'राइड के बारे में',
   'Lowering a limit never removes anyone who already joined.': 'सीमा घटाने से पहले से जुड़ा कोई भी व्यक्ति नहीं हटता।',
   'Bring and Know': 'क्या लाएँ और क्या जानें',
+  'Not Ready to Save': 'अभी सेव नहीं हो सकता',
   'No Changes Yet': 'अभी कोई बदलाव नहीं',
   'Change anything above, then save. Riders see the new details right away.': 'ऊपर कुछ भी बदलें, फिर सहेजें। राइडर्स को नए विवरण तुरंत दिखते हैं।',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'राइड के सभी लोगों को सूचना मिलती है, और राइड पेज दिखाता है कि क्या बदला।',
@@ -2964,6 +2968,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'नाम {v} अक्षरों से कम रखें।',
   'Check the departure time.': 'प्रस्थान का समय जाँचें।',
   'Check the expected finish time.': 'अनुमानित समाप्ति समय जाँचें।',
+  'Set the meeting point before adding instructions.': 'निर्देश जोड़ने से पहले मीटिंग पॉइंट सेट करें।',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'मीटिंग पॉइंट सेट करें: कोई जगह खोजें, मैप पर टैप करें या "38.57, -109.55" जैसे निर्देशांक पेस्ट करें।',
   'Route length is a number of miles, like 42.5.': 'रूट की लंबाई मील में एक संख्या है, जैसे 42.5।',
   '{list} and {last}': '{list} और {last}',

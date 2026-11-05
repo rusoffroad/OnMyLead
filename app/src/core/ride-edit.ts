@@ -196,12 +196,14 @@ export function ridePatch(
       changed.add('details');
     }
 
-    // The exact spot only reaches riders on the ride; the leader always has it, but stay safe if not.
-    if (details) {
+    // The exact spot only reaches riders on the ride; the leader always has it. A ride whose spot
+    // never saved (no private row) keeps the form's spot box empty until the leader fills it.
+    // A place name with no spot has nowhere to go on such a ride, so it asks for the spot.
+    if (details || form.coords.trim() || form.meetLabel.trim()) {
       const spot = parseCoords(form.coords);
       if (!spot) return { error: tc('Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".') };
       const label = text(form.meetLabel);
-      const moved = coordsText(spot.lat, spot.lng) !== coordsText(details.meet_lat, details.meet_lng);
+      const moved = !details || coordsText(spot.lat, spot.lng) !== coordsText(details.meet_lat, details.meet_lng);
       if (moved) {
         p.meet_lat = spot.lat;
         p.meet_lng = spot.lng;
@@ -213,12 +215,12 @@ export function ridePatch(
         }
         changed.add('place');
       }
-      if (label !== (details.meet_label ?? null)) {
+      if (label !== (details?.meet_label ?? null)) {
         p.meet_label = label;
         changed.add('place');
       }
       const areaLabel = label ? publicAreaLabel(label) : ride.meet_area_label;
-      if ((moved || label !== (details.meet_label ?? null)) && areaLabel !== ride.meet_area_label) r.meet_area_label = areaLabel;
+      if ((moved || label !== (details?.meet_label ?? null)) && areaLabel !== ride.meet_area_label) r.meet_area_label = areaLabel;
     }
     if (ride.visibility === 'public' && form.meetState !== (ride.meet_state ?? null) && form.meetState) {
       r.meet_state = form.meetState;
@@ -271,12 +273,13 @@ export function ridePatch(
     r.join_policy = form.joinPolicy;
     changed.add('details');
   }
-  if (details) {
-    const instructions = text(form.instructions);
-    if (instructions !== (details.instructions ?? null)) {
-      p.instructions = instructions;
-      changed.add('details');
-    }
+  // A ride with no private row yet gets one only with a spot, so instructions ride along with it
+  // (the edit screen shows the box once a spot is picked) and can't go up on their own.
+  const instructions = text(form.instructions);
+  if (instructions !== (details?.instructions ?? null)) {
+    if (!details && !form.coords.trim()) return { error: tc('Set the meeting point before adding instructions.') };
+    p.instructions = instructions;
+    changed.add('details');
   }
 
   const order: RideChange[] = ['name', 'time', 'place', 'details'];

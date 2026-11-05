@@ -19,6 +19,7 @@ import {
   accountKey, agreementText, needsAgreement, parseAcceptances, pendingUpload, RIDER_AGREEMENT, type LocalAcceptances,
 } from '@/core/rider-agreement';
 import { isBackendConfigured, supabase } from './supabase';
+import { singleFlight } from './single-flight';
 
 const STORE_KEY = 'onmylead.riderAgreement';
 
@@ -48,18 +49,12 @@ const save = (local: LocalAcceptances) => {
   AsyncStorage.setItem(STORE_KEY, JSON.stringify(local)).catch(() => {});
 };
 
-let uploading = false;
-let again = false;
-
 /** Asks the server what this rider has agreed to, then sends anything waiting. */
-async function sync(): Promise<void> {
+const sync: () => Promise<void> = singleFlight(() => upload());
+
+async function upload(): Promise<void> {
   const userId = state.userId;
   if (!userId || !isBackendConfigured || !state.loaded) return;
-  if (uploading) {
-    again = true;
-    return;
-  }
-  uploading = true;
   try {
     if (state.serverVersion == null) {
       const { data, error } = await supabase.rpc('my_rider_agreement');
@@ -107,12 +102,6 @@ async function sync(): Promise<void> {
     set({ serverVersion: Math.max(state.serverVersion ?? 0, waiting.version) });
   } catch {
     // Offline: try again later.
-  } finally {
-    uploading = false;
-    if (again) {
-      again = false;
-      sync();
-    }
   }
 }
 

@@ -4,7 +4,7 @@ summary: See the satellite map on the real shape of the land in Ride Mode and Ma
 category: routes-maps
 order: 52
 release: "2.1"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/mapbox-map.tsx
   - app/src/components/mapbox-map.web.tsx

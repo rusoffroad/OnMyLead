@@ -82,7 +82,9 @@ describe('the reward card', () => {
     expect(rewardState(reward({ claimKind: 'google_offer' }), now).state).toBe('google_offer');
     expect(rewardState(reward({ claimKind: 'google_offer', redeemedAt: '2026-11-10T00:00:00Z' }), now).state).toBe('used');
     expect(rewardState(reward({ claimKind: 'google_defer' }), now).state).toBe('google_defer_pending');
-    expect(rewardState(reward({ claimKind: 'google_defer', deferredAt: '2026-11-10T00:00:00Z' }), now).state).toBe('used');
+    // Reserved but not confirmed by Google yet: still pending, so the rider can tap again and settle it.
+    expect(rewardState(reward({ claimKind: 'google_defer', deferredAt: '2026-11-10T00:00:00Z' }), now).state).toBe('google_defer_pending');
+    expect(rewardState(reward({ claimKind: 'google_defer', deferredAt: '2026-11-10T00:00:00Z', redeemedAt: '2026-11-10T00:00:00Z' }), now).state).toBe('used');
   });
 
   it('claims in this device’s store, and says where otherwise', () => {

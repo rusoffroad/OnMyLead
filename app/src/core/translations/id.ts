@@ -1,6 +1,9 @@
 // Indonesian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Belum ada orang lain yang bergabung untuk mengambil alih, jadi keluar akan membatalkan perjalanan.",
+  "Your location sharing for this ride stops.": "Berbagi lokasi Anda untuk perjalanan ini berhenti.",
+  "The lead goes back to the organizer.": "Pimpinan kembali ke penyelenggara.",
   "Language": "Bahasa",
   "Change language": "Ganti bahasa",
   "Map Mode. Open your offroad map": "Mode Peta. Buka peta offroad kamu",
@@ -2957,6 +2960,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Tentang ride',
   'Lowering a limit never removes anyone who already joined.': 'Menurunkan batas tidak pernah mengeluarkan siapa pun yang sudah bergabung.',
   'Bring and Know': 'Bawa dan ketahui',
+  'Not Ready to Save': 'Belum bisa disimpan',
   'No Changes Yet': 'Belum ada perubahan',
   'Change anything above, then save. Riders see the new details right away.': 'Ubah apa saja di atas, lalu simpan. Rider langsung melihat detail baru.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Semua orang di ride mendapat notifikasi, dan halaman ride menampilkan apa yang berubah.',
@@ -2964,6 +2968,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Nama harus kurang dari {v} karakter.',
   'Check the departure time.': 'Periksa waktu keberangkatan.',
   'Check the expected finish time.': 'Periksa perkiraan waktu selesai.',
+  'Set the meeting point before adding instructions.': 'Atur titik kumpul sebelum menambahkan petunjuk.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Atur titik kumpul: cari tempat, ketuk peta, atau tempel koordinat seperti "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'Panjang rute adalah angka dalam mil, seperti 42.5.',
   '{list} and {last}': '{list} dan {last}',
