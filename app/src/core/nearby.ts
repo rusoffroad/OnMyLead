@@ -47,7 +47,11 @@ export const NEARBY_OUTBOX_UUID = 'E3B1C7A2-5D4F-4E2A-9F61-0A6D1E7C4B21';
 export const MAX_FRAME_BYTES = 180;
 /** Text that fits in one message packet, in UTF-8 bytes. */
 export const REPLY_PART_BYTES = 88;
-/** A message goes out in up to this many packets (one per REPLY_PART_BYTES): enough for any Ride Mode message (RIDE_MESSAGE_MAX characters, even all emoji or Chinese), so one is never cut. */
+/**
+ * A message goes out in up to this many packets (one per REPLY_PART_BYTES). Any Ride Mode message
+ * (RIDE_MESSAGE_MAX UTF-16 units, at most 3 UTF-8 bytes each, so 360 bytes) needs at most 5; the
+ * sixth gives a longer Ride Chat message bridged from the server more room before it is cut.
+ */
 export const MAX_REPLY_PARTS = 6;
 /** Longest message that goes over Bluetooth, in UTF-8 bytes; longer ones are cut. */
 export const MAX_REPLY_BYTES = REPLY_PART_BYTES * MAX_REPLY_PARTS;
@@ -486,9 +490,16 @@ function rank(item: NearbyItem, myId: string): number {
 /**
  * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
  * message's parts go together or not at all, so a full round never ends partway through a message.
- * When messages don't all fit, `turn` (one more every ROTATE_MS) rotates which go first, so an older
+ * When messages don't all fit, `turn` (one more every ROTATE_MS) reshuffles which go first, so an older
  * message gets its round instead of waiting behind the newest until it ages out.
  */
+/** A message's place in a turn's order: the same on every phone, different every turn (FNV-1a). */
+function turnOrder(id: string, turn: number): number {
+  let h = 0x811c9dc5;
+  for (const ch of `${id}:${turn}`) h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193) >>> 0;
+  return h;
+}
+
 export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn = 0): T[] {
   if (items.length <= MAX_FRAMES_PER_ROUND) return items;
   const own = items.find((i) => i.kind === 'position' && i.userId === myId);
@@ -504,12 +515,17 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
     const g = messages.get(i.id);
     if (g) g.push(i); else messages.set(i.id, [i]);
   }
-  // The rider's own messages first, newest first; then the rest, rotating.
+  const idOf = (g: T[]) => (g[0] as NearbyReply).id;
+  // The rider's newest own message first; then the rest in an order that changes every turn, set
+  // by each message's id, so every message comes up near the front within a few turns, however
+  // many arrive meanwhile.
   const groups = [...messages.values()];
-  const mine = groups.filter((g) => g[0].userId === myId);
-  const others = groups.filter((g) => g[0].userId !== myId);
-  const start = others.length ? turn % others.length : 0;
-  for (const g of [...mine, ...others.slice(start), ...others.slice(0, start)]) {
+  const newestOwn = groups.find((g) => g[0].userId === myId);
+  const rest = groups.filter((g) => g !== newestOwn)
+    .map((g) => ({ g, k: turnOrder(idOf(g), turn) }))
+    .sort((a, b) => a.k - b.k)
+    .map((x) => x.g);
+  for (const g of newestOwn ? [newestOwn, ...rest] : rest) {
     if (g.length <= left) { for (const i of g) picked.add(i); left -= g.length; }
   }
   // Then other riders' spots and receipts.

@@ -211,7 +211,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
    * hadn't been sent yet; an urgent send (a tap, a message, a receipt) goes ahead of it.
    */
   private func send(_ frames: [Data], urgent: Bool = false) {
-    guard !frames.isEmpty else { return }
+    // An empty round still goes through: it clears what subscribers hadn't been sent yet.
+    guard !frames.isEmpty || !urgent else { return }
     for (id, ch) in peerInbox {
       guard let p = peers[id], p.state == .connected else { continue }
       for f in frames {

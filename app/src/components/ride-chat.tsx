@@ -31,7 +31,7 @@ export function PinnedAnnouncement({ message, senderName }: { message: ChatMessa
       accessibilityLabel={t('Announcement from {senderName}: {body}', { senderName, body: message.body })}
       style={{ backgroundColor: RideColors.yellow, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.one }}>
       <ThemedText type="small" style={{ color: '#3A2600', fontWeight: 700 }}>{t('Announcement from {senderName}, {v}', { senderName, v: dayAndClock(message.sent_at) })}</ThemedText>
-      <ThemedText style={{ color: '#1A1100', fontSize: 19, lineHeight: 25, fontWeight: 700 }}>{chatMessageText(message, t)}</ThemedText>
+      <ThemedText style={{ color: '#1A1100', fontSize: 19, lineHeight: 25, fontWeight: 700 }}>{message.body}</ThemedText>
     </View>
   );
 }

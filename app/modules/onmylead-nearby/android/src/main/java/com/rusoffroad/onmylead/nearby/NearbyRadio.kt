@@ -87,13 +87,19 @@ class NearbyRadio(
     var cccdRetry = false
     var mtu = 23
     var busy = false
+    /** This round's frames, replaced by each new round. */
     val queue = ArrayDeque<ByteArray>()
+    /** Frames sent at once (taps, messages, receipts): ahead of the round, kept until sent. */
+    val urgent = ArrayDeque<ByteArray>()
   }
 
   private class Subscriber(val device: BluetoothDevice) {
     var mtu = 23
     var busy = false
+    /** This round's frames, replaced by each new round. */
     val queue = ArrayDeque<ByteArray>()
+    /** Frames sent at once (taps, messages, receipts): ahead of the round, kept until sent. */
+    val urgent = ArrayDeque<ByteArray>()
   }
 
   private val peers = HashMap<String, Peer>()
@@ -185,7 +191,7 @@ class NearbyRadio(
 
   fun sendNow(frames: List<String>) {
     val decoded = frames.mapNotNull { decode(it) }
-    handler.post { send(decoded) }
+    handler.post { send(decoded, urgent = true) }
   }
 
   fun drain(): List<String> = synchronized(received) {
@@ -280,25 +286,28 @@ class NearbyRadio(
     server = null
   }
 
-  private fun send(frames: List<ByteArray>) {
-    if (frames.isEmpty()) return
+  /**
+   * Hands each link frames to send. A round (urgent false) carries everything still worth sending,
+   * so it replaces the round a slow link hadn't finished, even when it's empty; frames sent at once
+   * go ahead of it and stay until sent. A new batch always goes in whole.
+   */
+  private fun send(frames: List<ByteArray>, urgent: Boolean = false) {
+    if (urgent && frames.isEmpty()) return
     for (p in peers.values) {
       if (p.inbox == null) continue
-      enqueue(p.queue, frames, p.mtu)
+      enqueue(if (urgent) p.urgent else p.queue, frames, p.mtu, urgent)
       pump(p)
     }
     for (s in subscribers.values) {
-      enqueue(s.queue, frames, s.mtu)
+      enqueue(if (urgent) s.urgent else s.queue, frames, s.mtu, urgent)
       pump(s)
     }
   }
 
-  /**
-   * Adds a batch to a link's queue whole: when the queue is full, its oldest frames make room, so a
-   * batch (a message's parts) never goes in only partway.
-   */
-  private fun enqueue(queue: ArrayDeque<ByteArray>, frames: List<ByteArray>, mtu: Int) {
+  private fun enqueue(queue: ArrayDeque<ByteArray>, frames: List<ByteArray>, mtu: Int, keep: Boolean) {
     val fit = frames.filter { it.size <= mtu - 3 }.take(MAX_QUEUE)
+    if (!keep) queue.clear()
+    // Too much waiting: the oldest frames make room.
     while (queue.isNotEmpty() && queue.size + fit.size > MAX_QUEUE) queue.removeFirst()
     queue.addAll(fit)
   }
@@ -308,7 +317,7 @@ class NearbyRadio(
     if (p.busy) return
     if (p.cccd != null && writeCccd(p)) return
     val ch = p.inbox ?: return
-    val f = p.queue.removeFirstOrNull() ?: return
+    val f = p.urgent.removeFirstOrNull() ?: p.queue.removeFirstOrNull() ?: return
     p.busy = true
     val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       p.gatt.writeCharacteristic(ch, f, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE) == BluetoothStatusCodesSuccess
@@ -328,7 +337,7 @@ class NearbyRadio(
     val srv = server ?: return
     val ch = outboxChar ?: return
     if (s.busy) return
-    val f = s.queue.removeFirstOrNull() ?: return
+    val f = s.urgent.removeFirstOrNull() ?: s.queue.removeFirstOrNull() ?: return
     s.busy = true
     val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       srv.notifyCharacteristicChanged(s.device, ch, false, f) == BluetoothStatusCodesSuccess

@@ -341,7 +341,7 @@ describe('pickFrames', () => {
     expect(counts.size).toBe(3);
     // Later rounds start with other messages, so every message gets a round before it ages out.
     const seen = new Set<string>();
-    for (let turn = 0; turn < 5; turn++) for (const i of pickFrames(items, A, turn)) if (i.kind === 'reply') seen.add(i.id);
+    for (let turn = 0; turn < 20; turn++) for (const i of pickFrames(items, A, turn)) if (i.kind === 'reply') seen.add(i.id);
     expect(seen.size).toBe(5);
     // The rider's own message goes in every full round, whatever the turn.
     const mine = [0, 1, 2, 3, 4, 5].map((p) => ({ ...(reply('own', p, 6, 1) as object), userId: A } as unknown as NearbyItem));
