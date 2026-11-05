@@ -79,14 +79,18 @@ describe('own dot moving or stopped', () => {
     expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS - 1)).toBe(true);
     expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS)).toBe(false);
   });
-  it('a stopped fix keeps the last moving time, so a short slow stretch does not flip the dot', () => {
+  it('a stopped fix means stopped at once', () => {
     const a = ownMovingAt(ownMovingAt(start, true, 1000), false, 3000);
-    expect(a.movingAt).toBe(1000);
+    expect(ownStillMoving(a.movingAt, 3000)).toBe(false);
   });
   it('ignores a repeated fix (only the compass turned)', () => {
     const a = ownMovingAt(start, true, 1000);
     expect(ownMovingAt(a, true, 1000)).toBe(a);
-    expect(ownMovingAt(a, true, 900)).toBe(a);
+    expect(ownMovingAt(a, false, 1000)).toBe(a);
+  });
+  it('an earlier fix time (a phone clock jump) still counts, so the dot never freezes', () => {
+    const a = ownMovingAt(ownMovingAt(start, true, 9_000_000), true, 1000, 2000);
+    expect(a.movingAt).toBe(2000);
   });
   it('times moving from the clock, not from the phone\'s fix time', () => {
     expect(ownMovingAt(start, true, 5, 1000).movingAt).toBe(1000);

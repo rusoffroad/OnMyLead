@@ -67,10 +67,11 @@ export function ownArrow(
 export const OWN_STOPPED_AFTER_MS = 10_000;
 
 /**
- * When your own dot last saw you moving (`nowMs` when this fix is moving, else the time before).
- * A fix whose own time `fixAtMs` is no newer than the last one (some phones repeat the last spot
- * when only the compass turned) changes nothing, so a stopped rider turning the phone doesn't
- * count as moving again. The fix's time is only compared with other fixes, never with the clock.
+ * When your own dot last saw you moving: `nowMs` for a moving fix, null for a stopped one (the dot
+ * takes its stopped look at once). A fix with the same own time `fixAtMs` as the last one (some
+ * phones repeat the last spot when only the compass turned) changes nothing, so a stopped rider
+ * turning the phone doesn't count as moving again. The fix's time is only compared with the last
+ * fix's, never with the clock.
  */
 export function ownMovingAt(
   prev: { movingAt: number | null; fixAt: number | null },
@@ -78,8 +79,8 @@ export function ownMovingAt(
   fixAtMs: number,
   nowMs: number = fixAtMs,
 ): { movingAt: number | null; fixAt: number | null } {
-  if (prev.fixAt != null && fixAtMs <= prev.fixAt) return prev;
-  return { movingAt: moving ? nowMs : prev.movingAt, fixAt: fixAtMs };
+  if (prev.fixAt != null && fixAtMs === prev.fixAt) return prev;
+  return { movingAt: moving ? nowMs : null, fixAt: fixAtMs };
 }
 
 /** Whether your own dot still counts you as moving at `nowMs`. */
