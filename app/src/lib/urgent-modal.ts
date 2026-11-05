@@ -2,10 +2,11 @@ import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { Platform } from 'react-native';
 
 /**
- * Urgent screens (the Crash Alert countdown) over sheets like Map Settings. iPhone and iPad can't
- * show a second sheet over one already up, so while an urgent screen is waiting, any open sheet
- * closes itself, and the urgent screen shows once the sheet has finished closing. Elsewhere it
- * shows at once.
+ * Urgent screens (the Crash Alert countdown) over sheets like Map Settings. While an urgent screen
+ * is up, every sheet steps out of the way (hidden, not closed: it comes back as it was afterwards),
+ * so nothing can cover the urgent screen. iPhone and iPad can't show a second sheet over one
+ * already up, so there the urgent screen shows once the sheet has finished hiding; elsewhere at
+ * once.
  */
 const ONE_SHEET_AT_A_TIME = Platform.OS === 'ios';
 
@@ -34,13 +35,9 @@ export function useUrgentModal(): boolean {
   return !ONE_SHEET_AT_A_TIME || up === 0;
 }
 
-/**
- * For a sheet: whether it should close for an urgent screen. Only on iPhone and iPad; elsewhere
- * the urgent screen shows over the sheet, which stays as it was (and keeps what the rider typed).
- */
+/** For a sheet: whether an urgent screen is up (the sheet hides until it's gone). */
 export function useUrgentWaiting(): boolean {
-  const waiting = useSyncExternalStore(subscribe, () => urgent > 0, () => urgent > 0);
-  return ONE_SHEET_AT_A_TIME && waiting;
+  return useSyncExternalStore(subscribe, () => urgent > 0, () => urgent > 0);
 }
 
 /**

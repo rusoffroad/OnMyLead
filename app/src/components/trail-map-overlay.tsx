@@ -217,7 +217,7 @@ function MapSettingsSheet({
         if (pendingPro.current !== feature) return;
         pendingPro.current = null;
         requirePro(feature);
-      }, 700);
+      }, 1500);
     } else requirePro(feature);
     return false;
   }, [onClose]);
