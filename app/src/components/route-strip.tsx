@@ -6,7 +6,7 @@ import type { FreerideSummary } from '@/core/freeride';
 import type { RangeCheck } from '@/core/fuel';
 import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
-import { convoyLayout, describeRank, groupSpread, rankRiders } from '@/core/route-order';
+import { convoyLayout, describeRank, groupSpread, rankRiders, spreadRuler, type SpreadRuler } from '@/core/route-order';
 
 import { t as tr } from '@/lib/i18n';
 const RANGE_COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
@@ -51,9 +51,11 @@ export function RouteStrip({
   const ranked = rankRiders(riders);
   const [width, setWidth] = useState(0);
   const sizeOf = (r: PlacedRider) => (r.id === meId ? SIZE.me : SIZE[r.role]);
-  const spots = new Map(
-    convoyLayout(ranked, sizeOf, width).map((d) => [d.id, d]),
-  );
+  const layout = convoyLayout(ranked, sizeOf, width);
+  const spots = new Map(layout.map((d) => [d.id, d]));
+  // The scale under the line: leader to whoever is furthest back, with round-step ticks.
+  const ruler = width ? spreadRuler(ranked, layout) : null;
+  const rulerStale = !!ruler && !!lastSeenIds?.length && [ranked.find((r) => r.role === 'leader') ?? ranked[0], ranked[ranked.length - 1]].some((r) => r.id !== meId && lastSeenIds.includes(r.id));
   // Draw me last so my dot sits on top, then the leader and sweep over the riders.
   const order = [...ranked].sort((a, b) => layer(a) - layer(b));
   function layer(r: PlacedRider) {
@@ -164,6 +166,8 @@ export function RouteStrip({
         ) : null}
       </View>
 
+      {ruler ? <Ruler ruler={ruler} stale={rulerStale} /> : null}
+
       {compact ? null : freeride ? (
         <Text style={styles.compared}>
           {freeride.waiting
@@ -188,6 +192,43 @@ export function RouteStrip({
   );
 }
 
+/**
+ * A dimension line under the leader line, end caps under the leader's and the tail's dots, the
+ * leader-to-rear distance in the middle and a small tick every round step (core spreadRuler).
+ */
+function Ruler({ ruler, stale }: { ruler: SpreadRuler; stale: boolean }) {
+  const [labelW, setLabelW] = useState(0);
+  const mid = (ruler.fromX + ruler.toX) / 2;
+  const gapL = mid - labelW / 2 - 6;
+  const gapR = mid + labelW / 2 + 6;
+  const label = stale ? `~${ruler.label}` : ruler.label;
+  return (
+    <View
+      style={styles.ruler}
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={`${ruler.ends}, ${label}${stale ? tr(', last seen here') : ''}`}>
+      <View style={[styles.rulerCap, { left: ruler.fromX - 0.75 }]} />
+      <View style={[styles.rulerCap, { left: ruler.toX - 0.75 }]} />
+      {labelW ? (
+        <>
+          <View style={[styles.rulerLine, { left: ruler.fromX, width: Math.max(0, gapL - ruler.fromX) }]} />
+          <View style={[styles.rulerLine, { left: gapR, width: Math.max(0, ruler.toX - gapR) }]} />
+        </>
+      ) : null}
+      {ruler.ticks.filter((x) => x < gapL - 3 || x > gapR + 3).map((x) => (
+        <View key={x} style={[styles.rulerTick, { left: x - 0.5 }]} />
+      ))}
+      <Text
+        onLayout={(e) => setLabelW(Math.ceil(e.nativeEvent.layout.width))}
+        style={[styles.rulerText, { left: mid - labelW / 2, opacity: labelW ? 1 : 0 }, stale && styles.rulerStale]}
+        numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 const styles = themedStyles(() => ({
   wrap: { gap: 8, paddingHorizontal: 4, paddingBottom: 4 },
   head: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
@@ -195,6 +236,16 @@ const styles = themedStyles(() => ({
   of: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 20 },
   toGo: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
   track: { height: 34, justifyContent: 'center', marginHorizontal: 10 },
+  // Sits close under the track (the wrap's gap is 8): caps at 0, line at 5, ticks hang from it.
+  ruler: { height: 16, marginTop: -6, marginHorizontal: 10 },
+  rulerCap: { position: 'absolute', top: 0, width: 1.5, height: 11, borderRadius: 1, backgroundColor: Colors.textSecondary, opacity: 0.8 },
+  rulerLine: { position: 'absolute', top: 5, height: 1, backgroundColor: Colors.textSecondary, opacity: 0.55 },
+  rulerTick: { position: 'absolute', top: 5, width: 1, height: 4, backgroundColor: Colors.textSecondary, opacity: 0.55 },
+  rulerText: {
+    position: 'absolute', top: -1, color: Colors.textSecondary, fontFamily: font(700), fontSize: 12, lineHeight: 14,
+    letterSpacing: 0.3, fontVariant: ['tabular-nums'],
+  },
+  rulerStale: { fontStyle: 'italic' },
   rail: { position: 'absolute', left: 0, right: 0, height: 6, borderRadius: 3, backgroundColor: Colors.backgroundSelected },
   dot: { position: 'absolute', top: '50%', borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   letter: { color: '#fff', fontFamily: font(800), fontSize: 11 },
