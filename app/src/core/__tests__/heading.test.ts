@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
+import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownFixGap, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
 import { BATTERY_PLANS } from '../battery';
 
 describe('riderHeading', () => {
@@ -79,6 +79,7 @@ describe('own dot moving or stopped', () => {
     expect(ownStoppedAfterMs()).toBe(5000);
     expect(ownStoppedAfterMs(BATTERY_PLANS.saver.fixEveryMs)).toBeGreaterThan(2 * BATTERY_PLANS.saver.fixEveryMs);
     expect(ownStoppedAfterMs(Number.NaN)).toBe(5000);
+    expect(ownStoppedAfterMs(10 * 60_000)).toBe(150_000);
     expect(ownStillMoving(0, 20_000, ownStoppedAfterMs(BATTERY_PLANS.saver.fixEveryMs))).toBe(true);
   });
   it('counts you moving from a moving fix until no new moving fix for a while', () => {
@@ -102,6 +103,12 @@ describe('own dot moving or stopped', () => {
   });
   it('times moving from the clock, not from the phone\'s fix time', () => {
     expect(ownMovingAt(start, true, 5, 1000).movingAt).toBe(1000);
+  });
+  it('learns the fix gap from the fixes it sees, ignoring a stop or dead spot', () => {
+    expect(ownFixGap(1000, null, 5000)).toBe(1000);
+    expect(ownFixGap(1000, 0, 15_000)).toBe(15_000);
+    expect(ownFixGap(15_000, 0, 5 * 60_000)).toBe(15_000);
+    expect(ownFixGap(1000, 5000, 5000)).toBe(1000);
   });
   it('was never moving with no moving fix', () => {
     expect(ownStillMoving(ownMovingAt(start, false, 1000, 1000).movingAt, 1000)).toBe(false);

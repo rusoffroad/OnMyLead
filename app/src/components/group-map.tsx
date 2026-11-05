@@ -16,7 +16,6 @@ import { fallbackFollowStep } from './fallback-follow';
 import { TracklinePolylines } from './leader-trackline';
 import { GroupMapboxMap } from './group-mapbox-map';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
-import { MAP_FIX_RATE_FOLLOWS_PLAN } from '@/lib/location';
 import { RiderMarker } from './rider-marker';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
@@ -278,7 +277,7 @@ function FlatGroupMap({
         .map((r) => (
           <RiderMarker key={r.id} rider={r} mapHeading={mapHeading} onPress={onRiderPress} />
         ))}
-      <OwnHeadingMarker own={own} mapHeading={mapHeading} fixEveryMs={MAP_FIX_RATE_FOLLOWS_PLAN ? locationEveryMs : undefined} />
+      <OwnHeadingMarker own={own} mapHeading={mapHeading} />
       {regroup ? (
         <Marker coordinate={{ latitude: regroup.lat, longitude: regroup.lng }} title={regroup.label ?? 'Regroup here'} pinColor={RideColors.yellow} />
       ) : null}

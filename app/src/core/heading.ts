@@ -67,13 +67,27 @@ export function ownArrow(
  */
 export const OWN_STOPPED_AFTER_MS = 5000;
 
+/** A gap between fixes longer than this is a stop or a dead spot, not the map's fix rate (ms). */
+export const OWN_FIX_GAP_MAX_MS = 60_000;
+
 /**
- * How long your own dot waits with no new fix before counting you stopped, for a map that gets a
- * fix every `fixEveryMs` (Battery Saver sends one every 15 s): two and a half fix gaps, so it
- * never flips between fixes mid-ride or in a short GPS gap under trees, and never under 5 s.
+ * How long your own dot waits with no new fix before counting you stopped, for a map whose fixes
+ * come `fixGapMs` apart (Battery Saver on Android sends one every 15 s): two and a half fix gaps,
+ * so it never flips between fixes mid-ride or in a short GPS gap under trees, and never under 5 s.
  */
-export function ownStoppedAfterMs(fixEveryMs = 1000): number {
-  return Math.max(OWN_STOPPED_AFTER_MS, Math.round(2.5 * (Number.isFinite(fixEveryMs) ? fixEveryMs : 1000)));
+export function ownStoppedAfterMs(fixGapMs = 1000): number {
+  const gap = Number.isFinite(fixGapMs) && fixGapMs > 0 ? Math.min(fixGapMs, OWN_FIX_GAP_MAX_MS) : 1000;
+  return Math.max(OWN_STOPPED_AFTER_MS, Math.round(2.5 * gap));
+}
+
+/**
+ * The map's fix gap as your dot has seen it: the time since the last fix, unless that was a stop
+ * or a dead spot (over a minute), when the gap seen before stands.
+ */
+export function ownFixGap(prevGapMs: number, lastFixAtMs: number | null, nowMs: number): number {
+  if (lastFixAtMs == null) return prevGapMs;
+  const gap = nowMs - lastFixAtMs;
+  return gap > 0 && gap <= OWN_FIX_GAP_MAX_MS ? gap : prevGapMs;
 }
 
 /**
