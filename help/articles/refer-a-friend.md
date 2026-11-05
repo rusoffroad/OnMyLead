@@ -4,7 +4,7 @@ summary: Invite a riding buddy who's new to OnMyLead. When they finish their fir
 category: pro
 order: 45
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/app/invite-friends.tsx
   - app/src/components/referral-reward.tsx
