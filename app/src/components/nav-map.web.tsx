@@ -163,6 +163,7 @@ function FlatNavMap({
     if (!center) {
       meDot.current?.remove();
       meDot.current = null;
+      lastMeHeading.current = null;
       return;
     }
     if (meHeading != null) lastMeHeading.current = meHeading;

@@ -37,7 +37,6 @@ export function useOwnMoving(everyMs?: number): [boolean, (moving: boolean, fixA
     state.current = next;
     setMoving(next.moving);
     arm();
-    if (!next.moving) clearTimeout(timer.current);
   }, [arm]);
   return [moving, feed];
 }

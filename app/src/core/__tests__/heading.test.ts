@@ -114,6 +114,9 @@ describe('own dot moving or stopped', () => {
     expect(quiet.moving).toBe(false);
     expect(ownStopWaitMs(ownMoveStep(quiet, true, 20_000, 20_000))).toBe(OWN_STOPPED_AFTER_MS);
     expect(ownStopWaitMs(ownMoveStep(ride(1000, 3), true, 40_000, 40_000))).toBe(OWN_STOPPED_AFTER_MS);
+    // A short dead spot on a once-a-second map isn't its fix rate either.
+    expect(ownStopWaitMs(ownMoveStep(ride(1000, 5), true, 4000 + 15_000, 4000 + 15_000))).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ride(20_000, 3))).toBe(50_000);
   });
   it('measures gaps by the fixes\' own times, so a held-back burst keeps its real spacing', () => {
     let s = ownMoveStep(OWN_MOVE_START, true, 0, 100_000);

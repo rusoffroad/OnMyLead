@@ -84,8 +84,11 @@ export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, timed:
 export const OWN_STOPPED_AFTER_MS = 5000;
 /** The wait before any fix gap is known and the map gave no interval: just over Battery Saver's 15 s. */
 export const OWN_STOPPED_UNKNOWN_MS = 16_000;
-/** A gap between moving fixes longer than this is a dead spot, not the map's fix rate (ms). */
-export const OWN_FIX_GAP_MAX_MS = 30_000;
+/**
+ * A gap between moving fixes longer than this is a dead spot, not the map's fix rate (ms); so is
+ * one over three times the longest gap already seen (a canyon on a once-a-second map).
+ */
+export const OWN_FIX_GAP_MAX_MS = 20_000;
 /** How many recent fix gaps your dot remembers (the longest of them sets the wait). */
 export const OWN_FIX_GAPS_KEPT = 5;
 
@@ -102,7 +105,8 @@ export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number
   let gaps = prev.gaps;
   if (moving && prev.moving) {
     const gap = fixAt != null && prev.timed && prev.fixAt != null ? fixAt - prev.fixAt : prev.seenAt == null ? 0 : nowMs - prev.seenAt;
-    if (gap > 0 && gap <= OWN_FIX_GAP_MAX_MS) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
+    const limit = gaps.length ? Math.min(OWN_FIX_GAP_MAX_MS, 3 * Math.max(...gaps)) : OWN_FIX_GAP_MAX_MS;
+    if (gap > 0 && gap <= limit) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
   }
   // A fix with no time keeps the last fix time, so a later repeat of that fix is still caught.
   return { moving, fixAt: fixAt ?? prev.fixAt, timed: fixAt != null, seenAt: nowMs, gaps };
