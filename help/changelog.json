@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["emergency-siren", "emergency-and-safety", "notification-settings"],
+    "kind": "new",
+    "by": "pr",
+    "ref": "emergency-siren",
+    "why": "New in 2.2 (Chris asked during the 2.1 Bluetooth test): an EMERGENCY or a Crash Alert from a rider sounds a loud siren on the other riders' phones until they silence it, with the app open, from the push with it closed, and over Bluetooth with no service. New guide Hear the Emergency Siren; the emergency and notification guides mention it and the Emergency Siren switch."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["tilt-and-crash-alert"],
     "kind": "fix",
     "by": "pr",

@@ -1,5 +1,19 @@
 [
   {
+    "version": "2.2",
+    "title": "The Emergency Siren",
+    "intro": "OnMyLead 2.2 makes sure nobody misses a call for help. When a rider on your ride sends EMERGENCY, or their Crash Alert goes out, every other rider's phone sounds a loud siren until they silence it, over wind, engines and helmets, even with no service over Bluetooth.",
+    "whatsNew": "What's new in 2.2:\n\n• Emergency Siren: when a rider sends EMERGENCY or a Crash Alert goes out, your phone sounds a loud siren until you silence it. Tap Show Me Where to see them on the map. Turn it off or hear it in Notification Settings.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Emergency Siren: when another rider on your ride sends EMERGENCY, from the button, CarPlay or a Crash Alert that ran out, your phone sounds a loud siren on a full-screen alert until you tap Silence Siren or Show Me Where. With OnMyLead open it plays even with the ring/silent switch on silent and turns your music down under it; with the app closed the notification itself plays the siren (on Android as an alarm, so you hear it with the ringer on silent). With no service it sounds over Bluetooth too. It stops by itself if the rider cancels or taps I'm OK. It's on for everyone; switch it off or tap Play Siren to hear it in Notification Settings."
+      }
+    ]
+  },
+  {
     "version": "2.1",
     "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",

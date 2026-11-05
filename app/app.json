@@ -15,6 +15,9 @@
       "requireFullScreen": false,
       "appleTeamId": "YJ4KUF2QQV",
       "associatedDomains": ["applinks:onmylead.com"],
+      "entitlements": {
+        "com.apple.developer.usernotifications.time-sensitive": true
+      },
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "With no cell service, Ride Mode passes your ride's locations and alerts to nearby riders on the same ride over Bluetooth. Everything sent is encrypted for your ride only.",
         "UIBackgroundModes": ["bluetooth-central", "bluetooth-peripheral"],
@@ -303,10 +306,19 @@
         {
           "icon": "./assets/images/android-icon-monochrome.png",
           "color": "#E5262E",
-          "defaultChannel": "ride-updates"
+          "defaultChannel": "ride-updates",
+          "sounds": ["./assets/sounds/siren.wav"]
         }
       ],
-      "@rnmapbox/maps"
+      "@rnmapbox/maps",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

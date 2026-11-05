@@ -94,6 +94,12 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   quick reply; up to 6 saved My Quick Replies per device, 2.0), broadcast receipts with offline queue and cancel, pinned
   announcement read aloud, Regroup Here, Navigate to a rider, Mechanical Issue spoken to leaders.
 - Emergency sheet: Alert My Group (hold), Call 911.
+- Emergency Siren (2.2): another rider's EMERGENCY (or a Crash Alert that went out) sounds a
+  looping siren on a full-screen card over any screen until Silence Siren / Show Me Where; the
+  push plays the siren with the app closed (iOS sound, Android `ride-emergency` channel); Bluetooth
+  calls in the background get a local notification. Switch + Play Siren in Notification Settings.
+  `core/siren.ts`, `lib/siren.ts`, `components/emergency-siren.tsx`, migration
+  `20261105070000_emergency_siren.sql`.
 - Keep-awake, speech, haptics, route progress strip, directions sheet, add waypoint.
 - CarPlay ride screen **[iOS-only]** (2.1; Apple granted the Driving Task entitlement 2026-11-04):
   status buttons, Group list, Regroup Here or Running Late, EMERGENCY with confirm, help-call and

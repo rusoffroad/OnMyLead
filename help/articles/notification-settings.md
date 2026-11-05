@@ -17,7 +17,7 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - supabase/migrations/20261101500000_rider_badges.sql
   - supabase/migrations/20261101700000_out_riding.sql
-related: [notifications-inbox, getting-started, status-buttons, ride-chat, group-chat, follow-leaders, emergency-and-safety, pro-trial, troubleshooting]
+related: [emergency-siren, notifications-inbox, getting-started, status-buttons, ride-chat, group-chat, follow-leaders, emergency-and-safety, pro-trial, troubleshooting]
 keywords: [notifications, push, alerts, mute, quiet hours, do not disturb, reminder, lock screen, preview, emails, sound]
 ---
 
@@ -35,6 +35,10 @@ You can also tap the bell at the top of the **Rides** tab, then **Notification S
 ## Always On: Help and EMERGENCY
 
 When someone in your group taps **Need Help** or **EMERGENCY**, you're always told, even during quiet hours. This can't be turned off.
+
+:::release 2.2
+**Emergency Siren**, just below, starts on: an EMERGENCY from your group sounds a loud siren until you silence it. Tap **Play Siren** to hear it, or switch it off to get EMERGENCY notifications with the normal sound. See [Hear the Emergency Siren](/help/emergency-siren).
+:::
 
 ## What You Can Turn On or Off
 
