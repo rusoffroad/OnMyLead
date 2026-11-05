@@ -4,7 +4,7 @@ summary: See what your friends are up to, like and comment on rides, badges and 
 category: groups
 order: 27
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/app/social/index.tsx
   - app/src/app/social/item.tsx

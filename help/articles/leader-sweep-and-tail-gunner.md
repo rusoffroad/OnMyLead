@@ -4,7 +4,7 @@ summary: Who rides up front, who rides at the rear, and how to make someone lead
 category: rides
 order: 50
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/rider-pin.tsx
   - app/src/components/rider-puck.tsx
