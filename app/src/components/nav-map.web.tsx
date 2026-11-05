@@ -28,7 +28,7 @@ export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
 /** Your own dot on the website's flat map, in the rider's Dot Style and Dot Size (core/own-dot-art). */
 const meDotHtml = (style: DotStyle, d: number, heading: number | null | undefined, moving: boolean) =>
-  `<div role="img" aria-label="${tr('You are here')}" style="display:block;pointer-events:none">${ownDotSvg(style, d, heading == null ? null : Math.round(heading), moving, 'me')}</div>`;
+  `<div role="img" aria-label="${esc(tr('You are here'))}" style="display:block;pointer-events:none">${ownDotSvg(style, d, heading == null ? null : Math.round(heading), moving, 'me')}</div>`;
 
 type NavMapProps = Parameters<typeof FlatNavMap>[0];
 

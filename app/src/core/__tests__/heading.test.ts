@@ -101,7 +101,9 @@ describe('own dot moving or stopped', () => {
     expect(ownStopWaitMs(first, Number.NaN)).toBe(OWN_STOPPED_UNKNOWN_MS);
   });
   it('then 2.5 of the longest recent gap between moving fixes, at least 5 s', () => {
-    expect(ownStopWaitMs(ride(1000, 5), 15_000)).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ride(1000, 5))).toBe(OWN_STOPPED_AFTER_MS);
+    // A quick pair of fixes never shortens the wait below the map's own interval.
+    expect(ownStopWaitMs(ride(1000, 5), 15_000)).toBe(37_500);
     expect(ownStopWaitMs(ride(15_000, 3))).toBe(37_500);
     expect(ownStopWaitMs(ownMoveStep(ride(15_000, 3), true, 30_500, 30_500))).toBe(37_500);
   });
@@ -123,6 +125,12 @@ describe('own dot moving or stopped', () => {
     const t = ownMoveStep(s, false, null, 1000);
     expect(t).not.toBe(s);
     expect(t.moving).toBe(false);
+  });
+  it('a timeless fix in between does not hide a repeat, nor double the next gap', () => {
+    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 0, 0), true, null, 1000);
+    expect(ownMoveStep(s, true, 0, 1500)).toBe(s);
+    const next = ownMoveStep(s, true, 2000, 2000);
+    expect(next.gaps).toEqual([1000, 1000]);
   });
   it('ignores a repeated fix (only the compass turned)', () => {
     const s = ownMoveStep(OWN_MOVE_START, true, 1000, 1000);

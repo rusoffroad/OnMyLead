@@ -13,25 +13,31 @@ export function useOwnMoving(everyMs?: number): [boolean, (moving: boolean, fixA
   const state = useRef(OWN_MOVE_START);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const every = useRef(everyMs);
+  const arm = useCallback(() => {
+    clearTimeout(timer.current);
+    const s = state.current;
+    if (!s.moving || s.seenAt == null) return;
+    timer.current = setTimeout(() => {
+      state.current = ownMoveTimedOut(state.current);
+      setMoving(false);
+    }, Math.max(0, s.seenAt + ownStopWaitMs(s, every.current) - Date.now()));
+  }, []);
   useEffect(() => {
     if (every.current === everyMs) return;
     every.current = everyMs;
+    // A new interval (a battery plan picked mid-ride): start the fix gaps over, and a wait already
+    // running takes the new length.
     state.current = { ...state.current, gaps: [] };
-  }, [everyMs]);
+    arm();
+  }, [everyMs, arm]);
   useEffect(() => () => clearTimeout(timer.current), []);
   const feed = useCallback((isMoving: boolean, fixAtMs?: number) => {
-    const now = Date.now();
-    const next = ownMoveStep(state.current, isMoving, fixAtMs, now);
+    const next = ownMoveStep(state.current, isMoving, fixAtMs, Date.now());
     if (next === state.current) return;
     state.current = next;
-    clearTimeout(timer.current);
     setMoving(next.moving);
-    if (next.moving) {
-      timer.current = setTimeout(() => {
-        state.current = ownMoveTimedOut(state.current);
-        setMoving(false);
-      }, ownStopWaitMs(next, every.current));
-    }
-  }, []);
+    arm();
+    if (!next.moving) clearTimeout(timer.current);
+  }, [arm]);
   return [moving, feed];
 }
