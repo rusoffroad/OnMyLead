@@ -110,6 +110,14 @@
       {
         "kind": "fixed",
         "text": "Posts, comments and chat messages show exactly as the rider wrote them in every language, and reward dates show in your language."
+      },
+      {
+        "kind": "fixed",
+        "text": "A new waypoint alert goes out once per waypoint: switching it to Just Me and back no longer alerts the ride again."
+      },
+      {
+        "kind": "improved",
+        "text": "Refer a Friend: your friend's first ride counts once that ride has actually started, so a ride that was created and never led doesn't earn the reward."
       }
     ]
   },

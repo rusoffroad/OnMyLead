@@ -71,9 +71,9 @@ export const TAG_WINDOW_SEC = 15 * 60;
 /** Most packets one broadcast round sends, so a big group can't flood the link. */
 export const MAX_FRAMES_PER_ROUND = 24;
 /** How often a full round moves on in line: longer than the slowest radio round (10 s on Max Battery Saver), so every turn's pick goes out at least once. */
-export const ROTATE_MS = 10_500;
-/** How long an item must stay in the pick to count as sent: the slowest radio round (Max Battery Saver). */
-export const HELD_MS = 10_000;
+export const ROTATE_MS = 12_000;
+/** How long an item must stay in the pick to count as sent: longer than the slowest radio round (10 s on Max Battery Saver), with room for timer drift. */
+export const HELD_MS = 11_000;
 /** Other riders' spots, and receipts, a full round always makes room for. */
 export const SPOT_SHARE = 6;
 export const ACK_SHARE = 2;
@@ -517,7 +517,10 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   // first), so every spot, tap, message and receipt gets its turn however many are live.
   const inLine = <G,>(list: G[], keyOf: (g: G) => string) =>
     list.map((g, n) => ({ g, n, sent: lastSent(keyOf(g)) })).sort((a, b) => a.sent - b.sent || a.n - b.n).map((x) => x.g);
-  const waiting = (kind: NearbyItem['kind']) => inLine(items.filter((i) => i.kind === kind && !picked.has(i)), roundKey);
+  // Each kind is put in line once; what's already picked is skipped when a line is used.
+  const lines = new Map<NearbyItem['kind'], T[]>();
+  for (const kind of ['position', 'ack', 'status'] as const) lines.set(kind, inLine(items.filter((i) => i.kind === kind), roundKey));
+  const waiting = (kind: NearbyItem['kind']) => (lines.get(kind) ?? []).filter((i) => !picked.has(i));
   // Emergencies (leaving room for the own spot), the own spot, then the rider's own taps.
   for (const i of sos) if (left > (own ? 1 : 0)) take([i]);
   if (own) take([own]);
