@@ -3210,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "ライドの全員に位置情報付きで緊急通知を送りますか？",
   "Running Late": "遅れます",
   "Need a Minute": "少し待って",
+  "Couldn’t Change the Trackline": "リーダートラックを変更できませんでした",
+  "Leader Trackline": "リーダートラック",
+  "A line behind you in the leader color, on every rider’s map": "全ライダーの地図で、あなたの後ろにリーダーの色で線を表示",
+  "On for Everyone": "全員に表示",
+  "Off for Everyone": "全員に非表示",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "先導した道を全ライダーの地図に表示します。線を再び横切ると、古い線が薄くなります。",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "リーダートラックをオフにする機能はまだ有効になっていません。次回のサーバー更新で使えるようになります。",
 };
 
 export default dict;

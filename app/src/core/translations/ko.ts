@@ -3210,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "라이드의 모든 사람에게 내 위치와 함께 긴급 알림을 보낼까요?",
   "Running Late": "늦어요",
   "Need a Minute": "잠깐만요",
+  "Couldn’t Change the Trackline": "리더 트랙라인을 변경할 수 없습니다",
+  "Leader Trackline": "리더 트랙라인",
+  "A line behind you in the leader color, on every rider’s map": "모든 라이더의 지도에 리더 색상으로 당신 뒤에 선을 표시",
+  "On for Everyone": "모두에게 켜짐",
+  "Off for Everyone": "모두에게 꺼짐",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "이끈 길을 모든 라이더의 지도에 보여 줍니다. 다시 가로지르면 이전 선이 흐려집니다.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "리더 트랙라인 끄기는 아직 사용할 수 없습니다. 다음 서버 업데이트 후 작동합니다.",
 };
 
 export default dict;

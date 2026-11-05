@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, pick which roads, trails and land bo
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/trail-map-overlay.tsx
   - app/src/components/trail-width-row.tsx
@@ -63,6 +63,8 @@ Tap it to open the **Map Style** panel. Tap it again to close the panel.
 
 :::release 2.1
 The panel has **Map Style** at the top and **Map Features** under it. On a phone the panel scrolls if it's taller than the space above Ride Mode's or Map Mode's bottom panel.
+
+In Ride Mode the leader and the ride's organizers also see **Leader Trackline** between the two, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
 :::
 
 Your choices are remembered on your phone and used on every map in the app.
