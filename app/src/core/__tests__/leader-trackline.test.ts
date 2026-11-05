@@ -69,8 +69,9 @@ describe('lastCrossing', () => {
     const pts = trail([...out, ...back]);
     const { from, crossings } = lastCrossing(pts);
     expect(crossings).toBe(1);
-    // The fresh line starts at the turnaround, not part way back down.
-    expect((pts[from].lat - start.lat) * M_LAT).toBeGreaterThan(1460);
+    // The fresh line starts at the turnaround (within the few dozen meters a tight turn counts as
+    // standing still, TRACKLINE_STILL_M), not part way back down.
+    expect((pts[from].lat - start.lat) * M_LAT).toBeGreaterThan(1400);
     const t = tracklinePieces(pts);
     const freshLen = t.fresh.flat().length;
     expect(freshLen).toBeGreaterThan(back.length * 0.85);
@@ -118,6 +119,20 @@ describe('lastCrossing', () => {
   });
 });
 
+describe('stops', () => {
+  it('GPS wander while the leader is stopped never fades the line behind them', () => {
+    // 2 km out, then 40 spots wandering up to 15 m each way around a lunch stop (a phone in a
+    // pocket under trees), then on another 1 km.
+    const out = path([[0, 0], [2000, 0]]);
+    const wander = Array.from({ length: 40 }, (_, i) => at(2000 + 15 * Math.sin(i * 1.7), 15 * Math.cos(i * 2.3)));
+    const on = path([[2000, 0], [3000, 0]]).slice(1);
+    const pts = trail([...out, ...wander, ...on]);
+    const { from } = lastCrossing(pts);
+    // Whatever the scribble at the stop does, the morning's 2 km stays bright.
+    expect((pts[from].lat - start.lat) * M_LAT).toBeLessThan(10);
+  });
+});
+
 describe('ridden', () => {
   it('breaks the line where the phone missed the leader for a long way, never drawing across', () => {
     const a = path([[0, 0], [300, 0]]);
@@ -125,6 +140,13 @@ describe('ridden', () => {
     const pieces = ridden([...a, ...b]);
     expect(pieces).toHaveLength(2);
     expect(pieces[0]).toHaveLength(a.length);
+  });
+
+  it('still draws the line when the leader is heard only every 45 s at highway speed', () => {
+    // Max Battery Saver or the backup poll: about 1.3 km between spots at 30 m/s.
+    const pts = trail(path([[0, 0], [13_000, 0]], 1_300));
+    expect(ridden(pts)).toHaveLength(1);
+    expect(tracklinePieces(pts).fresh.flat().length).toBe(pts.length);
   });
 
   it('drops a lone spot that has nothing to join', () => {

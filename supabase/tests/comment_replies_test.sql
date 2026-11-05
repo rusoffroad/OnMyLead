@@ -169,7 +169,22 @@ select as_user('00000000-0000-0000-0000-000000000ee2');
 set role authenticated;
 do $$ begin
   if exists (select 1 from feed_item_thread(reply_key())) then raise exception 'FAIL: replies under a hidden comment still shown'; end if;
+  -- 2.0 builds and the Feed's counts and preview leave them out too.
+  if exists (select 1 from feed_item_comments(reply_key()) where id in (reply_id('r1'), reply_id('r2'))) then
+    raise exception 'FAIL: feed_item_comments shows replies under a hidden comment';
+  end if;
 end $$;
+reset role;
+do $$ begin
+  if (select comment_count from feed_item_stats('00000000-0000-0000-0000-000000000ee2', reply_key()))
+     <> (select count(*) from feed_comments where item_key = reply_key() and hidden_at is null and parent_id is distinct from reply_id('c1')) then
+    raise exception 'FAIL: comment count still counts replies under a hidden comment';
+  end if;
+  if exists (select 1 from rider_notifications where data ->> 'commentId' in (reply_id('r1')::text, reply_id('r2')::text)) then
+    raise exception 'FAIL: notifications about replies under a hidden comment left behind';
+  end if;
+end $$;
+set role authenticated;
 reset role;
 select as_user('00000000-0000-0000-0000-000000000ee6');
 set role authenticated;

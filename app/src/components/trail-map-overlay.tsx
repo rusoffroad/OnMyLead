@@ -264,7 +264,7 @@ function TracklineRow({ sw }: { sw: TracklineSwitch }) {
         accessibilityRole="switch"
         accessibilityState={{ checked: sw.on, busy: !!sw.busy }}
         accessibilityLabel={tr('Leader Trackline')}
-        accessibilityHint={tr('A line behind you in the leader color, on every rider’s map')}
+        accessibilityHint={tr('A line behind the leader in the leader color, on every rider’s map')}
         disabled={sw.busy}
         onPress={() => sw.onChange(!sw.on)}
         style={({ pressed }) => [styles.feature, sw.on && styles.featureOn, pressed && { opacity: 0.85 }]}>

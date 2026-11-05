@@ -139,6 +139,8 @@ export function notificationKey(raw: unknown): string | null {
   if (d.type === 'message') return `chat:${str(d.rideId)}`;
   if (d.type === 'group_message') return `group:${str(d.groupId)}`;
   if (d.type === 'direct_message') return `dm:${str(d.userId)}`;
+  // A like on a comment is its own event, not the post's like (the push collapses the same way).
+  if (d.type === 'feed_like' && str((d as Record<string, unknown>).commentId)) return `feed_like:${str(d.key)}:${str((d as Record<string, unknown>).commentId)}`;
   if (d.type === 'feed_like' || d.type === 'feed_comment') return `${d.type}:${str(d.key)}`;
   if (d.type === 'waypoint') return `waypoint:${str(d.waypointId)}`;
   const extra = d as Record<string, unknown>;

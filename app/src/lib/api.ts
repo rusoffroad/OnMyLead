@@ -315,13 +315,13 @@ export async function handOffRide(rideId: string, toUserId: string) {
   track('ride_handed_off', { ride_id: rideId });
 }
 
-/** Name the one rider at the rear (stored as the 'sweep' role), or clear it with null. */
 /** The leader (or an organizer) turns the Leader Trackline on or off for everyone on the ride. */
 export async function setLeaderTrackline(rideId: string, on: boolean) {
   unwrap(await supabase.rpc('set_leader_trackline', { p_ride: rideId, p_on: on }));
   track('leader_trackline_set', { on });
 }
 
+/** Name the one rider at the rear (stored as the 'sweep' role), or clear it with null. */
 export async function setTailGunner(rideId: string, userId: string | null) {
   unwrap(await supabase.rpc('set_tail_gunner', { p_ride: rideId, p_user: userId }));
   track('tail_gunner_set', { cleared: !userId });
