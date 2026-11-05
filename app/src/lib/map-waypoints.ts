@@ -10,6 +10,7 @@ import type { Waypoint } from '@/core/waypoints';
 import { track } from './analytics';
 import { currentEntitlements } from './entitlements';
 import { isBackendConfigured, supabase } from './supabase';
+import { singleFlight } from './single-flight';
 
 /**
  * Map Mode waypoints (core/map-waypoints.ts has the rules): kept on the device so they work with
@@ -128,19 +129,12 @@ function backupSoon() {
   }, 4_000);
 }
 
-let running: Promise<void> | null = null;
-
 /** Swap Map Mode waypoints with the backup now. Safe to call often; does nothing when signed out or offline. */
-export function backupMapWaypointsNow(): Promise<void> {
-  running ??= run()
-    .catch(() => {
-      // Offline, or the server doesn't have the backup yet: try again next time.
-    })
-    .finally(() => {
-      running = null;
-    });
-  return running;
-}
+export const backupMapWaypointsNow: () => Promise<void> = singleFlight(() =>
+  run().catch(() => {
+    // Offline, or the server doesn't have the backup yet: try again next time.
+  }),
+);
 
 async function run() {
   if (!can(currentEntitlements(), 'sync')) return;

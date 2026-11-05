@@ -203,32 +203,39 @@ export function useTrailMap(): TrailMap {
         // Not a saved choice.
       }
     };
-    const applyRiders = (v: string | null) => {
-      riderOnRef.current = v !== '0';
-      setRiderOn(v !== '0');
-      featuresRef.current = { ...featuresRef.current, riderTrails: v !== '0' };
+    // The You tab's own keys ('1' / '0') win over the panel's saved layers for these two, in
+    // either direction, so a switch turned back on in the You tab shows the trails again.
+    // On first read a missing key leaves the panel's saved layers alone; a synced null (another
+    // rider signed in, lib/settings-sync) means that account's default, on.
+    const applyRiders = (v: string | null, synced = false) => {
+      if (v !== '0' && v !== '1' && !synced) return;
+      const on = v !== '0';
+      riderOnRef.current = on;
+      setRiderOn(on);
+      featuresRef.current = { ...featuresRef.current, riderTrails: on };
       setFeatureState(featuresRef.current);
     };
-    AsyncStorage.getItem(KEY).then(applyLayers).catch(() => {});
-    AsyncStorage.getItem(RIDER_TRAILS_KEY)
-      .then((v) => v === '0' && applyRiders(v))
-      .catch(() => {});
-    const applyParks = (v: string | null) => {
-      parkOnRef.current = v !== '0';
-      setParkOn(v !== '0');
-      featuresRef.current = { ...featuresRef.current, parkTrails: v !== '0' };
+    const applyParks = (v: string | null, synced = false) => {
+      if (v !== '0' && v !== '1' && !synced) return;
+      const on = v !== '0';
+      parkOnRef.current = on;
+      setParkOn(on);
+      featuresRef.current = { ...featuresRef.current, parkTrails: on };
       setFeatureState(featuresRef.current);
     };
-    AsyncStorage.getItem(PARK_TRAILS_KEY)
-      .then((v) => v === '0' && applyParks(v))
-      .catch(() => {});
+    const read = (k: string) => AsyncStorage.getItem(k).catch(() => null);
+    Promise.all([read(KEY), read(RIDER_TRAILS_KEY), read(PARK_TRAILS_KEY)]).then(([layers, riders, parks]) => {
+      applyLayers(layers);
+      applyRiders(riders);
+      applyParks(parks);
+    });
     // The park list (names from far out) comes from the phone first, then the server.
     parkList(false).then((saved) => saved.length && setParks(saved)).catch(() => {});
     parkList(true).then((fresh) => fresh.length && setParks(fresh)).catch(() => {});
     // Picked on another device (lib/settings-sync).
     const offLayers = onSyncedChange(KEY, applyLayers);
-    const offRiders = onSyncedChange(RIDER_TRAILS_KEY, applyRiders);
-    const offParks = onSyncedChange(PARK_TRAILS_KEY, applyParks);
+    const offRiders = onSyncedChange(RIDER_TRAILS_KEY, (v) => applyRiders(v, true));
+    const offParks = onSyncedChange(PARK_TRAILS_KEY, (v) => applyParks(v, true));
     return () => {
       offLayers();
       offRiders();

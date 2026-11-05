@@ -190,4 +190,29 @@ do $$ begin
   reset role;
 end $$;
 
+-- E9. A ride with no private details row (the app writes it in a second request) gets its spot
+-- on edit instead of a silent no-op, and riders hear about the place once.
+select as_user('00000000-0000-0000-0000-00000000e0d4');
+set role authenticated;
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, meet_area_label, visibility, max_vehicles)
+values ('0e0e0e0e-0e0e-4e0e-8e0e-0e0e0e0e0e0f', auth.uid(), 'No Spot Yet', now() + interval '3 days', 38.58, -109.56, 'Moab, UT', 'public', 8);
+reset role;
+delete from pushed;
+select as_user('00000000-0000-0000-0000-00000000e0d4');
+set role authenticated;
+select edit_ride('0e0e0e0e-0e0e-4e0e-8e0e-0e0e0e0e0e0f', '{}', '{"meet_lat": 38.57, "meet_lng": -109.55, "meet_label": "Lions Park"}');
+reset role;
+do $$ begin
+  if (select meet_label from ride_private_details where ride_id = '0e0e0e0e-0e0e-4e0e-8e0e-0e0e0e0e0e0f') is distinct from 'Lions Park'
+     or (select meet_lat from ride_private_details where ride_id = '0e0e0e0e-0e0e-4e0e-8e0e-0e0e0e0e0e0f') <> 38.57 then
+    raise exception 'FAIL: the spot was not written for a ride without private details';
+  end if;
+  if (select details_changed from rides where id = '0e0e0e0e-0e0e-4e0e-8e0e-0e0e0e0e0e0f') <> '{place}' then
+    raise exception 'FAIL: place not recorded: %', (select details_changed from rides where id = '0e0e0e0e-0e0e-4e0e-8e0e-0e0e0e0e0e0f');
+  end if;
+  if (select count(*) from pushed where event ->> 'change' = 'place') <> 1 then
+    raise exception 'FAIL: nobody was told about the new spot: %', (select jsonb_agg(event) from pushed);
+  end if;
+end $$;
+
 select 'edit_ride_test passed' as result;

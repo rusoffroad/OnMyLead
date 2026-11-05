@@ -8,6 +8,7 @@ import {
 import { isBackendConfigured, supabase } from './supabase';
 import { can } from '@/core/entitlements';
 import { currentEntitlements } from './entitlements';
+import { singleFlight } from './single-flight';
 
 /**
  * Settings that follow the account across devices (core/synced-settings.ts has the list and the
@@ -126,24 +127,8 @@ function schedulePush() {
   }, 2_000);
 }
 
-let running: Promise<void> | null = null;
-let again = false;
-
 /** Swap changes with the account now. Safe to call often; does nothing when signed out. */
-export function syncSettingsNow(): Promise<void> {
-  if (running) {
-    again = true;
-    return running;
-  }
-  running = run().finally(() => {
-    running = null;
-    if (again) {
-      again = false;
-      syncSettingsNow();
-    }
-  });
-  return running;
-}
+export const syncSettingsNow: () => Promise<void> = singleFlight(() => run());
 
 async function run() {
   // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
@@ -166,6 +151,7 @@ async function run() {
       stamps = { ...seedFromDevice(Object.fromEntries(pairs), sameAccount), ...stamps };
     }
 
+    const sent = stamps;
     const { data, error } = await supabase.rpc('sync_rider_settings', { p_changes: stamps });
     if (error) {
       // The server update hasn't run yet: stay quiet, keep everything on the device, try next time.
@@ -176,7 +162,16 @@ async function run() {
       throw new Error(error.message);
     }
     const remote = parseSyncedMap(data);
-    const { merged, apply } = mergeSynced(stamps, remote);
+    // The server merged what was sent with the account copy (newer wins, stamps capped at its
+    // clock plus a minute), so its answer settles every key it holds, even where this device's
+    // clock ran ahead; a key the rider changed while the call was out keeps its new stamp.
+    const settled: SyncedMap = { ...stamps };
+    for (const [k, r] of Object.entries(remote)) if (sent[k] && stamps[k] === sent[k]) settled[k] = r;
+    const { merged, apply } = mergeSynced(settled, remote);
+    for (const [k, r] of Object.entries(remote)) {
+      const was = sent[k];
+      if (was && stamps[k] === was && was.v !== r.v) apply[k] = r;
+    }
     for (const [k, e] of Object.entries(apply)) {
       await writeLocal(k, e.v);
       tell(k, e.v);

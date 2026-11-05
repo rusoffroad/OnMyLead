@@ -4,7 +4,7 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - supabase/migrations/20261104050000_badge_leaderboard.sql
   - supabase/migrations/20261102950000_events.sql
@@ -50,6 +50,10 @@ Once you've joined a ride, the other riders on it can see:
 - Your messages in the ride chat, except leader-only messages, which only you and the leader can read.
 - Your status taps and quick replies from Ride Mode (and, from 2.0, messages you type there). A status tap carries your phone's location at the moment you tapped it.
 - Your live location, but only while you're sharing with the ride.
+
+:::release 2.1
+- If you're the leader, the path you've ridden while sharing, drawn as the [Leader Trackline](/help/leader-trackline). Each rider's phone draws it from the live positions it already gets; nothing extra is uploaded. You can turn it off for the ride.
+:::
 
 ## Your Live Location
 

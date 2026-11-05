@@ -9,7 +9,9 @@ import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { track } from '@/lib/analytics';
+import type { TracklinePieces } from '@/core/leader-trackline';
 import type { GroupMapHandle, MapRider } from './group-map-types';
+import { tracklineMapLines } from './leader-trackline-ink';
 import { useFollowCamera } from './use-follow-camera';
 import { useGlide } from './use-glide';
 import { RiderPin } from './rider-pin';
@@ -25,12 +27,13 @@ type Inset = { top: number; right: number; bottom: number; left: number };
  * 3D Terrain's raised satellite ground).
  */
 export function GroupMapboxMap({
-  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding, fallback,
+  riders, regroup, route, trackline, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding, fallback,
   onReady, onUserMove, follow, locationEveryMs = 1000, ref,
 }: {
   riders: MapRider[];
   meId?: string;
   route?: LatLng[] | null;
+  trackline?: TracklinePieces | null;
   regroup: { lat: number; lng: number; label: string | null } | null;
   onPressRider?: (id: string) => void;
   trail: TrailMap;
@@ -57,6 +60,7 @@ export function GroupMapboxMap({
   const [mapHeading, setMapHeading] = useState(0);
   const lastFix = useRef<LatLng | null>(null);
   const followed = useRef<LatLng | null>(null);
+  const followRun = useRef(0);
   const followRef = useRef(follow);
   const everyMs = useRef(locationEveryMs);
   useEffect(() => {
@@ -85,12 +89,18 @@ export function GroupMapboxMap({
     lastFix.current = { lat: f.lat, lng: f.lng };
     const fl = followRef.current;
     if (!fl || !followCamShouldMove(followed.current, f)) return;
-    followed.current = { lat: f.lat, lng: f.lng };
     fitted.current = 'route';
-    void cam.step(f, fl.inset, followCamDurationMs(everyMs.current));
+    // Only a fix the camera used counts as followed, so one skipped while a step is still
+    // running (a slow junction lookup) doesn't make the next one look like jitter.
+    const run = followRun.current;
+    void cam.step(f, fl.inset, followCamDurationMs(everyMs.current)).then((took) => {
+      // Not after Follow Me was switched off or restarted while the step ran.
+      if (took && run === followRun.current) followed.current = { lat: f.lat, lng: f.lng };
+    });
   }, [cam]);
   const followOn = !!follow;
   useEffect(() => {
+    followRun.current++;
     if (!followOn) {
       followed.current = null;
       cam.stop();
@@ -118,9 +128,13 @@ export function GroupMapboxMap({
     }
   }, [ready, riders, route, edgePadding, fallback]);
 
+  // The route, then the Leader Trackline over it (old passes first, the fresh one on top).
   const lines = useMemo<MapLine[]>(
-    () => (route && route.length > 1 ? [{ id: 'route', points: route, color: Colors.accent, width: 5, casing: Colors.background, casingWidth: 9 }] : []),
-    [route],
+    () => [
+      ...(route && route.length > 1 ? [{ id: 'route', points: route, color: Colors.accent, width: 5, casing: Colors.background, casingWidth: 9 }] : []),
+      ...tracklineMapLines(trackline),
+    ],
+    [route, trackline],
   );
   const pressRider = useRef(onPressRider);
   useEffect(() => {

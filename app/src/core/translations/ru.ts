@@ -1,6 +1,21 @@
 // Russian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Ответить",
+  "Unlike comment": "Убрать лайк с комментария",
+  "Like comment": "Лайкнуть комментарий",
+  "Reply to {authorName}": "Ответить {authorName}",
+  "yourself": "себе",
+  "Replying to {name}": "Ответ для {name}",
+  "Cancel reply": "Отменить ответ",
+  "Post reply": "Отправить ответ",
+  "posted a photo": "опубликовал(а) фото",
+  "{name}’s photo. Opens it in Social": "Фото {name}. Открывает в Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Комментарии и ответы входят в OnMyLead Pro. Читать и ставить лайки по-прежнему бесплатно.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Пока ничего нового. Когда друзья публикуют фото, катаются, получают значки или делятся трассами, это появится здесь.",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Больше никто не присоединился, чтобы принять поездку, поэтому выход отменяет её.",
+  "Your location sharing for this ride stops.": "Передача вашего местоположения для этой поездки прекращается.",
+  "The lead goes back to the organizer.": "Лидерство возвращается организатору.",
   "Language": "Язык",
   "Change language": "Сменить язык",
   "Map Mode. Open your offroad map": "Режим карты. Открыть внедорожную карту",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'О выезде',
   'Lowering a limit never removes anyone who already joined.': 'Снижение лимита никогда не удаляет тех, кто уже присоединился.',
   'Bring and Know': 'Взять с собой и знать',
+  'Not Ready to Save': 'Пока нельзя сохранить',
   'No Changes Yet': 'Пока без изменений',
   'Change anything above, then save. Riders see the new details right away.': 'Измените что угодно выше и сохраните. Участники сразу увидят новые детали.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Все участники выезда получат уведомление, а на странице выезда будет видно, что изменилось.',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Название должно быть короче {v} символов.',
   'Check the departure time.': 'Проверьте время выезда.',
   'Check the expected finish time.': 'Проверьте ожидаемое время возвращения.',
+  'Set the meeting point before adding instructions.': 'Сначала задайте точку сбора, затем добавляйте инструкции.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Задайте точку сбора: найдите место, коснитесь карты или вставьте координаты вида "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'Длина маршрута — число в милях, например 42.5.',
   '{list} and {last}': '{list} и {last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "Отправить ЭКСТРЕННЫЙ сигнал с вашим местоположением всем участникам поездки?",
   "Running Late": "Опаздываю",
   "Need a Minute": "Нужна минута",
+  "Couldn’t Change the Trackline": "Не удалось изменить трек лидера",
+  "Leader Trackline": "Трек лидера",
+  "A line behind you in the leader color, on every rider’s map": "Линия за вами цветом лидера на карте каждого райдера",
+  "On for Everyone": "Включён для всех",
+  "Off for Everyone": "Выключен для всех",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Показывает, где вы вели группу, на карте каждого райдера. Если пересечь трек снова, старый проход бледнеет.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Выключение трека лидера пока недоступно. Оно заработает после следующего обновления сервера.",
 };
 
 export default dict;

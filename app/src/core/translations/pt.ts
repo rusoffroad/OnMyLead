@@ -1,6 +1,21 @@
 // Portuguese (Brazil). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Responder",
+  "Unlike comment": "Descurtir comentário",
+  "Like comment": "Curtir comentário",
+  "Reply to {authorName}": "Responder a {authorName}",
+  "yourself": "você mesmo",
+  "Replying to {name}": "Respondendo a {name}",
+  "Cancel reply": "Cancelar resposta",
+  "Post reply": "Publicar resposta",
+  "posted a photo": "publicou uma foto",
+  "{name}’s photo. Opens it in Social": "Foto de {name}. Abre no Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Comentar e responder fazem parte do OnMyLead Pro. Ler e curtir continuam grátis.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Nada novo ainda. Quando seus amigos postarem fotos, pedalarem, ganharem emblemas ou compartilharem trilhas, aparece aqui.",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Ninguém mais entrou para assumir, então sair cancela o passeio.",
+  "Your location sharing for this ride stops.": "O compartilhamento da sua localização neste passeio para.",
+  "The lead goes back to the organizer.": "A liderança volta para o organizador.",
   "Language": "Idioma",
   "Change language": "Mudar idioma",
   "Map Mode. Open your offroad map": "Modo Mapa. Abra seu mapa off-road",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Sobre a trilha',
   'Lowering a limit never removes anyone who already joined.': 'Baixar um limite nunca remove quem já entrou.',
   'Bring and Know': 'O que levar e saber',
+  'Not Ready to Save': 'Ainda não dá para salvar',
   'No Changes Yet': 'Nenhuma alteração ainda',
   'Change anything above, then save. Riders see the new details right away.': 'Altere o que quiser acima e salve. Os pilotos veem os novos detalhes na hora.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Todos na trilha recebem uma notificação, e a página da trilha mostra o que mudou.',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Mantenha o nome com menos de {v} caracteres.',
   'Check the departure time.': 'Confira o horário de saída.',
   'Check the expected finish time.': 'Confira o horário previsto de retorno.',
+  'Set the meeting point before adding instructions.': 'Defina o ponto de encontro antes de adicionar instruções.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Defina o ponto de encontro: pesquise um lugar, toque no mapa ou cole coordenadas como "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'A extensão da rota é um número de milhas, como 42.5.',
   '{list} and {last}': '{list} e {last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "Enviar EMERGÊNCIA com sua localização para todos no passeio?",
   "Running Late": "Vou atrasar",
   "Need a Minute": "Preciso de um minuto",
+  "Couldn’t Change the Trackline": "Não foi possível mudar a linha do líder",
+  "Leader Trackline": "Linha do líder",
+  "A line behind you in the leader color, on every rider’s map": "Uma linha atrás de você na cor do líder, no mapa de cada piloto",
+  "On for Everyone": "Ligada para todos",
+  "Off for Everyone": "Desligada para todos",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Mostra por onde você guiou no mapa de cada piloto. Se cruzar de novo, a passagem anterior fica apagada.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Desligar a linha do líder ainda não está disponível. Vai funcionar com a próxima atualização do servidor.",
 };
 
 export default dict;

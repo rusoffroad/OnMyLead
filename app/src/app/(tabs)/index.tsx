@@ -411,7 +411,7 @@ export default function HomeScreen() {
             items={feedAll ? feed : feed.slice(0, FEED_SHOWN)}
             onChange={(i, next) => setFeed((list) => (list ? list.map((x, j) => (j === i ? next : x)) : list))}
             emptyText={feedSettings.kinds.length
-              ? t('Nothing new yet. When friends ride, earn badges or share trails, it shows here.')
+              ? t('Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.')
               : t('Everything is switched off in Customize.')}
           />
           {feed.length > FEED_SHOWN ? (

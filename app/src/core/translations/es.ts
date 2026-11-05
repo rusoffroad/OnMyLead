@@ -1,6 +1,21 @@
 // Spanish. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Responder",
+  "Unlike comment": "Quitar me gusta del comentario",
+  "Like comment": "Me gusta el comentario",
+  "Reply to {authorName}": "Responder a {authorName}",
+  "yourself": "ti mismo",
+  "Replying to {name}": "Respondiendo a {name}",
+  "Cancel reply": "Cancelar respuesta",
+  "Post reply": "Publicar respuesta",
+  "posted a photo": "publicó una foto",
+  "{name}’s photo. Opens it in Social": "Foto de {name}. La abre en Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Comentar y responder son parte de OnMyLead Pro. Leer y dar me gusta siguen siendo gratis.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Nada nuevo todavía. Cuando tus amigos publiquen fotos, rueden, ganen insignias o compartan senderos, aparecerá aquí.",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Nadie más se ha unido para tomar el relevo, así que salir cancela la ruta.",
+  "Your location sharing for this ride stops.": "Se deja de compartir tu ubicación en esta ruta.",
+  "The lead goes back to the organizer.": "El liderazgo vuelve al organizador.",
   "Language": "Idioma",
   "Change language": "Cambiar idioma",
   "Map Mode. Open your offroad map": "Modo Mapa. Abre tu mapa todoterreno",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Sobre la salida',
   'Lowering a limit never removes anyone who already joined.': 'Bajar un límite nunca quita a nadie que ya se unió.',
   'Bring and Know': 'Qué llevar y saber',
+  'Not Ready to Save': 'Aún no se puede guardar',
   'No Changes Yet': 'Sin cambios todavía',
   'Change anything above, then save. Riders see the new details right away.': 'Cambia lo que quieras arriba y guarda. Los pilotos ven los nuevos detalles enseguida.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Todos en la salida reciben una notificación, y la página de la salida muestra qué cambió.',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'El nombre debe tener menos de {v} caracteres.',
   'Check the departure time.': 'Revisa la hora de salida.',
   'Check the expected finish time.': 'Revisa la hora prevista de regreso.',
+  'Set the meeting point before adding instructions.': 'Fija el punto de encuentro antes de añadir instrucciones.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Define el punto de encuentro: busca un lugar, toca el mapa o pega coordenadas como "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'La longitud de la ruta es un número de millas, como 42.5.',
   '{list} and {last}': '{list} y {last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "¿Enviar EMERGENCIA con tu ubicación a todos en la ruta?",
   "Running Late": "Voy tarde",
   "Need a Minute": "Necesito un minuto",
+  "Couldn’t Change the Trackline": "No se pudo cambiar la línea del líder",
+  "Leader Trackline": "Línea del líder",
+  "A line behind you in the leader color, on every rider’s map": "Una línea detrás de ti en el color del líder, en el mapa de cada piloto",
+  "On for Everyone": "Activada para todos",
+  "Off for Everyone": "Desactivada para todos",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Muestra por dónde has guiado en el mapa de cada piloto. Si vuelves a cruzarla, el paso anterior se atenúa.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Desactivar la línea del líder aún no está disponible. Funcionará con la próxima actualización del servidor.",
 };
 
 export default dict;

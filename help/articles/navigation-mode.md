@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/use-follow-camera.ts
   - app/src/core/intersections.ts

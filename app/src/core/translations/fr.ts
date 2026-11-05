@@ -1,6 +1,21 @@
 // French. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Répondre",
+  "Unlike comment": "Je n’aime plus ce commentaire",
+  "Like comment": "J’aime ce commentaire",
+  "Reply to {authorName}": "Répondre à {authorName}",
+  "yourself": "vous-même",
+  "Replying to {name}": "Réponse à {name}",
+  "Cancel reply": "Annuler la réponse",
+  "Post reply": "Publier la réponse",
+  "posted a photo": "a publié une photo",
+  "{name}’s photo. Opens it in Social": "Photo de {name}. L’ouvre dans Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Commenter et répondre font partie d’OnMyLead Pro. Lire et aimer restent gratuits.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Rien de nouveau. Quand vos amis publient des photos, roulent, gagnent des badges ou partagent des pistes, ça s’affiche ici.",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Personne d’autre n’a rejoint pour prendre le relais, donc partir annule la sortie.",
+  "Your location sharing for this ride stops.": "Le partage de votre position pour cette sortie s’arrête.",
+  "The lead goes back to the organizer.": "La tête revient à l’organisateur.",
   "Language": "Langue",
   "Change language": "Changer de langue",
   "Map Mode. Open your offroad map": "Mode Carte. Ouvrir votre carte tout-terrain",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'À propos de la sortie',
   'Lowering a limit never removes anyone who already joined.': 'Baisser une limite ne retire jamais quelqu’un qui a déjà rejoint.',
   'Bring and Know': 'À apporter et à savoir',
+  'Not Ready to Save': 'Pas encore prêt à enregistrer',
   'No Changes Yet': 'Aucune modification pour l’instant',
   'Change anything above, then save. Riders see the new details right away.': 'Modifiez ce que vous voulez ci-dessus, puis enregistrez. Les pilotes voient les nouveaux détails tout de suite.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Tout le monde sur la sortie reçoit une notification, et la page de la sortie montre ce qui a changé.',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Le nom doit faire moins de {v} caractères.',
   'Check the departure time.': 'Vérifiez l’heure de départ.',
   'Check the expected finish time.': 'Vérifiez l’heure de retour prévue.',
+  'Set the meeting point before adding instructions.': 'Définissez le point de rendez-vous avant d’ajouter des consignes.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Définissez le point de rendez-vous : cherchez un lieu, touchez la carte ou collez des coordonnées comme "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'La longueur de l’itinéraire est un nombre de miles, comme 42.5.',
   '{list} and {last}': '{list} et {last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "Envoyer une URGENCE avec ta position à tous les participants ?",
   "Running Late": "En retard",
   "Need a Minute": "Une minute",
+  "Couldn’t Change the Trackline": "Impossible de modifier la trace du leader",
+  "Leader Trackline": "Trace du leader",
+  "A line behind you in the leader color, on every rider’s map": "Une ligne derrière vous, à la couleur du leader, sur la carte de chaque pilote",
+  "On for Everyone": "Activée pour tous",
+  "Off for Everyone": "Désactivée pour tous",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Montre par où vous avez mené sur la carte de chaque pilote. Si vous la recoupez, l’ancien passage s’estompe.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "La désactivation de la trace du leader n’est pas encore disponible. Elle fonctionnera après la prochaine mise à jour du serveur.",
 };
 
 export default dict;

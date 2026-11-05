@@ -4,7 +4,7 @@ summary: What's on the Rides tab from version 2.0. Join, create and find rides, 
 category: getting-started
 order: 15
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/app/leaderboard.tsx
   - app/src/components/home/events-card.tsx
@@ -116,6 +116,10 @@ Tap a post about a group ride or a trail to open it. The feed shows a few posts;
 
 :::release 2.0
 Riders' own posts show in the feed too. Tap the **heart** on any post to like it, or tap the post to open it in **Social** with every comment. **Open Social**, next to **Customize**, shows all your friends' activity, your friends and your posts. See [Like, Comment and Post in Social](/help/social).
+:::
+
+:::release 2.1
+A friend's post with a photo shows a small copy of the photo on the right; tap it, or the post, to open it in Social with the photo full width and every comment.
 :::
 
 A ride is named only if it was public or you were on it. Your location is never in anyone's feed: an Out Riding post says only the spot words the rider chose, and only to riders who could already see them on Who's Riding.

@@ -1,32 +1,35 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
 import { KeyboardScreen, keyboardScroll, TextBox } from '@/components/keyboard';
 import { ReportSheet } from '@/components/report-sheet';
-import { RiderPhoto } from '@/components/rider-photo';
-import { faceColor, Initial } from '@/components/home/parts';
+import { CommentThreadView } from '@/components/social/comment-thread';
 import { ProTag, Social } from '@/components/social/parts';
 import { SocialCard } from '@/components/social/social-card';
 import { Colors, font, scrollIndicator, themedStyles } from '@/constants/theme';
+import { Button } from '@/components/ui';
 import { can } from '@/core/entitlements';
-import { timeAgo } from '@/core/feed';
-import { COMMENT_MAX, isItemKey, likesLine, profileHref, SOCIAL_NOT_SWITCHED_ON, type Comment, type SocialItem } from '@/core/social';
+import {
+  COMMENT_MAX, isItemKey, likesLine, nestThread, removeComment, replaceComment, SOCIAL_NOT_SWITCHED_ON, toggleLike, type SocialItem,
+  type ThreadComment,
+} from '@/core/social';
 import { useLayout } from '@/hooks/use-layout';
 import { confirmAsync } from '@/lib/confirm';
 import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
 import { useSession } from '@/lib/session';
-import { addComment, deleteComment, feedItem, itemComments, itemLikers, ProNeededError, SocialOffError } from '@/lib/social';
+import { addComment, addReply, deleteComment, feedItem, itemLikers, itemThread, ProNeededError, setCommentLike, SocialOffError } from '@/lib/social';
 import { t } from '@/lib/i18n';
 
 /**
  * One Feed item with every comment and who liked it, opened from the Feed, Social, a profile or a
  * notification. Pro riders write comments in the box at the bottom (it rides up with the keyboard);
- * Free riders read them and see what Pro adds. A comment's writer can delete it, and so can the
- * rider whose item it's on; anyone else can report it.
+ * Free riders read them and see what Pro adds. Every comment can be liked (free) and replied to
+ * (Pro); replies sit under their comment. A comment's writer can delete it, and so can the rider
+ * whose item it's on; anyone else can report it.
  */
 export default function SocialItemScreen() {
   const params = useLocalSearchParams<{ key?: string; comment?: string }>();
@@ -37,22 +40,25 @@ export default function SocialItemScreen() {
   const pro = can(ent, 'social_posts');
 
   const [item, setItem] = useState<SocialItem | null | undefined>(undefined);
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<ThreadComment[]>([]);
+  const [threads, setThreads] = useState(true);
+  const [replyTo, setReplyTo] = useState<ThreadComment | null>(null);
   const [likers, setLikers] = useState<{ userId: string; name: string }[]>([]);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [off, setOff] = useState(false);
-  const [reporting, setReporting] = useState<Comment | null>(null);
+  const [reporting, setReporting] = useState<ThreadComment | null>(null);
   const input = useRef<TextInput>(null);
   const scroller = useRef<ScrollView>(null);
 
   const load = useCallback(async () => {
     if (!key) return setItem(null);
     try {
-      const [it, cs] = await Promise.all([feedItem(key), itemComments(key)]);
+      const [it, cs] = await Promise.all([feedItem(key), itemThread(key)]);
       setItem(it);
-      setComments(cs);
+      setComments(cs.list);
+      setThreads(cs.replies);
       itemLikers(key).then(setLikers).catch(() => {});
     } catch (e) {
       if (e instanceof SocialOffError) setOff(true);
@@ -74,17 +80,36 @@ export default function SocialItemScreen() {
     }, [session, loading, load, params.comment, pro]),
   );
 
+  // Opened from a notification while the app was still waking up and the request got dropped:
+  // try again on its own once the app is in front, so the Retry button is the last resort.
+  const failed = item === null && !!error;
+  const retry = useCallback(() => {
+    setError(null);
+    setItem(undefined);
+    void load();
+  }, [load]);
+  useEffect(() => {
+    if (!failed) return;
+    const sub = AppState.addEventListener('change', (s) => s === 'active' && retry());
+    return () => sub.remove();
+  }, [failed, retry]);
+
   const send = async () => {
     if (!key || !draft.trim()) return;
     if (!requirePro('social_posts')) return;
     setSending(true);
     setError(null);
     try {
-      await addComment(key, draft);
+      if (replyTo) await addReply(replyTo.id, draft);
+      else await addComment(key, draft);
       setDraft('');
-      setComments(await itemComments(key));
+      const wasReply = !!replyTo;
+      setReplyTo(null);
+      const next = await itemThread(key);
+      setComments(next.list);
+      setThreads(next.replies);
       setItem((it) => (it ? { ...it, commentCount: it.commentCount + 1 } : it));
-      setTimeout(() => scroller.current?.scrollToEnd({ animated: true }), 100);
+      if (!wasReply) setTimeout(() => scroller.current?.scrollToEnd({ animated: true }), 100);
     } catch (e) {
       if (!(e instanceof ProNeededError)) setError((e as Error).message);
     } finally {
@@ -92,13 +117,34 @@ export default function SocialItemScreen() {
     }
   };
 
-  const remove = async (c: Comment) => {
+  const likeComment = async (c: ThreadComment) => {
+    const next = toggleLike(c);
+    setComments((list) => replaceComment(list, next));
+    try {
+      const n = await setCommentLike(c.id, next.liked);
+      setComments((list) => replaceComment(list, { ...next, likeCount: n }));
+    } catch (e) {
+      setComments((list) => replaceComment(list, c));
+      setError((e as Error).message);
+    }
+  };
+
+  const reply = (c: ThreadComment) => {
+    if (!requirePro('social_posts')) return;
+    setReplyTo(c);
+    setError(null);
+    setTimeout(() => input.current?.focus(), 50);
+  };
+
+  const remove = async (c: ThreadComment) => {
     const ok = await confirmAsync(t('Delete This Comment?'), c.mine ? t('It comes off for everyone.') : t('{authorName}’s comment comes off your post for everyone.', { authorName: c.authorName }), t('Delete'));
     if (!ok) return;
     try {
       await deleteComment(c.id);
-      setComments((list) => list.filter((x) => x.id !== c.id));
-      setItem((it) => (it ? { ...it, commentCount: Math.max(0, it.commentCount - 1) } : it));
+      const { list, removed } = removeComment(comments, c.id);
+      setComments(list);
+      if (replyTo && !list.some((x) => x.id === replyTo.id)) setReplyTo(null);
+      setItem((it) => (it ? { ...it, commentCount: Math.max(0, it.commentCount - removed) } : it));
     } catch (e) {
       setError((e as Error).message);
     }
@@ -127,7 +173,10 @@ export default function SocialItemScreen() {
           <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={styles.body} {...keyboardScroll} indicatorStyle={scrollIndicator()}>
             {off ? <Text style={styles.muted}>{SOCIAL_NOT_SWITCHED_ON}</Text> : null}
             {item === null && !off ? (
-              <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
+              <>
+                <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
+                {error ? <Button title={t('Retry')} kind="secondary" onPress={retry} /> : null}
+              </>
             ) : null}
             {item ? (
               <>
@@ -142,32 +191,18 @@ export default function SocialItemScreen() {
                   {comments.length ? `${comments.length} ${comments.length === 1 ? t('Comment') : t('Comments')}` : t('Comments')}
                 </Text>
                 {comments.length ? (
-                  <View style={{ gap: 14 }}>
-                    {comments.map((c) => (
-                      <View key={c.id} style={styles.comment}>
-                        <RiderPhoto userId={c.authorId} name={c.authorName} size={34} fallback={<Initial name={c.authorName} size={34} color={faceColor(c.authorId)} />} />
-                        <View style={styles.bubble}>
-                          <View style={styles.commentHead}>
-                            <Pressable onPress={() => router.push(profileHref(c.authorId) as never)} accessibilityRole="link" style={{ flexShrink: 1 }}>
-                              <Text style={styles.commentName} numberOfLines={1}>{c.mine ? t('You') : c.authorName}</Text>
-                            </Pressable>
-                            <Text style={styles.commentWhen}>{timeAgo(c.at)}</Text>
-                          </View>
-                          <Text style={styles.commentBody} selectable>{t(c.body)}</Text>
-                          <View style={styles.commentActions}>
-                            {c.canDelete ? (
-                              <Pressable onPress={() => remove(c)} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Delete comment')}>
-                                <Text style={styles.commentAction}>{t('Delete')}</Text>
-                              </Pressable>
-                            ) : null}
-                            {!c.mine ? (
-                              <Pressable onPress={() => setReporting(c)} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('Report {authorName}’s comment', { authorName: c.authorName })}>
-                                <Text style={styles.commentAction}>{t('Report')}</Text>
-                              </Pressable>
-                            ) : null}
-                          </View>
-                        </View>
-                      </View>
+                  <View style={{ gap: 18 }}>
+                    {nestThread(comments).map((th) => (
+                      <CommentThreadView
+                        key={th.comment.id}
+                        thread={th}
+                        replies={threads}
+                        replyingTo={replyTo?.id ?? null}
+                        onLike={likeComment}
+                        onReply={reply}
+                        onDelete={remove}
+                        onReport={setReporting}
+                      />
                     ))}
                   </View>
                 ) : (
@@ -181,22 +216,34 @@ export default function SocialItemScreen() {
             pro ? (
               <View style={styles.composer}>
                 {error ? <Text style={styles.error}>{error}</Text> : null}
+                {replyTo ? (
+                  <View style={styles.replying}>
+                    <Text style={styles.replyingText} numberOfLines={1}>
+                      {t('Replying to {name}', { name: replyTo.mine ? t('yourself') : replyTo.authorName })}
+                    </Text>
+                    <Pressable onPress={() => setReplyTo(null)} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Cancel reply')}>
+                      <Icon name="close" size={18} color={Social.muted} />
+                    </Pressable>
+                  </View>
+                ) : null}
                 <View style={styles.inputRow}>
                   <TextBox
                     ref={input}
                     value={draft}
                     onChangeText={setDraft}
-                    placeholder={t('Comment on {v} {v2}', { v: item.mine ? 'your' : `${item.actorName}’s`, v2: item.kind === 'post' ? 'post' : item.kind })}
+                    placeholder={replyTo
+                      ? t('Reply to {authorName}', { authorName: replyTo.mine ? t('yourself') : replyTo.authorName })
+                      : t('Comment on {v} {v2}', { v: item.mine ? 'your' : `${item.actorName}’s`, v2: item.kind === 'post' ? 'post' : item.kind })}
                     placeholderTextColor={Colors.textSecondary}
                     maxLength={COMMENT_MAX}
                     multiline
-                    accessibilityLabel={t('Comment')}
+                    accessibilityLabel={replyTo ? t('Reply') : t('Comment')}
                     style={styles.input}
                     onSubmitEditing={Platform.OS === 'web' ? send : undefined}
                   />
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel={t('Post comment')}
+                    accessibilityLabel={replyTo ? t('Post reply') : t('Post comment')}
                     disabled={!draft.trim() || sending}
                     onPress={send}
                     style={({ pressed }) => [styles.send, (!draft.trim() || sending) && { backgroundColor: Colors.backgroundSelected }, pressed && { opacity: 0.8 }]}>
@@ -210,7 +257,7 @@ export default function SocialItemScreen() {
             ) : (
               <Pressable onPress={() => requirePro('social_posts')} accessibilityRole="button" style={styles.locked}>
                 <ProTag />
-                <Text style={styles.lockedText}>{t('Commenting is part of OnMyLead Pro. Reading and liking stay free.')}</Text>
+                <Text style={styles.lockedText}>{t('Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.')}</Text>
                 <Icon name="chevron" size={18} color={Social.gold} />
               </Pressable>
             )
@@ -236,14 +283,8 @@ const styles = themedStyles(() => ({
   muted: { color: Social.muted, fontFamily: font(500), fontSize: 14, lineHeight: 20 },
   likes: { color: Colors.textSoft, fontFamily: font(600), fontSize: 14, lineHeight: 19 },
   section: { color: Colors.text, fontFamily: font(600, 'display'), fontSize: 22, marginTop: 4 },
-  comment: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  bubble: { flex: 1, backgroundColor: Social.panel, borderRadius: 16, borderTopLeftRadius: 4, borderWidth: 1, borderColor: Social.line, padding: 12, gap: 4 },
-  commentHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  commentName: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
-  commentWhen: { color: Social.muted, fontFamily: font(500), fontSize: 12 },
-  commentBody: { color: Colors.text, fontFamily: font(500), fontSize: 15, lineHeight: 21 },
-  commentActions: { flexDirection: 'row', gap: 18, paddingTop: 2 },
-  commentAction: { color: Social.muted, fontFamily: font(600), fontSize: 12 },
+  replying: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 6 },
+  replyingText: { flex: 1, color: Colors.sky, fontFamily: font(600), fontSize: 13 },
   composer: { borderTopWidth: 1, borderTopColor: Social.line, padding: 10, gap: 6, backgroundColor: Colors.background },
   inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
   input: {

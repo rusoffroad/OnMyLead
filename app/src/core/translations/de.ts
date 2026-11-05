@@ -1,6 +1,21 @@
 // German. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Antworten",
+  "Unlike comment": "Kommentar nicht mehr liken",
+  "Like comment": "Kommentar liken",
+  "Reply to {authorName}": "{authorName} antworten",
+  "yourself": "dir selbst",
+  "Replying to {name}": "Antwort an {name}",
+  "Cancel reply": "Antwort abbrechen",
+  "Post reply": "Antwort senden",
+  "posted a photo": "hat ein Foto gepostet",
+  "{name}’s photo. Opens it in Social": "Foto von {name}. Öffnet es in Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Kommentieren und Antworten gehören zu OnMyLead Pro. Lesen und Liken bleiben kostenlos.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Noch nichts Neues. Wenn Freunde Fotos posten, fahren, Abzeichen verdienen oder Trails teilen, erscheint es hier.",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Sonst ist niemand beigetreten, der übernehmen könnte, also sagt das Verlassen die Tour ab.",
+  "Your location sharing for this ride stops.": "Deine Standortfreigabe für diese Tour endet.",
+  "The lead goes back to the organizer.": "Die Führung geht zurück an den Organisator.",
   "Language": "Sprache",
   "Change language": "Sprache ändern",
   "Map Mode. Open your offroad map": "Kartenmodus. Deine Offroad-Karte öffnen",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Über die Tour',
   'Lowering a limit never removes anyone who already joined.': 'Ein niedrigeres Limit entfernt nie jemanden, der schon beigetreten ist.',
   'Bring and Know': 'Mitbringen und wissen',
+  'Not Ready to Save': 'Noch nicht speicherbar',
   'No Changes Yet': 'Noch keine Änderungen',
   'Change anything above, then save. Riders see the new details right away.': 'Ändere oben, was du willst, und speichere. Fahrer sehen die neuen Details sofort.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Alle auf der Tour bekommen eine Benachrichtigung, und die Tourseite zeigt, was sich geändert hat.',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Der Name darf höchstens {v} Zeichen haben.',
   'Check the departure time.': 'Prüfe die Abfahrtszeit.',
   'Check the expected finish time.': 'Prüfe die voraussichtliche Rückkehrzeit.',
+  'Set the meeting point before adding instructions.': 'Lege zuerst den Treffpunkt fest, bevor du Hinweise hinzufügst.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Lege den Treffpunkt fest: Suche einen Ort, tippe auf die Karte oder füge Koordinaten wie "38.57, -109.55" ein.',
   'Route length is a number of miles, like 42.5.': 'Die Streckenlänge ist eine Zahl in Meilen, zum Beispiel 42.5.',
   '{list} and {last}': '{list} und {last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "NOTFALL mit deinem Standort an alle auf der Tour senden?",
   "Running Late": "Verspäte mich",
   "Need a Minute": "Brauche kurz",
+  "Couldn’t Change the Trackline": "Leader-Spur konnte nicht geändert werden",
+  "Leader Trackline": "Leader-Spur",
+  "A line behind you in the leader color, on every rider’s map": "Eine Linie hinter dir in der Leader-Farbe, auf der Karte jedes Fahrers",
+  "On for Everyone": "Für alle an",
+  "Off for Everyone": "Für alle aus",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Zeigt auf der Karte jedes Fahrers, wo du geführt hast. Kreuzt du sie wieder, wird die ältere Spur blasser.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Das Ausschalten der Leader-Spur ist noch nicht freigeschaltet. Es funktioniert nach dem nächsten Server-Update.",
 };
 
 export default dict;

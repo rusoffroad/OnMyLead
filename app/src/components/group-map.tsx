@@ -6,12 +6,14 @@ import { Colors, RideColors } from '@/constants/theme';
 import { FOLLOW_FRAME_START, followCamShouldMove, type FollowFrame } from '@/core/follow-camera';
 import { followCamDurationMs } from '@/core/glide';
 import type { LatLng } from '@/core/geo';
+import type { TracklinePieces } from '@/core/leader-trackline';
 import { cameraCenterFor, fitInset, isFarOut, openMapCenter, rideViewCorners } from '@/core/map-center';
 import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import { symbolLabel, waypointSymbol } from '@/core/waypoint-symbols';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
 import { fallbackFollowStep } from './fallback-follow';
+import { TracklinePolylines } from './leader-trackline';
 import { GroupMapboxMap } from './group-mapbox-map';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
 import { RiderMarker } from './rider-marker';
@@ -60,7 +62,7 @@ export function GroupMap(props: GroupMapProps) {
  * passes for a live one.
  */
 function FlatGroupMap({
-  riders, regroup, route, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding = FIT_PADDING, fallback,
+  riders, regroup, route, trackline, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding = FIT_PADDING, fallback,
   onReady, onUserMove, follow, locationEveryMs = 1000, ref,
 }: {
   riders: MapRider[];
@@ -68,6 +70,8 @@ function FlatGroupMap({
   meId?: string;
   /** The ride's planned route, drawn under the riders. */
   route?: LatLng[] | null;
+  /** Leader Trackline: where the leader has been, the newest pass bright (null: off). */
+  trackline?: TracklinePieces | null;
   regroup: { lat: number; lng: number; label: string | null } | null;
   onPressRider?: (id: string) => void;
   /** Topo and public trails layers (see useTrailMap); tapping a trail shows what it is. */
@@ -248,6 +252,7 @@ function FlatGroupMap({
           <RouteEnds points={route} />
         </>
       ) : null}
+      <TracklinePolylines trackline={trackline} />
       {waypoints?.map((w) => (
         <Marker
           key={`w-${w.id}`}

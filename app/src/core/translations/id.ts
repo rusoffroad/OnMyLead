@@ -1,6 +1,21 @@
 // Indonesian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Balas",
+  "Unlike comment": "Batal suka komentar",
+  "Like comment": "Suka komentar",
+  "Reply to {authorName}": "Balas {authorName}",
+  "yourself": "diri sendiri",
+  "Replying to {name}": "Membalas {name}",
+  "Cancel reply": "Batalkan balasan",
+  "Post reply": "Kirim balasan",
+  "posted a photo": "memposting foto",
+  "{name}’s photo. Opens it in Social": "Foto {name}. Membukanya di Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Berkomentar dan membalas adalah bagian dari OnMyLead Pro. Membaca dan menyukai tetap gratis.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Belum ada yang baru. Saat teman memposting foto, riding, mendapat lencana, atau membagikan jalur, akan muncul di sini.",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "Belum ada orang lain yang bergabung untuk mengambil alih, jadi keluar akan membatalkan perjalanan.",
+  "Your location sharing for this ride stops.": "Berbagi lokasi Anda untuk perjalanan ini berhenti.",
+  "The lead goes back to the organizer.": "Pimpinan kembali ke penyelenggara.",
   "Language": "Bahasa",
   "Change language": "Ganti bahasa",
   "Map Mode. Open your offroad map": "Mode Peta. Buka peta offroad kamu",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'Tentang ride',
   'Lowering a limit never removes anyone who already joined.': 'Menurunkan batas tidak pernah mengeluarkan siapa pun yang sudah bergabung.',
   'Bring and Know': 'Bawa dan ketahui',
+  'Not Ready to Save': 'Belum bisa disimpan',
   'No Changes Yet': 'Belum ada perubahan',
   'Change anything above, then save. Riders see the new details right away.': 'Ubah apa saja di atas, lalu simpan. Rider langsung melihat detail baru.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'Semua orang di ride mendapat notifikasi, dan halaman ride menampilkan apa yang berubah.',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': 'Nama harus kurang dari {v} karakter.',
   'Check the departure time.': 'Periksa waktu keberangkatan.',
   'Check the expected finish time.': 'Periksa perkiraan waktu selesai.',
+  'Set the meeting point before adding instructions.': 'Atur titik kumpul sebelum menambahkan petunjuk.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': 'Atur titik kumpul: cari tempat, ketuk peta, atau tempel koordinat seperti "38.57, -109.55".',
   'Route length is a number of miles, like 42.5.': 'Panjang rute adalah angka dalam mil, seperti 42.5.',
   '{list} and {last}': '{list} dan {last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "Kirim DARURAT dengan lokasimu ke semua orang di riding?",
   "Running Late": "Terlambat",
   "Need a Minute": "Butuh semenit",
+  "Couldn’t Change the Trackline": "Tidak bisa mengubah garis pemimpin",
+  "Leader Trackline": "Garis Pemimpin",
+  "A line behind you in the leader color, on every rider’s map": "Garis di belakang Anda dengan warna pemimpin, di peta setiap pengendara",
+  "On for Everyone": "Aktif untuk semua",
+  "Off for Everyone": "Nonaktif untuk semua",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "Menunjukkan jalur yang Anda pimpin di peta setiap pengendara. Jika dilintasi lagi, lintasan lama memudar.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "Mematikan garis pemimpin belum tersedia. Fitur ini akan berfungsi setelah pembaruan server berikutnya.",
 };
 
 export default dict;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  anyLand, anyTrails, defaultFeatures, FEATURE_GROUPS, featureKey, MAP_FEATURE_IDS, MAP_FEATURES, osmFeatureLayers, readFeatures, rnStyle, TRAIL_FEATURES,
+  anyLand, anyTrails, defaultFeatures, FEATURE_GROUPS, featureKey, MAP_FEATURE_IDS, MAP_FEATURES, osmFeatureLayers, osmLayerShows, readFeatures, rnStyle, TRAIL_FEATURES,
 } from '../map-features';
 import {
   inTexas, LAND_SOURCES, landQueryUrl, MVUM_NARROW_SYMBOLS, PADUS, PADUS_FIELDS, parcelIdentifyUrl, parseFsTrail, parsePadus, parseParcel, pickLayers,
@@ -116,6 +116,19 @@ describe('OpenStreetMap lines on Mapbox', () => {
     expect(JSON.stringify(layers.find((l) => l.id === 'oml-osm-hiking')!.filter)).toContain('bridleway');
     // Sidewalks (footway) are not hiking trails.
     expect(JSON.stringify(layers.find((l) => l.id === 'oml-osm-hiking')!.filter)).not.toContain('footway');
+  });
+
+  it('names follow the switch of the line they sit on', () => {
+    const trackNames = layers.find((l) => l.id === 'oml-osm-names')!;
+    const pathNames = layers.find((l) => l.id === 'oml-osm-hiking-names')!;
+    expect(trackNames.feature).toBe('offroad');
+    expect(JSON.stringify(trackNames.filter)).not.toContain('path');
+    expect(pathNames.feature).toBe('hiking');
+    expect(JSON.stringify(pathNames.filter)).toContain('path');
+    // Hiking on, Off-Road off: path lines and their names show, track names don't.
+    const choices = { ...defaultFeatures(), offroad: false, hiking: true };
+    expect(osmLayerShows(pathNames, choices)).toBe(true);
+    expect(osmLayerShows(trackNames, choices)).toBe(false);
   });
 
   it('hands the apps the same style in camel case', () => {

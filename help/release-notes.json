@@ -3,7 +3,7 @@
     "version": "2.1",
     "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
-    "whatsNew": "What's new in 2.1:\n\n• New rider dot with the arrow built in; leader blue, tail gunner violet.\n• Map zooms in at intersections, then back out.\n• Edit Ride Details later.\n• Bluetooth Sharing: no service? Your ride still gets your spot, taps, EMERGENCY and messages, phone to phone.\n• Badge Leaderboard: your rank everywhere or in your state.\n• 3D Terrain: satellite on the real shape of the land, offline too.\n• Hold the map to drop a waypoint.\n• Map Features: roads, hiking, land.\n• CarPlay support.",
+    "whatsNew": "What's new in 2.1:\n\n• New rider dot with the arrow built in; leader blue, tail gunner violet.\n• Leader Trackline shows where the leader went.\n• Map zooms in at intersections, then back out.\n• Edit Ride Details anytime.\n• Bluetooth Sharing: no service? Spots, taps, EMERGENCY and messages go phone to phone.\n• Badge Leaderboard: your rank nationally or by state.\n• 3D Terrain, offline too.\n• Hold the map to drop a waypoint.\n• Map Features: roads, hiking, land.\n• CarPlay support.",
     "apple": null,
     "google": null,
     "notes": [
@@ -14,6 +14,10 @@
       {
         "kind": "improved",
         "text": "The map keeps up with you without jumping: your dot moves through the middle of the map, the map zooms out one step the first time you near an edge, and after that it slides to keep you on screen with more of the way ahead showing. Center on Me starts that over."
+      },
+      {
+        "kind": "new",
+        "text": "Leader Trackline: in Ride Mode a line in the leader's blue follows behind the leader on every rider's map, so at a fork or a faint trail you can see exactly which way they went. When the leader crosses the line, rides a loop back to the start or doubles back down the same trail, the older pass fades to a thin dashed line and the fresh line stays bright on top. The leader can turn it off for everyone from the layers button. Also on onmylead.com's live map."
       },
       {
         "kind": "new",
@@ -86,6 +90,22 @@
       {
         "kind": "new",
         "text": "CarPlay: plug your iPhone into a CarPlay car (or connect wirelessly) during a ride and OnMyLead shows on the car screen. One tap sends OK, Stopped, Need Fuel, Mechanical Issue or Need Help to the group, Regroup Here (organizer and leader) or Running Late, and EMERGENCY asks once before it alerts everyone. Group lists every rider, and the leader and tail gunner get an alert on the car screen when someone falls behind. Open Ride Mode on your phone first; the car screen follows it."
+      },
+      {
+        "kind": "fixed",
+        "text": "Share Picture works with Facebook, Instagram and Messages again: the shared card is now a 1080 pixel picture named OnMyLead, a couple of MB at most, instead of a 40 MB file the other app couldn't take."
+      },
+      {
+        "kind": "fixed",
+        "text": "Trail names follow their own switch in Map Features: Off-Road Trails names with Off-Road Trails, hiking path names with Hiking Trails. A park's miles count its trails only. Rider Trails and Park Trails switched on in the You tab show on every map again."
+      },
+      {
+        "kind": "fixed",
+        "text": "Opening a comment or the Activity feed right as the app comes to the front no longer shows an error: the request is tried again quietly, and if there is still no signal you get a Retry button."
+      },
+      {
+        "kind": "new",
+        "text": "Like and reply to comments: every comment in Social has Like and Reply. Replies sit under the comment they answer, and the rider you answer or whose comment you like gets a notification. Liking is free; replying is part of commenting, so it's Pro. A friend's post with a photo now shows the photo right in the Feed on the Rides tab."
       }
     ]
   },

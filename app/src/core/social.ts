@@ -8,6 +8,7 @@ import { feedLine, feedStat, parseFeed, type FeedItem } from './feed';
 import { METERS_PER_MILE } from './geo';
 
 import { coreLocale, tc } from './i18n';
+import { isTransientError } from './errors';
 /** Longest post and comment, in characters (the database checks the same). */
 export const POST_MAX = 500;
 export const COMMENT_MAX = 500;
@@ -157,6 +158,63 @@ export function parseComment(rows: unknown): Comment[] {
     });
   }
   return out;
+}
+
+/**
+ * A comment with its likes and where it sits in a thread (feed_item_thread, migration
+ * 20261104220000_comment_likes_replies.sql). Replies are one level deep: parentId is always the top
+ * comment, and replyToName is whom a reply answered when that was another reply's writer.
+ */
+export type ThreadComment = Comment & { parentId: string | null; replyToName: string | null; likeCount: number; liked: boolean };
+
+/** A top comment and its replies, oldest first. */
+export type CommentThread = { comment: ThreadComment; replies: ThreadComment[] };
+
+export function parseThread(rows: unknown): ThreadComment[] {
+  if (!Array.isArray(rows)) return [];
+  const base = parseComment(rows);
+  const byId = new Map<string, Record<string, unknown>>();
+  for (const r of rows) if (r && typeof r === 'object' && typeof (r as Record<string, unknown>).id === 'string') byId.set((r as Record<string, unknown>).id as string, r as Record<string, unknown>);
+  return base.map((c) => {
+    const o = byId.get(c.id) ?? {};
+    return { ...c, parentId: str(o.parent_id), replyToName: str(o.reply_to_name), likeCount: int(o.like_count), liked: o.liked === true };
+  });
+}
+
+/** Comments from a server without replies yet: every one is a top comment with no likes. */
+export function asThread(list: Comment[]): ThreadComment[] {
+  return list.map((c) => ({ ...c, parentId: null, replyToName: null, likeCount: 0, liked: false }));
+}
+
+/**
+ * Groups replies under their top comment, keeping the server's order (oldest first). A reply whose
+ * top comment isn't in the list (deleted or hidden while loading) is left out.
+ */
+export function nestThread(list: ThreadComment[]): CommentThread[] {
+  const out: CommentThread[] = [];
+  const index = new Map<string, CommentThread>();
+  for (const c of list) {
+    if (c.parentId) continue;
+    const t = { comment: c, replies: [] as ThreadComment[] };
+    index.set(c.id, t);
+    out.push(t);
+  }
+  for (const c of list) {
+    if (!c.parentId) continue;
+    index.get(c.parentId)?.replies.push(c);
+  }
+  return out;
+}
+
+/** Replaces one comment in a flat thread list (after a like). */
+export function replaceComment(list: ThreadComment[], next: ThreadComment): ThreadComment[] {
+  return list.map((c) => (c.id === next.id ? next : c));
+}
+
+/** Removes a comment and, for a top comment, its replies (they go with it on the server). */
+export function removeComment(list: ThreadComment[], id: string): { list: ThreadComment[]; removed: number } {
+  const kept = list.filter((c) => c.id !== id && c.parentId !== id);
+  return { list: kept, removed: list.length - kept.length };
 }
 
 const RELATIONS: FriendRelationName[] = ['self', 'friends', 'sent', 'received', 'none'];
@@ -335,4 +393,19 @@ export function socialNotSwitchedOn(message: string | null | undefined, code?: s
   return code === 'PGRST202' || code === '42883' || code === '42P01'
     || (/social_feed|rider_timeline|feed_item|set_feed_like|add_feed_comment|create_rider_post|rider_profile/.test(message ?? '')
       && /does not exist|could not find|schema cache/i.test(message ?? ''));
+}
+
+/** True when the server doesn't have comment likes and replies yet (20261104220000). */
+export function threadNotSwitchedOn(message: string | null | undefined, code?: string | null): boolean {
+  return code === 'PGRST202' || code === '42883'
+    || (/feed_item_thread|set_comment_like|add_feed_reply/.test(message ?? '') && /does not exist|could not find|schema cache/i.test(message ?? ''));
+}
+
+/** What a Social screen says when a call fails: never a raw exception. */
+export function friendlySocialError(message: string | null | undefined, tc: (s: string) => string = (s) => s): string {
+  if (isTransientError(message)) return tc('No signal. Check your connection and tap Retry.');
+  const m = (message ?? '').replace(/^[A-Z0-9]+: /, '');
+  // Technical text (a native exception, a stack location) is not for riders.
+  if (!m || /exception|\.swift|\.kt|\bat \w+\//i.test(m)) return tc('Something went wrong. Try again.');
+  return m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.');
 }

@@ -238,6 +238,8 @@ const widthByZoom = (w: number): Expr => ['interpolate', ['linear'], ['zoom'], 6
 
 /** The Mapbox zoom from which OpenStreetMap tracks and paths are drawn by Mapbox itself (core/terrain NATIVE_TRACKS_MIN_ZOOM). */
 const CLOSE = 13;
+const trailNameLayout = { 'symbol-placement': 'line', 'text-field': ['get', 'name'], 'text-size': 12, 'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'], 'text-max-angle': 30, 'symbol-spacing': 320 };
+const trailNamePaint = { 'text-color': '#FFFFFF', 'text-halo-color': 'rgba(10,22,38,0.92)', 'text-halo-width': 1.6 };
 
 export function osmFeatureLayers(): OsmLayer[] {
   const hw = FEATURE_BY_ID.highways.ink;
@@ -261,10 +263,14 @@ export function osmFeatureLayers(): OsmLayer[] {
     { id: 'oml-osm-open', feature: 'offroad', type: 'line', sourceLayer: 'transportation', filter: ['all', cls('track'), openAccess], minzoom: CLOSE, layout: dashLayout, paint: { 'line-color': trail.color, 'line-width': trail.width, 'line-dasharray': dashFor(trail) } },
     { id: 'oml-osm-closed-case', feature: 'closed', type: 'line', sourceLayer: 'transportation', filter: ['all', cls('track'), closedAccess], minzoom: CLOSE, layout: lineLayout, paint: { 'line-color': CASING, 'line-width': closed.width + 3.3 } },
     { id: 'oml-osm-closed', feature: 'closed', type: 'line', sourceLayer: 'transportation', filter: ['all', cls('track'), closedAccess], minzoom: CLOSE, layout: dashLayout, paint: { 'line-color': closed.color, 'line-width': closed.width, 'line-dasharray': dashFor(closed) } },
+    // Trail names follow their own switch: track names with Off-Road, path names with Hiking.
     {
-      id: 'oml-osm-names', feature: 'offroad', type: 'symbol', sourceLayer: 'transportation_name', filter: ['all', cls('track', 'path'), ['has', 'name']], minzoom: CLOSE,
-      layout: { 'symbol-placement': 'line', 'text-field': ['get', 'name'], 'text-size': 12, 'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'], 'text-max-angle': 30, 'symbol-spacing': 320 },
-      paint: { 'text-color': '#FFFFFF', 'text-halo-color': 'rgba(10,22,38,0.92)', 'text-halo-width': 1.6 },
+      id: 'oml-osm-names', feature: 'offroad', type: 'symbol', sourceLayer: 'transportation_name', filter: ['all', cls('track'), ['has', 'name']], minzoom: CLOSE,
+      layout: trailNameLayout, paint: trailNamePaint,
+    },
+    {
+      id: 'oml-osm-hiking-names', feature: 'hiking', type: 'symbol', sourceLayer: 'transportation_name', filter: ['all', cls('path'), ['has', 'name']], minzoom: CLOSE,
+      layout: trailNameLayout, paint: trailNamePaint,
     },
     {
       id: 'oml-osm-road-names', feature: 'roads', type: 'symbol', sourceLayer: 'transportation_name', filter: cls('motorway', 'trunk', 'primary', 'secondary', 'tertiary'), minzoom: 11,

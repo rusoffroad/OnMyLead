@@ -1,6 +1,21 @@
 // Chinese (Simplified). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "回复",
+  "Unlike comment": "取消点赞评论",
+  "Like comment": "点赞评论",
+  "Reply to {authorName}": "回复 {authorName}",
+  "yourself": "自己",
+  "Replying to {name}": "正在回复 {name}",
+  "Cancel reply": "取消回复",
+  "Post reply": "发布回复",
+  "posted a photo": "发布了一张照片",
+  "{name}’s photo. Opens it in Social": "{name} 的照片。在 Social 中打开",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "评论和回复属于 OnMyLead Pro。阅读和点赞仍然免费。",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "还没有新动态。当好友发布照片、骑行、获得徽章或分享路线时，会显示在这里。",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "没有其他人加入来接手，所以退出将取消此次骑行。",
+  "Your location sharing for this ride stops.": "你在本次骑行中的位置共享将停止。",
+  "The lead goes back to the organizer.": "领队身份交回给组织者。",
   "Language": "语言",
   "Change language": "更改语言",
   "Map Mode. Open your offroad map": "地图模式。打开你的越野地图",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': '关于活动',
   'Lowering a limit never removes anyone who already joined.': '降低上限不会移除任何已加入的人。',
   'Bring and Know': '携带与须知',
+  'Not Ready to Save': '尚不能保存',
   'No Changes Yet': '尚无更改',
   'Change anything above, then save. Riders see the new details right away.': '修改上方任意内容后保存。骑手会立即看到新详情。',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': '活动中的所有人都会收到通知，活动页面会显示更改内容。',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': '名称请少于 {v} 个字符。',
   'Check the departure time.': '请检查出发时间。',
   'Check the expected finish time.': '请检查预计结束时间。',
+  'Set the meeting point before adding instructions.': '请先设置集合点，再添加说明。',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': '设置集合点：搜索地点、点按地图或粘贴坐标，如 "38.57, -109.55"。',
   'Route length is a number of miles, like 42.5.': '路线长度是英里数，例如 42.5。',
   '{list} and {last}': '{list}和{last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "向本次骑行的所有人发送带你位置的紧急求助？",
   "Running Late": "我会迟到",
   "Need a Minute": "等我一下",
+  "Couldn’t Change the Trackline": "无法更改领队轨迹",
+  "Leader Trackline": "领队轨迹",
+  "A line behind you in the leader color, on every rider’s map": "在每位骑手的地图上，用领队颜色在你身后画一条线",
+  "On for Everyone": "对所有人开启",
+  "Off for Everyone": "对所有人关闭",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "在每位骑手的地图上显示你带队走过的路线。再次穿过时，较早的轨迹会变淡。",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "关闭领队轨迹的功能尚未开放。下次服务器更新后即可使用。",
 };
 
 export default dict;

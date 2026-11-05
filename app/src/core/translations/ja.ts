@@ -1,6 +1,21 @@
 // Japanese. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "返信",
+  "Unlike comment": "コメントのいいねを取り消す",
+  "Like comment": "コメントにいいね",
+  "Reply to {authorName}": "{authorName} に返信",
+  "yourself": "自分",
+  "Replying to {name}": "{name} に返信中",
+  "Cancel reply": "返信をキャンセル",
+  "Post reply": "返信を投稿",
+  "posted a photo": "写真を投稿しました",
+  "{name}’s photo. Opens it in Social": "{name} の写真。Social で開きます",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "コメントと返信は OnMyLead Pro の機能です。閲覧といいねは無料のままです。",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "まだ新着はありません。友達が写真を投稿したり、走ったり、バッジを獲得したり、トレイルを共有したりすると、ここに表示されます。",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "引き継ぐ人が誰も参加していないため、退出するとライドはキャンセルされます。",
+  "Your location sharing for this ride stops.": "このライドでの位置情報の共有が停止します。",
+  "The lead goes back to the organizer.": "リードは主催者に戻ります。",
   "Language": "言語",
   "Change language": "言語を変更",
   "Map Mode. Open your offroad map": "マップモード。オフロードマップを開く",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': 'ライドについて',
   'Lowering a limit never removes anyone who already joined.': '上限を下げても、すでに参加した人が外れることはありません。',
   'Bring and Know': '持ち物と注意事項',
+  'Not Ready to Save': 'まだ保存できません',
   'No Changes Yet': 'まだ変更はありません',
   'Change anything above, then save. Riders see the new details right away.': '上の項目を変更して保存してください。ライダーにはすぐに新しい詳細が表示されます。',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': 'ライドの全員に通知が届き、ライドページに変更内容が表示されます。',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': '名前は {v} 文字未満にしてください。',
   'Check the departure time.': '出発時刻を確認してください。',
   'Check the expected finish time.': '終了予定時刻を確認してください。',
+  'Set the meeting point before adding instructions.': '集合場所を設定してから案内を追加してください。',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': '集合場所を設定してください。場所を検索するか、地図をタップするか、"38.57, -109.55" のような座標を貼り付けます。',
   'Route length is a number of miles, like 42.5.': 'ルートの長さはマイル数で入力します（例: 42.5）。',
   '{list} and {last}': '{list}と{last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "ライドの全員に位置情報付きで緊急通知を送りますか？",
   "Running Late": "遅れます",
   "Need a Minute": "少し待って",
+  "Couldn’t Change the Trackline": "リーダートラックを変更できませんでした",
+  "Leader Trackline": "リーダートラック",
+  "A line behind you in the leader color, on every rider’s map": "全ライダーの地図で、あなたの後ろにリーダーの色で線を表示",
+  "On for Everyone": "全員に表示",
+  "Off for Everyone": "全員に非表示",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "先導した道を全ライダーの地図に表示します。線を再び横切ると、古い線が薄くなります。",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "リーダートラックをオフにする機能はまだ有効になっていません。次回のサーバー更新で使えるようになります。",
 };
 
 export default dict;

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Colors, font, RideColors, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
+import type { TracklinePieces } from '@/core/leader-trackline';
 import type { Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { GroupMapHandle, MapRider } from './group-map-types';
@@ -35,6 +36,8 @@ function SketchGroupMap({
 }: {
   riders: MapRider[];
   route?: { lat: number; lng: number }[] | null;
+  /** The Leader Trackline needs the live map; the sketch shows the route only. */
+  trackline?: TracklinePieces | null;
   regroup: { lat: number; lng: number; label: string | null } | null;
   onPressRider?: (id: string) => void;
   trail?: TrailMap;

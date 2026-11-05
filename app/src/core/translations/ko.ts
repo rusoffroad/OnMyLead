@@ -1,6 +1,21 @@
 // Korean. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "답글",
+  "Unlike comment": "댓글 좋아요 취소",
+  "Like comment": "댓글 좋아요",
+  "Reply to {authorName}": "{authorName}에게 답글",
+  "yourself": "나",
+  "Replying to {name}": "{name}에게 답글 작성 중",
+  "Cancel reply": "답글 취소",
+  "Post reply": "답글 게시",
+  "posted a photo": "사진을 게시했습니다",
+  "{name}’s photo. Opens it in Social": "{name}의 사진. Social에서 엽니다",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "댓글과 답글은 OnMyLead Pro 기능입니다. 읽기와 좋아요는 계속 무료입니다.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "아직 새 소식이 없습니다. 친구가 사진을 올리거나 라이딩하거나 배지를 받거나 트레일을 공유하면 여기에 표시됩니다.",
+  "Nobody else has joined to take it over, so leaving cancels the ride.": "이어받을 다른 라이더가 없어서 나가면 라이드가 취소됩니다.",
+  "Your location sharing for this ride stops.": "이 라이드의 위치 공유가 중지됩니다.",
+  "The lead goes back to the organizer.": "리드가 주최자에게 돌아갑니다.",
   "Language": "언어",
   "Change language": "언어 변경",
   "Map Mode. Open your offroad map": "지도 모드. 오프로드 지도 열기",
@@ -2957,6 +2972,7 @@ const dict: Record<string, string> = {
   'About the Ride': '라이드 정보',
   'Lowering a limit never removes anyone who already joined.': '제한을 낮춰도 이미 참여한 사람은 제외되지 않습니다.',
   'Bring and Know': '준비물과 안내',
+  'Not Ready to Save': '아직 저장할 수 없음',
   'No Changes Yet': '아직 변경 사항 없음',
   'Change anything above, then save. Riders see the new details right away.': '위 항목을 변경한 뒤 저장하세요. 라이더에게 새 세부 정보가 바로 표시됩니다.',
   'Everyone on the ride gets a notification, and the ride page shows what changed.': '라이드의 모든 사람에게 알림이 가고, 라이드 페이지에 변경 내용이 표시됩니다.',
@@ -2964,6 +2980,7 @@ const dict: Record<string, string> = {
   'Keep the name under {v} characters.': '이름은 {v}자 미만으로 입력하세요.',
   'Check the departure time.': '출발 시간을 확인하세요.',
   'Check the expected finish time.': '예상 종료 시간을 확인하세요.',
+  'Set the meeting point before adding instructions.': '안내를 추가하기 전에 집결지를 설정하세요.',
   'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".': '집결지를 설정하세요. 장소를 검색하거나 지도를 탭하거나 "38.57, -109.55" 같은 좌표를 붙여넣으세요.',
   'Route length is a number of miles, like 42.5.': '경로 길이는 마일 단위 숫자입니다(예: 42.5).',
   '{list} and {last}': '{list} 및 {last}',
@@ -3193,6 +3210,13 @@ const dict: Record<string, string> = {
   "Send EMERGENCY with your location to everyone on the ride?": "라이드의 모든 사람에게 내 위치와 함께 긴급 알림을 보낼까요?",
   "Running Late": "늦어요",
   "Need a Minute": "잠깐만요",
+  "Couldn’t Change the Trackline": "리더 트랙라인을 변경할 수 없습니다",
+  "Leader Trackline": "리더 트랙라인",
+  "A line behind you in the leader color, on every rider’s map": "모든 라이더의 지도에 리더 색상으로 당신 뒤에 선을 표시",
+  "On for Everyone": "모두에게 켜짐",
+  "Off for Everyone": "모두에게 꺼짐",
+  "Shows where you’ve led on every rider’s map. Cross back over it and the older pass fades.": "이끈 길을 모든 라이더의 지도에 보여 줍니다. 다시 가로지르면 이전 선이 흐려집니다.",
+  "Turning off the trackline isn’t switched on yet. It starts working with the next server update.": "리더 트랙라인 끄기는 아직 사용할 수 없습니다. 다음 서버 업데이트 후 작동합니다.",
 };
 
 export default dict;

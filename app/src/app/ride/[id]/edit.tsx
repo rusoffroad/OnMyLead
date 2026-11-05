@@ -58,7 +58,8 @@ export default function EditRide() {
     })().catch((e) => setError(e instanceof Error ? e.message : t('Could not load the ride.')));
   }, [id, me]);
 
-  const set = <K extends keyof RideEditForm>(key: K, value: RideEditForm[K]) => setForm((f) => (f ? { ...f, [key]: value } : f));
+  const set = <K extends keyof RideEditForm>(key: K, value: RideEditForm[K]) =>
+    setForm((f) => (f ? { ...f, [key]: value } : f));
 
   // What saving would do right now, worked out as the leader types.
   const preview = useMemo(() => (ride && form ? ridePatch(ride, details, form, new Date()) : null), [ride, details, form]);
@@ -85,6 +86,9 @@ export default function EditRide() {
 
   const whenWhere = canEditWhenAndWhere(ride.status);
   const spot = parseCoords(form.coords);
+  // On a ride whose spot never saved, the instructions box comes with the spot, and stays while it
+  // holds text so the "set the meeting point first" reason never points at a hidden field.
+  const instructionsShown = !!(details || (whenWhere && (spot || form.instructions)));
 
   async function pickPlace(p: Place) {
     set('coords', `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
@@ -148,7 +152,7 @@ export default function EditRide() {
     </Locked>
   );
 
-  const where = whenWhere && details ? (
+  const where = whenWhere ? (
     <Card>
       <ThemedText type="heading">{t('Meeting Point')}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
@@ -223,7 +227,7 @@ export default function EditRide() {
         <Field label={t('What to Bring')} value={form.whatToBring} onChangeText={(v) => set('whatToBring', v)} multiline />
         <Field label={t('Required Equipment')} value={form.requiredEquipment} onChangeText={(v) => set('requiredEquipment', v)} multiline placeholder={t('Whip flag, helmet, spare belt')} />
         <Field label={t('Fuel')} value={form.fuelNotes} onChangeText={(v) => set('fuelNotes', v)} placeholder={t('Full tank, no gas on the trail')} />
-        {details ? (
+        {instructionsShown ? (
           <Field label={t('Instructions for Joined Riders')} value={form.instructions} onChangeText={(v) => set('instructions', v)} multiline />
         ) : null}
       </Card>
@@ -274,6 +278,8 @@ function SaveBar({
   onSave: () => void;
 }) {
   const patch = preview && !('error' in preview) ? preview : null;
+  // What stops the save as the leader types (a half-typed spot, instructions with no spot yet).
+  const notYet = preview && 'error' in preview ? preview.error : null;
   const label = patch ? changeLabel(patch.changed) : null;
   const tells = !live && !!patch && (patch.changed.includes('time') || patch.changed.includes('place'));
   return (
@@ -285,10 +291,10 @@ function SaveBar({
           borderLeftColor: label ? (tells ? Colors.accent : Colors.sky) : Colors.border,
           backgroundColor: label ? withAlpha(tells ? Colors.accent : Colors.sky, 0.1) : Colors.backgroundElement,
         }}>
-        <ThemedText style={{ fontWeight: 700 }}>{label ?? t('No Changes Yet')}</ThemedText>
+        <ThemedText style={{ fontWeight: 700 }}>{label ?? (notYet ? t('Not Ready to Save') : t('No Changes Yet'))}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           {!label
-            ? t('Change anything above, then save. Riders see the new details right away.')
+            ? notYet ?? t('Change anything above, then save. Riders see the new details right away.')
             : tells
               ? t('Everyone on the ride gets a notification, and the ride page shows what changed.')
               : t('No notification for this. Riders see it on the ride page, marked Updated.')}
