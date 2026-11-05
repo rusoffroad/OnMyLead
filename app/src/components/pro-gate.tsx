@@ -41,7 +41,7 @@ function promptCopy(block: ProBlock): { title: string; body: string; need: strin
     const reset = nextReset().toLocaleDateString(currentLocale(), { month: 'long', day: 'numeric', timeZone: 'UTC' });
     return {
       title: t('You’ve Created This Month’s Free Ride'),
-      body: t('Free accounts create {v} a month, and your next one opens on {reset}. Joining other rides stays free.', { v: block.allowance === 1 ? 'one ride' : `${block.allowance} rides`, reset }),
+      body: t('Free accounts create {v} a month, and your next one opens on {reset}. Joining other rides stays free.', { v: block.allowance === 1 ? t('one ride') : t('{n} rides', { n: block.allowance }), reset }),
       need: 'Pro creates as many rides as you lead.',
     };
   }

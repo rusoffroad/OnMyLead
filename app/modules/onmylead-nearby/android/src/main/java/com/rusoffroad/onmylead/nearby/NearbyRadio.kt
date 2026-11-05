@@ -77,6 +77,7 @@ class NearbyRadio(
 
   private class Peer(val gatt: BluetoothGatt) {
     var inbox: BluetoothGattCharacteristic? = null
+    var subscribeFails = 0
     var mtu = 23
     var busy = false
     val queue = ArrayDeque<ByteArray>()
@@ -459,8 +460,8 @@ class NearbyRadio(
    */
   @Suppress("DEPRECATION")
   private fun subscribe(gatt: BluetoothGatt, out: BluetoothGattCharacteristic, tries: Int) {
-    val p = peers[gatt.device.address] ?: return
-    if (p.gatt !== gatt || !running) return
+    val p = peerOf(gatt) ?: return
+    if (!running) return
     val d = out.getDescriptor(CCCD) ?: return
     if (p.busy) {
       if (tries < SUBSCRIBE_TRIES) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 500)
@@ -484,6 +485,9 @@ class NearbyRadio(
     }
   }
 
+  /** The peer this link belongs to, or null for a link already closed and replaced. */
+  private fun peerOf(gatt: BluetoothGatt): Peer? = peers[gatt.device.address]?.takeIf { it.gatt === gatt }
+
   private fun drop(gatt: BluetoothGatt) {
     // A late callback from a link already closed (Bluetooth switched off and on) must not remove
     // the new link to the same phone.
@@ -506,7 +510,8 @@ class NearbyRadio(
 
     override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
       handler.post {
-        peers[gatt.device.address]?.mtu = if (status == BluetoothGatt.GATT_SUCCESS) mtu else 23
+        val p = peerOf(gatt) ?: return@post
+        p.mtu = if (status == BluetoothGatt.GATT_SUCCESS) mtu else 23
         gatt.discoverServices()
       }
     }
@@ -514,7 +519,7 @@ class NearbyRadio(
     @Suppress("DEPRECATION")
     override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
       handler.post {
-        val p = peers[gatt.device.address] ?: return@post
+        val p = peerOf(gatt) ?: return@post
         val s = gatt.getService(service) ?: return@post drop(gatt)
         p.inbox = s.getCharacteristic(inbox)
         val out = s.getCharacteristic(outbox)
@@ -529,15 +534,20 @@ class NearbyRadio(
 
     override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
       handler.post {
-        val p = peers[gatt.device.address] ?: return@post
+        val p = peerOf(gatt) ?: return@post
         p.busy = false
         pump(p)
+        // The stack took the request but the peer refused it: ask again.
+        if (status != BluetoothGatt.GATT_SUCCESS && descriptor.uuid == CCCD) {
+          val out = descriptor.characteristic
+          if (out != null && ++p.subscribeFails < 10) handler.postDelayed({ subscribe(gatt, out, 1) }, 500)
+        }
       }
     }
 
     override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
       handler.post {
-        val p = peers[gatt.device.address] ?: return@post
+        val p = peerOf(gatt) ?: return@post
         p.busy = false
         pump(p)
       }

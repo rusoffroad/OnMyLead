@@ -57,7 +57,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-1",
-    "why": "2.1 release test, whole-app pass 1. Crash Alert counts a hard landing after the vehicle was in the air at driving speed (tilt-and-crash-alert, 2.1 block). Only a ride that went live counts as a referred friend's first ride (refer-a-friend). Posts, comments and typed chat show exactly as written; only status buttons and built-in quick replies are translated (language, 2.1 block). The other articles are re-dated because they list code these fixes touched: Bluetooth uploads skip an item with a bad time instead of failing, settings sync keeps each account's settings apart even when the last rider was on Free, reward and Free-plan dates show in the rider's language, and a hidden reply's writer isn't named. Riders see no other difference."
+    "why": "2.1 release test, whole-app pass 1. Crash Alert counts a hard landing after the vehicle was in the air at driving speed (tilt-and-crash-alert, 2.1 block). Only a ride that went live counts as a referred friend's first ride (refer-a-friend). Posts, comments and typed chat show exactly as written; only status buttons and built-in quick replies are translated (language, 2.1 block). The other articles are re-dated because they list code these fixes touched: Bluetooth uploads skip an item with a bad time instead of failing, reward and Free-plan dates show in the rider's language, and a hidden reply's writer isn't named. Riders see no other difference."
   },
   {
     "date": "2026-11-05",

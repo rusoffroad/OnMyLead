@@ -143,7 +143,7 @@ export function RideChat({
       {!open ? (
         last ? (
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            {last.user_id === me ? t('You') : nameOf(last.user_id)}: {isPoll(last) ? `Poll: ${last.body}` : last.body}
+            {last.user_id === me ? t('You') : nameOf(last.user_id)}: {isPoll(last) ? t('Poll: {body}', { body: last.body }) : chatMessageText(last, t)}
           </ThemedText>
         ) : null
       ) : (
