@@ -51,7 +51,7 @@ To go back to following your phone, tap **Match Phone** at the top of the list. 
 :::release 2.1
 - The whole app switches: Home, Ride Mode, Map Mode, ride and group pages, chat, Events, Social, Friends, Garage, Trips, Starlink, Tilt, Pro and every setting, along with the alerts and messages OnMyLead shows you.
 - Spoken alerts in Ride Mode are read in your language. If the voice you picked under **You** > **Voice** speaks another language, your phone's own voice for your language reads them instead.
-- Status buttons and the built-in quick replies (like **Need Fuel** or **Flat Tire**) show in each rider's own language, so a rider who reads Spanish sees them in Spanish even if you sent them in English.
+- Status buttons and the built-in quick replies (like **Need Fuel** or **Flat Tire**) show in each rider's own language, so a rider who reads Spanish sees them in Spanish even if you sent them in English. A Ride Mode message you type with the same words as one of them (like "on my way") shows as that quick reply.
 - What riders write themselves (posts, comments, chat messages and your own quick replies) shows exactly as they wrote it.
 - Push notifications on your lock screen, the Terms of Use and the Privacy Policy are still in English.
 - The [CarPlay](/help/carplay) screen in your car uses the same language as the app.

@@ -207,10 +207,6 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     send(outgoing)
   }
 
-  /**
-   * A round (urgent false) carries everything still worth sending, so it replaces what subscribers
-   * hadn't been sent yet; an urgent send (a tap, a message, a receipt) goes ahead of it.
-   */
   private func write(_ frames: [Data], to p: CBPeripheral, _ ch: CBCharacteristic) {
     for f in frames {
       let type: CBCharacteristicWriteType = p.canSendWriteWithoutResponse ? .withoutResponse : .withResponse
@@ -218,6 +214,10 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     }
   }
 
+  /**
+   * A round (urgent false) carries everything still worth sending, so it replaces what subscribers
+   * hadn't been sent yet; an urgent send (a tap, a message, a receipt) goes ahead of it.
+   */
   private func send(_ frames: [Data], urgent: Bool = false) {
     // An empty round still goes through: it clears what subscribers hadn't been sent yet.
     guard !frames.isEmpty || !urgent else { return }
@@ -379,8 +379,6 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     // Only the new phone gets the round at once (until iOS's queue is full; the next round brings
     // the rest); the others carry on with theirs.
     guard let out = outboxChar else { return }
-    // Waiting urgent frames go to everyone first, the new phone included.
-    drainNotify()
     for f in outgoing where f.count <= central.maximumUpdateValueLength {
       if !pm.updateValue(f, for: out, onSubscribedCentrals: [central]) { break }
     }

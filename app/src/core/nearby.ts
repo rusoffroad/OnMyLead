@@ -574,7 +574,7 @@ export class NearbyMesh {
   private turn = 0;
   private turnStarted = -Infinity;
   private sentTurn = new Map<string, number>();
-  /** Messages picked in the current turn: counted as sent once the turn ends, so the pick stays the same all turn. */
+  /** Messages in the current turn's latest pick (what the radio is sending): counted as sent once the turn ends, so the pick stays the same all turn. */
   private pickedNow = new Set<string>();
 
   /** Moves to the next turn every ROTATE_MS (by one even when rounds run late or the clock is set back). */
@@ -773,6 +773,8 @@ export class NearbyMesh {
     const ids = new Set(items.flatMap((i) => (i.kind === 'reply' ? [i.id] : [])));
     this.advanceTurn(now, ids);
     const picked = pickFrames(items, this.myId, (id) => this.sentTurn.get(id) ?? -1);
+    // Only the latest pick counts: an earlier one in the same turn was replaced before it went out.
+    this.pickedNow.clear();
     if (picked.length < items.length) for (const i of picked) if (i.kind === 'reply') this.pickedNow.add(i.id);
     return picked.map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
