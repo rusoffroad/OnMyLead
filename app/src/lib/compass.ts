@@ -12,6 +12,8 @@ let current: number | null = null;
 const listeners = new Set<(deg: number | null) => void>();
 let sub: { remove: () => void } | null = null;
 let starting = false;
+// Location was allowed while a look was under way: look again once it ends.
+let again = false;
 let retry: ReturnType<typeof setTimeout> | null = null;
 let retryMs = 5000;
 
@@ -52,6 +54,12 @@ function start() {
     .catch(() => {})
     .finally(() => {
       starting = false;
+      if (again) {
+        again = false;
+        if (retry) clearTimeout(retry);
+        retry = null;
+        if (listeners.size && !sub) start();
+      }
     });
 }
 
@@ -60,7 +68,8 @@ export function compassAllowed() {
   if (!listeners.size || sub) return;
   if (retry) clearTimeout(retry);
   retry = null;
-  start();
+  if (starting) again = true;
+  else start();
 }
 
 function stop() {

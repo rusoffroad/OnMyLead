@@ -3305,6 +3305,7 @@ const dict: Record<string, string> = {
   "Classic": "Klasik",
   "Right-drag or Ctrl-drag to tilt and turn.": "Seret dengan klik kanan atau Ctrl untuk memiringkan dan memutar.",
   "Drag up or down with two fingers to tilt, twist to turn.": "Seret ke atas atau bawah dengan dua jari untuk memiringkan, putar untuk memutar.",
+  "More statuses": "Status lainnya",
 };
 
 export default dict;

@@ -3305,6 +3305,7 @@ const dict: Record<string, string> = {
   "Classic": "クラシック",
   "Right-drag or Ctrl-drag to tilt and turn.": "右ドラッグまたは Ctrl+ドラッグで傾けたり回したりできます。",
   "Drag up or down with two fingers to tilt, twist to turn.": "2 本指で上下にドラッグすると傾き、ひねると回転します。",
+  "More statuses": "その他のステータス",
 };
 
 export default dict;

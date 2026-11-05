@@ -344,6 +344,9 @@ export function MapboxMap({
   );
 }
 
+/** With no location update this long, the rider has stopped (ms). */
+const PUCK_STILL_MS = 4000;
+
 /**
  * Your own dot (the Chevron Puck, drawn as images): Mapbox moves and turns it itself, in step with
  * the map. Its arrow follows the GPS course while you move and the compass while you're stopped;
@@ -357,8 +360,16 @@ const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.Mutabl
   const hasCompass = useHasCompass();
   const kind = moving ? 'moving' : hasCompass ? 'stopped' : 'still';
   useEffect(() => {
-    feedRef.current = setMoving;
+    // Location updates stop once the phone stands still (they come only after a move), so with no
+    // update for a few seconds the rider has stopped and the dot goes back to its stopped look.
+    let still: ReturnType<typeof setTimeout> | undefined;
+    feedRef.current = (m: boolean) => {
+      setMoving(m);
+      if (still) clearTimeout(still);
+      still = m ? setTimeout(() => setMoving(false), PUCK_STILL_MS) : undefined;
+    };
     return () => {
+      if (still) clearTimeout(still);
       feedRef.current = null;
     };
   }, [feedRef]);

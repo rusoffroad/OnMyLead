@@ -3305,6 +3305,7 @@ const dict: Record<string, string> = {
   "Classic": "经典",
   "Right-drag or Ctrl-drag to tilt and turn.": "右键拖动或按住 Ctrl 拖动可倾斜和旋转。",
   "Drag up or down with two fingers to tilt, twist to turn.": "用两根手指上下拖动可倾斜，旋转可转向。",
+  "More statuses": "更多状态",
 };
 
 export default dict;

@@ -189,13 +189,13 @@ export function QuickRow({ lastReply, onReply, onMore }: { lastReply: string | n
   return (
     <View style={styles.row}>
       {PANEL_REPLIES.map((q) => (
-        <QuickTile key={q} icon={REPLY_ICON[q]} label={q} on={lastReply === q} onPress={() => onReply(q)} a11y={t('Send to the group: {q}', { q })} style={styles.quarter} />
+        <QuickTile key={q} icon={REPLY_ICON[q]} label={t(q)} on={lastReply === q} onPress={() => onReply(q)} a11y={t('Send to the group: {q}', { q: t(q) })} style={styles.quarter} />
       ))}
       <QuickTile
         icon="more"
         label={t('More')}
         onPress={onMore}
-        a11y="More statuses"
+        a11y={t('More statuses')}
         style={styles.quarter}
       />
     </View>

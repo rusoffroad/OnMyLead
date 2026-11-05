@@ -3305,6 +3305,7 @@ const dict: Record<string, string> = {
   "Classic": "Классический",
   "Right-drag or Ctrl-drag to tilt and turn.": "Перетаскивайте правой кнопкой или с Ctrl, чтобы наклонять и поворачивать.",
   "Drag up or down with two fingers to tilt, twist to turn.": "Проведите двумя пальцами вверх или вниз, чтобы наклонить, поверните, чтобы развернуть.",
+  "More statuses": "Другие статусы",
 };
 
 export default dict;

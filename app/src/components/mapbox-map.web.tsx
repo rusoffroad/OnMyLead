@@ -459,16 +459,19 @@ export function MapboxMarker({
   const drop = useRef(onDragEnd);
   // Made once the pin has a real spot (the map library throws on anything else).
   const real = isLatLng(at);
+  // The newest spot, so a pin that moved while the map library was loading is made where it is now.
+  const latest = useRef(at);
   useEffect(() => {
     drop.current = onDragEnd;
-  }, [onDragEnd]);
+    if (isLatLng(at)) latest.current = at;
+  }, [onDragEnd, at]);
   useEffect(() => {
     if (!map || !holder || !real) return;
     let gone = false;
     loadGl().then((gl) => {
       if (gone) return;
       holder.style.transform = '';
-      const mk = new gl.Marker({ element: holder, anchor: 'top-left', offset: [0, 0], draggable: !!draggable }).setLngLat([at.lng, at.lat]).addTo(map);
+      const mk = new gl.Marker({ element: holder, anchor: 'top-left', offset: [0, 0], draggable: !!draggable }).setLngLat([latest.current.lng, latest.current.lat]).addTo(map);
       mk.on('dragend', () => {
         const p = mk.getLngLat();
         drop.current?.({ lat: p.lat, lng: p.lng });
