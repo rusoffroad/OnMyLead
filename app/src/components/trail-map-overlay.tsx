@@ -334,7 +334,7 @@ function StyleTile({ base, on, onPress }: { base: BaseMap; on: boolean; onPress:
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityState={{ selected: on }}
+      accessibilityState={{ checked: on }}
       accessibilityLabel={tr(BASE_NAME[base])}
       onPress={onPress}
       style={({ pressed }) => [styles.styleTile, on && styles.styleTileOn, pressed && { transform: [{ scale: 0.97 }] }]}>

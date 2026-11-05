@@ -15,6 +15,8 @@ export function SheetModal({ visible = true, onDismiss, ...rest }: ModalProps) {
   const sheetDismissed = useSheetUp(shown);
   return (
     <Modal
+      // iPhone and iPad otherwise turn a landscape screen back to portrait to show the sheet.
+      supportedOrientations={['portrait', 'landscape']}
       {...rest}
       visible={shown}
       onDismiss={() => {
