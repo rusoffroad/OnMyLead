@@ -17,6 +17,22 @@
   },
   {
     "date": "2026-11-05",
+    "slugs": ["contact-support", "create-a-ride-on-the-website", "getting-started", "pro-trial", "subscribe-to-pro"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "promote-bluetooth-sharing",
+    "why": "Re-dated only: the onmylead.com homepage gets a No Service section for Bluetooth Sharing once 2.1 is live. Contact, prices, the Pro Trial and creating a ride on the website are unchanged."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["faq", "bluetooth-sharing"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "promote-bluetooth-sharing",
+    "why": "2.1 launch: the FAQ's \"Does Live Tracking Work With No Cell Service?\" answers yes for nearby riders from 2.1 (Bluetooth Sharing) and links the Bluetooth Sharing guide; the old answer stays until 2.1 is live. Bluetooth Sharing now leads the 2.1 release notes and What's New, and onmylead.com gets a No Service section once 2.1 is live."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["tilt-and-crash-alert"],
     "kind": "fix",
     "by": "pr",

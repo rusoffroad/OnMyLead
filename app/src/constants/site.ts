@@ -65,3 +65,9 @@ export const SHOWCASE_PARK_TRAILS: boolean = false;
 export const SHOWCASE_COMMENT_REPLIES: boolean = false;
 /** The Emergency Siren line in the showcase. Off until the app version with the siren (2.1 build 10) is live in the stores. */
 export const SHOWCASE_EMERGENCY_SIREN: boolean = false;
+/**
+ * The No Service section on the homepage (Bluetooth Sharing: riders pass spots, status taps,
+ * EMERGENCY and messages phone to phone with no cell service), its hero link and nav link. Off
+ * until the app version with Bluetooth Sharing (2.1) is live in the stores.
+ */
+export const SHOWCASE_NO_SERVICE: boolean = false;

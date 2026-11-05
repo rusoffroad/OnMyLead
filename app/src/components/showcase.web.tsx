@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -68,6 +68,7 @@ export function Showcase() {
           <img src="/showcase/logo-lockup.png" alt="OnMyLead" width={158} height={36} />
         </a>
         <nav aria-label="Sections">
+          {SHOWCASE_NO_SERVICE ? <a href="#no-service" onClick={jump('no-service')}>No Service</a> : null}
           <a href="#new" onClick={jump('new')}>New in 2.0</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
@@ -100,6 +101,11 @@ export function Showcase() {
               Free to download and ride. Pro is {PRO_PRICES.monthly} a month or {PRO_PRICES.annual} a year, and every
               new account gets {TRIAL_DAYS} days of Pro with no card.
             </p>
+            {SHOWCASE_NO_SERVICE ? (
+              <a className="hero-new" href="#no-service" onClick={jump('no-service')}>
+                <b>New in 2.1</b> No service? Your group still hears you, over Bluetooth.
+              </a>
+            ) : null}
           </div>
           <div className="hero-phone">
             <figure className="phone">
@@ -111,6 +117,8 @@ export function Showcase() {
           Built for SXS/UTV, ATV, Dirt Bike, Motorcycle, Jeep/4x4, Truck, Overland Rig, Snowmobile and Car Club rides.
         </p>
       </section>
+
+      {SHOWCASE_NO_SERVICE ? <NoService /> : null}
 
       <PromoVideo />
 
@@ -611,6 +619,97 @@ function NewIn2() {
   );
 }
 
+/**
+ * Bluetooth Sharing (2.1), the headline of the release: with no cell service, phones on the same ride
+ * pass spots, status taps, EMERGENCY and messages to each other and along the group. The picture is
+ * a strung-out group on a trail: a tap from the tail gunner hops rider to rider up to the leader.
+ * Claims match help/articles/bluetooth-sharing.md (range, six hops, not a satellite messenger).
+ */
+const NS_RIDERS = [
+  { x: 120, y: 520, kind: 'sweep' },
+  { x: 315, y: 468, kind: 'rider' },
+  { x: 495, y: 372, kind: 'rider' },
+  { x: 680, y: 300, kind: 'rider' },
+  { x: 872, y: 168, kind: 'leader' },
+] as const;
+
+const NS_FACTS = [
+  { title: 'See Each Other', text: 'Riders near you keep moving on your map, marked Via Bluetooth, while you share your location with the ride.' },
+  { title: 'Taps and EMERGENCY', text: 'Flat Tire, Need Fuel or EMERGENCY reaches nearby riders at once. EMERGENCY always goes first, and your card shows who got it and who saw it.' },
+  { title: 'Messages, Read Out Loud', text: 'Quick replies and the messages you type in Ride Mode reach nearby riders whole, in any language, and their phones read them out.' },
+  { title: 'Passed Down the Line', text: 'Each phone passes on what it hears, up to six phones, so the back of the group reaches the front. The first phone to get a bar sends it all to OnMyLead.' },
+];
+
+function NoService() {
+  return (
+    <section id="no-service" className="ns" aria-labelledby="ns-title">
+      <div className="ns-inner">
+        <div className="ns-copy">
+          <p className="ns-bars" aria-hidden="true">
+            <svg viewBox="0 0 28 22" width="28" height="22">
+              <rect x="1" y="15" width="4" height="6" rx="1" />
+              <rect x="8" y="11" width="4" height="10" rx="1" />
+              <rect x="15" y="6" width="4" height="15" rx="1" />
+              <rect x="22" y="1" width="4" height="20" rx="1" />
+              <path d="M2 2 L26 20" />
+            </svg>
+            No Service
+          </p>
+          <h2 id="ns-title" className="ns-title">No Service?<br />Your Group Still Hears You.</h2>
+          <p>
+            Out past the last bar, OnMyLead phones on the same ride talk to each other over Bluetooth. Riders near you
+            keep moving on your map, and a status tap, a message or an EMERGENCY still gets through. Every phone passes
+            it along, so the rider at the back reaches the leader through the riders in between.
+          </p>
+          <p className="ns-small">
+            New in 2.1. Free and on by default on iPhone, iPad and Android, and they all work together. Encrypted so
+            only riders on your ride can read it.
+          </p>
+        </div>
+        <figure className="ns-map">
+          <svg viewBox="0 0 1000 640" role="img" aria-label="Five riders strung out along a trail with no cell service. A Flat Tire tap from the tail gunner hops phone to phone, rider to rider, up to the leader.">
+            <path className="ns-trail" d="M -20 560 C 60 540, 90 520, 120 520 S 250 500, 315 468 S 430 380, 495 372 S 610 330, 680 300 S 800 200, 872 168 S 960 120, 1030 100" />
+            {NS_RIDERS.map((r, i) => (
+              <circle key={`range${i}`} className="ns-range" cx={r.x} cy={r.y} r={140} />
+            ))}
+            {NS_RIDERS.slice(1).map((r, i) => (
+              <line key={`hop${i}`} className="ns-hop" style={{ animationDelay: `${0.35 + i * 0.6}s` }} x1={NS_RIDERS[i].x} y1={NS_RIDERS[i].y} x2={r.x} y2={r.y} pathLength={1} />
+            ))}
+            {NS_RIDERS.map((r, i) => (
+              <circle key={`ping${i}`} className="ns-ping" style={{ animationDelay: `${i * 0.6}s` }} cx={r.x} cy={r.y} r={140} />
+            ))}
+            {NS_RIDERS.map((r, i) => (
+              <circle key={`dot${i}`} className={`ns-dot ns-${r.kind}`} cx={r.x} cy={r.y} r={r.kind === 'leader' ? 24 : r.kind === 'sweep' ? 20 : 16} />
+            ))}
+          </svg>
+          <div className="ns-card ns-card-from">
+            <b>Flat Tire</b>
+            <span>Reached Ray over Bluetooth</span>
+          </div>
+          <div className="ns-card ns-card-to">
+            <b>Jess: Flat Tire</b>
+            <span>Via Bluetooth</span>
+          </div>
+          <figcaption>One tap from the tail gunner, carried rider to rider to the leader.</figcaption>
+        </figure>
+        <dl className="ns-facts">
+          {NS_FACTS.map((f) => (
+            <div key={f.title}>
+              <dt>{f.title}</dt>
+              <dd>{f.text}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="ns-range-note">
+          Bluetooth reaches about 100 to 300 feet between phones in the open, and less through trees, hills and steel,
+          so it works best when the group rides close. Riders in between carry it farther. It isn’t a satellite
+          messenger and can’t reach 911. <a href="/help/bluetooth-sharing">How Bluetooth Sharing works</a>
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function Feature({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="feature">
@@ -974,6 +1073,67 @@ const CSS = `
 }
 @keyframes settle { from { transform: scale(1.08); opacity: 0.4; } to { transform: none; opacity: 1; } }
 @keyframes rise { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* No Service (Bluetooth Sharing, 2.1): the release headline, right under the hero. */
+.hero-new { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 22px; padding: 10px 16px; border-radius: 12px;
+  background: rgba(59, 134, 247, 0.16); border: 1.5px solid rgba(59, 134, 247, 0.55); color: #fff; text-decoration: none; font-size: 17px; }
+.hero-new b { color: #8DB8FF; }
+.hero-new:hover { background: rgba(59, 134, 247, 0.26); }
+.ns { position: relative; padding: 120px 0 40px; isolation: isolate; }
+.ns::before { content: ''; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(60% 55% at 72% 42%, rgba(59, 134, 247, 0.16), rgba(59, 134, 247, 0) 70%); }
+.ns-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 32px 56px; align-items: center; }
+.ns-bars { display: inline-flex; align-items: center; gap: 10px; color: var(--dust); font-family: ${display7}; font-size: 20px; }
+.ns-bars rect { fill: var(--line); }
+.ns-bars path { stroke: var(--red); stroke-width: 3; stroke-linecap: round; }
+.ns-title { margin-top: 14px !important; font-size: clamp(46px, 5.6vw, 76px); line-height: 0.94; }
+.ns-copy > p:not(.ns-bars) { margin-top: 22px; color: #DCE3EC; font-size: 20px; max-width: 30em; }
+.ns-copy > .ns-small { margin-top: 14px; color: var(--soft); font-size: 16px; }
+.ns-map { position: relative; margin: 0; }
+.ns-map svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ns-trail { fill: none; stroke: var(--sand); stroke-opacity: 0.55; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 2 18; }
+.ns-range { fill: rgba(59, 134, 247, 0.05); stroke: rgba(59, 134, 247, 0.35); stroke-width: 2; stroke-dasharray: 6 10; }
+.ns-hop { stroke: #8DB8FF; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; filter: drop-shadow(0 0 8px rgba(59, 134, 247, 0.9)); }
+.ns-ping { fill: none; stroke: #8DB8FF; stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ns-dot { stroke: var(--text); stroke-width: 4; }
+.ns-rider { fill: var(--rider); }
+.ns-leader { fill: var(--blue); stroke-width: 5; }
+.ns-sweep { fill: var(--sweep); }
+.ns-card { position: absolute; display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-radius: 12px; background: rgba(18, 34, 58, 0.96);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.9); font-size: 15px; line-height: 1.3; color: var(--soft); white-space: nowrap; }
+.ns-card b { color: var(--text); font-size: 17px; }
+.ns-card-from { left: 0; top: 90%; transform: translateY(-100%); border-left: 5px solid var(--sweep); }
+.ns-card-to { right: 0; top: 0; border-left: 5px solid var(--blue); }
+.ns-map figcaption { margin-top: 18px; color: var(--dust); font-family: ${display7}; font-size: 18px; }
+.ns-facts { grid-column: 1 / -1; margin: 40px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+.ns-facts > div { border-top: 3px solid var(--blue); padding-top: 16px; }
+.ns-facts dt { font-family: ${display}; font-size: 26px; line-height: 1.05; }
+.ns-facts dd { margin: 10px 0 0; color: var(--soft); font-size: 16px; line-height: 1.5; }
+.ns-range-note { grid-column: 1 / -1; color: var(--dust); font-size: 15px; max-width: 62em; }
+.ns-range-note a { color: #8DB8FF; font-family: ${body7}; white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .ns-hop { stroke-dashoffset: 1; animation: ns-hop 6s linear infinite; }
+  .ns-ping { animation: ns-ping 6s ease-out infinite; }
+}
+@keyframes ns-hop { 0% { stroke-dashoffset: 1; opacity: 1; } 9% { stroke-dashoffset: 0; } 72% { stroke-dashoffset: 0; opacity: 1; } 85%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes ns-ping { 0% { transform: scale(0.12); opacity: 0.9; } 16% { transform: scale(1); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
+@media (max-width: 980px) {
+  .ns-inner { grid-template-columns: 1fr; }
+  .ns-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
+}
+@media (max-width: 640px) {
+  .ns { padding-top: 80px; }
+  .ns-copy > p:not(.ns-bars) { font-size: 17px; }
+  .ns-card { font-size: 13px; padding: 8px 10px; }
+  .ns-card b { font-size: 15px; }
+  .ns-map { display: flex; flex-direction: column; gap: 10px; }
+  .ns-map svg { order: 0; }
+  .ns-card { position: static; transform: none; align-self: flex-start; }
+  .ns-card-from { order: 1; }
+  .ns-card-to { order: 2; align-self: flex-end; }
+  .ns-map figcaption { order: 3; margin-top: 8px; font-size: 16px; }
+  .ns-facts { grid-template-columns: 1fr; gap: 24px; }
+}
 
 /* Section titles */
 .section-title { font-size: clamp(42px, 5.2vw, 68px); line-height: 0.96; }
