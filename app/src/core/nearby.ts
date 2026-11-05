@@ -487,28 +487,28 @@ function rank(item: NearbyItem, myId: string): number {
   return 5;
 }
 
-/**
- * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
- * message's parts go together or not at all, so a full round never ends partway through a message.
- * When messages don't all fit, `turn` (one more every ROTATE_MS) reshuffles which go first, so an older
- * message gets its round instead of waiting behind the newest until it ages out.
- */
-/** A message's place in a turn's order: the same on every phone, different every turn (FNV-1a). */
+/** A message's place in a turn's order: fixed for a given turn, different every turn (FNV-1a). */
 function turnOrder(id: string, turn: number): number {
   let h = 0x811c9dc5;
   for (const ch of `${id}:${turn}`) h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193) >>> 0;
   return h;
 }
 
+/**
+ * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
+ * message's parts go together or not at all, so a full round never ends partway through a message.
+ * When messages don't all fit, `turn` (one more every ROTATE_MS) reshuffles which go first, so an older
+ * message gets its round instead of waiting behind the newest until it ages out.
+ */
 export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn = 0): T[] {
   if (items.length <= MAX_FRAMES_PER_ROUND) return items;
   const own = items.find((i) => i.kind === 'position' && i.userId === myId);
   let left = MAX_FRAMES_PER_ROUND - (own ? 1 : 0);
   const picked = new Set<T>();
   if (own) picked.add(own);
-  // Taps first, as sending order has them.
-  for (const i of items) if (i.kind === 'status' && left > 0) { picked.add(i); left--; }
-  // Then whole messages, starting at this round's turn.
+  // Emergencies and the rider's own taps first, as sending order has them.
+  const first = (i: T) => i.kind === 'status' && (i.status === 'emergency' || i.userId === myId);
+  for (const i of items) if (first(i) && left > 0) { picked.add(i); left--; }
   const messages = new Map<string, T[]>();
   for (const i of items) {
     if (i.kind !== 'reply') continue;
@@ -516,16 +516,18 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
     if (g) g.push(i); else messages.set(i.id, [i]);
   }
   const idOf = (g: T[]) => (g[0] as NearbyReply).id;
-  // The rider's newest own message first; then the rest in an order that changes every turn, set
-  // by each message's id, so every message comes up near the front within a few turns, however
-  // many arrive meanwhile.
   const groups = [...messages.values()];
   const newestOwn = groups.find((g) => g[0].userId === myId);
+  // Then the rider's newest own message, whole, then other riders' taps.
+  if (newestOwn && newestOwn.length <= left) { for (const i of newestOwn) picked.add(i); left -= newestOwn.length; }
+  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > 0) { picked.add(i); left--; }
+  // Then the other messages, whole, in an order that changes every turn (set by each message's id),
+  // so every message comes up near the front within a few turns, however many arrive meanwhile.
   const rest = groups.filter((g) => g !== newestOwn)
     .map((g) => ({ g, k: turnOrder(idOf(g), turn) }))
     .sort((a, b) => a.k - b.k)
     .map((x) => x.g);
-  for (const g of newestOwn ? [newestOwn, ...rest] : rest) {
+  for (const g of rest) {
     if (g.length <= left) { for (const i of g) picked.add(i); left -= g.length; }
   }
   // Then other riders' spots and receipts.

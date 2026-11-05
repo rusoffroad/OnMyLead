@@ -374,6 +374,10 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
 
   func peripheralManager(_ pm: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom ch: CBCharacteristic) {
     subscribers[central.identifier] = nil
+    if subscribers.isEmpty {
+      pendingUrgent.removeAll()
+      pendingRound.removeAll()
+    }
     report()
   }
 }

@@ -315,8 +315,9 @@ class NearbyRadio(
   @Suppress("DEPRECATION")
   private fun pump(p: Peer) {
     if (p.busy) return
-    if (p.cccd != null && writeCccd(p)) return
+    if (p.cccd != null) return writeCccd(p)
     val ch = p.inbox ?: return
+    val fromUrgent = p.urgent.isNotEmpty()
     val f = p.urgent.removeFirstOrNull() ?: p.queue.removeFirstOrNull() ?: return
     p.busy = true
     val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -329,6 +330,11 @@ class NearbyRadio(
     if (!ok) {
       p.busy = false
       p.queue.clear()
+      // An urgent frame is kept until sent: back to the front, tried again shortly.
+      if (fromUrgent) {
+        p.urgent.addFirst(f)
+        handler.postDelayed({ peerOf(p.gatt)?.let { pump(it) } }, 200)
+      }
     }
   }
 
@@ -337,6 +343,7 @@ class NearbyRadio(
     val srv = server ?: return
     val ch = outboxChar ?: return
     if (s.busy) return
+    val fromUrgent = s.urgent.isNotEmpty()
     val f = s.urgent.removeFirstOrNull() ?: s.queue.removeFirstOrNull() ?: return
     s.busy = true
     val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -348,6 +355,10 @@ class NearbyRadio(
     if (!ok) {
       s.busy = false
       s.queue.clear()
+      if (fromUrgent) {
+        s.urgent.addFirst(f)
+        handler.postDelayed({ subscribers[s.device.address]?.takeIf { it === s }?.let { pump(it) } }, 200)
+      }
     }
   }
 
@@ -369,7 +380,10 @@ class NearbyRadio(
     s.addCharacteristic(out)
     outboxChar = out
     if (!srv.addService(s)) {
-      // Refused at once (the stack isn't ready): no callback comes, so the next round tries again.
+      // Refused at once (the stack isn't ready): the next round opens a new server, under a new
+      // generation so anything this one still reports is ignored.
+      serverGen++
+      outboxChar = null
       try { srv.close() } catch (_: Exception) {}
       return
     }
@@ -511,12 +525,12 @@ class NearbyRadio(
    * the link, and frames wait until the stack has taken it: right after discovery the stack is often
    * busy (Android 13+), and a frame write then would fail the same way and lose the queue. A refused
    * request is tried again shortly; a link that keeps refusing is dropped, and the next round
-   * connects afresh. Returns true while the request holds the link (nothing else may be written).
+   * connects afresh. While the request is pending, nothing else is written on the link.
    */
   @Suppress("DEPRECATION")
-  private fun writeCccd(p: Peer): Boolean {
-    val d = p.cccd ?: return false
-    if (p.cccdRetry) return true
+  private fun writeCccd(p: Peer) {
+    val d = p.cccd ?: return
+    if (p.cccdRetry) return
     p.busy = true
     val started = try {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -530,11 +544,10 @@ class NearbyRadio(
     }
     if (started) {
       p.cccd = null
-      return true
+      return
     }
     p.busy = false
     subscribeLater(p, d)
-    return true
   }
 
   /**

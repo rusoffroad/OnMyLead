@@ -98,14 +98,14 @@ export function ProLock({ feature, title, detail }: { feature: FeatureKey; title
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t('{v}. Part of OnMyLead Pro', { v: title ?? info.title })}
+      accessibilityLabel={t('{v}. Part of OnMyLead Pro', { v: title ?? t(info.title) })}
       onPress={() => showProGate({ kind: 'pro_required', feature })}
       style={({ pressed }) => [styles.lock, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.lockIcon}>
         <Icon name="lock" size={18} color={Colors.accent} strokeWidth={2.2} />
       </View>
       <View style={{ flex: 1, gap: 1 }}>
-        <ThemedText style={{ fontWeight: 700 }}>{title ?? info.title}</ThemedText>
+        <ThemedText style={{ fontWeight: 700 }}>{title ?? t(info.title)}</ThemedText>
         {detail ? <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText> : null}
       </View>
       <ProChip />
