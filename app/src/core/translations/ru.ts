@@ -1,6 +1,18 @@
 // Russian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "Ответить",
+  "Unlike comment": "Убрать лайк с комментария",
+  "Like comment": "Лайкнуть комментарий",
+  "Reply to {authorName}": "Ответить {authorName}",
+  "yourself": "себе",
+  "Replying to {name}": "Ответ для {name}",
+  "Cancel reply": "Отменить ответ",
+  "Post reply": "Отправить ответ",
+  "posted a photo": "опубликовал(а) фото",
+  "{name}’s photo. Opens it in Social": "Фото {name}. Открывает в Social",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "Комментарии и ответы входят в OnMyLead Pro. Читать и ставить лайки по-прежнему бесплатно.",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "Пока ничего нового. Когда друзья публикуют фото, катаются, получают значки или делятся трассами, это появится здесь.",
   "Nobody else has joined to take it over, so leaving cancels the ride.": "Больше никто не присоединился, чтобы принять поездку, поэтому выход отменяет её.",
   "Your location sharing for this ride stops.": "Передача вашего местоположения для этой поездки прекращается.",
   "The lead goes back to the organizer.": "Лидерство возвращается организатору.",

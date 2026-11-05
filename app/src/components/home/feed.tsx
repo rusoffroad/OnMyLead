@@ -1,3 +1,4 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Fragment, useState } from 'react';
 import { Pressable, Switch, Text, View } from 'react-native';
@@ -66,7 +67,7 @@ export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; 
                 style={({ pressed }) => [{ flex: 1, gap: 3 }, pressed && { opacity: 0.7 }]}>
                 <Text style={styles.line} numberOfLines={item.kind === 'post' ? 3 : undefined}>
                   <Text style={{ fontFamily: font(700) }}>{item.actorName} </Text>
-                  {item.kind === 'post' ? item.body ?? 'posted a photo' : feedLine(item)}
+                  {item.kind === 'post' ? item.body ?? t('posted a photo') : feedLine(item)}
                 </Text>
                 <Text style={[homeStyles.muted, { fontSize: 12 }]}>
                   {item.kind === 'out' ? t('Riding now') : timeAgo(item.at)}
@@ -74,6 +75,11 @@ export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; 
                   {item.commentCount ? `  ·  ${commentsLabel(item.commentCount)}` : ''}
                 </Text>
               </Pressable>
+              {item.photoUrl ? (
+                <Pressable onPress={open} accessibilityRole="imagebutton" accessibilityLabel={t('{name}’s photo. Opens it in Social', { name: item.actorName })}>
+                  <Image source={{ uri: item.photoUrl }} contentFit="cover" transition={120} style={styles.thumb} accessibilityIgnoresInvertColors />
+                </Pressable>
+              ) : null}
               {item.badge ? <BadgePatch badge={item.badge.badge} level={item.badge.level} size={34} /> : null}
               {item.key && onChange ? (
                 <Pressable
@@ -185,6 +191,7 @@ const styles = themedStyles(() => ({
   item: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
   divider: { height: 1, backgroundColor: Home.line },
   heart: { alignItems: 'center', minWidth: 32, gap: 1 },
+  thumb: { width: 54, height: 54, borderRadius: 12, backgroundColor: Home.muted },
   heartCount: { color: Home.muted, fontFamily: font(700), fontSize: 11 },
   live: { position: 'absolute', right: -1, bottom: -1, width: 13, height: 13, borderRadius: 7, backgroundColor: Home.mint, borderWidth: 2, borderColor: Home.panel },
   line: { color: Colors.text, fontFamily: font(500), fontSize: 15, lineHeight: 20 },

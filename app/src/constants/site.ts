@@ -56,3 +56,5 @@ export const SHOWCASE_MAP_FEATURES: boolean = false;
 export const SHOWCASE_INTERSECTION_ZOOM: boolean = false;
 /** The Park Trails line in the showcase. Off until the app version with park trails (2.1) is live in the stores. */
 export const SHOWCASE_PARK_TRAILS: boolean = false;
+/** The comment likes and replies line in the showcase. Off until the app version with them (2.1) is live in the stores. */
+export const SHOWCASE_COMMENT_REPLIES: boolean = false;

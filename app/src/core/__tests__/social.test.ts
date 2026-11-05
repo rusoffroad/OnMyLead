@@ -5,6 +5,7 @@ import { inboxLook, notificationKey } from '../inbox';
 import {
   canShareOut, commentsLabel, fitWithin, friendlySocialError, isItemKey, isOwnFile, itemHref, likesLine, nextQuality, parseComment, parseProfile,
   parseSocial, postPhotoPath, postPhotoUrl, shareHeadline, shareSubline, shareText, sinceLine, socialNotSwitchedOn, statLine, toggleLike,
+  asThread, nestThread, parseThread, removeComment, replaceComment, threadNotSwitchedOn,
 } from '../social';
 
 const URL = 'https://x.supabase.co';
@@ -136,6 +137,48 @@ describe('profiles and notifications', () => {
     expect(socialNotSwitchedOn('Could not find the function public.social_feed in the schema cache')).toBe(true);
     expect(socialNotSwitchedOn('', 'PGRST202')).toBe(true);
     expect(socialNotSwitchedOn('permission denied')).toBe(false);
+  });
+});
+
+describe('comment likes and replies', () => {
+  const row = (id: string, parent: string | null, extra: Record<string, unknown> = {}) => ({
+    id, author_id: `a-${id}`, author_name: `Rider ${id}`, body: `body ${id}`, at: '2026-11-04T20:00:00Z',
+    mine: false, can_delete: false, parent_id: parent, reply_to_name: null, like_count: 0, liked: false, ...extra,
+  });
+
+  it('reads likes, the parent and whom a reply answered', () => {
+    const [c] = parseThread([row('r2', 'c1', { reply_to_name: 'Eli', like_count: '3', liked: true })]);
+    expect(c).toMatchObject({ id: 'r2', parentId: 'c1', replyToName: 'Eli', likeCount: 3, liked: true });
+    expect(parseThread('nope')).toEqual([]);
+    expect(parseThread([{ id: 'x' }])).toEqual([]);
+  });
+
+  it('nests replies under their comment, oldest first, and drops orphans', () => {
+    const list = parseThread([row('c1', null), row('r1', 'c1'), row('c2', null), row('r2', 'c1'), row('rx', 'gone')]);
+    const threads = nestThread(list);
+    expect(threads.map((t) => t.comment.id)).toEqual(['c1', 'c2']);
+    expect(threads[0].replies.map((r) => r.id)).toEqual(['r1', 'r2']);
+    expect(threads[1].replies).toEqual([]);
+  });
+
+  it('removing a comment takes its replies; removing a reply takes only it', () => {
+    const list = parseThread([row('c1', null), row('r1', 'c1'), row('c2', null)]);
+    expect(removeComment(list, 'c1')).toMatchObject({ removed: 2, list: [{ id: 'c2' }] });
+    expect(removeComment(list, 'r1').removed).toBe(1);
+  });
+
+  it('likes toggle optimistically and replace in place', () => {
+    const list = parseThread([row('c1', null), row('c2', null, { like_count: 2 })]);
+    const next = toggleLike(list[1]);
+    expect(next).toMatchObject({ liked: true, likeCount: 3 });
+    expect(replaceComment(list, next)[1].likeCount).toBe(3);
+  });
+
+  it('an older server gives plain comments, and that is detected', () => {
+    expect(asThread(parseComment([row('c1', null)]))[0]).toMatchObject({ parentId: null, likeCount: 0, liked: false });
+    expect(threadNotSwitchedOn('Could not find the function public.feed_item_thread(p_key) in the schema cache')).toBe(true);
+    expect(threadNotSwitchedOn(null, 'PGRST202')).toBe(true);
+    expect(threadNotSwitchedOn('this comment isn’t available')).toBe(false);
   });
 });
 

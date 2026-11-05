@@ -1,6 +1,18 @@
 // Hindi. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Reply": "जवाब दें",
+  "Unlike comment": "टिप्पणी की पसंद हटाएं",
+  "Like comment": "टिप्पणी पसंद करें",
+  "Reply to {authorName}": "{authorName} को जवाब दें",
+  "yourself": "खुद",
+  "Replying to {name}": "{name} को जवाब दे रहे हैं",
+  "Cancel reply": "जवाब रद्द करें",
+  "Post reply": "जवाब पोस्ट करें",
+  "posted a photo": "ने एक फ़ोटो पोस्ट की",
+  "{name}’s photo. Opens it in Social": "{name} की फ़ोटो। इसे Social में खोलता है",
+  "Commenting and replying are part of OnMyLead Pro. Reading and liking stay free.": "टिप्पणी और जवाब देना OnMyLead Pro का हिस्सा है। पढ़ना और पसंद करना मुफ़्त रहता है।",
+  "Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.": "अभी कुछ नया नहीं। जब दोस्त फ़ोटो पोस्ट करेंगे, राइड करेंगे, बैज जीतेंगे या ट्रेल शेयर करेंगे, यहां दिखेगा।",
   "Nobody else has joined to take it over, so leaving cancels the ride.": "कोई और शामिल नहीं हुआ जो इसे संभाल सके, इसलिए छोड़ने पर राइड रद्द हो जाएगी।",
   "Your location sharing for this ride stops.": "इस राइड के लिए आपकी लोकेशन शेयरिंग बंद हो जाती है।",
   "The lead goes back to the organizer.": "लीड वापस आयोजक के पास चली जाती है।",

@@ -4,7 +4,7 @@ summary: Pick public or private, set the day, time and meeting point, choose a m
 category: rides
 order: 10
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/meet-point-mapbox-map.tsx
   - app/src/components/meet-point-map.tsx

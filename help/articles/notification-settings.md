@@ -4,7 +4,7 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - supabase/migrations/20261104150000_waypoint_alerts.sql
   - app/src/app/notifications.tsx
@@ -76,6 +76,9 @@ Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status
 :::
 :::release 2.0
 - **Likes and Comments**: a rider likes or comments on your post, ride, badge or trail, or replies after you comment. Likes on one post come at most once every 15 minutes. See [Like, Comment and Post in Social](/help/social).
+:::
+:::release 2.1
+- **Likes and Comments** also covers a rider liking or replying to your comment. Likes on one comment come at most once every 15 minutes too.
 :::
 
 ### Your Account

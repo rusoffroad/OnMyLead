@@ -310,7 +310,7 @@ export default function UserDetail() {
             c={{
               kind: 'comment', id: c.id, authorId: id, body: c.body, createdAt: c.created_at,
               hiddenAt: c.hidden_at, hiddenReason: c.hidden_reason, hiddenBy: c.hidden_by,
-              note: `On ${c.owner_name}’s ${c.item_key.split(':')[0]}${c.reports ? `, ${c.reports} reports` : ''}`,
+              note: `${c.parent_id ? 'Reply on' : 'On'} ${c.owner_name}’s ${c.item_key.split(':')[0]}${c.likes ? `, ${c.likes} ${c.likes === 1 ? 'like' : 'likes'}` : ''}${c.reports ? `, ${c.reports} reports` : ''}`,
             }}
           />
         ))}

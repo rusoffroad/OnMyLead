@@ -171,6 +171,9 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   `social/new.tsx` (post with one photo). Likes free; comment, post and share **[Pro: social_posts]**.
   Share to other apps via a generated card (`lib/share-activity*.ts`). Tap any profile picture for
   full size (`components/photo-viewer.tsx`). Migration 20261102900000_social_hub.sql.
+- 2.1: like (free) and reply (Pro) on every comment, replies one level deep under their comment
+  (`components/social/comment-thread.tsx`, migration 20261104220000_comment_likes_replies.sql);
+  Home Feed posts show their photo.
 
 ### Riding Groups and Social
 - Groups tab: New Group, your groups, groups you're in, group chat with unread counts and ride

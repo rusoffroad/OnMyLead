@@ -12,8 +12,9 @@ import { isTransientError } from '@/core/errors';
 import { tc } from '@/core/i18n';
 import { handleProError } from '@/lib/pro';
 import {
-  fitWithin, friendlySocialError, nextQuality, parseComment, parseProfile, parseSocial, POST_PHOTO_BUCKET, POST_PHOTO_MAX,
-  POST_PHOTO_MAX_BYTES, POST_PHOTO_QUALITY, postPhotoPath, socialNotSwitchedOn, type Comment, type RiderProfile, type SocialItem,
+  asThread, fitWithin, friendlySocialError, nextQuality, parseComment, parseProfile, parseSocial, parseThread, POST_PHOTO_BUCKET, POST_PHOTO_MAX,
+  POST_PHOTO_MAX_BYTES, POST_PHOTO_QUALITY, postPhotoPath, socialNotSwitchedOn, threadNotSwitchedOn, type Comment, type RiderProfile, type SocialItem,
+  type ThreadComment,
 } from '@/core/social';
 import { track } from './analytics';
 import { readPhotoBytes } from './photo-bytes';
@@ -91,6 +92,31 @@ export async function setLike(key: string, liked: boolean): Promise<number> {
 export async function addComment(key: string, body: string): Promise<string> {
   const id = check(await supabase.rpc('add_feed_comment', { p_key: key, p_body: body }));
   track('feed_comment', { kind: key.split(':')[0] });
+  return String(id);
+}
+
+/**
+ * Every comment and reply on an item, with likes (feed_item_thread, 20261104220000). A server
+ * without that update gets the plain comments and `replies: false`, so the screen hides Like and
+ * Reply on comments instead of failing.
+ */
+export async function itemThread(key: string): Promise<{ list: ThreadComment[]; replies: boolean }> {
+  const res = await read('feed_item_thread', { p_key: key });
+  if (res.error && threadNotSwitchedOn(res.error.message, res.error.code)) return { list: asThread(await itemComments(key)), replies: false };
+  return { list: parseThread(check(res)), replies: true };
+}
+
+/** Like or unlike a comment or reply; returns the new count. Free, like liking a post. */
+export async function setCommentLike(commentId: string, liked: boolean): Promise<number> {
+  const n = check(await supabase.rpc('set_comment_like', { p_id: commentId, p_liked: liked }));
+  if (liked) track('comment_like', {});
+  return typeof n === 'number' ? n : 0;
+}
+
+/** Reply to a comment or reply (Pro, like commenting; the server checks too). */
+export async function addReply(commentId: string, body: string): Promise<string> {
+  const id = check(await supabase.rpc('add_feed_reply', { p_comment: commentId, p_body: body }));
+  track('comment_reply', {});
   return String(id);
 }
 
@@ -175,7 +201,10 @@ export async function reportContent(target: { postId?: string; commentId?: strin
 // Admin Dashboard ---------------------------------------------------------------
 
 export type AdminPost = { id: string; body: string | null; photo_path: string | null; created_at: string; hidden_at: string | null; hidden_reason: string | null; hidden_by: string | null; likes: number; comments: number; reports: number };
-export type AdminComment = { id: string; item_key: string; body: string; created_at: string; hidden_at: string | null; hidden_reason: string | null; hidden_by: string | null; owner_name: string; reports: number };
+export type AdminComment = { id: string; item_key: string; body: string; created_at: string; hidden_at: string | null; hidden_reason: string | null; hidden_by: string | null; owner_name: string; reports: number;
+  /** Set on a reply (20261104220000); missing on an older server. */
+  parent_id?: string | null;
+  likes?: number };
 
 export async function adminRiderSocial(userId: string): Promise<{ posts: AdminPost[]; comments: AdminComment[] }> {
   const { data, error } = await supabase.rpc('admin_rider_social', { p_user: userId });

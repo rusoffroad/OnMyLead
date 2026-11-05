@@ -4,7 +4,7 @@ summary: What every OnMyLead account gets for free, what OnMyLead Pro adds, and 
 category: pro
 order: 10
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/core/pro.ts
   - app/src/core/entitlements.ts
@@ -152,7 +152,7 @@ Free accounts get 8 hours of Map Mode every calendar month (UTC time). Pro has n
 - **Group Rides on Your Trails:** turn one of your trails into a group ride's route.
 - **Import GPX Routes:** bring in a track from Gaia, onX or any GPX file. See [Import a GPX Route](/help/import-gpx).
 - **Offline Maps:** download satellite, topo and trail maps so the map keeps working with no signal. See [Offline Maps](/help/offline-maps). Maps already on your phone keep working on Free.
-- **Post, Comment and Share:** post ride reports with a photo on your profile, comment on your friends' rides, badges, trails and posts, and share to Facebook, Instagram or X. Seeing Social, reading comments and liking stay free. Pro riders show a gold **PRO** tag next to their name. See [Like, Comment and Post in Social](/help/social).
+- **Post, Comment and Share:** post ride reports with a photo on your profile, comment on your friends' rides, badges, trails and posts, and share to Facebook, Instagram or X. Seeing Social, reading comments and liking (posts and comments) stay free; replying to a comment is commenting, so it's Pro. Pro riders show a gold **PRO** tag next to their name. See [Like, Comment and Post in Social](/help/social).
 - **Create Events:** post a rally, poker run or ride weekend with photos, an agenda and its group rides. Seeing events, saying you're going and being a co-host or Ride Manager stay free. See [Events](/help/events).
 - **Saved Riding Groups:** save your crew, add riders and invite everyone in one tap. Joining a group, its chat and its ride invites stay free. See [Riding Groups](/help/riding-groups).
 - **Custom Share Codes:** pick your own easy code for a ride, group or friend link. Every ride and group still gets a free code that works. See [Choose Your Own Code](/help/custom-codes).
