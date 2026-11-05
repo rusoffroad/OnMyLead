@@ -53,7 +53,7 @@ export const REPLY_PART_BYTES = 88;
  * sixth is headroom.
  */
 export const MAX_REPLY_PARTS = 6;
-/** Longest message that goes over Bluetooth, in UTF-8 bytes; longer ones are cut. */
+/** Upper bound on a message's UTF-8 bytes over Bluetooth. Parts split at whole characters, so the real limit can be a few bytes lower: use fitReply, not this, to decide what goes whole. */
 export const MAX_REPLY_BYTES = REPLY_PART_BYTES * MAX_REPLY_PARTS;
 /** A packet is passed on at most this many times after the phone that made it. */
 export const MAX_HOPS = 6;
@@ -72,6 +72,8 @@ export const TAG_WINDOW_SEC = 15 * 60;
 export const MAX_FRAMES_PER_ROUND = 24;
 /** How often a full round moves on in line: longer than the slowest radio round (10 s on Max Battery Saver), so every turn's pick goes out at least once. */
 export const ROTATE_MS = 10_500;
+/** How long an item must stay in the pick to count as sent: one normal radio round. */
+export const HELD_MS = 4_000;
 /** Other riders' spots, and receipts, a full round always makes room for. */
 export const SPOT_SHARE = 6;
 export const ACK_SHARE = 2;
@@ -537,9 +539,10 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   // Then the rider's newest own message, whole.
   if (newestOwn && newestOwn.length <= left) take(newestOwn);
   const ring = inLine(groups.filter((g) => g !== newestOwn), (g) => roundKey(g[0]));
-  // Then other riders' taps, leaving room for the next message in line (when it could fit at all),
+  // Then other riders' taps, leaving room for the first message in line that could fit,
   // so a crowd of taps can't keep every message off the air.
-  const hold = ring.length && ring[0].length <= left ? ring[0].length : 0;
+  const next = ring.find((g) => g.length <= left);
+  const hold = next ? next.length : 0;
   for (const i of waiting('status')) if (left > hold) take([i]);
   // Then the other messages, whole, then the rest of the spots and receipts.
   for (const g of ring) if (g.length <= left) take(g);
@@ -581,14 +584,17 @@ export class NearbyMesh {
   private turn = 0;
   private turnStarted = -Infinity;
   private sentTurn = new Map<string, number>();
-  /** Messages in the current turn's latest pick (what the radio is sending): counted as sent once the turn ends, so the pick stays the same all turn. */
-  private pickedNow = new Set<string>();
+  /**
+   * The current pick (what the radio is sending), each with when it joined the pick. Counted as
+   * sent when the turn ends, if it stayed in the pick for a whole radio round (HELD_MS).
+   */
+  private pickedNow = new Map<string, number>();
 
   /** Moves to the next turn every ROTATE_MS (by one even when rounds run late or the clock is set back). */
   private advanceTurn(now: number, live: Set<string>) {
     if (now - this.turnStarted < ROTATE_MS && now >= this.turnStarted) return;
     if (this.turnStarted !== -Infinity) {
-      for (const id of this.pickedNow) this.sentTurn.set(id, this.turn);
+      for (const [k, since] of this.pickedNow) if (now - since >= HELD_MS) this.sentTurn.set(k, this.turn);
       this.turn++;
     }
     this.pickedNow.clear();
@@ -780,9 +786,10 @@ export class NearbyMesh {
     const ids = new Set(items.map(roundKey));
     this.advanceTurn(now, ids);
     const picked = pickFrames(items, this.myId, (id) => this.sentTurn.get(id) ?? -1);
-    // Only the latest pick counts: an earlier one in the same turn was replaced before it went out.
-    this.pickedNow.clear();
-    if (picked.length < items.length) for (const i of picked) this.pickedNow.add(roundKey(i));
+    // Only what is still in the pick counts: anything dropped from it was replaced before it went out.
+    const keys = new Set(picked.length < items.length ? picked.map(roundKey) : []);
+    for (const k of this.pickedNow.keys()) if (!keys.has(k)) this.pickedNow.delete(k);
+    for (const k of keys) if (!this.pickedNow.has(k)) this.pickedNow.set(k, now);
     return picked.map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 
