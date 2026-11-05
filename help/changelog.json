@@ -9,6 +9,7 @@
       "full-map",
       "location-sharing",
       "notification-settings",
+      "out-riding",
       "ride-bubble",
       "ride-mode",
       "tilt-and-crash-alert",
@@ -17,7 +18,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-5",
-    "why": "2.1 release test, passes 4 to 6. Crash Alert treats a fall at driving speed as the vehicle possibly in the air, and says that stopping right after the phone falls may start the countdown (tilt-and-crash-alert, 2.1 block). The Ride Mode articles are re-dated because the announcement banner in Ride Mode now shows the leader's words exactly as written; riders see no other difference. notification-settings is re-dated because the in-app message pop-up also shows rider text as written."
+    "why": "2.1 release test, passes 4 to 6. Crash Alert treats a fall at driving speed as the vehicle possibly in the air, and says that stopping right after the phone falls may start the countdown (tilt-and-crash-alert, 2.1 block). The Ride Mode articles are re-dated because the announcement banner in Ride Mode now shows the leader's words exactly as written; riders see no other difference. notification-settings is re-dated because the in-app message pop-up also shows rider text as written. out-riding is re-dated because direct messages and group chat also show rider text as written."
   },
   {
     "date": "2026-11-05",
