@@ -111,9 +111,9 @@ Everyone in the group gets a notification and sees the ride under **Ride Invites
 
 To get these invites, keep **Ride Invites** on in [Notification Settings](/help/notification-settings).
 
+:::release 2.1
 ## Add a Group Photo
 
-:::release 2.1
 If you made the group, you can give it a photo, like the crew lined up by the trailhead. Everyone in the group sees it at the top of the group page, next to the group's name on the **Riding Groups** screen, on the **Your Group** card on Home and under **Invite a Group** on a ride. It also shows on the group link. Until you add one, the group shows its initials.
 
 1. Open the group.

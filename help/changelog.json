@@ -1,6 +1,22 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["home-screen", "invite-riders"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "group-photos",
+    "why": "Group Photos (2.1): the Your Group card on Home and Invite a Group now show the group's photo or initials; the guides say so."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["contact-support", "create-a-ride-on-the-website", "custom-codes", "follow-leaders", "getting-started", "group-chat", "language", "organizer-controls", "pro-trial", "profile-picture", "ride-name-and-profile", "subscribe-to-pro"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "group-photos",
+    "why": "Group Photos touched shared code these guides list (the group page, the invite card, admin rider page, site constants, translations). Checked: nothing riders see in these guides changed."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["riding-groups"],
     "kind": "update",
     "by": "pr",
