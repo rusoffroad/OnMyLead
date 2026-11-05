@@ -180,8 +180,10 @@ set role authenticated;
 insert into ref_out values ('hal_google', claim_referral_reward('google'));
 reset role;
 -- Reserve, Google refuses, the reward goes back unredeemed; reserve again and confirm.
-select referral_reserve_deferral('00000000-0000-0000-0000-000000000f05');
 do $$ begin
+  if not referral_reserve_deferral('00000000-0000-0000-0000-000000000f05') then raise exception 'FAIL: first reservation not taken'; end if;
+  -- A second call at the same time gets false and leaves Google to the first.
+  if referral_reserve_deferral('00000000-0000-0000-0000-000000000f05') then raise exception 'FAIL: reserved twice'; end if;
   if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') is null then raise exception 'FAIL: not reserved'; end if;
   if (select referral_defer_target('00000000-0000-0000-0000-000000000f05') ->> 'redeemed_at') is not null then raise exception 'FAIL: reserved counts as redeemed'; end if;
   perform referral_unmark_deferred('00000000-0000-0000-0000-000000000f05');

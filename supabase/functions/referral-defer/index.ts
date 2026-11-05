@@ -16,6 +16,8 @@ import { db, deferSubscription, getSubscription, playConfigured } from '../_shar
 
 const json = (body: unknown, status = 200) => Response.json(body, { status });
 const DAY = 86_400_000;
+// A reservation younger than this belongs to a call that may still be waiting on Google.
+const IN_FLIGHT_MS = 2 * 60 * 1000;
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'bad_request' }, 405);
@@ -53,21 +55,32 @@ Deno.serve(async (req) => {
   // already reserved means an earlier call got no answer, and if the subscription now ends on
   // that date, that call went through.
   if (target.deferred_at) {
+    // Another call is still asking Google (a double tap, a second device): let it finish.
+    if (Date.now() - Date.parse(target.deferred_at) < IN_FLIGHT_MS) return json({ error: 'retry' }, 503);
     const { data: reserved } = await db.from('play_events').select('payload')
       .eq('type', 'REFERRAL_DEFER_RESERVED').eq('purchase_token', target.purchase_token)
       .order('received_at', { ascending: false }).limit(1).maybeSingle();
     const asked = Date.parse(reserved?.payload?.to ?? '');
     const from = Date.parse(reserved?.payload?.from ?? '');
-    if (Number.isFinite(asked) && Number.isFinite(from) && Math.abs(current - asked) < DAY) {
+    // The subscription already ends on or after the asked date (a renewal since only moves it
+    // further): that call went through, so it is confirmed rather than deferred again.
+    if (Number.isFinite(asked) && Number.isFinite(from) && current >= asked - DAY) {
       return await confirm(user.id, target.purchase_token, from, current);
     }
-  } else {
-    const { error: reserveError } = await db.rpc('referral_reserve_deferral', { p_user: user.id });
-    if (reserveError) {
-      console.error('referral_reserve_deferral failed', reserveError.message);
+    // Reserved, but the subscription never moved: re-take the reservation for this call.
+    const { error: retakeError } = await db.rpc('referral_unmark_deferred', { p_user: user.id });
+    if (retakeError) {
+      console.error('referral_unmark_deferred failed', retakeError.message);
       return json({ error: 'retry' }, 503);
     }
   }
+  const { data: took, error: reserveError } = await db.rpc('referral_reserve_deferral', { p_user: user.id });
+  if (reserveError) {
+    console.error('referral_reserve_deferral failed', reserveError.message);
+    return json({ error: 'retry' }, 503);
+  }
+  // false: another call took it between our read and now, and it asks Google instead.
+  if (took === false) return json({ error: 'retry' }, 503);
   const { error: noteError } = await db.from('play_events').insert({
     type: 'REFERRAL_DEFER_RESERVED',
     purchase_token: target.purchase_token,

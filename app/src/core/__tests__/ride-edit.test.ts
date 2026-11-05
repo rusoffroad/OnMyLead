@@ -86,6 +86,7 @@ describe('ridePatch', () => {
     expect(both.private).toMatchObject({ meet_lat: 38.57, instructions: 'Air down at the lot' });
     expect(both.changed).toEqual(['place', 'details']);
     expect(ridePatch(ride, null, { ...formFromRide(ride, null), instructions: 'Air down' }, now)).toEqual({ error: 'Set the meeting point before adding instructions.' });
+    expect(ridePatch(ride, null, { ...formFromRide(ride, null), meetLabel: 'Lions Park' }, now)).toHaveProperty('error');
   });
 
   it('sends only the name when only the name changed', () => {

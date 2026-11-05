@@ -198,7 +198,8 @@ export function ridePatch(
 
     // The exact spot only reaches riders on the ride; the leader always has it. A ride whose spot
     // never saved (no private row) keeps the form's spot box empty until the leader fills it.
-    if (details || form.coords.trim()) {
+    // A place name with no spot has nowhere to go on such a ride, so it asks for the spot.
+    if (details || form.coords.trim() || form.meetLabel.trim()) {
       const spot = parseCoords(form.coords);
       if (!spot) return { error: tc('Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".') };
       const label = text(form.meetLabel);

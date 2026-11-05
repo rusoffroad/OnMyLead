@@ -12,7 +12,8 @@ describe('requests that never got an answer', () => {
     expect(isTransientError('P0001: that invite timed out')).toBe(false);
     expect(isTransientError('canceling statement due to statement timeout')).toBe(false);
     expect(isTransientError('Request canceled')).toBe(true);
-    expect(isTransientError('java.io.IOException: Canceled')).toBe(false);
+    expect(isTransientError('java.io.IOException: Canceled')).toBe(true);
+    expect(isTransientError('TypeError: java.io.IOException: Canceled')).toBe(true);
     expect(isTransientError('TypeError: Load failed')).toBe(true);
     expect(isTransientError('Upload failed: file too large')).toBe(false);
     expect(isTransientError('TypeError: The request timed out.')).toBe(true);

@@ -145,7 +145,7 @@ export default function SocialItemScreen() {
             {item === null && !off ? (
               <>
                 <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
-                {error ? <Button title={t('Retry')} kind="secondary" onPress={() => { setError(null); void load(); }} /> : null}
+                {error ? <Button title={t('Retry')} kind="secondary" onPress={() => { setError(null); setItem(undefined); void load(); }} /> : null}
               </>
             ) : null}
             {item ? (

@@ -197,11 +197,14 @@ revoke execute on function reports_social_fill() from public, anon, authenticate
 --    referral_mark_deferred, and puts the reward back with referral_unmark_deferred when Google
 --    refused; a reward that is reserved but not confirmed is never reserved again, so a retry
 --    can't push the same subscription out twice.
+drop function if exists referral_reserve_deferral(uuid);
+-- True only for the call that took the reservation, so two calls at once can't both ask Google.
 create or replace function referral_reserve_deferral(p_user uuid)
-returns void language plpgsql security definer set search_path = public as $$
+returns boolean language plpgsql security definer set search_path = public as $$
 begin
   update referral_rewards set deferred_at = now()
   where user_id = p_user and claim_kind = 'google_defer' and deferred_at is null;
+  return found;
 end;
 $$;
 -- Confirms the deferral: the reward is redeemed and the subscription row takes Google's own expiry.
