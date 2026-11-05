@@ -72,8 +72,8 @@ export const TAG_WINDOW_SEC = 15 * 60;
 export const MAX_FRAMES_PER_ROUND = 24;
 /** How often a full round moves on in line: longer than the slowest radio round (10 s on Max Battery Saver), so every turn's pick goes out at least once. */
 export const ROTATE_MS = 10_500;
-/** How long an item must stay in the pick to count as sent: one normal radio round. */
-export const HELD_MS = 4_000;
+/** How long an item must stay in the pick to count as sent: the slowest radio round (Max Battery Saver). */
+export const HELD_MS = 10_000;
 /** Other riders' spots, and receipts, a full round always makes room for. */
 export const SPOT_SHARE = 6;
 export const ACK_SHARE = 2;
@@ -787,7 +787,7 @@ export class NearbyMesh {
     this.advanceTurn(now, ids);
     const picked = pickFrames(items, this.myId, (id) => this.sentTurn.get(id) ?? -1);
     // Only what is still in the pick counts: anything dropped from it was replaced before it went out.
-    const keys = new Set(picked.length < items.length ? picked.map(roundKey) : []);
+    const keys = new Set(picked.map(roundKey));
     for (const k of this.pickedNow.keys()) if (!keys.has(k)) this.pickedNow.delete(k);
     for (const k of keys) if (!this.pickedNow.has(k)) this.pickedNow.set(k, now);
     return picked.map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
