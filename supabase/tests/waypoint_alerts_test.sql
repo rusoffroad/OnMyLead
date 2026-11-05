@@ -111,6 +111,19 @@ do $$ begin
   end if;
 end $$;
 
+-- A4b. Switching it back to Just Me and to Everyone again doesn't announce it a second time.
+delete from rider_notifications where kind = 'waypoint' and data ->> 'waypointId' = '0a700000-0000-0000-0000-000000000003';
+select as_user('00000000-0000-0000-0000-000000000a71');
+set role authenticated;
+update ride_waypoints set shared = false where id = '0a700000-0000-0000-0000-000000000003';
+update ride_waypoints set shared = true where id = '0a700000-0000-0000-0000-000000000003';
+reset role;
+do $$ begin
+  if exists (select 1 from rider_notifications where kind = 'waypoint' and data ->> 'waypointId' = '0a700000-0000-0000-0000-000000000003') then
+    raise exception 'FAIL: a waypoint shared again was announced again';
+  end if;
+end $$;
+
 -- A5. A planned stop says so.
 select as_user('00000000-0000-0000-0000-000000000a71');
 set role authenticated;

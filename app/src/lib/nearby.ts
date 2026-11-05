@@ -254,6 +254,9 @@ export function stopNearby() {
   if (!s) return;
   session = null;
   clearInterval(s.timer);
+  if (outTimer) clearTimeout(outTimer);
+  outTimer = null;
+  recentFrames.clear();
   s.subs.forEach((x) => x.remove());
   try {
     native?.stop();
@@ -388,12 +391,34 @@ function sendNow(items: NearbyItem[]) {
   pushOutgoing();
 }
 
+// The native round sends the outgoing set every few seconds, so sealing it again on every GPS fix
+// only burns battery: seal at most once per OUT_MIN_MS, with one trailing pass for the latest.
+const OUT_MIN_MS = 1_500;
+let outTimer: ReturnType<typeof setTimeout> | null = null;
+let lastOut = 0;
+
 function pushOutgoing() {
-  const s = session;
-  if (!s || !native) return;
-  try {
-    native.setOutgoing(s.mesh.outgoing(Date.now(), nonce).map(toBase64));
-  } catch {}
+  if (outTimer) return;
+  outTimer = setTimeout(() => {
+    outTimer = null;
+    lastOut = Date.now();
+    const s = session;
+    if (!s || !native) return;
+    try {
+      native.setOutgoing(s.mesh.outgoing(Date.now(), nonce).map(toBase64));
+    } catch {}
+  }, Math.max(0, OUT_MIN_MS - (Date.now() - lastOut)));
+}
+
+// The module hands each packet over twice (as it arrives, and again from its drain buffer for
+// packets that came while JavaScript was paused): open each one once.
+const RECENT_FRAMES = 512;
+const recentFrames = new Set<string>();
+function firstTime(b64: string): boolean {
+  if (recentFrames.has(b64)) return false;
+  recentFrames.add(b64);
+  if (recentFrames.size > RECENT_FRAMES) recentFrames.delete(recentFrames.values().next().value as string);
+  return true;
 }
 
 export type NearbyEvent =
@@ -417,7 +442,7 @@ function emit(e: NearbyEvent) {
 
 function receive(b64: string) {
   const s = session;
-  if (!s) return;
+  if (!s || !firstTime(b64)) return;
   let item: NearbyItem | null = null;
   try {
     item = s.mesh.receive(fromBase64(b64), Date.now());

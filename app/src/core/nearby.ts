@@ -47,8 +47,8 @@ export const NEARBY_OUTBOX_UUID = 'E3B1C7A2-5D4F-4E2A-9F61-0A6D1E7C4B21';
 export const MAX_FRAME_BYTES = 180;
 /** Text that fits in one message packet, in UTF-8 bytes. */
 export const REPLY_PART_BYTES = 88;
-/** A message goes out in up to this many packets (one per REPLY_PART_BYTES). */
-export const MAX_REPLY_PARTS = 4;
+/** A message goes out in up to this many packets (one per REPLY_PART_BYTES): enough for any Ride Mode message (RIDE_MESSAGE_MAX characters, even all emoji or Chinese), so one is never cut. */
+export const MAX_REPLY_PARTS = 6;
 /** Longest message that goes over Bluetooth, in UTF-8 bytes; longer ones are cut. */
 export const MAX_REPLY_BYTES = REPLY_PART_BYTES * MAX_REPLY_PARTS;
 /** A packet is passed on at most this many times after the phone that made it. */

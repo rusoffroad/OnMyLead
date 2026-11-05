@@ -133,7 +133,8 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
   const droppedAt = fell && !airborne ? s.t : (state.droppedAt ?? null);
   const justDropped = droppedAt != null && s.t - droppedAt <= DROP_IGNORE_MS;
   // After a drop the tilt is the phone's, not the vehicle's, until it's back near level for a while.
-  let displaced = fell || !!state.displaced;
+  // (Not after a fall at driving speed: that may be the vehicle in the air, and a roll after it counts.)
+  let displaced = (fell && !airborne) || !!state.displaced;
   let levelSince = state.levelSince ?? null;
   if (displaced && !fell) {
     const level = s.roll != null && s.pitch != null && Math.abs(s.roll) < REMOUNT_DEG && Math.abs(s.pitch) < REMOUNT_DEG;
@@ -142,7 +143,7 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
       displaced = false;
       levelSince = null;
     }
-  } else if (fell) levelSince = null;
+  } else if (fell && !airborne) levelSince = null;
   const drop = { fallingSince, droppedAt, displaced, levelSince };
 
   const tipped =

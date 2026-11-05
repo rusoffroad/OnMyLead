@@ -99,10 +99,14 @@ class NearbyRadio(
     running = true
     if (!hasPermissions()) return@post report("unauthorized")
     val a = adapter ?: return@post report("unsupported")
-    if (!a.isEnabled) return@post report("off")
-    openServer()
-    startScan()
-    report("on")
+    if (a.isEnabled) {
+      openServer()
+      startScan()
+      report("on")
+    } else {
+      // Rounds keep running so the radio starts by itself once the rider turns Bluetooth on.
+      report("off")
+    }
     handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
   }
 
@@ -195,14 +199,33 @@ class NearbyRadio(
     if (!running) return
     val a = adapter
     if (a == null || !a.isEnabled) {
-      if (state != "off") report("off")
+      if (state != "off") {
+        // Turning Bluetooth off ends every scan, advertisement and link: forget them, so they all
+        // start again when it comes back on.
+        resetLinks()
+        report("off")
+      }
     } else {
-      if (server == null) openServer()
+      if (server == null) openServer() else if (!advertising) startAdvertising()
       if (!scanning) startScan()
       if (state != "on") report("on")
       send(outgoing)
     }
     handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
+  }
+
+  private fun resetLinks() {
+    try {
+      if (scanning) adapter?.bluetoothLeScanner?.stopScan(scanCallback)
+      if (advertising) adapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
+    } catch (_: Exception) {}
+    scanning = false
+    advertising = false
+    peers.values.forEach { try { it.gatt.close() } catch (_: Exception) {} }
+    peers.clear()
+    subscribers.clear()
+    try { server?.close() } catch (_: Exception) {}
+    server = null
   }
 
   private fun send(frames: List<ByteArray>) {
@@ -423,12 +446,14 @@ class NearbyRadio(
           val d = out.getDescriptor(CCCD)
           if (d != null) {
             p.busy = true
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-              gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+            val started = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+              gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == BluetoothStatusCodesSuccess
             } else {
               d.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
               gatt.writeDescriptor(d)
             }
+            // Not accepted: no callback will come, so don't wait for one (writes still go out).
+            if (!started) p.busy = false
           }
         }
         report()

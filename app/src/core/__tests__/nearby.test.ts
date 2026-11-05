@@ -6,6 +6,7 @@ import {
   canonical, fitReply, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
   type NearbyItem, type RideKeys,
 } from '../nearby';
+import { RIDE_MESSAGE_MAX } from '../ride-message';
 
 const RIDE = '11111111-2222-4333-8444-555555555555';
 const A = 'aaaaaaaa-0000-4000-8000-000000000001';
@@ -80,6 +81,10 @@ describe('packets', () => {
     const back = openFrame(key(1), sealFrame(key(1), st, nonce(), T0 / 1000), T0 / 1000);
     expect(back).toEqual(st);
     expect(fitReply('  On my way  ')).toBe('On my way');
+    // The longest Ride Mode message is never cut, even all emoji or Chinese, so the copy a relay
+    // uploads is the whole message.
+    expect(fitReply('🙂'.repeat(RIDE_MESSAGE_MAX))).toBe('🙂'.repeat(RIDE_MESSAGE_MAX));
+    expect(fitReply('路'.repeat(RIDE_MESSAGE_MAX))).toBe('路'.repeat(RIDE_MESSAGE_MAX));
   });
 
   it('keeps a status without a spot', () => {

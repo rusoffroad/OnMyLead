@@ -15,6 +15,7 @@ sources:
   - app/src/lib/referrals.ts
   - supabase/migrations/20261103800000_referrals.sql
   - supabase/migrations/20261105050000_release_fixes_pass1.sql
+  - supabase/migrations/20261105060000_release_fixes_pass2.sql
   - supabase/functions/referral-defer/index.ts
 related: [friends, subscribe-to-pro, promo-codes, manage-subscription, free-vs-pro]
 keywords: [refer a friend, referral, invite friends, invite code, discount, 50% off, half price, reward, pro annual, coupon, friend link]
