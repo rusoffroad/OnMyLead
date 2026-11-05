@@ -413,6 +413,37 @@ describe('NearbyMesh turn-taking', () => {
       clock.mockRestore();
     }
   });
+
+  it('keeps a picked tap in the pick when newer taps keep arriving ahead of it', () => {
+    const clock = vi.spyOn(performance, 'now');
+    try {
+      const a = new NearbyMesh(keys(2), A);
+      const uuid = (p: string, n: number) => `${p}-0000-4000-8000-${String(n).padStart(12, '0')}`;
+      for (let n = 0; n < 40; n++) a.bridgeStatus({ id: uuid('ffffffff', n), userId: B, status: 'ok', lat: null, lng: null, at: T0 - n * 1000 });
+      // Sent means held in the pick for a whole slow radio round, not just glimpsed in one call.
+      const sent = new Set<string>();
+      const since = new Map<string, number>();
+      let fresh = 0;
+      for (let t = 0; t <= 180_000; t += 2_000) {
+        clock.mockReturnValue(t);
+        // A new tap every 2 s whose id sorts first.
+        a.bridgeStatus({ id: uuid('00000000', fresh++), userId: B, status: 'ok', lat: null, lng: null, at: T0 + t });
+        const now = new Set<string>();
+        for (const f of a.outgoing(T0 + t, nonce)) {
+          const item = openFrame(key(1), f, (T0 + t) / 1000);
+          if (item?.kind === 'status' && item.id.startsWith('ffffffff')) now.add(item.id);
+        }
+        for (const id of since.keys()) if (!now.has(id)) since.delete(id);
+        for (const id of now) {
+          if (!since.has(id)) since.set(id, t);
+          if (t - since.get(id)! >= 10_000) sent.add(id);
+        }
+      }
+      expect(sent.size).toBe(40);
+    } finally {
+      clock.mockRestore();
+    }
+  });
 });
 
 describe('fitReply', () => {
