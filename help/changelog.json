@@ -1,11 +1,11 @@
 [
   {
     "date": "2026-11-05",
-    "slugs": ["offline-maps", "park-trails"],
+    "slugs": ["3d-terrain", "create-a-ride", "edit-cancel-or-delete-a-ride", "find-a-ride", "follow-me", "free-vs-pro", "full-map", "getting-started", "home-screen", "import-gpx", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "leader-trackline", "map-layers", "navigation-mode", "notifications-inbox", "offline-maps", "park-trails", "ride-name-and-profile", "ride-summary-and-ride-again", "route-builder", "trip-planner", "use-onmylead-on-a-tablet"],
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-50",
-    "why": "2.1 release test, pass 50. Steps that said to tap the layers button now say Map Settings (and Fine-Tune for the Park Trails row), matching 2.1."
+    "why": "2.1 release test, passes 49 and 50. Steps that said to tap the layers button now say Map Settings (and Fine-Tune for the Park Trails row). Dragging the map always pauses Follow Me, your dot shows no arrow on a stopped device with no compass reading, Zoom Out at the Edge stays off on every map once turned off, and the Map Settings button's dot shows only after a real change; other listed articles describe the same screens and read the same."
   },
   {
     "date": "2026-11-05",
