@@ -511,10 +511,13 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   const picked = new Set<T>();
   let left = MAX_FRAMES_PER_ROUND;
   const take = (g: T[]) => { for (const i of g) { out.push(i); picked.add(i); } left -= g.length; };
-  // Everything else waits in line: what went out longest ago first, then sending order (newest
-  // first), so every spot, tap, message and receipt gets its turn however many are live.
+  // Everything else waits in line: what went out longest ago first, ties in a fixed order by key
+  // (not by time, so a rider's new fix or a new tap doesn't reshuffle the pick before it goes out),
+  // so every spot, tap, message and receipt gets its turn however many are live.
   const inLine = <G,>(list: G[], keyOf: (g: G) => string) =>
-    list.map((g, n) => ({ g, n, sent: lastSent(keyOf(g)) })).sort((a, b) => a.sent - b.sent || a.n - b.n).map((x) => x.g);
+    list.map((g) => ({ g, k: keyOf(g), sent: lastSent(keyOf(g)) }))
+      .sort((a, b) => a.sent - b.sent || (a.k < b.k ? -1 : a.k > b.k ? 1 : 0))
+      .map((x) => x.g);
   // Each kind is put in line once; what's already picked is skipped when a line is used.
   const lines = new Map<NearbyItem['kind'], T[]>();
   for (const kind of ['position', 'ack', 'status'] as const) lines.set(kind, inLine(items.filter((i) => i.kind === kind), roundKey));

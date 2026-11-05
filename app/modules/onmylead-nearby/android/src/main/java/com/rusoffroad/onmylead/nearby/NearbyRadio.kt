@@ -567,8 +567,8 @@ class NearbyRadio(
    * Asks the peer for its packets (turns on notifications). The request goes ahead of every frame on
    * the link, and frames wait until the stack has taken it: right after discovery the stack is often
    * busy (Android 13+), and a frame write then would fail the same way and lose the queue. A refused
-   * request is tried again shortly; a link that keeps refusing is dropped, and the next round
-   * connects afresh. While the request is pending, nothing else is written on the link.
+   * request is tried again shortly; on a link that keeps refusing, this phone stops asking and
+   * keeps writing to it one way. While the request is pending, nothing else is written on the link.
    */
   @Suppress("DEPRECATION")
   private fun writeCccd(p: Peer) {
@@ -595,14 +595,15 @@ class NearbyRadio(
 
   /**
    * A notification setup the stack or the peer refused: asked again after 500 ms, frames waiting
-   * behind it. A link that keeps refusing is dropped (on the next turn, since this may run inside
-   * send()'s loop over the peers) and the next round connects afresh.
+   * behind it. On a link that keeps refusing, this phone stops asking and writes to it one way (the
+   * pump is posted, since this may run inside send()'s loop over the peers).
    */
   private fun subscribeLater(p: Peer, d: BluetoothGattDescriptor) {
     if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) {
+      // Give up on hearing from it, but keep writing to it: a one-way link still carries this
+      // phone's taps and EMERGENCY.
       p.cccd = null
-      p.inbox = null
-      handler.post { peerOf(p.gatt)?.let { drop(it.gatt) } }
+      handler.post { peerOf(p.gatt)?.let { pump(it) } }
       return
     }
     p.cccd = d
