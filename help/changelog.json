@@ -21,7 +21,9 @@
       "bluetooth-sharing",
       "carplay",
       "check-in",
+      "contact-support",
       "create-a-ride",
+      "create-a-ride-on-the-website",
       "delete-account",
       "directions",
       "edit-cancel-or-delete-a-ride",
@@ -32,6 +34,7 @@
       "follow-me",
       "fuel-range",
       "full-map",
+      "getting-started",
       "import-gpx",
       "join-a-ride",
       "language",
@@ -39,10 +42,12 @@
       "offline-maps",
       "organizer-controls",
       "park-trails",
+      "pro-trial",
       "ride-bubble",
       "ride-chat",
       "route-builder",
       "status-buttons",
+      "subscribe-to-pro",
       "troubleshooting",
       "use-onmylead-on-a-tablet",
       "waypoints-and-planned-stops"
@@ -50,7 +55,7 @@
     "kind": "review",
     "by": "pr",
     "ref": "leader-trackline-touched",
-    "why": "The Leader Trackline change touches Ride Mode's screen and map (live.tsx, group-map.tsx), the map layers panel (trail-map-overlay.tsx), the shared API (api.ts, one new call) and the translations (new lines in every language). Riders see no difference in these articles' screens, so they only get a new updated: date."
+    "why": "The Leader Trackline change touches Ride Mode's screen and map (live.tsx, group-map.tsx), the map layers panel (trail-map-overlay.tsx), the shared API (api.ts, one new call) and the translations (new lines in every language). Riders see no difference in these articles' screens, so they only get a new updated: date. It also adds a hidden showcase flag (constants/site.ts, showcase.web.tsx) for the Leader Trackline line, off until 2.1 is live; plans and prices are unchanged."
   },
   {
     "date": "2026-11-05",
