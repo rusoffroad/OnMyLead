@@ -21,6 +21,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 import { riderHeading } from '@/core/heading';
+import { useCompass } from '@/lib/compass';
 import { dotScale } from '@/core/dot-size';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
 
@@ -53,6 +54,11 @@ const PUCK_IMAGES = {
   'oml-you-orange-stopped': require('../../assets/images/puck/you-orange-stopped.png'),
   'oml-you-classic-moving': require('../../assets/images/puck/you-classic-moving.png'),
   'oml-you-classic-stopped': require('../../assets/images/puck/you-classic-stopped.png'),
+  'oml-you-dome-still': require('../../assets/images/puck/you-dome-still.png'),
+  'oml-you-ring-still': require('../../assets/images/puck/you-ring-still.png'),
+  'oml-you-arrow-still': require('../../assets/images/puck/you-arrow-still.png'),
+  'oml-you-orange-still': require('../../assets/images/puck/you-orange-still.png'),
+  'oml-you-classic-still': require('../../assets/images/puck/you-classic-still.png'),
   'oml-puck-clear': require('../../assets/images/puck/clear.png'),
 };
 
@@ -108,6 +114,9 @@ export function MapboxMap({
   const heading = useRef(0);
   // Until when the camera is moving because the app moved it.
   const autoUntil = useRef(0);
+  // Whether a finger is on the map: a drag then counts as the rider's even while Follow Me is
+  // still panning (Follow Me keeps the window above open on every fix).
+  const touching = useRef(false);
   const autoMove = (ms: number) => {
     autoUntil.current = Math.max(autoUntil.current, Date.now() + ms + 200);
   };
@@ -218,7 +227,7 @@ export function MapboxMap({
     if (shown === 'terrain') setExaggeration(Math.round(terrainExaggeration(p.pitch ?? 0) * 10) / 10);
     // Only the rider's own drag, pinch or turn counts; the app's own camera moves (Follow Me, a fit)
     // can report a gesture on some phones, which paused Follow Me after its first move.
-    if (s.gestures?.isGestureActive && Date.now() > autoUntil.current) onUserMove?.();
+    if (s.gestures?.isGestureActive && (touching.current || Date.now() > autoUntil.current)) onUserMove?.();
   }, [onCamera, onUserMove, shown, trail]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
@@ -247,6 +256,15 @@ export function MapboxMap({
   return (
     <View
       style={StyleSheet.absoluteFill}
+      onTouchStart={() => {
+        touching.current = true;
+      }}
+      onTouchEnd={(e) => {
+        touching.current = e.nativeEvent.touches.length > 0;
+      }}
+      onTouchCancel={() => {
+        touching.current = false;
+      }}
       onLayout={(e) => {
         size.current = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height };
         trail.mapProps.onLayout(e);
@@ -315,13 +333,16 @@ export function MapboxMap({
 
 /**
  * Your own dot (the Chevron Puck, drawn as images): Mapbox moves and turns it itself, in step with
- * the map. Its arrow follows the GPS course while you move and the compass while you're stopped.
+ * the map. Its arrow follows the GPS course while you move and the compass while you're stopped;
+ * a stopped phone with no compass reading (some tablets) shows a round centre with no arrow.
  */
 const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.MutableRefObject<((moving: boolean) => void) | null> }) {
   const [moving, setMoving] = useState(false);
   // The images are drawn at Medium; Mapbox scales them for the rider's Dot Size.
   const [size] = useDotSizePref();
   const [style] = useDotStylePref();
+  const compass = useCompass();
+  const kind = moving ? 'moving' : compass != null ? 'stopped' : 'still';
   useEffect(() => {
     feedRef.current = setMoving;
     return () => {
@@ -332,11 +353,11 @@ const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.Mutabl
     <>
       <Mapbox.Images images={PUCK_IMAGES} />
       <Mapbox.LocationPuck
-        puckBearingEnabled
+        puckBearingEnabled={kind !== 'still'}
         puckBearing={moving ? 'course' : 'heading'}
         topImage="oml-puck-clear"
         shadowImage="oml-puck-clear"
-        bearingImage={`oml-you-${style}-${moving ? 'moving' : 'stopped'}`}
+        bearingImage={`oml-you-${style}-${kind}`}
         pulsing={{ isEnabled: false }}
         scale={dotScale(size)}
       />

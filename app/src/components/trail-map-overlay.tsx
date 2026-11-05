@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Modal, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, Ellipse, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
@@ -17,7 +17,7 @@ import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInf
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { can, type FeatureKey } from '@/core/entitlements';
-import { currentEntitlements, requirePro } from '@/lib/pro';
+import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
 import { RateTrailSheet } from './rate-trail-sheet';
 import { RigFitLine, TrailWidthRow } from './trail-width-row';
 import { inches } from '@/core/trail-width';
@@ -87,7 +87,9 @@ export function TrailMapOverlay({
     .filter(Boolean)
     .join(', ');
   // A small dot on the Map Settings button says the map isn't showing the standard set.
-  const changed = trail.base !== 'satellite' || featuresChanged(trail.features);
+  // A Free rider's map shows only the free features (the rest read as off), so only those count.
+  const layersPro = useCan('map_layers');
+  const changed = trail.base !== 'satellite' || featuresChanged(trail.features, layersPro ? undefined : FREE_FEATURES);
 
   return (
     <>
@@ -180,6 +182,8 @@ export function TrailMapOverlay({
  * The Pro check for controls inside Map Settings. The sheet is a Modal, and iPhone won't show the
  * Pro prompt (another Modal) over it, so a Free rider's tap closes the sheet and then opens the prompt.
  */
+const FREE_FEATURES: MapFeatureId[] = ['riderTrails', 'parkTrails'];
+
 const SheetPro = createContext<(feature: FeatureKey) => boolean>(requirePro);
 
 function MapSettingsSheet({
@@ -201,16 +205,24 @@ function MapSettingsSheet({
   // A tablet in landscape (or a wide window) keeps the map in view: the sheet docks on the right.
   const side = layout.wide && layout.landscape;
   const bases: BaseMap[] = trail.terrainAvailable ? ['satellite', 'topo', 'terrain'] : ['satellite', 'topo'];
+  // iPhone and iPad: the prompt waits until the sheet has fully gone (onDismiss). Android and the
+  // website show it over the closing sheet straight away.
+  const pendingPro = useRef<FeatureKey | null>(null);
   const pro = useCallback((feature: FeatureKey) => {
     if (can(currentEntitlements(), feature)) return true;
     onClose();
-    // After the sheet's own close animation, so the prompt has the screen to itself.
-    setTimeout(() => requirePro(feature), 450);
+    if (Platform.OS === 'ios') pendingPro.current = feature;
+    else requirePro(feature);
     return false;
   }, [onClose]);
+  const dismissed = () => {
+    const feature = pendingPro.current;
+    pendingPro.current = null;
+    if (feature) requirePro(feature);
+  };
   return (
     <SheetPro.Provider value={pro}>
-    <Modal visible={visible} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} statusBarTranslucent>
+    <Modal visible={visible} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} onDismiss={dismissed} statusBarTranslucent>
       <SheetRoot style={[styles.sheetRoot, side && styles.sheetRootSide]}>
         <Pressable style={styles.sheetScrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
         <SwipeSheet

@@ -225,9 +225,9 @@ export function quickLayerToggle(f: FeatureChoices, q: QuickLayer): { id: MapFea
 }
 
 /** Whether anything differs from what a new rider sees (the Layers button shows a small dot). */
-export function featuresChanged(f: FeatureChoices): boolean {
+export function featuresChanged(f: FeatureChoices, ids: readonly MapFeatureId[] = MAP_FEATURE_IDS): boolean {
   const d = defaultFeatures();
-  return MAP_FEATURE_IDS.some((id) => f[id] !== d[id]);
+  return ids.some((id) => f[id] !== d[id]);
 }
 
 /** A short, steady name for a set of choices, used to tell map squares drawn for different choices apart. */

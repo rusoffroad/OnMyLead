@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["follow-me"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-49",
+    "why": "2.1 release test, pass 49. Your dot shows no arrow when a stopped device has no compass reading; dragging the map now always pauses Follow Me; Zoom Out at the Edge stays off on every map once turned off; the Map Settings button's dot only shows after a real change."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": [
       "map-layers",
       "sync-across-devices"

@@ -17,16 +17,21 @@ onSyncedChange(EDGE_ZOOM_KEY, (v) => {
   emit();
 });
 
-function subscribe(l: () => void) {
-  listeners.add(l);
-  loading ??= AsyncStorage.getItem(EDGE_ZOOM_KEY)
+// Read the saved choice at once: the fallback maps ask edgeZoomOn() before any switch mounts.
+const load = () =>
+  (loading ??= AsyncStorage.getItem(EDGE_ZOOM_KEY)
     .then((v) => {
       if (value == null) value = v !== '0';
     })
     .catch(() => {
       if (value == null) value = true;
     })
-    .finally(emit);
+    .finally(emit));
+load();
+
+function subscribe(l: () => void) {
+  listeners.add(l);
+  load();
   return () => {
     listeners.delete(l);
   };

@@ -210,5 +210,8 @@ describe('Map Settings quick switches', () => {
     expect(featuresChanged(f)).toBe(false);
     f.hiking = false;
     expect(featuresChanged(f)).toBe(true);
+    // A Free rider's map has the Pro features off; only the free ones count.
+    expect(featuresChanged(f, ['riderTrails', 'parkTrails'])).toBe(false);
+    expect(featuresChanged({ ...f, parkTrails: !f.parkTrails }, ['riderTrails', 'parkTrails'])).toBe(true);
   });
 });
