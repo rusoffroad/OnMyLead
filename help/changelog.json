@@ -30,7 +30,12 @@
       "status-buttons",
       "troubleshooting",
       "use-onmylead-on-a-tablet",
-      "waypoints-and-planned-stops"
+      "waypoints-and-planned-stops",
+      "bluetooth-sharing",
+      "carplay",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range"
     ],
     "kind": "update",
     "by": "pr",
