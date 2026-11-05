@@ -1,6 +1,6 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -74,6 +74,21 @@ export default function SocialItemScreen() {
       });
     }, [session, loading, load, params.comment, pro]),
   );
+
+  // Opened from a notification while the app was still waking up and the request got dropped:
+  // try again on its own once the app is in front, so the Retry button is the last resort.
+  const failed = item === null && !!error;
+  useEffect(() => {
+    if (!failed) return;
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s === 'active') {
+        setError(null);
+        setItem(undefined);
+        load();
+      }
+    });
+    return () => sub.remove();
+  }, [failed, load]);
 
   const send = async () => {
     if (!key || !draft.trim()) return;

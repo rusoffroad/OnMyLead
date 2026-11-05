@@ -18,6 +18,7 @@ import {
 import { track } from './analytics';
 import { readPhotoBytes } from './photo-bytes';
 import { supabase, supabaseUrl } from './supabase';
+import { whenActive } from './when-active';
 
 export class SocialOffError extends Error {}
 
@@ -39,13 +40,16 @@ export class ProNeededError extends Error {}
 const friendly = (message: string) => friendlySocialError(message, tc);
 
 /**
- * A read, tried once more after a moment when the first try never got an answer (no signal for
- * a second, or iOS cancelling the request as the app came to the front), so a comment opened
- * from a notification doesn't show an error for a request that would have worked.
+ * A read, tried once more when the first try never got an answer (no signal for a second, or iOS
+ * cancelling the request because the app was still coming to the front: Chris tapped a comment
+ * notification and saw "fetch failed: UnexpectedException: cancelled", 2026-11-04). The retry
+ * waits for the app to be active, then a moment, so a request that would have worked doesn't
+ * show an error.
  */
 async function read(name: string, args: Record<string, unknown>): Promise<Res> {
   const first = (await supabase.rpc(name, args)) as Res;
   if (!first.error || !isTransientError(first.error.message)) return first;
+  await whenActive();
   await new Promise((r) => setTimeout(r, 600));
   return (await supabase.rpc(name, args)) as Res;
 }
