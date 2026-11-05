@@ -6,6 +6,8 @@
  * them (either spelling), so a server message about a cancelled ride or a statement timeout is shown as itself.
  */
 export function isTransientError(message: string | null | undefined): boolean {
-  return /network request (failed|timed out)|failed to fetch|fetch failed|network error|^(TypeError: )?load failed|UnexpectedException: cancell?ed|^(the )?(request )?(cancell?ed|timed out)\b/i
-    .test(message ?? '');
+  // postgrest-js words a dropped fetch as "<name>: <message>" (TypeError, FetchError, AbortError).
+  const m = (message ?? '').replace(/^[A-Za-z]*Error: /, '');
+  return /network request (failed|timed out)|failed to fetch|fetch failed|network ?error|^load failed|UnexpectedException: cancell?ed|^(the )?(request )?(cancell?ed|timed out)\b/i
+    .test(m);
 }

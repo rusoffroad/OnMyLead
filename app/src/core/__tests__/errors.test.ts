@@ -15,6 +15,10 @@ describe('requests that never got an answer', () => {
     expect(isTransientError('java.io.IOException: Canceled')).toBe(false);
     expect(isTransientError('TypeError: Load failed')).toBe(true);
     expect(isTransientError('Upload failed: file too large')).toBe(false);
+    expect(isTransientError('TypeError: The request timed out.')).toBe(true);
+    expect(isTransientError('FetchError: Load failed')).toBe(true);
+    expect(isTransientError('TypeError: NetworkError when attempting to fetch resource.')).toBe(true);
+    expect(isTransientError('AbortError: Request cancelled')).toBe(true);
     expect(isTransientError(null)).toBe(false);
   });
 });

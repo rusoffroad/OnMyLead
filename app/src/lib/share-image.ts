@@ -1,6 +1,5 @@
 import { File, Paths } from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
-import type { ImageRef } from 'expo-image-manipulator';
 import type { RefObject } from 'react';
 import type { View } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
@@ -20,7 +19,7 @@ export async function snapshotForShare(
   // react-native-view-shot hands back a bare path on iOS; expo-file-system wants a file:// address.
   const raw = captured.startsWith('file://') ? captured : `file://${captured}`;
   let saved: { uri: string };
-  let image: ImageRef | null = null;
+  let image: ImageManipulator.ImageRef | null = null;
   try {
     const ctx = ImageManipulator.ImageManipulator.manipulate(raw);
     ctx.resize(opts.height ? { width: opts.width, height: opts.height } : { width: opts.width });
