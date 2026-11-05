@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownFixGaps, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
+import { heldHeading, HELD_HEADING_MS, OWN_MOVE_START, OWN_STOPPED_AFTER_MS, OWN_STOPPED_UNKNOWN_MS, ownArrow, ownFix, ownMoveStep, ownMoveTimedOut, ownStopWaitMs, riderHeading, screenAngle } from '../heading';
 import { BATTERY_PLANS } from '../battery';
 
 describe('riderHeading', () => {
@@ -73,49 +73,44 @@ describe("other riders' arrows stay on after they stop", () => {
 });
 
 describe('own dot moving or stopped', () => {
-  const start = { movingAt: null, fixAt: null };
-  it('waits 5 s on a map with a fix every second, and longer than two fix gaps on Battery Saver', () => {
-    expect(ownStoppedAfterMs(1000)).toBe(OWN_STOPPED_AFTER_MS);
-    expect(ownStoppedAfterMs()).toBe(5000);
-    expect(ownStoppedAfterMs(BATTERY_PLANS.saver.fixEveryMs)).toBeGreaterThan(2 * BATTERY_PLANS.saver.fixEveryMs);
-    expect(ownStoppedAfterMs(Number.NaN)).toBe(5000);
-    expect(ownStoppedAfterMs(10 * 60_000)).toBe(150_000);
-    expect(ownStillMoving(0, 20_000, ownStoppedAfterMs(BATTERY_PLANS.saver.fixEveryMs))).toBe(true);
+  const ride = (gapMs: number, n: number, from = OWN_MOVE_START, t0 = 0) => {
+    let s = from;
+    for (let k = 0; k < n; k++) s = ownMoveStep(s, true, t0 + k * gapMs, t0 + k * gapMs);
+    return s;
+  };
+  it('a moving fix means moving; a stopped fix means stopped at once', () => {
+    const s = ownMoveStep(OWN_MOVE_START, true, 1000, 1000);
+    expect(s.moving).toBe(true);
+    expect(ownMoveStep(s, false, 2000, 2000).moving).toBe(false);
   });
-  it('counts you moving from a moving fix until no new moving fix for a while', () => {
-    const a = ownMovingAt(start, true, 1000, 1000);
-    expect(a.movingAt).toBe(1000);
-    expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS - 1)).toBe(true);
-    expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS)).toBe(false);
+  it('waits just over Battery Saver until the fix rate is known, then 2.5 fix gaps, at least 5 s', () => {
+    expect(OWN_STOPPED_UNKNOWN_MS).toBeGreaterThan(BATTERY_PLANS.saver.fixEveryMs);
+    expect(ownStopWaitMs(ownMoveStep(OWN_MOVE_START, true, 0, 0))).toBe(OWN_STOPPED_UNKNOWN_MS);
+    expect(ownStopWaitMs(ride(1000, 5))).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(ride(BATTERY_PLANS.saver.fixEveryMs, 3))).toBe(2.5 * BATTERY_PLANS.saver.fixEveryMs);
   });
-  it('a stopped fix means stopped at once', () => {
-    const a = ownMovingAt(ownMovingAt(start, true, 1000, 1000), false, 3000, 3000);
-    expect(ownStillMoving(a.movingAt, 3000)).toBe(false);
+  it('one quick pair of fixes on Battery Saver does not shorten the wait', () => {
+    const s = ownMoveStep(ride(15_000, 3), true, 30_500, 30_500);
+    expect(ownStopWaitMs(s)).toBe(37_500);
+  });
+  it('a stop (or the quiet spell running out) never counts as a fix gap', () => {
+    const atLight = ownMoveStep(ride(1000, 5), false, 4500, 4500);
+    const off = ownMoveStep(atLight, true, 44_500, 44_500);
+    expect(ownStopWaitMs(off)).toBe(OWN_STOPPED_AFTER_MS);
+    const quiet = ownMoveTimedOut(ride(1000, 5));
+    expect(quiet.moving).toBe(false);
+    expect(ownStopWaitMs(ownMoveStep(quiet, true, 50_000, 50_000))).toBe(OWN_STOPPED_AFTER_MS);
+  });
+  it('ignores a dead spot over a minute as a fix gap', () => {
+    expect(ownStopWaitMs(ownMoveStep(ride(1000, 3), true, 100_000, 100_000))).toBe(OWN_STOPPED_AFTER_MS);
   });
   it('ignores a repeated fix (only the compass turned)', () => {
-    const a = ownMovingAt(start, true, 1000, 1000);
-    expect(ownMovingAt(a, true, 1000, 1500)).toBe(a);
-    expect(ownMovingAt(a, false, 1000, 1500)).toBe(a);
+    const s = ownMoveStep(OWN_MOVE_START, true, 1000, 1000);
+    expect(ownMoveStep(s, true, 1000, 1500)).toBe(s);
+    expect(ownMoveStep(s, false, 1000, 1500)).toBe(s);
   });
   it('an earlier fix time (a phone clock jump) still counts, so the dot never freezes', () => {
-    const a = ownMovingAt(ownMovingAt(start, true, 9_000_000, 1000), true, 1000, 2000);
-    expect(a.movingAt).toBe(2000);
-  });
-  it('times moving from the clock, not from the phone\'s fix time', () => {
-    expect(ownMovingAt(start, true, 5, 1000).movingAt).toBe(1000);
-  });
-  it('learns the fix gaps from the fixes it sees, ignoring a stop or dead spot', () => {
-    expect(ownFixGaps([], null, 5000)).toEqual([]);
-    expect(ownFixGaps([], 0, 15_000)).toEqual([15_000]);
-    expect(ownFixGaps([15_000], 0, 5 * 60_000)).toEqual([15_000]);
-    expect(ownFixGaps([15_000], 5000, 5000)).toEqual([15_000]);
-  });
-  it('keeps the longest recent gap, so one quick pair of fixes does not shorten the wait', () => {
-    const g = ownFixGaps([15_000, 15_000], 0, 1000);
-    expect(Math.max(...g)).toBe(15_000);
-    expect(ownFixGaps([1, 2, 3, 4, 5], 0, 6).length).toBe(5);
-  });
-  it('was never moving with no moving fix', () => {
-    expect(ownStillMoving(ownMovingAt(start, false, 1000, 1000).movingAt, 1000)).toBe(false);
+    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 9_000_000, 1000), false, 1000, 2000);
+    expect(s.moving).toBe(false);
   });
 });
