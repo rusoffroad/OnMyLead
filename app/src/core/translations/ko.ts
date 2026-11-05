@@ -2822,6 +2822,8 @@ const dict: Record<string, string> = {
   "Remove quick reply: {s}": "빠른 답장 삭제: {s}",
   "Send to the group: {s}": "그룹에 보내기: {s}",
   ", your vote": ", 내 투표",
+  "{n} vote": "{n}표",
+  "{n} votes": "{n}표",
   "Tap a choice to vote.": "항목을 탭해 투표하세요.",
   "Tap another choice to change your vote.": "다른 항목을 탭하면 투표를 바꿀 수 있습니다.",
   "Start with {question}": "{question}(으)로 시작",

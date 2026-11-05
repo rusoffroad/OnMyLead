@@ -40,7 +40,7 @@ export function PollCard({
             onPress={() => !mine && me && onVote(i)}
             accessibilityRole="radio"
             accessibilityState={{ selected: mine }}
-            accessibilityLabel={`${label}, ${tally.counts[i]} ${tally.counts[i] === 1 ? 'vote' : 'votes'}${mine ? tr(', your vote') : ''}`}
+            accessibilityLabel={`${label}, ${tr(tally.counts[i] === 1 ? '{n} vote' : '{n} votes', { n: tally.counts[i] })}${mine ? tr(', your vote') : ''}`}
             style={({ pressed }) => [styles.choice, mine && styles.choiceMine, pressed && { opacity: 0.85 }]}>
             <View
               style={[

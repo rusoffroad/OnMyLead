@@ -598,8 +598,8 @@ class NearbyRadio(
   /**
    * A notification setup the stack or the peer refused: asked again after 500 ms, with frames
    * flowing meanwhile, up to MAX_SUBSCRIBE_FAILS times (about 20 s, long enough for bonding). On a
-   * link that keeps refusing, this phone stops asking and writes to it one way (the pump is
-   * posted, since this may run inside send()'s loop over the peers).
+   * link that keeps refusing, this phone stops asking and writes to it one way. The pump is
+   * always posted, since this may run inside pump() or send()'s loop over the peers.
    */
   private fun subscribeLater(p: Peer, d: BluetoothGattDescriptor) {
     if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) {
@@ -611,6 +611,8 @@ class NearbyRadio(
     }
     p.cccd = d
     p.cccdRetry = true
+    // Frames go out while the setup waits to be asked again.
+    handler.post { peerOf(p.gatt)?.let { pump(it) } }
     handler.postDelayed({
       peerOf(p.gatt)?.let {
         it.cccdRetry = false
@@ -681,7 +683,6 @@ class NearbyRadio(
         if (descriptor.uuid == CCCD && status != BluetoothGatt.GATT_SUCCESS) {
           // The peer said no (busy, still bonding): ask again shortly, frames flowing meanwhile.
           subscribeLater(p, descriptor)
-          pump(p)
           return@post
         }
         pump(p)

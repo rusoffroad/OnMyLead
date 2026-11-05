@@ -2822,6 +2822,8 @@ const dict: Record<string, string> = {
   "Remove quick reply: {s}": "Quitar respuesta rápida: {s}",
   "Send to the group: {s}": "Enviar al grupo: {s}",
   ", your vote": ", tu voto",
+  "{n} vote": "{n} voto",
+  "{n} votes": "{n} votos",
   "Tap a choice to vote.": "Toca una opción para votar.",
   "Tap another choice to change your vote.": "Toca otra opción para cambiar tu voto.",
   "Start with {question}": "Empieza con {question}",

@@ -29,8 +29,10 @@ export function nextReset(now: Date = new Date()): Date {
 /** A server refusal as a prompt: a Pro feature, or the Free ride limit. */
 export type ProBlock = ProError;
 
-/** What the Pro prompt says about each feature: what it does, and what stays free. */
-/** `body` is a translation key; `vars` fill its {placeholders}. */
+/**
+ * What the Pro prompt says about each feature: what it does, and what stays free.
+ * `body` is a translation key; `vars` fill its {placeholders}.
+ */
 export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string; vars?: Record<string, number> }> = {
   create_ride: {
     title: 'Create More Rides',
