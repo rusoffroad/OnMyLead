@@ -17,8 +17,10 @@ export async function selectAll(table: string, columns: string, key: string): Pr
     const { data, error } = await q;
     if (error) throw new Error(error.message);
     const rows = (data ?? []) as unknown as Record<string, unknown>[];
+    // Stops on an empty page, not a short one: the server may cap pages below PAGE.
+    if (rows.length === 0) return out;
     out.push(...rows);
-    if (rows.length < PAGE) return out;
     last = rows[rows.length - 1][key];
+    if (last === undefined || last === null) throw new Error(`selectAll: ${key} must be one of the columns`);
   }
 }

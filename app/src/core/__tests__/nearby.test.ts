@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ACK_DELIVERED, ACK_SEEN, EMERGENCY_RELAY_SEC, FLAG_FROM_SERVER, MAX_FRAME_BYTES, MAX_HOPS, MAX_REPLY_BYTES, MAX_REPLY_PARTS,
-  NO_MAC, NearbyMesh, POSITION_RELAY_SEC, REPLY_PART_BYTES, TAG_WINDOW_SEC,
-  canonical, fitReply, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
+  MAX_FRAMES_PER_ROUND, NO_MAC, NearbyMesh, POSITION_RELAY_SEC, REPLY_PART_BYTES, TAG_WINDOW_SEC,
+  canonical, fitReply, pickFrames, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
   type NearbyItem, type RideKeys,
 } from '../nearby';
 import { RIDE_MESSAGE_MAX } from '../ride-message';
@@ -313,5 +313,31 @@ describe('NearbyMesh', () => {
     a.ownStatus({ id: C, status: 'stuck', lat: null, lng: null, at: T0 });
     a.forget(C);
     expect(a.live(T0)).toHaveLength(0);
+  });
+});
+
+describe('pickFrames', () => {
+  const reply = (id: string, part: number, parts: number, at: number): NearbyItem =>
+    ({ kind: 'reply', userId: B, id, body: 'x', at, part, parts, flags: 0, hops: 0 } as unknown as NearbyItem);
+  const spot = (userId: string): NearbyItem =>
+    ({ kind: 'position', userId, at: 1, latE7: 0, lngE7: 0, accuracyM: null, speedCms: null, headingDd: null, flags: 0, hops: 0 } as unknown as NearbyItem);
+
+  it('keeps every item when they fit', () => {
+    const items = [reply('m1', 0, 2, 5), reply('m1', 1, 2, 5), spot(A)];
+    expect(pickFrames(items, A)).toEqual(items);
+  });
+
+  it("always sends the rider's own spot and never cuts a message partway", () => {
+    const items: NearbyItem[] = [];
+    for (let m = 0; m < 5; m++) for (let p = 0; p < 6; p++) items.push(reply(`m${m}`, p, 6, 100 - m));
+    items.push(spot(C), spot(A));
+    const out = pickFrames(items, A);
+    expect(out.length).toBeLessThanOrEqual(MAX_FRAMES_PER_ROUND);
+    expect(out).toContain(items[items.length - 1]);
+    const counts = new Map<string, number>();
+    for (const i of out) if (i.kind === 'reply') counts.set(i.id, (counts.get(i.id) ?? 0) + 1);
+    for (const n of counts.values()) expect(n).toBe(6);
+    // Three whole messages fit beside the own spot; a fourth would go over.
+    expect(counts.size).toBe(3);
   });
 });

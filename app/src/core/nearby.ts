@@ -480,6 +480,35 @@ function rank(item: NearbyItem, myId: string): number {
   return 5;
 }
 
+/**
+ * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
+ * message's parts go together or not at all, so a full round never ends partway through a message.
+ */
+export function pickFrames<T extends NearbyItem>(items: T[], myId: string): T[] {
+  if (items.length <= MAX_FRAMES_PER_ROUND) return items;
+  const own = items.find((i) => i.kind === 'position' && i.userId === myId);
+  const budget = MAX_FRAMES_PER_ROUND - (own ? 1 : 0);
+  const partsOf = new Map<string, number>();
+  for (const i of items) if (i.kind === 'reply') partsOf.set(i.id, (partsOf.get(i.id) ?? 0) + 1);
+  const picked = new Set<T>();
+  const whole = new Set<string>();
+  const waits = new Set<string>();
+  let used = 0; // Frames spoken for, counting the rest of a message already let in.
+  for (const i of items) {
+    if (i === own) continue;
+    if (i.kind === 'reply') {
+      if (whole.has(i.id)) { picked.add(i); continue; }
+      if (waits.has(i.id)) continue;
+      const n = partsOf.get(i.id) ?? 1;
+      if (used + n <= budget) { whole.add(i.id); picked.add(i); used += n; } else waits.add(i.id);
+      continue;
+    }
+    if (used < budget) { picked.add(i); used += 1; }
+  }
+  if (own) picked.add(own);
+  return items.filter((i) => picked.has(i));
+}
+
 /** The key an event is kept under: taps and whole messages by id, message parts and receipts by more. */
 const eventKey = (i: NearbyStatus | NearbyReply | NearbyAck) =>
   i.kind === 'reply' ? `${i.id}#${i.part}` : i.kind === 'ack' ? `${i.id}@${i.userId}` : i.id;
@@ -675,16 +704,17 @@ export class NearbyMesh {
 
   /**
    * The packets for one broadcast round. Items heard from other phones go out with one more hop;
-   * ones that already made MAX_HOPS stay here. The newest items win when there are too many.
+   * ones that already made MAX_HOPS stay here. When there are too many, this phone's own spot
+   * always goes, a message goes whole or waits for a later round (never cut in the same place each
+   * round), and the rest follow sending order.
    */
   outgoing(now: number, nonce: () => Uint8Array): Uint8Array[] {
     const nowSec = Math.floor(now / 1000);
     const heard = (i: NearbyItem) => (i.kind === 'position' ? this.positions.get(i.userId) : this.events.get(eventKey(i)));
-    return this.live(now)
+    const items = this.live(now)
       .map((i) => (heard(i)?.mine ? i : { ...i, hops: i.hops + 1 }))
-      .filter((i) => i.hops <= MAX_HOPS)
-      .slice(0, MAX_FRAMES_PER_ROUND)
-      .map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
+      .filter((i) => i.hops <= MAX_HOPS);
+    return pickFrames(items, this.myId).map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 
   /** Newest spot heard for each other rider. */
