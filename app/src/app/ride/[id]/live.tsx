@@ -90,6 +90,7 @@ import {
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
+import { endEmergency, endStaleCalls, raiseEmergency } from '@/lib/siren';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -217,6 +218,8 @@ export default function RideMode() {
   const canRegroup = mine && ['organizer', 'co_organizer', 'leader'].includes(mine.role);
   const watchesBubble = mine && ['organizer', 'co_organizer', 'leader', 'sweep'].includes(mine.role);
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
+  // The siren screen says "A rider" until the name is known (a call can arrive before the roster).
+  const sirenName = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || null, [members]);
 
   // Waypoints: the leader's shared ones and this rider's own. Press and hold the map to drop one.
   const wp = useRideWaypoints(id, !!mine);
@@ -424,7 +427,12 @@ export default function RideMode() {
       })
       // A rider cancelled a tap: their status goes back to what it was before.
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
-        if ((payload.new as { cancelled_at?: string | null })?.cancelled_at) refresh();
+        const row = payload.new as { id?: string; cancelled_at?: string | null };
+        if (row?.cancelled_at) {
+          // A cancelled EMERGENCY stops the siren on every phone that is sounding it.
+          if (row.id) endEmergency(row.id);
+          refresh();
+        }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'regroup_points', filter: `ride_id=eq.${id}` }, () => {
         activeRegroup(id).then((rg) => {
@@ -532,6 +540,8 @@ export default function RideMode() {
           });
         } else if (e.kind === 'status') {
           if (!memberIds.current.has(e.status.user_id)) return;
+          // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren).
+          raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             const old = prev[e.status.user_id];
             if (old && (old.id === e.status.id || Date.parse(old.tapped_at) > Date.parse(e.status.tapped_at))) return prev;
@@ -544,7 +554,7 @@ export default function RideMode() {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }),
-    [nameOf],
+    [nameOf, sirenName, id, me],
   );
 
   const settings: BubbleSettings = useMemo(() => {
@@ -580,6 +590,16 @@ export default function RideMode() {
     }
     announced.current = red;
   }, [bubble.alerts, watchesBubble, meOffline]);
+
+  // Emergency Siren (lib/siren): another rider's fresh EMERGENCY sounds the siren on every phone on
+  // the ride, until silenced; a newer tap from that rider (I'm OK...) ends it. Live updates and
+  // Bluetooth both land in `statuses`.
+  useEffect(() => {
+    for (const [userId, s] of Object.entries(statuses)) {
+      raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null);
+    }
+    endStaleCalls(id, statuses);
+  }, [statuses, id, me, sirenName]);
 
   // Leader and tail gunner hear a Mechanical Issue the moment it's tapped, once per tap.
   const heardBreakdowns = useRef<Set<string> | null>(null);

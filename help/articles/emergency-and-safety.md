@@ -18,7 +18,7 @@ sources:
   - app/src/app/terms.tsx
   - supabase/migrations/20261015000000_notification_settings.sql
   - supabase/migrations/20261019300000_status_broadcast.sql
-related: [tilt-and-crash-alert, status-buttons, ride-mode, location-sharing, family-link, notification-settings, offline-maps]
+related: [emergency-siren, tilt-and-crash-alert, status-buttons, ride-mode, location-sharing, family-link, notification-settings, offline-maps]
 keywords: [emergency, sos, 911, help, need help, accident, injury, hurt, crash, safety, rescue, tablet]
 ---
 
@@ -60,6 +60,10 @@ When the alert goes out:
 - Every rider on the ride gets a notification, "EMERGENCY: your name needs help now", with "Tap to see where they are."
 - It shows in red on their Ride Mode screen. If you're sharing your location, they see you on the map and can tap **Navigate** to get directions to you.
 - Help and EMERGENCY notifications are always on for every rider, even in quiet hours, and they come through even from a rider someone has blocked.
+
+:::release 2.1
+- Their phones sound a loud **Emergency Siren** until they silence it, unless they turned it off. See [Hear the Emergency Siren](/help/emergency-siren).
+:::
 
 You see a card showing whose phones have the alert. If you sent it by mistake, tap **Cancel** on the card and the group is told to ignore it. See [Send a Status or Quick Reply](/help/status-buttons).
 

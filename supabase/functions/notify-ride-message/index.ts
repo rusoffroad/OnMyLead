@@ -50,7 +50,7 @@
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-import { channelFor, fcmAccessToken, readServiceAccount, sendFcm } from '../_shared/fcm.ts';
+import { channelFor, fcmAccessToken, readServiceAccount, sendFcm, SIREN_CHANNEL } from '../_shared/fcm.ts';
 
 const SOCIAL_EVENTS = new Set(['invite', 'leader_ride']);
 const ACCOUNT_EVENTS = new Set(['trial', 'badge', 'trail_hidden']);
@@ -71,6 +71,8 @@ type Push = {
   body: string;
   thread_id: string;
   data: Record<string, unknown>;
+  /** Set by withSiren: play the Emergency Siren instead of the plain sound. */
+  siren?: boolean;
 };
 
 Deno.serve(async (req) => {
@@ -112,6 +114,8 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
   if (blockers.size) all = all.filter((r) => !blockers.has(r.user_id));
   if (!all.length) return { sent: 0 };
 
+  if (event.type === 'status') all = await withSiren(all);
+
   const [ios, android] = await Promise.all([
     sendIos(all.filter((r) => r.platform === 'ios')),
     sendAndroid(all.filter((r) => r.platform === 'android')),
@@ -129,6 +133,40 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
   return { sent: results.filter((r) => r.outcome === 'ok').length, removed: gone.length, ...(notes ? { note: notes } : null) };
 }
 
+/**
+ * EMERGENCY status pushes (the button, CarPlay or a Crash Alert): phones whose app has the
+ * Emergency Siren switched on (push_tokens.siren, migration 20261105070000_emergency_siren.sql)
+ * get the siren as the push's sound, on its own Android channel. The tap data also names the rider,
+ * so an app that is open can show who needs help. Phones with older apps (siren null) or the switch
+ * off get the push exactly as before. Fails open to the plain push: any lookup error (say the
+ * column isn't there yet) leaves the rows unchanged.
+ */
+export async function withSiren(rows: Push[]): Promise<Push[]> {
+  const sos = rows.filter((r) => r.data?.status === 'emergency');
+  if (!sos.length) return rows;
+  try {
+    const itemId = typeof sos[0].data?.itemId === 'string' ? sos[0].data.itemId : null;
+    const [tokens, who] = await Promise.all([
+      db.from('push_tokens').select('token, siren').in('token', sos.map((r) => r.token)),
+      itemId
+        ? db.from('rider_statuses').select('user_id, profiles(display_name)').eq('id', itemId).maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
+    ]);
+    const siren = new Set(((tokens.data ?? []) as { token: string; siren: boolean | null }[]).filter((t) => t.siren === true).map((t) => t.token));
+    // deno-lint-ignore no-explicit-any
+    const sender = (who as any)?.data as { user_id?: string; profiles?: { display_name?: string | null } | null } | null;
+    const extra: Record<string, unknown> = {};
+    if (sender?.user_id) extra.userId = sender.user_id;
+    const name = sender?.profiles?.display_name?.trim();
+    if (name) extra.name = name;
+    return rows.map((r) =>
+      r.data?.status === 'emergency' ? { ...r, siren: siren.has(r.token), data: { ...r.data, ...extra } } : r,
+    );
+  } catch {
+    return rows;
+  }
+}
+
 type Sent = { results: { row: Push; outcome: 'ok' | 'gone' | 'failed' }[]; note?: string };
 
 /** iPhone and iPad, straight to Apple. */
@@ -141,7 +179,7 @@ async function sendIos(rows: Push[]): Promise<Sent> {
       sendApns(
         r.token,
         {
-          aps: { alert: { title: r.title, body: r.body }, sound: 'default', 'thread-id': r.thread_id },
+          aps: apsFor(r),
           // expo-notifications exposes this as notification.request.content.data.
           body: r.data,
         },
@@ -151,6 +189,21 @@ async function sendIos(rows: Push[]): Promise<Sent> {
     ),
   );
   return { results: rows.map((row, i) => ({ row, outcome: outcomes[i] })) };
+}
+
+/**
+ * The aps part of an iPhone or iPad push. The siren is the bundled siren.wav (app.json,
+ * expo-notifications "sounds"), sent as time-sensitive so it breaks through a Focus where the
+ * rider allows it. (A Critical Alert, which also ignores the ring/silent switch, needs an
+ * entitlement Apple has to grant: docs/feature-parity.md Exceptions.)
+ */
+export function apsFor(r: Pick<Push, 'title' | 'body' | 'thread_id' | 'siren'>): Record<string, unknown> {
+  return {
+    alert: { title: r.title, body: r.body },
+    sound: r.siren ? 'siren.wav' : 'default',
+    'thread-id': r.thread_id,
+    ...(r.siren ? { 'interruption-level': 'time-sensitive' } : null),
+  };
 }
 
 /** Android phones and tablets, through Firebase Cloud Messaging (_shared/fcm.ts). */
@@ -167,7 +220,7 @@ async function sendAndroid(rows: Push[]): Promise<Sent> {
         title: r.title,
         body: r.body,
         data: r.data,
-        channelId: channelFor(r.data?.type),
+        channelId: r.siren ? SIREN_CHANNEL : channelFor(r.data?.type),
         tag: typeof r.data?.collapseId === 'string' ? r.data.collapseId : undefined,
       }),
     ),

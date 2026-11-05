@@ -27,6 +27,13 @@ export type FcmPush = {
   tag?: string;
 };
 
+/**
+ * The Emergency Siren's channel (app/src/core/siren.ts SIREN_CHANNEL): its sound is siren.wav in
+ * res/raw. Only phones that told the server they have it (push_tokens.siren) get pushes on it;
+ * Android would put a push for a channel the app never made on a plain fallback channel.
+ */
+export const SIREN_CHANNEL = 'ride-emergency';
+
 /** The Android notification channel for a push type. The app creates these channels (lib/push.ts). */
 export function channelFor(type: unknown): string {
   if (type === 'status' || type === 'cancelled') return 'ride-alerts';
@@ -48,10 +55,11 @@ export function fcmMessage(p: FcmPush) {
     title: p.title,
     body: p.body,
     channel_id: p.channelId,
-    sound: 'default',
+    // On Android 8 and later the channel's sound plays; this is for older Android.
+    sound: p.channelId === SIREN_CHANNEL ? 'siren' : 'default',
   };
   // Help, EMERGENCY and other status taps show on the lock screen in full, like their channel.
-  if (p.channelId === 'ride-alerts') notification.visibility = 'PUBLIC';
+  if (p.channelId === 'ride-alerts' || p.channelId === SIREN_CHANNEL) notification.visibility = 'PUBLIC';
   if (tag) notification.tag = tag;
   return { message: { token: p.token, data, android: { priority: 'HIGH', notification } } };
 }

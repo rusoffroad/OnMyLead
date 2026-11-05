@@ -56,5 +56,6 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/event_presenter_test.sql" \
   -f "$here/bluetooth_mesh_test.sql" \
   -f "$here/riding_spots_test.sql" \
-  -f "$here/leader_trackline_test.sql"
+  -f "$here/leader_trackline_test.sql" \
+  -f "$here/emergency_siren_test.sql"
 bash "$here/concurrency_test.sh" "$db"
