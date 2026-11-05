@@ -87,9 +87,9 @@ From 2.1 the stacked-layers button is the round **Map Settings** button, with a 
 - **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Safety Orange** (an orange 3D dome with a white arrow and a silver rim, the default), **Hi-Viz Dome** (lime with a black arrow), **Reflective Ring**, **Floating Arrowhead** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on the **You** tab.
 - **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the map slides along with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
 - **Map Buttons** (Ride Mode and Map Mode): **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available).
-
-These are the same switches as on the **You** tab, so a change shows everywhere.
 - **Download This Ride's Map** (Ride Mode), **Offline Maps**, and who the map data comes from.
+
+The Your Dot, Following and Map Buttons settings are the same ones as on the **You** tab, so a change shows everywhere.
 
 The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
 

@@ -8,6 +8,7 @@ import { COUNTDOWN_S, secondsLeft, type CrashCause } from '@/core/crash-detect';
 import { speak, stopSpeaking } from '@/lib/voice';
 
 import { t } from '@/lib/i18n';
+import { useUrgentModal } from '@/lib/urgent-modal';
 /**
  * The Crash Alert countdown: full screen and loud, so a rider who is fine can stop it with one tap
  * and a rider who isn't gets help without doing anything. At zero it calls `onSend` once.
@@ -23,6 +24,8 @@ export function CrashCountdown({
   onTurnOff?: () => void;
 }) {
   const [now, setNow] = useState(() => Date.now());
+  // Shows once any open sheet (Map Settings) has closed for it: iPhone and iPad can't show two at once.
+  const ready = useUrgentModal();
   const sent = useRef(false);
   const left = secondsLeft(startedAt, now);
 
@@ -51,7 +54,7 @@ export function CrashCountdown({
 
   const progress = 1 - left / COUNTDOWN_S;
   return (
-    <Modal visible animationType="fade" transparent={false} onRequestClose={onOk} supportedOrientations={['portrait', 'landscape']}>
+    <Modal visible={ready} animationType="fade" transparent={false} onRequestClose={onOk} supportedOrientations={['portrait', 'landscape']}>
       <SafeAreaView style={styles.page}>
         <View style={styles.top} accessibilityLiveRegion="assertive">
           <Text style={styles.title} accessibilityRole="header">{cause === 'rollover' ? t('Rollover Detected') : t('Crash Detected')}</Text>

@@ -58,6 +58,9 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
   const stepGen = useRef(0);
 
   const start = useCallback((p: LatLng, inset: Inset, animated = true) => {
+    // A step still waiting on the map mustn't move the camera after this.
+    stepGen.current++;
+    busy.current = false;
     frame.current = FOLLOW_FRAME_START;
     junction.current = JUNCTION_ZOOM_START;
     lookedAt.current = 0;
@@ -65,6 +68,9 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
   }, [map]);
 
   const stop = useCallback(() => {
+    // A step still waiting on the map (up to about a second) mustn't move the camera once paused.
+    stepGen.current++;
+    busy.current = false;
     frame.current = FOLLOW_FRAME_START;
     junction.current = JUNCTION_ZOOM_START;
   }, []);
