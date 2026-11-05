@@ -12,6 +12,7 @@
 import { SHARE_CODE_MAX, SHARE_CODE_MIN } from './share-code';
 
 import { tc } from './i18n';
+import { isTransientError } from './errors';
 /** 'friends', 'sent' (I asked them) or 'received' (they asked me). */
 export type FriendStatus = 'friends' | 'sent' | 'received';
 
@@ -144,7 +145,7 @@ export function friendsNotSwitchedOn(message: string | null | undefined, code?: 
 /** Turn a database error into something a rider can act on. */
 export function friendlyFriendError(message: string): string {
   if (friendsNotSwitchedOn(message)) return FRIENDS_NOT_SWITCHED_ON;
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and try again.');
+  if (isTransientError(message)) return tc('No signal. Check your connection and try again.');
   if (/friend_you_blocked/i.test(message)) return tc('You blocked this rider. Unblock them from You, Blocked Riders to add them.');
   if (/friend_daily_limit.*this week/i.test(message)) return tc('You already asked this rider this week.');
   if (/friend_daily_limit/i.test(message)) return tc('You’ve sent a lot of friend requests today. Try again tomorrow.');

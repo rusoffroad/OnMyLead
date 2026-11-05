@@ -1,4 +1,5 @@
 import { tc } from './i18n';
+import { isTransientError } from './errors';
 
 /**
  * Custom share codes: the code in a ride link (onmylead.com/r/CODE), a riding group link (/g/CODE)
@@ -139,7 +140,7 @@ export function friendlyShareCodeError(message: string, kind: ShareCodeKind): st
   if (shareCodesNotSwitchedOn(message)) return SHARE_CODES_NOT_SWITCHED_ON;
   const status = shareCodeErrorStatus(message);
   if (status) return shareCodeLine(status, kind);
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and try again.');
+  if (isTransientError(message)) return tc('No signal. Check your connection and try again.');
   return message;
 }
 

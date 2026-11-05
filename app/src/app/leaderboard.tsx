@@ -285,7 +285,7 @@ function Row({ r, first, showCountry }: { r: LeaderRow; first: boolean; showCoun
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${ordinal(r.place)}, ${r.me ? t('you') : r.name}. ${rank}. ${levelsLine(r)}.${area ? ` ${area}.` : ''}${r.top ? t(' Top badge {v}.', { v: badgeTitle(r.top) }) : ''}`}
+      accessibilityLabel={`${ordinal(r.place)}, ${r.me ? t('You') : r.name}. ${rank}. ${levelsLine(r)}.${area ? ` ${area}.` : ''}${r.top ? t(' Top badge {v}.', { v: badgeTitle(r.top) }) : ''}`}
       onPress={() => router.push(profileHref(r.userId) as never)}
       style={({ pressed }) => [styles.row, !first && styles.rowLine, r.me && styles.rowMe, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={[styles.place, medal ? { backgroundColor: medal } : null]}>

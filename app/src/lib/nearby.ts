@@ -95,6 +95,8 @@ type Session = {
 };
 
 let session: Session | null = null;
+/** Bumped by every start and stop, so a start overtaken while it waits gives up. */
+let generation = 0;
 let view: NearbyView = EMPTY;
 const listeners = new Set<() => void>();
 
@@ -158,8 +160,9 @@ async function loadKeys(rideId: string): Promise<{ rideKey: Uint8Array; riderKey
       await SecureStore.setItemAsync(keyName(rideId), JSON.stringify(row)).catch(() => {});
       return { rideKey: fromBase64(row.ride_key), riderKey: fromBase64(row.rider_key) };
     }
-    // The server answered no (left the ride, ride over, or a server without this feature yet).
-    if (error && !/fetch|network|timed? ?out/i.test(error.message)) {
+    // The server itself said no (left the ride, ride over: errcode 42501) or has no such function
+    // yet (42883). Anything else (no service, a gateway error) keeps the keys saved last time.
+    if (error && /^(42501|42883|P0001|PGRST202)$/.test((error as { code?: string }).code ?? '')) {
       await SecureStore.deleteItemAsync(keyName(rideId)).catch(() => {});
       return null;
     }
@@ -209,18 +212,22 @@ async function askAndroidPermission(): Promise<boolean> {
  */
 export async function startNearby(rideId: string, myId: string): Promise<void> {
   if (!native || !nearbyAvailable) return;
+  // A stop or a newer start while this one waits (settings, keys, the Android prompt) wins:
+  // this one then opens nothing, so Ride Mode closing mid-start leaves no radio running.
+  const mine = ++generation;
   await loadSetting();
-  if (!settingOn) return;
+  if (mine !== generation || !settingOn) return;
   if (session?.rideId === rideId) return;
   stopNearby();
+  generation = mine;
   const keys = await loadKeys(rideId);
-  if (!keys) return;
+  if (!keys || mine !== generation) return;
   if (!(await askAndroidPermission())) {
-    publish({ ...EMPTY, state: 'unauthorized' });
+    if (mine === generation) publish({ ...EMPTY, state: 'unauthorized' });
     return;
   }
-  // Another start may have won while this one waited.
-  if (session) return;
+  // Another start or a stop may have won while this one waited.
+  if (session || mine !== generation) return;
   const mesh = new NearbyMesh({ rideId, ...keys }, myId);
   const subs = [
     native.addListener('onFrame', (e) => receive(e.data)),
@@ -242,6 +249,7 @@ export async function startNearby(rideId: string, myId: string): Promise<void> {
 }
 
 export function stopNearby() {
+  generation++;
   const s = session;
   if (!s) return;
   session = null;

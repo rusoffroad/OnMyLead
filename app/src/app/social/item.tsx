@@ -1,6 +1,6 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useRef, useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AppState, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -10,6 +10,7 @@ import { CommentThreadView } from '@/components/social/comment-thread';
 import { ProTag, Social } from '@/components/social/parts';
 import { SocialCard } from '@/components/social/social-card';
 import { Colors, font, scrollIndicator, themedStyles } from '@/constants/theme';
+import { Button } from '@/components/ui';
 import { can } from '@/core/entitlements';
 import {
   COMMENT_MAX, isItemKey, likesLine, nestThread, removeComment, replaceComment, SOCIAL_NOT_SWITCHED_ON, toggleLike, type SocialItem,
@@ -78,6 +79,20 @@ export default function SocialItemScreen() {
       });
     }, [session, loading, load, params.comment, pro]),
   );
+
+  // Opened from a notification while the app was still waking up and the request got dropped:
+  // try again on its own once the app is in front, so the Retry button is the last resort.
+  const failed = item === null && !!error;
+  const retry = useCallback(() => {
+    setError(null);
+    setItem(undefined);
+    void load();
+  }, [load]);
+  useEffect(() => {
+    if (!failed) return;
+    const sub = AppState.addEventListener('change', (s) => s === 'active' && retry());
+    return () => sub.remove();
+  }, [failed, retry]);
 
   const send = async () => {
     if (!key || !draft.trim()) return;
@@ -158,7 +173,10 @@ export default function SocialItemScreen() {
           <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={styles.body} {...keyboardScroll} indicatorStyle={scrollIndicator()}>
             {off ? <Text style={styles.muted}>{SOCIAL_NOT_SWITCHED_ON}</Text> : null}
             {item === null && !off ? (
-              <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
+              <>
+                <Text style={styles.muted}>{error ?? 'This isn’t available anymore. It may have been deleted, or the rider changed who sees their activity.'}</Text>
+                {error ? <Button title={t('Retry')} kind="secondary" onPress={retry} /> : null}
+              </>
             ) : null}
             {item ? (
               <>

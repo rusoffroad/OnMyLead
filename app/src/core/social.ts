@@ -8,6 +8,7 @@ import { feedLine, feedStat, parseFeed, type FeedItem } from './feed';
 import { METERS_PER_MILE } from './geo';
 
 import { coreLocale, tc } from './i18n';
+import { isTransientError } from './errors';
 /** Longest post and comment, in characters (the database checks the same). */
 export const POST_MAX = 500;
 export const COMMENT_MAX = 500;
@@ -398,4 +399,13 @@ export function socialNotSwitchedOn(message: string | null | undefined, code?: s
 export function threadNotSwitchedOn(message: string | null | undefined, code?: string | null): boolean {
   return code === 'PGRST202' || code === '42883'
     || (/feed_item_thread|set_comment_like|add_feed_reply/.test(message ?? '') && /does not exist|could not find|schema cache/i.test(message ?? ''));
+}
+
+/** What a Social screen says when a call fails: never a raw exception. */
+export function friendlySocialError(message: string | null | undefined, tc: (s: string) => string = (s) => s): string {
+  if (isTransientError(message)) return tc('No signal. Check your connection and tap Retry.');
+  const m = (message ?? '').replace(/^[A-Z0-9]+: /, '');
+  // Technical text (a native exception, a stack location) is not for riders.
+  if (!m || /exception|\.swift|\.kt|\bat \w+\//i.test(m)) return tc('Something went wrong. Try again.');
+  return m.charAt(0).toUpperCase() + m.slice(1) + (/[.!?]$/.test(m) ? '' : '.');
 }

@@ -4,7 +4,7 @@ summary: Why OnMyLead asks you to agree before you ride, what the agreement says
 category: safety-privacy
 order: 45
 release: "2.0"
-updated: 2026-11-03
+updated: 2026-11-04
 sources:
   - app/src/components/rider-agreement.tsx
   - app/src/app/rider-agreement.tsx

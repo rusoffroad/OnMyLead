@@ -4,7 +4,7 @@ summary: How join requests work on rides where the organizer approves riders, an
 category: joining
 order: 50
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/core/leaving.ts
   - app/src/components/leave-ride.tsx

@@ -152,7 +152,7 @@ Every line has a dark outline, so it stands out on forest, desert and snow.
 
 Zoomed in, the map shows names:
 
-- OpenStreetMap trails get a name tag in the middle of the trail, like **Hell's Revenge 4x4 Trail**. A tag with a red border and **Closed** marks a trail mapped as closed or private.
+- OpenStreetMap trails get a name tag in the middle of the trail, like **Hell's Revenge 4x4 Trail**. A tag with a red border and **Closed** marks a trail mapped as closed or private. Each name follows its line's switch: Off-Road Trails names show with **Off-Road Trails**, hiking path names with **Hiking Trails**.
 - Forest Service roads and trails show their name and number along the line, like **Jenny Lind 414.1**.
 - Road names come from the satellite map's own labels, and the topo map has its own road names.
 :::

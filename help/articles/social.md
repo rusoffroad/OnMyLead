@@ -74,7 +74,7 @@ Tap any profile picture, in Social, Friends, Messages, chats or Who's Riding, to
 ## Share to Facebook, Instagram or X
 
 1. Tap **Share** under one of your own rides, badges or posts, or under a shared trail.
-2. Tap **Share Picture** to share a picture card with the miles, badge or trail name, or **Share Text Only**.
+2. Tap **Share Picture** to share a picture card with the miles, badge or trail name, or **Share Text Only**. The picture is a 1080 by 1350 PNG named OnMyLead, about 1 to 2 MB, so Facebook, Instagram and Messages take it right away.
 3. Pick Facebook, Instagram, X, Messages or any other app.
 
 Every share links to onmylead.com. Your location is never in a share, and you can't share other riders' rides or posts, or who's out riding right now.

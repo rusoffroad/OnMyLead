@@ -11,6 +11,7 @@ import { isBackendConfigured, supabase } from './supabase';
 import { restorePhoto } from './trail-photo-files';
 import { can } from '@/core/entitlements';
 import { currentEntitlements } from './entitlements';
+import { singleFlight } from './single-flight';
 
 /**
  * The rider's private trail backup (core/trail-backup.ts has the rules): every recorded, drawn and
@@ -40,37 +41,22 @@ setTrailBackupHooks(() => {
   }, 4_000);
 });
 
-let running: Promise<void> | null = null;
-let again = false;
-
 /** Swap trails with the backup now. Safe to call often; does nothing when signed out. */
-export function backupTrailsNow(): Promise<void> {
-  if (running) {
-    again = true;
-    return running;
-  }
-  running = run()
-    .catch(() => {
-      // Offline, or the server doesn't have the backup yet: try again next time.
-    })
-    .finally(() => {
-      running = null;
-      if (again) {
-        again = false;
-        backupTrailsNow();
-      }
-    });
-  return running;
-}
+export const backupTrailsNow: () => Promise<void> = singleFlight(() =>
+  run().catch(() => {
+    // Offline, or the server doesn't have the backup yet: try again next time.
+  }),
+);
 
 async function run() {
-  // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
-  if (!can(currentEntitlements(), 'sync')) return;
   if (!isBackendConfigured) return;
   const { data: auth } = await supabase.auth.getSession();
   const me = auth.session?.user.id ?? null;
+  // Whoever is signed in sees their own trails (and the device's unowned ones), Pro or not.
   setTrailViewer(me);
   if (!me) return;
+  // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
+  if (!can(currentEntitlements(), 'sync')) return;
 
   const { data: list, error } = await supabase.from('rider_trail_backups').select('trail_id, deleted, updated_at');
   if (error) throw new Error(error.message);

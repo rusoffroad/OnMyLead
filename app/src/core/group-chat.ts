@@ -1,4 +1,5 @@
 import { coreLocale, tc } from './i18n';
+import { isTransientError } from './errors';
 
 /**
  * Group Chat: a group text inside each riding group (migration 20261019400000_group_chat.sql).
@@ -65,7 +66,7 @@ export function groupChatNotSwitchedOn(message: string | null | undefined, code?
 export function friendlyGroupChatError(message: string): string {
   if (groupChatNotSwitchedOn(message)) return NOT_SWITCHED_ON;
   if (/only the sender or the group/i.test(message)) return tc('Only the person who sent it, or whoever runs the group, can clear it.');
-  if (/network request failed|failed to fetch|fetch failed|network error/i.test(message)) return tc('No signal. Check your connection and tap Retry.');
+  if (isTransientError(message)) return tc('No signal. Check your connection and tap Retry.');
   if (/slow down/i.test(message)) return tc('You’re sending a lot. Wait a minute and try again.');
   if (/row-level security|violates row-level/i.test(message)) return tc('Only riders in this group can post here, about rides they’re on.');
   if (/too long/i.test(message)) return tc('Keep it under 500 characters.');

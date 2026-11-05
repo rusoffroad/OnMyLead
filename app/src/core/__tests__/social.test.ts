@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { tapTarget } from '../push-tap';
 import { inboxLook, notificationKey } from '../inbox';
 import {
-  canShareOut, commentsLabel, fitWithin, isItemKey, isOwnFile, itemHref, likesLine, nextQuality, parseComment, parseProfile,
+  canShareOut, commentsLabel, fitWithin, friendlySocialError, isItemKey, isOwnFile, itemHref, likesLine, nextQuality, parseComment, parseProfile,
   parseSocial, postPhotoPath, postPhotoUrl, shareHeadline, shareSubline, shareText, sinceLine, socialNotSwitchedOn, statLine, toggleLike,
   asThread, nestThread, parseThread, removeComment, replaceComment, threadNotSwitchedOn,
 } from '../social';
@@ -179,5 +179,16 @@ describe('comment likes and replies', () => {
     expect(threadNotSwitchedOn('Could not find the function public.feed_item_thread(p_key) in the schema cache')).toBe(true);
     expect(threadNotSwitchedOn(null, 'PGRST202')).toBe(true);
     expect(threadNotSwitchedOn('this comment isn’t available')).toBe(false);
+  });
+});
+
+describe('errors riders see', () => {
+  it('turns a cancelled or dropped request into a retry line, and hides native exceptions', () => {
+    expect(friendlySocialError('fetch failed: UnexpectedException: cancelled (at ExpoModulesCore/Promise.swift:56).')).toBe('No signal. Check your connection and tap Retry.');
+    expect(friendlySocialError('Network request failed')).toBe('No signal. Check your connection and tap Retry.');
+    expect(friendlySocialError('UnexpectedException: something odd (at Foo.swift:1)')).toBe('Something went wrong. Try again.');
+    expect(friendlySocialError('P0001: you were blocked')).toBe('You were blocked.');
+    expect(friendlySocialError('P0001: that ride was cancelled')).toBe('That ride was cancelled.');
+    expect(friendlySocialError('')).toBe('Something went wrong. Try again.');
   });
 });

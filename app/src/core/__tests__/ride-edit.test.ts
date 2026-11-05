@@ -76,6 +76,23 @@ describe('formFromRide', () => {
 });
 
 describe('ridePatch', () => {
+  it('gives a ride with no saved spot one, and leaves it alone until the leader fills it in', () => {
+    expect(isEmptyPatch(patch({}, ride, null))).toBe(true);
+    const p = patch({ coords: '38.57, -109.55', meetLabel: 'Lions Park' }, ride, null);
+    expect(p.private).toMatchObject({ meet_lat: 38.57, meet_lng: -109.55, meet_label: 'Lions Park' });
+    expect(p.changed).toContain('place');
+    // Instructions ride along with the spot; alone, the server would have no row to put them on.
+    const both = patch({ coords: '38.57, -109.55', instructions: 'Air down at the lot' }, ride, null);
+    expect(both.private).toMatchObject({ meet_lat: 38.57, instructions: 'Air down at the lot' });
+    expect(both.changed).toEqual(['place', 'details']);
+    expect(ridePatch(ride, null, { ...formFromRide(ride, null), instructions: 'Air down' }, now)).toEqual({ error: 'Set the meeting point before adding instructions.' });
+    expect(ridePatch(ride, null, { ...formFromRide(ride, null), meetLabel: 'Lions Park' }, now)).toEqual({
+      error: 'Set the meeting point: search a place, tap the map or paste coordinates like "38.57, -109.55".',
+    });
+    // A ride with a saved spot can't lose it by clearing the coordinates either.
+    expect(ridePatch(ride, details, { ...formFromRide(ride, details), coords: '' }, now)).toHaveProperty('error', expect.stringMatching(/^Set the meeting point/));
+  });
+
   it('sends only the name when only the name changed', () => {
     const p = patch({ name: '  Fins and Things  ' });
     expect(p.ride).toEqual({ name: 'Fins and Things' });
