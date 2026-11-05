@@ -58,10 +58,7 @@ function start() {
       if (listeners.size) sub = s;
       else s.remove();
     })
-    .catch(() => {
-      // No compass here (or it failed): don't look again for a start that came in meanwhile.
-      if (again === 'soon') again = false;
-    })
+    .catch(() => {})
     .finally(() => {
       starting = false;
       const next = again;

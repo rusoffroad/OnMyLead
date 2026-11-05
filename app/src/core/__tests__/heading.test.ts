@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownStillMoving, riderHeading, screenAngle } from '../heading';
+import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
 import { BATTERY_PLANS } from '../battery';
 
 describe('riderHeading', () => {
@@ -74,8 +74,12 @@ describe("other riders' arrows stay on after they stop", () => {
 
 describe('own dot moving or stopped', () => {
   const start = { movingAt: null, fixAt: null };
-  it('waits longer than the slowest fix rate (Max Battery Saver) before calling you stopped', () => {
-    expect(OWN_STOPPED_AFTER_MS).toBeGreaterThan(2 * BATTERY_PLANS.saver.fixEveryMs - 1);
+  it('waits 5 s on a map with a fix every second, and longer than two fix gaps on Battery Saver', () => {
+    expect(ownStoppedAfterMs(1000)).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStoppedAfterMs()).toBe(5000);
+    expect(ownStoppedAfterMs(BATTERY_PLANS.saver.fixEveryMs)).toBeGreaterThan(2 * BATTERY_PLANS.saver.fixEveryMs);
+    expect(ownStoppedAfterMs(Number.NaN)).toBe(5000);
+    expect(ownStillMoving(0, 20_000, ownStoppedAfterMs(BATTERY_PLANS.saver.fixEveryMs))).toBe(true);
   });
   it('counts you moving from a moving fix until no new moving fix for a while', () => {
     const a = ownMovingAt(start, true, 1000, 1000);

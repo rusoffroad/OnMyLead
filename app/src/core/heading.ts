@@ -60,12 +60,21 @@ export function ownArrow(
 }
 
 /**
- * With no new fix for this long, your own dot counts you as stopped: phones send no location update
+ * With no new fix for a while, your own dot counts you as stopped: phones send no location update
  * while standing still, so the last fix's speed would otherwise keep the dot in its moving look.
- * Twice the slowest fix rate (Max Battery Saver, one fix every 15 s), so the dot never flips
- * between fixes mid-ride or in a short GPS gap under trees (ms). A stopped fix flips it at once.
+ * A stopped fix flips it at once. This is the shortest wait (ms), for a map getting a fix every
+ * second; see ownStoppedAfterMs.
  */
-export const OWN_STOPPED_AFTER_MS = 30_000;
+export const OWN_STOPPED_AFTER_MS = 5000;
+
+/**
+ * How long your own dot waits with no new fix before counting you stopped, for a map that gets a
+ * fix every `fixEveryMs` (Battery Saver sends one every 15 s): two and a half fix gaps, so it
+ * never flips between fixes mid-ride or in a short GPS gap under trees, and never under 5 s.
+ */
+export function ownStoppedAfterMs(fixEveryMs = 1000): number {
+  return Math.max(OWN_STOPPED_AFTER_MS, Math.round(2.5 * (Number.isFinite(fixEveryMs) ? fixEveryMs : 1000)));
+}
 
 /**
  * When your own dot last saw you moving: `nowMs` for a moving fix, null for a stopped one (the dot
@@ -84,9 +93,9 @@ export function ownMovingAt(
   return { movingAt: moving ? nowMs : null, fixAt: fixAtMs };
 }
 
-/** Whether your own dot still counts you as moving at `nowMs`. */
-export function ownStillMoving(movingAt: number | null, nowMs: number): boolean {
-  return movingAt != null && nowMs - movingAt < OWN_STOPPED_AFTER_MS;
+/** Whether your own dot still counts you as moving at `nowMs`, waiting `waitMs` (ownStoppedAfterMs). */
+export function ownStillMoving(movingAt: number | null, nowMs: number, waitMs = OWN_STOPPED_AFTER_MS): boolean {
+  return movingAt != null && nowMs - movingAt < waitMs;
 }
 
 /** How long another rider's dot keeps pointing their last way after they slow down (ms). */

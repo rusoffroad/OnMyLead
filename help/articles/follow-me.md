@@ -8,6 +8,7 @@ updated: 2026-11-05
 sources:
   - app/src/core/follow-camera.ts
   - app/src/core/heading.ts
+  - app/src/hooks/use-own-moving.ts
   - app/src/hooks/use-follow-me.ts
   - app/src/components/follow-me-button.tsx
   - app/src/components/own-heading.tsx
