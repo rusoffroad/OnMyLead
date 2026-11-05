@@ -335,7 +335,7 @@ export default function HomeScreen() {
         quota={session ? createQuota(ent) : null}
         findOn={findOn}
         findText={radius != null && findCount(others.length, located ? radius : 0)
-          ? located && radius ? t('{n} Within {distance}', { n: others.length, distance: t('{n} mi', { n: radius.toLocaleString(currentLocale()) }) }) : t('{n} Coming Up', { n: others.length })
+          ? located && radius ? t('{n} Within {distance}', { n: others.length, distance: t('{n} mi', { n: radius.toLocaleString(currentLocale()) }) }) : others.length === 1 ? t('1 Coming Up') : t('{n} Coming Up', { n: others.length })
           : null}
         onCreate={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
         onFind={() => router.push('/find')}

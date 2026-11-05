@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["language"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-2.1-spanish-check",
+    "why": "2.1 phone check in Spanish: Leaderboard places, the Ride Mode line, the badge rank ladder, quick replies and Home counts now show in the rider's language."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["import-gpx", "manage-subscription", "offline-maps", "pro-trial", "ride-summary-and-ride-again", "route-builder", "trip-planner"],
     "kind": "update",
     "by": "pr",

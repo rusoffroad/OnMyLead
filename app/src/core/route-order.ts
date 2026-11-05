@@ -1,7 +1,7 @@
 import { formatDistance, metersToMiles } from './geo';
 import { miles, type PlacedRider } from './route';
 
-import { tc } from './i18n';
+import { ordinal, tc } from './i18n';
 /**
  * The group's running order along the route: every placed rider ranked from the front (1) to the
  * rear, and laid out on the route line so no dot hides another while each stays as close as it
@@ -110,25 +110,21 @@ export function convoyLayout(
   return layoutDots(ranked.map((r) => ({ id: r.id, alongM: pos(r), size: sizeOf(r) })), span, width, opts);
 }
 
-const ordinal = (n: number) => {
-  const t = n % 100;
-  const s = t >= 11 && t <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th';
-  return `${n}${s}`;
-};
 
 const short = (m: number) => (metersToMiles(m) < 0.1 ? formatDistance(m) : `${miles(m)} mi`);
 
 /** One line about a rider on the order line, e.g. "Mia · 3rd of 6 · 0.4 mi behind the leader". */
 export function describeRank(r: RankedRider, ranked: RankedRider[], name: string, meId?: string, offWord = 'off the route'): string {
-  const who = r.id === meId ? 'You' : name;
-  const parts = [who, ranked.length === 1 ? 'only one on the line' : r.rank === 1 ? 'out front' : r.rank === ranked.length ? `last of ${ranked.length}` : `${ordinal(r.rank)} of ${ranked.length}`];
+  const who = r.id === meId ? tc('You') : name;
+  const n = ranked.length;
+  const parts = [who, n === 1 ? tc('only one on the line') : r.rank === 1 ? tc('out front') : r.rank === n ? tc('last of {n}', { n }) : tc('{v} of {n}', { v: ordinal(r.rank), n })];
   const leader = ranked.find((x) => x.role === 'leader');
   if (leader && leader.id !== r.id) {
     const d = leader.place!.alongM - r.place!.alongM;
-    if (Math.abs(d) < 30) parts.push('with the leader');
-    else parts.push(d > 0 ? `${short(d)} behind the leader` : `${short(-d)} ahead of the leader`);
+    if (Math.abs(d) < 30) parts.push(tc('with the leader'));
+    else parts.push(tc(d > 0 ? '{d} behind the leader' : '{d} ahead of the leader', { d: short(Math.abs(d)) }));
   } else if (!leader && r.rank > 1) {
-    parts.push(`${short(r.backM)} back from the front`);
+    parts.push(tc('{d} back from the front', { d: short(r.backM) }));
   }
   if (!r.place!.onRoute) parts.push(offWord);
   return parts.join(' · ');
@@ -138,5 +134,5 @@ export function describeRank(r: RankedRider, ranked: RankedRider[], name: string
 export function groupSpread(ranked: RankedRider[]): string | null {
   if (ranked.length < 2) return null;
   const span = ranked[ranked.length - 1].backM;
-  return tc('{length} riders over {v}', { length: ranked.length, v: span < 30 ? 'a few yards' : short(span) });
+  return tc('{length} riders over {v}', { length: ranked.length, v: span < 30 ? tc('a few yards') : short(span) });
 }
