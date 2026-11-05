@@ -57,6 +57,13 @@ export function ownArrow(
   return { deg: lastCourseDeg ?? null, moving: false };
 }
 
+/**
+ * With no new fix for this long, your own dot counts you as stopped: phones send no location update
+ * while standing still, so the last fix's speed would otherwise keep the dot in its moving look.
+ * Long enough that a short GPS gap under trees or in a canyon doesn't flip it mid-ride (ms).
+ */
+export const OWN_STOPPED_AFTER_MS = 10_000;
+
 /** How long another rider's dot keeps pointing their last way after they slow down (ms). */
 export const HELD_HEADING_MS = 10 * 60_000;
 

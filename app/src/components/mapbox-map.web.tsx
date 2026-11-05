@@ -463,8 +463,7 @@ export function MapboxMarker({
   const latest = useRef(at);
   useEffect(() => {
     drop.current = onDragEnd;
-    if (isLatLng(at)) latest.current = at;
-  }, [onDragEnd, at]);
+  }, [onDragEnd]);
   useEffect(() => {
     if (!map || !holder || !real) return;
     let gone = false;
@@ -487,7 +486,10 @@ export function MapboxMarker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, holder, draggable, real]);
   useEffect(() => {
-    if (isLatLng(at)) marker.current?.setLngLat([at.lng, at.lat]);
+    if (!isLatLng(at)) return;
+    latest.current = at;
+    marker.current?.setLngLat([at.lng, at.lat]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [at.lat, at.lng]);
   if (!holder) return null;
   return createPortal(

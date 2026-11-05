@@ -1,7 +1,7 @@
 import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { ownArrow, riderHeading, screenAngle } from '@/core/heading';
+import { OWN_STOPPED_AFTER_MS, ownArrow, riderHeading, screenAngle } from '@/core/heading';
 import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
 import { useCompass } from '@/lib/compass';
 import { OwnDot } from './own-dot';
@@ -21,14 +21,23 @@ export function useOwnPuckStore() {
     let fix: OwnPuckFix | null = null;
     let lastCourse: number | null = null;
     let mapHeading = 0;
+    let still: ReturnType<typeof setTimeout> | undefined;
     const listeners = new Set<() => void>();
     const emit = () => listeners.forEach((l) => l());
     return {
       setFix(f: OwnPuckFix) {
         // The last real GPS direction, for when the rider stops and there is no compass.
-        lastCourse = riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) ?? lastCourse;
+        const course = riderHeading({ speedMps: f.speed, headingDeg: f.course }, true);
+        lastCourse = course ?? lastCourse;
         fix = { ...f, lastCourse };
         emit();
+        // No new fix for a while: the rider has stopped, so the dot takes its stopped look.
+        if (still) clearTimeout(still);
+        still = course == null ? undefined : setTimeout(() => {
+          still = undefined;
+          if (fix) fix = { ...fix, speed: 0 };
+          emit();
+        }, OWN_STOPPED_AFTER_MS);
       },
       setHeading(h: number) {
         if (h === mapHeading) return;

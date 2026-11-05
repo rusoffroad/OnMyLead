@@ -12,13 +12,19 @@ let current: number | null = null;
 const listeners = new Set<(deg: number | null) => void>();
 let sub: { remove: () => void } | null = null;
 let starting = false;
-// Location was allowed while a look was under way: look again once it ends.
+// Asked to start while a look was under way: look again once it ends.
 let again = false;
 let retry: ReturnType<typeof setTimeout> | null = null;
 let retryMs = 5000;
 
 function start() {
-  if (Platform.OS === 'web' || sub || starting) return;
+  if (Platform.OS === 'web' || sub) return;
+  // A look is already under way: look again when it ends, in case it gives up (no maps were
+  // left, or location wasn't allowed yet) while a map is waiting now.
+  if (starting) {
+    again = true;
+    return;
+  }
   starting = true;
   Location.getForegroundPermissionsAsync()
     .then((p) => {
@@ -68,8 +74,7 @@ export function compassAllowed() {
   if (!listeners.size || sub) return;
   if (retry) clearTimeout(retry);
   retry = null;
-  if (starting) again = true;
-  else start();
+  start();
 }
 
 function stop() {

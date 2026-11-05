@@ -5,7 +5,7 @@
     "kind": "fix",
     "by": "pr",
     "ref": "release-test-pass-56",
-    "why": "2.1 test pass 56: the quick status buttons in Ride Mode now show and read out in the rider's language, your dot goes back to its stopped look a few seconds after you stop, and map pins skip spots that aren't real coordinates. No steps changed."
+    "why": "2.1 test pass 56: the quick status buttons in Ride Mode now show and read out in the rider's language; your dot goes back to its stopped look about 10 seconds after you stop (apps and website); the compass starts right after Allow even while the app is already checking; and a meeting-point pin on the website lands at its newest spot when the map finishes loading. No steps changed."
   },
   {
     "date": "2026-11-05",

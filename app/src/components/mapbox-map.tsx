@@ -20,7 +20,7 @@ import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
-import { riderHeading } from '@/core/heading';
+import { OWN_STOPPED_AFTER_MS, riderHeading } from '@/core/heading';
 import { useHasCompass } from '@/lib/compass';
 import { dotScale } from '@/core/dot-size';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
@@ -344,9 +344,6 @@ export function MapboxMap({
   );
 }
 
-/** With no location update this long, the rider has stopped (ms). */
-const PUCK_STILL_MS = 4000;
-
 /**
  * Your own dot (the Chevron Puck, drawn as images): Mapbox moves and turns it itself, in step with
  * the map. Its arrow follows the GPS course while you move and the compass while you're stopped;
@@ -360,13 +357,13 @@ const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.Mutabl
   const hasCompass = useHasCompass();
   const kind = moving ? 'moving' : hasCompass ? 'stopped' : 'still';
   useEffect(() => {
-    // Location updates stop once the phone stands still (they come only after a move), so with no
-    // update for a few seconds the rider has stopped and the dot goes back to its stopped look.
+    // Location updates stop once the phone stands still, so with no update for a while the rider
+    // has stopped and the dot goes back to its stopped look (core/heading OWN_STOPPED_AFTER_MS).
     let still: ReturnType<typeof setTimeout> | undefined;
     feedRef.current = (m: boolean) => {
       setMoving(m);
       if (still) clearTimeout(still);
-      still = m ? setTimeout(() => setMoving(false), PUCK_STILL_MS) : undefined;
+      still = m ? setTimeout(() => setMoving(false), OWN_STOPPED_AFTER_MS) : undefined;
     };
     return () => {
       if (still) clearTimeout(still);
