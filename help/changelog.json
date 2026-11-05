@@ -3,6 +3,20 @@
     "date": "2026-11-05",
     "slugs": [
       "bluetooth-sharing",
+      "navigation-mode",
+      "refer-a-friend",
+      "tilt-and-crash-alert",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-2",
+    "why": "2.1 release test, whole-app pass 2. Ride Mode messages now go over Bluetooth whole in every language (bluetooth-sharing). After a fall at driving speed Crash Alert also counts the vehicle coming to rest on its side or roof (tilt-and-crash-alert, 2.1 block). A reward set to move a Google Play bill whose subscription ended can be claimed again (refer-a-friend sources). navigation-mode and waypoints-and-planned-stops are re-dated because Map Mode waypoint backups now read every row past 1000; a waypoint shared again isn't announced again. Riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "bluetooth-sharing",
       "create-a-ride",
       "emergency-and-safety",
       "free-vs-pro",
