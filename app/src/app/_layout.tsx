@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { DirectionsHost } from '@/components/directions';
+import { EmergencySiren } from '@/components/emergency-siren';
 import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
 import { TabletProGate } from '@/components/tablet-pro-gate';
@@ -213,6 +214,7 @@ function RootLayout() {
       <TabletProGate />
       <ProGateHost />
       <DirectionsHost />
+      <EmergencySiren />
       {/* Before You Ride: the safety and liability agreement, until the rider agrees. */}
       <RiderAgreementGate />
       {/* The owner's minimum version (Admin Dashboard > Releases), over everything, with Not Now. */}

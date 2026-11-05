@@ -1,6 +1,22 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["carplay", "contact-support", "create-a-ride-on-the-website", "directions", "faq", "follow-me", "fuel-range", "full-map", "garage", "getting-started", "language", "location-sharing", "pro-trial", "profile-picture", "promo-codes", "ride-bubble", "ride-chat", "ride-mode", "subscribe-to-pro", "sync-across-devices", "troubleshooting", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops", "bluetooth-sharing", "status-buttons"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "emergency-siren",
+    "why": "Reviewed for the Emergency Siren (2.1). Bluetooth Sharing and Send a Status now say an EMERGENCY sounds the siren (2.1 blocks). The rest share Ride Mode, push, translations or settings code that changed only to add the siren and its switch; what they describe reads the same."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["emergency-siren", "emergency-and-safety", "notification-settings"],
+    "kind": "new",
+    "by": "pr",
+    "ref": "emergency-siren",
+    "why": "New in 2.1 build 10 (Chris asked during the 2.1 Bluetooth test and wanted it in before submitting): an EMERGENCY or a Crash Alert from a rider sounds a loud siren on the other riders' phones until they silence it, with the app open, from the push with it closed, and over Bluetooth with no service. New guide Hear the Emergency Siren; the emergency and notification guides mention it and the Emergency Siren switch."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["contact-support", "create-a-ride-on-the-website", "getting-started", "pro-trial", "subscribe-to-pro"],
     "kind": "review",
     "by": "pr",

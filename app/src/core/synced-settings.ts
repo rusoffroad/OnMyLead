@@ -70,6 +70,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'tilt.limits': 'Roll and pitch warning angles',
   'tilt.voice': 'Spoken tilt warnings on or off',
   'tilt.show': 'Tilt Meter on or off (the Tilt tile in Map Mode and Ride Mode)',
+  'alerts.siren.v1': 'Emergency Siren on or off (each phone tells the server for its pushes, lib/push)',
   'tilt.warn': 'Tilt warnings on or off',
   'crash.alert': 'Crash Alert on or off and its sensitivity',
   // Settings from other threads register here as they land (waypoint symbols, units).
@@ -85,6 +86,7 @@ export const SYNCED_PREFIXES: Record<string, string> = {
 
 /** Kept on each device on purpose, and why. Not synced. */
 export const DEVICE_ONLY: Record<string, string> = {
+  'alerts.sirenSilenced.v1': 'EMERGENCY alerts this phone already silenced, so they never sound again here',
   'battery.mode.v1': 'Battery Saver is about this device’s battery, and the background location task reads it offline',
   'nav.trackLine.v1': 'Track Line breadcrumbs are location history: they never leave the device',
   'nav.recording.v1': 'A recording in progress is saved as it grows; it syncs as a trail once saved',
