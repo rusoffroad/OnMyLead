@@ -89,7 +89,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   private var serviceAdded = false
   /** didAdd confirmed the service; a service that is never confirmed is added again (as on Android). */
   private var serviceConfirmed = false
-  private var serviceAddedAt = Date.distantPast
+  /** systemUptime when the service was added: monotonic, so a clock change can't trip the watchdog. */
+  private var serviceAddedAt: TimeInterval = 0
   /** The service last added: didAdd for an older one (removed by the watchdog) is ignored. */
   private var addedService: CBMutableService?
 
@@ -211,7 +212,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       scan()
     }
     if let pm = peripheral, pm.state == .poweredOn {
-      if serviceAdded && !serviceConfirmed && Date().timeIntervalSince(serviceAddedAt) > 15 {
+      if serviceAdded && !serviceConfirmed && ProcessInfo.processInfo.systemUptime - serviceAddedAt > 15 {
         pm.removeAllServices()
         serviceAdded = false
         outboxChar = nil
@@ -251,6 +252,11 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       writeUrgent[id] = nil
       writeRound[id] = nil
       return
+    }
+    // Urgent frames never wait for room: with the queue full they go with response (few, capped).
+    if !p.canSendWriteWithoutResponse, let urgent = writeUrgent[id], !urgent.isEmpty {
+      for f in urgent where f.count <= p.maximumWriteValueLength(for: .withResponse) { p.writeValue(f, for: ch, type: .withResponse) }
+      writeUrgent[id] = []
     }
     while p.canSendWriteWithoutResponse {
       let fromUrgent = !(writeUrgent[id] ?? []).isEmpty
@@ -415,7 +421,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     pm.add(s)
     serviceAdded = true
     serviceConfirmed = false
-    serviceAddedAt = Date()
+    serviceAddedAt = ProcessInfo.processInfo.systemUptime
   }
 
   func peripheralManager(_ pm: CBPeripheralManager, didAdd s: CBService, error: Error?) {

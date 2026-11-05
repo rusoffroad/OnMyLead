@@ -541,8 +541,10 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   const groups = [...messages.values()];
   const newestOwn = groups.find((g) => g[0].userId === myId);
   // Then the rider's newest own message, whole.
-  if (newestOwn && newestOwn.length <= left) take(newestOwn);
-  const ring = inLine(groups.filter((g) => g !== newestOwn), (g) => roundKey(g[0]));
+  const ownFits = !!newestOwn && newestOwn.length <= left;
+  if (ownFits) take(newestOwn);
+  // (When it doesn't fit now, it waits in line with the rest.)
+  const ring = inLine(groups.filter((g) => !(ownFits && g === newestOwn)), (g) => roundKey(g[0]));
   // Then other riders' taps, leaving room for the first message in line that could fit,
   // so a crowd of taps can't keep every message off the air.
   const next = ring.find((g) => g.length <= left);
