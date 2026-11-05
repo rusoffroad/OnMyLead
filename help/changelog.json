@@ -1,11 +1,7 @@
 [
   {
     "date": "2026-11-05",
-    "slugs": [
-      "privacy",
-      "status-buttons",
-      "follow-me"
-    ],
+    "slugs": ["privacy", "status-buttons", "follow-me"],
     "kind": "fix",
     "by": "pr",
     "ref": "release-test-pass-56",
@@ -13,16 +9,7 @@
   },
   {
     "date": "2026-11-05",
-    "slugs": [
-      "accurate-location",
-      "battery-saver",
-      "create-a-ride",
-      "location-sharing",
-      "map-layers",
-      "park-trails",
-      "ride-mode",
-      "troubleshooting"
-    ],
+    "slugs": ["accurate-location", "battery-saver", "create-a-ride", "location-sharing", "map-layers", "park-trails", "ride-mode", "troubleshooting"],
     "kind": "fix",
     "by": "pr",
     "ref": "release-2.1-create-ride-crash",
@@ -30,32 +17,7 @@
   },
   {
     "date": "2026-11-05",
-    "slugs": [
-      "3d-terrain",
-      "create-a-ride",
-      "edit-cancel-or-delete-a-ride",
-      "find-a-ride",
-      "follow-me",
-      "free-vs-pro",
-      "full-map",
-      "getting-started",
-      "home-screen",
-      "import-gpx",
-      "join-a-ride",
-      "language",
-      "leader-sweep-and-tail-gunner",
-      "leader-trackline",
-      "map-layers",
-      "navigation-mode",
-      "notifications-inbox",
-      "offline-maps",
-      "park-trails",
-      "ride-name-and-profile",
-      "ride-summary-and-ride-again",
-      "route-builder",
-      "trip-planner",
-      "use-onmylead-on-a-tablet"
-    ],
+    "slugs": ["3d-terrain", "create-a-ride", "edit-cancel-or-delete-a-ride", "find-a-ride", "follow-me", "free-vs-pro", "full-map", "getting-started", "home-screen", "import-gpx", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "leader-trackline", "map-layers", "navigation-mode", "notifications-inbox", "offline-maps", "park-trails", "ride-name-and-profile", "ride-summary-and-ride-again", "route-builder", "trip-planner", "use-onmylead-on-a-tablet"],
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-50",
@@ -63,9 +25,7 @@
   },
   {
     "date": "2026-11-05",
-    "slugs": [
-      "follow-me"
-    ],
+    "slugs": ["follow-me"],
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-49",
