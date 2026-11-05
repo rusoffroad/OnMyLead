@@ -21,7 +21,6 @@ import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { fallbackFollowStep } from './fallback-follow';
 import { MarkerBody } from './marker-body';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
-import { MAP_FIXES_FOLLOW_PLAN } from '@/lib/battery';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
 import { t as tr } from '@/lib/i18n';
@@ -243,7 +242,7 @@ function FlatNavMap({
         else trail.identifyAt(lat, lng);
       }}>
       <TrailTiles trail={trail} />
-      <OwnHeadingMarker own={own} mapHeading={mapHeading} everyMs={MAP_FIXES_FOLLOW_PLAN ? NAV_FIX_EVERY_MS : undefined} />
+      <OwnHeadingMarker own={own} mapHeading={mapHeading} />
       {(trackLines ?? []).map((d) => d.pieces.map((piece, i) => (
         <Polyline key={`t${d.key}${i}`} coordinates={toCoords(piece)} strokeColor={d.color} strokeWidth={4} zIndex={3} tappable={false} />
       )))}
