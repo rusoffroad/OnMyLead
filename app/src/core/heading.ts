@@ -76,8 +76,10 @@ export type OwnMoveState = {
   gaps: number[];
   /** Stopped only because the quiet spell ran out (no stopped fix came). */
   quiet: boolean;
+  /** The gap before a moving fix that came after a quiet spell, waiting for a second like it (ms). */
+  pendingGap: number | null;
 };
-export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, seenAt: null, gaps: [], quiet: false };
+export const OWN_MOVE_START: OwnMoveState = { moving: false, fixAt: null, seenAt: null, gaps: [], quiet: false, pendingGap: null };
 
 /** The shortest quiet spell that means stopped (ms). */
 export const OWN_STOPPED_AFTER_MS = 5000;
@@ -96,13 +98,21 @@ export const OWN_FIX_GAPS_KEPT = 5;
 export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number, nowMs: number): OwnMoveState {
   if (prev.fixAt != null && fixAtMs === prev.fixAt) return prev;
   let gaps = prev.gaps;
-  // Back-to-back moving fixes, or a moving fix right after the quiet spell ran out (the fixes got
-  // slower, e.g. Battery Saver came on), show the map's fix rate; a stopped fix in between doesn't.
-  if (moving && (prev.moving || prev.quiet) && prev.seenAt != null) {
-    const gap = nowMs - prev.seenAt;
-    if (gap > 0 && gap <= OWN_FIX_GAP_MAX_MS) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
-  }
-  return { moving, fixAt: fixAtMs, seenAt: nowMs, gaps, quiet: false };
+  let pendingGap = prev.pendingGap;
+  const gap = prev.seenAt == null ? 0 : nowMs - prev.seenAt;
+  const fits = gap > 0 && gap <= OWN_FIX_GAP_MAX_MS;
+  if (moving && prev.moving && fits) {
+    // Back-to-back moving fixes show the map's fix rate.
+    gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
+  } else if (moving && prev.quiet && fits) {
+    // A moving fix right after the quiet spell ran out: either a short stop or slower fixes
+    // (Battery Saver came on). Two such gaps of about the same length in a row are the new rate.
+    if (pendingGap != null && Math.abs(gap - pendingGap) <= pendingGap / 2) {
+      gaps = [...gaps, pendingGap, gap].slice(-OWN_FIX_GAPS_KEPT);
+      pendingGap = null;
+    } else pendingGap = gap;
+  } else if (!moving) pendingGap = null;
+  return { moving, fixAt: fixAtMs, seenAt: nowMs, gaps, quiet: false, pendingGap };
 }
 
 /** The quiet spell had no new fix: stopped (the learned fix rate stays). */
