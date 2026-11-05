@@ -62,9 +62,10 @@ export function ownArrow(
 /**
  * With no new fix for this long, your own dot counts you as stopped: phones send no location update
  * while standing still, so the last fix's speed would otherwise keep the dot in its moving look.
- * Long enough that a short GPS gap under trees or in a canyon doesn't flip it mid-ride (ms).
+ * Twice the slowest fix rate (Max Battery Saver, one fix every 15 s), so the dot never flips
+ * between fixes mid-ride or in a short GPS gap under trees (ms). A stopped fix flips it at once.
  */
-export const OWN_STOPPED_AFTER_MS = 10_000;
+export const OWN_STOPPED_AFTER_MS = 30_000;
 
 /**
  * When your own dot last saw you moving: `nowMs` for a moving fix, null for a stopped one (the dot
@@ -77,7 +78,7 @@ export function ownMovingAt(
   prev: { movingAt: number | null; fixAt: number | null },
   moving: boolean,
   fixAtMs: number,
-  nowMs: number = fixAtMs,
+  nowMs: number,
 ): { movingAt: number | null; fixAt: number | null } {
   if (prev.fixAt != null && fixAtMs === prev.fixAt) return prev;
   return { movingAt: moving ? nowMs : null, fixAt: fixAtMs };

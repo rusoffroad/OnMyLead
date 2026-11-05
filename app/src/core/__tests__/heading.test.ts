@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownStillMoving, riderHeading, screenAngle } from '../heading';
+import { BATTERY_PLANS } from '../battery';
 
 describe('riderHeading', () => {
   it('uses the GPS course while a live rider is moving', () => {
@@ -73,29 +74,32 @@ describe("other riders' arrows stay on after they stop", () => {
 
 describe('own dot moving or stopped', () => {
   const start = { movingAt: null, fixAt: null };
+  it('waits longer than the slowest fix rate (Max Battery Saver) before calling you stopped', () => {
+    expect(OWN_STOPPED_AFTER_MS).toBeGreaterThan(2 * BATTERY_PLANS.saver.fixEveryMs - 1);
+  });
   it('counts you moving from a moving fix until no new moving fix for a while', () => {
-    const a = ownMovingAt(start, true, 1000);
+    const a = ownMovingAt(start, true, 1000, 1000);
     expect(a.movingAt).toBe(1000);
     expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS - 1)).toBe(true);
     expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS)).toBe(false);
   });
   it('a stopped fix means stopped at once', () => {
-    const a = ownMovingAt(ownMovingAt(start, true, 1000), false, 3000);
+    const a = ownMovingAt(ownMovingAt(start, true, 1000, 1000), false, 3000, 3000);
     expect(ownStillMoving(a.movingAt, 3000)).toBe(false);
   });
   it('ignores a repeated fix (only the compass turned)', () => {
-    const a = ownMovingAt(start, true, 1000);
-    expect(ownMovingAt(a, true, 1000)).toBe(a);
-    expect(ownMovingAt(a, false, 1000)).toBe(a);
+    const a = ownMovingAt(start, true, 1000, 1000);
+    expect(ownMovingAt(a, true, 1000, 1500)).toBe(a);
+    expect(ownMovingAt(a, false, 1000, 1500)).toBe(a);
   });
   it('an earlier fix time (a phone clock jump) still counts, so the dot never freezes', () => {
-    const a = ownMovingAt(ownMovingAt(start, true, 9_000_000), true, 1000, 2000);
+    const a = ownMovingAt(ownMovingAt(start, true, 9_000_000, 1000), true, 1000, 2000);
     expect(a.movingAt).toBe(2000);
   });
   it('times moving from the clock, not from the phone\'s fix time', () => {
     expect(ownMovingAt(start, true, 5, 1000).movingAt).toBe(1000);
   });
   it('was never moving with no moving fix', () => {
-    expect(ownStillMoving(ownMovingAt(start, false, 1000).movingAt, 1000)).toBe(false);
+    expect(ownStillMoving(ownMovingAt(start, false, 1000, 1000).movingAt, 1000)).toBe(false);
   });
 });
