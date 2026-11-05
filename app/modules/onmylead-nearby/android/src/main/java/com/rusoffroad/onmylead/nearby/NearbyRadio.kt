@@ -273,13 +273,23 @@ class NearbyRadio(
     if (frames.isEmpty()) return
     for (p in peers.values) {
       if (p.inbox == null) continue
-      for (f in frames) if (f.size <= p.mtu - 3 && p.queue.size < MAX_QUEUE) p.queue.add(f)
+      enqueue(p.queue, frames, p.mtu)
       pump(p)
     }
     for (s in subscribers.values) {
-      for (f in frames) if (f.size <= s.mtu - 3 && s.queue.size < MAX_QUEUE) s.queue.add(f)
+      enqueue(s.queue, frames, s.mtu)
       pump(s)
     }
+  }
+
+  /**
+   * Adds a batch to a link's queue whole: when the queue is full, its oldest frames make room, so a
+   * batch (a message's parts) never goes in only partway.
+   */
+  private fun enqueue(queue: ArrayDeque<ByteArray>, frames: List<ByteArray>, mtu: Int) {
+    val fit = frames.filter { it.size <= mtu - 3 }.take(MAX_QUEUE)
+    while (queue.isNotEmpty() && queue.size + fit.size > MAX_QUEUE) queue.removeFirst()
+    queue.addAll(fit)
   }
 
   @Suppress("DEPRECATION")
@@ -371,7 +381,17 @@ class NearbyRadio(
    */
   private fun serverCallbackFor(gen: Int) = object : BluetoothGattServerCallback() {
     override fun onServiceAdded(status: Int, service: BluetoothGattService) {
-      handler.post { if (gen == serverGen) startAdvertising() }
+      handler.post {
+        if (gen != serverGen) return@post
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+          startAdvertising()
+        } else {
+          // The stack wasn't ready (often right after Bluetooth turns on): the next round opens a new server.
+          serverGen++
+          try { server?.close() } catch (_: Exception) {}
+          server = null
+        }
+      }
     }
 
     override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
@@ -400,6 +420,7 @@ class NearbyRadio(
       device: BluetoothDevice, requestId: Int, descriptor: BluetoothGattDescriptor,
       preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?,
     ) {
+      if (gen != serverGen) return
       if (descriptor.uuid == CCCD) handler.post {
         if (gen != serverGen) return@post
         val on = value != null && value.isNotEmpty() && value[0].toInt() != 0
@@ -563,7 +584,16 @@ class NearbyRadio(
         // The stack took the request but the peer refused it: queue it again, a few times per link.
         if (descriptor.uuid == CCCD && status != BluetoothGatt.GATT_SUCCESS) {
           if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) return@post drop(gatt)
+          // The peer said no (busy, still bonding): ask again shortly, frames waiting behind it.
           p.cccd = descriptor
+          p.cccdRetry = true
+          handler.postDelayed({
+            peerOf(gatt)?.let {
+              it.cccdRetry = false
+              pump(it)
+            }
+          }, 500)
+          return@post
         }
         pump(p)
       }

@@ -68,8 +68,8 @@ export function ProGateHost() {
           <View style={styles.head}>
             <ProShield size={52} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={styles.title} accessibilityRole="header">{copy.title}</Text>
-              <Text style={styles.need}>{copy.need}</Text>
+              <Text style={styles.title} accessibilityRole="header">{t(copy.title)}</Text>
+              <Text style={styles.need}>{t(copy.need)}</Text>
             </View>
           </View>
           <ThemedText style={{ color: Colors.text }}>{t(copy.body)}</ThemedText>

@@ -2772,6 +2772,8 @@ const dict: Record<string, string> = {
   "Waiting on Google Play to approve the purchase.": "Google Play의 구매 승인을 기다리는 중.",
   "Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.": "이 기기에서 Google Play가 할인을 제공하지 않았습니다. Google Play에서 OnMyLead를 업데이트하고 다시 시도하세요. 청구되지 않았습니다.",
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "완료. 다음 Google Play 결제가 6개월 미뤄져 {date}입니다.",
+  "Pro creates as many rides as you lead.": "Pro로 리드하는 라이드를 원하는 만큼 만들 수 있습니다.",
+  "Part of OnMyLead Pro.": "OnMyLead Pro 기능입니다.",
   "one ride": "라이드 1개",
   "{n} rides": "라이드 {n}개",
   "Poll: {body}": "투표: {body}",

@@ -2772,6 +2772,8 @@ const dict: Record<string, string> = {
   "Waiting on Google Play to approve the purchase.": "En attente de l’approbation de l’achat par Google Play.",
   "Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.": "Google Play n’a pas proposé la remise sur cet appareil. Mettez à jour OnMyLead depuis Google Play et réessayez. Vous n’avez pas été facturé.",
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "C’est fait. Votre prochaine facture Google Play est repoussée de 6 mois, au {date}.",
+  "Pro creates as many rides as you lead.": "Pro crée autant de sorties que vous en menez.",
+  "Part of OnMyLead Pro.": "Inclus dans OnMyLead Pro.",
   "one ride": "une sortie",
   "{n} rides": "{n} sorties",
   "Poll: {body}": "Sondage : {body}",

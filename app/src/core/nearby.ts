@@ -66,6 +66,8 @@ export const MAX_CLOCK_SKEW_SEC = 5 * 60;
 export const TAG_WINDOW_SEC = 15 * 60;
 /** Most packets one broadcast round sends, so a big group can't flood the link. */
 export const MAX_FRAMES_PER_ROUND = 24;
+/** How often a full round moves on to the next messages: at least one radio round (10 s on Max Battery Saver). */
+export const ROTATE_MS = 10_000;
 
 const MAGIC = 0x4f; // "O"
 const VERSION = 1;
@@ -483,7 +485,7 @@ function rank(item: NearbyItem, myId: string): number {
 /**
  * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
  * message's parts go together or not at all, so a full round never ends partway through a message.
- * When messages don't all fit, `turn` (one more each round) rotates which go first, so an older
+ * When messages don't all fit, `turn` (one more every ROTATE_MS) rotates which go first, so an older
  * message gets its round instead of waiting behind the newest until it ages out.
  */
 export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn = 0): T[] {
@@ -530,8 +532,6 @@ export type OwnReplyInput = { id: string; body: string; at: number };
 export class NearbyMesh {
   private positions = new Map<string, Heard>();
   private events = new Map<string, Heard>();
-  /** Rounds sent so far: rotates which messages go first when a round is full. */
-  private turn = 0;
 
   readonly myId: string;
 
@@ -714,7 +714,7 @@ export class NearbyMesh {
     const items = this.live(now)
       .map((i) => (heard(i)?.mine ? i : { ...i, hops: i.hops + 1 }))
       .filter((i) => i.hops <= MAX_HOPS);
-    return pickFrames(items, this.myId, this.turn++).map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
+    return pickFrames(items, this.myId, Math.floor(now / ROTATE_MS)).map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 
   /** Newest spot heard for each other rider. */

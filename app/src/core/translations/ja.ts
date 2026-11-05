@@ -2772,6 +2772,8 @@ const dict: Record<string, string> = {
   "Waiting on Google Play to approve the purchase.": "Google Play の購入承認を待っています。",
   "Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.": "この端末では Google Play が割引を提示しませんでした。Google Play から OnMyLead を更新してもう一度お試しください。請求はされていません。",
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "完了。次回の Google Play の請求が 6 か月延びて {date} になりました。",
+  "Pro creates as many rides as you lead.": "Pro なら、リードするライドをいくつでも作成できます。",
+  "Part of OnMyLead Pro.": "OnMyLead Pro の機能です。",
   "one ride": "1 件のライド",
   "{n} rides": "{n} 件のライド",
   "Poll: {body}": "投票: {body}",
