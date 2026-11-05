@@ -367,6 +367,20 @@ describe('pickFrames with many taps', () => {
   });
 });
 
+describe('pickFrames keeps spots moving', () => {
+  it("relays other riders' spots and rotates taps when taps fill the round", () => {
+    const tap = (n: number) => ({ kind: 'status', userId: B, id: `t${n}`, status: 'ok', at: 100 - n, flags: 0, latE7: null, lngE7: null, hops: 0 } as unknown as NearbyItem);
+    const spot = (u: string) => ({ kind: 'position', userId: u, at: 1, latE7: 0, lngE7: 0, accuracyM: null, speedCms: null, headingDd: null, flags: 0, hops: 0 } as unknown as NearbyItem);
+    const items = [...Array.from({ length: 30 }, (_, n) => tap(n)), spot(C), spot(B)];
+    const first = pickFrames(items, A);
+    expect(first.filter((i) => i.kind === 'position')).toHaveLength(2);
+    // The taps left out this round lead the next one.
+    const sent = new Set(first.filter((i) => i.kind === 'status').map((i) => (i as { id: string }).id));
+    const next = pickFrames(items, A, (id) => (sent.has(id) ? 0 : -1));
+    expect(next.filter((i) => i.kind === 'status' && !sent.has((i as { id: string }).id))).toHaveLength(30 - sent.size);
+  });
+});
+
 describe('fitReply', () => {
   it('joins back from its own parts even when the cut lands after a space', () => {
     for (let n = 0; n < 12; n++) {

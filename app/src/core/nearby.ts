@@ -72,6 +72,8 @@ export const TAG_WINDOW_SEC = 15 * 60;
 export const MAX_FRAMES_PER_ROUND = 24;
 /** How often a full round moves on to the next messages: at least one radio round (10 s on Max Battery Saver). */
 export const ROTATE_MS = 10_000;
+/** Other riders' spots a full round always makes room for. */
+export const SPOT_SHARE = 6;
 
 const MAGIC = 0x4f; // "O"
 const VERSION = 1;
@@ -487,18 +489,11 @@ function rank(item: NearbyItem, myId: string): number {
   return 5;
 }
 
-/** A message's fixed place in the rotation, from its id (FNV-1a), the same every round. */
-function idOrder(id: string): number {
-  let h = 0x811c9dc5;
-  for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193) >>> 0;
-  return h;
-}
-
 /**
  * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
  * message's parts go together or not at all, so a full round never ends partway through a message.
- * When messages don't all fit, the ones that went out longest ago (`lastSent`, by message id; never
- * sent counts as longest ago) go first, so every message gets its turn however many arrive.
+ * When taps or messages don't all fit, the ones that went out longest ago (`lastSent`, by id; never
+ * sent counts as longest ago) go first, so every one gets its turn however many arrive.
  */
 export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastSent: (id: string) => number = () => -1): T[] {
   const own = items.find((i) => i.kind === 'position' && i.userId === myId);
@@ -515,35 +510,42 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   const picked = new Set<T>();
   let left = MAX_FRAMES_PER_ROUND;
   const take = (g: T[]) => { for (const i of g) { out.push(i); picked.add(i); } left -= g.length; };
+  // Taps and messages wait in line: the ones sent longest ago first, then newest first (sending
+  // order), so every one gets its turn however many arrive.
+  const inLine = <G,>(list: G[], idOf: (g: G) => string) =>
+    list.map((g, n) => ({ g, n, sent: lastSent(idOf(g)) })).sort((a, b) => a.sent - b.sent || a.n - b.n).map((x) => x.g);
   // Emergencies (leaving room for the own spot), the own spot, then the rider's own taps.
   for (const i of sos) if (left > (own ? 1 : 0)) take([i]);
   if (own) take([own]);
   for (const i of items) if (i.kind === 'status' && i.userId === myId && !picked.has(i) && left > 0) take([i]);
+  // Then other riders' newest spots, up to SPOT_SHARE, so the mesh keeps passing locations on
+  // however many taps and messages are live.
+  let spots = 0;
+  for (const i of items) {
+    if (i.kind === 'position' && !picked.has(i) && spots < SPOT_SHARE && left > 0) { take([i]); spots++; }
+  }
   const messages = new Map<string, T[]>();
   for (const i of items) {
     if (i.kind !== 'reply') continue;
     const g = messages.get(i.id);
     if (g) g.push(i); else messages.set(i.id, [i]);
   }
-  const idOf = (g: T[]) => (g[0] as NearbyReply).id;
+  const msgId = (g: T[]) => (g[0] as NearbyReply).id;
   const groups = [...messages.values()];
   const newestOwn = groups.find((g) => g[0].userId === myId);
-  // Then the rider's newest own message, whole, then other riders' taps.
+  // Then the rider's newest own message, whole.
   if (newestOwn && newestOwn.length <= left) take(newestOwn);
-  // The other messages wait in line: the ones sent longest ago first (ties by a fixed order from
-  // the id, the same every round).
-  const ring = groups.filter((g) => g !== newestOwn)
-    .map((g) => ({ g, sent: lastSent(idOf(g)), k: idOrder(idOf(g)) }))
-    .sort((a, b) => a.sent - b.sent || a.k - b.k)
-    .map((x) => x.g);
-  // Other riders' taps leave room for the next message in line (when it could fit at all), so a
-  // crowd of taps can't keep every message off the air.
+  const ring = inLine(groups.filter((g) => g !== newestOwn), msgId);
+  // Then other riders' taps in line, leaving room for the next message in line (when it could fit
+  // at all), so a crowd of taps can't keep every message off the air.
   const hold = ring.length && ring[0].length <= left ? ring[0].length : 0;
-  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > hold) take([i]);
+  const taps = inLine(items.filter((i) => i.kind === 'status' && !picked.has(i)), (i) => (i as NearbyStatus).id);
+  for (const i of taps) if (left > hold) take([i]);
   // Then the other messages, whole, in line.
   for (const g of ring) if (g.length <= left) take(g);
-  // Then other riders' spots and receipts.
-  for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) take([i]);
+  // Then the rest of the spots, then receipts.
+  for (const i of items) if (!picked.has(i) && i.kind === 'position' && left > 0) take([i]);
+  for (const i of items) if (!picked.has(i) && i.kind === 'ack' && left > 0) take([i]);
   return out;
 }
 
@@ -579,7 +581,8 @@ export class NearbyMesh {
 
   /** Moves to the next turn every ROTATE_MS (by one even when rounds run late or the clock is set back). */
   private advanceTurn(now: number, live: Set<string>) {
-    if (now - this.turnStarted < ROTATE_MS && now >= this.turnStarted) return;
+    // A little early still counts, so a round timer that fires a few ms early doesn't stretch a turn.
+    if (now - this.turnStarted < ROTATE_MS - 500 && now >= this.turnStarted) return;
     if (this.turnStarted !== -Infinity) {
       for (const id of this.pickedNow) this.sentTurn.set(id, this.turn);
       this.turn++;
@@ -770,12 +773,12 @@ export class NearbyMesh {
     const items = this.live(now)
       .map((i) => (heard(i)?.mine ? i : { ...i, hops: i.hops + 1 }))
       .filter((i) => i.hops <= MAX_HOPS);
-    const ids = new Set(items.flatMap((i) => (i.kind === 'reply' ? [i.id] : [])));
+    const ids = new Set(items.flatMap((i) => (i.kind === 'reply' || i.kind === 'status' ? [i.id] : [])));
     this.advanceTurn(now, ids);
     const picked = pickFrames(items, this.myId, (id) => this.sentTurn.get(id) ?? -1);
     // Only the latest pick counts: an earlier one in the same turn was replaced before it went out.
     this.pickedNow.clear();
-    if (picked.length < items.length) for (const i of picked) if (i.kind === 'reply') this.pickedNow.add(i.id);
+    if (picked.length < items.length) for (const i of picked) if (i.kind === 'reply' || i.kind === 'status') this.pickedNow.add(i.id);
     return picked.map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 
