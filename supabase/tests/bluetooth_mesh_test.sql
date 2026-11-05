@@ -204,6 +204,21 @@ do $$ begin
   end;
 end $$;
 
+-- M6. One bad item (a time far out of range) skips only that item; the rest of the upload lands.
+do $$
+declare t bigint := extract(epoch from now())::bigint - 10;
+begin
+  if bm_upload('00000000-0000-0000-0000-0000000b1e11', jsonb_build_array(
+       jsonb_build_object('k', 'r', 'user_id', '00000000-0000-0000-0000-0000000b1e12', 'id', '0c0c0c0c-0000-4000-8000-0000000000b1',
+         'body', 'Bad clock', 'at', 999999999999999999, 'mac', 'ff'),
+       bm_msg('00000000-0000-0000-0000-0000000b1e12', '0c0c0c0c-0000-4000-8000-0000000000b2', 'Still here', t))) <> 1 then
+    raise exception 'FAIL: one bad item failed the whole upload';
+  end if;
+  if not exists (select 1 from ride_messages where id = '0c0c0c0c-0000-4000-8000-0000000000b2') then
+    raise exception 'FAIL: the good message after a bad one was lost';
+  end if;
+end $$;
+
 drop function bm_upload(uuid, jsonb);
 drop function bm_ack(uuid, uuid, int, bigint);
 drop function bm_msg(uuid, uuid, text, bigint);

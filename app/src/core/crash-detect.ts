@@ -6,7 +6,8 @@
  * bump that keeps rolling isn't one, and neither is a phone lifted out of its mount while parked:
  * the vehicle has to have been moving in the last few seconds. A dropped phone isn't one either: a
  * drop starts with a moment of free fall (the phone feels close to 0 g), so a hit right after a fall
- * is ignored, and a phone left lying at an angle doesn't count as a rollover until it is back in
+ * is ignored when the vehicle is slow or parked (at driving speed the fall may be the vehicle in the
+ * air, so the landing counts), and a phone left lying at an angle doesn't count as a rollover until it is back in
  * its mount. The countdown is still there for anything that slips through. Pure logic: the screen
  * feeds in samples.
  */
@@ -125,7 +126,11 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
   const falling = s.feltG != null && Number.isFinite(s.feltG) && s.feltG < FREE_FALL_G;
   const fallingSince = falling ? (state.fallingSince ?? s.t) : null;
   const fell = fallingSince != null && s.t - fallingSince >= FREE_FALL_MS;
-  const droppedAt = fell ? s.t : (state.droppedAt ?? null);
+  // At driving speed a free fall is as likely the vehicle in the air (a jump, a ledge, a roll) as a
+  // dropped phone, so the landing hit still counts; a phone that only fell to the floor rides on and
+  // the "rode on" rule below clears it.
+  const airborne = speed != null && speed >= DROVE_ON_MPS;
+  const droppedAt = fell && !airborne ? s.t : (state.droppedAt ?? null);
   const justDropped = droppedAt != null && s.t - droppedAt <= DROP_IGNORE_MS;
   // After a drop the tilt is the phone's, not the vehicle's, until it's back near level for a while.
   let displaced = fell || !!state.displaced;

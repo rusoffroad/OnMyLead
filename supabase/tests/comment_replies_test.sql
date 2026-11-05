@@ -194,6 +194,23 @@ select as_admin_session('00000000-0000-0000-0000-00000000ad01', 'aal2');
 select admin_set_comment_hidden(reply_id('c1'), false);
 select as_admin_session(null, 'aal1');
 
+-- R7b. A hidden reply's writer isn't named on the replies that answered it.
+select as_admin_session('00000000-0000-0000-0000-00000000ad01', 'aal2');
+select admin_set_comment_hidden(reply_id('r1'), true, 'Rude');
+select as_admin_session(null, 'aal1');
+select as_user('00000000-0000-0000-0000-000000000ee2');
+set role authenticated;
+do $$ begin
+  if not exists (select 1 from feed_item_thread(reply_key()) where id = reply_id('r2')) then raise exception 'FAIL: Ann''s reply went with Eli''s'; end if;
+  if (select reply_to_name from feed_item_thread(reply_key()) where id = reply_id('r2')) is not null then
+    raise exception 'FAIL: reply_to_name names the writer of a hidden reply';
+  end if;
+end $$;
+reset role;
+select as_admin_session('00000000-0000-0000-0000-00000000ad01', 'aal2');
+select admin_set_comment_hidden(reply_id('r1'), false);
+select as_admin_session(null, 'aal1');
+
 -- R8. Ben deletes his comment: its replies, their likes and the notifications about them go too.
 select as_user('00000000-0000-0000-0000-000000000ee2');
 set role authenticated;

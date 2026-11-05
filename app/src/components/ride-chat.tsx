@@ -8,7 +8,7 @@ import { PollCard, PollComposer } from '@/components/ride-poll';
 import { Button, Card, Choice, ErrorText, Field, Tag } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import {
-  checkMessage, isLeaderOnly, isResolved, MAX_MESSAGE_LENGTH, SEND_STATE_LABEL,
+  chatMessageText, checkMessage, isLeaderOnly, isResolved, MAX_MESSAGE_LENGTH, SEND_STATE_LABEL,
   type ChatMessage, type MessageAudience, type MessageKind, type PendingMessage, type SendState,
 } from '@/core/chat';
 import { parseProError } from '@/core/entitlements';
@@ -31,7 +31,7 @@ export function PinnedAnnouncement({ message, senderName }: { message: ChatMessa
       accessibilityLabel={t('Announcement from {senderName}: {body}', { senderName, body: message.body })}
       style={{ backgroundColor: RideColors.yellow, borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.one }}>
       <ThemedText type="small" style={{ color: '#3A2600', fontWeight: 700 }}>{t('Announcement from {senderName}, {v}', { senderName, v: dayAndClock(message.sent_at) })}</ThemedText>
-      <ThemedText style={{ color: '#1A1100', fontSize: 19, lineHeight: 25, fontWeight: 700 }}>{t(message.body)}</ThemedText>
+      <ThemedText style={{ color: '#1A1100', fontSize: 19, lineHeight: 25, fontWeight: 700 }}>{chatMessageText(message, t)}</ThemedText>
     </View>
   );
 }
@@ -211,7 +211,7 @@ export function RideChat({
                       announcement && { fontWeight: 700 },
                       resolved && { color: theme.textSecondary },
                     ]}>
-                    {t(m.body)}
+                    {chatMessageText(m, t)}
                   </ThemedText>
                 )}
                 {menuOpen && !mine ? (
@@ -273,7 +273,7 @@ export function RideChat({
                 </ThemedText>
                 <SendBadge state={p.state} />
               </View>
-              <ThemedText style={{ color: p.state === 'sending' ? theme.textSecondary : theme.text }}>{t(p.body)}</ThemedText>
+              <ThemedText style={{ color: p.state === 'sending' ? theme.textSecondary : theme.text }}>{chatMessageText(p, t)}</ThemedText>
               {p.state === 'failed' ? (
                 <>
                   {p.error ? <ThemedText type="small" style={{ color: Colors.danger }}>{p.error}</ThemedText> : null}

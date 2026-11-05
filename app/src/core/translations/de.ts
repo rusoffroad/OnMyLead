@@ -2771,6 +2771,7 @@ const dict: Record<string, string> = {
   "Open the App Store and redeem code {code}.": "Öffne den App Store und löse den Code {code} ein.",
   "Waiting on Google Play to approve the purchase.": "Warten auf die Freigabe des Kaufs durch Google Play.",
   "Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.": "Google Play hat den Rabatt auf diesem Gerät nicht angeboten. Aktualisiere OnMyLead über Google Play und versuch es noch einmal. Dir wurde nichts berechnet.",
+  "Done. Your next Google Play bill moved back 6 months, to {date}.": "Erledigt. Deine nächste Google-Play-Abbuchung wurde um 6 Monate verschoben, auf den {date}.",
   "Done. Your next Google Play bill moved back 6 months{v}.": "Erledigt. Deine nächste Google-Play-Abbuchung wurde um 6 Monate verschoben{v}.",
   "Google Play didn’t answer. Your reward is saved; try again in a minute.": "Google Play hat nicht geantwortet. Deine Belohnung ist gespeichert; versuch es in einer Minute noch einmal.",
   "${discounted} for the first year instead of ${annual}": "${discounted} im ersten Jahr statt ${annual}",

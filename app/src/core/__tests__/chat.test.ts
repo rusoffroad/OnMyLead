@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  alertTitle, checkMessage, friendlyChatError, isLeaderOnly, isResolved, latestAnnouncement, MAX_MESSAGE_LENGTH, mergeMessages,
+  alertTitle, chatMessageText, checkMessage, friendlyChatError, isLeaderOnly, isResolved, latestAnnouncement, MAX_MESSAGE_LENGTH, mergeMessages,
   messageActionsNotSwitchedOn, QUICK_REPLIES, reconcileMessages, rideLeaderIds, SEND_STATE_LABEL, shouldAlert, spokenAnnouncement,
   withoutMessage,
   type ChatMessage,
@@ -158,5 +158,14 @@ describe('clear and resolve', () => {
 
   it('names every send state in Title Case', () => {
     expect(SEND_STATE_LABEL).toEqual({ sending: 'Sending…', sent: 'Sent', failed: 'Not Sent', queued: 'Waiting for Signal' });
+  });
+});
+
+describe('chatMessageText', () => {
+  const upper = (s: string) => s.toUpperCase();
+  it('shows one-tap replies in the reader’s language and typed messages as typed', () => {
+    expect(chatMessageText({ kind: 'status', body: 'On My Way' }, upper)).toBe('ON MY WAY');
+    expect(chatMessageText({ kind: 'chat', body: 'On My Way' }, upper)).toBe('On My Way');
+    expect(chatMessageText({ kind: 'announcement', body: 'Done' }, upper)).toBe('Done');
   });
 });

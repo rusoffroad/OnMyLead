@@ -81,7 +81,7 @@ export function SocialCard({
           {stat ? <Text style={styles.stat}>{`  ${stat}`}</Text> : null}
         </Text>
       ) : null}
-      {item.body ? <Text style={styles.post} numberOfLines={full ? undefined : 8}>{t(item.body)}</Text> : null}
+      {item.body ? <Text style={styles.post} numberOfLines={full ? undefined : 8}>{item.body}</Text> : null}
       {item.badge ? (
         <View style={styles.badgeRow}>
           <BadgePatch badge={item.badge.badge} level={item.badge.level} size={full ? 72 : 52} />
@@ -140,7 +140,7 @@ export function SocialCard({
           {item.comments.map((c) => (
             <Text key={c.id} style={styles.preview} numberOfLines={2}>
               <Text style={{ fontFamily: font(700), color: Colors.text }}>{c.authorName}  </Text>
-              {t(c.body)}
+              {c.body}
             </Text>
           ))}
         </Pressable>
@@ -166,7 +166,7 @@ export function SocialCard({
       ) : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <PhotoViewer uri={photoOpen ? item.photoUrl : null} square={false} caption={t(item.body)} onClose={() => setPhotoOpen(false)} />
+      <PhotoViewer uri={photoOpen ? item.photoUrl : null} square={false} caption={item.body} onClose={() => setPhotoOpen(false)} />
       <ShareSheet item={sharing ? item : null} onClose={() => setSharing(false)} />
       <BottomSheet visible={menu} onClose={() => setMenu(false)} title={item.mine ? t('Your Post') : item.actorName}>
         <View style={{ gap: 4 }}>

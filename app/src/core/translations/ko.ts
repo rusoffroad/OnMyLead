@@ -2771,6 +2771,7 @@ const dict: Record<string, string> = {
   "Open the App Store and redeem code {code}.": "App Store를 열고 코드 {code}을(를) 사용하세요.",
   "Waiting on Google Play to approve the purchase.": "Google Play의 구매 승인을 기다리는 중.",
   "Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.": "이 기기에서 Google Play가 할인을 제공하지 않았습니다. Google Play에서 OnMyLead를 업데이트하고 다시 시도하세요. 청구되지 않았습니다.",
+  "Done. Your next Google Play bill moved back 6 months, to {date}.": "완료. 다음 Google Play 결제가 6개월 미뤄져 {date}입니다.",
   "Done. Your next Google Play bill moved back 6 months{v}.": "완료. 다음 Google Play 결제가 6개월 미뤄졌습니다{v}.",
   "Google Play didn’t answer. Your reward is saved; try again in a minute.": "Google Play가 응답하지 않았습니다. 보상은 저장되었습니다. 1분 후 다시 시도하세요.",
   "${discounted} for the first year instead of ${annual}": "첫해 ${annual} 대신 ${discounted}",

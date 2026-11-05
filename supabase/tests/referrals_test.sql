@@ -262,6 +262,49 @@ do $$ begin
   if (select v ->> 'code' from ref_out where name = 'rex_after_off') <> 'AAAA1111' then raise exception 'FAIL: earned reward lost when switched off'; end if;
 end $$;
 
+-- R11 (2.1 release test fixes, 20261105050000). Jo 0f07 was invited by Rex.
+insert into auth.users (id, raw_user_meta_data) values ('00000000-0000-0000-0000-000000000f07', '{"full_name":"Jo Ref"}');
+insert into referrals (referrer_id, friend_id, code, created_at)
+values ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000f07', 'REXREF0001', now() - interval '5 hours');
+-- A ride that was ended without ever going live is not Jo's first ride.
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, status)
+values ('0f000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000f07', 'Never went', now() - interval '3 hours', 35.1, -84.1, 'scheduled');
+update rides set status = 'ended', ended_at = now() where id = '0f000000-0000-0000-0000-000000000007';
+do $$ begin
+  if exists (select 1 from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f07') then
+    raise exception 'FAIL: a ride that never went live earned a reward';
+  end if;
+end $$;
+-- Jo's reward, claimed as the Google Play offer, can't also take an Apple code.
+insert into referral_rewards (user_id, referral_id, role, expires_at)
+select '00000000-0000-0000-0000-000000000f07', id, 'friend', now() + interval '180 days' from referrals where friend_id = '00000000-0000-0000-0000-000000000f07';
+select as_user('00000000-0000-0000-0000-000000000f07');
+set role authenticated;
+insert into ref_out values ('jo_google', claim_referral_reward('google'));
+insert into ref_out values ('jo_apple', claim_referral_reward('apple'));
+reset role;
+do $$ begin
+  if (select v ->> 'kind' from ref_out where name = 'jo_google') <> 'google_offer' then raise exception 'FAIL: Jo''s Google claim %', (select v from ref_out where name = 'jo_google'); end if;
+  if (select v ->> 'error' from ref_out where name = 'jo_apple') is distinct from 'claimed_on_other_store'
+     or (select v ->> 'store' from ref_out where name = 'jo_apple') is distinct from 'google' then
+    raise exception 'FAIL: Apple claim after the Google offer %', (select v from ref_out where name = 'jo_apple');
+  end if;
+  if (select claim_kind from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f07') <> 'google_offer'
+     or exists (select 1 from referral_offer_codes where assigned_to = '00000000-0000-0000-0000-000000000f07') then
+    raise exception 'FAIL: the Google offer claim was overwritten by an Apple code';
+  end if;
+end $$;
+-- A Play subscription in grace or paused counts even past its stored expiry; a lapsed active one doesn't.
+insert into play_subscriptions (purchase_token, user_id, product_id, status, environment, expires_at)
+values ('jo-grace-token', '00000000-0000-0000-0000-000000000f07', 'com.rusoffroad.onmylead.pro.monthly', 'grace', 'Production', now() - interval '1 day'),
+       ('ivy-stale-token', '00000000-0000-0000-0000-000000000f06', 'com.rusoffroad.onmylead.pro.monthly', 'active', 'Production', now() - interval '1 day');
+do $$ begin
+  if referral_play_token('00000000-0000-0000-0000-000000000f07') is distinct from 'jo-grace-token' then raise exception 'FAIL: grace subscription not found'; end if;
+  update play_subscriptions set status = 'paused' where purchase_token = 'jo-grace-token';
+  if referral_play_token('00000000-0000-0000-0000-000000000f07') is distinct from 'jo-grace-token' then raise exception 'FAIL: paused subscription not found'; end if;
+  if referral_play_token('00000000-0000-0000-0000-000000000f06') is not null then raise exception 'FAIL: a lapsed subscription counted'; end if;
+end $$;
+
 drop table ref_out;
 select as_user(null);
 \echo 'referrals_test: ok'

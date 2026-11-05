@@ -131,12 +131,24 @@ function schedulePush() {
 export const syncSettingsNow: () => Promise<void> = singleFlight(() => run());
 
 async function run() {
-  // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
-  if (!can(currentEntitlements(), 'sync')) return;
   if (!isBackendConfigured) return;
   const { data: auth } = await supabase.auth.getSession();
   const me = auth.session?.user.id;
   if (!me) return;
+  // Sync across devices is Pro: a Free account keeps its settings and trails on this device. It
+  // still notes whose settings these are, so a different rider who signs in here with Pro gets
+  // their own account's settings instead of adopting this rider's.
+  if (!can(currentEntitlements(), 'sync')) {
+    const lastAccount = await AsyncStorage.getItem(ACCOUNT_KEY).catch(() => null);
+    if (lastAccount !== me) {
+      // The stamps were the last account's: this rider starts fresh if they go Pro here later.
+      await load();
+      stamps = {};
+      saveStamps();
+      await AsyncStorage.setItem(ACCOUNT_KEY, me).catch(() => {});
+    }
+    return;
+  }
   await load();
   setStatus({ syncing: true });
   try {

@@ -14,6 +14,7 @@ sources:
   - app/src/core/referrals.ts
   - app/src/lib/referrals.ts
   - supabase/migrations/20261103800000_referrals.sql
+  - supabase/migrations/20261105050000_release_fixes_pass1.sql
   - supabase/functions/referral-defer/index.ts
 related: [friends, subscribe-to-pro, promo-codes, manage-subscription, free-vs-pro]
 keywords: [refer a friend, referral, invite friends, invite code, discount, 50% off, half price, reward, pro annual, coupon, friend link]
@@ -31,7 +32,7 @@ Your invite link is your friend link, so your friend can also add you as a frien
 ## What Your Friend Does
 
 1. Opens your link and creates a new OnMyLead account within 7 days.
-2. Finishes a ride: leads one or joins one that runs for at least 10 minutes and is ended.
+2. Finishes a ride: leads one or joins one that starts (goes live), runs for at least 10 minutes and is ended. A ride that's ended without ever starting doesn't count.
 
 That's it. You both get a notification in the inbox, and the discount shows on **Invite Friends** and on the Pro screen.
 

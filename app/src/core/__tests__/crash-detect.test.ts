@@ -210,6 +210,26 @@ describe('dropped phone', () => {
     expect(after.alarms).toEqual(['rollover']);
   });
 
+  it('a vehicle in the air at speed (a jump or a ledge) still alarms on the landing hit', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 12, feltG: 1 }),
+      ...every(1050, 1650, { speedMps: 12, feltG: 0.05 }), // airborne ~600 ms
+      s(1700, { speedMps: 10, feltG: 8, userAccel: { x: 8 * G, y: 0, z: 0 } }), // lands hard
+      ...every(1750, 9000, { speedMps: 0, feltG: 1, roll: 95 }),
+    ]);
+    expect(alarms).toEqual(['impact']);
+  });
+
+  it('a phone that falls to the floor while driving on does not alarm', () => {
+    const { alarms } = run([
+      ...every(0, 1000, { speedMps: 12, feltG: 1 }),
+      ...every(1050, 1350, { speedMps: 12, feltG: 0.05 }),
+      s(1400, { speedMps: 12, feltG: 6, userAccel: { x: 6 * G, y: 0, z: 0 } }),
+      ...every(1450, 12_000, { speedMps: 12, feltG: 1, roll: 85 }),
+    ]);
+    expect(alarms).toEqual([]);
+  });
+
   it('a crash that throws the phone out of the mount still alarms', () => {
     const { alarms } = run([
       ...every(0, 500, { speedMps: 12, feltG: 1 }),

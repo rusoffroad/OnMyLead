@@ -39,6 +39,14 @@ export const MAX_MESSAGE_LENGTH = 500;
 /** Messages per minute per rider before the database asks them to slow down. */
 export const MESSAGES_PER_MINUTE = 10;
 
+/**
+ * The text to show for a chat message: one-tap replies and status taps (kind 'status') are the
+ * app's own words, so they show in the reader's language; anything a rider typed shows as typed.
+ */
+export function chatMessageText(m: Pick<ChatMessage, 'kind' | 'body'>, translate: (text: string) => string): string {
+  return m.kind === 'status' ? translate(m.body) : m.body;
+}
+
 /** One-tap replies for Ride Mode. Sent as kind 'status' so the chat can show them differently. */
 export const QUICK_REPLIES = ['On My Way', 'Running Late', 'Need a Minute', 'All Good', 'Beverage Break'] as const;
 export type QuickReply = (typeof QUICK_REPLIES)[number];
