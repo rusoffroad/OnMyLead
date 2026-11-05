@@ -36,7 +36,7 @@ You can also tap the bell at the top of the **Rides** tab, then **Notification S
 
 When someone in your group taps **Need Help** or **EMERGENCY**, you're always told, even during quiet hours. This can't be turned off.
 
-:::release 2.2
+:::release 2.1
 **Emergency Siren**, just below, starts on: an EMERGENCY from your group sounds a loud siren until you silence it. Tap **Play Siren** to hear it, or switch it off to get EMERGENCY notifications with the normal sound. See [Hear the Emergency Siren](/help/emergency-siren).
 :::
 

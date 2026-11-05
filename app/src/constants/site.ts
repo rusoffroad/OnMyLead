@@ -63,5 +63,5 @@ export const SHOWCASE_LEADER_TRACKLINE: boolean = false;
 export const SHOWCASE_PARK_TRAILS: boolean = false;
 /** The comment likes and replies line in the showcase. Off until the app version with them (2.1) is live in the stores. */
 export const SHOWCASE_COMMENT_REPLIES: boolean = false;
-/** The Emergency Siren line in the showcase. Off until the app version with the siren (2.2) is live in the stores. */
+/** The Emergency Siren line in the showcase. Off until the app version with the siren (2.1 build 10) is live in the stores. */
 export const SHOWCASE_EMERGENCY_SIREN: boolean = false;

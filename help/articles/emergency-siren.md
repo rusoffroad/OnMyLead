@@ -3,7 +3,7 @@ title: Hear the Emergency Siren
 summary: When a rider in your group sends EMERGENCY or a Crash Alert goes out, your phone sounds a loud siren until you silence it. Here's how it works and how to turn it off.
 category: safety-privacy
 order: 51
-release: "2.2"
+release: "2.1"
 updated: 2026-11-05
 sources:
   - app/src/core/siren.ts

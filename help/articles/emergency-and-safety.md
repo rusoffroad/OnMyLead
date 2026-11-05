@@ -61,7 +61,7 @@ When the alert goes out:
 - It shows in red on their Ride Mode screen. If you're sharing your location, they see you on the map and can tap **Navigate** to get directions to you.
 - Help and EMERGENCY notifications are always on for every rider, even in quiet hours, and they come through even from a rider someone has blocked.
 
-:::release 2.2
+:::release 2.1
 - Their phones sound a loud **Emergency Siren** until they silence it, unless they turned it off. See [Hear the Emergency Siren](/help/emergency-siren).
 :::
 

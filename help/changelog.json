@@ -5,7 +5,7 @@
     "kind": "review",
     "by": "pr",
     "ref": "emergency-siren",
-    "why": "Reviewed for the Emergency Siren (2.2). Bluetooth Sharing and Send a Status now say an EMERGENCY sounds the siren (2.2 blocks). The rest share Ride Mode, push, translations or settings code that changed only to add the siren and its switch; what they describe reads the same."
+    "why": "Reviewed for the Emergency Siren (2.1). Bluetooth Sharing and Send a Status now say an EMERGENCY sounds the siren (2.1 blocks). The rest share Ride Mode, push, translations or settings code that changed only to add the siren and its switch; what they describe reads the same."
   },
   {
     "date": "2026-11-05",
@@ -13,7 +13,7 @@
     "kind": "new",
     "by": "pr",
     "ref": "emergency-siren",
-    "why": "New in 2.2 (Chris asked during the 2.1 Bluetooth test): an EMERGENCY or a Crash Alert from a rider sounds a loud siren on the other riders' phones until they silence it, with the app open, from the push with it closed, and over Bluetooth with no service. New guide Hear the Emergency Siren; the emergency and notification guides mention it and the Emergency Siren switch."
+    "why": "New in 2.1 build 10 (Chris asked during the 2.1 Bluetooth test and wanted it in before submitting): an EMERGENCY or a Crash Alert from a rider sounds a loud siren on the other riders' phones until they silence it, with the app open, from the push with it closed, and over Bluetooth with no service. New guide Hear the Emergency Siren; the emergency and notification guides mention it and the Emergency Siren switch."
   },
   {
     "date": "2026-11-05",
