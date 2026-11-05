@@ -341,11 +341,15 @@ describe('pickFrames', () => {
     expect(counts.size).toBe(3);
     // Later rounds start with other messages, so every message gets a round before it ages out.
     const seen = new Set<string>();
-    for (let turn = 0; turn < 20; turn++) for (const i of pickFrames(items, A, turn)) if (i.kind === 'reply') seen.add(i.id);
+    // Least recently sent first: with room for 3 of 5, every message goes within two turns.
+    const sent = new Map<string, number>();
+    for (let turn = 0; turn < 2; turn++) {
+      for (const i of pickFrames(items, A, (id) => sent.get(id) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(i.id, turn); }
+    }
     expect(seen.size).toBe(5);
     // The rider's own message goes in every full round, whatever the turn.
     const mine = [0, 1, 2, 3, 4, 5].map((p) => ({ ...(reply('own', p, 6, 1) as object), userId: A } as unknown as NearbyItem));
-    for (let turn = 0; turn < 5; turn++) expect(pickFrames([...items, ...mine], A, turn).filter((i) => i.kind === 'reply' && i.id === 'own')).toHaveLength(6);
+    for (let turn = 0; turn < 5; turn++) expect(pickFrames([...items, ...mine], A, (id) => (id === 'own' ? 99 : turn)).filter((i) => i.kind === 'reply' && i.id === 'own')).toHaveLength(6);
   });
 });
 
