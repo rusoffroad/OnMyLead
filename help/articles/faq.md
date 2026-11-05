@@ -25,8 +25,9 @@ sources:
   - app/src/components/update-required.tsx
   - app/src/components/app-notices.tsx
   - app/src/lib/app-update.ts
+  - app/src/core/nearby.ts
 related: [troubleshooting, free-vs-pro, privacy, location-sharing, contact-support]
-keywords: [questions, faq, release notes, what's new, update, update required, update available, version, how many rides, cost, price, free, iphone, website, tablet]
+keywords: [no service, bluetooth, questions, faq, release notes, what's new, update, update required, update available, version, how many rides, cost, price, free, iphone, website, tablet]
 ---
 
 ## Is OnMyLead Free?
@@ -96,7 +97,13 @@ Only when you stop it. Sharing with chosen riders or a family link set to **Unti
 
 ## Does Live Tracking Work With No Cell Service?
 
+:::until 2.1
 No. Positions only update when a phone has a connection. [Offline maps](/help/offline-maps) keep the map and route on your screen, and riders without service show where they were last seen.
+:::
+
+:::release 2.1
+Yes, for riders close to you. With no service, OnMyLead phones on the same ride pass spots, status taps, EMERGENCY and Ride Mode messages to each other over Bluetooth, about 100 to 300 feet between phones in the open, and each phone passes them along the group, up to six phones down the line. Riders out of Bluetooth range show where they were last seen, and the first phone to get signal sends everything it heard to OnMyLead. It's on by default. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing), and download the ride's [offline map](/help/offline-maps) before you go.
+:::
 
 :::release 2.0
 ## Why Does the App Ask Me to Agree to a Safety Agreement?
