@@ -77,6 +77,8 @@ export function useSheetUp(visible: boolean): () => void {
       down();
       return;
     }
+    // A sheet that was never up has nothing to wait for.
+    if (!counted.current) return;
     // iPhone and iPad: onDismiss reports the end of the close; in case it never comes, give up
     // waiting well after the close animation (about 0.3 s) would have finished, even on a busy phone.
     const t = setTimeout(down, 1500);
