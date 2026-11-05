@@ -49,7 +49,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   follow, trial reminders), cancellation emails, message preview, quiet hours.
 - Directions app choice (Ask Each Time / Apple Maps / Google Maps; Google only on Android).
 - Subscription, Blocked Riders, Report a Bug (1.0.1: screenshot + app activity log), Contact Us, Help and Support, Terms, Safety Agreement (2.0), Privacy, Admin Dashboard link
-  (admins).
+  (admins only; since 2.1 it is the first row of the You tab, right under the name card).
 
 ### Rides: Create, Manage, Organize
 - Create a Ride (`/ride/new`, also on the website): Public / Private, name, day (quick picks plus a month calendar, today up to a year out, 1.0.1) and time,

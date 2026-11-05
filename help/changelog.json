@@ -13,6 +13,37 @@
   {
     "date": "2026-11-05",
     "slugs": [
+      "bluetooth-sharing",
+      "badges-and-ranks",
+      "contact-support",
+      "delete-account",
+      "directions",
+      "faq",
+      "follow-me",
+      "garage",
+      "getting-started",
+      "location-sharing",
+      "manage-subscription",
+      "notification-settings",
+      "offline-maps",
+      "park-trails",
+      "profile-picture",
+      "refer-a-friend",
+      "report-and-block",
+      "ride-name-and-profile",
+      "sign-in",
+      "starlink",
+      "sync-across-devices",
+      "trip-planner"
+    ],
+    "kind": "review",
+    "by": "pr",
+    "ref": "admin-dashboard-top",
+    "why": "Chris asked to move the Admin Dashboard row to the top of the You tab. That row only shows for the owner's admin account, so riders see no difference in these articles' screens; dates bumped after checking the You tab against each article."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
       "leader-trackline",
       "ride-mode",
       "leader-sweep-and-tail-gunner",
