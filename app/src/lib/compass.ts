@@ -55,6 +55,14 @@ function start() {
     });
 }
 
+/** Location was just allowed: start the compass now for any map waiting on it. */
+export function compassAllowed() {
+  if (!listeners.size || sub) return;
+  if (retry) clearTimeout(retry);
+  retry = null;
+  start();
+}
+
 function stop() {
   sub?.remove();
   sub = null;

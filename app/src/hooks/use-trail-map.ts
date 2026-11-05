@@ -349,17 +349,16 @@ export function useTrailMap(): TrailMap {
   }, []);
 
   const setFeatures = (changes: { id: MapFeatureId; on: boolean }[]) => {
-    const next = { ...featuresRef.current };
-    let changed = false;
+    // Rider Trails and Park Trails have their own setters, which update featuresRef themselves;
+    // the rest are copied after them so those changes aren't written back over.
     for (const { id, on } of changes) {
       if (id === 'riderTrails') setRiderTrails(on);
       else if (id === 'parkTrails') setParkTrails(on);
-      else {
-        next[id] = on;
-        changed = true;
-      }
     }
-    if (!changed) return;
+    const rest = changes.filter((c) => c.id !== 'riderTrails' && c.id !== 'parkTrails');
+    if (!rest.length) return;
+    const next = { ...featuresRef.current };
+    for (const { id, on } of rest) next[id] = on;
     featuresRef.current = next;
     setFeatureState(next);
     trailsRef.current = anyTrails(next);

@@ -46,25 +46,27 @@ Satellite, topo and the trails layer are Pro features. See [Free and Pro](/help/
 
 ## Open the Layers
 
+:::until 2.1
 The layers button is the round button with a stacked layers icon in the top-right corner of the map. You'll find it on:
+:::
+
+:::release 2.1
+The round **Map Settings** button (a two-slider icon) is in the top-right corner of the map. You'll find it on:
+:::
 
 - Ride Mode's map
 - A ride's waypoints map
 - The route builder
 - The area picker for offline maps
 
-:::until 2.0
-Tap it to open the **Map** panel. Tap it again to close the panel.
-:::
-
-:::release 2.0
+:::until 2.1
 Tap it to open the **Map Style** panel. Tap it again to close the panel.
 :::
 
 :::release 2.1
-The panel has **Map Style** at the top and **Map Features** under it. On a phone the panel scrolls if it's taller than the space above Ride Mode's or Map Mode's bottom panel.
+Tap it to open **Map Settings** (below). Swipe the sheet down, tap the map, or tap **X** to close it.
 
-In Ride Mode the leader and the ride's organizers also see **Leader Trackline** between the two, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
+In Ride Mode the leader and the ride's organizers also see **Leader Trackline** in Map Settings, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
 :::
 
 :::release 2.1

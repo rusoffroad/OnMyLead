@@ -261,6 +261,14 @@ export function MapboxMap({
       onTouchStart={(e) => {
         downAt.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY };
       }}
+      onTouchCancel={() => {
+        // The map's own pan took the touch over: that is a drag (a tap ends, it isn't cancelled).
+        if (downAt.current) movedAt.current = Date.now();
+        downAt.current = null;
+      }}
+      onTouchEnd={() => {
+        downAt.current = null;
+      }}
       onTouchMove={(e) => {
         // Past a finger's wobble (10 points), so a tap that shifts a little stays a tap.
         const d = downAt.current;
