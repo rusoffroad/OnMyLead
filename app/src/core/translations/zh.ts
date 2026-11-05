@@ -1,6 +1,17 @@
 // Chinese (Simplified). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Shows on the group page, in everyone’s group list and on the invite link.": "显示在群组页面、每个人的群组列表和邀请链接上。",
+  "Group photo changed.": "已更换群组照片。",
+  "Group photo saved. Everyone in the group sees it.": "已保存群组照片。群组里的每个人都能看到。",
+  "Remove the Group Photo?": "移除群组照片？",
+  "The group shows its initials instead.": "群组将改为显示名称缩写。",
+  "Group photo removed.": "已移除群组照片。",
+  "Group Photo": "群组照片",
+  "Add a photo of the crew. It shows on the group page, in everyone’s group list and on the invite link.": "添加一张车队合影。它会显示在群组页面、每个人的群组列表和邀请链接上。",
+  "Anyone with the group link can see it. Keep it friendly: the OnMyLead team removes photos that break the rules.": "任何拥有群组链接的人都能看到。请保持友善：OnMyLead 团队会移除违反规则的照片。",
+  "{name} group photo": "{name} 群组照片",
+  "See the {name} group photo": "查看 {name} 群组照片",
   "Reply": "回复",
   "Unlike comment": "取消点赞评论",
   "Like comment": "点赞评论",

@@ -1,6 +1,17 @@
 // Korean. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Shows on the group page, in everyone’s group list and on the invite link.": "그룹 페이지, 모두의 그룹 목록, 초대 링크에 표시돼요.",
+  "Group photo changed.": "그룹 사진을 변경했어요.",
+  "Group photo saved. Everyone in the group sees it.": "그룹 사진을 저장했어요. 그룹의 모두가 볼 수 있어요.",
+  "Remove the Group Photo?": "그룹 사진을 삭제할까요?",
+  "The group shows its initials instead.": "대신 그룹 이니셜이 표시돼요.",
+  "Group photo removed.": "그룹 사진을 삭제했어요.",
+  "Group Photo": "그룹 사진",
+  "Add a photo of the crew. It shows on the group page, in everyone’s group list and on the invite link.": "크루 사진을 추가하세요. 그룹 페이지, 모두의 그룹 목록, 초대 링크에 표시돼요.",
+  "Anyone with the group link can see it. Keep it friendly: the OnMyLead team removes photos that break the rules.": "그룹 링크가 있는 누구나 볼 수 있어요. 규칙을 어기는 사진은 OnMyLead 팀이 삭제해요.",
+  "{name} group photo": "{name} 그룹 사진",
+  "See the {name} group photo": "{name} 그룹 사진 보기",
   "Reply": "답글",
   "Unlike comment": "댓글 좋아요 취소",
   "Like comment": "댓글 좋아요",

@@ -1,6 +1,17 @@
 // Spanish. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Shows on the group page, in everyone’s group list and on the invite link.": "Aparece en la página del grupo, en la lista de grupos de todos y en el enlace de invitación.",
+  "Group photo changed.": "Foto del grupo cambiada.",
+  "Group photo saved. Everyone in the group sees it.": "Foto del grupo guardada. Todos en el grupo la ven.",
+  "Remove the Group Photo?": "¿Quitar la foto del grupo?",
+  "The group shows its initials instead.": "El grupo muestra sus iniciales en su lugar.",
+  "Group photo removed.": "Foto del grupo quitada.",
+  "Group Photo": "Foto del grupo",
+  "Add a photo of the crew. It shows on the group page, in everyone’s group list and on the invite link.": "Añade una foto del equipo. Aparece en la página del grupo, en la lista de grupos de todos y en el enlace de invitación.",
+  "Anyone with the group link can see it. Keep it friendly: the OnMyLead team removes photos that break the rules.": "Cualquiera con el enlace del grupo puede verla. Que sea amistosa: el equipo de OnMyLead quita las fotos que incumplen las normas.",
+  "{name} group photo": "Foto del grupo {name}",
+  "See the {name} group photo": "Ver la foto del grupo {name}",
   "Reply": "Responder",
   "Unlike comment": "Quitar me gusta del comentario",
   "Like comment": "Me gusta el comentario",

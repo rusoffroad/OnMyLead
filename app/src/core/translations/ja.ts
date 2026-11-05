@@ -1,6 +1,17 @@
 // Japanese. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Shows on the group page, in everyone’s group list and on the invite link.": "グループページ、全員のグループ一覧、招待リンクに表示されます。",
+  "Group photo changed.": "グループ写真を変更しました。",
+  "Group photo saved. Everyone in the group sees it.": "グループ写真を保存しました。グループの全員に表示されます。",
+  "Remove the Group Photo?": "グループ写真を削除しますか？",
+  "The group shows its initials instead.": "代わりにグループのイニシャルが表示されます。",
+  "Group photo removed.": "グループ写真を削除しました。",
+  "Group Photo": "グループ写真",
+  "Add a photo of the crew. It shows on the group page, in everyone’s group list and on the invite link.": "仲間の写真を追加しましょう。グループページ、全員のグループ一覧、招待リンクに表示されます。",
+  "Anyone with the group link can see it. Keep it friendly: the OnMyLead team removes photos that break the rules.": "グループリンクを持っている人なら誰でも見られます。ルールに反する写真は OnMyLead チームが削除します。",
+  "{name} group photo": "{name} のグループ写真",
+  "See the {name} group photo": "{name} のグループ写真を見る",
   "Reply": "返信",
   "Unlike comment": "コメントのいいねを取り消す",
   "Like comment": "コメントにいいね",

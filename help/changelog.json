@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["riding-groups"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "group-photos",
+    "why": "New in 2.1: the rider who made a riding group can add, change or remove a group photo. The guide says where it shows (group page, Riding Groups, the Your Group card on Home, Invite a Group and the group link), how to add it on each device, and who can see it."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["ride-mode", "fuel-range"],
     "kind": "update",
     "by": "pr",
