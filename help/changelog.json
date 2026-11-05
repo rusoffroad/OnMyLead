@@ -2,6 +2,16 @@
   {
     "date": "2026-11-05",
     "slugs": [
+      "whats-new-in-2-0"
+    ],
+    "kind": "review",
+    "by": "audit",
+    "ref": "help-audit-2026-11-05",
+    "why": "Checked against help/release-notes.json: since this guide was written, the notes only added the 2.0 store release dates and the upcoming 2.1 notes. Nothing about 2.0 changed for riders."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
       "leader-trackline",
       "3d-terrain",
       "approvals-and-waitlist",
