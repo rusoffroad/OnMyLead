@@ -46,25 +46,27 @@ Satellite, topo and the trails layer are Pro features. See [Free and Pro](/help/
 
 ## Open the Layers
 
+:::until 2.1
 The layers button is the round button with a stacked layers icon in the top-right corner of the map. You'll find it on:
+:::
+
+:::release 2.1
+The round **Map Settings** button (a two-slider icon) is in the top-right corner of the map. You'll find it on:
+:::
 
 - Ride Mode's map
 - A ride's waypoints map
 - The route builder
 - The area picker for offline maps
 
-:::until 2.0
-Tap it to open the **Map** panel. Tap it again to close the panel.
-:::
-
-:::release 2.0
+:::until 2.1
 Tap it to open the **Map Style** panel. Tap it again to close the panel.
 :::
 
 :::release 2.1
-The panel has **Map Style** at the top and **Map Features** under it. On a phone the panel scrolls if it's taller than the space above Ride Mode's or Map Mode's bottom panel.
+Tap it to open **Map Settings** (below). Swipe the sheet down, tap the map, or tap **X** to close it.
 
-In Ride Mode the leader and the ride's organizers also see **Leader Trackline** between the two, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
+In Ride Mode the leader and the ride's organizers also see **Leader Trackline** in Map Settings, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
 :::
 
 :::release 2.1
@@ -85,9 +87,9 @@ From 2.1 the stacked-layers button is the round **Map Settings** button, with a 
 - **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Safety Orange** (an orange 3D dome with a white arrow and a silver rim, the default), **Hi-Viz Dome** (lime with a black arrow), **Reflective Ring**, **Floating Arrowhead** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on the **You** tab.
 - **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the map slides along with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
 - **Map Buttons** (Ride Mode and Map Mode): **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available).
-
-These are the same switches as on the **You** tab, so a change shows everywhere.
 - **Download This Ride's Map** (Ride Mode), **Offline Maps**, and who the map data comes from.
+
+The Your Dot, Following and Map Buttons settings are the same ones as on the **You** tab, so a change shows everywhere.
 
 The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
 

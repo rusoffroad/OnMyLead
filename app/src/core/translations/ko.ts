@@ -3303,6 +3303,9 @@ const dict: Record<string, string> = {
   "Floating Arrowhead": "떠 있는 화살촉",
   "Safety Orange": "안전 주황",
   "Classic": "클래식",
+  "Right-drag or Ctrl-drag to tilt and turn.": "오른쪽 버튼이나 Ctrl을 누른 채 드래그하면 기울이고 돌릴 수 있어요.",
+  "Drag up or down with two fingers to tilt, twist to turn.": "두 손가락으로 위아래로 드래그하면 기울고, 비틀면 돌아가요.",
+  "More statuses": "상태 더 보기",
 };
 
 export default dict;

@@ -1,6 +1,79 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["tilt-and-crash-alert"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-84-86",
+    "why": "2.1 test passes 84-86: on iPhone and iPad the Crash Alert countdown's 30 seconds now start once it is on screen (it can wait a moment for an open sheet to step aside), so a rider gets the whole window to tap I'm OK; the guide says so. Sheets no longer turn a landscape iPhone back to portrait."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["tilt-and-crash-alert"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-81-83",
+    "why": "2.1 test passes 81-83: an open sheet now steps aside (hidden, not closed) while the Crash Alert countdown is up, on every device, so nothing can cover I'm OK and the sheet comes back afterwards; the guide now says so."
+  },
+  {"date": "2026-11-05", "slugs": ["approvals-and-waitlist", "badges-and-ranks", "bluetooth-sharing", "carplay", "directions", "emergency-and-safety", "faq", "follow-me", "fuel-range", "invite-riders", "music-controls", "navigation-mode", "profile-picture", "qr-codes", "report-and-block", "ride-chat", "ride-mode", "social", "subscribe-to-pro", "tilt-and-crash-alert"], "kind": "fix", "by": "pr", "ref": "release-test-pass-80", "why": "2.1 test pass 80: on iPhone and iPad an open sheet or pop-up (Status, Music, Rider List, messages and the rest) could keep the Crash Alert countdown from showing; every sheet now steps aside so the countdown fills the screen. Map Mode starts the compass right after Allow. The Ride Mode and Navigate guides and the 2.1 release notes no longer call your dot cyan (it's Safety Orange unless you pick another Dot Style), and Follow Me says which maps show a round centre with no compass. Other guides only re-dated: their screens' sheets changed underneath, nothing riders do changed."},
+  {
+    "date": "2026-11-05",
+    "slugs": ["tilt-and-crash-alert", "map-layers", "follow-me"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-79",
+    "why": "2.1 test pass 79: on iPhone and iPad the Crash Alert countdown couldn't show while Map Settings was open (two sheets can't be up at once); Map Settings now closes so the countdown fills the screen. Pausing Follow Me also stops a camera move that was still on its way. Map Layers' Map Settings list no longer breaks in two."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["ride-mode", "navigation-mode", "leader-sweep-and-tail-gunner", "full-map", "follow-me"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-78",
+    "why": "2.1 test pass 78: guides that still said \"layers button\" now name the round Map Settings button for 2.1 (the old wording stays until 2.1 is out), the leader turns the trackline off in Map Settings, and Follow Me says Zoom In at Intersections can be turned off in Map Settings too."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["follow-me", "privacy", "ride-bubble", "waypoints-and-planned-stops"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-57-77",
+    "why": "2.1 test passes 57-77: your dot takes its stopped look as soon as the phone reports you've stopped, or after a quiet spell with no new location (about 8 seconds; in Ride Mode on Android's basic map about 25 seconds with Balanced and 37 with Max Battery Saver, so it never flips between updates), the same on every map (apps with or without Mapbox, and both website maps); the compass starts right after Allow even while the app is already checking; and a meeting-point pin on the website lands at its newest spot when the map finishes loading. Follow Me's Your Dot section now says when the stopped look starts."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["privacy", "status-buttons", "follow-me"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-56",
+    "why": "2.1 test pass 56: the quick status buttons in Ride Mode now show and read out in the rider's language, your dot goes back to its stopped look after you stop (timing in the passes 57+ entry), and map pins skip spots that aren't real coordinates. No steps changed."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["accurate-location", "battery-saver", "create-a-ride", "location-sharing", "map-layers", "park-trails", "ride-mode", "troubleshooting"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-2.1-create-ride-crash",
+    "why": "2.1 test build: opening Create a Ride crashed on iPhone when the phone sent a location update with no position yet. Every map now skips spots that aren't real coordinates. Closed park trails draw dashed on Android too. Allowing location starts the compass right away. Riders see no other change in these articles."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["3d-terrain", "create-a-ride", "edit-cancel-or-delete-a-ride", "find-a-ride", "follow-me", "free-vs-pro", "full-map", "getting-started", "home-screen", "import-gpx", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "leader-trackline", "map-layers", "navigation-mode", "notifications-inbox", "offline-maps", "park-trails", "ride-name-and-profile", "ride-summary-and-ride-again", "route-builder", "trip-planner", "use-onmylead-on-a-tablet"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-50",
+    "why": "2.1 release test, passes 49 and 50. Steps that said to tap the layers button now say Map Settings (and Fine-Tune for the Park Trails row). Dragging the map always pauses Follow Me, your dot shows no arrow on a stopped device with no compass reading, Zoom Out at the Edge stays off on every map once turned off, and the Map Settings button's dot shows only after a real change; other listed articles describe the same screens and read the same."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["follow-me"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-49",
+    "why": "2.1 release test, pass 49. Your dot shows no arrow when a stopped device has no compass reading; dragging the map now always pauses Follow Me; Zoom Out at the Edge stays off on every map once turned off; the Map Settings button's dot only shows after a real change."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": [
       "map-layers",
       "sync-across-devices"

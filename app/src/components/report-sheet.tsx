@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
@@ -15,6 +15,7 @@ import { sendReport } from '@/lib/pro';
 import { reportContent } from '@/lib/social';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 // source: where the report was sent from, so the Admin Dashboard can say (2.0).
 type Target =
   | { kind: 'ride'; rideId: string; name: string; source?: ReportSource }
@@ -84,7 +85,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
 
   const reasons = target ? REPORT_REASONS[target.kind] : [];
   return (
-    <Modal visible={!!target} transparent animationType="slide" onRequestClose={close} statusBarTranslucent>
+    <SheetModal visible={!!target} transparent animationType="slide" onRequestClose={close} statusBarTranslucent>
       <SheetRoot>
       <Pressable style={styles.scrim} onPress={close} accessibilityLabel={t('Close')} accessibilityRole="button" />
       {target ? (
@@ -141,7 +142,7 @@ export function ReportSheet({ target, onClose }: { target: Target | null; onClos
         </KeyboardLift>
       ) : null}
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

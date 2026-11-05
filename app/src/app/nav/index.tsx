@@ -25,6 +25,7 @@ import { FollowMeButton } from '@/components/follow-me-button';
 import { FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
 import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
+import { compassAllowed } from '@/lib/compass';
 import {
   acceptFix, canRate, clock, coveredM, EMPTY_DETAILS, feet, feetOrMiles, followProgress, newTrailId, RIDER_TRAIL_INK, toLatLngs, toTrackPoint,
   DEFAULT_TRAIL_RULES, trackStats, unseenHidden, type LocalTrail, type PublicTrail, type TrailRules,
@@ -147,6 +148,7 @@ export default function NavMode() {
   const [speed, setSpeed] = useState<number | null>(null);
   // Which way the rider is moving, for the arrow on their own dot on the website's map.
   const [meHeading, setMeHeading] = useState<number | null>(null);
+  const [meFixAt, setMeFixAt] = useState<number | null>(null);
   const [altitude, setAltitude] = useState<number | null>(null);
   const [noLocation, setNoLocation] = useState(false);
   const fixListener = useRef<(l: Location.LocationObject) => void>(() => {});
@@ -185,7 +187,14 @@ export default function NavMode() {
           tripSaved.current = t.distanceM;
         })
         .catch(() => {});
-      foregroundPermission({ get: () => Location.getForegroundPermissionsAsync(), request: () => Location.requestForegroundPermissionsAsync() })
+      foregroundPermission({
+        get: () => Location.getForegroundPermissionsAsync(),
+        // Allowed just now: the compass starts at once for the dot's arrow (lib/compass).
+        request: () => Location.requestForegroundPermissionsAsync().then((p) => {
+          if (p.status === 'granted') compassAllowed();
+          return p;
+        }),
+      })
         .then(async (p) => {
           if (gone) return;
           if (p.status !== 'granted') return setNoLocation(true);
@@ -213,6 +222,7 @@ export default function NavMode() {
             setMe({ lat: l.coords.latitude, lng: l.coords.longitude });
             setSpeed(l.coords.speed != null && l.coords.speed >= 0 ? l.coords.speed : null);
             setMeHeading(riderHeading({ speedMps: l.coords.speed, headingDeg: l.coords.heading }, true));
+            setMeFixAt(l.timestamp);
             setAltitude(l.coords.altitude ?? null);
             const t = addTripFix(tripRef.current, { lat: l.coords.latitude, lng: l.coords.longitude, accuracy: l.coords.accuracy ?? null, speedMps: l.coords.speed, timestamp: l.timestamp });
             if (t !== tripRef.current) {
@@ -561,6 +571,7 @@ export default function NavMode() {
         padding={panelPad}
         followMe={camOn ? me : null}
         meHeading={meHeading}
+        meFixAt={meFixAt}
         onUserMove={() => camEvent('pan')}
         waypoints={shownWaypoints}
         onPressWaypoint={openWaypoint}

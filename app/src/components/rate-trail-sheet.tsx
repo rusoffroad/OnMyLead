@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
@@ -12,6 +12,7 @@ import { ACCURACY_WORDS, feetOrMiles, QUALITY_WORDS, RIDER_TRAIL_INK, type Publi
 import { rateTrail } from '@/lib/nav-trails';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 const GOLD = '#F5C451';
 
 /**
@@ -60,7 +61,7 @@ export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
   }
 
   return (
-    <Modal visible={!!trail} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <SheetModal visible={!!trail} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
         <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={t('Close')} accessibilityRole="button" />
         {trail ? (
@@ -103,7 +104,7 @@ export function RateTrailSheet({ trail, ridden, onClose, onRated }: {
           </KeyboardLift>
         ) : null}
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

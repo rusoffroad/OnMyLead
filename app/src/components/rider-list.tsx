@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { badgeTitle } from '@/core/badges';
@@ -11,6 +11,7 @@ import { Icon } from './icon';
 import { RiderDot } from './rider-dot';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 const ROLE_NAME = { leader: 'Leader', sweep: 'Tail Gunner', rider: null } as const;
 const ORDER = { live: 0, delayed: 1, lost: 2 } as const;
 
@@ -34,7 +35,7 @@ export function RiderList({
   footer?: ReactNode;
 }) {
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <SheetModal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <SheetRoot>
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={t('Close Riders')} />
       <SwipeSheet onClose={onClose} style={styles.sheet} accessibilityViewIsModal>
@@ -54,7 +55,7 @@ export function RiderList({
         </SheetScroll>
       </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

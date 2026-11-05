@@ -4,10 +4,11 @@ import { Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
-import { COUNTDOWN_S, secondsLeft, type CrashCause } from '@/core/crash-detect';
+import { COUNTDOWN_S, countdownStart, secondsLeft, type CrashCause } from '@/core/crash-detect';
 import { speak, stopSpeaking } from '@/lib/voice';
 
 import { t } from '@/lib/i18n';
+import { useUrgentModal } from '@/lib/urgent-modal';
 /**
  * The Crash Alert countdown: full screen and loud, so a rider who is fine can stop it with one tap
  * and a rider who isn't gets help without doing anything. At zero it calls `onSend` once.
@@ -23,8 +24,18 @@ export function CrashCountdown({
   onTurnOff?: () => void;
 }) {
   const [now, setNow] = useState(() => Date.now());
+  // Shows once any open sheet (Map Settings) has closed for it: iPhone and iPad can't show two at once.
+  const ready = useUrgentModal();
+  const [mountedAt] = useState(() => Date.now());
+  const [shownAt, setShownAt] = useState<number | null>(null);
+  useEffect(() => {
+    if (!ready) return;
+    const id = setTimeout(() => setShownAt((s) => s ?? Date.now()), 0);
+    return () => clearTimeout(id);
+  }, [ready]);
   const sent = useRef(false);
-  const left = secondsLeft(startedAt, now);
+  // The clock waits (briefly) while the countdown is still hidden, so the rider gets the full window.
+  const left = secondsLeft(countdownStart(startedAt, mountedAt, shownAt, now), now);
 
   useEffect(() => {
     speak('Crash detected. Tap I’m OK, or your group gets an emergency alert.');
@@ -51,7 +62,7 @@ export function CrashCountdown({
 
   const progress = 1 - left / COUNTDOWN_S;
   return (
-    <Modal visible animationType="fade" transparent={false} onRequestClose={onOk} supportedOrientations={['portrait', 'landscape']}>
+    <Modal visible={ready} animationType="fade" transparent={false} onRequestClose={onOk} supportedOrientations={['portrait', 'landscape']}>
       <SafeAreaView style={styles.page}>
         <View style={styles.top} accessibilityLiveRegion="assertive">
           <Text style={styles.title} accessibilityRole="header">{cause === 'rollover' ? t('Rollover Detected') : t('Crash Detected')}</Text>

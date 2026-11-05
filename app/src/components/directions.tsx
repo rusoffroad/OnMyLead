@@ -1,4 +1,4 @@
-import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetRoot, SwipeSheet } from '@/components/swipe-sheet';
@@ -11,6 +11,7 @@ import { MAPS_APPS_TEXT, openDirections, openIn, useMapsPreference, useWebDirect
 import { ProTag } from './pro-tag';
 
 import { t as tr } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 /**
  * Places to get turn-by-turn directions to, one row each. A tap opens the rider's maps app, or asks
  * Apple Maps or Google Maps first when they haven't picked one in Profile.
@@ -67,7 +68,7 @@ export function DirectionsSheet({ visible, rows, onClose }: { visible: boolean; 
     setTimeout(() => openDirections(t), Platform.OS === 'ios' ? 400 : 0);
   };
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <SheetModal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
       <SwipeSheet onClose={onClose} style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, Spacing.three) + Spacing.two }]} accessibilityViewIsModal>
@@ -85,7 +86,7 @@ export function DirectionsSheet({ visible, rows, onClose }: { visible: boolean; 
         <Button title={tr('Close')} kind="ghost" onPress={onClose} />
       </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 
@@ -94,7 +95,7 @@ export function DirectionsHost() {
   const [target, close] = useWebDirectionsPrompt();
   if (Platform.OS !== 'web') return null;
   return (
-    <Modal visible={!!target} transparent animationType="fade" onRequestClose={close}>
+    <SheetModal visible={!!target} transparent animationType="fade" onRequestClose={close}>
       <SheetRoot>
       <Pressable style={styles.scrim} onPress={close} accessibilityLabel={tr('Close')} accessibilityRole="button" />
       {target ? (
@@ -118,7 +119,7 @@ export function DirectionsHost() {
         </SwipeSheet>
       ) : null}
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

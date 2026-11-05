@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import type { ReactNode } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
@@ -10,6 +10,7 @@ import { Icon, type IconName } from './icon';
 import { SheetRoot, SwipeSheet } from './swipe-sheet';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 /** A light tap you can feel, so a rider wearing gloves knows a button took. */
 export function tapFeel() {
   if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
@@ -124,7 +125,7 @@ export function StatusSheet({
   };
   const tone = (k: RiderStatusKind) => (k === 'mechanical' ? 'amber' : k === 'need_help' ? 'red' : undefined);
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <SheetModal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <SheetRoot style={[styles.wrap, tablet && styles.wrapTablet]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityLabel={t('Close')} accessibilityRole="button" />
         <SwipeSheet
@@ -171,7 +172,7 @@ export function StatusSheet({
           </ScrollView>
         </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 
@@ -189,13 +190,13 @@ export function QuickRow({ lastReply, onReply, onMore }: { lastReply: string | n
   return (
     <View style={styles.row}>
       {PANEL_REPLIES.map((q) => (
-        <QuickTile key={q} icon={REPLY_ICON[q]} label={q} on={lastReply === q} onPress={() => onReply(q)} a11y={t('Send to the group: {q}', { q })} style={styles.quarter} />
+        <QuickTile key={q} icon={REPLY_ICON[q]} label={t(q)} on={lastReply === q} onPress={() => onReply(q)} a11y={t('Send to the group: {q}', { q: t(q) })} style={styles.quarter} />
       ))}
       <QuickTile
         icon="more"
         label={t('More')}
         onPress={onMore}
-        a11y="More statuses"
+        a11y={t('More statuses')}
         style={styles.quarter}
       />
     </View>

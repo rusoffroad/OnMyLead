@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  COUNTDOWN_HIDDEN_MAX_MS,
   COUNTDOWN_S,
+  countdownStart,
   INITIAL_CRASH,
   REARM_MS,
   crashMessage,
@@ -137,6 +139,19 @@ describe('countdown and settings', () => {
     expect(secondsLeft(0, 400)).toBe(30);
     expect(secondsLeft(0, 1000)).toBe(29);
     expect(secondsLeft(0, 31_000)).toBe(0);
+  });
+
+  it('holds the clock while the countdown waits hidden, but never long enough to stop the alert', () => {
+    // Shown at once: the clock starts at the alarm.
+    expect(countdownStart(1000, 1200, 1200, 5000)).toBe(1000);
+    // Still hidden 900 ms after mounting: the clock waits with it.
+    expect(countdownStart(1000, 1200, null, 2100)).toBe(1900);
+    // Shown 1.5 s after mounting: the rider still gets the whole window.
+    expect(countdownStart(1000, 1200, 2700, 9000)).toBe(2500);
+    expect(secondsLeft(countdownStart(1000, 1200, 2700, 2700), 2700)).toBe(COUNTDOWN_S);
+    // Never shown: the wait is capped, so the alert still sends.
+    expect(countdownStart(1000, 1200, null, 60_000)).toBe(1000 + COUNTDOWN_HIDDEN_MAX_MS);
+    expect(secondsLeft(countdownStart(1000, 1200, null, 60_000), 60_000)).toBe(0);
   });
 
   it('names the cause in the group message', () => {

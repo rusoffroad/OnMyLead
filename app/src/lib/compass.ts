@@ -12,13 +12,38 @@ let current: number | null = null;
 const listeners = new Set<(deg: number | null) => void>();
 let sub: { remove: () => void } | null = null;
 let starting = false;
+// Asked to start while a look was under way: look again once it ends ('now' when location was
+// just allowed, so the look happens at once; 'soon' waits for a retry already set).
+let again: false | 'soon' | 'now' = false;
+let retry: ReturnType<typeof setTimeout> | null = null;
+let retryMs = 5000;
 
 function start() {
-  if (Platform.OS === 'web' || sub || starting) return;
+  if (Platform.OS === 'web' || sub) return;
+  // A look is already under way: look again when it ends, in case it gives up (no maps were
+  // left, or location wasn't allowed yet) while a map is waiting now.
+  if (starting) {
+    again ||= 'soon';
+    return;
+  }
   starting = true;
   Location.getForegroundPermissionsAsync()
     .then((p) => {
-      if (p.status !== 'granted' || !listeners.size) return null;
+      if (!listeners.size) return null;
+      if (p.status !== 'granted') {
+        // A map can open before the rider answers the location prompt: look again shortly
+        // (not when the answer was a lasting no; the next map that opens asks again).
+        if (!p.canAskAgain) return null;
+        // Each look waits a little longer, up to 30 s.
+        if (!retry) {
+          retry = setTimeout(() => {
+            retry = null;
+            if (listeners.size) start();
+          }, retryMs);
+          retryMs = Math.min(30_000, retryMs + 5000);
+        }
+        return null;
+      }
       return Location.watchHeadingAsync((h) => {
         const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading;
         if (!(deg >= 0)) return;
@@ -29,18 +54,38 @@ function start() {
     })
     .then((s) => {
       if (!s) return;
+      retryMs = 5000;
       if (listeners.size) sub = s;
       else s.remove();
     })
     .catch(() => {})
     .finally(() => {
       starting = false;
+      const next = again;
+      again = false;
+      if (next === 'now' && retry) {
+        clearTimeout(retry);
+        retry = null;
+      }
+      if (next && !retry && listeners.size && !sub) start();
     });
+}
+
+/** Location was just allowed: start the compass now for any map waiting on it. */
+export function compassAllowed() {
+  if (!listeners.size || sub) return;
+  if (retry) clearTimeout(retry);
+  retry = null;
+  if (starting) again = 'now';
+  else start();
 }
 
 function stop() {
   sub?.remove();
   sub = null;
+  if (retry) clearTimeout(retry);
+  retry = null;
+  retryMs = 5000;
 }
 
 /** The compass heading while the calling component is on screen, or null when there is none. */
@@ -55,4 +100,22 @@ export function useCompass(): number | null {
     };
   }, []);
   return deg;
+}
+
+/**
+ * Whether the compass has given a reading while the calling component is on screen. Changes only
+ * once, so a component that needs just this doesn't redraw on every turn.
+ */
+export function useHasCompass(): boolean {
+  const [has, setHas] = useState(current != null);
+  useEffect(() => {
+    const l = (deg: number | null) => setHas(deg != null);
+    listeners.add(l);
+    start();
+    return () => {
+      listeners.delete(l);
+      if (!listeners.size) stop();
+    };
+  }, []);
+  return has;
 }

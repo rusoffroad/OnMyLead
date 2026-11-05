@@ -3303,6 +3303,9 @@ const dict: Record<string, string> = {
   "Floating Arrowhead": "Freccia Fluttuante",
   "Safety Orange": "Arancione Sicurezza",
   "Classic": "Classico",
+  "Right-drag or Ctrl-drag to tilt and turn.": "Trascina con il tasto destro o con Ctrl per inclinare e ruotare.",
+  "Drag up or down with two fingers to tilt, twist to turn.": "Trascina su o giù con due dita per inclinare, ruota per girare.",
+  "More statuses": "Altri stati",
 };
 
 export default dict;

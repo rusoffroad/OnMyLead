@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { ActivityIndicator, Modal, Platform, Pressable, Switch, Text, View } from 'react-native';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, Ellipse, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
@@ -17,7 +17,7 @@ import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInf
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { can, type FeatureKey } from '@/core/entitlements';
-import { currentEntitlements, requirePro } from '@/lib/pro';
+import { currentEntitlements, PRO_PROMPT_WAITS_FOR_DISMISS, requirePro, useCan } from '@/lib/pro';
 import { RateTrailSheet } from './rate-trail-sheet';
 import { RigFitLine, TrailWidthRow } from './trail-width-row';
 import { inches } from '@/core/trail-width';
@@ -41,6 +41,7 @@ import { musicAvailable } from '@/lib/music';
 import { setTiltShown, useTiltSettings } from '@/lib/tilt';
 
 import { t as tr } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
 
@@ -77,6 +78,7 @@ export function TrailMapOverlay({
   trackline?: TracklineSwitch;
 }) {
   const [open, setOpen] = useState(false);
+  const closeSheet = useCallback(() => setOpen(false), []);
   const [rating, setRating] = useState<PublicTrail | null>(null);
   const osmOn = (['highways', 'roads', 'dirtRoads', 'offroad', 'hiking', 'closed'] as MapFeatureId[]).some((id) => trail.features[id]);
   const credit = [
@@ -87,7 +89,9 @@ export function TrailMapOverlay({
     .filter(Boolean)
     .join(', ');
   // A small dot on the Map Settings button says the map isn't showing the standard set.
-  const changed = trail.base !== 'satellite' || featuresChanged(trail.features);
+  // A Free rider's map shows only the free features (the rest read as off), so only those count.
+  const layersPro = useCan('map_layers');
+  const changed = trail.base !== 'satellite' || featuresChanged(trail.features, layersPro ? undefined : FREE_FEATURES);
 
   return (
     <>
@@ -115,7 +119,7 @@ export function TrailMapOverlay({
       {bare ? null : (
         <MapSettingsSheet
           visible={open}
-          onClose={() => setOpen(false)}
+          onClose={closeSheet}
           trail={trail}
           route={route}
           ride={ride}
@@ -168,6 +172,14 @@ export function TrailMapOverlay({
   );
 }
 
+const FREE_FEATURES: MapFeatureId[] = ['riderTrails', 'parkTrails'];
+
+/**
+ * The Pro check for controls inside Map Settings. The sheet is a Modal, and iPhone won't show the
+ * Pro prompt (another Modal) over it, so a Free rider's tap closes the sheet and then opens the prompt.
+ */
+const SheetPro = createContext<(feature: FeatureKey) => boolean>(requirePro);
+
 /**
  * Map Settings (2.1): everything about the map in one sheet, opened from the Map Settings button. The map
  * style as three pictures (Satellite, Topo, 3D Terrain), four big switches for what riders think in
@@ -176,12 +188,6 @@ export function TrailMapOverlay({
  * the map. It slides up from the bottom on a phone and docks on the right of a tablet in landscape,
  * with a light dim so the map shows each change as it's made.
  */
-/**
- * The Pro check for controls inside Map Settings. The sheet is a Modal, and iPhone won't show the
- * Pro prompt (another Modal) over it, so a Free rider's tap closes the sheet and then opens the prompt.
- */
-const SheetPro = createContext<(feature: FeatureKey) => boolean>(requirePro);
-
 function MapSettingsSheet({
   visible, onClose, trail, route, ride, lookupHint, credit, trackline, controls,
 }: {
@@ -201,16 +207,33 @@ function MapSettingsSheet({
   // A tablet in landscape (or a wide window) keeps the map in view: the sheet docks on the right.
   const side = layout.wide && layout.landscape;
   const bases: BaseMap[] = trail.terrainAvailable ? ['satellite', 'topo', 'terrain'] : ['satellite', 'topo'];
+  const pendingPro = useRef<FeatureKey | null>(null);
+  const proLater = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  // Leaving the screen drops a Pro prompt still waiting, so it can't pop up somewhere else.
+  useEffect(() => () => clearTimeout(proLater.current), []);
   const pro = useCallback((feature: FeatureKey) => {
     if (can(currentEntitlements(), feature)) return true;
     onClose();
-    // After the sheet's own close animation, so the prompt has the screen to itself.
-    setTimeout(() => requirePro(feature), 450);
+    if (PRO_PROMPT_WAITS_FOR_DISMISS) {
+      pendingPro.current = feature;
+      // In case the close never reports back (onDismiss), ask just after it would have finished.
+      clearTimeout(proLater.current);
+      proLater.current = setTimeout(() => {
+        if (pendingPro.current !== feature) return;
+        pendingPro.current = null;
+        requirePro(feature);
+      }, 1500);
+    } else requirePro(feature);
     return false;
   }, [onClose]);
+  const dismissed = () => {
+    const feature = pendingPro.current;
+    pendingPro.current = null;
+    if (feature) requirePro(feature);
+  };
   return (
     <SheetPro.Provider value={pro}>
-    <Modal visible={visible} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} statusBarTranslucent>
+    <SheetModal visible={visible} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} onDismiss={dismissed} statusBarTranslucent>
       <SheetRoot style={[styles.sheetRoot, side && styles.sheetRootSide]}>
         <Pressable style={styles.sheetScrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
         <SwipeSheet
@@ -245,7 +268,7 @@ function MapSettingsSheet({
               {trail.base === 'terrain' ? (
                 <Text style={styles.fine}>
                   {trail.terrain3d
-                    ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.' })
+                    ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? tr('Right-drag or Ctrl-drag to tilt and turn.') : tr('Drag up or down with two fingers to tilt, twist to turn.') })
                     : tr('No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.')}
                 </Text>
               ) : null}
@@ -302,7 +325,7 @@ function MapSettingsSheet({
           </SheetScroll>
         </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
     </SheetPro.Provider>
   );
 }
@@ -312,7 +335,7 @@ function StyleTile({ base, on, onPress }: { base: BaseMap; on: boolean; onPress:
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityState={{ selected: on }}
+      accessibilityState={{ checked: on }}
       accessibilityLabel={tr(BASE_NAME[base])}
       onPress={onPress}
       style={({ pressed }) => [styles.styleTile, on && styles.styleTileOn, pressed && { transform: [{ scale: 0.97 }] }]}>
@@ -810,7 +833,7 @@ function RideMapDownload({ ride, route, terrain }: { ride: { id: string; name: s
           <Text style={styles.saveText}>{tr('Download This Ride’s Map')}</Text>
           <ProTag feature="offline_maps" />
         </View>
-        <Text style={styles.saveSub}>{`${terrain ? tr('Satellite, Topo, Trails and 3D Terrain') : tr('Satellite, Topo and Trails')}, About ${formatBytes(estimate)}`}</Text>
+        <Text style={styles.saveSub}>{`${terrain ? tr('Satellite, Topo, Trails and 3D Terrain') : tr('Satellite, Topo and Trails')}, ${tr('About {v}', { v: formatBytes(estimate) })}`}</Text>
       </Pressable>
     );
   }

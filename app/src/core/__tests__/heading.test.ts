@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { heldHeading, HELD_HEADING_MS, ownArrow, ownFix, riderHeading, screenAngle } from '../heading';
+import { fixTimeMs, heldHeading, HELD_HEADING_MS, OWN_MOVE_START, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownFixMoving, ownMoveStep, ownStopWaitMs, riderHeading, screenAngle } from '../heading';
+import { BATTERY_PLANS } from '../battery';
 
 describe('riderHeading', () => {
   it('uses the GPS course while a live rider is moving', () => {
@@ -68,5 +69,58 @@ describe("other riders' arrows stay on after they stop", () => {
     expect(heldHeading(h, { speedMps: 0, headingDeg: -1 }, true, 60_000)).toBe(h);
     expect(heldHeading(h, { speedMps: 0, headingDeg: -1 }, true, HELD_HEADING_MS + 1)).toBeNull();
     expect(heldHeading(h, { speedMps: 10, headingDeg: 90 }, false, 1)).toBeNull();
+  });
+});
+
+describe('ownFix time', () => {
+  it('keeps the fix\'s own time when the map gives one', () => {
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: 1234 })?.atMs).toBe(1234);
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0 })?.atMs).toBeUndefined();
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: Number.NaN })?.atMs).toBeUndefined();
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: 0 })?.atMs).toBeUndefined();
+  });
+});
+
+describe('own dot moving or stopped', () => {
+  it('a moving fix means moving; a stopped fix means stopped at once', () => {
+    const s = ownMoveStep(OWN_MOVE_START, true, 1000);
+    expect(s.moving).toBe(true);
+    expect(ownMoveStep(s, false, 2000).moving).toBe(false);
+  });
+  it('waits 2.5 map update intervals with no new fix, never under 8 s', () => {
+    expect(ownStopWaitMs()).toBe(OWN_STOPPED_AFTER_MS);
+    expect(ownStopWaitMs(1000)).toBe(8000);
+    expect(ownStopWaitMs(BATTERY_PLANS.balanced.fixEveryMs)).toBe(25_000);
+    expect(ownStopWaitMs(BATTERY_PLANS.saver.fixEveryMs)).toBe(37_500);
+    expect(ownStopWaitMs(Number.NaN)).toBe(8000);
+    expect(ownStopWaitMs(10 * 60_000)).toBe(75_000);
+  });
+  it('ignores a repeated fix (only the compass turned)', () => {
+    const s = ownMoveStep(OWN_MOVE_START, true, 1000);
+    expect(ownMoveStep(s, true, 1000)).toBe(s);
+    expect(ownMoveStep(s, false, 1000)).toBe(s);
+  });
+  it('a timeless fix in between does not hide a repeat of the last timed fix', () => {
+    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 5), true, null);
+    expect(ownMoveStep(s, true, 5)).toBe(s);
+  });
+  it('a fix with no time, or a time of 0, is never taken for a repeat', () => {
+    const s = ownMoveStep(OWN_MOVE_START, true, null);
+    expect(ownMoveStep(s, false, null).moving).toBe(false);
+    const z = ownMoveStep(OWN_MOVE_START, true, 0);
+    expect(ownMoveStep(z, false, 0).moving).toBe(false);
+    expect(fixTimeMs(0)).toBeNull();
+    expect(fixTimeMs(-1)).toBeNull();
+    expect(fixTimeMs(Number.NaN)).toBeNull();
+    expect(fixTimeMs(12)).toBe(12);
+  });
+  it('an earlier fix time (a phone clock jump) still counts, so the dot never freezes', () => {
+    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 9_000_000), false, 1000);
+    expect(s.moving).toBe(false);
+  });
+  it('moving means faster than a walk with a real course', () => {
+    expect(ownFixMoving({ speedMps: 8, headingDeg: 90 })).toBe(true);
+    expect(ownFixMoving({ speedMps: 0.5, headingDeg: 90 })).toBe(false);
+    expect(ownFixMoving({ speedMps: 8, headingDeg: -1 })).toBe(false);
   });
 });

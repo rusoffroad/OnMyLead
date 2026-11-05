@@ -3,6 +3,7 @@ import { Marker, type UserLocationChangeEvent } from 'react-native-maps';
 
 import { ownFix, screenAngle, type OwnFix } from '@/core/heading';
 import { useCompass } from '@/lib/compass';
+import { useOwnMoving } from '@/hooks/use-own-moving';
 import { MarkerBody } from './marker-body';
 import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
 import { ownDotBox } from '@/core/own-dot-art';
@@ -52,19 +53,21 @@ export function useOwnLocation(onFix?: (f: OwnFix) => void): OwnLocation {
  * arrow built in as on the Mapbox maps, drawn over the dot the phone draws itself. The arrow always
  * shows: the GPS direction while moving, the compass when stopped, else the last direction.
  */
-export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHeading?: number | null }) {
+export function OwnHeadingMarker({ own, mapHeading, everyMs }: { own: OwnLocation; mapHeading?: number | null; /** The map's own update interval (ms), if it sets one. */ everyMs?: number }) {
   const [fix, setFix] = useState<OwnFix | null>(own.last.current);
   const [lastCourse, setLastCourse] = useState<number | null>(null);
+  const [moving, feed] = useOwnMoving(everyMs);
   useEffect(() => own.subscribe((f) => {
     setFix(f);
+    feed(f.headingDeg != null, f.atMs);
     if (f.headingDeg != null) setLastCourse(f.headingDeg);
-  }), [own]);
+  }), [own, feed]);
   const compass = useCompass();
   const d = useOwnDotD();
   const [style] = useDotStylePref();
   if (!fix) return null;
-  const moving = fix.headingDeg != null;
-  const deg = fix.headingDeg ?? (compass != null && compass >= 0 ? compass : lastCourse);
+  // The GPS direction only while you count as moving; stopped, the compass (or the last direction).
+  const deg = (moving ? fix.headingDeg : null) ?? (compass != null && compass >= 0 ? compass : lastCourse);
   const box = ownDotBox(d);
   return (
     <Marker

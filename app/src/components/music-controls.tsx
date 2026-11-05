@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
@@ -12,6 +12,7 @@ import { ProTag } from '@/components/pro-tag';
 import { askMusicAccess, canOpenSpotify, musicCommand, openSpotify, readMusic, setMusicVolume, SystemVolumeSlider } from '@/lib/music';
 
 import { t as tr } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 const glass = GlassSurface;
 
 /** The music note drawn for the Music button (filled heads read at a glance on a bumpy mount). */
@@ -130,7 +131,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
   const showSpotify = spotify && Platform.OS === 'ios' && (!v || v.mode === 'volume_only' || !v.playing);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={close}>
+    <SheetModal visible={visible} animationType="slide" transparent onRequestClose={close}>
       <SheetRoot style={[styles.wrap, tablet && styles.wrapTablet]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel={tr('Close Music Controls')} />
         <SwipeSheet onClose={close} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
@@ -225,7 +226,7 @@ export function MusicSheet({ visible, tablet, onClose }: { visible: boolean; tab
           </SheetScroll>
         </SwipeSheet>
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

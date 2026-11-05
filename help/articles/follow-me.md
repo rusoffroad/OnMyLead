@@ -8,6 +8,7 @@ updated: 2026-11-05
 sources:
   - app/src/core/follow-camera.ts
   - app/src/core/heading.ts
+  - app/src/hooks/use-own-moving.ts
   - app/src/hooks/use-follow-me.ts
   - app/src/components/follow-me-button.tsx
   - app/src/components/own-heading.tsx
@@ -49,11 +50,11 @@ Tapping **Center on Me**, or picking Follow Me back up after a pause, starts fre
 
 While the map is following you and you're moving, it zooms in as you come up on a junction of roads or trails, about 9 seconds before you reach it, so you can see the turn up close. Once you're through, it zooms back out to where it was. It works with any road, track or trail drawn on the map, including on a downloaded map with no signal.
 
-**Zoom In at Intersections** is on until you turn it off in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
+**Zoom In at Intersections** is on until you turn it off, either in [Map Settings](/help/map-layers) under **Following** or in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
 
 ## Your Dot
 
-Your own dot is a cyan disc with a white arrow built into it and a soft beam ahead of it. The arrow always shows which way you're facing: the direction you're riding while you move, and your phone's compass when you're stopped, so it turns as you turn. The beam is long while you ride and shorter when you stop. It stays true when you turn the map.
+Your own dot has an arrow built into it and a soft beam ahead of it (Safety Orange unless you pick another **Dot Style** in [Map Settings](/help/map-layers)). The arrow always shows which way you're facing: the direction you're riding while you move, and your phone's compass when you're stopped, so it turns as you turn. The beam is long while you ride and shorter when you stop. The dot takes its stopped look as soon as your phone reports you've stopped, or after a short while with no new location (about 8 seconds; in Ride Mode on Android phones and tablets using the basic map instead of Mapbox, about 25 seconds with Balanced and about 37 seconds with Max Battery Saver, which update less often). It stays true when you turn the map. On the Mapbox map in the iPhone, iPad and Android apps, if your device has no compass reading while you're stopped, the dot shows a round centre with no arrow instead of guessing a direction; the basic map and the website keep pointing the last way you were heading.
 :::
 
 ## The Follow Me Button

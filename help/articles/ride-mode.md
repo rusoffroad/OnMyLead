@@ -106,7 +106,7 @@ When a rider is moving, a small white arrow on the edge of their dot points the 
 :::release 2.1
 From 2.1 every live rider is a glossy disc with a white rim and a white arrow built into it, pointing the way they're heading. The leader is the biggest dot, in blue with a blue name tag; the tail gunner is the next biggest, in violet with a violet name tag; everyone else is graphite with a dark name tag. A rider keeps their arrow, pointing the last way they were heading, while they're stopped and still live. A rider whose position is only last seen is a hollow ring with no arrow, as before.
 
-Your own dot is cyan, with a soft beam ahead of it. Its arrow always shows which way you're facing: the way you're riding while you move, and your phone's compass when you stop.
+Your own dot is Safety Orange unless you pick another Dot Style in [Map Settings](/help/map-layers), with a soft beam ahead of it. Its arrow always shows which way you're facing: the way you're riding while you move, and your phone's compass when you stop.
 :::
 
 :::release 2.0
@@ -119,7 +119,13 @@ A blue line follows behind the leader, showing exactly where they rode. When the
 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
 
+:::until 2.1
 To switch map layers or download the ride's map for riding with no signal, use the layers button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
+:::
+
+:::release 2.1
+To switch map layers or download the ride's map for riding with no signal, use the round **Map Settings** button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
+:::
 
 :::release 1.0.2
 ### Center the Map on You

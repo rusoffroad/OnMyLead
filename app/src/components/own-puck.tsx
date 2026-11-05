@@ -1,8 +1,9 @@
-import { useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { ownArrow, riderHeading, screenAngle } from '@/core/heading';
+import { ownArrow, ownFixMoving, riderHeading, screenAngle } from '@/core/heading';
 import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
+import { useOwnMoving } from '@/hooks/use-own-moving';
 import { useCompass } from '@/lib/compass';
 import { OwnDot } from './own-dot';
 import { useGlide } from './use-glide';
@@ -10,7 +11,7 @@ import { useGlide } from './use-glide';
 import { t } from '@/lib/i18n';
 
 
-export type OwnPuckFix = { lat: number; lng: number; course: number | null; speed: number | null; lastCourse?: number | null };
+export type OwnPuckFix = { lat: number; lng: number; course: number | null; speed: number | null; lastCourse?: number | null; /** The fix's own time (ms), when known. */ at?: number };
 
 /**
  * The newest fix of the phone's own dot and the map's turn, kept outside React state so a moving
@@ -73,7 +74,12 @@ function OwnPuckAt({ fix, mapHeading, Marker }: { fix: OwnPuckFix; mapHeading: n
   const compass = useCompass();
   const d = useOwnDotD();
   const [style] = useDotStylePref();
-  const arrow = ownArrow({ speedMps: fix.speed, headingDeg: fix.course }, compass, fix.lastCourse);
+  // Moving or stopped by the shared rule (no new moving fix for a while means stopped).
+  const [moving, feed] = useOwnMoving();
+  useEffect(() => {
+    feed(ownFixMoving({ speedMps: fix.speed, headingDeg: fix.course }), fix.at);
+  }, [fix, feed]);
+  const arrow = ownArrow(moving ? { speedMps: fix.speed, headingDeg: fix.course } : null, compass, fix.lastCourse);
   return (
     <Marker at={at}>
       <View accessible accessibilityLabel={t('You are here')}>

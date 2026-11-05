@@ -3,7 +3,7 @@ import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, use
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
-import type { LatLng } from '@/core/geo';
+import { isLatLng, type LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
 import { JUNCTION_QUERY_FILTER, junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
@@ -20,9 +20,11 @@ import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
-import { riderHeading } from '@/core/heading';
+import { ownFixMoving } from '@/core/heading';
+import { useHasCompass } from '@/lib/compass';
 import { dotScale } from '@/core/dot-size';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
+import { useOwnMoving } from '@/hooks/use-own-moving';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -53,6 +55,11 @@ const PUCK_IMAGES = {
   'oml-you-orange-stopped': require('../../assets/images/puck/you-orange-stopped.png'),
   'oml-you-classic-moving': require('../../assets/images/puck/you-classic-moving.png'),
   'oml-you-classic-stopped': require('../../assets/images/puck/you-classic-stopped.png'),
+  'oml-you-dome-still': require('../../assets/images/puck/you-dome-still.png'),
+  'oml-you-ring-still': require('../../assets/images/puck/you-ring-still.png'),
+  'oml-you-arrow-still': require('../../assets/images/puck/you-arrow-still.png'),
+  'oml-you-orange-still': require('../../assets/images/puck/you-orange-still.png'),
+  'oml-you-classic-still': require('../../assets/images/puck/you-classic-still.png'),
   'oml-puck-clear': require('../../assets/images/puck/clear.png'),
 };
 
@@ -108,12 +115,17 @@ export function MapboxMap({
   const heading = useRef(0);
   // Until when the camera is moving because the app moved it.
   const autoUntil = useRef(0);
+  // When a finger last moved on the map: a drag then counts as the rider's even while Follow Me
+  // is still panning (Follow Me keeps the window above open on every fix). A tap (no move)
+  // doesn't count, so tapping a trail mid-pan leaves Follow Me on.
+  const movedAt = useRef(0);
+  const downAt = useRef<{ x: number; y: number } | null>(null);
   const autoMove = (ms: number) => {
     autoUntil.current = Math.max(autoUntil.current, Date.now() + ms + 200);
   };
   // Tells your own dot whether you're moving; the dot keeps that state itself, so a change
   // re-draws only the dot, not the whole map.
-  const puckMoving = useRef<((moving: boolean) => void) | null>(null);
+  const puckMoving = useRef<((moving: boolean, fixAtMs?: number) => void) | null>(null);
   // How much the terrain is raised, following the tilt (only while 3D Terrain is shown).
   const [exaggeration, setExaggeration] = useState(TERRAIN_EXAGGERATION);
   const ownFix = useRef(onOwnFix);
@@ -132,6 +144,7 @@ export function MapboxMap({
 
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {
+      if (!isLatLng(p)) return;
       const far = zoom.current < FAR_OUT_ZOOM;
       autoMove(opts?.animated === false ? 0 : opts?.duration ?? 450);
       camera.current?.setCamera({
@@ -143,7 +156,7 @@ export function MapboxMap({
       });
     },
     fit(points, inset, animated = true) {
-      const c = fitCorners(points);
+      const c = fitCorners(points.filter(isLatLng));
       if (!c) return;
       autoMove(animated ? 600 : 0);
       camera.current?.fitBounds(c[0], c[1], [inset.top, inset.right, inset.bottom, inset.left], animated ? 600 : 0);
@@ -218,7 +231,7 @@ export function MapboxMap({
     if (shown === 'terrain') setExaggeration(Math.round(terrainExaggeration(p.pitch ?? 0) * 10) / 10);
     // Only the rider's own drag, pinch or turn counts; the app's own camera moves (Follow Me, a fit)
     // can report a gesture on some phones, which paused Follow Me after its first move.
-    if (s.gestures?.isGestureActive && Date.now() > autoUntil.current) onUserMove?.();
+    if (s.gestures?.isGestureActive && (Date.now() - movedAt.current < 1000 || Date.now() > autoUntil.current)) onUserMove?.();
   }, [onCamera, onUserMove, shown, trail]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
@@ -247,6 +260,22 @@ export function MapboxMap({
   return (
     <View
       style={StyleSheet.absoluteFill}
+      onTouchStart={(e) => {
+        downAt.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY };
+      }}
+      onTouchCancel={() => {
+        // The map's own pan took the touch over: that is a drag (a tap ends, it isn't cancelled).
+        if (downAt.current) movedAt.current = Date.now();
+        downAt.current = null;
+      }}
+      onTouchEnd={() => {
+        downAt.current = null;
+      }}
+      onTouchMove={(e) => {
+        // Past a finger's wobble (10 points), so a tap that shifts a little stays a tap.
+        const d = downAt.current;
+        if (!d || Math.hypot(e.nativeEvent.pageX - d.x, e.nativeEvent.pageY - d.y) >= 10) movedAt.current = Date.now();
+      }}
       onLayout={(e) => {
         size.current = { width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height };
         trail.mapProps.onLayout(e);
@@ -274,8 +303,8 @@ export function MapboxMap({
         <Mapbox.Camera
           ref={camera}
           defaultSettings={{
-            centerCoordinate: initial ? [initial.center.lng, initial.center.lat] : [-105.8, 39.5],
-            zoomLevel: initial?.zoom ?? (initial ? RIDE_ZOOM : 4),
+            centerCoordinate: initial && isLatLng(initial.center) ? [initial.center.lng, initial.center.lat] : [-105.8, 39.5],
+            zoomLevel: initial && isLatLng(initial.center) ? initial.zoom ?? RIDE_ZOOM : 4,
             pitch: lookPitch(shown),
           }}
         />
@@ -301,9 +330,12 @@ export function MapboxMap({
           <Line key={l.id} line={l} />
         ))}
         <Mapbox.UserLocation visible={false} minDisplacement={1} onUpdate={(loc) => {
-          const c = loc.coords;
+          const c = loc?.coords;
+          // iPhone can send an update before it has a position (only a heading): skip it, since
+          // the map library throws on a spot that isn't numbers.
+          if (!c || !isLatLng({ lat: c.latitude, lng: c.longitude })) return;
           const f = { lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null };
-          puckMoving.current?.(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null);
+          puckMoving.current?.(ownFixMoving({ speedMps: f.speed, headingDeg: f.course }), loc.timestamp);
           ownFix.current?.(f);
         }} />
         {children}
@@ -315,28 +347,33 @@ export function MapboxMap({
 
 /**
  * Your own dot (the Chevron Puck, drawn as images): Mapbox moves and turns it itself, in step with
- * the map. Its arrow follows the GPS course while you move and the compass while you're stopped.
+ * the map. Its arrow follows the GPS course while you move and the compass while you're stopped;
+ * a stopped phone with no compass reading (some tablets) shows a round centre with no arrow.
  */
-const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.MutableRefObject<((moving: boolean) => void) | null> }) {
-  const [moving, setMoving] = useState(false);
+const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.MutableRefObject<((moving: boolean, fixAtMs?: number) => void) | null> }) {
+  // Moving or stopped by the shared rule (hooks/use-own-moving): no new moving fix for a while
+  // means stopped, since location updates stop once the phone stands still.
+  const [moving, feed] = useOwnMoving();
   // The images are drawn at Medium; Mapbox scales them for the rider's Dot Size.
   const [size] = useDotSizePref();
   const [style] = useDotStylePref();
+  const hasCompass = useHasCompass();
+  const kind = moving ? 'moving' : hasCompass ? 'stopped' : 'still';
   useEffect(() => {
-    feedRef.current = setMoving;
+    feedRef.current = feed;
     return () => {
       feedRef.current = null;
     };
-  }, [feedRef]);
+  }, [feedRef, feed]);
   return (
     <>
       <Mapbox.Images images={PUCK_IMAGES} />
       <Mapbox.LocationPuck
-        puckBearingEnabled
+        puckBearingEnabled={kind !== 'still'}
         puckBearing={moving ? 'course' : 'heading'}
         topImage="oml-puck-clear"
         shadowImage="oml-puck-clear"
-        bearingImage={`oml-you-${style}-${moving ? 'moving' : 'stopped'}`}
+        bearingImage={`oml-you-${style}-${kind}`}
         pulsing={{ isEnabled: false }}
         scale={dotScale(size)}
       />
@@ -457,9 +494,16 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
       </Mapbox.ShapeSource>
       <Mapbox.ShapeSource id="oml-park-trails" shape={parkLines}>
         <Mapbox.LineLayer id="oml-park-trails-case" style={{ lineColor: TRAIL_INK.casing, lineWidth: ['case', ['get', 'road'], 5.2, 7], lineJoin: 'round' }} />
+        {/* Two layers, not a dash expression: Android's Mapbox doesn't take a data-driven dash. */}
         <Mapbox.LineLayer
           id="oml-park-trails-line"
-          style={{ lineColor: ['get', 'color'], lineWidth: ['case', ['get', 'road'], 2.4, 4], lineJoin: 'round', lineCap: 'round', lineDasharray: ['case', ['get', 'closed'], ['literal', CLOSED_DASH], ['literal', [1, 0]]] }}
+          filter={['!', ['to-boolean', ['get', 'closed']]]}
+          style={{ lineColor: ['get', 'color'], lineWidth: ['case', ['get', 'road'], 2.4, 4], lineJoin: 'round', lineCap: 'round' }}
+        />
+        <Mapbox.LineLayer
+          id="oml-park-trails-closed"
+          filter={['to-boolean', ['get', 'closed']]}
+          style={{ lineColor: ['get', 'color'], lineWidth: ['case', ['get', 'road'], 2.4, 4], lineJoin: 'round', lineCap: 'butt', lineDasharray: CLOSED_DASH }}
         />
       </Mapbox.ShapeSource>
       <Mapbox.ShapeSource id="oml-park-names" shape={parkNames}>
@@ -509,6 +553,8 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
 export function MapboxMarker({
   id, at, anchor = { x: 0.5, y: 0.5 }, draggable, onDragEnd, children,
 }: { id?: string; at: LatLng; anchor?: { x: number; y: number }; draggable?: boolean; onDragEnd?: (p: LatLng) => void; children: ReactNode }) {
+  // A pin without a real spot draws nothing rather than crash the map library.
+  if (!isLatLng(at)) return null;
   if (draggable) {
     return (
       <Mapbox.PointAnnotation
@@ -518,7 +564,8 @@ export function MapboxMarker({
         draggable
         onDragEnd={(e) => {
           const c = e.geometry.coordinates;
-          onDragEnd?.({ lat: c[1], lng: c[0] });
+          const p = { lat: c[1], lng: c[0] };
+          if (isLatLng(p)) onDragEnd?.(p);
         }}>
         <View>{children}</View>
       </Mapbox.PointAnnotation>

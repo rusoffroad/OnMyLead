@@ -54,8 +54,13 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
   const busy = useRef(false);
   const busySince = useRef(0);
   const lookedAt = useRef(0);
+  // Each step's number: a step that hung and was overtaken mustn't move the camera or free the lock.
+  const stepGen = useRef(0);
 
   const start = useCallback((p: LatLng, inset: Inset, animated = true) => {
+    // A step still waiting on the map mustn't move the camera after this.
+    stepGen.current++;
+    busy.current = false;
     frame.current = FOLLOW_FRAME_START;
     junction.current = JUNCTION_ZOOM_START;
     lookedAt.current = 0;
@@ -63,6 +68,9 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
   }, [map]);
 
   const stop = useCallback(() => {
+    // A step still waiting on the map (up to about a second) mustn't move the camera once paused.
+    stepGen.current++;
+    busy.current = false;
     frame.current = FOLLOW_FRAME_START;
     junction.current = JUNCTION_ZOOM_START;
   }, []);
@@ -75,6 +83,7 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
     if (!m || (busy.current && Date.now() - busySince.current < STEP_STUCK_MS)) return false;
     busy.current = true;
     busySince.current = Date.now();
+    const gen = ++stepGen.current;
     try {
       const cam = m.camera();
       const size = { width: cam.width, height: cam.height };
@@ -89,6 +98,7 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
           lookedAt.current = Date.now();
           const radius = Math.min(700, JUNCTION_AHEAD_M / Math.max(0.05, metersPerPointAt(f.lat, cam.zoom)));
           ahead = nextJunction(f, heading, await within(m.roadsNear(f, radius), MAP_CALL_MS, []));
+          if (gen !== stepGen.current) return false;
         }
         const r = junctionZoomStep(j, { on: on.current, nowMs: Date.now(), zoom: cam.zoom, at: f, speedMps: f.speed ?? null, junction: ahead });
         junction.current = r.next;
@@ -99,8 +109,10 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       }
 
       // Keep the dot on screen: zoom out once, then move the map.
+      const pt = await within(m.project(f), MAP_CALL_MS, null);
+      if (gen !== stepGen.current) return false;
       const move = followMove(frame.current, {
-        pt: await within(m.project(f), MAP_CALL_MS, null), size, inset, zoom: cam.zoom, screenHeadingDeg: screenHeading,
+        pt, size, inset, zoom: cam.zoom, screenHeadingDeg: screenHeading,
         noZoomOut: junction.current.state === 'in' || !edge.current,
       });
       frame.current = followFrameAfter(frame.current, move);
@@ -108,7 +120,7 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       else if (move.kind === 'pan') m.centerOn(f, move.inset, { duration: durationMs });
       return true;
     } finally {
-      busy.current = false;
+      if (gen === stepGen.current) busy.current = false;
     }
   }, [map]);
 

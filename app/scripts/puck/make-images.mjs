@@ -15,9 +15,10 @@ const browser = await chromium.launch();
 for (const scale of [1, 2, 3]) {
   const page = await browser.newPage({ deviceScaleFactor: scale });
   for (const style of DOT_STYLES) {
-    for (const kind of ['moving', 'stopped']) {
+    for (const kind of ['moving', 'stopped', 'still']) {
       // Drawn pointing up: Mapbox turns the whole image to the course (moving) or compass (stopped).
-      await page.setContent(`<html><body style="margin:0;background:transparent">${ownDotSvg(style, D, 0, kind === 'moving')}</body></html>`);
+      // 'still' has no arrow or beam, for a stopped phone with no compass reading.
+      await page.setContent(`<html><body style="margin:0;background:transparent">${ownDotSvg(style, D, kind === 'still' ? null : 0, kind === 'moving')}</body></html>`);
       const png = await page.locator('svg').screenshot({ omitBackground: true });
       writeFileSync(`assets/images/puck/you-${style}-${kind}${scale === 1 ? '' : `@${scale}x`}.png`, png);
     }

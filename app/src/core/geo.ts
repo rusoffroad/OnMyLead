@@ -5,6 +5,16 @@ export type LatLng = { lat: number; lng: number };
 const EARTH_RADIUS_M = 6_371_008.8;
 export const METERS_PER_MILE = 1609.344;
 
+/**
+ * Whether a spot is a real place: finite numbers within the globe. Every map checks this before
+ * handing a spot to the map library, which throws (and crashes the app) on anything else, such as
+ * a location update that carries only a compass heading.
+ */
+export function isLatLng(p: { lat?: unknown; lng?: unknown } | null | undefined): p is LatLng {
+  return !!p && typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng)
+    && Math.abs(p.lat) <= 90 && Math.abs(p.lng) <= 180;
+}
+
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 const toDeg = (rad: number) => (rad * 180) / Math.PI;
 

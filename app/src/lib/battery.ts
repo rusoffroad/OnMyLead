@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
 import { BATTERY_PLANS, DEFAULT_BATTERY_MODE, parseBatteryMode, type BatteryMode, type BatteryPlan } from '@/core/battery';
 
@@ -7,6 +8,9 @@ import { BATTERY_PLANS, DEFAULT_BATTERY_MODE, parseBatteryMode, type BatteryMode
  * This phone's Battery Saver choice (core/battery.ts). Kept on the phone, not the account: it is
  * about this phone's battery, and the background location task must read it with no service.
  */
+
+/** Whether the map's own location updates follow the plan's fix rate: Android only (iPhone and iPad deliver as the GPS reports). */
+export const MAP_FIXES_FOLLOW_PLAN = Platform.OS === 'android';
 
 const KEY = 'battery.mode.v1';
 let mode: BatteryMode = DEFAULT_BATTERY_MODE;

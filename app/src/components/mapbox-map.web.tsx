@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
-import type { LatLng } from '@/core/geo';
+import { isLatLng, type LatLng } from '@/core/geo';
 import { JUNCTION_QUERY_FILTER, junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
@@ -254,7 +254,7 @@ export function MapboxMap({
         const watch = navigator.geolocation.watchPosition(
           (p) => {
             const f = { lat: p.coords.latitude, lng: p.coords.longitude, course: p.coords.heading, speed: p.coords.speed };
-            own.setFix(f);
+            own.setFix({ ...f, at: p.timestamp });
             cb.current.onOwnFix?.(f);
           },
           () => {},
@@ -299,7 +299,7 @@ export function MapboxMap({
 
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {
-      if (!map) return;
+      if (!map || !isLatLng(p)) return;
       const { clientWidth: width, clientHeight: height } = map.getContainer();
       const pad = cameraPadding(inset ?? { top: 0, right: 0, bottom: 0, left: 0 }, { width, height });
       map.easeTo({
@@ -310,7 +310,7 @@ export function MapboxMap({
       });
     },
     fit(points, inset, animated = true) {
-      const c = fitCorners(points);
+      const c = fitCorners(points.filter(isLatLng));
       if (!c || !map) return;
       map.fitBounds([c[1], c[0]], { padding: inset, duration: animated ? 600 : 0, pitch: map.getPitch() });
     },
@@ -457,18 +457,23 @@ export function MapboxMarker({
   const holder = useMemo(() => (typeof document === 'undefined' ? null : document.createElement('div')), []);
   const marker = useRef<MapboxMarker_ | null>(null);
   const drop = useRef(onDragEnd);
+  // Made once the pin has a real spot (the map library throws on anything else).
+  const real = isLatLng(at);
+  // The newest spot, so a pin that moved while the map library was loading is made where it is now.
+  const latest = useRef(at);
   useEffect(() => {
     drop.current = onDragEnd;
   }, [onDragEnd]);
   useEffect(() => {
-    if (!map || !holder) return;
+    if (!map || !holder || !real) return;
     let gone = false;
     loadGl().then((gl) => {
       if (gone) return;
       holder.style.transform = '';
-      const mk = new gl.Marker({ element: holder, anchor: 'top-left', offset: [0, 0], draggable: !!draggable }).setLngLat([at.lng, at.lat]).addTo(map);
+      const mk = new gl.Marker({ element: holder, anchor: 'top-left', offset: [0, 0], draggable: !!draggable }).setLngLat([latest.current.lng, latest.current.lat]).addTo(map);
       mk.on('dragend', () => {
         const p = mk.getLngLat();
+        latest.current = { lat: p.lat, lng: p.lng };
         drop.current?.({ lat: p.lat, lng: p.lng });
       });
       marker.current = mk;
@@ -479,10 +484,12 @@ export function MapboxMarker({
       marker.current = null;
     };
     // Made once per map; the position is moved below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, holder, draggable]);
+  }, [map, holder, draggable, real]);
   useEffect(() => {
+    if (!isLatLng(at)) return;
+    latest.current = at;
     marker.current?.setLngLat([at.lng, at.lat]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [at.lat, at.lng]);
   if (!holder) return null;
   return createPortal(
