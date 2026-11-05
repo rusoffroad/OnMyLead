@@ -38,7 +38,7 @@ import { PARK_TRAILS_KEY, RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useFollowMePref } from '@/hooks/use-follow-me';
 import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
-import { DotSizeChoice } from '@/components/trail-map-overlay';
+import { DotSizeChoice, DotStyleChoice } from '@/components/trail-map-overlay';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { signOut, useSession } from '@/lib/session';
@@ -241,6 +241,9 @@ export default function You() {
             />
           }
         />
+        <MenuRow icon="locate" color={Colors.sky} title={t('Dot Style')} detail={t('How your own dot looks on the map.')}>
+          <DotStyleChoice />
+        </MenuRow>
         <MenuRow icon="locate" color={Colors.sky} title={t('Dot Size')} detail={t('How big your own dot is on the map.')} right={<DotSizeChoice />} />
         <MenuRow
           icon="locate"

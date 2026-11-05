@@ -82,7 +82,7 @@ From 2.1 the stacked-layers button is the round **Map Settings** button, with a 
   A switch is on while any of its lines shows. Tapping it turns them all off, or all on.
 - **Every Map Feature**: tap **Fine-Tune** to open the full list below, one row per kind of line or land.
 - **Leader Trackline**: for the leader and organizers in Ride Mode.
-- **Your Dot** (Ride Mode and Map Mode): **Dot Size** sets how big your own dot is: **Small**, **Medium** or **Large**.
+- **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Hi-Viz Dome** (a lime 3D dome with a black arrow, the default), **Reflective Ring**, **Floating Arrowhead**, **Safety Orange** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on the **You** tab.
 - **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the map slides along with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
 - **Map Buttons** (Ride Mode and Map Mode): **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available).
 
@@ -91,7 +91,7 @@ These are the same switches as on the **You** tab, so a change shows everywhere.
 
 The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
 
-From 2.1 your own dot is half again as big at **Medium**, so it's easy to spot on a mount. Pick **Large** under **Dot Size** for a bigger one.
+From 2.1 your own dot is a high-viz 3D dome, half again as big as before at **Medium**, so it's easy to spot on a mount. Other riders' dots keep their colors (the leader blue, the tail gunner violet), so yours is the one lime dot on the map.
 :::
 
 Your choices are remembered on your phone and used on every map in the app.

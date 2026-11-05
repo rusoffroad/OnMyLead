@@ -30,8 +30,10 @@ import { useLayout } from '@/hooks/use-layout';
 import { withAlpha } from '@/core/color';
 import { useFollowMePref } from '@/hooks/use-follow-me';
 import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
-import { useDotSizePref } from '@/hooks/use-dot-size';
+import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
 import { DOT_SIZE_NAME, DOT_SIZES } from '@/core/dot-size';
+import { DOT_STYLE_INK, DOT_STYLE_NAME, DOT_STYLES } from '@/core/own-dot-art';
+import { DotSample } from './own-dot';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { useMusicControlsSetting } from '@/hooks/use-music-controls';
 import { useFlag } from '@/lib/app-settings';
@@ -442,11 +444,12 @@ function MapButtons({ trail }: { trail: TrailMap }) {
   );
 }
 
-/** Your Dot: Small, Medium or Large, the same choice on every live map and the You tab. */
+/** Your Dot: its look and its size, the same choice on every live map and the You tab. */
 function DotSizeRow() {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{tr('Your Dot')}</Text>
+      <DotStyleChoice />
       <View style={[styles.group2, styles.switchRow]}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.switchName}>{tr('Dot Size')}</Text>
@@ -454,6 +457,32 @@ function DotSizeRow() {
         </View>
         <DotSizeChoice />
       </View>
+    </View>
+  );
+}
+
+/** The Dot Styles as sample tiles, one tap to pick (Map Settings and the You tab). */
+export function DotStyleChoice() {
+  const [style, setStyle] = useDotStylePref();
+  return (
+    <View style={styles.dotStyles} accessibilityRole="radiogroup" accessibilityLabel={tr('Dot Style')}>
+      {DOT_STYLES.map((s) => {
+        const on = style === s;
+        return (
+          <Pressable
+            key={s}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: on }}
+            accessibilityLabel={tr(DOT_STYLE_NAME[s])}
+            onPress={() => setStyle(s)}
+            style={[styles.dotStyle, on && { borderColor: DOT_STYLE_INK[s], backgroundColor: withAlpha(DOT_STYLE_INK[s], 0.1) }]}>
+            <View style={styles.dotStyleArt}>
+              <DotSample style={s} size={40} />
+            </View>
+            <Text style={[styles.dotStyleName, on && { color: Colors.text }]} numberOfLines={2}>{tr(DOT_STYLE_NAME[s])}</Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -1007,6 +1036,10 @@ const styles = themedStyles(() => ({
   group2: { borderRadius: 18, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge, paddingHorizontal: 14 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, minHeight: 60 },
   switchRowRule: { borderTopWidth: 1, borderTopColor: Glass.edge },
+  dotStyles: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  dotStyle: { flexGrow: 1, flexBasis: 88, maxWidth: 140, alignItems: 'center', gap: 4, paddingVertical: 10, paddingHorizontal: 6, borderRadius: 16, borderWidth: 1.5, borderColor: Glass.edge, backgroundColor: Glass.tile },
+  dotStyleArt: { height: 46, justifyContent: 'center', alignItems: 'center' },
+  dotStyleName: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 12, lineHeight: 15, textAlign: 'center' },
   seg: { flexDirection: 'row', borderRadius: 999, padding: 3, backgroundColor: withAlpha(Colors.textSecondary, 0.18) },
   segItem: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 7, minHeight: 32, justifyContent: 'center' },
   segOn: { backgroundColor: Colors.sky },

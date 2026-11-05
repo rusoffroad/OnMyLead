@@ -3296,6 +3296,13 @@ const dict: Record<string, string> = {
   "Small": "小",
   "Medium": "中",
   "Large": "大",
+  "Dot Style": "圆点样式",
+  "How your own dot looks on the map.": "你自己的圆点在地图上的样子。",
+  "Hi-Viz Dome": "高亮圆顶",
+  "Reflective Ring": "反光环",
+  "Floating Arrowhead": "悬浮箭头",
+  "Safety Orange": "安全橙",
+  "Classic": "经典",
 };
 
 export default dict;

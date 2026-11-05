@@ -3296,6 +3296,13 @@ const dict: Record<string, string> = {
   "Small": "Piccolo",
   "Medium": "Medio",
   "Large": "Grande",
+  "Dot Style": "Stile del Punto",
+  "How your own dot looks on the map.": "Come appare il tuo punto sulla mappa.",
+  "Hi-Viz Dome": "Cupola Alta Visibilità",
+  "Reflective Ring": "Anello Riflettente",
+  "Floating Arrowhead": "Freccia Fluttuante",
+  "Safety Orange": "Arancione Sicurezza",
+  "Classic": "Classico",
 };
 
 export default dict;

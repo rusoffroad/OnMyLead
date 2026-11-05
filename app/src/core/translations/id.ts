@@ -3296,6 +3296,13 @@ const dict: Record<string, string> = {
   "Small": "Kecil",
   "Medium": "Sedang",
   "Large": "Besar",
+  "Dot Style": "Gaya Titik",
+  "How your own dot looks on the map.": "Tampilan titik Anda sendiri di peta.",
+  "Hi-Viz Dome": "Kubah Hi-Viz",
+  "Reflective Ring": "Cincin Reflektif",
+  "Floating Arrowhead": "Mata Panah Melayang",
+  "Safety Orange": "Oranye Keselamatan",
+  "Classic": "Klasik",
 };
 
 export default dict;

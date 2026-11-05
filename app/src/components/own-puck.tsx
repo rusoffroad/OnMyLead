@@ -2,9 +2,9 @@ import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { ownArrow, riderHeading, screenAngle } from '@/core/heading';
-import { useOwnDotD } from '@/hooks/use-dot-size';
+import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
 import { useCompass } from '@/lib/compass';
-import { RiderPuck, YOU_INK } from './rider-puck';
+import { OwnDot } from './own-dot';
 import { useGlide } from './use-glide';
 
 import { t } from '@/lib/i18n';
@@ -57,7 +57,7 @@ export function useOwnPuck(store: OwnPuckStore) {
 }
 
 /**
- * Your own dot (2.1): the cyan puck with its arrow built in and a beam ahead of it. The arrow always
+ * Your own dot (2.1) in the rider's Dot Style, with its arrow built in and a beam ahead of it. The arrow always
  * shows: the GPS course while moving, the phone's compass when stopped (core/heading ownArrow).
  * `Marker` is the map's own marker (Mapbox on the apps and the website), handed in so this file
  * doesn't depend on which map draws it.
@@ -72,11 +72,12 @@ function OwnPuckAt({ fix, mapHeading, Marker }: { fix: OwnPuckFix; mapHeading: n
   const at = useGlide(fix.lat, fix.lng);
   const compass = useCompass();
   const d = useOwnDotD();
+  const [style] = useDotStylePref();
   const arrow = ownArrow({ speedMps: fix.speed, headingDeg: fix.course }, compass, fix.lastCourse);
   return (
     <Marker at={at}>
       <View accessible accessibilityLabel={t('You are here')}>
-        <RiderPuck color={YOU_INK} d={d} beam moving={arrow.moving} angle={arrow.deg == null ? null : screenAngle(arrow.deg, mapHeading)} />
+        <OwnDot style={style} d={d} moving={arrow.moving} angle={arrow.deg == null ? null : screenAngle(arrow.deg, mapHeading)} />
       </View>
     </Marker>
   );

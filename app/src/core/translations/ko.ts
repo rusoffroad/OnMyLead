@@ -3296,6 +3296,13 @@ const dict: Record<string, string> = {
   "Small": "작게",
   "Medium": "보통",
   "Large": "크게",
+  "Dot Style": "점 스타일",
+  "How your own dot looks on the map.": "지도에서 내 점의 모양입니다.",
+  "Hi-Viz Dome": "하이비즈 돔",
+  "Reflective Ring": "반사 링",
+  "Floating Arrowhead": "떠 있는 화살촉",
+  "Safety Orange": "안전 주황",
+  "Classic": "클래식",
 };
 
 export default dict;

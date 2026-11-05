@@ -3296,6 +3296,13 @@ const dict: Record<string, string> = {
   "Small": "小",
   "Medium": "中",
   "Large": "大",
+  "Dot Style": "点のスタイル",
+  "How your own dot looks on the map.": "地図上の自分の点の見た目。",
+  "Hi-Viz Dome": "ハイビズ・ドーム",
+  "Reflective Ring": "リフレクティブ・リング",
+  "Floating Arrowhead": "フローティング矢印",
+  "Safety Orange": "セーフティオレンジ",
+  "Classic": "クラシック",
 };
 
 export default dict;

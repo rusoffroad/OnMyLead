@@ -22,7 +22,7 @@ import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 import { riderHeading } from '@/core/heading';
 import { dotScale } from '@/core/dot-size';
-import { useDotSizePref } from '@/hooks/use-dot-size';
+import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -38,13 +38,21 @@ const RIDE_ZOOM = 13.5;
 const FAR_OUT_ZOOM = 8;
 
 /**
- * Your own dot as images for Mapbox's native location puck (drawn by scripts/puck/make-images.mjs
- * from rider-puck.tsx). 2.1 first drew it as a React marker that slid in JavaScript about 30 times
+ * Your own dot in every Dot Style as images for Mapbox's native location puck (drawn by
+ * scripts/puck/make-images.mjs from core/own-dot-art). 2.1 first drew it as a React marker that slid in JavaScript about 30 times
  * a second; on a phone it trailed the map while the map moved and made the map stutter.
  */
 const PUCK_IMAGES = {
-  'oml-you-moving': require('../../assets/images/puck/you-moving.png'),
-  'oml-you-stopped': require('../../assets/images/puck/you-stopped.png'),
+  'oml-you-dome-moving': require('../../assets/images/puck/you-dome-moving.png'),
+  'oml-you-dome-stopped': require('../../assets/images/puck/you-dome-stopped.png'),
+  'oml-you-ring-moving': require('../../assets/images/puck/you-ring-moving.png'),
+  'oml-you-ring-stopped': require('../../assets/images/puck/you-ring-stopped.png'),
+  'oml-you-arrow-moving': require('../../assets/images/puck/you-arrow-moving.png'),
+  'oml-you-arrow-stopped': require('../../assets/images/puck/you-arrow-stopped.png'),
+  'oml-you-orange-moving': require('../../assets/images/puck/you-orange-moving.png'),
+  'oml-you-orange-stopped': require('../../assets/images/puck/you-orange-stopped.png'),
+  'oml-you-classic-moving': require('../../assets/images/puck/you-classic-moving.png'),
+  'oml-you-classic-stopped': require('../../assets/images/puck/you-classic-stopped.png'),
   'oml-puck-clear': require('../../assets/images/puck/clear.png'),
 };
 
@@ -313,6 +321,7 @@ const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.Mutabl
   const [moving, setMoving] = useState(false);
   // The images are drawn at Medium; Mapbox scales them for the rider's Dot Size.
   const [size] = useDotSizePref();
+  const [style] = useDotStylePref();
   useEffect(() => {
     feedRef.current = setMoving;
     return () => {
@@ -327,7 +336,7 @@ const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.Mutabl
         puckBearing={moving ? 'course' : 'heading'}
         topImage="oml-puck-clear"
         shadowImage="oml-puck-clear"
-        bearingImage={moving ? 'oml-you-moving' : 'oml-you-stopped'}
+        bearingImage={`oml-you-${style}-${moving ? 'moving' : 'stopped'}`}
         pulsing={{ isEnabled: false }}
         scale={dotScale(size)}
       />
