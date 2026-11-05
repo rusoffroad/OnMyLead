@@ -487,17 +487,17 @@ function rank(item: NearbyItem, myId: string): number {
   return 5;
 }
 
-/** A message's place in a turn's order: fixed for a given turn, different every turn (FNV-1a). */
-function turnOrder(id: string, turn: number): number {
+/** A message's fixed place in the rotation, from its id (FNV-1a), the same every round. */
+function idOrder(id: string): number {
   let h = 0x811c9dc5;
-  for (const ch of `${id}:${turn}`) h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193) >>> 0;
+  for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193) >>> 0;
   return h;
 }
 
 /**
  * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
  * message's parts go together or not at all, so a full round never ends partway through a message.
- * When messages don't all fit, `turn` (one more every ROTATE_MS) reshuffles which go first, so an older
+ * When messages don't all fit, `turn` (one more every ROTATE_MS) moves which go first, so an older
  * message gets its round instead of waiting behind the newest until it ages out.
  */
 export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn = 0): T[] {
@@ -528,13 +528,15 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   const waiting = groups.filter((g) => g !== newestOwn).map((g) => g.length);
   const reserve = waiting.length ? Math.min(...waiting) : 0;
   for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > reserve) take([i]);
-  // Then the other messages, whole, in an order that changes every turn (set by each message's id),
-  // so every message comes up near the front within a few turns, however many arrive meanwhile.
-  const rest = groups.filter((g) => g !== newestOwn)
-    .map((g) => ({ g, k: turnOrder(idOf(g), turn) }))
+  // Then the other messages, whole, in a fixed order set by each message's id (so a new message
+  // doesn't shift the others), starting one further along each turn: while the set stays the same,
+  // every message leads within as many turns as there are messages.
+  const ring = groups.filter((g) => g !== newestOwn)
+    .map((g) => ({ g, k: idOrder(idOf(g)) }))
     .sort((a, b) => a.k - b.k)
     .map((x) => x.g);
-  for (const g of rest) if (g.length <= left) take(g);
+  const start = ring.length ? turn % ring.length : 0;
+  for (const g of [...ring.slice(start), ...ring.slice(0, start)]) if (g.length <= left) take(g);
   // Then other riders' spots and receipts.
   for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) take([i]);
   return out;

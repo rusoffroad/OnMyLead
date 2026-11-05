@@ -376,8 +376,14 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   func peripheralManager(_ pm: CBPeripheralManager, central: CBCentral, didSubscribeTo ch: CBCharacteristic) {
     subscribers[central.identifier] = central
     report()
-    send(outgoing)
+    // Only the new phone gets the round at once (until iOS's queue is full; the next round brings
+    // the rest); the others carry on with theirs.
+    guard let out = outboxChar else { return }
+    for f in outgoing where f.count <= central.maximumUpdateValueLength {
+      if !pm.updateValue(f, for: out, onSubscribedCentrals: [central]) { break }
+    }
   }
+
 
   func peripheralManagerIsReady(toUpdateSubscribers pm: CBPeripheralManager) {
     drainNotify()
