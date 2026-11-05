@@ -2,11 +2,10 @@
 -- already in riders' hands keeps working.
 --
 -- 1. referral_settle: only a ride that actually went live counts as the friend's first ride.
--- 2. claim_referral_reward: a reward claimed as a Google Play offer can't also take an Apple code.
--- 3. bluetooth_relay_upload: one item with bad data skips that item instead of failing the whole
---    upload.
--- 4. badge_leaderboard: builds rows (with their badges) only for the top of the board and you.
--- 5. feed_item_thread: "replying to" names a rider only when that reply is shown to you
+-- 2. bluetooth_relay_upload: an item with a time far out of range is skipped instead of failing
+--    the whole upload.
+-- 3. badge_leaderboard: builds rows (with their badges) only for the top of the board and you.
+-- 4. feed_item_thread: "replying to" names a rider only when that reply is shown to you
 --    (not hidden, and neither of you blocked the other).
 
 create or replace function referral_settle(p_friend uuid)
@@ -32,61 +31,6 @@ begin
   perform referral_give_reward(r.friend_id, r.id, 'friend', r.referrer_id);
   perform referral_give_reward(r.referrer_id, r.id, 'referrer', r.friend_id);
   return true;
-end;
-$$;
-
-create or replace function claim_referral_reward(p_store text)
-returns jsonb language plpgsql security definer set search_path = public as $$
-declare
-  v_me uuid := auth.uid();
-  w referral_rewards;
-  v_code text;
-  v_rules jsonb := referral_rules();
-begin
-  if v_me is null then raise exception 'sign in first' using errcode = '42501'; end if;
-  if p_store not in ('apple', 'google') then raise exception 'store must be apple or google'; end if;
-  select * into w from referral_rewards where user_id = v_me for update;
-  if not found then return jsonb_build_object('error', 'no_reward'); end if;
-  if w.claimed_at is null and w.expires_at <= now() then return jsonb_build_object('error', 'expired'); end if;
-  if w.redeemed_at is not null and w.claim_kind = 'google_offer' then return jsonb_build_object('error', 'used'); end if;
-
-  -- Claimed before: hand back the same thing (the Apple code again, or the Play offer again
-  -- until the rider buys it).
-  if w.claim_kind = 'apple_code' then
-    if p_store <> 'apple' then return jsonb_build_object('error', 'claimed_on_other_store', 'store', 'apple'); end if;
-    return jsonb_build_object('kind', 'apple_code', 'code', w.apple_code,
-      'url', 'https://apps.apple.com/redeem?ctx=offercodes&id=' || (v_rules ->> 'apple_app_id') || '&code=' || w.apple_code);
-  elsif w.claim_kind = 'google_defer' then
-    return jsonb_build_object('kind', 'google_defer', 'deferred_at', w.deferred_at);
-  elsif w.claim_kind = 'google_offer' and p_store = 'apple' then
-    return jsonb_build_object('error', 'claimed_on_other_store', 'store', 'google');
-  elsif w.claim_kind = 'google_offer' and p_store = 'google' then
-    return jsonb_build_object('kind', 'google_offer', 'offer_id', v_rules ->> 'google_offer_id');
-  end if;
-
-  if p_store = 'apple' then
-    select c.code into v_code from referral_offer_codes c
-    where c.assigned_at is null and c.environment = 'Production' and c.expires_on > current_date
-    order by c.expires_on, c.added_at
-    limit 1
-    for update skip locked;
-    if v_code is null then return jsonb_build_object('error', 'no_codes'); end if;
-    update referral_offer_codes set assigned_to = v_me, assigned_at = now() where code = v_code;
-    update referral_rewards set claimed_at = now(), claim_store = 'apple', claim_kind = 'apple_code', apple_code = v_code
-    where id = w.id;
-    return jsonb_build_object('kind', 'apple_code', 'code', v_code,
-      'url', 'https://apps.apple.com/redeem?ctx=offercodes&id=' || (v_rules ->> 'apple_app_id') || '&code=' || v_code);
-  end if;
-
-  if referral_play_token(v_me) is not null then
-    -- The referral-defer Edge Function does the deferral and sets deferred_at.
-    update referral_rewards set claimed_at = coalesce(claimed_at, now()), claim_store = 'google', claim_kind = 'google_defer'
-    where id = w.id;
-    return jsonb_build_object('kind', 'google_defer', 'deferred_at', null);
-  end if;
-  update referral_rewards set claimed_at = coalesce(claimed_at, now()), claim_store = 'google', claim_kind = 'google_offer'
-  where id = w.id;
-  return jsonb_build_object('kind', 'google_offer', 'offer_id', v_rules ->> 'google_offer_id');
 end;
 $$;
 
@@ -131,11 +75,10 @@ begin
     exception when others then
       continue;
     end;
-    -- One bad item (a time out of range, a row a constraint refuses) skips only that item.
-    begin
     -- A phone uploads its own spots, taps, messages and receipts itself.
     continue when v_user is null or v_user = v_uid or v_at is null;
-    continue when to_timestamp(v_at) > now() + interval '5 minutes' or to_timestamp(v_at) < now() - interval '1 day';
+    -- Compared as seconds, so a time far out of range skips the item instead of failing the upload.
+    continue when v_at > extract(epoch from now())::bigint + 300 or v_at < extract(epoch from now())::bigint - 86400;
     continue when not is_ride_member(p_ride, v_user);
     select rider_key into v_key from ride_member_bluetooth_keys where ride_id = p_ride and user_id = v_user;
     continue when v_key is null;
@@ -221,11 +164,6 @@ begin
       get diagnostics v_n = row_count;
       v_count := v_count + v_n;
     end if;
-    -- Bad data only (a value out of range, a row a constraint or a chat limit refuses). A lock
-    -- timeout or deadlock still fails the upload, so the phone tries all of it again later.
-    exception when data_exception or integrity_constraint_violation or raise_exception then
-      raise warning 'bluetooth_relay_upload item skipped: %', sqlerrm;
-    end;
   end loop;
   return v_count;
 end $$;

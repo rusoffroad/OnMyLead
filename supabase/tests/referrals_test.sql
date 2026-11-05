@@ -275,25 +275,6 @@ do $$ begin
     raise exception 'FAIL: a ride that never went live earned a reward';
   end if;
 end $$;
--- Jo's reward, claimed as the Google Play offer, can't also take an Apple code.
-insert into referral_rewards (user_id, referral_id, role, expires_at)
-select '00000000-0000-0000-0000-000000000f07', id, 'friend', now() + interval '180 days' from referrals where friend_id = '00000000-0000-0000-0000-000000000f07';
-select as_user('00000000-0000-0000-0000-000000000f07');
-set role authenticated;
-insert into ref_out values ('jo_google', claim_referral_reward('google'));
-insert into ref_out values ('jo_apple', claim_referral_reward('apple'));
-reset role;
-do $$ begin
-  if (select v ->> 'kind' from ref_out where name = 'jo_google') <> 'google_offer' then raise exception 'FAIL: Jo''s Google claim %', (select v from ref_out where name = 'jo_google'); end if;
-  if (select v ->> 'error' from ref_out where name = 'jo_apple') is distinct from 'claimed_on_other_store'
-     or (select v ->> 'store' from ref_out where name = 'jo_apple') is distinct from 'google' then
-    raise exception 'FAIL: Apple claim after the Google offer %', (select v from ref_out where name = 'jo_apple');
-  end if;
-  if (select claim_kind from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f07') <> 'google_offer'
-     or exists (select 1 from referral_offer_codes where assigned_to = '00000000-0000-0000-0000-000000000f07') then
-    raise exception 'FAIL: the Google offer claim was overwritten by an Apple code';
-  end if;
-end $$;
 -- A lapsed Play subscription (past its stored expiry) isn't a deferral target.
 insert into play_subscriptions (purchase_token, user_id, product_id, status, environment, expires_at)
 values ('ivy-stale-token', '00000000-0000-0000-0000-000000000f06', 'com.rusoffroad.onmylead.pro.monthly', 'active', 'Production', now() - interval '1 day');

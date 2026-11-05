@@ -130,6 +130,9 @@ function schedulePush() {
 /** Swap changes with the account now. Safe to call often; does nothing when signed out. */
 export const syncSettingsNow: () => Promise<void> = singleFlight(() => run());
 
+/** ACCOUNT_KEY for a rider using settings another rider left on this device. */
+const inheritedBy = (me: string) => `inherited:${me}`;
+
 async function run() {
   if (!isBackendConfigured) return;
   const { data: auth } = await supabase.auth.getSession();
@@ -140,22 +143,18 @@ async function run() {
   // their own account's settings instead of adopting this rider's.
   if (!can(currentEntitlements(), 'sync')) {
     const lastAccount = await AsyncStorage.getItem(ACCOUNT_KEY).catch(() => null);
-    if (lastAccount !== me) {
+    if (!lastAccount) {
       // No account noted yet (a Free install from before 2.1, or a new one): these settings are
-      // this rider's, stamps and all. Only a different rider starts fresh.
-      if (lastAccount) {
-        await load();
-        stamps = {};
-        saveStamps();
-        // A different rider was here: put the synced settings back to the app's defaults, as the
-        // Pro path does, so this rider (or their Pro account later) never takes the last rider's.
-        for (const k of Object.keys(SYNCED_SETTINGS)) {
-          await writeLocal(k, null);
-          tell(k, null);
-        }
-        prefixListeners.forEach((set) => set.forEach((l) => l()));
-      }
+      // this rider's, stamps and all.
       await AsyncStorage.setItem(ACCOUNT_KEY, me).catch(() => {});
+    } else if (lastAccount !== me && lastAccount !== inheritedBy(me)) {
+      // A different rider was here. Free keeps everything on the device, so their settings stay
+      // (nothing else holds them), but they are noted as not this rider's: if this rider syncs
+      // with Pro here later, their account's settings replace them instead of taking them in.
+      await load();
+      stamps = {};
+      saveStamps();
+      await AsyncStorage.setItem(ACCOUNT_KEY, inheritedBy(me)).catch(() => {});
     }
     return;
   }

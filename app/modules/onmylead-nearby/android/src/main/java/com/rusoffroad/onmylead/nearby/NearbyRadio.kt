@@ -485,8 +485,10 @@ class NearbyRadio(
   }
 
   private fun drop(gatt: BluetoothGatt) {
-    peers.remove(gatt.device.address)
-    gatt.close()
+    // A late callback from a link already closed (Bluetooth switched off and on) must not remove
+    // the new link to the same phone.
+    if (peers[gatt.device.address]?.gatt === gatt) peers.remove(gatt.device.address)
+    try { gatt.close() } catch (_: Exception) {}
     report()
   }
 

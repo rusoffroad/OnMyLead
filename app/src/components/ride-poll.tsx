@@ -30,7 +30,7 @@ export function PollCard({
 
   return (
     <View style={{ gap: Spacing.two }} accessibilityRole="radiogroup" accessibilityLabel={`Poll: ${message.body}`}>
-      <Text style={styles.question}>{tr(message.body)}</Text>
+      <Text style={styles.question}>{message.body}</Text>
       {choices.map((label, i) => {
         const mine = tally.mine === i;
         const leading = tally.total > 0 && tally.counts[i] === lead;

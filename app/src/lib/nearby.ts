@@ -254,8 +254,6 @@ export function stopNearby() {
   if (!s) return;
   session = null;
   clearInterval(s.timer);
-  if (outTimer) clearTimeout(outTimer);
-  outTimer = null;
   recentFrames.clear();
   s.subs.forEach((x) => x.remove());
   try {
@@ -270,7 +268,7 @@ export function setNearbySharing(rideId: string, sharing: boolean) {
   if (!s || s.rideId !== rideId || s.sharing === sharing) return;
   s.sharing = sharing;
   if (!sharing) s.mesh.clearOwnPosition();
-  pushOutgoing(true);
+  pushOutgoing();
 }
 
 /**
@@ -325,7 +323,7 @@ export function nearbyReply(rideId: string, r: { id?: string; body: string; tapp
 /** A tap the rider cancelled stops going out. */
 export function nearbyForget(id: string) {
   session?.mesh.forget(id);
-  pushOutgoing(true);
+  pushOutgoing();
 }
 
 /** This rider saw these other riders' taps or messages on screen (hooks/use-broadcast useAcknowledge). */
@@ -391,28 +389,12 @@ function sendNow(items: NearbyItem[]) {
   pushOutgoing();
 }
 
-// The native round sends the outgoing set every few seconds, so sealing it again on every GPS fix
-// only burns battery: seal at most once per OUT_MIN_MS, with one trailing pass for the latest.
-const OUT_MIN_MS = 1_500;
-let outTimer: ReturnType<typeof setTimeout> | null = null;
-let lastOut = 0;
-
-function sealOutgoing() {
-  if (outTimer) clearTimeout(outTimer);
-  outTimer = null;
-  lastOut = Date.now();
+function pushOutgoing() {
   const s = session;
   if (!s || !native) return;
   try {
     native.setOutgoing(s.mesh.outgoing(Date.now(), nonce).map(toBase64));
   } catch {}
-}
-
-/** `now`: something must stop going out (sharing turned off, a tap cancelled), so don't wait. */
-function pushOutgoing(now = false) {
-  if (now) return sealOutgoing();
-  if (outTimer) return;
-  outTimer = setTimeout(sealOutgoing, Math.max(0, OUT_MIN_MS - (Date.now() - lastOut)));
 }
 
 // The module hands each packet over twice (as it arrives, and again from its drain buffer for

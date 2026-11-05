@@ -204,7 +204,7 @@ do $$ begin
   end;
 end $$;
 
--- M6. One bad item (a time far out of range) skips only that item; the rest of the upload lands.
+-- M6. An item with a time far out of range is skipped; the rest of the upload lands.
 do $$
 declare t bigint := extract(epoch from now())::bigint - 10;
 begin
