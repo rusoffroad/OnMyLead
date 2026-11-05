@@ -1,4 +1,20 @@
 [
+  {
+    "date": "2026-11-05",
+    "slugs": ["ride-mode", "fuel-range"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "group-spread-ruler",
+    "why": "2.1: the Ride Mode leader line gets a measuring line from the leader to the tail gunner, with the distance to the rider furthest back in the middle and ticks every round step (Chris: show the distance between the leader and the person in back to set a sense of scale). The big miles-done header above the line is gone and the line about your place is centered, so the guide says so. Fuel Range: the range line still sits under the leader line, now centered; no change to how it works."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["contact-support", "create-a-ride-on-the-website", "getting-started", "pro-trial", "subscribe-to-pro"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "group-spread-ruler",
+    "why": "Re-dated only: the onmylead.com homepage's Ride Mode card gets a line about the group spread ruler once 2.1 is live. Contact, prices, the Pro Trial and creating a ride on the website are unchanged."
+  },
   {"date": "2026-11-05", "slugs": ["map-layers", "full-map", "3d-terrain", "ride-mode", "navigation-mode", "follow-me"], "kind": "update", "by": "pr", "ref": "map-corner-flag-dot", "why": "2.1 build 10 (Chris): the Map Settings button moved to the top-left corner of every riding map, level with the compass on the right, and both sit just under the top bar while it shows so they can always be seen; they stay on screen in Full Map now. Map Mode is listed as a place to find it. New Dot Style Red, White and Blue is the default for your own dot; Safety Orange and the rest are still in Map Settings."},
   {"date": "2026-11-05", "slugs": ["bluetooth-sharing", "carplay", "create-a-ride-on-the-website", "getting-started", "directions", "emergency-and-safety", "fuel-range", "import-gpx", "language", "leader-trackline", "location-sharing", "offline-maps", "park-trails", "place-search", "ride-bubble", "ride-chat", "route-builder", "status-buttons", "troubleshooting", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "review", "by": "pr", "ref": "map-corner-flag-dot", "why": "Re-dated only: their screens moved the Map Settings button and compass (map-layers says where), got the new Dot Style's name in every language, or sit beside the onmylead.com showcase, which now mentions both. Nothing these guides describe changed."},
   {

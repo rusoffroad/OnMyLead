@@ -136,3 +136,70 @@ export function groupSpread(ranked: RankedRider[]): string | null {
   const span = ranked[ranked.length - 1].backM;
   return tc('{length} riders over {v}', { length: ranked.length, v: span < 30 ? tc('a few yards') : short(span) });
 }
+
+const FT_PER_M = 3.28084;
+/** Ruler steps, in meters: feet (50 to 500 ft) while the label is in feet, then 0.1 mi up to 50 mi. */
+const STEPS_US = [50, 100, 250, 500].map((ft) => ft / FT_PER_M).concat([0.1, 0.25, 0.5, 1, 2, 5, 10, 25, 50].map((mi) => mi * 1609.344));
+const STEPS_METRIC = [10, 25, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
+/** Under this the group reads as together: the ruler shows no ticks, just "a few yards". */
+const TOGETHER_M = 30;
+
+/** A short distance for the ruler: "450 ft" / "0.8 mi", or "120 m" / "1.3 km". */
+export function rulerDistance(m: number, metric = false): string {
+  if (metric) return m < 1000 ? tc('{n} m', { n: Math.round(m / 10) * 10 }) : tc('{n} km', { n: (m / 1000).toFixed(1) });
+  return metersToMiles(m) < 0.1 ? tc('{n} ft', { n: Math.round((m * FT_PER_M) / 10) * 10 }) : tc('{n} mi', { n: miles(m) });
+}
+
+export type SpreadRuler = {
+  /** Leader to the rider furthest back, in meters. */
+  meters: number;
+  /** e.g. "0.8 mi", or "a few yards" when the group is together. */
+  label: string;
+  /** Who the span runs between, e.g. "Leader to Tail Gunner". */
+  ends: string;
+  /** Where the ruler starts and stops on the track: under the leader's dot and the tail's dot. */
+  fromX: number;
+  toX: number;
+  /** Tick marks between the ends, one per step, as x on the track. */
+  ticks: number[];
+  /** Meters between ticks (0 when there are none). */
+  stepM: number;
+};
+
+/**
+ * The scale under the leader line: a span from the leader's dot to the tail's dot labelled with
+ * the distance from the leader to whoever is furthest back, and evenly spaced ticks (a round
+ * step, 50 ft up to 50 mi) so riders get a feel for how far apart the dots really are. Works from
+ * whatever spots the line has, so Bluetooth and last-seen positions count the same as live ones.
+ * `ranked` is rankRiders' output and `spots` convoyLayout's for the same riders. Null for fewer
+ * than two riders on the line.
+ */
+export function spreadRuler(
+  ranked: RankedRider[],
+  spots: DotSpot[],
+  opts: { metric?: boolean; minTickGap?: number } = {},
+): SpreadRuler | null {
+  if (ranked.length < 2 || spots.length < 2) return null;
+  const lead = ranked.find((r) => r.role === 'leader') ?? ranked[0];
+  const others = ranked.filter((r) => r.id !== lead.id);
+  const tail = [...others].reverse().find((r) => r.role === 'sweep') ?? others[others.length - 1];
+  const rear = others[others.length - 1];
+  const at = new Map(spots.map((s) => [s.id, s.x]));
+  const fromX = at.get(lead.id);
+  const toX = at.get(tail.id);
+  if (fromX == null || toX == null) return null;
+  const front = lead.place!.alongM;
+  const meters = Math.max(0, front - Math.min(tail.place!.alongM, rear.place!.alongM));
+  const ends = tc(rear.role === 'sweep' ? 'Leader to Tail Gunner' : 'Leader to Last Rider');
+  const together = meters < TOGETHER_M;
+  const label = together ? tc('a few yards') : rulerDistance(meters, opts.metric);
+
+  // Ticks are laid along the leader-to-tail span the dots are placed on (convoyLayout).
+  const spanM = Math.max(1, front - tail.place!.alongM);
+  const px = toX - fromX;
+  const minGap = opts.minTickGap ?? 24;
+  const step = together || px <= 0 ? undefined : (opts.metric ? STEPS_METRIC : STEPS_US.filter((s) => metersToMiles(meters) < 0.1 || s >= 0.1 * 1609.344)).find((s) => (s / spanM) * px >= minGap);
+  const ticks: number[] = [];
+  if (step) for (let d = step; d < spanM - step * 0.35; d += step) ticks.push(Math.round((fromX + (d / spanM) * px) * 10) / 10);
+  return { meters, label, ends, fromX, toX, ticks, stepM: ticks.length ? step! : 0 };
+}

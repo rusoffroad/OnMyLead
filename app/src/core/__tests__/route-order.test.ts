@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { convoyLayout, describeRank, groupSpread, layoutDots, rankRiders } from '../route-order';
+import { convoyLayout, describeRank, groupSpread, layoutDots, rankRiders, rulerDistance, spreadRuler } from '../route-order';
 import type { PlacedRider } from '../route';
 
 const at = (id: string, alongM: number | null, role: PlacedRider['role'] = 'rider', onRoute = true): PlacedRider => ({
@@ -137,5 +137,57 @@ describe('convoyLayout', () => {
     expect(spots[spots.length - 1].id).toBe('sweep');
     expect(spots[0].x).toBe(0);
     expect(spots[spots.length - 1].x).toBe(300);
+  });
+});
+
+describe('spreadRuler', () => {
+  const MI = 1609.344;
+  const ruler = (placed: PlacedRider[], width = 300, opts = {}) => {
+    const ranked = rankRiders(placed);
+    return spreadRuler(ranked, convoyLayout(ranked, () => 20, width), opts);
+  };
+
+  it('spans the leader to the tail gunner, labelled with the distance and round-step ticks', () => {
+    const r = ruler([at('lead', 2 * MI, 'leader'), at('a', 1.6 * MI), at('sweep', 1.2 * MI, 'sweep')])!;
+    expect(r.label).toBe('0.8 mi');
+    expect(r.ends).toBe('Leader to Tail Gunner');
+    expect(r.fromX).toBe(10);
+    expect(r.toX).toBe(290);
+    // 0.8 mi over 280 points: 0.1 mi is 35 points (at least 24), so a tick every 0.1 mi.
+    expect(r.stepM).toBeCloseTo(0.1 * MI);
+    expect(r.ticks).toEqual([45, 80, 115, 150, 185, 220, 255]);
+  });
+
+  it('uses a bigger step when the line is short', () => {
+    const r = ruler([at('lead', 3 * MI, 'leader'), at('sweep', 0, 'sweep')], 120)!;
+    expect(r.label).toBe('3.0 mi');
+    expect(r.stepM).toBeCloseTo(1 * MI);
+    expect(r.ticks).toHaveLength(2);
+  });
+
+  it('measures to whoever is furthest back, even behind the tail gunner', () => {
+    const r = ruler([at('lead', 1000, 'leader'), at('sweep', 600, 'sweep'), at('straggler', 200)])!;
+    expect(r.meters).toBe(800);
+    expect(r.ends).toBe('Leader to Last Rider');
+  });
+
+  it('says "a few yards" with no ticks when the group is together', () => {
+    const r = ruler([at('lead', 500, 'leader'), at('b', 490)])!;
+    expect(r.label).toBe('a few yards');
+    expect(r.ticks).toEqual([]);
+    expect(r.stepM).toBe(0);
+  });
+
+  it('works with no leader on the line, and is null for one rider', () => {
+    expect(ruler([at('a', 900), at('b', 100)])!.meters).toBe(800);
+    expect(ruler([at('a', 900)])).toBeNull();
+    expect(spreadRuler(rankRiders([at('a', 900), at('b', 100)]), [])).toBeNull();
+  });
+
+  it('writes short distances in feet, and metric on request', () => {
+    expect(rulerDistance(100)).toBe('330 ft');
+    expect(rulerDistance(0.5 * MI)).toBe('0.5 mi');
+    expect(rulerDistance(240, true)).toBe('240 m');
+    expect(rulerDistance(1300, true)).toBe('1.3 km');
   });
 });

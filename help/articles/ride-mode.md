@@ -213,8 +213,12 @@ Tap **Navigate** next to a live rider, or **Go to Last Seen** for a rider whose 
 When the ride has a route, the route strip at the bottom shows the whole route as one straight line from start to finish, with each rider placed by how far along they are. It shows your miles so far, such as **12.3 of 40.1 mi**, and how far you have to go. Below the line it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
 :::
 
-:::release 2.0
+:::until 2.1
 When the ride has a route, the line at the bottom shows your miles so far, such as **12.3 of 40.1 mi**, and how far you have to go. Below the line it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
+:::
+
+:::release 2.1
+When the ride has a route, the line at the bottom shows every sharing rider in order. Under it, centered, it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
 :::
 
 If you've added your machine in the [Garage](/help/garage) with its fuel details, the strip also says whether your range covers the route. See [Fuel Range](/help/fuel-range).
@@ -238,12 +242,26 @@ Every rider who is sharing has a dot on the leader line, strung out in running o
 - Riders who aren't sharing their location aren't on the line.
 - With a big group, the dots get smaller to fit the line.
 
+:::release 2.1
+### See How Spread Out the Group Is
+
+A thin measuring line runs under the leader line, from under the leader's dot to under the tail gunner's dot. The number in the middle, such as **0.8 mi**, is how far the rider furthest back is behind the leader (in feet when the group is close, or **a few yards** when everyone is together). Small ticks along the line mark round steps, such as every 0.1 mi or every 0.5 mi, so you can see how far apart the dots really are.
+
+- It works on routes and on Freerides, and it uses whatever spots your phone has, including ones passed over [Bluetooth Sharing](/help/bluetooth-sharing) with no service.
+- When the leader or the last rider is only last seen, the number starts with **~**, because it's from their last known spot.
+:::
+
 :::release 2.0
 ### See the Group Behind the Leader on a Freeride
 
 A Freeride has no route, so the line at the bottom of Ride Mode shows the group behind the leader instead. The leader is at the far left, the tail gunner (or the rider furthest back) is at the far right, and everyone else is in order between them.
 
+:::until 2.1
 - The top of the line shows how spread out the group is, such as **0.9 mi spread, Leader to Tail Gunner**. When everyone is close, it says how many riders are together.
+:::
+:::release 2.1
+- The measuring line under the dots shows how spread out the group is, such as **0.9 mi** from the leader to the tail gunner.
+:::
 - Below the line it tells you where you stand, for example "The leader is 0.3 mi ahead". The leader sees how far back the tail gunner (or the last rider) is.
 - Distances are measured along the path the leader has ridden, so bends and switchbacks count. Your phone keeps that path from the leader's live location while you're in Ride Mode; it stays on your phone and isn't uploaded.
 - A hollow dot is a rider who isn't on the leader's path, such as someone who took another way or was already behind when you opened Ride Mode. Their distance is measured in a straight line.
