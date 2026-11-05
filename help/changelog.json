@@ -1,7 +1,7 @@
 [
   {
     "date": "2026-11-05",
-    "slugs": ["language"],
+    "slugs": ["badge-leaderboard", "badges-and-ranks", "create-a-ride", "edit-cancel-or-delete-a-ride", "events", "find-a-ride", "free-vs-pro", "fuel-range", "full-map", "getting-started", "home-screen", "import-gpx", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "notifications-inbox", "ride-mode", "ride-name-and-profile", "ride-summary-and-ride-again", "route-builder", "status-buttons", "use-onmylead-on-a-tablet"],
     "kind": "update",
     "by": "pr",
     "ref": "release-2.1-spanish-check",
