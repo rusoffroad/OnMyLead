@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { heldHeading, HELD_HEADING_MS, ownArrow, ownFix, riderHeading, screenAngle } from '../heading';
+import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownStillMoving, riderHeading, screenAngle } from '../heading';
 
 describe('riderHeading', () => {
   it('uses the GPS course while a live rider is moving', () => {
@@ -68,5 +68,30 @@ describe("other riders' arrows stay on after they stop", () => {
     expect(heldHeading(h, { speedMps: 0, headingDeg: -1 }, true, 60_000)).toBe(h);
     expect(heldHeading(h, { speedMps: 0, headingDeg: -1 }, true, HELD_HEADING_MS + 1)).toBeNull();
     expect(heldHeading(h, { speedMps: 10, headingDeg: 90 }, false, 1)).toBeNull();
+  });
+});
+
+describe('own dot moving or stopped', () => {
+  const start = { movingAt: null, fixAt: null };
+  it('counts you moving from a moving fix until no new moving fix for a while', () => {
+    const a = ownMovingAt(start, true, 1000);
+    expect(a.movingAt).toBe(1000);
+    expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS - 1)).toBe(true);
+    expect(ownStillMoving(a.movingAt, 1000 + OWN_STOPPED_AFTER_MS)).toBe(false);
+  });
+  it('a stopped fix keeps the last moving time, so a short slow stretch does not flip the dot', () => {
+    const a = ownMovingAt(ownMovingAt(start, true, 1000), false, 3000);
+    expect(a.movingAt).toBe(1000);
+  });
+  it('ignores a repeated fix (only the compass turned)', () => {
+    const a = ownMovingAt(start, true, 1000);
+    expect(ownMovingAt(a, true, 1000)).toBe(a);
+    expect(ownMovingAt(a, true, 900)).toBe(a);
+  });
+  it('times moving from the clock, not from the phone\'s fix time', () => {
+    expect(ownMovingAt(start, true, 5, 1000).movingAt).toBe(1000);
+  });
+  it('was never moving with no moving fix', () => {
+    expect(ownStillMoving(ownMovingAt(start, false, 1000).movingAt, 1000)).toBe(false);
   });
 });

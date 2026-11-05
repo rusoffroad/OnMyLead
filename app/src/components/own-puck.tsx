@@ -1,8 +1,9 @@
-import { useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { OWN_STOPPED_AFTER_MS, ownArrow, riderHeading, screenAngle } from '@/core/heading';
+import { ownArrow, riderHeading, screenAngle } from '@/core/heading';
 import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
+import { useOwnMoving } from '@/hooks/use-own-moving';
 import { useCompass } from '@/lib/compass';
 import { OwnDot } from './own-dot';
 import { useGlide } from './use-glide';
@@ -10,7 +11,7 @@ import { useGlide } from './use-glide';
 import { t } from '@/lib/i18n';
 
 
-export type OwnPuckFix = { lat: number; lng: number; course: number | null; speed: number | null; lastCourse?: number | null };
+export type OwnPuckFix = { lat: number; lng: number; course: number | null; speed: number | null; lastCourse?: number | null; /** The fix's own time (ms), when known. */ at?: number };
 
 /**
  * The newest fix of the phone's own dot and the map's turn, kept outside React state so a moving
@@ -21,23 +22,14 @@ export function useOwnPuckStore() {
     let fix: OwnPuckFix | null = null;
     let lastCourse: number | null = null;
     let mapHeading = 0;
-    let still: ReturnType<typeof setTimeout> | undefined;
     const listeners = new Set<() => void>();
     const emit = () => listeners.forEach((l) => l());
     return {
       setFix(f: OwnPuckFix) {
         // The last real GPS direction, for when the rider stops and there is no compass.
-        const course = riderHeading({ speedMps: f.speed, headingDeg: f.course }, true);
-        lastCourse = course ?? lastCourse;
+        lastCourse = riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) ?? lastCourse;
         fix = { ...f, lastCourse };
         emit();
-        // No new fix for a while: the rider has stopped, so the dot takes its stopped look.
-        if (still) clearTimeout(still);
-        still = course == null ? undefined : setTimeout(() => {
-          still = undefined;
-          if (fix) fix = { ...fix, speed: 0 };
-          emit();
-        }, OWN_STOPPED_AFTER_MS);
       },
       setHeading(h: number) {
         if (h === mapHeading) return;
@@ -82,7 +74,12 @@ function OwnPuckAt({ fix, mapHeading, Marker }: { fix: OwnPuckFix; mapHeading: n
   const compass = useCompass();
   const d = useOwnDotD();
   const [style] = useDotStylePref();
-  const arrow = ownArrow({ speedMps: fix.speed, headingDeg: fix.course }, compass, fix.lastCourse);
+  // Moving or stopped by the shared rule (no new moving fix for a while means stopped).
+  const [moving, feed] = useOwnMoving();
+  useEffect(() => {
+    feed(riderHeading({ speedMps: fix.speed, headingDeg: fix.course }, true) != null, fix.at);
+  }, [fix, feed]);
+  const arrow = ownArrow(moving ? { speedMps: fix.speed, headingDeg: fix.course } : null, compass, fix.lastCourse);
   return (
     <Marker at={at}>
       <View accessible accessibilityLabel={t('You are here')}>

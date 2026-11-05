@@ -254,7 +254,7 @@ export function MapboxMap({
         const watch = navigator.geolocation.watchPosition(
           (p) => {
             const f = { lat: p.coords.latitude, lng: p.coords.longitude, course: p.coords.heading, speed: p.coords.speed };
-            own.setFix(f);
+            own.setFix({ ...f, at: p.timestamp });
             cb.current.onOwnFix?.(f);
           },
           () => {},
@@ -473,6 +473,7 @@ export function MapboxMarker({
       const mk = new gl.Marker({ element: holder, anchor: 'top-left', offset: [0, 0], draggable: !!draggable }).setLngLat([latest.current.lng, latest.current.lat]).addTo(map);
       mk.on('dragend', () => {
         const p = mk.getLngLat();
+        latest.current = { lat: p.lat, lng: p.lng };
         drop.current?.({ lat: p.lat, lng: p.lng });
       });
       marker.current = mk;

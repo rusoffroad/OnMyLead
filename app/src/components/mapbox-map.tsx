@@ -20,10 +20,11 @@ import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
-import { OWN_STOPPED_AFTER_MS, riderHeading } from '@/core/heading';
+import { riderHeading } from '@/core/heading';
 import { useHasCompass } from '@/lib/compass';
 import { dotScale } from '@/core/dot-size';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
+import { useOwnMoving } from '@/hooks/use-own-moving';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -124,7 +125,7 @@ export function MapboxMap({
   };
   // Tells your own dot whether you're moving; the dot keeps that state itself, so a change
   // re-draws only the dot, not the whole map.
-  const puckMoving = useRef<((moving: boolean) => void) | null>(null);
+  const puckMoving = useRef<((moving: boolean, fixAtMs?: number) => void) | null>(null);
   // How much the terrain is raised, following the tilt (only while 3D Terrain is shown).
   const [exaggeration, setExaggeration] = useState(TERRAIN_EXAGGERATION);
   const ownFix = useRef(onOwnFix);
@@ -334,7 +335,7 @@ export function MapboxMap({
           // the map library throws on a spot that isn't numbers.
           if (!c || !isLatLng({ lat: c.latitude, lng: c.longitude })) return;
           const f = { lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null };
-          puckMoving.current?.(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null);
+          puckMoving.current?.(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null, loc.timestamp);
           ownFix.current?.(f);
         }} />
         {children}
@@ -349,27 +350,21 @@ export function MapboxMap({
  * the map. Its arrow follows the GPS course while you move and the compass while you're stopped;
  * a stopped phone with no compass reading (some tablets) shows a round centre with no arrow.
  */
-const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.MutableRefObject<((moving: boolean) => void) | null> }) {
-  const [moving, setMoving] = useState(false);
+const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.MutableRefObject<((moving: boolean, fixAtMs?: number) => void) | null> }) {
+  // Moving or stopped by the shared rule (hooks/use-own-moving): no new moving fix for a while
+  // means stopped, since location updates stop once the phone stands still.
+  const [moving, feed] = useOwnMoving();
   // The images are drawn at Medium; Mapbox scales them for the rider's Dot Size.
   const [size] = useDotSizePref();
   const [style] = useDotStylePref();
   const hasCompass = useHasCompass();
   const kind = moving ? 'moving' : hasCompass ? 'stopped' : 'still';
   useEffect(() => {
-    // Location updates stop once the phone stands still, so with no update for a while the rider
-    // has stopped and the dot goes back to its stopped look (core/heading OWN_STOPPED_AFTER_MS).
-    let still: ReturnType<typeof setTimeout> | undefined;
-    feedRef.current = (m: boolean) => {
-      setMoving(m);
-      if (still) clearTimeout(still);
-      still = m ? setTimeout(() => setMoving(false), OWN_STOPPED_AFTER_MS) : undefined;
-    };
+    feedRef.current = feed;
     return () => {
-      if (still) clearTimeout(still);
       feedRef.current = null;
     };
-  }, [feedRef]);
+  }, [feedRef, feed]);
   return (
     <>
       <Mapbox.Images images={PUCK_IMAGES} />

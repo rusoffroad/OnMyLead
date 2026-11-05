@@ -12,8 +12,9 @@ let current: number | null = null;
 const listeners = new Set<(deg: number | null) => void>();
 let sub: { remove: () => void } | null = null;
 let starting = false;
-// Asked to start while a look was under way: look again once it ends.
-let again = false;
+// Asked to start while a look was under way: look again once it ends ('now' when location was
+// just allowed, so the look happens at once; 'soon' waits for a retry already set).
+let again: false | 'soon' | 'now' = false;
 let retry: ReturnType<typeof setTimeout> | null = null;
 let retryMs = 5000;
 
@@ -22,7 +23,7 @@ function start() {
   // A look is already under way: look again when it ends, in case it gives up (no maps were
   // left, or location wasn't allowed yet) while a map is waiting now.
   if (starting) {
-    again = true;
+    again ||= 'soon';
     return;
   }
   starting = true;
@@ -60,12 +61,13 @@ function start() {
     .catch(() => {})
     .finally(() => {
       starting = false;
-      if (again) {
-        again = false;
-        if (retry) clearTimeout(retry);
+      const next = again;
+      again = false;
+      if (next === 'now' && retry) {
+        clearTimeout(retry);
         retry = null;
-        if (listeners.size && !sub) start();
       }
+      if (next && !retry && listeners.size && !sub) start();
     });
 }
 
@@ -74,7 +76,8 @@ export function compassAllowed() {
   if (!listeners.size || sub) return;
   if (retry) clearTimeout(retry);
   retry = null;
-  start();
+  if (starting) again = 'now';
+  else start();
 }
 
 function stop() {

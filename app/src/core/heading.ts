@@ -26,7 +26,7 @@ export function screenAngle(headingDeg: number, mapHeadingDeg: number | null | u
 }
 
 /** This phone's own spot and arrow, from the map's location dot (or the phone's location watch). */
-export type OwnFix = { lat: number; lng: number; headingDeg: number | null };
+export type OwnFix = { lat: number; lng: number; headingDeg: number | null; /** The fix's own time (ms), when the phone gives one. */ atMs?: number };
 
 /**
  * The phone's own fix as the map's blue dot reports it (react-native-maps onUserLocationChange:
@@ -35,10 +35,12 @@ export type OwnFix = { lat: number; lng: number; headingDeg: number | null };
  * other rider: only while moving faster than a walk.
  */
 export function ownFix(
-  c: { latitude?: number | null; longitude?: number | null; speed?: number | null; heading?: number | null } | null | undefined,
+  c: { latitude?: number | null; longitude?: number | null; speed?: number | null; heading?: number | null; timestamp?: number | null } | null | undefined,
 ): OwnFix | null {
   if (!c || c.latitude == null || c.longitude == null || !Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return null;
-  return { lat: c.latitude, lng: c.longitude, headingDeg: riderHeading({ speedMps: c.speed, headingDeg: c.heading }, true) };
+  const f: OwnFix = { lat: c.latitude, lng: c.longitude, headingDeg: riderHeading({ speedMps: c.speed, headingDeg: c.heading }, true) };
+  if (c.timestamp != null && Number.isFinite(c.timestamp)) f.atMs = c.timestamp;
+  return f;
 }
 
 /**
@@ -63,6 +65,27 @@ export function ownArrow(
  * Long enough that a short GPS gap under trees or in a canyon doesn't flip it mid-ride (ms).
  */
 export const OWN_STOPPED_AFTER_MS = 10_000;
+
+/**
+ * When your own dot last saw you moving (`nowMs` when this fix is moving, else the time before).
+ * A fix whose own time `fixAtMs` is no newer than the last one (some phones repeat the last spot
+ * when only the compass turned) changes nothing, so a stopped rider turning the phone doesn't
+ * count as moving again. The fix's time is only compared with other fixes, never with the clock.
+ */
+export function ownMovingAt(
+  prev: { movingAt: number | null; fixAt: number | null },
+  moving: boolean,
+  fixAtMs: number,
+  nowMs: number = fixAtMs,
+): { movingAt: number | null; fixAt: number | null } {
+  if (prev.fixAt != null && fixAtMs <= prev.fixAt) return prev;
+  return { movingAt: moving ? nowMs : prev.movingAt, fixAt: fixAtMs };
+}
+
+/** Whether your own dot still counts you as moving at `nowMs`. */
+export function ownStillMoving(movingAt: number | null, nowMs: number): boolean {
+  return movingAt != null && nowMs - movingAt < OWN_STOPPED_AFTER_MS;
+}
 
 /** How long another rider's dot keeps pointing their last way after they slow down (ms). */
 export const HELD_HEADING_MS = 10 * 60_000;
