@@ -301,46 +301,6 @@ do $$ begin
   if referral_play_token('00000000-0000-0000-0000-000000000f06') is not null then raise exception 'FAIL: a lapsed subscription counted'; end if;
 end $$;
 
--- R12 (20261105060000). Ivy's reward was set to move her Play bill, but that subscription ended
--- before it moved: claiming again gives her the Play offer instead of a stuck deferral.
-insert into referrals (referrer_id, friend_id, code) values ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000f06', 'REXREF0001');
--- (Reserved an hour ago and Google never answered.)
-insert into referral_rewards (user_id, referral_id, role, expires_at, claimed_at, claim_store, claim_kind, deferred_at)
-select '00000000-0000-0000-0000-000000000f06', id, 'friend', now() + interval '180 days', now(), 'google', 'google_defer', now() - interval '1 hour'
-from referrals where friend_id = '00000000-0000-0000-0000-000000000f06';
-select as_user('00000000-0000-0000-0000-000000000f06');
-set role authenticated;
-insert into ref_out values ('ivy_reclaim', claim_referral_reward('google'));
-reset role;
-do $$ begin
-  if (select v ->> 'kind' from ref_out where name = 'ivy_reclaim') is distinct from 'google_offer' then
-    raise exception 'FAIL: a deferral with no subscription left stayed stuck: %', (select v from ref_out where name = 'ivy_reclaim');
-  end if;
-  if (select deferred_at from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f06') is not null then
-    raise exception 'FAIL: the old reservation was left on the reward';
-  end if;
-  -- Hal's deferral (subscription still running) is left as it is.
-  if (select claim_kind from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f05') <> 'google_defer' then
-    raise exception 'FAIL: a working deferral changed';
-  end if;
-end $$;
-
--- R13. An expired reward with an unfinished bill move doesn't take a fresh code.
-insert into auth.users (id, raw_user_meta_data) values ('00000000-0000-0000-0000-000000000f08', '{"full_name":"Kai Ref"}');
-insert into referrals (referrer_id, friend_id, code) values ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000f08', 'REXREF0001');
-insert into referral_rewards (user_id, referral_id, role, expires_at, claimed_at, claim_store, claim_kind)
-select '00000000-0000-0000-0000-000000000f08', id, 'friend', now() - interval '1 day', now() - interval '200 days', 'google', 'google_defer'
-from referrals where friend_id = '00000000-0000-0000-0000-000000000f08';
-select as_user('00000000-0000-0000-0000-000000000f08');
-set role authenticated;
-insert into ref_out values ('kai_apple', claim_referral_reward('apple'));
-reset role;
-do $$ begin
-  if (select v ->> 'error' from ref_out where name = 'kai_apple') is distinct from 'expired' then
-    raise exception 'FAIL: expired reward reclaimed: %', (select v from ref_out where name = 'kai_apple');
-  end if;
-end $$;
-
 drop table ref_out;
 select as_user(null);
 \echo 'referrals_test: ok'

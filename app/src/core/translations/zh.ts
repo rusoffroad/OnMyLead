@@ -2772,7 +2772,6 @@ const dict: Record<string, string> = {
   "Waiting on Google Play to approve the purchase.": "正在等待 Google Play 批准购买。",
   "Google Play didn’t offer the discount on this device. Update OnMyLead from Google Play and try again. You weren’t charged.": "Google Play 未在此设备上提供折扣。从 Google Play 更新 OnMyLead 后重试。未扣费。",
   "Done. Your next Google Play bill moved back 6 months, to {date}.": "完成。你的下次 Google Play 扣款已推迟 6 个月，至 {date}。",
-  "Your Google Play subscription has ended, so there’s no bill to move back. Your reward is saved; tap again in a few minutes to get the discount instead.": "你的 Google Play 订阅已结束，没有可推迟的扣款。奖励已保存；几分钟后再点一次即可改为获得折扣。",
   "Done. Your next Google Play bill moved back 6 months{v}.": "完成。你的下次 Google Play 扣款已推迟 6 个月{v}。",
   "Google Play didn’t answer. Your reward is saved; try again in a minute.": "Google Play 没有响应。你的奖励已保存；请一分钟后重试。",
   "${discounted} for the first year instead of ${annual}": "第一年 ${discounted}，原价 ${annual}",

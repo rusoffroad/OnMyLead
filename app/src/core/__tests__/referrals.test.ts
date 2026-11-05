@@ -93,9 +93,6 @@ describe('the reward card', () => {
     expect(rewardAction(reward(), null, now)?.kind).toBe('in_app');
     expect(rewardAction(reward({ claimKind: 'apple_code', appleCode: 'A1B2C3' }), 'google', now)?.kind).toBe('other_store');
     expect(rewardAction(reward({ claimKind: 'google_offer' }), 'apple', now)?.kind).toBe('other_store');
-    // An unfinished bill move: the server says on an Apple device whether it can become a code.
-    expect(rewardAction(reward({ claimKind: 'google_defer' }), 'apple', now)).toEqual({ kind: 'claim', title: 'Claim 50% Off' });
-    expect(rewardAction(reward({ claimKind: 'google_defer' }), 'google', now)).toEqual({ kind: 'claim', title: 'Apply Your Reward' });
     expect(rewardAction(reward({ claimKind: 'apple_code', appleCode: 'A1B2C3' }), 'apple', now)).toEqual({ kind: 'claim', title: 'Redeem Your Code' });
     expect(rewardAction(reward({ expiresAt: '2026-11-01T00:00:00Z' }), 'apple', now)).toBeNull();
   });

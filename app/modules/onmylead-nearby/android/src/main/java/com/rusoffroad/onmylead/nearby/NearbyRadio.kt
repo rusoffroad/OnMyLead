@@ -53,6 +53,7 @@ class NearbyRadio(
 ) {
   companion object {
     private const val MAX_PEERS = 8
+    private const val SUBSCRIBE_TRIES = 120
     private const val ROUND_MS = 4_000L
     // Low power (service, nobody in range, or Max Battery Saver): send less often and let the
     // chip scan and advertise in its low-power duty cycle. Phones that connect are served at once.
@@ -454,7 +455,7 @@ class NearbyRadio(
   /**
    * Asks the peer for its packets (turns on notifications). The stack can refuse while another
    * request is still going (common right after discovery on Android 13+): no callback comes then,
-   * so writes aren't held back, and it is asked again shortly, a few times.
+   * so writes aren't held back, and it is asked again every half second for as long as a minute.
    */
   @Suppress("DEPRECATION")
   private fun subscribe(gatt: BluetoothGatt, out: BluetoothGattCharacteristic, tries: Int) {
@@ -462,7 +463,7 @@ class NearbyRadio(
     if (p.gatt !== gatt || !running) return
     val d = out.getDescriptor(CCCD) ?: return
     if (p.busy) {
-      if (tries < 5) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 400)
+      if (tries < SUBSCRIBE_TRIES) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 500)
       return
     }
     p.busy = true
@@ -479,7 +480,7 @@ class NearbyRadio(
     if (!started) {
       p.busy = false
       pump(p)
-      if (tries < 5) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 400)
+      if (tries < SUBSCRIBE_TRIES) handler.postDelayed({ subscribe(gatt, out, tries + 1) }, 500)
     }
   }
 

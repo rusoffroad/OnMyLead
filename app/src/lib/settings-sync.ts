@@ -141,10 +141,12 @@ async function run() {
   if (!can(currentEntitlements(), 'sync')) {
     const lastAccount = await AsyncStorage.getItem(ACCOUNT_KEY).catch(() => null);
     if (lastAccount !== me) {
-      await load();
-      stamps = {};
-      saveStamps();
+      // No account noted yet (a Free install from before 2.1, or a new one): these settings are
+      // this rider's, stamps and all. Only a different rider starts fresh.
       if (lastAccount) {
+        await load();
+        stamps = {};
+        saveStamps();
         // A different rider was here: put the synced settings back to the app's defaults, as the
         // Pro path does, so this rider (or their Pro account later) never takes the last rider's.
         for (const k of Object.keys(SYNCED_SETTINGS)) {

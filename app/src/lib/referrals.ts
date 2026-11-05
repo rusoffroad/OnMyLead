@@ -130,12 +130,8 @@ export async function openAppleRedeem(url: string): Promise<boolean> {
 }
 
 /** Google Play subscribers: asks the server to push the next bill back. */
-export async function applyPlayDeferral(): Promise<{ ok: boolean; expiresAt: string | null; gone?: boolean }> {
+export async function applyPlayDeferral(): Promise<{ ok: boolean; expiresAt: string | null }> {
   const { data, error } = await supabase.functions.invoke('referral-defer', { body: {} });
-  if (error || !data?.deferred) {
-    // 400: there's no Google Play subscription left to move (it ended), as opposed to no answer.
-    const status = (error as { context?: { status?: number } } | null)?.context?.status;
-    return { ok: false, expiresAt: null, gone: status === 400 };
-  }
+  if (error || !data?.deferred) return { ok: false, expiresAt: null };
   return { ok: true, expiresAt: typeof data.expiresAt === 'string' ? data.expiresAt : null };
 }

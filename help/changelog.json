@@ -16,7 +16,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-5",
-    "why": "2.1 release test, passes 4 and 5. Crash Alert treats a fall while moving, even slowly, as the vehicle possibly in the air, and says that a phone falling just before you stop may start the countdown (tilt-and-crash-alert, 2.1 block). The Ride Mode articles are re-dated because the announcement banner in Ride Mode now shows the leader's words exactly as written; riders see no other difference."
+    "why": "2.1 release test, passes 4 to 6. Crash Alert treats a fall at driving speed as the vehicle possibly in the air, and says that stopping right after the phone falls may start the countdown (tilt-and-crash-alert, 2.1 block). The Ride Mode articles are re-dated because the announcement banner in Ride Mode now shows the leader's words exactly as written; riders see no other difference."
   },
   {
     "date": "2026-11-05",
@@ -30,7 +30,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "release-test-pass-2",
-    "why": "2.1 release test, whole-app pass 2. Ride Mode messages now go over Bluetooth whole in every language (bluetooth-sharing). After a fall at driving speed Crash Alert also counts the vehicle coming to rest on its side or roof (tilt-and-crash-alert, 2.1 block). A reward set to move a Google Play bill whose subscription ended can be claimed again (refer-a-friend sources). navigation-mode and waypoints-and-planned-stops are re-dated because Map Mode waypoint backups now read every row past 1000; a waypoint shared again isn't announced again. Riders see no other difference."
+    "why": "2.1 release test, whole-app pass 2. Ride Mode messages now go over Bluetooth whole in every language (bluetooth-sharing). After a fall at driving speed Crash Alert also counts the vehicle coming to rest on its side or roof (tilt-and-crash-alert, 2.1 block). A ride ending now checks only its own riders' referrals (refer-a-friend sources). navigation-mode and waypoints-and-planned-stops are re-dated because Map Mode waypoint backups now read every row past 1000; a waypoint shared again isn't announced again. Riders see no other difference."
   },
   {
     "date": "2026-11-05",

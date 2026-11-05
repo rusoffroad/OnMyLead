@@ -128,11 +128,10 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
   const falling = s.feltG != null && Number.isFinite(s.feltG) && s.feltG < FREE_FALL_G;
   const fallingSince = falling ? (state.fallingSince ?? s.t) : null;
   const fell = fallingSince != null && s.t - fallingSince >= FREE_FALL_MS;
-  // While the vehicle is moving at all, a free fall is as likely the vehicle in the air (a jump, a
-  // ledge, a slow tip off a rock) as a dropped phone, so the landing hit and a roll still count; a
-  // phone that only fell to the floor rides on and the "rode on" rule below clears it. Only a fall
-  // while stopped (or with no GPS speed) is taken as a dropped phone.
-  const airborne = speed != null && speed >= STOPPED_MPS;
+  // At driving speed a free fall is as likely the vehicle in the air (a jump, a ledge, a roll) as a
+  // dropped phone, so the landing hit and a roll still count; a phone that only fell to the floor
+  // rides on and the "rode on" rule below clears it. Slower, a fall is taken as a dropped phone.
+  const airborne = speed != null && speed >= DROVE_ON_MPS;
   const droppedAt = fell && !airborne ? s.t : (state.droppedAt ?? null);
   const justDropped = droppedAt != null && s.t - droppedAt <= DROP_IGNORE_MS;
   // After a drop the tilt is the phone's, not the vehicle's, until it's back near level for a while.
@@ -144,7 +143,8 @@ export function crashStep(state: CrashState, s: CrashSample, sensitivity: CrashS
   let displaced = (fell && !airborne) || !!state.displaced;
   if (airborneAt != null && !fell && s.t - airborneAt > SETTLE_WINDOW_MS) {
     const lying = (s.roll != null && Math.abs(s.roll) >= th.rolloverDeg) || (s.pitch != null && Math.abs(s.pitch) >= th.rolloverDeg);
-    const carryingOn = speed != null && speed >= DROVE_ON_MPS;
+    // A vehicle on its side doesn't move; a phone on the floor of one that does is off its mount.
+    const carryingOn = speed != null && speed >= STOPPED_MPS;
     if (!lying) airborneAt = null;
     else if (carryingOn) {
       airborneAt = null;

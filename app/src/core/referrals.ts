@@ -184,14 +184,12 @@ export function rewardAction(reward: ReferralReward | null, store: Store | null,
   if (s.state === 'apple_code' && store === 'google') {
     return { kind: 'other_store', message: tc('You claimed this discount as an Apple offer code. Redeem it on your iPhone or iPad.') };
   }
-  // A Google Play bill move that never finished can still turn into an Apple code once that Play
-  // subscription has ended (the server decides), so an Apple device offers to claim.
-  if (s.state === 'google_offer' && store === 'apple') {
+  if ((s.state === 'google_offer' || s.state === 'google_defer_pending') && store === 'apple') {
     return { kind: 'other_store', message: tc('You claimed this discount on Google Play. Use it on your Android phone or tablet.') };
   }
   if (s.state === 'apple_code') return { kind: 'claim', title: tc('Redeem Your Code') };
   if (s.state === 'google_offer') return { kind: 'claim', title: tc('Get 50% Off in Google Play') };
-  if (s.state === 'google_defer_pending') return { kind: 'claim', title: store === 'apple' ? tc('Claim 50% Off') : tc('Apply Your Reward') };
+  if (s.state === 'google_defer_pending') return { kind: 'claim', title: tc('Apply Your Reward') };
   return { kind: 'claim', title: tc('Claim 50% Off') };
 }
 
