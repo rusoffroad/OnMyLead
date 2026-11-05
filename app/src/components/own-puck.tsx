@@ -8,8 +8,8 @@ import { useGlide } from './use-glide';
 
 import { t } from '@/lib/i18n';
 
-/** Your own dot's disc size (points). */
-export const OWN_PUCK_D = 22;
+/** Your own dot's disc size (points): twice the 2.1 test size, so it reads at a glance on a mount (2026-11-05). */
+export const OWN_PUCK_D = 44;
 
 export type OwnPuckFix = { lat: number; lng: number; course: number | null; speed: number | null; lastCourse?: number | null };
 

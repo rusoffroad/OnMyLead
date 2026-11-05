@@ -37,6 +37,7 @@ import { loadTrails, useLocalTrails } from '@/lib/nav-trails';
 import { PARK_TRAILS_KEY, RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useFollowMePref } from '@/hooks/use-follow-me';
+import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { signOut, useSession } from '@/lib/session';
@@ -88,6 +89,7 @@ export default function You() {
   const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
   const [followMe, setFollowMe] = useFollowMePref();
   const [intersectionZoom, setIntersectionZoom] = useIntersectionZoomPref();
+  const [edgeZoom, setEdgeZoom] = useEdgeZoomPref();
   useEffect(() => {
     loadTrails();
   }, []);
@@ -235,6 +237,22 @@ export default function You() {
               thumbColor="#FFFFFF"
               {...({ activeThumbColor: '#FFFFFF' } as object)}
               accessibilityLabel={t('Follow Me on Maps')}
+            />
+          }
+        />
+        <MenuRow
+          icon="locate"
+          color={Colors.sky}
+          title={t('Zoom Out at the Edge')}
+          detail={edgeZoom ? t('While following you, the map zooms out once as your dot nears the edge, then slides along') : t('Off. The map slides along without zooming out')}
+          right={
+            <Switch
+              value={edgeZoom}
+              onValueChange={setEdgeZoom}
+              trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
+              accessibilityLabel={t('Zoom Out at the Edge')}
             />
           }
         />

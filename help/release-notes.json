@@ -9,15 +9,15 @@
     "notes": [
       {
         "kind": "new",
-        "text": "A new rider dot with the arrow built in: every live rider is a glossy disc with a white rim and a white arrow pointing the way they're heading, and it keeps pointing their last way while they're stopped. The leader is the biggest dot, in blue; the tail gunner is next, in violet; everyone else is graphite. Your own dot is cyan with a soft beam ahead of it, and its arrow always shows which way you're facing: the way you're riding while you move, your phone's compass when you stop."
+        "text": "A new rider dot with the arrow built in: every live rider is a glossy disc with a white rim and a white arrow pointing the way they're heading, and it keeps pointing their last way while they're stopped. The leader is the biggest dot, in blue; the tail gunner is next, in violet; everyone else is graphite. Your own dot is big and cyan with a soft beam ahead of it, and its arrow always shows which way you're facing: the way you're riding while you move, your phone's compass when you stop."
       },
       {
         "kind": "new",
-        "text": "Map Settings: the Layers button on the map opens one sheet for everything about the map. Pick Satellite, Topo or 3D Terrain from pictures of each, flip big switches for Streets and Roads, Off-Road Trails, Hiking Trails and Land Boundaries (or fine-tune every map feature), and turn the map's own buttons on or off: Follow Me, Zoom In at Intersections, the Tilt Meter and the Music button. On a tablet held sideways it sits beside the map so you see each change as you make it."
+        "text": "Map Settings: the round Map Settings button on the map opens one sheet for everything about the map. Pick Satellite, Topo or 3D Terrain from pictures of each, flip big switches for Streets and Roads, Off-Road Trails, Hiking Trails and Land Boundaries (or fine-tune every map feature), choose how the map follows you (Follow Me, Zoom Out at the Edge, Zoom In at Intersections), and turn the Tilt Meter and Music button on or off. On a tablet held sideways it sits beside the map so you see each change as you make it."
       },
       {
         "kind": "fixed",
-        "text": "The map moves smoothly while you ride. Your own dot glides in step with the map again instead of trailing it, and the map does less work every second, so it keeps up when you're moving."
+        "text": "The map moves smoothly while you ride. Your own dot glides in step with the map again instead of trailing it, and the map does less work every second, so it keeps up when you're moving. If a map lookup ever stalls, the map still keeps your dot on screen, and the app's own map moves no longer pause Follow Me."
       },
       {
         "kind": "improved",

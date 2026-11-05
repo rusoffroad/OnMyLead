@@ -50,6 +50,8 @@ export type TrailMap = {
   /** Each Map Feature on or off (core/map-features), for a Pro rider; all off for a Free rider. */
   features: FeatureChoices;
   setFeature: (id: MapFeatureId, on: boolean) => void;
+  /** Several features in one go (one map refresh, one save), for the quick switches and Show All. */
+  setFeatures: (changes: { id: MapFeatureId; on: boolean }[]) => void;
   /** The agencies' trail and land layers to draw for the features that are on. */
   agencyLayers: AgencyLayer[];
   /** Whose land a tap landed on (land features on and no trail under the finger). */
@@ -346,10 +348,18 @@ export function useTrailMap(): TrailMap {
       .catch(() => {});
   }, []);
 
-  const setFeature = (id: MapFeatureId, on: boolean) => {
-    if (id === 'riderTrails') return setRiderTrails(on);
-    if (id === 'parkTrails') return setParkTrails(on);
-    const next = { ...featuresRef.current, [id]: on };
+  const setFeatures = (changes: { id: MapFeatureId; on: boolean }[]) => {
+    const next = { ...featuresRef.current };
+    let changed = false;
+    for (const { id, on } of changes) {
+      if (id === 'riderTrails') setRiderTrails(on);
+      else if (id === 'parkTrails') setParkTrails(on);
+      else {
+        next[id] = on;
+        changed = true;
+      }
+    }
+    if (!changed) return;
     featuresRef.current = next;
     setFeatureState(next);
     trailsRef.current = anyTrails(next);
@@ -358,6 +368,7 @@ export function useTrailMap(): TrailMap {
     refreshOsm();
     save(baseRef.current, next);
   };
+  const setFeature = (id: MapFeatureId, on: boolean) => setFeatures([{ id, on }]);
 
   /** The old single switch: every trail feature on or off together. */
   const setTrails = (on: boolean) => {
@@ -542,6 +553,7 @@ export function useTrailMap(): TrailMap {
     trails,
     features,
     setFeature,
+    setFeatures,
     agencyLayers,
     land,
     clearLand: () => setLand(null),

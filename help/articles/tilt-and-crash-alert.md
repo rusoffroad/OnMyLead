@@ -38,7 +38,7 @@ You can also open it from the **You** tab: tap **Tilt and Crash Alert**. The scr
 Don't want it? At the top of the Tilt screen, under the Crash Alert switch, tap **Tilt Meter On** to turn it off. The Tilt tile leaves Map Mode and Ride Mode, the Tilt screen hides the readings, and tilt warnings stop. Crash Alert keeps working on its own switch. Tap **Tilt Meter Off** to bring it back. The switch follows your account to your other devices.
 
 :::release 2.1
-The same switch is under **Map Buttons** in **Map Settings**: tap the **Layers** button on Ride Mode's or Map Mode's map and switch **Tilt Meter**.
+The same switch is under **Map Buttons** in **Map Settings**: tap the round **Map Settings** button on Ride Mode's or Map Mode's map and switch **Tilt Meter**.
 :::
 
 ## Calibrate It for Your Mount

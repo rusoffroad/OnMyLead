@@ -69,7 +69,7 @@ Your own dot is a cyan disc with a white arrow built into it and a soft beam ahe
 Follow Me is on until you turn it off. Your phone remembers the choice for Ride Mode and Navigate alike, and you can also switch it in the **You** tab under **On the Trail**: **Follow Me on Maps**.
 
 :::release 2.1
-From 2.1 **Follow Me** and **Zoom In at Intersections** are also under **Map Buttons** in **Map Settings** (the **Layers** button on Ride Mode's and Map Mode's map).
+From 2.1 these switches are also under **Following** in **Map Settings** (the round **Map Settings** button on Ride Mode's and Map Mode's map): **Follow Me**, **Zoom Out at the Edge** and **Zoom In at Intersections**. Turn **Zoom Out at the Edge** off and the map slides along with your dot without zooming out first; it's also on the **You** tab under **On the Trail**. The zoom switches work while Follow Me is on.
 :::
 
 With Follow Me off, **Center on Me** still centers the map on you once, and Navigate doesn't move the map by itself, even while you record or follow a trail.

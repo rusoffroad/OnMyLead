@@ -3248,6 +3248,13 @@ const dict: Record<string, string> = {
   "Closes in on a turn as you reach it, then zooms back out.": "Aproxima um cruzamento quando você chega e depois afasta de novo.",
   "Roll and pitch on the map. Calibrate it on the Tilt screen.": "Inclinação lateral e frontal no mapa. Calibre na tela de Inclinação.",
   "Play, pause, skip and volume without leaving the map.": "Tocar, pausar, pular e volume sem sair do mapa.",
+  "Zoom Out at the Edge": "Afastar na Borda",
+  "The map moves to keep your dot on screen as you ride.": "O mapa se move para manter seu ponto na tela enquanto você anda.",
+  "The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.": "Na primeira vez que seu ponto chega perto da borda, o mapa se afasta um nível. Depois ele desliza com você.",
+  "Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.": "Aproxima um cruzamento de estrada ou trilha quando você chega para ver para onde ir, depois se afasta.",
+  "Zooming works while Follow Me is on.": "O zoom funciona enquanto Siga-me está ligado.",
+  "While following you, the map zooms out once as your dot nears the edge, then slides along": "Enquanto segue você, o mapa se afasta uma vez quando seu ponto chega perto da borda e depois desliza junto",
+  "Off. The map slides along without zooming out": "Desligado. O mapa desliza sem se afastar",
 };
 
 export default dict;

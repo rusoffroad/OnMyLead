@@ -3,6 +3,7 @@ import type MapView from 'react-native-maps';
 import { followFrameAfter, followMove, type FollowFrame } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
+import { edgeZoomOn } from '@/hooks/use-edge-zoom';
 
 /**
  * The follow camera's edge rule (core/follow-camera followMove) on the fallback maps (Apple Maps,
@@ -22,7 +23,7 @@ export async function fallbackFollowStep(
   ]);
   // iPhone and iPad report height (altitude) rather than zoom: treat any as a riding zoom.
   const zoom = cam?.zoom ?? 15;
-  const move = followMove(frame.current, { pt, size, inset, zoom, screenHeadingDeg: null, noZoomOut: !cam });
+  const move = followMove(frame.current, { pt, size, inset, zoom, screenHeadingDeg: null, noZoomOut: !cam || !edgeZoomOn() });
   frame.current = followFrameAfter(frame.current, move);
   if (move.kind === 'zoom-out') {
     if (cam?.zoom != null) m.animateCamera({ zoom: cam.zoom - 1 }, { duration: 700 });

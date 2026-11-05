@@ -96,8 +96,14 @@ export function MapboxMap({
   const size = useRef({ width: 390, height: 800 });
   const zoom = useRef(initial?.zoom ?? 4);
   const heading = useRef(0);
-  // Whether your own dot is moving (its arrow follows the GPS course) or stopped (the compass).
-  const [moving, setMoving] = useState(false);
+  // Until when the camera is moving because the app moved it.
+  const autoUntil = useRef(0);
+  const autoMove = (ms: number) => {
+    autoUntil.current = Math.max(autoUntil.current, Date.now() + ms + 200);
+  };
+  // Tells your own dot whether you're moving; the dot keeps that state itself, so a change
+  // re-draws only the dot, not the whole map.
+  const puckMoving = useRef<((moving: boolean) => void) | null>(null);
   // How much the terrain is raised, following the tilt (only while 3D Terrain is shown).
   const [exaggeration, setExaggeration] = useState(TERRAIN_EXAGGERATION);
   const ownFix = useRef(onOwnFix);
@@ -110,12 +116,14 @@ export function MapboxMap({
   useEffect(() => {
     if (firstLook.current === shown) return;
     firstLook.current = shown;
+    autoMove(600);
     camera.current?.setCamera({ pitch: lookPitch(shown), animationDuration: 600, animationMode: 'easeTo' });
   }, [shown]);
 
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {
       const far = zoom.current < FAR_OUT_ZOOM;
+      autoMove(opts?.animated === false ? 0 : opts?.duration ?? 450);
       camera.current?.setCamera({
         centerCoordinate: [p.lng, p.lat],
         padding: cameraPadding(inset ?? { top: 0, right: 0, bottom: 0, left: 0 }, size.current),
@@ -127,9 +135,11 @@ export function MapboxMap({
     fit(points, inset, animated = true) {
       const c = fitCorners(points);
       if (!c) return;
+      autoMove(animated ? 600 : 0);
       camera.current?.fitBounds(c[0], c[1], [inset.top, inset.right, inset.bottom, inset.left], animated ? 600 : 0);
     },
     zoomBy(levels) {
+      autoMove(250);
       camera.current?.zoomTo(Math.max(1, Math.min(22, zoom.current + levels)), 250);
     },
     async pointAt(x, y) {
@@ -151,6 +161,7 @@ export function MapboxMap({
     },
     camera: () => ({ zoom: zoom.current, heading: heading.current, ...size.current }),
     zoomTo(z, duration = 700) {
+      autoMove(duration);
       camera.current?.setCamera({ zoomLevel: z, animationDuration: duration, animationMode: 'easeTo' });
     },
     async roadsNear(p, radiusPt) {
@@ -195,7 +206,9 @@ export function MapboxMap({
     }
     // In steps of a tenth, so a tilt redraws the map a few times rather than on every frame.
     if (shown === 'terrain') setExaggeration(Math.round(terrainExaggeration(p.pitch ?? 0) * 10) / 10);
-    if (s.gestures?.isGestureActive) onUserMove?.();
+    // Only the rider's own drag, pinch or turn counts; the app's own camera moves (Follow Me, a fit)
+    // can report a gesture on some phones, which paused Follow Me after its first move.
+    if (s.gestures?.isGestureActive && Date.now() > autoUntil.current) onUserMove?.();
   }, [onCamera, onUserMove, shown, trail]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
@@ -280,24 +293,42 @@ export function MapboxMap({
         <Mapbox.UserLocation visible={false} minDisplacement={1} onUpdate={(loc) => {
           const c = loc.coords;
           const f = { lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null };
-          setMoving(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null);
+          puckMoving.current?.(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null);
           ownFix.current?.(f);
         }} />
         {children}
-        {/* Your own dot (the Chevron Puck, drawn as images): Mapbox moves and turns it itself, in step with the map. */}
-        <Mapbox.Images images={PUCK_IMAGES} />
-        <Mapbox.LocationPuck
-          puckBearingEnabled
-          puckBearing={moving ? 'course' : 'heading'}
-          topImage="oml-puck-clear"
-          shadowImage="oml-puck-clear"
-          bearingImage={moving ? 'oml-you-moving' : 'oml-you-stopped'}
-          pulsing={{ isEnabled: false }}
-        />
+        <NativePuck feedRef={puckMoving} />
       </Mapbox.MapView>
     </View>
   );
 }
+
+/**
+ * Your own dot (the Chevron Puck, drawn as images): Mapbox moves and turns it itself, in step with
+ * the map. Its arrow follows the GPS course while you move and the compass while you're stopped.
+ */
+const NativePuck = memo(function NativePuck({ feedRef }: { feedRef: React.MutableRefObject<((moving: boolean) => void) | null> }) {
+  const [moving, setMoving] = useState(false);
+  useEffect(() => {
+    feedRef.current = setMoving;
+    return () => {
+      feedRef.current = null;
+    };
+  }, [feedRef]);
+  return (
+    <>
+      <Mapbox.Images images={PUCK_IMAGES} />
+      <Mapbox.LocationPuck
+        puckBearingEnabled
+        puckBearing={moving ? 'course' : 'heading'}
+        topImage="oml-puck-clear"
+        shadowImage="oml-puck-clear"
+        bearingImage={moving ? 'oml-you-moving' : 'oml-you-stopped'}
+        pulsing={{ isEnabled: false }}
+      />
+    </>
+  );
+});
 
 /** A screen's line: navy casing, then the colored line, optionally dashed (in points). */
 const Line = memo(function Line({ line }: { line: MapLine }) {

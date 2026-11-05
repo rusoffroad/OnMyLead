@@ -3248,6 +3248,13 @@ const dict: Record<string, string> = {
   "Closes in on a turn as you reach it, then zooms back out.": "मोड़ पास आने पर ज़ूम इन करता है, फिर वापस ज़ूम आउट करता है।",
   "Roll and pitch on the map. Calibrate it on the Tilt screen.": "मैप पर रोल और पिच। झुकाव स्क्रीन पर कैलिब्रेट करें।",
   "Play, pause, skip and volume without leaving the map.": "मैप छोड़े बिना चलाएँ, रोकें, आगे बढ़ाएँ और आवाज़ बदलें।",
+  "Zoom Out at the Edge": "किनारे पर ज़ूम आउट",
+  "The map moves to keep your dot on screen as you ride.": "चलते समय आपका डॉट स्क्रीन पर रखने के लिए मैप खिसकता है।",
+  "The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.": "पहली बार डॉट किनारे के पास आने पर मैप एक स्टेप ज़ूम आउट होता है। उसके बाद वह आपके साथ खिसकता है।",
+  "Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.": "सड़क या ट्रेल के मोड़ पर पहुँचते ही ज़ूम इन करता है ताकि रास्ता दिखे, फिर ज़ूम आउट करता है।",
+  "Zooming works while Follow Me is on.": "ज़ूम तभी काम करता है जब मुझे फ़ॉलो करें चालू हो।",
+  "While following you, the map zooms out once as your dot nears the edge, then slides along": "फ़ॉलो करते समय डॉट किनारे के पास आने पर मैप एक बार ज़ूम आउट होता है, फिर साथ खिसकता है",
+  "Off. The map slides along without zooming out": "बंद। मैप बिना ज़ूम आउट किए खिसकता है",
 };
 
 export default dict;

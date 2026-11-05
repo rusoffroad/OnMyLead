@@ -16,6 +16,7 @@ import type { TrailMap } from '@/hooks/use-trail-map';
 import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
 import { OWN_PUCK_D } from './own-puck';
+import { edgeZoomOn } from '@/hooks/use-edge-zoom';
 import { puckBox, puckSvg, YOU_INK } from './rider-puck';
 import { blaze, stopSign } from './waypoint-map.web';
 import { t as tr } from '@/lib/i18n';
@@ -177,7 +178,7 @@ function FlatNavMap({
     const sz = m.getSize();
     const move = followMove(followFrame.current, {
       pt: m.latLngToContainerPoint(ll(followMe)), size: { width: sz.x, height: sz.y },
-      inset: { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] }, zoom: m.getZoom(), screenHeadingDeg: null,
+      inset: { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] }, zoom: m.getZoom(), screenHeadingDeg: null, noZoomOut: !edgeZoomOn(),
     });
     followFrame.current = followFrameAfter(followFrame.current, move);
     if (move.kind === 'zoom-out') m.setZoom(move.zoom, { animate: true });
