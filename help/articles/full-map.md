@@ -30,7 +30,7 @@ Every map in OnMyLead can fill your whole screen. **Full Map** tucks the top bar
 :::
 
 :::release 2.1
-Every map in OnMyLead can fill your whole screen. **Full Map** tucks the top bar, the Map Settings button and the panel away, and leaves one slim bar at the bottom so you can bring everything back with one tap.
+Every map in OnMyLead can fill your whole screen. **Full Map** tucks the top bar and the panel away, and leaves one slim bar at the bottom so you can bring everything back with one tap. The round **Map Settings** button stays in the top-left corner and the compass in the top-right, so you can change the map without leaving Full Map.
 :::
 
 ## Turn On Full Map

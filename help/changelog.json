@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["map-layers", "full-map", "3d-terrain", "ride-mode", "navigation-mode", "follow-me"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-corner-flag-dot",
+    "why": "2.1 build 10 (Chris): the Map Settings button moved to the top-left corner of every riding map, level with the compass on the right, and both sit just under the top bar while it shows so they can always be seen; they stay on screen in Full Map now. Map Mode is listed as a place to find it. New Dot Style Red, White and Blue is the default for your own dot; Safety Orange and the rest are still in Map Settings."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["tilt-and-crash-alert"],
     "kind": "fix",
     "by": "pr",

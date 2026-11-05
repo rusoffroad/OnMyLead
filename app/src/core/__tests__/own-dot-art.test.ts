@@ -3,10 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_DOT_STYLE, DOT_STYLE_NAME, DOT_STYLES, ownDotBox, ownDotSvg, parseDotStyle } from '../own-dot-art';
 
 describe('own dot art', () => {
-  it('defaults to Safety Orange', () => {
-    expect(DEFAULT_DOT_STYLE).toBe('orange');
-    expect(parseDotStyle(null)).toBe('orange');
-    expect(parseDotStyle('nope')).toBe('orange');
+  it('defaults to Red, White and Blue, listed first, and keeps a saved Safety Orange', () => {
+    expect(DEFAULT_DOT_STYLE).toBe('flag');
+    expect(DOT_STYLES[0]).toBe('flag');
+    expect(DOT_STYLE_NAME.flag).toBe('Red, White and Blue');
+    expect(parseDotStyle(null)).toBe('flag');
+    expect(parseDotStyle('nope')).toBe('flag');
+    expect(parseDotStyle('orange')).toBe('orange');
     for (const s of DOT_STYLES) expect(parseDotStyle(s)).toBe(s);
     expect(Object.keys(DOT_STYLE_NAME).sort()).toEqual([...DOT_STYLES].sort());
   });

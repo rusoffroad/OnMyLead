@@ -3301,6 +3301,7 @@ const dict: Record<string, string> = {
   "Hi-Viz Dome": "Kubah Hi-Viz",
   "Reflective Ring": "Cincin Reflektif",
   "Floating Arrowhead": "Mata Panah Melayang",
+  "Red, White and Blue": "Merah, Putih dan Biru",
   "Safety Orange": "Oranye Keselamatan",
   "Classic": "Klasik",
   "Right-drag or Ctrl-drag to tilt and turn.": "Seret dengan klik kanan atau Ctrl untuk memiringkan dan memutar.",

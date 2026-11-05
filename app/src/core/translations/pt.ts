@@ -3301,6 +3301,7 @@ const dict: Record<string, string> = {
   "Hi-Viz Dome": "Domo Alta Visibilidade",
   "Reflective Ring": "Anel Refletivo",
   "Floating Arrowhead": "Seta Flutuante",
+  "Red, White and Blue": "Vermelho, Branco e Azul",
   "Safety Orange": "Laranja de Segurança",
   "Classic": "Clássico",
   "Right-drag or Ctrl-drag to tilt and turn.": "Arraste com o botão direito ou com Ctrl para inclinar e girar.",

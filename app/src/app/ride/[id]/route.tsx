@@ -10,6 +10,7 @@ import { Icon } from '@/components/icon';
 import { MapSearch } from '@/components/map-search';
 import { PanelHandle } from '@/components/panel-handle';
 import { RouteBuilderMap } from '@/components/route-builder-map';
+import { CompassSpot } from '@/components/compass-spot';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { TrailPickerSheet } from '@/components/trail-picker-sheet';
 import { Button, ErrorText } from '@/components/ui';
@@ -188,28 +189,35 @@ export default function RouteBuilder() {
             ? tr('Keep {v} along the trail. Drag a point to move it{v2}.', { v: web ? 'clicking' : 'tapping', v2: web ? ', or press Ctrl+Z to undo' : '' })
             : tr('Straight lines between points. Switch to Follow Trails to snap to the trail.');
 
+  // Map Settings (top left) and the compass (top right) sit level, just under the top bar, or at
+  // the top in Full Map (core/map-corner). On a wide tablet the bar is the panel column, so they're at the top.
+  const cornerTop = full ? insets.top + 12 : wide ? insets.top + 20 : insets.top + 66;
+  const compassSpot = { top: cornerTop };
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       {loaded ? (
-        <RouteBuilderMap
-          points={route?.points ?? []}
-          waypoints={imported ? [] : taps}
-          center={center}
-          editable={!imported}
-          onAdd={add}
-          onMove={draft.move}
-          pending={pending}
-          trail={trail}
-          found={found}
-          onCenter={(c) => (looking.current = c)}
-          padding={full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : undefined}
-        />
+        <CompassSpot.Provider value={compassSpot}>
+          <RouteBuilderMap
+            points={route?.points ?? []}
+            waypoints={imported ? [] : taps}
+            center={center}
+            editable={!imported}
+            onAdd={add}
+            onMove={draft.move}
+            pending={pending}
+            trail={trail}
+            found={found}
+            onCenter={(c) => (looking.current = c)}
+            padding={full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : undefined}
+          />
+        </CompassSpot.Provider>
       ) : null}
       {loaded ? (
         <TrailMapOverlay
           trail={trail}
           bare={full}
-          top={full ? insets.top + 12 : insets.top + 66}
+          top={cornerTop}
+          left={wide && !full ? PANEL_W + 32 : undefined}
           cardTop={insets.top + 118}
           route={route?.points}
           ride={ride}
