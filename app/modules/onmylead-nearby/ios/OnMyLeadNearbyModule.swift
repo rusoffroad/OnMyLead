@@ -207,10 +207,15 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     send(outgoing)
   }
 
+  /**
+   * Writes until CoreBluetooth's send queue for that phone is full, and leaves the rest to the next
+   * round (which carries everything again), so a slow link never builds a backlog and a tap sent
+   * at once doesn't wait behind old rounds.
+   */
   private func write(_ frames: [Data], to p: CBPeripheral, _ ch: CBCharacteristic) {
     for f in frames {
-      let type: CBCharacteristicWriteType = p.canSendWriteWithoutResponse ? .withoutResponse : .withResponse
-      if f.count <= p.maximumWriteValueLength(for: type) { p.writeValue(f, for: ch, type: type) }
+      guard p.canSendWriteWithoutResponse else { return }
+      if f.count <= p.maximumWriteValueLength(for: .withoutResponse) { p.writeValue(f, for: ch, type: .withoutResponse) }
     }
   }
 

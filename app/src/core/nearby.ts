@@ -53,8 +53,6 @@ export const REPLY_PART_BYTES = 88;
  * sixth is headroom.
  */
 export const MAX_REPLY_PARTS = 6;
-/** Upper bound on a message's UTF-8 bytes over Bluetooth. Parts split at whole characters, so the real limit can be a few bytes lower: use fitReply, not this, to decide what goes whole. */
-export const MAX_REPLY_BYTES = REPLY_PART_BYTES * MAX_REPLY_PARTS;
 /** A packet is passed on at most this many times after the phone that made it. */
 export const MAX_HOPS = 6;
 /** A rider's spot is passed on for this long after it was taken. */
@@ -72,7 +70,7 @@ export const TAG_WINDOW_SEC = 15 * 60;
 export const MAX_FRAMES_PER_ROUND = 24;
 /** How often a full round moves on in line: longer than the slowest radio round (10 s on Max Battery Saver), so every turn's pick goes out at least once. */
 export const ROTATE_MS = 12_000;
-/** How long an item must stay in the pick to count as sent: longer than the slowest radio round (10 s on Max Battery Saver), with room for timer drift. */
+/** How long an item must stay in the pick to count as sent: longer than the slowest radio round (10 s on Max Battery Saver: LOW_ROUND_MS on Android, lowRoundSeconds on iPhone, ROUND_MS.low in lib/nearby.ts; keep them in step), with room for timer drift. */
 export const HELD_MS = 11_000;
 /** Other riders' spots, and receipts, a full round always makes room for. */
 export const SPOT_SHARE = 6;

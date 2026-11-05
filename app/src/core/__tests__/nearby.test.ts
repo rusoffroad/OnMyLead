@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  ACK_DELIVERED, ACK_SEEN, EMERGENCY_RELAY_SEC, FLAG_FROM_SERVER, MAX_FRAME_BYTES, MAX_HOPS, MAX_REPLY_BYTES, MAX_REPLY_PARTS,
+  ACK_DELIVERED, ACK_SEEN, EMERGENCY_RELAY_SEC, FLAG_FROM_SERVER, MAX_FRAME_BYTES, MAX_HOPS, MAX_REPLY_PARTS,
   MAX_FRAMES_PER_ROUND, NO_MAC, NearbyMesh, POSITION_RELAY_SEC, REPLY_PART_BYTES, TAG_WINDOW_SEC,
   canonical, fitReply, pickFrames, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
   type NearbyItem, type RideKeys,
@@ -71,7 +71,7 @@ describe('packets', () => {
       expect(bytes(p.body)).toBeLessThanOrEqual(REPLY_PART_BYTES);
       expect(sealFrame(key(1), p, nonce(), T0 / 1000).length).toBeLessThanOrEqual(MAX_FRAME_BYTES);
     }
-    expect(bytes(parts.map((p) => p.body).join(''))).toBeLessThanOrEqual(MAX_REPLY_BYTES);
+    expect(bytes(parts.map((p) => p.body).join(''))).toBeLessThanOrEqual(REPLY_PART_BYTES * MAX_REPLY_PARTS);
     expect(splitReply('Running late, go on without me')).toEqual(['Running late, go on without me']);
     expect(splitReply('x'.repeat(100))).toEqual(['x'.repeat(88), 'x'.repeat(12)]);
     const ack = a.ownAck(C, ACK_SEEN, T0)!;
