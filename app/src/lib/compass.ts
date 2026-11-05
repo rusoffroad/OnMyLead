@@ -21,7 +21,9 @@ function start() {
     .then((p) => {
       if (!listeners.size) return null;
       if (p.status !== 'granted') {
-        // A map can open before the rider answers the location prompt: look again shortly.
+        // A map can open before the rider answers the location prompt: look again shortly
+        // (not when the answer was a lasting no; the next map that opens asks again).
+        if (!p.canAskAgain) return null;
         retry ??= setTimeout(() => {
           retry = null;
           if (listeners.size) start();

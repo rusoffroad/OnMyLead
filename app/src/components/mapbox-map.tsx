@@ -117,6 +117,9 @@ export function MapboxMap({
   // Whether a finger is on the map: a drag then counts as the rider's even while Follow Me is
   // still panning (Follow Me keeps the window above open on every fix).
   const touching = useRef(false);
+  // When a finger last went down: some phones cancel the touch once the map's own gesture takes
+  // over, so a gesture soon after a touch counts as the rider's too.
+  const touchedAt = useRef(0);
   const autoMove = (ms: number) => {
     autoUntil.current = Math.max(autoUntil.current, Date.now() + ms + 200);
   };
@@ -227,7 +230,7 @@ export function MapboxMap({
     if (shown === 'terrain') setExaggeration(Math.round(terrainExaggeration(p.pitch ?? 0) * 10) / 10);
     // Only the rider's own drag, pinch or turn counts; the app's own camera moves (Follow Me, a fit)
     // can report a gesture on some phones, which paused Follow Me after its first move.
-    if (s.gestures?.isGestureActive && (touching.current || Date.now() > autoUntil.current)) onUserMove?.();
+    if (s.gestures?.isGestureActive && (touching.current || Date.now() - touchedAt.current < 1500 || Date.now() > autoUntil.current)) onUserMove?.();
   }, [onCamera, onUserMove, shown, trail]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
@@ -258,6 +261,7 @@ export function MapboxMap({
       style={StyleSheet.absoluteFill}
       onTouchStart={() => {
         touching.current = true;
+        touchedAt.current = Date.now();
       }}
       onTouchEnd={(e) => {
         touching.current = e.nativeEvent.touches.length > 0;

@@ -255,7 +255,7 @@ function MapSettingsSheet({
               {trail.base === 'terrain' ? (
                 <Text style={styles.fine}>
                   {trail.terrain3d
-                    ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.' })
+                    ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? tr('Right-drag or Ctrl-drag to tilt and turn.') : tr('Drag up or down with two fingers to tilt, twist to turn.') })
                     : tr('No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.')}
                 </Text>
               ) : null}
