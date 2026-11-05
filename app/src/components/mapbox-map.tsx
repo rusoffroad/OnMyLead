@@ -20,7 +20,7 @@ import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
-import { riderHeading } from '@/core/heading';
+import { ownFixMoving } from '@/core/heading';
 import { useHasCompass } from '@/lib/compass';
 import { dotScale } from '@/core/dot-size';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
@@ -335,7 +335,7 @@ export function MapboxMap({
           // the map library throws on a spot that isn't numbers.
           if (!c || !isLatLng({ lat: c.latitude, lng: c.longitude })) return;
           const f = { lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null };
-          puckMoving.current?.(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null, loc.timestamp);
+          puckMoving.current?.(ownFixMoving({ speedMps: f.speed, headingDeg: f.course }), loc.timestamp);
           ownFix.current?.(f);
         }} />
         {children}

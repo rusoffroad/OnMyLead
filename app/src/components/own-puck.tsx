@@ -1,7 +1,7 @@
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { ownArrow, riderHeading, screenAngle } from '@/core/heading';
+import { ownArrow, ownFixMoving, riderHeading, screenAngle } from '@/core/heading';
 import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
 import { useOwnMoving } from '@/hooks/use-own-moving';
 import { useCompass } from '@/lib/compass';
@@ -77,7 +77,7 @@ function OwnPuckAt({ fix, mapHeading, Marker }: { fix: OwnPuckFix; mapHeading: n
   // Moving or stopped by the shared rule (no new moving fix for a while means stopped).
   const [moving, feed] = useOwnMoving();
   useEffect(() => {
-    feed(riderHeading({ speedMps: fix.speed, headingDeg: fix.course }, true) != null, fix.at);
+    feed(ownFixMoving({ speedMps: fix.speed, headingDeg: fix.course }), fix.at);
   }, [fix, feed]);
   const arrow = ownArrow(moving ? { speedMps: fix.speed, headingDeg: fix.course } : null, compass, fix.lastCourse);
   return (
