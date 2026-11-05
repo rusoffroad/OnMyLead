@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["import-gpx", "manage-subscription", "offline-maps", "pro-trial", "ride-summary-and-ride-again", "route-builder", "trip-planner"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-23",
+    "why": "2.1 release test, pass 23. The Pro prompt now shows every feature's title and description in the rider's language; the wording in English is unchanged."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": [
       "carplay",
       "directions",
