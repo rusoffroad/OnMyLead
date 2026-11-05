@@ -26,6 +26,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.SystemClock
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.ParcelUuid
@@ -56,6 +57,8 @@ class NearbyRadio(
     private const val MAX_SUBSCRIBE_FAILS = 10
     /** Refused writes of one urgent frame before it is left to later rounds. */
     private const val MAX_URGENT_TRIES = 5
+    /** How long a new server's service may take to register before the server is replaced. */
+    private const val SERVICE_WAIT_MS = 15_000L
     private const val ROUND_MS = 4_000L
     // Low power (service, nobody in range, or Max Battery Saver): send less often and let the
     // chip scan and advertise in its low-power duty cycle. Phones that connect are served at once.
@@ -79,6 +82,8 @@ class NearbyRadio(
   private var advertising = false
   /** The server's service is registered: only then may the phone advertise it. */
   private var serviceReady = false
+  /** When the current server was opened: one whose service never registers is replaced. */
+  private var serverOpenedAt = 0L
   private var scanning = false
 
   private class Peer(val gatt: BluetoothGatt) {
@@ -267,6 +272,13 @@ class NearbyRadio(
         report("off")
       }
     } else {
+      if (server != null && !serviceReady && SystemClock.elapsedRealtime() - serverOpenedAt > SERVICE_WAIT_MS) {
+        // The stack took the service but never confirmed it: start over with a new server.
+        serverGen++
+        outboxChar = null
+        try { server?.close() } catch (_: Exception) {}
+        server = null
+      }
       if (server == null) openServer() else if (serviceReady && !advertising) startAdvertising()
       if (!scanning) startScan()
       if (state != "on") report("on")
@@ -411,6 +423,7 @@ class NearbyRadio(
       return
     }
     server = srv
+    serverOpenedAt = SystemClock.elapsedRealtime()
   }
 
   private fun startAdvertising() {

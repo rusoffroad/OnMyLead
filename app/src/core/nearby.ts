@@ -70,8 +70,8 @@ export const TAG_WINDOW_SEC = 15 * 60;
 export const MAX_FRAMES_PER_ROUND = 24;
 /** How often a full round moves on in line: longer than the slowest radio round (10 s on Max Battery Saver), so every turn's pick goes out at least once. */
 export const ROTATE_MS = 12_000;
-/** How long an item must stay in the pick to count as sent: longer than the slowest radio round (10 s on Max Battery Saver: LOW_ROUND_MS on Android, lowRoundSeconds on iPhone, ROUND_MS.low in lib/nearby.ts; keep them in step), with room for timer drift. */
-export const HELD_MS = 11_000;
+/** How long an item must stay in the pick to count as sent: as long as the slowest radio round (10 s on Max Battery Saver: LOW_ROUND_MS on Android, lowRoundSeconds on iPhone, ROUND_MS.low in lib/nearby.ts; keep them in step), so one round went out while it was picked. */
+export const HELD_MS = 10_000;
 /** Other riders' spots, and receipts, a full round always makes room for. */
 export const SPOT_SHARE = 6;
 export const ACK_SHARE = 2;

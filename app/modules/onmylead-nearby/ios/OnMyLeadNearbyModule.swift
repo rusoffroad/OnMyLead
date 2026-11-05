@@ -158,6 +158,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       }
       self.peers.removeAll()
       self.peerInbox.removeAll()
+      self.writeUrgent.removeAll()
+      self.writeRound.removeAll()
       self.subscribers.removeAll()
       self.pendingUrgent.removeAll()
       self.pendingRound.removeAll()
@@ -208,15 +210,42 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   }
 
   /**
-   * Writes until CoreBluetooth's send queue for that phone is full, and leaves the rest to the next
-   * round (which carries everything again), so a slow link never builds a backlog and a tap sent
-   * at once doesn't wait behind old rounds.
+   * Frames still to write to each connected phone, the same way as pendingUrgent and pendingRound
+   * for subscribers: urgent ones first and kept until written, the round replaced by each new one.
+   * Written while CoreBluetooth has room; peripheralIsReady picks up the rest, so a slow link
+   * never builds a backlog and a tap sent at once never waits behind old rounds.
    */
-  private func write(_ frames: [Data], to p: CBPeripheral, _ ch: CBCharacteristic) {
-    for f in frames {
-      guard p.canSendWriteWithoutResponse else { return }
-      if f.count <= p.maximumWriteValueLength(for: .withoutResponse) { p.writeValue(f, for: ch, type: .withoutResponse) }
+  private var writeUrgent: [UUID: [Data]] = [:]
+  private var writeRound: [UUID: [Data]] = [:]
+
+  private func queueWrites(_ frames: [Data], to id: UUID, urgent: Bool) {
+    let batch = Array(frames.prefix(NearbyRadio.maxPendingNotify))
+    if urgent {
+      var u = (writeUrgent[id] ?? []) + batch
+      if u.count > NearbyRadio.maxPendingNotify { u.removeFirst(u.count - NearbyRadio.maxPendingNotify) }
+      writeUrgent[id] = u
+    } else {
+      writeRound[id] = batch
     }
+  }
+
+  private func drainWrites(_ p: CBPeripheral) {
+    let id = p.identifier
+    guard let ch = peerInbox[id], p.state == .connected else {
+      writeUrgent[id] = nil
+      writeRound[id] = nil
+      return
+    }
+    while p.canSendWriteWithoutResponse {
+      let fromUrgent = !(writeUrgent[id] ?? []).isEmpty
+      guard let f = fromUrgent ? writeUrgent[id]?.first : writeRound[id]?.first else { return }
+      if f.count <= p.maximumWriteValueLength(for: .withoutResponse) { p.writeValue(f, for: ch, type: .withoutResponse) }
+      if fromUrgent { writeUrgent[id]?.removeFirst() } else { writeRound[id]?.removeFirst() }
+    }
+  }
+
+  func peripheralIsReady(toSendWriteWithoutResponse p: CBPeripheral) {
+    drainWrites(p)
   }
 
   /**
@@ -226,9 +255,11 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   private func send(_ frames: [Data], urgent: Bool = false) {
     // An empty round still goes through: it clears what subscribers hadn't been sent yet.
     guard !frames.isEmpty || !urgent else { return }
-    for (id, ch) in peerInbox {
+    for id in peerInbox.keys {
       guard let p = peers[id], p.state == .connected else { continue }
-      write(frames, to: p, ch)
+      if urgent && frames.isEmpty { continue }
+      queueWrites(frames, to: id, urgent: urgent)
+      drainWrites(p)
     }
     guard !subscribers.isEmpty else { return }
     let batch = Array(frames.prefix(NearbyRadio.maxPendingNotify))
@@ -291,6 +322,8 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     if c.state == .poweredOn { scan() } else {
       peers.removeAll()
       peerInbox.removeAll()
+      writeUrgent.removeAll()
+      writeRound.removeAll()
     }
     report(NearbyRadio.stateName(c.state))
   }
@@ -309,11 +342,15 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
   func centralManager(_ c: CBCentralManager, didFailToConnect p: CBPeripheral, error: Error?) {
     peers[p.identifier] = nil
     peerInbox[p.identifier] = nil
+    writeUrgent[p.identifier] = nil
+    writeRound[p.identifier] = nil
   }
 
   func centralManager(_ c: CBCentralManager, didDisconnectPeripheral p: CBPeripheral, error: Error?) {
     peers[p.identifier] = nil
     peerInbox[p.identifier] = nil
+    writeUrgent[p.identifier] = nil
+    writeRound[p.identifier] = nil
     report()
   }
 
@@ -333,7 +370,10 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     report()
     // A new phone gets everything at once rather than waiting for the next round; the others
     // carry on with theirs.
-    if let ch = peerInbox[p.identifier], p.state == .connected { write(outgoing, to: p, ch) }
+    if peerInbox[p.identifier] != nil {
+      queueWrites(outgoing, to: p.identifier, urgent: false)
+      drainWrites(p)
+    }
   }
 
   func peripheral(_ p: CBPeripheral, didUpdateValueFor ch: CBCharacteristic, error: Error?) {
@@ -365,6 +405,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
       // Not ready yet (often right after Bluetooth turns on): the next round adds it again.
       pm.removeAllServices()
       serviceAdded = false
+      outboxChar = nil
       return
     }
     // No name in the advertisement: other phones see only that an OnMyLead phone is near.
