@@ -2,6 +2,25 @@
   {
     "date": "2026-11-05",
     "slugs": [
+      "carplay",
+      "directions",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "location-sharing",
+      "ride-bubble",
+      "ride-mode",
+      "tilt-and-crash-alert",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-5",
+    "why": "2.1 release test, passes 4 and 5. Crash Alert treats a fall while moving, even slowly, as the vehicle possibly in the air, and says that a phone falling just before you stop may start the countdown (tilt-and-crash-alert, 2.1 block). The Ride Mode articles are re-dated because the announcement banner in Ride Mode now shows the leader's words exactly as written; riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
       "bluetooth-sharing",
       "navigation-mode",
       "refer-a-friend",
