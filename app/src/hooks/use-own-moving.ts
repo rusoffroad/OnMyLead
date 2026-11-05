@@ -14,7 +14,7 @@ export function useOwnMoving(): [boolean, (moving: boolean, fixAtMs?: number) =>
   useEffect(() => () => clearTimeout(timer.current), []);
   const feed = useCallback((isMoving: boolean, fixAtMs?: number) => {
     const now = Date.now();
-    const next = ownMoveStep(state.current, isMoving, fixAtMs ?? now, now);
+    const next = ownMoveStep(state.current, isMoving, fixAtMs, now);
     if (next === state.current) return;
     state.current = next;
     clearTimeout(timer.current);

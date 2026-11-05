@@ -72,6 +72,14 @@ describe("other riders' arrows stay on after they stop", () => {
   });
 });
 
+describe('ownFix time', () => {
+  it('keeps the fix\'s own time when the map gives one', () => {
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: 1234 })?.atMs).toBe(1234);
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0 })?.atMs).toBeUndefined();
+    expect(ownFix({ latitude: 1, longitude: 2, speed: 0, heading: 0, timestamp: Number.NaN })?.atMs).toBeUndefined();
+  });
+});
+
 describe('own dot moving or stopped', () => {
   const ride = (gapMs: number, n: number, from = OWN_MOVE_START, t0 = 0) => {
     let s = from;
@@ -117,6 +125,23 @@ describe('own dot moving or stopped', () => {
   it('ignores a dead spot as a fix gap, so the wait never grows past 50 s', () => {
     expect(ownStopWaitMs(ownMoveStep(ride(1000, 3), true, 30_000, 30_000))).toBe(OWN_STOPPED_AFTER_MS);
     expect(ownStopWaitMs(ride(20_000, 5))).toBe(50_000);
+  });
+  it('two like quiet spells must come in a row: riding on between them starts over', () => {
+    const one = ownMoveStep(ownMoveTimedOut(ride(1000, 5)), true, 16_000, 16_000);
+    const rode = ownMoveStep(one, true, 17_000, 17_000);
+    const two = ownMoveStep(ownMoveTimedOut(rode), true, 31_000, 31_000);
+    expect(ownStopWaitMs(two)).toBe(OWN_STOPPED_AFTER_MS);
+  });
+  it('measures gaps by the fixes\' own times, so a held-back burst keeps its real spacing', () => {
+    let s = ownMoveStep(OWN_MOVE_START, true, 0, 100_000);
+    for (let k = 1; k <= 3; k++) s = ownMoveStep(s, true, k * 15_000, 100_000 + k);
+    expect(ownStopWaitMs(s)).toBe(37_500);
+  });
+  it('a fix with no time of its own is never taken for a repeat', () => {
+    const s = ownMoveStep(OWN_MOVE_START, true, null, 1000);
+    const t = ownMoveStep(s, false, null, 1000);
+    expect(t).not.toBe(s);
+    expect(t.moving).toBe(false);
   });
   it('ignores a repeated fix (only the compass turned)', () => {
     const s = ownMoveStep(OWN_MOVE_START, true, 1000, 1000);

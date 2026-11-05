@@ -68,7 +68,7 @@ export function ownArrow(
  */
 export type OwnMoveState = {
   moving: boolean;
-  /** The last fix's own time (ms), only ever compared with the next fix's. */
+  /** The last fix's own time (ms) when the phone gave one, only ever compared with other fixes' times. */
   fixAt: number | null;
   /** The clock time (ms) of the last fix. */
   seenAt: number | null;
@@ -91,19 +91,24 @@ export const OWN_FIX_GAP_MAX_MS = 20_000;
 export const OWN_FIX_GAPS_KEPT = 5;
 
 /**
- * The next state for a fix (moving or not, its own time, the clock now). A fix with the same own
- * time as the last one (some phones repeat the last spot when only the compass turned) returns
- * `prev` itself: nothing changes, so a stopped rider turning the phone doesn't count as moving.
+ * The next state for a fix (moving or not, its own time when the phone gives one, the clock now).
+ * A fix with the same own time as the last one (some phones repeat the last spot when only the
+ * compass turned) returns `prev` itself: nothing changes, so a stopped rider turning the phone
+ * doesn't count as moving. Gaps are measured between the fixes' own times when both have one, so
+ * a burst of fixes the phone held back (the app coming back from the background) keeps their real
+ * spacing; otherwise by when they arrived.
  */
-export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number, nowMs: number): OwnMoveState {
-  if (prev.fixAt != null && fixAtMs === prev.fixAt) return prev;
+export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number | null | undefined, nowMs: number): OwnMoveState {
+  const fixAt = fixAtMs != null && Number.isFinite(fixAtMs) ? fixAtMs : null;
+  if (fixAt != null && prev.fixAt != null && fixAt === prev.fixAt) return prev;
   let gaps = prev.gaps;
   let pendingGap = prev.pendingGap;
-  const gap = prev.seenAt == null ? 0 : nowMs - prev.seenAt;
+  const gap = fixAt != null && prev.fixAt != null ? fixAt - prev.fixAt : prev.seenAt == null ? 0 : nowMs - prev.seenAt;
   const fits = gap > 0 && gap <= OWN_FIX_GAP_MAX_MS;
-  if (moving && prev.moving && fits) {
-    // Back-to-back moving fixes show the map's fix rate.
-    gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
+  if (moving && prev.moving) {
+    // Back-to-back moving fixes show the map's fix rate (and end any half-learned slower rate).
+    if (fits) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
+    pendingGap = null;
   } else if (moving && prev.quiet && fits) {
     // A moving fix right after the quiet spell ran out: either a short stop or slower fixes
     // (Battery Saver came on). Two such gaps of about the same length in a row are the new rate.
@@ -112,7 +117,7 @@ export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number
       pendingGap = null;
     } else pendingGap = gap;
   } else if (!moving) pendingGap = null;
-  return { moving, fixAt: fixAtMs, seenAt: nowMs, gaps, quiet: false, pendingGap };
+  return { moving, fixAt, seenAt: nowMs, gaps, quiet: false, pendingGap };
 }
 
 /** The quiet spell had no new fix: stopped (the learned fix rate stays). */
