@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["contact-support", "create-a-ride-on-the-website", "getting-started", "pro-trial", "subscribe-to-pro"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "promote-bluetooth-sharing",
+    "why": "Re-dated only: the onmylead.com homepage gets a No Service section for Bluetooth Sharing once 2.1 is live. Contact, prices, the Pro Trial and creating a ride on the website are unchanged."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["faq", "bluetooth-sharing"],
     "kind": "update",
     "by": "pr",
