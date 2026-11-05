@@ -9,6 +9,7 @@ import {
 import type { Waypoint } from '@/core/waypoints';
 import { track } from './analytics';
 import { currentEntitlements } from './entitlements';
+import { selectAll } from './select-all';
 import { isBackendConfigured, supabase } from './supabase';
 import { singleFlight } from './single-flight';
 
@@ -146,8 +147,7 @@ async function run() {
   if (!me) return;
   await load();
 
-  const { data: list, error } = await supabase.from('rider_map_waypoints').select('waypoint_id, deleted, updated_at');
-  if (error) throw new Error(error.message);
+  const list = await selectAll('rider_map_waypoints', 'waypoint_id, deleted, updated_at', 'waypoint_id');
   const tombstones = await readTombstones();
   const plan = planMapWaypointSync(all, tombstones, parseBackupList(list), me);
 

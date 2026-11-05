@@ -47,10 +47,12 @@ export const NEARBY_OUTBOX_UUID = 'E3B1C7A2-5D4F-4E2A-9F61-0A6D1E7C4B21';
 export const MAX_FRAME_BYTES = 180;
 /** Text that fits in one message packet, in UTF-8 bytes. */
 export const REPLY_PART_BYTES = 88;
-/** A message goes out in up to this many packets (one per REPLY_PART_BYTES). */
-export const MAX_REPLY_PARTS = 4;
-/** Longest message that goes over Bluetooth, in UTF-8 bytes; longer ones are cut. */
-export const MAX_REPLY_BYTES = REPLY_PART_BYTES * MAX_REPLY_PARTS;
+/**
+ * A message goes out in up to this many packets (one per REPLY_PART_BYTES). Any Ride Mode message
+ * (RIDE_MESSAGE_MAX UTF-16 units, at most 3 UTF-8 bytes each, so 360 bytes) needs at most 5; the
+ * sixth is headroom.
+ */
+export const MAX_REPLY_PARTS = 6;
 /** A packet is passed on at most this many times after the phone that made it. */
 export const MAX_HOPS = 6;
 /** A rider's spot is passed on for this long after it was taken. */
@@ -66,6 +68,13 @@ export const MAX_CLOCK_SKEW_SEC = 5 * 60;
 export const TAG_WINDOW_SEC = 15 * 60;
 /** Most packets one broadcast round sends, so a big group can't flood the link. */
 export const MAX_FRAMES_PER_ROUND = 24;
+/** How often a full round moves on in line: longer than the slowest radio round (10 s on Max Battery Saver), so every turn's pick goes out at least once. */
+export const ROTATE_MS = 12_000;
+/** How long an item must stay in the pick to count as sent: a margin over the slowest radio round (10 s on Max Battery Saver: LOW_ROUND_MS on Android, lowRoundSeconds on iPhone, ROUND_MS.low in lib/nearby.ts; keep them in step), so a round surely went out while it was picked. Erring long only slows the line; erring short would skip items. */
+export const HELD_MS = 10_500;
+/** Other riders' spots, and receipts, a full round always makes room for. */
+export const SPOT_SHARE = 6;
+export const ACK_SHARE = 2;
 
 const MAGIC = 0x4f; // "O"
 const VERSION = 1;
@@ -437,23 +446,26 @@ function sameBytes(a: Uint8Array, b: Uint8Array) {
 
 /** Fits a message into MAX_REPLY_PARTS packets, cutting at a whole character. */
 export function fitReply(body: string): string {
-  let out = body.trim();
-  while (enc.encode(out).length > MAX_REPLY_BYTES) out = Array.from(out).slice(0, -1).join('');
-  return out;
+  // No trailing space at a cut: the parts are split again from this text and must join back to it.
+  return splitReply(body).join('').trimEnd();
 }
 
-/** Splits a message's text into the pieces that each fit one packet, at whole characters. */
+/**
+ * Splits a message's text into the pieces that each fit one packet, at whole characters, keeping
+ * at most MAX_REPLY_PARTS pieces (the rest is cut).
+ */
 export function splitReply(body: string): string[] {
   const out: string[] = [];
   let cur = '';
-  for (const ch of fitReply(body)) {
+  for (const ch of body.trim()) {
     if (enc.encode(cur + ch).length > REPLY_PART_BYTES) {
       out.push(cur);
       cur = '';
+      if (out.length === MAX_REPLY_PARTS) return out;
     }
     cur += ch;
   }
-  out.push(cur);
+  if (cur || !out.length) out.push(cur);
   return out;
 }
 
@@ -476,6 +488,87 @@ function rank(item: NearbyItem, myId: string): number {
   if (item.kind === 'reply') return 2;
   if (item.kind === 'position') return item.userId === myId ? 3 : 4;
   return 5;
+}
+
+/**
+ * At most MAX_FRAMES_PER_ROUND items, in sending order: the rider's own spot is always kept, and a
+ * message's parts go together or not at all, so a full round never ends partway through a message.
+ * When taps or messages don't all fit, the ones that went out longest ago (`lastSent`, by id; never
+ * sent counts as longest ago) go first, so every one gets its turn however many arrive.
+ */
+export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastSent: (key: string) => number = () => -1): T[] {
+  const own = items.find((i) => i.kind === 'position' && i.userId === myId);
+  const sos = items.filter((i) => i.kind === 'status' && i.status === 'emergency');
+  // Emergencies, then the rider's own spot, go out first: a slow link that can't finish the round
+  // still carries them.
+  if (items.length <= MAX_FRAMES_PER_ROUND) {
+    const lead = own ? [...sos, own] : sos;
+    return [...lead, ...items.filter((i) => !lead.includes(i))];
+  }
+  // Picked in priority order, and sent in that order too, so a link that can't finish the round
+  // loses only the least important frames.
+  const out: T[] = [];
+  const picked = new Set<T>();
+  let left = MAX_FRAMES_PER_ROUND;
+  const take = (g: T[]) => { for (const i of g) { out.push(i); picked.add(i); } left -= g.length; };
+  // Everything else waits in line: what went out longest ago first, ties in a fixed order by key
+  // (not by time, so a rider's new fix or a new tap doesn't reshuffle the pick before it goes out),
+  // so every spot, tap, message and receipt gets its turn however many are live.
+  const inLine = <G,>(list: G[], keyOf: (g: G) => string) =>
+    list.map((g) => ({ g, k: keyOf(g), sent: lastSent(keyOf(g)) }))
+      .sort((a, b) => a.sent - b.sent || (a.k < b.k ? -1 : a.k > b.k ? 1 : 0))
+      .map((x) => x.g);
+  // Each kind is put in line once; what's already picked is skipped when a line is used.
+  const lines = new Map<NearbyItem['kind'], T[]>();
+  for (const kind of ['position', 'ack', 'status'] as const) lines.set(kind, inLine(items.filter((i) => i.kind === kind), roundKey));
+  const waiting = (kind: NearbyItem['kind']) => (lines.get(kind) ?? []).filter((i) => !picked.has(i));
+  // Emergencies (leaving room for the own spot), the own spot, then the rider's own taps.
+  for (const i of sos) if (left > (own ? 1 : 0)) take([i]);
+  if (own) take([own]);
+  for (const i of items) if (i.kind === 'status' && i.userId === myId && !picked.has(i) && left > 0) take([i]);
+  // Then a share of other riders' spots and of receipts, so locations and "Seen by" keep moving
+  // through the mesh however many taps and messages are live.
+  let n = 0;
+  for (const i of waiting('position')) if (n < SPOT_SHARE && left > 0) { take([i]); n++; }
+  n = 0;
+  for (const i of waiting('ack')) if (n < ACK_SHARE && left > 0) { take([i]); n++; }
+  const messages = new Map<string, T[]>();
+  for (const i of items) {
+    if (i.kind !== 'reply') continue;
+    const g = messages.get(i.id);
+    if (g) g.push(i); else messages.set(i.id, [i]);
+  }
+  const groups = [...messages.values()];
+  // The newest by time; for two in the same second, the one stored last.
+  let newestOwn: T[] | undefined;
+  for (const g of groups) if (g[0].userId === myId && (!newestOwn || g[0].at >= newestOwn[0].at)) newestOwn = g;
+  // Then the rider's newest own message, whole.
+  const ownFits = !!newestOwn && newestOwn.length <= left;
+  if (ownFits && newestOwn) take(newestOwn);
+  // (When it doesn't fit now, it waits in line with the rest.)
+  const ring = inLine(groups.filter((g) => !(ownFits && g === newestOwn)), (g) => roundKey(g[0]));
+  // Then other riders' taps, leaving room for the first message in line that could fit,
+  // so a crowd of taps can't keep every message off the air.
+  const next = ring.find((g) => g.length <= left);
+  const hold = next ? next.length : 0;
+  for (const i of waiting('status')) if (left > hold) take([i]);
+  // Then the other messages, whole, then the rest of the spots and receipts.
+  for (const g of ring) if (g.length <= left) take(g);
+  for (const i of [...waiting('position'), ...waiting('ack')]) if (left > 0) take([i]);
+  return out;
+}
+
+/** Milliseconds from a monotonic clock when there is one (performance.now), else the given wall time. */
+function monotonicMs(fallback: number): number {
+  const p = (globalThis as { performance?: { now?: () => number } }).performance;
+  return typeof p?.now === 'function' ? p.now() : fallback;
+}
+
+/** What the rotation tracks an item by: a rider's spot, a tap, a whole message, or a receipt. */
+export function roundKey(i: NearbyItem): string {
+  if (i.kind === 'position') return `p:${i.userId}`;
+  if (i.kind === 'ack') return `a:${i.id}@${i.userId}`;
+  return `${i.kind === 'reply' ? 'r' : 's'}:${i.id}`;
 }
 
 /** The key an event is kept under: taps and whole messages by id, message parts and receipts by more. */
@@ -501,6 +594,27 @@ export type OwnReplyInput = { id: string; body: string; at: number };
 export class NearbyMesh {
   private positions = new Map<string, Heard>();
   private events = new Map<string, Heard>();
+  /** Turns of ROTATE_MS: the turn each item last went out in a full round, by roundKey. */
+  private turn = 0;
+  private turnStarted = -Infinity;
+  private sentTurn = new Map<string, number>();
+  /**
+   * The current pick (what the radio is sending), each with when it joined the pick. Counted as
+   * sent when the turn ends, if it stayed in the pick for a whole radio round (HELD_MS).
+   */
+  private pickedNow = new Map<string, number>();
+
+  /** Moves to the next turn every ROTATE_MS (by one even when rounds run late or the clock is set back). */
+  private advanceTurn(now: number, live: Set<string>) {
+    if (now - this.turnStarted < ROTATE_MS && now >= this.turnStarted) return;
+    if (this.turnStarted !== -Infinity) {
+      for (const [k, since] of this.pickedNow) if (now - since >= HELD_MS) this.sentTurn.set(k, this.turn);
+      this.turn++;
+    }
+    this.pickedNow.clear();
+    this.turnStarted = now;
+    for (const id of this.sentTurn.keys()) if (!live.has(id)) this.sentTurn.delete(id);
+  }
 
   readonly myId: string;
 
@@ -673,16 +787,27 @@ export class NearbyMesh {
 
   /**
    * The packets for one broadcast round. Items heard from other phones go out with one more hop;
-   * ones that already made MAX_HOPS stay here. The newest items win when there are too many.
+   * ones that already made MAX_HOPS stay here. When there are too many, this phone's own spot
+   * always goes, a message goes whole or waits for a later round (never cut in the same place each
+   * round), and the rest follow sending order.
    */
   outgoing(now: number, nonce: () => Uint8Array): Uint8Array[] {
     const nowSec = Math.floor(now / 1000);
     const heard = (i: NearbyItem) => (i.kind === 'position' ? this.positions.get(i.userId) : this.events.get(eventKey(i)));
-    return this.live(now)
+    const items = this.live(now)
       .map((i) => (heard(i)?.mine ? i : { ...i, hops: i.hops + 1 }))
-      .filter((i) => i.hops <= MAX_HOPS)
-      .slice(0, MAX_FRAMES_PER_ROUND)
-      .map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
+      .filter((i) => i.hops <= MAX_HOPS);
+    const ids = new Set(items.map(roundKey));
+    // Turn timing runs on a monotonic clock, so a phone clock corrected after a dead zone can't
+    // credit items early (`now` stays the wall clock for frame times).
+    const mono = monotonicMs(now);
+    this.advanceTurn(mono, ids);
+    const picked = pickFrames(items, this.myId, (id) => this.sentTurn.get(id) ?? -1);
+    // Only what is still in the pick counts: anything dropped from it was replaced before it went out.
+    const keys = new Set(picked.map(roundKey));
+    for (const k of this.pickedNow.keys()) if (!keys.has(k)) this.pickedNow.delete(k);
+    for (const k of keys) if (!this.pickedNow.has(k)) this.pickedNow.set(k, mono);
+    return picked.map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 
   /** Newest spot heard for each other rider. */

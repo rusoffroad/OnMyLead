@@ -7,6 +7,7 @@ import {
 } from '@/core/trail-backup';
 import { allLocalTrails, putBackedUpTrails, readTombstones, setTrailBackupHooks, setTrailViewer, writeTombstones } from './nav-trails';
 import { readPhotoBytes } from './photo-bytes';
+import { selectAll } from './select-all';
 import { isBackendConfigured, supabase } from './supabase';
 import { restorePhoto } from './trail-photo-files';
 import { can } from '@/core/entitlements';
@@ -58,8 +59,7 @@ async function run() {
   // Sync across devices is Pro: a Free account keeps its settings and trails on this device.
   if (!can(currentEntitlements(), 'sync')) return;
 
-  const { data: list, error } = await supabase.from('rider_trail_backups').select('trail_id, deleted, updated_at');
-  if (error) throw new Error(error.message);
+  const list = await selectAll('rider_trail_backups', 'trail_id, deleted, updated_at', 'trail_id');
   const local = await allLocalTrails();
   const tombstones = await readTombstones();
   const plan = planTrailSync(local, tombstones, parseBackupRows(list), me, Date.now());

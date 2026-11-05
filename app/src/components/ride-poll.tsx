@@ -29,8 +29,8 @@ export function PollCard({
   const lead = Math.max(...tally.counts);
 
   return (
-    <View style={{ gap: Spacing.two }} accessibilityRole="radiogroup" accessibilityLabel={`Poll: ${message.body}`}>
-      <Text style={styles.question}>{tr(message.body)}</Text>
+    <View style={{ gap: Spacing.two }} accessibilityRole="radiogroup" accessibilityLabel={tr('Poll: {body}', { body: message.body })}>
+      <Text style={styles.question}>{message.body}</Text>
       {choices.map((label, i) => {
         const mine = tally.mine === i;
         const leading = tally.total > 0 && tally.counts[i] === lead;
@@ -40,7 +40,7 @@ export function PollCard({
             onPress={() => !mine && me && onVote(i)}
             accessibilityRole="radio"
             accessibilityState={{ selected: mine }}
-            accessibilityLabel={`${label}, ${tally.counts[i]} ${tally.counts[i] === 1 ? 'vote' : 'votes'}${mine ? tr(', your vote') : ''}`}
+            accessibilityLabel={`${label}, ${tr(tally.counts[i] === 1 ? '{n} vote' : '{n} votes', { n: tally.counts[i] })}${mine ? tr(', your vote') : ''}`}
             style={({ pressed }) => [styles.choice, mine && styles.choiceMine, pressed && { opacity: 0.85 }]}>
             <View
               style={[

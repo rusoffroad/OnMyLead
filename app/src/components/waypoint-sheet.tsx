@@ -296,7 +296,7 @@ export function WaypointSheet({
                   {viewing.planned_stop ? (
                     <Text style={styles.privateText}>{tr('Every rider on the ride sees this stop. Added by {v}.', { v: viewing.user_id === me ? tr('you') : ownerName(viewing.user_id) })}</Text>
                   ) : null}
-                  {viewing.note ? <ThemedText>{tr(viewing.note)}</ThemedText> : null}
+                  {viewing.note ? <ThemedText>{viewing.note}</ThemedText> : null}
                   <Text style={styles.coords}>{viewing.lat.toFixed(5)}, {viewing.lng.toFixed(5)}</Text>
                   <ErrorText error={error} />
                   <Button title={tr('Navigate')} big onPress={() => onNavigate(viewing.lat, viewing.lng, viewing.name)} />

@@ -52,7 +52,7 @@ import { mapPanelWidth, sidebarWidth } from '@/core/layout';
 import { isApproximateFix, LOCATION_PROBLEM_BANNER } from '@/core/precise-location';
 import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
-import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
+import { chatMessageText, latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { FreerideTracker, summarizeFreeride } from '@/core/freeride';
 import { tracklineError, tracklineOn } from '@/core/leader-trackline';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
@@ -538,7 +538,7 @@ export default function RideMode() {
           });
         } else if (memberIds.current.has(e.reply.user_id)) {
           // Read out, the way announcements are; the chat shows it too (hooks/use-ride-chat).
-          speak(`${nameOf(e.reply.user_id)}: ${e.reply.body}`);
+          speak(`${nameOf(e.reply.user_id)}: ${chatMessageText({ kind: 'status', body: e.reply.body }, t)}`);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }),
@@ -1249,7 +1249,7 @@ export default function RideMode() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.announcementLabel} numberOfLines={1}>{t('{v} · Tap to Hear Again', { v: nameOf(announcement.user_id) })}</Text>
-                <Text style={styles.announcementText} numberOfLines={3}>{t(announcement.body)}</Text>
+                <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
               </View>
             </Pressable>
           ) : null}

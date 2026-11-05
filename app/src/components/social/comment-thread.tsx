@@ -56,7 +56,7 @@ function CommentRow({ c, reply = false, replies, onLike, onReply, onDelete, onRe
           </View>
           <Text style={styles.body} selectable>
             {c.replyToName ? <Text style={styles.to}>{`@${c.replyToName} `}</Text> : null}
-            {t(c.body)}
+            {c.body}
           </Text>
         </View>
         <View style={styles.actions}>

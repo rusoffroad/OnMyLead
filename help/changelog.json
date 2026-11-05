@@ -1,6 +1,86 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["import-gpx", "manage-subscription", "offline-maps", "pro-trial", "ride-summary-and-ride-again", "route-builder", "trip-planner"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-23",
+    "why": "2.1 release test, pass 23. The Pro prompt now shows every feature's title and description in the rider's language; the wording in English is unchanged."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "carplay",
+      "directions",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "location-sharing",
+      "notification-settings",
+      "out-riding",
+      "ride-bubble",
+      "ride-mode",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-5",
+    "why": "2.1 release test, passes 4 to 9. The Ride Mode articles are re-dated because the announcement banner in Ride Mode now shows the leader's words exactly as written; riders see no other difference. notification-settings is re-dated because the in-app message pop-up also shows rider text as written. out-riding is re-dated because direct messages and group chat also show rider text as written."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "bluetooth-sharing",
+      "navigation-mode",
+      "refer-a-friend",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-2",
+    "why": "2.1 release test, whole-app pass 2. Ride Mode messages now go over Bluetooth whole in every language (bluetooth-sharing). A ride ending now checks only its own riders' referrals (refer-a-friend sources). navigation-mode and waypoints-and-planned-stops are re-dated because Map Mode waypoint backups now read every row past 1000; a waypoint shared again isn't announced again. Riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "bluetooth-sharing",
+      "create-a-ride",
+      "emergency-and-safety",
+      "free-vs-pro",
+      "group-chat",
+      "language",
+      "leader-sweep-and-tail-gunner",
+      "privacy",
+      "refer-a-friend",
+      "report-and-block",
+      "ride-chat",
+      "ride-polls",
+      "social",
+      "status-buttons",
+      "subscribe-to-pro",
+      "sync-across-devices"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-1",
+    "why": "2.1 release test, whole-app pass 1. Only a ride that went live counts as a referred friend's first ride (refer-a-friend). Posts, comments and typed chat show exactly as written; only status buttons and built-in quick replies are translated (language, 2.1 block). The other articles are re-dated because they list code these fixes touched: Bluetooth uploads skip an item with a bad time instead of failing, reward and Free-plan dates show in the rider's language, and a hidden reply's writer isn't named. Riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "profile-picture",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "version-2-1",
+    "why": "The app is now version 2.1 (iOS build 9, Android versionCode 9) for the 2.1 build. Its release notes are in help/release-notes.json; articles in :::release 2.1 blocks publish when Apple releases 2.1. These articles are logged because they list app.json as a source; the version number is the only change, so riders see no difference."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": [
       "leader-trackline",
       "3d-terrain",
