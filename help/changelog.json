@@ -4,8 +4,8 @@
     "slugs": ["follow-me", "privacy", "ride-bubble", "waypoints-and-planned-stops"],
     "kind": "fix",
     "by": "pr",
-    "ref": "release-test-pass-57-69",
-    "why": "2.1 test passes 57-69: your dot takes its stopped look as soon as the phone reports you've stopped, or after a quiet spell with no new location (about 5 seconds when the map updates every second, longer when Balanced or Max Battery Saver sends fewer updates, so it never flips between them), the same on every map (apps with or without Mapbox, and both website maps); the compass starts right after Allow even while the app is already checking; and a meeting-point pin on the website lands at its newest spot when the map finishes loading. Follow Me's Your Dot section now says when the stopped look starts."
+    "ref": "release-test-pass-57-70",
+    "why": "2.1 test passes 57-70: your dot takes its stopped look as soon as the phone reports you've stopped, or after a quiet spell with no new location (usually 5 to 16 seconds, about 40 seconds with Max Battery Saver, so it never flips between updates), the same on every map (apps with or without Mapbox, and both website maps); the compass starts right after Allow even while the app is already checking; and a meeting-point pin on the website lands at its newest spot when the map finishes loading. Follow Me's Your Dot section now says when the stopped look starts."
   },
   {
     "date": "2026-11-05",
@@ -13,7 +13,7 @@
     "kind": "fix",
     "by": "pr",
     "ref": "release-test-pass-56",
-    "why": "2.1 test pass 56: the quick status buttons in Ride Mode now show and read out in the rider's language, your dot goes back to its stopped look a few seconds after you stop, and map pins skip spots that aren't real coordinates. No steps changed."
+    "why": "2.1 test pass 56: the quick status buttons in Ride Mode now show and read out in the rider's language, your dot goes back to its stopped look after you stop (timing in the passes 57+ entry), and map pins skip spots that aren't real coordinates. No steps changed."
   },
   {
     "date": "2026-11-05",

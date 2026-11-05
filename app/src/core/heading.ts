@@ -109,7 +109,9 @@ export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number
     // Back-to-back moving fixes show the map's fix rate (and end any half-learned slower rate).
     if (fits) gaps = [...gaps, gap].slice(-OWN_FIX_GAPS_KEPT);
     pendingGap = null;
-  } else if (moving && prev.quiet && fits) {
+  } else if (moving && prev.quiet && !fits) {
+    pendingGap = null;
+  } else if (moving && prev.quiet) {
     // A moving fix right after the quiet spell ran out: either a short stop or slower fixes
     // (Battery Saver came on). Two such gaps of about the same length in a row are the new rate.
     if (pendingGap != null && Math.abs(gap - pendingGap) <= pendingGap / 2) {
@@ -117,7 +119,7 @@ export function ownMoveStep(prev: OwnMoveState, moving: boolean, fixAtMs: number
       pendingGap = null;
     } else pendingGap = gap;
   } else if (!moving) pendingGap = null;
-  return { moving, fixAt, seenAt: nowMs, gaps, quiet: false, pendingGap };
+  return { moving, fixAt: fixAt ?? prev.fixAt, seenAt: nowMs, gaps, quiet: false, pendingGap };
 }
 
 /** The quiet spell had no new fix: stopped (the learned fix rate stays). */

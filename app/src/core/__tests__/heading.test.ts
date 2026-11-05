@@ -143,6 +143,16 @@ describe('own dot moving or stopped', () => {
     expect(t).not.toBe(s);
     expect(t.moving).toBe(false);
   });
+  it('a dead spot between two quiet spells means they were not in a row', () => {
+    const one = ownMoveStep(ownMoveTimedOut(ride(1000, 5)), true, 19_000, 19_000);
+    const dead = ownMoveStep(ownMoveTimedOut(one), true, 49_000, 49_000);
+    const two = ownMoveStep(ownMoveTimedOut(dead), true, 64_000, 64_000);
+    expect(ownStopWaitMs(two)).toBe(OWN_STOPPED_AFTER_MS);
+  });
+  it('a timeless fix in between does not hide a repeat of the last timed fix', () => {
+    const s = ownMoveStep(ownMoveStep(OWN_MOVE_START, true, 1000, 1000), true, null, 1500);
+    expect(ownMoveStep(s, true, 1000, 1800)).toBe(s);
+  });
   it('ignores a repeated fix (only the compass turned)', () => {
     const s = ownMoveStep(OWN_MOVE_START, true, 1000, 1000);
     expect(ownMoveStep(s, true, 1000, 1500)).toBe(s);
