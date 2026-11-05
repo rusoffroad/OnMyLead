@@ -1,11 +1,17 @@
 [
   {
     "date": "2026-11-05",
-    "slugs": [],
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "profile-picture",
+      "use-onmylead-on-a-tablet"
+    ],
     "kind": "update",
     "by": "pr",
     "ref": "version-2-1",
-    "why": "The app is now version 2.1 (iOS build 9, Android versionCode 9) for the 2.1 build. Its release notes are in help/release-notes.json; articles in :::release 2.1 blocks publish when Apple releases 2.1."
+    "why": "The app is now version 2.1 (iOS build 9, Android versionCode 9) for the 2.1 build. Its release notes are in help/release-notes.json; articles in :::release 2.1 blocks publish when Apple releases 2.1. These articles are logged because they list app.json as a source; the version number is the only change, so riders see no difference."
   },
   {
     "date": "2026-11-05",
