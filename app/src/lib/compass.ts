@@ -13,6 +13,7 @@ const listeners = new Set<(deg: number | null) => void>();
 let sub: { remove: () => void } | null = null;
 let starting = false;
 let retry: ReturnType<typeof setTimeout> | null = null;
+let retryMs = 5000;
 
 function start() {
   if (Platform.OS === 'web' || sub || starting) return;
@@ -24,10 +25,12 @@ function start() {
         // A map can open before the rider answers the location prompt: look again shortly
         // (not when the answer was a lasting no; the next map that opens asks again).
         if (!p.canAskAgain) return null;
+        // Each look waits twice as long, up to a minute.
         retry ??= setTimeout(() => {
           retry = null;
           if (listeners.size) start();
-        }, 5000);
+        }, retryMs);
+        retryMs = Math.min(60_000, retryMs * 2);
         return null;
       }
       return Location.watchHeadingAsync((h) => {
@@ -40,6 +43,7 @@ function start() {
     })
     .then((s) => {
       if (!s) return;
+      retryMs = 5000;
       if (listeners.size) sub = s;
       else s.remove();
     })

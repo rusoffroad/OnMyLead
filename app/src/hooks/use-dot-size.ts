@@ -19,16 +19,21 @@ onSyncedChange(DOT_SIZE_KEY, (v) => {
   emit();
 });
 
-function subscribe(l: () => void) {
-  listeners.add(l);
-  loading ??= AsyncStorage.getItem(DOT_SIZE_KEY)
+// Read the saved choices at launch, so the first map draws the rider's own dot, not the default.
+const load = () =>
+  (loading ??= AsyncStorage.getItem(DOT_SIZE_KEY)
     .then((v) => {
       if (value == null) value = parseDotSize(v);
     })
     .catch(() => {
       if (value == null) value = 'medium';
     })
-    .finally(emit);
+    .finally(emit));
+load();
+
+function subscribe(l: () => void) {
+  listeners.add(l);
+  load();
   return () => {
     listeners.delete(l);
   };
@@ -64,16 +69,20 @@ onSyncedChange(DOT_STYLE_KEY, (v) => {
   emitStyle();
 });
 
-function subscribeStyle(l: () => void) {
-  styleListeners.add(l);
-  styleLoading ??= AsyncStorage.getItem(DOT_STYLE_KEY)
+const loadStyle = () =>
+  (styleLoading ??= AsyncStorage.getItem(DOT_STYLE_KEY)
     .then((v) => {
       if (style == null) style = parseDotStyle(v);
     })
     .catch(() => {
       if (style == null) style = DEFAULT_DOT_STYLE;
     })
-    .finally(emitStyle);
+    .finally(emitStyle));
+loadStyle();
+
+function subscribeStyle(l: () => void) {
+  styleListeners.add(l);
+  loadStyle();
   return () => {
     styleListeners.delete(l);
   };
