@@ -77,6 +77,8 @@ function FlatNavMap({
   onUserMove?: () => void;
   /** The website draws the rider's arrow from this; the phones read their own map dot. */
   meHeading?: number | null;
+  /** The website: the rider's newest fix's own time (ms), so a repeated fix is ignored. */
+  meFixAt?: number | null;
   /** Track Line: where the rider has been, one colour per day, oldest first. */
   trackLines?: DayLine[];
   /** Named spots on the trail being drawn, recorded or followed. */

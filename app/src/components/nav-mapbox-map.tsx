@@ -49,6 +49,7 @@ export function NavMapboxMap({
   onUserMove?: () => void;
   /** The flat maps draw the rider's arrow from this; the Mapbox map draws your dot (with its arrow) itself. */
   meHeading?: number | null;
+  meFixAt?: number | null;
   trackLines?: DayLine[];
   obstacles?: Obstacle[];
   onObstacle?: (o: Obstacle) => void;

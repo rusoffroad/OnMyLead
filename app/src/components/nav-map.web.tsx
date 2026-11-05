@@ -44,7 +44,7 @@ export function NavMap(props: NavMapProps) {
  * finder. A click measures while measuring; otherwise it shows the trail under it.
  */
 function FlatNavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, meFixAt, trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -63,6 +63,8 @@ function FlatNavMap({
   onUserMove?: () => void;
   /** Which way the rider is moving (core/heading riderHeading), for the arrow on their dot. */
   meHeading?: number | null;
+  /** The rider's newest fix's own time (ms), so a repeated fix is ignored. */
+  meFixAt?: number | null;
   /** Track Line: where the rider has been, one colour per day, oldest first. */
   trackLines?: DayLine[];
   /** Named spots on the trail being drawn, recorded or followed. */
@@ -152,8 +154,8 @@ function FlatNavMap({
   // last way the rider was heading (the website has no compass).
   const [meMoving, feedMe] = useOwnMoving();
   useEffect(() => {
-    if (center) feedMe(meHeading != null);
-  }, [center, meHeading, feedMe]);
+    if (center) feedMe(meHeading != null, meFixAt ?? undefined);
+  }, [center, meHeading, meFixAt, feedMe]);
   const lastMeHeading = useRef<number | null>(null);
   useEffect(() => {
     const m = map.current;

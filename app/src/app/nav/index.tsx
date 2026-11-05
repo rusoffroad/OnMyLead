@@ -147,6 +147,7 @@ export default function NavMode() {
   const [speed, setSpeed] = useState<number | null>(null);
   // Which way the rider is moving, for the arrow on their own dot on the website's map.
   const [meHeading, setMeHeading] = useState<number | null>(null);
+  const [meFixAt, setMeFixAt] = useState<number | null>(null);
   const [altitude, setAltitude] = useState<number | null>(null);
   const [noLocation, setNoLocation] = useState(false);
   const fixListener = useRef<(l: Location.LocationObject) => void>(() => {});
@@ -213,6 +214,7 @@ export default function NavMode() {
             setMe({ lat: l.coords.latitude, lng: l.coords.longitude });
             setSpeed(l.coords.speed != null && l.coords.speed >= 0 ? l.coords.speed : null);
             setMeHeading(riderHeading({ speedMps: l.coords.speed, headingDeg: l.coords.heading }, true));
+            setMeFixAt(l.timestamp);
             setAltitude(l.coords.altitude ?? null);
             const t = addTripFix(tripRef.current, { lat: l.coords.latitude, lng: l.coords.longitude, accuracy: l.coords.accuracy ?? null, speedMps: l.coords.speed, timestamp: l.timestamp });
             if (t !== tripRef.current) {
@@ -561,6 +563,7 @@ export default function NavMode() {
         padding={panelPad}
         followMe={camOn ? me : null}
         meHeading={meHeading}
+        meFixAt={meFixAt}
         onUserMove={() => camEvent('pan')}
         waypoints={shownWaypoints}
         onPressWaypoint={openWaypoint}
