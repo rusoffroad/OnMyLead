@@ -170,6 +170,14 @@ export function TrailMapOverlay({
   );
 }
 
+const FREE_FEATURES: MapFeatureId[] = ['riderTrails', 'parkTrails'];
+
+/**
+ * The Pro check for controls inside Map Settings. The sheet is a Modal, and iPhone won't show the
+ * Pro prompt (another Modal) over it, so a Free rider's tap closes the sheet and then opens the prompt.
+ */
+const SheetPro = createContext<(feature: FeatureKey) => boolean>(requirePro);
+
 /**
  * Map Settings (2.1): everything about the map in one sheet, opened from the Map Settings button. The map
  * style as three pictures (Satellite, Topo, 3D Terrain), four big switches for what riders think in
@@ -178,14 +186,6 @@ export function TrailMapOverlay({
  * the map. It slides up from the bottom on a phone and docks on the right of a tablet in landscape,
  * with a light dim so the map shows each change as it's made.
  */
-/**
- * The Pro check for controls inside Map Settings. The sheet is a Modal, and iPhone won't show the
- * Pro prompt (another Modal) over it, so a Free rider's tap closes the sheet and then opens the prompt.
- */
-const FREE_FEATURES: MapFeatureId[] = ['riderTrails', 'parkTrails'];
-
-const SheetPro = createContext<(feature: FeatureKey) => boolean>(requirePro);
-
 function MapSettingsSheet({
   visible, onClose, trail, route, ride, lookupHint, credit, trackline, controls,
 }: {

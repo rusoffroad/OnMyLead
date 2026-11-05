@@ -116,3 +116,19 @@ describe('parseTime', () => {
     expect(parseTime('soon')).toBeNull();
   });
 });
+
+describe('isLatLng', () => {
+  it('accepts only real spots, so no map is handed something the map library throws on', async () => {
+    const { isLatLng } = await import('../geo');
+    expect(isLatLng({ lat: 38.57, lng: -109.55 })).toBe(true);
+    expect(isLatLng({ lat: 0, lng: 0 })).toBe(true);
+    // An iPhone update that carries only a heading (the 2.1 Create a Ride crash), and other junk.
+    expect(isLatLng({ lat: undefined, lng: undefined })).toBe(false);
+    expect(isLatLng({ lat: NaN, lng: -109.55 })).toBe(false);
+    expect(isLatLng({ lat: 38.57, lng: Infinity })).toBe(false);
+    expect(isLatLng({ lat: '38.57', lng: '-109.55' })).toBe(false);
+    expect(isLatLng({ lat: 91, lng: 0 })).toBe(false);
+    expect(isLatLng(null)).toBe(false);
+    expect(isLatLng(undefined)).toBe(false);
+  });
+});

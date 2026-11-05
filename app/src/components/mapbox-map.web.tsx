@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
-import type { LatLng } from '@/core/geo';
+import { isLatLng, type LatLng } from '@/core/geo';
 import { JUNCTION_QUERY_FILTER, junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
@@ -299,7 +299,7 @@ export function MapboxMap({
 
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {
-      if (!map) return;
+      if (!map || !isLatLng(p)) return;
       const { clientWidth: width, clientHeight: height } = map.getContainer();
       const pad = cameraPadding(inset ?? { top: 0, right: 0, bottom: 0, left: 0 }, { width, height });
       map.easeTo({
@@ -310,7 +310,7 @@ export function MapboxMap({
       });
     },
     fit(points, inset, animated = true) {
-      const c = fitCorners(points);
+      const c = fitCorners(points.filter(isLatLng));
       if (!c || !map) return;
       map.fitBounds([c[1], c[0]], { padding: inset, duration: animated ? 600 : 0, pitch: map.getPitch() });
     },
@@ -457,11 +457,13 @@ export function MapboxMarker({
   const holder = useMemo(() => (typeof document === 'undefined' ? null : document.createElement('div')), []);
   const marker = useRef<MapboxMarker_ | null>(null);
   const drop = useRef(onDragEnd);
+  // Made once the pin has a real spot (the map library throws on anything else).
+  const real = isLatLng(at);
   useEffect(() => {
     drop.current = onDragEnd;
   }, [onDragEnd]);
   useEffect(() => {
-    if (!map || !holder) return;
+    if (!map || !holder || !real) return;
     let gone = false;
     loadGl().then((gl) => {
       if (gone) return;
@@ -480,9 +482,9 @@ export function MapboxMarker({
     };
     // Made once per map; the position is moved below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, holder, draggable]);
+  }, [map, holder, draggable, real]);
   useEffect(() => {
-    marker.current?.setLngLat([at.lng, at.lat]);
+    if (isLatLng(at)) marker.current?.setLngLat([at.lng, at.lat]);
   }, [at.lat, at.lng]);
   if (!holder) return null;
   return createPortal(

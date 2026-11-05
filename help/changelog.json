@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-11-05",
+    "slugs": ["accurate-location", "battery-saver", "create-a-ride", "location-sharing", "map-layers", "park-trails", "ride-mode", "troubleshooting"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-2.1-create-ride-crash",
+    "why": "2.1 test build: opening Create a Ride crashed on iPhone when the phone sent a location update with no position yet. Every map now skips spots that aren't real coordinates. Closed park trails draw dashed on Android too. Allowing location starts the compass right away. Riders see no other change in these articles."
+  },
+  {
+    "date": "2026-11-05",
     "slugs": ["3d-terrain", "create-a-ride", "edit-cancel-or-delete-a-ride", "find-a-ride", "follow-me", "free-vs-pro", "full-map", "getting-started", "home-screen", "import-gpx", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "leader-trackline", "map-layers", "navigation-mode", "notifications-inbox", "offline-maps", "park-trails", "ride-name-and-profile", "ride-summary-and-ride-again", "route-builder", "trip-planner", "use-onmylead-on-a-tablet"],
     "kind": "update",
     "by": "pr",

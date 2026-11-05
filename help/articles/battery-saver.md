@@ -4,7 +4,7 @@ summary: Choose how often your phone sends your location while you share, to mak
 category: safety-privacy
 order: 15
 release: "1.0.1"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/app/battery.tsx
   - app/src/core/battery.ts

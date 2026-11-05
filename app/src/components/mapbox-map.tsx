@@ -3,7 +3,7 @@ import { memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, use
 import { StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
-import type { LatLng } from '@/core/geo';
+import { isLatLng, type LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
 import { JUNCTION_QUERY_FILTER, junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
@@ -143,6 +143,7 @@ export function MapboxMap({
 
   useImperativeHandle(ref, () => ({
     centerOn(p, inset, opts) {
+      if (!isLatLng(p)) return;
       const far = zoom.current < FAR_OUT_ZOOM;
       autoMove(opts?.animated === false ? 0 : opts?.duration ?? 450);
       camera.current?.setCamera({
@@ -154,7 +155,7 @@ export function MapboxMap({
       });
     },
     fit(points, inset, animated = true) {
-      const c = fitCorners(points);
+      const c = fitCorners(points.filter(isLatLng));
       if (!c) return;
       autoMove(animated ? 600 : 0);
       camera.current?.fitBounds(c[0], c[1], [inset.top, inset.right, inset.bottom, inset.left], animated ? 600 : 0);
@@ -301,8 +302,8 @@ export function MapboxMap({
         <Mapbox.Camera
           ref={camera}
           defaultSettings={{
-            centerCoordinate: initial ? [initial.center.lng, initial.center.lat] : [-105.8, 39.5],
-            zoomLevel: initial?.zoom ?? (initial ? RIDE_ZOOM : 4),
+            centerCoordinate: initial && isLatLng(initial.center) ? [initial.center.lng, initial.center.lat] : [-105.8, 39.5],
+            zoomLevel: initial && isLatLng(initial.center) ? initial.zoom ?? RIDE_ZOOM : 4,
             pitch: lookPitch(shown),
           }}
         />
@@ -328,7 +329,10 @@ export function MapboxMap({
           <Line key={l.id} line={l} />
         ))}
         <Mapbox.UserLocation visible={false} minDisplacement={1} onUpdate={(loc) => {
-          const c = loc.coords;
+          const c = loc?.coords;
+          // iPhone can send an update before it has a position (only a heading): skip it, since
+          // the map library throws on a spot that isn't numbers.
+          if (!c || !isLatLng({ lat: c.latitude, lng: c.longitude })) return;
           const f = { lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null };
           puckMoving.current?.(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null);
           ownFix.current?.(f);
@@ -487,9 +491,16 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
       </Mapbox.ShapeSource>
       <Mapbox.ShapeSource id="oml-park-trails" shape={parkLines}>
         <Mapbox.LineLayer id="oml-park-trails-case" style={{ lineColor: TRAIL_INK.casing, lineWidth: ['case', ['get', 'road'], 5.2, 7], lineJoin: 'round' }} />
+        {/* Two layers, not a dash expression: Android's Mapbox doesn't take a data-driven dash. */}
         <Mapbox.LineLayer
           id="oml-park-trails-line"
-          style={{ lineColor: ['get', 'color'], lineWidth: ['case', ['get', 'road'], 2.4, 4], lineJoin: 'round', lineCap: 'round', lineDasharray: ['case', ['get', 'closed'], ['literal', CLOSED_DASH], ['literal', [1, 0]]] }}
+          filter={['!', ['to-boolean', ['get', 'closed']]]}
+          style={{ lineColor: ['get', 'color'], lineWidth: ['case', ['get', 'road'], 2.4, 4], lineJoin: 'round', lineCap: 'round' }}
+        />
+        <Mapbox.LineLayer
+          id="oml-park-trails-closed"
+          filter={['to-boolean', ['get', 'closed']]}
+          style={{ lineColor: ['get', 'color'], lineWidth: ['case', ['get', 'road'], 2.4, 4], lineJoin: 'round', lineCap: 'butt', lineDasharray: CLOSED_DASH }}
         />
       </Mapbox.ShapeSource>
       <Mapbox.ShapeSource id="oml-park-names" shape={parkNames}>
@@ -539,6 +550,8 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
 export function MapboxMarker({
   id, at, anchor = { x: 0.5, y: 0.5 }, draggable, onDragEnd, children,
 }: { id?: string; at: LatLng; anchor?: { x: number; y: number }; draggable?: boolean; onDragEnd?: (p: LatLng) => void; children: ReactNode }) {
+  // A pin without a real spot draws nothing rather than crash the map library.
+  if (!isLatLng(at)) return null;
   if (draggable) {
     return (
       <Mapbox.PointAnnotation
@@ -548,7 +561,8 @@ export function MapboxMarker({
         draggable
         onDragEnd={(e) => {
           const c = e.geometry.coordinates;
-          onDragEnd?.({ lat: c[1], lng: c[0] });
+          const p = { lat: c[1], lng: c[0] };
+          if (isLatLng(p)) onDragEnd?.(p);
         }}>
         <View>{children}</View>
       </Mapbox.PointAnnotation>
