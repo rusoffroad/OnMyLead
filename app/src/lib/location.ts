@@ -25,6 +25,9 @@ import { supabase } from './supabase';
 import { nearbyOwnFix } from './nearby';
 import { recordTrackFixes } from './track-line';
 
+/** Whether the map's own location updates follow the Battery Saver fix rate: Android only (iPhone and iPad deliver as the GPS reports). */
+export const MAP_FIX_RATE_FOLLOWS_PLAN = Platform.OS === 'android';
+
 export const LOCATION_TASK = 'ride-location-updates';
 /**
  * Track points not yet uploaded, kept per ride. Version 1 was one list for whatever ride was

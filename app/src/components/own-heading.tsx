@@ -57,10 +57,6 @@ export function OwnHeadingMarker({ own, mapHeading, fixEveryMs }: { own: OwnLoca
   const [fix, setFix] = useState<OwnFix | null>(own.last.current);
   const [lastCourse, setLastCourse] = useState<number | null>(null);
   const [moving, feed] = useOwnMoving(fixEveryMs);
-  useEffect(() => {
-    const f = own.last.current;
-    if (f) feed(f.headingDeg != null, f.atMs);
-  }, [own, feed]);
   useEffect(() => own.subscribe((f) => {
     setFix(f);
     feed(f.headingDeg != null, f.atMs);

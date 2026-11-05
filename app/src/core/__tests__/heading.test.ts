@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownFixStale, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
+import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
 import { BATTERY_PLANS } from '../battery';
 
 describe('riderHeading', () => {
@@ -102,12 +102,6 @@ describe('own dot moving or stopped', () => {
   });
   it('times moving from the clock, not from the phone\'s fix time', () => {
     expect(ownMovingAt(start, true, 5, 1000).movingAt).toBe(1000);
-  });
-  it('an old fix (a map opening after a stop) is stale; a fresh, future or clock-jumped one is not', () => {
-    expect(ownFixStale(0, 6000, 5000)).toBe(true);
-    expect(ownFixStale(2000, 6000, 5000)).toBe(false);
-    expect(ownFixStale(9000, 6000, 5000)).toBe(false);
-    expect(ownFixStale(0, 5_000_000, 5000)).toBe(false);
   });
   it('was never moving with no moving fix', () => {
     expect(ownStillMoving(ownMovingAt(start, false, 1000, 1000).movingAt, 1000)).toBe(false);
