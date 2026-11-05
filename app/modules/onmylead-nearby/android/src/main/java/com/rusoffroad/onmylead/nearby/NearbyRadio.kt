@@ -75,6 +75,8 @@ class NearbyRadio(
   @Volatile private var serverGen = 0
   private var outboxChar: BluetoothGattCharacteristic? = null
   private var advertising = false
+  /** The server's service is registered: only then may the phone advertise it. */
+  private var serviceReady = false
   private var scanning = false
 
   private class Peer(val gatt: BluetoothGatt) {
@@ -114,7 +116,8 @@ class NearbyRadio(
       val st = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
       if (st == BluetoothAdapter.STATE_TURNING_OFF || st == BluetoothAdapter.STATE_OFF) {
         handler.post {
-          if (!running || state == "off") return@post
+          // Nothing to reset while the radio never started (no permission, no Bluetooth hardware).
+          if (!running || state == "off" || state == "unauthorized" || state == "unsupported") return@post
           resetLinks()
           report("off")
         }
@@ -252,7 +255,7 @@ class NearbyRadio(
         report("off")
       }
     } else {
-      if (server == null) openServer() else if (!advertising) startAdvertising()
+      if (server == null) openServer() else if (serviceReady && !advertising) startAdvertising()
       if (!scanning) startScan()
       if (state != "on") report("on")
       send(outgoing)
@@ -272,6 +275,7 @@ class NearbyRadio(
     subscribers.clear()
     pendingMtu.clear()
     serverGen++
+    serviceReady = false
     try { server?.close() } catch (_: Exception) {}
     server = null
   }
@@ -391,10 +395,12 @@ class NearbyRadio(
       handler.post {
         if (gen != serverGen) return@post
         if (status == BluetoothGatt.GATT_SUCCESS) {
+          serviceReady = true
           startAdvertising()
         } else {
           // The stack wasn't ready (often right after Bluetooth turns on): the next round opens a new server.
           serverGen++
+          serviceReady = false
           try { server?.close() } catch (_: Exception) {}
           server = null
         }
@@ -514,13 +520,23 @@ class NearbyRadio(
       return true
     }
     p.busy = false
+    subscribeLater(p, d)
+    return true
+  }
+
+  /**
+   * A notification setup the stack or the peer refused: asked again after 500 ms, frames waiting
+   * behind it. A link that keeps refusing is dropped (on the next turn, since this may run inside
+   * send()'s loop over the peers) and the next round connects afresh.
+   */
+  private fun subscribeLater(p: Peer, d: BluetoothGattDescriptor) {
     if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) {
-      // Dropped on the next turn: this may run inside send()'s loop over the peers.
       p.cccd = null
       p.inbox = null
       handler.post { peerOf(p.gatt)?.let { drop(it.gatt) } }
-      return true
+      return
     }
+    p.cccd = d
     p.cccdRetry = true
     handler.postDelayed({
       peerOf(p.gatt)?.let {
@@ -528,7 +544,6 @@ class NearbyRadio(
         pump(it)
       }
     }, 500)
-    return true
   }
 
   /** The peer this link belongs to, or null for a link already closed and replaced. */
@@ -590,16 +605,8 @@ class NearbyRadio(
         p.busy = false
         // The stack took the request but the peer refused it: queue it again, a few times per link.
         if (descriptor.uuid == CCCD && status != BluetoothGatt.GATT_SUCCESS) {
-          if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) return@post drop(gatt)
-          // The peer said no (busy, still bonding): ask again shortly, frames waiting behind it.
-          p.cccd = descriptor
-          p.cccdRetry = true
-          handler.postDelayed({
-            peerOf(gatt)?.let {
-              it.cccdRetry = false
-              pump(it)
-            }
-          }, 500)
+          // The peer said no (busy, still bonding): ask again shortly.
+          subscribeLater(p, descriptor)
           return@post
         }
         pump(p)

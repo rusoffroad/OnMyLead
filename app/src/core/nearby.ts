@@ -439,7 +439,8 @@ function sameBytes(a: Uint8Array, b: Uint8Array) {
 
 /** Fits a message into MAX_REPLY_PARTS packets, cutting at a whole character. */
 export function fitReply(body: string): string {
-  return splitReply(body).join('');
+  // No trailing space at a cut: the parts are split again from this text and must join back to it.
+  return splitReply(body).join('').trimEnd();
 }
 
 /**

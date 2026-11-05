@@ -345,3 +345,14 @@ describe('pickFrames', () => {
     expect(seen.size).toBe(5);
   });
 });
+
+describe('fitReply', () => {
+  it('joins back from its own parts even when the cut lands after a space', () => {
+    for (let n = 0; n < 12; n++) {
+      const body = 'x'.repeat(n) + ' a'.repeat(400);
+      const fitted = fitReply(body);
+      expect(splitReply(fitted).join('')).toBe(fitted);
+      expect(fitted).toBe(fitted.trimEnd());
+    }
+  });
+});
