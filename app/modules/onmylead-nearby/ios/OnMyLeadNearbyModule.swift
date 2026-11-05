@@ -213,13 +213,7 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     }
     if let pm = peripheral, pm.state == .poweredOn {
       if serviceAdded && !serviceConfirmed && ProcessInfo.processInfo.systemUptime - serviceAddedAt > 15 {
-        pm.removeAllServices()
-        serviceAdded = false
-        outboxChar = nil
-        subscribers.removeAll()
-        pendingUrgent.removeAll()
-        pendingRound.removeAll()
-        report()
+        resetService(pm)
       }
       if !serviceAdded { peripheralManagerDidUpdateState(pm) }
     }
@@ -424,13 +418,24 @@ final class NearbyRadio: NSObject, CBCentralManagerDelegate, CBPeripheralManager
     serviceAddedAt = ProcessInfo.processInfo.systemUptime
   }
 
+  /** Takes the service down so the next round adds it again, forgetting everything it served. */
+  private func resetService(_ pm: CBPeripheralManager) {
+    pm.removeAllServices()
+    serviceAdded = false
+    serviceConfirmed = false
+    addedService = nil
+    outboxChar = nil
+    subscribers.removeAll()
+    pendingUrgent.removeAll()
+    pendingRound.removeAll()
+    report()
+  }
+
   func peripheralManager(_ pm: CBPeripheralManager, didAdd s: CBService, error: Error?) {
     guard let added = addedService, s === added else { return }
     guard error == nil else {
       // Not ready yet (often right after Bluetooth turns on): the next round adds it again.
-      pm.removeAllServices()
-      serviceAdded = false
-      outboxChar = nil
+      resetService(pm)
       return
     }
     serviceConfirmed = true

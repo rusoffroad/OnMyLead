@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   ACK_DELIVERED, ACK_SEEN, EMERGENCY_RELAY_SEC, FLAG_FROM_SERVER, MAX_FRAME_BYTES, MAX_HOPS, MAX_REPLY_PARTS,
@@ -389,6 +389,29 @@ describe('pickFrames keeps spots moving', () => {
       for (const i of pickFrames(items, A, (k) => sent.get(k) ?? -1)) if (i.kind === 'position') { seen.add(i.userId); sent.set(`p:${i.userId}`, turn); }
     }
     expect(seen.size).toBe(10);
+  });
+});
+
+describe('NearbyMesh turn-taking', () => {
+  it('sends every tap within a few turns when there are more than a round holds', () => {
+    const clock = vi.spyOn(performance, 'now');
+    try {
+      const a = new NearbyMesh(keys(2), A);
+      const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+      for (let n = 0; n < 40; n++) a.bridgeStatus({ id: uuid(n), userId: B, status: 'ok', lat: null, lng: null, at: T0 - n * 1000 });
+      const sent = new Set<string>();
+      // A call every 4 s (a radio round) for 2 minutes.
+      for (let t = 0; t <= 120_000; t += 4_000) {
+        clock.mockReturnValue(t);
+        for (const f of a.outgoing(T0 + t, nonce)) {
+          const item = openFrame(key(1), f, (T0 + t) / 1000);
+          if (item?.kind === 'status') sent.add(item.id);
+        }
+      }
+      expect(sent.size).toBe(40);
+    } finally {
+      clock.mockRestore();
+    }
   });
 });
 

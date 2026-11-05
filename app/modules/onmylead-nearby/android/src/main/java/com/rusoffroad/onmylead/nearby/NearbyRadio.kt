@@ -679,8 +679,9 @@ class NearbyRadio(
         p.busy = false
         // The stack took the request but the peer refused it: queue it again, a few times per link.
         if (descriptor.uuid == CCCD && status != BluetoothGatt.GATT_SUCCESS) {
-          // The peer said no (busy, still bonding): ask again shortly.
+          // The peer said no (busy, still bonding): ask again shortly, frames flowing meanwhile.
           subscribeLater(p, descriptor)
+          pump(p)
           return@post
         }
         pump(p)
