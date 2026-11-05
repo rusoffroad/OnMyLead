@@ -13,7 +13,7 @@
       },
       {
         "kind": "new",
-        "text": "Map Settings: the round Map Settings button on the map opens one sheet for everything about the map. Pick Satellite, Topo or 3D Terrain from pictures of each, flip big switches for Streets and Roads, Off-Road Trails, Hiking Trails and Land Boundaries (or fine-tune every map feature), choose how the map follows you (Follow Me, Zoom Out at the Edge, Zoom In at Intersections), and turn the Tilt Meter and Music button on or off. On a tablet held sideways it sits beside the map so you see each change as you make it."
+        "text": "Map Settings: the round Map Settings button on the map opens one sheet for everything about the map. Pick Satellite, Topo or 3D Terrain from pictures of each, flip big switches for Streets and Roads, Off-Road Trails, Hiking Trails and Land Boundaries (or fine-tune every map feature), choose how the map follows you (Follow Me, Zoom Out at the Edge, Zoom In at Intersections), pick your own dot's look and size (a safety-orange 3D dome by default), and turn the Tilt Meter and Music button on or off. On a tablet held sideways it sits beside the map so you see each change as you make it."
       },
       {
         "kind": "fixed",

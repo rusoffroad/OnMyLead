@@ -11,9 +11,9 @@
 
 export type DotStyle = 'dome' | 'ring' | 'arrow' | 'orange' | 'classic';
 
-/** In the order the picker shows them; Hi-Viz Dome is the default (Chris, 2026-11-05). */
-export const DOT_STYLES: readonly DotStyle[] = ['dome', 'ring', 'arrow', 'orange', 'classic'];
-export const DEFAULT_DOT_STYLE: DotStyle = 'dome';
+/** In the order the picker shows them; Safety Orange is the default (Chris, 2026-11-05). */
+export const DOT_STYLES: readonly DotStyle[] = ['orange', 'dome', 'ring', 'arrow', 'classic'];
+export const DEFAULT_DOT_STYLE: DotStyle = 'orange';
 
 export const DOT_STYLE_NAME: Record<DotStyle, string> = {
   dome: 'Hi-Viz Dome',

@@ -51,7 +51,7 @@ export function useOwnDotD(): number {
   return DOT_D[useSyncExternalStore(subscribe, read, read)];
 }
 
-/** Dot Style (Map Settings > Your Dot): how your own dot looks, remembered with the account; Hi-Viz Dome unless picked. */
+/** Dot Style (Map Settings > Your Dot): how your own dot looks, remembered with the account; Safety Orange unless picked. */
 export const DOT_STYLE_KEY = 'map.dotStyle.v1';
 
 let style: DotStyle | null = null;

@@ -8,7 +8,7 @@
     "kind": "update",
     "by": "pr",
     "ref": "map-settings-dot-size",
-    "why": "2.1: Map Settings gains Your Dot: Dot Style (Hi-Viz Dome by default, Reflective Ring, Floating Arrowhead, Safety Orange or Classic) and Dot Size (Small, Medium, Large) for your own dot on Ride Mode and Map Mode, also on the You tab and synced with your account."
+    "why": "2.1: Map Settings gains Your Dot: Dot Style (Safety Orange by default, Hi-Viz Dome, Reflective Ring, Floating Arrowhead or Classic) and Dot Size (Small, Medium, Large) for your own dot on Ride Mode and Map Mode, also on the You tab and synced with your account."
   },
   {
     "date": "2026-11-05",
