@@ -3,13 +3,21 @@
     "version": "2.1",
     "title": "Every Map on Mapbox, 3D Terrain, Bluetooth Sharing and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
-    "whatsNew": "What's new in 2.1:\n\n• New rider dot with the arrow built in; leader blue, tail gunner violet.\n• Leader Trackline shows where the leader went.\n• Map zooms in at intersections, then back out.\n• Edit Ride Details anytime.\n• Bluetooth Sharing: no service? Spots, taps, EMERGENCY and messages go phone to phone.\n• Badge Leaderboard: your rank nationally or by state.\n• 3D Terrain, offline too.\n• Hold the map to drop a waypoint.\n• Map Features: roads, hiking, land.\n• CarPlay support.",
+    "whatsNew": "What's new in 2.1:\n\n• New rider dot with the arrow built in; leader blue, tail gunner violet.\n• Leader Trackline shows where the leader went.\n• Map zooms in at intersections, then back out.\n• Edit Ride Details anytime.\n• Bluetooth Sharing: no service? Spots, taps, EMERGENCY and messages go phone to phone.\n• Badge Leaderboard: your rank nationally or by state.\n• 3D Terrain, offline too.\n• Hold the map to drop a waypoint.\n• Map Settings: style, roads, trails, land.\n• CarPlay support.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "new",
         "text": "A new rider dot with the arrow built in: every live rider is a glossy disc with a white rim and a white arrow pointing the way they're heading, and it keeps pointing their last way while they're stopped. The leader is the biggest dot, in blue; the tail gunner is next, in violet; everyone else is graphite. Your own dot is cyan with a soft beam ahead of it, and its arrow always shows which way you're facing: the way you're riding while you move, your phone's compass when you stop."
+      },
+      {
+        "kind": "new",
+        "text": "Map Settings: the Layers button on the map opens one sheet for everything about the map. Pick Satellite, Topo or 3D Terrain from pictures of each, flip big switches for Streets and Roads, Off-Road Trails, Hiking Trails and Land Boundaries (or fine-tune every map feature), and turn the map's own buttons on or off: Follow Me, Zoom In at Intersections, the Tilt Meter and the Music button. On a tablet held sideways it sits beside the map so you see each change as you make it."
+      },
+      {
+        "kind": "fixed",
+        "text": "The map moves smoothly while you ride. Your own dot glides in step with the map again instead of trailing it, and the map does less work every second, so it keeps up when you're moving."
       },
       {
         "kind": "improved",

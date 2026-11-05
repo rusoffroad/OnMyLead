@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
 import type { Inset } from '@/core/map-center';
-import { junctionLines } from '@/core/intersections';
+import { JUNCTION_QUERY_FILTER, junctionLines } from '@/core/intersections';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { parkPieces, parkSummaryLine, PARK_NAMES_MIN_Z } from '@/core/park-trails';
 import {
@@ -20,7 +20,7 @@ import { TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
-import { OwnPuck, useOwnPuckStore } from './own-puck';
+import { riderHeading } from '@/core/heading';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -34,6 +34,17 @@ if (mapboxBuilt) {
 const RIDE_ZOOM = 13.5;
 /** Mapbox's zoom below which the map counts as zoomed far out (a state or more across). */
 const FAR_OUT_ZOOM = 8;
+
+/**
+ * Your own dot as images for Mapbox's native location puck (drawn by scripts/puck/make-images.mjs
+ * from rider-puck.tsx). 2.1 first drew it as a React marker that slid in JavaScript about 30 times
+ * a second; on a phone it trailed the map while the map moved and made the map stutter.
+ */
+const PUCK_IMAGES = {
+  'oml-you-moving': require('../../assets/images/puck/you-moving.png'),
+  'oml-you-stopped': require('../../assets/images/puck/you-stopped.png'),
+  'oml-puck-clear': require('../../assets/images/puck/clear.png'),
+};
 
 const TERRAIN_STYLE_JSON = { version: 8, sources: TERRAIN_SOURCES, layers: terrainLayers() };
 
@@ -85,7 +96,8 @@ export function MapboxMap({
   const size = useRef({ width: 390, height: 800 });
   const zoom = useRef(initial?.zoom ?? 4);
   const heading = useRef(0);
-  const own = useOwnPuckStore();
+  // Whether your own dot is moving (its arrow follows the GPS course) or stopped (the compass).
+  const [moving, setMoving] = useState(false);
   // How much the terrain is raised, following the tilt (only while 3D Terrain is shown).
   const [exaggeration, setExaggeration] = useState(TERRAIN_EXAGGERATION);
   const ownFix = useRef(onOwnFix);
@@ -145,7 +157,11 @@ export function MapboxMap({
       try {
         const pt = await view.current?.getPointInView([p.lng, p.lat]);
         if (!pt) return [];
-        const fc = await view.current?.queryRenderedFeaturesInRect([pt[1] - radiusPt, pt[0] - radiusPt, pt[1] + radiusPt, pt[0] + radiusPt], [], null);
+        // Only lines with a road or trail class (or the app's own tracks): asking for everything drawn
+        // sent every label, building and land shape to JavaScript each second and stalled the map.
+        const fc = await view.current?.queryRenderedFeaturesInRect(
+          [pt[1] - radiusPt, pt[0] - radiusPt, pt[1] + radiusPt, pt[0] + radiusPt], JUNCTION_QUERY_FILTER as never, null,
+        );
         return junctionLines((fc?.features ?? []) as never);
       } catch {
         return [];
@@ -175,12 +191,12 @@ export function MapboxMap({
     const h = Math.round((p.heading ?? 0) / 5) * 5 % 360;
     if (h !== heading.current) {
       heading.current = h;
-      own.setHeading(h);
       onCamera?.({ heading: h });
     }
-    if (shown === 'terrain') setExaggeration(terrainExaggeration(p.pitch ?? 0));
+    // In steps of a tenth, so a tilt redraws the map a few times rather than on every frame.
+    if (shown === 'terrain') setExaggeration(Math.round(terrainExaggeration(p.pitch ?? 0) * 10) / 10);
     if (s.gestures?.isGestureActive) onUserMove?.();
-  }, [onCamera, onUserMove, shown, trail, own]);
+  }, [onCamera, onUserMove, shown, trail]);
 
   const idle = useCallback((s: Mapbox.MapState) => {
     const p = s.properties;
@@ -264,12 +280,20 @@ export function MapboxMap({
         <Mapbox.UserLocation visible={false} minDisplacement={1} onUpdate={(loc) => {
           const c = loc.coords;
           const f = { lat: c.latitude, lng: c.longitude, course: c.course ?? null, speed: c.speed ?? null };
-          own.setFix(f);
+          setMoving(riderHeading({ speedMps: f.speed, headingDeg: f.course }, true) != null);
           ownFix.current?.(f);
         }} />
         {children}
-        {/* Your own dot, with its arrow built in (own-puck), above everything else. */}
-        <OwnPuck store={own} Marker={MapboxMarker} />
+        {/* Your own dot (the Chevron Puck, drawn as images): Mapbox moves and turns it itself, in step with the map. */}
+        <Mapbox.Images images={PUCK_IMAGES} />
+        <Mapbox.LocationPuck
+          puckBearingEnabled
+          puckBearing={moving ? 'course' : 'heading'}
+          topImage="oml-puck-clear"
+          shadowImage="oml-puck-clear"
+          bearingImage={moving ? 'oml-you-moving' : 'oml-you-stopped'}
+          pulsing={{ isEnabled: false }}
+        />
       </Mapbox.MapView>
     </View>
   );

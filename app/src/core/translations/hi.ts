@@ -3266,6 +3266,23 @@ const dict: Record<string, string> = {
   "You’re {v} of {total} everywhere.": "आप कुल {total} में से {v} हैं।",
   "{n} (ordinal)": "{n}वें",
   "1 (ordinal)": "पहले",
+  "Map Settings": "मैप सेटिंग्स",
+  "Map style, roads, trails, land and the buttons on the map": "मैप स्टाइल, सड़कें, ट्रेल्स, ज़मीन और मैप पर बटन",
+  "On the Map": "मैप पर",
+  "Every Map Feature": "मैप की हर चीज़",
+  "Fine-Tune": "बारीकी से बदलें",
+  "Map Buttons": "मैप बटन",
+  "Music Button": "म्यूज़िक बटन",
+  "Streets and Roads": "गलियाँ और सड़कें",
+  "Land Boundaries": "ज़मीन की सीमाएँ",
+  "Highways, paved roads and dirt roads": "हाईवे, पक्की सड़कें और कच्ची सड़कें",
+  "Motorized trails, tracks and width limits": "मोटर ट्रेल्स, कच्चे रास्ते और चौड़ाई की सीमा",
+  "Foot and horse trails": "पैदल और घुड़सवारी ट्रेल्स",
+  "National forests, BLM, parks and property lines": "राष्ट्रीय वन, BLM, पार्क और प्रॉपर्टी लाइनें",
+  "The map moves with you as you ride.": "चलते समय मैप आपके साथ चलता है।",
+  "Closes in on a turn as you reach it, then zooms back out.": "मोड़ पास आने पर ज़ूम इन करता है, फिर वापस ज़ूम आउट करता है।",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "मैप पर रोल और पिच। झुकाव स्क्रीन पर कैलिब्रेट करें।",
+  "Play, pause, skip and volume without leaving the map.": "मैप छोड़े बिना चलाएँ, रोकें, आगे बढ़ाएँ और आवाज़ बदलें।",
 };
 
 export default dict;

@@ -3266,6 +3266,23 @@ const dict: Record<string, string> = {
   "You’re {v} of {total} everywhere.": "Vous êtes {v} sur {total} au classement général.",
   "{n} (ordinal)": "{n}e",
   "1 (ordinal)": "1er",
+  "Map Settings": "Réglages de la Carte",
+  "Map style, roads, trails, land and the buttons on the map": "Style de carte, routes, sentiers, terrains et boutons de la carte",
+  "On the Map": "Sur la Carte",
+  "Every Map Feature": "Tous les Éléments de la Carte",
+  "Fine-Tune": "Affiner",
+  "Map Buttons": "Boutons de la Carte",
+  "Music Button": "Bouton Musique",
+  "Streets and Roads": "Rues et Routes",
+  "Land Boundaries": "Limites des Terrains",
+  "Highways, paved roads and dirt roads": "Autoroutes, routes goudronnées et chemins de terre",
+  "Motorized trails, tracks and width limits": "Sentiers motorisés, pistes et limites de largeur",
+  "Foot and horse trails": "Sentiers pédestres et équestres",
+  "National forests, BLM, parks and property lines": "Forêts nationales, BLM, parcs et limites de propriété",
+  "The map moves with you as you ride.": "La carte vous suit pendant que vous roulez.",
+  "Closes in on a turn as you reach it, then zooms back out.": "Zoome sur un carrefour à votre approche, puis dézoome.",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "Roulis et tangage sur la carte. Calibrez-le dans l’écran Inclinaison.",
+  "Play, pause, skip and volume without leaving the map.": "Lecture, pause, morceau suivant et volume sans quitter la carte.",
 };
 
 export default dict;

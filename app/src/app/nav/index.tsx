@@ -568,7 +568,7 @@ export default function NavMode() {
       />
       <TrailMapOverlay
         trail={trail}
-        threeD
+        controls
         bare={full}
         top={full ? insets.top + 12 : insets.top + 66}
         cardTop={full ? insets.top + 64 : wide ? insets.top + 118 : undefined}

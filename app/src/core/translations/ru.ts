@@ -3266,6 +3266,23 @@ const dict: Record<string, string> = {
   "You’re {v} of {total} everywhere.": "Вы {v} из {total} в общем рейтинге.",
   "{n} (ordinal)": "{n}-й",
   "1 (ordinal)": "1-й",
+  "Map Settings": "Настройки Карты",
+  "Map style, roads, trails, land and the buttons on the map": "Стиль карты, дороги, тропы, земли и кнопки на карте",
+  "On the Map": "На Карте",
+  "Every Map Feature": "Все Элементы Карты",
+  "Fine-Tune": "Настроить",
+  "Map Buttons": "Кнопки Карты",
+  "Music Button": "Кнопка Музыки",
+  "Streets and Roads": "Улицы и Дороги",
+  "Land Boundaries": "Границы Земель",
+  "Highways, paved roads and dirt roads": "Шоссе, асфальтированные и грунтовые дороги",
+  "Motorized trails, tracks and width limits": "Тропы для техники, колеи и ограничения ширины",
+  "Foot and horse trails": "Пешие и конные тропы",
+  "National forests, BLM, parks and property lines": "Национальные леса, BLM, парки и границы участков",
+  "The map moves with you as you ride.": "Карта движется вместе с вами.",
+  "Closes in on a turn as you reach it, then zooms back out.": "Приближает перекрёсток, когда вы к нему подъезжаете, затем отдаляет.",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "Крен и тангаж на карте. Откалибруйте на экране наклона.",
+  "Play, pause, skip and volume without leaving the map.": "Воспроизведение, пауза, переключение и громкость, не покидая карту.",
 };
 
 export default dict;

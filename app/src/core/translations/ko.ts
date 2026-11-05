@@ -3266,6 +3266,23 @@ const dict: Record<string, string> = {
   "You’re {v} of {total} everywhere.": "전체 {total}명 중 {v}입니다.",
   "{n} (ordinal)": "{n}위",
   "1 (ordinal)": "1위",
+  "Map Settings": "지도 설정",
+  "Map style, roads, trails, land and the buttons on the map": "지도 스타일, 도로, 트레일, 토지와 지도 위 버튼",
+  "On the Map": "지도에 표시",
+  "Every Map Feature": "모든 지도 요소",
+  "Fine-Tune": "세부 조정",
+  "Map Buttons": "지도 버튼",
+  "Music Button": "음악 버튼",
+  "Streets and Roads": "거리와 도로",
+  "Land Boundaries": "토지 경계",
+  "Highways, paved roads and dirt roads": "고속도로, 포장도로, 비포장도로",
+  "Motorized trails, tracks and width limits": "동력 트레일, 바퀴 자국 길, 폭 제한",
+  "Foot and horse trails": "도보 및 승마 트레일",
+  "National forests, BLM, parks and property lines": "국유림, BLM, 공원, 부지 경계",
+  "The map moves with you as you ride.": "주행하는 동안 지도가 함께 움직입니다.",
+  "Closes in on a turn as you reach it, then zooms back out.": "교차로에 다가가면 확대하고 지나면 다시 축소합니다.",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "지도에 롤과 피치를 표시합니다. 기울기 화면에서 보정하세요.",
+  "Play, pause, skip and volume without leaving the map.": "지도를 떠나지 않고 재생, 일시정지, 건너뛰기, 볼륨 조절.",
 };
 
 export default dict;

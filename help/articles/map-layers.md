@@ -67,6 +67,27 @@ The panel has **Map Style** at the top and **Map Features** under it. On a phone
 In Ride Mode the leader and the ride's organizers also see **Leader Trackline** between the two, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
 :::
 
+:::release 2.1
+## Map Settings
+
+From 2.1 the Layers button opens **Map Settings**, one sheet for everything about the map. On a phone it slides up from the bottom; on a tablet held sideways it sits on the right so you can watch the map change. The map stays lightly visible behind it, so each change shows as you make it. Swipe it down, tap the map, or tap **X** to close it. A small blue dot on the Layers button means the map isn't showing the standard set.
+
+- **Map Style**: **Satellite**, **Topo** and **3D Terrain**, each shown as a picture. The one you're using has a blue ring and a check.
+- **On the Map**: four big switches, each with a strip of map showing the lines it draws:
+  - **Streets and Roads**: highways, paved roads, dirt roads and street-legal-only roads.
+  - **Off-Road Trails**: motorized trails and tracks, including width-limited trails.
+  - **Hiking Trails**: foot and horse trails.
+  - **Land Boundaries**: national forests, BLM land, national and state parks. Turning it on leaves **Property Lines** off; turn that on under **Every Map Feature**.
+
+  A switch is on while any of its lines shows. Tapping it turns them all off, or all on.
+- **Every Map Feature**: tap **Fine-Tune** to open the full list below, one row per kind of line or land.
+- **Leader Trackline**: for the leader and organizers in Ride Mode.
+- **Map Buttons** (Ride Mode and Map Mode): switches for **Follow Me**, **Zoom In at Intersections** (on the Mapbox map), **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available). They're the same switches as on the **You** tab, so a change shows everywhere.
+- **Download This Ride's Map** (Ride Mode), **Offline Maps**, and who the map data comes from.
+
+The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
+:::
+
 Your choices are remembered on your phone and used on every map in the app.
 
 :::release 2.1

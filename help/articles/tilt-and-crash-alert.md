@@ -4,7 +4,7 @@ summary: See your vehicle's roll and pitch, get warned before a steep lean, and 
 category: safety-privacy
 order: 52
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/app/tilt.tsx
   - app/src/components/tilt-gauge.tsx
@@ -36,6 +36,10 @@ You can also open it from the **You** tab: tap **Tilt and Crash Alert**. The scr
 ## Turn the Tilt Meter Off
 
 Don't want it? At the top of the Tilt screen, under the Crash Alert switch, tap **Tilt Meter On** to turn it off. The Tilt tile leaves Map Mode and Ride Mode, the Tilt screen hides the readings, and tilt warnings stop. Crash Alert keeps working on its own switch. Tap **Tilt Meter Off** to bring it back. The switch follows your account to your other devices.
+
+:::release 2.1
+The same switch is under **Map Buttons** in **Map Settings**: tap the **Layers** button on Ride Mode's or Map Mode's map and switch **Tilt Meter**.
+:::
 
 ## Calibrate It for Your Mount
 

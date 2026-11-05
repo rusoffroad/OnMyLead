@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
-import Svg, { Ellipse, Path, Rect } from 'react-native-svg';
+import { ActivityIndicator, Modal, Platform, Pressable, Switch, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, Ellipse, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { Colors, font, Glass, GlassSurface, Radius, themedStyles } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
@@ -9,7 +10,9 @@ import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_IN
 import { formatBytes, IMAGERY_ATTRIBUTION, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import { PARK_LEVEL_COLORS, PARK_LEVEL_LEGEND, PARK_TRAILS_ATTRIBUTION, parkLevelLabel, parkTrailColor, parkTrailLength, type ParkTrail } from '@/core/park-trails';
-import { FEATURE_GROUPS, FEATURE_INK, MAP_FEATURE_IDS, MAP_FEATURES, type MapFeature, type MapFeatureId } from '@/core/map-features';
+import {
+  FEATURE_GROUPS, FEATURE_INK, featuresChanged, MAP_FEATURES, QUICK_LAYERS, quickLayerOn, quickLayerToggle, type MapFeature, type MapFeatureId, type QuickLayer,
+} from '@/core/map-features';
 import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
@@ -21,6 +24,15 @@ import { useGarageWidths } from '@/lib/trail-width';
 import { StarScore } from './stars';
 import { ProTag } from '@/components/pro-tag';
 import { tracklineInk } from './leader-trackline-ink';
+import { SheetRoot, SheetScroll, SwipeSheet } from './swipe-sheet';
+import { useLayout } from '@/hooks/use-layout';
+import { withAlpha } from '@/core/color';
+import { useFollowMePref } from '@/hooks/use-follow-me';
+import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
+import { useMusicControlsSetting } from '@/hooks/use-music-controls';
+import { useFlag } from '@/lib/app-settings';
+import { musicAvailable } from '@/lib/music';
+import { setTiltShown, useTiltSettings } from '@/lib/tilt';
 
 import { t as tr } from '@/lib/i18n';
 const SAND = '#ECCD91';
@@ -34,7 +46,7 @@ const WEB = Platform.OS === 'web';
  * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
-  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, threeD = false, trackline,
+  trail, top = 12, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, controls = false, trackline,
 }: {
   trail: TrailMap;
   /** Where the layers button sits. */
@@ -51,10 +63,10 @@ export function TrailMapOverlay({
   onFollow?: (t: PublicTrail) => void;
   /** Meters of a rider trail covered in Map Mode (for the rating sheet). */
   ridden?: (t: PublicTrail) => number | null;
-  /** Full Map: no layers button or zoom hint, just the 3D button, the No Signal tag and a tapped trail's card. */
+  /** Full Map: no Layers button or zoom hint, just the No Signal tag and a tapped trail's card. */
   bare?: boolean;
-  /** A map that can tilt (Ride Mode, Map Mode): adds the one-tap 3D button under the layers button. */
-  threeD?: boolean;
+  /** Ride Mode and Map Mode: Map Settings also shows the switches for the buttons on the map (Tilt Meter, Music and so on). */
+  controls?: boolean;
   /** Ride Mode, for the leader (and organizers): the Leader Trackline switch for the whole ride. */
   trackline?: TracklineSwitch;
 }) {
@@ -68,39 +80,53 @@ export function TrailMapOverlay({
   ]
     .filter(Boolean)
     .join(', ');
-  const anyOn = MAP_FEATURE_IDS.some((id) => trail.features[id]);
+  // A small dot on the Layers button says the map isn't showing the standard set.
+  const changed = trail.base !== 'satellite' || featuresChanged(trail.features);
 
   return (
     <>
       <View pointerEvents="box-none" style={[styles.corner, { top }]}>
         {bare ? null : (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={tr('Map Style and Features')}
-          accessibilityState={{ expanded: open }}
-          hitSlop={6}
-          onPress={() => setOpen((o) => !o)}
-          style={({ pressed }) => [styles.fab, (open || anyOn || trail.base !== 'satellite') && styles.fabOn, pressed && { opacity: 0.8 }]}>
-          <LayersIcon color={anyOn || trail.base !== 'satellite' ? SAND : Colors.text} />
-        </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={tr('Map Settings')}
+            accessibilityHint={tr('Map style, roads, trails, land and the buttons on the map')}
+            accessibilityState={{ expanded: open }}
+            hitSlop={6}
+            onPress={() => setOpen(true)}
+            style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}>
+            <LayersIcon color={Colors.text} />
+            {changed ? <View style={styles.fabDot} /> : null}
+          </Pressable>
         )}
-        {threeD && trail.terrainAvailable && trail.mapbox && (!open || bare) ? <ThreeDButton trail={trail} /> : null}
-        {trail.offline && (!open || bare) ? (
+        {trail.offline ? (
           <View style={styles.offline} accessible accessibilityLabel={tr('No signal. The map is showing what\'s downloaded on this phone.')}>
             <Text style={styles.offlineText}>{tr('No Signal')}</Text>
             <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>
           </View>
         ) : null}
-        {open && !bare ? <LayersPanel trail={trail} route={route} ride={ride} lookupHint={lookupHint} credit={credit} top={top} bottom={bottom} trackline={trackline} /> : null}
       </View>
+      {bare ? null : (
+        <MapSettingsSheet
+          visible={open}
+          onClose={() => setOpen(false)}
+          trail={trail}
+          route={route}
+          ride={ride}
+          lookupHint={lookupHint}
+          credit={credit}
+          trackline={trackline}
+          controls={controls}
+        />
+      )}
 
-      {(trail.zoomInHint || trail.closerForTracks) && !open && !bare ? (
+      {(trail.zoomInHint || trail.closerForTracks) && !bare ? (
         <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
           <Text style={styles.hintText}>{trail.zoomInHint ? tr('Zoom In to See Trails') : tr('Zoom In for Park and Local Trails')}</Text>
         </View>
       ) : null}
 
-      {!open || bare ? (
+      {(
         <View pointerEvents="box-none" style={[styles.bottom, cardTop != null ? { top: cardTop } : { bottom }, cardWidth ? { left: 'auto', width: cardWidth } : null]}>
           {trail.looking ? (
             <View style={styles.looking}>
@@ -122,7 +148,7 @@ export function TrailMapOverlay({
             <LandCard land={trail.land} onClose={trail.clearLand} />
           ) : null}
         </View>
-      ) : null}
+      )}
       <RateTrailSheet
         trail={rating}
         ridden={rating ? ridden?.(rating) : null}
@@ -136,62 +162,277 @@ export function TrailMapOverlay({
   );
 }
 
-function LayersPanel({
-  trail, route, ride, lookupHint, credit, top, bottom, trackline,
-}: { trail: TrailMap; route?: LatLng[] | null; ride?: { id: string; name: string } | null; lookupHint: string; credit: string; top: number; bottom: number; trackline?: TracklineSwitch }) {
-  const { height } = useWindowDimensions();
-  // Under the layers button and clear of the screen's own bottom panel; the list scrolls inside.
-  const maxHeight = Math.max(240, height - top - 52 - Math.max(96, bottom + 90));
+/**
+ * Map Settings (2.1): everything about the map in one sheet, opened from the Layers button. The map
+ * style as three pictures (Satellite, Topo, 3D Terrain), four big switches for what riders think in
+ * (Streets and Roads, Off-Road Trails, Hiking Trails, Land Boundaries), every Map Feature for
+ * fine-tuning, the leader's Leader Trackline, and on the riding maps the switches for the buttons on
+ * the map. It slides up from the bottom on a phone and docks on the right of a tablet in landscape,
+ * with a light dim so the map shows each change as it's made.
+ */
+function MapSettingsSheet({
+  visible, onClose, trail, route, ride, lookupHint, credit, trackline, controls,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  trail: TrailMap;
+  route?: LatLng[] | null;
+  ride?: { id: string; name: string } | null;
+  lookupHint: string;
+  credit: string;
+  trackline?: TracklineSwitch;
+  controls: boolean;
+}) {
+  const insets = useSafeAreaInsets();
+  const layout = useLayout();
+  const [every, setEvery] = useState(false);
+  // A tablet in landscape (or a wide window) keeps the map in view: the sheet docks on the right.
+  const side = layout.wide && layout.landscape;
+  const bases: BaseMap[] = trail.terrainAvailable ? ['satellite', 'topo', 'terrain'] : ['satellite', 'topo'];
   return (
-    <ScrollView
-      style={[styles.panel, { maxHeight }]}
-      contentContainerStyle={styles.panelBody}
-      showsVerticalScrollIndicator
-      accessibilityViewIsModal={false}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Text style={styles.panelTitle}>{tr('Map Style')}</Text>
-        <ProTag feature="map_layers" style={{ alignSelf: 'auto' }} />
-      </View>
-      <View style={styles.bases} accessibilityRole="radiogroup" accessibilityLabel={tr('Map style')}>
-        {(trail.terrainAvailable ? (['satellite', 'topo', 'terrain'] as BaseMap[]) : (['satellite', 'topo'] as BaseMap[])).map((b) => {
-          const on = trail.base === b;
-          return (
-            <Pressable
-              key={b}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: on }}
-              accessibilityLabel={tr(BASE_NAME[b])}
-              onPress={() => requirePro('map_layers') && trail.setBase(b)}
-              style={({ pressed }) => [styles.base, pressed && { opacity: 0.8 }]}>
-              <View style={[styles.baseThumb, on && styles.baseThumbOn]}>
-                <StyleThumb base={b} />
-              </View>
-              <Text style={[styles.baseText, on && { color: Colors.text }]}>{tr(BASE_NAME[b])}</Text>
+    <Modal visible={visible} transparent animationType={side ? 'fade' : 'slide'} onRequestClose={onClose} statusBarTranslucent>
+      <SheetRoot style={[styles.sheetRoot, side && styles.sheetRootSide]}>
+        <Pressable style={styles.sheetScrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
+        <SwipeSheet
+          onClose={onClose}
+          accessibilityViewIsModal
+          style={[
+            styles.sheet,
+            side ? [styles.sheetSide, { marginTop: insets.top + 12, marginBottom: Math.max(insets.bottom, 12), marginRight: Math.max(insets.right, 12) }]
+              : layout.wide ? styles.sheetWide : null,
+            { paddingBottom: side ? 12 : Math.max(insets.bottom, 16) + 8 },
+          ]}>
+          {side ? null : <View style={styles.grip} />}
+          <View style={styles.sheetHead}>
+            <Text style={styles.sheetTitle} accessibilityRole="header">{tr('Map Settings')}</Text>
+            <Pressable accessibilityRole="button" accessibilityLabel={tr('Close')} hitSlop={10} onPress={onClose} style={styles.sheetClose}>
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                <Path d="M6 6l12 12M18 6L6 18" stroke={Colors.text} strokeWidth={2.8} strokeLinecap="round" />
+              </Svg>
             </Pressable>
-          );
-        })}
+          </View>
+          <SheetScroll style={{ flexShrink: 1 }} contentContainerStyle={styles.sheetBody} showsVerticalScrollIndicator={false}>
+            <View style={styles.section}>
+              <View style={styles.sectionHead}>
+                <Text style={styles.sectionTitle}>{tr('Map Style')}</Text>
+                <ProTag feature="map_layers" style={{ alignSelf: 'auto' }} />
+              </View>
+              <View style={styles.styles} accessibilityRole="radiogroup" accessibilityLabel={tr('Map style')}>
+                {bases.map((b) => (
+                  <StyleTile key={b} base={b} on={trail.base === b} onPress={() => requirePro('map_layers') && trail.setBase(b)} />
+                ))}
+              </View>
+              {trail.base === 'terrain' ? (
+                <Text style={styles.fine}>
+                  {trail.terrain3d
+                    ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.' })
+                    : tr('No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.')}
+                </Text>
+              ) : null}
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{tr('On the Map')}</Text>
+              <View style={styles.quickGrid}>
+                {QUICK_LAYERS.map((q) => (
+                  <QuickTile
+                    key={q.id}
+                    q={q}
+                    on={quickLayerOn(trail.features, q)}
+                    onPress={() => {
+                      if (!requirePro('map_layers')) return;
+                      for (const c of quickLayerToggle(trail.features, q)) trail.setFeature(c.id, c.on);
+                    }}
+                  />
+                ))}
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ expanded: every }}
+                onPress={() => setEvery((e) => !e)}
+                style={({ pressed }) => [styles.disclose, pressed && { opacity: 0.7 }]}>
+                <Text style={styles.discloseText}>{tr('Every Map Feature')}</Text>
+                <Text style={styles.discloseSub}>{every ? tr('Hide') : tr('Fine-Tune')}</Text>
+                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" style={{ transform: [{ rotate: every ? '180deg' : '0deg' }] }}>
+                  <Path d="M6 9l6 6 6-6" stroke={Colors.textSecondary} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
+                </Svg>
+              </Pressable>
+              {every ? <MapFeaturesList trail={trail} lookupHint={lookupHint} /> : null}
+            </View>
+
+            {trackline ? <TracklineRow sw={trackline} /> : null}
+
+            {controls ? <MapButtons trail={trail} /> : null}
+
+            {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} terrain={trail.terrainAvailable && trail.base === 'terrain'} /> : null}
+            {!WEB ? (
+              <Pressable
+                accessibilityRole="link"
+                onPress={() => {
+                  onClose();
+                  router.push('/maps');
+                }}
+                hitSlop={6}
+                style={styles.link}>
+                <Text style={styles.linkText}>{tr('Offline Maps')}</Text>
+                <Text style={styles.linkText}>›</Text>
+              </Pressable>
+            ) : null}
+            {credit ? <Text style={styles.fine}>{tr('Map data: {credit}', { credit })}</Text> : null}
+          </SheetScroll>
+        </SwipeSheet>
+      </SheetRoot>
+    </Modal>
+  );
+}
+
+/** One map style as a picture of itself, its name set on the picture; the chosen one has a sky ring and a check. */
+function StyleTile({ base, on, onPress }: { base: BaseMap; on: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ selected: on }}
+      accessibilityLabel={tr(BASE_NAME[base])}
+      onPress={onPress}
+      style={({ pressed }) => [styles.styleTile, on && styles.styleTileOn, pressed && { transform: [{ scale: 0.97 }] }]}>
+      <View style={styles.styleArt}>
+        <View style={StyleSheetFill}>
+          <StyleThumb base={base} />
+        </View>
+        <Svg style={StyleSheetFill} width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <Defs>
+            <LinearGradient id={`fade-${base}`} x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0.45" stopColor="#061223" stopOpacity={0} />
+              <Stop offset="1" stopColor="#061223" stopOpacity={0.85} />
+            </LinearGradient>
+          </Defs>
+          <Rect width={100} height={100} fill={`url(#fade-${base})`} />
+        </Svg>
+        <Text style={styles.styleName} numberOfLines={1}>{tr(BASE_NAME[base])}</Text>
+        {on ? (
+          <View style={styles.styleCheck}>
+            <Svg width={11} height={11} viewBox="0 0 24 24" fill="none">
+              <Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#FFFFFF" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" />
+            </Svg>
+          </View>
+        ) : null}
       </View>
-      {trail.base === 'terrain' ? (
-        <Text style={styles.fine}>
-          {trail.terrain3d
-            ? tr('Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.', { v: WEB ? 'Right-drag or Ctrl-drag to tilt and turn.' : 'Drag up or down with two fingers to tilt, twist to turn.' })
-            : tr('No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.')}
-        </Text>
-      ) : null}
+    </Pressable>
+  );
+}
 
-      {trackline ? <TracklineRow sw={trackline} /> : null}
+const StyleSheetFill = { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 } as const;
 
-      <MapFeaturesList trail={trail} lookupHint={lookupHint} />
+/**
+ * One of the four big switches: a strip of map with the lines drawn exactly as the map draws them
+ * (core/map-features inks), lit in their own colors while on and grey when off, over the name and
+ * a small switch.
+ */
+function QuickTile({ q, on, onPress }: { q: QuickLayer; on: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityState={{ checked: on }}
+      accessibilityLabel={tr(q.name)}
+      accessibilityHint={tr(q.detail)}
+      onPress={onPress}
+      style={({ pressed }) => [styles.quick, on && styles.quickOn, pressed && { transform: [{ scale: 0.97 }] }]}>
+      <QuickArt id={q.id} on={on} />
+      <View style={styles.quickFoot}>
+        <View style={{ flex: 1, gap: 1 }}>
+          <Text style={[styles.quickName, !on && { color: Colors.textSecondary }]} numberOfLines={2}>{tr(q.name)}</Text>
+        </View>
+        <View style={[styles.pill, on && styles.pillOn]}>
+          <View style={[styles.knob, on && styles.knobOn]} />
+        </View>
+      </View>
+    </Pressable>
+  );
+}
 
-      {!WEB && ride && route && route.length > 1 ? <RideMapDownload ride={ride} route={route} terrain={trail.terrainAvailable && trail.base === 'terrain'} /> : null}
-      {!WEB ? (
-        <Pressable accessibilityRole="link" onPress={() => router.push('/maps')} hitSlop={6} style={styles.link}>
-          <Text style={styles.linkText}>{tr('Offline Maps')}</Text>
-          <Text style={styles.linkText}>›</Text>
-        </Pressable>
-      ) : null}
-      {credit ? <Text style={styles.fine}>{tr('Map data: {credit}', { credit })}</Text> : null}
-    </ScrollView>
+/** The quick switch's strip of map. Off, every line fades to grey so the tile reads as off at a glance. */
+function QuickArt({ id, on }: { id: QuickLayer['id']; on: boolean }) {
+  const grey = '#6E7A88';
+  const ink = (c: string) => (on ? c : grey);
+  const casing = 'rgba(6,18,35,0.92)';
+  return (
+    <View style={styles.quickArt}>
+      <Svg width="100%" height="100%" viewBox="0 0 160 56" preserveAspectRatio="xMidYMid slice">
+        <Rect width={160} height={56} fill={on ? '#1D2B20' : '#1A2129'} />
+        <Path d="M0 40 C30 30 50 52 90 38 S140 20 160 26" stroke="rgba(255,255,255,0.05)" strokeWidth={14} fill="none" />
+        {id === 'streets' ? (
+          <>
+            <Path d="M-4 46 C40 40 80 18 164 12" stroke={casing} strokeWidth={8.5} fill="none" strokeLinecap="round" />
+            <Path d="M-4 46 C40 40 80 18 164 12" stroke={ink(FEATURE_INK.highway)} strokeWidth={5} fill="none" strokeLinecap="round" />
+            <Path d="M52 -4 C58 20 70 40 74 60" stroke={casing} strokeWidth={6.5} fill="none" />
+            <Path d="M52 -4 C58 20 70 40 74 60" stroke={ink(FEATURE_INK.road)} strokeWidth={3.4} fill="none" />
+            <Path d="M110 60 C116 46 128 34 150 30" stroke={casing} strokeWidth={6} fill="none" />
+            <Path d="M110 60 C116 46 128 34 150 30" stroke={ink(FEATURE_INK.dirtRoad)} strokeWidth={2.8} fill="none" />
+          </>
+        ) : id === 'offroad' ? (
+          <>
+            <Path d="M-4 40 C30 44 52 14 92 20 S140 44 164 30" stroke={casing} strokeWidth={7.5} fill="none" strokeLinecap="round" />
+            <Path d="M-4 40 C30 44 52 14 92 20 S140 44 164 30" stroke={ink(FEATURE_INK.trail)} strokeWidth={3.6} strokeDasharray="10 5.5" fill="none" />
+            <Path d="M96 20 C104 6 120 2 140 -4" stroke={casing} strokeWidth={7} fill="none" />
+            <Path d="M96 20 C104 6 120 2 140 -4" stroke={ink(FEATURE_INK.narrow)} strokeWidth={3.4} strokeDasharray="4.5 3.4" fill="none" />
+          </>
+        ) : id === 'hiking' ? (
+          <>
+            <Path d="M-4 18 C26 14 40 42 76 40 S128 12 164 22" stroke="rgba(6,18,35,0.6)" strokeWidth={4.4} fill="none" />
+            <Path d="M-4 18 C26 14 40 42 76 40 S128 12 164 22" stroke={ink(FEATURE_INK.hiking)} strokeWidth={2.6} strokeDasharray="7 3 1.2 3" fill="none" />
+            <Path d="M76 40 C84 48 92 52 104 60" stroke={ink(FEATURE_INK.hiking)} strokeWidth={2.6} strokeDasharray="7 3 1.2 3" fill="none" />
+          </>
+        ) : (
+          <>
+            <Path d="M-6 -6 L86 -6 L76 30 L40 44 L-6 38 Z" fill={ink(FEATURE_INK.nationalForest)} fillOpacity={on ? 0.32 : 0.16} stroke={ink(FEATURE_INK.nationalForest)} strokeWidth={2} />
+            <Path d="M86 -6 L166 -6 L166 40 L110 50 L76 30 Z" fill={ink(FEATURE_INK.blm)} fillOpacity={on ? 0.3 : 0.14} stroke={ink(FEATURE_INK.blm)} strokeWidth={2} />
+            <Path d="M40 44 L76 30 L110 50 L104 62 L36 62 Z" fill={ink(FEATURE_INK.statePark)} fillOpacity={on ? 0.28 : 0.12} stroke={ink(FEATURE_INK.statePark)} strokeWidth={2} />
+          </>
+        )}
+      </Svg>
+    </View>
+  );
+}
+
+/**
+ * The switches for what floats on the riding maps, so a rider tunes the whole map screen in one
+ * place. The same switches are on the You tab; they're shared, so a change shows everywhere.
+ */
+function MapButtons({ trail }: { trail: TrailMap }) {
+  const tilt = useTiltSettings();
+  const [music, setMusic] = useMusicControlsSetting();
+  const musicFlag = useFlag('music_controls');
+  const [followMe, setFollowMe] = useFollowMePref();
+  const [junctions, setJunctions] = useIntersectionZoomPref();
+  const rows: { key: string; name: string; detail: string; on: boolean; set: (on: boolean) => void }[] = [
+    { key: 'follow', name: 'Follow Me', detail: 'The map moves with you as you ride.', on: followMe, set: setFollowMe },
+    ...(trail.mapbox ? [{ key: 'junctions', name: 'Zoom In at Intersections', detail: 'Closes in on a turn as you reach it, then zooms back out.', on: junctions, set: setJunctions }] : []),
+    ...(!WEB ? [{ key: 'tilt', name: 'Tilt Meter', detail: 'Roll and pitch on the map. Calibrate it on the Tilt screen.', on: tilt.show, set: setTiltShown }] : []),
+    ...(musicAvailable && musicFlag ? [{ key: 'music', name: 'Music Button', detail: 'Play, pause, skip and volume without leaving the map.', on: music, set: setMusic }] : []),
+  ];
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{tr('Map Buttons')}</Text>
+      <View style={styles.group2}>
+        {rows.map((r, i) => (
+          <View key={r.key} style={[styles.switchRow, i > 0 && styles.switchRowRule]}>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={styles.switchName}>{tr(r.name)}</Text>
+              <Text style={styles.switchDetail}>{tr(r.detail)}</Text>
+            </View>
+            <Switch
+              value={r.on}
+              onValueChange={r.set}
+              accessibilityLabel={tr(r.name)}
+              trackColor={{ false: withAlpha(Colors.textSecondary, 0.35), true: Colors.sky }}
+              thumbColor="#FFFFFF"
+              {...(WEB ? { activeThumbColor: "#FFFFFF" } : {})}
+              ios_backgroundColor={withAlpha(Colors.textSecondary, 0.35)}
+            />
+          </View>
+        ))}
+      </View>
+    </View>
   );
 }
 
@@ -208,10 +449,6 @@ function MapFeaturesList({ trail, lookupHint }: { trail: TrailMap; lookupHint: s
   };
   return (
     <View style={{ gap: 14 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Text style={styles.panelTitle}>{tr('Map Features')}</Text>
-        <ProTag feature="map_layers" style={{ alignSelf: 'auto' }} />
-      </View>
       {FEATURE_GROUPS.map((g) => {
         const list = MAP_FEATURES.filter((f) => f.group === g.id);
         const allOn = list.every((f) => trail.features[f.id]);
@@ -258,8 +495,8 @@ function TracklineRow({ sw }: { sw: TracklineSwitch }) {
   const fresh = sw.on ? ink.fresh : '#7B8794';
   const old = sw.on ? ink.old : '#56606C';
   return (
-    <View style={{ gap: 8 }}>
-      <Text style={styles.panelTitle}>{tr('Leader Trackline')}</Text>
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{tr('Leader Trackline')}</Text>
       <Pressable
         accessibilityRole="switch"
         accessibilityState={{ checked: sw.on, busy: !!sw.busy }}
@@ -635,26 +872,6 @@ export function ParkTrailCard({ t, onClose }: { t: ParkTrail; onClose: () => voi
   );
 }
 
-/**
- * One tap between the flat map and 3D Terrain, so riders don't have to find it in Map Layers.
- * Lit while 3D is on; tapping again goes back to the style the rider had (Satellite or Topo).
- */
-function ThreeDButton({ trail }: { trail: TrailMap }) {
-  const on = trail.base === 'terrain';
-  return (
-    <Pressable
-      accessibilityRole="switch"
-      accessibilityLabel={tr('3D Terrain')}
-      accessibilityState={{ checked: on }}
-      accessibilityHint={on ? tr('Lays the map flat again') : tr('Tilts the map and raises the mountains')}
-      hitSlop={6}
-      onPress={() => requirePro('map_layers') && trail.toggle3d()}
-      style={({ pressed }) => [styles.fab, on && styles.fab3dOn, pressed && { opacity: 0.8 }]}>
-      <Text style={[styles.fab3dText, on && styles.fab3dTextOn]}>3D</Text>
-    </Pressable>
-  );
-}
-
 function LayersIcon({ color }: { color: string }) {
   return (
     <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
@@ -668,15 +885,56 @@ const glass = GlassSurface;
 
 const styles = themedStyles(() => ({
   corner: { position: 'absolute', right: 12, alignItems: 'flex-end', gap: 8, zIndex: 20 },
-  fab: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', ...glass },
-  fabOn: { borderColor: SAND },
-  fab3dOn: { backgroundColor: Colors.sky, borderColor: Colors.sky },
-  fab3dText: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 16, letterSpacing: 0.5 },
-  fab3dTextOn: { color: '#FFFFFF' },
+  fab: {
+    width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', ...glass,
+    shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
+  },
+  fabPressed: { transform: [{ scale: 0.94 }], opacity: 0.9 },
+  fabDot: { position: 'absolute', top: 9, right: 9, width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.sky, borderWidth: 1.5, borderColor: Glass.panel },
+  sheetRoot: { backgroundColor: 'rgba(4,10,20,0.28)' },
+  sheetRootSide: { flexDirection: 'row' },
+  sheetScrim: { flex: 1, alignSelf: 'stretch', outlineWidth: 0 },
+  sheet: {
+    flexShrink: 1, maxHeight: '86%', backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,
+    paddingTop: 8, gap: 6, borderWidth: 1, borderBottomWidth: 0, borderColor: Glass.edge,
+    shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 24, shadowOffset: { width: 0, height: -6 }, elevation: 16,
+  },
+  sheetWide: { width: 560, maxWidth: '100%', alignSelf: 'center' },
+  sheetSide: { width: 392, maxHeight: undefined, alignSelf: 'stretch', borderRadius: 28, borderBottomWidth: 1, paddingTop: 16 },
+  grip: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: Colors.border },
+  sheetHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingTop: 4, paddingBottom: 6 },
+  sheetTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 28, lineHeight: 32 },
+  sheetClose: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
+  sheetBody: { paddingHorizontal: 20, paddingBottom: 12, gap: 26 },
+  section: { gap: 12 },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sectionTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19, lineHeight: 22 },
+  styles: { flexDirection: 'row', gap: 10 },
+  styleTile: { flex: 1, height: 92, borderRadius: 18, padding: 3, borderWidth: 2, borderColor: 'transparent' },
+  styleTileOn: { borderColor: Colors.sky },
+  styleArt: { flex: 1, borderRadius: 14, overflow: 'hidden', justifyContent: 'flex-end' },
+  styleName: { color: '#FFFFFF', fontFamily: font(700), fontSize: 14, paddingHorizontal: 10, paddingBottom: 8 },
+  styleCheck: { position: 'absolute', top: 7, right: 7, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.sky, alignItems: 'center', justifyContent: 'center' },
+  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  quick: { flexBasis: '47%', flexGrow: 1, borderRadius: 18, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge, overflow: 'hidden' },
+  quickOn: { borderColor: Colors.sky },
+  quickArt: { height: 58 },
+  quickFoot: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 10, minHeight: 52 },
+  quickName: { color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 17 },
+  pill: { width: 34, height: 20, borderRadius: 10, padding: 2, backgroundColor: withAlpha(Colors.textSecondary, 0.35), justifyContent: 'center' },
+  pillOn: { backgroundColor: Colors.sky },
+  knob: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#FFFFFF' },
+  knobOn: { alignSelf: 'flex-end' },
+  disclose: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 14, borderRadius: 14, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
+  discloseText: { flex: 1, color: Colors.text, fontFamily: font(700), fontSize: 15 },
+  discloseSub: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
+  group2: { borderRadius: 18, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge, paddingHorizontal: 14 },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, minHeight: 60 },
+  switchRowRule: { borderTopWidth: 1, borderTopColor: Glass.edge },
+  switchName: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
+  switchDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12, lineHeight: 16 },
   hint: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.pill, ...glass },
   hintText: { color: Colors.text, fontFamily: font(600), fontSize: 13 },
-  panel: { width: 300, borderRadius: Radius.card, ...glass },
-  panelBody: { padding: 14, gap: 12 },
   group: { gap: 6 },
   groupHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', paddingTop: 2 },
   groupTitle: { color: SAND, fontFamily: font(700), fontSize: 15 },
@@ -689,7 +947,6 @@ const styles = themedStyles(() => ({
   tick: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: Colors.textSecondary, alignItems: 'center', justifyContent: 'center' },
   tickOn: { backgroundColor: Colors.sky, borderColor: Colors.sky },
   landDot: { width: 10, height: 10, borderRadius: 3 },
-  panelTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 20 },
   bases: { flexDirection: 'row', gap: 10 },
   base: { flex: 1, gap: 6, alignItems: 'center' },
   baseThumb: { width: '100%', height: 64, borderRadius: Radius.control, overflow: 'hidden', borderWidth: 2, borderColor: Glass.edge },

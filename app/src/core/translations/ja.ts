@@ -3266,6 +3266,23 @@ const dict: Record<string, string> = {
   "You’re {v} of {total} everywhere.": "全体で {total} 人中 {v}です。",
   "{n} (ordinal)": "{n} 位",
   "1 (ordinal)": "1 位",
+  "Map Settings": "マップ設定",
+  "Map style, roads, trails, land and the buttons on the map": "マップのスタイル、道路、トレイル、土地、マップ上のボタン",
+  "On the Map": "マップに表示",
+  "Every Map Feature": "すべてのマップ要素",
+  "Fine-Tune": "細かく調整",
+  "Map Buttons": "マップのボタン",
+  "Music Button": "ミュージックボタン",
+  "Streets and Roads": "道路と通り",
+  "Land Boundaries": "土地の境界",
+  "Highways, paved roads and dirt roads": "高速道路、舗装路、未舗装路",
+  "Motorized trails, tracks and width limits": "モーター車両用トレイル、轍道、幅制限",
+  "Foot and horse trails": "徒歩と乗馬のトレイル",
+  "National forests, BLM, parks and property lines": "国有林、BLM、公園、地所境界",
+  "The map moves with you as you ride.": "走行中、マップがあなたと一緒に動きます。",
+  "Closes in on a turn as you reach it, then zooms back out.": "交差点に近づくと拡大し、通過すると元に戻ります。",
+  "Roll and pitch on the map. Calibrate it on the Tilt screen.": "マップにロールとピッチを表示。傾斜画面で校正します。",
+  "Play, pause, skip and volume without leaving the map.": "マップを離れずに再生、一時停止、スキップ、音量調整。",
 };
 
 export default dict;
