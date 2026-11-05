@@ -105,6 +105,10 @@ The statuses:
 
 **Need Help** sends right away and shows in red for the group. **EMERGENCY** asks you to confirm first. See [Emergencies and Safety](/help/emergency-and-safety).
 
+:::release 2.2
+An EMERGENCY also sounds a siren on every other rider's phone until they silence it. See [Hear the Emergency Siren](/help/emergency-siren).
+:::
+
 :::release 1.0.3
 In [Full Map](/help/ride-mode), the quick replies and status buttons are tucked away and only **EMERGENCY** stays on screen.
 :::
