@@ -4,7 +4,7 @@ summary: Mark camp, fuel, water, a gate or a hazard on a ride's map, and let the
 category: routes-maps
 order: 30
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/app/ride/[id]/waypoints.tsx
   - app/src/app/r/[code].tsx
