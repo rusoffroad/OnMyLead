@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownFixGap, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
+import { heldHeading, HELD_HEADING_MS, OWN_STOPPED_AFTER_MS, ownArrow, ownFix, ownMovingAt, ownFixGaps, ownStillMoving, ownStoppedAfterMs, riderHeading, screenAngle } from '../heading';
 import { BATTERY_PLANS } from '../battery';
 
 describe('riderHeading', () => {
@@ -104,11 +104,16 @@ describe('own dot moving or stopped', () => {
   it('times moving from the clock, not from the phone\'s fix time', () => {
     expect(ownMovingAt(start, true, 5, 1000).movingAt).toBe(1000);
   });
-  it('learns the fix gap from the fixes it sees, ignoring a stop or dead spot', () => {
-    expect(ownFixGap(1000, null, 5000)).toBe(1000);
-    expect(ownFixGap(1000, 0, 15_000)).toBe(15_000);
-    expect(ownFixGap(15_000, 0, 5 * 60_000)).toBe(15_000);
-    expect(ownFixGap(1000, 5000, 5000)).toBe(1000);
+  it('learns the fix gaps from the fixes it sees, ignoring a stop or dead spot', () => {
+    expect(ownFixGaps([], null, 5000)).toEqual([]);
+    expect(ownFixGaps([], 0, 15_000)).toEqual([15_000]);
+    expect(ownFixGaps([15_000], 0, 5 * 60_000)).toEqual([15_000]);
+    expect(ownFixGaps([15_000], 5000, 5000)).toEqual([15_000]);
+  });
+  it('keeps the longest recent gap, so one quick pair of fixes does not shorten the wait', () => {
+    const g = ownFixGaps([15_000, 15_000], 0, 1000);
+    expect(Math.max(...g)).toBe(15_000);
+    expect(ownFixGaps([1, 2, 3, 4, 5], 0, 6).length).toBe(5);
   });
   it('was never moving with no moving fix', () => {
     expect(ownStillMoving(ownMovingAt(start, false, 1000, 1000).movingAt, 1000)).toBe(false);

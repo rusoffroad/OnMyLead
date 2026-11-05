@@ -80,14 +80,19 @@ export function ownStoppedAfterMs(fixGapMs = 1000): number {
   return Math.max(OWN_STOPPED_AFTER_MS, Math.round(2.5 * gap));
 }
 
+/** How many recent fix gaps your dot remembers (the longest of them sets the wait). */
+export const OWN_FIX_GAPS_KEPT = 5;
+
 /**
- * The map's fix gap as your dot has seen it: the time since the last fix, unless that was a stop
- * or a dead spot (over a minute), when the gap seen before stands.
+ * The recent gaps between the map's fixes, newest last: the time since the last fix is added
+ * unless it was a stop or a dead spot (over a minute). The longest kept gap is the map's fix
+ * rate, so one quick pair of fixes on Battery Saver doesn't shorten the wait.
  */
-export function ownFixGap(prevGapMs: number, lastFixAtMs: number | null, nowMs: number): number {
-  if (lastFixAtMs == null) return prevGapMs;
+export function ownFixGaps(prev: readonly number[], lastFixAtMs: number | null, nowMs: number): number[] {
+  if (lastFixAtMs == null) return [...prev];
   const gap = nowMs - lastFixAtMs;
-  return gap > 0 && gap <= OWN_FIX_GAP_MAX_MS ? gap : prevGapMs;
+  if (!(gap > 0 && gap <= OWN_FIX_GAP_MAX_MS)) return [...prev];
+  return [...prev, gap].slice(-OWN_FIX_GAPS_KEPT);
 }
 
 /**
