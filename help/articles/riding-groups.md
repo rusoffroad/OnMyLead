@@ -6,6 +6,7 @@ order: 10
 release: "1.0"
 updated: 2026-11-05
 sources:
+  - app/src/core/pro.ts
   - app/src/app/(tabs)/groups.tsx
   - app/src/app/groups/new.tsx
   - app/src/app/groups/[id]/index.tsx
@@ -115,6 +116,8 @@ To get these invites, keep **Ride Invites** on in [Notification Settings](/help/
 ## Add a Group Photo
 
 If you made the group, you can give it a photo, like the crew lined up by the trailhead. Everyone in the group sees it at the top of the group page, next to the group's name on the **Riding Groups** screen, on the **Your Group** card on Home and under **Invite a Group** on a ride. It also shows on the group link. Until you add one, the group shows its initials.
+
+Adding or changing a group photo is part of OnMyLead Pro, including the Pro Trial. On Free, **Take Photo** and **Choose Photo** show the **Pro** tag. Everyone can see group photos on every plan, and you can always remove one.
 
 1. Open the group.
 2. Scroll down to **Group Photo**, below the riders.

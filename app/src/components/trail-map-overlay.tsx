@@ -32,7 +32,7 @@ import { useFollowMePref } from '@/hooks/use-follow-me';
 import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
 import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
 import { DOT_SIZE_NAME, DOT_SIZES } from '@/core/dot-size';
-import { DOT_STYLE_INK, DOT_STYLE_NAME, DOT_STYLES } from '@/core/own-dot-art';
+import { DEFAULT_DOT_STYLE, DOT_STYLE_INK, DOT_STYLE_NAME, DOT_STYLES } from '@/core/own-dot-art';
 import { DotSample } from './own-dot';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { useMusicControlsSetting } from '@/hooks/use-music-controls';
@@ -488,7 +488,10 @@ function DotSizeRow() {
 /** The Dot Styles as sample tiles, one tap to pick (Map Settings and the You tab). */
 export function DotStyleChoice() {
   const [style, setStyle] = useDotStylePref();
+  const pro = useContext(SheetPro);
   return (
+    <View style={{ gap: 6 }}>
+    <ProTag feature="custom_dot" style={{ alignSelf: 'flex-start' }} />
     <View style={styles.dotStyles} accessibilityRole="radiogroup" accessibilityLabel={tr('Dot Style')}>
       {DOT_STYLES.map((s) => {
         const on = style === s;
@@ -498,7 +501,7 @@ export function DotStyleChoice() {
             accessibilityRole="radio"
             accessibilityState={{ checked: on }}
             accessibilityLabel={tr(DOT_STYLE_NAME[s])}
-            onPress={() => setStyle(s)}
+            onPress={() => (s === DEFAULT_DOT_STYLE || pro('custom_dot')) && setStyle(s)}
             style={[styles.dotStyle, on && { borderColor: DOT_STYLE_INK[s], backgroundColor: withAlpha(DOT_STYLE_INK[s], 0.1) }]}>
             <View style={styles.dotStyleArt}>
               <DotSample style={s} size={40} />
@@ -508,12 +511,14 @@ export function DotStyleChoice() {
         );
       })}
     </View>
+    </View>
   );
 }
 
 /** Small, Medium, Large as one pill (Map Settings and the You tab). */
 export function DotSizeChoice() {
   const [size, setSize] = useDotSizePref();
+  const pro = useContext(SheetPro);
   return (
     <View style={styles.seg} accessibilityRole="radiogroup" accessibilityLabel={tr('Dot Size')}>
       {DOT_SIZES.map((s) => (
@@ -522,7 +527,7 @@ export function DotSizeChoice() {
           accessibilityRole="radio"
           accessibilityState={{ checked: size === s }}
           accessibilityLabel={tr(DOT_SIZE_NAME[s])}
-          onPress={() => setSize(s)}
+          onPress={() => (s === 'medium' || pro('custom_dot')) && setSize(s)}
           hitSlop={4}
           style={[styles.segItem, size === s && styles.segOn]}>
           <Text style={[styles.segText, size === s && styles.segTextOn]}>{tr(DOT_SIZE_NAME[s])}</Text>

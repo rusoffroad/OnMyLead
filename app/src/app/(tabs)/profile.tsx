@@ -85,6 +85,8 @@ export default function You() {
   const [musicMine, setMusicMine] = useMusicControlsSetting();
   const bluetoothFlag = useFlag('bluetooth_sharing');
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1). On Free the switch still runs the relay and the safety alerts.
+  const bluetoothPro = can('bluetooth_sharing');
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
@@ -332,18 +334,24 @@ export default function You() {
             icon="bluetooth"
             color={Colors.sky}
             title={t('Bluetooth Sharing')}
-            detail={bluetoothMine
-              ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
-              : t('Off. Turn it on to keep sharing with nearby riders when there is no service')}
+            onPress={bluetoothPro ? undefined : () => requirePro('bluetooth_sharing')}
+            detail={!bluetoothMine
+              ? t('Off. Turn it on to keep sharing with nearby riders when there is no service')
+              : bluetoothPro
+                ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
+                : t('With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.')}
             right={
-              <Switch
-                value={bluetoothMine}
-                onValueChange={setBluetoothMine}
-                trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                thumbColor="#FFFFFF"
-                {...({ activeThumbColor: '#FFFFFF' } as object)}
-                accessibilityLabel={t('Bluetooth Sharing')}
-              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <ProTag feature="bluetooth_sharing" />
+                <Switch
+                  value={bluetoothMine}
+                  onValueChange={setBluetoothMine}
+                  trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+                  thumbColor="#FFFFFF"
+                  {...({ activeThumbColor: '#FFFFFF' } as object)}
+                  accessibilityLabel={t('Bluetooth Sharing')}
+                />
+              </View>
             }
           />
         ) : null}

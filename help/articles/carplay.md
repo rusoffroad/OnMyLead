@@ -10,6 +10,7 @@ sources:
   - app/plugins/with-carplay.js
   - app/src/core/carplay.ts
   - app/src/lib/carplay.ts
+  - app/src/app/_layout.tsx
   - app/src/app/ride/[id]/live.tsx
 related: [ride-mode, status-buttons, emergency-and-safety, ride-bubble, leader-sweep-and-tail-gunner, music-controls]
 keywords: [carplay, car play, car screen, dashboard, truck, jeep, car, apple carplay, android auto, head unit, infotainment]
@@ -18,6 +19,8 @@ keywords: [carplay, car play, car screen, dashboard, truck, jeep, car, apple car
 If your truck, Jeep or car has Apple CarPlay, OnMyLead shows on the car's screen during a ride. You get big buttons for the status taps you use most, your group, and EMERGENCY, so you can keep your phone in the mount and your eyes on the trail.
 
 CarPlay works with iPhone. iPad, Android phones and Android tablets don't have it, and OnMyLead doesn't support Android Auto.
+
+CarPlay is part of OnMyLead Pro, including the Pro Trial. On a Free account the car screen says **CarPlay Is Part of OnMyLead Pro**, and Ride Mode, status taps and EMERGENCY keep working on your phone. See [Free and Pro](/help/free-vs-pro).
 
 ## Start CarPlay
 
@@ -53,4 +56,5 @@ The car screen uses the language you picked in OnMyLead. See [Language](/help/la
 
 - **OnMyLead isn't on the car screen.** Update OnMyLead from the App Store, then reconnect your iPhone to the car.
 - **The car screen says No Ride Running.** Open Ride Mode for your ride on your phone.
+- **The car screen says CarPlay Is Part of OnMyLead Pro.** Your account is on Free. Check **You** > **Subscription** on your phone.
 - **A button did nothing.** Status taps need the same signal as on your phone. With no service, they wait and send when you're back in range, just like in Ride Mode.
