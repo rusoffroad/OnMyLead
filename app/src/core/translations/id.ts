@@ -3255,6 +3255,12 @@ const dict: Record<string, string> = {
   "Zooming works while Follow Me is on.": "Zoom berfungsi saat Ikuti aku aktif.",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "Saat mengikuti, peta diperkecil sekali ketika titik mendekati tepi, lalu bergeser bersama Anda",
   "Off. The map slides along without zooming out": "Mati. Peta bergeser tanpa diperkecil",
+  "Your Dot": "Titik Anda",
+  "Dot Size": "Ukuran Titik",
+  "How big your own dot is on the map.": "Seberapa besar titik Anda sendiri di peta.",
+  "Small": "Kecil",
+  "Medium": "Sedang",
+  "Large": "Besar",
 };
 
 export default dict;

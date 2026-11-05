@@ -3255,6 +3255,12 @@ const dict: Record<string, string> = {
   "Zooming works while Follow Me is on.": "확대/축소는 팔로우가 켜져 있을 때 작동합니다.",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "따라가는 동안 점이 가장자리에 가까워지면 한 번 축소한 뒤 함께 이동합니다",
   "Off. The map slides along without zooming out": "꺼짐. 축소 없이 함께 이동합니다",
+  "Your Dot": "내 점",
+  "Dot Size": "점 크기",
+  "How big your own dot is on the map.": "지도에서 내 점의 크기입니다.",
+  "Small": "작게",
+  "Medium": "보통",
+  "Large": "크게",
 };
 
 export default dict;

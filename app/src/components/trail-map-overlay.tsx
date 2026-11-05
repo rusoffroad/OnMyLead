@@ -30,6 +30,8 @@ import { useLayout } from '@/hooks/use-layout';
 import { withAlpha } from '@/core/color';
 import { useFollowMePref } from '@/hooks/use-follow-me';
 import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
+import { useDotSizePref } from '@/hooks/use-dot-size';
+import { DOT_SIZE_NAME, DOT_SIZES } from '@/core/dot-size';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { useMusicControlsSetting } from '@/hooks/use-music-controls';
 import { useFlag } from '@/lib/app-settings';
@@ -433,9 +435,47 @@ function MapButtons({ trail }: { trail: TrailMap }) {
   ];
   return (
     <>
+      <DotSizeRow />
       <SwitchGroup title="Following" rows={following} note={followMe ? null : 'Zooming works while Follow Me is on.'} />
       {buttons.length ? <SwitchGroup title="Map Buttons" rows={buttons} /> : null}
     </>
+  );
+}
+
+/** Your Dot: Small, Medium or Large, the same choice on every live map and the You tab. */
+function DotSizeRow() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{tr('Your Dot')}</Text>
+      <View style={[styles.group2, styles.switchRow]}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={styles.switchName}>{tr('Dot Size')}</Text>
+          <Text style={styles.switchDetail}>{tr('How big your own dot is on the map.')}</Text>
+        </View>
+        <DotSizeChoice />
+      </View>
+    </View>
+  );
+}
+
+/** Small, Medium, Large as one pill (Map Settings and the You tab). */
+export function DotSizeChoice() {
+  const [size, setSize] = useDotSizePref();
+  return (
+    <View style={styles.seg} accessibilityRole="radiogroup" accessibilityLabel={tr('Dot Size')}>
+      {DOT_SIZES.map((s) => (
+        <Pressable
+          key={s}
+          accessibilityRole="radio"
+          accessibilityState={{ checked: size === s }}
+          accessibilityLabel={tr(DOT_SIZE_NAME[s])}
+          onPress={() => setSize(s)}
+          hitSlop={4}
+          style={[styles.segItem, size === s && styles.segOn]}>
+          <Text style={[styles.segText, size === s && styles.segTextOn]}>{tr(DOT_SIZE_NAME[s])}</Text>
+        </Pressable>
+      ))}
+    </View>
   );
 }
 
@@ -967,6 +1007,11 @@ const styles = themedStyles(() => ({
   group2: { borderRadius: 18, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge, paddingHorizontal: 14 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, minHeight: 60 },
   switchRowRule: { borderTopWidth: 1, borderTopColor: Glass.edge },
+  seg: { flexDirection: 'row', borderRadius: 999, padding: 3, backgroundColor: withAlpha(Colors.textSecondary, 0.18) },
+  segItem: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 7, minHeight: 32, justifyContent: 'center' },
+  segOn: { backgroundColor: Colors.sky },
+  segText: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 13 },
+  segTextOn: { color: '#FFFFFF' },
   switchName: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   switchDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 12, lineHeight: 16 },
   hint: { position: 'absolute', alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.pill, ...glass },

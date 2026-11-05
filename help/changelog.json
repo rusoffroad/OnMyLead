@@ -3,6 +3,17 @@
     "date": "2026-11-05",
     "slugs": [
       "map-layers",
+      "sync-across-devices"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings-dot-size",
+    "why": "2.1: Map Settings gains Your Dot with a Dot Size choice (Small, Medium, Large) for your own dot on Ride Mode and Map Mode, also on the You tab and synced with your account."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "map-layers",
       "3d-terrain",
       "follow-me",
       "leader-trackline",

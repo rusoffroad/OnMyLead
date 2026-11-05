@@ -39,6 +39,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'map.followMe.v1': 'Follow Me on live maps',
   'map.intersectionZoom.v1': 'Zoom In at Intersections on live maps',
   'map.edgeZoomOut.v1': 'Zoom Out at the Edge on live maps',
+  'map.dotSize.v1': 'Dot Size on live maps',
   'nav.trackLineOn.v1': 'The Track Line switch (the line itself stays on the device)',
   'nav.measureTrails.v1': 'Map Mode measures along trails',
   'route.followTrails.v1': 'Route Builder snaps to trails',

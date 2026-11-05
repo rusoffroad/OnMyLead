@@ -2,14 +2,13 @@ import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { ownArrow, riderHeading, screenAngle } from '@/core/heading';
+import { useOwnDotD } from '@/hooks/use-dot-size';
 import { useCompass } from '@/lib/compass';
 import { RiderPuck, YOU_INK } from './rider-puck';
 import { useGlide } from './use-glide';
 
 import { t } from '@/lib/i18n';
 
-/** Your own dot's disc size (points): twice the 2.1 test size, so it reads at a glance on a mount (2026-11-05). */
-export const OWN_PUCK_D = 33;
 
 export type OwnPuckFix = { lat: number; lng: number; course: number | null; speed: number | null; lastCourse?: number | null };
 
@@ -72,11 +71,12 @@ export function OwnPuck({ store, Marker }: { store: OwnPuckStore; Marker: (p: { 
 function OwnPuckAt({ fix, mapHeading, Marker }: { fix: OwnPuckFix; mapHeading: number; Marker: (p: { at: { lat: number; lng: number }; children: ReactNode }) => ReactNode }) {
   const at = useGlide(fix.lat, fix.lng);
   const compass = useCompass();
+  const d = useOwnDotD();
   const arrow = ownArrow({ speedMps: fix.speed, headingDeg: fix.course }, compass, fix.lastCourse);
   return (
     <Marker at={at}>
       <View accessible accessibilityLabel={t('You are here')}>
-        <RiderPuck color={YOU_INK} d={OWN_PUCK_D} beam moving={arrow.moving} angle={arrow.deg == null ? null : screenAngle(arrow.deg, mapHeading)} />
+        <RiderPuck color={YOU_INK} d={d} beam moving={arrow.moving} angle={arrow.deg == null ? null : screenAngle(arrow.deg, mapHeading)} />
       </View>
     </Marker>
   );

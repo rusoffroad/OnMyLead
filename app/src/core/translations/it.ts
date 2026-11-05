@@ -3255,6 +3255,12 @@ const dict: Record<string, string> = {
   "Zooming works while Follow Me is on.": "Lo zoom funziona quando Seguimi è attivo.",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "Mentre ti segue, la mappa si allontana una volta quando il tuo punto si avvicina al bordo, poi scorre con te",
   "Off. The map slides along without zooming out": "Disattivato. La mappa scorre senza allontanarsi",
+  "Your Dot": "Il Tuo Punto",
+  "Dot Size": "Dimensione del Punto",
+  "How big your own dot is on the map.": "Quanto è grande il tuo punto sulla mappa.",
+  "Small": "Piccolo",
+  "Medium": "Medio",
+  "Large": "Grande",
 };
 
 export default dict;

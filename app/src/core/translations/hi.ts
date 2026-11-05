@@ -3255,6 +3255,12 @@ const dict: Record<string, string> = {
   "Zooming works while Follow Me is on.": "ज़ूम तभी काम करता है जब मुझे फ़ॉलो करें चालू हो।",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "फ़ॉलो करते समय डॉट किनारे के पास आने पर मैप एक बार ज़ूम आउट होता है, फिर साथ खिसकता है",
   "Off. The map slides along without zooming out": "बंद। मैप बिना ज़ूम आउट किए खिसकता है",
+  "Your Dot": "आपका बिंदु",
+  "Dot Size": "बिंदु का आकार",
+  "How big your own dot is on the map.": "मैप पर आपका अपना बिंदु कितना बड़ा है।",
+  "Small": "छोटा",
+  "Medium": "मध्यम",
+  "Large": "बड़ा",
 };
 
 export default dict;

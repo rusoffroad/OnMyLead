@@ -3255,6 +3255,12 @@ const dict: Record<string, string> = {
   "Zooming works while Follow Me is on.": "缩放仅在“关注我”开启时有效。",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "跟随时，位置点接近边缘时地图缩小一次，之后随你平移",
   "Off. The map slides along without zooming out": "已关闭。地图平移但不缩小",
+  "Your Dot": "你的圆点",
+  "Dot Size": "圆点大小",
+  "How big your own dot is on the map.": "你自己的圆点在地图上的大小。",
+  "Small": "小",
+  "Medium": "中",
+  "Large": "大",
 };
 
 export default dict;

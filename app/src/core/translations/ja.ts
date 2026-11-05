@@ -3255,6 +3255,12 @@ const dict: Record<string, string> = {
   "Zooming works while Follow Me is on.": "ズームは「フォローする」がオンのときに働きます。",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "追従中、点が端に近づくと一度ズームアウトし、その後一緒にスライドします",
   "Off. The map slides along without zooming out": "オフ。ズームアウトせずにスライドします",
+  "Your Dot": "自分の点",
+  "Dot Size": "点のサイズ",
+  "How big your own dot is on the map.": "地図上の自分の点の大きさ。",
+  "Small": "小",
+  "Medium": "中",
+  "Large": "大",
 };
 
 export default dict;
