@@ -50,7 +50,7 @@ export const REPLY_PART_BYTES = 88;
 /**
  * A message goes out in up to this many packets (one per REPLY_PART_BYTES). Any Ride Mode message
  * (RIDE_MESSAGE_MAX UTF-16 units, at most 3 UTF-8 bytes each, so 360 bytes) needs at most 5; the
- * sixth gives a longer Ride Chat message bridged from the server more room before it is cut.
+ * sixth is headroom.
  */
 export const MAX_REPLY_PARTS = 6;
 /** Longest message that goes over Bluetooth, in UTF-8 bytes; longer ones are cut. */
@@ -523,19 +523,17 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   const newestOwn = groups.find((g) => g[0].userId === myId);
   // Then the rider's newest own message, whole, then other riders' taps.
   if (newestOwn && newestOwn.length <= left) take(newestOwn);
-  // Other riders' taps leave room for the shortest waiting message, so a crowd of taps can't keep
-  // every message off the air.
-  const waiting = groups.filter((g) => g !== newestOwn).map((g) => g.length);
-  const reserve = waiting.length ? Math.min(...waiting) : 0;
-  // (Only when that message could fit at all.)
-  const hold = reserve <= left ? reserve : 0;
-  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > hold) take([i]);
-  // Then the other messages, whole, the ones sent longest ago first (ties by a fixed order from the
-  // id, the same every round).
+  // The other messages wait in line: the ones sent longest ago first (ties by a fixed order from
+  // the id, the same every round).
   const ring = groups.filter((g) => g !== newestOwn)
     .map((g) => ({ g, sent: lastSent(idOf(g)), k: idOrder(idOf(g)) }))
     .sort((a, b) => a.sent - b.sent || a.k - b.k)
     .map((x) => x.g);
+  // Other riders' taps leave room for the next message in line (when it could fit at all), so a
+  // crowd of taps can't keep every message off the air.
+  const hold = ring.length && ring[0].length <= left ? ring[0].length : 0;
+  for (const i of items) if (i.kind === 'status' && !picked.has(i) && left > hold) take([i]);
+  // Then the other messages, whole, in line.
   for (const g of ring) if (g.length <= left) take(g);
   // Then other riders' spots and receipts.
   for (const i of items) if (!picked.has(i) && i.kind !== 'status' && i.kind !== 'reply' && left > 0) take([i]);

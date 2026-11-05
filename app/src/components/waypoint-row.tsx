@@ -35,7 +35,7 @@ export function WaypointRow({
         <Text style={[styles.meta, w.shared && { color: Colors.sky }, w.planned_stop && styles.stopMeta]} numberOfLines={1}>
           {audience}
         </Text>
-        {w.planned_stop && w.note ? <Text style={styles.note} numberOfLines={2}>{t(w.note)}</Text> : null}
+        {w.planned_stop && w.note ? <Text style={styles.note} numberOfLines={2}>{w.note}</Text> : null}
       </View>
       <Icon name="chevron" size={18} color={Colors.textSecondary} />
     </Pressable>

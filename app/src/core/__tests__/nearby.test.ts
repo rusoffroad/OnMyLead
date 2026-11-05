@@ -353,6 +353,20 @@ describe('pickFrames', () => {
   });
 });
 
+describe('pickFrames with many taps', () => {
+  it('gets a longer message out within a couple of turns when taps fill the round', () => {
+    const tap = (n: number) => ({ kind: 'status', userId: B, id: `t${n}`, status: 'ok', at: 50 - n, flags: 0, latE7: null, lngE7: null, hops: 0 } as unknown as NearbyItem);
+    const part = (id: string, p: number, parts: number) => ({ kind: 'reply', userId: C, id, body: 'x', at: 10, part: p, parts, flags: 0, hops: 0 } as unknown as NearbyItem);
+    const items = [...Array.from({ length: 20 }, (_, n) => tap(n)), part('short', 0, 1), ...[0, 1, 2, 3].map((p) => part('long', p, 4))];
+    const sent = new Map<string, number>();
+    const seen = new Set<string>();
+    for (let turn = 0; turn < 3; turn++) {
+      for (const i of pickFrames(items, A, (id) => sent.get(id) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(i.id, turn); }
+    }
+    expect(seen).toEqual(new Set(['short', 'long']));
+  });
+});
+
 describe('fitReply', () => {
   it('joins back from its own parts even when the cut lands after a space', () => {
     for (let n = 0; n < 12; n++) {
