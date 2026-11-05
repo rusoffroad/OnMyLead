@@ -120,7 +120,14 @@ class NearbyRadio(
         }
       } else if (st == BluetoothAdapter.STATE_ON) {
         handler.post {
-          if (!running || !hasPermissions() || adapter == null) return@post
+          val a = adapter
+          if (!running || !hasPermissions() || a == null) return@post
+          // A scan or advertisement left registered when Bluetooth went off (it couldn't be stopped
+          // then) would make the fresh start fail as already started: clear both first.
+          try { a.bluetoothLeScanner?.stopScan(scanCallback) } catch (_: Exception) {}
+          try { a.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback) } catch (_: Exception) {}
+          scanning = false
+          advertising = false
           // One loop of rounds: drop the waiting one and run now.
           handler.removeCallbacks(roundTask)
           round()

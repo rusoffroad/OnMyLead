@@ -498,7 +498,11 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, turn 
   for (const i of items) if (i.kind === 'status' && left > 0) { picked.add(i); left--; }
   // Then whole messages, starting at this round's turn.
   const messages = new Map<string, T[]>();
-  for (const i of items) if (i.kind === 'reply') messages.set(i.id, [...(messages.get(i.id) ?? []), i]);
+  for (const i of items) {
+    if (i.kind !== 'reply') continue;
+    const g = messages.get(i.id);
+    if (g) g.push(i); else messages.set(i.id, [i]);
+  }
   const groups = [...messages.values()];
   const start = groups.length ? turn % groups.length : 0;
   for (const g of [...groups.slice(start), ...groups.slice(0, start)]) {
@@ -532,6 +536,17 @@ export type OwnReplyInput = { id: string; body: string; at: number };
 export class NearbyMesh {
   private positions = new Map<string, Heard>();
   private events = new Map<string, Heard>();
+  private turn = 0;
+  private turnStarted = -Infinity;
+
+  /** Which turn a full round is on: one more each ROTATE_MS, by one even when rounds run late. */
+  private turnAt(now: number): number {
+    if (now - this.turnStarted >= ROTATE_MS) {
+      if (this.turnStarted !== -Infinity) this.turn++;
+      this.turnStarted = now;
+    }
+    return this.turn;
+  }
 
   readonly myId: string;
 
@@ -714,7 +729,7 @@ export class NearbyMesh {
     const items = this.live(now)
       .map((i) => (heard(i)?.mine ? i : { ...i, hops: i.hops + 1 }))
       .filter((i) => i.hops <= MAX_HOPS);
-    return pickFrames(items, this.myId, Math.floor(now / ROTATE_MS)).map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
+    return pickFrames(items, this.myId, this.turnAt(now)).map((i) => sealFrame(this.keys.rideKey, i, nonce(), nowSec));
   }
 
   /** Newest spot heard for each other rider. */

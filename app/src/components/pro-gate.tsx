@@ -35,19 +35,19 @@ export function ProShield({ size = 64 }: { size?: number }) {
   );
 }
 
-/** What the prompt says for a block: a Pro feature, or the Free ride limit. */
+/** What the prompt says for a block, already translated: a Pro feature, or the Free ride limit. */
 function promptCopy(block: ProBlock): { title: string; body: string; need: string } {
   if (block.kind === 'ride_limit') {
     const reset = nextReset().toLocaleDateString(currentLocale(), { month: 'long', day: 'numeric', timeZone: 'UTC' });
     return {
       title: t('You’ve Created This Month’s Free Ride'),
       body: t('Free accounts create {v} a month, and your next one opens on {reset}. Joining other rides stays free.', { v: block.allowance === 1 ? t('one ride') : t('{n} rides', { n: block.allowance }), reset }),
-      need: 'Pro creates as many rides as you lead.',
+      need: t('Pro creates as many rides as you lead.'),
     };
   }
-  if (!block.feature) return { title: 'OnMyLead Pro', body: t('Upgrade to use this. Joining rides and every safety feature stay free.'), need: 'Part of OnMyLead Pro.' };
+  if (!block.feature) return { title: 'OnMyLead Pro', body: t('Upgrade to use this. Joining rides and every safety feature stay free.'), need: t('Part of OnMyLead Pro.') };
   const info = FEATURE_INFO[block.feature];
-  return { title: info.title, body: info.body, need: 'Part of OnMyLead Pro.' };
+  return { title: t(info.title), body: t(info.body), need: t('Part of OnMyLead Pro.') };
 }
 
 /**
@@ -68,11 +68,11 @@ export function ProGateHost() {
           <View style={styles.head}>
             <ProShield size={52} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={styles.title} accessibilityRole="header">{t(copy.title)}</Text>
-              <Text style={styles.need}>{t(copy.need)}</Text>
+              <Text style={styles.title} accessibilityRole="header">{copy.title}</Text>
+              <Text style={styles.need}>{copy.need}</Text>
             </View>
           </View>
-          <ThemedText style={{ color: Colors.text }}>{t(copy.body)}</ThemedText>
+          <ThemedText style={{ color: Colors.text }}>{copy.body}</ThemedText>
           <Button
             title={t('See OnMyLead Pro')}
             big
