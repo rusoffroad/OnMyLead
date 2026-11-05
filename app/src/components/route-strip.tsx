@@ -6,7 +6,7 @@ import type { FreerideSummary } from '@/core/freeride';
 import type { RangeCheck } from '@/core/fuel';
 import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
-import { convoyLayout, describeRank, groupSpread, rankRiders, spreadRuler, type SpreadRuler } from '@/core/route-order';
+import { convoyLayout, describeRank, rankRiders, spreadRuler, type SpreadRuler } from '@/core/route-order';
 
 import { t as tr } from '@/lib/i18n';
 const RANGE_COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
@@ -22,12 +22,13 @@ const LABEL_W = 190;
  * to the far left edge and the tail gunner pinned to the far right edge (core/route-order
  * convoyLayout). Everyone else sits between them by how far behind the leader they are, as near
  * that spot as they can without hiding a neighbor, so a bunched-up group reads as a string of
- * dots rather than one blob. Tap a dot for the rider's name and place. The head still shows the
- * miles done and to go on a route, so one glance answers both "how far along are we?" and "where
- * am I in the group?" without reading a map.
+ * dots rather than one blob. Tap a dot for the rider's name and place. Under the line a
+ * dimension line (core/route-order spreadRuler) gives the distance from the leader to whoever is
+ * furthest back, with a tick every round step, so the spacing has a scale. Below that, one
+ * centered sentence says where this rider is. (Chris, 2026-11-05: no miles-done header.)
  *
  * On a Freeride (no mapped route) the distances are measured along the leader's own path
- * (core/freeride), with the group's spread in place of the miles done.
+ * (core/freeride).
  */
 export function RouteStrip({
   riders, meId, summary, nameOf, offline, range, compact, lastSeenIds, freeride,
@@ -71,46 +72,12 @@ export function RouteStrip({
   }, [picked]);
   const pickedRider = picked ? ranked.find((r) => r.id === picked) : undefined;
   const pickedSpot = pickedRider ? spots.get(pickedRider.id) : undefined;
-  const spread = groupSpread(ranked);
   const offWord = freeride ? tr('off the leader’s path') : tr('off the route');
   const describe = (r: (typeof ranked)[number]) => describeRank(r, ranked, nameOf(r.id), meId, offWord);
   const fs = freeride?.summary;
-  const [spreadNum, ...spreadUnit] = fs?.spread?.split(' ') ?? [];
 
   return (
     <View style={styles.wrap}>
-      <View
-        style={styles.head}
-        accessible
-        accessibilityLabel={freeride ? [
-          freeride.waiting ? tr('Freeride. Waiting for the leader to share their location.') : fs?.spread ? tr('Freeride. The group is spread over {spread}, {ends}.', { spread: fs.spread, ends: fs.ends }) : tr('Freeride. {ends}.', { ends: fs?.ends ?? '' }),
-          fs?.compared ?? '',
-        ].join(' ') : [
-          summary ? tr('Mile {doneMi} of {totalMi}. {compared} {v}', { doneMi: summary.doneMi, totalMi: summary.totalMi, compared: summary.compared, v: summary.offRoute ?? '' }) : tr('Route, {length} riders on it', { length: ranked.length }),
-          spread ? tr('{spread}, front to rear.', { spread }) : '',
-        ].join(' ')}>
-        {freeride ? (
-          freeride.waiting ? (
-            <Text style={styles.of}>{tr('Waiting for the Leader')}</Text>
-          ) : fs?.spread ? (
-            <Text style={styles.big}>
-              {spreadNum}
-              <Text style={styles.of}>{tr('{v} spread', { v: spreadUnit.join(' ') })}</Text>
-            </Text>
-          ) : (
-            <Text style={styles.of}>{fs?.ends}</Text>
-          )
-        ) : summary ? (
-          <Text style={styles.big}>
-            {summary.doneMi}
-            <Text style={styles.of}>{tr('of {totalMi} mi', { totalMi: summary.totalMi })}</Text>
-          </Text>
-        ) : (
-          <Text style={styles.of}>{tr('Route · {v}', { v: ranked.length ? tr('{n} on the line', { n: ranked.length }) : tr('nobody placed yet') })}</Text>
-        )}
-        <Text style={styles.toGo}>{freeride ? (freeride.waiting || !fs?.spread ? tr('Freeride') : fs.ends) : summary ? summary.toGo : offline ? tr('Saved route, no signal') : ''}</Text>
-      </View>
-
       <View style={styles.track} onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}>
         <View style={styles.rail} />
         {order.map((r) => {
@@ -231,10 +198,6 @@ function Ruler({ ruler, stale }: { ruler: SpreadRuler; stale: boolean }) {
 
 const styles = themedStyles(() => ({
   wrap: { gap: 8, paddingHorizontal: 4, paddingBottom: 4 },
-  head: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
-  big: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 36 },
-  of: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 20 },
-  toGo: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
   track: { height: 34, justifyContent: 'center', marginHorizontal: 10 },
   // Sits close under the track (the wrap's gap is 8): caps at 0, line at 5, ticks hang from it.
   ruler: { height: 16, marginTop: -6, marginHorizontal: 10 },
@@ -254,8 +217,8 @@ const styles = themedStyles(() => ({
     borderRadius: 10, backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
   },
   labelText: { color: Colors.text, fontFamily: font(700), fontSize: 13, lineHeight: 17, textAlign: 'center' },
-  range: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  range: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   rangeDot: { width: 10, height: 10, borderRadius: 5 },
-  rangeText: { flex: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },
-  compared: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20 },
+  rangeText: { flexShrink: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },
+  compared: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20, textAlign: 'center' },
 }));

@@ -138,7 +138,7 @@ export function groupSpread(ranked: RankedRider[]): string | null {
 }
 
 const FT_PER_M = 3.28084;
-/** Ruler steps, in meters: feet first (50 ft to 500 ft), then tenths of a mile up to 50 mi. */
+/** Ruler steps, in meters: feet (50 to 500 ft) while the label is in feet, then 0.1 mi up to 50 mi. */
 const STEPS_US = [50, 100, 250, 500].map((ft) => ft / FT_PER_M).concat([0.1, 0.25, 0.5, 1, 2, 5, 10, 25, 50].map((mi) => mi * 1609.344));
 const STEPS_METRIC = [10, 25, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
 /** Under this the group reads as together: the ruler shows no ticks, just "a few yards". */
@@ -198,7 +198,7 @@ export function spreadRuler(
   const spanM = Math.max(1, front - tail.place!.alongM);
   const px = toX - fromX;
   const minGap = opts.minTickGap ?? 24;
-  const step = together || px <= 0 ? undefined : (opts.metric ? STEPS_METRIC : STEPS_US).find((s) => (s / spanM) * px >= minGap);
+  const step = together || px <= 0 ? undefined : (opts.metric ? STEPS_METRIC : STEPS_US.filter((s) => metersToMiles(meters) < 0.1 || s >= 0.1 * 1609.344)).find((s) => (s / spanM) * px >= minGap);
   const ticks: number[] = [];
   if (step) for (let d = step; d < spanM - step * 0.35; d += step) ticks.push(Math.round((fromX + (d / spanM) * px) * 10) / 10);
   return { meters, label, ends, fromX, toX, ticks, stepM: ticks.length ? step! : 0 };

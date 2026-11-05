@@ -13,6 +13,10 @@
       },
       {
         "kind": "new",
+        "text": "Group Spread on the leader line: a thin measuring line under the rider dots runs from the leader to the tail gunner, with how far back the last rider is in the middle (such as 0.8 mi) and small ticks every round step, so you can see how far apart the group really is. It works on routes and Freerides, and with Bluetooth Sharing when there's no service. The big miles-done number above the line is gone, and the line about your place is centered under it."
+      },
+      {
+        "kind": "new",
         "text": "Emergency Siren: when another rider on your ride sends EMERGENCY, from the button, CarPlay or a Crash Alert that ran out, your phone sounds a loud siren on a full-screen alert until you tap Silence Siren or Show Me Where. With OnMyLead open it plays even with the ring/silent switch on silent and turns your music down under it; with the app closed the notification itself plays the siren (on Android as an alarm, so you hear it with the ringer on silent). With no service it sounds over Bluetooth too. It stops by itself if the rider cancels or taps I'm OK. It's on for everyone; switch it off or tap Play Siren to hear it in Notification Settings."
       },
       {
