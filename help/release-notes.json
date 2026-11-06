@@ -37,7 +37,7 @@
       },
       {
         "kind": "improved",
-        "text": "The map keeps up with you without jumping: your dot moves through the middle of the map, the map zooms out one step the first time you near an edge, and after that it slides to keep you on screen with more of the way ahead showing. Center on Me starts that over."
+        "text": "The map keeps your dot on screen: your dot moves through the middle of the map, the map zooms out one step the first time you get within about a tenth of the screen of an edge, and the next time it centers on your dot and moves with you so you never ride off the screen. Center on Me starts that over."
       },
       {
         "kind": "new",

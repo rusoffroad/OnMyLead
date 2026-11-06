@@ -3313,7 +3313,7 @@ const dict: Record<string, string> = {
   "Play, pause, skip and volume without leaving the map.": "マップを離れずに再生、一時停止、スキップ、音量調整。",
   "Zoom Out at the Edge": "端でズームアウト",
   "The map moves to keep your dot on screen as you ride.": "走行中、自分の点が画面に収まるようにマップが動きます。",
-  "The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.": "自分の点が初めて端に近づくと、マップが1段階ズームアウトします。その後は一緒にスライドします。",
+  "The first time your dot nears the edge, the map zooms out one step. The next time it centers on you and follows.": "自分の点が初めて端に近づくと、マップが1段階ズームアウトします。次からは自分を中心に表示して追従します。",
   "Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.": "道路やトレイルの交差点に近づくと拡大して進む方向を見せ、その後ズームアウトします。",
   "Zooming works while Follow Me is on.": "ズームは「フォローする」がオンのときに働きます。",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "追従中、点が端に近づくと一度ズームアウトし、その後一緒にスライドします",

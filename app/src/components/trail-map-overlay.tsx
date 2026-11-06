@@ -454,7 +454,7 @@ function MapButtons({ trail }: { trail: TrailMap }) {
   const [junctions, setJunctions] = useIntersectionZoomPref();
   const following: SwitchRowItem[] = [
     { key: 'follow', name: 'Follow Me', detail: 'The map moves to keep your dot on screen as you ride.', on: followMe, set: setFollowMe },
-    { key: 'edge', name: 'Zoom Out at the Edge', detail: 'The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.', on: edgeZoom, set: setEdgeZoom, off: !followMe },
+    { key: 'edge', name: 'Zoom Out at the Edge', detail: 'The first time your dot nears the edge, the map zooms out one step. The next time it centers on you and follows.', on: edgeZoom, set: setEdgeZoom, off: !followMe },
     ...(trail.mapbox ? [{ key: 'junctions', name: 'Zoom In at Intersections', detail: 'Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.', on: junctions, set: setJunctions, off: !followMe }] : []),
   ];
   const buttons: SwitchRowItem[] = [

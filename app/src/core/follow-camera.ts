@@ -91,27 +91,30 @@ export function followCamShouldMove(last: LatLng | null, next: LatLng): boolean 
 }
 
 /**
- * Keeping the dot on screen (2.1). Instead of re-centering on every step, the dot rides freely
- * through the middle of the open map. When it gets near an edge (outside the box FOLLOW_EDGE_FRACTION
- * in from each side), the map zooms out one step, once. After that, reaching the edge again moves
- * the map instead, putting the dot a little behind the middle so more of the way ahead shows.
- * Follow Me starting again (Center on Me, the button, a resume) allows the one zoom out again.
+ * Keeping the dot on screen (2.1). The dot rides freely through the middle of the open map. The
+ * first time it gets within FOLLOW_EDGE_FRACTION of an edge, the map zooms out one step. The next
+ * time it reaches an edge (or the first time, with Zoom Out at the Edge off or already zoomed far
+ * out), the map centers on the dot and from then on keeps it centered on every fix, so the dot is
+ * always on screen. Follow Me starting again (Center on Me, the button, a resume after a drag)
+ * goes back to the start: free in the middle, one zoom out allowed.
  */
-export const FOLLOW_EDGE_FRACTION = 0.2;
-/** The edge box never closes in tighter than this many points from a side. */
-export const FOLLOW_EDGE_MIN_PT = 36;
-/** How far behind the middle the dot sits after a move, as a share of the open map's smaller side. */
+export const FOLLOW_EDGE_FRACTION = 0.1;
+/** The edge band is never thinner than this many points. */
+export const FOLLOW_EDGE_MIN_PT = 24;
+/** How far behind the middle the dot sits when zoomed in at an intersection, as a share of the open map's smaller side. */
 export const FOLLOW_LEAD = 0.18;
 /** Never zoom out past this Mapbox zoom (about 30 km across a phone). */
 export const FOLLOW_MIN_ZOOM = 10;
+/** The one zoom out at the edge, in zoom levels (twice as much ground across). */
+export const FOLLOW_ZOOM_OUT_STEP = 1;
 
 export type ScreenPoint = { x: number; y: number };
 export type ScreenSize = { width: number; height: number };
 type Box = { left: number; top: number; right: number; bottom: number };
 
-/** Remembered for one stretch of following. */
-export type FollowFrame = { zoomedOut: boolean };
-export const FOLLOW_FRAME_START: FollowFrame = { zoomedOut: false };
+/** Remembered for one stretch of following: the one zoom out used, and whether the map now keeps the dot centered. */
+export type FollowFrame = { zoomedOut: boolean; locked: boolean };
+export const FOLLOW_FRAME_START: FollowFrame = { zoomedOut: false, locked: false };
 
 export type FollowMove =
   | { kind: 'stay' }
@@ -168,14 +171,22 @@ export function followMove(
   frame: FollowFrame,
   ctx: { pt: ScreenPoint | null; size: ScreenSize; inset: Inset; zoom: number; screenHeadingDeg: number | null; noZoomOut?: boolean },
 ): FollowMove {
+  const center: FollowMove = { kind: 'pan', inset: ctx.inset };
+  // Following centered: every fix keeps the dot in the middle of the open map.
+  if (frame.locked) return center;
   // Can't tell where the dot is on screen (the map is still drawing): just keep it in view.
-  if (!ctx.pt) return { kind: 'pan', inset: leadInset(ctx.inset, ctx.size, ctx.screenHeadingDeg) };
+  if (!ctx.pt) return center;
   if (insideFollowBox(ctx.pt, ctx.size, ctx.inset)) return { kind: 'stay' };
-  const off = ctx.pt.x < -ctx.size.width || ctx.pt.x > 2 * ctx.size.width || ctx.pt.y < -ctx.size.height || ctx.pt.y > 2 * ctx.size.height;
-  if (!frame.zoomedOut && !ctx.noZoomOut && !off && ctx.zoom - 1 >= FOLLOW_MIN_ZOOM) return { kind: 'zoom-out', zoom: ctx.zoom - 1 };
-  return { kind: 'pan', inset: leadInset(ctx.inset, ctx.size, ctx.screenHeadingDeg) };
+  // Mapbox on iPhone and iPad answers (-1, -1) for a spot off the screen.
+  const unknown = ctx.pt.x === -1 && ctx.pt.y === -1;
+  const off = unknown || ctx.pt.x < -ctx.size.width || ctx.pt.x > 2 * ctx.size.width || ctx.pt.y < -ctx.size.height || ctx.pt.y > 2 * ctx.size.height;
+  const zoom = ctx.zoom - FOLLOW_ZOOM_OUT_STEP;
+  if (!frame.zoomedOut && !ctx.noZoomOut && !off && zoom >= FOLLOW_MIN_ZOOM) return { kind: 'zoom-out', zoom };
+  return center;
 }
 
 export function followFrameAfter(frame: FollowFrame, move: FollowMove): FollowFrame {
-  return move.kind === 'zoom-out' ? { zoomedOut: true } : frame;
+  if (move.kind === 'zoom-out') return { ...frame, zoomedOut: true };
+  if (move.kind === 'pan' && !frame.locked) return { ...frame, locked: true };
+  return frame;
 }

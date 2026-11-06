@@ -213,7 +213,7 @@ export default function RideMode() {
   const announced = useRef(new Set<string>());
   const [route, setRoute] = useState<{ route: RideRoute | null; offline: boolean; loaded?: boolean }>({ route: null, offline: false });
   // This phone's own fix, kept on the phone: it places me on the route even when I'm not sharing.
-  const [myFix, setMyFix] = useState<{ lat: number; lng: number } | null>(null);
+  const [myFix, setMyFix] = useState<{ lat: number; lng: number; course?: number | null; speed?: number | null } | null>(null);
   // Each rider's last progress along the route, so loops and out-and-backs don't make them jump.
   const [tracker] = useState(() => new RouteTracker());
   const routeMiles = useRef<number | null | undefined>(undefined);
@@ -411,7 +411,7 @@ export default function RideMode() {
       .then(async (p) => {
         if (p.status !== 'granted' || gone) return;
         sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.High, distanceInterval: followEveryM }, (l) =>
-          setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude }),
+          setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude, course: l.coords.heading, speed: l.coords.speed }),
         );
         if (gone) sub.remove();
       })
@@ -1162,6 +1162,7 @@ export default function RideMode() {
             follow.camEvent('pan');
           }}
           follow={following ? { inset: openMapInset } : null}
+          myFix={myFix}
           locationEveryMs={batteryMode === 'best' ? 1000 : BATTERY_PLANS[batteryMode].fixEveryMs}
         />
       </CompassSpot.Provider>
