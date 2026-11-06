@@ -430,7 +430,9 @@ export default function RideMode() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ride_members', filter: `ride_id=eq.${id}` }, () => refresh())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
         const s = payload.new as TappedStatus & { user_id: string };
-        // An older tap arriving late (uploaded after a newer one) changes nothing.
+        // An older tap arriving late (uploaded after a newer one) changes nothing. Kept current right
+        // away too, so a Bluetooth copy of an older EMERGENCY in the same tick doesn't count as newer.
+        if (isNewerTap(statusesNow.current[s.user_id], s)) statusesNow.current = { ...statusesNow.current, [s.user_id]: s };
         setStatuses((prev) => (isNewerTap(prev[s.user_id], s) ? { ...prev, [s.user_id]: s } : prev));
       })
       // A rider cancelled a tap: their status goes back to what it was before.
