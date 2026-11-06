@@ -90,7 +90,7 @@ import {
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
-import { endEmergency, endStaleCalls, raiseEmergency, sirenHasCall } from '@/lib/siren';
+import { endStaleCalls, raiseEmergency, sirenHasCall, tapTakenBack } from '@/lib/siren';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -438,7 +438,7 @@ export default function RideMode() {
         const row = payload.new as { id?: string; cancelled_at?: string | null };
         if (row?.cancelled_at) {
           // A cancelled EMERGENCY stops the siren on every phone that is sounding it.
-          if (row.id) endEmergency(row.id);
+          if (row.id) tapTakenBack(row.id);
           refresh();
         }
       })

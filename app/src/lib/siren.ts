@@ -142,7 +142,7 @@ export async function sirenWillSound(e: IncomingEmergency, me: string | null): P
   if (!Number.isFinite(at) || !shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() })) return false;
   // Already sounding, or would join the list (not an older call from a rider with a newer one).
   if (calls.some((c) => c.id === e.id)) return true;
-  const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt: e.tappedAt, name: e.name, possibleCrash: e.possibleCrash };
+  const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt: e.tappedAt ?? (e.source === 'push' ? undefined : at), name: e.name, possibleCrash: e.possibleCrash };
   if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) return false;
   return addCall(calls, call) !== calls;
 }
@@ -167,19 +167,16 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     }
     // Ride Mode already shows a newer tap from this rider: it's over before it sounds.
     if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) {
-      endedHere.add(call.id);
-      silencedSet.add(call.id);
+      markEnded(call.id);
       return;
     }
     const isNew = !calls.some((c) => c.id === call.id);
     const next = addCall(calls, call);
     if (next === calls) return;
-    // Another call from the same rider replaces the older one: that one needs no silencing.
+    // Another call from the same rider replaces the older one: its notification goes, but it isn't
+    // silenced (if the newer one is taken back, the older one can sound again).
     const replaced = calls.filter((c) => !next.some((n) => n.id === c.id)).map((c) => c.id);
-    if (replaced.length) {
-      remember(replaced);
-      silencedHook?.(replaced);
-    }
+    if (replaced.length) silencedHook?.(replaced);
     calls = next;
     emit();
     if (isNew && AppState.currentState !== 'active' && e.source === 'bluetooth') backgroundNotifier?.(call);
@@ -188,29 +185,41 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
 }
 
 /** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
+/** Ends a call for this run only, keeping the list to SIREN_REMEMBER ids. */
+function markEnded(id: string) {
+  if (endedHere.has(id)) return;
+  if (endedHere.size >= SIREN_REMEMBER) {
+    const oldest = endedHere.values().next().value as string;
+    endedHere.delete(oldest);
+    if (!silenced.includes(oldest)) silencedSet.delete(oldest);
+  }
+  endedHere.add(id);
+  silencedSet.add(id);
+}
+
 /**
  * A newer tap from the rider ended this call. Kept for this run only (not saved as silenced), so
  * it can't sound again now; if the rider needs help again they tap EMERGENCY again, a new call.
  */
 function endByTap(callId: string) {
   if (!calls.some((c) => c.id === callId)) return;
-  endedHere.add(callId);
-  silencedSet.add(callId);
+  markEnded(callId);
   silencedHook?.([callId]);
   calls = dropCall(calls, callId);
   emit();
   update();
 }
 
+/** A rider took a tap back (Ride Mode's cancel, a cancelled push): it ends a call of that id, and no longer counts as their newest. */
+export function tapTakenBack(id: string) {
+  for (const ride of Object.values(knownLatest))
+    for (const [u, k] of Object.entries(ride)) if (k.id === id) delete ride[u];
+  endEmergency(id);
+}
+
 export function endEmergency(id: string) {
   if (!calls.some((c) => c.id === id)) {
-    if (endedHere.size >= SIREN_REMEMBER) {
-      const oldest = endedHere.values().next().value as string;
-      endedHere.delete(oldest);
-      if (!silenced.includes(oldest)) silencedSet.delete(oldest);
-    }
-    endedHere.add(id);
-    silencedSet.add(id);
+    markEnded(id);
     return;
   }
   remember([id]);
@@ -347,7 +356,7 @@ async function checkCallsOnServer() {
   const unnamed = calls.filter((c) => c.userId.startsWith('item:'));
   if (unnamed.length) {
     const { data } = await supabase.from('rider_statuses').select('id, cancelled_at').in('id', unnamed.map((c) => c.id));
-    for (const r of (data ?? []) as { id: string; cancelled_at?: string | null }[]) if (r.cancelled_at) endEmergency(r.id);
+    for (const r of (data ?? []) as { id: string; cancelled_at?: string | null }[]) if (r.cancelled_at) tapTakenBack(r.id);
   }
   const waiting = calls.filter((c) => !c.userId.startsWith('item:'));
   // The rides are separate: ask for each at once.
@@ -361,7 +370,7 @@ async function checkCallsOnServer() {
     const rows: Row[] = pages.flatMap((p) => (p.error ? [] : ((p.data ?? []) as Row[])));
     for (const c of mine) {
       if (rows.some((r) => r.id === c.id && r.cancelled_at)) {
-        endEmergency(c.id);
+        tapTakenBack(c.id);
         continue;
       }
       // The same newest-tap rule as Ride Mode (ties included).

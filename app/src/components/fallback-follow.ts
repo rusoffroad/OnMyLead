@@ -26,7 +26,7 @@ export async function fallbackFollowStep(
   const move = followMove(frame.current, { pt, size, inset, zoom, screenHeadingDeg: null, noZoomOut: !cam || !edgeZoomOn() });
   frame.current = followFrameAfter(frame.current, move);
   if (move.kind === 'zoom-out') {
-    if (cam?.zoom != null) m.animateCamera({ zoom: cam.zoom - 1 }, { duration: 700 });
+    if (cam?.zoom != null) m.animateCamera({ zoom: move.zoom }, { duration: 700 });
     else if (cam?.altitude != null) m.animateCamera({ altitude: cam.altitude * 2 }, { duration: 700 });
     return 'stay';
   }

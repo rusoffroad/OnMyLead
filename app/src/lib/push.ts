@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { endEmergency, loadSiren, noteRiderTap, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
+import { loadSiren, noteRiderTap, tapTakenBack, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -71,15 +71,20 @@ const isEmergency = (d: TapData | undefined) => d?.type === 'status' && (d as { 
  * plain sound.
  */
 let sirenSent = true;
-async function sendSirenSetting() {
-  if (!myToken) return;
-  sirenSent = false;
-  try {
-    // The saved switch, not the default true before it has loaded.
-    await loadSiren();
-    const { error } = await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
-    sirenSent = !error;
-  } catch {}
+let sirenChain: Promise<void> = Promise.resolve();
+/** One at a time, each sending the switch as it is then, so quick toggles end on the last one. */
+function sendSirenSetting(): Promise<void> {
+  sirenChain = sirenChain.then(async () => {
+    if (!myToken) return;
+    sirenSent = false;
+    try {
+      // The saved switch, not the default true before it has loaded.
+      await loadSiren();
+      const { error } = await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
+      sirenSent = !error;
+    } catch {}
+  });
+  return sirenChain;
 }
 onSirenSetting(() => void sendSirenSetting());
 // Not through yet (no signal when the switch moved): try again each time the app comes back.
@@ -240,7 +245,7 @@ export function useNotificationTaps() {
 
 /** An EMERGENCY push while the app is open sounds the siren; a cancelled one stops it. */
 function sirenFromPush(data: TapData | undefined) {
-  if (typeof data?.itemId === 'string' && data.type === 'cancelled') return endEmergency(data.itemId);
+  if (typeof data?.itemId === 'string' && data.type === 'cancelled') return tapTakenBack(data.itemId);
   // A rider's later tap (I'm OK...), named by newer servers: ends their call on any screen.
   const d = data as (TapData & { status?: unknown; userId?: unknown; tappedAt?: unknown }) | undefined;
   if (d?.type === 'status' && d.status !== 'emergency' && typeof d.itemId === 'string' && typeof d.rideId === 'string'
