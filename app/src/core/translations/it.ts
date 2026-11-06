@@ -3353,6 +3353,7 @@ const dict: Record<string, string> = {
   "{name} may have crashed and didn’t tap I’m OK.": "{name} potrebbe aver avuto un incidente e non ha toccato Sto bene.",
   "{n} more rider needs help": "Un altro pilota ha bisogno di aiuto ({n})",
   "{n} more riders need help": "Altri {n} piloti hanno bisogno di aiuto",
+  "Version {v}": "Versione {v}",
 };
 
 export default dict;

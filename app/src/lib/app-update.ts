@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react';
 import { AppState, Linking, Platform } from 'react-native';
 
 import {
-  isVersion, noticeForVersion, parseAppStoreLookup, parsePlayPage, updateState, type UpdateState, type VersionNotice,
+  isVersion, noticeForVersion, versionLabel, parseAppStoreLookup, parsePlayPage, updateState, type UpdateState, type VersionNotice,
 } from '@/core/app-versions';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/constants/site';
 import { useAppSettings } from './app-settings';
@@ -87,6 +87,19 @@ export function useStoreVersion(): string | null {
 export function appVersion(): string | null {
   if (Platform.OS !== 'ios' && Platform.OS !== 'android') return null;
   return Constants.expoConfig?.version ?? null;
+}
+
+/** This build's number (iOS buildNumber, Android versionCode), or null on the website. */
+export function appBuild(): string | null {
+  const c = Constants.expoConfig;
+  if (Platform.OS === 'ios') return c?.ios?.buildNumber ?? null;
+  if (Platform.OS === 'android') return c?.android?.versionCode != null ? String(c.android.versionCode) : null;
+  return null;
+}
+
+/** "2.1 (10)" for the phone apps, null on the website. */
+export function appVersionLabel(): string | null {
+  return versionLabel(appVersion(), appBuild());
 }
 
 /** Opens OnMyLead's page in the App Store or Google Play. */

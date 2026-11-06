@@ -146,6 +146,12 @@ You might also see:
 OnMyLead checks the App Store (iPhone and iPad) or Google Play (Android) for you. When a newer version is out, an **Update Available** card shows at the top of the home screen. Tap **Update** to go straight to OnMyLead in the store, or close the card with the X and it won't show again for that version. The check needs a signal and runs at most twice a day, so the card can take a few hours to appear after an update comes out.
 :::
 
+:::release 2.1
+## Which Version of OnMyLead Do I Have?
+
+Scroll to the very bottom of the home screen. It shows something like **Version 2.1 (10)**: the version, then the build number in brackets. It also shows at the bottom of the logo screen for a moment when you open the app. To get the newest version, update OnMyLead from the App Store or Google Play.
+:::
+
 ## How Many Waypoints Can I Add?
 
 Each rider can add up to 100 waypoints to a ride. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
