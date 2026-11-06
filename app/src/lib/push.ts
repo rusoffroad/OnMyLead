@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { loadSiren, noteRiderTap, tapTakenBack, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
+import { loadSiren, noteRiderTap, tapTakenBack, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSignedOut, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -51,7 +51,11 @@ Notifications.setNotificationHandler({
     // off): a banner without the push's own siren sound, which nothing here could silence.
     // A push with the plain sound (switch off, or the server's late or over call) still plays it.
     // (With the switch off here but the server not told yet, it still shows: an alert beats silence.)
-    if (call && AppState.currentState !== 'background') return { shouldShowBanner: !androidSiren || !sirenEnabled(), shouldShowList: !androidSiren || !sirenEnabled(), shouldPlaySound: !pushSiren, shouldSetBadge: false };
+    // Signed out, nothing in the app sounds it, so it shows even on the siren channel.
+    if (call && AppState.currentState !== 'background') {
+      const show = !androidSiren || !sirenEnabled() || sirenSignedOut();
+      return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: !pushSiren || sirenSignedOut(), shouldSetBadge: false };
+    }
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());

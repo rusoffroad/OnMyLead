@@ -154,6 +154,8 @@ export async function sirenWillSound(e: IncomingEmergency, me: string | null): P
 export function raiseEmergency(e: IncomingEmergency, me: string | null) {
   if (signedOut) return;
   void loadSiren().then(() => {
+    // Signed out while the switch was loading: nothing sounds for an account that's gone.
+    if (signedOut) return;
     const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
     if (!Number.isFinite(at)) return;
     // Ride Mode and Bluetooth hand over the tap time itself as `at`: that is the tap time.
@@ -280,6 +282,11 @@ export function sirenSignedIn() {
   signedOut = false;
 }
 
+/** Signed out: the in-app siren sounds nothing, so a push has to show itself. */
+export function sirenSignedOut(): boolean {
+  return signedOut;
+}
+
 export function resetSirenCalls() {
   signedOut = true;
   for (const k of Object.keys(knownLatest)) delete knownLatest[k];
@@ -397,7 +404,9 @@ async function checkCallsOnServer() {
       if (newest.status === 'emergency' && newest.id !== c.id && tapOrder(c.tappedAt ?? c.at, Date.parse(newest.tapped_at)) > 0) {
         // The older call is over either way; the newer one sounds if it can.
         endByTap(c.id);
-        raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: newest.tapped_at, name: c.name, possibleCrash: c.possibleCrash, source: 'ride' }, null);
+        // It counts from now, so a newer tap uploaded late (over ten minutes old) still carries on the
+        // siren that was already sounding for this rider.
+        raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: Date.now(), tappedAt: Date.parse(newest.tapped_at), name: c.name, possibleCrash: c.possibleCrash, source: 'ride' }, null);
       } else if (newest.status !== 'emergency') noteRiderTap(c.rideId, c.userId, newest);
     }
   }));
