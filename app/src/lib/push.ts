@@ -31,6 +31,8 @@ import { tc } from '@/core/i18n';
 Notifications.setNotificationHandler({
   handleNotification: async (n) => {
     const data = tapData(n.request.content.data);
+    // The saved silenced list and switch, whatever state the app is in.
+    await loadSiren();
     // The siren switch as saved, not the default, before deciding (lib/siren).
     // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner,
     // but only when the siren will really sound (not for an old or silenced one, or with it off).
@@ -88,7 +90,9 @@ setSirenSilencedHook((ids) => {
 
 // A call that came over Bluetooth while the app was in the background: the siren as a notification
 // (no service means no push). Tapping it opens Ride Mode and silences it.
-setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean) => {
+const WAITING_CHANNEL = 'emergency-waiting';
+
+setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, quiet?: boolean) => {
   const name = c.name?.trim() || tc('A rider');
   Notifications.scheduleNotificationAsync({
     // The tap's id, the same tag the server's push uses, so the two make one entry (the push can
@@ -96,13 +100,13 @@ setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean) => {
     identifier: c.id,
     content: {
       title: c.possibleCrash ? tc('Possible Crash: {name}', { name }) : tc('EMERGENCY: {name} needs help now', { name }),
-      body: tc('Sent over Bluetooth. Tap to see where they are.'),
-      // With the siren switched off: the normal sound, on the usual ride alerts channel.
-      sound: plain ? 'default' : SIREN_SOUND,
+      body: quiet ? tc('Not silenced yet. Tap to see where they are.') : tc('Sent over Bluetooth. Tap to see where they are.'),
+      // With the siren switched off: the normal sound, on the usual ride alerts channel. Quiet: none.
+      ...(quiet ? {} : { sound: plain ? 'default' : SIREN_SOUND }),
       interruptionLevel: 'timeSensitive',
       data: { type: 'status', status: 'emergency', rideId: c.rideId, itemId: c.id },
     },
-    trigger: Platform.OS === 'android' ? { channelId: plain ? 'ride-alerts' : SIREN_CHANNEL } : null,
+    trigger: Platform.OS === 'android' ? { channelId: quiet ? WAITING_CHANNEL : plain ? 'ride-alerts' : SIREN_CHANNEL } : null,
   }).catch(() => {});
 });
 
@@ -158,6 +162,16 @@ async function createAndroidChannels() {
         usage: Notifications.AndroidAudioUsage.ALARM,
         contentType: Notifications.AndroidAudioContentType.SONIFICATION,
       },
+    }),
+    // The quiet reminder left on the lock screen when the app goes away with an EMERGENCY still
+    // unsilenced (lib/siren): no sound, so it never plays over a call to 911.
+    Notifications.setNotificationChannelAsync(WAITING_CHANNEL, {
+      name: tc('Emergency Waiting'),
+      description: tc('A quiet reminder of an EMERGENCY you haven’t silenced yet.'),
+      importance: high,
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      sound: null,
+      enableVibrate: false,
     }),
     Notifications.setNotificationChannelAsync('ride-chat', { name: tc('Ride Chat'), description: tc('Messages in ride and group chats.'), importance: high }),
     Notifications.setNotificationChannelAsync('ride-updates', {

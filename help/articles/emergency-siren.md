@@ -38,6 +38,8 @@ The siren takes over the whole screen, on any screen in the app, and it says who
 - Tap **Show Me Where** to silence it and open Ride Mode with their location, so you can tap **Navigate** to them.
 - Tap **Silence Siren** to silence it and stay where you are.
 
+If you lock your phone or switch to another app before silencing it (say, to call 911), the siren stops and a quiet notification stays on your lock screen; tap it to see where they are.
+
 If more than one rider needs help, the newest shows first, with how many more riders need help. Silencing it silences all of them.
 
 The siren stops by itself if the rider cancels their EMERGENCY, or, while you have Ride Mode open, taps another status like **I'm OK** (with no service, a cancel doesn't travel over Bluetooth, so ask them to tap **I'm OK**). An EMERGENCY you've silenced never sounds again on that phone, and one older than 10 minutes doesn't sound when you open Ride Mode later; it still shows in red there.

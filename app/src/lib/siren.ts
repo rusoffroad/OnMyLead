@@ -41,14 +41,14 @@ const settingListeners = new Set<(on: boolean) => void>();
 const emit = () => listeners.forEach((l) => l());
 
 /** Shows a local notification with the siren for a call that came over Bluetooth while the app was in the background (lib/push.ts). */
-let backgroundNotifier: ((c: EmergencyCall, plain?: boolean) => void) | null = null;
+let backgroundNotifier: ((c: EmergencyCall, plain?: boolean, quiet?: boolean) => void) | null = null;
 /** Takes silenced calls' notifications off the phone, so their own siren sound stops too (lib/push.ts). */
 let silencedHook: ((ids: string[]) => void) | null = null;
 export function setSirenSilencedHook(fn: ((ids: string[]) => void) | null) {
   silencedHook = fn;
 }
 
-export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall, plain?: boolean) => void) | null) {
+export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall, plain?: boolean, quiet?: boolean) => void) | null) {
   backgroundNotifier = fn;
 }
 
@@ -290,7 +290,13 @@ AppState.addEventListener('change', (s) => {
       resume = null;
       update();
     }, RESUME_DELAY_MS);
-  else update();
+  else {
+    // Gone to the background with calls not silenced yet (the screen locked before the rider
+    // looked): the in-app siren stops, so each stays on the lock screen as a quiet reminder. No
+    // sound, so it never plays over the dialer when the rider leaves to call 911.
+    if (s === 'background') for (const c of calls) backgroundNotifier?.(c, false, true);
+    update();
+  }
 });
 
 function getPlayer(): AudioPlayer | null {
