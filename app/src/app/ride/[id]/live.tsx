@@ -591,7 +591,7 @@ export default function RideMode() {
             statusesNow.current = { ...statusesNow.current, [e.status.user_id]: tap };
           }
           // An older copy of a call already waiting can still add the crash flag (Possible Crash).
-          if ((newer || (e.status.possible_crash && sirenHasCall(e.status.id))) && me) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
+          if (e.status.status === 'emergency' && (newer || (e.status.possible_crash && sirenHasCall(e.status.id))) && me) void raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             if (!isNewerTap(prev[e.status.user_id], e.status)) return prev;
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;

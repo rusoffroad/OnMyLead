@@ -509,8 +509,9 @@ function startSound() {
   // Only this start's setup may play: a stop (or a stop and a new start) since then wins.
   const gen = ++soundGen;
   // Plays with the ring/silent switch on, and lowers the rider's music under it.
-  void audioStep(() => setIsAudioActiveAsync(true));
-  audioStep(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }))
+  // The mode first, so the session never turns on in a category that would pause the music.
+  audioStep(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }));
+  audioStep(() => setIsAudioActiveAsync(true))
     .then(() => {
       // A stop since then (which gives the music back itself) or a newer start wins.
       if (gen !== soundGen) return;
