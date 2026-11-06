@@ -84,8 +84,9 @@ function sendSirenSetting(): Promise<void> {
     try {
       // The saved switch, not the default true before it has loaded.
       await loadSiren();
-      const { error } = await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
-      sirenSent = !error;
+      const { data, error } = await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
+      // false: no row for this token yet (say the server dropped it): try again on the next resume.
+      sirenSent = !error && data !== false;
     } catch {}
   });
   return sirenChain;

@@ -5,7 +5,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { AppState, Platform } from 'react-native';
 
 import {
-  addCall, dropCall, endedCalls, isNewerTap, newestTapPerRider, parseSirenSetting, tapOrder, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
+  addCall, dropCall, endedCalls, isNewerTap, isUnknownRider, newestTapPerRider, parseSirenSetting, tapOrder, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
   SIREN_REMEMBER,
 } from '@/core/siren';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
@@ -151,9 +151,9 @@ export async function sirenWillSound(e: IncomingEmergency, me: string | null): P
 }
 
 /** A status reached this phone. Starts the siren when it is another rider's fresh EMERGENCY. */
-export function raiseEmergency(e: IncomingEmergency, me: string | null) {
-  if (signedOut) return;
-  void loadSiren().then(() => {
+export function raiseEmergency(e: IncomingEmergency, me: string | null): Promise<void> {
+  if (signedOut) return Promise.resolve();
+  return loadSiren().then(() => {
     // Signed out while the switch was loading: nothing sounds for an account that's gone.
     if (signedOut) return;
     const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
@@ -165,7 +165,7 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
       // Siren switched off: an EMERGENCY heard over Bluetooth in the background still gets a
       // notification with the normal sound, once (no service means no push brings it).
       const wouldSound = shouldSound({ ...e, at }, { me, enabled: true, silenced: silencedSet, now: Date.now() });
-      if (!enabled && wouldSound && e.source === 'bluetooth' && AppState.currentState !== 'active' && !plainNotified.has(call.id)) {
+      if (!enabled && wouldSound && e.source === 'bluetooth' && AppState.currentState === 'background' && !plainNotified.has(call.id)) {
         plainNotified.add(call.id);
         backgroundNotifier?.(call, true);
       }
@@ -188,7 +188,8 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     }
     calls = next;
     emit();
-    if (isNew && AppState.currentState !== 'active' && e.source === 'bluetooth') backgroundNotifier?.(call);
+    // Only in the background ('inactive' is still in front, where the in-app siren plays).
+    if (isNew && AppState.currentState === 'background' && e.source === 'bluetooth') backgroundNotifier?.(call);
     update();
   });
 }
@@ -377,12 +378,12 @@ function update() {
 // the app comes back and every 20 s while a call waits.
 async function checkCallsOnServer() {
   // Calls from an older server don't name the rider: look those up by id, for a cancel.
-  const unnamed = calls.filter((c) => c.userId.startsWith('item:'));
+  const unnamed = calls.filter((c) => isUnknownRider(c.userId));
   if (unnamed.length) {
     const { data } = await supabase.from('rider_statuses').select('id, cancelled_at').in('id', unnamed.map((c) => c.id));
     for (const r of (data ?? []) as { id: string; cancelled_at?: string | null }[]) if (r.cancelled_at) tapTakenBack(r.id);
   }
-  const waiting = calls.filter((c) => !c.userId.startsWith('item:'));
+  const waiting = calls.filter((c) => !isUnknownRider(c.userId));
   // The rides are separate: ask for each at once.
   await Promise.all([...new Set(waiting.map((c) => c.rideId))].map(async (rideId) => {
     const mine = waiting.filter((c) => c.rideId === rideId);
@@ -404,11 +405,12 @@ async function checkCallsOnServer() {
       // Only when it really was tapped later (an older one on the server, say while the newer one
       // came over Bluetooth and isn't uploaded yet, changes nothing).
       if (newest.status === 'emergency' && newest.id !== c.id && tapOrder(c.tappedAt ?? c.at, Date.parse(newest.tapped_at)) > 0) {
-        // The older call is over either way; the newer one sounds if it can.
-        endByTap(c.id);
-        // It counts from now, so a newer tap uploaded late (over ten minutes old) still carries on the
-        // siren that was already sounding for this rider.
-        raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: Date.now(), tappedAt: Date.parse(newest.tapped_at), name: c.name, possibleCrash: c.possibleCrash, source: 'ride' }, null);
+        // The newer one takes over without a gap in the siren (addCall drops the older call); the
+        // older call is over either way, so it ends after if the newer one didn't sound. It counts
+        // from now, so a newer tap uploaded late (over ten minutes old) still carries on the siren
+        // that was already sounding for this rider.
+        const old = c.id;
+        void raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: Date.now(), tappedAt: Date.parse(newest.tapped_at), name: c.name, possibleCrash: c.possibleCrash, source: 'ride' }, null).then(() => endByTap(old));
       } else if (newest.status !== 'emergency') noteRiderTap(c.rideId, c.userId, newest);
     }
   }));

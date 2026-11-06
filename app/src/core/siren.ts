@@ -121,7 +121,7 @@ export function pushCallAt(tappedAt: number | undefined, now: number): number {
 export function unknownRider(id: string): string {
   return `item:${id}`;
 }
-const isUnknownRider = (userId: string) => userId.startsWith('item:');
+export const isUnknownRider = (userId: string) => userId.startsWith('item:');
 
 /** Drops a call: the rider took it back, or tapped another status since. */
 export function dropCall(calls: readonly EmergencyCall[], id: string): EmergencyCall[] {
