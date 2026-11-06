@@ -271,7 +271,11 @@ function update() {
 // Website: a browser that refused to play before the first click gets another try on each click.
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
   document.addEventListener('pointerdown', () => {
-    if (!sounding && calls.length) update();
+    // play() doesn't say it was refused: a call waiting while nothing plays gets started again.
+    if (!calls.length || !sounding || player?.playing) return;
+    sounding = false;
+    soundGen++;
+    update();
   });
 }
 
@@ -324,12 +328,6 @@ function startSound() {
       p.volume = 1;
       p.seekTo(0).catch(() => {});
       p.play();
-      // The website may refuse to play before the rider has clicked (play() doesn't say so): if it
-      // isn't playing a moment later, the next update tries again.
-      if (Platform.OS === 'web')
-        setTimeout(() => {
-          if (gen === soundGen && !p.playing) sounding = false;
-        }, 1000);
     });
 }
 

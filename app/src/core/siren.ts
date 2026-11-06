@@ -150,8 +150,8 @@ function tieGoesTo(known: { status?: string }, incoming: { status?: string }): b
 
 /**
  * Whether a status tap that reached this phone is newer than the one already known for that rider.
- * An older one relayed late changes nothing; a tie follows tieGoesTo, so every phone settles on the
- * same tap whichever order they hear them in.
+ * An older one relayed late changes nothing; an EMERGENCY against another tap in a tie follows
+ * tieGoesTo on every phone. (Two other taps in one second keep whichever was heard first.)
  */
 export function isNewerTap(known: Tap | undefined, incoming: Tap): boolean {
   if (!known) return true;
