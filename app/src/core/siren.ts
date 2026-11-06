@@ -94,7 +94,8 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
   }
   // An older call from the same rider arriving late doesn't replace their newer one.
   const mine = calls.find((x) => x.rideId === c.rideId && x.userId === c.userId);
-  if (mine && (mine.tappedAt ?? mine.at) > (c.tappedAt ?? c.at)) return calls as EmergencyCall[];
+  // Same rule as every other tap order (tapOrder); a tie keeps the call already sounding.
+  if (mine && tapOrder(c.tappedAt ?? c.at, mine.tappedAt ?? mine.at) >= 0) return calls as EmergencyCall[];
   const rest = calls.filter((x) => !(x.rideId === c.rideId && x.userId === c.userId));
   return [c, ...rest].sort((a, b) => b.at - a.at);
 }

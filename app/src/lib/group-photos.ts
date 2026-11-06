@@ -97,10 +97,11 @@ export async function saveGroupPhoto(groupId: string, asset: ImagePicker.ImagePi
       throw new Error('pro_required:group_photos');
     throw new Error(upErr.message);
   }
-  const { error } = await supabase.from('riding_groups').update({ photo_path: path }).eq('id', groupId);
-  if (error) {
+  const { data: updated, error } = await supabase.from('riding_groups').update({ photo_path: path }).eq('id', groupId).select('id');
+  if (error || !updated?.length) {
     await bucket.remove([path]);
-    throw new Error(isNotOn(error.message) ? NOT_ON : error.message);
+    // No row changed: the group is gone or no longer this rider's.
+    throw new Error(error ? (isNotOn(error.message) ? NOT_ON : error.message) : 'This group was deleted or is no longer yours.');
   }
   if (isGroupPhotoPath(row.photo_path, row.owner_id) && row.photo_path !== path) await bucket.remove([row.photo_path]);
   track('group_photo_saved', { platform: Platform.OS });
