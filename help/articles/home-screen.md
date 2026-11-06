@@ -4,7 +4,7 @@ summary: What's on the Rides tab from version 2.0. Join, create and find rides, 
 category: getting-started
 order: 15
 release: "2.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/leaderboard.tsx
   - app/src/components/home/events-card.tsx
@@ -18,6 +18,7 @@ sources:
   - app/src/core/feed.ts
   - app/src/lib/feed.ts
   - app/src/core/track-line.ts
+  - app/src/components/launch-cover.tsx
   - supabase/migrations/20261102300000_home_feed.sql
 related: [join-a-ride, create-a-ride, find-a-ride, navigation-mode, riding-groups, friends, follow-leaders, badges-and-ranks, use-onmylead-on-a-tablet]
 keywords: [home, home screen, rides tab, main screen, feed, activity, customize feed, who sees my activity, toolkit, public rides near me, distance, radius, 500 miles, rides left, unlimited, your group]
@@ -154,6 +155,12 @@ Shortcuts to the tools that live on the **You** tab: **Who's Riding**, **Friends
 ## Help & Support
 
 Opens Help and Support. At the top, **Help Center: How-To Guides** opens these step-by-step guides; below it are **Contact Us** and quick answers to common questions, each with a **Read the Guide** link.
+
+:::release 2.1
+## Your App Version
+
+The very bottom of Home shows which version of OnMyLead you have, like **Version 2.1 (10)**: the version number, then the build number in brackets. The same line shows at the bottom of the logo screen for a moment when the app opens. It's on iPhone, iPad, Android phones and Android tablets; the website is always the newest version, so it doesn't show one. Tell us this number when you [contact support](/help/contact-support).
+:::
 
 ## On a Tablet
 

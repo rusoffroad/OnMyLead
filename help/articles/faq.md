@@ -4,7 +4,7 @@ summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, 
 category: troubleshooting
 order: 20
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/ride/[id]/edit.tsx
   - supabase/migrations/20261018000000_pro_entitlements.sql
@@ -144,6 +144,12 @@ You might also see:
 ## How Do I Know When There's a New Version?
 
 OnMyLead checks the App Store (iPhone and iPad) or Google Play (Android) for you. When a newer version is out, an **Update Available** card shows at the top of the home screen. Tap **Update** to go straight to OnMyLead in the store, or close the card with the X and it won't show again for that version. The check needs a signal and runs at most twice a day, so the card can take a few hours to appear after an update comes out.
+:::
+
+:::release 2.1
+## Which Version of OnMyLead Do I Have?
+
+Scroll to the very bottom of the home screen. It shows something like **Version 2.1 (10)**: the version, then the build number in brackets. It also shows at the bottom of the logo screen for a moment when you open the app. To get the newest version, update OnMyLead from the App Store or Google Play.
 :::
 
 ## How Many Waypoints Can I Add?
