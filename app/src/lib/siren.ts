@@ -144,7 +144,9 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
     if (!Number.isFinite(at)) return;
     if (!shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() })) return;
-    const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt: e.tappedAt, name: e.name, possibleCrash: e.possibleCrash };
+    // Ride Mode and Bluetooth hand over the tap time itself as `at`: that is the tap time.
+    const tappedAt = e.tappedAt ?? (e.source === 'push' ? undefined : at);
+    const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt, name: e.name, possibleCrash: e.possibleCrash };
     const isNew = !calls.some((c) => c.id === call.id);
     const next = addCall(calls, call);
     if (next === calls) return;
@@ -233,7 +235,8 @@ function update() {
   if (want && resume) return;
   if (want) {
     // The in-app siren takes over from any siren notification still in the tray (Android alarm).
-    if (!sounding) silencedHook?.(calls.map((c) => c.id));
+    // (`buzz` runs only for a real call; the Play Siren sample sounds without it.)
+    if (!buzz) silencedHook?.(calls.map((c) => c.id));
     startSound();
     startBuzz();
   } else if (sample && !buzz) {
