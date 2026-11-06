@@ -145,6 +145,8 @@ export async function adminRemoveGroupPhoto(groupId: string, ownerId: string, re
     // The group no longer shows it; say so if the file itself is still up (try again to remove it).
     // Storage answers a refused delete with no error and nothing deleted, so check both.
     const { data: gone, error: rmErr } = await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([data]);
-    if (rmErr || !gone?.length) throw new Error(`The group no longer shows the photo, but its file couldn't be deleted${rmErr ? `: ${rmErr.message}` : ' (sign in again with two-factor and retry)'}.`);
+    // The group's photo is already cleared, so this can't be retried here: name the file to delete by hand.
+    if (rmErr || !gone?.length)
+      throw new Error(`The group no longer shows the photo, but its file is still in storage: delete ${GROUP_PHOTO_BUCKET}/${data} in Supabase Storage${rmErr ? ` (${rmErr.message})` : ''}.`);
   }
 }

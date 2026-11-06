@@ -169,8 +169,6 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) {
       endedHere.add(call.id);
       silencedSet.add(call.id);
-      const by = knownLatest[call.rideId]?.[call.userId]?.id;
-      if (by) endedBy.set(call.id, { tap: by, call });
       return;
     }
     const isNew = !calls.some((c) => c.id === call.id);
@@ -190,51 +188,21 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
 }
 
 /** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
-// Calls ended by a rider's newer tap, and which tap: if that tap is taken back, the call is live again.
-const endedBy = new Map<string, { tap: string; call: EmergencyCall }>();
-
-/** A newer tap from the rider ended this call. Not saved: taking that tap back brings it back. */
-function endByTap(callId: string, tapId: string | null | undefined) {
-  const call = calls.find((c) => c.id === callId);
-  if (!call) return;
+/**
+ * A newer tap from the rider ended this call. Kept for this run only (not saved as silenced), so
+ * it can't sound again now; if the rider needs help again they tap EMERGENCY again, a new call.
+ */
+function endByTap(callId: string) {
+  if (!calls.some((c) => c.id === callId)) return;
   endedHere.add(callId);
   silencedSet.add(callId);
-  if (tapId) endedBy.set(callId, { tap: tapId, call });
   silencedHook?.([callId]);
   calls = dropCall(calls, callId);
   emit();
   update();
 }
 
-/** A tap was taken back: calls it had ended count again, and it no longer counts as the newest. */
-function undoTap(tapId: string) {
-  for (const ride of Object.values(knownLatest))
-    for (const [u, k] of Object.entries(ride)) if (k.id === tapId) delete ride[u];
-  let back = false;
-  for (const [callId, by] of [...endedBy]) {
-    if (by.tap !== tapId) continue;
-    endedBy.delete(callId);
-    endedHere.delete(callId);
-    if (silenced.includes(callId)) continue;
-    silencedSet.delete(callId);
-    // Live again on any screen, if it's still fresh enough to sound.
-    if (shouldSound({ ...by.call, status: 'emergency' }, { me: null, enabled, silenced: silencedSet, now: Date.now() })) {
-      const next = addCall(calls, by.call);
-      if (next !== calls) {
-        calls = next;
-        back = true;
-      }
-    }
-  }
-  if (back) {
-    emit();
-    update();
-  }
-}
-
 export function endEmergency(id: string) {
-  // Also the way a taken-back tap arrives (Ride Mode's cancel, a cancelled push).
-  undoTap(id);
   if (!calls.some((c) => c.id === id)) {
     if (endedHere.size >= SIREN_REMEMBER) {
       const oldest = endedHere.values().next().value as string;
@@ -260,17 +228,14 @@ export function endStaleCalls(rideId: string, latest: Record<string, { id?: stri
     const at = st ? Date.parse(st.tapped_at) : NaN;
     if (st && Number.isFinite(at)) now[u] = { id: st.id, status: st.status, at };
   }
-  // Keep a newer tap learned another way (a push, the server check) over Ride Mode's older one,
-  // unless Ride Mode shows the very call that tap ended: then the tap was taken back.
+  // Keep a newer tap learned another way (a push, the server check) over Ride Mode's older one.
   const before = knownLatest[rideId] ?? {};
   for (const [u, k] of Object.entries(before)) {
     const n = now[u];
-    const takenBack = !!n?.id && endedBy.get(n.id)?.tap === k.id && n.id !== k.id;
-    if (takenBack && k.id) undoTap(k.id);
-    else if (!n || isNewerTap({ id: n.id, status: n.status, tapped_at: iso(n.at) }, { id: k.id, status: k.status, tapped_at: iso(k.at) })) now[u] = k;
+    if (!n || isNewerTap({ id: n.id, status: n.status, tapped_at: iso(n.at) }, { id: k.id, status: k.status, tapped_at: iso(k.at) })) now[u] = k;
   }
   knownLatest[rideId] = now;
-  for (const id of endedCalls(calls, rideId, now)) endByTap(id, now[calls.find((c) => c.id === id)?.userId ?? '']?.id);
+  for (const id of endedCalls(calls, rideId, now)) endByTap(id);
 }
 
 /**
@@ -283,7 +248,7 @@ export function noteRiderTap(rideId: string, userId: string, tap: { id: string; 
   const known = knownLatest[rideId]?.[userId];
   if (known?.id && !isNewerTap({ id: known.id, status: known.status, tapped_at: new Date(known.at).toISOString() }, tap)) return;
   knownLatest[rideId] = { ...knownLatest[rideId], [userId]: { id: tap.id, status: tap.status, at } };
-  for (const id of endedCalls(calls, rideId, knownLatest[rideId])) endByTap(id, tap.id);
+  for (const id of endedCalls(calls, rideId, knownLatest[rideId])) endByTap(id);
 }
 
 /** Whether this call is waiting (sounding or on the siren screen). */
@@ -401,7 +366,11 @@ async function checkCallsOnServer() {
       }
       // The same newest-tap rule as Ride Mode (ties included).
       const newest = newestTapPerRider(rows.filter((r) => r.user_id === c.userId && !r.cancelled_at))[c.userId];
-      if (newest) noteRiderTap(c.rideId, c.userId, newest);
+      if (!newest) continue;
+      // A newer EMERGENCY from the same rider takes this call's place (addCall replaces it).
+      if (newest.status === 'emergency' && newest.id !== c.id)
+        raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: newest.tapped_at, name: c.name, source: 'ride' }, null);
+      else noteRiderTap(c.rideId, c.userId, newest);
     }
   }));
 }
