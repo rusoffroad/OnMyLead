@@ -90,7 +90,7 @@ import {
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
-import { endEmergency, endStaleCalls, raiseEmergency } from '@/lib/siren';
+import { endEmergency, endStaleCalls, raiseEmergency, sirenHasCall } from '@/lib/siren';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -561,8 +561,8 @@ export default function RideMode() {
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
             statusesNow.current = { ...statusesNow.current, [e.status.user_id]: tap };
           }
-          // An older copy still counts when it carries the crash flag (the siren says Possible Crash).
-          if ((newer || e.status.possible_crash) && me) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
+          // An older copy of a call already waiting can still add the crash flag (Possible Crash).
+          if ((newer || (e.status.possible_crash && sirenHasCall(e.status.id))) && me) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             if (!isNewerTap(prev[e.status.user_id], e.status)) return prev;
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;

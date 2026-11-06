@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { endEmergency, loadSiren, noteRiderTap, resetSirenCalls, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
+import { endEmergency, loadSiren, noteRiderTap, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -189,8 +189,6 @@ async function createAndroidChannels() {
 /** Forget the registration so the next sign-in registers again. */
 export function resetPushRegistration() {
   registeredFor = null;
-  // Signed out (or another account): the last account's waiting calls go with it.
-  resetSirenCalls();
 }
 
 /** A rider's status tap or quick reply reached this phone by push: the sender's card says so. */

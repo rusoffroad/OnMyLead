@@ -233,6 +233,11 @@ export function noteRiderTap(rideId: string, userId: string, tap: { id: string; 
   for (const id of endedCalls(calls, rideId, knownLatest[rideId])) endEmergency(id);
 }
 
+/** Whether this call is waiting (sounding or on the siren screen). */
+export function sirenHasCall(id: string): boolean {
+  return calls.some((c) => c.id === id);
+}
+
 /** Sign-out: the last account's waiting calls and what was known about its rides go. */
 export function resetSirenCalls() {
   for (const k of Object.keys(knownLatest)) delete knownLatest[k];
@@ -326,13 +331,14 @@ async function checkCallsOnServer() {
     for (const r of (data ?? []) as { id: string; cancelled_at?: string | null }[]) if (r.cancelled_at) endEmergency(r.id);
   }
   const waiting = calls.filter((c) => !c.userId.startsWith('item:'));
-  for (const rideId of [...new Set(waiting.map((c) => c.rideId))]) {
+  // The rides are separate: ask for each at once.
+  await Promise.all([...new Set(waiting.map((c) => c.rideId))].map(async (rideId) => {
     const mine = waiting.filter((c) => c.rideId === rideId);
     // One request per ride: the newest taps of every rider with a call waiting.
     const { data, error } = await supabase.from('rider_statuses').select('id, user_id, status, tapped_at, cancelled_at')
       .eq('ride_id', rideId).in('user_id', [...new Set(mine.map((c) => c.userId))])
       .order('tapped_at', { ascending: false }).limit(20 * mine.length);
-    if (error || !data) continue;
+    if (error || !data) return;
     const rows = data as { id: string; user_id: string; status: string; tapped_at: string; cancelled_at?: string | null }[];
     for (const c of mine) {
       if (rows.some((r) => r.id === c.id && r.cancelled_at)) {
@@ -343,7 +349,7 @@ async function checkCallsOnServer() {
       const newest = newestTapPerRider(rows.filter((r) => r.user_id === c.userId && !r.cancelled_at))[c.userId];
       if (newest) noteRiderTap(c.rideId, c.userId, newest);
     }
-  }
+  }));
 }
 let checking = false;
 function checkSoon() {
