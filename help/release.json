@@ -34,6 +34,14 @@
       "submitted": "2026-11-04",
       "notes": "Everything through PR #171 (notifications inbox, accurate location, Leave Ride hand-off, Full Map, Follow Me, Freeride rider line, Ride Mode messages, Update Available, Music Controls, ride miles fix). Android versionCode 8. Named 2.0 by Chris (was planned as 1.0.4). Live on the App Store and Google Play 2026-11-04.",
       "released": "2026-11-04"
+    },
+    {
+      "version": "2.1",
+      "build": "10",
+      "commit": "822384d",
+      "status": "review",
+      "submitted": "2026-11-06",
+      "notes": "Bluetooth Sharing with no service, Emergency Siren, Map Settings, Your Dot styles, 3D Terrain, every map on Mapbox, Leader Trackline, group spread, Badge Leaderboard, group photos, CarPlay, Edit Ride Details, Rider Agreement v2. Bluetooth Sharing, custom dots, group photo upload and CarPlay are Pro, with a fresh 30-day Pro trial for every rider without Pro. Android versionCode 10 (9 was halted). Approved by Chris on his phones and submitted to both stores 2026-11-06."
     }
   ],
   "unreleased": [

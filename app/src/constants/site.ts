@@ -37,42 +37,47 @@ export const SUPPORT_EMAIL = 'support@rusoffroad.com';
  */
 export const MAPBOX_PUBLIC_TOKEN = '';
 
+/*
+ * The 2.1 showcase lines below were switched on for the 2.1 launch (2026-11-06, build 10). The
+ * website is deployed with them only once 2.1 is live in the App Store and Google Play.
+ */
+
 /**
  * The 3D Terrain line in the showcase. Off until the app version with 3D Terrain (2.1) is live in
  * the stores and the Mapbox token above is set, so the website never shows what riders can't get.
  */
-export const SHOWCASE_3D_TERRAIN: boolean = false;
+export const SHOWCASE_3D_TERRAIN: boolean = true;
 
 /**
  * The Map Features line in the showcase (roads, hiking trails and land boundaries you switch on and
  * off). Off until the app version with Map Features (2.1) is live in the stores.
  */
-export const SHOWCASE_MAP_FEATURES: boolean = false;
+export const SHOWCASE_MAP_FEATURES: boolean = true;
 
 /**
  * The rider dot and Zoom In at Intersections line in the showcase (2.1). Off until that version is
  * live in the stores.
  */
-export const SHOWCASE_INTERSECTION_ZOOM: boolean = false;
+export const SHOWCASE_INTERSECTION_ZOOM: boolean = true;
 /**
  * The Leader Trackline line in the showcase (a line behind the leader; older passes fade when the
  * leader crosses back over it). Off until the app version with it (2.1) is live in the stores.
  */
-export const SHOWCASE_LEADER_TRACKLINE: boolean = false;
+export const SHOWCASE_LEADER_TRACKLINE: boolean = true;
 /** The group spread ruler line in the showcase (leader-to-last-rider distance under the leader line). Off until 2.1 is live in the stores. */
-export const SHOWCASE_SPREAD_RULER: boolean = false;
+export const SHOWCASE_SPREAD_RULER: boolean = true;
 /** The Park Trails line in the showcase. Off until the app version with park trails (2.1) is live in the stores. */
-export const SHOWCASE_PARK_TRAILS: boolean = false;
+export const SHOWCASE_PARK_TRAILS: boolean = true;
 /** The comment likes and replies line in the showcase. Off until the app version with them (2.1) is live in the stores. */
-export const SHOWCASE_COMMENT_REPLIES: boolean = false;
+export const SHOWCASE_COMMENT_REPLIES: boolean = true;
 /** The Emergency Siren line in the showcase. Off until the app version with the siren (2.1 build 10) is live in the stores. */
-export const SHOWCASE_EMERGENCY_SIREN: boolean = false;
+export const SHOWCASE_EMERGENCY_SIREN: boolean = true;
 /**
  * The No Service section on the homepage (Bluetooth Sharing: riders pass spots, status taps,
  * EMERGENCY and messages phone to phone with no cell service), its hero link and nav link. Off
  * until the app version with Bluetooth Sharing (2.1) is live in the stores. Also adds the 2.1 Pro
  * lines to the Free vs Pro table (Bluetooth Sharing, Group Photos, Custom Dots).
  */
-export const SHOWCASE_NO_SERVICE: boolean = false;
+export const SHOWCASE_NO_SERVICE: boolean = true;
 /** The Group Photos line in the showcase. Off until the app version with group photos (2.1) is live in the stores. */
-export const SHOWCASE_GROUP_PHOTOS: boolean = false;
+export const SHOWCASE_GROUP_PHOTOS: boolean = true;
