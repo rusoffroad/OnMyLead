@@ -3347,6 +3347,8 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "충돌 가능성: {name}",
   "EMERGENCY: {name} needs help now": "긴급: {name}님이 지금 도움이 필요합니다",
   "Sent over Bluetooth. Tap to see where they are.": "블루투스로 전송됨. 탭하여 위치를 확인하세요.",
+  "Tap to see where they are.": "탭하여 위치를 확인하세요.",
+  "This group was deleted or is no longer yours.": "이 그룹은 삭제되었거나 더 이상 내 그룹이 아닙니다.",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "그룹의 누군가가 긴급 또는 충돌 알림을 보내면 사이렌이 울립니다.",
   "Possible Crash": "충돌 가능성",
   "{name} needs help now.": "{name}님이 지금 도움이 필요합니다.",

@@ -109,7 +109,8 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       }
 
       // Keep the dot on screen: zoom out once, then move the map.
-      const pt = await within(m.project(f), MAP_CALL_MS, null);
+      // Centered following doesn't need the dot's spot on screen: skip the map call (no lag).
+      const pt = frame.current.locked ? null : await within(m.project(f), MAP_CALL_MS, null);
       if (gen !== stepGen.current) return false;
       const move = followMove(frame.current, {
         pt, size, inset, zoom: cam.zoom, screenHeadingDeg: screenHeading,

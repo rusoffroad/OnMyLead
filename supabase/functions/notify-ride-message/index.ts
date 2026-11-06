@@ -162,12 +162,12 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
     const [tokens, who] = await Promise.all([
       sirenTokens(sos.map((r) => r.token)),
       itemId
-        ? db.from('rider_statuses').select('user_id, tapped_at, profiles(display_name)').eq('id', itemId).maybeSingle()
+        ? db.from('rider_statuses').select('ride_id, user_id, tapped_at, profiles(display_name)').eq('id', itemId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
     ]);
     const siren = new Set(tokens.filter((t) => t.siren === true).map((t) => t.token));
     // deno-lint-ignore no-explicit-any
-    const sender = (who as any)?.data as { user_id?: string; tapped_at?: string | null; profiles?: { display_name?: string | null } | null } | null;
+    const sender = (who as any)?.data as { ride_id?: string; user_id?: string; tapped_at?: string | null; profiles?: { display_name?: string | null } | null } | null;
     const extra: Record<string, unknown> = {};
     if (sender?.user_id) extra.userId = sender.user_id;
     // When it was tapped, so a later I'm OK on the rider's phone always counts as newer.
@@ -177,7 +177,14 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
     // A tap uploaded over an hour late (relayed after a long stretch with no service) gets the
     // plain sound, as the app keeps it quiet too (core/siren PUSH_LATE_MAX_MS).
     const tapped = sender?.tapped_at ? Date.parse(sender.tapped_at) : NaN;
-    const late = Number.isFinite(tapped) && Date.now() - tapped > 60 * 60_000;
+    let late = Number.isFinite(tapped) && Date.now() - tapped > 60 * 60_000;
+    // Uploaded after the rider's own newer tap (both relayed late with no service, I'm OK first):
+    // it's already over, so no siren. A failed lookup leaves the siren on.
+    if (!late && sender?.ride_id && sender.user_id && sender.tapped_at) {
+      const { data: newer } = await db.from('rider_statuses').select('id').eq('ride_id', sender.ride_id)
+        .eq('user_id', sender.user_id).gt('tapped_at', sender.tapped_at).is('cancelled_at', null).limit(1);
+      if (newer?.length) late = true;
+    }
     return rows.map((r) =>
       r.data?.status === 'emergency' ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra } } : r,
     );

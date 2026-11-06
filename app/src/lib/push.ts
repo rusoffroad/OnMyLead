@@ -86,14 +86,14 @@ setSirenSilencedHook((ids) => {
 
 // A call that came over Bluetooth while the app was in the background: the siren as a notification
 // (no service means no push). Tapping it opens Ride Mode and silences it.
-setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean) => {
+setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, bluetooth = true) => {
   const name = c.name?.trim() || tc('A rider');
   Notifications.scheduleNotificationAsync({
     // The tap's id, the same tag the server's push uses, so the two show (and sound) once.
     identifier: c.id,
     content: {
       title: c.possibleCrash ? tc('Possible Crash: {name}', { name }) : tc('EMERGENCY: {name} needs help now', { name }),
-      body: tc('Sent over Bluetooth. Tap to see where they are.'),
+      body: bluetooth ? tc('Sent over Bluetooth. Tap to see where they are.') : tc('Tap to see where they are.'),
       // With the siren switched off: the normal sound, on the usual ride alerts channel.
       sound: plain ? 'default' : SIREN_SOUND,
       interruptionLevel: 'timeSensitive',
