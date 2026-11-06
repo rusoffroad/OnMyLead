@@ -147,7 +147,13 @@ export async function registerForPush(userId: string): Promise<void> {
     const { data: token } = await Notifications.getDevicePushTokenAsync();
     if (typeof token !== 'string' || !token) return;
     // Fails harmlessly until the database has the push update.
-    await supabase.rpc('register_push_token', { p_token: token, p_platform: Platform.OS });
+    const { error } = await supabase.rpc('register_push_token', { p_token: token, p_platform: Platform.OS });
+    if (error) {
+      // Not registered: try again on the next sync, and don't send the switch for a token the
+      // server doesn't have (that would count as sent and never go again).
+      registeredFor = null;
+      return;
+    }
     myToken = token;
     await sendSirenSetting();
   } catch {

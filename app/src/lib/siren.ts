@@ -275,8 +275,10 @@ export function sirenHasCall(id: string): boolean {
 }
 
 /** Sign-out: the last account's waiting calls and what was known about its rides go. */
-// Signed out: no account, so nothing sounds until someone signs in again.
-let signedOut = false;
+// Signed out: no account, so nothing sounds until someone signs in again. The app starts signed
+// out until MessageAlerts sees the session (a phone signed out earlier still gets that account's
+// pushes, which then keep their banner).
+let signedOut = true;
 /** Someone is signed in (again): calls can sound. */
 export function sirenSignedIn() {
   signedOut = false;
