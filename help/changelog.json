@@ -1,6 +1,6 @@
 [
   {"date": "2026-11-06", "slugs": ["home-screen", "faq"], "kind": "update", "by": "pr", "ref": "app-version", "why": "2.1 (Chris): the app version and build number, like Version 2.1 (10), now show at the very bottom of Home and at the bottom of the logo screen when the app opens. Your Home Screen gets a Your App Version section and the FAQ answers Which Version of OnMyLead Do I Have?"},
-  {"date": "2026-11-06", "slugs": ["find-a-ride", "free-vs-pro", "getting-started", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "notifications-inbox", "promo-codes", "ride-name-and-profile", "ride-summary-and-ride-again", "use-onmylead-on-a-tablet"], "kind": "review", "by": "pr", "ref": "app-version", "why": "Re-dated only: the version line touched the home screen, the app's root layout and the translations these guides list. Their steps are unchanged."},
+  {"date": "2026-11-06", "slugs": ["carplay", "create-a-ride", "edit-cancel-or-delete-a-ride", "find-a-ride", "free-vs-pro", "getting-started", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "notifications-inbox", "promo-codes", "ride-name-and-profile", "ride-summary-and-ride-again", "use-onmylead-on-a-tablet"], "kind": "review", "by": "pr", "ref": "app-version", "why": "Re-dated only: the version line touched the home screen, the app's root layout and the translations these guides list. Their steps are unchanged."},
   {
     "date": "2026-11-05",
     "slugs": ["map-layers"],
