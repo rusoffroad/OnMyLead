@@ -334,12 +334,12 @@ async function checkCallsOnServer() {
   // The rides are separate: ask for each at once.
   await Promise.all([...new Set(waiting.map((c) => c.rideId))].map(async (rideId) => {
     const mine = waiting.filter((c) => c.rideId === rideId);
-    // One request per ride: the newest taps of every rider with a call waiting.
-    const { data, error } = await supabase.from('rider_statuses').select('id, user_id, status, tapped_at, cancelled_at')
-      .eq('ride_id', rideId).in('user_id', [...new Set(mine.map((c) => c.userId))])
-      .order('tapped_at', { ascending: false }).limit(20 * mine.length);
-    if (error || !data) return;
-    const rows = data as { id: string; user_id: string; status: string; tapped_at: string; cancelled_at?: string | null }[];
+    // Each waiting rider's own newest taps (one rider's many taps can't crowd out another's).
+    type Row = { id: string; user_id: string; status: string; tapped_at: string; cancelled_at?: string | null };
+    const pages = await Promise.all([...new Set(mine.map((c) => c.userId))].map((u) =>
+      supabase.from('rider_statuses').select('id, user_id, status, tapped_at, cancelled_at')
+        .eq('ride_id', rideId).eq('user_id', u).order('tapped_at', { ascending: false }).limit(20)));
+    const rows: Row[] = pages.flatMap((p) => (p.error ? [] : ((p.data ?? []) as Row[])));
     for (const c of mine) {
       if (rows.some((r) => r.id === c.id && r.cancelled_at)) {
         endEmergency(c.id);

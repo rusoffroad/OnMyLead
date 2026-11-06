@@ -141,5 +141,9 @@ export async function adminUserGroups(userId: string): Promise<AdminGroup[]> {
 export async function adminRemoveGroupPhoto(groupId: string, ownerId: string, reason: string): Promise<void> {
   const { data, error } = await supabase.rpc('admin_remove_group_photo', { p_group: groupId, p_reason: reason });
   if (error) throw new Error(error.message);
-  if (typeof data === 'string' && isGroupPhotoPath(data, ownerId)) await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([data]);
+  if (typeof data === 'string' && isGroupPhotoPath(data, ownerId)) {
+    // The group no longer shows it; say so if the file itself is still up (try again to remove it).
+    const { error: rmErr } = await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([data]);
+    if (rmErr) throw new Error(`The group no longer shows the photo, but its file couldn't be deleted: ${rmErr.message}`);
+  }
 }
