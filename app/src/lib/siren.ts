@@ -9,6 +9,7 @@ import {
   SIREN_REMEMBER,
 } from '@/core/siren';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
+import { supabase } from './supabase';
 import { criticalUrgentUp, onUrgentChange } from './urgent-modal';
 
 /**
@@ -202,7 +203,14 @@ export function endEmergency(id: string) {
 /** Ride Mode's latest status per rider: calls whose rider has tapped something newer are over. */
 export function endStaleCalls(rideId: string, latest: Record<string, { id?: string | null; status: string; tapped_at: string } | undefined>) {
   const now: Record<string, { id?: string | null; status: string; at: number }> = {};
+  const iso = (at: number) => new Date(at).toISOString();
   for (const [u, st] of Object.entries(latest)) if (st) now[u] = { id: st.id, status: st.status, at: Date.parse(st.tapped_at) };
+  // Keep a newer tap learned another way (a push, the server check) over Ride Mode's older one.
+  const before = knownLatest[rideId] ?? {};
+  for (const [u, k] of Object.entries(before)) {
+    const n = now[u];
+    if (!n || isNewerTap({ id: n.id, status: n.status, tapped_at: iso(n.at) }, { id: k.id, status: k.status, tapped_at: iso(k.at) })) now[u] = k;
+  }
   knownLatest[rideId] = now;
   for (const id of endedCalls(calls, rideId, now)) endEmergency(id);
 }
@@ -285,14 +293,45 @@ function update() {
   }
 }
 
+// The server's word on each waiting call, so a rider's I'm OK or cancel that this phone missed (it
+// came while the app was away, or that kind of notification is off here) still ends it: checked when
+// the app comes back and every 20 s while a call waits.
+async function checkCallsOnServer() {
+  for (const c of [...calls]) {
+    if (c.userId.startsWith('item:')) continue;
+    const { data, error } = await supabase.from('rider_statuses').select('id, status, tapped_at, cancelled_at')
+      .eq('ride_id', c.rideId).eq('user_id', c.userId).order('tapped_at', { ascending: false }).limit(5);
+    if (error || !data) continue;
+    const rows = data as { id: string; status: string; tapped_at: string; cancelled_at?: string | null }[];
+    if (rows.some((r) => r.id === c.id && r.cancelled_at)) {
+      endEmergency(c.id);
+      continue;
+    }
+    const newest = rows.find((r) => !r.cancelled_at);
+    if (newest) noteRiderTap(c.rideId, c.userId, newest);
+  }
+}
+let checking = false;
+function checkSoon() {
+  if (checking || !calls.length) return;
+  checking = true;
+  void checkCallsOnServer().catch(() => {}).finally(() => (checking = false));
+}
+setInterval(() => {
+  if (calls.length && AppState.currentState === 'active') checkSoon();
+}, 20_000);
+
 // Website: a browser that refused to play before the first click gets another try on each click.
 if (Platform.OS === 'web' && typeof document !== 'undefined') {
-  document.addEventListener('pointerdown', () => {
+  // 'click' counts as the rider's gesture on touch screens too; play() runs right in it.
+  document.addEventListener('click', () => {
     // play() doesn't say it was refused: a call waiting while nothing plays gets started again.
     if (!calls.length || !sounding || player?.playing) return;
-    sounding = false;
-    soundGen++;
-    update();
+    const p = getPlayer();
+    if (!p) return;
+    p.loop = true;
+    p.volume = 1;
+    p.play();
   });
 }
 
@@ -302,6 +341,7 @@ onUrgentChange(() => update());
 AppState.addEventListener('change', (s) => {
   if (resume) clearTimeout(resume);
   resume = null;
+  if (s === 'active') checkSoon();
   if (s === 'active')
     resume = setTimeout(() => {
       resume = null;
