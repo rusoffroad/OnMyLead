@@ -452,11 +452,16 @@ export type StatusRow = {
 
 /** The ride's recent status taps, newest first, without the ones their riders cancelled. */
 export async function latestStatuses(rideId: string) {
+  return (await latestStatusesAndCancels(rideId)).statuses;
+}
+
+/** The same, plus the ids of taps their riders took back (so a Bluetooth copy of one stays taken back). */
+export async function latestStatusesAndCancels(rideId: string) {
   // '*' rather than a column list so this keeps working before the cancelled_at column exists.
   const rows = unwrap<StatusRow[]>(
     await supabase.from('rider_statuses').select('*').eq('ride_id', rideId).order('created_at', { ascending: false }).limit(200),
   );
-  return rows.filter((r) => !r.cancelled_at);
+  return { statuses: rows.filter((r) => !r.cancelled_at), cancelled: rows.filter((r) => r.cancelled_at && r.id).map((r) => r.id as string) };
 }
 
 /** Takes back one of my status taps or quick replies. Says which it was. */

@@ -54,8 +54,9 @@ Notifications.setNotificationHandler({
     // Signed out, or the switch off here before the server heard, nothing in the app sounds it, so
     // it shows with its own sound even on the siren channel (an alert beats silence).
     if (call && AppState.currentState !== 'background') {
-      const show = !androidSiren || !sirenEnabled() || sirenSignedOut();
-      return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: !pushSiren || sirenSignedOut() || !sirenEnabled(), shouldSetBadge: false };
+      // Shown even on Android's siren channel (the app and the server disagreeing, say a clock far
+      // off, must never hide an EMERGENCY); silent there unless nothing in the app can sound it.
+      return { shouldShowBanner: true, shouldShowList: true, shouldPlaySound: !pushSiren || sirenSignedOut() || !sirenEnabled(), shouldSetBadge: false };
     }
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
