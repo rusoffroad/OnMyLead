@@ -33,6 +33,8 @@ let silencedSet = new Set<string>();
 const endedHere = new Set<string>();
 // Bluetooth EMERGENCY ids already shown as a plain notification (siren switched off).
 const plainNotified = new Set<string>();
+// Calls already left on the lock screen as a quiet reminder: once each.
+const reminded = new Set<string>();
 // Each ride's latest status per rider, as Ride Mode last saw it, so a call that arrives later by
 // push is checked against it too.
 const knownLatest: Record<string, Record<string, { id?: string | null; status: string; at: number }>> = {};
@@ -204,7 +206,10 @@ export function endEmergency(id: string) {
 export function endStaleCalls(rideId: string, latest: Record<string, { id?: string | null; status: string; tapped_at: string } | undefined>) {
   const now: Record<string, { id?: string | null; status: string; at: number }> = {};
   const iso = (at: number) => new Date(at).toISOString();
-  for (const [u, st] of Object.entries(latest)) if (st) now[u] = { id: st.id, status: st.status, at: Date.parse(st.tapped_at) };
+  for (const [u, st] of Object.entries(latest)) {
+    const at = st ? Date.parse(st.tapped_at) : NaN;
+    if (st && Number.isFinite(at)) now[u] = { id: st.id, status: st.status, at };
+  }
   // Keep a newer tap learned another way (a push, the server check) over Ride Mode's older one.
   const before = knownLatest[rideId] ?? {};
   for (const [u, k] of Object.entries(before)) {
@@ -297,18 +302,23 @@ function update() {
 // came while the app was away, or that kind of notification is off here) still ends it: checked when
 // the app comes back and every 20 s while a call waits.
 async function checkCallsOnServer() {
-  for (const c of [...calls]) {
-    if (c.userId.startsWith('item:')) continue;
-    const { data, error } = await supabase.from('rider_statuses').select('id, status, tapped_at, cancelled_at')
-      .eq('ride_id', c.rideId).eq('user_id', c.userId).order('tapped_at', { ascending: false }).limit(5);
+  const waiting = calls.filter((c) => !c.userId.startsWith('item:'));
+  for (const rideId of [...new Set(waiting.map((c) => c.rideId))]) {
+    const mine = waiting.filter((c) => c.rideId === rideId);
+    // One request per ride: the newest taps of every rider with a call waiting.
+    const { data, error } = await supabase.from('rider_statuses').select('id, user_id, status, tapped_at, cancelled_at')
+      .eq('ride_id', rideId).in('user_id', [...new Set(mine.map((c) => c.userId))])
+      .order('tapped_at', { ascending: false }).limit(20 * mine.length);
     if (error || !data) continue;
-    const rows = data as { id: string; status: string; tapped_at: string; cancelled_at?: string | null }[];
-    if (rows.some((r) => r.id === c.id && r.cancelled_at)) {
-      endEmergency(c.id);
-      continue;
+    const rows = data as { id: string; user_id: string; status: string; tapped_at: string; cancelled_at?: string | null }[];
+    for (const c of mine) {
+      if (rows.some((r) => r.id === c.id && r.cancelled_at)) {
+        endEmergency(c.id);
+        continue;
+      }
+      const newest = rows.find((r) => r.user_id === c.userId && !r.cancelled_at);
+      if (newest) noteRiderTap(c.rideId, c.userId, newest);
     }
-    const newest = rows.find((r) => !r.cancelled_at);
-    if (newest) noteRiderTap(c.rideId, c.userId, newest);
   }
 }
 let checking = false;
@@ -351,7 +361,12 @@ AppState.addEventListener('change', (s) => {
     // Gone to the background with calls not silenced yet (the screen locked before the rider
     // looked): the in-app siren stops, so each stays on the lock screen as a quiet reminder. No
     // sound, so it never plays over the dialer when the rider leaves to call 911.
-    if (s === 'background') for (const c of calls) backgroundNotifier?.(c, false, true);
+    if (s === 'background')
+      for (const c of calls) {
+        if (reminded.has(c.id)) continue;
+        reminded.add(c.id);
+        backgroundNotifier?.(c, false, true);
+      }
     update();
   }
 });

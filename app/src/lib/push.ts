@@ -168,7 +168,8 @@ async function createAndroidChannels() {
     Notifications.setNotificationChannelAsync(WAITING_CHANNEL, {
       name: tc('Emergency Waiting'),
       description: tc('A quiet reminder of an EMERGENCY you haven’t silenced yet.'),
-      importance: high,
+      // Default importance: on the lock screen and in the tray, but no banner over the dialer.
+      importance: Notifications.AndroidImportance.DEFAULT,
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
       sound: null,
       enableVibrate: false,
