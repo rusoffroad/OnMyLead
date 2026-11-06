@@ -1,4 +1,5 @@
 [
+  {"date": "2026-11-06", "slugs": ["language", "offline-maps", "park-trails", "route-builder"], "kind": "review", "by": "pr", "ref": "edge-follow", "why": "Re-dated only: the Zoom Out at the Edge description in Map Settings (and its translations) changed to say the map centers and follows the next time. Nothing in these guides' steps changed."},
   {"date": "2026-11-06", "slugs": ["3d-terrain", "bluetooth-sharing", "carplay", "directions", "emergency-and-safety", "fuel-range", "full-map", "leader-trackline", "location-sharing", "ride-bubble", "ride-chat", "status-buttons", "troubleshooting", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "review", "by": "pr", "ref": "edge-follow", "why": "Re-dated only: Ride Mode's screen now hands its own GPS fix to the map for Follow Me. Nothing riders see in these guides changed."},
   {
     "date": "2026-11-06",
