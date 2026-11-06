@@ -175,3 +175,15 @@ export function versionsValue(v: AppVersions): Record<string, unknown> {
   if (v.notice) out.notice = v.notice;
   return out;
 }
+
+/**
+ * The version line riders see at the bottom of Home and on the launch screen: "2.1 (10)", the
+ * store version and this build's number (iOS buildNumber, Android versionCode). Null when the
+ * version is unknown (the website), so nothing shows.
+ */
+export function versionLabel(version: string | null | undefined, build: string | number | null | undefined): string | null {
+  const v = typeof version === 'string' ? version.trim() : '';
+  if (!v) return null;
+  const b = build == null ? '' : String(build).trim();
+  return b ? `${v} (${b})` : v;
+}

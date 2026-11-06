@@ -3353,6 +3353,7 @@ const dict: Record<string, string> = {
   "{name} may have crashed and didn’t tap I’m OK.": "{name}さんが衝突した可能性があり、「大丈夫」をタップしていません。",
   "{n} more rider needs help": "ほかに{n}人のライダーが助けを必要としています",
   "{n} more riders need help": "ほかに{n}人のライダーが助けを必要としています",
+  "Version {v}": "バージョン {v}",
 };
 
 export default dict;
