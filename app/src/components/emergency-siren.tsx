@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { sirenText, type EmergencyCall } from '@/core/siren';
 import { t } from '@/lib/i18n';
-import { silenceAll, useEmergencyCalls } from '@/lib/siren';
+import { silenceAll, silenceEmergency, useEmergencyCalls } from '@/lib/siren';
 import { useLesserUrgentShown } from '@/lib/urgent-modal';
 
 /**
@@ -37,7 +37,8 @@ function SirenScreen({ calls }: { calls: EmergencyCall[] }) {
   }, [ready, title, body]);
 
   const showMe = () => {
-    silenceAll();
+    // Only this rider's call: any other rider still waiting shows next, over their location.
+    silenceEmergency(top.id);
     if (path !== live) router.push(live as never);
   };
 

@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { endEmergency, loadSiren, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
+import { endEmergency, loadSiren, noteRiderTap, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -227,6 +227,11 @@ export function useNotificationTaps() {
 /** An EMERGENCY push while the app is open sounds the siren; a cancelled one stops it. */
 function sirenFromPush(data: TapData | undefined) {
   if (typeof data?.itemId === 'string' && data.type === 'cancelled') return endEmergency(data.itemId);
+  // A rider's later tap (I'm OK...), named by newer servers: ends their call on any screen.
+  const d = data as (TapData & { status?: unknown; userId?: unknown; tappedAt?: unknown }) | undefined;
+  if (d?.type === 'status' && d.status !== 'emergency' && typeof d.itemId === 'string' && typeof d.rideId === 'string'
+    && typeof d.userId === 'string' && typeof d.tappedAt === 'string' && typeof d.status === 'string')
+    return noteRiderTap(d.rideId, d.userId, { id: d.itemId, status: d.status, tapped_at: d.tappedAt });
   const e = emergencyFromPush(data);
   if (e) raiseEmergency(e, registeredFor);
 }
@@ -235,7 +240,9 @@ function sirenFromPush(data: TapData | undefined) {
 function emergencyFromPush(data: TapData | undefined): IncomingEmergency | null {
   if (typeof data?.itemId !== 'string') return null;
   if (!isEmergency(data) || typeof data.rideId !== 'string') return null;
-  const d = data as TapData & { name?: unknown; userId?: unknown; tappedAt?: unknown };
+  const d = data as TapData & { name?: unknown; userId?: unknown; tappedAt?: unknown; over?: unknown };
+  // The server already knows it's over (a newer tap is in, or it's over an hour late).
+  if (d.over === true) return null;
   const tappedAt = typeof d.tappedAt === 'string' ? Date.parse(d.tappedAt) : NaN;
   return {
       id: data.itemId,

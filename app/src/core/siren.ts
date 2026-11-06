@@ -97,7 +97,8 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
   // Same rule as every other tap order (tapOrder); a tie keeps the call already sounding.
   if (mine && tapOrder(c.tappedAt ?? c.at, mine.tappedAt ?? mine.at) >= 0) return calls as EmergencyCall[];
   const rest = calls.filter((x) => !(x.rideId === c.rideId && x.userId === c.userId));
-  return [c, ...rest].sort((a, b) => b.at - a.at);
+  // Newest tap first (tap time where known: a push's `at` is when it arrived).
+  return [c, ...rest].sort((a, b) => (b.tappedAt ?? b.at) - (a.tappedAt ?? a.at));
 }
 
 /**

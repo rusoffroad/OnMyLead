@@ -155,12 +155,15 @@ async function sirenTokens(all: string[]): Promise<{ token: string; siren: boole
  * column isn't there yet) leaves the rows unchanged.
  */
 export async function withSiren(rows: Push[]): Promise<Push[]> {
-  const sos = rows.filter((r) => r.data?.status === 'emergency');
-  if (!sos.length) return rows;
+  // Every status push names the rider and the tap time, so an app with a siren sounding can tell
+  // that rider's later I'm OK ends it, on any screen. Only EMERGENCY ones get the siren.
+  const taps = rows.filter((r) => r.data?.type === 'status' && typeof r.data?.itemId === 'string');
+  if (!taps.length) return rows;
+  const sos = taps.filter((r) => r.data?.status === 'emergency');
   try {
-    const itemId = typeof sos[0].data?.itemId === 'string' ? sos[0].data.itemId : null;
+    const itemId = taps[0].data!.itemId as string;
     const [tokens, who] = await Promise.all([
-      sirenTokens(sos.map((r) => r.token)),
+      sos.length ? sirenTokens(sos.map((r) => r.token)) : Promise.resolve([]),
       itemId
         ? db.from('rider_statuses').select('ride_id, user_id, tapped_at, profiles(display_name)').eq('id', itemId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
@@ -177,6 +180,10 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
     // A tap uploaded over an hour late (relayed after a long stretch with no service) gets the
     // plain sound, as the app keeps it quiet too (core/siren PUSH_LATE_MAX_MS).
     const tapped = sender?.tapped_at ? Date.parse(sender.tapped_at) : NaN;
+    const tapOnly: Record<string, unknown> = {};
+    if (extra.userId) tapOnly.userId = extra.userId;
+    if (extra.tappedAt) tapOnly.tappedAt = extra.tappedAt;
+    if (!sos.length) return rows.map((r) => (r.data?.type === 'status' ? { ...r, data: { ...r.data, ...tapOnly } } : r));
     let late = Number.isFinite(tapped) && Date.now() - tapped > 60 * 60_000;
     // Uploaded after the rider's own newer tap (both relayed late with no service, I'm OK first):
     // it's already over, so no siren. A failed lookup leaves the siren on.
@@ -196,7 +203,8 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
       }
     }
     return rows.map((r) =>
-      r.data?.status === 'emergency' ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra } } : r,
+      // `over`: already over (a newer tap is in, or over an hour late), so open apps don't sound it either.
+      r.data?.status === 'emergency' ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra, ...(late ? { over: true } : null) } } : r,
     );
   } catch {
     return rows;

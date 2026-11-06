@@ -5,7 +5,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { AppState, Platform } from 'react-native';
 
 import {
-  addCall, dropCall, endedCalls, parseSirenSetting, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
+  addCall, dropCall, endedCalls, isNewerTap, parseSirenSetting, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
   SIREN_REMEMBER,
 } from '@/core/siren';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
@@ -183,7 +183,11 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
 /** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
 export function endEmergency(id: string) {
   if (!calls.some((c) => c.id === id)) {
-    if (endedHere.size >= SIREN_REMEMBER) endedHere.delete(endedHere.values().next().value as string);
+    if (endedHere.size >= SIREN_REMEMBER) {
+      const oldest = endedHere.values().next().value as string;
+      endedHere.delete(oldest);
+      if (!silenced.includes(oldest)) silencedSet.delete(oldest);
+    }
     endedHere.add(id);
     silencedSet.add(id);
     return;
@@ -201,6 +205,19 @@ export function endStaleCalls(rideId: string, latest: Record<string, { id?: stri
   for (const [u, st] of Object.entries(latest)) if (st) now[u] = { id: st.id, status: st.status, at: Date.parse(st.tapped_at) };
   knownLatest[rideId] = now;
   for (const id of endedCalls(calls, rideId, now)) endEmergency(id);
+}
+
+/**
+ * A later status from a rider reached this phone outside Ride Mode (a push for I'm OK, Stopped...):
+ * it ends that rider's call just as Ride Mode's newer status would.
+ */
+export function noteRiderTap(rideId: string, userId: string, tap: { id: string; status: string; tapped_at: string }) {
+  const at = Date.parse(tap.tapped_at);
+  if (!Number.isFinite(at)) return;
+  const known = knownLatest[rideId]?.[userId];
+  if (known?.id && !isNewerTap({ id: known.id, status: known.status, tapped_at: new Date(known.at).toISOString() }, tap)) return;
+  knownLatest[rideId] = { ...knownLatest[rideId], [userId]: { id: tap.id, status: tap.status, at } };
+  for (const id of endedCalls(calls, rideId, knownLatest[rideId])) endEmergency(id);
 }
 
 /** The rider silenced one call (a notification tap counts too). */

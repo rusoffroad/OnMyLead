@@ -40,9 +40,9 @@ The siren takes over the whole screen, on any screen in the app, and it says who
 
 If you lock your phone or switch to another app before silencing it (say, to call 911), the siren stops and a quiet notification stays on your lock screen; tap it to see where they are.
 
-If more than one rider needs help, the newest shows first, with how many more riders need help. Silencing it silences all of them.
+If more than one rider needs help, the newest shows first, with how many more riders need help. **Silence Siren** silences all of them; **Show Me Where** silences only that rider's, and the next rider who needs help shows right after.
 
-The siren stops by itself if the rider cancels their EMERGENCY, or, while you have Ride Mode open, taps another status like **I'm OK** (with no service, a cancel doesn't travel over Bluetooth, so ask them to tap **I'm OK**). An EMERGENCY you've silenced never sounds again on that phone, and one older than 10 minutes doesn't sound when you open Ride Mode later; it still shows in red there.
+The siren stops by itself if the rider cancels their EMERGENCY or taps another status like **I'm OK** (with no service, a cancel doesn't travel over Bluetooth, so ask them to tap **I'm OK**). An EMERGENCY you've silenced never sounds again on that phone, and one older than 10 minutes doesn't sound when you open Ride Mode later; it still shows in red there.
 
 ## With OnMyLead Closed or in the Background
 
