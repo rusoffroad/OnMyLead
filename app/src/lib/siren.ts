@@ -159,14 +159,20 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
       // Siren switched off: an EMERGENCY heard over Bluetooth in the background still gets a
       // notification with the normal sound, once (no service means no push brings it).
       const wouldSound = shouldSound({ ...e, at }, { me, enabled: true, silenced: silencedSet, now: Date.now() });
-      if (!enabled && wouldSound && e.source === 'bluetooth' && AppState.currentState !== 'active' && !plainNotified.has(call.id)) {
+      if (!enabled && wouldSound && e.source === 'bluetooth' && AppState.currentState === 'background' && !plainNotified.has(call.id)) {
         plainNotified.add(call.id);
         backgroundNotifier?.(call, true);
       }
       return;
     }
     // Ride Mode already shows a newer tap from this rider: it's over before it sounds.
-    if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) return endEmergency(call.id);
+    if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) {
+      endedHere.add(call.id);
+      silencedSet.add(call.id);
+      const by = knownLatest[call.rideId]?.[call.userId]?.id;
+      if (by) endedBy.set(call.id, by);
+      return;
+    }
     const isNew = !calls.some((c) => c.id === call.id);
     const next = addCall(calls, call);
     if (next === calls) return;
@@ -178,13 +184,42 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     }
     calls = next;
     emit();
-    if (isNew && AppState.currentState !== 'active' && e.source === 'bluetooth') backgroundNotifier?.(call);
+    if (isNew && AppState.currentState === 'background' && e.source === 'bluetooth') backgroundNotifier?.(call);
     update();
   });
 }
 
 /** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
+// Calls ended by a rider's newer tap, and which tap: if that tap is taken back, the call is live again.
+const endedBy = new Map<string, string>();
+
+/** A newer tap from the rider ended this call. Not saved: taking that tap back brings it back. */
+function endByTap(callId: string, tapId: string | null | undefined) {
+  if (!calls.some((c) => c.id === callId)) return;
+  endedHere.add(callId);
+  silencedSet.add(callId);
+  if (tapId) endedBy.set(callId, tapId);
+  silencedHook?.([callId]);
+  calls = dropCall(calls, callId);
+  emit();
+  update();
+}
+
+/** A tap was taken back: calls it had ended count again, and it no longer counts as the newest. */
+function undoTap(tapId: string) {
+  for (const [callId, by] of [...endedBy]) {
+    if (by !== tapId) continue;
+    endedBy.delete(callId);
+    endedHere.delete(callId);
+    if (!silenced.includes(callId)) silencedSet.delete(callId);
+  }
+  for (const ride of Object.values(knownLatest))
+    for (const [u, k] of Object.entries(ride)) if (k.id === tapId) delete ride[u];
+}
+
 export function endEmergency(id: string) {
+  // Also the way a taken-back tap arrives (Ride Mode's cancel, a cancelled push).
+  undoTap(id);
   if (!calls.some((c) => c.id === id)) {
     if (endedHere.size >= SIREN_REMEMBER) {
       const oldest = endedHere.values().next().value as string;
@@ -217,7 +252,7 @@ export function endStaleCalls(rideId: string, latest: Record<string, { id?: stri
     if (!n || isNewerTap({ id: n.id, status: n.status, tapped_at: iso(n.at) }, { id: k.id, status: k.status, tapped_at: iso(k.at) })) now[u] = k;
   }
   knownLatest[rideId] = now;
-  for (const id of endedCalls(calls, rideId, now)) endEmergency(id);
+  for (const id of endedCalls(calls, rideId, now)) endByTap(id, now[calls.find((c) => c.id === id)?.userId ?? '']?.id);
 }
 
 /**
@@ -230,7 +265,7 @@ export function noteRiderTap(rideId: string, userId: string, tap: { id: string; 
   const known = knownLatest[rideId]?.[userId];
   if (known?.id && !isNewerTap({ id: known.id, status: known.status, tapped_at: new Date(known.at).toISOString() }, tap)) return;
   knownLatest[rideId] = { ...knownLatest[rideId], [userId]: { id: tap.id, status: tap.status, at } };
-  for (const id of endedCalls(calls, rideId, knownLatest[rideId])) endEmergency(id);
+  for (const id of endedCalls(calls, rideId, knownLatest[rideId])) endByTap(id, tap.id);
 }
 
 /** Whether this call is waiting (sounding or on the siren screen). */
@@ -296,7 +331,8 @@ let resume: ReturnType<typeof setTimeout> | null = null;
 
 function update() {
   // Quiet while this rider's own Crash Alert countdown is up: its screen and voice come first.
-  const want = calls.length > 0 && AppState.currentState === 'active' && !criticalUrgentUp();
+  // Not only 'active': iPhone's 'inactive' (Control Center or Face ID over the app) still counts.
+  const want = calls.length > 0 && AppState.currentState !== 'background' && !criticalUrgentUp();
   // Just back in front: wait for the resume moment, so a notification tap can silence its call first.
   if (want && resume) return;
   if (want) {

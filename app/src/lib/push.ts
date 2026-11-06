@@ -40,7 +40,7 @@ Notifications.setNotificationHandler({
     // On iPhone and iPad it stays in Notification Center without sound, so it's still there if the
     // screen locks before the rider looks. Not in the tray on Android, where the siren channel
     // would play its own siren over the app's.
-    if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: Platform.OS === 'ios', shouldPlaySound: false, shouldSetBadge: false };
+    if (call && AppState.currentState !== 'background' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: Platform.OS === 'ios', shouldPlaySound: false, shouldSetBadge: false };
     // On Android a push the server sent on the siren channel (its `siren` flag) plays the alarm if
     // it's posted at all, so the cases below keep it out of the tray there.
     const pushSiren = (data as { siren?: unknown } | undefined)?.siren === true;
@@ -50,7 +50,7 @@ Notifications.setNotificationHandler({
     // Open, but the in-app siren won't sound it (too old, an older call, or the switch just went
     // off): a banner without the push's own siren sound, which nothing here could silence.
     // A push with the plain sound (switch off, or the server's late or over call) still plays it.
-    if (call && AppState.currentState === 'active') return { shouldShowBanner: !androidSiren, shouldShowList: !androidSiren, shouldPlaySound: !pushSiren, shouldSetBadge: false };
+    if (call && AppState.currentState !== 'background') return { shouldShowBanner: !androidSiren, shouldShowList: !androidSiren, shouldPlaySound: !pushSiren, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
