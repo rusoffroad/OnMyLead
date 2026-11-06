@@ -76,6 +76,7 @@ set role authenticated;
 select expect_refused($q$update riding_groups set photo_path = '00000000-0000-0000-0000-0000000b7a02/x.jpg' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo in someone else''s folder');
 select expect_refused($q$update riding_groups set photo_path = 'https://evil.example/x.jpg' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo pointed at another site');
 select expect_refused($q$update riding_groups set photo_path = '00000000-0000-0000-0000-0000000b7a01/../x.jpg' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo path escapes the folder');
+select expect_refused($q$update riding_groups set photo_path = '00000000-0000-0000-0000-0000000b7a01/..' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo file named ..');
 reset role;
 
 -- GP5. Olive removes it, then sets a new one.

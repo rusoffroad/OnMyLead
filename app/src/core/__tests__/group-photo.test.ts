@@ -52,6 +52,9 @@ describe('group photo paths', () => {
     expect(p.slice(p.indexOf('/') + 1).length).toBeLessThanOrEqual(120);
   });
   it('never shows a photo from someone else’s folder, another site, or a nested path', () => {
+    expect(isGroupPhotoPath(`${OWNER}/..`, OWNER)).toBe(false);
+    expect(isGroupPhotoPath(`${OWNER}/.`, OWNER)).toBe(false);
+    expect(isGroupPhotoPath(`${OWNER}/.hidden.jpg`, OWNER)).toBe(true);
     expect(isGroupPhotoPath(`${OTHER}/x.jpg`, OWNER)).toBe(false);
     expect(isGroupPhotoPath('https://evil.example/x.jpg')).toBe(false);
     expect(isGroupPhotoPath(`${OWNER}/../x.jpg`)).toBe(false);

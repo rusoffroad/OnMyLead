@@ -46,3 +46,13 @@ begin
     with check (bucket_id = 'group-photos' and (storage.foldername(name))[1] = auth.uid()::text
                 and has_feature(auth.uid(), 'group_photos'))$p$;
 end $$;
+
+-- A photo's file name can't be only dots ('.' or '..' would point at a folder, not a photo); the
+-- app's isGroupPhotoPath says the same. No group has a photo yet, so nothing existing breaks.
+alter table riding_groups drop constraint if exists riding_groups_photo_path_own_folder;
+alter table riding_groups add constraint riding_groups_photo_path_own_folder check (
+  photo_path is null
+  or (char_length(photo_path) <= 160
+      and photo_path ~ ('^' || owner_id::text || '/[A-Za-z0-9._-]{1,120}$')
+      and photo_path !~ '/[.]+$')
+);

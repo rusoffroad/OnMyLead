@@ -380,8 +380,25 @@ async function checkCallsOnServer() {
   // Calls from an older server don't name the rider: look those up by id, for a cancel.
   const unnamed = calls.filter((c) => isUnknownRider(c.userId));
   if (unnamed.length) {
-    const { data } = await supabase.from('rider_statuses').select('id, cancelled_at').in('id', unnamed.map((c) => c.id));
-    for (const r of (data ?? []) as { id: string; cancelled_at?: string | null }[]) if (r.cancelled_at) tapTakenBack(r.id);
+    const { data } = await supabase.from('rider_statuses').select('id, user_id, tapped_at, cancelled_at').in('id', unnamed.map((c) => c.id));
+    let named = false;
+    for (const r of (data ?? []) as { id: string; user_id?: string; tapped_at?: string; cancelled_at?: string | null }[]) {
+      if (r.cancelled_at) {
+        tapTakenBack(r.id);
+        continue;
+      }
+      // The server names the rider: the call takes their id (addCall fills it in), so the rider's
+      // later I'm OK ends it just below like any other call.
+      const c = calls.find((x) => x.id === r.id);
+      const tapped = r.tapped_at ? Date.parse(r.tapped_at) : NaN;
+      if (!c || !r.user_id) continue;
+      const next = addCall(calls, { ...c, userId: r.user_id, ...(Number.isFinite(tapped) ? { tappedAt: tapped } : {}) });
+      if (next !== calls) {
+        calls = next;
+        named = true;
+      }
+    }
+    if (named) emit();
   }
   const waiting = calls.filter((c) => !isUnknownRider(c.userId));
   // The rides are separate: ask for each at once.
