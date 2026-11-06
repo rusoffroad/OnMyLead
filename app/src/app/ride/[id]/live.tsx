@@ -509,7 +509,7 @@ export default function RideMode() {
   // turning it back on in Ride Mode starts Bluetooth again at once.
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
   // Bluetooth Sharing is Pro (2.1). On Free the phone still relays for the group and still sends and
-  // hears EMERGENCY, Need Help and Crash Alerts (lib/nearby relay only); spots, other taps and
+  // hears status taps, EMERGENCY and I'm OK included (lib/nearby relay only); spots and
   // messages over Bluetooth need Pro.
   const bluetoothPro = useCan('bluetooth_sharing');
   useEffect(() => setNearbyRelayOnly(!bluetoothPro), [bluetoothPro]);
@@ -553,7 +553,13 @@ export default function RideMode() {
           // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren), unless
           // the rider has already tapped something newer (a relayed old EMERGENCY after I'm OK).
           const known = statusesNow.current[e.status.user_id];
-          if (!known || (known.id !== e.status.id && Date.parse(known.tapped_at) <= Date.parse(e.status.tapped_at))) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
+          const newer = !known || (known.id !== e.status.id && Date.parse(known.tapped_at) <= Date.parse(e.status.tapped_at));
+          // Kept current right away, so the next packet in the same batch is checked against this one.
+          if (newer) {
+            const { user_id: _u, possible_crash: _c, ...tap } = e.status;
+            statusesNow.current = { ...statusesNow.current, [e.status.user_id]: tap };
+          }
+          if (newer) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             const old = prev[e.status.user_id];
             if (old && (old.id === e.status.id || Date.parse(old.tapped_at) > Date.parse(e.status.tapped_at))) return prev;

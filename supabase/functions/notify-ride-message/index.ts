@@ -141,18 +141,29 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
  * off get the push exactly as before. Fails open to the plain push: any lookup error (say the
  * column isn't there yet) leaves the rows unchanged.
  */
+/** push_tokens.siren for these tokens, 50 at a time so a big ride's lookup URL stays short. */
+async function sirenTokens(all: string[]): Promise<{ token: string; siren: boolean | null }[]> {
+  const out: { token: string; siren: boolean | null }[] = [];
+  for (let i = 0; i < all.length; i += 50) {
+    const { data, error } = await db.from('push_tokens').select('token, siren').in('token', all.slice(i, i + 50));
+    if (error) throw error;
+    out.push(...((data ?? []) as { token: string; siren: boolean | null }[]));
+  }
+  return out;
+}
+
 export async function withSiren(rows: Push[]): Promise<Push[]> {
   const sos = rows.filter((r) => r.data?.status === 'emergency');
   if (!sos.length) return rows;
   try {
     const itemId = typeof sos[0].data?.itemId === 'string' ? sos[0].data.itemId : null;
     const [tokens, who] = await Promise.all([
-      db.from('push_tokens').select('token, siren').in('token', sos.map((r) => r.token)),
+      sirenTokens(sos.map((r) => r.token)),
       itemId
         ? db.from('rider_statuses').select('user_id, tapped_at, profiles(display_name)').eq('id', itemId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
     ]);
-    const siren = new Set(((tokens.data ?? []) as { token: string; siren: boolean | null }[]).filter((t) => t.siren === true).map((t) => t.token));
+    const siren = new Set(tokens.filter((t) => t.siren === true).map((t) => t.token));
     // deno-lint-ignore no-explicit-any
     const sender = (who as any)?.data as { user_id?: string; tapped_at?: string | null; profiles?: { display_name?: string | null } | null } | null;
     const extra: Record<string, unknown> = {};

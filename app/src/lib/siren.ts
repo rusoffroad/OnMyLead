@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
+import { createAudioPlayer, setAudioModeAsync, setIsAudioActiveAsync, type AudioPlayer } from 'expo-audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { AppState, Platform } from 'react-native';
@@ -105,6 +105,13 @@ export type IncomingEmergency = {
   /** Where it came from. Only a Bluetooth call needs its own notification in the background (a push already is one). */
   source: 'ride' | 'bluetooth' | 'push';
 };
+
+/** Whether this call would sound the siren now (so the push handler only drops the banner then). */
+export async function sirenWillSound(e: IncomingEmergency, me: string | null): Promise<boolean> {
+  await loadSiren();
+  const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
+  return Number.isFinite(at) && shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() });
+}
 
 /** A status reached this phone. Starts the siren when it is another rider's fresh EMERGENCY. */
 export function raiseEmergency(e: IncomingEmergency, me: string | null) {
@@ -227,10 +234,13 @@ function startBuzz() {
 }
 
 function stopSound() {
+  const was = sounding;
   sounding = false;
   try {
     player?.pause();
   } catch {}
+  // Let the rider's music come back up (the siren ducked it).
+  if (was) setIsAudioActiveAsync(false).catch(() => {});
   if (buzz) clearInterval(buzz);
   buzz = null;
 }

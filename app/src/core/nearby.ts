@@ -902,18 +902,11 @@ export function nearbyPower(s: { online: boolean; peers: number; batterySaver: b
 
 /**
  * What a phone on Free does with Bluetooth Sharing (2.1, Bluetooth Sharing is Pro): it still passes
- * every packet along for the group (relay), and still sends and hears the safety alerts, EMERGENCY,
- * Need Help and a Crash Alert. Seeing riders' spots, sending its own spot, other status taps and
- * messages over Bluetooth are Pro.
+ * every packet along for the group (relay), and still sends and hears status taps, so EMERGENCY,
+ * Need Help and a Crash Alert get through, and so does the I'm OK (or any later tap) that ends one,
+ * whatever order the packets arrive in. Seeing riders' spots, sending its own spot and messages
+ * over Bluetooth are Pro.
  */
-export function nearbyFreeAllows(
-  item: { kind: string; status?: string; flags?: number },
-  /** The same rider's previous tap: the tap after a safety alert (I'm OK and the rest) ends it, so it goes through too. */
-  prev?: { status?: string; flags?: number } | null,
-): boolean {
-  if (item.kind !== 'status') return false;
-  return isSafetyTap(item) || (prev != null && isSafetyTap(prev));
+export function nearbyFreeAllows(item: { kind: string }): boolean {
+  return item.kind === 'status';
 }
-
-const isSafetyTap = (t: { status?: string; flags?: number }) =>
-  t.status === 'emergency' || t.status === 'need_help' || ((t.flags ?? 0) & FLAG_POSSIBLE_CRASH) === FLAG_POSSIBLE_CRASH;

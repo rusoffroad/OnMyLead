@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { endEmergency, loadSiren, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled } from './siren';
+import { endEmergency, loadSiren, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenWillSound, type IncomingEmergency } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -32,9 +32,10 @@ Notifications.setNotificationHandler({
   handleNotification: async (n) => {
     const data = tapData(n.request.content.data);
     // The siren switch as saved, not the default, before deciding (lib/siren).
-    if (isEmergency(data)) await loadSiren();
-    // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner.
-    if (isEmergency(data) && sirenEnabled()) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
+    // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner,
+    // but only when the siren will really sound (not for an old or silenced one, or with it off).
+    const call = emergencyFromPush(data);
+    if (call && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
@@ -185,13 +186,18 @@ export function useNotificationTaps() {
 
 /** An EMERGENCY push while the app is open sounds the siren; a cancelled one stops it. */
 function sirenFromPush(data: TapData | undefined) {
-  if (typeof data?.itemId !== 'string') return;
-  if (data.type === 'cancelled') return endEmergency(data.itemId);
-  if (!isEmergency(data) || typeof data.rideId !== 'string') return;
+  if (typeof data?.itemId === 'string' && data.type === 'cancelled') return endEmergency(data.itemId);
+  const e = emergencyFromPush(data);
+  if (e) raiseEmergency(e, registeredFor);
+}
+
+/** The EMERGENCY call a push carries, or null. */
+function emergencyFromPush(data: TapData | undefined): IncomingEmergency | null {
+  if (typeof data?.itemId !== 'string') return null;
+  if (!isEmergency(data) || typeof data.rideId !== 'string') return null;
   const d = data as TapData & { name?: unknown; userId?: unknown; tappedAt?: unknown };
   const tappedAt = typeof d.tappedAt === 'string' ? Date.parse(d.tappedAt) : NaN;
-  raiseEmergency(
-    {
+  return {
       id: data.itemId,
       rideId: data.rideId,
       // The rider, when the server says (notify-ride-message); else the call stands on its own.
@@ -202,9 +208,7 @@ function sirenFromPush(data: TapData | undefined) {
       // future, so a phone whose clock runs behind still sounds it.
       at: Number.isFinite(tappedAt) ? Math.min(tappedAt, Date.now()) : Date.now(),
       source: 'push',
-    },
-    registeredFor,
-  );
+  };
 }
 
 /**
