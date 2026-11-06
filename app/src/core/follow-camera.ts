@@ -119,7 +119,8 @@ export const FOLLOW_FRAME_START: FollowFrame = { zoomedOut: false, locked: false
 export type FollowMove =
   | { kind: 'stay' }
   | { kind: 'zoom-out'; zoom: number }
-  | { kind: 'pan'; inset: Inset };
+  /** `unsure`: the dot's spot on screen wasn't known, so this pan doesn't switch to centered following. */
+  | { kind: 'pan'; inset: Inset; unsure?: boolean };
 
 /** The part of the map the dot may move through without the camera moving. */
 export function followBox(size: ScreenSize, inset: Inset): Box {
@@ -175,7 +176,7 @@ export function followMove(
   // Following centered: every fix keeps the dot in the middle of the open map.
   if (frame.locked) return center;
   // Can't tell where the dot is on screen (the map is still drawing): just keep it in view.
-  if (!ctx.pt) return center;
+  if (!ctx.pt) return { kind: 'pan', inset: ctx.inset, unsure: true };
   if (insideFollowBox(ctx.pt, ctx.size, ctx.inset)) return { kind: 'stay' };
   // Mapbox on iPhone and iPad answers (-1, -1) for a spot off the screen.
   const unknown = ctx.pt.x === -1 && ctx.pt.y === -1;
@@ -187,6 +188,6 @@ export function followMove(
 
 export function followFrameAfter(frame: FollowFrame, move: FollowMove): FollowFrame {
   if (move.kind === 'zoom-out') return { ...frame, zoomedOut: true };
-  if (move.kind === 'pan' && !frame.locked) return { ...frame, locked: true };
+  if (move.kind === 'pan' && !move.unsure && !frame.locked) return { ...frame, locked: true };
   return frame;
 }

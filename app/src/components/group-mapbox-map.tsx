@@ -108,7 +108,8 @@ export function GroupMapboxMap({
   const backupLat = myFix?.lat;
   const backupLng = myFix?.lng;
   useEffect(() => {
-    if (!myFix || Date.now() - nativeAt.current < NATIVE_QUIET_MS) return;
+    // Quiet means no map fix for longer than its own interval (15 s or more on Battery Saver).
+    if (!myFix || Date.now() - nativeAt.current < Math.max(NATIVE_QUIET_MS, 2 * (everyMs.current ?? 0))) return;
     onOwnFix(myFix);
     // Only when the fix moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps

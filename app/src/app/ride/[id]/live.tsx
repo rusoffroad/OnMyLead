@@ -1088,10 +1088,16 @@ export default function RideMode() {
   });
   const carKey = JSON.stringify(car);
   // CarPlay is Pro (2.1). On Free the car keeps the Pro notice (root layout) and gets no ride.
+  // Once the ride is on the car screen it stays there for this ride even if Pro runs out, so the
+  // car's EMERGENCY button is still there (carPlayActionAllowed lets only EMERGENCY through).
   const carPlayPro = useCan('carplay');
+  const carRideShown = useRef(false);
   useEffect(() => {
-    if (!carPlayPro) return clearCarPlay();
-    if (ride) showRideOnCarPlay(JSON.parse(carKey));
+    if (!carPlayPro && !carRideShown.current) return clearCarPlay();
+    if (ride) {
+      showRideOnCarPlay(JSON.parse(carKey));
+      carRideShown.current = true;
+    }
   }, [carKey, ride, carPlayPro]);
   useEffect(() => () => clearCarPlay(), []);
   const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency });

@@ -6,6 +6,7 @@ import { AppState, Platform } from 'react-native';
 
 import {
   addCall, dropCall, endedCalls, parseSirenSetting, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
+  SIREN_REMEMBER,
 } from '@/core/siren';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
 import { criticalUrgentUp, onUrgentChange } from './urgent-modal';
@@ -26,6 +27,9 @@ let settingChanged = false;
 let calls: EmergencyCall[] = [];
 let silenced: string[] = [];
 let silencedSet = new Set<string>();
+// Taps taken back that were never a call here (most are not EMERGENCY): kept for this run only, so
+// a late copy can't sound, without crowding the saved list of silenced calls.
+const endedHere = new Set<string>();
 let loaded: Promise<void> | null = null;
 const listeners = new Set<() => void>();
 const settingListeners = new Set<(on: boolean) => void>();
@@ -52,7 +56,7 @@ export function loadSiren(): Promise<void> {
         const list = JSON.parse(ids ?? '[]');
         if (Array.isArray(list)) silenced = rememberSilenced(list.filter((x) => typeof x === 'string'), silenced);
       } catch {}
-      silencedSet = new Set(silenced);
+      silencedSet = new Set([...silenced, ...endedHere]);
       settingListeners.forEach((l) => l(enabled));
     })
     .catch(() => {});
@@ -159,8 +163,13 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
 
 /** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
 export function endEmergency(id: string) {
-  if (!silencedSet.has(id)) remember([id]);
-  if (!calls.some((c) => c.id === id)) return;
+  if (!calls.some((c) => c.id === id)) {
+    if (endedHere.size >= SIREN_REMEMBER) endedHere.delete(endedHere.values().next().value as string);
+    endedHere.add(id);
+    silencedSet.add(id);
+    return;
+  }
+  remember([id]);
   silencedHook?.([id]);
   calls = dropCall(calls, id);
   emit();
@@ -192,7 +201,7 @@ export function silenceAll() {
 
 function remember(ids: string[]) {
   silenced = rememberSilenced(silenced, ids);
-  silencedSet = new Set(silenced);
+  silencedSet = new Set([...silenced, ...endedHere]);
   // After the saved list has been read in (loadSiren merges it), so saving never drops it.
   void loadSiren().then(() => AsyncStorage.setItem(SILENCED_KEY, JSON.stringify(silenced))).catch(() => {});
 }
@@ -225,7 +234,14 @@ function update() {
     if (!sounding) silencedHook?.(calls.map((c) => c.id));
     startSound();
     startBuzz();
-  } else if (!sample) stopSound();
+  } else if (sample && !buzz) {
+    // Only the three-second Play Siren sample is playing: let it finish.
+  } else {
+    // A real call was sounding (its buzz runs) and is over or silenced: stop now, sample or not.
+    if (sample) clearTimeout(sample);
+    sample = null;
+    stopSound();
+  }
 }
 
 // The countdown came or went: the siren stops for it, and sounds again after.

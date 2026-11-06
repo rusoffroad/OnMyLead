@@ -63,7 +63,7 @@ describe('the list of calls', () => {
     let list = addCall([], { ...call('a', unknownRider('a')) });
     list = addCall(list, call('a', 'u1'));
     expect(list[0].userId).toBe('u1');
-    expect(endedCalls(list, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 1 } })).toEqual(['a']);
+    expect(endedCalls(list, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 1000 } })).toEqual(['a']);
   });
   it('keeps one call per rider per ride: a newer one replaces the older', () => {
     let list = addCall([], call('a', 'u1', NOW - 5000));
@@ -125,7 +125,7 @@ describe('endedCalls', () => {
 
   const calls = [call('a', 'u1', NOW - 60_000), call('b', 'u2', NOW - 60_000), call('x', 'u3', NOW, 'r2')];
   it('ends a call once the rider tapped something newer', () => {
-    expect(endedCalls(calls, 'r1', { u1: { id: 'n', status: 'ok', at: NOW } })).toEqual(['a']);
+    expect(endedCalls(calls, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 1000 } })).toEqual(['a']);
   });
   it('keeps it while Ride Mode still shows an older status (push got here first)', () => {
     expect(endedCalls(calls, 'r1', { u1: { id: 'old', status: 'stopped', at: NOW - 120_000 } })).toEqual([]);
@@ -133,6 +133,11 @@ describe('endedCalls', () => {
   it('keeps it while that EMERGENCY is still the rider’s status, or nothing is known yet', () => {
     expect(endedCalls(calls, 'r1', { u1: { id: 'a', status: 'emergency', at: NOW - 60_000 } })).toEqual([]);
     expect(endedCalls(calls, 'r1', {})).toEqual([]);
+  });
+  it('keeps it for a different tap in the same second (can’t tell which came first)', () => {
+    const sos = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: 1_000_900, tappedAt: 1_000_900 }];
+    expect(endedCalls(sos, 'r1', { u1: { id: 'stop', status: 'stopped', at: 1_000_200 } })).toEqual([]);
+    expect(endedCalls(sos, 'r1', { u1: { id: 'ok', status: 'ok', at: 1_001_000 } })).toEqual(['sos']);
   });
   it('only looks at calls on this ride', () => {
     expect(endedCalls(calls, 'r1', { u3: { id: 'n', status: 'ok', at: NOW + 1 } })).toEqual([]);
