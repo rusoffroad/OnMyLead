@@ -16,7 +16,7 @@ import {
 } from '@/core/terrain';
 import { OSM_TILEJSON } from '@/core/osm-trails';
 import { FEATURE_BY_ID, osmFeatureLayers, type AgencyLayer } from '@/core/map-features';
-import { TRAIL_INK } from '@/core/trails';
+import { LAND_FADE_IN, TRAIL_INK } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
@@ -129,7 +129,7 @@ function syncAgency(m: MapboxMap_, want: AgencyLayer[], offline: boolean) {
     m.addSource(id, { type: 'raster', tiles: [mapboxAgencyTemplate(a.template)], tileSize: AGENCY_TILE_SIZE, minzoom: a.minZ - 1 });
     // Land first, under the trails; everything under the OpenStreetMap lines and the app's own.
     const before = a.land ? want.find((b) => !b.land && m.getLayer(`oml-agency-${b.key}`)) : undefined;
-    m.addLayer({ id, type: 'raster', source: id, paint: { 'raster-fade-duration': 0 } }, before ? `oml-agency-${before.key}` : AGENCY_ANCHOR);
+    m.addLayer({ id, type: 'raster', source: id, minzoom: a.minZ, paint: { 'raster-fade-duration': 0, 'raster-opacity': a.land ? (LAND_FADE_IN as never) : 1 } }, before ? `oml-agency-${before.key}` : AGENCY_ANCHOR);
   }
 }
 

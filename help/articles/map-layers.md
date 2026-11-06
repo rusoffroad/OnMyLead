@@ -156,7 +156,7 @@ Land is off until you turn it on, since it tints the whole map:
 - **State Parks**: state parks and state recreation areas, tinted teal.
 - **Property Lines**: private parcel lines in coral, in Texas for now. They show when you're zoomed in to a few blocks across. No owner names are shown.
 
-Land shows from about a few counties across, with each area's name when you're zoomed in. Tap the map with land on to see a card with whose land it is: the area's name, who manages it, whether it's open to the public and its size. In Texas, with **Property Lines** on, tapping private land shows **Property Parcel**, its county and acres. If you tap a trail, its card comes first.
+Land shows once the map is about one county across (about 60 miles on a phone screen), fading in as you zoom, with each area's name when you're zoomed in closer. Further out it stays hidden, so whole states aren't covered in color. If you turned land on and see **Zoom In to See Land Boundaries**, zoom in a little. iPad and Android tablets show it at the same zoom as a phone, over their bigger map. Tap the map with land on to see a card with whose land it is: the area's name, who manages it, whether it's open to the public and its size. In Texas, with **Property Lines** on, tapping private land shows **Property Parcel**, its county and acres. If you tap a trail, its card comes first.
 
 Land boundaries come from public records (USGS PAD-US and the Texas Geographic Information Office) and can be out of date. Posted signs and fences always win. Land doesn't download with an offline map yet; it shows when you have signal.
 

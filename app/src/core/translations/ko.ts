@@ -2939,6 +2939,7 @@ const dict: Record<string, string> = {
   "Clear {label}": "{label} 지우기",
   "Saved from {mapper}": "{mapper}에서 저장됨",
   "Zoom In to See Trails": "확대하면 트레일이 보입니다",
+  "Zoom In to See Land Boundaries": "확대하면 토지 경계가 보입니다",
   "Zoom In for Park and Local Trails": "확대하면 파크와 지역 트레일이 보입니다",
   "Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.": "실제 지형 위에 위성 사진을 얹고 등고선과 봉우리 높이(피트)를 표시합니다. {v} 라이드 모드와 지도 모드에서 표시됩니다.",
   "No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.": "여기는 신호가 없어 평면 지도가 보입니다. 오프라인 지도 다운로드에 3D 지형을 추가하면 신호 없이도 볼 수 있습니다.",

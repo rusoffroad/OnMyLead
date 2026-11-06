@@ -2939,6 +2939,7 @@ const dict: Record<string, string> = {
   "Clear {label}": "Cancella {label}",
   "Saved from {mapper}": "Salvato da {mapper}",
   "Zoom In to See Trails": "Ingrandisci per vedere i sentieri",
+  "Zoom In to See Land Boundaries": "Ingrandisci per vedere i confini dei terreni",
   "Zoom In for Park and Local Trails": "Ingrandisci per parchi e sentieri locali",
   "Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.": "Satellite sulla forma reale del terreno, con curve di livello e altezze delle cime in piedi. {v} Appare in Modalità Uscita e Modalità Mappa.",
   "No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.": "Nessun segnale qui, quindi viene mostrata la mappa piatta. Aggiungi Terreno 3D a un download in Mappe offline per vederlo senza segnale.",

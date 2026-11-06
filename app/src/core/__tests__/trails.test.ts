@@ -228,3 +228,18 @@ describe('closures', () => {
     expect(lines[0].parts[0][0]).toEqual({ lat: 38.45, lng: -111.551 });
   });
 });
+
+describe('land boundaries far out', () => {
+  it('wait until about one county fills a phone (no orange and green blobs over whole states)', async () => {
+    const { LAND_MIN_Z, LAND_FADE_IN, LAND_SOURCES, landShowsAt } = await import('../trails');
+    expect(LAND_MIN_Z).toBe(9);
+    expect(LAND_SOURCES.padus.minZ).toBe(LAND_MIN_Z);
+    expect(landShowsAt(7)).toBe(false);
+    expect(landShowsAt(8.9)).toBe(false);
+    expect(landShowsAt(9)).toBe(true);
+    // Property lines stay later still.
+    expect(LAND_SOURCES.txparcels.minZ).toBeGreaterThan(LAND_MIN_Z);
+    // Fades in over the first level, fully drawn from one level in.
+    expect(LAND_FADE_IN.slice(3)).toEqual([LAND_MIN_Z, 0.65, LAND_MIN_Z + 1, 1]);
+  });
+});

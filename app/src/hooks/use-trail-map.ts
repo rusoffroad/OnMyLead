@@ -10,7 +10,7 @@ import { terrainBoxes } from '@/core/offline-maps';
 import { lookFor, mapboxDraws, type MapLook } from '@/core/terrain';
 import { anyLand, anyTrails, defaultFeatures, featureKey, readFeatures, type AgencyLayer, type FeatureChoices, type MapFeatureId } from '@/core/map-features';
 import {
-  LAND_SOURCE_IDS, LAND_SOURCES, mapZoom, metersPerPoint, sourceFeatures, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate,
+  landShowsAt, LAND_SOURCE_IDS, LAND_SOURCES, mapZoom, metersPerPoint, sourceFeatures, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate,
   type BaseMap, type ClosedLine, type LandInfo, type TrailInfo, type TrailSourceId,
 } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
@@ -59,6 +59,8 @@ export type TrailMap = {
   clearLand: () => void;
   /** True when trails are on but the map is too far out to draw them. */
   zoomInHint: boolean;
+  /** True when land boundaries are on but the map is too far out to draw them (core/trails LAND_MIN_Z). */
+  landZoomHint: boolean;
   /** OpenStreetMap tracks to draw (TrailTiles), once the map is in to OSM_VIEW_MIN_Z (about 15 miles across). */
   osmLines: OsmTrail[];
   /** Name tags for the named OpenStreetMap tracks on screen (agency names are drawn into their tiles). */
@@ -436,7 +438,8 @@ export function useTrailMap(): TrailMap {
       setPickedPark(null);
       setLand(null);
       const f = featuresRef.current;
-      const landOn = layersPro && anyLand(f);
+      // Land isn't drawn far out (core/trails LAND_MIN_Z), so a tap there can't be on it.
+      const landOn = layersPro && anyLand(f) && !!region.current && landShowsAt(zoomNow.current ?? mapZoom(region.current, width.current));
       // Nothing under the finger but land: say whose land it is.
       const lookLand = (id: number) => {
         if (!landOn) return;
@@ -557,6 +560,7 @@ export function useTrailMap(): TrailMap {
     land,
     clearLand: () => setLand(null),
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
+    landZoomHint: anyLand(features) && !landShowsAt(zoom),
     osmLines: trails ? osmShown : [],
     labels: trails ? labelsShown : [],
     closedLines: features.closed ? closedShown : [],

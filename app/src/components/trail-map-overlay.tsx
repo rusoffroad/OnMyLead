@@ -131,9 +131,11 @@ export function TrailMapOverlay({
         controls={controls}
       />
 
-      {(trail.zoomInHint || trail.closerForTracks) && !bare ? (
+      {(trail.zoomInHint || trail.landZoomHint || trail.closerForTracks) && !bare ? (
         <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
-          <Text style={styles.hintText}>{trail.zoomInHint ? tr('Zoom In to See Trails') : tr('Zoom In for Park and Local Trails')}</Text>
+          <Text style={styles.hintText}>
+            {trail.zoomInHint ? tr('Zoom In to See Trails') : trail.landZoomHint ? tr('Zoom In to See Land Boundaries') : tr('Zoom In for Park and Local Trails')}
+          </Text>
         </View>
       ) : null}
 

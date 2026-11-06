@@ -2939,6 +2939,7 @@ const dict: Record<string, string> = {
   "Clear {label}": "{label}を消去",
   "Saved from {mapper}": "{mapper} から保存",
   "Zoom In to See Trails": "ズームインしてトレイルを表示",
+  "Zoom In to See Land Boundaries": "ズームインして土地の境界を表示",
   "Zoom In for Park and Local Trails": "ズームインしてパークとローカルトレイルを表示",
   "Satellite on the real shape of the land, with contour lines and peak heights in feet. {v} Shows in Ride Mode and Map Mode.": "実際の地形の起伏に衛星画像を重ね、等高線と山頂の標高（フィート）を表示します。{v} ライドモードとマップモードで表示されます。",
   "No signal here, so the flat map is showing. Add 3D Terrain to a download in Offline Maps to see it with no signal.": "ここは圏外のため平面マップを表示しています。オフラインマップのダウンロードに 3D 地形を追加すると圏外でも表示できます。",
