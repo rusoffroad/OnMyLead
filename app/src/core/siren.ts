@@ -138,25 +138,37 @@ export function tapOrder(a: number, b: number): -1 | 0 | 1 {
   return y > x ? 1 : y < x ? -1 : 0;
 }
 
+type Tap = { id?: string | null; tapped_at: string; status?: string };
+
 /**
- * Whether a status tap that reached this phone is newer than the one already known for that rider.
- * An older one relayed late changes nothing, and neither does one that can't be told apart (the same
- * second over Bluetooth), so every phone settles on the same tap.
+ * When two taps can't be told apart (the same second over Bluetooth), the one that isn't EMERGENCY
+ * wins: a rider who taps EMERGENCY by mistake taps I'm OK right after, almost never the other way.
  */
-export function isNewerTap(known: { id?: string | null; tapped_at: string } | undefined, incoming: { id?: string | null; tapped_at: string }): boolean {
-  if (!known) return true;
-  return known.id !== incoming.id && tapOrder(Date.parse(known.tapped_at), Date.parse(incoming.tapped_at)) > 0;
+function tieGoesTo(known: { status?: string }, incoming: { status?: string }): boolean {
+  return known.status === 'emergency' && !!incoming.status && incoming.status !== 'emergency';
 }
 
 /**
- * Each rider's newest tap from rows newest upload first, by tap time (tapOrder). In a tie the newer
- * upload stays.
+ * Whether a status tap that reached this phone is newer than the one already known for that rider.
+ * An older one relayed late changes nothing; a tie follows tieGoesTo, so every phone settles on the
+ * same tap whichever order they hear them in.
  */
-export function newestTapPerRider<T extends { user_id: string; tapped_at: string }>(rows: readonly T[]): Record<string, T> {
+export function isNewerTap(known: Tap | undefined, incoming: Tap): boolean {
+  if (!known) return true;
+  if (known.id === incoming.id) return false;
+  const o = tapOrder(Date.parse(known.tapped_at), Date.parse(incoming.tapped_at));
+  return o > 0 || (o === 0 && tieGoesTo(known, incoming));
+}
+
+/**
+ * Each rider's newest tap from rows newest upload first, by the same rule as isNewerTap (in a full
+ * tie the newer upload stays).
+ */
+export function newestTapPerRider<T extends { user_id: string; tapped_at: string; id?: string | null; status?: string }>(rows: readonly T[]): Record<string, T> {
   const out: Record<string, T> = {};
   for (const r of rows) {
     const p = out[r.user_id];
-    if (!p || tapOrder(Date.parse(p.tapped_at), Date.parse(r.tapped_at)) > 0) out[r.user_id] = r;
+    if (!p || isNewerTap(p, r)) out[r.user_id] = r;
   }
   return out;
 }
@@ -182,7 +194,8 @@ export function endedCalls(
       // the status is on the sender's: only a tap a full minute later counts, so clocks a little
       // apart don't end it at once.
       if (c.tappedAt == null) return s.at > c.at + 60_000;
-      return tapOrder(c.tappedAt, s.at) > 0;
+      const o = tapOrder(c.tappedAt, s.at);
+      return o > 0 || (o === 0 && s.status !== 'emergency');
     })
     .map((c) => c.id);
 }

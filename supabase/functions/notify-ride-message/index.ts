@@ -174,8 +174,12 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
     if (sender?.tapped_at) extra.tappedAt = sender.tapped_at;
     const name = sender?.profiles?.display_name?.trim();
     if (name) extra.name = name;
+    // A tap uploaded over an hour late (relayed after a long stretch with no service) gets the
+    // plain sound, as the app keeps it quiet too (core/siren PUSH_LATE_MAX_MS).
+    const tapped = sender?.tapped_at ? Date.parse(sender.tapped_at) : NaN;
+    const late = Number.isFinite(tapped) && Date.now() - tapped > 60 * 60_000;
     return rows.map((r) =>
-      r.data?.status === 'emergency' ? { ...r, siren: siren.has(r.token), data: { ...r.data, ...extra } } : r,
+      r.data?.status === 'emergency' ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra } } : r,
     );
   } catch {
     return rows;

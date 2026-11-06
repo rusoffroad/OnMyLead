@@ -30,6 +30,8 @@ let silencedSet = new Set<string>();
 // Taps taken back that were never a call here (most are not EMERGENCY): kept for this run only, so
 // a late copy can't sound, without crowding the saved list of silenced calls.
 const endedHere = new Set<string>();
+// Bluetooth EMERGENCY ids already shown as a plain notification (siren switched off).
+const plainNotified = new Set<string>();
 // Each ride's latest status per rider, as Ride Mode last saw it, so a call that arrives later by
 // push is checked against it too.
 const knownLatest: Record<string, Record<string, { id?: string | null; status: string; at: number }>> = {};
@@ -39,14 +41,14 @@ const settingListeners = new Set<(on: boolean) => void>();
 const emit = () => listeners.forEach((l) => l());
 
 /** Shows a local notification with the siren for a call that came over Bluetooth while the app was in the background (lib/push.ts). */
-let backgroundNotifier: ((c: EmergencyCall) => void) | null = null;
+let backgroundNotifier: ((c: EmergencyCall, plain?: boolean) => void) | null = null;
 /** Takes silenced calls' notifications off the phone, so their own siren sound stops too (lib/push.ts). */
 let silencedHook: ((ids: string[]) => void) | null = null;
 export function setSirenSilencedHook(fn: ((ids: string[]) => void) | null) {
   silencedHook = fn;
 }
 
-export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall) => void) | null) {
+export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall, plain?: boolean) => void) | null) {
   backgroundNotifier = fn;
 }
 
@@ -147,10 +149,19 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
   void loadSiren().then(() => {
     const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
     if (!Number.isFinite(at)) return;
-    if (!shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() })) return;
     // Ride Mode and Bluetooth hand over the tap time itself as `at`: that is the tap time.
     const tappedAt = e.tappedAt ?? (e.source === 'push' ? undefined : at);
     const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt, name: e.name, possibleCrash: e.possibleCrash };
+    if (!shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() })) {
+      // Siren switched off: an EMERGENCY heard over Bluetooth in the background still gets a
+      // notification with the normal sound, once (no service means no push brings it).
+      const wouldSound = shouldSound({ ...e, at }, { me, enabled: true, silenced: silencedSet, now: Date.now() });
+      if (!enabled && wouldSound && e.source === 'bluetooth' && AppState.currentState !== 'active' && !plainNotified.has(call.id)) {
+        plainNotified.add(call.id);
+        backgroundNotifier?.(call, true);
+      }
+      return;
+    }
     // Ride Mode already shows a newer tap from this rider: it's over before it sounds.
     if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) return endEmergency(call.id);
     const isNew = !calls.some((c) => c.id === call.id);
@@ -279,18 +290,23 @@ function getPlayer(): AudioPlayer | null {
   }
 }
 
+// Audio session changes run one after another, so a stop and a quick restart can't land out of order.
+let audioChain: Promise<unknown> = Promise.resolve();
+function audioStep(fn: () => Promise<unknown>): Promise<unknown> {
+  audioChain = audioChain.then(fn).catch(() => {});
+  return audioChain;
+}
+
 function startSound() {
   if (sounding) return;
   sounding = true;
   // Plays with the ring/silent switch on, and lowers the rider's music under it.
-  setIsAudioActiveAsync(true)
-    .catch(() => {})
-    .then(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }))
-    .catch(() => {})
+  void audioStep(() => setIsAudioActiveAsync(true));
+  audioStep(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }))
     .then(() => {
       if (!sounding) {
         // Stopped before the audio was set up: give the rider's music back, as stopSound does.
-        if (Platform.OS === 'ios') setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
+        if (Platform.OS === 'ios') void audioStep(() => setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }));
         return;
       }
       const p = getPlayer();
@@ -316,7 +332,7 @@ function stopSound() {
   } catch {}
   // iPhone and iPad: let the rider's music come back up (the siren ducked it), without switching
   // the app's audio off (a voice prompt may be speaking). Android gives it back when the player pauses.
-  if (was && Platform.OS === 'ios') setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
+  if (was && Platform.OS === 'ios') void audioStep(() => setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }));
   if (buzz) clearInterval(buzz);
   buzz = null;
 }

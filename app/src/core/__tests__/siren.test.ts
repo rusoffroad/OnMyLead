@@ -193,3 +193,17 @@ describe('newestTapPerRider', () => {
     expect(out.u2.id).toBe('b2');
   });
 });
+
+describe('same-second ties', () => {
+  const t = (id: string, at: string, status: string) => ({ id, tapped_at: at, status });
+  it('the tap that isn’t EMERGENCY wins a tie, whichever is heard first', () => {
+    const sos = t('sos', '2026-11-06T10:00:00Z', 'emergency');
+    const ok = t('ok', '2026-11-06T10:00:00Z', 'ok');
+    expect(isNewerTap(sos, ok)).toBe(true);
+    expect(isNewerTap(ok, sos)).toBe(false);
+    expect(newestTapPerRider([{ ...sos, user_id: 'u1' }, { ...ok, user_id: 'u1' }]).u1.id).toBe('ok');
+    expect(newestTapPerRider([{ ...ok, user_id: 'u1' }, { ...sos, user_id: 'u1' }]).u1.id).toBe('ok');
+    const call = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: 1_000_000, tappedAt: 1_000_000 }];
+    expect(endedCalls(call, 'r1', { u1: { id: 'ok', status: 'ok', at: 1_000_000 } })).toEqual(['sos']);
+  });
+});
