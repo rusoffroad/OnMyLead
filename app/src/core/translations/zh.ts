@@ -3313,7 +3313,7 @@ const dict: Record<string, string> = {
   "Play, pause, skip and volume without leaving the map.": "无需离开地图即可播放、暂停、切歌和调音量。",
   "Zoom Out at the Edge": "边缘时缩小",
   "The map moves to keep your dot on screen as you ride.": "骑行时地图移动，让你的位置点保持在屏幕上。",
-  "The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.": "位置点第一次接近边缘时，地图缩小一级。之后地图随你平移。",
+  "The first time your dot nears the edge, the map zooms out one step. The next time it centers on you and follows.": "位置点第一次接近边缘时，地图缩小一级。下一次地图会以你为中心并跟随你。",
   "Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.": "接近道路或小径路口时放大，让你看清该往哪走，然后再缩小。",
   "Zooming works while Follow Me is on.": "缩放仅在“关注我”开启时有效。",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "跟随时，位置点接近边缘时地图缩小一次，之后随你平移",

@@ -3313,7 +3313,7 @@ const dict: Record<string, string> = {
   "Play, pause, skip and volume without leaving the map.": "Riproduci, pausa, salta e volume senza lasciare la mappa.",
   "Zoom Out at the Edge": "Allontana al Bordo",
   "The map moves to keep your dot on screen as you ride.": "La mappa si sposta per tenere il tuo punto sullo schermo mentre guidi.",
-  "The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.": "La prima volta che il tuo punto si avvicina al bordo, la mappa si allontana di un livello. Poi scorre con te.",
+  "The first time your dot nears the edge, the map zooms out one step. The next time it centers on you and follows.": "La prima volta che il tuo punto si avvicina al bordo, la mappa si allontana di un livello. La volta successiva ti centra e ti segue.",
   "Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.": "Ingrandisce un incrocio di strade o sentieri quando ci arrivi così vedi dove andare, poi si allontana.",
   "Zooming works while Follow Me is on.": "Lo zoom funziona quando Seguimi è attivo.",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "Mentre ti segue, la mappa si allontana una volta quando il tuo punto si avvicina al bordo, poi scorre con te",

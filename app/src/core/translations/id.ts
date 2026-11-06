@@ -3313,7 +3313,7 @@ const dict: Record<string, string> = {
   "Play, pause, skip and volume without leaving the map.": "Putar, jeda, lewati, dan atur volume tanpa meninggalkan peta.",
   "Zoom Out at the Edge": "Perkecil di Tepi",
   "The map moves to keep your dot on screen as you ride.": "Peta bergerak agar titik Anda tetap di layar saat berkendara.",
-  "The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.": "Saat titik Anda pertama kali mendekati tepi, peta diperkecil satu tingkat. Setelah itu peta bergeser bersama Anda.",
+  "The first time your dot nears the edge, the map zooms out one step. The next time it centers on you and follows.": "Saat titik Anda pertama kali mendekati tepi, peta diperkecil satu tingkat. Berikutnya peta memusatkan Anda dan mengikuti.",
   "Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.": "Memperbesar persimpangan jalan atau jalur saat Anda tiba agar terlihat arah yang dituju, lalu memperkecil lagi.",
   "Zooming works while Follow Me is on.": "Zoom berfungsi saat Ikuti aku aktif.",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "Saat mengikuti, peta diperkecil sekali ketika titik mendekati tepi, lalu bergeser bersama Anda",
