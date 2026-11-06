@@ -254,7 +254,8 @@ function update() {
   if (want) {
     // The in-app siren takes over from any siren notification still in the tray (Android alarm).
     // (`buzz` runs only for a real call; the Play Siren sample sounds without it.)
-    if (!buzz) silencedHook?.(calls.map((c) => c.id));
+    // Android only: on iPhone and iPad the push's entry stays, quiet, in Notification Center.
+    if (!buzz && Platform.OS === 'android') silencedHook?.(calls.map((c) => c.id));
     startSound();
     startBuzz();
   } else if (sample && !buzz) {
@@ -308,21 +309,20 @@ function startSound() {
   void audioStep(() => setIsAudioActiveAsync(true));
   audioStep(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }))
     .then(() => {
+      // A stop since then (which gives the music back itself) or a newer start wins.
       if (gen !== soundGen) return;
-      if (!sounding) {
-        // Stopped before the audio was set up: give the rider's music back, as stopSound does.
-        if (Platform.OS === 'ios') void audioStep(() => setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }));
-        return;
-      }
       const p = getPlayer();
       if (!p) return;
       p.loop = true;
       p.volume = 1;
       p.seekTo(0).catch(() => {});
-      // The website may refuse to play before the rider has clicked: try again on the next update.
-      Promise.resolve(p.play() as unknown).catch(() => {
-        if (gen === soundGen) sounding = false;
-      });
+      p.play();
+      // The website may refuse to play before the rider has clicked (play() doesn't say so): if it
+      // isn't playing a moment later, the next update tries again.
+      if (Platform.OS === 'web')
+        setTimeout(() => {
+          if (gen === soundGen && !p.playing) sounding = false;
+        }, 1000);
     });
 }
 
