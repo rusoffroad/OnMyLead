@@ -197,11 +197,13 @@ export default function RideMode() {
   const [positions, setPositions] = useState<Record<string, Position>>({});
   const [statuses, setStatuses] = useState<Record<string, TappedStatus>>({});
   const statusesNow = useRef(statuses);
+  /** Taps their riders took back on this ride. */
+  const cancelledTaps = useRef(new Set<string>());
   useEffect(() => {
     // Keeps a newer tap the live handlers already put here (it may not have rendered yet), so an
     // older Bluetooth copy can't count as newer in between.
     const next = { ...statuses };
-    for (const [u, r] of Object.entries(statusesNow.current)) if (r && isNewerTap(next[u], r)) next[u] = r;
+    for (const [u, r] of Object.entries(statusesNow.current)) if (r && !(r.id && cancelledTaps.current.has(r.id)) && isNewerTap(next[u], r)) next[u] = r;
     statusesNow.current = next;
   }, [statuses]);
   const [regroup, setRegroup] = useState<RegroupPoint | null>(null);
@@ -460,9 +462,9 @@ export default function RideMode() {
           // A cancelled EMERGENCY stops the siren on every phone that is sounding it.
           if (row.id) {
             tapTakenBack(row.id);
-            // The taken-back tap no longer counts as anyone's newest here.
-            const left = Object.entries(statusesNow.current).filter(([, v]) => v?.id !== row.id);
-            statusesNow.current = Object.fromEntries(left);
+            // Taken back: Bluetooth copies of it (cancels don't travel there) change nothing, and it
+            // stops counting as the rider's newest once the refreshed statuses land.
+            cancelledTaps.current.add(row.id);
           }
           refresh();
         }
@@ -578,6 +580,8 @@ export default function RideMode() {
           });
         } else if (e.kind === 'status') {
           if (!memberIds.current.has(e.status.user_id)) return;
+          // A tap its rider took back, relayed again over Bluetooth: it stays taken back.
+          if (e.status.id && cancelledTaps.current.has(e.status.id)) return;
           // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren), unless
           // the rider has already tapped something newer (a relayed old EMERGENCY after I'm OK).
           const newer = isNewerTap(statusesNow.current[e.status.user_id], e.status);

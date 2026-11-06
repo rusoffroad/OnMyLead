@@ -439,7 +439,10 @@ export function useTrailMap(): TrailMap {
       setLand(null);
       const f = featuresRef.current;
       // Land isn't drawn far out (core/trails LAND_MIN_Z), so a tap there can't be on it.
-      const landOn = layersPro && anyLand(f) && !!region.current && landShowsAt(zoomNow.current ?? mapZoom(region.current, width.current));
+      const zNow = region.current ? zoomNow.current ?? mapZoom(region.current, width.current) : 0;
+      // Property lines alone draw only from PARCELS_MIN_Z (the same rule as landZoomHint).
+      const onlyParcels = LAND_FEATURES.every((k) => k === 'private' || !f[k]);
+      const landOn = layersPro && anyLand(f) && !!region.current && landShowsAt(zNow) && !(onlyParcels && zNow < PARCELS_MIN_Z);
       // Nothing under the finger but land: say whose land it is.
       const lookLand = (id: number) => {
         if (!landOn) return;

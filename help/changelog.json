@@ -1,4 +1,5 @@
 [
+  {"date": "2026-11-06", "slugs": ["follow-leaders"], "kind": "review", "by": "pr", "ref": "release-test-build-10-pass-54", "why": "Deleting a riding group no longer fails when the group photo lookup does. Following a ride leader works the same."},
   {"date": "2026-11-06", "slugs": ["emergency-siren"], "kind": "update", "by": "pr", "ref": "release-test-build-10-pass-52", "why": "2.1 build 10 test pass 52: an EMERGENCY that reaches an open Ride Mode late (sent with no service) now sounds the siren when it arrives, the same as a late push."},
   {"date": "2026-11-06", "slugs": ["create-a-ride-on-the-website"], "kind": "review", "by": "pr", "ref": "release-test-build-10-pass-46", "why": "The onmylead.com pricing list now shows CarPlay under Pro. Creating a ride on the website works the same."},
   {"date": "2026-11-06", "slugs": ["emergency-siren"], "kind": "update", "by": "pr", "ref": "release-test-build-10-pass-37", "why": "2.1 build 10 test pass 37: the guide now says that taking back an I'm OK doesn't bring the siren back; a rider who still needs help taps EMERGENCY again."},
