@@ -25,3 +25,18 @@ $$;
 drop trigger if exists riding_groups_photo_guard on riding_groups;
 create trigger riding_groups_photo_guard before insert or update of photo_path on riding_groups
   for each row execute function riding_groups_photo_guard();
+
+-- Uploading into the group-photos bucket needs the same feature (has_feature: Pro, or Free when
+-- Admin moves group_photos back to Free), so Free accounts can't use it as image hosting.
+-- Reading and deleting stay as they were.
+do $$
+begin
+  if to_regclass('storage.objects') is null then
+    raise notice 'storage schema not found; skipping group-photos upload policy';
+    return;
+  end if;
+  execute 'drop policy if exists group_photos_owner_insert on storage.objects';
+  execute $p$create policy group_photos_owner_insert on storage.objects for insert to authenticated
+    with check (bucket_id = 'group-photos' and (storage.foldername(name))[1] = auth.uid()::text
+                and has_feature(auth.uid(), 'group_photos'))$p$;
+end $$;

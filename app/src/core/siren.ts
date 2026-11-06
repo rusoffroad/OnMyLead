@@ -28,7 +28,7 @@ export const SIREN_SETTING_KEY = 'alerts.siren.v1';
  */
 export const SIREN_FRESH_MS = 10 * 60_000;
 /** How many silenced alerts are remembered on the phone, so a restart doesn't sound them again. */
-export const SIREN_REMEMBER = 100;
+export const SIREN_REMEMBER = 500;
 
 /** Off only when the rider turned it off. */
 export function parseSirenSetting(v: string | null | undefined): boolean {

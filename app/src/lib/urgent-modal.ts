@@ -32,6 +32,16 @@ function subscribe(l: () => void) {
   };
 }
 
+/** Whether the Crash Alert countdown is up (the siren stays quiet for it, lib/siren). */
+export function criticalUrgentUp(): boolean {
+  return critical > 0;
+}
+
+/** Listens to urgent screens and sheets coming and going. */
+export function onUrgentChange(l: () => void): () => void {
+  return subscribe(l);
+}
+
 /**
  * For an urgent screen: true once it can show (no sheet is still up on iPhone and iPad). The
  * critical one (the Crash Alert countdown) also waits for a lesser urgent screen (the siren) to

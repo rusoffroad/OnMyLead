@@ -8,6 +8,7 @@ import {
   addCall, dropCall, endedCalls, parseSirenSetting, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
 } from '@/core/siren';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
+import { criticalUrgentUp, onUrgentChange } from './urgent-modal';
 
 /**
  * The Emergency Siren on this device (core/siren.ts has the rules). Holds the EMERGENCY calls
@@ -43,7 +44,7 @@ export function loadSiren(): Promise<void> {
       if (!settingChanged) enabled = parseSirenSetting(on);
       try {
         const list = JSON.parse(ids ?? '[]');
-        if (Array.isArray(list)) silenced = rememberSilenced(silenced, list.filter((x) => typeof x === 'string'));
+        if (Array.isArray(list)) silenced = rememberSilenced(list.filter((x) => typeof x === 'string'), silenced);
       } catch {}
       silencedSet = new Set(silenced);
       settingListeners.forEach((l) => l(enabled));
@@ -193,12 +194,16 @@ let buzz: ReturnType<typeof setInterval> | null = null;
 let resume: ReturnType<typeof setTimeout> | null = null;
 
 function update() {
-  const want = calls.length > 0 && AppState.currentState === 'active';
+  // Quiet while this rider's own Crash Alert countdown is up: its screen and voice come first.
+  const want = calls.length > 0 && AppState.currentState === 'active' && !criticalUrgentUp();
   if (want) {
     startSound();
     startBuzz();
   } else if (!sample) stopSound();
 }
+
+// The countdown came or went: the siren stops for it, and sounds again after.
+onUrgentChange(() => update());
 
 AppState.addEventListener('change', (s) => {
   if (resume) clearTimeout(resume);
