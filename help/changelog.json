@@ -1,4 +1,5 @@
 [
+  {"date": "2026-11-06", "slugs": ["carplay", "directions", "emergency-and-safety", "faq", "follow-me", "fuel-range", "full-map", "getting-started", "location-sharing", "notification-settings", "ride-bubble", "ride-chat", "ride-mode", "status-buttons", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "fix", "by": "pr", "ref": "release-test-build-10-pass-1", "why": "2.1 build 10 test pass 1: Ride Mode, push and Bluetooth code underneath these guides changed for the Emergency Siren fixes (an EMERGENCY from CarPlay always goes; old relayed alerts stay quiet). Nothing riders do here changed, so these guides are only re-dated."},
   {
     "date": "2026-11-06",
     "slugs": ["bluetooth-sharing", "free-vs-pro", "troubleshooting", "emergency-siren"],

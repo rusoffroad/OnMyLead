@@ -4,7 +4,7 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - supabase/migrations/20261104150000_waypoint_alerts.sql
   - app/src/app/notifications.tsx
