@@ -88,7 +88,7 @@ export async function saveGroupPhoto(groupId: string, asset: ImagePicker.ImagePi
   const bucket = supabase.storage.from(GROUP_PHOTO_BUCKET);
   const { error: upErr } = await bucket.upload(path, bytes, { contentType: 'image/jpeg', upsert: false, cacheControl: '31536000' });
   // The bucket refuses uploads without the feature (a plan that just ended): the Pro prompt shows.
-  if (upErr) throw new Error(isNotOn(upErr.message) ? NOT_ON : /row-level security|unauthorized|403/i.test(upErr.message) ? 'pro_required:group_photos' : upErr.message);
+  if (upErr) throw new Error(isNotOn(upErr.message) ? NOT_ON : /row-level security/i.test(upErr.message) ? 'pro_required:group_photos' : upErr.message);
   const { error } = await supabase.from('riding_groups').update({ photo_path: path }).eq('id', groupId);
   if (error) {
     await bucket.remove([path]);

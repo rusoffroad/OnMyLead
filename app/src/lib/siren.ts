@@ -77,6 +77,11 @@ function applySetting(on: boolean) {
   if (!on) silenceAll();
 }
 
+/** Whether this call was silenced (or ended) on this phone. */
+export function sirenSilenced(id: string): boolean {
+  return silencedSet.has(id);
+}
+
 export function sirenEnabled(): boolean {
   return enabled;
 }
@@ -148,8 +153,8 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
 /** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
 export function endEmergency(id: string) {
   if (!silencedSet.has(id)) remember([id]);
-  silencedHook?.([id]);
   if (!calls.some((c) => c.id === id)) return;
+  silencedHook?.([id]);
   calls = dropCall(calls, id);
   emit();
   update();
@@ -206,6 +211,8 @@ let resume: ReturnType<typeof setTimeout> | null = null;
 function update() {
   // Quiet while this rider's own Crash Alert countdown is up: its screen and voice come first.
   const want = calls.length > 0 && AppState.currentState === 'active' && !criticalUrgentUp();
+  // Just back in front: wait for the resume moment, so a notification tap can silence its call first.
+  if (want && resume) return;
   if (want) {
     startSound();
     startBuzz();
@@ -218,7 +225,11 @@ onUrgentChange(() => update());
 AppState.addEventListener('change', (s) => {
   if (resume) clearTimeout(resume);
   resume = null;
-  if (s === 'active') resume = setTimeout(update, RESUME_DELAY_MS);
+  if (s === 'active')
+    resume = setTimeout(() => {
+      resume = null;
+      update();
+    }, RESUME_DELAY_MS);
   else update();
 });
 
@@ -262,9 +273,9 @@ function stopSound() {
   try {
     player?.pause();
   } catch {}
-  // iPhone and iPad: let the rider's music come back up (the siren ducked it). Android gives the
-  // audio back when the player pauses, and switching audio off there would mute the next siren.
-  if (was && Platform.OS === 'ios') setIsAudioActiveAsync(false).catch(() => {});
+  // iPhone and iPad: let the rider's music come back up (the siren ducked it), without switching
+  // the app's audio off (a voice prompt may be speaking). Android gives it back when the player pauses.
+  if (was && Platform.OS === 'ios') setAudioModeAsync({ interruptionMode: 'mixWithOthers' }).catch(() => {});
   if (buzz) clearInterval(buzz);
   buzz = null;
 }
