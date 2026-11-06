@@ -3347,7 +3347,6 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "Posible choque: {name}",
   "EMERGENCY: {name} needs help now": "EMERGENCIA: {name} necesita ayuda ya",
   "Sent over Bluetooth. Tap to see where they are.": "Enviado por Bluetooth. Toca para ver dónde está.",
-  "Tap to see where they are.": "Toca para ver dónde está.",
   "This group was deleted or is no longer yours.": "Este grupo se eliminó o ya no es tuyo.",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "Una sirena cuando alguien de tu grupo envía EMERGENCIA o una alerta de choque.",
   "Possible Crash": "Posible choque",

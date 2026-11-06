@@ -181,9 +181,19 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
     // Uploaded after the rider's own newer tap (both relayed late with no service, I'm OK first):
     // it's already over, so no siren. A failed lookup leaves the siren on.
     if (!late && sender?.ride_id && sender.user_id && sender.tapped_at) {
-      const { data: newer } = await db.from('rider_statuses').select('id').eq('ride_id', sender.ride_id)
-        .eq('user_id', sender.user_id).gt('tapped_at', sender.tapped_at).is('cancelled_at', null).limit(1);
-      if (newer?.length) late = true;
+      // From the start of the same second, with the app's tie rule (core/siren): a tap later in time,
+      // or one in the same second that isn't EMERGENCY (Bluetooth carries whole seconds).
+      const sec = Math.floor(tapped / 1000);
+      const { data: near } = await db.from('rider_statuses').select('id, status, tapped_at').eq('ride_id', sender.ride_id)
+        .eq('user_id', sender.user_id).gte('tapped_at', new Date(sec * 1000).toISOString()).is('cancelled_at', null)
+        .neq('id', itemId).order('tapped_at', { ascending: false }).limit(20);
+      for (const r of (near ?? []) as { status: string; tapped_at: string }[]) {
+        const t = Date.parse(r.tapped_at);
+        // Milliseconds count only when both times have them (tapOrder in core/siren).
+        const exact = t % 1000 !== 0 && tapped % 1000 !== 0;
+        const s2 = Math.floor(t / 1000);
+        if (exact ? t > tapped : s2 > sec || (s2 === sec && r.status !== 'emergency')) late = true;
+      }
     }
     return rows.map((r) =>
       r.data?.status === 'emergency' ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra } } : r,

@@ -41,14 +41,14 @@ const settingListeners = new Set<(on: boolean) => void>();
 const emit = () => listeners.forEach((l) => l());
 
 /** Shows a local notification with the siren for a call that came over Bluetooth while the app was in the background (lib/push.ts). */
-let backgroundNotifier: ((c: EmergencyCall, plain?: boolean, bluetooth?: boolean) => void) | null = null;
+let backgroundNotifier: ((c: EmergencyCall, plain?: boolean) => void) | null = null;
 /** Takes silenced calls' notifications off the phone, so their own siren sound stops too (lib/push.ts). */
 let silencedHook: ((ids: string[]) => void) | null = null;
 export function setSirenSilencedHook(fn: ((ids: string[]) => void) | null) {
   silencedHook = fn;
 }
 
-export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall, plain?: boolean, bluetooth?: boolean) => void) | null) {
+export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall, plain?: boolean) => void) | null) {
   backgroundNotifier = fn;
 }
 
@@ -278,12 +278,7 @@ AppState.addEventListener('change', (s) => {
       resume = null;
       update();
     }, RESUME_DELAY_MS);
-  else {
-    // Going to the background with calls still unsilenced (say the screen locked before the rider
-    // looked): the in-app siren stops, so each comes back as a notification to see and tap.
-    if (s === 'background') for (const c of calls) backgroundNotifier?.(c, !enabled, false);
-    update();
-  }
+  else update();
 });
 
 function getPlayer(): AudioPlayer | null {
@@ -302,13 +297,18 @@ function audioStep(fn: () => Promise<unknown>): Promise<unknown> {
   return audioChain;
 }
 
+let soundGen = 0;
+
 function startSound() {
   if (sounding) return;
   sounding = true;
+  // Only this start's setup may play: a stop (or a stop and a new start) since then wins.
+  const gen = ++soundGen;
   // Plays with the ring/silent switch on, and lowers the rider's music under it.
   void audioStep(() => setIsAudioActiveAsync(true));
   audioStep(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }))
     .then(() => {
+      if (gen !== soundGen) return;
       if (!sounding) {
         // Stopped before the audio was set up: give the rider's music back, as stopSound does.
         if (Platform.OS === 'ios') void audioStep(() => setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }));
@@ -319,7 +319,10 @@ function startSound() {
       p.loop = true;
       p.volume = 1;
       p.seekTo(0).catch(() => {});
-      p.play();
+      // The website may refuse to play before the rider has clicked: try again on the next update.
+      Promise.resolve(p.play() as unknown).catch(() => {
+        if (gen === soundGen) sounding = false;
+      });
     });
 }
 
@@ -332,6 +335,7 @@ function startBuzz() {
 function stopSound() {
   const was = sounding;
   sounding = false;
+  soundGen++;
   try {
     player?.pause();
   } catch {}

@@ -3347,7 +3347,6 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "可能发生碰撞：{name}",
   "EMERGENCY: {name} needs help now": "紧急：{name} 现在需要帮助",
   "Sent over Bluetooth. Tap to see where they are.": "通过蓝牙发送。轻点查看其位置。",
-  "Tap to see where they are.": "轻点查看其位置。",
   "This group was deleted or is no longer yours.": "该群组已被删除或已不属于你。",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "当队友发送紧急求助或碰撞警报时响起警报声。",
   "Possible Crash": "可能发生碰撞",

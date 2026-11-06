@@ -35,8 +35,10 @@ Notifications.setNotificationHandler({
     // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner,
     // but only when the siren will really sound (not for an old or silenced one, or with it off).
     const call = emergencyFromPush(data);
-    // Not in the tray either: on Android the siren channel would play its own siren over the app's.
-    if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: false, shouldPlaySound: false, shouldSetBadge: false };
+    // On iPhone and iPad it stays in Notification Center without sound, so it's still there if the
+    // screen locks before the rider looks. Not in the tray on Android, where the siren channel
+    // would play its own siren over the app's.
+    if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: Platform.OS === 'ios', shouldPlaySound: false, shouldSetBadge: false };
     // Already silenced here: in the list, without the siren sound coming back from the push.
     if (call && sirenSilenced(call.id!)) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
     // Open, but the in-app siren won't sound it (too old, an older call, or the switch just went
@@ -86,14 +88,15 @@ setSirenSilencedHook((ids) => {
 
 // A call that came over Bluetooth while the app was in the background: the siren as a notification
 // (no service means no push). Tapping it opens Ride Mode and silences it.
-setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, bluetooth = true) => {
+setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean) => {
   const name = c.name?.trim() || tc('A rider');
   Notifications.scheduleNotificationAsync({
-    // The tap's id, the same tag the server's push uses, so the two show (and sound) once.
+    // The tap's id, the same tag the server's push uses, so the two make one entry (the push can
+    // still alert again when service comes back and the rider hasn't silenced it).
     identifier: c.id,
     content: {
       title: c.possibleCrash ? tc('Possible Crash: {name}', { name }) : tc('EMERGENCY: {name} needs help now', { name }),
-      body: bluetooth ? tc('Sent over Bluetooth. Tap to see where they are.') : tc('Tap to see where they are.'),
+      body: tc('Sent over Bluetooth. Tap to see where they are.'),
       // With the siren switched off: the normal sound, on the usual ride alerts channel.
       sound: plain ? 'default' : SIREN_SOUND,
       interruptionLevel: 'timeSensitive',
