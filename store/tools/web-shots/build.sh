@@ -24,5 +24,15 @@ sed -i "s/const tiltShown = Platform.OS !== 'web' \&\& /const tiltShown = /" "sr
 sed -i "s/if (Platform.OS === 'web') {/if (false) {/" src/app/maps/index.tsx
 sed -i "s/{Platform.OS === 'web' ? (/{false ? (/" src/app/ride/new.tsx
 sed -i "s/const web = Platform.OS === 'web';/const web = false;/" "src/app/ride/[id]/route.tsx"
+# 2.1 shots, switched on per shot by shoot.mjs (localStorage), so one export serves every set:
+# shots.nearby = no service with three phones in Bluetooth range (Ride Mode's banner, riders marked
+# Via Bluetooth); shots.siren = another rider's EMERGENCY sounding (the full-screen siren).
+L="src/app/ride/[id]/live.tsx"
+sed -i "s/const nearby = useNearby();/const shotBT = typeof localStorage !== 'undefined' \&\& !!localStorage.getItem('shots.nearby'); const realNearby = useNearby(); const nearby = shotBT ? { ...realNearby, state: 'on' as const, peers: 3 } : realNearby;/" "$L"
+sed -i "s/const offlineSince = viewerOfflineSince(lastHeardAt, now);/const offlineSince = shotBT ? now - 600000 : viewerOfflineSince(lastHeardAt, now);/" "$L"
+sed -i "s/p \&\& nearby.positions\[m.user_id\]?.recorded_at === p.recorded_at ? t('Via Bluetooth')/p \&\& (shotBT || nearby.positions[m.user_id]?.recorded_at === p.recorded_at) ? t('Via Bluetooth')/" "$L"
+sed -i "s/  const calls = useEmergencyCalls();/  const real = useEmergencyCalls(); const calls = typeof localStorage !== 'undefined' \&\& localStorage.getItem('shots.siren') ? [{ id: 'shot', rideId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', userId: 'x', at: Date.now(), name: 'Marcus' }] : real;/" src/components/emergency-siren.tsx
+[ "$(grep -c shotBT "$L")" -ge 3 ] || { echo "live.tsx shot patch missed" >&2; exit 1; }
+grep -q shots.siren src/components/emergency-siren.tsx || { echo "siren shot patch missed" >&2; exit 1; }
 EXPO_OFFLINE=1 EXPO_PUBLIC_SUPABASE_URL=https://mock.supabase.co EXPO_PUBLIC_SUPABASE_ANON_KEY=mock \
   npx expo export --platform web --output-dir "$OUT/dist"

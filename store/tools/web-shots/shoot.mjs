@@ -1,9 +1,11 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 // Store screenshots: serves the web export (build.sh) and answers Supabase calls from fixtures/.
-// Each target is "name|path|width|height|signedOut|scrollTo|clickAt|clickText|language|appearanceJSON|clicks".
+// Each target is "name|path|width|height|signedOut|scrollTo|clickAt|clickText|language|appearanceJSON|clicks|flags"
+// (flags: localStorage keys set before the page loads, comma separated, such as shots.nearby; see build.sh).
 // Run everything with shots.sh.
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
-import { tables, rpcs, session, localTrails, avatarFile } from './fixtures/store/fixtures.mjs';
+// FIXTURES=spread: ten riders strung out along a longer route (fixtures/store/spread.mjs).
+const { tables, rpcs, session, localTrails, avatarFile } = await import(`./fixtures/store/${process.env.FIXTURES || 'fixtures'}.mjs`);
 const [dist, out, ...targets] = process.argv.slice(2);
 const types = { '.js': 'text/javascript', '.css': 'text/css', '.html': 'text/html', '.png': 'image/png', '.ttf': 'font/ttf', '.ico': 'image/x-icon', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.webp': 'image/webp' };
 const srv = http.createServer((req, res) => {
@@ -32,11 +34,12 @@ function filterRows(rows, params) {
 }
 const browser = await chromium.launch();
 for (const t of targets) {
-  const [name, url, w = '393', h = '852', signedOut, scrollTo, clickAt, clickText, lang, theme, clicks] = t.split('|');
+  const [name, url, w = '393', h = '852', signedOut, scrollTo, clickAt, clickText, lang, theme, clicks, flags] = t.split('|');
   const ctx = await browser.newContext({ viewport: { width: +w, height: +h }, deviceScaleFactor: +(process.env.DPR || 2), timezoneId: 'America/Denver', geolocation: { latitude: 38.5881, longitude: -109.5335 }, permissions: ['geolocation'] });
   if (!signedOut) await ctx.addInitScript((s) => localStorage.setItem('sb-mock-auth-token', JSON.stringify(s)), session());
   await ctx.addInitScript((t) => localStorage.setItem('nav.trails.v1', JSON.stringify(t)), localTrails);
   // The language to shoot in (as if picked in You > Language); none = Match Phone (the browser is en-US).
+  for (const k of (flags || '').split(',').filter(Boolean)) await ctx.addInitScript((key) => localStorage.setItem(key, '1'), k);
   if (theme) await ctx.addInitScript((t) => localStorage.setItem('onmylead.appearance', t), theme);
   await ctx.addInitScript(() => { const g = navigator.geolocation; const wrap = (cb) => (p) => cb({ timestamp: p.timestamp, coords: { latitude: p.coords.latitude, longitude: p.coords.longitude, accuracy: 5, altitude: 1395, altitudeAccuracy: 5, heading: 62, speed: 11 } }); const w = g.watchPosition.bind(g), c = g.getCurrentPosition.bind(g); g.watchPosition = (a, b, o) => w(wrap(a), b, o); g.getCurrentPosition = (a, b, o) => c(wrap(a), b, o); localStorage.setItem('nav.trip.v1', JSON.stringify({ distanceM: 37200, movingS: 5580 })); localStorage.setItem('nav.panelOpen.v1', 'true'); });
   await ctx.addInitScript(() => { localStorage.setItem('tilt.calibration', JSON.stringify({ gravity: { x: 0, y: -1, z: 0 } })); });

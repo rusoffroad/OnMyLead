@@ -58,7 +58,7 @@ export function Showcase() {
         <title>OnMyLead: the Group Ride App for iPhone, iPad and Android</title>
         <meta
           name="description"
-          content="Create a ride, bring your crew and keep everyone together on the trail. Live group map, Ride Bubble alerts, ride chat and more. Free on iPhone and Android phones, with Pro for the riders who lead and for iPad, Android tablets and the website."
+          content="Create a ride, bring your crew and keep everyone together on the trail. Live group map, Ride Bubble alerts, ride chat, Bluetooth Sharing with no service and more. Free on iPhone and Android phones, with Pro for the riders who lead and for iPad, Android tablets and the website."
         />
       </Head>
       <style>{CSS}</style>
@@ -69,7 +69,7 @@ export function Showcase() {
         </a>
         <nav aria-label="Sections">
           {SHOWCASE_NO_SERVICE ? <a href="#no-service" onClick={jump('no-service')}>No Service</a> : null}
-          <a href="#new" onClick={jump('new')}>New in 2.0</a>
+          <a href="#new" onClick={jump('new')}>New in 2.1</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
           <a href="#features" onClick={jump('features')}>Features</a>
@@ -109,7 +109,7 @@ export function Showcase() {
           </div>
           <div className="hero-phone">
             <figure className="phone">
-              <img src="/showcase/group-map.webp" alt="Ride Mode’s live group map: every rider’s dot along the trail on satellite imagery, the leader’s bigger blue dot out front, and the group’s progress along the route" width={786} height={1704} />
+              <img src="/showcase/group-map.webp" alt="Ride Mode’s live group map: every rider’s dot along the trail on satellite imagery, the leader’s bigger blue dot out front, and the group spread under the rider line" width={786} height={1704} />
             </figure>
           </div>
         </div>
@@ -588,24 +588,25 @@ function Step({ n, shot, alt, title, text, points }: { n: number; shot: string; 
   );
 }
 
-// The headline features of OnMyLead 2.0, each with the real screen (rendered from the app's code
-// with sample riders; remake with store/tools/web-shots/shots.sh).
+// The headline features of OnMyLead 2.1, each with the real screen (rendered from the app's code
+// with sample riders; remake with store/tools/web-shots/shots.sh, plus the feature threads' shots
+// of 3D Terrain, Map Settings and group photos). Pro features say so, and EMERGENCY never needs Pro.
 const NEW_IN_2 = [
-  { shot: 'home-2', title: 'A New Home', text: 'Join a Ride up front with a box for the code, Create and Find under it, public rides near you, your group and a Feed of your friends’ rides.', alt: 'The new Home screen: the live ride card, the red Join a Ride card with its code box, and the Create a Ride and Find a Ride tiles' },
-  { shot: 'map-mode', title: 'Map Mode', text: 'Your offroad map for solo rides: speed, elevation, heading and trip, custom trails, Track Line and named spots. Free for 8 hours a month.', alt: 'Map Mode on satellite with trails, speed, elevation, heading, trip miles, roll and pitch' },
-  { shot: 'tilt', title: 'Tilt Meter and Crash Alert', text: 'Roll and pitch over the map with your own limits. In Ride Mode, a hard hit or a rollover starts an I’m OK countdown before your group is alerted. It never calls 911.', alt: 'The Tilt screen with Crash Alert on and the roll and pitch dials' },
-  { shot: 'events', title: 'Events', text: 'Rallies, poker runs and ride weekends on one shareable page, with the agenda and the group rides to join.', alt: 'The Events screen with Moab Spring Rally coming up' },
-  { shot: 'social', title: 'Social', text: 'Like and comment on your friends’ rides, badges and trails, and post ride reports with a photo. Your location never goes in a post.', alt: 'The Social screen with posts from riders, likes and comments' },
-  { shot: 'badges', title: 'Badges and Ranks', text: 'Earn Bronze, Silver and Gold from real GPS tracks and climb from Rookie to Legend. Look for the Founder and Brand Ambassador badges.', alt: 'The Badges screen with the OnMyLead Founder and Brand Ambassador badges and the rider’s rank, Veteran' },
-  { shot: 'themes', title: 'Light Mode and Themes', text: 'Dark, Light or Match Phone, four themes and Color Blind Mode, in 12 languages. Your settings follow you to every device.', alt: 'The Appearance screen in Light mode with the Night Navy, Carbon, Desert and Forest themes' },
+  { shot: 'bluetooth', title: 'Bluetooth Sharing', text: 'No service? Riders close by keep moving on your map and your taps and messages still get through, phone to phone. Pro, and EMERGENCY goes out on every plan.', alt: 'Ride Mode with no service: the banner says No Service. Sharing With 3 Nearby Phones Over Bluetooth, over the group on the trail' },
+  { shot: 'siren', title: 'Emergency Siren', text: 'When a rider sends EMERGENCY or their Crash Alert goes out, every phone on the ride sounds a loud siren until you silence it.', alt: 'The full-screen Emergency Siren: SOS, EMERGENCY, Marcus needs help now, with Show Me Where and Silence Siren' },
+  { shot: 'map-settings', title: 'Map Settings and Your Dot', text: 'One button, top left on every riding map: map style, roads, trails and land, how the map follows you, and your own dot (Pro).', alt: 'The Map Settings sheet with Your Dot styles, Dot Size and the Following switches' },
+  { shot: '3d-terrain', title: '3D Terrain', text: 'Satellite on the real shape of the ridges and canyons, in Ride Mode and Map Mode. Save it for offline riding too.', alt: 'Map Mode in 3D Terrain: satellite over the hills around Moab, with trails and the rider’s dot' },
+  { shot: 'spread', title: 'Group Spread', text: 'A measuring line under the rider line shows how far the last rider is behind the leader, and the leader’s Trackline shows where they went.', alt: 'Ride Mode with ten riders strung out along the trail and the group spread, 5.9 miles, under the rider line' },
+  { shot: 'leaderboard', title: 'Badge Leaderboard', text: 'See where you rank in your state, your country or everywhere, by the badges you earned riding. Only ever your state, never where you are.', alt: 'The Leaderboard: your place, 5th of 214 in the United States, and the top riders with their badge levels' },
+  { shot: 'group-photo', title: 'Group Photos', text: 'Give your riding group a photo of the crew. Everyone sees it; adding one is Pro.', alt: 'The Saturday Crew riding group page with a photo of the crew on the dunes' },
 ];
 
 function NewIn2() {
   return (
     <section id="new" className="new2" aria-labelledby="new-title">
       <div className="new2-inner">
-        <h2 id="new-title" className="section-title">New in OnMyLead 2.0</h2>
-        <p className="section-lede">The biggest update yet, on iPhone, iPad and Android.</p>
+        <h2 id="new-title" className="section-title">New in OnMyLead 2.1</h2>
+        <p className="section-lede">Your group keeps talking where the signal ends, on iPhone, iPad and Android.</p>
         <ul className="new2-grid">
           {NEW_IN_2.map((f) => (
             <li key={f.shot} className="new2-card">
@@ -1164,7 +1165,7 @@ const CSS = `
 .film-btn:hover { background: rgba(10, 22, 38, 0.82); border-color: rgba(241, 244, 248, 0.55); }
 .film-btn[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); }
 
-/* New in 2.0 */
+/* New in 2.1 */
 .new2 { padding: 120px 0 20px; }
 .new2-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); }
 .new2-grid { list-style: none; margin: 56px 0 0; padding: 0; display: grid; gap: 44px 28px;

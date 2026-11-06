@@ -5,7 +5,6 @@ category: safety-privacy
 order: 51
 release: "2.1"
 updated: 2026-11-06
-review: "Android with OnMyLead open: does the in-app siren (expo-audio) play on the media stream, so it follows media volume? If so, say so under With OnMyLead Open."
 sources:
   - app/src/core/siren.ts
   - app/src/lib/siren.ts
@@ -35,6 +34,8 @@ When another rider on your ride sends **EMERGENCY**, your phone sounds a loud si
 ## With OnMyLead Open
 
 The siren takes over the whole screen, on any screen in the app, and it says who needs help. Your phone buzzes with it, it plays even with the ring/silent switch on silent, and any music you're playing turns down under it.
+
+On Android, with OnMyLead open, the siren plays at your phone's media volume, so keep media volume up on a ride.
 
 - Tap **Show Me Where** to silence it and open Ride Mode with their location, so you can tap **Navigate** to them.
 - Tap **Silence Siren** to silence it and stay where you are.

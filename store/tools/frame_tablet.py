@@ -25,14 +25,14 @@ EDGE = (40, 56, 80)
 
 CAPTIONS = {
     '01': 'Everyone on One Live Map',
-    '02': 'Join a Ride in Seconds',
-    '03': 'Map Mode for Any Trail',
-    '04': 'Tilt Meter and Crash Alert',
-    '05': 'Rallies, Runs and Ride Weekends',
-    '06': 'Share the Ride With Friends',
-    '07': 'Earn Badges as You Ride',
+    '02': 'No Service? Share Over Bluetooth',
+    '03': 'A Loud Siren When a Rider Needs Help',
+    '04': 'Every Map Setting One Tap Away',
+    '05': 'Join a Ride in Seconds',
+    '06': 'Map Mode for Any Trail',
+    '07': 'Climb the Badge Leaderboard',
     '08': 'Routes That Follow the Trail',
-    '09': 'Themes and Light Mode',
+    '09': 'Tilt Meter and Crash Alert',
     '10': 'Save Maps for Places With No Signal',
 }
 
