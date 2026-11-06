@@ -268,6 +268,13 @@ function update() {
   }
 }
 
+// Website: a browser that refused to play before the first click gets another try on each click.
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  document.addEventListener('pointerdown', () => {
+    if (!sounding && calls.length) update();
+  });
+}
+
 // The countdown came or went: the siren stops for it, and sounds again after.
 onUrgentChange(() => update());
 

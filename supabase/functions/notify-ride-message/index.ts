@@ -192,7 +192,7 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
         // Milliseconds count only when both times have them (tapOrder in core/siren).
         const exact = t % 1000 !== 0 && tapped % 1000 !== 0;
         const s2 = Math.floor(t / 1000);
-        if (exact ? t > tapped : s2 > sec || (s2 === sec && r.status !== 'emergency')) late = true;
+        if (exact ? t > tapped || (t === tapped && r.status !== 'emergency') : s2 > sec || (s2 === sec && r.status !== 'emergency')) late = true;
       }
     }
     return rows.map((r) =>
