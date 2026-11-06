@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/components/rider-puck.tsx
   - app/src/components/own-puck.tsx
@@ -147,7 +147,7 @@ While you're moving, your own dot has the same white arrow as everyone else's, p
 :::
 
 :::release 2.1
-From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step once, and after that it slides to keep you on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in the **You** tab turns that off). See [Follow Me on the Map](/help/follow-me).
+From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step, and the next time it centers on your dot and moves with you so you're always on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in the **You** tab turns that off). See [Follow Me on the Map](/help/follow-me).
 :::
 
 ### The Bottom Panel

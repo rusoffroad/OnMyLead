@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, pick which roads, trails and land bo
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/hooks/use-dot-size.ts
   - app/src/components/trail-map-overlay.tsx
@@ -87,7 +87,7 @@ From 2.1 the stacked-layers button is the round **Map Settings** button, with a 
 - **Every Map Feature**: tap **Fine-Tune** to open the full list below, one row per kind of line or land.
 - **Leader Trackline**: for the leader and organizers in Ride Mode.
 - **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Red, White and Blue** (a glossy navy dome with a white arrow inside a red band and a white rim, the default; a white star when your phone can't tell which way you're facing), **Safety Orange** (an orange 3D dome with a white arrow and a silver rim), **Hi-Viz Dome** (lime with a black arrow), **Reflective Ring**, **Floating Arrowhead** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on the **You** tab. Picking a style or size other than Red, White and Blue at Medium is part of OnMyLead Pro; on Free the picker shows the **Pro** tag and your dot stays the default.
-- **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the map slides along with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
+- **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the next time the map centers on you and moves with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
 - **Map Buttons** (Ride Mode and Map Mode): **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available).
 - **Download This Ride's Map** (Ride Mode), **Offline Maps**, and who the map data comes from.
 
