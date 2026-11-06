@@ -77,6 +77,18 @@ describe('the list of calls', () => {
   });
 });
 
+describe('addCall merging', () => {
+  it('keeps the earliest tap time and gives the same list back when nothing changed', () => {
+    const push = { id: 'sos', rideId: 'r1', userId: 'u1', at: NOW };
+    const list = addCall([], push);
+    expect(addCall(list, push)).toBe(list);
+    // Ride Mode then hears the same tap with its real time: that becomes what ends it.
+    const merged = addCall(list, { ...push, at: NOW - 60_000 });
+    expect(merged[0].tappedAt).toBe(NOW - 60_000);
+    expect(endedCalls(merged, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW - 30_000 } })).toEqual(['sos']);
+  });
+});
+
 describe('isNewerTap', () => {
   const t = (id: string, iso: string) => ({ id, tapped_at: iso });
   it('takes a different tap at the same time or later, never an older one or the same one again', () => {

@@ -31,7 +31,7 @@ import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-s
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
 import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
-import { carPlayState, parseCarPlayAction } from '@/core/carplay';
+import { carPlayActionAllowed, carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
@@ -429,7 +429,8 @@ export default function RideMode() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ride_members', filter: `ride_id=eq.${id}` }, () => refresh())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
         const s = payload.new as TappedStatus & { user_id: string };
-        setStatuses((prev) => ({ ...prev, [s.user_id]: s }));
+        // An older tap arriving late (uploaded after a newer one) changes nothing.
+        setStatuses((prev) => (isNewerTap(prev[s.user_id], s) ? { ...prev, [s.user_id]: s } : prev));
       })
       // A rider cancelled a tap: their status goes back to what it was before.
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
@@ -1100,9 +1101,7 @@ export default function RideMode() {
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
       const a = parseCarPlayAction(buttonId);
-      // EMERGENCY from the car always goes, even if Pro ran out while the car still showed the ride.
-      const emergency = a.type === 'emergency' || (a.type === 'status' && a.kind === 'emergency');
-      if (!emergency && !can(currentEntitlements(), 'carplay')) return;
+      if (!carPlayActionAllowed(a, can(currentEntitlements(), 'carplay'))) return;
       const act = carActions.current;
       if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
       else if (a.type === 'reply' && (QUICK_REPLIES as readonly string[]).includes(a.body)) act.quickReply(a.body as QuickReply);

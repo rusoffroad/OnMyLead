@@ -67,6 +67,17 @@ describe('CarPlay on Free', () => {
   });
 });
 
+describe('CarPlay on Free', () => {
+  it('lets EMERGENCY through without Pro, nothing else', async () => {
+    const { carPlayActionAllowed } = await import('../carplay');
+    expect(carPlayActionAllowed({ type: 'emergency' }, false)).toBe(true);
+    expect(carPlayActionAllowed({ type: 'status', kind: 'emergency' }, false)).toBe(true);
+    expect(carPlayActionAllowed({ type: 'status', kind: 'ok' }, false)).toBe(false);
+    expect(carPlayActionAllowed({ type: 'regroup' }, false)).toBe(false);
+    expect(carPlayActionAllowed({ type: 'regroup' }, true)).toBe(true);
+  });
+});
+
 describe('Bluetooth on Free (relay only)', () => {
   it('still sends and shows status taps (so I\'m OK always ends an EMERGENCY), not spots or messages', async () => {
     const { nearbyFreeAllows } = await import('../nearby');

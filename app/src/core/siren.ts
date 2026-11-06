@@ -73,12 +73,24 @@ export function shouldSound(
  */
 export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): EmergencyCall[] {
   if (calls.some((x) => x.id === c.id)) {
-    // Fill in what the first copy didn't know (a name, the crash flag).
-    return calls.map((x) =>
-      x.id === c.id
-        ? { ...x, userId: isUnknownRider(x.userId) ? c.userId : x.userId, name: x.name || c.name, possibleCrash: x.possibleCrash || c.possibleCrash }
-        : x,
-    );
+    // Fill in what the first copy didn't know (the rider, a name, the crash flag, the earliest tap
+    // time: a push that came without one has only its arrival time). Unchanged: the same list back.
+    let changed = false;
+    const next = calls.map((x) => {
+      if (x.id !== c.id) return x;
+      const was = x.tappedAt ?? x.at;
+      const tapped = Math.min(was, c.tappedAt ?? c.at);
+      const merged: EmergencyCall = {
+        ...x,
+        userId: isUnknownRider(x.userId) ? c.userId : x.userId,
+        name: x.name || c.name,
+        possibleCrash: x.possibleCrash || c.possibleCrash,
+        tappedAt: tapped === was ? x.tappedAt : tapped,
+      };
+      changed = merged.userId !== x.userId || merged.name !== x.name || merged.possibleCrash !== x.possibleCrash || merged.tappedAt !== x.tappedAt;
+      return changed ? merged : x;
+    });
+    return changed ? next : (calls as EmergencyCall[]);
   }
   const rest = calls.filter((x) => !(x.rideId === c.rideId && x.userId === c.userId));
   return [c, ...rest].sort((a, b) => b.at - a.at);
@@ -99,12 +111,6 @@ export function dropCall(calls: readonly EmergencyCall[], id: string): Emergency
 }
 
 /**
- * Ride Mode knows each rider's latest status. A call is over once its rider has tapped something
- * newer (I'm OK, Stopped...): these are the ids to drop. A status that is older than the call (the
- * push got here before Ride Mode heard the tap) ends nothing. A cancelled tap is dropped by its id
- * instead (dropCall), since the status shown then is the older one again.
- */
-/**
  * Whether a status tap that reached this phone is newer than the one already known for that rider
  * (a different tap, tapped at the same time or later). An older one relayed late changes nothing.
  */
@@ -113,6 +119,12 @@ export function isNewerTap(known: { id?: string | null; tapped_at: string } | un
   return known.id !== incoming.id && Date.parse(known.tapped_at) <= Date.parse(incoming.tapped_at);
 }
 
+/**
+ * Ride Mode knows each rider's latest status. A call is over once its rider has tapped something
+ * newer (I'm OK, Stopped...): these are the ids to drop. A status that is older than the call (the
+ * push got here before Ride Mode heard the tap) ends nothing. A cancelled tap is dropped by its id
+ * instead (dropCall), since the status shown then is the older one again.
+ */
 export function endedCalls(
   calls: readonly EmergencyCall[],
   rideId: string,

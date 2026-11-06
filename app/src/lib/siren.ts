@@ -17,7 +17,7 @@ import { onSyncedChange, setSyncedItem } from './settings-sync';
  */
 
 const SILENCED_KEY = 'alerts.sirenSilenced.v1';
-/** On iPhone and iPad, give a notification tap a moment to silence its call before sounding. */
+/** Coming back to the app, give a notification tap a moment to silence its call before sounding. */
 const RESUME_DELAY_MS = 700;
 
 let enabled = true;
@@ -124,6 +124,7 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt: e.tappedAt, name: e.name, possibleCrash: e.possibleCrash };
     const isNew = !calls.some((c) => c.id === call.id);
     const next = addCall(calls, call);
+    if (next === calls) return;
     // Another call from the same rider replaces the older one: that one needs no silencing.
     const replaced = calls.filter((c) => !next.some((n) => n.id === c.id)).map((c) => c.id);
     if (replaced.length) remember(replaced);
@@ -199,7 +200,7 @@ function update() {
 AppState.addEventListener('change', (s) => {
   if (resume) clearTimeout(resume);
   resume = null;
-  if (s === 'active') resume = setTimeout(update, Platform.OS === 'ios' ? RESUME_DELAY_MS : 0);
+  if (s === 'active') resume = setTimeout(update, RESUME_DELAY_MS);
   else update();
 });
 
