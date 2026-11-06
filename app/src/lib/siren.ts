@@ -127,7 +127,11 @@ export type IncomingEmergency = {
 export async function sirenWillSound(e: IncomingEmergency, me: string | null): Promise<boolean> {
   await loadSiren();
   const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
-  return Number.isFinite(at) && shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() });
+  if (!Number.isFinite(at) || !shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() })) return false;
+  // Already sounding, or would join the list (not an older call from a rider with a newer one).
+  if (calls.some((c) => c.id === e.id)) return true;
+  const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt: e.tappedAt, name: e.name, possibleCrash: e.possibleCrash };
+  return addCall(calls, call) !== calls;
 }
 
 /** A status reached this phone. Starts the siren when it is another rider's fresh EMERGENCY. */

@@ -153,7 +153,8 @@ export function endedCalls(
       const s = latest[c.userId];
       if (!s?.id) return false;
       if (s.id === c.id) return s.status !== 'emergency';
-      return s.at > (c.tappedAt ?? c.at);
+      // Whole seconds, the way isNewerTap counts (Bluetooth carries tap times to the second).
+      return Math.floor(s.at / 1000) >= Math.floor((c.tappedAt ?? c.at) / 1000);
     })
     .map((c) => c.id);
 }

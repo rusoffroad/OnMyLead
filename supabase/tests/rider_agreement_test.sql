@@ -36,7 +36,7 @@ do $$
 declare v jsonb; t text := (select body from rider_agreements where version = 1); n int;
 begin
   if (my_rider_agreement() ->> 'version') is not null then raise exception 'FAIL: Ada agreed before agreeing'; end if;
-  if (my_rider_agreement() ->> 'current')::int <> 1 then raise exception 'FAIL: current version'; end if;
+  if (my_rider_agreement() ->> 'current')::int <> 2 then raise exception 'FAIL: current version'; end if;
   v := accept_rider_agreement(1, t, now() - interval '5 seconds', false, 'ios', '2.0', '8', 'iPhone 16 Pro', '27.0', 'en-US');
   if (v ->> 'matches')::boolean is not true then raise exception 'FAIL: published text should match %', v; end if;
   perform accept_rider_agreement(1, t);
@@ -138,7 +138,7 @@ do $$
 declare v jsonb; e jsonb;
 begin
   v := admin_rider_agreements();
-  if (v ->> 'total')::int <> 3 or (v ->> 'current_version')::int <> 1 then raise exception 'FAIL: admin list %', v; end if;
+  if (v ->> 'total')::int <> 3 or (v ->> 'current_version')::int <> 2 then raise exception 'FAIL: admin list %', v; end if;
   if (select count(*) from jsonb_array_elements(v -> 'rows') r where (r ->> 'account_deleted')::boolean) <> 1 then
     raise exception 'FAIL: deleted account not marked';
   end if;

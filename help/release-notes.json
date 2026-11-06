@@ -143,7 +143,7 @@
         "kind": "new",
         "text": "Group Photos: the rider who made a riding group can take or choose a photo for it, change it or remove it, from Group Photo on the group page. It shows wide at the top of the group page (tap it to see it full size), next to the group's name on Riding Groups, on the Your Group card on Home and under Invite a Group on a ride, and at the top of the group's invite link, on the website too. Groups without one show their initials. On Android you frame it on the crop screen; on iPhone, iPad and the website the middle of the photo is used."
       },
-      {
+      {"kind": "improved", "text": "Always call 911 in an emergency: the Rider Safety and Liability Agreement (version 2) now says plainly that EMERGENCY, Crash Alert, Need Help and the Emergency Siren only alert riders on your ride and never call 911 or a rescue service. After you update, the Before You Ride screen shows once more so you can read it and tap I Agree."}, {
         "kind": "new",
         "text": "See which version you have: the very bottom of Home shows it with the build number, like Version 2.1 (10), and it shows on the logo screen for a moment when the app opens."
       }
