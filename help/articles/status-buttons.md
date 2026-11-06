@@ -4,7 +4,7 @@ summary: Tell the whole group what's happening with one tap, see who got it, and
 category: ride-mode
 order: 20
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/components/ride-controls.tsx
   - app/src/app/ride/[id]/live.tsx
@@ -104,6 +104,10 @@ The statuses:
 - **EMERGENCY**
 
 **Need Help** sends right away and shows in red for the group. **EMERGENCY** asks you to confirm first. See [Emergencies and Safety](/help/emergency-and-safety).
+
+:::release 2.1
+An EMERGENCY also sounds a siren on every other rider's phone until they silence it. See [Hear the Emergency Siren](/help/emergency-siren).
+:::
 
 :::release 1.0.3
 In [Full Map](/help/ride-mode), the quick replies and status buttons are tucked away and only **EMERGENCY** stays on screen.

@@ -1,4 +1,427 @@
 [
+  {"date": "2026-11-06", "slugs": ["language", "offline-maps", "park-trails", "route-builder"], "kind": "review", "by": "pr", "ref": "edge-follow", "why": "Re-dated only: the Zoom Out at the Edge description in Map Settings (and its translations) changed to say the map centers and follows the next time. Nothing in these guides' steps changed."},
+  {"date": "2026-11-06", "slugs": ["3d-terrain", "bluetooth-sharing", "carplay", "directions", "emergency-and-safety", "fuel-range", "full-map", "leader-trackline", "location-sharing", "ride-bubble", "ride-chat", "status-buttons", "troubleshooting", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "review", "by": "pr", "ref": "edge-follow", "why": "Re-dated only: Ride Mode's screen now hands its own GPS fix to the map for Follow Me. Nothing riders see in these guides changed."},
+  {
+    "date": "2026-11-06",
+    "slugs": ["follow-me", "ride-mode", "navigation-mode", "map-layers"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "edge-follow",
+    "why": "2.1 (Chris): when your dot gets within about 10% of an edge, the map zooms out one step the first time, and the next time centers on your dot and keeps following it so it's always on screen (it used to slide only at the edge, with the dot behind the middle). Ride Mode's map also follows Ride Mode's own GPS when the map's location feed goes quiet. The guides describe the new behavior."
+  },
+  {"date": "2026-11-06", "slugs": ["home-screen", "faq"], "kind": "update", "by": "pr", "ref": "app-version", "why": "2.1 (Chris): the app version and build number, like Version 2.1 (10), now show at the very bottom of Home and at the bottom of the logo screen when the app opens. Your Home Screen gets a Your App Version section and the FAQ answers Which Version of OnMyLead Do I Have?"},
+  {"date": "2026-11-06", "slugs": ["carplay", "create-a-ride", "edit-cancel-or-delete-a-ride", "find-a-ride", "free-vs-pro", "getting-started", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "notifications-inbox", "promo-codes", "ride-name-and-profile", "ride-summary-and-ride-again", "use-onmylead-on-a-tablet"], "kind": "review", "by": "pr", "ref": "app-version", "why": "Re-dated only: the version line touched the home screen, the app's root layout and the translations these guides list. Their steps are unchanged."},
+  {
+    "date": "2026-11-05",
+    "slugs": ["map-layers"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "land-zoom",
+    "why": "Land boundaries (2.1) now wait until the map is about one county across and fade in, instead of covering whole states in orange and green when zoomed out. New hint Zoom In to See Land Boundaries. The guide says when land shows."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["troubleshooting"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "land-zoom",
+    "why": "New 2.1 entry: I Turned On Land but See No Boundaries (zoom in to about 60 miles across; Zoom In to See Land Boundaries)."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["3d-terrain", "full-map", "language", "leader-trackline", "offline-maps", "park-trails", "route-builder"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "land-zoom",
+    "why": "The land zoom change touched shared map code these guides list (Mapbox maps, the map overlay, useTrailMap, translations). Checked: nothing riders see in these guides changed."
+  },
+  {"date": "2026-11-05", "slugs": ["riding-groups", "bluetooth-sharing", "free-vs-pro", "faq", "ride-mode", "troubleshooting", "emergency-siren", "location-sharing", "emergency-and-safety"], "kind": "update", "by": "pr", "ref": "pro-bluetooth-dot-photos", "why": "Adding a group photo is Pro (seeing and removing stay free). Bluetooth Sharing on Free: phones still pass everything along and still send and hear EMERGENCY, Need Help and Crash Alerts over Bluetooth; seeing riders' spots and sending your spot, other taps and messages over Bluetooth are Pro. The guides say so."},
+  {"date": "2026-11-05", "slugs": ["troubleshooting", "emergency-and-safety", "location-sharing", "follow-me"], "kind": "update", "by": "pr", "ref": "pro-bluetooth-dot-photos", "why": "2.1: Bluetooth Sharing is Pro, so the troubleshooting, safety and location guides say nearby riders need it on with Pro or the trial; Follow Me notes that picking another Dot Style is Pro."},
+  {"date": "2026-11-05", "slugs": ["3d-terrain", "badges-and-ranks", "contact-support", "create-a-ride-on-the-website", "create-a-ride", "delete-account", "directions", "fuel-range", "full-map", "garage", "getting-started", "import-gpx", "language", "leader-trackline", "manage-subscription", "notification-settings", "offline-maps", "park-trails", "profile-picture", "promo-codes", "refer-a-friend", "report-and-block", "ride-bubble", "ride-chat", "ride-name-and-profile", "ride-polls", "ride-summary-and-ride-again", "route-builder", "sign-in", "starlink", "status-buttons", "subscribe-to-pro", "sync-across-devices", "trip-planner", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "review", "by": "pr", "ref": "pro-bluetooth-dot-photos", "why": "Re-dated only: shared Pro, Ride Mode, You tab, Map Settings and site code changed for the 2.1 Pro features (Bluetooth Sharing, CarPlay, Your Dot, group photos) and the trial notice on Home. These guides' steps are unchanged; Free vs Pro and the Pro Trial guide carry the details."},
+  {"date": "2026-11-05", "slugs": ["free-vs-pro", "bluetooth-sharing", "carplay", "pro-trial", "map-layers", "ride-mode", "faq", "emergency-siren"], "kind": "update", "by": "pr", "ref": "pro-bluetooth-dot-photos", "why": "2.1 (Chris): Bluetooth Sharing with no service, CarPlay, customizing Your Dot and adding group photos are Pro. Free vs Pro gets the 2.1 table and what each new Pro feature does; Bluetooth Sharing, CarPlay, Map Settings, Ride Mode, the FAQ and the siren guide say it's Pro and what Free sees; the Pro Trial guide explains the fresh 30-day trial every rider without Pro gets with 2.1 and the trial notice on Home."},
+  {
+    "date": "2026-11-05",
+    "slugs": ["home-screen", "invite-riders"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "group-photos",
+    "why": "Group Photos (2.1): the Your Group card on Home and Invite a Group now show the group's photo or initials; the guides say so."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["contact-support", "create-a-ride-on-the-website", "custom-codes", "follow-leaders", "getting-started", "group-chat", "language", "organizer-controls", "pro-trial", "profile-picture", "ride-name-and-profile", "subscribe-to-pro"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "group-photos",
+    "why": "Group Photos touched shared code these guides list (the group page, the invite card, admin rider page, site constants, translations). Checked: nothing riders see in these guides changed."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["riding-groups"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "group-photos",
+    "why": "New in 2.1: the rider who made a riding group can add, change or remove a group photo. The guide says where it shows (group page, Riding Groups, the Your Group card on Home, Invite a Group and the group link), how to add it on each device, and who can see it."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["ride-mode", "fuel-range"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "group-spread-ruler",
+    "why": "2.1: the Ride Mode leader line gets a measuring line from the leader to the tail gunner, with the distance to the rider furthest back in the middle and ticks every round step (Chris: show the distance between the leader and the person in back to set a sense of scale). The big miles-done header above the line is gone and the line about your place is centered, so the guide says so. Fuel Range: the range line still sits under the leader line, now centered; no change to how it works."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["contact-support", "create-a-ride-on-the-website", "getting-started", "pro-trial", "subscribe-to-pro"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "group-spread-ruler",
+    "why": "Re-dated only: the onmylead.com homepage's Ride Mode card gets a line about the group spread ruler once 2.1 is live. Contact, prices, the Pro Trial and creating a ride on the website are unchanged."
+  },
+  {"date": "2026-11-05", "slugs": ["map-layers", "full-map", "3d-terrain", "ride-mode", "navigation-mode", "follow-me"], "kind": "update", "by": "pr", "ref": "map-corner-flag-dot", "why": "2.1 build 10 (Chris): the Map Settings button moved to the top-left corner of every riding map, level with the compass on the right, and both sit just under the top bar while it shows so they can always be seen; they stay on screen in Full Map now. Map Mode is listed as a place to find it. New Dot Style Red, White and Blue is the default for your own dot; Safety Orange and the rest are still in Map Settings."},
+  {"date": "2026-11-05", "slugs": ["bluetooth-sharing", "carplay", "create-a-ride-on-the-website", "getting-started", "directions", "emergency-and-safety", "fuel-range", "import-gpx", "language", "leader-trackline", "location-sharing", "offline-maps", "park-trails", "place-search", "ride-bubble", "ride-chat", "route-builder", "status-buttons", "troubleshooting", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "review", "by": "pr", "ref": "map-corner-flag-dot", "why": "Re-dated only: their screens moved the Map Settings button and compass (map-layers says where), got the new Dot Style's name in every language, or sit beside the onmylead.com showcase, which now mentions both. Nothing these guides describe changed."},
+  {
+    "date": "2026-11-05",
+    "slugs": ["carplay", "contact-support", "create-a-ride-on-the-website", "directions", "faq", "follow-me", "fuel-range", "full-map", "garage", "getting-started", "language", "location-sharing", "pro-trial", "profile-picture", "promo-codes", "ride-bubble", "ride-chat", "ride-mode", "subscribe-to-pro", "sync-across-devices", "troubleshooting", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops", "bluetooth-sharing", "status-buttons"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "emergency-siren",
+    "why": "Reviewed for the Emergency Siren (2.1). Bluetooth Sharing and Send a Status now say an EMERGENCY sounds the siren (2.1 blocks). The rest share Ride Mode, push, translations or settings code that changed only to add the siren and its switch; what they describe reads the same."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["emergency-siren", "emergency-and-safety", "notification-settings"],
+    "kind": "new",
+    "by": "pr",
+    "ref": "emergency-siren",
+    "why": "New in 2.1 build 10 (Chris asked during the 2.1 Bluetooth test and wanted it in before submitting): an EMERGENCY or a Crash Alert from a rider sounds a loud siren on the other riders' phones until they silence it, with the app open, from the push with it closed, and over Bluetooth with no service. New guide Hear the Emergency Siren; the emergency and notification guides mention it and the Emergency Siren switch."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["contact-support", "create-a-ride-on-the-website", "getting-started", "pro-trial", "subscribe-to-pro"],
+    "kind": "review",
+    "by": "pr",
+    "ref": "promote-bluetooth-sharing",
+    "why": "Re-dated only: the onmylead.com homepage gets a No Service section for Bluetooth Sharing once 2.1 is live. Contact, prices, the Pro Trial and creating a ride on the website are unchanged."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["faq", "bluetooth-sharing"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "promote-bluetooth-sharing",
+    "why": "2.1 launch: the FAQ's \"Does Live Tracking Work With No Cell Service?\" answers yes for nearby riders from 2.1 (Bluetooth Sharing) and links the Bluetooth Sharing guide; the old answer stays until 2.1 is live. Bluetooth Sharing now leads the 2.1 release notes and What's New, and onmylead.com gets a No Service section once 2.1 is live."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["tilt-and-crash-alert"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-84-86",
+    "why": "2.1 test passes 84-86: on iPhone and iPad the Crash Alert countdown's 30 seconds now start once it is on screen (it can wait a moment for an open sheet to step aside), so a rider gets the whole window to tap I'm OK; the guide says so. Sheets no longer turn a landscape iPhone back to portrait."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["tilt-and-crash-alert"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-81-83",
+    "why": "2.1 test passes 81-83: an open sheet now steps aside (hidden, not closed) while the Crash Alert countdown is up, on every device, so nothing can cover I'm OK and the sheet comes back afterwards; the guide now says so."
+  },
+  {"date": "2026-11-05", "slugs": ["approvals-and-waitlist", "badges-and-ranks", "bluetooth-sharing", "carplay", "directions", "emergency-and-safety", "faq", "follow-me", "fuel-range", "invite-riders", "music-controls", "navigation-mode", "profile-picture", "qr-codes", "report-and-block", "ride-chat", "ride-mode", "social", "subscribe-to-pro", "tilt-and-crash-alert"], "kind": "fix", "by": "pr", "ref": "release-test-pass-80", "why": "2.1 test pass 80: on iPhone and iPad an open sheet or pop-up (Status, Music, Rider List, messages and the rest) could keep the Crash Alert countdown from showing; every sheet now steps aside so the countdown fills the screen. Map Mode starts the compass right after Allow. The Ride Mode and Navigate guides and the 2.1 release notes no longer call your dot cyan (it's Safety Orange unless you pick another Dot Style), and Follow Me says which maps show a round centre with no compass. Other guides only re-dated: their screens' sheets changed underneath, nothing riders do changed."},
+  {
+    "date": "2026-11-05",
+    "slugs": ["tilt-and-crash-alert", "map-layers", "follow-me"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-79",
+    "why": "2.1 test pass 79: on iPhone and iPad the Crash Alert countdown couldn't show while Map Settings was open (two sheets can't be up at once); Map Settings now closes so the countdown fills the screen. Pausing Follow Me also stops a camera move that was still on its way. Map Layers' Map Settings list no longer breaks in two."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["ride-mode", "navigation-mode", "leader-sweep-and-tail-gunner", "full-map", "follow-me"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-78",
+    "why": "2.1 test pass 78: guides that still said \"layers button\" now name the round Map Settings button for 2.1 (the old wording stays until 2.1 is out), the leader turns the trackline off in Map Settings, and Follow Me says Zoom In at Intersections can be turned off in Map Settings too."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["follow-me", "privacy", "ride-bubble", "waypoints-and-planned-stops"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-57-77",
+    "why": "2.1 test passes 57-77: your dot takes its stopped look as soon as the phone reports you've stopped, or after a quiet spell with no new location (about 8 seconds; in Ride Mode on Android's basic map about 25 seconds with Balanced and 37 with Max Battery Saver, so it never flips between updates), the same on every map (apps with or without Mapbox, and both website maps); the compass starts right after Allow even while the app is already checking; and a meeting-point pin on the website lands at its newest spot when the map finishes loading. Follow Me's Your Dot section now says when the stopped look starts."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["privacy", "status-buttons", "follow-me"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-pass-56",
+    "why": "2.1 test pass 56: the quick status buttons in Ride Mode now show and read out in the rider's language, your dot goes back to its stopped look after you stop (timing in the passes 57+ entry), and map pins skip spots that aren't real coordinates. No steps changed."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["accurate-location", "battery-saver", "create-a-ride", "location-sharing", "map-layers", "park-trails", "ride-mode", "troubleshooting"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-2.1-create-ride-crash",
+    "why": "2.1 test build: opening Create a Ride crashed on iPhone when the phone sent a location update with no position yet. Every map now skips spots that aren't real coordinates. Closed park trails draw dashed on Android too. Allowing location starts the compass right away. Riders see no other change in these articles."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["3d-terrain", "create-a-ride", "edit-cancel-or-delete-a-ride", "find-a-ride", "follow-me", "free-vs-pro", "full-map", "getting-started", "home-screen", "import-gpx", "join-a-ride", "language", "leader-sweep-and-tail-gunner", "leader-trackline", "map-layers", "navigation-mode", "notifications-inbox", "offline-maps", "park-trails", "ride-name-and-profile", "ride-summary-and-ride-again", "route-builder", "trip-planner", "use-onmylead-on-a-tablet"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-50",
+    "why": "2.1 release test, passes 49 and 50. Steps that said to tap the layers button now say Map Settings (and Fine-Tune for the Park Trails row). Dragging the map always pauses Follow Me, your dot shows no arrow on a stopped device with no compass reading, Zoom Out at the Edge stays off on every map once turned off, and the Map Settings button's dot shows only after a real change; other listed articles describe the same screens and read the same."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": ["follow-me"],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-49",
+    "why": "2.1 release test, pass 49. Your dot shows no arrow when a stopped device has no compass reading; dragging the map now always pauses Follow Me; Zoom Out at the Edge stays off on every map once turned off; the Map Settings button's dot only shows after a real change."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "map-layers",
+      "sync-across-devices"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings-dot-size",
+    "why": "2.1: Map Settings gains Your Dot: Dot Style (Safety Orange by default, Hi-Viz Dome, Reflective Ring, Floating Arrowhead or Classic) and Dot Size (Small, Medium, Large) for your own dot on Ride Mode and Map Mode, also on the You tab and synced with your account."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "map-layers",
+      "3d-terrain",
+      "follow-me",
+      "leader-trackline",
+      "music-controls",
+      "ride-mode",
+      "tilt-and-crash-alert"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings-following",
+    "why": "2.1: the map's settings button is now called Map Settings, with a two-slider icon. Map Settings gains a Following section (Follow Me, the new Zoom Out at the Edge switch, Zoom In at Intersections), Zoom Out at the Edge is also on the You tab, and your own dot is half again as big."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "badges-and-ranks",
+      "bluetooth-sharing",
+      "contact-support",
+      "create-a-ride-on-the-website",
+      "delete-account",
+      "directions",
+      "faq",
+      "full-map",
+      "garage",
+      "getting-started",
+      "language",
+      "location-sharing",
+      "manage-subscription",
+      "navigation-mode",
+      "notification-settings",
+      "offline-maps",
+      "park-trails",
+      "profile-picture",
+      "refer-a-friend",
+      "report-and-block",
+      "ride-name-and-profile",
+      "route-builder",
+      "sign-in",
+      "starlink",
+      "sync-across-devices",
+      "trip-planner",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings-following-shared",
+    "why": "2.1: these guides share code with the change above (the You tab gained the Zoom Out at the Edge switch, the website's feature list mentions it, and the map code and translations changed). sync-across-devices lists Zoom Out at the Edge among the settings that follow your account; riders see no other difference in these guides."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "badge-leaderboard",
+      "badges-and-ranks",
+      "create-a-ride",
+      "edit-cancel-or-delete-a-ride",
+      "events",
+      "find-a-ride",
+      "free-vs-pro",
+      "fuel-range",
+      "full-map",
+      "getting-started",
+      "home-screen",
+      "import-gpx",
+      "join-a-ride",
+      "language",
+      "leader-sweep-and-tail-gunner",
+      "notifications-inbox",
+      "ride-mode",
+      "ride-name-and-profile",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "status-buttons",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-2.1-spanish-check",
+    "why": "2.1 phone check in Spanish: Leaderboard places, the Ride Mode line, the badge rank ladder, quick replies and Home counts now show in the rider's language."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "map-layers",
+      "3d-terrain",
+      "ride-mode",
+      "leader-trackline",
+      "follow-me",
+      "music-controls",
+      "tilt-and-crash-alert"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings",
+    "why": "2.1: the Layers button now opens Map Settings, one sheet with the map style (3D Terrain moved here from the round 3D button, which is gone), four big switches for Streets and Roads, Off-Road Trails, Hiking Trails and Land Boundaries, every Map Feature, and the switches for Follow Me, Zoom In at Intersections, Tilt Meter and the Music button."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "full-map",
+      "language",
+      "location-sharing",
+      "navigation-mode",
+      "offline-maps",
+      "park-trails",
+      "ride-bubble",
+      "ride-chat",
+      "route-builder",
+      "status-buttons",
+      "troubleshooting",
+      "use-onmylead-on-a-tablet",
+      "waypoints-and-planned-stops",
+      "bluetooth-sharing",
+      "carplay",
+      "directions",
+      "emergency-and-safety",
+      "fuel-range"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-lag",
+    "why": "2.1: the map no longer stutters while you ride. Your own dot is drawn by the map itself again, so it glides in step with the map, and the intersection lookup asks the map for road and trail lines only. These articles describe screens that share the changed map code; riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "create-a-ride-on-the-website",
+      "getting-started"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "map-settings-showcase",
+    "why": "The website's feature list gains Map Settings and points 3D Terrain to it; it shows once 2.1 is in the stores. These guides are re-dated because they share the homepage code; nothing in them changed."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "import-gpx",
+      "manage-subscription",
+      "offline-maps",
+      "pro-trial",
+      "ride-summary-and-ride-again",
+      "route-builder",
+      "trip-planner"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-23",
+    "why": "2.1 release test, pass 23. The Pro prompt now shows every feature's title and description in the rider's language; the wording in English is unchanged."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "carplay",
+      "directions",
+      "follow-me",
+      "fuel-range",
+      "full-map",
+      "location-sharing",
+      "notification-settings",
+      "out-riding",
+      "ride-bubble",
+      "ride-mode",
+      "troubleshooting"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-5",
+    "why": "2.1 release test, passes 4 to 9. The Ride Mode articles are re-dated because the announcement banner in Ride Mode now shows the leader's words exactly as written; riders see no other difference. notification-settings is re-dated because the in-app message pop-up also shows rider text as written. out-riding is re-dated because direct messages and group chat also show rider text as written."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "bluetooth-sharing",
+      "navigation-mode",
+      "refer-a-friend",
+      "waypoints-and-planned-stops"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-2",
+    "why": "2.1 release test, whole-app pass 2. Ride Mode messages now go over Bluetooth whole in every language (bluetooth-sharing). A ride ending now checks only its own riders' referrals (refer-a-friend sources). navigation-mode and waypoints-and-planned-stops are re-dated because Map Mode waypoint backups now read every row past 1000; a waypoint shared again isn't announced again. Riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "bluetooth-sharing",
+      "create-a-ride",
+      "emergency-and-safety",
+      "free-vs-pro",
+      "group-chat",
+      "language",
+      "leader-sweep-and-tail-gunner",
+      "privacy",
+      "refer-a-friend",
+      "report-and-block",
+      "ride-chat",
+      "ride-polls",
+      "social",
+      "status-buttons",
+      "subscribe-to-pro",
+      "sync-across-devices"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "release-test-pass-1",
+    "why": "2.1 release test, whole-app pass 1. Only a ride that went live counts as a referred friend's first ride (refer-a-friend). Posts, comments and typed chat show exactly as written; only status buttons and built-in quick replies are translated (language, 2.1 block). The other articles are re-dated because they list code these fixes touched: Bluetooth uploads skip an item with a bad time instead of failing, reward and Free-plan dates show in the rider's language, and a hidden reply's writer isn't named. Riders see no other difference."
+  },
+  {
+    "date": "2026-11-05",
+    "slugs": [
+      "faq",
+      "garage",
+      "getting-started",
+      "profile-picture",
+      "use-onmylead-on-a-tablet"
+    ],
+    "kind": "update",
+    "by": "pr",
+    "ref": "version-2-1",
+    "why": "The app is now version 2.1 (iOS build 9, Android versionCode 9) for the 2.1 build. Its release notes are in help/release-notes.json; articles in :::release 2.1 blocks publish when Apple releases 2.1. These articles are logged because they list app.json as a source; the version number is the only change, so riders see no difference."
+  },
   {
     "date": "2026-11-05",
     "slugs": [

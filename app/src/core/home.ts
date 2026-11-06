@@ -52,12 +52,13 @@ export function parseRadius(raw: unknown): number {
 }
 
 /** "500 mi", or "Anywhere" for 0. */
-export const radiusLabel = (mi: number) => (mi === 0 ? tc('Anywhere') : `${mi.toLocaleString(coreLocale())} mi`);
+export const radiusLabel = (mi: number) => (mi === 0 ? tc('Anywhere') : tc('{n} mi', { n: mi.toLocaleString(coreLocale()) }));
 
 /** The count on Find a Ride: "12 Within 500 mi", "3 Anywhere", or null when there are none. */
 export function findCount(count: number, radiusMi: number): string | null {
   if (count <= 0) return null;
-  return radiusMi === 0 ? tc('{count} Coming Up', { count }) : `${count} Within ${radiusLabel(radiusMi)}`;
+  if (radiusMi !== 0) return tc('{n} Within {distance}', { n: count, distance: radiusLabel(radiusMi) });
+  return count === 1 ? tc('1 Coming Up') : tc('{count} Coming Up', { count });
 }
 
 /** The toolkit on the home screen: the tools that used to be lost in the You menu. */

@@ -240,7 +240,7 @@ export default function GroupChat() {
                         self ? styles.bubbleMine : styles.bubbleTheirs,
                         self ? { borderBottomRightRadius: lastInRun ? 6 : 18 } : { borderBottomLeftRadius: lastInRun ? 6 : 18 },
                       ]}>
-                      <Text style={[styles.body, self && { color: '#fff' }]}>{tr(m.body)}</Text>
+                      <Text style={[styles.body, self && { color: '#fff' }]}>{m.body}</Text>
                     </Pressable>
                     {menuOpen ? (
                       <View style={styles.menu}>
@@ -288,7 +288,7 @@ export default function GroupChat() {
               <View style={[styles.col, { alignItems: 'flex-end' }]}>
                 {p.rideId && rideById.get(p.rideId) ? <RideTicket ride={rideById.get(p.rideId)!} compact /> : null}
                 <View style={[styles.bubble, styles.bubbleMine, { borderBottomRightRadius: 6, opacity: p.state === 'sending' ? 0.6 : 1 }, p.state === 'failed' && styles.bubbleFailed]}>
-                  <Text style={[styles.body, { color: '#fff' }]}>{tr(p.body)}</Text>
+                  <Text style={[styles.body, { color: '#fff' }]}>{p.body}</Text>
                 </View>
                 <View style={styles.meta}>
                   <SendBadge state={p.state} />

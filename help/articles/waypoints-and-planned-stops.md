@@ -4,9 +4,10 @@ summary: Mark camp, fuel, water, a gate or a hazard on a ride's map, and let the
 category: routes-maps
 order: 30
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/ride/[id]/waypoints.tsx
+  - supabase/migrations/20261105060000_release_fixes_pass2.sql
   - app/src/app/r/[code].tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/waypoint-sheet.tsx
@@ -98,7 +99,7 @@ To change one later, tap it on the map, then tap **Edit** (name, symbol, note) o
 
 When the leader or an organizer shares a waypoint or a planned stop while the ride is live, everyone else on the ride gets a notification with a sound, like "Lou added a new waypoint: Fuel Stop". Tap it to open Ride Mode with that waypoint showing. It also goes into your [Notifications](/help/notifications-inbox).
 
-- It goes out once per waypoint: when it's added for everyone, or when a **Just Me** waypoint is switched to **Everyone on the Ride**. Editing it afterwards doesn't send another.
+- It goes out once per waypoint: when it's added for everyone, or when a **Just Me** waypoint is switched to **Everyone on the Ride**. Editing it afterwards, or switching it to **Just Me** and back, doesn't send another.
 - Waypoints set up before the ride starts don't send alerts. They're on the map when riders open Ride Mode.
 - New waypoint alerts follow the **Announcements** switch in [Notification Settings](/help/notification-settings) and your quiet hours.
 :::

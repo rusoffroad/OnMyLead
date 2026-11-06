@@ -9,6 +9,11 @@ import { isTransientError } from './errors';
  * riders can only send the canned quick replies below, never type.
  */
 
+/** One line, single spaces, trimmed: how Ride Mode messages and quick replies are compared and sent. */
+export function tidyRideMessage(raw: string): string {
+  return raw.replace(/\s+/g, ' ').trim();
+}
+
 export type MessageKind = 'chat' | 'announcement' | 'status';
 
 /**
@@ -38,6 +43,23 @@ export type ChatMessage = {
 export const MAX_MESSAGE_LENGTH = 500;
 /** Messages per minute per rider before the database asks them to slow down. */
 export const MESSAGES_PER_MINUTE = 10;
+
+/**
+ * The text to show for a chat message: the built-in one-tap replies are the app's own words, so
+ * they show in the reader's language; anything a rider typed (custom quick replies included) shows
+ * as typed.
+ */
+export function chatMessageText(m: Pick<ChatMessage, 'kind' | 'body'>, translate: (text: string) => string): string {
+  if (m.kind !== 'status') return m.body;
+  const builtIn = builtInReply(m.body);
+  return builtIn ? translate(builtIn) : m.body;
+}
+
+/** The built-in quick reply this text is (any case and spacing), if it is one. */
+export function builtInReply(body: string): QuickReply | undefined {
+  const said = tidyRideMessage(body).toLocaleLowerCase();
+  return QUICK_REPLIES.find((q) => q.toLocaleLowerCase() === said);
+}
 
 /** One-tap replies for Ride Mode. Sent as kind 'status' so the chat can show them differently. */
 export const QUICK_REPLIES = ['On My Way', 'Running Late', 'Need a Minute', 'All Good', 'Beverage Break'] as const;

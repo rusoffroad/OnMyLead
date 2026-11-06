@@ -12,6 +12,7 @@ import {
 import { loadNotificationSettings, saveNotificationSettings } from '@/lib/notification-settings';
 import { askPushPermission, openPhoneSettings, pushPermission, syncRideReminders, type PushPermission } from '@/lib/push';
 import { useSession } from '@/lib/session';
+import { playSirenSample, useSirenSetting } from '@/lib/siren';
 import { t as tr } from '@/lib/i18n';
 
 /** What a rider hears about, and when. Every change saves as soon as it's made. */
@@ -21,6 +22,7 @@ export default function NotificationsScreen() {
   const [switchedOn, setSwitchedOn] = useState<boolean | null>(null);
   const [permission, setPermission] = useState<PushPermission | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [siren, setSiren] = useSirenSetting();
 
   useEffect(() => {
     if (!loading && !session) router.replace('/sign-in');
@@ -115,6 +117,20 @@ export default function NotificationsScreen() {
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.rowTitle}>{tr('Help and EMERGENCY')}</Text>
           <Text style={styles.rowDetail}>{tr('When someone in your group taps Need help or EMERGENCY. Always on, even in quiet hours.')}</Text>
+        </View>
+      </View>
+
+      {/* Emergency Siren (lib/siren): this device's choice, so it works before the server update too. */}
+      <View style={styles.card}>
+        <ToggleRow
+          first
+          title={tr('Emergency Siren')}
+          detail={tr('A loud siren when someone in your group sends EMERGENCY or a crash alert. With OnMyLead open, it keeps going until you silence it.')}
+          value={siren}
+          onChange={setSiren}
+        />
+        <View style={[styles.row, styles.rowRule]}>
+          <Button title={tr('Play Siren')} kind="secondary" style={{ flex: 1 }} onPress={playSirenSample} accessibilityHint={tr('Plays the siren for three seconds')} />
         </View>
       </View>
 

@@ -3,9 +3,10 @@ import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react';
 import { FOLLOW_FRAME_START, followFrameAfter, followMove, leadInset } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { riderHeading, screenAngle } from '@/core/heading';
-import { JUNCTION_AHEAD_M, JUNCTION_ZOOM_START, junctionZoomStep, nextJunction } from '@/core/intersections';
+import { JUNCTION_AHEAD_M, JUNCTION_LOOK_EVERY_MS, JUNCTION_ZOOM_START, junctionZoomStep, nextJunction } from '@/core/intersections';
 import type { Inset } from '@/core/map-center';
 import { metersPerPointAt } from '@/core/terrain';
+import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import type { MapboxMapHandle } from './mapbox-map-types';
 
@@ -14,6 +15,20 @@ export type FollowFix = LatLng & { course?: number | null; speed?: number | null
 
 /** How long the zoom into and out of an intersection takes (ms). */
 const JUNCTION_ZOOM_MS = 900;
+/** A map lookup that takes longer than this is given up on for this fix (ms). */
+const MAP_CALL_MS = 500;
+/** A step running longer than this has hung; the next fix moves the camera anyway (ms). */
+const STEP_STUCK_MS = 2500;
+
+/** The answer, or `fallback` if the map hasn't answered in `ms` (a lookup never holds up the camera). */
+function within<T>(p: Promise<T> | undefined, ms: number, fallback: T): Promise<T> {
+  if (!p) return Promise.resolve(fallback);
+  return new Promise((resolve) => {
+    const t = setTimeout(() => resolve(fallback), ms);
+    p.then((v) => resolve(v), () => resolve(fallback)).finally(() => clearTimeout(t));
+  });
+}
+
 /** How long the one zoom out takes (ms). */
 const ZOOM_OUT_MS = 700;
 
@@ -28,20 +43,34 @@ const ZOOM_OUT_MS = 700;
 export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
   const [junctionsOn] = useIntersectionZoomPref();
   const on = useRef(junctionsOn);
+  const [edgeOn] = useEdgeZoomPref();
+  const edge = useRef(edgeOn);
   useEffect(() => {
     on.current = junctionsOn;
-  }, [junctionsOn]);
+    edge.current = edgeOn;
+  }, [junctionsOn, edgeOn]);
   const frame = useRef(FOLLOW_FRAME_START);
   const junction = useRef(JUNCTION_ZOOM_START);
   const busy = useRef(false);
+  const busySince = useRef(0);
+  const lookedAt = useRef(0);
+  // Each step's number: a step that hung and was overtaken mustn't move the camera or free the lock.
+  const stepGen = useRef(0);
 
   const start = useCallback((p: LatLng, inset: Inset, animated = true) => {
+    // A step still waiting on the map mustn't move the camera after this.
+    stepGen.current++;
+    busy.current = false;
     frame.current = FOLLOW_FRAME_START;
     junction.current = JUNCTION_ZOOM_START;
+    lookedAt.current = 0;
     map.current?.centerOn(p, inset, animated ? undefined : { animated: false });
   }, [map]);
 
   const stop = useCallback(() => {
+    // A step still waiting on the map (up to about a second) mustn't move the camera once paused.
+    stepGen.current++;
+    busy.current = false;
     frame.current = FOLLOW_FRAME_START;
     junction.current = JUNCTION_ZOOM_START;
   }, []);
@@ -49,8 +78,12 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
   /** Moves the map for this fix; false when a slower step is still running (the fix is skipped). */
   const step = useCallback(async (f: FollowFix, inset: Inset, durationMs: number): Promise<boolean> => {
     const m = map.current;
-    if (!m || busy.current) return false;
+    // A step still running skips this fix, unless it has hung (a map call that never answered):
+    // then the camera must not stay frozen, so this fix goes ahead.
+    if (!m || (busy.current && Date.now() - busySince.current < STEP_STUCK_MS)) return false;
     busy.current = true;
+    busySince.current = Date.now();
+    const gen = ++stepGen.current;
     try {
       const cam = m.camera();
       const size = { width: cam.width, height: cam.height };
@@ -61,9 +94,11 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       const j = junction.current;
       if (on.current || j.state === 'in') {
         let ahead: { at: LatLng; distM: number } | null = null;
-        if (j.state === 'idle' && heading != null) {
+        if (j.state === 'idle' && heading != null && Date.now() - lookedAt.current >= JUNCTION_LOOK_EVERY_MS) {
+          lookedAt.current = Date.now();
           const radius = Math.min(700, JUNCTION_AHEAD_M / Math.max(0.05, metersPerPointAt(f.lat, cam.zoom)));
-          ahead = nextJunction(f, heading, await m.roadsNear(f, radius));
+          ahead = nextJunction(f, heading, await within(m.roadsNear(f, radius), MAP_CALL_MS, []));
+          if (gen !== stepGen.current) return false;
         }
         const r = junctionZoomStep(j, { on: on.current, nowMs: Date.now(), zoom: cam.zoom, at: f, speedMps: f.speed ?? null, junction: ahead });
         junction.current = r.next;
@@ -74,15 +109,18 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       }
 
       // Keep the dot on screen: zoom out once, then move the map.
+      const pt = await within(m.project(f), MAP_CALL_MS, null);
+      if (gen !== stepGen.current) return false;
       const move = followMove(frame.current, {
-        pt: await m.project(f), size, inset, zoom: cam.zoom, screenHeadingDeg: screenHeading, noZoomOut: junction.current.state === 'in',
+        pt, size, inset, zoom: cam.zoom, screenHeadingDeg: screenHeading,
+        noZoomOut: junction.current.state === 'in' || !edge.current,
       });
       frame.current = followFrameAfter(frame.current, move);
       if (move.kind === 'zoom-out') m.zoomTo(move.zoom, ZOOM_OUT_MS);
       else if (move.kind === 'pan') m.centerOn(f, move.inset, { duration: durationMs });
       return true;
     } finally {
-      busy.current = false;
+      if (gen === stepGen.current) busy.current = false;
     }
   }, [map]);
 

@@ -3,9 +3,11 @@ import { Marker, type UserLocationChangeEvent } from 'react-native-maps';
 
 import { ownFix, screenAngle, type OwnFix } from '@/core/heading';
 import { useCompass } from '@/lib/compass';
+import { useOwnMoving } from '@/hooks/use-own-moving';
 import { MarkerBody } from './marker-body';
-import { OWN_PUCK_D } from './own-puck';
-import { puckBox, RiderPuck, YOU_INK } from './rider-puck';
+import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
+import { ownDotBox } from '@/core/own-dot-art';
+import { OwnDot } from './own-dot';
 
 import { t } from '@/lib/i18n';
 export type OwnLocation = {
@@ -51,18 +53,22 @@ export function useOwnLocation(onFix?: (f: OwnFix) => void): OwnLocation {
  * arrow built in as on the Mapbox maps, drawn over the dot the phone draws itself. The arrow always
  * shows: the GPS direction while moving, the compass when stopped, else the last direction.
  */
-export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHeading?: number | null }) {
+export function OwnHeadingMarker({ own, mapHeading, everyMs }: { own: OwnLocation; mapHeading?: number | null; /** The map's own update interval (ms), if it sets one. */ everyMs?: number }) {
   const [fix, setFix] = useState<OwnFix | null>(own.last.current);
   const [lastCourse, setLastCourse] = useState<number | null>(null);
+  const [moving, feed] = useOwnMoving(everyMs);
   useEffect(() => own.subscribe((f) => {
     setFix(f);
+    feed(f.headingDeg != null, f.atMs);
     if (f.headingDeg != null) setLastCourse(f.headingDeg);
-  }), [own]);
+  }), [own, feed]);
   const compass = useCompass();
+  const d = useOwnDotD();
+  const [style] = useDotStylePref();
   if (!fix) return null;
-  const moving = fix.headingDeg != null;
-  const deg = fix.headingDeg ?? (compass != null && compass >= 0 ? compass : lastCourse);
-  const box = puckBox(OWN_PUCK_D, true);
+  // The GPS direction only while you count as moving; stopped, the compass (or the last direction).
+  const deg = (moving ? fix.headingDeg : null) ?? (compass != null && compass >= 0 ? compass : lastCourse);
+  const box = ownDotBox(d);
   return (
     <Marker
       coordinate={{ latitude: fix.lat, longitude: fix.lng }}
@@ -71,7 +77,7 @@ export function OwnHeadingMarker({ own, mapHeading }: { own: OwnLocation; mapHea
       zIndex={9}
       accessibilityLabel={t('You are here')}>
       <MarkerBody style={{ width: box, height: box }} pointerEvents="none">
-        <RiderPuck color={YOU_INK} d={OWN_PUCK_D} beam moving={moving} angle={deg == null ? null : screenAngle(deg, mapHeading)} />
+        <OwnDot style={style} d={d} moving={moving} angle={deg == null ? null : screenAngle(deg, mapHeading)} />
       </MarkerBody>
     </Marker>
   );

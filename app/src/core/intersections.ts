@@ -17,6 +17,15 @@ export const JUNCTION_CLASSES = new Set([
   'track', 'path', 'link',
 ]);
 
+/**
+ * The map query's filter: only road and trail lines (and the app's own track copies, which carry
+ * `path`) come back, so the lookup stays small however much else the map draws.
+ */
+export const JUNCTION_QUERY_FILTER = ['any', ['match', ['get', 'class'], [...JUNCTION_CLASSES], true, false], ['has', 'path']];
+
+/** Look for the next junction at most this often (ms): a junction 220 m ahead is seconds away. */
+export const JUNCTION_LOOK_EVERY_MS = 2000;
+
 /** Whether a drawn map line is a road or trail worth zooming in for. */
 export function isJunctionLine(props: Record<string, unknown> | null | undefined): boolean {
   if (!props) return false;

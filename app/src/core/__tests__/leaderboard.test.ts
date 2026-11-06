@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { areaFromPlace, areaLabel, areaShort, COUNTRIES, searchCountries, STATES, stateWord } from '../areas';
 import { RANKS } from '../badges';
+import { setCoreTranslator, translateWith } from '../i18n';
+import es from '../translations/es';
+import ja from '../translations/ja';
 import { filterTitle, levelsLine, myStanding, ordinal, parseAreas, parseLeaderboard, parseSettings, rankName, startingFilter } from '../leaderboard';
 
 const row = (o: Record<string, unknown>) => ({
@@ -120,5 +123,20 @@ describe('leaderboard', () => {
     );
     expect(myStanding(null, { ...tx, shown: false }, { country: null, state: null })).toMatch(/hidden/);
     expect(myStanding({ total: 3, rows: [], me: null }, tx, { country: null, state: null })).toMatch(/first badge level/);
+    expect(myStanding(board, tx, { country: null, state: null })).toBe('You’re 7th of 40 everywhere.');
+  });
+
+  it('says the place in the rider’s language', () => {
+    const tx = { country: 'US', state: 'TX', shown: true, chosen: false };
+    const board = parseLeaderboard({ total: 3, rows: [], me: row({ place: 2, me: true }) });
+    try {
+      setCoreTranslator((text, vars) => translateWith(es, text, vars), 'es-ES');
+      expect(myStanding(board, tx, { country: null, state: null })).toBe('Eres el 2.º de 3 en total.');
+      expect([1, 2].map(ordinal)).toEqual(['1.º', '2.º']);
+      setCoreTranslator((text, vars) => translateWith(ja, text, vars), 'ja-JP');
+      expect(myStanding(board, tx, { country: null, state: null })).toBe('全体で 3 人中 2 位です。');
+    } finally {
+      setCoreTranslator((text, vars) => translateWith(null, text, vars), 'en-US');
+    }
   });
 });

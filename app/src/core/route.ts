@@ -9,6 +9,7 @@
  * how far along everyone is, and who is ahead or behind.
  */
 import { distanceM, formatDistance, metersToMiles, type LatLng } from './geo';
+import { tc } from './i18n';
 
 /** 'trail': one of the rider's own Map Mode trails (free; only 'gpx' imports need Pro). Older builds read it as 'drawn'. */
 export type RouteSource = 'drawn' | 'gpx' | 'trail';
@@ -256,24 +257,29 @@ export function summarizeMe(route: RideRoute, placed: PlacedRider[], meId: strin
   const behind = others.filter((r) => r.place!.alongM < along - 30).length;
 
   let compared: string;
-  if (!others.length) compared = 'Nobody else is sharing a spot on the route yet.';
+  if (!others.length) compared = tc('Nobody else is sharing a spot on the route yet.');
   else if (me.role === 'leader') {
     const last = Math.min(...others.map((r) => r.place!.alongM));
-    compared = along - last < 30 ? 'The group is right with you.' : `You're out front. ${sweep ? 'Sweep' : 'The last rider'} is ${gap(along - (sweep?.place!.alongM ?? last))} back.`;
+    const back = gap(along - (sweep?.place!.alongM ?? last));
+    compared = along - last < 30
+      ? tc('The group is right with you.')
+      : tc(sweep ? "You're out front. Sweep is {gap} back." : "You're out front. The last rider is {gap} back.", { gap: back });
   } else if (leader) {
     const d = leader.place!.alongM - along;
-    compared = Math.abs(d) < 30 ? "You're right with the leader." : d > 0 ? `The leader is ${gap(d)} ahead.` : `You're ${gap(d)} past the leader.`;
-    if (me.role !== 'sweep' && behind === 0 && ahead > 0) compared += ' Nobody is behind you.';
+    compared = Math.abs(d) < 30
+      ? tc("You're right with the leader.")
+      : tc(d > 0 ? 'The leader is {gap} ahead.' : "You're {gap} past the leader.", { gap: gap(d) });
+    if (me.role !== 'sweep' && behind === 0 && ahead > 0) compared = tc('{v} Nobody is behind you.', { v: compared });
   } else {
-    compared = `${ahead} ${ahead === 1 ? 'rider' : 'riders'} ahead of you, ${behind} behind.`;
+    compared = tc(ahead === 1 ? '1 rider ahead of you, {behind} behind.' : '{ahead} riders ahead of you, {behind} behind.', { ahead, behind });
   }
 
   return {
     doneMi: miles(along),
     totalMi: miles(route.lengthM),
-    toGo: `${miles(route.lengthM - along)} mi to go`,
+    toGo: tc('{v} mi to go', { v: miles(route.lengthM - along) }),
     compared,
-    offRoute: me.place.onRoute ? null : `You're ${gap(me.place.offRouteM)} off the route.`,
+    offRoute: me.place.onRoute ? null : tc("You're {gap} off the route.", { gap: gap(me.place.offRouteM) }),
   };
 }
 

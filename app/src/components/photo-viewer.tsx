@@ -1,11 +1,12 @@
 import { Image } from 'expo-image';
-import { Modal, Pressable, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
 import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 /**
  * A rider's picture (or a post photo) full size over a dark backdrop, so you can actually see it.
  * Tap anywhere, the close button, Escape on a keyboard, or Android's Back closes it. The picture
@@ -19,7 +20,7 @@ export function PhotoViewer({
   const insets = useSafeAreaInsets();
   const side = Math.min(640, width - Spacing.four * 2, height - insets.top - insets.bottom - 160);
   return (
-    <Modal visible={!!uri} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent supportedOrientations={['portrait', 'landscape']}>
+    <SheetModal visible={!!uri} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent supportedOrientations={['portrait', 'landscape']}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityRole="button" accessibilityLabel={t('Close picture')}>
         <View style={[styles.close, { top: insets.top + Spacing.three }]}>
           <Icon name="close" size={22} color="#fff" />
@@ -37,7 +38,7 @@ export function PhotoViewer({
         {name ? <Text style={styles.name}>{name}</Text> : null}
         {caption ? <Text style={styles.caption} numberOfLines={3}>{caption}</Text> : null}
       </Pressable>
-    </Modal>
+    </SheetModal>
   );
 }
 

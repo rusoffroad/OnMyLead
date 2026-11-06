@@ -15,6 +15,8 @@ import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { DirectionsHost } from '@/components/directions';
+import { EmergencySiren } from '@/components/emergency-siren';
+import { LaunchCover } from '@/components/launch-cover';
 import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
 import { TabletProGate } from '@/components/tablet-pro-gate';
@@ -26,7 +28,8 @@ import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { logScreen, startAppLog } from '@/lib/app-log';
 import { startAppearance, takeReturnPath, useAppearance } from '@/lib/appearance';
 import { startAppSettings } from '@/lib/app-settings';
-import { startEntitlements } from '@/lib/entitlements';
+import { startEntitlements, useEntitlements } from '@/lib/entitlements';
+import { can } from '@/core/entitlements';
 import { startOrientationRule } from '@/lib/orientation';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
@@ -88,7 +91,9 @@ function RootLayout() {
   }, [version, langVersion, router]);
 
   // The CarPlay screen's fixed words follow the app's language (does nothing off iPhone).
-  useEffect(() => syncCarPlayLabels(), [langVersion]);
+  // CarPlay is Pro (2.1): on Free the car shows the Pro notice in place of the waiting screen.
+  const carPlayPro = can(useEntitlements().ent, 'carplay');
+  useEffect(() => syncCarPlayLabels(!carPlayPro), [langVersion, carPlayPro]);
 
   useEffect(() => {
     setCrashScreen(screen);
@@ -121,7 +126,10 @@ function RootLayout() {
 
   useEffect(() => {
     if (!ready) return;
-    const t = setTimeout(() => SplashScreen.hideAsync().catch(() => {}), Math.max(0, SPLASH_MIN_MS - (Date.now() - launchedAt)));
+    // On the phone apps the native launch screen hands over to LaunchCover (the same picture plus
+    // the version) as soon as the app can draw; the cover keeps the logo up for the minimum.
+    const wait = Platform.OS === 'web' ? Math.max(0, SPLASH_MIN_MS - (Date.now() - launchedAt)) : 0;
+    const t = setTimeout(() => SplashScreen.hideAsync().catch(() => {}), wait);
     return () => clearTimeout(t);
   }, [ready]);
 
@@ -213,10 +221,13 @@ function RootLayout() {
       <TabletProGate />
       <ProGateHost />
       <DirectionsHost />
+      <EmergencySiren />
       {/* Before You Ride: the safety and liability agreement, until the rider agrees. */}
       <RiderAgreementGate />
       {/* The owner's minimum version (Admin Dashboard > Releases), over everything, with Not Now. */}
       <UpdateRequired />
+      {/* A copy of the launch screen with the app's version, over everything until launch ends. */}
+      <LaunchCover until={launchedAt + SPLASH_MIN_MS} />
     </ThemeProvider>
   );
 }

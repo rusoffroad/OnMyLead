@@ -5,10 +5,12 @@
  */
 import { router } from 'expo-router';
 
+import { groupPhotoUrl } from '@/core/group-photo';
 import { cleanGroupName, isGroupsNotSwitchedOn, NOT_SWITCHED_ON, sortRideMates, type RideMate } from '@/core/groups';
 import { shownName } from '@/core/profile';
 import { track } from './analytics';
-import { supabase } from './supabase';
+import { removeGroupPhotoFile } from './group-photos';
+import { supabase, supabaseUrl } from './supabase';
 import type { Ride } from './types';
 import { requirePro } from './pro';
 
@@ -54,9 +56,13 @@ export type RidingGroup = {
   /** Everyone in the group, owner first. */
   riders: GroupRider[];
   mine: boolean;
+  /** The group's photo (set by its owner), or null: the group shows its initials. */
+  photoUrl: string | null;
+  photoPath: string | null;
 };
 
-type GroupRow = { id: string; name: string; owner_id: string; invite_code: string; created_at: string };
+// photo_path is missing on servers before the group photo update (migration 20261105080000).
+type GroupRow = { id: string; name: string; owner_id: string; invite_code: string; created_at: string; photo_path?: string | null };
 
 async function withRiders(groups: GroupRow[], uid: string): Promise<RidingGroup[]> {
   if (!groups.length) return [];
@@ -77,6 +83,8 @@ async function withRiders(groups: GroupRow[], uid: string): Promise<RidingGroup[
       inviteCode: g.invite_code,
       riders: [{ id: g.owner_id, name: ownerName, isOwner: true }, ...others],
       mine: g.owner_id === uid,
+      photoUrl: groupPhotoUrl(supabaseUrl, g.photo_path, g.owner_id),
+      photoPath: g.photo_path ?? null,
     };
   });
 }
@@ -135,7 +143,9 @@ export async function leaveGroup(id: string) {
 }
 
 export async function deleteGroup(id: string) {
+  const row = unwrap<GroupRow | null>(await supabase.from('riding_groups').select('*').eq('id', id).maybeSingle());
   unwrap(await supabase.from('riding_groups').delete().eq('id', id));
+  if (row) await removeGroupPhotoFile(row.owner_id, row.photo_path);
   track('riding_group_deleted');
 }
 
@@ -143,12 +153,27 @@ export async function resetGroupLink(id: string): Promise<string> {
   return unwrap<string>(await supabase.rpc('reset_group_link', { p_group: id }));
 }
 
-export type GroupPreview = { id: string; name: string; owner_name: string; riders: number; is_member: boolean };
+export type GroupPreview = {
+  id: string; name: string; owner_name: string; riders: number; is_member: boolean;
+  /** The group's photo, or null. */
+  photo_url: string | null;
+};
 
-/** What the group link shows before joining. Null when the link is wrong or was replaced. */
+type PreviewRow = Omit<GroupPreview, 'photo_url'> & { photo_path?: string | null };
+
+/**
+ * What the group link shows before joining, with the group's photo. Null when the link is wrong or
+ * was replaced. Servers before the group photo update only have group_preview (no photo).
+ */
 export async function groupPreview(code: string): Promise<GroupPreview | null> {
-  const rows = unwrap<GroupPreview[]>(await supabase.rpc('group_preview', { p_code: code }));
-  return rows[0] ?? null;
+  let res = (await supabase.rpc('group_preview_v2', { p_code: code })) as Res<PreviewRow[]>;
+  if (res.error && /group_preview_v2|could not find the function|PGRST202/i.test(`${res.error.code ?? ''} ${res.error.message}`)) {
+    res = (await supabase.rpc('group_preview', { p_code: code })) as Res<PreviewRow[]>;
+  }
+  const row = unwrap<PreviewRow[]>(res)[0];
+  if (!row) return null;
+  const { photo_path, ...rest } = row;
+  return { ...rest, photo_url: groupPhotoUrl(supabaseUrl, photo_path) };
 }
 
 export async function joinGroup(code: string): Promise<string> {

@@ -16,6 +16,7 @@ import { fallbackFollowStep } from './fallback-follow';
 import { TracklinePolylines } from './leader-trackline';
 import { GroupMapboxMap } from './group-mapbox-map';
 import { OwnHeadingMarker, useOwnLocation } from './own-heading';
+import { MAP_FIXES_FOLLOW_PLAN } from '@/lib/battery';
 import { RiderMarker } from './rider-marker';
 import { RouteEnds, RouteLine } from './route-overlay';
 import { TrailTiles } from './trail-tiles';
@@ -96,6 +97,11 @@ function FlatGroupMap({
   follow?: { inset: { top: number; right: number; bottom: number; left: number } } | null;
   /** How often Android reports the phone's own dot (iPhone and iPad report it as it moves). */
   locationEveryMs?: number;
+  /**
+   * Ride Mode's own GPS fix for this phone. The Mapbox map follows it whenever its own location
+   * feed goes quiet, so Follow Me never stops because one source stopped reporting.
+   */
+  myFix?: (LatLng & { course?: number | null; speed?: number | null }) | null;
   /** Lets Ride Mode center the map on the rider (when it opens, and the center-on-me button). */
   ref?: Ref<GroupMapHandle>;
 }) {
@@ -277,7 +283,7 @@ function FlatGroupMap({
         .map((r) => (
           <RiderMarker key={r.id} rider={r} mapHeading={mapHeading} onPress={onRiderPress} />
         ))}
-      <OwnHeadingMarker own={own} mapHeading={mapHeading} />
+      <OwnHeadingMarker own={own} mapHeading={mapHeading} everyMs={MAP_FIXES_FOLLOW_PLAN ? locationEveryMs : undefined} />
       {regroup ? (
         <Marker coordinate={{ latitude: regroup.lat, longitude: regroup.lng }} title={regroup.label ?? 'Regroup here'} pinColor={RideColors.yellow} />
       ) : null}

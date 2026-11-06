@@ -257,8 +257,19 @@ export type LandSourceId = 'padus' | 'txparcels';
 export const PADUS = 'https://edits.nationalmap.gov/arcgis/rest/services/PAD-US/PAD_US_4_1/MapServer';
 export const TX_PARCELS = 'https://feature.geographic.texas.gov/arcgis/rest/services/Parcels/stratmap_land_parcels_48_most_recent/MapServer';
 
-/** Land tints show from about a few counties across (a national forest reads as a shape, not a smear). */
-export const LAND_MIN_Z = 7;
+/**
+ * Land shows from about one county across (zoom 9, some 60 miles on a phone). Further out the
+ * agency's server merges thousands of small BLM and state pieces into solid orange and green
+ * blobs that hide the map (Chris, 2026-11-05), so land waits until each piece reads as a shape.
+ */
+export const LAND_MIN_Z = 9;
+/** Land fades in over its first zoom level, so it doesn't pop on all at once during a pinch. */
+export const LAND_FADE_IN = ['interpolate', ['linear'], ['zoom'], LAND_MIN_Z, 0.65, LAND_MIN_Z + 1, 1] as const;
+
+/** Whether land boundaries are drawn (and can be tapped) at this map zoom. */
+export function landShowsAt(zoom: number): boolean {
+  return zoom >= LAND_MIN_Z;
+}
 /** Property lines are dense in towns; they wait until a few blocks fill the screen. */
 export const PARCELS_MIN_Z = 14;
 

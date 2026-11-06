@@ -7,6 +7,7 @@
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
+import { compassAllowed } from './compass';
 import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import { Linking, Platform } from 'react-native';
@@ -226,7 +227,12 @@ export async function requestLocationPermission(): Promise<'always' | 'while_usi
 function foregroundPermission() {
   return askOnlyIfNeeded({
     get: () => Location.getForegroundPermissionsAsync(),
-    request: () => Location.requestForegroundPermissionsAsync(),
+    request: () =>
+      Location.requestForegroundPermissionsAsync().then((p) => {
+        // A map that opened before this answer starts its compass now instead of at its next look.
+        if (p.status === 'granted') compassAllowed();
+        return p;
+      }),
   });
 }
 

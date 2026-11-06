@@ -4,7 +4,7 @@ summary: Send your ride by text, email or any app, copy its link, show a QR code
 category: joining
 order: 30
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/invite-card.tsx
   - app/src/components/group-invite.tsx
@@ -60,6 +60,10 @@ From the ride page:
 
 1. Open the ride page and tap **Riders**.
 2. On the invite card, under **Invite a Group**, tap **Invite All** next to the group.
+
+:::release 2.1
+Each group shows its group photo (or its initials) beside its name.
+:::
 
 From the group:
 

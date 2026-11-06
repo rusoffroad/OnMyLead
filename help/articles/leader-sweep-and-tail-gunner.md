@@ -4,7 +4,7 @@ summary: Who rides up front, who rides at the rear, and how to make someone lead
 category: rides
 order: 50
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/components/rider-pin.tsx
   - app/src/components/rider-puck.tsx
@@ -38,7 +38,7 @@ On the **Riders** section of the ride page, the line at the top of the **Going**
 
 In Ride Mode the leader and the tail gunner stand out from everyone else: the leader is the biggest dot, in blue with a blue name tag, and the tail gunner is the next biggest, in violet with a violet name tag. Every other rider is a graphite dot with a dark name tag. The riders list uses the same colors.
 
-A blue line also follows behind the leader on every rider's map, so the group can see exactly where the leader went. The leader can turn it off for everyone from the layers button. See [Follow the Leader's Trackline](/help/leader-trackline).
+A blue line also follows behind the leader on every rider's map, so the group can see exactly where the leader went. The leader can turn it off for everyone in **Map Settings**. See [Follow the Leader's Trackline](/help/leader-trackline).
 :::
 
 ## Make Someone Leader

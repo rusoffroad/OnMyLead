@@ -5,6 +5,7 @@ import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { invitedLine, namesLine, ridersLabel } from '@/core/groups';
 import { inviteGroupToRide, myGroups, NotSwitchedOnError, openNewGroup, type RidingGroup } from '@/lib/groups';
 import { Convoy } from './convoy';
+import { GroupPhoto } from './group-photo';
 import { Icon } from './icon';
 import { ThemedText } from './themed-text';
 import { Button } from './ui';
@@ -61,6 +62,7 @@ export function GroupInvite({ rideId }: { rideId: string }) {
         groups.map((g) => (
           <View key={g.id} style={styles.group}>
             <View style={styles.groupTop}>
+              <GroupPhoto uri={g.photoUrl} name={g.name} size={44} radius={12} />
               <View style={{ flex: 1, gap: 6 }}>
                 <ThemedText style={styles.name} numberOfLines={1}>{g.name}</ThemedText>
                 <Convoy names={g.riders.map((r) => r.name)} ids={g.riders.map((r) => r.id)} size={22} max={5} />

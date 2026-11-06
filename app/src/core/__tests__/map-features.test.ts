@@ -179,3 +179,39 @@ describe('Forest Service hiking trails', () => {
     expect(t.miles).toBe(3.3);
   });
 });
+
+describe('Map Settings quick switches', () => {
+  it('lights a switch when any of its features shows', async () => {
+    const { QUICK_LAYERS, quickLayerOn, defaultFeatures } = await import('../map-features');
+    const f = defaultFeatures();
+    const by = Object.fromEntries(QUICK_LAYERS.map((q) => [q.id, q]));
+    expect(quickLayerOn(f, by.streets)).toBe(true);
+    expect(quickLayerOn(f, by.land)).toBe(false);
+    f.highways = false;
+    expect(quickLayerOn(f, by.streets)).toBe(true);
+  });
+
+  it('turns every feature off, or on (land without property lines)', async () => {
+    const { QUICK_LAYERS, quickLayerToggle, defaultFeatures } = await import('../map-features');
+    const f = defaultFeatures();
+    const by = Object.fromEntries(QUICK_LAYERS.map((q) => [q.id, q]));
+    expect(quickLayerToggle(f, by.streets).every((c) => !c.on)).toBe(true);
+    expect(quickLayerToggle(f, by.streets).map((c) => c.id)).toEqual(['highways', 'roads', 'dirtRoads', 'streetLegal']);
+    const land = quickLayerToggle(f, by.land);
+    expect(land.map((c) => c.id)).toEqual(['nationalForest', 'blm', 'nationalPark', 'statePark']);
+    expect(land.every((c) => c.on)).toBe(true);
+    f.private = true;
+    expect(quickLayerToggle(f, by.land)).toEqual([{ id: 'private', on: false }]);
+  });
+
+  it('tells when the rider changed anything', async () => {
+    const { featuresChanged, defaultFeatures } = await import('../map-features');
+    const f = defaultFeatures();
+    expect(featuresChanged(f)).toBe(false);
+    f.hiking = false;
+    expect(featuresChanged(f)).toBe(true);
+    // A Free rider's map has the Pro features off; only the free ones count.
+    expect(featuresChanged(f, ['riderTrails', 'parkTrails'])).toBe(false);
+    expect(featuresChanged({ ...f, parkTrails: !f.parkTrails }, ['riderTrails', 'parkTrails'])).toBe(true);
+  });
+});

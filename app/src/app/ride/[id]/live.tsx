@@ -3,7 +3,7 @@ import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, AppState, Linking, Modal, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, AppState, Linking, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DirectionsSheet } from '@/components/directions';
@@ -24,6 +24,7 @@ import { CrashCountdown } from '@/components/crash-countdown';
 import { TILT_TILE_H, TiltTile } from '@/components/tilt-tile';
 import { SharePicker } from '@/components/share-picker';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
+import { CompassSpot } from '@/components/compass-spot';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
@@ -52,7 +53,7 @@ import { mapPanelWidth, sidebarWidth } from '@/core/layout';
 import { isApproximateFix, LOCATION_PROBLEM_BANNER } from '@/core/precise-location';
 import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
-import { latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
+import { chatMessageText, latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
 import { FreerideTracker, summarizeFreeride } from '@/core/freeride';
 import { tracklineError, tracklineOn } from '@/core/leader-trackline';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
@@ -84,20 +85,23 @@ import { openDirections } from '@/lib/directions';
 import { currentPosition, startSendingLocation, stopSendingLocation } from '@/lib/location';
 import { useFlag } from '@/lib/app-settings';
 import {
-  nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
+  nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbyRelayOnly, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
 } from '@/lib/nearby';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
+import { endEmergency, endStaleCalls, raiseEmergency } from '@/lib/siren';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
 import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMember, type RiderStatusKind } from '@/lib/types';
 import { speak } from '@/lib/voice';
-import { requirePro } from '@/lib/pro';
+import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
+import { can } from '@/core/entitlements';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
 
@@ -204,7 +208,7 @@ export default function RideMode() {
   const announced = useRef(new Set<string>());
   const [route, setRoute] = useState<{ route: RideRoute | null; offline: boolean; loaded?: boolean }>({ route: null, offline: false });
   // This phone's own fix, kept on the phone: it places me on the route even when I'm not sharing.
-  const [myFix, setMyFix] = useState<{ lat: number; lng: number } | null>(null);
+  const [myFix, setMyFix] = useState<{ lat: number; lng: number; course?: number | null; speed?: number | null } | null>(null);
   // Each rider's last progress along the route, so loops and out-and-backs don't make them jump.
   const [tracker] = useState(() => new RouteTracker());
   const routeMiles = useRef<number | null | undefined>(undefined);
@@ -215,6 +219,8 @@ export default function RideMode() {
   const canRegroup = mine && ['organizer', 'co_organizer', 'leader'].includes(mine.role);
   const watchesBubble = mine && ['organizer', 'co_organizer', 'leader', 'sweep'].includes(mine.role);
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
+  // The siren screen says "A rider" until the name is known (a call can arrive before the roster).
+  const sirenName = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || null, [members]);
 
   // Waypoints: the leader's shared ones and this rider's own. Press and hold the map to drop one.
   const wp = useRideWaypoints(id, !!mine);
@@ -400,7 +406,7 @@ export default function RideMode() {
       .then(async (p) => {
         if (p.status !== 'granted' || gone) return;
         sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.High, distanceInterval: followEveryM }, (l) =>
-          setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude }),
+          setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude, course: l.coords.heading, speed: l.coords.speed }),
         );
         if (gone) sub.remove();
       })
@@ -422,7 +428,12 @@ export default function RideMode() {
       })
       // A rider cancelled a tap: their status goes back to what it was before.
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
-        if ((payload.new as { cancelled_at?: string | null })?.cancelled_at) refresh();
+        const row = payload.new as { id?: string; cancelled_at?: string | null };
+        if (row?.cancelled_at) {
+          // A cancelled EMERGENCY stops the siren on every phone that is sounding it.
+          if (row.id) endEmergency(row.id);
+          refresh();
+        }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'regroup_points', filter: `ride_id=eq.${id}` }, () => {
         activeRegroup(id).then((rg) => {
@@ -493,6 +504,11 @@ export default function RideMode() {
   // The rider's own switch (You > Bluetooth Sharing, or the no-service banner here). On by default;
   // turning it back on in Ride Mode starts Bluetooth again at once.
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1). On Free the phone still relays for the group and still sends and
+  // hears EMERGENCY, Need Help and Crash Alerts (lib/nearby relay only); spots, other taps and
+  // messages over Bluetooth need Pro.
+  const bluetoothPro = useCan('bluetooth_sharing');
+  useEffect(() => setNearbyRelayOnly(!bluetoothPro), [bluetoothPro]);
   const bluetoothOffered = nearbyAvailable && bluetoothFlag;
   const nearby = useNearby();
   const iAmJoined = !!me && joined.some((m) => m.user_id === me);
@@ -530,6 +546,8 @@ export default function RideMode() {
           });
         } else if (e.kind === 'status') {
           if (!memberIds.current.has(e.status.user_id)) return;
+          // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren).
+          raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             const old = prev[e.status.user_id];
             if (old && (old.id === e.status.id || Date.parse(old.tapped_at) > Date.parse(e.status.tapped_at))) return prev;
@@ -538,11 +556,11 @@ export default function RideMode() {
           });
         } else if (memberIds.current.has(e.reply.user_id)) {
           // Read out, the way announcements are; the chat shows it too (hooks/use-ride-chat).
-          speak(`${nameOf(e.reply.user_id)}: ${e.reply.body}`);
+          speak(`${nameOf(e.reply.user_id)}: ${chatMessageText({ kind: 'status', body: e.reply.body }, t)}`);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }),
-    [nameOf],
+    [nameOf, sirenName, id, me],
   );
 
   const settings: BubbleSettings = useMemo(() => {
@@ -578,6 +596,16 @@ export default function RideMode() {
     }
     announced.current = red;
   }, [bubble.alerts, watchesBubble, meOffline]);
+
+  // Emergency Siren (lib/siren): another rider's fresh EMERGENCY sounds the siren on every phone on
+  // the ride, until silenced; a newer tap from that rider (I'm OK...) ends it. Live updates and
+  // Bluetooth both land in `statuses`.
+  useEffect(() => {
+    for (const [userId, s] of Object.entries(statuses)) {
+      raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null);
+    }
+    endStaleCalls(id, statuses);
+  }, [statuses, id, me, sirenName]);
 
   // Leader and tail gunner hear a Mechanical Issue the moment it's tapped, once per tap.
   const heardBreakdowns = useRef<Set<string> | null>(null);
@@ -752,6 +780,10 @@ export default function RideMode() {
     : panelH
       ? Math.max(BANNERS_MIN, screenH - Spacing.two - panelRest - (alertsShown ? ALERTS_MIN : 0) - topRowBottom - 6)
       : undefined;
+  // Map Settings (top left) and the compass (top right) sit level, just under the top bar, or at
+  // the top in Full Map (core/map-corner). On a tablet the bar is the riders column, so they're at the top.
+  const cornerTop = tablet || fullMap ? insets.top + EDGE : insets.top + 66;
+  const compassSpot = { top: cornerTop };
   const shownBannersBottom = fullMap ? insets.top : tablet ? panelTop : topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
   // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
   // and hold the map still drops one).
@@ -1042,9 +1074,12 @@ export default function RideMode() {
     helpCalls: helpCalls.map(({ m, s }) => ({ name: m.profiles?.display_name || t('Rider'), status: t(STATUS_LABEL[s.status]) })),
   });
   const carKey = JSON.stringify(car);
+  // CarPlay is Pro (2.1). On Free the car keeps the Pro notice (root layout) and gets no ride.
+  const carPlayPro = useCan('carplay');
   useEffect(() => {
+    if (!carPlayPro) return clearCarPlay();
     if (ride) showRideOnCarPlay(JSON.parse(carKey));
-  }, [carKey, ride]);
+  }, [carKey, ride, carPlayPro]);
   useEffect(() => () => clearCarPlay(), []);
   const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency });
   useEffect(() => {
@@ -1052,6 +1087,7 @@ export default function RideMode() {
   });
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
+      if (!can(currentEntitlements(), 'carplay')) return;
       const a = parseCarPlayAction(buttonId);
       const act = carActions.current;
       if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
@@ -1093,33 +1129,37 @@ export default function RideMode() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <GroupMap
-        ref={groupMap}
-        riders={mapRiders}
-        meId={me}
-        regroup={regroup}
-        route={route.route?.points}
-        trackline={trackline}
-        trail={trail}
-        waypoints={wp.waypoints}
-        onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
-        onLongPressMap={mine ? openNewWaypoint : undefined}
-        edgePadding={fitPadding}
-        fallback={meet}
-        onReady={() => setMapReady(true)}
-        onUserMove={() => {
-          setMapMoved(true);
-          follow.camEvent('pan');
-        }}
-        follow={following ? { inset: openMapInset } : null}
-        locationEveryMs={batteryMode === 'best' ? 1000 : BATTERY_PLANS[batteryMode].fixEveryMs}
-      />
-      {/* In Full Map only No Signal and a tapped trail's card stay; the layers button tucks away. */}
+      <CompassSpot.Provider value={compassSpot}>
+        <GroupMap
+          ref={groupMap}
+          riders={mapRiders}
+          meId={me}
+          regroup={regroup}
+          route={route.route?.points}
+          trackline={trackline}
+          trail={trail}
+          waypoints={wp.waypoints}
+          onPressWaypoint={(w) => setWpTarget({ type: 'view', waypoint: w })}
+          onLongPressMap={mine ? openNewWaypoint : undefined}
+          edgePadding={fitPadding}
+          fallback={meet}
+          onReady={() => setMapReady(true)}
+          onUserMove={() => {
+            setMapMoved(true);
+            follow.camEvent('pan');
+          }}
+          follow={following ? { inset: openMapInset } : null}
+          myFix={myFix}
+          locationEveryMs={batteryMode === 'best' ? 1000 : BATTERY_PLANS[batteryMode].fixEveryMs}
+        />
+      </CompassSpot.Provider>
+      {/* Map Settings stays in the top-left corner of the map, Full Map included (on a tablet, just right of the riders column). */}
       <TrailMapOverlay
         trail={trail}
-        threeD
+        controls
         bare={fullMap}
-        top={tablet || fullMap ? insets.top + EDGE : insets.top + 66}
+        top={cornerTop}
+        left={tablet && !fullMap ? sideW + 2 * Spacing.two + EDGE - Spacing.two : undefined}
         cardTop={tablet || fullMap ? insets.top + 64 : insets.top + 118}
         cardWidth={tablet ? Math.min(360, layout.width - sideW - 3 * EDGE) : undefined}
         route={route.route?.points}
@@ -1173,8 +1213,8 @@ export default function RideMode() {
         {hasBanners ? (
           <ScrollView
             style={{ maxHeight: bannersMax, flexGrow: 0 }}
-            // On a phone the map layers button sits at the right of the first banner: leave it room.
-            contentContainerStyle={{ gap: 6, paddingRight: tablet ? 0 : 58 }}
+            // On a phone Map Settings sits at the left of the first banner and the compass at its right: leave them room.
+            contentContainerStyle={{ gap: 6, paddingHorizontal: tablet ? 0 : 54 }}
             onContentSizeChange={(_w, h) => setBannersH(Math.round(h))}
             showsVerticalScrollIndicator={false}>
           {precise.problem ? (
@@ -1193,7 +1233,7 @@ export default function RideMode() {
             <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
               <View style={styles.offlineDot} />
               <Text style={styles.offlineText}>
-                {nearby.state === 'on' && nearby.peers > 0
+                {nearby.state === 'on' && nearby.peers > 0 && bluetoothPro
                   ? activeShare
                     ? t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth.' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth.', { n: nearby.peers })
                     : t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth (Your Spot Stays Private Until You Share).' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth (Your Spot Stays Private Until You Share).', { n: nearby.peers })
@@ -1214,6 +1254,7 @@ export default function RideMode() {
                   <Icon name="bluetooth" size={14} color={bluetoothMine ? Colors.sky : Colors.textSecondary} strokeWidth={2.2} />
                   {/* Shows what it is now, like a switch; tapping flips it. */}
                   <Text style={styles.shareActionText}>{bluetoothMine ? t('Bluetooth On') : t('Bluetooth Off')}</Text>
+                  <ProTag feature="bluetooth_sharing" style={{ marginLeft: 2 }} />
                 </Pressable>
               ) : null}
             </View>
@@ -1249,7 +1290,7 @@ export default function RideMode() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.announcementLabel} numberOfLines={1}>{t('{v} · Tap to Hear Again', { v: nameOf(announcement.user_id) })}</Text>
-                <Text style={styles.announcementText} numberOfLines={3}>{t(announcement.body)}</Text>
+                <Text style={styles.announcementText} numberOfLines={3}>{announcement.body}</Text>
               </View>
             </Pressable>
           ) : null}
@@ -1655,7 +1696,7 @@ export default function RideMode() {
         onClose={() => setWpTarget(null)}
       />
 
-      <Modal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
+      <SheetModal visible={askShare && ride?.status === 'live'} animationType="slide" transparent onRequestClose={() => setAskShare(false)}>
         <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <KeyboardLift>
           <SwipeSheet onClose={() => setAskShare(false)} style={[styles.sheet, tablet && styles.sheetTablet]} accessibilityViewIsModal>
@@ -1676,9 +1717,9 @@ export default function RideMode() {
           </SwipeSheet>
           </KeyboardLift>
         </SheetRoot>
-      </Modal>
+      </SheetModal>
 
-      <Modal visible={sosOpen} animationType="fade" transparent onRequestClose={() => setSosOpen(false)}>
+      <SheetModal visible={sosOpen} animationType="fade" transparent onRequestClose={() => setSosOpen(false)}>
         <SheetRoot style={[styles.sheetWrap, tablet && styles.sheetWrapTablet]}>
           <SwipeSheet
             onClose={() => setSosOpen(false)}
@@ -1707,7 +1748,7 @@ export default function RideMode() {
             <Button title={t('Cancel')} kind="secondary" onPress={() => setSosOpen(false)} />
           </SwipeSheet>
         </SheetRoot>
-      </Modal>
+      </SheetModal>
     </View>
   );
 }

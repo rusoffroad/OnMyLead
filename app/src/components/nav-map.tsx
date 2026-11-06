@@ -26,6 +26,9 @@ import { TrailTiles } from './trail-tiles';
 import { t as tr } from '@/lib/i18n';
 import { StopPin, WaypointPin } from './waypoint-blaze';
 
+/** How often Map Mode's flat map asks Android for the rider's spot (ms). */
+const NAV_FIX_EVERY_MS = 1000;
+
 export type NavMapHandle = {
   /** Move the map to a point, keeping a close zoom. */
   centerOn: (p: LatLng) => void;
@@ -77,6 +80,8 @@ function FlatNavMap({
   onUserMove?: () => void;
   /** The website draws the rider's arrow from this; the phones read their own map dot. */
   meHeading?: number | null;
+  /** The website: the rider's newest fix's own time (ms), so a repeated fix is ignored. */
+  meFixAt?: number | null;
   /** Track Line: where the rider has been, one colour per day, oldest first. */
   trackLines?: DayLine[];
   /** Named spots on the trail being drawn, recorded or followed. */
@@ -197,8 +202,8 @@ function FlatNavMap({
       mapType={trail.mapProps.mapType}
       showsUserLocation
       onUserLocationChange={own.onUserLocationChange}
-      userLocationUpdateInterval={1000}
-      userLocationFastestInterval={1000}
+      userLocationUpdateInterval={NAV_FIX_EVERY_MS}
+      userLocationFastestInterval={NAV_FIX_EVERY_MS}
       onMapReady={() => setReady(true)}
       showsCompass
       showsScale

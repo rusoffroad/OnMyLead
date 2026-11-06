@@ -12,14 +12,14 @@ import { sheetCanPull, sheetDrag, sheetRelease } from '@/core/sheet-swipe';
  * Every sheet in the app (a menu or form that slides up from the bottom) closes when you swipe it
  * down, the same as its Cancel or Close button. Use the three pieces together inside the sheet's Modal:
  *
- *   <Modal transparent ...>
+ *   <SheetModal transparent ...>
  *     <SheetRoot>
  *       <Pressable style={scrim} onPress={onClose} />
  *       <SwipeSheet onClose={onClose} style={styles.sheet}>
  *         <SheetScroll>...a long form...</SheetScroll>
  *       </SwipeSheet>
  *     </SheetRoot>
- *   </Modal>
+ *   </SheetModal>
  *
  * A pull anywhere on the sheet drags it down; let go far enough (or flick) and it closes, otherwise
  * it springs back. Inside SheetScroll the list scrolls first and the sheet only follows once the list

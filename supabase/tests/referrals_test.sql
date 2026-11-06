@@ -262,6 +262,26 @@ do $$ begin
   if (select v ->> 'code' from ref_out where name = 'rex_after_off') <> 'AAAA1111' then raise exception 'FAIL: earned reward lost when switched off'; end if;
 end $$;
 
+-- R11 (2.1 release test fixes, 20261105050000). Jo 0f07 was invited by Rex.
+insert into auth.users (id, raw_user_meta_data) values ('00000000-0000-0000-0000-000000000f07', '{"full_name":"Jo Ref"}');
+insert into referrals (referrer_id, friend_id, code, created_at)
+values ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000f07', 'REXREF0001', now() - interval '5 hours');
+-- A ride that was ended without ever going live is not Jo's first ride.
+insert into rides (id, organizer_id, name, meet_at, meet_area_lat, meet_area_lng, status)
+values ('0f000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000f07', 'Never went', now() - interval '3 hours', 35.1, -84.1, 'scheduled');
+update rides set status = 'ended', ended_at = now() where id = '0f000000-0000-0000-0000-000000000007';
+do $$ begin
+  if exists (select 1 from referral_rewards where user_id = '00000000-0000-0000-0000-000000000f07') then
+    raise exception 'FAIL: a ride that never went live earned a reward';
+  end if;
+end $$;
+-- A lapsed Play subscription (past its stored expiry) isn't a deferral target.
+insert into play_subscriptions (purchase_token, user_id, product_id, status, environment, expires_at)
+values ('ivy-stale-token', '00000000-0000-0000-0000-000000000f06', 'com.rusoffroad.onmylead.pro.monthly', 'active', 'Production', now() - interval '1 day');
+do $$ begin
+  if referral_play_token('00000000-0000-0000-0000-000000000f06') is not null then raise exception 'FAIL: a lapsed subscription counted'; end if;
+end $$;
+
 drop table ref_out;
 select as_user(null);
 \echo 'referrals_test: ok'

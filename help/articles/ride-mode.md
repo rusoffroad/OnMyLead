@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/components/rider-puck.tsx
   - app/src/components/own-puck.tsx
@@ -106,7 +106,7 @@ When a rider is moving, a small white arrow on the edge of their dot points the 
 :::release 2.1
 From 2.1 every live rider is a glossy disc with a white rim and a white arrow built into it, pointing the way they're heading. The leader is the biggest dot, in blue with a blue name tag; the tail gunner is the next biggest, in violet with a violet name tag; everyone else is graphite with a dark name tag. A rider keeps their arrow, pointing the last way they were heading, while they're stopped and still live. A rider whose position is only last seen is a hollow ring with no arrow, as before.
 
-Your own dot is cyan, with a soft beam ahead of it. Its arrow always shows which way you're facing: the way you're riding while you move, and your phone's compass when you stop.
+Your own dot is Red, White and Blue unless you pick another Dot Style in [Map Settings](/help/map-layers), with a soft beam ahead of it. Its arrow always shows which way you're facing: the way you're riding while you move, and your phone's compass when you stop.
 :::
 
 :::release 2.0
@@ -119,7 +119,13 @@ A blue line follows behind the leader, showing exactly where they rode. When the
 
 You don't need to leave Ride Mode to see new riders. Someone who joins the ride while you're on the map appears within a few seconds of starting to share, and a rider whose share ends or who leaves the ride drops off the map within about 15 seconds.
 
+:::until 2.1
 To switch map layers or download the ride's map for riding with no signal, use the layers button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
+:::
+
+:::release 2.1
+To switch map layers or download the ride's map for riding with no signal, use the round **Map Settings** button on the map. See [Map Layers](/help/map-layers) and [Offline Maps](/help/offline-maps).
+:::
 
 :::release 1.0.2
 ### Center the Map on You
@@ -141,7 +147,7 @@ While you're moving, your own dot has the same white arrow as everyone else's, p
 :::
 
 :::release 2.1
-From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step once, and after that it slides to keep you on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in the **You** tab turns that off). See [Follow Me on the Map](/help/follow-me).
+From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step, and the next time it centers on your dot and moves with you so you're always on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in the **You** tab turns that off). See [Follow Me on the Map](/help/follow-me).
 :::
 
 ### The Bottom Panel
@@ -207,8 +213,12 @@ Tap **Navigate** next to a live rider, or **Go to Last Seen** for a rider whose 
 When the ride has a route, the route strip at the bottom shows the whole route as one straight line from start to finish, with each rider placed by how far along they are. It shows your miles so far, such as **12.3 of 40.1 mi**, and how far you have to go. Below the line it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
 :::
 
-:::release 2.0
+:::until 2.1
 When the ride has a route, the line at the bottom shows your miles so far, such as **12.3 of 40.1 mi**, and how far you have to go. Below the line it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
+:::
+
+:::release 2.1
+When the ride has a route, the line at the bottom shows every sharing rider in order. Under it, centered, it tells you where you stand, for example "The leader is 0.4 miles ahead" or "2 riders ahead of you, 1 behind", and warns you if you're off the route.
 :::
 
 If you've added your machine in the [Garage](/help/garage) with its fuel details, the strip also says whether your range covers the route. See [Fuel Range](/help/fuel-range).
@@ -232,12 +242,26 @@ Every rider who is sharing has a dot on the leader line, strung out in running o
 - Riders who aren't sharing their location aren't on the line.
 - With a big group, the dots get smaller to fit the line.
 
+:::release 2.1
+### See How Spread Out the Group Is
+
+A thin measuring line runs under the leader line, from under the leader's dot to under the tail gunner's dot. The number in the middle, such as **0.8 mi**, is how far the rider furthest back is behind the leader (in feet when the group is close, or **a few yards** when everyone is together). Small ticks along the line mark round steps, such as every 0.1 mi or every 0.5 mi, so you can see how far apart the dots really are.
+
+- It works on routes and on Freerides, and it uses whatever spots your phone has, including ones passed over [Bluetooth Sharing](/help/bluetooth-sharing) with no service.
+- When the leader or the last rider is only last seen, the number starts with **~**, because it's from their last known spot.
+:::
+
 :::release 2.0
 ### See the Group Behind the Leader on a Freeride
 
 A Freeride has no route, so the line at the bottom of Ride Mode shows the group behind the leader instead. The leader is at the far left, the tail gunner (or the rider furthest back) is at the far right, and everyone else is in order between them.
 
+:::until 2.1
 - The top of the line shows how spread out the group is, such as **0.9 mi spread, Leader to Tail Gunner**. When everyone is close, it says how many riders are together.
+:::
+:::release 2.1
+- The measuring line under the dots shows how spread out the group is, such as **0.9 mi** from the leader to the tail gunner.
+:::
 - Below the line it tells you where you stand, for example "The leader is 0.3 mi ahead". The leader sees how far back the tail gunner (or the last rider) is.
 - Distances are measured along the path the leader has ridden, so bends and switchbacks count. Your phone keeps that path from the leader's live location while you're in Ride Mode; it stays on your phone and isn't uploaded.
 - A hollow dot is a rider who isn't on the leader's path, such as someone who took another way or was already behind when you opened Ride Mode. Their distance is measured in a straight line.
@@ -326,7 +350,7 @@ If your phone can't reach the server for a short while, a banner says **No Servi
 :::
 
 :::release 2.1
-Riders close to you on the same ride keep moving with no service, over Bluetooth, and the banner says **No Service. Sharing With 2 Nearby Phones Over Bluetooth**. Your status taps, quick replies and messages reach them too, phones pass everything along the group, and the card under your tap names who got it. Tap **Bluetooth On** on the banner to turn Bluetooth Sharing off, and tap it again to turn it back on. Riders out of Bluetooth range show where they were last seen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+Riders close to you on the same ride keep moving with no service, over Bluetooth, and the banner says **No Service. Sharing With 2 Nearby Phones Over Bluetooth**. Your status taps, quick replies and messages reach them too, phones pass everything along the group, and the card under your tap names who got it. Tap **Bluetooth On** on the banner to turn Bluetooth Sharing off, and tap it again to turn it back on. Seeing riders and sharing your spot, taps and messages over Bluetooth are Pro; on Free the button shows the **Pro** tag, and your phone still passes things along and sends EMERGENCY. Riders out of Bluetooth range show where they were last seen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 Status taps and quick replies you make with no service wait on your phone and send on their own when you get signal.
@@ -334,7 +358,7 @@ Status taps and quick replies you make with no service wait on your phone and se
 :::release 2.1
 ## See the Land in 3D
 
-From 2.1 the live map is drawn by Mapbox on every device, and on onmylead.com too, so the website's Ride Mode shows the same live map as the phone. Tap the round **3D** button under the layers button (or pick **3D Terrain** under **Map Style**) to see the ride on the real shape of the land, with contour lines and peak heights. Rider dots, the route, waypoints and the regroup pin all show the same way. See [3D Terrain](/help/3d-terrain).
+From 2.1 the live map is drawn by Mapbox on every device, and on onmylead.com too, so the website's Ride Mode shows the same live map as the phone. Tap the **Map Settings** button and pick **3D Terrain** under **Map Style** to see the ride on the real shape of the land, with contour lines and peak heights. Rider dots, the route, waypoints and the regroup pin all show the same way. See [3D Terrain](/help/3d-terrain).
 :::
 
 ## Leave Ride Mode

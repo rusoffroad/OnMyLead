@@ -37,6 +37,8 @@ import { loadTrails, useLocalTrails } from '@/lib/nav-trails';
 import { PARK_TRAILS_KEY, RIDER_TRAILS_KEY } from '@/hooks/use-trail-map';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useFollowMePref } from '@/hooks/use-follow-me';
+import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
+import { DotSizeChoice, DotStyleChoice } from '@/components/trail-map-overlay';
 import { useIntersectionZoomPref } from '@/hooks/use-intersection-zoom';
 import { RIDER_TRAIL_INK } from '@/core/nav-trails';
 import { signOut, useSession } from '@/lib/session';
@@ -83,11 +85,14 @@ export default function You() {
   const [musicMine, setMusicMine] = useMusicControlsSetting();
   const bluetoothFlag = useFlag('bluetooth_sharing');
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
+  // Bluetooth Sharing is Pro (2.1). On Free the switch still runs the relay and the safety alerts.
+  const bluetoothPro = can('bluetooth_sharing');
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
   const [followMe, setFollowMe] = useFollowMePref();
   const [intersectionZoom, setIntersectionZoom] = useIntersectionZoomPref();
+  const [edgeZoom, setEdgeZoom] = useEdgeZoomPref();
   useEffect(() => {
     loadTrails();
   }, []);
@@ -238,6 +243,26 @@ export default function You() {
             />
           }
         />
+        <MenuRow icon="locate" color={Colors.sky} title={t('Dot Style')} detail={t('How your own dot looks on the map.')}>
+          <DotStyleChoice />
+        </MenuRow>
+        <MenuRow icon="locate" color={Colors.sky} title={t('Dot Size')} detail={t('How big your own dot is on the map.')} right={<DotSizeChoice />} />
+        <MenuRow
+          icon="locate"
+          color={Colors.sky}
+          title={t('Zoom Out at the Edge')}
+          detail={edgeZoom ? t('While following you, the map zooms out once as your dot nears the edge, then slides along') : t('Off. The map slides along without zooming out')}
+          right={
+            <Switch
+              value={edgeZoom}
+              onValueChange={setEdgeZoom}
+              trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+              thumbColor="#FFFFFF"
+              {...({ activeThumbColor: '#FFFFFF' } as object)}
+              accessibilityLabel={t('Zoom Out at the Edge')}
+            />
+          }
+        />
         <MenuRow
           icon="turn"
           color={Colors.sky}
@@ -309,18 +334,24 @@ export default function You() {
             icon="bluetooth"
             color={Colors.sky}
             title={t('Bluetooth Sharing')}
-            detail={bluetoothMine
-              ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
-              : t('Off. Turn it on to keep sharing with nearby riders when there is no service')}
+            onPress={bluetoothPro ? undefined : () => requirePro('bluetooth_sharing')}
+            detail={!bluetoothMine
+              ? t('Off. Turn it on to keep sharing with nearby riders when there is no service')
+              : bluetoothPro
+                ? t('With no service, Ride Mode passes spots and alerts to nearby riders on your ride')
+                : t('With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.')}
             right={
-              <Switch
-                value={bluetoothMine}
-                onValueChange={setBluetoothMine}
-                trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
-                thumbColor="#FFFFFF"
-                {...({ activeThumbColor: '#FFFFFF' } as object)}
-                accessibilityLabel={t('Bluetooth Sharing')}
-              />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <ProTag feature="bluetooth_sharing" />
+                <Switch
+                  value={bluetoothMine}
+                  onValueChange={setBluetoothMine}
+                  trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+                  thumbColor="#FFFFFF"
+                  {...({ activeThumbColor: '#FFFFFF' } as object)}
+                  accessibilityLabel={t('Bluetooth Sharing')}
+                />
+              </View>
             }
           />
         ) : null}

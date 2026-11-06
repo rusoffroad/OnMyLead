@@ -6,7 +6,7 @@ import type { FreerideSummary } from '@/core/freeride';
 import type { RangeCheck } from '@/core/fuel';
 import { initialOf } from '@/core/profile';
 import type { MyRouteSummary, PlacedRider } from '@/core/route';
-import { convoyLayout, describeRank, groupSpread, rankRiders } from '@/core/route-order';
+import { convoyLayout, describeRank, rankRiders, spreadRuler, type SpreadRuler } from '@/core/route-order';
 
 import { t as tr } from '@/lib/i18n';
 const RANGE_COLOR: Record<RangeCheck, string> = { get ok() { return RideColors.green; }, get tight() { return RideColors.yellow; }, get over() { return RideColors.red; } };
@@ -22,12 +22,13 @@ const LABEL_W = 190;
  * to the far left edge and the tail gunner pinned to the far right edge (core/route-order
  * convoyLayout). Everyone else sits between them by how far behind the leader they are, as near
  * that spot as they can without hiding a neighbor, so a bunched-up group reads as a string of
- * dots rather than one blob. Tap a dot for the rider's name and place. The head still shows the
- * miles done and to go on a route, so one glance answers both "how far along are we?" and "where
- * am I in the group?" without reading a map.
+ * dots rather than one blob. Tap a dot for the rider's name and place. Under the line a
+ * dimension line (core/route-order spreadRuler) gives the distance from the leader to whoever is
+ * furthest back, with a tick every round step, so the spacing has a scale. Below that, one
+ * centered sentence says where this rider is. (Chris, 2026-11-05: no miles-done header.)
  *
  * On a Freeride (no mapped route) the distances are measured along the leader's own path
- * (core/freeride), with the group's spread in place of the miles done.
+ * (core/freeride).
  */
 export function RouteStrip({
   riders, meId, summary, nameOf, offline, range, compact, lastSeenIds, freeride,
@@ -51,9 +52,11 @@ export function RouteStrip({
   const ranked = rankRiders(riders);
   const [width, setWidth] = useState(0);
   const sizeOf = (r: PlacedRider) => (r.id === meId ? SIZE.me : SIZE[r.role]);
-  const spots = new Map(
-    convoyLayout(ranked, sizeOf, width).map((d) => [d.id, d]),
-  );
+  const layout = convoyLayout(ranked, sizeOf, width);
+  const spots = new Map(layout.map((d) => [d.id, d]));
+  // The scale under the line: leader to whoever is furthest back, with round-step ticks.
+  const ruler = width ? spreadRuler(ranked, layout) : null;
+  const rulerStale = !!ruler && !!lastSeenIds?.length && [ranked.find((r) => r.role === 'leader') ?? ranked[0], ranked[ranked.length - 1]].some((r) => r.id !== meId && lastSeenIds.includes(r.id));
   // Draw me last so my dot sits on top, then the leader and sweep over the riders.
   const order = [...ranked].sort((a, b) => layer(a) - layer(b));
   function layer(r: PlacedRider) {
@@ -69,46 +72,12 @@ export function RouteStrip({
   }, [picked]);
   const pickedRider = picked ? ranked.find((r) => r.id === picked) : undefined;
   const pickedSpot = pickedRider ? spots.get(pickedRider.id) : undefined;
-  const spread = groupSpread(ranked);
   const offWord = freeride ? tr('off the leader’s path') : tr('off the route');
   const describe = (r: (typeof ranked)[number]) => describeRank(r, ranked, nameOf(r.id), meId, offWord);
   const fs = freeride?.summary;
-  const [spreadNum, ...spreadUnit] = fs?.spread?.split(' ') ?? [];
 
   return (
     <View style={styles.wrap}>
-      <View
-        style={styles.head}
-        accessible
-        accessibilityLabel={freeride ? [
-          freeride.waiting ? tr('Freeride. Waiting for the leader to share their location.') : fs?.spread ? tr('Freeride. The group is spread over {spread}, {ends}.', { spread: fs.spread, ends: fs.ends }) : `Freeride. ${fs?.ends}.`,
-          fs?.compared ?? '',
-        ].join(' ') : [
-          summary ? tr('Mile {doneMi} of {totalMi}. {compared} {v}', { doneMi: summary.doneMi, totalMi: summary.totalMi, compared: summary.compared, v: summary.offRoute ?? '' }) : tr('Route, {length} riders on it', { length: ranked.length }),
-          spread ? tr('{spread}, front to rear.', { spread }) : '',
-        ].join(' ')}>
-        {freeride ? (
-          freeride.waiting ? (
-            <Text style={styles.of}>{tr('Waiting for the Leader')}</Text>
-          ) : fs?.spread ? (
-            <Text style={styles.big}>
-              {spreadNum}
-              <Text style={styles.of}>{tr('{v} spread', { v: spreadUnit.join(' ') })}</Text>
-            </Text>
-          ) : (
-            <Text style={styles.of}>{fs?.ends}</Text>
-          )
-        ) : summary ? (
-          <Text style={styles.big}>
-            {summary.doneMi}
-            <Text style={styles.of}>{tr('of {totalMi} mi', { totalMi: summary.totalMi })}</Text>
-          </Text>
-        ) : (
-          <Text style={styles.of}>{tr('Route · {v}', { v: ranked.length ? tr('{n} on the line', { n: ranked.length }) : tr('nobody placed yet') })}</Text>
-        )}
-        <Text style={styles.toGo}>{freeride ? (freeride.waiting || !fs?.spread ? tr('Freeride') : fs.ends) : summary ? summary.toGo : offline ? tr('Saved route, no signal') : ''}</Text>
-      </View>
-
       <View style={styles.track} onLayout={(e) => setWidth(Math.round(e.nativeEvent.layout.width))}>
         <View style={styles.rail} />
         {order.map((r) => {
@@ -164,11 +133,13 @@ export function RouteStrip({
         ) : null}
       </View>
 
+      {ruler ? <Ruler ruler={ruler} stale={rulerStale} /> : null}
+
       {compact ? null : freeride ? (
         <Text style={styles.compared}>
           {freeride.waiting
             ? tr('The line fills in once the leader shares their location.')
-            : fs?.compared ?? 'Share your location to see how far you are behind the leader.'}
+            : fs?.compared ?? tr('Share your location to see how far you are behind the leader.')}
         </Text>
       ) : summary ? (
         <Text style={styles.compared}>
@@ -188,13 +159,56 @@ export function RouteStrip({
   );
 }
 
+/**
+ * A dimension line under the leader line, end caps under the leader's and the tail's dots, the
+ * leader-to-rear distance in the middle and a small tick every round step (core spreadRuler).
+ */
+function Ruler({ ruler, stale }: { ruler: SpreadRuler; stale: boolean }) {
+  const [labelW, setLabelW] = useState(0);
+  const mid = (ruler.fromX + ruler.toX) / 2;
+  const gapL = mid - labelW / 2 - 6;
+  const gapR = mid + labelW / 2 + 6;
+  const label = stale ? `~${ruler.label}` : ruler.label;
+  return (
+    <View
+      style={styles.ruler}
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={`${ruler.ends}, ${label}${stale ? tr(', last seen here') : ''}`}>
+      <View style={[styles.rulerCap, { left: ruler.fromX - 0.75 }]} />
+      <View style={[styles.rulerCap, { left: ruler.toX - 0.75 }]} />
+      {labelW ? (
+        <>
+          <View style={[styles.rulerLine, { left: ruler.fromX, width: Math.max(0, gapL - ruler.fromX) }]} />
+          <View style={[styles.rulerLine, { left: gapR, width: Math.max(0, ruler.toX - gapR) }]} />
+        </>
+      ) : null}
+      {ruler.ticks.filter((x) => x < gapL - 3 || x > gapR + 3).map((x) => (
+        <View key={x} style={[styles.rulerTick, { left: x - 0.5 }]} />
+      ))}
+      <Text
+        onLayout={(e) => setLabelW(Math.ceil(e.nativeEvent.layout.width))}
+        style={[styles.rulerText, { left: mid - labelW / 2, opacity: labelW ? 1 : 0 }, stale && styles.rulerStale]}
+        numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 const styles = themedStyles(() => ({
   wrap: { gap: 8, paddingHorizontal: 4, paddingBottom: 4 },
-  head: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between' },
-  big: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 34, lineHeight: 36 },
-  of: { color: Colors.textSecondary, fontFamily: font(700, 'display'), fontSize: 20 },
-  toGo: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14 },
   track: { height: 34, justifyContent: 'center', marginHorizontal: 10 },
+  // Sits close under the track (the wrap's gap is 8): caps at 0, line at 5, ticks hang from it.
+  ruler: { height: 16, marginTop: -6, marginHorizontal: 10 },
+  rulerCap: { position: 'absolute', top: 0, width: 1.5, height: 11, borderRadius: 1, backgroundColor: Colors.textSecondary, opacity: 0.8 },
+  rulerLine: { position: 'absolute', top: 5, height: 1, backgroundColor: Colors.textSecondary, opacity: 0.55 },
+  rulerTick: { position: 'absolute', top: 5, width: 1, height: 4, backgroundColor: Colors.textSecondary, opacity: 0.55 },
+  rulerText: {
+    position: 'absolute', top: -1, color: Colors.textSecondary, fontFamily: font(700), fontSize: 12, lineHeight: 14,
+    letterSpacing: 0.3, fontVariant: ['tabular-nums'],
+  },
+  rulerStale: { fontStyle: 'italic' },
   rail: { position: 'absolute', left: 0, right: 0, height: 6, borderRadius: 3, backgroundColor: Colors.backgroundSelected },
   dot: { position: 'absolute', top: '50%', borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   letter: { color: '#fff', fontFamily: font(800), fontSize: 11 },
@@ -203,8 +217,8 @@ const styles = themedStyles(() => ({
     borderRadius: 10, backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
   },
   labelText: { color: Colors.text, fontFamily: font(700), fontSize: 13, lineHeight: 17, textAlign: 'center' },
-  range: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  range: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   rangeDot: { width: 10, height: 10, borderRadius: 5 },
-  rangeText: { flex: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },
-  compared: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20 },
+  rangeText: { flexShrink: 1, color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 18 },
+  compared: { color: Colors.text, fontFamily: font(600), fontSize: 15, lineHeight: 20, textAlign: 'center' },
 }));

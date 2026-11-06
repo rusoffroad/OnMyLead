@@ -31,7 +31,10 @@ export function onCarPlayAction(listener: (id: string) => void): Subscription {
   return native?.addListener('onAction', (e) => listener(e.id)) ?? { remove() {} };
 }
 
-/** Sends the car screen's fixed words in the rider's language. The root layout calls it at launch and on a language change. */
-export function syncCarPlayLabels() {
-  native?.setLabels?.(carPlayLabels());
+/**
+ * Sends the car screen's fixed words in the rider's language. The root layout calls it at launch,
+ * on a language change and when the plan changes (`proNeeded` turns the waiting screen into the Pro notice).
+ */
+export function syncCarPlayLabels(proNeeded = false) {
+  native?.setLabels?.(carPlayLabels(proNeeded));
 }

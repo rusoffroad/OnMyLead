@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_PARK_TRAILS, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -68,6 +68,7 @@ export function Showcase() {
           <img src="/showcase/logo-lockup.png" alt="OnMyLead" width={158} height={36} />
         </a>
         <nav aria-label="Sections">
+          {SHOWCASE_NO_SERVICE ? <a href="#no-service" onClick={jump('no-service')}>No Service</a> : null}
           <a href="#new" onClick={jump('new')}>New in 2.0</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
@@ -100,6 +101,11 @@ export function Showcase() {
               Free to download and ride. Pro is {PRO_PRICES.monthly} a month or {PRO_PRICES.annual} a year, and every
               new account gets {TRIAL_DAYS} days of Pro with no card.
             </p>
+            {SHOWCASE_NO_SERVICE ? (
+              <a className="hero-new" href="#no-service" onClick={jump('no-service')}>
+                <b>New in 2.1</b> No service? Your group still hears you, over Bluetooth.
+              </a>
+            ) : null}
           </div>
           <div className="hero-phone">
             <figure className="phone">
@@ -111,6 +117,8 @@ export function Showcase() {
           Built for SXS/UTV, ATV, Dirt Bike, Motorcycle, Jeep/4x4, Truck, Overland Rig, Snowmobile and Car Club rides.
         </p>
       </section>
+
+      {SHOWCASE_NO_SERVICE ? <NoService /> : null}
 
       <PromoVideo />
 
@@ -143,7 +151,7 @@ export function Showcase() {
               alt="Ride Mode showing every rider in running order on the route line, a Full Map button, a separated rider alert and big status buttons"
               title="Ride Together"
               text="Ride Mode puts the group on one screen. Every rider’s dot sits on the route line in running order, so the leader sees everyone from the front to the rear. On a Freeride with no mapped route, the line shows the group behind the leader and how spread out it is. On the map, a small arrow on each moving rider’s dot, yours included, shows which way they’re heading, and Ride Bubble warns everyone when someone drops back or stops moving. Riders glide smoothly between updates, and the controls sit in one clean panel: three quick replies, More for every status, and EMERGENCY always one tap away."
-              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Type your own message to the group when the buttons don’t cover it, and save the ones you send often', 'Full Map on every map gives you the whole screen (tap it or swipe the panel down), with EMERGENCY one tap away and a swipe up to bring the buttons back', 'Follow Me keeps the map moving with you as you ride: drag to look around, one tap to follow again', ...(SHOWCASE_INTERSECTION_ZOOM ? ['Every rider’s dot has the arrow built in, the leader in blue and the tail gunner in violet, and the map zooms in at intersections so you see the turn, then back out'] : []), ...(SHOWCASE_LEADER_TRACKLINE ? ['A line in the leader’s blue shows exactly where the leader went, and when they cross back over it or double back, the older pass fades so the fresh line stands out'] : [])]}
+              points={['Glove-sized buttons for On My Way, Flat Tire, Need Fuel and Regroup', 'Every tap notifies the group, shows who got it, and cancels in one tap', 'Type your own message to the group when the buttons don’t cover it, and save the ones you send often', 'Full Map on every map gives you the whole screen (tap it or swipe the panel down), with EMERGENCY one tap away and a swipe up to bring the buttons back', 'Follow Me keeps the map moving with you as you ride: drag to look around, one tap to follow again', ...(SHOWCASE_INTERSECTION_ZOOM ? ['Every rider’s dot has the arrow built in, the leader in blue and the tail gunner in violet, and the map zooms in at intersections so you see the turn, then back out'] : []), ...(SHOWCASE_LEADER_TRACKLINE ? ['A line in the leader’s blue shows exactly where the leader went, and when they cross back over it or double back, the older pass fades so the fresh line stands out'] : []), ...(SHOWCASE_SPREAD_RULER ? ['A measuring line under the rider line shows how far the last rider is behind the leader, with ticks every round step, even over Bluetooth with no service'] : [])]}
             />
             <Step
               n={4}
@@ -296,20 +304,20 @@ export function Showcase() {
             <ul className="ticks">
               <li><b>Trails on the Map.</b> Bold trail lines with their names on the map, showing from about 15 miles across: public land trails and roads, plus OpenStreetMap trails in off-road parks like Hidden Falls. Closed trails and roads show in red, from Forest Service and BLM travel plans and seasons. Over satellite or topo.</li>
               {SHOWCASE_MAP_FEATURES ? (
-                <li><b>Map Features.</b> Pick what the map shows: highways and paved roads in blue, dirt roads, street-legal-only roads, off-road trails, width-limited trails, and hiking trails in their own pink dash-dot so you never mistake one for a ride. Turn on national forests, BLM land, national and state parks, and Texas property lines, then tap the map to see whose land you’re on.</li>
+                <li><b>Map Settings.</b> One Map Settings button in the top-left corner of every riding map, level with the compass and on screen even in Full Map, opens everything: the map style, big switches for streets and roads, off-road trails, hiking trails and land boundaries, how the map follows you (zoom out at the edge, zoom in at intersections), your own dot’s look and size (a red, white and blue 3D dome by default), and the map’s own buttons like the tilt meter and music. Fine-tune what the map shows: highways and paved roads in blue, dirt roads, street-legal-only roads, off-road trails, width-limited trails, and hiking trails in their own pink dash-dot so you never mistake one for a ride. Turn on national forests, BLM land, national and state parks, and Texas property lines, then tap the map to see whose land you’re on.</li>
               ) : null}
               {SHOWCASE_PARK_TRAILS ? (
                 <li><b>Offroad Park Trails.</b> The trails of Hidden Falls, Katemcy Rocks, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR and about fifty more parks and OHV areas, drawn on every map in the park’s own levels: green for 1 and 2, blue 3, white 4, red 5, with the park’s name from far out and trail names up close. Tap one for its level and length.</li>
               ) : null}
               {SHOWCASE_3D_TERRAIN ? (
-                <li><b>3D Terrain.</b> One tap on the 3D button in Ride Mode and Map Mode shows satellite on the real shape of the ridges and canyons, with contour lines and peak heights in feet. Tilt and turn it, and save it in Offline Maps for no-signal riding.</li>
+                <li><b>3D Terrain.</b> Pick it in Map Settings in Ride Mode and Map Mode to see satellite on the real shape of the ridges and canyons, with contour lines and peak heights in feet. Tilt and turn it, and save it in Offline Maps for no-signal riding.</li>
               ) : null}
               <li><b>Will It Fit?</b> Tap a trail to see its width limit: 50 inch Forest Service trails, and widths riders add to any public trail. Add your machine’s width in the Garage and the card tells you if it fits.</li>
               <li><b>Routes That Follow the Trail.</b> Tap a few points and the route runs along the trail between them, worked out on your phone, even with no signal in an area you’ve downloaded.</li>
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
               <li><b>A Family Link.</b> People at home follow along on a read-only page, no app needed.</li>
-              <li><b>Bluetooth Sharing, New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on.</li>
+              <li><b>Bluetooth Sharing, New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on. Spots, taps and messages are Pro; EMERGENCY goes out on every plan.</li>
             </ul>
           </div>
           <figure className="signal-map">
@@ -347,12 +355,15 @@ export function Showcase() {
               <Feature title="Social: Like, Comment and Post">Like any ride, badge, trail or post in your Feed, and open Social to see all your friends’ activity and every comment. Pro riders post ride reports and photos to their profile, comment, and share their rides and badges to Facebook, Instagram or X with one tap. Tap anyone’s picture to see it full size.{SHOWCASE_COMMENT_REPLIES ? ' Like any comment, reply to keep the conversation going, and see friends’ photos right in your Feed.' : ''} Your location never goes in a post or a share.</Feature>
               <Feature title="Friends">Add the riders you ride with as friends, or share your friend link. Friends see each other when they’re out riding nearby and can message any time, without ever sharing where they are.</Feature>
               <Feature title="Profile Pictures">Take a photo or pick one from your library, cropped square and shrunk to a small file. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
+              {SHOWCASE_GROUP_PHOTOS ? (
+                <Feature title="Group Photos">Give your riding group a photo of the crew. Everyone in the group sees it on the group page, in their group list and on Home, and friends you send the group link to see it before they join, so they know it’s your crew.</Feature>
+              ) : null}
               <Feature title="Pick Your Own Code">Give your ride, riding group or friend link a code that’s easy to say at the trailhead, like MOAB-2026. OnMyLead checks as you type that nobody else has it.</Feature>
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
               <Feature title="Gear from RUS Offroad">Suggestions for what to bring, from the people who build the parts.</Feature>
               <Feature title="Your Location Is Never Public">Share with your ride or with people you pick, for 15 minutes to 8 hours, until an end date up to a year out, or until you turn it off, and stop with one tap. Strangers see a rounded area; the exact meeting spot is only for riders who join.</Feature>
               <Feature title="Tilt Meter and Crash Alert">See your roll and pitch over the map, with a full tilt meter whose axle and wheels lean as you do. Zero it for your mount, set your own limits and get a buzz before a steep side hill, or switch it off with one tap. In Ride Mode, a hard hit or a rollover starts a 30 second I’m OK countdown, and if you don’t answer, your group gets an EMERGENCY alert with your location. It works with no signal and sends once you reconnect. It never calls 911.</Feature>
-              <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.</Feature>
+              <Feature title="Emergency, Never by Accident">Hold Alert My Group and a bar fills while it says Keep Holding, so you know it’s working. Let go early and nothing is sent. When it goes out, every rider on the ride is told, even in quiet hours.{SHOWCASE_EMERGENCY_SIREN ? ' Their phones sound a loud siren until they silence it, including riders in Bluetooth range when there’s no service, so nobody misses it over the engine.' : ''}</Feature>
               <Feature title="Update Heads-Ups">When a fix is out, an Update Available card says so on the home screen, and if your version has a known problem, About This Version tells you what to do until the fix arrives.</Feature>
               <Feature title="Report or Block Any Rider">Press and hold a message, tap a rider, or use Report a Rider on the You tab to report harassment or threats. The OnMyLead team reads the messages you report and can suspend or ban riders who break the rules. A blocked rider’s messages disappear for you, and nobody is told who reported or blocked them.</Feature>
               {referralsOn ? (
@@ -611,6 +622,98 @@ function NewIn2() {
   );
 }
 
+/**
+ * Bluetooth Sharing (2.1), the headline of the release: with no cell service, phones on the same ride
+ * pass spots, status taps, EMERGENCY and messages to each other and along the group. The picture is
+ * a strung-out group on a trail: a tap from the tail gunner hops rider to rider up to the leader.
+ * Claims match help/articles/bluetooth-sharing.md (range, six hops, not a satellite messenger).
+ */
+const NS_RIDERS = [
+  { x: 120, y: 520, kind: 'sweep' },
+  { x: 315, y: 468, kind: 'rider' },
+  { x: 495, y: 372, kind: 'rider' },
+  { x: 680, y: 300, kind: 'rider' },
+  { x: 872, y: 168, kind: 'leader' },
+] as const;
+
+const NS_FACTS = [
+  { title: 'See Each Other', text: 'Riders near you keep moving on your map, marked Via Bluetooth, while you share your location with the ride.' },
+  { title: 'Taps and EMERGENCY', text: 'Flat Tire, Need Fuel or EMERGENCY reaches nearby riders at once. EMERGENCY always goes first, and your card shows who got it and who saw it.' },
+  { title: 'Messages, Read Out Loud', text: 'Quick replies and the messages you type in Ride Mode reach nearby riders whole, in any language, and their phones read them out.' },
+  { title: 'Passed Down the Line', text: 'Each phone passes on what it hears, up to six phones, so the back of the group reaches the front. The first phone to get a bar sends it all to OnMyLead.' },
+];
+
+function NoService() {
+  return (
+    <section id="no-service" className="ns" aria-labelledby="ns-title">
+      <div className="ns-inner">
+        <div className="ns-copy">
+          <p className="ns-bars" aria-hidden="true">
+            <svg viewBox="0 0 28 22" width="28" height="22">
+              <rect x="1" y="15" width="4" height="6" rx="1" />
+              <rect x="8" y="11" width="4" height="10" rx="1" />
+              <rect x="15" y="6" width="4" height="15" rx="1" />
+              <rect x="22" y="1" width="4" height="20" rx="1" />
+              <path d="M2 2 L26 20" />
+            </svg>
+            No Service
+          </p>
+          <h2 id="ns-title" className="ns-title">No Service?<br />Your Group Still Hears You.</h2>
+          <p>
+            Out past the last bar, OnMyLead phones on the same ride talk to each other over Bluetooth. Riders near you
+            keep moving on your map, and a status tap, a message or an EMERGENCY still gets through. Every phone passes
+            it along, so the rider at the back reaches the leader through the riders in between.
+          </p>
+          <p className="ns-small">
+            New in 2.1 with OnMyLead Pro (every new account gets {TRIAL_DAYS} days of Pro free). On every plan, phones
+            pass it all along and EMERGENCY goes out over Bluetooth. iPhone, iPad and Android all work together, and
+            it’s encrypted so only riders on your ride can read it.
+          </p>
+        </div>
+        <figure className="ns-map">
+          <svg viewBox="0 0 1000 640" role="img" aria-label="Five riders strung out along a trail with no cell service. A Flat Tire tap from the tail gunner hops phone to phone, rider to rider, up to the leader.">
+            <path className="ns-trail" d="M -20 560 C 60 540, 90 520, 120 520 S 250 500, 315 468 S 430 380, 495 372 S 610 330, 680 300 S 800 200, 872 168 S 960 120, 1030 100" />
+            {NS_RIDERS.map((r, i) => (
+              <circle key={`range${i}`} className="ns-range" cx={r.x} cy={r.y} r={140} />
+            ))}
+            {NS_RIDERS.slice(1).map((r, i) => (
+              <line key={`hop${i}`} className="ns-hop" style={{ animationDelay: `${0.35 + i * 0.6}s` }} x1={NS_RIDERS[i].x} y1={NS_RIDERS[i].y} x2={r.x} y2={r.y} pathLength={1} />
+            ))}
+            {NS_RIDERS.map((r, i) => (
+              <circle key={`ping${i}`} className="ns-ping" style={{ animationDelay: `${i * 0.6}s` }} cx={r.x} cy={r.y} r={140} />
+            ))}
+            {NS_RIDERS.map((r, i) => (
+              <circle key={`dot${i}`} className={`ns-dot ns-${r.kind}`} cx={r.x} cy={r.y} r={r.kind === 'leader' ? 24 : r.kind === 'sweep' ? 20 : 16} />
+            ))}
+          </svg>
+          <div className="ns-card ns-card-from">
+            <b>Flat Tire</b>
+            <span>Reached Ray over Bluetooth</span>
+          </div>
+          <div className="ns-card ns-card-to">
+            <b>Jess: Flat Tire</b>
+            <span>Via Bluetooth</span>
+          </div>
+          <figcaption>One tap from the tail gunner, carried rider to rider to the leader.</figcaption>
+        </figure>
+        <dl className="ns-facts">
+          {NS_FACTS.map((f) => (
+            <div key={f.title}>
+              <dt>{f.title}</dt>
+              <dd>{f.text}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="ns-range-note">
+          Bluetooth reaches about 100 to 300 feet between phones in the open, and less through trees, hills and steel,
+          so it works best when the group rides close. Riders in between carry it farther. It isn’t a satellite
+          messenger and can’t reach 911. <a href="/help/bluetooth-sharing">How Bluetooth Sharing works</a>
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function Feature({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="feature">
@@ -644,13 +747,14 @@ const PRO = [
   'Offline Maps',
   'Post, Comment and Share to Social Media',
   'Create Events',
-  'Saved Riding Groups and Custom Codes',
+  ...(SHOWCASE_NO_SERVICE ? ['Bluetooth Sharing With No Service'] : []),
+  SHOWCASE_NO_SERVICE ? 'Saved Riding Groups, Group Photos and Custom Codes' : 'Saved Riding Groups and Custom Codes',
   'Create and Vote on Ride Polls',
   'Your Own Messages and Music Controls',
   'Full Ride History',
   'Advanced Ride Statistics and Premium Cards',
   'Advanced Trip Planning and Garage Build Sheet',
-  'Themes, Light Mode and Natural Voices',
+  SHOWCASE_NO_SERVICE ? 'Themes, Light Mode, Natural Voices and Custom Dots' : 'Themes, Light Mode and Natural Voices',
   'Sync Across Devices',
 ];
 
@@ -974,6 +1078,67 @@ const CSS = `
 }
 @keyframes settle { from { transform: scale(1.08); opacity: 0.4; } to { transform: none; opacity: 1; } }
 @keyframes rise { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* No Service (Bluetooth Sharing, 2.1): the release headline, right under the hero. */
+.hero-new { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-top: 22px; padding: 10px 16px; border-radius: 12px;
+  background: rgba(59, 134, 247, 0.16); border: 1.5px solid rgba(59, 134, 247, 0.55); color: #fff; text-decoration: none; font-size: 17px; }
+.hero-new b { color: #8DB8FF; }
+.hero-new:hover { background: rgba(59, 134, 247, 0.26); }
+.ns { position: relative; padding: 120px 0 40px; isolation: isolate; }
+.ns::before { content: ''; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(60% 55% at 72% 42%, rgba(59, 134, 247, 0.16), rgba(59, 134, 247, 0) 70%); }
+.ns-inner { max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 32px 56px; align-items: center; }
+.ns-bars { display: inline-flex; align-items: center; gap: 10px; color: var(--dust); font-family: ${display7}; font-size: 20px; }
+.ns-bars rect { fill: var(--line); }
+.ns-bars path { stroke: var(--red); stroke-width: 3; stroke-linecap: round; }
+.ns-title { margin-top: 14px !important; font-size: clamp(46px, 5.6vw, 76px); line-height: 0.94; }
+.ns-copy > p:not(.ns-bars) { margin-top: 22px; color: #DCE3EC; font-size: 20px; max-width: 30em; }
+.ns-copy > .ns-small { margin-top: 14px; color: var(--soft); font-size: 16px; }
+.ns-map { position: relative; margin: 0; }
+.ns-map svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ns-trail { fill: none; stroke: var(--sand); stroke-opacity: 0.55; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 2 18; }
+.ns-range { fill: rgba(59, 134, 247, 0.05); stroke: rgba(59, 134, 247, 0.35); stroke-width: 2; stroke-dasharray: 6 10; }
+.ns-hop { stroke: #8DB8FF; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; filter: drop-shadow(0 0 8px rgba(59, 134, 247, 0.9)); }
+.ns-ping { fill: none; stroke: #8DB8FF; stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ns-dot { stroke: var(--text); stroke-width: 4; }
+.ns-rider { fill: var(--rider); }
+.ns-leader { fill: var(--blue); stroke-width: 5; }
+.ns-sweep { fill: var(--sweep); }
+.ns-card { position: absolute; display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-radius: 12px; background: rgba(18, 34, 58, 0.96);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.9); font-size: 15px; line-height: 1.3; color: var(--soft); white-space: nowrap; }
+.ns-card b { color: var(--text); font-size: 17px; }
+.ns-card-from { left: 0; top: 90%; transform: translateY(-100%); border-left: 5px solid var(--sweep); }
+.ns-card-to { right: 0; top: 0; border-left: 5px solid var(--blue); }
+.ns-map figcaption { margin-top: 18px; color: var(--dust); font-family: ${display7}; font-size: 18px; }
+.ns-facts { grid-column: 1 / -1; margin: 40px 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+.ns-facts > div { border-top: 3px solid var(--blue); padding-top: 16px; }
+.ns-facts dt { font-family: ${display}; font-size: 26px; line-height: 1.05; }
+.ns-facts dd { margin: 10px 0 0; color: var(--soft); font-size: 16px; line-height: 1.5; }
+.ns-range-note { grid-column: 1 / -1; color: var(--dust); font-size: 15px; max-width: 62em; }
+.ns-range-note a { color: #8DB8FF; font-family: ${body7}; white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .ns-hop { stroke-dashoffset: 1; animation: ns-hop 6s linear infinite; }
+  .ns-ping { animation: ns-ping 6s ease-out infinite; }
+}
+@keyframes ns-hop { 0% { stroke-dashoffset: 1; opacity: 1; } 9% { stroke-dashoffset: 0; } 72% { stroke-dashoffset: 0; opacity: 1; } 85%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes ns-ping { 0% { transform: scale(0.12); opacity: 0.9; } 16% { transform: scale(1); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
+@media (max-width: 980px) {
+  .ns-inner { grid-template-columns: 1fr; }
+  .ns-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
+}
+@media (max-width: 640px) {
+  .ns { padding-top: 80px; }
+  .ns-copy > p:not(.ns-bars) { font-size: 17px; }
+  .ns-card { font-size: 13px; padding: 8px 10px; }
+  .ns-card b { font-size: 15px; }
+  .ns-map { display: flex; flex-direction: column; gap: 10px; }
+  .ns-map svg { order: 0; }
+  .ns-card { position: static; transform: none; align-self: flex-start; }
+  .ns-card-from { order: 1; }
+  .ns-card-to { order: 2; align-self: flex-end; }
+  .ns-map figcaption { order: 3; margin-top: 8px; font-size: 16px; }
+  .ns-facts { grid-template-columns: 1fr; gap: 24px; }
+}
 
 /* Section titles */
 .section-title { font-size: clamp(42px, 5.2vw, 68px); line-height: 0.96; }

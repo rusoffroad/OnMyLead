@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { Platform } from 'react-native';
 
 import { can, parseProError, type FeatureKey } from '@/core/entitlements';
 import type { ReportSource } from '@/core/moderation';
@@ -42,6 +43,13 @@ export function useProGatePrompt(): ProBlock | null {
     () => prompt,
   );
 }
+
+/**
+ * iPhone and iPad can't show the Pro prompt (a Modal) over another Modal, so a prompt asked for
+ * from inside a sheet waits until the sheet has gone (its onDismiss). Android and the website show
+ * it over the closing sheet straight away.
+ */
+export const PRO_PROMPT_WAITS_FOR_DISMISS = Platform.OS === 'ios';
 
 /** True when the feature is allowed; otherwise opens the Pro prompt and returns false. */
 export function requirePro(feature: FeatureKey): boolean {

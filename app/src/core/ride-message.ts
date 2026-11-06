@@ -8,7 +8,7 @@
  *
  * Riders can keep messages they send often as their own quick replies on this device.
  */
-import { QUICK_REPLIES } from './chat';
+import { builtInReply, tidyRideMessage } from './chat';
 
 import { tc } from './i18n';
 /** Longest custom Ride Mode message: it is the push title, so it has to read at a glance. */
@@ -18,10 +18,7 @@ export const MAX_SAVED_REPLIES = 6;
 
 export type RideMessageCheck = { ok: true; body: string } | { ok: false; error: string };
 
-/** One line, single spaces, trimmed. */
-export function tidyRideMessage(raw: string): string {
-  return raw.replace(/\s+/g, ' ').trim();
-}
+export { tidyRideMessage };
 
 /** Tidy and validate what the rider typed in Ride Mode before it is sent. */
 export function checkRideMessage(raw: string): RideMessageCheck {
@@ -42,7 +39,7 @@ const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLower
 
 /** True when the message is already one of the built-in quick replies. */
 export function isBuiltInReply(body: string): boolean {
-  return QUICK_REPLIES.some((q) => same(q, tidyRideMessage(body)));
+  return !!builtInReply(body);
 }
 
 /**

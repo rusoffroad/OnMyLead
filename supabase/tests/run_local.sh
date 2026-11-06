@@ -36,6 +36,7 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/park_trails_test.sql" \
   -f "$here/share_codes_test.sql" \
   -f "$here/profile_photos_test.sql" \
+  -f "$here/group_photos_test.sql" \
   -f "$here/notification_inbox_test.sql" \
   -f "$here/ride_miles_test.sql" \
   -f "$here/home_feed_test.sql" \
@@ -49,6 +50,7 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/referrals_test.sql" \
   -f "$here/account_sync_test.sql" \
   -f "$here/pro_tiers_test.sql" \
+  -f "$here/pro_2_1_test.sql" \
   -f "$here/badge_leaderboard_test.sql" \
   -f "$here/bluetooth_sharing_test.sql" \
   -f "$here/waypoint_alerts_test.sql" \
@@ -56,5 +58,6 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/event_presenter_test.sql" \
   -f "$here/bluetooth_mesh_test.sql" \
   -f "$here/riding_spots_test.sql" \
-  -f "$here/leader_trackline_test.sql"
+  -f "$here/leader_trackline_test.sql" \
+  -f "$here/emergency_siren_test.sql"
 bash "$here/concurrency_test.sh" "$db"

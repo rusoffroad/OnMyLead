@@ -17,11 +17,13 @@ import { Linking, Platform } from 'react-native';
 
 import { planReminders } from '@/core/notifications';
 import { tapData, tapTarget, type TapData } from '@/core/push-tap';
+import { SIREN_CHANNEL, SIREN_SOUND, unknownRider, type EmergencyCall } from '@/core/siren';
 import { ackRideItems, myRides } from './api';
 import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
+import { endEmergency, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -29,6 +31,8 @@ import { tc } from '@/core/i18n';
 Notifications.setNotificationHandler({
   handleNotification: async (n) => {
     const data = tapData(n.request.content.data);
+    // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner.
+    if (isEmergency(data) && sirenEnabled()) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
@@ -37,6 +41,39 @@ Notifications.setNotificationHandler({
 });
 
 let registeredFor: string | null = null;
+/** This phone's push token, once registered, so the siren switch can be sent with it. */
+let myToken: string | null = null;
+
+const isEmergency = (d: TapData | undefined) => d?.type === 'status' && (d as { status?: unknown }).status === 'emergency';
+
+/**
+ * Tells the server whether this phone wants the Emergency Siren as the sound of EMERGENCY pushes
+ * (push_tokens.siren). Fails quietly until the server has the siren update; then pushes keep their
+ * plain sound.
+ */
+async function sendSirenSetting() {
+  if (!myToken) return;
+  try {
+    await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
+  } catch {}
+}
+onSirenSetting(() => void sendSirenSetting());
+
+// A call that came over Bluetooth while the app was in the background: the siren as a notification
+// (no service means no push). Tapping it opens Ride Mode and silences it.
+setBackgroundSirenNotifier((c: EmergencyCall) => {
+  const name = c.name?.trim() || tc('A rider');
+  Notifications.scheduleNotificationAsync({
+    content: {
+      title: c.possibleCrash ? tc('Possible Crash: {name}', { name }) : tc('EMERGENCY: {name} needs help now', { name }),
+      body: tc('Sent over Bluetooth. Tap to see where they are.'),
+      sound: SIREN_SOUND,
+      interruptionLevel: 'timeSensitive',
+      data: { type: 'status', status: 'emergency', rideId: c.rideId, itemId: c.id },
+    },
+    trigger: Platform.OS === 'android' ? { channelId: SIREN_CHANNEL } : null,
+  }).catch(() => {});
+});
 
 /**
  * Ask once for permission and register this phone for the signed-in rider. Safe to call
@@ -54,6 +91,8 @@ export async function registerForPush(userId: string): Promise<void> {
     if (typeof token !== 'string' || !token) return;
     // Fails harmlessly until the database has the push update.
     await supabase.rpc('register_push_token', { p_token: token, p_platform: Platform.OS });
+    myToken = token;
+    await sendSirenSetting();
   } catch {
     // No push entitlement (free Apple ID build), no network, or no backend support yet.
   }
@@ -71,6 +110,23 @@ async function createAndroidChannels() {
       description: tc('Need Help, EMERGENCY and other status taps from your group.'),
       importance: Notifications.AndroidImportance.MAX,
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    }),
+    // EMERGENCY with the Emergency Siren on (core/siren.ts). A channel's sound can't change once
+    // it is made, so the siren has its own channel; it plays as an alarm, so it is heard with
+    // the ringer on silent.
+    Notifications.setNotificationChannelAsync(SIREN_CHANNEL, {
+      name: tc('Emergency Siren'),
+      description: tc('A siren when someone in your group sends EMERGENCY or a crash alert.'),
+      importance: Notifications.AndroidImportance.MAX,
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      sound: SIREN_SOUND,
+      bypassDnd: true,
+      enableVibrate: true,
+      vibrationPattern: [0, 800, 400, 800, 400, 800],
+      audioAttributes: {
+        usage: Notifications.AndroidAudioUsage.ALARM,
+        contentType: Notifications.AndroidAudioContentType.SONIFICATION,
+      },
     }),
     Notifications.setNotificationChannelAsync('ride-chat', { name: tc('Ride Chat'), description: tc('Messages in ride and group chats.'), importance: high }),
     Notifications.setNotificationChannelAsync('ride-updates', {
@@ -109,6 +165,8 @@ export function useNotificationTaps() {
     handled.current = key;
     const data = tapData(last.notification.request.content.data);
     acknowledge(data);
+    // The rider heard the siren and opened it: it doesn't sound again in the app.
+    if (isEmergency(data) && typeof data?.itemId === 'string') silenceEmergency(data.itemId);
     // Its row in the Notifications inbox counts as read.
     markReadForPush(last.notification.request.content.data);
     const target = tapTarget(data);
@@ -121,6 +179,28 @@ export function useNotificationTaps() {
   }, [last, navReady]);
 }
 
+/** An EMERGENCY push while the app is open sounds the siren; a cancelled one stops it. */
+function sirenFromPush(data: TapData | undefined) {
+  if (typeof data?.itemId !== 'string') return;
+  if (data.type === 'cancelled') return endEmergency(data.itemId);
+  if (!isEmergency(data) || typeof data.rideId !== 'string') return;
+  const d = data as TapData & { name?: unknown; userId?: unknown };
+  raiseEmergency(
+    {
+      id: data.itemId,
+      rideId: data.rideId,
+      // The rider, when the server says (notify-ride-message); else the call stands on its own.
+      userId: typeof d.userId === 'string' ? d.userId : unknownRider(data.itemId),
+      name: typeof d.name === 'string' ? d.name : null,
+      status: 'emergency',
+      // A push is news: it was just sent.
+      at: Date.now(),
+      source: 'push',
+    },
+    registeredFor,
+  );
+}
+
 /**
  * A ride you're on was cancelled, removed or moved while the app is running: reschedule the
  * reminders so the old one doesn't go off.
@@ -130,6 +210,7 @@ export function useRideChangeReminders() {
     const sub = Notifications.addNotificationReceivedListener((n) => {
       const data = tapData(n.request.content.data);
       acknowledge(data);
+      sirenFromPush(data);
       // The bell on the Rides tab picks it up straight away.
       refreshInbox();
       if (data?.type === 'ride' && data.change !== 'live') syncRideReminders(currentNotificationSettings().reminder_minutes);

@@ -4,7 +4,7 @@ summary: Choose who sees your location and for how long, from a few hours to unt
 category: safety-privacy
 order: 10
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/share.tsx
@@ -163,7 +163,7 @@ Live tracking needs a connection. When your phone has no service:
 Offline maps keep the map on your screen without service, but positions only update when phones have a connection. See [Offline Maps](/help/offline-maps).
 
 :::release 2.1
-The exception is riders close by on the same ride: phones within Bluetooth range (about 30 to 100 meters) pass spots to each other with no service, encrypted for the ride only. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+The exception is riders close by on the same ride: phones within Bluetooth range (about 30 to 100 meters) pass spots to each other with no service, encrypted for the ride only. Seeing those spots and sending yours over Bluetooth is part of OnMyLead Pro. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 ## Who Sees What

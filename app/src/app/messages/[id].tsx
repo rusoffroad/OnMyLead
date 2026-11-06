@@ -211,7 +211,7 @@ export default function Conversation() {
                         delayLongPress={350}
                         accessibilityHint={self ? undefined : tr('Long press to report this message')}
                         style={[styles.bubble, self ? styles.bubbleMine : styles.bubbleTheirs]}>
-                        <Text style={[styles.body, self && { color: '#fff' }]}>{tr(m.body)}</Text>
+                        <Text style={[styles.body, self && { color: '#fff' }]}>{m.body}</Text>
                       </Pressable>
                       <View style={styles.meta}>
                         <Text style={styles.time}>{clock(m.sent_at)}</Text>
@@ -227,7 +227,7 @@ export default function Conversation() {
               <View key={p.localId} style={[styles.row, styles.rowMine]}>
                 <View style={[styles.col, { alignItems: 'flex-end' }]}>
                   <View style={[styles.bubble, styles.bubbleMine, { opacity: p.state === 'sending' ? 0.6 : 1 }, p.state === 'failed' && styles.bubbleFailed]}>
-                    <Text style={[styles.body, { color: '#fff' }]}>{tr(p.body)}</Text>
+                    <Text style={[styles.body, { color: '#fff' }]}>{p.body}</Text>
                   </View>
                   <View style={styles.meta}>
                     <SendBadge state={p.state} />

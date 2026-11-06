@@ -94,6 +94,12 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   quick reply; up to 6 saved My Quick Replies per device, 2.0), broadcast receipts with offline queue and cancel, pinned
   announcement read aloud, Regroup Here, Navigate to a rider, Mechanical Issue spoken to leaders.
 - Emergency sheet: Alert My Group (hold), Call 911.
+- Emergency Siren (2.1 build 10): another rider's EMERGENCY (or a Crash Alert that went out) sounds a
+  looping siren on a full-screen card over any screen until Silence Siren / Show Me Where; the
+  push plays the siren with the app closed (iOS sound, Android `ride-emergency` channel); Bluetooth
+  calls in the background get a local notification. Switch + Play Siren in Notification Settings.
+  `core/siren.ts`, `lib/siren.ts`, `components/emergency-siren.tsx`, migration
+  `20261105070000_emergency_siren.sql`.
 - Keep-awake, speech, haptics, route progress strip, directions sheet, add waypoint.
 - CarPlay ride screen **[iOS-only]** (2.1; Apple granted the Driving Task entitlement 2026-11-04):
   status buttons, Group list, Regroup Here or Running Late, EMERGENCY with confirm, help-call and
@@ -179,6 +185,9 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Groups tab: New Group, your groups, groups you're in, group chat with unread counts and ride
   "tickets", group links (`/g/[code]`), invite a group to a ride, leave / delete **[Pro]** to
   create.
+- Group Photos (2.1): the group's maker adds, changes or removes a 16:9 group photo (group page);
+  shown on the group page, Riding Groups, Home Your Group, Invite a Group and the `/g/[code]` link.
+  Admin removes one from the rider's page.
 - Follow leaders and see their upcoming rides.
 - Blocked riders list; report rider or ride; You > Report a Rider (2.0) for anyone you messaged, friended, rode with or blocked.
 

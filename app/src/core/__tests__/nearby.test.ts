@@ -1,11 +1,12 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
-  ACK_DELIVERED, ACK_SEEN, EMERGENCY_RELAY_SEC, FLAG_FROM_SERVER, MAX_FRAME_BYTES, MAX_HOPS, MAX_REPLY_BYTES, MAX_REPLY_PARTS,
-  NO_MAC, NearbyMesh, POSITION_RELAY_SEC, REPLY_PART_BYTES, TAG_WINDOW_SEC,
-  canonical, fitReply, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
+  ACK_DELIVERED, ACK_SEEN, EMERGENCY_RELAY_SEC, FLAG_FROM_SERVER, MAX_FRAME_BYTES, MAX_HOPS, MAX_REPLY_PARTS,
+  MAX_FRAMES_PER_ROUND, NO_MAC, NearbyMesh, POSITION_RELAY_SEC, REPLY_PART_BYTES, TAG_WINDOW_SEC,
+  canonical, fitReply, pickFrames, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
   type NearbyItem, type RideKeys,
 } from '../nearby';
+import { RIDE_MESSAGE_MAX } from '../ride-message';
 
 const RIDE = '11111111-2222-4333-8444-555555555555';
 const A = 'aaaaaaaa-0000-4000-8000-000000000001';
@@ -70,7 +71,7 @@ describe('packets', () => {
       expect(bytes(p.body)).toBeLessThanOrEqual(REPLY_PART_BYTES);
       expect(sealFrame(key(1), p, nonce(), T0 / 1000).length).toBeLessThanOrEqual(MAX_FRAME_BYTES);
     }
-    expect(bytes(parts.map((p) => p.body).join(''))).toBeLessThanOrEqual(MAX_REPLY_BYTES);
+    expect(bytes(parts.map((p) => p.body).join(''))).toBeLessThanOrEqual(REPLY_PART_BYTES * MAX_REPLY_PARTS);
     expect(splitReply('Running late, go on without me')).toEqual(['Running late, go on without me']);
     expect(splitReply('x'.repeat(100))).toEqual(['x'.repeat(88), 'x'.repeat(12)]);
     const ack = a.ownAck(C, ACK_SEEN, T0)!;
@@ -80,6 +81,18 @@ describe('packets', () => {
     const back = openFrame(key(1), sealFrame(key(1), st, nonce(), T0 / 1000), T0 / 1000);
     expect(back).toEqual(st);
     expect(fitReply('  On my way  ')).toBe('On my way');
+    // The longest Ride Mode message is never cut, even all emoji or Chinese, so the copy a relay
+    // uploads is the whole message.
+    expect(fitReply('🙂'.repeat(RIDE_MESSAGE_MAX))).toBe('🙂'.repeat(RIDE_MESSAGE_MAX));
+    expect(fitReply('路'.repeat(RIDE_MESSAGE_MAX))).toBe('路'.repeat(RIDE_MESSAGE_MAX));
+    // A longer message from the server is cut to whole packets, never more than receivers take.
+    for (const long of ['a' + '路'.repeat(400), '路'.repeat(176), '🙂'.repeat(300)]) {
+      const pieces = splitReply(long);
+      expect(pieces.length).toBeLessThanOrEqual(MAX_REPLY_PARTS);
+      for (const p of pieces) expect(new TextEncoder().encode(p).length).toBeLessThanOrEqual(REPLY_PART_BYTES);
+      expect(fitReply(long)).toBe(pieces.join(''));
+    }
+    expect(splitReply('')).toEqual(['']);
   });
 
   it('keeps a status without a spot', () => {
@@ -300,5 +313,146 @@ describe('NearbyMesh', () => {
     a.ownStatus({ id: C, status: 'stuck', lat: null, lng: null, at: T0 });
     a.forget(C);
     expect(a.live(T0)).toHaveLength(0);
+  });
+});
+
+describe('pickFrames', () => {
+  const reply = (id: string, part: number, parts: number, at: number): NearbyItem =>
+    ({ kind: 'reply', userId: B, id, body: 'x', at, part, parts, flags: 0, hops: 0 } as unknown as NearbyItem);
+  const spot = (userId: string): NearbyItem =>
+    ({ kind: 'position', userId, at: 1, latE7: 0, lngE7: 0, accuracyM: null, speedCms: null, headingDd: null, flags: 0, hops: 0 } as unknown as NearbyItem);
+
+  it('keeps every item when they fit', () => {
+    const items = [reply('m1', 0, 2, 5), reply('m1', 1, 2, 5), spot(A)];
+    expect(pickFrames(items, A)).toEqual([items[2], items[0], items[1]]);
+  });
+
+  it("always sends the rider's own spot and never cuts a message partway", () => {
+    const items: NearbyItem[] = [];
+    for (let m = 0; m < 5; m++) for (let p = 0; p < 6; p++) items.push(reply(`m${m}`, p, 6, 100 - m));
+    items.push(spot(C), spot(A));
+    const out = pickFrames(items, A);
+    expect(out.length).toBeLessThanOrEqual(MAX_FRAMES_PER_ROUND);
+    expect(out).toContain(items[items.length - 1]);
+    const counts = new Map<string, number>();
+    for (const i of out) if (i.kind === 'reply') counts.set(i.id, (counts.get(i.id) ?? 0) + 1);
+    for (const n of counts.values()) expect(n).toBe(6);
+    // Three whole messages fit beside the own spot; a fourth would go over.
+    expect(counts.size).toBe(3);
+    // Later rounds start with other messages, so every message gets a round before it ages out.
+    const seen = new Set<string>();
+    // Least recently sent first: with room for 3 of 5, every message goes within two turns.
+    const sent = new Map<string, number>();
+    for (let turn = 0; turn < 2; turn++) {
+      for (const i of pickFrames(items, A, (k) => sent.get(k) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(`r:${i.id}`, turn); }
+    }
+    expect(seen.size).toBe(5);
+    // The rider's own message goes in every full round, whatever the turn.
+    const mine = [0, 1, 2, 3, 4, 5].map((p) => ({ ...(reply('own', p, 6, 1) as object), userId: A } as unknown as NearbyItem));
+    for (let turn = 0; turn < 5; turn++) expect(pickFrames([...items, ...mine], A, (k) => (k === 'r:own' ? 99 : turn)).filter((i) => i.kind === 'reply' && i.id === 'own')).toHaveLength(6);
+  });
+});
+
+describe('pickFrames with many taps', () => {
+  it('gets a longer message out within a couple of turns when taps fill the round', () => {
+    const tap = (n: number) => ({ kind: 'status', userId: B, id: `t${n}`, status: 'ok', at: 50 - n, flags: 0, latE7: null, lngE7: null, hops: 0 } as unknown as NearbyItem);
+    const part = (id: string, p: number, parts: number) => ({ kind: 'reply', userId: C, id, body: 'x', at: 10, part: p, parts, flags: 0, hops: 0 } as unknown as NearbyItem);
+    const items = [...Array.from({ length: 20 }, (_, n) => tap(n)), part('short', 0, 1), ...[0, 1, 2, 3].map((p) => part('long', p, 4))];
+    const sent = new Map<string, number>();
+    const seen = new Set<string>();
+    for (let turn = 0; turn < 3; turn++) {
+      for (const i of pickFrames(items, A, (k) => sent.get(k) ?? -1)) if (i.kind === 'reply') { seen.add(i.id); sent.set(`r:${i.id}`, turn); }
+    }
+    expect(seen).toEqual(new Set(['short', 'long']));
+  });
+});
+
+describe('pickFrames keeps spots moving', () => {
+  const tap = (n: number) => ({ kind: 'status', userId: B, id: `t${n}`, status: 'ok', at: 100 - n, flags: 0, latE7: null, lngE7: null, hops: 0 } as unknown as NearbyItem);
+  const spot = (u: string) => ({ kind: 'position', userId: u, at: 1, latE7: 0, lngE7: 0, accuracyM: null, speedCms: null, headingDd: null, flags: 0, hops: 0 } as unknown as NearbyItem);
+  it("relays other riders' spots and rotates taps when taps fill the round", () => {
+    const items = [...Array.from({ length: 30 }, (_, n) => tap(n)), spot(C), spot(B)];
+    const first = pickFrames(items, A);
+    expect(first.filter((i) => i.kind === 'position')).toHaveLength(2);
+    // The taps left out this round lead the next one.
+    const sent = new Set(first.filter((i) => i.kind === 'status').map((i) => (i as { id: string }).id));
+    const next = pickFrames(items, A, (k) => (sent.has(k.slice(2)) ? 0 : -1));
+    expect(next.filter((i) => i.kind === 'status' && !sent.has((i as { id: string }).id))).toHaveLength(30 - sent.size);
+  });
+
+  it('gives every spot a turn when there are more than the share', () => {
+    const spots = Array.from({ length: 10 }, (_, n) => spot(`r${n}`));
+    const items = [...Array.from({ length: 20 }, (_, n) => tap(n)), ...spots];
+    const sent = new Map<string, number>();
+    const seen = new Set<string>();
+    for (let turn = 0; turn < 3; turn++) {
+      for (const i of pickFrames(items, A, (k) => sent.get(k) ?? -1)) if (i.kind === 'position') { seen.add(i.userId); sent.set(`p:${i.userId}`, turn); }
+    }
+    expect(seen.size).toBe(10);
+  });
+});
+
+describe('NearbyMesh turn-taking', () => {
+  it('sends every tap within a few turns when there are more than a round holds', () => {
+    const clock = vi.spyOn(performance, 'now');
+    try {
+      const a = new NearbyMesh(keys(2), A);
+      const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+      for (let n = 0; n < 40; n++) a.bridgeStatus({ id: uuid(n), userId: B, status: 'ok', lat: null, lng: null, at: T0 - n * 1000 });
+      const sent = new Set<string>();
+      // A call every 4 s (a radio round) for 2 minutes.
+      for (let t = 0; t <= 120_000; t += 4_000) {
+        clock.mockReturnValue(t);
+        for (const f of a.outgoing(T0 + t, nonce)) {
+          const item = openFrame(key(1), f, (T0 + t) / 1000);
+          if (item?.kind === 'status') sent.add(item.id);
+        }
+      }
+      expect(sent.size).toBe(40);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+
+  it('keeps a picked tap in the pick when newer taps keep arriving ahead of it', () => {
+    const clock = vi.spyOn(performance, 'now');
+    try {
+      const a = new NearbyMesh(keys(2), A);
+      const uuid = (p: string, n: number) => `${p}-0000-4000-8000-${String(n).padStart(12, '0')}`;
+      for (let n = 0; n < 40; n++) a.bridgeStatus({ id: uuid('ffffffff', n), userId: B, status: 'ok', lat: null, lng: null, at: T0 - n * 1000 });
+      // Sent means held in the pick for a whole slow radio round, not just glimpsed in one call.
+      const sent = new Set<string>();
+      const since = new Map<string, number>();
+      let fresh = 0;
+      for (let t = 0; t <= 180_000; t += 2_000) {
+        clock.mockReturnValue(t);
+        // A new tap every 2 s whose id sorts first.
+        a.bridgeStatus({ id: uuid('00000000', fresh++), userId: B, status: 'ok', lat: null, lng: null, at: T0 + t });
+        const now = new Set<string>();
+        for (const f of a.outgoing(T0 + t, nonce)) {
+          const item = openFrame(key(1), f, (T0 + t) / 1000);
+          if (item?.kind === 'status' && item.id.startsWith('ffffffff')) now.add(item.id);
+        }
+        for (const id of since.keys()) if (!now.has(id)) since.delete(id);
+        for (const id of now) {
+          if (!since.has(id)) since.set(id, t);
+          if (t - since.get(id)! >= 10_000) sent.add(id);
+        }
+      }
+      expect(sent.size).toBe(40);
+    } finally {
+      clock.mockRestore();
+    }
+  });
+});
+
+describe('fitReply', () => {
+  it('joins back from its own parts even when the cut lands after a space', () => {
+    for (let n = 0; n < 12; n++) {
+      const body = 'x'.repeat(n) + ' a'.repeat(400);
+      const fitted = fitReply(body);
+      expect(splitReply(fitted).join('')).toBe(fitted);
+      expect(fitted).toBe(fitted.trimEnd());
+    }
   });
 });

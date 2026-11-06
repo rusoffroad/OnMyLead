@@ -2,7 +2,7 @@
   "expo": {
     "name": "OnMyLead",
     "slug": "onmylead",
-    "version": "2.0",
+    "version": "2.1",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "onmylead",
@@ -10,11 +10,14 @@
     "backgroundColor": "#0A1626",
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead.app",
-      "buildNumber": "8",
+      "buildNumber": "10",
       "supportsTablet": true,
       "requireFullScreen": false,
       "appleTeamId": "YJ4KUF2QQV",
       "associatedDomains": ["applinks:onmylead.com"],
+      "entitlements": {
+        "com.apple.developer.usernotifications.time-sensitive": true
+      },
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "With no cell service, Ride Mode passes your ride's locations and alerts to nearby riders on the same ride over Bluetooth. Everything sent is encrypted for your ride only.",
         "UIBackgroundModes": ["bluetooth-central", "bluetooth-peripheral"],
@@ -176,7 +179,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.rusoffroad.onmylead.app",
-      "versionCode": 8,
+      "versionCode": 10,
       "blockedPermissions": [
         "android.permission.ACCESS_BACKGROUND_LOCATION",
         "android.permission.RECORD_AUDIO",
@@ -303,10 +306,19 @@
         {
           "icon": "./assets/images/android-icon-monochrome.png",
           "color": "#E5262E",
-          "defaultChannel": "ride-updates"
+          "defaultChannel": "ride-updates",
+          "sounds": ["./assets/sounds/siren.wav"]
         }
       ],
-      "@rnmapbox/maps"
+      "@rnmapbox/maps",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -39,6 +39,8 @@ Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free
 - **Rider Trails on Maps** and **Follow Me on Maps**
 :::release 2.1
 - **Zoom In at Intersections**
+- **Zoom Out at the Edge**
+- **Dot Style** and **Dot Size**
 :::
 - The **Track Line** switch (the line itself stays on each device, see below)
 - **Directions**: which maps app Navigate opens. If you picked Apple Maps, an Android phone asks each time, since it doesn't have Apple Maps.

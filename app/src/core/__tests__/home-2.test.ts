@@ -38,6 +38,7 @@ describe('home screen', () => {
     expect(radiusLabel(0)).toBe('Anywhere');
     expect(findCount(12, 500)).toBe('12 Within 500 mi');
     expect(findCount(3, 0)).toBe('3 Coming Up');
+    expect(findCount(1, 0)).toBe('1 Coming Up');
     expect(findCount(0, 500)).toBeNull();
   });
   it('hides toolkit tools the admin switched off', () => {

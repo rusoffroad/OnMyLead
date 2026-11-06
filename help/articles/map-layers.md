@@ -4,8 +4,9 @@ summary: Switch between satellite and topo, pick which roads, trails and land bo
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
+  - app/src/hooks/use-dot-size.ts
   - app/src/components/trail-map-overlay.tsx
   - app/src/components/trail-width-row.tsx
   - app/src/core/trail-width.ts
@@ -46,25 +47,55 @@ Satellite, topo and the trails layer are Pro features. See [Free and Pro](/help/
 
 ## Open the Layers
 
+:::until 2.1
 The layers button is the round button with a stacked layers icon in the top-right corner of the map. You'll find it on:
+:::
+
+:::release 2.1
+The round **Map Settings** button (a two-slider icon) is in the top-left corner of the map, level with the compass on the right (the compass shows once the map is turned away from north). While a screen's top bar is showing, both sit just under it so nothing covers them; in [Full Map](/help/full-map) they move up to the top of the screen and stay there. On an iPad or Android tablet, Ride Mode puts the button just right of the riders column, and Map Mode, the route builder and the waypoints map held sideways put it just right of the panel. On onmylead.com the compass is with the zoom buttons instead. You'll find it on:
+:::
 
 - Ride Mode's map
+- Map Mode
 - A ride's waypoints map
 - The route builder
 - The area picker for offline maps
 
-:::until 2.0
-Tap it to open the **Map** panel. Tap it again to close the panel.
-:::
-
-:::release 2.0
+:::until 2.1
 Tap it to open the **Map Style** panel. Tap it again to close the panel.
 :::
 
 :::release 2.1
-The panel has **Map Style** at the top and **Map Features** under it. On a phone the panel scrolls if it's taller than the space above Ride Mode's or Map Mode's bottom panel.
+Tap it to open **Map Settings** (below). Swipe the sheet down, tap the map, or tap **X** to close it.
 
-In Ride Mode the leader and the ride's organizers also see **Leader Trackline** between the two, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
+In Ride Mode the leader and the ride's organizers also see **Leader Trackline** in Map Settings, to turn the line behind the leader on or off for everyone. See [Follow the Leader's Trackline](/help/leader-trackline).
+:::
+
+:::release 2.1
+## Map Settings
+
+From 2.1 the stacked-layers button is the round **Map Settings** button, with a two-slider icon, and it opens **Map Settings**, one sheet for everything about the map. On a phone it slides up from the bottom; on a tablet held sideways it sits on the right so you can watch the map change. The map stays lightly visible behind it, so each change shows as you make it. Swipe it down, tap the map, or tap **X** to close it. A small blue dot on the button means the map isn't showing the standard set.
+
+- **Map Style**: **Satellite**, **Topo** and **3D Terrain**, each shown as a picture. The one you're using has a blue ring and a check.
+- **On the Map**: four big switches, each with a strip of map showing the lines it draws:
+  - **Streets and Roads**: highways, paved roads, dirt roads and street-legal-only roads.
+  - **Off-Road Trails**: motorized trails and tracks, including width-limited trails.
+  - **Hiking Trails**: foot and horse trails.
+  - **Land Boundaries**: national forests, BLM land, national and state parks. Turning it on leaves **Property Lines** off; turn that on under **Every Map Feature**.
+
+  A switch is on while any of its lines shows. Tapping it turns them all off, or all on.
+- **Every Map Feature**: tap **Fine-Tune** to open the full list below, one row per kind of line or land.
+- **Leader Trackline**: for the leader and organizers in Ride Mode.
+- **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Red, White and Blue** (a glossy navy dome with a white arrow inside a red band and a white rim, the default; a white star when your phone can't tell which way you're facing), **Safety Orange** (an orange 3D dome with a white arrow and a silver rim), **Hi-Viz Dome** (lime with a black arrow), **Reflective Ring**, **Floating Arrowhead** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on the **You** tab. Picking a style or size other than Red, White and Blue at Medium is part of OnMyLead Pro; on Free the picker shows the **Pro** tag and your dot stays the default.
+- **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the next time the map centers on you and moves with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
+- **Map Buttons** (Ride Mode and Map Mode): **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available).
+- **Download This Ride's Map** (Ride Mode), **Offline Maps**, and who the map data comes from.
+
+The Your Dot, Following and Map Buttons settings are the same ones as on the **You** tab, so a change shows everywhere.
+
+The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
+
+From 2.1 your own dot is a safety-orange 3D dome, half again as big as before at **Medium**, so it's easy to spot on a mount. Other riders' dots keep their colors (the leader blue, the tail gunner violet), so yours stands out.
 :::
 
 Your choices are remembered on your phone and used on every map in the app.
@@ -125,7 +156,7 @@ Land is off until you turn it on, since it tints the whole map:
 - **State Parks**: state parks and state recreation areas, tinted teal.
 - **Property Lines**: private parcel lines in coral, in Texas for now. They show when you're zoomed in to a few blocks across. No owner names are shown.
 
-Land shows from about a few counties across, with each area's name when you're zoomed in. Tap the map with land on to see a card with whose land it is: the area's name, who manages it, whether it's open to the public and its size. In Texas, with **Property Lines** on, tapping private land shows **Property Parcel**, its county and acres. If you tap a trail, its card comes first.
+Land shows once the map is about one county across (about 60 miles on a phone screen), fading in as you zoom, with each area's name when you're zoomed in closer. Further out it stays hidden, so whole states aren't covered in color. If you turned land on and see **Zoom In to See Land Boundaries**, zoom in a little. iPad and Android tablets show it at the same zoom as a phone, over their bigger map. Tap the map with land on to see a card with whose land it is: the area's name, who manages it, whether it's open to the public and its size. In Texas, with **Property Lines** on, tapping private land shows **Property Parcel**, its county and acres. If you tap a trail, its card comes first.
 
 Land boundaries come from public records (USGS PAD-US and the Texas Geographic Information Office) and can be out of date. Posted signs and fences always win. Land doesn't download with an offline map yet; it shows when you have signal.
 

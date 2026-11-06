@@ -4,7 +4,7 @@ summary: OnMyLead uses your phone's language when it speaks it, and English when
 category: account
 order: 76
 release: "2.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/language.tsx
   - app/src/components/language-button.tsx
@@ -50,8 +50,10 @@ To go back to following your phone, tap **Match Phone** at the top of the list. 
 
 :::release 2.1
 - The whole app switches: Home, Ride Mode, Map Mode, ride and group pages, chat, Events, Social, Friends, Garage, Trips, Starlink, Tilt, Pro and every setting, along with the alerts and messages OnMyLead shows you.
+- Places on the Leaderboard and along the Ride Mode line are written your language's way (2.º in Spanish, 2. in German, 2 位 in Japanese), and counts like "1 Coming Up" use the right singular or plural.
 - Spoken alerts in Ride Mode are read in your language. If the voice you picked under **You** > **Voice** speaks another language, your phone's own voice for your language reads them instead.
-- Status buttons and the built-in quick replies (like **Need Fuel** or **Flat Tire**) show in each rider's own language, so a rider who reads Spanish sees them in Spanish even if you sent them in English.
+- Status buttons and the built-in quick replies (like **Need Fuel** or **Flat Tire**) show in each rider's own language, so a rider who reads Spanish sees them in Spanish even if you sent them in English. A Ride Mode message you type with the same words as a built-in quick reply (like "on my way") shows as that quick reply.
+- What riders write themselves (posts, comments, chat messages and your own quick replies) shows exactly as they wrote it.
 - Push notifications on your lock screen, the Terms of Use and the Privacy Policy are still in English.
 - The [CarPlay](/help/carplay) screen in your car uses the same language as the app.
 :::

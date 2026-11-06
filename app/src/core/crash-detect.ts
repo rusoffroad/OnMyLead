@@ -187,6 +187,18 @@ export function secondsLeft(startedAt: number, now: number, total = COUNTDOWN_S)
   return Math.max(0, Math.ceil(total - (now - startedAt) / 1000));
 }
 
+/** Longest the countdown waits off screen (for an open sheet to step aside) without counting down. */
+export const COUNTDOWN_HIDDEN_MAX_MS = 2000;
+
+/**
+ * When the countdown's clock starts: the alarm time, moved later by however long the countdown sat
+ * hidden after it mounted (an open sheet stepping aside on iPhone and iPad), so the rider sees the
+ * whole window to tap I'm OK. Never moved more than COUNTDOWN_HIDDEN_MAX_MS, so the alert still sends.
+ */
+export function countdownStart(startedAt: number, mountedAt: number, shownAt: number | null, now: number): number {
+  return startedAt + Math.min(COUNTDOWN_HIDDEN_MAX_MS, Math.max(0, (shownAt ?? now) - mountedAt));
+}
+
 /** The chat message the group gets with the EMERGENCY alert. */
 export function crashMessage(cause: CrashCause): string {
   return cause === 'rollover'

@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Convoy, RiderDot } from '@/components/convoy';
 import { Icon } from '@/components/icon';
 import { OutRidingCard } from '@/components/out-riding-card';
+import { GroupPhoto } from '@/components/group-photo';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen, Section } from '@/components/ui';
@@ -148,6 +149,7 @@ function GroupCard({ group, chat, me }: { group: RidingGroup; chat?: GroupChatSu
       onPress={() => router.push(`/groups/${group.id}`)}
       style={({ pressed }) => [styles.card, pressed && { backgroundColor: Colors.backgroundSelected }]}>
       <View style={styles.cardTop}>
+        <GroupPhoto uri={group.photoUrl} name={group.name} size={56} />
         <Text style={styles.cardName} numberOfLines={2}>{group.name}</Text>
         <Icon name="chevron" color={Colors.textSecondary} />
       </View>
@@ -185,7 +187,7 @@ function EmptyCrew() {
 const styles = themedStyles(() => ({
   note: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.sky, padding: Spacing.three, gap: 4 },
   card: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, padding: Spacing.three, gap: 10 },
-  cardTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  cardTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
   cardName: { flex: 1, color: Colors.text, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 32 },
   list: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, overflow: 'hidden' },
   followRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 10 },

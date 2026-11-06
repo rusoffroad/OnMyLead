@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { hiddenByBlock } from '@/core/blocks';
-import { alertTitle, isLeaderOnly, isResolved, shouldAlert, type ChatMessage } from '@/core/chat';
+import { alertTitle, chatMessageText, isLeaderOnly, isResolved, shouldAlert, type ChatMessage } from '@/core/chat';
 import type { NotificationSettings } from '@/core/notifications';
 import { blockedIds, useBlocks } from '@/lib/blocks';
 import { useInboxSync } from '@/lib/inbox';
@@ -50,7 +50,7 @@ async function toAlert(m: ChatMessage): Promise<Alert> {
   return {
     id: m.id,
     title: alertTitle(m, who, ride?.name),
-    body: m.poll_options?.length ? tr('{body} Tap to vote.', { body: m.body }) : m.body,
+    body: m.poll_options?.length ? tr('{body} Tap to vote.', { body: m.body }) : chatMessageText(m, tr),
     inviteCode: ride?.invite_code ?? null,
     accent: announcement ? RideColors.yellow : isLeaderOnly(m) ? RideColors.leader : Colors.accent,
     seconds: announcement ? 10 : 6,
@@ -150,7 +150,7 @@ export function MessageAlerts() {
         style={[styles.card, { borderLeftColor: current.accent }]}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={styles.title} numberOfLines={1}>{current.title}</Text>
-          <Text style={styles.body} numberOfLines={3}>{tr(current.body)}</Text>
+          <Text style={styles.body} numberOfLines={3}>{current.body}</Text>
           {queue.length > 1 ? (
             <View style={styles.moreRow}>
               <Text style={styles.more}>{tr('+{v} More', { v: queue.length - 1 })}</Text>

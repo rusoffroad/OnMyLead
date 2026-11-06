@@ -45,7 +45,11 @@ export type FeatureKey =
   | 'sync'
   | 'themes'
   | 'natural_voices'
-  | 'tablet_web';
+  | 'tablet_web'
+  | 'bluetooth_sharing'
+  | 'custom_dot'
+  | 'group_photos'
+  | 'carplay';
 
 export const FEATURE_KEYS: FeatureKey[] = [
   'create_ride', 'import_gpx', 'offline_maps', 'saved_groups', 'create_poll', 'ride_history',
@@ -72,6 +76,11 @@ export const FEATURE_KEYS: FeatureKey[] = [
   'themes',
   'natural_voices',
   'tablet_web',
+  // 2.1 (Chris 2026-11-05, migration 20261105090000_pro_bluetooth_dot_photos.sql).
+  'bluetooth_sharing',
+  'custom_dot',
+  'group_photos',
+  'carplay',
 ];
 
 /** Names for prompts and the comparison table (Title Case). */
@@ -109,6 +118,10 @@ export const FEATURE_NAMES: Record<FeatureKey, string> = {
   themes: 'Themes and Light Mode',
   natural_voices: 'Natural Voices',
   tablet_web: 'iPad, Android Tablets and the Website',
+  bluetooth_sharing: 'Bluetooth Sharing With No Service',
+  custom_dot: 'Customize Your Dot',
+  group_photos: 'Group Photos',
+  carplay: 'CarPlay',
 };
 
 /** Pro-only by default (feature_plans min_plan 'pro'); used when a cached Pro answer runs out on the device. */
@@ -117,7 +130,7 @@ export const PRO_BY_DEFAULT: FeatureKey[] = [
   'premium_ride_cards', 'record_trails', 'share_trails', 'trail_rides', 'social_posts', 'create_events',
   'custom_codes', 'quick_replies', 'music_controls', 'vote_polls', 'route_builder', 'waypoints', 'directions',
   'map_layers', 'custom_trails', 'save_trails', 'rate_trails', 'track_line', 'trail_spots', 'garage_build',
-  'sync', 'themes', 'natural_voices', 'tablet_web',
+  'sync', 'themes', 'natural_voices', 'tablet_web', 'bluetooth_sharing', 'custom_dot', 'group_photos', 'carplay',
 ];
 
 export type AccountType = 'free' | 'pro' | 'admin';

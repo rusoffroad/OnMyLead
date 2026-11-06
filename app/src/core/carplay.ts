@@ -39,11 +39,17 @@ export type CarPlayLabels = {
   ok: string;
 };
 
-/** The words on CarPlay screens the phone doesn't build per ride (the waiting screen, the group list, alerts). */
-export function carPlayLabels(): CarPlayLabels {
+/**
+ * The words on CarPlay screens the phone doesn't build per ride (the waiting screen, the group list, alerts).
+ * `proNeeded`: CarPlay is part of OnMyLead Pro (2.1), so a Free rider's car shows a plain notice on
+ * the waiting screen instead of the ride. It only informs: there is nothing to buy in the car.
+ */
+export function carPlayLabels(proNeeded = false): CarPlayLabels {
   return {
-    waitingTitle: tc('No Ride Running'),
-    waitingDetail: tc('Open Ride Mode on your phone and your group shows up here.'),
+    waitingTitle: proNeeded ? tc('CarPlay Is Part of OnMyLead Pro') : tc('No Ride Running'),
+    waitingDetail: proNeeded
+      ? tc('Ride Mode, status taps and EMERGENCY keep working on your phone with the Free plan.')
+      : tc('Open Ride Mode on your phone and your group shows up here.'),
     group: tc('Group'),
     nobodySharing: tc('Nobody Is Sharing Yet'),
     confirmEmergency: tc('Send EMERGENCY with your location to everyone on the ride?'),

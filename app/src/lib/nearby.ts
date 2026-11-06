@@ -22,7 +22,7 @@ import { AppState, PermissionsAndroid, Platform } from 'react-native';
 
 import {
   ACK_DELIVERED, ACK_SEEN, FLAG_FROM_SERVER, FLAG_POSSIBLE_CRASH, NEARBY_INBOX_UUID, NEARBY_OUTBOX_UUID, NEARBY_SERVICE_UUID, NearbyMesh,
-  fromBase64, fromE7, nearbyPower, sealFrame, toBase64, uploadRow,
+  fromBase64, fromE7, nearbyFreeAllows, nearbyPower, sealFrame, toBase64, uploadRow,
   type NearbyItem, type NearbyPosition, type NearbyPower, type NearbyStatus,
 } from '@/core/nearby';
 import { supabase } from './supabase';
@@ -106,6 +106,28 @@ function publish(next: Partial<NearbyView>) {
 }
 
 const nonce = () => Crypto.getRandomBytes(12);
+
+// ---------------------------------------------------------------------------
+// Free (relay only). Bluetooth Sharing is Pro from 2.1, but a phone on Free still passes every
+// packet along so it never breaks the chain for the rest of the group, and still sends and hears
+// EMERGENCY, Need Help and Crash Alerts (core/nearby nearbyFreeAllows). It doesn't show riders'
+// spots, send its own spot, or send or show other taps and messages. Ride Mode keeps this in step
+// with the rider's plan.
+// ---------------------------------------------------------------------------
+
+let relayOnly = false;
+
+export function setNearbyRelayOnly(on: boolean) {
+  if (relayOnly === on) return;
+  relayOnly = on;
+  const s = session;
+  if (!s) return;
+  if (on) {
+    s.mesh.clearOwnPosition();
+    publish({ positions: {}, replies: [], statuses: Object.fromEntries(Object.entries(view.statuses).filter(([, v]) => nearbyFreeAllows({ kind: 'status', status: v.status, flags: v.possible_crash ? FLAG_POSSIBLE_CRASH : 0 }))) });
+  }
+  pushOutgoing();
+}
 
 // ---------------------------------------------------------------------------
 // The rider's own switch (You > Bluetooth Sharing). On unless they turned it off.
@@ -300,7 +322,7 @@ function applyPower() {
 /** This rider's newest fix (lib/location.ts calls this for every fix, even with the screen off). */
 export function nearbyOwnFix(fix: { lat: number; lng: number; accuracyM: number | null; speedMps: number | null; headingDeg: number | null; at: number }) {
   const s = session;
-  if (!s?.sharing) return;
+  if (!s?.sharing || relayOnly) return;
   if (s.mesh.ownPosition(fix)) pushOutgoing();
 }
 
@@ -308,6 +330,7 @@ export function nearbyOwnFix(fix: { lat: number; lng: number; accuracyM: number 
 export function nearbyStatus(rideId: string, t: { id?: string; status: RiderStatusKind; lat: number | null; lng: number | null; tappedAt: string; possibleCrash?: boolean }) {
   const s = session;
   if (!s || s.rideId !== rideId || !t.id || !native) return;
+  if (relayOnly && !nearbyFreeAllows({ kind: 'status', status: t.status, flags: t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0 })) return;
   const item = s.mesh.ownStatus({ id: t.id, status: t.status, flags: t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0, lat: t.lat, lng: t.lng, at: Date.parse(t.tappedAt) });
   sendNow([item]);
 }
@@ -315,7 +338,7 @@ export function nearbyStatus(rideId: string, t: { id?: string; status: RiderStat
 /** A quick reply or typed message of this rider's (lib/outbox.ts, every one). */
 export function nearbyReply(rideId: string, r: { id?: string; body: string; tappedAt: string }) {
   const s = session;
-  if (!s || s.rideId !== rideId || !r.id || !native) return;
+  if (!s || s.rideId !== rideId || !r.id || !native || relayOnly) return;
   sendNow(s.mesh.ownReply({ id: r.id, body: r.body, at: Date.parse(r.tappedAt) }));
 }
 
@@ -426,6 +449,8 @@ function receive(b64: string) {
   }
   if (!item) return;
   const fromServer = (item.flags & FLAG_FROM_SERVER) !== 0;
+  // On Free the mesh above still keeps it to pass along; only the safety alerts show here.
+  if (relayOnly && item.kind !== 'ack' && !nearbyFreeAllows(item)) return;
   if (item.kind === 'position') {
     const position = asPosition(item);
     publish({ positions: { ...view.positions, [item.userId]: position } });

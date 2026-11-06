@@ -4,7 +4,7 @@ summary: Hide the bars and panels on any map so the map fills your screen, and b
 category: routes-maps
 order: 12
 release: "2.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/hooks/use-panel-fold.ts
   - app/src/core/panel-swipe.ts
@@ -25,7 +25,13 @@ related: [follow-me, ride-mode, navigation-mode, route-builder, waypoints-and-pl
 keywords: [full map, full screen, bigger map, more map, hide buttons, hide controls, show controls, map only]
 ---
 
+:::until 2.1
 Every map in OnMyLead can fill your whole screen. **Full Map** tucks the top bar, the layers button and the panel away, and leaves one slim bar at the bottom so you can bring everything back with one tap.
+:::
+
+:::release 2.1
+Every map in OnMyLead can fill your whole screen. **Full Map** tucks the top bar and the panel away, and leaves one slim bar at the bottom so you can bring everything back with one tap. The round **Map Settings** button stays in the top-left corner and the compass in the top-right, so you can change the map without leaving Full Map.
+:::
 
 ## Turn On Full Map
 

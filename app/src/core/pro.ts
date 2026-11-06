@@ -10,6 +10,8 @@
 import { can, trialBadgeText, type Entitlements, type FeatureKey, type ProError } from './entitlements';
 
 import { coreLocale, tc } from './i18n';
+import type { DotSize } from './dot-size';
+import { DEFAULT_DOT_STYLE, type DotStyle } from './own-dot-art';
 /** Free history shows this many past rides. */
 export const FREE_HISTORY = 5;
 
@@ -29,8 +31,11 @@ export function nextReset(now: Date = new Date()): Date {
 /** A server refusal as a prompt: a Pro feature, or the Free ride limit. */
 export type ProBlock = ProError;
 
-/** What the Pro prompt says about each feature: what it does, and what stays free. */
-export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> = {
+/**
+ * What the Pro prompt says about each feature: what it does, and what stays free.
+ * `body` is a translation key; `vars` fill its {placeholders}.
+ */
+export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string; vars?: Record<string, number> }> = {
   create_ride: {
     title: 'Create More Rides',
     body: 'Free accounts create one ride each month. Pro creates as many as you lead. Joining rides is always free.',
@@ -53,7 +58,8 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
   },
   ride_history: {
     title: 'Full Ride History',
-    body: `Free shows your last ${FREE_HISTORY} rides. Pro shows every ride you’ve been on. Nothing is ever deleted.`,
+    body: 'Free shows your last {n} rides. Pro shows every ride you’ve been on. Nothing is ever deleted.',
+    vars: { n: FREE_HISTORY },
   },
   advanced_trip_planning: {
     title: 'Advanced Trip Planning',
@@ -163,6 +169,22 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string }> =
     title: 'iPad, Android Tablets and the Website',
     body: 'Use OnMyLead on a big screen. Joining a ride and following the leader stay free on every device.',
   },
+  bluetooth_sharing: {
+    title: 'Bluetooth Sharing With No Service',
+    body: 'With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.',
+  },
+  custom_dot: {
+    title: 'Customize Your Dot',
+    body: 'Pick how your own dot looks and how big it is on the map. The Red, White and Blue dot stays free.',
+  },
+  group_photos: {
+    title: 'Group Photos',
+    body: 'Give your riding group a photo. Everyone can still see group photos for free.',
+  },
+  carplay: {
+    title: 'CarPlay',
+    body: 'See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.',
+  },
 };
 
 /** The comparison on the Pro screen. true = included, false = not, a string = the amount. */
@@ -175,6 +197,8 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Social Feed: See, Like and Read Comments', free: true, pro: true },
   { label: 'Badges, Events and Friends', free: true, pro: true },
   { label: 'Draw Routes, Waypoints and Directions', free: false, pro: true },
+  { label: 'Bluetooth Sharing With No Service', free: false, pro: true },
+  { label: 'CarPlay', free: false, pro: true },
   { label: 'Map Layers: Satellite, Topo and Trails', free: false, pro: true },
   { label: 'Draw, Record, Save, Rate and Share Trails', free: false, pro: true },
   { label: 'Track Line and Named Spots', free: false, pro: true },
@@ -183,14 +207,14 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Offline Maps', free: false, pro: true },
   { label: 'Post, Comment and Share to Social Media', free: false, pro: true },
   { label: 'Create Events', free: false, pro: true },
-  { label: 'Saved Riding Groups and Custom Codes', free: false, pro: true },
+  { label: 'Saved Riding Groups, Group Photos and Custom Codes', free: false, pro: true },
   { label: 'Create and Vote on Ride Polls', free: false, pro: true },
   { label: 'Your Own Messages and Music Controls', free: false, pro: true },
   { label: 'Ride History', free: `Last ${FREE_HISTORY}`, pro: 'All' },
   { label: 'Advanced Ride Statistics and Premium Cards', free: false, pro: true },
   { label: 'Advanced Trip Planning', free: false, pro: true },
   { label: 'Garage Build Sheet', free: false, pro: true },
-  { label: 'Themes, Light Mode and Natural Voices', free: false, pro: true },
+  { label: 'Themes, Light Mode, Natural Voices and Custom Dots', free: false, pro: true },
   { label: 'Sync Across Devices', free: false, pro: true },
   { label: 'iPad, Android Tablets and the Website', free: false, pro: true },
 ];
@@ -205,6 +229,15 @@ export function annualSavingsPercent(monthly: number = PRICES.monthly, annual: n
 /** "$2.50", the annual price spread over twelve months. */
 export function annualPerMonth(annual: number = PRICES.annual): string {
   return `$${(Math.ceil((annual / 12) * 100) / 100).toFixed(2)}`;
+}
+
+/**
+ * The dot a rider actually sees: their saved Dot Style and Dot Size with Pro (or a trial), the
+ * default Red, White and Blue dot at Medium on Free. The saved pick is kept, so it comes back when
+ * they go Pro.
+ */
+export function effectiveDot(ent: Entitlements, style: DotStyle, size: DotSize): { style: DotStyle; size: DotSize } {
+  return can(ent, 'custom_dot') ? { style, size } : { style: DEFAULT_DOT_STYLE, size: 'medium' };
 }
 
 /** Split past rides into the ones shown and how many more Pro would show. */

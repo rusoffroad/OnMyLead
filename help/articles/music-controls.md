@@ -4,7 +4,7 @@ summary: Play, pause, skip songs and change the volume of the music on your phon
 category: ride-mode
 order: 45
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/components/music-controls.tsx
   - app/src/core/music.ts
@@ -48,6 +48,10 @@ The buttons are big enough to use with gloves on, but pull over before you look 
 ## Hide the Music Button
 
 Don't want it? Tap **Hide Music Button** at the bottom of the Music sheet, or go to the **You** tab and switch off **Music Controls**. The button disappears from Ride Mode and Navigate. Switch **Music Controls** back on in the **You** tab any time. The setting is kept on each phone or tablet separately.
+
+:::release 2.1
+From 2.1 you can also show or hide it from the map: tap the round **Map Settings** button, then switch **Music Button** under **Map Buttons**.
+:::
 
 :::note
 What you listen to stays on your phone. OnMyLead doesn't send it to the server or show it to other riders.

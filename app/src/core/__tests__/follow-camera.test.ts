@@ -84,33 +84,59 @@ describe('Follow Me switch', () => {
   });
 });
 
-describe('keeping the dot on screen: zoom out once, then move the map', () => {
+describe('keeping the dot on screen: zoom out once, then center and follow', () => {
   const size = { width: 400, height: 800 };
   const inset = { top: 100, right: 0, bottom: 300, left: 0 };
-  // Open map: x 0-400, y 100-500; box: x 80-320, y 180-420.
+  // Open map: x 0-400, y 100-500; edge band 10% (40 pt each side): box x 40-360, y 140-460.
 
   it('leaves the map alone while the dot is in the middle', () => {
     expect(followMove(FOLLOW_FRAME_START, { pt: { x: 200, y: 300 }, size, inset, zoom: 14, screenHeadingDeg: 0 })).toEqual({ kind: 'stay' });
-    expect(insideFollowBox({ x: 81, y: 419 }, size, inset)).toBe(true);
+    expect(insideFollowBox({ x: 41, y: 459 }, size, inset)).toBe(true);
+    // Within 10% of the edge is outside the box.
+    expect(insideFollowBox({ x: 39, y: 300 }, size, inset)).toBe(false);
+    expect(insideFollowBox({ x: 200, y: 461 }, size, inset)).toBe(false);
   });
 
-  it('zooms out one step the first time the dot nears an edge', () => {
-    const m = followMove(FOLLOW_FRAME_START, { pt: { x: 200, y: 150 }, size, inset, zoom: 14, screenHeadingDeg: 0 });
+  it('zooms out one step the first time the dot gets within 10% of an edge', () => {
+    const m = followMove(FOLLOW_FRAME_START, { pt: { x: 200, y: 130 }, size, inset, zoom: 14, screenHeadingDeg: 0 });
     expect(m).toEqual({ kind: 'zoom-out', zoom: 13 });
-    expect(followFrameAfter(FOLLOW_FRAME_START, m)).toEqual({ zoomedOut: true });
+    expect(followFrameAfter(FOLLOW_FRAME_START, m)).toEqual({ zoomedOut: true, locked: false });
   });
 
-  it('moves the map every time after that, never zooming out again', () => {
-    const frame = { zoomedOut: true };
-    const m = followMove(frame, { pt: { x: 380, y: 300 }, size, inset, zoom: 13, screenHeadingDeg: 90 });
-    expect(m.kind).toBe('pan');
-    expect(followFrameAfter(frame, m)).toBe(frame);
+  it('the second time, centers the dot and keeps it centered on every fix after', () => {
+    const zoomed = { zoomedOut: true, locked: false };
+    const m = followMove(zoomed, { pt: { x: 380, y: 300 }, size, inset, zoom: 13, screenHeadingDeg: 90 });
+    expect(m).toEqual({ kind: 'pan', inset });
+    const locked = followFrameAfter(zoomed, m);
+    expect(locked).toEqual({ zoomedOut: true, locked: true });
+    // Even right in the middle, the map keeps moving with the dot.
+    expect(followMove(locked, { pt: { x: 200, y: 300 }, size, inset, zoom: 13, screenHeadingDeg: 0 })).toEqual({ kind: 'pan', inset });
+    expect(followFrameAfter(locked, { kind: 'pan', inset })).toBe(locked);
   });
 
-  it('moves instead of zooming while zoomed in at a junction, when too far out, or when the dot is way off screen', () => {
-    expect(followMove(FOLLOW_FRAME_START, { pt: { x: 0, y: 300 }, size, inset, zoom: 17, screenHeadingDeg: 0, noZoomOut: true }).kind).toBe('pan');
-    expect(followMove(FOLLOW_FRAME_START, { pt: { x: 0, y: 300 }, size, inset, zoom: FOLLOW_MIN_ZOOM + 0.5, screenHeadingDeg: 0 }).kind).toBe('pan');
-    expect(followMove(FOLLOW_FRAME_START, { pt: { x: 5000, y: 300 }, size, inset, zoom: 14, screenHeadingDeg: 0 }).kind).toBe('pan');
+  it('a whole run: middle, edge (zoom out), middle, edge (center), then follows', () => {
+    let f = FOLLOW_FRAME_START;
+    const kinds: string[] = [];
+    for (const pt of [{ x: 200, y: 300 }, { x: 395, y: 300 }, { x: 300, y: 300 }, { x: 5, y: 300 }, { x: 200, y: 300 }, { x: 210, y: 290 }]) {
+      const m = followMove(f, { pt, size, inset, zoom: 15, screenHeadingDeg: 0 });
+      kinds.push(m.kind);
+      f = followFrameAfter(f, m);
+    }
+    expect(kinds).toEqual(['stay', 'zoom-out', 'stay', 'pan', 'pan', 'pan']);
+  });
+
+  it('centers and follows at once when it cannot zoom out: switch off, at a junction, too far out, or the dot is way off screen', () => {
+    for (const ctx of [
+      { pt: { x: 0, y: 300 }, zoom: 17, noZoomOut: true },
+      { pt: { x: 0, y: 300 }, zoom: FOLLOW_MIN_ZOOM + 0.5 },
+      { pt: { x: 5000, y: 300 }, zoom: 14 },
+      // Mapbox on iPhone answers (-1, -1) for a spot off the screen.
+      { pt: { x: -1, y: -1 }, zoom: 14 },
+    ]) {
+      const m = followMove(FOLLOW_FRAME_START, { size, inset, screenHeadingDeg: 0, ...ctx });
+      expect(m.kind).toBe('pan');
+      expect(followFrameAfter(FOLLOW_FRAME_START, m).locked).toBe(true);
+    }
   });
 
   it('keeps the dot in view when the map cannot say where it is', () => {

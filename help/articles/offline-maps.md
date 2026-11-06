@@ -4,7 +4,7 @@ summary: Download a ride's map or any area before you leave, so the map and rout
 category: routes-maps
 order: 60
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/maps/index.tsx
   - app/src/app/maps/area.tsx
@@ -67,9 +67,17 @@ From Offline Maps:
 
 From the ride's map:
 
+:::until 2.1
 1. Open Ride Mode or the ride's waypoints map.
 2. Tap the layers button.
 3. Tap **Download This Ride's Map**.
+:::
+
+:::release 2.1
+1. Open Ride Mode or the ride's waypoints map.
+2. Tap the round **Map Settings** button.
+3. Tap **Download This Ride's Map**.
+:::
 
 **Your Rides** lists upcoming rides you've joined that have a mapped route. Downloading a ride again replaces its earlier download, which is handy if the route changed.
 

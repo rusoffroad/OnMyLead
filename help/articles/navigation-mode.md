@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/components/use-follow-camera.ts
   - app/src/core/intersections.ts
@@ -85,8 +85,15 @@ On a tablet, the panel sits beside the map in landscape, and floats over the cor
 **Explore** shows your speed and elevation, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
 :::
 
-:::release 2.0
+:::until 2.1
 **Explore** shows your speed big on the left, with the map centered on you. Use the layers button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
+:::
+
+:::release 2.1
+**Explore** shows your speed big on the left, with the map centered on you. Use the round **Map Settings** button for **Satellite** or **Topo** and trail lines (see [Map Layers and Trails](/help/map-layers)), the search box to jump to a place, and the round **Center on Me** button to center on you again. Tap any line to see what it is.
+:::
+
+:::release 2.0
 
 Next to your speed are four readings:
 
@@ -117,7 +124,7 @@ To look around, drag or pinch the map. It pauses (the button shows **Paused**) u
 :::
 
 :::release 2.1
-From 2.1 the map zooms out one step the first time your dot nears an edge, then slides to keep you on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot is a cyan disc with its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
+From 2.1 the map zooms out one step the first time your dot nears an edge, then the next time centers on your dot and moves with you so it stays on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot (Red, White and Blue unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
 :::
 
 The screen stays on while Navigate is open.

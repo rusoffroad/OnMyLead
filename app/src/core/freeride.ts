@@ -14,6 +14,7 @@
  * leader pinned to the left edge and the tail gunner to the right edge (route-order convoyLayout).
  */
 import { distanceM, formatDistance, metersToMiles, type LatLng } from './geo';
+import { tc } from './i18n';
 import { cumulativeM, locateOnRoute, miles, type PlacedRider, type RouteRider } from './route';
 
 /** The leader's trail grows a point each time the leader moves at least this far. */
@@ -168,23 +169,27 @@ export function summarizeFreeride(line: FreerideLine, meId: string | undefined):
   const sweep = others.find((r) => r.role === 'sweep');
   const together = !others.length || line.spanM < TOGETHER_M;
   const ends = !others.length
-    ? 'Only the leader on the line'
+    ? tc('Only the leader on the line')
     : together
-      ? `${placed.length} riders together`
-      : `Leader to ${rear?.role === 'sweep' ? 'Tail Gunner' : 'Last Rider'}`;
+      ? tc('{n} riders together', { n: placed.length })
+      : tc(rear?.role === 'sweep' ? 'Leader to Tail Gunner' : 'Leader to Last Rider');
 
   const me = placed.find((r) => r.id === meId);
   let compared: string | null = null;
   if (me) {
-    if (!others.length) compared = 'Nobody else is sharing a spot yet.';
+    if (!others.length) compared = tc('Nobody else is sharing a spot yet.');
     else if (me.id === line.leaderId) {
       const back = sweep ? line.behindM[sweep.id] : line.spanM;
-      compared = together ? 'The group is right with you.' : `You're out front. ${sweep ? 'The tail gunner' : 'The last rider'} is ${gap(back)} back.`;
+      compared = together
+        ? tc('The group is right with you.')
+        : tc(sweep ? "You're out front. The tail gunner is {gap} back." : "You're out front. The last rider is {gap} back.", { gap: gap(back) });
     } else {
       const d = line.behindM[me.id];
       const off = !me.place!.onRoute;
-      compared = d < TOGETHER_M ? "You're right with the leader." : `The leader is ${gap(d)} ahead${off ? ' in a straight line' : ''}.`;
-      if (me.role !== 'sweep' && rear?.id === me.id && others.length > 1) compared += ' Nobody is behind you.';
+      compared = d < TOGETHER_M
+        ? tc("You're right with the leader.")
+        : tc(off ? 'The leader is {gap} ahead in a straight line.' : 'The leader is {gap} ahead.', { gap: gap(d) });
+      if (me.role !== 'sweep' && rear?.id === me.id && others.length > 1) compared = tc('{v} Nobody is behind you.', { v: compared });
     }
   }
   return { spread: together ? null : gap(line.spanM), ends, compared };

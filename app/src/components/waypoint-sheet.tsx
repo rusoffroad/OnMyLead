@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { Modal, Platform, Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { TimePicker } from '@/components/time-picker';
@@ -23,6 +23,7 @@ import { addMapWaypoint, removeMapWaypoint, updateMapWaypoint } from '@/lib/map-
 import { addWaypoint, removeWaypoint, reorderPlannedStops, updateWaypoint } from '@/lib/waypoints';
 
 import { t as tr } from '@/lib/i18n';
+import { SheetModal } from '@/components/sheet-modal';
 /** Who a waypoint is for: a stop the whole ride makes, everyone's map, or just this rider. */
 type Audience = 'stop' | 'everyone' | 'me';
 const audienceOf = (w: Waypoint): Audience => (w.planned_stop ? 'stop' : w.shared ? 'everyone' : 'me');
@@ -175,7 +176,7 @@ export function WaypointSheet({
   const mayEdit = !!viewing && (!rideId || canEditWaypoint(viewing, me, canShare));
   const mayRemove = !!viewing && (!rideId || canRemoveWaypoint(viewing, me, canShare));
   return (
-    <Modal visible={!!target} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <SheetModal visible={!!target} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
       <SheetRoot>
       <Pressable style={styles.scrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
       {target ? (
@@ -296,7 +297,7 @@ export function WaypointSheet({
                   {viewing.planned_stop ? (
                     <Text style={styles.privateText}>{tr('Every rider on the ride sees this stop. Added by {v}.', { v: viewing.user_id === me ? tr('you') : ownerName(viewing.user_id) })}</Text>
                   ) : null}
-                  {viewing.note ? <ThemedText>{tr(viewing.note)}</ThemedText> : null}
+                  {viewing.note ? <ThemedText>{viewing.note}</ThemedText> : null}
                   <Text style={styles.coords}>{viewing.lat.toFixed(5)}, {viewing.lng.toFixed(5)}</Text>
                   <ErrorText error={error} />
                   <Button title={tr('Navigate')} big onPress={() => onNavigate(viewing.lat, viewing.lng, viewing.name)} />
@@ -334,7 +335,7 @@ export function WaypointSheet({
         </KeyboardLift>
       ) : null}
       </SheetRoot>
-    </Modal>
+    </SheetModal>
   );
 }
 

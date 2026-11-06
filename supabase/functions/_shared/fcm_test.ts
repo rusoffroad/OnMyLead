@@ -3,7 +3,7 @@
 // (also runs under Node 22: node supabase/functions/_shared/fcm_test.ts)
 import assert from 'node:assert/strict';
 
-import { channelFor, fcmMessage, fcmOutcome, readServiceAccount, serviceAccountJwt } from './fcm.ts';
+import { channelFor, fcmMessage, fcmOutcome, readServiceAccount, serviceAccountJwt, SIREN_CHANNEL } from './fcm.ts';
 
 // deno-lint-ignore no-explicit-any
 const g = globalThis as any;
@@ -34,6 +34,14 @@ test('notification message in the format expo-notifications reads', () => {
   assert.equal('tag' in bare.data, false);
   assert.equal('tag' in bare.android.notification, false);
   assert.equal(fcmMessage({ token: 't', title: 'Help', body: '', data: { type: 'status' }, channelId: 'ride-alerts' }).message.android.notification.visibility, 'PUBLIC');
+});
+
+test('Emergency Siren pushes use the siren channel, in full on the lock screen', () => {
+  const n = fcmMessage({ token: 't', title: 'EMERGENCY: Sam needs help now', body: 'Moab', data: { type: 'status', status: 'emergency' }, channelId: SIREN_CHANNEL }).message.android.notification;
+  assert.equal(SIREN_CHANNEL, 'ride-emergency');
+  assert.equal(n.channel_id, 'ride-emergency');
+  assert.equal(n.sound, 'siren');
+  assert.equal(n.visibility, 'PUBLIC');
 });
 
 test('channels follow the push type', () => {

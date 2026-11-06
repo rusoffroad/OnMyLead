@@ -4,7 +4,7 @@ summary: A line in the leader's blue shows where the leader went in Ride Mode. O
 category: ride-mode
 order: 15
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/core/leader-trackline.ts
   - app/src/hooks/use-leader-trackline.ts
@@ -33,7 +33,7 @@ Short wiggles, a tight hairpin, or wandering a few yards off the old line on the
 
 The line is on for every ride unless the leader turns it off. Turning it off hides it for everyone on the ride, and turning it back on brings it back for everyone, including the part ridden while it was off.
 
-1. In Ride Mode, tap the layers button on the map.
+1. In Ride Mode, tap the round **Map Settings** button on the map.
 2. Under **Leader Trackline**, tap the row to switch between **On for Everyone** and **Off for Everyone**.
 
 The switch shows for the leader and the ride's organizers. If nobody has the Leader role, the organizer leads. Riders see the line but not the switch. With no signal the switch can't save; try again when you have service.

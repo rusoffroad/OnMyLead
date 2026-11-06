@@ -4,7 +4,7 @@ summary: See the satellite map on the real shape of the land in Ride Mode and Ma
 category: routes-maps
 order: 52
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/components/mapbox-map.tsx
   - app/src/components/mapbox-map.web.tsx
@@ -25,11 +25,10 @@ keywords: [3d, 3d map, terrain, elevation, contour, contour lines, topo, peaks, 
 ## Turn On 3D Terrain
 
 1. Open Ride Mode or Map Mode.
-2. Tap the round **3D** button in the top-right corner of the map, just under the layers button.
+2. Tap the round **Map Settings** button (two sliders) in the top-left corner of the map.
+3. Under **Map Style**, tap **3D Terrain**.
 
-The map tilts to show the land in 3D and the button turns blue. Tap **3D** again to lay the map flat; it goes back to the style you had before (Satellite or Topo). The **3D** button also stays on the map in [Full Map](/help/full-map).
-
-You can also pick **3D Terrain** under **Map Style** in the layers panel, and go back by tapping **Satellite** or **Topo** there.
+The map tilts to show the land in 3D. To lay it flat again, tap **Satellite** or **Topo** under **Map Style**.
 
 Your choice is remembered and used in Ride Mode and Map Mode. Other maps, like the route builder and Find a Ride, show plain satellite while 3D Terrain is picked.
 

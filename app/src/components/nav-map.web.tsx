@@ -15,8 +15,10 @@ import { stopNumber, stopTimeLabel, type Waypoint } from '@/core/waypoints';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { NavMapboxMap } from '@/components/nav-mapbox-map';
 import { drawRoute, esc, frame, ll, reportRegion, satelliteMap, trailLayers } from '@/lib/web-map';
-import { OWN_PUCK_D } from './own-puck';
-import { puckBox, puckSvg, YOU_INK } from './rider-puck';
+import { useDotStylePref, useOwnDotD } from '@/hooks/use-dot-size';
+import { useOwnMoving } from '@/hooks/use-own-moving';
+import { ownDotBox, ownDotSvg, type DotStyle } from '@/core/own-dot-art';
+import { edgeZoomOn } from '@/hooks/use-edge-zoom';
 import { blaze, stopSign } from './waypoint-map.web';
 import { t as tr } from '@/lib/i18n';
 
@@ -24,11 +26,9 @@ export type NavMapHandle = { centerOn: (p: LatLng) => void; fit: (points: LatLng
 
 export const RECORD_INK = '#F6F1E3';
 const MEASURE_INK = '#ECCD91';
-/** The rider's dot with the white wedge every moving rider gets, turned to their heading. */
-/** Your own dot on the website's flat map: the cyan puck with its arrow built in (rider-puck). */
-const ME_BOX = puckBox(OWN_PUCK_D, true);
-const meDotHtml = (heading: number | null | undefined) =>
-  `<div role="img" aria-label="You are here">${puckSvg(YOU_INK, OWN_PUCK_D, heading ?? null, true, heading != null)}</div>`;
+/** Your own dot on the website's flat map, in the rider's Dot Style and Dot Size (core/own-dot-art). */
+const meDotHtml = (style: DotStyle, d: number, heading: number | null | undefined, moving: boolean) =>
+  `<div role="img" aria-label="${esc(tr('You are here'))}" style="display:block;pointer-events:none">${ownDotSvg(style, d, heading == null ? null : Math.round(heading), moving, 'me')}</div>`;
 
 type NavMapProps = Parameters<typeof FlatNavMap>[0];
 
@@ -44,7 +44,7 @@ export function NavMap(props: NavMapProps) {
  * finder. A click measures while measuring; otherwise it shows the trail under it.
  */
 function FlatNavMap({
-  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
+  trail, recorded, following, measure, measureTaps, measuring, onMeasure, center, found, onCenter, padding, followMe, onUserMove, meHeading, meFixAt, trackLines, obstacles, onObstacle, waypoints, onPressWaypoint, onLongPressMap, ref,
 }: {
   trail: TrailMap;
   recorded: LatLng[];
@@ -63,6 +63,8 @@ function FlatNavMap({
   onUserMove?: () => void;
   /** Which way the rider is moving (core/heading riderHeading), for the arrow on their dot. */
   meHeading?: number | null;
+  /** The rider's newest fix's own time (ms), so a repeated fix is ignored. */
+  meFixAt?: number | null;
   /** Track Line: where the rider has been, one colour per day, oldest first. */
   trackLines?: DayLine[];
   /** Named spots on the trail being drawn, recorded or followed. */
@@ -145,23 +147,35 @@ function FlatNavMap({
     map.current.setView(ll(center), 13);
   }, [center]);
 
-  // The rider's own spot (the phone maps draw it themselves).
+  // The rider's own spot (the phone maps draw it themselves), at the rider's Dot Size.
+  const meD = useOwnDotD();
+  const [meStyle] = useDotStylePref();
+  // Moving or stopped by the same rule as every other map; stopped, the dot keeps pointing the
+  // last way the rider was heading (the website has no compass).
+  const [meMoving, feedMe] = useOwnMoving();
+  useEffect(() => {
+    if (center) feedMe(meHeading != null, meFixAt ?? undefined);
+  }, [center, meHeading, meFixAt, feedMe]);
+  const lastMeHeading = useRef<number | null>(null);
   useEffect(() => {
     const m = map.current;
     if (!m) return;
     if (!center) {
       meDot.current?.remove();
       meDot.current = null;
+      lastMeHeading.current = null;
       return;
     }
-    const icon = L.divIcon({ className: '', iconSize: [ME_BOX, ME_BOX], iconAnchor: [ME_BOX / 2, ME_BOX / 2], html: meDotHtml(meHeading) });
+    if (meHeading != null) lastMeHeading.current = meHeading;
+    const box = ownDotBox(meD);
+    const icon = L.divIcon({ className: '', iconSize: [box, box], iconAnchor: [box / 2, box / 2], html: meDotHtml(meStyle, meD, lastMeHeading.current, meMoving) });
     if (meDot.current) {
       meDot.current.setLatLng(ll(center));
       meDot.current.setIcon(icon);
     } else {
       meDot.current = L.marker(ll(center), { interactive: false, keyboard: false, zIndexOffset: 1000, icon }).addTo(m);
     }
-  }, [center, meHeading]);
+  }, [center, meHeading, meMoving, meD, meStyle]);
 
   // Follow-me camera: pan (same zoom) so the spot sits in the open map between the panels.
   useEffect(() => {
@@ -177,7 +191,7 @@ function FlatNavMap({
     const sz = m.getSize();
     const move = followMove(followFrame.current, {
       pt: m.latLngToContainerPoint(ll(followMe)), size: { width: sz.x, height: sz.y },
-      inset: { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] }, zoom: m.getZoom(), screenHeadingDeg: null,
+      inset: { top: pad[0], right: pad[1], bottom: pad[2], left: pad[3] }, zoom: m.getZoom(), screenHeadingDeg: null, noZoomOut: !edgeZoomOn(),
     });
     followFrame.current = followFrameAfter(followFrame.current, move);
     if (move.kind === 'zoom-out') m.setZoom(move.zoom, { animate: true });

@@ -4,7 +4,7 @@ summary: See your vehicle's roll and pitch, get warned before a steep lean, and 
 category: safety-privacy
 order: 52
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-05
 sources:
   - app/src/app/tilt.tsx
   - app/src/components/tilt-gauge.tsx
@@ -37,6 +37,10 @@ You can also open it from the **You** tab: tap **Tilt and Crash Alert**. The scr
 
 Don't want it? At the top of the Tilt screen, under the Crash Alert switch, tap **Tilt Meter On** to turn it off. The Tilt tile leaves Map Mode and Ride Mode, the Tilt screen hides the readings, and tilt warnings stop. Crash Alert keeps working on its own switch. Tap **Tilt Meter Off** to bring it back. The switch follows your account to your other devices.
 
+:::release 2.1
+The same switch is under **Map Buttons** in **Map Settings**: tap the round **Map Settings** button on Ride Mode's or Map Mode's map and switch **Tilt Meter**.
+:::
+
 ## Calibrate It for Your Mount
 
 The tilt meter is off until you calibrate it, because your phone probably doesn't sit flat in its mount. Until then the Tilt screen shows **Calibrate** instead of readings, and the tile in Map Mode and Ride Mode says **Calibrate Tilt**. Tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers.
@@ -64,6 +68,10 @@ Crash Alert is on unless you turn it off. To turn it on or off, open the Tilt sc
 2. Tap **I'm OK** to cancel. Nothing is sent.
 3. If nobody taps **I'm OK**, your group gets the same **EMERGENCY** alert as the Emergency button, with your location, plus a chat message saying your phone detected a possible crash. Tap **Alert My Group Now** to send it straight away.
 4. To cancel and stop Crash Alert for now, tap **I'm OK, Turn Off Crash Alert** under the buttons. Turn it back on from the top of the Tilt screen.
+
+:::release 2.1
+If a sheet such as **Map Settings** is open when the countdown starts, it steps aside so the countdown can fill the screen, and comes back once the countdown has gone. The 30 seconds start once the countdown is on screen (it waits at most 2 seconds for the sheet).
+:::
 
 Choose how easily it goes off under **Sensitivity** on the Tilt screen: **Low** (only very hard hits and full rollovers, fewer false alarms on rough trails), **Normal** (recommended) or **High** (also smaller hits and steep tips). A hard bump you keep riding through doesn't count, and neither does knocking the phone while parked. Dropping your phone doesn't count either: Crash Alert notices the moment of falling and ignores the landing, and a dropped phone lying at an angle doesn't count as a rollover until it's back in its mount. If something still sets it off by mistake, tap **I'm OK**.
 

@@ -12,7 +12,7 @@ import { track } from '@/lib/analytics';
 import type { TracklinePieces } from '@/core/leader-trackline';
 import type { GroupMapHandle, MapRider } from './group-map-types';
 import { tracklineMapLines } from './leader-trackline-ink';
-import { useFollowCamera } from './use-follow-camera';
+import { useFollowCamera, type FollowFix } from './use-follow-camera';
 import { useGlide } from './use-glide';
 import { RiderPin } from './rider-pin';
 import { MapboxMap, MapboxMarker, type MapLine, type MapboxMapHandle, type MapboxOwnFix } from './mapbox-map';
@@ -21,6 +21,9 @@ import { StopPin, WaypointPin } from './waypoint-blaze';
 import { t } from '@/lib/i18n';
 type Inset = { top: number; right: number; bottom: number; left: number };
 
+/** The map's own location feed counts as quiet after this long without a fix (ms). */
+const NATIVE_QUIET_MS = 4000;
+
 /**
  * Ride Mode's live map on Mapbox: the same riders, route, waypoints and regroup pin as the flat
  * map (group-map.tsx), framed and followed the same way, in the rider's look (satellite, topo or
@@ -28,7 +31,7 @@ type Inset = { top: number; right: number; bottom: number; left: number };
  */
 export function GroupMapboxMap({
   riders, regroup, route, trackline, meId, onPressRider, trail, waypoints, onPressWaypoint, onLongPressMap, edgePadding, fallback,
-  onReady, onUserMove, follow, locationEveryMs = 1000, ref,
+  onReady, onUserMove, follow, locationEveryMs = 1000, myFix, ref,
 }: {
   riders: MapRider[];
   meId?: string;
@@ -46,6 +49,7 @@ export function GroupMapboxMap({
   onUserMove?: () => void;
   follow?: { inset: Inset } | null;
   locationEveryMs?: number;
+  myFix?: FollowFix | null;
   ref?: Ref<GroupMapHandle>;
 }) {
   const map = useRef<MapboxMapHandle>(null);
@@ -85,7 +89,9 @@ export function GroupMapboxMap({
 
   // Follow Me: keep the rider's own spot on screen as they move (core/follow-camera: zoom out
   // once, then move the map), zooming in at intersections when that's on (jitter under a couple of meters skipped).
-  const onOwnFix = useCallback((f: MapboxOwnFix) => {
+  // When the map's own location feed last reported (it drives the camera while it does).
+  const nativeAt = useRef(0);
+  const onOwnFix = useCallback((f: FollowFix) => {
     lastFix.current = { lat: f.lat, lng: f.lng };
     const fl = followRef.current;
     if (!fl || !followCamShouldMove(followed.current, f)) return;
@@ -98,6 +104,15 @@ export function GroupMapboxMap({
       if (took && run === followRun.current) followed.current = { lat: f.lat, lng: f.lng };
     });
   }, [cam]);
+  // Ride Mode's own GPS keeps the camera going whenever the map's location feed is quiet.
+  const backupLat = myFix?.lat;
+  const backupLng = myFix?.lng;
+  useEffect(() => {
+    if (!myFix || Date.now() - nativeAt.current < NATIVE_QUIET_MS) return;
+    onOwnFix(myFix);
+    // Only when the fix moves.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [backupLat, backupLng]);
   const followOn = !!follow;
   useEffect(() => {
     followRun.current++;
@@ -155,7 +170,10 @@ export function GroupMapboxMap({
         onReady?.();
       }}
       onCamera={(c) => setMapHeading(c.heading)}
-      onOwnFix={onOwnFix}>
+      onOwnFix={(f: MapboxOwnFix) => {
+        nativeAt.current = Date.now();
+        onOwnFix(f);
+      }}>
       {route && route.length > 1 ? <RouteEnds3d points={route} /> : null}
       {waypoints?.map((w) => (
         <MapboxMarker key={`w-${w.id}`} at={w}>

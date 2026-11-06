@@ -4,7 +4,7 @@ summary: What to check when riders don't show on the map, alerts don't arrive, a
 category: troubleshooting
 order: 10
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/components/rider-puck.tsx
   - app/src/core/freshness.ts
@@ -78,7 +78,7 @@ It waits on your phone as **Waiting for Signal** and sends by itself as soon as 
 :::release 2.1
 ## Nearby Riders Don't Show Up Over Bluetooth
 
-Bluetooth Sharing reaches about 30 to 100 meters between phones. Check that Bluetooth is on in the phone's settings, that OnMyLead is allowed to use Bluetooth (iPhone and iPad: **Settings > OnMyLead > Bluetooth**; Android: **Settings > Apps > OnMyLead > Permissions > Nearby devices**), that **Bluetooth Sharing** is on in the You tab (or the no-service banner in Ride Mode says **Bluetooth On**), and that you opened Ride Mode once with service. Riders only send their spot while they share with the ride. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+Bluetooth Sharing reaches about 30 to 100 meters between phones. Check that Bluetooth is on in the phone's settings, that OnMyLead is allowed to use Bluetooth (iPhone and iPad: **Settings > OnMyLead > Bluetooth**; Android: **Settings > Apps > OnMyLead > Permissions > Nearby devices**), that **Bluetooth Sharing** is on in the You tab (or the no-service banner in Ride Mode says **Bluetooth On**), and that you opened Ride Mode once with service. On Free, riders' spots and messages over Bluetooth don't show (they're Pro); EMERGENCY, Need Help and Crash Alerts still do. Riders only send their spot while they share with the ride. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 :::
 
 ## I'm Not Getting Alerts
@@ -108,6 +108,12 @@ Zoom in. Forest Service and BLM lines appear from about zoom level 9 (**Zoom In 
 
 :::release 1.0.2
 Zoom in. Forest Service and BLM lines appear when the map is about 60 miles across a phone screen (**Zoom In to See Trails**), and park and local tracks from OpenStreetMap when it's about 15 miles across (**Zoom In for Park and Local Trails**). The website shows fewer trail layers than the app. See [Map Layers](/help/map-layers).
+:::
+
+:::release 2.1
+## I Turned On Land but See No Boundaries
+
+Zoom in. National forests, BLM land and parks show once the map is about 60 miles across a phone screen (**Zoom In to See Land Boundaries**), and Texas property lines only when you're zoomed in to a few blocks. Land needs a signal to load. See [Map Layers and Trails](/help/map-layers).
 :::
 
 ## My Offline Map Download Stopped

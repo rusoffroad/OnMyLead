@@ -4,6 +4,8 @@ import { useCallback, useState } from 'react';
 import { Linking, Platform, Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
 import { Convoy, RiderDot } from '@/components/convoy';
+import { GroupPhoto } from '@/components/group-photo';
+import { GroupPhotoEditor } from '@/components/group-photo-editor';
 import { Icon } from '@/components/icon';
 import { RiderPicker } from '@/components/rider-picker';
 import { ShareCodeEditor } from '@/components/share-code-editor';
@@ -113,6 +115,7 @@ export default function GroupPage() {
       <Stack.Screen options={{ title: '' }} />
 
       <View style={styles.hero}>
+        {group.photoUrl ? <GroupPhoto uri={group.photoUrl} name={group.name} zoom /> : null}
         {renaming !== null ? (
           <View style={{ gap: Spacing.two, alignSelf: 'stretch' }}>
             <Field label={t('Group Name')} value={renaming} onChangeText={setRenaming} autoFocus maxLength={MAX_GROUP_NAME + 8} returnKeyType="done" />
@@ -267,6 +270,8 @@ export default function GroupPage() {
           />
         )
       ) : null}
+
+      {owner ? <GroupPhotoEditor groupId={group.id} name={group.name} uri={group.photoUrl} onChanged={load} /> : null}
 
       <View style={styles.linkCard}>
         <ThemedText type="heading">{t('Invite by Link')}</ThemedText>

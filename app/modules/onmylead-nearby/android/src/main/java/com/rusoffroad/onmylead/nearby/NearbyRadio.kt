@@ -20,9 +20,13 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.SystemClock
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.ParcelUuid
@@ -50,6 +54,11 @@ class NearbyRadio(
 ) {
   companion object {
     private const val MAX_PEERS = 8
+    private const val MAX_SUBSCRIBE_FAILS = 40
+    /** Refused writes of one urgent frame before it is left to later rounds. */
+    private const val MAX_URGENT_TRIES = 5
+    /** How long a new server's service may take to register before the server is replaced. */
+    private const val SERVICE_WAIT_MS = 15_000L
     private const val ROUND_MS = 4_000L
     // Low power (service, nobody in range, or Max Battery Saver): send less often and let the
     // chip scan and advertise in its low-power duty cycle. Phones that connect are served at once.
@@ -67,21 +76,41 @@ class NearbyRadio(
   private val adapter: BluetoothAdapter? = manager?.adapter
 
   private var server: BluetoothGattServer? = null
+  /** Goes up each time the server is closed, so callbacks it posted before closing are ignored. */
+  @Volatile private var serverGen = 0
   private var outboxChar: BluetoothGattCharacteristic? = null
   private var advertising = false
+  /** The server's service is registered: only then may the phone advertise it. */
+  private var serviceReady = false
+  /** When the current server was opened: one whose service never registers is replaced. */
+  private var serverOpenedAt = 0L
   private var scanning = false
 
   private class Peer(val gatt: BluetoothGatt) {
     var inbox: BluetoothGattCharacteristic? = null
+    /** Notifications from this peer still to be turned on: written before any frame. */
+    var cccd: BluetoothGattDescriptor? = null
+    var subscribeFails = 0
+    var cccdRetry = false
     var mtu = 23
     var busy = false
+    /** This round's frames, replaced by each new round. */
     val queue = ArrayDeque<ByteArray>()
+    /** Frames sent at once (taps, messages, receipts): ahead of the round, kept until sent. */
+    val urgent = ArrayDeque<ByteArray>()
+    var urgentFails = 0
+    var urgentRetry = false
   }
 
   private class Subscriber(val device: BluetoothDevice) {
     var mtu = 23
     var busy = false
+    /** This round's frames, replaced by each new round. */
     val queue = ArrayDeque<ByteArray>()
+    /** Frames sent at once (taps, messages, receipts): ahead of the round, kept until sent. */
+    val urgent = ArrayDeque<ByteArray>()
+    var urgentFails = 0
+    var urgentRetry = false
   }
 
   private val peers = HashMap<String, Peer>()
@@ -95,32 +124,73 @@ class NearbyRadio(
   // ---------------------------------------------------------------------------------------------
   // Called from JavaScript (any thread); everything else runs on `handler`.
 
+  // Bluetooth switched off and on between two rounds would leave dead scans and links behind, so
+  // the switch itself resets them; the next round starts everything again.
+  private var stateReceiverOn = false
+  private val roundTask = Runnable { round() }
+  private val stateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(c: Context, intent: Intent) {
+      val st = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+      if (st == BluetoothAdapter.STATE_TURNING_OFF || st == BluetoothAdapter.STATE_OFF) {
+        handler.post {
+          // Nothing to reset while the radio never started (no permission, no Bluetooth hardware).
+          if (!running || state == "off" || state == "unauthorized" || state == "unsupported") return@post
+          resetLinks()
+          report("off")
+        }
+      } else if (st == BluetoothAdapter.STATE_ON) {
+        handler.post {
+          val a = adapter
+          if (!running || !hasPermissions() || a == null) return@post
+          // A scan or advertisement left registered when Bluetooth went off (it couldn't be stopped
+          // then) would make the fresh start fail as already started: clear both first.
+          try { a.bluetoothLeScanner?.stopScan(scanCallback) } catch (_: Exception) {}
+          try { a.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback) } catch (_: Exception) {}
+          scanning = false
+          advertising = false
+          // One loop of rounds: drop the waiting one and run now.
+          handler.removeCallbacks(roundTask)
+          round()
+        }
+      }
+    }
+  }
+
   fun start() = handler.post {
     running = true
+    if (!stateReceiverOn) {
+      try {
+        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+          context.registerReceiver(stateReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+          context.registerReceiver(stateReceiver, filter)
+        }
+        stateReceiverOn = true
+      } catch (_: Exception) {}
+    }
     if (!hasPermissions()) return@post report("unauthorized")
     val a = adapter ?: return@post report("unsupported")
-    if (!a.isEnabled) return@post report("off")
-    openServer()
-    startScan()
-    report("on")
-    handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
+    if (a.isEnabled) {
+      openServer()
+      startScan()
+      report("on")
+    } else {
+      // Rounds keep running so the radio starts by itself once the rider turns Bluetooth on.
+      report("off")
+    }
+    handler.postDelayed(roundTask, if (low) LOW_ROUND_MS else ROUND_MS)
   }
 
   fun stop() {
     handler.post {
       running = false
       handler.removeCallbacksAndMessages(null)
-      try {
-        if (scanning) adapter?.bluetoothLeScanner?.stopScan(scanCallback)
-        if (advertising) adapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
-      } catch (_: Exception) {}
-      scanning = false
-      advertising = false
-      peers.values.forEach { it.gatt.close() }
-      peers.clear()
-      subscribers.clear()
-      server?.close()
-      server = null
+      if (stateReceiverOn) {
+        try { context.unregisterReceiver(stateReceiver) } catch (_: Exception) {}
+        stateReceiverOn = false
+      }
+      resetLinks()
       thread.quitSafely()
     }
   }
@@ -132,7 +202,7 @@ class NearbyRadio(
 
   fun sendNow(frames: List<String>) {
     val decoded = frames.mapNotNull { decode(it) }
-    handler.post { send(decoded) }
+    handler.post { send(decoded, urgent = true) }
   }
 
   fun drain(): List<String> = synchronized(received) {
@@ -156,7 +226,7 @@ class NearbyRadio(
     advertising = false
     val a = adapter
     if (a != null && a.isEnabled) {
-      startAdvertising()
+      if (server != null && serviceReady) startAdvertising()
       startScan()
     }
   }
@@ -195,34 +265,86 @@ class NearbyRadio(
     if (!running) return
     val a = adapter
     if (a == null || !a.isEnabled) {
-      if (state != "off") report("off")
+      if (state != "off") {
+        // Turning Bluetooth off ends every scan, advertisement and link: forget them, so they all
+        // start again when it comes back on.
+        resetLinks()
+        report("off")
+      }
     } else {
-      if (server == null) openServer()
+      if (server != null && !serviceReady && SystemClock.elapsedRealtime() - serverOpenedAt > SERVICE_WAIT_MS) {
+        // The stack took the service but never confirmed it: start over with a new server.
+        closeServer()
+      }
+      if (server == null) openServer() else if (serviceReady && !advertising) startAdvertising()
       if (!scanning) startScan()
       if (state != "on") report("on")
       send(outgoing)
     }
-    handler.postDelayed(::round, if (low) LOW_ROUND_MS else ROUND_MS)
+    handler.postDelayed(roundTask, if (low) LOW_ROUND_MS else ROUND_MS)
   }
 
-  private fun send(frames: List<ByteArray>) {
-    if (frames.isEmpty()) return
+  private fun resetLinks() {
+    try {
+      if (scanning) adapter?.bluetoothLeScanner?.stopScan(scanCallback)
+      if (advertising) adapter?.bluetoothLeAdvertiser?.stopAdvertising(advertiseCallback)
+    } catch (_: Exception) {}
+    scanning = false
+    advertising = false
+    peers.values.forEach { try { it.gatt.close() } catch (_: Exception) {} }
+    peers.clear()
+    closeServer()
+  }
+
+  /**
+   * Closes the GATT server and forgets everything it served. The new generation makes anything it
+   * still reports (disconnects included) ignored, so its subscribers are dropped here.
+   */
+  private fun closeServer() {
+    serverGen++
+    serviceReady = false
+    outboxChar = null
+    subscribers.clear()
+    pendingMtu.clear()
+    try { server?.close() } catch (_: Exception) {}
+    server = null
+    if (running) report()
+  }
+
+  /**
+   * Hands each link frames to send. A round (urgent false) carries everything still worth sending,
+   * so it replaces the round a slow link hadn't finished, even when it's empty; frames sent at once
+   * go ahead of it and stay until sent. A new batch always goes in whole.
+   */
+  private fun send(frames: List<ByteArray>, urgent: Boolean = false) {
+    if (urgent && frames.isEmpty()) return
     for (p in peers.values) {
       if (p.inbox == null) continue
-      for (f in frames) if (f.size <= p.mtu - 3 && p.queue.size < MAX_QUEUE) p.queue.add(f)
+      enqueue(if (urgent) p.urgent else p.queue, frames, p.mtu, urgent)
       pump(p)
     }
     for (s in subscribers.values) {
-      for (f in frames) if (f.size <= s.mtu - 3 && s.queue.size < MAX_QUEUE) s.queue.add(f)
+      enqueue(if (urgent) s.urgent else s.queue, frames, s.mtu, urgent)
       pump(s)
     }
   }
 
+  private fun enqueue(queue: ArrayDeque<ByteArray>, frames: List<ByteArray>, mtu: Int, keep: Boolean) {
+    val fit = frames.filter { it.size <= mtu - 3 }.take(MAX_QUEUE)
+    if (!keep) queue.clear()
+    // Too much waiting: the oldest frames make room.
+    while (queue.isNotEmpty() && queue.size + fit.size > MAX_QUEUE) queue.removeFirst()
+    queue.addAll(fit)
+  }
+
   @Suppress("DEPRECATION")
   private fun pump(p: Peer) {
-    val ch = p.inbox ?: return
     if (p.busy) return
-    val f = p.queue.removeFirstOrNull() ?: return
+    // The notification setup goes first; while a refused one waits to be asked again, frames flow.
+    if (p.cccd != null && !p.cccdRetry) return writeCccd(p)
+    val ch = p.inbox ?: return
+    val fromUrgent = p.urgent.isNotEmpty()
+    val f = p.urgent.removeFirstOrNull() ?: p.queue.removeFirstOrNull() ?: return
     p.busy = true
     val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       p.gatt.writeCharacteristic(ch, f, BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE) == BluetoothStatusCodesSuccess
@@ -231,9 +353,22 @@ class NearbyRadio(
       ch.value = f
       p.gatt.writeCharacteristic(ch)
     }
-    if (!ok) {
+    if (ok) {
+      if (fromUrgent) p.urgentFails = 0
+    } else {
       p.busy = false
-      p.queue.clear()
+      // A refused round frame drops the rest of the round (the next one carries it all again); a
+      // refused urgent frame leaves the round alone.
+      if (!fromUrgent) p.queue.clear()
+      if (fromUrgent) {
+        // Given up on after a few tries (later rounds carry it), else back to the front.
+        if (++p.urgentFails >= MAX_URGENT_TRIES) p.urgentFails = 0 else p.urgent.addFirst(f)
+        // Either way the link is tried again shortly, for what is still waiting.
+        if (!p.urgentRetry) {
+          p.urgentRetry = true
+          handler.postDelayed({ peerOf(p.gatt)?.let { it.urgentRetry = false; pump(it) } }, 200)
+        }
+      }
     }
   }
 
@@ -242,7 +377,8 @@ class NearbyRadio(
     val srv = server ?: return
     val ch = outboxChar ?: return
     if (s.busy) return
-    val f = s.queue.removeFirstOrNull() ?: return
+    val fromUrgent = s.urgent.isNotEmpty()
+    val f = s.urgent.removeFirstOrNull() ?: s.queue.removeFirstOrNull() ?: return
     s.busy = true
     val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       srv.notifyCharacteristicChanged(s.device, ch, false, f) == BluetoothStatusCodesSuccess
@@ -250,9 +386,22 @@ class NearbyRadio(
       ch.value = f
       srv.notifyCharacteristicChanged(s.device, ch, false)
     }
-    if (!ok) {
+    if (ok) {
+      if (fromUrgent) s.urgentFails = 0
+    } else {
       s.busy = false
-      s.queue.clear()
+      // A refused round frame drops the rest of the round (the next one carries it all again); a
+      // refused urgent frame leaves the round alone.
+      if (!fromUrgent) s.queue.clear()
+      if (fromUrgent) {
+        // Given up on after a few tries (later rounds carry it), else back to the front.
+        if (++s.urgentFails >= MAX_URGENT_TRIES) s.urgentFails = 0 else s.urgent.addFirst(f)
+        // Either way the link is tried again shortly, for what is still waiting.
+        if (!s.urgentRetry) {
+          s.urgentRetry = true
+          handler.postDelayed({ subscribers[s.device.address]?.takeIf { it === s }?.let { it.urgentRetry = false; pump(it) } }, 200)
+        }
+      }
     }
   }
 
@@ -261,7 +410,7 @@ class NearbyRadio(
 
   private fun openServer() {
     val m = manager ?: return
-    val srv = m.openGattServer(context, serverCallback) ?: return
+    val srv = m.openGattServer(context, serverCallbackFor(serverGen)) ?: return
     val inboxChar = BluetoothGattCharacteristic(
       inbox,
       BluetoothGattCharacteristic.PROPERTY_WRITE or BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE,
@@ -273,8 +422,16 @@ class NearbyRadio(
     s.addCharacteristic(inboxChar)
     s.addCharacteristic(out)
     outboxChar = out
-    srv.addService(s)
+    if (!srv.addService(s)) {
+      // Refused at once (the stack isn't ready): the next round opens a new server, under a new
+      // generation so anything this one still reports is ignored.
+      serverGen++
+      outboxChar = null
+      try { srv.close() } catch (_: Exception) {}
+      return
+    }
     server = srv
+    serverOpenedAt = SystemClock.elapsedRealtime()
   }
 
   private fun startAdvertising() {
@@ -300,27 +457,42 @@ class NearbyRadio(
     }
   }
 
-  private val serverCallback = object : BluetoothGattServerCallback() {
+  /**
+   * Callbacks for one server. Each server gets its own, holding the generation it was opened in, so
+   * anything a closed server still reports (even after the new one opened) is ignored.
+   */
+  private fun serverCallbackFor(gen: Int) = object : BluetoothGattServerCallback() {
     override fun onServiceAdded(status: Int, service: BluetoothGattService) {
-      handler.post { startAdvertising() }
+      handler.post {
+        if (gen != serverGen) return@post
+        if (status == BluetoothGatt.GATT_SUCCESS) {
+          serviceReady = true
+          startAdvertising()
+        } else {
+          // The stack wasn't ready (often right after Bluetooth turns on): the next round opens a new server.
+          closeServer()
+        }
+      }
     }
 
     override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
       if (newState == BluetoothProfile.STATE_DISCONNECTED) handler.post {
+        if (gen != serverGen) return@post
         subscribers.remove(device.address)
         report()
       }
     }
 
     override fun onMtuChanged(device: BluetoothDevice, mtu: Int) {
-      handler.post { subscribers[device.address]?.mtu = mtu }
-      pendingMtu[device.address] = mtu
+      handler.post { if (gen == serverGen) subscribers[device.address]?.mtu = mtu }
+      if (gen == serverGen) pendingMtu[device.address] = mtu
     }
 
     override fun onCharacteristicWriteRequest(
       device: BluetoothDevice, requestId: Int, characteristic: BluetoothGattCharacteristic,
       preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?,
     ) {
+      if (gen != serverGen) return
       if (characteristic.uuid == inbox && !preparedWrite && offset == 0 && value != null) deliver(value)
       if (responseNeeded) server?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
     }
@@ -329,12 +501,17 @@ class NearbyRadio(
       device: BluetoothDevice, requestId: Int, descriptor: BluetoothGattDescriptor,
       preparedWrite: Boolean, responseNeeded: Boolean, offset: Int, value: ByteArray?,
     ) {
+      if (gen != serverGen) return
       if (descriptor.uuid == CCCD) handler.post {
+        if (gen != serverGen) return@post
         val on = value != null && value.isNotEmpty() && value[0].toInt() != 0
         if (on) {
-          subscribers.getOrPut(device.address) { Subscriber(device) }.mtu = pendingMtu[device.address] ?: 185
+          val sub = subscribers.getOrPut(device.address) { Subscriber(device) }
+          sub.mtu = pendingMtu[device.address] ?: 185
           report()
-          send(outgoing)
+          // Only the new phone gets the round at once; the others carry on with theirs.
+          enqueue(sub.queue, outgoing, sub.mtu, false)
+          pump(sub)
         } else {
           subscribers.remove(device.address)
           report()
@@ -345,6 +522,7 @@ class NearbyRadio(
 
     override fun onNotificationSent(device: BluetoothDevice, status: Int) {
       handler.post {
+        if (gen != serverGen) return@post
         val s = subscribers[device.address] ?: return@post
         s.busy = false
         pump(s)
@@ -386,15 +564,82 @@ class NearbyRadio(
     peers[device.address] = Peer(gatt)
   }
 
+  /**
+   * Asks the peer for its packets (turns on notifications). The request goes ahead of every frame on
+   * the link, and frames wait until the stack has taken it: right after discovery the stack is often
+   * busy (Android 13+), and a frame write then would fail the same way and lose the queue. A refused
+   * request is tried again shortly; on a link that keeps refusing, this phone stops asking and
+   * keeps writing to it one way. While the request is in flight nothing else is written; while a
+   * refused one waits to be asked again, frames flow.
+   */
+  @Suppress("DEPRECATION")
+  private fun writeCccd(p: Peer) {
+    val d = p.cccd ?: return
+    if (p.cccdRetry) return
+    p.busy = true
+    val started = try {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        p.gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) == BluetoothStatusCodesSuccess
+      } else {
+        d.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+        p.gatt.writeDescriptor(d)
+      }
+    } catch (_: Exception) {
+      false
+    }
+    if (started) {
+      p.cccd = null
+      return
+    }
+    p.busy = false
+    subscribeLater(p, d)
+  }
+
+  /**
+   * A notification setup the stack or the peer refused: asked again after 500 ms, with frames
+   * flowing meanwhile, up to MAX_SUBSCRIBE_FAILS times (about 20 s, long enough for bonding). On a
+   * link that keeps refusing, this phone stops asking and writes to it one way. The pump is
+   * always posted, since this may run inside pump() or send()'s loop over the peers.
+   */
+  private fun subscribeLater(p: Peer, d: BluetoothGattDescriptor) {
+    if (++p.subscribeFails >= MAX_SUBSCRIBE_FAILS) {
+      // Give up on hearing from it, but keep writing to it: a one-way link still carries this
+      // phone's taps and EMERGENCY.
+      p.cccd = null
+      handler.post { peerOf(p.gatt)?.let { pump(it) } }
+      return
+    }
+    p.cccd = d
+    p.cccdRetry = true
+    // Frames go out while the setup waits to be asked again.
+    handler.post { peerOf(p.gatt)?.let { pump(it) } }
+    handler.postDelayed({
+      peerOf(p.gatt)?.let {
+        it.cccdRetry = false
+        pump(it)
+      }
+    }, 500)
+  }
+
+  /** The peer this link belongs to, or null for a link already closed and replaced. */
+  private fun peerOf(gatt: BluetoothGatt): Peer? = peers[gatt.device.address]?.takeIf { it.gatt === gatt }
+
   private fun drop(gatt: BluetoothGatt) {
-    peers.remove(gatt.device.address)
-    gatt.close()
+    // A late callback from a link already closed (Bluetooth switched off and on) must not remove
+    // the new link to the same phone.
+    if (peers[gatt.device.address]?.gatt === gatt) peers.remove(gatt.device.address)
+    try { gatt.close() } catch (_: Exception) {}
     report()
   }
 
   private val gattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
       handler.post {
+        // A link already closed (Bluetooth switched off) or replaced: just let it go.
+        if (peerOf(gatt) == null) {
+          try { gatt.close() } catch (_: Exception) {}
+          return@post
+        }
         if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
           // Bigger packets first; services are found once the size is agreed.
           if (!gatt.requestMtu(WANT_MTU)) gatt.discoverServices()
@@ -406,7 +651,8 @@ class NearbyRadio(
 
     override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
       handler.post {
-        peers[gatt.device.address]?.mtu = if (status == BluetoothGatt.GATT_SUCCESS) mtu else 23
+        val p = peerOf(gatt) ?: return@post
+        p.mtu = if (status == BluetoothGatt.GATT_SUCCESS) mtu else 23
         gatt.discoverServices()
       }
     }
@@ -414,39 +660,38 @@ class NearbyRadio(
     @Suppress("DEPRECATION")
     override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
       handler.post {
-        val p = peers[gatt.device.address] ?: return@post
+        val p = peerOf(gatt) ?: return@post
         val s = gatt.getService(service) ?: return@post drop(gatt)
         p.inbox = s.getCharacteristic(inbox)
         val out = s.getCharacteristic(outbox)
         if (out != null) {
           gatt.setCharacteristicNotification(out, true)
-          val d = out.getDescriptor(CCCD)
-          if (d != null) {
-            p.busy = true
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-              gatt.writeDescriptor(d, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-            } else {
-              d.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-              gatt.writeDescriptor(d)
-            }
-          }
+          p.cccd = out.getDescriptor(CCCD)
         }
         report()
-        send(outgoing)
+        // Only the new phone gets the round at once; the others carry on with theirs.
+        if (p.inbox != null) enqueue(p.queue, outgoing, p.mtu, false)
+        pump(p)
       }
     }
 
     override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
       handler.post {
-        val p = peers[gatt.device.address] ?: return@post
+        val p = peerOf(gatt) ?: return@post
         p.busy = false
+        // The stack took the request but the peer refused it: queue it again, a few times per link.
+        if (descriptor.uuid == CCCD && status != BluetoothGatt.GATT_SUCCESS) {
+          // The peer said no (busy, still bonding): ask again shortly, frames flowing meanwhile.
+          subscribeLater(p, descriptor)
+          return@post
+        }
         pump(p)
       }
     }
 
     override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
       handler.post {
-        val p = peers[gatt.device.address] ?: return@post
+        val p = peerOf(gatt) ?: return@post
         p.busy = false
         pump(p)
       }
@@ -454,7 +699,7 @@ class NearbyRadio(
 
     // Android 13+.
     override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) {
-      if (characteristic.uuid == outbox) deliver(value)
+      if (characteristic.uuid == outbox) handler.post { if (peerOf(gatt) != null) deliver(value) }
     }
 
     // Android 12 and older.
@@ -462,7 +707,8 @@ class NearbyRadio(
     @Suppress("DEPRECATION")
     override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && characteristic.uuid == outbox) {
-        characteristic.value?.let { deliver(it.copyOf()) }
+        val v = characteristic.value?.copyOf() ?: return
+        handler.post { if (peerOf(gatt) != null) deliver(v) }
       }
     }
   }

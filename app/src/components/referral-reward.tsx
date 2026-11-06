@@ -11,7 +11,7 @@ import { useEntitlements } from '@/lib/entitlements';
 import { buy } from '@/lib/purchases';
 import { applyPlayDeferral, claimReward, openAppleRedeem } from '@/lib/referrals';
 
-import { t } from '@/lib/i18n';
+import { currentLocale, t } from '@/lib/i18n';
 /**
  * The refer-a-friend reward, shaped like a trail pass: what was earned on the left of the
  * perforation, the price on the right, and one button that claims it the way this device's store
@@ -51,7 +51,7 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
         const res = await buy(PRODUCTS.annual, r.offerId);
         if (res.ok) {
           await refresh();
-          setNote('You’re on Pro Annual at half price for your first year.');
+          setNote(t('You’re on Pro Annual at half price for your first year. Thanks for spreading the word.'));
         } else if (res.reason !== 'cancelled') {
           setNote(res.reason === 'pending'
             ? t('Waiting on Google Play to approve the purchase.')
@@ -59,9 +59,13 @@ export function ReferralRewardCard({ reward, onChanged }: { reward: ReferralRewa
         }
       } else {
         const d = await applyPlayDeferral();
-        setNote(d.ok
-          ? t('Done. Your next Google Play bill moved back 6 months{v}.', { v: d.expiresAt ? `, to ${new Date(d.expiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : '' })
-          : t('Google Play didn’t answer. Your reward is saved; try again in a minute.'));
+        setNote(!d.ok
+          ? t('Google Play didn’t answer. Your reward is saved; try again in a minute.')
+          : d.expiresAt
+            ? t('Done. Your next Google Play bill moved back 6 months, to {date}.', {
+                date: new Date(d.expiresAt).toLocaleDateString(currentLocale(), { month: 'short', day: 'numeric', year: 'numeric' }),
+              })
+            : t('Done. Your next Google Play bill moved back 6 months.'));
       }
       onChanged();
     } finally {

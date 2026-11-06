@@ -4,7 +4,7 @@ summary: With no cell service, riders on the same ride pass spots, status taps a
 category: ride-mode
 order: 25
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/core/nearby.ts
   - app/src/lib/nearby.ts
@@ -16,6 +16,7 @@ sources:
   - app/src/components/ride-chat.tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/(tabs)/profile.tsx
+  - app/src/core/pro.ts
   - supabase/migrations/20261104060000_bluetooth_sharing.sql
   - supabase/migrations/20261104100000_bluetooth_mesh.sql
 related: [ride-mode, ride-chat, location-sharing, emergency-and-safety, status-buttons, offline-maps, battery-saver, privacy]
@@ -24,11 +25,17 @@ keywords: [bluetooth, no service, no signal, offline, dead zone, mesh, relay, ne
 
 When there's no cell service, OnMyLead phones on the same ride talk to each other over Bluetooth. Riders close to you keep moving on your map, and your status taps, quick replies and typed messages reach them, with no service at all. Each phone passes on what it hears, so the rider at the back can reach the front through the riders in between. It works on iPhone, iPad, Android phones and Android tablets, and they all work with each other.
 
+Seeing nearby riders, sharing your spot, and sending your other status taps and messages over Bluetooth are part of OnMyLead Pro, including the free Pro Trial. On every plan, your phone passes everything along for the group, and EMERGENCY, Need Help and Crash Alerts go out and come in over Bluetooth. On Free, the switch shows the **Pro** tag. With service, everything works as always on every plan. See [Free and Pro](/help/free-vs-pro).
+
 ## What It Does
 
 - **Spots.** If you're sharing your location with the ride, nearby riders on the ride see your dot move. Their details say **Via Bluetooth** when the spot came phone to phone. When one phone gets a newer spot for any rider, from Bluetooth or from the internet, it passes that on too, so everyone in range sees the freshest spot the group has.
 - **Status taps and EMERGENCY.** A status you tap goes to nearby riders at once over Bluetooth, with or without service, and still sends over the internet when you have signal. An EMERGENCY alerts nearby riders just like it does with service, and always goes out first.
-- **Quick replies and messages.** Your quick replies and the messages you type in Ride Mode reach nearby riders too. Their phones read them out loud, and they show in Ride Chat marked **Via Bluetooth**. Long messages are cut at about 350 characters over Bluetooth.
+
+:::release 2.1
+- **The Emergency Siren over Bluetooth.** An EMERGENCY from a nearby rider sounds the siren on your phone with no service, and a notification with the siren if OnMyLead is in the background. See [Hear the Emergency Siren](/help/emergency-siren).
+:::
+- **Quick replies and messages.** Your quick replies and the messages you type in Ride Mode reach nearby riders too. Their phones read them out loud, and they show in Ride Chat marked **Via Bluetooth**. Every Ride Mode message goes over Bluetooth whole, in any language.
 - **Got it, seen it.** The card under your tap says who has it: **Reached (name) over Bluetooth** when their phone got it, and **Seen by (name)** once it showed on their screen. While your tap is **Waiting for Signal**, the card still names the nearby riders who got it over Bluetooth.
 - **Passed along.** Each phone passes on what it hears, up to six phones down the line, so a strung-out group can still hear each other when the riders in between are in range.
 - **A phone with service helps the rest.** Any phone on the ride that has signal puts what OnMyLead knows about the group, the other riders' spots, status taps and messages, on the air for the riders near it with none.
@@ -77,6 +84,7 @@ Bluetooth uses far less battery than GPS, but it adds a little to Ride Mode's ba
 
 ## Good to Know
 
+- Phones on Free still pass everything along, so a Free rider in the middle of the group never breaks the chain. A phone with Bluetooth Sharing switched off doesn't pass anything along.
 - It isn't a satellite messenger. It doesn't reach 911 or anyone outside Bluetooth range. See [Emergency and Safety](/help/emergency-and-safety).
 - Photos, polls, announcements and leader-only messages still need service.
 - With no service, a message you get over Bluetooth shows in Ride Chat with **Via Bluetooth** until OnMyLead has it; then it looks like any other message.

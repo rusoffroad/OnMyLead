@@ -1,7 +1,7 @@
 import { formatDistance, metersToMiles } from './geo';
 import { miles, type PlacedRider } from './route';
 
-import { tc } from './i18n';
+import { ordinal, tc } from './i18n';
 /**
  * The group's running order along the route: every placed rider ranked from the front (1) to the
  * rear, and laid out on the route line so no dot hides another while each stays as close as it
@@ -110,25 +110,21 @@ export function convoyLayout(
   return layoutDots(ranked.map((r) => ({ id: r.id, alongM: pos(r), size: sizeOf(r) })), span, width, opts);
 }
 
-const ordinal = (n: number) => {
-  const t = n % 100;
-  const s = t >= 11 && t <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] ?? 'th';
-  return `${n}${s}`;
-};
 
 const short = (m: number) => (metersToMiles(m) < 0.1 ? formatDistance(m) : `${miles(m)} mi`);
 
 /** One line about a rider on the order line, e.g. "Mia · 3rd of 6 · 0.4 mi behind the leader". */
 export function describeRank(r: RankedRider, ranked: RankedRider[], name: string, meId?: string, offWord = 'off the route'): string {
-  const who = r.id === meId ? 'You' : name;
-  const parts = [who, ranked.length === 1 ? 'only one on the line' : r.rank === 1 ? 'out front' : r.rank === ranked.length ? `last of ${ranked.length}` : `${ordinal(r.rank)} of ${ranked.length}`];
+  const who = r.id === meId ? tc('You') : name;
+  const n = ranked.length;
+  const parts = [who, n === 1 ? tc('only one on the line') : r.rank === 1 ? tc('out front') : r.rank === n ? tc('last of {n}', { n }) : tc('{v} of {n}', { v: ordinal(r.rank), n })];
   const leader = ranked.find((x) => x.role === 'leader');
   if (leader && leader.id !== r.id) {
     const d = leader.place!.alongM - r.place!.alongM;
-    if (Math.abs(d) < 30) parts.push('with the leader');
-    else parts.push(d > 0 ? `${short(d)} behind the leader` : `${short(-d)} ahead of the leader`);
+    if (Math.abs(d) < 30) parts.push(tc('with the leader'));
+    else parts.push(tc(d > 0 ? '{d} behind the leader' : '{d} ahead of the leader', { d: short(Math.abs(d)) }));
   } else if (!leader && r.rank > 1) {
-    parts.push(`${short(r.backM)} back from the front`);
+    parts.push(tc('{d} back from the front', { d: short(r.backM) }));
   }
   if (!r.place!.onRoute) parts.push(offWord);
   return parts.join(' · ');
@@ -138,5 +134,72 @@ export function describeRank(r: RankedRider, ranked: RankedRider[], name: string
 export function groupSpread(ranked: RankedRider[]): string | null {
   if (ranked.length < 2) return null;
   const span = ranked[ranked.length - 1].backM;
-  return tc('{length} riders over {v}', { length: ranked.length, v: span < 30 ? 'a few yards' : short(span) });
+  return tc('{length} riders over {v}', { length: ranked.length, v: span < 30 ? tc('a few yards') : short(span) });
+}
+
+const FT_PER_M = 3.28084;
+/** Ruler steps, in meters: feet (50 to 500 ft) while the label is in feet, then 0.1 mi up to 50 mi. */
+const STEPS_US = [50, 100, 250, 500].map((ft) => ft / FT_PER_M).concat([0.1, 0.25, 0.5, 1, 2, 5, 10, 25, 50].map((mi) => mi * 1609.344));
+const STEPS_METRIC = [10, 25, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
+/** Under this the group reads as together: the ruler shows no ticks, just "a few yards". */
+const TOGETHER_M = 30;
+
+/** A short distance for the ruler: "450 ft" / "0.8 mi", or "120 m" / "1.3 km". */
+export function rulerDistance(m: number, metric = false): string {
+  if (metric) return m < 1000 ? tc('{n} m', { n: Math.round(m / 10) * 10 }) : tc('{n} km', { n: (m / 1000).toFixed(1) });
+  return metersToMiles(m) < 0.1 ? tc('{n} ft', { n: Math.round((m * FT_PER_M) / 10) * 10 }) : tc('{n} mi', { n: miles(m) });
+}
+
+export type SpreadRuler = {
+  /** Leader to the rider furthest back, in meters. */
+  meters: number;
+  /** e.g. "0.8 mi", or "a few yards" when the group is together. */
+  label: string;
+  /** Who the span runs between, e.g. "Leader to Tail Gunner". */
+  ends: string;
+  /** Where the ruler starts and stops on the track: under the leader's dot and the tail's dot. */
+  fromX: number;
+  toX: number;
+  /** Tick marks between the ends, one per step, as x on the track. */
+  ticks: number[];
+  /** Meters between ticks (0 when there are none). */
+  stepM: number;
+};
+
+/**
+ * The scale under the leader line: a span from the leader's dot to the tail's dot labelled with
+ * the distance from the leader to whoever is furthest back, and evenly spaced ticks (a round
+ * step, 50 ft up to 50 mi) so riders get a feel for how far apart the dots really are. Works from
+ * whatever spots the line has, so Bluetooth and last-seen positions count the same as live ones.
+ * `ranked` is rankRiders' output and `spots` convoyLayout's for the same riders. Null for fewer
+ * than two riders on the line.
+ */
+export function spreadRuler(
+  ranked: RankedRider[],
+  spots: DotSpot[],
+  opts: { metric?: boolean; minTickGap?: number } = {},
+): SpreadRuler | null {
+  if (ranked.length < 2 || spots.length < 2) return null;
+  const lead = ranked.find((r) => r.role === 'leader') ?? ranked[0];
+  const others = ranked.filter((r) => r.id !== lead.id);
+  const tail = [...others].reverse().find((r) => r.role === 'sweep') ?? others[others.length - 1];
+  const rear = others[others.length - 1];
+  const at = new Map(spots.map((s) => [s.id, s.x]));
+  const fromX = at.get(lead.id);
+  const toX = at.get(tail.id);
+  if (fromX == null || toX == null) return null;
+  const front = lead.place!.alongM;
+  const meters = Math.max(0, front - Math.min(tail.place!.alongM, rear.place!.alongM));
+  const ends = tc(rear.role === 'sweep' ? 'Leader to Tail Gunner' : 'Leader to Last Rider');
+  const together = meters < TOGETHER_M;
+  const label = together ? tc('a few yards') : rulerDistance(meters, opts.metric);
+
+  // Ticks are laid along the leader-to-tail span the dots are placed on (convoyLayout).
+  const spanM = Math.max(1, front - tail.place!.alongM);
+  const px = toX - fromX;
+  const minGap = opts.minTickGap ?? 24;
+  const step = together || px <= 0 ? undefined : (opts.metric ? STEPS_METRIC : STEPS_US.filter((s) => metersToMiles(meters) < 0.1 || s >= 0.1 * 1609.344)).find((s) => (s / spanM) * px >= minGap);
+  const ticks: number[] = [];
+  if (step) for (let d = step; d < spanM - step * 0.35; d += step) ticks.push(Math.round((fromX + (d / spanM) * px) * 10) / 10);
+  return { meters, label, ends, fromX, toX, ticks, stepM: ticks.length ? step! : 0 };
 }
