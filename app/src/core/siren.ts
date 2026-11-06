@@ -131,7 +131,9 @@ export function dropCall(calls: readonly EmergencyCall[], id: string): Emergency
  */
 export function isNewerTap(known: { id?: string | null; tapped_at: string } | undefined, incoming: { id?: string | null; tapped_at: string }): boolean {
   if (!known) return true;
-  return known.id !== incoming.id && Date.parse(known.tapped_at) <= Date.parse(incoming.tapped_at);
+  // Whole seconds: Bluetooth carries tap times to the second, the server to the millisecond.
+  const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000);
+  return known.id !== incoming.id && sec(known.tapped_at) <= sec(incoming.tapped_at);
 }
 
 /**

@@ -24,7 +24,7 @@ export type GroupPhotoSource = 'camera' | 'library';
 export const canUseGroupCamera = Platform.OS !== 'web';
 
 const NOT_ON = 'Group photos aren’t switched on yet. Try again after the next update.';
-const isNotOn = (message: string) => /photo_path|column|schema cache|bucket not found/i.test(message);
+const isNotOn = (message: string) => !/check constraint/i.test(message) && /photo_path|column|schema cache|bucket not found/i.test(message);
 
 /**
  * Lets the owner take or pick a photo. Android's crop screen keeps it 16:9; iPhone and iPad's crop

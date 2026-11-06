@@ -142,7 +142,10 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     if (next === calls) return;
     // Another call from the same rider replaces the older one: that one needs no silencing.
     const replaced = calls.filter((c) => !next.some((n) => n.id === c.id)).map((c) => c.id);
-    if (replaced.length) remember(replaced);
+    if (replaced.length) {
+      remember(replaced);
+      silencedHook?.(replaced);
+    }
     calls = next;
     emit();
     if (isNew && AppState.currentState !== 'active' && e.source === 'bluetooth') backgroundNotifier?.(call);
@@ -214,6 +217,8 @@ function update() {
   // Just back in front: wait for the resume moment, so a notification tap can silence its call first.
   if (want && resume) return;
   if (want) {
+    // The in-app siren takes over from any siren notification still in the tray (Android alarm).
+    if (!sounding) silencedHook?.(calls.map((c) => c.id));
     startSound();
     startBuzz();
   } else if (!sample) stopSound();

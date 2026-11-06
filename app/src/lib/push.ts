@@ -85,6 +85,8 @@ setSirenSilencedHook((ids) => {
 setBackgroundSirenNotifier((c: EmergencyCall) => {
   const name = c.name?.trim() || tc('A rider');
   Notifications.scheduleNotificationAsync({
+    // The tap's id, the same tag the server's push uses, so the two show (and sound) once.
+    identifier: c.id,
     content: {
       title: c.possibleCrash ? tc('Possible Crash: {name}', { name }) : tc('EMERGENCY: {name} needs help now', { name }),
       body: tc('Sent over Bluetooth. Tap to see where they are.'),

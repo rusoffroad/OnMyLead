@@ -111,6 +111,8 @@ describe('isNewerTap', () => {
     // An EMERGENCY relayed late, after the rider's I'm OK.
     expect(isNewerTap(t('ok', '2026-11-06T10:03:00Z'), t('sos', '2026-11-06T10:00:00Z'))).toBe(false);
     expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('a', '2026-11-06T10:05:00Z'))).toBe(false);
+    // Bluetooth to the second against the server to the millisecond: the same second counts as newer.
+    expect(isNewerTap(t('sos', '2026-11-06T10:00:00.700Z'), t('ok', '2026-11-06T10:00:00.000Z'))).toBe(true);
   });
 });
 
