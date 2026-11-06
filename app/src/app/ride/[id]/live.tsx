@@ -617,11 +617,14 @@ export default function RideMode() {
   useEffect(() => {
     // Not until we know who this rider is, so their own EMERGENCY never sounds on their phone.
     if (!me) return;
+    const raised: Promise<void>[] = [];
     for (const [userId, s] of Object.entries(statuses)) {
       if (s.status !== 'emergency') continue;
-      raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null);
+      raised.push(raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null));
     }
-    endStaleCalls(id, statuses);
+    // After the raises land: a rider's newer EMERGENCY takes the older one's place without the
+    // siren stopping in between (addCall replaces it), and the older one ends after if it's still there.
+    void Promise.all(raised).then(() => endStaleCalls(id, statuses));
   }, [statuses, id, me, sirenName]);
 
   // Leader and tail gunner hear a Mechanical Issue the moment it's tapped, once per tap.
