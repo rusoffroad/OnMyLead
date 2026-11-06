@@ -98,6 +98,7 @@ import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMembe
 import { speak } from '@/lib/voice';
 import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
 import { can } from '@/core/entitlements';
+import { isNewerTap } from '@/core/siren';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
@@ -552,8 +553,7 @@ export default function RideMode() {
           if (!memberIds.current.has(e.status.user_id)) return;
           // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren), unless
           // the rider has already tapped something newer (a relayed old EMERGENCY after I'm OK).
-          const known = statusesNow.current[e.status.user_id];
-          const newer = !known || (known.id !== e.status.id && Date.parse(known.tapped_at) <= Date.parse(e.status.tapped_at));
+          const newer = isNewerTap(statusesNow.current[e.status.user_id], e.status);
           // Kept current right away, so the next packet in the same batch is checked against this one.
           if (newer) {
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
@@ -561,8 +561,7 @@ export default function RideMode() {
           }
           if (newer) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
-            const old = prev[e.status.user_id];
-            if (old && (old.id === e.status.id || Date.parse(old.tapped_at) > Date.parse(e.status.tapped_at))) return prev;
+            if (!isNewerTap(prev[e.status.user_id], e.status)) return prev;
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
             return { ...prev, [e.status.user_id]: tap };
           });
@@ -614,6 +613,7 @@ export default function RideMode() {
   // Bluetooth both land in `statuses`.
   useEffect(() => {
     for (const [userId, s] of Object.entries(statuses)) {
+      if (s.status !== 'emergency') continue;
       raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null);
     }
     endStaleCalls(id, statuses);

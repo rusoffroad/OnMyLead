@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  addCall, dropCall, endedCalls, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
+  addCall, dropCall, endedCalls, isNewerTap, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
   SIREN_FRESH_MS, SIREN_REMEMBER, type EmergencyCall,
 } from '../siren';
 
@@ -77,7 +77,25 @@ describe('the list of calls', () => {
   });
 });
 
+describe('isNewerTap', () => {
+  const t = (id: string, iso: string) => ({ id, tapped_at: iso });
+  it('takes a different tap at the same time or later, never an older one or the same one again', () => {
+    expect(isNewerTap(undefined, t('a', '2026-11-06T10:00:00Z'))).toBe(true);
+    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('b', '2026-11-06T10:03:00Z'))).toBe(true);
+    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('b', '2026-11-06T10:00:00Z'))).toBe(true);
+    // An EMERGENCY relayed late, after the rider's I'm OK.
+    expect(isNewerTap(t('ok', '2026-11-06T10:03:00Z'), t('sos', '2026-11-06T10:00:00Z'))).toBe(false);
+    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('a', '2026-11-06T10:05:00Z'))).toBe(false);
+  });
+});
+
 describe('endedCalls', () => {
+  it('a push that arrived late is ended by any tap the rider made after tapping it', () => {
+    // Arrived (at) 15 minutes after the tap; the rider's I'm OK came 2 minutes after the tap.
+    const late = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: NOW, tappedAt: NOW - 15 * 60_000 }];
+    expect(endedCalls(late, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW - 13 * 60_000 } })).toEqual(['sos']);
+  });
+
   const calls = [call('a', 'u1', NOW - 60_000), call('b', 'u2', NOW - 60_000), call('x', 'u3', NOW, 'r2')];
   it('ends a call once the rider tapped something newer', () => {
     expect(endedCalls(calls, 'r1', { u1: { id: 'n', status: 'ok', at: NOW } })).toEqual(['a']);

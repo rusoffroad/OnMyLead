@@ -133,6 +133,19 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
   return { sent: results.filter((r) => r.outcome === 'ok').length, removed: gone.length, ...(notes ? { note: notes } : null) };
 }
 
+/** push_tokens.siren for these tokens, 50 per lookup (all at once) so a big ride's URLs stay short. */
+async function sirenTokens(all: string[]): Promise<{ token: string; siren: boolean | null }[]> {
+  const slices: string[][] = [];
+  for (let i = 0; i < all.length; i += 50) slices.push(all.slice(i, i + 50));
+  const pages = await Promise.all(slices.map((part) => db.from('push_tokens').select('token, siren').in('token', part)));
+  const out: { token: string; siren: boolean | null }[] = [];
+  for (const { data, error } of pages) {
+    if (error) throw error;
+    out.push(...((data ?? []) as { token: string; siren: boolean | null }[]));
+  }
+  return out;
+}
+
 /**
  * EMERGENCY status pushes (the button, CarPlay or a Crash Alert): phones whose app has the
  * Emergency Siren switched on (push_tokens.siren, migration 20261105070000_emergency_siren.sql)
@@ -141,17 +154,6 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
  * off get the push exactly as before. Fails open to the plain push: any lookup error (say the
  * column isn't there yet) leaves the rows unchanged.
  */
-/** push_tokens.siren for these tokens, 50 at a time so a big ride's lookup URL stays short. */
-async function sirenTokens(all: string[]): Promise<{ token: string; siren: boolean | null }[]> {
-  const out: { token: string; siren: boolean | null }[] = [];
-  for (let i = 0; i < all.length; i += 50) {
-    const { data, error } = await db.from('push_tokens').select('token, siren').in('token', all.slice(i, i + 50));
-    if (error) throw error;
-    out.push(...((data ?? []) as { token: string; siren: boolean | null }[]));
-  }
-  return out;
-}
-
 export async function withSiren(rows: Push[]): Promise<Push[]> {
   const sos = rows.filter((r) => r.data?.status === 'emergency');
   if (!sos.length) return rows;

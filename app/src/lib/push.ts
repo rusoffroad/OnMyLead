@@ -13,7 +13,7 @@
 import * as Notifications from 'expo-notifications';
 import { router, useRootNavigationState } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { Linking, Platform } from 'react-native';
+import { AppState, Linking, Platform } from 'react-native';
 
 import { planReminders } from '@/core/notifications';
 import { tapData, tapTarget, type TapData } from '@/core/push-tap';
@@ -35,7 +35,7 @@ Notifications.setNotificationHandler({
     // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner,
     // but only when the siren will really sound (not for an old or silenced one, or with it off).
     const call = emergencyFromPush(data);
-    if (call && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
+    if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
@@ -204,9 +204,10 @@ function emergencyFromPush(data: TapData | undefined): IncomingEmergency | null 
       userId: typeof d.userId === 'string' ? d.userId : unknownRider(data.itemId),
       name: typeof d.name === 'string' ? d.name : null,
       status: 'emergency',
-      // When it was tapped (newer servers say); else a push is news: it was just sent. Never in the
-      // future, so a phone whose clock runs behind still sounds it.
-      at: Number.isFinite(tappedAt) ? Math.min(tappedAt, Date.now()) : Date.now(),
+      // A push is news: it was just sent (a tap uploaded late, say after a crash with no service,
+      // still sounds). When the rider tapped it (newer servers say) decides what ends it.
+      at: Date.now(),
+      tappedAt: Number.isFinite(tappedAt) ? tappedAt : undefined,
       source: 'push',
   };
 }

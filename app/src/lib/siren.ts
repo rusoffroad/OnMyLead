@@ -99,6 +99,8 @@ export type IncomingEmergency = {
   status: string;
   /** When it was tapped: ms since 1970 or an ISO time. */
   at: number | string;
+  /** For a push: when the rider tapped it (`at` is when it arrived, so a late upload still sounds). */
+  tappedAt?: number;
   name?: string | null;
   possibleCrash?: boolean;
   cancelled?: boolean;
@@ -119,7 +121,7 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
     if (!Number.isFinite(at)) return;
     if (!shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() })) return;
-    const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, name: e.name, possibleCrash: e.possibleCrash };
+    const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt: e.tappedAt, name: e.name, possibleCrash: e.possibleCrash };
     const isNew = !calls.some((c) => c.id === call.id);
     const next = addCall(calls, call);
     // Another call from the same rider replaces the older one: that one needs no silencing.
@@ -214,7 +216,9 @@ function startSound() {
   if (sounding) return;
   sounding = true;
   // Plays with the ring/silent switch on, and lowers the rider's music under it.
-  setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false })
+  setIsAudioActiveAsync(true)
+    .catch(() => {})
+    .then(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }))
     .catch(() => {})
     .then(() => {
       if (!sounding) return;
@@ -239,8 +243,9 @@ function stopSound() {
   try {
     player?.pause();
   } catch {}
-  // Let the rider's music come back up (the siren ducked it).
-  if (was) setIsAudioActiveAsync(false).catch(() => {});
+  // iPhone and iPad: let the rider's music come back up (the siren ducked it). Android gives the
+  // audio back when the player pauses, and switching audio off there would mute the next siren.
+  if (was && Platform.OS === 'ios') setIsAudioActiveAsync(false).catch(() => {});
   if (buzz) clearInterval(buzz);
   buzz = null;
 }

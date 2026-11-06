@@ -43,8 +43,10 @@ export type EmergencyCall = {
   id: string;
   rideId: string;
   userId: string;
-  /** When it was tapped, ms since 1970. */
+  /** When it was tapped, ms since 1970 (for a push: when it arrived, so a late upload still sounds). */
   at: number;
+  /** When the rider tapped it, when known apart from `at` (a push): a later tap of theirs ends it. */
+  tappedAt?: number;
   /** The rider's name, when known. */
   name?: string | null;
   /** Sent by a Crash Alert (Bluetooth carries this flag; the internet path says so in the chat line). */
@@ -102,6 +104,15 @@ export function dropCall(calls: readonly EmergencyCall[], id: string): Emergency
  * push got here before Ride Mode heard the tap) ends nothing. A cancelled tap is dropped by its id
  * instead (dropCall), since the status shown then is the older one again.
  */
+/**
+ * Whether a status tap that reached this phone is newer than the one already known for that rider
+ * (a different tap, tapped at the same time or later). An older one relayed late changes nothing.
+ */
+export function isNewerTap(known: { id?: string | null; tapped_at: string } | undefined, incoming: { id?: string | null; tapped_at: string }): boolean {
+  if (!known) return true;
+  return known.id !== incoming.id && Date.parse(known.tapped_at) <= Date.parse(incoming.tapped_at);
+}
+
 export function endedCalls(
   calls: readonly EmergencyCall[],
   rideId: string,
@@ -113,7 +124,7 @@ export function endedCalls(
       const s = latest[c.userId];
       if (!s?.id) return false;
       if (s.id === c.id) return s.status !== 'emergency';
-      return s.at > c.at;
+      return s.at > (c.tappedAt ?? c.at);
     })
     .map((c) => c.id);
 }
