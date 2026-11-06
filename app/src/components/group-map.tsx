@@ -97,6 +97,11 @@ function FlatGroupMap({
   follow?: { inset: { top: number; right: number; bottom: number; left: number } } | null;
   /** How often Android reports the phone's own dot (iPhone and iPad report it as it moves). */
   locationEveryMs?: number;
+  /**
+   * Ride Mode's own GPS fix for this phone. The Mapbox map follows it whenever its own location
+   * feed goes quiet, so Follow Me never stops because one source stopped reporting.
+   */
+  myFix?: (LatLng & { course?: number | null; speed?: number | null }) | null;
   /** Lets Ride Mode center the map on the rider (when it opens, and the center-on-me button). */
   ref?: Ref<GroupMapHandle>;
 }) {

@@ -4,7 +4,7 @@ summary: Choose who sees your location and for how long, from a few hours to unt
 category: safety-privacy
 order: 10
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/ride/[id]/live.tsx
   - app/src/app/share.tsx

@@ -3313,7 +3313,7 @@ const dict: Record<string, string> = {
   "Play, pause, skip and volume without leaving the map.": "Воспроизведение, пауза, переключение и громкость, не покидая карту.",
   "Zoom Out at the Edge": "Отдалять у Края",
   "The map moves to keep your dot on screen as you ride.": "Карта сдвигается, чтобы ваша точка оставалась на экране во время езды.",
-  "The first time your dot nears the edge, the map zooms out one step. After that it slides along with you.": "Когда точка впервые подходит к краю, карта отдаляется на один шаг. Дальше она сдвигается вместе с вами.",
+  "The first time your dot nears the edge, the map zooms out one step. The next time it centers on you and follows.": "Когда точка впервые подходит к краю, карта отдаляется на один шаг. В следующий раз она ставит вас в центр и следует за вами.",
   "Closes in on a road or trail junction as you reach it so you can see which way to go, then zooms back out.": "Приближает перекрёсток дорог или троп, когда вы подъезжаете, чтобы было видно, куда ехать, затем отдаляет.",
   "Zooming works while Follow Me is on.": "Масштабирование работает, пока включено «Подписаться на меня».",
   "While following you, the map zooms out once as your dot nears the edge, then slides along": "При слежении карта один раз отдаляется, когда точка подходит к краю, а затем сдвигается вместе с вами",
