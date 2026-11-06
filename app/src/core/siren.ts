@@ -102,10 +102,6 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
   return [c, ...rest].sort((a, b) => (b.tappedAt ?? b.at) - (a.tappedAt ?? a.at));
 }
 
-/**
- * A push from a server without the siren update doesn't say who sent it: the call stands in with
- * `item:<id>` until Ride Mode hears the tap and fills in the rider.
- */
 /** How late a push may arrive and still count as news (a tap uploaded late after no service). */
 export const PUSH_LATE_MAX_MS = 60 * 60_000;
 
@@ -118,6 +114,10 @@ export function pushCallAt(tappedAt: number | undefined, now: number): number {
   return tappedAt != null && Number.isFinite(tappedAt) && now - tappedAt > PUSH_LATE_MAX_MS ? tappedAt : now;
 }
 
+/**
+ * A push from a server without the siren update doesn't say who sent it: the call stands in with
+ * `item:<id>` until Ride Mode hears the tap and fills in the rider.
+ */
 export function unknownRider(id: string): string {
   return `item:${id}`;
 }

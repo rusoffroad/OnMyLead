@@ -173,10 +173,13 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     const isNew = !calls.some((c) => c.id === call.id);
     const next = addCall(calls, call);
     if (next === calls) return;
-    // Another call from the same rider replaces the older one: its notification goes, but it isn't
-    // silenced (if the newer one is taken back, the older one can sound again).
+    // Another call from the same rider replaces the older one: that one is over for this run, the
+    // same as when a newer tap ends it in Ride Mode (a rider who still needs help taps EMERGENCY again).
     const replaced = calls.filter((c) => !next.some((n) => n.id === c.id)).map((c) => c.id);
-    if (replaced.length) silencedHook?.(replaced);
+    if (replaced.length) {
+      replaced.forEach(markEnded);
+      silencedHook?.(replaced);
+    }
     calls = next;
     emit();
     if (isNew && AppState.currentState !== 'active' && e.source === 'bluetooth') backgroundNotifier?.(call);
@@ -184,7 +187,6 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
   });
 }
 
-/** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
 /** Ends a call for this run only, keeping the list to SIREN_REMEMBER ids. */
 function markEnded(id: string) {
   if (endedHere.has(id)) return;
@@ -217,6 +219,7 @@ export function tapTakenBack(id: string) {
   endEmergency(id);
 }
 
+/** A call is over (silenced, or the rider took it back): saved, so it never sounds again. */
 export function endEmergency(id: string) {
   if (!calls.some((c) => c.id === id)) {
     markEnded(id);
@@ -377,9 +380,11 @@ async function checkCallsOnServer() {
       const newest = newestTapPerRider(rows.filter((r) => r.user_id === c.userId && !r.cancelled_at))[c.userId];
       if (!newest) continue;
       // A newer EMERGENCY from the same rider takes this call's place (addCall replaces it).
-      if (newest.status === 'emergency' && newest.id !== c.id)
+      if (newest.status === 'emergency' && newest.id !== c.id) {
+        // The older call is over either way; the newer one sounds if it can.
+        endByTap(c.id);
         raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: newest.tapped_at, name: c.name, source: 'ride' }, null);
-      else noteRiderTap(c.rideId, c.userId, newest);
+      } else noteRiderTap(c.rideId, c.userId, newest);
     }
   }));
 }
