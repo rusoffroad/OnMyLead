@@ -7,8 +7,10 @@ import {
   aspectCrop, GROUP_PHOTO_BUCKET, GROUP_PHOTO_HEIGHT, GROUP_PHOTO_MAX_BYTES, GROUP_PHOTO_QUALITY, GROUP_PHOTO_WIDTH,
   groupPhotoPath, hasAspect, isGroupPhotoPath,
 } from '@/core/group-photo';
+import { can } from '@/core/entitlements';
 import { nextQuality } from '@/core/social';
 import { track } from './analytics';
+import { currentEntitlements, refreshEntitlements } from './entitlements';
 import { readPhotoBytes } from './photo-bytes';
 import { supabase } from './supabase';
 
@@ -87,8 +89,14 @@ export async function saveGroupPhoto(groupId: string, asset: ImagePicker.ImagePi
   const path = groupPhotoPath(row.owner_id, groupId, Crypto.randomUUID());
   const bucket = supabase.storage.from(GROUP_PHOTO_BUCKET);
   const { error: upErr } = await bucket.upload(path, bytes, { contentType: 'image/jpeg', upsert: false, cacheControl: '31536000' });
-  // The bucket refuses uploads without the feature (a plan that just ended): the Pro prompt shows.
-  if (upErr) throw new Error(isNotOn(upErr.message) ? NOT_ON : /row-level security/i.test(upErr.message) ? 'pro_required:group_photos' : upErr.message);
+  // The bucket refuses uploads without the feature (a plan that just ended): the Pro prompt shows,
+  // but only when the plan, checked again now, really is without it (not a signed-out session).
+  if (upErr) {
+    if (isNotOn(upErr.message)) throw new Error(NOT_ON);
+    if (/row-level security/i.test(upErr.message) && !can(await refreshEntitlements().catch(() => currentEntitlements()), 'group_photos'))
+      throw new Error('pro_required:group_photos');
+    throw new Error(upErr.message);
+  }
   const { error } = await supabase.from('riding_groups').update({ photo_path: path }).eq('id', groupId);
   if (error) {
     await bucket.remove([path]);

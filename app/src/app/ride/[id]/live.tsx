@@ -1099,7 +1099,8 @@ export default function RideMode() {
     if (!carPlayPro && !carRideShown.current) return clearCarPlay();
     if (ride) {
       showRideOnCarPlay(JSON.parse(carKey));
-      carRideShown.current = true;
+      // Only a real Pro answer counts (before the plan has loaded every feature reads as on).
+      if (carPlayPro && currentEntitlements().switchedOn) carRideShown.current = true;
     }
   }, [carKey, ride, carPlayPro]);
   useEffect(() => () => clearCarPlay(), []);
