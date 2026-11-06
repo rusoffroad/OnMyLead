@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { endEmergency, loadSiren, noteRiderTap, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
+import { endEmergency, loadSiren, noteRiderTap, resetSirenCalls, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenSilenced, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -41,12 +41,15 @@ Notifications.setNotificationHandler({
     // screen locks before the rider looks. Not in the tray on Android, where the siren channel
     // would play its own siren over the app's.
     if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: Platform.OS === 'ios', shouldPlaySound: false, shouldSetBadge: false };
+    // On Android with the siren on, the push is on the siren channel: posting it at all plays the
+    // alarm (the channel's sound), so the cases below keep it out of the tray there.
+    const androidSiren = Platform.OS === 'android' && sirenEnabled();
     // Already silenced here: in the list, without the siren sound coming back from the push.
-    if (call && sirenSilenced(call.id!)) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
+    if (call && sirenSilenced(call.id!)) return { shouldShowBanner: false, shouldShowList: !androidSiren, shouldPlaySound: false, shouldSetBadge: false };
     // Open, but the in-app siren won't sound it (too old, an older call, or the switch just went
     // off): a banner without the push's own siren sound, which nothing here could silence.
     // With the switch off the push has the plain sound, which still plays.
-    if (call && AppState.currentState === 'active') return { shouldShowBanner: true, shouldShowList: true, shouldPlaySound: !sirenEnabled(), shouldSetBadge: false };
+    if (call && AppState.currentState === 'active') return { shouldShowBanner: !androidSiren, shouldShowList: !androidSiren, shouldPlaySound: !sirenEnabled(), shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
@@ -186,6 +189,8 @@ async function createAndroidChannels() {
 /** Forget the registration so the next sign-in registers again. */
 export function resetPushRegistration() {
   registeredFor = null;
+  // Signed out (or another account): the last account's waiting calls go with it.
+  resetSirenCalls();
 }
 
 /** A rider's status tap or quick reply reached this phone by push: the sender's card says so. */

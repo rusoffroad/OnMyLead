@@ -561,7 +561,8 @@ export default function RideMode() {
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
             statusesNow.current = { ...statusesNow.current, [e.status.user_id]: tap };
           }
-          if (newer && me) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
+          // An older copy still counts when it carries the crash flag (the siren says Possible Crash).
+          if ((newer || e.status.possible_crash) && me) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             if (!isNewerTap(prev[e.status.user_id], e.status)) return prev;
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;

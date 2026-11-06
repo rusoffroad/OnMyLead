@@ -84,7 +84,7 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
         ...x,
         userId: isUnknownRider(x.userId) ? c.userId : x.userId,
         name: x.name || c.name,
-        possibleCrash: x.possibleCrash || c.possibleCrash,
+        possibleCrash: x.possibleCrash || c.possibleCrash ? true : x.possibleCrash,
         tappedAt: tapped === was ? x.tappedAt : tapped,
       };
       changed = merged.userId !== x.userId || merged.name !== x.name || merged.possibleCrash !== x.possibleCrash || merged.tappedAt !== x.tappedAt;

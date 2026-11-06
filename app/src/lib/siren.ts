@@ -5,7 +5,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { AppState, Platform } from 'react-native';
 
 import {
-  addCall, dropCall, endedCalls, isNewerTap, parseSirenSetting, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
+  addCall, dropCall, endedCalls, isNewerTap, newestTapPerRider, parseSirenSetting, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
   SIREN_REMEMBER,
 } from '@/core/siren';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
@@ -233,6 +233,15 @@ export function noteRiderTap(rideId: string, userId: string, tap: { id: string; 
   for (const id of endedCalls(calls, rideId, knownLatest[rideId])) endEmergency(id);
 }
 
+/** Sign-out: the last account's waiting calls and what was known about its rides go. */
+export function resetSirenCalls() {
+  for (const k of Object.keys(knownLatest)) delete knownLatest[k];
+  if (!calls.length) return;
+  calls = [];
+  emit();
+  update();
+}
+
 /** The rider silenced one call (a notification tap counts too). */
 export function silenceEmergency(id: string) {
   // Saved even when it isn't sounding yet (a notification tap on a cold start), so it never sounds.
@@ -326,7 +335,8 @@ async function checkCallsOnServer() {
         endEmergency(c.id);
         continue;
       }
-      const newest = rows.find((r) => r.user_id === c.userId && !r.cancelled_at);
+      // The same newest-tap rule as Ride Mode (ties included).
+      const newest = newestTapPerRider(rows.filter((r) => r.user_id === c.userId && !r.cancelled_at))[c.userId];
       if (newest) noteRiderTap(c.rideId, c.userId, newest);
     }
   }
