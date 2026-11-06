@@ -3358,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "{n} piloto más necesita ayuda",
   "{n} more riders need help": "{n} pilotos más necesitan ayuda",
   "Version {v}": "Versión {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "Las fotos de grupo aún no están activadas. Vuelve a intentarlo después de la próxima actualización.",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "OnMyLead necesita la cámara para tomar la foto del grupo. Actívala en Ajustes o elige una foto.",
+  "That photo is too big. Try another one.": "Esa foto es demasiado grande. Prueba con otra.",
+  "This group is gone, or you’re no longer in it.": "Este grupo ya no existe o ya no formas parte de él.",
+  "Please sign in first.": "Primero inicia sesión.",
+  "Only the rider who made the group can change its photo.": "Solo quien creó el grupo puede cambiar su foto.",
 };
 
 export default dict;

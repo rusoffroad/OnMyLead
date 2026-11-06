@@ -98,7 +98,7 @@ import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMembe
 import { speak } from '@/lib/voice';
 import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
 import { can } from '@/core/entitlements';
-import { isNewerTap, newestTapPerRider } from '@/core/siren';
+import { isNewerTap, newestTapPerRider, pushCallAt } from '@/core/siren';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
@@ -231,6 +231,11 @@ export default function RideMode() {
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
   // The siren screen says "A rider" until the name is known (a call can arrive before the roster).
   const sirenName = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || null, [members]);
+  // For the live-update handler below, which doesn't restart when these change.
+  const sirenNow = useRef({ me, sirenName });
+  useEffect(() => {
+    sirenNow.current = { me, sirenName };
+  }, [me, sirenName]);
 
   // Waypoints: the leader's shared ones and this rider's own. Press and hold the map to drop one.
   const wp = useRideWaypoints(id, !!mine);
@@ -436,7 +441,16 @@ export default function RideMode() {
         const s = payload.new as TappedStatus & { user_id: string };
         // An older tap arriving late (uploaded after a newer one) changes nothing. Kept current right
         // away too, so a Bluetooth copy of an older EMERGENCY in the same tick doesn't count as newer.
-        if (isNewerTap(statusesNow.current[s.user_id], s)) statusesNow.current = { ...statusesNow.current, [s.user_id]: s };
+        if (isNewerTap(statusesNow.current[s.user_id], s)) {
+          statusesNow.current = { ...statusesNow.current, [s.user_id]: s };
+          // An EMERGENCY arriving live counts from now, like a push (core/siren pushCallAt), so one
+          // uploaded late after no service still sounds; opening Ride Mode later goes by tap time.
+          const tapped = Date.parse(s.tapped_at);
+          const { me: who, sirenName: nameOf } = sirenNow.current;
+          if (s.status === 'emergency' && s.id && who && Number.isFinite(tapped)) {
+            void raiseEmergency({ id: s.id, rideId: id, userId: s.user_id, status: s.status, at: pushCallAt(tapped, Date.now()), tappedAt: tapped, name: nameOf(s.user_id), source: 'ride' }, who);
+          }
+        }
         setStatuses((prev) => (isNewerTap(prev[s.user_id], s) ? { ...prev, [s.user_id]: s } : prev));
       })
       // A rider cancelled a tap: their status goes back to what it was before.

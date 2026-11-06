@@ -3358,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "라이더 {n}명이 더 도움이 필요합니다",
   "{n} more riders need help": "라이더 {n}명이 더 도움이 필요합니다",
   "Version {v}": "버전 {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "그룹 사진이 아직 켜지지 않았습니다. 다음 업데이트 후 다시 시도하세요.",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "그룹 사진을 찍으려면 OnMyLead에 카메라가 필요합니다. 설정에서 켜거나 사진을 선택하세요.",
+  "That photo is too big. Try another one.": "사진이 너무 큽니다. 다른 사진을 사용해 보세요.",
+  "This group is gone, or you’re no longer in it.": "이 그룹이 없어졌거나 더 이상 멤버가 아닙니다.",
+  "Please sign in first.": "먼저 로그인하세요.",
+  "Only the rider who made the group can change its photo.": "그룹을 만든 라이더만 그룹 사진을 바꿀 수 있습니다.",
 };
 
 export default dict;

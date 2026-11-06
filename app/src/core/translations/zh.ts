@@ -3358,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "还有 {n} 位骑手需要帮助",
   "{n} more riders need help": "还有 {n} 位骑手需要帮助",
   "Version {v}": "版本 {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "群组照片尚未开启。请在下次更新后再试。",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "OnMyLead 需要相机来拍摄群组照片。请在设置中开启，或改为选择一张照片。",
+  "That photo is too big. Try another one.": "照片太大了。请换一张试试。",
+  "This group is gone, or you’re no longer in it.": "该群组已不存在，或你已不在其中。",
+  "Please sign in first.": "请先登录。",
+  "Only the rider who made the group can change its photo.": "只有创建群组的骑手才能更改群组照片。",
 };
 
 export default dict;
