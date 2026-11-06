@@ -4,7 +4,7 @@ summary: What every OnMyLead account gets for free, what OnMyLead Pro adds, and 
 category: pro
 order: 10
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - supabase/migrations/20261105090000_pro_bluetooth_dot_photos.sql
   - app/src/core/carplay.ts
@@ -211,7 +211,7 @@ If you were already using a theme or a voice before 2.0, the app keeps it.
 :::release 2.1
 New in Pro with 2.1:
 
-- **Bluetooth Sharing With No Service:** with no cell service, see nearby riders on your map and pass your spot, status taps and messages to them over Bluetooth, and phones pass them along the group. On every plan, your phone passes everything along for the group, and EMERGENCY, Need Help and Crash Alerts go out and come in over Bluetooth. On Free, the switch shows the Pro tag. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+- **Bluetooth Sharing With No Service:** with no cell service, see nearby riders on your map and pass your spot, status taps and messages to them over Bluetooth, and phones pass them along the group. On every plan, your phone passes everything along for the group, and EMERGENCY, Need Help and Crash Alerts (and the tap that ends one, such as I'm OK) go out and come in over Bluetooth. On Free, the switch shows the Pro tag. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
 - **CarPlay:** see your group and send status taps from your car's screen. On Free, the car screen says **CarPlay Is Part of OnMyLead Pro**, and Ride Mode, status taps and EMERGENCY keep working on your phone. See [Use OnMyLead in CarPlay](/help/carplay).
 - **Customize Your Dot:** pick your Dot Style and Dot Size. On Free your dot is the Red, White and Blue dot at Medium. If you picked another one during a trial, it comes back when you have Pro again.
 - **Group Photos:** give a riding group you made a photo. Everyone can still see group photos for free. See [Riding Groups](/help/riding-groups).

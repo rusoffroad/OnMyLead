@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { endEmergency, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled } from './siren';
+import { endEmergency, loadSiren, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -31,6 +31,8 @@ import { tc } from '@/core/i18n';
 Notifications.setNotificationHandler({
   handleNotification: async (n) => {
     const data = tapData(n.request.content.data);
+    // The siren switch as saved, not the default, before deciding (lib/siren).
+    if (isEmergency(data)) await loadSiren();
     // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner.
     if (isEmergency(data) && sirenEnabled()) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
@@ -54,6 +56,8 @@ const isEmergency = (d: TapData | undefined) => d?.type === 'status' && (d as { 
 async function sendSirenSetting() {
   if (!myToken) return;
   try {
+    // The saved switch, not the default true before it has loaded.
+    await loadSiren();
     await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
   } catch {}
 }
@@ -184,7 +188,8 @@ function sirenFromPush(data: TapData | undefined) {
   if (typeof data?.itemId !== 'string') return;
   if (data.type === 'cancelled') return endEmergency(data.itemId);
   if (!isEmergency(data) || typeof data.rideId !== 'string') return;
-  const d = data as TapData & { name?: unknown; userId?: unknown };
+  const d = data as TapData & { name?: unknown; userId?: unknown; tappedAt?: unknown };
+  const tappedAt = typeof d.tappedAt === 'string' ? Date.parse(d.tappedAt) : NaN;
   raiseEmergency(
     {
       id: data.itemId,
@@ -193,8 +198,9 @@ function sirenFromPush(data: TapData | undefined) {
       userId: typeof d.userId === 'string' ? d.userId : unknownRider(data.itemId),
       name: typeof d.name === 'string' ? d.name : null,
       status: 'emergency',
-      // A push is news: it was just sent.
-      at: Date.now(),
+      // When it was tapped (newer servers say); else a push is news: it was just sent. Never in the
+      // future, so a phone whose clock runs behind still sounds it.
+      at: Number.isFinite(tappedAt) ? Math.min(tappedAt, Date.now()) : Date.now(),
       source: 'push',
     },
     registeredFor,

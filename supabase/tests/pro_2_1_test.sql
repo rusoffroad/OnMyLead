@@ -46,6 +46,18 @@ begin
 end $$;
 reset role;
 
+-- A Free owner can't add a group photo straight through the API (20261106010000); taking one down stays free.
+alter table riding_groups disable trigger riding_groups_pro;
+insert into riding_groups (id, owner_id, name, invite_code)
+values ('d81d81d8-1d81-4d81-8d81-d81d81d81d81', '00000000-0000-0000-0000-000000000d81', 'Tia Crew', 'TIACREW001');
+alter table riding_groups enable trigger riding_groups_pro;
+select as_user('00000000-0000-0000-0000-000000000d81');
+set role authenticated;
+select expect_error($q$update riding_groups set photo_path = '00000000-0000-0000-0000-000000000d81/d81d81d8-1d81-4d81-8d81-d81d81d81d81-a-1.jpg' where id = 'd81d81d8-1d81-4d81-8d81-d81d81d81d81'$q$, 'pro_required:group_photos%', 'Free owner sets a group photo');
+update riding_groups set photo_path = null where id = 'd81d81d8-1d81-4d81-8d81-d81d81d81d81';
+reset role;
+delete from riding_groups where id = 'd81d81d8-1d81-4d81-8d81-d81d81d81d81';
+
 -- Admin moves CarPlay to Free (the way back if Apple objects), then it's put back.
 select as_session('00000000-0000-0000-0000-000000000d82', 'aal2');
 set role authenticated;

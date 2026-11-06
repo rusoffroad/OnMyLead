@@ -110,7 +110,7 @@ const nonce = () => Crypto.getRandomBytes(12);
 // ---------------------------------------------------------------------------
 // Free (relay only). Bluetooth Sharing is Pro from 2.1, but a phone on Free still passes every
 // packet along so it never breaks the chain for the rest of the group, and still sends and hears
-// EMERGENCY, Need Help and Crash Alerts (core/nearby nearbyFreeAllows). It doesn't show riders'
+// EMERGENCY, Need Help and Crash Alerts, and the tap that ends one (core/nearby nearbyFreeAllows). It doesn't show riders'
 // spots, send its own spot, or send or show other taps and messages. Ride Mode keeps this in step
 // with the rider's plan.
 // ---------------------------------------------------------------------------
@@ -261,6 +261,7 @@ export async function startNearby(rideId: string, myId: string): Promise<void> {
     AppState.addEventListener('change', (s) => s === 'active' && markUnseenSeen()),
   ];
   const timer = setInterval(round, ROUND_MS.normal);
+  lastOwnTap = null;
   session = { rideId, mesh, sharing: false, online: true, batterySaver: false, power: 'normal', timer, subs, lastUpload: 0, unseen: new Map() };
   publish({ ...EMPTY, state: 'starting' });
   try {
@@ -326,11 +327,17 @@ export function nearbyOwnFix(fix: { lat: number; lng: number; accuracyM: number 
   if (s.mesh.ownPosition(fix)) pushOutgoing();
 }
 
+/** This rider's last status tap, so on Free the tap that ends an EMERGENCY still goes out. */
+let lastOwnTap: { status: string; flags: number } | null = null;
+
 /** A status tap of this rider's (lib/outbox.ts, every tap, with or without service). */
 export function nearbyStatus(rideId: string, t: { id?: string; status: RiderStatusKind; lat: number | null; lng: number | null; tappedAt: string; possibleCrash?: boolean }) {
   const s = session;
   if (!s || s.rideId !== rideId || !t.id || !native) return;
-  if (relayOnly && !nearbyFreeAllows({ kind: 'status', status: t.status, flags: t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0 })) return;
+  const flags = t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0;
+  const prev = lastOwnTap;
+  lastOwnTap = { status: t.status, flags };
+  if (relayOnly && !nearbyFreeAllows({ kind: 'status', status: t.status, flags }, prev)) return;
   const item = s.mesh.ownStatus({ id: t.id, status: t.status, flags: t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0, lat: t.lat, lng: t.lng, at: Date.parse(t.tappedAt) });
   sendNow([item]);
 }
@@ -450,7 +457,10 @@ function receive(b64: string) {
   if (!item) return;
   const fromServer = (item.flags & FLAG_FROM_SERVER) !== 0;
   // On Free the mesh above still keeps it to pass along; only the safety alerts show here.
-  if (relayOnly && item.kind !== 'ack' && !nearbyFreeAllows(item)) return;
+  if (relayOnly && item.kind !== 'ack') {
+    const before = view.statuses[item.userId];
+    if (!nearbyFreeAllows(item, before ? { status: before.status, flags: before.possible_crash ? FLAG_POSSIBLE_CRASH : 0 } : null)) return;
+  }
   if (item.kind === 'position') {
     const position = asPosition(item);
     publish({ positions: { ...view.positions, [item.userId]: position } });

@@ -906,7 +906,14 @@ export function nearbyPower(s: { online: boolean; peers: number; batterySaver: b
  * Need Help and a Crash Alert. Seeing riders' spots, sending its own spot, other status taps and
  * messages over Bluetooth are Pro.
  */
-export function nearbyFreeAllows(item: { kind: string; status?: string; flags?: number }): boolean {
+export function nearbyFreeAllows(
+  item: { kind: string; status?: string; flags?: number },
+  /** The same rider's previous tap: the tap after a safety alert (I'm OK and the rest) ends it, so it goes through too. */
+  prev?: { status?: string; flags?: number } | null,
+): boolean {
   if (item.kind !== 'status') return false;
-  return item.status === 'emergency' || item.status === 'need_help' || ((item.flags ?? 0) & FLAG_POSSIBLE_CRASH) === FLAG_POSSIBLE_CRASH;
+  return isSafetyTap(item) || (prev != null && isSafetyTap(prev));
 }
+
+const isSafetyTap = (t: { status?: string; flags?: number }) =>
+  t.status === 'emergency' || t.status === 'need_help' || ((t.flags ?? 0) & FLAG_POSSIBLE_CRASH) === FLAG_POSSIBLE_CRASH;

@@ -1,5 +1,13 @@
 [
   {
+    "date": "2026-11-06",
+    "slugs": ["bluetooth-sharing", "free-vs-pro", "troubleshooting", "emergency-siren"],
+    "kind": "fix",
+    "by": "pr",
+    "ref": "release-test-build-10-pass-1",
+    "why": "2.1 build 10 test pass 1: on Free, the tap that ends an EMERGENCY (I'm OK and the rest) now goes out and comes in over Bluetooth too, so the siren stops for everyone; the guides say so. The siren switch is read at launch, so a rider who turned it off stays off, an old relayed EMERGENCY no longer sounds after I'm OK, and the siren stops once the rider taps something newer even when the push came late."
+  },
+  {
     "date": "2026-11-05",
     "slugs": ["map-layers"],
     "kind": "update",

@@ -149,14 +149,16 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
     const [tokens, who] = await Promise.all([
       db.from('push_tokens').select('token, siren').in('token', sos.map((r) => r.token)),
       itemId
-        ? db.from('rider_statuses').select('user_id, profiles(display_name)').eq('id', itemId).maybeSingle()
+        ? db.from('rider_statuses').select('user_id, tapped_at, profiles(display_name)').eq('id', itemId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
     ]);
     const siren = new Set(((tokens.data ?? []) as { token: string; siren: boolean | null }[]).filter((t) => t.siren === true).map((t) => t.token));
     // deno-lint-ignore no-explicit-any
-    const sender = (who as any)?.data as { user_id?: string; profiles?: { display_name?: string | null } | null } | null;
+    const sender = (who as any)?.data as { user_id?: string; tapped_at?: string | null; profiles?: { display_name?: string | null } | null } | null;
     const extra: Record<string, unknown> = {};
     if (sender?.user_id) extra.userId = sender.user_id;
+    // When it was tapped, so a later I'm OK on the rider's phone always counts as newer.
+    if (sender?.tapped_at) extra.tappedAt = sender.tapped_at;
     const name = sender?.profiles?.display_name?.trim();
     if (name) extra.name = name;
     return rows.map((r) =>

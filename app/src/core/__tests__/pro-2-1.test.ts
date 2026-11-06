@@ -76,5 +76,10 @@ describe('Bluetooth on Free (relay only)', () => {
     expect(nearbyFreeAllows({ kind: 'status', status: 'flat_tire' })).toBe(false);
     expect(nearbyFreeAllows({ kind: 'position' })).toBe(false);
     expect(nearbyFreeAllows({ kind: 'reply' })).toBe(false);
+    // The tap after a safety alert ends it, so it goes through on Free too; the next one doesn't.
+    expect(nearbyFreeAllows({ kind: 'status', status: 'ok' }, { status: 'emergency' })).toBe(true);
+    expect(nearbyFreeAllows({ kind: 'status', status: 'stopped' }, { status: 'ok', flags: FLAG_POSSIBLE_CRASH })).toBe(true);
+    expect(nearbyFreeAllows({ kind: 'status', status: 'flat_tire' }, { status: 'ok' })).toBe(false);
+    expect(nearbyFreeAllows({ kind: 'position' }, { status: 'emergency' })).toBe(false);
   });
 });

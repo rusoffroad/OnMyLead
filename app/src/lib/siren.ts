@@ -21,6 +21,7 @@ const SILENCED_KEY = 'alerts.sirenSilenced.v1';
 const RESUME_DELAY_MS = 700;
 
 let enabled = true;
+let settingChanged = false;
 let calls: EmergencyCall[] = [];
 let silenced: string[] = [];
 let silencedSet = new Set<string>();
@@ -38,7 +39,8 @@ export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall) => void) | nu
 export function loadSiren(): Promise<void> {
   loaded ??= AsyncStorage.multiGet([SIREN_SETTING_KEY, SILENCED_KEY])
     .then(([[, on], [, ids]]) => {
-      enabled = parseSirenSetting(on);
+      // A switch flipped (here or on another device) before the read finished wins.
+      if (!settingChanged) enabled = parseSirenSetting(on);
       try {
         const list = JSON.parse(ids ?? '[]');
         if (Array.isArray(list)) silenced = rememberSilenced(silenced, list.filter((x) => typeof x === 'string'));
@@ -50,12 +52,16 @@ export function loadSiren(): Promise<void> {
   return loaded;
 }
 
+// Read at launch, so the push handler and the server get the rider's own choice, not the default.
+void loadSiren();
+
 // Switched on another device (lib/settings-sync).
 onSyncedChange(SIREN_SETTING_KEY, (v) => {
   applySetting(parseSirenSetting(v));
 });
 
 function applySetting(on: boolean) {
+  settingChanged = true;
   enabled = on;
   settingListeners.forEach((l) => l(on));
   if (!on) silenceAll();
@@ -151,7 +157,8 @@ export function silenceAll() {
 function remember(ids: string[]) {
   silenced = rememberSilenced(silenced, ids);
   silencedSet = new Set(silenced);
-  AsyncStorage.setItem(SILENCED_KEY, JSON.stringify(silenced)).catch(() => {});
+  // After the saved list has been read in (loadSiren merges it), so saving never drops it.
+  void loadSiren().then(() => AsyncStorage.setItem(SILENCED_KEY, JSON.stringify(silenced))).catch(() => {});
 }
 
 function subscribe(l: () => void) {
@@ -174,8 +181,10 @@ let resume: ReturnType<typeof setTimeout> | null = null;
 
 function update() {
   const want = calls.length > 0 && AppState.currentState === 'active';
-  if (want) startSound();
-  else if (!sample) stopSound();
+  if (want) {
+    startSound();
+    startBuzz();
+  } else if (!sample) stopSound();
 }
 
 AppState.addEventListener('change', (s) => {
@@ -209,6 +218,9 @@ function startSound() {
       p.seekTo(0).catch(() => {});
       p.play();
     });
+}
+
+function startBuzz() {
   buzz ??= setInterval(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
   }, 1500);
@@ -230,7 +242,6 @@ export function playSirenSample() {
     sample = null;
     update();
   }, 3000);
+  // Sound only; a real call that is waiting (or arrives meanwhile) keeps its vibration (update).
   startSound();
-  if (buzz) clearInterval(buzz);
-  buzz = null;
 }

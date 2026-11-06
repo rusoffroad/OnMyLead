@@ -4,7 +4,7 @@ summary: When a rider in your group sends EMERGENCY or a Crash Alert goes out, y
 category: safety-privacy
 order: 51
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/core/siren.ts
   - app/src/lib/siren.ts

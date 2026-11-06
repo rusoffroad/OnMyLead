@@ -4,7 +4,7 @@ summary: With no cell service, riders on the same ride pass spots, status taps a
 category: ride-mode
 order: 25
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/core/nearby.ts
   - app/src/lib/nearby.ts
@@ -25,7 +25,7 @@ keywords: [bluetooth, no service, no signal, offline, dead zone, mesh, relay, ne
 
 When there's no cell service, OnMyLead phones on the same ride talk to each other over Bluetooth. Riders close to you keep moving on your map, and your status taps, quick replies and typed messages reach them, with no service at all. Each phone passes on what it hears, so the rider at the back can reach the front through the riders in between. It works on iPhone, iPad, Android phones and Android tablets, and they all work with each other.
 
-Seeing nearby riders, sharing your spot, and sending your other status taps and messages over Bluetooth are part of OnMyLead Pro, including the free Pro Trial. On every plan, your phone passes everything along for the group, and EMERGENCY, Need Help and Crash Alerts go out and come in over Bluetooth. On Free, the switch shows the **Pro** tag. With service, everything works as always on every plan. See [Free and Pro](/help/free-vs-pro).
+Seeing nearby riders, sharing your spot, and sending your other status taps and messages over Bluetooth are part of OnMyLead Pro, including the free Pro Trial. On every plan, your phone passes everything along for the group, and EMERGENCY, Need Help and Crash Alerts (and the tap that ends one, such as I'm OK) go out and come in over Bluetooth. On Free, the switch shows the **Pro** tag. With service, everything works as always on every plan. See [Free and Pro](/help/free-vs-pro).
 
 ## What It Does
 

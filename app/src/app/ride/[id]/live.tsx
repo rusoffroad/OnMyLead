@@ -194,6 +194,10 @@ export default function RideMode() {
   const [members, setMembers] = useState<RideMember[]>([]);
   const [positions, setPositions] = useState<Record<string, Position>>({});
   const [statuses, setStatuses] = useState<Record<string, TappedStatus>>({});
+  const statusesNow = useRef(statuses);
+  useEffect(() => {
+    statusesNow.current = statuses;
+  }, [statuses]);
   const [regroup, setRegroup] = useState<RegroupPoint | null>(null);
   const [share, setShare] = useState<ActiveShare | null>(null);
   const [askShare, setAskShare] = useState(false);
@@ -546,8 +550,10 @@ export default function RideMode() {
           });
         } else if (e.kind === 'status') {
           if (!memberIds.current.has(e.status.user_id)) return;
-          // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren).
-          raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
+          // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren), unless
+          // the rider has already tapped something newer (a relayed old EMERGENCY after I'm OK).
+          const known = statusesNow.current[e.status.user_id];
+          if (!known || (known.id !== e.status.id && Date.parse(known.tapped_at) <= Date.parse(e.status.tapped_at))) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             const old = prev[e.status.user_id];
             if (old && (old.id === e.status.id || Date.parse(old.tapped_at) > Date.parse(e.status.tapped_at))) return prev;
@@ -1087,8 +1093,10 @@ export default function RideMode() {
   });
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
-      if (!can(currentEntitlements(), 'carplay')) return;
       const a = parseCarPlayAction(buttonId);
+      // EMERGENCY from the car always goes, even if Pro ran out while the car still showed the ride.
+      const emergency = a.type === 'emergency' || (a.type === 'status' && a.kind === 'emergency');
+      if (!emergency && !can(currentEntitlements(), 'carplay')) return;
       const act = carActions.current;
       if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
       else if (a.type === 'reply' && (QUICK_REPLIES as readonly string[]).includes(a.body)) act.quickReply(a.body as QuickReply);
