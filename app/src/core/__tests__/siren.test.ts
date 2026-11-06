@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  addCall, dropCall, endedCalls, isNewerTap, pushCallAt, PUSH_LATE_MAX_MS, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
+  addCall, dropCall, endedCalls, isNewerTap, newestTapPerRider, pushCallAt, PUSH_LATE_MAX_MS, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
   SIREN_FRESH_MS, SIREN_REMEMBER, type EmergencyCall,
 } from '../siren';
 
@@ -170,5 +170,19 @@ describe('sirenText', () => {
   it('counts the other riders waiting', () => {
     expect(sirenText({ name: 'Sam' }, 1).moreText).toBe('{n} more rider needs help');
     expect(sirenText({ name: 'Sam' }, 2).moreText).toBe('{n} more riders need help');
+  });
+});
+
+describe('newestTapPerRider', () => {
+  it('keeps the newest tap by tap time, not upload order; a tie keeps the newer upload', () => {
+    const rows = [
+      { id: 'sos', user_id: 'u1', tapped_at: '2026-11-06T12:00:00.400Z' }, // relayed, uploaded last
+      { id: 'ok', user_id: 'u1', tapped_at: '2026-11-06T12:00:20.000Z' },
+      { id: 'b2', user_id: 'u2', tapped_at: '2026-11-06T12:00:05.900Z' },
+      { id: 'b1', user_id: 'u2', tapped_at: '2026-11-06T12:00:05.000Z' },
+    ];
+    const out = newestTapPerRider(rows);
+    expect(out.u1.id).toBe('ok');
+    expect(out.u2.id).toBe('b2');
   });
 });

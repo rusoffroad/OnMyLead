@@ -98,7 +98,7 @@ import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMembe
 import { speak } from '@/lib/voice';
 import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
 import { can } from '@/core/entitlements';
-import { isNewerTap } from '@/core/siren';
+import { isNewerTap, newestTapPerRider } from '@/core/siren';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
@@ -152,13 +152,9 @@ type RideSnapshot = {
 async function loadSnapshot(id: string): Promise<RideSnapshot> {
   await flushOutbox();
   const [ride, members, regroup, st] = await Promise.all([getRide(id), getMembers(id), activeRegroup(id), latestStatuses(id)]);
-  const statuses: RideSnapshot['statuses'] = {};
   // Each rider's newest tap by when it was tapped: a tap relayed and uploaded late (newer upload,
   // older tap) never takes the place of the one the rider made after it.
-  for (const s of st) {
-    const p = statuses[s.user_id];
-    if (!p || Date.parse(s.tapped_at) > Date.parse(p.tapped_at)) statuses[s.user_id] = s;
-  }
+  const statuses: RideSnapshot['statuses'] = newestTapPerRider(st);
   const pos = await getPositions(members.filter((x) => x.status === 'joined').map((x) => x.user_id));
   return { ride, members, regroup, statuses, positions: Object.fromEntries(pos.map((p) => [p.user_id, p])) };
 }
@@ -565,7 +561,7 @@ export default function RideMode() {
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
             statusesNow.current = { ...statusesNow.current, [e.status.user_id]: tap };
           }
-          if (newer) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
+          if (newer && me) raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
             if (!isNewerTap(prev[e.status.user_id], e.status)) return prev;
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
@@ -618,6 +614,8 @@ export default function RideMode() {
   // the ride, until silenced; a newer tap from that rider (I'm OK...) ends it. Live updates and
   // Bluetooth both land in `statuses`.
   useEffect(() => {
+    // Not until we know who this rider is, so their own EMERGENCY never sounds on their phone.
+    if (!me) return;
     for (const [userId, s] of Object.entries(statuses)) {
       if (s.status !== 'emergency') continue;
       raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null);

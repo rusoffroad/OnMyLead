@@ -41,7 +41,8 @@ Notifications.setNotificationHandler({
     if (call && sirenSilenced(call.id!)) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
     // Open, but the in-app siren won't sound it (too old, an older call, or the switch just went
     // off): a banner without the push's own siren sound, which nothing here could silence.
-    if (call && AppState.currentState === 'active') return { shouldShowBanner: true, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
+    // With the switch off the push has the plain sound, which still plays.
+    if (call && AppState.currentState === 'active') return { shouldShowBanner: true, shouldShowList: true, shouldPlaySound: !sirenEnabled(), shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());

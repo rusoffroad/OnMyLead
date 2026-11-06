@@ -290,7 +290,7 @@ function startSound() {
     .then(() => {
       if (!sounding) {
         // Stopped before the audio was set up: give the rider's music back, as stopSound does.
-        if (Platform.OS === 'ios') setAudioModeAsync({ interruptionMode: 'mixWithOthers' }).catch(() => {});
+        if (Platform.OS === 'ios') setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
         return;
       }
       const p = getPlayer();
@@ -316,7 +316,7 @@ function stopSound() {
   } catch {}
   // iPhone and iPad: let the rider's music come back up (the siren ducked it), without switching
   // the app's audio off (a voice prompt may be speaking). Android gives it back when the player pauses.
-  if (was && Platform.OS === 'ios') setAudioModeAsync({ interruptionMode: 'mixWithOthers' }).catch(() => {});
+  if (was && Platform.OS === 'ios') setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
   if (buzz) clearInterval(buzz);
   buzz = null;
 }

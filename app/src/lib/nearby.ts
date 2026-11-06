@@ -25,6 +25,7 @@ import {
   fromBase64, fromE7, nearbyFreeAllows, nearbyPower, sealFrame, toBase64, uploadRow,
   type NearbyItem, type NearbyPosition, type NearbyPower, type NearbyStatus,
 } from '@/core/nearby';
+import { isNewerTap } from '@/core/siren';
 import { supabase } from './supabase';
 import type { Position, RiderStatusKind } from './types';
 
@@ -471,7 +472,7 @@ function receive(b64: string) {
   if (item.kind === 'status') {
     const status = asStatus(item);
     const prev = view.statuses[item.userId];
-    if (!prev || Date.parse(prev.tapped_at) <= item.at * 1000) publish({ statuses: { ...view.statuses, [item.userId]: status } });
+    if (isNewerTap(prev, status)) publish({ statuses: { ...view.statuses, [item.userId]: status } });
     emit({ kind: 'status', status, fromServer });
   } else {
     const reply = { id: item.id, user_id: item.userId, body: item.body, at: new Date(item.at * 1000).toISOString() };

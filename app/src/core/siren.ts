@@ -137,6 +137,20 @@ export function isNewerTap(known: { id?: string | null; tapped_at: string } | un
 }
 
 /**
+ * Each rider's newest tap from rows newest upload first, by tap time in whole seconds (as
+ * isNewerTap counts). In a tie the newer upload stays, as it would have arrived last live.
+ */
+export function newestTapPerRider<T extends { user_id: string; tapped_at: string }>(rows: readonly T[]): Record<string, T> {
+  const out: Record<string, T> = {};
+  const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000);
+  for (const r of rows) {
+    const p = out[r.user_id];
+    if (!p || sec(r.tapped_at) > sec(p.tapped_at)) out[r.user_id] = r;
+  }
+  return out;
+}
+
+/**
  * Ride Mode knows each rider's latest status. A call is over once its rider has tapped something
  * newer (I'm OK, Stopped...): these are the ids to drop. A status that is older than the call (the
  * push got here before Ride Mode heard the tap) ends nothing. A cancelled tap is dropped by its id
