@@ -50,7 +50,8 @@ Notifications.setNotificationHandler({
     // Open, but the in-app siren won't sound it (too old, an older call, or the switch just went
     // off): a banner without the push's own siren sound, which nothing here could silence.
     // A push with the plain sound (switch off, or the server's late or over call) still plays it.
-    if (call && AppState.currentState !== 'background') return { shouldShowBanner: !androidSiren, shouldShowList: !androidSiren, shouldPlaySound: !pushSiren, shouldSetBadge: false };
+    // (With the switch off here but the server not told yet, it still shows: an alert beats silence.)
+    if (call && AppState.currentState !== 'background') return { shouldShowBanner: !androidSiren || !sirenEnabled(), shouldShowList: !androidSiren || !sirenEnabled(), shouldPlaySound: !pushSiren, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
@@ -69,15 +70,22 @@ const isEmergency = (d: TapData | undefined) => d?.type === 'status' && (d as { 
  * (push_tokens.siren). Fails quietly until the server has the siren update; then pushes keep their
  * plain sound.
  */
+let sirenSent = true;
 async function sendSirenSetting() {
   if (!myToken) return;
+  sirenSent = false;
   try {
     // The saved switch, not the default true before it has loaded.
     await loadSiren();
-    await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
+    const { error } = await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
+    sirenSent = !error;
   } catch {}
 }
 onSirenSetting(() => void sendSirenSetting());
+// Not through yet (no signal when the switch moved): try again each time the app comes back.
+AppState.addEventListener('change', (st) => {
+  if (st === 'active' && !sirenSent) void sendSirenSetting();
+});
 
 // Silenced or ended calls: take their notifications down too, so a siren-channel alarm still
 // playing from the tray (Android) stops with the in-app siren.
