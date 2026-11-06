@@ -5,7 +5,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { AppState, Platform } from 'react-native';
 
 import {
-  addCall, dropCall, endedCalls, isNewerTap, newestTapPerRider, parseSirenSetting, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
+  addCall, dropCall, endedCalls, isNewerTap, newestTapPerRider, parseSirenSetting, tapOrder, rememberSilenced, shouldSound, sirenSettingValue, SIREN_SETTING_KEY, type EmergencyCall,
   SIREN_REMEMBER,
 } from '@/core/siren';
 import { onSyncedChange, setSyncedItem } from './settings-sync';
@@ -149,6 +149,7 @@ export async function sirenWillSound(e: IncomingEmergency, me: string | null): P
 
 /** A status reached this phone. Starts the siren when it is another rider's fresh EMERGENCY. */
 export function raiseEmergency(e: IncomingEmergency, me: string | null) {
+  if (signedOut) return;
   void loadSiren().then(() => {
     const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
     if (!Number.isFinite(at)) return;
@@ -269,7 +270,15 @@ export function sirenHasCall(id: string): boolean {
 }
 
 /** Sign-out: the last account's waiting calls and what was known about its rides go. */
+// Signed out: no account, so nothing sounds until someone signs in again.
+let signedOut = false;
+/** Someone is signed in (again): calls can sound. */
+export function sirenSignedIn() {
+  signedOut = false;
+}
+
 export function resetSirenCalls() {
+  signedOut = true;
   for (const k of Object.keys(knownLatest)) delete knownLatest[k];
   reminded.clear();
   plainNotified.clear();
@@ -380,11 +389,13 @@ async function checkCallsOnServer() {
       const newest = newestTapPerRider(rows.filter((r) => r.user_id === c.userId && !r.cancelled_at))[c.userId];
       if (!newest) continue;
       // A newer EMERGENCY from the same rider takes this call's place (addCall replaces it).
-      if (newest.status === 'emergency' && newest.id !== c.id) {
+      // Only when it really was tapped later (an older one on the server, say while the newer one
+      // came over Bluetooth and isn't uploaded yet, changes nothing).
+      if (newest.status === 'emergency' && newest.id !== c.id && tapOrder(c.tappedAt ?? c.at, Date.parse(newest.tapped_at)) > 0) {
         // The older call is over either way; the newer one sounds if it can.
         endByTap(c.id);
-        raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: newest.tapped_at, name: c.name, source: 'ride' }, null);
-      } else noteRiderTap(c.rideId, c.userId, newest);
+        raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: newest.tapped_at, name: c.name, possibleCrash: c.possibleCrash, source: 'ride' }, null);
+      } else if (newest.status !== 'emergency') noteRiderTap(c.rideId, c.userId, newest);
     }
   }));
 }

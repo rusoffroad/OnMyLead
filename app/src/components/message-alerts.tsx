@@ -14,7 +14,7 @@ import { currentNotificationSettings, resetNotificationSettings, syncNotificatio
 import { useOutRidingKeeper } from '@/lib/out-riding';
 import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps, useRideChangeReminders } from '@/lib/push';
 import { useSession } from '@/lib/session';
-import { resetSirenCalls } from '@/lib/siren';
+import { resetSirenCalls, sirenSignedIn } from '@/lib/siren';
 import { newChannel, supabase } from '@/lib/supabase';
 
 import { t as tr } from '@/lib/i18n';
@@ -86,6 +86,7 @@ export function MessageAlerts() {
   const lastMe = useRef<string | null>(null);
   useEffect(() => {
     if (lastMe.current && lastMe.current !== me) resetSirenCalls();
+    if (me) sirenSignedIn();
     lastMe.current = me ?? null;
   }, [me]);
 
