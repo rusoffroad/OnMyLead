@@ -460,6 +460,9 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
 onUrgentChange(() => update());
 
 AppState.addEventListener('change', (s) => {
+  // A brief 'inactive' (Notification Center, Face ID) while coming back leaves the wait running,
+  // so a notification tap still silences its call before the siren starts.
+  if (s === 'inactive' && resume) return;
   if (resume) clearTimeout(resume);
   resume = null;
   if (s === 'active') checkSoon();

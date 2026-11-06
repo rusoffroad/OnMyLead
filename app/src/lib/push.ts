@@ -51,10 +51,11 @@ Notifications.setNotificationHandler({
     // off): a banner without the push's own siren sound, which nothing here could silence.
     // A push with the plain sound (switch off, or the server's late or over call) still plays it.
     // (With the switch off here but the server not told yet, it still shows: an alert beats silence.)
-    // Signed out, nothing in the app sounds it, so it shows even on the siren channel.
+    // Signed out, or the switch off here before the server heard, nothing in the app sounds it, so
+    // it shows with its own sound even on the siren channel (an alert beats silence).
     if (call && AppState.currentState !== 'background') {
       const show = !androidSiren || !sirenEnabled() || sirenSignedOut();
-      return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: !pushSiren || sirenSignedOut(), shouldSetBadge: false };
+      return { shouldShowBanner: show, shouldShowList: show, shouldPlaySound: !pushSiren || sirenSignedOut() || !sirenEnabled(), shouldSetBadge: false };
     }
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())

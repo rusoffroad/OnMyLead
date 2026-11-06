@@ -458,7 +458,12 @@ export default function RideMode() {
         const row = payload.new as { id?: string; cancelled_at?: string | null };
         if (row?.cancelled_at) {
           // A cancelled EMERGENCY stops the siren on every phone that is sounding it.
-          if (row.id) tapTakenBack(row.id);
+          if (row.id) {
+            tapTakenBack(row.id);
+            // The taken-back tap no longer counts as anyone's newest here.
+            const left = Object.entries(statusesNow.current).filter(([, v]) => v?.id !== row.id);
+            statusesNow.current = Object.fromEntries(left);
+          }
           refresh();
         }
       })
