@@ -436,7 +436,9 @@ let checking = false;
 function checkSoon() {
   if (checking || !calls.length) return;
   checking = true;
-  void checkCallsOnServer().catch(() => {}).finally(() => (checking = false));
+  // A request that never settles (weak signal) must not stop every later check: give up after 15 s.
+  const giveUp = new Promise<void>((done) => setTimeout(done, 15_000));
+  void Promise.race([checkCallsOnServer().catch(() => {}), giveUp]).finally(() => (checking = false));
 }
 setInterval(() => {
   if (calls.length && AppState.currentState === 'active') checkSoon();

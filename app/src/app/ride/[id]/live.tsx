@@ -75,7 +75,7 @@ import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
-  activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatusesAndCancels, myActiveShares, myVehicles,
+  activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, myActiveShares, myVehicles,
   setLeaderTrackline, startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
 import { useBatteryMode } from '@/lib/battery';
@@ -90,6 +90,7 @@ import {
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
+import { statusesAndCancels } from '@/lib/ride-taps';
 import { endStaleCalls, raiseEmergency, sirenHasCall, tapTakenBack } from '@/lib/siren';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
@@ -153,7 +154,7 @@ type RideSnapshot = {
 
 async function loadSnapshot(id: string): Promise<RideSnapshot> {
   await flushOutbox();
-  const [ride, members, regroup, taps] = await Promise.all([getRide(id), getMembers(id), activeRegroup(id), latestStatusesAndCancels(id)]);
+  const [ride, members, regroup, taps] = await Promise.all([getRide(id), getMembers(id), activeRegroup(id), statusesAndCancels(id)]);
   const st = taps.statuses;
   // Each rider's newest tap by when it was tapped: a tap relayed and uploaded late (newer upload,
   // older tap) never takes the place of the one the rider made after it.
