@@ -1,4 +1,5 @@
 [
+  {"date": "2026-11-06", "slugs": ["3d-terrain", "leader-trackline", "map-layers", "offline-maps", "park-trails", "route-builder"], "kind": "fix", "by": "pr", "ref": "release-test-build-10-pass-2", "why": "2.1 build 10 test pass 2: the Map Settings sheet underneath these guides changed only for the Your Dot pickers (on Free, tapping the default dot keeps the pick that comes back with Pro). Nothing here changed for riders, so these guides are only re-dated."},
   {"date": "2026-11-06", "slugs": ["carplay", "directions", "emergency-and-safety", "faq", "follow-me", "fuel-range", "full-map", "getting-started", "location-sharing", "notification-settings", "ride-bubble", "ride-chat", "ride-mode", "status-buttons", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "fix", "by": "pr", "ref": "release-test-build-10-pass-1", "why": "2.1 build 10 test pass 1: Ride Mode, push and Bluetooth code underneath these guides changed for the Emergency Siren fixes (an EMERGENCY from CarPlay always goes; old relayed alerts stay quiet). Nothing riders do here changed, so these guides are only re-dated."},
   {
     "date": "2026-11-06",

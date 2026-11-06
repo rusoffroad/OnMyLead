@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, pick which roads, trails and land bo
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/hooks/use-dot-size.ts
   - app/src/components/trail-map-overlay.tsx

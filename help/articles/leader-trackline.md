@@ -4,7 +4,7 @@ summary: A line in the leader's blue shows where the leader went in Ride Mode. O
 category: ride-mode
 order: 15
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/core/leader-trackline.ts
   - app/src/hooks/use-leader-trackline.ts
