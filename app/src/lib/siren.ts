@@ -137,7 +137,10 @@ export type IncomingEmergency = {
 
 /** Whether this call would sound the siren now (so the push handler only drops the banner then). */
 export async function sirenWillSound(e: IncomingEmergency, me: string | null): Promise<boolean> {
+  // Signed out, raiseEmergency sounds nothing: the push keeps its banner.
+  if (signedOut) return false;
   await loadSiren();
+  if (signedOut) return false;
   const at = typeof e.at === 'number' ? e.at : Date.parse(e.at);
   if (!Number.isFinite(at) || !shouldSound({ ...e, at }, { me, enabled, silenced: silencedSet, now: Date.now() })) return false;
   // Already sounding, or would join the list (not an older call from a rider with a newer one).

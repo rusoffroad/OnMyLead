@@ -26,7 +26,7 @@ export type GroupPhotoSource = 'camera' | 'library';
 export const canUseGroupCamera = Platform.OS !== 'web';
 
 const NOT_ON = 'Group photos aren’t switched on yet. Try again after the next update.';
-const isNotOn = (message: string) => !/check constraint/i.test(message) && /photo_path|column|schema cache|bucket not found/i.test(message);
+const isNotOn = (message: string) => !/check constraint/i.test(message) && /photo_path|schema cache|bucket not found/i.test(message);
 
 /**
  * Lets the owner take or pick a photo. Android's crop screen keeps it 16:9; iPhone and iPad's crop
@@ -111,8 +111,10 @@ export async function saveGroupPhoto(groupId: string, asset: ImagePicker.ImagePi
 export async function removeGroupPhoto(groupId: string): Promise<void> {
   const row = await ownerRow(groupId);
   if (!row.photo_path) return;
-  const { error } = await supabase.from('riding_groups').update({ photo_path: null }).eq('id', groupId);
+  const { data: updated, error } = await supabase.from('riding_groups').update({ photo_path: null }).eq('id', groupId).select('id');
   if (error) throw new Error(error.message);
+  // No row changed: the group is gone or no longer this rider's, so its file stays.
+  if (!updated?.length) throw new Error('This group was deleted or is no longer yours.');
   if (isGroupPhotoPath(row.photo_path, row.owner_id)) await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([row.photo_path]);
   track('group_photo_removed');
 }

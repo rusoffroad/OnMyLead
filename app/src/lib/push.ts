@@ -204,6 +204,8 @@ async function createAndroidChannels() {
 /** Forget the registration so the next sign-in registers again. */
 export function resetPushRegistration() {
   registeredFor = null;
+  // Signed out: the token belongs to no account until it registers again, so the switch isn't sent.
+  myToken = null;
 }
 
 /** A rider's status tap or quick reply reached this phone by push: the sender's card says so. */
