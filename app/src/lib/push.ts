@@ -17,7 +17,7 @@ import { AppState, Linking, Platform } from 'react-native';
 
 import { planReminders } from '@/core/notifications';
 import { tapData, tapTarget, type TapData } from '@/core/push-tap';
-import { SIREN_CHANNEL, SIREN_SOUND, unknownRider, type EmergencyCall } from '@/core/siren';
+import { pushCallAt, SIREN_CHANNEL, SIREN_SOUND, unknownRider, type EmergencyCall } from '@/core/siren';
 import { ackRideItems, myRides } from './api';
 import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
@@ -204,9 +204,10 @@ function emergencyFromPush(data: TapData | undefined): IncomingEmergency | null 
       userId: typeof d.userId === 'string' ? d.userId : unknownRider(data.itemId),
       name: typeof d.name === 'string' ? d.name : null,
       status: 'emergency',
-      // A push is news: it was just sent (a tap uploaded late, say after a crash with no service,
-      // still sounds). When the rider tapped it (newer servers say) decides what ends it.
-      at: Date.now(),
+      // A push is news (a tap uploaded late, say after a crash with no service, still sounds),
+      // unless it was tapped over an hour ago (core/siren pushCallAt). When the rider tapped it
+      // (newer servers say) decides what ends it.
+      at: pushCallAt(Number.isFinite(tappedAt) ? tappedAt : undefined, Date.now()),
       tappedAt: Number.isFinite(tappedAt) ? tappedAt : undefined,
       source: 'push',
   };

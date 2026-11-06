@@ -19,6 +19,10 @@ function afterLeaving(f: () => void): void {
 
 let urgent = 0;
 let sheetsUp = 0;
+/** The Crash Alert countdown: it comes before every other urgent screen (the Emergency Siren). */
+let critical = 0;
+/** Lesser urgent screens (the siren) on screen, which the countdown waits for on iPhone and iPad. */
+let lesserUp = 0;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 function subscribe(l: () => void) {
@@ -28,21 +32,40 @@ function subscribe(l: () => void) {
   };
 }
 
-/** For an urgent screen: true once it can show (no sheet is still up on iPhone and iPad). */
-export function useUrgentModal(): boolean {
+/**
+ * For an urgent screen: true once it can show (no sheet is still up on iPhone and iPad). The
+ * critical one (the Crash Alert countdown) also waits for a lesser urgent screen (the siren) to
+ * step aside; a lesser one is shown with useLesserUrgentShown.
+ */
+export function useUrgentModal(opts: { critical?: boolean } = {}): boolean {
+  const isCritical = !!opts.critical;
   useEffect(() => {
     urgent++;
+    if (isCritical) critical++;
     emit();
     return () => {
       // Sheets come back only once the urgent screen has left the screen (iPhone and iPad).
       afterLeaving(() => {
         urgent--;
+        if (isCritical) critical--;
         emit();
       });
     };
-  }, []);
-  const up = useSyncExternalStore(subscribe, () => sheetsUp, () => sheetsUp);
+  }, [isCritical]);
+  const up = useSyncExternalStore(subscribe, () => sheetsUp + (isCritical ? lesserUp : 0), () => sheetsUp + (isCritical ? lesserUp : 0));
   return !ONE_SHEET_AT_A_TIME || up === 0;
+}
+
+/**
+ * For a lesser urgent screen (the Emergency Siren): whether to show it now, and the function for
+ * its Modal's onDismiss. It steps aside while the Crash Alert countdown is up, and comes back after.
+ */
+export function useLesserUrgentShown(): [boolean, () => void] {
+  const ready = useUrgentModal();
+  const blocked = useSyncExternalStore(subscribe, () => critical > 0, () => critical > 0);
+  const shown = ready && !blocked;
+  const dismissed = useSheetUp(shown, 'lesser');
+  return [shown, dismissed];
 }
 
 /** For a sheet: whether an urgent screen is up (the sheet hides until it's gone). */
@@ -50,23 +73,28 @@ export function useUrgentWaiting(): boolean {
   return useSyncExternalStore(subscribe, () => urgent > 0, () => urgent > 0);
 }
 
+function countUp(lesser: boolean, n: number) {
+  if (lesser) lesserUp += n;
+  else sheetsUp += n;
+  emit();
+}
+
 /**
  * For a sheet: counts it as up while `visible`, until it has finished closing. Call the returned
  * function from the Modal's onDismiss (iPhone and iPad report when the close animation is done).
  */
-export function useSheetUp(visible: boolean): () => void {
+export function useSheetUp(visible: boolean, kind: 'sheet' | 'lesser' = 'sheet'): () => void {
   const counted = useRef(false);
+  const lesser = useRef(kind === 'lesser');
   const up = () => {
     if (counted.current) return;
     counted.current = true;
-    sheetsUp++;
-    emit();
+    countUp(lesser.current, 1);
   };
   const down = () => {
     if (!counted.current) return;
     counted.current = false;
-    sheetsUp--;
-    emit();
+    countUp(lesser.current, -1);
   };
   useEffect(() => {
     if (visible) {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  addCall, dropCall, endedCalls, isNewerTap, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
+  addCall, dropCall, endedCalls, isNewerTap, pushCallAt, PUSH_LATE_MAX_MS, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
   SIREN_FRESH_MS, SIREN_REMEMBER, type EmergencyCall,
 } from '../siren';
 
@@ -86,6 +86,19 @@ describe('addCall merging', () => {
     const merged = addCall(list, { ...push, at: NOW - 60_000 });
     expect(merged[0].tappedAt).toBe(NOW - 60_000);
     expect(endedCalls(merged, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW - 30_000 } })).toEqual(['sos']);
+  });
+});
+
+describe('late arrivals', () => {
+  it('a late push still sounds within the hour, an old one counts from its tap', () => {
+    expect(pushCallAt(NOW - 15 * 60_000, NOW)).toBe(NOW);
+    expect(pushCallAt(undefined, NOW)).toBe(NOW);
+    expect(pushCallAt(NOW - PUSH_LATE_MAX_MS - 1, NOW)).toBe(NOW - PUSH_LATE_MAX_MS - 1);
+  });
+  it('an older call from the same rider never replaces their newer one', () => {
+    const b = { id: 'b', rideId: 'r1', userId: 'u1', at: NOW, tappedAt: NOW - 60_000 };
+    const list = addCall([], b);
+    expect(addCall(list, { id: 'a', rideId: 'r1', userId: 'u1', at: NOW, tappedAt: NOW - 120_000 })).toBe(list);
   });
 });
 

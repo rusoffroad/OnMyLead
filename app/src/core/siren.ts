@@ -92,6 +92,9 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
     });
     return changed ? next : (calls as EmergencyCall[]);
   }
+  // An older call from the same rider arriving late doesn't replace their newer one.
+  const mine = calls.find((x) => x.rideId === c.rideId && x.userId === c.userId);
+  if (mine && (mine.tappedAt ?? mine.at) > (c.tappedAt ?? c.at)) return calls as EmergencyCall[];
   const rest = calls.filter((x) => !(x.rideId === c.rideId && x.userId === c.userId));
   return [c, ...rest].sort((a, b) => b.at - a.at);
 }
@@ -100,6 +103,18 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
  * A push from a server without the siren update doesn't say who sent it: the call stands in with
  * `item:<id>` until Ride Mode hears the tap and fills in the rider.
  */
+/** How late a push may arrive and still count as news (a tap uploaded late after no service). */
+export const PUSH_LATE_MAX_MS = 60 * 60_000;
+
+/**
+ * The time a pushed EMERGENCY counts from for sounding: when it arrived, so a tap uploaded late
+ * (say a Crash Alert with no service) still sounds, but not one tapped over an hour ago (a push the
+ * phone only got after hours with no signal), which counts from its tap time and stays quiet.
+ */
+export function pushCallAt(tappedAt: number | undefined, now: number): number {
+  return tappedAt != null && Number.isFinite(tappedAt) && now - tappedAt > PUSH_LATE_MAX_MS ? tappedAt : now;
+}
+
 export function unknownRider(id: string): string {
   return `item:${id}`;
 }

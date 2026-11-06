@@ -133,14 +133,14 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
   return { sent: results.filter((r) => r.outcome === 'ok').length, removed: gone.length, ...(notes ? { note: notes } : null) };
 }
 
-/** push_tokens.siren for these tokens, 50 per lookup (all at once) so a big ride's URLs stay short. */
+/** push_tokens.siren for these tokens, 20 per lookup (all at once) so URLs stay short even with long Android tokens; a failed lookup only costs those 20 phones the siren sound. */
 async function sirenTokens(all: string[]): Promise<{ token: string; siren: boolean | null }[]> {
   const slices: string[][] = [];
-  for (let i = 0; i < all.length; i += 50) slices.push(all.slice(i, i + 50));
+  for (let i = 0; i < all.length; i += 20) slices.push(all.slice(i, i + 20));
   const pages = await Promise.all(slices.map((part) => db.from('push_tokens').select('token, siren').in('token', part)));
   const out: { token: string; siren: boolean | null }[] = [];
   for (const { data, error } of pages) {
-    if (error) throw error;
+    if (error) continue;
     out.push(...((data ?? []) as { token: string; siren: boolean | null }[]));
   }
   return out;

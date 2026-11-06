@@ -57,7 +57,10 @@ void loadSiren();
 
 // Switched on another device (lib/settings-sync).
 onSyncedChange(SIREN_SETTING_KEY, (v) => {
-  applySetting(parseSirenSetting(v));
+  const on = parseSirenSetting(v);
+  // This device's own change comes back here too: already applied.
+  if (settingChanged && on === enabled) return;
+  applySetting(on);
 });
 
 function applySetting(on: boolean) {

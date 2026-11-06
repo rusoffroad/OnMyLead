@@ -40,7 +40,7 @@ The siren takes over the whole screen, on any screen in the app, and it says who
 
 If more than one rider needs help, the newest shows first, with how many more riders need help. Silencing it silences all of them.
 
-The siren stops by itself if the rider cancels their EMERGENCY or taps another status, like **I'm OK**. An EMERGENCY you've silenced never sounds again on that phone, and one older than 10 minutes doesn't sound when you open Ride Mode later; it still shows in red there.
+The siren stops by itself if the rider taps another status, like **I'm OK**, or cancels their EMERGENCY (with no service, a cancel doesn't travel over Bluetooth, so ask them to tap **I'm OK**). An EMERGENCY you've silenced never sounds again on that phone, and one older than 10 minutes doesn't sound when you open Ride Mode later; it still shows in red there.
 
 ## With OnMyLead Closed or in the Background
 
@@ -64,4 +64,4 @@ Ride Mode on onmylead.com sounds the siren while the page is open. Your browser 
 3. Tap **Play Siren** to hear it for three seconds.
 4. Switch **Emergency Siren** off if you'd rather not hear it. EMERGENCY notifications still come through, with the normal notification sound.
 
-Your choice follows your account to your other devices.
+With [Sync Across Devices](/help/sync-across-devices) (Pro), your choice follows your account to your other devices.
