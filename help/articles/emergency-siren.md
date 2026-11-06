@@ -4,7 +4,8 @@ summary: When a rider in your group sends EMERGENCY or a Crash Alert goes out, y
 category: safety-privacy
 order: 51
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-06
+review: "Android with OnMyLead open: does the in-app siren (expo-audio) play on the media stream, so it follows media volume? If so, say so under With OnMyLead Open."
 sources:
   - app/src/core/siren.ts
   - app/src/lib/siren.ts
@@ -38,16 +39,18 @@ The siren takes over the whole screen, on any screen in the app, and it says who
 - Tap **Show Me Where** to silence it and open Ride Mode with their location, so you can tap **Navigate** to them.
 - Tap **Silence Siren** to silence it and stay where you are.
 
-If more than one rider needs help, the newest shows first, with how many more riders need help. Silencing it silences all of them.
+If you lock your phone or switch to another app before silencing it (say, to call 911), the siren stops and a quiet notification stays on your lock screen; tap it to see where they are.
 
-The siren stops by itself if the rider cancels their EMERGENCY or taps another status, like **I'm OK**. An EMERGENCY you've silenced never sounds again on that phone, and one older than 10 minutes doesn't sound when you open Ride Mode later; it still shows in red there.
+If more than one rider needs help, the newest shows first, with how many more riders need help. **Silence Siren** silences all of them; **Show Me Where** silences only that rider's, and the next rider who needs help shows right after.
+
+The siren stops by itself if the rider cancels their EMERGENCY or taps another status like **I'm OK** (with no service, a cancel doesn't travel over Bluetooth, so ask them to tap **I'm OK**). If they take back that I'm OK, the siren doesn't come back; a rider who still needs help taps **EMERGENCY** again. An EMERGENCY you've silenced never sounds again on that phone, and one older than 10 minutes doesn't sound when you open Ride Mode later; it still shows in red there. One that reaches you late while Ride Mode is open (say the rider had no service when they sent it) still sounds when it arrives.
 
 ## With OnMyLead Closed or in the Background
 
 The EMERGENCY notification plays the siren as its sound, for about 27 seconds. Tap the notification to open Ride Mode at their location; the siren doesn't start again in the app.
 
 - **iPhone and iPad:** the siren follows your ring/silent switch, like any notification. It's a Time Sensitive notification, so it comes through a Focus if you allow Time Sensitive notifications for OnMyLead in **Settings > Notifications > OnMyLead**.
-- **Android phones and tablets:** the siren has its own notification channel, **Emergency Siren**, and plays as an alarm, so you hear it with the ringer on silent. Do Not Disturb can still hold it back; to let it through, open **Settings > Apps > OnMyLead > Notifications > Emergency Siren** and allow it to override Do Not Disturb.
+- **Android phones and tablets:** the siren has its own notification channel, **Emergency Siren**, and plays as an alarm, so you hear it with the ringer on silent. Do Not Disturb can still hold it back; to let it through, open **Settings > Apps > OnMyLead > Notifications > Emergency Siren** and allow it to override Do Not Disturb. If you turn the **Emergency Siren** channel off there, EMERGENCY notifications come with the usual ride alert sound instead.
 
 ## With No Service
 
@@ -64,4 +67,4 @@ Ride Mode on onmylead.com sounds the siren while the page is open. Your browser 
 3. Tap **Play Siren** to hear it for three seconds.
 4. Switch **Emergency Siren** off if you'd rather not hear it. EMERGENCY notifications still come through, with the normal notification sound.
 
-Your choice follows your account to your other devices.
+With [Sync Across Devices](/help/sync-across-devices) (Pro), your choice follows your account to your other devices.

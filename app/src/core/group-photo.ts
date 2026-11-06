@@ -60,7 +60,8 @@ export function groupPhotoPath(ownerId: string, groupId: string, token: string, 
   return `${ownerId}/${group}-${clean}-${now}.jpg`;
 }
 
-const FILE = /^[A-Za-z0-9._-]{1,120}$/;
+// A file name, not '.' or '..' (which would point at a folder).
+const FILE = /^(?!\.+$)[A-Za-z0-9._-]{1,120}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**

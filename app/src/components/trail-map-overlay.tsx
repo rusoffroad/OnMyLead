@@ -491,6 +491,8 @@ function DotSizeRow() {
 export function DotStyleChoice() {
   const [style, setStyle] = useDotStylePref();
   const pro = useContext(SheetPro);
+  // On Free the default already shows; tapping it mustn't save over the pick that comes back with Pro.
+  const canDot = useCan('custom_dot');
   return (
     <View style={{ gap: 6 }}>
     <ProTag feature="custom_dot" style={{ alignSelf: 'flex-start' }} />
@@ -503,7 +505,7 @@ export function DotStyleChoice() {
             accessibilityRole="radio"
             accessibilityState={{ checked: on }}
             accessibilityLabel={tr(DOT_STYLE_NAME[s])}
-            onPress={() => (s === DEFAULT_DOT_STYLE || pro('custom_dot')) && setStyle(s)}
+            onPress={() => (s === DEFAULT_DOT_STYLE ? canDot : pro('custom_dot')) && setStyle(s)}
             style={[styles.dotStyle, on && { borderColor: DOT_STYLE_INK[s], backgroundColor: withAlpha(DOT_STYLE_INK[s], 0.1) }]}>
             <View style={styles.dotStyleArt}>
               <DotSample style={s} size={40} />
@@ -521,6 +523,7 @@ export function DotStyleChoice() {
 export function DotSizeChoice() {
   const [size, setSize] = useDotSizePref();
   const pro = useContext(SheetPro);
+  const canDot = useCan('custom_dot');
   return (
     <View style={styles.seg} accessibilityRole="radiogroup" accessibilityLabel={tr('Dot Size')}>
       {DOT_SIZES.map((s) => (
@@ -529,7 +532,7 @@ export function DotSizeChoice() {
           accessibilityRole="radio"
           accessibilityState={{ checked: size === s }}
           accessibilityLabel={tr(DOT_SIZE_NAME[s])}
-          onPress={() => (s === 'medium' || pro('custom_dot')) && setSize(s)}
+          onPress={() => (s === 'medium' ? canDot : pro('custom_dot')) && setSize(s)}
           hitSlop={4}
           style={[styles.segItem, size === s && styles.segOn]}>
           <Text style={[styles.segText, size === s && styles.segTextOn]}>{tr(DOT_SIZE_NAME[s])}</Text>

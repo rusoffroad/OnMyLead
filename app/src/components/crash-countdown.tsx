@@ -25,7 +25,7 @@ export function CrashCountdown({
 }) {
   const [now, setNow] = useState(() => Date.now());
   // Shows once any open sheet (Map Settings) has closed for it: iPhone and iPad can't show two at once.
-  const ready = useUrgentModal();
+  const ready = useUrgentModal({ critical: true });
   const [mountedAt] = useState(() => Date.now());
   const [shownAt, setShownAt] = useState<number | null>(null);
   useEffect(() => {

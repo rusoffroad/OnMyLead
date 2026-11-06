@@ -18,7 +18,8 @@ export async function fallbackFollowStep(
   frame: { current: FollowFrame },
 ): Promise<'stay' | 'pan'> {
   const [pt, cam] = await Promise.all([
-    m.pointForCoordinate({ latitude: f.lat, longitude: f.lng }).catch(() => null),
+    // Locked to centred, the point isn't used: skip the map round trip.
+    frame.current.locked ? Promise.resolve(null) : m.pointForCoordinate({ latitude: f.lat, longitude: f.lng }).catch(() => null),
     m.getCamera().catch(() => null),
   ]);
   // iPhone and iPad report height (altitude) rather than zoom: treat any as a riding zoom.
@@ -26,7 +27,7 @@ export async function fallbackFollowStep(
   const move = followMove(frame.current, { pt, size, inset, zoom, screenHeadingDeg: null, noZoomOut: !cam || !edgeZoomOn() });
   frame.current = followFrameAfter(frame.current, move);
   if (move.kind === 'zoom-out') {
-    if (cam?.zoom != null) m.animateCamera({ zoom: cam.zoom - 1 }, { duration: 700 });
+    if (cam?.zoom != null) m.animateCamera({ zoom: move.zoom }, { duration: 700 });
     else if (cam?.altitude != null) m.animateCamera({ altitude: cam.altitude * 2 }, { duration: 700 });
     return 'stay';
   }

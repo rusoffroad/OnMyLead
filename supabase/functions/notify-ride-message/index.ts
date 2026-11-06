@@ -133,6 +133,19 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
   return { sent: results.filter((r) => r.outcome === 'ok').length, removed: gone.length, ...(notes ? { note: notes } : null) };
 }
 
+/** push_tokens.siren for these tokens, 20 per lookup (all at once) so URLs stay short even with long Android tokens; a failed lookup only costs those 20 phones the siren sound. */
+async function sirenTokens(all: string[]): Promise<{ token: string; siren: boolean | null }[]> {
+  const slices: string[][] = [];
+  for (let i = 0; i < all.length; i += 20) slices.push(all.slice(i, i + 20));
+  const pages = await Promise.all(slices.map((part) => db.from('push_tokens').select('token, siren').in('token', part)));
+  const out: { token: string; siren: boolean | null }[] = [];
+  for (const { data, error } of pages) {
+    if (error) continue;
+    out.push(...((data ?? []) as { token: string; siren: boolean | null }[]));
+  }
+  return out;
+}
+
 /**
  * EMERGENCY status pushes (the button, CarPlay or a Crash Alert): phones whose app has the
  * Emergency Siren switched on (push_tokens.siren, migration 20261105070000_emergency_siren.sql)
@@ -142,25 +155,59 @@ async function sendPushes(event: any): Promise<{ sent: number; removed?: number;
  * column isn't there yet) leaves the rows unchanged.
  */
 export async function withSiren(rows: Push[]): Promise<Push[]> {
-  const sos = rows.filter((r) => r.data?.status === 'emergency');
-  if (!sos.length) return rows;
+  // Every status push names the rider and the tap time, so an app with a siren sounding can tell
+  // that rider's later I'm OK ends it, on any screen. Only EMERGENCY ones get the siren.
+  const taps = rows.filter((r) => r.data?.type === 'status' && typeof r.data?.itemId === 'string');
+  if (!taps.length) return rows;
+  const sos = taps.filter((r) => r.data?.status === 'emergency');
   try {
-    const itemId = typeof sos[0].data?.itemId === 'string' ? sos[0].data.itemId : null;
+    const itemId = taps[0].data!.itemId as string;
     const [tokens, who] = await Promise.all([
-      db.from('push_tokens').select('token, siren').in('token', sos.map((r) => r.token)),
+      sos.length ? sirenTokens(sos.map((r) => r.token)) : Promise.resolve([]),
       itemId
-        ? db.from('rider_statuses').select('user_id, profiles(display_name)').eq('id', itemId).maybeSingle()
+        ? db.from('rider_statuses').select('ride_id, user_id, tapped_at, profiles(display_name)').eq('id', itemId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
     ]);
-    const siren = new Set(((tokens.data ?? []) as { token: string; siren: boolean | null }[]).filter((t) => t.siren === true).map((t) => t.token));
+    const siren = new Set(tokens.filter((t) => t.siren === true).map((t) => t.token));
     // deno-lint-ignore no-explicit-any
-    const sender = (who as any)?.data as { user_id?: string; profiles?: { display_name?: string | null } | null } | null;
+    const sender = (who as any)?.data as { ride_id?: string; user_id?: string; tapped_at?: string | null; profiles?: { display_name?: string | null } | null } | null;
     const extra: Record<string, unknown> = {};
     if (sender?.user_id) extra.userId = sender.user_id;
+    // When it was tapped, so a later I'm OK on the rider's phone always counts as newer.
+    if (sender?.tapped_at) extra.tappedAt = sender.tapped_at;
     const name = sender?.profiles?.display_name?.trim();
     if (name) extra.name = name;
+    // A tap uploaded over an hour late (relayed after a long stretch with no service) gets the
+    // plain sound, as the app keeps it quiet too (core/siren PUSH_LATE_MAX_MS).
+    const tapped = sender?.tapped_at ? Date.parse(sender.tapped_at) : NaN;
+    const tapOnly: Record<string, unknown> = {};
+    if (extra.userId) tapOnly.userId = extra.userId;
+    if (extra.tappedAt) tapOnly.tappedAt = extra.tappedAt;
+    if (!sos.length) return rows.map((r) => (r.data?.type === 'status' ? { ...r, data: { ...r.data, ...tapOnly } } : r));
+    let late = Number.isFinite(tapped) && Date.now() - tapped > 60 * 60_000;
+    // Uploaded after the rider's own newer tap (both relayed late with no service, I'm OK first):
+    // it's already over, so no siren. A failed lookup leaves the siren on.
+    if (!late && sender?.ride_id && sender.user_id && sender.tapped_at) {
+      // From the start of the same second, with the app's tie rule (core/siren): a tap later in time,
+      // or one in the same second that isn't EMERGENCY (Bluetooth carries whole seconds).
+      const sec = Math.floor(tapped / 1000);
+      const { data: near } = await db.from('rider_statuses').select('id, status, tapped_at').eq('ride_id', sender.ride_id)
+        .eq('user_id', sender.user_id).gte('tapped_at', new Date(sec * 1000).toISOString()).is('cancelled_at', null)
+        .neq('id', itemId).order('tapped_at', { ascending: false }).limit(20);
+      for (const r of (near ?? []) as { status: string; tapped_at: string }[]) {
+        const t = Date.parse(r.tapped_at);
+        // Milliseconds count only when both times have them (tapOrder in core/siren).
+        const exact = t % 1000 !== 0 && tapped % 1000 !== 0;
+        const s2 = Math.floor(t / 1000);
+        if (exact ? t > tapped || (t === tapped && r.status !== 'emergency') : s2 > sec || (s2 === sec && r.status !== 'emergency')) late = true;
+      }
+    }
     return rows.map((r) =>
-      r.data?.status === 'emergency' ? { ...r, siren: siren.has(r.token), data: { ...r.data, ...extra } } : r,
+      // `over`: already over (a newer tap is in, or over an hour late), so open apps don't sound it either.
+      // `siren` in the data too, so the app knows which channel the push is on.
+      r.data?.status === 'emergency'
+        ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra, siren: !late && siren.has(r.token), ...(late ? { over: true } : null) } }
+        : r,
     );
   } catch {
     return rows;

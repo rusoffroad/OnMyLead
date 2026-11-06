@@ -3347,6 +3347,10 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "可能发生碰撞：{name}",
   "EMERGENCY: {name} needs help now": "紧急：{name} 现在需要帮助",
   "Sent over Bluetooth. Tap to see where they are.": "通过蓝牙发送。轻点查看其位置。",
+  "Not silenced yet. Tap to see where they are.": "尚未静音。轻点查看其位置。",
+  "Emergency Waiting": "待处理的紧急求助",
+  "A quiet reminder of an EMERGENCY you haven’t silenced yet.": "对你尚未静音的紧急求助的无声提醒。",
+  "This group was deleted or is no longer yours.": "该群组已被删除或已不属于你。",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "当队友发送紧急求助或碰撞警报时响起警报声。",
   "Possible Crash": "可能发生碰撞",
   "{name} needs help now.": "{name} 现在需要帮助。",
@@ -3354,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "还有 {n} 位骑手需要帮助",
   "{n} more riders need help": "还有 {n} 位骑手需要帮助",
   "Version {v}": "版本 {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "群组照片尚未开启。请在下次更新后再试。",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "OnMyLead 需要相机来拍摄群组照片。请在设置中开启，或改为选择一张照片。",
+  "That photo is too big. Try another one.": "照片太大了。请换一张试试。",
+  "This group is gone, or you’re no longer in it.": "该群组已不存在，或你已不在其中。",
+  "Please sign in first.": "请先登录。",
+  "Only the rider who made the group can change its photo.": "只有创建群组的骑手才能更改群组照片。",
 };
 
 export default dict;

@@ -140,7 +140,10 @@ describe('keeping the dot on screen: zoom out once, then center and follow', () 
   });
 
   it('keeps the dot in view when the map cannot say where it is', () => {
-    expect(followMove(FOLLOW_FRAME_START, { pt: null, size, inset, zoom: 14, screenHeadingDeg: null })).toEqual({ kind: 'pan', inset });
+    const m = followMove(FOLLOW_FRAME_START, { pt: null, size, inset, zoom: 14, screenHeadingDeg: null });
+    expect(m).toEqual({ kind: 'pan', inset, unsure: true });
+    // A slow or failed screen lookup keeps the dot in view without switching to centered following.
+    expect(followFrameAfter(FOLLOW_FRAME_START, m)).toEqual(FOLLOW_FRAME_START);
   });
 
   it('puts the dot behind the middle so the way ahead has room', () => {

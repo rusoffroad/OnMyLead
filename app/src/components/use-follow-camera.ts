@@ -109,7 +109,8 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       }
 
       // Keep the dot on screen: zoom out once, then move the map.
-      const pt = await within(m.project(f), MAP_CALL_MS, null);
+      // Centered following doesn't need the dot's spot on screen: skip the map call (no lag).
+      const pt = frame.current.locked ? null : await within(m.project(f), MAP_CALL_MS, null);
       if (gen !== stepGen.current) return false;
       const move = followMove(frame.current, {
         pt, size, inset, zoom: cam.zoom, screenHeadingDeg: screenHeading,
@@ -117,7 +118,8 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       });
       frame.current = followFrameAfter(frame.current, move);
       if (move.kind === 'zoom-out') m.zoomTo(move.zoom, ZOOM_OUT_MS);
-      else if (move.kind === 'pan') m.centerOn(f, move.inset, { duration: durationMs });
+      // Zoomed in at an intersection, the dot stays back of centre so the way ahead shows.
+      else if (move.kind === 'pan') m.centerOn(f, junction.current.state === 'in' ? leadInset(inset, size, screenHeading) : move.inset, { duration: durationMs });
       return true;
     } finally {
       if (gen === stepGen.current) busy.current = false;

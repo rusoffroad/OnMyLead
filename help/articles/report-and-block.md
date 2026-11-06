@@ -4,7 +4,7 @@ summary: Report a rider or a ride to the OnMyLead team, and block a rider to hid
 category: safety-privacy
 order: 40
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/e/[code].tsx
   - app/src/components/report-sheet.tsx

@@ -6,8 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { sirenText, type EmergencyCall } from '@/core/siren';
 import { t } from '@/lib/i18n';
-import { silenceAll, useEmergencyCalls } from '@/lib/siren';
-import { useUrgentModal } from '@/lib/urgent-modal';
+import { silenceAll, silenceEmergency, useEmergencyCalls } from '@/lib/siren';
+import { useLesserUrgentShown } from '@/lib/urgent-modal';
 
 /**
  * The Emergency Siren screen: full screen over everything (any open sheet steps aside, like the
@@ -22,7 +22,8 @@ export function EmergencySiren() {
 }
 
 function SirenScreen({ calls }: { calls: EmergencyCall[] }) {
-  const ready = useUrgentModal();
+  // Steps aside while this rider's own Crash Alert countdown is up (iPhone and iPad show one at a time).
+  const [ready, sirenDismissed] = useLesserUrgentShown();
   const path = usePathname();
   const top = calls[0];
   const words = sirenText(top, calls.length - 1);
@@ -36,12 +37,13 @@ function SirenScreen({ calls }: { calls: EmergencyCall[] }) {
   }, [ready, title, body]);
 
   const showMe = () => {
-    silenceAll();
+    // Only this rider's call: any other rider still waiting shows next, over their location.
+    silenceEmergency(top.id);
     if (path !== live) router.push(live as never);
   };
 
   return (
-    <Modal visible={ready} animationType="fade" transparent={false} onRequestClose={silenceAll} supportedOrientations={['portrait', 'landscape']}>
+    <Modal visible={ready} onDismiss={sirenDismissed} animationType="fade" transparent={false} onRequestClose={silenceAll} supportedOrientations={['portrait', 'landscape']}>
       <SafeAreaView style={styles.page}>
         <View style={styles.top} accessibilityLiveRegion="assertive">
           <View style={styles.badge}>

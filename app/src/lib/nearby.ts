@@ -25,6 +25,7 @@ import {
   fromBase64, fromE7, nearbyFreeAllows, nearbyPower, sealFrame, toBase64, uploadRow,
   type NearbyItem, type NearbyPosition, type NearbyPower, type NearbyStatus,
 } from '@/core/nearby';
+import { isNewerTap } from '@/core/siren';
 import { supabase } from './supabase';
 import type { Position, RiderStatusKind } from './types';
 
@@ -110,8 +111,9 @@ const nonce = () => Crypto.getRandomBytes(12);
 // ---------------------------------------------------------------------------
 // Free (relay only). Bluetooth Sharing is Pro from 2.1, but a phone on Free still passes every
 // packet along so it never breaks the chain for the rest of the group, and still sends and hears
-// EMERGENCY, Need Help and Crash Alerts (core/nearby nearbyFreeAllows). It doesn't show riders'
-// spots, send its own spot, or send or show other taps and messages. Ride Mode keeps this in step
+// status taps, so EMERGENCY, Need Help and Crash Alerts get through, and so does the I'm OK that
+// ends one (core/nearby nearbyFreeAllows). It doesn't show riders' spots, send its own spot, or send
+// or show messages. Ride Mode keeps this in step
 // with the rider's plan.
 // ---------------------------------------------------------------------------
 
@@ -124,7 +126,7 @@ export function setNearbyRelayOnly(on: boolean) {
   if (!s) return;
   if (on) {
     s.mesh.clearOwnPosition();
-    publish({ positions: {}, replies: [], statuses: Object.fromEntries(Object.entries(view.statuses).filter(([, v]) => nearbyFreeAllows({ kind: 'status', status: v.status, flags: v.possible_crash ? FLAG_POSSIBLE_CRASH : 0 }))) });
+    publish({ positions: {}, replies: [], statuses: view.statuses });
   }
   pushOutgoing();
 }
@@ -330,7 +332,6 @@ export function nearbyOwnFix(fix: { lat: number; lng: number; accuracyM: number 
 export function nearbyStatus(rideId: string, t: { id?: string; status: RiderStatusKind; lat: number | null; lng: number | null; tappedAt: string; possibleCrash?: boolean }) {
   const s = session;
   if (!s || s.rideId !== rideId || !t.id || !native) return;
-  if (relayOnly && !nearbyFreeAllows({ kind: 'status', status: t.status, flags: t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0 })) return;
   const item = s.mesh.ownStatus({ id: t.id, status: t.status, flags: t.possibleCrash ? FLAG_POSSIBLE_CRASH : 0, lat: t.lat, lng: t.lng, at: Date.parse(t.tappedAt) });
   sendNow([item]);
 }
@@ -471,7 +472,7 @@ function receive(b64: string) {
   if (item.kind === 'status') {
     const status = asStatus(item);
     const prev = view.statuses[item.userId];
-    if (!prev || Date.parse(prev.tapped_at) <= item.at * 1000) publish({ statuses: { ...view.statuses, [item.userId]: status } });
+    if (isNewerTap(prev, status)) publish({ statuses: { ...view.statuses, [item.userId]: status } });
     emit({ kind: 'status', status, fromServer });
   } else {
     const reply = { id: item.id, user_id: item.userId, body: item.body, at: new Date(item.at * 1000).toISOString() };

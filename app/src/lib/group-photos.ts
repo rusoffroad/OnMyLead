@@ -7,8 +7,10 @@ import {
   aspectCrop, GROUP_PHOTO_BUCKET, GROUP_PHOTO_HEIGHT, GROUP_PHOTO_MAX_BYTES, GROUP_PHOTO_QUALITY, GROUP_PHOTO_WIDTH,
   groupPhotoPath, hasAspect, isGroupPhotoPath,
 } from '@/core/group-photo';
+import { can } from '@/core/entitlements';
 import { nextQuality } from '@/core/social';
 import { track } from './analytics';
+import { currentEntitlements, refreshEntitlements } from './entitlements';
 import { readPhotoBytes } from './photo-bytes';
 import { supabase } from './supabase';
 
@@ -24,7 +26,7 @@ export type GroupPhotoSource = 'camera' | 'library';
 export const canUseGroupCamera = Platform.OS !== 'web';
 
 const NOT_ON = 'Group photos aren’t switched on yet. Try again after the next update.';
-const isNotOn = (message: string) => /photo_path|column|schema cache|bucket not found/i.test(message);
+const isNotOn = (message: string) => !/check constraint/i.test(message) && /photo_path|schema cache|bucket not found/i.test(message);
 
 /**
  * Lets the owner take or pick a photo. Android's crop screen keeps it 16:9; iPhone and iPad's crop
@@ -87,11 +89,19 @@ export async function saveGroupPhoto(groupId: string, asset: ImagePicker.ImagePi
   const path = groupPhotoPath(row.owner_id, groupId, Crypto.randomUUID());
   const bucket = supabase.storage.from(GROUP_PHOTO_BUCKET);
   const { error: upErr } = await bucket.upload(path, bytes, { contentType: 'image/jpeg', upsert: false, cacheControl: '31536000' });
-  if (upErr) throw new Error(isNotOn(upErr.message) ? NOT_ON : upErr.message);
-  const { error } = await supabase.from('riding_groups').update({ photo_path: path }).eq('id', groupId);
-  if (error) {
+  // The bucket refuses uploads without the feature (a plan that just ended): the Pro prompt shows,
+  // but only when the plan, checked again now, really is without it (not a signed-out session).
+  if (upErr) {
+    if (isNotOn(upErr.message)) throw new Error(NOT_ON);
+    if (/row-level security/i.test(upErr.message) && !can(await refreshEntitlements().catch(() => currentEntitlements()), 'group_photos'))
+      throw new Error('pro_required:group_photos');
+    throw new Error(upErr.message);
+  }
+  const { data: updated, error } = await supabase.from('riding_groups').update({ photo_path: path }).eq('id', groupId).select('id');
+  if (error || !updated?.length) {
     await bucket.remove([path]);
-    throw new Error(isNotOn(error.message) ? NOT_ON : error.message);
+    // No row changed: the group is gone or no longer this rider's.
+    throw new Error(error ? (isNotOn(error.message) ? NOT_ON : error.message) : 'This group was deleted or is no longer yours.');
   }
   if (isGroupPhotoPath(row.photo_path, row.owner_id) && row.photo_path !== path) await bucket.remove([row.photo_path]);
   track('group_photo_saved', { platform: Platform.OS });
@@ -101,8 +111,10 @@ export async function saveGroupPhoto(groupId: string, asset: ImagePicker.ImagePi
 export async function removeGroupPhoto(groupId: string): Promise<void> {
   const row = await ownerRow(groupId);
   if (!row.photo_path) return;
-  const { error } = await supabase.from('riding_groups').update({ photo_path: null }).eq('id', groupId);
+  const { data: updated, error } = await supabase.from('riding_groups').update({ photo_path: null }).eq('id', groupId).select('id');
   if (error) throw new Error(error.message);
+  // No row changed: the group is gone or no longer this rider's, so its file stays.
+  if (!updated?.length) throw new Error('This group was deleted or is no longer yours.');
   if (isGroupPhotoPath(row.photo_path, row.owner_id)) await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([row.photo_path]);
   track('group_photo_removed');
 }
@@ -131,5 +143,12 @@ export async function adminUserGroups(userId: string): Promise<AdminGroup[]> {
 export async function adminRemoveGroupPhoto(groupId: string, ownerId: string, reason: string): Promise<void> {
   const { data, error } = await supabase.rpc('admin_remove_group_photo', { p_group: groupId, p_reason: reason });
   if (error) throw new Error(error.message);
-  if (typeof data === 'string' && isGroupPhotoPath(data, ownerId)) await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([data]);
+  if (typeof data === 'string' && isGroupPhotoPath(data, ownerId)) {
+    // The group no longer shows it; say so if the file itself is still up (try again to remove it).
+    // Storage answers a refused delete with no error and nothing deleted, so check both.
+    const { data: gone, error: rmErr } = await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([data]);
+    // The group's photo is already cleared, so this can't be retried here: name the file to delete by hand.
+    if (rmErr || !gone?.length)
+      throw new Error(`The group no longer shows the photo, but its file is still in storage: delete ${GROUP_PHOTO_BUCKET}/${data} in Supabase Storage${rmErr ? ` (${rmErr.message})` : ''}.`);
+  }
 }

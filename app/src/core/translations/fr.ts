@@ -3347,6 +3347,10 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "Chute possible : {name}",
   "EMERGENCY: {name} needs help now": "URGENCE : {name} a besoin d’aide maintenant",
   "Sent over Bluetooth. Tap to see where they are.": "Envoyé par Bluetooth. Touchez pour voir où il se trouve.",
+  "Not silenced yet. Tap to see where they are.": "Pas encore coupé. Touchez pour voir où il se trouve.",
+  "Emergency Waiting": "Urgence en attente",
+  "A quiet reminder of an EMERGENCY you haven’t silenced yet.": "Un rappel silencieux d'une urgence que vous n'avez pas encore coupée.",
+  "This group was deleted or is no longer yours.": "Ce groupe a été supprimé ou ne vous appartient plus.",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "Une sirène quand quelqu’un de votre groupe envoie URGENCE ou une alerte de chute.",
   "Possible Crash": "Chute possible",
   "{name} needs help now.": "{name} a besoin d’aide maintenant.",
@@ -3354,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "{n} autre pilote a besoin d’aide",
   "{n} more riders need help": "{n} autres pilotes ont besoin d’aide",
   "Version {v}": "Version {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "Les photos de groupe ne sont pas encore activées. Réessayez après la prochaine mise à jour.",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "OnMyLead a besoin de l’appareil photo pour prendre la photo du groupe. Activez-le dans Réglages, ou choisissez plutôt une photo.",
+  "That photo is too big. Try another one.": "Cette photo est trop lourde. Essayez-en une autre.",
+  "This group is gone, or you’re no longer in it.": "Ce groupe n’existe plus, ou vous n’en faites plus partie.",
+  "Please sign in first.": "Connectez-vous d’abord.",
+  "Only the rider who made the group can change its photo.": "Seul le pilote qui a créé le groupe peut changer sa photo.",
 };
 
 export default dict;

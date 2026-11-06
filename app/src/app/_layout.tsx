@@ -28,8 +28,8 @@ import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { logScreen, startAppLog } from '@/lib/app-log';
 import { startAppearance, takeReturnPath, useAppearance } from '@/lib/appearance';
 import { startAppSettings } from '@/lib/app-settings';
-import { startEntitlements, useEntitlements } from '@/lib/entitlements';
-import { can } from '@/core/entitlements';
+import { startEntitlements } from '@/lib/entitlements';
+import { useCan } from '@/lib/pro';
 import { startOrientationRule } from '@/lib/orientation';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
@@ -92,7 +92,7 @@ function RootLayout() {
 
   // The CarPlay screen's fixed words follow the app's language (does nothing off iPhone).
   // CarPlay is Pro (2.1): on Free the car shows the Pro notice in place of the waiting screen.
-  const carPlayPro = can(useEntitlements().ent, 'carplay');
+  const carPlayPro = useCan('carplay');
   useEffect(() => syncCarPlayLabels(!carPlayPro), [langVersion, carPlayPro]);
 
   useEffect(() => {

@@ -3347,6 +3347,10 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "衝突の可能性：{name}",
   "EMERGENCY: {name} needs help now": "緊急：{name}さんが今すぐ助けを必要としています",
   "Sent over Bluetooth. Tap to see where they are.": "Bluetooth経由で送信。タップして場所を確認。",
+  "Not silenced yet. Tap to see where they are.": "まだ消音されていません。タップして場所を確認。",
+  "Emergency Waiting": "待機中の緊急通知",
+  "A quiet reminder of an EMERGENCY you haven’t silenced yet.": "まだ消音していない緊急通知の静かなお知らせ。",
+  "This group was deleted or is no longer yours.": "このグループは削除されたか、あなたのものではなくなりました。",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "グループの誰かが緊急または衝突アラートを送るとサイレンが鳴ります。",
   "Possible Crash": "衝突の可能性",
   "{name} needs help now.": "{name}さんが今すぐ助けを必要としています。",
@@ -3354,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "ほかに{n}人のライダーが助けを必要としています",
   "{n} more riders need help": "ほかに{n}人のライダーが助けを必要としています",
   "Version {v}": "バージョン {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "グループ写真はまだオンになっていません。次のアップデート後にもう一度お試しください。",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "グループ写真を撮るには OnMyLead にカメラが必要です。設定でオンにするか、写真を選んでください。",
+  "That photo is too big. Try another one.": "その写真は大きすぎます。別の写真を試してください。",
+  "This group is gone, or you’re no longer in it.": "このグループはなくなったか、あなたはもうメンバーではありません。",
+  "Please sign in first.": "まずサインインしてください。",
+  "Only the rider who made the group can change its photo.": "グループの写真を変えられるのは、グループを作ったライダーだけです。",
 };
 
 export default dict;

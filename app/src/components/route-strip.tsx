@@ -56,7 +56,8 @@ export function RouteStrip({
   const spots = new Map(layout.map((d) => [d.id, d]));
   // The scale under the line: leader to whoever is furthest back, with round-step ticks.
   const ruler = width ? spreadRuler(ranked, layout) : null;
-  const rulerStale = !!ruler && !!lastSeenIds?.length && [ranked.find((r) => r.role === 'leader') ?? ranked[0], ranked[ranked.length - 1]].some((r) => r.id !== meId && lastSeenIds.includes(r.id));
+  const lead = ranked.find((r) => r.role === 'leader') ?? ranked[0];
+  const rulerStale = !!ruler && !!lastSeenIds?.length && [lead, [...ranked].reverse().find((r) => r.role === 'sweep' && r.id !== lead?.id), ranked[ranked.length - 1]].some((r) => !!r && r.id !== meId && lastSeenIds.includes(r.id));
   // Draw me last so my dot sits on top, then the leader and sweep over the riders.
   const order = [...ranked].sort((a, b) => layer(a) - layer(b));
   function layer(r: PlacedRider) {
