@@ -120,6 +120,24 @@ setSirenSilencedHook((ids) => {
 const WAITING_CHANNEL = 'emergency-waiting';
 
 setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, quiet?: boolean) => {
+  // The quiet reminder only when nothing for this call is on the lock screen yet (on iPhone the
+  // EMERGENCY push itself stays in Notification Center), so one call never shows twice.
+  if (quiet) {
+    Notifications.getPresentedNotificationsAsync()
+      .then((shown) => {
+        const there = shown.some((n) => {
+          const d = n.request.content.data as { itemId?: unknown } | undefined;
+          return n.request.identifier === c.id || d?.itemId === c.id;
+        });
+        if (!there) postSirenNotification(c, plain, quiet);
+      })
+      .catch(() => postSirenNotification(c, plain, quiet));
+    return;
+  }
+  postSirenNotification(c, plain, quiet);
+});
+
+function postSirenNotification(c: EmergencyCall, plain?: boolean, quiet?: boolean) {
   const name = c.name?.trim() || tc('A rider');
   Notifications.scheduleNotificationAsync({
     // The tap's id, the same tag the server's push uses, so the two make one entry (the push can
@@ -136,7 +154,7 @@ setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, quiet?: boolean) 
     },
     trigger: Platform.OS === 'android' ? { channelId: quiet ? WAITING_CHANNEL : plain ? 'ride-alerts' : SIREN_CHANNEL } : null,
   }).catch(() => {});
-});
+}
 
 /**
  * Ask once for permission and register this phone for the signed-in rider. Safe to call
