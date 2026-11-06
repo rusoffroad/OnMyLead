@@ -18,7 +18,8 @@ export async function fallbackFollowStep(
   frame: { current: FollowFrame },
 ): Promise<'stay' | 'pan'> {
   const [pt, cam] = await Promise.all([
-    m.pointForCoordinate({ latitude: f.lat, longitude: f.lng }).catch(() => null),
+    // Locked to centred, the point isn't used: skip the map round trip.
+    frame.current.locked ? Promise.resolve(null) : m.pointForCoordinate({ latitude: f.lat, longitude: f.lng }).catch(() => null),
     m.getCamera().catch(() => null),
   ]);
   // iPhone and iPad report height (altitude) rather than zoom: treat any as a riding zoom.

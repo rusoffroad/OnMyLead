@@ -30,8 +30,9 @@ export function LaunchCover({ until }: { until: number }) {
 
   useEffect(() => {
     if (!up) return;
-    shown = true;
     const timer = setTimeout(() => {
+      // Done once its time is up (a remount before then, say a synced theme, keeps the cover up).
+      shown = true;
       setFading(true);
       Animated.timing(opacity, { toValue: 0, duration: FADE_MS, useNativeDriver: true }).start(() => setUp(false));
     }, Math.max(0, until - Date.now()));
