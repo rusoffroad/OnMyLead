@@ -1,4 +1,5 @@
 [
+  {"date": "2026-11-06", "slugs": ["whats-new-in-2-0"], "kind": "review", "by": "audit", "ref": "help-audit-2026-11-05", "why": "Checked against help/release-notes.json: since this guide was written, the notes only added the 2.0 store release dates and the upcoming 2.1 notes. Nothing about 2.0 changed for riders."},
   {"date": "2026-11-06", "slugs": ["language", "offline-maps", "park-trails", "route-builder"], "kind": "review", "by": "pr", "ref": "edge-follow", "why": "Re-dated only: the Zoom Out at the Edge description in Map Settings (and its translations) changed to say the map centers and follows the next time. Nothing in these guides' steps changed."},
   {"date": "2026-11-06", "slugs": ["3d-terrain", "bluetooth-sharing", "carplay", "directions", "emergency-and-safety", "fuel-range", "full-map", "leader-trackline", "location-sharing", "ride-bubble", "ride-chat", "status-buttons", "troubleshooting", "use-onmylead-on-a-tablet", "waypoints-and-planned-stops"], "kind": "review", "by": "pr", "ref": "edge-follow", "why": "Re-dated only: Ride Mode's screen now hands its own GPS fix to the map for Follow Me. Nothing riders see in these guides changed."},
   {
@@ -421,16 +422,6 @@
     "by": "pr",
     "ref": "version-2-1",
     "why": "The app is now version 2.1 (iOS build 9, Android versionCode 9) for the 2.1 build. Its release notes are in help/release-notes.json; articles in :::release 2.1 blocks publish when Apple releases 2.1. These articles are logged because they list app.json as a source; the version number is the only change, so riders see no difference."
-  },
-  {
-    "date": "2026-11-05",
-    "slugs": [
-      "whats-new-in-2-0"
-    ],
-    "kind": "review",
-    "by": "audit",
-    "ref": "help-audit-2026-11-05",
-    "why": "Checked against help/release-notes.json: since this guide was written, the notes only added the 2.0 store release dates and the upcoming 2.1 notes. Nothing about 2.0 changed for riders."
   },
   {
     "date": "2026-11-05",
