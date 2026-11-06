@@ -285,7 +285,11 @@ function update() {
     // The in-app siren takes over from any siren notification still in the tray (Android alarm).
     // (`buzz` runs only for a real call; the Play Siren sample sounds without it.)
     // Android only: on iPhone and iPad the push's entry stays, quiet, in Notification Center.
-    if (!buzz && Platform.OS === 'android') silencedHook?.(calls.map((c) => c.id));
+    if (!buzz && Platform.OS === 'android') {
+      silencedHook?.(calls.map((c) => c.id));
+      // That took any lock-screen reminder down too: the next trip away posts it again.
+      for (const c of calls) reminded.delete(c.id);
+    }
     startSound();
     startBuzz();
   } else if (sample && !buzz) {
@@ -302,6 +306,12 @@ function update() {
 // came while the app was away, or that kind of notification is off here) still ends it: checked when
 // the app comes back and every 20 s while a call waits.
 async function checkCallsOnServer() {
+  // Calls from an older server don't name the rider: look those up by id, for a cancel.
+  const unnamed = calls.filter((c) => c.userId.startsWith('item:'));
+  if (unnamed.length) {
+    const { data } = await supabase.from('rider_statuses').select('id, cancelled_at').in('id', unnamed.map((c) => c.id));
+    for (const r of (data ?? []) as { id: string; cancelled_at?: string | null }[]) if (r.cancelled_at) endEmergency(r.id);
+  }
   const waiting = calls.filter((c) => !c.userId.startsWith('item:'));
   for (const rideId of [...new Set(waiting.map((c) => c.rideId))]) {
     const mine = waiting.filter((c) => c.rideId === rideId);
