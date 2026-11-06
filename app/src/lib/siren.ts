@@ -33,6 +33,12 @@ const emit = () => listeners.forEach((l) => l());
 
 /** Shows a local notification with the siren for a call that came over Bluetooth while the app was in the background (lib/push.ts). */
 let backgroundNotifier: ((c: EmergencyCall) => void) | null = null;
+/** Takes silenced calls' notifications off the phone, so their own siren sound stops too (lib/push.ts). */
+let silencedHook: ((ids: string[]) => void) | null = null;
+export function setSirenSilencedHook(fn: ((ids: string[]) => void) | null) {
+  silencedHook = fn;
+}
+
 export function setBackgroundSirenNotifier(fn: ((c: EmergencyCall) => void) | null) {
   backgroundNotifier = fn;
 }
@@ -141,7 +147,8 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
 
 /** A call is over: the rider took the tap back or tapped something newer. Never sounds again. */
 export function endEmergency(id: string) {
-  remember([id]);
+  if (!silencedSet.has(id)) remember([id]);
+  silencedHook?.([id]);
   if (!calls.some((c) => c.id === id)) return;
   calls = dropCall(calls, id);
   emit();
@@ -162,7 +169,10 @@ export function silenceEmergency(id: string) {
 
 /** Silence Siren: every call waiting. */
 export function silenceAll() {
-  if (calls.length) remember(calls.map((c) => c.id));
+  if (calls.length) {
+    remember(calls.map((c) => c.id));
+    silencedHook?.(calls.map((c) => c.id));
+  }
   calls = [];
   emit();
   update();

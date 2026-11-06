@@ -28,7 +28,7 @@ create trigger riding_groups_photo_guard before insert or update of photo_path o
 
 -- Uploading into the group-photos bucket needs the same feature (has_feature: Pro, or Free when
 -- Admin moves group_photos back to Free), so Free accounts can't use it as image hosting.
--- Reading and deleting stay as they were.
+-- Replacing a file already there needs it too. Reading and deleting stay as they were.
 do $$
 begin
   if to_regclass('storage.objects') is null then
@@ -37,6 +37,11 @@ begin
   end if;
   execute 'drop policy if exists group_photos_owner_insert on storage.objects';
   execute $p$create policy group_photos_owner_insert on storage.objects for insert to authenticated
+    with check (bucket_id = 'group-photos' and (storage.foldername(name))[1] = auth.uid()::text
+                and has_feature(auth.uid(), 'group_photos'))$p$;
+  execute 'drop policy if exists group_photos_owner_update on storage.objects';
+  execute $p$create policy group_photos_owner_update on storage.objects for update to authenticated
+    using (bucket_id = 'group-photos' and (storage.foldername(name))[1] = auth.uid()::text)
     with check (bucket_id = 'group-photos' and (storage.foldername(name))[1] = auth.uid()::text
                 and has_feature(auth.uid(), 'group_photos'))$p$;
 end $$;

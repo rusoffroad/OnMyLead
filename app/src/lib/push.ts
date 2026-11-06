@@ -23,7 +23,7 @@ import { openGroupChat } from './group-chat';
 import { markReadForPush, refreshInbox } from './inbox';
 import { openDmWith } from './out-riding';
 import { currentNotificationSettings } from './notification-settings';
-import { endEmergency, loadSiren, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenWillSound, type IncomingEmergency } from './siren';
+import { endEmergency, loadSiren, onSirenSetting, raiseEmergency, setBackgroundSirenNotifier, silenceEmergency, sirenEnabled, sirenWillSound, setSirenSilencedHook, type IncomingEmergency } from './siren';
 import { supabase } from './supabase';
 
 import { tc } from '@/core/i18n';
@@ -35,7 +35,8 @@ Notifications.setNotificationHandler({
     // An EMERGENCY while the app is open: the siren screen takes over (lib/siren), not a banner,
     // but only when the siren will really sound (not for an old or silenced one, or with it off).
     const call = emergencyFromPush(data);
-    if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: true, shouldPlaySound: false, shouldSetBadge: false };
+    // Not in the tray either: on Android the siren channel would play its own siren over the app's.
+    if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: false, shouldPlaySound: false, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
@@ -63,6 +64,19 @@ async function sendSirenSetting() {
   } catch {}
 }
 onSirenSetting(() => void sendSirenSetting());
+
+// Silenced or ended calls: take their notifications down too, so a siren-channel alarm still
+// playing from the tray (Android) stops with the in-app siren.
+setSirenSilencedHook((ids) => {
+  Notifications.getPresentedNotificationsAsync()
+    .then((shown) => {
+      for (const n of shown) {
+        const d = tapData(n.request.content.data);
+        if (typeof d?.itemId === 'string' && ids.includes(d.itemId)) Notifications.dismissNotificationAsync(n.request.identifier).catch(() => {});
+      }
+    })
+    .catch(() => {});
+});
 
 // A call that came over Bluetooth while the app was in the background: the siren as a notification
 // (no service means no push). Tapping it opens Ride Mode and silences it.
