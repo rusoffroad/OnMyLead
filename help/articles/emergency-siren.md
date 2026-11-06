@@ -5,6 +5,7 @@ category: safety-privacy
 order: 51
 release: "2.1"
 updated: 2026-11-06
+review: "Android with OnMyLead open: does the in-app siren (expo-audio) play on the media stream, so it follows media volume? If so, say so under With OnMyLead Open."
 sources:
   - app/src/core/siren.ts
   - app/src/lib/siren.ts
@@ -49,7 +50,7 @@ The siren stops by itself if the rider cancels their EMERGENCY or taps another s
 The EMERGENCY notification plays the siren as its sound, for about 27 seconds. Tap the notification to open Ride Mode at their location; the siren doesn't start again in the app.
 
 - **iPhone and iPad:** the siren follows your ring/silent switch, like any notification. It's a Time Sensitive notification, so it comes through a Focus if you allow Time Sensitive notifications for OnMyLead in **Settings > Notifications > OnMyLead**.
-- **Android phones and tablets:** the siren has its own notification channel, **Emergency Siren**, and plays as an alarm, so you hear it with the ringer on silent. Do Not Disturb can still hold it back; to let it through, open **Settings > Apps > OnMyLead > Notifications > Emergency Siren** and allow it to override Do Not Disturb.
+- **Android phones and tablets:** the siren has its own notification channel, **Emergency Siren**, and plays as an alarm, so you hear it with the ringer on silent. Do Not Disturb can still hold it back; to let it through, open **Settings > Apps > OnMyLead > Notifications > Emergency Siren** and allow it to override Do Not Disturb. If you turn the **Emergency Siren** channel off there, EMERGENCY notifications come with the usual ride alert sound instead.
 
 ## With No Service
 

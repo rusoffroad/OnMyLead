@@ -459,10 +459,14 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
 // The countdown came or went: the siren stops for it, and sounds again after.
 onUrgentChange(() => update());
 
+let lastAppState = AppState.currentState;
 AppState.addEventListener('change', (s) => {
+  const was = lastAppState;
+  lastAppState = s;
   // A brief 'inactive' (Notification Center, Face ID) while coming back leaves the wait running,
-  // so a notification tap still silences its call before the siren starts.
-  if (s === 'inactive' && resume) return;
+  // and on the way back from the background (a lock-screen tap) 'inactive' waits for 'active', so
+  // a notification tap still silences its call before the siren starts.
+  if (s === 'inactive' && (resume || was === 'background')) return;
   if (resume) clearTimeout(resume);
   resume = null;
   if (s === 'active') checkSoon();

@@ -79,7 +79,25 @@ const isEmergency = (d: TapData | undefined) => d?.type === 'status' && (d as { 
  * plain sound.
  */
 let sirenSent = true;
+/** What the server was last told (null: not yet), so a change made in the phone's settings goes too. */
+let sirenToldOn: boolean | null = null;
 let sirenChain: Promise<void> = Promise.resolve();
+
+/**
+ * On Android the rider can turn the Emergency Siren channel off in the phone's settings. A push on
+ * a channel that's off never shows, so then the server sends EMERGENCY on the usual ride alerts
+ * channel instead, the same as with the app's switch off.
+ */
+async function sirenWanted(): Promise<boolean> {
+  if (!sirenEnabled()) return false;
+  if (Platform.OS !== 'android') return true;
+  try {
+    const ch = await Notifications.getNotificationChannelAsync(SIREN_CHANNEL);
+    return !ch || ch.importance !== Notifications.AndroidImportance.NONE;
+  } catch {
+    return true;
+  }
+}
 /** One at a time, each sending the switch as it is then, so quick toggles end on the last one. */
 function sendSirenSetting(): Promise<void> {
   sirenChain = sirenChain.then(async () => {
@@ -88,8 +106,10 @@ function sendSirenSetting(): Promise<void> {
     try {
       // The saved switch, not the default true before it has loaded.
       await loadSiren();
-      const { data, error } = await supabase.rpc('set_push_siren', { p_token: myToken, p_on: sirenEnabled() });
+      const on = await sirenWanted();
+      const { data, error } = await supabase.rpc('set_push_siren', { p_token: myToken, p_on: on });
       sirenSent = !error;
+      if (!error) sirenToldOn = data === false ? null : on;
       // No row for this token (say the server dropped it): register it again on the next sync,
       // which sends the switch after.
       if (!error && data === false) registeredFor = null;
@@ -99,8 +119,15 @@ function sendSirenSetting(): Promise<void> {
 }
 onSirenSetting(() => void sendSirenSetting());
 // Not through yet (no signal when the switch moved): try again each time the app comes back.
+// Also when the Emergency Siren channel was turned off or on in the phone's settings meanwhile.
 AppState.addEventListener('change', (st) => {
-  if (st === 'active' && !sirenSent) void sendSirenSetting();
+  if (st !== 'active') return;
+  if (!sirenSent) void sendSirenSetting();
+  else if (Platform.OS === 'android' && myToken && sirenToldOn !== null) {
+    void sirenWanted().then((on) => {
+      if (on !== sirenToldOn) void sendSirenSetting();
+    });
+  }
 });
 
 // Silenced or ended calls: take their notifications down too, so a siren-channel alarm still
@@ -132,15 +159,17 @@ setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, quiet?: boolean) 
           const d = tapData(n.request.content.data);
           return n.request.identifier === c.id || (d?.type !== 'cancelled' && d?.itemId === c.id);
         });
-        if (!there) postSirenNotification(c, plain, quiet);
+        if (!there) void postSirenNotification(c, plain, quiet);
       })
-      .catch(() => postSirenNotification(c, plain, quiet));
+      .catch(() => void postSirenNotification(c, plain, quiet));
     return;
   }
-  postSirenNotification(c, plain, quiet);
+  void postSirenNotification(c, plain, quiet);
 });
 
-function postSirenNotification(c: EmergencyCall, plain?: boolean, quiet?: boolean) {
+async function postSirenNotification(c: EmergencyCall, plainAsked?: boolean, quiet?: boolean) {
+  // The Emergency Siren channel turned off in Android's settings: the usual ride alerts sound.
+  const plain = plainAsked || (!quiet && !(await sirenWanted()));
   const name = c.name?.trim() || tc('A rider');
   Notifications.scheduleNotificationAsync({
     // The tap's id, the same tag the server's push uses, so the two make one entry (the push can
