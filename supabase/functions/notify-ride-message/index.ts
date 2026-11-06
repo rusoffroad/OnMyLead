@@ -204,7 +204,10 @@ export async function withSiren(rows: Push[]): Promise<Push[]> {
     }
     return rows.map((r) =>
       // `over`: already over (a newer tap is in, or over an hour late), so open apps don't sound it either.
-      r.data?.status === 'emergency' ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra, ...(late ? { over: true } : null) } } : r,
+      // `siren` in the data too, so the app knows which channel the push is on.
+      r.data?.status === 'emergency'
+        ? { ...r, siren: !late && siren.has(r.token), data: { ...r.data, ...extra, siren: !late && siren.has(r.token), ...(late ? { over: true } : null) } }
+        : r,
     );
   } catch {
     return rows;

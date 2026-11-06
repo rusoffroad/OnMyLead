@@ -143,7 +143,8 @@ export async function adminRemoveGroupPhoto(groupId: string, ownerId: string, re
   if (error) throw new Error(error.message);
   if (typeof data === 'string' && isGroupPhotoPath(data, ownerId)) {
     // The group no longer shows it; say so if the file itself is still up (try again to remove it).
-    const { error: rmErr } = await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([data]);
-    if (rmErr) throw new Error(`The group no longer shows the photo, but its file couldn't be deleted: ${rmErr.message}`);
+    // Storage answers a refused delete with no error and nothing deleted, so check both.
+    const { data: gone, error: rmErr } = await supabase.storage.from(GROUP_PHOTO_BUCKET).remove([data]);
+    if (rmErr || !gone?.length) throw new Error(`The group no longer shows the photo, but its file couldn't be deleted${rmErr ? `: ${rmErr.message}` : ' (sign in again with two-factor and retry)'}.`);
   }
 }

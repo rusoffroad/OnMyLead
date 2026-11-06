@@ -41,15 +41,16 @@ Notifications.setNotificationHandler({
     // screen locks before the rider looks. Not in the tray on Android, where the siren channel
     // would play its own siren over the app's.
     if (call && AppState.currentState === 'active' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: Platform.OS === 'ios', shouldPlaySound: false, shouldSetBadge: false };
-    // On Android with the siren on, the push is on the siren channel: posting it at all plays the
-    // alarm (the channel's sound), so the cases below keep it out of the tray there.
-    const androidSiren = Platform.OS === 'android' && sirenEnabled();
+    // On Android a push the server sent on the siren channel (its `siren` flag) plays the alarm if
+    // it's posted at all, so the cases below keep it out of the tray there.
+    const pushSiren = (data as { siren?: unknown } | undefined)?.siren === true;
+    const androidSiren = Platform.OS === 'android' && pushSiren;
     // Already silenced here: in the list, without the siren sound coming back from the push.
     if (call && sirenSilenced(call.id!)) return { shouldShowBanner: false, shouldShowList: !androidSiren, shouldPlaySound: false, shouldSetBadge: false };
     // Open, but the in-app siren won't sound it (too old, an older call, or the switch just went
     // off): a banner without the push's own siren sound, which nothing here could silence.
-    // With the switch off the push has the plain sound, which still plays.
-    if (call && AppState.currentState === 'active') return { shouldShowBanner: !androidSiren, shouldShowList: !androidSiren, shouldPlaySound: !sirenEnabled(), shouldSetBadge: false };
+    // A push with the plain sound (switch off, or the server's late or over call) still plays it.
+    if (call && AppState.currentState === 'active') return { shouldShowBanner: !androidSiren, shouldShowList: !androidSiren, shouldPlaySound: !pushSiren, shouldSetBadge: false };
     // A group chat message for the chat that's already open shows there instead.
     const banner = data?.type !== 'message' && !(data?.type === 'group_message' && data.groupId === openGroupChat())
       && !(data?.type === 'direct_message' && data.userId === openDmWith());
@@ -106,7 +107,8 @@ setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, quiet?: boolean) 
       body: quiet ? tc('Not silenced yet. Tap to see where they are.') : tc('Sent over Bluetooth. Tap to see where they are.'),
       // With the siren switched off: the normal sound, on the usual ride alerts channel. Quiet: none.
       ...(quiet ? {} : { sound: plain ? 'default' : SIREN_SOUND }),
-      interruptionLevel: 'timeSensitive',
+      // The quiet reminder doesn't break through Focus or drop a banner over a call to 911.
+      interruptionLevel: quiet ? 'passive' : 'timeSensitive',
       data: { type: 'status', status: 'emergency', rideId: c.rideId, itemId: c.id },
     },
     trigger: Platform.OS === 'android' ? { channelId: quiet ? WAITING_CHANNEL : plain ? 'ride-alerts' : SIREN_CHANNEL } : null,
