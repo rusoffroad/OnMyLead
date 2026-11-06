@@ -63,7 +63,7 @@ describe('the list of calls', () => {
     let list = addCall([], { ...call('a', unknownRider('a')) });
     list = addCall(list, call('a', 'u1'));
     expect(list[0].userId).toBe('u1');
-    expect(endedCalls(list, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 1000 } })).toEqual(['a']);
+    expect(endedCalls(list, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 61_000 } })).toEqual(['a']);
   });
   it('keeps one call per rider per ride: a newer one replaces the older', () => {
     let list = addCall([], call('a', 'u1', NOW - 5000));
@@ -138,6 +138,11 @@ describe('endedCalls', () => {
     const sos = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: 1_000_900, tappedAt: 1_000_900 }];
     expect(endedCalls(sos, 'r1', { u1: { id: 'stop', status: 'stopped', at: 1_000_200 } })).toEqual([]);
     expect(endedCalls(sos, 'r1', { u1: { id: 'ok', status: 'ok', at: 1_001_000 } })).toEqual(['sos']);
+  });
+  it('without a tap time, a status a few seconds ahead (clocks apart) doesn’t end it', () => {
+    const viaPush = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: NOW }];
+    expect(endedCalls(viaPush, 'r1', { u1: { id: 'stop', status: 'stopped', at: NOW + 3000 } })).toEqual([]);
+    expect(endedCalls(viaPush, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW + 61_000 } })).toEqual(['sos']);
   });
   it('only looks at calls on this ride', () => {
     expect(endedCalls(calls, 'r1', { u3: { id: 'n', status: 'ok', at: NOW + 1 } })).toEqual([]);

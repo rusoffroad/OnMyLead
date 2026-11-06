@@ -185,6 +185,8 @@ export function endStaleCalls(rideId: string, latest: Record<string, { id?: stri
 
 /** The rider silenced one call (a notification tap counts too). */
 export function silenceEmergency(id: string) {
+  // Saved even when it isn't sounding yet (a notification tap on a cold start), so it never sounds.
+  if (!calls.some((c) => c.id === id) && !silenced.includes(id)) remember([id]);
   endEmergency(id);
 }
 

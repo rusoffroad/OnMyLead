@@ -155,7 +155,11 @@ export function endedCalls(
       if (s.id === c.id) return s.status !== 'emergency';
       // Whole seconds (Bluetooth carries tap times to the second). A different tap in the same
       // second can't be told apart from one just before, so only a later second ends the call.
-      return Math.floor(s.at / 1000) > Math.floor((c.tappedAt ?? c.at) / 1000);
+      // Without the tap time (an older server), `at` is when it got here on this phone's clock and
+      // the status is on the sender's: only a tap a full minute later counts, so clocks a little
+      // apart don't end it at once.
+      if (c.tappedAt == null) return s.at > c.at + 60_000;
+      return Math.floor(s.at / 1000) > Math.floor(c.tappedAt / 1000);
     })
     .map((c) => c.id);
 }
