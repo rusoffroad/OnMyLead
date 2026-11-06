@@ -153,7 +153,12 @@ async function loadSnapshot(id: string): Promise<RideSnapshot> {
   await flushOutbox();
   const [ride, members, regroup, st] = await Promise.all([getRide(id), getMembers(id), activeRegroup(id), latestStatuses(id)]);
   const statuses: RideSnapshot['statuses'] = {};
-  for (const s of st) if (!statuses[s.user_id]) statuses[s.user_id] = s;
+  // Each rider's newest tap by when it was tapped: a tap relayed and uploaded late (newer upload,
+  // older tap) never takes the place of the one the rider made after it.
+  for (const s of st) {
+    const p = statuses[s.user_id];
+    if (!p || Date.parse(s.tapped_at) > Date.parse(p.tapped_at)) statuses[s.user_id] = s;
+  }
   const pos = await getPositions(members.filter((x) => x.status === 'joined').map((x) => x.user_id));
   return { ride, members, regroup, statuses, positions: Object.fromEntries(pos.map((p) => [p.user_id, p])) };
 }

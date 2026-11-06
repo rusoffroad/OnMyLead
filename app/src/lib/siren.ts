@@ -30,6 +30,9 @@ let silencedSet = new Set<string>();
 // Taps taken back that were never a call here (most are not EMERGENCY): kept for this run only, so
 // a late copy can't sound, without crowding the saved list of silenced calls.
 const endedHere = new Set<string>();
+// Each ride's latest status per rider, as Ride Mode last saw it, so a call that arrives later by
+// push is checked against it too.
+const knownLatest: Record<string, Record<string, { id?: string | null; status: string; at: number }>> = {};
 let loaded: Promise<void> | null = null;
 const listeners = new Set<() => void>();
 const settingListeners = new Set<(on: boolean) => void>();
@@ -135,6 +138,7 @@ export async function sirenWillSound(e: IncomingEmergency, me: string | null): P
   // Already sounding, or would join the list (not an older call from a rider with a newer one).
   if (calls.some((c) => c.id === e.id)) return true;
   const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt: e.tappedAt, name: e.name, possibleCrash: e.possibleCrash };
+  if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) return false;
   return addCall(calls, call) !== calls;
 }
 
@@ -147,6 +151,8 @@ export function raiseEmergency(e: IncomingEmergency, me: string | null) {
     // Ride Mode and Bluetooth hand over the tap time itself as `at`: that is the tap time.
     const tappedAt = e.tappedAt ?? (e.source === 'push' ? undefined : at);
     const call: EmergencyCall = { id: e.id!, rideId: e.rideId, userId: e.userId, at, tappedAt, name: e.name, possibleCrash: e.possibleCrash };
+    // Ride Mode already shows a newer tap from this rider: it's over before it sounds.
+    if (endedCalls([call], call.rideId, knownLatest[call.rideId] ?? {}).length) return endEmergency(call.id);
     const isNew = !calls.some((c) => c.id === call.id);
     const next = addCall(calls, call);
     if (next === calls) return;
@@ -182,6 +188,7 @@ export function endEmergency(id: string) {
 export function endStaleCalls(rideId: string, latest: Record<string, { id?: string | null; status: string; tapped_at: string } | undefined>) {
   const now: Record<string, { id?: string | null; status: string; at: number }> = {};
   for (const [u, st] of Object.entries(latest)) if (st) now[u] = { id: st.id, status: st.status, at: Date.parse(st.tapped_at) };
+  knownLatest[rideId] = now;
   for (const id of endedCalls(calls, rideId, now)) endEmergency(id);
 }
 
@@ -281,7 +288,11 @@ function startSound() {
     .then(() => setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'duckOthers', shouldPlayInBackground: false, allowsRecording: false }))
     .catch(() => {})
     .then(() => {
-      if (!sounding) return;
+      if (!sounding) {
+        // Stopped before the audio was set up: give the rider's music back, as stopSound does.
+        if (Platform.OS === 'ios') setAudioModeAsync({ interruptionMode: 'mixWithOthers' }).catch(() => {});
+        return;
+      }
       const p = getPlayer();
       if (!p) return;
       p.loop = true;
