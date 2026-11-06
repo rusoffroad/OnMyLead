@@ -24,12 +24,15 @@ export function LaunchCover({ until }: { until: number }) {
   const label = appVersionLabel();
   const [up, setUp] = useState(() => !shown && !!label && Platform.OS !== 'web');
   const [opacity] = useState(() => new Animated.Value(1));
+  // Takes touches while it hides the screen (no taps on a Home the rider can't see), not while fading.
+  const [fading, setFading] = useState(false);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!up) return;
     shown = true;
     const timer = setTimeout(() => {
+      setFading(true);
       Animated.timing(opacity, { toValue: 0, duration: FADE_MS, useNativeDriver: true }).start(() => setUp(false));
     }, Math.max(0, until - Date.now()));
     return () => clearTimeout(timer);
@@ -37,7 +40,7 @@ export function LaunchCover({ until }: { until: number }) {
 
   if (!up || !label) return null;
   return (
-    <Animated.View pointerEvents="none" style={[styles.cover, { opacity }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <Animated.View pointerEvents={fading ? 'none' : 'auto'} style={[styles.cover, { opacity }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Image
         source={LOGO}
         style={{ width: LOGO_WIDTH, height: Math.round(LOGO_WIDTH * LOGO_ASPECT) }}

@@ -90,7 +90,8 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
       changed = merged.userId !== x.userId || merged.name !== x.name || merged.possibleCrash !== x.possibleCrash || merged.tappedAt !== x.tappedAt;
       return changed ? merged : x;
     });
-    return changed ? next : (calls as EmergencyCall[]);
+    // A merged tap time can change which call is newest.
+    return changed ? next.sort((a, b) => (b.tappedAt ?? b.at) - (a.tappedAt ?? a.at)) : (calls as EmergencyCall[]);
   }
   // An older call from the same rider arriving late doesn't replace their newer one.
   const mine = calls.find((x) => x.rideId === c.rideId && x.userId === c.userId);

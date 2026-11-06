@@ -236,7 +236,11 @@ export function noteRiderTap(rideId: string, userId: string, tap: { id: string; 
 /** Sign-out: the last account's waiting calls and what was known about its rides go. */
 export function resetSirenCalls() {
   for (const k of Object.keys(knownLatest)) delete knownLatest[k];
+  reminded.clear();
+  plainNotified.clear();
   if (!calls.length) return;
+  // Their notifications (tray alarm, lock-screen reminder) go too.
+  silencedHook?.(calls.map((c) => c.id));
   calls = [];
   emit();
   update();
