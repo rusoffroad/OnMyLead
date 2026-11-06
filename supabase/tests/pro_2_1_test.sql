@@ -47,6 +47,9 @@ end $$;
 reset role;
 
 -- A Free owner can't add a group photo straight through the API (20261106010000); taking one down stays free.
+-- As in production, riders can't call pro_required itself (privacy_test grants every function
+-- for the suite): the photo guard has to go through require_my_feature.
+revoke execute on function pro_required(uuid, text) from anon, authenticated;
 alter table riding_groups disable trigger riding_groups_pro;
 insert into riding_groups (id, owner_id, name, invite_code)
 values ('d81d81d8-1d81-4d81-8d81-d81d81d81d81', '00000000-0000-0000-0000-000000000d81', 'Tia Crew', 'TIACREW001');

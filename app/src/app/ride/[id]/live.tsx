@@ -198,7 +198,11 @@ export default function RideMode() {
   const [statuses, setStatuses] = useState<Record<string, TappedStatus>>({});
   const statusesNow = useRef(statuses);
   useEffect(() => {
-    statusesNow.current = statuses;
+    // Keeps a newer tap the live handlers already put here (it may not have rendered yet), so an
+    // older Bluetooth copy can't count as newer in between.
+    const next = { ...statuses };
+    for (const [u, r] of Object.entries(statusesNow.current)) if (r && isNewerTap(next[u], r)) next[u] = r;
+    statusesNow.current = next;
   }, [statuses]);
   const [regroup, setRegroup] = useState<RegroupPoint | null>(null);
   const [share, setShare] = useState<ActiveShare | null>(null);

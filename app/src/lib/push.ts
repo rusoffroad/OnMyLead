@@ -109,6 +109,8 @@ setSirenSilencedHook((ids) => {
     .then((shown) => {
       for (const n of shown) {
         const d = tapData(n.request.content.data);
+        // The rider's "cancelled" notice says why the siren stopped: it stays.
+        if (d?.type === 'cancelled') continue;
         if (typeof d?.itemId === 'string' && ids.includes(d.itemId)) Notifications.dismissNotificationAsync(n.request.identifier).catch(() => {});
       }
     })
@@ -126,8 +128,8 @@ setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, quiet?: boolean) 
     Notifications.getPresentedNotificationsAsync()
       .then((shown) => {
         const there = shown.some((n) => {
-          const d = n.request.content.data as { itemId?: unknown } | undefined;
-          return n.request.identifier === c.id || d?.itemId === c.id;
+          const d = tapData(n.request.content.data);
+          return n.request.identifier === c.id || (d?.type !== 'cancelled' && d?.itemId === c.id);
         });
         if (!there) postSirenNotification(c, plain, quiet);
       })
