@@ -405,12 +405,12 @@ async function checkCallsOnServer() {
       // Only when it really was tapped later (an older one on the server, say while the newer one
       // came over Bluetooth and isn't uploaded yet, changes nothing).
       if (newest.status === 'emergency' && newest.id !== c.id && tapOrder(c.tappedAt ?? c.at, Date.parse(newest.tapped_at)) > 0) {
-        // The newer one takes over without a gap in the siren (addCall drops the older call); the
+        // (A new tap: not the old call's crash flag.) The newer one takes over without a gap in the siren (addCall drops the older call); the
         // older call is over either way, so it ends after if the newer one didn't sound. It counts
         // from now, so a newer tap uploaded late (over ten minutes old) still carries on the siren
         // that was already sounding for this rider.
         const old = c.id;
-        void raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: Date.now(), tappedAt: Date.parse(newest.tapped_at), name: c.name, possibleCrash: c.possibleCrash, source: 'ride' }, null).then(() => endByTap(old));
+        void raiseEmergency({ id: newest.id, rideId: c.rideId, userId: c.userId, status: 'emergency', at: Date.now(), tappedAt: Date.parse(newest.tapped_at), name: c.name, source: 'ride' }, null).then(() => endByTap(old));
       } else if (newest.status !== 'emergency') noteRiderTap(c.rideId, c.userId, newest);
     }
   }));

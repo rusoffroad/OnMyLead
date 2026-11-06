@@ -1099,8 +1099,15 @@ export default function RideMode() {
   // of this ride even if Pro runs out, so EMERGENCY and then I'm OK always go from the car.
   const carPlayPro = useCan('carplay');
   const carRideShown = useRef(false);
+  const carCleared = useRef(false);
   useEffect(() => {
-    if (!carPlayPro && !carRideShown.current) return clearCarPlay();
+    // On Free, clear the car screen once, not on every rider update.
+    if (!carPlayPro && !carRideShown.current) {
+      if (!carCleared.current) clearCarPlay();
+      carCleared.current = true;
+      return;
+    }
+    carCleared.current = false;
     if (ride) {
       showRideOnCarPlay(JSON.parse(carKey));
       // Only a real Pro answer counts (before the plan has loaded every feature reads as on).

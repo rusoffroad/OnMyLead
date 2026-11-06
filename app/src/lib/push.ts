@@ -40,7 +40,7 @@ Notifications.setNotificationHandler({
     // On iPhone and iPad it stays in Notification Center without sound, so it's still there if the
     // screen locks before the rider looks. Not in the tray on Android, where the siren channel
     // would play its own siren over the app's.
-    if (call && AppState.currentState !== 'background' && (await sirenWillSound(call, registeredFor))) return { shouldShowBanner: false, shouldShowList: Platform.OS === 'ios', shouldPlaySound: false, shouldSetBadge: false };
+    if (call && AppState.currentState !== 'background' && (await sirenWillSound(call, pushUser))) return { shouldShowBanner: false, shouldShowList: Platform.OS === 'ios', shouldPlaySound: false, shouldSetBadge: false };
     // On Android a push the server sent on the siren channel (its `siren` flag) plays the alarm if
     // it's posted at all, so the cases below keep it out of the tray there.
     const pushSiren = (data as { siren?: unknown } | undefined)?.siren === true;
@@ -64,6 +64,9 @@ Notifications.setNotificationHandler({
 });
 
 let registeredFor: string | null = null;
+/** The signed-in rider, for the push handler (their own EMERGENCY never sounds here). Unlike
+ * registeredFor it stays set while a failed registration waits to be tried again. */
+let pushUser: string | null = null;
 /** This phone's push token, once registered, so the siren switch can be sent with it. */
 let myToken: string | null = null;
 
@@ -140,6 +143,7 @@ setBackgroundSirenNotifier((c: EmergencyCall, plain?: boolean, quiet?: boolean) 
  * often: it does the work once per account per app launch, and never throws.
  */
 export async function registerForPush(userId: string): Promise<void> {
+  pushUser = userId;
   if (registeredFor === userId) return;
   registeredFor = userId;
   try {
@@ -217,6 +221,7 @@ async function createAndroidChannels() {
 /** Forget the registration so the next sign-in registers again. */
 export function resetPushRegistration() {
   registeredFor = null;
+  pushUser = null;
   // Signed out: the token belongs to no account until it registers again, so the switch isn't sent.
   myToken = null;
 }
@@ -267,7 +272,7 @@ function sirenFromPush(data: TapData | undefined) {
     && typeof d.userId === 'string' && typeof d.tappedAt === 'string' && typeof d.status === 'string')
     return noteRiderTap(d.rideId, d.userId, { id: d.itemId, status: d.status, tapped_at: d.tappedAt });
   const e = emergencyFromPush(data);
-  if (e) raiseEmergency(e, registeredFor);
+  if (e) void raiseEmergency(e, pushUser);
 }
 
 /** The EMERGENCY call a push carries, or null. */
