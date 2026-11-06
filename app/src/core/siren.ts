@@ -126,26 +126,36 @@ export function dropCall(calls: readonly EmergencyCall[], id: string): Emergency
 }
 
 /**
- * Whether a status tap that reached this phone is newer than the one already known for that rider
- * (a different tap, tapped at the same time or later). An older one relayed late changes nothing.
+ * Which of two tap times is later: 1 when `b` is, -1 when `a` is, 0 when it can't be told. Bluetooth
+ * carries tap times to the whole second and the server to the millisecond, so milliseconds count
+ * only when both times have them; otherwise the same second is a tie.
  */
-export function isNewerTap(known: { id?: string | null; tapped_at: string } | undefined, incoming: { id?: string | null; tapped_at: string }): boolean {
-  if (!known) return true;
-  // Whole seconds: Bluetooth carries tap times to the second, the server to the millisecond.
-  const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000);
-  return known.id !== incoming.id && sec(known.tapped_at) <= sec(incoming.tapped_at);
+export function tapOrder(a: number, b: number): -1 | 0 | 1 {
+  const exact = a % 1000 !== 0 && b % 1000 !== 0;
+  const x = exact ? a : Math.floor(a / 1000);
+  const y = exact ? b : Math.floor(b / 1000);
+  return y > x ? 1 : y < x ? -1 : 0;
 }
 
 /**
- * Each rider's newest tap from rows newest upload first, by tap time in whole seconds (as
- * isNewerTap counts). In a tie the newer upload stays, as it would have arrived last live.
+ * Whether a status tap that reached this phone is newer than the one already known for that rider.
+ * An older one relayed late changes nothing, and neither does one that can't be told apart (the same
+ * second over Bluetooth), so every phone settles on the same tap.
+ */
+export function isNewerTap(known: { id?: string | null; tapped_at: string } | undefined, incoming: { id?: string | null; tapped_at: string }): boolean {
+  if (!known) return true;
+  return known.id !== incoming.id && tapOrder(Date.parse(known.tapped_at), Date.parse(incoming.tapped_at)) > 0;
+}
+
+/**
+ * Each rider's newest tap from rows newest upload first, by tap time (tapOrder). In a tie the newer
+ * upload stays.
  */
 export function newestTapPerRider<T extends { user_id: string; tapped_at: string }>(rows: readonly T[]): Record<string, T> {
   const out: Record<string, T> = {};
-  const sec = (iso: string) => Math.floor(Date.parse(iso) / 1000);
   for (const r of rows) {
     const p = out[r.user_id];
-    if (!p || sec(r.tapped_at) > sec(p.tapped_at)) out[r.user_id] = r;
+    if (!p || tapOrder(Date.parse(p.tapped_at), Date.parse(r.tapped_at)) > 0) out[r.user_id] = r;
   }
   return out;
 }
@@ -167,13 +177,11 @@ export function endedCalls(
       const s = latest[c.userId];
       if (!s?.id) return false;
       if (s.id === c.id) return s.status !== 'emergency';
-      // Whole seconds (Bluetooth carries tap times to the second). A different tap in the same
-      // second can't be told apart from one just before, so only a later second ends the call.
-      // Without the tap time (an older server), `at` is when it got here on this phone's clock and
+      // A tap that is later (tapOrder) ends it; one that can't be told apart doesn't. Without the tap time (an older server), `at` is when it got here on this phone's clock and
       // the status is on the sender's: only a tap a full minute later counts, so clocks a little
       // apart don't end it at once.
       if (c.tappedAt == null) return s.at > c.at + 60_000;
-      return Math.floor(s.at / 1000) > Math.floor(c.tappedAt / 1000);
+      return tapOrder(c.tappedAt, s.at) > 0;
     })
     .map((c) => c.id);
 }

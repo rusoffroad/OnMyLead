@@ -104,15 +104,18 @@ describe('late arrivals', () => {
 
 describe('isNewerTap', () => {
   const t = (id: string, iso: string) => ({ id, tapped_at: iso });
-  it('takes a different tap at the same time or later, never an older one or the same one again', () => {
+  it('takes a later different tap, never an older one, the same one again, or one it can’t tell apart', () => {
     expect(isNewerTap(undefined, t('a', '2026-11-06T10:00:00Z'))).toBe(true);
     expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('b', '2026-11-06T10:03:00Z'))).toBe(true);
-    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('b', '2026-11-06T10:00:00Z'))).toBe(true);
+    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('b', '2026-11-06T10:00:00Z'))).toBe(false);
     // An EMERGENCY relayed late, after the rider's I'm OK.
     expect(isNewerTap(t('ok', '2026-11-06T10:03:00Z'), t('sos', '2026-11-06T10:00:00Z'))).toBe(false);
     expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('a', '2026-11-06T10:05:00Z'))).toBe(false);
-    // Bluetooth to the second against the server to the millisecond: the same second counts as newer.
-    expect(isNewerTap(t('sos', '2026-11-06T10:00:00.700Z'), t('ok', '2026-11-06T10:00:00.000Z'))).toBe(true);
+    // Bluetooth to the second against the server to the millisecond: the same second is a tie, kept.
+    expect(isNewerTap(t('ok', '2026-11-06T10:00:00.800Z'), t('sos', '2026-11-06T10:00:00.000Z'))).toBe(false);
+    // Both to the millisecond: the order is known even inside one second.
+    expect(isNewerTap(t('sos', '2026-11-06T10:00:00.200Z'), t('ok', '2026-11-06T10:00:00.900Z'))).toBe(true);
+    expect(isNewerTap(t('ok', '2026-11-06T10:00:00.900Z'), t('sos', '2026-11-06T10:00:00.200Z'))).toBe(false);
   });
 });
 
@@ -143,6 +146,10 @@ describe('endedCalls', () => {
     const viaPush = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: NOW }];
     expect(endedCalls(viaPush, 'r1', { u1: { id: 'stop', status: 'stopped', at: NOW + 3000 } })).toEqual([]);
     expect(endedCalls(viaPush, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW + 61_000 } })).toEqual(['sos']);
+  });
+  it('ends on an I’m OK later in the same second when both times have milliseconds', () => {
+    const sos = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: 1_000_200, tappedAt: 1_000_200 }];
+    expect(endedCalls(sos, 'r1', { u1: { id: 'ok', status: 'ok', at: 1_000_900 } })).toEqual(['sos']);
   });
   it('only looks at calls on this ride', () => {
     expect(endedCalls(calls, 'r1', { u3: { id: 'n', status: 'ok', at: NOW + 1 } })).toEqual([]);
