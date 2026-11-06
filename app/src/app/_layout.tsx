@@ -16,6 +16,7 @@ import { Platform } from 'react-native';
 
 import { DirectionsHost } from '@/components/directions';
 import { EmergencySiren } from '@/components/emergency-siren';
+import { LaunchCover } from '@/components/launch-cover';
 import { MessageAlerts } from '@/components/message-alerts';
 import { ProGateHost } from '@/components/pro-gate';
 import { TabletProGate } from '@/components/tablet-pro-gate';
@@ -125,7 +126,10 @@ function RootLayout() {
 
   useEffect(() => {
     if (!ready) return;
-    const t = setTimeout(() => SplashScreen.hideAsync().catch(() => {}), Math.max(0, SPLASH_MIN_MS - (Date.now() - launchedAt)));
+    // On the phone apps the native launch screen hands over to LaunchCover (the same picture plus
+    // the version) as soon as the app can draw; the cover keeps the logo up for the minimum.
+    const wait = Platform.OS === 'web' ? Math.max(0, SPLASH_MIN_MS - (Date.now() - launchedAt)) : 0;
+    const t = setTimeout(() => SplashScreen.hideAsync().catch(() => {}), wait);
     return () => clearTimeout(t);
   }, [ready]);
 
@@ -222,6 +226,8 @@ function RootLayout() {
       <RiderAgreementGate />
       {/* The owner's minimum version (Admin Dashboard > Releases), over everything, with Not Now. */}
       <UpdateRequired />
+      {/* A copy of the launch screen with the app's version, over everything until launch ends. */}
+      <LaunchCover until={launchedAt + SPLASH_MIN_MS} />
     </ThemeProvider>
   );
 }

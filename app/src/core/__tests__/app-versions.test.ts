@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { NO_SETTINGS, parseAppSettings } from '../app-settings';
 import {
   compareVersions, isVersion, newestVersion, NO_VERSIONS, noticeForVersion, parseAppStoreLookup, parseAppVersions, parsePlayPage,
-  updateState, versionsProblem, versionsValue,
+  updateState, versionLabel, versionsProblem, versionsValue,
   type AppVersions,
 } from '../app-versions';
 
@@ -133,5 +133,23 @@ describe('store version (automatic Update Available)', () => {
     expect(newestVersion('1.0.10', '1.0.9')).toBe('1.0.10');
     expect(newestVersion(null, 'x')).toBeNull();
     expect(newestVersion(undefined, '1.1')).toBe('1.1');
+  });
+});
+
+describe('versionLabel', () => {
+  it('shows the version and build number', () => {
+    expect(versionLabel('2.1', '10')).toBe('2.1 (10)');
+    expect(versionLabel('2.1.1', 11)).toBe('2.1.1 (11)');
+  });
+
+  it('shows the version alone when the build is unknown', () => {
+    expect(versionLabel('2.1', null)).toBe('2.1');
+    expect(versionLabel('2.1', ' ')).toBe('2.1');
+  });
+
+  it('shows nothing without a version (the website)', () => {
+    expect(versionLabel(null, '10')).toBeNull();
+    expect(versionLabel(undefined, undefined)).toBeNull();
+    expect(versionLabel('', '10')).toBeNull();
   });
 });

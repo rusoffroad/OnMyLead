@@ -40,6 +40,7 @@ import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useTheme } from '@/hooks/use-theme';
 import { deleteRide, discoverPublicRides, getMembers, leaveRide, myRideName, myRides, publicRidesNear } from '@/lib/api';
 import { useAppSettings } from '@/lib/app-settings';
+import { appVersionLabel } from '@/lib/app-update';
 import { fetchMyBadges } from '@/lib/badges';
 import { confirmAsync, showNotice } from '@/lib/confirm';
 import { useEntitlements } from '@/lib/entitlements';
@@ -247,6 +248,7 @@ export default function HomeScreen() {
   const friendsOut = outIds.size;
 
   const name = firstName(rideName);
+  const versionLine = appVersionLabel();
   const narrowColumn = layout.expanded;
   const railWidth = narrowColumn ? 250 : Math.min(300, Math.round(Math.min(layout.width, 800) * 0.72));
 
@@ -518,6 +520,8 @@ export default function HomeScreen() {
             </>
           )}
           <ErrorText error={error} />
+          {/* The app's version and build number, small at the very bottom (phone apps only). */}
+          {versionLine ? <Text style={styles.version} accessibilityLabel={t('Version {v}', { v: versionLine })}>{t('Version {v}', { v: versionLine })}</Text> : null}
         </View>
       </Screen>
       {sheets}
@@ -552,6 +556,7 @@ const styles = themedStyles(() => ({
   lead: { gap: 12 },
   live: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, borderWidth: 2, borderColor: Colors.accent, padding: 14, backgroundColor: Home.panel },
   liveDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.accent },
+  version: { color: Home.muted, fontFamily: font(500), fontSize: 12, lineHeight: 16, textAlign: 'center', opacity: 0.7, marginTop: -12 },
   nudge: {
     flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, padding: 14, borderLeftWidth: 4, borderLeftColor: Colors.sky,
     backgroundColor: Home.panel,
