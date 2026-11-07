@@ -4,7 +4,7 @@ summary: Plan a ride on onmylead.com from your computer, drop the meeting point 
 category: rides
 order: 20
 release: web
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/app/ride/[id]/edit.tsx
   - app/src/app/ride/new.tsx

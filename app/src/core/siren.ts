@@ -28,7 +28,7 @@ export const SIREN_SETTING_KEY = 'alerts.siren.v1';
  */
 export const SIREN_FRESH_MS = 10 * 60_000;
 /** How many silenced alerts are remembered on the phone, so a restart doesn't sound them again. */
-export const SIREN_REMEMBER = 100;
+export const SIREN_REMEMBER = 500;
 
 /** Off only when the rider turned it off. */
 export function parseSirenSetting(v: string | null | undefined): boolean {
@@ -43,8 +43,10 @@ export type EmergencyCall = {
   id: string;
   rideId: string;
   userId: string;
-  /** When it was tapped, ms since 1970. */
+  /** When it was tapped, ms since 1970 (for a push: when it arrived, so a late upload still sounds). */
   at: number;
+  /** When the rider tapped it, when known apart from `at` (a push): a later tap of theirs ends it. */
+  tappedAt?: number;
   /** The rider's name, when known. */
   name?: string | null;
   /** Sent by a Crash Alert (Bluetooth carries this flag; the internet path says so in the chat line). */
@@ -71,15 +73,45 @@ export function shouldSound(
  */
 export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): EmergencyCall[] {
   if (calls.some((x) => x.id === c.id)) {
-    // Fill in what the first copy didn't know (a name, the crash flag).
-    return calls.map((x) =>
-      x.id === c.id
-        ? { ...x, userId: isUnknownRider(x.userId) ? c.userId : x.userId, name: x.name || c.name, possibleCrash: x.possibleCrash || c.possibleCrash }
-        : x,
-    );
+    // Fill in what the first copy didn't know (the rider, a name, the crash flag, the earliest tap
+    // time: a push that came without one has only its arrival time). Unchanged: the same list back.
+    let changed = false;
+    const next = calls.map((x) => {
+      if (x.id !== c.id) return x;
+      const was = x.tappedAt ?? x.at;
+      const tapped = Math.min(was, c.tappedAt ?? c.at);
+      const merged: EmergencyCall = {
+        ...x,
+        userId: isUnknownRider(x.userId) ? c.userId : x.userId,
+        name: x.name || c.name,
+        possibleCrash: x.possibleCrash || c.possibleCrash ? true : x.possibleCrash,
+        tappedAt: tapped === was ? x.tappedAt : tapped,
+      };
+      changed = merged.userId !== x.userId || merged.name !== x.name || merged.possibleCrash !== x.possibleCrash || merged.tappedAt !== x.tappedAt;
+      return changed ? merged : x;
+    });
+    // A merged tap time can change which call is newest.
+    return changed ? next.sort((a, b) => (b.tappedAt ?? b.at) - (a.tappedAt ?? a.at)) : (calls as EmergencyCall[]);
   }
+  // An older call from the same rider arriving late doesn't replace their newer one.
+  const mine = calls.find((x) => x.rideId === c.rideId && x.userId === c.userId);
+  // Same rule as every other tap order (tapOrder); a tie keeps the call already sounding.
+  if (mine && tapOrder(c.tappedAt ?? c.at, mine.tappedAt ?? mine.at) >= 0) return calls as EmergencyCall[];
   const rest = calls.filter((x) => !(x.rideId === c.rideId && x.userId === c.userId));
-  return [c, ...rest].sort((a, b) => b.at - a.at);
+  // Newest tap first (tap time where known: a push's `at` is when it arrived).
+  return [c, ...rest].sort((a, b) => (b.tappedAt ?? b.at) - (a.tappedAt ?? a.at));
+}
+
+/** How late a push may arrive and still count as news (a tap uploaded late after no service). */
+export const PUSH_LATE_MAX_MS = 60 * 60_000;
+
+/**
+ * The time a pushed EMERGENCY counts from for sounding: when it arrived, so a tap uploaded late
+ * (say a Crash Alert with no service) still sounds, but not one tapped over an hour ago (a push the
+ * phone only got after hours with no signal), which counts from its tap time and stays quiet.
+ */
+export function pushCallAt(tappedAt: number | undefined, now: number): number {
+  return tappedAt != null && Number.isFinite(tappedAt) && now - tappedAt > PUSH_LATE_MAX_MS ? tappedAt : now;
 }
 
 /**
@@ -89,11 +121,58 @@ export function addCall(calls: readonly EmergencyCall[], c: EmergencyCall): Emer
 export function unknownRider(id: string): string {
   return `item:${id}`;
 }
-const isUnknownRider = (userId: string) => userId.startsWith('item:');
+export const isUnknownRider = (userId: string) => userId.startsWith('item:');
 
 /** Drops a call: the rider took it back, or tapped another status since. */
 export function dropCall(calls: readonly EmergencyCall[], id: string): EmergencyCall[] {
   return calls.filter((x) => x.id !== id);
+}
+
+/**
+ * Which of two tap times is later: 1 when `b` is, -1 when `a` is, 0 when it can't be told. Bluetooth
+ * carries tap times to the whole second and the server to the millisecond, so milliseconds count
+ * only when both times have them; otherwise the same second is a tie.
+ */
+export function tapOrder(a: number, b: number): -1 | 0 | 1 {
+  const exact = a % 1000 !== 0 && b % 1000 !== 0;
+  const x = exact ? a : Math.floor(a / 1000);
+  const y = exact ? b : Math.floor(b / 1000);
+  return y > x ? 1 : y < x ? -1 : 0;
+}
+
+type Tap = { id?: string | null; tapped_at: string; status?: string };
+
+/**
+ * When two taps can't be told apart (the same second over Bluetooth), the one that isn't EMERGENCY
+ * wins: a rider who taps EMERGENCY by mistake taps I'm OK right after, almost never the other way.
+ */
+function tieGoesTo(known: { status?: string }, incoming: { status?: string }): boolean {
+  return known.status === 'emergency' && !!incoming.status && incoming.status !== 'emergency';
+}
+
+/**
+ * Whether a status tap that reached this phone is newer than the one already known for that rider.
+ * An older one relayed late changes nothing; an EMERGENCY against another tap in a tie follows
+ * tieGoesTo on every phone. (Two other taps in one second keep whichever was heard first.)
+ */
+export function isNewerTap(known: Tap | undefined, incoming: Tap): boolean {
+  if (!known) return true;
+  if (known.id === incoming.id) return false;
+  const o = tapOrder(Date.parse(known.tapped_at), Date.parse(incoming.tapped_at));
+  return o > 0 || (o === 0 && tieGoesTo(known, incoming));
+}
+
+/**
+ * Each rider's newest tap from rows newest upload first, by the same rule as isNewerTap (in a full
+ * tie the newer upload stays).
+ */
+export function newestTapPerRider<T extends { user_id: string; tapped_at: string; id?: string | null; status?: string }>(rows: readonly T[]): Record<string, T> {
+  const out: Record<string, T> = {};
+  for (const r of rows) {
+    const p = out[r.user_id];
+    if (!p || isNewerTap(p, r)) out[r.user_id] = r;
+  }
+  return out;
 }
 
 /**
@@ -113,7 +192,12 @@ export function endedCalls(
       const s = latest[c.userId];
       if (!s?.id) return false;
       if (s.id === c.id) return s.status !== 'emergency';
-      return s.at > c.at;
+      // A tap that is later (tapOrder) ends it; one that can't be told apart doesn't. Without the tap time (an older server), `at` is when it got here on this phone's clock and
+      // the status is on the sender's: only a tap a full minute later counts, so clocks a little
+      // apart don't end it at once.
+      if (c.tappedAt == null) return s.at > c.at + 60_000;
+      const o = tapOrder(c.tappedAt, s.at);
+      return o > 0 || (o === 0 && s.status !== 'emergency');
     })
     .map((c) => c.id);
 }

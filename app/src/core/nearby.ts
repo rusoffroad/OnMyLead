@@ -902,11 +902,11 @@ export function nearbyPower(s: { online: boolean; peers: number; batterySaver: b
 
 /**
  * What a phone on Free does with Bluetooth Sharing (2.1, Bluetooth Sharing is Pro): it still passes
- * every packet along for the group (relay), and still sends and hears the safety alerts, EMERGENCY,
- * Need Help and a Crash Alert. Seeing riders' spots, sending its own spot, other status taps and
- * messages over Bluetooth are Pro.
+ * every packet along for the group (relay), and still sends and hears status taps, so EMERGENCY,
+ * Need Help and a Crash Alert get through, and so does the I'm OK (or any later tap) that ends one,
+ * whatever order the packets arrive in. Seeing riders' spots, sending its own spot and messages
+ * over Bluetooth are Pro.
  */
-export function nearbyFreeAllows(item: { kind: string; status?: string; flags?: number }): boolean {
-  if (item.kind !== 'status') return false;
-  return item.status === 'emergency' || item.status === 'need_help' || ((item.flags ?? 0) & FLAG_POSSIBLE_CRASH) === FLAG_POSSIBLE_CRASH;
+export function nearbyFreeAllows(item: { kind: string }): boolean {
+  return item.kind === 'status';
 }

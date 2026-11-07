@@ -67,13 +67,21 @@ describe('CarPlay on Free', () => {
   });
 });
 
+describe('CarPlay on Free', () => {
+  it('lets EMERGENCY through without Pro, nothing else', async () => {
+    const { carPlayActionAllowed } = await import('../carplay');
+    expect(carPlayActionAllowed({ type: 'emergency' }, false)).toBe(true);
+    expect(carPlayActionAllowed({ type: 'status', kind: 'emergency' }, false)).toBe(true);
+    expect(carPlayActionAllowed({ type: 'status', kind: 'ok' }, false)).toBe(false);
+    expect(carPlayActionAllowed({ type: 'regroup' }, false)).toBe(false);
+    expect(carPlayActionAllowed({ type: 'regroup' }, true)).toBe(true);
+  });
+});
+
 describe('Bluetooth on Free (relay only)', () => {
-  it('still sends and shows EMERGENCY, Need Help and Crash Alerts, nothing else', async () => {
-    const { nearbyFreeAllows, FLAG_POSSIBLE_CRASH } = await import('../nearby');
-    expect(nearbyFreeAllows({ kind: 'status', status: 'emergency' })).toBe(true);
-    expect(nearbyFreeAllows({ kind: 'status', status: 'need_help' })).toBe(true);
-    expect(nearbyFreeAllows({ kind: 'status', status: 'ok', flags: FLAG_POSSIBLE_CRASH })).toBe(true);
-    expect(nearbyFreeAllows({ kind: 'status', status: 'flat_tire' })).toBe(false);
+  it('still sends and shows status taps (so I\'m OK always ends an EMERGENCY), not spots or messages', async () => {
+    const { nearbyFreeAllows } = await import('../nearby');
+    expect(nearbyFreeAllows({ kind: 'status' })).toBe(true);
     expect(nearbyFreeAllows({ kind: 'position' })).toBe(false);
     expect(nearbyFreeAllows({ kind: 'reply' })).toBe(false);
   });

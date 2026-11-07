@@ -46,6 +46,27 @@ begin
 end $$;
 reset role;
 
+-- A Free owner can't add a group photo straight through the API (20261106010000); taking one down stays free.
+-- As in production, riders can't call pro_required itself (privacy_test grants every function
+-- for the suite): the photo guard has to go through require_my_feature.
+revoke execute on function pro_required(uuid, text) from anon, authenticated;
+alter table riding_groups disable trigger riding_groups_pro;
+insert into riding_groups (id, owner_id, name, invite_code)
+values ('d81d81d8-1d81-4d81-8d81-d81d81d81d81', '00000000-0000-0000-0000-000000000d81', 'Tia Crew', 'TIACREW001');
+alter table riding_groups enable trigger riding_groups_pro;
+select as_user('00000000-0000-0000-0000-000000000d81');
+set role authenticated;
+select expect_error($q$update riding_groups set photo_path = '00000000-0000-0000-0000-000000000d81/d81d81d8-1d81-4d81-8d81-d81d81d81d81-a-1.jpg' where id = 'd81d81d8-1d81-4d81-8d81-d81d81d81d81'$q$, 'pro_required:group_photos%', 'Free owner sets a group photo');
+update riding_groups set photo_path = null where id = 'd81d81d8-1d81-4d81-8d81-d81d81d81d81';
+reset role;
+alter table riding_groups disable trigger riding_groups_pro;
+select as_user('00000000-0000-0000-0000-000000000d81');
+set role authenticated;
+select expect_error($q$insert into riding_groups (owner_id, name, invite_code, photo_path) values ('00000000-0000-0000-0000-000000000d81', 'Sneaky', 'SNEAKY0001', '00000000-0000-0000-0000-000000000d81/x-1.jpg')$q$, 'pro_required:group_photos%', 'Free owner makes a group with a photo');
+reset role;
+alter table riding_groups enable trigger riding_groups_pro;
+delete from riding_groups where id = 'd81d81d8-1d81-4d81-8d81-d81d81d81d81';
+
 -- Admin moves CarPlay to Free (the way back if Apple objects), then it's put back.
 select as_session('00000000-0000-0000-0000-000000000d82', 'aal2');
 set role authenticated;

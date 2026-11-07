@@ -8,9 +8,9 @@ import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrai
 import { drawableParkTrails, outsideParks, PARK_NAMES_MIN_Z, PARK_TRAILS_MIN_Z, parkTrailLabels, parksInView, type ParkLabel, type ParkSummary, type ParkTrail } from '@/core/park-trails';
 import { terrainBoxes } from '@/core/offline-maps';
 import { lookFor, mapboxDraws, type MapLook } from '@/core/terrain';
-import { anyLand, anyTrails, defaultFeatures, featureKey, readFeatures, type AgencyLayer, type FeatureChoices, type MapFeatureId } from '@/core/map-features';
+import { anyLand, LAND_FEATURES, anyTrails, defaultFeatures, featureKey, readFeatures, type AgencyLayer, type FeatureChoices, type MapFeatureId } from '@/core/map-features';
 import {
-  landShowsAt, LAND_SOURCE_IDS, LAND_SOURCES, mapZoom, metersPerPoint, sourceFeatures, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate,
+  landShowsAt, PARCELS_MIN_Z, LAND_SOURCE_IDS, LAND_SOURCES, mapZoom, metersPerPoint, sourceFeatures, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate,
   type BaseMap, type ClosedLine, type LandInfo, type TrailInfo, type TrailSourceId,
 } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
@@ -439,7 +439,10 @@ export function useTrailMap(): TrailMap {
       setLand(null);
       const f = featuresRef.current;
       // Land isn't drawn far out (core/trails LAND_MIN_Z), so a tap there can't be on it.
-      const landOn = layersPro && anyLand(f) && !!region.current && landShowsAt(zoomNow.current ?? mapZoom(region.current, width.current));
+      const zNow = region.current ? zoomNow.current ?? mapZoom(region.current, width.current) : 0;
+      // Property lines alone draw only from PARCELS_MIN_Z (the same rule as landZoomHint).
+      const onlyParcels = LAND_FEATURES.every((k) => k === 'private' || !f[k]);
+      const landOn = layersPro && anyLand(f) && !!region.current && landShowsAt(zNow) && !(onlyParcels && zNow < PARCELS_MIN_Z);
       // Nothing under the finger but land: say whose land it is.
       const lookLand = (id: number) => {
         if (!landOn) return;
@@ -560,7 +563,8 @@ export function useTrailMap(): TrailMap {
     land,
     clearLand: () => setLand(null),
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
-    landZoomHint: anyLand(features) && !landShowsAt(zoom),
+    // Property lines alone draw only from PARCELS_MIN_Z, so the hint stays until then.
+    landZoomHint: anyLand(features) && (!landShowsAt(zoom) || (LAND_FEATURES.every((f) => f === 'private' || !features[f]) && zoom < PARCELS_MIN_Z)),
     osmLines: trails ? osmShown : [],
     labels: trails ? labelsShown : [],
     closedLines: features.closed ? closedShown : [],

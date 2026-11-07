@@ -113,6 +113,11 @@ export type CarPlayAction =
   | { type: 'emergency' }
   | { type: 'none' };
 
+/** CarPlay is Pro (2.1), but EMERGENCY from the car always goes, even if Pro ran out mid-ride. */
+export function carPlayActionAllowed(a: CarPlayAction, carPlayPro: boolean): boolean {
+  return carPlayPro || a.type === 'emergency' || (a.type === 'status' && a.kind === 'emergency');
+}
+
 export function parseCarPlayAction(id: string): CarPlayAction {
   if (id.startsWith('status:')) return { type: 'status', kind: id.slice(7) };
   if (id.startsWith('reply:')) return { type: 'reply', body: id.slice(6) };

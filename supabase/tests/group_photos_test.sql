@@ -2,6 +2,10 @@
 -- after admin_test.sql (as_admin_session, the admin Chris …ad01). Each block raises an exception
 -- if a rule is broken.
 
+-- As in production, riders can't call pro_required itself (privacy_test grants every function for
+-- the suite). The photo guard runs as the rider, so it must go through require_my_feature.
+revoke execute on function pro_required(uuid, text) from anon, authenticated;
+
 insert into auth.users (id, raw_user_meta_data) values
   ('00000000-0000-0000-0000-0000000b7a01', '{"full_name":"Olive Owner"}'),
   ('00000000-0000-0000-0000-0000000b7a02', '{"full_name":"Max Member"}'),
@@ -72,6 +76,7 @@ set role authenticated;
 select expect_refused($q$update riding_groups set photo_path = '00000000-0000-0000-0000-0000000b7a02/x.jpg' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo in someone else''s folder');
 select expect_refused($q$update riding_groups set photo_path = 'https://evil.example/x.jpg' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo pointed at another site');
 select expect_refused($q$update riding_groups set photo_path = '00000000-0000-0000-0000-0000000b7a01/../x.jpg' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo path escapes the folder');
+select expect_refused($q$update riding_groups set photo_path = '00000000-0000-0000-0000-0000000b7a01/..' where id = 'b7a0b7a0-b7a0-4b7a-8b7a-b7a0b7a0b7a0'$q$, 'group photo file named ..');
 reset role;
 
 -- GP5. Olive removes it, then sets a new one.

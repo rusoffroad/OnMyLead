@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { confirmAsync } from '@/lib/confirm';
-import { requirePro } from '@/lib/pro';
+import { requirePro, handleProError } from '@/lib/pro';
 import { canUseGroupCamera, pickGroupPhoto, removeGroupPhoto, saveGroupPhoto, type GroupPhotoSource } from '@/lib/group-photos';
 import { t } from '@/lib/i18n';
 
@@ -35,7 +35,8 @@ export function GroupPhotoEditor({
       await onChanged();
       setDone(uri ? t('Group photo changed.') : t('Group photo saved. Everyone in the group sees it.'));
     } catch (e) {
-      setError((e as Error).message);
+      // The server says Pro is needed (a plan that just ended): the Pro prompt, not the raw code.
+      if (!handleProError(e)) setError((e as Error).message);
     } finally {
       setBusy(null);
     }

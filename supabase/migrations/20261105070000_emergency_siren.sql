@@ -27,3 +27,16 @@ $$;
 
 revoke all on function set_push_siren(text, boolean) from public, anon;
 grant execute on function set_push_siren(text, boolean) to authenticated;
+
+-- A phone that another account signs in on (the same token registered again for a different
+-- rider) starts over at null, the plain sound, until that rider's app sends its own switch: the
+-- last rider's choice never carries over to the next.
+create or replace function push_tokens_siren_owner() returns trigger language plpgsql set search_path = public as $$
+begin
+  if new.user_id is distinct from old.user_id then new.siren := null; end if;
+  return new;
+end;
+$$;
+drop trigger if exists push_tokens_siren_owner on push_tokens;
+create trigger push_tokens_siren_owner before update of user_id on push_tokens
+  for each row execute function push_tokens_siren_owner();

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  addCall, dropCall, endedCalls, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
+  addCall, dropCall, endedCalls, isNewerTap, newestTapPerRider, pushCallAt, PUSH_LATE_MAX_MS, parseSirenSetting, rememberSilenced, shouldSound, unknownRider, sirenSettingValue, sirenText,
   SIREN_FRESH_MS, SIREN_REMEMBER, type EmergencyCall,
 } from '../siren';
 
@@ -63,7 +63,7 @@ describe('the list of calls', () => {
     let list = addCall([], { ...call('a', unknownRider('a')) });
     list = addCall(list, call('a', 'u1'));
     expect(list[0].userId).toBe('u1');
-    expect(endedCalls(list, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 1 } })).toEqual(['a']);
+    expect(endedCalls(list, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 61_000 } })).toEqual(['a']);
   });
   it('keeps one call per rider per ride: a newer one replaces the older', () => {
     let list = addCall([], call('a', 'u1', NOW - 5000));
@@ -77,10 +77,58 @@ describe('the list of calls', () => {
   });
 });
 
+describe('addCall merging', () => {
+  it('keeps the earliest tap time and gives the same list back when nothing changed', () => {
+    const push = { id: 'sos', rideId: 'r1', userId: 'u1', at: NOW };
+    const list = addCall([], push);
+    expect(addCall(list, push)).toBe(list);
+    // Ride Mode then hears the same tap with its real time: that becomes what ends it.
+    const merged = addCall(list, { ...push, at: NOW - 60_000 });
+    expect(merged[0].tappedAt).toBe(NOW - 60_000);
+    expect(endedCalls(merged, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW - 30_000 } })).toEqual(['sos']);
+  });
+});
+
+describe('late arrivals', () => {
+  it('a late push still sounds within the hour, an old one counts from its tap', () => {
+    expect(pushCallAt(NOW - 15 * 60_000, NOW)).toBe(NOW);
+    expect(pushCallAt(undefined, NOW)).toBe(NOW);
+    expect(pushCallAt(NOW - PUSH_LATE_MAX_MS - 1, NOW)).toBe(NOW - PUSH_LATE_MAX_MS - 1);
+  });
+  it('an older call from the same rider never replaces their newer one', () => {
+    const b = { id: 'b', rideId: 'r1', userId: 'u1', at: NOW, tappedAt: NOW - 60_000 };
+    const list = addCall([], b);
+    expect(addCall(list, { id: 'a', rideId: 'r1', userId: 'u1', at: NOW, tappedAt: NOW - 120_000 })).toBe(list);
+  });
+});
+
+describe('isNewerTap', () => {
+  const t = (id: string, iso: string) => ({ id, tapped_at: iso });
+  it('takes a later different tap, never an older one, the same one again, or one it can’t tell apart', () => {
+    expect(isNewerTap(undefined, t('a', '2026-11-06T10:00:00Z'))).toBe(true);
+    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('b', '2026-11-06T10:03:00Z'))).toBe(true);
+    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('b', '2026-11-06T10:00:00Z'))).toBe(false);
+    // An EMERGENCY relayed late, after the rider's I'm OK.
+    expect(isNewerTap(t('ok', '2026-11-06T10:03:00Z'), t('sos', '2026-11-06T10:00:00Z'))).toBe(false);
+    expect(isNewerTap(t('a', '2026-11-06T10:00:00Z'), t('a', '2026-11-06T10:05:00Z'))).toBe(false);
+    // Bluetooth to the second against the server to the millisecond: the same second is a tie, kept.
+    expect(isNewerTap(t('ok', '2026-11-06T10:00:00.800Z'), t('sos', '2026-11-06T10:00:00.000Z'))).toBe(false);
+    // Both to the millisecond: the order is known even inside one second.
+    expect(isNewerTap(t('sos', '2026-11-06T10:00:00.200Z'), t('ok', '2026-11-06T10:00:00.900Z'))).toBe(true);
+    expect(isNewerTap(t('ok', '2026-11-06T10:00:00.900Z'), t('sos', '2026-11-06T10:00:00.200Z'))).toBe(false);
+  });
+});
+
 describe('endedCalls', () => {
+  it('a push that arrived late is ended by any tap the rider made after tapping it', () => {
+    // Arrived (at) 15 minutes after the tap; the rider's I'm OK came 2 minutes after the tap.
+    const late = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: NOW, tappedAt: NOW - 15 * 60_000 }];
+    expect(endedCalls(late, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW - 13 * 60_000 } })).toEqual(['sos']);
+  });
+
   const calls = [call('a', 'u1', NOW - 60_000), call('b', 'u2', NOW - 60_000), call('x', 'u3', NOW, 'r2')];
   it('ends a call once the rider tapped something newer', () => {
-    expect(endedCalls(calls, 'r1', { u1: { id: 'n', status: 'ok', at: NOW } })).toEqual(['a']);
+    expect(endedCalls(calls, 'r1', { u1: { id: 'n', status: 'ok', at: NOW + 1000 } })).toEqual(['a']);
   });
   it('keeps it while Ride Mode still shows an older status (push got here first)', () => {
     expect(endedCalls(calls, 'r1', { u1: { id: 'old', status: 'stopped', at: NOW - 120_000 } })).toEqual([]);
@@ -88,6 +136,20 @@ describe('endedCalls', () => {
   it('keeps it while that EMERGENCY is still the rider’s status, or nothing is known yet', () => {
     expect(endedCalls(calls, 'r1', { u1: { id: 'a', status: 'emergency', at: NOW - 60_000 } })).toEqual([]);
     expect(endedCalls(calls, 'r1', {})).toEqual([]);
+  });
+  it('keeps it for a different tap in the same second (can’t tell which came first)', () => {
+    const sos = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: 1_000_900, tappedAt: 1_000_900 }];
+    expect(endedCalls(sos, 'r1', { u1: { id: 'stop', status: 'stopped', at: 1_000_200 } })).toEqual([]);
+    expect(endedCalls(sos, 'r1', { u1: { id: 'ok', status: 'ok', at: 1_001_000 } })).toEqual(['sos']);
+  });
+  it('without a tap time, a status a few seconds ahead (clocks apart) doesn’t end it', () => {
+    const viaPush = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: NOW }];
+    expect(endedCalls(viaPush, 'r1', { u1: { id: 'stop', status: 'stopped', at: NOW + 3000 } })).toEqual([]);
+    expect(endedCalls(viaPush, 'r1', { u1: { id: 'ok', status: 'ok', at: NOW + 61_000 } })).toEqual(['sos']);
+  });
+  it('ends on an I’m OK later in the same second when both times have milliseconds', () => {
+    const sos = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: 1_000_200, tappedAt: 1_000_200 }];
+    expect(endedCalls(sos, 'r1', { u1: { id: 'ok', status: 'ok', at: 1_000_900 } })).toEqual(['sos']);
   });
   it('only looks at calls on this ride', () => {
     expect(endedCalls(calls, 'r1', { u3: { id: 'n', status: 'ok', at: NOW + 1 } })).toEqual([]);
@@ -115,5 +177,33 @@ describe('sirenText', () => {
   it('counts the other riders waiting', () => {
     expect(sirenText({ name: 'Sam' }, 1).moreText).toBe('{n} more rider needs help');
     expect(sirenText({ name: 'Sam' }, 2).moreText).toBe('{n} more riders need help');
+  });
+});
+
+describe('newestTapPerRider', () => {
+  it('keeps the newest tap by tap time, not upload order; a tie keeps the newer upload', () => {
+    const rows = [
+      { id: 'sos', user_id: 'u1', tapped_at: '2026-11-06T12:00:00.400Z' }, // relayed, uploaded last
+      { id: 'ok', user_id: 'u1', tapped_at: '2026-11-06T12:00:20.000Z' },
+      { id: 'b2', user_id: 'u2', tapped_at: '2026-11-06T12:00:05.900Z' },
+      { id: 'b1', user_id: 'u2', tapped_at: '2026-11-06T12:00:05.000Z' },
+    ];
+    const out = newestTapPerRider(rows);
+    expect(out.u1.id).toBe('ok');
+    expect(out.u2.id).toBe('b2');
+  });
+});
+
+describe('same-second ties', () => {
+  const t = (id: string, at: string, status: string) => ({ id, tapped_at: at, status });
+  it('the tap that isn’t EMERGENCY wins a tie, whichever is heard first', () => {
+    const sos = t('sos', '2026-11-06T10:00:00Z', 'emergency');
+    const ok = t('ok', '2026-11-06T10:00:00Z', 'ok');
+    expect(isNewerTap(sos, ok)).toBe(true);
+    expect(isNewerTap(ok, sos)).toBe(false);
+    expect(newestTapPerRider([{ ...sos, user_id: 'u1' }, { ...ok, user_id: 'u1' }]).u1.id).toBe('ok');
+    expect(newestTapPerRider([{ ...ok, user_id: 'u1' }, { ...sos, user_id: 'u1' }]).u1.id).toBe('ok');
+    const call = [{ id: 'sos', rideId: 'r1', userId: 'u1', at: 1_000_000, tappedAt: 1_000_000 }];
+    expect(endedCalls(call, 'r1', { u1: { id: 'ok', status: 'ok', at: 1_000_000 } })).toEqual(['sos']);
   });
 });

@@ -44,7 +44,7 @@ const FEATURES: Record<string, { label: string; hint: string; allowance?: string
   themes: { label: 'Themes and Light Mode', hint: 'Dark and Color Blind Mode stay free.' },
   natural_voices: { label: 'Natural Voices', hint: 'Automatic voice stays free.' },
   tablet_web: { label: 'iPad, Android Tablets and the Website', hint: 'Joining rides and Ride Mode stay free everywhere.' },
-  bluetooth_sharing: { label: 'Bluetooth Sharing With No Service', hint: 'Spots, taps and messages over Bluetooth with no service. Free phones still relay, and EMERGENCY, Need Help and Crash Alerts stay free.' },
+  bluetooth_sharing: { label: 'Bluetooth Sharing With No Service', hint: 'Spots, taps and messages over Bluetooth with no service. Free phones still relay, and status taps (EMERGENCY, Need Help, Crash Alerts, I’m OK) stay free.' },
   custom_dot: { label: 'Customize Your Dot', hint: 'Dot Style and Dot Size. The default dot stays free.' },
   group_photos: { label: 'Group Photos', hint: 'Adding a riding group photo. Seeing group photos stays free.' },
   carplay: { label: 'CarPlay', hint: 'The ride on the car screen. Free shows a notice there; Ride Mode on the phone stays free.' },

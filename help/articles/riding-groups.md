@@ -4,7 +4,7 @@ summary: Save the people you ride with as a group, invite friends with a link, a
 category: groups
 order: 10
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-06
 sources:
   - app/src/core/pro.ts
   - app/src/app/(tabs)/groups.tsx

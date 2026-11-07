@@ -143,7 +143,8 @@ export async function leaveGroup(id: string) {
 }
 
 export async function deleteGroup(id: string) {
-  const row = unwrap<GroupRow | null>(await supabase.from('riding_groups').select('*').eq('id', id).maybeSingle());
+  // Only to find the photo file: a failed read doesn't stop the delete.
+  const { data: row } = await supabase.from('riding_groups').select('*').eq('id', id).maybeSingle<GroupRow>();
   unwrap(await supabase.from('riding_groups').delete().eq('id', id));
   if (row) await removeGroupPhotoFile(row.owner_id, row.photo_path);
   track('riding_group_deleted');

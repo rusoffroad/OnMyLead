@@ -28,8 +28,8 @@ export type RiderAgreement = {
 };
 
 export const RIDER_AGREEMENT: RiderAgreement = {
-  version: 1,
-  effective: 'November 3, 2026',
+  version: 2,
+  effective: 'November 6, 2026',
   title: 'Rider Safety and Liability Agreement',
   summary:
     'OnMyLead is a tool to help your group keep track of each other. You are in charge of your own safety. Please read this and agree before you ride.',
@@ -55,6 +55,11 @@ export const RIDER_AGREEMENT: RiderAgreement = {
         'Locations can be late, wrong or missing. Phones lose signal and batteries run out. Help, SOS and other alerts only reach riders in the app and may arrive late or not at all. Never rely on OnMyLead to keep you or anyone else safe. In an emergency, call 911 or your local emergency number.',
     },
     {
+      title: 'Always Call 911 in an Emergency',
+      body:
+        'The EMERGENCY button, Crash Alert, Need Help and the Emergency Siren only alert other riders on your ride who use OnMyLead. They do not call or text 911, police, fire, ambulance or any rescue service, and they can be late, missed or not work at all, for example with no signal, a dead battery or Bluetooth out of range. If you or anyone else is hurt, in danger or needs help, always call 911 or your local emergency number first, then use OnMyLead to tell your group.',
+    },
+    {
       title: 'You Are Responsible for What You Do',
       body:
         'You are responsible for your own actions, for how you ride and drive, and for any accident, injury or damage you cause while using OnMyLead. Leading, following or joining a ride does not make the leader, other riders or OnMyLead responsible for your safety.',
@@ -70,7 +75,7 @@ export const RIDER_AGREEMENT: RiderAgreement = {
         'If you are under 18, a parent or guardian must read and agree to this for you. This agreement is part of the OnMyLead Terms of Use, which also apply. If any part cannot be enforced where you live, the rest still applies. If you do not agree, do not use OnMyLead.',
     },
   ],
-  checkbox: 'I have read and agree to the Rider Safety and Liability Agreement, and I accept the risks of riding.',
+  checkbox: 'I have read and agree to the Rider Safety and Liability Agreement, I accept the risks of riding, and I will always call 911 in an emergency.',
 };
 
 /**

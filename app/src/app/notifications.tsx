@@ -120,7 +120,7 @@ export default function NotificationsScreen() {
         </View>
       </View>
 
-      {/* Emergency Siren (lib/siren): this device's choice, so it works before the server update too. */}
+      {/* Emergency Siren (lib/siren): kept on the phone, so it works before the server update too, and follows the account with Sync Across Devices. */}
       <View style={styles.card}>
         <ToggleRow
           first

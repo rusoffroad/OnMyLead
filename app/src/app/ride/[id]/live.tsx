@@ -31,7 +31,7 @@ import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-s
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
 import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
-import { carPlayState, parseCarPlayAction } from '@/core/carplay';
+import { carPlayActionAllowed, carPlayState, parseCarPlayAction } from '@/core/carplay';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
@@ -75,7 +75,7 @@ import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
-  activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, latestStatuses, myActiveShares, myVehicles,
+  activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, myActiveShares, myVehicles,
   setLeaderTrackline, startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
 import { useBatteryMode } from '@/lib/battery';
@@ -90,7 +90,8 @@ import {
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
-import { endEmergency, endStaleCalls, raiseEmergency } from '@/lib/siren';
+import { statusesAndCancels } from '@/lib/ride-taps';
+import { endStaleCalls, raiseEmergency, sirenHasCall, tapTakenBack } from '@/lib/siren';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { newChannel, supabase } from '@/lib/supabase';
@@ -98,6 +99,7 @@ import { bubbleRole, type Position, type RegroupPoint, type Ride, type RideMembe
 import { speak } from '@/lib/voice';
 import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
 import { can } from '@/core/entitlements';
+import { isNewerTap, newestTapPerRider, pushCallAt } from '@/core/siren';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
@@ -145,16 +147,20 @@ type RideSnapshot = {
   members: RideMember[];
   regroup: RegroupPoint | null;
   statuses: Record<string, TappedStatus>;
+  /** Taps taken back on this ride. */
+  cancelled: string[];
   positions: Record<string, Position>;
 };
 
 async function loadSnapshot(id: string): Promise<RideSnapshot> {
   await flushOutbox();
-  const [ride, members, regroup, st] = await Promise.all([getRide(id), getMembers(id), activeRegroup(id), latestStatuses(id)]);
-  const statuses: RideSnapshot['statuses'] = {};
-  for (const s of st) if (!statuses[s.user_id]) statuses[s.user_id] = s;
+  const [ride, members, regroup, taps] = await Promise.all([getRide(id), getMembers(id), activeRegroup(id), statusesAndCancels(id)]);
+  const st = taps.statuses;
+  // Each rider's newest tap by when it was tapped: a tap relayed and uploaded late (newer upload,
+  // older tap) never takes the place of the one the rider made after it.
+  const statuses: RideSnapshot['statuses'] = newestTapPerRider(st);
   const pos = await getPositions(members.filter((x) => x.status === 'joined').map((x) => x.user_id));
-  return { ride, members, regroup, statuses, positions: Object.fromEntries(pos.map((p) => [p.user_id, p])) };
+  return { ride, members, regroup, statuses, cancelled: taps.cancelled, positions: Object.fromEntries(pos.map((p) => [p.user_id, p])) };
 }
 
 export default function RideMode() {
@@ -194,6 +200,16 @@ export default function RideMode() {
   const [members, setMembers] = useState<RideMember[]>([]);
   const [positions, setPositions] = useState<Record<string, Position>>({});
   const [statuses, setStatuses] = useState<Record<string, TappedStatus>>({});
+  const statusesNow = useRef(statuses);
+  /** Taps their riders took back on this ride. */
+  const cancelledTaps = useRef(new Set<string>());
+  useEffect(() => {
+    // Keeps a newer tap the live handlers already put here (it may not have rendered yet), so an
+    // older Bluetooth copy can't count as newer in between.
+    const next = { ...statuses };
+    for (const [u, r] of Object.entries(statusesNow.current)) if (r && !(r.id && cancelledTaps.current.has(r.id)) && isNewerTap(next[u], r)) next[u] = r;
+    statusesNow.current = next;
+  }, [statuses]);
   const [regroup, setRegroup] = useState<RegroupPoint | null>(null);
   const [share, setShare] = useState<ActiveShare | null>(null);
   const [askShare, setAskShare] = useState(false);
@@ -221,6 +237,11 @@ export default function RideMode() {
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
   // The siren screen says "A rider" until the name is known (a call can arrive before the roster).
   const sirenName = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || null, [members]);
+  // For the live-update handler below, which doesn't restart when these change.
+  const sirenNow = useRef({ me, sirenName });
+  useEffect(() => {
+    sirenNow.current = { me, sirenName };
+  }, [me, sirenName]);
 
   // Waypoints: the leader's shared ones and this rider's own. Press and hold the map to drop one.
   const wp = useRideWaypoints(id, !!mine);
@@ -330,6 +351,7 @@ export default function RideMode() {
     setMemberKey(rosterKey(memberIds.current));
     setMembers(d.members);
     setRegroup(d.regroup);
+    for (const c of d.cancelled) cancelledTaps.current.add(c);
     setStatuses(d.statuses);
     setPositions(d.positions);
     setLastHeardAt(Date.now());
@@ -424,14 +446,31 @@ export default function RideMode() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ride_members', filter: `ride_id=eq.${id}` }, () => refresh())
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
         const s = payload.new as TappedStatus & { user_id: string };
-        setStatuses((prev) => ({ ...prev, [s.user_id]: s }));
+        // An older tap arriving late (uploaded after a newer one) changes nothing. Kept current right
+        // away too, so a Bluetooth copy of an older EMERGENCY in the same tick doesn't count as newer.
+        if (isNewerTap(statusesNow.current[s.user_id], s)) {
+          statusesNow.current = { ...statusesNow.current, [s.user_id]: s };
+          // An EMERGENCY arriving live counts from now, like a push (core/siren pushCallAt), so one
+          // uploaded late after no service still sounds; opening Ride Mode later goes by tap time.
+          const tapped = Date.parse(s.tapped_at);
+          const { me: who, sirenName: nameOf } = sirenNow.current;
+          if (s.status === 'emergency' && s.id && who && Number.isFinite(tapped)) {
+            void raiseEmergency({ id: s.id, rideId: id, userId: s.user_id, status: s.status, at: pushCallAt(tapped, Date.now()), tappedAt: tapped, name: nameOf(s.user_id), source: 'ride' }, who);
+          }
+        }
+        setStatuses((prev) => (isNewerTap(prev[s.user_id], s) ? { ...prev, [s.user_id]: s } : prev));
       })
       // A rider cancelled a tap: their status goes back to what it was before.
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rider_statuses', filter: `ride_id=eq.${id}` }, (payload) => {
         const row = payload.new as { id?: string; cancelled_at?: string | null };
         if (row?.cancelled_at) {
           // A cancelled EMERGENCY stops the siren on every phone that is sounding it.
-          if (row.id) endEmergency(row.id);
+          if (row.id) {
+            tapTakenBack(row.id);
+            // Taken back: Bluetooth copies of it (cancels don't travel there) change nothing, and it
+            // stops counting as the rider's newest once the refreshed statuses land.
+            cancelledTaps.current.add(row.id);
+          }
           refresh();
         }
       })
@@ -505,7 +544,7 @@ export default function RideMode() {
   // turning it back on in Ride Mode starts Bluetooth again at once.
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
   // Bluetooth Sharing is Pro (2.1). On Free the phone still relays for the group and still sends and
-  // hears EMERGENCY, Need Help and Crash Alerts (lib/nearby relay only); spots, other taps and
+  // hears status taps, EMERGENCY and I'm OK included (lib/nearby relay only); spots and
   // messages over Bluetooth need Pro.
   const bluetoothPro = useCan('bluetooth_sharing');
   useEffect(() => setNearbyRelayOnly(!bluetoothPro), [bluetoothPro]);
@@ -546,11 +585,20 @@ export default function RideMode() {
           });
         } else if (e.kind === 'status') {
           if (!memberIds.current.has(e.status.user_id)) return;
-          // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren).
-          raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: e.fromServer ? 'ride' : 'bluetooth' }, me ?? null);
+          // A tap its rider took back, relayed again over Bluetooth: it stays taken back.
+          if (e.status.id && cancelledTaps.current.has(e.status.id)) return;
+          // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren), unless
+          // the rider has already tapped something newer (a relayed old EMERGENCY after I'm OK).
+          const newer = isNewerTap(statusesNow.current[e.status.user_id], e.status);
+          // Kept current right away, so the next packet in the same batch is checked against this one.
+          if (newer) {
+            const { user_id: _u, possible_crash: _c, ...tap } = e.status;
+            statusesNow.current = { ...statusesNow.current, [e.status.user_id]: tap };
+          }
+          // An older copy of a call already waiting can still add the crash flag (Possible Crash).
+          if (e.status.status === 'emergency' && (newer || (e.status.possible_crash && sirenHasCall(e.status.id))) && me) void raiseEmergency({ ...e.status, rideId: id, userId: e.status.user_id, at: e.status.tapped_at, name: sirenName(e.status.user_id), possibleCrash: e.status.possible_crash, source: 'bluetooth' }, me ?? null);
           setStatuses((prev) => {
-            const old = prev[e.status.user_id];
-            if (old && (old.id === e.status.id || Date.parse(old.tapped_at) > Date.parse(e.status.tapped_at))) return prev;
+            if (!isNewerTap(prev[e.status.user_id], e.status)) return prev;
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
             return { ...prev, [e.status.user_id]: tap };
           });
@@ -601,10 +649,16 @@ export default function RideMode() {
   // the ride, until silenced; a newer tap from that rider (I'm OK...) ends it. Live updates and
   // Bluetooth both land in `statuses`.
   useEffect(() => {
+    // Not until we know who this rider is, so their own EMERGENCY never sounds on their phone.
+    if (!me) return;
+    const raised: Promise<void>[] = [];
     for (const [userId, s] of Object.entries(statuses)) {
-      raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null);
+      if (s.status !== 'emergency') continue;
+      raised.push(raiseEmergency({ id: s.id, rideId: id, userId, status: s.status, at: s.tapped_at, name: sirenName(userId), source: 'ride' }, me ?? null));
     }
-    endStaleCalls(id, statuses);
+    // After the raises land: a rider's newer EMERGENCY takes the older one's place without the
+    // siren stopping in between (addCall replaces it), and the older one ends after if it's still there.
+    void Promise.all(raised).then(() => endStaleCalls(id, statuses));
   }, [statuses, id, me, sirenName]);
 
   // Leader and tail gunner hear a Mechanical Issue the moment it's tapped, once per tap.
@@ -1075,10 +1129,24 @@ export default function RideMode() {
   });
   const carKey = JSON.stringify(car);
   // CarPlay is Pro (2.1). On Free the car keeps the Pro notice (root layout) and gets no ride.
+  // Once the ride is on the car screen it stays there, and its buttons keep working, for the rest
+  // of this ride even if Pro runs out, so EMERGENCY and then I'm OK always go from the car.
   const carPlayPro = useCan('carplay');
+  const carRideShown = useRef(false);
+  const carCleared = useRef(false);
   useEffect(() => {
-    if (!carPlayPro) return clearCarPlay();
-    if (ride) showRideOnCarPlay(JSON.parse(carKey));
+    // On Free, clear the car screen once, not on every rider update.
+    if (!carPlayPro && !carRideShown.current) {
+      if (!carCleared.current) clearCarPlay();
+      carCleared.current = true;
+      return;
+    }
+    carCleared.current = false;
+    if (ride) {
+      showRideOnCarPlay(JSON.parse(carKey));
+      // Only a real Pro answer counts (before the plan has loaded every feature reads as on).
+      if (carPlayPro && currentEntitlements().switchedOn) carRideShown.current = true;
+    }
   }, [carKey, ride, carPlayPro]);
   useEffect(() => () => clearCarPlay(), []);
   const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency });
@@ -1087,8 +1155,10 @@ export default function RideMode() {
   });
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
-      if (!can(currentEntitlements(), 'carplay')) return;
       const a = parseCarPlayAction(buttonId);
+      // Pro running out mid-ride keeps the car working for this ride (it stays on the car screen,
+      // so I'm OK after an EMERGENCY still goes).
+      if (!carPlayActionAllowed(a, can(currentEntitlements(), 'carplay') || carRideShown.current)) return;
       const act = carActions.current;
       if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
       else if (a.type === 'reply' && (QUICK_REPLIES as readonly string[]).includes(a.body)) act.quickReply(a.body as QuickReply);

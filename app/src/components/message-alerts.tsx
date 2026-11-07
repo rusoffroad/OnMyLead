@@ -14,6 +14,7 @@ import { currentNotificationSettings, resetNotificationSettings, syncNotificatio
 import { useOutRidingKeeper } from '@/lib/out-riding';
 import { registerForPush, resetPushRegistration, syncRideReminders, useNotificationTaps, useRideChangeReminders } from '@/lib/push';
 import { useSession } from '@/lib/session';
+import { resetSirenCalls, sirenSignedIn } from '@/lib/siren';
 import { newChannel, supabase } from '@/lib/supabase';
 
 import { t as tr } from '@/lib/i18n';
@@ -79,6 +80,15 @@ export function MessageAlerts() {
   useOutRidingKeeper();
   // The Notifications inbox (the bell on the Rides tab) stays current.
   useInboxSync();
+
+  // Who was signed in last, so the siren's waiting calls clear on a real sign-out (or a switch to
+  // another account), never while the session is still loading at launch.
+  const lastMe = useRef<string | null>(null);
+  useEffect(() => {
+    if (lastMe.current && lastMe.current !== me) resetSirenCalls();
+    if (me) sirenSignedIn();
+    lastMe.current = me ?? null;
+  }, [me]);
 
   useEffect(() => {
     if (!me) {

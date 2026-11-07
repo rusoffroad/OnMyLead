@@ -63,3 +63,25 @@ select as_user(null);
 set role authenticated;
 select expect_refused($q$select set_push_siren('sia-phone-000000000000000000000', true)$q$, 'no user set a siren');
 reset role;
+
+-- S5. Another account signs in on Sia's phone: the switch starts over (plain sound) for them.
+select as_user('00000000-0000-0000-0000-000000000b81');
+set role authenticated;
+select set_push_siren('sia-phone-000000000000000000000', false);
+reset role;
+select as_user('00000000-0000-0000-0000-000000000b82');
+set role authenticated;
+select register_push_token('sia-phone-000000000000000000000', 'ios');
+reset role;
+do $$ begin
+  if (select siren from push_tokens where token = 'sia-phone-000000000000000000000') is not null then raise exception 'FAIL: siren carried over to another account'; end if;
+end $$;
+-- The same rider registering again keeps it.
+select as_user('00000000-0000-0000-0000-000000000b82');
+set role authenticated;
+select set_push_siren('sia-phone-000000000000000000000', true);
+select register_push_token('sia-phone-000000000000000000000', 'ios');
+reset role;
+do $$ begin
+  if (select siren from push_tokens where token = 'sia-phone-000000000000000000000') is not true then raise exception 'FAIL: re-register cleared the siren'; end if;
+end $$;

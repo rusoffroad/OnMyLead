@@ -3347,6 +3347,10 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "Posible choque: {name}",
   "EMERGENCY: {name} needs help now": "EMERGENCIA: {name} necesita ayuda ya",
   "Sent over Bluetooth. Tap to see where they are.": "Enviado por Bluetooth. Toca para ver dónde está.",
+  "Not silenced yet. Tap to see where they are.": "Aún sin silenciar. Toca para ver dónde está.",
+  "Emergency Waiting": "Emergencia en espera",
+  "A quiet reminder of an EMERGENCY you haven’t silenced yet.": "Un aviso silencioso de una emergencia que aún no silenciaste.",
+  "This group was deleted or is no longer yours.": "Este grupo se eliminó o ya no es tuyo.",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "Una sirena cuando alguien de tu grupo envía EMERGENCIA o una alerta de choque.",
   "Possible Crash": "Posible choque",
   "{name} needs help now.": "{name} necesita ayuda ya.",
@@ -3354,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "{n} piloto más necesita ayuda",
   "{n} more riders need help": "{n} pilotos más necesitan ayuda",
   "Version {v}": "Versión {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "Las fotos de grupo aún no están activadas. Vuelve a intentarlo después de la próxima actualización.",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "OnMyLead necesita la cámara para tomar la foto del grupo. Actívala en Ajustes o elige una foto.",
+  "That photo is too big. Try another one.": "Esa foto es demasiado grande. Prueba con otra.",
+  "This group is gone, or you’re no longer in it.": "Este grupo ya no existe o ya no formas parte de él.",
+  "Please sign in first.": "Primero inicia sesión.",
+  "Only the rider who made the group can change its photo.": "Solo quien creó el grupo puede cambiar su foto.",
 };
 
 export default dict;

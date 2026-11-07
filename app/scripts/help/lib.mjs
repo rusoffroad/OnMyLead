@@ -88,7 +88,8 @@ export function git(args) {
 /**
  * Which App Store version riders can download, asked of Apple's free public lookup. Falls back to
  * release.json's `live` when Apple can't be reached, and to the prelaunch version (with its notice)
- * while nothing is live yet. Never guesses upward: a failed lookup can only show fewer articles.
+ * while nothing is live yet. Never guesses upward: a failed lookup can only show fewer articles. The
+ * one exception is release.json `publishAhead`, which the owner sets by hand.
  */
 export async function resolveRelease(release, { offline = false } = {}) {
   let apple = { checked: false, version: null, error: null, releaseNotes: null, releasedAt: null, url: null };
@@ -111,7 +112,12 @@ export async function resolveRelease(release, { offline = false } = {}) {
       apple.error = String(e.message ?? e);
     }
   }
-  const live = apple.version ?? (apple.checked ? null : release.live) ?? null;
+  const fromApple = apple.version ?? (apple.checked ? null : release.live) ?? null;
+  // `publishAhead` (release.json): the owner chose to publish a version's guides before Apple
+  // releases it (Chris, 2026-11-06, for 2.1 while it waits on App Review). Only ever raises the
+  // version; remove it once the App Store has that version.
+  const ahead = release.publishAhead ?? null;
+  const live = ahead && (!fromApple || engine.compareVersions(ahead, fromApple) > 0) ? ahead : fromApple;
   const prelaunch = !live;
   return {
     apple,

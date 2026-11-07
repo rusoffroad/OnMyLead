@@ -3347,6 +3347,10 @@ const dict: Record<string, string> = {
   "Possible Crash: {name}": "Kemungkinan Tabrakan: {name}",
   "EMERGENCY: {name} needs help now": "DARURAT: {name} butuh bantuan sekarang",
   "Sent over Bluetooth. Tap to see where they are.": "Dikirim lewat Bluetooth. Ketuk untuk melihat lokasinya.",
+  "Not silenced yet. Tap to see where they are.": "Belum dibisukan. Ketuk untuk melihat lokasinya.",
+  "Emergency Waiting": "Darurat Menunggu",
+  "A quiet reminder of an EMERGENCY you haven’t silenced yet.": "Pengingat tanpa suara untuk darurat yang belum kamu bisukan.",
+  "This group was deleted or is no longer yours.": "Grup ini sudah dihapus atau bukan milikmu lagi.",
   "A siren when someone in your group sends EMERGENCY or a crash alert.": "Sirene saat seseorang di grup Anda mengirim DARURAT atau peringatan tabrakan.",
   "Possible Crash": "Kemungkinan Tabrakan",
   "{name} needs help now.": "{name} butuh bantuan sekarang.",
@@ -3354,6 +3358,12 @@ const dict: Record<string, string> = {
   "{n} more rider needs help": "{n} pengendara lain butuh bantuan",
   "{n} more riders need help": "{n} pengendara lain butuh bantuan",
   "Version {v}": "Versi {v}",
+  "Group photos aren’t switched on yet. Try again after the next update.": "Foto grup belum aktif. Coba lagi setelah pembaruan berikutnya.",
+  "OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.": "OnMyLead perlu kamera untuk mengambil foto grup. Nyalakan di Pengaturan, atau pilih foto saja.",
+  "That photo is too big. Try another one.": "Foto itu terlalu besar. Coba foto lain.",
+  "This group is gone, or you’re no longer in it.": "Grup ini sudah tidak ada, atau kamu bukan anggotanya lagi.",
+  "Please sign in first.": "Masuk dulu, ya.",
+  "Only the rider who made the group can change its photo.": "Hanya pengendara yang membuat grup yang bisa mengganti fotonya.",
 };
 
 export default dict;
