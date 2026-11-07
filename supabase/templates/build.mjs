@@ -32,7 +32,10 @@ const C = {
 };
 const FONT = "'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif";
 
-const link = (type) => `{{ .SiteURL }}/auth-callback?token_hash={{ .TokenHash }}&type=${type}`;
+// app=1 marks a link asked for in the app (its redirect is the app's own address), so the website
+// page knows to hand it straight on to the app when a mail app opens it in a browser.
+const APP_REDIRECT = '{{ if eq .RedirectTo "onmylead://auth-callback" "onmylead://reset-password" }}&app=1{{ end }}';
+const link = (type) => `{{ .SiteURL }}/auth-callback?token_hash={{ .TokenHash }}&type=${type}${APP_REDIRECT}`;
 
 /** Each email: what the inbox shows, what it says, and what the button does. */
 const EMAILS = {

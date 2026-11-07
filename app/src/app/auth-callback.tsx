@@ -6,7 +6,7 @@ import { Logo } from '@/components/logo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Screen } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
-import { afterAuthLink, androidAuthHandoff, appAuthLink, authLinkDone, authLinkError, parseAuthLink, type AuthLink } from '@/core/auth-link';
+import { afterAuthLink, androidAuthHandoff, appAuthLink, askedInApp, authLinkDone, authLinkError, parseAuthLink, type AuthLink } from '@/core/auth-link';
 import { isAppleMobile } from '@/core/ride-link';
 import { track } from '@/lib/analytics';
 import { completeAuthLink } from '@/lib/session';
@@ -88,6 +88,8 @@ export default function AuthCallback() {
 
   useEffect(() => {
     if (androidIntent) window.location.replace(androidIntent);
+    // Asked for in the app but opened in a browser (Gmail and other mail apps do this): open the app.
+    else if (iphoneWeb && askedInApp(params)) Linking.openURL(appAuthLink(link)).catch(() => {});
     if (state.step === 'working') finish();
     // Runs once, for the link this screen was opened with.
     // eslint-disable-next-line react-hooks/exhaustive-deps
