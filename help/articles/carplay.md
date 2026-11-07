@@ -4,7 +4,7 @@ summary: During a ride, OnMyLead shows on your car's CarPlay screen with one-tap
 category: ride-mode
 order: 46
 release: "2.1"
-updated: 2026-11-06
+updated: 2026-11-07
 sources:
   - app/modules/onmylead-carplay/**
   - app/plugins/with-carplay.js
