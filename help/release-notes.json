@@ -1,5 +1,19 @@
 [
   {
+    "version": "2.1.1",
+    "title": "CarPlay Fix",
+    "intro": "OnMyLead 2.1.1 fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
+    "whatsNew": "What's new in 2.1.1:\n\n• Fixed: on iPhone, opening OnMyLead while your phone was already connected to CarPlay could close the app. It now opens normally.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "fixed",
+        "text": "CarPlay: opening OnMyLead on your iPhone while it was already connected to CarPlay (or changing Dark, Light or Match Phone while connected) could close the app. It now opens normally and the car screen keeps working."
+      }
+    ]
+  },
+  {
     "version": "2.1",
     "title": "Bluetooth Sharing With No Service, Every Map on Mapbox, 3D Terrain and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group (seeing riders and sharing over Bluetooth is part of OnMyLead Pro; on every plan your phone passes alerts along and EMERGENCY goes out, and every rider without Pro gets a fresh 30-day Pro trial with this update). When a rider sends EMERGENCY or their Crash Alert goes out, every other rider's phone now sounds a loud siren until they silence it. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
