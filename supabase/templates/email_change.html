@@ -26,7 +26,7 @@
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td style="border-radius:14px;background:#E5262E;">
-                  <a href="{{ .SiteURL }}/auth-callback?token_hash={{ .TokenHash }}&type=email_change" style="display:inline-block;padding:16px 30px;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:18px;line-height:22px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:14px;">Confirm New Email</a>
+                  <a href="{{ .SiteURL }}/auth-callback?token_hash={{ .TokenHash }}&type=email_change{{ if eq .RedirectTo "onmylead://auth-callback" "onmylead://reset-password" }}&app=1{{ end }}" style="display:inline-block;padding:16px 30px;font-family:'Barlow', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:18px;line-height:22px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:14px;">Confirm New Email</a>
                 </td>
               </tr>
             </table>

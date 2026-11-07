@@ -77,6 +77,15 @@ export function appAuthLink(link: AuthLink): string {
 }
 
 /**
+ * True when an emailed link was asked for in the app (the template adds app=1 when the redirect is
+ * the app's own address). Mail apps such as Gmail open links in a browser instead of the app, so
+ * the website page then hands the link straight on to the app rather than waiting for a tap.
+ */
+export function askedInApp(params: Params): boolean {
+  return one(params.app) === '1' && parseAuthLink(params).kind === 'token';
+}
+
+/**
  * Android hand-off for emailed links. The iPhone opens /auth-callback?token_hash=... in the app
  * through the site association file, but Android's App Links can't filter on the query string, so
  * claiming /auth-callback would also pull the website's Google and Facebook returns (?code=...)

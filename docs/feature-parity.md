@@ -32,7 +32,7 @@ web build and the Android emulator.
 
 | ID | Feature | iPhone | iPad | Android Phone | Android Tablet | Backend | Admin | Docs | Release | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|
-| F01 | Email sign-up, sign-in, reset, email link | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ sign-in | iOS 1.0 | |
+| F01 | Email sign-up, sign-in, reset, email link | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ sign-in | iOS 1.0 | 2026-11-07 (PR #263): emails asked for in the app add app=1, and the website /auth-callback page opens the app right away on iPhone when a mail app (Gmail) opens the link in a browser; Android already hands off by intent URL. Website-only, needs a website deploy and an iPhone check. |
 | F02 | Sign in with Apple | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ✅ Settings flag apple_web_sign_in (off until set) | ✅ sign-in | iOS 1.0; website and Android 2.1 | 2026-11-04: the website and Android use Apple's web sign-in through Supabase once Chris sets up the Services ID and secret (docs/web-sign-in-with-apple.md, secret script scripts/release/apple-web-secret.mjs) and switches the flag on. Owed: Chris's Apple Developer + Supabase steps, then a web and Android device check (E04 kept for the record). |
 | F03 | Sign in with Google | ✅ | 🟡 | ⬜ | ⬜ | ✅ | ➖ | ✅ sign-in | iOS 1.0 | Android: browser fallback works in theory; native client needs SHA-1 |
 | F04 | Sign in with Facebook | ✅ | 🟡 | 🟡 | 🟡 | ✅ | ➖ | ✅ sign-in | iOS 1.0 | |

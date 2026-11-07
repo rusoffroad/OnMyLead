@@ -5,6 +5,7 @@ import {
   androidAuthHandoff,
   androidIntentUrl,
   appAuthLink,
+  askedInApp,
   appleFullName,
   APP_AUTH_CALLBACK,
   parseAuthLink,
@@ -133,5 +134,14 @@ describe('Android hand-off for emailed links', () => {
       'intent://auth-callback?token_hash=a&type=signup#Intent;scheme=onmylead;package=com.rusoffroad.onmylead.app;' +
         'S.browser_fallback_url=https%3A%2F%2Fonmylead.com%2Fauth-callback%3Ftoken_hash%3Da%26type%3Dsignup%26web%3D1;end',
     );
+  });
+});
+
+describe('links asked for in the app', () => {
+  it('hands on only branded token links marked app=1', () => {
+    expect(askedInApp({ token_hash: 'pkce_abc', type: 'signup', app: '1' })).toBe(true);
+    expect(askedInApp({ token_hash: 'pkce_abc', type: 'signup' })).toBe(false);
+    expect(askedInApp({ code: 'abc', app: '1' })).toBe(false);
+    expect(askedInApp({ token_hash: 'abc', type: 'bogus', app: '1' })).toBe(false);
   });
 });
