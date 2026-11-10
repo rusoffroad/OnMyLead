@@ -3462,6 +3462,11 @@ const dict: Record<string, string> = {
   "Start a group for the riders you ride with.": "Crie um grupo para os pilotos com quem você anda.",
   "{name}, out riding now": "{name}, rodando agora",
   "Requests": "Pedidos",
+  "1 Device Connected": "1 dispositivo conectado",
+  "{n} Devices Connected": "{n} dispositivos conectados",
+  "Opens the Starlink page": "Abre a página do Starlink",
+  "Down": "Download",
+  "Up": "Upload",
 };
 
 export default dict;

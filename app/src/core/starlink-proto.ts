@@ -218,9 +218,47 @@ export const REQ_GET_HISTORY = 1007;
 /** Response oneof field numbers. */
 export const RES_DISH_GET_STATUS = 2004;
 export const RES_DISH_GET_HISTORY = 2006;
+/** Wi-Fi router: who is connected (same field number in Request and Response). */
+export const REQ_WIFI_GET_CLIENTS = 3002;
+export const RES_WIFI_GET_CLIENTS = 3002;
 
 export const statusRequest = () => grpcWebFrame(emptyField(REQ_GET_STATUS));
 export const historyRequest = () => grpcWebFrame(emptyField(REQ_GET_HISTORY));
+export const clientsRequest = () => grpcWebFrame(emptyField(REQ_WIFI_GET_CLIENTS));
+
+// --- Wi-Fi clients -----------------------------------------------------------
+
+/** WifiClient.role: 2 repeater and 3 controller are Starlink mesh units, not riders' devices. */
+const MESH_ROLES = new Set([2, 3]);
+
+/**
+ * How many devices are on the Starlink router (WifiGetClientsResponse.clients). Counts each MAC
+ * once and leaves out mesh units, blocked devices and the dish itself. Null if the reply isn't one.
+ */
+export function decodeClientCount(responseBytes: Uint8Array): number | null {
+  const reply = decodeMessage(responseBytes);
+  const list = reply.get(RES_WIFI_GET_CLIENTS);
+  if (!list) return null;
+  const res = getMessage(reply, RES_WIFI_GET_CLIENTS);
+  if (!res) return null;
+  const seen = new Set<string>();
+  let anonymous = 0;
+  for (const f of res.get(1) ?? []) {
+    if (f.wire !== WIRE_LEN) continue;
+    let c: Message;
+    try {
+      c = decodeMessage(f.bytes);
+    } catch {
+      continue;
+    }
+    if (MESH_ROLES.has(getUint(c, 14) ?? 0) || getBool(c, 42)) continue;
+    if (getString(c, 3) === '192.168.100.1') continue;
+    const mac = getString(c, 2)?.toLowerCase();
+    if (mac) seen.add(mac);
+    else anonymous++;
+  }
+  return seen.size + anonymous;
+}
 
 // --- Status ------------------------------------------------------------------
 
@@ -491,6 +529,30 @@ export function dishHeadline(s: DishStatus): string {
   if (s.alerts.length) return `Online with ${s.alerts.length === 1 ? 'an alert' : `${s.alerts.length} alerts`}.`;
   if ((s.dropRate ?? 0) >= 0.05 || (s.obstructionFraction ?? 0) >= 0.05) return 'Online, but the connection is patchy.';
   return 'Online and working well.';
+}
+
+export type GlanceLabel = 'Down' | 'Up' | 'Latency' | 'Sky Blocked';
+
+/** The few numbers the Home card shows, already formatted. Pure, so it is unit tested. */
+export type DishGlance = {
+  online: boolean;
+  /** "Online", or why it's down, e.g. "Obstructed". */
+  state: string;
+  stats: { label: GlanceLabel; value: string }[];
+  /** e.g. "3 Devices Connected"; null when the router wouldn't say. */
+  devices: { n: number } | null;
+};
+
+export function dishGlance(s: DishStatus, devices: number | null): DishGlance {
+  const stats: DishGlance['stats'] = s.online
+    ? [
+        { label: 'Down', value: formatMbps(s.downlinkBps) },
+        { label: 'Up', value: formatMbps(s.uplinkBps) },
+        { label: 'Latency', value: s.latencyMs == null || !Number.isFinite(s.latencyMs) ? '—' : `${Math.round(s.latencyMs)} ms` },
+        { label: 'Sky Blocked', value: formatPercent(s.obstructionFraction) },
+      ]
+    : [];
+  return { online: s.online, state: s.state, stats, devices: devices == null || devices < 0 ? null : { n: devices } };
 }
 
 export const formatPercent = (f: number | null, digits = 1) =>

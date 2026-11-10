@@ -13,8 +13,10 @@ sources:
   - app/src/app/(tabs)/profile.tsx
   - app/src/components/app-notices.tsx
   - app/src/components/starlink-mount-ad.tsx
+  - app/src/components/home/starlink-card.tsx
+  - app/plugins/with-starlink-local-network.js
 related: [garage, trip-planner, troubleshooting]
-keywords: [starlink, dish, satellite internet, mini, roam, battery, power station, solar, watts, runtime, obstruction, latency]
+keywords: [starlink, devices connected, home card, dish, satellite internet, mini, roam, battery, power station, solar, watts, runtime, obstruction, latency]
 ---
 
 The Starlink page shows how your dish is doing, keeps your plan details in one place, and works out how long your batteries will run it.
@@ -59,7 +61,18 @@ If you see **Can't Reach Your Dish**:
 
 The page keeps trying every 10 seconds. Tap **Retry Now** to try straight away. If it says your dish answered but couldn't be read, a Starlink software update may have changed things. Try again later.
 
-Reading the dish only works in the iPhone app, not on the website.
+Reading the dish only works in the phone app, not on the website.
+
+:::release 3.0
+## Starlink on Home
+
+Once you're on a Starlink's Wi-Fi, a small **Starlink** card shows on Home with the dish's state, **Down**, **Up**, **Latency** and **Sky Blocked**, plus how many devices are connected to the Starlink router. Tap it to open this page. It reads the dish about every 10 seconds while Home is open, and disappears when no Starlink answers.
+
+- **iPhone and iPad:** it starts after you've tapped **Connect to My Dish** here once.
+- **Android phones and tablets:** it shows on its own.
+
+The devices count comes from the Starlink router. It doesn't show if you use your own router or bypass mode, or if the router won't say. Mesh units aren't counted.
+:::
 
 :::release 2.0
 ## RUS Starlink Mini Mount V2

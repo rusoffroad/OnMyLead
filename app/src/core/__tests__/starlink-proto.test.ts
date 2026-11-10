@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   compassPoint, dishHeadline, formatSeconds, minuteBuckets, outageRuns,
   decodeHistory, decodeMessage, decodeStatus, encodeVarint, formatMbps, formatPercent, formatUptime, getFloats,
-  grpcWebFrame, historyRequest, parseGrpcWeb, ringTail, statusRequest,
+  grpcWebFrame, historyRequest, parseGrpcWeb, ringTail, statusRequest, clientsRequest, decodeClientCount, dishGlance,
 } from '../starlink-proto';
 
 // A tiny independent protobuf writer, only for building fixtures.
@@ -218,5 +218,55 @@ describe('display', () => {
     expect(formatPercent(0.0216)).toBe('2.2%');
     expect(formatPercent(0)).toBe('0%');
     expect(formatPercent(null)).toBe('—');
+  });
+});
+
+describe('Starlink on Home', () => {
+  const client = (mac: string, extra: number[] = []) => len(1, [...str(1, 'phone'), ...str(2, mac), ...str(3, '192.168.1.20'), ...extra]);
+
+  it('frames Request{wifi_get_clients:{}}', () => {
+    // field 3002, wire type 2 -> tag 24018 -> varint d2 bb 01.
+    expect(hex(clientsRequest())).toBe('0000000004d2bb0100');
+  });
+
+  it('counts each device on the router once, leaving out mesh units, blocked devices and the dish', () => {
+    const res = [
+      ...client('AA:AA:AA:AA:AA:01', uint(14, 1)),
+      ...client('aa:aa:aa:aa:aa:01'), // same device on two bands
+      ...client('AA:AA:AA:AA:AA:02'),
+      ...client('AA:AA:AA:AA:AA:03', uint(14, 2)), // mesh repeater
+      ...client('AA:AA:AA:AA:AA:04', uint(42, 1)), // blocked
+      ...len(1, [...str(2, 'AA:AA:AA:AA:AA:05'), ...str(3, '192.168.100.1')]), // the dish itself
+      ...uint(2, 1),
+    ];
+    expect(decodeClientCount(new Uint8Array(len(3002, res)))).toBe(2);
+    expect(decodeClientCount(new Uint8Array(len(3002, [])))).toBe(0);
+  });
+
+  it('gives null when the reply is not a client list', () => {
+    expect(decodeClientCount(new Uint8Array(STATUS_RESPONSE))).toBeNull();
+  });
+
+  it('sums up an online dish in four numbers plus the device count', () => {
+    const s = decodeStatus(new Uint8Array(STATUS_RESPONSE));
+    const g = dishGlance(s, 3);
+    expect(g.online).toBe(true);
+    expect(g.state).toBe('Online');
+    expect(g.stats).toEqual([
+      { label: 'Down', value: '88 Mbps' },
+      { label: 'Up', value: '11 Mbps' },
+      { label: 'Latency', value: '32 ms' },
+      { label: 'Sky Blocked', value: '2.2%' },
+    ]);
+    expect(g.devices).toEqual({ n: 3 });
+    expect(dishGlance(s, null).devices).toBeNull();
+  });
+
+  it('shows only the state when the dish is down', () => {
+    const offline = [...uint(1, 0), ...len(2004, [...len(1014, uint(1, 6))])];
+    const g = dishGlance(decodeStatus(new Uint8Array(offline)), null);
+    expect(g.online).toBe(false);
+    expect(g.state).toBe('Obstructed');
+    expect(g.stats).toEqual([]);
   });
 });
