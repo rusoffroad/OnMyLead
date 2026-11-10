@@ -5,6 +5,7 @@ import { APP_STORE_URL, PLAY_STORE_URL } from '@/constants/site';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { appRideUrl, isAndroid, isAppleMobile, rideLink } from '@/core/ride-link';
 import { track } from '@/lib/analytics';
+import { storeLink } from '@/lib/found-us';
 import { QrCode } from './ride-qr';
 import { Button } from './ui';
 
@@ -21,7 +22,8 @@ export function GetTheApp({ inviteCode }: { inviteCode: string }) {
   const iphone = isAppleMobile(agent);
   const android = isAndroid(agent);
   // The store for this device; a computer gets the App Store, or Google Play if that's all there is.
-  const store = android ? PLAY_STORE_URL : APP_STORE_URL ?? PLAY_STORE_URL;
+  const plain = android ? PLAY_STORE_URL : APP_STORE_URL ?? PLAY_STORE_URL;
+  const store = plain ? storeLink(plain) : null;
 
   const download = store ? (
     <Button

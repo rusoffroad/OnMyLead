@@ -6,6 +6,8 @@ order: 15
 release: "2.0"
 updated: 2026-11-10
 sources:
+  - app/src/components/found-us-card.tsx
+  - app/src/lib/found-us.ts
   - app/src/app/leaderboard.tsx
   - app/src/components/home/events-card.tsx
   - app/src/app/(tabs)/index.tsx
@@ -36,6 +38,10 @@ Join a Ride, Create a Ride, Find a Ride, Events and Map Mode all fit on the firs
 - **The flag** shows the language the app is in (for example 🇺🇸 EN). Tap it to pick another. It shows when you're signed out too. See [Change the App's Language](/help/language).
 - **The bell** opens your notifications, with a red number for new ones. See [See and Clear Your Notifications](/help/notifications-inbox).
 - **Your picture** (or your first letter) opens the **You** tab.
+
+:::release 3.0
+In your first month, Home asks once: **How Did You Find OnMyLead?** Tap where you heard about us (Facebook, a friend, a riding club and so on) and tap **Send**, or tap **Not Now** and it won't ask again. Your answer is only counted, never shown to other riders.
+:::
 
 ## Join, Create and Find
 

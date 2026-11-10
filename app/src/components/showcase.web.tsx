@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
+import { storeLink } from '@/lib/found-us';
 import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
@@ -392,7 +393,7 @@ export function Showcase() {
             {APP_STORE_URL || PLAY_STORE_URL ? (
               <>
                 {APP_STORE_URL ? (
-                  <a className="btn btn-store btn-big" href={APP_STORE_URL}>
+                  <a className="btn btn-store btn-big" href={storeLink(APP_STORE_URL)}>
                     <AppleMark />
                     <span><small>Download on the</small>App Store</span>
                   </a>
@@ -438,7 +439,7 @@ export function Showcase() {
 function StoreButton({ onSoon }: { onSoon: (e: MouseEvent) => void }) {
   if (APP_STORE_URL) {
     return (
-      <a className="btn btn-store" href={APP_STORE_URL}>
+      <a className="btn btn-store" href={storeLink(APP_STORE_URL)}>
         <AppleMark />
         <span><small>Download Free on the</small>App Store</span>
       </a>
@@ -456,7 +457,7 @@ function StoreButton({ onSoon }: { onSoon: (e: MouseEvent) => void }) {
 function PlayButton({ big }: { big?: boolean }) {
   if (!PLAY_STORE_URL) return null;
   return (
-    <a className={big ? 'btn btn-store btn-play btn-big' : 'btn btn-store btn-play'} href={PLAY_STORE_URL}>
+    <a className={big ? 'btn btn-store btn-play btn-big' : 'btn btn-store btn-play'} href={storeLink(PLAY_STORE_URL)}>
       <PlayMark />
       <span><small>Get It on</small>Google Play</span>
     </a>

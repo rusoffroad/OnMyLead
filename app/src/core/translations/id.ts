@@ -3384,6 +3384,20 @@ const dict: Record<string, string> = {
   "Off. Tap to change in Settings": "Mati. Ketuk untuk mengubah di Pengaturan",
   "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Aktif. Meta dan TikTok tahu saat iklan membawamu ke sini. Tidak pernah lokasi, perjalanan, atau pesanmu",
   "Off. Nothing is sent to ad networks": "Mati. Tidak ada yang dikirim ke jaringan iklan",
+  "Thanks! That helps us reach more riders.": "Terima kasih! Ini membantu kami menjangkau lebih banyak rider.",
+  "How Did You Find OnMyLead?": "Dari mana kamu tahu OnMyLead?",
+  "One tap. It tells us where to find more riders like you.": "Sekali ketuk. Ini memberi tahu kami di mana menemukan rider sepertimu.",
+  "Where?": "Di mana?",
+  "A trail sign, a forum, a dealer...": "Papan jalur, forum, dealer...",
+  "Google Search": "Penelusuran Google",
+  "A Friend": "Teman",
+  "A Riding Group or Club": "Grup atau klub riding",
+  "An Event or Trail": "Acara atau jalur",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;

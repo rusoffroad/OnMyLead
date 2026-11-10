@@ -3384,6 +3384,20 @@ const dict: Record<string, string> = {
   "Off. Tap to change in Settings": "オフ。タップして設定で変更",
   "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "オン。広告からここに来たことを Meta と TikTok が知ります。位置情報、ライド、メッセージは送られません",
   "Off. Nothing is sent to ad networks": "オフ。広告ネットワークには何も送られません",
+  "Thanks! That helps us reach more riders.": "ありがとうございます！より多くのライダーに届けるのに役立ちます。",
+  "How Did You Find OnMyLead?": "OnMyLead をどこで知りましたか？",
+  "One tap. It tells us where to find more riders like you.": "タップするだけ。あなたのようなライダーをどこで探せばよいかがわかります。",
+  "Where?": "どこで？",
+  "A trail sign, a forum, a dealer...": "トレイルの看板、フォーラム、販売店など...",
+  "Google Search": "Google 検索",
+  "A Friend": "友だち",
+  "A Riding Group or Club": "ライディンググループやクラブ",
+  "An Event or Trail": "イベントやトレイル",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;

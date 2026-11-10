@@ -56,6 +56,7 @@ import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import { askForTracking } from '@/lib/ad-tracking';
+import { FoundUsCard } from '@/components/found-us-card';
 import { useNeedsRiderAgreement } from '@/lib/rider-agreement';
 import { setTrackLineOn } from '@/lib/track-line';
 import type { Ride, RideMember } from '@/lib/types';
@@ -317,6 +318,7 @@ export default function HomeScreen() {
   const nudgeAndLive = (
     <>
       <AppNotices />
+      {session ? <FoundUsCard /> : null}
       {session && rideName === '' ? (
         <Pressable accessibilityRole="button" onPress={() => router.push('/ride-name')} style={styles.nudge}>
           <View style={{ flex: 1 }}>

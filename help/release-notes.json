@@ -30,6 +30,10 @@
       {
         "kind": "new",
         "text": "Ad Measurement: OnMyLead now asks once, on iPhone and iPad with Apple's tracking prompt, whether Meta and TikTok may learn that one of our ads brought you here (an install, a new account, a trial or a Pro purchase). It never includes your location, rides, messages or email. Say no and nothing is sent. On Android it's a switch in You > Settings > Ad Measurement, and onmylead.com asks before loading any ad cookies."
+      },
+      {
+        "kind": "new",
+        "text": "How Did You Find OnMyLead?: new riders see one quick question on Home, asked once. Tap where you heard about us or tap Not Now. Answers are only counted, never shown to other riders."
       }
     ]
   },

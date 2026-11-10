@@ -29,6 +29,7 @@ import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { logScreen, startAppLog } from '@/lib/app-log';
 import { startAppearance, takeReturnPath, useAppearance } from '@/lib/appearance';
 import { startAdTracking } from '@/lib/ad-tracking';
+import { startFoundUs } from '@/lib/found-us';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
 import { currentEntitlements, useCan } from '@/lib/pro';
@@ -123,6 +124,8 @@ function RootLayout() {
   useEffect(() => startReferrals(), []);
   // Ad measurement for OnMyLead's Meta, Google and TikTok ads: only with the rider's OK (lib/ad-tracking.ts).
   useEffect(() => startAdTracking(), []);
+  // Where riders found OnMyLead: the website keeps the ad or link a visitor came from (lib/found-us.ts).
+  useEffect(() => startFoundUs(), []);
   // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();

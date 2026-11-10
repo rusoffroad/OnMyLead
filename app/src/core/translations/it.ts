@@ -3384,6 +3384,20 @@ const dict: Record<string, string> = {
   "Off. Tap to change in Settings": "Disattivata. Tocca per cambiarlo in Impostazioni",
   "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Attiva. Meta e TikTok sanno quando un annuncio ti ha portato qui. Mai la tua posizione, le uscite o i messaggi",
   "Off. Nothing is sent to ad networks": "Disattivata. Non viene inviato nulla alle reti pubblicitarie",
+  "Thanks! That helps us reach more riders.": "Grazie! Ci aiuta a raggiungere più piloti.",
+  "How Did You Find OnMyLead?": "Come hai scoperto OnMyLead?",
+  "One tap. It tells us where to find more riders like you.": "Un tocco. Ci dice dove trovare altri piloti come te.",
+  "Where?": "Dove?",
+  "A trail sign, a forum, a dealer...": "Un cartello sul sentiero, un forum, un concessionario...",
+  "Google Search": "Ricerca Google",
+  "A Friend": "Un amico",
+  "A Riding Group or Club": "Un gruppo o club di piloti",
+  "An Event or Trail": "Un evento o un sentiero",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;
