@@ -1,0 +1,28 @@
+diff --git a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
+--- a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
++++ b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/styles/terrain/RNMBXTerrain.kt
+@@ -47,6 +47,10 @@
+ 
+     override fun removeFromMap(mapView: RNMBXMapView, reason: RemovalReason): Boolean {
+         mapView.savedStyle?.let { it.removeTerrain() }
++        // OnMyLead patch: forget the terrain too, so a style update that arrives after removal
++        // (the exaggeration follows the tilt) doesn't reach addStyles with no map (Sentry
++        // NullPointerException at RNMBXTerrain.addStyles). Mirrors RNMBXAtmosphere.
++        mTerrain = null
+         mMap = null
+         return super.removeFromMap(mapView, reason)
+     }
+@@ -56,10 +60,12 @@
+     }
+ 
+     fun addStyles() {
++        // OnMyLead patch: not on a map (removed, or not added yet): addToMap applies the style.
++        val map = mMap ?: return
+         mTerrain?.also {
+             RNMBXStyleFactory.setTerrainLayerStyle(
+                 it,
+-                RNMBXStyle(context, mReactStyle, mMap!!)
++                RNMBXStyle(context, mReactStyle, map)
+             )
+         } ?: run {
+             Logger.e("RNMBXTerrainLayer", "mLayer is null")
