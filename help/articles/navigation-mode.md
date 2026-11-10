@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/components/use-follow-camera.ts
   - app/src/core/intersections.ts
@@ -125,6 +125,10 @@ To look around, drag or pinch the map. It pauses (the button shows **Paused**) u
 
 :::release 2.1
 From 2.1 the map zooms out one step the first time your dot nears an edge, then the next time centers on your dot and moves with you so it stays on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot (Red, White and Blue unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
+:::
+
+:::release 2.1.1
+From 2.1.1, when another junction is coming up within about a quarter mile, the map stays zoomed in from one junction to the next and zooms back out once after the last.
 :::
 
 The screen stays on while Navigate is open.
