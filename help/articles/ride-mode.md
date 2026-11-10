@@ -150,8 +150,8 @@ While you're moving, your own dot has the same white arrow as everyone else's, p
 From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step, and the next time it centers on your dot and moves with you so you're always on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in the **You** tab turns that off). See [Follow Me on the Map](/help/follow-me).
 :::
 
-:::release 2.1.1
-From 2.1.1, when another junction is coming up within about a quarter mile, the map stays zoomed in from one junction to the next and zooms back out once after the last.
+:::release 3.0
+From 3.0, when another junction is coming up within about a quarter mile, the map stays zoomed in from one junction to the next and zooms back out once after the last.
 :::
 
 ### The Bottom Panel

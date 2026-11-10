@@ -152,7 +152,7 @@ export const JUNCTION_CLEAR_M = 35;
 /** Never hold the close-up longer than this (ms), in case the rider stops at the junction. */
 export const JUNCTION_HOLD_MAX_MS = 60_000;
 /**
- * Look-ahead (2.1.1): once through a junction, the map stays zoomed in when another junction is
+ * Look-ahead (3.0): once through a junction, the map stays zoomed in when another junction is
  * this close ahead (miles), instead of zooming out and straight back in. This is the "x miles" to
  * tune. A quarter mile is about 20 seconds at 45 mph, and fits in what the close-up map shows
  * ahead of the rider (about 500 m on a phone at zoom 17), which is all the map can be asked about.

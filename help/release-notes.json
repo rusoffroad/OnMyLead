@@ -1,9 +1,9 @@
 [
   {
-    "version": "2.1.1",
+    "version": "3.0",
     "title": "Smoother Zoom at Intersections",
-    "intro": "OnMyLead 2.1.1 smooths out Zoom In at Intersections. When junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in.",
-    "whatsNew": "What's new in 2.1.1:\n\n• Smoother Zoom In at Intersections: when another junction is coming up within about a quarter mile, the map stays zoomed in instead of zooming out and back in.",
+    "intro": "OnMyLead 3.0 smooths out Zoom In at Intersections. When junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in.",
+    "whatsNew": "What's new in 3.0:\n\n• Smoother Zoom In at Intersections: when another junction is coming up within about a quarter mile, the map stays zoomed in instead of zooming out and back in.",
     "apple": null,
     "google": null,
     "notes": [
