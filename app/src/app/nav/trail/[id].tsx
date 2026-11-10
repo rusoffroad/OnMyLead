@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { ObstacleSheet } from '@/components/obstacle-sheet';
+import { usePhotoCrop } from '@/components/photo-cropper';
 import { RouteMap } from '@/components/route-map';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Field, Screen, Section } from '@/components/ui';
@@ -39,6 +40,7 @@ export default function TrailDetail() {
   const saved = trails.find((t) => t.id === id) ?? null;
   const [details, setDetails] = useState<TrailDetails | null>(null);
   const [busy, setBusy] = useState<'save' | 'share' | 'stop' | 'photo' | 'delete' | null>(null);
+  const { cropper, crop } = usePhotoCrop();
   const [error, setError] = useState<string | null>(null);
   const [problems, setProblems] = useState<string[]>([]);
   const [extra, setExtra] = useState<{ hideStart: boolean; obstacles: Obstacle[] } | null>(null);
@@ -136,10 +138,12 @@ export default function TrailDetail() {
     if (saved!.photos.length >= MAX_PHOTOS) return showNotice(tr('Photo Limit'), tr('A trail can have up to {v} photos.', { v: MAX_PHOTOS }));
     setBusy('photo');
     try {
-      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: Platform.OS === 'web' ? 0.5 : 0.7 });
+      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
       if (res.canceled || !res.assets[0]) return;
-      const a = res.assets[0];
-      await addLocalPhoto({ ...saved!, details: details! }, { uri: a.uri, mimeType: a.mimeType ?? null });
+      // The website keeps trail photos in the browser's storage, so they stay smaller there.
+      const a = await crop(res.assets[0], { maxSide: Platform.OS === 'web' ? 1280 : 1600, quality: Platform.OS === 'web' ? 0.6 : 0.75 });
+      if (!a) return;
+      await addLocalPhoto({ ...saved!, details: details! }, { uri: a.uri, mimeType: 'image/jpeg' });
     } catch (e) {
       setError(e instanceof Error ? e.message : tr('Couldn’t add that photo.'));
     } finally {
@@ -335,6 +339,7 @@ export default function TrailDetail() {
         onRemove={removeSpot}
         onClose={() => setEditing(null)}
       />
+      {cropper}
     </Screen>
   );
 }

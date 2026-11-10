@@ -96,12 +96,12 @@ export type AvatarSource = 'camera' | 'library';
 export const canUseCamera = Platform.OS !== 'web';
 
 /**
- * Lets the rider take or pick a photo, cropped square (the native crop screen on iPhone, iPad
- * and Android). Returns null when they cancel or say no to access.
+ * Lets the rider take or pick a photo; the screen then shows the crop screen (components/
+ * photo-cropper, square with a round guide) before it saves. Returns null when they cancel.
  */
 export async function pickAvatar(source: AvatarSource): Promise<ImagePicker.ImagePickerAsset | null> {
   const options: ImagePicker.ImagePickerOptions = {
-    mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 1,
+    mediaTypes: ['images'], allowsEditing: false, quality: 1,
   };
   if (source === 'camera') {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
