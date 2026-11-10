@@ -15,10 +15,12 @@
 // Deploy:  supabase functions deploy ad-conversions --no-verify-jwt
 // Secrets: META_DATASET_ID       Meta Pixel / dataset id linked to the OnMyLead Meta app
 //          META_CAPI_TOKEN       Conversions API access token (Events Manager > Settings)
-//          TIKTOK_APP_ID         TikTok Events Manager app id
+//          TIKTOK_IOS_APP_ID     TikTok App ID of the iPhone app (Events Manager > the app > Copy the TikTok App ID)
+//          TIKTOK_ANDROID_APP_ID TikTok App ID of the Android app (TikTok gives each store listing its own)
+//          TIKTOK_APP_ID         older single id, used for a platform whose own id isn't set
 //          TIKTOK_EVENTS_TOKEN   TikTok Events API access token
 //          META_TEST_EVENT_CODE, TIKTOK_TEST_EVENT_CODE   optional, while checking in each Test Events page
-import { metaAppPayload, parseAdEventBody, tiktokAppPayload } from '../_shared/ad-conversions.ts';
+import { metaAppPayload, parseAdEventBody, tiktokAppIdFor, tiktokAppPayload } from '../_shared/ad-conversions.ts';
 
 const env = (k: string) => (Deno.env.get(k) ?? '').trim();
 const META_API = 'https://graph.facebook.com/v21.0';
@@ -58,7 +60,7 @@ Deno.serve(async (req) => {
       }, (e) => console.warn('meta', String(e))),
     );
   }
-  const ttApp = env('TIKTOK_APP_ID');
+  const ttApp = tiktokAppIdFor(body.platform, env);
   const ttToken = env('TIKTOK_EVENTS_TOKEN');
   if (ttApp && ttToken) {
     jobs.push(
