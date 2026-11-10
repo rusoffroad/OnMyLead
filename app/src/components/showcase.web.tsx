@@ -70,7 +70,7 @@ export function Showcase() {
         </a>
         <nav aria-label="Sections">
           {SHOWCASE_NO_SERVICE ? <a href="#no-service" onClick={jump('no-service')}>No Service</a> : null}
-          <a href="#new" onClick={jump('new')}>New in 2.1</a>
+          <a href="#new" onClick={jump('new')}>{SHOWCASE_REDESIGN_3 ? 'New in 3.0' : 'New in 2.1'}</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
           <a href="#features" onClick={jump('features')}>Features</a>
@@ -102,7 +102,11 @@ export function Showcase() {
               Free to download and ride. Pro is {PRO_PRICES.monthly} a month or {PRO_PRICES.annual} a year, and every
               new account gets {TRIAL_DAYS} days of Pro with no card.
             </p>
-            {SHOWCASE_NO_SERVICE ? (
+            {SHOWCASE_REDESIGN_3 ? (
+              <a className="hero-new" href="#new" onClick={jump('new')}>
+                <b>New in 3.0</b> A whole new look, with Map Mode up front.
+              </a>
+            ) : SHOWCASE_NO_SERVICE ? (
               <a className="hero-new" href="#no-service" onClick={jump('no-service')}>
                 <b>New in 2.1</b> No service? Your group still hears you, over Bluetooth.
               </a>
@@ -110,7 +114,7 @@ export function Showcase() {
           </div>
           <div className="hero-phone">
             <figure className="phone">
-              <img src="/showcase/group-map.webp" alt="Ride Mode’s live group map: every rider’s dot along the trail on satellite imagery, the leader’s bigger blue dot out front, and the group spread under the rider line" width={786} height={1704} />
+              <img src={`/showcase/${v3('group-map')}.webp`} alt="Ride Mode’s live group map: every rider’s dot along the trail on satellite imagery, the leader’s bigger blue dot out front, and the group spread under the rider line" width={786} height={1704} />
             </figure>
           </div>
         </div>
@@ -123,7 +127,7 @@ export function Showcase() {
 
       <PromoVideo />
 
-      <NewIn2 />
+      {SHOWCASE_REDESIGN_3 ? <NewIn3 /> : <NewIn2 />}
 
       <main>
         <section id="how" className="how" aria-labelledby="how-title">
@@ -141,7 +145,7 @@ export function Showcase() {
             <Step
               n={2}
               shot="find"
-              alt="Find a Ride with a place search, a map of Utah and the Rides, Find, Groups and You tabs"
+              alt={SHOWCASE_REDESIGN_3 ? 'The Rides tab: Rides Near You with a place search, a map of Utah and the Home, Rides, Map Mode, Events and Social tabs' : 'Find a Ride with a place search, a map of Utah and the Rides, Find, Groups and You tabs'}
               title="Bring Your Crew"
               text="Send the ride by link, text, email or its QR code. Friends see a preview before they make an account, and riders can find public rides near them, by state, or near a park or trailhead they search for."
               points={['Riding Groups invite your whole crew in one tap and have their own group chat', 'Follow This Leader to hear about their next public ride', 'Exact meeting spot only shows to riders who join']}
@@ -271,7 +275,7 @@ export function Showcase() {
 
         <section className="qr" aria-labelledby="nav-title">
           <figure className="phone qr-phone">
-            <img src="/showcase/navigate.webp" alt="Map Mode on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Draw tabs, and speed with elevation, heading, trip miles and moving time" loading="lazy" width={786} height={1704} />
+            <img src={`/showcase/${v3('navigate')}.webp`} alt="Map Mode on a phone: a satellite trail map with a rider-mapped trail in mint dots, the Explore, Record and Draw tabs, and speed with elevation, heading, trip miles and moving time" loading="lazy" width={786} height={1704} />
           </figure>
           <div className="qr-copy">
             <h2 id="nav-title" className="section-title">Map Mode When It’s Just You</h2>
@@ -382,7 +386,7 @@ export function Showcase() {
               <Feature title="Events">Rallies, poker runs and ride weekends on one shareable page: dates, place, photos, an agenda of concerts, raffles and runs, and the group rides to join. Pro riders post them, add co-hosts and pick a Ride Manager for each ride. Anyone can see them and say they’re going, and the app explains when you want an event and when a public ride will do. Events presented by RUS Offroad say so in gold, new in 2.1.</Feature>
             </div>
             <figure className="phone">
-              <img src="/showcase/vehicle.webp" alt="A Garage machine called Red Rocket with its fuel range and build list" loading="lazy" width={786} height={1704} />
+              <img src={`/showcase/${v3('vehicle')}.webp`} alt="A Garage machine called Red Rocket with its fuel range and build list" loading="lazy" width={786} height={1704} />
             </figure>
           </div>
         </section>
@@ -584,7 +588,7 @@ function Step({ n, shot, alt, title, text, points }: { n: number; shot: string; 
   return (
     <li className="step">
       <figure className="phone">
-        <img src={`/showcase/${shot}.webp`} alt={alt} loading="lazy" width={786} height={1704} />
+        <img src={`/showcase/${v3(shot)}.webp`} alt={alt} loading="lazy" width={786} height={1704} />
       </figure>
       <div className="step-copy">
         <span className="step-n" aria-hidden="true">{n}</span>
@@ -595,6 +599,48 @@ function Step({ n, shot, alt, title, text, points }: { n: number; shot: string; 
         </ul>
       </div>
     </li>
+  );
+}
+
+/**
+ * The 3.0 screens (store/tools/web-shots, rendered from the app's code with sample riders) replace
+ * the 2.x ones once 3.0 is live: `name-3.webp` sits beside `name.webp` until SHOWCASE_REDESIGN_3 is on.
+ * Remake them with store/tools/web-shots/showcase.sh.
+ */
+const FRESH_3 = new Set(['group-map', 'find', 'live', 'navigate', 'vehicle']);
+const v3 = (name: string) => (SHOWCASE_REDESIGN_3 && FRESH_3.has(name) ? `${name}-3` : name);
+
+// The headline features of OnMyLead 3.0, each with the real screen. Pro features say so.
+const NEW_IN_3 = [
+  { shot: 'home-3', title: 'A New Home', text: 'A satellite map of your area up top, Map Mode first, then Join a Ride, Start a Ride and Events, with who’s out riding and what’s up next.', alt: 'The 3.0 Home: a satellite map header, the blue Map Mode banner, the red Join a Ride card with its code box, and Start a Ride and Events tiles' },
+  { shot: 'map-mode-3', title: 'Ride Solo, Then Bring the Group', text: 'Map Mode is your own offroad map, tagged Solo. When it’s worth sharing, Make It a Group Ride turns your spot into the meeting point (Pro).', alt: 'Map Mode on a solo ride: the Solo tag, speed, elevation, trip miles and the blue Make It a Group Ride card' },
+  { shot: 'ride-mode-3', title: 'Ride Mode, Rebuilt', text: 'Bigger status buttons, alerts you can act on, Regroup Here and EMERGENCY always one tap away at the bottom.', alt: 'Ride Mode with a separated rider alert, a Flat Tire alert, status buttons, Regroup Here and the red EMERGENCY bar' },
+  { shot: 'rides-3', title: 'Rides Near You', text: 'Public rides on a map and in cards with the trail, the difficulty and the machines welcome, near you or by state.', alt: 'The Rides tab: a map of Utah with ride pins and ride cards with satellite thumbnails' },
+  { shot: 'events-3', title: 'Events', text: 'Rallies, poker runs and ride weekends with their photos, who’s going and the group rides inside each one.', alt: 'The Events tab: the Moab Fall Rally with its photo, I’m Going and Share, and more events near you' },
+  { shot: 'social-3', title: 'Social', text: 'Your riding groups, the friends who are out riding right now and everyone’s ride reports in one place.', alt: 'Social: Riding Groups, a row of friends with the ones out riding ringed, and the activity feed' },
+  { shot: 'customize-home', title: 'Customize Home', text: 'Show, hide and reorder the sections under the top cards. Your layout follows you to every device.', alt: 'The Customize Home sheet with switches and up and down arrows for each Home section' },
+  ...(SHOWCASE_PHOTO_CROP ? [{ shot: 'photo-crop', title: 'Crop Every Photo', text: 'Drag and zoom every photo before it goes up, and pick a shape where you can.', alt: 'The Crop Photo screen with a desert photo inside the frame, shape choices and Use Photo' }] : []),
+];
+
+function NewIn3() {
+  return (
+    <section id="new" className="new2" aria-labelledby="new-title">
+      <div className="new2-inner">
+        <h2 id="new-title" className="section-title">New in OnMyLead 3.0</h2>
+        <p className="section-lede">A whole new look, built to be the offroad map you open first, on iPhone, iPad and Android.</p>
+        <ul className="new2-grid">
+          {NEW_IN_3.map((f) => (
+            <li key={f.shot} className="new2-card">
+              <figure className="phone">
+                <img src={`/showcase/${f.shot}.webp`} alt={f.alt} loading="lazy" width={786} height={1596} />
+              </figure>
+              <h3>{f.title}</h3>
+              <p>{f.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
 
