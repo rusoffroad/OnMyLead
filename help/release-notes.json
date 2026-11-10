@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.0",
+    "title": "OnMyLead 3.0",
+    "intro": "OnMyLead 3.0 is in the works. These notes grow as each change is finished.",
+    "whatsNew": "What's new in 3.0:\n\n• Ad Measurement: if you allow it, Meta and TikTok learn when one of our ads brought you to OnMyLead. Never your location, rides or messages.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Ad Measurement: OnMyLead now asks once, on iPhone and iPad with Apple's tracking prompt, whether Meta and TikTok may learn that one of our ads brought you here (an install, a new account, a trial or a Pro purchase). It never includes your location, rides, messages or email. Say no and nothing is sent. On Android it's a switch in You > Settings > Ad Measurement, and onmylead.com asks before loading any ad cookies."
+      }
+    ]
+  },
+  {
     "version": "2.1",
     "title": "Bluetooth Sharing With No Service, Every Map on Mapbox, 3D Terrain and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group (seeing riders and sharing over Bluetooth is part of OnMyLead Pro; on every plan your phone passes alerts along and EMERGENCY goes out, and every rider without Pro gets a fresh 30-day Pro trial with this update). When a rider sends EMERGENCY or their Crash Alert goes out, every other rider's phone now sounds a loud siren until they silence it. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",

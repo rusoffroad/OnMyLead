@@ -7,6 +7,7 @@
     "NSCameraUsageDescription": "Ambil foto profil atau foto kendaraanmu. Hanya foto yang kamu ambil yang diunggah.",
     "NSMotionUsageDescription": "OnMyLead memakai sensor gerak untuk meter kemiringan dan untuk mendeteksi kemungkinan kecelakaan di Mode Riding agar bisa memperingatkan grupmu.",
     "NSLocalNetworkUsageDescription": "OnMyLead terhubung ke antena Starlink-mu lewat Wi-Fi-nya untuk menampilkan statusnya. Tidak ada hal lain di jaringanmu yang disentuh.",
-    "NSBluetoothAlwaysUsageDescription": "Tanpa sinyal seluler, Mode Riding meneruskan lokasi dan peringatan riding kamu lewat Bluetooth ke rider terdekat di riding yang sama. Semua yang dikirim dienkripsi hanya untuk riding kamu."
+    "NSBluetoothAlwaysUsageDescription": "Tanpa sinyal seluler, Mode Riding meneruskan lokasi dan peringatan riding kamu lewat Bluetooth ke rider terdekat di riding yang sama. Semua yang dikirim dienkripsi hanya untuk riding kamu.",
+    "NSUserTrackingUsageDescription": "Mengizinkan OnMyLead memberi tahu Meta dan TikTok saat kamu memasang, mendaftar, atau berlangganan setelah melihat iklan OnMyLead, agar kami tahu iklan mana yang berhasil. Lokasi, perjalanan, dan pesanmu tidak pernah dibagikan."
   }
 }

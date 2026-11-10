@@ -3364,6 +3364,19 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Этой группы больше нет, или вы в ней больше не состоите.",
   "Please sign in first.": "Сначала войдите.",
   "Only the rider who made the group can change its photo.": "Менять фото группы может только райдер, который её создал.",
+  "Cookie Notice": "Уведомление о cookie",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Мы используем рекламные cookie Meta, Google и TikTok, чтобы понять, какая наша реклама приводит райдеров в OnMyLead. Они никогда не видят ваше местоположение, поездки или сообщения.",
+  "Allow": "Разрешить",
+  "Ad Cookies on This Website": "Рекламные cookie на этом сайте",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Разрешены. Meta, Google и TikTok могут узнать, что вас привела наша реклама.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Выключены. На этом сайте ничего не загружается от Meta, Google или TikTok.",
+  "Turn Off Ad Cookies": "Выключить рекламные cookie",
+  "Allow Ad Cookies": "Разрешить рекламные cookie",
+  "Ad Measurement": "Измерение рекламы",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Вкл. Meta и TikTok узнают, что вас привела реклама. Нажмите, чтобы изменить в Настройках",
+  "Off. Tap to change in Settings": "Выкл. Нажмите, чтобы изменить в Настройках",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Вкл. Meta и TikTok узнают, что вас привела реклама. Никогда не ваше местоположение, поездки или сообщения",
+  "Off. Nothing is sent to ad networks": "Выкл. В рекламные сети ничего не отправляется",
 };
 
 export default dict;

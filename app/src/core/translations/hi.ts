@@ -3364,6 +3364,19 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "यह ग्रुप अब नहीं है, या आप अब इसमें नहीं हैं।",
   "Please sign in first.": "पहले साइन इन करें।",
   "Only the rider who made the group can change its photo.": "सिर्फ़ ग्रुप बनाने वाला राइडर ही इसकी फ़ोटो बदल सकता है।",
+  "Cookie Notice": "कुकी सूचना",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "हम Meta, Google और TikTok की विज्ञापन कुकी इस्तेमाल करते हैं ताकि पता चले कि हमारे कौन से विज्ञापन राइडर्स को OnMyLead तक लाते हैं। वे आपकी लोकेशन, राइड या मैसेज कभी नहीं देखते।",
+  "Allow": "अनुमति दें",
+  "Ad Cookies on This Website": "इस वेबसाइट पर विज्ञापन कुकी",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "अनुमति है। Meta, Google और TikTok जान सकते हैं कि आप हमारे किसी विज्ञापन से यहाँ आए।",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "बंद। इस वेबसाइट पर Meta, Google या TikTok का कुछ भी लोड नहीं होता।",
+  "Turn Off Ad Cookies": "विज्ञापन कुकी बंद करें",
+  "Allow Ad Cookies": "विज्ञापन कुकी की अनुमति दें",
+  "Ad Measurement": "विज्ञापन मापन",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "चालू। Meta और TikTok जानते हैं कि आप किसी विज्ञापन से यहाँ आए। बदलने के लिए Settings में टैप करें",
+  "Off. Tap to change in Settings": "बंद। बदलने के लिए Settings में टैप करें",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "चालू। Meta और TikTok जानते हैं कि आप किसी विज्ञापन से यहाँ आए। आपकी लोकेशन, राइड या मैसेज कभी नहीं",
+  "Off. Nothing is sent to ad networks": "बंद। विज्ञापन नेटवर्क को कुछ नहीं भेजा जाता",
 };
 
 export default dict;

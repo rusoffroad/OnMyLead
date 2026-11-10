@@ -7,6 +7,7 @@
     "NSCameraUsageDescription": "Tire uma foto de perfil ou uma foto do seu veículo. Só a foto tirada é enviada.",
     "NSMotionUsageDescription": "O OnMyLead usa os sensores de movimento para o medidor de inclinação e para detectar um possível acidente no Modo Passeio e avisar o seu grupo.",
     "NSLocalNetworkUsageDescription": "O OnMyLead se conecta à sua antena Starlink pelo Wi-Fi dela para mostrar o status. Nada mais na sua rede é tocado.",
-    "NSBluetoothAlwaysUsageDescription": "Sem sinal de celular, o Modo Passeio passa por Bluetooth as localizações e alertas do seu passeio para pilotos próximos no mesmo passeio. Tudo o que é enviado é criptografado só para o seu passeio."
+    "NSBluetoothAlwaysUsageDescription": "Sem sinal de celular, o Modo Passeio passa por Bluetooth as localizações e alertas do seu passeio para pilotos próximos no mesmo passeio. Tudo o que é enviado é criptografado só para o seu passeio.",
+    "NSUserTrackingUsageDescription": "Permite que o OnMyLead avise a Meta e o TikTok quando você instala, se cadastra ou assina depois de ver um anúncio do OnMyLead, para sabermos quais anúncios funcionam. Sua localização, seus passeios e suas mensagens nunca são compartilhados."
   }
 }

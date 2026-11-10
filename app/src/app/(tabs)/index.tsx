@@ -55,6 +55,8 @@ import { syncRideReminders } from '@/lib/push';
 import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
+import { askForTracking } from '@/lib/ad-tracking';
+import { useNeedsRiderAgreement } from '@/lib/rider-agreement';
 import { setTrackLineOn } from '@/lib/track-line';
 import type { Ride, RideMember } from '@/lib/types';
 import { currentLocale, t } from '@/lib/i18n';
@@ -116,6 +118,15 @@ export default function HomeScreen() {
     setFeedSettings(DEFAULT_FEED_SETTINGS);
     setError(null);
   }
+
+  // Apple's App Tracking Transparency prompt, once, on Home after sign-in and the rider agreement,
+  // never on a map or mid-ride (iPhone and iPad only; lib/ad-tracking.ts).
+  const needsAgreement = useNeedsRiderAgreement();
+  useEffect(() => {
+    if (!session || needsAgreement) return;
+    const timer = setTimeout(() => askForTracking(), 2000);
+    return () => clearTimeout(timer);
+  }, [session, needsAgreement]);
 
   // How far Public Rides Near You looks, remembered on this phone.
   useEffect(() => {

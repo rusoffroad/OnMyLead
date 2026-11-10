@@ -15,12 +15,14 @@ export type LegalSection = { title: string; body: string[]; guide?: string };
 /**
  * A plain reading page for the Terms of Use, the Privacy Policy and Help.
  */
-export function LegalPage({ title, updated, intro, sections, action, lead }: {
+export function LegalPage({ title, updated, intro, sections, action, lead, footer }: {
   title: string; updated: string; intro: string; sections: LegalSection[];
   /** Shown first, above the intro (e.g. the Help Center link on the Support page). */
   lead?: ReactNode;
   /** A button under the intro, e.g. Contact Us on the Support page. */
   action?: { title: string; href: '/contact' };
+  /** Shown after the sections, e.g. the website's ad cookie choice on the Privacy Policy. */
+  footer?: ReactNode;
 }) {
   return (
     <Screen>
@@ -42,6 +44,7 @@ export function LegalPage({ title, updated, intro, sections, action, lead }: {
             {s.guide ? <GuideLink slug={s.guide} /> : null}
           </View>
         ))}
+        {footer}
         <Button
           title={t('Back to OnMyLead')}
           kind="secondary"

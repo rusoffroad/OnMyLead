@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
+import { AdConsentNotice } from '@/components/ad-consent-notice';
 import { DirectionsHost } from '@/components/directions';
 import { EmergencySiren } from '@/components/emergency-siren';
 import { LaunchCover } from '@/components/launch-cover';
@@ -27,6 +28,7 @@ import { Colors, currentScheme, font, NavigationColors } from '@/constants/theme
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { logScreen, startAppLog } from '@/lib/app-log';
 import { startAppearance, takeReturnPath, useAppearance } from '@/lib/appearance';
+import { startAdTracking } from '@/lib/ad-tracking';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
 import { useCan } from '@/lib/pro';
@@ -109,6 +111,8 @@ function RootLayout() {
   useEffect(() => startRiderAgreement(), []);
   // A friend link opened before signing up counts as an invite once the new account signs in.
   useEffect(() => startReferrals(), []);
+  // Ad measurement for OnMyLead's Meta, Google and TikTok ads: only with the rider's OK (lib/ad-tracking.ts).
+  useEffect(() => startAdTracking(), []);
   // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();
@@ -226,6 +230,8 @@ function RootLayout() {
       <RiderAgreementGate />
       {/* The owner's minimum version (Admin Dashboard > Releases), over everything, with Not Now. */}
       <UpdateRequired />
+      {/* onmylead.com's cookie notice for the ad pixels (website only). */}
+      <AdConsentNotice />
       {/* A copy of the launch screen with the app's version, over everything until launch ends. */}
       <LaunchCover until={launchedAt + SPLASH_MIN_MS} />
     </ThemeProvider>

@@ -3364,6 +3364,19 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "该群组已不存在，或你已不在其中。",
   "Please sign in first.": "请先登录。",
   "Only the rider who made the group can change its photo.": "只有创建群组的骑手才能更改群组照片。",
+  "Cookie Notice": "Cookie 通知",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "我们使用 Meta、Google 和 TikTok 的广告 Cookie，了解哪些广告把骑手带到了 OnMyLead。它们永远看不到你的位置、骑行或消息。",
+  "Allow": "允许",
+  "Ad Cookies on This Website": "本网站的广告 Cookie",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "已允许。Meta、Google 和 TikTok 可以知道你是通过我们的广告来到这里的。",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "已关闭。本网站不会加载 Meta、Google 或 TikTok 的任何内容。",
+  "Turn Off Ad Cookies": "关闭广告 Cookie",
+  "Allow Ad Cookies": "允许广告 Cookie",
+  "Ad Measurement": "广告效果衡量",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "已开启。Meta 和 TikTok 会知道你是通过广告来的。轻点到设置中更改",
+  "Off. Tap to change in Settings": "已关闭。轻点到设置中更改",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "已开启。Meta 和 TikTok 会知道你是通过广告来的。绝不包括你的位置、骑行或消息",
+  "Off. Nothing is sent to ad networks": "已关闭。不会向广告网络发送任何内容",
 };
 
 export default dict;

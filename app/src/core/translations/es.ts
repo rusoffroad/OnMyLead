@@ -3364,6 +3364,19 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Este grupo ya no existe o ya no formas parte de él.",
   "Please sign in first.": "Primero inicia sesión.",
   "Only the rider who made the group can change its photo.": "Solo quien creó el grupo puede cambiar su foto.",
+  "Cookie Notice": "Aviso de cookies",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Usamos cookies publicitarias de Meta, Google y TikTok para saber cuáles de nuestros anuncios traen pilotos a OnMyLead. Nunca ven tu ubicación, tus rutas ni tus mensajes.",
+  "Allow": "Permitir",
+  "Ad Cookies on This Website": "Cookies publicitarias en este sitio web",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Permitidas. Meta, Google y TikTok pueden saber cuándo uno de nuestros anuncios te trajo aquí.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Desactivadas. Nada de Meta, Google ni TikTok se carga en este sitio web.",
+  "Turn Off Ad Cookies": "Desactivar cookies publicitarias",
+  "Allow Ad Cookies": "Permitir cookies publicitarias",
+  "Ad Measurement": "Medición de anuncios",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Activada. Meta y TikTok saben cuándo un anuncio te trajo aquí. Toca para cambiarlo en Ajustes",
+  "Off. Tap to change in Settings": "Desactivada. Toca para cambiarlo en Ajustes",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Activada. Meta y TikTok saben cuándo un anuncio te trajo aquí. Nunca tu ubicación, rutas ni mensajes",
+  "Off. Nothing is sent to ad networks": "Desactivada. No se envía nada a redes publicitarias",
 };
 
 export default dict;

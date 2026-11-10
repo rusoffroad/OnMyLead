@@ -3364,6 +3364,19 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Ce groupe n’existe plus, ou vous n’en faites plus partie.",
   "Please sign in first.": "Connectez-vous d’abord.",
   "Only the rider who made the group can change its photo.": "Seul le pilote qui a créé le groupe peut changer sa photo.",
+  "Cookie Notice": "Avis sur les cookies",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Nous utilisons des cookies publicitaires de Meta, Google et TikTok pour savoir lesquelles de nos publicités amènent des pilotes sur OnMyLead. Ils ne voient jamais votre position, vos sorties ni vos messages.",
+  "Allow": "Autoriser",
+  "Ad Cookies on This Website": "Cookies publicitaires sur ce site",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Autorisés. Meta, Google et TikTok peuvent savoir quand une de nos publicités vous a amené ici.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Désactivés. Rien de Meta, Google ou TikTok ne se charge sur ce site.",
+  "Turn Off Ad Cookies": "Désactiver les cookies publicitaires",
+  "Allow Ad Cookies": "Autoriser les cookies publicitaires",
+  "Ad Measurement": "Mesure publicitaire",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Activée. Meta et TikTok savent quand une publicité vous a amené ici. Touchez pour modifier dans Réglages",
+  "Off. Tap to change in Settings": "Désactivée. Touchez pour modifier dans Réglages",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Activée. Meta et TikTok savent quand une publicité vous a amené ici. Jamais votre position, vos sorties ni vos messages",
+  "Off. Nothing is sent to ad networks": "Désactivée. Rien n’est envoyé aux régies publicitaires",
 };
 
 export default dict;

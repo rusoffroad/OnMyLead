@@ -20,6 +20,7 @@ import { settingsSummary } from '@/core/notifications';
 import { planHeadline } from '@/core/pro';
 import { formatBytes } from '@/core/offline-maps';
 import { shareEndText } from '@/core/sharing';
+import { setAndroidAdMeasurement, useAdMeasurement } from '@/lib/ad-tracking';
 import { deleteMyAccount, myActiveShares, myRideName } from '@/lib/api';
 import { useAppSettings, useFlag } from '@/lib/app-settings';
 import { referralsSwitchedOn } from '@/core/referrals';
@@ -62,6 +63,7 @@ import { ProTag } from '@/components/pro-tag';
  */
 export default function You() {
   const { session, loading } = useSession();
+  const ads = useAdMeasurement();
   const [rideName, setRideName] = useState<string | null>(null);
   /** When the rider's personal share ends (epoch ms; far off for "until I turn it off"), or null when not sharing. */
   const [sharingUntil, setSharingUntil] = useState<number | null>(null);
@@ -401,6 +403,33 @@ export default function You() {
             <MenuRow icon="addFriend" color={Colors.accent} title={t('Invite Friends')} detail={t('You both get 50% off Pro Annual when they finish a ride')} onPress={() => router.push('/invite-friends')} />
           ) : null}
           <MenuRow icon="block" color={Colors.danger} title={t('Blocked Riders')} detail={blockedSummary} onPress={() => router.push('/blocked')} />
+          {/* Ad measurement for OnMyLead's own ads (lib/ad-tracking.ts). iPhone and iPad: Apple's
+              Allow Apps to Request to Track decides, so this opens Settings. Android: this switch. */}
+          {Platform.OS === 'ios' ? (
+            <MenuRow
+              icon="lock"
+              color={Colors.textSecondary}
+              title={t('Ad Measurement')}
+              detail={ads.consent === 'granted' ? t('On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings') : t('Off. Tap to change in Settings')}
+              onPress={() => Linking.openSettings()}
+            />
+          ) : Platform.OS === 'android' ? (
+            <MenuRow
+              icon="lock"
+              color={Colors.textSecondary}
+              title={t('Ad Measurement')}
+              detail={ads.androidOn ? t('On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages') : t('Off. Nothing is sent to ad networks')}
+              right={
+                <Switch
+                  value={ads.androidOn}
+                  onValueChange={setAndroidAdMeasurement}
+                  trackColor={{ true: Colors.sky, false: Colors.backgroundSelected }}
+                  thumbColor="#FFFFFF"
+                  accessibilityLabel={t('Ad Measurement')}
+                />
+              }
+            />
+          ) : null}
         </MenuGroup>
       ) : null}
 

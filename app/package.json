@@ -45,6 +45,7 @@
     "expo-symbols": "~57.0.3",
     "expo-system-ui": "~57.0.4",
     "expo-task-manager": "~57.0.21",
+    "expo-tracking-transparency": "~57.0.2",
     "expo-web-browser": "~57.0.3",
     "leaflet": "1.9.4",
     "mapbox-gl": "2.15.0",

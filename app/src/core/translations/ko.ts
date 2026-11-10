@@ -3364,6 +3364,19 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "이 그룹이 없어졌거나 더 이상 멤버가 아닙니다.",
   "Please sign in first.": "먼저 로그인하세요.",
   "Only the rider who made the group can change its photo.": "그룹을 만든 라이더만 그룹 사진을 바꿀 수 있습니다.",
+  "Cookie Notice": "쿠키 안내",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "어떤 광고가 라이더를 OnMyLead로 데려오는지 알기 위해 Meta, Google, TikTok의 광고 쿠키를 사용합니다. 이들은 위치, 라이드, 메시지를 절대 보지 못합니다.",
+  "Allow": "허용",
+  "Ad Cookies on This Website": "이 웹사이트의 광고 쿠키",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "허용됨. Meta, Google, TikTok이 저희 광고를 보고 오셨다는 것을 알 수 있습니다.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "꺼짐. 이 웹사이트에서는 Meta, Google, TikTok의 어떤 것도 불러오지 않습니다.",
+  "Turn Off Ad Cookies": "광고 쿠키 끄기",
+  "Allow Ad Cookies": "광고 쿠키 허용",
+  "Ad Measurement": "광고 성과 측정",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "켜짐. 광고를 보고 오셨다는 것을 Meta와 TikTok이 압니다. 탭하여 설정에서 변경",
+  "Off. Tap to change in Settings": "꺼짐. 탭하여 설정에서 변경",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "켜짐. 광고를 보고 오셨다는 것을 Meta와 TikTok이 압니다. 위치, 라이드, 메시지는 절대 보내지 않습니다",
+  "Off. Nothing is sent to ad networks": "꺼짐. 광고 네트워크에 아무것도 보내지 않습니다",
 };
 
 export default dict;
