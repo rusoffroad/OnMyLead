@@ -34,10 +34,10 @@ const styles = themedStyles(() => ({
   small: { fontSize: 14, lineHeight: 20, fontWeight: 500 },
   smallBold: { fontSize: 14, lineHeight: 20, fontWeight: 700 },
   /** Screen titles: condensed, tight, signage-like. */
-  title: { fontSize: 44, lineHeight: 44, fontWeight: 800, letterSpacing: -0.5 },
-  subtitle: { fontSize: 32, lineHeight: 34, fontWeight: 700, letterSpacing: -0.2 },
+  title: { fontSize: 36, lineHeight: 38, fontWeight: 700, letterSpacing: 0 },
+  subtitle: { fontSize: 28, lineHeight: 31, fontWeight: 700, letterSpacing: 0.1 },
   /** Section headings inside a screen. */
-  heading: { fontSize: 22, lineHeight: 26, fontWeight: 700 },
+  heading: { fontSize: 24, lineHeight: 27, fontWeight: 700, letterSpacing: 0.2 },
   link: { fontSize: 15, lineHeight: 22, fontWeight: 600 },
   linkPrimary: { fontSize: 15, lineHeight: 22, fontWeight: 600 },
   code: { fontFamily: Fonts.mono, fontSize: 12 },

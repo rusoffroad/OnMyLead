@@ -3,7 +3,7 @@ import { ReactNode, useContext, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { font, MaxContentWidth, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
+import { font, MaxContentWidth, Radius, scrollIndicator, Spacing, themedStyles, TileSurface } from '@/constants/theme';
 import { READABLE_WIDTH } from '@/core/layout';
 import { useTheme } from '@/hooks/use-theme';
 import type { FeatureKey } from '@/core/entitlements';
@@ -152,8 +152,7 @@ export function PasswordField(props: Omit<TextInputProps, 'secureTextEntry'> & {
 }
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
-  const theme = useTheme();
-  return <View style={[styles.card, { backgroundColor: theme.backgroundElement }, style]}>{children}</View>;
+  return <View style={[styles.card, TileSurface, style]}>{children}</View>;
 }
 
 /** A heading for a block of a screen, with an optional count or action on the right. */

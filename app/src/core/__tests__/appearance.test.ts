@@ -13,6 +13,7 @@ import {
   RIDE_INK_CB,
   SKINS,
   statusSymbol,
+  tileEdgeFor,
   type Appearance,
 } from '../appearance';
 import { contrast, deltaE, hexToRgb, simulate, withAlpha, type Vision } from '../color';
@@ -117,14 +118,30 @@ describe('Color Blind Mode', () => {
   });
 });
 
+describe('tile edges (3.0)', () => {
+  it('stand clearly off the background in every theme, dark and light', () => {
+    for (const skin of SKINS) {
+      for (const scheme of ['dark', 'light'] as const) {
+        const s = skin[scheme];
+        const edge = tileEdgeFor(s, scheme === 'dark');
+        // Brighter than the theme's own border, and visible against both the page and the tile.
+        expect(contrast(edge, s.background)).toBeGreaterThan(contrast(s.border, s.background));
+        expect(contrast(edge, s.background)).toBeGreaterThanOrEqual(1.6);
+        expect(contrast(edge, s.backgroundElement)).toBeGreaterThanOrEqual(1.4);
+      }
+    }
+  });
+});
+
 describe('appearance choice', () => {
   it('defaults to Dark Night Navy, the look riders already know', () => {
     const p = buildPalette(DEFAULT_APPEARANCE);
     expect(p.scheme).toBe('dark');
-    expect(p.colors.background).toBe('#0A1626');
+    expect(p.colors.background).toBe('#0A1019');
     expect(p.colors.accent).toBe('#E5262E');
     expect(p.colors.sky).toBe('#3B86F7');
-    expect(p.glass.panel).toBe('rgba(18,34,58,0.95)');
+    expect(p.glass.panel).toBe('rgba(19,28,41,0.95)');
+    expect(p.colors.tileEdge).toBe(tileEdgeFor(p.colors, true));
   });
 
   it('Match Phone follows the phone and falls back to dark', () => {

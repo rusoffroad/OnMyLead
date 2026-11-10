@@ -42,7 +42,7 @@ export const SKINS: Skin[] = [
     id: 'navy',
     name: 'Night Navy',
     blurb: 'The classic OnMyLead look',
-    dark: { background: '#0A1626', backgroundElement: '#12223A', backgroundSelected: '#1B2F4C', border: '#27406A', text: '#F1F4F8', textSecondary: '#97A7BE' },
+    dark: { background: '#0A1019', backgroundElement: '#131C29', backgroundSelected: '#1B2636', border: '#2C3B53', text: '#F5F7FA', textSecondary: '#9AA6B6' },
     light: { background: '#EEF2F7', backgroundElement: '#FFFFFF', backgroundSelected: '#E1E8F2', border: '#C9D4E3', text: '#0A1626', textSecondary: '#4F5F77' },
   },
   {
@@ -114,11 +114,20 @@ export const MAP_INK_CB: MapInk = {
 
 export type Palette = {
   scheme: Scheme;
-  colors: Surfaces & { textSoft: string; accent: string; onAccent: string; sky: string; danger: string; gold: string; scout: string; onScout: string; scrim: string };
+  colors: Surfaces & { tileEdge: string; textSoft: string; accent: string; onAccent: string; sky: string; danger: string; gold: string; scout: string; onScout: string; scrim: string };
   glass: { panel: string; tile: string; edge: string; redTint: string; redEdge: string; amberTint: string; amber: string; softRed: string };
   ride: RideInk;
   map: MapInk;
 };
+
+/**
+ * The edge drawn around every tile and card (3.0): a visible hairline a step brighter than the
+ * theme's border, so tiles stand off the background in sunlight (Chris asked for it to be clearly
+ * visible). Derived from each theme's own colours, so Carbon, Desert, Forest and Light follow.
+ */
+export function tileEdgeFor(s: Surfaces, dark: boolean): string {
+  return mix(s.border, s.textSecondary, dark ? 0.35 : 0.2);
+}
 
 /** Which scheme to draw, given the rider's mode and the phone's own setting. */
 export function resolveScheme(mode: AppearanceMode, system: string | null | undefined): Scheme {
@@ -133,7 +142,7 @@ export function buildPalette(a: Appearance, system?: string | null): Palette {
   const dark = scheme === 'dark';
   return {
     scheme,
-    colors: { ...s, textSoft: mix(s.text, s.textSecondary, 0.5), accent: b.accent, onAccent: '#FFFFFF', sky: b.sky, danger: b.danger, gold: b.gold, scout: b.scout, onScout: b.onScout, scrim: dark ? 'rgba(3,9,18,0.72)' : 'rgba(10,22,38,0.42)' },
+    colors: { ...s, tileEdge: tileEdgeFor(s, dark), textSoft: mix(s.text, s.textSecondary, 0.5), accent: b.accent, onAccent: '#FFFFFF', sky: b.sky, danger: b.danger, gold: b.gold, scout: b.scout, onScout: b.onScout, scrim: dark ? 'rgba(3,9,18,0.72)' : 'rgba(10,22,38,0.42)' },
     glass: {
       panel: withAlpha(s.backgroundElement, dark ? 0.95 : 0.96),
       tile: dark ? 'rgba(255,255,255,0.06)' : 'rgba(10,22,38,0.05)',
