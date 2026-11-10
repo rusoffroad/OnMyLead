@@ -12,7 +12,7 @@ type CarPlayNative = {
   clearRide(): void;
   /** Missing in the first CarPlay builds; optional so an older native module still works. */
   setLabels?(labels: CarPlayLabels): void;
-  /** Map Mode's dash (2.1.1). Optional like setLabels. */
+  /** Map Mode's dash (3.0). Optional like setLabels. */
   setMap?(state: CarPlayMapState): void;
   clearMap?(): void;
   addListener(event: 'onAction', listener: (e: { id: string }) => void): Subscription;

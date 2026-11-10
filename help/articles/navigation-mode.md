@@ -330,7 +330,7 @@ See [Create a Ride](/help/create-a-ride) and [Draw a Route](/help/route-builder)
 The round **Music** button above **Center on Me** pauses, skips and changes the volume of the music on your phone. See [Control Your Music While You Ride](/help/music-controls).
 :::
 
-:::release 2.1.1
+:::release 3.0
 ## Map Mode on CarPlay
 
 With OnMyLead Pro, an iPhone connected to CarPlay shows Map Mode's speed, elevation, heading, trip, the trail you're following and your recording on the car screen, with **Pause** and **Resume** for a recording. The map stays on your phone. See [Use OnMyLead on CarPlay](/help/carplay).

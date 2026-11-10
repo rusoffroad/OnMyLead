@@ -29,11 +29,11 @@ CarPlay is part of OnMyLead Pro, including the Pro Trial. On a Free account the 
 2. Tap **OnMyLead** on the car screen. If you don't see it, swipe across the car's home screen, or add it in your iPhone's **Settings** > **General** > **CarPlay** > your car > **Customize**.
 3. Open **Ride Mode** for your ride on your phone. The car screen follows it.
 
-:::until 2.1.1
+:::until 3.0
 Until Ride Mode is open on your phone, the car screen says **No Ride Running**.
 :::
 
-:::release 2.1.1
+:::release 3.0
 Riding solo, with no group ride? Open **Map Mode** on your phone, or tap **Open Map Mode** on the car screen, and the car shows Map Mode instead (see below).
 
 With neither Ride Mode nor Map Mode open on your phone, the car screen says **No Ride Running**, with an **Open Map Mode** button.
@@ -52,7 +52,7 @@ The buttons:
 
 Typed messages, your own quick replies and the map stay on your phone. CarPlay only allows a few buttons, and typing while driving isn't safe.
 
-:::release 2.1.1
+:::release 3.0
 ## Map Mode on the Car Screen
 
 When Map Mode is open on your phone and no ride is in Ride Mode, the car screen shows Map Mode's numbers, updated as you drive:
@@ -76,10 +76,10 @@ The car screen uses the language you picked in OnMyLead. See [Language](/help/la
 ## Troubleshooting
 
 - **OnMyLead isn't on the car screen.** Update OnMyLead from the App Store, then reconnect your iPhone to the car.
-:::until 2.1.1
+:::until 3.0
 - **The car screen says No Ride Running.** Open Ride Mode for your ride on your phone.
 :::
-:::release 2.1.1
+:::release 3.0
 - **The car screen says No Ride Running.** Open Ride Mode for your ride on your phone, or tap **Open Map Mode**.
 :::
 - **The car screen says CarPlay Is Part of OnMyLead Pro.** Your account is on Free. Check **You** > **Subscription** on your phone.

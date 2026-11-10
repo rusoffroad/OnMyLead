@@ -1,9 +1,9 @@
 [
   {
-    "version": "2.1.1",
+    "version": "3.0",
     "title": "CarPlay in Map Mode",
-    "intro": "OnMyLead 2.1.1 puts CarPlay to work on solo rides too: with Map Mode open on your iPhone, the car screen shows your speed, elevation, heading, trip and the trail you're following.",
-    "whatsNew": "What's new in 2.1.1:\n\n• CarPlay works without Ride Mode: open Map Mode and the car screen shows your speed, elevation, heading, trip, the trail you're following and your recording (Pro).",
+    "intro": "OnMyLead 3.0 puts CarPlay to work on solo rides too: with Map Mode open on your iPhone, the car screen shows your speed, elevation, heading, trip and the trail you're following.",
+    "whatsNew": "What's new in 3.0:\n\n• CarPlay works without Ride Mode: open Map Mode and the car screen shows your speed, elevation, heading, trip, the trail you're following and your recording (Pro).",
     "apple": null,
     "google": null,
     "notes": [
