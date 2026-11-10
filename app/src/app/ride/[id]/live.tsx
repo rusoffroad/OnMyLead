@@ -1708,7 +1708,7 @@ export default function RideMode() {
         {panelOpen ? (
           <>
             <View style={{ gap: Spacing.two, marginTop: Spacing.two }}>
-              <QuickRow lastReply={lastReply} onReply={quickReply} onMore={() => setStatusesOpen(true)} />
+              <QuickRow lastReply={lastReply} onReply={quickReply} onMore={() => setStatusesOpen(true)} trouble={{ labels: STATUS_LABEL, myStatus: myStatus?.status, onStatus: tapStatus }} />
               <PanelActions onRegroup={canRegroup ? regroupHere : undefined} onEmergency={() => tapStatus('emergency')} />
             </View>
           </>
@@ -1921,9 +1921,9 @@ const styles = themedStyles(() => ({
   callDismiss: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
   foldedSos: {
     flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Glass.redTint, borderWidth: 1.5, borderColor: 'rgba(229,38,46,0.75)',
+    backgroundColor: '#D9252C', borderWidth: 1.5, borderColor: 'rgba(255,175,175,0.55)',
   },
-  sosText: { color: Glass.softRed },
+  sosText: { color: '#fff', letterSpacing: 0.6 },
   actions: { flexDirection: 'row', gap: Spacing.two },
   handle: { alignItems: 'center', minHeight: 40, justifyContent: 'center', marginTop: -6 },
   fullGrab: { alignItems: 'center', paddingBottom: 6, marginTop: -4 },

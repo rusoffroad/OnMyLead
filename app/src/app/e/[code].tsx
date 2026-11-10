@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState, type ReactNode } from 'react';
-import { Linking, Platform, Pressable, ScrollView, Share, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { AgendaTimeline, Cover, DateStub, PeopleSheet, PresentedBy } from '@/components/events/parts';
 import { AddRideSheet, AgendaSheet } from '@/components/events/sheets';
@@ -19,7 +19,7 @@ import { APP_STORE_URL, PLAY_STORE_URL } from '@/constants/site';
 import { storeLink } from '@/lib/found-us';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
-  eventDates, eventLink, eventPhase, MAX_COHOSTS, MAX_EVENT_PHOTOS, nextRsvp, pickablePeople, rsvpLine,
+  eventDates, eventPhase, MAX_COHOSTS, MAX_EVENT_PHOTOS, nextRsvp, pickablePeople, rsvpLine,
   type AgendaItem, type EventDetail, type EventRide, type Person, type Rsvp,
 } from '@/core/events';
 import { isAndroid } from '@/core/ride-link';
@@ -33,10 +33,10 @@ import {
 } from '@/lib/events';
 import { useFriends } from '@/lib/friends';
 import { rideMates } from '@/lib/groups';
+import { shareEvent } from '@/lib/share-event';
 import { useSession } from '@/lib/session';
 import { t } from '@/lib/i18n';
 
-const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 const rideWhen = (iso: string) =>
   new Date(iso).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
@@ -109,20 +109,9 @@ export default function EventPage() {
 
   const e = ev;
   const phase = eventPhase(e);
-  const link = eventLink(e.share_code, WEB_URL);
   const cover = e.photos[0]?.path ?? null;
 
-  const share = async () => {
-    track('event_shared', { platform: Platform.OS });
-    const message = t('{title}, {v} at {location_name}. Agenda, group rides and who’s going: {link}', { title: e.title, v: eventDates(e.starts_at, e.ends_at), location_name: e.location_name, link });
-    if (Platform.OS === 'web') {
-      const nav = globalThis.navigator as Navigator | undefined;
-      if (nav?.share) return nav.share({ title: e.title, text: message, url: link }).catch(() => {});
-      await nav?.clipboard?.writeText(link).catch(() => {});
-      return showNotice(t('Link Copied'), link);
-    }
-    await Share.share({ message });
-  };
+  const share = () => shareEvent(e);
 
   const tapRsvp = (to: Rsvp) => {
     if (!session) return router.push('/sign-in?mode=create');

@@ -4,7 +4,7 @@ summary: Scout shows off-road parks, OHV areas, trail systems, trailheads and mo
 category: joining
 order: 15
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - app/src/components/scout/scout.tsx
   - app/src/components/scout/mile-slider.tsx

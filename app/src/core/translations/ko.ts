@@ -3451,6 +3451,17 @@ const dict: Record<string, string> = {
   "TikTok": "TikTok",
   "YouTube": "YouTube",
   "App Store": "App Store",
+  "Rides Near You": "근처 라이드",
+  "Create": "만들기",
+  "Near You": "근처",
+  "{v} Going": "{v}명 참석",
+  "1 Group Ride": "그룹 라이드 1개",
+  "{v} Group Rides": "그룹 라이드 {v}개",
+  "Going ✓": "참석 ✓",
+  "I’m Going": "참석할게요",
+  "Start a group for the riders you ride with.": "함께 타는 라이더들로 그룹을 만드세요.",
+  "{name}, out riding now": "{name}, 지금 라이딩 중",
+  "Requests": "요청",
 };
 
 export default dict;

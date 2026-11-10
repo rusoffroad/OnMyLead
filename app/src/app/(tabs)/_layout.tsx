@@ -36,7 +36,7 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: Colors.background },
       }}>
       <Tabs.Screen name="index" options={{ title: 'OnMyLead', headerShown: false }} />
-      <Tabs.Screen name="find" options={{ title: t('Find a Ride') }} />
+      <Tabs.Screen name="find" options={{ title: t('Rides Near You') }} />
       <Tabs.Screen name="events-tab" options={{ title: t('Events') }} />
       <Tabs.Screen name="social-tab" options={{ title: t('Social') }} />
       <Tabs.Screen name="groups" options={{ title: t('Riding Groups') }} />
