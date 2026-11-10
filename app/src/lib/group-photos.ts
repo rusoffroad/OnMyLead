@@ -29,15 +29,11 @@ const NOT_ON = 'Group photos aren’t switched on yet. Try again after the next 
 const isNotOn = (message: string) => !/check constraint/i.test(message) && /photo_path|schema cache|bucket not found/i.test(message);
 
 /**
- * Lets the owner take or pick a photo. Android's crop screen keeps it 16:9; iPhone and iPad's crop
- * screen can only make squares, so there (and on the website) the photo is centred to 16:9 instead.
- * Returns null when they cancel.
+ * Lets the owner take or pick a photo; the screen then shows the 16:9 crop screen (components/
+ * photo-cropper) on every device before it saves. Returns null when they cancel.
  */
 export async function pickGroupPhoto(source: GroupPhotoSource): Promise<ImagePicker.ImagePickerAsset | null> {
-  const options: ImagePicker.ImagePickerOptions = {
-    mediaTypes: ['images'], quality: 1,
-    ...(Platform.OS === 'android' ? { allowsEditing: true, aspect: [16, 9] as [number, number] } : {}),
-  };
+  const options: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], allowsEditing: false, quality: 1 };
   if (source === 'camera') {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) throw new Error('OnMyLead needs the camera to take the group photo. Turn it on in Settings, or choose a photo instead.');

@@ -6,6 +6,7 @@ import { createElement, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/icon';
+import { usePhotoCrop } from '@/components/photo-cropper';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field, Screen } from '@/components/ui';
 import { COMPANY } from '@/constants/site';
@@ -41,6 +42,7 @@ export default function ContactScreen() {
   const params = useLocalSearchParams<{ topic?: string }>();
   const [topic, setTopic] = useState<ContactTopic | null>(() => CONTACT_TOPICS.find((t) => t.value === params.topic)?.value ?? null);
   const [shot, setShot] = useState<{ uri: string; base64: string; type: string } | null>(null);
+  const { cropper, crop } = usePhotoCrop();
   // Screenshots and the log go only to a server that keeps them (see canSendBugReports).
   const [reportsReady, setReportsReady] = useState(false);
   useEffect(() => {
@@ -90,14 +92,16 @@ export default function ContactScreen() {
   const pickShot = async () => {
     setError(null);
     try {
-      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.6, base64: true });
-      const a = res.canceled ? null : res.assets[0];
+      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
+      const picked = res.canceled ? null : res.assets[0];
+      if (!picked) return;
+      // Crop to the part that shows the problem; it comes back as a JPEG with its base64.
+      const a = await crop(picked, { title: tr('Crop the Screenshot'), maxSide: 2048, quality: 0.6, base64: true });
       if (!a) return;
-      // The website hands back a data URL; the apps hand back base64 beside a file.
-      const base64 = a.base64 ?? (a.uri.startsWith('data:') ? a.uri.split(',')[1] : null);
+      const base64 = a.base64 ?? null;
       const why = screenshotProblem(base64);
       if (why || !base64) return setError(why);
-      setShot({ uri: a.uri, base64, type: a.mimeType ?? 'image/jpeg' });
+      setShot({ uri: a.uri, base64, type: 'image/jpeg' });
     } catch {
       setError(tr('Your pictures couldn’t be opened. Allow OnMyLead to see your photos in Settings, or send the message without one.'));
     }
@@ -264,6 +268,7 @@ export default function ContactScreen() {
           {tr('In an emergency, call 911 first.')}
         </ThemedText>
       </View>
+      {cropper}
     </Screen>
   );
 }
