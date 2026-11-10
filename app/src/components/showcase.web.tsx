@@ -70,7 +70,7 @@ export function Showcase() {
         </a>
         <nav aria-label="Sections">
           {SHOWCASE_NO_SERVICE ? <a href="#no-service" onClick={jump('no-service')}>No Service</a> : null}
-          <a href="#new" onClick={jump('new')}>New in 2.1</a>
+          <a href="#new" onClick={jump('new')}>{SHOWCASE_REDESIGN_3 ? 'New in 3.0' : 'New in 2.1'}</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
           <a href="#features" onClick={jump('features')}>Features</a>
