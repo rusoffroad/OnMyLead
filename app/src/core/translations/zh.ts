@@ -3244,6 +3244,7 @@ const dict: Record<string, string> = {
   "Group Together": "队伍在一起",
   "No Ride Running": "没有进行中的骑行",
   "Open Ride Mode on your phone and your group shows up here.": "在手机上打开骑行模式，你的队伍会显示在这里。",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "在手机上打开骑行模式或地图模式，它会显示在这里。",
   "Group": "队伍",
   "Nobody Is Sharing Yet": "还没有人共享",
   "Send EMERGENCY with your location to everyone on the ride?": "向本次骑行的所有人发送带你位置的紧急求助？",

@@ -4,7 +4,7 @@
  */
 import { requireOptionalNativeModule } from 'expo';
 
-import { carPlayLabels, type CarPlayLabels, type CarPlayState } from '@/core/carplay';
+import { carPlayLabels, type CarPlayLabels, type CarPlayMapState, type CarPlayState } from '@/core/carplay';
 
 type Subscription = { remove(): void };
 type CarPlayNative = {
@@ -12,6 +12,9 @@ type CarPlayNative = {
   clearRide(): void;
   /** Missing in the first CarPlay builds; optional so an older native module still works. */
   setLabels?(labels: CarPlayLabels): void;
+  /** Map Mode's dash (2.1.1). Optional like setLabels. */
+  setMap?(state: CarPlayMapState): void;
+  clearMap?(): void;
   addListener(event: 'onAction', listener: (e: { id: string }) => void): Subscription;
 };
 
@@ -25,6 +28,15 @@ export function showRideOnCarPlay(state: CarPlayState) {
 
 export function clearCarPlay() {
   native?.clearRide();
+}
+
+/** Map Mode on the car screen. Ride Mode's screen wins while a ride is on the car. */
+export function showMapOnCarPlay(state: CarPlayMapState) {
+  native?.setMap?.(state);
+}
+
+export function clearCarPlayMap() {
+  native?.clearMap?.();
 }
 
 export function onCarPlayAction(listener: (id: string) => void): Subscription {

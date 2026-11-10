@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/components/use-follow-camera.ts
   - app/src/core/intersections.ts
@@ -35,7 +35,7 @@ sources:
   - app/src/core/nav-trails.ts
   - app/src/lib/nav-trails.ts
   - supabase/migrations/20261101600000_nav_trails.sql
-related: [sync-across-devices, home-screen, follow-me, map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
+related: [carplay, sync-across-devices, home-screen, follow-me, map-layers, route-builder, create-a-ride, offline-maps, badges-and-ranks]
 keywords: [map mode, custom trail, map a custom trail, draw a trail, track line, breadcrumb, where i have been, obstacle, named spot, hide my start, navigate, navigation, nav mode, navigation mode, offroad map, gps, record a trail, track, my trails, share a trail, rider trails, user submitted trails, rate a trail, trail rating, accuracy, distance finder, measure, ruler, how far, trail photos, difficulty]
 ---
 
@@ -328,6 +328,12 @@ See [Create a Ride](/help/create-a-ride) and [Draw a Route](/help/route-builder)
 ## Control Your Music
 
 The round **Music** button above **Center on Me** pauses, skips and changes the volume of the music on your phone. See [Control Your Music While You Ride](/help/music-controls).
+:::
+
+:::release 2.1.1
+## Map Mode on CarPlay
+
+With OnMyLead Pro, an iPhone connected to CarPlay shows Map Mode's speed, elevation, heading, trip, the trail you're following and your recording on the car screen, with **Pause** and **Resume** for a recording. The map stays on your phone. See [Use OnMyLead on CarPlay](/help/carplay).
 :::
 
 ## On the Website

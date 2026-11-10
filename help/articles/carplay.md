@@ -4,7 +4,7 @@ summary: During a ride, OnMyLead shows on your car's CarPlay screen with one-tap
 category: ride-mode
 order: 46
 release: "2.1"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/modules/onmylead-carplay/**
   - app/plugins/with-carplay.js
@@ -12,7 +12,8 @@ sources:
   - app/src/lib/carplay.ts
   - app/src/app/_layout.tsx
   - app/src/app/ride/[id]/live.tsx
-related: [ride-mode, status-buttons, emergency-and-safety, ride-bubble, leader-sweep-and-tail-gunner, music-controls]
+  - app/src/app/nav/index.tsx
+related: [ride-mode, navigation-mode, status-buttons, emergency-and-safety, ride-bubble, leader-sweep-and-tail-gunner, music-controls]
 keywords: [carplay, car play, car screen, dashboard, truck, jeep, car, apple carplay, android auto, head unit, infotainment]
 ---
 
@@ -28,7 +29,15 @@ CarPlay is part of OnMyLead Pro, including the Pro Trial. On a Free account the 
 2. Tap **OnMyLead** on the car screen. If you don't see it, swipe across the car's home screen, or add it in your iPhone's **Settings** > **General** > **CarPlay** > your car > **Customize**.
 3. Open **Ride Mode** for your ride on your phone. The car screen follows it.
 
+:::until 2.1.1
 Until Ride Mode is open on your phone, the car screen says **No Ride Running**.
+:::
+
+:::release 2.1.1
+Riding solo, with no group ride? Open **Map Mode** on your phone, or tap **Open Map Mode** on the car screen, and the car shows Map Mode instead (see below).
+
+With neither Ride Mode nor Map Mode open on your phone, the car screen says **No Ride Running**, with an **Open Map Mode** button.
+:::
 
 ## What's on the Car Screen
 
@@ -43,6 +52,18 @@ The buttons:
 
 Typed messages, your own quick replies and the map stay on your phone. CarPlay only allows a few buttons, and typing while driving isn't safe.
 
+:::release 2.1.1
+## Map Mode on the Car Screen
+
+When Map Mode is open on your phone and no ride is in Ride Mode, the car screen shows Map Mode's numbers, updated as you drive:
+
+- **Speed**, **Elevation**, **Heading**, **Trip** and **Moving** time, the same as the dash in Map Mode on your phone.
+- When you're following a trail: the trail's name and the miles **Left on Trail**, or how far it is **To the Start**.
+- When you're recording a trail: **Recording** or **Paused** with its length so far, and a **Pause** or **Resume** button.
+
+The map itself stays on your phone. Apple only lets navigation apps draw maps on a CarPlay screen. Open Ride Mode and the car screen switches to your ride; close it and Map Mode comes back.
+:::
+
 ## Alerts on the Car Screen
 
 - When another rider taps a status, like **Need Fuel**, **Mechanical Issue**, **Need Help** or **EMERGENCY**, it pops up as an alert with their name. Tap **OK** to close it. **OK** taps don't alert anyone.
@@ -55,6 +76,11 @@ The car screen uses the language you picked in OnMyLead. See [Language](/help/la
 ## Troubleshooting
 
 - **OnMyLead isn't on the car screen.** Update OnMyLead from the App Store, then reconnect your iPhone to the car.
+:::until 2.1.1
 - **The car screen says No Ride Running.** Open Ride Mode for your ride on your phone.
+:::
+:::release 2.1.1
+- **The car screen says No Ride Running.** Open Ride Mode for your ride on your phone, or tap **Open Map Mode**.
+:::
 - **The car screen says CarPlay Is Part of OnMyLead Pro.** Your account is on Free. Check **You** > **Subscription** on your phone.
 - **A button did nothing.** Status taps need the same signal as on your phone. With no service, they wait and send when you're back in range, just like in Ride Mode.
