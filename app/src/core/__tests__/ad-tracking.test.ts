@@ -18,6 +18,7 @@ import {
   metaAppPayload,
   parseAdEventBody,
   TIKTOK_EVENT,
+  tiktokAppIdFor,
   tiktokAppPayload,
 } from '../../../../supabase/functions/_shared/ad-conversions';
 
@@ -125,6 +126,15 @@ describe('ad-conversions edge function input', () => {
     const android = tiktokAppPayload(parseAdEventBody({ ...base, platform: 'android' }, nowSec)!, 'TTAPP', null, null);
     expect(android.data[0].user).toEqual({ gaid: IDFA.toLowerCase() });
     expect(android.data[0].app.app_id).toBe('com.rusoffroad.onmylead.app');
+  });
+
+  it('uses each platform\'s own TikTok App ID, falling back to the single one', () => {
+    const both: Record<string, string> = { TIKTOK_IOS_APP_ID: 'I1', TIKTOK_ANDROID_APP_ID: 'A1', TIKTOK_APP_ID: 'OLD' };
+    expect(tiktokAppIdFor('ios', (k) => both[k] ?? '')).toBe('I1');
+    expect(tiktokAppIdFor('android', (k) => both[k] ?? '')).toBe('A1');
+    const old: Record<string, string> = { TIKTOK_APP_ID: 'OLD' };
+    expect(tiktokAppIdFor('android', (k) => old[k] ?? '')).toBe('OLD');
+    expect(tiktokAppIdFor('ios', () => '')).toBe('');
   });
 });
 

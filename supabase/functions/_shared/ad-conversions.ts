@@ -112,6 +112,12 @@ export function metaAppPayload(e: AdEventBody, ip: string | null, userAgent: str
   };
 }
 
+/** TikTok gives the iPhone and Android listings separate App IDs; TIKTOK_APP_ID is the older single one. */
+export function tiktokAppIdFor(platform: string, env: (k: string) => string): string {
+  const own = env(platform === 'ios' ? 'TIKTOK_IOS_APP_ID' : 'TIKTOK_ANDROID_APP_ID');
+  return own || env('TIKTOK_APP_ID');
+}
+
 /** TikTok Events API 2.0, app event (POST business-api.tiktok.com/open_api/v1.3/event/track/). */
 export function tiktokAppPayload(e: AdEventBody, tiktokAppId: string, ip: string | null, userAgent: string | null, testCode?: string) {
   const ios = e.platform === 'ios';
