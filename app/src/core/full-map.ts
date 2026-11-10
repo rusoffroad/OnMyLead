@@ -30,6 +30,18 @@ export function fullMapPadding(insetTop: number, insetBottom: number, barH = FUL
   return [insetTop + 24, 24, insetBottom + barH + 24, 24];
 }
 
+/**
+ * Map Mode's room to keep clear on a phone with the panel at the bottom, [top, right, bottom, left].
+ * The bottom is the panel's measured height (plus a small gap) so Follow Me's edge band and route
+ * fits sit above the panel, not under it (3.0.1: a fixed 200 pt left the band about 100 pt under
+ * the real panel, so the map didn't react until the dot was hidden). Before the panel is measured,
+ * a guess.
+ */
+export function bottomPanelPadding(panelH: number | undefined, open: boolean): [number, number, number, number] {
+  const bottom = panelH && panelH > 0 ? panelH + 12 : open ? 360 : 200;
+  return [120, 60, bottom, 60];
+}
+
 /** How tall the Full Map bar is, without the bottom safe area. */
 export const FULL_MAP_BAR_H = 56;
 

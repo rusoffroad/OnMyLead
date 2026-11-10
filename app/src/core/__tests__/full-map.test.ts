@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { FULL_MAP_BAR_H, fullMapKey, fullMapPadding, restoreA11yLabel, RESTORE_LABEL, swipeRestores } from '../full-map';
+import { bottomPanelPadding, FULL_MAP_BAR_H, fullMapKey, fullMapPadding, restoreA11yLabel, RESTORE_LABEL, swipeRestores } from '../full-map';
 
 describe('Full Map', () => {
   it('names the bring-back button the same way everywhere', () => {
@@ -30,5 +30,16 @@ describe('Full Map', () => {
     expect(fullMapKey('f', true, false)).toBeNull();
     expect(fullMapKey('f', false, true)).toBeNull();
     expect(fullMapKey('Escape', true, true)).toBeNull();
+  });
+});
+
+describe("Map Mode's bottom panel padding", () => {
+  it('keeps the measured panel clear, so the edge band sits above it', () => {
+    expect(bottomPanelPadding(304, false)).toEqual([120, 60, 316, 60]);
+    expect(bottomPanelPadding(420, true)[2]).toBe(432);
+  });
+  it('guesses until the panel is measured', () => {
+    expect(bottomPanelPadding(undefined, false)[2]).toBe(200);
+    expect(bottomPanelPadding(0, true)[2]).toBe(360);
   });
 });
