@@ -10,6 +10,13 @@
 export const APP_STORE_URL: string | null = 'https://apps.apple.com/us/app/onmylead/id6822352321';
 export const PLAY_STORE_URL: string | null = 'https://play.google.com/store/apps/details?id=com.rusoffroad.onmylead.app';
 
+/**
+ * App Store Connect's provider token (App Analytics > Campaigns > Generate a link: the pt= number).
+ * With it, website store buttons carry the visitor's ad campaign, so App Store Connect can show
+ * downloads by campaign. Not secret. Null leaves Apple links plain (lib/found-us.ts).
+ */
+export const APP_STORE_PROVIDER_TOKEN: string | null = null;
+
 /** Pro prices in US dollars, the same in App Store Connect and Google Play Console (see /pro/plan.md). */
 export const PRO_PRICES = {
   monthly: '$4.99',

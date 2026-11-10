@@ -3437,6 +3437,20 @@ const dict: Record<string, string> = {
   "This trail, your spot as the meet point. Invite with a code.": "Dieser Trail, dein Standort als Treffpunkt. Einladen mit einem Code.",
   "Your spot as the meet point. Invite with a code.": "Dein Standort als Treffpunkt. Einladen mit einem Code.",
   "Home": "Start",
+  "Thanks! That helps us reach more riders.": "Danke! Das hilft uns, mehr Fahrer zu erreichen.",
+  "How Did You Find OnMyLead?": "Wie hast du OnMyLead gefunden?",
+  "One tap. It tells us where to find more riders like you.": "Ein Tipp. So wissen wir, wo wir mehr Fahrer wie dich finden.",
+  "Where?": "Wo?",
+  "A trail sign, a forum, a dealer...": "Ein Schild am Trail, ein Forum, ein Händler...",
+  "Google Search": "Google-Suche",
+  "A Friend": "Ein Freund",
+  "A Riding Group or Club": "Eine Fahrgruppe oder ein Club",
+  "An Event or Trail": "Ein Event oder ein Trail",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;

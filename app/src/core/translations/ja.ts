@@ -3437,6 +3437,20 @@ const dict: Record<string, string> = {
   "This trail, your spot as the meet point. Invite with a code.": "このトレイル、現在地を集合場所に。コードで招待。",
   "Your spot as the meet point. Invite with a code.": "現在地を集合場所に。コードで招待。",
   "Home": "ホーム",
+  "Thanks! That helps us reach more riders.": "ありがとうございます！より多くのライダーに届けるのに役立ちます。",
+  "How Did You Find OnMyLead?": "OnMyLead をどこで知りましたか？",
+  "One tap. It tells us where to find more riders like you.": "タップするだけ。あなたのようなライダーをどこで探せばよいかがわかります。",
+  "Where?": "どこで？",
+  "A trail sign, a forum, a dealer...": "トレイルの看板、フォーラム、販売店など...",
+  "Google Search": "Google 検索",
+  "A Friend": "友だち",
+  "A Riding Group or Club": "ライディンググループやクラブ",
+  "An Event or Trail": "イベントやトレイル",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;
