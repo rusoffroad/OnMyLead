@@ -3366,6 +3366,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "이 그룹이 없어졌거나 더 이상 멤버가 아닙니다.",
   "Please sign in first.": "먼저 로그인하세요.",
   "Only the rider who made the group can change its photo.": "그룹을 만든 라이더만 그룹 사진을 바꿀 수 있습니다.",
+  "Everyone in {groupName} is already invited, going or hosting.": "{groupName}의 모두가 이미 초대되었거나, 참가하거나, 호스트입니다.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{groupName}에서 {count}{v}을(를) 초대했습니다. 알림을 받고 참가 또는 관심 있음을 선택할 수 있습니다.",
+  "Inviting a group to an event switches on with the next server update.": "이벤트에 그룹 초대는 다음 서버 업데이트와 함께 켜집니다.",
+  "Then invite everyone to your event in one tap.": "그러면 이벤트에 한 번의 탭으로 모두 초대할 수 있습니다.",
 };
 
 export default dict;

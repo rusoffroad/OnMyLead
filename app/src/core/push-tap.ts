@@ -21,6 +21,8 @@ export type TapData = {
   userId?: unknown;
   key?: unknown;
   waypointId?: unknown;
+  eventId?: unknown;
+  eventCode?: unknown;
 };
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -70,6 +72,9 @@ export function tapTarget(data: TapData | undefined): string | null {
   if ((data.type === 'feed_like' || data.type === 'feed_comment') && typeof data.key === 'string' && data.key) {
     return `/social/item?key=${encodeURIComponent(data.key)}`;
   }
+  // "Eve invited you to Moab Spring Rally" (3.0): the event page.
+  const eventCode = id(data.eventCode) ?? id(data.eventId);
+  if (data.type === 'event_invite' && eventCode) return `/e/${encodeURIComponent(eventCode)}`;
   // "Your shared trail is hidden": the rider's trails in Map Mode.
   if (data.type === 'trail_hidden') return '/nav/trails';
   const rideId = id(data.rideId);

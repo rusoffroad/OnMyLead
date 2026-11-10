@@ -106,6 +106,7 @@ export function inboxLook(item: Pick<InboxItem, 'kind' | 'data'>): { icon: Inbox
       return { icon: 'pin', tone: 'ride' };
     case 'invite':
     case 'leader_ride':
+    case 'event_invite':
       return { icon: 'flag', tone: 'social' };
     case 'friend_request':
     case 'friend_accept':
@@ -143,6 +144,7 @@ export function notificationKey(raw: unknown): string | null {
   if (d.type === 'feed_like' && str((d as Record<string, unknown>).commentId)) return `feed_like:${str(d.key)}:${str((d as Record<string, unknown>).commentId)}`;
   if (d.type === 'feed_like' || d.type === 'feed_comment') return `${d.type}:${str(d.key)}`;
   if (d.type === 'waypoint') return `waypoint:${str(d.waypointId)}`;
+  if (d.type === 'event_invite') return `event_invite:${str(d.eventId)}`;
   const extra = d as Record<string, unknown>;
   return [d.type, str(d.rideId), str(d.change), str(extra.trailId), str(extra.stage)].join(':');
 }

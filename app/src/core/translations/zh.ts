@@ -3366,6 +3366,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "该群组已不存在，或你已不在其中。",
   "Please sign in first.": "请先登录。",
   "Only the rider who made the group can change its photo.": "只有创建群组的骑手才能更改群组照片。",
+  "Everyone in {groupName} is already invited, going or hosting.": "{groupName} 中的所有人都已被邀请、会参加或是主办人。",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "已邀请 {groupName} 的 {count} {v}。他们会收到通知，并可选择参加或感兴趣。",
+  "Inviting a group to an event switches on with the next server update.": "邀请群组参加活动将在下次服务器更新后开启。",
+  "Then invite everyone to your event in one tap.": "然后一键邀请所有人参加你的活动。",
 };
 
 export default dict;

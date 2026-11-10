@@ -3366,6 +3366,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "このグループはなくなったか、あなたはもうメンバーではありません。",
   "Please sign in first.": "まずサインインしてください。",
   "Only the rider who made the group can change its photo.": "グループの写真を変えられるのは、グループを作ったライダーだけです。",
+  "Everyone in {groupName} is already invited, going or hosting.": "{groupName} の全員がすでに招待済み、参加予定、または主催者です。",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{groupName} から {count} {v}を招待しました。通知が届き、「参加」か「興味あり」を選べます。",
+  "Inviting a group to an event switches on with the next server update.": "イベントへのグループ招待は次回のサーバー更新で使えるようになります。",
+  "Then invite everyone to your event in one tap.": "イベントに全員をワンタップで招待できます。",
 };
 
 export default dict;

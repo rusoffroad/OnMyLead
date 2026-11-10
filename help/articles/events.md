@@ -4,7 +4,7 @@ summary: Find rallies, poker runs and ride weekends, see the agenda and join the
 category: joining
 order: 60
 release: "2.0"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - app/src/components/meet-point-mapbox-map.tsx
   - app/src/components/meet-point-map.tsx
@@ -20,8 +20,10 @@ sources:
   - app/src/core/events.ts
   - app/src/lib/events.ts
   - supabase/migrations/20261102950000_events.sql
+  - supabase/migrations/20261110100000_event_group_invite.sql
+  - app/src/components/group-invite.tsx
 related: [home-screen, join-a-ride, create-a-ride, organizer-controls, free-vs-pro, report-and-block]
-keywords: [presented by, sponsor, sponsored event, event or public ride, difference, event vs ride, event, events, rally, poker run, concert, raffle, show, meetup, ride weekend, agenda, schedule, co-host, ride manager, going, interested, rsvp, event link]
+keywords: [presented by, sponsor, sponsored event, event or public ride, difference, event vs ride, event, events, rally, poker run, concert, raffle, show, meetup, ride weekend, agenda, schedule, co-host, ride manager, going, interested, rsvp, event link, invite group, invite all, invite riders to event]
 ---
 
 Events are the big days: a rally, a poker run, a club weekend or a meetup. An event has its dates, a place, photos, an **Agenda** of what's happening and when (group rides, poker runs, concerts, raffles, shows, food), and the **Group Rides** you can join. Anyone can see events. Pro riders create them.
@@ -94,6 +96,17 @@ Each group ride can have a Ride Manager, someone who runs that ride for you. On 
 - If they aren't on the ride yet, they get a ride invite first, and become Co-Organizer when they join.
 - Picking someone else, or **No Ride Manager**, puts the old manager back to Rider.
 - Only a host who organizes (or co-organizes) the ride can pick its manager.
+
+:::release 3.0
+## Invite Your Riding Group
+
+Hosts and co-hosts can invite a whole [riding group](/help/riding-groups) to an upcoming event in one tap.
+
+1. Open the event's page.
+2. Under **Invite a Group**, tap **Invite All** next to the group.
+
+Everyone in the group gets a notification (it's also saved under the bell) that opens the event's page. An invite isn't a yes: each rider still taps **Going** or **Interested** themselves. Riders who already answered, the event's hosts and riders who were already invited are skipped, and tapping **Invite All** again doesn't notify anyone twice. You can invite any group you're in, and it's free on every plan. Riders who turned off **Ride Invites** in Notifications don't get the push. The event's group rides are separate: invite your group to each ride from the ride's page.
+:::
 
 ## Co-Hosts
 

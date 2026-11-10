@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  cleanGroupName, groupInviteMessage, groupLink, groupNameProblem, invitedLine, isGroupsNotSwitchedOn, leadersToFollow,
+  cleanGroupName, eventInvitedLine, groupInviteMessage, groupLink, groupNameProblem, invitedLine, isGroupsNotSwitchedOn, leadersToFollow,
   namesLine, ridersLabel, sortRideMates, togetherLabel,
 } from '../groups';
 
@@ -76,5 +76,13 @@ describe('leadersToFollow', () => {
   it('lists the organizer and leaders once, without you', () => {
     expect(leadersToFollow('org', ['lead', 'org'], 'me')).toEqual(['org', 'lead']);
     expect(leadersToFollow('org', ['lead'], 'org')).toEqual(['lead']);
+  });
+});
+
+describe('event group invites', () => {
+  it('says how many were invited from the group', () => {
+    expect(eventInvitedLine(3, 'Hill Crew')).toBe('Invited 3 riders from Hill Crew. They get a notification and can say Going or Interested.');
+    expect(eventInvitedLine(1, 'Hill Crew')).toContain('Invited 1 rider from');
+    expect(eventInvitedLine(0, 'Hill Crew')).toBe('Everyone in Hill Crew is already invited, going or hosting.');
   });
 });

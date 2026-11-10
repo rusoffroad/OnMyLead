@@ -1,12 +1,16 @@
 [
   {
     "version": "3.0",
-    "title": "Smoother Intersection Zoom, Show Password and a CarPlay Fix",
-    "intro": "OnMyLead 3.0 smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. It also fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
-    "whatsNew": "What's new in 3.0:\n\n• Smoother Zoom In at Intersections: with another junction coming up within about a quarter mile, the map stays zoomed in instead of zooming out and back in.\n• Show Password: tap the eye in any password box to check what you typed.\n• Fixed: on iPhone, opening OnMyLead while already connected to CarPlay could close the app. It now opens normally.",
+    "title": "Invite Your Group to an Event, Smoother Intersection Zoom, Show Password and a CarPlay Fix",
+    "intro": "OnMyLead 3.0 lets event hosts invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
+    "whatsNew": "What's new in 3.0:\n\n• Invite your riding group to an event: tap Invite All on the event page.\n• Smoother Zoom In at Intersections: with another junction coming up within about a quarter mile, the map stays zoomed in instead of zooming out and back in.\n• Show Password: tap the eye in any password box to check what you typed.\n• Fixed: on iPhone, opening OnMyLead while already connected to CarPlay could close the app. It now opens normally.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Invite a Group on events: an event's hosts and co-hosts tap Invite All next to a riding group on the event page. Everyone in the group gets a notification that opens the event, where they can tap Going or Interested. Riders who already answered or were already invited aren't notified again."
+      },
       {
         "kind": "improved",
         "text": "Zoom In at Intersections: once you're through a junction, the map looks about a quarter mile ahead. If another junction is coming, it stays zoomed in for that one too, and zooms back out once after the last one, so the map no longer pumps in and out in town or on a web of trails."
