@@ -1,6 +1,8 @@
 // Hindi. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "पासवर्ड दिखाएं",
+  "Hide Password": "पासवर्ड छिपाएं",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "नेटवर्क न होने पर आपका फ़ोन ग्रुप के अलर्ट आगे भेजता है और EMERGENCY भेजता है। Bluetooth पर लोकेशन और मैसेज Pro हैं।",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "नेटवर्क न होने पर पास के राइडर देखें और Bluetooth से उन्हें अपनी लोकेशन, स्टेटस और मैसेज भेजें। Free पर भी आपका फ़ोन ग्रुप के अलर्ट आगे भेजता रहता है, और EMERGENCY, मदद चाहिए और क्रैश अलर्ट Bluetooth से जाते रहते हैं।",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date} तक सभी Pro फ़ीचर आपके लिए मुफ़्त हैं। उसके बाद आप Free पर राइड करते रहेंगे, और राइड में जुड़ना, राइड मोड और EMERGENCY मुफ़्त रहेंगे।",
@@ -3365,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "यह ग्रुप अब नहीं है, या आप अब इसमें नहीं हैं।",
   "Please sign in first.": "पहले साइन इन करें।",
   "Only the rider who made the group can change its photo.": "सिर्फ़ ग्रुप बनाने वाला राइडर ही इसकी फ़ोटो बदल सकता है।",
+  "Everyone in {groupName} is already invited, going or hosting.": "{groupName} में सभी को पहले ही बुलाया जा चुका है, वे जा रहे हैं या होस्ट हैं।",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{groupName} से {count} {v} को बुलाया। उन्हें नोटिफ़िकेशन मिलता है और वे जा रहे हैं या रुचि है चुन सकते हैं।",
+  "Inviting a group to an event switches on with the next server update.": "किसी इवेंट में ग्रुप को बुलाना अगले सर्वर अपडेट के साथ चालू होगा।",
+  "Then invite everyone to your event in one tap.": "फिर अपने इवेंट में एक टैप में सबको बुलाएं।",
 };
 
 export default dict;

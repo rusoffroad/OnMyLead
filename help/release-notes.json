@@ -1,15 +1,31 @@
 [
   {
     "version": "3.0",
-    "title": "CarPlay in Map Mode",
-    "intro": "OnMyLead 3.0 puts CarPlay to work on solo rides too: with Map Mode open on your iPhone, the car screen shows your speed, elevation, heading, trip and the trail you're following.",
-    "whatsNew": "What's new in 3.0:\n\n• CarPlay works without Ride Mode: open Map Mode and the car screen shows your speed, elevation, heading, trip, the trail you're following and your recording (Pro).",
+    "title": "Invite Your Group to an Event, Smoother Intersection Zoom, CarPlay in Map Mode and Show Password",
+    "intro": "OnMyLead 3.0 lets event hosts invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. CarPlay now works on solo rides too: open Map Mode and the car screen shows your speed, elevation, heading, trip and the trail you're following. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
+    "whatsNew": "What's new in 3.0:\n\n• Invite your riding group to an event with Invite All.\n• Smoother Zoom In at Intersections: the map stays zoomed in when another junction is close.\n• Show Password: tap the eye in any password box.\n• CarPlay works in Map Mode, not just Ride Mode (Pro).\n• Fixed: a crash when opening OnMyLead while connected to CarPlay.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "new",
+        "text": "Invite a Group on events: an event's hosts and co-hosts tap Invite All next to a riding group on the event page. Everyone in the group gets a notification that opens the event, where they can tap Going or Interested. Riders who already answered or were already invited aren't notified again."
+      },
+      {
+        "kind": "new",
         "text": "CarPlay in Map Mode: with no group ride running, open Map Mode on your iPhone (or tap Open Map Mode on the car screen) and CarPlay shows Speed, Elevation, Heading, Trip and Moving time, the miles left on the trail you're following, and Pause or Resume for a recording. The map stays on your phone. Part of OnMyLead Pro."
+      },
+      {
+        "kind": "improved",
+        "text": "Zoom In at Intersections: once you're through a junction, the map looks about a quarter mile ahead. If another junction is coming, it stays zoomed in for that one too, and zooms back out once after the last one, so the map no longer pumps in and out in town or on a web of trails."
+      },
+      {
+        "kind": "improved",
+        "text": "Show Password: the password boxes on Sign In, Create Account and New Password have an eye button at the right edge. Tap it to see what you typed and tap it again to hide it. The password starts hidden every time."
+      },
+      {
+        "kind": "fixed",
+        "text": "CarPlay: opening OnMyLead on your iPhone while it was already connected to CarPlay (or changing Dark, Light or Match Phone while connected) could close the app. It now opens normally and the car screen keeps working."
       }
     ]
   },

@@ -1,6 +1,8 @@
 // Spanish. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "Mostrar contraseña",
+  "Hide Password": "Ocultar contraseña",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Sin cobertura, tu teléfono pasa las alertas a tu grupo y envía EMERGENCIA. Las ubicaciones y mensajes por Bluetooth son Pro.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Sin cobertura, ve a los pilotos cercanos y pásales tu ubicación, toques de estado y mensajes por Bluetooth. Con Free tu teléfono sigue pasando las alertas al grupo, y EMERGENCIA, Necesito Ayuda y las alertas de choque siguen saliendo por Bluetooth.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Todas las funciones Pro son tuyas gratis hasta el {date}. Después sigues rodando con Free, y unirte a rutas, el Modo Ruta y EMERGENCIA siguen siendo gratis.",
@@ -3365,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Este grupo ya no existe o ya no formas parte de él.",
   "Please sign in first.": "Primero inicia sesión.",
   "Only the rider who made the group can change its photo.": "Solo quien creó el grupo puede cambiar su foto.",
+  "Everyone in {groupName} is already invited, going or hosting.": "Todos en {groupName} ya están invitados, van o son anfitriones.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Invitaste a {count} {v} de {groupName}. Reciben una notificación y pueden decir Voy o Me interesa.",
+  "Inviting a group to an event switches on with the next server update.": "Invitar a un grupo a un evento se activa con la próxima actualización del servidor.",
+  "Then invite everyone to your event in one tap.": "Luego invita a todos a tu evento con un toque.",
 };
 
 export default dict;

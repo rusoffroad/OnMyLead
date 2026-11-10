@@ -45,6 +45,7 @@ psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   -f "$here/social_hub_test.sql" \
   -f "$here/comment_replies_test.sql" \
   -f "$here/events_test.sql" \
+  -f "$here/event_group_invite_test.sql" \
   -f "$here/trail_widths_test.sql" \
   -f "$here/brand_ambassador_test.sql" \
   -f "$here/referrals_test.sql" \

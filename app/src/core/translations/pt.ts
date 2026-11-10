@@ -1,6 +1,8 @@
 // Portuguese (Brazil). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "Mostrar senha",
+  "Hide Password": "Ocultar senha",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Sem sinal, seu celular repassa os alertas para o grupo e envia EMERGÊNCIA. Localizações e mensagens por Bluetooth são Pro.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Sem sinal, veja os pilotos próximos e passe sua localização, toques de status e mensagens por Bluetooth. No Free seu celular continua repassando alertas para o grupo, e EMERGÊNCIA, Preciso de Ajuda e alertas de acidente continuam saindo por Bluetooth.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Todos os recursos Pro são seus de graça até {date}. Depois você continua no Free, e entrar em passeios, o Modo Passeio e EMERGÊNCIA continuam grátis.",
@@ -3365,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Este grupo não existe mais, ou você não faz mais parte dele.",
   "Please sign in first.": "Entre na sua conta primeiro.",
   "Only the rider who made the group can change its photo.": "Só quem criou o grupo pode mudar a foto dele.",
+  "Everyone in {groupName} is already invited, going or hosting.": "Todos em {groupName} já foram convidados, vão ou são anfitriões.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Você convidou {count} {v} de {groupName}. Eles recebem uma notificação e podem dizer Vou ou Tenho interesse.",
+  "Inviting a group to an event switches on with the next server update.": "Convidar um grupo para um evento será ativado com a próxima atualização do servidor.",
+  "Then invite everyone to your event in one tap.": "Depois convide todos para o seu evento com um toque.",
 };
 
 export default dict;

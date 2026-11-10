@@ -5,6 +5,7 @@
  */
 import { router } from 'expo-router';
 
+import { friendlyEventError } from '@/core/events';
 import { groupPhotoUrl } from '@/core/group-photo';
 import { cleanGroupName, isGroupsNotSwitchedOn, NOT_SWITCHED_ON, sortRideMates, type RideMate } from '@/core/groups';
 import { shownName } from '@/core/profile';
@@ -13,6 +14,7 @@ import { removeGroupPhotoFile } from './group-photos';
 import { supabase, supabaseUrl } from './supabase';
 import type { Ride } from './types';
 import { requirePro } from './pro';
+import { t } from './i18n';
 
 export class NotSwitchedOnError extends Error {
   constructor() {
@@ -214,6 +216,18 @@ export async function inviteGroupToRide(rideId: string, groupId: string): Promis
   const count = unwrap<number>(await supabase.rpc('invite_group_to_ride', { p_ride: rideId, p_group: groupId }));
   track('ride_group_invited', { invited: count });
   return count;
+}
+
+/** Invites everyone in a group to an event (its hosts only). Returns how many were invited. */
+export async function inviteGroupToEvent(eventId: string, groupId: string): Promise<number> {
+  const { data, error } = await supabase.rpc('invite_group_to_event', { p_event: eventId, p_group: groupId });
+  if (error) {
+    // The server update with invite_group_to_event hasn't run yet.
+    if (/invite_group_to_event|schema cache|PGRST202/i.test(error.message)) throw new Error(t('Inviting a group to an event switches on with the next server update.'));
+    throw new Error(friendlyEventError(error.message));
+  }
+  track('event_group_invited', { invited: data as number });
+  return data as number;
 }
 
 export async function declineRideInvite(rideId: string) {
