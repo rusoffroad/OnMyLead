@@ -10,6 +10,7 @@ import { GroupInvite } from '@/components/group-invite';
 import { Gradient, Home, Pill } from '@/components/home/parts';
 import { Icon, type IconName } from '@/components/icon';
 import PageHead from '@/components/page-head';
+import { usePhotoCrop } from '@/components/photo-cropper';
 import { ReportSheet } from '@/components/report-sheet';
 import { RiderDot } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
@@ -59,6 +60,7 @@ export default function EventPage() {
   const [addRide, setAddRide] = useState(false);
   const [linkable, setLinkable] = useState<LinkableRide[] | null>(null);
   const [photoMenu, setPhotoMenu] = useState<{ id: string; path: string } | null>(null);
+  const { cropper, cropMany } = usePhotoCrop();
   const [people, setPeople] = useState<PeoplePick>(null);
   const [mates, setMates] = useState<Person[]>([]);
   const [reporting, setReporting] = useState(false);
@@ -136,8 +138,11 @@ export default function EventPage() {
     const room = MAX_EVENT_PHOTOS - e.photos.length;
     if (room <= 0) return showNotice(t('Photos Full'), t('An event can have up to {v} photos. Remove one to add another.', { v: MAX_EVENT_PHOTOS }));
     try {
-      const picked = await pickEventPhotos(source, room);
-      if (!picked.length) return;
+      const chosen = await pickEventPhotos(source, room);
+      if (!chosen.length) return;
+      // Each photo gets the crop screen in turn (or "Use the Rest As They Are").
+      const picked = await cropMany(chosen, { maxSide: 1600 });
+      if (!picked?.length) return;
       setBusy('photos');
       setError(null);
       for (let i = 0; i < picked.length; i++) {
@@ -444,6 +449,7 @@ export default function EventPage() {
 
   const sheets = (
     <>
+      {cropper}
       <AgendaSheet event={e} item={agendaItem} visible={agendaOpen} onClose={() => setAgendaOpen(false)} onSaved={load} />
       <AddRideSheet event={e} rides={linkable} visible={addRide} onClose={() => setAddRide(false)} onAdded={load} />
       <PeopleSheet

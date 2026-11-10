@@ -35,7 +35,13 @@ Until you add one, riders see your initial, the same as before. Riders on the li
 
 1. Go to the **You** tab and tap your name at the top.
 2. Under **Profile Picture**, tap **Take Photo** to use the camera, or **Choose Photo** to pick one from your photo library.
+:::until 3.0
 3. Move and zoom the photo so your face (or your machine) sits in the square, then tap **Choose** (or the check mark).
+:::
+
+:::release 3.0
+3. On the **Crop Your Picture** screen, drag and pinch the photo so your face (or your machine) sits in the circle, then tap **Use Photo**. See [Crop a Photo](/help/crop-a-photo).
+:::
 4. The picture saves straight away and the screen says **Picture saved**.
 
 To change it, do the same again: the button says **Choose New Photo**. Your old picture is replaced.
@@ -52,7 +58,15 @@ Pictures are kept under 200 KB, and anyone can tap a rider's picture to see it f
 
 ## On the Website
 
-On onmylead.com, tap your name on the **You** page, then **Choose Photo**. Your browser opens its file chooser; on a phone it also offers the camera. The picture is cropped to the middle square for you.
+On onmylead.com, tap your name on the **You** page, then **Choose Photo**. Your browser opens its file chooser; on a phone it also offers the camera.
+
+:::until 3.0
+The picture is cropped to the middle square for you.
+:::
+
+:::release 3.0
+The same crop screen opens: drag the photo, zoom with the mouse wheel or the **+** and **−** buttons, then click **Use Photo**.
+:::
 
 ## Remove Your Picture
 

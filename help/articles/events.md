@@ -22,7 +22,7 @@ sources:
   - supabase/migrations/20261102950000_events.sql
   - supabase/migrations/20261110100000_event_group_invite.sql
   - app/src/components/group-invite.tsx
-related: [home-screen, join-a-ride, create-a-ride, organizer-controls, free-vs-pro, report-and-block]
+related: [crop-a-photo, home-screen, join-a-ride, create-a-ride, organizer-controls, free-vs-pro, report-and-block]
 keywords: [presented by, sponsor, sponsored event, event or public ride, difference, event vs ride, event, events, rally, poker run, concert, raffle, show, meetup, ride weekend, agenda, schedule, co-host, ride manager, going, interested, rsvp, event link, invite group, invite all, invite riders to event]
 ---
 
@@ -84,6 +84,11 @@ The event opens, ready for the rest.
 Hosts see extra buttons on the event's page:
 
 - **Add Photos** picks up to 12 photos (on iPhone, iPad and Android you can also **Take a Photo**). The app shrinks each one before it uploads. The first photo is the cover; tap a photo to **Make It the Cover** or **Remove Photo**.
+
+:::release 3.0
+  Each photo opens on the crop screen in turn (it says **Photo 2 of 5** and so on). Frame it and tap **Use Photo**, or tap **Use the Rest As They Are** to skip cropping the others. **Cancel** adds none of them.
+:::
+
 - **Agenda > Add**: pick what it is (Group Ride, Poker Run, Concert, Raffle, Show, Contest, Food, Vendors, Meetup or Other), its name, the day, the start time and, if you like, an end time, where and details. Tap an item to change or remove it.
 - **Group Rides > Add**: tap **Create a New Ride for This Event**, or add a ride you already organize (with an optional label). A ride can be in one event at a time. Removing a ride from the event doesn't cancel the ride.
 - **Edit Details** changes the name, dates, place and the rest.

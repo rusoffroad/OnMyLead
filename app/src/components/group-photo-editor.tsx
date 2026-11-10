@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { GroupPhoto } from '@/components/group-photo';
+import { usePhotoCrop } from '@/components/photo-cropper';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
+import { GROUP_PHOTO_ASPECT } from '@/core/group-photo';
 import { confirmAsync } from '@/lib/confirm';
 import { requirePro, handleProError } from '@/lib/pro';
 import { canUseGroupCamera, pickGroupPhoto, removeGroupPhoto, saveGroupPhoto, type GroupPhotoSource } from '@/lib/group-photos';
@@ -21,6 +23,7 @@ export function GroupPhotoEditor({
   const [busy, setBusy] = useState<GroupPhotoSource | 'remove' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const { cropper, crop } = usePhotoCrop();
 
   const pick = async (source: GroupPhotoSource) => {
     // Adding or changing a group photo is Pro (2.1); everyone still sees it, and removing stays free.
@@ -29,7 +32,9 @@ export function GroupPhotoEditor({
     setDone(null);
     setBusy(source);
     try {
-      const asset = await pickGroupPhoto(source);
+      const picked = await pickGroupPhoto(source);
+      if (!picked) return;
+      const asset = await crop(picked, { aspect: GROUP_PHOTO_ASPECT, title: t('Crop the Group Photo'), maxSide: 1920 });
       if (!asset) return;
       await saveGroupPhoto(groupId, asset);
       await onChanged();
@@ -108,6 +113,7 @@ export function GroupPhotoEditor({
       <ThemedText type="small" themeColor="textSecondary">
         {t('Anyone with the group link can see it. Keep it friendly: the OnMyLead team removes photos that break the rules.')}
       </ThemedText>
+      {cropper}
     </View>
   );
 }

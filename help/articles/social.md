@@ -4,7 +4,7 @@ summary: See what your friends are up to, like and comment on rides, badges and 
 category: groups
 order: 27
 release: "2.0"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - app/src/app/social/index.tsx
   - app/src/app/social/item.tsx
@@ -19,7 +19,7 @@ sources:
   - supabase/migrations/20261102900000_social_hub.sql
   - supabase/migrations/20261104220000_comment_likes_replies.sql
   - app/src/components/home/feed.tsx
-related: [home-screen, friends, profile-picture, free-vs-pro, report-and-block, notification-settings, privacy]
+related: [crop-a-photo, home-screen, friends, profile-picture, free-vs-pro, report-and-block, notification-settings, privacy]
 keywords: [social, timeline, feed, like, likes, heart, comment, comments, reply, replies, like a comment, reply to a comment, photos, post, ride report, photo, profile, rider profile, pro badge, pro tag, share, facebook, instagram, x, twitter, share card, friends activity]
 ---
 
@@ -55,6 +55,11 @@ The rider whose comment you like or answer gets a notification. Deleting a comme
 1. In Social, tap **Post a ride report…** at the top (it's also at the top of your own profile).
 2. Write up to 500 characters about the ride, the trail or the crew.
 3. Tap **Take Photo** or **Add Photo** to add one picture, if you like.
+
+:::release 3.0
+   The crop screen opens: pick a shape (**Original**, **Square**, **4:3**, **16:9** or **4:5**), drag and zoom, then tap **Use Photo**.
+:::
+
 4. Tap **Post**.
 
 Your post shows on your profile and in the feeds of the riders your **Who Sees Your Activity** setting allows (see [Your Home Screen](/help/home-screen)). To delete it, tap **⋯** on the post, then **Delete Post**. Its likes and comments go with it.

@@ -124,7 +124,7 @@ export async function deleteComment(id: string): Promise<void> {
   check(await supabase.rpc('delete_feed_comment', { p_id: id }));
 }
 
-/** Lets the rider pick a photo for a post (library, or the camera in the app). Null when cancelled. */
+/** Lets the rider pick a photo for a post (library, or the camera in the app); New Post crops it next. Null when cancelled. */
 export async function pickPostPhoto(source: 'camera' | 'library'): Promise<ImagePicker.ImagePickerAsset | null> {
   const options: ImagePicker.ImagePickerOptions = { mediaTypes: ['images'], allowsEditing: false, quality: 1 };
   if (source === 'camera') {
