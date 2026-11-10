@@ -10,14 +10,19 @@
 import { Platform } from 'react-native';
 
 import {
-  decodeHistory, decodeStatus, historyRequest, parseGrpcWeb, statusRequest, type DishHistory, type DishStatus,
+  clientsRequest, decodeClientCount, decodeHistory, decodeStatus, historyRequest, parseGrpcWeb, statusRequest, type DishHistory,
+  type DishStatus,
 } from '@/core/starlink-proto';
 
 export type { DishHistory, DishStatus } from '@/core/starlink-proto';
-export { compassPoint, dishHeadline, formatMbps, formatPercent, formatSeconds, formatUptime } from '@/core/starlink-proto';
+export { compassPoint, dishGlance, dishHeadline, formatMbps, formatPercent, formatSeconds, formatUptime } from '@/core/starlink-proto';
 
 export const DISH_HOST = '192.168.100.1';
-const ENDPOINT = `http://${DISH_HOST}:9201/SpaceX.API.Device.Device/Handle`;
+const handle = (host: string, port: number) => `http://${host}:${port}/SpaceX.API.Device.Device/Handle`;
+const ENDPOINT = handle(DISH_HOST, 9201);
+/** The Starlink router (Gen 2/3 router and the Mini's built-in one) answers Wi-Fi questions here. */
+export const ROUTER_HOST = '192.168.1.1';
+const CLIENT_ENDPOINTS = [handle(ROUTER_HOST, 9001), ENDPOINT];
 
 /** Why the dish could not be read, so the screen can say something useful. */
 export type DishErrorKind = 'web' | 'unreachable' | 'timeout' | 'refused' | 'unreadable';
@@ -31,12 +36,12 @@ export class DishError extends Error {
 /** The local API can't be reached from a web page (mixed content, CORS, private network rules). */
 export const dishReadSupported = Platform.OS !== 'web';
 
-async function call(frame: Uint8Array, timeoutMs: number): Promise<Uint8Array> {
+async function call(frame: Uint8Array, timeoutMs: number, endpoint = ENDPOINT): Promise<Uint8Array> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   let res: Response;
   try {
-    res = await fetch(ENDPOINT, {
+    res = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/grpc-web+proto',
@@ -98,4 +103,29 @@ export async function readDish(timeoutMs = 5000): Promise<DishReading> {
   const status = await readStatus(timeoutMs);
   const history = await readHistory(timeoutMs);
   return { status, history, readAt: Date.now() };
+}
+
+let clientEndpoint: string | null = null;
+
+/**
+ * How many devices are on the Starlink's Wi-Fi, or null if nothing will say (a third-party router,
+ * bypass mode, or firmware that refuses). Only call this once the dish has answered, so a rider's
+ * home router at 192.168.1.1 is never asked. Remembers which address worked.
+ */
+export async function readClientCount(timeoutMs = 3000): Promise<number | null> {
+  if (!dishReadSupported) return null;
+  const tries = clientEndpoint ? [clientEndpoint] : CLIENT_ENDPOINTS;
+  for (const endpoint of tries) {
+    try {
+      const n = decodeClientCount(await call(clientsRequest(), timeoutMs, endpoint));
+      if (n != null) {
+        clientEndpoint = endpoint;
+        return n;
+      }
+    } catch {
+      // Try the next address.
+    }
+  }
+  clientEndpoint = null;
+  return null;
 }

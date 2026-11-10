@@ -12,6 +12,7 @@ sources:
   - app/src/components/home/events-card.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/home/**
+  - app/src/lib/starlink.ts
   - app/src/components/inbox-bell.tsx
   - app/src/components/language-button.tsx
   - app/src/components/badge-strip.tsx
@@ -25,7 +26,7 @@ sources:
   - app/src/components/tab-bar.tsx
   - supabase/migrations/20261102300000_home_feed.sql
 related: [join-a-ride, create-a-ride, find-a-ride, navigation-mode, riding-groups, friends, follow-leaders, badges-and-ranks, use-onmylead-on-a-tablet]
-keywords: [home, customize home, reorder home, hide sections, out riding now, up next, ride solo, home screen, rides tab, main screen, feed, activity, customize feed, who sees my activity, toolkit, public rides near me, distance, radius, 500 miles, rides left, unlimited, your group]
+keywords: [home, starlink card, starlink on home, customize home, reorder home, hide sections, out riding now, up next, ride solo, home screen, rides tab, main screen, feed, activity, customize feed, who sees my activity, toolkit, public rides near me, distance, radius, 500 miles, rides left, unlimited, your group]
 ---
 
 :::release 3.0
@@ -56,6 +57,14 @@ Two tiles side by side:
 - **Events** opens rallies, poker runs and ride weekends. See [Events](/help/events).
 
 When one of your rides is live, a card under them says **Your ride is live. Tap to open Ride Mode**.
+
+## Starlink
+
+When your phone or tablet is on a Starlink's Wi-Fi, a **Starlink** card shows under those tiles with whether the dish is **Online**, **Down** and **Up** speeds, **Latency**, **Sky Blocked**, and how many devices are connected to the Starlink. Tap it to open the [Starlink page](/help/starlink). When no Starlink is connected, the card isn't there.
+
+- **iPhone and iPad:** the card starts showing after you've connected to your dish once on the Starlink page and allowed local network access.
+- **Android phones and tablets:** it shows on its own when you join the Starlink's Wi-Fi.
+- **Website:** browsers can't reach the dish, so there's no card.
 
 ## Your Sections
 

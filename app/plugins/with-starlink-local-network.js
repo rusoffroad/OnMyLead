@@ -1,5 +1,6 @@
-// Lets the native app talk plain HTTP to a Starlink dish on its own Wi-Fi (192.168.100.1),
-// and nothing else. Used by the Starlink page's "Connect to my dish".
+// Lets the native app talk plain HTTP to a Starlink dish on its own Wi-Fi (192.168.100.1) and
+// the Starlink router (192.168.1.1, for the connected-devices count), and nothing else. Used by
+// the Starlink page's "Connect to my dish" and the Starlink card on Home.
 //
 // iOS: local network permission text plus an App Transport Security exception.
 // Android: a network security config that allows cleartext only to the dish. A debug-only
@@ -8,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { withAndroidManifest, withDangerousMod, withInfoPlist } = require('expo/config-plugins');
 
-const DISH_HOST = '192.168.100.1';
+const HOSTS = ['192.168.100.1', '192.168.1.1'];
 const RES_NAME = 'network_security_config';
 
 const releaseXml = `<?xml version="1.0" encoding="utf-8"?>
@@ -16,7 +17,7 @@ const releaseXml = `<?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
   <base-config cleartextTrafficPermitted="false" />
   <domain-config cleartextTrafficPermitted="true">
-    <domain includeSubdomains="false">${DISH_HOST}</domain>
+${HOSTS.map((h) => `    <domain includeSubdomains="false">${h}</domain>`).join('\n')}
   </domain-config>
 </network-security-config>
 `;
@@ -35,7 +36,7 @@ function withIos(config, { localNetworkText }) {
     ats.NSAllowsLocalNetworking = true;
     ats.NSExceptionDomains = {
       ...(ats.NSExceptionDomains ?? {}),
-      [DISH_HOST]: { NSExceptionAllowsInsecureHTTPLoads: true, NSIncludesSubdomains: false },
+      ...Object.fromEntries(HOSTS.map((h) => [h, { NSExceptionAllowsInsecureHTTPLoads: true, NSIncludesSubdomains: false }])),
     };
     c.modResults.NSAppTransportSecurity = ats;
     return c;

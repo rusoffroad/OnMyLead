@@ -3462,6 +3462,11 @@ const dict: Record<string, string> = {
   "Start a group for the riders you ride with.": "一緒に走る仲間のグループを作りましょう。",
   "{name}, out riding now": "{name}、走行中",
   "Requests": "リクエスト",
+  "1 Device Connected": "接続中のデバイス 1 台",
+  "{n} Devices Connected": "接続中のデバイス {n} 台",
+  "Opens the Starlink page": "Starlink のページを開きます",
+  "Down": "下り",
+  "Up": "上り",
 };
 
 export default dict;

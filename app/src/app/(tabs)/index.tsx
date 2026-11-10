@@ -16,6 +16,7 @@ import { OutRidingNow } from '@/components/home/out-riding-now';
 import { HeadLink, Home, homeStyles, Initial, SectionHead } from '@/components/home/parts';
 import { PublicRidesRail, RadiusChip, RadiusSheet } from '@/components/home/public-rides';
 import { ActionTiles, JoinHero } from '@/components/home/ride-actions';
+import { StarlinkHomeCard } from '@/components/home/starlink-card';
 import { HelpRow, Toolkit } from '@/components/home/toolkit';
 import { Icon } from '@/components/icon';
 import { InboxBell } from '@/components/inbox-bell';
@@ -352,6 +353,8 @@ export default function HomeScreen() {
           <Icon name="chevron" color={theme.textSecondary} />
         </Pressable>
       ) : null}
+      {/* Only there while the phone can see a Starlink dish (components/home/starlink-card). */}
+      <StarlinkHomeCard />
     </>
   );
 
