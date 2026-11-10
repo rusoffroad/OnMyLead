@@ -3,7 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react';
 import { FOLLOW_FRAME_START, followFrameAfter, followMove, leadInset } from '@/core/follow-camera';
 import type { LatLng } from '@/core/geo';
 import { riderHeading, screenAngle } from '@/core/heading';
-import { JUNCTION_AHEAD_M, JUNCTION_LOOK_EVERY_MS, JUNCTION_ZOOM_START, junctionZoomStep, nextJunction } from '@/core/intersections';
+import {
+  JUNCTION_AHEAD_M, JUNCTION_LOOK_EVERY_MS, JUNCTION_STAY_ZOOMED_M, JUNCTION_ZOOM_START, junctionPassed, junctionZoomStep, nextJunction,
+} from '@/core/intersections';
 import type { Inset } from '@/core/map-center';
 import { metersPerPointAt } from '@/core/terrain';
 import { useEdgeZoomPref } from '@/hooks/use-edge-zoom';
@@ -94,10 +96,15 @@ export function useFollowCamera(map: RefObject<MapboxMapHandle | null>) {
       const j = junction.current;
       if (on.current || j.state === 'in') {
         let ahead: { at: LatLng; distM: number } | null = null;
-        if (j.state === 'idle' && heading != null && Date.now() - lookedAt.current >= JUNCTION_LOOK_EVERY_MS) {
+        // Idle: look for a junction to zoom in for. Zoomed in and just through one: look further
+        // ahead for the next, so the map stays close instead of zooming out and back in.
+        const lookFor = j.state === 'idle'
+          ? (Date.now() - lookedAt.current >= JUNCTION_LOOK_EVERY_MS ? JUNCTION_AHEAD_M : 0)
+          : (on.current && junctionPassed(j, f) ? JUNCTION_STAY_ZOOMED_M : 0);
+        if (lookFor > 0 && heading != null) {
           lookedAt.current = Date.now();
-          const radius = Math.min(700, JUNCTION_AHEAD_M / Math.max(0.05, metersPerPointAt(f.lat, cam.zoom)));
-          ahead = nextJunction(f, heading, await within(m.roadsNear(f, radius), MAP_CALL_MS, []));
+          const radius = Math.min(700, lookFor / Math.max(0.05, metersPerPointAt(f.lat, cam.zoom)));
+          ahead = nextJunction(f, heading, await within(m.roadsNear(f, radius), MAP_CALL_MS, []), lookFor);
           if (gen !== stepGen.current) return false;
         }
         const r = junctionZoomStep(j, { on: on.current, nowMs: Date.now(), zoom: cam.zoom, at: f, speedMps: f.speed ?? null, junction: ahead });

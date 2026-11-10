@@ -1,12 +1,16 @@
 [
   {
     "version": "3.0",
-    "title": "CarPlay Fix",
-    "intro": "OnMyLead 3.0 fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
-    "whatsNew": "What's new in 3.0:\n\n• Fixed: on iPhone, opening OnMyLead while your phone was already connected to CarPlay could close the app. It now opens normally.",
+    "title": "Smoother Intersection Zoom and a CarPlay Fix",
+    "intro": "OnMyLead 3.0 smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. It also fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
+    "whatsNew": "What's new in 3.0:\n\n• Smoother Zoom In at Intersections: with another junction coming up within about a quarter mile, the map stays zoomed in instead of zooming out and back in.\n• Fixed: on iPhone, opening OnMyLead while already connected to CarPlay could close the app. It now opens normally.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "improved",
+        "text": "Zoom In at Intersections: once you're through a junction, the map looks about a quarter mile ahead. If another junction is coming, it stays zoomed in for that one too, and zooms back out once after the last one, so the map no longer pumps in and out in town or on a web of trails."
+      },
       {
         "kind": "fixed",
         "text": "CarPlay: opening OnMyLead on your iPhone while it was already connected to CarPlay (or changing Dark, Light or Match Phone while connected) could close the app. It now opens normally and the car screen keeps working."
