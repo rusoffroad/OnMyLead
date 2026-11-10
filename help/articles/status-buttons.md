@@ -4,7 +4,7 @@ summary: Tell the whole group what's happening with one tap, see who got it, and
 category: ride-mode
 order: 20
 release: "1.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/components/ride-controls.tsx
   - app/src/app/ride/[id]/live.tsx
@@ -49,6 +49,10 @@ The four blue buttons send a short message to the group. They also show in the r
 
 :::release 2.0
 Quick replies send a short message to the group. They also show in the ride chat. **On My Way**, **Need a Minute** and **All Good** sit on the bottom panel. Tap **More** for **Running Late**, **Beverage Break** and every status.
+:::
+
+:::release 3.0
+From 3.0 the bottom panel has two rows of big buttons you can hit with gloves on: **On My Way**, **Need a Minute** and **All Good**, then **Mechanical Issue** (amber), **Need Help** (red) and **More**. **EMERGENCY** is a solid red bar across the bottom, always in the same spot. Tapping it opens the emergency alert, where you still hold to send.
 :::
 
 - **On My Way**
@@ -174,6 +178,10 @@ While your status is anything other than OK, a card on your screen says **Your S
 Organizers, co-organizers and leaders see a **Regroup at My Location** button above the quick replies. Tap it to set a regroup point where you are.
 
 - Everyone on the ride sees a yellow pin on the map and a yellow banner, **Regroup point set. Tap to navigate**, and hears "Regroup point set."
+:::
+
+:::release 3.0
+From 3.0, **Regroup Here** is a full-width white button just above **EMERGENCY**.
 :::
 
 :::release 2.0

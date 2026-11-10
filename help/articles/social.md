@@ -37,7 +37,7 @@ keywords: [social, timeline, feed, like, likes, heart, comment, comments, reply,
 - Or tap **Friends & Social** in your toolkit.
 
 :::release 3.0
-From 3.0, **Social** has its own tab at the bottom of the screen. **Riding Groups** is at the top of Social.
+From 3.0, **Social** has its own tab at the bottom of the screen. Your crew comes first: a **Riding Groups** card at the top (your groups' pictures and names; tap it for the list), then your friends' faces in a row you can swipe. Friends out riding right now are first, with a green ring. Tap a face to open that rider's profile, or **Add** at the end (**Requests** when someone asked you) to add and manage friends. On an iPad, an Android tablet or a big window, the Riding Groups card sits above your friends on the left.
 :::
 
 On a phone, Social has three tabs: **Activity** (everyone's posts), **Friends** and **My Posts**. On an iPad, an Android tablet or a big window, your friends sit on the left and the posts on the right, so you can switch without losing your place.

@@ -11,6 +11,8 @@ sources:
   - app/src/components/meet-point-map.tsx
   - supabase/migrations/20261104130000_event_presenter.sql
   - app/src/app/events/index.tsx
+  - app/src/components/events/featured-event.tsx
+  - app/src/lib/share-event.ts
   - app/src/app/events/new.tsx
   - app/src/components/events/event-or-ride.tsx
   - app/src/app/e/[code].tsx
@@ -53,6 +55,10 @@ In the app, **Event or Public Ride?** on Events, Find a Ride, Create a Ride and 
 From 3.0, tap **Events** in the tab bar, or the **Events** tile on Home next to **Start a Ride**.
 :::
 
+:::release 3.0
+From 3.0, the next event coming up leads **Coming Up** as a big photo with its dates, who presents it, the place, how many are going and how many group rides it has. Tap **I'm Going** right on it (tap again to take it back), or **Share** to send its link. The rest follow under **Near You**.
+:::
+
 2. **Coming Up** lists public events, soonest first. With location allowed, it shows the ones within your distance (the same distance as Public Rides Near You); tap the distance chip to change it.
 3. Tap an event to open it.
 
@@ -78,7 +84,12 @@ Some events are presented (sponsored) by a company. Those show **Presented by** 
 
 ## Create an Event (Pro)
 
+:::until 3.0
 1. Open **Events** and tap **Create an Event**. On Free, the button carries a small gold **Pro** tag and opens the Pro prompt.
+:::
+:::release 3.0
+1. Open **Events** and tap **+ Create** at the top right. On Free, it carries a small gold **Pro** tag and opens the Pro prompt.
+:::
 2. Give it a name and details, and pick **Public** (shows in Events for everyone) or **Link Only** (only people with the link).
 3. Under **When**, pick the first day and the start time. For more than one day, tap **Several Days** and pick the last day (up to 31 days).
 4. Under **Where**, search a place or tap the map, and check the **Place Name**. Everyone who sees the event sees this place, so pick a public spot like a venue, park, campground or trailhead.

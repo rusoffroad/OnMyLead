@@ -40,3 +40,13 @@ describe('Start a Ride detail line', () => {
     expect(startRideDetail({ text: 'None Left This Month', tone: 'out', upgrade: true })).toBe('None left this month');
   });
 });
+
+describe('ride card map', () => {
+  it('pictures the rounded area, and nothing without a token', async () => {
+    const { staticMapUrl } = await import('../home');
+    const u = staticMapUrl({ lat: 38.5733, lng: -109.5498 }, 'pk.x', 72, 72, 10)!;
+    expect(u).toContain('/-109.55,38.55,10,0/72x72@2x');
+    expect(staticMapUrl({ lat: 1, lng: 2 }, '', 72, 72, 10)).toBeNull();
+    expect(staticMapUrl({ lat: NaN, lng: 2 }, 'pk.x', 72, 72, 10)).toBeNull();
+  });
+});
