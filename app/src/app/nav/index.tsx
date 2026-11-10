@@ -24,7 +24,7 @@ import { carPlayMapState, parseCarPlayAction } from '@/core/carplay';
 import { riderHeading } from '@/core/heading';
 import { useFollowMe } from '@/hooks/use-follow-me';
 import { FollowMeButton } from '@/components/follow-me-button';
-import { FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
+import { bottomPanelPadding, FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
 import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
 import { compassAllowed } from '@/lib/compass';
@@ -604,7 +604,7 @@ export default function NavMode() {
     ? { right: 12, bottom: Math.max(insets.bottom, 12) + (wide || floating ? 0 : FULL_MAP_BAR_H + 12) }
     : wide ? { right: 12, bottom: 24 } : { right: 12, bottom: panelH && panelH > 0 ? panelH + 12 : open ? 340 : 180 };
   const musicBottom = locatePos.bottom + (me ? 58 : 0);
-  const panelPad: [number, number, number, number] = full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : [120, 60, open ? 360 : 200, 60];
+  const panelPad: [number, number, number, number] = full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : bottomPanelPadding(panelH, open);
   // The one number the Full Map bar keeps.
   const barValue = ((): [string, string] => {
     if (mode === 'measure') {
