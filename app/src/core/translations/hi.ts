@@ -3403,6 +3403,20 @@ const dict: Record<string, string> = {
   "Crop the Screenshot": "स्क्रीनशॉट क्रॉप करें",
   "Original": "मूल",
   "Square": "वर्गाकार",
+  "Thanks! That helps us reach more riders.": "धन्यवाद! इससे हमें और राइडर्स तक पहुँचने में मदद मिलती है।",
+  "How Did You Find OnMyLead?": "आपको OnMyLead के बारे में कैसे पता चला?",
+  "One tap. It tells us where to find more riders like you.": "बस एक टैप। इससे हमें पता चलता है कि आप जैसे और राइडर्स कहाँ मिलेंगे।",
+  "Where?": "कहाँ?",
+  "A trail sign, a forum, a dealer...": "ट्रेल का साइनबोर्ड, कोई फ़ोरम, कोई डीलर...",
+  "Google Search": "Google सर्च",
+  "A Friend": "कोई दोस्त",
+  "A Riding Group or Club": "राइडिंग ग्रुप या क्लब",
+  "An Event or Trail": "कोई इवेंट या ट्रेल",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;

@@ -3403,6 +3403,20 @@ const dict: Record<string, string> = {
   "Crop the Screenshot": "裁剪截图",
   "Original": "原图",
   "Square": "正方形",
+  "Thanks! That helps us reach more riders.": "谢谢！这能帮助我们找到更多骑手。",
+  "How Did You Find OnMyLead?": "你是怎么知道 OnMyLead 的？",
+  "One tap. It tells us where to find more riders like you.": "轻点一下，告诉我们去哪里找到更多像你一样的骑手。",
+  "Where?": "在哪里？",
+  "A trail sign, a forum, a dealer...": "路标、论坛、经销商……",
+  "Google Search": "Google 搜索",
+  "A Friend": "朋友",
+  "A Riding Group or Club": "骑行团体或俱乐部",
+  "An Event or Trail": "活动或路线",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;

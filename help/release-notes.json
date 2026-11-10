@@ -38,6 +38,10 @@
       {
         "kind": "new",
         "text": "Crop any photo before it uploads. Your profile picture, group photo, machine photo, post photo, event photos, trail photos and bug report screenshots open on a crop screen first: drag the photo, pinch or double-tap to zoom (or use the minus and plus buttons), and tap Use Photo. Profile pictures crop square with a circle guide, group photos wide (16:9) and machine photos 4:3; for the rest pick Original, Square, 4:3, 16:9 or 4:5. Adding several event photos crops them one by one, or tap Use the Rest As They Are. Group photos on iPhone and iPad are no longer cut to the middle for you. It works the same on iPhone, iPad, Android phones and tablets, and onmylead.com, where the mouse wheel and keyboard zoom and move the photo too."
+      },
+      {
+        "kind": "new",
+        "text": "How Did You Find OnMyLead?: new riders see one quick question on Home, asked once. Tap where you heard about us or tap Not Now. Answers are only counted, never shown to other riders."
       }
     ]
   },

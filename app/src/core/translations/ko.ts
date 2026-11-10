@@ -3403,6 +3403,20 @@ const dict: Record<string, string> = {
   "Crop the Screenshot": "스크린샷 자르기",
   "Original": "원본",
   "Square": "정사각형",
+  "Thanks! That helps us reach more riders.": "감사합니다! 더 많은 라이더를 만나는 데 도움이 됩니다.",
+  "How Did You Find OnMyLead?": "OnMyLead를 어떻게 알게 되셨나요?",
+  "One tap. It tells us where to find more riders like you.": "한 번만 탭하세요. 당신 같은 라이더를 어디서 찾을지 알려 줍니다.",
+  "Where?": "어디서요?",
+  "A trail sign, a forum, a dealer...": "트레일 표지판, 포럼, 딜러...",
+  "Google Search": "Google 검색",
+  "A Friend": "친구",
+  "A Riding Group or Club": "라이딩 그룹 또는 클럽",
+  "An Event or Trail": "이벤트 또는 트레일",
+  "Facebook": "Facebook",
+  "Instagram": "Instagram",
+  "TikTok": "TikTok",
+  "YouTube": "YouTube",
+  "App Store": "App Store",
 };
 
 export default dict;

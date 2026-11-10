@@ -16,6 +16,7 @@ import { RiderDot } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { APP_STORE_URL, PLAY_STORE_URL } from '@/constants/site';
+import { storeLink } from '@/lib/found-us';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import {
   eventDates, eventLink, eventPhase, MAX_COHOSTS, MAX_EVENT_PHOTOS, nextRsvp, pickablePeople, rsvpLine,
@@ -253,7 +254,8 @@ export default function EventPage() {
         title={t('Get the App, Free')}
         onPress={() => {
           const ua = typeof navigator === 'undefined' ? '' : navigator.userAgent;
-          const store = isAndroid(ua) ? PLAY_STORE_URL : APP_STORE_URL ?? PLAY_STORE_URL;
+          const plain = isAndroid(ua) ? PLAY_STORE_URL : APP_STORE_URL ?? PLAY_STORE_URL;
+          const store = plain ? storeLink(plain) : null;
           track('web_get_app', { from: 'event_page' });
           if (store) Linking.openURL(store);
         }}

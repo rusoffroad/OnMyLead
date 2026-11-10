@@ -39,6 +39,19 @@ export const growthSeries = (from: string, to: string, bucket: Bucket) =>
 export const downloads = (from: string, to: string, bucket: Bucket) =>
   adminRpc<Downloads>('admin_downloads', { p_from: from, p_to: to, p_bucket: bucket });
 
+export type FoundUs = {
+  riders: number;
+  answered: number;
+  skipped: number;
+  answers: { answer: string; riders: number }[];
+  campaigns: { source: string | null; medium: string | null; campaign: string | null; riders: number }[];
+  other: string[];
+};
+
+/** Where riders who signed up in the period found OnMyLead (migration 20261110300000_rider_sources). */
+export const foundUs = (from: string | null, to: string | null) =>
+  adminRpc<FoundUs>('admin_found_us', { p_from: from, p_to: to });
+
 export const setTestAccount = (userId: string, test: boolean, note?: string) =>
   adminRpc<void>('admin_set_test_account', { p_user: userId, p_test: test, p_note: note ?? null });
 

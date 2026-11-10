@@ -10,6 +10,7 @@ import { Fact, LoadError, Notice, TextButton } from '@/components/admin-insights
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { deviceLabel, downloadSeries, needsRefresh, signInMethodLabel, STORE_NAME, storeState, type StoreKey } from '@/core/admin-growth';
+import { campaignLabel, foundUsLabel } from '@/core/found-us';
 import { bucketFor, fmtAgo, fmtDate, fmtInt } from '@/core/admin-format';
 import { useAdminData } from '@/lib/admin';
 import * as api from '@/lib/admin-growth';
@@ -60,8 +61,47 @@ export default function GrowthPage() {
         </Columns>
       ) : null}
 
+      <FoundUsPanel range={range} />
+
       <Downloads range={range} bucket={bucket} />
     </AdminPage>
+  );
+}
+
+function FoundUsPanel({ range }: { range: DateRange }) {
+  const found = useAdminData(() => api.foundUs(range.from, range.to), [range.from, range.to]);
+  const f = found.data;
+  if (found.error) {
+    return (
+      <Panel title="Where Riders Found Us">
+        <Notice text="This shows once the 3.0 server update (where riders found us) is installed." />
+      </Panel>
+    );
+  }
+  if (!f) return <Panel title="Where Riders Found Us"><Loading /></Panel>;
+  const rate = f.riders ? Math.round((f.answered / f.riders) * 100) : 0;
+  return (
+    <Columns ratio={[1, 1]}>
+      <Panel title="Where Riders Found Us">
+        <ThemedText type="small" themeColor="textSecondary">
+          {`What new riders tapped on Home's "How Did You Find OnMyLead?" question: ${fmtInt(f.answered)} of ${fmtInt(f.riders)} answered (${rate}%), ${fmtInt(f.skipped)} tapped Not Now.`}
+        </ThemedText>
+        {f.answers.length === 0 ? <Empty text="No answers in this period yet." /> : (
+          <BarList items={f.answers.map((a) => ({ label: foundUsLabel(a.answer), value: a.riders }))} />
+        )}
+        {f.other.length ? (
+          <ThemedText type="small" themeColor="textSecondary">{`Something else: ${f.other.join('; ')}`}</ThemedText>
+        ) : null}
+      </Panel>
+      <Panel title="Ads and Links That Brought Them">
+        <ThemedText type="small" themeColor="textSecondary">
+          Riders who signed up on onmylead.com after arriving from a tagged ad or link (utm tags or the Facebook, Google and TikTok click ids). App downloads by campaign are in App Store Connect and Play Console.
+        </ThemedText>
+        {f.campaigns.length === 0 ? <Empty text="No tagged visits turned into riders in this period." /> : (
+          <BarList items={f.campaigns.map((c) => ({ label: campaignLabel(c), value: c.riders }))} />
+        )}
+      </Panel>
+    </Columns>
   );
 }
 
