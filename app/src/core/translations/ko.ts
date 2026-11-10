@@ -3246,6 +3246,7 @@ const dict: Record<string, string> = {
   "Group Together": "그룹 함께 있음",
   "No Ride Running": "진행 중인 라이드 없음",
   "Open Ride Mode on your phone and your group shows up here.": "휴대폰에서 라이드 모드를 열면 그룹이 여기에 표시됩니다.",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "휴대폰에서 라이드 모드나 지도 모드를 열면 여기에 표시됩니다.",
   "Group": "그룹",
   "Nobody Is Sharing Yet": "아직 공유하는 사람이 없음",
   "Send EMERGENCY with your location to everyone on the ride?": "라이드의 모든 사람에게 내 위치와 함께 긴급 알림을 보낼까요?",

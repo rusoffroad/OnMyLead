@@ -3246,6 +3246,7 @@ const dict: Record<string, string> = {
   "Group Together": "Gruppo unito",
   "No Ride Running": "Nessuna uscita in corso",
   "Open Ride Mode on your phone and your group shows up here.": "Apri la Modalità Uscita sul telefono e il tuo gruppo apparirà qui.",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "Apri la Modalità Uscita o la Modalità Mappa sul telefono e apparirà qui.",
   "Group": "Gruppo",
   "Nobody Is Sharing Yet": "Nessuno condivide ancora",
   "Send EMERGENCY with your location to everyone on the ride?": "Inviare EMERGENZA con la tua posizione a tutti nell'uscita?",
