@@ -48,6 +48,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   leader messages, ride changes, new riders, reminders, ride invites, group chat, leaders you
   follow, trial reminders), cancellation emails, message preview, quiet hours.
 - Directions app choice (Ask Each Time / Apple Maps / Google Maps; Google only on Android).
+- Ad Measurement (3.0): iPhone/iPad opens Settings > Tracking (Apple's ATT prompt asked once on Home), Android switch; `lib/ad-tracking.ts`, edge function `ad-conversions`
 - Subscription, Blocked Riders, Report a Bug (1.0.1: screenshot + app activity log), Contact Us, Help and Support, Terms, Safety Agreement (2.0), Privacy, Admin Dashboard link
   (admins only; since 2.1 it is the first row of the You tab, right under the name card).
 
@@ -229,6 +230,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Showcase home (live group-map hero, features, Free vs Pro, promo film), Get the App.
 - Ride and group link previews, family link, web ride creation and route setup, sign-in.
 - Contact form, Support, Terms, Rider Safety Agreement (/rider-agreement, asked after sign-in from 2.0), Privacy; Help Center at /help.
+- Ad cookie notice (3.0): Meta Pixel, Google tag and TikTok Pixel only after Allow; change it on /privacy (`components/ad-consent-notice.web.tsx`).
 - Before You Ride (2.0): every rider agrees to the Rider Safety and Liability Agreement on first launch (all devices) and again when it changes; Admin > Rider Agreements lists and exports the permanent records.
 
 ### Admin Dashboard (onmylead.com/admin)

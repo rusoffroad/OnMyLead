@@ -3371,6 +3371,19 @@ const dict: Record<string, string> = {
   "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{groupName} から {count} {v}を招待しました。通知が届き、「参加」か「興味あり」を選べます。",
   "Inviting a group to an event switches on with the next server update.": "イベントへのグループ招待は次回のサーバー更新で使えるようになります。",
   "Then invite everyone to your event in one tap.": "イベントに全員をワンタップで招待できます。",
+  "Cookie Notice": "Cookie のお知らせ",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "どの広告からライダーが OnMyLead に来たかを知るため、Meta、Google、TikTok の広告 Cookie を使います。位置情報、ライド、メッセージが見られることはありません。",
+  "Allow": "許可",
+  "Ad Cookies on This Website": "このサイトの広告 Cookie",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "許可済み。Meta、Google、TikTok は当社の広告からここに来たことを知ることができます。",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "オフ。このサイトでは Meta、Google、TikTok のものは何も読み込まれません。",
+  "Turn Off Ad Cookies": "広告 Cookie をオフにする",
+  "Allow Ad Cookies": "広告 Cookie を許可",
+  "Ad Measurement": "広告効果の測定",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "オン。広告からここに来たことを Meta と TikTok が知ります。タップして設定で変更",
+  "Off. Tap to change in Settings": "オフ。タップして設定で変更",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "オン。広告からここに来たことを Meta と TikTok が知ります。位置情報、ライド、メッセージは送られません",
+  "Off. Nothing is sent to ad networks": "オフ。広告ネットワークには何も送られません",
 };
 
 export default dict;

@@ -3371,6 +3371,19 @@ const dict: Record<string, string> = {
   "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Mengundang {count} {v} dari {groupName}. Mereka mendapat notifikasi dan bisa memilih Ikut atau Tertarik.",
   "Inviting a group to an event switches on with the next server update.": "Mengundang grup ke acara aktif dengan pembaruan server berikutnya.",
   "Then invite everyone to your event in one tap.": "Lalu undang semua ke acaramu dengan sekali ketuk.",
+  "Cookie Notice": "Pemberitahuan Cookie",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Kami memakai cookie iklan dari Meta, Google, dan TikTok untuk melihat iklan mana yang membawa rider ke OnMyLead. Mereka tidak pernah melihat lokasi, perjalanan, atau pesanmu.",
+  "Allow": "Izinkan",
+  "Ad Cookies on This Website": "Cookie Iklan di Situs Ini",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Diizinkan. Meta, Google, dan TikTok bisa tahu saat salah satu iklan kami membawamu ke sini.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Mati. Tidak ada apa pun dari Meta, Google, atau TikTok yang dimuat di situs ini.",
+  "Turn Off Ad Cookies": "Matikan Cookie Iklan",
+  "Allow Ad Cookies": "Izinkan Cookie Iklan",
+  "Ad Measurement": "Pengukuran Iklan",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Aktif. Meta dan TikTok tahu saat iklan membawamu ke sini. Ketuk untuk mengubah di Pengaturan",
+  "Off. Tap to change in Settings": "Mati. Ketuk untuk mengubah di Pengaturan",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Aktif. Meta dan TikTok tahu saat iklan membawamu ke sini. Tidak pernah lokasi, perjalanan, atau pesanmu",
+  "Off. Nothing is sent to ad networks": "Mati. Tidak ada yang dikirim ke jaringan iklan",
 };
 
 export default dict;

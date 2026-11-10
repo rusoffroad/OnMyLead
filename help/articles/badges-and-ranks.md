@@ -4,7 +4,7 @@ summary: Earn Bronze, Silver and Gold badges for leading, riding, miles and trai
 category: account
 order: 25
 release: "1.0.3"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - supabase/migrations/20261103700000_brand_ambassador.sql
   - supabase/migrations/20261103900000_founder_badge.sql

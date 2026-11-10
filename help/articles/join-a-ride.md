@@ -4,7 +4,7 @@ summary: Join with an invite link, a QR code or a code, or from Find. Learn what
 category: joining
 order: 20
 release: "1.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/components/events/part-of-event.tsx
   - app/src/core/leaving.ts

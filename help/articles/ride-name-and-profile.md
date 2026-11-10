@@ -4,7 +4,7 @@ summary: Pick the ride name other riders see on the map, the rider list and in c
 category: account
 order: 20
 release: "1.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/app/ride-name.tsx
   - app/src/core/profile.ts

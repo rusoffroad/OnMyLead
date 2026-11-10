@@ -3371,6 +3371,19 @@ const dict: Record<string, string> = {
   "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Invitati {count} {v} da {groupName}. Ricevono una notifica e possono dire Ci vado o Mi interessa.",
   "Inviting a group to an event switches on with the next server update.": "Invitare un gruppo a un evento si attiva con il prossimo aggiornamento del server.",
   "Then invite everyone to your event in one tap.": "Poi invita tutti al tuo evento con un tocco.",
+  "Cookie Notice": "Avviso sui cookie",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Usiamo cookie pubblicitari di Meta, Google e TikTok per capire quali nostri annunci portano piloti su OnMyLead. Non vedono mai la tua posizione, le tue uscite o i tuoi messaggi.",
+  "Allow": "Consenti",
+  "Ad Cookies on This Website": "Cookie pubblicitari su questo sito",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Consentiti. Meta, Google e TikTok possono sapere quando un nostro annuncio ti ha portato qui.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Disattivati. Su questo sito non viene caricato nulla di Meta, Google o TikTok.",
+  "Turn Off Ad Cookies": "Disattiva i cookie pubblicitari",
+  "Allow Ad Cookies": "Consenti i cookie pubblicitari",
+  "Ad Measurement": "Misurazione annunci",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Attiva. Meta e TikTok sanno quando un annuncio ti ha portato qui. Tocca per cambiarlo in Impostazioni",
+  "Off. Tap to change in Settings": "Disattivata. Tocca per cambiarlo in Impostazioni",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Attiva. Meta e TikTok sanno quando un annuncio ti ha portato qui. Mai la tua posizione, le uscite o i messaggi",
+  "Off. Nothing is sent to ad networks": "Disattivata. Non viene inviato nulla alle reti pubblicitarie",
 };
 
 export default dict;

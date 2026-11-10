@@ -3371,6 +3371,19 @@ const dict: Record<string, string> = {
   "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Invitaste a {count} {v} de {groupName}. Reciben una notificación y pueden decir Voy o Me interesa.",
   "Inviting a group to an event switches on with the next server update.": "Invitar a un grupo a un evento se activa con la próxima actualización del servidor.",
   "Then invite everyone to your event in one tap.": "Luego invita a todos a tu evento con un toque.",
+  "Cookie Notice": "Aviso de cookies",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Usamos cookies publicitarias de Meta, Google y TikTok para saber cuáles de nuestros anuncios traen pilotos a OnMyLead. Nunca ven tu ubicación, tus rutas ni tus mensajes.",
+  "Allow": "Permitir",
+  "Ad Cookies on This Website": "Cookies publicitarias en este sitio web",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Permitidas. Meta, Google y TikTok pueden saber cuándo uno de nuestros anuncios te trajo aquí.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Desactivadas. Nada de Meta, Google ni TikTok se carga en este sitio web.",
+  "Turn Off Ad Cookies": "Desactivar cookies publicitarias",
+  "Allow Ad Cookies": "Permitir cookies publicitarias",
+  "Ad Measurement": "Medición de anuncios",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Activada. Meta y TikTok saben cuándo un anuncio te trajo aquí. Toca para cambiarlo en Ajustes",
+  "Off. Tap to change in Settings": "Desactivada. Toca para cambiarlo en Ajustes",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Activada. Meta y TikTok saben cuándo un anuncio te trajo aquí. Nunca tu ubicación, rutas ni mensajes",
+  "Off. Nothing is sent to ad networks": "Desactivada. No se envía nada a redes publicitarias",
 };
 
 export default dict;

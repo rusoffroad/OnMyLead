@@ -3371,6 +3371,19 @@ const dict: Record<string, string> = {
   "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Você convidou {count} {v} de {groupName}. Eles recebem uma notificação e podem dizer Vou ou Tenho interesse.",
   "Inviting a group to an event switches on with the next server update.": "Convidar um grupo para um evento será ativado com a próxima atualização do servidor.",
   "Then invite everyone to your event in one tap.": "Depois convide todos para o seu evento com um toque.",
+  "Cookie Notice": "Aviso de cookies",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Usamos cookies de anúncios da Meta, do Google e do TikTok para saber quais dos nossos anúncios trazem pilotos ao OnMyLead. Eles nunca veem sua localização, seus passeios ou suas mensagens.",
+  "Allow": "Permitir",
+  "Ad Cookies on This Website": "Cookies de anúncios neste site",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Permitidos. Meta, Google e TikTok podem saber quando um dos nossos anúncios trouxe você aqui.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Desativados. Nada da Meta, do Google ou do TikTok é carregado neste site.",
+  "Turn Off Ad Cookies": "Desativar cookies de anúncios",
+  "Allow Ad Cookies": "Permitir cookies de anúncios",
+  "Ad Measurement": "Medição de anúncios",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Ativada. Meta e TikTok sabem quando um anúncio trouxe você aqui. Toque para mudar em Ajustes",
+  "Off. Tap to change in Settings": "Desativada. Toque para mudar em Ajustes",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Ativada. Meta e TikTok sabem quando um anúncio trouxe você aqui. Nunca sua localização, passeios ou mensagens",
+  "Off. Nothing is sent to ad networks": "Desativada. Nada é enviado a redes de anúncios",
 };
 
 export default dict;

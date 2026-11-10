@@ -21,7 +21,7 @@ sources:
   - supabase/migrations/20261020000000_blocked_riders.sql
   - app/src/app/out-riding.tsx
   - supabase/migrations/20261101700000_out_riding.sql
-related: [location-sharing, family-link, report-and-block, ride-name-and-profile, delete-account]
+related: [location-sharing, family-link, report-and-block, ride-name-and-profile, delete-account, ad-measurement]
 keywords: [privacy, private, who can see me, meeting point, exact location, rounded, public ride, data, safe, stranger, tablet]
 ---
 

@@ -3371,6 +3371,19 @@ const dict: Record<string, string> = {
   "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{count} {v} de {groupName} invités. Ils reçoivent une notification et peuvent répondre J’y vais ou Intéressé.",
   "Inviting a group to an event switches on with the next server update.": "Inviter un groupe à un événement sera activé avec la prochaine mise à jour du serveur.",
   "Then invite everyone to your event in one tap.": "Puis invitez tout le monde à votre événement d’un seul geste.",
+  "Cookie Notice": "Avis sur les cookies",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Nous utilisons des cookies publicitaires de Meta, Google et TikTok pour savoir lesquelles de nos publicités amènent des pilotes sur OnMyLead. Ils ne voient jamais votre position, vos sorties ni vos messages.",
+  "Allow": "Autoriser",
+  "Ad Cookies on This Website": "Cookies publicitaires sur ce site",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "Autorisés. Meta, Google et TikTok peuvent savoir quand une de nos publicités vous a amené ici.",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "Désactivés. Rien de Meta, Google ou TikTok ne se charge sur ce site.",
+  "Turn Off Ad Cookies": "Désactiver les cookies publicitaires",
+  "Allow Ad Cookies": "Autoriser les cookies publicitaires",
+  "Ad Measurement": "Mesure publicitaire",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "Activée. Meta et TikTok savent quand une publicité vous a amené ici. Touchez pour modifier dans Réglages",
+  "Off. Tap to change in Settings": "Désactivée. Touchez pour modifier dans Réglages",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "Activée. Meta et TikTok savent quand une publicité vous a amené ici. Jamais votre position, vos sorties ni vos messages",
+  "Off. Nothing is sent to ad networks": "Désactivée. Rien n’est envoyé aux régies publicitaires",
 };
 
 export default dict;

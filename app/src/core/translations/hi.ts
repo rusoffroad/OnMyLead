@@ -3371,6 +3371,19 @@ const dict: Record<string, string> = {
   "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{groupName} से {count} {v} को बुलाया। उन्हें नोटिफ़िकेशन मिलता है और वे जा रहे हैं या रुचि है चुन सकते हैं।",
   "Inviting a group to an event switches on with the next server update.": "किसी इवेंट में ग्रुप को बुलाना अगले सर्वर अपडेट के साथ चालू होगा।",
   "Then invite everyone to your event in one tap.": "फिर अपने इवेंट में एक टैप में सबको बुलाएं।",
+  "Cookie Notice": "कुकी सूचना",
+  "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "हम Meta, Google और TikTok की विज्ञापन कुकी इस्तेमाल करते हैं ताकि पता चले कि हमारे कौन से विज्ञापन राइडर्स को OnMyLead तक लाते हैं। वे आपकी लोकेशन, राइड या मैसेज कभी नहीं देखते।",
+  "Allow": "अनुमति दें",
+  "Ad Cookies on This Website": "इस वेबसाइट पर विज्ञापन कुकी",
+  "Allowed. Meta, Google and TikTok can tell when one of our ads brought you here.": "अनुमति है। Meta, Google और TikTok जान सकते हैं कि आप हमारे किसी विज्ञापन से यहाँ आए।",
+  "Off. Nothing from Meta, Google or TikTok loads on this website.": "बंद। इस वेबसाइट पर Meta, Google या TikTok का कुछ भी लोड नहीं होता।",
+  "Turn Off Ad Cookies": "विज्ञापन कुकी बंद करें",
+  "Allow Ad Cookies": "विज्ञापन कुकी की अनुमति दें",
+  "Ad Measurement": "विज्ञापन मापन",
+  "On. Meta and TikTok learn when an ad brought you here. Tap to change in Settings": "चालू। Meta और TikTok जानते हैं कि आप किसी विज्ञापन से यहाँ आए। बदलने के लिए Settings में टैप करें",
+  "Off. Tap to change in Settings": "बंद। बदलने के लिए Settings में टैप करें",
+  "On. Meta and TikTok learn when an ad brought you here. Never your location, rides or messages": "चालू। Meta और TikTok जानते हैं कि आप किसी विज्ञापन से यहाँ आए। आपकी लोकेशन, राइड या मैसेज कभी नहीं",
+  "Off. Nothing is sent to ad networks": "बंद। विज्ञापन नेटवर्क को कुछ नहीं भेजा जाता",
 };
 
 export default dict;

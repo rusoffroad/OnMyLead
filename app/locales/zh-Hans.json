@@ -7,6 +7,7 @@
     "NSCameraUsageDescription": "拍摄头像或车辆照片。只会上传你拍摄的照片。",
     "NSMotionUsageDescription": "OnMyLead 使用运动传感器显示倾斜仪表，并在骑行模式中检测可能的事故，以便提醒你的队伍。",
     "NSLocalNetworkUsageDescription": "OnMyLead 通过 Wi-Fi 连接你的 Starlink 天线来显示其状态。不会触碰你网络中的其他任何设备。",
-    "NSBluetoothAlwaysUsageDescription": "没有手机信号时，骑行模式会通过蓝牙把你这次骑行的位置和警报传给同一骑行中附近的骑手。发送的所有内容都只为你的骑行加密。"
+    "NSBluetoothAlwaysUsageDescription": "没有手机信号时，骑行模式会通过蓝牙把你这次骑行的位置和警报传给同一骑行中附近的骑手。发送的所有内容都只为你的骑行加密。",
+    "NSUserTrackingUsageDescription": "允许 OnMyLead 在你看到 OnMyLead 广告后安装、注册或订阅时告知 Meta 和 TikTok，以便我们了解哪些广告有效。你的位置、骑行和消息绝不会被分享。"
   }
 }
