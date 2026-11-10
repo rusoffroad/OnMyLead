@@ -1,3 +1,4 @@
+import { AdCookieChoice } from '@/components/ad-consent-notice';
 import { LegalPage } from '@/components/legal-page';
 import { COMPANY, SUPPORT_EMAIL } from '@/constants/site';
 
@@ -5,8 +6,9 @@ export default function Privacy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="November 3, 2026"
+      updated="November 10, 2026"
       intro={`OnMyLead is made by ${COMPANY}. This page explains what the app and onmylead.com collect, why, and the choices you have. The short version: your location is never public, you choose who sees it, and sharing always ends.`}
+      footer={<AdCookieChoice />}
       sections={[
         {
           title: 'Your Location',
@@ -26,14 +28,22 @@ export default function Privacy() {
             'Purchases: if you buy Pro, Apple sends us the subscription’s status and transaction details. We never see your card or payment details.',
             'Safety agreement: when you agree to the Rider Safety and Liability Agreement, we save a record of it: your account, email address and ride name, which version you agreed to and a fingerprint of its exact text, the time, the app version, the kind of device and its system version, language, IP address and browser. It is never shown to other riders.',
             'Leaderboard: if you pick where you ride from, we save your country and, in some countries, your state or province (just those, never a place). If you tap Use My Location to fill it in, your phone works out the country and state itself and only those two are sent.',
-            'Website: onmylead.com uses Cloudflare Web Analytics, which counts visits without cookies.',
+            'Website: onmylead.com uses Cloudflare Web Analytics, which counts visits without cookies. If you tap Allow on the cookie notice, it also loads the Meta Pixel, the Google tag and the TikTok Pixel (see Ad Measurement below).',
             'Music Controls: to show what’s playing and let you pause, skip and change the volume, the app reads the current song, artist and music app on your phone. It never leaves your phone. On Android, the optional Notification Access you can allow for this is used only to see what’s playing; the app never reads or keeps your notifications.',
+          ],
+        },
+        {
+          title: 'Ad Measurement',
+          body: [
+            'OnMyLead advertises on Facebook, Instagram, Google and TikTok. To learn which of those ads bring new riders, and only if you allow it, we tell Meta, Google or TikTok when someone installed the app, created an account, started the Pro trial or bought Pro (with the price), along with an identifier they can match to the ad: on iPhone and iPad the advertising identifier Apple gives an app after you tap Allow on the "Allow OnMyLead to track your activity" prompt; on Android the device’s advertising ID; on the website the cookies of their pixels, after you tap Allow on the cookie notice. Meta and TikTok also receive the IP address and browser or app version of the device that sent it. They use it under their own privacy policies.',
+            'This never includes your location, routes, rides, groups, messages, photos, ride name or email address.',
+            'Turning it off: on iPhone and iPad tap Ask App Not to Track, or later go to Settings > Privacy & Security > Tracking. On Android turn off You > Settings > Ad Measurement, or delete your advertising ID in Android’s settings. On the website tap Decline on the cookie notice, or change it below. A browser that sends Global Privacy Control or Do Not Track is treated as Decline. Turning it off doesn’t change anything else in OnMyLead.',
           ],
         },
         {
           title: 'Who We Share It With',
           body: [
-            'We do not sell your data or use it for advertising. We share it only with the services that run OnMyLead: Supabase (database and sign-in), Apple (push notifications and purchases on iPhone and iPad), Google (push notifications through Firebase Cloud Messaging and purchases through Google Play on Android), Sentry (crash reports), Resend (emails such as ride cancellations) and Cloudflare (the website). If you look up a VIN in your Garage, that VIN is sent to the US government’s free NHTSA lookup. When you search for a park, trailhead or town, only the words you type and a rough map area go to Photon, an OpenStreetMap place search; trail maps are loaded from OpenFreeMap. Neither is told who you are. When you tap Navigate or Directions, the destination opens in Apple Maps or Google Maps, and their own privacy policies apply there. On Android the map itself is drawn by Google Maps, which Google’s privacy policy covers.',
+            'We do not sell your data, and nothing is used to show you ads inside OnMyLead. Apart from the ad measurement above, which you choose, we share it only with the services that run OnMyLead: Supabase (database and sign-in), Apple (push notifications and purchases on iPhone and iPad), Google (push notifications through Firebase Cloud Messaging and purchases through Google Play on Android), Sentry (crash reports), Resend (emails such as ride cancellations) and Cloudflare (the website). If you look up a VIN in your Garage, that VIN is sent to the US government’s free NHTSA lookup. When you search for a park, trailhead or town, only the words you type and a rough map area go to Photon, an OpenStreetMap place search; trail maps are loaded from OpenFreeMap. Neither is told who you are. When you tap Navigate or Directions, the destination opens in Apple Maps or Google Maps, and their own privacy policies apply there. On Android the map itself is drawn by Google Maps, which Google’s privacy policy covers.',
             'Reports: the OnMyLead team doesn’t read your direct messages or chats. When a rider reports another rider, the messages between those two riders (their direct messages, and what either wrote in the last 30 days in a riding group or ride chat they share) are saved with the report so the team can look into it, and kept while the report is needed. Only the OnMyLead team can read them, every viewing is logged, and the rider reported isn’t told who reported them.',
             'Other riders see what you share with them: your ride name, the rides you join, your messages on those rides and, while you share, your location. If you turn on Show My Google (or Apple or Facebook) Profile, riders you share a ride or riding group with also see that account’s name and photo. It’s off until you turn it on, and you can turn it off any time on the You tab.',
             'Signed-in riders can see the badge leaderboard: your ride name, picture, badges and the state or country you picked. Turn off Show Me on the Leaderboard to leave it. If your Feed activity is set to Nobody, you’re left off until you turn it on.',

@@ -14,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
+import { AdConsentNotice } from '@/components/ad-consent-notice';
 import { DirectionsHost } from '@/components/directions';
 import { EmergencySiren } from '@/components/emergency-siren';
 import { LaunchCover } from '@/components/launch-cover';
@@ -27,15 +28,18 @@ import { Colors, currentScheme, font, NavigationColors } from '@/constants/theme
 import { setCrashScreen, withCrashReporting } from '@/lib/crash';
 import { logScreen, startAppLog } from '@/lib/app-log';
 import { startAppearance, takeReturnPath, useAppearance } from '@/lib/appearance';
+import { startAdTracking } from '@/lib/ad-tracking';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
-import { useCan } from '@/lib/pro';
+import { currentEntitlements, useCan } from '@/lib/pro';
+import { can } from '@/core/entitlements';
 import { startOrientationRule } from '@/lib/orientation';
 // Registers the background location task at startup, before any screen mounts.
 import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
 import { startReferrals } from '@/lib/referrals';
-import { syncCarPlayLabels } from '@/lib/carplay';
+import { onCarPlayAction, syncCarPlayLabels } from '@/lib/carplay';
+import { parseCarPlayAction } from '@/core/carplay';
 import { startRiderAgreement } from '@/lib/rider-agreement';
 import { startSettingsSync } from '@/lib/settings-sync';
 import { startAppearanceSync } from '@/lib/appearance-sync';
@@ -94,6 +98,14 @@ function RootLayout() {
   // CarPlay is Pro (2.1): on Free the car shows the Pro notice in place of the waiting screen.
   const carPlayPro = useCan('carplay');
   useEffect(() => syncCarPlayLabels(!carPlayPro), [langVersion, carPlayPro]);
+  // The waiting screen's Open Map Mode button opens Map Mode on the phone, and the car follows it
+  // (the button only shows with Pro). From Ride Mode the ride keeps the car screen.
+  useEffect(() => {
+    const sub = onCarPlayAction((id) => {
+      if (parseCarPlayAction(id).type === 'open_map' && can(currentEntitlements(), 'carplay')) router.navigate('/nav');
+    });
+    return () => sub.remove();
+  }, [router]);
 
   useEffect(() => {
     setCrashScreen(screen);
@@ -109,6 +121,8 @@ function RootLayout() {
   useEffect(() => startRiderAgreement(), []);
   // A friend link opened before signing up counts as an invite once the new account signs in.
   useEffect(() => startReferrals(), []);
+  // Ad measurement for OnMyLead's Meta, Google and TikTok ads: only with the rider's OK (lib/ad-tracking.ts).
+  useEffect(() => startAdTracking(), []);
   // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();
@@ -226,6 +240,8 @@ function RootLayout() {
       <RiderAgreementGate />
       {/* The owner's minimum version (Admin Dashboard > Releases), over everything, with Not Now. */}
       <UpdateRequired />
+      {/* onmylead.com's cookie notice for the ad pixels (website only). */}
+      <AdConsentNotice />
       {/* A copy of the launch screen with the app's version, over everything until launch ends. */}
       <LaunchCover until={launchedAt + SPLASH_MIN_MS} />
     </ThemeProvider>

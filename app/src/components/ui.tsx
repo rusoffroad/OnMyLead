@@ -7,6 +7,7 @@ import { font, MaxContentWidth, Radius, scrollIndicator, Spacing, themedStyles }
 import { READABLE_WIDTH } from '@/core/layout';
 import { useTheme } from '@/hooks/use-theme';
 import type { FeatureKey } from '@/core/entitlements';
+import { Icon } from './icon';
 import { keyboardScroll, TextBox } from './keyboard';
 import { ProTag } from './pro-tag';
 import { ThemedText } from './themed-text';
@@ -86,12 +87,13 @@ export function Button({ title, kind = 'primary', big, loading, disabled, style,
   );
 }
 
-export function Field({ label, hint, style, onFocus, onBlur, placeholder, ...rest }: TextInputProps & { label: string; hint?: string }) {
+export function Field({ label, hint, style, onFocus, onBlur, placeholder, trailing, ...rest }: TextInputProps & { label: string; hint?: string; trailing?: ReactNode }) {
   const theme = useTheme();
   const [focused, setFocused] = useState(false);
   return (
     <View style={{ gap: 6 }}>
       <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{label}</ThemedText>
+      <View>
       <TextBox
         placeholder={tx(placeholder)}
         placeholderTextColor="#5F7190"
@@ -108,12 +110,44 @@ export function Field({ label, hint, style, onFocus, onBlur, placeholder, ...res
           styles.input,
           { color: theme.text, borderColor: focused ? theme.sky : 'transparent', backgroundColor: theme.backgroundSelected },
           rest.multiline && { minHeight: 96, paddingTop: 14, textAlignVertical: 'top' },
+          trailing ? { paddingRight: 52 } : null,
           style,
         ]}
         {...rest}
       />
+      {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
+      </View>
       {hint ? <ThemedText type="small" themeColor="textSecondary">{hint}</ThemedText> : null}
     </View>
+  );
+}
+
+/**
+ * A password box with an eye button that shows or hides what was typed (sign-in, create account,
+ * set a new password). Hidden by default; the choice resets each time the screen opens.
+ */
+export function PasswordField(props: Omit<TextInputProps, 'secureTextEntry'> & { label: string; hint?: string }) {
+  const theme = useTheme();
+  const [shown, setShown] = useState(false);
+  const label = shown ? t('Hide Password') : t('Show Password');
+  return (
+    <Field
+      {...props}
+      secureTextEntry={!shown}
+      autoCapitalize="none"
+      autoCorrect={false}
+      trailing={
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={label}
+          accessibilityState={{ checked: shown }}
+          hitSlop={4}
+          onPress={() => setShown((v) => !v)}
+          style={({ pressed }) => [styles.eye, pressed && { opacity: 0.6 }]}>
+          <Icon name={shown ? 'eyeOff' : 'eye'} size={22} color={theme.textSecondary} />
+        </Pressable>
+      }
+    />
   );
 }
 
@@ -226,6 +260,8 @@ const styles = themedStyles(() => ({
   buttonRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   buttonText: { fontSize: 17, fontFamily: font(600), textAlign: 'center' },
   buttonTextBig: { fontSize: 21, fontFamily: font(700, 'display'), letterSpacing: 0.2 },
+  trailing: { position: 'absolute', right: 0, top: 0, bottom: 0, justifyContent: 'center' },
+  eye: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
   input: { minHeight: 52, borderWidth: 1.5, borderRadius: Radius.control, paddingHorizontal: 14, fontSize: 17, fontFamily: font(500) },
   card: { borderRadius: Radius.card, padding: Spacing.three, gap: Spacing.two },
   section: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginTop: Spacing.two },

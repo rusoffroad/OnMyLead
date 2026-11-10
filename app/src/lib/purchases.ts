@@ -34,6 +34,7 @@ import {
   type ProProduct,
 } from '@/core/purchases';
 import { refreshEntitlements } from './entitlements';
+import { trackPurchase } from './ad-tracking';
 import { supabase } from './supabase';
 
 export { PRODUCTS };
@@ -174,6 +175,8 @@ export async function buy(id: string, offerId?: string | null): Promise<BuyResul
   const purchase = (Array.isArray(result) ? result : [result]).find((p) => p?.productId === id);
   if (!purchase || (android && purchase.purchaseState === 'pending')) return { ok: false, reason: 'pending' };
   const verified = await settle(purchase).catch(() => false);
+  // Counts the purchase for ad measurement (only if the rider allowed it; lib/ad-tracking.ts).
+  trackPurchase(id, purchase.id || purchase.purchaseToken || '');
   return { ok: true, verified };
 }
 

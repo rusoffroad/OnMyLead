@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
-import { invitedLine, namesLine, ridersLabel } from '@/core/groups';
-import { inviteGroupToRide, myGroups, NotSwitchedOnError, openNewGroup, type RidingGroup } from '@/lib/groups';
+import { eventInvitedLine, invitedLine, namesLine, ridersLabel } from '@/core/groups';
+import { inviteGroupToEvent, inviteGroupToRide, myGroups, NotSwitchedOnError, openNewGroup, type RidingGroup } from '@/lib/groups';
 import { Convoy } from './convoy';
 import { GroupPhoto } from './group-photo';
 import { Icon } from './icon';
@@ -13,10 +13,11 @@ import { ProTag } from './pro-tag';
 
 import { t } from '@/lib/i18n';
 /**
- * Invite a whole riding group to this ride in one tap. Shown to the ride's organizers inside the
- * invite card. Each invited rider gets a notification and sees the ride on their home screen.
+ * Invite a whole riding group to a ride or an event in one tap. Shown to the ride's organizers
+ * inside the invite card, and to an event's hosts on the event page. Each invited rider gets a
+ * notification (rides also show on their home screen; events open the event page).
  */
-export function GroupInvite({ rideId }: { rideId: string }) {
+export function GroupInvite({ rideId, eventId, bare }: { rideId?: string; eventId?: string; bare?: boolean }) {
   const [groups, setGroups] = useState<RidingGroup[] | null>(null);
   const [off, setOff] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -33,8 +34,13 @@ export function GroupInvite({ rideId }: { rideId: string }) {
     setBusy(g.id);
     setError(null);
     try {
-      const n = await inviteGroupToRide(rideId, g.id);
-      setDone((d) => ({ ...d, [g.id]: invitedLine(n, g.name) }));
+      if (eventId) {
+        const n = await inviteGroupToEvent(eventId, g.id);
+        setDone((d) => ({ ...d, [g.id]: eventInvitedLine(n, g.name) }));
+      } else if (rideId) {
+        const n = await inviteGroupToRide(rideId, g.id);
+        setDone((d) => ({ ...d, [g.id]: invitedLine(n, g.name) }));
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -43,8 +49,8 @@ export function GroupInvite({ rideId }: { rideId: string }) {
   };
 
   return (
-    <View style={styles.wrap}>
-      <ThemedText type="heading" style={{ fontSize: 20 }}>{t('Invite a Group')}</ThemedText>
+    <View style={bare ? styles.bare : styles.wrap}>
+      {bare ? null : <ThemedText type="heading" style={{ fontSize: 20 }}>{t('Invite a Group')}</ThemedText>}
       {off ? (
         <ThemedText type="small" themeColor="textSecondary">{t('Riding groups are not switched on yet. They start working with the next server update.')}</ThemedText>
       ) : groups === null ? null : groups.length === 0 ? (
@@ -54,7 +60,7 @@ export function GroupInvite({ rideId }: { rideId: string }) {
               <ThemedText style={{ fontWeight: 700, flexShrink: 1 }}>{t('Save Your Crew as a Group')}</ThemedText>
               <ProTag feature="saved_groups" />
             </View>
-            <ThemedText type="small" themeColor="textSecondary">{t('Then invite everyone to your next ride in one tap.')}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">{eventId ? t('Then invite everyone to your event in one tap.') : t('Then invite everyone to your next ride in one tap.')}</ThemedText>
           </View>
           <Icon name="chevron" color={Colors.textSecondary} />
         </Pressable>
@@ -87,6 +93,7 @@ export function GroupInvite({ rideId }: { rideId: string }) {
 }
 
 const styles = themedStyles(() => ({
+  bare: { gap: Spacing.two },
   wrap: { gap: Spacing.two, paddingTop: Spacing.two, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: Colors.border },
   group: { backgroundColor: Colors.backgroundSelected, borderRadius: Radius.control, padding: 12, gap: 8 },
   groupTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },

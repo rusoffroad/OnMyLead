@@ -66,3 +66,14 @@ describe('push tap target', () => {
     expect(tapTarget({ type: 'group_message', groupId: 5 })).toBeNull();
   });
 });
+
+describe('event invite taps', () => {
+  it('opens the event page by its link code', () => {
+    expect(tapTarget({ type: 'event_invite', eventId: 'e1', eventCode: 'AB12CD34' })).toBe('/e/AB12CD34');
+    expect(tapTarget(tapData({ body: JSON.stringify({ type: 'event_invite', eventId: 'e1', eventCode: 'AB12CD34' }) }))).toBe('/e/AB12CD34');
+  });
+  it('falls back to the event id', () => {
+    expect(tapTarget({ type: 'event_invite', eventId: '0f0e' })).toBe('/e/0f0e');
+    expect(tapTarget({ type: 'event_invite' })).toBeNull();
+  });
+});

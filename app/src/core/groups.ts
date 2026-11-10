@@ -41,6 +41,12 @@ export function invitedLine(count: number, groupName: string): string {
   return tc('Invited {count} {v} from {groupName}. They get a notification and see the ride on their home screen.', { count, v: count === 1 ? 'rider' : 'riders', groupName });
 }
 
+/** What Invite All on an event says once it's done. */
+export function eventInvitedLine(count: number, groupName: string): string {
+  if (count === 0) return tc('Everyone in {groupName} is already invited, going or hosting.', { groupName });
+  return tc('Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.', { count, v: count === 1 ? 'rider' : 'riders', groupName });
+}
+
 /** The group's link, for friends not on OnMyLead yet. */
 export const groupLink = (webUrl: string | null | undefined, code: string) => (webUrl ? `${webUrl.replace(/\/$/, '')}/g/${code}` : null);
 

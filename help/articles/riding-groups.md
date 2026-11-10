@@ -13,6 +13,7 @@ sources:
   - app/src/app/g/[code].tsx
   - app/src/components/group-invite.tsx
   - app/src/components/invite-card.tsx
+  - supabase/migrations/20261110100000_event_group_invite.sql
   - app/src/core/groups.ts
   - app/src/lib/groups.ts
   - app/src/app/r/[code].tsx
@@ -111,6 +112,12 @@ Or plan a new ride for the group: on Home, tap **Plan a Group Ride** on the **Yo
 Everyone in the group gets a notification and sees the ride under **Ride Invites** on their home screen. They can tap **Join Ride**, with no waiting for approval, or **No Thanks**. Riders who are already on the ride, waiting, or who said no thanks are left alone.
 
 To get these invites, keep **Ride Invites** on in [Notification Settings](/help/notification-settings).
+
+:::release 3.0
+## Invite Your Group to an Event
+
+If you host or co-host an event, open the event's page and tap **Invite All** next to the group under **Invite a Group**. Everyone gets a notification that opens the event, where they can tap **Going** or **Interested**. See [Events](/help/events).
+:::
 
 :::release 2.1
 ## Add a Group Photo

@@ -6,6 +6,7 @@ import { Linking, Platform, Pressable, ScrollView, Share, Text, View } from 'rea
 import { AgendaTimeline, Cover, DateStub, PeopleSheet, PresentedBy } from '@/components/events/parts';
 import { AddRideSheet, AgendaSheet } from '@/components/events/sheets';
 import { BottomSheet } from '@/components/bottom-sheet';
+import { GroupInvite } from '@/components/group-invite';
 import { Gradient, Home, Pill } from '@/components/home/parts';
 import { Icon, type IconName } from '@/components/icon';
 import PageHead from '@/components/page-head';
@@ -374,6 +375,13 @@ export default function EventPage() {
     </Section>
   ) : null;
 
+  // Hosts invite a saved riding group in one tap, like Invite All on a ride (3.0).
+  const inviteGroup = session && e.am_host && !e.hidden && (phase === 'upcoming' || phase === 'now') ? (
+    <Section title={t('Invite a Group')}>
+      <GroupInvite eventId={e.id} bare />
+    </Section>
+  ) : null;
+
   const hostTools = e.am_host ? (
     <View style={styles.tools}>
       <Tool icon="draw" label={t('Edit Details')} onPress={() => router.push(`/events/new?id=${e.id}`)} />
@@ -413,6 +421,7 @@ export default function EventPage() {
       {presented}
       {facts}
       {hostTools}
+      {inviteGroup}
       {photos}
       {about}
       {!layout.wide ? (

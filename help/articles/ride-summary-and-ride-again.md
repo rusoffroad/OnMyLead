@@ -4,7 +4,7 @@ summary: After a ride ends, see your distance and route, who finished, share a r
 category: rides
 order: 70
 release: "1.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/components/ride-summary.tsx
   - app/src/components/ride-card.tsx

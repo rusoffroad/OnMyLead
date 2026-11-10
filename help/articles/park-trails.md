@@ -4,7 +4,7 @@ summary: Every map shows the trails of offroad parks like Hidden Falls, colored 
 category: routes-maps
 order: 55
 release: "2.1"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/core/park-trails.ts
   - app/src/lib/park-trails.ts

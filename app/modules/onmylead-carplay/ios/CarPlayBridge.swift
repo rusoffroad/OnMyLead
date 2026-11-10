@@ -16,13 +16,15 @@ struct RiderRow: Equatable {
 /// English until the phone sends them.
 struct CarPlayLabels: Equatable {
   var waitingTitle = "No Ride Running"
-  var waitingDetail = "Open Ride Mode on your phone and your group shows up here."
+  var waitingDetail = "Open Ride Mode or Map Mode on your phone and it shows up here."
   var group = "Group"
   var nobodySharing = "Nobody Is Sharing Yet"
   var confirmEmergency = "Send EMERGENCY with your location to everyone on the ride?"
   var alertGroup = "Alert My Group"
   var cancel = "Cancel"
   var ok = "OK"
+  /// The waiting screen's button. Empty hides it (on Free, CarPlay is Pro: nothing to open).
+  var openMapMode = "Open Map Mode"
 
   init() {}
 
@@ -40,6 +42,8 @@ struct CarPlayLabels: Equatable {
     alertGroup = word("alertGroup", en.alertGroup)
     cancel = word("cancel", en.cancel)
     ok = word("ok", en.ok)
+    // Unlike the other words, an empty one is kept: it means "no button".
+    openMapMode = d?["openMapMode"] as? String ?? en.openMapMode
   }
 }
 
@@ -68,6 +72,26 @@ struct RideState: Equatable {
   }
 }
 
+/// What Map Mode on the phone last sent (shape: CarPlayMapState in src/core/carplay.ts).
+struct MapState: Equatable {
+  let title: String
+  let items: [RiderRow]
+  let actions: [RideButton]
+  let labels: CarPlayLabels?
+
+  init(_ d: [String: Any]) {
+    labels = d["labels"] == nil ? nil : CarPlayLabels(d["labels"] as? [String: Any])
+    title = d["title"] as? String ?? "Map Mode"
+    items = (d["items"] as? [[String: Any]] ?? []).map {
+      RiderRow(title: $0["title"] as? String ?? "", detail: $0["detail"] as? String ?? "")
+    }
+    actions = (d["actions"] as? [[String: Any]] ?? []).compactMap { b in
+      guard let id = b["id"] as? String, let title = b["title"] as? String else { return nil }
+      return RideButton(id: id, title: title, symbol: b["symbol"] as? String ?? "")
+    }
+  }
+}
+
 /// Owns the CarPlay templates. Everything here runs on the main thread.
 final class CarPlayBridge {
   static let shared = CarPlayBridge()
@@ -76,6 +100,10 @@ final class CarPlayBridge {
   private var interface: CPInterfaceController?
   private var state: RideState?
   private var grid: CPGridTemplate?
+  /// Map Mode's dash, when no ride is on the car screen.
+  private var mapState: MapState?
+  private var mapInfo: CPInformationTemplate?
+  private var mapInfoTitle: String?
   private var shownAlertId: String?
   private var labels = CarPlayLabels()
 
@@ -89,12 +117,28 @@ final class CarPlayBridge {
   func connect(_ interface: CPInterfaceController) {
     self.interface = interface
     grid = nil
+    mapInfo = nil
     render()
   }
 
   func disconnect() {
     interface = nil
     grid = nil
+    mapInfo = nil
+  }
+
+  /// Map Mode on the phone. A ride on the car screen wins; the dash shows once the ride clears.
+  func updateMap(_ next: MapState?) {
+    guard next != mapState else { return }
+    if let l = next?.labels { labels = l }
+    mapState = next
+    guard interface != nil, state == nil else { return }
+    if let next, let mapInfo, mapInfoTitle == next.title {
+      mapInfo.items = infoItems(next)
+      mapInfo.actions = infoActions(next)
+    } else {
+      render()
+    }
   }
 
   func update(_ next: RideState?) {
@@ -118,19 +162,51 @@ final class CarPlayBridge {
     guard let interface else { return }
     guard let state else {
       grid = nil
+      if let mapState {
+        let dash = CPInformationTemplate(
+          title: mapState.title,
+          layout: .twoColumn,
+          items: infoItems(mapState),
+          actions: infoActions(mapState)
+        )
+        mapInfo = dash
+        mapInfoTitle = mapState.title
+        interface.setRootTemplate(dash, animated: false, completion: nil)
+        return
+      }
+      mapInfo = nil
+      var actions: [CPTextButton] = []
+      if !labels.openMapMode.isEmpty {
+        actions.append(CPTextButton(title: labels.openMapMode, textStyle: .confirm) { [weak self] _ in
+          self?.emit?("open:map")
+        })
+      }
       let waiting = CPInformationTemplate(
         title: "OnMyLead",
         layout: .leading,
         items: [CPInformationItem(title: labels.waitingTitle, detail: labels.waitingDetail)],
-        actions: []
+        actions: actions
       )
       interface.setRootTemplate(waiting, animated: false, completion: nil)
       return
     }
+    mapInfo = nil
     let template = CPGridTemplate(title: state.title, gridButtons: gridButtons(state))
     grid = template
     interface.setRootTemplate(template, animated: false, completion: nil)
     showAlertIfNew(state)
+  }
+
+  private func infoItems(_ map: MapState) -> [CPInformationItem] {
+    map.items.prefix(10).map { CPInformationItem(title: $0.title, detail: $0.detail) }
+  }
+
+  private func infoActions(_ map: MapState) -> [CPTextButton] {
+    map.actions.prefix(3).map { b in
+      CPTextButton(title: b.title, textStyle: .normal) { [weak self] _ in
+        self?.emit?(b.id)
+      }
+    }
   }
 
   private func gridButtons(_ state: RideState) -> [CPGridButton] {

@@ -7,6 +7,7 @@
     "NSCameraUsageDescription": "Prenez une photo de profil ou une photo de votre véhicule. Seule la photo prise est envoyée.",
     "NSMotionUsageDescription": "OnMyLead utilise les capteurs de mouvement pour l’inclinomètre et pour détecter un éventuel accident en Mode Balade afin d’alerter votre groupe.",
     "NSLocalNetworkUsageDescription": "OnMyLead se connecte à votre antenne Starlink sur son Wi-Fi pour afficher son état. Rien d’autre sur votre réseau n’est touché.",
-    "NSBluetoothAlwaysUsageDescription": "Sans réseau mobile, le Mode Balade transmet par Bluetooth les positions et alertes de votre balade aux pilotes proches de la même balade. Tout ce qui est envoyé est chiffré pour votre balade uniquement."
+    "NSBluetoothAlwaysUsageDescription": "Sans réseau mobile, le Mode Balade transmet par Bluetooth les positions et alertes de votre balade aux pilotes proches de la même balade. Tout ce qui est envoyé est chiffré pour votre balade uniquement.",
+    "NSUserTrackingUsageDescription": "Permet à OnMyLead d’indiquer à Meta et TikTok quand vous installez l’app, créez un compte ou vous abonnez après avoir vu une publicité OnMyLead, pour savoir quelles publicités fonctionnent. Votre position, vos sorties et vos messages ne sont jamais partagés."
   }
 }
