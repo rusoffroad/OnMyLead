@@ -89,7 +89,12 @@ export default function NewPost() {
 
         {photo ? (
           <View>
-            <Image source={{ uri: photo.uri }} contentFit="cover" style={styles.preview} accessibilityLabel={t('The photo for your post')} />
+            <Image
+              source={{ uri: photo.uri }}
+              contentFit="cover"
+              // The photo's own shape (between 4:5 portrait and 16:9 wide), as the feed shows it.
+              style={[styles.preview, photo.width > 0 && photo.height > 0 && { aspectRatio: Math.min(Math.max(photo.width / photo.height, 4 / 5), 16 / 9) }]}
+              accessibilityLabel={t('The photo for your post')} />
             <Pressable onPress={() => setPhoto(null)} style={styles.removePhoto} accessibilityRole="button" accessibilityLabel={t('Remove photo')}>
               <Icon name="close" size={18} color="#fff" />
             </Pressable>

@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
 import { BadgePatch } from '@/components/badge-patch';
+import { ON_MAP } from '@/components/home/hero';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { BADGES, bestLevels, honorsHeld, rankFor, unseen, type MyBadges } from '@/core/badges';
@@ -42,7 +43,43 @@ export function BadgeStrip({ mine }: { mine: MyBadges }) {
   );
 }
 
+/**
+ * Your rank and patches, small and in light text, over the map at the very top of Home just above
+ * the greeting (Chris 2026-11-10). Tap for Badges.
+ */
+export function HeroBadges({ mine }: { mine: MyBadges }) {
+  const rank = rankFor(mine.badges);
+  const best = bestLevels(mine.badges);
+  const fresh = unseen(mine).length;
+  const honors = honorsHeld(mine.badges);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={[t('Badges.'), ...honors.map((h) => `${t(h.name)}.`), t('Your rank is {name}, {levels} levels earned.', { name: t(rank.name), levels: rank.levels }), fresh ? t('{n} new.', { n: fresh }) : ''].filter(Boolean).join(' ')}
+      hitSlop={6}
+      onPress={() => router.push('/badges')}
+      style={({ pressed }) => [styles.hero, pressed && { opacity: 0.8 }]}>
+      <View style={styles.heroPatches}>
+        {honors.map((h) => (
+          <BadgePatch key={h.key} badge={h.key} level={1} size={28} />
+        ))}
+        {BADGES.map((b) => (
+          <BadgePatch key={b.key} badge={b.key} level={best[b.key] ?? 0} size={28} />
+        ))}
+      </View>
+      <View style={styles.heroHead}>
+        <Text style={styles.heroRank} numberOfLines={1}>{t(rank.name)}</Text>
+        {fresh ? <Text style={styles.newPill}>{fresh === 1 ? t('New Badge') : t('{n} New', { n: fresh })}</Text> : null}
+      </View>
+    </Pressable>
+  );
+}
+
 const styles = themedStyles(() => ({
+  hero: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, alignSelf: 'flex-start', maxWidth: '100%', marginBottom: Spacing.two },
+  heroPatches: { flexDirection: 'row', gap: 4, flexShrink: 1, overflow: 'hidden' },
+  heroHead: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0 },
+  heroRank: { color: ON_MAP, fontFamily: font(700), fontSize: 14, textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 6 },
   badges: { gap: Spacing.two, borderRadius: Radius.card, padding: Spacing.three, backgroundColor: Colors.backgroundElement },
   badgesHead: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
   rankName: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 24, lineHeight: 28 },

@@ -48,7 +48,7 @@ export function Gradient({
           <Defs>
             <LinearGradient id={id} x1="0" y1="0" x2={angle === 'down' ? '0' : '1'} y2={angle === 'across' ? '0' : '1'}>
               {colors.map((c, i) => (
-                <Stop key={i} offset={colors.length === 1 ? 0 : i / (colors.length - 1)} stopColor={c} />
+                <Stop key={i} offset={colors.length === 1 ? 0 : i / (colors.length - 1)} {...stopPaint(c)} />
               ))}
             </LinearGradient>
           </Defs>
@@ -57,6 +57,17 @@ export function Gradient({
       ) : null}
     </View>
   );
+}
+
+/**
+ * Splits an rgba() colour into an rgb() stop colour plus a stop opacity. Android's SVG renderer
+ * drops the alpha of an rgba() stopColor, so a fade to transparent painted solid black there
+ * (3.0 test pass, home screen map card). Other colours keep full opacity.
+ */
+export function stopPaint(color: string): { stopColor: string; stopOpacity: number } {
+  const m = /^rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\)$/i.exec(color.trim());
+  if (!m) return { stopColor: color, stopOpacity: 1 };
+  return { stopColor: `rgb(${m[1]}, ${m[2]}, ${m[3]})`, stopOpacity: Number(m[4]) };
 }
 
 /** A section title with an optional link or chip on the right. */

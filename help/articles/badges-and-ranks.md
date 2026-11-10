@@ -92,7 +92,7 @@ Every level you earn counts once toward your rank. There are 21 levels in all.
 1. Go to the **You** tab. Under your name you see your rank and a row of all seven badges. Earned badges are in their Bronze, Silver or Gold color; the rest are outlines.
 :::
 :::release 3.0
-1. Go to **You** (your picture at the top of Home). Under your name you see your rank and a row of all seven badges. Earned badges are in their Bronze, Silver or Gold color; the rest are outlines.
+1. Look at the very top of Home, just above your greeting: your badge patches and your rank are there. You can also go to **You** (your picture at the top of Home), where they're under your name. Earned badges are in their Bronze, Silver or Gold color; the rest are outlines.
 :::
 2. Tap the row to open **Badges**.
 3. Each badge shows its level, what earns it and how far you are from the next level, for example **4 of 10 rides led for Silver**.

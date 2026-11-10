@@ -33,6 +33,8 @@ export function SocialCard({
   item, onChange, onDeleted, full = false,
 }: { item: SocialItem; onChange: (next: SocialItem) => void; onDeleted?: () => void; full?: boolean }) {
   const [photoOpen, setPhotoOpen] = useState(false);
+  // The photo's own shape, kept between 4:5 portrait and 16:9 wide, so a tall photo isn't cropped to 4:3.
+  const [photoAspect, setPhotoAspect] = useState(4 / 3);
   const [sharing, setSharing] = useState(false);
   const [menu, setMenu] = useState(false);
   const [report, setReport] = useState(false);
@@ -121,7 +123,17 @@ export function SocialCard({
 
       {item.photoUrl ? (
         <Pressable onPress={() => setPhotoOpen(true)} accessibilityRole="imagebutton" accessibilityLabel={t('See the photo full size')}>
-          <Image source={{ uri: item.photoUrl }} contentFit="cover" transition={120} style={styles.photo} accessibilityIgnoresInvertColors />
+          <Image
+            source={{ uri: item.photoUrl }}
+            contentFit="cover"
+            transition={120}
+            onLoad={(e) => {
+              const { width: w, height: h } = e.source;
+              if (w > 0 && h > 0) setPhotoAspect(Math.min(Math.max(w / h, 4 / 5), 16 / 9));
+            }}
+            style={[styles.photo, { aspectRatio: photoAspect }]}
+            accessibilityIgnoresInvertColors
+          />
         </Pressable>
       ) : null}
 

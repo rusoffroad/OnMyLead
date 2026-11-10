@@ -369,7 +369,7 @@ To turn what you're doing into a group ride (Pro):
 1. Open the panel at the bottom of Map Mode, on **Explore** or **Record**.
 2. Tap the blue **Make It a Group Ride** card.
 3. If you're recording, tap **Finish and Plan**. Your recording is saved to **My Trails** and becomes the ride's route.
-4. The new ride opens with the trail you're following (one of yours) or just recorded as its route, and where you are now as the meeting point. Pick the day, tap **Create**, and invite riders with the ride's code.
+4. The new ride opens with the trail you're following (one of yours) or just recorded as its route, and where you are now as the meeting point. The meet time starts at the next quarter hour today (8:00 am if it's nearly midnight); change the day or time if you like, tap **Create**, and invite riders with the ride's code.
 
 Following another rider's trail? The ride opens with your spot as the meeting point, named after that trail. On Free, the card has a **Pro** tag and opens what Pro adds. See [Free and Pro](/help/free-vs-pro).
 :::

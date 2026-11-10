@@ -4,8 +4,8 @@ import { groupRideDetail, groupRideHref } from '../nav-solo';
 
 describe('Make It a Group Ride', () => {
   it('sends the trail and the rider’s spot to the ride form', () => {
-    expect(groupRideHref({ trailId: 'abc', at: { lat: 38.5733112, lng: -109.549812 } })).toBe('/ride/new?trail=abc&lat=38.57331&lng=-109.54981&spot=Meet%20Point');
-    expect(groupRideHref({ at: { lat: 1, lng: 2 }, spot: "Hell's Gate & Back" })).toBe("/ride/new?lat=1.00000&lng=2.00000&spot=Hell's%20Gate%20%26%20Back");
+    expect(groupRideHref({ trailId: 'abc', at: { lat: 38.5733112, lng: -109.549812 } })).toBe('/ride/new?trail=abc&lat=38.57331&lng=-109.54981&spot=Meet%20Point&now=1');
+    expect(groupRideHref({ at: { lat: 1, lng: 2 }, spot: "Hell's Gate & Back" })).toBe("/ride/new?lat=1.00000&lng=2.00000&spot=Hell's%20Gate%20%26%20Back&now=1");
   });
 
   it('gives the ride form a spot it accepts', async () => {
