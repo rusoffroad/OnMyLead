@@ -20,6 +20,7 @@ import {
   TIKTOK_EVENT,
   tiktokAppIdFor,
   tiktokAppPayload,
+  tiktokTokenFor,
 } from '../../../../supabase/functions/_shared/ad-conversions';
 
 const IDFA = '6D92078A-8246-4BA4-AE5B-76104861E7DC';
@@ -135,6 +136,14 @@ describe('ad-conversions edge function input', () => {
     const old: Record<string, string> = { TIKTOK_APP_ID: 'OLD' };
     expect(tiktokAppIdFor('android', (k) => old[k] ?? '')).toBe('OLD');
     expect(tiktokAppIdFor('ios', () => '')).toBe('');
+  });
+  it("uses each app's own TikTok Events API token, falling back to the single one", () => {
+    const both: Record<string, string> = { TIKTOK_IOS_EVENTS_TOKEN: 'TI', TIKTOK_ANDROID_EVENTS_TOKEN: 'TA', TIKTOK_EVENTS_TOKEN: 'OLD' };
+    expect(tiktokTokenFor('ios', (k) => both[k] ?? '')).toBe('TI');
+    expect(tiktokTokenFor('android', (k) => both[k] ?? '')).toBe('TA');
+    const old: Record<string, string> = { TIKTOK_EVENTS_TOKEN: 'OLD' };
+    expect(tiktokTokenFor('android', (k) => old[k] ?? '')).toBe('OLD');
+    expect(tiktokTokenFor('ios', () => '')).toBe('');
   });
 });
 
