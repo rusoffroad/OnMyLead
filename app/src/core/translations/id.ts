@@ -1,6 +1,8 @@
 // Indonesian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "Tampilkan kata sandi",
+  "Hide Password": "Sembunyikan kata sandi",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Tanpa sinyal, ponselmu meneruskan peringatan untuk grup dan mengirim DARURAT. Lokasi dan pesan lewat Bluetooth adalah Pro.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Tanpa sinyal, lihat pengendara terdekat dan teruskan lokasi, status, dan pesanmu lewat Bluetooth. Dengan Free ponselmu tetap meneruskan peringatan untuk grup, dan DARURAT, Butuh Bantuan, serta peringatan tabrakan tetap terkirim lewat Bluetooth.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Semua fitur Pro gratis untukmu sampai {date}. Setelah itu kamu tetap berkendara dengan Free, dan bergabung ke perjalanan, Mode Perjalanan, serta DARURAT tetap gratis.",

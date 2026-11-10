@@ -4,7 +4,7 @@ summary: OnMyLead uses your phone's language when it speaks it, and English when
 category: account
 order: 76
 release: "2.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/app/language.tsx
   - app/src/components/language-button.tsx

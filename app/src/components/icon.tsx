@@ -23,6 +23,9 @@ const PATHS = {
   search: ['M15.5 15.5L20.5 20.5'],
   person: ['M4.5 20.5c.8-3.8 3.8-6 7.5-6s6.7 2.2 7.5 6'],
   wrench: ['M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z'],
+  // An eye, for Show Password; eyeOff (struck through) for Hide Password.
+  eye: ['M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z'],
+  eyeOff: ['M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z', 'M4 4l16 16'],
   lock: ['M7.5 10.5V8a4.5 4.5 0 0 1 9 0v2.5', 'M5.5 10.5h13v10h-13z', 'M12 14.5v2'],
   flagged: ['M5 21V4', 'M5 4.5c4-2 6 2 10 0s4 0 4 0v8.5s-1.5-1.5-4 0-6-2-10 0'],
   close: ['M6 6l12 12', 'M18 6L6 18'],
@@ -130,6 +133,7 @@ export function Icon({ name, size = 24, color = Colors.text, strokeWidth = 2, fi
           <Circle cx={16.2} cy={9.2} r={2.7} stroke={color} strokeWidth={strokeWidth} />
         </>
       ) : null}
+      {name === 'eye' || name === 'eyeOff' ? <Circle cx={12} cy={12} r={3} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'block' ? <Circle cx={12} cy={12} r={9} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'globe' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
       {name === 'theme' ? <Circle cx={12} cy={12} r={8.5} stroke={color} strokeWidth={strokeWidth} /> : null}
