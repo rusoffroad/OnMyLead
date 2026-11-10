@@ -40,7 +40,12 @@ If anyone is in danger, call 911 first.
 :::release 2.0
 ## Report a Rider From the You Tab
 
+:::until 3.0
 1. Tap the **You** tab.
+:::
+:::release 3.0
+1. Tap **You** (your picture at the top of Home).
+:::
 2. Under **Help**, tap **Report a Rider**.
 3. Tap the rider. The list shows riders you've messaged, added as friends, ridden with or share a group with, and riders you blocked. Type in **Search** to find one by name.
 4. Pick what's wrong, add details if you like, and tap **Send Report**.
@@ -142,7 +147,12 @@ You can also block from:
 
 ## Unblock a Rider
 
+:::until 3.0
 1. Tap the **You** tab.
+:::
+:::release 3.0
+1. Tap **You** (your picture at the top of Home).
+:::
 2. Under **Settings**, tap **Blocked Riders**.
 3. Tap **Unblock** next to the rider.
 

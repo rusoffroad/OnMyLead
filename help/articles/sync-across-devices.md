@@ -52,6 +52,11 @@ Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free
 - Your saved quick replies for ride chat
 - Which panels you keep open or folded in Ride Mode, Map Mode, Route Builder and Waypoints
 - The search distance in Find a Ride and Events
+
+:::release 3.0
+- **Customize Home**: which sections show on Home, and their order
+:::
+
 - Announcements you closed, and the Starlink page connecting by itself
 
 **Map Mode trails**

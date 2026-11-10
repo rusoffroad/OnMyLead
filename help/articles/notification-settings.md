@@ -26,11 +26,21 @@ You decide what OnMyLead tells you about. Every change saves as soon as you make
 
 ## Open Notification Settings
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Under **Settings**, tap **Notifications**. The line under it sums up your settings, like **Everything on** or **2 turned off**.
 
 :::release 2.0
+:::until 3.0
 You can also tap the bell at the top of the **Rides** tab, then **Notification Settings** at the bottom of the list.
+:::
+:::release 3.0
+You can also tap the bell at the top of the **Home** tab, then **Notification Settings** at the bottom of the list.
+:::
 :::
 
 ## Always On: Help and EMERGENCY
@@ -119,7 +129,12 @@ Tapping a notification takes you straight to what it's about, whether OnMyLead w
 :::
 
 :::release 2.0
+:::until 3.0
 Notifications you've missed or swiped away are kept under the bell on the **Rides** tab for 30 days. See [See and Clear Your Notifications](/help/notifications-inbox).
+:::
+:::release 3.0
+Notifications you've missed or swiped away are kept under the bell on the **Home** tab for 30 days. See [See and Clear Your Notifications](/help/notifications-inbox).
+:::
 :::
 
 ## Ride Reminder

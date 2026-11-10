@@ -23,7 +23,12 @@ Scout finds places to ride near you: off-road parks, OHV areas, trail systems, t
 
 ## Open Scout
 
+:::until 3.0
 1. Tap the **Find** tab.
+:::
+:::release 3.0
+1. Tap the **Rides** tab.
+:::
 2. Tap **Places to Ride** at the top. (**Rides** takes you back to public rides.)
 3. Allow location if asked. If location is off, tap **Use My Location**, or search a town or park instead.
 

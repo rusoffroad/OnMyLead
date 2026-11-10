@@ -25,7 +25,12 @@ Out Riding is off until you switch it on, and other riders never see where you a
 
 ## Switch On Out Riding
 
+:::until 3.0
 1. Go to the **Groups** tab and tap **Out Riding** at the top.
+:::
+:::release 3.0
+1. Go to **Riding Groups** (in **Social**) and tap **Out Riding** at the top.
+:::
 2. Under **Who Can See Me**, pick one:
    - **Riders I Know**: only your [friends](/help/friends), and riders you've been on a ride with or share a riding group with. This is the default.
    - **Everyone Nearby**: also any other OnMyLead rider who is Out Riding near you and picked **Everyone Nearby** too.

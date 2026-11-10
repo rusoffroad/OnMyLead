@@ -94,7 +94,12 @@ Delete removes the ride for everyone, along with its chat and route. Only the ri
 If the ride hadn't ended yet, everyone on it gets a notification and an email saying it's cancelled. Deleting can't be undone.
 
 :::tip
+:::until 3.0
 You can also delete a ride from the **Rides** tab. Swipe left on the ride under **Your Rides** or **Past Rides** and tap **Delete**.
+:::
+:::release 3.0
+You can also delete a ride from the **Home** tab. Swipe left on the ride under **Your Rides** or **Past Rides** and tap **Delete**.
+:::
 
 On onmylead.com there's nothing to swipe: each ride on the **Rides** page has its own button at the end of the row. Click the trash can (**Delete**) on a ride you organize, then confirm. On a ride someone else organizes the button is **Leave** (or **Decline** for an invite).
 :::

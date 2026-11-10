@@ -27,7 +27,12 @@ OnMyLead is not an emergency service. In an emergency, call 911 or your local em
 
 ## Send a Message From the App
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Under **Help**, tap **Contact Us**.
 3. Under **What's It About?**, pick a topic:
    - **Something Isn't Working**
@@ -52,7 +57,12 @@ If something in the app isn't working, tell us with a screenshot so we can fix i
    - **iPhone**: press the side button and volume up together.
    - **iPad**: press the top button and a volume button together.
    - **Android phone or tablet**: press the power and volume down buttons together.
+:::until 3.0
 2. Go to the **You** tab. Under **Help**, tap **Report a Bug**. The form opens with **Something Isn't Working** already picked.
+:::
+:::release 3.0
+2. Go to **You** (your picture at the top of Home). Under **Help**, tap **Report a Bug**. The form opens with **Something Isn't Working** already picked.
+:::
 3. Tap **Add a Screenshot** and pick your screenshot. Tap **Change Screenshot** or **Remove** if you picked the wrong one.
 
 :::release 3.0
@@ -86,18 +96,38 @@ On Android, the hint says purchases are billed by Google Play, with refunds thro
 ## Help and Support Page
 
 :::until 2.0
+:::until 3.0
 Under **Help** on the **You** tab, **Help and Support** has short answers to common questions about joining rides, location and battery, Pro, blocking and deleting your account.
+:::
+:::release 3.0
+Under **Help** on **You** (your picture at the top of Home), **Help and Support** has short answers to common questions about joining rides, location and battery, Pro, blocking and deleting your account.
+:::
 :::
 
 :::release 2.0
+:::until 3.0
 Under **Help** on the **You** tab, **Help and Support** has short answers to common questions about joining rides, location and battery, Pro, blocking and deleting your account. Under each answer, **Read the Guide** opens the full guide for that topic.
+:::
+:::release 3.0
+Under **Help** on **You** (your picture at the top of Home), **Help and Support** has short answers to common questions about joining rides, location and battery, Pro, blocking and deleting your account. Under each answer, **Read the Guide** opens the full guide for that topic.
+:::
 
 ## Open These Guides From the App
 
 The step-by-step guides you're reading now (onmylead.com/help) are one tap away in the app:
 
+:::until 3.0
 - On the **You** tab, under **Help**, tap **Help Center: How-To Guides**.
+:::
+:::release 3.0
+- On **You** (your picture at the top of Home), under **Help**, tap **Help Center: How-To Guides**.
+:::
+:::until 3.0
 - Or tap **Help & Support** on the **Home** tab, or **Help and Support** on the **You** tab, then tap **Help Center: How-To Guides** at the top.
+:::
+:::release 3.0
+- Or tap **Help & Support** on the **Home** tab, or **Help and Support** on **You** (your picture at the top of Home), then tap **Help Center: How-To Guides** at the top.
+:::
 
 The guides open inside OnMyLead. Tap **Done** (iPhone and iPad) or the close button at the top (Android phones and tablets) to go back to the app. On onmylead.com, the link opens the Help Center in the same tab.
 :::

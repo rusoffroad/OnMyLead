@@ -65,7 +65,12 @@ OnMyLead gives two special badges. They have no Bronze, Silver or Gold, you can'
 If OnMyLead gives you one:
 
 - You get a notification, for example **You're an OnMyLead Brand Ambassador**.
+:::until 3.0
 - It shows at the top of **Badges** and first in the badge row on the **You** tab.
+:::
+:::release 3.0
+- It shows at the top of **Badges** and first in the badge row on **You** (your picture at the top of Home).
+:::
 - It shows beside your name instead of your top riding badge, and on the Feed and your profile.
 :::
 
@@ -83,7 +88,12 @@ Every level you earn counts once toward your rank. There are 21 levels in all.
 
 ## See Your Badges
 
+:::until 3.0
 1. Go to the **You** tab. Under your name you see your rank and a row of all seven badges. Earned badges are in their Bronze, Silver or Gold color; the rest are outlines.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home). Under your name you see your rank and a row of all seven badges. Earned badges are in their Bronze, Silver or Gold color; the rest are outlines.
+:::
 2. Tap the row to open **Badges**.
 3. Each badge shows its level, what earns it and how far you are from the next level, for example **4 of 10 rides led for Silver**.
 

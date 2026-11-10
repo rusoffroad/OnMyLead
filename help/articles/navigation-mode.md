@@ -6,6 +6,7 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-10
 sources:
+  - app/src/core/nav-solo.ts
   - app/src/components/use-follow-camera.ts
   - app/src/core/intersections.ts
   - app/src/components/route-map.tsx
@@ -49,7 +50,12 @@ On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so y
 ## Open Navigate
 
 - On Home, tap the **Navigate** card.
+:::until 3.0
 - Or on the **You** tab, tap **Navigate** under **On the Trail**.
+:::
+:::release 3.0
+- Or on **You** (your picture at the top of Home), tap **Navigate** under **On the Trail**.
+:::
 
 At the top of the map are three tabs: **Explore**, **Record** and **Measure**. Swipe the panel down to see more of the map, and up to bring it back.
 :::
@@ -64,7 +70,17 @@ On a Free account, the top of Map Mode shows your time left, like **Free Map Mod
 - From any tab, tap the blue **Map Mode** button in the middle of the bar at the bottom of the screen. On a tablet, and on onmylead.com on a computer, it's in the menu down the left edge, under **Find**.
 - On Home, tap **Open Map Mode** (or the little map) on the **Map Mode** card.
 - To map a trail that isn't marked anywhere, tap **Map a Custom Trail** on the same card. Map Mode opens on the **Draw** tab.
+:::until 3.0
 - Or on the **You** tab, tap **Map Mode** under **On the Trail**.
+:::
+:::release 3.0
+- Or on **You** (your picture at the top of Home), tap **Map Mode** under **On the Trail**.
+:::
+
+:::release 3.0
+From 3.0, Map Mode is the first card on Home, labelled **Ride Solo**: tap **Open Map Mode**. The blue round key in the middle of the tab bar opens it from anywhere. **Map a Custom Trail** and the **Track Line** switch are inside Map Mode.
+:::
+
 
 At the bottom of the map are three tabs: **Explore**, **Record** and **Draw**. Swipe the panel down to see more of the map, and up to bring it back.
 
@@ -124,7 +140,12 @@ To look around, drag or pinch the map. It pauses (the button shows **Paused**) u
 :::
 
 :::release 2.1
+:::until 3.0
 From 2.1 the map zooms out one step the first time your dot nears an edge, then the next time centers on your dot and moves with you so it stays on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot (Red, White and Blue unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
+:::
+:::release 3.0
+From 2.1 the map zooms out one step the first time your dot nears an edge, then the next time centers on your dot and moves with you so it stays on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot (Red, White and Blue unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in **You** (your picture at the top of Home).
+:::
 :::
 
 :::release 3.0
@@ -300,7 +321,12 @@ When you follow a rider trail, the spots its mapper named show on the map with t
 
 ### Hide Rider Trails
 
+:::until 3.0
 On the **You** tab, under **On the Trail**, turn off **Rider Trails on Maps**. You can also turn off **Rider Trails** in the map's layers panel. They're on unless you turn them off.
+:::
+:::release 3.0
+On **You** (your picture at the top of Home), under **On the Trail**, turn off **Rider Trails on Maps**. You can also turn off **Rider Trails** in the map's layers panel. They're on unless you turn them off.
+:::
 
 ## Rate a Rider Trail
 
@@ -332,6 +358,22 @@ This is a Pro feature. See [Free and Pro](/help/free-vs-pro).
 - On a ride's route, tap **Use One of My Trails** and pick a trail.
 
 See [Create a Ride](/help/create-a-ride) and [Draw a Route](/help/route-builder).
+
+:::release 3.0
+## Riding Solo and Make It a Group Ride
+
+Map Mode is just you. A **Solo. Only you see this** tag sits under the top bar so you always know: nobody sees where you are in Map Mode. Tap the tag for a reminder of how to ride with others.
+
+To turn what you're doing into a group ride (Pro):
+
+1. Open the panel at the bottom of Map Mode, on **Explore** or **Record**.
+2. Tap the blue **Make It a Group Ride** card.
+3. If you're recording, tap **Finish and Plan**. Your recording is saved to **My Trails** and becomes the ride's route.
+4. The new ride opens with the trail you're following (one of yours) or just recorded as its route, and where you are now as the meeting point. Pick the day, tap **Create**, and invite riders with the ride's code.
+
+Following another rider's trail? The ride opens with your spot as the meeting point, named after that trail. On Free, the card has a **Pro** tag and opens what Pro adds. See [Free and Pro](/help/free-vs-pro).
+:::
+
 
 :::release 2.0
 ## Control Your Music

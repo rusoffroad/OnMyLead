@@ -147,7 +147,12 @@ While you're moving, your own dot has the same white arrow as everyone else's, p
 :::
 
 :::release 2.1
+:::until 3.0
 From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step, and the next time it centers on your dot and moves with you so you're always on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in the **You** tab turns that off). See [Follow Me on the Map](/help/follow-me).
+:::
+:::release 3.0
+From 2.1 your dot moves through the middle of the map; near an edge the map zooms out one step, and the next time it centers on your dot and moves with you so you're always on screen. Coming up on a junction, it zooms in so you see the turn, then zooms back out (**Zoom In at Intersections** in **You** (your picture at the top of Home) turns that off). See [Follow Me on the Map](/help/follow-me).
+:::
 :::
 
 :::release 3.0
@@ -380,7 +385,12 @@ Leaving the screen doesn't stop sharing: your location keeps going to the group 
 :::release 2.0
 ## Leave the Ride
 
+:::until 3.0
 Heading home early? Tap **Together** (or **Separated**) at the top to open **Riders**, then tap **Leave Ride** under the list and confirm. On a tablet, **Leave Ride** is at the bottom of the **Riders** sidebar. Your location stops going to the group and you're taken back to the **Rides** tab. The organizer first picks who takes the ride over; see [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
+:::
+:::release 3.0
+Heading home early? Tap **Together** (or **Separated**) at the top to open **Riders**, then tap **Leave Ride** under the list and confirm. On a tablet, **Leave Ride** is at the bottom of the **Riders** sidebar. Your location stops going to the group and you're taken back to the **Home** tab. The organizer first picks who takes the ride over; see [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
+:::
 :::
 
 :::until 2.0

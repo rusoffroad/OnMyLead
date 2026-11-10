@@ -21,7 +21,12 @@ The Starlink page shows how your dish is doing, keeps your plan details in one p
 
 ## Open the Starlink Page
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Under **On the Trail**, tap **Starlink**.
 
 ## See Your Dish's Live Status

@@ -32,7 +32,17 @@ keywords: [crew, group, club, friends, group link, invite group, invite all, mem
 
 A riding group is your regular crew, saved once. When you create a ride, you can invite everyone in the group in one tap instead of sending the invite to each rider. Each group also has its own [Group Chat](/help/group-chat).
 
+:::until 3.0
 Your groups live on the **Groups** tab, on the **Riding Groups** screen. It shows **Your Groups** (the ones you run) and **Groups You’re In** (the ones someone else runs).
+:::
+:::release 3.0
+Your groups live on **Riding Groups** (in **Social**), on the **Riding Groups** screen. It shows **Your Groups** (the ones you run) and **Groups You’re In** (the ones someone else runs).
+:::
+
+:::release 3.0
+From 3.0 there's no Groups tab: open **Social** and tap **Riding Groups** at the top, or tap **All** next to **Your Group** on Home.
+:::
+
 
 :::release 1.0.3
 The top of the Groups tab also has **Out Riding**, to see who's out riding near you, **Messages**, your direct messages, and **Friends**. See [See Who's Out Riding Nearby](/help/out-riding) and [Add Friends](/help/friends).
@@ -48,7 +58,12 @@ On the Free plan, the buttons that need Pro carry a small gold **Pro** tag, so y
 
 ## Create a Group
 
+:::until 3.0
 1. Tap the **Groups** tab.
+:::
+:::release 3.0
+1. Tap **Riding Groups** (in **Social**).
+:::
 2. Tap **New Group**.
 3. Type a **Group Name**, like Saturday Crew. Names can be up to 60 characters.
 4. Under **Add Riders You’ve Ridden With**, tick the riders you want in the group.
@@ -62,7 +77,12 @@ A group holds up to 100 riders.
 
 The group link is for friends who aren't on OnMyLead yet, or anyone you haven't ridden with. Anyone in the group can share it.
 
+:::until 3.0
 1. On the **Groups** tab, tap the group.
+:::
+:::release 3.0
+1. On **Riding Groups** (in **Social**), tap the group.
+:::
 2. Scroll to **Invite by Link**.
 3. Tap **Share Group Link**, or tap **Text**, **Email** or **Copy**.
 

@@ -21,7 +21,12 @@ If you pay for OnMyLead Pro but your plan shows Free, for example on a new iPhon
 ## Restore Your Subscription
 
 1. Sign in to your OnMyLead account.
+:::until 3.0
 2. On the **You** tab, under **Settings**, tap **Subscription**.
+:::
+:::release 3.0
+2. On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**.
+:::
 3. Tap **Restore Purchases**.
 4. If Apple asks, sign in with the Apple Account you used to buy Pro.
 

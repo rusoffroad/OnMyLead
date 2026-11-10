@@ -21,7 +21,12 @@ The Trip Planner keeps a packing list for each trip. Tick items off as they go i
 
 ## Open the Trip Planner
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Under **Your Gear**, tap **Trip Planner**.
 
 You need to be signed in.

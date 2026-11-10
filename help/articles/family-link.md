@@ -19,7 +19,12 @@ A family link is a web link you can text to someone at home. They open it in any
 
 ## Send a Family Link
 
+:::until 3.0
 1. Tap the **You** tab.
+:::
+:::release 3.0
+1. Tap **You** (your picture at the top of Home).
+:::
 2. Under **On the Trail**, tap **Share My Location**.
 3. Turn on **Family Link**.
 :::until 1.0.2
@@ -57,7 +62,12 @@ The page shows your last update, not a guaranteed live position. With no service
 
 The family link lasts exactly as long as the share it belongs to.
 
+:::until 3.0
 1. Tap the **You** tab, then **Share My Location**.
+:::
+:::release 3.0
+1. Tap **You** (your picture at the top of Home), then **Share My Location**.
+:::
 2. Find the card that says **Includes a family link**.
 :::until 1.0.2
 3. Tap **Add 1 Hour** to keep it going, or **Stop** to end it now.

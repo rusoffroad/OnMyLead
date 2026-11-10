@@ -28,7 +28,12 @@ The Garage keeps your machines in one place: a photo, the details, every part yo
 
 ## Open Your Garage
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Under **Your Gear**, tap **Garage**.
 
 You need to be signed in.

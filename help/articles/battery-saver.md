@@ -30,7 +30,12 @@ Battery Saver also slows Ride Mode's own work on your phone: your blue dot on th
 
 ## Change the Setting
 
+:::until 3.0
 1. Go to the **You** tab and tap **Battery Saver**. You can also tap **Change** next to **Battery Saver** at the bottom of **Share My Location**.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home) and tap **Battery Saver**. You can also tap **Change** next to **Battery Saver** at the bottom of **Share My Location**.
+:::
 2. Tap the setting you want.
 3. If you picked **Balanced** or **Max Battery Saver**, the app tells you what your group loses and asks you to confirm. Tap **Use Balanced** or **Use Max Battery Saver**, or **Keep Current** to leave it.
 

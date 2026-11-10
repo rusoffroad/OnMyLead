@@ -27,13 +27,23 @@ Add a profile picture so the riders you meet know who's who. It shows in place o
 - ride chat and group chat
 - **Messages** and your conversations
 - **Friends** and **Out Riding**
+:::until 3.0
 - your name at the top of the **You** tab
+:::
+:::release 3.0
+- your name at the top of **You** (your picture at the top of Home)
+:::
 
 Until you add one, riders see your initial, the same as before. Riders on the live ride map still show as colored dots, so the leader, tail gunner and anyone who stopped sharing stay easy to spot.
 
 ## Add or Change Your Picture
 
+:::until 3.0
 1. Go to the **You** tab and tap your name at the top.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home) and tap your name at the top.
+:::
 2. Under **Profile Picture**, tap **Take Photo** to use the camera, or **Choose Photo** to pick one from your photo library.
 :::until 3.0
 3. Move and zoom the photo so your face (or your machine) sits in the square, then tap **Choose** (or the check mark).
@@ -70,7 +80,12 @@ The same crop screen opens: drag the photo, zoom with the mouse wheel or the **+
 
 ## Remove Your Picture
 
+:::until 3.0
 1. Go to the **You** tab and tap your name at the top.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home) and tap your name at the top.
+:::
 2. Under **Profile Picture**, tap **Remove**, then **Remove** again to confirm.
 
 Riders see your initial again.

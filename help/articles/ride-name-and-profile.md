@@ -24,7 +24,12 @@ keywords: [nickname, display name, username, change name, profile photo, social 
 Your ride name is how the group knows you. It shows on the group map, the rider list and in ride chat. A nickname works fine.
 
 :::release 1.0.3
+:::until 3.0
 Under your name on the **You** tab you also see your rank and badges. See [Earn Badges and Ranks](/help/badges-and-ranks).
+:::
+:::release 3.0
+Under your name on **You** (your picture at the top of Home) you also see your rank and badges. See [Earn Badges and Ranks](/help/badges-and-ranks).
+:::
 :::
 
 :::release 1.0.3
@@ -33,7 +38,12 @@ The same screen also has your **Profile Picture**. See [Add a Profile Picture](/
 
 ## Pick or Change Your Ride Name
 
+:::until 3.0
 1. Go to the **You** tab and tap your name at the top. If you haven't picked one yet, it says **Pick Your Ride Name**. You can also tap **Pick Your Ride Name** on the **Rides** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home) and tap your name at the top. If you haven't picked one yet, it says **Pick Your Ride Name**. You can also tap **Pick Your Ride Name** on the **Home** tab.
+:::
 2. Type your name in **Ride Name**.
 3. Check the preview at the top. It shows your pin on the map and a chat line, the way the group sees you.
 4. Tap **Save Name**. The button changes to **Name Saved**.
@@ -52,7 +62,12 @@ If you created your account with your name, or signed in with Apple, Google or F
 
 If you signed in with Apple, Google or Facebook, you can let the riders you ride with see that account's name and photo. It helps people recognize who joined.
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Under **Account**, find **Show My Google Profile** (or **Show My Apple Profile** or **Show My Facebook Profile**, depending on how you signed in).
 3. Turn the switch on.
 
@@ -66,10 +81,20 @@ When it's off, nobody else sees it. It's off until you turn it on.
 - Never strangers browsing public rides.
 - Never someone you've blocked, or who has blocked you.
 
+:::until 3.0
 The name and photo come from the account you signed in with, and the app keeps them up to date each time you open the **You** tab. You can only turn the setting on or off.
+:::
+:::release 3.0
+The name and photo come from the account you signed in with, and the app keeps them up to date each time you open **You** (your picture at the top of Home). You can only turn the setting on or off.
+:::
 
 If you signed in with email only, this setting doesn't appear.
 
 ## Your Email
 
+:::until 3.0
 Under **Account** on the **You** tab, **Email** shows the email on your account. Only you see it.
+:::
+:::release 3.0
+Under **Account** on **You** (your picture at the top of Home), **Email** shows the email on your account. Only you see it.
+:::

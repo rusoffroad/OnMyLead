@@ -31,7 +31,12 @@ The **Tilt** tile shows your roll and pitch over the map:
 
 The numbers turn amber as you get close to your limit and red at it. Tap the tile to open the full **Tilt** screen, with an axle seen from behind that leans with your roll, two wheels seen from the side that tip with your pitch, and the biggest lean each way under each one. Tap **Reset Max** to clear those (it shows once the meter is calibrated).
 
+:::until 3.0
 You can also open it from the **You** tab: tap **Tilt and Crash Alert**. The screen stays on while it's open, so you can leave it up on your mount.
+:::
+:::release 3.0
+You can also open it from **You** (your picture at the top of Home): tap **Tilt and Crash Alert**. The screen stays on while it's open, so you can leave it up on your mount.
+:::
 
 ## Turn the Tilt Meter Off
 

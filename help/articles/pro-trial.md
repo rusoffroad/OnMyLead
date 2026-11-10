@@ -36,7 +36,12 @@ While a trial runs, Home shows **Your Pro Trial Runs Until** and the date. Close
 
 ## See How Many Days Are Left
 
+:::until 3.0
 On the **You** tab, under **Settings**, tap **Subscription**. **Your Plan** shows **Pro Trial** with the days remaining, the date it ends, and a row of 30 marks that fills in as the days go by.
+:::
+:::release 3.0
+On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**. **Your Plan** shows **Pro Trial** with the days remaining, the date it ends, and a row of 30 marks that fills in as the days go by.
+:::
 
 The trial is the same on Android. It belongs to your account, not your phone, so it shows the same days left on every device you sign in to.
 
@@ -64,7 +69,12 @@ See [Free and Pro](/help/free-vs-pro) for exactly what changes.
 
 ## Keep Pro After the Trial
 
+:::until 3.0
 1. On the **You** tab, under **Settings**, tap **Subscription**.
+:::
+:::release 3.0
+1. On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**.
+:::
 2. Tap **Keep Pro After the Trial**.
 3. Choose **Annual** or **Monthly**.
 4. Tap the **Subscribe for** button under the plans and confirm with Apple.
