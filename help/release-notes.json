@@ -3,7 +3,7 @@
     "version": "3.0",
     "title": "Invite Your Group to an Event, Smoother Intersection Zoom, CarPlay in Map Mode and Show Password",
     "intro": "OnMyLead 3.0 lets event hosts invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. CarPlay now works on solo rides too: open Map Mode and the car screen shows your speed, elevation, heading, trip and the trail you're following. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
-    "whatsNew": "What's new in 3.0:\n\n• Invite your riding group to an event with Invite All.\n• Smoother Zoom In at Intersections: the map stays zoomed in when another junction is close.\n• Show Password: tap the eye in any password box.\n• CarPlay works in Map Mode, not just Ride Mode (Pro).\n• Ad Measurement: you choose if our ads can learn they brought you here.\n• Fixed: a crash when opening OnMyLead while connected to CarPlay.",
+    "whatsNew": "What's new in 3.0:\n\n• Invite your riding group to an event with Invite All.\n• Smoother Zoom In at Intersections: the map stays zoomed in when another junction is close.\n• Show Password: tap the eye in any password box.\n• CarPlay works in Map Mode, not just Ride Mode (Pro).\n• Ad Measurement: you choose if our ads can learn they brought you here.\n• Fixed: a crash when opening OnMyLead while connected to CarPlay.\n• Fixed: a crash on Android while using 3D Terrain.",
     "apple": null,
     "google": null,
     "notes": [
@@ -26,6 +26,10 @@
       {
         "kind": "fixed",
         "text": "CarPlay: opening OnMyLead on your iPhone while it was already connected to CarPlay (or changing Dark, Light or Match Phone while connected) could close the app. It now opens normally and the car screen keeps working."
+      },
+      {
+        "kind": "fixed",
+        "text": "3D Terrain on Android: the app could close while the 3D Terrain map was showing, for example when tilting the map or switching map styles. It now keeps running."
       },
       {
         "kind": "new",
