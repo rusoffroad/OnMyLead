@@ -1,10 +1,12 @@
 /**
  * Customize Home (3.0, Chris 2026-11-10): riders show, hide and reorder the sections under the
- * four fixed cards at the top of Home (Map Mode, Join a Ride, Start a Ride, Events). The choice
+ * four fixed cards at the top of Home (Map Mode, Join a Ride, Start a Ride, Events). Badges sit
+ * at the very top, over the map above the greeting, and Your Toolkit at the very bottom (Chris
+ * 2026-11-10), so neither is a section here; a saved layout that still lists them drops them. The choice
  * follows the account (core/synced-settings `home.layout.v1`). Pure, so it is tested without a phone.
  */
 
-export type HomeSection = 'out' | 'next' | 'group' | 'feed' | 'public' | 'badges' | 'toolkit' | 'past';
+export type HomeSection = 'out' | 'next' | 'group' | 'feed' | 'public' | 'past';
 
 /** Every section, in the default order, with its title and whether it shows by default. */
 export const HOME_SECTIONS: { id: HomeSection; title: string; on: boolean }[] = [
@@ -13,8 +15,6 @@ export const HOME_SECTIONS: { id: HomeSection; title: string; on: boolean }[] = 
   { id: 'group', title: 'Your Group', on: true },
   { id: 'feed', title: 'Feed', on: true },
   { id: 'public', title: 'Public Rides Near You', on: false },
-  { id: 'badges', title: 'Your Badges', on: false },
-  { id: 'toolkit', title: 'Your Toolkit', on: false },
   { id: 'past', title: 'Past Rides', on: false },
 ];
 

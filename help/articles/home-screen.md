@@ -35,6 +35,7 @@ keywords: [home, starlink card, starlink on home, customize home, reorder home, 
 ## At the Top
 
 - **Good Morning**, **Good Afternoon** or **Good Evening** with your ride name, over a satellite map of your area. If you haven't allowed location, the map shows a riding area instead. The home screen never asks for your location.
+- **Your badges**, just above the greeting: your patches and your rank (like **Veteran**), with **New Badge** when you've earned one you haven't looked at. Tap them to open **Badges**, where **Leaderboard** shows how you rank. See [Earn Badges and Ranks](/help/badges-and-ranks).
 - **The bell** opens your notifications, with a red number for new ones. See [See and Clear Your Notifications](/help/notifications-inbox).
 - **Your picture** (or your first letter) opens **You**: your profile, settings, Garage, Offline Maps and the rest.
 - When you're signed out, a flag lets you pick the app's language. Signed in, it's in **You**. See [Change the App's Language](/help/language).
@@ -75,7 +76,9 @@ These show by default, in this order:
 - **Your Group**: your riding group with the newest chat message, with **Group Chat** and **Plan a Group Ride**. With more than one group, **All** opens your groups.
 - **Feed**: what your friends, riders you follow and your riding groups have been up to. Friends out riding show in Out Riding Now instead, so they aren't listed twice. **Customize** changes what the feed shows; **Open Social** opens Social.
 
-You can also turn on **Public Rides Near You**, **Your Badges**, **Your Toolkit** and **Past Rides**.
+You can also turn on **Public Rides Near You** and **Past Rides**.
+
+**Your Toolkit** is always at the bottom of Home, under your sections: shortcuts to **Who's Riding**, **Friends & Social**, **Garage**, **Trip Planner**, **Offline Maps**, **Starlink**, **Battery Saver** and **Share Location**.
 
 Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com, click **Delete** or **Leave** at the end of the row. The app always asks first.
 
@@ -86,7 +89,7 @@ Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com
 3. Use the up and down arrows to move a section higher or lower.
 4. Tap **Done**.
 
-Map Mode, Join a Ride, Start a Ride and Events always show first. **Reset to Default** puts everything back. Your layout is saved to your account, so it's the same on your phone, tablet and the website.
+Map Mode, Join a Ride, Start a Ride and Events always show first, your badges stay at the top and Your Toolkit stays at the bottom. **Reset to Default** puts everything back. Your layout is saved to your account, so it's the same on your phone, tablet and the website.
 
 ## Public Rides Near You
 
@@ -102,7 +105,7 @@ The very bottom of Home shows which version of OnMyLead you have, like **Version
 
 ## On a Tablet
 
-In landscape, and on a big window, Map Mode, Join a Ride, Start a Ride, Events and Customize Home are on the left and your sections are on the right, with the tabs in a rail down the left edge (**You** is at the bottom of the rail). In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+In landscape, and on a big window, Map Mode, Join a Ride, Start a Ride, Events and Customize Home are on the left and your sections, then Your Toolkit, are on the right, with the tabs in a rail down the left edge (**You** is at the bottom of the rail). In portrait it's one column, like a phone. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
 
 ## On the Website
 

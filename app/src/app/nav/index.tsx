@@ -4,7 +4,7 @@ import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, Switch, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
@@ -110,6 +110,7 @@ export default function NavMode() {
     else router.replace('/');
   }, [mapTime.usedUp]);
   const insets = useSafeAreaInsets();
+  const { height: winH } = useWindowDimensions();
   const layout = useLayout();
   const wide = layout.expanded;
   const floating = layout.wide && !wide;
@@ -117,6 +118,9 @@ export default function NavMode() {
   const map = useRef<NavMapHandle>(null);
   const [musicOpen, setMusicOpen] = useState(false);
   const musicOn = useMusicControls();
+  // The bottom panel's measured height on a phone, so the map buttons sit just above it rather
+  // than at a guessed height that ended up under a tall panel (3.0 test pass).
+  const [panelH, setPanelH] = useState<number | undefined>(undefined);
   // Full Map: the top bar, layers and panel tuck away; one slim bar keeps the number that matters
   // (speed, miles left on the trail, or the measured length) and Center on Me stays.
   const fullMap = useFullMap('nav.fullMap.v1');
@@ -598,7 +602,8 @@ export default function NavMode() {
   // Center on Me's corner, with Follow Me just left of it.
   const locatePos = full
     ? { right: 12, bottom: Math.max(insets.bottom, 12) + (wide || floating ? 0 : FULL_MAP_BAR_H + 12) }
-    : wide ? { right: 12, bottom: 24 } : { right: 12, bottom: open ? 340 : 180 };
+    : wide ? { right: 12, bottom: 24 } : { right: 12, bottom: panelH && panelH > 0 ? panelH + 12 : open ? 340 : 180 };
+  const musicBottom = locatePos.bottom + (me ? 58 : 0);
   const panelPad: [number, number, number, number] = full ? fullMapPadding(insets.top, insets.bottom) : wide ? [90, 70, 40, PANEL_W + 60] : [120, 60, open ? 360 : 200, 60];
   // The one number the Full Map bar keeps.
   const barValue = ((): [string, string] => {
@@ -617,6 +622,10 @@ export default function NavMode() {
   // the top in Full Map (core/map-corner). On a wide tablet the bar is the panel column, so they're at the top.
   const cornerTop = full ? insets.top + 12 : wide ? insets.top + 20 : insets.top + 108; // under the top bar and the Solo tag
   const compassSpot = { top: cornerTop };
+  // On a short phone screen with the panel open there may be no room between the top corner and
+  // the panel: hide a button rather than draw it over the top bar.
+  const musicFits = full || wide || winH - musicBottom - 48 >= cornerTop + 56;
+  const locateFits = full || wide || winH - locatePos.bottom - 48 >= cornerTop + 56;
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <CompassSpot.Provider value={compassSpot}>
@@ -738,15 +747,15 @@ export default function NavMode() {
       </SafeAreaView>
       )}
 
-      {me && mode !== 'measure' ? (
+      {me && mode !== 'measure' && locateFits ? (
         <FollowMeButton status={followStatus} onPress={tapFollowMe} compact={full} style={[locatePos, { right: locatePos.right + 56 }]} />
       ) : null}
-      {musicOn ? (
-        <MusicButton onPress={() => setMusicOpen(true)} style={[styles.music, { bottom: locatePos.bottom + (me ? 58 : 0) }]} />
+      {musicOn && musicFits ? (
+        <MusicButton onPress={() => setMusicOpen(true)} style={[styles.music, { bottom: musicBottom }]} />
       ) : null}
       {musicOn ? <MusicSheet visible={musicOpen} tablet={wide} onClose={() => setMusicOpen(false)} /> : null}
 
-      {me ? (
+      {me && locateFits ? (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={tr('Center on me')}
@@ -763,6 +772,10 @@ export default function NavMode() {
       {full ? null : (
       <Animated.View
         {...fold.panHandlers}
+        onLayout={(e) => {
+          const h = wide || floating ? undefined : e.nativeEvent.layout.height;
+          setPanelH((old) => (old === h ? old : h));
+        }}
         style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
         <SafeAreaView edges={wide || floating ? [] : ['bottom']} style={[styles.panelInner, !open && { gap: 6 }]}>
           <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Navigation Tools" fromTop={wide} onFullMap={fullMap.enter} />

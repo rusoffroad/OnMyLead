@@ -4,7 +4,7 @@ summary: Give your ride, riding group or friend link a code that's easy to say, 
 category: joining
 order: 32
 release: "1.0.3"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - app/src/core/share-code.ts
   - app/src/components/share-code-field.tsx

@@ -5,7 +5,7 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppNotices } from '@/components/app-notices';
-import { BadgeStrip } from '@/components/badge-strip';
+import { HeroBadges } from '@/components/badge-strip';
 import { FeedList, FeedSheet } from '@/components/home/feed';
 import { GroupCard, NoGroupCard } from '@/components/home/group-card';
 import { CustomizeHomeSheet } from '@/components/home/customize-home';
@@ -325,6 +325,8 @@ export default function HomeScreen() {
       <View style={[styles.heroInner, { maxWidth: layout.expanded ? 1200 : READABLE_WIDTH }]}>
         {header}
         <View style={{ flex: 1 }} />
+        {/* Badges at the very top, just above the greeting (Chris 2026-11-10). */}
+        {session && badges ? <HeroBadges mine={badges} /> : null}
         {hello}
       </View>
     </HomeHero>
@@ -461,19 +463,6 @@ export default function HomeScreen() {
     </Block>
   ) : null;
 
-  const badgeBlock = session && badges ? (
-    <Block
-      title={t('Your Badges')}
-      right={
-        <View style={{ flexDirection: 'row', gap: Spacing.three }}>
-          <HeadLink title={t('Leaderboard')} onPress={() => router.push('/leaderboard')} label={t('Badge leaderboard')} />
-          <HeadLink title={t('See All')} onPress={() => router.push('/badges')} label={t('See all badges')} />
-        </View>
-      }>
-      <BadgeStrip mine={badges} />
-    </Block>
-  ) : null;
-
   const pastBlock = past.shown.length ? (
     <Block title={t('Past Rides')}>
       <RowGroup>
@@ -520,8 +509,6 @@ export default function HomeScreen() {
     group: groupBlock,
     feed: feedBlock,
     public: publicBlock,
-    badges: badgeBlock,
-    toolkit: toolkitBlock,
     past: pastBlock,
   };
   // Signed out, Public Rides Near You is what there is to see, whatever the layout says.
@@ -547,12 +534,17 @@ export default function HomeScreen() {
                 {customize}
                 <HelpRow />
               </View>
-              <View style={[styles.column, { paddingTop: Spacing.two }]}>{sectionList}</View>
+              <View style={[styles.column, { paddingTop: Spacing.two }]}>
+                {sectionList}
+                {toolkitBlock}
+              </View>
             </View>
           ) : (
             <>
               {actions}
               {sectionList}
+              {/* Your Toolkit always sits at the bottom (Chris 2026-11-10). */}
+              {toolkitBlock}
               {customize}
               <HelpRow />
             </>
