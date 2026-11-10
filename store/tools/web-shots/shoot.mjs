@@ -1,7 +1,8 @@
 import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 // Store screenshots: serves the web export (build.sh) and answers Supabase calls from fixtures/.
 // Each target is "name|path|width|height|signedOut|scrollTo|clickAt|clickText|language|appearanceJSON|clicks|flags"
-// (flags: localStorage keys set before the page loads, comma separated, such as shots.nearby; see build.sh).
+// (clicks: text to click, @label to click by label, ^text to click and hand the file picker a photo;
+// flags: localStorage keys set before the page loads, comma separated, such as shots.nearby; see build.sh).
 // Run everything with shots.sh.
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
 // FIXTURES=spread: ten riders strung out along a longer route (fixtures/store/spread.mjs).
@@ -64,6 +65,7 @@ for (const t of targets) {
     if (u.pathname.startsWith('/auth/v1/user')) return route.fulfill({ json: session().user });
     if (u.pathname.startsWith('/realtime')) return route.abort();
     if (/\/storage\/v1\/object\/public\/rider-(avatars|posts)\//.test(u.pathname)) { const f = avatarFile(u.pathname.split(/\/rider-(?:avatars|posts)\//)[1]); return f ? route.fulfill({ path: new URL('./fixtures/social/img/' + f + '.jpg', import.meta.url).pathname, contentType: 'image/jpeg' }) : route.fulfill({ status: 404, body: '' }); }
+    if (/\/storage\/v1\/object\/public\/event-photos\//.test(u.pathname)) { const f = new URL('../../../app/public/showcase/photos/' + path.basename(u.pathname), import.meta.url).pathname; return fs.existsSync(f) ? route.fulfill({ path: f, contentType: 'image/webp' }) : route.fulfill({ status: 404, body: '' }); }
     console.log('  other', u.pathname); return route.fulfill({ json: {} });
   });
   const page = await ctx.newPage();
@@ -71,7 +73,7 @@ for (const t of targets) {
   await page.goto('http://localhost:8099' + url);
   await page.waitForTimeout(+(process.env.WAIT || 5000));
   if (scrollTo) { await page.getByText(scrollTo, { exact: false }).first().scrollIntoViewIfNeeded(); await page.evaluate(() => new Promise(r => setTimeout(r, 300))); const el = page.getByText(scrollTo).first(); await el.evaluate((e) => e.scrollIntoView({ block: 'start' })); await page.waitForTimeout(800); }
-  for (const c of (clicks || '').split(',').filter(Boolean)) { if (c.startsWith('@')) await page.getByLabel(c.slice(1), { exact: false }).first().click(); else await page.getByText(c, { exact: false }).first().click(); await page.waitForTimeout(1200); }
+  for (const c of (clicks || '').split(',').filter(Boolean)) { if (c.startsWith('^')) { const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.getByText(c.slice(1), { exact: false }).first().click()]); await fc.setFiles(new URL('../../../app/public/showcase/photos/hero.webp', import.meta.url).pathname); } else if (c.startsWith('@')) await page.getByLabel(c.slice(1), { exact: false }).first().click(); else await page.getByText(c, { exact: false }).first().click(); await page.waitForTimeout(1200); }
   if (clickAt) { const [cx, cy] = clickAt.split(',').map(Number); await page.mouse.click(cx, cy); await page.waitForTimeout(1500); }
   if (clickText) { await page.getByText(clickText, { exact: true }).first().click(); await page.waitForTimeout(800); if (scrollTo) await page.getByText(scrollTo).first().evaluate((e) => e.scrollIntoView({ block: 'start' })); await page.waitForTimeout(500); }
   if (process.env.DBG) console.log(await page.evaluate(() => [...document.querySelectorAll('img')].map((i) => i.src.slice(0, 120)).join('\n')));

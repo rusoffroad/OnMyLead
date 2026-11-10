@@ -42,21 +42,21 @@ buttons on one screen, which upright leaves only a sliver of map between the two
 | Google Play 10-inch tablet | 2560 × 1600 | `store/google-play/screenshots/tablet-10/` |
 | Google Play 7-inch tablet | 1920 × 1200 | `store/google-play/screenshots/tablet-7/` |
 
-**2.0 update (2026-11-04):** all sets were re-shot for 2.0 with ten screens; Google Play takes the
-first 8. `store/app-store/listing.md` has the order and captions.
+**3.0 update (2026-11-10):** all sets were re-shot for the 3.0 redesign with ten screens; Google
+Play takes the first 8. `store/app-store/listing.md` has the order and captions.
 
 | # | Screen | Caption |
 |---|---|---|
 | 01 | Ride Mode: riders sidebar, live map, status buttons | Everyone on One Live Map |
-| 02 | Home: Join a Ride, your group, public rides, Feed | Join a Ride in Seconds |
-| 03 | Map Mode with the tilt tile | Map Mode for Any Trail |
-| 04 | Tilt Meter and Crash Alert | Tilt Meter and Crash Alert |
-| 05 | Events | Rallies, Runs and Ride Weekends |
-| 06 | Social | Share the Ride With Friends |
-| 07 | Badges with Founder and Brand Ambassador | Earn Badges as You Ride |
-| 08 | Route builder beside the map | Routes That Follow the Trail |
-| 09 | Appearance in Light mode | Themes and Light Mode |
-| 10 | Offline maps | Save Maps for Places With No Signal |
+| 02 | Home: Map Mode banner, Join a Ride, Out Riding Now, Up Next | Your Whole Ride Starts at Home |
+| 03 | Map Mode, solo, with Make It a Group Ride | Map Mode for Any Trail |
+| 04 | Ride Mode with alerts, status buttons, Regroup Here and EMERGENCY | One Tap Tells the Whole Group |
+| 05 | Ride Mode with no service, sharing over Bluetooth | No Service? Share Over Bluetooth |
+| 06 | Emergency Siren | A Loud Siren When a Rider Needs Help |
+| 07 | Rides: map and ride cards | Find Rides Near You |
+| 08 | Events | Rallies, Runs and Ride Weekends |
+| 09 | Social: Riding Groups, friends and activity | Your Riding Groups and Friends |
+| 10 | Customize Home | Make Home Your Own |
 
 Upload in file order. Review copies are in the project folder `onmylead/store-2.0/`.
 

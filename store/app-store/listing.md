@@ -108,16 +108,16 @@ What's new in 2.0:
 • New Free and Pro plans.
 ```
 
-## Screenshots (version 2.0)
+## Screenshots (version 3.0)
 
-Upload in file-name order, replacing the 1.0 set. Captions are part of each image.
+Upload in file-name order, replacing the 2.1 set. Captions are part of each image.
 
 | Slot | Size | Folder |
 |---|---|---|
 | iPhone 6.9-inch | 1320 × 2868, 10 shots | `store/app-store/screenshots/` |
 | iPad 13-inch | 2732 × 2048 landscape, 10 shots | `store/app-store/screenshots/ipad/` |
 
-01 Everyone on One Live Map (Ride Mode), 02 Join a Ride in Seconds (Home), 03 Map Mode for Any Trail, 04 Tilt Meter and Crash Alert, 05 Rallies, Runs and Ride Weekends (Events), 06 Share the Ride With Friends (Social), 07 Earn Badges as You Ride, 08 Routes That Follow the Trail, 09 Themes and Light Mode, 10 Save Maps for Places With No Signal. Remake them with `bash store/tools/web-shots/shots.sh OUT_DIR`.
+01 Everyone on One Live Map (Ride Mode), 02 Your Whole Ride Starts at Home (Home with Map Mode first), 03 Map Mode for Any Trail (solo, with Make It a Group Ride), 04 One Tap Tells the Whole Group (Ride Mode buttons and EMERGENCY), 05 No Service? Share Over Bluetooth, 06 A Loud Siren When a Rider Needs Help, 07 Find Rides Near You (Rides), 08 Rallies, Runs and Ride Weekends (Events), 09 Your Riding Groups and Friends (Social), 10 Make Home Your Own (Customize Home). Remake them with `bash store/tools/web-shots/shots.sh OUT_DIR`.
 
 ## Age Rating answers
 

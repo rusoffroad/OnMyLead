@@ -129,10 +129,10 @@ What's new in 2.0:
 | 10-inch tablet screenshots | up to 8, 9:16 or 16:9 | `store/google-play/screenshots/tablet-10/` 01 to 08, 2560 × 1600 |
 | Promo video | YouTube URL, optional | Chris's promo film if he puts it on YouTube; otherwise leave blank |
 
-Upload each set in file order, replacing the 1.0 set. Each shows the real app screen, rendered
+Upload each set in file order, replacing the 2.1 set. Each shows the real app screen, rendered
 from the shared code with mock data, inside a plain Android-style frame with the same captions as
-the App Store set (2.0: Ride Mode, Home, Map Mode, Tilt Meter and Crash Alert, Events, Social,
-Badges, routes). Remake them with `bash store/tools/web-shots/shots.sh OUT_DIR`.
+the App Store set (3.0: the first 8 of the 10, Ride Mode, Home, Map Mode, Ride Mode buttons,
+Bluetooth, Emergency Siren, Rides, Events). Remake them with `bash store/tools/web-shots/shots.sh OUT_DIR`.
 
 ## App Content (Policy > App content)
 
