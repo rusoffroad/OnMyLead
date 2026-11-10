@@ -118,6 +118,12 @@ export function tiktokAppIdFor(platform: string, env: (k: string) => string): st
   return own || env('TIKTOK_APP_ID');
 }
 
+/** TikTok scopes an Events API token to one data source, so each app has its own; TIKTOK_EVENTS_TOKEN is the older single one. */
+export function tiktokTokenFor(platform: string, env: (k: string) => string): string {
+  const own = env(platform === 'ios' ? 'TIKTOK_IOS_EVENTS_TOKEN' : 'TIKTOK_ANDROID_EVENTS_TOKEN');
+  return own || env('TIKTOK_EVENTS_TOKEN');
+}
+
 /** TikTok Events API 2.0, app event (POST business-api.tiktok.com/open_api/v1.3/event/track/). */
 export function tiktokAppPayload(e: AdEventBody, tiktokAppId: string, ip: string | null, userAgent: string | null, testCode?: string) {
   const ios = e.platform === 'ios';
