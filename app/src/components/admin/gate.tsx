@@ -1,7 +1,8 @@
 import type { Session } from '@supabase/supabase-js';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, Text, TextInput, View } from 'react-native';
 
+import { Icon } from '@/components/icon';
 import { Logo } from '@/components/logo';
 import { font, themedStyles } from '@/constants/theme';
 import { signInWithPassword, signOut } from '@/lib/session';
@@ -183,13 +184,15 @@ function Message({ title, text, action }: { title: string; text: string; action?
 
 function Input({ label, value, onChange, secure, onSubmit, autoComplete }: { label: string; value: string; onChange: (v: string) => void; secure?: boolean; onSubmit?: () => void; autoComplete?: 'email' | 'current-password' }) {
   const [focused, setFocused] = useState(false);
+  const [shown, setShown] = useState(false);
   return (
     <View style={{ gap: 6 }}>
       <Text style={styles.label}>{label}</Text>
+      <View>
       <TextInput
         value={value}
         onChangeText={onChange}
-        secureTextEntry={secure}
+        secureTextEntry={secure && !shown}
         autoCapitalize="none"
         autoCorrect={false}
         autoComplete={autoComplete}
@@ -198,8 +201,19 @@ function Input({ label, value, onChange, secure, onSubmit, autoComplete }: { lab
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         accessibilityLabel={label}
-        style={[styles.input, focused && { borderColor: AdminColors.blue }]}
+        style={[styles.input, secure && { paddingRight: 52 }, focused && { borderColor: AdminColors.blue }]}
       />
+      {secure ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={shown ? 'Hide Password' : 'Show Password'}
+          accessibilityState={{ checked: shown }}
+          onPress={() => setShown((v) => !v)}
+          style={styles.eye}>
+          <Icon name={shown ? 'eyeOff' : 'eye'} size={22} color={AdminColors.dim} />
+        </Pressable>
+      ) : null}
+      </View>
     </View>
   );
 }
@@ -215,6 +229,7 @@ const styles = themedStyles(() => ({
   qrTile: { alignSelf: 'center', backgroundColor: '#E8EDF4', borderRadius: 14, padding: 12 },
   label: { fontFamily: font(600), fontSize: 13.5, color: AdminColors.dim },
   input: { outlineStyle: 'none' as never, fontFamily: font(500), fontSize: 16, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 12 },
+  eye: { position: 'absolute', right: 0, top: 0, bottom: 0, width: 48, alignItems: 'center', justifyContent: 'center' },
   code: { outlineStyle: 'none' as never, fontFamily: font(800, 'display'), fontSize: 36, letterSpacing: 10, textAlign: 'center', color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 12, paddingVertical: 10 },
   error: { fontFamily: font(600), fontSize: 14.5, color: AdminColors.danger },
   foot: { fontFamily: font(500), fontSize: 13, color: AdminColors.faint },

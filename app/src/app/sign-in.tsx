@@ -5,7 +5,7 @@ import { Platform, Pressable, View } from 'react-native';
 import { Logo } from '@/components/logo';
 import { SocialButton } from '@/components/social-button';
 import { ThemedText } from '@/components/themed-text';
-import { Button, Card, ErrorText, Field, Screen, Segmented } from '@/components/ui';
+import { Button, Card, ErrorText, Field, PasswordField, Screen, Segmented } from '@/components/ui';
 import { Colors, Spacing } from '@/constants/theme';
 import { BANNED_MESSAGE, isBannedError } from '@/core/moderation';
 import { track } from '@/lib/analytics';
@@ -128,11 +128,10 @@ export default function SignIn() {
         autoComplete="email"
         placeholder={t('you@example.com')}
       />
-      <Field
+      <PasswordField
         label={t('Password')}
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
         autoComplete={mode === 'create' ? 'new-password' : 'current-password'}
         placeholder={mode === 'create' ? t('At least 8 characters') : ''}
       />
