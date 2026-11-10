@@ -1,15 +1,19 @@
 [
   {
     "version": "3.0",
-    "title": "Invite Your Riding Group to an Event",
-    "intro": "OnMyLead 3.0 makes it easy to fill your event: hosts can invite a whole riding group in one tap, just like on a ride.",
-    "whatsNew": "What's new in 3.0:\n\n• Invite your riding group to an event: on the event page, tap Invite All next to the group. Everyone gets a notification that opens the event.",
+    "title": "Invite Your Riding Group to an Event and a CarPlay Fix",
+    "intro": "OnMyLead 3.0 lets event hosts invite a whole riding group in one tap, just like on a ride, and fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
+    "whatsNew": "What's new in 3.0:\n\n• Invite your riding group to an event: on the event page, tap Invite All next to the group. Everyone gets a notification that opens the event.\n• Fixed: on iPhone, opening OnMyLead while your phone was already connected to CarPlay could close the app. It now opens normally.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "new",
         "text": "Invite a Group on events: an event's hosts and co-hosts tap Invite All next to a riding group on the event page. Everyone in the group gets a notification that opens the event, where they can tap Going or Interested. Riders who already answered or were already invited aren't notified again."
+      },
+      {
+        "kind": "fixed",
+        "text": "CarPlay: opening OnMyLead on your iPhone while it was already connected to CarPlay (or changing Dark, Light or Match Phone while connected) could close the app. It now opens normally and the car screen keeps working."
       }
     ]
   },
