@@ -27,7 +27,12 @@ Alerts are read in the language the app is in (see [Change the App's Language](/
 
 ## Pick a Voice
 
+:::until 3.0
 1. Go to the **You** tab and tap **Voice**.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home) and tap **Voice**.
+:::
 2. **Automatic** is on to start. It uses the most natural voice on your phone, and the line under it says which one.
 3. Tap **Play** next to any voice to hear it say "Regroup point set. Sam is falling behind."
 4. Tap a voice to use it for spoken alerts. Tap **Automatic** to go back.

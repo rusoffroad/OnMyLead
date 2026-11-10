@@ -90,3 +90,8 @@ export const SHOWCASE_NO_SERVICE: boolean = true;
 export const SHOWCASE_GROUP_PHOTOS: boolean = true;
 /** The Crop Every Photo line in the showcase. Off until the app version with the crop screen (3.0) is live in the stores. */
 export const SHOWCASE_PHOTO_CROP: boolean = false;
+/**
+ * The 3.0 redesign lines in the showcase (Home leads with Map Mode, Customize Home, and Make It a
+ * Group Ride from a solo Map Mode ride). Off until the app version with them (3.0) is live in the stores.
+ */
+export const SHOWCASE_REDESIGN_3: boolean = false;

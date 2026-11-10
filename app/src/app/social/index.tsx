@@ -123,6 +123,7 @@ export default function SocialScreen() {
               <Text style={styles.title} accessibilityRole="header">{t('Your Friends')}</Text>
               <FriendRows list={friends.list} limit={12} />
               <Button title={t('View Your Profile')} kind="secondary" onPress={() => router.push(profileHref(me) as never)} />
+              <Button title={t('Riding Groups')} kind="secondary" onPress={() => router.push('/groups')} />
               {freeNote}
             </View>
           }
@@ -143,6 +144,8 @@ export default function SocialScreen() {
     <Screen width="readable">
       <Stack.Screen options={{ title: t('Social') }} />
       <View style={{ gap: 16 }}>
+        {/* 3.0: Riding Groups live inside Social (the tab bar has Home, Rides, Map Mode, Events, Social). */}
+        <Button title={t('Riding Groups')} kind="secondary" onPress={() => router.push('/groups')} />
         {compose}
         <Segmented
           options={[{ value: 'activity', label: t('Activity') }, { value: 'friends', label: t('Friends') }, { value: 'mine', label: t('My Posts') }]}

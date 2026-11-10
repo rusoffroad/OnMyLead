@@ -63,7 +63,12 @@ Ride Mode on onmylead.com sounds the siren while the page is open. Your browser 
 
 ## Hear It or Turn It Off
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Under **Settings**, tap **Notifications**.
 3. Tap **Play Siren** to hear it for three seconds.
 4. Switch **Emergency Siren** off if you'd rather not hear it. EMERGENCY notifications still come through, with the normal notification sound.

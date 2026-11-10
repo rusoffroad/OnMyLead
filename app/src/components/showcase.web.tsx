@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -358,6 +358,12 @@ export function Showcase() {
               <Feature title="Profile Pictures">Take a photo or pick one from your library, cropped square and shrunk to a small file. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
               {SHOWCASE_GROUP_PHOTOS ? (
                 <Feature title="Group Photos">Give your riding group a photo of the crew. Everyone in the group sees it on the group page, in their group list and on Home, and friends you send the group link to see it before they join, so they know it’s your crew.</Feature>
+              ) : null}
+              {SHOWCASE_REDESIGN_3 ? (
+                <>
+                  <Feature title="Ride Solo, Then Bring the Group">Map Mode is your own offroad map, and a Solo tag says nobody else sees where you are. When it’s worth sharing, Pro riders tap Make It a Group Ride: the trail you’re following or just recorded becomes the route, where you are becomes the meeting point, and your friends join with a code.</Feature>
+                  <Feature title="A Home That’s Yours">Home opens on a satellite map of your area with Map Mode first, then Join a Ride, Start a Ride and Events. Pick which sections show under them, like Out Riding Now, Up Next, Your Group and your Feed, and put them in your order. Your layout follows you to your phone, tablet and onmylead.com.</Feature>
+                </>
               ) : null}
               {SHOWCASE_PHOTO_CROP ? (
                 <Feature title="Crop Every Photo">Frame every photo before it goes up: your profile picture, group photo, garage, posts, events, trails and bug report screenshots. Drag and zoom it, pick a shape where you can, and tap Use Photo. The same on iPhone, iPad, Android and onmylead.com.</Feature>

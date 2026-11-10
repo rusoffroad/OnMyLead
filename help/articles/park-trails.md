@@ -51,7 +51,12 @@ Tap a park trail to see its card: the park's name, the trail's name, its level (
 
 ## Turn Park Trails Off
 
+:::until 3.0
 Tap the round **Map Settings** button on any map, tap **Fine-Tune** under **Every Map Feature**, then tap the **Park Trails** row in the **Trails** group to turn it off. The same choice is on the **You** tab as **Park Trails on Maps**. Either one changes every map, on every device you're signed in on. Park Trails is free for everyone, like Rider Trails, so it stays even without Pro.
+:::
+:::release 3.0
+Tap the round **Map Settings** button on any map, tap **Fine-Tune** under **Every Map Feature**, then tap the **Park Trails** row in the **Trails** group to turn it off. The same choice is on **You** (your picture at the top of Home) as **Park Trails on Maps**. Either one changes every map, on every device you're signed in on. Park Trails is free for everyone, like Rider Trails, so it stays even without Pro.
+:::
 
 ## With No Signal
 

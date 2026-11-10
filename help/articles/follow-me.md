@@ -54,7 +54,12 @@ While the map is following you and you're moving, it zooms in as you come up on 
 If another junction is coming up within about a quarter mile once you're through one, the map stays zoomed in for that one too instead of zooming out and straight back in. It zooms back out once after the last junction in the run, so riding through town or a web of trails no longer pumps the zoom in and out.
 :::
 
+:::until 3.0
 **Zoom In at Intersections** is on until you turn it off, either in [Map Settings](/help/map-layers) under **Following** or in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
+:::
+:::release 3.0
+**Zoom In at Intersections** is on until you turn it off, either in [Map Settings](/help/map-layers) under **Following** or in **You** (your picture at the top of Home) under **On the Trail**. Your choice follows your account to your other devices.
+:::
 
 ## Your Dot
 
@@ -71,10 +76,20 @@ Your own dot has an arrow built into it and a soft beam ahead of it (Red, White 
 | Blue outline, **Paused** | You dragged or pinched the map, so it stopped following to let you look around. Tap it, or **Center on Me**, to follow you again. |
 | Plain **Follow Me** | Follow Me is off. The map stays where you put it. Tap it to turn Follow Me on. |
 
+:::until 3.0
 Follow Me is on until you turn it off. Your phone remembers the choice for Ride Mode and Navigate alike, and you can also switch it in the **You** tab under **On the Trail**: **Follow Me on Maps**.
+:::
+:::release 3.0
+Follow Me is on until you turn it off. Your phone remembers the choice for Ride Mode and Navigate alike, and you can also switch it in **You** (your picture at the top of Home) under **On the Trail**: **Follow Me on Maps**.
+:::
 
 :::release 2.1
+:::until 3.0
 From 2.1 these switches are also under **Following** in **Map Settings** (the round **Map Settings** button on Ride Mode's and Map Mode's map): **Follow Me**, **Zoom Out at the Edge** and **Zoom In at Intersections**. Turn **Zoom Out at the Edge** off and the map centers on your dot and moves with you the first time you near an edge, without zooming out first; it's also on the **You** tab under **On the Trail**. The zoom switches work while Follow Me is on.
+:::
+:::release 3.0
+From 2.1 these switches are also under **Following** in **Map Settings** (the round **Map Settings** button on Ride Mode's and Map Mode's map): **Follow Me**, **Zoom Out at the Edge** and **Zoom In at Intersections**. Turn **Zoom Out at the Edge** off and the map centers on your dot and moves with you the first time you near an edge, without zooming out first; it's also on **You** (your picture at the top of Home) under **On the Trail**. The zoom switches work while Follow Me is on.
+:::
 :::
 
 With Follow Me off, **Center on Me** still centers the map on you once, and Navigate doesn't move the map by itself, even while you record or follow a trail.

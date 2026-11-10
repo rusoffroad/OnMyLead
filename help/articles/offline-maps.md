@@ -43,7 +43,12 @@ Offline maps are in the app on your phone or tablet only, not on the website.
 
 ## Open Offline Maps
 
+:::until 3.0
 - On the **You** tab, tap **Offline Maps**.
+:::
+:::release 3.0
+- On **You** (your picture at the top of Home), tap **Offline Maps**.
+:::
 - Or, on any map with the layers button, open the layers panel and tap **Offline Maps**.
 
 The screen shows how much space your maps use, how much is free on your phone, your downloads under **On This Phone**, and your upcoming rides under **Your Rides**.

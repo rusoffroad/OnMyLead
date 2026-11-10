@@ -40,7 +40,12 @@ Invited by a friend, or invited one? When the new rider finishes their first rid
 :::
 
 
+:::until 3.0
 1. On the **You** tab, under **Settings**, tap **Subscription**.
+:::
+:::release 3.0
+1. On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**.
+:::
 2. Tap **Upgrade to Pro**. During your free trial, this button says **Keep Pro After the Trial**.
 3. Choose **Annual** (marked **Best Value**) or **Monthly**.
 4. Tap the **Subscribe for** button under the plans, for example **Subscribe for $29.99 a Year**.

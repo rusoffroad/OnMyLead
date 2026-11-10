@@ -25,7 +25,12 @@ Invite a riding buddy who's new to OnMyLead. When they finish their first ride, 
 
 ## Invite a Friend
 
+:::until 3.0
 1. On the **You** tab, under **Settings**, tap **Invite Friends**. You can also tap **Invite Friends, Both Get 50% Off** at the bottom of the Pro screen.
+:::
+:::release 3.0
+1. On **You** (your picture at the top of Home), under **Settings**, tap **Invite Friends**. You can also tap **Invite Friends, Both Get 50% Off** at the bottom of the Pro screen.
+:::
 2. Tap **Share Invite** and send it, or tap **Copy Link**.
 
 Your invite link is your friend link, so your friend can also add you as a friend. See [Add Friends](/help/friends).

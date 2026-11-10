@@ -1,54 +1,42 @@
 import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
-import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
-import { JOIN_QUOTA, type Quota } from '@/core/home';
-import { Gradient, Home, Pill } from './parts';
+import { Colors, font, Spacing, themedStyles, TileSurface } from '@/constants/theme';
+import { withAlpha } from '@/core/color';
+import { startRideDetail, type Quota } from '@/core/home';
+import { showNotice } from '@/lib/confirm';
+import { Gradient } from './parts';
 import { t } from '@/lib/i18n';
 
-/** Faint contour lines in the corner of the red cards: trail-map texture, not decoration for its own sake. */
-function Topo({ size = 220 }: { size?: number }) {
-  return (
-    <View pointerEvents="none" style={{ position: 'absolute', right: -40, top: -30, opacity: 0.16 }}>
-      <Svg width={size} height={size} viewBox="0 0 200 200" fill="none" stroke="#fff" strokeWidth={1.4}>
-        <Path d="M20 120c30-40 60-50 90-40s50 0 70-30" />
-        <Path d="M10 140c35-45 70-55 100-45s55 2 80-32" />
-        <Path d="M30 100c25-32 50-42 78-34s44-2 62-26" />
-        <Path d="M45 82c20-24 40-31 62-25s36-3 50-20" />
-        <Path d="M0 162c40-50 80-60 112-50s60 4 88-34" />
-        <Path d="M62 66c14-16 28-21 44-17s26-3 36-14" />
-      </Svg>
-    </View>
-  );
-}
-
-/** A plan label ("Unlimited", "2 Left This Month") in the rider's language. */
-const quotaText = (text: string) => {
-  const left = /^(\d+) Left This Month$/.exec(text);
-  return left ? t('{n} Left This Month', { n: left[1] }) : t(text);
-};
-
 /**
- * Join a Ride: the big red card at the top, with the invite code box right in it. Kept short so
- * Join, Create, Find, Events and Map Mode all fit on one phone screen (Chris 2026-11-04); the code
- * box's own placeholder says what to type, so there's no extra line for it.
+ * Join a Ride: the red hero of the 3.0 home, lifted over the map header, with the invite code box
+ * right in it and a QR button (Chris 2026-11-10: "Join a Ride should be the red"). No plan pill:
+ * joining is always free.
  */
 export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: string) => void; onOpen: () => void }) {
   const ready = code.trim().length >= 4;
   return (
     <View style={styles.hero}>
-      <Gradient colors={['#F0323A', '#C41820', '#9E1218']} angle="diagonal" radius={28} />
-      <Topo />
+      <Gradient colors={['#EC2E36', '#D7222A']} radius={22} />
       <View style={styles.heroTop}>
-        <Text style={styles.heroTitle} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
-          {t('Join a Ride')}
-        </Text>
-        <Pill text={quotaText(JOIN_QUOTA.text)} tone="onRed" />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={styles.heroTitle} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+            {t('Join a Ride')}
+          </Text>
+          <Text style={styles.heroHelp}>{t('Enter the code from your ride leader.')}</Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('Scan a Ride QR Code')}
+          hitSlop={6}
+          onPress={() => showNotice(t('Scan a Ride QR Code'), t('Point your phone’s camera at the ride’s QR code. It opens the ride right here in OnMyLead.'))}
+          style={({ pressed }) => [styles.scanBtn, pressed && { opacity: 0.75 }]}>
+          <Icon name="qr" size={22} color="#fff" strokeWidth={2} />
+        </Pressable>
       </View>
-      <View style={styles.codeBox}>
+      <View style={styles.codeRow}>
         <TextBox
           value={code}
           onChangeText={onCode}
@@ -56,8 +44,8 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
           autoCapitalize="characters"
           autoCorrect={false}
           returnKeyType="go"
-          placeholder={t('Invite code, e.g. 7F3A9C21')}
-          placeholderTextColor="rgba(255,255,255,0.62)"
+          placeholder="7F3A 9C21"
+          placeholderTextColor="rgba(255,255,255,0.6)"
           selectionColor="#fff"
           accessibilityLabel={t('Got a code from the leader? Type it here.')}
           style={styles.codeInput}
@@ -68,101 +56,73 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
           accessibilityState={{ disabled: !ready }}
           disabled={!ready}
           onPress={onOpen}
-          style={({ pressed }) => [styles.codeGo, { opacity: ready ? (pressed ? 0.85 : 1) : 0.55 }]}>
+          style={({ pressed }) => [styles.codeGo, { opacity: ready ? (pressed ? 0.85 : 1) : 0.6 }]}>
           <Text style={styles.codeGoText}>{t('Join')}</Text>
         </Pressable>
       </View>
-      <Text style={styles.scan}>{t('Or open the ride link or QR code with your camera.')}</Text>
-    </View>
-  );
-}
-
-/** Create a Ride and Find a Ride, side by side under Join. */
-export function ActionTiles({
-  quota, findText, findOn, onCreate, onFind,
-}: {
-  quota: Quota | null;
-  findText: string | null;
-  findOn: boolean;
-  onCreate: () => void;
-  onFind: () => void;
-}) {
-  return (
-    <View style={styles.pair}>
-      <Tile
-        accent
-        icon="flag"
-        title={t('Create a Ride')}
-        detail={t('You lead. Public or friends only.')}
-        onPress={onCreate}
-        pill={quota ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={quota.upgrade ? t('{quota}. See Pro for unlimited rides', { quota: quotaText(quota.text) }) : t('{quota} rides with Pro', { quota: quotaText(quota.text) })}
-            disabled={!quota.upgrade}
-            hitSlop={8}
-            onPress={() => router.push('/pro')}>
-            <Pill text={quotaText(quota.text)} tone={quota.tone === 'pro' ? 'gold' : quota.tone === 'out' ? 'out' : 'plain'} />
-          </Pressable>
-        ) : null}
-      />
-      {findOn ? (
-        <Tile icon="search" title={t('Find a Ride')} detail={t('Near you or by state')} onPress={onFind} pill={findText ? <Pill text={findText} /> : null} />
-      ) : null}
     </View>
   );
 }
 
 /**
- * One half of the Create / Find pair. Both are the same dark card (Join a Ride above is the one
- * red card); Create gets red only as an accent: its icon chip and a thin red edge along the top.
- * Icon and title sit side by side and the pill always sits on the card's bottom edge, so the two
- * cards read as one even row whatever the text wraps to. The detail line is read out by screen
- * readers but not shown, which keeps the home screen's five actions on one screen.
+ * Start a Ride and Events, side by side under Join (approved mock v4). Start shows how many rides
+ * a Free rider has left (and opens Pro when they're out); Events opens rallies and ride weekends.
  */
+export function ActionTiles({ quota, onStart }: { quota: Quota | null; onStart: () => void }) {
+  const detail = startRideDetail(quota);
+  return (
+    <View style={styles.pair}>
+      <Tile icon="flag" tone="red" title={t('Start a Ride')} detail={detail} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
+      <Tile icon="calendar" tone="gold" title={t('Events')} detail={t('Rallies and weekends')} onPress={() => router.push('/events')} />
+    </View>
+  );
+}
+
+/** One of the two action tiles: an icon chip on top, a condensed title and one line at the bottom. */
 function Tile({
-  icon, title, detail, onPress, pill, accent,
-}: { icon: IconName; title: string; detail: string; onPress: () => void; pill: React.ReactNode; accent?: boolean }) {
+  icon, title, detail, onPress, tone,
+}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold' }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${title}. ${detail}`}
       onPress={onPress}
       style={({ pressed }) => [styles.tile, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-      <Gradient colors={[Home.panel2, Home.panel]} radius={20} />
-      {accent ? <View style={styles.accentEdge} /> : null}
-      <View style={styles.tileHead}>
-        <View style={[styles.tileIcon, accent && styles.tileIconRed]}>
-          <Icon name={icon} size={20} color={accent ? Colors.accent : Colors.text} strokeWidth={2.4} />
-        </View>
-        <Text style={styles.tileTitle} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
+      <View style={[styles.tileIcon, tone === 'red' ? styles.tileIconRed : styles.tileIconGold]}>
+        <Icon name={icon} size={21} color={tone === 'red' ? '#FF4A51' : Colors.gold} strokeWidth={2.1} />
       </View>
-      {pill ? <View style={styles.tilePill}>{pill}</View> : null}
+      <View>
+        <Text style={styles.tileTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
+        <Text style={styles.tileDetail} numberOfLines={1}>{detail}</Text>
+      </View>
     </Pressable>
   );
 }
 
 const styles = themedStyles(() => ({
-  hero: { borderRadius: 26, paddingHorizontal: 18, paddingTop: 16, paddingBottom: 14, overflow: 'hidden', gap: 10 },
-  heroTop: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
-  heroTitle: { flex: 1, color: '#fff', fontFamily: font(800, 'display'), fontSize: 38, lineHeight: 40 },
-  codeBox: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.two, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.24)',
-    backgroundColor: 'rgba(0,0,0,0.22)', paddingLeft: 14, padding: 5,
+  hero: {
+    borderRadius: 22, paddingHorizontal: 18, paddingTop: 18, paddingBottom: 18, overflow: 'hidden', gap: 16,
+    borderWidth: 1.5, borderColor: 'rgba(255,175,175,0.6)', boxShadow: '0px 20px 40px -12px rgba(0, 0, 0, 0.6)',
   },
-  codeInput: { flex: 1, minWidth: 0, minHeight: 44, color: '#fff', fontFamily: font(600), fontSize: 17, letterSpacing: 1.5 },
-  codeGo: { backgroundColor: '#fff', borderRadius: 11, paddingHorizontal: 18, minHeight: 44, justifyContent: 'center' },
-  codeGoText: { color: '#B3161D', fontFamily: font(700, 'display'), fontSize: 19 },
-  scan: { color: 'rgba(255,255,255,0.75)', fontFamily: font(500), fontSize: 12.5, lineHeight: 16, marginTop: -3 },
+  heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.three },
+  heroTitle: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 38, lineHeight: 40 },
+  heroHelp: { color: 'rgba(255,255,255,0.85)', fontFamily: font(500), fontSize: 14.5, lineHeight: 20, marginTop: 4 },
+  scanBtn: {
+    width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.18)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+  },
+  codeRow: { flexDirection: 'row', alignItems: 'stretch', gap: Spacing.two },
+  codeInput: {
+    flex: 1, minWidth: 0, minHeight: 54, borderRadius: 14, paddingHorizontal: 16, color: '#fff', fontFamily: font(600), fontSize: 18, letterSpacing: 2.5,
+    backgroundColor: 'rgba(60,0,4,0.32)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
+  },
+  codeGo: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 24, minHeight: 54, justifyContent: 'center' },
+  codeGoText: { color: '#B81C23', fontFamily: font(700), fontSize: 17 },
   pair: { flexDirection: 'row', alignItems: 'stretch', gap: 12 },
-  tile: {
-    flex: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 13, overflow: 'hidden', gap: 10,
-    borderWidth: 1, borderColor: Home.line, backgroundColor: Home.panel,
-  },
-  accentEdge: { position: 'absolute', left: 0, right: 0, top: 0, height: 3, backgroundColor: Colors.accent },
-  tileHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  tileIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.08)' },
-  tileIconRed: { backgroundColor: 'rgba(229,38,46,0.14)', borderWidth: 1, borderColor: 'rgba(229,38,46,0.38)' },
-  tileTitle: { flex: 1, minWidth: 0, color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 23 },
-  tilePill: { marginTop: 'auto', flexDirection: 'row' },
+  tile: { flex: 1, minHeight: 132, borderRadius: 20, padding: 16, overflow: 'hidden', justifyContent: 'space-between', ...TileSurface },
+  tileIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
+  tileIconRed: { backgroundColor: 'rgba(229,38,46,0.14)' },
+  tileIconGold: { backgroundColor: withAlpha(Colors.gold, 0.14) },
+  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 24, lineHeight: 26, marginTop: Spacing.three },
+  tileDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13.5, lineHeight: 18, marginTop: 2 },
 }));

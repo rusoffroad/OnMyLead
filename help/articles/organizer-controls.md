@@ -38,7 +38,12 @@ You get a notification when someone joins or asks to join a ride you organize. Y
 1. Open the ride page.
 2. Tap **Start Ride Mode**.
 
+:::until 3.0
 The ride goes live, riders on it get a notification that it started, and Ride Mode opens for you. Everyone else on the ride sees **Enter Ride Mode** on the ride page, and a banner on their **Rides** tab. See [Ride Mode](/help/ride-mode).
+:::
+:::release 3.0
+The ride goes live, riders on it get a notification that it started, and Ride Mode opens for you. Everyone else on the ride sees **Enter Ride Mode** on the ride page, and a banner on their **Home** tab. See [Ride Mode](/help/ride-mode).
+:::
 
 ## End the Ride
 

@@ -10,10 +10,10 @@ const at = (y: number, m: number, d: number, h = 12) => new Date(y, m - 1, d, h)
 
 describe('home screen', () => {
   it('greets by the time of day', () => {
-    expect(greeting(new Date(2026, 10, 3, 8))).toBe('Good morning');
-    expect(greeting(new Date(2026, 10, 3, 13))).toBe('Good afternoon');
-    expect(greeting(new Date(2026, 10, 3, 20))).toBe('Good evening');
-    expect(greeting(new Date(2026, 10, 3, 2))).toBe('Good evening');
+    expect(greeting(new Date(2026, 10, 3, 8))).toBe('Good Morning');
+    expect(greeting(new Date(2026, 10, 3, 13))).toBe('Good Afternoon');
+    expect(greeting(new Date(2026, 10, 3, 20))).toBe('Good Evening');
+    expect(greeting(new Date(2026, 10, 3, 2))).toBe('Good Evening');
   });
   it('uses the first word of the ride name', () => {
     expect(firstName('Chris Morelock')).toBe('Chris');

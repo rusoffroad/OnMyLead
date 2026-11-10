@@ -1,6 +1,6 @@
 ---
 title: Get Started With OnMyLead
-summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make your account, and find your way around the Rides, Find, Groups and You tabs.
+summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make your account, and find your way around the app.
 category: getting-started
 order: 10
 release: "1.0"
@@ -42,7 +42,12 @@ The first time you open the app, the **Before You Ride** screen shows the Rider 
 
 You can look around without an account, but you need one to create rides, save your Garage and keep riding groups.
 
+:::until 3.0
 1. On the **Rides** tab, tap **Sign In or Create a Free Account**.
+:::
+:::release 3.0
+1. On the **Home** tab, tap **Sign In or Create a Free Account**.
+:::
 2. Tap **Create Account** at the top.
 3. Use one of the **Continue with** buttons, or enter **Your Name**, **Email** and a **Password** of at least 8 characters, then tap **Create Account**.
 4. If we email you a link, tap it on the same iPhone to confirm your email and finish signing in.
@@ -55,6 +60,31 @@ New accounts start with a free Pro Trial. See [The Pro Trial](/help/pro-trial).
 
 ## Find Your Way Around
 
+:::release 3.0
+Along the bottom of the screen: **Home**, **Rides**, the raised blue **Map Mode** key in the middle, **Events** and **Social**. On a tablet they run down the left edge instead, with **You** at the bottom. See [Use OnMyLead on a Tablet](/help/use-onmylead-on-a-tablet).
+
+### Home
+
+Your home screen: **Map Mode** first, then **Join a Ride** (the big red card), **Start a Ride** and **Events**, then the sections you choose, like **Out Riding Now**, **Up Next**, **Your Group** and your **Feed**. Tap **Customize Home** at the bottom to change them. The bell and your picture at the top open your notifications and **You** (your profile, settings, Garage and tools). See [Your Home Screen](/help/home-screen).
+
+### Rides
+
+Public rides on a map. Choose **Near Me** or **By State**, or use **Search Near a Place** to look around a trailhead, park or town. See [Find a Ride](/help/find-a-ride).
+
+### Map Mode
+
+Your offroad map, for riding solo: trails, recording, Track Line and offline maps. Pro riders can turn it into a group ride with **Make It a Group Ride**. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
+
+### Events
+
+Rallies, poker runs and ride weekends. See [Events](/help/events).
+
+### Social
+
+Your friends' posts and activity, your friends and your posts. Tap **Riding Groups** at the top for your groups. You need an account for this tab. See [Like, Comment and Post in Social](/help/social) and [Riding Groups](/help/riding-groups).
+:::
+
+:::until 3.0
 :::until 2.0
 Four tabs run along the bottom of the screen.
 
@@ -91,7 +121,12 @@ Your home screen.
 - **Create a Ride** shows how many rides you have left this month on Free, or **Unlimited** on Pro. **Find a Ride** shows how many public rides are near you.
 - **Map Mode**: **Open Map Mode**, **Map a Custom Trail** and the **Track Line** switch.
 - **Your Next Ride**, **Ride Invites** and **Past Rides**; **Your Group**; **Public Rides Near You**; your **Feed**; **Your Badges**; **Your Toolkit**; and **Help & Support**.
+:::until 3.0
 - **The bell** and your picture at the top right open your notifications and the **You** tab.
+:::
+:::release 3.0
+- **The bell** and your picture at the top right open your notifications and **You** (your picture at the top of Home).
+:::
 
 :::release 2.1
 - **Events**, the gold card right under **Create a Ride** and **Find a Ride**, with **Map Mode** under it. Join, Create, Find, Events and Map Mode all fit on the first screen.
@@ -139,6 +174,7 @@ Everything that isn't a ride:
 
 :::release 1.0.3
 Any sheet that slides up from the bottom of the screen, such as a new waypoint, a report or the Pro prompt, closes when you swipe it down. That works on iPhone, iPad, Android phones and tablets. On onmylead.com you can drag it down with the mouse, or click **Cancel** or **Close**.
+:::
 :::
 
 ## Permissions the App Asks For

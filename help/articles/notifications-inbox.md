@@ -22,7 +22,12 @@ Missed a notification, or swiped one away too soon? OnMyLead keeps the ones it s
 
 ## Open Your Notifications
 
+:::until 3.0
 Tap the bell at the top right of the **Rides** tab. A red number on the bell shows how many are new.
+:::
+:::release 3.0
+Tap the bell at the top right of the **Home** tab. A red number on the bell shows how many are new.
+:::
 
 Notifications are listed newest first under **Today**, **Yesterday** and **Earlier**. Each one has a colored icon, so a rider alert like **Need Help** stands out from chat and ride changes. New ones have a dot.
 

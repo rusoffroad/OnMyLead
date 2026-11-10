@@ -36,7 +36,12 @@ In Ride Mode you can also tap **Message** to send the group a short message of y
 
 ## Open Ride Chat
 
+:::until 3.0
 1. Open the ride from the **Rides** tab.
+:::
+:::release 3.0
+1. Open the ride from the **Home** tab.
+:::
 2. Tap **Chat** in the row of sections under the ride's name.
 
 Tap **Ride Chat** at the top of the card to hide or show the messages. Hidden, it shows the message count and the latest message. The chat shows the newest 30 messages. To see older ones, tap the button above them, such as **Show 12 Earlier**.

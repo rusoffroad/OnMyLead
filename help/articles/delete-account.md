@@ -23,7 +23,12 @@ If you pay for OnMyLead Pro, cancel it with Apple too. Apple bills the subscript
 
 ## Delete Your Account
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Scroll to the bottom and tap **Delete Account**.
 3. Read the message, then tap **Delete Account** to confirm.
 

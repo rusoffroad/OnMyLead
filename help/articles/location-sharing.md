@@ -88,7 +88,12 @@ Closing Ride Mode, or locking your phone, doesn't stop sharing. If the app was c
 
 ## Share with Chosen Riders or Family
 
+:::until 3.0
 1. Tap the **You** tab.
+:::
+:::release 3.0
+1. Tap **You** (your picture at the top of Home).
+:::
 2. Under **On the Trail**, tap **Share My Location**.
 3. Under **Who Can See You**, tap the riders you want. Only people you've been on a ride with are listed.
 4. To share with someone who doesn't have the app, turn on **Family Link**. See [Share a Family Link](/help/family-link).
@@ -108,7 +113,12 @@ While you share, **Share My Location** shows a card for each share with **Sharin
 
 **Until I Turn It Off** has no time limit. It keeps sharing, even for days, until you tap **Stop Sharing**. The app asks you to confirm before it starts.
 
+:::until 3.0
 While you share, **Share My Location** shows a card for each share with **Sharing Now** and when it ends: the time left, the end date (such as **until Sat, Nov 14, 6:00 PM**), or **until you turn it off**. On the **You** tab, the **Share My Location** row also says you're sharing and until when, so a long share is never forgotten.
+:::
+:::release 3.0
+While you share, **Share My Location** shows a card for each share with **Sharing Now** and when it ends: the time left, the end date (such as **until Sat, Nov 14, 6:00 PM**), or **until you turn it off**. On **You** (your picture at the top of Home), the **Share My Location** row also says you're sharing and until when, so a long share is never forgotten.
+:::
 
 - Tap **Add 1 Hour** to keep going longer. In the last 10 minutes, the button says **Ending Soon · Add 1 Hr**. A share set to **Until I Turn It Off** doesn't need it, so it isn't shown.
 - Tap **Stop Sharing** to end it now.
@@ -175,7 +185,12 @@ The exception is riders close by on the same ride: phones within Bluetooth range
 :::release 1.0.2
 ## Stopping a Long Share
 
+:::until 3.0
 A share set to **Until I Turn It Off** or a far-off end date keeps your phone's location on in the background, which uses more battery. To stop it, tap the **You** tab, tap **Share My Location**, and tap **Stop Sharing**. On Android you can also tap the **Sharing Your Location** notification to get there. [Battery Saver](/help/battery-saver) makes a long share easier on the battery.
+:::
+:::release 3.0
+A share set to **Until I Turn It Off** or a far-off end date keeps your phone's location on in the background, which uses more battery. To stop it, tap **You** (your picture at the top of Home), tap **Share My Location**, and tap **Stop Sharing**. On Android you can also tap the **Sharing Your Location** notification to get there. [Battery Saver](/help/battery-saver) makes a long share easier on the battery.
+:::
 :::
 
 Your exact location is never shown publicly. See [Privacy](/help/privacy).

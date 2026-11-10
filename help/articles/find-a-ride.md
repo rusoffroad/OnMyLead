@@ -22,17 +22,37 @@ screenshots:
     shows: app/src/app/(tabs)/find.tsx
 ---
 
+:::until 3.0
 Looking for people to ride with? The **Find** tab shows public rides near you or anywhere in a state. Private rides never show here. You need an invite link or code for those. See [Join a Ride](/help/join-a-ride).
+:::
+:::release 3.0
+Looking for people to ride with? The **Rides** tab shows public rides near you or anywhere in a state. Private rides never show here. You need an invite link or code for those. See [Join a Ride](/help/join-a-ride).
+:::
+
+:::release 3.0
+From 3.0 this tab is called **Rides**. It sits next to **Home** in the tab bar, and everything below works the same.
+:::
+
 
 ![Find a Ride, near you or by state](/help/img/find.webp)
 
 :::release 2.1
+:::until 3.0
 Looking for somewhere to ride instead of a group? Tap **Places to Ride** at the top of the **Find** tab to open Scout: off-road parks, OHV areas, trail systems and trailheads near you. See [Find Places to Ride With Scout](/help/scout).
+:::
+:::release 3.0
+Looking for somewhere to ride instead of a group? Tap **Places to Ride** at the top of the **Rides** tab to open Scout: off-road parks, OHV areas, trail systems and trailheads near you. See [Find Places to Ride With Scout](/help/scout).
+:::
 :::
 
 ## Find Rides Near You
 
+:::until 3.0
 1. Tap the **Find** tab (or **Find a Ride** on the **Rides** tab).
+:::
+:::release 3.0
+1. Tap the **Rides** tab (or **Find a Ride** on the **Home** tab).
+:::
 2. Make sure **Near Me** is selected at the top.
 3. Allow location if asked. If location is off, tap **Use My Location**, or pick your state instead.
 4. Under **How Far Will You Go?**, pick **25 Miles**, **50 Miles**, **100 Miles** or **250 Miles**.
@@ -49,14 +69,24 @@ Home also shows **Public Rides Near You** as cards you swipe sideways, nearest f
 
 Planning a trip somewhere else? Search a park, trailhead or town.
 
+:::until 3.0
 1. On the **Find** tab, tap **Search Near a Place**.
+:::
+:::release 3.0
+1. On the **Rides** tab, tap **Search Near a Place**.
+:::
 2. Type the place and pick it from the results.
 
 The list shows **Rides Near** that place. Tap **Back to Near Me** to go back to rides around you.
 
 ## Find Rides in a State
 
+:::until 3.0
 1. On the **Find** tab, tap **By State**.
+:::
+:::release 3.0
+1. On the **Rides** tab, tap **By State**.
+:::
 2. Pick a state.
 
 Rides in that state show soonest first. To switch states, tap the state's name in the corner of the map.
@@ -91,5 +121,10 @@ Looking for a rally or a ride weekend? Those are events. Tap **Event or Public R
 :::
 
 :::tip
+:::until 3.0
 The **Rides** tab also lists a few upcoming **Public Rides**. Tap **Find Rides on the Map** (or **See All on the Map**, which shows how many there are) to see them all.
+:::
+:::release 3.0
+The **Home** tab also lists a few upcoming **Public Rides**. Tap **Find Rides on the Map** (or **See All on the Map**, which shows how many there are) to see them all.
+:::
 :::

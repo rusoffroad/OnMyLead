@@ -28,10 +28,20 @@ You need an account to create rides, keep a Garage and save riding groups. You c
 
 ## Open the Sign-In Screen
 
+:::until 3.0
 1. On the **Rides** tab or the **You** tab, tap **Sign In or Create a Free Account**.
+:::
+:::release 3.0
+1. On the **Home** tab or **You** (your picture at the top of Home), tap **Sign In or Create a Free Account**.
+:::
 2. At the top, choose **Sign In** if you already have an account, or **Create Account** if you're new.
 
+:::until 3.0
 Tapping something that needs an account, like the **Groups** tab, also opens this screen.
+:::
+:::release 3.0
+Tapping something that needs an account, like **Riding Groups** (in **Social**), also opens this screen.
+:::
 
 ## Sign In With Apple, Google or Facebook
 
@@ -99,7 +109,12 @@ If you see **Your Email Is Confirmed** and a request to sign in again, the link 
 
 ## Sign Out
 
+:::until 3.0
 1. Go to the **You** tab.
+:::
+:::release 3.0
+1. Go to **You** (your picture at the top of Home).
+:::
 2. Scroll down and tap **Sign Out**.
 
 This signs you out on this device only. If you're also signed in on another device or the website, you stay signed in there, and any location you're sharing from that device keeps going.

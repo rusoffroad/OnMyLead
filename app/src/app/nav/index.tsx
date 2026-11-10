@@ -48,7 +48,7 @@ import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
-import { confirmAsync } from '@/lib/confirm';
+import { confirmAsync, showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
 import { useMapWaypoints } from '@/lib/map-waypoints';
 import {
@@ -66,6 +66,8 @@ import { setSyncedItem } from '@/lib/settings-sync';
 import { MusicButton, MusicSheet } from '@/components/music-controls';
 import { useMusicControls } from '@/hooks/use-music-controls';
 import { ProTag } from '@/components/pro-tag';
+import { MAP_BLUE } from '@/components/home/map-mode-card';
+import { groupRideDetail, groupRideHref } from '@/core/nav-solo';
 
 import { t as tr } from '@/lib/i18n';
 type Mode = 'explore' | 'record' | 'measure';
@@ -368,12 +370,9 @@ export default function NavMode() {
     if (!paused) camEvent('record');
   }
 
-  async function finishRecording() {
-    if (!rec) return;
-    if (rec.points.length < 2) {
-      if (await confirmAsync(tr('Nothing Recorded Yet'), tr('Ride a little further first. Discard this recording?'), tr('Discard'), tr('Keep Recording'))) discardNow();
-      return;
-    }
+  /** Save the recording as one of your trails (and stop recording). Null when nothing was recorded. */
+  async function saveRecording(): Promise<LocalTrail | null> {
+    if (!rec || rec.points.length < 2) return null;
     const nowIso = new Date().toISOString();
     const t: LocalTrail = {
       id: newTrailId(),
@@ -390,7 +389,37 @@ export default function NavMode() {
     setRecording(null);
     writeRecording(null);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.push(`/nav/trail/${t.id}?fresh=1`);
+    return t;
+  }
+
+  async function finishRecording() {
+    if (!rec) return;
+    if (rec.points.length < 2) {
+      if (await confirmAsync(tr('Nothing Recorded Yet'), tr('Ride a little further first. Discard this recording?'), tr('Discard'), tr('Keep Recording'))) discardNow();
+      return;
+    }
+    const t = await saveRecording();
+    if (t) router.push(`/nav/trail/${t.id}?fresh=1`);
+  }
+
+  // --- Make It a Group Ride (Pro, 3.0) -----------------------------------------------
+  // Map Mode is solo. One tap turns it into a group ride: the trail you're recording (saved first)
+  // or following becomes the route, and where you are now is the meeting point.
+  const followingOwn = followed && !followed.publicTrail && params.trail ? params.trail : null;
+  async function makeGroupRide() {
+    if (!requirePro('trail_rides')) return;
+    let trailId = followingOwn;
+    if (rec && rec.points.length >= 2) {
+      const ok = await confirmAsync(
+        tr('Finish Recording?'),
+        tr('Your recording is saved to My Trails and becomes the group ride’s route.'),
+        tr('Finish and Plan'),
+        tr('Keep Recording'),
+      );
+      if (!ok) return;
+      trailId = (await saveRecording())?.id ?? trailId;
+    }
+    router.push(groupRideHref({ trailId, at: me, spot: followed?.name ?? tr('Meet Point') }) as never);
   }
 
   function discardNow() {
@@ -586,7 +615,7 @@ export default function NavMode() {
 
   // Map Settings (top left) and the compass (top right) sit level, just under the top bar, or at
   // the top in Full Map (core/map-corner). On a wide tablet the bar is the panel column, so they're at the top.
-  const cornerTop = full ? insets.top + 12 : wide ? insets.top + 20 : insets.top + 66;
+  const cornerTop = full ? insets.top + 12 : wide ? insets.top + 20 : insets.top + 108; // under the top bar and the Solo tag
   const compassSpot = { top: cornerTop };
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -679,6 +708,18 @@ export default function NavMode() {
             </Pressable>
           </View>
         )}
+        {searching === false ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={tr('Solo. Only you see this map. Tap to learn more')}
+            onPress={() => showNotice(tr('Riding Solo'), tr('Map Mode is just you: nobody sees where you are. To ride with others, tap Make It a Group Ride and invite them with a code.'))}
+            style={({ pressed }) => [styles.solo, pressed && { opacity: 0.85 }]}>
+            <Icon name="person" size={15} color={Colors.text} strokeWidth={2.2} />
+            <Text style={styles.soloText}>{tr('Solo. Only you see this')}</Text>
+            {rec && !rec.paused ? <View style={[styles.recDot, { marginLeft: 4 }]} /> : null}
+            {rec && !rec.paused ? <Text style={styles.soloText}>{tr('Recording')}</Text> : null}
+          </Pressable>
+        ) : null}
         {hidden && searching === false ? (
           <View style={styles.notice} accessibilityRole="alert">
             <View style={{ flex: 1, gap: 2 }}>
@@ -786,6 +827,9 @@ export default function NavMode() {
               onMark={() => (marking || requirePro('trail_spots')) && setMarking(!marking)}
             />
           )}
+          {open && mode !== 'measure' ? (
+            <GroupRideCard detail={tr(groupRideDetail({ recording: !!rec && rec.points.length >= 2, following: followed?.name ?? null }))} onPress={makeGroupRide} />
+          ) : null}
         </SafeAreaView>
       </Animated.View>
       )}
@@ -820,6 +864,26 @@ export default function NavMode() {
         onClose={() => setWpTarget(null)}
       />
     </View>
+  );
+}
+
+/** Make It a Group Ride: the blue card at the bottom of Map Mode's panel (Pro; Free riders see the Pro tag). */
+function GroupRideCard({ detail, onPress }: { detail: string; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${tr('Make It a Group Ride')}. ${detail}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.groupRide, pressed && { opacity: 0.9 }]}>
+      <View style={styles.groupRideIcon}>
+        <Icon name="people" size={20} color="#fff" strokeWidth={2.2} />
+      </View>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={styles.groupRideTitle} numberOfLines={1}>{tr('Make It a Group Ride')}</Text>
+        <Text style={styles.groupRideText} numberOfLines={2}>{detail}</Text>
+      </View>
+      <ProTag feature="trail_rides" />
+    </Pressable>
   );
 }
 
@@ -1163,6 +1227,16 @@ const styles = themedStyles(() => ({
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: Radius.pill, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   chipText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
+  // "Solo. Only you see this": Map Mode is just you (3.0).
+  solo: { flexDirection: 'row', alignItems: 'center', gap: 7, alignSelf: 'flex-start', height: 34, paddingHorizontal: 12, borderRadius: Radius.pill, ...GlassSurface },
+  soloText: { color: Colors.text, fontFamily: font(600), fontSize: 13.5 },
+  groupRide: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 16, padding: 12, backgroundColor: MAP_BLUE,
+    boxShadow: 'inset 0px 1px 0px rgba(255, 255, 255, 0.2)',
+  },
+  groupRideIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.16)' },
+  groupRideTitle: { color: '#fff', fontFamily: font(700), fontSize: 16 },
+  groupRideText: { color: 'rgba(255,255,255,0.85)', fontFamily: font(500), fontSize: 12.5, lineHeight: 16 },
   notice: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: Radius.card, ...glass, borderColor: RIDER_TRAIL_INK },
   noticeTitle: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   noticeText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },

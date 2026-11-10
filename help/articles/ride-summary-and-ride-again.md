@@ -24,7 +24,12 @@ When the organizer ends a ride, everyone who was on it gets a summary on the rid
 
 ## See Your Ride Summary
 
+:::until 3.0
 1. On the **Rides** tab, find the ride under **Past Rides**.
+:::
+:::release 3.0
+1. On the **Home** tab, find the ride under **Past Rides**.
+:::
 2. Tap it. The summary is at the top of the ride page.
 
 The summary has three parts.
@@ -80,6 +85,11 @@ Advanced Ride Statistics, Premium Ride Cards and full ride history work with Pro
 
 ## Past Rides
 
+:::until 3.0
 Ended and cancelled rides move to **Past Rides** on the **Rides** tab. Free shows your last 5. Full ride history is a Pro feature. Nothing is deleted, so older rides show again with Pro. See [Free and Pro](/help/free-vs-pro).
+:::
+:::release 3.0
+Ended and cancelled rides move to **Past Rides** on the **Home** tab. Free shows your last 5. Full ride history is a Pro feature. Nothing is deleted, so older rides show again with Pro. See [Free and Pro](/help/free-vs-pro).
+:::
 
 To remove a ride from your Past Rides, swipe left on it and tap **Leave** (or **Delete** if you organized it). On onmylead.com, click the button at the end of the ride's row instead.

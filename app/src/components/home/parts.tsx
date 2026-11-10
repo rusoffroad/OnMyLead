@@ -24,7 +24,15 @@ export const Home = {
  * keeps the height it had at first layout, so when a card grew afterwards (a quota pill arriving,
  * text wrapping) the fill stopped short of the bottom (2.0 build 8 home screen).
  */
-export function Gradient({ colors, angle = 'down', radius = 0 }: { colors: string[]; angle?: 'down' | 'diagonal'; radius?: number }) {
+export function Gradient({
+  colors, angle = 'down', radius = 0, overlay = false,
+}: {
+  colors: string[];
+  angle?: 'down' | 'diagonal' | 'across';
+  radius?: number;
+  /** Laid over a picture: no solid fill behind it while it measures, so the picture shows through. */
+  overlay?: boolean;
+}) {
   const id = `g${colors.join('').replace(/[^a-zA-Z0-9]/g, '')}${angle}`;
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   return (
@@ -34,11 +42,11 @@ export function Gradient({ colors, angle = 'down', radius = 0 }: { colors: strin
         const { width: w, height: h } = e.nativeEvent.layout;
         setSize((old) => (old && old.w === w && old.h === h ? old : { w, h }));
       }}
-      style={[StyleSheet.absoluteFill, { borderRadius: radius, overflow: 'hidden', backgroundColor: colors[colors.length - 1] }]}>
+      style={[StyleSheet.absoluteFill, { borderRadius: radius, overflow: 'hidden', backgroundColor: overlay ? 'transparent' : colors[colors.length - 1] }]}>
       {size ? (
         <Svg width={size.w} height={size.h} viewBox={`0 0 ${size.w} ${size.h}`}>
           <Defs>
-            <LinearGradient id={id} x1="0" y1="0" x2={angle === 'diagonal' ? '1' : '0'} y2="1">
+            <LinearGradient id={id} x1="0" y1="0" x2={angle === 'down' ? '0' : '1'} y2={angle === 'across' ? '0' : '1'}>
               {colors.map((c, i) => (
                 <Stop key={i} offset={colors.length === 1 ? 0 : i / (colors.length - 1)} stopColor={c} />
               ))}

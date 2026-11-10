@@ -235,7 +235,12 @@ Pro Annual is half price for the first year when you invite a new rider who fini
 :::
 
 
+:::until 3.0
 On the **You** tab, under **Settings**, tap **Subscription**. **Your Plan** shows Free, Pro Trial or Pro. On Free it also shows how many rides you've created this month.
+:::
+:::release 3.0
+On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**. **Your Plan** shows Free, Pro Trial or Pro. On Free it also shows how many rides you've created this month.
+:::
 
 Your plan is saved on your phone, so the app knows it even with no signal.
 

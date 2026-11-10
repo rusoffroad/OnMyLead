@@ -37,14 +37,24 @@ If you aren't signed in, the button says **Sign In to Join**. See [Sign In](/hel
 ## Join With a Code
 
 :::until 2.0
+:::until 3.0
 1. On the **Rides** tab, tap **Join a Ride**.
+:::
+:::release 3.0
+1. On the **Home** tab, tap **Join a Ride**.
+:::
 2. Type the invite code, for example 7F3A9C21.
 3. Tap **Open**.
 4. On the ride page, tap **Join Ride**.
 :::
 
 :::release 2.0
+:::until 3.0
 1. On the **Rides** tab, type the invite code in the **Join a Ride** card at the top, for example 7F3A9C21.
+:::
+:::release 3.0
+1. On the **Home** tab, type the invite code in the **Join a Ride** card at the top, for example 7F3A9C21.
+:::
 2. Tap **Join**.
 3. On the ride page, tap **Join Ride**.
 :::
@@ -59,11 +69,21 @@ Point your phone's camera at the ride's QR code and tap the link that appears. S
 
 ## Join From Find
 
+:::until 3.0
 Public rides are listed on the **Find** tab. Open one and tap **Join Ride**. See [Find a Ride](/help/find-a-ride).
+:::
+:::release 3.0
+Public rides are listed on the **Rides** tab. Open one and tap **Join Ride**. See [Find a Ride](/help/find-a-ride).
+:::
 
 ## Join From a Group Invite
 
+:::until 3.0
 When someone invites your riding group, you get a notification and the ride shows under **Ride Invites** on the **Rides** tab.
+:::
+:::release 3.0
+When someone invites your riding group, you get a notification and the ride shows under **Ride Invites** on the **Home** tab.
+:::
 
 1. Tap the ride.
 2. In the **You're Invited** card, tap **Join Ride**, or **No Thanks** to turn it down.
@@ -86,7 +106,12 @@ Before you join either kind, the ride page shows the name, time, general area an
 
 ## After You Join
 
+:::until 3.0
 The ride shows under **Your Rides** on the **Rides** tab. On the ride page you'll find **Details**, **Map**, **Riders** and **Chat** sections. When you get to the meeting spot, tap **I'm Here and Ready** to check in. See [Check In](/help/check-in).
+:::
+:::release 3.0
+The ride shows under **Your Rides** on the **Home** tab. On the ride page you'll find **Details**, **Map**, **Riders** and **Chat** sections. When you get to the meeting spot, tap **I'm Here and Ready** to check in. See [Check In](/help/check-in).
+:::
 
 When the organizer starts the ride, tap **Enter Ride Mode**. See [Ride Mode](/help/ride-mode).
 
@@ -103,14 +128,24 @@ If the ride is full, you go on the waitlist. If the organizer approves riders, y
 1. Open the ride page. **Leave Ride** is the red-outlined button at the bottom, whichever section you're on (on a tablet, it's at the bottom of the left column).
 2. Tap **Leave Ride**. A box tells you what happens; tap **Leave Ride** again to confirm, or **Stay**.
 
+:::until 3.0
 In Ride Mode, tap **Together** (or **Separated**) at the top to open **Riders**, and **Leave Ride** is under the list. On a tablet it's at the bottom of the **Riders** sidebar. You go back to the **Rides** tab when you've left.
+:::
+:::release 3.0
+In Ride Mode, tap **Together** (or **Separated**) at the top to open **Riders**, and **Leave Ride** is under the list. On a tablet it's at the bottom of the **Riders** sidebar. You go back to the **Home** tab when you've left.
+:::
 
 Leaving always stops your phone sharing your location for that ride, whether or not the ride has started.
 
 Organized the ride? See [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
 :::
 
+:::until 3.0
 Or, on the **Rides** tab, swipe left on the ride and tap **Leave** (on onmylead.com, click **Leave** at the end of the ride's row). Your spot opens up for someone else. You can rejoin with the ride's link or code if there's room. If the ride is live, leaving also stops sharing your location with the group.
+:::
+:::release 3.0
+Or, on the **Home** tab, swipe left on the ride and tap **Leave** (on onmylead.com, click **Leave** at the end of the ride's row). Your spot opens up for someone else. You can rejoin with the ride's link or code if there's room. If the ride is live, leaving also stops sharing your location with the group.
+:::
 
 :::note
 You can't join a ride that has ended or been cancelled.

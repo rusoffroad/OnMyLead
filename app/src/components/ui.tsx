@@ -3,7 +3,7 @@ import { ReactNode, useContext, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View, type PressableProps, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { font, MaxContentWidth, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
+import { font, MaxContentWidth, Radius, scrollIndicator, Spacing, themedStyles, TileSurface } from '@/constants/theme';
 import { READABLE_WIDTH } from '@/core/layout';
 import { useTheme } from '@/hooks/use-theme';
 import type { FeatureKey } from '@/core/entitlements';
@@ -19,14 +19,21 @@ import { t, tx } from '@/lib/i18n';
  * columns).
  */
 export function Screen({
-  children, scroll = true, top, width = 'page',
-}: { children: ReactNode; scroll?: boolean; top?: boolean; width?: 'page' | 'readable' | 'wide' }) {
+  children, scroll = true, top, width = 'page', hero,
+}: {
+  children: ReactNode;
+  scroll?: boolean;
+  top?: boolean;
+  width?: 'page' | 'readable' | 'wide';
+  /** Full-bleed art at the very top (Home's map header): drawn edge to edge, behind the status bar, and scrolls with the page. */
+  hero?: ReactNode;
+}) {
   const theme = useTheme();
   const inner = <View style={[styles.content, { maxWidth: SCREEN_WIDTHS[width] }]}>{children}</View>;
   // On a tab, the bottom tab bar already sits over the home indicator, so the page doesn't pad for
   // it twice. The tablet rail sits at the side (no height), so there the page pads for itself.
   const inTabs = !!useContext(BottomTabBarHeightContext);
-  const edges = [...(top ? (['top'] as const) : []), ...(inTabs ? [] : (['bottom'] as const))];
+  const edges = [...(top && !hero ? (['top'] as const) : []), ...(inTabs ? [] : (['bottom'] as const))];
   return (
     <SafeAreaView edges={edges} style={{ flex: 1, backgroundColor: theme.background }}>
       {scroll ? (
@@ -35,10 +42,14 @@ export function Screen({
           automaticallyAdjustKeyboardInsets
           {...keyboardScroll}
           indicatorStyle={scrollIndicator()} contentContainerStyle={{ paddingBottom: Spacing.five }}>
+          {hero}
           {inner}
         </ScrollView>
       ) : (
-        inner
+        <>
+          {hero}
+          {inner}
+        </>
       )}
     </SafeAreaView>
   );
@@ -152,8 +163,7 @@ export function PasswordField(props: Omit<TextInputProps, 'secureTextEntry'> & {
 }
 
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
-  const theme = useTheme();
-  return <View style={[styles.card, { backgroundColor: theme.backgroundElement }, style]}>{children}</View>;
+  return <View style={[styles.card, TileSurface, style]}>{children}</View>;
 }
 
 /** A heading for a block of a screen, with an optional count or action on the right. */

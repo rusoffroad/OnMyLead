@@ -6,6 +6,7 @@ order: 27
 release: "2.0"
 updated: 2026-11-10
 sources:
+  - app/src/app/(tabs)/social-tab.tsx
   - app/src/app/social/index.tsx
   - app/src/app/social/item.tsx
   - app/src/app/social/new.tsx
@@ -27,8 +28,17 @@ keywords: [social, timeline, feed, like, likes, heart, comment, comments, reply,
 
 ## Open Social
 
+:::until 3.0
 - On the **Rides** tab, tap **Open Social** next to **Feed**, or tap any post in the feed.
+:::
+:::release 3.0
+- On the **Home** tab, tap **Open Social** next to **Feed**, or tap any post in the feed.
+:::
 - Or tap **Friends & Social** in your toolkit.
+
+:::release 3.0
+From 3.0, **Social** has its own tab at the bottom of the screen. **Riding Groups** is at the top of Social.
+:::
 
 On a phone, Social has three tabs: **Activity** (everyone's posts), **Friends** and **My Posts**. On an iPad, an Android tablet or a big window, your friends sit on the left and the posts on the right, so you can switch without losing your place.
 

@@ -35,7 +35,12 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 
 ## Create Your Ride
 
+:::until 3.0
 1. On the **Rides** tab, tap **Create a Ride**.
+:::
+:::release 3.0
+1. On the **Home** tab, tap **Create a Ride**.
+:::
 2. Under **What Kind of Ride?**, tap **Public** (open to anyone, found by riders near you or in your state) or **Private** (only friends you invite by link, text or email).
 3. Type a **Ride Name**.
 4. Under **When**, pick the day (see [Pick the Day](#pick-the-day) below).

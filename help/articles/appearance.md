@@ -4,7 +4,7 @@ summary: Switch between Dark, Light and Match Phone, pick one of four themes, an
 category: account
 order: 75
 release: "2.0"
-updated: 2026-11-04
+updated: 2026-11-10
 sources:
   - app/src/app/appearance.tsx
   - app/src/core/appearance.ts

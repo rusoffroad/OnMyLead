@@ -25,7 +25,12 @@ OnMyLead Pro is billed by Apple, so you change or cancel it in your Apple Accoun
 
 ## Cancel or Change Your Plan in the App
 
+:::until 3.0
 1. On the **You** tab, under **Settings**, tap **Subscription**.
+:::
+:::release 3.0
+1. On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**.
+:::
 2. Tap **Manage Subscription**.
 3. Apple's subscription screen opens. Choose a different plan, or cancel your subscription.
 

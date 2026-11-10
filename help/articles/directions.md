@@ -29,7 +29,12 @@ Directions are a Pro feature. See [Free and Pro](/help/free-vs-pro). On a Free a
 
 ## Get Directions to the Meeting Point
 
+:::until 3.0
 1. Open the ride from the **Rides** tab.
+:::
+:::release 3.0
+1. Open the ride from the **Home** tab.
+:::
 2. On the **Details** section, find the **Directions** card.
 3. Tap a row:
    - **Meeting Point:** the exact meeting spot.
@@ -62,7 +67,12 @@ Directions along the route pass through up to 8 stops picked from the route, and
 
 ## Choose Your Maps App
 
+:::until 3.0
 1. Tap the **You** tab.
+:::
+:::release 3.0
+1. Tap **You** (your picture at the top of Home).
+:::
 2. Under **Settings**, tap **Directions**.
 3. Pick **Ask Each Time**, **Apple Maps** or **Google Maps**.
 4. Tap **Done**.

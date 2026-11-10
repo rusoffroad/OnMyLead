@@ -32,13 +32,23 @@ You can't follow yourself, so your own name doesn't get a Follow button.
 ## What You Get
 
 - A notification when a leader you follow posts a new public ride. Private and unlisted rides are never announced to followers.
+:::until 3.0
 - On the **Groups** tab, under **Leaders You Follow**, a list of the leaders you follow, and under **Their Upcoming Rides**, their upcoming public rides.
+:::
+:::release 3.0
+- On **Riding Groups** (in **Social**), under **Leaders You Follow**, a list of the leaders you follow, and under **Their Upcoming Rides**, their upcoming public rides.
+:::
 
 To turn these notifications off, switch off **Leaders You Follow** in [Notification Settings](/help/notification-settings).
 
 ## Unfollow a Leader
 
+:::until 3.0
 1. Tap the **Groups** tab.
+:::
+:::release 3.0
+1. Tap **Riding Groups** (in **Social**).
+:::
 2. Under **Leaders You Follow**, tap **Unfollow** next to the leader.
 
 ## Who Sees a Follow

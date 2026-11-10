@@ -1,12 +1,28 @@
 [
   {
     "version": "3.0",
-    "title": "Invite Your Group to an Event, Smoother Intersection Zoom, CarPlay in Map Mode and Show Password",
-    "intro": "OnMyLead 3.0 lets event hosts invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. CarPlay now works on solo rides too: open Map Mode and the car screen shows your speed, elevation, heading, trip and the trail you're following. Every photo you add, from your profile picture to event and trail photos, now opens on a crop screen so you can frame it first. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
-    "whatsNew": "What's new in 3.0:\n\n• Invite your riding group to an event with Invite All.\n• Crop every photo before it uploads.\n• Smoother Zoom In at Intersections: the map stays zoomed in when another junction is close.\n• Show Password: tap the eye in any password box.\n• CarPlay works in Map Mode, not just Ride Mode (Pro).\n• Ad Measurement: you choose if our ads can learn they brought you here.\n• Fixed: crashes when opening OnMyLead with CarPlay connected and in 3D Terrain on Android.",
+    "title": "A New Look, Map Mode Up Front, Invite Your Group to an Event and Show Password",
+    "intro": "OnMyLead 3.0 is a new look. Home opens on a satellite map of your area with Map Mode first, because OnMyLead is now your offroad map whether you ride solo or with a group. Join a Ride, Start a Ride and Events sit right under it, and you choose and order the rest. Map Mode tells you when you're riding solo, and Pro riders can turn that ride into a group ride in two taps. Event hosts can now invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. CarPlay now works on solo rides too: open Map Mode and the car screen shows your speed, elevation, heading, trip and the trail you're following. Every photo you add, from your profile picture to event and trail photos, now opens on a crop screen so you can frame it first. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
+    "whatsNew": "What's new in 3.0:\n\n• A new look: Map Mode up front, five tabs and a Home you can customize.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: crashes with CarPlay connected and in 3D Terrain on Android.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "A new look: Home opens on a satellite map of your area. Map Mode comes first, then the red Join a Ride card with the code box, then Start a Ride and Events. Under them: Out Riding Now, Up Next (your invites, next ride and next event), Your Group and your Feed. Headings are in Title Case and every card has a clear edge."
+      },
+      {
+        "kind": "new",
+        "text": "Customize Home: tap Customize Home at the bottom of Home to turn sections on or off and move them up or down, including Public Rides Near You, Your Badges, Your Toolkit and Past Rides. Your layout follows your account to every phone, tablet and the website."
+      },
+      {
+        "kind": "new",
+        "text": "Five tabs: Home, Rides, a raised blue Map Mode key in the middle, Events and Social. Riding Groups are inside Social, and You opens from your picture at the top of Home. On a tablet the tabs sit in a rail down the left with You at the bottom."
+      },
+      {
+        "kind": "new",
+        "text": "Riding solo in Map Mode: a Solo tag at the top says nobody else sees where you are. Pro riders tap Make It a Group Ride to turn the trail they're following or recording into a group ride, with where they are as the meeting point, then invite riders with a code."
+      },
       {
         "kind": "new",
         "text": "Invite a Group on events: an event's hosts and co-hosts tap Invite All next to a riding group on the event page. Everyone in the group gets a notification that opens the event, where they can tap Going or Interested. Riders who already answered or were already invited aren't notified again."

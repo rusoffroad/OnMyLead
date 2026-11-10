@@ -25,7 +25,12 @@ Being friends never shares where you are. In Out Riding, friends see your ride n
 
 ## Open Friends
 
+:::until 3.0
 Go to the **Groups** tab and tap **Friends** near the top. The row shows how many friends you have, how many are out riding, and any friend requests waiting for you.
+:::
+:::release 3.0
+Go to **Riding Groups** (in **Social**) and tap **Friends** near the top. The row shows how many friends you have, how many are out riding, and any friend requests waiting for you.
+:::
 
 :::release 2.0
 Tap a friend's picture to see it full size, or their name in **Social** to see their profile, rides, badges and posts. See [Like, Comment and Post in Social](/help/social).

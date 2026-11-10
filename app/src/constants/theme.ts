@@ -102,6 +102,23 @@ export const Glass: Palette['glass'] = { ...palette.glass };
 /** Text on the dark name tags drawn on the map itself (rider names, waypoints): the map is the same in every theme. */
 export const MapLabelText = '#F1F4F8';
 
+/**
+ * A tile or card on a page (3.0): the theme's card colour, a clearly visible edge and a soft
+ * shadow, so every tile stands off the background (Chris, 2026-11-10). Spread it into a style:
+ * `{ ...TileSurface, borderRadius: Radius.card }`. Refilled when the theme changes.
+ */
+export const TileSurface = tileSurface();
+
+function tileSurface() {
+  const dark = palette.scheme === 'dark';
+  return {
+    backgroundColor: palette.colors.backgroundElement,
+    borderWidth: 1.5,
+    borderColor: palette.colors.tileEdge,
+    boxShadow: dark ? '0px 10px 24px -14px rgba(0, 0, 0, 0.7)' : '0px 6px 16px -10px rgba(10, 22, 38, 0.25)',
+  };
+}
+
 /** The surface of a floating glass control. */
 export const GlassSurface = { backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge };
 
@@ -141,6 +158,7 @@ export function applyAppearance(next: Appearance, system: string | null | undefi
   });
   Object.assign(Glass, p.glass);
   Object.assign(GlassSurface, { backgroundColor: Glass.panel, borderColor: Glass.edge });
+  Object.assign(TileSurface, tileSurface());
   Object.assign(RideColors, p.ride);
   applyMapInk(p.map, p.scheme);
   version += 1;

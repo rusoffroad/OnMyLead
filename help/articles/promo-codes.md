@@ -19,7 +19,12 @@ OnMyLead promo codes are Apple offer codes for OnMyLead Pro. You redeem them thr
 
 ## Redeem a Code in the App
 
+:::until 3.0
 1. On the **You** tab, under **Settings**, tap **Subscription**.
+:::
+:::release 3.0
+1. On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**.
+:::
 2. Tap **Redeem Promo Code**.
 3. Enter your code in Apple's window and follow the steps to confirm.
 
@@ -35,7 +40,12 @@ A 50% off code you earned by inviting a friend opens from **Invite Friends** wit
 
 On Android, OnMyLead promo codes are Google Play promo codes.
 
+:::until 3.0
 1. On the **You** tab, under **Settings**, tap **Subscription**.
+:::
+:::release 3.0
+1. On **You** (your picture at the top of Home), under **Settings**, tap **Subscription**.
+:::
 2. Tap **Redeem Promo Code**. Google Play's **Redeem Code** page opens.
 3. Enter your code and follow the steps to confirm.
 4. Come back to OnMyLead. Once Google Play has the code, your plan changes to **Pro**.

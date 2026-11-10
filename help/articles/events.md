@@ -6,6 +6,7 @@ order: 60
 release: "2.0"
 updated: 2026-11-10
 sources:
+  - app/src/app/(tabs)/events-tab.tsx
   - app/src/components/meet-point-mapbox-map.tsx
   - app/src/components/meet-point-map.tsx
   - supabase/migrations/20261104130000_event_presenter.sql
@@ -41,7 +42,17 @@ In the app, **Event or Public Ride?** on Events, Find a Ride, Create a Ride and 
 
 ## Find an Event
 
+:::until 3.0
 1. On the **Rides** tab, tap the gold **Events** card (under Create a Ride, Find a Ride and Map Mode).
+:::
+:::release 3.0
+1. On the **Home** tab, tap the gold **Events** card (under Create a Ride, Find a Ride and Map Mode).
+:::
+
+:::release 3.0
+From 3.0, tap **Events** in the tab bar, or the **Events** tile on Home next to **Start a Ride**.
+:::
+
 2. **Coming Up** lists public events, soonest first. With location allowed, it shows the ones within your distance (the same distance as Public Rides Near You); tap the distance chip to change it.
 3. Tap an event to open it.
 

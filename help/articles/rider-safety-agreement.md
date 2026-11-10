@@ -57,7 +57,12 @@ The **Terms of Use** and **Privacy Policy** links on the screen open those pages
 
 ## Read It Again
 
+:::until 3.0
 - In the app: on the **You** tab, tap **Safety Agreement** at the bottom.
+:::
+:::release 3.0
+- In the app: on **You** (your picture at the top of Home), tap **Safety Agreement** at the bottom.
+:::
 - On the website: **Rider Safety Agreement** at the bottom of the onmylead.com homepage, or go to onmylead.com/rider-agreement.
 
 ## What Gets Saved

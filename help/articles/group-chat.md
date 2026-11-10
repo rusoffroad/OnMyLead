@@ -30,7 +30,12 @@ Group chat is free for everyone in the group. Only the riders in the group can r
 
 ## Open the Chat
 
+:::until 3.0
 1. Tap the **Groups** tab.
+:::
+:::release 3.0
+1. Tap **Riding Groups** (in **Social**).
+:::
 2. Tap the newest message under a group, or open the group and tap **Group Chat**.
 
 Groups with messages you haven't read show a red count.

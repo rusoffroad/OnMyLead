@@ -86,12 +86,22 @@ From 2.1 the stacked-layers button is the round **Map Settings** button, with a 
   A switch is on while any of its lines shows. Tapping it turns them all off, or all on.
 - **Every Map Feature**: tap **Fine-Tune** to open the full list below, one row per kind of line or land.
 - **Leader Trackline**: for the leader and organizers in Ride Mode.
+:::until 3.0
 - **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Red, White and Blue** (a glossy navy dome with a white arrow inside a red band and a white rim, the default; a white star when your phone can't tell which way you're facing), **Safety Orange** (an orange 3D dome with a white arrow and a silver rim), **Hi-Viz Dome** (lime with a black arrow), **Reflective Ring**, **Floating Arrowhead** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on the **You** tab. Picking a style or size other than Red, White and Blue at Medium is part of OnMyLead Pro; on Free the picker shows the **Pro** tag and your dot stays the default.
+:::
+:::release 3.0
+- **Your Dot** (Ride Mode and Map Mode): **Dot Style** picks how your own dot looks: **Red, White and Blue** (a glossy navy dome with a white arrow inside a red band and a white rim, the default; a white star when your phone can't tell which way you're facing), **Safety Orange** (an orange 3D dome with a white arrow and a silver rim), **Hi-Viz Dome** (lime with a black arrow), **Reflective Ring**, **Floating Arrowhead** or **Classic** (the cyan dot). **Dot Size** sets how big it is: **Small**, **Medium** or **Large**. Both are also on **You** (your picture at the top of Home). Picking a style or size other than Red, White and Blue at Medium is part of OnMyLead Pro; on Free the picker shows the **Pro** tag and your dot stays the default.
+:::
 - **Following** (Ride Mode and Map Mode): **Follow Me** keeps your dot on screen; **Zoom Out at the Edge** zooms out one step the first time your dot nears an edge, then the next time the map centers on you and moves with you; **Zoom In at Intersections** (on the Mapbox map) closes in on a junction so you can see which way to go. See [Follow Me](/help/follow-me).
 - **Map Buttons** (Ride Mode and Map Mode): **Tilt Meter** (iPhone, iPad and Android) and **Music Button** (where music controls are available).
 - **Download This Ride's Map** (Ride Mode), **Offline Maps**, and who the map data comes from.
 
+:::until 3.0
 The Your Dot, Following and Map Buttons settings are the same ones as on the **You** tab, so a change shows everywhere.
+:::
+:::release 3.0
+The Your Dot, Following and Map Buttons settings are the same ones as on **You** (your picture at the top of Home), so a change shows everywhere.
+:::
 
 The round **3D** button from earlier 2.1 test builds is gone: pick **3D Terrain** under **Map Style** instead.
 
@@ -220,7 +230,12 @@ Trail lines show from pretty far out. Forest Service and BLM lines appear when t
 
 Trails other riders mapped and shared in [Navigate](/help/navigation-mode) are drawn as **mint dotted lines**, so you can tell them apart from agency and OpenStreetMap trails. They show once you zoom in to about a county's width, when you're signed in. Tap one to see its card: it says **User Submitted Trail**, who mapped it, its difficulty, its **Quality** and **Line Accuracy** stars, and has **Rate Trail**, **Navigate** and **Details**.
 
+:::until 3.0
 Turn **Rider Trails** off in the panel (in **Map Features** from 2.1) to hide them. The same choice is on the **You** tab as **Rider Trails on Maps**. They're on unless you turn them off.
+:::
+:::release 3.0
+Turn **Rider Trails** off in the panel (in **Map Features** from 2.1) to hide them. The same choice is on **You** (your picture at the top of Home) as **Rider Trails on Maps**. They're on unless you turn them off.
+:::
 :::
 
 :::release 2.1
