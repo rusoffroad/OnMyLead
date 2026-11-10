@@ -68,10 +68,13 @@ export function QuickTile({
   );
 }
 
-/** Regroup Here (white, for leaders) and Emergency (red outline) side by side. */
+/**
+ * Regroup Here (white, for leaders), then EMERGENCY as a full-width solid red bar (3.0), always in
+ * the same spot under the status taps. Tapping it opens the emergency alert, where you hold to send.
+ */
 export function PanelActions({ onRegroup, onEmergency }: { onRegroup?: () => void; onEmergency: () => void }) {
   return (
-    <View style={styles.actions}>
+    <View style={{ gap: 8 }}>
       {onRegroup ? (
         <Pressable
           onPress={() => {
@@ -94,7 +97,8 @@ export function PanelActions({ onRegroup, onEmergency }: { onRegroup?: () => voi
         accessibilityLabel={t('Send status EMERGENCY')}
         accessibilityHint={t('Opens the emergency alert. You hold a button there to send it')}
         style={({ pressed }) => [styles.big, styles.sos, pressed && styles.pressed]}>
-        <Text style={[styles.bigText, { color: Glass.softRed }]}>{t('EMERGENCY')}</Text>
+        <Icon name="warning" size={20} color="#fff" strokeWidth={2.4} />
+        <Text style={[styles.bigText, styles.sosText]}>{t('EMERGENCY')}</Text>
       </Pressable>
     </View>
   );
@@ -185,20 +189,47 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-/** The panel's quick row: three replies and More. */
-export function QuickRow({ lastReply, onReply, onMore }: { lastReply: string | null; onReply: (q: QuickReply) => void; onMore: () => void }) {
+/** Trouble taps kept on the panel next to the replies (3.0), so the common calls are one tap. */
+export const PANEL_TROUBLE: RiderStatusKind[] = ['mechanical', 'need_help'];
+
+/**
+ * The panel's status taps, big enough for gloves: three quick replies on top, then Mechanical
+ * Issue, Need Help and More (every other status and reply) when `trouble` is given.
+ */
+export function QuickRow({
+  lastReply, onReply, onMore, trouble,
+}: {
+  lastReply: string | null;
+  onReply: (q: QuickReply) => void;
+  onMore: () => void;
+  trouble?: { labels: Record<RiderStatusKind, string>; myStatus?: RiderStatusKind; onStatus: (k: RiderStatusKind) => void };
+}) {
+  const more = <QuickTile icon="more" label={t('More')} onPress={onMore} a11y={t('More statuses')} style={styles.quarter} />;
   return (
-    <View style={styles.row}>
-      {PANEL_REPLIES.map((q) => (
-        <QuickTile key={q} icon={REPLY_ICON[q]} label={t(q)} on={lastReply === q} onPress={() => onReply(q)} a11y={t('Send to the group: {q}', { q: t(q) })} style={styles.quarter} />
-      ))}
-      <QuickTile
-        icon="more"
-        label={t('More')}
-        onPress={onMore}
-        a11y={t('More statuses')}
-        style={styles.quarter}
-      />
+    <View style={{ gap: 8 }}>
+      <View style={styles.row}>
+        {PANEL_REPLIES.map((q) => (
+          <QuickTile key={q} icon={REPLY_ICON[q]} label={t(q)} on={lastReply === q} onPress={() => onReply(q)} a11y={t('Send to the group: {q}', { q: t(q) })} style={styles.quarter} />
+        ))}
+        {trouble ? null : more}
+      </View>
+      {trouble ? (
+        <View style={styles.row}>
+          {PANEL_TROUBLE.map((k) => (
+            <QuickTile
+              key={k}
+              icon={k === 'mechanical' ? 'wrench' : 'warning'}
+              label={trouble.labels[k]}
+              tone={k === 'mechanical' ? 'amber' : 'red'}
+              on={trouble.myStatus === k}
+              onPress={() => trouble.onStatus(k)}
+              a11y={t('Send status {v}', { v: trouble.labels[k] })}
+              style={styles.quarter}
+            />
+          ))}
+          {more}
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -209,7 +240,7 @@ const styles = themedStyles(() => ({
   quarter: { flex: 1 },
   third: { flexBasis: '30%', flexGrow: 1, minHeight: 52 },
   tile: {
-    minHeight: 60, borderRadius: Radius.control, paddingHorizontal: 4, paddingVertical: 8, gap: 4,
+    minHeight: 64, borderRadius: Radius.control, paddingHorizontal: 4, paddingVertical: 8, gap: 4,
     alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge,
   },
   tileOn: { borderColor: Colors.text, borderWidth: 2 },
@@ -218,7 +249,8 @@ const styles = themedStyles(() => ({
   actions: { flexDirection: 'row', gap: 8 },
   big: { flex: 1, minHeight: 52, borderRadius: Radius.control + 2, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center' },
   regroup: { backgroundColor: Colors.text },
-  sos: { backgroundColor: Glass.redTint, borderWidth: 1.5, borderColor: 'rgba(229,38,46,0.75)' },
+  sos: { minHeight: 58, borderRadius: 16, backgroundColor: '#D9252C', borderWidth: 1.5, borderColor: 'rgba(255,175,175,0.55)' },
+  sosText: { color: '#fff', letterSpacing: 0.6 },
   bigText: { fontFamily: font(700, 'display'), fontSize: 20 },
   wrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.45)' },
   wrapTablet: { justifyContent: 'center', alignItems: 'center', padding: Spacing.four },

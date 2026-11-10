@@ -1,17 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { EventOrRide } from '@/components/events/event-or-ride';
+import { FeaturedEvent } from '@/components/events/featured-event';
 import { EventCardView } from '@/components/events/parts';
+import { Icon } from '@/components/icon';
 import { RadiusChip, RadiusSheet } from '@/components/home/public-rides';
 import { Home, Pill } from '@/components/home/parts';
 import PageHead from '@/components/page-head';
 import { ThemedText } from '@/components/themed-text';
-import { Button, ErrorText, Screen, Segmented } from '@/components/ui';
-import { Colors, font, Spacing, themedStyles } from '@/constants/theme';
-import { EVENTS_NOT_SWITCHED_ON, sortCards, type EventCard } from '@/core/events';
+import { ErrorText, Screen, Segmented } from '@/components/ui';
+import { Colors, font, Spacing, themedStyles, TileSurface } from '@/constants/theme';
+import { eventPhase, EVENTS_NOT_SWITCHED_ON, sortCards, type EventCard } from '@/core/events';
 import { parseRadius, RADIUS_STORAGE_KEY } from '@/core/home';
 import { useLayout } from '@/hooks/use-layout';
 import { useEntitlements } from '@/lib/entitlements';
@@ -75,43 +77,39 @@ export default function EventsScreen() {
   const list = tab === 'mine' ? mine : upcoming;
   const columns = layout.expanded ? 3 : layout.wide ? 2 : 1;
   const off = error === EVENTS_NOT_SWITCHED_ON;
+  // The next event coming up leads as a full photo (3.0); the rest follow as cards.
+  const featured = tab === 'upcoming' && list?.length ? list.find((e) => eventPhase(e) !== 'over' && eventPhase(e) !== 'cancelled') ?? null : null;
+  const rest = list ? list.filter((e) => e !== featured) : [];
 
   return (
     <>
-      <Stack.Screen options={{ title: t('Events') }} />
+      {/* 3.0: Create sits in the header, top right, instead of a big button over the list. */}
+      <Stack.Screen
+        options={{
+          title: t('Events'),
+          headerRight: () => (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('Create an Event')}
+              hitSlop={8}
+              onPress={create}
+              style={({ pressed }) => [styles.create, pressed && { opacity: 0.85 }]}>
+              <Icon name="plus" size={16} color={Colors.text} />
+              <Text style={styles.createText}>{t('Create')}</Text>
+              {session && !can('create_events') ? <Pill text="Pro" tone="gold" /> : null}
+            </Pressable>
+          ),
+        }}
+      />
       <PageHead><title>{t('Events | OnMyLead')}</title></PageHead>
       <Screen width="wide">
         <View style={{ gap: Spacing.four }}>
-          <View style={[styles.head, layout.wide && styles.headWide]}>
-            <View style={{ flex: 1, gap: 6 }}>
-              <Text style={styles.title} accessibilityRole="header">{t('Rallies, Runs and Ride Weekends')}</Text>
-              <ThemedText themeColor="textSecondary">
-                {t('See what’s happening, who’s going, the agenda and the group rides to join.')}
-              </ThemedText>
-            </View>
-            <View style={{ gap: 6, alignItems: layout.wide ? 'flex-end' : 'stretch' }}>
-              <Button title={t('Create an Event')} pro="create_events" onPress={create} style={layout.wide ? { minWidth: 220 } : undefined} />
-              {session && !can('create_events') ? <Pill text="Pro" tone="gold" style={{ alignSelf: layout.wide ? 'flex-end' : 'center' }} /> : null}
-            </View>
-          </View>
-
-          <EventOrRide from="events" />
-
           {session ? (
             <Segmented<Tab>
               options={[{ value: 'upcoming', label: t('Coming Up') }, { value: 'mine', label: t('Yours{v}', { v: mine?.length ? ` (${mine.length})` : '' }) }]}
               value={tab}
               onChange={setTab}
             />
-          ) : null}
-
-          {tab === 'upcoming' && radius != null ? (
-            <View style={styles.row}>
-              <ThemedText type="small" themeColor="textSecondary" style={{ flex: 1 }}>
-                {located ? t('Public events, soonest first.') : t('Public events everywhere. Allow location to see the ones near you first.')}
-              </ThemedText>
-              {located ? <RadiusChip radius={radius} onPress={() => setRadiusOpen(true)} /> : null}
-            </View>
           ) : null}
 
           {off ? (
@@ -133,7 +131,19 @@ export default function EventsScreen() {
             </View>
           ) : (
             <View style={{ gap: Spacing.three }}>
-              {rowsOf(list, columns).map((row, r) => (
+              {featured ? <FeaturedEvent key={featured.id} e={featured} height={layout.wide ? 380 : 320} /> : null}
+              {tab === 'upcoming' && radius != null ? (
+                <View style={styles.sectionHead}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={styles.section} accessibilityRole="header">{located ? t('Near You') : t('Coming Up')}</Text>
+                    {!located ? (
+                      <ThemedText type="small" themeColor="textSecondary">{t('Public events everywhere. Allow location to see the ones near you first.')}</ThemedText>
+                    ) : null}
+                  </View>
+                  {located ? <RadiusChip radius={radius} onPress={() => setRadiusOpen(true)} /> : null}
+                </View>
+              ) : null}
+              {rowsOf(rest, columns).map((row, r) => (
                 <View key={r} style={styles.gridRow}>
                   {row.map((e, i) => (
                     <View key={e?.id ?? `pad${i}`} style={{ flex: 1, minWidth: 0 }}>{e ? <EventCardView e={e} /> : null}</View>
@@ -143,6 +153,8 @@ export default function EventsScreen() {
             </View>
           )}
           {!off ? <ErrorText error={error} /> : null}
+
+          <EventOrRide from="events" />
         </View>
       </Screen>
       <RadiusSheet visible={radiusOpen} radius={radius ?? 0} located={located} onPick={pickRadius} onClose={() => setRadiusOpen(false)} />
@@ -162,10 +174,10 @@ function rowsOf<T>(items: T[], n: number): (T | null)[][] {
 }
 
 const styles = themedStyles(() => ({
-  head: { gap: Spacing.three },
-  headWide: { flexDirection: 'row', alignItems: 'flex-end' },
-  title: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 32, lineHeight: 35 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  create: { marginRight: Spacing.three, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 40, borderRadius: 12, ...TileSurface },
+  createText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, marginTop: Spacing.two },
+  section: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 29 },
   gridRow: { flexDirection: 'row', gap: Spacing.three, alignItems: 'stretch' },
   empty: { gap: 6, padding: Spacing.four, borderRadius: 22, borderWidth: 1, borderColor: Home.line, borderStyle: 'dashed' },
   emptyTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22 },

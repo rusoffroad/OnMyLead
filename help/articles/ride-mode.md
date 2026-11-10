@@ -176,6 +176,10 @@ The panel at the bottom holds, from the top:
 See [Send a Status or Quick Reply](/help/status-buttons).
 :::
 
+:::release 3.0
+From 3.0 the buttons are bigger, in two rows: **On My Way**, **Need a Minute** and **All Good**, then **Mechanical Issue**, **Need Help** and **More**. Under them, **Regroup Here** (for organizers and leaders) is a full-width white button, and **EMERGENCY** is a solid red bar across the bottom. Tapping **EMERGENCY** still opens the alert, where you hold to send.
+:::
+
 :::release 2.0
 Tap **Message** at the top left of the panel to type your own message to the group or send one of your saved quick replies. See [Type Your Own Message](/help/status-buttons).
 :::

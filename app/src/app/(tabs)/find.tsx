@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FlagGate } from '@/components/app-notices';
 import { Scout } from '@/components/scout/scout';
 import { EventOrRide } from '@/components/events/event-or-ride';
-import { RideRow, RowGroup } from '@/components/ride-row';
+import { RideTile } from '@/components/ride-tile';
 import { PlaceSearch } from '@/components/place-search';
 import { RidesMap } from '@/components/rides-map';
 import { ThemedText } from '@/components/themed-text';
@@ -55,7 +55,7 @@ function FindTab() {
   const view: View2 = params.view === 'places' ? 'places' : 'rides';
   const places = scoutOn && view === 'places';
   useEffect(() => {
-    navigation.setOptions({ title: places ? t('Scout') : t('Find a Ride') });
+    navigation.setOptions({ title: places ? t('Scout') : t('Rides Near You') });
   }, [navigation, places]);
   const pick = (v: View2) => router.setParams({ view: v });
   const top = scoutOn ? (
@@ -272,18 +272,10 @@ function FindRides({ top }: { top: React.ReactNode }) {
         )
       ) : null}
       {rides?.length ? (
-        <RowGroup>
-          {rides.map((r) => (
-            <RideRow
-              key={r.id}
-              ride={r}
-              note={[
-                r.distanceMi != null ? `${r.distanceMi < 1 ? t('Under 1') : Math.round(r.distanceMi)} mi away` : null,
-                r.vehicle_types.length ? r.vehicle_types.join(', ') : null,
-              ].filter(Boolean).join(', ') || undefined}
-            />
-          ))}
-        </RowGroup>
+        // 3.0 (approved mock): each ride is a card with a picture of its meeting area.
+        <View style={{ gap: 12 }}>
+          {rides.map((r) => <RideTile key={r.id} ride={r} distanceMi={r.distanceMi} />)}
+        </View>
       ) : null}
       <View style={{ height: Spacing.two }} />
     </>

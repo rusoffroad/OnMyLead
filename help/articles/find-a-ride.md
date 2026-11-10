@@ -7,6 +7,7 @@ release: "1.0"
 updated: 2026-11-10
 sources:
   - app/src/app/(tabs)/find.tsx
+  - app/src/components/ride-tile.tsx
   - app/src/app/(tabs)/index.tsx
   - app/src/components/rides-map.tsx
   - app/src/components/rides-mapbox-map.tsx
@@ -58,6 +59,10 @@ Looking for somewhere to ride instead of a group? Tap **Places to Ride** at the 
 4. Under **How Far Will You Go?**, pick **25 Miles**, **50 Miles**, **100 Miles** or **250 Miles**.
 
 Rides show on the map and in a list under it, nearest first, with how far away each one is.
+
+:::release 3.0
+From 3.0 the tab is titled **Rides Near You**, and each ride in the list is a card with a satellite picture of its meeting spot, the day (or a red **Live** tag while it's riding), how far away it is, the time, and tags for difficulty, trail miles and vehicle types. Tap a card to open the ride.
+:::
 
 :::release 2.0
 ### Public Rides Near You on Home

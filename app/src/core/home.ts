@@ -104,13 +104,21 @@ const HERO_STEP = 0.05;
  * Null when the build has no Mapbox token: the header then sits on the plain background.
  */
 export function heroMapUrl(at: { lat: number; lng: number } | null, token: string, widthPt: number, heightPt: number): string | null {
-  if (!token.startsWith('pk.')) return null;
-  const spot = at ?? HERO_FALLBACK;
+  return staticMapUrl(at ?? HERO_FALLBACK, token, widthPt, heightPt, 11.5);
+}
+
+/**
+ * A satellite picture of an area (Mapbox Static Images), for the home header and the 3.0 ride
+ * cards. The spot is rounded to about 5 km, so the picture never pins down a private place; a ride
+ * card uses the ride's public meeting area, which is already rounded. Null without a Mapbox token.
+ */
+export function staticMapUrl(at: { lat: number; lng: number }, token: string, widthPt: number, heightPt: number, zoom: number): string | null {
+  if (!token.startsWith('pk.') || !Number.isFinite(at.lat) || !Number.isFinite(at.lng)) return null;
   const round = (v: number) => (Math.round(v / HERO_STEP) * HERO_STEP).toFixed(2);
   // The Static Images API caps a side at 1280 px; @2x doubles the points.
   const w = Math.max(64, Math.min(640, Math.round(widthPt)));
   const h = Math.max(64, Math.min(640, Math.round(heightPt)));
-  return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${round(spot.lng)},${round(spot.lat)},11.5,0/${w}x${h}@2x?attribution=false&logo=false&access_token=${encodeURIComponent(token)}`;
+  return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${round(at.lng)},${round(at.lat)},${zoom},0/${w}x${h}@2x?attribution=false&logo=false&access_token=${encodeURIComponent(token)}`;
 }
 
 /**

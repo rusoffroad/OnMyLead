@@ -3,7 +3,7 @@
     "version": "3.0",
     "title": "A New Look, Map Mode Up Front, Invite Your Group to an Event and Show Password",
     "intro": "OnMyLead 3.0 is a new look. Home opens on a satellite map of your area with Map Mode first, because OnMyLead is now your offroad map whether you ride solo or with a group. Join a Ride, Start a Ride and Events sit right under it, and you choose and order the rest. Map Mode tells you when you're riding solo, and Pro riders can turn that ride into a group ride in two taps. Event hosts can now invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. CarPlay now works on solo rides too: open Map Mode and the car screen shows your speed, elevation, heading, trip and the trail you're following. Every photo you add, from your profile picture to event and trail photos, now opens on a crop screen so you can frame it first. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
-    "whatsNew": "What's new in 3.0:\n\n• A new look: Map Mode up front, five tabs and a Home you can customize.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: crashes with CarPlay connected and in 3D Terrain on Android.",
+    "whatsNew": "What's new in 3.0:\n\n• A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: crashes with CarPlay connected and in 3D Terrain on Android.",
     "apple": null,
     "google": null,
     "notes": [
@@ -18,6 +18,10 @@
       {
         "kind": "new",
         "text": "Five tabs: Home, Rides, a raised blue Map Mode key in the middle, Events and Social. Riding Groups are inside Social, and You opens from your picture at the top of Home. On a tablet the tabs sit in a rail down the left with You at the bottom."
+      },
+      {
+        "kind": "new",
+        "text": "Bolder screens everywhere: Rides Near You shows each ride as a card with a map picture, the day, how far it is and its difficulty. Events leads with the next event as a big photo with I'm Going and Share right on it, and Create moves to the top right. Social opens with your Riding Groups and a row of friends, with a green ring on anyone out riding. In Ride Mode the status buttons are bigger, Mechanical Issue and Need Help sit on the panel, and EMERGENCY is a solid red bar in the same spot every time."
       },
       {
         "kind": "new",

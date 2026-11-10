@@ -2,6 +2,7 @@ import { router, Stack, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Text, View } from 'react-native';
 
+import { FriendStrip, GroupsCard } from '@/components/social/crew';
 import { ComposePrompt, FriendRows, ItemList, useItems } from '@/components/social/lists';
 import { Social } from '@/components/social/parts';
 import { TwoPane } from '@/components/two-pane';
@@ -14,6 +15,7 @@ import { useLayout } from '@/hooks/use-layout';
 import { myRideName } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
 import { refreshFriends, useFriends } from '@/lib/friends';
+import { myGroups, type RidingGroup } from '@/lib/groups';
 import { useSession } from '@/lib/session';
 import { riderTimeline, socialFeed, SocialOffError } from '@/lib/social';
 import { t } from '@/lib/i18n';
@@ -39,6 +41,7 @@ export default function SocialScreen() {
   const mine = useItems();
   const [name, setName] = useState('');
   const [off, setOff] = useState(false);
+  const [groups, setGroups] = useState<RidingGroup[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -55,6 +58,7 @@ export default function SocialScreen() {
       setError(null);
       myRideName().then(setName).catch(() => {});
       refreshFriends();
+      myGroups().then(setGroups).catch(() => setGroups([]));
       socialFeed(PAGE)
         .then((list) => {
           setFeed(list);
@@ -120,10 +124,10 @@ export default function SocialScreen() {
           sideWidth={sideColumnWidth(layout.width)}
           side={
             <View style={{ gap: 18 }}>
+              <GroupsCard groups={groups} />
               <Text style={styles.title} accessibilityRole="header">{t('Your Friends')}</Text>
               <FriendRows list={friends.list} limit={12} />
               <Button title={t('View Your Profile')} kind="secondary" onPress={() => router.push(profileHref(me) as never)} />
-              <Button title={t('Riding Groups')} kind="secondary" onPress={() => router.push('/groups')} />
               {freeNote}
             </View>
           }
@@ -144,15 +148,16 @@ export default function SocialScreen() {
     <Screen width="readable">
       <Stack.Screen options={{ title: t('Social') }} />
       <View style={{ gap: 16 }}>
-        {/* 3.0: Riding Groups live inside Social (the tab bar has Home, Rides, Map Mode, Events, Social). */}
-        <Button title={t('Riding Groups')} kind="secondary" onPress={() => router.push('/groups')} />
-        {compose}
+        {/* 3.0: your crew first. Riding Groups live inside Social (the tab bar has Home, Rides, Map Mode, Events, Social). */}
+        <GroupsCard groups={groups} />
+        {friends.list.length ? <FriendStrip list={friends.list} /> : null}
         <Segmented
           options={[{ value: 'activity', label: t('Activity') }, { value: 'friends', label: t('Friends') }, { value: 'mine', label: t('My Posts') }]}
           value={tab}
           onChange={setTab}
         />
         <ErrorText error={error} />
+        {tab === 'activity' ? compose : null}
         {tab === 'activity' ? activity : tab === 'friends' ? <FriendRows list={friends.list} /> : myPosts}
         {tab !== 'friends' ? freeNote : null}
       </View>
