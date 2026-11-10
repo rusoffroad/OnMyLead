@@ -2,13 +2,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useFocusEffect } from 'expo-router';
 import { type ReactElement, type ReactNode, useCallback, useEffect, useState } from 'react';
 import { Platform, Pressable, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppNotices } from '@/components/app-notices';
 import { BadgeStrip } from '@/components/badge-strip';
 import { FeedList, FeedSheet } from '@/components/home/feed';
 import { GroupCard, NoGroupCard } from '@/components/home/group-card';
+import { CustomizeHomeSheet } from '@/components/home/customize-home';
 import { EventsCard } from '@/components/home/events-card';
-import { MapModeCard } from '@/components/home/map-mode-card';
+import { HomeHero, ON_MAP, useHeroMap } from '@/components/home/hero';
+import { MapModeBanner } from '@/components/home/map-mode-card';
+import { OutRidingNow } from '@/components/home/out-riding-now';
 import { HeadLink, Home, homeStyles, Initial, SectionHead } from '@/components/home/parts';
 import { PublicRidesRail, RadiusChip, RadiusSheet } from '@/components/home/public-rides';
 import { ActionTiles, JoinHero } from '@/components/home/ride-actions';
@@ -26,17 +30,17 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { flagOn } from '@/core/app-settings';
+import { DEFAULT_HOME_LAYOUT, HOME_LAYOUT_KEY, parseHomeLayout, serializeHomeLayout, shownSections, type HomeLayout, type HomeSection } from '@/core/home-layout';
+import { READABLE_WIDTH } from '@/core/layout';
 import type { MyBadges } from '@/core/badges';
 import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
 import { DEFAULT_FEED_SETTINGS, FEED_NOT_SWITCHED_ON, type FeedSettings } from '@/core/feed';
 import type { SocialItem } from '@/core/social';
 import type { GroupChatSummary } from '@/core/group-chat';
-import { createQuota, findCount, firstName, greeting, parseRadius, RADIUS_STORAGE_KEY, shortHome, toolkitFor } from '@/core/home';
+import { createQuota, firstName, greeting, parseRadius, RADIUS_STORAGE_KEY, toolkitFor } from '@/core/home';
 import { historySplit } from '@/core/pro';
 import { rowActionFor } from '@/core/row-swipe';
-import { TRACK_LINE_SWITCH_KEY } from '@/core/track-line';
 import { useLayout } from '@/hooks/use-layout';
-import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useTheme } from '@/hooks/use-theme';
 import { deleteRide, discoverPublicRides, getMembers, leaveRide, myRideName, myRides, publicRidesNear } from '@/lib/api';
 import { useAppSettings } from '@/lib/app-settings';
@@ -48,16 +52,15 @@ import { FeedOffError, homeFeed, myFeedSettings, saveFeedSettings } from '@/lib/
 import { myGroupChats } from '@/lib/group-chat';
 import { myGroups, type RidingGroup } from '@/lib/groups';
 import { positionIfAllowed } from '@/lib/location';
-import { publicTrailsIn } from '@/lib/nav-trails';
 import { currentNotificationSettings } from '@/lib/notification-settings';
 import { requirePro } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
-import { setSyncedItem } from '@/lib/settings-sync';
+import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
+import { publicTrailsIn } from '@/lib/nav-trails';
 import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import { askForTracking } from '@/lib/ad-tracking';
 import { useNeedsRiderAgreement } from '@/lib/rider-agreement';
-import { setTrackLineOn } from '@/lib/track-line';
 import type { Ride, RideMember } from '@/lib/types';
 import { currentLocale, t } from '@/lib/i18n';
 
@@ -69,8 +72,13 @@ const RAIL_MAX = 10;
 type Mine = RideMember & { rides: Ride };
 type Near = Ride & { distanceMi?: number };
 
-/** Rider trails around a spot, counted once per app session (it's a pill, not a live number). */
-let trailCount: { key: string; n: number } | null = null;
+/** How tall the map header is (points, below the status bar). The Join card overlaps its bottom. */
+const HERO_HEIGHT = 300;
+/** How far the Map Mode banner reaches up over the bottom of the map header. */
+const OVERLAP = 78;
+
+/** Rider trails around a spot, counted once per app session (it's a line on the banner, not a live number). */
+let trailCount: number | null = null;
 
 export default function HomeScreen() {
   const theme = useTheme();
@@ -101,8 +109,12 @@ export default function HomeScreen() {
   const [feedOpen, setFeedOpen] = useState(false);
   const [feedAll, setFeedAll] = useState(false);
   const [moreRides, setMoreRides] = useState(false);
-  const [trailsNear, setTrailsNear] = useState<number | null>(trailCount?.n ?? null);
-  const [trackOn, , setTrackSwitch] = useRememberedToggle(TRACK_LINE_SWITCH_KEY, false);
+  const [homeLayout, setHomeLayout] = useState<HomeLayout>(DEFAULT_HOME_LAYOUT);
+  const [customizing, setCustomizing] = useState(false);
+  const [trailsNear, setTrailsNear] = useState<number | null>(trailCount);
+  const insets = useSafeAreaInsets();
+  // One satellite picture for the map header and the Map Mode tile (cached on the phone).
+  const heroUrl = useHeroMap(Math.min(layout.width, 1200), HERO_HEIGHT + insets.top);
 
   // Signing out (or into another account) must not leave the last rider's things on screen.
   const uid = session?.user.id;
@@ -127,6 +139,34 @@ export default function HomeScreen() {
     const timer = setTimeout(() => askForTracking(), 2000);
     return () => clearTimeout(timer);
   }, [session, needsAgreement]);
+
+  // Customize Home: the rider's sections and their order, from the account (and live from other devices).
+  useEffect(() => {
+    AsyncStorage.getItem(HOME_LAYOUT_KEY).then((v) => setHomeLayout(parseHomeLayout(v))).catch(() => {});
+    return onSyncedChange(HOME_LAYOUT_KEY, (v) => setHomeLayout(parseHomeLayout(v)));
+  }, []);
+  const saveLayout = (l: HomeLayout) => {
+    setHomeLayout(l);
+    setSyncedItem(HOME_LAYOUT_KEY, serializeHomeLayout(l)).catch(() => {});
+  };
+
+  // The rider-trail count on the Map Mode banner, near wherever the phone is (only if location is allowed).
+  useEffect(() => {
+    if (!navOn || trailCount != null) return;
+    let gone = false;
+    positionIfAllowed()
+      .then(async (at) => {
+        if (!at) return;
+        const d = 0.75;
+        const found = await publicTrailsIn({ minLat: at.lat - d, maxLat: at.lat + d, minLng: at.lng - d, maxLng: at.lng + d });
+        trailCount = found.length;
+        if (!gone) setTrailsNear(found.length);
+      })
+      .catch(() => {});
+    return () => {
+      gone = true;
+    };
+  }, [navOn]);
 
   // How far Public Rides Near You looks, remembered on this phone.
   useEffect(() => {
@@ -167,24 +207,6 @@ export default function HomeScreen() {
       }
     }, [session, findOn, feedOn, radius, loadNearby]),
   );
-
-  // The rider-trail count on the Map Mode card, near wherever the phone is (only if location is allowed).
-  useEffect(() => {
-    if (!navOn || !session || trailCount) return;
-    let gone = false;
-    positionIfAllowed()
-      .then(async (at) => {
-        if (!at) return;
-        const d = 0.75;
-        const found = await publicTrailsIn({ minLat: at.lat - d, maxLat: at.lat + d, minLng: at.lng - d, maxLng: at.lng + d });
-        trailCount = { key: `${at.lat.toFixed(1)},${at.lng.toFixed(1)}`, n: found.length };
-        if (!gone) setTrailsNear(found.length);
-      })
-      .catch(() => {});
-    return () => {
-      gone = true;
-    };
-  }, [navOn, session]);
 
   // On onmylead.com, signed-out visitors get the showcase; signed-in riders get the app.
   if (Platform.OS === 'web' && !session) {
@@ -256,7 +278,6 @@ export default function HomeScreen() {
     : null;
   const outIds = new Set((feed ?? []).filter((f) => f.kind === 'out').map((f) => f.actorId));
   const groupOut = group ? group.riders.filter((r) => r.id !== uid && outIds.has(r.id)).length : 0;
-  const friendsOut = outIds.size;
 
   const name = firstName(rideName);
   const versionLine = appVersionLabel();
@@ -267,22 +288,19 @@ export default function HomeScreen() {
     setRadius(mi);
     setSyncedItem(RADIUS_STORAGE_KEY, String(mi)).catch(() => {});
   };
-  const switchTrack = (on: boolean) => {
-    setTrackSwitch(on);
-    setTrackLineOn(on);
-  };
 
+  // The header and greeting sit over the map picture (light text in every theme).
   const header = (
     <View style={styles.top}>
       <View style={styles.logo}>
-        <Logo height={52} />
+        <Logo height={44} onDark />
       </View>
       <View style={styles.topRight}>
-        {/* The language switcher: a flag every rider can spot, signed in or not. */}
-        <LanguageButton />
+        {/* Signed-out riders can switch language before they have an account; signed in, it's in You. */}
+        {session ? null : <LanguageButton />}
         {session ? (
           <>
-            <InboxBell compact />
+            <InboxBell compact onMap />
             <Pressable accessibilityRole="button" accessibilityLabel={t('You: profile and settings')} hitSlop={4} onPress={() => router.push('/profile')}>
               <View style={styles.avatar}>
                 <RiderPhoto userId={uid} size={40} zoom={false} fallback={<Initial name={name || 'R'} size={40} />} ring={0} />
@@ -294,24 +312,20 @@ export default function HomeScreen() {
     </View>
   );
 
-  // Small phones leave the greeting out so the five actions below still fit on one screen.
-  const short = !layout.wide && shortHome(layout.height);
-  const hello = short && friendsOut === 0 ? null : (
-    <View style={{ gap: 6 }}>
-      {short ? null : (
-        <Text style={styles.hello} accessibilityRole="header">
-          {t(greeting())}{name ? `, ${name}` : ''}
-        </Text>
-      )}
-      {friendsOut > 0 ? (
-        <Pressable accessibilityRole="link" onPress={() => router.push('/out-riding')} style={styles.pulseRow}>
-          <View style={styles.pulse} />
-          <Text style={homeStyles.muted}>
-            {friendsOut === 1 ? t('1 friend is out riding now') : t('{n} friends are out riding now', { n: friendsOut })}
-          </Text>
-        </Pressable>
-      ) : null}
-    </View>
+  const hello = (
+    <Text style={styles.hello} accessibilityRole="header" numberOfLines={2}>
+      {t(greeting())}{name ? `, ${name}` : ''}
+    </Text>
+  );
+
+  const hero = (
+    <HomeHero url={heroUrl} height={HERO_HEIGHT}>
+      <View style={[styles.heroInner, { maxWidth: layout.expanded ? 1200 : READABLE_WIDTH }]}>
+        {header}
+        <View style={{ flex: 1 }} />
+        {hello}
+      </View>
+    </HomeHero>
   );
 
   const nudgeAndLive = (
@@ -339,48 +353,51 @@ export default function HomeScreen() {
     </>
   );
 
-  // Join, then Create and Find, then Events, then Map Mode, all on one phone screen without
-  // scrolling (Chris 2026-11-04, mock approved). The sign-in link for visitors comes after them.
+  // 3.0 (approved mock v4, Chris 2026-11-10): Map Mode first, over the bottom of the map header,
+  // then the red Join a Ride, then Start a Ride and Events side by side. These four always lead;
+  // the sections under them are the rider's to show, hide and order (Customize Home).
   const actions = (
-    <View style={{ gap: 12 }}>
+    <View style={{ gap: 12, marginTop: -OVERLAP }}>
+      {navOn ? <MapModeBanner image={heroUrl} trailsNear={trailsNear} /> : null}
       <JoinHero code={code} onCode={setCode} onOpen={openCode} />
       <ActionTiles
         quota={session ? createQuota(ent) : null}
-        findOn={findOn}
-        findText={radius != null ? findCount(others.length, located ? radius : 0) : null}
-        onCreate={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
-        onFind={() => router.push('/find')}
+        onStart={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
       />
-      <EventsCard signedIn={!!session} radius={radius} />
-      {navOn ? <MapModeCard trailsNear={trailsNear} trackOn={trackOn} onTrack={switchTrack} /> : null}
+      {nudgeAndLive}
       {!loading && !session ? (
         <Button title={t('Sign In or Create a Free Account')} kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
       ) : null}
     </View>
   );
 
-  const ridesBlock = (
-    <>
+  // Up Next: ride invites, your next ride (or all of them), and your next event.
+  const nextBlock = (
+    <Block
+      title={t('Up Next')}
+      right={going.length > 1 ? (
+        <HeadLink title={moreRides ? t('Show Less') : t('All {n}', { n: going.length })} onPress={() => setMoreRides(!moreRides)} label={moreRides ? t('Show only your next ride') : t('Show all {n} of your rides', { n: going.length })} />
+      ) : undefined}>
       {invites.length ? (
-        <Block title={t('Ride Invites')}>
-          <RowGroup>{invites.map((m) => swipeRow(m, <RideRow ride={m.rides} note={t('You’re invited. Tap to join')} />))}</RowGroup>
-        </Block>
+        <RowGroup>{invites.map((m) => swipeRow(m, <RideRow ride={m.rides} note={t('You’re invited. Tap to join')} />))}</RowGroup>
       ) : null}
       {going.length ? (
-        <Block
-          title={going.length === 1 || !moreRides ? t('Your Next Ride') : t('Your Rides')}
-          right={going.length > 1 ? (
-            <HeadLink title={moreRides ? t('Show Less') : t('All {n}', { n: going.length })} onPress={() => setMoreRides(!moreRides)} label={moreRides ? t('Show only your next ride') : t('Show all {n} of your rides', { n: going.length })} />
-          ) : undefined}>
-          <RowGroup>
-            {(moreRides ? going : going.slice(0, 1)).map((m) =>
-              swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? t(roleLabel(m.role)) : m.status.replace('_', ' ')} />))}
-          </RowGroup>
-          {ROW_ACTION_HINT ? <Text style={[homeStyles.muted, { fontSize: 12 }]}>{ROW_ACTION_HINT}</Text> : null}
-        </Block>
+        <RowGroup>
+          {(moreRides ? going : going.slice(0, 1)).map((m) =>
+            swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? t(roleLabel(m.role)) : m.status.replace('_', ' ')} />))}
+        </RowGroup>
       ) : null}
-    </>
+      <EventsCard signedIn={!!session} radius={radius} />
+      {going.length && ROW_ACTION_HINT ? <Text style={[homeStyles.muted, { fontSize: 12 }]}>{ROW_ACTION_HINT}</Text> : null}
+    </Block>
   );
+
+  const outItems = (feed ?? []).filter((f) => f.kind === 'out');
+  const outBlock = session && feedOn && feed != null && !feedOff ? (
+    <Block title={t('Out Riding Now')} right={<HeadLink title={t('See All')} onPress={() => router.push('/out-riding')} label={t('Open Out Riding')} />}>
+      <OutRidingNow out={outItems} />
+    </Block>
+  ) : null;
 
   const groupBlock = session && groups ? (
     <Block title={t('Your Group')} right={groups.length > 1 ? <HeadLink title={t('All {n}', { n: groups.length })} onPress={() => router.push('/groups')} /> : undefined}>
@@ -405,6 +422,9 @@ export default function HomeScreen() {
     </Block>
   ) : null;
 
+  // Out Riding Now has the friends who are out, so the feed under it doesn't repeat them.
+  const outShown = !!outBlock && shownSections(homeLayout).includes('out');
+  const feedShown = (feed ?? []).filter((f) => !(outShown && f.kind === 'out'));
   const feedBlock = session && feedOn ? (
     <Block
       title={t('Feed')}
@@ -419,14 +439,17 @@ export default function HomeScreen() {
       ) : (
         <>
           <FeedList
-            items={feedAll ? feed : feed.slice(0, FEED_SHOWN)}
-            onChange={(i, next) => setFeed((list) => (list ? list.map((x, j) => (j === i ? next : x)) : list))}
+            items={feedAll ? feedShown : feedShown.slice(0, FEED_SHOWN)}
+            onChange={(i, next) => {
+              const was = feedShown[i];
+              setFeed((list) => (list ? list.map((x) => (x === was ? next : x)) : list));
+            }}
             emptyText={feedSettings.kinds.length
               ? t('Nothing new yet. When friends post photos, ride, earn badges or share trails, it shows here.')
               : t('Everything is switched off in Customize.')}
           />
-          {feed.length > FEED_SHOWN ? (
-            <HeadLink title={feedAll ? t('Show Less') : t('Show {n} More', { n: feed.length - FEED_SHOWN })} onPress={() => setFeedAll(!feedAll)} />
+          {feedShown.length > FEED_SHOWN ? (
+            <HeadLink title={feedAll ? t('Show Less') : t('Show {n} More', { n: feedShown.length - FEED_SHOWN })} onPress={() => setFeedAll(!feedAll)} />
           ) : null}
         </>
       )}
@@ -469,6 +492,7 @@ export default function HomeScreen() {
 
   const sheets = (
     <>
+      <CustomizeHomeSheet visible={customizing} layout={homeLayout} onClose={() => setCustomizing(false)} onSave={saveLayout} />
       <RadiusSheet visible={radiusOpen} radius={radius ?? 0} located={located} onPick={pickRadius} onClose={() => setRadiusOpen(false)} />
       {session && feedOn ? (
         <FeedSheet
@@ -485,48 +509,46 @@ export default function HomeScreen() {
     </>
   );
 
-  // On a tablet in landscape (or a wide window) the ride actions, Map Mode and the toolkit stay on
-  // the left and the rides, group, feed and badges sit beside them, instead of one long column.
+  const blocks: Record<HomeSection, ReactNode> = {
+    out: outBlock,
+    next: session ? nextBlock : null,
+    group: groupBlock,
+    feed: feedBlock,
+    public: publicBlock,
+    badges: badgeBlock,
+    toolkit: toolkitBlock,
+    past: pastBlock,
+  };
+  // Signed out, Public Rides Near You is what there is to see, whatever the layout says.
+  const sections = session ? shownSections(homeLayout) : (['public'] as HomeSection[]);
+  const sectionList = sections.map((id) => (blocks[id] ? <View key={id}>{blocks[id]}</View> : null));
+  const customize = session ? (
+    <Pressable accessibilityRole="button" onPress={() => setCustomizing(true)} style={({ pressed }) => [styles.customize, pressed && { opacity: 0.8 }]}>
+      <Icon name="sliders" size={18} color={Colors.text} />
+      <Text style={styles.customizeText}>{t('Customize Home')}</Text>
+    </Pressable>
+  ) : null;
+
+  // On a tablet in landscape (or a wide window) Map Mode, Join, Start and Events stay on the left
+  // and the rider's sections sit beside them, instead of one long column.
   return (
     <>
-      <Screen top width={layout.expanded ? 'wide' : 'readable'}>
+      <Screen top hero={hero} width={layout.expanded ? 'wide' : 'readable'}>
         <View style={{ gap: 28 }}>
-          {layout.expanded ? header : null}
           {layout.expanded ? (
             <View style={styles.columns}>
               <View style={styles.column}>
-                <View style={styles.lead}>
-                  {hello}
-                  {nudgeAndLive}
-                  {actions}
-                </View>
-                {toolkitBlock}
+                {actions}
+                {customize}
                 <HelpRow />
               </View>
-              <View style={styles.column}>
-                {ridesBlock}
-                {groupBlock}
-                {publicBlock}
-                {feedBlock}
-                {badgeBlock}
-                {pastBlock}
-              </View>
+              <View style={[styles.column, { paddingTop: Spacing.two }]}>{sectionList}</View>
             </View>
           ) : (
             <>
-              <View style={styles.lead}>
-                {header}
-                {hello}
-                {nudgeAndLive}
-                {actions}
-              </View>
-              {ridesBlock}
-              {groupBlock}
-              {publicBlock}
-              {feedBlock}
-              {badgeBlock}
-              {toolkitBlock}
-              {pastBlock}
+              {actions}
+              {sectionList}
+              {customize}
               <HelpRow />
             </>
           )}
@@ -558,13 +580,15 @@ const styles = themedStyles(() => ({
   logo: { width: 150, height: 52 },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(230,194,122,0.5)', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  hello: { color: Colors.text, fontFamily: font(600), fontSize: 24, lineHeight: 29 },
-  pulseRow: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start' },
-  pulse: { width: 8, height: 8, borderRadius: 4, backgroundColor: Home.mint },
+  heroInner: { flex: 1, width: '100%', alignSelf: 'center', paddingHorizontal: Spacing.three, paddingBottom: OVERLAP + 18 },
+  hello: { color: ON_MAP, fontFamily: font(700), fontSize: 26, lineHeight: 31, textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 8 },
+  customize: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, borderRadius: 14,
+    borderWidth: 1.5, borderColor: Colors.tileEdge, backgroundColor: Colors.backgroundElement,
+  },
+  customizeText: { color: Colors.text, fontFamily: font(700), fontSize: 15.5 },
   columns: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.five },
   column: { flex: 1, minWidth: 0, gap: 28 },
-  /** The top of Home (logo, greeting, Join, Create, Find, Events, Map Mode): tighter, so it fits on one screen. */
-  lead: { gap: 12 },
   live: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: Radius.card, borderWidth: 2, borderColor: Colors.accent, padding: 14, backgroundColor: Home.panel },
   liveDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.accent },
   version: { color: Home.muted, fontFamily: font(500), fontSize: 12, lineHeight: 16, textAlign: 'center', opacity: 0.7, marginTop: -12 },

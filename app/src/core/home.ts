@@ -5,10 +5,10 @@
 import type { Entitlements } from './entitlements';
 
 import { coreLocale, tc } from './i18n';
-/** "Good morning" before noon, "Good afternoon" until 5 PM, then "Good evening" (the phone's clock). */
+/** "Good Morning" before noon, "Good Afternoon" until 5 PM, then "Good Evening" (the phone's clock). */
 export function greeting(now: Date = new Date()): string {
   const h = now.getHours();
-  return h < 5 ? tc('Good evening') : h < 12 ? tc('Good morning') : h < 17 ? tc('Good afternoon') : tc('Good evening');
+  return h < 5 ? tc('Good Evening') : h < 12 ? tc('Good Morning') : h < 17 ? tc('Good Afternoon') : tc('Good Evening');
 }
 
 /** First word of the ride name, for "Good evening, Chris". Empty when they haven't picked one. */
@@ -90,4 +90,34 @@ export const SHORT_HOME_HEIGHT = 700;
 /** True when the greeting should be left out to keep the home screen's actions on one screen. */
 export function shortHome(windowHeight: number): boolean {
   return windowHeight > 0 && windowHeight < SHORT_HOME_HEIGHT;
+}
+
+/** Where the 3.0 home map sits when the phone's location isn't shared: Moab, Utah, a ride-anywhere landmark. */
+export const HERO_FALLBACK = { lat: 38.6, lng: -109.55 } as const;
+/** How close the home map follows the rider: rounded to about 5 km, so the picture is cached and never pinpoints them. */
+const HERO_STEP = 0.05;
+
+/**
+ * The satellite picture behind the 3.0 home header (Mapbox Static Images, no labels, no logo; the
+ * screen draws the attribution itself). The spot is rounded to about 5 km so the same picture is
+ * reused from the phone's cache and the image never gives away exactly where the rider is.
+ * Null when the build has no Mapbox token: the header then sits on the plain background.
+ */
+export function heroMapUrl(at: { lat: number; lng: number } | null, token: string, widthPt: number, heightPt: number): string | null {
+  if (!token.startsWith('pk.')) return null;
+  const spot = at ?? HERO_FALLBACK;
+  const round = (v: number) => (Math.round(v / HERO_STEP) * HERO_STEP).toFixed(2);
+  // The Static Images API caps a side at 1280 px; @2x doubles the points.
+  const w = Math.max(64, Math.min(640, Math.round(widthPt)));
+  const h = Math.max(64, Math.min(640, Math.round(heightPt)));
+  return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${round(spot.lng)},${round(spot.lat)},11.5,0/${w}x${h}@2x?attribution=false&logo=false&access_token=${encodeURIComponent(token)}`;
+}
+
+/**
+ * The line under Start a Ride on the 3.0 home: how many rides a Free rider has left this month
+ * (the old pill), else what the button does.
+ */
+export function startRideDetail(q: Quota | null): string {
+  if (!q || q.tone === 'pro') return tc('Lead your group');
+  return q.tone === 'out' ? tc('None left this month') : q.text;
 }

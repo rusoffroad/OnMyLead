@@ -59,6 +59,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'mapArea.panelOpen.v1': 'Offline map area panel open or folded',
   // Home and the rest
   'home.publicRadius.v1': 'Find a Ride and Events search radius',
+  'home.layout.v1': 'Customize Home: which sections show, and their order',
   'starlink.autoConnect.v1': 'Starlink page connects by itself',
   'onmylead.dismissedNotices': 'Announcements the rider closed',
   // Appearance (themes thread; lib/appearance applies a change from another device)

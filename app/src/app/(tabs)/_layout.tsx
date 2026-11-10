@@ -9,10 +9,11 @@ import { useSession } from '@/lib/session';
 import { t } from '@/lib/i18n';
 
 /**
- * The app's four homes: Rides, Find, Groups and You. Every other screen (a ride, the Garage,
- * settings) opens full screen on top of these and comes back here. On a phone they sit in a bar at
- * the bottom; on a tablet (or a wide window) in a rail down the left edge. Map Mode's key sits in the
- * same bar (after Find), so the offroad map is one tap from anywhere.
+ * The app's homes (3.0, approved mock v4): Home, Rides, Map Mode, Events and Social. Every other
+ * screen (a ride, the Garage, settings) opens full screen on top of these and comes back here. On a
+ * phone they sit in a bar at the bottom with Map Mode as the raised blue key in the middle; on a
+ * tablet (or a wide window) in a rail down the left edge, with You at the end. Riding Groups live
+ * inside Social, and You opens from your photo at the top of Home.
  */
 export default function TabsLayout() {
   const { session } = useSession();
@@ -36,6 +37,8 @@ export default function TabsLayout() {
       }}>
       <Tabs.Screen name="index" options={{ title: 'OnMyLead', headerShown: false }} />
       <Tabs.Screen name="find" options={{ title: t('Find a Ride') }} />
+      <Tabs.Screen name="events-tab" options={{ title: t('Events') }} />
+      <Tabs.Screen name="social-tab" options={{ title: t('Social') }} />
       <Tabs.Screen name="groups" options={{ title: t('Riding Groups') }} />
       <Tabs.Screen name="profile" options={{ title: t('You') }} />
     </Tabs>
