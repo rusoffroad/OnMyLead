@@ -76,6 +76,10 @@ Your post shows on your profile and in the feeds of the riders your **Who Sees Y
 
 Photos are made smaller before they upload: no more than 1,280 pixels on the long side and under 1 MB. Nothing about where you took the photo is added.
 
+:::release 3.0
+A post's photo shows in its own shape, from tall (4:5) to wide (16:9), in your post before you send it and in everyone's feed. Anything taller or wider is trimmed to fit.
+:::
+
 ## Rider Profiles
 
 Tap a rider's name anywhere in Social to open their profile: their picture, the **PRO** tag if they have OnMyLead Pro, when they joined, their rides, miles and badges, and their posts, rides, badges and trails, newest first. Tap the picture to see it full size.
