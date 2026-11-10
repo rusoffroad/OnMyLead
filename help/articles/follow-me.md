@@ -4,7 +4,7 @@ summary: Keep the map moving with your dot as you ride, see which way you're hea
 category: ride-mode
 order: 13
 release: "2.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/core/follow-camera.ts
   - app/src/core/heading.ts
@@ -49,6 +49,10 @@ Tapping **Center on Me**, or picking Follow Me back up after a pause, starts fre
 ## Zoom In at Intersections
 
 While the map is following you and you're moving, it zooms in as you come up on a junction of roads or trails, about 9 seconds before you reach it, so you can see the turn up close. Once you're through, it zooms back out to where it was. It works with any road, track or trail drawn on the map, including on a downloaded map with no signal.
+
+:::release 2.1.1
+If another junction is coming up within about a quarter mile once you're through one, the map stays zoomed in for that one too instead of zooming out and straight back in. It zooms back out once after the last junction in the run, so riding through town or a web of trails no longer pumps the zoom in and out.
+:::
 
 **Zoom In at Intersections** is on until you turn it off, either in [Map Settings](/help/map-layers) under **Following** or in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
 

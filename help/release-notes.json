@@ -1,5 +1,19 @@
 [
   {
+    "version": "2.1.1",
+    "title": "Smoother Zoom at Intersections",
+    "intro": "OnMyLead 2.1.1 smooths out Zoom In at Intersections. When junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in.",
+    "whatsNew": "What's new in 2.1.1:\n\n• Smoother Zoom In at Intersections: when another junction is coming up within about a quarter mile, the map stays zoomed in instead of zooming out and back in.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "improved",
+        "text": "Zoom In at Intersections: once you're through a junction, the map looks about a quarter mile ahead. If another junction is coming, it stays zoomed in for that one too, and zooms back out once after the last one, so the map no longer pumps in and out in town or on a web of trails."
+      }
+    ]
+  },
+  {
     "version": "2.1",
     "title": "Bluetooth Sharing With No Service, Every Map on Mapbox, 3D Terrain and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group (seeing riders and sharing over Bluetooth is part of OnMyLead Pro; on every plan your phone passes alerts along and EMERGENCY goes out, and every rider without Pro gets a fresh 30-day Pro trial with this update). When a rider sends EMERGENCY or their Crash Alert goes out, every other rider's phone now sounds a loud siren until they silence it. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",

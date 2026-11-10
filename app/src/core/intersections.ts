@@ -151,6 +151,14 @@ export const JUNCTION_MAX_ZOOM = 18;
 export const JUNCTION_CLEAR_M = 35;
 /** Never hold the close-up longer than this (ms), in case the rider stops at the junction. */
 export const JUNCTION_HOLD_MAX_MS = 60_000;
+/**
+ * Look-ahead (2.1.1): once through a junction, the map stays zoomed in when another junction is
+ * this close ahead (miles), instead of zooming out and straight back in. This is the "x miles" to
+ * tune. A quarter mile is about 20 seconds at 45 mph, and fits in what the close-up map shows
+ * ahead of the rider (about 500 m on a phone at zoom 17), which is all the map can be asked about.
+ */
+export const JUNCTION_STAY_ZOOMED_MI = 0.25;
+export const JUNCTION_STAY_ZOOMED_M = JUNCTION_STAY_ZOOMED_MI * 1609.344;
 
 export type JunctionZoom =
   | { state: 'idle' }
@@ -158,8 +166,19 @@ export type JunctionZoom =
 export const JUNCTION_ZOOM_START: JunctionZoom = { state: 'idle' };
 
 /**
+ * The rider is through the junction being zoomed in on: past it by JUNCTION_CLEAR_M and moving
+ * away. That's when to look ahead (JUNCTION_STAY_ZOOMED_M) for the next one before zooming out.
+ */
+export function junctionPassed(s: JunctionZoom, at: LatLng): boolean {
+  if (s.state !== 'in') return false;
+  const d = distanceM(at, s.at);
+  return d >= JUNCTION_CLEAR_M && d > Math.min(s.closestM, d) + 15;
+}
+
+/**
  * One step of Zoom In at Intersections, from the rider's newest fix. Returns the next state and,
- * when the camera should change, the zoom to go to.
+ * when the camera should change, the zoom to go to. While zoomed in, `junction` is the next one
+ * ahead once through the current one (looked up as far as JUNCTION_STAY_ZOOMED_M).
  */
 export function junctionZoomStep(
   s: JunctionZoom,
@@ -167,10 +186,16 @@ export function junctionZoomStep(
 ): { next: JunctionZoom; zoom: number | null } {
   if (s.state === 'in') {
     if (!ctx.on) return { next: JUNCTION_ZOOM_START, zoom: s.restoreZoom };
-    const d = distanceM(ctx.at, s.at);
-    const closestM = Math.min(s.closestM, d);
-    const through = d >= JUNCTION_CLEAR_M && d > closestM + 15;
-    if (through || ctx.nowMs - s.sinceMs >= JUNCTION_HOLD_MAX_MS) return { next: JUNCTION_ZOOM_START, zoom: s.restoreZoom };
+    const closestM = Math.min(s.closestM, distanceM(ctx.at, s.at));
+    if (junctionPassed(s, ctx.at)) {
+      // Another junction coming up soon: stay zoomed in and watch that one instead.
+      const n = ctx.junction;
+      if (n && n.distM <= JUNCTION_STAY_ZOOMED_M && distanceM(n.at, s.at) >= JUNCTION_CLEAR_M) {
+        return { next: { ...s, at: n.at, closestM: n.distM, sinceMs: ctx.nowMs }, zoom: null };
+      }
+      return { next: JUNCTION_ZOOM_START, zoom: s.restoreZoom };
+    }
+    if (ctx.nowMs - s.sinceMs >= JUNCTION_HOLD_MAX_MS) return { next: JUNCTION_ZOOM_START, zoom: s.restoreZoom };
     return { next: { ...s, closestM }, zoom: null };
   }
   if (!ctx.on || !ctx.junction || !(ctx.speedMps != null && ctx.speedMps >= MOVING_SPEED_MPS)) return { next: s, zoom: null };
