@@ -1,6 +1,8 @@
 // German. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "Passwort anzeigen",
+  "Hide Password": "Passwort verbergen",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Ohne Empfang gibt dein Handy Alarme an deine Gruppe weiter und sendet NOTFALL. Standorte und Nachrichten per Bluetooth sind Pro.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Ohne Empfang siehst du Fahrer in der Nähe und gibst ihnen per Bluetooth deinen Standort, Status-Tipps und Nachrichten. Mit Free gibt dein Handy weiter Alarme für die Gruppe weiter, und NOTFALL, Brauche Hilfe und Unfallalarme gehen weiter per Bluetooth raus.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Alle Pro-Funktionen gehören dir bis {date} kostenlos. Danach fährst du mit Free weiter, und Touren beitreten, der Tourmodus und NOTFALL bleiben kostenlos.",

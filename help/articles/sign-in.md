@@ -4,7 +4,7 @@ summary: Sign in with Apple, Google or Facebook, an email and password, or an em
 category: account
 order: 10
 release: "1.0"
-updated: 2026-11-07
+updated: 2026-11-10
 sources:
   - app/src/core/app-settings.ts
   - app/src/app/sign-in.tsx
@@ -19,8 +19,9 @@ sources:
   - app/src/core/auth-link.ts
   - app/src/core/google-oauth.ts
   - app/src/app/(tabs)/profile.tsx
+  - app/src/components/ui.tsx
 related: [getting-started, ride-name-and-profile, delete-account, troubleshooting]
-keywords: [log in, login, sign up, register, password, forgot password, reset, magic link, email link, apple, google, facebook, sign out, log out, tablet]
+keywords: [log in, login, sign up, register, password, show password, hide password, forgot password, reset, magic link, email link, apple, google, facebook, sign out, log out, tablet]
 ---
 
 You need an account to create rides, keep a Garage and save riding groups. You can sign in with a social account, with your email and a password, or with a link we email you.
@@ -60,6 +61,12 @@ On the website and on Android, **Continue with Apple** uses Apple's web sign-in:
 1. Tap **Sign In** at the top.
 2. Enter your **Email** and **Password**.
 3. Tap **Sign In**.
+
+:::release 3.0
+## See the Password You Typed
+
+Every password box (Sign In, Create Account and New Password) has an eye button at its right edge. Tap it to show what you typed so you can check it, and tap it again to hide it. The password starts hidden each time the screen opens.
+:::
 
 ## Sign In With an Email Link (No Password)
 

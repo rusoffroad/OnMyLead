@@ -1,6 +1,8 @@
 // Korean. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "비밀번호 표시",
+  "Hide Password": "비밀번호 숨기기",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "신호가 없으면 휴대폰이 그룹의 알림을 전달하고 긴급 상황을 보내요. 블루투스 위치와 메시지는 Pro예요.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "신호가 없을 때 가까운 라이더를 보고 블루투스로 내 위치, 상태, 메시지를 전달하세요. Free에서도 휴대폰은 그룹의 알림을 계속 전달하고, 긴급 상황, 도움 필요, 충돌 알림은 블루투스로 계속 나가요.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date}까지 모든 Pro 기능을 무료로 쓰실 수 있어요. 그 후에는 Free로 계속 달리며, 라이드 참여, 라이드 모드, 긴급 상황은 계속 무료예요.",
