@@ -15,7 +15,7 @@ sources:
   - app/src/core/app-log.ts
   - app/src/lib/app-log.ts
   - app/src/lib/device-info.ts
-related: [troubleshooting, faq, report-and-block, emergency-and-safety, manage-subscription, delete-account]
+related: [crop-a-photo, troubleshooting, faq, report-and-block, emergency-and-safety, manage-subscription, delete-account]
 keywords: [contact, support, help, email, bug, problem, feedback, feature request, billing question, refund, customer service]
 ---
 
@@ -54,6 +54,11 @@ If something in the app isn't working, tell us with a screenshot so we can fix i
    - **Android phone or tablet**: press the power and volume down buttons together.
 2. Go to the **You** tab. Under **Help**, tap **Report a Bug**. The form opens with **Something Isn't Working** already picked.
 3. Tap **Add a Screenshot** and pick your screenshot. Tap **Change Screenshot** or **Remove** if you picked the wrong one.
+
+:::release 3.0
+   On the **Crop the Screenshot** screen, zoom in on the part that shows the problem (or leave it whole), then tap **Use Photo**.
+:::
+
 4. Write what you tapped, what happened and what you expected, then tap **Send Message**.
 
 Your report also includes your phone model, your OnMyLead version, the screen you were on before you opened the form, and a short log of what the app just did (the screens you opened, errors and requests that failed). The log never includes your location, your messages or anything you typed, and it's kept only in memory: it's gone when you close the app.

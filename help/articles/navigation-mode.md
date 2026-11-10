@@ -223,6 +223,11 @@ On a trail you can:
 
 - Name it and add details: **Difficulty** (Easy, Moderate, Hard or Extreme), **Vehicles That Fit**, **Surface**, **Season**, **Width Limit (Inches, Optional)** for the narrowest gate or gap, **One Way** and notes.
 - Add up to 6 photos. Press and hold a photo to remove it.
+
+:::release 3.0
+Each photo opens on the crop screen first, so you can frame it and pick its shape. See [Crop a Photo](/help/crop-a-photo).
+:::
+
 - See its distance, climb, high point and, for a recording, moving time.
 - **Follow in Navigate**, **Plan a Group Ride on This Trail** or **Delete Trail**.
 

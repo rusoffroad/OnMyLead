@@ -102,7 +102,7 @@ export async function eventForRide(rideId: string): Promise<{ share_code: string
 
 // ---- Photos ----
 
-/** Picks photos from the library (several at once where the phone allows), or one from the camera. */
+/** Picks photos from the library (several at once where the phone allows), or one from the camera. The event page crops each one next. */
 export async function pickEventPhotos(source: 'camera' | 'library', max: number): Promise<ImagePicker.ImagePickerAsset[]> {
   if (max <= 0) return [];
   if (source === 'camera') {

@@ -6,6 +6,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
+import { usePhotoCrop } from '@/components/photo-cropper';
 import { ProTag, Social } from '@/components/social/parts';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, themedStyles } from '@/constants/theme';
@@ -29,6 +30,7 @@ export default function NewPost() {
   const pro = can(ent, 'social_posts');
   const [text, setText] = useState('');
   const [photo, setPhoto] = useState<ImagePickerAsset | null>(null);
+  const { cropper, crop } = usePhotoCrop();
   const [busy, setBusy] = useState<'post' | 'camera' | 'library' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +38,8 @@ export default function NewPost() {
     setError(null);
     setBusy(source);
     try {
-      const p = await pickPostPhoto(source);
+      const picked = await pickPostPhoto(source);
+      const p = picked && (await crop(picked, { maxSide: 2048 }));
       if (p) setPhoto(p);
     } catch (e) {
       setError((e as Error).message);
@@ -106,6 +109,7 @@ export default function NewPost() {
           {t('Shows on your profile and in the feeds of the riders your Who Sees Your Activity setting allows. Your location is never added. Keep it friendly: riders can report posts, and the OnMyLead team removes ones that break the rules.')}
         </Text>
       </View>
+      {cropper}
     </Screen>
   );
 }

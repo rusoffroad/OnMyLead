@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -358,6 +358,9 @@ export function Showcase() {
               <Feature title="Profile Pictures">Take a photo or pick one from your library, cropped square and shrunk to a small file. It shows next to your name in rider lists, chat, Messages, Friends and Out Riding, so everyone knows who’s who. No picture? You keep your initial.</Feature>
               {SHOWCASE_GROUP_PHOTOS ? (
                 <Feature title="Group Photos">Give your riding group a photo of the crew. Everyone in the group sees it on the group page, in their group list and on Home, and friends you send the group link to see it before they join, so they know it’s your crew.</Feature>
+              ) : null}
+              {SHOWCASE_PHOTO_CROP ? (
+                <Feature title="Crop Every Photo">Frame every photo before it goes up: your profile picture, group photo, garage, posts, events, trails and bug report screenshots. Drag and zoom it, pick a shape where you can, and tap Use Photo. The same on iPhone, iPad, Android and onmylead.com.</Feature>
               ) : null}
               <Feature title="Pick Your Own Code">Give your ride, riding group or friend link a code that’s easy to say at the trailhead, like MOAB-2026. OnMyLead checks as you type that nobody else has it.</Feature>
               <Feature title="Starlink Page">Plan power for your dish on the trail: watts, battery and solar, plus live status when you’re on its network.</Feature>
