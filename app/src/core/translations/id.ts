@@ -3364,6 +3364,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Grup ini sudah tidak ada, atau kamu bukan anggotanya lagi.",
   "Please sign in first.": "Masuk dulu, ya.",
   "Only the rider who made the group can change its photo.": "Hanya pengendara yang membuat grup yang bisa mengganti fotonya.",
+  "Everyone in {groupName} is already invited, going or hosting.": "Semua di {groupName} sudah diundang, ikut, atau menjadi tuan rumah.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Mengundang {count} {v} dari {groupName}. Mereka mendapat notifikasi dan bisa memilih Ikut atau Tertarik.",
+  "Inviting a group to an event switches on with the next server update.": "Mengundang grup ke acara aktif dengan pembaruan server berikutnya.",
+  "Then invite everyone to your event in one tap.": "Lalu undang semua ke acaramu dengan sekali ketuk.",
 };
 
 export default dict;

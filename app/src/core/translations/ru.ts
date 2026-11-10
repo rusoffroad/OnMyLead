@@ -3364,6 +3364,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Этой группы больше нет, или вы в ней больше не состоите.",
   "Please sign in first.": "Сначала войдите.",
   "Only the rider who made the group can change its photo.": "Менять фото группы может только райдер, который её создал.",
+  "Everyone in {groupName} is already invited, going or hosting.": "Все в {groupName} уже приглашены, идут или организуют.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Приглашено {count} {v} из {groupName}. Они получат уведомление и смогут ответить «Иду» или «Интересно».",
+  "Inviting a group to an event switches on with the next server update.": "Приглашение группы на событие включится со следующим обновлением сервера.",
+  "Then invite everyone to your event in one tap.": "Затем приглашайте всех на своё событие одним касанием.",
 };
 
 export default dict;
