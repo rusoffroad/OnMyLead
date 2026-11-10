@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.0",
+    "title": "Crop Every Photo You Add",
+    "intro": "OnMyLead 3.0 lets you frame every photo before it goes up. Your profile picture, group photo, machine photo, posts, event photos, trail photos and bug report screenshots all open on a crop screen where you drag and zoom until it looks right.",
+    "whatsNew": "What's new in 3.0:\n\n• Crop every photo you add: profile picture, group photo, garage, posts, events, trails and screenshots. Drag, pinch or double-tap to zoom, pick a shape, then Use Photo.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Crop any photo before it uploads. Your profile picture, group photo, machine photo, post photo, event photos, trail photos and bug report screenshots open on a crop screen first: drag the photo, pinch or double-tap to zoom (or use the minus and plus buttons), and tap Use Photo. Profile pictures crop square with a circle guide, group photos wide (16:9) and machine photos 4:3; for the rest pick Original, Square, 4:3, 16:9 or 4:5. Adding several event photos crops them one by one, or tap Use the Rest As They Are. Group photos on iPhone and iPad are no longer cut to the middle for you. It works the same on iPhone, iPad, Android phones and tablets, and onmylead.com, where the mouse wheel and keyboard zoom and move the photo too."
+      }
+    ]
+  },
+  {
     "version": "2.1",
     "title": "Bluetooth Sharing With No Service, Every Map on Mapbox, 3D Terrain and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group (seeing riders and sharing over Bluetooth is part of OnMyLead Pro; on every plan your phone passes alerts along and EMERGENCY goes out, and every rider without Pro gets a fresh 30-day Pro trial with this update). When a rider sends EMERGENCY or their Crash Alert goes out, every other rider's phone now sounds a loud siren until they silence it. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",

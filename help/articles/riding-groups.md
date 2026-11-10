@@ -4,7 +4,7 @@ summary: Save the people you ride with as a group, invite friends with a link, a
 category: groups
 order: 10
 release: "1.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/core/pro.ts
   - app/src/app/(tabs)/groups.tsx
@@ -124,7 +124,13 @@ Adding or changing a group photo is part of OnMyLead Pro, including the Pro Tria
 3. Tap **Take Photo** to use the camera, or **Choose Photo** to pick one from your photo library. On onmylead.com, **Choose Photo** opens your computer's or phone's file picker.
 4. The photo saves straight away and the screen says **Group photo saved**.
 
+:::until 3.0
 The photo is wide (16:9). On an Android phone or tablet you frame it on the crop screen before it saves. On iPhone, iPad and the website the middle of the photo is used, so keep the crew near the center.
+:::
+
+:::release 3.0
+The photo is wide (16:9). After you take or pick it, the **Crop the Group Photo** screen opens on every device: drag and zoom until the crew fills the frame, then tap **Use Photo**. See [Crop a Photo](/help/crop-a-photo).
+:::
 
 To change it, tap **Choose New Photo** (or **Take Photo**). To take it down, tap **Remove**, then **Remove** again. Tap the photo at the top of the group page to see it full size.
 

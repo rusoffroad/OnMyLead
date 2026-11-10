@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/components/use-follow-camera.ts
   - app/src/core/intersections.ts
@@ -219,6 +219,11 @@ On a trail you can:
 
 - Name it and add details: **Difficulty** (Easy, Moderate, Hard or Extreme), **Vehicles That Fit**, **Surface**, **Season**, **Width Limit (Inches, Optional)** for the narrowest gate or gap, **One Way** and notes.
 - Add up to 6 photos. Press and hold a photo to remove it.
+
+:::release 3.0
+Each photo opens on the crop screen first, so you can frame it and pick its shape. See [Crop a Photo](/help/crop-a-photo).
+:::
+
 - See its distance, climb, high point and, for a recording, moving time.
 - **Follow in Navigate**, **Plan a Group Ride on This Trail** or **Delete Trail**.
 

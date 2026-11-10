@@ -3,6 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 
+import { usePhotoCrop } from '@/components/photo-cropper';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
@@ -43,6 +44,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
   const [mpg, setMpg] = useState(str(vehicle?.mpg));
   const [width, setWidth] = useState(str(vehicle?.width_in));
   const [photo, setPhoto] = useState<PickedPhoto | null>(null);
+  const { cropper, crop } = usePhotoCrop();
   const [busy, setBusy] = useState(false);
   const [vinBusy, setVinBusy] = useState(false);
   const [vinNote, setVinNote] = useState<string | null>(null);
@@ -59,10 +61,12 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
   async function pickPhoto() {
     setError(null);
     try {
-      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [4, 3], quality: 0.7 });
+      const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: false, quality: 1 });
       if (res.canceled || !res.assets?.length) return;
-      const a = res.assets[0];
-      setPhoto({ uri: a.uri, mimeType: a.mimeType ?? null, file: a.file ?? null });
+      // The same 4:3 crop screen on every device, then a JPEG of at most 1600 px.
+      const a = await crop(res.assets[0], { aspect: 4 / 3, title: t('Crop the Photo'), maxSide: 1600, quality: 0.75 });
+      if (!a) return;
+      setPhoto({ uri: a.uri, mimeType: 'image/jpeg', file: null });
     } catch (e) {
       setError(e instanceof Error ? e.message : t('Could not open your photos.'));
     }
@@ -233,6 +237,7 @@ export function VehicleForm({ vehicle, onSaved }: { vehicle?: Vehicle | null; on
 
       <ErrorText error={error} />
       <Button title={current ? t('Save Changes') : t('Add to Garage')} big loading={busy} onPress={save} />
+      {cropper}
     </>
   );
 }

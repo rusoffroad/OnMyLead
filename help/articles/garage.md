@@ -4,7 +4,7 @@ summary: Add your rig or side-by-side with a photo, fill details from the VIN, t
 category: account
 order: 40
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - app/src/app/garage/**
   - app/src/components/vehicle-form.tsx
@@ -15,7 +15,7 @@ sources:
   - app/src/lib/export.web.ts
   - app/src/app/(tabs)/profile.tsx
   - app/app.json
-related: [fuel-range, trip-planner, starlink, rus-gear]
+related: [crop-a-photo, fuel-range, trip-planner, starlink, rus-gear]
 keywords: [garage, width, trail width, vehicle, machine, rig, truck, jeep, sxs, utv, side by side, vin, build sheet, mods, parts, csv, fuel range, mpg, tablet]
 screenshots:
   - file: vehicle.webp
@@ -38,6 +38,10 @@ You need to be signed in.
 1. Tap **Add a Machine**.
 2. Under **What Are You Adding?**, pick **Vehicle** or **SXS/UTV**.
 3. Tap **Choose Photo** to add a photo from your library (optional).
+
+:::release 3.0
+The **Crop the Photo** screen opens with a 4:3 frame. Drag and zoom until your machine fills it, then tap **Use Photo**.
+:::
 
 On Android, the system photo picker opens, and OnMyLead only gets the photo you pick.
 4. Fill in a **Nickname**, or the **Year**, **Make** and **Model**. You need a nickname or a make and model. **Trim** is optional.

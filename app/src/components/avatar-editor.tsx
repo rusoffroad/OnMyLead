@@ -7,25 +7,29 @@ import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/const
 import { initialOf } from '@/core/profile';
 import { canUseCamera, pickAvatar, removeAvatar, saveAvatar, useAvatar, type AvatarSource } from '@/lib/avatars';
 import { confirmAsync } from '@/lib/confirm';
+import { usePhotoCrop } from './photo-cropper';
 import { RiderPhoto } from './rider-photo';
 
 import { t } from '@/lib/i18n';
 /**
- * Profile Picture: take one with the camera (app) or choose one from the photo library, cropped
- * square; change or remove it. Riders without one keep their initial.
+ * Profile Picture: take one with the camera (app) or choose one from the photo library, then
+ * frame it on the square crop screen; change or remove it. Riders without one keep their initial.
  */
 export function AvatarEditor({ userId, name }: { userId: string; name: string }) {
   const photo = useAvatar(userId);
   const [busy, setBusy] = useState<AvatarSource | 'remove' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
+  const { cropper, crop } = usePhotoCrop();
 
   const pick = async (source: AvatarSource) => {
     setError(null);
     setDone(null);
     setBusy(source);
     try {
-      const asset = await pickAvatar(source);
+      const picked = await pickAvatar(source);
+      if (!picked) return;
+      const asset = await crop(picked, { aspect: 1, round: true, title: t('Crop Your Picture'), maxSide: 1024 });
       if (!asset) return;
       await saveAvatar(asset);
       setDone(photo ? t('Picture changed.') : t('Picture saved. Riders see it next to your name.'));
@@ -110,6 +114,7 @@ export function AvatarEditor({ userId, name }: { userId: string; name: string })
       <ThemedText type="small" themeColor="textSecondary">
         {t('Signed-in riders can see it, like your ride name. Keep it friendly: the OnMyLead team removes photos that break the rules.')}
       </ThemedText>
+      {cropper}
     </View>
   );
 }
