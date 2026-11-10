@@ -1,6 +1,8 @@
 // Korean. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "비밀번호 표시",
+  "Hide Password": "비밀번호 숨기기",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "신호가 없으면 휴대폰이 그룹의 알림을 전달하고 긴급 상황을 보내요. 블루투스 위치와 메시지는 Pro예요.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "신호가 없을 때 가까운 라이더를 보고 블루투스로 내 위치, 상태, 메시지를 전달하세요. Free에서도 휴대폰은 그룹의 알림을 계속 전달하고, 긴급 상황, 도움 필요, 충돌 알림은 블루투스로 계속 나가요.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date}까지 모든 Pro 기능을 무료로 쓰실 수 있어요. 그 후에는 Free로 계속 달리며, 라이드 참여, 라이드 모드, 긴급 상황은 계속 무료예요.",
@@ -3244,6 +3246,7 @@ const dict: Record<string, string> = {
   "Group Together": "그룹 함께 있음",
   "No Ride Running": "진행 중인 라이드 없음",
   "Open Ride Mode on your phone and your group shows up here.": "휴대폰에서 라이드 모드를 열면 그룹이 여기에 표시됩니다.",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "휴대폰에서 라이드 모드나 지도 모드를 열면 여기에 표시됩니다.",
   "Group": "그룹",
   "Nobody Is Sharing Yet": "아직 공유하는 사람이 없음",
   "Send EMERGENCY with your location to everyone on the ride?": "라이드의 모든 사람에게 내 위치와 함께 긴급 알림을 보낼까요?",
@@ -3364,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "이 그룹이 없어졌거나 더 이상 멤버가 아닙니다.",
   "Please sign in first.": "먼저 로그인하세요.",
   "Only the rider who made the group can change its photo.": "그룹을 만든 라이더만 그룹 사진을 바꿀 수 있습니다.",
+  "Everyone in {groupName} is already invited, going or hosting.": "{groupName}의 모두가 이미 초대되었거나, 참가하거나, 호스트입니다.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{groupName}에서 {count}{v}을(를) 초대했습니다. 알림을 받고 참가 또는 관심 있음을 선택할 수 있습니다.",
+  "Inviting a group to an event switches on with the next server update.": "이벤트에 그룹 초대는 다음 서버 업데이트와 함께 켜집니다.",
+  "Then invite everyone to your event in one tap.": "그러면 이벤트에 한 번의 탭으로 모두 초대할 수 있습니다.",
   "Cookie Notice": "쿠키 안내",
   "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "어떤 광고가 라이더를 OnMyLead로 데려오는지 알기 위해 Meta, Google, TikTok의 광고 쿠키를 사용합니다. 이들은 위치, 라이드, 메시지를 절대 보지 못합니다.",
   "Allow": "허용",

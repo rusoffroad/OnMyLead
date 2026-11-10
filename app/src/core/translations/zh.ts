@@ -1,6 +1,8 @@
 // Chinese (Simplified). The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "显示密码",
+  "Hide Password": "隐藏密码",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "没有信号时，你的手机会为车队转发警报并发送紧急求助。通过蓝牙共享位置和消息属于 Pro。",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "没有信号时，通过蓝牙看到附近骑手，并把你的位置、状态和消息传给他们。使用免费版时，你的手机仍会为车队转发警报，紧急求助、需要帮助和碰撞警报仍会通过蓝牙发出。",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "所有 Pro 功能在 {date} 之前免费归你使用。之后你将继续使用免费版，加入骑行、骑行模式和紧急求助仍然免费。",
@@ -3244,6 +3246,7 @@ const dict: Record<string, string> = {
   "Group Together": "队伍在一起",
   "No Ride Running": "没有进行中的骑行",
   "Open Ride Mode on your phone and your group shows up here.": "在手机上打开骑行模式，你的队伍会显示在这里。",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "在手机上打开骑行模式或地图模式，它会显示在这里。",
   "Group": "队伍",
   "Nobody Is Sharing Yet": "还没有人共享",
   "Send EMERGENCY with your location to everyone on the ride?": "向本次骑行的所有人发送带你位置的紧急求助？",
@@ -3364,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "该群组已不存在，或你已不在其中。",
   "Please sign in first.": "请先登录。",
   "Only the rider who made the group can change its photo.": "只有创建群组的骑手才能更改群组照片。",
+  "Everyone in {groupName} is already invited, going or hosting.": "{groupName} 中的所有人都已被邀请、会参加或是主办人。",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "已邀请 {groupName} 的 {count} {v}。他们会收到通知，并可选择参加或感兴趣。",
+  "Inviting a group to an event switches on with the next server update.": "邀请群组参加活动将在下次服务器更新后开启。",
+  "Then invite everyone to your event in one tap.": "然后一键邀请所有人参加你的活动。",
   "Cookie Notice": "Cookie 通知",
   "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "我们使用 Meta、Google 和 TikTok 的广告 Cookie，了解哪些广告把骑手带到了 OnMyLead。它们永远看不到你的位置、骑行或消息。",
   "Allow": "允许",

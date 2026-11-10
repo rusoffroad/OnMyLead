@@ -1,6 +1,8 @@
 // Indonesian. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "Tampilkan kata sandi",
+  "Hide Password": "Sembunyikan kata sandi",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Tanpa sinyal, ponselmu meneruskan peringatan untuk grup dan mengirim DARURAT. Lokasi dan pesan lewat Bluetooth adalah Pro.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Tanpa sinyal, lihat pengendara terdekat dan teruskan lokasi, status, dan pesanmu lewat Bluetooth. Dengan Free ponselmu tetap meneruskan peringatan untuk grup, dan DARURAT, Butuh Bantuan, serta peringatan tabrakan tetap terkirim lewat Bluetooth.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Semua fitur Pro gratis untukmu sampai {date}. Setelah itu kamu tetap berkendara dengan Free, dan bergabung ke perjalanan, Mode Perjalanan, serta DARURAT tetap gratis.",
@@ -3244,6 +3246,7 @@ const dict: Record<string, string> = {
   "Group Together": "Grup bersama",
   "No Ride Running": "Tidak ada riding berjalan",
   "Open Ride Mode on your phone and your group shows up here.": "Buka Mode Riding di ponselmu dan grupmu muncul di sini.",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "Buka Mode Riding atau Mode Peta di ponselmu dan tampil di sini.",
   "Group": "Grup",
   "Nobody Is Sharing Yet": "Belum ada yang berbagi",
   "Send EMERGENCY with your location to everyone on the ride?": "Kirim DARURAT dengan lokasimu ke semua orang di riding?",
@@ -3364,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Grup ini sudah tidak ada, atau kamu bukan anggotanya lagi.",
   "Please sign in first.": "Masuk dulu, ya.",
   "Only the rider who made the group can change its photo.": "Hanya pengendara yang membuat grup yang bisa mengganti fotonya.",
+  "Everyone in {groupName} is already invited, going or hosting.": "Semua di {groupName} sudah diundang, ikut, atau menjadi tuan rumah.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "Mengundang {count} {v} dari {groupName}. Mereka mendapat notifikasi dan bisa memilih Ikut atau Tertarik.",
+  "Inviting a group to an event switches on with the next server update.": "Mengundang grup ke acara aktif dengan pembaruan server berikutnya.",
+  "Then invite everyone to your event in one tap.": "Lalu undang semua ke acaramu dengan sekali ketuk.",
   "Cookie Notice": "Pemberitahuan Cookie",
   "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Kami memakai cookie iklan dari Meta, Google, dan TikTok untuk melihat iklan mana yang membawa rider ke OnMyLead. Mereka tidak pernah melihat lokasi, perjalanan, atau pesanmu.",
   "Allow": "Izinkan",

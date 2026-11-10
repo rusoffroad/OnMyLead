@@ -6,6 +6,7 @@ order: 30
 release: "1.0"
 updated: 2026-11-10
 sources:
+  - supabase/migrations/20261110100000_event_group_invite.sql
   - supabase/migrations/20261104150000_waypoint_alerts.sql
   - app/src/app/notifications.tsx
   - app/src/core/notifications.ts
@@ -73,6 +74,10 @@ Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status
 - **Ride Invites**: someone invites you, or a group you're in, to a ride.
 - **Riding Group Chat**: new messages in your riding groups' chats. To mute just one group, do it from that group's chat. See [Group Chat](/help/group-chat).
 - **Leaders You Follow**: a leader you follow posts a new public ride.
+
+:::release 3.0
+**Ride Invites** also covers event invites: an event's host invites a riding group you're in to their event. See [Events](/help/events).
+:::
 
 :::release 1.0.3
 - **Direct Messages**: a rider messages you, say after seeing you Out Riding. To mute one conversation, do it from inside it. See [See Who's Out Riding Nearby](/help/out-riding).

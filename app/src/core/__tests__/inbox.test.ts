@@ -88,3 +88,11 @@ describe('matching a row to the notification on the phone', () => {
     expect(inboxNotSwitchedOn('Network request failed')).toBe(false);
   });
 });
+
+describe('event invites in the inbox', () => {
+  it('look like other invites and match by event', () => {
+    expect(inboxLook(item({ kind: 'event_invite', data: { type: 'event_invite', eventId: 'e1' } }))).toEqual({ icon: 'flag', tone: 'social' });
+    expect(notificationKey({ type: 'event_invite', eventId: 'e1', eventCode: 'X' })).toBe('event_invite:e1');
+    expect(notificationKey({ type: 'event_invite', eventId: 'e2' })).not.toBe(notificationKey({ type: 'event_invite', eventId: 'e1' }));
+  });
+});

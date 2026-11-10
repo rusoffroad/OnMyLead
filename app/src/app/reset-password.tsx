@@ -2,7 +2,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 
 import { ThemedText } from '@/components/themed-text';
-import { Button, ErrorText, Field, Screen } from '@/components/ui';
+import { Button, ErrorText, PasswordField, Screen } from '@/components/ui';
 import { parseAuthLink } from '@/core/auth-link';
 import { completeAuthLink, updatePassword, useSession } from '@/lib/session';
 
@@ -48,7 +48,7 @@ export default function ResetPassword() {
   return (
     <Screen width="readable">
       <ThemedText type="subtitle">{t('Choose a New Password')}</ThemedText>
-      <Field label={t('New Password')} value={password} onChangeText={setPassword} secureTextEntry autoComplete="new-password" placeholder={t('At least 8 characters')} />
+      <PasswordField label={t('New Password')} value={password} onChangeText={setPassword} autoComplete="new-password" placeholder={t('At least 8 characters')} />
       <Button
         title={t('Save Password')}
         loading={busy}

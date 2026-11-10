@@ -1,6 +1,8 @@
 // Japanese. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "パスワードを表示",
+  "Hide Password": "パスワードを隠す",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "圏外のとき、スマートフォンがグループのアラートを中継し、緊急通報を送ります。Bluetooth での位置とメッセージは Pro です。",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "圏外のとき、近くのライダーを表示し、自分の位置、ステータス、メッセージを Bluetooth で伝えます。Free でもアラートの中継は続き、緊急通報、助けが必要、衝突アラートは Bluetooth で送られます。",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "{date} まで、すべての Pro 機能を無料でお使いいただけます。その後は Free で引き続き走れます。ライドへの参加、ライドモード、緊急通報は無料のままです。",
@@ -3244,6 +3246,7 @@ const dict: Record<string, string> = {
   "Group Together": "グループはまとまっています",
   "No Ride Running": "ライド中ではありません",
   "Open Ride Mode on your phone and your group shows up here.": "スマートフォンでライドモードを開くと、ここにグループが表示されます。",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "スマートフォンでライドモードかマップモードを開くと、ここに表示されます。",
   "Group": "グループ",
   "Nobody Is Sharing Yet": "まだ誰も共有していません",
   "Send EMERGENCY with your location to everyone on the ride?": "ライドの全員に位置情報付きで緊急通知を送りますか？",
@@ -3364,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "このグループはなくなったか、あなたはもうメンバーではありません。",
   "Please sign in first.": "まずサインインしてください。",
   "Only the rider who made the group can change its photo.": "グループの写真を変えられるのは、グループを作ったライダーだけです。",
+  "Everyone in {groupName} is already invited, going or hosting.": "{groupName} の全員がすでに招待済み、参加予定、または主催者です。",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{groupName} から {count} {v}を招待しました。通知が届き、「参加」か「興味あり」を選べます。",
+  "Inviting a group to an event switches on with the next server update.": "イベントへのグループ招待は次回のサーバー更新で使えるようになります。",
+  "Then invite everyone to your event in one tap.": "イベントに全員をワンタップで招待できます。",
   "Cookie Notice": "Cookie のお知らせ",
   "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "どの広告からライダーが OnMyLead に来たかを知るため、Meta、Google、TikTok の広告 Cookie を使います。位置情報、ライド、メッセージが見られることはありません。",
   "Allow": "許可",

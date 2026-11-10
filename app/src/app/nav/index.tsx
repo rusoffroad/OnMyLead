@@ -20,6 +20,7 @@ import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
+import { carPlayMapState, parseCarPlayAction } from '@/core/carplay';
 import { riderHeading } from '@/core/heading';
 import { useFollowMe } from '@/hooks/use-follow-me';
 import { FollowMeButton } from '@/components/follow-me-button';
@@ -54,6 +55,7 @@ import {
   fetchTrailRules, getLocalTrail, getPublicTrail, loadTrails, markHiddenSeen, readRecording, saveLocalTrail, syncMyTrails, trailLine, useLocalTrails, writeRecording,
   type Recording,
 } from '@/lib/nav-trails';
+import { clearCarPlayMap, onCarPlayAction, showMapOnCarPlay } from '@/lib/carplay';
 import { requirePro, showProGate, useCan } from '@/lib/pro';
 import { useMapModeTime } from '@/lib/map-mode-time';
 import { mapTimeLeftText } from '@/core/map-mode-time';
@@ -526,6 +528,42 @@ export default function NavMode() {
     if (me) map.current?.centerOn(me);
   }
   const rateable = !!followed?.publicTrail && !followed.publicTrail.mine && canRate(lineLengthM(followed.points), followCovered);
+
+  // CarPlay (Pro): with no ride on the car screen, it shows Map Mode's dash while this screen is
+  // in front (core/carplay carPlayMapState). A ride in Ride Mode takes the car screen over.
+  const carPlayPro = useCan('carplay');
+  const carMap = carPlayMapState({
+    speedMps: speed,
+    altitudeM: altitude,
+    headingDeg: dashHeading(meHeading, compass),
+    tripM: trip.distanceM,
+    movingS: trip.movingS,
+    followed: followed && progress
+      ? { name: followed.name, onTrail: progress.onTrail, remainingM: progress.remainingM ?? 0, toStartM: progress.toStartM }
+      : null,
+    recording: rec ? { lengthM: recStats?.lengthM ?? 0, paused: rec.paused } : null,
+  });
+  const carMapKey = JSON.stringify(carMap);
+  const carMapOn = carPlayPro && focused && !WEB;
+  useEffect(() => {
+    if (carMapOn) showMapOnCarPlay(JSON.parse(carMapKey));
+  }, [carMapOn, carMapKey]);
+  useEffect(() => {
+    if (!carMapOn) return;
+    return () => clearCarPlayMap();
+  }, [carMapOn]);
+  // Pause and Resume on the car screen work the recording here.
+  const carPause = useRef(pauseRecording);
+  useEffect(() => {
+    carPause.current = pauseRecording;
+  });
+  useEffect(() => {
+    const sub = onCarPlayAction((id) => {
+      const a = parseCarPlayAction(id);
+      if (a.type === 'record') carPause.current(a.paused);
+    });
+    return () => sub.remove();
+  }, []);
 
   const leave = () => (router.canGoBack() ? router.back() : router.replace('/'));
   // Center on Me's corner, with Follow Me just left of it.

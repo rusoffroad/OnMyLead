@@ -1,6 +1,8 @@
 // French. The English line is the key (core/i18n.ts); a line missing here shows in English.
 // Keep every {placeholder}. core/__tests__/i18n.test.ts checks each language has every line.
 const dict: Record<string, string> = {
+  "Show Password": "Afficher le mot de passe",
+  "Hide Password": "Masquer le mot de passe",
   "With no service, your phone passes alerts along for your group and sends EMERGENCY. Spots and messages over Bluetooth are Pro.": "Sans réseau, votre téléphone relaie les alertes pour votre groupe et envoie URGENCE. Positions et messages par Bluetooth sont Pro.",
   "With no service, see nearby riders and pass your spot, status taps and messages to them over Bluetooth. On Free your phone still passes alerts along for the group, and EMERGENCY, Need Help and Crash Alerts still go out over Bluetooth.": "Sans réseau, voyez les pilotes proches et transmettez-leur votre position, vos statuts et vos messages par Bluetooth. Avec Free, votre téléphone relaie toujours les alertes du groupe, et URGENCE, Besoin d’Aide et les alertes de chute partent toujours par Bluetooth.",
   "Every Pro feature is yours free until {date}. After that you keep riding on Free, and joining rides, Ride Mode and EMERGENCY stay free.": "Toutes les fonctions Pro sont à vous gratuitement jusqu’au {date}. Ensuite, vous continuez avec Free, et rejoindre des sorties, le Mode Sortie et URGENCE restent gratuits.",
@@ -3244,6 +3246,7 @@ const dict: Record<string, string> = {
   "Group Together": "Groupe réuni",
   "No Ride Running": "Aucune balade en cours",
   "Open Ride Mode on your phone and your group shows up here.": "Ouvre le Mode Balade sur ton téléphone et ton groupe apparaîtra ici.",
+  "Open Ride Mode or Map Mode on your phone and it shows up here.": "Ouvre le Mode Balade ou le Mode Carte sur ton téléphone et il apparaîtra ici.",
   "Group": "Groupe",
   "Nobody Is Sharing Yet": "Personne ne partage encore",
   "Send EMERGENCY with your location to everyone on the ride?": "Envoyer une URGENCE avec ta position à tous les participants ?",
@@ -3364,6 +3367,10 @@ const dict: Record<string, string> = {
   "This group is gone, or you’re no longer in it.": "Ce groupe n’existe plus, ou vous n’en faites plus partie.",
   "Please sign in first.": "Connectez-vous d’abord.",
   "Only the rider who made the group can change its photo.": "Seul le pilote qui a créé le groupe peut changer sa photo.",
+  "Everyone in {groupName} is already invited, going or hosting.": "Tout le monde dans {groupName} est déjà invité, participe ou organise.",
+  "Invited {count} {v} from {groupName}. They get a notification and can say Going or Interested.": "{count} {v} de {groupName} invités. Ils reçoivent une notification et peuvent répondre J’y vais ou Intéressé.",
+  "Inviting a group to an event switches on with the next server update.": "Inviter un groupe à un événement sera activé avec la prochaine mise à jour du serveur.",
+  "Then invite everyone to your event in one tap.": "Puis invitez tout le monde à votre événement d’un seul geste.",
   "Cookie Notice": "Avis sur les cookies",
   "We use ad cookies from Meta, Google and TikTok to see which of our ads bring riders to OnMyLead. They never see your location, rides or messages.": "Nous utilisons des cookies publicitaires de Meta, Google et TikTok pour savoir lesquelles de nos publicités amènent des pilotes sur OnMyLead. Ils ne voient jamais votre position, vos sorties ni vos messages.",
   "Allow": "Autoriser",

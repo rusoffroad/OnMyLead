@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { LatLng } from '../geo';
 import {
-  isJunctionLine, JUNCTION_HOLD_MAX_MS, JUNCTION_ZOOM_START, junctionLines, junctionTriggerM, junctionZoomStep, nextJunction, type JunctionZoom,
+  isJunctionLine, JUNCTION_CLEAR_M, JUNCTION_HOLD_MAX_MS, JUNCTION_STAY_ZOOMED_M, JUNCTION_STAY_ZOOMED_MI, junctionPassed, JUNCTION_ZOOM_START, junctionLines, junctionTriggerM, junctionZoomStep, nextJunction, type JunctionZoom,
 } from '../intersections';
 
 const O: LatLng = { lat: 39.5, lng: -105.8 };
@@ -106,5 +106,56 @@ describe('zooming in at a junction and back out', () => {
     const s = junctionZoomStep(JUNCTION_ZOOM_START, { on: true, nowMs: 0, zoom: 14, at: O, speedMps: 13, junction }).next;
     expect(junctionZoomStep(s, { on: true, nowMs: JUNCTION_HOLD_MAX_MS, zoom: 17, at: at(0, 98), speedMps: 0, junction: null }).zoom).toBe(14);
     expect(junctionZoomStep(s, { on: false, nowMs: 10, zoom: 17, at: at(0, 20), speedMps: 13, junction: null }).zoom).toBe(14);
+  });
+
+  describe('look-ahead: staying zoomed in when another junction is close', () => {
+    const inAt = () => junctionZoomStep(JUNCTION_ZOOM_START, { on: true, nowMs: 0, zoom: 14, at: O, speedMps: 13, junction }).next;
+
+    it('looks a quarter mile ahead, a tunable constant', () => {
+      expect(JUNCTION_STAY_ZOOMED_MI).toBe(0.25);
+      expect(JUNCTION_STAY_ZOOMED_M).toBeCloseTo(402.3, 1);
+    });
+
+    it('knows when the rider is through the junction', () => {
+      let s = inAt();
+      expect(junctionPassed(JUNCTION_ZOOM_START, at(0, 150))).toBe(false);
+      s = junctionZoomStep(s, { on: true, nowMs: 500, zoom: 17, at: at(0, 100), speedMps: 13, junction: null }).next;
+      expect(junctionPassed(s, at(0, 110))).toBe(false);
+      expect(junctionPassed(s, at(0, 100 + JUNCTION_CLEAR_M + 1))).toBe(true);
+    });
+
+    it('stays zoomed in through a run of close junctions, then zooms out once after the last', () => {
+      let s = inAt();
+      const zooms: (number | null)[] = [];
+      const ride = (north: number, next: { at: ReturnType<typeof at>; distM: number } | null, nowMs: number) => {
+        const r = junctionZoomStep(s, { on: true, nowMs, zoom: 17, at: at(0, north), speedMps: 13, junction: next });
+        zooms.push(r.zoom);
+        s = r.next;
+      };
+      ride(100, null, 1000);
+      // Through the first; the next is 200 m on: stay in and watch that one.
+      ride(140, { at: at(0, 340), distM: 200 }, 2000);
+      expect(s).toMatchObject({ state: 'in', restoreZoom: 14, at: at(0, 340) });
+      ride(340, null, 3000);
+      // Through the second; the next is a mile away: zoom back out to where it was.
+      ride(380, { at: at(0, 1990), distM: 1610 }, 4000);
+      expect(zooms).toEqual([null, null, null, 14]);
+      expect(s).toEqual(JUNCTION_ZOOM_START);
+    });
+
+    it('does not treat the junction just passed as the next one', () => {
+      let s = inAt();
+      s = junctionZoomStep(s, { on: true, nowMs: 500, zoom: 17, at: at(0, 100), speedMps: 13, junction: null }).next;
+      const r = junctionZoomStep(s, { on: true, nowMs: 1000, zoom: 17, at: at(0, 150), speedMps: 13, junction: { at: at(0, 110), distM: 40 } });
+      expect(r.zoom).toBe(14);
+    });
+
+    it('gives the next junction its own time limit, and still zooms out if the switch goes off', () => {
+      let s = inAt();
+      s = junctionZoomStep(s, { on: true, nowMs: 40_000, zoom: 17, at: at(0, 100), speedMps: 13, junction: null }).next;
+      s = junctionZoomStep(s, { on: true, nowMs: 50_000, zoom: 17, at: at(0, 150), speedMps: 13, junction: { at: at(0, 300), distM: 150 } }).next;
+      expect(junctionZoomStep(s, { on: true, nowMs: 70_000, zoom: 17, at: at(0, 200), speedMps: 13, junction: null }).zoom).toBeNull();
+      expect(junctionZoomStep(s, { on: false, nowMs: 70_000, zoom: 17, at: at(0, 200), speedMps: 13, junction: null }).zoom).toBe(14);
+    });
   });
 });
