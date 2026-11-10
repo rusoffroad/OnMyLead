@@ -33,6 +33,15 @@ jobs:
       # Mapbox public token for every map (repo Settings > Secrets and variables > Actions >
       # Variables > MAPBOX_PUBLIC_TOKEN). Empty: the website keeps its Leaflet maps, without 3D Terrain.
       EXPO_PUBLIC_MAPBOX_TOKEN: ${{ vars.MAPBOX_PUBLIC_TOKEN }}
+      # Ad measurement ids (F121), from repo Settings > Secrets and variables > Actions >
+      # Variables. They're public page ids (tokens stay in Supabase secrets); empty means the
+      # website simply loads no ad pixel.
+      EXPO_PUBLIC_META_PIXEL_ID: ${{ vars.META_PIXEL_ID }}
+      EXPO_PUBLIC_TIKTOK_PIXEL_ID: ${{ vars.TIKTOK_PIXEL_ID }}
+      EXPO_PUBLIC_GOOGLE_ADS_ID: ${{ vars.GOOGLE_ADS_ID }}
+      EXPO_PUBLIC_GOOGLE_ADS_SIGNUP_LABEL: ${{ vars.GOOGLE_ADS_SIGNUP_LABEL }}
+      EXPO_PUBLIC_GOOGLE_ADS_TRIAL_LABEL: ${{ vars.GOOGLE_ADS_TRIAL_LABEL }}
+      EXPO_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL: ${{ vars.GOOGLE_ADS_PURCHASE_LABEL }}
       EXPO_OFFLINE: '1'
     steps:
       - uses: actions/checkout@v4
