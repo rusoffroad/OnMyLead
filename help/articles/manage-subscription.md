@@ -4,7 +4,7 @@ summary: Change between monthly and annual or cancel OnMyLead Pro in your Apple 
 category: pro
 order: 40
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - app/src/app/subscription.tsx
   - app/src/app/pro.tsx

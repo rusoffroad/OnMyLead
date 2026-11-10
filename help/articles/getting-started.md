@@ -4,7 +4,7 @@ summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make y
 category: getting-started
 order: 10
 release: "1.0"
-updated: 2026-11-06
+updated: 2026-11-10
 sources:
   - app/src/app/(tabs)/_layout.tsx
   - app/src/components/tab-bar.tsx
@@ -159,6 +159,12 @@ On Android, allow location **While Using the App**. OnMyLead never asks for **Al
 
 If you add a photo of your machine to your Garage, the app asks to use your photos. Only the photo you pick is uploaded.
 
+:::release 3.0
+### Tracking (iPhone and iPad)
+
+After you sign in and agree before you ride, your iPhone or iPad asks once: **Allow "OnMyLead" to track your activity across other companies' apps and websites?** Tap **Allow** and Meta and TikTok learn when one of our ads brought you to OnMyLead. Tap **Ask App Not to Track** and nothing is sent. The app works the same either way. On Android this is the **Ad Measurement** switch in **You > Settings**. See [Ad Measurement and Tracking](/help/ad-measurement).
+:::
+
 ## Using the Website
 
 Some things also work at onmylead.com in a web browser:
@@ -171,6 +177,7 @@ Some things also work at onmylead.com in a web browser:
 :::release 2.0
 - **Map Mode** sits in the same menu, under **Find**.
 :::
+- The first time you visit, a notice at the bottom asks about ad cookies. Nothing from Meta, Google or TikTok loads unless you tap **Allow**. See [Ad Measurement and Tracking](/help/ad-measurement).
 - Read these guides: click **Help** at the top of the home page, on a computer or a phone.
 
 Ride Mode and live tracking stay in the app on your phone or tablet.

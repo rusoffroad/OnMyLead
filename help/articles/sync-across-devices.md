@@ -4,7 +4,7 @@ summary: Sign in with the same account on your iPhone, iPad, Android phone, tabl
 category: account
 order: 25
 release: "2.0"
-updated: 2026-11-05
+updated: 2026-11-10
 sources:
   - app/src/lib/map-waypoints.ts
   - app/src/core/map-waypoints.ts
