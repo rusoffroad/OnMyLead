@@ -32,7 +32,10 @@ export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; 
     return (
       <HomeCard style={styles.empty}>
         <Icon name="people" size={24} color={Home.muted} />
-        <Text style={[homeStyles.muted, { flex: 1 }]}>{emptyText}</Text>
+        {/* flex on the Text itself clipped it to one line on iPhone; the wrapper takes the width. */}
+        <View style={{ flex: 1 }}>
+          <Text style={homeStyles.muted}>{emptyText}</Text>
+        </View>
       </HomeCard>
     );
   }

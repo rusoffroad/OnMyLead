@@ -41,7 +41,7 @@ You can also run OnMyLead next to another app (Split View or Slide Over on an iP
 :::release 3.0
 On a tablet, **Home**, **Rides**, **Map Mode**, **Events**, **Social** and **You** run down the left edge of the screen instead of along the bottom. **Map Mode** opens your offroad map full screen.
 
-On **Home**, with the tablet sideways, **Map Mode**, **Join a Ride**, **Start a Ride**, **Events** and **Customize Home** stay on the left, and your sections (Out Riding Now, Up Next, Your Group, Feed and any others you turned on) are beside them. Upright, it's one column. See [Your Home Screen](/help/home-screen).
+On **Home**, with the tablet sideways, **Map Mode**, **Join a Ride**, **Start a Ride**, **Events** and **Customize Home** stay on the left, and your sections (Out Riding Now, Up Next, Your Group, Feed and any others you turned on) are beside them, with **Your Toolkit** at the bottom. Your badges sit at the top, just above the greeting. Upright, it's one column. See [Your Home Screen](/help/home-screen).
 :::
 
 :::until 3.0

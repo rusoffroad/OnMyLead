@@ -36,7 +36,16 @@ describe('Customize Home', () => {
     expect(placeSection(DEFAULT_HOME_LAYOUT, 'past', 0).order[0]).toBe('past');
     expect(shownSections(toggleSection(DEFAULT_HOME_LAYOUT, 'group', false))).toEqual(['out', 'next', 'feed']);
     expect(isDefaultLayout(DEFAULT_HOME_LAYOUT)).toBe(true);
-    expect(isDefaultLayout(toggleSection(DEFAULT_HOME_LAYOUT, 'badges', true))).toBe(false);
+    expect(isDefaultLayout(toggleSection(DEFAULT_HOME_LAYOUT, 'past', true))).toBe(false);
+  });
+
+  it('keeps Badges (top) and Your Toolkit (bottom) out of the sections, even from an old saved layout', () => {
+    expect(HOME_SECTIONS.map((s) => s.id)).not.toContain('badges');
+    expect(HOME_SECTIONS.map((s) => s.id)).not.toContain('toolkit');
+    const l = parseHomeLayout({ order: ['badges', 'feed', 'toolkit', 'out'], hidden: [] });
+    expect(l.order).not.toContain('badges');
+    expect(l.order).not.toContain('toolkit');
+    expect(l.order.indexOf('feed')).toBeLessThan(l.order.indexOf('out'));
   });
 
   it('follows the account across devices', () => {

@@ -13,7 +13,7 @@
       },
       {
         "kind": "new",
-        "text": "Customize Home: tap Customize Home at the bottom of Home to turn sections on or off and move them up or down, including Public Rides Near You, Your Badges, Your Toolkit and Past Rides. Your layout follows your account to every phone, tablet and the website."
+        "text": "Customize Home: tap Customize Home at the bottom of Home to turn sections on or off and move them up or down, including Public Rides Near You and Past Rides. Your badges and rank sit at the very top, just above your greeting, and Your Toolkit is always at the bottom. Your layout follows your account to every phone, tablet and the website."
       },
       {
         "kind": "new",
@@ -62,6 +62,18 @@
       {
         "kind": "new",
         "text": "How Did You Find OnMyLead?: new riders see one quick question on Home, asked once. Tap where you heard about us or tap Not Now. Answers are only counted, never shown to other riders."
+      },
+      {
+        "kind": "improved",
+        "text": "Post photos keep their shape: a tall or wide photo in a post now shows as you took it (from portrait 4:5 to wide 16:9) instead of being cropped to the same box every time."
+      },
+      {
+        "kind": "improved",
+        "text": "Make It a Group Ride sets the meet time to the next quarter hour today, so a ride you start from the trail is ready to go now instead of at 8:00 am."
+      },
+      {
+        "kind": "fixed",
+        "text": "Android: the fades on the Home cards showed as solid black. They now fade like on iPhone. Map Mode's Center on Me, Follow Me and music buttons also stay above the bottom panel on every phone size."
       }
     ]
   },

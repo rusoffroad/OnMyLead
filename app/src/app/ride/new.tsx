@@ -27,7 +27,7 @@ import { useGarageWidths } from '@/lib/trail-width';
 import { metersToMiles } from '@/core/geo';
 import { getLocalTrail, loadTrails, trailLine } from '@/lib/nav-trails';
 import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
-import { clockText, parseTime, shiftClock } from '@/core/time';
+import { clockText, LAST_MINUTE_OF_DAY, parseTime, shiftClock } from '@/core/time';
 import { cleanShareCode, friendlyShareCodeError } from '@/core/share-code';
 import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { linkRide } from '@/lib/events';
@@ -47,7 +47,7 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  const { type, copy, trail, group, event, spot, lat, lng, state } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string }>();
+  const { type, copy, trail, group, event, spot, lat, lng, state, now } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string; now?: string }>();
   const [fromSpot] = useState(() => (copy ? null : spotFromParams({ spot, lat, lng, state })));
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
@@ -55,7 +55,15 @@ export default function NewRide() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [day, setDay] = useState<number>(() => startOfDay(new Date()).getTime());
-  const [meetTime, setMeetTime] = useState('8:00 am');
+  // From Map Mode's Make It a Group Ride (now=1): meet at the next quarter hour today.
+  const [meetTime, setMeetTime] = useState(() => {
+    if (!fromSpot || now !== '1') return '8:00 am';
+    const d = new Date();
+    const next = Math.ceil((d.getHours() * 60 + d.getMinutes() + 1) / 15) * 15;
+    if (next > LAST_MINUTE_OF_DAY) return '8:00 am';
+    d.setHours(Math.floor(next / 60), next % 60, 0, 0);
+    return clockText(d);
+  });
   const [departTime, setDepartTime] = useState('');
   const [finishTime, setFinishTime] = useState('');
   const [meetLabel, setMeetLabel] = useState(fromSpot?.name ?? '');

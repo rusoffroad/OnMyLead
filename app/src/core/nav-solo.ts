@@ -16,6 +16,8 @@ export function groupRideHref({
     // The ride form only takes a spot with a name (core/spots spotFromParams).
     const name = spot?.trim().slice(0, 60) || 'Meet Point';
     q.push(`spot=${encodeURIComponent(name)}`);
+    // Riding now: the ride form starts the meet time at the next quarter hour, not 8:00 am.
+    q.push('now=1');
   }
   return q.length ? `/ride/new?${q.join('&')}` : '/ride/new';
 }
