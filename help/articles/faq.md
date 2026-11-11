@@ -4,7 +4,7 @@ summary: Quick answers about free rides, the Pro Trial, privacy, editing rides, 
 category: troubleshooting
 order: 20
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-11
 sources:
   - app/src/app/ride/[id]/edit.tsx
   - supabase/migrations/20261018000000_pro_entitlements.sql
