@@ -47,11 +47,11 @@
     },
     {
       "version": "3.0.1",
-      "build": "12",
+      "build": "13",
       "commit": "4c19739",
       "status": "in review",
       "submitted": "2026-11-11",
-      "notes": "First store release of 3.0 (the redesign, Map Mode up front, Make It a Group Ride, event group invites, Starlink on Home, photo crop, Show Password, CarPlay in Map Mode, Ad Measurement) plus the Map Mode Follow Me edge fix. 3.0 (11) was uploaded but never submitted: both stores refused it until the privacy answers said Ad Measurement tracks. Android versionCode 12. App Privacy and Play Data safety / Advertising ID updated 2026-11-11 with Chris's OK."
+      "notes": "First store release of 3.0 (the redesign, Map Mode up front, Make It a Group Ride, event group invites, Starlink on Home, photo crop, Show Password, CarPlay in Map Mode, Ad Measurement) plus the Map Mode Follow Me edge fix. 3.0 (11) was uploaded but never submitted: both stores refused it until the privacy answers said Ad Measurement tracks. Android versionCode 12. App Privacy and Play Data safety / Advertising ID updated 2026-11-11 with Chris's OK. iOS build 12 came back as Invalid Binary (privacy manifest had tracking on with no tracking domains); build 13 lists them and replaced it in review on 2026-11-11. Android stays versionCode 12 (live on Play 2026-11-11)."
     }
   ],
   "unreleased": [

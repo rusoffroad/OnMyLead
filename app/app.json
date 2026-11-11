@@ -10,7 +10,7 @@
     "backgroundColor": "#0A1626",
     "ios": {
       "bundleIdentifier": "com.rusoffroad.onmylead.app",
-      "buildNumber": "12",
+      "buildNumber": "13",
       "supportsTablet": true,
       "requireFullScreen": false,
       "appleTeamId": "YJ4KUF2QQV",
@@ -40,7 +40,7 @@
       },
       "privacyManifests": {
         "NSPrivacyTracking": true,
-        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyTrackingDomains": ["graph.facebook.com", "business-api.tiktok.com"],
         "NSPrivacyCollectedDataTypes": [
           {
             "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeEmailAddress",
