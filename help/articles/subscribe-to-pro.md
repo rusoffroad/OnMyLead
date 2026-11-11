@@ -4,7 +4,7 @@ summary: Choose the monthly or annual plan and subscribe to OnMyLead Pro in the 
 category: pro
 order: 30
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-11
 sources:
   - app/src/app/pro.tsx
   - app/src/components/pro-plan.tsx
