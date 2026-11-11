@@ -2,8 +2,8 @@
   {
     "version": "3.0.1",
     "title": "Follow Me Fix for Map Mode",
-    "intro": "OnMyLead 3.0.1 fixes Follow Me in Map Mode: the map now moves before your dot slides under the bottom panel.",
-    "whatsNew": "What's new in 3.0.1:\n\n• Fixed: in Map Mode, Follow Me now zooms out and then follows your dot before it reaches the bottom panel, instead of letting it slide under the panel.",
+    "intro": "OnMyLead 3.0.1 is the first store release of 3.0, with everything in 3.0 below, and it fixes Follow Me in Map Mode: the map now moves before your dot slides under the bottom panel.",
+    "whatsNew": "What's new in 3.0.1:\n\n• A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Starlink status on Home.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: CarPlay and 3D Terrain crashes, and Follow Me in Map Mode.",
     "apple": null,
     "google": null,
     "notes": [
