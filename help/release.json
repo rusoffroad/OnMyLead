@@ -44,6 +44,14 @@
       "submitted": "2026-11-06",
       "notes": "Bluetooth Sharing with no service, Emergency Siren, Map Settings, Your Dot styles, 3D Terrain, every map on Mapbox, Leader Trackline, group spread, Badge Leaderboard, group photos, CarPlay, Edit Ride Details, Rider Agreement v2. Bluetooth Sharing, custom dots, group photo upload and CarPlay are Pro, with a fresh 30-day Pro trial for every rider without Pro. Android versionCode 10 (9 was halted). Approved by Chris on his phones and submitted to both stores 2026-11-06. Website, Help Center and release notes published 2026-11-06 while the App Store and Google Play reviews finish (Chris: \"lets just go live now with everything since we are just waiting on apple\").",
       "released": "2026-11-06"
+    },
+    {
+      "version": "3.0.1",
+      "build": "12",
+      "commit": "4c19739",
+      "status": "in review",
+      "submitted": "2026-11-11",
+      "notes": "First store release of 3.0 (the redesign, Map Mode up front, Make It a Group Ride, event group invites, Starlink on Home, photo crop, Show Password, CarPlay in Map Mode, Ad Measurement) plus the Map Mode Follow Me edge fix. 3.0 (11) was uploaded but never submitted: both stores refused it until the privacy answers said Ad Measurement tracks. Android versionCode 12. App Privacy and Play Data safety / Advertising ID updated 2026-11-11 with Chris's OK."
     }
   ],
   "unreleased": [
