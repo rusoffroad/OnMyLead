@@ -4,7 +4,7 @@ summary: During a ride, OnMyLead shows on your car's CarPlay screen with one-tap
 category: ride-mode
 order: 46
 release: "2.1"
-updated: 2026-11-10
+updated: 2026-11-12
 sources:
   - app/modules/onmylead-carplay/**
   - app/plugins/with-carplay.js
@@ -62,6 +62,20 @@ When Map Mode is open on your phone and no ride is in Ride Mode, the car screen 
 - When you're recording a trail: **Recording** or **Paused** with its length so far, and a **Pause** or **Resume** button.
 
 The map itself stays on your phone. Apple only lets navigation apps draw maps on a CarPlay screen. Open Ride Mode and the car screen switches to your ride; close it and Map Mode comes back.
+:::
+
+:::release carplay-map
+## The Map on the Car Screen
+
+The car screen shows the OnMyLead map, in your Map Style, with your position and the direction you're heading. The map turns as you drive, so the way ahead is up.
+
+- **During a ride:** the ride route, the Leader Trackline, and every rider who is sharing. A hollow dot means that's only where a rider was last seen, not where they are now. A colored ring means the rider is separated or asked for help.
+- **In Map Mode:** the trail you're following and the trail you're recording.
+- **Guidance:** while you follow a trail or the ride route, the top of the screen says **Follow** and the trail's name, with the miles and time left. Off the trail, it says **Head to the Start** with how far it is.
+- The buttons on the map zoom in and out, bring the map back to you, and show arrows to move the map. On a touchscreen you can also drag it.
+- **Ride** opens the status buttons and EMERGENCY described above, and **Group** lists the riders. In Map Mode, **Dash** opens your speed, elevation and trip numbers, and **Pause** or **Resume** works your recording.
+
+Saved offline map areas draw with no service. Other riders' dots only move while your phone has service (or a Bluetooth connection to them); without it they stay where each rider was last seen.
 :::
 
 ## Alerts on the Car Screen

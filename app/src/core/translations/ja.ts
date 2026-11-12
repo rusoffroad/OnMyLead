@@ -3467,6 +3467,12 @@ const dict: Record<string, string> = {
   "Opens the Starlink page": "Starlink のページを開きます",
   "Down": "下り",
   "Up": "上り",
+  // CarPlay map (Navigation)
+  "Dash": "ダッシュ",
+  "Ride Route": "ライドのルート",
+  "Follow the Ride Route": "ライドのルートに沿って進む",
+  "Head to the Start of {name}": "{name}の起点へ向かう",
+  "Head to the Start of the Route": "ルートの起点へ向かう",
 };
 
 export default dict;

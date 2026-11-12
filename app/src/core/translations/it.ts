@@ -3467,6 +3467,12 @@ const dict: Record<string, string> = {
   "Opens the Starlink page": "Apre la pagina Starlink",
   "Down": "Download",
   "Up": "Upload",
+  // CarPlay map (Navigation)
+  "Dash": "Cruscotto",
+  "Ride Route": "Percorso del giro",
+  "Follow the Ride Route": "Segui il percorso del giro",
+  "Head to the Start of {name}": "Raggiungi l'inizio di {name}",
+  "Head to the Start of the Route": "Raggiungi l'inizio del percorso",
 };
 
 export default dict;

@@ -20,7 +20,9 @@ import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
-import { carPlayMapState, parseCarPlayAction } from '@/core/carplay';
+import { carMapGuide, carMapLine, carPlayMapState, parseCarPlayAction, type CarMapLine } from '@/core/carplay';
+import { flatLook, mapboxStyleFor } from '@/core/terrain';
+import { MAPBOX_TOKEN } from '@/lib/terrain';
 import { riderHeading } from '@/core/heading';
 import { useFollowMe } from '@/hooks/use-follow-me';
 import { FollowMeButton } from '@/components/follow-me-button';
@@ -565,7 +567,28 @@ export default function NavMode() {
   // CarPlay (Pro): with no ride on the car screen, it shows Map Mode's dash while this screen is
   // in front (core/carplay carPlayMapState). A ride in Ride Mode takes the car screen over.
   const carPlayPro = useCan('carplay');
+  // The car map (Navigation entitlement; builds without it ignore `map`): the trail you follow and
+  // your recording, with "Follow <trail>" guidance. Thinned once per change.
+  const carFollowLine = useMemo(() => carMapLine('following', followed?.points, Colors.accent, 5), [followed]);
+  const carRecLine = useMemo(() => carMapLine('recorded', recLine, '#F6F1E3', 4.5), [recLine]);
   const carMap = carPlayMapState({
+    map: {
+      style: mapboxStyleFor(flatLook(trail.look)),
+      token: MAPBOX_TOKEN,
+      lines: [carFollowLine, carRecLine].filter((l): l is CarMapLine => !!l),
+      dots: [],
+      guide: followed && progress
+        ? carMapGuide({
+            name: followed.name,
+            points: followed.points,
+            onTrail: progress.onTrail,
+            remainingM: progress.remainingM ?? 0,
+            toStartM: progress.toStartM,
+            tripM: trip.distanceM,
+            movingS: trip.movingS,
+          })
+        : null,
+    },
     speedMps: speed,
     altitudeM: altitude,
     headingDeg: dashHeading(meHeading, compass),

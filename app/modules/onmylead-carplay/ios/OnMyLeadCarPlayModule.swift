@@ -19,7 +19,9 @@ public class OnMyLeadCarPlayModule: Module {
     }
 
     Function("setRide") { (state: [String: Any]) in
-      DispatchQueue.main.async { CarPlayBridge.shared.update(RideState(state)) }
+      // The map rides along with the ride (CarMapData); builds without the car map ignore it.
+      let map = CarMapData(state["map"])
+      DispatchQueue.main.async { CarPlayBridge.shared.update(RideState(state), map: map) }
     }
 
     Function("setLabels") { (labels: [String: Any]) in
@@ -27,7 +29,8 @@ public class OnMyLeadCarPlayModule: Module {
     }
 
     Function("setMap") { (state: [String: Any]) in
-      DispatchQueue.main.async { CarPlayBridge.shared.updateMap(MapState(state)) }
+      let map = CarMapData(state["map"])
+      DispatchQueue.main.async { CarPlayBridge.shared.updateMap(MapState(state), map: map) }
     }
 
     Function("clearMap") {
