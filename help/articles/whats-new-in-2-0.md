@@ -4,7 +4,7 @@ summary: The biggest update yet in one place, with a link to the guide for each 
 category: getting-started
 order: 11
 release: "2.0"
-updated: 2026-11-11
+updated: 2026-11-12
 sources:
   - help/release-notes.json
 related: [getting-started, home-screen, navigation-mode, tilt-and-crash-alert, free-vs-pro]
