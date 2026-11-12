@@ -4,7 +4,7 @@ summary: Tell the whole group what's happening with one tap, see who got it, and
 category: ride-mode
 order: 20
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-12
 sources:
   - app/src/components/ride-controls.tsx
   - app/src/app/ride/[id]/live.tsx

@@ -54,7 +54,7 @@ describe('CarPlay screen', () => {
 
   it('has every car screen word in every language', () => {
     const words = [
-      ...CARPLAY_BUTTON_TITLES(), ...Object.values(carPlayLabels()),
+      ...CARPLAY_BUTTON_TITLES(), ...Object.values(carPlayLabels()).filter((v): v is string => typeof v === 'string'),
       'Group Together', '{n} Separated', 'A rider is separated',
       ...mapWords(),
     ];

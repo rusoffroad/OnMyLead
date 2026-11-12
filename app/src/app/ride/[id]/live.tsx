@@ -31,7 +31,15 @@ import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-s
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
 import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
-import { carPlayActionAllowed, carPlayState, parseCarPlayAction } from '@/core/carplay';
+import {
+  carMapDots, carMapGuide, carMapLine, carPlayActionAllowed, carPlayMessages, carPlayReplies, carPlayState, carSpokenMessage, parseCarPlayAction, type CarMap, type CarMapLine,
+  type CarMessageInput,
+} from '@/core/carplay';
+import { flatLook, mapboxStyleFor } from '@/core/terrain';
+import type { LatLng } from '@/core/geo';
+import { puckInk } from '@/components/rider-puck';
+import { tracklineMapLines } from '@/components/leader-trackline-ink';
+import { MAPBOX_TOKEN } from '@/lib/terrain';
 import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
@@ -1115,8 +1123,63 @@ export default function RideMode() {
     void broadcast.send({ id: newTapId(), kind: 'reply', label: body }, (tid) => sendQuickReplyReliably(id, body, tid));
   }
 
+  // CarPlay map (Navigation entitlement; builds without it ignore `map`): the ride route and the
+  // Leader Trackline, the other riders, and "Follow the Ride Route" guidance. Lines are thinned once
+  // per change, not on every rider update.
+  const carRouteLine = useMemo(() => carMapLine('route', route.route?.points, Colors.accent, 5), [route.route]);
+  const carTracklines = useMemo(
+    () =>
+      tracklineMapLines(trackline)
+        .flatMap((l) => {
+          // A trackline can come in pieces (gaps where nobody had a spot): one car line per piece.
+          const pieces = (Array.isArray(l.points[0]) ? l.points : [l.points]) as LatLng[][];
+          return pieces.map((p, i) => carMapLine(`${l.id}-${i}`, p, l.color, l.width));
+        })
+        .filter((l): l is CarMapLine => !!l),
+    [trackline],
+  );
+  const myPlace = placed.find((p) => p.id === me)?.place ?? null;
+  const carMap: CarMap = {
+    style: mapboxStyleFor(flatLook(trail.look)),
+    token: MAPBOX_TOKEN,
+    lines: [...(carRouteLine ? [carRouteLine] : []), ...carTracklines],
+    dots: carMapDots(
+      mapRiders.map((r) => ({
+        id: r.id,
+        name: r.name,
+        lat: r.lat,
+        lng: r.lng,
+        live: r.freshness?.state === 'live',
+        color: puckInk(r.role),
+        ring: r.status === 'red' || r.status === 'yellow' ? RideColors[r.status] : null,
+      })),
+      me,
+    ),
+    guide: route.route && myPlace
+      ? carMapGuide({
+          name: null,
+          points: route.route.points,
+          // Off the line before the start: head there. Off it later: keep following (the phone's
+          // own off-route alerts say so); the guidance shouldn't flip back to the start.
+          onTrail: myPlace.onRoute || myPlace.alongM > 50,
+          remainingM: Math.max(0, route.route.lengthM - myPlace.alongM),
+          toStartM: myPlace.offRouteM,
+          tripM: 0,
+          movingS: 0,
+        })
+      : null,
+  };
+  // CarPlay Messages: the ride's messages (tap one on the car to hear it) and one-tap replies,
+  // the built-in ones and this rider's saved My Quick Replies. Leader-only messages are only in
+  // chat.messages for the sender and the leader already.
+  const carMessageInputs: CarMessageInput[] = chat.messages.map((m) => ({
+    id: m.id, userId: m.user_id, kind: m.kind, body: m.body, pollOptions: m.poll_options, sentAt: m.sent_at,
+  }));
   // CarPlay: the car screen mirrors the group's state and sends button presses back here.
   const car = carPlayState({
+    map: carMap,
+    messages: carPlayMessages(carMessageInputs, nameOf, me, now, (b) => chatMessageText({ kind: 'status', body: b }, t)),
+    replies: carPlayReplies(savedReplies.saved, QUICK_REPLIES),
     rideName: ride?.name ?? t('Ride'),
     separated: bubble.alerts.map((a) => ({ riderId: a.riderId, message: a.message ?? t('A rider is separated') })),
     watchesBubble: !!watchesBubble,
@@ -1149,9 +1212,13 @@ export default function RideMode() {
     }
   }, [carKey, ride, carPlayPro]);
   useEffect(() => () => clearCarPlay(), []);
-  const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency });
+  const hearMessage = (messageId: string) => {
+    const m = carMessageInputs.find((x) => x.id === messageId);
+    if (m) speak(carSpokenMessage(m, nameOf, (b) => chatMessageText({ kind: 'status', body: b }, t)));
+  };
+  const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency, hearMessage, saved: savedReplies.saved });
   useEffect(() => {
-    carActions.current = { tapStatus, quickReply, regroupHere, sendEmergency };
+    carActions.current = { tapStatus, quickReply, regroupHere, sendEmergency, hearMessage, saved: savedReplies.saved };
   });
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
@@ -1162,6 +1229,9 @@ export default function RideMode() {
       const act = carActions.current;
       if (a.type === 'status') act.tapStatus(a.kind as RiderStatusKind);
       else if (a.type === 'reply' && (QUICK_REPLIES as readonly string[]).includes(a.body)) act.quickReply(a.body as QuickReply);
+      // Only the rider's own saved replies, never text the car made up.
+      else if (a.type === 'say' && act.saved.includes(a.body)) act.quickReply(a.body);
+      else if (a.type === 'hear') act.hearMessage(a.messageId);
       else if (a.type === 'regroup') act.regroupHere();
       else if (a.type === 'emergency') act.sendEmergency();
     });

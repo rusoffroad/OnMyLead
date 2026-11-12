@@ -4,7 +4,7 @@ summary: What every OnMyLead account gets for free, what OnMyLead Pro adds, and 
 category: pro
 order: 10
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-12
 sources:
   - supabase/migrations/20261105090000_pro_bluetooth_dot_photos.sql
   - app/src/core/carplay.ts

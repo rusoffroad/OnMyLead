@@ -3467,6 +3467,17 @@ const dict: Record<string, string> = {
   "Opens the Starlink page": "Starlink 페이지를 엽니다",
   "Down": "다운로드",
   "Up": "업로드",
+  // CarPlay map (Navigation)
+  "Dash": "대시",
+  "Ride Route": "라이딩 경로",
+  "Follow the Ride Route": "라이딩 경로를 따라가세요",
+  "Head to the Start of {name}": "{name} 시작점으로 이동",
+  "Head to the Start of the Route": "경로 시작점으로 이동",
+  // CarPlay messages
+  "Send a quick reply to the group": "그룹에 빠른 답장 보내기",
+  "Tap a message to hear it.": "메시지를 탭하면 읽어 줍니다.",
+  "Poll: {question}": "투표: {question}",
+  "Announcement: {text}": "공지: {text}",
 };
 
 export default dict;

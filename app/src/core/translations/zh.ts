@@ -3467,6 +3467,17 @@ const dict: Record<string, string> = {
   "Opens the Starlink page": "打开 Starlink 页面",
   "Down": "下行",
   "Up": "上行",
+  // CarPlay map (Navigation)
+  "Dash": "仪表",
+  "Ride Route": "骑行路线",
+  "Follow the Ride Route": "沿骑行路线行驶",
+  "Head to the Start of {name}": "前往{name}的起点",
+  "Head to the Start of the Route": "前往路线起点",
+  // CarPlay messages
+  "Send a quick reply to the group": "向队伍发送快捷回复",
+  "Tap a message to hear it.": "轻点消息即可收听。",
+  "Poll: {question}": "投票：{question}",
+  "Announcement: {text}": "公告：{text}",
 };
 
 export default dict;

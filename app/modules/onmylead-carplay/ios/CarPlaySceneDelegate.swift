@@ -18,4 +18,23 @@ public class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelega
   ) {
     CarPlayBridge.shared.disconnect()
   }
+
+  // Navigation apps (CarPlay Navigation entitlement) get a window to draw the map in. Without
+  // the map switched on (CarMapScreen.available) the bridge ignores the window and shows the
+  // Driving Task screens, so this is safe in every build.
+  public func templateApplicationScene(
+    _ templateApplicationScene: CPTemplateApplicationScene,
+    didConnect interfaceController: CPInterfaceController,
+    to window: CPWindow
+  ) {
+    CarPlayBridge.shared.connect(interfaceController, window: window)
+  }
+
+  public func templateApplicationScene(
+    _ templateApplicationScene: CPTemplateApplicationScene,
+    didDisconnect interfaceController: CPInterfaceController,
+    from window: CPWindow
+  ) {
+    CarPlayBridge.shared.disconnect()
+  }
 }

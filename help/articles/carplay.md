@@ -4,7 +4,7 @@ summary: During a ride, OnMyLead shows on your car's CarPlay screen with one-tap
 category: ride-mode
 order: 46
 release: "2.1"
-updated: 2026-11-10
+updated: 2026-11-12
 sources:
   - app/modules/onmylead-carplay/**
   - app/plugins/with-carplay.js
@@ -50,7 +50,20 @@ The buttons:
 - **Regroup Here** shows for the organizer and leader. Other riders get **Running Late** in its place.
 - **EMERGENCY** asks once, **Send EMERGENCY with your location to everyone on the ride?**, and tap **Alert My Group** to send it. **Cancel** sends nothing.
 
+:::until 3.1
 Typed messages, your own quick replies and the map stay on your phone. CarPlay only allows a few buttons, and typing while driving isn't safe.
+:::
+
+:::release 3.1
+## Messages on the Car Screen
+
+Tap **Messages** at the top of the car screen to see the ride's messages, newest first, with who sent each one and how long ago.
+
+- Tap a message to hear it read out. Long messages are cut short on the screen, and the whole message is read.
+- Tap **Reply** to send a quick reply with one tap: the built-in ones (**On My Way**, **Running Late**, **Need a Minute**, **All Good**, **Beverage Break**) and your own saved ones from **My Quick Replies** on your phone.
+
+There's no typing on the car screen, because Apple doesn't allow it while driving. To save a new reply for the car, type it once on your phone with **Message** in Ride Mode and turn on **Save as One of My Quick Replies**.
+:::
 
 :::release 3.0
 ## Map Mode on the Car Screen
@@ -62,6 +75,20 @@ When Map Mode is open on your phone and no ride is in Ride Mode, the car screen 
 - When you're recording a trail: **Recording** or **Paused** with its length so far, and a **Pause** or **Resume** button.
 
 The map itself stays on your phone. Apple only lets navigation apps draw maps on a CarPlay screen. Open Ride Mode and the car screen switches to your ride; close it and Map Mode comes back.
+:::
+
+:::release carplay-map
+## The Map on the Car Screen
+
+The car screen shows the OnMyLead map, in your Map Style, with your position and the direction you're heading. The map turns as you drive, so the way ahead is up.
+
+- **During a ride:** the ride route, the Leader Trackline, and every rider who is sharing. A hollow dot means that's only where a rider was last seen, not where they are now. A colored ring means the rider is separated or asked for help.
+- **In Map Mode:** the trail you're following and the trail you're recording.
+- **Guidance:** while you follow a trail or the ride route, the top of the screen says **Follow** and the trail's name, with the miles and time left. Off the trail, it says **Head to the Start** with how far it is.
+- The buttons on the map zoom in and out, bring the map back to you, and show arrows to move the map. On a touchscreen you can also drag it.
+- **Ride** opens the status buttons and EMERGENCY described above, and **Group** lists the riders. In Map Mode, **Dash** opens your speed, elevation and trip numbers, and **Pause** or **Resume** works your recording.
+
+Saved offline map areas draw with no service. Other riders' dots only move while your phone has service (or a Bluetooth connection to them); without it they stay where each rider was last seen.
 :::
 
 ## Alerts on the Car Screen

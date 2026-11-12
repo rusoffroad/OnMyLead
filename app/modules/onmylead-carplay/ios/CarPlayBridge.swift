@@ -25,6 +25,18 @@ struct CarPlayLabels: Equatable {
   var ok = "OK"
   /// The waiting screen's button. Empty hides it (on Free, CarPlay is Pro: nothing to open).
   var openMapMode = "Open Map Mode"
+  /// Car map (Navigation builds): the bar button that opens the ride's one-tap buttons.
+  var ride = "Ride"
+  /// Car map: the bar button that opens Map Mode's readouts.
+  var dash = "Dash"
+  /// Free plan: the car map shows the Pro notice instead of the map.
+  var proNeeded = false
+  /// The Messages button and screen.
+  var messages = "Messages"
+  var reply = "Reply"
+  var replyDetail = "Send a quick reply to the group"
+  var noMessages = "No Messages Yet"
+  var tapToHear = "Tap a message to hear it."
 
   init() {}
 
@@ -44,6 +56,14 @@ struct CarPlayLabels: Equatable {
     ok = word("ok", en.ok)
     // Unlike the other words, an empty one is kept: it means "no button".
     openMapMode = d?["openMapMode"] as? String ?? en.openMapMode
+    ride = word("ride", en.ride)
+    dash = word("dash", en.dash)
+    proNeeded = d?["proNeeded"] as? Bool ?? false
+    messages = word("messages", en.messages)
+    reply = word("reply", en.reply)
+    replyDetail = word("replyDetail", en.replyDetail)
+    noMessages = word("noMessages", en.noMessages)
+    tapToHear = word("tapToHear", en.tapToHear)
   }
 }
 
@@ -72,6 +92,30 @@ struct RideState: Equatable {
   }
 }
 
+/// The ride's messages and one-tap replies (shape: messages / replies on CarPlayState). Kept apart
+/// from RideState so a new message refreshes the Messages screen without redrawing the grid.
+struct RideMessages: Equatable {
+  let messages: [RideButton]
+  let replies: [RideButton]
+
+  init(_ d: [String: Any]) {
+    messages = (d["messages"] as? [[String: Any]] ?? []).compactMap { m in
+      guard let id = m["id"] as? String else { return nil }
+      // title: the sender; symbol carries the preview (RideButton is just three strings).
+      return RideButton(id: id, title: m["title"] as? String ?? "", symbol: m["detail"] as? String ?? "")
+    }
+    replies = (d["replies"] as? [[String: Any]] ?? []).compactMap { b in
+      guard let id = b["id"] as? String, let title = b["title"] as? String else { return nil }
+      return RideButton(id: id, title: title, symbol: b["symbol"] as? String ?? "text.bubble.fill")
+    }
+  }
+
+  init() {
+    messages = []
+    replies = []
+  }
+}
+
 /// What Map Mode on the phone last sent (shape: CarPlayMapState in src/core/carplay.ts).
 struct MapState: Equatable {
   let title: String
@@ -97,38 +141,68 @@ final class CarPlayBridge {
   static let shared = CarPlayBridge()
 
   var emit: ((String) -> Void)?
-  private var interface: CPInterfaceController?
-  private var state: RideState?
+  private(set) var interface: CPInterfaceController?
+  private(set) var state: RideState?
   private var grid: CPGridTemplate?
   /// Map Mode's dash, when no ride is on the car screen.
-  private var mapState: MapState?
+  private(set) var mapState: MapState?
+  /// What the car map draws for the ride and for Map Mode (CarMapData; ignored without the map).
+  private(set) var rideMap: CarMapData?
+  private(set) var modeMap: CarMapData?
+  /// The car map (CarPlay Navigation entitlement), when the car gave us a window to draw in.
+  private var mapScreen: CarMapScreen?
   private var mapInfo: CPInformationTemplate?
   private var mapInfoTitle: String?
   private var shownAlertId: String?
-  private var labels = CarPlayLabels()
+  private(set) var labels = CarPlayLabels()
+  private(set) var rideMessages = RideMessages()
+  /// The Messages screen while it is open, refreshed as messages come in.
+  private weak var messagesList: CPListTemplate?
 
   func setLabels(_ next: CarPlayLabels) {
     guard next != labels else { return }
     labels = next
+    if let mapScreen { mapScreen.refresh(); return }
     // The waiting screen is the only one built from labels alone; redraw it in the new language.
     if state == nil { render() }
   }
 
-  func connect(_ interface: CPInterfaceController) {
+  /// `window`: the car's map window, which iOS hands only to navigation apps. With it (and the map
+  /// switched on in Info.plist, plugins/with-carplay.js) the car screen is the map; without it the
+  /// Driving Task screens below.
+  func connect(_ interface: CPInterfaceController, window: UIWindow? = nil) {
+    if mapScreen != nil, self.interface === interface { return }
     self.interface = interface
     grid = nil
     mapInfo = nil
+    mapScreen?.tearDown()
+    mapScreen = nil
+    if let window, CarMapScreen.available {
+      let screen = CarMapScreen(bridge: self, interface: interface, window: window)
+      mapScreen = screen
+      screen.refresh()
+      return
+    }
     render()
   }
 
   func disconnect() {
+    mapScreen?.tearDown()
+    mapScreen = nil
     interface = nil
     grid = nil
     mapInfo = nil
   }
 
   /// Map Mode on the phone. A ride on the car screen wins; the dash shows once the ride clears.
-  func updateMap(_ next: MapState?) {
+  func updateMap(_ next: MapState?, map: CarMapData? = nil) {
+    if let mapScreen {
+      modeMap = next == nil ? nil : map
+      mapState = next
+      if let l = next?.labels { labels = l }
+      mapScreen.refresh()
+      return
+    }
     guard next != mapState else { return }
     if let l = next?.labels { labels = l }
     mapState = next
@@ -141,7 +215,19 @@ final class CarPlayBridge {
     }
   }
 
-  func update(_ next: RideState?) {
+  func update(_ next: RideState?, map: CarMapData? = nil, messages: RideMessages = RideMessages()) {
+    if messages != rideMessages {
+      rideMessages = messages
+      messagesList?.updateSections(messageSections())
+    }
+    if let mapScreen {
+      rideMap = next == nil ? nil : map
+      if next?.alertId == nil { shownAlertId = nil }
+      if let l = next?.labels { labels = l }
+      state = next
+      mapScreen.refresh()
+      return
+    }
     guard next != state else { return }
     if let l = next?.labels { labels = l }
     let hadRide = state != nil
@@ -192,6 +278,7 @@ final class CarPlayBridge {
     }
     mapInfo = nil
     let template = CPGridTemplate(title: state.title, gridButtons: gridButtons(state))
+    template.trailingNavigationBarButtons = [messagesButton()]
     grid = template
     interface.setRootTemplate(template, animated: false, completion: nil)
     showAlertIfNew(state)
@@ -209,7 +296,7 @@ final class CarPlayBridge {
     }
   }
 
-  private func gridButtons(_ state: RideState) -> [CPGridButton] {
+  func gridButtons(_ state: RideState) -> [CPGridButton] {
     state.buttons.prefix(8).map { b in
       let image = UIImage(systemName: b.symbol) ?? UIImage(systemName: "circle.fill") ?? UIImage()
       return CPGridButton(titleVariants: [b.title], image: image) { [weak self] _ in
@@ -229,7 +316,53 @@ final class CarPlayBridge {
     }
   }
 
-  private func showGroup() {
+  func messagesButton() -> CPBarButton {
+    CPBarButton(title: labels.messages) { [weak self] _ in self?.showMessages() }
+  }
+
+  /// The ride's messages: Reply first, then the newest messages. Tap one to hear it (the phone
+  /// reads it out in the rider's voice). Nothing to type: Apple doesn't allow typing in the car.
+  func showMessages() {
+    guard let interface, state != nil else { return }
+    let list = CPListTemplate(title: labels.messages, sections: messageSections())
+    messagesList = list
+    interface.pushTemplate(list, animated: true, completion: nil)
+  }
+
+  private func messageSections() -> [CPListSection] {
+    let reply = CPListItem(text: labels.reply, detailText: labels.replyDetail, image: UIImage(systemName: "arrowshape.turn.up.left.fill"))
+    reply.handler = { [weak self] _, done in
+      self?.showReplies()
+      done()
+    }
+    let items: [CPListItem] = rideMessages.messages.map { m in
+      let item = CPListItem(text: m.title, detailText: m.symbol)
+      item.handler = { [weak self] _, done in
+        self?.emit?("hear:\(m.id)")
+        done()
+      }
+      return item
+    }
+    let list = items.isEmpty ? [CPListItem(text: labels.noMessages, detailText: nil)] : items
+    return [CPListSection(items: [reply]), CPListSection(items: list, header: labels.tapToHear, sectionIndexTitle: nil)]
+  }
+
+  private func showReplies() {
+    guard let interface else { return }
+    let items: [CPListItem] = rideMessages.replies.map { r in
+      let item = CPListItem(text: r.title, detailText: nil, image: UIImage(systemName: r.symbol))
+      item.handler = { [weak self] _, done in
+        self?.emit?(r.id)
+        done()
+        // Back to the messages, where the reply shows up once it's sent.
+        self?.interface?.popTemplate(animated: true, completion: nil)
+      }
+      return item
+    }
+    interface.pushTemplate(CPListTemplate(title: labels.reply, sections: [CPListSection(items: items)]), animated: true, completion: nil)
+  }
+
+  func showGroup() {
     guard let interface, let state else { return }
     let items = state.riders.map { CPListItem(text: $0.title, detailText: $0.detail) }
     let list = CPListTemplate(title: labels.group, sections: [CPListSection(items: items)])
@@ -237,7 +370,7 @@ final class CarPlayBridge {
     interface.pushTemplate(list, animated: true, completion: nil)
   }
 
-  private func confirmEmergency() {
+  func confirmEmergency() {
     let send = CPAlertAction(title: labels.alertGroup, style: .destructive) { [weak self] _ in
       self?.emit?("emergency_confirmed")
       self?.interface?.dismissTemplate(animated: true, completion: nil)
@@ -248,7 +381,7 @@ final class CarPlayBridge {
     present(CPAlertTemplate(titleVariants: [labels.confirmEmergency], actions: [send, cancel]))
   }
 
-  private func showAlertIfNew(_ state: RideState) {
+  func showAlertIfNew(_ state: RideState) {
     guard let id = state.alertId, let text = state.alertText, id != shownAlertId else { return }
     shownAlertId = id
     let ok = CPAlertAction(title: labels.ok, style: .default) { [weak self] _ in
