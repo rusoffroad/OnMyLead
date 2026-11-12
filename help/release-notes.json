@@ -4,8 +4,8 @@
     "title": "Follow Me Fix for Map Mode",
     "intro": "OnMyLead 3.0.1 is the first store release of 3.0, with everything in 3.0 below, and it fixes Follow Me in Map Mode: the map now moves before your dot slides under the bottom panel.",
     "whatsNew": "What's new in 3.0.1:\n\n• A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Starlink status on Home.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: CarPlay and 3D Terrain crashes, and Follow Me in Map Mode.",
-    "apple": null,
-    "google": null,
+    "apple": "2026-11-11",
+    "google": "2026-11-11",
     "notes": [
       {
         "kind": "fixed",
@@ -18,8 +18,8 @@
     "title": "A New Look, Map Mode Up Front, Invite Your Group to an Event and Show Password",
     "intro": "OnMyLead 3.0 is a new look. Home opens on a satellite map of your area with Map Mode first, because OnMyLead is now your offroad map whether you ride solo or with a group. Join a Ride, Start a Ride and Events sit right under it, and you choose and order the rest. Map Mode tells you when you're riding solo, and Pro riders can turn that ride into a group ride in two taps. Event hosts can now invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. CarPlay now works on solo rides too: open Map Mode and the car screen shows your speed, elevation, heading, trip and the trail you're following. When you're on a Starlink's Wi-Fi, Home now shows its speed, latency and how many devices are connected. Every photo you add, from your profile picture to event and trail photos, now opens on a crop screen so you can frame it first. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
     "whatsNew": "What's new in 3.0:\n\n• A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Starlink status on Home.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: crashes with CarPlay connected and in 3D Terrain on Android.",
-    "apple": null,
-    "google": null,
+    "apple": "2026-11-11",
+    "google": "2026-11-11",
     "notes": [
       {
         "kind": "new",

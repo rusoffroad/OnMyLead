@@ -3,8 +3,7 @@
   "bundleId": "com.rusoffroad.onmylead.app",
   "appleId": "6822352321",
   "country": "us",
-  "live": "2.1",
-  "publishAhead": "3.0.1",
+  "live": "3.0.1",
   "prelaunch": {
     "version": "1.0",
     "notice": "OnMyLead 1.0 for iPhone, iPad and Android is with Apple and Google for store review. These guides describe that first release."
@@ -49,9 +48,10 @@
       "version": "3.0.1",
       "build": "13",
       "commit": "4c19739",
-      "status": "in review",
+      "status": "live",
       "submitted": "2026-11-11",
-      "notes": "First store release of 3.0 (the redesign, Map Mode up front, Make It a Group Ride, event group invites, Starlink on Home, photo crop, Show Password, CarPlay in Map Mode, Ad Measurement) plus the Map Mode Follow Me edge fix. 3.0 (11) was uploaded but never submitted: both stores refused it until the privacy answers said Ad Measurement tracks. Android versionCode 12. App Privacy and Play Data safety / Advertising ID updated 2026-11-11 with Chris's OK. iOS build 12 came back as Invalid Binary (privacy manifest had tracking on with no tracking domains); build 13 lists them and replaced it in review on 2026-11-11. Android stays versionCode 12 (live on Play 2026-11-11)."
+      "notes": "First store release of 3.0 (the redesign, Map Mode up front, Make It a Group Ride, event group invites, Starlink on Home, photo crop, Show Password, CarPlay in Map Mode, Ad Measurement) plus the Map Mode Follow Me edge fix. 3.0 (11) was uploaded but never submitted: both stores refused it until the privacy answers said Ad Measurement tracks. Android versionCode 12. App Privacy and Play Data safety / Advertising ID updated 2026-11-11 with Chris's OK. iOS build 12 came back as Invalid Binary (privacy manifest had tracking on with no tracking domains); build 13 lists them and replaced it in review on 2026-11-11. Android stays versionCode 12 (live on Play 2026-11-11). Live on Google Play 2026-11-11 and approved by Apple 2026-11-11 (auto-release).",
+      "released": "2026-11-11"
     }
   ],
   "unreleased": [
