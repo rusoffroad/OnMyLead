@@ -1,7 +1,7 @@
 import { useKeepAwake } from 'expo-keep-awake';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, AppState, Linking, PanResponder, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +14,7 @@ import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
+import { ExitModeButton, ExitRideSheet, leaveModeScreen, useModeBackButton } from '@/components/exit-mode';
 import { LeaveRide } from '@/components/leave-ride';
 import { RiderList, RiderRows } from '@/components/rider-list';
 import { PanelActions, QuickRow, StatusSheet, tapFeel } from '@/components/ride-controls';
@@ -52,6 +53,7 @@ import { rideDirections } from '@/core/directions';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
 import { RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
+import { backPress, rideExitAsks } from '@/core/mode-exit';
 import { isVerticalSwipe } from '@/core/panel-swipe';
 import { heldHeading } from '@/core/heading';
 import { positionsFilter, rosterKey } from '@/core/live-costs';
@@ -224,6 +226,17 @@ export default function RideMode() {
   const [now, setNow] = useState(() => Date.now());
   const [sosOpen, setSosOpen] = useState(false);
   const [ridersOpen, setRidersOpen] = useState(false);
+  // Exit Ride Mode while sharing asks whether to keep sharing (core/mode-exit).
+  const [exitOpen, setExitOpen] = useState(false);
+  const focusedRef = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      focusedRef.current = true;
+      return () => {
+        focusedRef.current = false;
+      };
+    }, []),
+  );
   // When this phone last heard from the server (a refresh or a live update). Long silence means
   // we have no service, so other riders' ages say nothing about their own signal.
   const [lastHeardAt, setLastHeardAt] = useState(() => Date.now());
@@ -1216,9 +1229,15 @@ export default function RideMode() {
     const m = carMessageInputs.find((x) => x.id === messageId);
     if (m) speak(carSpokenMessage(m, nameOf, (b) => chatMessageText({ kind: 'status', body: b }, t)));
   };
-  const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency, hearMessage, saved: savedReplies.saved });
+  // Exit on the car screen (it asks there first): leave Ride Mode, still on the ride and still
+  // sharing. With Map Mode open on top, both go, so the car doesn't keep showing the ride.
+  const exitFromCar = () => {
+    if (focusedRef.current) leaveModeScreen();
+    else if (router.canDismiss()) router.dismissAll();
+  };
+  const carActions = useRef({ tapStatus, quickReply, regroupHere, sendEmergency, hearMessage, exitFromCar, saved: savedReplies.saved });
   useEffect(() => {
-    carActions.current = { tapStatus, quickReply, regroupHere, sendEmergency, hearMessage, saved: savedReplies.saved };
+    carActions.current = { tapStatus, quickReply, regroupHere, sendEmergency, hearMessage, exitFromCar, saved: savedReplies.saved };
   });
   useEffect(() => {
     const sub = onCarPlayAction((buttonId) => {
@@ -1234,6 +1253,7 @@ export default function RideMode() {
       else if (a.type === 'hear') act.hearMessage(a.messageId);
       else if (a.type === 'regroup') act.regroupHere();
       else if (a.type === 'emergency') act.sendEmergency();
+      else if (a.type === 'exit' && a.mode === 'ride') act.exitFromCar();
     });
     return () => sub.remove();
   }, []);
@@ -1262,10 +1282,21 @@ export default function RideMode() {
       onLeft={() => {
         setShare(null);
         setRidersOpen(false);
+        setExitOpen(false);
         router.replace('/');
       }}
     />
   ) : null;
+  // Exit (top left, the Full Map bar, Android back, the car screen) only leaves this screen: the
+  // rider stays on the ride. While sharing, the sheet asks whether the group keeps seeing them.
+  const exitRide = () => {
+    if (rideExitAsks(!!activeShare)) setExitOpen(true);
+    else leaveModeScreen();
+  };
+  useModeBackButton(() => {
+    if (backPress({ fullMap }) === 'close_full_map') exitFullMap();
+    else exitRide();
+  });
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -1313,9 +1344,7 @@ export default function RideMode() {
         pointerEvents="box-none"
         style={[styles.top, tablet && [styles.topTablet, { width: sideW + 2 * Spacing.two, bottom: panelBottom - Spacing.two }]]}>
         <View style={styles.topRow} onLayout={(e) => setTopRowBottom(Math.round(e.nativeEvent.layout.y + e.nativeEvent.layout.height))}>
-          <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('Back')} style={styles.backBtn}>
-            <Icon name="back" size={18} color={Colors.text} strokeWidth={2.6} />
-          </Pressable>
+          <ExitModeButton onPress={exitRide} label={t('Exit Ride Mode')} />
           <Pressable
             onPress={() => (activeShare ? toggleShareOpen() : setAskShare(true))}
             hitSlop={6}
@@ -1719,6 +1748,7 @@ export default function RideMode() {
 
         {fullMap ? (
           <View style={[styles.foldedRow, !stripShown && { marginTop: 0 }]}>
+            <ExitModeButton bare onPress={exitRide} label={t('Exit Ride Mode')} style={styles.fullMapExit} />
             <Pressable
               onPress={showMenus}
               accessibilityRole="button"
@@ -1811,6 +1841,21 @@ export default function RideMode() {
       {musicOn ? <MusicSheet visible={musicOpen} tablet={tablet} onClose={() => setMusicOpen(false)} /> : null}
 
       <DirectionsSheet visible={directionsOpen} rows={directionRows} onClose={() => setDirectionsOpen(false)} />
+      <ExitRideSheet
+        visible={exitOpen}
+        onClose={() => setExitOpen(false)}
+        rideName={ride?.name ?? t('Ride')}
+        onKeepSharing={() => {
+          setExitOpen(false);
+          leaveModeScreen();
+        }}
+        onStopSharing={async () => {
+          await endShare().catch(() => {});
+          setExitOpen(false);
+          leaveModeScreen();
+        }}
+        leave={leaveButton}
+      />
 
       <RiderList
         visible={ridersOpen && !tablet}
@@ -1915,7 +1960,6 @@ const styles = themedStyles(() => ({
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 20, paddingLeft: 8, paddingRight: 10, paddingVertical: 7,
     minHeight: 54, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
-  backBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile },
   topTitleWrap: { flex: 1, minWidth: 0 },
   topText: { color: Colors.text, fontSize: 20, lineHeight: 22, fontFamily: font(700, 'display') },
   topSubRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 1 },
@@ -2006,6 +2050,7 @@ const styles = themedStyles(() => ({
   },
   typeText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
   fullMapBarBtn: { minHeight: 48 },
+  fullMapExit: { width: 56, height: 56, borderRadius: Radius.control, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   offlineBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10,
     backgroundColor: Glass.panel, borderWidth: 1.5, borderColor: Colors.textSecondary, borderStyle: 'dashed',

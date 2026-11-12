@@ -65,6 +65,15 @@ Tap **Messages** at the top of the car screen to see the ride's messages, newest
 There's no typing on the car screen, because Apple doesn't allow it while driving. To save a new reply for the car, type it once on your phone with **Message** in Ride Mode and turn on **Save as One of My Quick Replies**.
 :::
 
+:::release 3.1
+## Exit Ride Mode or Map Mode From the Car
+
+- **During a ride:** tap **Exit** at the top left of the car screen, then **Exit Ride Mode**. Ride Mode closes on your phone. You stay on the ride, and your phone keeps sharing your spot if it was. **Cancel** keeps Ride Mode open.
+- **In Map Mode:** tap **Exit Map Mode** under the numbers. If you're recording a trail, the car asks first, because the recording pauses until you come back.
+
+After you exit, the car screen shows **Open Map Mode** again.
+:::
+
 :::release 3.0
 ## Map Mode on the Car Screen
 
@@ -87,6 +96,7 @@ The car screen shows the OnMyLead map, in your Map Style, with your position and
 - **Guidance:** while you follow a trail or the ride route, the top of the screen says **Follow** and the trail's name, with the miles and time left. Off the trail, it says **Head to the Start** with how far it is.
 - The buttons on the map zoom in and out, bring the map back to you, and show arrows to move the map. On a touchscreen you can also drag it.
 - **Ride** opens the status buttons and EMERGENCY described above, and **Group** lists the riders. In Map Mode, **Dash** opens your speed, elevation and trip numbers, and **Pause** or **Resume** works your recording.
+- **Exit** at the top left closes Ride Mode or Map Mode on your phone, the same as on the screens without the map.
 
 Saved offline map areas draw with no service. Other riders' dots only move while your phone has service (or a Bluetooth connection to them); without it they stay where each rider was last seen.
 :::

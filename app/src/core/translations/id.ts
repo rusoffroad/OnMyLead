@@ -3478,6 +3478,20 @@ const dict: Record<string, string> = {
   "Tap a message to hear it.": "Ketuk pesan untuk mendengarnya.",
   "Poll: {question}": "Polling: {question}",
   "Announcement: {text}": "Pengumuman: {text}",
+  "Exit": "Keluar",
+  "Exit Ride Mode": "Keluar dari Mode Riding",
+  "Exit Map Mode": "Keluar dari Mode Peta",
+  "Exit Ride Mode?": "Keluar dari Mode Riding?",
+  "Exit Map Mode?": "Keluar dari Mode Peta?",
+  "You stay on {rideName}, and the group keeps seeing your spot until your sharing ends. Come back any time from Home or the ride page.": "Kamu tetap ikut {rideName}, dan grup tetap melihat lokasimu sampai berbagi lokasi berakhir. Kembali kapan saja dari Beranda atau halaman ride.",
+  "Exit and Keep Sharing": "Keluar dan Tetap Berbagi",
+  "Stop Sharing and Exit": "Berhenti Berbagi dan Keluar",
+  "Stay in Ride Mode": "Tetap di Mode Riding",
+  "Stay in Map Mode": "Tetap di Mode Peta",
+  "Pause and Exit": "Jeda dan Keluar",
+  "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "Rekamanmu dijeda selama kamu di luar Mode Peta. Rekaman tersimpan, dan bisa dilanjutkan saat kamu kembali.",
+  "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "Keluar dari Mode Riding? Kamu tetap ikut ride, dan ponselmu tetap berbagi lokasimu.",
+  "Exit Map Mode? Your recording pauses until you come back.": "Keluar dari Mode Peta? Rekamanmu dijeda sampai kamu kembali.",
 };
 
 export default dict;

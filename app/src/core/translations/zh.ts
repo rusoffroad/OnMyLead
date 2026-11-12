@@ -3478,6 +3478,20 @@ const dict: Record<string, string> = {
   "Tap a message to hear it.": "轻点消息即可收听。",
   "Poll: {question}": "投票：{question}",
   "Announcement: {text}": "公告：{text}",
+  "Exit": "退出",
+  "Exit Ride Mode": "退出骑行模式",
+  "Exit Map Mode": "退出地图模式",
+  "Exit Ride Mode?": "退出骑行模式？",
+  "Exit Map Mode?": "退出地图模式？",
+  "You stay on {rideName}, and the group keeps seeing your spot until your sharing ends. Come back any time from Home or the ride page.": "你仍在 {rideName} 中，在共享结束前车队仍能看到你的位置。随时可以从首页或骑行页面回来。",
+  "Exit and Keep Sharing": "退出并继续共享",
+  "Stop Sharing and Exit": "停止共享并退出",
+  "Stay in Ride Mode": "留在骑行模式",
+  "Stay in Map Mode": "留在地图模式",
+  "Pause and Exit": "暂停并退出",
+  "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "离开地图模式时录制会暂停。录制已保存，回来后可以继续。",
+  "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "退出骑行模式？你仍在骑行中，手机会继续共享你的位置。",
+  "Exit Map Mode? Your recording pauses until you come back.": "退出地图模式？录制会暂停，直到你回来。",
 };
 
 export default dict;

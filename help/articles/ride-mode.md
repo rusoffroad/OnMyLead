@@ -6,6 +6,8 @@ order: 10
 release: "1.0"
 updated: 2026-11-12
 sources:
+  - app/src/core/mode-exit.ts
+  - app/src/components/exit-mode.tsx
   - app/src/components/rider-puck.tsx
   - app/src/components/own-puck.tsx
   - app/src/core/intersections.ts
@@ -72,6 +74,10 @@ Your screen stays on while Ride Mode is open, so the map is ready when you glanc
 ## What's on the Screen
 
 ### The Top Bar
+
+:::release 3.1
+- **‹ Exit:** the button on the left closes Ride Mode. You stay on the ride; see [Leave Ride Mode](#leave-ride-mode).
+:::
 
 :::until 2.0
 - **‹ Ride name:** tap it to go back to the ride page.
@@ -381,10 +387,30 @@ Tap **‹ Ride name** at the top to go back to the ride page.
 :::
 
 :::release 2.0
+:::until 3.1
 Tap **‹** at the top left to go back to the ride page.
 :::
+:::
 
+:::until 3.1
 Leaving the screen doesn't stop sharing: your location keeps going to the group until your timer runs out, the ride ends, you leave the ride, or you tap **Stop**.
+:::
+
+:::release 3.1
+Tap **‹ Exit** at the top left. In [Full Map](/help/full-map), tap **‹** at the left end of the bar at the bottom. On an Android phone or tablet, the Back button does the same (in Full Map, the first Back brings the controls back). You go back to where you opened Ride Mode from, or to **Home** if you opened it from a notification, a link or the car screen.
+
+Exiting Ride Mode only closes the screen. You stay on the ride, and nothing changes for the rest of the group. Open Ride Mode again from Home or the ride page any time.
+
+If you're sharing your location, Exit first asks what you want:
+
+- **Exit and Keep Sharing:** the group keeps seeing your spot until your timer runs out, the ride ends or you stop sharing.
+- **Stop Sharing and Exit:** your location stops going to the group, and you're still on the ride.
+- **Stay in Ride Mode:** nothing changes (or swipe the sheet down).
+
+**Leave Ride** sits under these choices, for when you're done with the ride for good.
+
+When you aren't sharing, Exit closes Ride Mode straight away.
+:::
 
 :::release 2.0
 ## Leave the Ride
@@ -402,5 +428,7 @@ Opened Ride Mode by tapping a notification? Tap **‹ Ride name** (or Android's 
 :::
 
 :::release 2.0
+:::until 3.1
 Opened Ride Mode by tapping a notification? Tap **‹** at the top left (or Android's Back) to go to **Home**.
+:::
 :::
