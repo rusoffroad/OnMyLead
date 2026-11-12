@@ -6,6 +6,8 @@ order: 15
 release: "1.0.3"
 updated: 2026-11-12
 sources:
+  - app/src/core/mode-exit.ts
+  - app/src/components/exit-mode.tsx
   - app/src/core/nav-solo.ts
   - app/src/components/use-follow-camera.ts
   - app/src/core/intersections.ts
@@ -81,6 +83,14 @@ On a Free account, the top of Map Mode shows your time left, like **Free Map Mod
 From 3.0, Map Mode is the first card on Home, labelled **Ride Solo**: tap **Open Map Mode**. The blue round key in the middle of the tab bar opens it from anywhere. **Map a Custom Trail** and the **Track Line** switch are inside Map Mode.
 :::
 
+
+## Leave Map Mode
+
+:::release 3.1
+Tap **‹ Exit** at the top left, beside the **Map Mode** title. In [Full Map](/help/full-map), tap **‹** at the left end of the bar at the bottom. On an Android phone or tablet, the Back button does the same: the first Back closes Full Map or the search box if one is open. You go back to where you opened Map Mode from, or to **Home** if you opened it from the car screen or a link.
+
+If you're recording a trail, Exit asks first. **Pause and Exit** pauses the recording and saves it on your phone; the next time you open Map Mode it's there, paused, so tap **Resume** to carry on or save it. **Stay in Map Mode** keeps recording. A paused recording, or following a trail, exits straight away.
+:::
 
 At the bottom of the map are three tabs: **Explore**, **Record** and **Draw**. Swipe the panel down to see more of the map, and up to bring it back.
 

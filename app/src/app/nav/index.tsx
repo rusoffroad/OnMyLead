@@ -9,6 +9,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Svg, { Circle } from 'react-native-svg';
 
 import { CUSTOM_TRAIL_INTRO_KEY, CustomTrailIntro } from '@/components/custom-trail-intro';
+import { ExitModeButton, leaveModeScreen, useModeBackButton } from '@/components/exit-mode';
 import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
 import { ObstacleSheet } from '@/components/obstacle-sheet';
 import { Icon } from '@/components/icon';
@@ -27,6 +28,7 @@ import { riderHeading } from '@/core/heading';
 import { useFollowMe } from '@/hooks/use-follow-me';
 import { FollowMeButton } from '@/components/follow-me-button';
 import { bottomPanelPadding, FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
+import { backPress, mapExitPrompt } from '@/core/mode-exit';
 import { distanceM, type LatLng } from '@/core/geo';
 import { foregroundPermission } from '@/core/location-permission';
 import { compassAllowed } from '@/lib/compass';
@@ -608,20 +610,40 @@ export default function NavMode() {
     if (!carMapOn) return;
     return () => clearCarPlayMap();
   }, [carMapOn]);
-  // Pause and Resume on the car screen work the recording here.
+  // Exit (top left, the Full Map bar, Android back, the car screen): a running recording pauses
+  // and is saved first, so ask (core/mode-exit). Following a trail just stops.
+  const exitNow = () => {
+    if (recRef.current && !recRef.current.paused) pauseRecording(true);
+    leaveModeScreen();
+  };
+  const leave = async () => {
+    const p = mapExitPrompt(recRef.current);
+    if (p && !(await confirmAsync(p.title, p.message, p.confirm, p.stay))) return;
+    exitNow();
+  };
+  useModeBackButton(() => {
+    const b = backPress({ fullMap: full, searching: searching !== false });
+    if (b === 'close_full_map') fullMap.exit();
+    else if (b === 'close_search') setSearching(false);
+    else void leave();
+  });
+
+  // Pause, Resume and Exit on the car screen work Map Mode here (the car asks before an exit
+  // that pauses a recording).
   const carPause = useRef(pauseRecording);
+  const carExit = useRef(exitNow);
   useEffect(() => {
     carPause.current = pauseRecording;
+    carExit.current = exitNow;
   });
   useEffect(() => {
     const sub = onCarPlayAction((id) => {
       const a = parseCarPlayAction(id);
       if (a.type === 'record') carPause.current(a.paused);
+      else if (a.type === 'exit' && a.mode === 'map') carExit.current();
     });
     return () => sub.remove();
   }, []);
-
-  const leave = () => (router.canGoBack() ? router.back() : router.replace('/'));
   // Center on Me's corner, with Follow Me just left of it.
   const locatePos = full
     ? { right: 12, bottom: Math.max(insets.bottom, 12) + (wide || floating ? 0 : FULL_MAP_BAR_H + 12) }
@@ -698,7 +720,7 @@ export default function NavMode() {
       />
 
       {full ? (
-        <FullMapBar onRestore={fullMap.exit} wide={wide || floating}>
+        <FullMapBar onRestore={fullMap.exit} wide={wide || floating} onExit={() => void leave()} exitLabel={tr('Exit Map Mode')}>
           {rec && !rec.paused ? (
             <View style={styles.barRec} accessible accessibilityLabel={tr('Recording')}>
               <View style={styles.recDot} />
@@ -724,9 +746,8 @@ export default function NavMode() {
           />
         ) : (
           <View style={styles.topRow}>
-            <Pressable onPress={leave} hitSlop={16} accessibilityRole="button" accessibilityLabel={tr('Back')} style={styles.flex}>
-              <Text style={styles.topText} numberOfLines={1}>{tr('‹ Map Mode')}</Text>
-            </Pressable>
+            <ExitModeButton onPress={() => void leave()} label={tr('Exit Map Mode')} />
+            <Text style={[styles.topText, styles.flex]} numberOfLines={1} accessibilityRole="header">{tr('Map Mode')}</Text>
             <Pressable onPress={() => router.push('/nav/trails')} accessibilityRole="button" hitSlop={8} style={({ pressed }) => [styles.chip, pressed && { opacity: 0.8 }]}>
               <Text style={styles.chipText}>{tr('My Trails{v}', { v: local.length ? ` ${local.length}` : '' })}</Text>
             </Pressable>
@@ -1259,7 +1280,7 @@ const styles = themedStyles(() => ({
   flex: { flex: 1 },
   top: { position: 'absolute', top: 0, left: 0, right: 0, padding: Spacing.two, gap: Spacing.two, zIndex: 30 },
   topWide: { right: 'auto', width: PANEL_W + Spacing.two * 2, padding: 20, paddingBottom: 0 },
-  topRow: { flexDirection: 'row', alignItems: 'center', gap: 8, ...GlassSurface, borderRadius: 20, paddingHorizontal: 14, minHeight: 50 },
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: 8, ...GlassSurface, borderRadius: 20, paddingLeft: 8, paddingRight: 14, minHeight: 50 },
   topText: { color: Colors.text, fontSize: 20, fontFamily: font(700, 'display') },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: Radius.pill, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   chipText: { color: Colors.text, fontFamily: font(700), fontSize: 15 },

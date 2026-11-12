@@ -37,6 +37,11 @@ struct CarPlayLabels: Equatable {
   var replyDetail = "Send a quick reply to the group"
   var noMessages = "No Messages Yet"
   var tapToHear = "Tap a message to hear it."
+  /// Exit (3.1): takes the phone out of Ride Mode or Map Mode.
+  var exit = "Exit"
+  var exitRideMode = "Exit Ride Mode"
+  var exitRideConfirm = "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot."
+  var exitMapConfirm = "Exit Map Mode? Your recording pauses until you come back."
 
   init() {}
 
@@ -64,6 +69,10 @@ struct CarPlayLabels: Equatable {
     replyDetail = word("replyDetail", en.replyDetail)
     noMessages = word("noMessages", en.noMessages)
     tapToHear = word("tapToHear", en.tapToHear)
+    exit = word("exit", en.exit)
+    exitRideMode = word("exitRideMode", en.exitRideMode)
+    exitRideConfirm = word("exitRideConfirm", en.exitRideConfirm)
+    exitMapConfirm = word("exitMapConfirm", en.exitMapConfirm)
   }
 }
 
@@ -278,6 +287,7 @@ final class CarPlayBridge {
     }
     mapInfo = nil
     let template = CPGridTemplate(title: state.title, gridButtons: gridButtons(state))
+    template.leadingNavigationBarButtons = [exitRideButton()]
     template.trailingNavigationBarButtons = [messagesButton()]
     grid = template
     interface.setRootTemplate(template, animated: false, completion: nil)
@@ -291,9 +301,40 @@ final class CarPlayBridge {
   private func infoActions(_ map: MapState) -> [CPTextButton] {
     map.actions.prefix(3).map { b in
       CPTextButton(title: b.title, textStyle: .normal) { [weak self] _ in
-        self?.emit?(b.id)
+        if b.id == "map:exit" { self?.exitMap() } else { self?.emit?(b.id) }
       }
     }
+  }
+
+  /// Exit on the ride grid (and the car map's bar): asks first, then the phone leaves Ride Mode.
+  /// The rider stays on the ride.
+  func exitRideButton() -> CPBarButton {
+    CPBarButton(title: labels.exit) { [weak self] _ in self?.confirmExitRide() }
+  }
+
+  func confirmExitRide() {
+    let exit = CPAlertAction(title: labels.exitRideMode, style: .default) { [weak self] _ in
+      self?.emit?("ride:exit")
+      self?.interface?.dismissTemplate(animated: true, completion: nil)
+    }
+    let cancel = CPAlertAction(title: labels.cancel, style: .cancel) { [weak self] _ in
+      self?.interface?.dismissTemplate(animated: true, completion: nil)
+    }
+    present(CPAlertTemplate(titleVariants: [labels.exitRideConfirm], actions: [exit, cancel]))
+  }
+
+  /// Map Mode's Exit: straight away, or ask first while a recording runs (it pauses).
+  func exitMap() {
+    let recording = mapState?.actions.contains { $0.id == "map:pause" } ?? false
+    guard recording else { emit?("map:exit"); return }
+    let exit = CPAlertAction(title: labels.exit, style: .default) { [weak self] _ in
+      self?.emit?("map:exit")
+      self?.interface?.dismissTemplate(animated: true, completion: nil)
+    }
+    let cancel = CPAlertAction(title: labels.cancel, style: .cancel) { [weak self] _ in
+      self?.interface?.dismissTemplate(animated: true, completion: nil)
+    }
+    present(CPAlertTemplate(titleVariants: [labels.exitMapConfirm], actions: [exit, cancel]))
   }
 
   func gridButtons(_ state: RideState) -> [CPGridButton] {

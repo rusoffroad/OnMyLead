@@ -3478,6 +3478,20 @@ const dict: Record<string, string> = {
   "Tap a message to hear it.": "Toque numa mensagem para ouvi-la.",
   "Poll: {question}": "Enquete: {question}",
   "Announcement: {text}": "Aviso: {text}",
+  "Exit": "Sair",
+  "Exit Ride Mode": "Sair do Modo Passeio",
+  "Exit Map Mode": "Sair do Modo Mapa",
+  "Exit Ride Mode?": "Sair do Modo Passeio?",
+  "Exit Map Mode?": "Sair do Modo Mapa?",
+  "You stay on {rideName}, and the group keeps seeing your spot until your sharing ends. Come back any time from Home or the ride page.": "Você continua em {rideName} e o grupo continua vendo sua localização até o compartilhamento terminar. Volte quando quiser pelo Início ou pela página do passeio.",
+  "Exit and Keep Sharing": "Sair e continuar compartilhando",
+  "Stop Sharing and Exit": "Parar de compartilhar e sair",
+  "Stay in Ride Mode": "Ficar no Modo Passeio",
+  "Stay in Map Mode": "Ficar no Modo Mapa",
+  "Pause and Exit": "Pausar e sair",
+  "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "Sua gravação pausa enquanto você está fora do Modo Mapa. Ela fica salva e você pode retomá-la quando voltar.",
+  "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "Sair do Modo Passeio? Você continua no passeio e seu celular continua compartilhando sua localização.",
+  "Exit Map Mode? Your recording pauses until you come back.": "Sair do Modo Mapa? Sua gravação pausa até você voltar.",
 };
 
 export default dict;

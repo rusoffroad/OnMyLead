@@ -3478,6 +3478,20 @@ const dict: Record<string, string> = {
   "Tap a message to hear it.": "メッセージをタップすると読み上げます。",
   "Poll: {question}": "投票：{question}",
   "Announcement: {text}": "お知らせ：{text}",
+  "Exit": "終了",
+  "Exit Ride Mode": "ライドモードを終了",
+  "Exit Map Mode": "マップモードを終了",
+  "Exit Ride Mode?": "ライドモードを終了しますか？",
+  "Exit Map Mode?": "マップモードを終了しますか？",
+  "You stay on {rideName}, and the group keeps seeing your spot until your sharing ends. Come back any time from Home or the ride page.": "{rideName} には参加したままで、共有が終わるまでグループにはあなたの位置が表示されます。ホームやライドのページからいつでも戻れます。",
+  "Exit and Keep Sharing": "終了して共有を続ける",
+  "Stop Sharing and Exit": "共有を停止して終了",
+  "Stay in Ride Mode": "ライドモードに留まる",
+  "Stay in Map Mode": "マップモードに留まる",
+  "Pause and Exit": "一時停止して終了",
+  "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "マップモードを離れている間、記録は一時停止します。記録は保存され、戻ったときに再開できます。",
+  "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "ライドモードを終了しますか？ライドには参加したままで、スマホは位置の共有を続けます。",
+  "Exit Map Mode? Your recording pauses until you come back.": "マップモードを終了しますか？戻るまで記録は一時停止します。",
 };
 
 export default dict;

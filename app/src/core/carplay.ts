@@ -70,6 +70,13 @@ export type CarPlayLabels = {
   noMessages: string;
   /** Under each message: tap to hear it. */
   tapToHear: string;
+  /** Exit (3.1): the car's button that takes the phone out of Ride Mode or Map Mode. */
+  exit: string;
+  exitRideMode: string;
+  /** Asked on the car before Ride Mode exits: you stay on the ride. */
+  exitRideConfirm: string;
+  /** Asked on the car before Map Mode exits while a recording runs (it pauses). */
+  exitMapConfirm: string;
 };
 
 /**
@@ -98,6 +105,10 @@ export function carPlayLabels(proNeeded = false): CarPlayLabels {
     replyDetail: tc('Send a quick reply to the group'),
     noMessages: tc('No Messages Yet'),
     tapToHear: tc('Tap a message to hear it.'),
+    exit: tc('Exit'),
+    exitRideMode: tc('Exit Ride Mode'),
+    exitRideConfirm: tc('Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.'),
+    exitMapConfirm: tc('Exit Map Mode? Your recording pauses until you come back.'),
   };
 }
 
@@ -204,11 +215,18 @@ export function carPlayMapState(i: CarPlayMapInput): CarPlayMapState {
   if (i.recording) {
     items.push({ title: i.recording.paused ? tc('Paused') : tc('Recording'), detail: feetOrMiles(i.recording.lengthM) });
   }
-  const actions = i.recording
-    ? [i.recording.paused ? { id: 'map:resume', title: tc('Resume'), symbol: '' } : { id: 'map:pause', title: tc('Pause'), symbol: '' }]
-    : [];
+  // Pause or Resume first (the car map's bar shows the first one), then Exit (3.1).
+  const actions = [
+    ...(i.recording
+      ? [i.recording.paused ? { id: 'map:resume', title: tc('Resume'), symbol: '' } : { id: 'map:pause', title: tc('Pause'), symbol: '' }]
+      : []),
+    MAP_EXIT_BUTTON(),
+  ];
   return { title: tc('Map Mode'), labels: carPlayLabels(), items: items.slice(0, 10), actions, map: i.map ?? null };
 }
+
+/** Map Mode's Exit on the car's dash (the car asks first while a recording runs). */
+export const MAP_EXIT_BUTTON = (): CarPlayButton => ({ id: 'map:exit', title: tc('Exit Map Mode'), symbol: '' });
 
 /** What a CarPlay button press means for Ride Mode (or Map Mode, or the waiting screen). */
 export type CarPlayAction =
@@ -222,11 +240,13 @@ export type CarPlayAction =
   | { type: 'emergency' }
   | { type: 'open_map' }
   | { type: 'record'; paused: boolean }
+  /** Exit Ride Mode or Map Mode on the phone (the car already asked). */
+  | { type: 'exit'; mode: 'ride' | 'map' }
   | { type: 'none' };
 
-/** CarPlay is Pro (2.1), but EMERGENCY from the car always goes, even if Pro ran out mid-ride. */
+/** CarPlay is Pro (2.1), but EMERGENCY from the car always goes, even if Pro ran out mid-ride, and so does Exit. */
 export function carPlayActionAllowed(a: CarPlayAction, carPlayPro: boolean): boolean {
-  return carPlayPro || a.type === 'emergency' || (a.type === 'status' && a.kind === 'emergency');
+  return carPlayPro || a.type === 'emergency' || a.type === 'exit' || (a.type === 'status' && a.kind === 'emergency');
 }
 
 export function parseCarPlayAction(id: string): CarPlayAction {
@@ -238,6 +258,8 @@ export function parseCarPlayAction(id: string): CarPlayAction {
   if (id === 'emergency_confirmed') return { type: 'emergency' };
   if (id === 'open:map') return { type: 'open_map' };
   if (id === 'map:pause' || id === 'map:resume') return { type: 'record', paused: id === 'map:pause' };
+  if (id === 'ride:exit') return { type: 'exit', mode: 'ride' };
+  if (id === 'map:exit') return { type: 'exit', mode: 'map' };
   return { type: 'none' };
 }
 

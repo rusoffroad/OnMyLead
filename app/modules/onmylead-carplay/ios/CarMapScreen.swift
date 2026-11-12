@@ -136,11 +136,12 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
 
   /// The bar's buttons, rebuilt only when what they say changes (CarPlay limits template updates).
   private func updateBar(_ t: CPMapTemplate, bridge: CarPlayBridge, labels: CarPlayLabels) {
-    let recording = bridge.state == nil ? bridge.mapState?.actions.first : nil
+    // Pause or Resume; Exit has its own button on the left.
+    let recording = bridge.state == nil ? bridge.mapState?.actions.first(where: { $0.id != "map:exit" }) : nil
     let key = [
       panning ? "pan" : "",
       bridge.state != nil ? "ride" : bridge.mapState != nil ? "mode" : "none",
-      labels.ride, labels.group, labels.messages, labels.dash, labels.openMapMode, labels.ok,
+      labels.ride, labels.group, labels.messages, labels.dash, labels.openMapMode, labels.ok, labels.exit,
       recording?.id ?? "", recording?.title ?? "",
     ].joined(separator: "|")
     guard key != barKey else { return }
@@ -153,13 +154,19 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
       return
     }
     if bridge.state != nil {
-      t.leadingNavigationBarButtons = [CPBarButton(title: labels.ride) { [weak self] _ in self?.pushRideGrid() }]
+      t.leadingNavigationBarButtons = [
+        bridge.exitRideButton(),
+        CPBarButton(title: labels.ride) { [weak self] _ in self?.pushRideGrid() },
+      ]
       t.trailingNavigationBarButtons = [
         CPBarButton(title: labels.group) { [weak self] _ in self?.bridge?.showGroup() },
         bridge.messagesButton(),
       ]
     } else if bridge.mapState != nil {
-      t.leadingNavigationBarButtons = [CPBarButton(title: labels.dash) { [weak self] _ in self?.pushDash() }]
+      t.leadingNavigationBarButtons = [
+        CPBarButton(title: labels.exit) { [weak self] _ in self?.bridge?.exitMap() },
+        CPBarButton(title: labels.dash) { [weak self] _ in self?.pushDash() },
+      ]
       if let recording {
         t.trailingNavigationBarButtons = [CPBarButton(title: recording.title) { [weak self] _ in self?.bridge?.emit?(recording.id) }]
       } else {

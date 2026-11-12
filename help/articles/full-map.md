@@ -6,6 +6,7 @@ order: 12
 release: "2.0"
 updated: 2026-11-12
 sources:
+  - app/src/components/exit-mode.tsx
   - app/src/hooks/use-panel-fold.ts
   - app/src/core/panel-swipe.ts
   - app/src/core/freeride.ts
@@ -75,6 +76,10 @@ The bar keeps only what you shouldn't have to dig for:
 | Waypoints | Just the map and its pins. Press and hold the map to drop a waypoint |
 
 On every map, the **No Signal** tag stays when you have no service, and tapping a trail line still shows its card.
+
+:::release 3.1
+In Ride Mode and Map Mode, the bar also starts with **‹**, which exits the screen the same as **‹ Exit** at the top. See [Leave Ride Mode](/help/ride-mode#leave-ride-mode) and [Leave Map Mode](/help/navigation-mode#leave-map-mode).
+:::
 
 ## Phones, Tablets and the Website
 

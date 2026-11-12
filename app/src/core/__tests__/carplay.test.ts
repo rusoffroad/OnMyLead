@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CARPLAY_BUTTON_TITLES, carPlayActionAllowed, carPlayLabels, carPlayMapState, carPlayState, parseCarPlayAction } from '../carplay';
 import { TRANSLATIONS } from '../translations';
@@ -86,7 +88,7 @@ describe('CarPlay in Map Mode (no ride)', () => {
       { title: 'Trip', detail: '10.0 mi' },
       { title: 'Moving', detail: '42 min' },
     ]);
-    expect(s.actions).toEqual([]);
+    expect(s.actions.map((a) => a.id)).toEqual(['map:exit']);
   });
 
   it('shows dashes before the phone has a fix', () => {
@@ -107,12 +109,30 @@ describe('CarPlay in Map Mode (no ride)', () => {
   it('pauses and resumes a recording from the car, within Apple’s limits', () => {
     const rec = carPlayMapState({ ...map, followed: { name: 'x', onTrail: true, remainingM: 1, toStartM: 1 }, recording: { lengthM: 1609, paused: false } });
     expect(rec.items.at(-1)).toEqual({ title: 'Recording', detail: '1.0 mi' });
-    expect(rec.actions.map((a) => a.id)).toEqual(['map:pause']);
+    expect(rec.actions.map((a) => a.id)).toEqual(['map:pause', 'map:exit']);
+    expect(rec.actions.length).toBeLessThanOrEqual(3);
     expect(rec.items.length).toBeLessThanOrEqual(10);
     const paused = carPlayMapState({ ...map, recording: { lengthM: 0, paused: true } });
-    expect(paused.actions.map((a) => a.id)).toEqual(['map:resume']);
+    expect(paused.actions.map((a) => a.id)).toEqual(['map:resume', 'map:exit']);
     expect(parseCarPlayAction('map:pause')).toEqual({ type: 'record', paused: true });
     expect(parseCarPlayAction('map:resume')).toEqual({ type: 'record', paused: false });
+  });
+
+  it('exits Ride Mode and Map Mode from the car, on any plan', () => {
+    expect(carPlayMapState(map).actions.at(-1)).toEqual({ id: 'map:exit', title: 'Exit Map Mode', symbol: '' });
+    expect(parseCarPlayAction('ride:exit')).toEqual({ type: 'exit', mode: 'ride' });
+    expect(parseCarPlayAction('map:exit')).toEqual({ type: 'exit', mode: 'map' });
+    expect(carPlayActionAllowed(parseCarPlayAction('ride:exit'), false)).toBe(true);
+    expect(carPlayActionAllowed(parseCarPlayAction('map:exit'), false)).toBe(true);
+    const l = carPlayLabels();
+    expect([l.exit, l.exitRideMode]).toEqual(['Exit', 'Exit Ride Mode']);
+    expect(l.exitRideConfirm).toMatch(/stay on the ride/);
+    expect(l.exitMapConfirm).toMatch(/recording pauses/);
+    // The car reads every one of these words (CarPlayBridge.swift falls back to English).
+    const swift = readFileSync(join(__dirname, '../../../modules/onmylead-carplay/ios/CarPlayBridge.swift'), 'utf8');
+    for (const k of ['exit', 'exitRideMode', 'exitRideConfirm', 'exitMapConfirm']) expect(swift).toContain(`word("${k}"`);
+    expect(swift).toContain('"ride:exit"');
+    expect(swift).toContain('"map:exit"');
   });
 
   it('offers Open Map Mode on the waiting screen with Pro, never on Free', () => {
