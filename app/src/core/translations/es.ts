@@ -3473,6 +3473,11 @@ const dict: Record<string, string> = {
   "Follow the Ride Route": "Sigue la ruta del paseo",
   "Head to the Start of {name}": "Ve al inicio de {name}",
   "Head to the Start of the Route": "Ve al inicio de la ruta",
+  // CarPlay messages
+  "Send a quick reply to the group": "Envía una respuesta rápida al grupo",
+  "Tap a message to hear it.": "Toca un mensaje para escucharlo.",
+  "Poll: {question}": "Encuesta: {question}",
+  "Announcement: {text}": "Anuncio: {text}",
 };
 
 export default dict;

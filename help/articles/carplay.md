@@ -50,7 +50,20 @@ The buttons:
 - **Regroup Here** shows for the organizer and leader. Other riders get **Running Late** in its place.
 - **EMERGENCY** asks once, **Send EMERGENCY with your location to everyone on the ride?**, and tap **Alert My Group** to send it. **Cancel** sends nothing.
 
+:::until 3.1
 Typed messages, your own quick replies and the map stay on your phone. CarPlay only allows a few buttons, and typing while driving isn't safe.
+:::
+
+:::release 3.1
+## Messages on the Car Screen
+
+Tap **Messages** at the top of the car screen to see the ride's messages, newest first, with who sent each one and how long ago.
+
+- Tap a message to hear it read out. Long messages are cut short on the screen, and the whole message is read.
+- Tap **Reply** to send a quick reply with one tap: the built-in ones (**On My Way**, **Running Late**, **Need a Minute**, **All Good**, **Beverage Break**) and your own saved ones from **My Quick Replies** on your phone.
+
+There's no typing on the car screen, because Apple doesn't allow it while driving. To save a new reply for the car, type it once on your phone with **Message** in Ride Mode and turn on **Save as One of My Quick Replies**.
+:::
 
 :::release 3.0
 ## Map Mode on the Car Screen

@@ -140,7 +140,7 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
     let key = [
       panning ? "pan" : "",
       bridge.state != nil ? "ride" : bridge.mapState != nil ? "mode" : "none",
-      labels.ride, labels.group, labels.dash, labels.openMapMode, labels.ok,
+      labels.ride, labels.group, labels.messages, labels.dash, labels.openMapMode, labels.ok,
       recording?.id ?? "", recording?.title ?? "",
     ].joined(separator: "|")
     guard key != barKey else { return }
@@ -154,7 +154,10 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
     }
     if bridge.state != nil {
       t.leadingNavigationBarButtons = [CPBarButton(title: labels.ride) { [weak self] _ in self?.pushRideGrid() }]
-      t.trailingNavigationBarButtons = [CPBarButton(title: labels.group) { [weak self] _ in self?.bridge?.showGroup() }]
+      t.trailingNavigationBarButtons = [
+        CPBarButton(title: labels.group) { [weak self] _ in self?.bridge?.showGroup() },
+        bridge.messagesButton(),
+      ]
     } else if bridge.mapState != nil {
       t.leadingNavigationBarButtons = [CPBarButton(title: labels.dash) { [weak self] _ in self?.pushDash() }]
       if let recording {

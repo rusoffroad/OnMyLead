@@ -4,7 +4,8 @@ import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
-  CAR_DEFAULT_PACE_MPS, CAR_LINE_MAX_POINTS, carMapDots, carMapGuide, carMapLine, carPlayLabels, carPlayMapState, carPlayState, carTimeLeftS,
+  CAR_DEFAULT_PACE_MPS, CAR_LINE_MAX_POINTS, CAR_MESSAGE_PREVIEW, CAR_MESSAGES_MAX, carMapDots, carMapGuide, carMapLine, carPlayActionAllowed, carPlayLabels,
+  carPlayMapState, carPlayMessages, carPlayReplies, carPlayState, carPreview, carSpokenMessage, carTimeLeftS, parseCarPlayAction, type CarMessageInput,
 } from '../carplay';
 import type { LatLng } from '../geo';
 import { TRANSLATIONS } from '../translations';
@@ -138,5 +139,64 @@ describe('car map switch (plugins/with-carplay.js)', () => {
     expect(swift).toMatch(/#if OML_CARPLAY_MAPS && canImport\(MapboxMaps\)/);
     expect(podspec).toMatch(/s\.dependency 'MapboxMaps' if car_map/);
     expect(podspec).toContain('.oml-carplay-maps');
+  });
+});
+
+describe('messages on the car screen', () => {
+  const nameOf = (id: string) => ({ a: 'Sam', b: 'Dusty' })[id] ?? 'Rider';
+  const now = Date.parse('2026-11-12T01:00:00Z');
+  const msg = (id: string, minAgo: number, extra: Partial<CarMessageInput> = {}): CarMessageInput => ({
+    id, userId: 'a', kind: 'chat', body: `Message ${id}`, sentAt: new Date(now - minAgo * 60000).toISOString(), ...extra,
+  });
+
+  it('lists the newest first, at most a glanceable few, with who and how long ago', () => {
+    const list = carPlayMessages(Array.from({ length: 20 }, (_, i) => msg(`m${i}`, i)), nameOf, 'me', now);
+    expect(list).toHaveLength(CAR_MESSAGES_MAX);
+    expect(list[0]).toEqual({ id: 'm0', title: 'Sam', detail: 'Message m0 · Just Now' });
+    expect(list[5].detail).toBe('Message m5 · 5 Min Ago');
+  });
+
+  it('calls your own messages You', () => {
+    expect(carPlayMessages([msg('x', 1, { userId: 'me' })], nameOf, 'me', now)[0].title).toBe('You');
+  });
+
+  it('cuts long messages short on screen but reads out the whole thing', () => {
+    const long = msg('l', 2, { body: 'Fuel stop at the Sand Flats booth in twenty minutes, then we head up to the slickrock loop together' });
+    const [row] = carPlayMessages([long], nameOf, null, now);
+    expect(row.detail.split(' · ')[0].length).toBeLessThanOrEqual(CAR_MESSAGE_PREVIEW);
+    expect(row.detail).toContain('…');
+    expect(carSpokenMessage(long, nameOf)).toBe(`Sam: ${long.body}`);
+    expect(carPreview('short one')).toBe('short one');
+  });
+
+  it('labels polls and announcements', () => {
+    expect(carSpokenMessage(msg('p', 1, { body: 'Lunch here?', pollOptions: ['Yes', 'No'] }), nameOf)).toBe('Sam: Poll: Lunch here?');
+    expect(carSpokenMessage(msg('n', 1, { kind: 'announcement', userId: 'b', body: 'Fuel stop' }), nameOf)).toBe('Dusty: Announcement: Fuel stop');
+  });
+
+  it('offers the built-in quick replies, then your saved ones without repeats', () => {
+    const r = carPlayReplies(['Gas Stop Ahead', 'running late', ' '], ['On My Way', 'Running Late']);
+    expect(r.map((b) => b.id)).toEqual(['reply:On My Way', 'reply:Running Late', 'say:Gas Stop Ahead']);
+  });
+
+  it('turns Messages taps back into actions, and they need Pro like the rest of CarPlay', () => {
+    expect(parseCarPlayAction('say:Gas Stop Ahead')).toEqual({ type: 'say', body: 'Gas Stop Ahead' });
+    expect(parseCarPlayAction('hear:abc')).toEqual({ type: 'hear', messageId: 'abc' });
+    expect(carPlayActionAllowed({ type: 'say', body: 'x' }, false)).toBe(false);
+    expect(carPlayActionAllowed({ type: 'say', body: 'x' }, true)).toBe(true);
+  });
+
+  it('rides along with the ride state', () => {
+    const ride = { rideName: 'Moab', separated: [], watchesBubble: false, canRegroup: false, riders: [], helpCalls: [] };
+    expect(carPlayState(ride).messages).toEqual([]);
+    expect(carPlayState(ride).replies.length).toBeGreaterThan(0);
+  });
+
+  it('has every Messages word in every language', () => {
+    const l = carPlayLabels();
+    const words = [l.messages, l.reply, l.replyDetail, l.noMessages, l.tapToHear, 'Poll: {question}', 'Announcement: {text}', 'Just Now', '{totalMin} Min Ago', '{totalHr} Hr {m} Min Ago', 'You'];
+    for (const [lang, dict] of Object.entries(TRANSLATIONS)) {
+      for (const w of words) expect(dict?.[w], `${lang}: ${w}`).toBeTruthy();
+    }
   });
 });

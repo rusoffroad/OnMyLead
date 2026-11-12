@@ -3473,6 +3473,11 @@ const dict: Record<string, string> = {
   "Follow the Ride Route": "ライドのルートに沿って進む",
   "Head to the Start of {name}": "{name}の起点へ向かう",
   "Head to the Start of the Route": "ルートの起点へ向かう",
+  // CarPlay messages
+  "Send a quick reply to the group": "グループにクイック返信を送る",
+  "Tap a message to hear it.": "メッセージをタップすると読み上げます。",
+  "Poll: {question}": "投票：{question}",
+  "Announcement: {text}": "お知らせ：{text}",
 };
 
 export default dict;

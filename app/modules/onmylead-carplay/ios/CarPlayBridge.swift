@@ -31,6 +31,12 @@ struct CarPlayLabels: Equatable {
   var dash = "Dash"
   /// Free plan: the car map shows the Pro notice instead of the map.
   var proNeeded = false
+  /// The Messages button and screen.
+  var messages = "Messages"
+  var reply = "Reply"
+  var replyDetail = "Send a quick reply to the group"
+  var noMessages = "No Messages Yet"
+  var tapToHear = "Tap a message to hear it."
 
   init() {}
 
@@ -53,6 +59,11 @@ struct CarPlayLabels: Equatable {
     ride = word("ride", en.ride)
     dash = word("dash", en.dash)
     proNeeded = d?["proNeeded"] as? Bool ?? false
+    messages = word("messages", en.messages)
+    reply = word("reply", en.reply)
+    replyDetail = word("replyDetail", en.replyDetail)
+    noMessages = word("noMessages", en.noMessages)
+    tapToHear = word("tapToHear", en.tapToHear)
   }
 }
 
@@ -78,6 +89,30 @@ struct RideState: Equatable {
     let alert = d["alert"] as? [String: Any]
     alertId = alert?["id"] as? String
     alertText = alert?["text"] as? String
+  }
+}
+
+/// The ride's messages and one-tap replies (shape: messages / replies on CarPlayState). Kept apart
+/// from RideState so a new message refreshes the Messages screen without redrawing the grid.
+struct RideMessages: Equatable {
+  let messages: [RideButton]
+  let replies: [RideButton]
+
+  init(_ d: [String: Any]) {
+    messages = (d["messages"] as? [[String: Any]] ?? []).compactMap { m in
+      guard let id = m["id"] as? String else { return nil }
+      // title: the sender; symbol carries the preview (RideButton is just three strings).
+      return RideButton(id: id, title: m["title"] as? String ?? "", symbol: m["detail"] as? String ?? "")
+    }
+    replies = (d["replies"] as? [[String: Any]] ?? []).compactMap { b in
+      guard let id = b["id"] as? String, let title = b["title"] as? String else { return nil }
+      return RideButton(id: id, title: title, symbol: b["symbol"] as? String ?? "text.bubble.fill")
+    }
+  }
+
+  init() {
+    messages = []
+    replies = []
   }
 }
 
@@ -120,6 +155,9 @@ final class CarPlayBridge {
   private var mapInfoTitle: String?
   private var shownAlertId: String?
   private(set) var labels = CarPlayLabels()
+  private(set) var rideMessages = RideMessages()
+  /// The Messages screen while it is open, refreshed as messages come in.
+  private weak var messagesList: CPListTemplate?
 
   func setLabels(_ next: CarPlayLabels) {
     guard next != labels else { return }
@@ -177,7 +215,11 @@ final class CarPlayBridge {
     }
   }
 
-  func update(_ next: RideState?, map: CarMapData? = nil) {
+  func update(_ next: RideState?, map: CarMapData? = nil, messages: RideMessages = RideMessages()) {
+    if messages != rideMessages {
+      rideMessages = messages
+      messagesList?.updateSections(messageSections())
+    }
     if let mapScreen {
       rideMap = next == nil ? nil : map
       if next?.alertId == nil { shownAlertId = nil }
@@ -236,6 +278,7 @@ final class CarPlayBridge {
     }
     mapInfo = nil
     let template = CPGridTemplate(title: state.title, gridButtons: gridButtons(state))
+    template.trailingNavigationBarButtons = [messagesButton()]
     grid = template
     interface.setRootTemplate(template, animated: false, completion: nil)
     showAlertIfNew(state)
@@ -271,6 +314,52 @@ final class CarPlayBridge {
     default:
       emit?(id)
     }
+  }
+
+  func messagesButton() -> CPBarButton {
+    CPBarButton(title: labels.messages) { [weak self] _ in self?.showMessages() }
+  }
+
+  /// The ride's messages: Reply first, then the newest messages. Tap one to hear it (the phone
+  /// reads it out in the rider's voice). Nothing to type: Apple doesn't allow typing in the car.
+  func showMessages() {
+    guard let interface, state != nil else { return }
+    let list = CPListTemplate(title: labels.messages, sections: messageSections())
+    messagesList = list
+    interface.pushTemplate(list, animated: true, completion: nil)
+  }
+
+  private func messageSections() -> [CPListSection] {
+    let reply = CPListItem(text: labels.reply, detailText: labels.replyDetail, image: UIImage(systemName: "arrowshape.turn.up.left.fill"))
+    reply.handler = { [weak self] _, done in
+      self?.showReplies()
+      done()
+    }
+    let items: [CPListItem] = rideMessages.messages.map { m in
+      let item = CPListItem(text: m.title, detailText: m.symbol)
+      item.handler = { [weak self] _, done in
+        self?.emit?("hear:\(m.id)")
+        done()
+      }
+      return item
+    }
+    let list = items.isEmpty ? [CPListItem(text: labels.noMessages, detailText: nil)] : items
+    return [CPListSection(items: [reply]), CPListSection(items: list, header: labels.tapToHear, sectionIndexTitle: nil)]
+  }
+
+  private func showReplies() {
+    guard let interface else { return }
+    let items: [CPListItem] = rideMessages.replies.map { r in
+      let item = CPListItem(text: r.title, detailText: nil, image: UIImage(systemName: r.symbol))
+      item.handler = { [weak self] _, done in
+        self?.emit?(r.id)
+        done()
+        // Back to the messages, where the reply shows up once it's sent.
+        self?.interface?.popTemplate(animated: true, completion: nil)
+      }
+      return item
+    }
+    interface.pushTemplate(CPListTemplate(title: labels.reply, sections: [CPListSection(items: items)]), animated: true, completion: nil)
   }
 
   func showGroup() {
