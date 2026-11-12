@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-12
 sources:
   - app/src/components/rider-puck.tsx
   - app/src/components/own-puck.tsx

@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-10
+updated: 2026-11-12
 sources:
   - app/src/core/nav-solo.ts
   - app/src/components/use-follow-camera.ts
