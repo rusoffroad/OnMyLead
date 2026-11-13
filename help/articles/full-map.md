@@ -4,7 +4,7 @@ summary: Hide the bars and panels on any map so the map fills your screen, and b
 category: routes-maps
 order: 12
 release: "2.0"
-updated: 2026-11-12
+updated: 2026-11-13
 sources:
   - app/src/components/exit-mode.tsx
   - app/src/hooks/use-panel-fold.ts

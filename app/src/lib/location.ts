@@ -16,7 +16,7 @@ import { MOVING_SPEED_MPS } from '@/core/bubble';
 import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
 import { distanceM } from '@/core/geo';
-import { shouldFlushTrack } from '@/core/live-costs';
+import { capTrackQueue, isTrackRefused, shouldFlushTrack } from '@/core/live-costs';
 import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
 import { isApproximatePermission, shouldAskForGoogleAccuracy, shouldAskForPrecise } from '@/core/precise-location';
 import type { BatteryPlan } from '@/core/battery';
@@ -89,6 +89,10 @@ async function writeContext(ctx: TrackContext) {
 let lastSent: { at: number; lat: number; lng: number } | null = null;
 /** When queued track points last went up (this process); null sends the first batch at once. */
 let lastTrackFlushAt: number | null = null;
+/** Track uploads in a row that didn't get through (backs the next one off, core/live-costs). */
+let trackFlushFailures = 0;
+/** The upload running now, so fixes that arrive meanwhile don't start a second one. */
+let trackFlushRunning: Promise<void> | null = null;
 let movedAt: number | null = null;
 
 export async function handleLocations(locations: Location.LocationObject[]) {
@@ -121,6 +125,7 @@ export async function handleLocations(locations: Location.LocationObject[]) {
       next.lng, next.lat, Math.round(next.at / 1000), latest.coords.speed ?? null, latest.coords.altitude ?? null,
       accuracy != null ? Math.round(accuracy) : null,
     ]);
+    queue[ctx.rideId] = capTrackQueue(queue[ctx.rideId]);
     await writeQueue(queue);
   }
 
@@ -154,44 +159,71 @@ export async function handleLocations(locations: Location.LocationObject[]) {
     // multiplied server traffic); stopping the share sends whatever is left.
     if (!error) {
       const pending = Object.values(await readQueue()).reduce((n, pts) => n + (pts?.length ?? 0), 0);
-      if (shouldFlushTrack(lastTrackFlushAt, Date.now(), pending)) await flushTrack(userId);
+      if (!trackFlushRunning && shouldFlushTrack(lastTrackFlushAt, Date.now(), pending, trackFlushFailures)) await flushTrack(userId);
     }
   } catch {
     // No service: the point is queued above and goes up with the next fix that gets through.
   }
 }
 
-/** Append queued points to each ride's own track. Safe to call repeatedly. */
-export async function flushTrack(userId: string) {
+/**
+ * Append queued points to each ride's own track. Safe to call repeatedly: a call while one is
+ * running waits for that one instead of starting another.
+ */
+export function flushTrack(userId: string): Promise<void> {
+  if (!trackFlushRunning) {
+    trackFlushRunning = runTrackFlush(userId).finally(() => {
+      trackFlushRunning = null;
+    });
+  }
+  return trackFlushRunning;
+}
+
+async function runTrackFlush(userId: string) {
   lastTrackFlushAt = Date.now();
   // The old single list can't say which ride its points belong to, so it is dropped rather than
   // risk adding them to the wrong ride.
   await AsyncStorage.removeItem(OLD_QUEUE_KEY).catch(() => {});
   const queue = await readQueue();
+  let failed = false;
   for (const [rideId, pending] of Object.entries(queue)) {
     if (!pending?.length) {
       delete queue[rideId];
       continue;
     }
-    const { data: existing, error: readError } = await supabase
-      .from('ride_tracks')
-      .select('points')
-      .eq('ride_id', rideId)
-      .eq('user_id', userId)
-      .maybeSingle();
-    if (readError) continue;
-    const points = [...((existing?.points as QueuedPoint[] | undefined) ?? []), ...pending];
-    const { error } = await supabase
-      .from('ride_tracks')
-      .upsert({ ride_id: rideId, user_id: userId, points, updated_at: new Date().toISOString() });
-    if (error) continue;
-    // Points queued while this upload ran stay for the next flush.
-    const now = await readQueue();
-    const rest = (now[rideId] ?? []).slice(pending.length);
-    if (rest.length) now[rideId] = rest;
-    else delete now[rideId];
-    await writeQueue(now);
+    try {
+      const { data: existing, error: readError } = await supabase
+        .from('ride_tracks')
+        .select('points')
+        .eq('ride_id', rideId)
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (readError) {
+        failed = true;
+        continue;
+      }
+      const points = [...((existing?.points as QueuedPoint[] | undefined) ?? []), ...pending];
+      const { error, status } = await supabase
+        .from('ride_tracks')
+        .upsert({ ride_id: rideId, user_id: userId, points, updated_at: new Date().toISOString() });
+      // Refused for good (not a joined rider of that ride any more): those points can never go
+      // up, so they are dropped instead of being sent again and again.
+      const refused = !!error && isTrackRefused({ code: error.code, status });
+      if (error && !refused) {
+        failed = true;
+        continue;
+      }
+      // Points queued while this upload ran stay for the next flush.
+      const now = await readQueue();
+      const rest = refused ? [] : (now[rideId] ?? []).slice(pending.length);
+      if (rest.length) now[rideId] = rest;
+      else delete now[rideId];
+      await writeQueue(now);
+    } catch {
+      failed = true;
+    }
   }
+  trackFlushFailures = failed ? trackFlushFailures + 1 : 0;
 }
 
 if (Platform.OS !== 'web') {

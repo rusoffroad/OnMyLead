@@ -4,7 +4,7 @@ summary: Keep the map moving with your dot as you ride, see which way you're hea
 category: ride-mode
 order: 13
 release: "2.0"
-updated: 2026-11-12
+updated: 2026-11-13
 sources:
   - app/src/core/follow-camera.ts
   - app/src/core/heading.ts
@@ -58,7 +58,12 @@ If another junction is coming up within about a quarter mile once you're through
 **Zoom In at Intersections** is on until you turn it off, either in [Map Settings](/help/map-layers) under **Following** or in the **You** tab under **On the Trail**. Your choice follows your account to your other devices.
 :::
 :::release 3.0
+:::until 3.1
 **Zoom In at Intersections** is on until you turn it off, either in [Map Settings](/help/map-layers) under **Following** or in **You** (your picture at the top of Home) under **On the Trail**. Your choice follows your account to your other devices.
+:::
+:::
+:::release 3.1
+**Zoom In at Intersections** is off until you turn it on, either in [Map Settings](/help/map-layers) under **Following** or in **You** (your picture at the top of Home) under **On the Trail**. From 3.1 it starts off for everyone who hadn't turned it on themselves, so the map keeps its zoom at junctions unless you want it to zoom in. Your choice follows your account to your other devices.
 :::
 
 ## Your Dot

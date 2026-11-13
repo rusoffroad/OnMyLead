@@ -33,7 +33,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
 import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import {
-  carMapDots, carMapGuide, carMapLine, carPlayActionAllowed, carPlayMessages, carPlayReplies, carPlayState, carSpokenMessage, parseCarPlayAction, type CarMap, type CarMapLine,
+  carMapDots, carMapGuide, carMapLine, carRiderBar, carPlayActionAllowed, carPlayMessages, carPlayReplies, carPlayState, carSpokenMessage, parseCarPlayAction, type CarMap, type CarMapLine,
   type CarMessageInput,
 } from '@/core/carplay';
 import { flatLook, mapboxStyleFor } from '@/core/terrain';
@@ -1181,6 +1181,15 @@ export default function RideMode() {
           movingS: 0,
         })
       : null,
+    // The same rider line as the phone's strip, along the bottom of the car map.
+    bar: carRiderBar(route.route ? placed : freerideLine?.placed ?? [], me, (id) => {
+      const r = mapRiders.find((x) => x.id === id);
+      return {
+        color: puckInk(r?.role ?? 'rider'),
+        ring: r && (r.status === 'red' || r.status === 'yellow') ? RideColors[r.status] : null,
+        live: !lastSeenIds.includes(id),
+      };
+    }),
   };
   // CarPlay Messages: the ride's messages (tap one on the car to hear it) and one-tap replies,
   // the built-in ones and this rider's saved My Quick Replies. Leader-only messages are only in

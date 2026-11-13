@@ -537,8 +537,15 @@ final class CarPlayBridge {
       }
       return item
     }
+    // Riding Group chats stay one tap away during a ride, so the car can hear and answer them too.
+    let chats = CPListItem(text: labels.groupChats, detailText: nil, image: UIImage(systemName: "bubble.left.and.bubble.right.fill"))
+    chats.accessoryType = .disclosureIndicator
+    chats.handler = { [weak self] _, done in
+      self?.showChats()
+      done()
+    }
     let list = items.isEmpty ? [CPListItem(text: labels.noMessages, detailText: nil)] : items
-    return [CPListSection(items: [reply]), CPListSection(items: list, header: labels.tapToHear, sectionIndexTitle: nil)]
+    return [CPListSection(items: [reply, chats]), CPListSection(items: list, header: labels.tapToHear, sectionIndexTitle: nil)]
   }
 
   /// The ride's messages: Reply first, then the newest messages. Tap one to hear it (the phone
@@ -564,8 +571,15 @@ final class CarPlayBridge {
       }
       return item
     }
+    // Riding Group chats stay one tap away during a ride, so the car can hear and answer them too.
+    let chats = CPListItem(text: labels.groupChats, detailText: nil, image: UIImage(systemName: "bubble.left.and.bubble.right.fill"))
+    chats.accessoryType = .disclosureIndicator
+    chats.handler = { [weak self] _, done in
+      self?.showChats()
+      done()
+    }
     let list = items.isEmpty ? [CPListItem(text: labels.noMessages, detailText: nil)] : items
-    return [CPListSection(items: [reply]), CPListSection(items: list, header: labels.tapToHear, sectionIndexTitle: nil)]
+    return [CPListSection(items: [reply, chats]), CPListSection(items: list, header: labels.tapToHear, sectionIndexTitle: nil)]
   }
 
   private func showReplies() {
