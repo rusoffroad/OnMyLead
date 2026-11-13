@@ -46,7 +46,8 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
   // Guidance.
   private var session: CPNavigationSession?
   private var trip: CPTrip?
-  private var maneuver: CPManeuver?
+  private var maneuvers: [CPManeuver] = []
+  private var stepIds: [String] = []
   private var guideId: String?
 
   init(bridge: CarPlayBridge, interface: CPInterfaceController, window: UIWindow) {
@@ -210,30 +211,61 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
       end.name = g.endName
       let choice = CPRouteChoice(summaryVariants: [g.instruction], additionalInformationVariants: [], selectionSummaryVariants: [])
       let newTrip = CPTrip(origin: MKMapItem.forCurrentLocation(), destination: end, routeChoices: [choice])
-      let s = t.startNavigationSession(for: newTrip)
-      let m = CPManeuver()
-      m.instructionVariants = [g.instruction]
-      m.symbolImage = UIImage(systemName: g.id.hasPrefix("start:") ? "location.north.line.fill" : "arrow.up")
-      s.upcomingManeuvers = [m]
-      session = s
+      session = t.startNavigationSession(for: newTrip)
       trip = newTrip
-      maneuver = m
       guideId = g.id
     }
-    guard let session, let trip, let maneuver else { return }
-    let estimates = CPTravelEstimates(
-      distanceRemaining: Measurement(value: g.remainingM, unit: UnitLength.meters),
-      timeRemaining: g.remainingS
-    )
-    session.updateEstimates(estimates, for: maneuver)
-    t.update(estimates, for: trip, with: .default)
+    guard let session, let trip else { return }
+    // Turn-by-turn: the next step and the one after. Only rebuilt when the steps change (a step
+    // passed); the distance to the next one is updated in place every time.
+    let steps = g.steps.isEmpty
+      ? [CarMapData.Step(id: g.id, turn: g.id.hasPrefix("start:") ? "start" : "straight", instruction: g.instruction, distanceM: g.remainingM)]
+      : g.steps
+    let ids = steps.map(\.id)
+    if ids != stepIds {
+      maneuvers = steps.map { step in
+        let m = CPManeuver()
+        m.instructionVariants = [step.instruction]
+        m.symbolImage = UIImage(systemName: CarMapScreen.symbol(step.turn))
+        m.initialTravelEstimates = CarMapScreen.estimates(step.distanceM, nil)
+        return m
+      }
+      session.upcomingManeuvers = maneuvers
+      stepIds = ids
+    }
+    if let first = maneuvers.first, let step = steps.first {
+      session.updateEstimates(CarMapScreen.estimates(step.distanceM, nil), for: first)
+    }
+    t.update(CarMapScreen.estimates(g.remainingM, g.remainingS), for: trip, with: .default)
+  }
+
+  private static func estimates(_ meters: Double, _ seconds: Double?) -> CPTravelEstimates {
+    // Feet and miles in the US, metres and kilometres elsewhere: the car formats it for the locale.
+    CPTravelEstimates(distanceRemaining: Measurement(value: meters, unit: UnitLength.meters), timeRemaining: seconds ?? 0)
+  }
+
+  /// SF Symbols for each step (src/core/car-maneuvers.ts CarTurn).
+  static func symbol(_ turn: String) -> String {
+    switch turn {
+    case "left": return "arrow.turn.up.left"
+    case "right": return "arrow.turn.up.right"
+    case "bearLeft": return "arrow.up.left"
+    case "bearRight": return "arrow.up.right"
+    case "sharpLeft": return "arrow.down.left"
+    case "sharpRight": return "arrow.down.right"
+    case "uTurn": return "arrow.uturn.down"
+    case "arrive": return "mappin.circle.fill"
+    case "start": return "location.north.line.fill"
+    default: return "arrow.up"
+    }
   }
 
   private func finishGuide() {
     session?.finishTrip()
     session = nil
     trip = nil
-    maneuver = nil
+    maneuvers = []
+    stepIds = []
     guideId = nil
   }
 

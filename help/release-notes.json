@@ -1,5 +1,34 @@
 [
   {
+    "version": "3.1",
+    "title": "The Map on CarPlay",
+    "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, brings your ride's messages to the car, and adds an Exit button to Map Mode and Ride Mode. CarPlay is part of OnMyLead Pro.",
+    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: your route, your group's dots and turn-by-turn for the trail ahead (Pro).\n• Ride messages on CarPlay: tap one to hear it, and send a quick reply with one tap (Pro).\n• An Exit button in Map Mode and Ride Mode, plus Android's Back button. Exiting Ride Mode never leaves the ride.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "devices": "iphone-ipad",
+        "text": "CarPlay shows the OnMyLead map in your Map Style, turned so the way ahead is up: your position, the ride route and Leader Trackline, and every rider who is sharing, or in Map Mode the trail you follow and the one you're recording. Zoom, recenter and pan from the car screen. Pro."
+      },
+      {
+        "kind": "new",
+        "devices": "iphone-ipad",
+        "text": "Turn-by-turn on CarPlay while you follow a trail or the ride route: the next turn with an arrow and how far away it is, the turn after it, and the arrival, with miles and time left. The turns come from the trail's own shape, so they work on any trail. Before the trail, the car points you to its start; for road directions there, use Directions in Apple Maps or Google Maps."
+      },
+      {
+        "kind": "new",
+        "devices": "iphone-ipad",
+        "text": "Messages on CarPlay: the ride's latest messages with who sent them and when. Tap one to hear it read out, and tap Reply to send a quick reply, including your own saved My Quick Replies. There's no typing in the car."
+      },
+      {
+        "kind": "new",
+        "text": "An Exit button at the top left of Map Mode and Ride Mode (and in the Full Map bar), plus Android's Back button and Exit on the CarPlay screen. Exiting Ride Mode keeps you on the ride; it asks first if you're sharing your location, and Map Mode asks first if you're recording a trail."
+      }
+    ]
+  },
+  {
     "version": "3.0.1",
     "title": "Follow Me Fix for Map Mode",
     "intro": "OnMyLead 3.0.1 is the first store release of 3.0, with everything in 3.0 below, and it fixes Follow Me in Map Mode: the map now moves before your dot slides under the bottom panel.",
