@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CARPLAY_BUTTON_TITLES, carChat, carChatRows, carPlayActionAllowed, carPlayLabels, carPlayMapState, carPlayReplies, carPlayState, parseCarPlayAction } from '../carplay';
+import { CARPLAY_BUTTON_TITLES, carRiderBar, carChat, carChatRows, carPlayActionAllowed, carPlayLabels, carPlayMapState, carPlayReplies, carPlayState, parseCarPlayAction } from '../carplay';
 import { TRANSLATIONS } from '../translations';
 import { QUICK_REPLIES } from '../chat';
 
@@ -196,5 +196,44 @@ describe('CarPlay 3.1: group chats, layers and Open Ride Mode', () => {
     expect(l.layers).toBe('Layers');
     expect(l.openRideMode).toBe('Open Ride Mode');
     expect(l.groupChats).toBe('Group Chats');
+  });
+});
+
+describe('carRiderBar', () => {
+  const at = (id: string, role: 'leader' | 'sweep' | 'rider', alongM: number | null) => ({
+    id, role, at: alongM == null ? null : { lat: 0, lng: 0 },
+    place: alongM == null ? null : { alongM, offRouteM: 0, onRoute: true },
+  });
+  const look = (id: string) => ({ color: id === 'lead' ? '#1E6BFF' : '#4A5A72', ring: id === 'help' ? '#E5262E' : null, live: id !== 'stale' });
+
+  it('puts the leader on the left, the tail gunner on the right, and says how spread out the group is', () => {
+    const bar = carRiderBar([at('me', 'rider', 900), at('lead', 'leader', 2000), at('tail', 'sweep', 400), at('off', 'rider', null)], 'me', look)!;
+    const x = new Map(bar.dots.map((d) => [d.id, d.x]));
+    expect(x.get('lead')!).toBeLessThan(x.get('me')!);
+    expect(x.get('me')!).toBeLessThan(x.get('tail')!);
+    expect(x.has('off')).toBe(false);
+    expect(bar.spread).toMatch(/mi|ft/);
+    expect(bar.ends).toBe('Leader to Tail Gunner');
+    for (const d of bar.dots) {
+      expect(d.x).toBeGreaterThanOrEqual(0);
+      expect(d.x).toBeLessThanOrEqual(1);
+      expect(d.size).toBeGreaterThan(0);
+      expect(d.size).toBeLessThanOrEqual(1);
+    }
+    // Me drawn last, on top.
+    expect(bar.dots[bar.dots.length - 1].id).toBe('me');
+    expect(bar.dots.find((d) => d.id === 'me')!.me).toBe(true);
+  });
+
+  it('marks riders in trouble and riders only last seen', () => {
+    const bar = carRiderBar([at('lead', 'leader', 500), at('help', 'rider', 300), at('stale', 'rider', 100)], 'lead', look)!;
+    expect(bar.dots.find((d) => d.id === 'help')!.ring).toBe('#E5262E');
+    expect(bar.dots.find((d) => d.id === 'stale')!.live).toBe(false);
+    expect(bar.ends).toBe('Leader to Last Rider');
+  });
+
+  it('is left off with fewer than two riders on the line', () => {
+    expect(carRiderBar([at('lead', 'leader', 500), at('x', 'rider', null)], 'lead', look)).toBeNull();
+    expect(carRiderBar([], 'lead', look)).toBeNull();
   });
 });

@@ -61,6 +61,7 @@ Tap **Messages** at the top of the car screen to see the ride's messages, newest
 
 - Tap a message to hear it read out. Long messages are cut short on the screen, and the whole message is read.
 - Tap **Reply** to send a quick reply with one tap: the built-in ones (**On My Way**, **Running Late**, **Need a Minute**, **All Good**, **Beverage Break**) and your own saved ones from **My Quick Replies** on your phone.
+- Tap **Group Chats** to open your riding groups' chats without leaving the ride, hear their messages and send them a quick reply.
 
 There's no typing on the car screen, because Apple doesn't allow it while driving. To save a new reply for the car, type it once on your phone with **Message** in Ride Mode and turn on **Save as One of My Quick Replies**.
 :::
@@ -68,7 +69,7 @@ There's no typing on the car screen, because Apple doesn't allow it while drivin
 :::release 3.1
 ## Group Chats on the Car Screen
 
-With no ride in Ride Mode, tap **Messages** at the top of the car map to see your **Group Chats**: every riding group you run or are in, the one with the newest message first, with how many messages are new.
+With no ride in Ride Mode, tap **Messages** at the top of the car map to see your **Group Chats** (during a ride, tap **Messages**, then **Group Chats**): every riding group you run or are in, the one with the newest message first, with how many messages are new.
 
 - Tap a group to see its newest messages. Tap a message to hear it read out.
 - Tap **Reply** to send a quick reply to the group with one tap: the same built-in replies and your own saved ones as during a ride.
@@ -106,6 +107,7 @@ The map itself stays on your phone. Apple only lets navigation apps draw maps on
 The car screen shows the OnMyLead map, in your Map Style, with your position and the direction you're heading. The map turns as you drive, so the way ahead is up.
 
 - **During a ride:** the ride route, the Leader Trackline, and every rider who is sharing. A hollow dot means that's only where a rider was last seen, not where they are now. A colored ring means the rider is separated or asked for help.
+- **The rider line:** during a ride with two or more riders sharing, a bar along the bottom of the car map shows every rider's dot in running order, the same as the line in Ride Mode on your phone: the leader on the left, the tail gunner on the right, and your own dot outlined in white. The distance on the right is how far the last rider is behind the leader. The car screen can't be tapped on the map, so the bar doesn't show names; tap **Ride**, then **Group**, to see who is where.
 - **In Map Mode:** the trail you're following and the trail you're recording.
 - **Turn-by-turn:** while you follow a trail or the ride route, the top of the screen shows the next turn with an arrow and how far away it is (**Bear Left**, **Turn Right**, **Sharp Left**, **Make a U-Turn**), then the turn after it, and finally **Arrive at the End of** the trail. The turns come from the shape of the trail itself, so they work on any trail, with or without service. Gentle curves aren't called out. Below that are the miles left, the time left and when you'll get there.
 - **Head to the Start:** before you reach the trail, the car says **Head to the Start** and how far it is in a straight line. There are no road directions to the start; use Apple Maps or Google Maps for that (**Directions** on the ride or trail).
