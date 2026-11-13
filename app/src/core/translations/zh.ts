@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "离开地图模式时录制会暂停。录制已保存，回来后可以继续。",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "退出骑行模式？你仍在骑行中，手机会继续共享你的位置。",
   "Exit Map Mode? Your recording pauses until you come back.": "退出地图模式？录制会暂停，直到你回来。",
+  "Leave Waitlist": "离开候补名单",
+  "You’re Riding": "你正在骑行",
+  "You Rode This One": "你参加过这次骑行",
+  "Still in Your Rides": "仍在你的骑行中",
+  "You’re Going": "你已报名",
+  "Leave to take it off your list.": "离开即可从列表中移除。",
+  "Plans changed? You can leave any time.": "计划有变？你随时可以离开。",
+  "You’re on the Waitlist": "你在候补名单上",
+  "You’ll move up automatically if a spot opens.": "有空位时你会自动补上。",
+  "Request Sent": "请求已发送",
+  "Leaving hands the ride to another rider first.": "离开前你需要先把骑行交给另一位骑手。",
+  "Nobody else has joined yet, so leaving cancels the ride.": "还没有其他人加入，所以离开会取消这次骑行。",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "你仍在 {rideName} 中。随时可从首页或骑行页面回来。",
+  "Done with this ride? Leaving takes you off it for good.": "不再参加这次骑行？离开后你将被彻底移出。",
 };
 
 export default dict;

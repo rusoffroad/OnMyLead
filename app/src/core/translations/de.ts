@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "Deine Aufzeichnung pausiert, solange du nicht im Kartenmodus bist. Sie ist gespeichert, und du kannst sie fortsetzen, wenn du zurückkommst.",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "Tourmodus beenden? Du bleibst bei der Tour, und dein Handy teilt weiter deinen Standort.",
   "Exit Map Mode? Your recording pauses until you come back.": "Kartenmodus beenden? Deine Aufzeichnung pausiert, bis du zurückkommst.",
+  "Leave Waitlist": "Warteliste verlassen",
+  "You’re Riding": "Du fährst mit",
+  "You Rode This One": "Du bist diese Tour gefahren",
+  "Still in Your Rides": "Noch in deinen Touren",
+  "You’re Going": "Du bist dabei",
+  "Leave to take it off your list.": "Verlasse sie, um sie aus deiner Liste zu entfernen.",
+  "Plans changed? You can leave any time.": "Pläne geändert? Du kannst jederzeit aussteigen.",
+  "You’re on the Waitlist": "Du stehst auf der Warteliste",
+  "You’ll move up automatically if a spot opens.": "Du rückst automatisch nach, wenn ein Platz frei wird.",
+  "Request Sent": "Anfrage gesendet",
+  "Leaving hands the ride to another rider first.": "Beim Verlassen übergibst du die Tour zuerst an einen anderen Fahrer.",
+  "Nobody else has joined yet, so leaving cancels the ride.": "Noch ist niemand sonst dabei, daher sagt Verlassen die Tour ab.",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "Du bleibst bei {rideName}. Komm jederzeit über Start oder die Tourseite zurück.",
+  "Done with this ride? Leaving takes you off it for good.": "Fertig mit dieser Tour? Verlassen nimmt dich endgültig davon.",
 };
 
 export default dict;

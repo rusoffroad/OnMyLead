@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-12
+updated: 2026-11-13
 sources:
   - app/src/core/mode-exit.ts
   - app/src/components/exit-mode.tsx
@@ -409,7 +409,13 @@ If you're sharing your location, Exit first asks what you want:
 
 **Leave Ride** sits under these choices, for when you're done with the ride for good.
 
+:::until 3.2
 When you aren't sharing, Exit closes Ride Mode straight away.
+:::
+:::
+
+:::release 3.2
+When you aren't sharing, **‹ Exit** still asks once, so the way off the ride is right there: tap **Exit Ride Mode** to close the screen and stay on the ride, or **Leave Ride** at the bottom, under **Done with this ride?**, to leave it. The Android Back button closes Ride Mode straight away when you aren't sharing.
 :::
 
 :::release 2.0
@@ -421,6 +427,10 @@ Heading home early? Tap **Together** (or **Separated**) at the top to open **Rid
 :::release 3.0
 Heading home early? Tap **Together** (or **Separated**) at the top to open **Riders**, then tap **Leave Ride** under the list and confirm. On a tablet, **Leave Ride** is at the bottom of the **Riders** sidebar. Your location stops going to the group and you're taken back to the **Home** tab. The organizer first picks who takes the ride over; see [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
 :::
+:::
+
+:::release 3.2
+The quickest way: tap **‹ Exit** at the top left, then **Leave Ride** at the bottom of the box.
 :::
 
 :::until 2.0

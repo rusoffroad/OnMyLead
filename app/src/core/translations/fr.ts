@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "Votre enregistrement est mis en pause tant que vous êtes hors du mode Carte. Il est sauvegardé et vous pourrez le reprendre à votre retour.",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "Quitter le mode Balade ? Vous restez sur la balade et votre téléphone continue de partager votre position.",
   "Exit Map Mode? Your recording pauses until you come back.": "Quitter le mode Carte ? Votre enregistrement est en pause jusqu’à votre retour.",
+  "Leave Waitlist": "Quitter la liste d’attente",
+  "You’re Riding": "Vous roulez",
+  "You Rode This One": "Vous avez fait cette sortie",
+  "Still in Your Rides": "Toujours dans vos sorties",
+  "You’re Going": "Vous y allez",
+  "Leave to take it off your list.": "Quittez-la pour la retirer de votre liste.",
+  "Plans changed? You can leave any time.": "Vos plans ont changé ? Vous pouvez partir à tout moment.",
+  "You’re on the Waitlist": "Vous êtes sur la liste d’attente",
+  "You’ll move up automatically if a spot opens.": "Vous montez automatiquement si une place se libère.",
+  "Request Sent": "Demande envoyée",
+  "Leaving hands the ride to another rider first.": "En partant, vous confiez d’abord la sortie à un autre pilote.",
+  "Nobody else has joined yet, so leaving cancels the ride.": "Personne d’autre n’a encore rejoint, donc partir annule la sortie.",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "Vous restez dans {rideName}. Revenez quand vous voulez depuis l’Accueil ou la page de la sortie.",
+  "Done with this ride? Leaving takes you off it for good.": "Fini avec cette sortie ? La quitter vous en retire pour de bon.",
 };
 
 export default dict;

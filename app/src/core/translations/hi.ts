@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "मैप मोड से बाहर रहने तक आपकी रिकॉर्डिंग रुकी रहती है। यह सेव है, और वापस आने पर आप इसे फिर शुरू कर सकते हैं।",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "राइड मोड से बाहर निकलें? आप राइड में बने रहते हैं, और आपका फ़ोन आपकी जगह शेयर करता रहेगा।",
   "Exit Map Mode? Your recording pauses until you come back.": "मैप मोड से बाहर निकलें? वापस आने तक आपकी रिकॉर्डिंग रुकी रहेगी।",
+  "Leave Waitlist": "वेटलिस्ट छोड़ें",
+  "You’re Riding": "आप राइड पर हैं",
+  "You Rode This One": "आपने यह राइड की",
+  "Still in Your Rides": "अब भी आपकी राइड्स में",
+  "You’re Going": "आप जा रहे हैं",
+  "Leave to take it off your list.": "इसे अपनी सूची से हटाने के लिए छोड़ें।",
+  "Plans changed? You can leave any time.": "प्लान बदल गया? आप कभी भी छोड़ सकते हैं।",
+  "You’re on the Waitlist": "आप वेटलिस्ट पर हैं",
+  "You’ll move up automatically if a spot opens.": "जगह खाली होते ही आप अपने आप आगे आ जाएंगे।",
+  "Request Sent": "अनुरोध भेजा गया",
+  "Leaving hands the ride to another rider first.": "छोड़ने से पहले आप राइड किसी दूसरे राइडर को सौंपते हैं।",
+  "Nobody else has joined yet, so leaving cancels the ride.": "अभी तक कोई और नहीं जुड़ा, इसलिए छोड़ने से राइड रद्द हो जाएगी।",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "आप {rideName} पर बने रहते हैं। होम या राइड पेज से कभी भी वापस आएं।",
+  "Done with this ride? Leaving takes you off it for good.": "इस राइड से मन भर गया? छोड़ने पर आप इससे हमेशा के लिए हट जाएंगे।",
 };
 
 export default dict;

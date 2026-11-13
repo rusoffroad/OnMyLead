@@ -8,7 +8,7 @@ import { FollowLeaders } from '@/components/follow-leaders';
 import { FuelCheck } from '@/components/fuel-check';
 import { GetTheApp } from '@/components/get-the-app';
 import { InviteCard } from '@/components/invite-card';
-import { LeaveRide } from '@/components/leave-ride';
+import { YourSpot } from '@/components/leave-ride';
 import { PinnedAnnouncement, RideChat } from '@/components/ride-chat';
 import { ReportSheet } from '@/components/report-sheet';
 import { RideDay } from '@/components/ride-day';
@@ -213,6 +213,11 @@ export default function RidePage() {
   const mainSection: RideSection = split && section === 'details' ? 'map' : section;
   const show = (key: RideSection) => !sectioned || (split ? key === 'details' || key === mainSection : section === key);
 
+  // Leaving (from Your Spot): riders confirm, the organizer picks who takes over first.
+  const onLeft = (what: 'left' | 'cancelled') => {
+    track(what === 'left' ? 'ride_left' : 'ride_cancelled_on_leave', { ride_id: ride.id });
+    router.replace('/');
+  };
   const top = (
     <>
       <GetTheApp inviteCode={ride.invite_code} />
@@ -268,11 +273,7 @@ export default function RidePage() {
             <Button title={tr('No Thanks')} kind="secondary" loading={busy === 'decline'} onPress={() => act('decline', () => declineRideInvite(ride.id))} />
           </Card>
         )
-      ) : mine.status === 'pending' ? (
-        <ThemedText>{tr('Your request is waiting for the organizer.')}</ThemedText>
-      ) : mine.status === 'waitlisted' ? (
-        <ThemedText>{tr('You’re on the waitlist. You’ll move up automatically if a spot opens.')}</ThemedText>
-      ) : (
+      ) : mine.status === 'pending' || mine.status === 'waitlisted' ? null : (
         <View style={{ gap: Spacing.two }}>
           {ride.status === 'live' ? (
             <Button title={tr('Enter Ride Mode')} big onPress={() => router.push(`/ride/${ride.id}/live`)} />
@@ -284,6 +285,8 @@ export default function RidePage() {
           ) : null}
         </View>
       )}
+      {/* Where you stand on the ride, with Leave Ride beside it: no scrolling to find the way out. */}
+      <YourSpot ride={ride} members={members} me={me} skip={['decline']} onLeft={onLeft} />
       <ErrorText error={error} />
 
     </>
@@ -529,18 +532,6 @@ export default function RidePage() {
   );
   const bottom = (
     <>
-      {/* Leaving is always one tap away, whichever section is open: riders confirm, the organizer picks who takes over. */}
-      <LeaveRide
-        ride={ride}
-        members={members}
-        me={me}
-        skip={['decline']}
-        onLeft={(what) => {
-          track(what === 'left' ? 'ride_left' : 'ride_cancelled_on_leave', { ride_id: ride.id });
-          router.replace('/');
-        }}
-        style={{ marginTop: Spacing.two }}
-      />
       {me && !isOrganizer ? (
         <Pressable
           accessibilityRole="button"

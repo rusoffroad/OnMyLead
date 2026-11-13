@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "Rekamanmu dijeda selama kamu di luar Mode Peta. Rekaman tersimpan, dan bisa dilanjutkan saat kamu kembali.",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "Keluar dari Mode Riding? Kamu tetap ikut ride, dan ponselmu tetap berbagi lokasimu.",
   "Exit Map Mode? Your recording pauses until you come back.": "Keluar dari Mode Peta? Rekamanmu dijeda sampai kamu kembali.",
+  "Leave Waitlist": "Keluar dari Daftar Tunggu",
+  "You’re Riding": "Kamu Sedang Berkendara",
+  "You Rode This One": "Kamu Ikut Perjalanan Ini",
+  "Still in Your Rides": "Masih di Perjalananmu",
+  "You’re Going": "Kamu Ikut",
+  "Leave to take it off your list.": "Keluar untuk menghapusnya dari daftarmu.",
+  "Plans changed? You can leave any time.": "Rencana berubah? Kamu bisa keluar kapan saja.",
+  "You’re on the Waitlist": "Kamu di Daftar Tunggu",
+  "You’ll move up automatically if a spot opens.": "Kamu naik otomatis jika ada tempat kosong.",
+  "Request Sent": "Permintaan Terkirim",
+  "Leaving hands the ride to another rider first.": "Saat keluar, kamu serahkan dulu perjalanan ke pengendara lain.",
+  "Nobody else has joined yet, so leaving cancels the ride.": "Belum ada yang bergabung, jadi keluar akan membatalkan perjalanan.",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "Kamu tetap di {rideName}. Kembali kapan saja dari Beranda atau halaman perjalanan.",
+  "Done with this ride? Leaving takes you off it for good.": "Selesai dengan perjalanan ini? Keluar akan mengeluarkanmu untuk selamanya.",
 };
 
 export default dict;

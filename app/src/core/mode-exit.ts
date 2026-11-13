@@ -16,24 +16,32 @@ export function exitTarget(canGoBack: boolean): 'back' | 'home' {
 }
 
 /**
- * Ride Mode: exit straight away, or ask first. Only sharing matters: it keeps going in the
- * background after you exit (that's what keeps you on the group's map), so the rider gets to
- * choose to stop it. Nothing else about the ride changes, so nothing else needs a question.
+ * Ride Mode: exit straight away, or ask first. Sharing keeps going in the background after you
+ * exit (that's what keeps you on the group's map), so the rider gets to choose to stop it. And the
+ * Exit button is where a rider who's done with the ride looks for the way off it, so when they can
+ * leave, the sheet opens to offer Leave Ride next to Exit (`canLeave`). The Android back gesture
+ * (`viaBack`) stays quick: it only asks while sharing.
  */
-export function rideExitAsks(sharing: boolean): boolean {
-  return sharing;
+export function rideExitAsks(sharing: boolean, canLeave = false, viaBack = false): boolean {
+  return sharing || (canLeave && !viaBack);
 }
 
-export type RideExitPrompt = { title: string; message: string; keep: string; stop: string; stay: string };
+export type RideExitPrompt = { title: string; message: string; keep: string; stop: string | null; stay: string; done: string };
 
-/** The Exit Ride Mode sheet while sharing. Leave Ride sits under these choices for riders who are done. */
-export function rideExitPrompt(rideName: string): RideExitPrompt {
+/**
+ * The Exit Ride Mode sheet. While sharing it asks whether the group keeps seeing you; either way
+ * Leave Ride sits under the choices for riders who are done with the ride.
+ */
+export function rideExitPrompt(rideName: string, sharing = true): RideExitPrompt {
   return {
     title: tc('Exit Ride Mode?'),
-    message: tc('You stay on {rideName}, and the group keeps seeing your spot until your sharing ends. Come back any time from Home or the ride page.', { rideName }),
-    keep: tc('Exit and Keep Sharing'),
-    stop: tc('Stop Sharing and Exit'),
+    message: sharing
+      ? tc('You stay on {rideName}, and the group keeps seeing your spot until your sharing ends. Come back any time from Home or the ride page.', { rideName })
+      : tc('You stay on {rideName}. Come back any time from Home or the ride page.', { rideName }),
+    keep: sharing ? tc('Exit and Keep Sharing') : tc('Exit Ride Mode'),
+    stop: sharing ? tc('Stop Sharing and Exit') : null,
     stay: tc('Stay in Ride Mode'),
+    done: tc('Done with this ride? Leaving takes you off it for good.'),
   };
 }
 

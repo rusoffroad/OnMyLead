@@ -18,6 +18,18 @@ describe('Exit Ride Mode and Map Mode', () => {
     expect([p.keep, p.stop, p.stay]).toEqual(['Exit and Keep Sharing', 'Stop Sharing and Exit', 'Stay in Ride Mode']);
   });
 
+  it('Exit offers Leave Ride to a rider who can leave, but Android back stays quick', () => {
+    expect(rideExitAsks(false, true)).toBe(true);
+    expect(rideExitAsks(false, true, true)).toBe(false);
+    expect(rideExitAsks(true, true, true)).toBe(true);
+    expect(rideExitAsks(false, false)).toBe(false);
+    const p = rideExitPrompt('Moab Saturday', false);
+    expect(p.message).toBe('You stay on Moab Saturday. Come back any time from Home or the ride page.');
+    expect(p.keep).toBe('Exit Ride Mode');
+    expect(p.stop).toBeNull();
+    expect(p.done).toMatch(/Leaving takes you off it/);
+  });
+
   it('Map Mode only asks while a recording is running', () => {
     expect(mapExitPrompt(null)).toBeNull();
     expect(mapExitPrompt({ paused: true })).toBeNull();

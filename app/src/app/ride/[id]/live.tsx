@@ -1288,14 +1288,15 @@ export default function RideMode() {
     />
   ) : null;
   // Exit (top left, the Full Map bar, Android back, the car screen) only leaves this screen: the
-  // rider stays on the ride. While sharing, the sheet asks whether the group keeps seeing them.
-  const exitRide = () => {
-    if (rideExitAsks(!!activeShare)) setExitOpen(true);
+  // rider stays on the ride. The sheet asks whether the group keeps seeing them while sharing, and
+  // offers Leave Ride to anyone who can leave (the Exit button is where riders look for it).
+  const exitRide = (viaBack = false) => {
+    if (rideExitAsks(!!activeShare, !!leaveButton, viaBack)) setExitOpen(true);
     else leaveModeScreen();
   };
   useModeBackButton(() => {
     if (backPress({ fullMap }) === 'close_full_map') exitFullMap();
-    else exitRide();
+    else exitRide(true);
   });
 
   return (
@@ -1344,7 +1345,7 @@ export default function RideMode() {
         pointerEvents="box-none"
         style={[styles.top, tablet && [styles.topTablet, { width: sideW + 2 * Spacing.two, bottom: panelBottom - Spacing.two }]]}>
         <View style={styles.topRow} onLayout={(e) => setTopRowBottom(Math.round(e.nativeEvent.layout.y + e.nativeEvent.layout.height))}>
-          <ExitModeButton onPress={exitRide} label={t('Exit Ride Mode')} />
+          <ExitModeButton onPress={() => exitRide()} label={t('Exit Ride Mode')} />
           <Pressable
             onPress={() => (activeShare ? toggleShareOpen() : setAskShare(true))}
             hitSlop={6}
@@ -1748,7 +1749,7 @@ export default function RideMode() {
 
         {fullMap ? (
           <View style={[styles.foldedRow, !stripShown && { marginTop: 0 }]}>
-            <ExitModeButton bare onPress={exitRide} label={t('Exit Ride Mode')} style={styles.fullMapExit} />
+            <ExitModeButton bare onPress={() => exitRide()} label={t('Exit Ride Mode')} style={styles.fullMapExit} />
             <Pressable
               onPress={showMenus}
               accessibilityRole="button"
@@ -1845,6 +1846,7 @@ export default function RideMode() {
         visible={exitOpen}
         onClose={() => setExitOpen(false)}
         rideName={ride?.name ?? t('Ride')}
+        sharing={!!activeShare}
         onKeepSharing={() => {
           setExitOpen(false);
           leaveModeScreen();

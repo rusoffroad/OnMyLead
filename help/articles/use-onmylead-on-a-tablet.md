@@ -101,7 +101,12 @@ Tap **⤢ Full Map** at the top of the buttons panel to hide the riders list, th
 Once you've joined a ride, the ride and its details stay on the left, and **Map**, **Riders** and **Chat** open on the right. You can read the chat or check the route without losing the meeting time and place.
 
 :::release 2.0
+:::until 3.2
 **Leave Ride** is at the bottom of the left side of the ride page, and at the bottom of the **Riders** list in Ride Mode. See [Join a Ride](/help/join-a-ride).
+:::
+:::release 3.2
+**Leave Ride** is near the top of the left side of the ride page, beside **You're Going**, and in Ride Mode under **‹ Exit** and at the bottom of the **Riders** sidebar. See [Join a Ride](/help/join-a-ride).
+:::
 :::
 
 :::release 2.1

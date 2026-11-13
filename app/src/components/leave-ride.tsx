@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import { Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, Text, useWindowDimensions, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
@@ -12,7 +12,7 @@ import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/const
 import { ridersToTell } from '@/core/cancel';
 import {
   friendlyLeaveError, handOffAndLeavePrompt, handOffCandidates, LEAVE_LABEL, leadsRide, leaveAloneCancelPrompt,
-  leaveConfirm, leaveKind, type LeaveKind,
+  leaveConfirm, leaveKind, spotLine, type LeaveKind,
 } from '@/core/leaving';
 import { ROLE_LABEL } from '@/core/roles';
 import { cancelRide, handOffRide, leaveRide } from '@/lib/api';
@@ -30,8 +30,8 @@ type Props = {
   sharing?: boolean;
   /** Called once the rider is off the ride (or the ride is cancelled). */
   onLeft: (what: 'left' | 'cancelled') => void;
-  /** 'bar' is the full-width button on the ride page; 'dark' fits Ride Mode's dark panels. */
-  look?: 'bar' | 'dark';
+  /** 'bar' is the full-width button; 'dark' fits Ride Mode's dark panels; 'chip' is the short button in Your Spot. */
+  look?: 'bar' | 'dark' | 'chip';
   /** Kinds this screen already offers another way (the ride page has its own No Thanks for invites). */
   skip?: LeaveKind[];
   style?: StyleProp<ViewStyle>;
@@ -81,8 +81,9 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
     if (await confirmAsync(p.title, p.message, p.confirm, t('Stay'))) run(() => leaveRide(ride.id), 'left');
   }
 
-  const label = LEAVE_LABEL[kind];
+  const label = kind === 'withdraw' && mine?.status === 'waitlisted' ? t('Leave Waitlist') : LEAVE_LABEL[kind];
   const dark = look === 'dark';
+  const chip = look === 'chip';
   return (
     <>
       <Pressable
@@ -91,9 +92,10 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
         accessibilityRole="button"
         accessibilityLabel={kind === 'handOff' ? t('Leave Ride. First pick who takes the ride over') : label}
         accessibilityState={{ busy }}
-        style={({ pressed }) => [styles.bar, dark && styles.barDark, { opacity: busy ? 0.5 : pressed ? 0.75 : 1 }, style]}>
-        <Icon name="leave" size={20} color={Colors.danger} />
-        <Text style={styles.barText}>{busy ? t('Leaving…') : label}</Text>
+        hitSlop={chip ? 6 : undefined}
+        style={({ pressed }) => [styles.bar, dark && styles.barDark, chip && styles.chip, { opacity: busy ? 0.5 : pressed ? 0.75 : 1 }, style]}>
+        <Icon name="leave" size={chip ? 17 : 20} color={Colors.danger} />
+        <Text style={[styles.barText, chip && styles.chipText]} numberOfLines={1}>{busy ? t('Leaving…') : t(label)}</Text>
       </Pressable>
       {kind === 'handOff' ? (
         <HandOffSheet
@@ -119,6 +121,34 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
         />
       ) : null}
     </>
+  );
+}
+
+/**
+ * Your Spot: right under the ride's name, where you stand on the ride ("You’re Going", "Request
+ * Sent", "You’re Organizing") and the Leave Ride button beside it, so a rider whose plans
+ * changed never has to hunt for the way out. The button asks first, like everywhere else.
+ */
+export function YourSpot(props: Omit<Props, 'look' | 'style'>) {
+  const { ride, members, me, skip } = props;
+  const { width } = useWindowDimensions();
+  const kind = leaveKind(members, ride.organizer_id, me, ride.status);
+  const mine = members.find((m) => m.user_id === me);
+  const line = skip?.includes(kind) ? null : spotLine(kind, ride.status, { waitlisted: mine?.status === 'waitlisted' });
+  if (!line) return null;
+  const narrow = width < 360;
+  const tint = line.tone === 'in' ? RideColors.green : Colors.sky;
+  return (
+    <View style={[styles.spot, narrow && styles.spotWrap]} accessibilityRole="summary">
+      <View style={[styles.spotMark, { backgroundColor: line.tone === 'in' ? 'rgba(46,204,113,0.16)' : 'rgba(77,171,247,0.16)' }]}>
+        <Icon name={line.tone === 'in' ? 'check' : 'clock'} size={18} color={tint} strokeWidth={2.6} />
+      </View>
+      <View style={{ flex: 1, minWidth: 140, gap: 2 }}>
+        <Text style={styles.spotTitle} numberOfLines={2}>{line.title}</Text>
+        <ThemedText type="small" themeColor="textSecondary">{line.detail}</ThemedText>
+      </View>
+      <LeaveRide {...props} look="chip" />
+    </View>
   );
 }
 
@@ -191,6 +221,15 @@ const styles = themedStyles(() => ({
   },
   barDark: { backgroundColor: 'rgba(240,62,62,0.10)' },
   barText: { color: Colors.danger, fontFamily: font(700), fontSize: 17 },
+  chip: { minHeight: 44, paddingHorizontal: 14, gap: 6, borderRadius: Radius.pill, backgroundColor: 'rgba(240,62,62,0.08)' },
+  chipText: { fontSize: 15 },
+  spot: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.three, paddingVertical: Spacing.two + 2, paddingLeft: Spacing.three,
+    paddingRight: Spacing.two, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderWidth: 1, borderColor: Colors.border,
+  },
+  spotWrap: { flexWrap: 'wrap' },
+  spotMark: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  spotTitle: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 20, lineHeight: 23 },
   scrim: { flex: 1, backgroundColor: Colors.scrim },
   sheet: {
     flexShrink: 1, maxHeight: '85%', backgroundColor: Colors.backgroundElement, borderTopLeftRadius: 28, borderTopRightRadius: 28,

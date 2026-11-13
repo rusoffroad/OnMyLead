@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   friendlyLeaveError, handOffAndLeavePrompt, handOffCandidates, LEAVE_LABEL, leadsRide, leaveAloneCancelPrompt,
-  leaveConfirm, leaveKind,
+  leaveConfirm, leaveKind, spotLine,
 } from '../leaving';
 
 const m = (user_id: string, status: string, role = 'rider', name?: string) => ({
@@ -131,5 +131,31 @@ describe('friendlyLeaveError', () => {
     expect(friendlyLeaveError('this ride is over')).toBe('This ride is already over.');
     expect(friendlyLeaveError('TypeError: Network request failed')).toMatch(/No service/);
     expect(friendlyLeaveError('something odd')).toBe('something odd');
+  });
+});
+
+describe('spotLine (Your Spot at the top of the ride page)', () => {
+  it('tells a joined rider where they stand in every ride state', () => {
+    expect(spotLine('leave', 'scheduled')?.title).toBe('You’re Going');
+    expect(spotLine('leave', 'live')?.title).toBe('You’re Riding');
+    expect(spotLine('leave', 'ended')?.title).toBe('You Rode This One');
+    expect(spotLine('leave', 'cancelled')?.title).toBe('Still in Your Rides');
+    expect(spotLine('leave', 'scheduled')?.detail).toMatch(/leave any time/);
+    expect(spotLine('leave', 'scheduled')?.tone).toBe('in');
+  });
+
+  it('shows a request or waitlist spot as waiting', () => {
+    expect(spotLine('withdraw', 'scheduled')).toMatchObject({ title: 'Request Sent', tone: 'waiting' });
+    expect(spotLine('withdraw', 'live', { waitlisted: true })).toMatchObject({ title: 'You’re on the Waitlist', tone: 'waiting' });
+  });
+
+  it('warns the organizer what leaving does', () => {
+    expect(spotLine('handOff', 'scheduled')?.detail).toMatch(/hands the ride/);
+    expect(spotLine('cancel', 'live')?.detail).toMatch(/cancels the ride/);
+  });
+
+  it('shows nothing when there is nothing to leave, or for an invite (it has its own card)', () => {
+    expect(spotLine('none', 'scheduled')).toBeNull();
+    expect(spotLine('decline', 'scheduled')).toBeNull();
   });
 });
