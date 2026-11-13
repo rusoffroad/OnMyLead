@@ -134,3 +134,41 @@ export function friendlyLeaveError(message: string): string {
   if (/network|fetch|offline|timed? ?out/i.test(message)) return tc('No service. Try again when you have signal.');
   return message;
 }
+
+/**
+ * The "Your Spot" line at the top of the ride page: where you stand on the ride, next to the one
+ * button that takes you off it. Riders shouldn't have to scroll to the bottom to find a way out.
+ * Null when there's nothing to leave (invites have their own Join and No Thanks card).
+ */
+export type SpotLine = { title: string; detail: string; tone: 'in' | 'waiting' };
+
+export function spotLine(
+  kind: LeaveKind,
+  rideStatus: Status,
+  opts: { waitlisted?: boolean } = {},
+): SpotLine | null {
+  switch (kind) {
+    case 'leave':
+      return {
+        title: rideStatus === 'live' ? tc('You’re Riding')
+          : rideStatus === 'ended' ? tc('You Rode This One')
+          : rideStatus === 'cancelled' ? tc('Still in Your Rides')
+          : tc('You’re Going'),
+        detail: rideStatus === 'ended' || rideStatus === 'cancelled'
+          ? tc('Leave to take it off your list.')
+          : tc('Plans changed? You can leave any time.'),
+        tone: 'in',
+      };
+    case 'withdraw':
+      return opts.waitlisted
+        ? { title: tc('You’re on the Waitlist'), detail: tc('You’ll move up automatically if a spot opens.'), tone: 'waiting' }
+        : { title: tc('Request Sent'), detail: tc('Your request is waiting for the organizer.'), tone: 'waiting' };
+    case 'handOff':
+      return { title: tc('You’re Organizing'), detail: tc('Leaving hands the ride to another rider first.'), tone: 'in' };
+    case 'cancel':
+      return { title: tc('You’re Organizing'), detail: tc('Nobody else has joined yet, so leaving cancels the ride.'), tone: 'in' };
+    default:
+      return null;
+  }
+}
+

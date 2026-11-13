@@ -67,21 +67,22 @@ export function useModeBackButton(onBack: () => void) {
 }
 
 /**
- * Exit Ride Mode while sharing: the rider stays on the ride either way, and picks whether the
- * group keeps seeing them. `leave` is the Leave Ride button, under the choices, for a rider who's done.
+ * Exit Ride Mode: the rider stays on the ride, and while sharing picks whether the group keeps
+ * seeing them. `leave` is the Leave Ride button, under the choices, for a rider who's done.
  */
 export function ExitRideSheet({
-  visible, onClose, rideName, onKeepSharing, onStopSharing, leave,
+  visible, onClose, rideName, sharing = true, onKeepSharing, onStopSharing, leave,
 }: {
   visible: boolean;
   onClose: () => void;
   rideName: string;
+  sharing?: boolean;
   onKeepSharing: () => void;
   onStopSharing: () => Promise<void>;
   leave?: ReactNode;
 }) {
   const [busy, setBusy] = useState(false);
-  const p = rideExitPrompt(rideName);
+  const p = rideExitPrompt(rideName, sharing);
   const stop = async () => {
     setBusy(true);
     try {
@@ -95,10 +96,15 @@ export function ExitRideSheet({
       <Text style={styles.message}>{p.message}</Text>
       <View style={styles.choices}>
         <Button title={p.keep} big onPress={onKeepSharing} />
-        <Button title={p.stop} kind="secondary" loading={busy} onPress={stop} />
+        {p.stop ? <Button title={p.stop} kind="secondary" loading={busy} onPress={stop} /> : null}
         <Button title={p.stay} kind="ghost" onPress={onClose} />
       </View>
-      {leave ? <View style={styles.leave}>{leave}</View> : null}
+      {leave ? (
+        <View style={styles.leave}>
+          <Text style={styles.done}>{p.done}</Text>
+          {leave}
+        </View>
+      ) : null}
     </BottomSheet>
   );
 }
@@ -115,5 +121,6 @@ const styles = themedStyles(() => ({
   text: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   message: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 16, lineHeight: 22 },
   choices: { gap: Spacing.two },
-  leave: { paddingTop: Spacing.two, borderTopWidth: 1, borderTopColor: Colors.border },
+  leave: { gap: Spacing.two, paddingTop: Spacing.three, borderTopWidth: 1, borderTopColor: Colors.border },
+  done: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 14, lineHeight: 19 },
 }));

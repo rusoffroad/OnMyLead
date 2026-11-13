@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "マップモードを離れている間、記録は一時停止します。記録は保存され、戻ったときに再開できます。",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "ライドモードを終了しますか？ライドには参加したままで、スマホは位置の共有を続けます。",
   "Exit Map Mode? Your recording pauses until you come back.": "マップモードを終了しますか？戻るまで記録は一時停止します。",
+  "Leave Waitlist": "キャンセル待ちから外れる",
+  "You’re Riding": "ライド中です",
+  "You Rode This One": "このライドに参加しました",
+  "Still in Your Rides": "まだライド一覧にあります",
+  "You’re Going": "参加予定です",
+  "Leave to take it off your list.": "離脱すると一覧から消えます。",
+  "Plans changed? You can leave any time.": "予定が変わりましたか？いつでも離脱できます。",
+  "You’re on the Waitlist": "キャンセル待ちです",
+  "You’ll move up automatically if a spot opens.": "空きが出ると自動で繰り上がります。",
+  "Request Sent": "リクエスト送信済み",
+  "Leaving hands the ride to another rider first.": "離脱する前に、ほかのライダーにライドを引き継ぎます。",
+  "Nobody else has joined yet, so leaving cancels the ride.": "まだ誰も参加していないため、離脱するとライドは中止になります。",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "{rideName} には参加したままです。ホームやライドのページからいつでも戻れます。",
+  "Done with this ride? Leaving takes you off it for good.": "このライドはもう終わりですか？離脱すると完全に外れます。",
 };
 
 export default dict;

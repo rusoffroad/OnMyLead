@@ -4,7 +4,7 @@ summary: Let the group know you've made it to the meeting spot with one tap, and
 category: joining
 order: 60
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-13
 sources:
   - app/src/app/r/[code].tsx
   - app/src/components/ride-roster.tsx

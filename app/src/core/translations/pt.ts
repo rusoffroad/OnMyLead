@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "Sua gravação pausa enquanto você está fora do Modo Mapa. Ela fica salva e você pode retomá-la quando voltar.",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "Sair do Modo Passeio? Você continua no passeio e seu celular continua compartilhando sua localização.",
   "Exit Map Mode? Your recording pauses until you come back.": "Sair do Modo Mapa? Sua gravação pausa até você voltar.",
+  "Leave Waitlist": "Sair da lista de espera",
+  "You’re Riding": "Você está rodando",
+  "You Rode This One": "Você fez este passeio",
+  "Still in Your Rides": "Ainda nos seus passeios",
+  "You’re Going": "Você vai",
+  "Leave to take it off your list.": "Saia para tirá-lo da sua lista.",
+  "Plans changed? You can leave any time.": "Os planos mudaram? Você pode sair quando quiser.",
+  "You’re on the Waitlist": "Você está na lista de espera",
+  "You’ll move up automatically if a spot opens.": "Você sobe automaticamente se abrir uma vaga.",
+  "Request Sent": "Pedido enviado",
+  "Leaving hands the ride to another rider first.": "Ao sair, você passa o passeio para outro piloto primeiro.",
+  "Nobody else has joined yet, so leaving cancels the ride.": "Ninguém mais entrou ainda, então sair cancela o passeio.",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "Você continua em {rideName}. Volte quando quiser pelo Início ou pela página do passeio.",
+  "Done with this ride? Leaving takes you off it for good.": "Terminou este passeio? Sair tira você dele de vez.",
 };
 
 export default dict;

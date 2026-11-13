@@ -4,7 +4,7 @@ summary: Every new account gets 30 days of OnMyLead Pro with no payment, and it 
 category: pro
 order: 20
 release: "1.0"
-updated: 2026-11-11
+updated: 2026-11-13
 sources:
   - supabase/migrations/20261105090000_pro_bluetooth_dot_photos.sql
   - app/src/components/app-notices.tsx

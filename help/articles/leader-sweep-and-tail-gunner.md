@@ -4,7 +4,7 @@ summary: Who rides up front, who rides at the rear, and how to make someone lead
 category: rides
 order: 50
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-13
 sources:
   - app/src/components/rider-pin.tsx
   - app/src/components/rider-puck.tsx
@@ -86,7 +86,12 @@ They become the organizer and the leader. You stay on the ride as a rider and ca
 
 Can't make it? You don't have to cancel the ride on everyone.
 
+:::until 3.1
 1. Tap **Leave Ride** at the bottom of the ride page (or under **Riders** in Ride Mode).
+:::
+:::release 3.1
+1. Tap **Leave Ride** beside **You're Organizing**, right under the ride's name on the ride page (in Ride Mode, tap **‹ Exit** and it's at the bottom of the box).
+:::
 2. **Who Takes Over?** lists everyone who has joined, leaders and co-organizers first. Tap who should run it.
 3. Tap **Give Ride and Leave**.
 

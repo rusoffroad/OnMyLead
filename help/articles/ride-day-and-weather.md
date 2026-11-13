@@ -4,7 +4,7 @@ summary: See the forecast for the meeting area and check whether your ride gets 
 category: rides
 order: 60
 release: "1.0"
-updated: 2026-11-04
+updated: 2026-11-13
 sources:
   - app/src/components/ride-day.tsx
   - app/src/core/ride-day.ts

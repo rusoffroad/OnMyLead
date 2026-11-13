@@ -4,7 +4,7 @@ summary: Join with an invite link, a QR code or a code, or from Find. Learn what
 category: joining
 order: 20
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-13
 sources:
   - app/src/components/events/part-of-event.tsx
   - app/src/core/leaving.ts
@@ -119,33 +119,29 @@ If the ride is full, you go on the waitlist. If the organizer approves riders, y
 
 ## Leave a Ride
 
-:::until 2.0
-1. Open the ride page and tap **Riders**.
-2. Tap **Leave Ride**.
-:::
-
-:::release 2.0
+:::until 3.1
 1. Open the ride page. **Leave Ride** is the red-outlined button at the bottom, whichever section you're on (on a tablet, it's at the bottom of the left column).
 2. Tap **Leave Ride**. A box tells you what happens; tap **Leave Ride** again to confirm, or **Stay**.
 
-:::until 3.0
-In Ride Mode, tap **Together** (or **Separated**) at the top to open **Riders**, and **Leave Ride** is under the list. On a tablet it's at the bottom of the **Riders** sidebar. You go back to the **Rides** tab when you've left.
-:::
-:::release 3.0
 In Ride Mode, tap **Together** (or **Separated**) at the top to open **Riders**, and **Leave Ride** is under the list. On a tablet it's at the bottom of the **Riders** sidebar. You go back to the **Home** tab when you've left.
+:::
+
+:::release 3.1
+1. Open the ride page. Right under the ride's name it says **You're Going** (**You're Riding** once the ride is live), with **Leave Ride** beside it. On a tablet it's in the left column.
+2. Tap **Leave Ride**. A box tells you what happens; tap **Leave Ride** again to confirm, or **Stay**.
+
+Still waiting to get in? The same spot says **Request Sent** with **Withdraw**, or **You're on the Waitlist** with **Leave Waitlist**.
+
+In Ride Mode, tap **‹ Exit** at the top left: **Leave Ride** is at the bottom of the box, under **Done with this ride?**. It's also under the list in **Riders** (tap **Together** or **Separated** at the top), and at the bottom of the **Riders** sidebar on a tablet. You go back to the **Home** tab when you've left.
+
+On onmylead.com, the ride page works the same way.
 :::
 
 Leaving always stops your phone sharing your location for that ride, whether or not the ride has started.
 
 Organized the ride? See [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
-:::
 
-:::until 3.0
-Or, on the **Rides** tab, swipe left on the ride and tap **Leave** (on onmylead.com, click **Leave** at the end of the ride's row). Your spot opens up for someone else. You can rejoin with the ride's link or code if there's room. If the ride is live, leaving also stops sharing your location with the group.
-:::
-:::release 3.0
 Or, on the **Home** tab, swipe left on the ride and tap **Leave** (on onmylead.com, click **Leave** at the end of the ride's row). Your spot opens up for someone else. You can rejoin with the ride's link or code if there's room. If the ride is live, leaving also stops sharing your location with the group.
-:::
 
 :::note
 You can't join a ride that has ended or been cancelled.

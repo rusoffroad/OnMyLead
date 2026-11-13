@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "지도 모드에서 나가 있는 동안 기록이 일시정지돼요. 기록은 저장되며 돌아오면 다시 시작할 수 있어요.",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "라이드 모드에서 나갈까요? 라이드에는 남아 있고, 휴대폰은 계속 위치를 공유해요.",
   "Exit Map Mode? Your recording pauses until you come back.": "지도 모드에서 나갈까요? 돌아올 때까지 기록이 일시정지돼요.",
+  "Leave Waitlist": "대기 명단에서 나가기",
+  "You’re Riding": "라이딩 중입니다",
+  "You Rode This One": "이 라이드에 참여했습니다",
+  "Still in Your Rides": "아직 내 라이드에 있음",
+  "You’re Going": "참가 예정",
+  "Leave to take it off your list.": "나가면 목록에서 사라집니다.",
+  "Plans changed? You can leave any time.": "계획이 바뀌었나요? 언제든 나갈 수 있습니다.",
+  "You’re on the Waitlist": "대기 명단에 있습니다",
+  "You’ll move up automatically if a spot opens.": "자리가 나면 자동으로 올라갑니다.",
+  "Request Sent": "요청 보냄",
+  "Leaving hands the ride to another rider first.": "나가기 전에 먼저 다른 라이더에게 라이드를 넘깁니다.",
+  "Nobody else has joined yet, so leaving cancels the ride.": "아직 아무도 참가하지 않아 나가면 라이드가 취소됩니다.",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "{rideName}에 그대로 참여 중입니다. 홈이나 라이드 페이지에서 언제든 돌아오세요.",
+  "Done with this ride? Leaving takes you off it for good.": "이 라이드는 끝났나요? 나가면 완전히 빠집니다.",
 };
 
 export default dict;

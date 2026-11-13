@@ -3507,6 +3507,20 @@ const dict: Record<string, string> = {
   "Your recording pauses while you’re out of Map Mode. It’s saved, and you can resume it when you come back.": "Запись приостанавливается, пока вы вне режима карты. Она сохранена, и её можно продолжить, когда вернётесь.",
   "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.": "Выйти из режима поездки? Вы остаётесь в поездке, а телефон продолжает передавать ваше местоположение.",
   "Exit Map Mode? Your recording pauses until you come back.": "Выйти из режима карты? Запись приостановится, пока вы не вернётесь.",
+  "Leave Waitlist": "Покинуть лист ожидания",
+  "You’re Riding": "Вы в поездке",
+  "You Rode This One": "Вы проехали эту поездку",
+  "Still in Your Rides": "Всё ещё в ваших поездках",
+  "You’re Going": "Вы едете",
+  "Leave to take it off your list.": "Покиньте её, чтобы убрать из списка.",
+  "Plans changed? You can leave any time.": "Планы изменились? Покинуть поездку можно в любой момент.",
+  "You’re on the Waitlist": "Вы в листе ожидания",
+  "You’ll move up automatically if a spot opens.": "Вы поднимитесь автоматически, если освободится место.",
+  "Request Sent": "Запрос отправлен",
+  "Leaving hands the ride to another rider first.": "При выходе вы сначала передаёте поездку другому райдеру.",
+  "Nobody else has joined yet, so leaving cancels the ride.": "Больше никто не присоединился, поэтому выход отменит поездку.",
+  "You stay on {rideName}. Come back any time from Home or the ride page.": "Вы остаётесь в {rideName}. Вернитесь в любой момент с Главной или страницы поездки.",
+  "Done with this ride? Leaving takes you off it for good.": "Поездка больше не нужна? Выход уберёт вас из неё насовсем.",
 };
 
 export default dict;
