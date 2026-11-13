@@ -58,9 +58,10 @@
       "build": "14",
       "iosBuild": "15",
       "commit": "b8f6114",
+      "iosCommit": "f83b430",
       "status": "in review",
       "submitted": "2026-11-13",
-      "notes": "The map on CarPlay (Apple granted CarPlay Navigation 2026-11-13) with turn-by-turn from the trail's shape, CarPlay Messages (hear and one-tap reply), and Exit in Map Mode and Ride Mode (plus Android Back). Android versionCode 13. Two clean test passes on the iPhone Simulator and Android emulator; the CarPlay screens could not be opened in the simulator, and Chris chose to submit without a truck check. Submitted to both stores 2026-11-13 ~15:50Z with automatic release on approval. iOS build 14 pulled from App Review 2026-11-13 ~18:20Z (Chris OK) after his truck test: the car map had no trails or roads and no messages without a ride; iOS build 15 adds them (Android versionCode 13 stays in review: no CarPlay there)."
+      "notes": "The map on CarPlay (Apple granted CarPlay Navigation 2026-11-13) with turn-by-turn from the trail's shape, CarPlay Messages (hear and one-tap reply), and Exit in Map Mode and Ride Mode (plus Android Back). Android versionCode 13. Two clean test passes on the iPhone Simulator and Android emulator; the CarPlay screens could not be opened in the simulator, and Chris chose to submit without a truck check. Submitted to both stores 2026-11-13 ~15:50Z with automatic release on approval. iOS build 14 pulled from App Review 2026-11-13 ~18:20Z (Chris OK) after his truck test: the car map had no trails or roads and no messages without a ride; iOS build 15 (f83b430, PR #297) adds them: two clean test passes, installed on Chris's iPhone, resubmitted to App Review 2026-11-13 ~21:20Z with automatic release (Android versionCode 13 stays in review: no CarPlay there)."
     }
   ],
   "unreleased": [
