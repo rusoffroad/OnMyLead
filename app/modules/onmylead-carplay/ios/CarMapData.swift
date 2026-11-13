@@ -46,11 +46,29 @@ struct CarMapData: Equatable {
     let steps: [Step]
   }
 
+  /// The rider line (CarRiderBar in src/core/carplay.ts): leader left, tail gunner right.
+  struct Bar: Equatable {
+    struct Dot: Equatable {
+      let id: String
+      let x: Double
+      let size: Double
+      let color: String
+      let ring: String?
+      let me: Bool
+      let live: Bool
+    }
+    let dots: [Dot]
+    let spread: String?
+    let ends: String?
+  }
+
   let style: String
   let token: String
   let dots: [Dot]
   let lines: [Line]
   let guide: Guide?
+  /// Nil from an older phone build or with fewer than two riders on the line.
+  let bar: Bar?
 
   /// Nil when the phone sent no map (Driving Task builds of the phone code, or nothing to draw yet).
   init?(_ any: Any?) {
@@ -96,6 +114,23 @@ struct CarMapData: Equatable {
       )
     } else {
       guide = nil
+    }
+    if let b = d["bar"] as? [String: Any] {
+      let barDots: [Bar.Dot] = (b["dots"] as? [Any] ?? []).compactMap { item in
+        guard let o = item as? [String: Any], let id = o["id"] as? String, let x = CarMapData.num(o["x"]) else { return nil }
+        return Bar.Dot(
+          id: id,
+          x: min(1, max(0, x)),
+          size: min(1, max(0.2, CarMapData.num(o["size"]) ?? 0.7)),
+          color: o["color"] as? String ?? "#4A5A72",
+          ring: o["ring"] as? String,
+          me: o["me"] as? Bool ?? false,
+          live: o["live"] as? Bool ?? true
+        )
+      }
+      bar = barDots.count >= 2 ? Bar(dots: barDots, spread: b["spread"] as? String, ends: b["ends"] as? String) : nil
+    } else {
+      bar = nil
     }
   }
 

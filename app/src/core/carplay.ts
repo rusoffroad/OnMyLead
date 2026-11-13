@@ -10,7 +10,8 @@ import { tc } from './i18n';
 import { feet, feetOrMiles } from './nav-trails';
 import { headingReadout, movingReadout } from './trip-meter';
 import type { LatLng } from './geo';
-import { simplifyLine } from './route';
+import { simplifyLine, type PlacedRider } from './route';
+import { convoyLayout, rankRiders, spreadRuler } from './route-order';
 import { startManeuvers, stepsLengthM, upcomingManeuvers, type CarManeuver } from './car-maneuvers';
 import { QUICK_REPLIES } from './chat';
 
@@ -356,7 +357,72 @@ export type CarMap = {
   dots: CarMapDot[];
   lines: CarMapLine[];
   guide: CarMapGuide | null;
+  /** The rider line along the bottom of the car map (null: fewer than two riders on it). */
+  bar?: CarRiderBar | null;
 };
+
+/** One dot on the car's rider line. */
+export type CarRiderBarDot = {
+  id: string;
+  /** Centre across the line, 0 (left, the leader) to 1 (right, the tail gunner). */
+  x: number;
+  /** Diameter as a share of the line's height (0 to 1). */
+  size: number;
+  color: string;
+  ring: string | null;
+  me: boolean;
+  /** False: only where they were last seen (drawn hollow). */
+  live: boolean;
+};
+
+/**
+ * The phone's rider line (components/route-strip), for the car: every rider with a spot in
+ * running order, the leader pinned left and the tail gunner right, and the distance from the
+ * leader to whoever is furthest back. Apple's car screens take no tapping on the map, so a dot
+ * doesn't open the rider's name; the Ride list on the car says who is where.
+ */
+export type CarRiderBar = {
+  dots: CarRiderBarDot[];
+  /** e.g. "0.8 mi", or "a few yards" when the group is together. */
+  spread: string | null;
+  /** e.g. "Leader to Tail Gunner". */
+  ends: string | null;
+};
+
+/** The width the car line is laid out on (the car scales it to the screen). */
+export const CAR_BAR_UNITS = 300;
+/** Dot sizes on that width, before a big group shrinks them to fit (the phone's, scaled down). */
+const CAR_BAR_SIZE = { me: 20, leader: 18, sweep: 16, rider: 14 } as const;
+/** The line's height on that width: the share each dot's size is of it. */
+const CAR_BAR_HEIGHT = 22;
+
+export function carRiderBar(
+  riders: PlacedRider[],
+  meId: string | null | undefined,
+  look: (id: string) => { color: string; ring: string | null; live: boolean },
+): CarRiderBar | null {
+  const ranked = rankRiders(riders);
+  if (ranked.length < 2) return null;
+  const sizeOf = (r: PlacedRider) => (r.id === meId ? CAR_BAR_SIZE.me : CAR_BAR_SIZE[r.role]);
+  const layout = convoyLayout(ranked, sizeOf, CAR_BAR_UNITS);
+  const ruler = spreadRuler(ranked, layout);
+  const r3 = (n: number) => Math.round(n * 1000) / 1000;
+  // Riders under the leader and tail gunner, me on top (the phone's drawing order).
+  const layer = (id: string) => (id === meId ? 3 : ranked.find((r) => r.id === id)?.role === 'rider' ? 1 : 2);
+  const dots = [...layout].sort((a, b) => layer(a.id) - layer(b.id)).map((d) => {
+    const l = look(d.id);
+    return {
+      id: d.id,
+      x: r3(Math.max(0, Math.min(1, d.x / CAR_BAR_UNITS))),
+      size: r3(Math.min(1, d.size / CAR_BAR_HEIGHT)),
+      color: l.color,
+      ring: l.ring,
+      me: d.id === meId,
+      live: d.id === meId ? true : l.live,
+    };
+  });
+  return { dots, spread: ruler?.label ?? null, ends: ruler?.ends ?? null };
+}
 
 /** Points kept per line on the car: plenty for a car screen, small enough to send every few seconds. */
 export const CAR_LINE_MAX_POINTS = 400;

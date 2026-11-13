@@ -154,7 +154,12 @@ To look around, drag or pinch the map. It pauses (the button shows **Paused**) u
 From 2.1 the map zooms out one step the first time your dot nears an edge, then the next time centers on your dot and moves with you so it stays on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot (Red, White and Blue unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in the **You** tab.
 :::
 :::release 3.0
+:::until 3.1
 From 2.1 the map zooms out one step the first time your dot nears an edge, then the next time centers on your dot and moves with you so it stays on screen, and zooms in as you come up on a junction of roads or trails, then back out once you're through. Your own dot (Red, White and Blue unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. Turn the junction zoom off with **Zoom In at Intersections** in **You** (your picture at the top of Home).
+:::
+:::
+:::release 3.1
+From 2.1 the map zooms out one step the first time your dot nears an edge, then the next time centers on your dot and moves with you so it stays on screen. Your own dot (Red, White and Blue unless you pick another Dot Style in Map Settings) has its arrow built in, and the arrow follows your phone's compass when you stop. To have the map zoom in as you come up on a junction of roads or trails, then back out once you're through, turn on **Zoom In at Intersections** in **You** (your picture at the top of Home); it's off unless you turn it on.
 :::
 :::
 

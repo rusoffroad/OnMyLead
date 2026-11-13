@@ -3,19 +3,19 @@
     "version": "3.1",
     "title": "The Map on CarPlay",
     "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, and makes Leave Ride easy to find. CarPlay is part of OnMyLead Pro.",
-    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails and roads, your route, your group's dots and turn-by-turn for the trail ahead (Pro).\n• Ride messages and group chats on CarPlay: tap one to hear it, and send a quick reply with one tap (Pro).\n• An Exit button in Map Mode and Ride Mode, plus Android's Back button. Exiting Ride Mode never leaves the ride.\n• Leave Ride sits right under the ride's name, and in Ride Mode's Exit box.",
+    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails and roads, your route, your group's dots, the rider line and turn-by-turn for the trail ahead (Pro).\n• Ride messages and group chats on CarPlay: tap one to hear it, and send a quick reply with one tap (Pro).\n• An Exit button in Map Mode and Ride Mode, plus Android's Back button. Exit never leaves the ride.\n• Leave Ride now sits right under the ride's name.\n• Fixed a crash in Ride Mode. Zoom In at Intersections is now off unless you turn it on.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "new",
         "devices": "iphone-ipad",
-        "text": "CarPlay shows the OnMyLead map in your Map Style, turned so the way ahead is up: your position, the ride route and Leader Trackline, and every rider who is sharing, or in Map Mode the trail you follow and the one you're recording. Zoom, recenter and pan from the car screen. Pro."
-  },
-  {
-   "kind": "new",
-   "devices": "iphone-ipad",
-   "text": "Trails and roads on the CarPlay map: off-road trails with their names, Forest Service and BLM roads and trails, dirt and paved roads, hiking trails and closures, from your Map Features. Tap Layers on the car to turn them on and off; your picks are saved for every map in the app."
+        "text": "CarPlay shows the OnMyLead map in your Map Style, turned so the way ahead is up: your position, the ride route and Leader Trackline, and every rider who is sharing, or in Map Mode the trail you follow and the one you're recording. During a ride, the rider line along the bottom shows everyone in running order, leader to tail gunner, with how far apart the group is. Zoom, recenter and pan from the car screen. Pro."
+      },
+      {
+        "kind": "new",
+        "devices": "iphone-ipad",
+        "text": "Trails and roads on the CarPlay map: off-road trails with their names, Forest Service and BLM roads and trails, dirt and paved roads, hiking trails and closures, from your Map Features. Tap Layers on the car to turn them on and off; your picks are saved for every map in the app."
       },
       {
         "kind": "new",
@@ -25,11 +25,19 @@
       {
         "kind": "new",
         "devices": "iphone-ipad",
-        "text": "Messages on CarPlay: the ride's latest messages with who sent them and when. Tap one to hear it read out, and tap Reply to send a quick reply, including your own saved My Quick Replies. With no ride in Ride Mode, Messages opens your group chats the same way. While your phone shares on a ride, Open Ride Mode on the car opens Ride Mode. There's no typing in the car."
+        "text": "Messages on CarPlay: the ride's latest messages with who sent them and when. Tap one to hear it read out, and tap Reply to send a quick reply, including your own saved My Quick Replies. Your group chats are there too, during a ride and without one. While your phone shares on a ride, Open Ride Mode on the car opens Ride Mode. There's no typing in the car."
       },
       {
         "kind": "new",
         "text": "An Exit button at the top left of Map Mode and Ride Mode (and in the Full Map bar), plus Android's Back button and Exit on the CarPlay screen. Exiting Ride Mode keeps you on the ride; it asks first if you're sharing your location, and Map Mode asks first if you're recording a trail."
+      },
+      {
+        "kind": "fixed",
+        "text": "Fixed Ride Mode closing by itself during a ride when the phone couldn't save part of your ride track: it no longer retries over and over."
+      },
+      {
+        "kind": "improved",
+        "text": "Zoom In at Intersections is now off unless you turn it on, in Map Settings under Following or in You under On the Trail. If you had turned it on, it stays on."
       },
       {
         "kind": "improved",

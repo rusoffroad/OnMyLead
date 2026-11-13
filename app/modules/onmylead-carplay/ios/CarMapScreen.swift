@@ -309,6 +309,8 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
 /// The Mapbox map in the car's window. Map only: no ornaments, no controls.
 final class CarMapViewController: UIViewController {
   private var mapView: MapView?
+  /// The rider line along the bottom of the open part of the map (3.1).
+  private let barView = CarRiderBarView()
   private var lineManager: PolylineAnnotationManager?
   private var dotManager: CircleAnnotationManager?
   private var nameManager: PointAnnotationManager?
@@ -346,6 +348,24 @@ final class CarMapViewController: UIViewController {
     shown = data
     if before?.lines != data?.lines { drawLines(data?.lines ?? []) }
     if before?.dots != data?.dots { drawDots(data?.dots ?? []) }
+    if before?.bar != data?.bar { showBar(data?.bar) }
+  }
+
+  private func showBar(_ bar: CarMapData.Bar?) {
+    if barView.superview == nil { view.addSubview(barView) }
+    view.bringSubviewToFront(barView)
+    barView.bar = bar
+    barView.isHidden = bar == nil
+    view.setNeedsLayout()
+  }
+
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    // Inside the safe area, so the guidance card and the map bar never cover it.
+    let open = view.bounds.inset(by: view.safeAreaInsets)
+    let w = min(open.width - 16, 420)
+    let h: CGFloat = 40
+    barView.frame = CGRect(x: open.midX - w / 2, y: open.maxY - h - 8, width: max(0, w), height: h)
   }
 
   /// Draws the rider's Map Features (trails, roads, land) under the riders and your line.
@@ -545,6 +565,85 @@ final class CarMapViewController: UIViewController {
       mapView.camera.ease(to: to, duration: 0.3)
     } else {
       mapView.mapboxMap.setCamera(to: to)
+    }
+  }
+}
+
+/**
+ * The phone's rider line, drawn on the car map: a capsule with every rider's dot in running order
+ * (leader left, tail gunner right) and the leader-to-last distance. Nothing on it can be tapped:
+ * Apple keeps the car map free of controls, and the Ride list says who is where.
+ */
+final class CarRiderBarView: UIView {
+  var bar: CarMapData.Bar? { didSet { setNeedsDisplay() } }
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    isOpaque = false
+    isUserInteractionEnabled = false
+    contentMode = .redraw
+  }
+
+  required init?(coder: NSCoder) { fatalError("init(coder:) is not used") }
+
+  override func draw(_ rect: CGRect) {
+    guard let bar, let ctx = UIGraphicsGetCurrentContext() else { return }
+    let box = bounds.insetBy(dx: 1, dy: 1)
+    let capsule = UIBezierPath(roundedRect: box, cornerRadius: box.height / 2)
+    UIColor(white: 0.06, alpha: 0.82).setFill()
+    capsule.fill()
+    UIColor(white: 1, alpha: 0.14).setStroke()
+    capsule.lineWidth = 1
+    capsule.stroke()
+
+    // The distance on the right, then the line in the room left of it.
+    let label = bar.spread ?? ""
+    let attrs: [NSAttributedString.Key: Any] = [
+      .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+      .foregroundColor: UIColor.white,
+    ]
+    let textSize = (label as NSString).size(withAttributes: attrs)
+    let pad: CGFloat = box.height / 2
+    let textX = box.maxX - pad - textSize.width
+    if !label.isEmpty {
+      (label as NSString).draw(at: CGPoint(x: textX, y: box.midY - textSize.height / 2), withAttributes: attrs)
+    }
+    let lineH = box.height - 14
+    let left = box.minX + pad
+    let right = (label.isEmpty ? box.maxX - pad : textX - 10)
+    guard right > left else { return }
+    // Room for half the biggest dot at each end.
+    let edge = lineH / 2
+    let from = left + edge, to = right - edge
+    ctx.setStrokeColor(UIColor(white: 1, alpha: 0.35).cgColor)
+    ctx.setLineWidth(2)
+    ctx.move(to: CGPoint(x: from, y: box.midY))
+    ctx.addLine(to: CGPoint(x: to, y: box.midY))
+    ctx.strokePath()
+
+    for d in bar.dots {
+      let size = max(6, lineH * CGFloat(d.size))
+      let cx = from + (to - from) * CGFloat(d.x)
+      let r = CGRect(x: cx - size / 2, y: box.midY - size / 2, width: size, height: size)
+      let dot = UIBezierPath(ovalIn: r)
+      if d.live {
+        UIColor(carHex: d.color).setFill()
+        dot.fill()
+        UIColor.white.setStroke()
+        dot.lineWidth = d.me ? 2.5 : 1.5
+        dot.stroke()
+      } else {
+        // Last seen only: hollow and grey, never passed off as live.
+        UIColor(white: 0.6, alpha: 1).setStroke()
+        dot.lineWidth = 2
+        dot.stroke()
+      }
+      if let ring = d.ring {
+        let halo = UIBezierPath(ovalIn: r.insetBy(dx: -3, dy: -3))
+        UIColor(carHex: ring).setStroke()
+        halo.lineWidth = 2.5
+        halo.stroke()
+      }
     }
   }
 }
