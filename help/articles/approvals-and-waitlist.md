@@ -56,10 +56,10 @@ The **Spots** line on the ride page shows how full the ride is, like "8 of 10 ve
 
 ## Leaving the Waitlist or a Request
 
-:::until 3.2
+:::until 3.1
 Open the ride page and tap **Withdraw** at the bottom, then confirm. Or swipe left on the ride on the **Home** tab and tap **Leave**. You can ask again later with the ride's link or code.
 :::
-:::release 3.2
+:::release 3.1
 Open the ride page. Right under the ride's name it says **Request Sent** with **Withdraw** beside it, or **You're on the Waitlist** with **Leave Waitlist**. Tap it, then confirm. Or swipe left on the ride on the **Home** tab and tap **Leave**. You can ask again later with the ride's link or code.
 :::
 

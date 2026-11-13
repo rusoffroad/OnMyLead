@@ -1,27 +1,9 @@
 [
   {
-    "version": "3.2",
-    "title": "Leave a Ride in One Tap",
-    "intro": "OnMyLead 3.2 makes it easy to leave a ride when your plans change: Leave Ride sits right under the ride's name, and Exit in Ride Mode offers it too.",
-    "whatsNew": "What's new in 3.2:\n\n• Plans changed? The ride page shows You're Going right under the ride's name with Leave Ride beside it (Withdraw or Leave Waitlist while you wait to get in).\n• Exit in Ride Mode now offers Leave Ride at the bottom, so you can leave the ride from the map.\n• Leaving always asks first, and organizers hand the ride to another rider before they go.",
-    "apple": null,
-    "google": null,
-    "notes": [
-      {
-        "kind": "improved",
-        "text": "Leaving a ride is easier to find. The ride page shows where you stand right under the ride's name (You're Going, You're Riding, Request Sent, You're on the Waitlist or You're Organizing) with Leave Ride, Withdraw or Leave Waitlist beside it, instead of at the bottom of the page. It always asks first, and organizers pick who takes the ride over before they go."
-      },
-      {
-        "kind": "improved",
-        "text": "Exit in Ride Mode always offers Leave Ride at the bottom of its box, under Done with this ride?, even when you aren't sharing your location. Exit Ride Mode is still the big button, and Android's Back button still closes Ride Mode straight away when you aren't sharing."
-      }
-    ]
-  },
-  {
     "version": "3.1",
     "title": "The Map on CarPlay",
-    "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, and adds an Exit button to Map Mode and Ride Mode. CarPlay is part of OnMyLead Pro.",
-    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails and roads, your route, your group's dots and turn-by-turn for the trail ahead (Pro).\n• Ride messages and group chats on CarPlay: tap one to hear it, and send a quick reply with one tap (Pro).\n• An Exit button in Map Mode and Ride Mode, plus Android's Back button. Exiting Ride Mode never leaves the ride.",
+    "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, and makes Leave Ride easy to find. CarPlay is part of OnMyLead Pro.",
+    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails and roads, your route, your group's dots and turn-by-turn for the trail ahead (Pro).\n• Ride messages and group chats on CarPlay: tap one to hear it, and send a quick reply with one tap (Pro).\n• An Exit button in Map Mode and Ride Mode, plus Android's Back button. Exiting Ride Mode never leaves the ride.\n• Leave Ride sits right under the ride's name, and in Ride Mode's Exit box.",
     "apple": null,
     "google": null,
     "notes": [
@@ -48,6 +30,14 @@
       {
         "kind": "new",
         "text": "An Exit button at the top left of Map Mode and Ride Mode (and in the Full Map bar), plus Android's Back button and Exit on the CarPlay screen. Exiting Ride Mode keeps you on the ride; it asks first if you're sharing your location, and Map Mode asks first if you're recording a trail."
+      },
+      {
+        "kind": "improved",
+        "text": "Leaving a ride is easier to find. The ride page shows where you stand right under the ride's name (You're Going, You're Riding, Request Sent, You're on the Waitlist or You're Organizing) with Leave Ride, Withdraw or Leave Waitlist beside it, instead of at the bottom of the page. It always asks first, and organizers pick who takes the ride over before they go."
+      },
+      {
+        "kind": "improved",
+        "text": "Exit in Ride Mode always offers Leave Ride at the bottom of its box, under Done with this ride?, even when you aren't sharing your location. Exit Ride Mode is still the big button, and Android's Back button still closes Ride Mode straight away when you aren't sharing."
       }
     ]
   },

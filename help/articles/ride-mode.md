@@ -409,12 +409,6 @@ If you're sharing your location, Exit first asks what you want:
 
 **Leave Ride** sits under these choices, for when you're done with the ride for good.
 
-:::until 3.2
-When you aren't sharing, Exit closes Ride Mode straight away.
-:::
-:::
-
-:::release 3.2
 When you aren't sharing, **‹ Exit** still asks once, so the way off the ride is right there: tap **Exit Ride Mode** to close the screen and stay on the ride, or **Leave Ride** at the bottom, under **Done with this ride?**, to leave it. The Android Back button closes Ride Mode straight away when you aren't sharing.
 :::
 
@@ -429,7 +423,7 @@ Heading home early? Tap **Together** (or **Separated**) at the top to open **Rid
 :::
 :::
 
-:::release 3.2
+:::release 3.1
 The quickest way: tap **‹ Exit** at the top left, then **Leave Ride** at the bottom of the box.
 :::
 

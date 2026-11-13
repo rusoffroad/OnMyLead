@@ -119,14 +119,14 @@ If the ride is full, you go on the waitlist. If the organizer approves riders, y
 
 ## Leave a Ride
 
-:::until 3.2
+:::until 3.1
 1. Open the ride page. **Leave Ride** is the red-outlined button at the bottom, whichever section you're on (on a tablet, it's at the bottom of the left column).
 2. Tap **Leave Ride**. A box tells you what happens; tap **Leave Ride** again to confirm, or **Stay**.
 
 In Ride Mode, tap **Together** (or **Separated**) at the top to open **Riders**, and **Leave Ride** is under the list. On a tablet it's at the bottom of the **Riders** sidebar. You go back to the **Home** tab when you've left.
 :::
 
-:::release 3.2
+:::release 3.1
 1. Open the ride page. Right under the ride's name it says **You're Going** (**You're Riding** once the ride is live), with **Leave Ride** beside it. On a tablet it's in the left column.
 2. Tap **Leave Ride**. A box tells you what happens; tap **Leave Ride** again to confirm, or **Stay**.
 

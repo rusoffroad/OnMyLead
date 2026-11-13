@@ -86,10 +86,10 @@ They become the organizer and the leader. You stay on the ride as a rider and ca
 
 Can't make it? You don't have to cancel the ride on everyone.
 
-:::until 3.2
+:::until 3.1
 1. Tap **Leave Ride** at the bottom of the ride page (or under **Riders** in Ride Mode).
 :::
-:::release 3.2
+:::release 3.1
 1. Tap **Leave Ride** beside **You're Organizing**, right under the ride's name on the ride page (in Ride Mode, tap **‹ Exit** and it's at the bottom of the box).
 :::
 2. **Who Takes Over?** lists everyone who has joined, leaders and co-organizers first. Tap who should run it.

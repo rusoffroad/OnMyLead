@@ -96,7 +96,7 @@ export const SHOWCASE_PHOTO_CROP: boolean = true;
  */
 export const SHOWCASE_REDESIGN_3: boolean = true;
 /**
- * The showcase's Leave Any Time line in its 3.2 words (Leave Ride beside You're Going under the
- * ride's name, and under Exit in Ride Mode). Off until the app version with it (3.2) is live in the stores.
+ * The showcase's Leave Any Time line in its 3.1 words (Leave Ride beside You're Going under the
+ * ride's name, and under Exit in Ride Mode). Off until the app version with it (3.1) is live in the stores.
  */
 export const SHOWCASE_EASY_LEAVE: boolean = false;
