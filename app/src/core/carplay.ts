@@ -78,6 +78,14 @@ export type CarPlayLabels = {
   exitRideConfirm: string;
   /** Asked on the car before Map Mode exits while a recording runs (it pauses). */
   exitMapConfirm: string;
+  /** Car map (3.1): the bar button and screen that switch the Map Features drawn on the car. */
+  layers: string;
+  /** Car home screen (3.1): opens Ride Mode while this phone is sharing on a ride. */
+  openRideMode: string;
+  /** Messages with no ride in Ride Mode (3.1): the rider's group chats. */
+  groupChats: string;
+  noChats: string;
+  loading: string;
 };
 
 /**
@@ -110,6 +118,11 @@ export function carPlayLabels(proNeeded = false): CarPlayLabels {
     exitRideMode: tc('Exit Ride Mode'),
     exitRideConfirm: tc('Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot.'),
     exitMapConfirm: tc('Exit Map Mode? Your recording pauses until you come back.'),
+    layers: tc('Layers'),
+    openRideMode: tc('Open Ride Mode'),
+    groupChats: tc('Group Chats'),
+    noChats: tc('No Group Chats Yet'),
+    loading: tc('Loading…'),
   };
 }
 
@@ -243,11 +256,26 @@ export type CarPlayAction =
   | { type: 'record'; paused: boolean }
   /** Exit Ride Mode or Map Mode on the phone (the car already asked). */
   | { type: 'exit'; mode: 'ride' | 'map' }
+  /** Open Ride Mode for the ride this phone is sharing on (the car's home screen, 3.1). */
+  | { type: 'open_ride' }
+  /** Group chats on the car (3.1): the list, one chat, hear a message, send a one-tap reply. */
+  | { type: 'chats' }
+  | { type: 'chat'; groupId: string }
+  | { type: 'chat_hear'; groupId: string; messageId: string }
+  | { type: 'chat_say'; groupId: string; body: string }
+  /** A row on the car's Layers screen (core/car-layers carLayerToggle). */
+  | { type: 'layer'; rowId: string }
   | { type: 'none' };
 
 /** CarPlay is Pro (2.1), but EMERGENCY from the car always goes, even if Pro ran out mid-ride, and so does Exit. */
 export function carPlayActionAllowed(a: CarPlayAction, carPlayPro: boolean): boolean {
   return carPlayPro || a.type === 'emergency' || a.type === 'exit' || (a.type === 'status' && a.kind === 'emergency');
+}
+
+/** "group-id:rest of it" (group ids are uuids, so the first colon ends them). */
+function splitOnce(s: string): [string, string] {
+  const i = s.indexOf(':');
+  return i < 0 ? [s, ''] : [s.slice(0, i), s.slice(i + 1)];
 }
 
 export function parseCarPlayAction(id: string): CarPlayAction {
@@ -261,6 +289,18 @@ export function parseCarPlayAction(id: string): CarPlayAction {
   if (id === 'map:pause' || id === 'map:resume') return { type: 'record', paused: id === 'map:pause' };
   if (id === 'ride:exit') return { type: 'exit', mode: 'ride' };
   if (id === 'map:exit') return { type: 'exit', mode: 'map' };
+  if (id === 'open:ride') return { type: 'open_ride' };
+  if (id === 'chats:open') return { type: 'chats' };
+  if (id.startsWith('chathear:')) {
+    const [groupId, messageId] = splitOnce(id.slice(9));
+    return groupId && messageId ? { type: 'chat_hear', groupId, messageId } : { type: 'none' };
+  }
+  if (id.startsWith('chatsay:')) {
+    const [groupId, body] = splitOnce(id.slice(8));
+    return groupId && body.trim() ? { type: 'chat_say', groupId, body } : { type: 'none' };
+  }
+  if (id.startsWith('chat:')) return id.length > 5 ? { type: 'chat', groupId: id.slice(5) } : { type: 'none' };
+  if (id.startsWith('layer:')) return { type: 'layer', rowId: id };
   return { type: 'none' };
 }
 
@@ -491,4 +531,56 @@ export function carPlayReplies(saved: string[], builtIns: readonly string[]): Ca
     ...builtIns.map((b) => ({ id: `reply:${b}`, title: tc(b), symbol: 'text.bubble.fill' })),
     ...saved.filter((s) => s.trim() && !lower.has(s.trim().toLocaleLowerCase())).map((s) => ({ id: `say:${s}`, title: s, symbol: 'text.bubble' })),
   ];
+}
+
+// --- Group chats on the car (3.1) ---------------------------------------------------------------
+// With no ride in Ride Mode, the car's Messages button opens the rider's group chats: each group
+// with its newest message, then a chat's newest messages (tap one to hear it) and one-tap replies.
+// Nothing to type, as on the ride's Messages screen.
+
+export type CarChatGroup = { id: string; name: string };
+export type CarChatSummary = { groupId: string; lastBody: string | null; lastAt: string | null; unread: number };
+
+/** One row per group chat, the ones with the newest messages first. */
+export function carChatRows(groups: CarChatGroup[], summaries: CarChatSummary[], now: number): CarPlayMessage[] {
+  const byId = new Map(summaries.map((s) => [s.groupId, s]));
+  const at = (g: CarChatGroup) => Date.parse(byId.get(g.id)?.lastAt ?? '') || 0;
+  return [...groups]
+    .sort((a, b) => at(b) - at(a))
+    .slice(0, CAR_MESSAGES_MAX)
+    .map((g) => {
+      const s = byId.get(g.id);
+      const unread = s?.unread ? `${tc('{count} New', { count: s.unread })} · ` : '';
+      return {
+        id: `chat:${g.id}`,
+        title: g.name,
+        detail: s?.lastBody && s.lastAt ? `${unread}${carPreview(s.lastBody)} · ${ago(s.lastAt, now)}` : tc('No Messages Yet'),
+      };
+    });
+}
+
+/** What the car shows for one group chat (CarPlayBridge.swift showChat). */
+export type CarChat = {
+  groupId: string;
+  title: string;
+  /** Newest first; ids are the car's "hear" button ids. */
+  messages: CarPlayMessage[];
+  replies: CarPlayButton[];
+};
+
+export function carChat(
+  group: CarChatGroup,
+  messages: CarMessageInput[],
+  nameOf: (userId: string) => string,
+  meId: string | null | undefined,
+  now: number,
+  replies: CarPlayButton[],
+): CarChat {
+  return {
+    groupId: group.id,
+    title: group.name,
+    messages: carPlayMessages(messages, nameOf, meId, now).map((m) => ({ ...m, id: `chathear:${group.id}:${m.id}` })),
+    // A group message is plain text: the reply goes as the words on the button.
+    replies: replies.map((r) => ({ ...r, id: `chatsay:${group.id}:${r.title}` })),
+  };
 }

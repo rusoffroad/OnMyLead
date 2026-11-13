@@ -76,6 +76,7 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
     let root = ensureMapTemplate()
     let map = bridge.state != nil ? bridge.rideMap : bridge.modeMap
     mapView.show(map)
+    mapView.showTrails(bridge.trails)
     updateBar(root, bridge: bridge, labels: labels)
     updateGuide(root, map?.guide)
     if let rideGrid, let state = bridge.state, state != gridShows {
@@ -136,14 +137,13 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
   }
 
   /// The bar's buttons, rebuilt only when what they say changes (CarPlay limits template updates).
+  /// The bar holds two buttons a side: Layers and Messages always sit on the right (3.1).
   private func updateBar(_ t: CPMapTemplate, bridge: CarPlayBridge, labels: CarPlayLabels) {
-    // Pause or Resume; Exit has its own button on the left.
-    let recording = bridge.state == nil ? bridge.mapState?.actions.first(where: { $0.id != "map:exit" }) : nil
     let key = [
       panning ? "pan" : "",
       bridge.state != nil ? "ride" : bridge.mapState != nil ? "mode" : "none",
-      labels.ride, labels.group, labels.messages, labels.dash, labels.openMapMode, labels.ok, labels.exit,
-      recording?.id ?? "", recording?.title ?? "",
+      bridge.sharingRide ? "sharing" : "",
+      labels.ride, labels.messages, labels.dash, labels.openMapMode, labels.openRideMode, labels.ok, labels.exit, labels.layers,
     ].joined(separator: "|")
     guard key != barKey else { return }
     barKey = key
@@ -154,30 +154,28 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
       t.trailingNavigationBarButtons = []
       return
     }
+    t.trailingNavigationBarButtons = [bridge.layersButton(), bridge.messagesButton()]
     if bridge.state != nil {
+      // Group is the first button on the Ride screen.
       t.leadingNavigationBarButtons = [
         bridge.exitRideButton(),
         CPBarButton(title: labels.ride) { [weak self] _ in self?.pushRideGrid() },
       ]
-      t.trailingNavigationBarButtons = [
-        CPBarButton(title: labels.group) { [weak self] _ in self?.bridge?.showGroup() },
-        bridge.messagesButton(),
-      ]
     } else if bridge.mapState != nil {
+      // Pause and Resume are the first row on the Dash screen.
       t.leadingNavigationBarButtons = [
         CPBarButton(title: labels.exit) { [weak self] _ in self?.bridge?.exitMap() },
         CPBarButton(title: labels.dash) { [weak self] _ in self?.pushDash() },
       ]
-      if let recording {
-        t.trailingNavigationBarButtons = [CPBarButton(title: recording.title) { [weak self] _ in self?.bridge?.emit?(recording.id) }]
-      } else {
-        t.trailingNavigationBarButtons = []
-      }
     } else {
-      t.leadingNavigationBarButtons = labels.openMapMode.isEmpty ? [] : [
-        CPBarButton(title: labels.openMapMode) { [weak self] _ in self?.bridge?.emit?("open:map") },
-      ]
-      t.trailingNavigationBarButtons = []
+      var leading: [CPBarButton] = []
+      if bridge.sharingRide && !labels.openMapMode.isEmpty {
+        leading.append(CPBarButton(title: labels.openRideMode) { [weak self] _ in self?.bridge?.emit?("open:ride") })
+      }
+      if !labels.openMapMode.isEmpty {
+        leading.append(CPBarButton(title: labels.openMapMode) { [weak self] _ in self?.bridge?.emit?("open:map") })
+      }
+      t.leadingNavigationBarButtons = leading
     }
   }
 
@@ -198,7 +196,16 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
   }
 
   private func dashItems(_ m: MapState) -> [CPListItem] {
-    m.items.prefix(10).map { CPListItem(text: $0.title, detailText: $0.detail) }
+    // Pause or Resume while a recording runs (Exit has its own button on the map).
+    let record: [CPListItem] = m.actions.filter { $0.id == "map:pause" || $0.id == "map:resume" }.map { b in
+      let item = CPListItem(text: b.title, detailText: nil, image: UIImage(systemName: b.id == "map:pause" ? "pause.circle.fill" : "record.circle"))
+      item.handler = { [weak self] _, done in
+        self?.bridge?.emit?(b.id)
+        done()
+      }
+      return item
+    }
+    return record + m.items.prefix(10).map { CPListItem(text: $0.title, detailText: $0.detail) }
   }
 
   // MARK: Guidance
@@ -310,6 +317,13 @@ final class CarMapViewController: UIViewController {
   private var following = true
   private var zoomLevel: CGFloat = 14
   private var lastDrag: CGPoint = .zero
+  /// Map Features (3.1): what to draw, what is drawn now, and the style-loaded watch that redraws
+  /// them when the Map Style changes (a new style drops every added layer).
+  private var trails: CarTrailsData?
+  private var trailsDrawn = ""
+  private var drawnLayerIds: [String] = []
+  private var drawnSourceIds: [String] = []
+  private var styleWatch: AnyCancelable?
 
   /// Draws `data` (nil: just the base map and your position). Builds the map the first time
   /// there is a Mapbox token.
@@ -334,6 +348,46 @@ final class CarMapViewController: UIViewController {
     if before?.dots != data?.dots { drawDots(data?.dots ?? []) }
   }
 
+  /// Draws the rider's Map Features (trails, roads, land) under the riders and your line.
+  func showTrails(_ next: CarTrailsData?) {
+    trails = next
+    applyTrails()
+  }
+
+  private func applyTrails() {
+    guard let map = mapView?.mapboxMap, map.isStyleLoaded else { return }
+    let key = trails?.key ?? ""
+    guard key != trailsDrawn else { return }
+    for id in drawnLayerIds where map.layerExists(withId: id) { try? map.removeLayer(withId: id) }
+    for id in drawnSourceIds where map.sourceExists(withId: id) { try? map.removeSource(withId: id) }
+    drawnLayerIds = []
+    drawnSourceIds = []
+    trailsDrawn = key
+    guard let trails else { return }
+    for src in trails.sources {
+      guard let id = src["id"] as? String else { continue }
+      var props = src
+      props.removeValue(forKey: "id")
+      do {
+        try map.addSource(withId: id, properties: props)
+        drawnSourceIds.append(id)
+      } catch {
+        NSLog("OnMyLead car map: source \(id) not added: \(error)")
+      }
+    }
+    // Under the riders' lines and dots (the annotation layers), over the base map.
+    let under = ["oml-car-lines", "oml-car-dots", "oml-car-names"].first { map.layerExists(withId: $0) }
+    for layer in trails.layers {
+      guard let id = layer["id"] as? String, let source = layer["source"] as? String, drawnSourceIds.contains(source) else { continue }
+      do {
+        try map.addLayer(with: layer, layerPosition: under.map { .below($0) })
+        drawnLayerIds.append(id)
+      } catch {
+        NSLog("OnMyLead car map: layer \(id) not added: \(error)")
+      }
+    }
+  }
+
   private func ensureMap(style: String?) -> Bool {
     if mapView != nil { return true }
     guard !MapboxOptions.accessToken.isEmpty else { return false }
@@ -349,6 +403,14 @@ final class CarMapViewController: UIViewController {
     map.location.options.puckBearingEnabled = true
     view.addSubview(map)
     mapView = map
+    styleWatch = map.mapboxMap.onStyleLoaded.observe { [weak self] _ in
+      guard let self else { return }
+      // The new style has none of the added layers: draw them again.
+      self.trailsDrawn = ""
+      self.drawnLayerIds = []
+      self.drawnSourceIds = []
+      self.applyTrails()
+    }
     // Made in drawing order: lines under the dots, names on top.
     lineManager = map.annotations.makePolylineAnnotationManager(id: "oml-car-lines")
     dotManager = map.annotations.makeCircleAnnotationManager(id: "oml-car-dots")

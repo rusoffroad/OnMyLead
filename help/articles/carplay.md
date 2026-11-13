@@ -66,6 +66,16 @@ There's no typing on the car screen, because Apple doesn't allow it while drivin
 :::
 
 :::release 3.1
+## Group Chats on the Car Screen
+
+With no ride in Ride Mode, tap **Messages** at the top of the car map to see your **Group Chats**: every riding group you run or are in, the one with the newest message first, with how many messages are new.
+
+- Tap a group to see its newest messages. Tap a message to hear it read out.
+- Tap **Reply** to send a quick reply to the group with one tap: the same built-in replies and your own saved ones as during a ride.
+- Messages from riders you blocked don't show.
+:::
+
+:::release 3.1
 ## Exit Ride Mode or Map Mode From the Car
 
 - **During a ride:** tap **Exit** at the top left of the car screen, then **Exit Ride Mode**. Ride Mode closes on your phone. You stay on the ride, and your phone keeps sharing your spot if it was. **Cancel** keeps Ride Mode open.
@@ -99,8 +109,12 @@ The car screen shows the OnMyLead map, in your Map Style, with your position and
 - **In Map Mode:** the trail you're following and the trail you're recording.
 - **Turn-by-turn:** while you follow a trail or the ride route, the top of the screen shows the next turn with an arrow and how far away it is (**Bear Left**, **Turn Right**, **Sharp Left**, **Make a U-Turn**), then the turn after it, and finally **Arrive at the End of** the trail. The turns come from the shape of the trail itself, so they work on any trail, with or without service. Gentle curves aren't called out. Below that are the miles left, the time left and when you'll get there.
 - **Head to the Start:** before you reach the trail, the car says **Head to the Start** and how far it is in a straight line. There are no road directions to the start; use Apple Maps or Google Maps for that (**Directions** on the ride or trail).
+- **Trails and roads:** the same Map Features as the maps on your phone: off-road trails and tracks with their names, Forest Service and BLM roads and trails, dirt roads, paved roads, hiking trails and closures, plus land boundaries if you turned them on. Zoom in to see trails, the same as on your phone. Rider Trails and Park Trails show only on your phone for now.
+- **Layers** at the top right turns them on and off from the car: **Streets and Roads**, **Off-Road Trails**, **Hiking Trails** and **Land Boundaries**, then **Closures**, **Width-Limited Trails** and **Street-Legal Only**. A filled circle means it's on. What you pick here is saved for every map in OnMyLead, and **Map Settings** on your phone changes the car map too.
 - The buttons on the map zoom in and out, bring the map back to you, and show arrows to move the map. On a touchscreen you can also drag it.
-- **Ride** opens the status buttons and EMERGENCY described above, and **Group** lists the riders. In Map Mode, **Dash** opens your speed, elevation and trip numbers, and **Pause** or **Resume** works your recording.
+- **Ride** opens the status buttons, **Group** and EMERGENCY described above. In Map Mode, **Dash** opens your speed, elevation and trip numbers, with **Pause** or **Resume** at the top while you record.
+- **Messages** at the top right opens the ride's messages during a ride. With no ride in Ride Mode it opens your **Group Chats** (see below).
+- **Open Ride Mode** shows at the top left when your phone is sharing your spot on a ride but Ride Mode isn't open. Tap it and Ride Mode opens on your phone, so the car shows the ride, the riders' dots and the ride's messages.
 - **Exit** at the top left closes Ride Mode or Map Mode on your phone, the same as on the screens without the map.
 
 Saved offline map areas draw with no service. Other riders' dots only move while your phone has service (or a Bluetooth connection to them); without it they stay where each rider was last seen.

@@ -4,7 +4,7 @@ summary: What to check when riders don't show on the map, alerts don't arrive, a
 category: troubleshooting
 order: 10
 release: "1.0"
-updated: 2026-11-12
+updated: 2026-11-13
 sources:
   - app/src/components/rider-puck.tsx
   - app/src/core/freshness.ts

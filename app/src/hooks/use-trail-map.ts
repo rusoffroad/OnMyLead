@@ -8,10 +8,10 @@ import { drawableOsm, nearestOsmTrail, OSM_VIEW_MIN_Z, trailLabels, type OsmTrai
 import { drawableParkTrails, outsideParks, PARK_NAMES_MIN_Z, PARK_TRAILS_MIN_Z, parkTrailLabels, parksInView, type ParkLabel, type ParkSummary, type ParkTrail } from '@/core/park-trails';
 import { terrainBoxes } from '@/core/offline-maps';
 import { lookFor, mapboxDraws, type MapLook } from '@/core/terrain';
-import { anyLand, LAND_FEATURES, anyTrails, defaultFeatures, featureKey, readFeatures, type AgencyLayer, type FeatureChoices, type MapFeatureId } from '@/core/map-features';
+import { anyLand, LAND_FEATURES, anyTrails, defaultFeatures, readFeatures, type AgencyLayer, type FeatureChoices, type MapFeatureId } from '@/core/map-features';
 import {
-  landShowsAt, PARCELS_MIN_Z, LAND_SOURCE_IDS, LAND_SOURCES, mapZoom, metersPerPoint, sourceFeatures, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z, trailTileTemplate,
-  type BaseMap, type ClosedLine, type LandInfo, type TrailInfo, type TrailSourceId,
+  landShowsAt, PARCELS_MIN_Z, mapZoom, metersPerPoint, sourceFeatures, TRAIL_SOURCE_IDS, TRAIL_SOURCES, TRAILS_MIN_Z,
+  type BaseMap, type ClosedLine, type LandInfo, type TrailInfo,
 } from '@/core/trails';
 import { useMapSignal } from '@/lib/map-signal';
 import { useOfflineMaps } from '@/lib/offline-maps';
@@ -21,10 +21,13 @@ import { parkList, parkTrailsIn, savedParkTrailsIn } from '@/lib/park-trails';
 import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
 import { identifyLand } from '@/lib/trail-lookup';
+import { agencyLayersFor } from '@/core/car-layers';
 import { useCan } from '@/lib/pro';
 import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
-const KEY = 'map.layers.v1';
+/** The rider's map style and Map Features (every map in the app, and the car map). */
+export const MAP_LAYERS_KEY = 'map.layers.v1';
+const KEY = MAP_LAYERS_KEY;
 const NO_FEATURES = Object.fromEntries(Object.keys(defaultFeatures()).map((k) => [k, false])) as FeatureChoices;
 /** Show trails other riders mapped and shared (Navigation Mode). On unless the rider hid them. */
 export const RIDER_TRAILS_KEY = 'map.riderTrails.v1';
@@ -516,31 +519,7 @@ export function useTrailMap(): TrailMap {
   const labelsShown = useMemo(() => outsideParks(labels, parksDrawn), [labels, parksDrawn]);
   const closedShown = useMemo(() => outsideParks(closed, parksDrawn), [closed, parksDrawn]);
 
-  const agencyLayers = useMemo<AgencyLayer[]>(() => {
-    const on = (Object.keys(features) as MapFeatureId[]).filter((id) => features[id]);
-    const trailLayers = TRAIL_SOURCE_IDS.flatMap((id: TrailSourceId) => {
-      const tags = sourceFeatures(TRAIL_SOURCES[id]);
-      const shown = tags.filter((t) => on.includes(t as MapFeatureId));
-      if (!shown.length) return [];
-      // With no signal only the saved squares can show, and downloads save every trail layer.
-      const all = shown.length === tags.length || offline;
-      return [{
-        id,
-        key: all ? id : `${id}-${featureKey(shown as MapFeatureId[])}`,
-        template: trailTileTemplate(TRAIL_SOURCES[id], all ? undefined : shown),
-        minZ: TRAILS_MIN_Z,
-        attribution: TRAIL_SOURCES[id].attribution,
-        land: false,
-      }];
-    });
-    const landLayers = LAND_SOURCE_IDS.flatMap((id) => {
-      const src = LAND_SOURCES[id];
-      const shown = sourceFeatures(src).filter((t) => on.includes(t as MapFeatureId));
-      if (!shown.length) return [];
-      return [{ id, key: `${id}-${featureKey(shown as MapFeatureId[])}`, template: trailTileTemplate(src, shown), minZ: src.minZ, attribution: src.attribution, land: true }];
-    });
-    return [...landLayers, ...trailLayers];
-  }, [features, offline]);
+  const agencyLayers = useMemo<AgencyLayer[]>(() => agencyLayersFor(features, offline), [features, offline]);
 
   // Free riders get satellite (map layers are Pro); 3D Terrain picked but not offered any more
   // (switched off, or a build without Mapbox) is plain satellite too.

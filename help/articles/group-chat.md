@@ -4,7 +4,7 @@ summary: Talk with your whole riding group between rides, link a message to a ri
 category: groups
 order: 20
 release: "1.0"
-updated: 2026-11-05
+updated: 2026-11-13
 sources:
   - app/src/app/groups/[id]/chat.tsx
   - app/src/app/groups/[id]/index.tsx
@@ -71,6 +71,12 @@ To turn off notifications for all your groups' chats, switch off **Riding Group 
 
 - **Your own message:** press and hold it, then confirm **Clear**. It disappears for everyone, and this can't be undone.
 - **If you run the group:** press and hold anyone's message and tap **Clear**.
+
+:::release 3.1
+## On CarPlay
+
+With no ride in Ride Mode, tap **Messages** on the CarPlay map to see your group chats. Tap a message to hear it, or tap **Reply** to send a quick reply with one tap. See [CarPlay](/help/carplay).
+:::
 
 ## Report or Block a Rider
 
