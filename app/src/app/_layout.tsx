@@ -40,6 +40,7 @@ import '@/lib/location';
 import { startPurchaseUpdates } from '@/lib/purchases';
 import { startReferrals } from '@/lib/referrals';
 import { onCarPlayAction, syncCarPlayLabels } from '@/lib/carplay';
+import { CarPlayHome } from '@/components/carplay-home';
 import { parseCarPlayAction } from '@/core/carplay';
 import { startRiderAgreement } from '@/lib/rider-agreement';
 import { startSettingsSync } from '@/lib/settings-sync';
@@ -234,6 +235,8 @@ function RootLayout() {
         <Stack.Screen name="admin" options={{ title: tr('OnMyLead Admin'), headerShown: false }} />
       </Stack>
       <MessageAlerts />
+      {/* CarPlay (3.1): Map Features on the car map, group chats and Open Ride Mode on the car. */}
+      <CarPlayHome />
       {/* iPad, Android tablets and the website are Pro; joining and Ride Mode stay open. */}
       <TabletProGate />
       <ProGateHost />

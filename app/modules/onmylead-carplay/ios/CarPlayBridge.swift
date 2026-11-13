@@ -42,6 +42,13 @@ struct CarPlayLabels: Equatable {
   var exitRideMode = "Exit Ride Mode"
   var exitRideConfirm = "Exit Ride Mode? You stay on the ride, and your phone keeps sharing your spot."
   var exitMapConfirm = "Exit Map Mode? Your recording pauses until you come back."
+  /// Car map (3.1): the Layers button and screen (Map Features drawn on the car).
+  var layers = "Layers"
+  var openRideMode = "Open Ride Mode"
+  /// Messages with no ride in Ride Mode (3.1): the rider's group chats.
+  var groupChats = "Group Chats"
+  var noChats = "No Group Chats Yet"
+  var loading = "Loading…"
 
   init() {}
 
@@ -73,6 +80,11 @@ struct CarPlayLabels: Equatable {
     exitRideMode = word("exitRideMode", en.exitRideMode)
     exitRideConfirm = word("exitRideConfirm", en.exitRideConfirm)
     exitMapConfirm = word("exitMapConfirm", en.exitMapConfirm)
+    layers = word("layers", en.layers)
+    openRideMode = word("openRideMode", en.openRideMode)
+    groupChats = word("groupChats", en.groupChats)
+    noChats = word("noChats", en.noChats)
+    loading = word("loading", en.loading)
   }
 }
 
@@ -145,6 +157,55 @@ struct MapState: Equatable {
   }
 }
 
+/// A row on the car's Layers screen (carLayerRows in src/core/car-layers.ts).
+struct LayerRow: Equatable {
+  let id: String
+  let title: String
+  let detail: String
+  let on: Bool
+}
+
+/// The Map Features the car map draws (CarTrails in src/core/car-layers.ts) and the Layers screen's rows.
+struct CarTrailsData {
+  let key: String
+  let sources: [[String: Any]]
+  let layers: [[String: Any]]
+  let rows: [LayerRow]
+
+  init(_ d: [String: Any]) {
+    let t = d["trails"] as? [String: Any] ?? [:]
+    key = t["key"] as? String ?? ""
+    sources = t["sources"] as? [[String: Any]] ?? []
+    layers = t["layers"] as? [[String: Any]] ?? []
+    rows = (d["rows"] as? [[String: Any]] ?? []).compactMap { r in
+      guard let id = r["id"] as? String, let title = r["title"] as? String else { return nil }
+      return LayerRow(id: id, title: title, detail: r["detail"] as? String ?? "", on: r["on"] as? Bool ?? false)
+    }
+  }
+}
+
+/// One group chat on the car (CarChat in src/core/carplay.ts). Rows reuse RideButton: title is the
+/// sender (or the group), symbol carries the preview.
+struct CarChatData: Equatable {
+  let groupId: String
+  let title: String
+  let messages: [RideButton]
+  let replies: [RideButton]
+
+  init(_ d: [String: Any]) {
+    groupId = d["groupId"] as? String ?? ""
+    title = d["title"] as? String ?? ""
+    messages = (d["messages"] as? [[String: Any]] ?? []).compactMap { m in
+      guard let id = m["id"] as? String else { return nil }
+      return RideButton(id: id, title: m["title"] as? String ?? "", symbol: m["detail"] as? String ?? "")
+    }
+    replies = (d["replies"] as? [[String: Any]] ?? []).compactMap { b in
+      guard let id = b["id"] as? String, let title = b["title"] as? String else { return nil }
+      return RideButton(id: id, title: title, symbol: b["symbol"] as? String ?? "text.bubble.fill")
+    }
+  }
+}
+
 /// Owns the CarPlay templates. Everything here runs on the main thread.
 final class CarPlayBridge {
   static let shared = CarPlayBridge()
@@ -167,6 +228,17 @@ final class CarPlayBridge {
   private(set) var rideMessages = RideMessages()
   /// The Messages screen while it is open, refreshed as messages come in.
   private weak var messagesList: CPListTemplate?
+  /// Map Features for the car map and the Layers screen (3.1), from the phone.
+  private(set) var trails: CarTrailsData?
+  private weak var layersList: CPListTemplate?
+  /// The phone is sharing on a ride: the home screen offers Open Ride Mode (3.1).
+  private(set) var sharingRide = false
+  /// Group chats (3.1): the list and the chat open on the car, while they are open.
+  private weak var chatsList: CPListTemplate?
+  private weak var chatList: CPListTemplate?
+  private var chatRows: [RideButton]?
+  private var openChat: CarChatData?
+  private var openChatId: String?
 
   func setLabels(_ next: CarPlayLabels) {
     guard next != labels else { return }
@@ -358,7 +430,115 @@ final class CarPlayBridge {
   }
 
   func messagesButton() -> CPBarButton {
-    CPBarButton(title: labels.messages) { [weak self] _ in self?.showMessages() }
+    CPBarButton(title: labels.messages) { [weak self] _ in
+      guard let self else { return }
+      if self.state != nil { self.showMessages() } else { self.showChats() }
+    }
+  }
+
+  // MARK: Map Features (3.1)
+
+  func setTrails(_ next: CarTrailsData) {
+    let rowsChanged = next.rows != trails?.rows
+    trails = next
+    mapScreen?.refresh()
+    if rowsChanged { layersList?.updateSections(layerSections()) }
+  }
+
+  func setHome(sharingRide next: Bool) {
+    guard next != sharingRide else { return }
+    sharingRide = next
+    mapScreen?.refresh()
+  }
+
+  func layersButton() -> CPBarButton {
+    CPBarButton(title: labels.layers) { [weak self] _ in self?.showLayers() }
+  }
+
+  /// One tap turns a kind of line on or off; the phone saves it (every map in the app follows)
+  /// and sends the new layers back.
+  func showLayers() {
+    guard let interface else { return }
+    let list = CPListTemplate(title: labels.layers, sections: layerSections())
+    list.emptyViewTitleVariants = [labels.loading]
+    layersList = list
+    interface.pushTemplate(list, animated: true, completion: nil)
+  }
+
+  private func layerSections() -> [CPListSection] {
+    let items: [CPListItem] = (trails?.rows ?? []).map { r in
+      let item = CPListItem(text: r.title, detailText: r.detail, image: UIImage(systemName: r.on ? "checkmark.circle.fill" : "circle"))
+      item.handler = { [weak self] _, done in
+        self?.emit?(r.id)
+        done()
+      }
+      return item
+    }
+    return items.isEmpty ? [] : [CPListSection(items: items)]
+  }
+
+  // MARK: Group chats (3.1)
+
+  /// The rider's group chats, newest first. The phone loads them when this opens.
+  func showChats() {
+    guard let interface else { return }
+    chatRows = nil
+    let list = CPListTemplate(title: labels.groupChats, sections: [])
+    list.emptyViewTitleVariants = [labels.loading]
+    chatsList = list
+    interface.pushTemplate(list, animated: true, completion: nil)
+    emit?("chats:open")
+  }
+
+  func setChats(_ rows: [RideButton]) {
+    chatRows = rows
+    guard let chatsList else { return }
+    chatsList.emptyViewTitleVariants = [labels.noChats]
+    let items: [CPListItem] = rows.map { r in
+      let item = CPListItem(text: r.title, detailText: r.symbol)
+      item.handler = { [weak self] _, done in
+        self?.showChat(r)
+        done()
+      }
+      return item
+    }
+    chatsList.updateSections(items.isEmpty ? [] : [CPListSection(items: items)])
+  }
+
+  private func showChat(_ row: RideButton) {
+    guard let interface else { return }
+    openChatId = row.id
+    openChat = nil
+    let list = CPListTemplate(title: row.title, sections: [])
+    list.emptyViewTitleVariants = [labels.loading]
+    chatList = list
+    interface.pushTemplate(list, animated: true, completion: nil)
+    emit?(row.id)
+  }
+
+  func setChat(_ chat: CarChatData) {
+    guard openChatId == "chat:\(chat.groupId)", let chatList else { return }
+    guard chat != openChat else { return }
+    openChat = chat
+    chatList.updateSections(chatSections(chat))
+  }
+
+  private func chatSections(_ chat: CarChatData) -> [CPListSection] {
+    let reply = CPListItem(text: labels.reply, detailText: labels.replyDetail, image: UIImage(systemName: "arrowshape.turn.up.left.fill"))
+    reply.handler = { [weak self] _, done in
+      self?.showReplyList(chat.replies)
+      done()
+    }
+    let items: [CPListItem] = chat.messages.map { m in
+      let item = CPListItem(text: m.title, detailText: m.symbol)
+      item.handler = { [weak self] _, done in
+        self?.emit?(m.id)
+        done()
+      }
+      return item
+    }
+    let list = items.isEmpty ? [CPListItem(text: labels.noMessages, detailText: nil)] : items
+    return [CPListSection(items: [reply]), CPListSection(items: list, header: labels.tapToHear, sectionIndexTitle: nil)]
   }
 
   /// The ride's messages: Reply first, then the newest messages. Tap one to hear it (the phone
@@ -389,8 +569,12 @@ final class CarPlayBridge {
   }
 
   private func showReplies() {
+    showReplyList(rideMessages.replies)
+  }
+
+  private func showReplyList(_ replies: [RideButton]) {
     guard let interface else { return }
-    let items: [CPListItem] = rideMessages.replies.map { r in
+    let items: [CPListItem] = replies.map { r in
       let item = CPListItem(text: r.title, detailText: nil, image: UIImage(systemName: r.symbol))
       item.handler = { [weak self] _, done in
         self?.emit?(r.id)

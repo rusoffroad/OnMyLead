@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, pick which roads, trails and land bo
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-06
+updated: 2026-11-13
 sources:
   - app/src/hooks/use-dot-size.ts
   - app/src/components/trail-map-overlay.tsx
@@ -109,6 +109,12 @@ From 2.1 your own dot is a safety-orange 3D dome, half again as big as before at
 :::
 
 Your choices are remembered on your phone and used on every map in the app.
+
+:::release 3.1
+## On CarPlay
+
+The map on your car's CarPlay screen draws the same Map Features, and **Layers** at the top right of the car map turns the main ones on and off. What you pick there is saved for every map, here too. Rider Trails and Park Trails show only on your phone. See [CarPlay](/help/carplay).
+:::
 
 :::release 2.1
 ## One Map Everywhere

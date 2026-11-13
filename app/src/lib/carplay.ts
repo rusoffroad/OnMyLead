@@ -4,7 +4,8 @@
  */
 import { requireOptionalNativeModule } from 'expo';
 
-import { carPlayLabels, type CarPlayLabels, type CarPlayMapState, type CarPlayState } from '@/core/carplay';
+import { carPlayLabels, type CarChat, type CarPlayLabels, type CarPlayMapState, type CarPlayMessage, type CarPlayState } from '@/core/carplay';
+import type { CarLayerRow, CarTrails } from '@/core/car-layers';
 
 type Subscription = { remove(): void };
 type CarPlayNative = {
@@ -15,6 +16,13 @@ type CarPlayNative = {
   /** Map Mode's dash (3.0). Optional like setLabels. */
   setMap?(state: CarPlayMapState): void;
   clearMap?(): void;
+  /** 3.1, optional like setMap: Map Features on the car map and its Layers screen. */
+  setTrails?(data: { trails: CarTrails; rows: CarLayerRow[] }): void;
+  /** 3.1: the car's home screen offers Open Ride Mode while this phone shares on a ride. */
+  setHome?(data: { sharingRide: boolean }): void;
+  /** 3.1: the group chats on the car, and the one open there. */
+  setChats?(data: { chats: CarPlayMessage[] }): void;
+  setChat?(chat: CarChat): void;
   addListener(event: 'onAction', listener: (e: { id: string }) => void): Subscription;
 };
 
@@ -49,4 +57,21 @@ export function onCarPlayAction(listener: (id: string) => void): Subscription {
  */
 export function syncCarPlayLabels(proNeeded = false) {
   native?.setLabels?.(carPlayLabels(proNeeded));
+}
+
+/** The Map Features the car map draws, and the rows of its Layers screen. */
+export function showTrailsOnCarPlay(trails: CarTrails, rows: CarLayerRow[]) {
+  native?.setTrails?.({ trails, rows });
+}
+
+export function setCarPlayHome(sharingRide: boolean) {
+  native?.setHome?.({ sharingRide });
+}
+
+export function showChatsOnCarPlay(chats: CarPlayMessage[]) {
+  native?.setChats?.({ chats });
+}
+
+export function showChatOnCarPlay(chat: CarChat) {
+  native?.setChat?.(chat);
 }

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CARPLAY_BUTTON_TITLES, carPlayActionAllowed, carPlayLabels, carPlayMapState, carPlayState, parseCarPlayAction } from '../carplay';
+import { CARPLAY_BUTTON_TITLES, carChat, carChatRows, carPlayActionAllowed, carPlayLabels, carPlayMapState, carPlayReplies, carPlayState, parseCarPlayAction } from '../carplay';
 import { TRANSLATIONS } from '../translations';
 import { QUICK_REPLIES } from '../chat';
 
@@ -142,5 +142,59 @@ describe('CarPlay in Map Mode (no ride)', () => {
     expect(parseCarPlayAction('open:map')).toEqual({ type: 'open_map' });
     // Map Mode's buttons aren't safety buttons: they need Pro like the rest of CarPlay.
     expect(carPlayActionAllowed({ type: 'open_map' }, false)).toBe(false);
+  });
+});
+
+describe('CarPlay 3.1: group chats, layers and Open Ride Mode', () => {
+  const g = '7d0c9a52-1111-4222-8333-944455556666';
+  it('parses the new car button ids', () => {
+    expect(parseCarPlayAction('open:ride')).toEqual({ type: 'open_ride' });
+    expect(parseCarPlayAction('chats:open')).toEqual({ type: 'chats' });
+    expect(parseCarPlayAction(`chat:${g}`)).toEqual({ type: 'chat', groupId: g });
+    expect(parseCarPlayAction(`chathear:${g}:m1`)).toEqual({ type: 'chat_hear', groupId: g, messageId: 'm1' });
+    expect(parseCarPlayAction(`chatsay:${g}:On My Way: see you`)).toEqual({ type: 'chat_say', groupId: g, body: 'On My Way: see you' });
+    expect(parseCarPlayAction(`chatsay:${g}:  `)).toEqual({ type: 'none' });
+    expect(parseCarPlayAction('chat:')).toEqual({ type: 'none' });
+    expect(parseCarPlayAction('layer:quick:offroad')).toEqual({ type: 'layer', rowId: 'layer:quick:offroad' });
+  });
+
+  it('lists group chats newest first, with unread counts and No Messages Yet', () => {
+    const now = Date.parse('2026-11-13T18:00:00Z');
+    const rows = carChatRows(
+      [{ id: 'a', name: 'Quiet Group' }, { id: 'b', name: 'Trail Crew' }],
+      [{ groupId: 'b', lastBody: 'Fuel stop at the store', lastAt: '2026-11-13T17:55:00Z', unread: 2 }],
+      now,
+    );
+    expect(rows.map((r) => r.title)).toEqual(['Trail Crew', 'Quiet Group']);
+    expect(rows[0].id).toBe('chat:b');
+    expect(rows[0].detail).toBe('2 New · Fuel stop at the store · 5 Min Ago');
+    expect(rows[1].detail).toBe('No Messages Yet');
+  });
+
+  it('builds one chat with hear ids and replies sent as their words', () => {
+    const now = Date.parse('2026-11-13T18:00:00Z');
+    const chat = carChat(
+      { id: g, name: 'Trail Crew' },
+      [
+        { id: 'm1', userId: 'u1', kind: 'chat', body: 'Meet at the gate', sentAt: '2026-11-13T17:50:00Z' },
+        { id: 'm2', userId: 'me', kind: 'chat', body: 'On my way', sentAt: '2026-11-13T17:58:00Z' },
+      ],
+      (u) => (u === 'u1' ? 'Sam' : 'Rider'),
+      'me',
+      now,
+      carPlayReplies(['Gas stop'], QUICK_REPLIES),
+    );
+    expect(chat.title).toBe('Trail Crew');
+    expect(chat.messages.map((m) => m.id)).toEqual([`chathear:${g}:m2`, `chathear:${g}:m1`]);
+    expect(chat.messages[0].title).toBe('You');
+    expect(chat.replies[0].id).toBe(`chatsay:${g}:On My Way`);
+    expect(chat.replies.at(-1)?.id).toBe(`chatsay:${g}:Gas stop`);
+  });
+
+  it('labels carry the new words', () => {
+    const l = carPlayLabels();
+    expect(l.layers).toBe('Layers');
+    expect(l.openRideMode).toBe('Open Ride Mode');
+    expect(l.groupChats).toBe('Group Chats');
   });
 });
