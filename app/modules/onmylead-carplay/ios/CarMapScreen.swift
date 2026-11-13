@@ -314,8 +314,13 @@ final class CarMapViewController: UIViewController {
   /// Draws `data` (nil: just the base map and your position). Builds the map the first time
   /// there is a Mapbox token.
   func show(_ data: CarMapData?) {
-    if let token = data?.token, token.hasPrefix("pk."), MapboxOptions.accessToken.isEmpty {
-      MapboxOptions.accessToken = token
+    if MapboxOptions.accessToken.isEmpty {
+      // The phone's token, or the one the build put in Info.plist (plugins/with-carplay.js), so
+      // the car map draws even when CarPlay starts the app before any phone screen has run.
+      let bundled = Bundle.main.object(forInfoDictionaryKey: "OMLMapboxToken") as? String
+      if let token = [data?.token, bundled].compactMap({ $0 }).first(where: { $0.hasPrefix("pk.") }) {
+        MapboxOptions.accessToken = token
+      }
     }
     guard ensureMap(style: data?.style) else { return }
     if let style = data?.style, style != styleURL, let uri = StyleURI(rawValue: style) {

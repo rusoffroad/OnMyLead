@@ -31,6 +31,13 @@ const { withDangerousMod, withEntitlementsPlist, withInfoPlist } = require('expo
 const ENTITLEMENT = 'com.apple.developer.carplay-driving-task';
 const MAPS_ENTITLEMENT = 'com.apple.developer.carplay-maps';
 const MAPS_KEY = 'OMLCarPlayMaps';
+const TOKEN_KEY = 'OMLMapboxToken';
+
+/** Only a public token (pk.) goes into Info.plist; secret (sk.) tokens never do. */
+function carMapToken(env) {
+  const t = (env.EXPO_PUBLIC_MAPBOX_TOKEN ?? '').trim();
+  return t.startsWith('pk.') ? t : null;
+}
 const MAPS_MARKER = '.oml-carplay-maps';
 const CARPLAY_ROLE = 'CPTemplateApplicationSceneSessionRoleApplication';
 
@@ -67,6 +74,11 @@ function withCarPlay(config, options = {}) {
   return withInfoPlist(config, (c) => {
     if (mapsOn) c.modResults[MAPS_KEY] = true;
     else delete c.modResults[MAPS_KEY];
+    // The public Mapbox token (pk.), so the car map can draw when CarPlay starts the app before
+    // the phone's screens have run. Read from the build's environment; never committed.
+    const token = carMapToken(process.env);
+    if (mapsOn && token) c.modResults[TOKEN_KEY] = token;
+    else delete c.modResults[TOKEN_KEY];
     const manifest = c.modResults.UIApplicationSceneManifest ?? { UISceneConfigurations: {} };
     manifest.UISceneConfigurations = manifest.UISceneConfigurations ?? {};
     if (on) {
@@ -87,3 +99,4 @@ function withCarPlay(config, options = {}) {
 
 module.exports = withCarPlay;
 module.exports.carPlaySwitches = carPlaySwitches;
+module.exports.carMapToken = carMapToken;
