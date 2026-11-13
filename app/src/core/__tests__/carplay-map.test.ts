@@ -14,8 +14,9 @@ import { TRANSLATIONS } from '../translations';
 
 const app = resolve(__dirname, '../../..');
 const require = createRequire(import.meta.url);
-const { carPlaySwitches } = require(join(app, 'plugins/with-carplay.js')) as {
+const { carPlaySwitches, carMapToken } = require(join(app, 'plugins/with-carplay.js')) as {
   carPlaySwitches: (o?: { enabled?: boolean; maps?: boolean }, env?: Record<string, string | undefined>) => { on: boolean; mapsOn: boolean };
+  carMapToken: (env: Record<string, string | undefined>) => string | null;
 };
 
 /** A wiggly line `n` points long, about 11 m between points. */
@@ -121,6 +122,12 @@ describe('car map messages', () => {
 });
 
 describe('car map switch (plugins/with-carplay.js)', () => {
+  it('bundles only a public Mapbox token for a cold CarPlay start', () => {
+    expect(carMapToken({ EXPO_PUBLIC_MAPBOX_TOKEN: ' pk.abc ' })).toBe('pk.abc');
+    expect(carMapToken({ EXPO_PUBLIC_MAPBOX_TOKEN: 'sk.secret' })).toBeNull();
+    expect(carMapToken({})).toBeNull();
+  });
+
   it('is off until Apple grants CarPlay Navigation', () => {
     const plugin = JSON.parse(readFileSync(join(app, 'app.json'), 'utf8')).expo.plugins.find((p: unknown) => Array.isArray(p) && p[0] === './plugins/with-carplay');
     expect(carPlaySwitches(plugin[1], {})).toEqual({ on: true, mapsOn: true });
