@@ -123,7 +123,7 @@ describe('car map messages', () => {
 describe('car map switch (plugins/with-carplay.js)', () => {
   it('is off until Apple grants CarPlay Navigation', () => {
     const plugin = JSON.parse(readFileSync(join(app, 'app.json'), 'utf8')).expo.plugins.find((p: unknown) => Array.isArray(p) && p[0] === './plugins/with-carplay');
-    expect(carPlaySwitches(plugin[1], {})).toEqual({ on: true, mapsOn: false });
+    expect(carPlaySwitches(plugin[1], {})).toEqual({ on: true, mapsOn: true });
   });
 
   it('turns on with maps or ONMYLEAD_CARPLAY_MAPS=1, never without CarPlay itself', () => {

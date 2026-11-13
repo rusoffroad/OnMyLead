@@ -11,6 +11,7 @@ import { feet, feetOrMiles } from './nav-trails';
 import { headingReadout, movingReadout } from './trip-meter';
 import type { LatLng } from './geo';
 import { simplifyLine } from './route';
+import { startManeuvers, stepsLengthM, upcomingManeuvers, type CarManeuver } from './car-maneuvers';
 import { QUICK_REPLIES } from './chat';
 
 export type CarPlayButton = { id: string; title: string; symbol: string };
@@ -303,6 +304,8 @@ export type CarMapGuide = {
   endLat: number;
   endLng: number;
   endName: string;
+  /** Turn-by-turn (core/car-maneuvers): the next step with the distance to it, then the one after. */
+  steps: CarManeuver[];
 };
 
 export type CarMap = {
@@ -375,7 +378,9 @@ export function carMapGuide(i: CarGuideInput): CarMapGuide | null {
   const start = i.points[0];
   const end = i.points[i.points.length - 1];
   const name = i.name ?? tc('Ride Route');
+  const key = `${i.points.length}:${start.lat.toFixed(5)},${start.lng.toFixed(5)}`;
   if (i.onTrail) {
+    const alongM = Math.max(0, stepsLengthM(i.points) - i.remainingM);
     return {
       id: `follow:${name}`,
       instruction: i.name ? tc('Follow {name}', { name: i.name }) : tc('Follow the Ride Route'),
@@ -384,6 +389,7 @@ export function carMapGuide(i: CarGuideInput): CarMapGuide | null {
       endLat: end.lat,
       endLng: end.lng,
       endName: name,
+      steps: upcomingManeuvers(i.points, alongM, i.name, key),
     };
   }
   return {
@@ -394,6 +400,7 @@ export function carMapGuide(i: CarGuideInput): CarMapGuide | null {
     endLat: start.lat,
     endLng: start.lng,
     endName: name,
+    steps: startManeuvers(i.points, i.toStartM, i.name, i.name, key),
   };
 }
 

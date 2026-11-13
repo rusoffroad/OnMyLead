@@ -26,6 +26,14 @@ struct CarMapData: Equatable {
     }
   }
 
+  /// One turn-by-turn step (CarManeuver in src/core/car-maneuvers.ts).
+  struct Step: Equatable {
+    let id: String
+    let turn: String
+    let instruction: String
+    let distanceM: Double
+  }
+
   struct Guide: Equatable {
     let id: String
     let instruction: String
@@ -34,6 +42,8 @@ struct CarMapData: Equatable {
     let endLat: Double
     let endLng: Double
     let endName: String
+    /// Next step first. Empty from an older phone build: the car shows `instruction` alone.
+    let steps: [Step]
   }
 
   let style: String
@@ -78,7 +88,11 @@ struct CarMapData: Equatable {
         remainingS: max(0, CarMapData.num(g["remainingS"]) ?? 0),
         endLat: endLat,
         endLng: endLng,
-        endName: g["endName"] as? String ?? text
+        endName: g["endName"] as? String ?? text,
+        steps: (g["steps"] as? [Any] ?? []).compactMap { item in
+          guard let o = item as? [String: Any], let id = o["id"] as? String, let words = o["instruction"] as? String else { return nil }
+          return Step(id: id, turn: o["turn"] as? String ?? "", instruction: words, distanceM: max(0, CarMapData.num(o["distanceM"]) ?? 0))
+        }
       )
     } else {
       guide = nil

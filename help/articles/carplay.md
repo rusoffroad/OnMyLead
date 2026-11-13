@@ -4,7 +4,7 @@ summary: During a ride, OnMyLead shows on your car's CarPlay screen with one-tap
 category: ride-mode
 order: 46
 release: "2.1"
-updated: 2026-11-12
+updated: 2026-11-13
 sources:
   - app/modules/onmylead-carplay/**
   - app/plugins/with-carplay.js
@@ -83,17 +83,22 @@ When Map Mode is open on your phone and no ride is in Ride Mode, the car screen 
 - When you're following a trail: the trail's name and the miles **Left on Trail**, or how far it is **To the Start**.
 - When you're recording a trail: **Recording** or **Paused** with its length so far, and a **Pause** or **Resume** button.
 
-The map itself stays on your phone. Apple only lets navigation apps draw maps on a CarPlay screen. Open Ride Mode and the car screen switches to your ride; close it and Map Mode comes back.
+Open Ride Mode and the car screen switches to your ride; close it and Map Mode comes back.
 :::
 
-:::release carplay-map
+:::until 3.1
+The map itself stays on your phone. Apple only lets navigation apps draw maps on a CarPlay screen.
+:::
+
+:::release 3.1
 ## The Map on the Car Screen
 
 The car screen shows the OnMyLead map, in your Map Style, with your position and the direction you're heading. The map turns as you drive, so the way ahead is up.
 
 - **During a ride:** the ride route, the Leader Trackline, and every rider who is sharing. A hollow dot means that's only where a rider was last seen, not where they are now. A colored ring means the rider is separated or asked for help.
 - **In Map Mode:** the trail you're following and the trail you're recording.
-- **Guidance:** while you follow a trail or the ride route, the top of the screen says **Follow** and the trail's name, with the miles and time left. Off the trail, it says **Head to the Start** with how far it is.
+- **Turn-by-turn:** while you follow a trail or the ride route, the top of the screen shows the next turn with an arrow and how far away it is (**Bear Left**, **Turn Right**, **Sharp Left**, **Make a U-Turn**), then the turn after it, and finally **Arrive at the End of** the trail. The turns come from the shape of the trail itself, so they work on any trail, with or without service. Gentle curves aren't called out. Below that are the miles left, the time left and when you'll get there.
+- **Head to the Start:** before you reach the trail, the car says **Head to the Start** and how far it is in a straight line. There are no road directions to the start; use Apple Maps or Google Maps for that (**Directions** on the ride or trail).
 - The buttons on the map zoom in and out, bring the map back to you, and show arrows to move the map. On a touchscreen you can also drag it.
 - **Ride** opens the status buttons and EMERGENCY described above, and **Group** lists the riders. In Map Mode, **Dash** opens your speed, elevation and trip numbers, and **Pause** or **Resume** works your recording.
 - **Exit** at the top left closes Ride Mode or Map Mode on your phone, the same as on the screens without the map.

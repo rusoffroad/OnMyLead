@@ -296,7 +296,7 @@
         "./plugins/with-carplay",
         {
           "enabled": true,
-          "maps": false
+          "maps": true
         }
       ],
       "./plugins/with-sentry",
