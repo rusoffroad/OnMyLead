@@ -1,0 +1,2675 @@
+{
+  "generated": "2026-11-14T16:34:22.046Z",
+  "commit": "9cb022c110c955413fdc9d915e51c002475cb3a9",
+  "features": 130,
+  "columns": {
+    "iPhone": {
+      "counts": {
+        "✅": 49,
+        "🟡": 73,
+        "🔨": 4,
+        "⬜": 0,
+        "➖": 4
+      },
+      "open": [
+        {
+          "id": "F01a",
+          "feature": "Show Password eye button on every password box (Sign In, Create Account, New Password, admin sign-in)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F09",
+          "feature": "Edit Ride Details (2.1): the organizer or a co-organizer changes a ride's name, day, times, meeting point, state, description and every detail after creating it (Edit Ride Details in You're Organizing, /ride/[id]/edit); riders get the existing new time / new meeting spot notifications and the ride page shows \"Updated 5 min Ago: New Time\" for a week; once live only the name and details change",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29a",
+          "feature": "Waypoint symbols: 15 symbols (Spot, Camp, Fuel, Water, Food, Viewpoint, Photo Spot, Hazard, Water Crossing, Gate, Trailhead, Parking, Restroom, First Aid, Repair) on every map, list, planned stop and the website",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38a",
+          "feature": "Starlink Mini Mount V2 ad on the Starlink page (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F48",
+          "feature": "CarPlay (Ride Mode on the car screen: status buttons, Group list, Regroup Here or Running Late, EMERGENCY with confirm, help-call and separation alerts, in the rider's language; 3.0: Map Mode's dash (speed, elevation, heading, trip, moving, followed trail, recording with Pause/Resume) when no ride is on the car, and Open Map Mode on the waiting screen; next update (3.1, Chris 2026-11-12): Messages button with the ride's messages (newest 12, short previews, tap to hear in the rider's voice) and one-tap replies, built-in plus My Quick Replies (`say:` only sends the rider's own saved text); no typing, no dictation (Siri messaging needs Apple's Communication entitlement, only for apps whose main job is messaging))",
+          "mark": "🟡"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        },
+        {
+          "id": "F55",
+          "feature": "Ride Mode: rider dots on the exact spot at every zoom, easier to see, heading arrows",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56",
+          "feature": "Ride Mode: every rider on the route line in running order, and Full Map",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56b",
+          "feature": "Ride Mode: rider line on Freeride rides (group behind the leader, spread)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56c",
+          "feature": "Ride Mode: leader line with the leader pinned left and the tail gunner pinned right",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56d",
+          "feature": "Ride Mode: group spread ruler under the leader line (2.1)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F57",
+          "feature": "Swipe down to close every sheet",
+          "mark": "🟡"
+        },
+        {
+          "id": "F60",
+          "feature": "Release controls: roll back a bad update",
+          "mark": "🟡"
+        },
+        {
+          "id": "F61",
+          "feature": "Ride Mode: map opens centered on you",
+          "mark": "🟡"
+        },
+        {
+          "id": "F62",
+          "feature": "Badges and ranks (Trail Boss, Tail Gunner, Crew Rider, Mile Eater, Trailblazer, Mapmaker, Trail Scout)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F63",
+          "feature": "Out Riding (who's out riding nearby) and direct messages",
+          "mark": "🟡"
+        },
+        {
+          "id": "F64",
+          "feature": "Friends (friend requests, friend link, friends in Out Riding, message friends)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F65",
+          "feature": "Custom share codes (type your own ride, riding group and friend link code)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F70",
+          "feature": "Navigation Mode (Navigate): offroad map, record / draw / share trails, trail photos, rider trail ratings and auto-hide, distance finder, trails as group ride routes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F71",
+          "feature": "Profile pictures (take, choose, change, remove; shown next to riders' names; admin removal)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F72",
+          "feature": "Accurate location: Precise Location / Google Location Accuracy / rough-fix banner, Android precise + Google Location Accuracy prompts, Approximate Location label for other riders, Ride Bubble ignores the gap a rough fix explains",
+          "mark": "🟡"
+        },
+        {
+          "id": "F73",
+          "feature": "Notifications inbox (bell on the Rides tab: see, open, mark read, clear one or all; clears the device's own notifications and icon badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F74",
+          "feature": "Leave a ride (Your Spot under the ride name with Leave Ride / Withdraw / Leave Waitlist; Ride Mode Exit sheet and Riders; organizer hands off or cancels)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F75",
+          "feature": "Ride Mode custom message (✎ Message: type your own one-line message to the group; My Quick Replies saved on the device)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F76",
+          "feature": "Full Map on every map (Ride Mode, Navigate, Draw a Route, Waypoints, Find a Ride): one button hides the bars and panels; a slim bar with Controls (tap or swipe up) brings them back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F77",
+          "feature": "Update Available by itself: the app checks the App Store or Google Play for a newer version",
+          "mark": "🟡"
+        },
+        {
+          "id": "F78",
+          "feature": "Follow Me on live maps (Ride Mode, Navigate) + the arrow on your own dot",
+          "mark": "🟡"
+        },
+        {
+          "id": "F79",
+          "feature": "Music Controls (Music button in Ride Mode, Navigate and the Ride Mode Full Map bar: play/pause, previous, next, volume; riders can hide it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F80",
+          "feature": "Ride miles match the ride (ride summary, ride card, group totals, Mile Eater badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F81",
+          "feature": "Rider Safety and Liability Agreement (Before You Ride screen on first launch and on onmylead.com after sign-in; re-asked when the version changes; permanent acceptance records; Admin > Rider Agreements with CSV export)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F82",
+          "feature": "Home screen 2.0 (Rides tab): Join a Ride hero with code box (Unlimited), Create a Ride with rides left this month (tap: Pro screen), Find a Ride with the count near you, Map Mode card (Open Map, Map a Custom Trail, Track Line switch, rider trails near you), Your Next Ride / Ride Invites / Past Rides, Your Group card (riders, out riding now, newest group chat message, Group Chat, Plan a Group Ride), Public Rides Near You rail with a remembered distance (50 to 1,000 mi or Anywhere, default 500), Your Badges, Your Toolkit, Help & Support",
+          "mark": "🟡"
+        },
+        {
+          "id": "F83",
+          "feature": "Feed on Home (friends out riding, finished rides, badges, shared trails, group rides posted; last 30 days) with Customize: Show Posts From (Friends / + Follows / + My Groups), kinds on or off, Who Sees Your Activity (Friends Only default / Friends and Followers / Nobody)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F84",
+          "feature": "Map Mode additions: Navigate renamed Map Mode; Measure tab is Draw (Map a Custom Trail) with a How Custom Trails Work sheet (rule numbers from Admin trail_rules via `trail_rules_public`, Don't Show This Again); Track Line (where you've been, a colour per day, 7 days, phone only, also fed by the ride location task); named spots on trails (Obstacle / Hazard / Water Crossing / Viewpoint, up to 30, shared with the trail, shown when following); shared trails now full length with an optional Hide My Start on recordings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F85",
+          "feature": "Social (2.0): like and comment on every Feed item, Social area (Activity / Friends / My Posts; two panes on tablets), rider profiles with a PRO tag, posts with one photo, full-size profile pictures, share to Facebook / Instagram / X; Free = see + like + read comments, Pro = post, comment, share",
+          "mark": "🟡"
+        },
+        {
+          "id": "F86",
+          "feature": "Events (2.0): Events area from a Home card (Coming Up near you, Yours), event page onmylead.com/e/CODE (dates, public place, photos up to 12, details, website, Going / Interested, Share, Directions), Agenda (concerts, raffles, poker runs, shows, food... by day), linked Group Rides with labels and a Ride Manager each (becomes Co-Organizer, invited first if not on the ride), co-hosts (up to 10), Link Only events, cancel / delete, Part of [event] on ride pages, Report This Event; Pro creates, everyone views",
+          "mark": "🟡"
+        },
+        {
+          "id": "F87",
+          "feature": "Pro tags on Pro-only buttons (Free accounts)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F88",
+          "feature": "Natural voice for spoken alerts (You > Voice)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F89",
+          "feature": "Trail width limits: Forest Service 50\" limit from MVUM vehicle classes on the trail card; riders add a width to any public trail (Forest Service, BLM, OpenStreetMap; middle of all entries shown, one entry per rider per line); rider trails show their mapper's Width Limit on the map card; Garage Width (Inches) with \"Your RZR Is Too Wide\" / \"Fits\" on trail cards, public trail pages and the Plan a Group Ride on This Trail banner; the limit is copied into the ride's Instructions for Joined Riders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F90",
+          "feature": "Tilt meter and Crash Alert (2.0, moved up from 2.1 by Chris): Tilt tile (Roll / Pitch, green to amber to red near the rider's limits) under the Map Mode dash and over the Ride Mode map; Tilt screen (rear-view roll dial, side-view pitch dial, max each way, Reset Max, Zero for the phone mount, Clear Zero, Warn Me with Roll / Pitch limits 10-45°, Say It Out Loud, Show in Map Mode and Ride Mode; dials side by side on tablets and in landscape); Crash Alert in Ride Mode (hard hit or rollover while riding, then a stop, starts a 30 s I'm OK countdown with vibration and voice, then the EMERGENCY status plus a Possible Crash chat line through the outbox; Low / Normal / High; on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F91",
+          "feature": "Appearance: Dark / Light / Match Phone, four themes, Color Blind Mode",
+          "mark": "🟡"
+        },
+        {
+          "id": "F97",
+          "feature": "Refer a friend: Invite Friends (You > Settings, Pro screen link), friend link counts as an invite for a new account (7 days), invited friend's first ride (10+ minutes, ended) earns both riders Pro Annual at 50% off year one, claimed as a one-time Apple offer code (redeem link prefilled) on iPhone/iPad, the Google Play `referral-50` developer-determined offer on Android, or a 6-month Play bill deferral for riders already paying on Play; one reward per rider, 6 months to claim; reward card on Pro screen and Invite Friends; inbox notification; Admin > Referrals (totals, recent invites, top inviters, Apple code batch upload/remove, never-rode warning) and a Refer a Friend switch (off by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F96",
+          "feature": "Brand Ambassador and OnMyLead Founder badges (given by OnMyLead, one level, shown beside the name ahead of earned badges; Admin gives and takes it back)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F98",
+          "feature": "Sync across devices: settings follow the account (map style, layers, Follow Me, rider trails, Track Line switch, directions app, music controls, saved quick replies, panel open/folded, Find/Events radius, dismissed notices, Starlink auto-connect; registered for the theme/light/dark/color blind, voice, tilt limits and Crash Alert settings); private backup of Map Mode trails with photos and deletes; offline areas from other devices offered under On Your Other Devices; You > Sync Across Devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F99",
+          "feature": "2.0 Free and Pro tiers (Chris's chart picks): new Pro features custom codes, own messages and quick replies, music controls, poll voting, route builder, waypoints and planned stops, directions, map layers, Map a Custom Trail, saving trails, rating trails, Track Line, named spots, garage build sheet, sync, themes and light mode, picking a voice, and iPad / Android tablet / website; Map Mode free 8 hours per UTC month (server-counted, never while sharing on a group ride, Admin-adjustable); Pro tag on every gated button; tablet and website cover for Free that keeps Join a Ride, the ride page, Ride Mode and the account open",
+          "mark": "🟡"
+        },
+        {
+          "id": "F100",
+          "feature": "App language: 12 languages (English, Spanish, Portuguese, French, German, Italian, Russian, Chinese Simplified, Japanese, Korean, Hindi, Indonesian); Match Phone default (device language, English fallback); flag switcher at the top of Home (signed in or out) and You > Language; choice syncs per account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F101",
+          "feature": "Badge leaderboard (riders ranked by badge levels earned by riding; filter Everywhere / country / state or province; Where You Ride with Use My Location; Show Me on the Leaderboard)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F92",
+          "feature": "3D Terrain map style (Ride Mode and Map Mode): Mapbox satellite on raised ground, contour lines and peak heights in feet, every trail layer, tilt/turn; 3D Terrain in Offline Maps downloads",
+          "mark": "🔨"
+        },
+        {
+          "id": "F103",
+          "feature": "Presented By events (2.1): the owner marks an event as presented by RUS Offroad or another sponsor from Admin > Events (audited); riders see \"Presented by …\" in gold on the event card and a presenter card on the event page, with Shop RUS Offroad when RUS Offroad presents it",
+          "mark": "🟡"
+        },
+        {
+          "id": "F104",
+          "feature": "Tap-and-hold waypoints (2.1): press and hold the map in Ride Mode and Map Mode to drop an editable waypoint; on a live group ride it goes on the ride (leader's shared with everyone), and other riders get a New Waypoint Alert push with sound (\"Lou added a new waypoint: Fuel Stop\") that opens Ride Mode on it; Map Mode waypoints on your own stay private, on the device, backed up with Sync",
+          "mark": "🟡"
+        },
+        {
+          "id": "F106",
+          "feature": "Faster trail lines on Mapbox maps (2.1): agency (Forest Service, BLM) squares asked as 512-point squares at 1024 px (a quarter of the requests, same sharpness), no fade-in; OpenStreetMap tracks and names drawn by Mapbox from OpenFreeMap vector squares from zoom 13 with a signal; trail names, closures and rider trails load 180 ms after the camera rests instead of waiting for Mapbox idle; BLM routes fixed (BLM moved its service to BLM_Natl_GTLF_Public_Display; the old address answered 404, so BLM lines were missing on every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F107",
+          "feature": "3D Terrain from Map Settings (2.1): the round 3D button (added earlier in 2.1, never shipped) is replaced by the 3D Terrain tile under Map Style in Map Settings (F115)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F108",
+          "feature": "Swipe the map panel down for Full Map (2.1): a long or fast swipe on the panel (Ride Mode, Map Mode, route builder, Waypoints), or a swipe on the folded panel, enters Full Map; tablets with a top panel swipe up; the Full Map bar shows a small grab handle and swipes up to bring everything back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F109",
+          "feature": "Map Features (2.1): the map panel's Roads / Trails / Land switches, each with a sample of its line. Roads: Highways and Freeways (heavy blue), Paved Public Roads (light blue, with route numbers), Dirt Roads (white), Street-Legal Only (lavender, MVUM symbol 3-4). Trails: Off-Road Trails (amber dashes), Width-Limited Trails (orange, MVUM symbols 7-10, 16-17), Hiking Trails (pink dash-dot, thin: Forest Service NFS trails closed to motor vehicles, BLM non-motorized layers 4-5, OpenStreetMap path/bridleway), Closures, Rider Trails. Land (off by default): National Forests, BLM Land, National Parks, State Parks (USGS PAD-US 4.1), Property Lines (Texas StratMap parcels, lines only, no owner names). Tap the map with land on: land card (name, manager, access, acres). Choices synced across devices (map.layers.v1 features; old trailsOn kept for older builds)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F110",
+          "feature": "Scout, places to ride (2.1): Find tab Rides / Places to Ride switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10 to 1,000 miles (250 to start, slider remembered on the device), kind filters, gold place signs on the map, place page (Create a Ride Here, website, Directions, public rides within 15 mi, description, source credit), Suggest a Place (admin approves)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F111",
+          "feature": "Offroad park trails on every map (2.1): the trails of 55 offroad parks and OHV areas mapped in OpenStreetMap (69 listed; 14 have no trails mapped yet) (Hidden Falls Adventure Park with its level 1 to 5 ratings and closed trails, Katemcy Rocks, Wolf Caves, General Sam's, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR, Sand Mountain and more; 3,819 lines, 1,529 miles), drawn for everyone (signed out too) on Ride Mode, Map Mode, route builder, waypoints, Find a Ride and the website, colored by the park's level (green 1-2, blue 3, white 4, red 5, amber unrated, thin white park roads, red dashes closed); park names with trail counts from zoom 7, trail names from zoom 12, tap card (park, name, level, length, one way, OpenStreetMap credit); Park Trails row in Map Features > Trails (free for everyone, like Rider Trails) and You > Park Trails on Maps (synced); parks already seen draw with no signal",
+          "mark": "🟡"
+        },
+        {
+          "id": "F112",
+          "feature": "Rider dot with the arrow built in, follow camera edge rule and Zoom In at Intersections (2.1): every live rider is a glossy disc with a white rim and a white chevron pointing their heading (held for 10 min after they stop, `core/heading` heldHeading); leader biggest in blue, tail gunner next in violet (`RideColors.sweep`), others graphite; your own dot cyan with a beam, arrow from GPS course while moving, the phone's compass when stopped (`lib/compass.ts`), last course on the website. Follow Me: the dot rides through the middle 80% of the open map; the first time it gets within 10% of an edge the map zooms out one step, the next time it centers on the dot and keeps it centered on every fix (`core/follow-camera` followMove, FollowFrame.locked; 2026-11-06 Chris: \"first it zooms out a little, and then if it happens again it centers the dot on the map and follows it\"); Center on Me / resume starts over. Ride Mode's Mapbox map follows Ride Mode's own expo-location fix whenever the map's own location feed is quiet for 4 s (`group-mapbox-map` myFix), so a silent Mapbox location feed can't stop Follow Me. Zoom In at Intersections: junctions found in the road/track/path lines Mapbox has drawn near the rider (`core/intersections`, queryRenderedFeatures; T junctions and crossings, 25° minimum angle), zoom to 17 about 9 s before the junction, back to the old zoom once 35 m past it or after 60 s; look-ahead (3.0, 2026-11-10 Chris: \"zooms in and out too much\"): once 35 m past a junction it looks `JUNCTION_STAY_ZOOMED_MI` (0.25 mi) ahead and, if another junction is there, stays zoomed in and watches that one (its own 60 s limit), so it zooms out once after the last in a run; 3.0.1 (2026-11-10 Chris: \"the dot does not auto adjust ... when approaching 10% of the edge\"): Map Mode's open-map bottom is the measured panel height (`core/full-map` bottomPanelPadding) instead of a fixed 200/360 pt guess that put the edge band ~100 pt under the panel; reproduced and verified with a simulated drive on the iPhone simulator; Ride Mode already used the measured panel (`junctionPassed`, unit tested; real-drive check owed with the 3.0 build); You > Zoom In at Intersections (`map.intersectionZoom.v1`, synced; on by default until 3.1, off by default from 3.1 per Chris 2026-11-13 \"turn off Zoom at intersections for default and allow the user to turn it on\": only a stored '1' turns it on, so riders who never touched it now have it off and riders who turned it on keep it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F113",
+          "feature": "Comment likes and replies, friends' post photos on the Home Feed (2.1): Like on every comment and reply (free); Reply under any comment (Pro, like commenting), one level deep, a reply to a reply joins the same conversation with @name; replies hidden or deleted with their comment; Home Feed posts show the photo as a thumbnail",
+          "mark": "🟡"
+        },
+        {
+          "id": "F114",
+          "feature": "Leader Trackline (2.1): in Ride Mode a line in the leader dot's blue (`rider-puck` puckInk, so Color Blind Mode follows) follows behind the leader on every rider's map and the leader's own, on any ride (route or Freeride); when the leader comes back within 15 m of their own line at least 120 m further back (a crossing, a loop back to the start, doubling back on an out-and-back), everything before that point is drawn faded, thinner and dashed under the fresh solid line (`core/leader-trackline` lastCrossing: segment test on a grid, so widely spaced spots still catch a crossing; 80 m hysteresis so GPS drift on the way back stays one pass; breaks over 400 m are gaps, never straight lines). Leader / organizer switch in the layers panel, Leader Trackline > On for Everyone / Off for Everyone, for the whole ride (`rides.leader_trackline`, `set_leader_trackline`)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F115",
+          "feature": "Map Settings sheet and smooth riding map (2.1): the Layers button (glass circle, blue dot when the map isn't the standard set) opens Map Settings, a sheet from the bottom on phones and docked on the right on tablets in landscape (centered on tablets in portrait), light dim so the map shows each change: Map Style tiles (Satellite, Topo, 3D Terrain as pictures), On the Map switches (Streets and Roads, Off-Road Trails, Hiking Trails, Land Boundaries; `core/map-features` QUICK_LAYERS), Every Map Feature (Fine-Tune), Leader Trackline, Map Buttons on Ride Mode and Map Mode (Follow Me, Zoom In at Intersections on Mapbox, Tilt Meter on the apps, Music Button where available; same synced switches as the You tab), ride map download, Offline Maps. Lag fix: your own dot is Mapbox's native location puck again (the Chevron Puck as images, `assets/images/puck`, made by `app/scripts/puck/make-images.mjs`), course while moving and compass when stopped, instead of a React marker animated ~30 times a second; the intersection lookup asks Mapbox for road and trail lines only (`JUNCTION_QUERY_FILTER`) at most every 2 s; 3D exaggeration redraws in tenths",
+          "mark": "🟡"
+        },
+        {
+          "id": "F116",
+          "feature": "Emergency Siren (2.1 build 10): another rider's EMERGENCY (button, CarPlay or a Crash Alert that went out) sounds a looping siren (`assets/sounds/siren.wav`, made by `scripts/sounds/make-siren.mjs`) on a full-screen card over every screen (`components/emergency-siren.tsx`, rules in `core/siren.ts`, player in `lib/siren.ts`) until Silence Siren or Show Me Where; Ride Mode (Realtime and Bluetooth) and a push while the app is open raise it, a cancel or newer tap ends it, silenced ids are remembered. Closed app: the EMERGENCY push plays the siren (iOS `siren.wav`, time-sensitive; Android channel `ride-emergency`, alarm usage) for phones that set `push_tokens.siren` (migration 20261105070000, `set_push_siren`); older builds keep the plain sound. Bluetooth in the background: local notification with the siren. Switch + Play Siren in Notification Settings (synced `alerts.siren.v1`, on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F117",
+          "feature": "Group Photos (2.1): the rider who made a riding group takes (camera, apps) or chooses a photo for it, changes or removes it (`components/group-photo-editor.tsx` on the group page); cropped to 16:9 (Android crop screen at 16:9; iPhone/iPad/web centered by `core/group-photo.ts` `aspectCrop`, unit tested) and saved as a 1280 x 720 JPEG under 400 KB. Shown by `components/group-photo.tsx`: wide banner on the group page (tap for full size) and the invite link /g/CODE (app and website), 56/48/44 px thumbnails on Riding Groups, the Home Your Group card and Invite a Group; initials when there is none. Admin > Users > rider: Riding Groups They Run, with Remove Group Photo (reason, audit log).",
+          "mark": "🟡"
+        },
+        {
+          "id": "F118",
+          "feature": "2.1 Pro features and launch trial (Chris 2026-11-05): Bluetooth Sharing with no service (`bluetooth_sharing`: on Free the phone relays every packet and still sends and hears every status tap, including EMERGENCY, Need Help and Crash Alerts (`core/nearby` nearbyFreeAllows lets every status through, `lib/nearby` setNearbyRelayOnly); seeing spots, sending its own spot and messages need Pro; Pro tag on the You switch and Ride Mode chip), customizing Your Dot (`custom_dot`: Dot Style/Size pickers ask for Pro; Free draws the Red, White and Blue dot at Medium, saved pick kept), group photo upload (`group_photos`: Take/Choose Photo ask for Pro; seeing and removing stay free), CarPlay (`carplay`: Free's car screen shows an information-only \"CarPlay Is Part of OnMyLead Pro\" notice, no purchase in the car); feature_plans rows in migration 20261105090000 so Admin > Settings can move each back to Free; `start_pro_launch_trials(30)` (owner-only, once) gives every rider without Pro a fresh 30-day trial, run in Chris's server block; Home shows the trial end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F119",
+          "feature": "App version on Home and the launch screen (2.1): the very bottom of Home shows \"Version 2.1 (10)\" small and muted (version from app.json, build from iOS buildNumber / Android versionCode; `core/app-versions` versionLabel, `lib/app-update` appVersionLabel), under the two columns on tablets; on a cold start the native launch screen hands over to `components/launch-cover.tsx`, a copy of it (same background and logo size) with the version at the bottom, for the rest of the 1.8 s launch minimum, then it fades",
+          "mark": "🟡"
+        },
+        {
+          "id": "F120",
+          "feature": "Invite a Group on events (3.0): an event's hosts and co-hosts tap Invite All next to a saved riding group on the event page; everyone in the group gets a notification (and inbox row) that opens the event, where they pick Going or Interested",
+          "mark": "🟡"
+        },
+        {
+          "id": "F121",
+          "feature": "Ad measurement for OnMyLead's Meta, Google and TikTok ads (3.0, Chris 2026-11-07): install, sign-up, Pro trial and Pro purchase conversions, only with the rider's OK",
+          "mark": "🔨"
+        },
+        {
+          "id": "F122",
+          "feature": "Photo crop on every upload (3.0): every photo a rider adds opens the crop screen first (`components/photo-cropper.tsx` usePhotoCrop, math in `core/photo-crop.ts`, crop/save in `lib/photo-crop.ts` with expo-image-manipulator): drag, pinch, double-tap, - / + buttons, Reset; website mouse wheel, trackpad pinch, arrow keys, +/-, Enter, Esc. Locked frames: profile picture 1:1 with a circle guide, group photo 16:9, garage 4:3; free shape (Original, Square, 4:3, 16:9, 4:5) for post, event (one by one, Use the Rest As They Are), trail and contact screenshot. Native picker editing turned off everywhere so all devices crop the same (iPhone/iPad/web group photos no longer centre-cropped). Phone portrait: controls under the photo; tablets and landscape phones: side panel",
+          "mark": "🟡"
+        },
+        {
+          "id": "F123",
+          "feature": "Where riders found us (3.0, Chris 2026-11-10: \"track how many downloads, and where they found us\"): Home's one-time How Did You Find OnMyLead? question, website ad/link campaign capture, Admin Signups and Downloads card",
+          "mark": "🔨"
+        },
+        {
+          "id": "F124",
+          "feature": "3.0 redesign: refined Night Navy with visible tile edges; Home on a satellite map header with Map Mode first (Ride Solo, trails near you), red Join a Ride hero (code box, QR help), Start a Ride and Events tiles, your badges and rank over the map just above the greeting, then rider-chosen sections (Out Riding Now, Up Next, Your Group, Feed by default; Public Rides, Past Rides optional), then Your Toolkit always at the bottom with Customize Home (show/hide, move up/down, Reset to Default, synced `home.layout.v1`); five tabs Home, Rides, raised blue Map Mode key, Events, Social (Riding Groups inside Social, You from the Home avatar and the tablet rail); Map Mode Solo tag and Make It a Group Ride (Pro `trail_rides`: recorded or followed trail as route, current spot as meet point via `/ride/new`); Title Case greetings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F125",
+          "feature": "Starlink on Home (3.0, Chris 2026-11-10: \"If a starlink is connected, show some basic information about that on the home screen ... show how many people are connected\"): a Starlink card under Start a Ride and Events with the dish's state, Down, Up, Latency, Sky Blocked and devices connected; tap opens the Starlink page; hidden whenever no dish answers",
+          "mark": "🟡"
+        },
+        {
+          "id": "F126",
+          "feature": "CarPlay map (Chris 2026-11-12: \"thats the whole point of it, showing the map on carplay\"; Apple granted CarPlay Navigation 2026-11-13, Case-ID 23473467): the car screen is a CPMapTemplate over a Mapbox map in the car window (rider's Map Style, flat): your position (course up), the ride route and Leader Trackline or Map Mode's followed trail and recording, other riders as dots (hollow when only last seen, ring when separated or asking for help); turn-by-turn via CPNavigationSession: the next step and the one after (Bear/Turn/Sharp Left or Right, Make a U-Turn, Arrive at the End of <trail>, Head to the Start), found from the line's own shape (`core/car-maneuvers.ts`), with distance to the step and miles/time left; zoom, recenter, panning arrows and touch drag; bar buttons Ride (one-tap grid with Group), Dash (Pause/Resume as its first row) and Exit on the left, Layers and Messages on the right; Open Map Mode and, while the phone shares on a ride, Open Ride Mode when nothing is open. Trails and roads (Chris 2026-11-13 truck test): the rider's Map Features as Mapbox style layers (`core/car-layers.ts` carTrails: agency raster squares + OpenStreetMap vector roads/tracks/names), switched from the car's Layers list (four quick switches + Closures, Width-Limited, Street-Legal; saved to `map.layers.v1` so every map follows). Messages with no ride: the rider's group chats (newest first, unread count), a chat's newest messages (tap to hear), one-tap replies sent to the group (`components/carplay-home.tsx`); during a ride the Messages list has a Group Chats row too (Chris 2026-11-13: no group chats seen during a ride). Rider line (Chris 2026-11-13: \"the Ryder tracker bar\"): `core/carplay.ts` carRiderBar sends the phone strip's convoy layout (leader left, tail gunner right, last seen hollow, help ring) and the spread label; `CarRiderBarView` draws it as a capsule along the bottom of the car map's safe area, not tappable (Apple: no controls on the map), names in Ride > Group. Free gets the Pro notice",
+          "mark": "🔨"
+        },
+        {
+          "id": "F127",
+          "feature": "Exit Map Mode and Ride Mode (Chris 2026-11-12: \"a back button or some easy and intuitive way to exit any map mode or group ride mode\"): **‹ Exit** at the top left of both screens, a round **‹** in the map's top-left corner in Full Map (moved from the bar's left end 2026-11-14, Chris on build 16; Map Settings sits right of it), Android Back (closes Full Map or search first), and Exit on the CarPlay screen",
+          "mark": "🟡"
+        },
+        {
+          "id": "F128",
+          "feature": "Events and Group Rides (3.1, Chris 2026-11-14: \"rename events, Events and Group Rides\"): the Events area, its Home tile and screen title renamed; one switch at the top for Events, Group Rides (public rides near you, nearest first, Rides tab cards, same distance chip; See Them on the Map) and Yours; Create makes a public ride on Group Rides; `/events?show=rides` opens on Group Rides; tab bar keeps the short label Events (screen readers hear the full name)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F129",
+          "feature": "Ride Mode: floating map buttons in one even grid (3.1, Chris 2026-11-14 on build 17: \"fix all the buttons at the bottom so that they're uniform\")",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "iPad": {
+      "counts": {
+        "✅": 1,
+        "🟡": 117,
+        "🔨": 3,
+        "⬜": 4,
+        "➖": 5
+      },
+      "open": [
+        {
+          "id": "F01",
+          "feature": "Email sign-up, sign-in, reset, email link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F01a",
+          "feature": "Show Password eye button on every password box (Sign In, Create Account, New Password, admin sign-in)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F02",
+          "feature": "Sign in with Apple",
+          "mark": "🟡"
+        },
+        {
+          "id": "F03",
+          "feature": "Sign in with Google",
+          "mark": "🟡"
+        },
+        {
+          "id": "F04",
+          "feature": "Sign in with Facebook",
+          "mark": "🟡"
+        },
+        {
+          "id": "F05",
+          "feature": "Ride name, social profile",
+          "mark": "🟡"
+        },
+        {
+          "id": "F06",
+          "feature": "Delete account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F07",
+          "feature": "Create a ride (app and website)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F08",
+          "feature": "Free ride limit (1 a month)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F09",
+          "feature": "Edit Ride Details (2.1): the organizer or a co-organizer changes a ride's name, day, times, meeting point, state, description and every detail after creating it (Edit Ride Details in You're Organizing, /ride/[id]/edit); riders get the existing new time / new meeting spot notifications and the ride page shows \"Updated 5 min Ago: New Time\" for a week; once live only the name and details change",
+          "mark": "🟡"
+        },
+        {
+          "id": "F10",
+          "feature": "Cancel, delete, end ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F11",
+          "feature": "Organizer controls: approvals, hand-off, leaders, tail gunner",
+          "mark": "🟡"
+        },
+        {
+          "id": "F12",
+          "feature": "Ride page, Ride Day weather, fuel check",
+          "mark": "🟡"
+        },
+        {
+          "id": "F13",
+          "feature": "Join: code, link, QR, waitlist, check-in",
+          "mark": "🟡"
+        },
+        {
+          "id": "F14",
+          "feature": "Universal / App Links (onmylead.com/r, /g)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F15",
+          "feature": "Invite card: share, text, email, QR",
+          "mark": "🟡"
+        },
+        {
+          "id": "F16",
+          "feature": "Find a Ride (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F17",
+          "feature": "Ride Mode live map",
+          "mark": "🟡"
+        },
+        {
+          "id": "F18",
+          "feature": "Live location sharing (foreground)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F19",
+          "feature": "Background location during a ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F20",
+          "feature": "Wi-Fi-only tablets (no GPS)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F21",
+          "feature": "Personal sharing, family link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F22",
+          "feature": "Freshness, Ride Bubble, convoy",
+          "mark": "🟡"
+        },
+        {
+          "id": "F23",
+          "feature": "Status buttons, broadcast receipts, regroup, Mechanical Issue, SOS",
+          "mark": "🟡"
+        },
+        {
+          "id": "F24",
+          "feature": "Ride chat (everyone / leader)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F25",
+          "feature": "Ride polls (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F26",
+          "feature": "Route builder, trail snapping",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27",
+          "feature": "Maps (satellite, topo, trails layers)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F28",
+          "feature": "GPX import",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29",
+          "feature": "Waypoints, planned stops",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29a",
+          "feature": "Waypoint symbols: 15 symbols (Spot, Camp, Fuel, Water, Food, Viewpoint, Photo Spot, Hazard, Water Crossing, Gate, Trailhead, Parking, Restroom, First Aid, Repair) on every map, list, planned stop and the website",
+          "mark": "🟡"
+        },
+        {
+          "id": "F30",
+          "feature": "Directions hand-off",
+          "mark": "🟡"
+        },
+        {
+          "id": "F31",
+          "feature": "Offline maps",
+          "mark": "🟡"
+        },
+        {
+          "id": "F32",
+          "feature": "Place search",
+          "mark": "🟡"
+        },
+        {
+          "id": "F33",
+          "feature": "Riding groups, group chat, follow leaders",
+          "mark": "⬜"
+        },
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F35",
+          "feature": "Garage, fuel range",
+          "mark": "⬜"
+        },
+        {
+          "id": "F36",
+          "feature": "Trip planner (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F37",
+          "feature": "Starlink (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38",
+          "feature": "RUS gear (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38a",
+          "feature": "Starlink Mini Mount V2 ad on the Starlink page (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F39",
+          "feature": "Ride summary, share card, ride again",
+          "mark": "🟡"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F41",
+          "feature": "Notification settings, quiet hours",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F44",
+          "feature": "30-day Pro trial",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F49",
+          "feature": "Keyboard Done bar / dismiss",
+          "mark": "🟡"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        },
+        {
+          "id": "F55",
+          "feature": "Ride Mode: rider dots on the exact spot at every zoom, easier to see, heading arrows",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56",
+          "feature": "Ride Mode: every rider on the route line in running order, and Full Map",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56b",
+          "feature": "Ride Mode: rider line on Freeride rides (group behind the leader, spread)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56c",
+          "feature": "Ride Mode: leader line with the leader pinned left and the tail gunner pinned right",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56d",
+          "feature": "Ride Mode: group spread ruler under the leader line (2.1)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F57",
+          "feature": "Swipe down to close every sheet",
+          "mark": "🟡"
+        },
+        {
+          "id": "F60",
+          "feature": "Release controls: roll back a bad update",
+          "mark": "🟡"
+        },
+        {
+          "id": "F61",
+          "feature": "Ride Mode: map opens centered on you",
+          "mark": "🟡"
+        },
+        {
+          "id": "F62",
+          "feature": "Badges and ranks (Trail Boss, Tail Gunner, Crew Rider, Mile Eater, Trailblazer, Mapmaker, Trail Scout)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F63",
+          "feature": "Out Riding (who's out riding nearby) and direct messages",
+          "mark": "🟡"
+        },
+        {
+          "id": "F64",
+          "feature": "Friends (friend requests, friend link, friends in Out Riding, message friends)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F65",
+          "feature": "Custom share codes (type your own ride, riding group and friend link code)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F70",
+          "feature": "Navigation Mode (Navigate): offroad map, record / draw / share trails, trail photos, rider trail ratings and auto-hide, distance finder, trails as group ride routes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F71",
+          "feature": "Profile pictures (take, choose, change, remove; shown next to riders' names; admin removal)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F72",
+          "feature": "Accurate location: Precise Location / Google Location Accuracy / rough-fix banner, Android precise + Google Location Accuracy prompts, Approximate Location label for other riders, Ride Bubble ignores the gap a rough fix explains",
+          "mark": "🟡"
+        },
+        {
+          "id": "F73",
+          "feature": "Notifications inbox (bell on the Rides tab: see, open, mark read, clear one or all; clears the device's own notifications and icon badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F74",
+          "feature": "Leave a ride (Your Spot under the ride name with Leave Ride / Withdraw / Leave Waitlist; Ride Mode Exit sheet and Riders; organizer hands off or cancels)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F75",
+          "feature": "Ride Mode custom message (✎ Message: type your own one-line message to the group; My Quick Replies saved on the device)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F76",
+          "feature": "Full Map on every map (Ride Mode, Navigate, Draw a Route, Waypoints, Find a Ride): one button hides the bars and panels; a slim bar with Controls (tap or swipe up) brings them back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F77",
+          "feature": "Update Available by itself: the app checks the App Store or Google Play for a newer version",
+          "mark": "🟡"
+        },
+        {
+          "id": "F78",
+          "feature": "Follow Me on live maps (Ride Mode, Navigate) + the arrow on your own dot",
+          "mark": "🟡"
+        },
+        {
+          "id": "F79",
+          "feature": "Music Controls (Music button in Ride Mode, Navigate and the Ride Mode Full Map bar: play/pause, previous, next, volume; riders can hide it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F80",
+          "feature": "Ride miles match the ride (ride summary, ride card, group totals, Mile Eater badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F81",
+          "feature": "Rider Safety and Liability Agreement (Before You Ride screen on first launch and on onmylead.com after sign-in; re-asked when the version changes; permanent acceptance records; Admin > Rider Agreements with CSV export)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F82",
+          "feature": "Home screen 2.0 (Rides tab): Join a Ride hero with code box (Unlimited), Create a Ride with rides left this month (tap: Pro screen), Find a Ride with the count near you, Map Mode card (Open Map, Map a Custom Trail, Track Line switch, rider trails near you), Your Next Ride / Ride Invites / Past Rides, Your Group card (riders, out riding now, newest group chat message, Group Chat, Plan a Group Ride), Public Rides Near You rail with a remembered distance (50 to 1,000 mi or Anywhere, default 500), Your Badges, Your Toolkit, Help & Support",
+          "mark": "🟡"
+        },
+        {
+          "id": "F83",
+          "feature": "Feed on Home (friends out riding, finished rides, badges, shared trails, group rides posted; last 30 days) with Customize: Show Posts From (Friends / + Follows / + My Groups), kinds on or off, Who Sees Your Activity (Friends Only default / Friends and Followers / Nobody)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F84",
+          "feature": "Map Mode additions: Navigate renamed Map Mode; Measure tab is Draw (Map a Custom Trail) with a How Custom Trails Work sheet (rule numbers from Admin trail_rules via `trail_rules_public`, Don't Show This Again); Track Line (where you've been, a colour per day, 7 days, phone only, also fed by the ride location task); named spots on trails (Obstacle / Hazard / Water Crossing / Viewpoint, up to 30, shared with the trail, shown when following); shared trails now full length with an optional Hide My Start on recordings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F85",
+          "feature": "Social (2.0): like and comment on every Feed item, Social area (Activity / Friends / My Posts; two panes on tablets), rider profiles with a PRO tag, posts with one photo, full-size profile pictures, share to Facebook / Instagram / X; Free = see + like + read comments, Pro = post, comment, share",
+          "mark": "🟡"
+        },
+        {
+          "id": "F86",
+          "feature": "Events (2.0): Events area from a Home card (Coming Up near you, Yours), event page onmylead.com/e/CODE (dates, public place, photos up to 12, details, website, Going / Interested, Share, Directions), Agenda (concerts, raffles, poker runs, shows, food... by day), linked Group Rides with labels and a Ride Manager each (becomes Co-Organizer, invited first if not on the ride), co-hosts (up to 10), Link Only events, cancel / delete, Part of [event] on ride pages, Report This Event; Pro creates, everyone views",
+          "mark": "🟡"
+        },
+        {
+          "id": "F87",
+          "feature": "Pro tags on Pro-only buttons (Free accounts)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F88",
+          "feature": "Natural voice for spoken alerts (You > Voice)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F89",
+          "feature": "Trail width limits: Forest Service 50\" limit from MVUM vehicle classes on the trail card; riders add a width to any public trail (Forest Service, BLM, OpenStreetMap; middle of all entries shown, one entry per rider per line); rider trails show their mapper's Width Limit on the map card; Garage Width (Inches) with \"Your RZR Is Too Wide\" / \"Fits\" on trail cards, public trail pages and the Plan a Group Ride on This Trail banner; the limit is copied into the ride's Instructions for Joined Riders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F90",
+          "feature": "Tilt meter and Crash Alert (2.0, moved up from 2.1 by Chris): Tilt tile (Roll / Pitch, green to amber to red near the rider's limits) under the Map Mode dash and over the Ride Mode map; Tilt screen (rear-view roll dial, side-view pitch dial, max each way, Reset Max, Zero for the phone mount, Clear Zero, Warn Me with Roll / Pitch limits 10-45°, Say It Out Loud, Show in Map Mode and Ride Mode; dials side by side on tablets and in landscape); Crash Alert in Ride Mode (hard hit or rollover while riding, then a stop, starts a 30 s I'm OK countdown with vibration and voice, then the EMERGENCY status plus a Possible Crash chat line through the outbox; Low / Normal / High; on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F91",
+          "feature": "Appearance: Dark / Light / Match Phone, four themes, Color Blind Mode",
+          "mark": "🟡"
+        },
+        {
+          "id": "F97",
+          "feature": "Refer a friend: Invite Friends (You > Settings, Pro screen link), friend link counts as an invite for a new account (7 days), invited friend's first ride (10+ minutes, ended) earns both riders Pro Annual at 50% off year one, claimed as a one-time Apple offer code (redeem link prefilled) on iPhone/iPad, the Google Play `referral-50` developer-determined offer on Android, or a 6-month Play bill deferral for riders already paying on Play; one reward per rider, 6 months to claim; reward card on Pro screen and Invite Friends; inbox notification; Admin > Referrals (totals, recent invites, top inviters, Apple code batch upload/remove, never-rode warning) and a Refer a Friend switch (off by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F96",
+          "feature": "Brand Ambassador and OnMyLead Founder badges (given by OnMyLead, one level, shown beside the name ahead of earned badges; Admin gives and takes it back)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F98",
+          "feature": "Sync across devices: settings follow the account (map style, layers, Follow Me, rider trails, Track Line switch, directions app, music controls, saved quick replies, panel open/folded, Find/Events radius, dismissed notices, Starlink auto-connect; registered for the theme/light/dark/color blind, voice, tilt limits and Crash Alert settings); private backup of Map Mode trails with photos and deletes; offline areas from other devices offered under On Your Other Devices; You > Sync Across Devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F99",
+          "feature": "2.0 Free and Pro tiers (Chris's chart picks): new Pro features custom codes, own messages and quick replies, music controls, poll voting, route builder, waypoints and planned stops, directions, map layers, Map a Custom Trail, saving trails, rating trails, Track Line, named spots, garage build sheet, sync, themes and light mode, picking a voice, and iPad / Android tablet / website; Map Mode free 8 hours per UTC month (server-counted, never while sharing on a group ride, Admin-adjustable); Pro tag on every gated button; tablet and website cover for Free that keeps Join a Ride, the ride page, Ride Mode and the account open",
+          "mark": "🟡"
+        },
+        {
+          "id": "F100",
+          "feature": "App language: 12 languages (English, Spanish, Portuguese, French, German, Italian, Russian, Chinese Simplified, Japanese, Korean, Hindi, Indonesian); Match Phone default (device language, English fallback); flag switcher at the top of Home (signed in or out) and You > Language; choice syncs per account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F101",
+          "feature": "Badge leaderboard (riders ranked by badge levels earned by riding; filter Everywhere / country / state or province; Where You Ride with Use My Location; Show Me on the Leaderboard)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F102",
+          "feature": "Bluetooth Sharing mesh (2.1): with no service, Ride Mode passes spots (sharing riders only), status taps incl. EMERGENCY (always first), quick replies and typed messages (in up to 6 packets, so a 120-character Ride Mode message is never cut) between riders on the same ride over Bluetooth LE, relayed up to 6 hops, newest spot per rider wins; a phone with service bridges the server's view (spots, taps, messages) to riders with none; delivered/seen receipts travel the mesh and show on the tap card (\"Reached X over Bluetooth\", \"Seen by\", also while Waiting for Signal); chat shows \"Via Bluetooth\"; any phone that gets signal uploads spots, taps, messages and seen receipts; radio idles with service and no peers or on Max Battery Saver; \"Via Bluetooth\" on riders, no-service banner counts nearby phones; You > Bluetooth Sharing switch and a Bluetooth On/Off button on Ride Mode's no-service banner (on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F92",
+          "feature": "3D Terrain map style (Ride Mode and Map Mode): Mapbox satellite on raised ground, contour lines and peak heights in feet, every trail layer, tilt/turn; 3D Terrain in Offline Maps downloads",
+          "mark": "🔨"
+        },
+        {
+          "id": "F103",
+          "feature": "Presented By events (2.1): the owner marks an event as presented by RUS Offroad or another sponsor from Admin > Events (audited); riders see \"Presented by …\" in gold on the event card and a presenter card on the event page, with Shop RUS Offroad when RUS Offroad presents it",
+          "mark": "🟡"
+        },
+        {
+          "id": "F104",
+          "feature": "Tap-and-hold waypoints (2.1): press and hold the map in Ride Mode and Map Mode to drop an editable waypoint; on a live group ride it goes on the ride (leader's shared with everyone), and other riders get a New Waypoint Alert push with sound (\"Lou added a new waypoint: Fuel Stop\") that opens Ride Mode on it; Map Mode waypoints on your own stay private, on the device, backed up with Sync",
+          "mark": "🟡"
+        },
+        {
+          "id": "F105",
+          "feature": "Every map drawn by Mapbox (2.1): Ride Mode, Map Mode, route builder, waypoints, Find a Ride, area picker, meeting point (every device), trail-page previews and website Ride Mode live map; tilting further raises the terrain in 3D; looks Standard (Free) / Satellite / Topo (USGS over Mapbox) / 3D Terrain; 2.0 maps kept as fallback (no token, flag off, no signal outside a saved pack)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F106",
+          "feature": "Faster trail lines on Mapbox maps (2.1): agency (Forest Service, BLM) squares asked as 512-point squares at 1024 px (a quarter of the requests, same sharpness), no fade-in; OpenStreetMap tracks and names drawn by Mapbox from OpenFreeMap vector squares from zoom 13 with a signal; trail names, closures and rider trails load 180 ms after the camera rests instead of waiting for Mapbox idle; BLM routes fixed (BLM moved its service to BLM_Natl_GTLF_Public_Display; the old address answered 404, so BLM lines were missing on every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F107",
+          "feature": "3D Terrain from Map Settings (2.1): the round 3D button (added earlier in 2.1, never shipped) is replaced by the 3D Terrain tile under Map Style in Map Settings (F115)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F108",
+          "feature": "Swipe the map panel down for Full Map (2.1): a long or fast swipe on the panel (Ride Mode, Map Mode, route builder, Waypoints), or a swipe on the folded panel, enters Full Map; tablets with a top panel swipe up; the Full Map bar shows a small grab handle and swipes up to bring everything back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F109",
+          "feature": "Map Features (2.1): the map panel's Roads / Trails / Land switches, each with a sample of its line. Roads: Highways and Freeways (heavy blue), Paved Public Roads (light blue, with route numbers), Dirt Roads (white), Street-Legal Only (lavender, MVUM symbol 3-4). Trails: Off-Road Trails (amber dashes), Width-Limited Trails (orange, MVUM symbols 7-10, 16-17), Hiking Trails (pink dash-dot, thin: Forest Service NFS trails closed to motor vehicles, BLM non-motorized layers 4-5, OpenStreetMap path/bridleway), Closures, Rider Trails. Land (off by default): National Forests, BLM Land, National Parks, State Parks (USGS PAD-US 4.1), Property Lines (Texas StratMap parcels, lines only, no owner names). Tap the map with land on: land card (name, manager, access, acres). Choices synced across devices (map.layers.v1 features; old trailsOn kept for older builds)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F110",
+          "feature": "Scout, places to ride (2.1): Find tab Rides / Places to Ride switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10 to 1,000 miles (250 to start, slider remembered on the device), kind filters, gold place signs on the map, place page (Create a Ride Here, website, Directions, public rides within 15 mi, description, source credit), Suggest a Place (admin approves)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F111",
+          "feature": "Offroad park trails on every map (2.1): the trails of 55 offroad parks and OHV areas mapped in OpenStreetMap (69 listed; 14 have no trails mapped yet) (Hidden Falls Adventure Park with its level 1 to 5 ratings and closed trails, Katemcy Rocks, Wolf Caves, General Sam's, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR, Sand Mountain and more; 3,819 lines, 1,529 miles), drawn for everyone (signed out too) on Ride Mode, Map Mode, route builder, waypoints, Find a Ride and the website, colored by the park's level (green 1-2, blue 3, white 4, red 5, amber unrated, thin white park roads, red dashes closed); park names with trail counts from zoom 7, trail names from zoom 12, tap card (park, name, level, length, one way, OpenStreetMap credit); Park Trails row in Map Features > Trails (free for everyone, like Rider Trails) and You > Park Trails on Maps (synced); parks already seen draw with no signal",
+          "mark": "🟡"
+        },
+        {
+          "id": "F112",
+          "feature": "Rider dot with the arrow built in, follow camera edge rule and Zoom In at Intersections (2.1): every live rider is a glossy disc with a white rim and a white chevron pointing their heading (held for 10 min after they stop, `core/heading` heldHeading); leader biggest in blue, tail gunner next in violet (`RideColors.sweep`), others graphite; your own dot cyan with a beam, arrow from GPS course while moving, the phone's compass when stopped (`lib/compass.ts`), last course on the website. Follow Me: the dot rides through the middle 80% of the open map; the first time it gets within 10% of an edge the map zooms out one step, the next time it centers on the dot and keeps it centered on every fix (`core/follow-camera` followMove, FollowFrame.locked; 2026-11-06 Chris: \"first it zooms out a little, and then if it happens again it centers the dot on the map and follows it\"); Center on Me / resume starts over. Ride Mode's Mapbox map follows Ride Mode's own expo-location fix whenever the map's own location feed is quiet for 4 s (`group-mapbox-map` myFix), so a silent Mapbox location feed can't stop Follow Me. Zoom In at Intersections: junctions found in the road/track/path lines Mapbox has drawn near the rider (`core/intersections`, queryRenderedFeatures; T junctions and crossings, 25° minimum angle), zoom to 17 about 9 s before the junction, back to the old zoom once 35 m past it or after 60 s; look-ahead (3.0, 2026-11-10 Chris: \"zooms in and out too much\"): once 35 m past a junction it looks `JUNCTION_STAY_ZOOMED_MI` (0.25 mi) ahead and, if another junction is there, stays zoomed in and watches that one (its own 60 s limit), so it zooms out once after the last in a run; 3.0.1 (2026-11-10 Chris: \"the dot does not auto adjust ... when approaching 10% of the edge\"): Map Mode's open-map bottom is the measured panel height (`core/full-map` bottomPanelPadding) instead of a fixed 200/360 pt guess that put the edge band ~100 pt under the panel; reproduced and verified with a simulated drive on the iPhone simulator; Ride Mode already used the measured panel (`junctionPassed`, unit tested; real-drive check owed with the 3.0 build); You > Zoom In at Intersections (`map.intersectionZoom.v1`, synced; on by default until 3.1, off by default from 3.1 per Chris 2026-11-13 \"turn off Zoom at intersections for default and allow the user to turn it on\": only a stored '1' turns it on, so riders who never touched it now have it off and riders who turned it on keep it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F113",
+          "feature": "Comment likes and replies, friends' post photos on the Home Feed (2.1): Like on every comment and reply (free); Reply under any comment (Pro, like commenting), one level deep, a reply to a reply joins the same conversation with @name; replies hidden or deleted with their comment; Home Feed posts show the photo as a thumbnail",
+          "mark": "🟡"
+        },
+        {
+          "id": "F114",
+          "feature": "Leader Trackline (2.1): in Ride Mode a line in the leader dot's blue (`rider-puck` puckInk, so Color Blind Mode follows) follows behind the leader on every rider's map and the leader's own, on any ride (route or Freeride); when the leader comes back within 15 m of their own line at least 120 m further back (a crossing, a loop back to the start, doubling back on an out-and-back), everything before that point is drawn faded, thinner and dashed under the fresh solid line (`core/leader-trackline` lastCrossing: segment test on a grid, so widely spaced spots still catch a crossing; 80 m hysteresis so GPS drift on the way back stays one pass; breaks over 400 m are gaps, never straight lines). Leader / organizer switch in the layers panel, Leader Trackline > On for Everyone / Off for Everyone, for the whole ride (`rides.leader_trackline`, `set_leader_trackline`)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F115",
+          "feature": "Map Settings sheet and smooth riding map (2.1): the Layers button (glass circle, blue dot when the map isn't the standard set) opens Map Settings, a sheet from the bottom on phones and docked on the right on tablets in landscape (centered on tablets in portrait), light dim so the map shows each change: Map Style tiles (Satellite, Topo, 3D Terrain as pictures), On the Map switches (Streets and Roads, Off-Road Trails, Hiking Trails, Land Boundaries; `core/map-features` QUICK_LAYERS), Every Map Feature (Fine-Tune), Leader Trackline, Map Buttons on Ride Mode and Map Mode (Follow Me, Zoom In at Intersections on Mapbox, Tilt Meter on the apps, Music Button where available; same synced switches as the You tab), ride map download, Offline Maps. Lag fix: your own dot is Mapbox's native location puck again (the Chevron Puck as images, `assets/images/puck`, made by `app/scripts/puck/make-images.mjs`), course while moving and compass when stopped, instead of a React marker animated ~30 times a second; the intersection lookup asks Mapbox for road and trail lines only (`JUNCTION_QUERY_FILTER`) at most every 2 s; 3D exaggeration redraws in tenths",
+          "mark": "🟡"
+        },
+        {
+          "id": "F116",
+          "feature": "Emergency Siren (2.1 build 10): another rider's EMERGENCY (button, CarPlay or a Crash Alert that went out) sounds a looping siren (`assets/sounds/siren.wav`, made by `scripts/sounds/make-siren.mjs`) on a full-screen card over every screen (`components/emergency-siren.tsx`, rules in `core/siren.ts`, player in `lib/siren.ts`) until Silence Siren or Show Me Where; Ride Mode (Realtime and Bluetooth) and a push while the app is open raise it, a cancel or newer tap ends it, silenced ids are remembered. Closed app: the EMERGENCY push plays the siren (iOS `siren.wav`, time-sensitive; Android channel `ride-emergency`, alarm usage) for phones that set `push_tokens.siren` (migration 20261105070000, `set_push_siren`); older builds keep the plain sound. Bluetooth in the background: local notification with the siren. Switch + Play Siren in Notification Settings (synced `alerts.siren.v1`, on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F117",
+          "feature": "Group Photos (2.1): the rider who made a riding group takes (camera, apps) or chooses a photo for it, changes or removes it (`components/group-photo-editor.tsx` on the group page); cropped to 16:9 (Android crop screen at 16:9; iPhone/iPad/web centered by `core/group-photo.ts` `aspectCrop`, unit tested) and saved as a 1280 x 720 JPEG under 400 KB. Shown by `components/group-photo.tsx`: wide banner on the group page (tap for full size) and the invite link /g/CODE (app and website), 56/48/44 px thumbnails on Riding Groups, the Home Your Group card and Invite a Group; initials when there is none. Admin > Users > rider: Riding Groups They Run, with Remove Group Photo (reason, audit log).",
+          "mark": "🟡"
+        },
+        {
+          "id": "F118",
+          "feature": "2.1 Pro features and launch trial (Chris 2026-11-05): Bluetooth Sharing with no service (`bluetooth_sharing`: on Free the phone relays every packet and still sends and hears every status tap, including EMERGENCY, Need Help and Crash Alerts (`core/nearby` nearbyFreeAllows lets every status through, `lib/nearby` setNearbyRelayOnly); seeing spots, sending its own spot and messages need Pro; Pro tag on the You switch and Ride Mode chip), customizing Your Dot (`custom_dot`: Dot Style/Size pickers ask for Pro; Free draws the Red, White and Blue dot at Medium, saved pick kept), group photo upload (`group_photos`: Take/Choose Photo ask for Pro; seeing and removing stay free), CarPlay (`carplay`: Free's car screen shows an information-only \"CarPlay Is Part of OnMyLead Pro\" notice, no purchase in the car); feature_plans rows in migration 20261105090000 so Admin > Settings can move each back to Free; `start_pro_launch_trials(30)` (owner-only, once) gives every rider without Pro a fresh 30-day trial, run in Chris's server block; Home shows the trial end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F119",
+          "feature": "App version on Home and the launch screen (2.1): the very bottom of Home shows \"Version 2.1 (10)\" small and muted (version from app.json, build from iOS buildNumber / Android versionCode; `core/app-versions` versionLabel, `lib/app-update` appVersionLabel), under the two columns on tablets; on a cold start the native launch screen hands over to `components/launch-cover.tsx`, a copy of it (same background and logo size) with the version at the bottom, for the rest of the 1.8 s launch minimum, then it fades",
+          "mark": "🟡"
+        },
+        {
+          "id": "F120",
+          "feature": "Invite a Group on events (3.0): an event's hosts and co-hosts tap Invite All next to a saved riding group on the event page; everyone in the group gets a notification (and inbox row) that opens the event, where they pick Going or Interested",
+          "mark": "🟡"
+        },
+        {
+          "id": "F121",
+          "feature": "Ad measurement for OnMyLead's Meta, Google and TikTok ads (3.0, Chris 2026-11-07): install, sign-up, Pro trial and Pro purchase conversions, only with the rider's OK",
+          "mark": "🔨"
+        },
+        {
+          "id": "F122",
+          "feature": "Photo crop on every upload (3.0): every photo a rider adds opens the crop screen first (`components/photo-cropper.tsx` usePhotoCrop, math in `core/photo-crop.ts`, crop/save in `lib/photo-crop.ts` with expo-image-manipulator): drag, pinch, double-tap, - / + buttons, Reset; website mouse wheel, trackpad pinch, arrow keys, +/-, Enter, Esc. Locked frames: profile picture 1:1 with a circle guide, group photo 16:9, garage 4:3; free shape (Original, Square, 4:3, 16:9, 4:5) for post, event (one by one, Use the Rest As They Are), trail and contact screenshot. Native picker editing turned off everywhere so all devices crop the same (iPhone/iPad/web group photos no longer centre-cropped). Phone portrait: controls under the photo; tablets and landscape phones: side panel",
+          "mark": "🟡"
+        },
+        {
+          "id": "F123",
+          "feature": "Where riders found us (3.0, Chris 2026-11-10: \"track how many downloads, and where they found us\"): Home's one-time How Did You Find OnMyLead? question, website ad/link campaign capture, Admin Signups and Downloads card",
+          "mark": "🔨"
+        },
+        {
+          "id": "F124",
+          "feature": "3.0 redesign: refined Night Navy with visible tile edges; Home on a satellite map header with Map Mode first (Ride Solo, trails near you), red Join a Ride hero (code box, QR help), Start a Ride and Events tiles, your badges and rank over the map just above the greeting, then rider-chosen sections (Out Riding Now, Up Next, Your Group, Feed by default; Public Rides, Past Rides optional), then Your Toolkit always at the bottom with Customize Home (show/hide, move up/down, Reset to Default, synced `home.layout.v1`); five tabs Home, Rides, raised blue Map Mode key, Events, Social (Riding Groups inside Social, You from the Home avatar and the tablet rail); Map Mode Solo tag and Make It a Group Ride (Pro `trail_rides`: recorded or followed trail as route, current spot as meet point via `/ride/new`); Title Case greetings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F125",
+          "feature": "Starlink on Home (3.0, Chris 2026-11-10: \"If a starlink is connected, show some basic information about that on the home screen ... show how many people are connected\"): a Starlink card under Start a Ride and Events with the dish's state, Down, Up, Latency, Sky Blocked and devices connected; tap opens the Starlink page; hidden whenever no dish answers",
+          "mark": "🟡"
+        },
+        {
+          "id": "F127",
+          "feature": "Exit Map Mode and Ride Mode (Chris 2026-11-12: \"a back button or some easy and intuitive way to exit any map mode or group ride mode\"): **‹ Exit** at the top left of both screens, a round **‹** in the map's top-left corner in Full Map (moved from the bar's left end 2026-11-14, Chris on build 16; Map Settings sits right of it), Android Back (closes Full Map or search first), and Exit on the CarPlay screen",
+          "mark": "🟡"
+        },
+        {
+          "id": "F128",
+          "feature": "Events and Group Rides (3.1, Chris 2026-11-14: \"rename events, Events and Group Rides\"): the Events area, its Home tile and screen title renamed; one switch at the top for Events, Group Rides (public rides near you, nearest first, Rides tab cards, same distance chip; See Them on the Map) and Yours; Create makes a public ride on Group Rides; `/events?show=rides` opens on Group Rides; tab bar keeps the short label Events (screen readers hear the full name)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F129",
+          "feature": "Ride Mode: floating map buttons in one even grid (3.1, Chris 2026-11-14 on build 17: \"fix all the buttons at the bottom so that they're uniform\")",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Android Phone": {
+      "counts": {
+        "✅": 2,
+        "🟡": 115,
+        "🔨": 3,
+        "⬜": 4,
+        "➖": 6
+      },
+      "open": [
+        {
+          "id": "F01",
+          "feature": "Email sign-up, sign-in, reset, email link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F01a",
+          "feature": "Show Password eye button on every password box (Sign In, Create Account, New Password, admin sign-in)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F02",
+          "feature": "Sign in with Apple",
+          "mark": "🟡"
+        },
+        {
+          "id": "F03",
+          "feature": "Sign in with Google",
+          "mark": "⬜"
+        },
+        {
+          "id": "F04",
+          "feature": "Sign in with Facebook",
+          "mark": "🟡"
+        },
+        {
+          "id": "F05",
+          "feature": "Ride name, social profile",
+          "mark": "🟡"
+        },
+        {
+          "id": "F06",
+          "feature": "Delete account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F07",
+          "feature": "Create a ride (app and website)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F08",
+          "feature": "Free ride limit (1 a month)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F09",
+          "feature": "Edit Ride Details (2.1): the organizer or a co-organizer changes a ride's name, day, times, meeting point, state, description and every detail after creating it (Edit Ride Details in You're Organizing, /ride/[id]/edit); riders get the existing new time / new meeting spot notifications and the ride page shows \"Updated 5 min Ago: New Time\" for a week; once live only the name and details change",
+          "mark": "🟡"
+        },
+        {
+          "id": "F10",
+          "feature": "Cancel, delete, end ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F11",
+          "feature": "Organizer controls: approvals, hand-off, leaders, tail gunner",
+          "mark": "🟡"
+        },
+        {
+          "id": "F12",
+          "feature": "Ride page, Ride Day weather, fuel check",
+          "mark": "🟡"
+        },
+        {
+          "id": "F13",
+          "feature": "Join: code, link, QR, waitlist, check-in",
+          "mark": "🟡"
+        },
+        {
+          "id": "F14",
+          "feature": "Universal / App Links (onmylead.com/r, /g)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F15",
+          "feature": "Invite card: share, text, email, QR",
+          "mark": "🟡"
+        },
+        {
+          "id": "F16",
+          "feature": "Find a Ride (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F17",
+          "feature": "Ride Mode live map",
+          "mark": "⬜"
+        },
+        {
+          "id": "F18",
+          "feature": "Live location sharing (foreground)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F19",
+          "feature": "Background location during a ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21",
+          "feature": "Personal sharing, family link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F22",
+          "feature": "Freshness, Ride Bubble, convoy",
+          "mark": "🟡"
+        },
+        {
+          "id": "F23",
+          "feature": "Status buttons, broadcast receipts, regroup, Mechanical Issue, SOS",
+          "mark": "🟡"
+        },
+        {
+          "id": "F24",
+          "feature": "Ride chat (everyone / leader)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F25",
+          "feature": "Ride polls (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F26",
+          "feature": "Route builder, trail snapping",
+          "mark": "⬜"
+        },
+        {
+          "id": "F27",
+          "feature": "Maps (satellite, topo, trails layers)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F28",
+          "feature": "GPX import",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29",
+          "feature": "Waypoints, planned stops",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29a",
+          "feature": "Waypoint symbols: 15 symbols (Spot, Camp, Fuel, Water, Food, Viewpoint, Photo Spot, Hazard, Water Crossing, Gate, Trailhead, Parking, Restroom, First Aid, Repair) on every map, list, planned stop and the website",
+          "mark": "🟡"
+        },
+        {
+          "id": "F30",
+          "feature": "Directions hand-off",
+          "mark": "🟡"
+        },
+        {
+          "id": "F31",
+          "feature": "Offline maps",
+          "mark": "🟡"
+        },
+        {
+          "id": "F32",
+          "feature": "Place search",
+          "mark": "🟡"
+        },
+        {
+          "id": "F33",
+          "feature": "Riding groups, group chat, follow leaders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F35",
+          "feature": "Garage, fuel range",
+          "mark": "🟡"
+        },
+        {
+          "id": "F36",
+          "feature": "Trip planner (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F37",
+          "feature": "Starlink (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38",
+          "feature": "RUS gear (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38a",
+          "feature": "Starlink Mini Mount V2 ad on the Starlink page (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F39",
+          "feature": "Ride summary, share card, ride again",
+          "mark": "🟡"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F41",
+          "feature": "Notification settings, quiet hours",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F44",
+          "feature": "30-day Pro trial",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F49",
+          "feature": "Keyboard Done bar / dismiss",
+          "mark": "🟡"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        },
+        {
+          "id": "F55",
+          "feature": "Ride Mode: rider dots on the exact spot at every zoom, easier to see, heading arrows",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56",
+          "feature": "Ride Mode: every rider on the route line in running order, and Full Map",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56b",
+          "feature": "Ride Mode: rider line on Freeride rides (group behind the leader, spread)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56c",
+          "feature": "Ride Mode: leader line with the leader pinned left and the tail gunner pinned right",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56d",
+          "feature": "Ride Mode: group spread ruler under the leader line (2.1)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F57",
+          "feature": "Swipe down to close every sheet",
+          "mark": "🟡"
+        },
+        {
+          "id": "F60",
+          "feature": "Release controls: roll back a bad update",
+          "mark": "🟡"
+        },
+        {
+          "id": "F61",
+          "feature": "Ride Mode: map opens centered on you",
+          "mark": "🟡"
+        },
+        {
+          "id": "F62",
+          "feature": "Badges and ranks (Trail Boss, Tail Gunner, Crew Rider, Mile Eater, Trailblazer, Mapmaker, Trail Scout)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F63",
+          "feature": "Out Riding (who's out riding nearby) and direct messages",
+          "mark": "🟡"
+        },
+        {
+          "id": "F64",
+          "feature": "Friends (friend requests, friend link, friends in Out Riding, message friends)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F65",
+          "feature": "Custom share codes (type your own ride, riding group and friend link code)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F70",
+          "feature": "Navigation Mode (Navigate): offroad map, record / draw / share trails, trail photos, rider trail ratings and auto-hide, distance finder, trails as group ride routes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F71",
+          "feature": "Profile pictures (take, choose, change, remove; shown next to riders' names; admin removal)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F72",
+          "feature": "Accurate location: Precise Location / Google Location Accuracy / rough-fix banner, Android precise + Google Location Accuracy prompts, Approximate Location label for other riders, Ride Bubble ignores the gap a rough fix explains",
+          "mark": "🟡"
+        },
+        {
+          "id": "F73",
+          "feature": "Notifications inbox (bell on the Rides tab: see, open, mark read, clear one or all; clears the device's own notifications and icon badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F74",
+          "feature": "Leave a ride (Your Spot under the ride name with Leave Ride / Withdraw / Leave Waitlist; Ride Mode Exit sheet and Riders; organizer hands off or cancels)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F75",
+          "feature": "Ride Mode custom message (✎ Message: type your own one-line message to the group; My Quick Replies saved on the device)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F76",
+          "feature": "Full Map on every map (Ride Mode, Navigate, Draw a Route, Waypoints, Find a Ride): one button hides the bars and panels; a slim bar with Controls (tap or swipe up) brings them back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F77",
+          "feature": "Update Available by itself: the app checks the App Store or Google Play for a newer version",
+          "mark": "🟡"
+        },
+        {
+          "id": "F78",
+          "feature": "Follow Me on live maps (Ride Mode, Navigate) + the arrow on your own dot",
+          "mark": "🟡"
+        },
+        {
+          "id": "F79",
+          "feature": "Music Controls (Music button in Ride Mode, Navigate and the Ride Mode Full Map bar: play/pause, previous, next, volume; riders can hide it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F80",
+          "feature": "Ride miles match the ride (ride summary, ride card, group totals, Mile Eater badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F81",
+          "feature": "Rider Safety and Liability Agreement (Before You Ride screen on first launch and on onmylead.com after sign-in; re-asked when the version changes; permanent acceptance records; Admin > Rider Agreements with CSV export)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F82",
+          "feature": "Home screen 2.0 (Rides tab): Join a Ride hero with code box (Unlimited), Create a Ride with rides left this month (tap: Pro screen), Find a Ride with the count near you, Map Mode card (Open Map, Map a Custom Trail, Track Line switch, rider trails near you), Your Next Ride / Ride Invites / Past Rides, Your Group card (riders, out riding now, newest group chat message, Group Chat, Plan a Group Ride), Public Rides Near You rail with a remembered distance (50 to 1,000 mi or Anywhere, default 500), Your Badges, Your Toolkit, Help & Support",
+          "mark": "🟡"
+        },
+        {
+          "id": "F83",
+          "feature": "Feed on Home (friends out riding, finished rides, badges, shared trails, group rides posted; last 30 days) with Customize: Show Posts From (Friends / + Follows / + My Groups), kinds on or off, Who Sees Your Activity (Friends Only default / Friends and Followers / Nobody)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F84",
+          "feature": "Map Mode additions: Navigate renamed Map Mode; Measure tab is Draw (Map a Custom Trail) with a How Custom Trails Work sheet (rule numbers from Admin trail_rules via `trail_rules_public`, Don't Show This Again); Track Line (where you've been, a colour per day, 7 days, phone only, also fed by the ride location task); named spots on trails (Obstacle / Hazard / Water Crossing / Viewpoint, up to 30, shared with the trail, shown when following); shared trails now full length with an optional Hide My Start on recordings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F85",
+          "feature": "Social (2.0): like and comment on every Feed item, Social area (Activity / Friends / My Posts; two panes on tablets), rider profiles with a PRO tag, posts with one photo, full-size profile pictures, share to Facebook / Instagram / X; Free = see + like + read comments, Pro = post, comment, share",
+          "mark": "🟡"
+        },
+        {
+          "id": "F86",
+          "feature": "Events (2.0): Events area from a Home card (Coming Up near you, Yours), event page onmylead.com/e/CODE (dates, public place, photos up to 12, details, website, Going / Interested, Share, Directions), Agenda (concerts, raffles, poker runs, shows, food... by day), linked Group Rides with labels and a Ride Manager each (becomes Co-Organizer, invited first if not on the ride), co-hosts (up to 10), Link Only events, cancel / delete, Part of [event] on ride pages, Report This Event; Pro creates, everyone views",
+          "mark": "🟡"
+        },
+        {
+          "id": "F87",
+          "feature": "Pro tags on Pro-only buttons (Free accounts)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F88",
+          "feature": "Natural voice for spoken alerts (You > Voice)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F89",
+          "feature": "Trail width limits: Forest Service 50\" limit from MVUM vehicle classes on the trail card; riders add a width to any public trail (Forest Service, BLM, OpenStreetMap; middle of all entries shown, one entry per rider per line); rider trails show their mapper's Width Limit on the map card; Garage Width (Inches) with \"Your RZR Is Too Wide\" / \"Fits\" on trail cards, public trail pages and the Plan a Group Ride on This Trail banner; the limit is copied into the ride's Instructions for Joined Riders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F90",
+          "feature": "Tilt meter and Crash Alert (2.0, moved up from 2.1 by Chris): Tilt tile (Roll / Pitch, green to amber to red near the rider's limits) under the Map Mode dash and over the Ride Mode map; Tilt screen (rear-view roll dial, side-view pitch dial, max each way, Reset Max, Zero for the phone mount, Clear Zero, Warn Me with Roll / Pitch limits 10-45°, Say It Out Loud, Show in Map Mode and Ride Mode; dials side by side on tablets and in landscape); Crash Alert in Ride Mode (hard hit or rollover while riding, then a stop, starts a 30 s I'm OK countdown with vibration and voice, then the EMERGENCY status plus a Possible Crash chat line through the outbox; Low / Normal / High; on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F91",
+          "feature": "Appearance: Dark / Light / Match Phone, four themes, Color Blind Mode",
+          "mark": "🟡"
+        },
+        {
+          "id": "F97",
+          "feature": "Refer a friend: Invite Friends (You > Settings, Pro screen link), friend link counts as an invite for a new account (7 days), invited friend's first ride (10+ minutes, ended) earns both riders Pro Annual at 50% off year one, claimed as a one-time Apple offer code (redeem link prefilled) on iPhone/iPad, the Google Play `referral-50` developer-determined offer on Android, or a 6-month Play bill deferral for riders already paying on Play; one reward per rider, 6 months to claim; reward card on Pro screen and Invite Friends; inbox notification; Admin > Referrals (totals, recent invites, top inviters, Apple code batch upload/remove, never-rode warning) and a Refer a Friend switch (off by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F96",
+          "feature": "Brand Ambassador and OnMyLead Founder badges (given by OnMyLead, one level, shown beside the name ahead of earned badges; Admin gives and takes it back)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F98",
+          "feature": "Sync across devices: settings follow the account (map style, layers, Follow Me, rider trails, Track Line switch, directions app, music controls, saved quick replies, panel open/folded, Find/Events radius, dismissed notices, Starlink auto-connect; registered for the theme/light/dark/color blind, voice, tilt limits and Crash Alert settings); private backup of Map Mode trails with photos and deletes; offline areas from other devices offered under On Your Other Devices; You > Sync Across Devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F99",
+          "feature": "2.0 Free and Pro tiers (Chris's chart picks): new Pro features custom codes, own messages and quick replies, music controls, poll voting, route builder, waypoints and planned stops, directions, map layers, Map a Custom Trail, saving trails, rating trails, Track Line, named spots, garage build sheet, sync, themes and light mode, picking a voice, and iPad / Android tablet / website; Map Mode free 8 hours per UTC month (server-counted, never while sharing on a group ride, Admin-adjustable); Pro tag on every gated button; tablet and website cover for Free that keeps Join a Ride, the ride page, Ride Mode and the account open",
+          "mark": "🟡"
+        },
+        {
+          "id": "F100",
+          "feature": "App language: 12 languages (English, Spanish, Portuguese, French, German, Italian, Russian, Chinese Simplified, Japanese, Korean, Hindi, Indonesian); Match Phone default (device language, English fallback); flag switcher at the top of Home (signed in or out) and You > Language; choice syncs per account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F101",
+          "feature": "Badge leaderboard (riders ranked by badge levels earned by riding; filter Everywhere / country / state or province; Where You Ride with Use My Location; Show Me on the Leaderboard)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F102",
+          "feature": "Bluetooth Sharing mesh (2.1): with no service, Ride Mode passes spots (sharing riders only), status taps incl. EMERGENCY (always first), quick replies and typed messages (in up to 6 packets, so a 120-character Ride Mode message is never cut) between riders on the same ride over Bluetooth LE, relayed up to 6 hops, newest spot per rider wins; a phone with service bridges the server's view (spots, taps, messages) to riders with none; delivered/seen receipts travel the mesh and show on the tap card (\"Reached X over Bluetooth\", \"Seen by\", also while Waiting for Signal); chat shows \"Via Bluetooth\"; any phone that gets signal uploads spots, taps, messages and seen receipts; radio idles with service and no peers or on Max Battery Saver; \"Via Bluetooth\" on riders, no-service banner counts nearby phones; You > Bluetooth Sharing switch and a Bluetooth On/Off button on Ride Mode's no-service banner (on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F92",
+          "feature": "3D Terrain map style (Ride Mode and Map Mode): Mapbox satellite on raised ground, contour lines and peak heights in feet, every trail layer, tilt/turn; 3D Terrain in Offline Maps downloads",
+          "mark": "🔨"
+        },
+        {
+          "id": "F103",
+          "feature": "Presented By events (2.1): the owner marks an event as presented by RUS Offroad or another sponsor from Admin > Events (audited); riders see \"Presented by …\" in gold on the event card and a presenter card on the event page, with Shop RUS Offroad when RUS Offroad presents it",
+          "mark": "🟡"
+        },
+        {
+          "id": "F104",
+          "feature": "Tap-and-hold waypoints (2.1): press and hold the map in Ride Mode and Map Mode to drop an editable waypoint; on a live group ride it goes on the ride (leader's shared with everyone), and other riders get a New Waypoint Alert push with sound (\"Lou added a new waypoint: Fuel Stop\") that opens Ride Mode on it; Map Mode waypoints on your own stay private, on the device, backed up with Sync",
+          "mark": "🟡"
+        },
+        {
+          "id": "F106",
+          "feature": "Faster trail lines on Mapbox maps (2.1): agency (Forest Service, BLM) squares asked as 512-point squares at 1024 px (a quarter of the requests, same sharpness), no fade-in; OpenStreetMap tracks and names drawn by Mapbox from OpenFreeMap vector squares from zoom 13 with a signal; trail names, closures and rider trails load 180 ms after the camera rests instead of waiting for Mapbox idle; BLM routes fixed (BLM moved its service to BLM_Natl_GTLF_Public_Display; the old address answered 404, so BLM lines were missing on every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F107",
+          "feature": "3D Terrain from Map Settings (2.1): the round 3D button (added earlier in 2.1, never shipped) is replaced by the 3D Terrain tile under Map Style in Map Settings (F115)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F108",
+          "feature": "Swipe the map panel down for Full Map (2.1): a long or fast swipe on the panel (Ride Mode, Map Mode, route builder, Waypoints), or a swipe on the folded panel, enters Full Map; tablets with a top panel swipe up; the Full Map bar shows a small grab handle and swipes up to bring everything back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F109",
+          "feature": "Map Features (2.1): the map panel's Roads / Trails / Land switches, each with a sample of its line. Roads: Highways and Freeways (heavy blue), Paved Public Roads (light blue, with route numbers), Dirt Roads (white), Street-Legal Only (lavender, MVUM symbol 3-4). Trails: Off-Road Trails (amber dashes), Width-Limited Trails (orange, MVUM symbols 7-10, 16-17), Hiking Trails (pink dash-dot, thin: Forest Service NFS trails closed to motor vehicles, BLM non-motorized layers 4-5, OpenStreetMap path/bridleway), Closures, Rider Trails. Land (off by default): National Forests, BLM Land, National Parks, State Parks (USGS PAD-US 4.1), Property Lines (Texas StratMap parcels, lines only, no owner names). Tap the map with land on: land card (name, manager, access, acres). Choices synced across devices (map.layers.v1 features; old trailsOn kept for older builds)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F110",
+          "feature": "Scout, places to ride (2.1): Find tab Rides / Places to Ride switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10 to 1,000 miles (250 to start, slider remembered on the device), kind filters, gold place signs on the map, place page (Create a Ride Here, website, Directions, public rides within 15 mi, description, source credit), Suggest a Place (admin approves)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F111",
+          "feature": "Offroad park trails on every map (2.1): the trails of 55 offroad parks and OHV areas mapped in OpenStreetMap (69 listed; 14 have no trails mapped yet) (Hidden Falls Adventure Park with its level 1 to 5 ratings and closed trails, Katemcy Rocks, Wolf Caves, General Sam's, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR, Sand Mountain and more; 3,819 lines, 1,529 miles), drawn for everyone (signed out too) on Ride Mode, Map Mode, route builder, waypoints, Find a Ride and the website, colored by the park's level (green 1-2, blue 3, white 4, red 5, amber unrated, thin white park roads, red dashes closed); park names with trail counts from zoom 7, trail names from zoom 12, tap card (park, name, level, length, one way, OpenStreetMap credit); Park Trails row in Map Features > Trails (free for everyone, like Rider Trails) and You > Park Trails on Maps (synced); parks already seen draw with no signal",
+          "mark": "🟡"
+        },
+        {
+          "id": "F112",
+          "feature": "Rider dot with the arrow built in, follow camera edge rule and Zoom In at Intersections (2.1): every live rider is a glossy disc with a white rim and a white chevron pointing their heading (held for 10 min after they stop, `core/heading` heldHeading); leader biggest in blue, tail gunner next in violet (`RideColors.sweep`), others graphite; your own dot cyan with a beam, arrow from GPS course while moving, the phone's compass when stopped (`lib/compass.ts`), last course on the website. Follow Me: the dot rides through the middle 80% of the open map; the first time it gets within 10% of an edge the map zooms out one step, the next time it centers on the dot and keeps it centered on every fix (`core/follow-camera` followMove, FollowFrame.locked; 2026-11-06 Chris: \"first it zooms out a little, and then if it happens again it centers the dot on the map and follows it\"); Center on Me / resume starts over. Ride Mode's Mapbox map follows Ride Mode's own expo-location fix whenever the map's own location feed is quiet for 4 s (`group-mapbox-map` myFix), so a silent Mapbox location feed can't stop Follow Me. Zoom In at Intersections: junctions found in the road/track/path lines Mapbox has drawn near the rider (`core/intersections`, queryRenderedFeatures; T junctions and crossings, 25° minimum angle), zoom to 17 about 9 s before the junction, back to the old zoom once 35 m past it or after 60 s; look-ahead (3.0, 2026-11-10 Chris: \"zooms in and out too much\"): once 35 m past a junction it looks `JUNCTION_STAY_ZOOMED_MI` (0.25 mi) ahead and, if another junction is there, stays zoomed in and watches that one (its own 60 s limit), so it zooms out once after the last in a run; 3.0.1 (2026-11-10 Chris: \"the dot does not auto adjust ... when approaching 10% of the edge\"): Map Mode's open-map bottom is the measured panel height (`core/full-map` bottomPanelPadding) instead of a fixed 200/360 pt guess that put the edge band ~100 pt under the panel; reproduced and verified with a simulated drive on the iPhone simulator; Ride Mode already used the measured panel (`junctionPassed`, unit tested; real-drive check owed with the 3.0 build); You > Zoom In at Intersections (`map.intersectionZoom.v1`, synced; on by default until 3.1, off by default from 3.1 per Chris 2026-11-13 \"turn off Zoom at intersections for default and allow the user to turn it on\": only a stored '1' turns it on, so riders who never touched it now have it off and riders who turned it on keep it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F113",
+          "feature": "Comment likes and replies, friends' post photos on the Home Feed (2.1): Like on every comment and reply (free); Reply under any comment (Pro, like commenting), one level deep, a reply to a reply joins the same conversation with @name; replies hidden or deleted with their comment; Home Feed posts show the photo as a thumbnail",
+          "mark": "🟡"
+        },
+        {
+          "id": "F114",
+          "feature": "Leader Trackline (2.1): in Ride Mode a line in the leader dot's blue (`rider-puck` puckInk, so Color Blind Mode follows) follows behind the leader on every rider's map and the leader's own, on any ride (route or Freeride); when the leader comes back within 15 m of their own line at least 120 m further back (a crossing, a loop back to the start, doubling back on an out-and-back), everything before that point is drawn faded, thinner and dashed under the fresh solid line (`core/leader-trackline` lastCrossing: segment test on a grid, so widely spaced spots still catch a crossing; 80 m hysteresis so GPS drift on the way back stays one pass; breaks over 400 m are gaps, never straight lines). Leader / organizer switch in the layers panel, Leader Trackline > On for Everyone / Off for Everyone, for the whole ride (`rides.leader_trackline`, `set_leader_trackline`)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F115",
+          "feature": "Map Settings sheet and smooth riding map (2.1): the Layers button (glass circle, blue dot when the map isn't the standard set) opens Map Settings, a sheet from the bottom on phones and docked on the right on tablets in landscape (centered on tablets in portrait), light dim so the map shows each change: Map Style tiles (Satellite, Topo, 3D Terrain as pictures), On the Map switches (Streets and Roads, Off-Road Trails, Hiking Trails, Land Boundaries; `core/map-features` QUICK_LAYERS), Every Map Feature (Fine-Tune), Leader Trackline, Map Buttons on Ride Mode and Map Mode (Follow Me, Zoom In at Intersections on Mapbox, Tilt Meter on the apps, Music Button where available; same synced switches as the You tab), ride map download, Offline Maps. Lag fix: your own dot is Mapbox's native location puck again (the Chevron Puck as images, `assets/images/puck`, made by `app/scripts/puck/make-images.mjs`), course while moving and compass when stopped, instead of a React marker animated ~30 times a second; the intersection lookup asks Mapbox for road and trail lines only (`JUNCTION_QUERY_FILTER`) at most every 2 s; 3D exaggeration redraws in tenths",
+          "mark": "🟡"
+        },
+        {
+          "id": "F116",
+          "feature": "Emergency Siren (2.1 build 10): another rider's EMERGENCY (button, CarPlay or a Crash Alert that went out) sounds a looping siren (`assets/sounds/siren.wav`, made by `scripts/sounds/make-siren.mjs`) on a full-screen card over every screen (`components/emergency-siren.tsx`, rules in `core/siren.ts`, player in `lib/siren.ts`) until Silence Siren or Show Me Where; Ride Mode (Realtime and Bluetooth) and a push while the app is open raise it, a cancel or newer tap ends it, silenced ids are remembered. Closed app: the EMERGENCY push plays the siren (iOS `siren.wav`, time-sensitive; Android channel `ride-emergency`, alarm usage) for phones that set `push_tokens.siren` (migration 20261105070000, `set_push_siren`); older builds keep the plain sound. Bluetooth in the background: local notification with the siren. Switch + Play Siren in Notification Settings (synced `alerts.siren.v1`, on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F117",
+          "feature": "Group Photos (2.1): the rider who made a riding group takes (camera, apps) or chooses a photo for it, changes or removes it (`components/group-photo-editor.tsx` on the group page); cropped to 16:9 (Android crop screen at 16:9; iPhone/iPad/web centered by `core/group-photo.ts` `aspectCrop`, unit tested) and saved as a 1280 x 720 JPEG under 400 KB. Shown by `components/group-photo.tsx`: wide banner on the group page (tap for full size) and the invite link /g/CODE (app and website), 56/48/44 px thumbnails on Riding Groups, the Home Your Group card and Invite a Group; initials when there is none. Admin > Users > rider: Riding Groups They Run, with Remove Group Photo (reason, audit log).",
+          "mark": "🟡"
+        },
+        {
+          "id": "F118",
+          "feature": "2.1 Pro features and launch trial (Chris 2026-11-05): Bluetooth Sharing with no service (`bluetooth_sharing`: on Free the phone relays every packet and still sends and hears every status tap, including EMERGENCY, Need Help and Crash Alerts (`core/nearby` nearbyFreeAllows lets every status through, `lib/nearby` setNearbyRelayOnly); seeing spots, sending its own spot and messages need Pro; Pro tag on the You switch and Ride Mode chip), customizing Your Dot (`custom_dot`: Dot Style/Size pickers ask for Pro; Free draws the Red, White and Blue dot at Medium, saved pick kept), group photo upload (`group_photos`: Take/Choose Photo ask for Pro; seeing and removing stay free), CarPlay (`carplay`: Free's car screen shows an information-only \"CarPlay Is Part of OnMyLead Pro\" notice, no purchase in the car); feature_plans rows in migration 20261105090000 so Admin > Settings can move each back to Free; `start_pro_launch_trials(30)` (owner-only, once) gives every rider without Pro a fresh 30-day trial, run in Chris's server block; Home shows the trial end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F119",
+          "feature": "App version on Home and the launch screen (2.1): the very bottom of Home shows \"Version 2.1 (10)\" small and muted (version from app.json, build from iOS buildNumber / Android versionCode; `core/app-versions` versionLabel, `lib/app-update` appVersionLabel), under the two columns on tablets; on a cold start the native launch screen hands over to `components/launch-cover.tsx`, a copy of it (same background and logo size) with the version at the bottom, for the rest of the 1.8 s launch minimum, then it fades",
+          "mark": "🟡"
+        },
+        {
+          "id": "F120",
+          "feature": "Invite a Group on events (3.0): an event's hosts and co-hosts tap Invite All next to a saved riding group on the event page; everyone in the group gets a notification (and inbox row) that opens the event, where they pick Going or Interested",
+          "mark": "🟡"
+        },
+        {
+          "id": "F121",
+          "feature": "Ad measurement for OnMyLead's Meta, Google and TikTok ads (3.0, Chris 2026-11-07): install, sign-up, Pro trial and Pro purchase conversions, only with the rider's OK",
+          "mark": "🔨"
+        },
+        {
+          "id": "F122",
+          "feature": "Photo crop on every upload (3.0): every photo a rider adds opens the crop screen first (`components/photo-cropper.tsx` usePhotoCrop, math in `core/photo-crop.ts`, crop/save in `lib/photo-crop.ts` with expo-image-manipulator): drag, pinch, double-tap, - / + buttons, Reset; website mouse wheel, trackpad pinch, arrow keys, +/-, Enter, Esc. Locked frames: profile picture 1:1 with a circle guide, group photo 16:9, garage 4:3; free shape (Original, Square, 4:3, 16:9, 4:5) for post, event (one by one, Use the Rest As They Are), trail and contact screenshot. Native picker editing turned off everywhere so all devices crop the same (iPhone/iPad/web group photos no longer centre-cropped). Phone portrait: controls under the photo; tablets and landscape phones: side panel",
+          "mark": "🟡"
+        },
+        {
+          "id": "F123",
+          "feature": "Where riders found us (3.0, Chris 2026-11-10: \"track how many downloads, and where they found us\"): Home's one-time How Did You Find OnMyLead? question, website ad/link campaign capture, Admin Signups and Downloads card",
+          "mark": "🔨"
+        },
+        {
+          "id": "F124",
+          "feature": "3.0 redesign: refined Night Navy with visible tile edges; Home on a satellite map header with Map Mode first (Ride Solo, trails near you), red Join a Ride hero (code box, QR help), Start a Ride and Events tiles, your badges and rank over the map just above the greeting, then rider-chosen sections (Out Riding Now, Up Next, Your Group, Feed by default; Public Rides, Past Rides optional), then Your Toolkit always at the bottom with Customize Home (show/hide, move up/down, Reset to Default, synced `home.layout.v1`); five tabs Home, Rides, raised blue Map Mode key, Events, Social (Riding Groups inside Social, You from the Home avatar and the tablet rail); Map Mode Solo tag and Make It a Group Ride (Pro `trail_rides`: recorded or followed trail as route, current spot as meet point via `/ride/new`); Title Case greetings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F125",
+          "feature": "Starlink on Home (3.0, Chris 2026-11-10: \"If a starlink is connected, show some basic information about that on the home screen ... show how many people are connected\"): a Starlink card under Start a Ride and Events with the dish's state, Down, Up, Latency, Sky Blocked and devices connected; tap opens the Starlink page; hidden whenever no dish answers",
+          "mark": "🟡"
+        },
+        {
+          "id": "F127",
+          "feature": "Exit Map Mode and Ride Mode (Chris 2026-11-12: \"a back button or some easy and intuitive way to exit any map mode or group ride mode\"): **‹ Exit** at the top left of both screens, a round **‹** in the map's top-left corner in Full Map (moved from the bar's left end 2026-11-14, Chris on build 16; Map Settings sits right of it), Android Back (closes Full Map or search first), and Exit on the CarPlay screen",
+          "mark": "🟡"
+        },
+        {
+          "id": "F128",
+          "feature": "Events and Group Rides (3.1, Chris 2026-11-14: \"rename events, Events and Group Rides\"): the Events area, its Home tile and screen title renamed; one switch at the top for Events, Group Rides (public rides near you, nearest first, Rides tab cards, same distance chip; See Them on the Map) and Yours; Create makes a public ride on Group Rides; `/events?show=rides` opens on Group Rides; tab bar keeps the short label Events (screen readers hear the full name)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F129",
+          "feature": "Ride Mode: floating map buttons in one even grid (3.1, Chris 2026-11-14 on build 17: \"fix all the buttons at the bottom so that they're uniform\")",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Android Tablet": {
+      "counts": {
+        "✅": 1,
+        "🟡": 112,
+        "🔨": 3,
+        "⬜": 9,
+        "➖": 5
+      },
+      "open": [
+        {
+          "id": "F01",
+          "feature": "Email sign-up, sign-in, reset, email link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F01a",
+          "feature": "Show Password eye button on every password box (Sign In, Create Account, New Password, admin sign-in)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F02",
+          "feature": "Sign in with Apple",
+          "mark": "🟡"
+        },
+        {
+          "id": "F03",
+          "feature": "Sign in with Google",
+          "mark": "⬜"
+        },
+        {
+          "id": "F04",
+          "feature": "Sign in with Facebook",
+          "mark": "🟡"
+        },
+        {
+          "id": "F05",
+          "feature": "Ride name, social profile",
+          "mark": "🟡"
+        },
+        {
+          "id": "F06",
+          "feature": "Delete account",
+          "mark": "⬜"
+        },
+        {
+          "id": "F07",
+          "feature": "Create a ride (app and website)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F08",
+          "feature": "Free ride limit (1 a month)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F09",
+          "feature": "Edit Ride Details (2.1): the organizer or a co-organizer changes a ride's name, day, times, meeting point, state, description and every detail after creating it (Edit Ride Details in You're Organizing, /ride/[id]/edit); riders get the existing new time / new meeting spot notifications and the ride page shows \"Updated 5 min Ago: New Time\" for a week; once live only the name and details change",
+          "mark": "🟡"
+        },
+        {
+          "id": "F10",
+          "feature": "Cancel, delete, end ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F11",
+          "feature": "Organizer controls: approvals, hand-off, leaders, tail gunner",
+          "mark": "🟡"
+        },
+        {
+          "id": "F12",
+          "feature": "Ride page, Ride Day weather, fuel check",
+          "mark": "🟡"
+        },
+        {
+          "id": "F13",
+          "feature": "Join: code, link, QR, waitlist, check-in",
+          "mark": "🟡"
+        },
+        {
+          "id": "F14",
+          "feature": "Universal / App Links (onmylead.com/r, /g)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F15",
+          "feature": "Invite card: share, text, email, QR",
+          "mark": "🟡"
+        },
+        {
+          "id": "F16",
+          "feature": "Find a Ride (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F17",
+          "feature": "Ride Mode live map",
+          "mark": "⬜"
+        },
+        {
+          "id": "F18",
+          "feature": "Live location sharing (foreground)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F19",
+          "feature": "Background location during a ride",
+          "mark": "🟡"
+        },
+        {
+          "id": "F20",
+          "feature": "Wi-Fi-only tablets (no GPS)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F21",
+          "feature": "Personal sharing, family link",
+          "mark": "🟡"
+        },
+        {
+          "id": "F21a",
+          "feature": "Share until turned off, or until a calendar end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F22",
+          "feature": "Freshness, Ride Bubble, convoy",
+          "mark": "🟡"
+        },
+        {
+          "id": "F23",
+          "feature": "Status buttons, broadcast receipts, regroup, Mechanical Issue, SOS",
+          "mark": "🟡"
+        },
+        {
+          "id": "F24",
+          "feature": "Ride chat (everyone / leader)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F25",
+          "feature": "Ride polls (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F26",
+          "feature": "Route builder, trail snapping",
+          "mark": "⬜"
+        },
+        {
+          "id": "F27",
+          "feature": "Maps (satellite, topo, trails layers)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27a",
+          "feature": "Trail visibility, trail and road names, closures",
+          "mark": "🟡"
+        },
+        {
+          "id": "F27b",
+          "feature": "Trails from farther out, steady lines (Ride Mode and every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F28",
+          "feature": "GPX import",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29",
+          "feature": "Waypoints, planned stops",
+          "mark": "🟡"
+        },
+        {
+          "id": "F29a",
+          "feature": "Waypoint symbols: 15 symbols (Spot, Camp, Fuel, Water, Food, Viewpoint, Photo Spot, Hazard, Water Crossing, Gate, Trailhead, Parking, Restroom, First Aid, Repair) on every map, list, planned stop and the website",
+          "mark": "🟡"
+        },
+        {
+          "id": "F30",
+          "feature": "Directions hand-off",
+          "mark": "🟡"
+        },
+        {
+          "id": "F31",
+          "feature": "Offline maps",
+          "mark": "🟡"
+        },
+        {
+          "id": "F32",
+          "feature": "Place search",
+          "mark": "🟡"
+        },
+        {
+          "id": "F33",
+          "feature": "Riding groups, group chat, follow leaders",
+          "mark": "⬜"
+        },
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F35",
+          "feature": "Garage, fuel range",
+          "mark": "⬜"
+        },
+        {
+          "id": "F36",
+          "feature": "Trip planner (flag)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F37",
+          "feature": "Starlink (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38",
+          "feature": "RUS gear (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F38a",
+          "feature": "Starlink Mini Mount V2 ad on the Starlink page (flag)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F39",
+          "feature": "Ride summary, share card, ride again",
+          "mark": "🟡"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F41",
+          "feature": "Notification settings, quiet hours",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F44",
+          "feature": "30-day Pro trial",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F49",
+          "feature": "Keyboard Done bar / dismiss",
+          "mark": "🟡"
+        },
+        {
+          "id": "F52",
+          "feature": "Battery Saver (location update rate)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F53",
+          "feature": "Ride Mode: Center on Me button",
+          "mark": "🟡"
+        },
+        {
+          "id": "F55",
+          "feature": "Ride Mode: rider dots on the exact spot at every zoom, easier to see, heading arrows",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56",
+          "feature": "Ride Mode: every rider on the route line in running order, and Full Map",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56b",
+          "feature": "Ride Mode: rider line on Freeride rides (group behind the leader, spread)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56c",
+          "feature": "Ride Mode: leader line with the leader pinned left and the tail gunner pinned right",
+          "mark": "🟡"
+        },
+        {
+          "id": "F56d",
+          "feature": "Ride Mode: group spread ruler under the leader line (2.1)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F57",
+          "feature": "Swipe down to close every sheet",
+          "mark": "🟡"
+        },
+        {
+          "id": "F60",
+          "feature": "Release controls: roll back a bad update",
+          "mark": "🟡"
+        },
+        {
+          "id": "F61",
+          "feature": "Ride Mode: map opens centered on you",
+          "mark": "🟡"
+        },
+        {
+          "id": "F62",
+          "feature": "Badges and ranks (Trail Boss, Tail Gunner, Crew Rider, Mile Eater, Trailblazer, Mapmaker, Trail Scout)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F63",
+          "feature": "Out Riding (who's out riding nearby) and direct messages",
+          "mark": "🟡"
+        },
+        {
+          "id": "F64",
+          "feature": "Friends (friend requests, friend link, friends in Out Riding, message friends)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F65",
+          "feature": "Custom share codes (type your own ride, riding group and friend link code)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F70",
+          "feature": "Navigation Mode (Navigate): offroad map, record / draw / share trails, trail photos, rider trail ratings and auto-hide, distance finder, trails as group ride routes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F71",
+          "feature": "Profile pictures (take, choose, change, remove; shown next to riders' names; admin removal)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F72",
+          "feature": "Accurate location: Precise Location / Google Location Accuracy / rough-fix banner, Android precise + Google Location Accuracy prompts, Approximate Location label for other riders, Ride Bubble ignores the gap a rough fix explains",
+          "mark": "🟡"
+        },
+        {
+          "id": "F73",
+          "feature": "Notifications inbox (bell on the Rides tab: see, open, mark read, clear one or all; clears the device's own notifications and icon badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F74",
+          "feature": "Leave a ride (Your Spot under the ride name with Leave Ride / Withdraw / Leave Waitlist; Ride Mode Exit sheet and Riders; organizer hands off or cancels)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F75",
+          "feature": "Ride Mode custom message (✎ Message: type your own one-line message to the group; My Quick Replies saved on the device)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F76",
+          "feature": "Full Map on every map (Ride Mode, Navigate, Draw a Route, Waypoints, Find a Ride): one button hides the bars and panels; a slim bar with Controls (tap or swipe up) brings them back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F77",
+          "feature": "Update Available by itself: the app checks the App Store or Google Play for a newer version",
+          "mark": "🟡"
+        },
+        {
+          "id": "F78",
+          "feature": "Follow Me on live maps (Ride Mode, Navigate) + the arrow on your own dot",
+          "mark": "🟡"
+        },
+        {
+          "id": "F79",
+          "feature": "Music Controls (Music button in Ride Mode, Navigate and the Ride Mode Full Map bar: play/pause, previous, next, volume; riders can hide it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F80",
+          "feature": "Ride miles match the ride (ride summary, ride card, group totals, Mile Eater badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F81",
+          "feature": "Rider Safety and Liability Agreement (Before You Ride screen on first launch and on onmylead.com after sign-in; re-asked when the version changes; permanent acceptance records; Admin > Rider Agreements with CSV export)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F82",
+          "feature": "Home screen 2.0 (Rides tab): Join a Ride hero with code box (Unlimited), Create a Ride with rides left this month (tap: Pro screen), Find a Ride with the count near you, Map Mode card (Open Map, Map a Custom Trail, Track Line switch, rider trails near you), Your Next Ride / Ride Invites / Past Rides, Your Group card (riders, out riding now, newest group chat message, Group Chat, Plan a Group Ride), Public Rides Near You rail with a remembered distance (50 to 1,000 mi or Anywhere, default 500), Your Badges, Your Toolkit, Help & Support",
+          "mark": "🟡"
+        },
+        {
+          "id": "F83",
+          "feature": "Feed on Home (friends out riding, finished rides, badges, shared trails, group rides posted; last 30 days) with Customize: Show Posts From (Friends / + Follows / + My Groups), kinds on or off, Who Sees Your Activity (Friends Only default / Friends and Followers / Nobody)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F84",
+          "feature": "Map Mode additions: Navigate renamed Map Mode; Measure tab is Draw (Map a Custom Trail) with a How Custom Trails Work sheet (rule numbers from Admin trail_rules via `trail_rules_public`, Don't Show This Again); Track Line (where you've been, a colour per day, 7 days, phone only, also fed by the ride location task); named spots on trails (Obstacle / Hazard / Water Crossing / Viewpoint, up to 30, shared with the trail, shown when following); shared trails now full length with an optional Hide My Start on recordings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F85",
+          "feature": "Social (2.0): like and comment on every Feed item, Social area (Activity / Friends / My Posts; two panes on tablets), rider profiles with a PRO tag, posts with one photo, full-size profile pictures, share to Facebook / Instagram / X; Free = see + like + read comments, Pro = post, comment, share",
+          "mark": "🟡"
+        },
+        {
+          "id": "F86",
+          "feature": "Events (2.0): Events area from a Home card (Coming Up near you, Yours), event page onmylead.com/e/CODE (dates, public place, photos up to 12, details, website, Going / Interested, Share, Directions), Agenda (concerts, raffles, poker runs, shows, food... by day), linked Group Rides with labels and a Ride Manager each (becomes Co-Organizer, invited first if not on the ride), co-hosts (up to 10), Link Only events, cancel / delete, Part of [event] on ride pages, Report This Event; Pro creates, everyone views",
+          "mark": "🟡"
+        },
+        {
+          "id": "F87",
+          "feature": "Pro tags on Pro-only buttons (Free accounts)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F88",
+          "feature": "Natural voice for spoken alerts (You > Voice)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F89",
+          "feature": "Trail width limits: Forest Service 50\" limit from MVUM vehicle classes on the trail card; riders add a width to any public trail (Forest Service, BLM, OpenStreetMap; middle of all entries shown, one entry per rider per line); rider trails show their mapper's Width Limit on the map card; Garage Width (Inches) with \"Your RZR Is Too Wide\" / \"Fits\" on trail cards, public trail pages and the Plan a Group Ride on This Trail banner; the limit is copied into the ride's Instructions for Joined Riders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F90",
+          "feature": "Tilt meter and Crash Alert (2.0, moved up from 2.1 by Chris): Tilt tile (Roll / Pitch, green to amber to red near the rider's limits) under the Map Mode dash and over the Ride Mode map; Tilt screen (rear-view roll dial, side-view pitch dial, max each way, Reset Max, Zero for the phone mount, Clear Zero, Warn Me with Roll / Pitch limits 10-45°, Say It Out Loud, Show in Map Mode and Ride Mode; dials side by side on tablets and in landscape); Crash Alert in Ride Mode (hard hit or rollover while riding, then a stop, starts a 30 s I'm OK countdown with vibration and voice, then the EMERGENCY status plus a Possible Crash chat line through the outbox; Low / Normal / High; on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F91",
+          "feature": "Appearance: Dark / Light / Match Phone, four themes, Color Blind Mode",
+          "mark": "🟡"
+        },
+        {
+          "id": "F97",
+          "feature": "Refer a friend: Invite Friends (You > Settings, Pro screen link), friend link counts as an invite for a new account (7 days), invited friend's first ride (10+ minutes, ended) earns both riders Pro Annual at 50% off year one, claimed as a one-time Apple offer code (redeem link prefilled) on iPhone/iPad, the Google Play `referral-50` developer-determined offer on Android, or a 6-month Play bill deferral for riders already paying on Play; one reward per rider, 6 months to claim; reward card on Pro screen and Invite Friends; inbox notification; Admin > Referrals (totals, recent invites, top inviters, Apple code batch upload/remove, never-rode warning) and a Refer a Friend switch (off by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F96",
+          "feature": "Brand Ambassador and OnMyLead Founder badges (given by OnMyLead, one level, shown beside the name ahead of earned badges; Admin gives and takes it back)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F98",
+          "feature": "Sync across devices: settings follow the account (map style, layers, Follow Me, rider trails, Track Line switch, directions app, music controls, saved quick replies, panel open/folded, Find/Events radius, dismissed notices, Starlink auto-connect; registered for the theme/light/dark/color blind, voice, tilt limits and Crash Alert settings); private backup of Map Mode trails with photos and deletes; offline areas from other devices offered under On Your Other Devices; You > Sync Across Devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F99",
+          "feature": "2.0 Free and Pro tiers (Chris's chart picks): new Pro features custom codes, own messages and quick replies, music controls, poll voting, route builder, waypoints and planned stops, directions, map layers, Map a Custom Trail, saving trails, rating trails, Track Line, named spots, garage build sheet, sync, themes and light mode, picking a voice, and iPad / Android tablet / website; Map Mode free 8 hours per UTC month (server-counted, never while sharing on a group ride, Admin-adjustable); Pro tag on every gated button; tablet and website cover for Free that keeps Join a Ride, the ride page, Ride Mode and the account open",
+          "mark": "🟡"
+        },
+        {
+          "id": "F100",
+          "feature": "App language: 12 languages (English, Spanish, Portuguese, French, German, Italian, Russian, Chinese Simplified, Japanese, Korean, Hindi, Indonesian); Match Phone default (device language, English fallback); flag switcher at the top of Home (signed in or out) and You > Language; choice syncs per account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F101",
+          "feature": "Badge leaderboard (riders ranked by badge levels earned by riding; filter Everywhere / country / state or province; Where You Ride with Use My Location; Show Me on the Leaderboard)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F102",
+          "feature": "Bluetooth Sharing mesh (2.1): with no service, Ride Mode passes spots (sharing riders only), status taps incl. EMERGENCY (always first), quick replies and typed messages (in up to 6 packets, so a 120-character Ride Mode message is never cut) between riders on the same ride over Bluetooth LE, relayed up to 6 hops, newest spot per rider wins; a phone with service bridges the server's view (spots, taps, messages) to riders with none; delivered/seen receipts travel the mesh and show on the tap card (\"Reached X over Bluetooth\", \"Seen by\", also while Waiting for Signal); chat shows \"Via Bluetooth\"; any phone that gets signal uploads spots, taps, messages and seen receipts; radio idles with service and no peers or on Max Battery Saver; \"Via Bluetooth\" on riders, no-service banner counts nearby phones; You > Bluetooth Sharing switch and a Bluetooth On/Off button on Ride Mode's no-service banner (on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F92",
+          "feature": "3D Terrain map style (Ride Mode and Map Mode): Mapbox satellite on raised ground, contour lines and peak heights in feet, every trail layer, tilt/turn; 3D Terrain in Offline Maps downloads",
+          "mark": "🔨"
+        },
+        {
+          "id": "F103",
+          "feature": "Presented By events (2.1): the owner marks an event as presented by RUS Offroad or another sponsor from Admin > Events (audited); riders see \"Presented by …\" in gold on the event card and a presenter card on the event page, with Shop RUS Offroad when RUS Offroad presents it",
+          "mark": "🟡"
+        },
+        {
+          "id": "F104",
+          "feature": "Tap-and-hold waypoints (2.1): press and hold the map in Ride Mode and Map Mode to drop an editable waypoint; on a live group ride it goes on the ride (leader's shared with everyone), and other riders get a New Waypoint Alert push with sound (\"Lou added a new waypoint: Fuel Stop\") that opens Ride Mode on it; Map Mode waypoints on your own stay private, on the device, backed up with Sync",
+          "mark": "🟡"
+        },
+        {
+          "id": "F105",
+          "feature": "Every map drawn by Mapbox (2.1): Ride Mode, Map Mode, route builder, waypoints, Find a Ride, area picker, meeting point (every device), trail-page previews and website Ride Mode live map; tilting further raises the terrain in 3D; looks Standard (Free) / Satellite / Topo (USGS over Mapbox) / 3D Terrain; 2.0 maps kept as fallback (no token, flag off, no signal outside a saved pack)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F106",
+          "feature": "Faster trail lines on Mapbox maps (2.1): agency (Forest Service, BLM) squares asked as 512-point squares at 1024 px (a quarter of the requests, same sharpness), no fade-in; OpenStreetMap tracks and names drawn by Mapbox from OpenFreeMap vector squares from zoom 13 with a signal; trail names, closures and rider trails load 180 ms after the camera rests instead of waiting for Mapbox idle; BLM routes fixed (BLM moved its service to BLM_Natl_GTLF_Public_Display; the old address answered 404, so BLM lines were missing on every map)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F107",
+          "feature": "3D Terrain from Map Settings (2.1): the round 3D button (added earlier in 2.1, never shipped) is replaced by the 3D Terrain tile under Map Style in Map Settings (F115)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F108",
+          "feature": "Swipe the map panel down for Full Map (2.1): a long or fast swipe on the panel (Ride Mode, Map Mode, route builder, Waypoints), or a swipe on the folded panel, enters Full Map; tablets with a top panel swipe up; the Full Map bar shows a small grab handle and swipes up to bring everything back",
+          "mark": "🟡"
+        },
+        {
+          "id": "F109",
+          "feature": "Map Features (2.1): the map panel's Roads / Trails / Land switches, each with a sample of its line. Roads: Highways and Freeways (heavy blue), Paved Public Roads (light blue, with route numbers), Dirt Roads (white), Street-Legal Only (lavender, MVUM symbol 3-4). Trails: Off-Road Trails (amber dashes), Width-Limited Trails (orange, MVUM symbols 7-10, 16-17), Hiking Trails (pink dash-dot, thin: Forest Service NFS trails closed to motor vehicles, BLM non-motorized layers 4-5, OpenStreetMap path/bridleway), Closures, Rider Trails. Land (off by default): National Forests, BLM Land, National Parks, State Parks (USGS PAD-US 4.1), Property Lines (Texas StratMap parcels, lines only, no owner names). Tap the map with land on: land card (name, manager, access, acres). Choices synced across devices (map.layers.v1 features; old trailsOn kept for older builds)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F110",
+          "feature": "Scout, places to ride (2.1): Find tab Rides / Places to Ride switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10 to 1,000 miles (250 to start, slider remembered on the device), kind filters, gold place signs on the map, place page (Create a Ride Here, website, Directions, public rides within 15 mi, description, source credit), Suggest a Place (admin approves)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F111",
+          "feature": "Offroad park trails on every map (2.1): the trails of 55 offroad parks and OHV areas mapped in OpenStreetMap (69 listed; 14 have no trails mapped yet) (Hidden Falls Adventure Park with its level 1 to 5 ratings and closed trails, Katemcy Rocks, Wolf Caves, General Sam's, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR, Sand Mountain and more; 3,819 lines, 1,529 miles), drawn for everyone (signed out too) on Ride Mode, Map Mode, route builder, waypoints, Find a Ride and the website, colored by the park's level (green 1-2, blue 3, white 4, red 5, amber unrated, thin white park roads, red dashes closed); park names with trail counts from zoom 7, trail names from zoom 12, tap card (park, name, level, length, one way, OpenStreetMap credit); Park Trails row in Map Features > Trails (free for everyone, like Rider Trails) and You > Park Trails on Maps (synced); parks already seen draw with no signal",
+          "mark": "🟡"
+        },
+        {
+          "id": "F112",
+          "feature": "Rider dot with the arrow built in, follow camera edge rule and Zoom In at Intersections (2.1): every live rider is a glossy disc with a white rim and a white chevron pointing their heading (held for 10 min after they stop, `core/heading` heldHeading); leader biggest in blue, tail gunner next in violet (`RideColors.sweep`), others graphite; your own dot cyan with a beam, arrow from GPS course while moving, the phone's compass when stopped (`lib/compass.ts`), last course on the website. Follow Me: the dot rides through the middle 80% of the open map; the first time it gets within 10% of an edge the map zooms out one step, the next time it centers on the dot and keeps it centered on every fix (`core/follow-camera` followMove, FollowFrame.locked; 2026-11-06 Chris: \"first it zooms out a little, and then if it happens again it centers the dot on the map and follows it\"); Center on Me / resume starts over. Ride Mode's Mapbox map follows Ride Mode's own expo-location fix whenever the map's own location feed is quiet for 4 s (`group-mapbox-map` myFix), so a silent Mapbox location feed can't stop Follow Me. Zoom In at Intersections: junctions found in the road/track/path lines Mapbox has drawn near the rider (`core/intersections`, queryRenderedFeatures; T junctions and crossings, 25° minimum angle), zoom to 17 about 9 s before the junction, back to the old zoom once 35 m past it or after 60 s; look-ahead (3.0, 2026-11-10 Chris: \"zooms in and out too much\"): once 35 m past a junction it looks `JUNCTION_STAY_ZOOMED_MI` (0.25 mi) ahead and, if another junction is there, stays zoomed in and watches that one (its own 60 s limit), so it zooms out once after the last in a run; 3.0.1 (2026-11-10 Chris: \"the dot does not auto adjust ... when approaching 10% of the edge\"): Map Mode's open-map bottom is the measured panel height (`core/full-map` bottomPanelPadding) instead of a fixed 200/360 pt guess that put the edge band ~100 pt under the panel; reproduced and verified with a simulated drive on the iPhone simulator; Ride Mode already used the measured panel (`junctionPassed`, unit tested; real-drive check owed with the 3.0 build); You > Zoom In at Intersections (`map.intersectionZoom.v1`, synced; on by default until 3.1, off by default from 3.1 per Chris 2026-11-13 \"turn off Zoom at intersections for default and allow the user to turn it on\": only a stored '1' turns it on, so riders who never touched it now have it off and riders who turned it on keep it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F113",
+          "feature": "Comment likes and replies, friends' post photos on the Home Feed (2.1): Like on every comment and reply (free); Reply under any comment (Pro, like commenting), one level deep, a reply to a reply joins the same conversation with @name; replies hidden or deleted with their comment; Home Feed posts show the photo as a thumbnail",
+          "mark": "🟡"
+        },
+        {
+          "id": "F114",
+          "feature": "Leader Trackline (2.1): in Ride Mode a line in the leader dot's blue (`rider-puck` puckInk, so Color Blind Mode follows) follows behind the leader on every rider's map and the leader's own, on any ride (route or Freeride); when the leader comes back within 15 m of their own line at least 120 m further back (a crossing, a loop back to the start, doubling back on an out-and-back), everything before that point is drawn faded, thinner and dashed under the fresh solid line (`core/leader-trackline` lastCrossing: segment test on a grid, so widely spaced spots still catch a crossing; 80 m hysteresis so GPS drift on the way back stays one pass; breaks over 400 m are gaps, never straight lines). Leader / organizer switch in the layers panel, Leader Trackline > On for Everyone / Off for Everyone, for the whole ride (`rides.leader_trackline`, `set_leader_trackline`)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F115",
+          "feature": "Map Settings sheet and smooth riding map (2.1): the Layers button (glass circle, blue dot when the map isn't the standard set) opens Map Settings, a sheet from the bottom on phones and docked on the right on tablets in landscape (centered on tablets in portrait), light dim so the map shows each change: Map Style tiles (Satellite, Topo, 3D Terrain as pictures), On the Map switches (Streets and Roads, Off-Road Trails, Hiking Trails, Land Boundaries; `core/map-features` QUICK_LAYERS), Every Map Feature (Fine-Tune), Leader Trackline, Map Buttons on Ride Mode and Map Mode (Follow Me, Zoom In at Intersections on Mapbox, Tilt Meter on the apps, Music Button where available; same synced switches as the You tab), ride map download, Offline Maps. Lag fix: your own dot is Mapbox's native location puck again (the Chevron Puck as images, `assets/images/puck`, made by `app/scripts/puck/make-images.mjs`), course while moving and compass when stopped, instead of a React marker animated ~30 times a second; the intersection lookup asks Mapbox for road and trail lines only (`JUNCTION_QUERY_FILTER`) at most every 2 s; 3D exaggeration redraws in tenths",
+          "mark": "🟡"
+        },
+        {
+          "id": "F116",
+          "feature": "Emergency Siren (2.1 build 10): another rider's EMERGENCY (button, CarPlay or a Crash Alert that went out) sounds a looping siren (`assets/sounds/siren.wav`, made by `scripts/sounds/make-siren.mjs`) on a full-screen card over every screen (`components/emergency-siren.tsx`, rules in `core/siren.ts`, player in `lib/siren.ts`) until Silence Siren or Show Me Where; Ride Mode (Realtime and Bluetooth) and a push while the app is open raise it, a cancel or newer tap ends it, silenced ids are remembered. Closed app: the EMERGENCY push plays the siren (iOS `siren.wav`, time-sensitive; Android channel `ride-emergency`, alarm usage) for phones that set `push_tokens.siren` (migration 20261105070000, `set_push_siren`); older builds keep the plain sound. Bluetooth in the background: local notification with the siren. Switch + Play Siren in Notification Settings (synced `alerts.siren.v1`, on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F117",
+          "feature": "Group Photos (2.1): the rider who made a riding group takes (camera, apps) or chooses a photo for it, changes or removes it (`components/group-photo-editor.tsx` on the group page); cropped to 16:9 (Android crop screen at 16:9; iPhone/iPad/web centered by `core/group-photo.ts` `aspectCrop`, unit tested) and saved as a 1280 x 720 JPEG under 400 KB. Shown by `components/group-photo.tsx`: wide banner on the group page (tap for full size) and the invite link /g/CODE (app and website), 56/48/44 px thumbnails on Riding Groups, the Home Your Group card and Invite a Group; initials when there is none. Admin > Users > rider: Riding Groups They Run, with Remove Group Photo (reason, audit log).",
+          "mark": "🟡"
+        },
+        {
+          "id": "F118",
+          "feature": "2.1 Pro features and launch trial (Chris 2026-11-05): Bluetooth Sharing with no service (`bluetooth_sharing`: on Free the phone relays every packet and still sends and hears every status tap, including EMERGENCY, Need Help and Crash Alerts (`core/nearby` nearbyFreeAllows lets every status through, `lib/nearby` setNearbyRelayOnly); seeing spots, sending its own spot and messages need Pro; Pro tag on the You switch and Ride Mode chip), customizing Your Dot (`custom_dot`: Dot Style/Size pickers ask for Pro; Free draws the Red, White and Blue dot at Medium, saved pick kept), group photo upload (`group_photos`: Take/Choose Photo ask for Pro; seeing and removing stay free), CarPlay (`carplay`: Free's car screen shows an information-only \"CarPlay Is Part of OnMyLead Pro\" notice, no purchase in the car); feature_plans rows in migration 20261105090000 so Admin > Settings can move each back to Free; `start_pro_launch_trials(30)` (owner-only, once) gives every rider without Pro a fresh 30-day trial, run in Chris's server block; Home shows the trial end date",
+          "mark": "🟡"
+        },
+        {
+          "id": "F119",
+          "feature": "App version on Home and the launch screen (2.1): the very bottom of Home shows \"Version 2.1 (10)\" small and muted (version from app.json, build from iOS buildNumber / Android versionCode; `core/app-versions` versionLabel, `lib/app-update` appVersionLabel), under the two columns on tablets; on a cold start the native launch screen hands over to `components/launch-cover.tsx`, a copy of it (same background and logo size) with the version at the bottom, for the rest of the 1.8 s launch minimum, then it fades",
+          "mark": "🟡"
+        },
+        {
+          "id": "F120",
+          "feature": "Invite a Group on events (3.0): an event's hosts and co-hosts tap Invite All next to a saved riding group on the event page; everyone in the group gets a notification (and inbox row) that opens the event, where they pick Going or Interested",
+          "mark": "🟡"
+        },
+        {
+          "id": "F121",
+          "feature": "Ad measurement for OnMyLead's Meta, Google and TikTok ads (3.0, Chris 2026-11-07): install, sign-up, Pro trial and Pro purchase conversions, only with the rider's OK",
+          "mark": "🔨"
+        },
+        {
+          "id": "F122",
+          "feature": "Photo crop on every upload (3.0): every photo a rider adds opens the crop screen first (`components/photo-cropper.tsx` usePhotoCrop, math in `core/photo-crop.ts`, crop/save in `lib/photo-crop.ts` with expo-image-manipulator): drag, pinch, double-tap, - / + buttons, Reset; website mouse wheel, trackpad pinch, arrow keys, +/-, Enter, Esc. Locked frames: profile picture 1:1 with a circle guide, group photo 16:9, garage 4:3; free shape (Original, Square, 4:3, 16:9, 4:5) for post, event (one by one, Use the Rest As They Are), trail and contact screenshot. Native picker editing turned off everywhere so all devices crop the same (iPhone/iPad/web group photos no longer centre-cropped). Phone portrait: controls under the photo; tablets and landscape phones: side panel",
+          "mark": "🟡"
+        },
+        {
+          "id": "F123",
+          "feature": "Where riders found us (3.0, Chris 2026-11-10: \"track how many downloads, and where they found us\"): Home's one-time How Did You Find OnMyLead? question, website ad/link campaign capture, Admin Signups and Downloads card",
+          "mark": "🔨"
+        },
+        {
+          "id": "F124",
+          "feature": "3.0 redesign: refined Night Navy with visible tile edges; Home on a satellite map header with Map Mode first (Ride Solo, trails near you), red Join a Ride hero (code box, QR help), Start a Ride and Events tiles, your badges and rank over the map just above the greeting, then rider-chosen sections (Out Riding Now, Up Next, Your Group, Feed by default; Public Rides, Past Rides optional), then Your Toolkit always at the bottom with Customize Home (show/hide, move up/down, Reset to Default, synced `home.layout.v1`); five tabs Home, Rides, raised blue Map Mode key, Events, Social (Riding Groups inside Social, You from the Home avatar and the tablet rail); Map Mode Solo tag and Make It a Group Ride (Pro `trail_rides`: recorded or followed trail as route, current spot as meet point via `/ride/new`); Title Case greetings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F125",
+          "feature": "Starlink on Home (3.0, Chris 2026-11-10: \"If a starlink is connected, show some basic information about that on the home screen ... show how many people are connected\"): a Starlink card under Start a Ride and Events with the dish's state, Down, Up, Latency, Sky Blocked and devices connected; tap opens the Starlink page; hidden whenever no dish answers",
+          "mark": "🟡"
+        },
+        {
+          "id": "F127",
+          "feature": "Exit Map Mode and Ride Mode (Chris 2026-11-12: \"a back button or some easy and intuitive way to exit any map mode or group ride mode\"): **‹ Exit** at the top left of both screens, a round **‹** in the map's top-left corner in Full Map (moved from the bar's left end 2026-11-14, Chris on build 16; Map Settings sits right of it), Android Back (closes Full Map or search first), and Exit on the CarPlay screen",
+          "mark": "🟡"
+        },
+        {
+          "id": "F128",
+          "feature": "Events and Group Rides (3.1, Chris 2026-11-14: \"rename events, Events and Group Rides\"): the Events area, its Home tile and screen title renamed; one switch at the top for Events, Group Rides (public rides near you, nearest first, Rides tab cards, same distance chip; See Them on the Map) and Yours; Create makes a public ride on Group Rides; `/events?show=rides` opens on Group Rides; tab bar keeps the short label Events (screen readers hear the full name)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F129",
+          "feature": "Ride Mode: floating map buttons in one even grid (3.1, Chris 2026-11-14 on build 17: \"fix all the buttons at the bottom so that they're uniform\")",
+          "mark": "🟡"
+        }
+      ]
+    },
+    "Backend": {
+      "counts": {
+        "✅": 46,
+        "🟡": 39,
+        "🔨": 2,
+        "⬜": 0,
+        "➖": 43
+      },
+      "open": [
+        {
+          "id": "F29a",
+          "feature": "Waypoint symbols: 15 symbols (Spot, Camp, Fuel, Water, Food, Viewpoint, Photo Spot, Hazard, Water Crossing, Gate, Trailhead, Parking, Restroom, First Aid, Repair) on every map, list, planned stop and the website",
+          "mark": "🟡"
+        },
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F40",
+          "feature": "Push notifications",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F43",
+          "feature": "Restore, manage subscription",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F51",
+          "feature": "Admin: signups and downloads",
+          "mark": "🟡"
+        },
+        {
+          "id": "F58",
+          "feature": "Admin: Store Reviews (App Store + Google Play)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F60",
+          "feature": "Release controls: roll back a bad update",
+          "mark": "🟡"
+        },
+        {
+          "id": "F62",
+          "feature": "Badges and ranks (Trail Boss, Tail Gunner, Crew Rider, Mile Eater, Trailblazer, Mapmaker, Trail Scout)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F63",
+          "feature": "Out Riding (who's out riding nearby) and direct messages",
+          "mark": "🟡"
+        },
+        {
+          "id": "F64",
+          "feature": "Friends (friend requests, friend link, friends in Out Riding, message friends)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F65",
+          "feature": "Custom share codes (type your own ride, riding group and friend link code)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F70",
+          "feature": "Navigation Mode (Navigate): offroad map, record / draw / share trails, trail photos, rider trail ratings and auto-hide, distance finder, trails as group ride routes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F71",
+          "feature": "Profile pictures (take, choose, change, remove; shown next to riders' names; admin removal)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F73",
+          "feature": "Notifications inbox (bell on the Rides tab: see, open, mark read, clear one or all; clears the device's own notifications and icon badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F80",
+          "feature": "Ride miles match the ride (ride summary, ride card, group totals, Mile Eater badge)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F81",
+          "feature": "Rider Safety and Liability Agreement (Before You Ride screen on first launch and on onmylead.com after sign-in; re-asked when the version changes; permanent acceptance records; Admin > Rider Agreements with CSV export)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F83",
+          "feature": "Feed on Home (friends out riding, finished rides, badges, shared trails, group rides posted; last 30 days) with Customize: Show Posts From (Friends / + Follows / + My Groups), kinds on or off, Who Sees Your Activity (Friends Only default / Friends and Followers / Nobody)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F84",
+          "feature": "Map Mode additions: Navigate renamed Map Mode; Measure tab is Draw (Map a Custom Trail) with a How Custom Trails Work sheet (rule numbers from Admin trail_rules via `trail_rules_public`, Don't Show This Again); Track Line (where you've been, a colour per day, 7 days, phone only, also fed by the ride location task); named spots on trails (Obstacle / Hazard / Water Crossing / Viewpoint, up to 30, shared with the trail, shown when following); shared trails now full length with an optional Hide My Start on recordings",
+          "mark": "🟡"
+        },
+        {
+          "id": "F85",
+          "feature": "Social (2.0): like and comment on every Feed item, Social area (Activity / Friends / My Posts; two panes on tablets), rider profiles with a PRO tag, posts with one photo, full-size profile pictures, share to Facebook / Instagram / X; Free = see + like + read comments, Pro = post, comment, share",
+          "mark": "🟡"
+        },
+        {
+          "id": "F86",
+          "feature": "Events (2.0): Events area from a Home card (Coming Up near you, Yours), event page onmylead.com/e/CODE (dates, public place, photos up to 12, details, website, Going / Interested, Share, Directions), Agenda (concerts, raffles, poker runs, shows, food... by day), linked Group Rides with labels and a Ride Manager each (becomes Co-Organizer, invited first if not on the ride), co-hosts (up to 10), Link Only events, cancel / delete, Part of [event] on ride pages, Report This Event; Pro creates, everyone views",
+          "mark": "🟡"
+        },
+        {
+          "id": "F89",
+          "feature": "Trail width limits: Forest Service 50\" limit from MVUM vehicle classes on the trail card; riders add a width to any public trail (Forest Service, BLM, OpenStreetMap; middle of all entries shown, one entry per rider per line); rider trails show their mapper's Width Limit on the map card; Garage Width (Inches) with \"Your RZR Is Too Wide\" / \"Fits\" on trail cards, public trail pages and the Plan a Group Ride on This Trail banner; the limit is copied into the ride's Instructions for Joined Riders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F97",
+          "feature": "Refer a friend: Invite Friends (You > Settings, Pro screen link), friend link counts as an invite for a new account (7 days), invited friend's first ride (10+ minutes, ended) earns both riders Pro Annual at 50% off year one, claimed as a one-time Apple offer code (redeem link prefilled) on iPhone/iPad, the Google Play `referral-50` developer-determined offer on Android, or a 6-month Play bill deferral for riders already paying on Play; one reward per rider, 6 months to claim; reward card on Pro screen and Invite Friends; inbox notification; Admin > Referrals (totals, recent invites, top inviters, Apple code batch upload/remove, never-rode warning) and a Refer a Friend switch (off by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F96",
+          "feature": "Brand Ambassador and OnMyLead Founder badges (given by OnMyLead, one level, shown beside the name ahead of earned badges; Admin gives and takes it back)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F98",
+          "feature": "Sync across devices: settings follow the account (map style, layers, Follow Me, rider trails, Track Line switch, directions app, music controls, saved quick replies, panel open/folded, Find/Events radius, dismissed notices, Starlink auto-connect; registered for the theme/light/dark/color blind, voice, tilt limits and Crash Alert settings); private backup of Map Mode trails with photos and deletes; offline areas from other devices offered under On Your Other Devices; You > Sync Across Devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F99",
+          "feature": "2.0 Free and Pro tiers (Chris's chart picks): new Pro features custom codes, own messages and quick replies, music controls, poll voting, route builder, waypoints and planned stops, directions, map layers, Map a Custom Trail, saving trails, rating trails, Track Line, named spots, garage build sheet, sync, themes and light mode, picking a voice, and iPad / Android tablet / website; Map Mode free 8 hours per UTC month (server-counted, never while sharing on a group ride, Admin-adjustable); Pro tag on every gated button; tablet and website cover for Free that keeps Join a Ride, the ride page, Ride Mode and the account open",
+          "mark": "🟡"
+        },
+        {
+          "id": "F100",
+          "feature": "App language: 12 languages (English, Spanish, Portuguese, French, German, Italian, Russian, Chinese Simplified, Japanese, Korean, Hindi, Indonesian); Match Phone default (device language, English fallback); flag switcher at the top of Home (signed in or out) and You > Language; choice syncs per account",
+          "mark": "🟡"
+        },
+        {
+          "id": "F101",
+          "feature": "Badge leaderboard (riders ranked by badge levels earned by riding; filter Everywhere / country / state or province; Where You Ride with Use My Location; Show Me on the Leaderboard)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F104",
+          "feature": "Tap-and-hold waypoints (2.1): press and hold the map in Ride Mode and Map Mode to drop an editable waypoint; on a live group ride it goes on the ride (leader's shared with everyone), and other riders get a New Waypoint Alert push with sound (\"Lou added a new waypoint: Fuel Stop\") that opens Ride Mode on it; Map Mode waypoints on your own stay private, on the device, backed up with Sync",
+          "mark": "🟡"
+        },
+        {
+          "id": "F110",
+          "feature": "Scout, places to ride (2.1): Find tab Rides / Places to Ride switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10 to 1,000 miles (250 to start, slider remembered on the device), kind filters, gold place signs on the map, place page (Create a Ride Here, website, Directions, public rides within 15 mi, description, source credit), Suggest a Place (admin approves)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F111",
+          "feature": "Offroad park trails on every map (2.1): the trails of 55 offroad parks and OHV areas mapped in OpenStreetMap (69 listed; 14 have no trails mapped yet) (Hidden Falls Adventure Park with its level 1 to 5 ratings and closed trails, Katemcy Rocks, Wolf Caves, General Sam's, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR, Sand Mountain and more; 3,819 lines, 1,529 miles), drawn for everyone (signed out too) on Ride Mode, Map Mode, route builder, waypoints, Find a Ride and the website, colored by the park's level (green 1-2, blue 3, white 4, red 5, amber unrated, thin white park roads, red dashes closed); park names with trail counts from zoom 7, trail names from zoom 12, tap card (park, name, level, length, one way, OpenStreetMap credit); Park Trails row in Map Features > Trails (free for everyone, like Rider Trails) and You > Park Trails on Maps (synced); parks already seen draw with no signal",
+          "mark": "🟡"
+        },
+        {
+          "id": "F112",
+          "feature": "Rider dot with the arrow built in, follow camera edge rule and Zoom In at Intersections (2.1): every live rider is a glossy disc with a white rim and a white chevron pointing their heading (held for 10 min after they stop, `core/heading` heldHeading); leader biggest in blue, tail gunner next in violet (`RideColors.sweep`), others graphite; your own dot cyan with a beam, arrow from GPS course while moving, the phone's compass when stopped (`lib/compass.ts`), last course on the website. Follow Me: the dot rides through the middle 80% of the open map; the first time it gets within 10% of an edge the map zooms out one step, the next time it centers on the dot and keeps it centered on every fix (`core/follow-camera` followMove, FollowFrame.locked; 2026-11-06 Chris: \"first it zooms out a little, and then if it happens again it centers the dot on the map and follows it\"); Center on Me / resume starts over. Ride Mode's Mapbox map follows Ride Mode's own expo-location fix whenever the map's own location feed is quiet for 4 s (`group-mapbox-map` myFix), so a silent Mapbox location feed can't stop Follow Me. Zoom In at Intersections: junctions found in the road/track/path lines Mapbox has drawn near the rider (`core/intersections`, queryRenderedFeatures; T junctions and crossings, 25° minimum angle), zoom to 17 about 9 s before the junction, back to the old zoom once 35 m past it or after 60 s; look-ahead (3.0, 2026-11-10 Chris: \"zooms in and out too much\"): once 35 m past a junction it looks `JUNCTION_STAY_ZOOMED_MI` (0.25 mi) ahead and, if another junction is there, stays zoomed in and watches that one (its own 60 s limit), so it zooms out once after the last in a run; 3.0.1 (2026-11-10 Chris: \"the dot does not auto adjust ... when approaching 10% of the edge\"): Map Mode's open-map bottom is the measured panel height (`core/full-map` bottomPanelPadding) instead of a fixed 200/360 pt guess that put the edge band ~100 pt under the panel; reproduced and verified with a simulated drive on the iPhone simulator; Ride Mode already used the measured panel (`junctionPassed`, unit tested; real-drive check owed with the 3.0 build); You > Zoom In at Intersections (`map.intersectionZoom.v1`, synced; on by default until 3.1, off by default from 3.1 per Chris 2026-11-13 \"turn off Zoom at intersections for default and allow the user to turn it on\": only a stored '1' turns it on, so riders who never touched it now have it off and riders who turned it on keep it)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F113",
+          "feature": "Comment likes and replies, friends' post photos on the Home Feed (2.1): Like on every comment and reply (free); Reply under any comment (Pro, like commenting), one level deep, a reply to a reply joins the same conversation with @name; replies hidden or deleted with their comment; Home Feed posts show the photo as a thumbnail",
+          "mark": "🟡"
+        },
+        {
+          "id": "F114",
+          "feature": "Leader Trackline (2.1): in Ride Mode a line in the leader dot's blue (`rider-puck` puckInk, so Color Blind Mode follows) follows behind the leader on every rider's map and the leader's own, on any ride (route or Freeride); when the leader comes back within 15 m of their own line at least 120 m further back (a crossing, a loop back to the start, doubling back on an out-and-back), everything before that point is drawn faded, thinner and dashed under the fresh solid line (`core/leader-trackline` lastCrossing: segment test on a grid, so widely spaced spots still catch a crossing; 80 m hysteresis so GPS drift on the way back stays one pass; breaks over 400 m are gaps, never straight lines). Leader / organizer switch in the layers panel, Leader Trackline > On for Everyone / Off for Everyone, for the whole ride (`rides.leader_trackline`, `set_leader_trackline`)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F116",
+          "feature": "Emergency Siren (2.1 build 10): another rider's EMERGENCY (button, CarPlay or a Crash Alert that went out) sounds a looping siren (`assets/sounds/siren.wav`, made by `scripts/sounds/make-siren.mjs`) on a full-screen card over every screen (`components/emergency-siren.tsx`, rules in `core/siren.ts`, player in `lib/siren.ts`) until Silence Siren or Show Me Where; Ride Mode (Realtime and Bluetooth) and a push while the app is open raise it, a cancel or newer tap ends it, silenced ids are remembered. Closed app: the EMERGENCY push plays the siren (iOS `siren.wav`, time-sensitive; Android channel `ride-emergency`, alarm usage) for phones that set `push_tokens.siren` (migration 20261105070000, `set_push_siren`); older builds keep the plain sound. Bluetooth in the background: local notification with the siren. Switch + Play Siren in Notification Settings (synced `alerts.siren.v1`, on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F117",
+          "feature": "Group Photos (2.1): the rider who made a riding group takes (camera, apps) or chooses a photo for it, changes or removes it (`components/group-photo-editor.tsx` on the group page); cropped to 16:9 (Android crop screen at 16:9; iPhone/iPad/web centered by `core/group-photo.ts` `aspectCrop`, unit tested) and saved as a 1280 x 720 JPEG under 400 KB. Shown by `components/group-photo.tsx`: wide banner on the group page (tap for full size) and the invite link /g/CODE (app and website), 56/48/44 px thumbnails on Riding Groups, the Home Your Group card and Invite a Group; initials when there is none. Admin > Users > rider: Riding Groups They Run, with Remove Group Photo (reason, audit log).",
+          "mark": "🟡"
+        },
+        {
+          "id": "F121",
+          "feature": "Ad measurement for OnMyLead's Meta, Google and TikTok ads (3.0, Chris 2026-11-07): install, sign-up, Pro trial and Pro purchase conversions, only with the rider's OK",
+          "mark": "🔨"
+        },
+        {
+          "id": "F123",
+          "feature": "Where riders found us (3.0, Chris 2026-11-10: \"track how many downloads, and where they found us\"): Home's one-time How Did You Find OnMyLead? question, website ad/link campaign capture, Admin Signups and Downloads card",
+          "mark": "🔨"
+        }
+      ]
+    },
+    "Admin": {
+      "counts": {
+        "✅": 24,
+        "🟡": 24,
+        "🔨": 1,
+        "⬜": 0,
+        "➖": 81
+      },
+      "open": [
+        {
+          "id": "F34",
+          "feature": "Report and block",
+          "mark": "🟡"
+        },
+        {
+          "id": "F42",
+          "feature": "Pro subscription purchase",
+          "mark": "🟡"
+        },
+        {
+          "id": "F45",
+          "feature": "Promo codes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F46",
+          "feature": "Pro shared across devices",
+          "mark": "🟡"
+        },
+        {
+          "id": "F47",
+          "feature": "Contact form, support, Report a Bug",
+          "mark": "🟡"
+        },
+        {
+          "id": "F51",
+          "feature": "Admin: signups and downloads",
+          "mark": "🟡"
+        },
+        {
+          "id": "F58",
+          "feature": "Admin: Store Reviews (App Store + Google Play)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F60",
+          "feature": "Release controls: roll back a bad update",
+          "mark": "🟡"
+        },
+        {
+          "id": "F63",
+          "feature": "Out Riding (who's out riding nearby) and direct messages",
+          "mark": "🟡"
+        },
+        {
+          "id": "F64",
+          "feature": "Friends (friend requests, friend link, friends in Out Riding, message friends)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F65",
+          "feature": "Custom share codes (type your own ride, riding group and friend link code)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F70",
+          "feature": "Navigation Mode (Navigate): offroad map, record / draw / share trails, trail photos, rider trail ratings and auto-hide, distance finder, trails as group ride routes",
+          "mark": "🟡"
+        },
+        {
+          "id": "F71",
+          "feature": "Profile pictures (take, choose, change, remove; shown next to riders' names; admin removal)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F83",
+          "feature": "Feed on Home (friends out riding, finished rides, badges, shared trails, group rides posted; last 30 days) with Customize: Show Posts From (Friends / + Follows / + My Groups), kinds on or off, Who Sees Your Activity (Friends Only default / Friends and Followers / Nobody)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F85",
+          "feature": "Social (2.0): like and comment on every Feed item, Social area (Activity / Friends / My Posts; two panes on tablets), rider profiles with a PRO tag, posts with one photo, full-size profile pictures, share to Facebook / Instagram / X; Free = see + like + read comments, Pro = post, comment, share",
+          "mark": "🟡"
+        },
+        {
+          "id": "F89",
+          "feature": "Trail width limits: Forest Service 50\" limit from MVUM vehicle classes on the trail card; riders add a width to any public trail (Forest Service, BLM, OpenStreetMap; middle of all entries shown, one entry per rider per line); rider trails show their mapper's Width Limit on the map card; Garage Width (Inches) with \"Your RZR Is Too Wide\" / \"Fits\" on trail cards, public trail pages and the Plan a Group Ride on This Trail banner; the limit is copied into the ride's Instructions for Joined Riders",
+          "mark": "🟡"
+        },
+        {
+          "id": "F97",
+          "feature": "Refer a friend: Invite Friends (You > Settings, Pro screen link), friend link counts as an invite for a new account (7 days), invited friend's first ride (10+ minutes, ended) earns both riders Pro Annual at 50% off year one, claimed as a one-time Apple offer code (redeem link prefilled) on iPhone/iPad, the Google Play `referral-50` developer-determined offer on Android, or a 6-month Play bill deferral for riders already paying on Play; one reward per rider, 6 months to claim; reward card on Pro screen and Invite Friends; inbox notification; Admin > Referrals (totals, recent invites, top inviters, Apple code batch upload/remove, never-rode warning) and a Refer a Friend switch (off by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F96",
+          "feature": "Brand Ambassador and OnMyLead Founder badges (given by OnMyLead, one level, shown beside the name ahead of earned badges; Admin gives and takes it back)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F99",
+          "feature": "2.0 Free and Pro tiers (Chris's chart picks): new Pro features custom codes, own messages and quick replies, music controls, poll voting, route builder, waypoints and planned stops, directions, map layers, Map a Custom Trail, saving trails, rating trails, Track Line, named spots, garage build sheet, sync, themes and light mode, picking a voice, and iPad / Android tablet / website; Map Mode free 8 hours per UTC month (server-counted, never while sharing on a group ride, Admin-adjustable); Pro tag on every gated button; tablet and website cover for Free that keeps Join a Ride, the ride page, Ride Mode and the account open",
+          "mark": "🟡"
+        },
+        {
+          "id": "F102",
+          "feature": "Bluetooth Sharing mesh (2.1): with no service, Ride Mode passes spots (sharing riders only), status taps incl. EMERGENCY (always first), quick replies and typed messages (in up to 6 packets, so a 120-character Ride Mode message is never cut) between riders on the same ride over Bluetooth LE, relayed up to 6 hops, newest spot per rider wins; a phone with service bridges the server's view (spots, taps, messages) to riders with none; delivered/seen receipts travel the mesh and show on the tap card (\"Reached X over Bluetooth\", \"Seen by\", also while Waiting for Signal); chat shows \"Via Bluetooth\"; any phone that gets signal uploads spots, taps, messages and seen receipts; radio idles with service and no peers or on Max Battery Saver; \"Via Bluetooth\" on riders, no-service banner counts nearby phones; You > Bluetooth Sharing switch and a Bluetooth On/Off button on Ride Mode's no-service banner (on by default)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F110",
+          "feature": "Scout, places to ride (2.1): Find tab Rides / Places to Ride switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10 to 1,000 miles (250 to start, slider remembered on the device), kind filters, gold place signs on the map, place page (Create a Ride Here, website, Directions, public rides within 15 mi, description, source credit), Suggest a Place (admin approves)",
+          "mark": "🟡"
+        },
+        {
+          "id": "F111",
+          "feature": "Offroad park trails on every map (2.1): the trails of 55 offroad parks and OHV areas mapped in OpenStreetMap (69 listed; 14 have no trails mapped yet) (Hidden Falls Adventure Park with its level 1 to 5 ratings and closed trails, Katemcy Rocks, Wolf Caves, General Sam's, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR, Sand Mountain and more; 3,819 lines, 1,529 miles), drawn for everyone (signed out too) on Ride Mode, Map Mode, route builder, waypoints, Find a Ride and the website, colored by the park's level (green 1-2, blue 3, white 4, red 5, amber unrated, thin white park roads, red dashes closed); park names with trail counts from zoom 7, trail names from zoom 12, tap card (park, name, level, length, one way, OpenStreetMap credit); Park Trails row in Map Features > Trails (free for everyone, like Rider Trails) and You > Park Trails on Maps (synced); parks already seen draw with no signal",
+          "mark": "🟡"
+        },
+        {
+          "id": "F113",
+          "feature": "Comment likes and replies, friends' post photos on the Home Feed (2.1): Like on every comment and reply (free); Reply under any comment (Pro, like commenting), one level deep, a reply to a reply joins the same conversation with @name; replies hidden or deleted with their comment; Home Feed posts show the photo as a thumbnail",
+          "mark": "🟡"
+        },
+        {
+          "id": "F117",
+          "feature": "Group Photos (2.1): the rider who made a riding group takes (camera, apps) or chooses a photo for it, changes or removes it (`components/group-photo-editor.tsx` on the group page); cropped to 16:9 (Android crop screen at 16:9; iPhone/iPad/web centered by `core/group-photo.ts` `aspectCrop`, unit tested) and saved as a 1280 x 720 JPEG under 400 KB. Shown by `components/group-photo.tsx`: wide banner on the group page (tap for full size) and the invite link /g/CODE (app and website), 56/48/44 px thumbnails on Riding Groups, the Home Your Group card and Invite a Group; initials when there is none. Admin > Users > rider: Riding Groups They Run, with Remove Group Photo (reason, audit log).",
+          "mark": "🟡"
+        },
+        {
+          "id": "F123",
+          "feature": "Where riders found us (3.0, Chris 2026-11-10: \"track how many downloads, and where they found us\"): Home's one-time How Did You Find OnMyLead? question, website ad/link campaign capture, Admin Signups and Downloads card",
+          "mark": "🔨"
+        }
+      ]
+    },
+    "Docs": {
+      "counts": {
+        "✅": 125,
+        "🟡": 0,
+        "🔨": 1,
+        "⬜": 1,
+        "➖": 3
+      },
+      "open": [
+        {
+          "id": "F20",
+          "feature": "Wi-Fi-only tablets (no GPS)",
+          "mark": "⬜"
+        },
+        {
+          "id": "F126",
+          "feature": "CarPlay map (Chris 2026-11-12: \"thats the whole point of it, showing the map on carplay\"; Apple granted CarPlay Navigation 2026-11-13, Case-ID 23473467): the car screen is a CPMapTemplate over a Mapbox map in the car window (rider's Map Style, flat): your position (course up), the ride route and Leader Trackline or Map Mode's followed trail and recording, other riders as dots (hollow when only last seen, ring when separated or asking for help); turn-by-turn via CPNavigationSession: the next step and the one after (Bear/Turn/Sharp Left or Right, Make a U-Turn, Arrive at the End of <trail>, Head to the Start), found from the line's own shape (`core/car-maneuvers.ts`), with distance to the step and miles/time left; zoom, recenter, panning arrows and touch drag; bar buttons Ride (one-tap grid with Group), Dash (Pause/Resume as its first row) and Exit on the left, Layers and Messages on the right; Open Map Mode and, while the phone shares on a ride, Open Ride Mode when nothing is open. Trails and roads (Chris 2026-11-13 truck test): the rider's Map Features as Mapbox style layers (`core/car-layers.ts` carTrails: agency raster squares + OpenStreetMap vector roads/tracks/names), switched from the car's Layers list (four quick switches + Closures, Width-Limited, Street-Legal; saved to `map.layers.v1` so every map follows). Messages with no ride: the rider's group chats (newest first, unread count), a chat's newest messages (tap to hear), one-tap replies sent to the group (`components/carplay-home.tsx`); during a ride the Messages list has a Group Chats row too (Chris 2026-11-13: no group chats seen during a ride). Rider line (Chris 2026-11-13: \"the Ryder tracker bar\"): `core/carplay.ts` carRiderBar sends the phone strip's convoy layout (leader left, tail gunner right, last seen hollow, help ring) and the spread label; `CarRiderBarView` draws it as a capsule along the bottom of the car map's safe area, not tappable (Apple: no controls on the map), names in Ride > Group. Free gets the Pro notice",
+          "mark": "🔨"
+        }
+      ]
+    }
+  },
+  "foundations": [
+    {
+      "id": "D03",
+      "item": "Tablet layouts: Ride Mode sidebar, ride page split, list + detail",
+      "mark": "🔨",
+      "notes": "Ride Mode, ride page, Find, route builder, waypoints, Rides home and tab rail done; groups / garage / trips list + detail and keyboard shortcuts in issue #101"
+    },
+    {
+      "id": "D08",
+      "item": "Platform-neutral copy (no \"iPhone\" in shared screens)",
+      "mark": "🔨",
+      "notes": "PR #99 fixed the Android app's support answers, notification settings button and directions labels; the website showcase and Help Center now say iPhone, iPad and Android (iPad and Android release PR); legal and some billing copy remain"
+    }
+  ],
+  "drift": [],
+  "errors": []
+}
