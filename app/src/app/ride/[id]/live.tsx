@@ -22,7 +22,7 @@ import { RideMessageSheet } from '@/components/ride-message-sheet';
 import { RouteStrip } from '@/components/route-strip';
 import { BroadcastCard } from '@/components/broadcast-card';
 import { CrashCountdown } from '@/components/crash-countdown';
-import { TILT_TILE_H, TiltTile } from '@/components/tilt-tile';
+import { TiltTile } from '@/components/tilt-tile';
 import { SharePicker } from '@/components/share-picker';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { CompassSpot } from '@/components/compass-spot';
@@ -31,7 +31,7 @@ import { WaypointBlaze } from '@/components/waypoint-blaze';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui';
-import { Colors, font, Glass, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
+import { Colors, font, Glass, GlassSurface, Radius, RideColors, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import {
   carMapDots, carMapGuide, carMapLine, carRiderBar, carPlayActionAllowed, carPlayMessages, carPlayReplies, carPlayState, carSpokenMessage, parseCarPlayAction, type CarMap, type CarMapLine,
   type CarMessageInput,
@@ -50,6 +50,7 @@ import { withAlpha } from '@/core/color';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { crashMessage, type CrashCause } from '@/core/crash-detect';
 import { rideDirections } from '@/core/directions';
+import { actionHalfWidth, CONTROL_GAP, CONTROL_H, CONTROL_SIDE, phoneControls } from '@/core/map-controls';
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
 import { RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
@@ -138,9 +139,6 @@ const FULL_STRIP_ROOM_WITH_ALERTS = 720;
 const ALERTS_MIN = 72;
 const ALERTS_MAX = 180;
 const BANNERS_MIN = 76;
-const WP_FAB_H = 44;
-/** The round Center on Me button. */
-const LOCATE_SIZE = 48;
 // On a tablet the panels float this far from the screen's edges.
 const EDGE = 12;
 // On a tablet the controls panel starts below the map layers button (and its downloaded-map tag).
@@ -860,25 +858,46 @@ export default function RideMode() {
   const cornerTop = tablet || fullMap ? insets.top + EDGE : insets.top + 66;
   const compassSpot = { top: cornerTop };
   const shownBannersBottom = fullMap ? insets.top : tablet ? panelTop : topRowBottom + (hasBanners ? 6 + Math.min(bannersH, bannersMax ?? bannersH) : 0);
-  // The Add Waypoint button sits just above the panel; with no room there it stays hidden (press
-  // and hold the map still drops one).
-  const wpFabFits = !fullMap && screenH - panelBottom - panelH - 12 - WP_FAB_H >= shownBannersBottom + Spacing.two;
-  // Center on Me. On a phone it sits on the right just above the panel, over Add Waypoint when
-  // that is there, and shows when there is room (folding the panel always makes room). On a
-  // tablet it sits in the open map's bottom corner, just left of the panel, so it is always there.
-  // The website has a live map to move only with Mapbox; otherwise it has no button.
-  const locateBottom = tablet ? panelBottom : panelBottom + panelH + 12 + (mine && wpFabFits ? WP_FAB_H + 8 : 0);
-  const locateFits = (Platform.OS !== 'web' || trail.mapbox) && !!panelH &&
-    (tablet || screenH - locateBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
-  // Music (when the rider has it on) sits right above Center on Me, and only when there is room.
-  // In Full Map it moves into the slim bar instead.
-  const musicBottom = locateBottom + LOCATE_SIZE + 10;
-  const musicFits = musicOn && locateFits && !fullMap &&
-    (tablet || screenH - musicBottom - LOCATE_SIZE >= shownBannersBottom + Spacing.two);
-  // The Tilt tile: on a phone on the left, level with Music (above Center on Me's row); on a tablet
-  // in the open map's bottom-left corner. Only when there is room; Full Map hides it.
-  const tiltFits = tiltShown && locateFits && !fullMap &&
-    (tablet || screenH - musicBottom - TILT_TILE_H >= shownBannersBottom + Spacing.two);
+  const directionRows = rideDirections({
+    regroup,
+    meet,
+    route: route.route,
+    alongM: placed.find((p) => p.id === me)?.place?.alongM,
+    destination: ride?.destination_label,
+  });
+  // The floating map controls (3.1). On a phone they sit in one grid above the panel
+  // (core/map-controls): Directions | Add Waypoint as two equal halves just above it, then Tilt on
+  // the left level with Follow Me and Center on Me on the right, then Music over Center on Me. A row
+  // shows only when it fits under the banners (folding the panel always makes room); press and hold
+  // the map still drops a waypoint. On a tablet Directions | Add Waypoint sit over the panel, Center
+  // on Me and Music in the open map's bottom-right corner and Tilt in its bottom-left corner.
+  // The website has a live map to move only with Mapbox; otherwise it has no Center on Me.
+  const canLocate = (Platform.OS !== 'web' || trail.mapbox) && !!panelH;
+  const hasActions = directionRows.length > 0 || !!mine;
+  const phoneGrid = phoneControls({
+    screenH,
+    screenW: layout.width,
+    panelTop: panelBottom + panelH,
+    ceiling: shownBannersBottom + Spacing.two,
+    actions: !fullMap && !!panelH && hasActions,
+    locate: canLocate,
+    tilt: tiltShown && !fullMap && canLocate,
+    music: musicOn && !fullMap,
+  });
+  const actionsBottom = tablet
+    ? (!fullMap && !!panelH && hasActions && screenH - panelBottom - panelH - CONTROL_GAP - CONTROL_H >= shownBannersBottom + Spacing.two
+      ? panelBottom + panelH + CONTROL_GAP : null)
+    : phoneGrid.actionsBottom;
+  const wpFabFits = actionsBottom != null;
+  const locateFits = tablet ? canLocate : phoneGrid.locateBottom != null;
+  const locateBottom = tablet ? panelBottom : phoneGrid.locateBottom ?? 0;
+  const musicBottom = tablet ? panelBottom + CONTROL_H + CONTROL_GAP : phoneGrid.musicBottom ?? 0;
+  const musicFits = musicOn && !fullMap && (tablet ? canLocate : phoneGrid.musicBottom != null);
+  const tiltFits = tiltShown && !fullMap && (tablet ? canLocate : phoneGrid.tiltBottom != null);
+  const tiltBottom = tablet ? panelBottom : phoneGrid.tiltBottom ?? 0;
+  // Row 1's halves: across the panel's width on a tablet, the screen's on a phone.
+  const actionW = tablet ? Math.floor((panelW - CONTROL_GAP) / 2) : actionHalfWidth(layout.width);
+  const controlsRight = tablet ? panelW + 2 * EDGE : CONTROL_SIDE;
   // The first framing of the group keeps it clear of the panels over the map.
   const sidebarOpen = sidebar.open;
   const fitPadding = useMemo(
@@ -1270,13 +1289,6 @@ export default function RideMode() {
   const navigateTo = (lat: number, lng: number, title = 'There') => openDirections({ title, to: { lat, lng } });
   // To a rider who sent Need Help, EMERGENCY or a crash alert: always free.
   const navigateToRiderInNeed = (lat: number, lng: number) => openDirections({ title: t('There'), to: { lat, lng } }, { safety: true });
-  const directionRows = rideDirections({
-    regroup,
-    meet,
-    route: route.route,
-    alongM: placed.find((p) => p.id === me)?.place?.alongM,
-    destination: ride?.destination_label,
-  });
 
   const myPos = me ? positions[me] : undefined;
   const shareLeft = activeShare?.expires_at ? Date.parse(activeShare.expires_at) - now : null;
@@ -1528,40 +1540,45 @@ export default function RideMode() {
       </SafeAreaView>
       )}
 
-      {panelH && directionRows.length && wpFabFits ? (
+      {/* Row 1: Directions | Add Waypoint, two equal halves (each keeps its half when alone). */}
+      {directionRows.length > 0 && wpFabFits ? (
         <Pressable
           onPress={() => setDirectionsOpen(true)}
           accessibilityRole="button"
           accessibilityLabel={t('Directions in Apple Maps or Google Maps')}
           style={({ pressed }) => [
-            styles.wpFab, styles.directionsFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 },
-            tablet && { left: layout.width - EDGE - panelW },
+            styles.mapPill, styles.actionPill,
+            { bottom: actionsBottom!, width: actionW, left: tablet ? layout.width - EDGE - panelW : CONTROL_SIDE, opacity: pressed ? 0.8 : 1 },
           ]}>
-          <Icon name="turn" size={24} color={Colors.sky} strokeWidth={2.1} />
-          <Text style={styles.wpFabText}>{t('Directions')}</Text>
+          <Icon name="turn" size={22} color={Colors.sky} strokeWidth={2.1} />
+          <Text style={styles.mapPillText} numberOfLines={1}>{t('Directions')}</Text>
           <ProTag feature="directions" style={styles.fabPro} />
         </Pressable>
       ) : null}
 
-      {mine && panelH && wpFabFits ? (
+      {mine && wpFabFits ? (
         <Pressable
           onPress={dropWaypointHere}
           accessibilityRole="button"
           accessibilityLabel={t('Add a waypoint at your location')}
           accessibilityHint={t('You can also press and hold the map to drop one anywhere')}
-          style={({ pressed }) => [styles.wpFab, styles.waypointFab, { bottom: panelBottom + panelH + 12, opacity: pressed ? 0.8 : 1 }]}>
-          <WaypointBlaze symbol="spot" shared={false} size={24} />
-          <Text style={styles.wpFabText}>{t('Add Waypoint')}</Text>
+          style={({ pressed }) => [
+            styles.mapPill, styles.actionPill,
+            { bottom: actionsBottom!, width: actionW, right: tablet ? EDGE : CONTROL_SIDE, opacity: pressed ? 0.8 : 1 },
+          ]}>
+          <WaypointBlaze symbol="spot" shared={false} size={22} />
+          <Text style={styles.mapPillText} numberOfLines={1}>{t('Add Waypoint')}</Text>
           <ProTag feature="waypoints" style={styles.fabPro} />
         </Pressable>
       ) : null}
 
+      {/* Row 2: Follow Me and Center on Me on the right, Tilt on the left. */}
       {locateFits ? (
         <FollowMeButton
           status={followStatus}
           onPress={tapFollowMe}
-          compact={fullMap}
-          style={{ bottom: locateBottom, right: (tablet ? panelW + 2 * EDGE : 12) + LOCATE_SIZE + 8 }}
+          compact={fullMap || (!tablet && phoneGrid.followCompact)}
+          style={{ bottom: locateBottom, right: controlsRight + CONTROL_H + CONTROL_GAP }}
         />
       ) : null}
       {locateFits ? (
@@ -1572,11 +1589,8 @@ export default function RideMode() {
           accessibilityLabel={t('Center the map on you')}
           accessibilityState={{ busy: locating }}
           hitSlop={6}
-          style={({ pressed }) => [
-            styles.locateFab, { bottom: locateBottom, opacity: pressed ? 0.8 : 1 },
-            tablet && { right: panelW + 2 * EDGE },
-          ]}>
-          {locating ? <ActivityIndicator color={Colors.sky} /> : <Icon name="locate" size={26} color={Colors.sky} strokeWidth={2.2} />}
+          style={({ pressed }) => [styles.mapRound, { bottom: locateBottom, right: controlsRight, opacity: pressed ? 0.8 : 1 }]}>
+          {locating ? <ActivityIndicator color={Colors.sky} /> : <Icon name="locate" size={24} color={Colors.sky} strokeWidth={2.2} />}
         </Pressable>
       ) : null}
 
@@ -1584,7 +1598,7 @@ export default function RideMode() {
         <TiltTile
           reading={tiltReading}
           limits={tiltSettings.limits}
-          style={tablet ? { bottom: panelBottom, left: (sidebar.open ? sideW + EDGE : 0) + EDGE } : { bottom: musicBottom, left: 12 }}
+          style={{ bottom: tiltBottom, left: tablet ? (sidebar.open ? sideW + EDGE : 0) + EDGE : CONTROL_SIDE }}
         />
       ) : null}
       {crash.alarm ? (
@@ -1596,11 +1610,12 @@ export default function RideMode() {
         />
       ) : null}
 
+      {/* Row 3: Music over Center on Me. */}
       {musicFits ? (
         <MusicButton
           onPress={() => setMusicOpen(true)}
-          size={LOCATE_SIZE}
-          style={[styles.musicFab, { bottom: musicBottom }, tablet && { right: panelW + 2 * EDGE }]}
+          size={CONTROL_H}
+          style={[styles.musicFab, { bottom: musicBottom, right: controlsRight }]}
         />
       ) : null}
 
@@ -2015,15 +2030,16 @@ const styles = themedStyles(() => ({
     backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge, borderBottomWidth: 0, borderTopLeftRadius: 26, borderTopRightRadius: 26,
   },
   foldedRow: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.two },
+  // The folded panel's three buttons share one size, so they line up as equal thirds (3.1).
   foldedShow: {
-    flex: 1, minHeight: 56, borderRadius: Radius.control, flexDirection: 'row', gap: 8,
-    alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge,
+    flexGrow: 1, flexBasis: 0, minWidth: 0, minHeight: 56, borderRadius: Radius.control, flexDirection: 'row', gap: 8,
+    alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1.5, borderColor: Glass.edge,
   },
   foldedShowText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19 },
   foldedBadge: { minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow },
   foldedBadgeText: { color: '#1A1100', fontFamily: font(800), fontSize: 14 },
   foldedMech: {
-    flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6,
+    flexGrow: 1, flexBasis: 0, minWidth: 0, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6,
     backgroundColor: Glass.amberTint, borderWidth: 1.5, borderColor: 'rgba(242,178,51,0.6)',
   },
   mechText: { color: Glass.amber, fontSize: 18, lineHeight: 20 },
@@ -2046,7 +2062,7 @@ const styles = themedStyles(() => ({
   alertChipText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
   callDismiss: { minWidth: 32, minHeight: 32, alignItems: 'center', justifyContent: 'center' },
   foldedSos: {
-    flex: 1, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center',
+    flexGrow: 1, flexBasis: 0, minWidth: 0, minHeight: 56, paddingHorizontal: 6, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#D9252C', borderWidth: 1.5, borderColor: 'rgba(255,175,175,0.55)',
   },
   sosText: { color: '#fff', letterSpacing: 0.6 },
@@ -2056,11 +2072,12 @@ const styles = themedStyles(() => ({
   handleBar: { width: 38, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.22)' },
   fullMapBtn: { position: 'absolute', right: 0, top: -4 },
   // Mirrors Full Map on the left of the handle: Type a Message.
+  // The same chip as Full Map (components/full-map), so the two read as a pair (3.1).
   typeBtn: {
-    position: 'absolute', left: 0, top: 0, minHeight: 32, paddingHorizontal: 12, borderRadius: 16, flexDirection: 'row', gap: 6,
-    alignItems: 'center', backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge,
+    position: 'absolute', left: 0, top: -4, minHeight: 34, paddingHorizontal: 12, borderRadius: 17, flexDirection: 'row', gap: 6,
+    alignItems: 'center', backgroundColor: Colors.backgroundSelected,
   },
-  typeText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
+  typeText: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
   fullMapBarBtn: { minHeight: 48 },
   offlineBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10,
@@ -2077,22 +2094,21 @@ const styles = themedStyles(() => ({
   announcementLabel: { color: Glass.amber, fontFamily: font(700), fontSize: 12, letterSpacing: 0.3 },
   announcementText: { color: Colors.text, fontFamily: font(700), fontSize: 16, lineHeight: 21 },
   statusText: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 20, textAlign: 'center' },
-  wpFab: {
-    position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingLeft: 10, paddingRight: 14,
-    borderRadius: 22, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
+  // Every floating map control (3.1): CONTROL_H tall, the same glass, edge and type (core/map-controls).
+  mapPill: {
+    position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 8, height: CONTROL_H, paddingLeft: 12, paddingRight: 16,
+    borderRadius: CONTROL_H / 2, ...GlassSurface,
   },
-  directionsFab: { left: 12 },
+  actionPill: { justifyContent: 'center', paddingLeft: 10, paddingRight: 10 },
+  mapPillText: { flexShrink: 1, color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   fabPro: { marginLeft: 2 },
-  locateFab: {
-    position: 'absolute', right: 12, width: LOCATE_SIZE, height: LOCATE_SIZE, borderRadius: LOCATE_SIZE / 2,
-    alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
+  mapRound: {
+    position: 'absolute', width: CONTROL_H, height: CONTROL_H, borderRadius: CONTROL_H / 2,
+    alignItems: 'center', justifyContent: 'center', ...GlassSurface,
   },
-  waypointFab: { right: 12 },
-  musicFab: { position: 'absolute', right: 12 },
+  musicFab: { position: 'absolute' },
   // Square-cornered like its neighbours in the Full Map bar, and as tall.
   fullMapMusic: { borderRadius: Radius.control },
-  wpFabText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 17 },
   sheetWrap: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' },
   // On a tablet a sheet is a card in the middle of the screen, not a strip across the bottom.
   sheetWrapTablet: { justifyContent: 'center', alignItems: 'center', padding: Spacing.four },
