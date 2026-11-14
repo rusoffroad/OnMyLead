@@ -100,3 +100,8 @@ export const SHOWCASE_REDESIGN_3: boolean = true;
  * ride's name, and under Exit in Ride Mode). Off until the app version with it (3.1) is live in the stores.
  */
 export const SHOWCASE_EASY_LEAVE: boolean = false;
+/**
+ * The showcase's Events card in its 3.1 words (Events and Group Rides: events, public group rides
+ * near you and your own, under one switch). Off until the app version with it (3.1) is live in the stores.
+ */
+export const SHOWCASE_EVENTS_AND_RIDES: boolean = false;

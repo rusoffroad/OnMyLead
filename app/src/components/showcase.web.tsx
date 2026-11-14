@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -620,7 +620,9 @@ const NEW_IN_3 = [
   { shot: 'map-mode-3', title: 'Ride Solo, Then Bring the Group', text: 'Map Mode is your own offroad map, tagged Solo. When it’s worth sharing, Make It a Group Ride turns your spot into the meeting point (Pro).', alt: 'Map Mode on a solo ride: the Solo tag, speed, elevation, trip miles and the blue Make It a Group Ride card' },
   { shot: 'ride-mode-3', title: 'Ride Mode, Rebuilt', text: 'Bigger status buttons, alerts you can act on, Regroup Here and EMERGENCY always one tap away at the bottom.', alt: 'Ride Mode with a separated rider alert, a Flat Tire alert, status buttons, Regroup Here and the red EMERGENCY bar' },
   { shot: 'rides-3', title: 'Rides Near You', text: 'Public rides on a map and in cards with the trail, the difficulty and the machines welcome, near you or by state.', alt: 'The Rides tab: a map of Utah with ride pins and ride cards with satellite thumbnails' },
-  { shot: 'events-3', title: 'Events', text: 'Rallies, poker runs and ride weekends with their photos, who’s going and the group rides inside each one.', alt: 'The Events tab: the Moab Fall Rally with its photo, I’m Going and Share, and more events near you' },
+  SHOWCASE_EVENTS_AND_RIDES
+    ? { shot: 'events-3', title: 'Events and Group Rides', text: 'Rallies, poker runs and ride weekends with their photos and who’s going, and one tap over, the public group rides near you, nearest first.', alt: 'The Events tab: the Moab Fall Rally with its photo, I’m Going and Share, and more events near you' }
+    : { shot: 'events-3', title: 'Events', text: 'Rallies, poker runs and ride weekends with their photos, who’s going and the group rides inside each one.', alt: 'The Events tab: the Moab Fall Rally with its photo, I’m Going and Share, and more events near you' },
   { shot: 'social-3', title: 'Social', text: 'Your riding groups, the friends who are out riding right now and everyone’s ride reports in one place.', alt: 'Social: Riding Groups, a row of friends with the ones out riding ringed, and the activity feed' },
   { shot: 'customize-home', title: 'Customize Home', text: 'Show, hide and reorder the sections under the top cards. Your layout follows you to every device.', alt: 'The Customize Home sheet with switches and up and down arrows for each Home section' },
   ...(SHOWCASE_PHOTO_CROP ? [{ shot: 'photo-crop', title: 'Crop Every Photo', text: 'Drag and zoom every photo before it goes up, and pick a shape where you can.', alt: 'The Crop Photo screen with a desert photo inside the frame, shape choices and Use Photo' }] : []),

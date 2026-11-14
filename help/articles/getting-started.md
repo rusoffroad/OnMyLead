@@ -79,6 +79,10 @@ Your offroad map, for riding solo: trails, recording, Track Line and offline map
 
 Rallies, poker runs and ride weekends. See [Events](/help/events).
 
+:::release 3.1
+From 3.1 it's **Events and Group Rides**: a switch at the top shows **Events**, public **Group Rides** near you, or **Yours**. The tab keeps the short name **Events**.
+:::
+
 ### Social
 
 Your friends' posts and activity, your friends and your posts. Tap **Riding Groups** at the top for your groups. You need an account for this tab. See [Like, Comment and Post in Social](/help/social) and [Riding Groups](/help/riding-groups).

@@ -3521,6 +3521,16 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "아직 아무도 참가하지 않아 나가면 라이드가 취소됩니다.",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "{rideName}에 그대로 참여 중입니다. 홈이나 라이드 페이지에서 언제든 돌아오세요.",
   "Done with this ride? Leaving takes you off it for good.": "이 라이드는 끝났나요? 나가면 완전히 빠집니다.",
+  "Events and Group Rides": "이벤트와 그룹 라이드",
+  "Events and Group Rides | OnMyLead": "이벤트와 그룹 라이드 | OnMyLead",
+  "Rallies and rides": "랠리와 라이드",
+  "Group Rides Near You": "내 주변 그룹 라이드",
+  "Public Group Rides": "공개 그룹 라이드",
+  "One ride on one day. Join one and ride together in Ride Mode.": "하루 한 번의 라이드. 참가해서 라이드 모드로 함께 달리세요.",
+  "Every public ride coming up. Allow location to see the ones near you first.": "예정된 모든 공개 라이드. 위치를 허용하면 가까운 라이드부터 보입니다.",
+  "No Public Rides Coming Up": "예정된 공개 라이드가 없습니다",
+  "See Them on the Map": "지도에서 보기",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "지도 모드, 라이드 참가, 라이드 시작, 이벤트와 그룹 라이드는 항상 맨 위에 표시됩니다.",
 };
 
 export default dict;

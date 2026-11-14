@@ -134,5 +134,11 @@ Many tablets have no GPS. A Wi-Fi-only tablet can usually only tell roughly wher
 :::release 2.0
 ## Events on a Tablet
 
-Events shows two events per row on a tablet in portrait and three in landscape. An event's page keeps its photo, details and hosts on the left, and the agenda, group rides and who's going on the right. See [Events](/help/events).
+Events shows two events per row on a tablet in portrait and three in landscape.
+
+An event's page keeps its photo, details and hosts on the left, and the agenda, group rides and who's going on the right. See [Events](/help/events).
+:::
+
+:::release 3.1
+From 3.1, **Group Rides** in **Events and Group Rides** shows public rides the same way, two per row in portrait and three in landscape.
 :::

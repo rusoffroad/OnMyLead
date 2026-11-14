@@ -13,7 +13,7 @@ import { t } from '@/lib/i18n';
 
 /**
  * Customize Home: switch each section under the top cards on or off and move it up or down.
- * Map Mode, Join a Ride, Start a Ride and Events always come first. Saved to the account when the
+ * Map Mode, Join a Ride, Start a Ride and Events and Group Rides always come first. Saved to the account when the
  * rider taps Done, so every phone and tablet shows the same Home.
  */
 export function CustomizeHomeSheet({
@@ -35,7 +35,7 @@ export function CustomizeHomeSheet({
       footer={<Button title={t('Done')} onPress={() => { onSave(draft); onClose(); }} />}>
       <View style={styles.note}>
         <Icon name="lock" size={15} color={Colors.textSecondary} />
-        <Text style={styles.noteText}>{t('Map Mode, Join a Ride, Start a Ride and Events always show first.')}</Text>
+        <Text style={styles.noteText}>{t('Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.')}</Text>
       </View>
       <View style={styles.list}>
         {draft.order.map((id, i) => {

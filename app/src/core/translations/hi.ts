@@ -3521,6 +3521,16 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "अभी तक कोई और नहीं जुड़ा, इसलिए छोड़ने से राइड रद्द हो जाएगी।",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "आप {rideName} पर बने रहते हैं। होम या राइड पेज से कभी भी वापस आएं।",
   "Done with this ride? Leaving takes you off it for good.": "इस राइड से मन भर गया? छोड़ने पर आप इससे हमेशा के लिए हट जाएंगे।",
+  "Events and Group Rides": "इवेंट और ग्रुप राइड",
+  "Events and Group Rides | OnMyLead": "इवेंट और ग्रुप राइड | OnMyLead",
+  "Rallies and rides": "रैली और राइड",
+  "Group Rides Near You": "आपके पास ग्रुप राइड",
+  "Public Group Rides": "सार्वजनिक ग्रुप राइड",
+  "One ride on one day. Join one and ride together in Ride Mode.": "एक दिन की एक राइड। जुड़ें और राइड मोड में साथ चलें।",
+  "Every public ride coming up. Allow location to see the ones near you first.": "आने वाली सभी सार्वजनिक राइड। पास वाली पहले देखने के लिए लोकेशन की अनुमति दें।",
+  "No Public Rides Coming Up": "कोई सार्वजनिक राइड नहीं आ रही",
+  "See Them on the Map": "मैप पर देखें",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "मैप मोड, राइड में शामिल हों, राइड शुरू करें और इवेंट और ग्रुप राइड हमेशा सबसे ऊपर दिखते हैं।",
 };
 
 export default dict;

@@ -4,7 +4,7 @@ summary: Find rallies, poker runs and ride weekends, see the agenda and join the
 category: joining
 order: 60
 release: "2.0"
-updated: 2026-11-10
+updated: 2026-11-14
 sources:
   - app/src/app/(tabs)/events-tab.tsx
   - app/src/components/meet-point-mapbox-map.tsx
@@ -43,6 +43,16 @@ Just riding? Create a Public Ride. Running a rally or a weekend? Create an Event
 In the app, **Event or Public Ride?** on Events, Find a Ride, Create a Ride and Create an Event opens the same explanation. Tap **What's the Difference?** to open it and **Hide** to close it. It's the same on iPhone, iPad, Android and the website.
 
 ## Find an Event
+
+:::release 3.1
+From 3.1 this area is called **Events and Group Rides**. The tile on Home says **Events and Group Rides**, and the tab bar keeps the short name **Events**. A switch at the top picks what it lists:
+
+- **Events**: public events coming up, the next one first as a big photo, then the rest **Near You**.
+- **Group Rides**: public group rides coming up, nearest first, the same rides as the **Rides** tab. Tap the distance chip to change how far it looks (it's the same distance as Events). Tap a ride to open it and join. **See Them on the Map** opens the **Rides** tab.
+- **Yours**: the events you host, co-host, or said you're going or interested in.
+
+The **+** (or **Create**) button at the top right creates an event while you're on **Events** or **Yours** (Pro), and a public ride while you're on **Group Rides**. On a phone it shows just the **+**; on a tablet and the website it says **Create**. It's the same on iPhone, iPad, Android and the website; on a tablet the rides show in two or three columns.
+:::
 
 :::until 3.0
 1. On the **Rides** tab, tap the gold **Events** card (under Create a Ride, Find a Ride and Map Mode).

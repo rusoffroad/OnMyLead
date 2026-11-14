@@ -3521,6 +3521,16 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "还没有其他人加入，所以离开会取消这次骑行。",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "你仍在 {rideName} 中。随时可从首页或骑行页面回来。",
   "Done with this ride? Leaving takes you off it for good.": "不再参加这次骑行？离开后你将被彻底移出。",
+  "Events and Group Rides": "活动和群组骑行",
+  "Events and Group Rides | OnMyLead": "活动和群组骑行 | OnMyLead",
+  "Rallies and rides": "集会和骑行",
+  "Group Rides Near You": "附近的群组骑行",
+  "Public Group Rides": "公开群组骑行",
+  "One ride on one day. Join one and ride together in Ride Mode.": "一天一次的骑行。加入后在骑行模式中一起骑。",
+  "Every public ride coming up. Allow location to see the ones near you first.": "所有即将开始的公开骑行。允许定位可先看到附近的。",
+  "No Public Rides Coming Up": "暂无即将开始的公开骑行",
+  "See Them on the Map": "在地图上查看",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "地图模式、加入骑行、开始骑行和活动和群组骑行始终显示在最前面。",
 };
 
 export default dict;
