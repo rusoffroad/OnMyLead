@@ -334,3 +334,24 @@ export function pickablePeople(friends: Person[], mates: Person[], me: string | 
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
+
+/**
+ * 3.1 (Chris 2026-11-14): the Events area is "Events and Group Rides". One switch at the top picks
+ * what it lists: public events, public group rides (the same rides as the Rides tab, nearest
+ * first), or the events the rider hosts or is going to. The bottom tab keeps the short "Events"
+ * label, because the full name can't fit a tab bar beside "Rides".
+ */
+export const EVENTS_AND_RIDES_TITLE = 'Events and Group Rides';
+
+export type EventsView = 'events' | 'rides' | 'mine';
+
+/** The switch's choices: Group Rides only while Find a Ride is on, Yours only when signed in. */
+export function eventsViews(o: { signedIn: boolean; ridesOn: boolean }): EventsView[] {
+  return ['events' as const, ...(o.ridesOn ? (['rides'] as const) : []), ...(o.signedIn ? (['mine'] as const) : [])];
+}
+
+/** The view a link asks for (`/events?show=rides`), kept to the ones on offer; Events otherwise. */
+export function pickEventsView(param: string | string[] | null | undefined, offered: EventsView[]): EventsView {
+  const v = Array.isArray(param) ? param[0] : param;
+  return v && (offered as string[]).includes(v) ? (v as EventsView) : 'events';
+}

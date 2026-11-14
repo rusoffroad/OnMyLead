@@ -106,3 +106,8 @@ export const SHOWCASE_EASY_LEAVE: boolean = false;
  * is live in the stores; when it flips, retake the step's screenshot (site/create) too.
  */
 export const SHOWCASE_QUICK_CREATE: boolean = false;
+/**
+ * The showcase's Events card in its 3.1 words (Events and Group Rides: events, public group rides
+ * near you and your own, under one switch). Off until the app version with it (3.1) is live in the stores.
+ */
+export const SHOWCASE_EVENTS_AND_RIDES: boolean = false;

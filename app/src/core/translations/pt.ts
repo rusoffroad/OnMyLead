@@ -3527,6 +3527,16 @@ const dict: Record<string, string> = {
   "Friends I Invite": "Amigos que eu convidar",
   "More Options": "Mais opções",
   "Route, vehicles, rider limits, invite code, groups and details": "Rota, veículos, limites de pilotos, código de convite, grupos e detalhes",
+  "Events and Group Rides": "Eventos e passeios em grupo",
+  "Events and Group Rides | OnMyLead": "Eventos e passeios em grupo | OnMyLead",
+  "Rallies and rides": "Encontros e passeios",
+  "Group Rides Near You": "Passeios em grupo perto de você",
+  "Public Group Rides": "Passeios em grupo públicos",
+  "One ride on one day. Join one and ride together in Ride Mode.": "Um passeio em um dia. Entre e rodem juntos no Modo Passeio.",
+  "Every public ride coming up. Allow location to see the ones near you first.": "Todos os passeios públicos que vêm aí. Permita a localização para ver primeiro os mais perto.",
+  "No Public Rides Coming Up": "Nenhum passeio público por vir",
+  "See Them on the Map": "Ver no mapa",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Modo Mapa, Entrar em um passeio, Iniciar um passeio e Eventos e passeios em grupo sempre aparecem primeiro.",
 };
 
 export default dict;

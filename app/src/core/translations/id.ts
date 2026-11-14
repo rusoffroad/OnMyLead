@@ -3527,6 +3527,16 @@ const dict: Record<string, string> = {
   "Friends I Invite": "Teman yang saya undang",
   "More Options": "Opsi lainnya",
   "Route, vehicles, rider limits, invite code, groups and details": "Rute, kendaraan, batas peserta, kode undangan, grup, dan detail",
+  "Events and Group Rides": "Acara dan riding grup",
+  "Events and Group Rides | OnMyLead": "Acara dan riding grup | OnMyLead",
+  "Rallies and rides": "Rally dan riding",
+  "Group Rides Near You": "Riding grup di dekatmu",
+  "Public Group Rides": "Riding grup publik",
+  "One ride on one day. Join one and ride together in Ride Mode.": "Satu riding di satu hari. Gabung dan riding bersama di Mode Riding.",
+  "Every public ride coming up. Allow location to see the ones near you first.": "Semua riding publik yang akan datang. Izinkan lokasi untuk melihat yang terdekat lebih dulu.",
+  "No Public Rides Coming Up": "Belum ada riding publik",
+  "See Them on the Map": "Lihat di peta",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Mode Peta, Gabung riding, Mulai riding, dan Acara dan riding grup selalu tampil paling atas.",
 };
 
 export default dict;

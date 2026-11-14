@@ -3527,6 +3527,16 @@ const dict: Record<string, string> = {
   "Friends I Invite": "Друзья, которых я приглашу",
   "More Options": "Ещё параметры",
   "Route, vehicles, rider limits, invite code, groups and details": "Маршрут, техника, лимиты участников, код приглашения, группы и детали",
+  "Events and Group Rides": "События и групповые поездки",
+  "Events and Group Rides | OnMyLead": "События и групповые поездки | OnMyLead",
+  "Rallies and rides": "Слёты и поездки",
+  "Group Rides Near You": "Групповые поездки рядом",
+  "Public Group Rides": "Публичные групповые поездки",
+  "One ride on one day. Join one and ride together in Ride Mode.": "Одна поездка в один день. Присоединяйтесь и едьте вместе в режиме поездки.",
+  "Every public ride coming up. Allow location to see the ones near you first.": "Все предстоящие публичные поездки. Разрешите геолокацию, чтобы сначала видеть ближайшие.",
+  "No Public Rides Coming Up": "Нет предстоящих публичных поездок",
+  "See Them on the Map": "Смотреть на карте",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Режим карты, Присоединиться, Начать поездку и События и групповые поездки всегда идут первыми.",
 };
 
 export default dict;

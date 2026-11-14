@@ -65,23 +65,24 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
 }
 
 /**
- * Start a Ride and Events, side by side under Join (approved mock v4). Start shows how many rides
- * a Free rider has left (and opens Pro when they're out); Events opens rallies and ride weekends.
+ * Start a Ride and Events and Group Rides, side by side under Join (approved mock v4; renamed in
+ * 3.1). Start shows how many rides a Free rider has left (and opens Pro when they're out); the
+ * other opens rallies, ride weekends and public group rides near you.
  */
 export function ActionTiles({ quota, onStart }: { quota: Quota | null; onStart: () => void }) {
   const detail = startRideDetail(quota);
   return (
     <View style={styles.pair}>
       <Tile icon="flag" tone="red" title={t('Start a Ride')} detail={detail} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
-      <Tile icon="calendar" tone="gold" title={t('Events')} detail={t('Rallies and weekends')} onPress={() => router.push('/events')} />
+      <Tile icon="calendar" tone="gold" title={t('Events and Group Rides')} lines={2} detail={t('Rallies and rides')} onPress={() => router.push('/events')} />
     </View>
   );
 }
 
 /** One of the two action tiles: an icon chip on top, a condensed title and one line at the bottom. */
 function Tile({
-  icon, title, detail, onPress, tone,
-}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold' }) {
+  icon, title, detail, onPress, tone, lines = 1,
+}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; lines?: 1 | 2 }) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -92,7 +93,7 @@ function Tile({
         <Icon name={icon} size={21} color={tone === 'red' ? '#FF4A51' : Colors.gold} strokeWidth={2.1} />
       </View>
       <View>
-        <Text style={styles.tileTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
+        <Text style={styles.tileTitle} numberOfLines={lines} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
         <Text style={styles.tileDetail} numberOfLines={1}>{detail}</Text>
       </View>
     </Pressable>
