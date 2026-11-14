@@ -38,6 +38,10 @@ A rider whose phone shares only an approximate location (Precise Location turned
 
 The organizer picks the setting when creating the ride, under **Add Route, Difficulty and More**, in **Ride Bubble**.
 
+:::release 3.1
+From 3.1, **Ride Bubble** is under **More Options** on Create a Ride.
+:::
+
 | Setting | Yellow when the nearest rider is more than | Red when the nearest rider is more than |
 |---|---|---|
 | **Standard** | 0.5 miles | 1.5 miles |

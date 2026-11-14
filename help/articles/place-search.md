@@ -4,7 +4,7 @@ summary: Find a trailhead, off-road park, town, street address or coordinates fo
 category: routes-maps
 order: 70
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-14
 sources:
   - app/src/components/place-search.tsx
   - app/src/components/map-search.tsx
@@ -28,6 +28,10 @@ Wherever OnMyLead asks for a place, you can type its name instead of hunting on 
 - **Creating a ride**: **Search a Place or Address** sets the meeting point, and **Search a Destination** fills in where the ride ends up. See [Create a Ride](/help/create-a-ride).
 - **Find a Ride**: **Search Near a Place** shows rides near the place you pick instead of near you. Tap **Back to Near Me** (or **Clear**) to go back. See [Find a Ride](/help/find-a-ride).
 - **Route builder**: **Search** moves the map to a place before you draw. See [Draw a Route](/help/route-builder).
+
+:::release 3.1
+From 3.1, Create a Ride starts the meeting point where you are. Tap **Change** on the meeting point to open **Search a Place or Address**; **Search a Destination** is under **More Options**.
+:::
 
 :::release 1.0.1
 - **Waypoints map**: **Search** moves the map to a place so you can drop a waypoint or planned stop there. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).

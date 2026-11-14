@@ -2,8 +2,8 @@
   {
     "version": "3.1",
     "title": "The Map on CarPlay",
-    "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, and makes Leave Ride easy to find. CarPlay is part of OnMyLead Pro.",
-    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails and roads, your route, your group's dots, the rider line and turn-by-turn for the trail ahead (Pro).\n• Ride messages and group chats on CarPlay: tap one to hear it, and send a quick reply with one tap (Pro).\n• An Exit button in Map Mode and Ride Mode, plus Android's Back button. Exit never leaves the ride.\n• Leave Ride now sits right under the ride's name.\n• Fixed a crash in Ride Mode. Zoom In at Intersections is now off unless you turn it on.",
+    "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, makes Leave Ride easy to find, and turns Create a Ride into one short screen that opens already filled in. CarPlay is part of OnMyLead Pro.",
+    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails, your route, your group and turn-by-turn (Pro).\n• Ride messages and group chats on CarPlay, with one-tap replies (Pro).\n• Create a Ride is one short screen that starts on today, now and where you are.\n• An Exit button in Map Mode and Ride Mode. Exit never leaves the ride.\n• Leave Ride now sits right under the ride's name.\n• Fixed a crash in Ride Mode. Zoom In at Intersections is now off unless you turn it on.",
     "apple": null,
     "google": null,
     "notes": [
@@ -46,6 +46,26 @@
       {
         "kind": "improved",
         "text": "Exit in Ride Mode always offers Leave Ride at the bottom of its box, under Done with this ride?, even when you aren't sharing your location. Exit Ride Mode is still the big button, and Android's Back button still closes Ride Mode straight away when you aren't sharing."
+      },
+      {
+        "kind": "improved",
+        "text": "Create a Ride is one short screen that opens already filled in: today, the next quarter hour, where you are (when location is allowed), and a ride for the friends you invite. A ride from here, right now, is two taps: Start a Ride, then Create. Nothing is required but a meeting point."
+      },
+      {
+        "kind": "improved",
+        "text": "Day and Meet At are plain fields. Tap the day and a calendar opens; tap the time and a list of times opens, every 15 minutes. Picking closes it."
+      },
+      {
+        "kind": "new",
+        "text": "Your last three named meeting points show as buttons under Meeting Point, so your usual gas station or trailhead is one tap. They're kept on your device."
+      },
+      {
+        "kind": "improved",
+        "text": "The ride name is optional (an empty name becomes the day, like \"Saturday Ride\"). Who Can Join starts on Friends I Invite and then on what you picked last time, and the vehicles welcome start on your last ride's."
+      },
+      {
+        "kind": "improved",
+        "text": "The route, vehicles welcome, rider limits, your own invite code, riding groups and the ride's details moved under More Options. The route starts on Freeride; pick Mapped there to draw one, or map a route later from the ride's page."
       }
     ]
   },

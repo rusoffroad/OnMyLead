@@ -4,7 +4,7 @@ summary: Change your ride's name, day, time, meeting point, route and details, c
 category: rides
 order: 30
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/app/r/[code].tsx
   - app/src/app/ride/[id]/edit.tsx

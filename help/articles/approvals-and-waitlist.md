@@ -4,7 +4,7 @@ summary: How join requests work on rides where the organizer approves riders, an
 category: joining
 order: 50
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/core/leaving.ts
   - app/src/components/leave-ride.tsx
@@ -26,6 +26,10 @@ Organizers can choose to approve each rider on a public ride, and can cap how ma
 ## Rides That Need Approval
 
 When creating a public ride, the organizer picks **I Approve Riders** under **Joining**. See [Create a Ride](/help/create-a-ride).
+
+:::release 3.1
+From 3.1, **Joining** is under **More Options** on Create a Ride, in **Who's Riding**, once **Public** is picked.
+:::
 
 ### If You're Asking to Join
 

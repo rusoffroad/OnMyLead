@@ -56,6 +56,10 @@ Your machine's page then shows its **Full Range**, **Safe Turnaround** and **Saf
 
 A ride with neither has no miles to check against.
 
+:::release 3.1
+From 3.1, **Route Length (Miles)** is under **More Options** on Create a Ride.
+:::
+
 ## Check Before the Ride
 
 1. Join the ride, open it and tap the **Details** tab.

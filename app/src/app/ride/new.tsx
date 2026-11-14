@@ -1,5 +1,5 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import { EventOrRide } from '@/components/events/event-or-ride';
@@ -7,11 +7,12 @@ import { spotFromParams } from '@/core/spots';
 import { ThemedText } from '@/components/themed-text';
 import { MeetPointMap } from '@/components/meet-point-map';
 import { PlaceSearch } from '@/components/place-search';
-import { RideDatePicker } from '@/components/ride-date-picker';
 import { TimePicker } from '@/components/time-picker';
+import { WhenFields } from '@/components/when-fields';
+import { Icon } from '@/components/icon';
 import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-code-field';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
-import { Colors, Radius, Spacing } from '@/constants/theme';
+import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { withAlpha } from '@/core/color';
 import type { BubblePreset } from '@/core/bubble';
 import { rideAllowanceText, type FeatureKey } from '@/core/entitlements';
@@ -26,14 +27,16 @@ import { RigFitLine, WidthIcon } from '@/components/trail-width-row';
 import { useGarageWidths } from '@/lib/trail-width';
 import { metersToMiles } from '@/core/geo';
 import { getLocalTrail, loadTrails, trailLine } from '@/lib/nav-trails';
-import { atMinutes as at, canRideOn, nextWeekday, startOfDay } from '@/core/calendar';
-import { clockText, LAST_MINUTE_OF_DAY, parseTime, shiftClock } from '@/core/time';
+import { atMinutes as at, canRideOn, nextWeekday } from '@/core/calendar';
+import { atSpot, defaultWhen, type RecentSpot } from '@/core/quick-ride';
+import { clockText, minutesText, parseTime, shiftClock } from '@/core/time';
 import { cleanShareCode, friendlyShareCodeError } from '@/core/share-code';
 import { createRide, getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { linkRide } from '@/lib/events';
 import { useEntitlements } from '@/lib/entitlements';
 import { inviteGroupToRide, myGroups, type RidingGroup } from '@/lib/groups';
-import { currentPosition, stateAt } from '@/lib/location';
+import { currentPosition, positionIfAllowed, stateAt } from '@/lib/location';
+import { loadRideDefaults, saveRideDefaults } from '@/lib/quick-ride';
 import { useSession } from '@/lib/session';
 import { handleProError, requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
@@ -47,23 +50,17 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  const { type, copy, trail, group, event, spot, lat, lng, state, now } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string; now?: string }>();
+  const { type, copy, trail, group, event, spot, lat, lng, state } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string }>();
   const [fromSpot] = useState(() => (copy ? null : spotFromParams({ spot, lat, lng, state })));
   const { session, loading } = useSession();
   const { ent } = useEntitlements();
   const allowance = rideAllowanceText(ent);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [day, setDay] = useState<number>(() => startOfDay(new Date()).getTime());
-  // From Map Mode's Make It a Group Ride (now=1): meet at the next quarter hour today.
-  const [meetTime, setMeetTime] = useState(() => {
-    if (!fromSpot || now !== '1') return '8:00 am';
-    const d = new Date();
-    const next = Math.ceil((d.getHours() * 60 + d.getMinutes() + 1) / 15) * 15;
-    if (next > LAST_MINUTE_OF_DAY) return '8:00 am';
-    d.setHours(Math.floor(next / 60), next % 60, 0, 0);
-    return clockText(d);
-  });
+  // Opens on today at the next quarter hour (core/quick-ride): a ride from here, right now, is two taps.
+  const [start] = useState(() => defaultWhen(new Date()));
+  const [day, setDay] = useState<number>(() => start.day.getTime());
+  const [meetTime, setMeetTime] = useState(() => minutesText(start.minutes));
   const [departTime, setDepartTime] = useState('');
   const [finishTime, setFinishTime] = useState('');
   const [meetLabel, setMeetLabel] = useState(fromSpot?.name ?? '');
@@ -79,8 +76,16 @@ export default function NewRide() {
   const [requiredEquipment, setRequiredEquipment] = useState('');
   const [fuelNotes, setFuelNotes] = useState('');
   const [instructions, setInstructions] = useState('');
-  const [kind, setKind] = useState<Kind | null>(type === 'public' || type === 'private' ? type : null);
-  const [routePlan, setRoutePlan] = useState<RoutePlan | null>(null);
+  // Friends only until the rider says otherwise (or picked Public last time): nothing goes public by accident.
+  const [kind, setKind] = useState<Kind>(type === 'public' ? 'public' : 'private');
+  const [routePlan, setRoutePlan] = useState<RoutePlan>('freeride');
+  /** The meeting point is the rider's own spot, filled in when the screen opened. */
+  const [here, setHere] = useState(false);
+  const [locating, setLocating] = useState(() => !fromSpot && !copy && !trail);
+  /** The search, map and coordinates under the meeting point: open until there is a point, then behind Change. */
+  const [spotOpen, setSpotOpen] = useState<boolean | null>(null);
+  const [recent, setRecent] = useState<RecentSpot[]>([]);
+  const touched = useRef({ kind: false, vehicles: false, joining: false, spot: false });
   const [meetState, setMeetState] = useState<string | null>(fromSpot?.state ?? null);
   const [pickingState, setPickingState] = useState(false);
   const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>('open');
@@ -100,6 +105,36 @@ export default function NewRide() {
   // Create a Ride Here, from a Scout place page: the meeting point starts on the place (fields below).
   useEffect(() => {
     if (fromSpot && !fromSpot.state && !copy) stateAt(fromSpot).then(setMeetState).catch(() => {});
+    // Only the link the screen opened with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // What the last ride picked leads this one, and the meeting point starts where the rider is
+  // (only when location is already allowed: opening this screen never asks).
+  useEffect(() => {
+    let live = true;
+    loadRideDefaults().then((d) => {
+      if (!live) return;
+      setRecent(d.spots);
+      if (copy) return;
+      if (type !== 'public' && type !== 'private' && !touched.current.kind) setKind(d.kind);
+      if (d.vehicleTypes && !touched.current.vehicles) setVehicleTypes(d.vehicleTypes);
+      if (d.joinPolicy && !touched.current.joining) setJoinPolicy(d.joinPolicy);
+    }).catch(() => {});
+    if (!fromSpot && !copy && !trail) {
+      positionIfAllowed()
+        .then(async (p) => {
+          if (!live || !p || touched.current.spot) return;
+          setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+          setHere(true);
+          const st = await stateAt(p);
+          if (live && !touched.current.spot) setMeetState(st);
+        })
+        .finally(() => live && setLocating(false));
+    }
+    return () => {
+      live = false;
+    };
     // Only the link the screen opened with.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -132,7 +167,7 @@ export default function NewRide() {
       setJoinPolicy(src.join_policy);
       if (src.bubble_preset !== 'custom') setBubble(src.bubble_preset);
       setMeetState(src.meet_state ?? null);
-      setRoutePlan(route ? 'mapped' : src.freeride ? 'freeride' : null);
+      setRoutePlan(route ? 'mapped' : 'freeride');
       if (details) {
         setCoords(`${details.meet_lat.toFixed(5)}, ${details.meet_lng.toFixed(5)}`);
         setMeetLabel(details.meet_label ?? '');
@@ -185,10 +220,20 @@ export default function NewRide() {
 
   const parsedCoords = coords.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
 
+  /** The meeting point was set by hand: a late location fix no longer replaces it. */
+  function setSpot(p: { lat: number; lng: number }, label?: string) {
+    touched.current.spot = true;
+    setHere(false);
+    setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+    if (label != null) setMeetLabel(label);
+  }
+
   async function useMyLocation() {
     try {
       const p = await currentPosition();
-      setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+      setSpot(p, '');
+      setHere(true);
+      setSpotOpen(false);
       setMeetState(await stateAt(p));
     } catch (e) {
       setError(e instanceof Error ? e.message : tr('Could not get your location.'));
@@ -196,14 +241,20 @@ export default function NewRide() {
   }
 
   async function pickPlace(p: Place) {
-    setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
-    if (p.kind !== 'Coordinates') setMeetLabel(placeLabel(p));
+    setSpot(p, p.kind !== 'Coordinates' ? placeLabel(p) : undefined);
+    if (p.kind !== 'Coordinates') setSpotOpen(false);
     setMeetState(p.state ?? (await stateAt(p)));
   }
 
   async function pickOnMap(p: { lat: number; lng: number }) {
-    setCoords(`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`);
+    setSpot(p);
     setMeetState(await stateAt(p));
+  }
+
+  function pickRecent(s: RecentSpot) {
+    setSpot(s, s.label);
+    setSpotOpen(false);
+    setMeetState(s.state);
   }
 
   async function fillStateFromCoords() {
@@ -214,19 +265,17 @@ export default function NewRide() {
     setError(null);
     const dayDate = new Date(day);
     const meetAt = at(dayDate, parseTime(meetTime));
-    if (!kind) return setError(tr('Pick Public or Private at the top.'));
-    if (!name.trim()) return setError(tr('Give the ride a name.'));
     if (!meetAt) return setError(tr('Pick a meeting time.'));
     if (!canRideOn(dayDate, new Date())) return setError(tr('Pick a day from today up to three years out.'));
     if (!parsedCoords) return setError(tr('Set the meeting point: search a place, use your location or paste coordinates like "38.57, -109.55".'));
-    if (!routePlan) return setError(tr('Pick Mapped or Freeride under The Route.'));
     if (!codeCheckOk(codeCheck)) return setError(codeCheck === 'checking' ? tr('Checking your invite code. Try again in a second.') : tr('Pick a different invite code, or clear it to get one made for you.'));
     setBusy(true);
     try {
       const lat = Number(parsedCoords[1]);
       const lng = Number(parsedCoords[2]);
+      const state = meetState ?? (await stateAt({ lat, lng }));
       const ride = await createRide({
-        name: name.trim(),
+        name: name.trim() || autoName,
         description,
         meetAt,
         departAt: departTime ? at(dayDate, parseTime(departTime)) : null,
@@ -234,7 +283,7 @@ export default function NewRide() {
         meetLat: lat,
         meetLng: lng,
         meetLabel,
-        meetState: meetState ?? (await stateAt({ lat, lng })),
+        meetState: state,
         destinationLabel: destination,
         instructions,
         vehicleTypes,
@@ -253,6 +302,11 @@ export default function NewRide() {
         freeride: routePlan === 'freeride',
         inviteCode: cleanShareCode(inviteCode) || null,
       });
+      // The next ride starts from this one's choices, with this meeting point one tap away.
+      saveRideDefaults(
+        { kind, vehicleTypes: vehicleTypes.length ? vehicleTypes : null, joinPolicy: joinPolicy === 'approval' ? 'approval' : 'open' },
+        meetLabel.trim() ? { lat, lng, label: meetLabel.trim(), state } : null,
+      ).catch(() => {});
       // A group that fails to invite can be invited again from the ride page.
       for (const g of groups.filter((x) => groupNames.includes(x.name))) {
         await inviteGroupToRide(ride.id, g.id).catch(() => {});
@@ -274,13 +328,15 @@ export default function NewRide() {
   // Someone who opens onmylead.com/ride/new signed out signs in first, then comes straight back here.
   if (Platform.OS === 'web' && !loading && !session) return <Redirect href="/sign-in?next=/ride/new" />;
 
+  const point = parsedCoords ? { lat: Number(parsedCoords[1]), lng: Number(parsedCoords[2]) } : null;
+  const editing = spotOpen ?? (!point && !locating);
+  // A ride with no name is named for its day: "Saturday Ride".
+  const autoName = tr('{day} Ride', { day: new Date(day).toLocaleDateString(undefined, { weekday: 'long' }) });
+  const spotTitle = meetLabel.trim() || (here ? tr('Where You Are Now') : point ? coords.trim() : locating ? tr('Finding where you are…') : tr('Search a Place or Address'));
+  const spotDetail = point && meetState ? stateByCode(meetState)?.name ?? null : null;
+
   return (
     <Screen width="readable">
-      {Platform.OS === 'web' ? (
-        <ThemedText type="small" themeColor="textSecondary">
-          {tr('Plan it here on the big screen. The ride, its route and its stops show up in the OnMyLead app on your iPhone as soon as you save.')}
-        </ThemedText>
-      ) : null}
       {copiedFrom ? (
         <View style={{ gap: 2, padding: 12, borderRadius: Radius.card, backgroundColor: Colors.backgroundElement, borderLeftWidth: 4, borderLeftColor: Colors.sky }}>
           <ThemedText style={{ fontWeight: 700 }}>{tr('Riding {copiedFrom} Again', { copiedFrom })}</ThemedText>
@@ -322,189 +378,261 @@ export default function NewRide() {
           </Pressable>
         </View>
       ) : null}
-      {!event ? <EventOrRide from="create-ride" /> : null}
-      <ThemedText type="heading">{tr('What Kind of Ride?')}</ThemedText>
-      <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-        <KindCard
-          title={tr('Public')}
-          detail={tr('Open to anyone. Found by riders near you or in your state.')}
-          on={kind === 'public'}
-          onPress={() => setKind('public')}
-        />
-        <KindCard
-          title={tr('Private')}
-          detail={tr('Only friends you invite by link, text or email.')}
-          on={kind === 'private'}
-          onPress={() => setKind('private')}
-        />
-      </View>
 
-      <Field label={tr('Ride Name')} value={name} onChangeText={setName} placeholder={tr('Saturday Hell\'s Revenge run')} />
+      <Field label={tr('Ride Name')} value={name} onChangeText={setName} placeholder={autoName} maxLength={120} />
 
-      <Card>
-        <ThemedText type="heading">{tr('When')}</ThemedText>
-        <RideDatePicker value={day} onChange={setDay} />
-        <TimePicker label={tr('Meet At')} value={meetTime} onChange={setMeetTime} />
-      </Card>
+      <WhenFields day={day} onDay={setDay} time={meetTime} onTime={setMeetTime} />
 
-      <Card>
-        <ThemedText type="heading">{tr('Meeting Point')}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          {tr('Only joined riders see the exact spot. Public pages show the area within about a mile.')}
-        </ThemedText>
-        <PlaceSearch label={tr('Search a Place or Address')} onPick={pickPlace} />
-        <MeetPointMap value={parsedCoords ? { lat: Number(parsedCoords[1]), lng: Number(parsedCoords[2]) } : null} onPick={pickOnMap} />
-        <Button title={tr('Use My Current Location')} kind="secondary" onPress={useMyLocation} />
-        <Field label={tr('Coordinates')} value={coords} onChangeText={setCoords} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
-        <Field label={tr('Place Name')} value={meetLabel} onChangeText={setMeetLabel} placeholder={tr('Gas station on Main St, Moab, UT')} />
-        {kind === 'public' ? (
-          <View style={{ gap: Spacing.one }}>
-            <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('State')}</ThemedText>
-            <ThemedText>
-              {meetState ? tr('Listed in {name}.', { name: stateByCode(meetState)?.name }) : tr('Set the meeting point and we fill this in, or pick it.')}
+      <View style={{ gap: 6 }}>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('Meeting Point')}</ThemedText>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ expanded: editing }}
+          accessibilityLabel={`${tr('Meeting Point')}: ${spotTitle}. ${editing ? tr('Done') : tr('Change')}`}
+          onPress={() => setSpotOpen(!editing)}
+          style={({ pressed }) => [styles.spot, pressed && { opacity: 0.85 }]}>
+          <View style={styles.spotPin}><Icon name="pin" size={22} color={point ? Colors.accent : Colors.textSecondary} /></View>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <ThemedText style={{ fontWeight: 700 }} numberOfLines={1}>{spotTitle}</ThemedText>
+            {spotDetail ? <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{spotDetail}</ThemedText> : null}
+          </View>
+          <ThemedText type="linkPrimary">{editing ? tr('Done') : tr('Change')}</ThemedText>
+        </Pressable>
+        {recent.length ? (
+          <View style={styles.chips} accessibilityRole="radiogroup">
+            {recent.map((s) => {
+              const on = atSpot(point, s);
+              return (
+                <Pressable
+                  key={s.label}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: on }}
+                  onPress={() => pickRecent(s)}
+                  style={[styles.chip, { backgroundColor: on ? Colors.accent : Colors.backgroundSelected }]}>
+                  <ThemedText numberOfLines={1} style={[styles.chipText, { color: on ? Colors.onAccent : Colors.text }]}>{s.label}</ThemedText>
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : null}
+        {editing ? (
+          <Card>
+            <ThemedText type="small" themeColor="textSecondary">
+              {tr('Only joined riders see the exact spot. Public pages show the area within about a mile.')}
             </ThemedText>
-            {meetState && !pickingState ? (
-              <Button title={tr('Change State')} kind="ghost" onPress={() => setPickingState(true)} />
-            ) : (
-              <Choice
-                value={meetState}
-                onChange={(c) => {
-                  setMeetState(c);
-                  setPickingState(false);
-                }}
-                options={US_STATES.map((st) => ({ value: st.code, label: st.name }))}
-              />
-            )}
-          </View>
+            <PlaceSearch label={tr('Search a Place or Address')} onPick={pickPlace} />
+            <MeetPointMap value={parsedCoords ? { lat: Number(parsedCoords[1]), lng: Number(parsedCoords[2]) } : null} onPick={pickOnMap} />
+            <Button title={tr('Use My Current Location')} kind="secondary" onPress={useMyLocation} />
+            <Field label={tr('Coordinates')} value={coords} onChangeText={(v) => {
+              touched.current.spot = true;
+              setHere(false);
+              setCoords(v);
+            }} onEndEditing={fillStateFromCoords} placeholder="38.57330, -109.54980" autoCapitalize="none" />
+            <Field label={tr('Place Name')} value={meetLabel} onChangeText={setMeetLabel} placeholder={tr('Gas station on Main St, Moab, UT')} />
+            {kind === 'public' ? (
+              <View style={{ gap: Spacing.one }}>
+                <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('State')}</ThemedText>
+                <ThemedText>
+                  {meetState ? tr('Listed in {name}.', { name: stateByCode(meetState)?.name }) : tr('Set the meeting point and we fill this in, or pick it.')}
+                </ThemedText>
+                {meetState && !pickingState ? (
+                  <Button title={tr('Change State')} kind="ghost" onPress={() => setPickingState(true)} />
+                ) : (
+                  <Choice
+                    value={meetState}
+                    onChange={(c) => {
+                      setMeetState(c);
+                      setPickingState(false);
+                    }}
+                    options={US_STATES.map((st) => ({ value: st.code, label: st.name }))}
+                  />
+                )}
+              </View>
+            ) : null}
+          </Card>
         ) : null}
-      </Card>
-
-      <View style={{ gap: Spacing.two }}>
-        <ThemedText type="heading">{tr('The Route')}</ThemedText>
-        <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-          <KindCard
-            title={tr('Mapped')}
-            detail={tr('Draw the route or import a GPX next. Riders follow it in Ride Mode.')}
-            on={routePlan === 'mapped'}
-            onPress={() => requirePro('route_builder') && setRoutePlan('mapped')}
-            pro="route_builder"
-          />
-          <KindCard
-            title={tr('Freeride')}
-            detail={tr('No set route. Everyone follows the leader.')}
-            on={routePlan === 'freeride'}
-            onPress={() => setRoutePlan('freeride')}
-          />
-        </View>
       </View>
 
-      <Card>
-        <ThemedText type="heading">{tr('Who’s Riding')}</ThemedText>
-        <MultiChoice label={tr('Vehicles Welcome')} options={VEHICLE_TYPES} value={vehicleTypes} onChange={setVehicleTypes} />
-        {kind === 'public' ? (
-          <Choice
-            label={tr('Joining')}
-            value={joinPolicy}
-            onChange={setJoinPolicy}
-            options={[
-              { value: 'open', label: tr('Anyone Can Join') },
-              { value: 'approval', label: tr('I Approve Riders') },
-            ]}
-          />
-        ) : null}
-        <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-          <View style={{ flex: 1 }}>
-            <Field label={tr('Max Vehicles')} value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder={tr('No limit')} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Field label={tr('Max Riders')} value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder={tr('No limit')} />
+      <View style={{ gap: 6 }}>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('Who Can Join')}</ThemedText>
+        <View style={styles.kinds} accessibilityRole="radiogroup">
+          {([['private', tr('Friends I Invite')], ['public', tr('Public')]] as const).map(([value, title]) => {
+            const on = kind === value;
+            return (
+              <Pressable
+                key={value}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: on }}
+                onPress={() => {
+                  touched.current.kind = true;
+                  setKind(value);
+                }}
+                style={[styles.kind, on && { backgroundColor: Colors.accent }]}>
+                <ThemedText style={[styles.kindText, { color: on ? Colors.onAccent : Colors.text }]}>{title}</ThemedText>
+              </Pressable>
+            );
+          })}
+        </View>
+        <ThemedText type="small" themeColor="textSecondary">
+          {kind === 'public' ? tr('Open to anyone. Found by riders near you or in your state.') : tr('Only friends you invite by link, text or email.')}
+        </ThemedText>
+        {kind === 'public' && !event ? <EventOrRide from="create-ride" /> : null}
+      </View>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded: more }}
+        onPress={() => setMore(!more)}
+        style={({ pressed }) => [styles.spot, pressed && { opacity: 0.85 }]}>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <ThemedText style={{ fontWeight: 700 }}>{tr('More Options')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('Route, vehicles, rider limits, invite code, groups and details')}</ThemedText>
+        </View>
+        <ThemedText type="linkPrimary">{more ? tr('Hide') : tr('Show')}</ThemedText>
+      </Pressable>
+
+      {more ? (
+        <>
+        <View style={{ gap: Spacing.two }}>
+          <ThemedText type="heading">{tr('The Route')}</ThemedText>
+          <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+            <KindCard
+              title={tr('Mapped')}
+              detail={tr('Draw the route or import a GPX next. Riders follow it in Ride Mode.')}
+              on={routePlan === 'mapped'}
+              onPress={() => requirePro('route_builder') && setRoutePlan('mapped')}
+              pro="route_builder"
+            />
+            <KindCard
+              title={tr('Freeride')}
+              detail={tr('No set route. Everyone follows the leader.')}
+              on={routePlan === 'freeride'}
+              onPress={() => setRoutePlan('freeride')}
+            />
           </View>
         </View>
-      </Card>
 
-      <Card>
-        <ThemedText type="heading">{tr('Invite Code')}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">{tr('Riders open the ride with its link, QR code or this code. Leave it empty and OnMyLead makes one, or type your own so it’s easy to say out loud.{v}', { v: kind === 'private' ? ` ${tr('Anyone with the code can join, so pick one that’s hard to guess.')}` : '' })}</ThemedText>
-        <ShareCodeField kind="ride" label={tr('Your Own Code (Optional)')} value={inviteCode} onChange={setInviteCode} onCheck={setCodeCheck} />
-      </Card>
-
-      {groups.length ? (
         <Card>
-          <ThemedText type="heading">{tr('Invite a Group')}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            {tr('Everyone in the groups you pick gets a notification and sees the ride on their home screen. They join with one tap.')}
-          </ThemedText>
-          <MultiChoice label={tr('Your Riding Groups')} options={[...new Set(groups.map((g) => g.name))]} value={groupNames} onChange={setGroupNames} />
+          <ThemedText type="heading">{tr('Who’s Riding')}</ThemedText>
+          <MultiChoice label={tr('Vehicles Welcome')} options={VEHICLE_TYPES} value={vehicleTypes} onChange={(v) => {
+            touched.current.vehicles = true;
+            setVehicleTypes(v);
+          }} />
+          {kind === 'public' ? (
+            <Choice
+              label={tr('Joining')}
+              value={joinPolicy}
+              onChange={(v) => {
+                touched.current.joining = true;
+                setJoinPolicy(v);
+              }}
+              options={[
+                { value: 'open', label: tr('Anyone Can Join') },
+                { value: 'approval', label: tr('I Approve Riders') },
+              ]}
+            />
+          ) : null}
+          <View style={{ flexDirection: 'row', gap: Spacing.two }}>
+            <View style={{ flex: 1 }}>
+              <Field label={tr('Max Vehicles')} value={maxVehicles} onChangeText={setMaxVehicles} keyboardType="number-pad" placeholder={tr('No limit')} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Field label={tr('Max Riders')} value={maxRiders} onChangeText={setMaxRiders} keyboardType="number-pad" placeholder={tr('No limit')} />
+            </View>
+          </View>
         </Card>
-      ) : null}
 
-      <Button title={more ? tr('Fewer Details') : tr('Add Route, Difficulty and More')} kind="ghost" onPress={() => setMore(!more)} />
-      {more ? (
         <Card>
-          <Field label={tr('Description')} value={description} onChangeText={setDescription} multiline />
-          <TimePicker
-            label={tr('Departure Time (Optional)')}
-            value={departTime}
-            onChange={setDepartTime}
-            optional
-            suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 30)}
-          />
-          <TimePicker
-            label={tr('Expected Finish (Optional)')}
-            value={finishTime}
-            onChange={setFinishTime}
-            optional
-            suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 8 * 60)}
-          />
-          <PlaceSearch label={tr('Search a Destination')} onPick={(p) => setDestination(placeLabel(p))} />
-          <Field
-            label={tr('Destination')}
-            value={destination}
-            onChangeText={setDestination}
-            placeholder={tr('Trailhead, town or street address')}
-            hint={tr('Anyone who can see the ride sees this. Riders get directions to it in Apple Maps or Google Maps.')}
-          />
-          <Field label={tr('Route Length (Miles)')} value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint={tr('Used to warn riders whose fuel range is too short.')} />
-          <Choice
-            label={tr('Difficulty')}
-            value={difficulty}
-            onChange={setDifficulty}
-            options={[{ value: 'easy', label: tr('Easy') }, { value: 'moderate', label: tr('Moderate') }, { value: 'hard', label: tr('Hard') }, { value: 'extreme', label: tr('Extreme') }]}
-          />
-          <Choice
-            label={tr('Experience')}
-            value={experience}
-            onChange={setExperience}
-            options={[{ value: 'beginner', label: tr('Beginner') }, { value: 'intermediate', label: tr('Intermediate') }, { value: 'advanced', label: tr('Advanced') }, { value: 'expert', label: tr('Expert') }]}
-          />
-          <Field label={tr('What to Bring')} value={whatToBring} onChangeText={setWhatToBring} multiline />
-          <Field label={tr('Required Equipment')} value={requiredEquipment} onChangeText={setRequiredEquipment} multiline placeholder={tr('Whip flag, helmet, spare belt')} />
-          <Field label={tr('Fuel')} value={fuelNotes} onChangeText={setFuelNotes} placeholder={tr('Full tank, no gas on the trail')} />
-          <Field label={tr('Instructions for Joined Riders')} value={instructions} onChangeText={setInstructions} multiline />
-          <Choice
-            label={tr('Ride Bubble')}
-            value={bubble}
-            onChange={setBubble}
-            options={[
-              { value: 'default', label: tr('Standard') },
-              { value: 'tight_trail', label: tr('Tight Trail') },
-              { value: 'desert', label: tr('Desert') },
-              { value: 'highway', label: tr('Highway') },
-            ]}
-          />
+          <ThemedText type="heading">{tr('Invite Code')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('Riders open the ride with its link, QR code or this code. Leave it empty and OnMyLead makes one, or type your own so it’s easy to say out loud.{v}', { v: kind === 'private' ? ` ${tr('Anyone with the code can join, so pick one that’s hard to guess.')}` : '' })}</ThemedText>
+          <ShareCodeField kind="ride" label={tr('Your Own Code (Optional)')} value={inviteCode} onChange={setInviteCode} onCheck={setCodeCheck} />
         </Card>
+
+        {groups.length ? (
+          <Card>
+            <ThemedText type="heading">{tr('Invite a Group')}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              {tr('Everyone in the groups you pick gets a notification and sees the ride on their home screen. They join with one tap.')}
+            </ThemedText>
+            <MultiChoice label={tr('Your Riding Groups')} options={[...new Set(groups.map((g) => g.name))]} value={groupNames} onChange={setGroupNames} />
+          </Card>
+        ) : null}
+
+          <Card>
+            <Field label={tr('Description')} value={description} onChangeText={setDescription} multiline />
+            <TimePicker
+              label={tr('Departure Time (Optional)')}
+              value={departTime}
+              onChange={setDepartTime}
+              optional
+              suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 30)}
+            />
+            <TimePicker
+              label={tr('Expected Finish (Optional)')}
+              value={finishTime}
+              onChange={setFinishTime}
+              optional
+              suggest={shiftClock(parseTime(meetTime) ?? 8 * 60, 8 * 60)}
+            />
+            <PlaceSearch label={tr('Search a Destination')} onPick={(p) => setDestination(placeLabel(p))} />
+            <Field
+              label={tr('Destination')}
+              value={destination}
+              onChangeText={setDestination}
+              placeholder={tr('Trailhead, town or street address')}
+              hint={tr('Anyone who can see the ride sees this. Riders get directions to it in Apple Maps or Google Maps.')}
+            />
+            <Field label={tr('Route Length (Miles)')} value={routeMiles} onChangeText={setRouteMiles} keyboardType="decimal-pad" hint={tr('Used to warn riders whose fuel range is too short.')} />
+            <Choice
+              label={tr('Difficulty')}
+              value={difficulty}
+              onChange={setDifficulty}
+              options={[{ value: 'easy', label: tr('Easy') }, { value: 'moderate', label: tr('Moderate') }, { value: 'hard', label: tr('Hard') }, { value: 'extreme', label: tr('Extreme') }]}
+            />
+            <Choice
+              label={tr('Experience')}
+              value={experience}
+              onChange={setExperience}
+              options={[{ value: 'beginner', label: tr('Beginner') }, { value: 'intermediate', label: tr('Intermediate') }, { value: 'advanced', label: tr('Advanced') }, { value: 'expert', label: tr('Expert') }]}
+            />
+            <Field label={tr('What to Bring')} value={whatToBring} onChangeText={setWhatToBring} multiline />
+            <Field label={tr('Required Equipment')} value={requiredEquipment} onChangeText={setRequiredEquipment} multiline placeholder={tr('Whip flag, helmet, spare belt')} />
+            <Field label={tr('Fuel')} value={fuelNotes} onChangeText={setFuelNotes} placeholder={tr('Full tank, no gas on the trail')} />
+            <Field label={tr('Instructions for Joined Riders')} value={instructions} onChangeText={setInstructions} multiline />
+            <Choice
+              label={tr('Ride Bubble')}
+              value={bubble}
+              onChange={setBubble}
+              options={[
+                { value: 'default', label: tr('Standard') },
+                { value: 'tight_trail', label: tr('Tight Trail') },
+                { value: 'desert', label: tr('Desert') },
+                { value: 'highway', label: tr('Highway') },
+              ]}
+            />
+          </Card>
+        </>
       ) : null}
 
       <ErrorText error={error} />
-      <Button
-        title={kind === 'public' ? tr('Create Public Ride') : kind === 'private' ? tr('Create Private Ride') : tr('Create Ride')}
-        big
-        loading={busy}
-        onPress={submit}
-      />
+      <Button title={kind === 'public' ? tr('Create Public Ride') : tr('Create Private Ride')} big loading={busy} onPress={submit} />
     </Screen>
   );
 }
+
+const styles = themedStyles(() => ({
+  spot: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.three, minHeight: 64, paddingVertical: 10, paddingHorizontal: 14,
+    borderRadius: Radius.control, backgroundColor: Colors.backgroundElement,
+  },
+  spotPin: { width: 40, height: 40, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
+  chip: { borderRadius: Radius.pill, paddingHorizontal: 16, minHeight: 40, maxWidth: '100%', justifyContent: 'center' },
+  chipText: { fontSize: 15, fontFamily: font(600) },
+  kinds: { flexDirection: 'row', gap: 4, padding: 4, borderRadius: Radius.control, backgroundColor: Colors.backgroundElement },
+  kind: { flex: 1, minHeight: 44, borderRadius: Radius.control - 2, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  kindText: { fontSize: 16, fontFamily: font(700) },
+}));
 
 /** One of two choices (Public or Private, Mapped or Freeride): a big tappable card, outlined in red when picked. */
 function KindCard({ title, detail, on, onPress, pro }: { title: string; detail: string; on: boolean; onPress: () => void; pro?: FeatureKey }) {
