@@ -4,7 +4,7 @@ summary: Switch between satellite and topo, pick which roads, trails and land bo
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/hooks/use-dot-size.ts
   - app/src/components/trail-map-overlay.tsx
@@ -53,6 +53,10 @@ The layers button is the round button with a stacked layers icon in the top-righ
 
 :::release 2.1
 The round **Map Settings** button (a two-slider icon) is in the top-left corner of the map, level with the compass on the right (the compass shows once the map is turned away from north). While a screen's top bar is showing, both sit just under it so nothing covers them; in [Full Map](/help/full-map) they move up to the top of the screen and stay there. On an iPad or Android tablet, Ride Mode puts the button just right of the riders column, and Map Mode, the route builder and the waypoints map held sideways put it just right of the panel. On onmylead.com the compass is with the zoom buttons instead. You'll find it on:
+
+:::release 3.1
+In Full Map on Ride Mode and Map Mode, the round **‹** (Exit) takes the top-left corner and **Map Settings** sits just right of it.
+:::
 :::
 
 - Ride Mode's map
