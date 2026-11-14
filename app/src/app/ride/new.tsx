@@ -13,9 +13,8 @@ import { Icon } from '@/components/icon';
 import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-code-field';
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
-import { withAlpha } from '@/core/color';
 import type { BubblePreset } from '@/core/bubble';
-import { rideAllowanceText, type FeatureKey } from '@/core/entitlements';
+import { rideAllowanceText } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
@@ -85,7 +84,7 @@ export default function NewRide() {
   /** The search, map and coordinates under the meeting point: open until there is a point, then behind Change. */
   const [spotOpen, setSpotOpen] = useState<boolean | null>(null);
   const [recent, setRecent] = useState<RecentSpot[]>([]);
-  const touched = useRef({ kind: false, vehicles: false, joining: false, spot: false });
+  const touched = useRef({ kind: false, vehicles: false, joining: false, spot: false, route: false });
   const [meetState, setMeetState] = useState<string | null>(fromSpot?.state ?? null);
   const [pickingState, setPickingState] = useState(false);
   const [joinPolicy, setJoinPolicy] = useState<JoinPolicy>('open');
@@ -120,6 +119,8 @@ export default function NewRide() {
       if (type !== 'public' && type !== 'private' && !touched.current.kind) setKind(d.kind);
       if (d.vehicleTypes && !touched.current.vehicles) setVehicleTypes(d.vehicleTypes);
       if (d.joinPolicy && !touched.current.joining) setJoinPolicy(d.joinPolicy);
+      // A leader who maps every ride starts on Mapped (a trail's own route already did).
+      if (d.route && !trail && !touched.current.route) setRoutePlan(d.route);
     }).catch(() => {});
     if (!fromSpot && !copy && !trail) {
       positionIfAllowed()
@@ -304,7 +305,7 @@ export default function NewRide() {
       });
       // The next ride starts from this one's choices, with this meeting point one tap away.
       saveRideDefaults(
-        { kind, vehicleTypes: vehicleTypes.length ? vehicleTypes : null, joinPolicy: joinPolicy === 'approval' ? 'approval' : 'open' },
+        { kind, vehicleTypes: vehicleTypes.length ? vehicleTypes : null, joinPolicy: joinPolicy === 'approval' ? 'approval' : 'open', route: routePlan },
         meetLabel.trim() ? { lat, lng, label: meetLabel.trim(), state } : null,
       ).catch(() => {});
       // A group that fails to invite can be invited again from the ride page.
@@ -454,6 +455,33 @@ export default function NewRide() {
       </View>
 
       <View style={{ gap: 6 }}>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('The Route')}</ThemedText>
+        <View style={styles.kinds} accessibilityRole="radiogroup">
+          {([['mapped', tr('Mapped')], ['freeride', tr('Freeride')]] as const).map(([value, title]) => {
+            const on = routePlan === value;
+            return (
+              <Pressable
+                key={value}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: on }}
+                onPress={() => {
+                  if (value === 'mapped' && !requirePro('route_builder')) return;
+                  touched.current.route = true;
+                  setRoutePlan(value);
+                }}
+                style={[styles.kind, on && { backgroundColor: Colors.accent }]}>
+                <ThemedText style={[styles.kindText, { color: on ? Colors.onAccent : Colors.text }]}>{title}</ThemedText>
+                {value === 'mapped' ? <ProTag feature="route_builder" /> : null}
+              </Pressable>
+            );
+          })}
+        </View>
+        <ThemedText type="small" themeColor="textSecondary">
+          {routePlan === 'mapped' ? tr('Draw the route or import a GPX next. Riders follow it in Ride Mode.') : tr('No set route. Everyone follows the leader.')}
+        </ThemedText>
+      </View>
+
+      <View style={{ gap: 6 }}>
         <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('Who Can Join')}</ThemedText>
         <View style={styles.kinds} accessibilityRole="radiogroup">
           {([['private', tr('Friends I Invite')], ['public', tr('Public')]] as const).map(([value, title]) => {
@@ -486,32 +514,13 @@ export default function NewRide() {
         style={({ pressed }) => [styles.spot, pressed && { opacity: 0.85 }]}>
         <View style={{ flex: 1, minWidth: 0 }}>
           <ThemedText style={{ fontWeight: 700 }}>{tr('More Options')}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">{tr('Route, vehicles, rider limits, invite code, groups and details')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('Vehicles, rider limits, invite code, groups and details')}</ThemedText>
         </View>
         <ThemedText type="linkPrimary">{more ? tr('Hide') : tr('Show')}</ThemedText>
       </Pressable>
 
       {more ? (
         <>
-        <View style={{ gap: Spacing.two }}>
-          <ThemedText type="heading">{tr('The Route')}</ThemedText>
-          <View style={{ flexDirection: 'row', gap: Spacing.two }}>
-            <KindCard
-              title={tr('Mapped')}
-              detail={tr('Draw the route or import a GPX next. Riders follow it in Ride Mode.')}
-              on={routePlan === 'mapped'}
-              onPress={() => requirePro('route_builder') && setRoutePlan('mapped')}
-              pro="route_builder"
-            />
-            <KindCard
-              title={tr('Freeride')}
-              detail={tr('No set route. Everyone follows the leader.')}
-              on={routePlan === 'freeride'}
-              onPress={() => setRoutePlan('freeride')}
-            />
-          </View>
-        </View>
-
         <Card>
           <ThemedText type="heading">{tr('Who’s Riding')}</ThemedText>
           <MultiChoice label={tr('Vehicles Welcome')} options={VEHICLE_TYPES} value={vehicleTypes} onChange={(v) => {
@@ -630,26 +639,6 @@ const styles = themedStyles(() => ({
   chip: { borderRadius: Radius.pill, paddingHorizontal: 16, minHeight: 40, maxWidth: '100%', justifyContent: 'center' },
   chipText: { fontSize: 15, fontFamily: font(600) },
   kinds: { flexDirection: 'row', gap: 4, padding: 4, borderRadius: Radius.control, backgroundColor: Colors.backgroundElement },
-  kind: { flex: 1, minHeight: 44, borderRadius: Radius.control - 2, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
+  kind: { flex: 1, flexDirection: 'row', gap: 8, minHeight: 44, borderRadius: Radius.control - 2, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
   kindText: { fontSize: 16, fontFamily: font(700) },
 }));
-
-/** One of two choices (Public or Private, Mapped or Freeride): a big tappable card, outlined in red when picked. */
-function KindCard({ title, detail, on, onPress, pro }: { title: string; detail: string; on: boolean; onPress: () => void; pro?: FeatureKey }) {
-  return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected: on }}
-      onPress={onPress}
-      style={{
-        flex: 1, gap: Spacing.one, padding: Spacing.three, minHeight: 128, borderRadius: Radius.card, borderWidth: 2,
-        borderColor: on ? Colors.accent : 'transparent', backgroundColor: on ? withAlpha(Colors.accent, 0.14) : Colors.backgroundElement,
-      }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <ThemedText type="subtitle" style={{ fontSize: 30, lineHeight: 32 }}>{title}</ThemedText>
-        {pro ? <ProTag feature={pro} /> : null}
-      </View>
-      <ThemedText type="small" themeColor="textSecondary">{detail}</ThemedText>
-    </Pressable>
-  );
-}

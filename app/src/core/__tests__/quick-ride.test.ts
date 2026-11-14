@@ -71,10 +71,12 @@ describe('what the form remembers', () => {
 
   it('reads back the last ride and drops junk', () => {
     const saved = JSON.stringify({
-      kind: 'public', vehicleTypes: ['Jeep/4x4', 7, ''], joinPolicy: 'approval',
+      kind: 'public', vehicleTypes: ['Jeep/4x4', 7, ''], joinPolicy: 'approval', route: 'mapped',
       spots: [maverik, { lat: 999, lng: 0, label: 'Nowhere' }, { lat: 1, lng: 1, label: ' ' }, gate],
     });
-    expect(parseRideDefaults(saved)).toEqual({ kind: 'public', vehicleTypes: ['Jeep/4x4'], joinPolicy: 'approval', spots: [maverik, gate] });
+    expect(parseRideDefaults(saved)).toEqual({ kind: 'public', vehicleTypes: ['Jeep/4x4'], joinPolicy: 'approval', route: 'mapped', spots: [maverik, gate] });
+    // A ride saved before the route was remembered, or junk: Freeride leads, as on a first ride.
+    expect(parseRideDefaults(JSON.stringify({ kind: 'public', route: 'loop' })).route).toBeNull();
     expect(parseRideDefaults(JSON.stringify({ kind: 'unlisted', joinPolicy: 'invite_only', vehicleTypes: [] }))).toEqual(FIRST_RIDE_DEFAULTS);
   });
 

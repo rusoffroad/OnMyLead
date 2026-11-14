@@ -64,10 +64,11 @@ From 3.1, Create a Ride is one short screen that starts out already filled in: t
 3. Tap **Day** to pick another day (see [Pick the Day](#pick-the-day) below). It starts on today.
 4. Tap **Meet At** to pick another time (see [Pick the Time](#pick-the-time) below). It starts on the next quarter hour.
 5. Check the **Meeting Point**. When location is allowed it starts as **Where You Are Now**. To meet somewhere else, tap one of your last meeting points under it, or tap **Change** (see [Set the Meeting Point](#set-the-meeting-point) below).
-6. Under **Who Can Join**, tap **Friends I Invite** (a private ride, only for friends you invite by link, text or email) or **Public** (open to anyone, found by riders near you or in your state). It starts on **Friends I Invite**, and after your first ride it starts on what you picked last time.
-7. Tap **Create Private Ride** or **Create Public Ride**.
+6. Under **The Route**, tap **Mapped** (a fixed route: you draw it or import a GPX file right after the ride is created) or **Freeride** (no set route, everyone follows the leader). It starts on **Freeride**, and after your first ride it starts on what you picked last time.
+7. Under **Who Can Join**, tap **Friends I Invite** (a private ride, only for friends you invite by link, text or email) or **Public** (open to anyone, found by riders near you or in your state). It starts on **Friends I Invite**, and after your first ride it starts on what you picked last time.
+8. Tap **Create Private Ride** or **Create Public Ride**.
 
-Everything else is optional and sits under **More Options**: the route, the vehicles welcome, rider limits, your own invite code, riding groups to invite and the ride's details. You can also add most of it later with [Edit Ride Details](/help/edit-cancel-or-delete-a-ride). Public or private can't be changed after the ride is created, so pick it here.
+Everything else is optional and sits under **More Options**: the vehicles welcome, rider limits, your own invite code, riding groups to invite and the ride's details. You can also add most of it later with [Edit Ride Details](/help/edit-cancel-or-delete-a-ride). Public or private can't be changed after the ride is created, so pick it here.
 
 ### Set the Meeting Point
 
@@ -82,7 +83,7 @@ Add a **Place Name** if you like, such as "Gas station on Main St". A meeting po
 
 ### The Route
 
-Under **More Options**, **The Route** starts on **Freeride** (no set route, everyone follows the leader). Tap **Mapped** to draw the route or import a GPX file right after the ride is created. You can also map a route later from the ride's page.
+**The Route** is on the main screen, between the meeting point and **Who Can Join**. Pick **Mapped** and the route builder opens as soon as the ride is created. Pick **Freeride** and there is no set route; you can still map one later from the ride's page.
 :::
 
 :::release 2.1

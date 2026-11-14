@@ -57,7 +57,7 @@ The ride's organizer and any co-organizers can build or change the route, until 
 When you create a ride and pick **Mapped** under **The Route**, the route builder opens as soon as the ride is created.
 
 :::release 3.1
-From 3.1, **The Route** is under **More Options** on Create a Ride, and it starts on **Freeride**.
+From 3.1, **The Route** on Create a Ride starts on **Freeride**, and after your first ride on what you picked last time.
 :::
 
 To open it later:

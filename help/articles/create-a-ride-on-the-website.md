@@ -44,8 +44,8 @@ Using OnMyLead on the website is a Pro feature. See [Free and Pro](/help/free-vs
 :::release 2.1
    From 2.1 the meeting-point map is Mapbox's satellite map, the same one the app uses, and it opens near where you are if the browser shares your location. Clicking and dragging work the same.
 :::
-6. Under **Who Can Join**, pick **Friends I Invite** (a private ride) or **Public**.
-7. For a drawn route, click **More Options** and pick **Mapped** under **The Route**. It starts on **Freeride**. **More Options** also has the vehicles welcome, rider limits, your own invite code, riding groups and the ride's details.
+6. Under **The Route**, pick **Mapped** (a fixed route you draw next) or **Freeride** (no set route, everyone follows the leader). It starts on **Freeride**.
+7. Under **Who Can Join**, pick **Friends I Invite** (a private ride) or **Public**. **More Options** has the vehicles welcome, rider limits, your own invite code, riding groups and the ride's details.
 8. Click **Create Private Ride** or **Create Public Ride**.
 
 The rest of the form works the same as in the app. See [Create a Ride](/help/create-a-ride) for every option.

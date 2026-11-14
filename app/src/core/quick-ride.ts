@@ -68,11 +68,13 @@ export type RideDefaults = {
   kind: 'public' | 'private';
   vehicleTypes: string[] | null;
   joinPolicy: 'open' | 'approval' | null;
+  /** Mapped (a drawn route) or Freeride; null until a ride has been created. */
+  route: 'mapped' | 'freeride' | null;
   spots: RecentSpot[];
 };
 
 /** A first ride: friends only (nothing goes public by accident), nothing remembered. */
-export const FIRST_RIDE_DEFAULTS: RideDefaults = { kind: 'private', vehicleTypes: null, joinPolicy: null, spots: [] };
+export const FIRST_RIDE_DEFAULTS: RideDefaults = { kind: 'private', vehicleTypes: null, joinPolicy: null, route: null, spots: [] };
 
 const isSpot = (s: unknown): s is RecentSpot => {
   const x = s as RecentSpot | null;
@@ -91,6 +93,7 @@ export function parseRideDefaults(raw: string | null | undefined): RideDefaults 
       kind: v.kind === 'public' ? 'public' : 'private',
       vehicleTypes: vehicles.length ? vehicles : null,
       joinPolicy: v.joinPolicy === 'open' || v.joinPolicy === 'approval' ? v.joinPolicy : null,
+      route: v.route === 'mapped' || v.route === 'freeride' ? v.route : null,
       spots: (Array.isArray(v.spots) ? v.spots : []).filter(isSpot)
         .map((s) => ({ lat: s.lat, lng: s.lng, label: s.label.trim(), state: typeof s.state === 'string' ? s.state : null }))
         .slice(0, RECENT_SPOTS_MAX),

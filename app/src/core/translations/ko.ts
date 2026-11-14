@@ -3537,6 +3537,7 @@ const dict: Record<string, string> = {
   "No Public Rides Coming Up": "예정된 공개 라이드가 없습니다",
   "See Them on the Map": "지도에서 보기",
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "지도 모드, 라이드 참가, 라이드 시작, 이벤트와 그룹 라이드는 항상 맨 위에 표시됩니다.",
+  "Vehicles, rider limits, invite code, groups and details": "차량, 인원 제한, 초대 코드, 그룹 및 세부 정보",
 };
 
 export default dict;

@@ -140,7 +140,7 @@ export function Showcase() {
               alt="Create a Ride with The Route set to Mapped, next to Freeride, and the vehicles welcome"
               title="Create a Ride"
               text={SHOWCASE_QUICK_CREATE
-                ? 'One short screen, already filled in: today, the next quarter hour, where you are, and a ride for the friends you invite. Tap Create and share the link, or tap the day, the time or the meeting point to change it. Your last meeting spots are one tap. Under More Options, pick Mapped and tap along the trail so the route snaps to it, import a GPX file, set which machines are welcome, or make it public or approval-only.'
+                ? 'One short screen, already filled in: today, the next quarter hour, where you are, and a ride for the friends you invite. Tap Create and share the link, or tap the day, the time or the meeting point to change it. Your last meeting spots are one tap. Pick Mapped and tap along the trail so the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader. Under More Options, set which machines are welcome or make it approval-only.'
                 : 'Pick the day on a calendar and tap the meeting time (no typing), set the meeting point, difficulty and which machines are welcome, and choose public, private or approval-only. Then pick Mapped, search the trailhead or area to jump the map there, and tap along the trail so the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader.'}
               points={['Search parks, trailheads, towns or a street address for the meeting spot', 'Route miles checked against every machine’s fuel range', 'Hand the lead to another rider at any point']}
             />

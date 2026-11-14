@@ -3537,6 +3537,7 @@ const dict: Record<string, string> = {
   "No Public Rides Coming Up": "Belum ada riding publik",
   "See Them on the Map": "Lihat di peta",
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Mode Peta, Gabung riding, Mulai riding, dan Acara dan riding grup selalu tampil paling atas.",
+  "Vehicles, rider limits, invite code, groups and details": "Kendaraan, batas peserta, kode undangan, grup, dan detail",
 };
 
 export default dict;
