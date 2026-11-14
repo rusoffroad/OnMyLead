@@ -32,6 +32,10 @@
         "text": "An Exit button at the top left of Map Mode and Ride Mode (and in the Full Map bar), plus Android's Back button and Exit on the CarPlay screen. Exiting Ride Mode keeps you on the ride; it asks first if you're sharing your location, and Map Mode asks first if you're recording a trail."
       },
       {
+        "kind": "new",
+        "text": "Events is now Events and Group Rides. A switch at the top shows public events, public group rides near you (the same rides as the Rides tab, nearest first, with the distance chip) or your own events, and Create makes a public ride while you're on Group Rides. The Home tile is renamed to match; the tab bar keeps the short name Events."
+      },
+      {
         "kind": "fixed",
         "text": "Fixed Ride Mode closing by itself during a ride when the phone couldn't save part of your ride track: it no longer retries over and over."
       },
