@@ -455,7 +455,12 @@ export default function NewRide() {
       </View>
 
       <View style={{ gap: 6 }}>
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('The Route')}</ThemedText>
+        <View style={styles.labelRow}>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('The Route')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
+            {routePlan === 'mapped' ? tr('Draw or import the route next.') : tr('No set route. Everyone follows the leader.')}
+          </ThemedText>
+        </View>
         <View style={styles.kinds} accessibilityRole="radiogroup">
           {([['mapped', tr('Mapped')], ['freeride', tr('Freeride')]] as const).map(([value, title]) => {
             const on = routePlan === value;
@@ -476,13 +481,15 @@ export default function NewRide() {
             );
           })}
         </View>
-        <ThemedText type="small" themeColor="textSecondary">
-          {routePlan === 'mapped' ? tr('Draw the route or import a GPX next. Riders follow it in Ride Mode.') : tr('No set route. Everyone follows the leader.')}
-        </ThemedText>
       </View>
 
       <View style={{ gap: 6 }}>
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('Who Can Join')}</ThemedText>
+        <View style={styles.labelRow}>
+          <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('Who Can Join')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
+            {kind === 'public' ? tr('Open to anyone. Shown to riders nearby.') : tr('Only friends you invite.')}
+          </ThemedText>
+        </View>
         <View style={styles.kinds} accessibilityRole="radiogroup">
           {([['private', tr('Friends I Invite')], ['public', tr('Public')]] as const).map(([value, title]) => {
             const on = kind === value;
@@ -501,9 +508,6 @@ export default function NewRide() {
             );
           })}
         </View>
-        <ThemedText type="small" themeColor="textSecondary">
-          {kind === 'public' ? tr('Open to anyone. Found by riders near you or in your state.') : tr('Only friends you invite by link, text or email.')}
-        </ThemedText>
         {kind === 'public' && !event ? <EventOrRide from="create-ride" /> : null}
       </View>
 
@@ -511,10 +515,10 @@ export default function NewRide() {
         accessibilityRole="button"
         accessibilityState={{ expanded: more }}
         onPress={() => setMore(!more)}
-        style={({ pressed }) => [styles.spot, pressed && { opacity: 0.85 }]}>
+        style={({ pressed }) => [styles.spot, styles.more, pressed && { opacity: 0.85 }]}>
         <View style={{ flex: 1, minWidth: 0 }}>
           <ThemedText style={{ fontWeight: 700 }}>{tr('More Options')}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">{tr('Vehicles, rider limits, invite code, groups and details')}</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">{tr('Vehicles, limits, codes, groups, details')}</ThemedText>
         </View>
         <ThemedText type="linkPrimary">{more ? tr('Hide') : tr('Show')}</ThemedText>
       </Pressable>
@@ -634,10 +638,14 @@ const styles = themedStyles(() => ({
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, minHeight: 64, paddingVertical: 10, paddingHorizontal: 14,
     borderRadius: Radius.control, backgroundColor: Colors.backgroundElement,
   },
+  more: { minHeight: 52, paddingVertical: 6 },
   spotPin: { width: 40, height: 40, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   chip: { borderRadius: Radius.pill, paddingHorizontal: 16, minHeight: 40, maxWidth: '100%', justifyContent: 'center' },
   chipText: { fontSize: 15, fontFamily: font(600) },
+  // The hint sits beside its label, not under the control, so the whole screen fits on a phone without scrolling.
+  labelRow: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.two },
+  hint: { flex: 1, textAlign: 'right' },
   kinds: { flexDirection: 'row', gap: 4, padding: 4, borderRadius: Radius.control, backgroundColor: Colors.backgroundElement },
   kind: { flex: 1, flexDirection: 'row', gap: 8, minHeight: 44, borderRadius: Radius.control - 2, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 },
   kindText: { fontSize: 16, fontFamily: font(700) },
