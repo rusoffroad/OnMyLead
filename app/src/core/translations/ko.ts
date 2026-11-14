@@ -3539,6 +3539,7 @@ const dict: Record<string, string> = {
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "지도 모드, 라이드 참가, 라이드 시작, 이벤트와 그룹 라이드는 항상 맨 위에 표시됩니다.",
   "Vehicles, limits, codes, groups, details": "차량, 제한, 코드, 그룹, 세부 정보",
   "Draw or import the route next.": "다음 단계에서 경로를 그리거나 가져옵니다.",
+  "The route is already filled in.": "경로가 이미 입력되어 있습니다.",
   "Only friends you invite.": "초대한 친구만.",
   "Open to anyone. Shown to riders nearby.": "누구나 참여 가능. 근처 라이더에게 표시됩니다.",
 };

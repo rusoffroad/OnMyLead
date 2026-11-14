@@ -3539,6 +3539,7 @@ const dict: Record<string, string> = {
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "मैप मोड, राइड में शामिल हों, राइड शुरू करें और इवेंट और ग्रुप राइड हमेशा सबसे ऊपर दिखते हैं।",
   "Vehicles, limits, codes, groups, details": "वाहन, सीमाएँ, कोड, ग्रुप, विवरण",
   "Draw or import the route next.": "आगे रूट बनाएँ या इंपोर्ट करें।",
+  "The route is already filled in.": "रूट पहले से भरा हुआ है।",
   "Only friends you invite.": "सिर्फ़ वे दोस्त जिन्हें आप बुलाते हैं।",
   "Open to anyone. Shown to riders nearby.": "सबके लिए खुली। आस-पास के राइडर को दिखती है।",
 };
