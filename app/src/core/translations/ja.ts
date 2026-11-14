@@ -3537,7 +3537,10 @@ const dict: Record<string, string> = {
   "No Public Rides Coming Up": "予定されている公開ライドはありません",
   "See Them on the Map": "地図で見る",
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "マップモード、ライドに参加、ライドを開始、イベントとグループライドは常に先頭に表示されます。",
-  "Vehicles, rider limits, invite code, groups and details": "車両、人数制限、招待コード、グループ、詳細",
+  "Vehicles, limits, codes, groups, details": "車両、制限、コード、グループ、詳細",
+  "Draw or import the route next.": "次にルートを描くか読み込みます。",
+  "Only friends you invite.": "招待した友達だけ。",
+  "Open to anyone. Shown to riders nearby.": "誰でも参加可能。近くのライダーに表示されます。",
 };
 
 export default dict;
