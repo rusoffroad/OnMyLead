@@ -3539,6 +3539,7 @@ const dict: Record<string, string> = {
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "地图模式、加入骑行、开始骑行和活动和群组骑行始终显示在最前面。",
   "Vehicles, limits, codes, groups, details": "车辆、人数限制、邀请码、群组和详情",
   "Draw or import the route next.": "下一步绘制或导入路线。",
+  "The route is already filled in.": "路线已填好。",
   "Only friends you invite.": "仅限你邀请的好友。",
   "Open to anyone. Shown to riders nearby.": "对所有人开放。附近的骑手可以看到。",
 };

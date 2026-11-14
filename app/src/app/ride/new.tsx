@@ -458,7 +458,9 @@ export default function NewRide() {
         <View style={styles.labelRow}>
           <ThemedText type="small" themeColor="textSecondary" style={{ fontWeight: 600 }}>{tr('The Route')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
-            {routePlan === 'mapped' ? tr('Draw or import the route next.') : tr('No set route. Everyone follows the leader.')}
+            {routePlan === 'mapped'
+              ? copiedRoute ? tr('The route is already filled in.') : tr('Draw or import the route next.')
+              : tr('No set route. Everyone follows the leader.')}
           </ThemedText>
         </View>
         <View style={styles.kinds} accessibilityRole="radiogroup">

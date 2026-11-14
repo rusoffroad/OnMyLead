@@ -3539,6 +3539,7 @@ const dict: Record<string, string> = {
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Mode Carte, Rejoindre une balade, Lancer une balade et Événements et balades en groupe s’affichent toujours en premier.",
   "Vehicles, limits, codes, groups, details": "Véhicules, limites, codes, groupes, détails",
   "Draw or import the route next.": "Tracez ou importez l’itinéraire ensuite.",
+  "The route is already filled in.": "L’itinéraire est déjà rempli.",
   "Only friends you invite.": "Seulement les amis que vous invitez.",
   "Open to anyone. Shown to riders nearby.": "Ouverte à tous. Visible par les pilotes proches.",
 };

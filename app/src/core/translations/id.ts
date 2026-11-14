@@ -3539,6 +3539,7 @@ const dict: Record<string, string> = {
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Mode Peta, Gabung riding, Mulai riding, dan Acara dan riding grup selalu tampil paling atas.",
   "Vehicles, limits, codes, groups, details": "Kendaraan, batas, kode, grup, detail",
   "Draw or import the route next.": "Gambar atau impor rute setelah ini.",
+  "The route is already filled in.": "Rute sudah terisi.",
   "Only friends you invite.": "Hanya teman yang Anda undang.",
   "Open to anyone. Shown to riders nearby.": "Terbuka untuk semua. Terlihat oleh rider terdekat.",
 };
