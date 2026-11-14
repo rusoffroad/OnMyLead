@@ -14,7 +14,7 @@ import { GroupMap, type GroupMapHandle, type MapRider } from '@/components/group
 import { Icon } from '@/components/icon';
 import { KeyboardLift, keyboardScroll } from '@/components/keyboard';
 import { BreakdownBadge } from '@/components/rider-status-badge';
-import { ExitModeButton, ExitRideSheet, leaveModeScreen, useModeBackButton } from '@/components/exit-mode';
+import { CORNER_EXIT_ROOM, CornerExitButton, ExitModeButton, ExitRideSheet, leaveModeScreen, useModeBackButton } from '@/components/exit-mode';
 import { LeaveRide } from '@/components/leave-ride';
 import { RiderList, RiderRows } from '@/components/rider-list';
 import { PanelActions, QuickRow, StatusSheet, tapFeel } from '@/components/ride-controls';
@@ -1334,13 +1334,15 @@ export default function RideMode() {
           locationEveryMs={batteryMode === 'best' ? 1000 : BATTERY_PLANS[batteryMode].fixEveryMs}
         />
       </CompassSpot.Provider>
-      {/* Map Settings stays in the top-left corner of the map, Full Map included (on a tablet, just right of the riders column). */}
+      {/* Full Map: Exit takes the top-left corner (3.1), with Map Settings just right of it. */}
+      {fullMap ? <CornerExitButton onPress={() => exitRide()} label={t('Exit Ride Mode')} top={cornerTop} left={insets.left + EDGE} /> : null}
+      {/* Map Settings stays in the top-left corner of the map (on a tablet, just right of the riders column; in Full Map, right of Exit). */}
       <TrailMapOverlay
         trail={trail}
         controls
         bare={fullMap}
         top={cornerTop}
-        left={tablet && !fullMap ? sideW + 2 * Spacing.two + EDGE - Spacing.two : undefined}
+        left={tablet && !fullMap ? sideW + 2 * Spacing.two + EDGE - Spacing.two : fullMap ? insets.left + EDGE + CORNER_EXIT_ROOM : undefined}
         cardTop={tablet || fullMap ? insets.top + 64 : insets.top + 118}
         cardWidth={tablet ? Math.min(360, layout.width - sideW - 3 * EDGE) : undefined}
         route={route.route?.points}
@@ -1758,7 +1760,6 @@ export default function RideMode() {
 
         {fullMap ? (
           <View style={[styles.foldedRow, !stripShown && { marginTop: 0 }]}>
-            <ExitModeButton bare onPress={() => exitRide()} label={t('Exit Ride Mode')} style={styles.fullMapExit} />
             <Pressable
               onPress={showMenus}
               accessibilityRole="button"
@@ -2061,7 +2062,6 @@ const styles = themedStyles(() => ({
   },
   typeText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
   fullMapBarBtn: { minHeight: 48 },
-  fullMapExit: { width: 56, height: 56, borderRadius: Radius.control, backgroundColor: Glass.tile, borderWidth: 1, borderColor: Glass.edge },
   offlineBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10,
     backgroundColor: Glass.panel, borderWidth: 1.5, borderColor: Colors.textSecondary, borderStyle: 'dashed',

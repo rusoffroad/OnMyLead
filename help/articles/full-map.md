@@ -4,7 +4,7 @@ summary: Hide the bars and panels on any map so the map fills your screen, and b
 category: routes-maps
 order: 12
 release: "2.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/components/exit-mode.tsx
   - app/src/hooks/use-panel-fold.ts
@@ -78,7 +78,7 @@ The bar keeps only what you shouldn't have to dig for:
 On every map, the **No Signal** tag stays when you have no service, and tapping a trail line still shows its card.
 
 :::release 3.1
-In Ride Mode and Map Mode, the bar also starts with **‹**, which exits the screen the same as **‹ Exit** at the top. See [Leave Ride Mode](/help/ride-mode#leave-ride-mode) and [Leave Map Mode](/help/navigation-mode#leave-map-mode).
+In Ride Mode and Map Mode, a round **‹** button stays in the top-left corner of the map, with **Map Settings** just right of it. It exits the screen the same as **‹ Exit** at the top. See [Leave Ride Mode](/help/ride-mode#leave-ride-mode) and [Leave Map Mode](/help/navigation-mode#leave-map-mode).
 :::
 
 ## Phones, Tablets and the Website

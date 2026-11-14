@@ -29,8 +29,8 @@ Wherever OnMyLead asks for a place, you can type its name instead of hunting on 
 - **Find a Ride**: **Search Near a Place** shows rides near the place you pick instead of near you. Tap **Back to Near Me** (or **Clear**) to go back. See [Find a Ride](/help/find-a-ride).
 - **Route builder**: **Search** moves the map to a place before you draw. See [Draw a Route](/help/route-builder).
 
-:::release 3.2
-From 3.2, Create a Ride starts the meeting point where you are. Tap **Change** on the meeting point to open **Search a Place or Address**; **Search a Destination** is under **More Options**.
+:::release 3.1
+From 3.1, Create a Ride starts the meeting point where you are. Tap **Change** on the meeting point to open **Search a Place or Address**; **Search a Destination** is under **More Options**.
 :::
 
 :::release 1.0.1

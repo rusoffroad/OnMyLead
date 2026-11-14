@@ -101,8 +101,8 @@ export const SHOWCASE_REDESIGN_3: boolean = true;
  */
 export const SHOWCASE_EASY_LEAVE: boolean = false;
 /**
- * The showcase's Create a Ride step in its 3.2 words (one short screen that starts on today, now
- * and where you are; everything else under More Options). Off until the app version with it (3.2)
+ * The showcase's Create a Ride step in its 3.1 words (one short screen that starts on today, now
+ * and where you are; everything else under More Options). Off until the app version with it (3.1)
  * is live in the stores; when it flips, retake the step's screenshot (site/create) too.
  */
 export const SHOWCASE_QUICK_CREATE: boolean = false;

@@ -27,8 +27,8 @@ Organizers can choose to approve each rider on a public ride, and can cap how ma
 
 When creating a public ride, the organizer picks **I Approve Riders** under **Joining**. See [Create a Ride](/help/create-a-ride).
 
-:::release 3.2
-From 3.2, **Joining** is under **More Options** on Create a Ride, in **Who's Riding**, once **Public** is picked.
+:::release 3.1
+From 3.1, **Joining** is under **More Options** on Create a Ride, in **Who's Riding**, once **Public** is picked.
 :::
 
 ### If You're Asking to Join
