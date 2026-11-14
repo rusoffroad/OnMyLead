@@ -1805,7 +1805,7 @@ export default function RideMode() {
               accessibilityRole="button"
               accessibilityLabel={foldedCount ? t('Show buttons and {foldedCount} more alerts', { foldedCount }) : t('Show the message and status buttons')}
               style={({ pressed }) => [styles.foldedShow, { opacity: pressed ? 0.75 : 1 }]}>
-              <Text style={styles.foldedShowText}>{t('Buttons ▲')}</Text>
+              <Text style={styles.foldedShowText} numberOfLines={1}>{t('Buttons ▲')}</Text>
               {foldedCount ? (
                 <View style={styles.foldedBadge}>
                   <Text style={styles.foldedBadgeText}>{foldedCount}</Text>
@@ -2032,11 +2032,15 @@ const styles = themedStyles(() => ({
   foldedRow: { flexDirection: 'row', gap: Spacing.two, marginTop: Spacing.two },
   // The folded panel's three buttons share one size, so they line up as equal thirds (3.1).
   foldedShow: {
-    flexGrow: 1, flexBasis: 0, minWidth: 0, minHeight: 56, borderRadius: Radius.control, flexDirection: 'row', gap: 8,
+    flexGrow: 1, flexBasis: 0, minWidth: 0, minHeight: 56, paddingHorizontal: 6, borderRadius: Radius.control, flexDirection: 'row', gap: 8,
     alignItems: 'center', justifyContent: 'center', backgroundColor: Glass.tile, borderWidth: 1.5, borderColor: Glass.edge,
   },
   foldedShowText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19 },
-  foldedBadge: { minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 6, alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow },
+  // Sits on the button's top-right corner, so the label keeps its room and the three stay equal.
+  foldedBadge: {
+    position: 'absolute', top: -8, right: -6, minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 6,
+    alignItems: 'center', justifyContent: 'center', backgroundColor: RideColors.yellow, borderWidth: 2, borderColor: Glass.panel,
+  },
   foldedBadgeText: { color: '#1A1100', fontFamily: font(800), fontSize: 14 },
   foldedMech: {
     flexGrow: 1, flexBasis: 0, minWidth: 0, minHeight: 56, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6,
