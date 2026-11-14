@@ -515,7 +515,7 @@ export default function NewRide() {
         accessibilityRole="button"
         accessibilityState={{ expanded: more }}
         onPress={() => setMore(!more)}
-        style={({ pressed }) => [styles.spot, pressed && { opacity: 0.85 }]}>
+        style={({ pressed }) => [styles.spot, styles.more, pressed && { opacity: 0.85 }]}>
         <View style={{ flex: 1, minWidth: 0 }}>
           <ThemedText style={{ fontWeight: 700 }}>{tr('More Options')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">{tr('Vehicles, limits, codes, groups, details')}</ThemedText>
@@ -638,6 +638,7 @@ const styles = themedStyles(() => ({
     flexDirection: 'row', alignItems: 'center', gap: Spacing.three, minHeight: 64, paddingVertical: 10, paddingHorizontal: 14,
     borderRadius: Radius.control, backgroundColor: Colors.backgroundElement,
   },
+  more: { minHeight: 52, paddingVertical: 6 },
   spotPin: { width: 40, height: 40, borderRadius: Radius.control, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
   chip: { borderRadius: Radius.pill, paddingHorizontal: 16, minHeight: 40, maxWidth: '100%', justifyContent: 'center' },
