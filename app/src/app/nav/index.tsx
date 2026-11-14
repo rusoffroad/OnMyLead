@@ -9,7 +9,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Svg, { Circle } from 'react-native-svg';
 
 import { CUSTOM_TRAIL_INTRO_KEY, CustomTrailIntro } from '@/components/custom-trail-intro';
-import { ExitModeButton, leaveModeScreen, useModeBackButton } from '@/components/exit-mode';
+import { CORNER_EXIT_ROOM, CornerExitButton, ExitModeButton, leaveModeScreen, useModeBackButton } from '@/components/exit-mode';
 import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
 import { ObstacleSheet } from '@/components/obstacle-sheet';
 import { Icon } from '@/components/icon';
@@ -705,12 +705,14 @@ export default function NavMode() {
           onLongPressMap={mode === 'measure' ? undefined : openNewWaypoint}
         />
       </CompassSpot.Provider>
+      {/* Full Map: Exit takes the top-left corner (3.1), with Map Settings just right of it. */}
+      {full ? <CornerExitButton onPress={() => void leave()} label={tr('Exit Map Mode')} top={cornerTop} left={insets.left + 12} /> : null}
       <TrailMapOverlay
         trail={trail}
         controls
         bare={full}
         top={cornerTop}
-        left={wide && !full ? PANEL_W + 32 : undefined}
+        left={wide && !full ? PANEL_W + 32 : full ? insets.left + 12 + CORNER_EXIT_ROOM : undefined}
         cardTop={full ? insets.top + 64 : wide ? insets.top + 118 : undefined}
         bottom={wide ? 12 : open ? 330 : 170}
         cardWidth={wide || floating ? 380 : undefined}
@@ -720,7 +722,7 @@ export default function NavMode() {
       />
 
       {full ? (
-        <FullMapBar onRestore={fullMap.exit} wide={wide || floating} onExit={() => void leave()} exitLabel={tr('Exit Map Mode')}>
+        <FullMapBar onRestore={fullMap.exit} wide={wide || floating}>
           {rec && !rec.paused ? (
             <View style={styles.barRec} accessible accessibilityLabel={tr('Recording')}>
               <View style={styles.recDot} />
