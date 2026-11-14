@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/core/mode-exit.ts
   - app/src/components/exit-mode.tsx
@@ -402,7 +402,7 @@ Leaving the screen doesn't stop sharing: your location keeps going to the group 
 :::
 
 :::release 3.1
-Tap **‹ Exit** at the top left. In [Full Map](/help/full-map), tap **‹** at the left end of the bar at the bottom. On an Android phone or tablet, the Back button does the same (in Full Map, the first Back brings the controls back). You go back to where you opened Ride Mode from, or to **Home** if you opened it from a notification, a link or the car screen.
+Tap **‹ Exit** at the top left. In [Full Map](/help/full-map), tap the round **‹** in the top-left corner. On an Android phone or tablet, the Back button does the same (in Full Map, the first Back brings the controls back). You go back to where you opened Ride Mode from, or to **Home** if you opened it from a notification, a link or the car screen.
 
 Exiting Ride Mode only closes the screen. You stay on the ride, and nothing changes for the rest of the group. Open Ride Mode again from Home or the ride page any time.
 

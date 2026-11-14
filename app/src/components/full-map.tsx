@@ -2,7 +2,6 @@ import { useMemo, type ReactNode } from 'react';
 import { PanResponder, Platform, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ExitModeButton } from '@/components/exit-mode';
 import { Icon } from '@/components/icon';
 import { Colors, font, GlassSurface, Radius, RideColors, themedStyles } from '@/constants/theme';
 import { FULL_MAP_BAR_H, RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
@@ -38,12 +37,9 @@ export function FullMapButton({ onPress, style }: { onPress: () => void; style?:
  * the bottom.
  */
 export function FullMapBar({
-  onRestore, waiting = 0, children, wide = false, credit, onExit, exitLabel,
+  onRestore, waiting = 0, children, wide = false, credit,
 }: {
   onRestore: () => void;
-  /** Ride Mode and Map Mode: the icon-only Exit button at the bar's left end (components/exit-mode). */
-  onExit?: () => void;
-  exitLabel?: string;
   waiting?: number;
   children?: ReactNode;
   wide?: boolean;
@@ -69,7 +65,6 @@ export function FullMapBar({
       <View style={styles.bar}>
         {/* The small grab bar: swipe it (or the whole bar) up to bring the controls back. */}
         <View pointerEvents="none" style={styles.grab} />
-        {onExit ? <ExitModeButton bare onPress={onExit} label={exitLabel ?? t('Exit')} /> : null}
         <Pressable
           onPress={onRestore}
           accessibilityRole="button"

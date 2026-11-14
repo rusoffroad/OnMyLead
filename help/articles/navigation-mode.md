@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/core/mode-exit.ts
   - app/src/components/exit-mode.tsx
@@ -87,7 +87,7 @@ From 3.0, Map Mode is the first card on Home, labelled **Ride Solo**: tap **Open
 ## Leave Map Mode
 
 :::release 3.1
-Tap **‹ Exit** at the top left, beside the **Map Mode** title. In [Full Map](/help/full-map), tap **‹** at the left end of the bar at the bottom. On an Android phone or tablet, the Back button does the same: the first Back closes Full Map or the search box if one is open. You go back to where you opened Map Mode from, or to **Home** if you opened it from the car screen or a link.
+Tap **‹ Exit** at the top left, beside the **Map Mode** title. In [Full Map](/help/full-map), tap the round **‹** in the top-left corner. On an Android phone or tablet, the Back button does the same: the first Back closes Full Map or the search box if one is open. You go back to where you opened Map Mode from, or to **Home** if you opened it from the car screen or a link.
 
 If you're recording a trail, Exit asks first. **Pause and Exit** pauses the recording and saves it on your phone; the next time you open Map Mode it's there, paused, so tap **Resume** to carry on or save it. **Stay in Map Mode** keeps recording. A paused recording, or following a trail, exits straight away.
 :::

@@ -44,6 +44,26 @@ export function ExitModeButton({
   );
 }
 
+/** Room the corner Exit takes, so Map Settings sits just right of it in Full Map. */
+export const CORNER_EXIT_ROOM = 46 + 10;
+
+/**
+ * Exit in Full Map: a round button in the top-left corner of the map, where riders look for a way
+ * out (Chris, 3.1 build 16). Map Settings moves right of it (CORNER_EXIT_ROOM).
+ */
+export function CornerExitButton({ onPress, label, top, left }: { onPress: () => void; label: string; top: number; left: number }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      hitSlop={6}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed }) => [styles.corner, { top, left }, pressed && { opacity: 0.85, transform: [{ scale: 0.94 }] }]}>
+      <Icon name="back" size={20} color={Colors.text} strokeWidth={2.6} />
+    </Pressable>
+  );
+}
+
 /**
  * The Android back button on a map screen: `onBack` decides what it does (core/mode-exit
  * backPress) and the screen keeps it. Only while the screen is in front, so a screen pushed on top
@@ -117,6 +137,11 @@ const styles = themedStyles(() => ({
   bare: {
     width: 48, height: 48, borderRadius: Radius.control + 2, alignItems: 'center', justifyContent: 'center',
     backgroundColor: Colors.backgroundSelected,
+  },
+  corner: {
+    position: 'absolute', zIndex: 21, width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
+    shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
   },
   text: { color: Colors.text, fontFamily: font(700), fontSize: 15 },
   message: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 16, lineHeight: 22 },
