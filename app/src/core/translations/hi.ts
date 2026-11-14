@@ -3537,6 +3537,7 @@ const dict: Record<string, string> = {
   "No Public Rides Coming Up": "कोई सार्वजनिक राइड नहीं आ रही",
   "See Them on the Map": "मैप पर देखें",
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "मैप मोड, राइड में शामिल हों, राइड शुरू करें और इवेंट और ग्रुप राइड हमेशा सबसे ऊपर दिखते हैं।",
+  "Vehicles, rider limits, invite code, groups and details": "वाहन, राइडर सीमा, इनवाइट कोड, ग्रुप और विवरण",
 };
 
 export default dict;

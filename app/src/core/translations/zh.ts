@@ -3537,6 +3537,7 @@ const dict: Record<string, string> = {
   "No Public Rides Coming Up": "暂无即将开始的公开骑行",
   "See Them on the Map": "在地图上查看",
   "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "地图模式、加入骑行、开始骑行和活动和群组骑行始终显示在最前面。",
+  "Vehicles, rider limits, invite code, groups and details": "车辆、人数上限、邀请码、群组和详情",
 };
 
 export default dict;
