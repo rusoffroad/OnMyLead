@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  atSpot, defaultWhen, FIRST_RIDE_DEFAULTS, nearestQuickTime, parseRideDefaults, quickTimes, rememberSpot, type RecentSpot,
+  atSpot, defaultWhen, FIRST_RIDE_DEFAULTS, nearestQuickTime, parseRideDefaults, quickTimes, quickTimesOn, rememberSpot, timeOnDay, type RecentSpot,
 } from '../quick-ride';
 
 const at = (h: number, m: number) => new Date(2026, 10, 13, h, m, 0, 0);
@@ -31,6 +31,27 @@ describe('the time list', () => {
     expect(all).toHaveLength(96);
     expect(all[0]).toBe(0);
     expect(all[all.length - 1]).toBe(23 * 60 + 45);
+  });
+
+  it('leaves out times that have already passed today', () => {
+    const today = quickTimesOn(new Date(2026, 10, 13), at(21, 18));
+    expect(today[0]).toBe(21 * 60 + 30);
+    expect(today).toHaveLength(10);
+    expect(quickTimesOn(new Date(2026, 10, 13), at(21, 15))[0]).toBe(21 * 60 + 30);
+    expect(quickTimesOn(new Date(2026, 10, 13), at(23, 50))).toEqual([]);
+  });
+
+  it('offers the whole day for any other day', () => {
+    expect(quickTimesOn(new Date(2026, 10, 14), at(21, 18))).toHaveLength(96);
+  });
+
+  it('moves a passed time on when the ride moves to today', () => {
+    const today = new Date(2026, 10, 13);
+    expect(timeOnDay(today, 8 * 60, at(21, 18))).toBe(21 * 60 + 30);
+    expect(timeOnDay(today, 22 * 60, at(21, 18))).toBe(22 * 60);
+    expect(timeOnDay(new Date(2026, 10, 14), 8 * 60, at(21, 18))).toBe(8 * 60);
+    expect(timeOnDay(today, null, at(21, 18))).toBeNull();
+    expect(timeOnDay(today, 8 * 60, at(23, 50))).toBeNull();
   });
 
   it('marks the nearest quarter hour to a time picked elsewhere', () => {

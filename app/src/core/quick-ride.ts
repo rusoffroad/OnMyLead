@@ -33,6 +33,27 @@ export function quickTimes(): number[] {
   return out;
 }
 
+/**
+ * The times the list offers for a ride on `day`: every quarter hour, but for a ride today only
+ * the ones still to come (a ride can't meet at 9:00 pm when it is already 9:18 pm).
+ */
+export function quickTimesOn(day: Date, now: Date): number[] {
+  const all = quickTimes();
+  if (startOfDay(day).getTime() !== startOfDay(now).getTime()) return all;
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  return all.filter((m) => m > nowMinutes);
+}
+
+/**
+ * The meeting time after the rider picks `day`: the time they had, unless the ride is now today
+ * and that time has passed, in which case the next quarter hour (null when today has none left).
+ */
+export function timeOnDay(day: Date, minutes: number | null, now: Date): number | null {
+  if (minutes == null || startOfDay(day).getTime() !== startOfDay(now).getTime()) return minutes;
+  if (minutes > now.getHours() * 60 + now.getMinutes()) return minutes;
+  return quickTimesOn(day, now)[0] ?? null;
+}
+
 /** The time in the list nearest to `minutes` (the one the list scrolls to and marks). */
 export function nearestQuickTime(minutes: number): number {
   const m = Math.round(minutes / QUICK_TIME_STEP) * QUICK_TIME_STEP;

@@ -159,7 +159,7 @@ On a tablet, the calendar sits in the same form, with bigger day buttons.
 ## Pick the Time
 
 :::release 3.1
-From 3.1, **Meet At** is a field that starts on the next quarter hour (late at night, it starts on 8:00 AM tomorrow). Tap it and a list of times opens, every 15 minutes, already scrolled to the time that's set. Tap a time and the list closes. No typing needed.
+From 3.1, **Meet At** is a field that starts on the next quarter hour (late at night, it starts on 8:00 AM tomorrow). Tap it and a list of times opens, every 15 minutes, already scrolled to the time that's set. For a ride today, the list starts at the next quarter hour, so you can't pick a time that has already passed. Tap a time and the list closes. No typing needed.
 
 **Departure Time** and **Expected Finish** are under **More Options**. They start as **Not Set**: tap **Add** and the app suggests a time (30 minutes after you meet for departure, 8 hours after for the finish), then tap **AM** or **PM**, the hour and the minute to adjust. Tap **Clear** to leave one empty.
 :::

@@ -7,13 +7,12 @@ import { Icon } from '@/components/icon';
 import { ThemedText } from '@/components/themed-text';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { daysAwayText, longDayText, rideDayRange, startOfDay } from '@/core/calendar';
-import { nearestQuickTime, quickTimes } from '@/core/quick-ride';
+import { nearestQuickTime, quickTimesOn, timeOnDay } from '@/core/quick-ride';
 import { minutesLabel, minutesText, parseTime } from '@/core/time';
 import { t } from '@/lib/i18n';
 
 const ROW = 52;
 const LIST_HEIGHT = ROW * 6;
-const TIMES = quickTimes();
 
 /**
  * Create a Ride's day and time: two plain fields side by side. Tap the day and a calendar opens;
@@ -28,6 +27,8 @@ export function WhenFields({ day, onDay, time, onTime }: { day: number; onDay: (
   const picked = new Date(day);
   const minutes = parseTime(time);
   const marked = minutes == null ? null : nearestQuickTime(minutes);
+  // A ride today only offers the times still to come.
+  const times = quickTimesOn(picked, new Date());
   const near = Math.round((startOfDay(picked).getTime() - today.getTime()) / 86_400_000) <= 1;
   const dayTitle = near ? daysAwayText(picked, today) : picked.toLocaleDateString(undefined, { weekday: 'long' });
   const dayDetail = picked.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', ...(picked.getFullYear() === today.getFullYear() ? {} : { year: 'numeric' }) });
@@ -69,6 +70,9 @@ export function WhenFields({ day, onDay, time, onTime }: { day: number; onDay: (
           range={rideDayRange(today)}
           onChange={(d) => {
             onDay(d.getTime());
+            // Moved to today with a time that has passed: the next quarter hour instead.
+            const next = timeOnDay(d, minutes, new Date());
+            if (next != null && next !== minutes) onTime(minutesText(next));
             setOpen(null);
           }}
           note={t('Pick any day from today up to three years out.')}
@@ -82,8 +86,8 @@ export function WhenFields({ day, onDay, time, onTime }: { day: number; onDay: (
           style={{ height: LIST_HEIGHT }}
           accessibilityRole="radiogroup"
           // Opens with the picked time (or 8:00 am) a couple of rows from the top.
-          onLayout={() => list.current?.scrollTo({ y: Math.max(0, TIMES.indexOf(marked ?? 8 * 60) - 2) * ROW, animated: false })}>
-          {TIMES.map((m) => {
+          onLayout={() => list.current?.scrollTo({ y: Math.max(0, times.indexOf(marked ?? 8 * 60) - 2) * ROW, animated: false })}>
+          {times.map((m) => {
             const on = m === marked;
             return (
               <Pressable
