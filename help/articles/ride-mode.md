@@ -6,6 +6,7 @@ order: 10
 release: "1.0"
 updated: 2026-11-14
 sources:
+  - app/src/core/map-controls.ts
   - app/src/core/mode-exit.ts
   - app/src/components/exit-mode.tsx
   - app/src/components/rider-puck.tsx
@@ -196,6 +197,16 @@ Tap **Message** at the top left of the panel to type your own message to the gro
 :::
 
 Above the panel are two buttons: **Directions** (on the left) for Apple Maps or Google Maps, and **Add Waypoint** (on the right) to mark your spot. You can also press and hold anywhere on the map to drop a waypoint there.
+
+:::release 3.1
+On a phone, the buttons over the map line up in rows just above the panel, all the same height:
+
+- **Directions** and **Add Waypoint** side by side, each half the width of the screen.
+- The Tilt tile on the left, with **Follow Me** and **Center on Me** on the right.
+- **Music** (if you turned it on) above **Center on Me**.
+
+When the banners at the top leave no room for a row, that row hides until you fold the panel. On a tablet the buttons stay in the map's bottom corners and above the buttons panel.
+:::
 :::release 2.1
 When the leader shares one during the ride, everyone else gets a notification with a sound. See [New Waypoint Alerts](/help/waypoints-and-planned-stops#new-waypoint-alerts).
 :::

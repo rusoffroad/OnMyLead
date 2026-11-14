@@ -11,7 +11,7 @@ const row = (n: number) => 200 + CONTROL_GAP + n * (CONTROL_H + CONTROL_GAP);
 describe('Ride Mode map controls on a phone', () => {
   it('stacks the rows evenly above the panel: actions, then Tilt / Follow Me / Center on Me, then Music', () => {
     expect(phoneControls(base)).toEqual({
-      actionsBottom: row(0), locateBottom: row(1), tiltBottom: row(1), musicBottom: row(2), followCompact: true,
+      actionsBottom: row(0), locateBottom: row(1), tiltBottom: row(1), musicBottom: row(2), followCompact: false,
     });
   });
   it('puts Tilt level with Center on Me, never on a row of its own', () => {
@@ -26,9 +26,10 @@ describe('Ride Mode map controls on a phone', () => {
     expect(c.musicBottom).toBe(row(1));
   });
   it('keeps the Follow Me label on a wide phone and drops it beside Tilt on a narrow one', () => {
-    expect(phoneControls({ ...base, screenW: 430 }).followCompact).toBe(false);
-    expect(phoneControls({ ...base, screenW: 375 }).followCompact).toBe(true);
-    expect(phoneControls({ ...base, screenW: 375, tilt: false }).followCompact).toBe(false);
+    expect(phoneControls({ ...base, screenW: 440 }).followCompact).toBe(false);
+    expect(phoneControls({ ...base, screenW: 375 }).followCompact).toBe(false);
+    expect(phoneControls({ ...base, screenW: 360 }).followCompact).toBe(true);
+    expect(phoneControls({ ...base, screenW: 360, tilt: false }).followCompact).toBe(false);
   });
   it('hides whole rows from the top down when the banners leave no room', () => {
     // Room for exactly one row above the panel.

@@ -22,7 +22,7 @@ export const CONTROL_SIDE = 12;
  * Below this screen width, Tilt and a labelled Follow Me don't both fit beside Center on Me, so
  * Follow Me shows its icon alone (the blue outline still says Paused).
  */
-export const FOLLOW_LABEL_MIN_WIDTH = 400;
+export const FOLLOW_LABEL_MIN_WIDTH = 375;
 
 export type PhoneControlsInput = {
   /** Screen height. */
