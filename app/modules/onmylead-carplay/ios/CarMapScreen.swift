@@ -586,7 +586,7 @@ final class CarMapViewController: UIViewController {
     // The camera's center sits in the middle of its padding (follow() pads by the car's safe
     // area, which survives into panning), not the middle of the view. Starting from the view's
     // middle threw the map off by that padding on every drag update (3.1 build 17, Chris's truck).
-    let map = mapView.mapboxMap
+    let map: MapboxMap = mapView.mapboxMap
     let mid = map.point(for: map.cameraState.center)
     let center = map.coordinate(for: CGPoint(x: mid.x - d.x, y: mid.y - d.y))
     let to = CameraOptions(center: center)
