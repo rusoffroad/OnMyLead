@@ -4,7 +4,7 @@ summary: Ride Bubble watches for riders who drop back, run ahead or stop moving,
 category: ride-mode
 order: 30
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/core/bubble.ts
   - app/src/core/precise-location.ts
@@ -37,6 +37,10 @@ A rider whose phone shares only an approximate location (Precise Location turned
 ## Ride Bubble Settings
 
 The organizer picks the setting when creating the ride, under **Add Route, Difficulty and More**, in **Ride Bubble**.
+
+:::release 3.2
+From 3.2, **Ride Bubble** is under **More Options** on Create a Ride.
+:::
 
 | Setting | Yellow when the nearest rider is more than | Red when the nearest rider is more than |
 |---|---|---|

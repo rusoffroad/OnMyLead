@@ -3521,6 +3521,12 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "还没有其他人加入，所以离开会取消这次骑行。",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "你仍在 {rideName} 中。随时可从首页或骑行页面回来。",
   "Done with this ride? Leaving takes you off it for good.": "不再参加这次骑行？离开后你将被彻底移出。",
+  "{day} Ride": "{day}骑行",
+  "Where You Are Now": "您当前的位置",
+  "Who Can Join": "谁可以加入",
+  "Friends I Invite": "我邀请的朋友",
+  "More Options": "更多选项",
+  "Route, vehicles, rider limits, invite code, groups and details": "路线、车辆、人数上限、邀请码、群组和详情",
 };
 
 export default dict;

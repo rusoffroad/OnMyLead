@@ -3521,6 +3521,12 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "Nadie más se ha unido todavía, así que salir cancela la ruta.",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "Sigues en {rideName}. Vuelve cuando quieras desde Inicio o la página de la ruta.",
   "Done with this ride? Leaving takes you off it for good.": "¿Terminaste con esta ruta? Salir te quita de ella definitivamente.",
+  "{day} Ride": "Ruta del {day}",
+  "Where You Are Now": "Donde estás ahora",
+  "Who Can Join": "Quién puede unirse",
+  "Friends I Invite": "Amigos que invito",
+  "More Options": "Más opciones",
+  "Route, vehicles, rider limits, invite code, groups and details": "Recorrido, vehículos, límites de pilotos, código de invitación, grupos y detalles",
 };
 
 export default dict;

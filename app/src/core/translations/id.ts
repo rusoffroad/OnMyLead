@@ -3521,6 +3521,12 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "Belum ada yang bergabung, jadi keluar akan membatalkan perjalanan.",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "Kamu tetap di {rideName}. Kembali kapan saja dari Beranda atau halaman perjalanan.",
   "Done with this ride? Leaving takes you off it for good.": "Selesai dengan perjalanan ini? Keluar akan mengeluarkanmu untuk selamanya.",
+  "{day} Ride": "Riding {day}",
+  "Where You Are Now": "Lokasi Anda sekarang",
+  "Who Can Join": "Siapa yang bisa ikut",
+  "Friends I Invite": "Teman yang saya undang",
+  "More Options": "Opsi lainnya",
+  "Route, vehicles, rider limits, invite code, groups and details": "Rute, kendaraan, batas peserta, kode undangan, grup, dan detail",
 };
 
 export default dict;

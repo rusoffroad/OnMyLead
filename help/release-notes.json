@@ -1,5 +1,35 @@
 [
   {
+    "version": "3.2",
+    "title": "Create a Ride in One Screen",
+    "intro": "OnMyLead 3.2 makes creating a ride quick. The screen opens already filled in with today, the next quarter hour, where you are and a ride for the friends you invite, so a ride from here, right now, is two taps. Everything else is under More Options.",
+    "whatsNew": "What's new in 3.2:\n\n• Create a Ride is one short screen. It starts on today, the next quarter hour and where you are. Tap Create and share the link.\n• Tap the day for a calendar, or the time for a list of times.\n• Your last meeting spots are one tap away.\n• The ride name is optional. Leave it empty for a name like \"Saturday Ride\".\n• Route, vehicles, rider limits and details are under More Options.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "improved",
+        "text": "Create a Ride is one short screen that opens already filled in: today, the next quarter hour, where you are (when location is allowed), and a ride for the friends you invite. A ride from here, right now, is two taps: Start a Ride, then Create. Nothing is required but a meeting point."
+      },
+      {
+        "kind": "improved",
+        "text": "Day and Meet At are plain fields. Tap the day and a calendar opens; tap the time and a list of times opens, every 15 minutes. Picking closes it."
+      },
+      {
+        "kind": "new",
+        "text": "Your last three named meeting points show as buttons under Meeting Point, so your usual gas station or trailhead is one tap. They're kept on your device."
+      },
+      {
+        "kind": "improved",
+        "text": "The ride name is optional (an empty name becomes the day, like \"Saturday Ride\"). Who Can Join starts on Friends I Invite and then on what you picked last time, and the vehicles welcome start on your last ride's."
+      },
+      {
+        "kind": "improved",
+        "text": "The route, vehicles welcome, rider limits, your own invite code, riding groups and the ride's details moved under More Options. The route starts on Freeride; pick Mapped there to draw one, or map a route later from the ride's page."
+      }
+    ]
+  },
+  {
     "version": "3.1",
     "title": "The Map on CarPlay",
     "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, and makes Leave Ride easy to find. CarPlay is part of OnMyLead Pro.",

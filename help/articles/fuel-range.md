@@ -4,7 +4,7 @@ summary: See if your machine's tank covers the ride's miles, using the thirds ru
 category: routes-maps
 order: 40
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/components/fuel-check.tsx
   - app/src/core/fuel.ts
@@ -55,6 +55,10 @@ Your machine's page then shows its **Full Range**, **Safe Turnaround** and **Saf
 - If not, the organizer can enter **Route Length (Miles)** when creating the ride, under **Add Route, Difficulty and More**.
 
 A ride with neither has no miles to check against.
+
+:::release 3.2
+From 3.2, **Route Length (Miles)** is under **More Options** on Create a Ride.
+:::
 
 ## Check Before the Ride
 

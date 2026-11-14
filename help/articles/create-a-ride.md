@@ -1,10 +1,10 @@
 ---
 title: Create a Ride
-summary: Pick public or private, set the day, time and meeting point, choose a mapped route or freeride, and share your new ride.
+summary: Set the day, time and meeting point, pick who can join, and share your new ride. Everything else is optional.
 category: rides
 order: 10
 release: "1.0"
-updated: 2026-11-10
+updated: 2026-11-14
 sources:
   - app/src/components/meet-point-mapbox-map.tsx
   - app/src/components/meet-point-map.tsx
@@ -20,6 +20,9 @@ sources:
   - app/src/components/ride-date-picker.tsx
   - app/src/components/date-calendar.tsx
   - app/src/components/time-picker.tsx
+  - app/src/components/when-fields.tsx
+  - app/src/core/quick-ride.ts
+  - app/src/lib/quick-ride.ts
   - app/src/lib/api.ts
   - supabase/migrations/20261018000000_pro_entitlements.sql
 related: [create-a-ride-on-the-website, invite-riders, route-builder, approvals-and-waitlist, edit-cancel-or-delete-a-ride, free-vs-pro]
@@ -35,6 +38,7 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 
 ## Create Your Ride
 
+:::until 3.2
 :::until 3.0
 1. On the **Rides** tab, tap **Create a Ride**.
 :::
@@ -50,6 +54,36 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 8. Under **The Route**, tap **Mapped** (you draw the route or import a GPX file next) or **Freeride** (no set route, everyone follows the leader).
 9. Under **Who's Riding**, pick the **Vehicles Welcome**.
 10. Tap **Create Public Ride** or **Create Private Ride**.
+:::
+
+:::release 3.2
+From 3.2, Create a Ride is one short screen that starts out already filled in: today, the next quarter hour, where you are, and a ride for the friends you invite. A ride from here, right now, is two taps.
+
+1. On the **Home** tab, tap **Start a Ride**.
+2. Type a **Ride Name**, or leave it empty and the ride is named for its day, like "Saturday Ride".
+3. Tap **Day** to pick another day (see [Pick the Day](#pick-the-day) below). It starts on today.
+4. Tap **Meet At** to pick another time (see [Pick the Time](#pick-the-time) below). It starts on the next quarter hour.
+5. Check the **Meeting Point**. When location is allowed it starts as **Where You Are Now**. To meet somewhere else, tap one of your last meeting points under it, or tap **Change** (see [Set the Meeting Point](#set-the-meeting-point) below).
+6. Under **Who Can Join**, tap **Friends I Invite** (a private ride, only for friends you invite by link, text or email) or **Public** (open to anyone, found by riders near you or in your state). It starts on **Friends I Invite**, and after your first ride it starts on what you picked last time.
+7. Tap **Create Private Ride** or **Create Public Ride**.
+
+Everything else is optional and sits under **More Options**: the route, the vehicles welcome, rider limits, your own invite code, riding groups to invite and the ride's details. You can also add most of it later with [Edit Ride Details](/help/edit-cancel-or-delete-a-ride). Public or private can't be changed after the ride is created, so pick it here.
+
+### Set the Meeting Point
+
+Tap **Change** on the meeting point and the search, the map and the other ways to set it open under it:
+
+- Search in **Search a Place or Address** and pick a result.
+- Tap the satellite map to drop the pin, then drag the pin to fine-tune it.
+- Tap **Use My Current Location**.
+- Paste **Coordinates** like "38.57, -109.55".
+
+Add a **Place Name** if you like, such as "Gas station on Main St". A meeting point with a name is remembered on your phone, tablet or browser: your last three show as buttons under **Meeting Point** the next time you create a ride, so your usual spot is one tap. Tap **Done** to fold the search and map away.
+
+### The Route
+
+Under **More Options**, **The Route** starts on **Freeride** (no set route, everyone follows the leader). Tap **Mapped** to draw the route or import a GPX file right after the ride is created. You can also map a route later from the ride's page.
+:::
 
 :::release 2.1
 From 2.1 a satellite map sits under **Search a Place or Address**, on every device. It opens near where you are. Tap it to drop the meeting point there, then drag the pin to fine-tune the spot. Searching a place, **Use My Current Location** and typed **Coordinates** move the pin too. (The map needs a signal; without one, set the point by search, location or coordinates as before.)
@@ -60,7 +94,14 @@ Found a park in [Scout](/help/scout)? Tap **Create a Ride Here** on its page: Cr
 :::
 
 :::release 2.0
-Planning a rally or a ride weekend with several rides? That's an event, not one ride. Tap **Event or Public Ride?** at the top of Create a Ride to see the difference, or see [Events](/help/events).
+Planning a rally or a ride weekend with several rides? That's an event, not one ride. Tap **Event or Public Ride?** on Create a Ride to see the difference, or see [Events](/help/events).
+
+:::until 3.2
+**Event or Public Ride?** is at the top of the screen.
+:::
+:::release 3.2
+From 3.2, **Event or Public Ride?** shows under **Who Can Join** once you pick **Public**.
+:::
 :::
 
 If you picked **Mapped**, the route builder opens right away so you can draw the trail. See [Build a Route](/help/route-builder). Once the ride is saved you land on its page, ready to invite riders.
@@ -85,6 +126,11 @@ A **Mapped** ride, where you draw the route, is a Pro feature. See [Free and Pro
 
 ## Pick the Day
 
+:::release 3.2
+From 3.2, **Day** is a field that starts on today. Tap it and a calendar opens. Type the date in **Type a Date** (such as 06/12/2027; the slashes go in for you), or tap a day. Use the arrows to go to another month, or tap the month's name to choose a year and month. Any day from today up to three years out works. The calendar closes as soon as you pick, and the field shows **Today**, **Tomorrow** or the weekday, with the date under it.
+:::
+
+:::until 3.2
 :::until 1.0.1
 Under **When**, tap **Today**, **Tomorrow** or any day in the next two weeks.
 :::
@@ -108,9 +154,17 @@ You can schedule a ride for any day from today up to three years out, so rides n
 The day you picked shows under **When**, with how far away it is, such as "In 8 Weeks". Tap **Done** to fold the calendar away.
 
 On a tablet, the calendar sits in the same form, with bigger day buttons.
+:::
 
 ## Pick the Time
 
+:::release 3.2
+From 3.2, **Meet At** is a field that starts on the next quarter hour (late at night, it starts on 8:00 AM tomorrow). Tap it and a list of times opens, every 15 minutes, already scrolled to the time that's set. Tap a time and the list closes. No typing needed.
+
+**Departure Time** and **Expected Finish** are under **More Options**. They start as **Not Set**: tap **Add** and the app suggests a time (30 minutes after you meet for departure, 8 hours after for the finish), then tap **AM** or **PM**, the hour and the minute to adjust. Tap **Clear** to leave one empty.
+:::
+
+:::until 3.2
 :::until 1.0.3
 Type the time in **Meet At**, for example "8:00 am" or "2:30 pm".
 :::
@@ -129,6 +183,7 @@ The time shows in big letters as you tap. Tap **Done** to fold the picker away.
 On a tablet or a computer, all 12 hours and all 12 minutes fit in one row each.
 :::
 :::
+:::
 
 ## Public Ride Options
 
@@ -141,9 +196,17 @@ Public rides also have a **Joining** choice:
 
 See [Approvals and the Waitlist](/help/approvals-and-waitlist) for how requests work. Private rides don't have this choice: anyone holding your invite link or code can join.
 
+:::release 3.2
+From 3.2, the **State** shows when you tap **Change** on the meeting point, and **Joining** is under **More Options**, in **Who's Riding**. Joining starts on what you picked for your last ride.
+:::
+
 ## Limit Who Can Come
 
 Under **Who's Riding**, set **Max Vehicles**, **Max Riders** or both. Leave them empty for no limit. When the ride is full, new riders go on a waitlist. See [Approvals and the Waitlist](/help/approvals-and-waitlist).
+
+:::release 3.2
+From 3.2, **Who's Riding** is under **More Options**. **Vehicles Welcome** starts on what you picked for your last ride.
+:::
 
 :::release 1.0.3
 **Pick your own invite code.** Under **Invite Code**, leave **Your Own Code (Optional)** empty and OnMyLead makes a code for you. Or type your own, like MOAB-2026: 6 to 20 letters and numbers, with dashes between words. A green **Available** means no other ride uses it. See [Choose Your Own Code](/help/custom-codes).
@@ -153,9 +216,19 @@ Under **Who's Riding**, set **Max Vehicles**, **Max Riders** or both. Leave them
 
 If you're in a riding group, an **Invite a Group** section shows up. Pick one or more groups under **Your Riding Groups**. Everyone in them gets a notification and sees the ride on their Rides tab, and they join with one tap. See [Riding Groups](/help/riding-groups).
 
+:::release 3.2
+From 3.2, **Invite a Group** is under **More Options**.
+:::
+
 ## Add More Details
 
+:::until 3.2
 Tap **Add Route, Difficulty and More** to fill in any of these:
+:::
+:::release 3.2
+Tap **More Options** to fill in any of these:
+:::
+
 
 - **Description**
 - **Departure Time** and **Expected Finish** (used to check your ride against sunset, see [Ride Day and Weather](/help/ride-day-and-weather))

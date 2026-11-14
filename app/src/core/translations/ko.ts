@@ -3521,6 +3521,12 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "아직 아무도 참가하지 않아 나가면 라이드가 취소됩니다.",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "{rideName}에 그대로 참여 중입니다. 홈이나 라이드 페이지에서 언제든 돌아오세요.",
   "Done with this ride? Leaving takes you off it for good.": "이 라이드는 끝났나요? 나가면 완전히 빠집니다.",
+  "{day} Ride": "{day} 라이드",
+  "Where You Are Now": "현재 위치",
+  "Who Can Join": "참가할 수 있는 사람",
+  "Friends I Invite": "내가 초대한 친구",
+  "More Options": "옵션 더 보기",
+  "Route, vehicles, rider limits, invite code, groups and details": "경로, 차량, 인원 제한, 초대 코드, 그룹 및 세부 정보",
 };
 
 export default dict;

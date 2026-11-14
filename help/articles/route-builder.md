@@ -4,7 +4,7 @@ summary: Tap the map to lay down your ride's route. It snaps to trails for you, 
 category: routes-maps
 order: 10
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-14
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/app/r/[code].tsx
@@ -55,6 +55,10 @@ The ride's organizer and any co-organizers can build or change the route, until 
 ## Open the Route Builder
 
 When you create a ride and pick **Mapped** under **The Route**, the route builder opens as soon as the ride is created.
+
+:::release 3.2
+From 3.2, **The Route** is under **More Options** on Create a Ride, and it starts on **Freeride**.
+:::
 
 To open it later:
 

@@ -4,7 +4,7 @@ summary: Give your ride, riding group or friend link a code that's easy to say, 
 category: joining
 order: 32
 release: "1.0.3"
-updated: 2026-11-10
+updated: 2026-11-14
 sources:
   - app/src/core/share-code.ts
   - app/src/components/share-code-field.tsx
@@ -39,6 +39,10 @@ As you type, OnMyLead checks the code. A green **Available** means you can use i
 
 - **When you create it:** under **Invite Code**, type it in **Your Own Code (Optional)**. Leave it empty to get one made for you. See [Create a Ride](/help/create-a-ride).
 - **Later:** on the ride's invite card, tap **Choose Your Own Code**, type the new code and tap **Save Code**. Only the ride's organizers see this, and only before the ride ends.
+
+:::release 3.2
+From 3.2, **Invite Code** is under **More Options** on Create a Ride.
+:::
 
 On a private ride, anyone with the code can join, so pick one that's hard to guess.
 
